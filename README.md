@@ -1,83 +1,50 @@
-# Official components for Angular
-[![npm version](https://badge.fury.io/js/%40angular%2Fcdk.svg)](https://www.npmjs.com/package/@angular/cdk)
-[![Build status](https://circleci.com/gh/angular/components.svg?style=svg)](https://circleci.com/gh/angular/components)
-[![Gitter](https://badges.gitter.im/angular/components.svg)](https://gitter.im/angular/material2?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+# ngx-material-legacy
 
-The Angular team builds and maintains both common UI components and tools to help you build your
-own custom components. The team maintains several npm packages.
+A community continuation of Angular Material's removed legacy component APIs for supported current Angular, Angular Material and CDK releases.
 
-| Package                   | Description                                                                         | Docs             |
-| ------------------------- | ----------------------------------------------------------------------------------- | ---------------- |
-| `@angular/cdk`            | Library that helps you author custom UI components with common interaction patterns | [Docs][cdk-docs] |
-| `@angular/material`       | [Material Design][] UI components for Angular applications                          | [Docs][mat-docs] |
-| `@angular/google-maps`    | Angular components built on top of the [Google Maps JavaScript API][]               | [Docs][map-docs] |
-| `@angular/youtube-player` | Angular component built on top of the [YouTube Player API][]                        | [Docs][ytp-docs] |
+**Status: under development; not yet released. No compatibility guarantee yet.**
 
+| Item | Value |
+| --- | --- |
+| Package | `@ngx-compat/material-legacy` |
+| Repository | [`buu700/ngx-compat-material-legacy`](https://github.com/buu700/ngx-compat-material-legacy) |
+| Historical baseline | `angular/components` tag `16.2.14`, preserved as git tag `baseline/angular-components-16.2.x` |
 
-#### Quick links
-[Documentation, demos, and guides][mat-docs] |
-[Frequently Asked Questions](FAQ.md) |
-[Community Google group](https://groups.google.com/forum/#!forum/angular-material2) |
-[Contributing](https://github.com/angular/components/blob/main/CONTRIBUTING.md) |
-[StackBlitz Template](https://stackblitz.com/fork/components-issue)
+Publication, npm ownership, and long-term stewardship under ngx-compat are not claimed until they are actually authorized. Do not treat this README as a release announcement.
 
-## Getting started
+## Purpose
 
-See our [Getting Started Guide][getting-started] if you're building your first project with Angular
-Material.
+Preserve legacy component APIs, meaningful DOM/classes and historical Sass usage without requiring consumers to redesign a mature interface. Current Material/CDK remain peers and provide public shared infrastructure. Ordinary/current components continue to use official `@angular/material/*` imports. This is not a copy or mirror of current Material and does not preserve every ordinary component's Material-16 visuals.
 
+**Out of scope:** Cyph application work, Flex Layout, consumer app migrations, and inventing fake pass/badge claims.
 
-## Contributing
+## Planned migration shape
 
-If you'd like to contribute, please follow our [contributing guidelines][contributing]. Please see
-our [`help wanted`][help-wanted] label for a list of issues with good opportunities for
-contribution.
+```ts
+import {MatLegacySelectModule}
+  from '@ngx-compat/material-legacy/legacy-select';
+import {MatDatepickerModule} from '@angular/material/datepicker';
+```
 
-## What we're working on now (Q2 2023):
-* Investigating and fixing reported regressions for the new components launched in v15
-* Creating a new more flexible theming API in collaboration with [MDC Web](https://github.com/material-components/material-components-web/)
-* Continuing to focus on improving the accessibility of Angular Material components
-* Improving the performance of our components in large applications
+```scss
+@use '@ngx-compat/material-legacy' as mat;
+// Keep supported historical palette/theme/mixin expressions unchanged.
+```
 
-## About the team
-The Angular Components team is part of the Angular team at Google. The team includes both Google
-employees and community contributors from around the globe.
+The root Sass facade independently preserves the Material-16 M2 palette/theme/typography model and old names; it does not forward today's namespace wholesale or depend on upstream deprecated M2/backcompat Sass. A packaged migration schematic and peer-light pre-upgrade CLI are planned. Do not treat these planned commands as a published release until the support matrix and artifacts exist.
 
-Our team has two primary goals:
-* Build high-quality UI components that developers can drop into existing applications 
-* Provide tools that help developers build their own custom components with common interaction
-patterns
+Legacy Angular Animations is not part of the target runtime. Component behavior is migrated internally; direct consumers of removed engine-bound recipe exports receive explicit tested migration examples. No fabricated no-op API replacements.
 
+## Compatibility and contribution
 
-What do we mean by "high-quality" components?
-* Internationalized and accessible so that all users can use them.
-* Straightforward APIs that don't confuse developers.
-* Behave as expected across a wide variety of use-cases without bugs.
-* Behavior is well-tested with both unit and integration tests.
-* Customizable within the bounds of the Material Design specification.
-* Performance cost is minimized.
-* Code is clean and well-documented to serve as an example for Angular developers.
+Support only version combinations published in the tested matrix once that matrix exists. Build success alone is not visual parity. Contributions require preserved tests, provenance and explicit API/CSS exception review. No guaranteed response time or enterprise support is implied. See `CONTRIBUTING.md`, `SECURITY.md`, and `AGENTS.md`.
 
-## Browser and screen reader support
-The Angular Components team supports the most recent two versions of all major browsers:
-Chrome (including Android), Firefox, Safari (including iOS), and  Edge.
+## Origin and license
 
-We aim for great user experience with the following screen readers:
-* **Windows**: NVDA and JAWS with FF / Chrome.
-* **macOS**: VoiceOver with Safari / Chrome.
-* **iOS**: VoiceOver with Safari
-* **Android**: Android Accessibility Suite (formerly TalkBack) with Chrome.
-* **Chrome OS**: ChromeVox with Chrome.
+Derived from `angular/components` tag `16.2.14`, with history preserved (baseline tag `baseline/angular-components-16.2.x`). MIT licensed. Google copyright is retained, followed by Copyright (c) 2026 Ryan Lester. See `LICENSE`. This community continuation is not an official Angular/Google release or endorsement.
 
+## Planned release/support model
 
-[Material Design]: https://material.io
-[Google Maps JavaScript API]: https://developers.google.com/maps/documentation/javascript/tutorial
-[YouTube Player API]: https://developers.google.com/youtube/iframe_api_reference
-[MDC Web]: https://github.com/material-components/material-components-web/
-[cdk-docs]: https://material.angular.io/cdk/categories
-[mat-docs]: https://material.angular.io
-[map-docs]: https://github.com/angular/components/blob/main/src/google-maps/README.md
-[ytp-docs]: https://github.com/angular/components/blob/main/src/youtube-player/README.md
-[getting-started]: https://material.angular.io/guide/getting-started
-[contributing]: https://github.com/angular/components/blob/main/CONTRIBUTING.md
-[help-wanted]: https://github.com/angular/components/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22
+Package major follows Angular major. `main` tracks the active Angular line; a numbered maintenance branch tracks the immediately preceding supported/LTS major. Initial intended lines are 22.x (active) and 21.x (LTS), with RCs before stable releases. Exact peer minimums are published from the tested matrix and may be raised for security fixes.
+
+Historical M2 source-compatible consumers keep their old Sass expressions under this package's namespace. Mixed-generation applications theme current Material with M3 and use the owned-only M2 aggregate for legacy controls, without emitting M2 bridges for current controls. A native M3/system-token theme for legacy controls is optional future scope, not part of the first-stable promise.
