@@ -1,0 +1,40 @@
+// W07 theme coexistence: M2 legacy facade + current Material in one stylesheet.
+// Compiles against packed @ngx-compat/material-legacy + @angular/material peers.
+@use 'sass:map';
+@use '@ngx-compat/material-legacy' as legacy;
+@use '@angular/material' as mat;
+
+$primary: legacy.define-palette(legacy.$deep-purple-palette, 800);
+$accent: legacy.define-palette(legacy.$amber-palette, A200, A100, A400);
+$warn: legacy.define-palette(legacy.$red-palette);
+$theme: legacy.define-light-theme((
+  color: (
+    primary: $primary,
+    accent: $accent,
+    warn: $warn,
+  ),
+  typography: legacy.define-typography-config(),
+  density: 0,
+));
+
+@include legacy.core();
+@include legacy.all-legacy-component-themes($theme);
+
+// Current Material (M3-capable) system theme coexistence — does not claim
+// M3 theming of legacy controls; only proves both stacks can emit CSS together.
+html {
+  @include mat.theme((
+    color: (
+      theme-type: light,
+      primary: mat.$azure-palette,
+      tertiary: mat.$blue-palette,
+    ),
+    typography: Roboto,
+    density: 0,
+  ));
+}
+
+.coexist-marker {
+  // Owned legacy primary deep-purple 800 observation aid
+  color: legacy.get-color-from-palette($primary);
+}

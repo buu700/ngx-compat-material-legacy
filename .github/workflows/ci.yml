@@ -74,3 +74,24 @@ jobs:
           node --check scripts/build-migrate-legacy-cli.mjs
           node --check scripts/migrate-legacy-cli.mjs
           node scripts/build-migrate-legacy-cli.mjs --verify
+
+      - name: Motion lifecycle smoke (MATERIAL_ANIMATIONS helper)
+        run: node scripts/motion-lifecycle-smoke.mjs
+
+  packed-consumer-aot:
+    name: Packed-consumer AOT and harness
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Setup Node from .node-version
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version-file: .node-version
+          package-manager-cache: false
+
+      - name: Packed-consumer AOT + harness smoke
+        run: node scripts/packed-consumer-aot-smoke.mjs
+
