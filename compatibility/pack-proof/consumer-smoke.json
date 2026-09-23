@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "captured_at": "2026-09-23T17:25:59.924205-04:00",
+  "captured_at": "2026-09-23T17:33:52.505620-04:00",
   "tarball": {
     "path": "compatibility/pack-proof/ngx-compat-material-legacy-22.0.0-rc.0.tgz",
-    "sha256": "483fa1abfa10d4c8b07ef12d27db207b62b9929f221bfb4d6081c87942f088a7",
-    "size": 223171,
+    "sha256": "768b5624c731657cdf9372e981973710dcd845a95d38503035532dc042073143",
+    "size": 375118,
     "package": "@ngx-compat/material-legacy@22.0.0-rc.0"
   },
   "consumer": {
-    "dir": "/tmp/ngx-material-legacy-consumer-smoke5",
+    "dir": "/tmp/ngx-material-legacy-consumer-smoke7",
     "committed": false,
     "peers": [
       "@angular/*@22.1.7",
@@ -19,11 +19,17 @@
   },
   "sass_smoke": {
     "status": "ok",
-    "fixture": "deep-purple 800 + legacy-form-field/input/select themes",
+    "fixture": "deep-purple 800 + card/checkbox/radio/slide-toggle/progress themes",
     "expected_default": "#4527a0",
-    "css_bytes": 6044,
+    "css_bytes": 34091,
     "has_form_field": true,
-    "has_select": true
+    "has_select": true,
+    "has_card": true,
+    "has_checkbox": true,
+    "has_radio": true,
+    "has_slide_toggle": true,
+    "has_progress_bar": true,
+    "has_progress_spinner": true
   },
   "esm_smoke": {
     "status": "ok",
@@ -32,12 +38,21 @@
       "@ngx-compat/material-legacy/legacy-form-field",
       "@ngx-compat/material-legacy/legacy-input",
       "@ngx-compat/material-legacy/legacy-core",
-      "@ngx-compat/material-legacy/legacy-select"
+      "@ngx-compat/material-legacy/legacy-select",
+      "@ngx-compat/material-legacy/legacy-card",
+      "@ngx-compat/material-legacy/legacy-checkbox",
+      "@ngx-compat/material-legacy/legacy-radio",
+      "@ngx-compat/material-legacy/legacy-slide-toggle",
+      "@ngx-compat/material-legacy/legacy-slider",
+      "@ngx-compat/material-legacy/legacy-progress-bar",
+      "@ngx-compat/material-legacy/legacy-progress-spinner",
+      "@ngx-compat/material-legacy/legacy-button/testing"
     ]
   },
   "notes": [
-    "Overlay cross-section ports: legacy-form-field, legacy-input, legacy-core (option), legacy-select.",
-    "Select owns Material-16 _MatSelectBase and option bases; shared MAT_* tokens remain on @angular/material peers.",
-    "Live SCSS styleUrls for component styles; theme mixins resolve from packed Sass facade."
+    "Packed: button(+testing), form-field, input, core, select, card, checkbox, radio, slide-toggle, slider, progress-bar, progress-spinner.",
+    "legacy-button/testing owns LegacyButtonVariant/LegacyButtonHarnessFilters.",
+    "Remaining: dialog, menu, autocomplete, list, chips, table, paginator, tabs, snack-bar, tooltip (+ testing).",
+    "Dialog deferred: needs owned _MatDialogBase/_MatDialogContainerBase/matDialogAnimations/_defaultParams."
   ]
 }

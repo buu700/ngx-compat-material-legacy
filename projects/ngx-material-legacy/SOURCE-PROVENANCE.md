@@ -37,3 +37,13 @@ See `compatibility/inventories/sass-facade-copy-manifest.json`.
   abstract bases were removed from Angular Material 22; presentation SCSS from
   historical legacy sources; `MAT_SELECT_*` tokens that still exist remain on
   `@angular/material/select`.
+
+## Selection / chrome ports (2026-09-23)
+
+- `legacy-card`, `legacy-progress-bar`, `legacy-progress-spinner`: adapted with owned
+  `mixinColor` / `MatCommonModule`, `standalone: false`, live SCSS `styleUrls`.
+- `legacy-checkbox`, `legacy-radio`, `legacy-slide-toggle`: owned Material-16 bases and
+  required validators removed from Angular Material 22; shared `MAT_*` tokens remain
+  on `@angular/material/*` peers.
+- `legacy-button/testing`: secondary harness entry with owned historical
+  `LegacyButtonVariant` / `LegacyButtonHarnessFilters`.
