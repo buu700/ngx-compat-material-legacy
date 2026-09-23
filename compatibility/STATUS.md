@@ -18,7 +18,7 @@ Package `@ngx-compat/material-legacy@22.0.0-rc.0` on `main`
 | W10 21.x line | **Done (bootstrap+pack on branch)** | See `21.x` / `pack-proof-21/` — not merged to main |
 | `src/` mass-delete | **Blocked** | Shared-core / companions |
 | Full animation engine removal | **Blocked** | Needs CSS/WAAPI migrations |
-| CI green | **Pending tip** | |
+| CI green | **Done** | https://github.com/buu700/ngx-compat-material-legacy/actions/runs/35934292271 on `5f1a44afd` |
 
 ## Motion
 
