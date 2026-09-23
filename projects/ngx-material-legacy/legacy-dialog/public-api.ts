@@ -24,11 +24,10 @@ export {
 } from './dialog-content-directives';
 export {MatLegacyDialogRef, _closeDialogVia as _closeLegacyDialogVia} from './dialog-ref';
 export {MatLegacyDialogConfig} from './dialog-config';
-export {
-  matDialogAnimations as matLegacyDialogAnimations,
-  _defaultParams,
-  defaultParams,
-} from './dialog-animations';
+export {_defaultParams, defaultParams} from './dialog-animation-params';
+// Historical AnimationTriggerMetadata recipes moved to
+// `@ngx-compat/material-legacy/legacy-dialog/animations` so the primary
+// dialog FESM does not require `@angular/animations` at runtime.
 export {
   /**
    * @deprecated Use `_MatDialogBase` from the package internals / historical docs.

@@ -1,14 +1,8 @@
 /**
- * @license
- * Copyright Google LLC All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- *
- * Owned Material-16 dialog animation metadata (removed from Angular Material 22).
- * Preserves historical trigger API; `@angular/animations` remains an optional peer.
+ * Optional Angular animation recipes for legacy dialog.
+ * Import only when you need historical `AnimationTriggerMetadata` objects;
+ * the primary dialog container uses CSS + timers and does not load this entry.
  */
-
 import {
   animate,
   animateChild,
@@ -21,20 +15,12 @@ import {
   trigger,
 } from '@angular/animations';
 
-/**
- * Default parameters for the animation for backwards compatibility.
- * @docs-private
- */
+/** @docs-private */
 export const _defaultParams = {
   params: {enterAnimationDuration: '150ms', exitAnimationDuration: '75ms'},
 };
 
-/**
- * Alias used by the legacy dialog container template binding.
- * @docs-private
- * @deprecated Use `_defaultParams` instead.
- * @breaking-change 17.0.0
- */
+/** @docs-private @deprecated Use `_defaultParams` instead. */
 export const defaultParams = _defaultParams;
 
 /**
@@ -44,11 +30,7 @@ export const defaultParams = _defaultParams;
 export const matDialogAnimations: {
   readonly dialogContainer: AnimationTriggerMetadata;
 } = {
-  /** Animation that is applied on the dialog container by default. */
   dialogContainer: trigger('dialogContainer', [
-    // Note: The `enter` animation transitions to `transform: none`, because for some reason
-    // specifying the transform explicitly, causes IE both to blur the dialog content and
-    // decimate the animation performance. Leaving it as `none` solves both issues.
     state('void, exit', style({opacity: 0, transform: 'scale(0.7)'})),
     state('enter', style({transform: 'none'})),
     transition(
@@ -72,3 +54,5 @@ export const matDialogAnimations: {
     ),
   ]),
 };
+
+export {matDialogAnimations as matLegacyDialogAnimations};

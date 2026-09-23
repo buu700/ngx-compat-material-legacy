@@ -33,7 +33,7 @@ const targets = {
   menuAnims: read('projects/ngx-material-legacy/legacy-menu/menu-animations.ts'),
   selectAnims: read('projects/ngx-material-legacy/legacy-select/select-animations.ts'),
   formFieldAnims: read('projects/ngx-material-legacy/legacy-form-field/form-field-animations.ts'),
-  snackAnims: read('projects/ngx-material-legacy/legacy-snack-bar/snack-bar-animations.ts'),
+  snackAnims: read('projects/ngx-material-legacy/legacy-snack-bar/animations/index.ts'),
 };
 
 const errors = [];
@@ -49,7 +49,8 @@ if (!helper.includes('legacyAnimationTriggerState')) {
 const checks = {
   helper_uses_public_MATERIAL_ANIMATIONS: true,
   helper_avoids_private_Material_helpers: !privateRe.test(helper),
-  dialog_zero_duration_when_disabled: targets.dialog.includes('LEGACY_ZERO_ANIMATION_PARAMS'),
+  dialog_zero_duration_when_disabled: targets.dialog.includes('_animationsEnabled') &&
+    targets.dialog.includes('legacyAnimationsDisabled'),
   menu_parameterized_and_wired:
     targets.menuAnims.includes('{{enterDuration}}') &&
     targets.menu.includes('_getPanelAnimationState') &&
@@ -62,13 +63,17 @@ const checks = {
     targets.formFieldAnims.includes('{{transitionDuration}}') &&
     targets.formField.includes('_getSubscriptAnimationState') &&
     targets.formFieldHtml.includes('_getSubscriptAnimationState()'),
-  snack_bar_parameterized_and_wired:
-    targets.snackAnims.includes('{{enterDuration}}') &&
-    targets.snackBar.includes('_getAnimationState'),
+  snack_bar_css_motion:
+    targets.snackBar.includes('mat-snack-bar-container-enter') &&
+    targets.snackBar.includes('_animationsEnabled') &&
+    !targets.snackBar.includes('animations:') &&
+    targets.snackAnims.includes('matSnackBarAnimations'),
   tabs_zero_duration_when_disabled:
     targets.tabs.includes('legacyAnimationsDisabled') &&
     targets.tabs.includes("? '0ms'"),
-  dialog_retains_trigger_metadata: targets.dialog.includes('matDialogAnimations'),
+  dialog_uses_css_motion: targets.dialog.includes('mat-legacy-dialog-container-open') &&
+    !targets.dialog.includes('animations:') &&
+    read('projects/ngx-material-legacy/legacy-dialog/animations/index.ts').includes('matDialogAnimations'),
   menu_retains_trigger_metadata: targets.menuAnims.includes('trigger('),
   tooltip_uses_css_not_engine_in_component: !read(
     'projects/ngx-material-legacy/legacy-tooltip/tooltip.ts',
@@ -89,16 +94,16 @@ const result = {
   checks,
   errors,
   remaining_engine_bindings: [
-    'Owned @angular/animations trigger metadata retained for dialog/menu/select/form-field/snack-bar/tabs (and exported tooltip recipes).',
-    'Optional @angular/animations peer still required for those recipes until CSS/WAAPI replacements land.',
-    'Tooltip runtime uses CSS classes (_showAnimation/_hideAnimation), not component animations metadata.',
+    'Primary FESM still imports @angular/animations for: menu, select, form-field, tabs (component trigger metadata).',
+    'Optional recipe-only secondary entries (import peer only if used): legacy-dialog/animations, legacy-snack-bar/animations, legacy-tooltip/animations.',
+    'Dialog + snack-bar + tooltip primary runtime use CSS/timers/keyframes — no engine import on those primary FESMs.',
   ],
   artifacts: {
     helper_sha256: sha256(helper),
   },
   notes: [
-    'Maximum safe incremental step: parameterized durations + MATERIAL_ANIMATIONS-aware 0ms paths on dialog/menu/select/form-field/snack-bar/tabs.',
-    'Full engine removal remains deferred; do not delete trigger APIs without tested CSS/WAAPI migrations.',
+    'Dialog/snack-bar migrated to Material-22-style CSS motion; recipes opt-in via /animations secondary entries.',
+    'Menu/select/form-field/tabs still bind Angular animation triggers on primary entries.',
   ],
 };
 

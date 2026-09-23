@@ -23,7 +23,7 @@ import {CdkPortalOutlet, TemplatePortal} from '@angular/cdk/portal';
 import {Direction, Directionality} from '@angular/cdk/bidi';
 import {Subject, Subscription} from 'rxjs';
 import {distinctUntilChanged, startWith} from 'rxjs/operators';
-import {AnimationEvent} from '@angular/animations';
+import type {AnimationEvent} from '@angular/animations';
 import {legacyAnimationsDisabled} from '@ngx-compat/material-legacy/legacy-core';
 
 /**

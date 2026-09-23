@@ -22,7 +22,7 @@ import {
   TemplateRef,
   ViewChild,
 } from '@angular/core';
-import {AnimationEvent} from '@angular/animations';
+import type {AnimationEvent} from '@angular/animations';
 import {ActiveDescendantKeyManager} from '@angular/cdk/a11y';
 import {BooleanInput, coerceBooleanProperty, coerceStringArray} from '@angular/cdk/coercion';
 import {Platform} from '@angular/cdk/platform';

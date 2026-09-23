@@ -30,7 +30,7 @@ import {
   OnInit,
   ChangeDetectorRef,
 } from '@angular/core';
-import {AnimationEvent} from '@angular/animations';
+import type {AnimationEvent} from '@angular/animations';
 import {
   legacyAnimationTriggerState,
   legacyAnimationsDisabled,

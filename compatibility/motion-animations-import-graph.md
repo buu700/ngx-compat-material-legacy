@@ -1,57 +1,49 @@
 # Remaining `@angular/animations` import graph (honest)
 
-Captured **2026-09-23** on library source under `projects/ngx-material-legacy/`.
-Full peer / recipe removal is **still blocked**. Do not fake empty trigger metadata.
+Captured **2026-09-23** after CSS-motion wave for dialog / snack-bar / tooltip.
 
-## Source files (12)
+## Primary FESM — real `from '@angular/animations'` imports
 
-| File | Import kind | Why retained |
-| --- | --- | --- |
-| `legacy-dialog/dialog-animations.ts` | value (`trigger`/`animate`/…) | Owned `[@dialogContainer]` recipe |
-| `legacy-dialog/dialog-container.ts` | `AnimationEvent` (handler params) | Bound to recipe `@.done` / `@.start` |
-| `legacy-menu/menu-animations.ts` | value | Owned menu panel / fade recipes |
-| `legacy-menu/internal/menu-base.ts` | `AnimationEvent` | Panel animation subjects / handlers |
-| `legacy-select/select-animations.ts` | value | Owned panel transform recipes |
-| `legacy-form-field/form-field-animations.ts` | value | Owned subscript message recipe |
-| `legacy-snack-bar/snack-bar-animations.ts` | value | Owned enter/exit recipe |
-| `legacy-snack-bar/internal/snack-bar-container-base.ts` | `AnimationEvent` | `onAnimationEnd` |
-| `legacy-tabs/tabs-animations.ts` | value | Owned translate-tab recipe |
-| `legacy-tabs/internal/tab-body-base.ts` | `AnimationEvent` | `_translateTabComplete` stream |
-| `legacy-tooltip/tooltip-animations.ts` | value | **Exported API** `matLegacyTooltipAnimations` only — runtime tooltip uses CSS |
-| `legacy-autocomplete/internal/autocomplete-base.ts` | `AnimationEvent` (type shape) | Abstract `_animationDone`; legacy sets `null` (no runtime engine) |
+| FESM entry | Status |
+| --- | --- |
+| `legacy-dialog` | **Removed** (CSS + timers; Material 22-style) |
+| `legacy-snack-bar` | **Removed** (CSS keyframes + fallbacks) |
+| `legacy-tooltip` | **Removed** (runtime was already CSS; recipe moved) |
+| `legacy-menu` | **Still required** — component `animations:` + recipe |
+| `legacy-select` | **Still required** |
+| `legacy-form-field` | **Still required** |
+| `legacy-tabs` | **Still required** |
 
-## Packed FESM entries that still import `@angular/animations` (21.0.0-rc.0)
+## Opt-in recipe secondary entries (peer only if imported)
 
-- `fesm2022/ngx-compat-material-legacy-legacy-dialog.mjs`
-- `fesm2022/ngx-compat-material-legacy-legacy-form-field.mjs`
-- `fesm2022/ngx-compat-material-legacy-legacy-menu.mjs`
-- `fesm2022/ngx-compat-material-legacy-legacy-select.mjs`
-- `fesm2022/ngx-compat-material-legacy-legacy-snack-bar.mjs`
-- `fesm2022/ngx-compat-material-legacy-legacy-tabs.mjs`
-- `fesm2022/ngx-compat-material-legacy-legacy-tooltip.mjs` (via exported recipe re-export)
+| Entry | Export |
+| --- | --- |
+| `legacy-dialog/animations` | `matDialogAnimations` / `matLegacyDialogAnimations` |
+| `legacy-snack-bar/animations` | `matSnackBarAnimations` / `matLegacySnackBarAnimations` |
+| `legacy-tooltip/animations` | `matLegacyTooltipAnimations` |
 
-`legacy-autocomplete` does **not** appear in the packed animations importer list (type usage erased).
+These still import `@angular/animations` (real `AnimationTriggerMetadata`). Historical
+primary-path recipe re-exports were **removed** so primary FESMs stay peer-free.
 
-## What is already reduced
+## Source files still importing the engine (primary path)
 
-- Disable helper: `legacyAnimationsDisabled()` / `MATERIAL_ANIMATIONS` → 0ms params on dialog, menu, select, form-field, snack-bar, tabs.
-- Tooltip **runtime** path is CSS classes; `_animationsDisabled` honors the same helper.
-- Optional peer `@angular/animations` remains advertised because the seven recipe entries above ship real `AnimationTriggerMetadata`.
+| File | Kind |
+| --- | --- |
+| `legacy-menu/menu-animations.ts` | value recipes |
+| `legacy-menu/internal/menu-base.ts` | `import type {AnimationEvent}` |
+| `legacy-select/select-animations.ts` | value recipes |
+| `legacy-form-field/form-field-animations.ts` | value recipes |
+| `legacy-tabs/tabs-animations.ts` | value recipes |
+| `legacy-tabs/internal/tab-body-base.ts` | `import type {AnimationEvent}` |
+| `legacy-autocomplete/internal/autocomplete-base.ts` | `import type {AnimationEvent}` (erased; no FESM import) |
 
-## What would unblock full peer removal
+## Peer status
 
-1. Replace each owned recipe with CSS or Web Animations API equivalents **and** keep public trigger names or ship a documented breaking migration.
-2. Stop re-exporting `matLegacyTooltipAnimations` from `legacy-tooltip` **or** move it to a secondary entry consumers opt into (mild API path break).
-3. Replace `AnimationEvent` handler contracts with local event shapes where still needed after (1).
+- `peerDependenciesMeta["@angular/animations"].optional = true` (unchanged)
+- **Truly optional for consumers** who only use dialog / snack-bar / tooltip / non-animated entries
+- **Still required at runtime** if importing menu / select / form-field / tabs primary entries, or any `/animations` recipe entry
 
-Until then: optional peer stays; inspector flags expected. See `motion-overlay-trio.md`.
+## Pack note
 
-## Pass notes (2026-09-23)
-
-- Considered converting `AnimationEvent`-only imports to `import type` (autocomplete,
-  dialog-container, menu-base, snack-bar-container-base, tab-body-base). **Not landed**
-  this wave: local `ng-packagr` on this host already fails on unrelated
-  `strictPropertyInitialization` in `legacy-core` before those files compile; do not
-  ship source hygiene without a green pack.
-- Tooltip recipe split to opt-in secondary entry: deferred (API path change).
-- Full peer removal: still blocked on the seven recipe FESM entries above.
+Always build with `node scripts/pack-library.mjs` (passes `-c tsconfig.lib.json`).
+Bare `ng-packagr -p …` without `-c` uses ng-packagr's default tsconfig and fails TS2564.

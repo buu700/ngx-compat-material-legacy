@@ -10,7 +10,8 @@ export {MatLegacySnackBarModule} from './snack-bar-module';
 export {MatLegacySnackBar} from './snack-bar';
 export {MatLegacySnackBarContainer} from './snack-bar-container';
 export {LegacySimpleSnackBar, LegacyTextOnlySnackBar} from './simple-snack-bar';
-export {matSnackBarAnimations as matLegacySnackBarAnimations} from './snack-bar-animations';
+// Historical AnimationTriggerMetadata recipes moved to
+// `@ngx-compat/material-legacy/legacy-snack-bar/animations`.
 export {
   /**
    * @deprecated Use `MatSnackBarRef` from `@angular/material/snack-bar` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.

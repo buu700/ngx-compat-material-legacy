@@ -239,10 +239,19 @@ Object.defineProperty(globalThis, 'navigator', {
 (globalThis as any).Event = win.Event;
 (globalThis as any).KeyboardEvent = win.KeyboardEvent;
 (globalThis as any).MouseEvent = win.MouseEvent;
+(globalThis as any).AnimationEvent = win.AnimationEvent;
+(globalThis as any).CSS = win.CSS || {supports: () => false};
+(globalThis as any).ResizeObserver =
+  win.ResizeObserver ||
+  class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
 
 import 'zone.js';
 import '@angular/compiler';
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {
   BrowserDynamicTestingModule,
   platformBrowserDynamicTesting,
@@ -250,12 +259,20 @@ import {
 import {getTestBed, TestBed} from '@angular/core/testing';
 import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
 import {provideNoopAnimations} from '@angular/platform-browser/animations';
+import {OverlayContainer} from '@angular/cdk/overlay';
 import {MatLegacyButtonModule} from '@ngx-compat/material-legacy/legacy-button';
 import {MatLegacyButtonHarness} from '@ngx-compat/material-legacy/legacy-button/testing';
 import {MatLegacyFormFieldModule} from '@ngx-compat/material-legacy/legacy-form-field';
 import {MatLegacySelectModule} from '@ngx-compat/material-legacy/legacy-select';
 import {MatLegacySelectHarness} from '@ngx-compat/material-legacy/legacy-select/testing';
-import {MatLegacyDialogModule} from '@ngx-compat/material-legacy/legacy-dialog';
+import {MatLegacyDialog, MatLegacyDialogModule} from '@ngx-compat/material-legacy/legacy-dialog';
+import {MatLegacyDialogHarness} from '@ngx-compat/material-legacy/legacy-dialog/testing';
+import {MatLegacyMenuModule} from '@ngx-compat/material-legacy/legacy-menu';
+import {MatLegacyMenuHarness} from '@ngx-compat/material-legacy/legacy-menu/testing';
+import {MatLegacySnackBar, MatLegacySnackBarModule} from '@ngx-compat/material-legacy/legacy-snack-bar';
+import {MatLegacySnackBarHarness} from '@ngx-compat/material-legacy/legacy-snack-bar/testing';
+import {MatLegacyTooltipModule} from '@ngx-compat/material-legacy/legacy-tooltip';
+import {MatLegacyTooltipHarness} from '@ngx-compat/material-legacy/legacy-tooltip/testing';
 
 getTestBed().initTestEnvironment(
   BrowserDynamicTestingModule,
@@ -264,11 +281,21 @@ getTestBed().initTestEnvironment(
 
 @Component({
   standalone: true,
+  imports: [MatLegacyDialogModule],
+  template: \`<div mat-dialog-content id="dlg">Hello dialog</div>\`,
+})
+class SmokeDialogContent {}
+
+@Component({
+  standalone: true,
   imports: [
     MatLegacyButtonModule,
     MatLegacyFormFieldModule,
     MatLegacySelectModule,
     MatLegacyDialogModule,
+    MatLegacyMenuModule,
+    MatLegacySnackBarModule,
+    MatLegacyTooltipModule,
   ],
   template: \`
     <button mat-button id="h">Go</button>
@@ -278,28 +305,117 @@ getTestBed().initTestEnvironment(
         <mat-option value="a">A</mat-option>
       </mat-select>
     </mat-form-field>
+    <button mat-button [matMenuTriggerFor]="menu" id="menu-trigger">Menu</button>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item id="menu-item">Item</button>
+    </mat-menu>
+    <button mat-button id="snack-open">Snack</button>
+    <button mat-button matTooltip="Tip text" id="tip">Hover</button>
   \`,
 })
-class HarnessHost {}
+class HarnessHost {
+  private readonly _dialog = inject(MatLegacyDialog);
+  private readonly _snack = inject(MatLegacySnackBar);
+
+  openDialog() {
+    return this._dialog.open(SmokeDialogContent, {width: '240px'});
+  }
+
+  openSnack() {
+    return this._snack.open('Snack message', 'Dismiss', {duration: 5000});
+  }
+}
+
+function sleep(ms: number) {
+  return new Promise<void>(r => setTimeout(r, ms));
+}
 
 async function main() {
   TestBed.configureTestingModule({
-    imports: [HarnessHost],
+    imports: [HarnessHost, SmokeDialogContent],
     providers: [provideNoopAnimations()],
   });
   const fixture = TestBed.createComponent(HarnessHost);
   fixture.detectChanges();
   const loader = TestbedHarnessEnvironment.loader(fixture);
-  const button = await loader.getHarness(MatLegacyButtonHarness);
+  const rootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
+
+  const button = await loader.getHarness(MatLegacyButtonHarness.with({selector: '#h'}));
   const text = await button.getText();
   const select = await loader.getHarness(MatLegacySelectHarness);
   const isOpen = await select.isOpen();
+
+  // Dialog open/close under NoopAnimations (CSS motion disabled path).
+  const dialogRef = fixture.componentInstance.openDialog();
+  fixture.detectChanges();
+  await sleep(30);
+  fixture.detectChanges();
+  const dialogHarness = await rootLoader.getHarness(MatLegacyDialogHarness);
+  const dialogText = await dialogHarness.getContentText();
+  dialogRef.close();
+  fixture.detectChanges();
+  await sleep(30);
+  fixture.detectChanges();
+  const dialogsAfter = await rootLoader.getAllHarnesses(MatLegacyDialogHarness);
+
+  // Menu open via harness.
+  const menu = await loader.getHarness(MatLegacyMenuHarness.with({selector: '#menu-trigger'}));
+  await menu.open();
+  fixture.detectChanges();
+  await sleep(20);
+  const menuOpen = await menu.isOpen();
+  await menu.close();
+  fixture.detectChanges();
+  await sleep(20);
+
+  // Snack-bar open under NoopAnimations.
+  fixture.componentInstance.openSnack();
+  fixture.detectChanges();
+  await sleep(40);
+  fixture.detectChanges();
+  const snack = await rootLoader.getHarness(MatLegacySnackBarHarness);
+  const snackText = await snack.getMessage();
+  await snack.dismissWithAction();
+  fixture.detectChanges();
+  await sleep(40);
+
+  // Tooltip show via harness.
+  const tip = await loader.getHarness(MatLegacyTooltipHarness.with({selector: '#tip'}));
+  await tip.show();
+  fixture.detectChanges();
+  await sleep(20);
+  const tipVisible = await tip.isOpen();
+  const tipText = tipVisible ? await tip.getTooltipText() : '';
+  await tip.hide();
+  fixture.detectChanges();
+
   const out = {
-    ok: text === 'Go' && isOpen === false,
+    ok:
+      text === 'Go' &&
+      isOpen === false &&
+      dialogText.includes('Hello dialog') &&
+      dialogsAfter.length === 0 &&
+      menuOpen === true &&
+      snackText.includes('Snack message') &&
+      tipVisible === true &&
+      tipText.includes('Tip text'),
     buttonText: text,
     selectIsOpen: isOpen,
-    harnesses: ['MatLegacyButtonHarness', 'MatLegacySelectHarness'],
-    dialogModuleLoaded: !!MatLegacyDialogModule,
+    dialogText,
+    dialogsAfterClose: dialogsAfter.length,
+    menuOpen,
+    snackText,
+    tipVisible,
+    tipText,
+    harnesses: [
+      'MatLegacyButtonHarness',
+      'MatLegacySelectHarness',
+      'MatLegacyDialogHarness',
+      'MatLegacyMenuHarness',
+      'MatLegacySnackBarHarness',
+      'MatLegacyTooltipHarness',
+    ],
+    animationsProvider: 'provideNoopAnimations',
   };
   console.log(JSON.stringify(out));
   if (!out.ok) {
@@ -349,7 +465,14 @@ main().catch(err => {
         result: parsed,
         stderr_tail: (harness.stderr || '').slice(-2000),
         stdout_tail: (harness.stdout || '').slice(-1000),
-        entries: ['legacy-button/testing', 'legacy-select/testing', 'legacy-dialog (module load)'],
+        entries: [
+          'legacy-button/testing',
+          'legacy-select/testing',
+          'legacy-dialog/testing',
+          'legacy-menu/testing',
+          'legacy-snack-bar/testing',
+          'legacy-tooltip/testing',
+        ],
       };
       if (result.harness.status !== 'ok') {
         result.errors.push('Harness runtime failed');

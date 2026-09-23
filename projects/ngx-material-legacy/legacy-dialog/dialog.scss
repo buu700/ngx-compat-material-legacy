@@ -74,3 +74,31 @@ $button-margin: 8px !default;
     }
   }
 }
+
+
+// CSS open/close motion (Material 22-style). Replaces Angular animation triggers
+// on the primary legacy-dialog entry so `@angular/animations` is not required.
+.mat-dialog-container {
+  opacity: 0;
+  transform: scale(0.7);
+  transition:
+    opacity var(--mat-legacy-dialog-exit-duration, 75ms) cubic-bezier(0.4, 0, 0.2, 1),
+    transform var(--mat-legacy-dialog-enter-duration, 150ms) cubic-bezier(0, 0, 0.2, 1);
+
+  &.mat-legacy-dialog-container-open,
+  &.mat-legacy-dialog-container-opening {
+    opacity: 1;
+    transform: none;
+  }
+
+  &.mat-legacy-dialog-container-closing {
+    opacity: 0;
+    transform: none;
+  }
+
+  &._mat-animation-noopable {
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+}

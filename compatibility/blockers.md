@@ -116,3 +116,13 @@ Branch `21.x` packs against aged Angular 21.2.23 / Material 21.2.14 with Sass/ES
 consumer smoke (`compatibility/pack-proof-21/`). Remaining: Node 20.19 matrix,
 broader harness coverage, owner publish to `lts-21-next`. Do not merge 21 lockfile
 into `main`.
+
+## Motion engine (updated 2026-09-23)
+
+| Area | Status |
+| --- | --- |
+| Pack without `-c tsconfig.lib.json` | **Fixed** via `scripts/pack-library.mjs` |
+| dialog / snack-bar / tooltip primary FESM | **Unblocked** (CSS motion; recipes opt-in) |
+| menu / select / form-field / tabs | **Still blocked** for full peer-free primary FESM |
+| `src/` mass-delete | **Still blocked** (shared-core companions) |
+

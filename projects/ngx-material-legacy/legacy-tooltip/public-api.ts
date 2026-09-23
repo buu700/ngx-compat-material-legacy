@@ -8,7 +8,8 @@
 
 export {MatLegacyTooltipModule} from './tooltip-module';
 export {MatLegacyTooltip, LegacyTooltipComponent} from './tooltip';
-export {matLegacyTooltipAnimations} from './tooltip-animations';
+// Historical AnimationTriggerMetadata recipe moved to
+// `@ngx-compat/material-legacy/legacy-tooltip/animations`.
 export {
   _MatTooltipBase as _MatLegacyTooltipBase,
   _TooltipComponentBase as _LegacyTooltipComponentBase,

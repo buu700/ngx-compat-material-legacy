@@ -60,3 +60,18 @@ See `motion-animations-import-graph.md` for the precise 12-file source list and
 can use `import type` (hygiene); **value** recipe imports cannot be removed without
 CSS/WAAPI replacements. Tooltip remaining coupling is the **exported** recipe
 re-export into `legacy-tooltip` FESM — not the runtime CSS show/hide path.
+
+## CSS-motion wave (2026-09-23)
+
+| Entry | Runtime motion | Recipe location |
+| --- | --- | --- |
+| `legacy-dialog` | CSS + timers (`mat-legacy-dialog-container-*`) | `legacy-dialog/animations` (opt-in) |
+| `legacy-snack-bar` | CSS keyframes + timeout fallbacks | `legacy-snack-bar/animations` (opt-in) |
+| `legacy-tooltip` | CSS classes (unchanged) | `legacy-tooltip/animations` (opt-in) |
+| `legacy-menu` / `select` / `form-field` / `tabs` | Still Angular trigger metadata on primary | Same primary entry |
+
+Primary-path recipe re-exports removed for dialog/snack-bar/tooltip (mild import-path
+break for the rare consumer of `matLegacy*Animations` from the primary entry).
+Disable path: `provideNoopAnimations()` / `MATERIAL_ANIMATIONS` still honored.
+Evidence: `pack-proof/motion-lifecycle-smoke.json`, expanded `aot-harness-smoke.json`.
+

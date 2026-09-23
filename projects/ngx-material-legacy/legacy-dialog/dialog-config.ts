@@ -7,7 +7,7 @@
  */
 
 import {MatDialogConfig as DialogConfigBase} from '@angular/material/dialog';
-import {_defaultParams} from './dialog-animations';
+import {_defaultParams} from './dialog-animation-params';
 
 /**
  * @deprecated Use `MatDialogConfig` from `@angular/material/dialog` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
