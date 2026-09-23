@@ -50,3 +50,9 @@ testing secondary entries pack. Schematics + bundled peer-light CLI live under
    `projects/ngx-material-legacy` and attach unresolved edges.
 3. Only then propose a narrowly scoped deletion PR with recorded provenance —
    prefer documenting over deleting if unsure.
+
+## Status check (2026-09-23 tip)
+
+Reconfirmed on tip: classification still stands; **no** `src/`
+deletion authorized. Unresolved relative stubs remain **68**; shared-core and
+ordinary companions remain blocked. Prefer documenting over deleting.

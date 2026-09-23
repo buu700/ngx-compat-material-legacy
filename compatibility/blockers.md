@@ -4,6 +4,12 @@
 Mitigated: push-triggered CI is now producing runs (e.g. success on
 `5f7740be`). Keep `workflow_dispatch` as a backup.
 
+## B-CI-02 — CLI `--verify` hash drift (mitigated)
+Committed CLI tarball bytes drifted from `compatibility/migrate-legacy-cli-artifact.json`
+after repository metadata updates inside the packaged files, so CI `--verify` failed.
+Mitigated by rebuilding the artifact + hash record and refreshing pack-proof
+consumer-smoke sha256. Keep watching Actions on follow-up pushes.
+
 ## B-PKG-03 — Schematics / remaining legacy entries incomplete
 **Mitigated for component scope + full historical testing + migrate-legacy + bundled CLI**:
 all `research/scope.json` `preserved_entry_points` pack (including `legacy-tabs`).

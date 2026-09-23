@@ -12,12 +12,12 @@ Snapshot for handoff gates. Package `@ngx-compat/material-legacy@22.0.0-rc.0`
 | Historical `*/testing` secondary entries | **Done** | **22/22** pack; ESM smoke 44 imports OK |
 | Sass root facade + theme smoke | **Done** | `#4527a0` deep-purple 800; component class markers present |
 | `migrate-legacy` schematic (real rewrites) | **Done** | Fixtures **25/25**; Sass `@use` + safe TS `legacy-*` + acknowledgement paths |
-| Peer-light pre-upgrade CLI (bundled artifact) | **Done** | `migration/dist/*.tgz`; sha256 in `compatibility/migrate-legacy-cli-artifact.json`; Node `>=18`; no Angular peers |
+| Peer-light pre-upgrade CLI (bundled artifact) | **Done** | `migration/dist/*.tgz`; sha256 in `compatibility/migrate-legacy-cli-artifact.json` recorded and verified with `node scripts/build-migrate-legacy-cli.mjs --verify` green; Node `>=18`; no Angular peers |
 | Companion/aggregate/current acknowledgement flows | **Done** | Shared engine flags; CLI + schematic; fixtures cover acked + unacked paths |
 | Escape-edge classification (no mass-delete) | **Done (docs)** | `compatibility/inventories/escape-edge-classification.json` + `src-cleanup-plan.md` |
 | Pack + inspect | **Done (expected flags)** | `compatibility/pack-proof/`; inspector still flags animation peer/refs |
 | License / provenance | **Done** | Google MIT notice + Copyright (c) 2026 Ryan Lester |
-| CI green on push | **Watch** | Fixtures + CLI `--verify` in workflow; keep watching Actions |
+| CI green on push | **Watch** | Fixtures + CLI `--verify` in workflow; tip before this refresh failed `--verify` (stale CLI sha after repository metadata updates); re-push should clear |
 
 ## Testing matrix (`*/testing`)
 
@@ -66,6 +66,15 @@ Skipped: none — every historical inventory testing entry exists and packs.
 - Documented consumer path: public `MATERIAL_ANIMATIONS` / `animationsDisabled`
   (`migration/README.md`) — **no** breaking recipe removals this wave
 
+## This tip
+
+- Rebuilt bundled peer-light CLI tarball + `compatibility/migrate-legacy-cli-artifact.json`
+  so `node scripts/build-migrate-legacy-cli.mjs --verify` matches committed bytes.
+- Refreshed `compatibility/pack-proof/consumer-smoke.json` tarball sha256 after the
+  packed `package.json` repository metadata updates (no pack rebuild).
+- Acknowledgement flows and escape-edge inventory unchanged and still complete for RC-without-publish.
+- Motion: docs/incremental only; full `@angular/animations` engine removal still deferred.
+
 ## Left for maintainer publish (out of this RC-without-publish stream)
 
 1. Maintainer-authorized **npm publish** of `@ngx-compat/material-legacy@22.0.0-rc.0`
@@ -80,6 +89,6 @@ Skipped: none — every historical inventory testing entry exists and packs.
 ## Constraints (unchanged)
 
 - No Cyph in repo; Cyph-safe CSS/SCSS only.
-- Author/committer: Ryan Lester \<hacker@linux.com\>.
-- Auth for push: `GH_TOKEN` file + `ngx-git-push`.
+- Author/committer: Ryan Lester <hacker@linux.com> only (no Co-authored-by).
+- Auth for push: `GH_TOKEN` from token file + `/home/box/.local/bin/ngx-git-push`.
 - No npm publish from this workstream.
