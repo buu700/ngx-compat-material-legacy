@@ -1,0 +1,18 @@
+@use '@angular/material' as mat;
+@use 'sass:map';
+@use 'sass:meta';
+@if not map.has-key(mat.$green-palette, 700) { @error 'Historical M2 green hue 700 is required'; }
+.palette-values {
+  --green-map: #{meta.inspect(mat.$green-palette)};
+  --red-map: #{meta.inspect(mat.$red-palette)};
+  --gray-map: #{meta.inspect(mat.$gray-palette)};
+  --grey-map: #{meta.inspect(mat.$grey-palette)};
+  --amber-map: #{meta.inspect(mat.$amber-palette)};
+  --purple-map: #{meta.inspect(mat.$deep-purple-palette)};
+  --foreground-light: #{meta.inspect(mat.$light-theme-foreground-palette)};
+  --foreground-dark: #{meta.inspect(mat.$dark-theme-foreground-palette)};
+  --background-light: #{meta.inspect(mat.$light-theme-background-palette)};
+  --background-dark: #{meta.inspect(mat.$dark-theme-background-palette)};
+  color: map.get(mat.$green-palette, 700);
+  border-color: mat.get-color-from-palette(mat.define-palette(mat.$red-palette), 500, 0.45);
+}

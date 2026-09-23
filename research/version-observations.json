@@ -1,0 +1,93 @@
+{
+  "checked_on": "2026-09-23",
+  "purpose": "Dated research observations, not dependency pins or a tested compatibility matrix.",
+  "historical_baseline": {
+    "repository": "https://github.com/angular/components",
+    "tag": "16.2.14",
+    "branch": "16.2.x",
+    "observed_short_commit": "df60e73",
+    "verified_full_commit": null,
+    "source": "https://github.com/angular/components/releases/tag/16.2.14"
+  },
+  "current_source_reference": {
+    "tag": "v22.2.0",
+    "observed_short_commit": "68d65c2",
+    "observed_github_release_date": "2026-09-23",
+    "verified_full_commit": null,
+    "source": "https://github.com/angular/components/releases",
+    "npm_publication_verified": false,
+    "role": "research-only",
+    "establishes_release_baseline": false
+  },
+  "angular_docs_reference_row": {
+    "angular": "22.0.x",
+    "node": "^22.22.3 || ^24.15.0 || ^26.0.0",
+    "typescript": ">=6.0.0 <6.1.0",
+    "rxjs": "^6.5.3 || ^7.4.0",
+    "source": "https://angular.dev/reference/versions",
+    "limitation": "Verify the exact selected release. Do not infer all later minor requirements from this row."
+  },
+  "local_helper_environment": {
+    "node": "22.16.0",
+    "npm": "10.9.2",
+    "angular_build_executed": false,
+    "sass_compile_executed": false,
+    "note": "Record actual helper environment in VALIDATION.md; not the selected Node24 build/release toolchain."
+  },
+  "preflight_required": [
+    "Resolve full immutable baseline/current commits from official Git remote.",
+    "Verify published npm versions, package integrity and peer manifests; GitHub source manifests may contain placeholders.",
+    "Pin exact framework/CLI/compiler, Material/CDK, ng-packagr, TypeScript, RxJS, Sass, package manager and browser versions.",
+    "Verify organization/repository/publishing permissions independently.",
+    "Record a tested minimum/maximum peer matrix rather than promising arbitrary current or prerelease compatibility.",
+    "Record research head and release baseline separately. Verify branch-specific API availability against installed/packed aged peer versions and advertised minimums, not research-head source."
+  ],
+  "support_policy_file": "research/support-policy.json",
+  "initial_package_lines": [
+    "22.x active/main",
+    "21.x LTS/21.x branch"
+  ],
+  "supply_chain_policy": {
+    "minimumReleaseAge_minutes": 10080,
+    "minimumReleaseAgeStrict": true,
+    "minimumReleaseAgeIgnoreMissingTime": false,
+    "exception_policy": "exact-version urgent security/compatibility fixes only"
+  },
+  "typescript7_note": "TypeScript 7.0 has no old programmatic compiler API; isolate migration AST access and allow @typescript/typescript6 where necessary.",
+  "publication": "GitHub Actions standard public runners; npm trusted publishing/OIDC; staged publishing after package bootstrap.",
+  "angular_framework_observation": {
+    "latest_stable_observed": "22.1.7",
+    "next_observed": "22.2.0-rc.0",
+    "checked_on": "2026-09-23",
+    "source": "https://github.com/angular/angular/releases",
+    "note": "Do not assume Angular framework and Angular Components share the same latest minor on a given day. Resolve and test an actually compatible set at implementation/release time."
+  },
+  "toolchain_pin_file": "templates/toolchain-lock.json",
+  "toolchain_status": "Exact Node24/pnpm12/release-npm pins selected from official release evidence; installation, registry timestamp/integrity capture, and Angular compatibility builds remain implementation preflight.",
+  "release_baseline_policy": {
+    "research_head_is_release_baseline": false,
+    "minimum_release_age_minutes": 10080,
+    "selection": "Per supported branch, explicitly resolve and verify an aged compatible published package set; allow only a reviewed exact-version urgent exception. Research refs and source examples do not select runtime peers.",
+    "api_availability": "For every delegated TypeScript/Sass API, prove it exists in the exact packed release baseline and the advertised minimum peer version. An API seen only at the research head is not usable by assumption.",
+    "fresh_fix_handling": "Record relevance immediately. If a necessary fix is absent from the release baseline, safely adapt it to owned code or use a justified exact-version exception for a fixed peer and test it. Otherwise block affected releases; never silently install an unaged peer or defer an applicable severe vulnerability just to satisfy age.",
+    "canary_isolation": "No release lockfile mutations, publishing credentials or release artifacts from research/canary dependency environments."
+  },
+  "release_baselines": [
+    {
+      "package_major": 22,
+      "status": "unresolved-unverified",
+      "exact_packages": {},
+      "lockfile_sha256": null,
+      "verified": false,
+      "compatibility_tests_passed": false
+    },
+    {
+      "package_major": 21,
+      "status": "unresolved-unverified",
+      "exact_packages": {},
+      "lockfile_sha256": null,
+      "verified": false,
+      "compatibility_tests_passed": false
+    }
+  ]
+}

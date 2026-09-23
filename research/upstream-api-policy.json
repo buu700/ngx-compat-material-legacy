@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "scope": "shipped library, schematics/CLI runtime, and package-owned Sass; historical reference tooling may use isolated old dependencies",
+  "forbidden_modules": [
+    "@angular/animations",
+    "@angular/platform-browser/animations"
+  ],
+  "forbidden_module_substrings": [
+    "/private/",
+    "/src/"
+  ],
+  "forbidden_imported_symbol_prefixes": [
+    "_",
+    "\u0275"
+  ],
+  "forbidden_sass_patterns": [
+    "mat.m2-",
+    "mat.$m2-",
+    "@include mat.color-variants-backwards-compatibility",
+    "@use '@angular/material/core/",
+    "@use \"@angular/material/core/"
+  ],
+  "notes": [
+    "False positives are reviewed explicitly; do not add broad excludes.",
+    "A stable public symbol whose name itself legitimately begins underscore is still disallowed by project policy unless a maintainer approves a narrow temporary exception.",
+    "Current Material M2/backcompat code may appear in research/reference fixtures but not shipped implementation."
+  ],
+  "exceptions": []
+}

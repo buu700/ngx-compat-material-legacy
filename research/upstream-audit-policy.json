@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "purpose": "Complete commit coverage with risk-weighted review; no claim that the upstream audit has been executed.",
+  "coverage": "every-enumerated-full-sha",
+  "inventory_role": "research-only",
+  "research_head_selects_runtime_dependencies": false,
+  "classification_sources": [
+    "commit metadata",
+    "changed paths",
+    "diff/content evidence",
+    "owned/delegated dependency closure",
+    "advisories and linked fixes/tests"
+  ],
+  "titles_or_paths_alone_close_review": false,
+  "review_rules": [
+    {
+      "id": "low-risk-documentation-tests-refactors",
+      "review_depth": "evidence-backed-batch",
+      "batch_allowed": true,
+      "condition": "Diff screening establishes no behavior, contract, security, regression-test signal or relevant build effect."
+    },
+    {
+      "id": "build-tooling-only",
+      "review_depth": "evidence-backed-batch",
+      "batch_allowed": true,
+      "condition": "Only if no relevant dependencies, code generation, publishing, supply-chain or emitted-artifact effect; otherwise individual semantic/deep review."
+    },
+    {
+      "id": "unrelated-features",
+      "review_depth": "evidence-backed-batch",
+      "batch_allowed": true,
+      "condition": "Evidence shows the feature does not affect preserved or delegated behavior."
+    },
+    {
+      "id": "runtime-bugfix",
+      "review_depth": "individual-semantic",
+      "batch_allowed": false
+    },
+    {
+      "id": "accessibility-lifecycle",
+      "review_depth": "individual-semantic",
+      "batch_allowed": false
+    },
+    {
+      "id": "security-hardening",
+      "review_depth": "individual-deep",
+      "batch_allowed": false
+    },
+    {
+      "id": "public-api-removal-contract",
+      "review_depth": "individual-compatibility",
+      "batch_allowed": false
+    },
+    {
+      "id": "mixed-or-uncertain",
+      "review_depth": "individual-escalated",
+      "batch_allowed": false
+    }
+  ],
+  "batch_required_fields": [
+    "batch_id",
+    "commit_shas",
+    "category",
+    "rationale",
+    "evidence",
+    "reviewer",
+    "screening_and_escalation"
+  ],
+  "individual_required_fields": [
+    "commit_sha",
+    "category",
+    "review_depth",
+    "disposition",
+    "evidence",
+    "affected_branches",
+    "status"
+  ],
+  "final_dispositions": [
+    "inherited",
+    "not-applicable",
+    "already-baseline",
+    "adapt",
+    "test-only",
+    "do-not-adopt"
+  ],
+  "pending_dispositions": [
+    "security-review"
+  ],
+  "completion_requirements": [
+    "Reconcile raw inventory against exact individual/batch SHA membership; no gaps or wildcard closure.",
+    "Expand/split batches when security, behavior or contract relevance is uncertain.",
+    "Prove inherited fixes are in exact selected peers per branch, not merely in the research head.",
+    "Close adaptation/test items only with implementation and test evidence.",
+    "Resolve sensitive pending items before declaring audit completion or affected release readiness."
+  ],
+  "automatic_classification_is_audit_completion": false
+}

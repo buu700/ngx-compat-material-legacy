@@ -1,0 +1,45 @@
+{
+  "checked_on": "2026-09-23",
+  "purpose": "Known cliffs/removals to resolve before they surprise a future maintainer. Re-scan every supported Angular major.",
+  "items": [
+    {
+      "id": "FUT-ANIM-23",
+      "surface": "@angular/animations legacy engine",
+      "upstream_status": "deprecated with intent to remove in Angular 23",
+      "project_policy": "do not depend on it; native/CSS/WAAPI adaptation is part of initial port",
+      "state": "designed-out-before-first-stable",
+      "source": "https://angular.dev/api/animations/animate"
+    },
+    {
+      "id": "FUT-M2",
+      "surface": "Angular Material M2/backcompat Sass implementation",
+      "upstream_status": "M2 prebuilt/backcompat functionality documented for future removal",
+      "project_policy": "own Material-16 M2 model locally; use stable public current component overrides/system tokens only",
+      "state": "designed-out-before-first-stable",
+      "source": "https://github.com/angular/components/blob/main/guides/theming.md"
+    },
+    {
+      "id": "FUT-RECYCLE-23",
+      "surface": "MatRecycleRows / CdkRecycleRows",
+      "upstream_status": "deprecated no-op directives with @breaking-change 23.0.0",
+      "project_policy": "own MatLegacyRecycleRows symbol/selector; use stable CdkTable.recycleRows input/behavior where supported rather than delegating to the doomed directive/private repeater strategies",
+      "state": "must-resolve-before-first-stable",
+      "source": "https://raw.githubusercontent.com/angular/components/v22.2.0/src/cdk/table/table.ts"
+    },
+    {
+      "id": "FUT-TS7-API",
+      "surface": "TypeScript compiler API used by migration tooling",
+      "upstream_status": "TypeScript 7.0 has no old programmatic API; TypeScript 7.1 will have a different API",
+      "project_policy": "isolate parser/compiler adapter; pre-upgrade transformer may use @typescript/typescript6; library runtime does not depend on compiler API",
+      "state": "architecture-guardrail",
+      "source": "https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/"
+    },
+    {
+      "id": "FUT-DELEGATED-API-SCAN",
+      "surface": "all delegated Angular/Material/CDK public symbols",
+      "upstream_status": "unknown until each major scan",
+      "project_policy": "generated inventory + deprecation/breaking-change check on canary and before major release",
+      "state": "recurring"
+    }
+  ]
+}

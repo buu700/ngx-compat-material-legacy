@@ -1,0 +1,628 @@
+{
+  "schema_version": 1,
+  "status": "Research/triage ledger. No entries are applied patches or completed vulnerability assessments.",
+  "policy": "Resolve exact commit and selected-artifact applicability; adapt owned code or inherit peers as specified; record not-applicable outcomes.",
+  "candidates": [
+    {
+      "id": "ANIM-01",
+      "title": "Material core drops the animation-module dependency",
+      "source_url": "https://github.com/angular/components/pull/30459",
+      "recommended_action": "adapt checklist and dependency-boundary technique",
+      "targets": [
+        "package",
+        "core",
+        "all motion code"
+      ],
+      "reason": "Use the completed upstream transition as a dependency-closure checklist, not a mandatory implementation phase.",
+      "acceptance_tests": [
+        "no engine imports/types in published runtime or harnesses",
+        "packed consumer without deprecated animation packages"
+      ],
+      "checked_on": "2026-09-23",
+      "evidence": "primary PR/commit description or source inspected; selected-artifact applicability remains to verify",
+      "resolved_commit": null,
+      "disposition": "review-pending",
+      "applied": false,
+      "implementation_scope": "Candidate; determine owned-code applicability or exact inherited peer version before changing source."
+    },
+    {
+      "id": "ANIM-02",
+      "title": "Autocomplete CSS animation conversion",
+      "source_url": "https://github.com/angular/components/pull/30356",
+      "recommended_action": "adapt to legacy DOM and historical lifecycle",
+      "targets": [
+        "legacy-autocomplete"
+      ],
+      "reason": "Upstream switched to CSS and deliberately omitted an exit animation; do not inherit that behavior change without comparing the legacy contract.",
+      "acceptance_tests": [
+        "selection and close lifecycle",
+        "enter/exit contract comparison",
+        "focus and cancellation"
+      ],
+      "checked_on": "2026-09-23",
+      "evidence": "primary PR/commit description or source inspected; selected-artifact applicability remains to verify",
+      "resolved_commit": null,
+      "disposition": "review-pending",
+      "applied": false,
+      "implementation_scope": "Candidate; determine owned-code applicability or exact inherited peer version before changing source."
+    },
+    {
+      "id": "ANIM-03",
+      "title": "Tabs animation conversion",
+      "source_url": "https://github.com/angular/components/pull/30281",
+      "recommended_action": "adapt algorithm and tests",
+      "targets": [
+        "legacy-tabs"
+      ],
+      "reason": "Replace engine-driven body transitions while preserving legacy structure and public duration/event behavior.",
+      "acceptance_tests": [
+        "dynamic height",
+        "rapid selection reversal",
+        "RTL direction",
+        "lazy content and animationDone ordering"
+      ],
+      "checked_on": "2026-09-23",
+      "evidence": "primary PR/commit description or source inspected; selected-artifact applicability remains to verify",
+      "resolved_commit": null,
+      "disposition": "review-pending",
+      "applied": false,
+      "implementation_scope": "Candidate; determine owned-code applicability or exact inherited peer version before changing source."
+    },
+    {
+      "id": "ANIM-04",
+      "title": "Form-field subscript motion conversion",
+      "source_url": "https://github.com/angular/components/pull/30354",
+      "recommended_action": "adapt legacy-specific subscript implementation",
+      "targets": [
+        "legacy-form-field"
+      ],
+      "reason": "Current implementation is a reference for motion without the engine, not a reason to change legacy markup.",
+      "acceptance_tests": [
+        "hint/error transitions",
+        "no label/layout regressions",
+        "disabled/zero-duration completion"
+      ],
+      "checked_on": "2026-09-23",
+      "evidence": "primary PR/commit description or source inspected; selected-artifact applicability remains to verify",
+      "resolved_commit": null,
+      "disposition": "review-pending",
+      "applied": false,
+      "implementation_scope": "Candidate; determine owned-code applicability or exact inherited peer version before changing source."
+    },
+    {
+      "id": "ANIM-05",
+      "title": "Snack-bar animation conversion",
+      "source_url": "https://github.com/angular/components/pull/30381",
+      "recommended_action": "adapt lifecycle/controller",
+      "targets": [
+        "legacy-snack-bar"
+      ],
+      "reason": "Preserve enter/exit notification and disposal semantics as the implementation moves to native motion.",
+      "acceptance_tests": [
+        "dismiss during entrance",
+        "action/dismiss events exactly once",
+        "timer and overlay cleanup"
+      ],
+      "checked_on": "2026-09-23",
+      "evidence": "primary PR/commit description or source inspected; selected-artifact applicability remains to verify",
+      "resolved_commit": null,
+      "disposition": "review-pending",
+      "applied": false,
+      "implementation_scope": "Candidate; determine owned-code applicability or exact inherited peer version before changing source."
+    },
+    {
+      "id": "ANIM-06",
+      "title": "Select animation conversion",
+      "source_url": "https://github.com/angular/components/commit/a44b34794b129ba127206f7cf74c7c0a8a54be88",
+      "recommended_action": "adapt relevant lifecycle and motion",
+      "targets": [
+        "legacy-select"
+      ],
+      "reason": "Use upstream native-motion behavior as a reference while retaining legacy panel and option styling.",
+      "acceptance_tests": [
+        "rapid open-close",
+        "detach during transition",
+        "multiple/RTL cases",
+        "focus restoration"
+      ],
+      "checked_on": "2026-09-23",
+      "evidence": "primary PR/commit description or source inspected; selected-artifact applicability remains to verify",
+      "resolved_commit": null,
+      "disposition": "review-pending",
+      "applied": false,
+      "implementation_scope": "Candidate; determine owned-code applicability or exact inherited peer version before changing source."
+    },
+    {
+      "id": "ANIM-07",
+      "title": "Menu lifecycle decoupled from animations",
+      "source_url": "https://github.com/angular/components/pull/30148",
+      "recommended_action": "adapt owned lifecycle",
+      "targets": [
+        "legacy-menu"
+      ],
+      "reason": "Avoid tying menu existence and public behavior solely to successful animation completion.",
+      "acceptance_tests": [
+        "nested menus",
+        "keyboard closure",
+        "cancellation and no events",
+        "overlay disposal"
+      ],
+      "checked_on": "2026-09-23",
+      "evidence": "primary PR/commit description or source inspected; selected-artifact applicability remains to verify",
+      "resolved_commit": null,
+      "disposition": "review-pending",
+      "applied": false,
+      "implementation_scope": "Candidate; determine owned-code applicability or exact inherited peer version before changing source."
+    },
+    {
+      "id": "ANIM-08",
+      "title": "Current dialog native-motion implementation",
+      "source_url": "https://raw.githubusercontent.com/angular/components/v22.2.0/src/material/dialog/dialog-container.ts",
+      "recommended_action": "reference implementation; no private inheritance",
+      "targets": [
+        "legacy-dialog"
+      ],
+      "reason": "Use its current controller and completion handling as input to an owned legacy controller.",
+      "acceptance_tests": [
+        "enter/exit configuration",
+        "focus trapping/restoration",
+        "destroy while closing",
+        "event ownership"
+      ],
+      "checked_on": "2026-09-23",
+      "evidence": "primary PR/commit description or source inspected; selected-artifact applicability remains to verify",
+      "resolved_commit": null,
+      "disposition": "review-pending",
+      "applied": false,
+      "implementation_scope": "Candidate; determine owned-code applicability or exact inherited peer version before changing source."
+    },
+    {
+      "id": "ANIM-09",
+      "title": "Current tooltip implementation",
+      "source_url": "https://raw.githubusercontent.com/angular/components/v22.2.0/src/material/tooltip/tooltip.ts",
+      "recommended_action": "reference public behavior and internal algorithm",
+      "targets": [
+        "legacy-tooltip"
+      ],
+      "reason": "Port legacy tooltip internals without importing modern private bases or changing legacy panel presentation.",
+      "acceptance_tests": [
+        "show/hide delays",
+        "touch/hover/focus",
+        "rapid reentry",
+        "canceled motion and disposal"
+      ],
+      "checked_on": "2026-09-23",
+      "evidence": "primary PR/commit description or source inspected; selected-artifact applicability remains to verify",
+      "resolved_commit": null,
+      "disposition": "review-pending",
+      "applied": false,
+      "implementation_scope": "Candidate; determine owned-code applicability or exact inherited peer version before changing source."
+    },
+    {
+      "id": "SEC-01",
+      "title": "CDK media-matcher CSS injection hardening",
+      "source_url": "https://github.com/angular/components/commit/e8f34190606a706e27b594ad84543fad62dd24e8",
+      "recommended_action": "inherit from verified patched current CDK",
+      "targets": [
+        "CDK layout",
+        "selected peer floor"
+      ],
+      "reason": "Verify the used artifact includes the upstream fix; inspect equivalent owned string-to-style paths only if they exist. This is not evidence of a demonstrated exploit in this project.",
+      "acceptance_tests": [
+        "patched source/artifact check",
+        "relevant style input regression if owned"
+      ],
+      "checked_on": "2026-09-23",
+      "evidence": "primary PR/commit description or source inspected; selected-artifact applicability remains to verify",
+      "resolved_commit": null,
+      "disposition": "review-pending",
+      "applied": false,
+      "implementation_scope": "Candidate; determine owned-code applicability or exact inherited peer version before changing source."
+    },
+    {
+      "id": "SEC-02",
+      "title": "Trusted Types createPolicy clobbering guard",
+      "source_url": "https://github.com/angular/components/pull/33410",
+      "recommended_action": "inherit through CDK; inspect owned equivalents",
+      "targets": [
+        "shared infrastructure",
+        "any copied policy helpers"
+      ],
+      "reason": "Do not import the private helper directly or create permissive policies. Determine whether an owned equivalent needs the same hardening.",
+      "acceptance_tests": [
+        "strict Trusted Types fixture where relevant",
+        "policy initialization failure/duplicate conditions",
+        "selected peer verification"
+      ],
+      "checked_on": "2026-09-23",
+      "evidence": "primary PR/commit description or source inspected; selected-artifact applicability remains to verify",
+      "resolved_commit": null,
+      "disposition": "review-pending",
+      "applied": false,
+      "implementation_scope": "Candidate; determine owned-code applicability or exact inherited peer version before changing source."
+    },
+    {
+      "id": "SEC-03",
+      "title": "CSP nonce setAttribute correction",
+      "source_url": "https://github.com/angular/components/pull/28800",
+      "recommended_action": "inherit or adapt only where a copied code path remains",
+      "targets": [
+        "owned dynamic styles",
+        "SSR"
+      ],
+      "reason": "Upstream describes correct nonce assignment for SSR. Distinguish compatibility hardening from a verified security vulnerability.",
+      "acceptance_tests": [
+        "nonce preserved in SSR output",
+        "CSP rendering without permissive fallback"
+      ],
+      "checked_on": "2026-09-23",
+      "evidence": "primary PR/commit description or source inspected; selected-artifact applicability remains to verify",
+      "resolved_commit": null,
+      "disposition": "review-pending",
+      "applied": false,
+      "implementation_scope": "Candidate; determine owned-code applicability or exact inherited peer version before changing source."
+    },
+    {
+      "id": "CDK-01",
+      "title": "Deprecated portal symbol removal",
+      "source_url": "https://github.com/angular/components/pull/30584",
+      "recommended_action": "adapt callers to current public API",
+      "targets": [
+        "legacy overlays/portals"
+      ],
+      "reason": "Renamed/removed portal symbols are a porting task; avoid freezing a CDK copy to retain aliases.",
+      "acceptance_tests": [
+        "portal attach/detach",
+        "template/component portal teardown"
+      ],
+      "checked_on": "2026-09-23",
+      "evidence": "primary PR/commit description or source inspected; selected-artifact applicability remains to verify",
+      "resolved_commit": null,
+      "disposition": "review-pending",
+      "applied": false,
+      "implementation_scope": "Candidate; determine owned-code applicability or exact inherited peer version before changing source."
+    },
+    {
+      "id": "CDK-02",
+      "title": "CDK a11y v22 breaking changes",
+      "source_url": "https://github.com/angular/components/commit/7426334c5efb76ac3f359e26a7f6e48e29d4ec78",
+      "recommended_action": "inspect and adapt current public usages",
+      "targets": [
+        "legacy focus/overlay controls"
+      ],
+      "reason": "Constructor and token changes must be handled by public interfaces while preserving focus behavior.",
+      "acceptance_tests": [
+        "keyboard and focus-trap behavior",
+        "provider scopes",
+        "no current private imports"
+      ],
+      "checked_on": "2026-09-23",
+      "evidence": "primary PR/commit description or source inspected; selected-artifact applicability remains to verify",
+      "resolved_commit": null,
+      "disposition": "review-pending",
+      "applied": false,
+      "implementation_scope": "Candidate; determine owned-code applicability or exact inherited peer version before changing source."
+    },
+    {
+      "id": "CDK-03",
+      "title": "Table rows update when row definitions change",
+      "source_url": "https://github.com/angular/components/pull/33670",
+      "recommended_action": "inherit through verified current CDK; add legacy regression",
+      "targets": [
+        "legacy-table"
+      ],
+      "reason": "A current CDK table correction should flow through delegated infrastructure; prove legacy wiring actually benefits.",
+      "acceptance_tests": [
+        "dynamic row definitions",
+        "reordered/removed rows",
+        "correct table teardown"
+      ],
+      "checked_on": "2026-09-23",
+      "evidence": "primary PR/commit description or source inspected; selected-artifact applicability remains to verify",
+      "resolved_commit": null,
+      "disposition": "review-pending",
+      "applied": false,
+      "implementation_scope": "Candidate; determine owned-code applicability or exact inherited peer version before changing source."
+    },
+    {
+      "id": "ROB-01",
+      "title": "Bottom-sheet animation event ownership",
+      "source_url": "https://github.com/angular/components/commit/fb4478bff31976f6179fde21f800f1326395f707",
+      "recommended_action": "reference technique in owned motion controllers",
+      "targets": [
+        "legacy-dialog",
+        "legacy-snack-bar",
+        "legacy-menu"
+      ],
+      "reason": "The ordinary bottom-sheet component is not owned. Its event-target fix is useful as a general regression pattern.",
+      "acceptance_tests": [
+        "descendant events do not complete parent animation",
+        "matching property/name filters"
+      ],
+      "checked_on": "2026-09-23",
+      "evidence": "primary PR/commit description or source inspected; selected-artifact applicability remains to verify",
+      "resolved_commit": null,
+      "disposition": "review-pending",
+      "applied": false,
+      "implementation_scope": "Candidate; determine owned-code applicability or exact inherited peer version before changing source."
+    },
+    {
+      "id": "ROB-02",
+      "title": "Stepper validates animation durations",
+      "source_url": "https://github.com/angular/components/commit/30942bcd3640efd7f3980044144dd1fc8b10e8f3",
+      "recommended_action": "reference validation for owned duration APIs",
+      "targets": [
+        "legacy-tabs",
+        "legacy-dialog",
+        "motion utilities"
+      ],
+      "reason": "Do not copy stepper; preserve valid historical numeric/string duration forms while rejecting or safely normalizing invalid input.",
+      "acceptance_tests": [
+        "zero and supported unit strings",
+        "invalid/negative/NaN/infinite durations",
+        "bounded completion"
+      ],
+      "checked_on": "2026-09-23",
+      "evidence": "primary PR/commit description or source inspected; selected-artifact applicability remains to verify",
+      "resolved_commit": null,
+      "disposition": "review-pending",
+      "applied": false,
+      "implementation_scope": "Candidate; determine owned-code applicability or exact inherited peer version before changing source."
+    },
+    {
+      "id": "ROB-03",
+      "title": "Preserve externally supplied aria-describedby",
+      "source_url": "https://github.com/angular/components/pull/30699",
+      "recommended_action": "reproduce and adapt in owned form control layer",
+      "targets": [
+        "legacy-form-field",
+        "legacy-input",
+        "legacy-select"
+      ],
+      "reason": "Determine whether the legacy implementation loses external descriptions under updates before applying the correction.",
+      "acceptance_tests": [
+        "external IDs survive error/hint changes",
+        "no duplicated or dangling IDs"
+      ],
+      "checked_on": "2026-09-23",
+      "evidence": "primary PR/commit description or source inspected; selected-artifact applicability remains to verify",
+      "resolved_commit": null,
+      "disposition": "review-pending",
+      "applied": false,
+      "implementation_scope": "Candidate; determine owned-code applicability or exact inherited peer version before changing source."
+    },
+    {
+      "id": "ROB-04",
+      "title": "Select closes on overlay detach",
+      "source_url": "https://github.com/angular/components/pull/30634",
+      "recommended_action": "adapt if equivalent owned state bug exists",
+      "targets": [
+        "legacy-select"
+      ],
+      "reason": "Keep public open state, focus and lifecycle consistent when the overlay detaches independently.",
+      "acceptance_tests": [
+        "external detach",
+        "state/event consistency",
+        "reopen after detach"
+      ],
+      "checked_on": "2026-09-23",
+      "evidence": "primary PR/commit description or source inspected; selected-artifact applicability remains to verify",
+      "resolved_commit": null,
+      "disposition": "review-pending",
+      "applied": false,
+      "implementation_scope": "Candidate; determine owned-code applicability or exact inherited peer version before changing source."
+    },
+    {
+      "id": "ROB-05",
+      "title": "Dialog focus consistency zoneful/zoneless",
+      "source_url": "https://github.com/angular/components/pull/29192",
+      "recommended_action": "adapt owned scheduling; inherit CDK pieces",
+      "targets": [
+        "legacy-dialog"
+      ],
+      "reason": "Do not rely only on NgZone events that may not fire in the target mode.",
+      "acceptance_tests": [
+        "both runtime modes",
+        "autofocus ordering",
+        "focus restore on destroy"
+      ],
+      "checked_on": "2026-09-23",
+      "evidence": "primary PR/commit description or source inspected; selected-artifact applicability remains to verify",
+      "resolved_commit": null,
+      "disposition": "review-pending",
+      "applied": false,
+      "implementation_scope": "Candidate; determine owned-code applicability or exact inherited peer version before changing source."
+    },
+    {
+      "id": "ROB-06",
+      "title": "Dialog close ignores aria-disabled activation",
+      "source_url": "https://github.com/angular/components/pull/33373",
+      "recommended_action": "reproduce and adapt where the same contract applies",
+      "targets": [
+        "legacy-dialog close directive"
+      ],
+      "reason": "Check native disabled versus aria-disabled semantics and activation sources without silently changing unrelated public behavior.",
+      "acceptance_tests": [
+        "mouse and keyboard activation",
+        "disabled and aria-disabled",
+        "focusability when relevant"
+      ],
+      "checked_on": "2026-09-23",
+      "evidence": "primary PR/commit description or source inspected; selected-artifact applicability remains to verify",
+      "resolved_commit": null,
+      "disposition": "review-pending",
+      "applied": false,
+      "implementation_scope": "Candidate; determine owned-code applicability or exact inherited peer version before changing source."
+    },
+    {
+      "id": "SASS-01",
+      "title": "Core Sass compiler-warning modernization",
+      "source_url": "https://github.com/angular/components/pull/33040",
+      "recommended_action": "adapt equivalent public Sass syntax",
+      "targets": [
+        "owned legacy Sass"
+      ],
+      "reason": "Modernize deprecated Sass operations without importing current private theme architecture or suppressing all warnings.",
+      "acceptance_tests": [
+        "compiled legacy CSS equivalent",
+        "supported Sass compiler warnings",
+        "light/dark/theme map cases"
+      ],
+      "checked_on": "2026-09-23",
+      "evidence": "primary PR/commit description or source inspected; selected-artifact applicability remains to verify",
+      "resolved_commit": null,
+      "disposition": "review-pending",
+      "applied": false,
+      "implementation_scope": "Candidate; determine owned-code applicability or exact inherited peer version before changing source."
+    },
+    {
+      "id": "API-01",
+      "title": "Current public form-field control protocol",
+      "source_url": "https://raw.githubusercontent.com/angular/components/v22.2.0/src/material/form-field/form-field-control.ts",
+      "recommended_action": "evaluate and implement compatible owned protocol",
+      "targets": [
+        "legacy-form-field",
+        "legacy-input",
+        "legacy-select"
+      ],
+      "reason": "Current protocol evolution must not be hidden with casts. Preserve classic forms integration; do not promise new signal-form features without tests.",
+      "acceptance_tests": [
+        "strict type checking",
+        "reactive/template-driven forms",
+        "public custom control integration"
+      ],
+      "checked_on": "2026-09-23",
+      "evidence": "primary PR/commit description or source inspected; selected-artifact applicability remains to verify",
+      "resolved_commit": null,
+      "disposition": "review-pending",
+      "applied": false,
+      "implementation_scope": "Candidate; determine owned-code applicability or exact inherited peer version before changing source."
+    },
+    {
+      "id": "API-02",
+      "title": "Current ripple directive and public configuration",
+      "source_url": "https://raw.githubusercontent.com/angular/components/v22.2.0/src/material/core/ripple/ripple.ts",
+      "recommended_action": "delegate only after visual and identity proof",
+      "targets": [
+        "legacy-button",
+        "checkbox",
+        "options",
+        "shared core"
+      ],
+      "reason": "Reuse can eliminate copied infrastructure, but legacy ripple DOM/sizing/defaults require tests.",
+      "acceptance_tests": [
+        "ripple element classes/sizing",
+        "global/local config",
+        "disabled/reduced motion",
+        "single upstream identity"
+      ],
+      "checked_on": "2026-09-23",
+      "evidence": "primary PR/commit description or source inspected; selected-artifact applicability remains to verify",
+      "resolved_commit": null,
+      "disposition": "review-pending",
+      "applied": false,
+      "implementation_scope": "Candidate; determine owned-code applicability or exact inherited peer version before changing source."
+    },
+    {
+      "id": "THEME-01",
+      "title": "Current M2 public Sass API",
+      "source_url": "https://raw.githubusercontent.com/angular/components/v22.2.0/src/material/_index.scss",
+      "recommended_action": "reference oracle only; independently own Material-16 M2 model",
+      "targets": [
+        "owned historical Sass model",
+        "current-component bridge tests"
+      ],
+      "reason": "Use current M2 source/output only to cross-check our independently owned historical semantics while upstream still provides an oracle. Shipped Sass must not call current m2-* or compatibility-only theming APIs.",
+      "acceptance_tests": [
+        "Material-16 value/map/signature parity",
+        "no shipped m2-* dependency",
+        "current-component bridge via stable public override/token API"
+      ],
+      "checked_on": "2026-09-23",
+      "evidence": "primary PR/commit description or source inspected; selected-artifact applicability remains to verify",
+      "resolved_commit": null,
+      "disposition": "review-pending",
+      "applied": false,
+      "implementation_scope": "Reference-only. Do not delegate shipped Sass to this surface."
+    },
+    {
+      "id": "MOTION-01",
+      "title": "Share current public motion configuration",
+      "source_url": "https://raw.githubusercontent.com/angular/components/v22.2.0/src/material/core/animation/animation.ts",
+      "recommended_action": "Use MATERIAL_ANIMATIONS and public ANIMATION_MODULE_TYPE; implement owned state detection. Do not call _getAnimationsState or blindly copy process-global reduced-motion caching.",
+      "targets": [
+        "legacy-core",
+        "motion"
+      ],
+      "reason": "Use MATERIAL_ANIMATIONS and public ANIMATION_MODULE_TYPE; implement owned state detection. Do not call _getAnimationsState or blindly copy process-global reduced-motion caching.",
+      "acceptance_tests": [
+        "disabled, reduced motion, SSR state isolation and exactly-once completion"
+      ],
+      "checked_on": "2026-09-23",
+      "evidence": "tagged primary source inspected; selected artifact tests not executed",
+      "resolved_commit": null,
+      "disposition": "review-pending",
+      "applied": false,
+      "implementation_scope": "Candidate; determine owned-code applicability or exact inherited peer version before changing source."
+    },
+    {
+      "id": "SASS-02",
+      "title": "Historical core structural responsibilities",
+      "source_url": "https://raw.githubusercontent.com/angular/components/16.2.14/src/material/core/_core.scss",
+      "recommended_action": "Recreate responsibility set; use current public CDK styles as necessary and classify exact differences, not an old global CDK stylesheet.",
+      "targets": [
+        "core Sass"
+      ],
+      "reason": "Recreate responsibility set; use current public CDK styles as necessary and classify exact differences, not an old global CDK stylesheet.",
+      "acceptance_tests": [
+        "nonempty setup, overlay/autofill/focus/ripple coexistence"
+      ],
+      "checked_on": "2026-09-23",
+      "evidence": "tagged primary source inspected; selected artifact tests not executed",
+      "resolved_commit": null,
+      "disposition": "review-pending",
+      "applied": false,
+      "implementation_scope": "Candidate; determine owned-code applicability or exact inherited peer version before changing source."
+    },
+    {
+      "id": "SASS-03",
+      "title": "Current core mixin is empty",
+      "source_url": "https://raw.githubusercontent.com/angular/components/v22.2.0/src/material/core/_core.scss",
+      "recommended_action": "Never forward historical core() to this no-op.",
+      "targets": [
+        "core Sass"
+      ],
+      "reason": "Never forward historical core() to this no-op.",
+      "acceptance_tests": [
+        "negative test rejecting empty candidate core output"
+      ],
+      "checked_on": "2026-09-23",
+      "evidence": "tagged primary source inspected; selected artifact tests not executed",
+      "resolved_commit": null,
+      "disposition": "review-pending",
+      "applied": false,
+      "implementation_scope": "Candidate; determine owned-code applicability or exact inherited peer version before changing source."
+    },
+    {
+      "id": "SASS-04",
+      "title": "M2 names under current m2 prefix",
+      "source_url": "https://raw.githubusercontent.com/angular/components/v22.2.0/src/material/core/m2/_index.scss",
+      "recommended_action": "reference-only mapping aid; own old names/values locally",
+      "targets": [
+        "Sass facade"
+      ],
+      "reason": "Current m2-prefixed definitions help verify correspondence but are planned-removal compatibility infrastructure and therefore forbidden as shipped implementation dependencies.",
+      "acceptance_tests": [
+        "Material-16 hue/value/map equality",
+        "no shipped m2-* dependency",
+        "custom theme and typography structural fixtures"
+      ],
+      "checked_on": "2026-09-23",
+      "evidence": "tagged primary source inspected; selected artifact tests not executed",
+      "resolved_commit": null,
+      "disposition": "review-pending",
+      "applied": false,
+      "implementation_scope": "Reference-only. Do not delegate shipped Sass to this surface."
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+[
+  {
+    "id": "reject-m3-only-call",
+    "source": "@use '@angular/material' as mat;\n$t: mat.define-theme((color: (primary: mat.$azure-palette)));\n",
+    "expected_migration": "diagnostic; unchanged file",
+    "reason": "M3/current input must not be classified as a historical source-only migration."
+  },
+  {
+    "id": "reject-private-call",
+    "source": "@use '@angular/material' as mat;\n@include mat.private-all-legacy-component-densities(0);\n",
+    "expected_migration": "diagnostic unless individually supported/tested",
+    "reason": "Private baseline helpers are not an implicit public guarantee."
+  },
+  {
+    "id": "reject-unsupported-deep-import",
+    "source": "@use '@angular/material/core/theming/palette' as palette;\n",
+    "expected_migration": "targeted diagnostic; unchanged file",
+    "reason": "Root facade does not imply all historical deep files are public."
+  }
+]

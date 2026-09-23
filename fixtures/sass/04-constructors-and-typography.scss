@@ -1,0 +1,14 @@
+@use '@angular/material' as mat;
+@use 'sass:meta';
+$p: mat.define-palette(mat.$deep-purple-palette, 700, 300, 900);
+$a: mat.define-palette(mat.$amber-palette, A200, A100, A400);
+$light: mat.define-light-theme($p, $a);
+$dark: mat.define-dark-theme($p, $a);
+$type: mat.define-legacy-typography-config($font-family: 'Arial, sans-serif');
+.theme-values {
+  --light: #{meta.inspect($light)};
+  --dark: #{meta.inspect($dark)};
+  --typography: #{meta.inspect($type)};
+  --contrast: #{meta.inspect(mat.get-contrast-color-from-palette(mat.$deep-purple-palette, 700))};
+}
+@include mat.legacy-typography-hierarchy($type);

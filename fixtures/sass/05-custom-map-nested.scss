@@ -1,0 +1,17 @@
+@use '@angular/material' as mat;
+@use 'sass:map';
+$p: mat.define-palette(mat.$blue-grey-palette, 700, 200, 900);
+$a: mat.define-palette(mat.$green-palette, 600, 200, 900);
+$foreground: map.merge(mat.$dark-theme-foreground-palette, (text: #fafafa, secondary-text: rgba(250, 250, 250, .73)));
+$background: map.merge(mat.$dark-theme-background-palette, (background: #202025, card: #303038, dialog: #363640));
+$colors: (primary: $p, accent: $a, warn: mat.define-palette(mat.$red-palette), foreground: $foreground, background: $background, is-dark: true);
+$custom: (color: $colors, typography: mat.define-legacy-typography-config(), density: 0);
+.shell {
+  @include mat.legacy-form-field-theme($custom);
+  @include mat.legacy-input-theme($custom);
+  @include mat.legacy-select-theme($custom);
+  @include mat.legacy-card-theme($custom);
+  .alternate {
+    @include mat.legacy-button-theme(mat.define-light-theme($a, $p));
+  }
+}

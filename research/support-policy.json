@@ -1,0 +1,74 @@
+{
+  "checked_on": "2026-09-23",
+  "policy": "package major follows Angular major; support active Angular plus immediately preceding supported/LTS major",
+  "lines": [
+    {
+      "package_major": 22,
+      "branch": "main",
+      "angular_major": 22,
+      "angular_status": "active",
+      "initial_version": "22.0.0-rc.0",
+      "stable_target": "22.0.0",
+      "angular_support_end": "2028-06",
+      "typescript": ">=6.0.0 <6.1.0",
+      "node": "^22.22.3 || ^24.15.0 || ^26.0.0",
+      "rxjs": "^6.5.3 || ^7.4.0",
+      "notes": "Resolve exact aged security-patched compatible published framework/Material/CDK peers at implementation/release time; research head is not this baseline."
+    },
+    {
+      "package_major": 21,
+      "branch": "21.x",
+      "angular_major": 21,
+      "angular_status": "LTS",
+      "initial_version": "21.0.0-rc.0",
+      "stable_target": "21.0.0",
+      "angular_support_end": "2027-06",
+      "typescript": ">=5.9.0 <6.0.0",
+      "node": "^20.19.0 || ^22.12.0 || ^24.0.0",
+      "rxjs": "^6.5.3 || ^7.4.0",
+      "notes": "Maintenance line; use its own lockfile/toolchain and raise minimums for security patches as needed."
+    }
+  ],
+  "retirement": "Target active + immediately preceding supported/LTS Angular major. At transitions reconcile published support end dates with actual upstream dates; do not silently withdraw an already advertised support commitment early. Any temporary overlap or extension must be explicit.",
+  "older_major_policy": "Do not initially support Angular 20 or older without demonstrated consumer demand and explicit maintainer commitment.",
+  "security_floor_examples_not_pins": {
+    "angular_core_compiler_host_binding_fix": {
+      "21": "21.2.20",
+      "22": "22.1.0"
+    },
+    "platform_server_malformed_doctype_fix": {
+      "21": "21.2.23",
+      "22": "22.1.6"
+    }
+  },
+  "sources": [
+    "https://angular.dev/reference/releases",
+    "https://angular.dev/reference/versions",
+    "https://github.com/angular/angular/security/advisories/GHSA-hh8m-fm6v-7cvg",
+    "https://github.com/angular/angular/security/advisories/GHSA-f67j-2jqw-jpq7"
+  ],
+  "repository_toolchain": "templates/toolchain-lock.json (copy to repository root)",
+  "consumer_engine_policy": "Use each line's tested Angular-compatible Node range; never copy the private workspace's exact Node engine into a published manifest.",
+  "smoke_tests": [
+    {
+      "package_major": 22,
+      "full_node": "24.21.0",
+      "additional_node": "22.22.3",
+      "purpose": "Clean packed consumer plus schematic/CLI smoke."
+    },
+    {
+      "package_major": 21,
+      "full_node": "24.21.0",
+      "additional_node": "20.19.0",
+      "purpose": "Clean packed consumer smoke at advertised Node floor; historical/old-Node environment is isolated and has no publication credentials."
+    }
+  ],
+  "smoke_note": "Resolve patched releases and actual lower bounds at implementation; Node 22.12.0 is an additional 21.x edge case. Install pnpm12 under Node24 before switching if the npm-based installer cannot run on the smoke Node. Do not run repository build tooling under every consumer Node.",
+  "dist_tags": {
+    "main_rc": "next",
+    "main_stable": "latest",
+    "maintenance_rc": "lts-21-next",
+    "maintenance_stable": "lts-21"
+  },
+  "release_baseline_policy": "Exact aged security-patched published peers verified per branch; research source references never select dependencies. See research/version-observations.json and docs/07-upstream-security-release.md."
+}

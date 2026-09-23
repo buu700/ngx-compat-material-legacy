@@ -5,6 +5,7 @@ import json
 import subprocess
 import tempfile
 import unittest
+import sys
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -91,7 +92,7 @@ class HandoffDataChecks(unittest.TestCase):
     def test_bootstrap_default_makes_no_write(self):
         with tempfile.TemporaryDirectory() as td:
             p=Path(td)/'not-created'
-            r=subprocess.run(['python',str(ROOT/'scripts/bootstrap-material.py'),'--destination',str(p)],text=True,capture_output=True)
+            r=subprocess.run([sys.executable,str(ROOT/'scripts/bootstrap-material.py'),'--destination',str(p)],text=True,capture_output=True)
             self.assertEqual(r.returncode,0,r.stderr);self.assertFalse(p.exists());self.assertEqual(json.loads(r.stdout)['mode'],'dry-run')
 
 class SassRunnerWiringChecks(unittest.TestCase):
