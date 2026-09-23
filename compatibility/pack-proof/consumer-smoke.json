@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "captured_at": "2026-09-23T18:20:39.996738-04:00",
+  "captured_at": "2026-09-23T19:07:26.319244-04:00",
   "tarball": {
     "path": "compatibility/pack-proof/ngx-compat-material-legacy-22.0.0-rc.0.tgz",
-    "sha256": "4bf579b913550d0e8b679174bf0efcd54de16e9e5b464cf2701aace84acdbd70",
-    "size": 859980,
+    "sha256": "257e7f36b221b1dc2ea84a555c8ebdc118075ed05e0ccee9190503d0f4f69499",
+    "size": 858294,
     "package": "@ngx-compat/material-legacy@22.0.0-rc.0"
   },
   "consumer": {
-    "dir": "/tmp/ngx-compat-material-legacy-consumer-smoke_dil4p2u",
+    "dir": "/tmp/ngx-compat-material-legacy-consumer-smoke_5k1ejjci",
     "committed": false,
     "peers": [
       "@angular/*@22.1.7",
@@ -18,11 +18,21 @@
       "sass@1.104.1"
     ]
   },
+  "advertised_peers": {
+    "@angular/core": "^22.1.7",
+    "@angular/common": "^22.1.7",
+    "@angular/forms": "^22.1.7",
+    "@angular/platform-browser": "^22.1.7",
+    "@angular/cdk": "^22.1.7",
+    "@angular/material": "^22.1.7",
+    "rxjs": "^6.5.3 || ^7.4.0",
+    "@angular/animations": "^22.1.7"
+  },
   "sass_smoke": {
     "status": "ok",
     "fixture": "deep-purple 800 + all-legacy-component-themes",
     "expected_default": "#4527a0",
-    "css_bytes": 84436,
+    "css_bytes": 96591,
     "has_dialog": true,
     "has_chips": true,
     "has_table": true,
@@ -82,6 +92,12 @@
     ],
     "ok_count": 44
   },
+  "theme_coexistence": {
+    "status": "ok",
+    "fixture": "fixtures/interop/m2-legacy-plus-current-material.scss",
+    "note": "legacy M2 + current mat.theme compiled together",
+    "css_bytes": 104027
+  },
   "schematics": {
     "status": "real-sass-and-legacy-ts",
     "collection": "./schematics/collection.json",
@@ -90,7 +106,7 @@
     ],
     "fixture_runner": "scripts/schematics/test-migrate-legacy-fixtures.mjs",
     "fixtures": "fixtures/migration/cases.json",
-    "fixture_results": "28/28 PASS",
+    "fixture_results": "25/25 PASS",
     "peer_light_cli": "scripts/migrate-legacy-cli.mjs (shares sass-rewrite.js + ts-rewrite.js)"
   },
   "testing_matrix": {
@@ -123,8 +139,8 @@
   },
   "notes": [
     "Identity: @ngx-compat/material-legacy (repo buu700/ngx-compat-material-legacy).",
-    "migrate-legacy rewrites FROM @angular/material TO @ngx-compat/material-legacy only.",
-    "All historical legacy-*/testing secondary entries pack (22/22).",
+    "Advertised peers tightened to ^22.1.7.",
+    "Sass global opacity() updated to color.opacity() for Dart Sass 1.104.",
     "Inspector remaining: @angular/animations peer + owned historical animation-engine refs (motion policy)."
   ]
 }

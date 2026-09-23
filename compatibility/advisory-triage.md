@@ -16,13 +16,13 @@ lockfile path in this environment; OSV + GHSA are the primary evidence.
 
 | Peer | Range | Meta |
 | --- | --- | --- |
-| `@angular/core` | `^22.0.0` | required |
-| `@angular/common` | `^22.0.0` | required |
-| `@angular/platform-browser` | `^22.0.0` | required |
-| `@angular/cdk` | `^22.0.0` | required |
-| `@angular/material` | `^22.0.0` | required |
-| `@angular/forms` | `^22.0.0` | optional |
-| `@angular/animations` | `^22.0.0` | optional (motion metadata) |
+| `@angular/core` | `^22.1.7` | required |
+| `@angular/common` | `^22.1.7` | required |
+| `@angular/platform-browser` | `^22.1.7` | required |
+| `@angular/cdk` | `^22.1.7` | required |
+| `@angular/material` | `^22.1.7` | required |
+| `@angular/forms` | `^22.1.7` | optional |
+| `@angular/animations` | `^22.1.7` | optional (motion metadata) |
 | `rxjs` | `^6.5.3 \|\| ^7.4.0` | required |
 
 `@angular/platform-server` is **not** a peer and is not imported by the
@@ -93,7 +93,7 @@ minor). No library code change required.
 | Finding | Action this RC (no publish) |
 | --- | --- |
 | Exact aged baseline `22.1.7` includes known framework 22.x GHSA patches through the 22.1.1 / 22.1.4 floors | **Accepted** — keep aged pins; do not bump to same-day `22.1.8` / `22.2.0` |
-| Advertised peer range `^22.0.0` is wider than the security-patched floor | **Documented accepted risk for unpublished RC**; recommend tightening advertised floors (e.g. framework ≥`22.1.7` or at least ≥`22.1.1`, Material/CDK ≥`22.1.7`) at maintainer publish time after consumer impact review — **not silently changed here** |
+| Advertised peer range previously `^22.0.0` was wider than the security-patched floor | **Applied 2026-09-23**: advertised peers tightened to `^22.1.7` for framework + Material/CDK (+ optional animations/forms) to match the aged security/tested floor. Re-check before publish. |
 | Optional `@angular/animations` peer retained for overlay trigger metadata | **Accepted** until motion migration (see `compatibility/motion-overlay-trio.md`); optional, not a known GHSA |
 | Historical `@material/*` 15.0.0-canary direct deps (compile/theme) | Outside this Angular/Material/CDK advisory pass; leave for supply-chain follow-up if needed |
 | No frozen lockfile audit in this environment | Re-run `pnpm audit` / dependency review on the release lockfile before publish |
@@ -103,5 +103,6 @@ minor). No library code change required.
 - **Do not bump** the aged Angular/Material/CDK **22.1.7** selection for this
   unpublished RC.
 - **Do not** treat research-head / same-day `22.2.0` as a release baseline.
-- Advisory review for the aged peer set is **closed for this RC wave** with the
-  accepted-risk notes above; re-check GHSA/OSV immediately before any npm publish.
+- Advertised peer floor **tightened to `^22.1.7`** (applied on unpublished RC tip).
+- Advisory review for the aged peer set remains **closed for this RC wave**;
+  re-check GHSA/OSV immediately before any npm publish.
