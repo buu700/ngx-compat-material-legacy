@@ -25,3 +25,12 @@ depending on removed upstream Material 22 exports:
 Inspector flags for `@angular/animations` references are **expected** until a
 follow-up migration removes engine-bound recipes with tested CSS/`animate`
 alternatives. Do not delete trigger APIs without a consumer migration path.
+
+## RC note (documentation only)
+
+No breaking animation-recipe removals in this RC-without-publish wave. Consumers
+who need to disable animations should use the public `MATERIAL_ANIMATIONS` token
+(`animationsDisabled: true`) from `@angular/material/core`. Owned
+`@angular/animations` trigger metadata remains until a tested migration proves
+dialog/menu/select contracts stay intact. See `migration/README.md`.
+

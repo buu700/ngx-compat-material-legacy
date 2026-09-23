@@ -31,3 +31,11 @@
 ## Tests run
 - Local: `python3 -m unittest discover -s tests -v` (81 OK) prior to this packet
 - CI: https://github.com/buu700/ngx-compat-material-legacy/actions/runs/35920248851 (success)
+
+## Follow-up (this tip)
+
+- Classified W01 escape edges into shared-core / ordinary-current-companion /
+  owned-overlap / unresolved-relative in
+  `compatibility/inventories/escape-edge-classification.json`.
+- Updated `src-cleanup-plan.md`. **No `src/` deletions.**
+

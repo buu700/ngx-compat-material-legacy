@@ -18,11 +18,12 @@ core, radio, slide-toggle, card, chips, list, slider, progress-bar, progress-spi
 snack-bar, table, tabs, tooltip, autocomplete, paginator.
 
 Schematics: `schematics/collection.json` → `migrate-legacy` (real Sass `@use` rewrite +
-safe TypeScript `legacy-*` module specifier updates; fixture runner
-`scripts/schematics/test-migrate-legacy-fixtures.mjs` = 22/22).
+safe TypeScript `legacy-*` module specifier updates + acknowledgement options;
+fixture runner `scripts/schematics/test-migrate-legacy-fixtures.mjs` = **25/25**).
 
-Peer-light CLI stub: `scripts/migrate-legacy-cli.mjs` (shares the same rewrite modules;
-see `migration/README.md`).
+Peer-light CLI: bundled artifact `migration/dist/ngx-compat-material-legacy-migrate-cli-22.0.0-rc.0.tgz`
+(sha256 in `compatibility/migrate-legacy-cli-artifact.json`; Node `>=18`; no Angular peers)
+plus repo stub `scripts/migrate-legacy-cli.mjs` (see `migration/README.md`).
 
 | Artifact | Role |
 | --- | --- |

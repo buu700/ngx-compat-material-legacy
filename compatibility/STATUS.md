@@ -3,18 +3,20 @@
 Snapshot for handoff gates. Package `@ngx-compat/material-legacy@22.0.0-rc.0`
 (repo `buu700/ngx-compat-material-legacy`). **No npm publish.**
 
-## Done this line
+## RC candidate (unpublished) checklist
 
 | Gate | Status | Evidence |
 | --- | --- | --- |
-| Scoped legacy component secondary entries | Done | All `research/scope.json` preserved entries pack |
-| Historical `*/testing` secondary entries | Done | **22/22** pack; ESM smoke 44 imports OK |
-| Sass root facade + theme smoke | Done | `#4527a0` deep-purple 800; component class markers present |
-| `migrate-legacy` schematic (real rewrites) | Done | Fixtures 22/22; Sass `@use` + safe TS `legacy-*` |
-| Peer-light pre-upgrade CLI stub (W08) | Done (stub) | `scripts/migrate-legacy-cli.mjs` shares schematic engine; `migration/README.md` |
-| Pack + inspect | Done (expected flags) | `compatibility/pack-proof/`; inspector still flags animation peer/refs |
-| License / provenance | Done | Google MIT notice + Copyright (c) 2026 Ryan Lester |
-| CI green on push | Mitigated | Keep watching Actions; `workflow_dispatch` backup |
+| Scoped legacy component secondary entries | **Done** | All 22 `research/scope.json` preserved entries pack |
+| Historical `*/testing` secondary entries | **Done** | **22/22** pack; ESM smoke 44 imports OK |
+| Sass root facade + theme smoke | **Done** | `#4527a0` deep-purple 800; component class markers present |
+| `migrate-legacy` schematic (real rewrites) | **Done** | Fixtures **25/25**; Sass `@use` + safe TS `legacy-*` + acknowledgement paths |
+| Peer-light pre-upgrade CLI (bundled artifact) | **Done** | `migration/dist/*.tgz`; sha256 in `compatibility/migrate-legacy-cli-artifact.json`; Node `>=18`; no Angular peers |
+| Companion/aggregate/current acknowledgement flows | **Done** | Shared engine flags; CLI + schematic; fixtures cover acked + unacked paths |
+| Escape-edge classification (no mass-delete) | **Done (docs)** | `compatibility/inventories/escape-edge-classification.json` + `src-cleanup-plan.md` |
+| Pack + inspect | **Done (expected flags)** | `compatibility/pack-proof/`; inspector still flags animation peer/refs |
+| License / provenance | **Done** | Google MIT notice + Copyright (c) 2026 Ryan Lester |
+| CI green on push | **Watch** | Fixtures + CLI `--verify` in workflow; keep watching Actions |
 
 ## Testing matrix (`*/testing`)
 
@@ -45,15 +47,16 @@ Snapshot for handoff gates. Package `@ngx-compat/material-legacy@22.0.0-rc.0`
 
 Skipped: none — every historical inventory testing entry exists and packs.
 
-## CLI status
+## CLI / schematic status
 
 - **Schematic:** `ng generate @ngx-compat/material-legacy:migrate-legacy`
-- **Peer-light CLI stub:** `node scripts/migrate-legacy-cli.mjs <path> [--apply] [--json]`
-  - No Angular runtime peers required to run the CLI process
-  - Shares `sass-rewrite.js` / `ts-rewrite.js` with the schematic
-  - Default dry-run; blocking diagnostics → exit 1
-- **Still for RC packaging:** separately downloadable **bundled** CLI artifact
-  (parser included, published hash + Node engine) — not required for stub handoff
+  - Options: `acknowledgeCompanionBridges`, `acknowledgeAggregates`,
+    `acknowledgeCurrentComponents`
+- **Repo CLI stub:** `node scripts/migrate-legacy-cli.mjs <path> [--apply] [--json] [--acknowledge-*]`
+- **Bundled artifact:** `migration/dist/ngx-compat-material-legacy-migrate-cli-22.0.0-rc.0.tgz`
+  - Hash: see `compatibility/migrate-legacy-cli-artifact.json`
+  - Engines: Node `>=18.0.0`; Angular peers: none
+  - Rebuild/verify: `node scripts/build-migrate-legacy-cli.mjs[--verify]`
 
 ## Motion
 
@@ -62,16 +65,16 @@ Skipped: none — every historical inventory testing entry exists and packs.
 - Documented consumer path: public `MATERIAL_ANIMATIONS` / `animationsDisabled`
   (`migration/README.md`) — **no** breaking recipe removals this wave
 
-## Left for RC (without publish)
+## Left for maintainer publish (out of this RC-without-publish stream)
 
-1. Broader migrate-legacy acknowledgement flows (companion/aggregate bridges).
-2. Bundled peer-light CLI release artifact (hash + engines) when packaging RC.
-3. Motion follow-up: tested migrations off deprecated animation engine **without**
+1. Maintainer-authorized **npm publish** of `@ngx-compat/material-legacy@22.0.0-rc.0`
+   (and optionally the separate migrate-cli package) after packed-artifact and
+   metadata checks / org access.
+2. Motion follow-up: tested migrations off deprecated animation engine **without**
    breaking dialog/menu/select contracts.
-4. Escape-edge classification before any `src/` cleanup (do **not** mass-delete).
-5. Advisory / security triage for aged peer set; maintainer-authorized publish
-   after packed-artifact and metadata checks.
-6. Optional: expand consumer AOT/harness runtime tests beyond ESM import smoke.
+3. Advisory / security triage for aged peer set.
+4. Optional: expand consumer AOT/harness runtime tests beyond ESM import smoke.
+5. `src/` cleanup only after unresolved escape edges are closed (prefer docs over delete).
 
 ## Constraints (unchanged)
 
