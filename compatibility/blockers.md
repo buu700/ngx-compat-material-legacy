@@ -13,11 +13,12 @@ flags historical animation-engine references in dialog/menu/select/form-field
 deprecated engine from published runtime).
 
 ### Remaining entry points (scope)
-- `legacy-chips`, `legacy-table`, `legacy-paginator`, `legacy-tabs`,
+- `legacy-table`, `legacy-paginator`, `legacy-tabs`,
   `legacy-snack-bar`, `legacy-tooltip`.
 - Testing secondary entries beyond `legacy-button/testing`.
 
 ## Resolved / mitigated
+- **legacy-chips**: secondary entry builds and packs; theme smoke includes `.mat-chip`.
 - **Overlay trio**: `legacy-dialog`, `legacy-menu`, `legacy-autocomplete`
   secondary entries build and pack; consumer ESM + Sass theme smoke green
   (`#4527a0`). Owned Material-16 bases (`_MatDialogBase` /
