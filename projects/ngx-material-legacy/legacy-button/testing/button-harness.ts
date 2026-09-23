@@ -8,7 +8,27 @@
 
 import {ContentContainerComponentHarness, HarnessPredicate} from '@angular/cdk/testing';
 import {coerceBooleanProperty} from '@angular/cdk/coercion';
-import {ButtonHarnessFilters, ButtonVariant} from '@angular/material/button/testing';
+import {BaseHarnessFilters} from '@angular/cdk/testing';
+
+/**
+ * Historical legacy button variants (Material 16).
+ * Current Material's ButtonVariant no longer includes raised/flat/stroked.
+ */
+export type LegacyButtonVariant =
+  | 'basic'
+  | 'raised'
+  | 'flat'
+  | 'icon'
+  | 'stroked'
+  | 'fab'
+  | 'mini-fab';
+
+/** @deprecated Use filters with MatButtonHarness from @angular/material/button/testing for MDC buttons. */
+export interface LegacyButtonHarnessFilters extends BaseHarnessFilters {
+  text?: string | RegExp;
+  variant?: LegacyButtonVariant;
+  disabled?: boolean;
+}
 
 /**
  * Harness for interacting with a standard mat-button in tests.
@@ -27,7 +47,7 @@ export class MatLegacyButtonHarness extends ContentContainerComponentHarness {
    * @param options Options for filtering which button instances are considered a match.
    * @return a `HarnessPredicate` configured with the given options.
    */
-  static with(options: ButtonHarnessFilters = {}): HarnessPredicate<MatLegacyButtonHarness> {
+  static with(options: LegacyButtonHarnessFilters = {}): HarnessPredicate<MatLegacyButtonHarness> {
     return new HarnessPredicate(MatLegacyButtonHarness, options)
       .addOption('text', options.text, (harness, text) =>
         HarnessPredicate.stringMatches(harness.getText(), text),
@@ -81,7 +101,7 @@ export class MatLegacyButtonHarness extends ContentContainerComponentHarness {
   }
 
   /** Gets the variant of the button. */
-  async getVariant(): Promise<ButtonVariant> {
+  async getVariant(): Promise<LegacyButtonVariant> {
     const host = await this.host();
 
     if ((await host.getAttribute('mat-raised-button')) != null) {

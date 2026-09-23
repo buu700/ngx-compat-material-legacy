@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-export {MatLegacyButtonHarness} from './button-harness';
 export {
-  ButtonHarnessFilters as LegacyButtonHarnessFilters,
-  ButtonVariant as LegacyButtonVariant,
-} from '@angular/material/button/testing';
+  MatLegacyButtonHarness,
+  LegacyButtonVariant,
+  LegacyButtonHarnessFilters,
+} from './button-harness';
