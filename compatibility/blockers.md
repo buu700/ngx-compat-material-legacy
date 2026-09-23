@@ -10,6 +10,15 @@ after repository metadata updates inside the packaged files, so CI `--verify` fa
 Mitigated by rebuilding the artifact + hash record and refreshing pack-proof
 consumer-smoke sha256. Keep watching Actions on follow-up pushes.
 
+## B-ADV-01 — Aged peer advisory triage (mitigated for unpublished RC)
+Triage recorded in `compatibility/advisory-triage.md` (2026-09-23). Exact pins
+`@angular/*@22.1.7` / Material+CDK `22.1.7` are OSV-clean and include known
+Angular 22 GHSA patches (floors through 22.1.1 framework / 22.1.4 platform-server).
+Same-day `22.1.8` / `22.2.0` fail the 7-day age window — **not** adopted.
+Advertised library peer `^22.0.0` remains wider than the security floor:
+**accepted risk** for unpublished RC; publish-time floor tighten is queued, not
+applied silently. Re-check advisories immediately before npm publish.
+
 ## B-PKG-03 — Schematics / remaining legacy entries incomplete
 **Mitigated for component scope + full historical testing + migrate-legacy + bundled CLI**:
 all `research/scope.json` `preserved_entry_points` pack (including `legacy-tabs`).
@@ -35,6 +44,8 @@ migrations remove the deprecated engine from published runtime.
   `MATERIAL_ANIMATIONS`; no breaking trigger removals this wave).
 - `src/` cleanup only after unresolved escape edges close (prefer documenting).
 - Maintainer-authorized npm publish after packed-artifact and metadata checks.
+- Publish-time peer-floor tighten (`^22.0.0` → security/tested floor) per
+  `compatibility/advisory-triage.md` (deferred; not silently changed on RC tip).
 
 ## Resolved / mitigated
 - **Full historical testing ports (22/22)**: radio, slide-toggle, card, chips, list,
@@ -77,7 +88,10 @@ migrations remove the deprecated engine from published runtime.
   `compatibility/pack-proof/`.
 - **B-SASS-01**: Material-16.2.14 seals + strict CSS parity evidence (fixture
   compare still healthy this tip: owned palette/constructor/cyph/button CSS equal).
-- **B-TOOL-01**: Aged Angular 22.1.7 peer set installed; advisory review still open.
+- **B-TOOL-01**: Aged Angular 22.1.7 peer set installed; advisory triage recorded in
+  `compatibility/advisory-triage.md` (OSV clean for exact pins; known Angular 22
+  GHSAs patched by 22.1.7; same-day 22.1.8/22.2.0 not adopted; advertised `^22.0.0`
+  peer-floor tighten deferred to publish).
 
 ## Constraints
 - Cyph tree at `/workspace/ngx-compat/reference/cyph-dev-prod` is oracle-only; never commit it.

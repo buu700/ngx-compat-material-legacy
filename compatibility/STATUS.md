@@ -17,7 +17,8 @@ Snapshot for handoff gates. Package `@ngx-compat/material-legacy@22.0.0-rc.0`
 | Escape-edge classification (no mass-delete) | **Done (docs)** | `compatibility/inventories/escape-edge-classification.json` + `src-cleanup-plan.md` |
 | Pack + inspect | **Done (expected flags)** | `compatibility/pack-proof/`; inspector still flags animation peer/refs |
 | License / provenance | **Done** | Google MIT notice + Copyright (c) 2026 Ryan Lester |
-| CI green on push | **Done** | Tip run https://github.com/buu700/ngx-compat-material-legacy/actions/runs/35929724324 success on `3faae7d12` after CLI hash refresh |
+| CI green on push | **Done** | Tip run https://github.com/buu700/ngx-compat-material-legacy/actions/runs/35930115030 success on `008dfde0d` (Helper tests and static checks) |
+| Advisory / security triage (aged 22.1.7 peers) | **Done (docs)** | `compatibility/advisory-triage.md` — OSV clean for exact pins; known Angular 22 GHSAs patched by 22.1.7; no silent peer bumps; publish-time peer-floor tighten deferred |
 
 ## Testing matrix (`*/testing`)
 
@@ -65,26 +66,31 @@ Skipped: none — every historical inventory testing entry exists and packs.
   (`compatibility/motion-overlay-trio.md`)
 - Documented consumer path: public `MATERIAL_ANIMATIONS` / `animationsDisabled`
   (`migration/README.md`) — **no** breaking recipe removals this wave
+- Advisory triage did **not** require motion engine changes; full removal still deferred
 
 ## This tip
 
-- Rebuilt bundled peer-light CLI tarball + `compatibility/migrate-legacy-cli-artifact.json`
-  so `node scripts/build-migrate-legacy-cli.mjs --verify` matches committed bytes.
-- Refreshed `compatibility/pack-proof/consumer-smoke.json` tarball sha256 after
-  packed `package.json` repository metadata updates (no pack rebuild).
-- Acknowledgement flows and escape-edge inventory unchanged and still complete for RC-without-publish.
-- Motion: docs/incremental only; full `@angular/animations` engine removal still deferred.
+- Advisory triage recorded for aged Angular/Material/CDK **22.1.7** peer set
+  (`compatibility/advisory-triage.md`); OSV clean; keep aged pins; do not adopt
+  same-day `22.1.8` / `22.2.0`.
+- Motion: docs/incremental only; `@angular/animations` overlay metadata retained.
+- Escape-edge / `src/` cleanup: docs tip refreshed; **no** mass-delete; unresolved
+  relative stubs remain 68.
+- Prior tip work (CLI hash verify, pack-proof sha256, acknowledgement flows) unchanged.
 
 ## Left for maintainer publish (out of this RC-without-publish stream)
 
 1. Maintainer-authorized **npm publish** of `@ngx-compat/material-legacy@22.0.0-rc.0`
    (and optionally the separate migrate-cli package) after packed-artifact and
    metadata checks / org access.
-2. Motion follow-up: tested migrations off deprecated animation engine **without**
+2. Publish-time **peer-floor tighten** review (advertised `^22.0.0` vs security /
+   tested floor ≥22.1.7) — see advisory triage accepted-risk notes.
+3. Motion follow-up: tested migrations off deprecated animation engine **without**
    breaking dialog/menu/select contracts.
-3. Advisory / security triage for aged peer set.
 4. Optional: expand consumer AOT/harness runtime tests beyond ESM import smoke.
 5. `src/` cleanup only after unresolved escape edges are closed (prefer docs over delete).
+6. Re-run GHSA/OSV + lockfile `pnpm audit` immediately before publish; consider
+   aged `22.1.8+` only after the 7-day window and regression checks.
 
 ## Constraints (unchanged)
 

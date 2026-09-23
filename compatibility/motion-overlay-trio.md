@@ -34,3 +34,10 @@ who need to disable animations should use the public `MATERIAL_ANIMATIONS` token
 `@angular/animations` trigger metadata remains until a tested migration proves
 dialog/menu/select contracts stay intact. See `migration/README.md`.
 
+## Status after advisory triage (2026-09-23)
+
+Advisory triage (`compatibility/advisory-triage.md`) found no GHSA that requires
+removing or replacing owned `@angular/animations` trigger metadata on the aged
+22.1.7 peer set. Full engine removal from overlays remains **deferred** until a
+tested migration preserves dialog/menu/select contracts. Consumer disable path
+remains public `MATERIAL_ANIMATIONS` / `animationsDisabled`.

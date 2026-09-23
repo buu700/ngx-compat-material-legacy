@@ -53,6 +53,7 @@ testing secondary entries pack. Schematics + bundled peer-light CLI live under
 
 ## Status check (2026-09-23 tip)
 
-Reconfirmed on tip: classification still stands; **no** `src/`
+Reconfirmed after advisory triage: classification still stands; **no** `src/`
 deletion authorized. Unresolved relative stubs remain **68**; shared-core and
-ordinary companions remain blocked. Prefer documenting over deleting.
+ordinary companions remain blocked. Advisory work did not produce escape-edge
+closure evidence. Prefer documenting over deleting.
