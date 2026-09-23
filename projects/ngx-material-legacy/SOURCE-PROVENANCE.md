@@ -64,3 +64,17 @@ See `compatibility/inventories/sass-facade-copy-manifest.json`.
   `_MatAutocompleteTriggerBase` / `_MatAutocompleteOriginBase`; options via
   package `legacy-core`; shared default/scroll tokens on
   `@angular/material/autocomplete`. Legacy panel keeps `_animationDone = null`.
+
+## Table / paginator / tooltip / snack-bar ports (2026-09-23)
+
+- `legacy-tooltip`: owned `_MatTooltipBase` / `_TooltipComponentBase` and
+  scroll-strategy factory provider; shared position/default tokens on
+  `@angular/material/tooltip`. CSS show/hide animations retained.
+- `legacy-paginator`: owned `_MatPaginatorBase` and intl provider factory;
+  `MatPaginatorIntl` / `PageEvent` / select config from `@angular/material/paginator`.
+- `legacy-table`: owned `_MatTableDataSource` + paginator interfaces; table host
+  adapted to current CDK outlet/`CdkTable` template (no removed
+  `CDK_TABLE_TEMPLATE` / coalesced scheduler tokens).
+- `legacy-snack-bar`: owned `_MatSnackBarBase` / `_MatSnackBarContainerBase` /
+  `MatSnackBarRef` / `matSnackBarAnimations` / `LegacyTextOnlySnackBar`; shared
+  config/data tokens on `@angular/material/snack-bar`.

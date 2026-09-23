@@ -9,7 +9,7 @@ secondary entries plus the Sass root facade.
 `legacy-core` (option), `legacy-select`, `legacy-card`, `legacy-checkbox`,
 `legacy-radio`, `legacy-slide-toggle`, `legacy-progress-bar`,
 `legacy-progress-spinner`, `legacy-slider`, `legacy-list`, `legacy-dialog`,
-`legacy-menu`, `legacy-autocomplete`, `legacy-chips`.
+`legacy-menu`, `legacy-autocomplete`, `legacy-chips`, `legacy-tooltip`, `legacy-paginator`, `legacy-table`, `legacy-snack-bar`.
 
 | Artifact | Role |
 | --- | --- |

@@ -13,12 +13,17 @@ flags historical animation-engine references in dialog/menu/select/form-field
 deprecated engine from published runtime).
 
 ### Remaining entry points (scope)
-- `legacy-table`, `legacy-paginator`, `legacy-tabs`,
-  `legacy-snack-bar`, `legacy-tooltip`.
+- `legacy-tabs`.
 - Testing secondary entries beyond `legacy-button/testing`.
+- Schematics migrate-legacy stub collection.
 
 ## Resolved / mitigated
 - **legacy-chips**: secondary entry builds and packs; theme smoke includes `.mat-chip`.
+- **legacy-tooltip / legacy-paginator / legacy-table / legacy-snack-bar**: secondary
+  entries build and pack; owned Material-16 bases (`_MatTooltipBase` /
+  `_TooltipComponentBase`, `_MatPaginatorBase`, `_MatTableDataSource`,
+  `_MatSnackBarBase` / `_MatSnackBarContainerBase` / owned `MatSnackBarRef` +
+  `matSnackBarAnimations`); consumer ESM + Sass theme smoke green (`#4527a0`).
 - **Overlay trio**: `legacy-dialog`, `legacy-menu`, `legacy-autocomplete`
   secondary entries build and pack; consumer ESM + Sass theme smoke green
   (`#4527a0`). Owned Material-16 bases (`_MatDialogBase` /
