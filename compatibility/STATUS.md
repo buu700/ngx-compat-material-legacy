@@ -17,7 +17,7 @@ Snapshot for handoff gates. Package `@ngx-compat/material-legacy@22.0.0-rc.0`
 | Escape-edge classification (no mass-delete) | **Done (docs)** | `compatibility/inventories/escape-edge-classification.json` + `src-cleanup-plan.md` |
 | Pack + inspect | **Done (expected flags)** | `compatibility/pack-proof/`; inspector still flags animation peer/refs |
 | License / provenance | **Done** | Google MIT notice + Copyright (c) 2026 Ryan Lester |
-| CI green on push | **Watch** | Fixtures + CLI `--verify` in workflow; tip before this refresh failed `--verify` (stale CLI sha after repository metadata updates); re-push should clear |
+| CI green on push | **Done** | Tip run https://github.com/buu700/ngx-compat-material-legacy/actions/runs/35929724324 success on `3faae7d12` after CLI hash refresh |
 
 ## Testing matrix (`*/testing`)
 
@@ -70,7 +70,7 @@ Skipped: none — every historical inventory testing entry exists and packs.
 
 - Rebuilt bundled peer-light CLI tarball + `compatibility/migrate-legacy-cli-artifact.json`
   so `node scripts/build-migrate-legacy-cli.mjs --verify` matches committed bytes.
-- Refreshed `compatibility/pack-proof/consumer-smoke.json` tarball sha256 after the
+- Refreshed `compatibility/pack-proof/consumer-smoke.json` tarball sha256 after
   packed `package.json` repository metadata updates (no pack rebuild).
 - Acknowledgement flows and escape-edge inventory unchanged and still complete for RC-without-publish.
 - Motion: docs/incremental only; full `@angular/animations` engine removal still deferred.
