@@ -1,0 +1,158 @@
+--- reference/material-16.2.14/sass-css/06-aggregate-and-companions.css	2026-09-23 17:12:31.551854165 -0400
++++ /tmp/candidate-sass-bridge/06-aggregate-and-companions.css	2026-09-23 17:17:09.159724399 -0400
+@@ -17,8 +17,10 @@
+   transition: opacity, transform 0ms cubic-bezier(0, 0, 0.2, 1);
+   transform: scale3d(0, 0, 0);
+ }
+-.cdk-high-contrast-active .mat-ripple-element {
+-  display: none;
++@media (forced-colors: active) {
++  .mat-ripple-element {
++    display: none;
++  }
+ }
+ 
+ .cdk-visually-hidden {
+@@ -67,10 +69,10 @@
+   position: absolute;
+   pointer-events: auto;
+   box-sizing: border-box;
+-  z-index: 1000;
+   display: flex;
+   max-width: 100%;
+   max-height: 100%;
++  z-index: 1000;
+ }
+ 
+ .cdk-overlay-backdrop {
+@@ -79,17 +81,26 @@
+   bottom: 0;
+   left: 0;
+   right: 0;
+-  z-index: 1000;
+   pointer-events: auto;
+   -webkit-tap-highlight-color: transparent;
+-  transition: opacity 400ms cubic-bezier(0.25, 0.8, 0.25, 1);
+   opacity: 0;
++  touch-action: manipulation;
++  z-index: 1000;
++  transition: opacity 400ms cubic-bezier(0.25, 0.8, 0.25, 1);
++}
++@media (prefers-reduced-motion) {
++  .cdk-overlay-backdrop {
++    transition-duration: 1ms;
++  }
+ }
+-.cdk-overlay-backdrop.cdk-overlay-backdrop-showing {
++
++.cdk-overlay-backdrop-showing {
+   opacity: 1;
+ }
+-.cdk-high-contrast-active .cdk-overlay-backdrop.cdk-overlay-backdrop-showing {
+-  opacity: 0.6;
++@media (forced-colors: active) {
++  .cdk-overlay-backdrop-showing {
++    opacity: 0.6;
++  }
+ }
+ 
+ .cdk-overlay-dark-backdrop {
+@@ -101,7 +112,7 @@
+   visibility: hidden;
+   opacity: 1;
+ }
+-.cdk-overlay-transparent-backdrop.cdk-overlay-backdrop-showing {
++.cdk-overlay-transparent-backdrop.cdk-overlay-backdrop-showing, .cdk-high-contrast-active .cdk-overlay-transparent-backdrop {
+   opacity: 0;
+   visibility: visible;
+ }
+@@ -112,11 +123,11 @@
+ 
+ .cdk-overlay-connected-position-bounding-box {
+   position: absolute;
+-  z-index: 1000;
+   display: flex;
+   flex-direction: column;
+   min-width: 1px;
+   min-height: 1px;
++  z-index: 1000;
+ }
+ 
+ .cdk-global-scrollblock {
+@@ -125,6 +136,31 @@
+   overflow-y: scroll;
+ }
+ 
++.cdk-overlay-popover {
++  background: none;
++  border: none;
++  padding: 0;
++  outline: 0;
++  overflow: visible;
++  position: fixed;
++  pointer-events: none;
++  white-space: normal;
++  color: inherit;
++  text-decoration: none;
++  width: 100%;
++  height: 100%;
++  inset: auto;
++  top: 0;
++  left: 0;
++}
++.cdk-overlay-popover::backdrop {
++  display: none;
++}
++.cdk-overlay-popover .cdk-overlay-backdrop {
++  position: fixed;
++  z-index: auto;
++}
++
+ textarea.cdk-textarea-autosize {
+   resize: none;
+ }
+@@ -171,10 +207,11 @@
+   content: "";
+ }
+ 
+-.cdk-high-contrast-active {
+-  --mat-focus-indicator-display: block;
++@media (forced-colors: active) {
++  html {
++    --mat-focus-indicator-display: block;
++  }
+ }
+-
+ .mat-mdc-focus-indicator {
+   position: relative;
+ }
+@@ -194,10 +231,11 @@
+   content: "";
+ }
+ 
+-.cdk-high-contrast-active {
+-  --mat-mdc-focus-indicator-display: block;
++@media (forced-colors: active) {
++  html {
++    --mat-mdc-focus-indicator-display: block;
++  }
+ }
+-
+ .mat-button, .mat-icon-button, .mat-stroked-button {
+   color: inherit;
+   background: transparent;
+@@ -2033,9 +2071,11 @@
+   /* @alternate */
+   font-weight: var(--mat-badge-text-weight, 600);
+ }
+-.cdk-high-contrast-active .mat-badge-content {
+-  outline: solid 1px;
+-  border-radius: 0;
++@media (forced-colors: active) {
++  .mat-badge-content {
++    outline: solid 1px;
++    border-radius: 0;
++  }
+ }
+ 
+ .mat-badge-disabled .mat-badge-content {

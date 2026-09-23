@@ -1,12 +1,5 @@
 # Active blockers
 
-## B-SASS-02 — Bridge-review / aggregate CSS still needs disposition
-Strict owned Sass fixtures from the packed facade match sealed Material-16.2.14 CSS
-byte-for-byte (30/30 compiled strict cases; Cyph deep-purple 800 → `#4527a0`), see
-`compatibility/pack-proof/candidate-vs-reference-css.json`. Bridge-review fixtures
-(`02-core`, `03-legacy-core`, `06-aggregate-and-companions`, `08-core-theme`) still
-need explicit drift reports / approvals — not silent equality claims.
-
 ## B-PKG-02 — Component SCSS→CSS seam is precompiled for legacy-button
 `legacy-button` packs with checked-in `button.css` (compiled with Material-16
 `@material/*` load paths). Live `styleUrls: ['button.scss']` inside ng-packagr still
@@ -17,6 +10,11 @@ Mitigated: push-triggered CI is now producing runs (e.g. success on
 `5f7740be`). Keep `workflow_dispatch` as a backup.
 
 ## Resolved / mitigated
+- **B-SASS-02**: Bridge-review fixtures dispositioned 2026-09-23 as
+  **intentional current-bridge** (shared CDK infrastructure). See
+  `compatibility/bridge-disposition/` and `compatibility/migration-report-seed.md`.
+  No owned-parity must-fix; `core()` non-empty; aggregates did not shrink;
+  `08-core-theme` and all strict owned fixtures remain equal to Material-16.2.14 seals.
 - **B-PKG-01**: `pnpm approve-builds` for `esbuild` / `@parcel/watcher` done.
   ng-packagr produces primary + `legacy-button`; packed consumer smoke recorded under
   `compatibility/pack-proof/`.

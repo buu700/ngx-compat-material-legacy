@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "blocker": "B-SASS-02",
+  "recorded_at": "2026-09-23T17:19:00-04:00",
+  "reviewer": "Ryan Lester <hacker@linux.com>",
+  "method": "Newline-normalized byte compare of packed-facade candidate CSS (/tmp/candidate-sass-bridge from pack-proof run) vs sealed reference/material-16.2.14/sass-css. Unified diffs stored under compatibility/bridge-disposition/.",
+  "invariants_checked": {
+    "core_non_empty": true,
+    "legacy_core_non_empty": true,
+    "aggregate_did_not_shrink": true,
+    "palette_theme_constructors_unchanged": true,
+    "notes": "08-core-theme equal; all strict owned fixtures equal including 11-cyph-deep-purple-800 (#4527a0). Aggregate cand_bytes > ref_bytes."
+  },
+  "fixtures": [
+    {
+      "id": "02-core",
+      "status": "diff",
+      "ref_bytes": 4216,
+      "cand_bytes": 4853,
+      "delta_bytes": 637,
+      "ref_sha256": "fac41823e947b8730a19e2386dfedd984703692b7ddbf701a767240774407de8",
+      "cand_sha256": "fefd44278565e6e19822c2feeadd7b2b5f3cf413d8b14f6edf6b46cb4a98b34c",
+      "disposition": "intentional-current-bridge",
+      "category": "shared-infrastructure",
+      "owned_parity_required": false,
+      "summary": "mat.core() includes @angular/cdk overlay/a11y/text-field mixins from the current CDK peer. Diff is CDK modernization: .cdk-high-contrast-active \u2192 @media (forced-colors: active), prefers-reduced-motion on backdrop, cdk-overlay-popover rules, property-order churn, simplified .cdk-overlay-backdrop-showing selector. core() is not empty (+637 bytes vs Material-16 seal).",
+      "must_not": "Do not empty core(); do not vendor historical CDK overlay CSS into the owned facade to force byte equality.",
+      "diff_evidence": "compatibility/bridge-disposition/02-core.unified.diff"
+    },
+    {
+      "id": "03-legacy-core",
+      "status": "diff",
+      "ref_bytes": 4216,
+      "cand_bytes": 4853,
+      "delta_bytes": 637,
+      "ref_sha256": "fac41823e947b8730a19e2386dfedd984703692b7ddbf701a767240774407de8",
+      "cand_sha256": "fefd44278565e6e19822c2feeadd7b2b5f3cf413d8b14f6edf6b46cb4a98b34c",
+      "disposition": "intentional-current-bridge",
+      "category": "shared-infrastructure",
+      "owned_parity_required": false,
+      "summary": "mat.legacy-core() is an alias of the same structural core() path (ripple + current CDK a11y/overlay/text-field + focus structural styling). Candidate CSS is byte-identical to 02-core; same disposition.",
+      "must_not": "Do not diverge legacy-core() from core() structural includes; do not empty it.",
+      "diff_evidence": "compatibility/bridge-disposition/03-legacy-core.unified.diff"
+    },
+    {
+      "id": "06-aggregate-and-companions",
+      "status": "diff",
+      "ref_bytes": 182042,
+      "cand_bytes": 182695,
+      "delta_bytes": 653,
+      "ref_sha256": "b9e73e138556f00c4077c19032587c2b78a64aad0ecc46abc3dca56b1eb95070",
+      "cand_sha256": "8a24cc46ff666208bb12b5a2c2eb0af04a83168dc4d9b62c97c0453092e97507",
+      "disposition": "intentional-current-bridge",
+      "category": "shared-infrastructure",
+      "owned_parity_required": false,
+      "summary": "Aggregate = core() + all-legacy-component-themes(+ dark shell) + expansion-theme companion. After stripping the shared core() prefix, remaining owned legacy theme CSS matches Material-16 except (1) one leading blank-line whitespace and (2) badge theme @include cdk.high-contrast(active, off) now emitting forced-colors from current CDK. Aggregate grew (+653 bytes); membership did not shrink. expansion-theme companion still present.",
+      "must_not": "Do not drop aggregate members or companions to silence the bridge diff.",
+      "diff_evidence": "compatibility/bridge-disposition/06-aggregate-and-companions.unified.diff"
+    },
+    {
+      "id": "08-core-theme",
+      "status": "equal",
+      "ref_bytes": 7637,
+      "cand_bytes": 7637,
+      "delta_bytes": 0,
+      "ref_sha256": "5d0f9c132e40f3afd4764d99d965c1921aa84bda68d4da720b2c3daa84f40032",
+      "cand_sha256": "5d0f9c132e40f3afd4764d99d965c1921aa84bda68d4da720b2c3daa84f40032",
+      "disposition": "equal",
+      "category": "owned-legacy",
+      "owned_parity_required": true,
+      "summary": "legacy-core-theme / core-theme color+typography path matches Material-16.2.14 seal byte-for-byte. Confirms palette/theme constructor meanings unchanged under the bridge.",
+      "diff_evidence": null
+    }
+  ],
+  "must_fix_owned": [],
+  "blocked": [],
+  "cyph_priority": {
+    "palette_theme_constructors": "unchanged (strict fixtures + 08-core-theme equal)",
+    "core_not_empty": true,
+    "aggregates_not_shrunk": true
+  }
+}
