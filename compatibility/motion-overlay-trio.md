@@ -53,3 +53,10 @@ historical public API compatibility and still imports `@angular/animations` type
 inspector flags on that export are expected until a tested migration removes the
 symbol or replaces it with an honest non-engine type.
 
+## Import graph (2026-09-23 follow-up)
+
+See `motion-animations-import-graph.md` for the precise 12-file source list and
+7 packed FESM importers. Another pass confirmed: type-only `AnimationEvent` usage
+can use `import type` (hygiene); **value** recipe imports cannot be removed without
+CSS/WAAPI replacements. Tooltip remaining coupling is the **exported** recipe
+re-export into `legacy-tooltip` FESM — not the runtime CSS show/hide path.

@@ -29,7 +29,7 @@ Tip includes pack + consumer smoke (`db5d8840c` family).
 | Aged peer install | **Done** | framework 21.2.23, Material/CDK 21.2.14 |
 | `ng-packagr` rebuild + pack | **Done** | `compatibility/pack-proof-21/*.tgz` |
 | Packed-consumer Sass/ESM/AOT | **Done** | `pack-proof-21/consumer-smoke.json` |
-| Node 20.19 consumer matrix | **TODO** | Host smoke used Node 24 |
+| Node 20.19 consumer matrix | **Done** | `pack-proof-21/node20-consumer-smoke.json` on `21.x` (Node 20.19.6; Sass/ESM/AOT + button/select/checkbox harness) |
 | npm publish | **Not done** | Owner later → `lts-21-next` only |
 
 Angular 21 lockfile stays on `21.x` only — do not merge into `main`.
