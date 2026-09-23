@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "checked_on": "2026-09-23",
+  "minimum_age_minutes": 10080,
+  "repository": {
+    "node": "24.21.0",
+    "pnpm": "12.4.2"
+  },
+  "release": {
+    "npm": "11.19.0",
+    "minimum_npm_for_staging": "11.15.0",
+    "minimum_node_for_staging": "22.14.0"
+  },
+  "policy": {
+    "node_line": 24,
+    "pnpm_line": 12,
+    "updates": "Exact reviewed pin changes only; aged at least seven days, or a documented exact-version urgent security exception. No floating latest at install/build/publish time.",
+    "npm": "Release-only CLI; use an explicitly selected supported, aged version >=11.15.0. The npm major is independent of the pnpm major."
+  },
+  "release_observations": {
+    "node": {
+      "version": "24.21.0",
+      "official_release_date": "2026-09-08",
+      "source": "https://nodejs.org/en/blog/release/v24.21.0"
+    },
+    "pnpm": {
+      "version": "12.4.2",
+      "official_release_date": "2026-09-15",
+      "source": "https://github.com/pnpm/pnpm/releases/tag/v12.4.2",
+      "selection_reason": "Official release notes describe executable-shim and credential-link hardening, frozen-install cleanup, and update/lockfile fixes. The release date is more than seven days before the handoff check date; registry timestamp and downloaded artifact verification remain required before bootstrap."
+    },
+    "npm": {
+      "version": "11.19.0",
+      "official_release_date": "2026-07-29",
+      "source": "https://github.com/npm/cli/releases/tag/v11.19.0"
+    }
+  },
+  "bootstrap_verification": {
+    "status": "verified-local-2026-09-23",
+    "requirements": [
+      "Verify actual registry publication timestamps/integrity for pnpm/npm and platform-specific pnpm binaries or installer dependencies.",
+      "Verify official Node binary checksums/signatures for the chosen platform.",
+      "Record tools actually executed and check version output.",
+      "Review advisories and release notes; age alone does not certify safety."
+    ],
+    "registry_metadata_captured": true,
+    "selected_toolchain_executed": true,
+    "evidence_file": "compatibility/tooling-release-evidence.json"
+  },
+  "exceptions": []
+}
