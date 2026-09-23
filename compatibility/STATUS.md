@@ -19,7 +19,7 @@ Package `@ngx-compat/material-legacy@22.0.0-rc.0` on `main`
 | `@angular/animations` truly optional (no primary FESM import) | **Done** | Opt-in `/animations` only |
 | W10 21.x line | **Done (branch)** | |
 | `src/` mass-delete | **Blocked** | Shared-core companions |
-| CI green | **Track after push** | |
+| CI green | **Done** | https://github.com/buu700/ngx-compat-material-legacy/actions/runs/35935668842 on `067f7f91a` |
 
 ## Left for (honest)
 
