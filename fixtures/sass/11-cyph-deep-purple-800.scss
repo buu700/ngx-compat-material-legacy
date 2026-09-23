@@ -1,0 +1,26 @@
+@use '@angular/material' as mat;
+@use 'sass:map';
+@use 'sass:meta';
+
+// Cyph-like historical primary: define-palette($deep-purple-palette, 800, 700, 900)
+$cyph-primary: mat.define-palette(mat.$deep-purple-palette, 800, 700, 900);
+$cyph-accent: mat.define-palette(mat.$deep-purple-palette, 500, 400, 600);
+$cyph-warn: mat.define-palette(mat.$red-palette, 700, 600, 800);
+$theme: mat.define-light-theme((
+  color: (
+    primary: $cyph-primary,
+    accent: $cyph-accent,
+    warn: $cyph-warn,
+  ),
+  typography: mat.define-legacy-typography-config(),
+  density: 0,
+));
+
+.cyph-palette {
+  --primary-default: #{map.get($cyph-primary, default)};
+  --primary-lighter: #{map.get($cyph-primary, lighter)};
+  --primary-darker: #{map.get($cyph-primary, darker)};
+  --primary-contrast: #{mat.get-contrast-color-from-palette($cyph-primary, default)};
+  --theme: #{meta.inspect($theme)};
+  color: map.get($cyph-primary, default);
+}
