@@ -33,7 +33,8 @@ Branch **`origin/21.x`** — library rebuild + packed-consumer smoke **green** (
 | Aged peer `npm install` | **Done** | `compatibility/pack-proof-21/peer-install-smoke.json` — core `21.2.23`, Material `21.2.14` |
 | Same-day `21.2.24` | **Rejected** | Fails 7-day age window as of triage |
 | Library rebuild / pack on 21 peers | **Done** | `ng-packagr` 21.2.7 + TS 5.9; tarball in `pack-proof-21/` |
-| Packed-consumer Sass/ESM/AOT | **Done** | `pack-proof-21/consumer-smoke.json` (Node 24 host; Node 20.19 matrix still TODO) |
+| Packed-consumer Sass/ESM/AOT | **Done** | `pack-proof-21/consumer-smoke.json` (Node 24 host) |
+| Node 20.19 packed-consumer + harness | **Done** | `pack-proof-21/node20-consumer-smoke.json` (Node 20.19.6; button/select/checkbox harness) |
 | npm publish | **Not done** | Out of agent scope |
 
 See also `compatibility/STATUS-21.md` on branch `21.x`.
