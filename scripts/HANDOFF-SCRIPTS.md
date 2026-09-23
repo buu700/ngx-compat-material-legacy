@@ -4,6 +4,17 @@ Run from the extracted handoff root. Python helpers use the standard library (Py
 
 These helpers are usable starting tools, not an implementation of the package, schematic or standalone migration CLI. They neither publish nor install dependencies automatically. The schema files and fixture inputs are specifications/data, not captured baseline results.
 
+## 0. Peer-light migrate-legacy CLI (implementation)
+
+```bash
+node scripts/migrate-legacy-cli.mjs /path/to/workspace          # dry-run
+node scripts/migrate-legacy-cli.mjs /path/to/workspace --apply
+node scripts/schematics/test-migrate-legacy-fixtures.mjs        # 22/22 engine fixtures
+```
+
+Shares `projects/ngx-material-legacy/schematics/migrate-legacy/{sass,ts}-rewrite.js`
+with the Angular schematic. See `migration/README.md`. Not an `npx` of the library.
+
 ## 1. Safe source bootstrap
 
 ```bash
