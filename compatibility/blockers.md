@@ -1,20 +1,27 @@
 # Active blockers
 
-## B-TOOL-01 — Aged Angular/Material peer baseline unresolved
-`research/version-observations.json` release baselines remain `unresolved-unverified`.
-Cannot yet `pnpm install` a frozen Angular 22 / Material / CDK set under the
-7-day age policy with integrity evidence. Sass facade and TS ports need those
-peers for compile/pack proof.
+## B-SASS-01 — Full facade CSS goldens (W02) not yet sealed
+Owned M2 `define-palette` / `define-light-theme` smoke-compiles with sass@1.104.1
+against local styles (Cyph deep-purple 800 → `#4527a0`). Immutable Material-16.2.14
+reference CSS/value seals and `all-legacy-component-themes` / `core()` compile still
+need a reference environment plus `@material/*` load-path coverage for companion themes.
 
-## B-SASS-01 — Facade compile not yet verified against 16.2.14 goldens
-Owned Sass sources are imported, but Dart Sass + `@angular/cdk` / `@material/*`
-load-path compile and W02 immutable CSS/value seals are pending peer install.
+## B-PKG-01 — Packed library / ng-packagr proof pending
+Peers installed for development; `ng-packagr` build, secondary entry points, and
+packed-consumer install are not done. `esbuild`/`@parcel/watcher` build scripts were
+ignored by pnpm (approve-builds required before some tooling works).
 
 ## B-CI-01 — Push-triggered Actions initially produced zero runs
-`workflow_dispatch` successfully ran green CI. Prefer keeping that trigger;
-investigate whether first-time Actions enablement delayed push events.
+`workflow_dispatch` runs succeed. Keep that trigger; push delivery may need repo
+Actions permission confirmation in GitHub UI.
 
-## Non-blockers / constraints
+## Resolved / mitigated
+- **B-TOOL-01**: Proposed aged Angular 22.1.7 / Material 22.1.7 / CDK 22.1.7 /
+  TypeScript 6.0.3 / sass 1.104.1 selection recorded and installed into the private
+  workspace lockfile (see `compatibility/peers-22.proposed.json`). Still needs
+  packed-consumer and advisory review before calling it a release baseline.
+
+## Constraints
 - Cyph tree at `/workspace/ngx-compat/reference/cyph-dev-prod` is oracle-only; never commit it.
 - No npm publish.
-- Do not delete `src/` Material/CDK until escape edges/unresolved relatives are classified and extraction is complete.
+- Do not delete `src/` until escape edges are classified and extraction completes.
