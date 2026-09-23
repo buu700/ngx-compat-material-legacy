@@ -8,3 +8,4 @@
 
 export {MatLegacyButtonModule} from './button-module';
 export {MatLegacyButton, MatLegacyAnchor} from './button';
+export {MatCommonModule} from './internal/common-module';

@@ -8,28 +8,28 @@
 
 import {FocusMonitor, FocusableOption, FocusOrigin} from '@angular/cdk/a11y';
 import {
+  ANIMATION_MODULE_TYPE,
+  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
   ElementRef,
-  OnDestroy,
-  ViewChild,
-  ViewEncapsulation,
-  Optional,
   Inject,
   Input,
-  AfterViewInit,
   NgZone,
+  OnDestroy,
+  Optional,
+  ViewChild,
+  ViewEncapsulation,
 } from '@angular/core';
+import {MatRipple} from '@angular/material/core';
 import {
   CanColor,
   CanDisable,
   CanDisableRipple,
-  MatRipple,
   mixinColor,
   mixinDisabled,
   mixinDisableRipple,
-} from '@angular/material/core';
-import {ANIMATION_MODULE_TYPE} from '@angular/platform-browser/animations';
+} from './internal/common-behaviors';
 
 /** Default color palette for round buttons (mat-fab and mat-mini-fab) */
 const DEFAULT_ROUND_BUTTON_COLOR = 'accent';
@@ -80,6 +80,7 @@ const _MatButtonBase = mixinColor(
   },
   templateUrl: 'button.html',
   styleUrls: ['button.css'],
+  standalone: false,
   inputs: ['disabled', 'disableRipple', 'color'],
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -95,7 +96,7 @@ export class MatLegacyButton
   readonly isIconButton: boolean = this._hasHostAttributes('mat-icon-button');
 
   /** Reference to the MatRipple instance of the button. */
-  @ViewChild(MatRipple) ripple: MatRipple;
+  @ViewChild(MatRipple) ripple!: MatRipple;
 
   constructor(
     elementRef: ElementRef,
@@ -176,12 +177,13 @@ export class MatLegacyButton
   inputs: ['disabled', 'disableRipple', 'color'],
   templateUrl: 'button.html',
   styleUrls: ['button.css'],
+  standalone: false,
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MatLegacyAnchor extends MatLegacyButton implements AfterViewInit, OnDestroy {
   /** Tabindex of the button. */
-  @Input() tabIndex: number;
+  @Input() tabIndex!: number;
 
   constructor(
     focusMonitor: FocusMonitor,

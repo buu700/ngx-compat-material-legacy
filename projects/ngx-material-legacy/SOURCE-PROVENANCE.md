@@ -12,3 +12,13 @@ Historical sources under repository `src/` remain until inventory-gated
 deletion.
 
 See `compatibility/inventories/sass-facade-copy-manifest.json`.
+
+## Pack adaptations (2026-09-23)
+
+- Owned Material-16 common-behavior mixins under `legacy-button/internal/` (Material 22
+  no longer exports `mixinColor` / `mixinDisabled` / `mixinDisableRipple`).
+- Slim `MatCommonModule` re-exports CDK `BidiModule`.
+- `standalone: false` on legacy button/anchor; `ANIMATION_MODULE_TYPE` from `@angular/core`.
+- Component `button.css` precompiled from `button.scss` with `@material/*` load paths.
+- Library `dependencies` include Material-16-aligned `@material/*@15.0.0-canary.bc9ae6c9c.0`
+  set so Sass consumers resolve the facade without a separate MDC install.
