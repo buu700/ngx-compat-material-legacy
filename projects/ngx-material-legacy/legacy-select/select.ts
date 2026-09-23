@@ -31,7 +31,6 @@ import {MAT_SELECT_TRIGGER, MatSelectConfig} from '@angular/material/select';
 import {_MatSelectBase} from './internal/select-base';
 import {MatLegacyFormFieldControl} from '@ngx-compat/material-legacy/legacy-form-field';
 import {take, takeUntil} from 'rxjs/operators';
-import {matLegacySelectAnimations} from './select-animations';
 
 /**
  * The following style constants are necessary to save here in order
@@ -162,10 +161,6 @@ export class MatLegacySelectTrigger {}
     '(blur)': '_onBlur()',
     'ngSkipHydration': '',
   },
-  animations: [
-    matLegacySelectAnimations.transformPanelWrap,
-    matLegacySelectAnimations.transformPanel,
-  ],
   providers: [
     {provide: MatLegacyFormFieldControl, useExisting: MatLegacySelect},
     {provide: MAT_LEGACY_OPTION_PARENT_COMPONENT, useExisting: MatLegacySelect},
@@ -174,14 +169,10 @@ export class MatLegacySelectTrigger {}
 export class MatLegacySelect extends _MatSelectBase<MatLegacySelectChange> implements OnInit {
   /** Captured in injection context for MATERIAL_ANIMATIONS / NoopAnimations. */
   private readonly _legacyAnimationsDisabled = legacyAnimationsDisabled();
+  readonly _animationsEnabled = !this._legacyAnimationsDisabled;
 
-  /** Panel transform animation state with zero-duration params when disabled. */
-  _getTransformPanelState() {
-    return legacyAnimationTriggerState(
-      this.multiple ? 'showing-multiple' : 'showing',
-      {enterDuration: '120ms', exitDuration: '100ms'},
-      this._legacyAnimationsDisabled,
-    );
+  protected override _selectAnimationsEnabled(): boolean {
+    return this._animationsEnabled;
   }
 
   /** The scroll position of the overlay panel, calculated to center the selected option. */

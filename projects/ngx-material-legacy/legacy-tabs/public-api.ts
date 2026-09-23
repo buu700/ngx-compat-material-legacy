@@ -16,7 +16,7 @@ export {MatLegacyTabLabelWrapper} from './tab-label-wrapper';
 export {MatLegacyTabContent} from './tab-content';
 export {MatLegacyInkBar} from './ink-bar';
 export {MatLegacyTabLink, MatLegacyTabNav, MatLegacyTabNavPanel} from './tab-nav-bar/tab-nav-bar';
-export {matTabsAnimations as matLegacyTabsAnimations} from './tabs-animations';
+// Historical recipes: `@ngx-compat/material-legacy/legacy-tabs/animations`.
 export {
   _MatTabBase as _MatLegacyTabBase,
   MAT_TAB_GROUP as MAT_LEGACY_TAB_GROUP,

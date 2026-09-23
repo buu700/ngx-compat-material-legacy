@@ -27,7 +27,6 @@ import {startWith} from 'rxjs/operators';
 import {
   _MatTabBodyBase,
 } from './internal/tab-body-base';
-import {matTabsAnimations} from './tabs-animations';
 
 /**
  * The portal host directive for the contents of the tab.
@@ -88,7 +87,6 @@ export class MatLegacyTabBodyPortal extends CdkPortalOutlet {
   encapsulation: ViewEncapsulation.None,
   // tslint:disable-next-line:validate-decorators
   changeDetection: ChangeDetectionStrategy.Default,
-  animations: [matTabsAnimations.translateTab],
   host: {
     'class': 'mat-tab-body',
   },

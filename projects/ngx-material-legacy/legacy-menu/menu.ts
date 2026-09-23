@@ -20,7 +20,6 @@ import {
   MAT_MENU_PANEL,
   MatMenuDefaultOptions,
 } from '@angular/material/menu';
-import {matMenuAnimations} from './menu-animations';
 import {_MatMenuBase} from './internal/menu-base';
 
 /**
@@ -44,7 +43,6 @@ import {_MatMenuBase} from './internal/menu-base';
     // This binding is used to ensure that the component ID doesn't clash with the `MatMenu`.
     '[attr.mat-id-collision]': 'null',
   },
-  animations: [matMenuAnimations.transformMenu, matMenuAnimations.fadeInItems],
   providers: [{provide: MAT_MENU_PANEL, useExisting: MatLegacyMenu}],
 })
 export class MatLegacyMenu extends _MatMenuBase {

@@ -126,3 +126,11 @@ into `main`.
 | menu / select / form-field / tabs | **Still blocked** for full peer-free primary FESM |
 | `src/` mass-delete | **Still blocked** (shared-core companions) |
 
+## Motion engine (updated 2026-09-23 — full overlay CSS wave)
+
+| Area | Status |
+| --- | --- |
+| dialog / snack-bar / tooltip / menu / select / form-field / tabs primary FESM | **Unblocked** (CSS motion; recipes opt-in `/animations`) |
+| `@angular/animations` peer for primary overlay consumers | **Truly optional** |
+| `src/` mass-delete | **Still blocked** (shared-core companions) |
+

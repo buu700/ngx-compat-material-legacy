@@ -30,11 +30,16 @@ import {
   OnInit,
   ChangeDetectorRef,
 } from '@angular/core';
-import type {AnimationEvent} from '@angular/animations';
-import {
-  legacyAnimationTriggerState,
-  legacyAnimationsDisabled,
-} from '@ngx-compat/material-legacy/legacy-core';
+import {legacyAnimationsDisabled} from '@ngx-compat/material-legacy/legacy-core';
+
+/** Minimal shape emitted when CSS panel motion completes (replaces Angular AnimationEvent). */
+export interface LegacyMenuAnimationEvent {
+  toState: 'void' | 'enter' | string;
+  fromState?: string;
+}
+
+const ENTER_ANIMATION = 'mat-legacy-menu-enter';
+const EXIT_ANIMATION = 'mat-legacy-menu-exit';
 import {FocusKeyManager, FocusOrigin} from '@angular/cdk/a11y';
 import {Direction} from '@angular/cdk/bidi';
 import {BooleanInput, coerceBooleanProperty} from '@angular/cdk/coercion';
@@ -92,9 +97,12 @@ export class _MatMenuBase
 
   /** Captured in injection context for MATERIAL_ANIMATIONS / NoopAnimations. */
   private readonly _legacyAnimationsDisabled = legacyAnimationsDisabled();
+  readonly _animationsEnabled = !this._legacyAnimationsDisabled;
+
+  private _exitFallbackTimeout: ReturnType<typeof setTimeout> | undefined;
 
   /** Emits whenever an animation on the menu completes. */
-  readonly _animationDone = new Subject<AnimationEvent>();
+  readonly _animationDone = new Subject<LegacyMenuAnimationEvent>();
 
   /** Whether the menu is animating. */
   _isAnimating: boolean;
@@ -316,6 +324,9 @@ export class _MatMenuBase
   }
 
   ngOnDestroy() {
+    if (this._exitFallbackTimeout !== undefined) {
+      clearTimeout(this._exitFallbackTimeout);
+    }
     this._keyManager?.destroy();
     this._directDescendantItems.destroy();
     this.closed.complete();
@@ -467,45 +478,57 @@ export class _MatMenuBase
   }
 
 
-  /** Panel animation state + durations (0ms when MATERIAL_ANIMATIONS disables motion). */
-  _getPanelAnimationState() {
-    return legacyAnimationTriggerState(
-      this._panelAnimationState,
-      {enterDuration: '120ms', exitDuration: '100ms'},
-      this._legacyAnimationsDisabled,
-    );
-  }
-
-  /** Starts the enter animation. */
+  /** Starts the enter animation (CSS keyframes). */
   _startAnimation() {
-    // @breaking-change 8.0.0 Combine with _resetAnimation.
     this._panelAnimationState = 'enter';
-  }
-
-  /** Resets the panel animation to its initial state. */
-  _resetAnimation() {
-    // @breaking-change 8.0.0 Combine with _startAnimation.
-    this._panelAnimationState = 'void';
-  }
-
-  /** Callback that is invoked when the panel animation completes. */
-  _onAnimationDone(event: AnimationEvent) {
-    this._animationDone.next(event);
-    this._isAnimating = false;
-  }
-
-  _onAnimationStart(event: AnimationEvent) {
-    this._isAnimating = true;
-
-    // Scroll the content element to the top as soon as the animation starts. This is necessary,
-    // because we move focus to the first item while it's still being animated, which can throw
-    // the browser off when it determines the scroll position. Alternatively we can move focus
-    // when the animation is done, however moving focus asynchronously will interrupt screen
-    // readers which are in the process of reading out the menu already. We take the `element`
-    // from the `event` since we can't use a `ViewChild` to access the pane.
-    if (event.toState === 'enter' && this._keyManager.activeItemIndex === 0) {
-      event.element.scrollTop = 0;
+    if (!this._animationsEnabled) {
+      // Microtask so listeners subscribed after open still observe completion.
+      Promise.resolve().then(() => this._onCssAnimationDone(ENTER_ANIMATION));
     }
+    this._changeDetectorRef?.markForCheck();
+  }
+
+  /** Resets the panel animation to its initial (exit) state. */
+  _resetAnimation() {
+    this._panelAnimationState = 'void';
+    if (!this._animationsEnabled) {
+      Promise.resolve().then(() => this._onCssAnimationDone(EXIT_ANIMATION));
+    } else {
+      this._exitFallbackTimeout = setTimeout(
+        () => this._onCssAnimationDone(EXIT_ANIMATION),
+        200,
+      );
+    }
+    this._changeDetectorRef?.markForCheck();
+  }
+
+  _onCssAnimationStart(animationName: string) {
+    if (animationName === ENTER_ANIMATION || animationName === EXIT_ANIMATION) {
+      this._isAnimating = true;
+      if (animationName === ENTER_ANIMATION && this._keyManager?.activeItemIndex === 0) {
+        if (this._directDescendantItems?.length) {
+          const menuPanel = this._directDescendantItems.first
+            ._getHostElement()
+            .closest('[role="menu"]') as HTMLElement | null;
+          if (menuPanel) {
+            menuPanel.scrollTop = 0;
+          }
+        }
+      }
+    }
+  }
+
+  _onCssAnimationDone(animationName: string) {
+    const isExit = animationName === EXIT_ANIMATION;
+    if (!isExit && animationName !== ENTER_ANIMATION) {
+      return;
+    }
+    if (isExit && this._exitFallbackTimeout !== undefined) {
+      clearTimeout(this._exitFallbackTimeout);
+      this._exitFallbackTimeout = undefined;
+    }
+    this._animationDone.next({toState: isExit ? 'void' : 'enter'});
+    this._isAnimating = false;
   }
 
   /**

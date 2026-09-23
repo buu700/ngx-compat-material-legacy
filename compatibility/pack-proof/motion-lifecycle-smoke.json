@@ -1,32 +1,30 @@
 {
   "schema_version": 2,
-  "captured_at": "2026-09-23T23:44:10.876Z",
+  "captured_at": "2026-09-23T23:50:35.158Z",
   "status": "ok",
   "checks": {
     "helper_uses_public_MATERIAL_ANIMATIONS": true,
     "helper_avoids_private_Material_helpers": true,
     "dialog_zero_duration_when_disabled": true,
-    "menu_parameterized_and_wired": true,
-    "select_parameterized_and_wired": true,
-    "form_field_parameterized_and_wired": true,
+    "menu_css_motion": true,
+    "select_css_motion": true,
+    "form_field_css_motion": true,
     "snack_bar_css_motion": true,
-    "tabs_zero_duration_when_disabled": true,
+    "tabs_css_motion": true,
     "dialog_uses_css_motion": true,
-    "menu_retains_trigger_metadata": true,
+    "menu_recipes_opt_in_secondary": true,
     "tooltip_uses_css_not_engine_in_component": true,
     "tooltip_honors_MATERIAL_ANIMATIONS_helper": true
   },
   "errors": [],
   "remaining_engine_bindings": [
-    "Primary FESM still imports @angular/animations for: menu, select, form-field, tabs (component trigger metadata).",
-    "Optional recipe-only secondary entries (import peer only if used): legacy-dialog/animations, legacy-snack-bar/animations, legacy-tooltip/animations.",
-    "Dialog + snack-bar + tooltip primary runtime use CSS/timers/keyframes — no engine import on those primary FESMs."
+    "Primary overlay entries cleared of @angular/animations imports (dialog/menu/select/form-field/snack-bar/tabs/tooltip).",
+    "Opt-in /animations secondary entries still import the peer when consumers need historical AnimationTriggerMetadata."
   ],
   "artifacts": {
     "helper_sha256": "88812bc9ead98f1fc04fc0d58f38750ac515d8c93b1ad8fc694e6d1a2ea64f1a"
   },
   "notes": [
-    "Dialog/snack-bar migrated to Material-22-style CSS motion; recipes opt-in via /animations secondary entries.",
-    "Menu/select/form-field/tabs still bind Angular animation triggers on primary entries."
+    "All targeted overlay entries use CSS/timer motion on primary FESM; recipes live under /animations."
   ]
 }

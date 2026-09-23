@@ -11,11 +11,8 @@ export {MatLegacyMenuItem} from './menu-item';
 export {MatLegacyMenuTrigger} from './menu-trigger';
 export {MatLegacyMenuModule} from './menu-module';
 export {MatLegacyMenuContent} from './menu-content';
-export {
-  matMenuAnimations as matLegacyMenuAnimations,
-  fadeInItems as fadeInLegacyItems,
-  transformMenu as transformLegacyMenu,
-} from './menu-animations';
+// Historical AnimationTriggerMetadata recipes moved to
+// `@ngx-compat/material-legacy/legacy-menu/animations`.
 export {_MatMenuBase as _MatLegacyMenuBase} from './internal/menu-base';
 export {_MatMenuTriggerBase as _MatLegacyMenuTriggerBase} from './internal/menu-trigger-base';
 export {_MatMenuContentBase as _MatLegacyMenuContentBase} from './internal/menu-content-base';

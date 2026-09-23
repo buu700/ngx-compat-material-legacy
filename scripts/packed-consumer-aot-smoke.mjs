@@ -239,6 +239,8 @@ Object.defineProperty(globalThis, 'navigator', {
 (globalThis as any).Event = win.Event;
 (globalThis as any).KeyboardEvent = win.KeyboardEvent;
 (globalThis as any).MouseEvent = win.MouseEvent;
+(globalThis as any).Comment = win.Comment;
+(globalThis as any).DocumentFragment = win.DocumentFragment;
 (globalThis as any).AnimationEvent = win.AnimationEvent;
 (globalThis as any).CSS = win.CSS || {supports: () => false};
 (globalThis as any).ResizeObserver =
@@ -273,6 +275,8 @@ import {MatLegacySnackBar, MatLegacySnackBarModule} from '@ngx-compat/material-l
 import {MatLegacySnackBarHarness} from '@ngx-compat/material-legacy/legacy-snack-bar/testing';
 import {MatLegacyTooltipModule} from '@ngx-compat/material-legacy/legacy-tooltip';
 import {MatLegacyTooltipHarness} from '@ngx-compat/material-legacy/legacy-tooltip/testing';
+import {MatLegacyTabsModule} from '@ngx-compat/material-legacy/legacy-tabs';
+import {MatLegacyTabGroupHarness} from '@ngx-compat/material-legacy/legacy-tabs/testing';
 
 getTestBed().initTestEnvironment(
   BrowserDynamicTestingModule,
@@ -296,6 +300,7 @@ class SmokeDialogContent {}
     MatLegacyMenuModule,
     MatLegacySnackBarModule,
     MatLegacyTooltipModule,
+    MatLegacyTabsModule,
   ],
   template: \`
     <button mat-button id="h">Go</button>
@@ -311,6 +316,10 @@ class SmokeDialogContent {}
     </mat-menu>
     <button mat-button id="snack-open">Snack</button>
     <button mat-button matTooltip="Tip text" id="tip">Hover</button>
+    <mat-tab-group id="tabs">
+      <mat-tab label="One">Tab one</mat-tab>
+      <mat-tab label="Two">Tab two</mat-tab>
+    </mat-tab-group>
   \`,
 })
 class HarnessHost {
@@ -344,6 +353,14 @@ async function main() {
   const text = await button.getText();
   const select = await loader.getHarness(MatLegacySelectHarness);
   const isOpen = await select.isOpen();
+  await select.open();
+  fixture.detectChanges();
+  await sleep(30);
+  const selectOpened = await select.isOpen();
+  await select.close();
+  fixture.detectChanges();
+  await sleep(30);
+  const selectClosed = !(await select.isOpen());
 
   // Dialog open/close under NoopAnimations (CSS motion disabled path).
   const dialogRef = fixture.componentInstance.openDialog();
@@ -389,6 +406,13 @@ async function main() {
   await tip.hide();
   fixture.detectChanges();
 
+  const tabGroup = await loader.getHarness(MatLegacyTabGroupHarness);
+  const tabCount = (await tabGroup.getTabs()).length;
+  await tabGroup.selectTab({label: 'Two'});
+  fixture.detectChanges();
+  await sleep(30);
+  const selected = await (await tabGroup.getSelectedTab()).getLabel();
+
   const out = {
     ok:
       text === 'Go' &&
@@ -398,7 +422,11 @@ async function main() {
       menuOpen === true &&
       snackText.includes('Snack message') &&
       tipVisible === true &&
-      tipText.includes('Tip text'),
+      tipText.includes('Tip text') &&
+      selectOpened === true &&
+      selectClosed === true &&
+      tabCount === 2 &&
+      selected === 'Two',
     buttonText: text,
     selectIsOpen: isOpen,
     dialogText,
@@ -407,6 +435,10 @@ async function main() {
     snackText,
     tipVisible,
     tipText,
+    selectOpened,
+    selectClosed,
+    tabCount,
+    selectedTab: selected,
     harnesses: [
       'MatLegacyButtonHarness',
       'MatLegacySelectHarness',
@@ -414,6 +446,7 @@ async function main() {
       'MatLegacyMenuHarness',
       'MatLegacySnackBarHarness',
       'MatLegacyTooltipHarness',
+      'MatLegacyTabGroupHarness',
     ],
     animationsProvider: 'provideNoopAnimations',
   };
@@ -472,6 +505,7 @@ main().catch(err => {
           'legacy-menu/testing',
           'legacy-snack-bar/testing',
           'legacy-tooltip/testing',
+          'legacy-tabs/testing',
         ],
       };
       if (result.harness.status !== 'ok') {

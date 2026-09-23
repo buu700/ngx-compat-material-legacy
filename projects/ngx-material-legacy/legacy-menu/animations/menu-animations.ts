@@ -4,7 +4,14 @@
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
+ *
+ * Optional Angular animation recipes for legacy menu.
+ * Primary menu uses CSS keyframes; import this entry only for historical APIs.
+ *//**
+ * Optional Angular animation recipes for legacy menu.
+ * Primary menu uses CSS keyframes; import this entry only for historical APIs.
  */
+
 
 import {
   trigger,
