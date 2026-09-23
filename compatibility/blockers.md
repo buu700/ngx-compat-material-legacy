@@ -5,19 +5,27 @@ Mitigated: push-triggered CI is now producing runs (e.g. success on
 `5f7740be`). Keep `workflow_dispatch` as a backup.
 
 ## B-PKG-03 — Schematics / remaining legacy entries incomplete
-LICENSE (Google + Ryan) now ships in the packed tarball. Inspector still flags
-missing schematic collection and remaining legacy entry points (and optional
-`@angular/animations` peer advisory). Overlay trio now packs; inspector still
-flags historical animation-engine references in dialog/menu/select/form-field
-(owned metadata retained per motion policy until tested migrations remove the
-deprecated engine from published runtime).
+**Mitigated for component scope**: all `research/scope.json` `preserved_entry_points`
+now pack (including `legacy-tabs`). LICENSE (Google + Ryan) ships. Schematics
+`migrate-legacy` stub collection packs (`package.json` `schematics` field).
+Inspector still flags `@angular/animations` peer and historical animation-engine
+references in dialog/menu/select/form-field/snack-bar/tooltip/tabs (+ dialog/testing)
+— owned metadata retained per `compatibility/motion-overlay-trio.md` until tested
+migrations remove the deprecated engine from published runtime.
 
-### Remaining entry points (scope)
-- `legacy-tabs`.
-- Testing secondary entries beyond `legacy-button/testing`.
-- Schematics migrate-legacy stub collection.
+### Remaining non-component work
+- Broader testing harnesses (`legacy-form-field/testing`, `legacy-input/testing`,
+  `legacy-select/testing`, etc.).
+- Motion migration off `@angular/animations` engine where feasible.
+- Inventories / escape-edge classification; `src/` monorepo tree cleanup (do not
+  mass-delete yet).
+- Real migrate-legacy transforms (stub only today).
 
 ## Resolved / mitigated
+- **legacy-tabs**: secondary entry builds and packs; owned Material-16 tab bases +
+  `matTabsAnimations`; consumer ESM + Sass theme smoke green (`#4527a0`, `.mat-tab`).
+- **legacy-dialog/testing**: secondary entry packs (harness + test opener; button/testing pattern).
+- **schematics migrate-legacy stub**: collection + no-op factory in packed tarball.
 - **legacy-chips**: secondary entry builds and packs; theme smoke includes `.mat-chip`.
 - **legacy-tooltip / legacy-paginator / legacy-table / legacy-snack-bar**: secondary
   entries build and pack; owned Material-16 bases (`_MatTooltipBase` /
