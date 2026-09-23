@@ -81,31 +81,35 @@ def adapt_text(text: str, suffix: str) -> str:
         return text
 
     # ANIMATION_MODULE_TYPE moved to @angular/core
-    text = text.replace(
-        "import {ANIMATION_MODULE_TYPE} from '@angular/platform-browser/animations';",
-        "import {ANIMATION_MODULE_TYPE} from '@angular/core';",
-    )
-    # If already importing from @angular/core, merge ANIMATION_MODULE_TYPE into that import when possible
-    if "ANIMATION_MODULE_TYPE} from '@angular/core'" in text or (
-        "ANIMATION_MODULE_TYPE" in text and "from '@angular/core'" in text
-    ):
-        # dedupe separate ANIMATION import if core import exists
-        text = re.sub(
-            r"\nimport \{ANIMATION_MODULE_TYPE\} from '@angular/core';\n",
-            "\n",
-            text,
-            count=1,
+    if "from '@angular/platform-browser/animations'" in text and "ANIMATION_MODULE_TYPE" in text:
+        text = text.replace(
+            "import {ANIMATION_MODULE_TYPE} from '@angular/platform-browser/animations';\n",
+            "",
         )
-        if "ANIMATION_MODULE_TYPE" in text and not re.search(
-            r"ANIMATION_MODULE_TYPE", 
-            re.search(r"import \{([^}]+)\} from '@angular/core'", text).group(1) if re.search(r"import \{([^}]+)\} from '@angular/core'", text) else ""
-        ):
-            text = re.sub(
-                r"import \{",
-                "import {\n  ANIMATION_MODULE_TYPE,",
-                text,
-                count=1,
-            ) if "from '@angular/core'" in text and "ANIMATION_MODULE_TYPE" in text and "ANIMATION_MODULE_TYPE," not in text.split("from '@angular/core'")[0][-200:] else text
+        text = re.sub(
+            r"import \{([^}]*)\} from '@angular/platform-browser/animations';\n",
+            lambda m: (
+                ""
+                if m.group(1).strip() == "ANIMATION_MODULE_TYPE"
+                else "import {"
+                + ",".join(
+                    n.strip()
+                    for n in m.group(1).split(",")
+                    if n.strip() and n.strip() != "ANIMATION_MODULE_TYPE"
+                )
+                + "} from '@angular/platform-browser/animations';\n"
+            ),
+            text,
+        )
+        m = re.search(r"import \{([^}]+)\} from '@angular/core';", text, re.S)
+        if m:
+            names = [n.strip() for n in m.group(1).replace("\n", " ").split(",") if n.strip()]
+            if "ANIMATION_MODULE_TYPE" not in names:
+                names.insert(0, "ANIMATION_MODULE_TYPE")
+                replacement = "import {\n  " + ",\n  ".join(names) + ",\n} from '@angular/core';"
+                text = text[: m.start()] + replacement + text[m.end() :]
+        else:
+            text = "import {ANIMATION_MODULE_TYPE} from '@angular/core';\n" + text
 
     # MatCommonModule / mixins from material/core → local
     text = re.sub(
