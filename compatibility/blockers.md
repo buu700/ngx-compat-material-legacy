@@ -4,27 +4,24 @@
 Mitigated: push-triggered CI is now producing runs (e.g. success on
 `5f7740be`). Keep `workflow_dispatch` as a backup.
 
+## B-PKG-03 — Schematics / remaining legacy entries incomplete
+LICENSE (Google + Ryan) now ships in the packed tarball. Inspector still flags
+missing schematic collection and remaining legacy entry points (and optional
+`@angular/animations` peer advisory).
+
 ## Resolved / mitigated
-- **B-PKG-02**: Live SCSS→CSS for `legacy-button` via `styleUrls: ['button.scss']` and
-  `ng-package.json` `lib.styleIncludePaths` (`node_modules`, `../../node_modules`).
-  Direct deps added for transitive Sass packages (`@material/focus-ring`, `tokens`,
-  `progress-indicator`) so pnpm resolves `@use '@material/…'`. Checked-in `button.css`
-  removed; styles inlined in FESM. Pack + consumer smoke refreshed under
+- **Overlay ports**: `legacy-form-field`, `legacy-input`, `legacy-core` (option),
+  `legacy-select` secondary entries build and pack; consumer ESM + Sass theme
+  smoke green (`#4527a0`, form-field/select CSS present). Owned Material-16
+  `_MatSelectBase` / option bases; shared tokens stay on `@angular/material/*`.
+- **B-PKG-02**: Live SCSS→CSS for component `styleUrls` via `styleIncludePaths`
+  + transitive `@material/focus-ring|tokens|progress-indicator` direct deps.
+- **B-SASS-02**: Bridge-review fixtures dispositioned as intentional current-bridge
+  (shared CDK). See `compatibility/bridge-disposition/`.
+- **B-PKG-01**: ng-packagr primary + secondary entries; pack-proof under
   `compatibility/pack-proof/`.
-- **B-SASS-02**: Bridge-review fixtures dispositioned 2026-09-23 as
-  **intentional current-bridge** (shared CDK infrastructure). See
-  `compatibility/bridge-disposition/` and `compatibility/migration-report-seed.md`.
-  No owned-parity must-fix; `core()` non-empty; aggregates did not shrink;
-  `08-core-theme` and all strict owned fixtures remain equal to Material-16.2.14 seals.
-- **B-PKG-01**: `pnpm approve-builds` for `esbuild` / `@parcel/watcher` done.
-  ng-packagr produces primary + `legacy-button`; packed consumer smoke recorded under
-  `compatibility/pack-proof/`.
-- **B-SASS-01**: Material-16.2.14 reference CSS/value seals sealed at
-  `reference/material-16.2.14/` (`.reference-seal.json`). Candidate strict CSS parity
-  evidenced in pack-proof compare JSON.
-- **B-TOOL-01**: Aged Angular 22.1.7 peer set installed (see
-  `compatibility/peers-22.proposed.json`); advisory review still open before calling it
-  a release baseline.
+- **B-SASS-01**: Material-16.2.14 seals + strict CSS parity evidence.
+- **B-TOOL-01**: Aged Angular 22.1.7 peer set installed; advisory review still open.
 
 ## Constraints
 - Cyph tree at `/workspace/ngx-compat/reference/cyph-dev-prod` is oracle-only; never commit it.

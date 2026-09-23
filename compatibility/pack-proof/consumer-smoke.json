@@ -1,40 +1,43 @@
 {
   "schema_version": 1,
-  "captured_at": "2026-09-23T17:21:13.212842-04:00",
+  "captured_at": "2026-09-23T17:25:59.924205-04:00",
   "tarball": {
     "path": "compatibility/pack-proof/ngx-compat-material-legacy-22.0.0-rc.0.tgz",
-    "sha256": "a639aa76ff183561bb102a02c72b582b0dbaa54c45cc36643de2c120eef2a5d6",
-    "size": 105618,
+    "sha256": "483fa1abfa10d4c8b07ef12d27db207b62b9929f221bfb4d6081c87942f088a7",
+    "size": 223171,
     "package": "@ngx-compat/material-legacy@22.0.0-rc.0"
   },
   "consumer": {
-    "dir": "/tmp/ngx-material-legacy-consumer-smoke4",
+    "dir": "/tmp/ngx-material-legacy-consumer-smoke5",
     "committed": false,
     "peers": [
       "@angular/*@22.1.7",
       "@angular/cdk@22.1.7",
       "@angular/material@22.1.7",
       "sass@1.104.1"
-    ],
-    "material_web_packages_installed_transitively": 50
+    ]
   },
   "sass_smoke": {
     "status": "ok",
-    "fixture": "define-palette(mat.$deep-purple-palette, 800, 700, 900) + define-light-theme",
+    "fixture": "deep-purple 800 + legacy-form-field/input/select themes",
     "expected_default": "#4527a0",
-    "css": ".smoke {\n  color: #4527a0;\n  --primary: #4527a0;\n}"
+    "css_bytes": 6044,
+    "has_form_field": true,
+    "has_select": true
   },
   "esm_smoke": {
     "status": "ok",
-    "import": "@ngx-compat/material-legacy/legacy-button",
-    "keys": "ESM_STATUS=ok\nESM_KEYS=MatCommonModule,MatLegacyAnchor,MatLegacyButton,MatLegacyButtonModule",
-    "styles_inlined_from_scss": true,
-    "checked_in_button_css": false
+    "imports": [
+      "@ngx-compat/material-legacy/legacy-button",
+      "@ngx-compat/material-legacy/legacy-form-field",
+      "@ngx-compat/material-legacy/legacy-input",
+      "@ngx-compat/material-legacy/legacy-core",
+      "@ngx-compat/material-legacy/legacy-select"
+    ]
   },
   "notes": [
-    "ng-packagr builds primary + legacy-button secondary entry with live SCSS\u2192CSS via styleUrls button.scss.",
-    "lib.styleIncludePaths: projects/ngx-material-legacy/node_modules + workspace node_modules.",
-    "Direct deps include @material/focus-ring, tokens, progress-indicator for pnpm-resolvable Sass @use paths.",
-    "Library declares Material-16-aligned @material/* canary deps for Sass facade resolution."
+    "Overlay cross-section ports: legacy-form-field, legacy-input, legacy-core (option), legacy-select.",
+    "Select owns Material-16 _MatSelectBase and option bases; shared MAT_* tokens remain on @angular/material peers.",
+    "Live SCSS styleUrls for component styles; theme mixins resolve from packed Sass facade."
   ]
 }
