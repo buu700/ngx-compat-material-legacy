@@ -19,7 +19,7 @@ Package `@ngx-compat/material-legacy@22.0.0-rc.0` on `main`
 | W10 21.x line | **Done (branch)** | Node 20.19.6 smoke on `21.x` |
 | `src/` mass-delete | **Blocked** | Shared-core (~578) + companions; unresolved relative already 0 |
 | Full animation peer removal (all entries) | **Blocked** | menu/select/form-field/tabs (+ opt-in `/animations`) |
-| CI green | **Track after push** | |
+| CI green | **Done** | https://github.com/buu700/ngx-compat-material-legacy/actions/runs/35935179066 on `69173edcd` |
 
 ## Left for (honest)
 
