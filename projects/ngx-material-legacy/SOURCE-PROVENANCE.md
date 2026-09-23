@@ -23,3 +23,11 @@ See `compatibility/inventories/sass-facade-copy-manifest.json`.
 - Direct deps include transitive Sass packages (`focus-ring`, `tokens`, `progress-indicator`) so pnpm consumers resolve `@use '@material/…'` without relying on hoist.
 - Library `dependencies` include Material-16-aligned `@material/*@15.0.0-canary.bc9ae6c9c.0`
   set so Sass consumers resolve the facade without a separate MDC install.
+
+## Overlay ports (2026-09-23)
+
+- `legacy-form-field` and `legacy-input` secondary entries adapted for Angular 22
+  (`standalone: false`, owned `MatCommonModule` / `mixinColor`, owned
+  `matFormFieldAnimations`, `ANIMATION_MODULE_TYPE` from `@angular/core`, live SCSS
+  `styleUrls`). Shared tokens remain imported from `@angular/material/form-field` and
+  `@angular/material/input` per upstream API policy.
