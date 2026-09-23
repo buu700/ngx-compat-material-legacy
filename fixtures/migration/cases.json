@@ -13,7 +13,21 @@
       "language": "typescript",
       "before": "import {MatDatepickerModule} from '@angular/material/datepicker';",
       "expected_after": null,
-      "outcome": "unchanged; current-component review"
+      "outcome": "unchanged; current-component review",
+      "expect_ok": false
+    },
+    {
+      "id": "ordinary-import-acknowledged",
+      "language": "typescript",
+      "options": {
+        "acknowledgeCurrentComponents": true
+      },
+      "before": "import {MatDatepickerModule} from '@angular/material/datepicker';",
+      "expected_after": null,
+      "outcome": "unchanged ordinary import; acknowledgement recorded for current-component readiness (not visual approval)",
+      "expect_acknowledgements": [
+        "current-components"
+      ]
     },
     {
       "id": "legacy-testing",
@@ -83,14 +97,42 @@
       "language": "scss",
       "before": "@use '@angular/material' as mat;\n@include mat.expansion-theme($theme);",
       "expected_after": null,
-      "outcome": "report ordinary-current bridge; require explicit acknowledgement before readiness"
+      "outcome": "report ordinary-current bridge; require explicit acknowledgement before readiness",
+      "expect_ok": false
+    },
+    {
+      "id": "companion-bridge-acknowledged",
+      "language": "scss",
+      "options": {
+        "acknowledgeCompanionBridges": true
+      },
+      "before": "@use '@angular/material' as mat;\n@include mat.expansion-theme($theme);",
+      "expected_after": "@use '@ngx-compat/material-legacy' as mat;\n@include mat.expansion-theme($theme);",
+      "outcome": "safe module-source edit with recorded companion acknowledgement; no semantic rewrite of expansion-theme",
+      "expect_acknowledgements": [
+        "companion-bridges"
+      ]
     },
     {
       "id": "aggregate-bridge",
       "language": "scss",
       "before": "@use '@angular/material' as mat;\n@include mat.all-legacy-component-themes($theme);",
       "expected_after": null,
-      "outcome": "do not substitute owned-only aggregate; report companion responsibility set"
+      "outcome": "do not substitute owned-only aggregate; report companion responsibility set",
+      "expect_ok": false
+    },
+    {
+      "id": "aggregate-bridge-acknowledged",
+      "language": "scss",
+      "options": {
+        "acknowledgeAggregates": true
+      },
+      "before": "@use '@angular/material' as mat;\n@include mat.all-legacy-component-themes($theme);",
+      "expected_after": "@use '@ngx-compat/material-legacy' as mat;\n@include mat.all-legacy-component-themes($theme);",
+      "outcome": "safe module-source edit with recorded aggregate acknowledgement; do not substitute owned-only aggregate",
+      "expect_acknowledgements": [
+        "aggregates"
+      ]
     },
     {
       "id": "wildcard-namespace",

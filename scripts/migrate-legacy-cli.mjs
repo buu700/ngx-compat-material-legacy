@@ -7,9 +7,14 @@
  * No @angular/* runtime peers are required to run this CLI.
  *
  * Default mode is dry-run (report only). Pass --apply to write edits.
+ * Companion/aggregate/current-component cases require explicit acknowledgement
+ * flags (same semantics as the schematic options).
  *
  * Usage:
  *   node scripts/migrate-legacy-cli.mjs <path> [--apply] [--json]
+ *     [--acknowledge-companion-bridges]
+ *     [--acknowledge-aggregates]
+ *     [--acknowledge-current-components]
  *   node scripts/migrate-legacy-cli.mjs --help
  *
  * Exit codes:
@@ -60,17 +65,29 @@ schematic. Does not load the target workspace's Angular runtime.
 
 Usage:
   node scripts/migrate-legacy-cli.mjs <path> [--apply] [--json]
+    [--acknowledge-companion-bridges]
+    [--acknowledge-aggregates]
+    [--acknowledge-current-components]
   node scripts/migrate-legacy-cli.mjs --help
 
 Options:
   <path>     File or directory to scan (scss/sass/ts/tsx).
   --apply    Write safe edits. Default is dry-run (report only).
   --json     Emit a machine-readable summary on stdout.
+  --acknowledge-companion-bridges
+             Allow safe @use rewrite when ordinary-current companions
+             (e.g. expansion-theme) are present; records acknowledgement.
+  --acknowledge-aggregates
+             Allow safe @use rewrite when all-legacy-component-themes is
+             present; does not substitute owned-only aggregates.
+  --acknowledge-current-components
+             Record acknowledgement of ordinary (non-legacy) Material
+             imports for readiness; does not rewrite those imports.
   --help     Show this help.
 
 Exit codes:
-  0  ok (safe edits only / nothing to do)
-  1  blocking diagnostics or errors
+  0  ok (safe edits only / nothing to do; acknowledgements satisfied)
+  1  blocking diagnostics, unacknowledged risks, or errors
   2  bad usage
 
 See migration/README.md for schematic vs CLI distribution notes.
@@ -85,9 +102,6 @@ function walk(dir, out = []) {
     throw new Error(`Cannot read directory ${dir}: ${err.message}`);
   }
   for (const ent of entries) {
-    if (ent.name.startsWith('.') && ent.name !== '.') {
-      // skip dotfiles/dirs except we already skip .git via SKIP_DIRS
-    }
     const full = join(dir, ent.name);
     if (ent.isDirectory()) {
       if (SKIP_DIRS.has(ent.name)) continue;
@@ -115,13 +129,13 @@ function collectFiles(target) {
   throw new Error(`Not a file or directory: ${target}`);
 }
 
-function processFile(absPath, apply) {
+function processFile(absPath, apply, rewriteOptions) {
   const content = readFileSync(absPath, 'utf8');
   const kind = SCSS_RE.test(absPath) ? 'scss' : 'ts';
   const result =
     kind === 'scss'
-      ? rewriteSassModuleSource(content)
-      : rewriteLegacyTypescriptImports(content);
+      ? rewriteSassModuleSource(content, rewriteOptions)
+      : rewriteLegacyTypescriptImports(content, rewriteOptions);
 
   const record = {
     path: absPath,
@@ -129,6 +143,7 @@ function processFile(absPath, apply) {
     ok: result.ok,
     changed: Boolean(result.changed),
     diagnostics: result.diagnostics || [],
+    acknowledgements: result.acknowledgements || [],
     applied: false,
   };
 
@@ -151,6 +166,11 @@ function main(argv) {
 
   const apply = args.includes('--apply');
   const asJson = args.includes('--json');
+  const rewriteOptions = {
+    acknowledgeCompanionBridges: args.includes('--acknowledge-companion-bridges'),
+    acknowledgeAggregates: args.includes('--acknowledge-aggregates'),
+    acknowledgeCurrentComponents: args.includes('--acknowledge-current-components'),
+  };
   const positional = args.filter((a) => !a.startsWith('--'));
   if (positional.length !== 1) {
     console.error('Expected exactly one <path> argument.');
@@ -176,11 +196,13 @@ function main(argv) {
   let blocking = 0;
   let safeEdits = 0;
   let applied = 0;
+  /** @type {string[]} */
+  const allAcks = [];
 
   for (const file of files) {
     let record;
     try {
-      record = processFile(file, apply);
+      record = processFile(file, apply, rewriteOptions);
     } catch (err) {
       record = {
         path: file,
@@ -188,13 +210,11 @@ function main(argv) {
         ok: false,
         changed: false,
         diagnostics: [`io-error: ${err.message || err}`],
+        acknowledgements: [],
         applied: false,
       };
     }
     records.push(record);
-    if (!record.ok || record.diagnostics.some((d) => !record.ok)) {
-      // ok:false means blocking refuse; also count explicit failures
-    }
     if (!record.ok) {
       blocking += 1;
     }
@@ -203,6 +223,9 @@ function main(argv) {
     }
     if (record.applied) {
       applied += 1;
+    }
+    for (const a of record.acknowledgements || []) {
+      if (!allAcks.includes(a)) allAcks.push(a);
     }
   }
 
@@ -213,6 +236,8 @@ function main(argv) {
     safe_edits: safeEdits,
     applied,
     blocking,
+    acknowledgements: allAcks,
+    options: rewriteOptions,
     engine: {
       sass: 'projects/ngx-material-legacy/schematics/migrate-legacy/sass-rewrite.js',
       ts: 'projects/ngx-material-legacy/schematics/migrate-legacy/ts-rewrite.js',
@@ -227,6 +252,7 @@ function main(argv) {
         changed: r.changed,
         applied: r.applied,
         diagnostics: r.diagnostics,
+        acknowledgements: r.acknowledgements,
       })),
   };
 
@@ -236,7 +262,8 @@ function main(argv) {
     console.log(
       `migrate-legacy-cli (${summary.mode}): scanned ${summary.files_scanned} file(s); ` +
         `safe edits ${safeEdits}${apply ? ` (applied ${applied})` : ' (dry-run)'}; ` +
-        `blocking ${blocking}`,
+        `blocking ${blocking}` +
+        (allAcks.length ? `; acknowledgements ${allAcks.join(',')}` : ''),
     );
     for (const r of summary.records) {
       const tag = !r.ok ? 'BLOCK' : r.changed ? (r.applied ? 'APPLY' : 'WOULD') : 'NOTE';

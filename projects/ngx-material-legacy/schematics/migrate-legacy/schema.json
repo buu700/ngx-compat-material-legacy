@@ -3,6 +3,22 @@
   "$id": "NgxMaterialLegacyMigrateLegacy",
   "title": "migrate-legacy",
   "type": "object",
-  "properties": {},
+  "properties": {
+    "acknowledgeCompanionBridges": {
+      "type": "boolean",
+      "default": false,
+      "description": "Acknowledge ordinary-current companion bridges (e.g. expansion-theme). Records acknowledgement and allows safe @use module-source rewrite only; does not rewrite companion calls or approve visuals."
+    },
+    "acknowledgeAggregates": {
+      "type": "boolean",
+      "default": false,
+      "description": "Acknowledge historical all-legacy-component-themes aggregate membership (incl. ordinary companions). Allows safe @use rewrite only; does not substitute owned-only aggregates."
+    },
+    "acknowledgeCurrentComponents": {
+      "type": "boolean",
+      "default": false,
+      "description": "Acknowledge ordinary (non-legacy) @angular/material imports for readiness. Does not rewrite those imports or waive parity tests."
+    }
+  },
   "additionalProperties": false
 }
