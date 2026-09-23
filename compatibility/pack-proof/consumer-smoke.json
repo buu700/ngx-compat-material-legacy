@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "captured_at": "2026-09-23T17:35:15.661099-04:00",
+  "captured_at": "2026-09-23T17:42:29.631115-04:00",
   "tarball": {
     "path": "compatibility/pack-proof/ngx-compat-material-legacy-22.0.0-rc.0.tgz",
-    "sha256": "21a39bc777d478f875884e8b0255843b5852483ab28dd32e8236747bc183c6d2",
-    "size": 411661,
+    "sha256": "1b6859e8761f615e853362b8a7aed55d615f51508c67d0b7cd463b4db157bef8",
+    "size": 528567,
     "package": "@ngx-compat/material-legacy@22.0.0-rc.0"
   },
   "consumer": {
-    "dir": "/tmp/ngx-material-legacy-consumer-smoke7",
+    "dir": "/tmp/ngx-material-legacy-consumer-smoke8",
     "committed": false,
     "peers": [
       "@angular/*@22.1.7",
@@ -19,9 +19,9 @@
   },
   "sass_smoke": {
     "status": "ok",
-    "fixture": "deep-purple 800 + card/checkbox/radio/slide-toggle/progress themes",
+    "fixture": "deep-purple 800 + card/checkbox/radio/slide-toggle/progress/list/dialog/menu/autocomplete themes",
     "expected_default": "#4527a0",
-    "css_bytes": 34091,
+    "css_bytes": 42607,
     "has_form_field": true,
     "has_select": true,
     "has_card": true,
@@ -29,7 +29,10 @@
     "has_radio": true,
     "has_slide_toggle": true,
     "has_progress_bar": true,
-    "has_progress_spinner": true
+    "has_progress_spinner": true,
+    "has_dialog": true,
+    "has_menu": true,
+    "has_autocomplete": true
   },
   "esm_smoke": {
     "status": "ok",
@@ -47,12 +50,15 @@
       "@ngx-compat/material-legacy/legacy-list",
       "@ngx-compat/material-legacy/legacy-progress-bar",
       "@ngx-compat/material-legacy/legacy-progress-spinner",
+      "@ngx-compat/material-legacy/legacy-dialog",
+      "@ngx-compat/material-legacy/legacy-menu",
+      "@ngx-compat/material-legacy/legacy-autocomplete",
       "@ngx-compat/material-legacy/legacy-button/testing"
     ]
   },
   "notes": [
-    "Packed: button(+testing), form-field, input, core, select, card, checkbox, radio, slide-toggle, slider, list, progress-bar, progress-spinner.",
-    "Remaining: dialog, menu, autocomplete, chips, table, paginator, tabs, snack-bar, tooltip (+ testing).",
-    "Dialog needs owned _MatDialogBase/_MatDialogContainerBase/matDialogAnimations/_defaultParams."
+    "Packed overlay trio: legacy-dialog, legacy-menu, legacy-autocomplete with owned Material-16 bases.",
+    "Motion: owned historical matDialogAnimations / matMenuAnimations / select+form-field animation metadata locally; optional @angular/animations peer retained. Inspector still flags animation engine references (expected until motion removal migrations land).",
+    "Remaining: chips, table, paginator, tabs, snack-bar, tooltip (+ more testing)."
   ]
 }

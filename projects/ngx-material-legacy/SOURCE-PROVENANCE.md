@@ -47,3 +47,20 @@ See `compatibility/inventories/sass-facade-copy-manifest.json`.
   on `@angular/material/*` peers.
 - `legacy-button/testing`: secondary harness entry with owned historical
   `LegacyButtonVariant` / `LegacyButtonHarnessFilters`.
+
+## Overlay trio ports (2026-09-23)
+
+- `legacy-dialog`: owned `_MatDialogBase` / `_MatDialogContainerBase` adapted to
+  inject()-based CDK `CdkDialogContainer`; owned `matDialogAnimations` /
+  `_defaultParams`; owned `MatLegacyDialogRef` + `_closeDialogVia` (Material 22
+  `MatDialogRef` is MDC-shaped). Shared `MatDialogConfig` / `MatDialogState` /
+  position/role types remain on `@angular/material/dialog`.
+- `legacy-menu`: owned `_MatMenuBase` / `_MatMenuTriggerBase` /
+  `_MatMenuContentBase` (DomPortalOutlet without `ComponentFactoryResolver`);
+  owned `matMenuAnimations`; `MatLegacyMenuItem` still extends current
+  `MatMenuItem` with legacy host classes. Shared `MAT_MENU_*` tokens remain on
+  `@angular/material/menu`.
+- `legacy-autocomplete`: owned `_MatAutocompleteBase` /
+  `_MatAutocompleteTriggerBase` / `_MatAutocompleteOriginBase`; options via
+  package `legacy-core`; shared default/scroll tokens on
+  `@angular/material/autocomplete`. Legacy panel keeps `_animationDone = null`.

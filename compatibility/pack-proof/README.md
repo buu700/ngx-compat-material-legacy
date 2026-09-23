@@ -8,7 +8,8 @@ secondary entries plus the Sass root facade.
 `legacy-button`, `legacy-button/testing`, `legacy-form-field`, `legacy-input`,
 `legacy-core` (option), `legacy-select`, `legacy-card`, `legacy-checkbox`,
 `legacy-radio`, `legacy-slide-toggle`, `legacy-progress-bar`,
-`legacy-progress-spinner`, `legacy-slider`, `legacy-list`.
+`legacy-progress-spinner`, `legacy-slider`, `legacy-list`, `legacy-dialog`,
+`legacy-menu`, `legacy-autocomplete`.
 
 | Artifact | Role |
 | --- | --- |
