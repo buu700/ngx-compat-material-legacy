@@ -1,7 +1,8 @@
 # Pack proof (partial)
 
 Evidence that `ng-packagr` can build and `npm pack` the compatibility library with a
-working `legacy-button` secondary entry and Sass root facade.
+working `legacy-button` secondary entry and Sass root facade. Component styles compile
+from SCSS during the library build (`styleIncludePaths` + owned `@material/*` deps).
 
 | Artifact | Role |
 | --- | --- |

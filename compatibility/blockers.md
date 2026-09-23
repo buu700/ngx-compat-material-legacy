@@ -1,15 +1,16 @@
 # Active blockers
 
-## B-PKG-02 — Component SCSS→CSS seam is precompiled for legacy-button
-`legacy-button` packs with checked-in `button.css` (compiled with Material-16
-`@material/*` load paths). Live `styleUrls: ['button.scss']` inside ng-packagr still
-needs those load paths wired into the library build before porting more components.
-
 ## B-CI-01 — Push-triggered Actions initially produced zero runs
 Mitigated: push-triggered CI is now producing runs (e.g. success on
 `5f7740be`). Keep `workflow_dispatch` as a backup.
 
 ## Resolved / mitigated
+- **B-PKG-02**: Live SCSS→CSS for `legacy-button` via `styleUrls: ['button.scss']` and
+  `ng-package.json` `lib.styleIncludePaths` (`node_modules`, `../../node_modules`).
+  Direct deps added for transitive Sass packages (`@material/focus-ring`, `tokens`,
+  `progress-indicator`) so pnpm resolves `@use '@material/…'`. Checked-in `button.css`
+  removed; styles inlined in FESM. Pack + consumer smoke refreshed under
+  `compatibility/pack-proof/`.
 - **B-SASS-02**: Bridge-review fixtures dispositioned 2026-09-23 as
   **intentional current-bridge** (shared CDK infrastructure). See
   `compatibility/bridge-disposition/` and `compatibility/migration-report-seed.md`.

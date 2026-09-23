@@ -19,6 +19,7 @@ See `compatibility/inventories/sass-facade-copy-manifest.json`.
   no longer exports `mixinColor` / `mixinDisabled` / `mixinDisableRipple`).
 - Slim `MatCommonModule` re-exports CDK `BidiModule`.
 - `standalone: false` on legacy button/anchor; `ANIMATION_MODULE_TYPE` from `@angular/core`.
-- Component `button.css` precompiled from `button.scss` with `@material/*` load paths.
+- Component `styleUrls` point at `button.scss`; ng-packagr compiles with `styleIncludePaths` covering library + workspace `node_modules` (Material-16 `@material/*` load paths).
+- Direct deps include transitive Sass packages (`focus-ring`, `tokens`, `progress-indicator`) so pnpm consumers resolve `@use '@material/…'` without relying on hoist.
 - Library `dependencies` include Material-16-aligned `@material/*@15.0.0-canary.bc9ae6c9c.0`
   set so Sass consumers resolve the facade without a separate MDC install.

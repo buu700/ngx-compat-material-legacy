@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "captured_at": "2026-09-23T17:15:22.929522-04:00",
+  "captured_at": "2026-09-23T17:21:13.212842-04:00",
   "tarball": {
     "path": "compatibility/pack-proof/ngx-compat-material-legacy-22.0.0-rc.0.tgz",
-    "sha256": "1e584204c13079014bd4ceec9d9b28f14f4d593a1b7eef0052860800d78e55ae",
-    "size": 105611,
+    "sha256": "a639aa76ff183561bb102a02c72b582b0dbaa54c45cc36643de2c120eef2a5d6",
+    "size": 105618,
     "package": "@ngx-compat/material-legacy@22.0.0-rc.0"
   },
   "consumer": {
-    "dir": "/tmp/ngx-material-legacy-consumer-smoke3",
+    "dir": "/tmp/ngx-material-legacy-consumer-smoke4",
     "committed": false,
     "peers": [
       "@angular/*@22.1.7",
@@ -27,11 +27,14 @@
   "esm_smoke": {
     "status": "ok",
     "import": "@ngx-compat/material-legacy/legacy-button",
-    "keys": "ESM_STATUS=ok\nESM_KEYS=MatCommonModule,MatLegacyAnchor,MatLegacyButton,MatLegacyButtonModule"
+    "keys": "ESM_STATUS=ok\nESM_KEYS=MatCommonModule,MatLegacyAnchor,MatLegacyButton,MatLegacyButtonModule",
+    "styles_inlined_from_scss": true,
+    "checked_in_button_css": false
   },
   "notes": [
-    "ng-packagr builds primary + legacy-button secondary entry.",
-    "Component styles ship as precompiled button.css (SCSS\u2192CSS seam; @material load path needed for live SCSS compile).",
+    "ng-packagr builds primary + legacy-button secondary entry with live SCSS\u2192CSS via styleUrls button.scss.",
+    "lib.styleIncludePaths: projects/ngx-material-legacy/node_modules + workspace node_modules.",
+    "Direct deps include @material/focus-ring, tokens, progress-indicator for pnpm-resolvable Sass @use paths.",
     "Library declares Material-16-aligned @material/* canary deps for Sass facade resolution."
   ]
 }
