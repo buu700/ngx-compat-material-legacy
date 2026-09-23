@@ -21,7 +21,7 @@ testing secondary entries pack. Schematics + bundled peer-light CLI live under
 | `shared-core` | `src/material/core` (578 edges) | **No** — provenance / relative Sass+TS still referenced by historical trees |
 | `ordinary-current-companion` | datepicker, expansion, icon, sidenav, … | **No** — not owned legacy; keep as historical reference until unused |
 | `owned-overlap-ordinary` | ordinary `table` vs owned `legacy-table` | **No** — needs human review of harness/base edges |
-| `unresolved-relative` | 68 `.import` Sass forward stubs | **No** — lexical closure cannot resolve; blocked for delete |
+| `unresolved-relative` | **0** (was 68 `.import` false-negatives + 1 comment placeholder) | **No `src/` delete yet** — shared-core/companions still block; relative edges closed |
 | Package leads (`@angular/*`, CDK, sass:) | peers / builtins | N/A — dependency policy, not `src/` delete |
 
 ## Candidates for later deletion (after closure)
@@ -40,8 +40,8 @@ testing secondary entries pack. Schematics + bundled peer-light CLI live under
 - `src/material/{checkbox,menu,form-field,select,input,...}/testing` bases used as
   provenance for owned harness bases (or seal copies under `reference/`).
 - Inventories, goldens, and research packets under `compatibility/` / `research/`.
-- Unresolved relative `.import` forward stubs (68) until reclassified with a
-  compiler-aware or seal-based disposition.
+- Relative unresolved count is **0** after resolver/comment fixes; shared-core and
+  ordinary companions still block `src/` deletion.
 
 ## Next concrete steps (still no `git rm`)
 
@@ -53,18 +53,14 @@ testing secondary entries pack. Schematics + bundled peer-light CLI live under
 
 ## Status check (2026-09-23 tip)
 
-Reconfirmed after advisory triage: classification still stands; **no** `src/`
-deletion authorized. Unresolved relative stubs remain **68**; shared-core and
-ordinary companions remain blocked. Advisory work did not produce escape-edge
-closure evidence. Prefer documenting over deleting.
+Relative unresolved edges closed (**0**). **no** `src/` deletion authorized:
+shared-core and ordinary companions remain blocked. Prefer documenting over deleting.
 
 ## Status check (2026-09-23 peer-floor / motion wave)
 
 
-Escape-edge classification JSON advanced with per-specifier dispositions for the
-common `.import` forward stubs (private/theming/typography/button-common). Still
-**68** unresolved; **no** `src/` deletion. See
-`escape-edge-classification.json` → `unresolved_relative.target_dispositions`.
+`.import` resolution + comment/placeholder filtering: unresolved **0**.
+**no** `src/` deletion. See `escape-edge-classification.json`.
 
 ## Status check (2026-09-23 motion / escape-edge wave)
 
@@ -75,4 +71,14 @@ missing owned library files.
 
 **Still no `src/` mass-delete.** Shared-core (578) and ordinary companions remain
 blocked. Prefer documenting; only narrowly scoped deletes with provenance are allowed.
+
+## Status check (2026-09-23 zero-unresolved relative)
+
+`scripts/source-closure.py` now:
+1. Resolves historical `.import` modules to `_*.import.scss`
+2. Strips `//` and `/* */` comments before Sass edge scan
+3. Ignores documentation placeholders containing `<...>`
+
+**Unresolved relative edges: 0.** Shared-core (578) and ordinary companions remain
+`blocked-from-src-delete`. No mass-delete of `src/`.
 

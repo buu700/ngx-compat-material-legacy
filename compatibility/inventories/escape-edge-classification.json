@@ -5,7 +5,7 @@
   "policy": "No mass-delete of src/. Classify only; deletions require closure evidence.",
   "summary": {
     "legacy_to_ordinary_edge_count": 654,
-    "unresolved_relative_count": 1
+    "unresolved_relative_count": 0
   },
   "ordinary_material_dir_classes": {
     "core": {
@@ -352,27 +352,15 @@
     }
   },
   "unresolved_relative": {
-    "status": "mostly-resolved-by-resolver-fix",
-    "count": 1,
-    "previous_count": 68,
-    "advanced_on": "2026-09-23",
-    "note": "Fixed lexical Sass `.import` \u2192 `_*.import.scss` resolution in scripts/source-closure.py. Remaining edges are non-file template/inventory artifacts, not missing owned library sources. src/ still must not be mass-deleted: shared-core + ordinary companions remain blocked.",
-    "remaining": [
-      {
-        "from": "src/material/legacy-core/density/private/_all-density.scss",
-        "kind": "sass-use",
-        "specifier": "../../../<legacy-component>/<legacy-component>-theme"
-      }
+    "status": "resolved-zero",
+    "count": 0,
+    "previous_counts": [
+      68,
+      1
     ],
-    "remaining_dispositions": [
-      {
-        "specifier": "../../../<legacy-component>/<legacy-component>-theme",
-        "from": "src/material/legacy-core/density/private/_all-density.scss",
-        "class": "inventory-template-placeholder",
-        "disposition": "document-only; not a missing owned file",
-        "rationale": "Density aggregate uses a documented placeholder path for per-component themes; not a real filesystem edge. Does not block projects/ pack."
-      }
-    ]
+    "advanced_on": "2026-09-23",
+    "note": "Lexical closure reports zero unresolved relative edges after (1) `.import` partial resolution, (2) stripping // and /* */ comments before @use/@forward/@import scan, (3) ignoring documentation placeholders containing <...>. src/ mass-delete remains blocked by shared-core and ordinary companions.",
+    "remaining": []
   },
   "safe_vs_blocked": {
     "safe_to_document_only": [

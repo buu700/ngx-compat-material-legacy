@@ -73,6 +73,9 @@ const checks = {
   tooltip_uses_css_not_engine_in_component: !read(
     'projects/ngx-material-legacy/legacy-tooltip/tooltip.ts',
   ).includes('animations:'),
+  tooltip_honors_MATERIAL_ANIMATIONS_helper: read(
+    'projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts',
+  ).includes('legacyAnimationsDisabled'),
 };
 
 for (const [k, v] of Object.entries(checks)) {
