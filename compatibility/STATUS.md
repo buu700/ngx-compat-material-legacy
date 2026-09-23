@@ -24,7 +24,7 @@ Snapshot for handoff gates. Package `@ngx-compat/material-legacy@22.0.0-rc.0`
 | W09 upstream triage ledger | **Done (starter)** | `compatibility/upstream-triage-ledger.json` |
 | W10 support matrix / 21.x prep | **Partial** | `compatibility/support-matrix.md` checklist; no `21.x` branch yet |
 | Publish readiness (no publish) | **Done (docs)** | `compatibility/publish-readiness.md` |
-| CI green on push | **Pending tip** | Push this wave; prior tip https://github.com/buu700/ngx-compat-material-legacy/actions/runs/35931050332 |
+| CI green on push | **Done** | Tip run https://github.com/buu700/ngx-compat-material-legacy/actions/runs/35932193898 success on `fb722b982` (helper + packed-consumer AOT) |
 
 ## Testing matrix (`*/testing`)
 
@@ -47,6 +47,7 @@ in git history / `consumer-smoke.json` `testing_matrix`.
 
 ## This tip
 
+- CI green on `fb722b982` (run 35932193898): Helper tests + Packed-consumer AOT and harness.
 - Peer floor applied: advertised `^22.1.7` (was `^22.0.0`)
 - Sass `opacity()` → `color.opacity()` for Dart Sass 1.104 theme smoke
 - Packed-consumer AOT + harness runtime evidence committed
