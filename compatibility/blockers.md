@@ -43,8 +43,8 @@ migrations remove the deprecated engine from published runtime.
 - `src/` cleanup: unresolved relative edges **68→1**; shared-core/companions still
   blocked — prefer documenting; no mass-delete.
 - Maintainer-authorized npm publish after packed-artifact and metadata checks.
-- `21.x` branch bootstrapped (aged peer install OK); **library rebuild vs Material 21
-  blocked** pending adaptation (`compatibility/support-matrix.md`).
+- `21.x` branch packs + consumer smoke green on branch; keep lockfile off `main`
+  (`compatibility/support-matrix.md`).
 
 ## Resolved / mitigated
 - **Full historical testing ports (22/22)**: radio, slide-toggle, card, chips, list,
@@ -105,12 +105,14 @@ dialog/menu/select/form-field/snack-bar/tabs. Owned trigger metadata and optiona
 `@angular/animations` peer remain until tested CSS/WAAPI replacements preserve
 overlay contracts. See `compatibility/motion-overlay-trio.md`.
 
-## B-ESC-01 — Unresolved relative escape edges (mitigated)
-Was 68 lexical `.import` false-negatives. Resolver now maps to `_*.import.scss`.
-**1** placeholder edge remains. `src/` delete still blocked by shared-core /
+## B-ESC-01 — Unresolved relative escape edges (mitigated → 0)
+Was 68 lexical `.import` false-negatives + 1 commented placeholder. Resolver maps
+`.import` → `_*.import.scss`, strips comments, ignores `<...>` placeholders.
+**Unresolved relative count: 0.** `src/` delete still blocked by shared-core /
 ordinary companions.
 
-## B-21-01 — 21.x library rebuild (active)
-Branch `21.x` exists with aged peer selection and install smoke. Rebuilding the
-library against Angular/Material 21 requires API adaptation and is **not** claimed
-done. Do not publish 21.x until pack + packed-consumer evidence exists on that branch.
+## B-21-01 — 21.x library rebuild (mitigated on branch)
+Branch `21.x` packs against aged Angular 21.2.23 / Material 21.2.14 with Sass/ESM/AOT
+consumer smoke (`compatibility/pack-proof-21/`). Remaining: Node 20.19 matrix,
+broader harness coverage, owner publish to `lts-21-next`. Do not merge 21 lockfile
+into `main`.
