@@ -32,14 +32,14 @@
   [cdkConnectedOverlayPanelClass]="_overlayPanelClass"
   [cdkConnectedOverlayScrollStrategy]="_scrollStrategy"
   [cdkConnectedOverlayOrigin]="origin"
-  [cdkConnectedOverlayOpen]="panelOpen"
+  [cdkConnectedOverlayOpen]="_overlayAttached"
   [cdkConnectedOverlayPositions]="_positions"
   [cdkConnectedOverlayMinWidth]="_getOverlayMinWidth()"
   [cdkConnectedOverlayOffsetY]="_offsetY"
   (backdropClick)="close()"
   (attach)="_onAttached()"
   (detach)="close()">
-  <div class="mat-select-panel-wrap" [@transformPanelWrap]>
+  <div class="mat-select-panel-wrap">
     <div
       #panel
       role="listbox"
@@ -50,8 +50,10 @@
       [attr.aria-label]="ariaLabel || null"
       [attr.aria-labelledby]="_getPanelAriaLabelledby()"
       [ngClass]="panelClass"
-      [@transformPanel]="_getTransformPanelState()"
-      (@transformPanel.done)="_panelDoneAnimatingStream.next($event.toState)"
+      [class.mat-select-panel-animations-enabled]="_animationsEnabled"
+      [class.mat-select-panel-exit]="_panelExiting"
+      [class.mat-select-panel-multiple]="multiple"
+      (animationend)="_onPanelAnimationEnd($event.animationName)"
       [style.transformOrigin]="_transformOrigin"
       [style.font-size.px]="_triggerFontSize"
       (keydown)="_handleKeydown($event)">

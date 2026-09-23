@@ -51,9 +51,7 @@ import {
   MAT_PREFIX,
   MAT_SUFFIX,
 } from '@angular/material/form-field';
-import {matFormFieldAnimations} from './form-field-animations';
 import {
-  legacyAnimationTriggerState,
   legacyAnimationsDisabled,
 } from '@ngx-compat/material-legacy/legacy-core';
 
@@ -136,7 +134,6 @@ export const MAT_LEGACY_FORM_FIELD_DEFAULT_OPTIONS =
     'form-field-outline.scss',
     'form-field-standard.scss',
   ],
-  animations: [matFormFieldAnimations.transitionMessages],
   host: {
     'class': 'mat-form-field',
     '[class.mat-form-field-appearance-standard]': 'appearance == "standard"',
@@ -223,14 +220,6 @@ export class MatLegacyFormField
   /** State of the mat-hint and mat-error animations. */
   _subscriptAnimationState: string = '';
 
-  /** Subscript message animation state with zero-duration when disabled. */
-  _getSubscriptAnimationState() {
-    return legacyAnimationTriggerState(
-      this._subscriptAnimationState,
-      {transitionDuration: '300ms'},
-      this._legacyAnimationsDisabled,
-    );
-  }
 
 
   /** Text for the form field hint. */

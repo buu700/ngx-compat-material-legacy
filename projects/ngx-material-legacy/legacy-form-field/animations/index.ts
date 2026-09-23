@@ -1,9 +1,6 @@
 /**
- * @license
- * Copyright Google LLC All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * Optional Angular animation recipes for legacy form-field.
+ * Primary form-field uses CSS transitions for subscript messages.
  */
 import {
   animate,
@@ -14,11 +11,6 @@ import {
   AnimationTriggerMetadata,
 } from '@angular/animations';
 
-/**
- * Animations used by the MatFormField.
- * Duration parameterized for MATERIAL_ANIMATIONS / NoopAnimations.
- * @docs-private
- */
 export const matFormFieldAnimations: {
   readonly transitionMessages: AnimationTriggerMetadata;
 } = {
@@ -34,3 +26,5 @@ export const matFormFieldAnimations: {
     ),
   ]),
 };
+
+export {matFormFieldAnimations as matLegacyFormFieldAnimations};

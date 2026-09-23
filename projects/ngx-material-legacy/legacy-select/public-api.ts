@@ -7,7 +7,7 @@
  */
 
 export {MatLegacySelectModule} from './select-module';
-export {matLegacySelectAnimations} from './select-animations';
+// Historical recipes: `@ngx-compat/material-legacy/legacy-select/animations`.
 export {
   MatLegacySelectChange,
   MatLegacySelect,

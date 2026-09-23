@@ -4,15 +4,17 @@
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
+ *
+ * CSS keyframe motion (Material 22-style). Recipe metadata lives under
+ * `@ngx-compat/material-legacy/legacy-snack-bar/animations`.
  */
 
 import {ChangeDetectionStrategy, Component, ViewEncapsulation} from '@angular/core';
 import {_MatSnackBarContainerBase} from './internal/snack-bar-container-base';
-import {matSnackBarAnimations} from './snack-bar-animations';
-import {
-  legacyAnimationTriggerState,
-  legacyAnimationsDisabled,
-} from '@ngx-compat/material-legacy/legacy-core';
+import {legacyAnimationsDisabled} from '@ngx-compat/material-legacy/legacy-core';
+
+const ENTER_MS = 150;
+const EXIT_MS = 75;
 
 /**
  * Internal component that wraps user-provided snack bar content.
@@ -31,22 +33,71 @@ import {
   // tslint:disable-next-line:validate-decorators
   changeDetection: ChangeDetectionStrategy.Default,
   encapsulation: ViewEncapsulation.None,
-  animations: [matSnackBarAnimations.snackBarState],
   host: {
     'class': 'mat-snack-bar-container',
-    '[@state]': '_getAnimationState()',
-    '(@state.done)': 'onAnimationEnd($event)',
+    '[class.mat-snack-bar-container-enter]': "_animationState === 'visible'",
+    '[class.mat-snack-bar-container-exit]': "_animationState === 'hidden'",
+    '[class.mat-snack-bar-container-animations-enabled]': '_animationsEnabled',
+    '(animationend)': 'onAnimationEnd($event.animationName)',
   },
 })
 export class MatLegacySnackBarContainer extends _MatSnackBarContainerBase {
   private readonly _legacyAnimationsDisabled = legacyAnimationsDisabled();
+  readonly _animationsEnabled = !this._legacyAnimationsDisabled;
 
-  _getAnimationState() {
-    return legacyAnimationTriggerState(
-      this._animationState,
-      {enterDuration: '150ms', exitDuration: '75ms'},
-      this._legacyAnimationsDisabled,
-    );
+  private _enterFallback: ReturnType<typeof setTimeout> | null = null;
+  private _exitFallback: ReturnType<typeof setTimeout> | null = null;
+
+  protected override _afterEnterMotionStarted(): void {
+    if (!this._animationsEnabled) {
+      this._notifyEnter();
+      return;
+    }
+    if (this._enterFallback !== null) {
+      clearTimeout(this._enterFallback);
+    }
+    this._enterFallback = setTimeout(() => {
+      this.onAnimationEnd('mat-legacy-snack-bar-enter');
+    }, ENTER_MS + 50);
+  }
+
+  protected override _afterExitMotionStarted(): void {
+    if (!this._animationsEnabled) {
+      this._notifyExitComplete();
+      return;
+    }
+    if (this._exitFallback !== null) {
+      clearTimeout(this._exitFallback);
+    }
+    this._exitFallback = setTimeout(() => {
+      this.onAnimationEnd('mat-legacy-snack-bar-exit');
+    }, EXIT_MS + 50);
+  }
+
+  override onAnimationEnd(
+    event: string | {fromState?: string; toState?: string; animationName?: string},
+  ) {
+    if (typeof event === 'string') {
+      if (event === 'mat-legacy-snack-bar-enter' && this._enterFallback !== null) {
+        clearTimeout(this._enterFallback);
+        this._enterFallback = null;
+      }
+      if (event === 'mat-legacy-snack-bar-exit' && this._exitFallback !== null) {
+        clearTimeout(this._exitFallback);
+        this._exitFallback = null;
+      }
+    }
+    super.onAnimationEnd(event);
+  }
+
+  override ngOnDestroy() {
+    if (this._enterFallback !== null) {
+      clearTimeout(this._enterFallback);
+    }
+    if (this._exitFallback !== null) {
+      clearTimeout(this._exitFallback);
+    }
+    super.ngOnDestroy();
   }
 
   protected override _afterPortalAttached() {

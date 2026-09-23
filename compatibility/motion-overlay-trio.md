@@ -53,3 +53,28 @@ historical public API compatibility and still imports `@angular/animations` type
 inspector flags on that export are expected until a tested migration removes the
 symbol or replaces it with an honest non-engine type.
 
+## Import graph (2026-09-23 follow-up)
+
+See `motion-animations-import-graph.md` for the precise 12-file source list and
+7 packed FESM importers. Another pass confirmed: type-only `AnimationEvent` usage
+can use `import type` (hygiene); **value** recipe imports cannot be removed without
+CSS/WAAPI replacements. Tooltip remaining coupling is the **exported** recipe
+re-export into `legacy-tooltip` FESM — not the runtime CSS show/hide path.
+
+
+## CSS-motion wave complete (2026-09-23)
+
+| Entry | Runtime motion | Recipe location |
+| --- | --- | --- |
+| `legacy-dialog` | CSS + timers | `legacy-dialog/animations` |
+| `legacy-snack-bar` | CSS keyframes | `legacy-snack-bar/animations` |
+| `legacy-tooltip` | CSS classes | `legacy-tooltip/animations` |
+| `legacy-menu` | CSS keyframes | `legacy-menu/animations` |
+| `legacy-select` | CSS keyframes + exit-before-detach | `legacy-select/animations` |
+| `legacy-form-field` | CSS subscript transitions | `legacy-form-field/animations` |
+| `legacy-tabs` | CSS transform transitions | `legacy-tabs/animations` |
+
+Primary FESMs for all of the above are free of `@angular/animations` imports.
+Disable path: `provideNoopAnimations()` / `MATERIAL_ANIMATIONS` / `legacyAnimationsDisabled()`.
+Evidence: `pack-proof/motion-lifecycle-smoke.json`, `pack-proof/aot-harness-smoke.json`
+(button/select open-close/dialog/menu/snack/tooltip/tabs).

@@ -17,3 +17,43 @@
     display: none;
   }
 }
+
+
+.mat-tab-body {
+  &.mat-tab-body-active {
+    position: relative;
+    z-index: 1;
+  }
+
+  &.mat-tab-body-animating > .mat-tab-body-content {
+    min-height: 1px;
+    visibility: visible;
+  }
+}
+
+.mat-tab-body-content {
+  transform: none;
+  visibility: hidden;
+
+  &.mat-tab-body-content-can-animate {
+    transition: transform cubic-bezier(0.35, 0, 0.25, 1);
+    transition-duration: inherit;
+  }
+
+  &.mat-tab-body-content-left {
+    transform: translate3d(-100%, 0, 0);
+    min-height: 1px;
+    visibility: hidden;
+  }
+
+  &.mat-tab-body-content-right {
+    transform: translate3d(100%, 0, 0);
+    min-height: 1px;
+    visibility: hidden;
+  }
+}
+
+.mat-tab-body-active > .mat-tab-body-content,
+.mat-tab-body-animating > .mat-tab-body-content {
+  visibility: visible;
+}

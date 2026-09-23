@@ -71,6 +71,6 @@ export {
   MAT_PREFIX as MAT_LEGACY_PREFIX,
 } from '@angular/material/form-field';
 
-export {matFormFieldAnimations as matLegacyFormFieldAnimations} from './form-field-animations';
+// Historical recipes: `@ngx-compat/material-legacy/legacy-form-field/animations`.
 
 export {MatCommonModule} from './internal/common-module';

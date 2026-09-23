@@ -8,7 +8,6 @@
  * Owned Material-16 `_MatSnackBarContainerBase` (removed from Angular Material 22).
  */
 
-import {AnimationEvent} from '@angular/animations';
 import {AriaLivePoliteness} from '@angular/cdk/a11y';
 import {Platform} from '@angular/cdk/platform';
 import {BasePortalOutlet, CdkPortalOutlet, ComponentPortal, DomPortal, TemplatePortal} from '@angular/cdk/portal';
@@ -131,24 +130,58 @@ export abstract class _MatSnackBarContainerBase extends BasePortalOutlet impleme
     return result;
   };
 
-  /** Handle end of animations, updating the state of the snackbar. */
-  onAnimationEnd(event: AnimationEvent) {
-    const {fromState, toState} = event;
+  /**
+   * Handle end of enter/exit motion.
+   * Accepts a CSS `animationName`, or a historical `{fromState,toState}` shape.
+   */
+  onAnimationEnd(
+    event: string | {fromState?: string; toState?: string; animationName?: string},
+  ) {
+    if (typeof event === 'string') {
+      if (event === 'mat-legacy-snack-bar-exit') {
+        this._completeExit();
+      } else if (event === 'mat-legacy-snack-bar-enter') {
+        const onEnter = this._onEnter;
+        this._ngZone.run(() => {
+          onEnter.next();
+          onEnter.complete();
+        });
+      }
+      return;
+    }
 
+    const animationName = event.animationName;
+    if (animationName === 'mat-legacy-snack-bar-exit' || animationName === 'mat-legacy-snack-bar-enter') {
+      this.onAnimationEnd(animationName);
+      return;
+    }
+
+    const {fromState, toState} = event;
     if ((toState === 'void' && fromState !== 'void') || toState === 'hidden') {
       this._completeExit();
     }
 
     if (toState === 'visible') {
-      // Note: we shouldn't use `this` inside the zone callback,
-      // because it can cause a memory leak.
       const onEnter = this._onEnter;
-
       this._ngZone.run(() => {
         onEnter.next();
         onEnter.complete();
       });
     }
+  }
+
+  /** Used by CSS-motion subclasses when animations are disabled. */
+  protected _notifyEnter(): void {
+    const onEnter = this._onEnter;
+    this._ngZone.run(() => {
+      onEnter.next();
+      onEnter.complete();
+    });
+  }
+
+  /** Used by CSS-motion subclasses when animations are disabled. */
+  protected _notifyExitComplete(): void {
+    this._completeExit();
   }
 
   /** Begin animation of snack bar entrance into view. */
@@ -157,7 +190,13 @@ export abstract class _MatSnackBarContainerBase extends BasePortalOutlet impleme
       this._animationState = 'visible';
       this._changeDetectorRef.detectChanges();
       this._screenReaderAnnounce();
+      this._afterEnterMotionStarted();
     }
+  }
+
+  /** Hook for CSS-motion subclasses after enter state is applied. */
+  protected _afterEnterMotionStarted(): void {
+    // Default: Angular animation / no-op subclasses rely on onAnimationEnd.
   }
 
   /** Begin animation of the snack bar exiting from view. */
@@ -178,9 +217,15 @@ export abstract class _MatSnackBarContainerBase extends BasePortalOutlet impleme
       // If the snack bar hasn't been announced by the time it exits it wouldn't have been open
       // long enough to visually read it either, so clear the timeout for announcing.
       clearTimeout(this._announceTimeoutId);
+      this._afterExitMotionStarted();
     });
 
     return this._onExit;
+  }
+
+  /** Hook for CSS-motion subclasses after exit state is applied. */
+  protected _afterExitMotionStarted(): void {
+    // Default: Angular animation / no-op subclasses rely on onAnimationEnd.
   }
 
   /** Makes sure the exit callbacks have been invoked when the element is destroyed. */

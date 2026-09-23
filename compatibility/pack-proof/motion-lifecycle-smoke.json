@@ -1,32 +1,30 @@
 {
   "schema_version": 2,
-  "captured_at": "2026-09-23T23:32:48.308Z",
+  "captured_at": "2026-09-23T23:50:35.158Z",
   "status": "ok",
   "checks": {
     "helper_uses_public_MATERIAL_ANIMATIONS": true,
     "helper_avoids_private_Material_helpers": true,
     "dialog_zero_duration_when_disabled": true,
-    "menu_parameterized_and_wired": true,
-    "select_parameterized_and_wired": true,
-    "form_field_parameterized_and_wired": true,
-    "snack_bar_parameterized_and_wired": true,
-    "tabs_zero_duration_when_disabled": true,
-    "dialog_retains_trigger_metadata": true,
-    "menu_retains_trigger_metadata": true,
+    "menu_css_motion": true,
+    "select_css_motion": true,
+    "form_field_css_motion": true,
+    "snack_bar_css_motion": true,
+    "tabs_css_motion": true,
+    "dialog_uses_css_motion": true,
+    "menu_recipes_opt_in_secondary": true,
     "tooltip_uses_css_not_engine_in_component": true,
     "tooltip_honors_MATERIAL_ANIMATIONS_helper": true
   },
   "errors": [],
   "remaining_engine_bindings": [
-    "Owned @angular/animations trigger metadata retained for dialog/menu/select/form-field/snack-bar/tabs (and exported tooltip recipes).",
-    "Optional @angular/animations peer still required for those recipes until CSS/WAAPI replacements land.",
-    "Tooltip runtime uses CSS classes (_showAnimation/_hideAnimation), not component animations metadata."
+    "Primary overlay entries cleared of @angular/animations imports (dialog/menu/select/form-field/snack-bar/tabs/tooltip).",
+    "Opt-in /animations secondary entries still import the peer when consumers need historical AnimationTriggerMetadata."
   ],
   "artifacts": {
     "helper_sha256": "88812bc9ead98f1fc04fc0d58f38750ac515d8c93b1ad8fc694e6d1a2ea64f1a"
   },
   "notes": [
-    "Maximum safe incremental step: parameterized durations + MATERIAL_ANIMATIONS-aware 0ms paths on dialog/menu/select/form-field/snack-bar/tabs.",
-    "Full engine removal remains deferred; do not delete trigger APIs without tested CSS/WAAPI migrations."
+    "All targeted overlay entries use CSS/timer motion on primary FESM; recipes live under /animations."
   ]
 }

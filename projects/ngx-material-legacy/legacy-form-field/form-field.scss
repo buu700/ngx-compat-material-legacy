@@ -254,3 +254,22 @@ $default-infix-width: 180px !default;
 }
 
 @include datepicker-legacy-compat.legacy-form-field-compat();
+
+
+.mat-form-field-subscript-message.mat-form-field-subscript-animations-enabled {
+  opacity: 0;
+  transform: translateY(-5px);
+
+  &.mat-form-field-subscript-message-enter {
+    opacity: 1;
+    transform: translateY(0%);
+    transition:
+      opacity 300ms cubic-bezier(0.55, 0, 0.55, 0.2),
+      transform 300ms cubic-bezier(0.55, 0, 0.55, 0.2);
+  }
+}
+
+.mat-form-field-subscript-message:not(.mat-form-field-subscript-animations-enabled) {
+  opacity: 1;
+  transform: none;
+}

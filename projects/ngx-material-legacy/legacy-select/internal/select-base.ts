@@ -105,7 +105,6 @@ import {
   take,
   takeUntil,
 } from 'rxjs/operators';
-import {matLegacySelectAnimations as matSelectAnimations} from '../select-animations';
 import {
   getMatSelectDynamicMultipleError,
   getMatSelectNonArrayValueError,
@@ -256,6 +255,18 @@ export abstract class _MatSelectBase<C>
 
   /** Whether or not the overlay panel is open. */
   private _panelOpen = false;
+
+  /**
+   * Whether the connected overlay stays attached. Stays true during exit CSS
+   * animation after `_panelOpen` becomes false (Material 22-style).
+   */
+  _overlayAttached = false;
+
+  /** Whether the panel is playing the CSS exit animation. */
+  _panelExiting = false;
+
+  private _exitCleanup: (() => void) | undefined;
+
 
   /** Comparison function to specify which option is displayed. Defaults to object equality. */
   private _compareWith = (o1: any, o2: any) => o1 === o2;
@@ -598,6 +609,7 @@ export abstract class _MatSelectBase<C>
   }
 
   ngOnDestroy() {
+    this._exitCleanup?.();
     this._keyManager?.destroy();
     this._destroy.next();
     this._destroy.complete();
@@ -614,8 +626,12 @@ export abstract class _MatSelectBase<C>
   open(): void {
     if (this._canOpen()) {
       this._applyModalPanelOwnership();
+      this._exitCleanup?.();
+      this._exitCleanup = undefined;
+      this._panelExiting = false;
 
       this._panelOpen = true;
+      this._overlayAttached = true;
       this._keyManager.withHorizontalOrientation(null);
       this._highlightCorrectOption();
       this._changeDetectorRef.markForCheck();
@@ -694,6 +710,63 @@ export abstract class _MatSelectBase<C>
       this._keyManager.withHorizontalOrientation(this._isRtl() ? 'rtl' : 'ltr');
       this._changeDetectorRef.markForCheck();
       this._onTouched();
+      this._exitAndDetach();
+    }
+  }
+
+  /**
+   * Plays CSS exit motion (when enabled) then detaches the overlay.
+   * Emits panel-done stream states that historically came from Angular triggers.
+   */
+  protected _exitAndDetach(): void {
+    const animationsEnabled = this._selectAnimationsEnabled();
+    if (!animationsEnabled || !this.panel) {
+      this._overlayAttached = false;
+      this._panelExiting = false;
+      this._panelDoneAnimatingStream.next('void');
+      this._changeDetectorRef.markForCheck();
+      return;
+    }
+
+    this._exitCleanup?.();
+    this._panelExiting = true;
+    this._changeDetectorRef.markForCheck();
+
+    const panelEl = this.panel.nativeElement as HTMLElement;
+    const onEnd = (animationName?: string) => {
+      if (animationName && animationName !== 'mat-legacy-select-exit') {
+        return;
+      }
+      this._exitCleanup?.();
+      this._exitCleanup = undefined;
+      this._panelExiting = false;
+      this._overlayAttached = false;
+      this._panelDoneAnimatingStream.next('void');
+      this._changeDetectorRef.markForCheck();
+    };
+
+    const fallback = setTimeout(() => onEnd(), 200);
+    const handler = (event: Event) => {
+      onEnd((event as {animationName?: string}).animationName);
+    };
+    panelEl.addEventListener('animationend', handler);
+    this._exitCleanup = () => {
+      clearTimeout(fallback);
+      panelEl.removeEventListener('animationend', handler);
+    };
+  }
+
+  /** Whether CSS panel motion should run (overridden by concrete select). */
+  protected _selectAnimationsEnabled(): boolean {
+    return true;
+  }
+
+  /** Enter animation completion from template `(animationend)`. */
+  _onPanelAnimationEnd(animationName: string): void {
+    if (animationName === 'mat-legacy-select-enter' && this._panelOpen) {
+      this._panelDoneAnimatingStream.next(this.multiple ? 'showing-multiple' : 'showing');
+    } else if (animationName === 'mat-legacy-select-exit') {
+      // Exit path also handled in `_exitAndDetach` listener; ignore duplicates.
     }
   }
 
@@ -891,6 +964,9 @@ export abstract class _MatSelectBase<C>
     this._overlayDir.positionChange.pipe(take(1)).subscribe(() => {
       this._changeDetectorRef.detectChanges();
       this._positioningSettled();
+      if (!this._selectAnimationsEnabled()) {
+        this._panelDoneAnimatingStream.next(this.multiple ? 'showing-multiple' : 'showing');
+      }
     });
   }
 
