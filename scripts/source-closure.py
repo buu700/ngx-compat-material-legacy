@@ -67,7 +67,12 @@ def candidates(base: str, spec: str, sass: bool = False) -> list[str]:
     raw = norm(base, spec)
     p = PurePosixPath(raw)
     result: list[str] = []
-    if p.suffix:
+    # Historical Material uses `foo.import` Sass module names that resolve to
+    # `_foo.import.scss`. Treat non-source suffixes (e.g. `.import`) as part of
+    # the basename rather than a final file extension.
+    known_exts = set(TS_EXTS + SASS_EXTS + ASSET_EXTS)
+    has_known_ext = p.suffix.lower() in known_exts
+    if has_known_ext:
         result.append(raw)
     else:
         exts = SASS_EXTS if sass else TS_EXTS + ASSET_EXTS
@@ -79,13 +84,15 @@ def candidates(base: str, spec: str, sass: bool = False) -> list[str]:
         # Sass partial convention: foo/_bar.scss for `foo/bar` and `_foo.scss` for `foo`.
         parent, name = str(p.parent), p.name
         prefix = '' if parent == '.' else parent + '/'
-        if p.suffix:
+        if has_known_ext:
             if not name.startswith('_'):
                 result.append(prefix + '_' + name)
         else:
             for ext in SASS_EXTS:
                 result.append(prefix + '_' + name + ext)
                 result.append(raw + '/_index' + ext)
+                # Also try underscore form of the full `.import` basename.
+                result.append(prefix + '_' + name + ext)
     return list(dict.fromkeys(result))
 
 

@@ -5,7 +5,7 @@
   "policy": "No mass-delete of src/. Classify only; deletions require closure evidence.",
   "summary": {
     "legacy_to_ordinary_edge_count": 654,
-    "unresolved_relative_count": 68
+    "unresolved_relative_count": 1
   },
   "ordinary_material_dir_classes": {
     "core": {
@@ -352,115 +352,25 @@
     }
   },
   "unresolved_relative": {
-    "status": "blocked-for-delete",
-    "count": 68,
-    "note": "Mostly historical `.import` Sass forward stubs under src/material/core. Lexical closure cannot resolve them; do not treat as safe-delete evidence. Prefer documenting; seal/reference copies if needed. Advanced 2026-09-23: grouped sample by specifier and recorded per-target dispositions. Count remains 68; still blocked for delete.",
-    "sample": [
+    "status": "mostly-resolved-by-resolver-fix",
+    "count": 1,
+    "previous_count": 68,
+    "advanced_on": "2026-09-23",
+    "note": "Fixed lexical Sass `.import` \u2192 `_*.import.scss` resolution in scripts/source-closure.py. Remaining edges are non-file template/inventory artifacts, not missing owned library sources. src/ still must not be mass-deleted: shared-core + ordinary companions remain blocked.",
+    "remaining": [
       {
-        "from": "src/material/legacy-autocomplete/_autocomplete-theme.import.scss",
-        "kind": "sass-forward",
-        "specifier": "../core/style/private.import"
-      },
-      {
-        "from": "src/material/legacy-autocomplete/_autocomplete-theme.import.scss",
-        "kind": "sass-forward",
-        "specifier": "../core/theming/theming.import"
-      },
-      {
-        "from": "src/material/legacy-button/_button-base.import.scss",
-        "kind": "sass-forward",
-        "specifier": "../core/style/button-common.import"
-      },
-      {
-        "from": "src/material/legacy-button/_button-base.import.scss",
-        "kind": "sass-forward",
-        "specifier": "../core/style/private.import"
-      },
-      {
-        "from": "src/material/legacy-button/_button-theme.import.scss",
-        "kind": "sass-forward",
-        "specifier": "../core/style/private.import"
-      },
-      {
-        "from": "src/material/legacy-button/_button-theme.import.scss",
-        "kind": "sass-forward",
-        "specifier": "../core/theming/theming.import"
-      },
-      {
-        "from": "src/material/legacy-button/_button-theme.import.scss",
-        "kind": "sass-forward",
-        "specifier": "../core/typography/typography-utils.import"
-      },
-      {
-        "from": "src/material/legacy-card/_card-theme.import.scss",
-        "kind": "sass-forward",
-        "specifier": "../core/style/private.import"
-      },
-      {
-        "from": "src/material/legacy-card/_card-theme.import.scss",
-        "kind": "sass-forward",
-        "specifier": "../core/theming/theming.import"
-      },
-      {
-        "from": "src/material/legacy-card/_card-theme.import.scss",
-        "kind": "sass-forward",
-        "specifier": "../core/typography/typography-utils.import"
+        "from": "src/material/legacy-core/density/private/_all-density.scss",
+        "kind": "sass-use",
+        "specifier": "../../../<legacy-component>/<legacy-component>-theme"
       }
     ],
-    "advanced_on": "2026-09-23",
-    "grouping_from_sample": {
-      "sample_size": 30,
-      "by_specifier": {
-        "../core/typography/typography-utils.import": 10,
-        "../core/style/private.import": 6,
-        "../core/theming/theming.import": 6,
-        "../core/style/form-common.import": 6,
-        "../core/style/button-common.import": 1,
-        "../../../<legacy-component>/<legacy-component>-theme": 1
-      },
-      "by_legacy_family": {
-        "legacy-form-field": 10,
-        "legacy-button": 5,
-        "legacy-card": 3,
-        "legacy-chips": 3,
-        "legacy-dialog": 3,
-        "legacy-autocomplete": 2,
-        "legacy-checkbox": 2,
-        "legacy-core": 1,
-        "legacy-input": 1
-      }
-    },
-    "target_dispositions": {
-      "../core/style/private.import": {
-        "class": "historical-sass-import-stub",
-        "owned_under_projects": "projects/ngx-material-legacy/styles (partial) / legacy-core styles",
-        "disposition": "document-only; blocked-for-src-delete",
-        "rationale": "Material-16 @import forward stub; lexical closure cannot resolve .import \u2192 .scss. Facade under projects/ owns runtime Sass; src/ stub remains provenance."
-      },
-      "../core/theming/theming.import": {
-        "class": "historical-sass-import-stub",
-        "owned_under_projects": "projects/ngx-material-legacy/_index.scss + styles/theming",
-        "disposition": "document-only; blocked-for-src-delete",
-        "rationale": "Historical theming forward; owned M2 model lives in projects/ facade."
-      },
-      "../core/typography/typography-utils.import": {
-        "class": "historical-sass-import-stub",
-        "owned_under_projects": "projects/ngx-material-legacy/styles typography",
-        "disposition": "document-only; blocked-for-src-delete",
-        "rationale": "Typography util forward stub; do not delete until projects/ facade proves zero src need."
-      },
-      "../core/style/button-common.import": {
-        "class": "historical-sass-import-stub",
-        "owned_under_projects": "legacy-button styles under projects/",
-        "disposition": "document-only; blocked-for-src-delete",
-        "rationale": "Button common forward; owned button styles pack from projects/."
-      }
-    },
-    "extraction_candidates": [
+    "remaining_dispositions": [
       {
-        "pattern": "src/material/legacy-*/_*-theme.import.scss \u2192 ../core/*.import",
-        "action": "Keep documenting; projects/ already owns packed theme SCSS. No git rm.",
-        "blocker": "Lexical unresolved .import stubs + shared-core 578 edges"
+        "specifier": "../../../<legacy-component>/<legacy-component>-theme",
+        "from": "src/material/legacy-core/density/private/_all-density.scss",
+        "class": "inventory-template-placeholder",
+        "disposition": "document-only; not a missing owned file",
+        "rationale": "Density aggregate uses a documented placeholder path for per-component themes; not a real filesystem edge. Does not block projects/ pack."
       }
     ]
   },

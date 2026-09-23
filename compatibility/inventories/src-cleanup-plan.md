@@ -65,3 +65,14 @@ Escape-edge classification JSON advanced with per-specifier dispositions for the
 common `.import` forward stubs (private/theming/typography/button-common). Still
 **68** unresolved; **no** `src/` deletion. See
 `escape-edge-classification.json` → `unresolved_relative.target_dispositions`.
+
+## Status check (2026-09-23 motion / escape-edge wave)
+
+`scripts/source-closure.py` now resolves historical `.import` Sass module names to
+`_*.import.scss` partials. Unresolved relative edges dropped **68 → 1**. Remaining
+edge(s) are inventory placeholders (e.g. `<legacy-component>` density template), not
+missing owned library files.
+
+**Still no `src/` mass-delete.** Shared-core (578) and ordinary companions remain
+blocked. Prefer documenting; only narrowly scoped deletes with provenance are allowed.
+
