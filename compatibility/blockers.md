@@ -38,13 +38,13 @@ references in dialog/menu/select/form-field/snack-bar/tooltip/tabs (+ dialog/tes
 migrations remove the deprecated engine from published runtime.
 
 ### Remaining non-component work
-- Motion: dialog honors `MATERIAL_ANIMATIONS` disable path; **full** engine removal
-  from menu/select/form-field/snack-bar/tooltip/tabs still deferred (do not break
-  overlay contracts).
-- `src/` cleanup only after unresolved escape edges close (prefer documenting;
-  68 stubs remain).
+- Motion: MATERIAL_ANIMATIONS zero-duration wired for dialog/menu/select/form-field/
+  snack-bar/tabs; **full** `@angular/animations` recipe removal still deferred.
+- `src/` cleanup: unresolved relative edges **68→1**; shared-core/companions still
+  blocked — prefer documenting; no mass-delete.
 - Maintainer-authorized npm publish after packed-artifact and metadata checks.
-- Optional `21.x` maintenance branch per `compatibility/support-matrix.md`.
+- `21.x` branch bootstrapped (aged peer install OK); **library rebuild vs Material 21
+  blocked** pending adaptation (`compatibility/support-matrix.md`).
 
 ## Resolved / mitigated
 - **Full historical testing ports (22/22)**: radio, slide-toggle, card, chips, list,
@@ -97,3 +97,20 @@ migrations remove the deprecated engine from published runtime.
   local-only; never commit `node_modules`.
 - No npm publish.
 - Do not delete `src/` until escape edges are classified and extraction completes.
+
+
+## B-MOTION-01 — Full animation-engine removal (active)
+Mitigated partially: public `MATERIAL_ANIMATIONS` disable path forces 0ms on
+dialog/menu/select/form-field/snack-bar/tabs. Owned trigger metadata and optional
+`@angular/animations` peer remain until tested CSS/WAAPI replacements preserve
+overlay contracts. See `compatibility/motion-overlay-trio.md`.
+
+## B-ESC-01 — Unresolved relative escape edges (mitigated)
+Was 68 lexical `.import` false-negatives. Resolver now maps to `_*.import.scss`.
+**1** placeholder edge remains. `src/` delete still blocked by shared-core /
+ordinary companions.
+
+## B-21-01 — 21.x library rebuild (active)
+Branch `21.x` exists with aged peer selection and install smoke. Rebuilding the
+library against Angular/Material 21 requires API adaptation and is **not** claimed
+done. Do not publish 21.x until pack + packed-consumer evidence exists on that branch.
