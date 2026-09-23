@@ -60,7 +60,7 @@ Old Angular-16 workspaces may not install current Angular peers. Prefer the
 | Node engines | `>=18.0.0` |
 | Angular peers | **none** |
 | Build | `node scripts/build-migrate-legacy-cli.mjs` |
-| Verify | `node scripts/build-migrate-legacy-cli.mjs --verify` |
+| Verify | `node scripts/build-migrate-legacy-cli.mjs --verify` (committed tarball sha256 + rebuilt `content_sha256`) |
 
 ```bash
 # Review published sha256 in compatibility/migrate-legacy-cli-artifact.json first
