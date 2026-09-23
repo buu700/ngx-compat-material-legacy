@@ -14,6 +14,10 @@ import {
 } from '@angular/core';
 import {defaultParams, matDialogAnimations} from './dialog-animations';
 import {_MatDialogContainerBase} from './internal/dialog-container-base';
+import {
+  LEGACY_ZERO_ANIMATION_PARAMS,
+  legacyAnimationsDisabled,
+} from '@ngx-compat/material-legacy/legacy-core';
 
 /**
  * Internal component that wraps user-provided dialog content.
@@ -50,6 +54,9 @@ export class MatLegacyDialogContainer extends _MatDialogContainerBase {
   /** State of the dialog animation. */
   _state: 'void' | 'enter' | 'exit' = 'enter';
 
+  /** Captured in an injection context (field init); do not call inject() from methods. */
+  private readonly _legacyAnimationsDisabled = legacyAnimationsDisabled();
+
   /** Callback, invoked whenever an animation on the host completes. */
   _onAnimationDone({toState, totalTime}: AnimationEvent) {
     if (toState === 'enter') {
@@ -78,6 +85,11 @@ export class MatLegacyDialogContainer extends _MatDialogContainerBase {
   }
 
   _getAnimationState() {
+    // Respect public MATERIAL_ANIMATIONS / NoopAnimations / reduced-motion via owned helper.
+    // Trigger metadata remains until a tested CSS/WAAPI migration removes the engine.
+    if (this._legacyAnimationsDisabled) {
+      return {value: this._state, params: {...LEGACY_ZERO_ANIMATION_PARAMS}};
+    }
     return {
       value: this._state,
       params: {

@@ -41,3 +41,17 @@ removing or replacing owned `@angular/animations` trigger metadata on the aged
 22.1.7 peer set. Full engine removal from overlays remains **deferred** until a
 tested migration preserves dialog/menu/select contracts. Consumer disable path
 remains public `MATERIAL_ANIMATIONS` / `animationsDisabled`.
+
+## Incremental progress (2026-09-23 peer-floor / motion wave)
+
+Landed **maximum safe incremental step** without removing engine-bound recipes:
+
+| Change | Detail |
+| --- | --- |
+| Owned helper | `getLegacyAnimationsState()` / `legacyAnimationsDisabled()` in `legacy-core` |
+| Public APIs only | Reads `MATERIAL_ANIMATIONS` + `ANIMATION_MODULE_TYPE` + `MediaMatcher`; does **not** call `_getAnimationsState` / `_animationsDisabled` |
+| Dialog wiring | `MatLegacyDialogContainer` captures disabled state in field init; uses `LEGACY_ZERO_ANIMATION_PARAMS` when disabled |
+| Evidence | `compatibility/pack-proof/motion-lifecycle-smoke.json` via `scripts/motion-lifecycle-smoke.mjs` |
+| Still deferred | Full removal of `@angular/animations` trigger metadata from dialog/menu/select/form-field/snack-bar/tooltip/tabs |
+
+Honest status: **not done** for engine removal. Overlay contracts still require the optional `@angular/animations` peer for historical trigger metadata. Consumer disable path: provide `MATERIAL_ANIMATIONS` with `{animationsDisabled: true}` (now honored for dialog durations) or `NoopAnimations`.
