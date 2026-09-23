@@ -9,11 +9,16 @@ These helpers are usable starting tools, not an implementation of the package, s
 ```bash
 node scripts/migrate-legacy-cli.mjs /path/to/workspace          # dry-run
 node scripts/migrate-legacy-cli.mjs /path/to/workspace --apply
-node scripts/schematics/test-migrate-legacy-fixtures.mjs        # 22/22 engine fixtures
+node scripts/schematics/test-migrate-legacy-fixtures.mjs        # 25/25 engine fixtures
+node scripts/build-migrate-legacy-cli.mjs                       # rebuild bundled artifact + hash
+node scripts/build-migrate-legacy-cli.mjs --verify              # CI-friendly hash check
 ```
 
 Shares `projects/ngx-material-legacy/schematics/migrate-legacy/{sass,ts}-rewrite.js`
-with the Angular schematic. See `migration/README.md`. Not an `npx` of the library.
+with the Angular schematic. Bundled downloadable artifact:
+`migration/dist/ngx-compat-material-legacy-migrate-cli-*.tgz` with sha256 in
+`compatibility/migrate-legacy-cli-artifact.json` (Node `>=18`, no Angular peers).
+See `migration/README.md`. Not an `npx` of the library.
 
 ## 1. Safe source bootstrap
 

@@ -11,6 +11,26 @@ One transformation engine, two front-ends (handoff W08 / `docs/05-migration.md`)
 
 Both the Angular schematic and the filesystem CLI `require()` these modules. Do not fork the rewrite rules.
 
+### Acknowledgement (companion / aggregate / current-component)
+
+When a stylesheet uses ordinary-current companions (e.g. `expansion-theme`) or the
+historical `all-legacy-component-themes` aggregate, or when TypeScript still imports
+ordinary (non-legacy) `@angular/material/...` modules, the engine emits **explicit
+diagnostics requiring acknowledgement**. There is no silent rewrite and no silent skip
+without a report.
+
+| Flag (CLI) | Schematic option | Effect when set |
+| --- | --- | --- |
+| `--acknowledge-companion-bridges` | `acknowledgeCompanionBridges` | Record acknowledgement; allow **safe `@use` module-source edit only**. Does **not** rewrite companion mixin calls. |
+| `--acknowledge-aggregates` | `acknowledgeAggregates` | Record acknowledgement; allow safe `@use` edit only. Does **not** substitute an owned-only aggregate. |
+| `--acknowledge-current-components` | `acknowledgeCurrentComponents` | Record acknowledgement for readiness. Does **not** rewrite ordinary Material imports or waive parity tests. |
+
+Unacknowledged companion/aggregate/current-component hits are blocking (exit `1`).
+Generation mismatches (`current-m3`, `mixed-generation`) and unsupported syntax remain
+blocking even with acknowledgement flags.
+
+Fixture coverage: `node scripts/schematics/test-migrate-legacy-fixtures.mjs` (25/25).
+
 ## Angular schematic (modern workspaces)
 
 After installing `@ngx-compat/material-legacy` into an Angular ≥22 workspace:
@@ -18,28 +38,56 @@ After installing `@ngx-compat/material-legacy` into an Angular ≥22 workspace:
 ```bash
 ng generate @ngx-compat/material-legacy:migrate-legacy --dry-run
 ng generate @ngx-compat/material-legacy:migrate-legacy
+ng generate @ngx-compat/material-legacy:migrate-legacy \
+  --acknowledge-companion-bridges \
+  --acknowledge-aggregates \
+  --acknowledge-current-components
 ```
 
 Collection: `schematics/collection.json` → `migrate-legacy`.
 
 ## Peer-light pre-upgrade CLI (old workspaces)
 
-Old Angular-16 workspaces may not install current Angular peers. Use the
-**repository CLI stub** (no `@angular/*` runtime required to execute):
+Old Angular-16 workspaces may not install current Angular peers. Prefer the
+**bundled CLI artifact** (no `@angular/*` runtime required):
+
+### Bundled artifact (recommended for download)
+
+| Field | Value |
+| --- | --- |
+| Tarball | `migration/dist/ngx-compat-material-legacy-migrate-cli-22.0.0-rc.0.tgz` |
+| Hash record | `compatibility/migrate-legacy-cli-artifact.json` |
+| Node engines | `>=18.0.0` |
+| Angular peers | **none** |
+| Build | `node scripts/build-migrate-legacy-cli.mjs` |
+| Verify | `node scripts/build-migrate-legacy-cli.mjs --verify` |
 
 ```bash
-# From this repository checkout (development / maintainer path)
+# Review published sha256 in compatibility/migrate-legacy-cli-artifact.json first
+sha256sum migration/dist/ngx-compat-material-legacy-migrate-cli-22.0.0-rc.0.tgz
+
+mkdir -p /tmp/migrate-cli
+tar -xzf migration/dist/ngx-compat-material-legacy-migrate-cli-22.0.0-rc.0.tgz -C /tmp/migrate-cli
+node /tmp/migrate-cli/package/bin/migrate-legacy.js /path/to/old-workspace
+node /tmp/migrate-cli/package/bin/migrate-legacy.js /path/to/old-workspace --apply
+```
+
+Do **not** advertise `npx @ngx-compat/material-legacy` as peer-light — npm may
+resolve library peers. Do not pipe downloads to a shell.
+
+### Repository CLI stub (maintainer / checkout path)
+
+```bash
 node scripts/migrate-legacy-cli.mjs /path/to/old-workspace          # dry-run
-node scripts/migrate-legacy-cli.mjs /path/to/old-workspace --apply   # write safe edits
-node scripts/migrate-legacy-cli.mjs /path/to/file.scss --json
+node scripts/migrate-legacy-cli.mjs /path/to/old-workspace --apply
+node scripts/migrate-legacy-cli.mjs /path/to/file.scss --json \
+  --acknowledge-companion-bridges
 ```
 
 - Default is **dry-run**; `--apply` is required to write.
 - Scans `.scss` / `.sass` / `.ts` / `.tsx`; skips `node_modules`, `dist`, `.git`, etc.
-- Exit `0` when only safe edits / nothing to do; exit `1` when any file has blocking diagnostics; exit `2` on bad usage.
-- **Not** advertised as `npx @ngx-compat/material-legacy` — npm may resolve library peers. A separately downloadable bundled CLI artifact (hash + Node engine) remains a release-packaging follow-up.
-
-Fixture coverage for the shared engine: `node scripts/schematics/test-migrate-legacy-fixtures.mjs` (22/22).
+- Exit `0` when only safe edits / nothing to do; exit `1` when any file has blocking
+  diagnostics or unacknowledged risks; exit `2` on bad usage.
 
 ## Motion note (`MATERIAL_ANIMATIONS`)
 

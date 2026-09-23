@@ -64,3 +64,13 @@ jobs:
 
       - name: Toolchain runtime versions
         run: python3 scripts/check-toolchain.py --root . --runtime --release
+
+      - name: migrate-legacy fixture suite
+        run: node scripts/schematics/test-migrate-legacy-fixtures.mjs
+
+      - name: Bundled peer-light CLI artifact hash
+        run: |
+          set -euo pipefail
+          node --check scripts/build-migrate-legacy-cli.mjs
+          node --check scripts/migrate-legacy-cli.mjs
+          node scripts/build-migrate-legacy-cli.mjs --verify
