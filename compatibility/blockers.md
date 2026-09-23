@@ -5,36 +5,43 @@ Mitigated: push-triggered CI is now producing runs (e.g. success on
 `5f7740be`). Keep `workflow_dispatch` as a backup.
 
 ## B-PKG-03 — Schematics / remaining legacy entries incomplete
-**Mitigated for component scope + high-value testing + default migrate-legacy**:
+**Mitigated for component scope + full historical testing + migrate-legacy + CLI stub**:
 all `research/scope.json` `preserved_entry_points` pack (including `legacy-tabs`).
-LICENSE (Google + Ryan) ships. High-value testing secondary entries pack:
-`legacy-button/testing`, `legacy-dialog/testing`, `legacy-form-field/testing`,
-`legacy-input/testing`, `legacy-select/testing`, `legacy-checkbox/testing`,
-`legacy-menu/testing`, plus supporting `legacy-core/testing` (option/optgroup).
+LICENSE (Google + Ryan) ships. **All 22 historical testing secondary entries pack**
+(see `compatibility/inventories/testing-public-apis.json` and pack-proof).
 `migrate-legacy` performs the default Sass `@use '@angular/material'` →
 `@use '@ngx-compat/material-legacy'` rewrite (and common variants) plus safe
 TypeScript `legacy-*` module specifier updates; ambiguous/mixed/current-generation
-cases stop with diagnostics (fixture suite 22/22).
+cases stop with diagnostics (fixture suite 22/22). Peer-light pre-upgrade CLI stub
+`scripts/migrate-legacy-cli.mjs` shares the same rewrite engine (default dry-run;
+`--apply` to write); see `migration/README.md`.
 Inspector still flags `@angular/animations` peer and historical animation-engine
 references in dialog/menu/select/form-field/snack-bar/tooltip/tabs (+ dialog/testing)
 — owned metadata retained per `compatibility/motion-overlay-trio.md` until tested
 migrations remove the deprecated engine from published runtime.
 
 ### Remaining non-component work
-- Broader remaining testing harnesses (chips/radio/slide-toggle/list/tabs/table/
-  paginator/snack-bar/tooltip/autocomplete/progress-*, etc.).
 - Motion migration off `@angular/animations` engine where feasible (do not break
-  dialog/menu/select contracts; prefer documenting `MATERIAL_ANIMATIONS` usage).
+  dialog/menu/select contracts; prefer documenting / wiring public
+  `MATERIAL_ANIMATIONS`; no breaking trigger removals this wave).
 - Inventories / escape-edge classification; `src/` monorepo tree cleanup (do not
-  mass-delete yet — see `compatibility/inventories/src-cleanup-plan.md`).
+  mass-delete yet — see `compatibility/inventories/src-cleanup-plan.md` if present).
 - Broader migrate-legacy acknowledgement flows for companion/aggregate bridges;
-  peer-light pre-upgrade CLI still TBD.
+  downloadable **bundled** peer-light CLI artifact (hash + Node engine) still TBD
+  for release packaging (repo CLI stub exists).
+- Maintainer-authorized npm publish after packed-artifact and metadata checks.
 
 ## Resolved / mitigated
+- **Full historical testing ports (22/22)**: radio, slide-toggle, card, chips, list,
+  slider, progress-bar, progress-spinner, snack-bar, table, tabs, tooltip,
+  autocomplete, paginator (+ prior high-value set). Owned Material-16 bases where
+  M22 removed `_Mat*HarnessBase`; consumer ESM smoke 44/44 green (with
+  `@angular/compiler` preload for testing re-exports).
+- **Peer-light CLI stub**: `scripts/migrate-legacy-cli.mjs` shares schematic
+  `sass-rewrite.js` / `ts-rewrite.js`; documented under `migration/README.md`.
 - **High-value testing ports**: form-field/input/select/checkbox/menu (+ core
   option/optgroup) harnesses pack; owned Material-16 bases where M22 removed
-  `_Mat*HarnessBase` / legacy selectors; consumer ESM smoke green (with
-  `@angular/compiler` preload for testing re-exports).
+  `_Mat*HarnessBase` / legacy selectors.
 - **migrate-legacy (real)**: Sass default rewrite + safe TS legacy path updates;
   fixture runner green against `fixtures/migration/cases.json`.
 - **legacy-tabs**: secondary entry builds and packs; owned Material-16 tab bases +
