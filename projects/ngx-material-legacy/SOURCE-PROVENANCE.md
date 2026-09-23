@@ -1,0 +1,14 @@
+# Source provenance (library tree)
+
+Sass under `styles/` and root `_index.scss` were copied from
+`angular/components` tag `16.2.14`
+(`baseline/angular-components-16.2.x` /
+`df60e733c60e572ba538f6ad0ceff3e63e527b53`) as an owned Material-16 M2
+compatibility facade. Google copyright headers in individual files are
+retained. This package does not `@forward` current `@angular/material`.
+
+TypeScript entry points are stubs until component worksheets are ported.
+Historical sources under repository `src/` remain until inventory-gated
+deletion.
+
+See `compatibility/inventories/sass-facade-copy-manifest.json`.
