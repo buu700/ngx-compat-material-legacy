@@ -45,3 +45,13 @@ Full peer / recipe removal is **still blocked**. Do not fake empty trigger metad
 3. Replace `AnimationEvent` handler contracts with local event shapes where still needed after (1).
 
 Until then: optional peer stays; inspector flags expected. See `motion-overlay-trio.md`.
+
+## Pass notes (2026-09-23)
+
+- Considered converting `AnimationEvent`-only imports to `import type` (autocomplete,
+  dialog-container, menu-base, snack-bar-container-base, tab-body-base). **Not landed**
+  this wave: local `ng-packagr` on this host already fails on unrelated
+  `strictPropertyInitialization` in `legacy-core` before those files compile; do not
+  ship source hygiene without a green pack.
+- Tooltip recipe split to opt-in secondary entry: deferred (API path change).
+- Full peer removal: still blocked on the seven recipe FESM entries above.
