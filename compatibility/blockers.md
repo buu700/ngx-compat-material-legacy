@@ -10,14 +10,13 @@ after repository metadata updates inside the packaged files, so CI `--verify` fa
 Mitigated by rebuilding the artifact + hash record and refreshing pack-proof
 consumer-smoke sha256. Keep watching Actions on follow-up pushes.
 
-## B-ADV-01 — Aged peer advisory triage (mitigated for unpublished RC)
+## B-ADV-01 — Aged peer advisory triage (mitigated; peer floor applied)
 Triage recorded in `compatibility/advisory-triage.md` (2026-09-23). Exact pins
 `@angular/*@22.1.7` / Material+CDK `22.1.7` are OSV-clean and include known
 Angular 22 GHSA patches (floors through 22.1.1 framework / 22.1.4 platform-server).
 Same-day `22.1.8` / `22.2.0` fail the 7-day age window — **not** adopted.
-Advertised library peer `^22.0.0` remains wider than the security floor:
-**accepted risk** for unpublished RC; publish-time floor tighten is queued, not
-applied silently. Re-check advisories immediately before npm publish.
+Advertised library peers tightened to **`^22.1.7`** (applied on unpublished RC tip).
+Re-check advisories immediately before npm publish.
 
 ## B-PKG-03 — Schematics / remaining legacy entries incomplete
 **Mitigated for component scope + full historical testing + migrate-legacy + bundled CLI**:
@@ -39,13 +38,13 @@ references in dialog/menu/select/form-field/snack-bar/tooltip/tabs (+ dialog/tes
 migrations remove the deprecated engine from published runtime.
 
 ### Remaining non-component work
-- Motion migration off `@angular/animations` engine where feasible (do not break
-  dialog/menu/select contracts; prefer documenting / wiring public
-  `MATERIAL_ANIMATIONS`; no breaking trigger removals this wave).
-- `src/` cleanup only after unresolved escape edges close (prefer documenting).
+- Motion: dialog honors `MATERIAL_ANIMATIONS` disable path; **full** engine removal
+  from menu/select/form-field/snack-bar/tooltip/tabs still deferred (do not break
+  overlay contracts).
+- `src/` cleanup only after unresolved escape edges close (prefer documenting;
+  68 stubs remain).
 - Maintainer-authorized npm publish after packed-artifact and metadata checks.
-- Publish-time peer-floor tighten (`^22.0.0` → security/tested floor) per
-  `compatibility/advisory-triage.md` (deferred; not silently changed on RC tip).
+- Optional `21.x` maintenance branch per `compatibility/support-matrix.md`.
 
 ## Resolved / mitigated
 - **Full historical testing ports (22/22)**: radio, slide-toggle, card, chips, list,
@@ -90,8 +89,7 @@ migrations remove the deprecated engine from published runtime.
   compare still healthy this tip: owned palette/constructor/cyph/button CSS equal).
 - **B-TOOL-01**: Aged Angular 22.1.7 peer set installed; advisory triage recorded in
   `compatibility/advisory-triage.md` (OSV clean for exact pins; known Angular 22
-  GHSAs patched by 22.1.7; same-day 22.1.8/22.2.0 not adopted; advertised `^22.0.0`
-  peer-floor tighten deferred to publish).
+  GHSAs patched by 22.1.7; same-day 22.1.8/22.2.0 not adopted; advertised peers tightened to `^22.1.7`).
 
 ## Constraints
 - Cyph tree at `/workspace/ngx-compat/reference/cyph-dev-prod` is oracle-only; never commit it.

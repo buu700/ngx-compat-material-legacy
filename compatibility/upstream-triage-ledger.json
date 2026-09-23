@@ -2,6 +2,50 @@
   "schema_version": 1,
   "generated_for_package_version": "22.0.0-rc.0",
   "checked_on": "2026-09-23",
+  "policy": "Complete SHA coverage remains a recurring audit. This ledger records risk-weighted delegated API / future-breakage triage evidence for the unpublished RC. Research head is not the release baseline.",
+  "peer_baseline": "22.1.7",
+  "future_breakages_seed": "research/future-breakages.json",
+  "future_breakages": [
+    {
+      "id": "FUT-ANIM-23",
+      "surface": "@angular/animations legacy engine",
+      "upstream_status": "deprecated with intent to remove in Angular 23",
+      "project_policy": "do not depend on it; native/CSS/WAAPI adaptation is part of initial port",
+      "state": "designed-out-before-first-stable",
+      "source": "https://angular.dev/api/animations/animate"
+    },
+    {
+      "id": "FUT-M2",
+      "surface": "Angular Material M2/backcompat Sass implementation",
+      "upstream_status": "M2 prebuilt/backcompat functionality documented for future removal",
+      "project_policy": "own Material-16 M2 model locally; use stable public current component overrides/system tokens only",
+      "state": "designed-out-before-first-stable",
+      "source": "https://github.com/angular/components/blob/main/guides/theming.md"
+    },
+    {
+      "id": "FUT-RECYCLE-23",
+      "surface": "MatRecycleRows / CdkRecycleRows",
+      "upstream_status": "deprecated no-op directives with @breaking-change 23.0.0",
+      "project_policy": "own MatLegacyRecycleRows symbol/selector; use stable CdkTable.recycleRows input/behavior where supported rather than delegating to the doomed directive/private repeater strategies",
+      "state": "must-resolve-before-first-stable",
+      "source": "https://raw.githubusercontent.com/angular/components/v22.2.0/src/cdk/table/table.ts"
+    },
+    {
+      "id": "FUT-TS7-API",
+      "surface": "TypeScript compiler API used by migration tooling",
+      "upstream_status": "TypeScript 7.0 has no old programmatic API; TypeScript 7.1 will have a different API",
+      "project_policy": "isolate parser/compiler adapter; pre-upgrade transformer may use @typescript/typescript6; library runtime does not depend on compiler API",
+      "state": "architecture-guardrail",
+      "source": "https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/"
+    },
+    {
+      "id": "FUT-DELEGATED-API-SCAN",
+      "surface": "all delegated Angular/Material/CDK public symbols",
+      "upstream_status": "unknown until each major scan",
+      "project_policy": "generated inventory + deprecation/breaking-change check on canary and before major release",
+      "state": "recurring"
+    }
+  ],
   "entries": [
     {
       "symbol": "MATERIAL_ANIMATIONS",
@@ -118,8 +162,25 @@
       "notes": "Optional peer; owned metadata retained; MATERIAL_ANIMATIONS disable path for dialog landed; full removal deferred."
     }
   ],
-  "notes": [
-    "Starter inventory for W09. Expand via import scan before claiming complete SHA coverage.",
-    "See also compatibility/upstream-triage-ledger.json and research/future-breakages.json."
+  "batch_reviews": [
+    {
+      "id": "BATCH-LOW-DOCS-2026-09-23",
+      "risk": "low",
+      "scope": "Documentation-only advisory + support-matrix + publish-readiness refresh",
+      "result": "accepted",
+      "notes": "No runtime delegated symbol change besides MATERIAL_ANIMATIONS-aware dialog disable wiring."
+    },
+    {
+      "id": "BATCH-MOTION-HELPER-2026-09-23",
+      "risk": "medium",
+      "scope": "legacy-core getLegacyAnimationsState + dialog zero-duration when disabled",
+      "result": "accepted-with-follow-up",
+      "notes": "Does not remove @angular/animations metadata; menu/select/form-field still engine-bound."
+    }
+  ],
+  "open_followups": [
+    "Expand delegated inventory to every imported @angular/* symbol across projects/ngx-material-legacy (automated import scan).",
+    "Individual review before adopting Angular 23 recycleRows / animations removals.",
+    "Re-scan on canary Angular next without mutating release lockfile."
   ]
 }

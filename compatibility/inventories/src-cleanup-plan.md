@@ -57,3 +57,11 @@ Reconfirmed after advisory triage: classification still stands; **no** `src/`
 deletion authorized. Unresolved relative stubs remain **68**; shared-core and
 ordinary companions remain blocked. Advisory work did not produce escape-edge
 closure evidence. Prefer documenting over deleting.
+
+## Status check (2026-09-23 peer-floor / motion wave)
+
+
+Escape-edge classification JSON advanced with per-specifier dispositions for the
+common `.import` forward stubs (private/theming/typography/button-common). Still
+**68** unresolved; **no** `src/` deletion. See
+`escape-edge-classification.json` → `unresolved_relative.target_dispositions`.
