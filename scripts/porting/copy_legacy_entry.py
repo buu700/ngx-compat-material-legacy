@@ -75,6 +75,8 @@ def adapt_text(text: str, suffix: str) -> str:
         text = re.sub(r"@import\s+'\.\./core/", "@import '../styles/core/", text)
         text = re.sub(r"@use\s+'\.\./datepicker/", "@use '../styles/datepicker/", text)
         text = re.sub(r"@import\s+'\.\./datepicker/", "@import '../styles/datepicker/", text)
+        text = re.sub(r"@use\s+'\.\./divider/", "@use '../styles/divider/", text)
+        text = re.sub(r"@import\s+'\.\./divider/", "@import '../styles/divider/", text)
         return text
 
     if suffix != ".ts":

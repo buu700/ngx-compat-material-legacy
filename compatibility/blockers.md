@@ -15,7 +15,7 @@ missing schematic collection and remaining legacy entry points (and optional
   `_MatMenuBase` / `_MatMenuTriggerBase` / `_MatAutocompleteBase` /
   `_MatAutocompleteTriggerBase`, plus owned animation metadata where removed
   from Angular Material 22).
-- Also: `legacy-list`, `legacy-chips`, `legacy-table`,
+- Also: `legacy-chips`, `legacy-table`,
   `legacy-paginator`, `legacy-tabs`, `legacy-snack-bar`, `legacy-tooltip`.
 - Testing secondary entries beyond `legacy-button/testing`.
 
