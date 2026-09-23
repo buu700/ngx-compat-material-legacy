@@ -1,27 +1,28 @@
 {
   "schema_version": 1,
-  "captured_at": "2026-09-23T17:56:55.447911-04:00",
+  "captured_at": "2026-09-23T18:01:59.027729-04:00",
   "tarball": {
     "path": "compatibility/pack-proof/ngx-compat-material-legacy-22.0.0-rc.0.tgz",
-    "sha256": "b8cafbf7a7a31de071c608f82b06a36bcbf997dfd2181bb2c1f3cacc8ccf9ffe",
-    "size": 761404,
+    "sha256": "8d6ecb5b9cb3ed2bcf7854e2f1903d7fc121b4cdede9ddb3a0b2b06d8d006ac5",
+    "size": 783925,
     "package": "@ngx-compat/material-legacy@22.0.0-rc.0"
   },
   "consumer": {
-    "dir": "/tmp/ngx-material-legacy-consumer-smoke11",
+    "dir": "/tmp/ngx-material-legacy-consumer-smoke12",
     "committed": false,
     "peers": [
       "@angular/*@22.1.7",
       "@angular/cdk@22.1.7",
       "@angular/material@22.1.7",
+      "@angular/compiler@22.1.7",
       "sass@1.104.1"
     ]
   },
   "sass_smoke": {
     "status": "ok",
-    "fixture": "deep-purple 800 + table/paginator/snack-bar/tooltip/tabs",
+    "fixture": "deep-purple 800 + all-legacy-component-themes",
     "expected_default": "#4527a0",
-    "css_bytes": 34685,
+    "css_bytes": 84444,
     "has_dialog": true,
     "has_chips": true,
     "has_table": true,
@@ -32,6 +33,7 @@
   },
   "esm_smoke": {
     "status": "ok",
+    "note": "import '@angular/compiler' before testing entries that re-export current Material harnesses",
     "imports": [
       "@ngx-compat/material-legacy/legacy-button",
       "@ngx-compat/material-legacy/legacy-form-field",
@@ -52,6 +54,12 @@
       "@ngx-compat/material-legacy/legacy-chips",
       "@ngx-compat/material-legacy/legacy-button/testing",
       "@ngx-compat/material-legacy/legacy-dialog/testing",
+      "@ngx-compat/material-legacy/legacy-form-field/testing",
+      "@ngx-compat/material-legacy/legacy-input/testing",
+      "@ngx-compat/material-legacy/legacy-select/testing",
+      "@ngx-compat/material-legacy/legacy-checkbox/testing",
+      "@ngx-compat/material-legacy/legacy-menu/testing",
+      "@ngx-compat/material-legacy/legacy-core/testing",
       "@ngx-compat/material-legacy/legacy-tooltip",
       "@ngx-compat/material-legacy/legacy-paginator",
       "@ngx-compat/material-legacy/legacy-table",
@@ -60,13 +68,18 @@
     ]
   },
   "schematics": {
-    "status": "stub",
+    "status": "real-sass-and-legacy-ts",
     "collection": "./schematics/collection.json",
     "definitions": [
       "migrate-legacy"
-    ]
+    ],
+    "fixture_runner": "scripts/schematics/test-migrate-legacy-fixtures.mjs",
+    "fixtures": "fixtures/migration/cases.json (mirrored at compatibility/handoff/fixtures/migration/cases.json)",
+    "fixture_results": "22/22 PASS"
   },
   "notes": [
-    "All scope component secondary entries pack. Added legacy-tabs, legacy-dialog/testing, migrate-legacy schematics stub. Inspector remaining: @angular/animations peer + owned historical animation-engine refs (motion policy)."
+    "Added testing secondary entries: legacy-form-field/testing, legacy-input/testing, legacy-select/testing, legacy-checkbox/testing, legacy-menu/testing, plus supporting legacy-core/testing.",
+    "migrate-legacy now rewrites Sass @use '@angular/material' \u2192 '@ngx-compat/material-legacy' and safe TS legacy-* module specifiers; ambiguous/mixed/current-generation cases diagnose without editing.",
+    "Inspector remaining: @angular/animations peer + owned historical animation-engine refs (motion policy)."
   ]
 }

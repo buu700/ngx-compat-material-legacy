@@ -5,15 +5,18 @@ secondary entries plus the Sass root facade.
 
 ## Packed secondary entries (this tip)
 
-`legacy-button`, `legacy-button/testing`, `legacy-form-field`, `legacy-input`,
-`legacy-core` (option), `legacy-select`, `legacy-card`, `legacy-checkbox`,
-`legacy-radio`, `legacy-slide-toggle`, `legacy-progress-bar`,
+`legacy-button`, `legacy-button/testing`, `legacy-form-field`, `legacy-form-field/testing`,
+`legacy-input`, `legacy-input/testing`, `legacy-core`, `legacy-core/testing` (option + harnesses),
+`legacy-select`, `legacy-select/testing`, `legacy-card`, `legacy-checkbox`,
+`legacy-checkbox/testing`, `legacy-radio`, `legacy-slide-toggle`, `legacy-progress-bar`,
 `legacy-progress-spinner`, `legacy-slider`, `legacy-list`, `legacy-dialog`,
-`legacy-dialog/testing`, `legacy-menu`, `legacy-autocomplete`, `legacy-chips`,
-`legacy-tooltip`, `legacy-paginator`, `legacy-table`, `legacy-snack-bar`,
+`legacy-dialog/testing`, `legacy-menu`, `legacy-menu/testing`, `legacy-autocomplete`,
+`legacy-chips`, `legacy-tooltip`, `legacy-paginator`, `legacy-table`, `legacy-snack-bar`,
 `legacy-tabs`.
 
-Schematics stub: `schematics/collection.json` → `migrate-legacy` (no-op Rule).
+Schematics: `schematics/collection.json` → `migrate-legacy` (real Sass `@use` rewrite +
+safe TypeScript `legacy-*` module specifier updates; fixture runner
+`scripts/schematics/test-migrate-legacy-fixtures.mjs` = 22/22).
 
 | Artifact | Role |
 | --- | --- |
