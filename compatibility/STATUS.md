@@ -22,7 +22,7 @@ Snapshot for handoff gates. Package `@ngx-compat/material-legacy@22.0.0-rc.0`
 | W09 upstream triage ledger | **Done (starter)** | `upstream-triage-ledger.json` |
 | W10 21.x line | **Partial** | Branch `21.x` + aged peer install; library rebuild blocked |
 | Publish readiness (no publish) | **Done (docs)** | `publish-readiness.md` |
-| CI green on push | **Pending tip** | Prior green: https://github.com/buu700/ngx-compat-material-legacy/actions/runs/35932274661 |
+| CI green on push | **Done** | Tip https://github.com/buu700/ngx-compat-material-legacy/actions/runs/35932904697 success on `611929c29` |
 
 ## Motion
 
