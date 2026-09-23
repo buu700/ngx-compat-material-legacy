@@ -22,7 +22,13 @@ import {
   TemplateRef,
   ViewChild,
 } from '@angular/core';
-import type {AnimationEvent} from '@angular/animations';
+/** Owned stand-in for historical Angular AnimationEvent on a null animation stream. */
+export interface LegacyAutocompleteAnimationEvent {
+  fromState: string;
+  toState: string;
+  totalTime?: number;
+}
+
 import {ActiveDescendantKeyManager} from '@angular/cdk/a11y';
 import {BooleanInput, coerceBooleanProperty, coerceStringArray} from '@angular/cdk/coercion';
 import {Platform} from '@angular/cdk/platform';
@@ -76,7 +82,7 @@ export abstract class _MatAutocompleteBase
   protected abstract _hiddenClass: string;
 
   /** Emits when the panel animation is done. Null if the panel doesn't animate. */
-  abstract _animationDone: EventEmitter<AnimationEvent> | null;
+  abstract _animationDone: EventEmitter<LegacyAutocompleteAnimationEvent> | null;
 
   /** Manages active item in option list based on key events. */
   _keyManager: ActiveDescendantKeyManager<_MatOptionBase>;

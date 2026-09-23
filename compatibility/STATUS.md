@@ -32,6 +32,8 @@ Package `@ngx-compat/material-legacy@22.0.0-rc.0` on `main`
 ## Motion summary
 
 All targeted overlay primary FESMs cleared of `@angular/animations`.
+Autocomplete uses owned `LegacyAutocompleteAnimationEvent` (no peer type import).
+`blockers.md` refreshed to match (escape 0; motion primary cleared; src/ blocked).
 Recipes available under `legacy-*/animations` secondary entries.
 See `motion-animations-import-graph.md`, `motion-overlay-trio.md`.
 

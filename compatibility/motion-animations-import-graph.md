@@ -41,3 +41,9 @@ Only under `**/animations/**` secondary entry folders (plus erased `import type`
 ## Pack note
 
 Always build with `node scripts/pack-library.mjs` (passes `-c tsconfig.lib.json`).
+
+## Autocomplete (2026-09-23 follow-up)
+
+`legacy-autocomplete` uses `_animationDone = null` historically. The abstract field
+type is now an owned `LegacyAutocompleteAnimationEvent` — **no**
+`@angular/animations` import (type or value) outside `/animations` folders.
