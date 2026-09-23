@@ -2,6 +2,7 @@
 
 Snapshot for handoff gates. Package `@ngx-compat/material-legacy@22.0.0-rc.0`
 (repo `buu700/ngx-compat-material-legacy`). **No npm publish.**
+`migrate-legacy` rewrites `@angular/material` → `@ngx-compat/material-legacy` only.
 
 ## RC candidate (unpublished) checklist
 
