@@ -24,6 +24,8 @@ import {
   MAT_LEGACY_OPTION_PARENT_COMPONENT,
   MatLegacyOption,
   MatLegacyOptgroup,
+  legacyAnimationTriggerState,
+  legacyAnimationsDisabled,
 } from '@ngx-compat/material-legacy/legacy-core';
 import {MAT_SELECT_TRIGGER, MatSelectConfig} from '@angular/material/select';
 import {_MatSelectBase} from './internal/select-base';
@@ -170,6 +172,18 @@ export class MatLegacySelectTrigger {}
   ],
 })
 export class MatLegacySelect extends _MatSelectBase<MatLegacySelectChange> implements OnInit {
+  /** Captured in injection context for MATERIAL_ANIMATIONS / NoopAnimations. */
+  private readonly _legacyAnimationsDisabled = legacyAnimationsDisabled();
+
+  /** Panel transform animation state with zero-duration params when disabled. */
+  _getTransformPanelState() {
+    return legacyAnimationTriggerState(
+      this.multiple ? 'showing-multiple' : 'showing',
+      {enterDuration: '120ms', exitDuration: '100ms'},
+      this._legacyAnimationsDisabled,
+    );
+  }
+
   /** The scroll position of the overlay panel, calculated to center the selected option. */
   private _scrollTop = 0;
 

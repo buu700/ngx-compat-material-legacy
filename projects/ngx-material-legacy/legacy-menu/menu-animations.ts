@@ -17,22 +17,13 @@ import {
 
 /**
  * Animations used by the mat-menu component.
- * Animation duration and timing values are based on:
- * https://material.io/guidelines/components/menus.html#menus-usage
+ * Durations are parameterized so MATERIAL_ANIMATIONS / NoopAnimations can force 0ms.
  * @docs-private
  */
 export const matMenuAnimations: {
   readonly transformMenu: AnimationTriggerMetadata;
   readonly fadeInItems: AnimationTriggerMetadata;
 } = {
-  /**
-   * This animation controls the menu panel's entry and exit from the page.
-   *
-   * When the menu panel is added to the DOM, it scales in and fades in its border.
-   *
-   * When the menu panel is removed from the DOM, it simply fades out after a brief
-   * delay to display the ripple.
-   */
   transformMenu: trigger('transformMenu', [
     state(
       'void',
@@ -44,28 +35,27 @@ export const matMenuAnimations: {
     transition(
       'void => enter',
       animate(
-        '120ms cubic-bezier(0, 0, 0.2, 1)',
+        '{{enterDuration}} cubic-bezier(0, 0, 0.2, 1)',
         style({
           opacity: 1,
           transform: 'scale(1)',
         }),
       ),
+      {params: {enterDuration: '120ms'}},
     ),
-    transition('* => void', animate('100ms 25ms linear', style({opacity: 0}))),
+    transition(
+      '* => void',
+      animate('{{exitDuration}} linear', style({opacity: 0})),
+      {params: {exitDuration: '100ms'}},
+    ),
   ]),
 
-  /**
-   * This animation fades in the background color and content of the menu panel
-   * after its containing element is scaled in.
-   */
   fadeInItems: trigger('fadeInItems', [
-    // TODO(crisbeto): this is inside the `transformMenu`
-    // now. Remove next time we do breaking changes.
     state('showing', style({opacity: 1})),
     transition('void => *', [
       style({opacity: 0}),
-      animate('400ms 100ms cubic-bezier(0.55, 0, 0.55, 0.2)'),
-    ]),
+      animate('{{fadeDuration}} cubic-bezier(0.55, 0, 0.55, 0.2)'),
+    ], {params: {fadeDuration: '400ms'}}),
   ]),
 };
 

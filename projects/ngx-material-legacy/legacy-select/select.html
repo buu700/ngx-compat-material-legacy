@@ -50,7 +50,7 @@
       [attr.aria-label]="ariaLabel || null"
       [attr.aria-labelledby]="_getPanelAriaLabelledby()"
       [ngClass]="panelClass"
-      [@transformPanel]="multiple ? 'showing-multiple' : 'showing'"
+      [@transformPanel]="_getTransformPanelState()"
       (@transformPanel.done)="_panelDoneAnimatingStream.next($event.toState)"
       [style.transformOrigin]="_transformOrigin"
       [style.font-size.px]="_triggerFontSize"

@@ -15,5 +15,7 @@ export {
   LEGACY_ZERO_ANIMATION_PARAMS,
   getLegacyAnimationsState,
   legacyAnimationsDisabled,
+  zeroAnimationParams,
+  legacyAnimationTriggerState,
 } from './internal/legacy-animations';
 export type {LegacyAnimationsState} from './internal/legacy-animations';

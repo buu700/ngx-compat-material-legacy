@@ -24,6 +24,7 @@ import {Direction, Directionality} from '@angular/cdk/bidi';
 import {Subject, Subscription} from 'rxjs';
 import {distinctUntilChanged, startWith} from 'rxjs/operators';
 import {AnimationEvent} from '@angular/animations';
+import {legacyAnimationsDisabled} from '@ngx-compat/material-legacy/legacy-core';
 
 /**
  * These position states are used internally as animation states for the tab body. Setting the
@@ -86,7 +87,17 @@ export abstract class _MatTabBodyBase implements OnInit, OnDestroy {
   // Note that the default value will always be overwritten by `MatTabBody`, but we need one
   // anyway to prevent the animations module from throwing an error if the body is used on its own.
   /** Duration for the tab's animation. */
-  @Input() animationDuration: string = '500ms';
+  @Input()
+  get animationDuration(): string {
+    return this._legacyAnimationsDisabled ? '0ms' : this._animationDurationInput;
+  }
+  set animationDuration(value: string) {
+    this._animationDurationInput = value || '500ms';
+  }
+  private _animationDurationInput = '500ms';
+
+  /** Captured in injection context for MATERIAL_ANIMATIONS / NoopAnimations. */
+  private readonly _legacyAnimationsDisabled = legacyAnimationsDisabled();
 
   /** Whether the tab's content should be kept in the DOM while it's off-screen. */
   @Input() preserveContent: boolean = false;

@@ -9,6 +9,10 @@
 import {ChangeDetectionStrategy, Component, ViewEncapsulation} from '@angular/core';
 import {_MatSnackBarContainerBase} from './internal/snack-bar-container-base';
 import {matSnackBarAnimations} from './snack-bar-animations';
+import {
+  legacyAnimationTriggerState,
+  legacyAnimationsDisabled,
+} from '@ngx-compat/material-legacy/legacy-core';
 
 /**
  * Internal component that wraps user-provided snack bar content.
@@ -30,11 +34,21 @@ import {matSnackBarAnimations} from './snack-bar-animations';
   animations: [matSnackBarAnimations.snackBarState],
   host: {
     'class': 'mat-snack-bar-container',
-    '[@state]': '_animationState',
+    '[@state]': '_getAnimationState()',
     '(@state.done)': 'onAnimationEnd($event)',
   },
 })
 export class MatLegacySnackBarContainer extends _MatSnackBarContainerBase {
+  private readonly _legacyAnimationsDisabled = legacyAnimationsDisabled();
+
+  _getAnimationState() {
+    return legacyAnimationTriggerState(
+      this._animationState,
+      {enterDuration: '150ms', exitDuration: '75ms'},
+      this._legacyAnimationsDisabled,
+    );
+  }
+
   protected override _afterPortalAttached() {
     super._afterPortalAttached();
 

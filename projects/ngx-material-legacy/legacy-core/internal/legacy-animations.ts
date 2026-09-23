@@ -67,3 +67,27 @@ export const LEGACY_ZERO_ANIMATION_PARAMS = {
   enterAnimationDuration: '0ms',
   exitAnimationDuration: '0ms',
 } as const;
+
+/** Generic zero map for parameterized overlay recipes. */
+export function zeroAnimationParams<T extends Record<string, string>>(defaults: T): T {
+  const out = {} as T;
+  for (const key of Object.keys(defaults) as (keyof T)[]) {
+    out[key] = '0ms' as T[keyof T];
+  }
+  return out;
+}
+
+/**
+ * Build `{value, params}` for Angular animation host bindings.
+ * When disabled, every provided default duration becomes `0ms`.
+ */
+export function legacyAnimationTriggerState<T extends Record<string, string>>(
+  value: string,
+  defaults: T,
+  disabled: boolean,
+): {value: string; params: T} {
+  return {
+    value,
+    params: disabled ? zeroAnimationParams(defaults) : defaults,
+  };
+}

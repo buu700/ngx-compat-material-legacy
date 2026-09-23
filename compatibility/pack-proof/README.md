@@ -26,7 +26,7 @@ Peer-light CLI: `migration/dist/ngx-compat-material-legacy-migrate-cli-22.0.0-rc
 | `consumer-smoke-theme.css` | Cyph-like deep-purple 800 + theme mixins |
 | `theme-coexistence.css` | W07 legacy M2 + current Material theme CSS |
 | `aot-harness-smoke.json` | Packed-consumer AOT + button/select harness runtime |
-| `motion-lifecycle-smoke.json` | MATERIAL_ANIMATIONS helper + dialog wiring checks |
+| `motion-lifecycle-smoke.json` | MATERIAL_ANIMATIONS helper + dialog/menu/select/form-field/snack-bar/tabs wiring |
 | `inspect-packed-package.json` | Static inspector (animation peer/refs still flagged) |
 
 Rebuild: `pnpm exec ng-packagr -p projects/ngx-material-legacy/ng-package.json -c projects/ngx-material-legacy/tsconfig.lib.json`, then `npm pack` in `dist/ngx-material-legacy`.

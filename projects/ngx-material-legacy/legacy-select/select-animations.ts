@@ -21,7 +21,7 @@ import {
  * The following are all the animations for the mat-select component, with each
  * const containing the metadata for one animation.
  *
- * The values below match the implementation of the AngularJS Material mat-select animation.
+ * Durations are parameterized for MATERIAL_ANIMATIONS / NoopAnimations.
  * @docs-private
  * @deprecated Use `matSelectAnimations` from `@angular/material/select` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
  * @breaking-change 17.0.0
@@ -30,24 +30,10 @@ export const matLegacySelectAnimations: {
   readonly transformPanelWrap: AnimationTriggerMetadata;
   readonly transformPanel: AnimationTriggerMetadata;
 } = {
-  /**
-   * This animation ensures the select's overlay panel animation (transformPanel) is called when
-   * closing the select.
-   * This is needed due to https://github.com/angular/angular/issues/23302
-   */
   transformPanelWrap: trigger('transformPanelWrap', [
     transition('* => void', query('@transformPanel', [animateChild()], {optional: true})),
   ]),
 
-  /**
-   * This animation transforms the select's overlay panel on and off the page.
-   *
-   * When the panel is attached to the DOM, it expands its width by the amount of padding, scales it
-   * up to 100% on the Y axis, fades in its border, and translates slightly up and to the
-   * side to ensure the option text correctly overlaps the trigger text.
-   *
-   * When the panel is removed from the DOM, it simply fades out linearly.
-   */
   transformPanel: trigger('transformPanel', [
     state(
       'void',
@@ -61,7 +47,7 @@ export const matLegacySelectAnimations: {
       'showing',
       style({
         opacity: 1,
-        minWidth: 'calc(100% + 32px)', // 32px = 2 * 16px padding
+        minWidth: 'calc(100% + 32px)',
         transform: 'scaleY(1)',
       }),
     ),
@@ -69,11 +55,19 @@ export const matLegacySelectAnimations: {
       'showing-multiple',
       style({
         opacity: 1,
-        minWidth: 'calc(100% + 64px)', // 64px = 48px padding on the left + 16px padding on the right
+        minWidth: 'calc(100% + 64px)',
         transform: 'scaleY(1)',
       }),
     ),
-    transition('void => *', animate('120ms cubic-bezier(0, 0, 0.2, 1)')),
-    transition('* => void', animate('100ms 25ms linear', style({opacity: 0}))),
+    transition(
+      'void => *',
+      animate('{{enterDuration}} cubic-bezier(0, 0, 0.2, 1)'),
+      {params: {enterDuration: '120ms'}},
+    ),
+    transition(
+      '* => void',
+      animate('{{exitDuration}} linear', style({opacity: 0})),
+      {params: {exitDuration: '100ms'}},
+    ),
   ]),
 };

@@ -18,12 +18,12 @@ import {
 
 /**
  * Animations used by the Material snack bar.
+ * Durations parameterized for MATERIAL_ANIMATIONS / NoopAnimations.
  * @docs-private
  */
 export const matSnackBarAnimations: {
   readonly snackBarState: AnimationTriggerMetadata;
 } = {
-  /** Animation that shows and hides a snack bar. */
   snackBarState: trigger('state', [
     state(
       'void, hidden',
@@ -39,15 +39,20 @@ export const matSnackBarAnimations: {
         opacity: 1,
       }),
     ),
-    transition('* => visible', animate('150ms cubic-bezier(0, 0, 0.2, 1)')),
+    transition(
+      '* => visible',
+      animate('{{enterDuration}} cubic-bezier(0, 0, 0.2, 1)'),
+      {params: {enterDuration: '150ms'}},
+    ),
     transition(
       '* => void, * => hidden',
       animate(
-        '75ms cubic-bezier(0.4, 0.0, 1, 1)',
+        '{{exitDuration}} cubic-bezier(0.4, 0.0, 1, 1)',
         style({
           opacity: 0,
         }),
       ),
+      {params: {exitDuration: '75ms'}},
     ),
   ]),
 };

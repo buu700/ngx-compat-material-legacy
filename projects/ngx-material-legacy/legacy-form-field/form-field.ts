@@ -52,6 +52,10 @@ import {
   MAT_SUFFIX,
 } from '@angular/material/form-field';
 import {matFormFieldAnimations} from './form-field-animations';
+import {
+  legacyAnimationTriggerState,
+  legacyAnimationsDisabled,
+} from '@ngx-compat/material-legacy/legacy-core';
 
 let nextUniqueId = 0;
 const floatingLabelScale = 0.75;
@@ -219,6 +223,16 @@ export class MatLegacyFormField
   /** State of the mat-hint and mat-error animations. */
   _subscriptAnimationState: string = '';
 
+  /** Subscript message animation state with zero-duration when disabled. */
+  _getSubscriptAnimationState() {
+    return legacyAnimationTriggerState(
+      this._subscriptAnimationState,
+      {transitionDuration: '300ms'},
+      this._legacyAnimationsDisabled,
+    );
+  }
+
+
   /** Text for the form field hint. */
   @Input()
   get hintLabel(): string {
@@ -258,6 +272,9 @@ export class MatLegacyFormField
 
   /** Whether the Angular animations are enabled. */
   _animationsEnabled: boolean;
+
+  /** Captured in injection context for MATERIAL_ANIMATIONS / NoopAnimations. */
+  private _legacyAnimationsDisabled = false;
 
   @ViewChild('connectionContainer', {static: true}) _connectionContainerRef: ElementRef;
   @ViewChild('inputContainer') _inputContainerRef: ElementRef;
@@ -300,7 +317,9 @@ export class MatLegacyFormField
     super(elementRef);
 
     this.floatLabel = this._getDefaultFloatLabelState();
-    this._animationsEnabled = _animationMode !== 'NoopAnimations';
+    this._legacyAnimationsDisabled = legacyAnimationsDisabled();
+    this._animationsEnabled =
+      !this._legacyAnimationsDisabled && _animationMode !== 'NoopAnimations';
 
     // Set the default through here so we invoke the setter on the first run.
     this.appearance = _defaults?.appearance || 'legacy';

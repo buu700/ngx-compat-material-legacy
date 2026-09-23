@@ -31,6 +31,10 @@ import {
   ChangeDetectorRef,
 } from '@angular/core';
 import {AnimationEvent} from '@angular/animations';
+import {
+  legacyAnimationTriggerState,
+  legacyAnimationsDisabled,
+} from '@ngx-compat/material-legacy/legacy-core';
 import {FocusKeyManager, FocusOrigin} from '@angular/cdk/a11y';
 import {Direction} from '@angular/cdk/bidi';
 import {BooleanInput, coerceBooleanProperty} from '@angular/cdk/coercion';
@@ -85,6 +89,9 @@ export class _MatMenuBase
 
   /** Current state of the panel animation. */
   _panelAnimationState: 'void' | 'enter' = 'void';
+
+  /** Captured in injection context for MATERIAL_ANIMATIONS / NoopAnimations. */
+  private readonly _legacyAnimationsDisabled = legacyAnimationsDisabled();
 
   /** Emits whenever an animation on the menu completes. */
   readonly _animationDone = new Subject<AnimationEvent>();
@@ -457,6 +464,16 @@ export class _MatMenuBase
 
     // @breaking-change 15.0.0 Remove null check for `_changeDetectorRef`.
     this._changeDetectorRef?.markForCheck();
+  }
+
+
+  /** Panel animation state + durations (0ms when MATERIAL_ANIMATIONS disables motion). */
+  _getPanelAnimationState() {
+    return legacyAnimationTriggerState(
+      this._panelAnimationState,
+      {enterDuration: '120ms', exitDuration: '100ms'},
+      this._legacyAnimationsDisabled,
+    );
   }
 
   /** Starts the enter animation. */
