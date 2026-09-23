@@ -17,7 +17,7 @@ Snapshot for handoff gates. Package `@ngx-compat/material-legacy@22.0.0-rc.0`
 | Escape-edge classification (no mass-delete) | **Done (docs)** | `compatibility/inventories/escape-edge-classification.json` + `src-cleanup-plan.md` |
 | Pack + inspect | **Done (expected flags)** | `compatibility/pack-proof/`; inspector still flags animation peer/refs |
 | License / provenance | **Done** | Google MIT notice + Copyright (c) 2026 Ryan Lester |
-| CI green on push | **Done** | Tip run https://github.com/buu700/ngx-compat-material-legacy/actions/runs/35930115030 success on `008dfde0d` (Helper tests and static checks) |
+| CI green on push | **Done** | Tip run https://github.com/buu700/ngx-compat-material-legacy/actions/runs/35931050332 success on `744bd3285` (Helper tests and static checks) |
 | Advisory / security triage (aged 22.1.7 peers) | **Done (docs)** | `compatibility/advisory-triage.md` — OSV clean for exact pins; known Angular 22 GHSAs patched by 22.1.7; no silent peer bumps; publish-time peer-floor tighten deferred |
 
 ## Testing matrix (`*/testing`)
@@ -76,7 +76,8 @@ Skipped: none — every historical inventory testing entry exists and packs.
 - Motion: docs/incremental only; `@angular/animations` overlay metadata retained.
 - Escape-edge / `src/` cleanup: docs tip refreshed; **no** mass-delete; unresolved
   relative stubs remain 68.
-- Prior tip work (CLI hash verify, pack-proof sha256, acknowledgement flows) unchanged.
+- CI green on `744bd3285` (run 35931050332). Prior CLI hash / pack-proof /
+  acknowledgement work unchanged.
 
 ## Left for maintainer publish (out of this RC-without-publish stream)
 
