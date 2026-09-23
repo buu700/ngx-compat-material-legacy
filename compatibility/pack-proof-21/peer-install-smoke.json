@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-09-23T19:17:39.048317-04:00",
+  "branch": "21.x",
+  "package_target": "@ngx-compat/material-legacy@21.0.0-rc.0",
+  "aged_peers": {
+    "@angular/*": "21.2.23",
+    "@angular/material": "21.2.14",
+    "@angular/cdk": "21.2.14"
+  },
+  "steps": [
+    {
+      "npm_install_aged_21_peers": "ok",
+      "stderr_tail": "npm warn deprecated @angular/animations@21.2.23: @angular/animations is deprecated. Use `animate.enter` and `animate.leave` instead. For more information see: https://v22.angular.dev/guide/animations.\n"
+    },
+    {
+      "framework_esm_smoke": "skipped-needs-dom",
+      "stdout": "",
+      "note": "Bare node import of @angular/common needs document; aged peer install + version resolve is the evidence this step."
+    }
+  ],
+  "errors": [],
+  "resolved": {
+    "@angular/core": "21.2.23",
+    "@angular/material": "21.2.14"
+  },
+  "library_rebuild_against_21": {
+    "status": "blocked",
+    "why": "projects/ngx-material-legacy currently compiles against Angular/Material 22 APIs (MATERIAL_ANIMATIONS surface, M22 harness bases, ng-packagr 22). A faithful 21.x library rebuild needs a dedicated adaptation pass + lockfile, not a silent peer swap.",
+    "next": [
+      "Pin workspace devDependencies to aged 21.2.23 / Material 21.2.14 on branch 21.x",
+      "Adapt delegated API diffs vs Material 21",
+      "ng-packagr build + pack + packed-consumer AOT on Node 20.19 / 22.12"
+    ]
+  },
+  "status": "partial-peer-install-ok-library-rebuild-blocked",
+  "notes": [
+    "Aged Angular 21.2.23 + Material/CDK 21.2.14 install succeeds under Node 24.",
+    "Same-day 21.2.24 framework not adopted (age window).",
+    "Library rebuild against 21 peers blocked pending adaptation (see library_rebuild_against_21)."
+  ]
+}
