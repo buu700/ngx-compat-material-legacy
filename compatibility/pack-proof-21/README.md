@@ -41,3 +41,14 @@ Dist-tags (owner publish later): `lts-21-next` / `lts-21`
 - Library source mostly compatible with Material 21.2.14 for this RC smoke (MATERIAL_ANIMATIONS present).
 - Broader overlay interaction harness (menu open/close, snack-bar, tooltip CSS path under TestBed) deferred to avoid destabilizing the RC pack.
 - **No npm publish** from agent workstreams.
+
+## Post-merge motion wave (2026-09-23)
+
+Merged CSS motion from `main`. Re-packed on Angular **21.2.23** / Material **21.2.14**.
+
+| Artifact | Result |
+| --- | --- |
+| `post-merge-motion-pack.json` | Re-pack metadata; primary FESM animations imports **[]** |
+| `post-merge-esm-smoke.json` | Overlay entry ESM imports **ok** against aged 21 peers |
+| `post-merge-no-animations-peer-smoke.json` | menu/select/dialog/autocomplete import **ok** with `@angular/animations` **not installed** |
+

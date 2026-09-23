@@ -11,7 +11,7 @@ Branch `21.x`. Package `@ngx-compat/material-legacy@21.0.0-rc.0`.
 | Node 20.19.x packed-consumer matrix | **Done** | `pack-proof-21/node20-consumer-smoke.json` (Node **20.19.6**) |
 | Broader harness (button/select/checkbox) | **Done** | same |
 | Motion CSS wave (from `main`) | **Merged** | Primary FESMs cleared; recipes under `/animations` |
-| Post-merge re-pack / smoke | **In progress / Done when evidence refreshed** | `pack-proof-21/` |
+| Post-merge re-pack / smoke | **Done** | `post-merge-motion-pack.json`, `post-merge-esm-smoke.json`, `post-merge-no-animations-peer-smoke.json` |
 | npm publish | **Out of scope** | Owner-run later with `lts-21-next` |
 
 Do not merge this branch's Angular 21 lockfile into `main` (22.x).
