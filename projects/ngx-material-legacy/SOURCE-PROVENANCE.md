@@ -31,3 +31,9 @@ See `compatibility/inventories/sass-facade-copy-manifest.json`.
   `matFormFieldAnimations`, `ANIMATION_MODULE_TYPE` from `@angular/core`, live SCSS
   `styleUrls`). Shared tokens remain imported from `@angular/material/form-field` and
   `@angular/material/input` per upstream API policy.
+
+- `legacy-core` (option/optgroup) and `legacy-select` secondary entries: owned
+  Material-16 `_MatOptionBase` / `_MatOptgroupBase` / `_MatSelectBase` because those
+  abstract bases were removed from Angular Material 22; presentation SCSS from
+  historical legacy sources; `MAT_SELECT_*` tokens that still exist remain on
+  `@angular/material/select`.
