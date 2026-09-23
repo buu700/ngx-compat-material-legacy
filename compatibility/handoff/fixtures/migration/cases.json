@@ -1,0 +1,160 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "id": "legacy-named-alias",
+      "language": "typescript",
+      "before": "import {MatLegacySelectModule as MatSelectModule} from '@angular/material/legacy-select';",
+      "expected_after": "import {MatLegacySelectModule as MatSelectModule} from '@ngx-compat/material-legacy/legacy-select';",
+      "outcome": "safe-edit"
+    },
+    {
+      "id": "ordinary-import",
+      "language": "typescript",
+      "before": "import {MatDatepickerModule} from '@angular/material/datepicker';",
+      "expected_after": null,
+      "outcome": "unchanged; current-component review"
+    },
+    {
+      "id": "legacy-testing",
+      "language": "typescript",
+      "before": "export {MatLegacySelectHarness} from '@angular/material/legacy-select/testing';",
+      "expected_after": "export {MatLegacySelectHarness} from '@ngx-compat/material-legacy/legacy-select/testing';",
+      "outcome": "safe-edit after tagged testing path verification"
+    },
+    {
+      "id": "private-typescript",
+      "language": "typescript",
+      "before": "import {X} from '@angular/material/legacy-select/private';",
+      "expected_after": null,
+      "outcome": "blocking diagnostic"
+    },
+    {
+      "id": "explicit-sass-namespace",
+      "language": "scss",
+      "before": "@use '@angular/material' as mat;\n$p: mat.define-palette(mat.$red-palette);",
+      "expected_after": "@use '@ngx-compat/material-legacy' as mat;\n$p: mat.define-palette(mat.$red-palette);",
+      "outcome": "safe module-source edit"
+    },
+    {
+      "id": "implicit-sass-namespace",
+      "language": "scss",
+      "before": "@use '@angular/material';\n$p: material.define-palette(material.$red-palette);",
+      "expected_after": "@use '@ngx-compat/material-legacy' as material;\n$p: material.define-palette(material.$red-palette);",
+      "outcome": "binding-preserving syntax adjustment"
+    },
+    {
+      "id": "quotes-and-comments",
+      "language": "scss",
+      "before": "// keep @angular/material example\n@use \"@angular/material\" as mat; // retain\n.x { color: red; }",
+      "expected_after": "// keep @angular/material example\n@use \"@ngx-compat/material-legacy\" as mat; // retain\n.x { color: red; }",
+      "outcome": "safe token edit only"
+    },
+    {
+      "id": "with-config",
+      "language": "scss",
+      "before": "@use '@angular/material' as mat with ($theme-ignore-duplication-warnings: true);",
+      "expected_after": "@use '@ngx-compat/material-legacy' as mat with ($theme-ignore-duplication-warnings: true);",
+      "outcome": "safe only with tested configuration map"
+    },
+    {
+      "id": "already-migrated",
+      "language": "scss",
+      "before": "@use '@ngx-compat/material-legacy' as mat;\n@include mat.core();",
+      "expected_after": null,
+      "outcome": "idempotent unchanged"
+    },
+    {
+      "id": "current-m3",
+      "language": "scss",
+      "before": "@use '@angular/material' as mat;\n$t: mat.define-theme((color: (primary: mat.$azure-palette)));",
+      "expected_after": null,
+      "outcome": "blocking mixed/current generation diagnostic"
+    },
+    {
+      "id": "mixed-generation",
+      "language": "scss",
+      "before": "@use '@angular/material' as mat;\n$a: mat.define-palette(mat.$red-palette);\n$b: mat.m2-define-palette(mat.$m2-blue-palette);",
+      "expected_after": null,
+      "outcome": "blocking generation diagnostic"
+    },
+    {
+      "id": "companion-bridge",
+      "language": "scss",
+      "before": "@use '@angular/material' as mat;\n@include mat.expansion-theme($theme);",
+      "expected_after": null,
+      "outcome": "report ordinary-current bridge; require explicit acknowledgement before readiness"
+    },
+    {
+      "id": "aggregate-bridge",
+      "language": "scss",
+      "before": "@use '@angular/material' as mat;\n@include mat.all-legacy-component-themes($theme);",
+      "expected_after": null,
+      "outcome": "do not substitute owned-only aggregate; report companion responsibility set"
+    },
+    {
+      "id": "wildcard-namespace",
+      "language": "scss",
+      "before": "@use '@angular/material' as *;\n@include legacy-button-theme($t);",
+      "expected_after": null,
+      "outcome": "safely analyze shadows/collisions or diagnostic; no guessed rewrite"
+    },
+    {
+      "id": "forward-hide",
+      "language": "scss",
+      "before": "@forward '@angular/material' show $red-palette, define-palette;",
+      "expected_after": null,
+      "outcome": "known historical finite list can be rewritten only with forwarding tests; otherwise diagnostic"
+    },
+    {
+      "id": "old-import",
+      "language": "scss",
+      "before": "@import '~@angular/material/theming';\n@include mat-core();",
+      "expected_after": null,
+      "outcome": "diagnostic unless exact deprecated import API explicitly supported"
+    },
+    {
+      "id": "namespace-recipe",
+      "language": "typescript",
+      "before": "import * as old from '@angular/material/legacy-select';\nconst a = old.matLegacySelectAnimations;",
+      "expected_after": null,
+      "outcome": "binding-aware removed-recipe diagnostic and working example"
+    },
+    {
+      "id": "app-provider",
+      "language": "typescript",
+      "before": "import {BrowserAnimationsModule} from '@angular/platform-browser/animations';",
+      "expected_after": null,
+      "outcome": "unchanged; never remove consumer provider"
+    },
+    {
+      "id": "arbitrary-string",
+      "language": "typescript",
+      "before": "const example = '@angular/material/legacy-select';",
+      "expected_after": null,
+      "outcome": "unchanged non-module string"
+    },
+    {
+      "id": "dynamic-literal",
+      "language": "typescript",
+      "before": "const loader = () => import('@angular/material/legacy-dialog');",
+      "expected_after": "const loader = () => import('@ngx-compat/material-legacy/legacy-dialog');",
+      "outcome": "safe literal-module edit"
+    },
+    {
+      "id": "computed-import",
+      "language": "typescript",
+      "before": "const loader = () => import('@angular/material/' + name);",
+      "expected_after": null,
+      "outcome": "diagnostic; unchanged"
+    },
+    {
+      "id": "shadowed-require",
+      "language": "typescript",
+      "before": "function f(require: (s: string) => string) { return require('@angular/material/legacy-select'); }",
+      "expected_after": null,
+      "outcome": "unchanged; local function not module loader"
+    }
+  ],
+  "null_after_policy": "No edit is authorized by this fixture without satisfying the described analysis/acknowledgement. Never use null to mean arbitrary output."
+}
