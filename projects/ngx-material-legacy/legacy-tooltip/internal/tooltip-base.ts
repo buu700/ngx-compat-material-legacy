@@ -50,6 +50,7 @@ import {
   Optional,
   ViewContainerRef,
 } from '@angular/core';
+import {legacyAnimationsDisabled} from '@ngx-compat/material-legacy/legacy-core';
 import {
   MAT_TOOLTIP_DEFAULT_OPTIONS,
   MAT_TOOLTIP_SCROLL_STRATEGY,
@@ -834,7 +835,8 @@ export abstract class _TooltipComponentBase implements OnDestroy {
     private _changeDetectorRef: ChangeDetectorRef,
     @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,
   ) {
-    this._animationsDisabled = animationMode === 'NoopAnimations';
+    this._animationsDisabled =
+      legacyAnimationsDisabled() || animationMode === 'NoopAnimations';
   }
 
   /**

@@ -25,7 +25,7 @@ public disable path:
 | `legacy-snack-bar` | `matSnackBarAnimations` | Parameterized enter/exit; `_getAnimationState()` |
 | `legacy-tabs` | `matTabsAnimations` | `animationDuration` getter forces `0ms` when disabled |
 | `legacy-autocomplete` | `_animationDone = null` (historical) | Skips panel exit animation stream |
-| `legacy-tooltip` | Exported recipe file only | **Runtime uses CSS** show/hide classes, not component `animations:` metadata |
+| `legacy-tooltip` | Exported recipe file only (API compat) | **Runtime uses CSS** show/hide classes; `_animationsDisabled` also honors `legacyAnimationsDisabled()` / MATERIAL_ANIMATIONS |
 
 Inspector flags for `@angular/animations` references are **expected** until a
 follow-up migration removes engine-bound recipes with tested CSS/`animate`
@@ -44,3 +44,12 @@ Honest status: **not done** for engine removal. Optional `@angular/animations`
 peer remains required for dialog/menu/select/form-field/snack-bar/tabs recipes.
 Consumer disable path: provide `MATERIAL_ANIMATIONS` with `{animationsDisabled: true}`
 or `NoopAnimations` / reduced-motion — durations become `0ms` on wired entries.
+
+## Tooltip note
+
+`LegacyTooltipComponent` does not register Angular `animations:` metadata. Show/hide
+uses CSS classes. The exported `matLegacyTooltipAnimations` recipe remains for
+historical public API compatibility and still imports `@angular/animations` types —
+inspector flags on that export are expected until a tested migration removes the
+symbol or replaces it with an honest non-engine type.
+

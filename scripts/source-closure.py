@@ -103,12 +103,27 @@ def resolve_relative(all_files: set[str], base: str, spec: str, sass: bool = Fal
     return None
 
 
+def strip_code_comments(text: str, *, sass: bool = False) -> str:
+    """Remove // and /* */ comments so commented @use/@import examples are not edges."""
+    # Block comments first
+    out = re.sub(r'/\*.*?\*/', '', text, flags=re.DOTALL)
+    # Line comments (Sass and TS/JS)
+    out = re.sub(r'(?m)^[ \t]*//.*?$', '', out)
+    # Trailing // comments on code lines (avoid URLs with :// by requiring start or whitespace)
+    out = re.sub(r'(?<!:)//.*?$', '', out, flags=re.MULTILINE)
+    return out
+
+
+
 def parse_edges(path: str, text: str, all_files: set[str]) -> tuple[list[dict], list[dict]]:
     edges: list[dict] = []
     unresolved: list[dict] = []
     suffix = PurePosixPath(path).suffix.lower()
 
     def add(spec: str, kind: str, sass: bool = False) -> None:
+        # Documentation placeholders like <legacy-component> are not filesystem edges.
+        if '<' in spec or '>' in spec:
+            return
         if spec.startswith('.'):
             target = resolve_relative(all_files, path, spec, sass=sass)
             if target:
@@ -118,18 +133,19 @@ def parse_edges(path: str, text: str, all_files: set[str]) -> tuple[list[dict], 
         else:
             edges.append({'from': path, 'to': spec, 'kind': kind, 'specifier': spec, 'scope': 'package'})
 
+    code = strip_code_comments(text, sass=suffix in SASS_EXTS)
     if suffix in TS_EXTS:
-        for spec in TS_SPEC_RE.findall(text):
+        for spec in TS_SPEC_RE.findall(code):
             add(spec, 'ts-import-or-export')
-        for spec in TEMPLATE_RE.findall(text):
+        for spec in TEMPLATE_RE.findall(code):
             add(spec, 'template-url')
-        for spec in STYLE_RE.findall(text):
+        for spec in STYLE_RE.findall(code):
             add(spec, 'style-url')
-        for block in STYLES_RE.findall(text):
+        for block in STYLES_RE.findall(code):
             for spec in QUOTED_RE.findall(block):
                 add(spec, 'style-url')
     if suffix in SASS_EXTS:
-        for directive, spec in SASS_SPEC_RE.findall(text):
+        for directive, spec in SASS_SPEC_RE.findall(code):
             # CSS imports and package module URLs are recorded but not traversed.
             add(spec, f'sass-{directive}', sass=True)
     return edges, unresolved
