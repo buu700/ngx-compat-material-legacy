@@ -1,0 +1,200 @@
+{
+  "schema_version": 1,
+  "action": "retire-historical-scaffolding",
+  "date": "2026-09-23",
+  "author": "Ryan Lester <hacker@linux.com>",
+  "baseline_commit_before": "27464f24c8fbc03f3d136b948bfe9b945a317ef8",
+  "commit_retire_demos_examples": "d1777bf5ea8f64104ab4e88a83beb541c5d9b4e8",
+  "commit_delete_companions_core": "8b19f7b5f06fdb08c41a40c0cc118fbce865cd76",
+  "policy": "Delete dead monorepo scaffolding that only blocked src/ cleanup. Do not mass-delete remaining owned-overlap ordinary dirs without further provenance. No npm publish. Pack only via node scripts/pack-library.mjs.",
+  "deleted_demo_trees": [
+    {
+      "path": "src/dev-app",
+      "file_count": 462,
+      "reason": "Legacy demos dead-wired to @angular/material/legacy-* / deleted Bazel targets; remainder current Material not shipped by this package."
+    },
+    {
+      "path": "src/components-examples",
+      "file_count": 1082,
+      "reason": "Current-only examples unused by CI/pack."
+    }
+  ],
+  "deleted_material_dirs": [
+    {
+      "path": "src/material/core",
+      "file_count": 196,
+      "prior_disposition": "retained-provenance",
+      "reason": "Unused by projects/ pack. Only remaining refs were retired demos/examples and historical Bazel graphs."
+    },
+    {
+      "path": "src/material/datepicker",
+      "file_count": 75,
+      "prior_disposition": "retained-historical-reference",
+      "reason": "Unused by projects/ pack. Only remaining refs were retired demos/examples and historical Bazel graphs."
+    },
+    {
+      "path": "src/material/button-toggle",
+      "file_count": 26,
+      "prior_disposition": "retained-historical-reference",
+      "reason": "Unused by projects/ pack. Only remaining refs were retired demos/examples and historical Bazel graphs."
+    },
+    {
+      "path": "src/material/expansion",
+      "file_count": 31,
+      "prior_disposition": "retained-historical-reference",
+      "reason": "Unused by projects/ pack. Only remaining refs were retired demos/examples and historical Bazel graphs."
+    },
+    {
+      "path": "src/material/stepper",
+      "file_count": 33,
+      "prior_disposition": "retained-historical-reference",
+      "reason": "Unused by projects/ pack. Only remaining refs were retired demos/examples and historical Bazel graphs."
+    },
+    {
+      "path": "src/material/toolbar",
+      "file_count": 22,
+      "prior_disposition": "retained-historical-reference",
+      "reason": "Unused by projects/ pack. Only remaining refs were retired demos/examples and historical Bazel graphs."
+    },
+    {
+      "path": "src/material/tree",
+      "file_count": 27,
+      "prior_disposition": "retained-historical-reference",
+      "reason": "Unused by projects/ pack. Only remaining refs were retired demos/examples and historical Bazel graphs."
+    },
+    {
+      "path": "src/material/badge",
+      "file_count": 17,
+      "prior_disposition": "retained-historical-reference",
+      "reason": "Unused by projects/ pack. Only remaining refs were retired demos/examples and historical Bazel graphs."
+    },
+    {
+      "path": "src/material/bottom-sheet",
+      "file_count": 24,
+      "prior_disposition": "retained-historical-reference",
+      "reason": "Unused by projects/ pack. Only remaining refs were retired demos/examples and historical Bazel graphs."
+    },
+    {
+      "path": "src/material/divider",
+      "file_count": 21,
+      "prior_disposition": "retained-historical-reference",
+      "reason": "Unused by projects/ pack. Only remaining refs were retired demos/examples and historical Bazel graphs."
+    },
+    {
+      "path": "src/material/grid-list",
+      "file_count": 27,
+      "prior_disposition": "retained-historical-reference",
+      "reason": "Unused by projects/ pack. Only remaining refs were retired demos/examples and historical Bazel graphs."
+    },
+    {
+      "path": "src/material/icon",
+      "file_count": 23,
+      "prior_disposition": "retained-historical-reference",
+      "reason": "Unused by projects/ pack. Only remaining refs were retired demos/examples and historical Bazel graphs."
+    },
+    {
+      "path": "src/material/sidenav",
+      "file_count": 30,
+      "prior_disposition": "retained-historical-reference",
+      "reason": "Unused by projects/ pack. Only remaining refs were retired demos/examples and historical Bazel graphs."
+    },
+    {
+      "path": "src/material/sort",
+      "file_count": 25,
+      "prior_disposition": "retained-historical-reference",
+      "reason": "Unused by projects/ pack. Only remaining refs were retired demos/examples and historical Bazel graphs."
+    },
+    {
+      "path": "src/material/table",
+      "file_count": 26,
+      "prior_disposition": "retained-historical-reference",
+      "reason": "Unused by projects/ pack. Only remaining refs were retired demos/examples and historical Bazel graphs."
+    }
+  ],
+  "also_removed_scaffolding": [
+    "firebase.json",
+    ".circleci/",
+    "scripts/deploy-dev-app.js",
+    "scripts/build-docs-content.mts",
+    "scripts/build-docs-content-main.mts",
+    "scripts/run-component-tests.js",
+    "scripts/circleci/",
+    "scripts/deploy/",
+    "scripts/docs-deploy/"
+  ],
+  "updated_parents": [
+    ".github/CODEOWNERS",
+    "pkg-externals.bzl",
+    "scripts/check-package-externals.ts",
+    "scripts/detect-component-id-collisions.ts",
+    "tsconfig.json",
+    "src/tsconfig-legacy.json",
+    "tslint.json",
+    "DEV_ENVIRONMENT.md",
+    "src/material/config.bzl",
+    "src/material/BUILD.bazel",
+    "src/material/_index.scss",
+    "src/material/_theming.scss",
+    "src/material/_token-theming.scss"
+  ],
+  "retained_under_src_material": [
+    "autocomplete",
+    "button",
+    "card",
+    "checkbox",
+    "chips",
+    "dialog",
+    "form-field",
+    "input",
+    "list",
+    "menu",
+    "paginator",
+    "prebuilt-themes",
+    "progress-bar",
+    "progress-spinner",
+    "radio",
+    "schematics",
+    "select",
+    "slide-toggle",
+    "slider",
+    "snack-bar",
+    "tabs",
+    "testing",
+    "tooltip"
+  ],
+  "retained_rationale": "Owned-overlap ordinary dirs plus schematics/testing/prebuilt-themes remain. Still referenced by historical e2e-app/universal-app Bazel graphs and/or need human review for harness provenance. Prefer document over delete.",
+  "retained_src_top_level": [
+    "BUILD.bazel",
+    "README.md",
+    "bazel-tsconfig-build.json",
+    "bazel-tsconfig-test.json",
+    "cdk",
+    "cdk-experimental",
+    "circular-deps-test.conf.js",
+    "dev-mode-types.d.ts",
+    "e2e-app",
+    "google-maps",
+    "material",
+    "material-date-fns-adapter",
+    "material-experimental",
+    "material-luxon-adapter",
+    "material-moment-adapter",
+    "tsconfig-legacy.json",
+    "tsconfig-tsec.json",
+    "universal-app",
+    "youtube-player"
+  ],
+  "projects_pack_unused_proof_prior": "compatibility/inventories/ordinary-companions-unused-proof-2026-09-23.json",
+  "post_delete_verification": {
+    "projects_closure": "compatibility/inventories/source-closure-projects-HEAD.json",
+    "visited_file_count": 450,
+    "root_file_count": 32,
+    "visited_under_src": 0,
+    "unresolved_relative": 0,
+    "pack_tarball": "compatibility/pack-proof/ngx-compat-material-legacy-22.0.0-rc.0.tgz",
+    "pack_sha256": "308dbd4b5379000ab7ab5a6d51670c5cc512ccfc1b62147fc16aa2491e92a8de",
+    "pack_src_material_members": 0,
+    "aot_harness_smoke": "compatibility/pack-proof/aot-harness-smoke.json",
+    "motion_lifecycle_smoke": "compatibility/pack-proof/motion-lifecycle-smoke.json"
+  }
+}
