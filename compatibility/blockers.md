@@ -48,7 +48,7 @@ opt-in `/animations` recipe entries only (by design for API compat).
 **Mitigated → 0.** Was 68 lexical `.import` false-negatives + placeholders. Resolver
 maps `.import` → `_*.import.scss`, strips comments, ignores `<...>` placeholders.
 **Unresolved relative closed.** Legacy→core escape edges cleared by narrow mirror
-delete; remaining `src/` tree still not mass-deletable (core/companions/prebuilt).
+delete; remaining `src/` tree still not mass-deletable (core + ordinary companions only; `legacy-prebuilt-themes` deleted).
 
 ## B-21-01 — 21.x library rebuild
 **Mitigated on branch.** `21.x` packs against aged Angular 21.2.23 / Material 21.2.14
