@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "action": "narrow-scoped-delete",
+  "policy": "No mass-delete of src/. Delete only when projects/ owns equivalent and pack+closure prove unused.",
+  "date": "2026-09-23",
+  "author": "Ryan Lester <hacker@linux.com>",
+  "before_commit": "1b2330ab0735b47322af843cd7c0557ed991484c",
+  "deleted_paths": [
+    {
+      "path": "src/material/legacy-prebuilt-themes",
+      "file_count": 1,
+      "files": [
+        "BUILD.bazel"
+      ],
+      "owned_at": [
+        "projects/ngx-material-legacy/styles/legacy-core/theming/prebuilt/*.scss",
+        "projects/ngx-material-legacy/styles/core/theming/prebuilt/*.scss"
+      ],
+      "reason": "Bazel CSS genrule stub only; CSS sources targeted deleted src/material/legacy-core theming/prebuilt. Owned SCSS prebuilt themes already pack via ng-packagr assets (styles/**/*.scss). projects-rooted closure visits 0 files under src/; pack tarball has 0 src/material members."
+    }
+  ],
+  "also_cleaned": [
+    "src/material/BUILD.bazel (removed legacy-prebuilt-themes genrule deps)",
+    "src/material/package-base.json (removed historical legacy-prebuilt-themes exports)",
+    ".github/CODEOWNERS (removed legacy-prebuilt-themes path)"
+  ],
+  "evidence": {
+    "projects_rooted_source_closure": "compatibility/inventories/source-closure-projects-HEAD.json",
+    "projects_rooted_edges_into_src": 0,
+    "projects_rooted_unresolved_relative": 0,
+    "projects_visited_prebuilt_scss": 8,
+    "pack_tarball": "compatibility/pack-proof/ngx-compat-material-legacy-22.0.0-rc.0.tgz",
+    "pack_tarball_src_material_members": 0,
+    "pack_tarball_prebuilt_scss_members": 8,
+    "prior_extraction_batch": "compatibility/inventories/src-legacy-mirror-delete-2026-09-23.json",
+    "src_legacy_closure_after": "compatibility/inventories/source-closure-src-legacy-HEAD-after.json",
+    "default_src_legacy_roots_after": 0
+  },
+  "retained_after": [
+    "src/material/core (provenance; historical src/ tree still references)",
+    "ordinary companions under src/material/* (dev-app/examples/Bazel still reference)",
+    "src/material/prebuilt-themes (ordinary non-legacy Bazel companion)"
+  ],
+  "note": "No mass-delete of src/. No npm publish.",
+  "after_commit": "ecdf5d45f640e2a4f8de07699176bc2728009e1a"
+}

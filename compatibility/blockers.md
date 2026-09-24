@@ -17,9 +17,14 @@ tightened to **`^22.1.7`**. Re-check advisories immediately before npm publish.
 **Mitigated for component scope + full historical testing + migrate-legacy + bundled CLI.**
 
 ### Still open
-- **`src/` mass-delete** — blocked. Unresolved relative escape edges are **0**, but
-  shared-core (~578) and ordinary companions still block a safe mass-delete. Prefer
-  documenting; see `compatibility/inventories/src-cleanup-plan.md`.
+- **`src/` mass-delete** — still blocked for the remaining tree. Unresolved relative
+  edges **0**; legacy→ordinary escape edges **0** after narrow delete of 22
+  `src/material/legacy-*` mirrors (shared-core was 353 HEAD-before / 578 W01).
+  `legacy-prebuilt-themes` deleted (owned SCSS under projects; Bazel stub only).
+  Default src-legacy roots **0**. Retained: `src/material/core`, ordinary companions
+  (projects/pack unused-proof recorded; historical Bazel/demo still refs).
+  See `compatibility/inventories/src-cleanup-plan.md` and
+  `ordinary-companions-unused-proof-2026-09-23.json`.
 - **Maintainer-authorized npm publish** — owner-only after packed-artifact checks.
 - **`21.x` maintenance line** — packs + Node 20.19 consumer smoke on branch; keep the
   Angular 21 lockfile off `main` (`compatibility/support-matrix.md`).
@@ -42,7 +47,8 @@ opt-in `/animations` recipe entries only (by design for API compat).
 ## B-ESC-01 — Unresolved relative escape edges
 **Mitigated → 0.** Was 68 lexical `.import` false-negatives + placeholders. Resolver
 maps `.import` → `_*.import.scss`, strips comments, ignores `<...>` placeholders.
-**`src/` delete still blocked** by shared-core / ordinary companions.
+**Unresolved relative closed.** Legacy→core escape edges cleared by narrow mirror
+delete; remaining `src/` tree still not mass-deletable (core/companions/prebuilt).
 
 ## B-21-01 — 21.x library rebuild
 **Mitigated on branch.** `21.x` packs against aged Angular 21.2.23 / Material 21.2.14
@@ -58,4 +64,6 @@ publish to `lts-21-next` later. **Do not merge 21 lockfile into `main`.**
 - Cyph tree at `/workspace/ngx-compat/reference/cyph-dev-prod` is oracle-only; never commit it.
 - Isolated Material-16 env is local-only; never commit `node_modules`.
 - No npm publish from agent workstreams.
-- Do not delete `src/` until shared-core escape inventory supports narrow deletes with evidence.
+- No mass-delete of `src/`. Narrow deletes require provenance JSON + closure proof
+  (2026-09-23 batches: `src-legacy-mirror-delete-2026-09-23.json`,
+  `src-legacy-prebuilt-themes-delete-2026-09-23.json`).
