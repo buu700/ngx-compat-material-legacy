@@ -1,3 +1,5 @@
+> **Note (2026-09-23):** Historical `src/dev-app` and `src/components-examples` scaffolding has been retired in this fork. Library pack is via `node scripts/pack-library.mjs` / `yarn pack:lib`. Upstream Bazel/`yarn dev-app` instructions below are retained only as historical context.
+
 # Developer guide: getting your environment set up
 1. Make sure you have both `node` and `yarn` installed.
    We recommend using `nvm` to manage your node versions.

@@ -1,10 +1,11 @@
 # Inventory-gated `src/` cleanup plan (no mass-delete)
 
-Status: **narrow deletes advanced (2026-09-23).** Legacy→ordinary relative escape
-edges from `src/material/legacy-*` roots are **0** after deleting 22 superseded
-mirrors. `src/material/legacy-prebuilt-themes` deleted (owned SCSS under
-`projects/.../styles/{core,legacy-core}/theming/prebuilt/`). Do **not** mass-delete
-remaining `src/` (core, ordinary companions) without further provenance.
+Status: **scaffolding retire landed (2026-09-23).** Legacy→ordinary relative escape
+edges **0**. Deleted: 22 `legacy-*` mirrors, `legacy-prebuilt-themes`, `src/dev-app`,
+`src/components-examples`, `src/material/core` + ordinary companions. **Retained:**
+owned-overlap ordinary dirs (button/card/…) + schematics/testing/prebuilt-themes —
+still referenced by historical e2e/universal Bazel and/or harness provenance.
+See `src-scaffolding-retire-2026-09-23.json`. Prefer document over further deletes.
 
 Classification worksheet:
 `compatibility/inventories/escape-edge-classification.json`
@@ -20,9 +21,9 @@ testing secondary entries pack. Schematics + bundled peer-light CLI live under
 
 | Class | Examples | Safe to delete `src/`? |
 | --- | --- | --- |
-| `shared-core` | `src/material/core` (legacy→core edges **0**; was 353 HEAD-before / 578 W01) | **Tree retained** — escape edges cleared; keep as provenance until separate unused proof |
-| `ordinary-current-companion` | datepicker, expansion, icon, sidenav, … | **No** — not owned legacy; keep as historical reference until unused |
-| `owned-overlap-ordinary` | ordinary `table` vs owned `legacy-table` | **No** — needs human review of harness/base edges |
+| `shared-core` | `src/material/core` (legacy→core edges **0**; was 353 HEAD-before / 578 W01) | **DELETED 2026-09-23** — see scaffolding retire inventory |
+| `ordinary-current-companion` | datepicker, expansion, icon, sidenav, … | **DELETED 2026-09-23** after demos/examples retirement |
+| `owned-overlap-ordinary` | ordinary `button`/`card`/… vs owned `legacy-*` | **Retain** — e2e/universal Bazel + harness provenance review |
 | `unresolved-relative` | **0** (was 68 `.import` false-negatives + 1 comment placeholder) | **No `src/` delete yet** — shared-core/companions still block; relative edges closed |
 | Package leads (`@angular/*`, CDK, sass:) | peers / builtins | N/A — dependency policy, not `src/` delete |
 
@@ -37,14 +38,13 @@ testing secondary entries pack. Schematics + bundled peer-light CLI live under
 
 ## Must keep for now (blocked)
 
-- Entire `src/material/core` tree retained as provenance (legacy→core relative edges now **0**).
-- Ordinary companion directories listed in `escape-edge-classification.json`.
-- `src/material/{checkbox,menu,form-field,select,input,...}/testing` bases used as
-  provenance for owned harness bases (or seal copies under `reference/`).
+- Owned-overlap ordinary dirs under `src/material` (button, card, checkbox, chips,
+  dialog, form-field, input, list, menu, paginator, progress-*, radio, select,
+  slide-toggle, slider, snack-bar, tabs, tooltip) plus schematics/testing/prebuilt-themes.
+- Historical `src/e2e-app` / `src/universal-app` / CDK trees (not part of this retire).
 - Inventories, goldens, and research packets under `compatibility/` / `research/`.
-- Relative unresolved count is **0**; default `src/material/legacy-*` roots are
-  **empty** after prebuilt-themes delete. Shared-core and ordinary companions still
-  block full `src/` mass-delete (historical Bazel/demo references).
+- Relative unresolved **0**; projects-rooted visits under `src/` **0**; pack tarball
+  `src/material` members **0**.
 
 ## Next concrete steps
 
@@ -53,10 +53,10 @@ testing secondary entries pack. Schematics + bundled peer-light CLI live under
    `projects/ngx-material-legacy` and attach unresolved edges.
 3. `src/material/legacy-prebuilt-themes` **DONE** — see
    `src-legacy-prebuilt-themes-delete-2026-09-23.json`.
-4. Ordinary companions / `src/material/core`: projects/pack unused-proof recorded in
-   `ordinary-companions-unused-proof-2026-09-23.json`; **retain** while historical
-   `src/dev-app` / `src/components-examples` / Bazel graphs still reference them.
-5. Prefer documenting over deleting if unsure.
+4. Ordinary companions / `src/material/core`: **DELETED** after demos/examples retire
+   (`src-scaffolding-retire-2026-09-23.json`).
+5. Next: only consider owned-overlap ordinary dirs after e2e/universal Bazel retirement
+   + harness provenance review. Prefer documenting over deleting if unsure.
 
 ## Status check (2026-09-23 tip)
 
@@ -128,3 +128,13 @@ Provenance: `src-legacy-prebuilt-themes-delete-2026-09-23.json`.
 (`ordinary-companions-unused-proof-2026-09-23.json`) but **retained** — historical
 `src/dev-app`, `src/components-examples`, and Bazel BUILD graphs still reference them.
 Prefer docs over deletes. Pack via `node scripts/pack-library.mjs`.
+
+
+## Status check (2026-09-23 scaffolding retire)
+
+Retired `src/dev-app` + `src/components-examples` and deleted `src/material/core` plus
+ordinary companions listed in `ordinary-companions-unused-proof-2026-09-23.json`.
+Projects-rooted closure: **450** visited, **0** under `src/`, **0** unresolved.
+Pack tarball: **0** `src/material` members; AOT harness + motion smokes OK.
+Remaining `src/material/*` are owned-overlap ordinary + schematics/testing/prebuilt-themes.
+Provenance: `src-scaffolding-retire-2026-09-23.json`. No npm publish.

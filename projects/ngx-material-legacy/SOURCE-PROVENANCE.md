@@ -14,8 +14,10 @@ Historical `src/material/legacy-*` component mirrors that are fully owned under
 `src/material/legacy-prebuilt-themes` (Bazel CSS stub) deleted after owned SCSS
 landed under `styles/{core,legacy-core}/theming/prebuilt/`
 (`src-legacy-prebuilt-themes-delete-2026-09-23.json`).
-`src/material/core` and ordinary companions remain as historical provenance
-(projects/pack unused; see `ordinary-companions-unused-proof-2026-09-23.json`).
+`src/dev-app` / `src/components-examples`, `src/material/core`, and ordinary
+companions were retired 2026-09-23 (`src-scaffolding-retire-2026-09-23.json`).
+Owned-overlap ordinary dirs under `src/material` remain as documented historical
+reference only (not on the pack path).
 
 See `compatibility/inventories/sass-facade-copy-manifest.json`.
 

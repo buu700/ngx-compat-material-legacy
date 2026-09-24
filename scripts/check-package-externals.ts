@@ -27,10 +27,9 @@ const configFile = ts.readJsonConfigFile(join(projectRoot, 'tsconfig.json'), ts.
 const parsedConfig = ts.parseJsonSourceFileConfigFileContent(configFile, ts.sys, projectRoot);
 const filesToCheckGlob = [
   'src/**/!(*.spec).ts',
-  '!src/+(e2e-app|universal-app|dev-app)/**/*.ts',
+  '!src/+(e2e-app|universal-app)/**/*.ts',
   '!src/**/schematics/**/*.ts',
   '!src/**/tests/**/*.ts',
-  '!src/components-examples/private/localize-types.d.ts',
 ];
 
 const failures = new Map<string, string[]>();
