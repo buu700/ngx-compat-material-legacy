@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "action": "retire-residual-non-material-src-packages",
+  "date": "2026-09-23",
+  "author": "Ryan Lester <hacker@linux.com>",
+  "baseline_commit_before": "8d1a926a00c52c22c67b879fea1bb8908c077f96",
+  "policy": "User-confirmed delete of remaining non-Material src/ trees after ordinary/src cleanup. Unused-proof via projects-rooted source-closure (0 visits under src/) and pack path (scripts/pack-library.mjs + packed-consumer AOT). Also clean dangling Bazel/CODEOWNERS/tsconfig/scripts refs and solely-supporting integration leftovers. Hollow src/material facade deleted; src/ left with retirement README only. No npm publish.",
+  "projects_pack_unused_proof": {
+    "projects_rooted_visited": 450,
+    "projects_rooted_roots": 32,
+    "projects_rooted_visited_under_src": 0,
+    "projects_rooted_unresolved_relative": 0,
+    "conclusion": "No packing-path dependency on deleted trees.",
+    "pack_tarball_src_material_members": 0,
+    "pack_sha256": "308dbd4b5379000ab7ab5a6d51670c5cc512ccfc1b62147fc16aa2491e92a8de"
+  },
+  "deleted_package_trees": [
+    {
+      "path": "src/cdk",
+      "file_count": 531,
+      "prior_disposition": "retained-documented",
+      "reason": "Unused by projects/ pack and GHA pack path; residual Bazel/integration cleaned in same commit."
+    },
+    {
+      "path": "src/cdk-experimental",
+      "file_count": 74,
+      "prior_disposition": "retained-documented",
+      "reason": "Unused by projects/ pack and GHA pack path; residual Bazel/integration cleaned in same commit."
+    },
+    {
+      "path": "src/google-maps",
+      "file_count": 64,
+      "prior_disposition": "retained-documented",
+      "reason": "Unused by projects/ pack and GHA pack path; residual Bazel/integration cleaned in same commit."
+    },
+    {
+      "path": "src/youtube-player",
+      "file_count": 10,
+      "prior_disposition": "retained-documented",
+      "reason": "Unused by projects/ pack and GHA pack path; residual Bazel/integration cleaned in same commit."
+    },
+    {
+      "path": "src/material-luxon-adapter",
+      "file_count": 10,
+      "prior_disposition": "retained-documented",
+      "reason": "Unused by projects/ pack and GHA pack path; residual Bazel/integration cleaned in same commit."
+    },
+    {
+      "path": "src/material-moment-adapter",
+      "file_count": 9,
+      "prior_disposition": "retained-documented",
+      "reason": "Unused by projects/ pack and GHA pack path; residual Bazel/integration cleaned in same commit."
+    },
+    {
+      "path": "src/material-date-fns-adapter",
+      "file_count": 9,
+      "prior_disposition": "retained-documented",
+      "reason": "Unused by projects/ pack and GHA pack path; residual Bazel/integration cleaned in same commit."
+    },
+    {
+      "path": "src/material-experimental",
+      "file_count": 67,
+      "prior_disposition": "retained-documented",
+      "reason": "Unused by projects/ pack and GHA pack path; residual Bazel/integration cleaned in same commit."
+    },
+    {
+      "path": "src/material",
+      "file_count": 8,
+      "prior_disposition": "retained-documented",
+      "reason": "Unused by projects/ pack and GHA pack path; residual Bazel/integration cleaned in same commit."
+    }
+  ],
+  "deleted_src_meta": [
+    "src/BUILD.bazel",
+    "src/bazel-tsconfig-build.json",
+    "src/bazel-tsconfig-test.json",
+    "src/circular-deps-test.conf.js",
+    "src/dev-mode-types.d.ts",
+    "src/tsconfig-legacy.json",
+    "src/tsconfig-tsec.json"
+  ],
+  "also_removed_integration": [
+    {
+      "path": "integration/linker",
+      "file_count": 2,
+      "reason": "Solely-supporting Bazel leftovers for retired src packages; unused by GHA pack path."
+    },
+    {
+      "path": "integration/ts-compat",
+      "file_count": 4,
+      "reason": "Solely-supporting Bazel leftovers for retired src packages; unused by GHA pack path."
+    },
+    {
+      "path": "integration/size-test/cdk",
+      "file_count": 3,
+      "reason": "Solely-supporting Bazel leftovers for retired src packages; unused by GHA pack path."
+    },
+    {
+      "path": "integration/harness-e2e-cli",
+      "file_count": 29,
+      "reason": "Solely-supporting Bazel leftovers for retired src packages; unused by GHA pack path."
+    },
+    {
+      "path": "integration/ng-add",
+      "file_count": 5,
+      "reason": "Solely-supporting Bazel leftovers for retired src packages; unused by GHA pack path."
+    },
+    {
+      "path": "integration/ng-add-standalone",
+      "file_count": 5,
+      "reason": "Solely-supporting Bazel leftovers for retired src packages; unused by GHA pack path."
+    },
+    {
+      "path": "integration/yarn-pnp-compat",
+      "file_count": 31,
+      "reason": "Solely-supporting Bazel leftovers for retired src packages; unused by GHA pack path."
+    },
+    {
+      "path": "integration/mdc-migration",
+      "file_count": 215,
+      "reason": "Solely-supporting Bazel leftovers for retired src packages; unused by GHA pack path."
+    }
+  ],
+  "also_scrubbed_refs": [
+    "BUILD.bazel (drop src config loads; empty entryPoints)",
+    "pkg-externals.bzl (static framework/MDC externals only)",
+    "tools/public_api_guard/BUILD.bazel (empty generate_test_targets)",
+    ".github/CODEOWNERS (drop src package owners)",
+    ".ng-dev/commit-message.mts scopes",
+    ".ng-dev/google-sync-config.json syncedFilePatterns",
+    "tsconfig.json paths + schematic excludes",
+    "tslint.json package-specific excludes",
+    ".prettierignore cdk schematic excludes",
+    "goldens/tsec-exemption.json",
+    ".bazelignore deleted integration paths"
+  ],
+  "src_remaining": [
+    "src/README.md"
+  ],
+  "note": "Historical tools/public_api_guard/{cdk,material,google-maps,youtube-player} golden files retained as reference only."
+}

@@ -1,6 +1,10 @@
-Angular Material
-=======
+# `src/` retired (2026-09-23)
 
-The sources for this package are in the main [Angular Material](https://github.com/angular/components) repo. Please file issues and pull requests against that repo.
+Upstream package trees that previously lived here (`cdk`, `cdk-experimental`,
+`google-maps`, `youtube-player`, date adapters, `material-experimental`, and the
+hollow `material` facade) were deleted after projects/pack unused-proof showed
+**zero** visits under `src/` and the GitHub Actions pack path
+(`node scripts/pack-library.mjs` + packed-consumer AOT) does not consume them.
 
-License: MIT
+Owned library sources pack from `projects/ngx-material-legacy/`.
+See `compatibility/inventories/src-residual-packages-retire-2026-09-23.json`.

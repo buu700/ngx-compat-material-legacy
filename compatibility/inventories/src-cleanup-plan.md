@@ -1,12 +1,11 @@
 # Inventory-gated `src/` cleanup plan (no mass-delete)
 
-Status: **e2e/universal + owned-overlap retire landed (2026-09-23).** Legacy→ordinary
-relative escape edges **0**. Deleted: prior scaffolding/core/companions, then
-`src/e2e-app`, `src/universal-app`, owned-overlap ordinary dirs, hollow
-schematics/testing/prebuilt-themes. **Retained (documented):** `src/cdk*`,
-google-maps, youtube-player, date adapters, material-experimental — unused by pack
-but still cross-wired in residual Bazel/integration graphs.
-See `src-e2e-universal-ordinary-retire-2026-09-23.json`.
+Status: **residual non-Material src retire landed (2026-09-23).** Legacy→ordinary
+relative escape edges **0**. Deleted: scaffolding/core/companions, e2e/universal,
+owned-overlap ordinary, hollow schematics/testing/prebuilt-themes, then residual
+`src/cdk*` / maps / youtube / adapters / experimental / hollow material + supporting
+integration Bazel leftovers. **`src/` = README only.**
+See `src-residual-packages-retire-2026-09-23.json`.
 
 Classification worksheet:
 `compatibility/inventories/escape-edge-classification.json`
@@ -37,16 +36,13 @@ testing secondary entries pack. Schematics + bundled peer-light CLI live under
 | Bazel `BUILD.bazel` / tools unused by ng-packagr path | Confirm CI workflows no longer invoke Bazel for the library build |
 | Demo/docs apps under `src/` not used as fixtures | Keep until public fixture apps replace them |
 
-## Must keep for now (documented retention)
+## Must keep for now
 
-- Residual `src/cdk`, `src/cdk-experimental`, `src/google-maps`, `src/youtube-player`,
-  date adapters, `src/material-experimental` — unused by projects/ pack; retain until
-  a dedicated Bazel/integration retire with provenance.
-- Hollow `src/material` facade files (`BUILD.bazel`, Sass stubs, empty `config.bzl`
-  entrypoints) so residual Bazel parents still load.
 - Inventories, goldens, and research packets under `compatibility/` / `research/`.
+- Historical `tools/public_api_guard/{cdk,material,google-maps,youtube-player}`
+  golden files (reference only; no Bazel targets).
 - Relative unresolved **0**; projects-rooted visits under `src/` **0**; pack tarball
-  `src/material` members **0**.
+  `src/material` members **0**. `src/` = retirement README only.
 
 ## Next concrete steps
 
@@ -58,9 +54,9 @@ testing secondary entries pack. Schematics + bundled peer-light CLI live under
 4. Ordinary companions / `src/material/core`: **DELETED** after demos/examples retire
    (`src-scaffolding-retire-2026-09-23.json`).
 5. Owned-overlap ordinary + e2e/universal: **DELETED**
-   (`src-e2e-universal-ordinary-retire-2026-09-23.json`). Next optional: retire residual
-   `src/cdk*` / maps / youtube / adapters / experimental only with dedicated provenance.
-   Prefer documenting over deleting if unsure.
+   (`src-e2e-universal-ordinary-retire-2026-09-23.json`).
+6. Residual non-Material packages + hollow material: **DELETED**
+   (`src-residual-packages-retire-2026-09-23.json`).
 
 ## Status check (2026-09-23 tip)
 
@@ -152,3 +148,15 @@ Projects-rooted closure: **450** visited, **0** under `src/`, **0** unresolved.
 Provenance: `src-e2e-universal-ordinary-retire-2026-09-23.json` and
 `owned-overlap-unused-proof-2026-09-23.json`. Residual cdk*/maps/youtube/adapters/
 experimental **retained-documented**. No npm publish.
+
+
+## Status check (2026-09-23 residual non-Material packages retire)
+
+User-confirmed delete of remaining non-Material `src/` trees after ordinary cleanup.
+Deleted: `src/cdk`, `src/cdk-experimental`, `src/google-maps`, `src/youtube-player`,
+date adapters, `src/material-experimental`, hollow `src/material`, plus solely-
+supporting integration Bazel leftovers. Scrubbed root Bazel / CODEOWNERS /
+tsconfig / ng-dev / tslint / prettier / tsec. `src/` now = `README.md` only.
+Projects-rooted closure: **450** visited, **0** under `src/`, **0** unresolved.
+Provenance: `src-residual-packages-retire-2026-09-23.json` and
+`residual-packages-unused-proof-2026-09-23.json`. No npm publish.
