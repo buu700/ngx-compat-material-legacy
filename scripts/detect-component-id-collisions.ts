@@ -11,8 +11,6 @@ const errors: string[] = [];
 const seenMetadata = new Map<string, ts.ClassDeclaration>();
 const fileToCheck = join(__dirname, '../src/**/!(*.spec).ts');
 const ignoredPatterns = [
-  '**/e2e-app/**',
-  '**/universal-app/**',
 ];
 
 // Use glob + createSourceFile since we don't need type information

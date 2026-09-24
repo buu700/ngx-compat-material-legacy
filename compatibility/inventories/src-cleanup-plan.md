@@ -1,11 +1,12 @@
 # Inventory-gated `src/` cleanup plan (no mass-delete)
 
-Status: **scaffolding retire landed (2026-09-23).** Legacy→ordinary relative escape
-edges **0**. Deleted: 22 `legacy-*` mirrors, `legacy-prebuilt-themes`, `src/dev-app`,
-`src/components-examples`, `src/material/core` + ordinary companions. **Retained:**
-owned-overlap ordinary dirs (button/card/…) + schematics/testing/prebuilt-themes —
-still referenced by historical e2e/universal Bazel and/or harness provenance.
-See `src-scaffolding-retire-2026-09-23.json`. Prefer document over further deletes.
+Status: **e2e/universal + owned-overlap retire landed (2026-09-23).** Legacy→ordinary
+relative escape edges **0**. Deleted: prior scaffolding/core/companions, then
+`src/e2e-app`, `src/universal-app`, owned-overlap ordinary dirs, hollow
+schematics/testing/prebuilt-themes. **Retained (documented):** `src/cdk*`,
+google-maps, youtube-player, date adapters, material-experimental — unused by pack
+but still cross-wired in residual Bazel/integration graphs.
+See `src-e2e-universal-ordinary-retire-2026-09-23.json`.
 
 Classification worksheet:
 `compatibility/inventories/escape-edge-classification.json`
@@ -23,7 +24,7 @@ testing secondary entries pack. Schematics + bundled peer-light CLI live under
 | --- | --- | --- |
 | `shared-core` | `src/material/core` (legacy→core edges **0**; was 353 HEAD-before / 578 W01) | **DELETED 2026-09-23** — see scaffolding retire inventory |
 | `ordinary-current-companion` | datepicker, expansion, icon, sidenav, … | **DELETED 2026-09-23** after demos/examples retirement |
-| `owned-overlap-ordinary` | ordinary `button`/`card`/… vs owned `legacy-*` | **Retain** — e2e/universal Bazel + harness provenance review |
+| `owned-overlap-ordinary` | ordinary `button`/`card`/… vs owned `legacy-*` | **DELETED 2026-09-23** after e2e/universal retire |
 | `unresolved-relative` | **0** (was 68 `.import` false-negatives + 1 comment placeholder) | **No `src/` delete yet** — shared-core/companions still block; relative edges closed |
 | Package leads (`@angular/*`, CDK, sass:) | peers / builtins | N/A — dependency policy, not `src/` delete |
 
@@ -36,12 +37,13 @@ testing secondary entries pack. Schematics + bundled peer-light CLI live under
 | Bazel `BUILD.bazel` / tools unused by ng-packagr path | Confirm CI workflows no longer invoke Bazel for the library build |
 | Demo/docs apps under `src/` not used as fixtures | Keep until public fixture apps replace them |
 
-## Must keep for now (blocked)
+## Must keep for now (documented retention)
 
-- Owned-overlap ordinary dirs under `src/material` (button, card, checkbox, chips,
-  dialog, form-field, input, list, menu, paginator, progress-*, radio, select,
-  slide-toggle, slider, snack-bar, tabs, tooltip) plus schematics/testing/prebuilt-themes.
-- Historical `src/e2e-app` / `src/universal-app` / CDK trees (not part of this retire).
+- Residual `src/cdk`, `src/cdk-experimental`, `src/google-maps`, `src/youtube-player`,
+  date adapters, `src/material-experimental` — unused by projects/ pack; retain until
+  a dedicated Bazel/integration retire with provenance.
+- Hollow `src/material` facade files (`BUILD.bazel`, Sass stubs, empty `config.bzl`
+  entrypoints) so residual Bazel parents still load.
 - Inventories, goldens, and research packets under `compatibility/` / `research/`.
 - Relative unresolved **0**; projects-rooted visits under `src/` **0**; pack tarball
   `src/material` members **0**.
@@ -55,8 +57,10 @@ testing secondary entries pack. Schematics + bundled peer-light CLI live under
    `src-legacy-prebuilt-themes-delete-2026-09-23.json`.
 4. Ordinary companions / `src/material/core`: **DELETED** after demos/examples retire
    (`src-scaffolding-retire-2026-09-23.json`).
-5. Next: only consider owned-overlap ordinary dirs after e2e/universal Bazel retirement
-   + harness provenance review. Prefer documenting over deleting if unsure.
+5. Owned-overlap ordinary + e2e/universal: **DELETED**
+   (`src-e2e-universal-ordinary-retire-2026-09-23.json`). Next optional: retire residual
+   `src/cdk*` / maps / youtube / adapters / experimental only with dedicated provenance.
+   Prefer documenting over deleting if unsure.
 
 ## Status check (2026-09-23 tip)
 
@@ -138,3 +142,13 @@ Projects-rooted closure: **450** visited, **0** under `src/`, **0** unresolved.
 Pack tarball: **0** `src/material` members; AOT harness + motion smokes OK.
 Remaining `src/material/*` are owned-overlap ordinary + schematics/testing/prebuilt-themes.
 Provenance: `src-scaffolding-retire-2026-09-23.json`. No npm publish.
+
+
+## Status check (2026-09-23 e2e/universal + owned-overlap retire)
+
+Retired `src/e2e-app` + `src/universal-app` (+ `integration/size-test/material`), then
+deleted owned-overlap ordinary dirs and hollow schematics/testing/prebuilt-themes.
+Projects-rooted closure: **450** visited, **0** under `src/`, **0** unresolved.
+Provenance: `src-e2e-universal-ordinary-retire-2026-09-23.json` and
+`owned-overlap-unused-proof-2026-09-23.json`. Residual cdk*/maps/youtube/adapters/
+experimental **retained-documented**. No npm publish.

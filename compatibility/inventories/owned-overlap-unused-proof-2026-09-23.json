@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-23",
+  "baseline_commit_before": "49c662b028d8ef775d4ea3996ad982efd3361d03",
+  "methodology": {
+    "projects_closure": "scripts/source-closure.py --ref HEAD with projects public-api + _index.scss + owned prebuilt SCSS roots",
+    "repo_scan": "literal src/material/<dir> and //src/material/<dir> mentions outside that dir",
+    "ci": "GitHub Actions ci.yml uses pack-library + packed-consumer-aot + helper checks only; no Bazel e2e/universal"
+  },
+  "projects_pack_unused_proof": {
+    "projects_rooted_visited": 450,
+    "projects_rooted_roots": 32,
+    "projects_rooted_visited_under_src": 0,
+    "projects_rooted_unresolved_relative": 0,
+    "pack_tarball_src_material_members": 0,
+    "conclusion": "No packing-path dependency on retired trees.",
+    "pack_sha256": "308dbd4b5379000ab7ab5a6d51670c5cc512ccfc1b62147fc16aa2491e92a8de"
+  },
+  "refs_confirming_e2e_universal_blockers": {
+    "e2e-app_external_before": [
+      ".github/CODEOWNERS",
+      "src/cdk*/BUILD",
+      "src/material/slider/BUILD.bazel",
+      "scripts ignore globs",
+      "tsconfig/tslint"
+    ],
+    "universal-app_external_before": [
+      ".github/CODEOWNERS",
+      "tsconfig.json"
+    ],
+    "ordinary_dirs_external_before_besides_e2e_universal": [
+      "CODEOWNERS",
+      "research/*",
+      "integration/size-test/material",
+      "intra-src/material BUILD cross-deps",
+      "goldens/tsec-exemption.json"
+    ]
+  },
+  "disposition": {
+    "e2e-app": "deleted",
+    "universal-app": "deleted",
+    "ordinary_overlap": "deleted",
+    "schematics_testing_prebuilt": "deleted",
+    "cdk_maps_youtube_adapters_experimental": "retained-documented"
+  },
+  "recommendation": {
+    "deletable_from_projects_pack": true,
+    "deleted": true,
+    "deleted_commits": [
+      "db95f27dd4874cd6af32d630388a3eb318983bf1",
+      "ae5a68b6ad8018da9257442e9aebb1aa41a9ff16"
+    ]
+  }
+}

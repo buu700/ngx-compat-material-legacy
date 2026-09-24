@@ -1,0 +1,245 @@
+{
+  "schema_version": 1,
+  "action": "retire-e2e-universal-and-owned-overlap",
+  "date": "2026-09-23",
+  "author": "Ryan Lester <hacker@linux.com>",
+  "baseline_commit_before": "49c662b028d8ef775d4ea3996ad982efd3361d03",
+  "commit_retire_e2e_universal": "db95f27dd4874cd6af32d630388a3eb318983bf1",
+  "commit_delete_ordinary_overlap": "ae5a68b6ad8018da9257442e9aebb1aa41a9ff16",
+  "policy": "After confirming e2e-app/universal-app were the only non-docs blockers for owned-overlap ordinary dirs, retire those apps (and solely-supporting integration/size-test/material). Then unused-proof and delete ordinary overlap dirs plus hollow schematics/testing/prebuilt-themes. Do not mass-delete retained cdk*/maps/youtube/adapters/experimental. No npm publish. Pack only via node scripts/pack-library.mjs.",
+  "projects_pack_unused_proof": {
+    "projects_rooted_visited": 450,
+    "projects_rooted_roots": 32,
+    "projects_rooted_visited_under_src": 0,
+    "projects_rooted_unresolved_relative": 0,
+    "pack_tarball_src_material_members": 0,
+    "conclusion": "No packing-path dependency on retired trees."
+  },
+  "deleted_demo_trees": [
+    {
+      "path": "src/e2e-app",
+      "file_count": 20,
+      "reason": "Historical Bazel protractor e2e app; unused by GHA pack path; blocked ordinary-dir retirement."
+    },
+    {
+      "path": "src/universal-app",
+      "file_count": 11,
+      "reason": "Historical Bazel SSR kitchen-sink; unused by GHA pack path; referenced MATERIAL_TARGETS."
+    }
+  ],
+  "also_removed_scaffolding": [
+    "integration/size-test/material/",
+    "e2e_test_suite loads in src/cdk/overlay, src/cdk/testing, src/cdk-experimental/scrolling BUILD.bazel",
+    "src/cdk/testing/tests/webdriver-test.bzl e2e-app server_test wrapper"
+  ],
+  "deleted_material_dirs": [
+    {
+      "path": "src/material/autocomplete",
+      "file_count": 22,
+      "prior_disposition": "owned-overlap-ordinary",
+      "reason": "Unused by projects/ pack after e2e/universal retirement."
+    },
+    {
+      "path": "src/material/button",
+      "file_count": 30,
+      "prior_disposition": "owned-overlap-ordinary",
+      "reason": "Unused by projects/ pack after e2e/universal retirement."
+    },
+    {
+      "path": "src/material/card",
+      "file_count": 22,
+      "prior_disposition": "owned-overlap-ordinary",
+      "reason": "Unused by projects/ pack after e2e/universal retirement."
+    },
+    {
+      "path": "src/material/checkbox",
+      "file_count": 21,
+      "prior_disposition": "owned-overlap-ordinary",
+      "reason": "Unused by projects/ pack after e2e/universal retirement."
+    },
+    {
+      "path": "src/material/chips",
+      "file_count": 55,
+      "prior_disposition": "owned-overlap-ordinary",
+      "reason": "Unused by projects/ pack after e2e/universal retirement."
+    },
+    {
+      "path": "src/material/dialog",
+      "file_count": 30,
+      "prior_disposition": "owned-overlap-ordinary",
+      "reason": "Unused by projects/ pack after e2e/universal retirement."
+    },
+    {
+      "path": "src/material/form-field",
+      "file_count": 52,
+      "prior_disposition": "owned-overlap-ordinary",
+      "reason": "Unused by projects/ pack after e2e/universal retirement."
+    },
+    {
+      "path": "src/material/input",
+      "file_count": 24,
+      "prior_disposition": "owned-overlap-ordinary",
+      "reason": "Unused by projects/ pack after e2e/universal retirement."
+    },
+    {
+      "path": "src/material/list",
+      "file_count": 37,
+      "prior_disposition": "owned-overlap-ordinary",
+      "reason": "Unused by projects/ pack after e2e/universal retirement."
+    },
+    {
+      "path": "src/material/menu",
+      "file_count": 27,
+      "prior_disposition": "owned-overlap-ordinary",
+      "reason": "Unused by projects/ pack after e2e/universal retirement."
+    },
+    {
+      "path": "src/material/paginator",
+      "file_count": 21,
+      "prior_disposition": "owned-overlap-ordinary",
+      "reason": "Unused by projects/ pack after e2e/universal retirement."
+    },
+    {
+      "path": "src/material/progress-bar",
+      "file_count": 19,
+      "prior_disposition": "owned-overlap-ordinary",
+      "reason": "Unused by projects/ pack after e2e/universal retirement."
+    },
+    {
+      "path": "src/material/progress-spinner",
+      "file_count": 19,
+      "prior_disposition": "owned-overlap-ordinary",
+      "reason": "Unused by projects/ pack after e2e/universal retirement."
+    },
+    {
+      "path": "src/material/radio",
+      "file_count": 19,
+      "prior_disposition": "owned-overlap-ordinary",
+      "reason": "Unused by projects/ pack after e2e/universal retirement."
+    },
+    {
+      "path": "src/material/select",
+      "file_count": 21,
+      "prior_disposition": "owned-overlap-ordinary",
+      "reason": "Unused by projects/ pack after e2e/universal retirement."
+    },
+    {
+      "path": "src/material/slide-toggle",
+      "file_count": 21,
+      "prior_disposition": "owned-overlap-ordinary",
+      "reason": "Unused by projects/ pack after e2e/universal retirement."
+    },
+    {
+      "path": "src/material/slider",
+      "file_count": 25,
+      "prior_disposition": "owned-overlap-ordinary",
+      "reason": "Unused by projects/ pack after e2e/universal retirement."
+    },
+    {
+      "path": "src/material/snack-bar",
+      "file_count": 27,
+      "prior_disposition": "owned-overlap-ordinary",
+      "reason": "Unused by projects/ pack after e2e/universal retirement."
+    },
+    {
+      "path": "src/material/tabs",
+      "file_count": 50,
+      "prior_disposition": "owned-overlap-ordinary",
+      "reason": "Unused by projects/ pack after e2e/universal retirement."
+    },
+    {
+      "path": "src/material/tooltip",
+      "file_count": 20,
+      "prior_disposition": "owned-overlap-ordinary",
+      "reason": "Unused by projects/ pack after e2e/universal retirement."
+    },
+    {
+      "path": "src/material/schematics",
+      "file_count": 156,
+      "prior_disposition": "retained-review",
+      "reason": "Historical Material schematics; owned migrate-legacy + CLI live under projects/.../schematics/."
+    },
+    {
+      "path": "src/material/testing",
+      "file_count": 4,
+      "prior_disposition": "retained-review",
+      "reason": "Hollow month-constants helper; unused by pack."
+    },
+    {
+      "path": "src/material/prebuilt-themes",
+      "file_count": 1,
+      "prior_disposition": "retained-review",
+      "reason": "Bazel genrule stub pointing at deleted core CSS; owned prebuilt SCSS under projects/.../styles/."
+    }
+  ],
+  "updated_parents": [
+    ".github/CODEOWNERS",
+    "goldens/tsec-exemption.json",
+    "src/material/config.bzl",
+    "src/material/BUILD.bazel",
+    "src/material/_index.scss",
+    "src/material/_theming.scss",
+    "src/material/_token-theming.scss",
+    "src/tsconfig-legacy.json",
+    "tsconfig.json",
+    "tslint.json",
+    "tools/defaults.bzl",
+    "scripts/check-package-externals.ts",
+    "scripts/detect-component-id-collisions.ts",
+    ".prettierignore",
+    ".ng-dev/google-sync-config.json",
+    ".ng-dev/commit-message.mts",
+    "src/material-moment-adapter/BUILD.bazel",
+    "src/material-experimental/selection/BUILD.bazel"
+  ],
+  "retained_src_top_level": [
+    "BUILD.bazel",
+    "README.md",
+    "bazel-tsconfig-build.json",
+    "bazel-tsconfig-test.json",
+    "cdk",
+    "cdk-experimental",
+    "circular-deps-test.conf.js",
+    "dev-mode-types.d.ts",
+    "google-maps",
+    "material",
+    "material-date-fns-adapter",
+    "material-experimental",
+    "material-luxon-adapter",
+    "material-moment-adapter",
+    "tsconfig-legacy.json",
+    "tsconfig-tsec.json",
+    "youtube-player"
+  ],
+  "retained_under_src_material": [
+    "BUILD.bazel",
+    "_index.scss",
+    "_theming.scss",
+    "_token-theming.scss",
+    "config.bzl",
+    "index.ts",
+    "package-base.json",
+    "tsconfig.json"
+  ],
+  "retained_rationale": {
+    "cdk": "Residual Bazel/integration graphs; pack uses @angular/cdk peer. Document retention.",
+    "cdk-experimental": "Same as cdk.",
+    "google-maps": "Not shipped by this package; residual Bazel/public_api_guard. Document retention.",
+    "youtube-player": "Same as google-maps.",
+    "material-*-adapter": "Date adapters unused by pack; residual Bazel still references deleted core. Document retention.",
+    "material-experimental": "Unused by pack; residual Bazel. Document retention.",
+    "src/material hollow facade": "Empty entrypoints + Sass stubs so residual Bazel parents still load."
+  },
+  "post_delete_verification": {
+    "projects_closure": "compatibility/inventories/source-closure-projects-HEAD.json",
+    "visited_file_count": 450,
+    "root_file_count": 32,
+    "visited_under_src": 0,
+    "unresolved_relative": 0,
+    "pack_tarball": "compatibility/pack-proof/ngx-compat-material-legacy-22.0.0-rc.0.tgz",
+    "pack_sha256": "308dbd4b5379000ab7ab5a6d51670c5cc512ccfc1b62147fc16aa2491e92a8de",
+    "pack_src_material_members": 0,
+    "aot_harness_smoke": "compatibility/pack-proof/aot-harness-smoke.json",
+    "motion_lifecycle_smoke": "compatibility/pack-proof/motion-lifecycle-smoke.json"
+  }
+}
