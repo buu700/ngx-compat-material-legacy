@@ -20,7 +20,7 @@ Package `@ngx-compat/material-legacy@22.0.0-rc.0` on `main`
 | `@angular/animations` truly optional (no primary FESM import) | **Done** | Opt-in `/animations` only |
 | W10 21.x line | **Done (branch)** | |
 | `src/` mass-delete | **Blocked** (narrow OK) | Legacy→core escape **0**; prebuilt themes mirror deleted; core/companions retained |
-| CI green | **Done** | https://github.com/buu700/ngx-compat-material-legacy/actions/runs/35937085984 on `33a7ad5a1` |
+| CI green | **Done** | https://github.com/buu700/ngx-compat-material-legacy/actions/runs/35937180527 on `67c3a9a44` |
 
 ## Left for (honest)
 
@@ -29,6 +29,7 @@ Package `@ngx-compat/material-legacy@22.0.0-rc.0` on `main`
 | npm publish | **Owner only** |
 | `src/` mass-delete | **Blocked** — core/companions retained (projects/pack unused; historical src/ still refs); legacy mirrors + `legacy-prebuilt-themes` deleted |
 | Consumers of primary-path `matLegacy*Animations` | Migrate imports to `…/animations` |
+| Library-surface `src/` escape/closure | **Closed** — projects/pack unused for core/companions; mass-delete still deferred for historical Bazel/demo graphs |
 
 ## Motion summary
 
