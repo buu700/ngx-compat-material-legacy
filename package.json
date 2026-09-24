@@ -10,7 +10,12 @@
     "check:toolchain": "python3 scripts/check-toolchain.py --runtime",
     "check:release-toolchain": "python3 scripts/check-toolchain.py --runtime --release --require-bootstrap-evidence tooling-release-evidence.json",
     "build:lib": "node scripts/pack-library.mjs",
-    "pack:lib": "node scripts/pack-library.mjs"
+    "pack:lib": "node scripts/pack-library.mjs",
+    "test:legacy": "node scripts/run-legacy-tests.mjs",
+    "test:legacy:fail-proof": "LEGACY_TESTS_EXPECT_FAIL=1 node scripts/run-legacy-tests.mjs",
+    "pack:lib:ci": "node scripts/pack-library.mjs --out artifacts/local/main --line main",
+    "test:packed-consumer": "node scripts/packed-consumer-aot-smoke.mjs",
+    "test:fresh-artifact-negatives": "node scripts/fresh-artifact-negative-tests.mjs"
   },
   "description": "Private build workspace. Published library metadata belongs to its own project manifest.",
   "devDependencies": {
@@ -25,6 +30,13 @@
     "@angular/material": "22.1.7",
     "@angular/platform-browser": "22.1.7",
     "@angular/platform-browser-dynamic": "22.1.7",
+    "@types/jasmine": "5.1.7",
+    "esbuild": "0.25.5",
+    "jasmine-core": "5.6.0",
+    "karma": "6.4.4",
+    "karma-chrome-launcher": "3.2.0",
+    "karma-jasmine": "5.1.0",
+    "karma-jasmine-html-reporter": "2.1.0",
     "ng-packagr": "22.1.1",
     "rxjs": "7.8.2",
     "sass": "1.104.1",

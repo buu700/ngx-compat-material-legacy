@@ -3,9 +3,9 @@
   "mode": "completion-plan",
   "package": "@ngx-compat/material-legacy",
   "repository": "buu700/ngx-compat-material-legacy",
-  "updated_at": "2026-09-24T03:08:52Z",
-  "updated_by_task": "F02-F04",
-  "head_at_update": "b19480d15815e6ca463522f869529cda8606198e",
+  "updated_at": "2026-09-24T03:09:52Z",
+  "updated_by_task": "F08+F10",
+  "head_at_update": "4d0d0f11b150e152a6237ac239ffc37636a1a95d",
   "claim_policy": "No gate is passed unless its RELEASE-GATES evidence exists for a fresh artifact. Prior STATUS 'Done' rows are historical claims under investigation, not acceptance.",
   "tasks": [
     {
@@ -95,10 +95,19 @@
     {
       "id": "F08",
       "title": "Historical behavior tests",
-      "status": "not-started",
-      "evidence": [],
-      "notes": "Depends on F00.",
-      "source_revision": null
+      "status": "in-progress",
+      "evidence": [
+        "compatibility/f08/README.md",
+        "compatibility/f08/legacy-test-results.normal.json",
+        "compatibility/f08/legacy-test-results.fail-proof.json",
+        "compatibility/f08/port-manifest.json",
+        "compatibility/f08/blockers.md",
+        "compatibility/f08/priority-fetch-receipt.json",
+        "testing/legacy-runner/",
+        "scripts/run-legacy-tests.mjs"
+      ],
+      "notes": "Runner proven (35 executed; button+harness). Deliberate-fail proof OK. 6 button assertion failures. 35 priority specs fetched unadapted; full port open. G09 not passed.",
+      "source_revision": "4d0d0f11b150e152a6237ac239ffc37636a1a95d"
     },
     {
       "id": "F09",
@@ -111,10 +120,18 @@
     {
       "id": "F10",
       "title": "Security/upstream audit",
-      "status": "not-started",
-      "evidence": [],
-      "notes": "Depends on F00.",
-      "source_revision": null
+      "status": "in-progress",
+      "evidence": [
+        "compatibility/f10/README.md",
+        "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+        "compatibility/f10/upstream-sha-risk-bootstrap.json",
+        "compatibility/f10/authored-dependency-inventory-seed.json",
+        "compatibility/f10/retained-material-deps-inventory.json",
+        "compatibility/f10/security-deep-leads.md",
+        "compatibility/advisory-triage.md"
+      ],
+      "notes": "1697-SHA inventory + risk bootstrap (not dispositions). Symbol/material seed inventories. Advisory refresh still open. G11 not passed.",
+      "source_revision": "4d0d0f11b150e152a6237ac239ffc37636a1a95d"
     },
     {
       "id": "F11",
@@ -199,9 +216,11 @@
     {
       "id": "G09",
       "title": "Historical behavior suite",
-      "status": "not-started",
-      "evidence": [],
-      "notes": null
+      "status": "in-progress",
+      "evidence": [
+        "compatibility/f08/"
+      ],
+      "notes": "Runner bootstrap only; suite incomplete; button failures open."
     },
     {
       "id": "G10",
@@ -213,9 +232,11 @@
     {
       "id": "G11",
       "title": "Upstream and security disposition",
-      "status": "not-started",
-      "evidence": [],
-      "notes": null
+      "status": "in-progress",
+      "evidence": [
+        "compatibility/f10/"
+      ],
+      "notes": "Inventories bootstrapped; dispositions incomplete; do not treat as pass."
     },
     {
       "id": "G12",

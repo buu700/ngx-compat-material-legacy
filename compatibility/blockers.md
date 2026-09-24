@@ -47,7 +47,12 @@ remove → local replace → vendor-only-if-required.
 
 ## B-TEST-01 — Historical behavior suite not executed (open; F08)
 
-Original inventory ~57 spec paths; execution not demonstrated as release evidence.
+Runner proven (`test:legacy`) with button/harness (35 executed, 6 button failures). Full 57-spec port + reconciliation still open — see `compatibility/f08/blockers.md`.
+
+## B-F10-01 — Upstream/security audit incomplete (open; F10)
+
+1697-SHA inventory and heuristic risk buckets exist under `compatibility/f10/`. Dispositions,
+symbol completeness, advisory refresh, and peer-inherited fix proofs remain open. **G11 not passed.**
 
 ## B-PUB-01 — npm publish (owner-only)
 

@@ -34,9 +34,9 @@ to `compatibility/pack-proof/historical-unbound/` and unbound from smoke default
 | F05 migration safety | not-started |
 | F06 theme bridges/coexistence | not-started |
 | F07 archived Sass dependencies | not-started |
-| F08 historical behavior tests | not-started |
+| F08 historical behavior tests | **in-progress** (runner proven; ports open) |
 | F09 real-browser contracts | not-started |
-| F10 security/upstream audit | not-started |
+| F10 security/upstream audit | **in-progress** (inventories; G11 not passed) |
 | F11 final support-line validation | not-started |
 | F12 readiness/handoff | not-started |
 
@@ -70,3 +70,8 @@ G12: **in-progress** (F00 bootstrap receipts only; F11 final artifacts outstandi
 - Author/committer: Ryan Lester <hacker@linux.com> only (no Co-authored-by)
 - Push via `/home/box/.local/bin/ngx-git-push`
 - No npm publish; Cyph oracle-only
+
+## F08/F10 bootstrap (2026-09-23 evening ET)
+
+- F08: `pnpm run test:legacy` executes button + harness (35 cases). Fail-proof OK. See `compatibility/f08/`.
+- F10: 1697-SHA inventory + risk/symbol/material seeds under `compatibility/f10/`. **G11 not passed.**

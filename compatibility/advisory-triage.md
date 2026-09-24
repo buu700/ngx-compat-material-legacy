@@ -106,3 +106,7 @@ minor). No library code change required.
 - Advertised peer floor **tightened to `^22.1.7`** (applied on unpublished RC tip).
 - Advisory review for the aged peer set remains **closed for this RC wave**;
   re-check GHSA/OSV immediately before any npm publish.
+
+## F10 bootstrap note (2026-09-23 evening ET)
+
+F10 inventory bootstrapped under `compatibility/f10/`. This advisory document remains a **seed**; full OSV/GHSA refresh against the exact lockfile + retained `@material/*` closure is **open**. G11 not passed.

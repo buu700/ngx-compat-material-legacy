@@ -1,9 +1,9 @@
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {ApplicationRef, Component, DebugElement} from '@angular/core';
 import {By} from '@angular/platform-browser';
-import {MatLegacyButtonModule, MatLegacyButton} from './index';
+import {MatLegacyButtonModule, MatLegacyButton} from '@ngx-compat/material-legacy/legacy-button';
 import {MatRipple, ThemePalette} from '@angular/material/core';
-import {createMouseEvent, dispatchEvent} from '@angular/cdk/testing/private';
+import {createMouseEvent, dispatchEvent} from '../../../testing/legacy-runner/shims/cdk-testing-private';
 
 describe('MatLegacyButton', () => {
   beforeEach(waitForAsync(() => {
@@ -343,6 +343,7 @@ describe('MatLegacyButton', () => {
 
 /** Test component that contains an MatLegacyButton. */
 @Component({
+  standalone: false,
   selector: 'test-app',
   template: `
     <button [tabIndex]="tabIndex" mat-button type="button" (click)="increment()"
