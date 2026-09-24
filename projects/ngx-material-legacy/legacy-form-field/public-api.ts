@@ -71,6 +71,6 @@ export {
   MAT_PREFIX as MAT_LEGACY_PREFIX,
 } from '@angular/material/form-field';
 
-// Historical recipes: `@ngx-compat/material-legacy/legacy-form-field/animations`.
+// Historical `/animations` recipe secondary removed (F04); use CSS/Web Animations via MATERIAL_ANIMATIONS.
 
 export {MatCommonModule} from './internal/common-module';

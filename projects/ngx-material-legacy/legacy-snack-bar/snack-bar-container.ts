@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  *
  * CSS keyframe motion (Material 22-style). Recipe metadata lives under
- * `@ngx-compat/material-legacy/legacy-snack-bar/animations`.
+ * native CSS motion (historical `/animations` recipe secondary removed in F04).
  */
 
 import {ChangeDetectionStrategy, Component, ViewEncapsulation} from '@angular/core';

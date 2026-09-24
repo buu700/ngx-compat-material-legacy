@@ -7,7 +7,7 @@
  */
 
 export {MatLegacySelectModule} from './select-module';
-// Historical recipes: `@ngx-compat/material-legacy/legacy-select/animations`.
+// Historical `/animations` recipe secondary removed (F04); use CSS/Web Animations via MATERIAL_ANIMATIONS.
 export {
   MatLegacySelectChange,
   MatLegacySelect,

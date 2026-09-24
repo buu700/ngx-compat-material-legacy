@@ -12,7 +12,7 @@ export {MatLegacyMenuTrigger} from './menu-trigger';
 export {MatLegacyMenuModule} from './menu-module';
 export {MatLegacyMenuContent} from './menu-content';
 // Historical AnimationTriggerMetadata recipes moved to
-// `@ngx-compat/material-legacy/legacy-menu/animations`.
+// native CSS motion (historical `/animations` recipe secondary removed in F04).
 export {_MatMenuBase as _MatLegacyMenuBase} from './internal/menu-base';
 export {_MatMenuTriggerBase as _MatLegacyMenuTriggerBase} from './internal/menu-trigger-base';
 export {_MatMenuContentBase as _MatLegacyMenuContentBase} from './internal/menu-content-base';

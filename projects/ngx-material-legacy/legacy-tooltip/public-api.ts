@@ -9,7 +9,7 @@
 export {MatLegacyTooltipModule} from './tooltip-module';
 export {MatLegacyTooltip, LegacyTooltipComponent} from './tooltip';
 // Historical AnimationTriggerMetadata recipe moved to
-// `@ngx-compat/material-legacy/legacy-tooltip/animations`.
+// native CSS motion (historical `/animations` recipe secondary removed in F04).
 export {
   _MatTooltipBase as _MatLegacyTooltipBase,
   _TooltipComponentBase as _LegacyTooltipComponentBase,
