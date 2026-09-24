@@ -378,9 +378,9 @@ def ng_web_test_suite(deps = [], static_css = [], exclude_init_script = False, *
     # that is needed for measuring, will unexpectedly fail. Also always adding a prebuilt theme
     # reduces the amount of setup that is needed to create a test suite Bazel target. Note that the
     # prebuilt theme will be also added to CDK test suites but shouldn't affect anything.
+    # Historical prebuilt-themes + legacy-core CSS targets retired 2026-09-23.
+    # Owned prebuilt SCSS packs from projects/ngx-material-legacy/styles/.
     static_css = static_css + [
-        "//src/material/prebuilt-themes:indigo-pink",
-        "//src/material/legacy-core:indigo_pink_prebuilt",
     ]
 
     # Workaround for https://github.com/bazelbuild/rules_typescript/issues/301
