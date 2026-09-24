@@ -11,8 +11,6 @@ const errors: string[] = [];
 const seenMetadata = new Map<string, ts.ClassDeclaration>();
 const fileToCheck = join(__dirname, '../src/**/!(*.spec).ts');
 const ignoredPatterns = [
-  '**/components-examples/**',
-  '**/dev-app/**',
   '**/e2e-app/**',
   '**/universal-app/**',
 ];

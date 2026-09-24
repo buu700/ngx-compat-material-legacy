@@ -75,16 +75,3 @@ setup_entry_point_externals(
     "material-experimental",
     MATERIAL_EXPERIMENTAL_ENTRYPOINTS + MATERIAL_EXPERIMENTAL_TESTING_ENTRYPOINTS,
 )
-
-# External module names in the examples package. Individual examples are grouped
-# by package and component, so we add configure such entry-points as external.
-setup_entry_point_externals("components-examples/cdk", CDK_ENTRYPOINTS)
-setup_entry_point_externals("components-examples/cdk-experimental", CDK_EXPERIMENTAL_ENTRYPOINTS)
-setup_entry_point_externals(
-    "components-examples/material",
-    MATERIAL_ENTRYPOINTS + MATERIAL_TESTING_ENTRYPOINTS,
-)
-setup_entry_point_externals(
-    "components-examples/material-experimental",
-    MATERIAL_EXPERIMENTAL_ENTRYPOINTS + MATERIAL_EXPERIMENTAL_TESTING_ENTRYPOINTS,
-)
