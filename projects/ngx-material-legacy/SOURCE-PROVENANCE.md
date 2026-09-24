@@ -19,8 +19,10 @@ companions were retired 2026-09-23 (`src-scaffolding-retire-2026-09-23.json`).
 `src/e2e-app` / `src/universal-app`, owned-overlap ordinary dirs, and hollow
 schematics/testing/prebuilt-themes were retired 2026-09-23
 (`src-e2e-universal-ordinary-retire-2026-09-23.json`). Residual `src/cdk*`,
-maps, youtube, adapters, and material-experimental remain as documented
-historical reference only (not on the pack path).
+maps, youtube, adapters, material-experimental, and the hollow `src/material`
+facade were retired 2026-09-23
+(`src-residual-packages-retire-2026-09-23.json`); `src/` now holds only a
+retirement README.
 
 See `compatibility/inventories/sass-facade-copy-manifest.json`.
 

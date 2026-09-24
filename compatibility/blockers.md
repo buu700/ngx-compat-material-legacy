@@ -17,12 +17,10 @@ tightened to **`^22.1.7`**. Re-check advisories immediately before npm publish.
 **Mitigated for component scope + full historical testing + migrate-legacy + bundled CLI.**
 
 ### Still open
-- **`src/` mass-delete** — **narrowly advanced**. Unresolved relative **0**;
-  legacy→ordinary escape **0**. Also deleted: `src/e2e-app`, `src/universal-app`,
-  owned-overlap ordinary dirs, hollow schematics/testing/prebuilt-themes
-  (`src-e2e-universal-ordinary-retire-2026-09-23.json`). **Retained (documented):**
-  `src/cdk*`, google-maps, youtube-player, date adapters, material-experimental.
-  See `src-cleanup-plan.md`.
+- **`src/` mass-delete** — **done (narrow)**. Unresolved relative **0**;
+  legacy→ordinary escape **0**. Residual non-Material packages + hollow
+  `src/material` facade deleted (`src-residual-packages-retire-2026-09-23.json`);
+  `src/` holds README only. See `src-cleanup-plan.md`.
 - **Maintainer-authorized npm publish** — owner-only after packed-artifact checks.
 - **`21.x` maintenance line** — packs + Node 20.19 consumer smoke on branch; keep the
   Angular 21 lockfile off `main` (`compatibility/support-matrix.md`).
@@ -46,7 +44,8 @@ opt-in `/animations` recipe entries only (by design for API compat).
 **Mitigated → 0.** Was 68 lexical `.import` false-negatives + placeholders. Resolver
 maps `.import` → `_*.import.scss`, strips comments, ignores `<...>` placeholders.
 **Unresolved relative closed.** Legacy→core escape edges cleared by narrow mirror
-delete; owned-overlap ordinary dirs + e2e/universal retired 2026-09-23; residual cdk*/maps/youtube/adapters/experimental retained and documented.
+delete; owned-overlap ordinary dirs + e2e/universal + residual non-Material packages
+retired 2026-09-23.
 
 ## B-21-01 — 21.x library rebuild
 **Mitigated on branch.** `21.x` packs against aged Angular 21.2.23 / Material 21.2.14
@@ -65,4 +64,6 @@ publish to `lts-21-next` later. **Do not merge 21 lockfile into `main`.**
 - No mass-delete of `src/`. Narrow deletes require provenance JSON + closure proof
   (2026-09-23 batches: `src-legacy-mirror-delete-2026-09-23.json`,
   `src-legacy-prebuilt-themes-delete-2026-09-23.json`,
-  `src-scaffolding-retire-2026-09-23.json`).
+  `src-scaffolding-retire-2026-09-23.json`,
+  `src-e2e-universal-ordinary-retire-2026-09-23.json`,
+  `src-residual-packages-retire-2026-09-23.json`).

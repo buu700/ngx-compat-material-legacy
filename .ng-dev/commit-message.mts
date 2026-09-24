@@ -2,6 +2,8 @@ import {CommitMessageConfig} from '@angular/ng-dev';
 
 /**
  * The configuration for `ng-dev commit-message` commands.
+ * Upstream src/* package scopes retired 2026-09-23; library work lives under
+ * projects/ngx-material-legacy (use scope "multiple" or docs).
  */
 export const commitMessage: CommitMessageConfig = {
   maxLineLength: Infinity,
@@ -9,45 +11,5 @@ export const commitMessage: CommitMessageConfig = {
   minBodyLengthTypeExcludes: ['docs'],
   scopes: [
     'multiple', // For when a commit applies to multiple components.
-    'cdk-experimental/column-resize',
-    'cdk-experimental/combobox',
-    'cdk-experimental/popover-edit',
-    'cdk-experimental/scrolling',
-    'cdk-experimental/selection',
-    'cdk-experimental/table-scroll-container',
-    'cdk/a11y',
-    'cdk/accordion',
-    'cdk/bidi',
-    'cdk/clipboard',
-    'cdk/coercion',
-    'cdk/collections',
-    'cdk/dialog',
-    'cdk/drag-drop',
-    'cdk/keycodes',
-    'cdk/layout',
-    'cdk/listbox',
-    'cdk/menu',
-    'cdk/observers',
-    'cdk/overlay',
-    'cdk/platform',
-    'cdk/portal',
-    'cdk/schematics',
-    'cdk/scrolling',
-    'cdk/stepper',
-    'cdk/table',
-    'cdk/testing',
-    'cdk/text-field',
-    'cdk/tree',
-    'google-maps',
-    'material-experimental/column-resize',
-    'material-experimental/theming',
-    'material-experimental/menubar',
-    'material-experimental/popover-edit',
-    'material-experimental/selection',
-    'material/theming',
-    'material-moment-adapter',
-    'material-date-fns-adapter',
-    'material-luxon-adapter',
-    'youtube-player',
   ],
 };
