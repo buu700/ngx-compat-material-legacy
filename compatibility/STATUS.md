@@ -67,3 +67,9 @@ See `motion-animations-import-graph.md`, `motion-overlay-trio.md`.
 - Author/committer: Ryan Lester <hacker@linux.com> only (no Co-authored-by)
 - Push via `/home/box/.local/bin/ngx-git-push`
 - No npm publish; Cyph oracle-only
+
+
+## F02–F04 port (21.x)
+
+Source fixes cherry-picked from main (aliases, owned private deps, engine-free recipes).
+Full two-line gate evidence remains F11.

@@ -27,7 +27,12 @@ import {
   Optional,
   Output,
 } from '@angular/core';
-import {MAT_RIPPLE_GLOBAL_OPTIONS, RippleConfig, RippleGlobalOptions, RippleRenderer, RippleTarget} from '@angular/material/core';
+import {MAT_RIPPLE_GLOBAL_OPTIONS, RippleGlobalOptions} from '@angular/material/core';
+import {
+  LegacyRippleConfig as RippleConfig,
+  LegacyRippleRenderer as RippleRenderer,
+  LegacyRippleTarget as RippleTarget,
+} from '@ngx-compat/material-legacy/legacy-core';
 import {CanColor, CanDisable, CanDisableRipple, HasTabIndex, mixinColor, mixinDisableRipple, mixinTabIndex} from './internal/common-behaviors';
 import {Subject} from 'rxjs';
 import {take} from 'rxjs/operators';

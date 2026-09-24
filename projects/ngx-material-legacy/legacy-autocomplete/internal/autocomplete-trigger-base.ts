@@ -29,7 +29,7 @@ import {DOCUMENT} from '@angular/common';
 import {Directionality} from '@angular/cdk/bidi';
 import {BooleanInput, coerceBooleanProperty} from '@angular/cdk/coercion';
 import {DOWN_ARROW, ENTER, ESCAPE, TAB, UP_ARROW, hasModifierKey} from '@angular/cdk/keycodes';
-import {_getEventTarget} from '@angular/cdk/platform';
+import {legacyGetEventTarget} from '@ngx-compat/material-legacy/legacy-core';
 import {TemplatePortal} from '@angular/cdk/portal';
 import {ViewportRuler} from '@angular/cdk/scrolling';
 import {
@@ -358,7 +358,7 @@ export abstract class _MatAutocompleteTriggerBase
       filter(event => {
         // If we're in the Shadow DOM, the event target will be the shadow root, so we have to
         // fall back to check the first element in the path of the click event.
-        const clickTarget = _getEventTarget<HTMLElement>(event)!;
+        const clickTarget = legacyGetEventTarget<HTMLElement>(event)!;
         const formField = this._formField ? this._formField._elementRef.nativeElement : null;
         const customOrigin = this.connectedTo ? this.connectedTo.elementRef.nativeElement : null;
 

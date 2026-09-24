@@ -29,7 +29,11 @@ import {
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import {MAT_RIPPLE_GLOBAL_OPTIONS, RippleConfig, RippleGlobalOptions, RippleTarget, ThemePalette} from '@angular/material/core';
+import {MAT_RIPPLE_GLOBAL_OPTIONS, RippleGlobalOptions, ThemePalette} from '@angular/material/core';
+import {
+  LegacyRippleConfig as RippleConfig,
+  LegacyRippleTarget as RippleTarget,
+} from '@ngx-compat/material-legacy/legacy-core';
 import {CanDisable, CanDisableRipple, HasTabIndex, mixinDisabled, mixinDisableRipple, mixinTabIndex} from './common-behaviors';
 import {FocusableOption, FocusMonitor} from '@angular/cdk/a11y';
 import {Directionality} from '@angular/cdk/bidi';

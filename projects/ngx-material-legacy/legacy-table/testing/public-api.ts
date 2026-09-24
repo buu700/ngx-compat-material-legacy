@@ -24,7 +24,12 @@ export {
    */
   _MatTableHarnessBase as _MatLegacyTableHarnessBase,
 } from './table-harness-base';
+export {_MatLegacyCellHarnessBase} from './internal/cell-harness-base';
 export {
+  _MatLegacyRowHarnessBase,
+  MatLegacyRowHarnessColumnsText,
+} from './internal/row-harness-base';
+export type {
   /**
    * @deprecated Use `CellHarnessFilters` from `@angular/material/table/testing` instead.
    * @breaking-change 17.0.0
@@ -44,26 +49,8 @@ export {
   TableHarnessFilters as LegacyTableHarnessFilters,
 
   /**
-   * @deprecated Use `MatRowHarnessColumnsText` from `@angular/material/table/testing` instead.
-   * @breaking-change 17.0.0
-   */
-  MatRowHarnessColumnsText as MatLegacyRowHarnessColumnsText,
-
-  /**
    * @deprecated Use `MatTableHarnessColumnsText` from `@angular/material/table/testing` instead.
    * @breaking-change 17.0.0
    */
   MatTableHarnessColumnsText as MatLegacyTableHarnessColumnsText,
-
-  /**
-   * @deprecated Use `_MatCellHarnessBase` from `@angular/material/table/testing` instead.
-   * @breaking-change 17.0.0
-   */
-  _MatCellHarnessBase as _MatLegacyCellHarnessBase,
-
-  /**
-   * @deprecated Use `_MatRowHarnessBase` from `@angular/material/table/testing` instead.
-   * @breaking-change 17.0.0
-   */
-  _MatRowHarnessBase as _MatLegacyRowHarnessBase,
 } from '@angular/material/table/testing';

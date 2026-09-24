@@ -45,7 +45,9 @@ export {
   MAT_TAB_CONTENT as MAT_LEGACY_TAB_CONTENT,
   MAT_TABS_CONFIG as MAT_LEGACY_TABS_CONFIG,
   MatTabsConfig as MatLegacyTabsConfig,
+} from '@angular/material/tabs';
+export {
   _MatInkBarPositioner as _MatLegacyInkBarPositioner,
   _MAT_INK_BAR_POSITIONER as _MAT_LEGACY_INK_BAR_POSITIONER,
-} from '@angular/material/tabs';
+} from './internal/ink-bar-shared';
 export {MatCommonModule} from './internal/common-module';

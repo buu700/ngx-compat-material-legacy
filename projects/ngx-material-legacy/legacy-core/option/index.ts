@@ -8,7 +8,8 @@
 
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {MatRippleModule, MatPseudoCheckboxModule} from '@angular/material/core';
+import {MatRippleModule} from '@angular/material/core';
+import {MatLegacyPseudoCheckboxModule as MatPseudoCheckboxModule} from '../pseudo-checkbox';
 import {MatCommonModule} from '../internal/common-module';
 import {MatLegacyOption} from './option';
 import {MatLegacyOptgroup} from './optgroup';

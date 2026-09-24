@@ -32,7 +32,8 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
-import {MatLine, setLines, ThemePalette} from '@angular/material/core';
+import {MatLine, ThemePalette} from '@angular/material/core';
+import {legacySetLines} from '@ngx-compat/material-legacy/legacy-core';
 import {CanDisableRipple, mixinDisableRipple} from './internal/common-behaviors';
 import {Subject} from 'rxjs';
 import {startWith, takeUntil} from 'rxjs/operators';
@@ -234,7 +235,7 @@ export class MatLegacyListOption
   }
 
   ngAfterContentInit() {
-    setLines(this._lines, this._element);
+    legacySetLines(this._lines, this._element);
   }
 
   ngOnDestroy(): void {

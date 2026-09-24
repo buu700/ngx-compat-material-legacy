@@ -24,7 +24,8 @@ import {
   Input,
   Inject,
 } from '@angular/core';
-import {MatLine, setLines} from '@angular/material/core';
+import {MatLine} from '@angular/material/core';
+import {legacySetLines} from '@ngx-compat/material-legacy/legacy-core';
 import {CanDisable, CanDisableRipple, mixinDisableRipple, mixinDisabled} from './internal/common-behaviors';
 import {MAT_LIST, MAT_NAV_LIST} from '@angular/material/list';
 import {Subject} from 'rxjs';
@@ -238,7 +239,7 @@ export class MatLegacyListItem
   private _disabled = false;
 
   ngAfterContentInit() {
-    setLines(this._lines, this._element);
+    legacySetLines(this._lines, this._element);
   }
 
   ngOnDestroy() {

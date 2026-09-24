@@ -7,24 +7,19 @@
  */
 
 import {HarnessPredicate} from '@angular/cdk/testing';
-import {_MatCellHarnessBase, CellHarnessFilters} from '@angular/material/table/testing';
+import {CellHarnessFilters} from '@angular/material/table/testing';
+import {_MatLegacyCellHarnessBase} from './internal/cell-harness-base';
 
 /**
  * Harness for interacting with a standard Angular Material table cell.
  * @deprecated Use `MatCellHarness` from `@angular/material/table/testing` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
  * @breaking-change 17.0.0
  */
-export class MatLegacyCellHarness extends _MatCellHarnessBase {
-  /** The selector for the host element of a `MatCellHarness` instance. */
+export class MatLegacyCellHarness extends _MatLegacyCellHarnessBase {
   static hostSelector = '.mat-cell';
 
-  /**
-   * Gets a `HarnessPredicate` that can be used to search for a table cell with specific attributes.
-   * @param options Options for narrowing the search
-   * @return a `HarnessPredicate` configured with the given options.
-   */
   static with(options: CellHarnessFilters = {}): HarnessPredicate<MatLegacyCellHarness> {
-    return _MatCellHarnessBase._getCellPredicate(this, options);
+    return _MatLegacyCellHarnessBase._getCellPredicate(this, options);
   }
 }
 
@@ -33,18 +28,11 @@ export class MatLegacyCellHarness extends _MatCellHarnessBase {
  * @deprecated Use `MatHeaderCellHarness` from `@angular/material/table/testing` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
  * @breaking-change 17.0.0
  */
-export class MatLegacyHeaderCellHarness extends _MatCellHarnessBase {
-  /** The selector for the host element of a `MatHeaderCellHarness` instance. */
+export class MatLegacyHeaderCellHarness extends _MatLegacyCellHarnessBase {
   static hostSelector = '.mat-header-cell';
 
-  /**
-   * Gets a `HarnessPredicate` that can be used to search for
-   * a table header cell with specific attributes.
-   * @param options Options for narrowing the search
-   * @return a `HarnessPredicate` configured with the given options.
-   */
   static with(options: CellHarnessFilters = {}): HarnessPredicate<MatLegacyHeaderCellHarness> {
-    return _MatCellHarnessBase._getCellPredicate(this, options);
+    return _MatLegacyCellHarnessBase._getCellPredicate(this, options);
   }
 }
 
@@ -53,17 +41,10 @@ export class MatLegacyHeaderCellHarness extends _MatCellHarnessBase {
  * @deprecated Use `MatFooterCellHarness` from `@angular/material/table/testing` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
  * @breaking-change 17.0.0
  */
-export class MatLegacyFooterCellHarness extends _MatCellHarnessBase {
-  /** The selector for the host element of a `MatFooterCellHarness` instance. */
+export class MatLegacyFooterCellHarness extends _MatLegacyCellHarnessBase {
   static hostSelector = '.mat-footer-cell';
 
-  /**
-   * Gets a `HarnessPredicate` that can be used to search for
-   * a table footer cell with specific attributes.
-   * @param options Options for narrowing the search
-   * @return a `HarnessPredicate` configured with the given options.
-   */
   static with(options: CellHarnessFilters = {}): HarnessPredicate<MatLegacyFooterCellHarness> {
-    return _MatCellHarnessBase._getCellPredicate(this, options);
+    return _MatLegacyCellHarnessBase._getCellPredicate(this, options);
   }
 }
