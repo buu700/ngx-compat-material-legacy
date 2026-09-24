@@ -8,8 +8,10 @@ compatibility facade. Google copyright headers in individual files are
 retained. This package does not `@forward` current `@angular/material`.
 
 TypeScript entry points are stubs until component worksheets are ported.
-Historical sources under repository `src/` remain until inventory-gated
-deletion.
+Historical `src/material/legacy-*` component mirrors that are fully owned under
+`projects/ngx-material-legacy/legacy-*` were narrow-deleted 2026-09-23
+(see `compatibility/inventories/src-legacy-mirror-delete-2026-09-23.json`).
+`src/material/core` and ordinary companions remain until further closure.
 
 See `compatibility/inventories/sass-facade-copy-manifest.json`.
 
