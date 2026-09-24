@@ -27,7 +27,6 @@ const configFile = ts.readJsonConfigFile(join(projectRoot, 'tsconfig.json'), ts.
 const parsedConfig = ts.parseJsonSourceFileConfigFileContent(configFile, ts.sys, projectRoot);
 const filesToCheckGlob = [
   'src/**/!(*.spec).ts',
-  '!src/+(e2e-app|universal-app)/**/*.ts',
   '!src/**/schematics/**/*.ts',
   '!src/**/tests/**/*.ts',
 ];

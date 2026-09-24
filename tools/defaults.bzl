@@ -58,7 +58,7 @@ def _compute_module_name(testonly):
         return None
 
     # Skip module name generation for internal apps which are not built as NPM package
-    # and not scoped under `@angular/`. This includes e2e-app, dev-app and universal-app.
+    # and not scoped under `@angular/`. Historical *-app trees retired 2026-09-23.
     if "-app" in current_pkg:
         return None
 
