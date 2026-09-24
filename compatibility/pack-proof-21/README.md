@@ -25,6 +25,7 @@ Dist-tags (owner publish later): `lts-21-next` / `lts-21`
 | `node20-consumer-smoke.json` | Sass + ESM + AOT + harness **ok** on Node **20.19.6** |
 | `node20-consumer-smoke-theme.css` | same theme CSS from Node 20.19 run |
 | `peer-install-smoke.json` | aged peer install record |
+| `post-merge-src-cleanup-smoke.json` | Re-pack after main src/ cleanup merge; 0 src/material; primary FESM animations-import-free |
 
 ### Node 20.19 matrix (2026-09-23)
 
