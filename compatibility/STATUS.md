@@ -20,7 +20,7 @@ Package `@ngx-compat/material-legacy@22.0.0-rc.0` on `main`
 | `@angular/animations` truly optional (no primary FESM import) | **Done** | Opt-in `/animations` only |
 | W10 21.x line | **Done (branch)** | |
 | `src/` mass-delete | **Narrow advanced** | e2e/universal + owned-overlap ordinary + schematics/testing/prebuilt deleted; cdk*/maps/youtube/adapters retained |
-| CI green | **Done** | https://github.com/buu700/ngx-compat-material-legacy/actions/runs/35939385410 on `b69a98949` |
+| CI green | **Done** | https://github.com/buu700/ngx-compat-material-legacy/actions/runs/35939891799 on `512569f0d` |
 
 ## Left for (honest)
 
