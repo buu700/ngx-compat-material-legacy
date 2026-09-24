@@ -8,7 +8,7 @@
 
 import {ComponentType} from '@angular/cdk/overlay';
 import {ChangeDetectionStrategy, Component, NgModule, ViewEncapsulation} from '@angular/core';
-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {MATERIAL_ANIMATIONS} from '@angular/material/core';
 import {
   MatLegacyDialog,
   MatLegacyDialogConfig,
@@ -19,7 +19,7 @@ import {_MatTestDialogOpenerBase} from './dialog-opener-base';
 
 /**
  * Test component that immediately opens a dialog when created.
- * @deprecated Use `MatTestDialogOpener` from `@angular/material/dialog/testing` instead.
+ * @deprecated Use `MatTestDialogOpener` from `@angular/material/dialog/testing` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
  * @breaking-change 17.0.0
  */
 @Component({
@@ -52,8 +52,13 @@ export class MatTestLegacyDialogOpener<T = unknown, R = unknown> extends _MatTes
   }
 }
 
+/**
+ * Testing module that opens a dialog immediately and disables Material motion via the
+ * public MATERIAL_ANIMATIONS token (engine-free; no NoopAnimationsModule).
+ */
 @NgModule({
   declarations: [MatTestLegacyDialogOpener],
-  imports: [MatLegacyDialogModule, NoopAnimationsModule],
+  imports: [MatLegacyDialogModule],
+  providers: [{provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}}],
 })
 export class MatTestLegacyDialogOpenerModule {}

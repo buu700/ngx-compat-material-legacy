@@ -17,6 +17,31 @@ MAX_FILE_BYTES = 32 * 1024 * 1024
 MAX_TOTAL_BYTES = 128 * 1024 * 1024
 
 
+# Matches real dependency edges only (import/export/require), not comments/docs.
+_MODULE_EDGE = re.compile(
+    r"""(?:
+          (?:^|[;{}\n])\s*import\s*(?:type\s+)?(?:[\w*{}$,\s]+\s+from\s*)?\s*['"]([^'"]+)['"]
+        | (?:^|[;{}\n])\s*export\s*(?:type\s+)?(?:\{[^}]*\}\s*from\s*|\*\s*(?:as\s+\w+\s+)?from\s*)\s*['"]([^'"]+)['"]
+        | \bimport\s*\(\s*['"]([^'"]+)['"]
+        | \brequire\s*\(\s*['"]([^'"]+)['"]
+        )""",
+    re.MULTILINE | re.VERBOSE,
+)
+
+
+def module_edges(text: str) -> list[str]:
+    out = []
+    for m in _MODULE_EDGE.finditer(text):
+        out.append(next(g for g in m.groups() if g is not None))
+    return out
+
+
+def is_engine_module(module: str) -> bool:
+    return bool(ENGINE_RE.fullmatch(module) or ENGINE_RE.match(module + '/'))
+
+
+
+
 def read_package(path: Path) -> dict[str, bytes]:
     """Read without extracting; reject links, traversal, duplicates and excessive payloads."""
     files: dict[str, bytes] = {}
@@ -160,10 +185,15 @@ def inspect_files(files: dict[str, bytes], entries: list[str]) -> dict[str, Any]
         if not name.endswith(('.mjs', '.cjs', '.js', '.d.ts')):
             continue
         text = data.decode('utf-8', errors='replace')
-        if ENGINE_RE.search(text):
-            errors.append(f'Deprecated animation reference in distributed runtime/types: {name}')
-        if OLD_LEGACY_RE.search(text):
-            errors.append(f'Old Material legacy import path in distributed runtime/types: {name}')
+        for module in module_edges(text):
+            if ENGINE_RE.fullmatch(module) or module.startswith('@angular/animations') \
+                    or module.startswith('@angular/platform-browser/animations'):
+                errors.append(f'Deprecated animation reference in distributed runtime/types: {name}')
+                break
+        for module in module_edges(text):
+            if OLD_LEGACY_RE.fullmatch(module) or module.startswith('@angular/material/legacy-'):
+                errors.append(f'Old Material legacy import path in distributed runtime/types: {name}')
+                break
     return {'ok': not errors, 'package': manifest.get('name'), 'version': version,
             'file_count': len(files), 'errors': errors, 'notes': notes}
 

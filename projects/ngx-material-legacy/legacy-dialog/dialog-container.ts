@@ -8,7 +8,7 @@
  * Legacy dialog container motion follows Material 22's CSS + timer pattern
  * (no `@angular/animations` engine on the primary entry). Historical
  * `matDialogAnimations` / `matLegacyDialogAnimations` recipes live under
- * `@ngx-compat/material-legacy/legacy-dialog/animations`.
+ * native CSS motion (historical `/animations` recipe secondary removed in F04).
  */
 
 import {
