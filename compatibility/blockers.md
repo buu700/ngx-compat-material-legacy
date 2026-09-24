@@ -20,8 +20,11 @@ tightened to **`^22.1.7`**. Re-check advisories immediately before npm publish.
 - **`src/` mass-delete** — still blocked for the remaining tree. Unresolved relative
   edges **0**; legacy→ordinary escape edges **0** after narrow delete of 22
   `src/material/legacy-*` mirrors (shared-core was 353 HEAD-before / 578 W01).
-  Retained: `src/material/core`, ordinary companions, `legacy-prebuilt-themes`.
-  See `compatibility/inventories/src-cleanup-plan.md`.
+  `legacy-prebuilt-themes` deleted (owned SCSS under projects; Bazel stub only).
+  Default src-legacy roots **0**. Retained: `src/material/core`, ordinary companions
+  (projects/pack unused-proof recorded; historical Bazel/demo still refs).
+  See `compatibility/inventories/src-cleanup-plan.md` and
+  `ordinary-companions-unused-proof-2026-09-23.json`.
 - **Maintainer-authorized npm publish** — owner-only after packed-artifact checks.
 - **`21.x` maintenance line** — packs + Node 20.19 consumer smoke on branch; keep the
   Angular 21 lockfile off `main` (`compatibility/support-matrix.md`).
@@ -62,4 +65,5 @@ publish to `lts-21-next` later. **Do not merge 21 lockfile into `main`.**
 - Isolated Material-16 env is local-only; never commit `node_modules`.
 - No npm publish from agent workstreams.
 - No mass-delete of `src/`. Narrow deletes require provenance JSON + closure proof
-  (2026-09-23 batch: `src-legacy-mirror-delete-2026-09-23.json`).
+  (2026-09-23 batches: `src-legacy-mirror-delete-2026-09-23.json`,
+  `src-legacy-prebuilt-themes-delete-2026-09-23.json`).

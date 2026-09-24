@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "source": "compatibility/inventories/legacy-escape-summary.json",
-  "baseline": "HEAD-after-src-legacy-mirror-delete",
+  "baseline": "HEAD-after-legacy-prebuilt-themes-delete",
   "policy": "No mass-delete of src/. Narrow deletes require closure evidence + provenance JSON.",
   "summary": {
     "legacy_to_ordinary_edge_count_before": 391,
@@ -10,7 +10,10 @@
     "shared_core_edges_after": 0,
     "unresolved_relative_count": 0,
     "projects_rooted_edges_into_src": 0,
-    "deleted_legacy_mirror_dirs": 22
+    "deleted_legacy_mirror_dirs": 22,
+    "legacy_prebuilt_themes_deleted": true,
+    "default_src_legacy_roots_remaining": 0,
+    "deleted_legacy_prebuilt_themes": 1
   },
   "ordinary_material_dir_classes": {
     "core": {
@@ -158,19 +161,16 @@
     "blocked_from_src_delete": [
       {
         "area": "src/material/core",
-        "reason": "retained-provenance",
+        "reason": "retained-provenance; projects/pack unused; historical src/ Bazel/demo still references",
         "class": "shared-core",
-        "edges_from_legacy_roots": 0
-      },
-      {
-        "area": "src/material/legacy-prebuilt-themes",
-        "reason": "src-only; no projects counterpart yet",
-        "class": "owned-overlap-ordinary"
+        "edges_from_legacy_roots": 0,
+        "projects_pack_unused": true
       },
       {
         "area": "ordinary companions (datepicker, expansion, \u2026)",
-        "reason": "historical reference; not in legacy package scope",
-        "class": "ordinary-current-companion"
+        "reason": "projects/pack unused; historical src/dev-app/examples/Bazel still reference",
+        "class": "ordinary-current-companion",
+        "projects_pack_unused": true
       }
     ],
     "safe_to_document_only": [
@@ -178,6 +178,9 @@
         "area": "Bazel BUILD trees unused by ng-packagr path",
         "note": "CI does not build the library via Bazel."
       }
+    ],
+    "safe_narrow_deleted_prebuilt_batch": [
+      "src/material/legacy-prebuilt-themes"
     ]
   },
   "delta_2026_09_23": {
@@ -197,5 +200,18 @@
       "projects/ngx-material-legacy/styles/core/selection/pseudo-checkbox/pseudo-checkbox.scss"
     ],
     "provenance": "compatibility/inventories/src-legacy-mirror-delete-2026-09-23.json"
+  },
+  "delta_2026_09_23_prebuilt": {
+    "legacy_prebuilt_themes": "deleted",
+    "owned_at": [
+      "projects/ngx-material-legacy/styles/legacy-core/theming/prebuilt/*.scss",
+      "projects/ngx-material-legacy/styles/core/theming/prebuilt/*.scss"
+    ],
+    "provenance": "compatibility/inventories/src-legacy-prebuilt-themes-delete-2026-09-23.json",
+    "ordinary_companions_unused_proof": "compatibility/inventories/ordinary-companions-unused-proof-2026-09-23.json",
+    "default_src_legacy_roots_before": [
+      "src/material/legacy-prebuilt-themes/BUILD.bazel"
+    ],
+    "default_src_legacy_roots_after": []
   }
 }

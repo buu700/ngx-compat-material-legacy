@@ -2,8 +2,9 @@
 
 Status: **narrow deletes advanced (2026-09-23).** Legacy→ordinary relative escape
 edges from `src/material/legacy-*` roots are **0** after deleting 22 superseded
-mirrors. Do **not** mass-delete remaining `src/` (core, ordinary companions,
-`legacy-prebuilt-themes`) without further provenance.
+mirrors. `src/material/legacy-prebuilt-themes` deleted (owned SCSS under
+`projects/.../styles/{core,legacy-core}/theming/prebuilt/`). Do **not** mass-delete
+remaining `src/` (core, ordinary companions) without further provenance.
 
 Classification worksheet:
 `compatibility/inventories/escape-edge-classification.json`
@@ -41,17 +42,21 @@ testing secondary entries pack. Schematics + bundled peer-light CLI live under
 - `src/material/{checkbox,menu,form-field,select,input,...}/testing` bases used as
   provenance for owned harness bases (or seal copies under `reference/`).
 - Inventories, goldens, and research packets under `compatibility/` / `research/`.
-- Relative unresolved count is **0** after resolver/comment fixes; shared-core and
-  ordinary companions still block `src/` deletion.
+- Relative unresolved count is **0**; default `src/material/legacy-*` roots are
+  **empty** after prebuilt-themes delete. Shared-core and ordinary companions still
+  block full `src/` mass-delete (historical Bazel/demo references).
 
 ## Next concrete steps
 
 1. Keep `escape-edge-classification.json` updated when ports land.
 2. Optionally re-run `python3 scripts/source-closure.py` against
    `projects/ngx-material-legacy` and attach unresolved edges.
-3. Next narrow candidates: `src/material/legacy-prebuilt-themes`, then unused
-   ordinary companions / `src/material/core` only with fresh unused proof.
-4. Prefer documenting over deleting if unsure.
+3. `src/material/legacy-prebuilt-themes` **DONE** — see
+   `src-legacy-prebuilt-themes-delete-2026-09-23.json`.
+4. Ordinary companions / `src/material/core`: projects/pack unused-proof recorded in
+   `ordinary-companions-unused-proof-2026-09-23.json`; **retain** while historical
+   `src/dev-app` / `src/components-examples` / Bazel graphs still reference them.
+5. Prefer documenting over deleting if unsure.
 
 ## Status check (2026-09-23 tip)
 
@@ -102,3 +107,24 @@ under `projects/ngx-material-legacy/styles/{core,legacy-core}/`.
 
 **Still no mass-delete of `src/`.** Retained: `src/material/core`, ordinary companions,
 `legacy-prebuilt-themes`. Pack via `node scripts/pack-library.mjs`.
+
+## Status check (2026-09-23 legacy-prebuilt-themes delete)
+
+**Owned:** `projects/.../styles/{core,legacy-core}/theming/prebuilt/*.scss` (already
+extracted in shared-core batch; packing via ng-packagr `styles/**/*.scss` assets).
+
+**Narrow delete:** `src/material/legacy-prebuilt-themes` (Bazel CSS genrule stub only).
+Provenance: `src-legacy-prebuilt-themes-delete-2026-09-23.json`.
+
+| Metric | After prebuilt delete |
+| --- | --- |
+| Legacy→ordinary relative edges | **0** |
+| Unresolved relative | **0** |
+| Projects-rooted visits under `src/` | **0** |
+| Default src-legacy roots | **0** (empty) |
+| Pack tarball `src/material` members | **0** |
+
+**Ordinary companions + `src/material/core`:** unused from projects/ + pack
+(`ordinary-companions-unused-proof-2026-09-23.json`) but **retained** — historical
+`src/dev-app`, `src/components-examples`, and Bazel BUILD graphs still reference them.
+Prefer docs over deletes. Pack via `node scripts/pack-library.mjs`.

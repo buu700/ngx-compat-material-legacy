@@ -11,7 +11,11 @@ TypeScript entry points are stubs until component worksheets are ported.
 Historical `src/material/legacy-*` component mirrors that are fully owned under
 `projects/ngx-material-legacy/legacy-*` were narrow-deleted 2026-09-23
 (see `compatibility/inventories/src-legacy-mirror-delete-2026-09-23.json`).
-`src/material/core` and ordinary companions remain until further closure.
+`src/material/legacy-prebuilt-themes` (Bazel CSS stub) deleted after owned SCSS
+landed under `styles/{core,legacy-core}/theming/prebuilt/`
+(`src-legacy-prebuilt-themes-delete-2026-09-23.json`).
+`src/material/core` and ordinary companions remain as historical provenance
+(projects/pack unused; see `ordinary-companions-unused-proof-2026-09-23.json`).
 
 See `compatibility/inventories/sass-facade-copy-manifest.json`.
 
