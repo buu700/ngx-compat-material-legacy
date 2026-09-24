@@ -28,9 +28,9 @@ to `compatibility/pack-proof/historical-unbound/` and unbound from smoke default
 | --- | --- |
 | F00 baselines + both-line bootstrap | **passed** (bootstrap only) |
 | F01 fresh-artifact CI | not-started |
-| F02 public API recovery | not-started |
-| F03 public upstream boundary | not-started |
-| F04 engine-free motion | not-started |
+| F02 public API recovery | **in-progress** (48 aliases restored; full audit open) |
+| F03 public upstream boundary | **in-progress** (private deps owned; scanner extended) |
+| F04 engine-free motion | **in-progress** (recipes/peer removed; consumer proof open) |
 | F05 migration safety | not-started |
 | F06 theme bridges/coexistence | not-started |
 | F07 archived Sass dependencies | not-started |
@@ -40,8 +40,8 @@ to `compatibility/pack-proof/historical-unbound/` and unbound from smoke default
 | F11 final support-line validation | not-started |
 | F12 readiness/handoff | not-started |
 
-Release gates G01–G11 / G13: **not-started**. G12: **in-progress** (F00 bootstrap
-receipts only; F11 final artifacts outstanding).
+Release gates G01/G05–G11/G13: **not-started**. G02–G04: **in-progress** (F02–F04).
+G12: **in-progress** (F00 bootstrap receipts only; F11 final artifacts outstanding).
 
 ## Historical RC checklist (pre-completion-plan; not acceptance)
 

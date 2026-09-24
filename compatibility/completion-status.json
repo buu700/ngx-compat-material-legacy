@@ -3,8 +3,8 @@
   "mode": "completion-plan",
   "package": "@ngx-compat/material-legacy",
   "repository": "buu700/ngx-compat-material-legacy",
-  "updated_at": "2026-09-24T03:01:07Z",
-  "updated_by_task": "F00",
+  "updated_at": "2026-09-24T03:08:52Z",
+  "updated_by_task": "F02-F04",
   "head_at_update": "29298796202c05269c301aa11ead7bd5de941e99",
   "claim_policy": "No gate is passed unless its RELEASE-GATES evidence exists for a fresh artifact. Prior STATUS 'Done' rows are historical claims under investigation, not acceptance.",
   "tasks": [
@@ -32,25 +32,40 @@
     {
       "id": "F02",
       "title": "Public API recovery",
-      "status": "not-started",
-      "evidence": [],
-      "notes": "Depends on F00. Restore missing legacy-core historical aliases.",
+      "status": "in-progress",
+      "evidence": [
+        "compatibility/pack-proof/f02-f04/core-aliases.json",
+        "scripts/f02-f03/core-alias-identity-smoke.mjs",
+        "projects/ngx-material-legacy/legacy-core/public-api.ts"
+      ],
+      "notes": "48/48 named core aliases restored in packed d.ts; runtime identity smoke passed for delegated tokens and owned helpers. Full compiler API audit vs Material 16.2.14 declarations and datepicker fixture still open.",
       "source_revision": null
     },
     {
       "id": "F03",
       "title": "Public upstream boundary",
-      "status": "not-started",
-      "evidence": [],
-      "notes": "Depends on F00. Remove private/docs-private upstream deps.",
+      "status": "in-progress",
+      "evidence": [
+        "research/upstream-api-policy.json",
+        "scripts/check-upstream-api-policy.py",
+        "tests/policy/test_upstream_api_policy_syntax.py",
+        "projects/ngx-material-legacy/legacy-core/pseudo-checkbox/",
+        "projects/ngx-material-legacy/legacy-core/ripple/"
+      ],
+      "notes": "Private underscore imports and docs-private pseudo-checkbox/ripple/setLines replaced with owned helpers; policy scanner syntax-aware + docs-private symbol list; 0 violations on projects/ngx-material-legacy. Real-browser chip/tab/list proofs deferred to F09.",
       "source_revision": null
     },
     {
       "id": "F04",
       "title": "Engine-free motion",
-      "status": "not-started",
-      "evidence": [],
-      "notes": "Depends on F00. Eliminate engine-bound animation entry points.",
+      "status": "in-progress",
+      "evidence": [
+        "compatibility/compatibility-exceptions.json",
+        "compatibility/motion-animations-import-graph.md",
+        "compatibility/pack-proof/f02-f04/inspect-packed-package.json",
+        "tests/inspect/test_inspect_packed_syntax.py"
+      ],
+      "notes": "Seven recipe secondaries removed; @angular/animations peer removed; dialog testing uses MATERIAL_ANIMATIONS; inspect-packed-package syntax-aware and passes on fresh pack. Engine-free packed-consumer open/close suite still open (needs F01 consumer harness).",
       "source_revision": null
     },
     {
@@ -129,23 +144,29 @@
     {
       "id": "G02",
       "title": "Public API completeness",
-      "status": "not-started",
-      "evidence": [],
-      "notes": null
+      "status": "in-progress",
+      "evidence": [
+        "compatibility/pack-proof/f02-f04/core-aliases.json"
+      ],
+      "notes": "Named alias probe green; full declaration audit outstanding."
     },
     {
       "id": "G03",
       "title": "Stable public dependency boundary",
-      "status": "not-started",
-      "evidence": [],
-      "notes": null
+      "status": "in-progress",
+      "evidence": [
+        "scripts/check-upstream-api-policy.py"
+      ],
+      "notes": "0 policy violations on shipped source; peer-floor annotation evidence for both lines still needed for full pass."
     },
     {
       "id": "G04",
       "title": "No animation engine",
-      "status": "not-started",
-      "evidence": [],
-      "notes": null
+      "status": "in-progress",
+      "evidence": [
+        "compatibility/pack-proof/f02-f04/inspect-packed-package.json"
+      ],
+      "notes": "Fresh pack inspector ok with no engine peers/imports; consumer proof without animations install outstanding."
     },
     {
       "id": "G05",
@@ -216,8 +237,10 @@
   ],
   "limitations": [
     "Publication out of scope (no npm credential).",
-    "Prior pack-proof smoke receipts are unbound-stale (digest incoherence documented).",
-    "Inspector exit 1 (21 findings) and policy exit 1 (17 findings) on both lines are known failures for F03/F04."
+    "F01 fresh-artifact CI not landed; local pack used for F02\u2013F04 proofs.",
+    "Full Material-16.2.14 declaration API audit and datepicker+form-field fixture not yet executed.",
+    "F09 real-browser ripple/pseudo-checkbox/motion suite not yet run.",
+    "Engine-free packed-consumer open/close suite blocked on F01 consumer harness wiring."
   ],
   "baseline_reviewed_commit": "49792a0ca09cd425a26ef9eaeddc115fe3f302a6",
   "f00_commit": "29298796202c05269c301aa11ead7bd5de941e99"

@@ -15,7 +15,7 @@ import {
   Optional,
 } from '@angular/core';
 import {take} from 'rxjs/operators';
-import {_MAT_INK_BAR_POSITIONER, _MatInkBarPositioner} from '@angular/material/tabs';
+import {_MAT_INK_BAR_POSITIONER, _MatInkBarPositioner} from './internal/ink-bar-shared';
 
 /**
  * The ink-bar is used to display and animate the line underneath the current active tab label.

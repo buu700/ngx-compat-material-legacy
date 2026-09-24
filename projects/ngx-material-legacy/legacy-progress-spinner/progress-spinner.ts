@@ -7,7 +7,8 @@
  */
 
 import {coerceNumberProperty, NumberInput} from '@angular/cdk/coercion';
-import {Platform, _getShadowRoot} from '@angular/cdk/platform';
+import {Platform} from '@angular/cdk/platform';
+import {legacyGetShadowRoot} from '@ngx-compat/material-legacy/legacy-core';
 import {ViewportRuler} from '@angular/cdk/scrolling';
 import {DOCUMENT} from '@angular/common';
 import {
@@ -250,7 +251,7 @@ export class MatLegacyProgressSpinner
     // Note that we need to look up the root node in ngOnInit, rather than the constructor, because
     // Angular seems to create the element outside the shadow root and then moves it inside, if the
     // node is inside an `ngIf` and a ShadowDom-encapsulated component.
-    this._styleRoot = _getShadowRoot(element) || this._document.head;
+    this._styleRoot = legacyGetShadowRoot(element) || this._document.head;
     this._attachStyleNode();
     element.classList.add('mat-progress-spinner-indeterminate-animation');
   }

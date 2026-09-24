@@ -20,7 +20,7 @@ import {
 } from 'rxjs';
 import {DataSource} from '@angular/cdk/collections';
 import {MatSort, Sort} from '@angular/material/sort';
-import {_isNumberValue} from '@angular/cdk/coercion';
+import {legacyIsNumberValue} from '@ngx-compat/material-legacy/legacy-core';
 import {map} from 'rxjs/operators';
 
 /**
@@ -167,7 +167,7 @@ export class _MatTableDataSource<
   ): string | number => {
     const value = (data as unknown as Record<string, any>)[sortHeaderId];
 
-    if (_isNumberValue(value)) {
+    if (legacyIsNumberValue(value)) {
       const numberValue = Number(value);
 
       // Numbers beyond `MAX_SAFE_INTEGER` can't be compared reliably so we

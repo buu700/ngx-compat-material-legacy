@@ -8,7 +8,8 @@
 
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
-import {MatRippleModule, MatLineModule, MatPseudoCheckboxModule} from '@angular/material/core';
+import {MatRippleModule, MatLineModule} from '@angular/material/core';
+import {MatLegacyPseudoCheckboxModule as MatPseudoCheckboxModule} from '@ngx-compat/material-legacy/legacy-core';
 import {MatCommonModule} from './internal/common-module';
 import {
   MatLegacyList,

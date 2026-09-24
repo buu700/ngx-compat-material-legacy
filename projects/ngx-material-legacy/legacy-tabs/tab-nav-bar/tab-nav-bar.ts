@@ -28,7 +28,8 @@ import {
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import {MAT_RIPPLE_GLOBAL_OPTIONS, RippleGlobalOptions, RippleRenderer} from '@angular/material/core';
+import {MAT_RIPPLE_GLOBAL_OPTIONS, RippleGlobalOptions} from '@angular/material/core';
+import {LegacyRippleRenderer as RippleRenderer} from '@ngx-compat/material-legacy/legacy-core';
 import {MatLegacyInkBar} from '../ink-bar';
 import {_MatTabLinkBase, _MatTabNavBase} from '../internal/tab-nav-bar-base';
 
