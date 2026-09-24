@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "mode": "completion-plan",
+  "package": "@ngx-compat/material-legacy",
+  "repository": "buu700/ngx-compat-material-legacy",
+  "updated_at": "2026-09-24T03:01:07Z",
+  "updated_by_task": "F00",
+  "head_at_update": "post-commit; see git rev-parse HEAD after this F00 commit",
+  "claim_policy": "No gate is passed unless its RELEASE-GATES evidence exists for a fresh artifact. Prior STATUS 'Done' rows are historical claims under investigation, not acceptance.",
+  "tasks": [
+    {
+      "id": "F00",
+      "title": "Source baselines and both-line bootstrap",
+      "status": "passed",
+      "evidence": [
+        "compatibility/support-line-bootstrap.json",
+        "compatibility/completion-baseline/",
+        "compatibility/pack-proof/historical-unbound/UNBOUND.json"
+      ],
+      "notes": "Both lines bootstrap-ready. Scanner failures captured (not passes). Historical tarball unbound.",
+      "source_revision": "see-git-HEAD-after-F00-commit",
+      "baseline_reviewed_commit": "49792a0ca09cd425a26ef9eaeddc115fe3f302a6"
+    },
+    {
+      "id": "F01",
+      "title": "Fresh-artifact CI",
+      "status": "not-started",
+      "evidence": [],
+      "notes": "Depends on F00. Must build/pack current source before packed-consumer; no committed .tgz fallback.",
+      "source_revision": null
+    },
+    {
+      "id": "F02",
+      "title": "Public API recovery",
+      "status": "not-started",
+      "evidence": [],
+      "notes": "Depends on F00. Restore missing legacy-core historical aliases.",
+      "source_revision": null
+    },
+    {
+      "id": "F03",
+      "title": "Public upstream boundary",
+      "status": "not-started",
+      "evidence": [],
+      "notes": "Depends on F00. Remove private/docs-private upstream deps.",
+      "source_revision": null
+    },
+    {
+      "id": "F04",
+      "title": "Engine-free motion",
+      "status": "not-started",
+      "evidence": [],
+      "notes": "Depends on F00. Eliminate engine-bound animation entry points.",
+      "source_revision": null
+    },
+    {
+      "id": "F05",
+      "title": "Migration safety",
+      "status": "not-started",
+      "evidence": [],
+      "notes": "Depends on F02, F04.",
+      "source_revision": null
+    },
+    {
+      "id": "F06",
+      "title": "Theme bridges/coexistence",
+      "status": "not-started",
+      "evidence": [],
+      "notes": "Depends on F00.",
+      "source_revision": null
+    },
+    {
+      "id": "F07",
+      "title": "Eliminate archived external Sass dependencies",
+      "status": "not-started",
+      "evidence": [],
+      "notes": "Depends on F06.",
+      "source_revision": null
+    },
+    {
+      "id": "F08",
+      "title": "Historical behavior tests",
+      "status": "not-started",
+      "evidence": [],
+      "notes": "Depends on F00.",
+      "source_revision": null
+    },
+    {
+      "id": "F09",
+      "title": "Real-browser contracts",
+      "status": "not-started",
+      "evidence": [],
+      "notes": "Depends on F01, F02, F04, F06, F08.",
+      "source_revision": null
+    },
+    {
+      "id": "F10",
+      "title": "Security/upstream audit",
+      "status": "not-started",
+      "evidence": [],
+      "notes": "Depends on F00.",
+      "source_revision": null
+    },
+    {
+      "id": "F11",
+      "title": "Final supported-line validation",
+      "status": "not-started",
+      "evidence": [],
+      "notes": "Depends on F00\u2013F10. Must not postpone 21.x setup (done in F00).",
+      "source_revision": null
+    },
+    {
+      "id": "F12",
+      "title": "Readiness and handoff",
+      "status": "not-started",
+      "evidence": [],
+      "notes": "Depends on F01\u2013F11.",
+      "source_revision": null
+    }
+  ],
+  "gates": [
+    {
+      "id": "G01",
+      "title": "Fresh artifact integrity",
+      "status": "not-started",
+      "evidence": [],
+      "notes": null
+    },
+    {
+      "id": "G02",
+      "title": "Public API completeness",
+      "status": "not-started",
+      "evidence": [],
+      "notes": null
+    },
+    {
+      "id": "G03",
+      "title": "Stable public dependency boundary",
+      "status": "not-started",
+      "evidence": [],
+      "notes": null
+    },
+    {
+      "id": "G04",
+      "title": "No animation engine",
+      "status": "not-started",
+      "evidence": [],
+      "notes": null
+    },
+    {
+      "id": "G05",
+      "title": "Migration safety",
+      "status": "not-started",
+      "evidence": [],
+      "notes": null
+    },
+    {
+      "id": "G06",
+      "title": "Historical owned Sass/API contracts",
+      "status": "not-started",
+      "evidence": [],
+      "notes": null
+    },
+    {
+      "id": "G07",
+      "title": "Current bridges and M3 coexistence",
+      "status": "not-started",
+      "evidence": [],
+      "notes": null
+    },
+    {
+      "id": "G08",
+      "title": "No external archived MDC obligation",
+      "status": "not-started",
+      "evidence": [],
+      "notes": null
+    },
+    {
+      "id": "G09",
+      "title": "Historical behavior suite",
+      "status": "not-started",
+      "evidence": [],
+      "notes": null
+    },
+    {
+      "id": "G10",
+      "title": "Real browsers and motion",
+      "status": "not-started",
+      "evidence": [],
+      "notes": null
+    },
+    {
+      "id": "G11",
+      "title": "Upstream and security disposition",
+      "status": "not-started",
+      "evidence": [],
+      "notes": null
+    },
+    {
+      "id": "G12",
+      "title": "Supported branch and peer floors",
+      "status": "in-progress",
+      "evidence": [
+        "compatibility/support-line-bootstrap.json",
+        "compatibility/completion-baseline/"
+      ],
+      "notes": "F00 bootstrap receipts established for main and 21.x; F11 final artifacts not done. bootstrap-ready \u2260 release-validated."
+    },
+    {
+      "id": "G13",
+      "title": "Maintainer readiness",
+      "status": "not-started",
+      "evidence": [],
+      "notes": null
+    }
+  ],
+  "limitations": [
+    "Publication out of scope (no npm credential).",
+    "Prior pack-proof smoke receipts are unbound-stale (digest incoherence documented).",
+    "Inspector exit 1 (21 findings) and policy exit 1 (17 findings) on both lines are known failures for F03/F04."
+  ],
+  "baseline_reviewed_commit": "49792a0ca09cd425a26ef9eaeddc115fe3f302a6"
+}

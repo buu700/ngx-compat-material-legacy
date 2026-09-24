@@ -1,69 +1,71 @@
-# Active blockers
+# Active blockers (completion-plan mode)
 
-## B-CI-01 — Push-triggered Actions initially produced zero runs
-Mitigated: push-triggered CI is producing runs. Keep `workflow_dispatch` as a backup.
+Authoritative task/gate status: `compatibility/completion-status.json`.
+Bootstrap: `compatibility/support-line-bootstrap.json`.
 
-## B-CI-02 — CLI `--verify` hash drift (mitigated)
-Committed CLI tarball bytes drifted from `compatibility/migrate-legacy-cli-artifact.json`
-after repository metadata updates inside the packaged files. Mitigated by rebuilding
-the artifact + hash record. Keep watching Actions on follow-up pushes.
+## B-F00 — Baseline established (not a release claim)
 
-## B-ADV-01 — Aged peer advisory triage (mitigated; peer floor applied)
-Triage in `compatibility/advisory-triage.md` (2026-09-23). Exact pins
-`@angular/*@22.1.7` / Material+CDK `22.1.7` are OSV-clean. Advertised library peers
-tightened to **`^22.1.7`**. Re-check advisories immediately before npm publish.
+F00 passed as **bootstrap**: both `main` and `21.x` worktrees, peer floors, command
+profiles, and immutable failure receipts exist. This does **not** close G01–G13.
 
-## B-PKG-03 — Remaining non-component work
-**Mitigated for component scope + full historical testing + migrate-legacy + bundled CLI.**
+## B-CI-F01 — Fresh-artifact CI required (open)
 
-### Still open
-- **`src/` mass-delete** — **done (narrow)**. Unresolved relative **0**;
-  legacy→ordinary escape **0**. Residual non-Material packages + hollow
-  `src/material` facade deleted (`src-residual-packages-retire-2026-09-23.json`);
-  `src/` holds README only. See `src-cleanup-plan.md`.
-- **Maintainer-authorized npm publish** — owner-only after packed-artifact checks.
-- **`21.x` maintenance line** — packs + Node 20.19 consumer smoke on branch; keep the
-  Angular 21 lockfile off `main` (`compatibility/support-matrix.md`).
+Packed-consumer smoke no longer defaults to a committed `.tgz` (moved to
+`compatibility/pack-proof/historical-unbound/`). CI job `packed-consumer-aot` still
+invokes `node scripts/packed-consumer-aot-smoke.mjs` without `--tarball` and will
+fail-closed until F01 wires build→pack→digest→smoke. Prior smoke receipts are
+`unbound-stale` (consumer digest `257e7f36…` ≠ aot/committed `308dbd4b…`).
 
-### Motion (resolved for primary runtime)
-Primary overlay FESMs (**dialog / menu / select / form-field / snack-bar / tabs /
-tooltip / autocomplete**) have **zero** `@angular/animations` imports. Runtime uses
-CSS/timer motion (Material 22-style). Historical `AnimationTriggerMetadata` recipes
-live under opt-in `legacy-*/animations` secondary entries only — the peer remains
-`optional: true` and is **truly optional** unless a consumer imports those entries.
-See `compatibility/motion-animations-import-graph.md` and
-`compatibility/motion-overlay-trio.md`.
+## B-SCAN-01 — Packed inspector failures (open; F03/F04)
 
-Pack always via `node scripts/pack-library.mjs` (`-c tsconfig.lib.json`).
+`python3 scripts/inspect-packed-package.py` exit **1**, **21** findings on both lines
+(engine/recipe/testing references including comment-only and real imports). Receipts:
+`compatibility/completion-baseline/f00-main-2026-09-23/inspect-packed-package.json`,
+`…/f00-l21-2026-09-23/inspect-packed-package.json`.
 
-## B-MOTION-01 — Full animation-engine removal from primary FESM
-**Mitigated (2026-09-23).** Primary overlay entries cleared. Remaining peer surface is
-opt-in `/animations` recipe entries only (by design for API compat).
+## B-SCAN-02 — Upstream API policy failures (open; F03)
 
-## B-ESC-01 — Unresolved relative escape edges
-**Mitigated → 0.** Was 68 lexical `.import` false-negatives + placeholders. Resolver
-maps `.import` → `_*.import.scss`, strips comments, ignores `<...>` placeholders.
-**Unresolved relative closed.** Legacy→core escape edges cleared by narrow mirror
-delete; owned-overlap ordinary dirs + e2e/universal + residual non-Material packages
-retired 2026-09-23.
+`python3 scripts/check-upstream-api-policy.py` exit **1**, **17** violations (private
+symbol prefixes, `@angular/animations` recipe modules, etc.). Receipts under
+`compatibility/completion-baseline/`.
 
-## B-21-01 — 21.x library rebuild
-**Mitigated on branch.** `21.x` packs against aged Angular 21.2.23 / Material 21.2.14
-with Sass/ESM/AOT + Node 20.19 consumer smoke (`compatibility/pack-proof-21/`). Owner
-publish to `lts-21-next` later. **Do not merge 21 lockfile into `main`.**
+## B-API-01 — Missing legacy-core historical aliases (open; F02)
 
-## Resolved / mitigated (historical)
-- Full historical testing ports (22/22); peer-light migrate CLI; escape-edge
-  classification; overlay / selection / chrome ports; pack-proof; Sass seals;
-  aged Angular 22.1.7 toolchain.
+Plan baseline: packed/core declarations omit historical aliases such as
+`MatLegacyNativeDateModule`, `LegacyDateAdapter`, `MAT_LEGACY_DATE_FORMATS`,
+`LegacyThemePalette`, `LEGACY_VERSION`, `MatLegacyRippleModule`.
+
+## B-THEME-01 — Current-component theme bridges (open; F06)
+
+No proof of current Material `*-overrides` bridges + owned-only aggregate for M3
+coexistence. Historical Sass seals must not be overwritten.
+
+## B-MDC-01 — External archived `@material/*` dependencies (open; F07)
+
+Published metadata still lists many `@material/*` dependencies; eliminate via
+remove → local replace → vendor-only-if-required.
+
+## B-TEST-01 — Historical behavior suite not executed (open; F08)
+
+Original inventory ~57 spec paths; execution not demonstrated as release evidence.
+
+## B-PUB-01 — npm publish (owner-only)
+
+Out of scope for agents. No credential.
+
+## B-21-LOCK — Do not merge 21 lockfile into main
+
+`21.x` lockfile (`d847f46e…`) and Angular 21 peers stay on the maintenance branch /
+`/workspace/ngx-compat/material-21` worktree only.
+
+## Mitigated / historical (pre-completion-plan)
+
+Push-triggered CI runs, CLI hash drift rebuilds, aged peer floor `^22.1.7`, narrow
+`src/` retires, escape-edge 0, primary FESM motion clears — treat as prior work to
+re-verify under F01–F04, not as gate passes.
 
 ## Constraints
+
 - Cyph tree at `/workspace/ngx-compat/reference/cyph-dev-prod` is oracle-only; never commit it.
 - Isolated Material-16 env is local-only; never commit `node_modules`.
 - No npm publish from agent workstreams.
-- No mass-delete of `src/`. Narrow deletes require provenance JSON + closure proof
-  (2026-09-23 batches: `src-legacy-mirror-delete-2026-09-23.json`,
-  `src-legacy-prebuilt-themes-delete-2026-09-23.json`,
-  `src-scaffolding-retire-2026-09-23.json`,
-  `src-e2e-universal-ordinary-retire-2026-09-23.json`,
-  `src-residual-packages-retire-2026-09-23.json`).

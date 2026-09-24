@@ -8,7 +8,7 @@
  * MatLegacyButtonHarness.
  *
  * Usage:
- *   node scripts/packed-consumer-aot-smoke.mjs [--tarball path] [--skip-harness]
+ *   node scripts/packed-consumer-aot-smoke.mjs --tarball path [--skip-harness]
  * Evidence:
  *   compatibility/pack-proof/aot-harness-smoke.json
  */
@@ -29,16 +29,18 @@ import {spawnSync} from 'node:child_process';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const outPath = join(root, 'compatibility/pack-proof/aot-harness-smoke.json');
-const defaultTarball = join(
+// F00: committed historical tarball moved to pack-proof/historical-unbound/.
+// Do not silently default to it. F01 will wire fresh build/pack → --tarball.
+const historicalUnboundTarball = join(
   root,
-  'compatibility/pack-proof/ngx-compat-material-legacy-22.0.0-rc.0.tgz',
+  'compatibility/pack-proof/historical-unbound/ngx-compat-material-legacy-22.0.0-rc.0.tgz',
 );
 
 const args = process.argv.slice(2);
 const skipHarness = args.includes('--skip-harness');
 const tarballArgIdx = args.indexOf('--tarball');
 const tarball =
-  tarballArgIdx >= 0 ? resolve(args[tarballArgIdx + 1]) : defaultTarball;
+  tarballArgIdx >= 0 ? resolve(args[tarballArgIdx + 1]) : null;
 
 function sha256File(path) {
   return createHash('sha256').update(readFileSync(path)).digest('hex');
@@ -52,6 +54,13 @@ function run(cmd, cmdlineArgs, opts = {}) {
   return res;
 }
 
+if (!tarball) {
+  console.error(
+    'F00/F01: --tarball <path> is required. Committed pack-proof .tgz is historical-unbound and must not be a silent default. Build/pack current source first (see scripts/pack-library.mjs), then pass its path.',
+  );
+  console.error(`Historical unbound (traceability only): ${historicalUnboundTarball}`);
+  process.exit(2);
+}
 if (!existsSync(tarball)) {
   console.error(`Missing tarball: ${tarball}. Build/pack first.`);
   process.exit(2);

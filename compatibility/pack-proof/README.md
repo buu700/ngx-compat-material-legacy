@@ -33,3 +33,8 @@ Rebuild: `pnpm exec ng-packagr -p projects/ngx-material-legacy/ng-package.json -
 
 AOT/harness: `node scripts/packed-consumer-aot-smoke.mjs`
 Motion: `node scripts/motion-lifecycle-smoke.mjs`
+
+## F00 notice (2026-09-23)
+
+The committed `ngx-compat-material-legacy-22.0.0-rc.0.tgz` was moved to `historical-unbound/`.
+Smoke receipts below are labeled `f00_evidence_binding.evidence_binding=unbound-stale`. F01 replaces defaults with fresh-artifact CI.
