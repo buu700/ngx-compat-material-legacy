@@ -18,11 +18,11 @@ tightened to **`^22.1.7`**. Re-check advisories immediately before npm publish.
 
 ### Still open
 - **`src/` mass-delete** — **narrowly advanced**. Unresolved relative **0**;
-  legacy→ordinary escape **0**. Deleted: 22 `legacy-*` mirrors, `legacy-prebuilt-themes`,
-  `src/dev-app`, `src/components-examples`, `src/material/core` + ordinary companions
-  (`src-scaffolding-retire-2026-09-23.json`). **Retained (documented):** owned-overlap
-  ordinary dirs under `src/material` (button/card/…; e2e/universal Bazel + harness
-  provenance). See `src-cleanup-plan.md`.
+  legacy→ordinary escape **0**. Also deleted: `src/e2e-app`, `src/universal-app`,
+  owned-overlap ordinary dirs, hollow schematics/testing/prebuilt-themes
+  (`src-e2e-universal-ordinary-retire-2026-09-23.json`). **Retained (documented):**
+  `src/cdk*`, google-maps, youtube-player, date adapters, material-experimental.
+  See `src-cleanup-plan.md`.
 - **Maintainer-authorized npm publish** — owner-only after packed-artifact checks.
 - **`21.x` maintenance line** — packs + Node 20.19 consumer smoke on branch; keep the
   Angular 21 lockfile off `main` (`compatibility/support-matrix.md`).
@@ -46,7 +46,7 @@ opt-in `/animations` recipe entries only (by design for API compat).
 **Mitigated → 0.** Was 68 lexical `.import` false-negatives + placeholders. Resolver
 maps `.import` → `_*.import.scss`, strips comments, ignores `<...>` placeholders.
 **Unresolved relative closed.** Legacy→core escape edges cleared by narrow mirror
-delete; remaining owned-overlap ordinary dirs under `src/material` retained pending harness/Bazel provenance review; scaffolding/core/companions deleted.
+delete; owned-overlap ordinary dirs + e2e/universal retired 2026-09-23; residual cdk*/maps/youtube/adapters/experimental retained and documented.
 
 ## B-21-01 — 21.x library rebuild
 **Mitigated on branch.** `21.x` packs against aged Angular 21.2.23 / Material 21.2.14

@@ -16,8 +16,11 @@ landed under `styles/{core,legacy-core}/theming/prebuilt/`
 (`src-legacy-prebuilt-themes-delete-2026-09-23.json`).
 `src/dev-app` / `src/components-examples`, `src/material/core`, and ordinary
 companions were retired 2026-09-23 (`src-scaffolding-retire-2026-09-23.json`).
-Owned-overlap ordinary dirs under `src/material` remain as documented historical
-reference only (not on the pack path).
+`src/e2e-app` / `src/universal-app`, owned-overlap ordinary dirs, and hollow
+schematics/testing/prebuilt-themes were retired 2026-09-23
+(`src-e2e-universal-ordinary-retire-2026-09-23.json`). Residual `src/cdk*`,
+maps, youtube, adapters, and material-experimental remain as documented
+historical reference only (not on the pack path).
 
 See `compatibility/inventories/sass-facade-copy-manifest.json`.
 
