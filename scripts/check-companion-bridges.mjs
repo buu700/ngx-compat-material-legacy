@@ -30,7 +30,7 @@ const theme = `
 `;
 
 function compile(body) {
-  return sass.compileString(
+  const result = sass.compileString(
     `@use 'projects/ngx-material-legacy' as legacy;\n@use '@angular/material' as mat;\n${body}`,
     {
       loadPaths,
@@ -38,7 +38,15 @@ function compile(body) {
       url: pathToFileURL(path.join(root, 'companion-bridge-check.scss')),
       silenceDeprecations: ['if-function', 'global-builtin', 'color-functions', 'import'],
     },
-  ).css;
+  );
+  const external = result.loadedUrls
+    .map((url) => url.pathname)
+    .filter((pathname) => pathname.includes('/node_modules/@material/') || pathname.includes('/@material+'));
+  if (external.length) {
+    console.error('Sass loaded external @material files:', external.slice(0, 8).join(', '));
+    process.exit(1);
+  }
+  return result.css;
 }
 
 const bridges = compile(`${theme}\n.bridges { @include legacy.all-current-companion-bridges($theme); }`);
