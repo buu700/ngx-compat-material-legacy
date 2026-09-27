@@ -35,8 +35,8 @@ const EXIT_MS = 75;
   encapsulation: ViewEncapsulation.None,
   host: {
     'class': 'mat-snack-bar-container',
-    '[class.mat-snack-bar-container-enter]': "_animationState === 'visible'",
-    '[class.mat-snack-bar-container-exit]': "_animationState === 'hidden'",
+    '[class.mat-snack-bar-container-enter]': "_animationsEnabled && _animationState === 'visible'",
+    '[class.mat-snack-bar-container-exit]': "_animationsEnabled && _animationState === 'hidden'",
     '[class.mat-snack-bar-container-animations-enabled]': '_animationsEnabled',
     '(animationend)': 'onAnimationEnd($event.animationName)',
   },
@@ -63,9 +63,7 @@ export class MatLegacySnackBarContainer extends _MatSnackBarContainerBase {
 
   protected override _afterExitMotionStarted(): void {
     if (!this._animationsEnabled) {
-      // Let the hidden host class be checked before removal. Completing the
-      // exit in this same turn flips the class during change detection.
-      setTimeout(() => this._notifyExitComplete());
+      this._notifyExitComplete();
       return;
     }
     if (this._exitFallback !== null) {
