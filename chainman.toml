@@ -1,0 +1,30 @@
+schema = 3
+
+# Project-owned launcher. Dependency updates are reserved in
+# chainman/future-update-holds.toml and are not declared here, so setup
+# and ordinary tasks keep the committed pins.
+
+[project]
+name = "ngx-compat-material-legacy"
+default_profile = "default"
+
+[profiles.default]
+flake = "flake.nix#default"
+
+[setup.javascript]
+pnpm = true
+profile = "default"
+inputs = [
+  "package.json",
+  "pnpm-lock.yaml",
+  "pnpm-workspace.yaml",
+  ".npmrc",
+  "projects/ngx-material-legacy/package.json",
+  "nix/tool-sources.json",
+  "flake.lock",
+  "toolchain-lock.json",
+]
+artifacts = ["node_modules/.modules.yaml"]
+
+[tasks.toolchain]
+commands = [["node", "-v"], ["pnpm", "-v"]]
