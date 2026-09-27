@@ -63,7 +63,10 @@ export class MatLegacySnackBarContainer extends _MatSnackBarContainerBase {
 
   protected override _afterExitMotionStarted(): void {
     if (!this._animationsEnabled) {
-      this._notifyExitComplete();
+      // Do not wait for NgZone.onMicrotaskEmpty. A zoneless consumer never
+      // emits it, so the snack bar would stay attached.
+      this._onExit.next();
+      this._onExit.complete();
       return;
     }
     if (this._exitFallback !== null) {
