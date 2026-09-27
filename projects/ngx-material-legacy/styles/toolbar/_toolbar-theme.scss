@@ -1,3 +1,4 @@
+@use '../bridges/companion-overrides' as bridges;
 @use 'sass:map';
 @use '../core/theming/theming';
 @use '../core/typography/typography';
@@ -16,62 +17,36 @@
 }
 
 @mixin color($config-or-theme) {
-  $config: theming.get-color-config($config-or-theme);
-
-  @include sass-utils.current-selector-or-root() {
-    @include token-utils.create-token-values(tokens-mat-toolbar.$prefix,
-      tokens-mat-toolbar.get-color-tokens($config));
-  }
-
-  .mat-toolbar {
-    &.mat-primary {
-      @include _palette-styles(map.get($config, primary));
-    }
-
-    &.mat-accent {
-      @include _palette-styles(map.get($config, accent));
-    }
-
-    &.mat-warn {
-      @include _palette-styles(map.get($config, warn));
-    }
-  }
+  @include bridges.toolbar((
+    color: theming.get-color-config($config-or-theme),
+    typography: null,
+    density: null
+  ));
 }
+
 
 @mixin typography($config-or-theme) {
-  $config: typography.private-typography-to-2014-config(
-      theming.get-typography-config($config-or-theme));
-
-  @include sass-utils.current-selector-or-root() {
-    @include token-utils.create-token-values(tokens-mat-toolbar.$prefix,
-      tokens-mat-toolbar.get-typography-tokens($config));
-  }
+  @include bridges.toolbar((
+    color: null,
+    typography: theming.get-typography-config($config-or-theme),
+    density: null
+  ));
 }
+
 
 @mixin density($config-or-theme) {
-  $density-scale: theming.get-density-config($config-or-theme);
-
-  @include sass-utils.current-selector-or-root() {
-    @include token-utils.create-token-values(tokens-mat-toolbar.$prefix,
-      tokens-mat-toolbar.get-density-tokens($density-scale));
-  }
+  @include bridges.toolbar((
+    color: null,
+    typography: null,
+    density: theming.get-density-config($config-or-theme)
+  ));
 }
+
 
 @mixin theme($theme-or-color-config) {
   $theme: theming.private-legacy-get-theme($theme-or-color-config);
   @include theming.private-check-duplicate-theme-styles($theme, 'mat-toolbar') {
-    $color: theming.get-color-config($theme);
-    $density: theming.get-density-config($theme);
-    $typography: theming.get-typography-config($theme);
-
-    @if $color != null {
-      @include color($color);
-    }
-    @if $density != null {
-      @include density($density);
-    }
-    @if $typography != null {
-      @include typography($typography);
-    }
+    @include bridges.toolbar($theme);
   }
 }
+

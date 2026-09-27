@@ -1,0 +1,479 @@
+// Public bridges from the owned Material 16 theme maps to current
+// @angular/material *-overrides. Historical theme() mixins are unchanged.
+@use 'sass:color';
+@use 'sass:list';
+@use 'sass:map';
+@use 'sass:meta';
+@use '@angular/material' as mat;
+@use '../core/theming/theming';
+@use '../core/typography/typography';
+@use '../core/tokens/m2/mat/badge' as badge-tokens;
+@use '../core/tokens/m2/mat/bottom-sheet' as bottom-sheet-tokens;
+@use '../core/tokens/m2/mat/standard-button-toggle' as button-toggle-tokens;
+@use '../core/tokens/m2/mat/datepicker' as datepicker-tokens;
+@use '../core/tokens/m2/mat/divider' as divider-tokens;
+@use '../core/tokens/m2/mat/expansion' as expansion-tokens;
+@use '../core/tokens/m2/mat/grid-list' as grid-list-tokens;
+@use '../core/tokens/m2/mat/icon' as icon-tokens;
+@use '../core/tokens/m2/mat/sidenav' as sidenav-tokens;
+@use '../core/tokens/m2/mat/stepper' as stepper-tokens;
+@use '../core/tokens/m2/mat/toolbar' as toolbar-tokens;
+@use '../core/typography/typography-utils';
+@use '../core/density/private/compatibility';
+@use '../tree/tree-variables';
+@use '../legacy-button/button-theme' as legacy-button;
+@use '../legacy-card/card-theme' as legacy-card;
+@use '../legacy-progress-bar/progress-bar-theme' as legacy-progress-bar;
+@use '../legacy-progress-spinner/progress-spinner-theme' as legacy-progress-spinner;
+@use '../legacy-tooltip/tooltip-theme' as legacy-tooltip;
+@use '../legacy-input/input-theme' as legacy-input;
+@use '../legacy-form-field/form-field-theme' as legacy-form-field;
+@use '../legacy-checkbox/checkbox-theme' as legacy-checkbox;
+@use '../legacy-select/select-theme' as legacy-select;
+@use '../legacy-autocomplete/autocomplete-theme' as legacy-autocomplete;
+@use '../legacy-dialog/dialog-theme' as legacy-dialog;
+@use '../legacy-chips/chips-theme' as legacy-chips;
+@use '../legacy-slide-toggle/slide-toggle-theme' as legacy-slide-toggle;
+@use '../legacy-radio/radio-theme' as legacy-radio;
+@use '../legacy-slider/slider-theme' as legacy-slider;
+@use '../legacy-menu/menu-theme' as legacy-menu;
+@use '../legacy-list/list-theme' as legacy-list;
+@use '../legacy-paginator/paginator-theme' as legacy-paginator;
+@use '../legacy-tabs/tabs-theme' as legacy-tabs;
+@use '../legacy-snack-bar/snack-bar-theme' as legacy-snack-bar;
+@use '../legacy-table/table-theme' as legacy-table;
+@use '../legacy-core/core-theme' as legacy-core;
+
+$badge-allowed: (
+  background-color, text-color, disabled-state-background-color, disabled-state-text-color,
+  text-font, text-size, text-weight, line-height, small-size-text-size, large-size-text-size,
+  small-size-line-height, large-size-line-height
+);
+$bottom-sheet-allowed: (
+  container-text-color, container-background-color, container-text-font,
+  container-text-line-height, container-text-size, container-text-tracking,
+  container-text-weight, container-shape
+);
+$button-toggle-allowed: (
+  background-color, disabled-selected-state-background-color,
+  disabled-selected-state-text-color, disabled-state-background-color,
+  disabled-state-text-color, divider-color, selected-state-background-color,
+  selected-state-text-color, state-layer-color, text-color, height,
+  label-text-font, focus-state-layer-opacity, hover-state-layer-opacity, shape
+);
+$datepicker-allowed: (
+  calendar-container-elevation-shadow, calendar-container-shape,
+  calendar-container-touch-elevation-shadow, calendar-container-touch-shape,
+  calendar-body-label-text-color, calendar-container-background-color,
+  calendar-container-text-color, calendar-date-disabled-state-text-color,
+  calendar-date-focus-state-background-color, calendar-date-hover-state-background-color,
+  calendar-date-in-comparison-range-state-background-color,
+  calendar-date-in-overlap-range-selected-state-background-color,
+  calendar-date-in-overlap-range-state-background-color,
+  calendar-date-in-range-state-background-color, calendar-date-outline-color,
+  calendar-date-preview-state-outline-color,
+  calendar-date-selected-disabled-state-background-color,
+  calendar-date-selected-state-background-color, calendar-date-selected-state-text-color,
+  calendar-date-text-color, calendar-date-today-disabled-state-outline-color,
+  calendar-date-today-outline-color, calendar-date-today-selected-state-outline-color,
+  calendar-header-divider-color, calendar-header-text-color,
+  calendar-navigation-button-icon-color, calendar-period-button-icon-color,
+  calendar-period-button-text-color, range-input-disabled-state-separator-color,
+  range-input-disabled-state-text-color, range-input-separator-color,
+  toggle-active-state-icon-color, toggle-icon-color, calendar-body-label-text-size,
+  calendar-body-label-text-weight, calendar-header-text-size, calendar-header-text-weight,
+  calendar-period-button-text-size, calendar-period-button-text-weight,
+  calendar-text-font, calendar-text-size
+);
+$divider-allowed: (color, width);
+$expansion-allowed: (
+  container-shape, header-indicator-display, legacy-header-indicator-display,
+  container-elevation-shadow, actions-divider-color, container-background-color,
+  container-text-color, header-description-color, header-disabled-state-text-color,
+  header-focus-state-layer-color, header-hover-state-layer-color, header-indicator-color,
+  header-text-color, container-text-font, container-text-line-height, container-text-size,
+  container-text-tracking, container-text-weight, header-text-font, header-text-line-height,
+  header-text-size, header-text-tracking, header-text-weight, header-collapsed-state-height,
+  header-expanded-state-height
+);
+$grid-list-allowed: (
+  tile-header-primary-text-size, tile-header-secondary-text-size,
+  tile-footer-primary-text-size, tile-footer-secondary-text-size
+);
+$sidenav-allowed: (
+  container-shape, container-width, container-elevation-shadow, container-divider-color,
+  container-background-color, container-text-color, content-background-color,
+  content-text-color, scrim-color
+);
+$stepper-allowed: (
+  header-focus-state-layer-shape, header-hover-state-layer-shape,
+  header-error-state-icon-background-color, container-color,
+  header-done-state-icon-background-color, header-done-state-icon-foreground-color,
+  header-edit-state-icon-background-color, header-edit-state-icon-foreground-color,
+  header-error-state-icon-foreground-color, header-error-state-label-text-color,
+  header-focus-state-layer-color, header-hover-state-layer-color,
+  header-icon-background-color, header-icon-foreground-color, header-label-text-color,
+  header-optional-label-text-color, header-selected-state-icon-background-color,
+  header-selected-state-icon-foreground-color, header-selected-state-label-text-color,
+  line-color, container-text-font, header-label-text-font, header-label-text-size,
+  header-label-text-weight, header-error-state-label-text-size,
+  header-selected-state-label-text-size, header-selected-state-label-text-weight,
+  header-height
+);
+$icon-allowed: (color);
+$sort-allowed: (arrow-color);
+$toolbar-allowed: (
+  container-background-color, container-text-color, title-text-font, title-text-line-height,
+  title-text-size, title-text-tracking, title-text-weight, standard-height, mobile-height
+);
+$tree-allowed: (
+  container-background-color, node-text-color, node-text-font, node-text-size,
+  node-text-weight, node-min-height
+);
+
+@function _qualify($prefix, $tokens, $allowed) {
+  $out: ();
+  @if $tokens != null {
+    @each $key, $value in $tokens {
+      // Public *-overrides maps use the component-local name. The $prefix
+      // argument documents the component and is not part of the key.
+      @if $value != null and list.index($allowed, $key) and $prefix != null {
+        $out: map.set($out, $key, $value);
+      }
+    }
+  }
+  @return $out;
+}
+
+@function _collect($prefix, $theme, $allowed, $color-fn, $typo-fn, $density-fn, $base-fn) {
+  $out: ();
+  $color: theming.get-color-config($theme);
+  $typography: typography.private-typography-to-2014-config(theming.get-typography-config($theme));
+  $density: theming.get-density-config($theme);
+  @if $base-fn != null {
+    $out: map.merge($out, _qualify($prefix, meta.call($base-fn), $allowed));
+  }
+  @if $color != null and $color-fn != null {
+    $out: map.merge($out, _qualify($prefix, meta.call($color-fn, $color), $allowed));
+  }
+  @if $typography != null and $typo-fn != null {
+    $out: map.merge($out, _qualify($prefix, meta.call($typo-fn, $typography), $allowed));
+  }
+  @if $density != null and $density-fn != null {
+    $out: map.merge($out, _qualify($prefix, meta.call($density-fn, $density), $allowed));
+  }
+  @return $out;
+}
+
+@mixin badge($theme) {
+  @include mat.badge-overrides(_collect(
+    badge, $theme, $badge-allowed,
+    meta.get-function('get-color-tokens', $module: 'badge-tokens'),
+    meta.get-function('get-typography-tokens', $module: 'badge-tokens'),
+    null, null
+  ));
+  $color: theming.get-color-config($theme);
+  @if $color != null {
+    @each $name in (accent, warn) {
+      .mat-badge-#{$name} {
+        @include mat.badge-overrides(_qualify(
+          badge,
+          badge-tokens.private-get-color-palette-color-tokens(map.get($color, $name)),
+          $badge-allowed
+        ));
+      }
+    }
+  }
+}
+
+@mixin bottom-sheet($theme) {
+  @include mat.bottom-sheet-overrides(_collect(
+    bottom-sheet, $theme, $bottom-sheet-allowed,
+    meta.get-function('get-color-tokens', $module: 'bottom-sheet-tokens'),
+    meta.get-function('get-typography-tokens', $module: 'bottom-sheet-tokens'),
+    null,
+    meta.get-function('get-unthemable-tokens', $module: 'bottom-sheet-tokens')
+  ));
+}
+
+@mixin button-toggle($theme) {
+  $tokens: _collect(
+    button-toggle, $theme, $button-toggle-allowed,
+    meta.get-function('get-color-tokens', $module: 'button-toggle-tokens'),
+    null,
+    meta.get-function('get-density-tokens', $module: 'button-toggle-tokens'),
+    meta.get-function('get-unthemable-tokens', $module: 'button-toggle-tokens')
+  );
+  $typography: typography.private-typography-to-2014-config(theming.get-typography-config($theme));
+  @if $typography != null {
+    $font: typography-utils.font-family($typography);
+    @if $font != null {
+      $tokens: map.set($tokens, label-text-font, $font);
+    }
+  }
+  @include mat.button-toggle-overrides($tokens);
+}
+
+@mixin datepicker($theme) {
+  @include mat.datepicker-overrides(_collect(
+    datepicker, $theme, $datepicker-allowed,
+    meta.get-function('get-color-tokens', $module: 'datepicker-tokens'),
+    meta.get-function('get-typography-tokens', $module: 'datepicker-tokens'),
+    meta.get-function('get-density-tokens', $module: 'datepicker-tokens'),
+    null
+  ));
+  $color: theming.get-color-config($theme);
+  @if $color != null {
+    @each $name in (accent, warn) {
+      $palette-color: theming.get-color-from-palette(map.get($color, $name));
+      $range: datepicker-tokens.private-get-range-background-color($palette-color);
+      $tokens: _qualify(
+        datepicker,
+        map.merge(
+          datepicker-tokens.private-get-calendar-color-palette-color-tokens($color, $name),
+          datepicker-tokens.get-range-color-tokens($range)
+        ),
+        $datepicker-allowed
+      );
+      .mat-datepicker-content.mat-#{$name} {
+        @include mat.datepicker-overrides($tokens);
+      }
+      .mat-datepicker-toggle-active.mat-#{$name} {
+        @include mat.datepicker-overrides(_qualify(
+          datepicker,
+          datepicker-tokens.private-get-toggle-color-palette-color-tokens($color, $name),
+          $datepicker-allowed
+        ));
+      }
+    }
+  }
+}
+
+@mixin divider($theme) {
+  @include mat.divider-overrides(_collect(
+    divider, $theme, $divider-allowed,
+    meta.get-function('get-color-tokens', $module: 'divider-tokens'),
+    null, null,
+    meta.get-function('get-unthemable-tokens', $module: 'divider-tokens')
+  ));
+}
+
+@mixin expansion($theme) {
+  @include mat.expansion-overrides(_collect(
+    expansion, $theme, $expansion-allowed,
+    meta.get-function('get-color-tokens', $module: 'expansion-tokens'),
+    meta.get-function('get-typography-tokens', $module: 'expansion-tokens'),
+    meta.get-function('get-density-tokens', $module: 'expansion-tokens'),
+    meta.get-function('get-unthemable-tokens', $module: 'expansion-tokens')
+  ));
+}
+
+@mixin grid-list($theme) {
+  @include mat.grid-list-overrides(_collect(
+    grid-list, $theme, $grid-list-allowed,
+    null,
+    meta.get-function('get-typography-tokens', $module: 'grid-list-tokens'),
+    null, null
+  ));
+}
+
+@mixin icon($theme) {
+  @include mat.icon-overrides(_collect(
+    icon, $theme, $icon-allowed,
+    meta.get-function('get-color-tokens', $module: 'icon-tokens'),
+    null, null, null
+  ));
+  $color: theming.get-color-config($theme);
+  @if $color != null {
+    .mat-icon {
+      @each $name in (primary, accent, warn) {
+        &.mat-#{$name} {
+          @include mat.icon-overrides((
+            color: theming.get-color-from-palette(map.get($color, $name), text)
+          ));
+        }
+      }
+    }
+  }
+}
+
+@mixin sidenav($theme) {
+  @include mat.sidenav-overrides(_collect(
+    sidenav, $theme, $sidenav-allowed,
+    meta.get-function('get-color-tokens', $module: 'sidenav-tokens'),
+    null, null,
+    meta.get-function('get-unthemable-tokens', $module: 'sidenav-tokens')
+  ));
+}
+
+@mixin stepper($theme) {
+  @include mat.stepper-overrides(_collect(
+    stepper, $theme, $stepper-allowed,
+    meta.get-function('get-color-tokens', $module: 'stepper-tokens'),
+    meta.get-function('get-typography-tokens', $module: 'stepper-tokens'),
+    meta.get-function('get-density-tokens', $module: 'stepper-tokens'),
+    meta.get-function('get-unthemable-tokens', $module: 'stepper-tokens')
+  ));
+  $color: theming.get-color-config($theme);
+  @if $color != null {
+    @each $name in (accent, warn) {
+      .mat-step-header.mat-#{$name} {
+        @include mat.stepper-overrides(_qualify(
+          stepper,
+          stepper-tokens.private-get-color-palette-color-tokens(map.get($color, $name)),
+          $stepper-allowed
+        ));
+      }
+    }
+  }
+}
+
+@mixin sort($theme) {
+  $color: theming.get-color-config($theme);
+  $tokens: ();
+  @if $color != null {
+    $background: map.get($color, background);
+    $foreground: map.get($color, foreground);
+    $table-background: theming.get-color-from-palette($background, card);
+    $text-color: theming.get-color-from-palette($foreground, secondary-text);
+    $arrow: $text-color;
+    @if meta.type-of($table-background) == color and meta.type-of($text-color) == color {
+      $text-opacity: color.opacity($text-color);
+      $arrow: color.mix($table-background, rgba($text-color, 1), (1 - $text-opacity) * 100%);
+    }
+    $tokens: (arrow-color: $arrow);
+  }
+  @include mat.sort-overrides($tokens);
+}
+
+@mixin toolbar($theme) {
+  @include mat.toolbar-overrides(_collect(
+    toolbar, $theme, $toolbar-allowed,
+    meta.get-function('get-color-tokens', $module: 'toolbar-tokens'),
+    meta.get-function('get-typography-tokens', $module: 'toolbar-tokens'),
+    meta.get-function('get-density-tokens', $module: 'toolbar-tokens'),
+    null
+  ));
+  $color: theming.get-color-config($theme);
+  @if $color != null {
+    .mat-toolbar {
+      @each $name in (primary, accent, warn) {
+        $palette: map.get($color, $name);
+        &.mat-#{$name} {
+          @include mat.toolbar-overrides(_qualify(
+            toolbar,
+            toolbar-tokens.private-get-color-palette-color-tokens(
+              $background-color: theming.get-color-from-palette($palette),
+              $text-color: theming.get-color-from-palette($palette, default-contrast)
+            ),
+            $toolbar-allowed
+          ));
+        }
+      }
+    }
+  }
+}
+
+@mixin tree($theme) {
+  $color: theming.get-color-config($theme);
+  $typography: typography.private-typography-to-2014-config(theming.get-typography-config($theme));
+  $density: theming.get-density-config($theme);
+  $tokens: ();
+  @if $color != null {
+    $tokens: map.merge($tokens, (
+      container-background-color: theming.get-color-from-palette(map.get($color, background), card),
+      node-text-color: theming.get-color-from-palette(map.get($color, foreground), text),
+    ));
+  }
+  @if $typography != null {
+    $tokens: map.merge($tokens, (
+      node-text-font: typography-utils.font-family($typography),
+      node-text-size: typography-utils.font-size($typography, body-1),
+      node-text-weight: typography-utils.font-weight($typography, body-1),
+    ));
+  }
+  @if $density != null {
+    $height: compatibility.private-density-prop-value(
+      tree-variables.$density-config, $density, height);
+    @if $height != null {
+      $tokens: map.set($tokens, node-min-height, $height);
+    }
+  }
+  @include mat.tree-overrides($tokens);
+}
+
+/// Themes the thirteen current ordinary companions through public *-overrides.
+@mixin all-current-companion-bridges($theme) {
+  @include badge($theme);
+  @include bottom-sheet($theme);
+  @include button-toggle($theme);
+  @include datepicker($theme);
+  @include divider($theme);
+  @include expansion($theme);
+  @include grid-list($theme);
+  @include icon($theme);
+  @include sidenav($theme);
+  @include stepper($theme);
+  @include sort($theme);
+  @include toolbar($theme);
+  @include tree($theme);
+}
+
+/// Legacy families only. Does not emit current-component overrides.
+@mixin all-owned-component-themes($theme-or-color-config) {
+  @include legacy-button.theme($theme-or-color-config);
+  @include legacy-core.theme($theme-or-color-config);
+  @include legacy-card.theme($theme-or-color-config);
+  @include legacy-progress-bar.theme($theme-or-color-config);
+  @include legacy-progress-spinner.theme($theme-or-color-config);
+  @include legacy-tooltip.theme($theme-or-color-config);
+  @include legacy-input.theme($theme-or-color-config);
+  @include legacy-form-field.theme($theme-or-color-config);
+  @include legacy-select.theme($theme-or-color-config);
+  @include legacy-checkbox.theme($theme-or-color-config);
+  @include legacy-autocomplete.theme($theme-or-color-config);
+  @include legacy-dialog.theme($theme-or-color-config);
+  @include legacy-chips.theme($theme-or-color-config);
+  @include legacy-slide-toggle.theme($theme-or-color-config);
+  @include legacy-radio.theme($theme-or-color-config);
+  @include legacy-slider.theme($theme-or-color-config);
+  @include legacy-menu.theme($theme-or-color-config);
+  @include legacy-list.theme($theme-or-color-config);
+  @include legacy-paginator.theme($theme-or-color-config);
+  @include legacy-tabs.theme($theme-or-color-config);
+  @include legacy-snack-bar.theme($theme-or-color-config);
+  @include legacy-table.theme($theme-or-color-config);
+}
+
+/// Owned families, color system only.
+@mixin all-owned-component-colors($config-or-theme) {
+  $config: if(theming.private-is-theme-object($config-or-theme),
+      theming.get-color-config($config-or-theme), $config-or-theme);
+  @include all-owned-component-themes((
+    color: $config,
+    typography: null,
+    density: null
+  ));
+}
+
+/// Owned families, typography system only.
+@mixin all-owned-component-typographies($config-or-theme) {
+  $config: if(theming.private-is-theme-object($config-or-theme),
+      theming.get-typography-config($config-or-theme), $config-or-theme);
+  @include all-owned-component-themes((
+    color: null,
+    typography: $config,
+    density: null
+  ));
+}
+
+/// Owned families, density system only.
+@mixin all-owned-component-densities($config-or-theme) {
+  $config: if(theming.private-is-theme-object($config-or-theme),
+      theming.get-density-config($config-or-theme), $config-or-theme);
+  @include all-owned-component-themes((
+    color: null,
+    typography: null,
+    density: $config
+  ));
+}
