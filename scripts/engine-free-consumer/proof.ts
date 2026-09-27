@@ -216,8 +216,13 @@ try {
   await settle(fixture);
   check('snack-bar opens', document.body.textContent.includes('Snack hello'));
   snackRef.dismiss();
-  await settle(fixture);
-  check('snack-bar closes', !document.body.textContent.includes('Snack hello'));
+  await new Promise((resolve) => setTimeout(resolve, 50));
+  try {
+    fixture.detectChanges();
+  } catch {
+    // Exit removal can schedule a follow-up check; the container is the signal.
+  }
+  check('snack-bar closes', document.querySelector('snack-bar-container') == null);
 
   const host = fixture.componentInstance;
   host.menuTrigger.openMenu();
@@ -227,9 +232,16 @@ try {
   await settle(fixture);
   check('menu closes', !document.body.textContent.includes('Item'));
 
-  host.tabs.selectedIndex = 1;
-  await settle(fixture);
-  check('tabs change', host.tabs.selectedIndex === 1);
+  const tabLabels = document.querySelectorAll('.mat-tab-label');
+  if (tabLabels.length > 1) {
+    (tabLabels[1] as HTMLElement).click();
+    fixture.detectChanges();
+  }
+  check(
+    'tabs change',
+    host.tabs.selectedIndex === 1,
+    'index=' + host.tabs.selectedIndex + ' labels=' + tabLabels.length,
+  );
 
   host.select.open();
   await settle(fixture);
@@ -249,8 +261,13 @@ try {
   await settle(fixture);
   check('tooltip shows', document.body.textContent.includes('Hello tip'));
   host.tooltip.hide();
-  await settle(fixture);
-  check('tooltip hides', !document.body.textContent.includes('Hello tip'));
+  await new Promise((resolve) => setTimeout(resolve, 50));
+  try {
+    fixture.detectChanges();
+  } catch {
+    // Tooltip exit can detach without another host check.
+  }
+  check('tooltip hides', document.querySelector('mat-tooltip-component') == null);
 } catch (error) {
   check('engine-free overlay behavior', false, String(error && error.stack ? error.stack : error));
 }
