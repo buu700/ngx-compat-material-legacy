@@ -1,3 +1,4 @@
+@use '../bridges/companion-overrides' as bridges;
 @use 'sass:map';
 @use '../core/theming/theming';
 @use '../core/tokens/m2/mat/icon' as tokens-mat-icon;
@@ -12,48 +13,37 @@
 }
 
 @mixin color($config-or-theme) {
-  $config: theming.get-color-config($config-or-theme);
-
-  @include sass-utils.current-selector-or-root() {
-    @include token-utils.create-token-values(tokens-mat-icon.$prefix,
-      tokens-mat-icon.get-color-tokens($config));
-  }
-
-  .mat-icon {
-    &.mat-primary {
-      @include _palette-colors($config, primary);
-    }
-
-    &.mat-accent {
-      @include _palette-colors($config, accent);
-    }
-
-    &.mat-warn {
-      @include _palette-colors($config, warn);
-    }
-  }
+  @include bridges.icon((
+    color: theming.get-color-config($config-or-theme),
+    typography: null,
+    density: null
+  ));
 }
 
-@mixin typography($config-or-theme) {}
 
-@mixin density($config-or-theme) {}
+@mixin typography($config-or-theme) {
+  @include bridges.icon((
+    color: null,
+    typography: theming.get-typography-config($config-or-theme),
+    density: null
+  ));
+}
+
+
+@mixin density($config-or-theme) {
+  @include bridges.icon((
+    color: null,
+    typography: null,
+    density: theming.get-density-config($config-or-theme)
+  ));
+}
+
 
 @mixin theme($theme-or-color-config) {
   $theme: theming.private-legacy-get-theme($theme-or-color-config);
   @include theming.private-check-duplicate-theme-styles($theme, 'mat-icon') {
-    $color: theming.get-color-config($theme);
-    $density: theming.get-density-config($theme);
-    $typography: theming.get-typography-config($theme);
-
-    @if $color != null {
-      @include color($color);
-    }
-    @if $density != null {
-      @include density($density);
-    }
-    @if $typography != null {
-      @include typography($typography);
-    }
+    @include bridges.icon($theme);
   }
 }
+
 
