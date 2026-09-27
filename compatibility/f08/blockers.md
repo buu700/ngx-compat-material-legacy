@@ -14,7 +14,7 @@ From `research/historical-test-ports.csv` (57 rows). Present in runner today:
 
 | Historical | Candidate | Disposition |
 | --- | --- | --- |
-| legacy-button/button.spec.ts | projects/.../legacy-button/button.spec.ts | executed (6 failing assertions) |
+| legacy-button/button.spec.ts | projects/.../legacy-button/button.spec.ts | executed (35/35 passing) |
 | legacy-button/testing/button-harness.spec.ts | .../testing/button-harness.spec.ts | executed (12 pass) |
 
 Unfinished high-priority families (not yet in runner entry):
