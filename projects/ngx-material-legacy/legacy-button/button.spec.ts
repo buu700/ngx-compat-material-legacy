@@ -1,5 +1,5 @@
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
-import {ApplicationRef, Component, DebugElement} from '@angular/core';
+import {ApplicationRef, ChangeDetectionStrategy, Component, DebugElement} from '@angular/core';
 import {By} from '@angular/platform-browser';
 import {MatLegacyButtonModule, MatLegacyButton} from '@ngx-compat/material-legacy/legacy-button';
 import {MatRipple, ThemePalette} from '@angular/material/core';
@@ -344,6 +344,8 @@ describe('MatLegacyButton', () => {
 /** Test component that contains an MatLegacyButton. */
 @Component({
   standalone: false,
+  // Angular 22 treats a missing strategy as OnPush, which skips later detectChanges.
+  changeDetection: ChangeDetectionStrategy.Default,
   selector: 'test-app',
   template: `
     <button [tabIndex]="tabIndex" mat-button type="button" (click)="increment()"
