@@ -63,7 +63,9 @@ export class MatLegacySnackBarContainer extends _MatSnackBarContainerBase {
 
   protected override _afterExitMotionStarted(): void {
     if (!this._animationsEnabled) {
-      this._notifyExitComplete();
+      // Let the hidden host class be checked before removal. Completing the
+      // exit in this same turn flips the class during change detection.
+      setTimeout(() => this._notifyExitComplete());
       return;
     }
     if (this._exitFallback !== null) {
