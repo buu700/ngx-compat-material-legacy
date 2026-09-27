@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import importlib.util
+import io
 import json
+import tarfile
 import tempfile
 import unittest
 from pathlib import Path
@@ -57,6 +59,21 @@ export const x = 1;
         result = scan_source(src)
         self.assertFalse(result['ok'])
         self.assertTrue(any(v['value'] == 'RippleTarget' for v in result['violations']))
+
+    def test_packed_tarball_private_import_is_caught(self):
+        payload = b"import {MatPseudoCheckbox} from '@angular/material/core';\n"
+        buf = io.BytesIO()
+        with tarfile.open(fileobj=buf, mode='w:gz') as archive:
+            info = tarfile.TarInfo('package/fesm2022/legacy-core.mjs')
+            info.size = len(payload)
+            archive.addfile(info, io.BytesIO(payload))
+        with tempfile.TemporaryDirectory() as tmp:
+            tarball = Path(tmp) / 'pkg.tgz'
+            tarball.write_bytes(buf.getvalue())
+            result = MOD.scan(tarball, POLICY)
+        self.assertFalse(result['ok'])
+        self.assertEqual(result['scanned_artifact'], 'tarball')
+        self.assertTrue(any(v['value'] == 'MatPseudoCheckbox' for v in result['violations']))
 
     def test_owned_local_symbol_is_allowed(self):
         src = "import {MatLegacyPseudoCheckbox} from '@ngx-compat/material-legacy/legacy-core';\n"

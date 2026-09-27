@@ -11,7 +11,9 @@ from __future__ import annotations
 import argparse
 import json
 import re
-from pathlib import Path
+import tarfile
+import tempfile
+from pathlib import Path, PurePosixPath
 
 TEXT_EXTS = {'.ts', '.tsx', '.js', '.mjs', '.cjs', '.scss', '.sass'}
 
@@ -82,7 +84,43 @@ def load_policy(path: Path) -> dict:
     return data
 
 
+def _extract_package(tarball: Path, dest: Path) -> None:
+    """Materialize npm-pack members so the policy scan binds to artifact bytes."""
+    with tarfile.open(tarball, mode='r:*') as archive:
+        for member in archive:
+            pure = PurePosixPath(member.name)
+            if pure.is_absolute() or '..' in pure.parts:
+                raise ValueError(f'Unsafe archive path: {member.name}')
+            if member.issym() or member.islnk() or member.isdir():
+                if member.issym() or member.islnk():
+                    raise ValueError(f'Archive links not accepted: {member.name}')
+                continue
+            if not member.isfile() or not pure.parts or pure.parts[0] != 'package':
+                raise ValueError(f'Unexpected archive member: {member.name}')
+            name = PurePosixPath(*pure.parts[1:])
+            if name.suffix.lower() not in TEXT_EXTS:
+                continue
+            target = dest.joinpath(*name.parts)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            source = archive.extractfile(member)
+            if source is None:
+                raise ValueError(f'Unreadable archive member: {member.name}')
+            target.write_bytes(source.read())
+
+
 def scan(root: Path, policy: dict) -> dict:
+    if root.is_file() and (root.suffix == '.tgz' or root.name.endswith('.tar.gz')):
+        with tempfile.TemporaryDirectory(prefix='policy-tarball-') as tmp:
+            extracted = Path(tmp)
+            _extract_package(root, extracted)
+            result = _scan_tree(extracted, policy)
+        result['scanned_root'] = str(root.resolve())
+        result['scanned_artifact'] = 'tarball'
+        return result
+    return _scan_tree(root, policy)
+
+
+def _scan_tree(root: Path, policy: dict) -> dict:
     violations = []
     forbidden_modules = set(policy.get('forbidden_modules', []))
     forbidden_substrings = policy.get('forbidden_module_substrings', [])
