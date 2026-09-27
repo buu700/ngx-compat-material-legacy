@@ -27,6 +27,10 @@ function migrateLegacy(options) {
 
   return (tree, context) => {
     const logger = context && context.logger ? context.logger : console;
+    /** @type {{path: string, content: string, kind: string}[]} */
+    const edits = [];
+    /** @type {{path: string, diagnostics: string[]}[]} */
+    const blocked = [];
     const visit = (dirPath) => {
       const dir = tree.getDir(dirPath);
       for (const file of dir.subfiles) {
@@ -47,9 +51,10 @@ function migrateLegacy(options) {
               `[migrate-legacy] ${path}: acknowledgements=${result.acknowledgements.join(',')}`,
             );
           }
-          if (result.ok && result.changed && result.content != null) {
-            tree.overwrite(path, result.content);
-            logger.info(`[migrate-legacy] updated Sass @use in ${path}`);
+          if (!result.ok) {
+            blocked.push({path, diagnostics: result.diagnostics || []});
+          } else if (result.changed && result.content != null) {
+            edits.push({path, content: result.content, kind: 'sass'});
           }
         } else if (TS_RE.test(file)) {
           const buf = tree.read(path);
@@ -64,9 +69,10 @@ function migrateLegacy(options) {
               `[migrate-legacy] ${path}: acknowledgements=${result.acknowledgements.join(',')}`,
             );
           }
-          if (result.ok && result.changed && result.content != null) {
-            tree.overwrite(path, result.content);
-            logger.info(`[migrate-legacy] updated TypeScript legacy import in ${path}`);
+          if (!result.ok) {
+            blocked.push({path, diagnostics: result.diagnostics || []});
+          } else if (result.changed && result.content != null) {
+            edits.push({path, content: result.content, kind: 'ts'});
           }
         }
       }
@@ -77,6 +83,18 @@ function migrateLegacy(options) {
       }
     };
     visit('/');
+    if (blocked.length) {
+      const detail = blocked
+        .map((item) => `${item.path}: ${item.diagnostics.join('; ')}`)
+        .join('\n');
+      throw new Error(
+        `migrate-legacy blocked ${blocked.length} file(s) and wrote nothing:\n${detail}`,
+      );
+    }
+    for (const edit of edits) {
+      tree.overwrite(edit.path, edit.content);
+      logger.info(`[migrate-legacy] updated ${edit.kind} in ${edit.path}`);
+    }
     return tree;
   };
 }

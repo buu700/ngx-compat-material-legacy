@@ -30,16 +30,205 @@ function normalizeOptions(options) {
   };
 }
 
+/** Historical legacy entry points. `/testing` is the only allowed extra segment. */
+const LEGACY_ENTRIES = new Set([
+  'legacy-autocomplete',
+  'legacy-button',
+  'legacy-card',
+  'legacy-checkbox',
+  'legacy-chips',
+  'legacy-dialog',
+  'legacy-form-field',
+  'legacy-input',
+  'legacy-list',
+  'legacy-menu',
+  'legacy-paginator',
+  'legacy-progress-bar',
+  'legacy-progress-spinner',
+  'legacy-radio',
+  'legacy-select',
+  'legacy-slide-toggle',
+  'legacy-slider',
+  'legacy-snack-bar',
+  'legacy-table',
+  'legacy-tabs',
+  'legacy-tooltip',
+  'legacy-core',
+]);
+
+const RECIPE_NAME = /\bmatLegacy[A-Za-z0-9]*Animations\b/;
+
+/**
+ * Blank comments, strings, and template literals so later matches see code only.
+ * Newlines stay in place, so indexes still refer to the original source.
+ * Template `${...}` interpolations are scanned as code.
+ * @param {string} source
+ * @returns {string}
+ */
+function maskNonCode(source, flags = null) {
+  const chars = source.split('');
+  const n = chars.length;
+  let i = 0;
+
+  const blank = (from, to) => {
+    for (let k = from; k < to; k++) {
+      if (chars[k] !== '\n') {
+        chars[k] = ' ';
+        if (flags) flags[k] = true;
+      }
+    }
+  };
+
+  while (i < n) {
+    const c = chars[i];
+    const next = chars[i + 1];
+    if (c === '/' && next === '/') {
+      const start = i;
+      i += 2;
+      while (i < n && chars[i] !== '\n') i++;
+      blank(start, i);
+      continue;
+    }
+    if (c === '/' && next === '*') {
+      const start = i;
+      i += 2;
+      while (i + 1 < n && !(chars[i] === '*' && chars[i + 1] === '/')) i++;
+      i = Math.min(n, i + 2);
+      blank(start, i);
+      continue;
+    }
+    if (c === '\'' || c === '"') {
+      const quote = c;
+      const start = i;
+      i++;
+      while (i < n) {
+        if (chars[i] === '\\') {
+          i += 2;
+          continue;
+        }
+        if (chars[i] === quote || chars[i] === '\n') {
+          if (chars[i] === quote) i++;
+          break;
+        }
+        i++;
+      }
+      blank(start, i);
+      continue;
+    }
+    if (c === '`') {
+      const start = i;
+      i++;
+      while (i < n) {
+        if (chars[i] === '\\') {
+          i += 2;
+          continue;
+        }
+        if (chars[i] === '`') {
+          i++;
+          break;
+        }
+        if (chars[i] === '$' && chars[i + 1] === '{') {
+          blank(start, i);
+          i += 2;
+          let depth = 1;
+          while (i < n && depth > 0) {
+            if (chars[i] === '{') depth++;
+            else if (chars[i] === '}') depth--;
+            if (depth > 0) i++;
+            else i++;
+          }
+          continue;
+        }
+        i++;
+      }
+      blank(start, i);
+      continue;
+    }
+    i++;
+  }
+  return chars.join('');
+}
+
+function nonCodeFlags(source) {
+  const flags = new Array(source.length).fill(false);
+  maskNonCode(source, flags);
+  return flags;
+}
+
+/**
+ * @param {string} spec
+ * @returns {'rewrite'|'private'|'unknown'|'deep'|'ignore'}
+ */
+function classifyLegacySpecifier(spec) {
+  if (!spec.startsWith(FROM_PREFIX)) return 'ignore';
+  const rest = spec.slice(FROM_PREFIX.length);
+  const parts = rest.split('/');
+  const entry = `legacy-${parts[0]}`;
+  if (!LEGACY_ENTRIES.has(entry)) return 'unknown';
+  if (parts.length === 1) return 'rewrite';
+  if (parts.length === 2 && parts[1] === 'testing') return 'rewrite';
+  if (parts.indexOf('private') !== -1) return 'private';
+  return 'deep';
+}
+
+/**
+ * @param {string} masked
+ * @returns {{spec: string, specStart: number, specEnd: number, clause: string}[]}
+ */
+function keywordInCode(match, flags) {
+  const kw = match[0].search(/[A-Za-z]/);
+  const idx = match.index + (kw < 0 ? 0 : kw);
+  return !flags[idx];
+}
+
+function collectLegacyImports(source, flags) {
+  /** @type {{spec: string, specStart: number, specEnd: number, clause: string}[]} */
+  const found = [];
+  const seen = new Set();
+  const record = (match, spec, clause) => {
+    if (!keywordInCode(match, flags)) return;
+    const specStart = match.index + match[0].lastIndexOf(spec);
+    const key = `${specStart}:${spec}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    found.push({spec, specStart, specEnd: specStart + spec.length, clause: clause || ''});
+  };
+
+  const fromRe =
+    /(?:^|[^.\w$])(?:import|export)\s+(?:type\s+)?([\s\S]*?)\s+from\s+(['"])(@angular\/material\/legacy-[^'"]+)\2/g;
+  const sideRe =
+    /(?:^|[^.\w$])import\s+(['"])(@angular\/material\/legacy-[^'"]+)\1/g;
+  const dynamicRe =
+    /import\s*\(\s*(['"])(@angular\/material\/legacy-[^'"]+)\1\s*\)/g;
+  const requireRe =
+    /require\s*\(\s*(['"])(@angular\/material\/legacy-[^'"]+)\1\s*\)/g;
+
+  const requireIsShadowed =
+    /(?:function\s+[A-Za-z_$][\w$]*\s*\([^)]*\brequire\b|\(\s*require\s*[:,)]|\b(?:const|let|var|function|class)\s+require\b|\brequire\s*=>)/.test(
+      source,
+    );
+  for (const match of source.matchAll(fromRe)) record(match, match[3], match[1]);
+  for (const match of source.matchAll(sideRe)) record(match, match[2], '');
+  for (const match of source.matchAll(dynamicRe)) record(match, match[2], '');
+  if (!requireIsShadowed) {
+    for (const match of source.matchAll(requireRe)) record(match, match[2], '');
+  }
+  return found;
+}
+
 /**
  * Detect ordinary (non-legacy) Material module specifiers in import/export/from forms.
  * @param {string} content
  * @returns {boolean}
  */
 function hasOrdinaryMaterialModuleSpecifiers(content) {
-  // from '...', import('...') — exclude legacy-* and bare @angular/material if any
+  const flags = nonCodeFlags(content);
   const fromRe =
     /(?:from\s+|import\s*\(\s*)(['"])(@angular\/material\/(?!legacy-)[^'"]+)\1/g;
-  return fromRe.test(content);
+  for (const match of content.matchAll(fromRe)) {
+    if (keywordInCode(match, flags)) return true;
+  }
+  return false;
 }
 
 /**
@@ -52,53 +241,48 @@ function rewriteLegacyTypescriptImports(content, options) {
   const diagnostics = [];
   /** @type {string[]} */
   const acknowledgements = [];
+  const flags = nonCodeFlags(content);
+  const masked = maskNonCode(content);
+  const found = collectLegacyImports(content, flags);
 
-  if (/@angular\/material\/legacy-[\w-]+\/private\b/.test(content)) {
-    diagnostics.push(
-      'private-typescript: import of `@angular/material/legacy-*/private` is unsupported; refusing rewrite.',
-    );
-    return {ok: false, content, diagnostics, changed: false, acknowledgements};
-  }
-
-  // Computed / concatenated dynamic import — refuse whole file.
-  if (/import\s*\(\s*(['"])@angular\/material\/\1\s*\+/.test(content)) {
+  if (/import\s*\(\s*(['"])@angular\/material\/\1\s*\+/.test(masked)) {
     diagnostics.push('computed-import: dynamic import uses concatenation; refusing rewrite.');
+  }
+
+  for (const item of found) {
+    const kind = classifyLegacySpecifier(item.spec);
+    if (kind === 'private') {
+      diagnostics.push(
+        'private-typescript: import of `@angular/material/legacy-*/private` is unsupported; refusing rewrite.',
+      );
+    } else if (kind === 'unknown') {
+      diagnostics.push(
+        `unknown-entry: \`${item.spec}\` is not a historical legacy entry point; refusing rewrite.`,
+      );
+    } else if (kind === 'deep') {
+      diagnostics.push(
+        `unsupported-path: \`${item.spec}\` is not a supported legacy or /testing path; refusing rewrite.`,
+      );
+    } else if (item.clause && RECIPE_NAME.test(item.clause)) {
+      diagnostics.push(
+        `engine-recipe: \`${item.spec}\` imports a removed animation recipe; refusing rewrite. ` +
+          'Use the native motion API instead of /animations metadata.',
+      );
+    } else if (
+      item.clause &&
+      /^\s*\*\s+as\s+[A-Za-z_$][\w$]*\s*$/.test(item.clause) &&
+      RECIPE_NAME.test(masked)
+    ) {
+      diagnostics.push(
+        'namespace-recipe: namespace import references removed animation recipes; provide a binding-aware migration example instead of guessing.',
+      );
+    }
+  }
+
+  if (diagnostics.length) {
     return {ok: false, content, diagnostics, changed: false, acknowledgements};
   }
 
-  // Namespace import of legacy entry that references removed recipes — diagnostic only.
-  if (
-    /import\s*\*\s*as\s+\w+\s+from\s+(['"])@angular\/material\/legacy-[\w/-]+\1/.test(content) &&
-    /matLegacy\w+Animations/.test(content)
-  ) {
-    diagnostics.push(
-      'namespace-recipe: namespace import references removed animation recipes; provide a binding-aware migration example instead of guessing.',
-    );
-    return {ok: false, content, diagnostics, changed: false, acknowledgements};
-  }
-
-  let changed = false;
-
-  // import / export ... from '...'
-  let next = content.replace(
-    /(from\s+)(['"])(@angular\/material\/legacy-[\w/-]+)\2/g,
-    (match, fromKw, quote, spec) => {
-      changed = true;
-      return `${fromKw}${quote}${spec.replace(FROM_PREFIX, TO_PREFIX)}${quote}`;
-    },
-  );
-
-  // dynamic import('...')
-  next = next.replace(
-    /(import\s*\(\s*)(['"])(@angular\/material\/legacy-[\w/-]+)\2(\s*\))/g,
-    (match, lead, quote, spec, trail) => {
-      changed = true;
-      return `${lead}${quote}${spec.replace(FROM_PREFIX, TO_PREFIX)}${quote}${trail}`;
-    },
-  );
-
-  // Ordinary current-component module usage: report; acknowledgement records readiness
-  // acceptance without rewriting those imports.
   if (hasOrdinaryMaterialModuleSpecifiers(content)) {
     if (!opts.acknowledgeCurrentComponents) {
       diagnostics.push(
@@ -106,19 +290,6 @@ function rewriteLegacyTypescriptImports(content, options) {
           'require --acknowledge-current-components (schematic: acknowledgeCurrentComponents) ' +
           'before readiness. No rewrite of ordinary imports.',
       );
-      // Unacknowledged current-component risk blocks readiness (ok:false) but must not
-      // invent edits. If legacy rewrites also applied in the same file, still refuse
-      // to stage a half-ready report: leave content unchanged when blocking.
-      if (changed) {
-        // Transactional: do not apply legacy rewrites alongside unacked current-component risk.
-        return {
-          ok: false,
-          content,
-          diagnostics,
-          changed: false,
-          acknowledgements,
-        };
-      }
       return {ok: false, content, diagnostics, changed: false, acknowledgements};
     }
     acknowledgements.push('current-components');
@@ -126,6 +297,18 @@ function rewriteLegacyTypescriptImports(content, options) {
       'current-component-acknowledged: ordinary Material imports left unchanged; ' +
         'recorded acknowledgement that current-component drift is accepted for readiness (not visual approval).',
     );
+  }
+
+  let next = content;
+  let changed = false;
+  const rewrites = found
+    .filter((item) => classifyLegacySpecifier(item.spec) === 'rewrite')
+    .sort((a, b) => b.specStart - a.specStart);
+  for (const item of rewrites) {
+    const replacement = TO_PREFIX + item.spec.slice(FROM_PREFIX.length);
+    if (replacement === item.spec) continue;
+    next = next.slice(0, item.specStart) + replacement + next.slice(item.specEnd);
+    changed = true;
   }
 
   return {ok: true, content: next, diagnostics, changed, acknowledgements};
