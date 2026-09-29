@@ -1388,10 +1388,20 @@
       ],
       "disposition": "not-owned",
       "evidence": "The patch measures CDK sticky columns and rows inside the coalesced style scheduler instead of before it. The package does not define StickyStyler. That measurement was not copied."
+    },
+    {
+      "sha": "2dc10daa07a9380c61c955edd44005f2c06e5e22",
+      "files": [
+        "src/material/button/_button-theme.scss",
+        "src/material/button/button.scss",
+        "src/material/core/tokens/m2/mdc/_protected-button.scss"
+      ],
+      "disposition": "not-applied",
+      "evidence": "The patch replaces the MDC button elevation mixins with token shadow variables and moves the protected-button elevation numbers into the token map. The package has no structural button.scss and no protected-button token map. The owned MDC theme still passes container-elevation 0 through the protected theme mixin. The legacy button theme still uses the historical elevation helper. Those shadows were not added."
     }
   ],
   "limitations": [
-    "The other 897 behavior-semantic SHAs were not read.",
+    "The other 896 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
