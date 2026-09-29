@@ -808,10 +808,21 @@
       ],
       "disposition": "not-applied",
       "evidence": "The patch removes ripple-theme-styles and emits button ripple colors as token slots. styles/button/_button-theme-private.scss still defines ripple-theme-styles and --mat-mdc-button-persistent-ripple-color. The button, fab, and icon-button themes still call that mixin. Those token maps were not added."
+    },
+    {
+      "sha": "47341ac0d6a56c7adb6dca5f89ba2d6fcfb7d572",
+      "files": [
+        "src/material/core/_core-theme.scss",
+        "src/material/core/ripple/_ripple-theme.scss",
+        "src/material/core/ripple/_ripple.scss",
+        "src/material/core/tokens/m2/mat/_ripple.scss"
+      ],
+      "disposition": "not-applied",
+      "evidence": "The patch adds a ripple token map and emits ripple color through current-selector-or-root instead of under .mat-ripple-element. styles/core/ripple/_ripple-theme.scss still sets the element background from get-color-config. There is no styles/core/tokens/m2/mat/_ripple.scss, and that token map was not added."
     }
   ],
   "limitations": [
-    "The other 960 behavior-semantic SHAs were not read.",
+    "The other 959 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
