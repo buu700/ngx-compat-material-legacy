@@ -5560,10 +5560,18 @@
       ],
       "disposition": "owned-retained",
       "evidence": "The patch creates the menu overlay through createOverlayRef and createRepositionScrollStrategy, and listens on overlay keydownEvents. Owned menu still creates the overlay with Overlay.create and uses scrollStrategies.reposition (legacy-menu/internal/menu-trigger-base.ts). Those calls were not switched."
+    },
+    {
+      "sha": "f5c4f632d04556c0452ea4aff01297ae5f79c106",
+      "files": [
+        "src/material/select/select.ts"
+      ],
+      "disposition": "owned-retained",
+      "evidence": "The patch builds the select scroll strategy with createRepositionScrollStrategy. Owned select still returns overlay.scrollStrategies.reposition (legacy-select/internal/select-base.ts). That call was not switched."
     }
   ],
   "limitations": [
-    "The other 415 behavior-semantic SHAs were not read.",
+    "The other 414 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
