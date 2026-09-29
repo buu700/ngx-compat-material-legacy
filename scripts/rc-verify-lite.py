@@ -71,6 +71,7 @@ CHECKS = (
     ["node", "--check", "scripts/ssr-dialog.mjs"],
     ["node", "scripts/freeze-upstream-audit.mjs", "--check"],
     ["node", "scripts/check-security-deep-review.mjs"],
+    ["node", "scripts/group-docs-build-batch.mjs", "--check"],
     ["node", "--check", "scripts/motion-lifecycle-smoke.mjs"],
     ["node", "--check", "scripts/packed-consumer-aot-smoke.mjs"],
     ["node", "scripts/fresh-artifact-negative-tests.mjs"],
