@@ -1666,10 +1666,18 @@
       ],
       "disposition": "owned-retained",
       "evidence": "The patch emits the slide-toggle base, color, typography, and density tokens under current-selector-or-root. The owned mixins still nest those styles under .mat-mdc-slide-toggle. The emission selector was not changed."
+    },
+    {
+      "sha": "41766330b6993628dc511bf8595b8d58dd495c22",
+      "files": [
+        "src/material/slider/slider-thumb.ts"
+      ],
+      "disposition": "not-owned",
+      "evidence": "The patch skips removing pointer listeners when the MDC slider thumb is destroyed before the input element exists. The package has no slider thumb class. The owned slider removes its listeners from the document and the host element. The guard was not added."
     }
   ],
   "limitations": [
-    "The other 867 behavior-semantic SHAs were not read.",
+    "The other 866 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
