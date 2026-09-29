@@ -5031,10 +5031,19 @@
       ],
       "disposition": "not-owned",
       "evidence": "The patch reads EnvironmentInjector from the portal injector before attaching a DomPortalOutlet view. This package does not define DomPortalOutlet."
+    },
+    {
+      "sha": "32353fb3ab97de9a5617115b92dafa667d53f1e0",
+      "files": [
+        "src/material/autocomplete/autocomplete-trigger.ts",
+        "src/material/menu/menu-trigger.ts"
+      ],
+      "disposition": "owned-retained",
+      "evidence": "The patch widens autocomplete, datepicker, and timepicker input handlers from a string or KeyboardEvent to Event, and optional-chains menu.panelId. Owned autocomplete still types those handlers as KeyboardEvent (legacy-autocomplete/internal/autocomplete-trigger-base.ts). Owned menu already optional-chains panelId. Datepicker and timepicker inputs are not defined here. The handler signatures were not widened."
     }
   ],
   "limitations": [
-    "The other 481 behavior-semantic SHAs were not read.",
+    "The other 480 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
