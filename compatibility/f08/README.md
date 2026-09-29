@@ -1,6 +1,6 @@
 # F08 — Historical behavior TestBed runner (bootstrap)
 
-**Status:** in progress (runner proven; full 57-spec port incomplete)  
+**Live inventory:** `testing/legacy-runner/historical-inventory.json` (also pointed to by `port-manifest.json`). The notes below are the bootstrap snapshot, not the current disposition index.  
 **G09:** not claimed passed
 
 ## Runner

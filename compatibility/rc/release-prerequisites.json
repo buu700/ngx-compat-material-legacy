@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "observed_at": "2026-09-29T01:40:00Z",
+  "observation_limits": "Registry name lookup and local npm auth only. Branch protection was not queried because gh is not installed and the embedded remote credential was not reused for a metadata API call.",
+  "package": "@ngx-compat/material-legacy",
+  "registry": {
+    "lookup": "npm view @ngx-compat/material-legacy",
+    "result": "404, package name is not in the public registry on this date",
+    "versions_observed_unused": ["22.0.0-rc.0", "21.0.0-rc.0"],
+    "recheck_before_publish": true
+  },
+  "planned_dist_tags": {
+    "main_rc": "next",
+    "maintenance_rc": "lts-21-next",
+    "stable": "latest",
+    "maintenance_stable": "lts-21"
+  },
+  "npm_auth": "npm whoami returned ENEEDAUTH. This machine is not logged in for publication.",
+  "github": {
+    "repository": "buu700/ngx-compat-material-legacy",
+    "default_push_remote": "origin",
+    "gh_cli": "absent",
+    "branch_protection": "not observed this session",
+    "rulesets": "not observed this session"
+  },
+  "authority": {
+    "publication": "not granted",
+    "registry_account_configuration": "not granted",
+    "cyph_policy_change": "not granted",
+    "push_of_source_commits": "granted for this execution by the owner instruction to push every commit"
+  },
+  "owner_queue": [
+    {
+      "id": "cyph-rc-age-admission",
+      "decision": "Approve or refuse an exact package/version/integrity exception under the 30-day policy. Do not use a security-exception label or a namespace bypass.",
+      "blocks": ["RC-12", "RC-00-A04 closure as approved"]
+    },
+    {
+      "id": "registry-publish-authority",
+      "decision": "Confirm npm scope ownership, trusted publishing, and the exact version/tag to publish after engineering readiness.",
+      "blocks": ["RC-11"]
+    },
+    {
+      "id": "github-protection-read",
+      "decision": "Provide a read of branch protection and rulesets, or install an authenticated gh client that does not require extracting the remote token.",
+      "blocks": ["RC-00-A05 complete protection evidence"]
+    }
+  ]
+}
