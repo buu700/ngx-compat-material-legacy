@@ -15,10 +15,21 @@
       ],
       "disposition": "not-owned",
       "evidence": "The patch moves the current mat-mdc-slider theme onto MDC slider token maps, including active-track height 6px and handle size 20px. It does not touch legacy-slider. The owned slider styles do not reference mdc-slider tokens, and they were not changed."
+    },
+    {
+      "sha": "77ffdf98ba71c11d908b29e02b516dddf487ae0b",
+      "files": [
+        "src/material/autocomplete/autocomplete-trigger.ts",
+        "src/material/autocomplete/autocomplete.spec.ts",
+        "src/dev-app/autocomplete/autocomplete-demo.ts",
+        "src/components-examples/material/autocomplete/autocomplete-require-selection"
+      ],
+      "disposition": "already-present",
+      "evidence": "The patch skips _onChange while typing when requireSelection is set, and the MDC spec then expects the model to stay at the previous object instead of the typed string Cali. legacy-autocomplete/internal/autocomplete-trigger-base.ts already has that same guard and comment. No source was changed."
     }
   ],
   "limitations": [
-    "The other 1039 behavior-semantic SHAs were not read.",
+    "The other 1038 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
