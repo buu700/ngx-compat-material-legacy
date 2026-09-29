@@ -1229,10 +1229,18 @@
       ],
       "disposition": "owned-retained",
       "evidence": "The patch removes ngSkipHydration from the autocomplete, menu, and select. The owned autocomplete, menu, and select still set that host binding. Those bindings were not removed."
+    },
+    {
+      "sha": "e43c059ac313fca732443c6c73cf397f0cf446f3",
+      "files": [
+        "src/cdk/a11y/aria-describer/aria-reference.ts"
+      ],
+      "disposition": "not-owned",
+      "evidence": "The patch trims the aria id once and uses strict comparison inside the CDK aria-reference helpers. The owned select and autocomplete import those helpers from @angular/cdk/a11y. The package does not define them. The comparison was not copied."
     }
   ],
   "limitations": [
-    "The other 915 behavior-semantic SHAs were not read.",
+    "The other 914 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
