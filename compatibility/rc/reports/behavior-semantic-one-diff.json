@@ -5528,10 +5528,18 @@
       ],
       "disposition": "owned-retained",
       "evidence": "The patch creates the autocomplete overlay through createOverlayRef and createRepositionScrollStrategy. Owned autocomplete still creates the overlay with Overlay.create and uses scrollStrategies.reposition (legacy-autocomplete/internal/autocomplete-trigger-base.ts). Those calls were not switched."
+    },
+    {
+      "sha": "2dbfd7277328a2c22ce7e3b3adf0ac1c556502f8",
+      "files": [
+        "src/material/bottom-sheet/bottom-sheet.ts"
+      ],
+      "disposition": "not-owned",
+      "evidence": "The patch opens the bottom sheet with createBlockScrollStrategy and createGlobalPositionStrategy. This package does not define MatBottomSheet. Those calls were not added."
     }
   ],
   "limitations": [
-    "The other 419 behavior-semantic SHAs were not read.",
+    "The other 418 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
