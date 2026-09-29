@@ -4855,10 +4855,18 @@
       ],
       "disposition": "already-present",
       "evidence": "The patch passes a field-injected ViewContainerRef into the tooltip portal instead of reading it from the injector at attach time. Owned tooltip already receives ViewContainerRef in the constructor and passes that reference to the portal (legacy-tooltip/internal/tooltip-base.ts). That field initializer was not added."
+    },
+    {
+      "sha": "f0d6658263083fe8737a8ebd9299c90106faad8b",
+      "files": [
+        "src/material/checkbox/_checkbox-common.scss"
+      ],
+      "disposition": "owned-retained",
+      "evidence": "The patch raises the MDC checkbox input above other layers so it receives clicks. Owned checkbox input does not set that z-index (legacy-checkbox/checkbox.scss). That stacking was not added."
     }
   ],
   "limitations": [
-    "The other 503 behavior-semantic SHAs were not read.",
+    "The other 502 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
