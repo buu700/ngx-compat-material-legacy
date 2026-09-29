@@ -1,8 +1,8 @@
 {
   "template": false,
-  "packet_id": "RC-02",
-  "substep_id": "RC-02.02",
-  "source_commit": "5684270c77ccbf64a4ee66c8a7c89c645ddc05b3",
+  "packet_id": "RC-06",
+  "substep_id": "RC-06.03",
+  "source_commit": "2b2d3bc5526a5b2042f166363840db62e00b7c99",
   "source_content_digest": null,
   "worktree_line": "main",
   "line_21_commit": "cbf86f3faccb240e7beeb6a1e2af727b5d9a674d",
@@ -16,25 +16,30 @@
     "compatibility/rc/release-prerequisites.json",
     "compatibility/rc/session-handoff.json"
   ],
-  "last_command": ["just chainman exec -- node scripts/pack-library.mjs --out /tmp/ngx-pack-rc02 --line main"],
-  "outcome": "passed",
-  "first_actionable_error": "Cyph has no exact first-party RC age admission. gh is absent, so branch protection was not read. Container-nix cannot execute the official Node binary; host-nix is the qualified mode. packed-consumer exits 2 until a fresh tarball is passed, and just verify is fail-closed because the full gate is not implemented.",
-  "failed_case_ids": [],
+  "last_command": ["just test-legacy --family select"],
+  "outcome": "failed",
+  "first_actionable_error": "Select panel width is the trigger width, not 32px wider. Default select options now follow the published MAT_SELECT_CONFIG. packed-consumer still exits 2 without a fresh tarball, and just verify is fail-closed.",
+  "failed_case_ids": [
+    "MatSelect > core > overlay panel > should set the width of the overlay based on the trigger",
+    "MatSelect > core > overlay panel > should set the width of the overlay based on a larger trigger width"
+  ],
   "report_paths": [
     "compatibility/rc/status.json",
     "compatibility/rc/reports/legacy-card.json",
     "compatibility/rc/reports/legacy-tooltip.json",
     "compatibility/rc/reports/setup-invalidation.json",
-    "compatibility/rc/reports/rc01-negative.json"
+    "compatibility/rc/reports/rc01-negative.json",
+    "compatibility/rc/reports/legacy-select.json"
   ],
   "completed_acceptance_ids": ["RC-00-A01", "RC-00-A02", "RC-00-A03", "RC-01-A01", "RC-01-A02", "RC-01-A03", "RC-01-A04", "RC-01-A05"],
   "not_run_scope": [
     "RC-00-A04 remains blocked on an owner age-admission decision",
     "GitHub branch protection and rulesets",
-    "Historical families other than card and tooltip",
-    "RC-02 through RC-05 and RC-07 through RC-12"
+    "Historical families other than card, tooltip, and select",
+    "RC-02 still needs a fresh tarball passed to packed-consumer",
+    "RC-03 through RC-05 and RC-07 through RC-12"
   ],
-  "next_action": "RC-02: put the npm pack identity into a draft run manifest and pass that tarball to packed-consumer.",
+  "next_action": "Resolve the two select panel-width failures, then continue autocomplete and form-field.",
   "blocked_owner_decisions": [
     "cyph-rc-age-admission",
     "registry-publish-authority",

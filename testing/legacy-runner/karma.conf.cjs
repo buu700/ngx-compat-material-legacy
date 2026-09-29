@@ -20,7 +20,9 @@ module.exports = function (config) {
         : path.resolve(__dirname, '../../compatibility/f08/legacy-test-results.json'),
       expectFail,
     },
-    port: 9876,
+    hostname: '127.0.0.1',
+    // Fixed off the default so a leftover browser tab cannot join the run.
+    port: 9887,
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: false,

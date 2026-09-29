@@ -38,6 +38,7 @@ import {
   ScrollStrategy,
 } from '@angular/cdk/overlay';
 import {ViewportRuler} from '@angular/cdk/scrolling';
+import {MAT_SELECT_CONFIG} from '@angular/material/select';
 import {
   AfterContentInit,
   Attribute,
@@ -145,9 +146,6 @@ export interface MatSelectConfig {
    */
   panelWidth?: string | number | null;
 }
-
-/** Injection token that can be used to provide the default options the select module. */
-export const MAT_SELECT_CONFIG = new InjectionToken<MatSelectConfig>('MAT_SELECT_CONFIG');
 
 /** @docs-private */
 export const MAT_SELECT_SCROLL_STRATEGY_PROVIDER = {
