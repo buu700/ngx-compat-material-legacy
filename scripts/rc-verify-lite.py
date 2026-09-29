@@ -67,6 +67,7 @@ CHECKS = (
     ["node", "--check", "scripts/aot-same-selector.mjs"],
     ["node", "--check", "scripts/aot-historical-scenario.mjs"],
     ["node", "scripts/declare-browser-matrix.mjs", "--check"],
+    ["node", "--check", "scripts/browser-dialog-escape.mjs"],
     ["node", "--check", "scripts/motion-lifecycle-smoke.mjs"],
     ["node", "--check", "scripts/packed-consumer-aot-smoke.mjs"],
     ["node", "scripts/fresh-artifact-negative-tests.mjs"],
