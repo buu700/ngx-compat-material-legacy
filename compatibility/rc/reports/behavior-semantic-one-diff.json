@@ -4174,10 +4174,20 @@
       ],
       "disposition": "not-owned",
       "evidence": "The patch always renders a button-toggle checkbox wrapper and animates it open over 150ms after the first view render. This package does not define MatButtonToggle. That animation was not added."
+    },
+    {
+      "sha": "26a817ccb3b7391b1baed6693adfb80a88cdd9c1",
+      "files": [
+        "src/material/snack-bar/snack-bar-ref.ts",
+        "src/material/snack-bar/snack-bar-container.ts",
+        "src/material/dialog/dialog-ref.ts"
+      ],
+      "disposition": "owned-retained",
+      "evidence": "The patch types timeout ids as ReturnType<typeof setTimeout> instead of number. Owned snack-bar still types its duration and announce timeout ids as number (legacy-snack-bar/internal/snack-bar-ref.ts and snack-bar-container-base.ts). Those types were not changed."
     }
   ],
   "limitations": [
-    "The other 587 behavior-semantic SHAs were not read.",
+    "The other 586 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
