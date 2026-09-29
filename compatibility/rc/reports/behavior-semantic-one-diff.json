@@ -5152,10 +5152,18 @@
       ],
       "disposition": "owned-retained",
       "evidence": "The patch emits M3 theme tokens through create-token-values-mixed so selectors are not repeated around mixed declarations. Owned themes still call create-token-values (styles/core/tokens/_token-utils.scss). That mixed mixin was not added."
+    },
+    {
+      "sha": "0a4cd9127c1bc213aa81092c7b8b710c37eb5dc3",
+      "files": [
+        "src/material/core/animation/animation.ts"
+      ],
+      "disposition": "owned-retained",
+      "evidence": "The patch replaces per-component NoopAnimations checks with a shared _animationsDisabled helper that calls inject. Owned components still inject ANIMATION_MODULE_TYPE in their constructors (legacy-button/button.ts). That helper was not added."
     }
   ],
   "limitations": [
-    "The other 466 behavior-semantic SHAs were not read.",
+    "The other 465 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
