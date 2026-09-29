@@ -603,10 +603,19 @@
       ],
       "disposition": "not-applied",
       "evidence": "The patch adds bottom-sheet-base and emits bottom-sheet unthemable tokens from bottom-sheet-theme. The owned forward lists bottom-sheet-theme, color, typography, and density. styles/bottom-sheet/_bottom-sheet-theme.scss has no base mixin, and that mixin was not added."
+    },
+    {
+      "sha": "1de6a3aa37118e4153fb995a8c8f4daecdf6d0b5",
+      "files": [
+        "src/material/button/_button-theme.scss",
+        "src/material/core/tokens/m2/mdc/_button-protected.scss"
+      ],
+      "disposition": "already-present",
+      "evidence": "The patch uses protected button color tokens for raised buttons and sets the disabled label to 0.5 opacity in a dark theme. styles/button/_button-theme.scss already themes .mat-mdc-raised-button with the protected theme, and its disabled ink is rgba of on-surface at 0.5 when is-dark is set. No source was changed."
     }
   ],
   "limitations": [
-    "The other 980 behavior-semantic SHAs were not read.",
+    "The other 979 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
