@@ -19,3 +19,7 @@ export {
   dispatchPointerEvent,
   dispatchTouchEvent,
 } from './dispatch-events';
+export {patchElementFocus, triggerFocus, triggerBlur} from './element-focus';
+export {typeInElement, clearElement} from './type-in-element';
+export {MockNgZone} from './mock-ng-zone';
+export {wrappedErrorMessage} from './wrapped-error-message';

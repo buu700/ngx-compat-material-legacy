@@ -703,7 +703,9 @@ describe('MatTabHeader', () => {
         label.textContent += extraText;
       });
 
-      mutationCallbacks.forEach(callback => callback());
+      const text = document.createTextNode('x');
+      const record = {type: 'childList', target: text, addedNodes: [text], removedNodes: [] as Node[]};
+      mutationCallbacks.forEach(callback => callback([record]));
       fixture.detectChanges();
 
       expect(tabHeaderElement.classList).toContain(enabledClass);

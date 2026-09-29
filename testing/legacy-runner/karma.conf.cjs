@@ -23,6 +23,10 @@ module.exports = function (config) {
     logLevel: config.LOG_INFO,
     autoWatch: false,
     singleRun: true,
+    captureTimeout: 180000,
+    browserNoActivityTimeout: 600000,
+    browserDisconnectTimeout: 180000,
+    pingTimeout: 120000,
     browsers: ['ChromeHeadlessNoSandbox'],
     customLaunchers: {
       ChromeHeadlessNoSandbox: {

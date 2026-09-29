@@ -18,7 +18,7 @@ import {DialogHarnessFilters} from '@angular/material/dialog/testing';
 import {DialogRole} from '@angular/material/dialog';
 
 /** Selectors for different sections of the mat-dialog that can contain user content. */
-export const enum MatDialogSection {
+export enum MatDialogSection {
   TITLE = '.mat-dialog-title',
   CONTENT = '.mat-dialog-content',
   ACTIONS = '.mat-dialog-actions',

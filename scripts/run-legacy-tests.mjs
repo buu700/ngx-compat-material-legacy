@@ -44,5 +44,14 @@ if (expectFail) {
   process.exit(1);
 }
 const failed = results.totals?.failed ?? 0;
+const skipped = results.totals?.skipped ?? 0;
+if ((results.mapped_specs || []).length < 57 && process.env.LEGACY_SPEC_FILTER == null) {
+  console.error(`Historical reconciliation listed ${results.mapped_specs?.length ?? 0} paths, expected 57`);
+  process.exit(1);
+}
+if (skipped > 0) {
+  console.error(`Unexplained skipped tests: ${skipped}`);
+  process.exit(1);
+}
 if (failed > 0 || code !== 0) process.exit(1);
 process.exit(0);

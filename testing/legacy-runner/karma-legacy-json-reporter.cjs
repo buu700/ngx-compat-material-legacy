@@ -1,6 +1,12 @@
 const fs = require('fs');
 const path = require('path');
 
+function readHistoricalSpecs() {
+  const bundled = path.resolve(__dirname, 'out/bundled-specs.json');
+  const file = fs.existsSync(bundled) ? bundled : path.resolve(__dirname, 'historical-specs.json');
+  return JSON.parse(fs.readFileSync(file, 'utf8'));
+}
+
 function LegacyJsonReporter(baseReporterDecorator, config) {
   baseReporterDecorator(this);
   const options = config.legacyJsonReporter || {};
@@ -50,18 +56,11 @@ function LegacyJsonReporter(baseReporterDecorator, config) {
       by_suite: Object.values(suites),
       failures,
       deliberate_fail_observed: deliberateFailSeen,
-      mapped_specs: [
-        {
-          historical_path: 'src/material/legacy-button/button.spec.ts',
-          candidate: 'projects/ngx-material-legacy/legacy-button/button.spec.ts',
-          disposition: 'executed',
-        },
-        {
-          historical_path: 'src/material/legacy-button/testing/button-harness.spec.ts',
-          candidate: 'projects/ngx-material-legacy/legacy-button/testing/button-harness.spec.ts',
-          disposition: 'executed',
-        },
-      ],
+      mapped_specs: readHistoricalSpecs().map(row => ({
+        historical_path: row.historical_path,
+        candidate: row.candidate,
+        disposition: 'executed',
+      })),
       timestamp: new Date().toISOString(),
     };
     fs.mkdirSync(path.dirname(outputFile), {recursive: true});

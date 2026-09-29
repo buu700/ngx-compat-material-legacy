@@ -14,6 +14,12 @@ import {_defaultParams} from './dialog-animation-params';
  * @breaking-change 17.0.0
  */
 export class MatLegacyDialogConfig<D = any> extends DialogConfigBase<D> {
+  /**
+   * Whether the dialog should set `aria-modal`. Current Material defaults this
+   * to false; the legacy dialog set it to true.
+   */
+  override ariaModal: boolean = true;
+
   /** Duration of the enter animation. Has to be a valid CSS value (e.g. 100ms). */
   override enterAnimationDuration?: string = _defaultParams.params.enterAnimationDuration;
 

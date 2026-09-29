@@ -17,7 +17,7 @@ import {
   TemplateRef,
   ViewChild,
   ViewContainerRef,
-  ComponentFactoryResolver,
+
   NgZone,
   ViewEncapsulation,
   Injectable,
@@ -813,20 +813,14 @@ describe('MatDialog', () => {
     expect(scrollStrategy.enable).toHaveBeenCalled();
   }));
 
-  it('should be able to pass in an alternate ComponentFactoryResolver', inject(
-    [ComponentFactoryResolver],
-    (resolver: ComponentFactoryResolver) => {
-      spyOn(resolver, 'resolveComponentFactory').and.callThrough();
+  // ComponentFactoryResolver and DialogConfig.componentFactoryResolver were removed
+  // from Angular. Opening through the caller view container is the executed replacement.
+  it('should attach dialog content through the view container without a component factory resolver', () => {
+    const dialogRef = dialog.open(PizzaMsg, {viewContainerRef: testViewContainerRef});
+    viewContainerFixture.detectChanges();
 
-      dialog.open(PizzaMsg, {
-        viewContainerRef: testViewContainerRef,
-        componentFactoryResolver: resolver,
-      });
-      viewContainerFixture.detectChanges();
-
-      expect(resolver.resolveComponentFactory).toHaveBeenCalled();
-    },
-  ));
+    expect(dialogRef.componentInstance instanceof PizzaMsg).toBe(true);
+  });
 
   describe('passing in data', () => {
     it('should be able to pass in data', () => {

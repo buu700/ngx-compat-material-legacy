@@ -1,20 +1,13 @@
 /**
- * Asserts that the mapped button historical specs were loaded into Jasmine.
+ * Asserts that every historical spec module selected for this run was evaluated.
+ * The bundle prefix records the historical path when the module body runs.
  */
 describe('legacy-runner discovery', () => {
-  function topDescriptions(): string[] {
-    const env: any = jasmine.getEnv();
-    const top = env.topSuite ? env.topSuite() : env._topSuite;
-    return (top?.children || []).map((s: any) => String(s.description));
-  }
-
-  it('loaded MatLegacyButton historical suite', () => {
-    expect(topDescriptions()).toContain('MatLegacyButton');
-  });
-
-  it('loaded harness suite', () => {
-    const names = topDescriptions();
-    const found = names.some((n: string) => n.includes('MatLegacyButtonHarness'));
-    expect(found).withContext(`suites: ${names.join(' | ')}`).toBe(true);
+  it('evaluated every mapped historical spec module', () => {
+    const expected: string[] = (globalThis as any).__LEGACY_EXPECTED_SPECS__ || [];
+    const hit = new Set<string>((globalThis as any).__LEGACY_SPEC_HIT__ || []);
+    const missing = expected.filter(path => !hit.has(path));
+    expect(expected.length).withContext('no historical specs were selected').toBeGreaterThan(0);
+    expect(missing).withContext(`missing ${missing.length} of ${expected.length}`).toEqual([]);
   });
 });
