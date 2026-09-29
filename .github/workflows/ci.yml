@@ -43,7 +43,7 @@ jobs:
   packed-consumer-aot:
     name: Packed-consumer AOT and harness
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 45
     steps:
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -60,6 +60,9 @@ jobs:
           sudo mv /tmp/just /usr/local/bin/just
           just --version
 
+      - name: Pack a draft run
+        run: just chainman run pack-draft -- --line main --out artifacts/main/draft
+
       - name: Packed-consumer AOT + harness smoke
-        run: just chainman run packed-consumer
+        run: just chainman run packed-consumer -- --run artifacts/main/draft/run.json
 

@@ -11,10 +11,11 @@ profiles, and immutable failure receipts exist. This does **not** close G01–G1
 ## B-CI-F01 — Fresh-artifact CI required (open)
 
 Packed-consumer smoke no longer defaults to a committed `.tgz` (moved to
-`compatibility/pack-proof/historical-unbound/`). CI job `packed-consumer-aot` still
-invokes `node scripts/packed-consumer-aot-smoke.mjs` without `--tarball` and will
-fail-closed until F01 wires build→pack→digest→smoke. Prior smoke receipts are
-`unbound-stale` (consumer digest `257e7f36…` ≠ aot/committed `308dbd4b…`).
+`compatibility/pack-proof/historical-unbound/`). CI job `packed-consumer-aot` now
+packs a draft run and passes `run.json` to the consumer, which rehashes the
+tarball before install. The run stays unsealed: fan-out, finalization, and a
+clean release build are still open. Prior smoke receipts are `unbound-stale`
+(consumer digest `257e7f36…` ≠ aot/committed `308dbd4b…`).
 
 ## B-SCAN-01 — Packed inspector failures (open; F03/F04)
 
