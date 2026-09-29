@@ -163,10 +163,40 @@
       ],
       "disposition": "already-present",
       "evidence": "The patch replaces a single dialog title id with a queue so aria-labelledby updates when a title is destroyed. MatLegacyDialogTitle already pushes its id onto _ariaLabelledByQueue and splices it out in ngOnDestroy, and the container already binds aria-labelledby to the first queued id. No source was changed."
+    },
+    {
+      "sha": "f7e3ae3bd1b86d5987df57bb06d350001c592931",
+      "files": [
+        "src/material/legacy-autocomplete",
+        "src/material/legacy-button",
+        "src/material/legacy-card",
+        "src/material/legacy-checkbox",
+        "src/material/legacy-chips",
+        "src/material/legacy-core",
+        "src/material/legacy-dialog",
+        "src/material/legacy-form-field",
+        "src/material/legacy-input",
+        "src/material/legacy-list",
+        "src/material/legacy-menu",
+        "src/material/legacy-paginator",
+        "src/material/legacy-progress-bar",
+        "src/material/legacy-progress-spinner",
+        "src/material/legacy-radio",
+        "src/material/legacy-select",
+        "src/material/legacy-slider",
+        "src/material/legacy-slide-toggle",
+        "src/material/legacy-snack-bar",
+        "src/material/legacy-table",
+        "src/material/legacy-tabs",
+        "src/material/legacy-tooltip",
+        "src/material/_index.scss"
+      ],
+      "disposition": "owned-retained",
+      "evidence": "The patch deletes 702 files, including the legacy component trees, and stops forwarding their Sass from _index.scss. This package still has all 22 legacy directories, from autocomplete through tooltip, and the facade still forwards them. None of those directories were deleted."
     }
   ],
   "limitations": [
-    "The other 1024 behavior-semantic SHAs were not read.",
+    "The other 1023 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
