@@ -819,10 +819,18 @@
       ],
       "disposition": "not-applied",
       "evidence": "The patch adds a ripple token map and emits ripple color through current-selector-or-root instead of under .mat-ripple-element. styles/core/ripple/_ripple-theme.scss still sets the element background from get-color-config. There is no styles/core/tokens/m2/mat/_ripple.scss, and that token map was not added."
+    },
+    {
+      "sha": "737c7a8f1a5bc4df0e790d3ecdd227f8342499f8",
+      "files": [
+        "src/cdk/a11y/fake-event-detection.ts"
+      ],
+      "disposition": "not-owned",
+      "evidence": "The patch changes isFakeMousedownFromScreenReader to test event.detail instead of offsetX and offsetY. That function is imported from @angular/cdk/a11y by the owned menu trigger and ripple renderer. It is not defined in this package, and the CDK body was not copied."
     }
   ],
   "limitations": [
-    "The other 959 behavior-semantic SHAs were not read.",
+    "The other 958 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
