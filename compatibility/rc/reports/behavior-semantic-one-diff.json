@@ -5368,10 +5368,18 @@
       ],
       "disposition": "owned-retained",
       "evidence": "The patch renames hardcoded custom properties and density prefixes to the new component-first names, including circular-progress to progress-spinner. Owned progress spinner still sets width and height from diameter (legacy-progress-spinner/progress-spinner.ts). Owned tokens still use the circular-progress prefix (styles/core/tokens/m2/mdc/_circular-progress.scss). Those names were not renamed."
+    },
+    {
+      "sha": "b1cc0501e969362d8c051568eee98767442cc3fd",
+      "files": [
+        "src/cdk/table/table.ts"
+      ],
+      "disposition": "not-owned",
+      "evidence": "The patch makes CDK table data optional and returns from renderRows before data exists. This package does not define CdkTable. MatLegacyTable extends the current CDK table. That early return was not added."
     }
   ],
   "limitations": [
-    "The other 439 behavior-semantic SHAs were not read.",
+    "The other 438 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
