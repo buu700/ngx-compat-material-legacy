@@ -73,6 +73,7 @@ CHECKS = (
     ["node", "scripts/check-security-deep-review.mjs"],
     ["node", "scripts/group-docs-build-batch.mjs", "--check"],
     ["node", "scripts/check-docs-build-one-diff.mjs"],
+    ["node", "scripts/check-behavior-semantic-one-diff.mjs"],
     ["node", "--check", "scripts/motion-lifecycle-smoke.mjs"],
     ["node", "--check", "scripts/packed-consumer-aot-smoke.mjs"],
     ["node", "scripts/fresh-artifact-negative-tests.mjs"],
