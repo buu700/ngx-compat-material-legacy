@@ -99,7 +99,7 @@ export class LabRoot {
   imports: [BrowserModule, MatLegacyDialogModule, MatLegacySelectModule],
   declarations: [LabRoot, DialogBody],
   bootstrap: [LabRoot],
-  providers: [{provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}}],
+  providers: [{provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: false}}],
 })
 export class LabModule {}
 
@@ -251,6 +251,7 @@ let focusAfter = null;
 let outsideClosed = false;
 let selectOpened = false;
 let selectClosed = false;
+let dialogMotion = null;
 let error = null;
 let diagnostic = null;
 try {
@@ -259,15 +260,43 @@ try {
   await send('Page.addScriptToEvaluateOnNewDocument', {
     source: 'window.__errors=[];window.addEventListener("error",e=>window.__errors.push(String(e.message)));',
   });
+  await send('Emulation.setEmulatedMedia', {
+    features: [{name: 'prefers-reduced-motion', value: 'no'}],
+  });
   await send('Page.reload', {ignoreCache: true});
   for (let i = 0; i < 50 && !(await evaluate('!!document.getElementById("open") || !!document.getElementById("bootstrap-error")')); i += 1) await sleep(100);
   diagnostic = await evaluate('({errors: window.__errors || [], text: document.body.innerText, html: document.body.innerHTML.slice(0, 500)})');
   if (await evaluate('!!document.getElementById("bootstrap-error")')) throw new Error('bootstrap failed');
+  await evaluate(`(() => {
+    window.__dialogTransitions = [];
+    document.addEventListener('transitionend', event => {
+      const target = event.target;
+      if (target && target.classList && target.classList.contains('mat-dialog-container')) {
+        window.__dialogTransitions.push(event.propertyName);
+      }
+    }, true);
+  })()`);
   await evaluate('document.getElementById("open").focus()');
   focusBefore = await evaluate('document.activeElement && document.activeElement.id');
   await evaluate('document.getElementById("open").click()');
   for (let i = 0; i < 50 && !(await evaluate('!!document.getElementById("dialog-body")')); i += 1) await sleep(100);
   opened = await evaluate('!!document.getElementById("dialog-body")');
+  for (let i = 0; i < 40; i += 1) {
+    dialogMotion = await evaluate(`(() => {
+      const el = document.querySelector('mat-dialog-container');
+      if (!el) return null;
+      const style = getComputedStyle(el);
+      return {
+        noop: el.classList.contains('_mat-animation-noopable'),
+        enter_duration: el.style.getPropertyValue('--mat-legacy-dialog-enter-duration'),
+        transition_duration: style.transitionDuration,
+        events: window.__dialogTransitions || [],
+      };
+    })()`);
+    if (dialogMotion && (dialogMotion.events.includes('opacity') || dialogMotion.events.includes('transform'))) break;
+    await sleep(50);
+  }
+  for (let i = 0; i < 20 && await evaluate('document.activeElement && document.activeElement.id === "open"'); i += 1) await sleep(50);
   focusWhileOpen = await evaluate('document.activeElement && (document.activeElement.id || document.activeElement.tagName)');
   await send('Input.dispatchKeyEvent', {type: 'keyDown', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27});
   await send('Input.dispatchKeyEvent', {type: 'keyUp', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27});
@@ -316,14 +345,16 @@ const report = {
   closed_by_backdrop_click: outsideClosed,
   select_panel_opened: selectOpened,
   select_panel_closed_by_escape: selectOpened && selectClosed,
+  dialog_motion: dialogMotion,
+  dialog_transition_on_container: !!(dialogMotion && dialogMotion.noop === false && dialogMotion.enter_duration === '150ms' && (dialogMotion.events || []).some(name => name === 'opacity' || name === 'transform')),
   bundle_has_partial_declarations: bundleDeclares,
   bundle_imports_angular_compiler: bundleCompilerImport,
   matrix_updated: false,
   error,
-  diagnostic: opened && closed && focusAfter === 'open' && outsideClosed && selectOpened && selectClosed ? null : diagnostic,
+  diagnostic: opened && closed && focusAfter === 'open' && outsideClosed && selectOpened && selectClosed && dialogMotion && dialogMotion.noop === false && (dialogMotion.events || []).some(name => name === 'opacity' || name === 'transform') ? null : diagnostic,
   limitations: [
     'Dialog and one select panel. The declared matrix stays not-executed.',
-    'Animations were disabled through MATERIAL_ANIMATIONS.',
+    'This run enables dialog motion and emulates prefers-reduced-motion: no. It does not cover reduced, zero, or interrupted motion.',
     'The app source does not import @angular/compiler. The linker runs while bundling.',
     'This is not RC-07-A03.',
   ],
@@ -338,5 +369,6 @@ console.log(JSON.stringify({
   closed_by_backdrop_click: report.closed_by_backdrop_click,
   select_panel_opened: report.select_panel_opened,
   select_panel_closed_by_escape: report.select_panel_closed_by_escape,
+  dialog_transition_on_container: report.dialog_transition_on_container,
 }, null, 2));
-if (!report.closed_by_escape || !report.focus_restored_to_open_button || !report.closed_by_backdrop_click || !report.select_panel_closed_by_escape) process.exit(1);
+if (!report.closed_by_escape || !report.focus_restored_to_open_button || !report.closed_by_backdrop_click || !report.select_panel_closed_by_escape || !report.dialog_transition_on_container) process.exit(1);
