@@ -36,10 +36,18 @@
       ],
       "disposition": "owned-retained",
       "evidence": "The patch deletes upstream _theming.scss and the .import.scss and -legacy-index.scss shims, and says @import is no longer supported. This package still has 29 .import.scss files and the legacy-index forwards, including legacy-button and legacy-slider. None of those files were deleted."
+    },
+    {
+      "sha": "49f6859246bde08ff50c9a19de936227dccd0626",
+      "files": [
+        "src/material/chips/chip-option.ts"
+      ],
+      "disposition": "not-owned",
+      "evidence": "The patch makes MatChipOption._handlePrimaryActionInteraction call focus() before toggleSelected, to clear a Safari focus leftover. The owned chips have no MatChipOption and no _handlePrimaryActionInteraction, and that method was not added."
     }
   ],
   "limitations": [
-    "The other 1037 behavior-semantic SHAs were not read.",
+    "The other 1036 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
