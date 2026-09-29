@@ -24,10 +24,16 @@ function fail(code, message) {
 
 let tarball = null;
 let reducedMotion = false;
+let zoneless = false;
 for (let i = 2; i < process.argv.length; i += 1) {
   if (process.argv[i] === '--reduced-motion') {
     reducedMotion = true;
     reportPath = join(root, 'compatibility/rc/reports/browser-dialog-reduced-motion.json');
+    continue;
+  }
+  if (process.argv[i] === '--zoneless') {
+    zoneless = true;
+    reportPath = join(root, 'compatibility/rc/reports/browser-dialog-zoneless.json');
     continue;
   }
   if (process.argv[i] === '--tarball') {
@@ -62,7 +68,7 @@ writeFileSync(join(consumer, 'package.json'), JSON.stringify({
     rxjs: '7.8.2',
     tslib: '2.8.1',
     typescript: '6.0.3',
-    'zone.js': '0.16.3',
+    ...(zoneless ? {} : {'zone.js': '0.16.3'}),
   },
 }, null, 2));
 writeFileSync(join(consumer, '.npmrc'), 'install-links=true\nfund=false\naudit=false\n');
@@ -76,8 +82,8 @@ const installed = realpathSync(join(consumer, 'node_modules/@ngx-compat/material
 if (relative(realpathSync(consumer), installed).startsWith('..')) fail(1, `Library resolved outside the consumer: ${installed}`);
 
 mkdirSync(join(consumer, 'src'), {recursive: true});
-writeFileSync(join(consumer, 'src/main.ts'), `import 'zone.js';
-import {Component, NgModule, inject} from '@angular/core';
+writeFileSync(join(consumer, 'src/main.ts'), `${zoneless ? '' : `import 'zone.js';
+`}import {Component, NgModule, inject${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {MATERIAL_ANIMATIONS} from '@angular/material/core';
@@ -105,7 +111,7 @@ export class LabRoot {
   imports: [BrowserModule, MatLegacyDialogModule, MatLegacySelectModule],
   declarations: [LabRoot, DialogBody],
   bootstrap: [LabRoot],
-  providers: [{provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: false}}],
+  providers: [${zoneless ? 'provideZonelessChangeDetection(), ' : ''}{provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: false}}],
 })
 export class LabModule {}
 
@@ -173,8 +179,9 @@ await esbuild.build({
 const bundle = readFileSync(join(consumer, 'dist/app.js'), 'utf8');
 const bundleDeclares = bundle.includes('ɵɵngDeclare');
 const bundleCompilerImport = /(?:from|require\()\s*['"]@angular\/compiler['"]/.test(bundle);
-if (bundleDeclares || bundleCompilerImport) {
-  fail(1, `bundle still has partial declarations=${bundleDeclares} compiler import=${bundleCompilerImport}`);
+const bundleHasZone = bundle.includes('Zone.__symbol__');
+if (bundleDeclares || bundleCompilerImport || (zoneless && bundleHasZone)) {
+  fail(1, `bundle partial=${bundleDeclares} compiler=${bundleCompilerImport} zone=${bundleHasZone}`);
 }
 writeFileSync(join(consumer, 'dist/index.html'), `<!doctype html><html><body><lab-root></lab-root><script src="/app.js"></script></body></html>\n`);
 
@@ -258,6 +265,7 @@ let outsideClosed = false;
 let selectOpened = false;
 let selectClosed = false;
 let dialogMotion = null;
+let zoneGlobal = null;
 let error = null;
 let diagnostic = null;
 try {
@@ -273,6 +281,7 @@ try {
   for (let i = 0; i < 50 && !(await evaluate('!!document.getElementById("open") || !!document.getElementById("bootstrap-error")')); i += 1) await sleep(100);
   diagnostic = await evaluate('({errors: window.__errors || [], text: document.body.innerText, html: document.body.innerHTML.slice(0, 500)})');
   if (await evaluate('!!document.getElementById("bootstrap-error")')) throw new Error('bootstrap failed');
+  zoneGlobal = await evaluate('typeof Zone');
   await evaluate(`(() => {
     window.__dialogTransitions = [];
     document.addEventListener('transitionend', event => {
@@ -341,8 +350,9 @@ const transitionOnContainer = !!(dialogMotion && dialogMotion.noop === false && 
 const reducedNoop = !!(dialogMotion && dialogMotion.noop === true && (dialogMotion.events || []).length === 0 && String(dialogMotion.transition_duration).startsWith('0s'));
 const report = {
   schema_version: 1,
-  role: reducedMotion ? 'legacy dialog under prefers-reduced-motion' : 'one legacy dialog Escape in Chromium',
+  role: zoneless ? 'zoneless legacy dialog' : reducedMotion ? 'legacy dialog under prefers-reduced-motion' : 'one legacy dialog Escape in Chromium',
   reduced_motion: reducedMotion,
+  zoneless,
   tarball_sha256: createHash('sha256').update(readFileSync(tarball)).digest('hex'),
   browser: version.Browser,
   opened,
@@ -357,6 +367,8 @@ const report = {
   dialog_motion: dialogMotion,
   dialog_transition_on_container: transitionOnContainer,
   dialog_noop_under_reduced_motion: reducedMotion ? reducedNoop : null,
+  zone_global: zoneGlobal,
+  bundle_has_zone: bundleHasZone,
   bundle_has_partial_declarations: bundleDeclares,
   bundle_imports_angular_compiler: bundleCompilerImport,
   matrix_updated: false,
@@ -367,6 +379,7 @@ const report = {
     reducedMotion
       ? 'This run emulates prefers-reduced-motion: reduce. Zero-duration and interrupted motion are not covered.'
       : 'This run enables dialog motion and emulates prefers-reduced-motion: no. Reduced motion is a separate run.',
+    zoneless ? 'Zone.js is not installed. The click opens the dialog without a forced detectChanges. This is not the zoneless matrix.' : 'This run loads zone.js.',
     'The app source does not import @angular/compiler. The linker runs while bundling.',
     'This is not RC-07-A03.',
   ],
@@ -383,6 +396,8 @@ console.log(JSON.stringify({
   select_panel_closed_by_escape: report.select_panel_closed_by_escape,
   dialog_transition_on_container: report.dialog_transition_on_container,
   dialog_noop_under_reduced_motion: report.dialog_noop_under_reduced_motion,
+  zone_global: report.zone_global,
 }, null, 2));
 const motionOk = reducedMotion ? report.dialog_noop_under_reduced_motion : report.dialog_transition_on_container;
-if (!report.closed_by_escape || !report.focus_restored_to_open_button || !report.closed_by_backdrop_click || !report.select_panel_closed_by_escape || !motionOk) process.exit(1);
+const zoneOk = zoneless ? zoneGlobal === 'undefined' && bundleHasZone === false : true;
+if (!report.closed_by_escape || !report.focus_restored_to_open_button || !report.closed_by_backdrop_click || !report.select_panel_closed_by_escape || !motionOk || !zoneOk) process.exit(1);
