@@ -4131,10 +4131,18 @@
       ],
       "disposition": "owned-retained",
       "evidence": "The patch handles menu panel keyboard events from the overlay keydown stream and stops calling stopPropagation inside the panel handler. Owned menu still binds keydown on the panel (legacy-menu/menu.html) and still stops propagation (legacy-menu/internal/menu-base.ts). The overlay keydown subscription still only consumes the events. That dispatch was not changed."
+    },
+    {
+      "sha": "f1c417353964c6bb7f22cee4376595931615de5d",
+      "files": [
+        "src/cdk/table/table.ts"
+      ],
+      "disposition": "not-owned",
+      "evidence": "The patch always runs each CDK table row's column differ, even after an earlier row already has a diff. This package does not define CdkTable. That differ was not changed."
     }
   ],
   "limitations": [
-    "The other 592 behavior-semantic SHAs were not read.",
+    "The other 591 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
