@@ -1,7 +1,7 @@
 {
   "template": false,
   "packet_id": "RC-02",
-  "substep_id": "RC-02.02",
+  "substep_id": "RC-02.04",
   "source_commit": "66d23a4c5ebb984c16425e9425a26ab39ab8b30f",
   "source_content_digest": "91b747fb446ed9595289d5322d1401aa38631eb8bd375d9a6f62acb57796c8e2",
   "worktree_line": "main",
@@ -16,9 +16,9 @@
     "compatibility/rc/release-prerequisites.json",
     "compatibility/rc/session-handoff.json"
   ],
-  "last_command": ["just chainman run packed-consumer -- --run artifacts/main/draft/run.json"],
+  "last_command": ["node scripts/seal-draft-run.mjs --run artifacts/main/draft/run.json"],
   "outcome": "passed",
-  "first_actionable_error": "The draft run is unsealed and its report index is empty. Select panel width is still the trigger width, not 32px wider. Cyph has no exact first-party RC age admission. gh is absent, so branch protection was not read. just verify remains fail-closed.",
+  "first_actionable_error": "The sealed manifest covers only the pack-draft matrix. Select panel width is still the trigger width, not 32px wider. Cyph has no exact first-party RC age admission. gh is absent, so branch protection was not read. just verify remains fail-closed.",
   "failed_case_ids": [
     "MatSelect > core > overlay panel > should set the width of the overlay based on the trigger",
     "MatSelect > core > overlay panel > should set the width of the overlay based on a larger trigger width"
@@ -37,11 +37,11 @@
     "RC-00-A04 remains blocked on an owner age-admission decision",
     "GitHub branch protection and rulesets",
     "Historical families other than card, tooltip, and select",
-    "RC-02.03 isolation proof beyond this one consumer and RC-02.04 finalization",
+    "RC-02.03 still needs proof the consumer cannot see workspace modules or source aliases",
     "RC-02-A01 through RC-02-A05 are not closed",
     "RC-03 through RC-05 and RC-07 through RC-12"
   ],
-  "next_action": "RC-02.04: hash the packed-consumer report into the draft and refuse to seal while the matrix is only that one check.",
+  "next_action": "RC-02.03: show the packed consumer resolves the library from the tarball with no workspace node_modules, NODE_PATH, or source alias.",
   "blocked_owner_decisions": [
     "cyph-rc-age-admission",
     "registry-publish-authority",

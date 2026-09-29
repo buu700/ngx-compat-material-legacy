@@ -3,6 +3,7 @@
  * Fail-closed checks for the draft pack identity.
  * These do not pack the library and do not install a consumer.
  */
+import {createHash} from 'node:crypto';
 import {spawnSync} from 'node:child_process';
 import {mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';
@@ -90,6 +91,60 @@ const evilPath = join(runDir, 'evil-run.json');
 writeFileSync(evilPath, JSON.stringify(evil));
 const traversal = run(['scripts/packed-consumer-aot-smoke.mjs', '--run', evilPath]);
 expect('path traversal exits 2', traversal.status === 2, traversal.stderr);
+
+const sealDir = join(scratch, 'seal');
+mkdirSync(sealDir);
+const sealTarball = join(sealDir, 'sample.tgz');
+writeFileSync(sealTarball, 'seal-bytes');
+const sealDrafted = run([
+  'scripts/write-draft-run.mjs',
+  '--line',
+  'main',
+  '--out',
+  sealDir,
+  '--tarball',
+  sealTarball,
+]);
+expect('seal fixture draft is written', sealDrafted.status === 0, sealDrafted.stderr);
+const beforeSeal = readFileSync(join(sealDir, 'run.json'), 'utf8');
+const missingReport = run(['scripts/seal-draft-run.mjs', '--run', join(sealDir, 'run.json')]);
+expect('missing report exits 1', missingReport.status === 1, missingReport.stderr);
+expect('missing report leaves the draft', readFileSync(join(sealDir, 'run.json'), 'utf8') === beforeSeal);
+
+const sealDraft = JSON.parse(beforeSeal);
+const wrongReport = {
+  schema_version: 1,
+  template: false,
+  run_id: 'other-run',
+  check_id: 'packed-consumer',
+  subject_kind: 'artifact',
+  result: 'pass',
+  exit_code: 0,
+  failed: 0,
+  artifact: sealDraft.artifacts[0],
+};
+mkdirSync(join(sealDir, 'reports'));
+writeFileSync(join(sealDir, 'reports/packed-consumer.json'), JSON.stringify(wrongReport));
+const wrongRun = run(['scripts/seal-draft-run.mjs', '--run', join(sealDir, 'run.json')]);
+expect('wrong run id exits 1', wrongRun.status === 1, wrongRun.stderr);
+expect('wrong run id leaves the draft', readFileSync(join(sealDir, 'run.json'), 'utf8') === beforeSeal);
+
+writeFileSync(
+  join(sealDir, 'reports/packed-consumer.json'),
+  JSON.stringify({...wrongReport, run_id: sealDraft.run_id}),
+);
+const sealed = run(['scripts/seal-draft-run.mjs', '--run', join(sealDir, 'run.json')]);
+expect('matching report seals', sealed.status === 0, sealed.stderr);
+const sealedManifest = JSON.parse(readFileSync(join(sealDir, 'run.json'), 'utf8'));
+const sidecar = readFileSync(join(sealDir, 'run.json.sha256'), 'utf8').split(' ')[0];
+expect('sealed stage is recorded', sealedManifest.stage === 'sealed' && sealedManifest.reports.length === 1);
+expect('sidecar is outside the manifest', sealedManifest.run_json_sha256 === undefined);
+expect(
+  'sidecar matches the sealed bytes',
+  sidecar === createHash('sha256').update(readFileSync(join(sealDir, 'run.json'))).digest('hex'),
+);
+const again = run(['scripts/seal-draft-run.mjs', '--run', join(sealDir, 'run.json')]);
+expect('a second seal exits 2', again.status === 2, again.stderr);
 
 rmSync(scratch, {recursive: true, force: true});
 
