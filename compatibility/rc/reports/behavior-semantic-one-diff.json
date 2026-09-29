@@ -2148,10 +2148,19 @@
       ],
       "disposition": "owned-retained",
       "evidence": "The patch updates the tooltip overlay position in afterNextRender instead of waiting for the zone microtask queue to empty. The owned tooltip still waits for onMicrotaskEmpty. The render hook was not added."
+    },
+    {
+      "sha": "0d232a6f3265182c80aa6cff3a38c01c31047ad7",
+      "files": [
+        "src/material/datepicker/calendar-body.ts",
+        "src/material/datepicker/datepicker-base.ts"
+      ],
+      "disposition": "not-owned",
+      "evidence": "The patch focuses the calendar cell and updates the datepicker overlay in afterNextRender instead of waiting for NgZone stability. The package does not define the calendar body or the datepicker base. The render hooks were not added."
     }
   ],
   "limitations": [
-    "The other 811 behavior-semantic SHAs were not read.",
+    "The other 810 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
