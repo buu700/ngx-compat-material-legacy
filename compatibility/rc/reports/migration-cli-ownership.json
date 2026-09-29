@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "role": "migration CLI ownership and isolation",
+  "captured_at": "2026-09-29T03:42:26.283Z",
+  "cli": {
+    "package": "@ngx-compat/material-legacy-migrate-cli",
+    "version": "22.0.0-rc.0",
+    "license": "MIT",
+    "engines": {
+      "node": ">=18.0.0"
+    },
+    "dependencies": null,
+    "files": [
+      "bin/migrate-legacy.js",
+      "lib/sass-rewrite.js",
+      "lib/ts-rewrite.js",
+      "LICENSE"
+    ]
+  },
+  "library_engines": {
+    "node": "^22.22.3 || ^24.15.0 || ^26.0.0"
+  },
+  "parsers": {
+    "typescript": "projects/ngx-material-legacy/schematics/migrate-legacy/ts-rewrite.js string mask, copied to lib/ts-rewrite.js. Not the typescript package.",
+    "sass": "projects/ngx-material-legacy/schematics/migrate-legacy/sass-rewrite.js string mask, copied to lib/sass-rewrite.js. Not the sass package.",
+    "schematic": "projects/ngx-material-legacy/schematics/migrate-legacy/index.js. The Angular CLI host supplies the devkit tree. The packaged CLI does not include this file."
+  },
+  "isolation": {
+    "consumer_resolution_guard": [
+      "typescript",
+      "sass",
+      "@angular/*"
+    ],
+    "exit_code": 0,
+    "safe_edits": 1,
+    "rewritten_specifier": "@ngx-compat/material-legacy/legacy-button"
+  },
+  "limitations": [
+    "Uses the committed CLI tarball. It does not rebuild that tarball in a fresh central run.",
+    "Does not execute the Angular schematic factory.",
+    "This is not RC-04-A03."
+  ]
+}
