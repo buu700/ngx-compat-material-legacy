@@ -32,6 +32,15 @@ _NAMED_FROM = re.compile(
     r"""(?:import|export)\s*(?:type\s+)?\{([^}]*)\}\s*from\s*['"]([^'"]+)['"]""",
     re.MULTILINE | re.DOTALL,
 )
+_NAMESPACE_IMPORT = re.compile(
+    r"""import\s*\*\s*as\s+(\w+)\s*from\s*['"](@angular/[^'"]+)['"]"""
+)
+_REQUIRE_ALIAS = re.compile(
+    r"""(?:import|const|let|var)\s+(\w+)\s*=\s*require\(\s*['"](@angular/[^'"]+)['"]\s*\)"""
+)
+_NAMESPACE_MEMBER = re.compile(
+    r"""\b(\w+)\s*(?:\.\s*([A-Za-z_$][\w$]*)|\[\s*['"]([A-Za-z_$][\w$]*)['"]\s*\])"""
+)
 
 _SASS_USE = re.compile(r"""@(?:use|forward)\s+['"]([^'"]+)['"](?:\s+as\s+([\w*]+))?""")
 _SASS_IMPORT = re.compile(r"""@import\s+['"]([^'"]+)['"]""")
@@ -156,6 +165,35 @@ def _scan_tree(root: Path, policy: dict) -> dict:
                                 'needle': needle,
                             }
                         )
+            bindings = {alias: module for alias, module in _NAMESPACE_IMPORT.findall(text)}
+            bindings.update({alias: module for alias, module in _REQUIRE_ALIAS.findall(text)})
+            for alias, member, computed in _NAMESPACE_MEMBER.findall(text):
+                module = bindings.get(alias)
+                if not module or not module.startswith('@angular/'):
+                    continue
+                name = member or computed
+                if prefixes and name.startswith(prefixes) and not exempt(
+                    rel, 'forbidden-symbol-prefix', name
+                ):
+                    violations.append(
+                        {
+                            'path': rel,
+                            'rule': 'forbidden-symbol-prefix',
+                            'value': name,
+                            'module': module,
+                            'access': 'namespace',
+                        }
+                    )
+                if name in forbidden_symbols and not exempt(rel, 'forbidden-symbol', name):
+                    violations.append(
+                        {
+                            'path': rel,
+                            'rule': 'forbidden-symbol',
+                            'value': name,
+                            'module': module,
+                            'access': 'namespace',
+                        }
+                    )
             for names, module in _NAMED_FROM.findall(text):
                 if not module.startswith(('@angular/', 'rxjs', 'typescript')):
                     continue

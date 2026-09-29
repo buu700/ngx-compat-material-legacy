@@ -75,6 +75,45 @@ export const x = 1;
         self.assertEqual(result['scanned_artifact'], 'tarball')
         self.assertTrue(any(v['value'] == 'MatPseudoCheckbox' for v in result['violations']))
 
+    def test_namespace_member_access_is_caught(self):
+        src = """
+import * as material from '@angular/material/core';
+export const checkbox = material.MatPseudoCheckbox;
+"""
+        result = scan_source(src)
+        self.assertFalse(result['ok'])
+        self.assertTrue(any(v['value'] == 'MatPseudoCheckbox' and v.get('access') == 'namespace' for v in result['violations']))
+
+    def test_computed_namespace_access_is_caught(self):
+        src = """
+import * as material from '@angular/material/core';
+export const checkbox = material['RippleRenderer'];
+"""
+        result = scan_source(src)
+        self.assertFalse(result['ok'])
+        self.assertTrue(any(v['value'] == 'RippleRenderer' for v in result['violations']))
+
+    def test_require_alias_member_access_is_caught(self):
+        src = "const material = require('@angular/material/core');\nexport const lines = material.setLines;\n"
+        result = scan_source(src)
+        self.assertFalse(result['ok'])
+        self.assertTrue(any(v['value'] == 'setLines' for v in result['violations']))
+
+    def test_commented_namespace_import_is_not_a_violation(self):
+        src = """
+// import * as material from '@angular/material/core';
+// export const checkbox = material.MatPseudoCheckbox;
+export const x = 1;
+"""
+        result = scan_source(src)
+        self.assertTrue(result['ok'], result)
+
+    def test_deep_private_path_is_caught(self):
+        src = "import {foo} from '@angular/cdk/a11y/private/foo';\n"
+        result = scan_source(src)
+        self.assertFalse(result['ok'])
+        self.assertTrue(any(v['rule'] == 'forbidden-module-substring' for v in result['violations']))
+
     def test_owned_local_symbol_is_allowed(self):
         src = "import {MatLegacyPseudoCheckbox} from '@ngx-compat/material-legacy/legacy-core';\n"
         result = scan_source(src)
