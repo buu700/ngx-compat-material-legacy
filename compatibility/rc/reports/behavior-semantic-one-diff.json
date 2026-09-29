@@ -1335,10 +1335,19 @@
       ],
       "disposition": "owned-retained",
       "evidence": "The patch completes the snack-bar exit in a queueMicrotask instead of waiting for NgZone.onMicrotaskEmpty. The owned _completeExit still subscribes to onMicrotaskEmpty and emits inside the zone. That wait was not changed."
+    },
+    {
+      "sha": "1fe1f69303780c11c07ff84313f5fdc10440d55b",
+      "files": [
+        "src/cdk/table/cell.ts",
+        "src/cdk/table/table.ts"
+      ],
+      "disposition": "not-owned",
+      "evidence": "The patch caches the CDK table cell role and skips the cell role on a native table. The owned cell classes extend the peer CdkCell and do not compute the role. That cache was not copied."
     }
   ],
   "limitations": [
-    "The other 903 behavior-semantic SHAs were not read.",
+    "The other 902 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
