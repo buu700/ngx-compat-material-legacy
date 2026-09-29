@@ -59,6 +59,7 @@ CHECKS = (
     ["node", "--check", "scripts/migration-transaction.mjs"],
     ["node", "--check", "scripts/migration-schematic-runner.mjs"],
     ["node", "--check", "scripts/inventory-sass-facade.mjs"],
+    ["node", "--check", "scripts/compare-sealed-sass-values.mjs"],
     ["node", "--check", "scripts/motion-lifecycle-smoke.mjs"],
     ["node", "--check", "scripts/packed-consumer-aot-smoke.mjs"],
     ["node", "scripts/fresh-artifact-negative-tests.mjs"],
