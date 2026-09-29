@@ -846,10 +846,18 @@
       ],
       "disposition": "not-owned",
       "evidence": "The patch reads item._lines instead of item._titles for the line count and changes the list-item content checks from throw to console.warn. That check is on MatListItemBase. The owned list items have a _lines query and no _titles field or sanityCheckListItemContent function. That function was not added."
+    },
+    {
+      "sha": "d5d468a29a2db4c0676c57d60bc8431ed4fd6e18",
+      "files": [
+        "src/material/autocomplete/autocomplete-trigger.ts"
+      ],
+      "disposition": "not-applied",
+      "evidence": "The patch clears the previous autocomplete option inside _updateNativeInputValue when the new value is falsy, which covers a reactive form reset. The owned trigger clears that option from _handleInput when the typed value is empty. _updateNativeInputValue only writes the input and _previousValue, and that reset call was not added."
     }
   ],
   "limitations": [
-    "The other 956 behavior-semantic SHAs were not read.",
+    "The other 955 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
