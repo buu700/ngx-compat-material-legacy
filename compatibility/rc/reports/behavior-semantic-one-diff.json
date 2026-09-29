@@ -4121,10 +4121,20 @@
       ],
       "disposition": "not-owned",
       "evidence": "The patch keeps aria-describedby ids that were set directly on the input when the form field assigns its own ids. Owned MatLegacyInput does not define setDescribedByIds; it extends the current MatInput. That preservation was not added."
+    },
+    {
+      "sha": "42f6a4ac45b115784a155c886dff28b100d9604b",
+      "files": [
+        "src/material/menu/menu-trigger.ts",
+        "src/material/menu/menu.html",
+        "src/material/menu/menu.ts"
+      ],
+      "disposition": "owned-retained",
+      "evidence": "The patch handles menu panel keyboard events from the overlay keydown stream and stops calling stopPropagation inside the panel handler. Owned menu still binds keydown on the panel (legacy-menu/menu.html) and still stops propagation (legacy-menu/internal/menu-base.ts). The overlay keydown subscription still only consumes the events. That dispatch was not changed."
     }
   ],
   "limitations": [
-    "The other 593 behavior-semantic SHAs were not read.",
+    "The other 592 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
