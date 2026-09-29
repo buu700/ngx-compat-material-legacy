@@ -26,10 +26,20 @@
       ],
       "disposition": "already-present",
       "evidence": "The patch skips _onChange while typing when requireSelection is set, and the MDC spec then expects the model to stay at the previous object instead of the typed string Cali. legacy-autocomplete/internal/autocomplete-trigger-base.ts already has that same guard and comment. No source was changed."
+    },
+    {
+      "sha": "86e9e524c3234f44eece21632048cd4290e5f3f4",
+      "files": [
+        "src/material/_theming.scss",
+        "src/material/**/*.import.scss",
+        "src/material/**/*-legacy-index.scss"
+      ],
+      "disposition": "owned-retained",
+      "evidence": "The patch deletes upstream _theming.scss and the .import.scss and -legacy-index.scss shims, and says @import is no longer supported. This package still has 29 .import.scss files and the legacy-index forwards, including legacy-button and legacy-slider. None of those files were deleted."
     }
   ],
   "limitations": [
-    "The other 1038 behavior-semantic SHAs were not read.",
+    "The other 1037 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
