@@ -3209,10 +3209,18 @@
       ],
       "disposition": "owned-retained",
       "evidence": "The patch null-checks the radio input before removing its click listener on destroy and before focusing it from the touch target. The owned destroy does not remove that listener, and the owned touch-target focus still uses the input directly. The null checks were not added."
+    },
+    {
+      "sha": "5892acfde36ac1c12e98f7ea95a2a02bb95eeedd",
+      "files": [
+        "src/material/slide-toggle/slide-toggle.scss"
+      ],
+      "disposition": "not-owned",
+      "evidence": "The patch moves the slide-toggle :active state from the container onto the MDC switch and adds user-select none. The owned styles have no those MDC switch selectors. user-select none is already on the owned toggle. The selector change was not applied."
     }
   ],
   "limitations": [
-    "The other 700 behavior-semantic SHAs were not read.",
+    "The other 699 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
