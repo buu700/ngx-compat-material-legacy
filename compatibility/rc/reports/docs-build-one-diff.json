@@ -237,10 +237,68 @@
       ],
       "disposition": "not-owned",
       "evidence": "The patch continues the upstream ts_library to ts_project migration and adds Bazel tsconfig files for the universal app and tests. No component source is in the diff. This package has no Bazel graph."
+    },
+    {
+      "sha": "d2e154c60cc124b882d0afd26256034bd3e22489",
+      "files": [
+        "BUILD.bazel",
+        ".bazelrc"
+      ],
+      "disposition": "not-owned",
+      "evidence": "The patch changes 26 Bazel files from ts_library to ts_project and sets symlink_prefix to dist/. No component source is in the diff. This package has no Bazel graph."
+    },
+    {
+      "sha": "b5d4de9794cd6c826a9a2d4fb27e7e9e3cb884ac",
+      "files": [
+        "BUILD.bazel",
+        "patches/@angular__compiler-cli.patch",
+        "pnpm-lock.yaml"
+      ],
+      "disposition": "not-owned",
+      "evidence": "The patch prepares an ng_project trial in cdk/a11y. Its compiler-cli patch drops the rootDir branch of the import strategy. This package does not vendor that patch or the Bazel graph."
+    },
+    {
+      "sha": "ae9678df4b22be90ae27cec25224e364e91963f5",
+      "files": [
+        "BUILD.bazel",
+        "src/components-examples",
+        "src/dev-app"
+      ],
+      "disposition": "not-owned",
+      "evidence": "The patch migrates ng_module targets to ng_project. The non-Bazel edits add type references to examples and the dev-app and delete localize-types.d.ts. Those files are not in this package."
+    },
+    {
+      "sha": "7af0f92fc5dd112933f096c18d3f1dfea4b8f052",
+      "files": [
+        "tools/postinstall/patches",
+        "BUILD.bazel"
+      ],
+      "disposition": "not-owned",
+      "evidence": "The patch deletes an ng_module postinstall patch and retargets the remaining Bazel patch from @angular/bazel to rules_angular. This package does not carry those patches."
+    },
+    {
+      "sha": "5d27e7c0b454ef721b7a4dfdf99e18884f690378",
+      "files": [
+        "BUILD.bazel",
+        "tools/highlight-files/highlight-code-block.ts"
+      ],
+      "disposition": "not-owned",
+      "evidence": "The patch removes interop_deps from 276 Bazel files and changes the docs highlighter from require('highlight.js') to an import. This package has neither file."
+    },
+    {
+      "sha": "207bc6cd48279538c58f6e275f5e758f940dee9e",
+      "files": [
+        "BUILD.bazel",
+        "src/cdk/testing/tests/webdriver.e2e.spec.ts",
+        "src/dev-app/polyfills.ts",
+        "src/esbuild-linked.config.mjs"
+      ],
+      "disposition": "not-owned",
+      "evidence": "The patch splits Bazel targets and moves a localize import into the dev-app polyfills, adds an esbuild config, and drops a chromedriver env assignment from an e2e spec. Those files are not in this package."
     }
   ],
   "limitations": [
-    "The other 35 docs-build SHAs were not read.",
+    "The other 29 docs-build SHAs were not read.",
     "Seed dispositions for these SHAs stay open.",
     "This is not RC-08-A02."
   ]
