@@ -76,6 +76,7 @@ import {BrowserModule} from '@angular/platform-browser';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {MATERIAL_ANIMATIONS} from '@angular/material/core';
 import {MatLegacyDialog, MatLegacyDialogModule} from '@ngx-compat/material-legacy/legacy-dialog';
+import {MatLegacySelectModule} from '@ngx-compat/material-legacy/legacy-select';
 
 @Component({
   standalone: false,
@@ -87,7 +88,7 @@ export class DialogBody {}
 @Component({
   standalone: false,
   selector: 'lab-root',
-  template: '<button id="open" type="button" (click)="open()">Open</button>',
+  template: '<button id="open" type="button" (click)="open()">Open</button><mat-select id="choice"><mat-option id="option-a" value="a">A</mat-option></mat-select>',
 })
 export class LabRoot {
   private dialog = inject(MatLegacyDialog);
@@ -95,7 +96,7 @@ export class LabRoot {
 }
 
 @NgModule({
-  imports: [BrowserModule, MatLegacyDialogModule],
+  imports: [BrowserModule, MatLegacyDialogModule, MatLegacySelectModule],
   declarations: [LabRoot, DialogBody],
   bootstrap: [LabRoot],
   providers: [{provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}}],
@@ -248,6 +249,8 @@ let focusBefore = null;
 let focusWhileOpen = null;
 let focusAfter = null;
 let outsideClosed = false;
+let selectOpened = false;
+let selectClosed = false;
 let error = null;
 let diagnostic = null;
 try {
@@ -285,6 +288,13 @@ try {
   }
   for (let i = 0; i < 50 && await evaluate('!!document.getElementById("dialog-body")'); i += 1) await sleep(100);
   outsideClosed = !(await evaluate('!!document.getElementById("dialog-body")'));
+  await evaluate('document.querySelector("#choice .mat-select-trigger").click()');
+  for (let i = 0; i < 50 && !(await evaluate('!!document.querySelector(".cdk-overlay-pane .mat-select-panel #option-a")')); i += 1) await sleep(100);
+  selectOpened = await evaluate('!!document.querySelector(".cdk-overlay-pane .mat-select-panel #option-a")');
+  await send('Input.dispatchKeyEvent', {type: 'keyDown', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27});
+  await send('Input.dispatchKeyEvent', {type: 'keyUp', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27});
+  for (let i = 0; i < 50 && await evaluate('!!document.querySelector(".cdk-overlay-pane .mat-select-panel")'); i += 1) await sleep(100);
+  selectClosed = !(await evaluate('!!document.querySelector(".cdk-overlay-pane .mat-select-panel")'));
 } catch (err) {
   error = String(err);
 } finally {
@@ -304,13 +314,15 @@ const report = {
   focus_after: focusAfter,
   focus_restored_to_open_button: focusBefore === 'open' && focusWhileOpen !== 'open' && focusAfter === 'open',
   closed_by_backdrop_click: outsideClosed,
+  select_panel_opened: selectOpened,
+  select_panel_closed_by_escape: selectOpened && selectClosed,
   bundle_has_partial_declarations: bundleDeclares,
   bundle_imports_angular_compiler: bundleCompilerImport,
   matrix_updated: false,
   error,
-  diagnostic: opened && closed && focusAfter === 'open' && outsideClosed ? null : diagnostic,
+  diagnostic: opened && closed && focusAfter === 'open' && outsideClosed && selectOpened && selectClosed ? null : diagnostic,
   limitations: [
-    'One dialog scenario. The declared matrix stays not-executed.',
+    'Dialog and one select panel. The declared matrix stays not-executed.',
     'Animations were disabled through MATERIAL_ANIMATIONS.',
     'The app source does not import @angular/compiler. The linker runs while bundling.',
     'This is not RC-07-A03.',
@@ -324,5 +336,7 @@ console.log(JSON.stringify({
   closed_by_escape: report.closed_by_escape,
   focus_restored_to_open_button: report.focus_restored_to_open_button,
   closed_by_backdrop_click: report.closed_by_backdrop_click,
+  select_panel_opened: report.select_panel_opened,
+  select_panel_closed_by_escape: report.select_panel_closed_by_escape,
 }, null, 2));
-if (!report.closed_by_escape || !report.focus_restored_to_open_button || !report.closed_by_backdrop_click) process.exit(1);
+if (!report.closed_by_escape || !report.focus_restored_to_open_button || !report.closed_by_backdrop_click || !report.select_panel_closed_by_escape) process.exit(1);
