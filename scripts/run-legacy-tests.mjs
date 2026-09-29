@@ -7,6 +7,15 @@ import {fileURLToPath} from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const expectFail = process.env.LEGACY_TESTS_EXPECT_FAIL === '1';
 
+if (!process.env.CHROME_BIN) {
+  for (const candidate of ['/usr/bin/chromium-browser', '/usr/bin/chromium', '/snap/bin/chromium']) {
+    if (fs.existsSync(candidate)) {
+      process.env.CHROME_BIN = candidate;
+      break;
+    }
+  }
+}
+
 function run(cmd, args, env = {}) {
   console.log(`$ ${cmd} ${args.join(' ')}`);
   const r = spawnSync(cmd, args, {cwd: root, env: {...process.env, ...env}, stdio: 'inherit'});
@@ -28,7 +37,9 @@ code = run(process.execPath, [karmaBin, 'start', 'testing/legacy-runner/karma.co
   LEGACY_TESTS_EXPECT_FAIL: expectFail ? '1' : '0',
 });
 
-const resultsPath = path.join(root, 'compatibility/f08/legacy-test-results.json');
+const resultsPath = process.env.LEGACY_RESULTS_PATH
+  ? path.resolve(root, process.env.LEGACY_RESULTS_PATH)
+  : path.join(root, 'compatibility/f08/legacy-test-results.json');
 if (!fs.existsSync(resultsPath)) {
   console.error('Missing results JSON at', resultsPath);
   process.exit(code || 1);
@@ -43,10 +54,21 @@ if (expectFail) {
   console.error('PROOF FAILED: deliberate fail not observed.');
   process.exit(1);
 }
+const executed = results.totals?.executed ?? 0;
+if (executed === 0) {
+  console.error('Historical runner executed zero tests');
+  process.exit(1);
+}
 const failed = results.totals?.failed ?? 0;
 const skipped = results.totals?.skipped ?? 0;
-if ((results.mapped_specs || []).length < 57 && process.env.LEGACY_SPEC_FILTER == null) {
-  console.error(`Historical reconciliation listed ${results.mapped_specs?.length ?? 0} paths, expected 57`);
+const subset = process.env.LEGACY_SPEC_FILTER != null || process.env.LEGACY_SPEC_FAMILY != null;
+const mapped = (results.mapped_specs || []).length;
+if (!subset && mapped < 57) {
+  console.error(`Historical reconciliation listed ${mapped} paths, expected 57`);
+  process.exit(1);
+}
+if (subset && mapped === 0) {
+  console.error('Historical selection matched no specs');
   process.exit(1);
 }
 if (skipped > 0) {

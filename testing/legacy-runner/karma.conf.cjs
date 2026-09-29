@@ -15,7 +15,9 @@ module.exports = function (config) {
       require('./karma-legacy-json-reporter.cjs'),
     ],
     legacyJsonReporter: {
-      outputFile: path.resolve(__dirname, '../../compatibility/f08/legacy-test-results.json'),
+      outputFile: process.env.LEGACY_RESULTS_PATH
+        ? path.resolve(process.env.LEGACY_RESULTS_PATH)
+        : path.resolve(__dirname, '../../compatibility/f08/legacy-test-results.json'),
       expectFail,
     },
     port: 9876,

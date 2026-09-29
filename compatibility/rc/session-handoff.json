@@ -1,8 +1,8 @@
 {
   "template": false,
-  "packet_id": "RC-00",
-  "substep_id": "RC-00.05",
-  "source_commit": "bf93510002e3db059cdaca960b686bd3c4ea8003",
+  "packet_id": "RC-01",
+  "substep_id": "RC-01.01",
+  "source_commit": "7ee99e95441b0c43ca1bc3a7485c0d0e89127c84",
   "source_content_digest": null,
   "worktree_line": "main",
   "line_21_commit": "cbf86f3faccb240e7beeb6a1e2af727b5d9a674d",
@@ -16,9 +16,9 @@
     "compatibility/rc/release-prerequisites.json",
     "compatibility/rc/session-handoff.json"
   ],
-  "last_command": ["python3 historical inventory writer and seal verification"],
-  "outcome": "recorded",
-  "first_actionable_error": "Cyph has no exact first-party RC age admission. Shell Node is v22.23.3 while the workspace pin is 24.21.0. gh is absent, so branch protection was not read.",
+  "last_command": ["just test-legacy --family card"],
+  "outcome": "passed",
+  "first_actionable_error": "Cyph has no exact first-party RC age admission. gh is absent, so branch protection was not read. Container-nix cannot execute the official Node binary; host-nix is the qualified mode.",
   "failed_case_ids": [
     "MatTooltip > basic usage > should be able to override the default show and hide delays",
     "MatTooltip > basic usage > should position center-bottom by default",
@@ -27,17 +27,17 @@
   ],
   "report_paths": [
     "compatibility/rc/status.json",
-    "testing/legacy-runner/historical-inventory.json"
+    "compatibility/rc/reports/legacy-card.json"
   ],
   "completed_acceptance_ids": ["RC-00-A01", "RC-00-A02", "RC-00-A03"],
   "not_run_scope": [
     "RC-00-A04 remains blocked on an owner age-admission decision",
     "GitHub branch protection and rulesets",
-    "Qualified Node 24.21.0 Chainman setup",
-    "Any historical spec on current HEAD",
-    "RC-01 through RC-12"
+    "RC-01-A02 lock-change invalidation and RC-01-A04 CI reuse",
+    "Historical families other than card",
+    "RC-02 through RC-12"
   ],
-  "next_action": "RC-01.01: add setup, verify-lite, and one targeted historical-family Chainman task using the pinned schema, then run them under the Node 24.21.0 environment.",
+  "next_action": "RC-01.02: record the host-nix qualification and prove setup invalidation, then continue the next historical family failure (tooltip has four open cases).",
   "blocked_owner_decisions": [
     "cyph-rc-age-admission",
     "registry-publish-authority",

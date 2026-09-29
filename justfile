@@ -4,6 +4,9 @@
 chainman +args:
     #!/bin/sh
     set -eu
+    # Profile default allows only host-nix: container mode cannot run the
+    # official Node binary's host dynamic linker.
+    export CHAINMAN_MODE="${CHAINMAN_MODE:-host-nix}"
     IFS= read -r revision < chainman.lock
     case "$revision" in ''|*[!0-9a-f]*) echo 'chainman.lock requires a full lowercase Git SHA' >&2; exit 2 ;; esac
     test "${#revision}" -eq 40 && test "$(wc -c < chainman.lock)" -eq 41
@@ -25,3 +28,21 @@ chainman +args:
     test "$(g --git-dir="$cache" cat-file -t "$revision")" = commit
     entry=$(g --git-dir="$cache" cat-file blob "$revision:bootstrap/git-entry.sh")
     exec sh -c "$entry" chainman "$PWD" "$cache" "$revision" "$@"
+
+[group("RC")]
+[positional-arguments]
+setup *args:
+    #!/bin/sh
+    exec just chainman recipe setup "$@"
+
+[group("RC")]
+[positional-arguments]
+verify-lite *args:
+    #!/bin/sh
+    exec just chainman recipe verify-lite "$@"
+
+[group("RC")]
+[positional-arguments]
+test-legacy *args:
+    #!/bin/sh
+    exec just chainman run test-legacy "$@"

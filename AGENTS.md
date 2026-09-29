@@ -15,3 +15,7 @@ Keep the MIT Google notice, followed by Copyright (c) 2026 Ryan Lester. Add no o
 ## Repository tooling and release scope
 
 Use root `toolchain-lock.json`, `.node-version`, `.npm-version` and `packageManager` consistently. Node24/pnpm12 are private-workspace tools, not a reason to narrow published consumer engines. Do not use floating latest or installer auto-updates. Require mixed M2/M3 coexistence but do not block first stable on native M3 theming of legacy controls. Publication remains a maintainer-authorized operation after packed-artifact and metadata checks.
+
+## RC commands
+
+`just setup` prepares the pinned Chainman environment in host-nix mode. `just verify-lite` runs nonmutating inventory coherence checks and prints the omitted product gates; it is not `verify`. `just test-legacy --family <name>` runs one historical family into `compatibility/rc/reports/legacy-<family>.json`. An unknown family, an empty selection, or a failed child command exits nonzero. These commands do not publish or close G01–G13.

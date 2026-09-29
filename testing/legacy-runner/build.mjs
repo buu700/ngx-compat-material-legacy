@@ -12,6 +12,7 @@ const root = path.resolve(__dirname, '../..');
 const outDir = path.join(__dirname, 'out');
 const expectFail = process.env.LEGACY_TESTS_EXPECT_FAIL === '1';
 const filter = process.env.LEGACY_SPEC_FILTER || '';
+const family = process.env.LEGACY_SPEC_FAMILY || '';
 
 fs.mkdirSync(outDir, {recursive: true});
 
@@ -32,8 +33,24 @@ function resolveDistExport(subpath) {
   return path.join(distPkg, rel);
 }
 
+const inventory = JSON.parse(
+  fs.readFileSync(path.join(__dirname, 'historical-inventory.json'), 'utf8'),
+);
+const familyCandidates = family
+  ? new Set(inventory.rows.filter(row => row.family === family).map(row => row.candidate))
+  : null;
+if (family && familyCandidates.size === 0) {
+  const known = [...new Set(inventory.rows.map(row => row.family))].sort();
+  console.error(`Unknown historical family "${family}". Known: ${known.join(', ')}`);
+  process.exit(1);
+}
 const rows = JSON.parse(fs.readFileSync(path.join(__dirname, 'historical-specs.json'), 'utf8'))
-  .filter(row => !filter || row.historical_path.includes(filter) || row.candidate.includes(filter));
+  .filter(row => !filter || row.historical_path.includes(filter) || row.candidate.includes(filter))
+  .filter(row => !familyCandidates || familyCandidates.has(row.candidate));
+if ((family || filter) && rows.length === 0) {
+  console.error('Historical selection matched no specs');
+  process.exit(1);
+}
 for (const row of rows) {
   if (!fs.existsSync(path.join(root, row.candidate))) {
     console.error(`Missing historical spec ${row.candidate}`);
