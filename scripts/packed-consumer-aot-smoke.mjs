@@ -15,16 +15,19 @@
 import {
   cpSync,
   existsSync,
+  lstatSync,
   mkdirSync,
   mkdtempSync,
+  readdirSync,
   readFileSync,
+  realpathSync,
   rmSync,
   statSync,
   writeFileSync,
 } from 'node:fs';
 import {createHash} from 'node:crypto';
 import {tmpdir} from 'node:os';
-import {dirname, isAbsolute, join, relative, resolve} from 'node:path';
+import {dirname, isAbsolute, join, relative, resolve, sep} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {spawnSync} from 'node:child_process';
 
@@ -75,6 +78,235 @@ function run(cmd, cmdlineArgs, opts = {}) {
     ...opts,
   });
   return res;
+}
+
+function isolatedEnv() {
+  const env = {...process.env, NODE_OPTIONS: ''};
+  delete env.NODE_PATH;
+  return env;
+}
+
+function isInside(parent, target) {
+  const rel = relative(parent, target);
+  return rel === '' || (!rel.startsWith('..') && !isAbsolute(rel));
+}
+
+function librarySpec(exportKey) {
+  if (exportKey === '.') return '@ngx-compat/material-legacy';
+  return `@ngx-compat/material-legacy/${exportKey.slice(2)}`;
+}
+
+function assertIsolatedInstall(consumer, consumerReal, rootReal) {
+  const pkgRoot = join(consumer, 'node_modules/@ngx-compat/material-legacy');
+  const pkgReal = realpathSync(pkgRoot);
+  if (
+    isInside(rootReal, pkgReal) ||
+    pkgReal.includes(`${sep}projects${sep}ngx-material-legacy`) ||
+    pkgReal.includes(`${sep}dist${sep}ngx-material-legacy`)
+  ) {
+    throw new Error(`Installed library resolves inside the workspace: ${pkgReal}`);
+  }
+  if (!isInside(consumerReal, pkgReal)) {
+    throw new Error(`Installed library is outside the consumer install: ${pkgReal}`);
+  }
+
+  const workspaceLinks = [];
+  const modulesDir = join(consumer, 'node_modules');
+  for (const entry of readdirSync(modulesDir)) {
+    const entryPath = join(modulesDir, entry);
+    const children = entry.startsWith('@') && !entry.startsWith('.')
+      ? readdirSync(entryPath).map(name => join(entryPath, name))
+      : [entryPath];
+    for (const child of children) {
+      if (!lstatSync(child).isSymbolicLink()) continue;
+      const target = realpathSync(child);
+      if (isInside(rootReal, target)) workspaceLinks.push(`${child} -> ${target}`);
+    }
+  }
+  if (workspaceLinks.length) {
+    throw new Error(`Consumer links into the repository: ${workspaceLinks.join(', ')}`);
+  }
+
+  const installed = JSON.parse(readFileSync(join(pkgRoot, 'package.json'), 'utf8'));
+  const specs = Object.entries(installed.exports ?? {})
+    .filter(([key, value]) => {
+      if (key === './_index' || key === './package.json') return false;
+      return Boolean(value && (value.default || value.import || value.types));
+    })
+    .map(([key]) => librarySpec(key));
+  const resolved = [];
+  for (const spec of specs) {
+    const probe = run(
+      process.execPath,
+      ['--input-type=module', '-e', `
+        import {createRequire} from 'node:module';
+        import {pathToFileURL} from 'node:url';
+        const require = createRequire(pathToFileURL(process.cwd() + '/'));
+        console.log(require.resolve(process.env.LEGACY_SPEC));
+      `],
+      {cwd: consumer, env: {...isolatedEnv(), LEGACY_SPEC: spec}},
+    );
+    if (probe.status !== 0) {
+      throw new Error(`Unable to resolve ${spec}: ${(probe.stderr || probe.stdout || '').slice(-500)}`);
+    }
+    const found = realpathSync(probe.stdout.trim());
+    if (
+      isInside(rootReal, found) ||
+      !found.includes(`${sep}@ngx-compat${sep}material-legacy${sep}`)
+    ) {
+      throw new Error(`${spec} resolved outside the installed library: ${found}`);
+    }
+    resolved.push(spec);
+  }
+
+  const animationHits = [];
+  for (const name of readdirSync(join(pkgRoot, 'fesm2022'))) {
+    if (!name.endsWith('.mjs')) continue;
+    const text = readFileSync(join(pkgRoot, 'fesm2022', name), 'utf8');
+    if (
+      /from\s+['"]@angular\/animations['"]/.test(text) ||
+      /require\(\s*['"]@angular\/animations['"]\s*\)/.test(text)
+    ) {
+      animationHits.push(name);
+    }
+  }
+  if (animationHits.length) {
+    throw new Error(`Installed library imports @angular/animations: ${animationHits.join(', ')}`);
+  }
+
+  const lock = JSON.parse(readFileSync(join(consumer, 'package-lock.json'), 'utf8'));
+  const lockedCore = lock.packages?.['node_modules/@angular/core']?.version;
+  if (lockedCore !== '22.1.7') {
+    throw new Error(`Consumer lock resolved @angular/core@${lockedCore ?? 'missing'}, expected 22.1.7`);
+  }
+
+  mkdirSync(join(consumer, 'src'), {recursive: true});
+  writeFileSync(
+    join(consumer, 'src/all-entries.ts'),
+    `${specs.map(spec => `import '${spec}';`).join('\n')}\nexport {};\n`,
+  );
+  writeFileSync(
+    join(consumer, 'tsconfig.entries.json'),
+    JSON.stringify(
+      {
+        compilerOptions: {
+          target: 'ES2022',
+          module: 'ES2022',
+          moduleResolution: 'bundler',
+          strict: true,
+          skipLibCheck: false,
+          noEmit: true,
+          experimentalDecorators: true,
+          lib: ['ES2022', 'DOM'],
+          types: [],
+        },
+        files: ['src/all-entries.ts'],
+      },
+      null,
+      2,
+    ),
+  );
+  const tsc = run(
+    process.execPath,
+    [join(consumer, 'node_modules/typescript/lib/tsc.js'), '-p', 'tsconfig.entries.json', '--pretty', 'false'],
+    {cwd: consumer, timeout: 180000, env: isolatedEnv()},
+  );
+  if (tsc.status !== 0) {
+    throw new Error(
+      `Declaration check failed:\n${(tsc.stdout || '').slice(-2500)}\n${(tsc.stderr || '').slice(-1500)}`,
+    );
+  }
+
+  writeFileSync(
+    join(consumer, 'src/legacy-strict.ts'),
+    `import {Component, NgModule} from '@angular/core';
+import {MatLegacyButtonModule} from '@ngx-compat/material-legacy/legacy-button';
+
+@Component({
+  standalone: false,
+  selector: 'legacy-strict-root',
+  template: '<button mat-button>Ok</button>',
+})
+export class LegacyStrictRoot {}
+
+@NgModule({
+  imports: [MatLegacyButtonModule],
+  declarations: [LegacyStrictRoot],
+})
+export class LegacyStrictModule {}
+`,
+  );
+  writeFileSync(
+    join(consumer, 'src/modern-strict.ts'),
+    `import {Component, NgModule} from '@angular/core';
+import {MatButtonModule} from '@angular/material/button';
+
+@Component({
+  standalone: false,
+  selector: 'modern-strict-root',
+  template: '<button mat-button>Ok</button>',
+})
+export class ModernStrictRoot {}
+
+@NgModule({
+  imports: [MatButtonModule],
+  declarations: [ModernStrictRoot],
+})
+export class ModernStrictModule {}
+`,
+  );
+  const strictConfig = (file, outDir) => ({
+    compilerOptions: {
+      target: 'ES2022',
+      module: 'ES2022',
+      moduleResolution: 'bundler',
+      experimentalDecorators: true,
+      strict: true,
+      skipLibCheck: false,
+      lib: ['ES2022', 'DOM'],
+      rootDir: 'src',
+      outDir,
+      types: [],
+      ignoreDeprecations: '6.0',
+    },
+    files: [file],
+    angularCompilerOptions: {compilationMode: 'full', strictTemplates: true},
+  });
+  writeFileSync(
+    join(consumer, 'tsconfig.legacy-strict.json'),
+    JSON.stringify(strictConfig('src/legacy-strict.ts', 'out-legacy'), null, 2),
+  );
+  writeFileSync(
+    join(consumer, 'tsconfig.modern.json'),
+    JSON.stringify(strictConfig('src/modern-strict.ts', 'out-modern'), null, 2),
+  );
+  const ngc = join(consumer, 'node_modules/@angular/compiler-cli/bundles/src/bin/ngc.js');
+  for (const project of ['tsconfig.legacy-strict.json', 'tsconfig.modern.json']) {
+    const compiled = run(process.execPath, [ngc, '-p', project], {
+      cwd: consumer,
+      timeout: 180000,
+      env: isolatedEnv(),
+    });
+    if (compiled.status !== 0) {
+      throw new Error(
+        `${project} failed:\n${(compiled.stdout || '').slice(-1500)}\n${(compiled.stderr || '').slice(-2000)}`,
+      );
+    }
+  }
+
+  return {
+    consumer_outside_repository: true,
+    node_path: 'unset',
+    workspace_symlinks: [],
+    resolved_entries: resolved.length,
+    declaration_check: 'skipLibCheck:false',
+    strict_templates: ['legacy-button', 'modern-button'],
+    separate_compilation_scopes: true,
+    animation_engine_imports: [],
+    registry_core_version: lockedCore,
+    sass_include_paths: [],
+    sass_compile: 'not run in this consumer',
+  };
 }
 
 let draftRun = null;
@@ -170,6 +402,12 @@ if (!existsSync(tarball)) {
 }
 
 const consumer = mkdtempSync(join(tmpdir(), 'ngx-compat-aot-harness_'));
+const rootReal = realpathSync(root);
+const consumerReal = realpathSync(consumer);
+if (isInside(rootReal, consumerReal)) {
+  console.error(`Consumer directory is inside the repository: ${consumerReal}`);
+  process.exit(1);
+}
 const detailPath = draftRun
   ? join(draftRun.runDir, 'reports/packed-consumer-detail.json')
   : outPath;
@@ -186,6 +424,12 @@ const result = {
 };
 
 try {
+  const installTarball = join(consumer, 'library.tgz');
+  cpSync(tarball, installTarball);
+  if (sha256File(installTarball) !== sha256File(tarball)) {
+    throw new Error('Copied tarball digest does not match the rehashed artifact');
+  }
+  const repoLockBefore = sha256File(join(root, 'pnpm-lock.yaml'));
   const pkg = {
     name: 'ngx-compat-material-legacy-aot-harness-smoke',
     private: true,
@@ -201,7 +445,7 @@ try {
       '@angular/material': '22.1.7',
       '@angular/platform-browser': '22.1.7',
       '@angular/platform-browser-dynamic': '22.1.7',
-      '@ngx-compat/material-legacy': `file:${tarball}`,
+      '@ngx-compat/material-legacy': `file:${installTarball}`,
       rxjs: '7.8.2',
       tslib: '2.8.1',
       typescript: '6.0.3',
@@ -210,16 +454,22 @@ try {
     },
   };
   writeFileSync(join(consumer, 'package.json'), JSON.stringify(pkg, null, 2));
+  writeFileSync(join(consumer, '.npmrc'), 'install-links=true\nfund=false\naudit=false\n');
 
-  const install = run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund'], {
+  const install = run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock'], {
     cwd: consumer,
     timeout: 180000,
+    env: isolatedEnv(),
   });
   if (install.status !== 0) {
     result.errors.push('npm install failed');
     result.aot = {status: 'fail', stderr: (install.stderr || '').slice(-2000)};
     throw new Error('install failed');
   }
+  if (sha256File(join(root, 'pnpm-lock.yaml')) !== repoLockBefore) {
+    throw new Error('Consumer install changed the repository pnpm-lock.yaml');
+  }
+  result.isolation = assertIsolatedInstall(consumer, consumerReal, rootReal);
 
   mkdirSync(join(consumer, 'src'), {recursive: true});
 
@@ -312,7 +562,7 @@ platformBrowserDynamic().bootstrapModule(AotSmokeModule).catch(err => console.er
   const aot = run(process.execPath, [ngcCmd, '-p', 'tsconfig.json'], {
     cwd: consumer,
     timeout: 180000,
-    env: {...process.env, NODE_OPTIONS: ''},
+    env: isolatedEnv(),
   });
   const aotOk =
     aot.status === 0 &&
@@ -587,7 +837,7 @@ main().catch(err => {
     const aot2 = run(process.execPath, [ngcCmd, '-p', 'tsconfig.json'], {
       cwd: consumer,
       timeout: 180000,
-      env: {...process.env, NODE_OPTIONS: ''},
+      env: isolatedEnv(),
     });
     if (aot2.status !== 0) {
       result.harness = {
@@ -601,6 +851,7 @@ main().catch(err => {
       const harness = run(process.execPath, ['out-tsc/harness-runtime.js'], {
         cwd: consumer,
         timeout: 120000,
+        env: isolatedEnv(),
       });
       let parsed = null;
       try {
