@@ -48,12 +48,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
-      - name: Setup Node from .node-version
-        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
-        with:
-          node-version-file: .node-version
-          package-manager-cache: false
+      - name: Install pinned Nix
+        uses: DeterminateSystems/nix-installer-action@3138316df39ed29be04236d7ffc686fa525866aa # v23
+
+      - name: Install pinned just 1.46.0
+        run: |
+          set -euo pipefail
+          curl -fsSL -o /tmp/just.tar.gz https://github.com/casey/just/releases/download/1.46.0/just-1.46.0-x86_64-unknown-linux-musl.tar.gz
+          echo "79966e6e353f535ee7d1c6221641bcc8e3381c55b0d0a6dc6e54b34f9db36eaa  /tmp/just.tar.gz" | sha256sum -c
+          tar -xzf /tmp/just.tar.gz -C /tmp just
+          sudo mv /tmp/just /usr/local/bin/just
+          just --version
 
       - name: Packed-consumer AOT + harness smoke
-        run: node scripts/packed-consumer-aot-smoke.mjs
+        run: just chainman run packed-consumer
 
