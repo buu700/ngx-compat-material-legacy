@@ -371,10 +371,26 @@
       ],
       "disposition": "not-applied",
       "evidence": "The patch replaces mixinDisabled and mixinDisableRipple on MatMenuItem with booleanAttribute inputs. MatLegacyMenuItem still extends the peer menu item and still declares inputs disabled and disableRipple. The owned mixin helpers under legacy-menu/internal/common-behaviors remain."
+    },
+    {
+      "sha": "90465a1882028144a8e56eabc03b4cc93947df9f",
+      "files": [
+        "src/material/autocomplete/_autocomplete-theme.scss",
+        "src/material/badge/_badge-theme.scss",
+        "src/material/chips/_chips-theme.scss",
+        "src/material/dialog/_dialog-theme.scss",
+        "src/material/list/_list-theme.scss",
+        "src/material/menu/_menu-theme.scss",
+        "src/material/select/_select-theme.scss",
+        "src/material/core/typography/_typography.scss",
+        "src/material/core/theming/_inspection.scss"
+      ],
+      "disposition": "not-applied",
+      "evidence": "The patch reads the remaining component themes through the inspection API and removes legacy-typography-hierarchy. The owned themes still call theming.get-color-config. The facade still forwards legacy-typography-hierarchy, and that mixin was not removed."
     }
   ],
   "limitations": [
-    "The other 1004 behavior-semantic SHAs were not read.",
+    "The other 1003 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
