@@ -4037,10 +4037,19 @@
       ],
       "disposition": "owned-retained",
       "evidence": "The patch replaces Sass global mix, opacity, and map-merge calls with the color and map module functions, and raises the Sass range to 1.80.6. Owned private-rgba-to-hex still calls the global mix function (styles/core/theming/_theming.scss). The owned Sass pin stays 1.104.1. Those calls were not rewritten."
+    },
+    {
+      "sha": "17ff5befb6f7d94f0f56c0c20ee10310cf986a10",
+      "files": [
+        "src/cdk/listbox/listbox.ts",
+        "src/cdk/a11y/key-manager/list-key-manager.ts"
+      ],
+      "disposition": "not-owned",
+      "evidence": "The patch stores the CDK listbox disabled state, tabindex, and active item in signals so they update without Zone.js. This package does not define CdkListbox or ListKeyManager. Those fields were not converted."
     }
   ],
   "limitations": [
-    "The other 603 behavior-semantic SHAs were not read.",
+    "The other 602 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
