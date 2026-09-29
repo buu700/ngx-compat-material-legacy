@@ -5552,10 +5552,18 @@
       ],
       "disposition": "owned-retained",
       "evidence": "The patch opens the dialog with createBlockScrollStrategy and createGlobalPositionStrategy. Owned dialog still uses scrollStrategies.block and position().global() (legacy-dialog/internal/dialog-base.ts). Those calls were not switched."
+    },
+    {
+      "sha": "c9ccc21f21a1c71ff597ce541870f9ff5258a921",
+      "files": [
+        "src/material/menu/menu-trigger.ts"
+      ],
+      "disposition": "owned-retained",
+      "evidence": "The patch creates the menu overlay through createOverlayRef and createRepositionScrollStrategy, and listens on overlay keydownEvents. Owned menu still creates the overlay with Overlay.create and uses scrollStrategies.reposition (legacy-menu/internal/menu-trigger-base.ts). Those calls were not switched."
     }
   ],
   "limitations": [
-    "The other 416 behavior-semantic SHAs were not read.",
+    "The other 415 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
