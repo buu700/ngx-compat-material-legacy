@@ -247,6 +247,7 @@ let closed = false;
 let focusBefore = null;
 let focusWhileOpen = null;
 let focusAfter = null;
+let outsideClosed = false;
 let error = null;
 let diagnostic = null;
 try {
@@ -270,6 +271,20 @@ try {
   for (let i = 0; i < 50 && await evaluate('!!document.getElementById("dialog-body")'); i += 1) await sleep(100);
   closed = !(await evaluate('!!document.getElementById("dialog-body")'));
   focusAfter = await evaluate('document.activeElement && document.activeElement.id');
+  await evaluate('document.getElementById("open").click()');
+  for (let i = 0; i < 50 && !(await evaluate('!!document.querySelector(".cdk-overlay-backdrop")')); i += 1) await sleep(100);
+  const backdrop = await evaluate(`(() => {
+    const el = document.querySelector('.cdk-overlay-backdrop');
+    if (!el) return null;
+    const rect = el.getBoundingClientRect();
+    return {x: rect.x + 2, y: rect.y + 2};
+  })()`);
+  if (backdrop) {
+    await send('Input.dispatchMouseEvent', {type: 'mousePressed', x: backdrop.x, y: backdrop.y, button: 'left', clickCount: 1});
+    await send('Input.dispatchMouseEvent', {type: 'mouseReleased', x: backdrop.x, y: backdrop.y, button: 'left', clickCount: 1});
+  }
+  for (let i = 0; i < 50 && await evaluate('!!document.getElementById("dialog-body")'); i += 1) await sleep(100);
+  outsideClosed = !(await evaluate('!!document.getElementById("dialog-body")'));
 } catch (err) {
   error = String(err);
 } finally {
@@ -288,11 +303,12 @@ const report = {
   focus_while_open: focusWhileOpen,
   focus_after: focusAfter,
   focus_restored_to_open_button: focusBefore === 'open' && focusWhileOpen !== 'open' && focusAfter === 'open',
+  closed_by_backdrop_click: outsideClosed,
   bundle_has_partial_declarations: bundleDeclares,
   bundle_imports_angular_compiler: bundleCompilerImport,
   matrix_updated: false,
   error,
-  diagnostic: opened && closed && focusAfter === 'open' ? null : diagnostic,
+  diagnostic: opened && closed && focusAfter === 'open' && outsideClosed ? null : diagnostic,
   limitations: [
     'One dialog scenario. The declared matrix stays not-executed.',
     'Animations were disabled through MATERIAL_ANIMATIONS.',
@@ -307,5 +323,6 @@ console.log(JSON.stringify({
   opened,
   closed_by_escape: report.closed_by_escape,
   focus_restored_to_open_button: report.focus_restored_to_open_button,
+  closed_by_backdrop_click: report.closed_by_backdrop_click,
 }, null, 2));
-if (!report.closed_by_escape || !report.focus_restored_to_open_button) process.exit(1);
+if (!report.closed_by_escape || !report.focus_restored_to_open_button || !report.closed_by_backdrop_click) process.exit(1);
