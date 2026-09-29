@@ -1,8 +1,8 @@
 {
   "template": false,
   "packet_id": "RC-01",
-  "substep_id": "RC-01.04",
-  "source_commit": "576bf3b15b99d67a053acf82b0ddffca1d9f1e34",
+  "substep_id": "RC-01.05",
+  "source_commit": "dd7291507e78b0d96d2fcdb3607a84d0d0c5ea4a",
   "source_content_digest": null,
   "worktree_line": "main",
   "line_21_commit": "cbf86f3faccb240e7beeb6a1e2af727b5d9a674d",
@@ -16,9 +16,9 @@
     "compatibility/rc/release-prerequisites.json",
     "compatibility/rc/session-handoff.json"
   ],
-  "last_command": ["just test-legacy --family nope", "just test-legacy", "just verify-lite --extra"],
+  "last_command": ["just verify-lite", "just verify --out /tmp/rc-verify-unused"],
   "outcome": "passed",
-  "first_actionable_error": "Cyph has no exact first-party RC age admission. gh is absent, so branch protection was not read. Container-nix cannot execute the official Node binary; host-nix is the qualified mode. CI still selects Node with setup-node instead of the Chainman tasks.",
+  "first_actionable_error": "Cyph has no exact first-party RC age admission. gh is absent, so branch protection was not read. Container-nix cannot execute the official Node binary; host-nix is the qualified mode. The packed-consumer CI job still selects Node outside Chainman, and just verify is fail-closed because the full gate is not implemented.",
   "failed_case_ids": [],
   "report_paths": [
     "compatibility/rc/status.json",
@@ -31,11 +31,11 @@
   "not_run_scope": [
     "RC-00-A04 remains blocked on an owner age-admission decision",
     "GitHub branch protection and rulesets",
-    "RC-01-A04 CI reuse of the same tasks",
+    "RC-01-A04 remains open: packed-consumer CI still selects Node outside Chainman, and just verify is not the full gate",
     "Historical families other than card and tooltip",
     "RC-02 through RC-05 and RC-07 through RC-12"
   ],
-  "next_action": "Point CI at the same Chainman tasks as local RC commands, then continue the remaining historical families under RC-06.",
+  "next_action": "Move the packed-consumer job onto the Chainman toolchain, then continue the remaining historical families under RC-06.",
   "blocked_owner_decisions": [
     "cyph-rc-age-admission",
     "registry-publish-authority",

@@ -15,68 +15,30 @@ permissions:
 
 jobs:
   helper-checks:
-    name: Helper tests and static checks
+    name: Chainman verify-lite
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
-      - name: Setup Node from .node-version
-        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
-        with:
-          node-version-file: .node-version
-          package-manager-cache: false
+      - name: Install pinned Nix
+        uses: DeterminateSystems/nix-installer-action@3138316df39ed29be04236d7ffc686fa525866aa # v23
 
-      - name: Enable pinned pnpm via corepack
+      - name: Install pinned just 1.46.0
         run: |
           set -euo pipefail
-          corepack enable
-          corepack prepare pnpm@12.4.2 --activate
-          node --version
-          npm --version
-          pnpm --version
+          curl -fsSL -o /tmp/just.tar.gz https://github.com/casey/just/releases/download/1.46.0/just-1.46.0-x86_64-unknown-linux-musl.tar.gz
+          echo "79966e6e353f535ee7d1c6221641bcc8e3381c55b0d0a6dc6e54b34f9db36eaa  /tmp/just.tar.gz" | sha256sum -c
+          tar -xzf /tmp/just.tar.gz -C /tmp just
+          sudo mv /tmp/just /usr/local/bin/just
+          just --version
 
-      - name: Helper unit tests
-        run: python3 -m unittest discover -s tests -v
+      - name: verify-lite
+        run: just verify-lite
 
-      - name: Static script syntax checks
-        run: |
-          set -euo pipefail
-          python3 -m py_compile scripts/bootstrap-material.py \
-            scripts/check-toolchain.py \
-            scripts/check-upstream-api-policy.py \
-            scripts/check-workflow-pins.py \
-            scripts/compare-css.py \
-            scripts/inspect-packed-package.py \
-            scripts/inventory-source.py \
-            scripts/list-upstream-deltas.py \
-            scripts/seal-reference.py \
-            scripts/source-closure.py
-          node --check scripts/run-sass-fixtures.mjs
-          node --check scripts/run-sass-value-fixtures.mjs
-
-      - name: Workflow action pin checker
-        run: python3 scripts/check-workflow-pins.py .
-
-      - name: Toolchain configuration consistency
-        run: python3 scripts/check-toolchain.py --root .
-
-      - name: Toolchain runtime versions
-        run: python3 scripts/check-toolchain.py --root . --runtime --release
-
-      - name: migrate-legacy fixture suite
-        run: node scripts/schematics/test-migrate-legacy-fixtures.mjs
-
-      - name: Bundled peer-light CLI artifact hash
-        run: |
-          set -euo pipefail
-          node --check scripts/build-migrate-legacy-cli.mjs
-          node --check scripts/migrate-legacy-cli.mjs
-          node scripts/build-migrate-legacy-cli.mjs --verify
-
-      - name: Motion lifecycle smoke (MATERIAL_ANIMATIONS helper)
-        run: node scripts/motion-lifecycle-smoke.mjs
+      - name: Motion lifecycle smoke
+        run: just chainman run motion-smoke
 
   packed-consumer-aot:
     name: Packed-consumer AOT and harness

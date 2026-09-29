@@ -46,3 +46,9 @@ verify-lite *args:
 test-legacy *args:
     #!/bin/sh
     exec just chainman run test-legacy "$@"
+
+[group("RC")]
+[positional-arguments]
+verify *args:
+    #!/bin/sh
+    exec just chainman run verify "$@"
