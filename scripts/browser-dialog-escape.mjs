@@ -14,7 +14,7 @@ import {dirname, join, relative, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const reportPath = join(root, 'compatibility/rc/reports/browser-dialog-escape.json');
+let reportPath = join(root, 'compatibility/rc/reports/browser-dialog-escape.json');
 const esbuild = createRequire(join(root, 'package.json'))('esbuild');
 
 function fail(code, message) {
@@ -23,7 +23,13 @@ function fail(code, message) {
 }
 
 let tarball = null;
+let reducedMotion = false;
 for (let i = 2; i < process.argv.length; i += 1) {
+  if (process.argv[i] === '--reduced-motion') {
+    reducedMotion = true;
+    reportPath = join(root, 'compatibility/rc/reports/browser-dialog-reduced-motion.json');
+    continue;
+  }
   if (process.argv[i] === '--tarball') {
     const value = process.argv[i + 1];
     if (!value || value.startsWith('-')) fail(2, '--tarball requires a path');
@@ -261,7 +267,7 @@ try {
     source: 'window.__errors=[];window.addEventListener("error",e=>window.__errors.push(String(e.message)));',
   });
   await send('Emulation.setEmulatedMedia', {
-    features: [{name: 'prefers-reduced-motion', value: 'no'}],
+    features: [{name: 'prefers-reduced-motion', value: reducedMotion ? 'reduce' : 'no'}],
   });
   await send('Page.reload', {ignoreCache: true});
   for (let i = 0; i < 50 && !(await evaluate('!!document.getElementById("open") || !!document.getElementById("bootstrap-error")')); i += 1) await sleep(100);
@@ -331,9 +337,12 @@ try {
   chrome.kill();
   server.close();
 }
+const transitionOnContainer = !!(dialogMotion && dialogMotion.noop === false && dialogMotion.enter_duration === '150ms' && (dialogMotion.events || []).some(name => name === 'opacity' || name === 'transform'));
+const reducedNoop = !!(dialogMotion && dialogMotion.noop === true && (dialogMotion.events || []).length === 0 && String(dialogMotion.transition_duration).startsWith('0s'));
 const report = {
   schema_version: 1,
-  role: 'one legacy dialog Escape in Chromium',
+  role: reducedMotion ? 'legacy dialog under prefers-reduced-motion' : 'one legacy dialog Escape in Chromium',
+  reduced_motion: reducedMotion,
   tarball_sha256: createHash('sha256').update(readFileSync(tarball)).digest('hex'),
   browser: version.Browser,
   opened,
@@ -346,15 +355,18 @@ const report = {
   select_panel_opened: selectOpened,
   select_panel_closed_by_escape: selectOpened && selectClosed,
   dialog_motion: dialogMotion,
-  dialog_transition_on_container: !!(dialogMotion && dialogMotion.noop === false && dialogMotion.enter_duration === '150ms' && (dialogMotion.events || []).some(name => name === 'opacity' || name === 'transform')),
+  dialog_transition_on_container: transitionOnContainer,
+  dialog_noop_under_reduced_motion: reducedMotion ? reducedNoop : null,
   bundle_has_partial_declarations: bundleDeclares,
   bundle_imports_angular_compiler: bundleCompilerImport,
   matrix_updated: false,
   error,
-  diagnostic: opened && closed && focusAfter === 'open' && outsideClosed && selectOpened && selectClosed && dialogMotion && dialogMotion.noop === false && (dialogMotion.events || []).some(name => name === 'opacity' || name === 'transform') ? null : diagnostic,
+  diagnostic: opened && closed && (reducedMotion ? reducedNoop : transitionOnContainer) ? null : diagnostic,
   limitations: [
     'Dialog and one select panel. The declared matrix stays not-executed.',
-    'This run enables dialog motion and emulates prefers-reduced-motion: no. It does not cover reduced, zero, or interrupted motion.',
+    reducedMotion
+      ? 'This run emulates prefers-reduced-motion: reduce. Zero-duration and interrupted motion are not covered.'
+      : 'This run enables dialog motion and emulates prefers-reduced-motion: no. Reduced motion is a separate run.',
     'The app source does not import @angular/compiler. The linker runs while bundling.',
     'This is not RC-07-A03.',
   ],
@@ -370,5 +382,7 @@ console.log(JSON.stringify({
   select_panel_opened: report.select_panel_opened,
   select_panel_closed_by_escape: report.select_panel_closed_by_escape,
   dialog_transition_on_container: report.dialog_transition_on_container,
+  dialog_noop_under_reduced_motion: report.dialog_noop_under_reduced_motion,
 }, null, 2));
-if (!report.closed_by_escape || !report.focus_restored_to_open_button || !report.closed_by_backdrop_click || !report.select_panel_closed_by_escape || !report.dialog_transition_on_container) process.exit(1);
+const motionOk = reducedMotion ? report.dialog_noop_under_reduced_motion : report.dialog_transition_on_container;
+if (!report.closed_by_escape || !report.focus_restored_to_open_button || !report.closed_by_backdrop_click || !report.select_panel_closed_by_escape || !motionOk) process.exit(1);
