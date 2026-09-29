@@ -54,6 +54,7 @@ CHECKS = (
     ["node", "--check", "scripts/check-packed-exports.mjs"],
     ["node", "--check", "scripts/compare-core-declarations.mjs"],
     ["node", "--check", "scripts/trace-owned-helpers.mjs"],
+    ["node", "--check", "scripts/engine-free-consumer.mjs"],
     ["node", "--check", "scripts/motion-lifecycle-smoke.mjs"],
     ["node", "--check", "scripts/packed-consumer-aot-smoke.mjs"],
     ["node", "scripts/fresh-artifact-negative-tests.mjs"],
