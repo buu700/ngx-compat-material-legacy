@@ -70,8 +70,7 @@ const installed = realpathSync(join(consumer, 'node_modules/@ngx-compat/material
 if (relative(realpathSync(consumer), installed).startsWith('..')) fail(1, `Library resolved outside the consumer: ${installed}`);
 
 mkdirSync(join(consumer, 'src'), {recursive: true});
-writeFileSync(join(consumer, 'src/main.ts'), `import '@angular/compiler';
-import 'zone.js';
+writeFileSync(join(consumer, 'src/main.ts'), `import 'zone.js';
 import {Component, NgModule, inject} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
@@ -133,6 +132,10 @@ const compiled = spawnSync(process.execPath, [ngc, '-p', 'tsconfig.json'], {
 });
 if (compiled.status !== 0) fail(1, `${compiled.stdout || ''}\n${compiled.stderr || ''}`.slice(-2500));
 
+const linkerRequire = createRequire(join(consumer, 'node_modules/@angular/compiler-cli/package.json'));
+const {transformSync} = linkerRequire('@babel/core');
+const linkerPlugin = linkerRequire('@angular/compiler-cli/linker/babel').default;
+const {needsLinking} = linkerRequire('@angular/compiler-cli/linker');
 await esbuild.build({
   absWorkingDir: consumer,
   entryPoints: ['out/main.js'],
@@ -141,7 +144,31 @@ await esbuild.build({
   outfile: 'dist/app.js',
   platform: 'browser',
   logLevel: 'silent',
+  plugins: [{
+    name: 'ng-linker',
+    setup(build) {
+      build.onLoad({filter: /\.m?js$/}, args => {
+        const source = readFileSync(args.path, 'utf8');
+        if (!source.includes('ɵɵngDeclare')) return null;
+        if (!needsLinking(args.path, source)) return null;
+        const linked = transformSync(source, {
+          filename: args.path,
+          compact: false,
+          configFile: false,
+          babelrc: false,
+          plugins: [[linkerPlugin, {linkerJitMode: false}]],
+        });
+        return {contents: linked.code, loader: 'js'};
+      });
+    },
+  }],
 });
+const bundle = readFileSync(join(consumer, 'dist/app.js'), 'utf8');
+const bundleDeclares = bundle.includes('ɵɵngDeclare');
+const bundleCompilerImport = /(?:from|require\()\s*['"]@angular\/compiler['"]/.test(bundle);
+if (bundleDeclares || bundleCompilerImport) {
+  fail(1, `bundle still has partial declarations=${bundleDeclares} compiler import=${bundleCompilerImport}`);
+}
 writeFileSync(join(consumer, 'dist/index.html'), `<!doctype html><html><body><lab-root></lab-root><script src="/app.js"></script></body></html>\n`);
 
 const server = createServer((req, res) => {
@@ -250,13 +277,15 @@ const report = {
   browser: version.Browser,
   opened,
   closed_by_escape: opened && closed,
+  bundle_has_partial_declarations: bundleDeclares,
+  bundle_imports_angular_compiler: bundleCompilerImport,
   matrix_updated: false,
   error,
   diagnostic: opened && closed ? null : diagnostic,
   limitations: [
     'One dialog scenario. The declared matrix stays not-executed.',
     'Animations were disabled through MATERIAL_ANIMATIONS.',
-    'The browser bundle loads @angular/compiler because the packed library is partial and was not linked.',
+    'The app source does not import @angular/compiler. The linker runs while bundling.',
     'This is not RC-07-A03.',
   ],
 };
