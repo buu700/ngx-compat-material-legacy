@@ -111,7 +111,7 @@ import {
   getMatSelectNonArrayValueError,
   getMatSelectNonFunctionValueError,
 } from '../select-errors';
-import {legacyHostMotionEvent} from '../../legacy-core/internal/motion-event';
+import {legacyHostMotionEvent} from '@ngx-compat/material-legacy/legacy-core';
 
 let nextUniqueId = 0;
 

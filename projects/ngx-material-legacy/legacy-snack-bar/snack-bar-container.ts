@@ -11,8 +11,7 @@
 
 import {ChangeDetectionStrategy, Component, ViewEncapsulation} from '@angular/core';
 import {_MatSnackBarContainerBase} from './internal/snack-bar-container-base';
-import {legacyAnimationsDisabled} from '@ngx-compat/material-legacy/legacy-core';
-import {legacyHostMotionEvent} from '../legacy-core/internal/motion-event';
+import {legacyAnimationsDisabled, legacyHostMotionEvent} from '@ngx-compat/material-legacy/legacy-core';
 
 const ENTER_MS = 150;
 const EXIT_MS = 75;
@@ -87,7 +86,14 @@ export class MatLegacySnackBarContainer extends _MatSnackBarContainerBase {
   override onAnimationEnd(
     event: string | Event | {fromState?: string; toState?: string; animationName?: string},
   ) {
-    if (typeof event !== 'string' && event instanceof Event && !legacyHostMotionEvent(event)) {
+    if (typeof event !== 'string' && event instanceof Event) {
+      if (!legacyHostMotionEvent(event)) {
+        return;
+      }
+      const animationName = (event as AnimationEvent).animationName;
+      if (animationName) {
+        this.onAnimationEnd(animationName);
+      }
       return;
     }
     if (typeof event === 'string') {

@@ -30,8 +30,11 @@ import {
   OnInit,
   ChangeDetectorRef,
 } from '@angular/core';
-import {legacyAnimationsDisabled} from '@ngx-compat/material-legacy/legacy-core';
-import {legacyHostMotionEvent, legacyNextMotionCompletion} from '../../legacy-core/internal/motion-event';
+import {
+  legacyAnimationsDisabled,
+  legacyHostMotionEvent,
+  legacyNextMotionCompletion,
+} from '@ngx-compat/material-legacy/legacy-core';
 
 /** Minimal shape emitted when CSS panel motion completes (replaces Angular AnimationEvent). */
 export interface LegacyMenuAnimationEvent {

@@ -33,7 +33,7 @@ import {
   VerticalConnectionPos,
 } from '@angular/cdk/overlay';
 import {normalizePassiveListenerOptions, Platform} from '@angular/cdk/platform';
-import {legacyHostMotionEvent} from '../../legacy-core/internal/motion-event';
+import {legacyHostMotionEvent} from '@ngx-compat/material-legacy/legacy-core';
 import {ComponentPortal, ComponentType} from '@angular/cdk/portal';
 import {ScrollDispatcher} from '@angular/cdk/scrolling';
 import {DOCUMENT} from '@angular/common';

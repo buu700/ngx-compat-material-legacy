@@ -19,6 +19,7 @@ export {
   legacyAnimationTriggerState,
 } from './internal/legacy-animations';
 export type {LegacyAnimationsState} from './internal/legacy-animations';
+export {legacyHostMotionEvent, legacyNextMotionCompletion} from './internal/motion-event';
 
 // --- Owned helpers / constants (F02/F03) ---
 export {LegacyAnimationCurves, LegacyAnimationDurations} from './internal/animation/animation-constants';
