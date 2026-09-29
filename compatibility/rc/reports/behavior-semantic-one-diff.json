@@ -4847,10 +4847,18 @@
       ],
       "disposition": "owned-retained",
       "evidence": "The patch styles disabled MDC paginator buttons through aria-disabled and GrayText in high contrast. Owned paginator icons still fill with CanvasText under cdk.high-contrast(active, off) (legacy-paginator/paginator.scss). That high-contrast color was not changed."
+    },
+    {
+      "sha": "68b267dd59f3addf92a3b9f8ce9e8baa479df7f4",
+      "files": [
+        "src/material/tooltip/tooltip.ts"
+      ],
+      "disposition": "already-present",
+      "evidence": "The patch passes a field-injected ViewContainerRef into the tooltip portal instead of reading it from the injector at attach time. Owned tooltip already receives ViewContainerRef in the constructor and passes that reference to the portal (legacy-tooltip/internal/tooltip-base.ts). That field initializer was not added."
     }
   ],
   "limitations": [
-    "The other 504 behavior-semantic SHAs were not read.",
+    "The other 503 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
