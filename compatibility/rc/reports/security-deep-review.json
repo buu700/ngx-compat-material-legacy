@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "role": "individual review of the security-deep heuristic bucket",
+  "g11_claim": "not-passed",
+  "seed_dispositions_changed": false,
+  "reviews": [
+    {
+      "sha": "b423c0e0b754b1f1d118d17e022981c357c3aa68",
+      "subject": "fix(material/datepicker): deprecate constructor injection in NativeDateAdapter",
+      "disposition": "not-owned",
+      "evidence": "The patch removes the Platform constructor parameter from Material's NativeDateAdapter. This package re-exports that symbol from @angular/material/core and does not implement it."
+    },
+    {
+      "sha": "cf3506adf1af1556d705dbb651e7e96a7141b81d",
+      "subject": "fix(material/progress-bar): avoid CSP issues for apps not using buffer mode",
+      "disposition": "unaffected",
+      "evidence": "The patch stops rendering MDC buffer dots unless mode is buffer. The owned legacy progress bar template uses an inline SVG pattern and does not render mdc-linear-progress__buffer-dots."
+    },
+    {
+      "sha": "878700d10ab042b6a62c6f86f4fcc24d5a0ae685",
+      "subject": "fix(material/progress-bar): avoid CSP issues due to buffer dots",
+      "disposition": "unaffected",
+      "evidence": "The patch replaces an MDC data-URI mask with a radial gradient. The owned progress-bar stylesheet has no data URI. The vendored linear-progress theme still has a data-URI background inside an IE11 media query only."
+    },
+    {
+      "sha": "622152de761b629a426b744ec2ff3e4e79d18889",
+      "subject": "perf(material/tooltip): Defer injection of injectables not needed until tooltip is shown.",
+      "disposition": "not-security",
+      "evidence": "The patch defers Overlay, ScrollDispatcher, ViewContainerRef, and DOCUMENT injection. It does not change a security sink. No tooltip security edit follows from it."
+    },
+    {
+      "sha": "1d42431b2fe745602727eda03338c80c8897850a",
+      "subject": "refactor: move trusted types logic into CDK",
+      "disposition": "not-owned",
+      "evidence": "The patch moves trustedHTMLFromString into @angular/cdk/private and updates Material's icon registry. This package has neither that helper nor a cdk/private import."
+    },
+    {
+      "sha": "231f94f5557bb58afc0070585688b3014d541eb2",
+      "subject": "fix(cdk/layout): avoid CSS injection attacks in media matcher",
+      "disposition": "call-site-unaffected",
+      "evidence": "The patch strips curly braces before MediaMatcher inserts a stylesheet rule. The only owned call passes the constant prefers-reduced-motion query, which contains no braces. The installed CDK file was not opened, so this review does not claim the peer contains the fix."
+    }
+  ],
+  "limitations": [
+    "The 1697-row seed still marks every SHA open, including these six.",
+    "This is not RC-08-A02."
+  ]
+}

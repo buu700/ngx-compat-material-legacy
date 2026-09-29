@@ -70,6 +70,7 @@ CHECKS = (
     ["node", "--check", "scripts/browser-dialog-escape.mjs"],
     ["node", "--check", "scripts/ssr-dialog.mjs"],
     ["node", "scripts/freeze-upstream-audit.mjs", "--check"],
+    ["node", "scripts/check-security-deep-review.mjs"],
     ["node", "--check", "scripts/motion-lifecycle-smoke.mjs"],
     ["node", "--check", "scripts/packed-consumer-aot-smoke.mjs"],
     ["node", "scripts/fresh-artifact-negative-tests.mjs"],
