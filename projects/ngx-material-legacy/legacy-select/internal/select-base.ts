@@ -111,6 +111,7 @@ import {
   getMatSelectNonArrayValueError,
   getMatSelectNonFunctionValueError,
 } from '../select-errors';
+import {legacyHostMotionEvent} from '../../legacy-core/internal/motion-event';
 
 let nextUniqueId = 0;
 
@@ -745,6 +746,9 @@ export abstract class _MatSelectBase<C>
 
     const fallback = setTimeout(() => onEnd(), 200);
     const handler = (event: Event) => {
+      if (!legacyHostMotionEvent(event)) {
+        return;
+      }
       onEnd((event as {animationName?: string}).animationName);
     };
     panelEl.addEventListener('animationend', handler);
@@ -760,7 +764,14 @@ export abstract class _MatSelectBase<C>
   }
 
   /** Enter animation completion from template `(animationend)`. */
-  _onPanelAnimationEnd(animationName: string): void {
+  _onPanelAnimationEnd(animationNameOrEvent: string | Event): void {
+    if (typeof animationNameOrEvent !== 'string' && !legacyHostMotionEvent(animationNameOrEvent)) {
+      return;
+    }
+    const animationName =
+      typeof animationNameOrEvent === 'string'
+        ? animationNameOrEvent
+        : (animationNameOrEvent as AnimationEvent).animationName;
     if (animationName === 'mat-legacy-select-enter' && this._panelOpen) {
       this._panelDoneAnimatingStream.next(this.multiple ? 'showing-multiple' : 'showing');
     } else if (animationName === 'mat-legacy-select-exit') {

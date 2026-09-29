@@ -33,6 +33,7 @@ import {
   VerticalConnectionPos,
 } from '@angular/cdk/overlay';
 import {normalizePassiveListenerOptions, Platform} from '@angular/cdk/platform';
+import {legacyHostMotionEvent} from '../../legacy-core/internal/motion-event';
 import {ComponentPortal, ComponentType} from '@angular/cdk/portal';
 import {ScrollDispatcher} from '@angular/cdk/scrolling';
 import {DOCUMENT} from '@angular/common';
@@ -925,7 +926,11 @@ export abstract class _TooltipComponentBase implements OnDestroy {
   protected _onShow(): void {}
 
   /** Event listener dispatched when an animation on the tooltip finishes. */
-  _handleAnimationEnd({animationName}: AnimationEvent) {
+  _handleAnimationEnd(event: AnimationEvent) {
+    if (!legacyHostMotionEvent(event)) {
+      return;
+    }
+    const {animationName} = event;
     if (animationName === this._showAnimation || animationName === this._hideAnimation) {
       this._finalizeAnimation(animationName === this._showAnimation);
     }

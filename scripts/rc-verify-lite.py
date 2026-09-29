@@ -58,6 +58,7 @@ CHECKS = (
     ["node", "--check", "scripts/motion-lifecycle-smoke.mjs"],
     ["node", "--check", "scripts/packed-consumer-aot-smoke.mjs"],
     ["node", "scripts/fresh-artifact-negative-tests.mjs"],
+    ["node", "--experimental-strip-types", "tests/motion/host-motion-event.test.mjs"],
     ["python3", "scripts/check-workflow-pins.py", "."],
     ["python3", "scripts/check-toolchain.py", "--root", "."],
     ["python3", "scripts/check-toolchain.py", "--root", ".", "--runtime", "--release"],

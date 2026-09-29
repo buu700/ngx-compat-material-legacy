@@ -12,6 +12,7 @@
 import {ChangeDetectionStrategy, Component, ViewEncapsulation} from '@angular/core';
 import {_MatSnackBarContainerBase} from './internal/snack-bar-container-base';
 import {legacyAnimationsDisabled} from '@ngx-compat/material-legacy/legacy-core';
+import {legacyHostMotionEvent} from '../legacy-core/internal/motion-event';
 
 const ENTER_MS = 150;
 const EXIT_MS = 75;
@@ -38,7 +39,7 @@ const EXIT_MS = 75;
     '[class.mat-snack-bar-container-enter]': "_animationsEnabled && _animationState === 'visible'",
     '[class.mat-snack-bar-container-exit]': "_animationsEnabled && _animationState === 'hidden'",
     '[class.mat-snack-bar-container-animations-enabled]': '_animationsEnabled',
-    '(animationend)': 'onAnimationEnd($event.animationName)',
+    '(animationend)': 'onAnimationEnd($event)',
   },
 })
 export class MatLegacySnackBarContainer extends _MatSnackBarContainerBase {
@@ -84,8 +85,11 @@ export class MatLegacySnackBarContainer extends _MatSnackBarContainerBase {
   }
 
   override onAnimationEnd(
-    event: string | {fromState?: string; toState?: string; animationName?: string},
+    event: string | Event | {fromState?: string; toState?: string; animationName?: string},
   ) {
+    if (typeof event !== 'string' && event instanceof Event && !legacyHostMotionEvent(event)) {
+      return;
+    }
     if (typeof event === 'string') {
       if (event === 'mat-legacy-snack-bar-enter' && this._enterFallback !== null) {
         clearTimeout(this._enterFallback);
