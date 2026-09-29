@@ -62,6 +62,7 @@ CHECKS = (
     ["node", "--check", "scripts/compare-sealed-sass-values.mjs"],
     ["node", "--check", "scripts/map-companion-bridges.mjs"],
     ["node", "--check", "scripts/compare-legacy-aggregate.mjs"],
+    ["node", "--check", "scripts/compile-packed-sass.mjs"],
     ["node", "--check", "scripts/motion-lifecycle-smoke.mjs"],
     ["node", "--check", "scripts/packed-consumer-aot-smoke.mjs"],
     ["node", "scripts/fresh-artifact-negative-tests.mjs"],
