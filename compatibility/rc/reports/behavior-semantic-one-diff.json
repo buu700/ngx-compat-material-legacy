@@ -1104,10 +1104,20 @@
       ],
       "disposition": "not-applied",
       "evidence": "The patch adds the docs-private internal form field and a form-field token map, then uses that field in the MDC checkbox, radio, and slide-toggle templates. The package has no internal form field. The owned templates still use mat-checkbox-layout, mat-radio-label, and mat-slide-toggle-label. That field was not added."
+    },
+    {
+      "sha": "a962bb77f2e68b44e4e3ccf88841f63495661036",
+      "files": [
+        "src/material/core/private/ripple-loader.ts",
+        "src/material/button/button-base.ts",
+        "src/material/chips/chip.ts"
+      ],
+      "disposition": "not-owned",
+      "evidence": "The patch tracks ripple hosts in the private MatRippleLoader and destroys the host ripple from the button and chip. The package has no ripple loader. The owned ripple renderer still destroys an individual ripple ref when its transition ends. That loader was not added."
     }
   ],
   "limitations": [
-    "The other 929 behavior-semantic SHAs were not read.",
+    "The other 928 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
