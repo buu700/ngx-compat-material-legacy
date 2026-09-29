@@ -5520,10 +5520,18 @@
       ],
       "disposition": "not-owned",
       "evidence": "The patch switches CDK overlay tests and directives to createOverlayRef and the other tree-shakeable factories. This package does not define the CDK overlay. Owned dialog still imports Overlay from @angular/cdk/overlay (legacy-dialog/dialog.ts). Those calls were not switched."
+    },
+    {
+      "sha": "2d28807a0d50e8c065ff4900516dce560636112d",
+      "files": [
+        "src/material/autocomplete/autocomplete-trigger.ts"
+      ],
+      "disposition": "owned-retained",
+      "evidence": "The patch creates the autocomplete overlay through createOverlayRef and createRepositionScrollStrategy. Owned autocomplete still creates the overlay with Overlay.create and uses scrollStrategies.reposition (legacy-autocomplete/internal/autocomplete-trigger-base.ts). Those calls were not switched."
     }
   ],
   "limitations": [
-    "The other 420 behavior-semantic SHAs were not read.",
+    "The other 419 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
