@@ -42,7 +42,10 @@ function migrateLegacy(options) {
           const buf = tree.read(path);
           if (!buf) continue;
           const content = buf.toString('utf8');
-          const result = rewriteSassModuleSource(content, rewriteOptions);
+          const result = rewriteSassModuleSource(
+            content,
+            /\.sass$/i.test(file) ? {...rewriteOptions, syntax: 'indented'} : rewriteOptions,
+          );
           for (const d of result.diagnostics) {
             logger.warn(`[migrate-legacy] ${path}: ${d}`);
           }

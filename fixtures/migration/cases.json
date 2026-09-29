@@ -146,7 +146,9 @@
       "language": "scss",
       "before": "@forward '@angular/material' show $red-palette, define-palette;",
       "expected_after": null,
-      "outcome": "known historical finite list can be rewritten only with forwarding tests; otherwise diagnostic"
+      "outcome": "known historical finite list can be rewritten only with forwarding tests; otherwise diagnostic",
+      "expect_ok": false,
+      "expect_diagnostic": "forward-hide"
     },
     {
       "id": "old-import",
@@ -224,6 +226,25 @@
       "before": "const sample = `from '@angular/material/legacy-card'`;\nimport {MatLegacyCardModule} from '@angular/material/legacy-card';",
       "expected_after": "const sample = `from '@angular/material/legacy-card'`;\nimport {MatLegacyCardModule} from '@ngx-compat/material-legacy/legacy-card';",
       "outcome": "template string bytes stay; only the module specifier changes"
+    },
+    {
+      "id": "palette-selector-preserved",
+      "language": "scss",
+      "before": "@use 'sass:map';\n@use '@angular/material' as mat;\n$hue: map.get(mat.$red-palette, 500);\n.button { color: $hue; }",
+      "expected_after": "@use 'sass:map';\n@use '@ngx-compat/material-legacy' as mat;\n$hue: map.get(mat.$red-palette, 500);\n.button { color: $hue; }",
+      "outcome": "only the material module source changes; palette lookup and selector stay"
+    },
+    {
+      "id": "indented-sass-refused",
+      "language": "sass",
+      "options": {
+        "syntax": "indented"
+      },
+      "before": "@use '@angular/material' as mat\n$p: mat.define-palette(mat.$red-palette)",
+      "expected_after": null,
+      "outcome": "indented Sass is refused with no rewrite",
+      "expect_ok": false,
+      "expect_diagnostic": "indented-sass"
     }
   ],
   "null_after_policy": "No edit is authorized by this fixture without satisfying the described analysis/acknowledgement. Never use null to mean arbitrary output."

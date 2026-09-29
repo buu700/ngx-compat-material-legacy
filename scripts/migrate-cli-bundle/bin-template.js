@@ -98,11 +98,12 @@ function collectFiles(target) {
 
 function processFile(absPath, apply, rewriteOptions) {
   const content = readFileSync(absPath, 'utf8');
-  const kind = SCSS_RE.test(absPath) ? 'scss' : 'ts';
+  const indented = /\.sass$/i.test(absPath);
+  const kind = indented ? 'sass' : SCSS_RE.test(absPath) ? 'scss' : 'ts';
   const result =
-    kind === 'scss'
-      ? rewriteSassModuleSource(content, rewriteOptions)
-      : rewriteLegacyTypescriptImports(content, rewriteOptions);
+    kind === 'ts'
+      ? rewriteLegacyTypescriptImports(content, rewriteOptions)
+      : rewriteSassModuleSource(content, indented ? Object.assign({}, rewriteOptions, {syntax: 'indented'}) : rewriteOptions);
 
   const record = {
     path: absPath,
