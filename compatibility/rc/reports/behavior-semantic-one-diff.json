@@ -4791,10 +4791,18 @@
       ],
       "disposition": "not-owned",
       "evidence": "The patch skips the sticky-column replay queue when no columns are sticky and disconnects the resize observer on destroy. This package does not define the CDK sticky styler. That cleanup was not added."
+    },
+    {
+      "sha": "24c25672b4eeb8d5599243bd50dec9fe4125de9b",
+      "files": [
+        "src/material/select/select.ts"
+      ],
+      "disposition": "already-present",
+      "evidence": "The patch runs the select exit listener inside the Angular zone and marks for check when the overlay detaches. Owned close already clears the overlay binding and marks for check from the animationend handler (legacy-select/internal/select-base.ts). That zone move was not added."
     }
   ],
   "limitations": [
-    "The other 511 behavior-semantic SHAs were not read.",
+    "The other 510 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
