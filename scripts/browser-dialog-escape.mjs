@@ -244,6 +244,9 @@ async function evaluate(expression) {
 }
 let opened = false;
 let closed = false;
+let focusBefore = null;
+let focusWhileOpen = null;
+let focusAfter = null;
 let error = null;
 let diagnostic = null;
 try {
@@ -256,13 +259,17 @@ try {
   for (let i = 0; i < 50 && !(await evaluate('!!document.getElementById("open") || !!document.getElementById("bootstrap-error")')); i += 1) await sleep(100);
   diagnostic = await evaluate('({errors: window.__errors || [], text: document.body.innerText, html: document.body.innerHTML.slice(0, 500)})');
   if (await evaluate('!!document.getElementById("bootstrap-error")')) throw new Error('bootstrap failed');
+  await evaluate('document.getElementById("open").focus()');
+  focusBefore = await evaluate('document.activeElement && document.activeElement.id');
   await evaluate('document.getElementById("open").click()');
   for (let i = 0; i < 50 && !(await evaluate('!!document.getElementById("dialog-body")')); i += 1) await sleep(100);
   opened = await evaluate('!!document.getElementById("dialog-body")');
+  focusWhileOpen = await evaluate('document.activeElement && (document.activeElement.id || document.activeElement.tagName)');
   await send('Input.dispatchKeyEvent', {type: 'keyDown', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27});
   await send('Input.dispatchKeyEvent', {type: 'keyUp', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27});
   for (let i = 0; i < 50 && await evaluate('!!document.getElementById("dialog-body")'); i += 1) await sleep(100);
   closed = !(await evaluate('!!document.getElementById("dialog-body")'));
+  focusAfter = await evaluate('document.activeElement && document.activeElement.id');
 } catch (err) {
   error = String(err);
 } finally {
@@ -277,11 +284,15 @@ const report = {
   browser: version.Browser,
   opened,
   closed_by_escape: opened && closed,
+  focus_before: focusBefore,
+  focus_while_open: focusWhileOpen,
+  focus_after: focusAfter,
+  focus_restored_to_open_button: focusBefore === 'open' && focusWhileOpen !== 'open' && focusAfter === 'open',
   bundle_has_partial_declarations: bundleDeclares,
   bundle_imports_angular_compiler: bundleCompilerImport,
   matrix_updated: false,
   error,
-  diagnostic: opened && closed ? null : diagnostic,
+  diagnostic: opened && closed && focusAfter === 'open' ? null : diagnostic,
   limitations: [
     'One dialog scenario. The declared matrix stays not-executed.',
     'Animations were disabled through MATERIAL_ANIMATIONS.',
@@ -291,5 +302,10 @@ const report = {
 };
 mkdirSync(dirname(reportPath), {recursive: true});
 writeFileSync(reportPath, JSON.stringify(report, null, 2) + '\n');
-console.log(JSON.stringify({browser: version.Browser, opened, closed_by_escape: report.closed_by_escape}, null, 2));
-if (!report.closed_by_escape) process.exit(1);
+console.log(JSON.stringify({
+  browser: version.Browser,
+  opened,
+  closed_by_escape: report.closed_by_escape,
+  focus_restored_to_open_button: report.focus_restored_to_open_button,
+}, null, 2));
+if (!report.closed_by_escape || !report.focus_restored_to_open_button) process.exit(1);
