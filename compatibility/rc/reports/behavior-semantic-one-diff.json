@@ -1327,10 +1327,18 @@
       ],
       "disposition": "owned-retained",
       "evidence": "The patch deletes the slide-toggle token map and stops emitting label-text font, size, tracking, line-height, and weight. styles/core/tokens/m2/mat/_slide-toggle.scss still returns those tokens, and the theme still writes them. The token file was not deleted."
+    },
+    {
+      "sha": "96c1b85297e2af6675bea5856455aaea24b3a0e1",
+      "files": [
+        "src/material/snack-bar/snack-bar-container.ts"
+      ],
+      "disposition": "owned-retained",
+      "evidence": "The patch completes the snack-bar exit in a queueMicrotask instead of waiting for NgZone.onMicrotaskEmpty. The owned _completeExit still subscribes to onMicrotaskEmpty and emits inside the zone. That wait was not changed."
     }
   ],
   "limitations": [
-    "The other 904 behavior-semantic SHAs were not read.",
+    "The other 903 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
