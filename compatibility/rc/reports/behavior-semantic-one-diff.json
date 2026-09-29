@@ -151,10 +151,22 @@
       ],
       "disposition": "not-applied",
       "evidence": "The patch adds slider-base and emits MDC slider unthemable tokens from slider-theme. The owned forward lists slider-theme, color, typography, and density. styles/slider/_slider-theme.scss has no base mixin, and that mixin was not added."
+    },
+    {
+      "sha": "642d886ef117721a34c98055391c9055fde29607",
+      "files": [
+        "src/cdk/dialog/dialog-container.ts",
+        "src/material/dialog/dialog-container.ts",
+        "src/material/dialog/dialog-content-directives.ts",
+        "src/material/legacy-dialog/dialog-container.ts",
+        "src/material/legacy-dialog/dialog-content-directives.ts"
+      ],
+      "disposition": "already-present",
+      "evidence": "The patch replaces a single dialog title id with a queue so aria-labelledby updates when a title is destroyed. MatLegacyDialogTitle already pushes its id onto _ariaLabelledByQueue and splices it out in ngOnDestroy, and the container already binds aria-labelledby to the first queued id. No source was changed."
     }
   ],
   "limitations": [
-    "The other 1025 behavior-semantic SHAs were not read.",
+    "The other 1024 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
