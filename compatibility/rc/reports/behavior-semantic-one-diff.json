@@ -3854,10 +3854,19 @@
       ],
       "disposition": "owned-retained",
       "evidence": "The patch removes explicit standalone: true from Material components, relying on the later Angular default. Owned dialog content still sets standalone: false (legacy-dialog/dialog-content-directives.ts). The owned pseudo-checkbox still sets standalone: true. Those flags were not removed."
+    },
+    {
+      "sha": "613cf54063138201a9398979cd363ee1ace7ea66",
+      "files": [
+        "src/material/core/_core.scss",
+        "src/material/core/tokens/_m3-system.scss"
+      ],
+      "disposition": "not-applied",
+      "evidence": "The patch renames the M3 system CSS variable prefix from --mat-app to --mat-sys, including the core on-surface initializer. The owned package has no M3 system theme and does not emit those variables. That prefix was not renamed."
     }
   ],
   "limitations": [
-    "The other 625 behavior-semantic SHAs were not read.",
+    "The other 624 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
