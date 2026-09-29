@@ -112,15 +112,9 @@ function processFile(absPath, apply, rewriteOptions) {
     changed: Boolean(result.changed),
     diagnostics: result.diagnostics || [],
     acknowledgements: result.acknowledgements || [],
+    content: result.ok && result.changed ? result.content : null,
     applied: false,
   };
-
-  if (result.ok && result.changed && result.content != null) {
-    if (apply) {
-      writeFileSync(absPath, result.content, 'utf8');
-      record.applied = true;
-    }
-  }
   return record;
 }
 
@@ -168,7 +162,7 @@ function main(argv) {
   for (const file of files) {
     let record;
     try {
-      record = processFile(file, apply, rewriteOptions);
+      record = processFile(file, false, rewriteOptions);
     } catch (err) {
       record = {
         path: file,
@@ -186,6 +180,16 @@ function main(argv) {
     if (record.applied) applied += 1;
     for (const a of record.acknowledgements || []) {
       if (!allAcks.includes(a)) allAcks.push(a);
+    }
+  }
+
+  if (apply && blocking === 0) {
+    for (const record of records) {
+      if (record.content != null) {
+        writeFileSync(record.path, record.content, 'utf8');
+        record.applied = true;
+        applied += 1;
+      }
     }
   }
 
