@@ -268,10 +268,19 @@
       ],
       "disposition": "not-applied",
       "evidence": "The patch moves the hover opacity from .mat-mdc-form-field:hover to .mat-mdc-text-field-wrapper:hover so the subscript does not show the hover state. styles/form-field/_form-field-focus-overlay.scss line 29 still uses .mat-mdc-form-field:hover. That selector was not changed."
+    },
+    {
+      "sha": "ca9c490ee30dbf7c9c147079197d0dbc0abcd611",
+      "files": [
+        "src/cdk/table/table.ts",
+        "src/cdk/table/table.spec.ts"
+      ],
+      "disposition": "not-owned",
+      "evidence": "The patch calls markForCheck on CdkTable when the no-data row is shown or hidden. MatLegacyTable extends CdkTable and does not reimplement that toggle. MatLegacyNoDataRow only sets the mat-no-data-row class. The CDK method was not copied into this package."
     }
   ],
   "limitations": [
-    "The other 1015 behavior-semantic SHAs were not read.",
+    "The other 1014 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
