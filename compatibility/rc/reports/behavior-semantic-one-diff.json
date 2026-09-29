@@ -854,10 +854,18 @@
       ],
       "disposition": "not-applied",
       "evidence": "The patch clears the previous autocomplete option inside _updateNativeInputValue when the new value is falsy, which covers a reactive form reset. The owned trigger clears that option from _handleInput when the typed value is empty. _updateNativeInputValue only writes the input and _previousValue, and that reset call was not added."
+    },
+    {
+      "sha": "d902f8d4a131c974c768d20446718b93c893fa1b",
+      "files": [
+        "src/material/datepicker/calendar-body.ts"
+      ],
+      "disposition": "not-owned",
+      "evidence": "The patch starts a date-range drag from cell.compareValue instead of cell.rawValue. The owned package has no calendar-body.ts and no compareValue or rawValue field. That comparison was not copied."
     }
   ],
   "limitations": [
-    "The other 955 behavior-semantic SHAs were not read.",
+    "The other 954 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
