@@ -4332,10 +4332,19 @@
       ],
       "disposition": "owned-retained",
       "evidence": "The patch replaces fromEvent mouseleave and paginator touchstart subscriptions with renderer listeners. Owned paginated tab header still uses fromEvent for those events (legacy-tabs/internal/paginated-tab-header.ts). This package does not define the CDK menu and scroll listeners. Those bindings were not changed."
+    },
+    {
+      "sha": "edb761233a7055bb2b5773e82fd96b5ad11325c4",
+      "files": [
+        "src/material/menu/menu-trigger.ts",
+        "src/material/tooltip/tooltip.ts"
+      ],
+      "disposition": "already-present",
+      "evidence": "The patch restores native addEventListener bindings after the optioned renderer change. Owned menu still binds touchstart with addEventListener and owned tooltip still stores passive listeners (legacy-menu/internal/menu-trigger-base.ts, legacy-tooltip/internal/tooltip-base.ts). That restore was already the owned shape."
     }
   ],
   "limitations": [
-    "The other 568 behavior-semantic SHAs were not read.",
+    "The other 567 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
