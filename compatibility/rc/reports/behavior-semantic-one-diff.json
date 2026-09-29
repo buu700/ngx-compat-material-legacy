@@ -5408,10 +5408,18 @@
       ],
       "disposition": "not-owned",
       "evidence": "The patch traps bottom-sheet focus with preventScroll so a backdrop filter does not jump the page. This package does not define MatBottomSheetContainer. Owned dialog still calls _trapFocus with no options (legacy-dialog/internal/dialog-container-base.ts). That preventScroll call was not added."
+    },
+    {
+      "sha": "8b033742b68c08b733e2df4caf0fe0ced61db57a",
+      "files": [
+        "src/material/snack-bar/snack-bar-config.ts"
+      ],
+      "disposition": "not-owned",
+      "evidence": "The patch changes the snack-bar config default politeness from assertive to polite. This package does not define MatSnackBarConfig; it re-exports the current Material config (legacy-snack-bar/public-api.ts). The owned container still maps an assertive config to aria-live assertive (legacy-snack-bar/internal/snack-bar-container-base.ts). That default was not changed."
     }
   ],
   "limitations": [
-    "The other 434 behavior-semantic SHAs were not read.",
+    "The other 433 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
