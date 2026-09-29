@@ -4250,10 +4250,18 @@
       ],
       "disposition": "owned-retained",
       "evidence": "The patch adds canSelectNullableOptions so a null option can stay selected instead of resetting the select. Owned select still treats a null option as a reset (legacy-select/internal/select-base.ts). That input was not added."
+    },
+    {
+      "sha": "77393153fd4f6acad65fad6b8f0eefeb8dcd4b06",
+      "files": [
+        "src/material/menu/menu-trigger.ts"
+      ],
+      "disposition": "owned-retained",
+      "evidence": "The patch closes a menu without waiting for the exit animation and opens a hovered submenu without waiting for the panel animation. Owned menu close still waits on _animationDone before detaching lazy content, and submenu hover still waits while _isAnimating (legacy-menu/internal/menu-trigger-base.ts). That lifecycle was not changed."
     }
   ],
   "limitations": [
-    "The other 578 behavior-semantic SHAs were not read.",
+    "The other 577 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
