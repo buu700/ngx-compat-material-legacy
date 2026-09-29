@@ -3125,10 +3125,19 @@
       ],
       "disposition": "already-present",
       "evidence": "The revert drops the 48px chip remove overlay and restores the earlier state-layer background slot. The owned remove icon stays 18px and never had that overlay. Nothing changed."
+    },
+    {
+      "sha": "174cf42e84fc875071cef6adafcb5c61666c2ec6",
+      "files": [
+        "src/material/core/mdc-helpers/_mdc-helpers.scss",
+        "src/material/core/tokens/_token-utils.scss"
+      ],
+      "disposition": "owned-retained",
+      "evidence": "The patch deletes variable-safe-contrast-tone, private-fallback-typography-from-mdc, and disable-mdc-fallback-declarations, then moves contrast-tone into token utilities. Owned themes still call those helpers. The helpers were not removed."
     }
   ],
   "limitations": [
-    "The other 710 behavior-semantic SHAs were not read.",
+    "The other 709 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
