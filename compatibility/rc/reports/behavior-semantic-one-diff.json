@@ -5544,10 +5544,18 @@
       ],
       "disposition": "not-owned",
       "evidence": "The patch opens the datepicker through createOverlayRef and the tree-shakeable scroll and position factories. This package does not define MatDatepicker. Those calls were not added."
+    },
+    {
+      "sha": "d9b91de2eb82cd46ff039d43f38ede73f735bf69",
+      "files": [
+        "src/material/dialog/dialog.ts"
+      ],
+      "disposition": "owned-retained",
+      "evidence": "The patch opens the dialog with createBlockScrollStrategy and createGlobalPositionStrategy. Owned dialog still uses scrollStrategies.block and position().global() (legacy-dialog/internal/dialog-base.ts). Those calls were not switched."
     }
   ],
   "limitations": [
-    "The other 417 behavior-semantic SHAs were not read.",
+    "The other 416 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
