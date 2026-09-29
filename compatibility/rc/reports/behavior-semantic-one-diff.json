@@ -2140,10 +2140,18 @@
       ],
       "disposition": "owned-retained",
       "evidence": "The patch reads the stored M2 color, density, and typography maps before falling back to the public getters, so the duplicate-style check does not treat every M2 theme as the same. The owned check still reads those configs through the public getters. The stored-map lookup was not added."
+    },
+    {
+      "sha": "3e91f91139147e0441bc561457b23e998a23d514",
+      "files": [
+        "src/material/tooltip/tooltip.ts"
+      ],
+      "disposition": "owned-retained",
+      "evidence": "The patch updates the tooltip overlay position in afterNextRender instead of waiting for the zone microtask queue to empty. The owned tooltip still waits for onMicrotaskEmpty. The render hook was not added."
     }
   ],
   "limitations": [
-    "The other 812 behavior-semantic SHAs were not read.",
+    "The other 811 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
