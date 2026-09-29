@@ -795,10 +795,23 @@
       ],
       "disposition": "not-applied",
       "evidence": "The patch changes MatDialog._dialog from private to protected so a subclass can replace the CDK dialog. legacy-dialog/internal/dialog-base.ts still declares private _dialog: Dialog. That visibility was not changed."
+    },
+    {
+      "sha": "56771e49ae95b26a7748b068c7a5e81e80679282",
+      "files": [
+        "src/material/button/_button-theme-private.scss",
+        "src/material/button/_button-theme.scss",
+        "src/material/button/_fab-theme.scss",
+        "src/material/button/_icon-button-theme.scss",
+        "src/material/core/tokens/m2/mat/_filled-button.scss",
+        "src/material/core/tokens/m2/mdc/_filled-button.scss"
+      ],
+      "disposition": "not-applied",
+      "evidence": "The patch removes ripple-theme-styles and emits button ripple colors as token slots. styles/button/_button-theme-private.scss still defines ripple-theme-styles and --mat-mdc-button-persistent-ripple-color. The button, fab, and icon-button themes still call that mixin. Those token maps were not added."
     }
   ],
   "limitations": [
-    "The other 961 behavior-semantic SHAs were not read.",
+    "The other 960 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
