@@ -1,8 +1,8 @@
 {
   "template": false,
   "packet_id": "RC-01",
-  "substep_id": "RC-01.01",
-  "source_commit": "7ee99e95441b0c43ca1bc3a7485c0d0e89127c84",
+  "substep_id": "RC-01.02",
+  "source_commit": "6038f39c7",
   "source_content_digest": null,
   "worktree_line": "main",
   "line_21_commit": "cbf86f3faccb240e7beeb6a1e2af727b5d9a674d",
@@ -16,28 +16,26 @@
     "compatibility/rc/release-prerequisites.json",
     "compatibility/rc/session-handoff.json"
   ],
-  "last_command": ["just test-legacy --family card"],
+  "last_command": ["just test-legacy --family tooltip"],
   "outcome": "passed",
-  "first_actionable_error": "Cyph has no exact first-party RC age admission. gh is absent, so branch protection was not read. Container-nix cannot execute the official Node binary; host-nix is the qualified mode.",
-  "failed_case_ids": [
-    "MatTooltip > basic usage > should be able to override the default show and hide delays",
-    "MatTooltip > basic usage > should position center-bottom by default",
-    "MatTooltip > basic usage > should be able to override the default positionAtOrigin",
-    "MatTooltip > basic usage > should be able to update the tooltip position while open"
-  ],
+  "first_actionable_error": "Cyph has no exact first-party RC age admission. gh is absent, so branch protection was not read. Container-nix cannot execute the official Node binary; host-nix is the qualified mode. RC-01 cancellation smoke and CI task reuse are not done.",
+  "failed_case_ids": [],
   "report_paths": [
     "compatibility/rc/status.json",
-    "compatibility/rc/reports/legacy-card.json"
+    "compatibility/rc/reports/legacy-card.json",
+    "compatibility/rc/reports/legacy-tooltip.json",
+    "compatibility/rc/reports/setup-invalidation.json"
   ],
-  "completed_acceptance_ids": ["RC-00-A01", "RC-00-A02", "RC-00-A03"],
+  "completed_acceptance_ids": ["RC-00-A01", "RC-00-A02", "RC-00-A03", "RC-01-A01", "RC-01-A02"],
   "not_run_scope": [
     "RC-00-A04 remains blocked on an owner age-admission decision",
     "GitHub branch protection and rulesets",
-    "RC-01-A02 lock-change invalidation and RC-01-A04 CI reuse",
-    "Historical families other than card",
-    "RC-02 through RC-12"
+    "RC-01-A03 cancellation smoke",
+    "RC-01-A04 CI reuse of the same tasks",
+    "Historical families other than card and tooltip",
+    "RC-02 through RC-05 and RC-07 through RC-12"
   ],
-  "next_action": "RC-01.02: record the host-nix qualification and prove setup invalidation, then continue the next historical family failure (tooltip has four open cases).",
+  "next_action": "Finish RC-01.04 cancellation smoke and RC-01.05 CI entry points, then continue the remaining historical families under RC-06.",
   "blocked_owner_decisions": [
     "cyph-rc-age-admission",
     "registry-publish-authority",

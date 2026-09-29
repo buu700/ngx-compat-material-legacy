@@ -452,8 +452,11 @@ describe('MatTooltip', () => {
 
       assertTooltipInstance(tooltipDirective, true);
 
-      tooltipDirective.position = 'above';
+      // The position setter applies the overlay update immediately. A later
+      // change-detection pass does not write the unchanged template binding
+      // again, so the spy has to be installed before the assignment.
       spyOn(tooltipDirective._overlayRef!, 'updatePosition').and.callThrough();
+      tooltipDirective.position = 'above';
       fixture.detectChanges();
       tick();
 
@@ -1499,6 +1502,8 @@ describe('MatTooltip', () => {
 
 @Component({
   selector: 'app',
+  // Angular 22 treats a missing strategy as OnPush, which skips later detectChanges.
+  changeDetection: ChangeDetectionStrategy.Default,
   template: `
     <button #button
             *ngIf="showButton"
@@ -1521,6 +1526,8 @@ class BasicTooltipDemo {
 
 @Component({
   selector: 'app',
+  // Angular 22 treats a missing strategy as OnPush, which skips later detectChanges.
+  changeDetection: ChangeDetectionStrategy.Default,
   template: `
     <div cdkScrollable style="padding: 100px; margin: 300px;
                                height: 200px; width: 200px; overflow: auto;">
@@ -1565,6 +1572,8 @@ class OnPushTooltipDemo {
 
 @Component({
   selector: 'app',
+  // Angular 22 treats a missing strategy as OnPush, which skips later detectChanges.
+  changeDetection: ChangeDetectionStrategy.Default,
   template: `
     <button *ngFor="let tooltip of tooltips"
             [matTooltip]="tooltip">
@@ -1576,6 +1585,8 @@ class DynamicTooltipsDemo {
 }
 
 @Component({
+  // Angular 22 treats a missing strategy as OnPush, which skips later detectChanges.
+  changeDetection: ChangeDetectionStrategy.Default,
   template: `<button [matTooltip]="message" [attr.aria-label]="message">Click me</button>`,
 })
 class DataBoundAriaLabelTooltip {
@@ -1583,6 +1594,8 @@ class DataBoundAriaLabelTooltip {
 }
 
 @Component({
+  // Angular 22 treats a missing strategy as OnPush, which skips later detectChanges.
+  changeDetection: ChangeDetectionStrategy.Default,
   template: `
     <input
       #input
@@ -1602,6 +1615,8 @@ class TooltipOnTextFields {
 }
 
 @Component({
+  // Angular 22 treats a missing strategy as OnPush, which skips later detectChanges.
+  changeDetection: ChangeDetectionStrategy.Default,
   template: `
     <button
       #button
@@ -1617,6 +1632,8 @@ class TooltipOnDraggableElement {
 
 @Component({
   selector: 'app',
+  // Angular 22 treats a missing strategy as OnPush, which skips later detectChanges.
+  changeDetection: ChangeDetectionStrategy.Default,
   template: `<button #button [matTooltip]="message">Button</button>`,
 })
 class TooltipDemoWithoutPositionBinding {
@@ -1627,6 +1644,8 @@ class TooltipDemoWithoutPositionBinding {
 
 @Component({
   selector: 'app',
+  // Angular 22 treats a missing strategy as OnPush, which skips later detectChanges.
+  changeDetection: ChangeDetectionStrategy.Default,
   styles: [`button { width: 500px; height: 500px; }`],
   template: `<button #button [matTooltip]="message">Button</button>`,
 })

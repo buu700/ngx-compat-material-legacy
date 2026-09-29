@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "observed_at": "2026-09-29T01:55:00Z",
+  "mode": "host-nix",
+  "source_commit": "6038f39c7",
+  "checks": [
+    {
+      "id": "warm-unchanged",
+      "command": "just setup",
+      "result": "second invocation exited 0 and did not run pnpm install"
+    },
+    {
+      "id": "missing-artifact",
+      "action": "removed node_modules/.modules.yaml, then restored the same bytes",
+      "setup_status": {
+        "current": false,
+        "reason": "artifact-missing-or-incompatible",
+        "exit": 1
+      },
+      "after_restore": {"current": true, "exit": 0}
+    },
+    {
+      "id": "changed-lock",
+      "action": "appended one newline to pnpm-lock.yaml, then restored it with git checkout",
+      "setup_status": {
+        "current": false,
+        "reason": "inputs-changed",
+        "changed": ["setup:pnpm-lock.yaml"],
+        "exit": 1
+      },
+      "after_restore": {"current": true, "exit": 0}
+    }
+  ],
+  "qualified_tools": {
+    "node": "v24.21.0",
+    "node_path": "/nix/store/w8jijs92barihdb0z54dsgq5szj2wd47-nodejs-24.21.0/bin/node",
+    "pnpm": "12.4.2",
+    "browser": "Chromium 153 via /usr/bin/chromium-browser as CHROME_BIN",
+    "unqualified": ["container-nix"]
+  }
+}

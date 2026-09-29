@@ -33,7 +33,14 @@ module.exports = function (config) {
     customLaunchers: {
       ChromeHeadlessNoSandbox: {
         base: 'ChromeHeadless',
-        flags: ['--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage'],
+        flags: [
+          '--no-sandbox',
+          '--disable-gpu',
+          '--disable-dev-shm-usage',
+          // Historical layout specs place a 500px trigger and read the tooltip
+          // below it. The default headless viewport clips that trigger.
+          '--window-size=1400,1200',
+        ],
       },
     },
     client: {

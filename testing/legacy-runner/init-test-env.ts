@@ -31,7 +31,7 @@ import 'zone.js/testing';
 
 import {CommonModule} from '@angular/common';
 import {NgModule, provideZoneChangeDetection} from '@angular/core';
-import {ComponentFixture, getTestBed, TestBed} from '@angular/core/testing';
+import {ComponentFixture, getTestBed} from '@angular/core/testing';
 import {
   BrowserTestingModule,
   platformBrowserTesting,
@@ -61,8 +61,14 @@ ComponentFixture.prototype.whenStable = function (this: ComponentFixture<unknown
   return whenStable.call(this);
 };
 
-const configureTestingModule = TestBed.configureTestingModule.bind(TestBed);
-TestBed.configureTestingModule = (moduleDef: any = {}) => {
+// TestBed.configureTestingModule is static and forwards to the TestBed instance.
+// resetTestingModule() returns that instance, so chained configureTestingModule
+// calls never hit a static wrapper. Patch the instance method once.
+const testingModule = getTestBed() as unknown as {
+  configureTestingModule: (moduleDef?: object) => unknown;
+};
+const configureTestingModule = testingModule.configureTestingModule.bind(testingModule);
+testingModule.configureTestingModule = (moduleDef: {imports?: unknown[]} = {}) => {
   const imports = Array.isArray(moduleDef.imports) ? moduleDef.imports : [];
   if (!imports.includes(CommonModule)) {
     moduleDef = {...moduleDef, imports: [CommonModule, ...imports]};
