@@ -1263,10 +1263,18 @@
       ],
       "disposition": "not-owned",
       "evidence": "The patch updates the inactive range-thumb width when the MDC slider input value is set. The package has no slider input and no range thumb. That width update was not added."
+    },
+    {
+      "sha": "a643a2ed42b7751087c59ff55a61c7e14f262604",
+      "files": [
+        "src/material/snack-bar/snack-bar-container.ts"
+      ],
+      "disposition": "not-applied",
+      "evidence": "The patch calls markForCheck when the snack-bar animation state changes so an OnPush ancestor refreshes the host bindings. The owned enter method still calls detectChanges and does not call markForCheck. The owned exit method sets the state inside the zone and does not call markForCheck. Those calls were not added."
     }
   ],
   "limitations": [
-    "The other 911 behavior-semantic SHAs were not read.",
+    "The other 910 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
