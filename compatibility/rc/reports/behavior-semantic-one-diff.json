@@ -4113,10 +4113,18 @@
       ],
       "disposition": "owned-retained",
       "evidence": "The patch syncs form-field aria-describedby only when the error state or user aria-describedby changes. Owned form field still calls _syncDescribedByIds on every control state change (legacy-form-field/form-field.ts). That filter was not added."
+    },
+    {
+      "sha": "9db29c9b7922a7d11aeab85ae7fb6b627f808341",
+      "files": [
+        "src/material/input/input.ts"
+      ],
+      "disposition": "not-owned",
+      "evidence": "The patch keeps aria-describedby ids that were set directly on the input when the form field assigns its own ids. Owned MatLegacyInput does not define setDescribedByIds; it extends the current MatInput. That preservation was not added."
     }
   ],
   "limitations": [
-    "The other 594 behavior-semantic SHAs were not read.",
+    "The other 593 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
