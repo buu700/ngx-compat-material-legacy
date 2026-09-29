@@ -202,10 +202,24 @@
       ],
       "disposition": "not-applied",
       "evidence": "The patch inlines CDK_ROW_TEMPLATE and CDK_TABLE_TEMPLATE on the MDC table so local compilation can see the template. The owned legacy rows still use CDK_ROW_TEMPLATE with class mat-header-row. The owned table template is a separate inline template with thead and tbody. Those templates were not rewritten."
+    },
+    {
+      "sha": "55f9618b687fc0da4743a3cf27e113ceb837e151",
+      "files": [
+        "src/material/autocomplete",
+        "src/material/checkbox",
+        "src/material/dialog",
+        "src/material/menu",
+        "src/material/select",
+        "src/material/tabs",
+        "src/material/tooltip"
+      ],
+      "disposition": "owned-retained",
+      "evidence": "The patch deletes the shared _Mat*Base classes after the legacy components were removed, and folds that behavior into the current Mat* classes. This package still exports those bases, including _MatAutocompleteBase, _MatDialogBase, _MatSelectBase, _MatCheckboxBase, and _MatTooltipBase. None of those classes were removed."
     }
   ],
   "limitations": [
-    "The other 1022 behavior-semantic SHAs were not read.",
+    "The other 1021 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
