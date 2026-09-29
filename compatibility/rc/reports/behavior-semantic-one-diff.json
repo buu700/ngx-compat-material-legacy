@@ -1200,10 +1200,20 @@
       ],
       "disposition": "not-owned",
       "evidence": "The patch creates the CDK focus trap only in the browser and guards later calls when the trap is missing. The package does not define CdkTrapFocus. That guard was not copied."
+    },
+    {
+      "sha": "5849a7477d3e696d237b9e8f0b125d9ff3e25b7e",
+      "files": [
+        "src/material/tabs/ink-bar.ts",
+        "src/material/core/ripple/ripple-renderer.ts",
+        "src/cdk/drag-drop/drag-ref.ts"
+      ],
+      "disposition": "owned-retained",
+      "evidence": "The patch renames ClientRect annotations to DOMRect in CDK drag-drop, overlay, and scrolling, and in the ripple and ink bar. The owned ripple renderer already uses DOMRect. The owned ink bar still types the previous indicator as ClientRect. Those ink-bar annotations were not renamed. The CDK files are not in this package."
     }
   ],
   "limitations": [
-    "The other 918 behavior-semantic SHAs were not read.",
+    "The other 917 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
