@@ -5160,10 +5160,18 @@
       ],
       "disposition": "owned-retained",
       "evidence": "The patch replaces per-component NoopAnimations checks with a shared _animationsDisabled helper that calls inject. Owned components still inject ANIMATION_MODULE_TYPE in their constructors (legacy-button/button.ts). That helper was not added."
+    },
+    {
+      "sha": "1ffe70646eb585e3f0ce0b69919db25b9f2e85eb",
+      "files": [
+        "src/cdk/overlay/overlay-config.ts"
+      ],
+      "disposition": "not-owned",
+      "evidence": "The patch adds disableAnimations to the CDK overlay config and passes it from autocomplete, dialog, menu, snack-bar, and tooltip. This package does not define OverlayConfig. Owned overlays do not set that option."
     }
   ],
   "limitations": [
-    "The other 465 behavior-semantic SHAs were not read.",
+    "The other 464 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
