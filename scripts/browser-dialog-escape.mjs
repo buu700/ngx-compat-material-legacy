@@ -25,6 +25,7 @@ function fail(code, message) {
 let tarball = null;
 let reducedMotion = false;
 let zoneless = false;
+let csp = false;
 for (let i = 2; i < process.argv.length; i += 1) {
   if (process.argv[i] === '--reduced-motion') {
     reducedMotion = true;
@@ -34,6 +35,11 @@ for (let i = 2; i < process.argv.length; i += 1) {
   if (process.argv[i] === '--zoneless') {
     zoneless = true;
     reportPath = join(root, 'compatibility/rc/reports/browser-dialog-zoneless.json');
+    continue;
+  }
+  if (process.argv[i] === '--csp') {
+    csp = true;
+    reportPath = join(root, 'compatibility/rc/reports/browser-dialog-csp.json');
     continue;
   }
   if (process.argv[i] === '--tarball') {
@@ -83,7 +89,7 @@ if (relative(realpathSync(consumer), installed).startsWith('..')) fail(1, `Libra
 
 mkdirSync(join(consumer, 'src'), {recursive: true});
 writeFileSync(join(consumer, 'src/main.ts'), `${zoneless ? '' : `import 'zone.js';
-`}import {Component, NgModule, inject${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';
+`}import {CSP_NONCE, Component, NgModule, inject${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {MATERIAL_ANIMATIONS} from '@angular/material/core';
@@ -111,7 +117,7 @@ export class LabRoot {
   imports: [BrowserModule, MatLegacyDialogModule, MatLegacySelectModule],
   declarations: [LabRoot, DialogBody],
   bootstrap: [LabRoot],
-  providers: [${zoneless ? 'provideZonelessChangeDetection(), ' : ''}{provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: false}}],
+  providers: [...((window as unknown as {__cspNonce?: string}).__cspNonce ? [{provide: CSP_NONCE, useValue: (window as unknown as {__cspNonce: string}).__cspNonce}] : []), ${zoneless ? 'provideZonelessChangeDetection(), ' : ''}{provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: false}}],
 })
 export class LabModule {}
 
@@ -183,13 +189,21 @@ const bundleHasZone = bundle.includes('Zone.__symbol__');
 if (bundleDeclares || bundleCompilerImport || (zoneless && bundleHasZone)) {
   fail(1, `bundle partial=${bundleDeclares} compiler=${bundleCompilerImport} zone=${bundleHasZone}`);
 }
-writeFileSync(join(consumer, 'dist/index.html'), `<!doctype html><html><body><lab-root></lab-root><script src="/app.js"></script></body></html>\n`);
+const cspNonce = 'rc07csp';
+const cspHeader = `default-src 'none'; script-src 'nonce-${cspNonce}'; style-src 'nonce-${cspNonce}'`;
+const violationListener = `<script nonce="${cspNonce}">window.__cspViolations=[];document.addEventListener('securitypolicyviolation',event=>{window.__cspViolations.push(event.violatedDirective+' '+(event.sample||event.blockedURI||''));});</script>`;
+writeFileSync(join(consumer, 'dist/index.html'), csp
+  ? `<!doctype html><html><body><lab-root></lab-root>${violationListener}<script nonce="${cspNonce}">window.__cspNonce=${JSON.stringify(cspNonce)};</script><script nonce="${cspNonce}" src="/app.js"></script></body></html>\n`
+  : `<!doctype html><html><body><lab-root></lab-root><script src="/app.js"></script></body></html>\n`);
+writeFileSync(join(consumer, 'dist/missing.html'), `<!doctype html><html><body><lab-root></lab-root>${violationListener}<script nonce="${cspNonce}" src="/app.js"></script></body></html>\n`);
 
 const server = createServer((req, res) => {
   const file = req.url === '/' ? 'index.html' : req.url.split('?')[0].replace(/^\//, '');
   try {
     const body = readFileSync(join(consumer, 'dist', file));
-    res.writeHead(200, {'content-type': file.endsWith('.js') ? 'text/javascript' : 'text/html'});
+    const headers = {'content-type': file.endsWith('.js') ? 'text/javascript' : 'text/html'};
+    if (csp) headers['content-security-policy'] = cspHeader;
+    res.writeHead(200, headers);
     res.end(body);
   } catch {
     res.writeHead(404);
@@ -198,7 +212,7 @@ const server = createServer((req, res) => {
 });
 await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
 const {port} = server.address();
-const pageUrl = `http://127.0.0.1:${port}/`;
+const pageUrl = `http://127.0.0.1:${port}/${csp ? 'missing.html' : ''}`;
 const chromeDir = mkdtempSync(join(tmpdir(), 'ngx-compat-chrome-'));
 const chrome = spawn('/usr/bin/chromium-browser', [
   '--headless=new',
@@ -255,6 +269,64 @@ function send(method, params = {}) {
 async function evaluate(expression) {
   const result = await send('Runtime.evaluate', {expression, returnByValue: true});
   return result.result?.value;
+}
+if (csp) {
+  let missingViolations = [];
+  let nonceViolations = [];
+  let stylesWithNonce = 0;
+  let cspOpened = false;
+  let cspError = null;
+  try {
+    await send('Runtime.enable');
+    await send('Page.enable');
+    for (let i = 0; i < 50 && !(await evaluate('!!document.getElementById("open") || (window.__cspViolations || []).length')); i += 1) await sleep(100);
+    missingViolations = await evaluate('window.__cspViolations || []');
+    await send('Page.navigate', {url: `http://127.0.0.1:${port}/`});
+    for (let i = 0; i < 50 && !(await evaluate('!!document.getElementById("open")')); i += 1) await sleep(100);
+    await evaluate('document.getElementById("open").click()');
+    for (let i = 0; i < 50 && !(await evaluate('!!document.getElementById("dialog-body")')); i += 1) await sleep(100);
+    cspOpened = await evaluate('!!document.getElementById("dialog-body")');
+    stylesWithNonce = await evaluate(`Array.from(document.querySelectorAll('style')).filter(style => style.nonce === ${JSON.stringify(cspNonce)}).length`);
+    nonceViolations = await evaluate('window.__cspViolations || []');
+  } catch (err) {
+    cspError = String(err);
+  } finally {
+    ws.close();
+    chrome.kill();
+    server.close();
+  }
+  const missingDetected = missingViolations.some(item => String(item).includes('style-src'));
+  const nonceClean = cspOpened && stylesWithNonce > 0 && nonceViolations.length === 0;
+  const cspReport = {
+    schema_version: 1,
+    role: 'strict CSP nonce for the dialog page',
+    tarball_sha256: createHash('sha256').update(readFileSync(tarball)).digest('hex'),
+    browser: version.Browser,
+    policy: cspHeader,
+    missing_nonce_violations: missingViolations,
+    missing_nonce_detected: missingDetected,
+    styles_with_nonce: stylesWithNonce,
+    nonce_violations: nonceViolations,
+    dialog_opened_with_nonce: cspOpened,
+    nonce_clean: nonceClean,
+    matrix_updated: false,
+    error: cspError,
+    limitations: [
+      'style-src allows only the nonce. unsafe-inline is not enabled.',
+      'The missing-nonce page must report a style-src violation.',
+      'This is not RC-07-A04.',
+    ],
+  };
+  mkdirSync(dirname(reportPath), {recursive: true});
+  writeFileSync(reportPath, JSON.stringify(cspReport, null, 2) + '\n');
+  console.log(JSON.stringify({
+    missing_nonce_detected: missingDetected,
+    styles_with_nonce: stylesWithNonce,
+    nonce_violations: nonceViolations.length,
+    dialog_opened_with_nonce: cspOpened,
+  }, null, 2));
+  if (!missingDetected || !nonceClean) process.exit(1);
+  process.exit(0);
 }
 let opened = false;
 let closed = false;
