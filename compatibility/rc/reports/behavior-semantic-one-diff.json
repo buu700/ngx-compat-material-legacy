@@ -3778,10 +3778,20 @@
       ],
       "disposition": "not-owned",
       "evidence": "The patch parses native adapter times with an anchored regex instead of Date.parse against today's date. The owned package has no native date adapter. That parser was not added."
+    },
+    {
+      "sha": "be342289c2cc720af31edf1ce98eee08e2bf9235",
+      "files": [
+        "src/cdk/dialog/dialog.ts",
+        "src/material/dialog/dialog-config.ts",
+        "src/material/menu/menu-content.ts"
+      ],
+      "disposition": "already-present",
+      "evidence": "The patch stops passing ComponentFactoryResolver into dialog, overlay, and menu portals and deprecates the config field. The owned dialog and menu already construct those outlets without that resolver. The removal is already present."
     }
   ],
   "limitations": [
-    "The other 634 behavior-semantic SHAs were not read.",
+    "The other 633 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
