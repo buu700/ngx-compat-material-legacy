@@ -3572,10 +3572,19 @@
       ],
       "disposition": "not-owned",
       "evidence": "The patch stores the overlay afterNextRender handle and destroys it before the next call and on dispose. The owned package does not define OverlayRef and does not call afterNextRender. That cleanup was not added."
+    },
+    {
+      "sha": "9122335b25b28a5532159ab87c36aab3be9c3716",
+      "files": [
+        "src/material/checkbox/checkbox.ts",
+        "src/material/checkbox/checkbox.html"
+      ],
+      "disposition": "owned-retained",
+      "evidence": "The patch forwards aria-expanded, aria-controls, and aria-owns from the checkbox onto its input. The owned checkbox does not expose those inputs. They were not added."
     }
   ],
   "limitations": [
-    "The other 658 behavior-semantic SHAs were not read.",
+    "The other 657 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
