@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "observed_at": "2026-09-29T02:45:00Z",
+  "mode": "host-nix",
+  "checks": [
+    {
+      "id": "unknown-family",
+      "command": "just test-legacy --family nope",
+      "exit": 1,
+      "summary": "Prints the known family list and does not start Karma."
+    },
+    {
+      "id": "empty-selection",
+      "command": "just test-legacy",
+      "exit": 2,
+      "summary": "Prints usage and the known family list. No family report is written."
+    },
+    {
+      "id": "verify-lite-extra-args",
+      "command": "just verify-lite --extra",
+      "exit": 1,
+      "summary": "verify-lite rejects unknown arguments and still does not close omitted product gates."
+    },
+    {
+      "id": "sigint-during-browser",
+      "command": "just test-legacy --family card",
+      "signal": "SIGINT to the setsid process group after Karma reported ChromeHeadless starting",
+      "exit": 130,
+      "port_9876": "closed",
+      "leftover_test_browsers": "none"
+    }
+  ]
+}
