@@ -13,6 +13,7 @@ import {fileURLToPath} from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const reportPath = join(root, 'compatibility/rc/reports/aot-same-selector.json');
+const scenario = JSON.parse(readFileSync(join(root, 'compatibility/rc/scenarios/button.json'), 'utf8'));
 
 function fail(code, message) {
   console.error(message);
@@ -78,7 +79,7 @@ if (rel.startsWith('..')) fail(1, `Library resolved outside the consumer: ${inst
 mkdirSync(join(consumer, 'src'), {recursive: true});
 writeFileSync(
   join(consumer, 'src/scenario.ts'),
-  `export const buttonLabel = 'Save';\n`,
+  `export const buttonLabel = ${JSON.stringify(scenario.label)};\n`,
 );
 const component = (name, imports) => `import {Component, NgModule} from '@angular/core';
 ${imports}
@@ -87,7 +88,7 @@ import {buttonLabel} from './scenario';
 @Component({
   standalone: false,
   selector: 'scope-root',
-  template: '<button mat-button>{{label}}</button>',
+  template: ${JSON.stringify(scenario.template)},
 })
 export class ScopeRoot {
   label = buttonLabel;
@@ -120,7 +121,7 @@ import {buttonLabel} from './scenario';
 @Component({
   standalone: false,
   selector: 'scope-root',
-  template: '<button mat-button>{{label}}</button>',
+  template: ${JSON.stringify(scenario.template)},
 })
 export class ScopeRoot {
   label = buttonLabel;
@@ -170,7 +171,7 @@ const report = {
   schema_version: 1,
   role: 'same-selector AOT scopes',
   tarball_sha256: createHash('sha256').update(readFileSync(tarball)).digest('hex'),
-  shared_scenario: 'src/scenario.ts buttonLabel',
+  shared_scenario: 'compatibility/rc/scenarios/button.json',
   legacy_exit: legacy.status,
   modern_exit: modern.status,
   combined_exit: combined.status,
