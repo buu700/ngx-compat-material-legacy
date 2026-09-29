@@ -52,6 +52,7 @@ CHECKS = (
     ["node", "--check", "scripts/write-draft-run.mjs"],
     ["node", "--check", "scripts/seal-draft-run.mjs"],
     ["node", "--check", "scripts/check-packed-exports.mjs"],
+    ["node", "--check", "scripts/compare-core-declarations.mjs"],
     ["node", "--check", "scripts/motion-lifecycle-smoke.mjs"],
     ["node", "--check", "scripts/packed-consumer-aot-smoke.mjs"],
     ["node", "scripts/fresh-artifact-negative-tests.mjs"],
