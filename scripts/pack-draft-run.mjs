@@ -69,6 +69,10 @@ for (const name of readdirSync(outDir)) {
     rmSync(join(outDir, name), {recursive: true, force: true});
   }
 }
+if (process.env.RC_PACK_DRAFT_FAIL === '1') {
+  console.error('RC_PACK_DRAFT_FAIL: pack refused before ng-packagr');
+  process.exit(1);
+}
 
 runNode('scripts/pack-library.mjs', ['--out', outDir, '--line', line]);
 const metaPath = join(outDir, 'pack-meta.json');

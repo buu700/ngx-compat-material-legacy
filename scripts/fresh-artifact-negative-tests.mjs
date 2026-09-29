@@ -5,7 +5,7 @@
  */
 import {createHash} from 'node:crypto';
 import {spawnSync} from 'node:child_process';
-import {mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync} from 'node:fs';
+import {existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {dirname, join} from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -117,6 +117,7 @@ const wrongReport = {
   template: false,
   run_id: 'other-run',
   check_id: 'packed-consumer',
+  line: 'main',
   subject_kind: 'artifact',
   result: 'pass',
   exit_code: 0,
@@ -128,6 +129,26 @@ writeFileSync(join(sealDir, 'reports/packed-consumer.json'), JSON.stringify(wron
 const wrongRun = run(['scripts/seal-draft-run.mjs', '--run', join(sealDir, 'run.json')]);
 expect('wrong run id exits 1', wrongRun.status === 1, wrongRun.stderr);
 expect('wrong run id leaves the draft', readFileSync(join(sealDir, 'run.json'), 'utf8') === beforeSeal);
+
+writeFileSync(
+  join(sealDir, 'reports/packed-consumer.json'),
+  JSON.stringify({...wrongReport, run_id: sealDraft.run_id, line: '21.x'}),
+);
+const wrongLine = run(['scripts/seal-draft-run.mjs', '--run', join(sealDir, 'run.json')]);
+expect('mismatched line exits 1', wrongLine.status === 1, wrongLine.stderr);
+expect('mismatched line leaves the draft', readFileSync(join(sealDir, 'run.json'), 'utf8') === beforeSeal);
+
+writeFileSync(
+  join(sealDir, 'reports/packed-consumer.json'),
+  JSON.stringify({...wrongReport, run_id: sealDraft.run_id, line: 'main', result: 'fail', failed: 1, exit_code: 1}),
+);
+writeFileSync(
+  join(sealDir, 'reports/packed-consumer.previous.json'),
+  JSON.stringify({...wrongReport, run_id: sealDraft.run_id, line: 'main', result: 'pass'}),
+);
+const stale = run(['scripts/seal-draft-run.mjs', '--run', join(sealDir, 'run.json')]);
+expect('stale passing report cannot rescue a failure', stale.status === 1, stale.stderr);
+expect('stale report leaves the draft', readFileSync(join(sealDir, 'run.json'), 'utf8') === beforeSeal);
 
 writeFileSync(
   join(sealDir, 'reports/packed-consumer.json'),
@@ -145,6 +166,44 @@ expect(
 );
 const again = run(['scripts/seal-draft-run.mjs', '--run', join(sealDir, 'run.json')]);
 expect('a second seal exits 2', again.status === 2, again.stderr);
+
+const exportDir = join(scratch, 'exports');
+mkdirSync(exportDir);
+const required = JSON.parse(
+  readFileSync(join(root, 'compatibility/rc/matrices/library-exports.json'), 'utf8'),
+).exports;
+function writeExportTar(name, keys) {
+  const pkgDir = join(exportDir, name);
+  mkdirSync(join(pkgDir, 'package'), {recursive: true});
+  const exportsMap = Object.fromEntries(keys.map(key => [key, {default: './fesm2022/entry.mjs'}]));
+  writeFileSync(join(pkgDir, 'package/package.json'), JSON.stringify({name: 'sample', exports: exportsMap}));
+  const tarPath = join(exportDir, `${name}.tgz`);
+  const packed = spawnSync('tar', ['-czf', tarPath, '-C', pkgDir, 'package'], {encoding: 'utf8'});
+  if (packed.status !== 0) throw new Error(packed.stderr || 'tar failed');
+  return tarPath;
+}
+const completeTar = writeExportTar('complete', required);
+const omittedTar = writeExportTar('omitted', required.filter(key => key !== './legacy-button'));
+const completeCheck = run(['scripts/check-packed-exports.mjs', '--tarball', completeTar]);
+expect('complete export set passes', completeCheck.status === 0, completeCheck.stderr);
+const omittedCheck = run(['scripts/check-packed-exports.mjs', '--tarball', omittedTar]);
+expect('omitted export exits 1', omittedCheck.status === 1, omittedCheck.stderr);
+
+const oldDir = join(scratch, 'old-pack');
+mkdirSync(oldDir);
+writeFileSync(join(oldDir, 'previous.tgz'), 'old-tarball');
+writeFileSync(join(oldDir, 'run.json'), '{"stage":"draft"}\n');
+const failedPack = spawnSync(process.execPath, ['scripts/pack-draft-run.mjs', '--line', 'main', '--out', oldDir], {
+  cwd: root,
+  encoding: 'utf8',
+  env: {...process.env, RC_PACK_DRAFT_FAIL: '1'},
+});
+expect('broken pack exits 1', failedPack.status === 1, failedPack.stderr);
+expect('broken pack removes the old tarball', !existsSync(join(oldDir, 'previous.tgz')));
+expect('broken pack does not write a new manifest', !existsSync(join(oldDir, 'run.json')));
+
+const motion = run(['scripts/motion-lifecycle-smoke.mjs', '--self-check']);
+expect('motion self-check passes', motion.status === 0, motion.stderr);
 
 rmSync(scratch, {recursive: true, force: true});
 

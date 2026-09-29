@@ -95,6 +95,9 @@ for (const check of required) {
   if (report.run_id !== draft.run_id || report.check_id !== check.check_id) {
     fail(1, `Report ${check.check_id} does not match this run`);
   }
+  if (report.line !== draft.source?.line) {
+    fail(1, `Report ${check.check_id} is for line ${report.line ?? 'missing'}, draft is ${draft.source?.line}`);
+  }
   if (report.result !== 'pass' || report.exit_code !== 0 || report.failed !== 0) {
     fail(1, `Required check ${check.check_id} did not pass`);
   }

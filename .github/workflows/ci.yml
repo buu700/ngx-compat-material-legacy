@@ -63,6 +63,11 @@ jobs:
       - name: Pack a draft run
         run: just chainman run pack-draft -- --line main --out artifacts/main/draft
 
+      - name: Require the packed export map
+        run: |
+          tarball=$(python3 -c 'import json; print(json.load(open("artifacts/main/draft/pack-meta.json"))["tarball"])')
+          just chainman exec -- node scripts/check-packed-exports.mjs --tarball "artifacts/main/draft/${tarball}"
+
       - name: Packed-consumer AOT + harness smoke
         run: just chainman run packed-consumer -- --run artifacts/main/draft/run.json
 

@@ -354,7 +354,7 @@ if (runManifestPath) {
   }
   const digest = sha256File(tarball);
   const bytes = statSync(tarball).size;
-  draftRun = {run_id: draft.run_id, runDir, artifact, digest, bytes};
+  draftRun = {run_id: draft.run_id, runDir, artifact, digest, bytes, line: draft.source?.line ?? null};
   if (digest !== artifact.sha256 || bytes !== artifact.bytes) {
     console.error('Tarball bytes do not match the draft library artifact. Not repacking.');
     mkdirSync(join(runDir, 'reports'), {recursive: true});
@@ -366,6 +366,7 @@ if (runManifestPath) {
           template: false,
           run_id: draft.run_id,
           check_id: 'packed-consumer',
+          line: draft.source?.line ?? null,
           subject_kind: 'artifact',
           subject_ids: ['library'],
           command: process.argv.slice(1),
@@ -907,6 +908,7 @@ main().catch(err => {
       template: false,
       run_id: draftRun.run_id,
       check_id: 'packed-consumer',
+      line: draftRun.line,
       subject_kind: 'artifact',
       subject_ids: ['library'],
       command: process.argv.slice(1),
