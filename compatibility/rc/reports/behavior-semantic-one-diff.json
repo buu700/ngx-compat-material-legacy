@@ -3735,10 +3735,19 @@
       ],
       "disposition": "owned-retained",
       "evidence": "The patch sets the chip set tabindex directly on the element so focus can escape before change detection. The owned chip list still clears and restores its bound tab index. That escape change was not applied."
+    },
+    {
+      "sha": "86ebb9bfd55e637be1e6d0117a10e290c5247ebd",
+      "files": [
+        "src/material/chips/chip-set.ts",
+        "src/material/chips/chip.ts"
+      ],
+      "disposition": "already-present",
+      "evidence": "The patch stores the chip list disabled state separately so it does not overwrite each chip's own disabled input. The owned chip list already writes _chipListDisabled, and the chip disabled getter combines both flags. The change is already present."
     }
   ],
   "limitations": [
-    "The other 639 behavior-semantic SHAs were not read.",
+    "The other 638 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
