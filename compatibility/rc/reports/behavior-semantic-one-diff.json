@@ -44,10 +44,21 @@
       ],
       "disposition": "not-owned",
       "evidence": "The patch makes MatChipOption._handlePrimaryActionInteraction call focus() before toggleSelected, to clear a Safari focus leftover. The owned chips have no MatChipOption and no _handlePrimaryActionInteraction, and that method was not added."
+    },
+    {
+      "sha": "776e530f7d9dbec0208f5f6302ad46db66a4da16",
+      "files": [
+        "src/material/slider/slider.ts",
+        "src/material/slider/slider-thumb.ts",
+        "src/material/slider/slider-input.ts",
+        "src/material/slider/slider-interface.ts"
+      ],
+      "disposition": "not-owned",
+      "evidence": "The patch keeps the MDC slider thumb active on iOS only when the pointer is on the thumb, and it skips pointer focus and animation on iOS. The owned slider has no MatSliderThumb and sets _isActive from the focus origin. That iOS path was not added."
     }
   ],
   "limitations": [
-    "The other 1036 behavior-semantic SHAs were not read.",
+    "The other 1035 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
