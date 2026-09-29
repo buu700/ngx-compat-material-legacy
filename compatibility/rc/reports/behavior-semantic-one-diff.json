@@ -1308,10 +1308,19 @@
       ],
       "disposition": "not-owned",
       "evidence": "The patch replaces the date-module provider objects with calls to provideNativeDateAdapter and the other adapter functions. The package re-exports the peer date module and does not define those modules. The provider lists were not changed."
+    },
+    {
+      "sha": "30f07054913ff1026b0ec8420cd217ccc8daa167",
+      "files": [
+        "src/cdk/table/table.ts",
+        "src/material/table/table.ts"
+      ],
+      "disposition": "owned-retained",
+      "evidence": "The patch removes ngSkipHydration from the Material table, projects unclaimed content on the server, and puts mdc-data-table__content on the native tbody. The owned table already projects content when _isServer is set and already wraps native sections. It still sets ngSkipHydration, and its tbody has no mdc-data-table__content class. The CDK outlet changes are not in this package. The skip and the class were not changed."
     }
   ],
   "limitations": [
-    "The other 906 behavior-semantic SHAs were not read.",
+    "The other 905 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
