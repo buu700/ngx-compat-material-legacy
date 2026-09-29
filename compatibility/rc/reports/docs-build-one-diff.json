@@ -295,10 +295,78 @@
       ],
       "disposition": "not-owned",
       "evidence": "The patch splits Bazel targets and moves a localize import into the dev-app polyfills, adds an esbuild config, and drops a chromedriver env assignment from an e2e spec. Those files are not in this package."
+    },
+    {
+      "sha": "6fa655c99756abcd7e7c80040cc72e4aa98a4df5",
+      "files": [
+        "BUILD.bazel"
+      ],
+      "disposition": "not-owned",
+      "evidence": "The patch renames karma_web_test_suite to ng_web_test_suite in seven upstream BUILD files. No component source is in the diff. This package has no Bazel graph."
+    },
+    {
+      "sha": "e500a8ea9ad5043dd2775b39e395204b5cbdb78b",
+      "files": [
+        "BUILD.bazel",
+        "tools/defaults.bzl"
+      ],
+      "disposition": "not-owned",
+      "evidence": "The patch merges defaults2.bzl back into defaults.bzl across 307 Bazel files. The load path changes from //tools:defaults2.bzl to //tools:defaults.bzl. This package has no Bazel graph."
+    },
+    {
+      "sha": "01ec1e0e1e0a9d62c1f7d294bc91ed9e0e3c7e7d",
+      "files": [
+        "src/material/button/button.md"
+      ],
+      "disposition": "docs-only",
+      "evidence": "The patch inserts a blank line before the button variants table in button.md so the table renders. This package does not contain that markdown."
+    },
+    {
+      "sha": "15e9a57a10d1d5bd2295bb62026b4621999c9e20",
+      "files": [
+        "src/material/button/BUILD.bazel"
+      ],
+      "disposition": "not-owned",
+      "evidence": "The patch adds fab_theme and icon_button_theme to the button Bazel theme srcs. This package has no Bazel graph."
+    },
+    {
+      "sha": "bd17fb3652d66a28ca2b1e84c4cc67aecff9cab2",
+      "files": [
+        "src/components-examples/material/menu/context-menu",
+        "src/material/menu/menu.md"
+      ],
+      "disposition": "not-owned",
+      "evidence": "The patch documents matContextMenuTriggerFor and adds a right-click menu example. This package has no matContextMenuTriggerFor and does not contain those files."
+    },
+    {
+      "sha": "b5fbf52fff33101a16595d274c425a377dfc9228",
+      "files": [
+        "src/cdk/tree/tree.md",
+        "src/material/tree/tree.md"
+      ],
+      "disposition": "docs-only",
+      "evidence": "The patch renames the documented selector cdkNodeDef to cdkTreeNodeDef in the CDK and Material tree guides. This package does not contain those guides or that selector."
+    },
+    {
+      "sha": "efea6041e057607efbfa4ec7caf0d2952150038f",
+      "files": [
+        "BUILD.bazel"
+      ],
+      "disposition": "not-owned",
+      "evidence": "The patch removes @angular/animations from six upstream BUILD files. This package still uses animations for the historical specs, and it has no Bazel graph."
+    },
+    {
+      "sha": "5373ced467ba58315abf22bc96c0c24583467776",
+      "files": [
+        "BUILD.bazel",
+        "src/cdk-experimental/accordion/accordion.ts"
+      ],
+      "disposition": "not-owned",
+      "evidence": "The patch enables strict deps on ts_project targets. The only source edit removes a trailing slash from an import in cdk-experimental accordion. That file is not in this package."
     }
   ],
   "limitations": [
-    "The other 29 docs-build SHAs were not read.",
+    "The other 21 docs-build SHAs were not read.",
     "Seed dispositions for these SHAs stay open.",
     "This is not RC-08-A02."
   ]
