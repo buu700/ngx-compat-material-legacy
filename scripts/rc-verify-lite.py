@@ -64,6 +64,7 @@ CHECKS = (
     ["node", "--check", "scripts/compare-legacy-aggregate.mjs"],
     ["node", "--check", "scripts/compile-packed-sass.mjs"],
     ["node", "scripts/check-select-panel-width.mjs"],
+    ["node", "--check", "scripts/aot-same-selector.mjs"],
     ["node", "--check", "scripts/motion-lifecycle-smoke.mjs"],
     ["node", "--check", "scripts/packed-consumer-aot-smoke.mjs"],
     ["node", "scripts/fresh-artifact-negative-tests.mjs"],
