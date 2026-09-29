@@ -3319,10 +3319,18 @@
       ],
       "disposition": "owned-retained",
       "evidence": "The patch sets aria-disabled when the slide toggle is disabled and disabledInteractive, and the harness falls back to that attribute. The owned template has no disabledInteractive binding. The owned harness still reads only the disabled attribute. Those changes were not added."
+    },
+    {
+      "sha": "ec35e99c48b78aaef001c4aeff52f2fa34804675",
+      "files": [
+        "src/material/form-field/form-field.ts"
+      ],
+      "disposition": "owned-retained",
+      "evidence": "The patch reinitializes the form field when the projected control changes, swaps the type class, and resubscribes to state and value changes. The owned field still subscribes once in ngAfterContentInit and only validates the control in ngAfterContentChecked. The resubscription was not added."
     }
   ],
   "limitations": [
-    "The other 687 behavior-semantic SHAs were not read.",
+    "The other 686 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
