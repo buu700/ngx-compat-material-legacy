@@ -4550,10 +4550,18 @@
       ],
       "disposition": "owned-retained",
       "evidence": "The patch binds passive menu and ripple listeners through _bindEventWithOptions. Owned menu still uses addEventListener for touchstart (legacy-menu/internal/menu-trigger-base.ts). This package does not define the CDK listeners. Those bindings were not changed."
+    },
+    {
+      "sha": "5a6b94db577ba2580c18d43e6a3a8cf2a894a3a1",
+      "files": [
+        "src/cdk/overlay/overlay-directives.ts"
+      ],
+      "disposition": "not-owned",
+      "evidence": "The patch makes CdkConnectedOverlay attach and detach public so a caller can open and close the overlay. This package does not define CdkConnectedOverlay. That method was not added."
     }
   ],
   "limitations": [
-    "The other 541 behavior-semantic SHAs were not read.",
+    "The other 540 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
