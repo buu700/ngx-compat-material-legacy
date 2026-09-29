@@ -838,10 +838,18 @@
       ],
       "disposition": "already-present",
       "evidence": "The patch changes const enum to enum for CDK types and for TransitionCheckState, RippleState, and MatDialogState. The owned ripple state is already export enum LegacyRippleState. The package has no const enum declarations. TransitionCheckState and MatDialogState are re-exported from the peer and are not defined here."
+    },
+    {
+      "sha": "76e3172ea4569fb089def3a013db6a3255161d12",
+      "files": [
+        "src/material/list/list-base.ts"
+      ],
+      "disposition": "not-owned",
+      "evidence": "The patch reads item._lines instead of item._titles for the line count and changes the list-item content checks from throw to console.warn. That check is on MatListItemBase. The owned list items have a _lines query and no _titles field or sanityCheckListItemContent function. That function was not added."
     }
   ],
   "limitations": [
-    "The other 957 behavior-semantic SHAs were not read.",
+    "The other 956 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
