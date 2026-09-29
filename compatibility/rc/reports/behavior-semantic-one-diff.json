@@ -4258,10 +4258,18 @@
       ],
       "disposition": "owned-retained",
       "evidence": "The patch closes a menu without waiting for the exit animation and opens a hovered submenu without waiting for the panel animation. Owned menu close still waits on _animationDone before detaching lazy content, and submenu hover still waits while _isAnimating (legacy-menu/internal/menu-trigger-base.ts). That lifecycle was not changed."
+    },
+    {
+      "sha": "c12b73ee6648723fb900607ff8c8095163957e92",
+      "files": [
+        "src/material/table/table-data-source.ts"
+      ],
+      "disposition": "owned-retained",
+      "evidence": "The patch matches a table filter against each property value instead of one concatenated string. Owned filterPredicate still joins values with the triangle delimiter and searches that string (legacy-table/internal/table-data-source-base.ts). That predicate was not changed."
     }
   ],
   "limitations": [
-    "The other 577 behavior-semantic SHAs were not read.",
+    "The other 576 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
