@@ -1505,10 +1505,18 @@
       ],
       "disposition": "not-owned",
       "evidence": "The patch redeclares ErrorStateMatcher as a local interface so Closure Compiler keeps the error matcher, then calls isErrorState without a function check. The owned copies import ErrorStateMatcher from @angular/material/core and call matcher.isErrorState directly. This package does not define that interface. The local alias was not added."
+    },
+    {
+      "sha": "7f1562dfa87ced12f637a35e2b42a26f261dfaba",
+      "files": [
+        "src/material/dialog/dialog.scss"
+      ],
+      "disposition": "not-applied",
+      "evidence": "The patch moves the dialog scale transition onto the MDC dialog surface and limits the container transition to opacity. The owned container still transitions opacity and transform together, and the noop class clears that transition on the same container. The surface split was not added."
     }
   ],
   "limitations": [
-    "The other 884 behavior-semantic SHAs were not read.",
+    "The other 883 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
