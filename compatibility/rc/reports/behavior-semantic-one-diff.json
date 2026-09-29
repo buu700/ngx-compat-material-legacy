@@ -827,10 +827,21 @@
       ],
       "disposition": "not-owned",
       "evidence": "The patch changes isFakeMousedownFromScreenReader to test event.detail instead of offsetX and offsetY. That function is imported from @angular/cdk/a11y by the owned menu trigger and ripple renderer. It is not defined in this package, and the CDK body was not copied."
+    },
+    {
+      "sha": "8a5302a5f942144a83d8b0336262e7559f0eef6f",
+      "files": [
+        "src/material/checkbox/checkbox.ts",
+        "src/material/core/ripple/ripple-ref.ts",
+        "src/material/dialog/dialog-ref.ts",
+        "src/cdk/a11y/focus-monitor/focus-monitor.ts"
+      ],
+      "disposition": "already-present",
+      "evidence": "The patch changes const enum to enum for CDK types and for TransitionCheckState, RippleState, and MatDialogState. The owned ripple state is already export enum LegacyRippleState. The package has no const enum declarations. TransitionCheckState and MatDialogState are re-exported from the peer and are not defined here."
     }
   ],
   "limitations": [
-    "The other 958 behavior-semantic SHAs were not read.",
+    "The other 957 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
