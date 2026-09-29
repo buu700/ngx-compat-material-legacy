@@ -193,10 +193,19 @@
       ],
       "disposition": "owned-retained",
       "evidence": "The patch deletes 702 files, including the legacy component trees, and stops forwarding their Sass from _index.scss. This package still has all 22 legacy directories, from autocomplete through tooltip, and the facade still forwards them. None of those directories were deleted."
+    },
+    {
+      "sha": "3f35b12290ea4dbee4a9d82845c0964b2b4df50d",
+      "files": [
+        "src/material/table/row.ts",
+        "src/material/table/table.ts"
+      ],
+      "disposition": "not-applied",
+      "evidence": "The patch inlines CDK_ROW_TEMPLATE and CDK_TABLE_TEMPLATE on the MDC table so local compilation can see the template. The owned legacy rows still use CDK_ROW_TEMPLATE with class mat-header-row. The owned table template is a separate inline template with thead and tbody. Those templates were not rewritten."
     }
   ],
   "limitations": [
-    "The other 1023 behavior-semantic SHAs were not read.",
+    "The other 1022 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
