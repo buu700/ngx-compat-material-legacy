@@ -1,7 +1,7 @@
 {
   "template": false,
-  "packet_id": "RC-01",
-  "substep_id": "RC-01.05",
+  "packet_id": "RC-02",
+  "substep_id": "RC-02.02",
   "source_commit": "5684270c77ccbf64a4ee66c8a7c89c645ddc05b3",
   "source_content_digest": null,
   "worktree_line": "main",
@@ -16,8 +16,8 @@
     "compatibility/rc/release-prerequisites.json",
     "compatibility/rc/session-handoff.json"
   ],
-  "last_command": ["just chainman run packed-consumer"],
-  "outcome": "failed",
+  "last_command": ["just chainman exec -- node scripts/pack-library.mjs --out /tmp/ngx-pack-rc02 --line main"],
+  "outcome": "passed",
   "first_actionable_error": "Cyph has no exact first-party RC age admission. gh is absent, so branch protection was not read. Container-nix cannot execute the official Node binary; host-nix is the qualified mode. packed-consumer exits 2 until a fresh tarball is passed, and just verify is fail-closed because the full gate is not implemented.",
   "failed_case_ids": [],
   "report_paths": [
@@ -27,15 +27,14 @@
     "compatibility/rc/reports/setup-invalidation.json",
     "compatibility/rc/reports/rc01-negative.json"
   ],
-  "completed_acceptance_ids": ["RC-00-A01", "RC-00-A02", "RC-00-A03", "RC-01-A01", "RC-01-A02", "RC-01-A03"],
+  "completed_acceptance_ids": ["RC-00-A01", "RC-00-A02", "RC-00-A03", "RC-01-A01", "RC-01-A02", "RC-01-A03", "RC-01-A04", "RC-01-A05"],
   "not_run_scope": [
     "RC-00-A04 remains blocked on an owner age-admission decision",
     "GitHub branch protection and rulesets",
-    "RC-01-A04 remains open: just verify is not the full gate, and packed-consumer has no fresh tarball",
     "Historical families other than card and tooltip",
     "RC-02 through RC-05 and RC-07 through RC-12"
   ],
-  "next_action": "Continue the remaining historical families under RC-06, starting with select and autocomplete.",
+  "next_action": "RC-02: put the npm pack identity into a draft run manifest and pass that tarball to packed-consumer.",
   "blocked_owner_decisions": [
     "cyph-rc-age-admission",
     "registry-publish-authority",
