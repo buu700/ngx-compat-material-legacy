@@ -4566,10 +4566,19 @@
       ],
       "disposition": "already-present",
       "evidence": "The patch replaces the select panel Angular animation with CSS scale enter and fade exit keyframes. Owned select already uses mat-legacy-select-enter and mat-legacy-select-exit and listens for animationend (legacy-select/select.scss, select.html). That animations-module dependency was not added."
+    },
+    {
+      "sha": "b7c377bd517ae31bd65ed7f445931ef349392033",
+      "files": [
+        "src/material/select/select.ts",
+        "src/material/select/select.html"
+      ],
+      "disposition": "owned-retained",
+      "evidence": "The patch emits select openedChange on a microtask and closes on overlay Escape instead of the panel animationend. Owned select still emits openedChange when the panel animation finishes and still binds detach to close (legacy-select/internal/select-base.ts, select.html). That timing was not changed."
     }
   ],
   "limitations": [
-    "The other 539 behavior-semantic SHAs were not read.",
+    "The other 538 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
