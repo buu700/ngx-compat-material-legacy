@@ -4307,10 +4307,19 @@
       ],
       "disposition": "owned-retained",
       "evidence": "The patch treats command+a as select-all on a selection list by also checking metaKey. Owned selection list still checks only ctrlKey (legacy-list/selection-list.ts). That modifier was not added."
+    },
+    {
+      "sha": "36bdbd817a70e105ca17b2f68ade17f986320611",
+      "files": [
+        "src/material/menu/menu-trigger.ts",
+        "src/material/tooltip/tooltip.ts"
+      ],
+      "disposition": "owned-retained",
+      "evidence": "The patch binds passive menu, tooltip, and ripple listeners through _bindEventWithOptions. Owned menu still uses addEventListener for touchstart (legacy-menu/internal/menu-trigger-base.ts) and owned tooltip still stores passive listeners for removeEventListener (legacy-tooltip/internal/tooltip-base.ts). Those bindings were not changed."
     }
   ],
   "limitations": [
-    "The other 571 behavior-semantic SHAs were not read.",
+    "The other 570 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
