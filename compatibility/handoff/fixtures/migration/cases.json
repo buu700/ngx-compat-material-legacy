@@ -196,6 +196,34 @@
       "before": "function f(require: (s: string) => string) { return require('@angular/material/legacy-select'); }",
       "expected_after": null,
       "outcome": "unchanged; local function not module loader"
+    },
+    {
+      "id": "type-only-import",
+      "language": "typescript",
+      "before": "import type {MatLegacyButton} from '@angular/material/legacy-button';",
+      "expected_after": "import type {MatLegacyButton} from '@ngx-compat/material-legacy/legacy-button';",
+      "outcome": "specifier-only edit; type keyword and binding stay"
+    },
+    {
+      "id": "inline-type-specifier",
+      "language": "typescript",
+      "before": "import {type MatLegacyListModule} from '@angular/material/legacy-list';",
+      "expected_after": "import {type MatLegacyListModule} from '@ngx-compat/material-legacy/legacy-list';",
+      "outcome": "specifier-only edit; inline type keyword stays"
+    },
+    {
+      "id": "comment-and-string-preserved",
+      "language": "typescript",
+      "before": "// import {X} from '@angular/material/legacy-button';\nconst note = '@angular/material/legacy-button';\nimport {MatLegacyButtonModule} from '@angular/material/legacy-button';",
+      "expected_after": "// import {X} from '@angular/material/legacy-button';\nconst note = '@angular/material/legacy-button';\nimport {MatLegacyButtonModule} from '@ngx-compat/material-legacy/legacy-button';",
+      "outcome": "comment and string bytes stay; only the module specifier changes"
+    },
+    {
+      "id": "template-string-preserved",
+      "language": "typescript",
+      "before": "const sample = `from '@angular/material/legacy-card'`;\nimport {MatLegacyCardModule} from '@angular/material/legacy-card';",
+      "expected_after": "const sample = `from '@angular/material/legacy-card'`;\nimport {MatLegacyCardModule} from '@ngx-compat/material-legacy/legacy-card';",
+      "outcome": "template string bytes stay; only the module specifier changes"
     }
   ],
   "null_after_policy": "No edit is authorized by this fixture without satisfying the described analysis/acknowledgement. Never use null to mean arbitrary output."
