@@ -5464,10 +5464,18 @@
       ],
       "disposition": "owned-retained",
       "evidence": "The patch moves DOCUMENT imports from @angular/common to @angular/core. Owned tooltip still imports DOCUMENT from @angular/common (legacy-tooltip/tooltip.ts). Those imports were not moved."
+    },
+    {
+      "sha": "08f4acfefd57bcc213e34ac399f04c3923c53e26",
+      "files": [
+        "src/cdk/overlay/overlay.ts"
+      ],
+      "disposition": "not-owned",
+      "evidence": "The patch adds tree-shakeable CDK overlay factory functions, including createOverlayRef. This package does not define the CDK overlay. Owned dialog still imports Overlay from @angular/cdk/overlay (legacy-dialog/dialog.ts). Those factories were not added."
     }
   ],
   "limitations": [
-    "The other 427 behavior-semantic SHAs were not read.",
+    "The other 426 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
