@@ -3977,10 +3977,19 @@
       ],
       "disposition": "not-owned",
       "evidence": "The patch assigns overlay pane ids through the CDK _IdGenerator instead of a local counter. This package does not define the CDK Overlay class. That id assignment was not changed."
+    },
+    {
+      "sha": "8c073c5fedeefd469de012ca9158cfaeaaaa81f5",
+      "files": [
+        "src/material/dialog/dialog.ts",
+        "src/material/dialog/dialog-content-directives.ts"
+      ],
+      "disposition": "owned-retained",
+      "evidence": "The patch assigns dialog and dialog-title ids through the CDK _IdGenerator. Owned dialog still uses a local uniqueId counter with the mat-dialog- prefix (legacy-dialog/internal/dialog-base.ts) and a local dialogElementUid for titles (legacy-dialog/dialog-content-directives.ts). Those counters were not replaced."
     }
   ],
   "limitations": [
-    "The other 610 behavior-semantic SHAs were not read.",
+    "The other 609 behavior-semantic SHAs were not read.",
     "Seed dispositions stay open.",
     "This is not RC-08-A03."
   ]
