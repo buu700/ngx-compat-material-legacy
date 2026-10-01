@@ -300,7 +300,7 @@ def main() -> int:
     results["companion-computed-styles"] = "pass" if code == 0 else "fail"
     implemented_ran.append("companion-computed-styles")
 
-    # browser-matrix: Chromium dialog/select + overlay families PR-slice; not the full matrix.
+    # browser-matrix: Chromium dialog/select + overlay families (zoneful/zoneless) PR-slice; not the full matrix.
     code = run_node("scripts/run-browser-matrix-slice.mjs", ["--run", str(run_path)])
     browser_detail = ROOT / "compatibility/rc/reports/browser-matrix-slice.json"
     if browser_detail.is_file():
