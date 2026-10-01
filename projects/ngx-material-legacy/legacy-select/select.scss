@@ -106,9 +106,18 @@ $placeholder-arrow-space: 2 * ($arrow-size + $arrow-margin);
   padding-top: 0;
   padding-bottom: 0;
   max-height: $panel-max-height;
-  min-width: 100%; // prevents some animation twitching and test inconsistencies in IE11
+  // Engine-free resting width for the open panel. Historical Angular
+  // `transformPanel` states set minWidth to calc(100% + 32px) when showing and
+  // calc(100% + 64px) when showing-multiple; CSS keyframes only animate
+  // opacity/transform, so restore those widths here. Void still used 100%.
+  // min-width wins over menu-common max-width: 280px when the trigger is wider.
+  min-width: calc(100% + 32px);
   border-radius: 4px;
   outline: 0;
+
+  &.mat-select-panel-multiple {
+    min-width: calc(100% + 64px);
+  }
 
   @include cdk.high-contrast(active, off) {
     outline: solid 1px;

@@ -3,13 +3,12 @@
   "role": "select panel width mechanism",
   "historical_sha256": "ac7715b14385c823a1dc0a9d3c2be9128b26e4aa39b7dadec91a66e0bea0bfbd",
   "historical_has_calc_rule": false,
-  "local_has_calc_rule": false,
-  "local_difference": "Import paths are under styles/, and CSS keyframes were added for the engine-free panel. The panel width rules match the 16.2.14 stylesheet.",
-  "failures_recorded": [
-    "Expected select panel width to be 100% + 32px: 200 vs about 232, and 400 vs about 432"
-  ],
+  "local_has_calc_rule": true,
+  "local_has_multiple_calc_rule": true,
+  "root_cause": "Historical +32/+64px came from Angular transformPanel animation minWidth states, not SCSS. Engine-free CSS keyframes omitted those widths; candidate SCSS restores them on the open panel.",
+  "local_difference": "Candidate declares min-width: calc(100% + 32px) (and +64px for .mat-select-panel-multiple) as the resting open-panel width. Historical oracle keeps min-width: 100% only. Spec assertions remain 200+32 / 400+32.",
   "limitations": [
-    "No calc rule was added. The 16.2.14 stylesheet does not contain one.",
-    "This does not make the two select tests pass."
+    "This source check does not execute the two overlay geometry specs; those need the family runner.",
+    "Does not claim G09 or full historical suite closure."
   ]
 }
