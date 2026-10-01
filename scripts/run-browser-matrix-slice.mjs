@@ -137,7 +137,15 @@ const nodeArgs = typeof globalThis.WebSocket === 'function'
   ? []
   : ['--experimental-websocket'];
 
+function freeCdpPort(port) {
+  spawnSync('bash', ['-lc', `fuser -k ${port}/tcp >/dev/null 2>&1 || true`], {
+    encoding: 'utf8',
+    timeout: 5000,
+  });
+}
+
 for (const scenario of scenarios) {
+  freeCdpPort(scenario.script.includes('overlay') ? 9334 : 9333);
   const result = spawnSync(
     process.execPath,
     [...nodeArgs, join(root, scenario.script), '--tarball', tarball, ...scenario.args],

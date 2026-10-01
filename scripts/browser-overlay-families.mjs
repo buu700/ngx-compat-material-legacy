@@ -249,9 +249,11 @@ await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
 const {port} = server.address();
 const pageUrl = `http://127.0.0.1:${port}/`;
 const chromeDir = mkdtempSync(join(tmpdir(), 'ngx-compat-chrome-overlay-'));
+const debugPort = Number(process.env.CDP_PORT || '9334');
 const chrome = spawn(chromeBin, [
+
   '--headless=new',
-  '--remote-debugging-port=0',
+  '--remote-debugging-port=' + String(debugPort),
   '--user-data-dir=' + chromeDir,
   '--no-sandbox',
   '--disable-gpu',
@@ -266,16 +268,6 @@ async function jsonGet(url) {
   if (!response.ok) throw new Error(`${url} ${response.status}`);
   return response.json();
 }
-let debugPort = null;
-for (let i = 0; i < 50 && debugPort == null; i += 1) {
-  const active = join(chromeDir, 'DevToolsActivePort');
-  if (existsSync(active)) {
-    const lines = readFileSync(active, 'utf8').trim().split(/\r?\n/);
-    if (lines[0] && /^\d+$/.test(lines[0])) debugPort = Number(lines[0]);
-  }
-  if (debugPort == null) await sleep(100);
-}
-if (debugPort == null) fail(1, `Chromium did not write DevToolsActivePort\n${chromeLog.slice(-1000)}`);
 let version = null;
 for (let i = 0; i < 50; i += 1) {
   try {
