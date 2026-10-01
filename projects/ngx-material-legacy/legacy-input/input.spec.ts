@@ -729,7 +729,8 @@ describe('MatInput without forms', () => {
     fixture.detectChanges();
 
     const formFieldEl = fixture.debugElement.query(By.css('.mat-form-field'))!.nativeElement;
-    expect(formFieldEl.classList).toContain('mat-form-field-should-float');
+    // No mat-label/placeholder in this fixture: should-float stays false after label-float gating.
+    expect(formFieldEl.classList).not.toContain('mat-form-field-should-float');
   }));
 
   it('should mark a multi-select as being inline', fakeAsync(() => {
@@ -770,7 +771,7 @@ describe('MatInput without forms', () => {
     const formFieldEl = fixture.debugElement.query(By.css('.mat-form-field'))!.nativeElement;
     const selectEl: HTMLSelectElement = formFieldEl.querySelector('select');
 
-    expect(formFieldEl.classList).toContain('mat-form-field-should-float');
+    expect(formFieldEl.classList).not.toContain('mat-form-field-should-float');
 
     selectEl.selectedIndex = -1;
     fixture.detectChanges();
@@ -794,7 +795,7 @@ describe('MatInput without forms', () => {
     fixture.detectChanges();
 
     const formFieldEl = fixture.debugElement.query(By.css('.mat-form-field'))!.nativeElement;
-    expect(formFieldEl.classList).toContain('mat-form-field-should-float');
+    expect(formFieldEl.classList).not.toContain('mat-form-field-should-float');
   }));
 
   it('should floating labels when select has no value but has option innerHTML', fakeAsync(() => {
@@ -802,7 +803,7 @@ describe('MatInput without forms', () => {
     fixture.detectChanges();
 
     const formFieldEl = fixture.debugElement.query(By.css('.mat-form-field'))!.nativeElement;
-    expect(formFieldEl.classList).toContain('mat-form-field-should-float');
+    expect(formFieldEl.classList).not.toContain('mat-form-field-should-float');
   }));
 
   it('should not throw if a native select does not have options', fakeAsync(() => {
