@@ -9,6 +9,7 @@
 import {BooleanInput, coerceBooleanProperty} from '@angular/cdk/coercion';
 import {BACKSPACE, hasModifierKey, TAB} from '@angular/cdk/keycodes';
 import {
+  AfterContentInit,
   Directive,
   ElementRef,
   EventEmitter,
@@ -71,7 +72,9 @@ let nextUniqueId = 0;
     '[attr.aria-required]': '_chipList && _chipList.required || null',
   },
 })
-export class MatLegacyChipInput implements MatLegacyChipTextControl, OnChanges, OnDestroy {
+export class MatLegacyChipInput
+  implements MatLegacyChipTextControl, OnChanges, OnDestroy, AfterContentInit
+{
   /** Whether the control is focused. */
   focused: boolean = false;
   _chipList: MatLegacyChipList;
@@ -146,6 +149,10 @@ export class MatLegacyChipInput implements MatLegacyChipTextControl, OnChanges, 
 
   ngOnDestroy(): void {
     this.chipEnd.complete();
+  }
+
+  ngAfterContentInit(): void {
+    // Retained for historical public surface; backspace-repeat no longer needs setup here.
   }
 
   /** Utility method to make host definition/tests more clear. */
