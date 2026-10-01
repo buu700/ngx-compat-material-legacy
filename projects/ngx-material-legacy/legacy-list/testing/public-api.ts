@@ -26,5 +26,6 @@ export {
   MatLegacyListItemSection,
   MatLegacyListItemHarnessBase,
   MatLegacySubheaderHarness,
+  getListItemPredicate,
 } from './list-item-harness-base';
 export {MatLegacyListHarnessBase, ListSection} from './list-harness-base';

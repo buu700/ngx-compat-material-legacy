@@ -17,6 +17,10 @@ export {
   ProgressSpinnerMode as LegacyProgressSpinnerMode,
 } from '@angular/material/progress-spinner';
 
+export {
+  MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS_FACTORY as MAT_LEGACY_PROGRESS_SPINNER_DEFAULT_OPTIONS_FACTORY,
+} from './internal/progress-spinner-defaults';
+
 /**
  * @deprecated Import Progress Spinner instead. Note that the
  *    `mat-spinner` selector isn't deprecated.

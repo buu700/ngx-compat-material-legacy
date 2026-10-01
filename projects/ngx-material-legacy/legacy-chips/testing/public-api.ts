@@ -16,7 +16,7 @@ export {
   LegacyChipRemoveHarnessFilters,
   LegacyChipAvatarHarnessFilters,
 } from './chip-harness-filters';
-export {MatLegacyChipListHarness} from './chip-list-harness';
+export {MatLegacyChipListHarness, _MatChipListHarnessBase} from './chip-list-harness';
 export {MatLegacyChipInputHarness} from './chip-input-harness';
 export {MatLegacyChipRemoveHarness} from './chip-remove-harness';
 export {MatLegacyChipOptionHarness} from './chip-option-harness';

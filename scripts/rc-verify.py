@@ -233,7 +233,7 @@ def main() -> int:
         exit_code=code,
         limitations=[
             "Checks the committed migrate-legacy CLI tarball identity and isolation.",
-            "CLI is not yet packed into the same library run.json as a sibling artifact.",
+            "CLI identity is the committed migration/dist tarball; draft run.json records it as migrate-cli when present.",
             "Schematic runner / old-workspace migration fixtures remain separate.",
         ],
     )
@@ -280,6 +280,27 @@ def main() -> int:
     )
     results["browser-matrix"] = "pass" if code == 0 else "fail"
     implemented_ran.append("browser-matrix")
+
+    # api-completeness: packed vs 16.2.14 names + allowlist + structural signatures.
+    code = run_node("scripts/api-completeness.mjs", ["--run", str(run_path)])
+    api_detail = ROOT / "compatibility/rc/reports/api-completeness.json"
+    if api_detail.is_file():
+        (out_dir / "reports").mkdir(parents=True, exist_ok=True)
+        (out_dir / "reports" / "api-completeness-detail.json").write_text(api_detail.read_text())
+    write_check_report(
+        out_dir,
+        run_id,
+        line,
+        "api-completeness",
+        exit_code=code,
+        limitations=[
+            "Export-name completeness vs Material 16.2.14 with reviewed allowlist.",
+            "Structural member-name signatures for shared class/interface exports.",
+            "Does not claim G02 (full overload/generics/protected/DI identity).",
+        ],
+    )
+    results["api-completeness"] = "pass" if code == 0 else "fail"
+    implemented_ran.append("api-completeness")
 
     # historical-legacy-artifact: all inventory families against the packed --run.
     code = run_node("scripts/rc-test-legacy-family.mjs", ["--run", str(run_path)])

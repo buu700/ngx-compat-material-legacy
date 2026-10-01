@@ -164,6 +164,19 @@ const manifest = {
       bytes: artifactStat.size,
       sha256: sha256File(tarball),
     },
+    ...(() => {
+      const cliRel = 'migration/dist/ngx-compat-material-legacy-migrate-cli-22.0.0-rc.0.tgz';
+      const cliPath = join(root, cliRel);
+      if (!existsSync(cliPath)) return [];
+      const st = statSync(cliPath);
+      return [{
+        id: 'migrate-cli',
+        path: cliRel,
+        bytes: st.size,
+        sha256: sha256File(cliPath),
+        note: 'Committed peer-light CLI sibling; not rebuilt by this draft pack.',
+      }];
+    })(),
   ],
   expected_matrix: {
     path: 'compatibility/rc/matrices/pack-draft.json',

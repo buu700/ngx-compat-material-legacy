@@ -46,8 +46,10 @@ export {
   MAT_TABS_CONFIG as MAT_LEGACY_TABS_CONFIG,
   MatTabsConfig as MatLegacyTabsConfig,
 } from '@angular/material/tabs';
+export type {ScrollDirection as LegacyScrollDirection} from '@angular/material/tabs';
 export {
   _MatInkBarPositioner as _MatLegacyInkBarPositioner,
   _MAT_INK_BAR_POSITIONER as _MAT_LEGACY_INK_BAR_POSITIONER,
+  _MAT_INK_BAR_POSITIONER_FACTORY as _MAT_LEGACY_INK_BAR_POSITIONER_FACTORY,
 } from './internal/ink-bar-shared';
 export {MatCommonModule} from './internal/common-module';

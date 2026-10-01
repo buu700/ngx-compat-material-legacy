@@ -3,11 +3,11 @@
   "role": "canonical upstream disposition ledger (partial)",
   "g11_claim": "not-passed",
   "seed_rows": 1697,
-  "ledger_rows": 10,
-  "closed_dispositions": 8,
-  "open_or_deferred": 2,
+  "ledger_rows": 24,
+  "closed_dispositions": 24,
+  "open_or_deferred": 0,
   "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-  "batch_id": "docs-build-final-2026-10-01-a",
+  "batch_id": "security-already-present-2026-10-01-b",
   "entries": [
     {
       "sha": "2dc599762eab74812c011370d30f9cec307e884d",
@@ -58,15 +58,15 @@
       "sha": "7369dfadcf38d05d4f93a8fa8308ed7ccb55f2a9",
       "bucket": "docs-build-batch-candidate",
       "subject": "docs(material/slider): Page Up/Down increase value but not by 10 steps (#27854)",
-      "final_disposition": "needs-individual-review",
-      "reason": "Docs-build candidate note is not a pure markdown path; deferred.",
+      "final_disposition": "irrelevant",
+      "reason": "The SHA only edits Material slider.md (Page Up step wording). This package does not contain that markdown. Owned legacy-slider still uses _increment(10); that behavior is a separate adaptation question, not closed by this docs SHA.",
       "read_note_disposition": "docs-only",
       "files": [
         "src/material/slider/slider.md"
       ],
       "evidence_report": "compatibility/rc/reports/docs-build-one-diff.json",
-      "batch_id": "docs-build-final-2026-10-01-a",
-      "recorded_at_utc": "2026-10-01T16:10:09Z",
+      "batch_id": "security-already-present-2026-10-01-b",
+      "recorded_at_utc": "2026-10-01T16:30:02Z",
       "g11_claim": "not-passed"
     },
     {
@@ -150,21 +150,262 @@
       "sha": "1999e203c5853272faff77f54372939e550f6e2a",
       "bucket": "docs-build-batch-candidate",
       "subject": "docs(material/slider): value should go in the input tag (#28257)",
-      "final_disposition": "needs-individual-review",
-      "reason": "Docs-build candidate note is not a pure markdown path; deferred.",
+      "final_disposition": "irrelevant",
+      "reason": "The SHA only moves value onto the inner input in Material slider.md. This package does not contain that markdown.",
       "read_note_disposition": "docs-only",
       "files": [
         "src/material/slider/slider.md"
       ],
       "evidence_report": "compatibility/rc/reports/docs-build-one-diff.json",
-      "batch_id": "docs-build-final-2026-10-01-a",
-      "recorded_at_utc": "2026-10-01T16:10:09Z",
+      "batch_id": "security-already-present-2026-10-01-b",
+      "recorded_at_utc": "2026-10-01T16:30:02Z",
       "g11_claim": "not-passed"
+    },
+    {
+      "sha": "b423c0e0b754b1f1d118d17e022981c357c3aa68",
+      "bucket": "security-deep",
+      "subject": "fix(material/datepicker): deprecate constructor injection in NativeDateAdapter (#26144)",
+      "final_disposition": "irrelevant",
+      "reason": "NativeDateAdapter lives in @angular/material/core. This package only re-exports LegacyNativeDateAdapter from the peer and does not implement the adapter.",
+      "read_note_disposition": "not-owned",
+      "evidence_report": "compatibility/rc/reports/security-deep-review.json",
+      "source_check": "projects/ngx-material-legacy/legacy-core/public-api.ts re-exports NativeDateAdapter as LegacyNativeDateAdapter",
+      "files": [],
+      "batch_id": "security-already-present-2026-10-01-b",
+      "recorded_at_utc": "2026-10-01T16:30:02Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "cf3506adf1af1556d705dbb651e7e96a7141b81d",
+      "bucket": "security-deep",
+      "subject": "fix(material/progress-bar): avoid CSP issues for apps not using buffer mode (#28946)",
+      "final_disposition": "irrelevant",
+      "reason": "Owned legacy progress-bar template uses an inline SVG pattern for the buffer track and does not render mdc-linear-progress__buffer-dots.",
+      "read_note_disposition": "unaffected",
+      "evidence_report": "compatibility/rc/reports/security-deep-review.json",
+      "source_check": "legacy-progress-bar/progress-bar.html SVG pattern; no buffer-dots class",
+      "files": [],
+      "batch_id": "security-already-present-2026-10-01-b",
+      "recorded_at_utc": "2026-10-01T16:30:02Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "878700d10ab042b6a62c6f86f4fcc24d5a0ae685",
+      "bucket": "security-deep",
+      "subject": "fix(material/progress-bar): avoid CSP issues due to buffer dots (#31818)",
+      "final_disposition": "irrelevant",
+      "reason": "Owned progress-bar styles have no data-URI mask. The CSP buffer-dots change targets MDC styles this package does not ship on the progress-bar path.",
+      "read_note_disposition": "unaffected",
+      "evidence_report": "compatibility/rc/reports/security-deep-review.json",
+      "source_check": "no data: URI under legacy-progress-bar/*.scss",
+      "files": [],
+      "batch_id": "security-already-present-2026-10-01-b",
+      "recorded_at_utc": "2026-10-01T16:30:02Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "622152de761b629a426b744ec2ff3e4e79d18889",
+      "bucket": "security-deep",
+      "subject": "perf(material/tooltip): Defer injection of injectables not needed until tooltip is shown. (#30440)",
+      "final_disposition": "irrelevant",
+      "reason": "Deferred Overlay/ScrollDispatcher/ViewContainerRef/DOCUMENT injection is a performance change, not a security-sink change for this package.",
+      "read_note_disposition": "not-security",
+      "evidence_report": "compatibility/rc/reports/security-deep-review.json",
+      "source_check": "security-deep note classification retained after review",
+      "files": [],
+      "batch_id": "security-already-present-2026-10-01-b",
+      "recorded_at_utc": "2026-10-01T16:30:02Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "1d42431b2fe745602727eda03338c80c8897850a",
+      "bucket": "security-deep",
+      "subject": "refactor: move trusted types logic into CDK (#32387)",
+      "final_disposition": "irrelevant",
+      "reason": "trustedHTMLFromString / icon-registry trusted-types move is not owned here; package has no cdk/private trusted-types helper.",
+      "read_note_disposition": "not-owned",
+      "evidence_report": "compatibility/rc/reports/security-deep-review.json",
+      "source_check": "no trustedHTMLFromString or @angular/cdk/private import in projects/ngx-material-legacy",
+      "files": [],
+      "batch_id": "security-already-present-2026-10-01-b",
+      "recorded_at_utc": "2026-10-01T16:30:02Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "231f94f5557bb58afc0070585688b3014d541eb2",
+      "bucket": "security-deep",
+      "subject": "fix(cdk/layout): avoid CSS injection attacks in media matcher",
+      "final_disposition": "irrelevant",
+      "reason": "Owned MediaMatcher call site passes the constant (prefers-reduced-motion) query with no braces. This disposition does not claim the installed CDK peer contains the strip fix.",
+      "read_note_disposition": "call-site-unaffected",
+      "evidence_report": "compatibility/rc/reports/security-deep-review.json",
+      "source_check": "legacy-core/internal/legacy-animations.ts matchMedia('(prefers-reduced-motion)')",
+      "files": [],
+      "batch_id": "security-already-present-2026-10-01-b",
+      "recorded_at_utc": "2026-10-01T16:30:02Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "77ffdf98ba71c11d908b29e02b516dddf487ae0b",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/autocomplete): don't assign to model value while typing when requireSelection is enabled (#27572)",
+      "final_disposition": "already-adapted",
+      "reason": "legacy-autocomplete/internal/autocomplete-trigger-base.ts already skips _onChange while typing when requireSelection is set.",
+      "read_note_disposition": "already-present",
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "autocomplete-trigger-base.ts requireSelection guard around _onChange",
+      "files": [
+        "src/material/autocomplete/autocomplete-trigger.ts",
+        "src/material/autocomplete/autocomplete.spec.ts",
+        "src/dev-app/autocomplete/autocomplete-demo.ts",
+        "src/components-examples/material/autocomplete/autocomplete-require-selection"
+      ],
+      "batch_id": "security-already-present-2026-10-01-b",
+      "recorded_at_utc": "2026-10-01T16:30:02Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "642d886ef117721a34c98055391c9055fde29607",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/dialog): update aria-labelledby if title is swapped (#27609)",
+      "final_disposition": "already-adapted",
+      "reason": "MatLegacyDialogTitle pushes/splices ids on _ariaLabelledByQueue; container binds aria-labelledby to the first queued id.",
+      "read_note_disposition": "already-present",
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-dialog dialog-container.ts + dialog-content-directives.ts queue",
+      "files": [
+        "src/cdk/dialog/dialog-container.ts",
+        "src/material/dialog/dialog-container.ts",
+        "src/material/dialog/dialog-content-directives.ts",
+        "src/material/legacy-dialog/dialog-container.ts",
+        "src/material/legacy-dialog/dialog-content-directives.ts"
+      ],
+      "batch_id": "security-already-present-2026-10-01-b",
+      "recorded_at_utc": "2026-10-01T16:30:02Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "7a2191906339aab259e59fb8cea05273538f4ebf",
+      "bucket": "behavior-semantic",
+      "subject": "docs(material/autocomplete): fix autocomplete typo (#27662)",
+      "final_disposition": "already-adapted",
+      "reason": "legacy-autocomplete/internal/autocomplete-base.ts already spells autocomplete correctly on requireSelection comments/API.",
+      "read_note_disposition": "already-present",
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "no autcomplete misspelling under legacy-autocomplete/internal",
+      "files": [
+        "src/material/autocomplete/autocomplete.ts"
+      ],
+      "batch_id": "security-already-present-2026-10-01-b",
+      "recorded_at_utc": "2026-10-01T16:30:02Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "db06fa8d8939d793f598bc3dbedc96a5a71c0db0",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/autocomplete): requireSelection incorrectly resetting value when there are no options",
+      "final_disposition": "already-adapted",
+      "reason": "autocomplete-trigger-base.ts already captures attach value via _captureValueOnAttach and compares against it for requireSelection.",
+      "read_note_disposition": "already-present",
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "_captureValueOnAttach / _valueOnAttach present",
+      "files": [
+        "src/material/autocomplete/autocomplete-trigger.ts",
+        "src/material/autocomplete/autocomplete.spec.ts"
+      ],
+      "batch_id": "security-already-present-2026-10-01-b",
+      "recorded_at_utc": "2026-10-01T16:30:02Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "5dd614aa100e28f0815fdd83e5b68f4239ef01f9",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/tabs): nav bar not navigating on enter presses (#27862)",
+      "final_disposition": "already-adapted",
+      "reason": "tab-nav-bar-base.ts _handleKeydown clicks on Enter and Space when a tab panel is set, and prevents the key when disabled.",
+      "read_note_disposition": "already-present",
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-tabs/internal/tab-nav-bar-base.ts ENTER|SPACE handler",
+      "files": [
+        "src/material/tabs/tab-nav-bar/tab-nav-bar.ts",
+        "src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts"
+      ],
+      "batch_id": "security-already-present-2026-10-01-b",
+      "recorded_at_utc": "2026-10-01T16:30:02Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "f6c5ea4c5d41a25ea4500999250d8e5f60fd2c20",
+      "bucket": "behavior-semantic",
+      "subject": "Toggle aria-modal attribute in parent modal when autocomplete panel opens / closes (#27663)",
+      "final_disposition": "already-adapted",
+      "reason": "openPanel/closePanel already add/remove aria-owns on the tracked parent modal for the panel id.",
+      "read_note_disposition": "already-present",
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "autocomplete-trigger-base.ts aria-owns add/remove",
+      "files": [
+        "src/material/autocomplete/autocomplete-trigger.ts",
+        "src/material/autocomplete/autocomplete.spec.ts"
+      ],
+      "batch_id": "security-already-present-2026-10-01-b",
+      "recorded_at_utc": "2026-10-01T16:30:02Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "1de6a3aa37118e4153fb995a8c8f4daecdf6d0b5",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/button): fix color tokens of raised buttons (#27904)",
+      "final_disposition": "already-adapted",
+      "reason": "styles/button/_button-theme.scss already themes .mat-mdc-raised-button with protected tokens and dark disabled ink at 0.5 opacity.",
+      "read_note_disposition": "already-present",
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "_button-theme.scss raised-button + disabled-ink 0.5 dark",
+      "files": [
+        "src/material/button/_button-theme.scss",
+        "src/material/core/tokens/m2/mdc/_button-protected.scss"
+      ],
+      "batch_id": "security-already-present-2026-10-01-b",
+      "recorded_at_utc": "2026-10-01T16:30:02Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "8a5302a5f942144a83d8b0336262e7559f0eef6f",
+      "bucket": "behavior-semantic",
+      "subject": "refactor: use enum instead of const enum (#28052)",
+      "final_disposition": "already-adapted",
+      "reason": "Owned LegacyRippleState is already export enum. Package has no const enum declarations; peer-reexported enums follow the installed Material/CDK.",
+      "read_note_disposition": "already-present",
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-core/ripple/ripple-ref.ts export enum LegacyRippleState; no const enum in package",
+      "files": [
+        "src/material/checkbox/checkbox.ts",
+        "src/material/core/ripple/ripple-ref.ts",
+        "src/material/dialog/dialog-ref.ts",
+        "src/cdk/a11y/focus-monitor/focus-monitor.ts"
+      ],
+      "batch_id": "security-already-present-2026-10-01-b",
+      "recorded_at_utc": "2026-10-01T16:30:02Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
     }
   ],
   "limitations": [
-    "Partial ledger only; 1697 seed rows remain mostly without final dispositions.",
-    "Read notes are inputs; this batch converts a bounded docs-build set.",
-    "Does not claim G11."
+    "Partial ledger only; most of 1697 seed rows still lack final dispositions.",
+    "Read notes are inputs; this batch converts security-deep + already-present (+ closes two deferred docs-build rows).",
+    "Does not claim G11.",
+    "Cell upstream-audit-disposition stays open until every seed SHA has a non-open final disposition."
   ]
 }
