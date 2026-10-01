@@ -4,8 +4,8 @@
  * getComputedStyle CSS custom-property rows after applying
  * all-current-companion-bridges.
  *
- * Slice: badge, divider, icon, toolbar, sort, grid-list, button-toggle (main / Chromium / zoneful).
- * Does not claim RC-05-A02 / G06–G08 or full thirteen-companion coverage.
+ * Slice: all 13 companions (main / Chromium / zoneful).
+ * Does not claim RC-05-A02 / G06–G08 or peer M2 oracle equality / state grids.
  *
  *   node scripts/check-companion-computed-styles.mjs --tarball <path>
  *   node scripts/check-companion-computed-styles.mjs --run <run.json>
@@ -101,6 +101,36 @@ const slice = [
     host_id: 'button-toggle-host',
     tokens: ['background-color', 'text-color'],
   },
+  {
+    component: 'bottom-sheet',
+    host_id: 'bottom-sheet-host',
+    tokens: ['container-background-color', 'container-text-color'],
+  },
+  {
+    component: 'datepicker',
+    host_id: 'datepicker-host',
+    tokens: ['calendar-container-background-color', 'calendar-container-text-color'],
+  },
+  {
+    component: 'expansion',
+    host_id: 'expansion-host',
+    tokens: ['container-background-color', 'header-text-color'],
+  },
+  {
+    component: 'sidenav',
+    host_id: 'sidenav-host',
+    tokens: ['container-background-color', 'container-text-color'],
+  },
+  {
+    component: 'stepper',
+    host_id: 'stepper-host',
+    tokens: ['container-color', 'header-label-text-color'],
+  },
+  {
+    component: 'tree',
+    host_id: 'tree-host',
+    tokens: ['container-background-color', 'node-text-color'],
+  },
 ];
 
 const consumer = mkdtempSync(join(tmpdir(), 'ngx-compat-companion-computed-'));
@@ -190,6 +220,24 @@ if (!bridgeCss.includes('--mat-button-toggle-background-color')) {
 if (!bridgeCss.includes('--mat-grid-list-tile-header-primary-text-size')) {
   fail(1, 'Compiled theme missing grid-list tile header token');
 }
+if (!bridgeCss.includes('--mat-bottom-sheet-container-background-color')) {
+  fail(1, 'Compiled theme missing bottom-sheet container background token');
+}
+if (!bridgeCss.includes('--mat-datepicker-calendar-container-background-color')) {
+  fail(1, 'Compiled theme missing datepicker calendar container background token');
+}
+if (!bridgeCss.includes('--mat-expansion-container-background-color')) {
+  fail(1, 'Compiled theme missing expansion container background token');
+}
+if (!bridgeCss.includes('--mat-sidenav-container-background-color')) {
+  fail(1, 'Compiled theme missing sidenav container background token');
+}
+if (!bridgeCss.includes('--mat-stepper-container-color')) {
+  fail(1, 'Compiled theme missing stepper container color token');
+}
+if (!bridgeCss.includes('--mat-tree-container-background-color')) {
+  fail(1, 'Compiled theme missing tree container background token');
+}
 writeFileSync(join(consumer, 'theme.css'), bridgeCss);
 
 mkdirSync(join(consumer, 'src'), {recursive: true});
@@ -198,12 +246,25 @@ import {Component, NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {MatBadgeModule} from '@angular/material/badge';
+import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
+import {MatNativeDateModule} from '@angular/material/core';
+import {MatDatepickerModule} from '@angular/material/datepicker';
 import {MatDividerModule} from '@angular/material/divider';
+import {MatExpansionModule} from '@angular/material/expansion';
+import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatGridListModule} from '@angular/material/grid-list';
 import {MatIconModule} from '@angular/material/icon';
+import {MatInputModule} from '@angular/material/input';
+import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatSortModule} from '@angular/material/sort';
+import {MatStepperModule} from '@angular/material/stepper';
 import {MatToolbarModule} from '@angular/material/toolbar';
+import {MatTreeFlatDataSource, MatTreeFlattener, MatTreeModule} from '@angular/material/tree';
+import {FlatTreeControl} from '@angular/cdk/tree';
+
+interface TreeNode { name: string; children?: TreeNode[]; }
+interface FlatNode { expandable: boolean; name: string; level: number; }
 
 @Component({
   standalone: false,
@@ -232,13 +293,77 @@ import {MatToolbarModule} from '@angular/material/toolbar';
         <mat-button-toggle value="a" checked>A</mat-button-toggle>
         <mat-button-toggle value="b">B</mat-button-toggle>
       </mat-button-toggle-group>
+      <div id="bottom-sheet-host" class="mat-bottom-sheet-container">Bottom sheet host</div>
+      <mat-form-field>
+        <mat-label>Date</mat-label>
+        <input matInput [matDatepicker]="picker" />
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker id="datepicker-host" #picker></mat-datepicker>
+      </mat-form-field>
+      <mat-expansion-panel id="expansion-host" expanded>
+        <mat-expansion-panel-header>Expansion</mat-expansion-panel-header>
+        Content
+      </mat-expansion-panel>
+      <mat-sidenav-container>
+        <mat-sidenav id="sidenav-host" opened mode="side">Sidenav</mat-sidenav>
+        <mat-sidenav-content>Content</mat-sidenav-content>
+      </mat-sidenav-container>
+      <mat-horizontal-stepper id="stepper-host" linear="false">
+        <mat-step label="One"><div>Step one</div></mat-step>
+        <mat-step label="Two"><div>Step two</div></mat-step>
+      </mat-horizontal-stepper>
+      <mat-tree id="tree-host" [dataSource]="dataSource" [treeControl]="treeControl">
+        <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>{{node.name}}</mat-tree-node>
+        <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding>
+          <button matTreeNodeToggle type="button">{{node.name}}</button>
+        </mat-tree-node>
+      </mat-tree>
     </div>
   \`,
 })
-export class LabRoot {}
+export class LabRoot {
+  private _transformer = (node: TreeNode, level: number): FlatNode => ({
+    expandable: !!node.children && node.children.length > 0,
+    name: node.name,
+    level,
+  });
+  treeControl = new FlatTreeControl<FlatNode>(
+    node => node.level,
+    node => node.expandable,
+  );
+  treeFlattener = new MatTreeFlattener(
+    this._transformer,
+    node => node.level,
+    node => node.expandable,
+    node => node.children,
+  );
+  dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
+  hasChild = (_: number, node: FlatNode) => node.expandable;
+  constructor() {
+    this.dataSource.data = [{name: 'Root', children: [{name: 'Child'}]}];
+  }
+}
 
 @NgModule({
-  imports: [BrowserModule, MatBadgeModule, MatButtonToggleModule, MatDividerModule, MatGridListModule, MatIconModule, MatSortModule, MatToolbarModule],
+  imports: [
+    BrowserModule,
+    MatBadgeModule,
+    MatBottomSheetModule,
+    MatButtonToggleModule,
+    MatDatepickerModule,
+    MatDividerModule,
+    MatExpansionModule,
+    MatFormFieldModule,
+    MatGridListModule,
+    MatIconModule,
+    MatInputModule,
+    MatNativeDateModule,
+    MatSidenavModule,
+    MatSortModule,
+    MatStepperModule,
+    MatToolbarModule,
+    MatTreeModule,
+  ],
   declarations: [LabRoot],
   bootstrap: [LabRoot],
 })
@@ -476,9 +601,9 @@ const report = {
   g06_g07_g08_claim: 'not-passed',
   error,
   limitations: [
-    'Only badge, divider, icon, toolbar, sort, grid-list, and button-toggle were rendered on main/Chromium/zoneful.',
+    'All thirteen companions were rendered on main/Chromium/zoneful; bottom-sheet uses an in-tree host (not an opened overlay panel).',
     'Captures getComputedStyle CSS custom properties after all-current-companion-bridges; not full dimension matrix or peer M2 oracle equality.',
-    'Remaining companions, 21.x line, density/typography/dark/RTL state grids remain not-executed.',
+    '21.x line, density/typography/dark/RTL state grids remain not-executed.',
     'Does not claim RC-05-A02 / G06–G08.',
   ],
 };

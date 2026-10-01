@@ -3,130 +3,89 @@
   "role": "needs-triage diffs that were read",
   "g11_claim": "not-passed",
   "batch_reviewed": true,
-  "batch_id": "needs-triage-companion-docs-examples-spec-2026-10-01",
-  "count": 9,
+  "batch_id": "companion-all13-owned-jsdoc-unused-2026-10-01",
+  "count": 6,
   "selection_policy": {
-    "include": "needs-triage companion-only docs/comment/examples with inspected patches; current Material TS not shipped (badge/icon/datepicker/bottom-sheet Sass bridges only)",
+    "include": "companion unused-file deletion; owned-path unused-file keep; careful owned JSDoc/type/docs renames with inspected patches",
     "fail_closed_excluded": [
-      "owned legacy component JSDoc/M3 color note adaptations pending review",
-      "behavior-semantic bucket",
-      "feat/perf/M3 theming production refactors",
-      "mixed production Sass adaptations"
+      "unread behavior-semantic bucket",
+      "residual test-only with tooling/api-golden/prod/harness-impl",
+      "M3 color JSDoc binge without owned-path evidence",
+      "mixed production Sass/theme refactors"
     ],
-    "prior_batch": "test-only-residual-needs-triage-docs-2026-10-01"
+    "prior_batch": "needs-triage-companion-docs-examples-spec-2026-10-01"
   },
   "reviews": [
     {
-      "sha": "a080fcba2fa9a3997bc1ece122ba79b1afa1de45",
-      "subject": "docs: omit repetitions (#27753)",
+      "sha": "456741a61a8e85e597e82503941ccab97777bc97",
+      "subject": "refactor(material/button-toggle): remove unused file (#27716)",
       "files": [
-        "src/material/form-field/_form-field-sizing.scss",
-        "src/material/schematics/ng-generate/mdc-migration/rules/ts-migration/runtime-migration.ts"
+        "src/material/button-toggle/_button-toggle-variables.scss"
       ],
-      "patch_sha256": "b85c257b3236070aa25fa4a2d8b55c3dae09bcc7007bc08def8f32b8505c1198",
-      "patch_bytes": 1698,
-      "disposition": "already-present",
-      "evidence": "Inspected upstream patch content (sha256=b85c257b3236070aa25fa4a2d8b55c3dae09bcc7007bc08def8f32b8505c1198, bytes=1698). Paths: src/material/form-field/_form-field-sizing.scss, src/material/schematics/ng-generate/mdc-migration/rules/ts-migration/runtime-migration.ts. The schematic path is not shipped. The form-field sizing comment typo is already absent in owned projects/ngx-material-legacy/styles/form-field/_form-field-sizing.scss (reads \"a consistent\"). Already present / not-owned mix; no product adaptation required."
+      "patch_sha256": "aa8e1a7188595cf08f5ca67747a3e265ffb57ff892093b52ff1986c088084662",
+      "patch_bytes": 896,
+      "disposition": "irrelevant",
+      "evidence": "Inspected upstream patch content (sha256=aa8e1a7188595cf08f5ca67747a3e265ffb57ff892093b52ff1986c088084662, bytes=896). Changed paths: src/material/button-toggle/_button-toggle-variables.scss. Deletes unused current Material companion file src/material/button-toggle/_button-toggle-variables.scss. This package does not ship that current Material Sass path; companion button-toggle coverage is the owned Sass bridge/theme only and has no _button-toggle-variables.scss. Irrelevant to retained legacy product behavior."
     },
     {
-      "sha": "1dc30e8eacae1f318b53a9d22a462571b9de8ddb",
-      "subject": "docs: remove duplicate words (#27712)",
+      "sha": "f6949e3e57fe25406968eeaea90ba662343c3e79",
+      "subject": "refactor(material/paginator): remove unused file (#27685)",
       "files": [
-        "src/material/datepicker/month-view.ts",
-        "src/material/datepicker/multi-year-view.ts",
-        "src/material/datepicker/year-view.ts"
+        "src/material/paginator/_paginator-variables.scss"
       ],
-      "patch_sha256": "ad2ca6a7edfc519c5f8e64a9fd3511cf8a93d4ec3b3b7a27d9d014b5cb7643da",
-      "patch_bytes": 1941,
-      "disposition": "irrelevant",
-      "evidence": "Inspected upstream patch content (sha256=ad2ca6a7edfc519c5f8e64a9fd3511cf8a93d4ec3b3b7a27d9d014b5cb7643da, bytes=1941). Changed paths: src/material/datepicker/month-view.ts, src/material/datepicker/multi-year-view.ts, src/material/datepicker/year-view.ts. Comment-only typo edits in current Material datepicker view classes. This package does not ship those TypeScript sources; companion datepicker coverage is Sass bridge/theme only. Irrelevant to retained legacy product behavior."
+      "patch_sha256": "deeb5b42885d5d93a76e331e3736398b8af4655db100b174f4ab9df4d6feac59",
+      "patch_bytes": 759,
+      "disposition": "not-applicable",
+      "evidence": "Inspected upstream patch content (sha256=deeb5b42885d5d93a76e331e3736398b8af4655db100b174f4ab9df4d6feac59, bytes=759). Changed paths: src/material/paginator/_paginator-variables.scss. Upstream deletes src/material/paginator/_paginator-variables.scss as unused. Owned legacy-paginator still @use/@forward paginator-variables and reads $density-config from projects/ngx-material-legacy/legacy-paginator/_paginator-variables.scss (and styles/legacy-paginator copy). Deleting that file would break owned density theming. Upstream deletion is not applicable to retained legacy product behavior."
     },
     {
-      "sha": "91b2937d3470aaa503722c4bf329ea81aa7012f5",
-      "subject": "docs: remove duplicate word (#27743)",
+      "sha": "c73ab023af60220f19e98e85c32ea9924b217dae",
+      "subject": "docs: show MatListItem activated type (#29845)",
       "files": [
-        "src/material/button-toggle/button-toggle.ts"
+        "src/material/list/list.ts"
       ],
-      "patch_sha256": "f5dbe323aba85d911c8227c57130ab6272bda2594948daf78a2468c3afcde797",
-      "patch_bytes": 876,
+      "patch_sha256": "ae644451452e79e649c00e935f88d5159d3c53394d5a9c72a855bac009c92690",
+      "patch_bytes": 451,
       "disposition": "irrelevant",
-      "evidence": "Inspected upstream patch content (sha256=f5dbe323aba85d911c8227c57130ab6272bda2594948daf78a2468c3afcde797, bytes=876). Changed paths: src/material/button-toggle/button-toggle.ts. Comment-only typo edit in current Material button-toggle.ts. This package does not ship that TypeScript source; companion button-toggle coverage is Sass bridge/theme only. Irrelevant to retained legacy product behavior."
+      "evidence": "Inspected upstream patch content (sha256=ae644451452e79e649c00e935f88d5159d3c53394d5a9c72a855bac009c92690, bytes=451). Changed paths: src/material/list/list.ts. Adds an explicit `: boolean` return type on current Material MatListItem.activated getter in list.ts. This package does not ship current Material list.ts; owned legacy-list MatLegacyListItem has no activated API. Irrelevant to retained legacy product behavior."
     },
     {
-      "sha": "b83c6c1effc53f97a981cc95c7b4e53174290d45",
-      "subject": "docs(material/bottom-sheet): update panelClass comment (#33321)",
+      "sha": "3cf5bb797de6d54133aebb368b57dfdf8320148a",
+      "subject": "docs(material/form-field): update documentation to replace 'mat-chip-list' with 'mat-chip-grid' (#30830)",
       "files": [
-        "src/material/bottom-sheet/bottom-sheet-config.ts"
+        "src/material/chips/chip-text-control.ts",
+        "src/material/form-field/form-field.md"
       ],
-      "patch_sha256": "20141f8c1793be614e44af2d7f6b3e2bf93360c7e5fce0dde445b88cd9702cd7",
-      "patch_bytes": 605,
-      "disposition": "irrelevant",
-      "evidence": "Inspected upstream patch content (sha256=20141f8c1793be614e44af2d7f6b3e2bf93360c7e5fce0dde445b88cd9702cd7, bytes=605). Changed paths: src/material/bottom-sheet/bottom-sheet-config.ts. Comment-only panelClass wording edit in current Material bottom-sheet-config.ts. This package does not ship that TypeScript source; companion bottom-sheet coverage is Sass bridge/theme only. Irrelevant to retained legacy product behavior."
+      "patch_sha256": "428c7c9acd4ce0844bcd550f92fa2105ded032239033072d613cf6464c1c000a",
+      "patch_bytes": 1401,
+      "disposition": "not-applicable",
+      "evidence": "Inspected upstream patch content (sha256=428c7c9acd4ce0844bcd550f92fa2105ded032239033072d613cf6464c1c000a, bytes=1401). Changed paths: src/material/chips/chip-text-control.ts, src/material/form-field/form-field.md. Renames comment/docs references from mat-chip-list to mat-chip-grid in current Material chip-text-control.ts and form-field.md. Owned legacy-chips chip-text-control and chip-list APIs intentionally retain mat-chip-list wording for the historical legacy control. The rename is not applicable to retained legacy product behavior."
     },
     {
-      "sha": "0c0b033fb256e26c409899ce7b4325f162a6ed2d",
-      "subject": "docs(material/datepicker): fixed typo in ssrSafeIsHTMLTextAreaElement function description (#33107)",
+      "sha": "0cd258fb6b1cbaf12191ab198ce99a6b4126d832",
+      "subject": "docs(material/slider): Update description for color input description on API page (#29335)",
       "files": [
-        "src/material/datepicker/aria-accessible-name.ts"
+        "src/material/slider/slider.ts"
       ],
-      "patch_sha256": "b3f7e90980bf3b0cfc4847ce53c25880f96a34e0778d12999f42cd05a02e0148",
-      "patch_bytes": 684,
-      "disposition": "irrelevant",
-      "evidence": "Inspected upstream patch content (sha256=b3f7e90980bf3b0cfc4847ce53c25880f96a34e0778d12999f42cd05a02e0148, bytes=684). Changed paths: src/material/datepicker/aria-accessible-name.ts. Comment-only typo fix (funciton\u2192function) in current Material datepicker aria helper. This package does not ship that TypeScript source; companion datepicker coverage is Sass bridge/theme only. Irrelevant to retained legacy product behavior."
+      "patch_sha256": "4243337ffebd3fb2aba872f0b096e5611f425f0d85142553c5e31ab17f1ca102",
+      "patch_bytes": 659,
+      "disposition": "not-applicable",
+      "evidence": "Inspected upstream patch content (sha256=4243337ffebd3fb2aba872f0b096e5611f425f0d85142553c5e31ab17f1ca102, bytes=659). Changed paths: src/material/slider/slider.ts. Expands current Material slider color @Input JSDoc with an M3-themes-have-no-effect disclaimer and M3 color-variant link. Owned legacy-slider / CanColor mixin retain the historical M2 wording \"Theme color palette for the component.\" Legacy controls use the package M2 theme model; the current-Material M3 color-variant disclaimer is not applicable."
     },
     {
-      "sha": "a0fc66f6d2a379d42ea05d0673fa77488b2b0fe3",
-      "subject": "docs(material/icon): #29838 update broken link in icon documentation (#29849)",
+      "sha": "701c4fda774e0736c47f61e89cfab5218f62eb59",
+      "subject": "docs(material/list): Update description for color input description on API page (#29327)",
       "files": [
-        "src/material/icon/icon.ts"
+        "src/material/list/list-option.ts"
       ],
-      "patch_sha256": "61f715050511f62f32777685dafe2c16b53b3c4ae4a090972caf22f22dcf2890",
-      "patch_bytes": 706,
-      "disposition": "irrelevant",
-      "evidence": "Inspected upstream patch content (sha256=61f715050511f62f32777685dafe2c16b53b3c4ae4a090972caf22f22dcf2890, bytes=706). Changed paths: src/material/icon/icon.ts. Comment-only documentation URL update in current Material icon.ts. This package does not ship that TypeScript source; companion icon coverage is Sass bridge/theme only. Irrelevant to retained legacy product behavior."
-    },
-    {
-      "sha": "39b15dcc527f054733eaaa5916d51a77bb53fb61",
-      "subject": "docs(material/datepicker): Added context to docs for date picker null value #29385 (#29387)",
-      "files": [
-        "src/material/datepicker/datepicker-input-base.ts"
-      ],
-      "patch_sha256": "56bd388badd5a036b30fa7ee74ab74d52fc552904fdd632867fd910b8560930b",
-      "patch_bytes": 752,
-      "disposition": "irrelevant",
-      "evidence": "Inspected upstream patch content (sha256=56bd388badd5a036b30fa7ee74ab74d52fc552904fdd632867fd910b8560930b, bytes=752). Changed paths: src/material/datepicker/datepicker-input-base.ts. Comment-only JSDoc expansion on DateFilterFn in current Material datepicker-input-base.ts. This package does not ship that TypeScript source; companion datepicker coverage is Sass bridge/theme only. Irrelevant to retained legacy product behavior."
-    },
-    {
-      "sha": "d15df24d3554b5c3d8e5e130f4af72b5862b9dd6",
-      "subject": "docs(material/badge): minor doc fixes (#29233)",
-      "files": [
-        "src/components-examples/material/badge/badge-overview/badge-overview-example.html",
-        "src/material/badge/badge.md",
-        "src/material/badge/badge.ts"
-      ],
-      "patch_sha256": "d2277390b9b562c459ad6395ddc9fa01382dad0fa57dcdbdc4eef42b59cab9c0",
-      "patch_bytes": 4853,
-      "disposition": "irrelevant",
-      "evidence": "Inspected upstream patch content (sha256=d2277390b9b562c459ad6395ddc9fa01382dad0fa57dcdbdc4eef42b59cab9c0, bytes=4853). Changed paths: src/components-examples/material/badge/badge-overview/badge-overview-example.html, src/material/badge/badge.md, src/material/badge/badge.ts. Docs/examples plus comment-only M3 theming note on current Material badge.ts. This package does not ship badge TypeScript or Material badge.md / components-examples; companion badge coverage is Sass bridge/theme only. Irrelevant to retained legacy product behavior."
-    },
-    {
-      "sha": "f6151612ab1c2b3c35d8c6501e2770aeb2f65a8a",
-      "subject": "docs(material/icon): Update docs and examples (#29260)",
-      "files": [
-        "src/components-examples/material/icon/icon-harness/icon-harness-example.ts",
-        "src/components-examples/material/icon/icon-overview/icon-overview-example.ts",
-        "src/components-examples/material/icon/icon-svg/icon-svg-example.ts",
-        "src/material/icon/icon.md",
-        "src/material/icon/icon.ts"
-      ],
-      "patch_sha256": "2a53e999a81c7f1e18cd6c85fe2ac6eab6ea43068896c95e0e65d5ae159a8c56",
-      "patch_bytes": 5383,
-      "disposition": "irrelevant",
-      "evidence": "Inspected upstream patch content (sha256=2a53e999a81c7f1e18cd6c85fe2ac6eab6ea43068896c95e0e65d5ae159a8c56, bytes=5383). Changed paths: src/components-examples/material/icon/icon-harness/icon-harness-example.ts, src/components-examples/material/icon/icon-overview/icon-overview-example.ts, src/components-examples/material/icon/icon-svg/icon-svg-example.ts, src/material/icon/icon.md, src/material/icon/icon.ts. Docs/examples plus comment-only M3 color notes on current Material icon.ts. This package does not ship icon TypeScript or Material icon.md / components-examples; companion icon coverage is Sass bridge/theme only. Irrelevant to retained legacy product behavior."
+      "patch_sha256": "5d668a54601a107fbdc7598d4eb8ffcc29a3e1a299bfd6fddc44193ee36dfcec",
+      "patch_bytes": 837,
+      "disposition": "not-applicable",
+      "evidence": "Inspected upstream patch content (sha256=5d668a54601a107fbdc7598d4eb8ffcc29a3e1a299bfd6fddc44193ee36dfcec, bytes=837). Changed paths: src/material/list/list-option.ts. Expands current Material list-option color @Input JSDoc with an M3-themes-have-no-effect disclaimer. Owned legacy-list selection-list color docs retain historical M2 ThemePalette wording without that M3 disclaimer. The current-Material M3 color-variant JSDoc is not applicable to retained legacy product behavior."
     }
   ],
   "limitations": [
-    "Closed 6 additional needs-triage companion docs rows this batch; bucket remains largely unread.",
+    "Closed 6 fail-closed needs-triage rows this batch; bucket remains largely unread.",
     "Does not claim G11."
   ]
 }
