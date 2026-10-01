@@ -300,7 +300,7 @@ def main() -> int:
     results["companion-computed-styles"] = "pass" if code == 0 else "fail"
     implemented_ran.append("companion-computed-styles")
 
-    # browser-matrix: real Chromium dialog/select PR-slice + dialog CSP-nonce; not the full matrix.
+    # browser-matrix: Chromium dialog/select + overlay families PR-slice; not the full matrix.
     code = run_node("scripts/run-browser-matrix-slice.mjs", ["--run", str(run_path)])
     browser_detail = ROOT / "compatibility/rc/reports/browser-matrix-slice.json"
     if browser_detail.is_file():
@@ -313,8 +313,8 @@ def main() -> int:
         "browser-matrix",
         exit_code=code,
         limitations=[
-            "Executes dialog/select Chromium PR-slice plus dialog CSP-nonce; does not fan out to unexecuted cells.",
-            "Firefox/WebKit, remaining families, SSR, enabled-motion, and non-dialog CSP remain not-executed.",
+            "Executes dialog/select (zoneful/zoneless/CSP/reduced-motion) plus menu/snack-bar/tooltip/autocomplete/tabs defaults; does not fan out to unexecuted cells.",
+            "Firefox/WebKit, remaining families/states, SSR, enabled-motion, and other CSP remain not-executed.",
             "Does not claim G10.",
         ],
     )

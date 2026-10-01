@@ -3,9 +3,9 @@
  * Execute a real Chromium browser slice against a packed artifact and credit
  * only the declared matrix cells that actually ran.
  *
- * PR-stage dialog family, Chromium, main line, zoneful + zoneless, default
- * state, plus reduced-motion evidence. Does not fan success into unexecuted
- * engines/families. Does not claim G10.
+ * PR-stage Chromium main-line slice: dialog/select (zoneful/zoneless/CSP/
+ * reduced-motion) plus menu/snack-bar/tooltip/autocomplete/tabs defaults.
+ * Does not fan success into unexecuted engines/families. Does not claim G10.
  *
  *   node scripts/run-browser-matrix-slice.mjs --tarball <path>
  *   node scripts/run-browser-matrix-slice.mjs --run <run.json>
@@ -48,12 +48,14 @@ const tarballSha = sha256File(tarball);
 const scenarios = [
   {
     id: 'dialog-escape-zoneful',
+    script: 'scripts/browser-dialog-escape.mjs',
     args: [],
     cells: [
       'pr/main/chromium/zoneful/dialog/default',
       'pr/main/chromium/zoneful/dialog/focused',
       'pr/main/chromium/zoneful/select/default',
     ],
+    detail: 'compatibility/rc/reports/browser-dialog-escape.json',
     require: report => report.opened && report.closed_by_escape
       && report.focus_restored_to_open_button
       && report.select_panel_opened && report.select_panel_closed_by_escape
@@ -62,22 +64,26 @@ const scenarios = [
   },
   {
     id: 'dialog-reduced-motion',
+    script: 'scripts/browser-dialog-escape.mjs',
     args: ['--reduced-motion'],
     cells: [
       'pr/main/chromium/zoneful/dialog/default',
     ],
     credit_as: 'reduced-motion-overlay',
+    detail: 'compatibility/rc/reports/browser-dialog-reduced-motion.json',
     require: report => report.opened && report.closed_by_escape
       && report.dialog_noop_under_reduced_motion === true
       && !report.error,
   },
   {
     id: 'dialog-zoneless',
+    script: 'scripts/browser-dialog-escape.mjs',
     args: ['--zoneless'],
     cells: [
       'pr/main/chromium/zoneless/dialog/default',
       'pr/main/chromium/zoneless/select/default',
     ],
+    detail: 'compatibility/rc/reports/browser-dialog-zoneless.json',
     require: report => report.opened && report.closed_by_escape
       && report.bundle_has_zone === false
       && (report.zone_global === false || report.zone_global === 'undefined' || report.zone_global == null)
@@ -85,15 +91,40 @@ const scenarios = [
   },
   {
     id: 'dialog-csp-nonce',
+    script: 'scripts/browser-dialog-escape.mjs',
     args: ['--csp'],
     cells: [
       'pr/main/chromium/zoneful/dialog/csp-nonce',
     ],
     credit_as: 'csp-nonce-dialog',
+    detail: 'compatibility/rc/reports/browser-dialog-csp.json',
     require: report => report.missing_nonce_detected === true
       && report.dialog_opened_with_nonce === true
       && report.nonce_clean === true
       && report.styles_with_nonce > 0
+      && !report.error,
+  },
+  {
+    id: 'overlay-families-zoneful',
+    script: 'scripts/browser-overlay-families.mjs',
+    args: [],
+    cells: [
+      'pr/main/chromium/zoneful/menu/default',
+      'pr/main/chromium/zoneful/snack-bar/default',
+      'pr/main/chromium/zoneful/tooltip/default',
+      'pr/main/chromium/zoneful/autocomplete/default',
+      'pr/main/chromium/zoneful/tabs/default',
+    ],
+    detail: 'compatibility/rc/reports/browser-overlay-families.json',
+    require: report => Array.isArray(report.credited_cell_ids)
+      && report.credited_cell_ids.length >= 5
+      && report.families?.menu?.opened
+      && report.families?.menu?.closed_by_escape
+      && report.families?.['snack-bar']?.opened
+      && report.families?.['snack-bar']?.dismissed
+      && report.families?.tooltip?.shown
+      && report.families?.autocomplete?.panel_opened
+      && report.families?.tabs?.second_selected
       && !report.error,
   },
 ];
@@ -102,21 +133,17 @@ const executed = [];
 const failed = [];
 const scenarioResults = [];
 
+const nodeArgs = typeof globalThis.WebSocket === 'function'
+  ? []
+  : ['--experimental-websocket'];
+
 for (const scenario of scenarios) {
   const result = spawnSync(
     process.execPath,
-    [join(root, 'scripts/browser-dialog-escape.mjs'), '--tarball', tarball, ...scenario.args],
+    [...nodeArgs, join(root, scenario.script), '--tarball', tarball, ...scenario.args],
     {cwd: root, encoding: 'utf8', timeout: 300000, env: {...process.env, NODE_PATH: '', NODE_OPTIONS: ''}},
   );
-  // browser-dialog-escape writes different report paths per flag
-  let detailPath = join(root, 'compatibility/rc/reports/browser-dialog-escape.json');
-  if (scenario.args.includes('--reduced-motion')) {
-    detailPath = join(root, 'compatibility/rc/reports/browser-dialog-reduced-motion.json');
-  } else if (scenario.args.includes('--zoneless')) {
-    detailPath = join(root, 'compatibility/rc/reports/browser-dialog-zoneless.json');
-  } else if (scenario.args.includes('--csp')) {
-    detailPath = join(root, 'compatibility/rc/reports/browser-dialog-csp.json');
-  }
+  const detailPath = join(root, scenario.detail);
   let detail = null;
   if (existsSync(detailPath)) {
     detail = JSON.parse(readFileSync(detailPath, 'utf8'));
@@ -134,9 +161,6 @@ for (const scenario of scenarios) {
   scenarioResults.push(entry);
   if (ok) {
     for (const cellId of scenario.cells) {
-      if (!matrix.required_ids.includes(cellId) && !matrix.required_ids?.includes?.(cellId)) {
-        // Still record; declare-browser-matrix may use required_ids array.
-      }
       executed.push(cellId);
     }
   } else {
@@ -165,8 +189,8 @@ const report = {
   result: ok ? 'pass' : 'fail',
   matrix_updated: false,
   limitations: [
-    'Only the dialog/select Chromium PR-slice plus dialog CSP-nonce above was executed.',
-    'Firefox/WebKit, remaining families/states, SSR, enabled-motion, and non-dialog CSP cells stay not-executed.',
+    'Chromium PR-slice: dialog/select (zoneful/zoneless/CSP/reduced-motion) plus menu/snack-bar/tooltip/autocomplete/tabs defaults.',
+    'Firefox/WebKit, remaining families/states, SSR, enabled-motion, and other CSP cells stay not-executed.',
     'Success is not copied to unexecuted cells.',
     'Does not claim G10.',
   ],

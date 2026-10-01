@@ -231,7 +231,7 @@ const pageUrl = `http://127.0.0.1:${port}/${csp ? 'missing.html' : ''}`;
 const chromeDir = mkdtempSync(join(tmpdir(), 'ngx-compat-chrome-'));
 const chrome = spawn(chromeBin, [
   '--headless=new',
-  '--remote-debugging-port=9333',
+  '--remote-debugging-port=0',
   '--user-data-dir=' + chromeDir,
   '--no-sandbox',
   '--disable-gpu',
@@ -246,17 +246,27 @@ async function jsonGet(url) {
   if (!response.ok) throw new Error(`${url} ${response.status}`);
   return response.json();
 }
+let debugPort = null;
+for (let i = 0; i < 50 && debugPort == null; i += 1) {
+  const active = join(chromeDir, 'DevToolsActivePort');
+  if (existsSync(active)) {
+    const lines = readFileSync(active, 'utf8').trim().split(/\r?\n/);
+    if (lines[0] && /^\d+$/.test(lines[0])) debugPort = Number(lines[0]);
+  }
+  if (debugPort == null) await sleep(100);
+}
+if (debugPort == null) fail(1, `Chromium did not write DevToolsActivePort\n${chromeLog.slice(-1000)}`);
 let version = null;
 for (let i = 0; i < 50; i += 1) {
   try {
-    version = await jsonGet('http://127.0.0.1:9333/json/version');
+    version = await jsonGet(`http://127.0.0.1:${debugPort}/json/version`);
     break;
   } catch {
     await sleep(100);
   }
 }
 if (!version) fail(1, `Chromium did not open a debugging port\n${chromeLog.slice(-1000)}`);
-const targets = await jsonGet('http://127.0.0.1:9333/json/list');
+const targets = await jsonGet(`http://127.0.0.1:${debugPort}/json/list`);
 const page = targets.find(target => target.type === 'page');
 if (!page) fail(1, 'Chromium opened no page');
 const ws = new WebSocket(page.webSocketDebuggerUrl);

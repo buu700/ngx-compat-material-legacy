@@ -3,7 +3,7 @@
   "role": "executed browser matrix slice (not full matrix)",
   "check_id": "browser-matrix",
   "run_id": null,
-  "tarball_sha256": "bb3b6a60b5cd90bf3c937abe95beea5fddb50d20fdedc0b1851333fb97705948",
+  "tarball_sha256": "5f12ddc114639bd36bf5b62bebea95f1711bc1f9401c12588cb2e234edab6e79",
   "declared_cell_count": 3588,
   "declared_required_count": 3140,
   "executed_cell_ids": [
@@ -12,9 +12,14 @@
     "pr/main/chromium/zoneful/select/default",
     "pr/main/chromium/zoneless/dialog/default",
     "pr/main/chromium/zoneless/select/default",
-    "pr/main/chromium/zoneful/dialog/csp-nonce"
+    "pr/main/chromium/zoneful/dialog/csp-nonce",
+    "pr/main/chromium/zoneful/menu/default",
+    "pr/main/chromium/zoneful/snack-bar/default",
+    "pr/main/chromium/zoneful/tooltip/default",
+    "pr/main/chromium/zoneful/autocomplete/default",
+    "pr/main/chromium/zoneful/tabs/default"
   ],
-  "executed_count": 6,
+  "executed_count": 11,
   "failed_scenarios": [],
   "scenario_results": [
     {
@@ -63,14 +68,29 @@
       "credit_as": "csp-nonce-dialog",
       "detail_report": "/workspace/ngx-compat/material/compatibility/rc/reports/browser-dialog-csp.json",
       "stderr_tail": ""
+    },
+    {
+      "scenario": "overlay-families-zoneful",
+      "exit_code": 0,
+      "ok": true,
+      "cells": [
+        "pr/main/chromium/zoneful/menu/default",
+        "pr/main/chromium/zoneful/snack-bar/default",
+        "pr/main/chromium/zoneful/tooltip/default",
+        "pr/main/chromium/zoneful/autocomplete/default",
+        "pr/main/chromium/zoneful/tabs/default"
+      ],
+      "credit_as": null,
+      "detail_report": "/workspace/ngx-compat/material/compatibility/rc/reports/browser-overlay-families.json",
+      "stderr_tail": ""
     }
   ],
   "unknown_credited_cells": [],
   "result": "pass",
   "matrix_updated": false,
   "limitations": [
-    "Only the dialog/select Chromium PR-slice plus dialog CSP-nonce above was executed.",
-    "Firefox/WebKit, remaining families/states, SSR, enabled-motion, and non-dialog CSP cells stay not-executed.",
+    "Chromium PR-slice: dialog/select (zoneful/zoneless/CSP/reduced-motion) plus menu/snack-bar/tooltip/autocomplete/tabs defaults.",
+    "Firefox/WebKit, remaining families/states, SSR, enabled-motion, and other CSP cells stay not-executed.",
     "Success is not copied to unexecuted cells.",
     "Does not claim G10."
   ]
