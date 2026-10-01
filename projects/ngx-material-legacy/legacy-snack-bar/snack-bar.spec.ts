@@ -645,9 +645,11 @@ describe('MatSnackBar', () => {
   it('should cap the timeout to the maximum accepted delay in setTimeout', fakeAsync(() => {
     const config = new MatLegacySnackBarConfig();
     config.duration = Infinity;
+    // Spy before open so noop-animation sync afterOpened still records the capped timer
+    // (Material-current async suite spies before open for the same reason).
+    spyOn(window, 'setTimeout').and.callThrough();
     snackBar.open('content', 'test', config);
     viewContainerFixture.detectChanges();
-    spyOn(window, 'setTimeout').and.callThrough();
     tick(100);
 
     expect(window.setTimeout).toHaveBeenCalledWith(jasmine.any(Function), Math.pow(2, 31) - 1);

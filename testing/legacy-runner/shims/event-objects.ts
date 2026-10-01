@@ -47,7 +47,8 @@ export function createMouseEvent(
     shiftKey: modifiers.shift,
     metaKey: modifiers.meta,
     button: button,
-    buttons: 1,
+    // Match the pressed button bit so right/middle clicks are not reported as primary.
+    buttons: button === 0 ? 1 : 1 << button,
   });
 
   // The `MouseEvent` constructor doesn't allow us to pass these properties into the constructor.

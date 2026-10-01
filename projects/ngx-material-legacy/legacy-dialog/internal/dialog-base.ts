@@ -114,7 +114,7 @@ export abstract class _MatDialogBase<C extends _MatDialogContainerBase> implemen
     config?: MatDialogConfig<D>,
   ): MatLegacyDialogRef<T, R> {
     let dialogRef: MatLegacyDialogRef<T, R>;
-    config = {...(this._defaultOptions || new MatDialogConfig()), ...config};
+    config = {...(this._defaultOptions || new this.dialogConfigClass()), ...config};
     config.id = config.id || `${this._idPrefix}${uniqueId++}`;
     config.scrollStrategy = config.scrollStrategy || this._scrollStrategy();
 

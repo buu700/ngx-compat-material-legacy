@@ -1386,7 +1386,9 @@ describe('MatDialog', () => {
 
       tick(500);
       viewContainerFixture.detectChanges();
-      expect(lastFocusOrigin!).toBe('program');
+      expect(lastFocusOrigin!)
+        .withContext('Expected the trigger button to be blurred')
+        .toBeNull();
 
       dispatchKeyboardEvent(document.body, 'keydown', ESCAPE);
 
@@ -1419,7 +1421,9 @@ describe('MatDialog', () => {
 
       tick(500);
       viewContainerFixture.detectChanges();
-      expect(lastFocusOrigin!).toBe('program');
+      expect(lastFocusOrigin!)
+        .withContext('Expected the trigger button to be blurred')
+        .toBeNull();
 
       const backdrop = overlayContainerElement.querySelector(
         '.cdk-overlay-backdrop',

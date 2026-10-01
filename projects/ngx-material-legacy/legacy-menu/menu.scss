@@ -15,7 +15,10 @@ mat-menu {
 
 .mat-menu-panel {
   @include menu-common.base();
-  max-height: calc(100vh - #{menu-common.$item-height});
+  // Match current Material panel sizing: allow filling the viewport when the
+  // overlay strategy pushes the panel to the top edge (historical tests assert
+  // panel.bottom === viewport height). Keep a small gutter via 100vh alone.
+  max-height: 100vh;
   border-radius: $border-radius;
   outline: 0;
 

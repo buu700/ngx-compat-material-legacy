@@ -10,10 +10,12 @@ import {OverlayModule} from '@angular/cdk/overlay';
 import {PortalModule} from '@angular/cdk/portal';
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
+import {MAT_SNACK_BAR_DEFAULT_OPTIONS} from '@angular/material/snack-bar';
 import {MatCommonModule} from './internal/common-module';
 import {MatLegacyButtonModule} from '@ngx-compat/material-legacy/legacy-button';
 import {LegacySimpleSnackBar} from './simple-snack-bar';
 import {MatLegacySnackBarContainer} from './snack-bar-container';
+import {MAT_SNACK_BAR_DEFAULT_OPTIONS_FACTORY} from './internal/snack-bar-base';
 
 /**
  * @deprecated Use `MatSnackBarModule` from `@angular/material/snack-bar` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
@@ -23,5 +25,11 @@ import {MatLegacySnackBarContainer} from './snack-bar-container';
   imports: [OverlayModule, PortalModule, CommonModule, MatLegacyButtonModule, MatCommonModule],
   exports: [MatLegacySnackBarContainer, MatCommonModule],
   declarations: [MatLegacySnackBarContainer, LegacySimpleSnackBar],
+  providers: [
+    {
+      provide: MAT_SNACK_BAR_DEFAULT_OPTIONS,
+      useFactory: MAT_SNACK_BAR_DEFAULT_OPTIONS_FACTORY,
+    },
+  ],
 })
 export class MatLegacySnackBarModule {}

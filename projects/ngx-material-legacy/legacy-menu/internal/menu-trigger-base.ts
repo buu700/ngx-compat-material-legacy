@@ -334,9 +334,10 @@ export abstract class _MatMenuTriggerBase implements AfterContentInit, OnDestroy
     this._closingActionsSubscription = this._menuClosingActions().subscribe(() => this.closeMenu());
     this._initMenu(menu);
 
-    if (menu instanceof _MatMenuBase) {
-      menu._startAnimation();
-      menu._directDescendantItems.changes.pipe(takeUntil(menu.close)).subscribe(() => {
+    if (typeof (menu as _MatMenuBase)._startAnimation === 'function') {
+      const materialMenu = menu as _MatMenuBase;
+      materialMenu._startAnimation();
+      materialMenu._directDescendantItems.changes.pipe(takeUntil(materialMenu.close)).subscribe(() => {
         // Re-adjust the position without locking when the amount of items
         // changes so that the overlay is allowed to pick a new optimal position.
         positionStrategy.withLockedPosition(false).reapplyLastPosition();
@@ -384,7 +385,10 @@ export abstract class _MatMenuTriggerBase implements AfterContentInit, OnDestroy
     // from making it back to the root trigger when closing a long chain of menus by clicking
     // on the backdrop.
     if (this.restoreFocus && (reason === 'keydown' || !this._openedBy || !this.triggersSubmenu())) {
-      this.focus(this._openedBy);
+      // Fall back to program like focusFirstItem when open was not from mouse/touch
+      // (e.g. click after a non-primary mousedown). Native focus() can otherwise
+      // inherit a stale FocusMonitor mouse origin from that mousedown.
+      this.focus(this._openedBy || 'program');
     }
 
     this._openedBy = undefined;

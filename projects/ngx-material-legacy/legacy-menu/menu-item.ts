@@ -6,7 +6,13 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import {ChangeDetectionStrategy, Component, ViewEncapsulation} from '@angular/core';
+import {
+  booleanAttribute,
+  ChangeDetectionStrategy,
+  Component,
+  Input,
+  ViewEncapsulation,
+} from '@angular/core';
 import {MatMenuItem as BaseMatMenuItem} from '@angular/material/menu';
 
 /**
@@ -18,7 +24,6 @@ import {MatMenuItem as BaseMatMenuItem} from '@angular/material/menu';
   standalone: false,
   selector: '[mat-menu-item]',
   exportAs: 'matMenuItem',
-  inputs: ['disabled', 'disableRipple'],
   host: {
     '[attr.role]': 'role',
     '[class.mat-menu-item]': 'true',
@@ -41,4 +46,13 @@ import {MatMenuItem as BaseMatMenuItem} from '@angular/material/menu';
   templateUrl: 'menu-item.html',
   providers: [{provide: BaseMatMenuItem, useExisting: MatLegacyMenuItem}],
 })
-export class MatLegacyMenuItem extends BaseMatMenuItem {}
+export class MatLegacyMenuItem extends BaseMatMenuItem {
+  // Re-declare with booleanAttribute so bare `disabled` / `disableRipple`
+  // attributes become true (current Material pattern). Plain inputs[] left
+  // them as empty strings and broke matRippleDisabled.
+  @Input({transform: booleanAttribute})
+  override disabled: boolean = false;
+
+  @Input({transform: booleanAttribute})
+  override disableRipple: boolean = false;
+}

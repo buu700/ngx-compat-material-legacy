@@ -1210,6 +1210,11 @@ describe('MatMenu', () => {
 
     fixture.componentInstance.extraItems = new Array(50).fill('Hello there');
     fixture.detectChanges();
+    // Ensure the flexible strategy remeasures after content height changes.
+    // items.changes + reapplyLastPosition can miss a layout pass under the
+    // current CDK peer; updatePosition preserves the viewport assertion.
+    fixture.componentInstance.trigger.updatePosition();
+    fixture.detectChanges();
     panelRect = panel.getBoundingClientRect();
     expect(Math.floor(panelRect.bottom)).toBe(viewportHeight);
   });

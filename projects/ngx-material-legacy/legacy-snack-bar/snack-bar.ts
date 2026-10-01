@@ -12,7 +12,10 @@ import {Overlay} from '@angular/cdk/overlay';
 import {Inject, Injectable, Injector, Optional, SkipSelf} from '@angular/core';
 import {LegacySimpleSnackBar} from './simple-snack-bar';
 import {MAT_SNACK_BAR_DEFAULT_OPTIONS, MatSnackBarConfig} from '@angular/material/snack-bar';
-import {_MatSnackBarBase} from './internal/snack-bar-base';
+import {
+  _MatSnackBarBase,
+  MAT_SNACK_BAR_DEFAULT_OPTIONS_FACTORY,
+} from './internal/snack-bar-base';
 import {MatLegacySnackBarContainer} from './snack-bar-container';
 import {MatLegacySnackBarModule} from './snack-bar-module';
 
