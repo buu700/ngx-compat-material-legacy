@@ -250,8 +250,9 @@ describe('MatInput without forms', () => {
       try {
         fixture.detectChanges();
         flush();
-      } catch {
+      } catch (e) {
         flush();
+        throw e;
       }
     }).toThrowError(wrappedErrorMessage(getMatLegacyFormFieldDuplicatedHintError('start')));
   }));
@@ -263,8 +264,9 @@ describe('MatInput without forms', () => {
       try {
         fixture.detectChanges();
         flush();
-      } catch {
+      } catch (e) {
         flush();
+        throw e;
       }
     }).toThrowError(wrappedErrorMessage(getMatLegacyFormFieldDuplicatedHintError('start')));
   }));
@@ -276,8 +278,9 @@ describe('MatInput without forms', () => {
       try {
         fixture.detectChanges();
         flush();
-      } catch {
+      } catch (e) {
         flush();
+        throw e;
       }
     }).toThrowError(wrappedErrorMessage(getMatLegacyFormFieldPlaceholderConflictError()));
   }));

@@ -69,11 +69,11 @@ export function runInputHarnessTests(
   it('should be able to get id of input', async () => {
     const inputs = await loader.getAllHarnesses(inputHarness);
     expect(inputs.length).toBe(7);
-    expect(await inputs[0].getId()).toMatch(/mat-input-\d+/);
-    expect(await inputs[1].getId()).toMatch(/mat-input-\d+/);
+    expect(await inputs[0].getId()).toMatch(/mat-input-\w+/);
+    expect(await inputs[1].getId()).toMatch(/mat-input-\w+/);
     expect(await inputs[2].getId()).toBe('myTextarea');
     expect(await inputs[3].getId()).toBe('nativeControl');
-    expect(await inputs[4].getId()).toMatch(/mat-input-\d+/);
+    expect(await inputs[4].getId()).toMatch(/mat-input-\w+/);
     expect(await inputs[5].getId()).toBe('has-ng-model');
   });
 

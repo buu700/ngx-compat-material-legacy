@@ -31,7 +31,7 @@ import {
 import {ThemePalette} from '@angular/material/core';
 import {CanColor, mixinColor} from './internal/common-behaviors';
 import {fromEvent, merge, Subject} from 'rxjs';
-import {startWith, take, takeUntil} from 'rxjs/operators';
+import {take, takeUntil} from 'rxjs/operators';
 import {MatLegacyError} from './error';
 import {_MAT_LEGACY_HINT, MatLegacyHint} from './hint';
 import {MatLegacyLabel} from './label';
@@ -345,11 +345,15 @@ export class MatLegacyFormField
     }
 
     // Subscribe to changes in the child control state in order to update the form field UI.
-    control.stateChanges.pipe(startWith(null)).subscribe(() => {
+    // Initial validation runs outside subscribe so RxJS does not swallow synchronous throws
+    // (current Material form-field uses the same pattern).
+    control.stateChanges.subscribe(() => {
       this._validatePlaceholders();
       this._syncDescribedByIds();
       this._changeDetectorRef.markForCheck();
     });
+    this._validatePlaceholders();
+    this._syncDescribedByIds();
 
     // Run change detection if the value changes.
     if (control.ngControl && control.ngControl.valueChanges) {
@@ -376,16 +380,18 @@ export class MatLegacyFormField
     });
 
     // Re-validate when the number of hints changes.
-    this._hintChildren.changes.pipe(startWith(null)).subscribe(() => {
+    this._hintChildren.changes.subscribe(() => {
       this._processHints();
       this._changeDetectorRef.markForCheck();
     });
+    this._processHints();
 
     // Update the aria-described by when the number of errors changes.
-    this._errorChildren.changes.pipe(startWith(null)).subscribe(() => {
+    this._errorChildren.changes.subscribe(() => {
       this._syncDescribedByIds();
       this._changeDetectorRef.markForCheck();
     });
+    this._syncDescribedByIds();
 
     if (this._dir) {
       this._dir.change.pipe(takeUntil(this._destroyed)).subscribe(() => {
