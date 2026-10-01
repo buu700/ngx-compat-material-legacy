@@ -6,9 +6,9 @@
  * PR-stage Chromium main-line slice: dialog/select (zoneful/zoneless/CSP/
  * reduced-motion), menu/snack-bar/tooltip/autocomplete/tabs defaults
  * (zoneful and zoneless), chips/form-field defaults (zoneful and
- * zoneless), plus input/list/slider default+focused/disabled (zoneful and
- * zoneless). Does not fan success into unexecuted engines/families. Does
- * not claim G10.
+ * zoneless), plus input/list/slider/radio/checkbox/slide-toggle
+ * default+focused/disabled (zoneful and zoneless). Does not fan success
+ * into unexecuted engines/families. Does not claim G10.
  *
  *   node scripts/run-browser-matrix-slice.mjs --tarball <path>
  *   node scripts/run-browser-matrix-slice.mjs --run <run.json>
@@ -210,10 +210,16 @@ const scenarios = [
       'pr/main/chromium/zoneful/list/disabled',
       'pr/main/chromium/zoneful/slider/default',
       'pr/main/chromium/zoneful/slider/disabled',
+      'pr/main/chromium/zoneful/radio/default',
+      'pr/main/chromium/zoneful/radio/disabled',
+      'pr/main/chromium/zoneful/checkbox/default',
+      'pr/main/chromium/zoneful/checkbox/disabled',
+      'pr/main/chromium/zoneful/slide-toggle/default',
+      'pr/main/chromium/zoneful/slide-toggle/disabled',
     ],
     detail: 'compatibility/rc/reports/browser-control-families.json',
     require: report => Array.isArray(report.credited_cell_ids)
-      && report.credited_cell_ids.length >= 6
+      && report.credited_cell_ids.length >= 12
       && report.families?.input?.present
       && report.families?.input?.focused
       && report.families?.list?.present
@@ -221,6 +227,12 @@ const scenarios = [
       && report.families?.slider?.present
       && report.families?.slider?.disabled_class
       && report.families?.slider?.value_reflected
+      && report.families?.radio?.present
+      && report.families?.radio?.disabled_class
+      && report.families?.checkbox?.present
+      && report.families?.checkbox?.disabled_class
+      && report.families?.['slide-toggle']?.present
+      && report.families?.['slide-toggle']?.disabled_class
       && !report.error,
   },
   {
@@ -234,10 +246,16 @@ const scenarios = [
       'pr/main/chromium/zoneless/list/disabled',
       'pr/main/chromium/zoneless/slider/default',
       'pr/main/chromium/zoneless/slider/disabled',
+      'pr/main/chromium/zoneless/radio/default',
+      'pr/main/chromium/zoneless/radio/disabled',
+      'pr/main/chromium/zoneless/checkbox/default',
+      'pr/main/chromium/zoneless/checkbox/disabled',
+      'pr/main/chromium/zoneless/slide-toggle/default',
+      'pr/main/chromium/zoneless/slide-toggle/disabled',
     ],
     detail: 'compatibility/rc/reports/browser-control-families-zoneless.json',
     require: report => Array.isArray(report.credited_cell_ids)
-      && report.credited_cell_ids.length >= 6
+      && report.credited_cell_ids.length >= 12
       && report.zoneless === true
       && report.bundle_has_zone === false
       && report.zone_global === 'undefined'
@@ -248,6 +266,12 @@ const scenarios = [
       && report.families?.slider?.present
       && report.families?.slider?.disabled_class
       && report.families?.slider?.value_reflected
+      && report.families?.radio?.present
+      && report.families?.radio?.disabled_class
+      && report.families?.checkbox?.present
+      && report.families?.checkbox?.disabled_class
+      && report.families?.['slide-toggle']?.present
+      && report.families?.['slide-toggle']?.disabled_class
       && !report.error,
   },
 ];

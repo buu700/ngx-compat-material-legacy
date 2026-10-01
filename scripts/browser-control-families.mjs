@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 /**
- * Chromium PR-slice for legacy control families: input, list, and slider.
+ * Chromium PR-slice for legacy control families: input, list, slider, radio,
+ * checkbox, and slide-toggle.
  *
- * Asserts honest family/state cells: input default+focused, list default+disabled,
- * slider default+disabled. Supports --zoneless (no Zone.js; provideZoneless
- * ChangeDetection). Does not fan success into unexecuted engines or states.
- * Does not claim G10.
+ * Asserts honest family/state cells: input default+focused, list/slider/radio/
+ * checkbox/slide-toggle default+disabled. Supports --zoneless (no Zone.js;
+ * provideZoneless ChangeDetection). Does not fan success into unexecuted
+ * engines or states. Does not claim G10.
  *
  *   node scripts/browser-control-families.mjs --tarball <path>
  *   node scripts/browser-control-families.mjs --tarball <path> --zoneless
@@ -117,6 +118,9 @@ import {MatLegacyFormFieldModule} from '@ngx-compat/material-legacy/legacy-form-
 import {MatLegacyInputModule} from '@ngx-compat/material-legacy/legacy-input';
 import {MatLegacyListModule} from '@ngx-compat/material-legacy/legacy-list';
 import {MatLegacySliderModule} from '@ngx-compat/material-legacy/legacy-slider';
+import {MatLegacyRadioModule} from '@ngx-compat/material-legacy/legacy-radio';
+import {MatLegacyCheckboxModule} from '@ngx-compat/material-legacy/legacy-checkbox';
+import {MatLegacySlideToggleModule} from '@ngx-compat/material-legacy/legacy-slide-toggle';
 
 @Component({
   standalone: false,
@@ -134,11 +138,29 @@ import {MatLegacySliderModule} from '@ngx-compat/material-legacy/legacy-slider';
 
     <mat-slider id="slider-default" [(ngModel)]="value" min="0" max="100" step="1" thumbLabel></mat-slider>
     <mat-slider id="slider-disabled" [disabled]="true" [value]="25" min="0" max="100"></mat-slider>
+
+    <mat-radio-group id="radio-group-default" [(ngModel)]="radioValue">
+      <mat-radio-button id="radio-a" value="a">Alpha</mat-radio-button>
+      <mat-radio-button id="radio-b" value="b">Beta</mat-radio-button>
+    </mat-radio-group>
+    <mat-radio-group id="radio-group-disabled" [disabled]="true" [(ngModel)]="radioDisabledValue">
+      <mat-radio-button id="radio-disabled" value="x">Disabled</mat-radio-button>
+    </mat-radio-group>
+
+    <mat-checkbox id="checkbox-default" [(ngModel)]="checked">Default</mat-checkbox>
+    <mat-checkbox id="checkbox-disabled" [disabled]="true">Disabled</mat-checkbox>
+
+    <mat-slide-toggle id="toggle-default" [(ngModel)]="toggled">Default</mat-slide-toggle>
+    <mat-slide-toggle id="toggle-disabled" [disabled]="true">Disabled</mat-slide-toggle>
   \`,
 })
 export class LabRoot {
   text = '';
   value = 40;
+  radioValue = 'a';
+  radioDisabledValue = 'x';
+  checked = false;
+  toggled = false;
 }
 
 @NgModule({
@@ -149,6 +171,9 @@ export class LabRoot {
     MatLegacyInputModule,
     MatLegacyListModule,
     MatLegacySliderModule,
+    MatLegacyRadioModule,
+    MatLegacyCheckboxModule,
+    MatLegacySlideToggleModule,
   ],
   declarations: [LabRoot],
   bootstrap: [LabRoot],
@@ -312,6 +337,9 @@ const families = {
   input: {present: false, focused: false},
   list: {present: false, disabled_class: false},
   slider: {present: false, disabled_class: false, value_reflected: false},
+  radio: {present: false, disabled_class: false},
+  checkbox: {present: false, disabled_class: false},
+  'slide-toggle': {present: false, disabled_class: false},
 };
 let error = null;
 let diagnostic = null;
@@ -358,6 +386,24 @@ try {
     '!!document.querySelector("mat-slider#slider-disabled.mat-slider-disabled")',
   );
 
+  // Radio default + disabled state cell.
+  families.radio.present = await waitFor('!!document.querySelector("mat-radio-button#radio-a")');
+  families.radio.disabled_class = await waitFor(
+    '!!document.querySelector("mat-radio-button#radio-disabled.mat-radio-disabled")',
+  );
+
+  // Checkbox default + disabled state cell.
+  families.checkbox.present = await waitFor('!!document.querySelector("mat-checkbox#checkbox-default")');
+  families.checkbox.disabled_class = await waitFor(
+    '!!document.querySelector("mat-checkbox#checkbox-disabled.mat-checkbox-disabled")',
+  );
+
+  // Slide-toggle default + disabled state cell (legacy uses mat-disabled host class).
+  families['slide-toggle'].present = await waitFor('!!document.querySelector("mat-slide-toggle#toggle-default")');
+  families['slide-toggle'].disabled_class = await waitFor(
+    '!!document.querySelector("mat-slide-toggle#toggle-disabled.mat-disabled")',
+  );
+
   zoneGlobal = await evaluate('typeof Zone === "undefined" ? "undefined" : typeof Zone');
 } catch (err) {
   error = String(err);
@@ -375,6 +421,12 @@ const cells = [
   `pr/main/chromium/${runtime}/list/disabled`,
   `pr/main/chromium/${runtime}/slider/default`,
   `pr/main/chromium/${runtime}/slider/disabled`,
+  `pr/main/chromium/${runtime}/radio/default`,
+  `pr/main/chromium/${runtime}/radio/disabled`,
+  `pr/main/chromium/${runtime}/checkbox/default`,
+  `pr/main/chromium/${runtime}/checkbox/disabled`,
+  `pr/main/chromium/${runtime}/slide-toggle/default`,
+  `pr/main/chromium/${runtime}/slide-toggle/disabled`,
 ];
 const zoneOk = zoneless
   ? (zoneGlobal === 'undefined' && bundleHasZone === false)
@@ -384,13 +436,16 @@ const ok =
   && zoneOk
   && families.input.present && families.input.focused
   && families.list.present && families.list.disabled_class
-  && families.slider.present && families.slider.disabled_class && families.slider.value_reflected;
+  && families.slider.present && families.slider.disabled_class && families.slider.value_reflected
+  && families.radio.present && families.radio.disabled_class
+  && families.checkbox.present && families.checkbox.disabled_class
+  && families['slide-toggle'].present && families['slide-toggle'].disabled_class;
 
 const report = {
   schema_version: 1,
   role: zoneless
-    ? 'zoneless Chromium PR-slice for input/list/slider (not full matrix)'
-    : 'Chromium PR-slice for input/list/slider (not full matrix)',
+    ? 'zoneless Chromium PR-slice for input/list/slider/radio/checkbox/slide-toggle (not full matrix)'
+    : 'Chromium PR-slice for input/list/slider/radio/checkbox/slide-toggle (not full matrix)',
   tarball_sha256: createHash('sha256').update(readFileSync(tarball)).digest('hex'),
   browser: version.Browser,
   zoneless,
@@ -403,13 +458,16 @@ const report = {
   diagnostic: ok ? null : diagnostic,
   limitations: [
     zoneless
-      ? 'Only Chromium main-line zoneless input/list/slider default+focused/disabled cells; Zone.js is not installed.'
-      : 'Only Chromium main-line zoneful input/list/slider default+focused/disabled cells.',
+      ? 'Only Chromium main-line zoneless input/list/slider/radio/checkbox/slide-toggle default+focused/disabled cells; Zone.js is not installed.'
+      : 'Only Chromium main-line zoneful input/list/slider/radio/checkbox/slide-toggle default+focused/disabled cells.',
     'Firefox/WebKit, CSP, motion, invalid/RTL/density/dark, and other states stay not-executed.',
     'MATERIAL_ANIMATIONS.animationsDisabled=true for deterministic layout; not enabled-motion proof.',
     'Input credit is presence + focus; typing/validation/textarea not exercised.',
     'List credit is item presence + disabled class on disabled mat-list-item; selection-list/nav-list not exercised.',
     'Slider credit is presence + thumb label value + disabled class; drag/keyboard range motion not exercised.',
+    'Radio credit is button presence + disabled class on group-disabled mat-radio-button; keyboard/focus/invalid not exercised.',
+    'Checkbox credit is presence + disabled class; indeterminate/checked/focus/invalid not exercised.',
+    'Slide-toggle credit is presence + mat-disabled host class; focus/invalid/checked interaction not exercised.',
     'Success is not copied to unexecuted cells.',
     'Does not claim G10.',
   ],

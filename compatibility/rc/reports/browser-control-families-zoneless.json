@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "role": "zoneless Chromium PR-slice for input/list/slider (not full matrix)",
-  "tarball_sha256": "bb3b6a60b5cd90bf3c937abe95beea5fddb50d20fdedc0b1851333fb97705948",
+  "role": "zoneless Chromium PR-slice for input/list/slider/radio/checkbox/slide-toggle (not full matrix)",
+  "tarball_sha256": "5f12ddc114639bd36bf5b62bebea95f1711bc1f9401c12588cb2e234edab6e79",
   "browser": "Chrome/151.0.7922.169",
   "zoneless": true,
   "bundle_has_zone": false,
@@ -19,6 +19,18 @@
       "present": true,
       "disabled_class": true,
       "value_reflected": true
+    },
+    "radio": {
+      "present": true,
+      "disabled_class": true
+    },
+    "checkbox": {
+      "present": true,
+      "disabled_class": true
+    },
+    "slide-toggle": {
+      "present": true,
+      "disabled_class": true
     }
   },
   "credited_cell_ids": [
@@ -27,18 +39,27 @@
     "pr/main/chromium/zoneless/list/default",
     "pr/main/chromium/zoneless/list/disabled",
     "pr/main/chromium/zoneless/slider/default",
-    "pr/main/chromium/zoneless/slider/disabled"
+    "pr/main/chromium/zoneless/slider/disabled",
+    "pr/main/chromium/zoneless/radio/default",
+    "pr/main/chromium/zoneless/radio/disabled",
+    "pr/main/chromium/zoneless/checkbox/default",
+    "pr/main/chromium/zoneless/checkbox/disabled",
+    "pr/main/chromium/zoneless/slide-toggle/default",
+    "pr/main/chromium/zoneless/slide-toggle/disabled"
   ],
   "matrix_updated": false,
   "error": null,
   "diagnostic": null,
   "limitations": [
-    "Only Chromium main-line zoneless input/list/slider default+focused/disabled cells; Zone.js is not installed.",
+    "Only Chromium main-line zoneless input/list/slider/radio/checkbox/slide-toggle default+focused/disabled cells; Zone.js is not installed.",
     "Firefox/WebKit, CSP, motion, invalid/RTL/density/dark, and other states stay not-executed.",
     "MATERIAL_ANIMATIONS.animationsDisabled=true for deterministic layout; not enabled-motion proof.",
     "Input credit is presence + focus; typing/validation/textarea not exercised.",
     "List credit is item presence + disabled class on disabled mat-list-item; selection-list/nav-list not exercised.",
     "Slider credit is presence + thumb label value + disabled class; drag/keyboard range motion not exercised.",
+    "Radio credit is button presence + disabled class on group-disabled mat-radio-button; keyboard/focus/invalid not exercised.",
+    "Checkbox credit is presence + disabled class; indeterminate/checked/focus/invalid not exercised.",
+    "Slide-toggle credit is presence + mat-disabled host class; focus/invalid/checked interaction not exercised.",
     "Success is not copied to unexecuted cells.",
     "Does not claim G10."
   ]
