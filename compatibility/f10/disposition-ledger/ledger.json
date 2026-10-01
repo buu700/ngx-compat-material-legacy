@@ -3,11 +3,11 @@
   "role": "canonical upstream disposition ledger (partial)",
   "g11_claim": "not-passed",
   "seed_rows": 1697,
-  "ledger_rows": 687,
-  "closed_dispositions": 687,
-  "open_or_deferred": 1010,
+  "ledger_rows": 711,
+  "closed_dispositions": 711,
+  "open_or_deferred": 986,
   "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-  "batch_id": "product-adapt-residual-2026-10-01-k",
+  "batch_id": "product-adapt-residual-2026-10-01-l",
   "entries": [
     {
       "sha": "2dc599762eab74812c011370d30f9cec307e884d",
@@ -13052,11 +13052,472 @@
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
       "category": "autocomplete-initial-render-na"
+    },
+    {
+      "sha": "d4e61e233088ce0d5bbfb6cf3ff652e303e7e38d",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/table): use ResizeObserver to react to size changes (#28783)",
+      "final_disposition": "already-adapted",
+      "reason": "Legacy paginated tab header observes host size via SharedResizeObserver with debounce, retaining viewport ruler for compatibility.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/tabs/paginated-tab-header.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-tabs/internal/paginated-tab-header.ts SharedResizeObserver.observe",
+      "batch_id": "product-adapt-residual-2026-10-01-l",
+      "recorded_at_utc": "2026-10-01T18:30:00Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "category": "tabs-resize-observer",
+      "product_adaptation": true
+    },
+    {
+      "sha": "99b33120e774768467120b77703ee4fb9d98d411",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/paginator): items per page form field touch target size insufficient (#29109)",
+      "final_disposition": "already-adapted",
+      "reason": "Legacy paginator page-size select gains a 48px transparent touch-target overlay that opens the select.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/paginator/paginator.html",
+        "src/material/paginator/paginator.scss",
+        "src/material/core/tokens/m2/mat/_paginator.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-paginator/paginator.html mat-paginator-touch-target",
+      "batch_id": "product-adapt-residual-2026-10-01-l",
+      "recorded_at_utc": "2026-10-01T18:30:00Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "category": "paginator-touch-target",
+      "product_adaptation": true
+    },
+    {
+      "sha": "f67ffa5c0f3c45ca4ce1661b8be6356dd615feed",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/button): stack icons on top of touch target (#29291)",
+      "final_disposition": "already-adapted",
+      "reason": "Legacy button icons and i elements stack above ripple/state layers with relative positioning and z-index 1.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/button/_button-base.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-button/button.scss mat-button-wrapper .mat-icon z-index",
+      "batch_id": "product-adapt-residual-2026-10-01-l",
+      "recorded_at_utc": "2026-10-01T18:30:00Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "category": "button-icon-stack",
+      "product_adaptation": true
+    },
+    {
+      "sha": "051917432ad18aadd1747c5b6e8d5af0e861cc52",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/chips): navigate between rows on up/down arrow (#29364)",
+      "final_disposition": "not-applicable",
+      "reason": "Upstream chip-grid navigates primary/trailing actions between rows. Legacy chip-list is a listbox with FocusKeyManager vertical orientation already; it has no row/action grid.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/chips/chip-grid.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-chips/chip-list.ts withVerticalOrientation",
+      "batch_id": "product-adapt-residual-2026-10-01-l",
+      "recorded_at_utc": "2026-10-01T18:30:00Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "category": "chips-grid-rows-na"
+    },
+    {
+      "sha": "10da6c63757200b5848c00e560eabe8642435fe8",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/input): Number input not changing on wheel interaction (#29449)",
+      "final_disposition": "not-applicable",
+      "reason": "Upstream later reverted the wheel workaround (663d8160e / #31391) because it made browser behavior inconsistent. Re-applying it would fight current Material; MatLegacyInput extends peer MatInput.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/input/input.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "peer @angular/material/input; upstream 663d8160e revert",
+      "batch_id": "product-adapt-residual-2026-10-01-l",
+      "recorded_at_utc": "2026-10-01T18:30:00Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "category": "input-wheel-reverted-na"
+    },
+    {
+      "sha": "5403b2b3163fedaf557bbc51a1ca5d34b40f91d2",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/chips): remove tab-index attribute from mat-chip host (#29436)",
+      "final_disposition": "not-applicable",
+      "reason": "Upstream MDC chips moved focus onto inner action buttons and dropped host tabindex. Legacy chips are themselves the focusable control; removing host tabindex would break the listbox focus model.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/chips/chip.ts",
+        "src/material/chips/chip-row.html"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-chips/chip.ts host tabindex binding",
+      "batch_id": "product-adapt-residual-2026-10-01-l",
+      "recorded_at_utc": "2026-10-01T18:30:00Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "category": "chips-tabindex-host-na"
+    },
+    {
+      "sha": "d22a24d667a16c39d4a4ec5f59b248f990fa029e",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/list): checkmark not visible in high contrast mode (#29546)",
+      "final_disposition": "not-applicable",
+      "reason": "Legacy checkbox already has HC disabled opacity and black-on-white checkmark stroke. MDC CanvasText CSS variables do not map to the owned SVG stroke model.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/checkbox/_checkbox-common.scss",
+        "src/material/checkbox/checkbox.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-checkbox/checkbox.scss high-contrast checkmark-path stroke",
+      "batch_id": "product-adapt-residual-2026-10-01-l",
+      "recorded_at_utc": "2026-10-01T18:30:00Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "category": "checkbox-hc-canvatext-na"
+    },
+    {
+      "sha": "357f6f27a5feb7f0b0aa6e626352a386e6725202",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/tabs): switch pagination to not use native buttons (#29605)",
+      "final_disposition": "already-adapted",
+      "reason": "Legacy tab header and nav-bar pagination controls are non-focusable divs instead of native buttons, dropping button-reset styles.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/tabs/tab-header.html",
+        "src/material/tabs/tab-nav-bar/tab-nav-bar.html"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-tabs/tab-header.html div.mat-tab-header-pagination",
+      "batch_id": "product-adapt-residual-2026-10-01-l",
+      "recorded_at_utc": "2026-10-01T18:30:00Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "category": "tabs-non-button-paginators",
+      "product_adaptation": true
+    },
+    {
+      "sha": "b3a9062edf8863250ddd462e5abe009fbc46243b",
+      "bucket": "behavior-semantic",
+      "subject": "fix(multiple): ripples not showing up in some cases (#29672)",
+      "final_disposition": "already-adapted",
+      "reason": "Raised owned checkbox ripple selector specificity. Owned package has no MatRippleLoader; that injector half of the upstream patch does not apply. Legacy tabs lack a dedicated mat-tab-ripple element.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/checkbox/checkbox.scss",
+        "src/material/tabs/_tabs-common.scss",
+        "src/material/core/private/ripple-loader.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-checkbox/checkbox.scss .mat-checkbox .mat-checkbox-ripple",
+      "batch_id": "product-adapt-residual-2026-10-01-l",
+      "recorded_at_utc": "2026-10-01T18:30:00Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "category": "ripple-specificity",
+      "product_adaptation": true
+    },
+    {
+      "sha": "77051f871a71b973ab6cbb642b1bdd6fe8a0da28",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/form-field): Don't allow label to grow larger than input (#29673)",
+      "final_disposition": "already-adapted",
+      "reason": "Legacy outline gap width is capped by container width minus prefix/suffix so a long floating label cannot outgrow the infix.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/form-field/form-field.ts",
+        "src/material/form-field/_mdc-text-field-structure.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-form-field/form-field.ts updateOutlineGap maxGap",
+      "batch_id": "product-adapt-residual-2026-10-01-l",
+      "recorded_at_utc": "2026-10-01T18:30:00Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "category": "form-field-notch-cap",
+      "product_adaptation": true
+    },
+    {
+      "sha": "9122335b25b28a5532159ab87c36aab3be9c3716",
+      "bucket": "behavior-semantic",
+      "subject": "feat(material/checkbox): add new aria properties to MatCheckbox (#29457)",
+      "final_disposition": "already-adapted",
+      "reason": "Legacy checkbox forwards aria-expanded, aria-controls, and aria-owns onto the native input.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/checkbox/checkbox.ts",
+        "src/material/checkbox/checkbox.html"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-checkbox/checkbox.html aria-controls/expanded/owns",
+      "batch_id": "product-adapt-residual-2026-10-01-l",
+      "recorded_at_utc": "2026-10-01T18:30:00Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "category": "checkbox-aria-props",
+      "product_adaptation": true
+    },
+    {
+      "sha": "ef14c286986f9451addeada26ab7b51402aa143f",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/core): option showing double selected indicator in high contrast mode",
+      "final_disposition": "already-adapted",
+      "reason": "Owned MDC and legacy option HC selected marks use :has(.\u2026-pseudo-checkbox) instead of the multiple-option class so a checkmark and dot do not both show.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/option/option.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "styles/core/option/option.scss and legacy-core/option/option.scss :has",
+      "batch_id": "product-adapt-residual-2026-10-01-l",
+      "recorded_at_utc": "2026-10-01T18:30:00Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "category": "option-hc-has-pseudo",
+      "product_adaptation": true
+    },
+    {
+      "sha": "4d0a3eff7c5d5186516fe5c8f1af8c003d02882d",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/select): Update checkbox color to match the selected label text color (#29684)",
+      "final_disposition": "already-adapted",
+      "reason": "Selected option sets the minimal pseudo-checkbox checkmark color from the selected label text token.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/option/option.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "styles/core/option/option.scss --mat-minimal-pseudo-checkbox-selected-checkmark-color",
+      "batch_id": "product-adapt-residual-2026-10-01-l",
+      "recorded_at_utc": "2026-10-01T18:30:00Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "category": "option-pseudo-checkbox-color",
+      "product_adaptation": true
+    },
+    {
+      "sha": "d0cf8bfe8bc476145984e0f8f3ab7d18eea36f1a",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/snack-bar): prevent override of snack bar action button color (#27511)",
+      "final_disposition": "already-adapted",
+      "reason": "Legacy snack-bar action color applies only to unthemed mat-button children so an explicitly colored action is not overridden.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/snack-bar/snack-bar-container.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-snack-bar/_snack-bar-theme.scss :not(.mat-primary/.mat-accent/.mat-warn)",
+      "batch_id": "product-adapt-residual-2026-10-01-l",
+      "recorded_at_utc": "2026-10-01T18:30:00Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "category": "snack-bar-action-color",
+      "product_adaptation": true
+    },
+    {
+      "sha": "42f6a4ac45b115784a155c886dff28b100d9604b",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/menu): handle keyboard events through dispatcher (#29997)",
+      "final_disposition": "already-adapted",
+      "reason": "Legacy menu handles panel keyboard events from the overlay keydown stream and no longer stopPropagates inside the panel handler or binds keydown on the panel template.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/menu/menu-trigger.ts",
+        "src/material/menu/menu.html",
+        "src/material/menu/menu.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-menu/internal/menu-trigger-base.ts overlayRef.keydownEvents",
+      "batch_id": "product-adapt-residual-2026-10-01-l",
+      "recorded_at_utc": "2026-10-01T18:30:00Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "category": "menu-keydown-dispatcher",
+      "product_adaptation": true
+    },
+    {
+      "sha": "77393153fd4f6acad65fad6b8f0eefeb8dcd4b06",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/menu): decouple menu lifecycle from animations (#30148)",
+      "final_disposition": "already-adapted",
+      "reason": "Legacy menu close detaches lazy content immediately without waiting for exit animation; submenu hover opens without waiting while _isAnimating.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/menu/menu-trigger.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-menu/internal/menu-trigger-base.ts _destroyMenu/_handleHover",
+      "batch_id": "product-adapt-residual-2026-10-01-l",
+      "recorded_at_utc": "2026-10-01T18:30:00Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "category": "menu-lifecycle-animation",
+      "product_adaptation": true
+    },
+    {
+      "sha": "306e437d213f3ace7b3ee294ef1dd82f5e8e2fab",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/select): match disabled placeholder color with label (#29870)",
+      "final_disposition": "already-adapted",
+      "reason": "Disabled select placeholder uses the same disabled-text palette color as the disabled value.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/select/select.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-select/_select-theme.scss .mat-select-disabled .mat-select-placeholder",
+      "batch_id": "product-adapt-residual-2026-10-01-l",
+      "recorded_at_utc": "2026-10-01T18:30:00Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "category": "select-disabled-placeholder",
+      "product_adaptation": true
+    },
+    {
+      "sha": "7c9c898faac8daac1bbb20a0807168a74360760d",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/chips): fix chip blur timing (#30347)",
+      "final_disposition": "already-adapted",
+      "reason": "Legacy chip blur defers via setTimeout instead of NgZone.onStable, matching current Material chip blur timing.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/chips/chip.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-chips/chip.ts _blur setTimeout",
+      "batch_id": "product-adapt-residual-2026-10-01-l",
+      "recorded_at_utc": "2026-10-01T18:30:00Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "category": "chips-blur-timeout",
+      "product_adaptation": true
+    },
+    {
+      "sha": "11f02eecc18939a1c8a2ac4c4cc9b74b2f5ca07a",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/select): fixed text color for selected options in multiple select (#30367)",
+      "final_disposition": "already-adapted",
+      "reason": "Selected label text color token applies only in single selection; multiple options keep default text and rely on the checkbox.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/option/option.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "styles/core/option/option.scss :not(.mat-mdc-option-multiple) primary-text color",
+      "batch_id": "product-adapt-residual-2026-10-01-l",
+      "recorded_at_utc": "2026-10-01T18:30:00Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "category": "option-multiple-text-color",
+      "product_adaptation": true
+    },
+    {
+      "sha": "f2cf22987220ac087c665524708fd95f5da15119",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/paginator): disabled buttons not visible in high contrast mode (#30505)",
+      "final_disposition": "already-adapted",
+      "reason": "Legacy paginator HC styles use currentColor for icons and GrayText on disabled navigation buttons.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/paginator/paginator.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-paginator/paginator.scss high-contrast GrayText",
+      "batch_id": "product-adapt-residual-2026-10-01-l",
+      "recorded_at_utc": "2026-10-01T18:30:00Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "category": "paginator-hc-disabled",
+      "product_adaptation": true
+    },
+    {
+      "sha": "d27f79357786e6d0b67d3895cb6e79135954ac11",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/button): inherit button shape in focus indicator (#31065)",
+      "final_disposition": "already-adapted",
+      "reason": "Non-FAB legacy button focus indicators inherit border-radius from the button; FAB keeps the default indicator radius.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/button/_button-base.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-button/button.scss mat-focus-indicator::before border-radius inherit",
+      "batch_id": "product-adapt-residual-2026-10-01-l",
+      "recorded_at_utc": "2026-10-01T18:30:00Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "category": "button-focus-shape",
+      "product_adaptation": true
+    },
+    {
+      "sha": "82ecf0d24aabbb156463903c45667a10b5606a79",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/form-field): insufficient color contrast text to input fill (#28274)",
+      "final_disposition": "not-applicable",
+      "reason": "Upstream only lowers an MDC form-field focus state-layer opacity token. Owned legacy fill theming has no that opacity token map.",
+      "read_note_disposition": "not-applied",
+      "files": [
+        "src/material/core/tokens/m2/mat/_form-field.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-form-field/_form-field-fill-theme.scss no focus-state-layer-opacity",
+      "batch_id": "product-adapt-residual-2026-10-01-l",
+      "recorded_at_utc": "2026-10-01T18:30:00Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "category": "form-field-focus-opacity-na"
+    },
+    {
+      "sha": "e5870e90b96a23eae946326eb3edaa6d3d8065f4",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/form-field): container height in lower densities (#28546)",
+      "final_disposition": "not-applicable",
+      "reason": "Upstream changes MDC form-field icon padding from 12px all sides to horizontal-only. Owned legacy form field has no that icon padding rule.",
+      "read_note_disposition": "not-applied",
+      "files": [
+        "src/material/form-field/form-field.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-form-field/form-field.scss no 12px icon padding",
+      "batch_id": "product-adapt-residual-2026-10-01-l",
+      "recorded_at_utc": "2026-10-01T18:30:00Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "category": "form-field-icon-padding-na"
+    },
+    {
+      "sha": "28aa37ae5e1945be87ddde473cbe107f16f63b61",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/checkbox): ensure focus indicator has the correct shape (#30332)",
+      "final_disposition": "already-adapted",
+      "reason": "Legacy checkbox ripple focus indicator uses a higher-specificity circle border-radius so later ripple styles cannot square it.",
+      "read_note_disposition": "not-applied",
+      "files": [
+        "src/material/checkbox/checkbox.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-checkbox/checkbox.scss .mat-checkbox .mat-checkbox-ripple::before",
+      "batch_id": "product-adapt-residual-2026-10-01-l",
+      "recorded_at_utc": "2026-10-01T18:30:00Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "category": "checkbox-focus-shape",
+      "product_adaptation": true
     }
   ],
   "limitations": [
     "Observations converted only with linked read-note evidence and owned source_check; not auto-approval of unread SHAs.",
     "Does not claim G11 or flip upstream-audit-disposition.",
-    "Sensitive adaptation-required rows left missing (24); see adaptation queue."
+    "Adaptation queue for already-read sensitive set cleared this batch; unread triage/test-only/semantic remain missing."
   ]
 }
