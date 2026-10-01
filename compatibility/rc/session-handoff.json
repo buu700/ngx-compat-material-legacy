@@ -1,24 +1,20 @@
 {
   "template": false,
-  "packet_id": "RC-03",
-  "substep_id": "RC-08.03",
+  "packet_id": "RC-00",
+  "substep_id": "RC-00.01",
   "source_commit": "39cbc812e28620a79a5355e3c0064813756a35b6",
   "source_content_digest": "eac85dbb9e6b46dc71a41a4790b6e32e5e291eed1f19edad1dd9c765deb79eb6",
   "worktree_line": "main",
   "line_21_commit": "cbf86f3faccb240e7beeb6a1e2af727b5d9a674d",
   "owned_paths": [
-    "testing/legacy-runner/historical-inventory.json",
-    "compatibility/f08/port-manifest.json",
     "compatibility/rc/status.json",
-    "compatibility/rc/line-bootstrap.json",
-    "compatibility/rc/evidence-classification.json",
-    "compatibility/rc/cyph-intake.json",
-    "compatibility/rc/release-prerequisites.json",
     "compatibility/rc/session-handoff.json"
   ],
-  "last_command": ["node scripts/check-behavior-semantic-one-diff.mjs"],
-  "outcome": "passed",
-  "first_actionable_error": "The owned Sass facade does not compile the three sealed value fixtures because companion bridge Sass imports @angular/material. The library policy scan still reports 23 violations. Host motion checks are not a browser lifecycle run. legacyHostMotionEvent and legacyNextMotionCompletion are exported on main and absent on 21.x. Select panel width is still the trigger width, not 32px wider. Cyph has no exact first-party RC age admission. gh is absent, so branch protection was not read. just verify remains fail-closed.",
+  "last_command": [
+    "python3 tools/history_check.py --repo <worktree> --content-tip 1a47e7f9c29de3fd44505d4ab481204de2a25ab0"
+  ],
+  "outcome": "history-content-preserved;product-not-run",
+  "first_actionable_error": "History content preserved with exact tree equality to old tip; product CI/bootstrap still broken (known fetch-depth/report-classifier defects). Resume RC-00 re-entry then RC-01 repair. Prior Sass/select/motion product failures remain open and are not revalidated by this history step.",
   "failed_case_ids": [
     "MatSelect > core > overlay panel > should set the width of the overlay based on the trigger",
     "MatSelect > core > overlay panel > should set the width of the overlay based on a larger trigger width"
@@ -59,7 +55,16 @@
     "compatibility/rc/reports/docs-build-one-diff.json",
     "compatibility/rc/reports/behavior-semantic-one-diff.json"
   ],
-  "completed_acceptance_ids": ["RC-00-A01", "RC-00-A02", "RC-00-A03", "RC-01-A01", "RC-01-A02", "RC-01-A03", "RC-01-A04", "RC-01-A05"],
+  "completed_acceptance_ids": [
+    "RC-00-A01",
+    "RC-00-A02",
+    "RC-00-A03",
+    "RC-01-A01",
+    "RC-01-A02",
+    "RC-01-A03",
+    "RC-01-A04",
+    "RC-01-A05"
+  ],
   "not_run_scope": [
     "RC-00-A04 remains blocked on an owner age-admission decision",
     "GitHub branch protection and rulesets",
@@ -67,10 +72,25 @@
     "RC-02-A01 through RC-02-A05 are not closed; the broken-pack probe refuses before ng-packagr instead of compiling a mutated tree",
     "RC-03 through RC-05 and RC-07 through RC-12"
   ],
-  "next_action": "RC-08.03: read the next behavior-semantic diff, 5db4fcf95b0cf835720003cfd73b2c154bb38aa1, which removes component M3 tokens from the theme config. 397 behavior-semantic SHAs and 986 commits still have no diff review.",
+  "next_action": "RC-01: repair CI fetch-depth:0 and pack-lane setup; fix legacy-*.json report classifier so legacy-aggregate.json is not misclassified; then verify-lite / bootstrap.",
   "blocked_owner_decisions": [
     "cyph-rc-age-admission",
     "registry-publish-authority",
     "github-protection-read"
-  ]
+  ],
+  "source_identity_role": "historical_artifact_receipt",
+  "current_source_checkpoint": {
+    "commit": "1a47e7f9c29de3fd44505d4ab481204de2a25ab0",
+    "tree": "022b1403c6ca51b100f45bb8b9ef82f0a2934b5a",
+    "identity_role": "inspected_content_checkpoint"
+  },
+  "audit_cursor": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+  "completed_acceptance_identity_role": "historical_reported_not_revalidated",
+  "history_transition": {
+    "content_tip": "1a47e7f9c29de3fd44505d4ab481204de2a25ab0",
+    "content_tree": "022b1403c6ca51b100f45bb8b9ef82f0a2934b5a",
+    "old_head": "11ee5b9690b245739f84393e37e1157ab557660c",
+    "replacement_commits": 5,
+    "notes_unique_total": 711
+  }
 }
