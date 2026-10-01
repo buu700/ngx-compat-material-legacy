@@ -1,26 +1,19 @@
 {
   "template": false,
   "packet_id": "RC-06",
-  "substep_id": "RC-06.02-all-family-artifact-ci",
-  "source_commit": "a63a45c355ede3f0c70784046e5770d86a9dc559",
+  "substep_id": "RC-06.02-all-family-artifact-ci-green",
+  "source_commit": "643f901d7759574e9964ecb9e729d2f26f2ddc75",
   "worktree_line": "main",
   "line_21_commit": "cbf86f3faccb240e7beeb6a1e2af727b5d9a674d",
   "owned_paths": [
-    "scripts/rc-verify.py",
-    "scripts/run-legacy-artifact-suite.mjs",
-    "compatibility/rc/matrices/full-verify.json",
-    ".github/workflows/ci.yml",
-    "tests/test_legacy_artifact_run_mode.py",
-    "tests/test_ci_fresh_pack_path.py",
-    "AGENTS.md",
     "compatibility/rc/session-handoff.json",
     "compatibility/rc/status.json"
   ],
   "last_command": [
-    "python3 -m unittest tests.test_ci_fresh_pack_path tests.test_legacy_artifact_run_mode"
+    "gh run view 36888571143 --repo buu700/ngx-compat-material-legacy"
   ],
-  "outcome": "CI expanded to all-22 artifact families + engine-free + migration-packaged; three full-verify cells flipped to implemented; G01-G13 not claimed; tip CI pending",
-  "first_actionable_error": "Await tip Actions for all-family artifact suite; remaining matrix cells: sass-seal, browser-matrix, api-completeness, upstream-audit-disposition",
+  "outcome": "tip CI green: all 22 families artifact-bound 2153/2153; engine-free + migration-packaged green; three matrix cells flipped; G01-G13 not claimed",
+  "first_actionable_error": "Remaining full-verify cells unimplemented: sass-seal, browser-matrix, api-completeness, upstream-audit-disposition",
   "failed_case_ids": [],
   "report_paths": [
     "compatibility/rc/status.json",
@@ -29,22 +22,58 @@
   ],
   "completed_acceptance_ids": [],
   "not_run_scope": [
-    "RC-02 full verify / complete G01 matrix (sass-seal, browser-matrix, api-completeness, upstream-audit-disposition still unimplemented)",
-    "Tip CI all-family artifact suite not yet observed on this commit",
+    "RC-02 full verify / complete G01 (sass-seal, browser-matrix, api-completeness, upstream-audit-disposition still unimplemented)",
     "21.x line not retested",
     "G01-G13 not claimed",
     "Audit cursor preserved at 5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
   ],
-  "next_action": "Wait for Actions on the product tip; record family counts under artifact mode and which matrix cells flipped. Do not claim G01-G13 or RC engineering ready.",
+  "next_action": "Implement remaining full-verify cells honestly (sass-seal with peer-aware packed consumer; browser-matrix execution; api-completeness; audit disposition without binge). Keep G01 unclaimed until criteria met.",
   "blocked_owner_decisions": [
     "cyph-rc-age-admission",
     "registry-publish-authority",
     "github-protection-read"
   ],
-  "recorded_at_utc": "2026-10-01T15:59:30Z",
+  "recorded_at_utc": "2026-10-01T16:05:20Z",
   "clock_confidence": "verified",
+  "artifact_run_ci": {
+    "mode": "artifact",
+    "entry": "artifacts/main/entry-643f901d7759574e9964ecb9e729d2f26f2ddc75",
+    "tarball_sha256_prefix": "bb3b6a60b5cd",
+    "families": 22,
+    "mapped_specs": "57/57 executed",
+    "totals": {
+      "executed": 2153,
+      "passed": 2153,
+      "failed": 0,
+      "skipped": 0
+    },
+    "family_list": [
+      "autocomplete",
+      "button",
+      "card",
+      "checkbox",
+      "chips",
+      "core",
+      "dialog",
+      "form-field",
+      "input",
+      "list",
+      "menu",
+      "paginator",
+      "progress-bar",
+      "progress-spinner",
+      "radio",
+      "select",
+      "slide-toggle",
+      "slider",
+      "snack-bar",
+      "table",
+      "tabs",
+      "tooltip"
+    ]
+  },
   "rc_02_04": {
-    "status": "incremental-orchestration-expanded",
+    "status": "incremental-orchestration-expanded-ci-green",
     "matrix": "compatibility/rc/matrices/full-verify.json",
     "implemented_checks": [
       "pack-library",
@@ -69,11 +98,17 @@
     "local iteration used host node/pnpm PATH, not declared Chainman profile"
   ],
   "ci": {
-    "tested_commit": "6dc2d276302e12e7a04b224dc7f400ac0cced8e6",
-    "product_commit": "6dc2d276302e12e7a04b224dc7f400ac0cced8e6",
-    "run_id": 36886965625,
-    "url": "https://github.com/buu700/ngx-compat-material-legacy/actions/runs/36886965625",
-    "outcome": "success-card-smoke-only-prior-tip",
-    "note": "Prior tip had card-only artifact smoke. This change expands CI to all 22 families; await new run."
+    "tested_commit": "643f901d7759574e9964ecb9e729d2f26f2ddc75",
+    "product_commit": "643f901d7759574e9964ecb9e729d2f26f2ddc75",
+    "run_id": 36888571143,
+    "url": "https://github.com/buu700/ngx-compat-material-legacy/actions/runs/36888571143",
+    "outcome": "success",
+    "jobs": [
+      "Chainman verify-lite",
+      "Packed-consumer AOT and harness",
+      "Engine-free required consumer against tip pack",
+      "Migration packaged CLI verify and isolation",
+      "Artifact-bound historical families (all 22)"
+    ]
   }
 }
