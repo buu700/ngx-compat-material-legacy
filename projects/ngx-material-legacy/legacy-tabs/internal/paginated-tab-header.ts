@@ -548,18 +548,20 @@ export abstract class MatPaginatedTabHeader
     if (this.disablePagination) {
       this._showPaginationControls = false;
     } else {
-      const isEnabled =
-        this._tabListInner.nativeElement.scrollWidth > this._elementRef.nativeElement.offsetWidth;
+      const scrollWidth = this._tabListInner.nativeElement.scrollWidth;
+      const containerWidth = this._elementRef.nativeElement.offsetWidth;
+      // Safari can round scrollWidth inconsistently when pagination toggles, causing an
+      // infinite show/hide loop. Require a small threshold before enabling pagination.
+      const isEnabled = scrollWidth - containerWidth >= 5;
 
       if (!isEnabled) {
         this.scrollDistance = 0;
       }
 
       if (isEnabled !== this._showPaginationControls) {
+        this._showPaginationControls = isEnabled;
         this._changeDetectorRef.markForCheck();
       }
-
-      this._showPaginationControls = isEnabled;
     }
   }
 

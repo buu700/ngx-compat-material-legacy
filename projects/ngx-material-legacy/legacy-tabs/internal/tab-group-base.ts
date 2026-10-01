@@ -502,6 +502,15 @@ export abstract class _MatTabGroupBase
       this._tabHeader.focusIndex = index;
     }
   }
+
+  /** True when animations are disabled globally or animationDuration is zero. */
+  _animationsDisabled(): boolean {
+    return (
+      this._animationMode === 'NoopAnimations' ||
+      this.animationDuration === '0' ||
+      this.animationDuration === '0ms'
+    );
+  }
 }
 
 /**

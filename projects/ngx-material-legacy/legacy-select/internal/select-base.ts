@@ -623,18 +623,21 @@ export abstract class _MatSelectBase<C>
 
   /** Opens the overlay panel. */
   open(): void {
-    if (this._canOpen()) {
-      this._applyModalPanelOwnership();
-      this._exitCleanup?.();
-      this._exitCleanup = undefined;
-      this._panelExiting = false;
-
-      this._panelOpen = true;
-      this._overlayAttached = true;
-      this._keyManager.withHorizontalOrientation(null);
-      this._highlightCorrectOption();
-      this._changeDetectorRef.markForCheck();
+    // Early return avoids measuring/toggling when open cannot proceed (e.g. focus+click flicker).
+    if (!this._canOpen()) {
+      return;
     }
+
+    this._applyModalPanelOwnership();
+    this._exitCleanup?.();
+    this._exitCleanup = undefined;
+    this._panelExiting = false;
+
+    this._panelOpen = true;
+    this._overlayAttached = true;
+    this._keyManager.withHorizontalOrientation(null);
+    this._highlightCorrectOption();
+    this._changeDetectorRef.markForCheck();
   }
 
   /**

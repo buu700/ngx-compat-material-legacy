@@ -9,7 +9,6 @@
 import {BooleanInput, coerceBooleanProperty} from '@angular/cdk/coercion';
 import {BACKSPACE, hasModifierKey, TAB} from '@angular/cdk/keycodes';
 import {
-  AfterContentInit,
   Directive,
   ElementRef,
   EventEmitter,
@@ -62,7 +61,6 @@ let nextUniqueId = 0;
   host: {
     'class': 'mat-chip-input mat-input-element',
     '(keydown)': '_keydown($event)',
-    '(keyup)': '_keyup($event)',
     '(blur)': '_blur()',
     '(focus)': '_focus()',
     '(input)': '_onInput()',
@@ -73,12 +71,7 @@ let nextUniqueId = 0;
     '[attr.aria-required]': '_chipList && _chipList.required || null',
   },
 })
-export class MatLegacyChipInput
-  implements MatLegacyChipTextControl, OnChanges, OnDestroy, AfterContentInit
-{
-  /** Used to prevent focus moving to chips while user is holding backspace */
-  private _focusLastChipOnBackspace: boolean;
-
+export class MatLegacyChipInput implements MatLegacyChipTextControl, OnChanges, OnDestroy {
   /** Whether the control is focused. */
   focused: boolean = false;
   _chipList: MatLegacyChipList;
@@ -155,10 +148,6 @@ export class MatLegacyChipInput
     this.chipEnd.complete();
   }
 
-  ngAfterContentInit(): void {
-    this._focusLastChipOnBackspace = this.empty;
-  }
-
   /** Utility method to make host definition/tests more clear. */
   _keydown(event?: KeyboardEvent) {
     if (event) {
@@ -168,30 +157,17 @@ export class MatLegacyChipInput
         this._chipList._allowFocusEscape();
       }
 
-      // To prevent the user from accidentally deleting chips when pressing BACKSPACE continuously,
-      // We focus the last chip on backspace only after the user has released the backspace button,
-      // and the input is empty (see behaviour in _keyup)
-      if (event.keyCode === BACKSPACE && this._focusLastChipOnBackspace) {
-        this._chipList._keyManager.setLastItemActive();
+      // Focus the last chip on backspace when the input is empty, ignoring key-repeat.
+      if (this.empty && event.keyCode === BACKSPACE) {
+        if (!event.repeat) {
+          this._chipList._keyManager.setLastItemActive();
+        }
         event.preventDefault();
         return;
-      } else {
-        this._focusLastChipOnBackspace = false;
       }
     }
 
     this._emitChipEnd(event);
-  }
-
-  /**
-   * Pass events to the keyboard manager. Available here for tests.
-   */
-  _keyup(event: KeyboardEvent) {
-    // Allow user to move focus to chips next time he presses backspace
-    if (!this._focusLastChipOnBackspace && event.keyCode === BACKSPACE && this.empty) {
-      this._focusLastChipOnBackspace = true;
-      event.preventDefault();
-    }
   }
 
   /** Checks to see if the blur should emit the (chipEnd) event. */
@@ -209,7 +185,6 @@ export class MatLegacyChipInput
 
   _focus() {
     this.focused = true;
-    this._focusLastChipOnBackspace = this.empty;
     this._chipList.stateChanges.next();
   }
 
@@ -243,7 +218,6 @@ export class MatLegacyChipInput
   /** Clears the input */
   clear(): void {
     this.inputElement.value = '';
-    this._focusLastChipOnBackspace = true;
   }
 
   /** Checks whether a keycode is one of the configured separators. */

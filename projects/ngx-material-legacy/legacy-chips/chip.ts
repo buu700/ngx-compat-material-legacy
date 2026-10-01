@@ -436,10 +436,16 @@ export class MatLegacyChip
 
     switch (event.keyCode) {
       case DELETE:
-      case BACKSPACE:
         // If we are removable, remove the focused chip
         this.remove();
         // Always prevent so page navigation does not occur
+        event.preventDefault();
+        break;
+      case BACKSPACE:
+        // Ignore key-repeat so holding backspace does not remove multiple chips.
+        if (!event.repeat) {
+          this.remove();
+        }
         event.preventDefault();
         break;
       case SPACE:

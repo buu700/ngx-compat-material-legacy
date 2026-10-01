@@ -38,7 +38,7 @@ import {MatLegacyLabel} from './label';
 import {MatLegacyPlaceholder} from './placeholder';
 import {MatLegacyPrefix} from './prefix';
 import {MatLegacySuffix} from './suffix';
-import {Platform} from '@angular/cdk/platform';
+import {Platform, _getShadowRoot} from '@angular/cdk/platform';
 import {AbstractControlDirective} from '@angular/forms';
 import {ANIMATION_MODULE_TYPE} from '@angular/core';
 import {
@@ -441,7 +441,11 @@ export class MatLegacyFormField
     return !!(this._labelChildNonStatic || this._labelChildStatic);
   }
 
-  _shouldLabelFloat() {
+  _shouldLabelFloat(): boolean {
+    // Avoid leaving a floated gap when the floating label was removed dynamically.
+    if (!this._hasFloatingLabel()) {
+      return false;
+    }
     return (
       this._canLabelFloat() &&
       ((this._control && this._control.shouldLabelFloat) || this._shouldAlwaysFloat())
@@ -667,19 +671,31 @@ export class MatLegacyFormField
     return this._dir && this._dir.value === 'rtl' ? rect.right : rect.left;
   }
 
+  /**
+   * Cached shadow root that the element is placed in. `null` means that the element isn't in
+   * the shadow DOM and `undefined` means that it hasn't been resolved yet.
+   */
+  private _cachedShadowRoot: ShadowRoot | null | undefined;
+
   /** Checks whether the form field is attached to the DOM. */
   private _isAttachedToDOM(): boolean {
     const element: HTMLElement = this._elementRef.nativeElement;
+    const rootNode = element.getRootNode ? element.getRootNode() : null;
+    // Require a real document/shadow root attachment and a visible offset parent in the
+    // light DOM so outline notch measurement does not run against an unrendered host.
+    return !!(
+      rootNode &&
+      rootNode !== element &&
+      ((rootNode === document && element.offsetParent !== null) ||
+        rootNode === this._resolveShadowRoot())
+    );
+  }
 
-    if (element.getRootNode) {
-      const rootNode = element.getRootNode();
-      // If the element is inside the DOM the root node will be either the document
-      // or the closest shadow root, otherwise it'll be the element itself.
-      return rootNode && rootNode !== element;
+  /** Lazily resolve the host shadow root (or null when not in shadow DOM). */
+  private _resolveShadowRoot(): ShadowRoot | null {
+    if (this._cachedShadowRoot === undefined) {
+      this._cachedShadowRoot = _getShadowRoot(this._elementRef.nativeElement);
     }
-
-    // Otherwise fall back to checking if it's in the document. This doesn't account for
-    // shadow DOM, however browser that support shadow DOM should support `getRootNode` as well.
-    return document.documentElement!.contains(element);
+    return this._cachedShadowRoot;
   }
 }

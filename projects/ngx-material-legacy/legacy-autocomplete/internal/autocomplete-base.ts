@@ -106,6 +106,9 @@ export abstract class _MatAutocompleteBase
   }
   _isOpen: boolean = false;
 
+  /** Latest trigger that opened the autocomplete (multi-trigger safety). */
+  _latestOpeningTrigger: unknown;
+
   /** @docs-private Sets the theme color of the panel. */
   _setColor(value: ThemePalette) {
     this._color = value;

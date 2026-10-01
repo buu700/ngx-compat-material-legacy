@@ -39,6 +39,11 @@ mat-menu {
   //    `mouseenter` event by dispatching it on tap.
   &.ng-animating {
     pointer-events: none;
+
+    // Hide empty panels while animating away when the same menu is reused across triggers.
+    &:has(.mat-menu-content:empty) {
+      display: none;
+    }
   }
 
   @include cdk.high-contrast(active, off) {
@@ -129,5 +134,9 @@ button.mat-menu-item {
 
   &.mat-menu-panel-animating {
     pointer-events: none;
+
+    &:has(.mat-menu-content:empty) {
+      display: none;
+    }
   }
 }

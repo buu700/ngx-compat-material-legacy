@@ -237,6 +237,7 @@ export abstract class _MatRadioGroupBase<T extends _MatRadioButtonBase>
   _touch() {
     if (this.onTouched) {
       this.onTouched();
+      this._changeDetector.markForCheck();
     }
   }
 
@@ -610,7 +611,8 @@ export abstract class _MatRadioButtonBase
     if (!this.disabled) {
       // Normally the input should be focused already, but if the click
       // comes from the touch target, then we might have to focus it ourselves.
-      this._inputElement.nativeElement.focus();
+      // Null-check in case the button was destroyed before view init.
+      this._inputElement?.nativeElement.focus();
     }
   }
 
