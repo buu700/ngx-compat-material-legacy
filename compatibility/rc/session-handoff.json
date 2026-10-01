@@ -1,84 +1,74 @@
 {
   "template": false,
-  "packet_id": "RC-02+RC-06",
-  "substep_id": "RC-02.fresh-entry-ci-green+RC-06.select-width-local-green",
-  "source_commit": "ca2b084d1469dd275786739d548fbdd7e9b6885e",
+  "packet_id": "RC-06",
+  "substep_id": "RC-06.remaining-families-autocomplete-form-field-input",
+  "source_commit": "9d3003fcdc64106d3c4d30dca17cea9a3ce6e52b",
   "worktree_line": "main",
   "line_21_commit": "cbf86f3faccb240e7beeb6a1e2af727b5d9a674d",
   "owned_paths": [
-    ".github/workflows/ci.yml",
-    "AGENTS.md",
-    "scripts/pack-library.mjs",
-    "scripts/check-select-panel-width.mjs",
-    "projects/ngx-material-legacy/legacy-select/select.scss",
-    "tests/test_ci_fresh_pack_path.py",
-    "compatibility/rc/reports/legacy-select.json",
+    "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+    "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+    "testing/legacy-runner/shims/harness/input/shared-input.spec.ts",
+    "compatibility/rc/reports/legacy-autocomplete.json",
+    "compatibility/rc/reports/legacy-form-field.json",
+    "compatibility/rc/reports/legacy-input.json",
     "compatibility/rc/reports/legacy-card.json",
-    "compatibility/rc/reports/select-panel-width.json",
+    "compatibility/rc/reports/legacy-select.json",
     "compatibility/rc/status.json",
     "compatibility/rc/session-handoff.json"
   ],
   "last_command": [
-    "gh run watch 36881780441",
-    "node scripts/rc-test-legacy-family.mjs --family select",
-    "node scripts/rc-test-legacy-family.mjs --family card"
+    "node scripts/rc-test-legacy-family.mjs --family autocomplete",
+    "node scripts/rc-test-legacy-family.mjs --family form-field",
+    "node scripts/rc-test-legacy-family.mjs --family input",
+    "node scripts/pack-library.mjs --out artifacts/local/entry-input-fix-* --line main"
   ],
-  "outcome": "rc02-entry-sha-pack-ci-green;rc06-select-width-restored;local-select-270;local-card-14;g-gates-not-claimed",
+  "outcome": "rc06-autocomplete-184;form-field-25;input-149;card-14;select-270;workspace-dist;form-field-validation-fix;g-gates-not-claimed",
   "first_actionable_error": "Full RC-06 artifact-bound suite and remaining families not run; RC-02 full verify still a stub.",
   "failed_case_ids": [],
   "report_paths": [
     "compatibility/rc/status.json",
     "compatibility/rc/session-handoff.json",
-    "compatibility/rc/reports/legacy-select.json",
+    "compatibility/rc/reports/legacy-autocomplete.json",
+    "compatibility/rc/reports/legacy-form-field.json",
+    "compatibility/rc/reports/legacy-input.json",
     "compatibility/rc/reports/legacy-card.json",
-    "compatibility/rc/reports/select-panel-width.json"
+    "compatibility/rc/reports/legacy-select.json"
   ],
   "completed_acceptance_ids": [],
   "not_run_scope": [
     "RC-02 full verify / complete G01 matrix",
     "RC-06 full 57-path / 21-family artifact-bound suite",
-    "21.x line not retested for select width",
+    "21.x line not retested for these families",
     "G01-G13 not claimed",
-    "Select/card greens are workspace-dist iteration, not artifact --run mode",
+    "Family greens are workspace-dist iteration, not artifact --run mode",
+    "Overlay families (dialog/menu/snack-bar/tooltip) and later risk tiers not run this session",
     "Audit cursor preserved at 5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
   ],
-  "next_action": "Continue RC-06 remaining families and/or artifact-bound --run mode; or RC-02.04 verify orchestration. Do not claim G01-G13 or RC engineering ready.",
+  "next_action": "Continue RC-06 overlay families and/or artifact-bound --run mode; or RC-02.04 verify orchestration. Do not claim G01-G13 or RC engineering ready.",
   "blocked_owner_decisions": [
     "cyph-rc-age-admission",
     "registry-publish-authority",
     "github-protection-read"
   ],
-  "recorded_at_utc": "2026-10-01T15:09:22Z",
+  "recorded_at_utc": "2026-10-01T15:15:29Z",
   "clock_confidence": "verified",
-  "select_width": {
-    "root_cause": "Historical +32/+64px from Angular transformPanel animation minWidth states; engine-free CSS keyframes omitted them.",
-    "fix_commit": "0cf327c11a2f4293019f4010e3c20c5b0b062bc5",
-    "fix": "SCSS min-width: calc(100% + 32px) and +64px for .mat-select-panel-multiple",
-    "local_iteration": {
-      "select": "270/270",
-      "card": "14/14",
-      "mode": "workspace-dist"
-    }
+  "family_iteration": {
+    "mode": "workspace-dist",
+    "autocomplete": "184/184",
+    "form_field": "25/25",
+    "input": "149/149",
+    "card": "14/14",
+    "select": "270/270"
+  },
+  "input_fixes": {
+    "product": "legacy form-field: run hint/placeholder validation outside RxJS subscribe so duplicate-hint and placeholder-conflict errors reach detectChanges (matches current Material pattern; startWith(null) subscribe swallowed throws under RxJS 7+)",
+    "test_adapt": "input.spec.ts: rethrow after fakeAsync flush in three validation cases so Jasmine observes the historical error",
+    "harness_shim": "shared-input.spec.ts: accept Angular IdGenerator alphanumeric suffixes (/mat-input-\\\\w+/)"
   },
   "rc02": {
     "ci_pack_path": "artifacts/main/entry-${GITHUB_SHA}",
-    "wiring_commit": "ca2b084d1469dd275786739d548fbdd7e9b6885e",
-    "pack_meta_fields_added": [
-      "source_sha",
-      "source_tree_hash",
-      "dirty"
-    ],
-    "f01_wip_reuse": "ideas only; did not replay F01 Chainman-less CI or history rewrite"
-  },
-  "ci": {
-    "tested_commit": "ca2b084d1469dd275786739d548fbdd7e9b6885e",
-    "run_id": 36881780441,
-    "url": "https://github.com/buu700/ngx-compat-material-legacy/actions/runs/36881780441",
-    "outcome": "success",
-    "jobs": [
-      "Chainman verify-lite",
-      "Packed-consumer AOT and harness"
-    ]
+    "note": "No RC-02.04 verify orchestration change this session"
   },
   "audit_cursor": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
   "history_transition": {
