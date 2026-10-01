@@ -3,11 +3,11 @@
   "role": "canonical upstream disposition ledger (partial)",
   "g11_claim": "not-passed",
   "seed_rows": 1697,
-  "ledger_rows": 637,
-  "closed_dispositions": 637,
-  "open_or_deferred": 1060,
+  "ledger_rows": 660,
+  "closed_dispositions": 660,
+  "open_or_deferred": 1037,
   "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-  "batch_id": "product-adapt-a11y-overlay-2026-10-01-i",
+  "batch_id": "product-adapt-priority-2026-10-01-j",
   "entries": [
     {
       "sha": "2dc599762eab74812c011370d30f9cec307e884d",
@@ -12145,6 +12145,424 @@
       "source_check": "legacy-chips/chip-list.ts _allowFocusEscape DOM tabindex",
       "batch_id": "product-adapt-a11y-overlay-2026-10-01-i",
       "recorded_at_utc": "2026-10-01T17:10:57Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "product_adaptation": true
+    },
+    {
+      "sha": "216ae0cca12d1a9139f0faf0a85fceb157fc2490",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/autocomplete): requireSelection sometimes not clearing value when editing after selection (#28628)",
+      "final_disposition": "already-adapted",
+      "reason": "Capture input value on keydown via _valueOnLastKeydown and pass it into _openPanelInternal so requireSelection clears after edit-before-blur.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/autocomplete/autocomplete-trigger.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-autocomplete/internal/autocomplete-trigger-base.ts _valueOnLastKeydown",
+      "batch_id": "product-adapt-priority-2026-10-01-j",
+      "recorded_at_utc": "2026-10-01T17:22:07Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "product_adaptation": true
+    },
+    {
+      "sha": "2f17c69b81f3f67ec9c179ac859a646f6306ce8c",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/autocomplete): panel not visible when opened from multiple triggers (#28843)",
+      "final_disposition": "already-adapted",
+      "reason": "Track _latestOpeningTrigger and only reset panel open state when the closing trigger is still the latest opener.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/autocomplete/autocomplete-trigger.ts",
+        "src/material/autocomplete/autocomplete.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-autocomplete autocomplete-base/trigger-base _latestOpeningTrigger",
+      "batch_id": "product-adapt-priority-2026-10-01-j",
+      "recorded_at_utc": "2026-10-01T17:22:07Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "product_adaptation": true
+    },
+    {
+      "sha": "008212a9807fd01fd32fe136a075763b7b2c854d",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/autocomplete): autocomplete panel top is cut off in landscape mode (#28982)",
+      "final_disposition": "already-adapted",
+      "reason": "Observe HandsetLandscape and enable flexibleDimensions/growAfterOpen/viewportMargin(8) so the panel is not clipped.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/autocomplete/autocomplete-trigger.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-autocomplete/internal/autocomplete-trigger-base.ts BreakpointObserver",
+      "batch_id": "product-adapt-priority-2026-10-01-j",
+      "recorded_at_utc": "2026-10-01T17:22:07Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "product_adaptation": true
+    },
+    {
+      "sha": "13629b0cd814ccc5fa01cf670b8b3001bc0021ff",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/autocomplete): regression in requireSelection when options are filtered (#28119)",
+      "final_disposition": "already-adapted",
+      "reason": "Capture _valueOnAttach only when the overlay is first attached, not on every typing attach.",
+      "read_note_disposition": "not-applied",
+      "files": [
+        "src/material/autocomplete/autocomplete-trigger.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-autocomplete/internal/autocomplete-trigger-base.ts attach-only capture",
+      "batch_id": "product-adapt-priority-2026-10-01-j",
+      "recorded_at_utc": "2026-10-01T17:22:07Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "product_adaptation": true
+    },
+    {
+      "sha": "d5d468a29a2db4c0676c57d60bc8431ed4fd6e18",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/autocomplete): clear previous selection on reactive form reset (#27653)",
+      "final_disposition": "already-adapted",
+      "reason": "_assignOptionValue clears previous selected option when the assigned value is null (reactive form reset).",
+      "read_note_disposition": "not-applied",
+      "files": [
+        "src/material/autocomplete/autocomplete-trigger.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-autocomplete/internal/autocomplete-trigger-base.ts _assignOptionValue null clear",
+      "batch_id": "product-adapt-priority-2026-10-01-j",
+      "recorded_at_utc": "2026-10-01T17:22:07Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "product_adaptation": true
+    },
+    {
+      "sha": "cf868a5089a4c9eaddd4a55fd18b952fb96d5c19",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/autocomplete): clear selected option if it is removed while typing (#28146)",
+      "final_disposition": "already-adapted",
+      "reason": "While typing with the panel open and requireSelection off, deselect options whose display no longer matches.",
+      "read_note_disposition": "not-applied",
+      "files": [
+        "src/material/autocomplete/autocomplete-trigger.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-autocomplete/internal/autocomplete-trigger-base.ts _handleInput deselect",
+      "batch_id": "product-adapt-priority-2026-10-01-j",
+      "recorded_at_utc": "2026-10-01T17:22:07Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "product_adaptation": true
+    },
+    {
+      "sha": "6b7e6c5886cefab4008b1fa97a5bf899475baa2b",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/autocomplete): not closing when clicking on hint area (#28316)",
+      "final_disposition": "already-adapted",
+      "reason": "Outside-click stream uses form-field getConnectedOverlayOrigin so hint clicks close the panel.",
+      "read_note_disposition": "not-applied",
+      "files": [
+        "src/material/autocomplete/autocomplete-trigger.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-autocomplete/internal/autocomplete-trigger-base.ts _getOutsideClickStream",
+      "batch_id": "product-adapt-priority-2026-10-01-j",
+      "recorded_at_utc": "2026-10-01T17:22:07Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "product_adaptation": true
+    },
+    {
+      "sha": "eb22e2e85fc007c6357067a2fcf57cb54283f8d5",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/form-field): outline label position (#29123)",
+      "final_disposition": "already-adapted",
+      "reason": "_isAttachedToDOM requires the root to be the document or the host shadow root.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/form-field/form-field.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-form-field/form-field.ts _isAttachedToDOM",
+      "batch_id": "product-adapt-priority-2026-10-01-j",
+      "recorded_at_utc": "2026-10-01T17:22:07Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "product_adaptation": true
+    },
+    {
+      "sha": "6318f24d57572b9aeb1da9b4556030fd38efad8a",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/form-field): outline label position (#29138)",
+      "final_disposition": "already-adapted",
+      "reason": "Attachment also requires a visible offsetParent in the light DOM and caches the shadow root.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/form-field/form-field.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-form-field/form-field.ts _resolveShadowRoot",
+      "batch_id": "product-adapt-priority-2026-10-01-j",
+      "recorded_at_utc": "2026-10-01T17:22:07Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "product_adaptation": true
+    },
+    {
+      "sha": "13aef8cf87409a706f3634caa75d5b04505a8ec9",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/form-field): hiding a label after it has been (#29461)",
+      "final_disposition": "already-adapted",
+      "reason": "_shouldLabelFloat returns false when there is no floating label, avoiding a floated blank gap.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/form-field/form-field.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-form-field/form-field.ts _shouldLabelFloat",
+      "batch_id": "product-adapt-priority-2026-10-01-j",
+      "recorded_at_utc": "2026-10-01T17:22:07Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "product_adaptation": true
+    },
+    {
+      "sha": "e3abc65d7d191f2adf1c294bdb84f532d4eac05c",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/radio): mark radio-group for check on touch (#29203)",
+      "final_disposition": "already-adapted",
+      "reason": "Radio group _touch calls markForCheck after onTouched for OnPush consumers.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/radio/radio.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-radio/internal/radio-base.ts _touch",
+      "batch_id": "product-adapt-priority-2026-10-01-j",
+      "recorded_at_utc": "2026-10-01T17:22:07Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "product_adaptation": true
+    },
+    {
+      "sha": "fd47a0e60dd9ab50d9f923713ca60a7fd21ccc16",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/radio): avoid error if destroyed quickly (#29507)",
+      "final_disposition": "already-adapted",
+      "reason": "Null-check _inputElement before focusing from the touch target.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/radio/radio.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-radio/internal/radio-base.ts _onTouchTargetClick",
+      "batch_id": "product-adapt-priority-2026-10-01-j",
+      "recorded_at_utc": "2026-10-01T17:22:07Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "product_adaptation": true
+    },
+    {
+      "sha": "cc00a74ea50df0ea076bfa887f25a023d9bb749f",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/tabs): avoid pagination infinite loop in safari (#29121)",
+      "final_disposition": "already-adapted",
+      "reason": "Enable tab pagination only when scrollWidth exceeds container by >=5px to avoid Safari loops.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/tabs/paginated-tab-header.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-tabs/internal/paginated-tab-header.ts _checkPaginationEnabled",
+      "batch_id": "product-adapt-priority-2026-10-01-j",
+      "recorded_at_utc": "2026-10-01T17:22:07Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "product_adaptation": true
+    },
+    {
+      "sha": "c63b1fe7b340796d21492b9ccc28e91df6464f37",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/tabs): flicker when animationDuration is set to zero (#30966)",
+      "final_disposition": "already-adapted",
+      "reason": "_animationsDisabled treats animationDuration 0/0ms like NoopAnimations for the noopable class.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/tabs/tab-group.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-tabs tab-group.html/_animationsDisabled",
+      "batch_id": "product-adapt-priority-2026-10-01-j",
+      "recorded_at_utc": "2026-10-01T17:22:07Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "product_adaptation": true
+    },
+    {
+      "sha": "1b6db8c89b00ace8aaa0e0824866acec5369635f",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/select): flicker if opened from inside a focus handler (#28287)",
+      "final_disposition": "already-adapted",
+      "reason": "Trigger click calls open() instead of toggle(); open early-returns when _canOpen is false.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/select/select.html",
+        "src/material/select/select.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-select select.html + select-base open",
+      "batch_id": "product-adapt-priority-2026-10-01-j",
+      "recorded_at_utc": "2026-10-01T17:22:07Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "product_adaptation": true
+    },
+    {
+      "sha": "3550a8798a5aa51e945121c0fcf4e17b4e882faa",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/menu): animation issue when same menu is used for multiple nested triggers (#29280)",
+      "final_disposition": "already-adapted",
+      "reason": "Hide animating menu panels whose .mat-menu-content is empty when the menu is reused across triggers.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/menu/menu.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-menu/menu.scss :has(.mat-menu-content:empty)",
+      "batch_id": "product-adapt-priority-2026-10-01-j",
+      "recorded_at_utc": "2026-10-01T17:22:07Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "product_adaptation": true
+    },
+    {
+      "sha": "46bcc21cbc19ff8ec946485febf70a85146f1026",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/chips): simplify repeat chip removal prevention (#29048)",
+      "final_disposition": "already-adapted",
+      "reason": "Use KeyboardEvent.repeat to ignore held backspace on chips and chip-input instead of keyup flag.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/chips/chip.ts",
+        "src/material/chips/chip-input.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-chips chip.ts + chip-input.ts",
+      "batch_id": "product-adapt-priority-2026-10-01-j",
+      "recorded_at_utc": "2026-10-01T17:22:07Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "product_adaptation": true
+    },
+    {
+      "sha": "fef66fee7cca3829a0b756f57800e88624c597a2",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/dialog): `mat-dialog-title` should work under `OnPush` `viewContainerRef` (#28329)",
+      "final_disposition": "already-adapted",
+      "reason": "Dialog title registers/unregisters via CDK _addAriaLabelledBy/_removeAriaLabelledBy (markForCheck).",
+      "read_note_disposition": "not-applied",
+      "files": [
+        "src/cdk/dialog/dialog-container.ts",
+        "src/material/dialog/dialog-content-directives.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-dialog/dialog-content-directives.ts",
+      "batch_id": "product-adapt-priority-2026-10-01-j",
+      "recorded_at_utc": "2026-10-01T17:22:07Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "product_adaptation": true
+    },
+    {
+      "sha": "59c8bb9a14c61c3932d6701994366f05ef719a91",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/button): fix raised button line-height (#28073)",
+      "final_disposition": "already-adapted",
+      "reason": "Typography mixins set line-height: inherit on raised/text/flat/outlined (MDC bridge + legacy) buttons.",
+      "read_note_disposition": "not-applied",
+      "files": [
+        "src/material/button/_button-theme.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "styles/button/_button-theme.scss + legacy-button/_button-theme.scss",
+      "batch_id": "product-adapt-priority-2026-10-01-j",
+      "recorded_at_utc": "2026-10-01T17:22:07Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "product_adaptation": true
+    },
+    {
+      "sha": "8fb5b6b413f7a80d41d3052b7c4703451767d1f1",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/button): fix text button line-height (#28091)",
+      "final_disposition": "already-adapted",
+      "reason": "Typography mixins set line-height: inherit on mat-mdc-button / .mat-button variants.",
+      "read_note_disposition": "not-applied",
+      "files": [
+        "src/material/button/_button-theme.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "styles/button/_button-theme.scss + legacy-button/_button-theme.scss",
+      "batch_id": "product-adapt-priority-2026-10-01-j",
+      "recorded_at_utc": "2026-10-01T17:22:07Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "product_adaptation": true
+    },
+    {
+      "sha": "a6582b51082955cec4c61f04d1407ff02c749c88",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/button): fix flat button line-height (#28090)",
+      "final_disposition": "already-adapted",
+      "reason": "Typography mixins set line-height: inherit on unelevated/flat button variants.",
+      "read_note_disposition": "not-applied",
+      "files": [
+        "src/material/button/_button-theme.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "styles/button/_button-theme.scss + legacy-button/_button-theme.scss",
+      "batch_id": "product-adapt-priority-2026-10-01-j",
+      "recorded_at_utc": "2026-10-01T17:22:07Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "product_adaptation": true
+    },
+    {
+      "sha": "6b2f03be33ed0b2fc3329a14217f18e7a8590b31",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/button): fix outlined button line-height (#28092)",
+      "final_disposition": "already-adapted",
+      "reason": "Typography mixins set line-height: inherit on outlined/stroked button variants.",
+      "read_note_disposition": "not-applied",
+      "files": [
+        "src/material/button/_button-theme.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "styles/button/_button-theme.scss + legacy-button/_button-theme.scss",
+      "batch_id": "product-adapt-priority-2026-10-01-j",
+      "recorded_at_utc": "2026-10-01T17:22:07Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "product_adaptation": true
+    },
+    {
+      "sha": "657885e893f4693197d428c51bf74ec80f662f26",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/slide-toggle): rendering issue in Safari 18.3 (#30490)",
+      "final_disposition": "already-adapted",
+      "reason": "Legacy thumb-container already uses transform: translate3d(0,0,0), the Safari compositing analog of upstream translateZ(0).",
+      "read_note_disposition": "not-applied",
+      "files": [
+        "src/material/slide-toggle/slide-toggle.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-slide-toggle/slide-toggle.scss thumb-container translate3d",
+      "batch_id": "product-adapt-priority-2026-10-01-j",
+      "recorded_at_utc": "2026-10-01T17:22:07Z",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
       "product_adaptation": true
