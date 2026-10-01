@@ -1452,11 +1452,12 @@ describe('MatChipList', () => {
       });
     }));
 
-    it('should set the proper aria-live attribute on the error messages', () => {
+    it('should be in a parent element with an aria-live attribute to announce the error', () => {
       errorTestComponent.formControl.markAsTouched();
       fixture.detectChanges();
 
-      expect(containerEl.querySelector('mat-error')!.getAttribute('aria-live')).toBe('polite');
+      const error = containerEl.querySelector('mat-error')!;
+      expect(error.closest('[aria-live]')!.getAttribute('aria-live')).toBe('polite');
     });
 
     it('sets the aria-describedby to reference errors when in error state', () => {
