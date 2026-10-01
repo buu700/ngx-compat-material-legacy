@@ -5,7 +5,8 @@
  *
  * PR-stage Chromium main-line slice: dialog/select (zoneful/zoneless/CSP/
  * reduced-motion), menu/snack-bar/tooltip/autocomplete/tabs defaults
- * (zoneful and zoneless), plus chips/form-field defaults (zoneful and
+ * (zoneful and zoneless), chips/form-field defaults (zoneful and
+ * zoneless), plus input/list/slider default+focused/disabled (zoneful and
  * zoneless). Does not fan success into unexecuted engines/families. Does
  * not claim G10.
  *
@@ -198,6 +199,57 @@ const scenarios = [
       && report.families?.['form-field']?.label_floating
       && !report.error,
   },
+  {
+    id: 'control-families-zoneful',
+    script: 'scripts/browser-control-families.mjs',
+    args: [],
+    cells: [
+      'pr/main/chromium/zoneful/input/default',
+      'pr/main/chromium/zoneful/input/focused',
+      'pr/main/chromium/zoneful/list/default',
+      'pr/main/chromium/zoneful/list/disabled',
+      'pr/main/chromium/zoneful/slider/default',
+      'pr/main/chromium/zoneful/slider/disabled',
+    ],
+    detail: 'compatibility/rc/reports/browser-control-families.json',
+    require: report => Array.isArray(report.credited_cell_ids)
+      && report.credited_cell_ids.length >= 6
+      && report.families?.input?.present
+      && report.families?.input?.focused
+      && report.families?.list?.present
+      && report.families?.list?.disabled_class
+      && report.families?.slider?.present
+      && report.families?.slider?.disabled_class
+      && report.families?.slider?.value_reflected
+      && !report.error,
+  },
+  {
+    id: 'control-families-zoneless',
+    script: 'scripts/browser-control-families.mjs',
+    args: ['--zoneless'],
+    cells: [
+      'pr/main/chromium/zoneless/input/default',
+      'pr/main/chromium/zoneless/input/focused',
+      'pr/main/chromium/zoneless/list/default',
+      'pr/main/chromium/zoneless/list/disabled',
+      'pr/main/chromium/zoneless/slider/default',
+      'pr/main/chromium/zoneless/slider/disabled',
+    ],
+    detail: 'compatibility/rc/reports/browser-control-families-zoneless.json',
+    require: report => Array.isArray(report.credited_cell_ids)
+      && report.credited_cell_ids.length >= 6
+      && report.zoneless === true
+      && report.bundle_has_zone === false
+      && report.zone_global === 'undefined'
+      && report.families?.input?.present
+      && report.families?.input?.focused
+      && report.families?.list?.present
+      && report.families?.list?.disabled_class
+      && report.families?.slider?.present
+      && report.families?.slider?.disabled_class
+      && report.families?.slider?.value_reflected
+      && !report.error,
+  },
 ];
 
 const executed = [];
@@ -216,11 +268,13 @@ function freeCdpPort(port) {
 }
 
 for (const scenario of scenarios) {
-  const cdpPort = scenario.script.includes('form-families')
-    ? 9335
-    : scenario.script.includes('overlay')
-      ? 9334
-      : 9333;
+  const cdpPort = scenario.script.includes('control-families')
+    ? 9336
+    : scenario.script.includes('form-families')
+      ? 9335
+      : scenario.script.includes('overlay')
+        ? 9334
+        : 9333;
   freeCdpPort(cdpPort);
   process.env.CDP_PORT = String(cdpPort);
   const result = spawnSync(
@@ -274,7 +328,7 @@ const report = {
   result: ok ? 'pass' : 'fail',
   matrix_updated: false,
   limitations: [
-    'Chromium PR-slice: dialog/select (zoneful/zoneless/CSP/reduced-motion), menu/snack-bar/tooltip/autocomplete/tabs defaults (zoneful+zoneless), chips/form-field defaults (zoneful+zoneless).',
+    'Chromium PR-slice: dialog/select (zoneful/zoneless/CSP/reduced-motion), menu/snack-bar/tooltip/autocomplete/tabs defaults (zoneful+zoneless), chips/form-field defaults (zoneful+zoneless), input/list/slider default+focused/disabled (zoneful+zoneless).',
     'Firefox/WebKit, remaining families/states, SSR, enabled-motion, and other CSP cells stay not-executed.',
     'Success is not copied to unexecuted cells.',
     'Does not claim G10.',
