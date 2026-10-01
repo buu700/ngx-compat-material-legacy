@@ -1,50 +1,17 @@
 {
   "schema_version": 1,
   "role": "adaptation-required queue from sensitive already-read notes",
-  "batch_id": "product-adapt-priority-2026-10-01-j",
-  "recorded_at_utc": "2026-10-01T17:22:07Z",
+  "batch_id": "product-adapt-residual-2026-10-01-k",
+  "recorded_at_utc": "2026-10-01T17:45:00Z",
   "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
   "g11_claim": "not-passed",
-  "count": 51,
+  "count": 24,
   "by_read_note_disposition": {
-    "owned-retained": 45,
-    "not-applied": 6
+    "owned-retained": 21,
+    "not-applied": 3
   },
   "policy": "Each row has a read note proving owned sources still lack the upstream fix. Rows stay missing from the final disposition ledger until an adaptation (or an evidence-backed not-applicable/inherited/already-adapted decision) lands. Not unread binge; not G11.",
   "items": [
-    {
-      "sha": "1dcc195853a74d1e0b724b742673eb5fd744cb67",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/core): ensure that option inherits container background",
-      "files": [
-        "src/material/core/option/option.scss"
-      ],
-      "evidence": "The patch sets the option list-item background to transparent so it matches its container. The owned list-item rule only centers the content. The transparent background was not added.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
-      "sha": "556bcc3b0ff85bc47fe3727ae90a66b8c6f25348",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/tabs): prevent page scroll on space press (#28532)",
-      "files": [
-        "src/material/tabs/tab-nav-bar/tab-nav-bar.ts"
-      ],
-      "evidence": "The patch calls preventDefault for space on an enabled tab link so the page does not scroll, and leaves enter alone. The owned key handler still calls preventDefault only when the link is disabled. The space call was not added.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
-      "sha": "4f518f9fffd1c85cddef9d573ae7bbda4981f7cb",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/list): use direction-agnostic text-align",
-      "files": [
-        "src/material/list/list.scss"
-      ],
-      "evidence": "The patch sets list item buttons to text-align start and removes the right-to-left override. The owned list buttons still align left and override that to right. The start value was not added.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
     {
       "sha": "d4e61e233088ce0d5bbfb6cf3ff652e303e7e38d",
       "read_note_disposition": "owned-retained",
@@ -92,17 +59,6 @@
       "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
     },
     {
-      "sha": "d6aed804460d4b75082d7d04e051f2cae9b4f8f6",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/chips): remove button is too small (#29351)",
-      "files": [
-        "src/material/chips/chip.scss"
-      ],
-      "evidence": "The patch expands the chip remove overlay to a 48px touch target. The owned remove icon stays 18px and has no that overlay padding. The touch target was not added.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
       "sha": "10da6c63757200b5848c00e560eabe8642435fe8",
       "read_note_disposition": "owned-retained",
       "subject": "fix(material/input): Number input not changing on wheel interaction (#29449)",
@@ -134,17 +90,6 @@
         "src/material/checkbox/checkbox.scss"
       ],
       "evidence": "The patch moves MDC checkbox high-contrast checkmark color, disabled opacity, and print color-adjust into the common stylesheet. The owned checkbox already sets print color-adjust and a 0.5 disabled opacity in high contrast, and it sets the checkmark stroke for black-on-white. The MDC CanvasText variables were not added.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
-      "sha": "ec35e99c48b78aaef001c4aeff52f2fa34804675",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/form-field): update state if control changes (#29573)",
-      "files": [
-        "src/material/form-field/form-field.ts"
-      ],
-      "evidence": "The patch reinitializes the form field when the projected control changes, swaps the type class, and resubscribes to state and value changes. The owned field still subscribes once in ngAfterContentInit and only validates the control in ngAfterContentChecked. The resubscription was not added.",
       "status": "adaptation-required",
       "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
     },
@@ -220,72 +165,6 @@
       "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
     },
     {
-      "sha": "777d1d295aaa8bc6e47a7c76e8fe9246ed30db2e",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/chips): increase chip remove touch target size (#29452)",
-      "files": [
-        "src/material/chips/chip.scss"
-      ],
-      "evidence": "The patch expands the chip remove action to a 48px touch target with padding and a negative margin. The owned chip remove stays 18px. The touch target was not expanded.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
-      "sha": "2861a306aebc54eafe4a72b4a53860d8612af5d4",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/chips): chip grid not re-focusing first item",
-      "files": [
-        "src/material/chips/chip-grid.ts"
-      ],
-      "evidence": "The patch re-focuses the chip grid's active chip when the grid receives focus, and only activates the first chip when none is active. The owned chip list still activates the first chip whenever the list has chips. That focus change was not applied.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
-      "sha": "48b2680f6b41be5dc9bda7f261279cc4c9ad7d64",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/form-field): account in `cols` attribute on textarea (#29836)",
-      "files": [
-        "src/material/form-field/form-field.scss"
-      ],
-      "evidence": "The patch sets the form-field infix width to auto when it contains a textarea with a cols attribute. The owned infix stays the 180px default width. That override was not added.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
-      "sha": "da9cb714e92dc2fc997043bbca33004910763998",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/dialog): updates dialog max-height in landscape (#29853)",
-      "files": [
-        "src/material/dialog/dialog.scss"
-      ],
-      "evidence": "The patch adds a 95vh dialog container max-height variable. The owned dialog container still inherits its max height, and the content max height stays 65vh. That variable was not added.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
-      "sha": "5153a5cd4bdd69649f07ba6596cad56bfd9eb2b1",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/chips): emitting end event multiple times when holding down key (#29894)",
-      "files": [
-        "src/material/chips/chip-input.ts"
-      ],
-      "evidence": "The patch ignores a repeated separator key so holding it does not emit chipEnd again. Owned chip input still emits chipEnd for every separator key, including repeats (legacy-chips/chip-input.ts). That repeat check was not added.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
-      "sha": "0064b4218b375b30b65bf1c13530d8620f20d980",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/tabs): remove IE animation workaround (#29899)",
-      "files": [
-        "src/material/tabs/tab-body.ts"
-      ],
-      "evidence": "The patch drops distinctUntilChanged on tab translation completion so duplicate animation done events are no longer collapsed. Owned tab body still collapses those events when the from and to states match (legacy-tabs/internal/tab-body-base.ts). That filter was not removed.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
       "sha": "d0cf8bfe8bc476145984e0f8f3ab7d18eea36f1a",
       "read_note_disposition": "owned-retained",
       "subject": "fix(material/snack-bar): prevent override of snack bar action button color (#27511)",
@@ -293,17 +172,6 @@
         "src/material/snack-bar/snack-bar-container.scss"
       ],
       "evidence": "The patch applies the snack-bar action button color token only under .mat-unthemed so a themed button color is not overridden. Owned snack-bar still sets .mat-simple-snackbar-action color directly (legacy-snack-bar/_snack-bar-theme.scss). That color was not gated.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
-      "sha": "d62c23629208f50620fccd1b5dc33f64f1df0a10",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/form-field): avoid touching the DOM on each state change",
-      "files": [
-        "src/material/form-field/form-field.ts"
-      ],
-      "evidence": "The patch syncs form-field aria-describedby only when the error state or user aria-describedby changes. Owned form field still calls _syncDescribedByIds on every control state change (legacy-form-field/form-field.ts). That filter was not added.",
       "status": "adaptation-required",
       "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
     },
@@ -321,39 +189,6 @@
       "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
     },
     {
-      "sha": "8980ad584c7ab7d8a0553528cbff88958e94a22a",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/chips): emit state changes when chip grid is disabled (#30033)",
-      "files": [
-        "src/material/chips/chip-grid.ts"
-      ],
-      "evidence": "The patch emits stateChanges when the chip grid disabled setter runs. Owned chip list still only syncs chip state in that setter (legacy-chips/chip-list.ts). That emission was not added.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
-      "sha": "6962c858378b52e0a90f7e2cada0f71c297840ed",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/core): optgroup label color not inferred correctly (#30085)",
-      "files": [
-        "src/material/core/option/optgroup.scss"
-      ],
-      "evidence": "The patch sets color: inherit on the optgroup label so a list color does not win. Owned optgroup label styles do not set that color (legacy-core/option/optgroup.scss). The theme still colors the label from the foreground secondary text. That inherit was not added.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
-      "sha": "a028b5d8421f1e0094381f30c37f8ec3c02e2c46",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/tabs): ink bar not showing when same tab is re-selected (#30121)",
-      "files": [
-        "src/material/tabs/ink-bar.ts"
-      ],
-      "evidence": "The patch clears the ink bar's current item when the bar is hidden, so selecting the same tab again shows the bar. Owned ink bar hide still only deactivates the items (legacy-tabs/internal/ink-bar-shared.ts). That current item was not cleared.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
       "sha": "77393153fd4f6acad65fad6b8f0eefeb8dcd4b06",
       "read_note_disposition": "owned-retained",
       "subject": "fix(material/menu): decouple menu lifecycle from animations (#30148)",
@@ -361,39 +196,6 @@
         "src/material/menu/menu-trigger.ts"
       ],
       "evidence": "The patch closes a menu without waiting for the exit animation and opens a hovered submenu without waiting for the panel animation. Owned menu close still waits on _animationDone before detaching lazy content, and submenu hover still waits while _isAnimating (legacy-menu/internal/menu-trigger-base.ts). That lifecycle was not changed.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
-      "sha": "c04f84fd3b81dbf5e1e76304845f51d16f365ab3",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/tooltip): body line height affecting gap (#30164)",
-      "files": [
-        "src/material/tooltip/tooltip.scss"
-      ],
-      "evidence": "The patch sets line-height normal on the MDC tooltip panel so body line height does not change the gap. Owned tooltip panel does not set that line height (legacy-tooltip/tooltip.scss). That rule was not added.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
-      "sha": "4697d8e18046540ed7b632bc8c94c74d980d7e02",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/list): enable MacOS select all with command+a (#30183)",
-      "files": [
-        "src/material/list/selection-list.ts"
-      ],
-      "evidence": "The patch treats command+a as select-all on a selection list by also checking metaKey. Owned selection list still checks only ctrlKey (legacy-list/selection-list.ts). That modifier was not added.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
-      "sha": "59a79852a3e655a48d3ccc5d1e7e3c637f60517f",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/tabs): tab nav bar animation not working when navigating forwards (#30313)",
-      "files": [
-        "src/material/tabs/tab-nav-bar/tab-nav-bar.ts"
-      ],
-      "evidence": "The patch stops hiding the tab nav ink bar when no link is active so a forward navigation can animate. Owned updateActiveLink still hides the bar (legacy-tabs/internal/tab-nav-bar-base.ts). That hide was not removed.",
       "status": "adaptation-required",
       "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
     },
@@ -442,72 +244,6 @@
       "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
     },
     {
-      "sha": "cdb15925494fa83bf1e4033b49e42d6649e43deb",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/form-field): trigger CD when form (#30395)",
-      "files": [
-        "src/material/form-field/form-field.ts"
-      ],
-      "evidence": "The patch marks the form field for check when the control validator function changes, such as when an input is replaced by a select. Owned form field does not compare validator functions. That check was not added.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
-      "sha": "c5213fd3ef4202e9a6896be0f9202bbba78bde6b",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/chips): forced colors disabled chip fix (#30429)",
-      "files": [
-        "src/material/chips/chip.scss"
-      ],
-      "evidence": "The patch sets forced-color-adjust: none on disabled MDC chips. Owned chips do not set that property (legacy-chips/chips.scss). That adjustment was not added.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
-      "sha": "8b2b944c88c59e58618c30d4722f154972debac4",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/list): option views not change detected when control is disabled (#30532)",
-      "files": [
-        "src/material/list/selection-list.ts"
-      ],
-      "evidence": "The patch marks each list option for check when the selection list is disabled. Owned setDisabledState only assigns the disabled flag (legacy-list/selection-list.ts). That option check was not added.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
-      "sha": "e61d152e002937f4bc9df96851c2932e15ce7461",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/autocomplete): incorrectly resolving focused element in shadow DOM (#30619)",
-      "files": [
-        "src/material/autocomplete/autocomplete-trigger.ts"
-      ],
-      "evidence": "The patch resolves autocomplete focus through the shadow DOM instead of document.activeElement. Owned autocomplete still compares document.activeElement (legacy-autocomplete/internal/autocomplete-trigger-base.ts). That focus check was not changed.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
-      "sha": "e9b015737ca86eabd18e1ce2411dd4e5c8882dc4",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/form-field): move error aria-live to parent container (#30678)",
-      "files": [
-        "src/material/form-field/form-field.html"
-      ],
-      "evidence": "The patch moves aria-live onto one permanent form-field subscript wrapper and stops setting it on the error. Owned errors still set aria-live on themselves (legacy-form-field/error.ts), and the subscript still switches between separate hint and error wrappers. That wrapper was not merged.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
-      "sha": "a5aade2df3a34532924365c3ac797e4b343633f6",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/form-field): preserve aria-describedby set externally across all form controls (#30699)",
-      "files": [
-        "src/material/form-field/form-field.ts"
-      ],
-      "evidence": "The patch preserves aria-describedby ids that were set outside the form field by filtering the control's describedByIds. Owned form field still assigns only the hint and error ids (legacy-form-field/form-field.ts). That filter was not added.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
       "sha": "d27f79357786e6d0b67d3895cb6e79135954ac11",
       "read_note_disposition": "owned-retained",
       "subject": "fix(material/button): inherit button shape in focus indicator (#31065)",
@@ -515,28 +251,6 @@
         "src/material/button/_button-base.scss"
       ],
       "evidence": "The patch makes the button focus indicator inherit the button border radius, and turns that off for the FAB. Owned buttons size the focus indicator with a negative margin (legacy-button/button.scss). That inherited radius was not added.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
-      "sha": "96fe7b3f3fd663560943ddf051b1b160834111e1",
-      "read_note_disposition": "not-applied",
-      "subject": "fix(material/tooltip): increase specificity of non-interactive styles (#28180)",
-      "files": [
-        "src/material/tooltip/tooltip.scss"
-      ],
-      "evidence": "The patch raises the non-interactive tooltip selector to .mat-mdc-tooltip-panel.mat-mdc-tooltip-panel-non-interactive. legacy-tooltip/tooltip.scss still uses .mat-tooltip-panel-non-interactive alone for pointer-events none. That selector was not changed.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
-      "sha": "7f1562dfa87ced12f637a35e2b42a26f261dfaba",
-      "read_note_disposition": "not-applied",
-      "subject": "fix(material/dialog): scale animation not working (#28449)",
-      "files": [
-        "src/material/dialog/dialog.scss"
-      ],
-      "evidence": "The patch moves the dialog scale transition onto the MDC dialog surface and limits the container transition to opacity. The owned container still transitions opacity and transform together, and the noop class clears that transition on the same container. The surface split was not added.",
       "status": "adaptation-required",
       "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
     },
@@ -570,17 +284,6 @@
         "src/material/checkbox/checkbox.scss"
       ],
       "evidence": "The patch raises the specificity of the MDC checkbox ripple circle so a later ripple stylesheet cannot square the focus indicator. Owned checkbox ripple does not set that border radius (legacy-checkbox/checkbox.scss). That selector was not changed.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
-      "sha": "12b767111e1fc3c01867cacc02ad73e0aec81fed",
-      "read_note_disposition": "not-applied",
-      "subject": "fix(material/autocomplete): fix initial render logic (#30348)",
-      "files": [
-        "src/material/autocomplete/autocomplete-trigger.ts"
-      ],
-      "evidence": "The patch passes the environment injector to the autocomplete render callback so the first render does not fail. Owned autocomplete trigger does not schedule that render callback. That injector was not changed.",
       "status": "adaptation-required",
       "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
     }
