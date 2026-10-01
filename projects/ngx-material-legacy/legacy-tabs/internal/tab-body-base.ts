@@ -26,7 +26,6 @@ import {
 import {CdkPortalOutlet, TemplatePortal} from '@angular/cdk/portal';
 import {Direction, Directionality} from '@angular/cdk/bidi';
 import {Subject, Subscription} from 'rxjs';
-import {distinctUntilChanged} from 'rxjs/operators';
 import {legacyAnimationsDisabled} from '@ngx-compat/material-legacy/legacy-core';
 
 /**
@@ -112,21 +111,15 @@ export abstract class _MatTabBodyBase implements OnInit, OnDestroy {
       });
     }
 
-    this._translateTabComplete
-      .pipe(
-        distinctUntilChanged((x, y) => {
-          return x.fromState === y.fromState && x.toState === y.toState;
-        }),
-      )
-      .subscribe(event => {
-        if (this._isCenterPosition(event.toState) && this._isCenterPosition(this._position)) {
-          this._onCentered.emit();
-        }
+    this._translateTabComplete.subscribe(event => {
+      if (this._isCenterPosition(event.toState) && this._isCenterPosition(this._position)) {
+        this._onCentered.emit();
+      }
 
-        if (this._isCenterPosition(event.fromState) && !this._isCenterPosition(this._position)) {
-          this._afterLeavingCenter.emit();
-        }
-      });
+      if (this._isCenterPosition(event.fromState) && !this._isCenterPosition(this._position)) {
+        this._afterLeavingCenter.emit();
+      }
+    });
   }
 
   ngOnInit() {

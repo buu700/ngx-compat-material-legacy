@@ -201,7 +201,7 @@ export class MatLegacyChipInput
       this._chipList._keydown(event);
     }
 
-    if (!event || this._isSeparatorKey(event)) {
+    if (!event || (this._isSeparatorKey(event) && !event.repeat)) {
       this.chipEnd.emit({
         input: this.inputElement,
         value: this.inputElement.value,

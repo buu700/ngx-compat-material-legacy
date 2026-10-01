@@ -30,8 +30,8 @@ import {
 } from '@angular/core';
 import {ThemePalette} from '@angular/material/core';
 import {CanColor, mixinColor} from './internal/common-behaviors';
-import {fromEvent, merge, Subject} from 'rxjs';
-import {take, takeUntil} from 'rxjs/operators';
+import {fromEvent, merge, Subject, Subscription} from 'rxjs';
+import {filter, map, pairwise, startWith, take, takeUntil} from 'rxjs/operators';
 import {MatLegacyError} from './error';
 import {_MAT_LEGACY_HINT, MatLegacyHint} from './hint';
 import {MatLegacyLabel} from './label';
@@ -39,7 +39,7 @@ import {MatLegacyPlaceholder} from './placeholder';
 import {MatLegacyPrefix} from './prefix';
 import {MatLegacySuffix} from './suffix';
 import {Platform, _getShadowRoot} from '@angular/cdk/platform';
-import {AbstractControlDirective} from '@angular/forms';
+import {AbstractControlDirective, ValidatorFn} from '@angular/forms';
 import {ANIMATION_MODULE_TYPE} from '@angular/core';
 import {
   getMatFormFieldDuplicatedHintError,
@@ -280,6 +280,13 @@ export class MatLegacyFormField
     this._explicitFormFieldControl = value;
   }
   private _explicitFormFieldControl: MatFormFieldControl<any>;
+  private _previousControl: MatFormFieldControl<unknown> | null = null;
+  private _previousControlValidatorFn: ValidatorFn | null = null;
+  private _stateChanges: Subscription | undefined;
+  private _valueChanges: Subscription | undefined;
+  private _describedByChanges: Subscription | undefined;
+  /** Hint/error IDs last assigned by `_syncDescribedByIds`. */
+  private _describedByIds: string[] | undefined;
 
   @ContentChild(MatLegacyLabel) _labelChildNonStatic: MatLegacyLabel;
   @ContentChild(MatLegacyLabel, {static: true}) _labelChildStatic: MatLegacyLabel;
@@ -337,30 +344,8 @@ export class MatLegacyFormField
 
   ngAfterContentInit() {
     this._validateControlChild();
-
-    const control = this._control;
-
-    if (control.controlType) {
-      this._elementRef.nativeElement.classList.add(`mat-form-field-type-${control.controlType}`);
-    }
-
-    // Subscribe to changes in the child control state in order to update the form field UI.
-    // Initial validation runs outside subscribe so RxJS does not swallow synchronous throws
-    // (current Material form-field uses the same pattern).
-    control.stateChanges.subscribe(() => {
-      this._validatePlaceholders();
-      this._syncDescribedByIds();
-      this._changeDetectorRef.markForCheck();
-    });
-    this._validatePlaceholders();
-    this._syncDescribedByIds();
-
-    // Run change detection if the value changes.
-    if (control.ngControl && control.ngControl.valueChanges) {
-      control.ngControl.valueChanges
-        .pipe(takeUntil(this._destroyed))
-        .subscribe(() => this._changeDetectorRef.markForCheck());
-    }
+    // Control initialization (type class + subscriptions) happens in
+    // ngAfterContentChecked so a swapped projected control is re-wired.
 
     // Note that we have to run outside of the `NgZone` explicitly,
     // in order to avoid throwing users into an infinite loop
@@ -408,6 +393,27 @@ export class MatLegacyFormField
 
   ngAfterContentChecked() {
     this._validateControlChild();
+
+    if (this._control !== this._previousControl) {
+      this._initializeControl(this._previousControl);
+
+      if (this._control.ngControl && this._control.ngControl.control) {
+        this._previousControlValidatorFn = this._control.ngControl.control.validator;
+      } else {
+        this._previousControlValidatorFn = null;
+      }
+
+      this._previousControl = this._control;
+    }
+
+    if (this._control.ngControl && this._control.ngControl.control) {
+      const validatorFn = this._control.ngControl.control.validator;
+      if (validatorFn !== this._previousControlValidatorFn) {
+        this._previousControlValidatorFn = validatorFn;
+        this._changeDetectorRef.markForCheck();
+      }
+    }
+
     if (this._outlineGapCalculationNeededImmediately) {
       this.updateOutlineGap();
     }
@@ -420,6 +426,9 @@ export class MatLegacyFormField
   }
 
   ngOnDestroy() {
+    this._stateChanges?.unsubscribe();
+    this._valueChanges?.unsubscribe();
+    this._describedByChanges?.unsubscribe();
     this._destroyed.next();
     this._destroyed.complete();
   }
@@ -578,7 +587,63 @@ export class MatLegacyFormField
         ids.push(...this._errorChildren.map(error => error.id));
       }
 
-      this._control.setDescribedByIds(ids);
+      const existingDescribedBy = this._control.describedByIds;
+      let toAssign: string[];
+
+      // Preserve aria-describedby IDs assigned outside the form field (e.g. AriaDescriber).
+      if (existingDescribedBy) {
+        const exclude = this._describedByIds || ids;
+        toAssign = ids.concat(existingDescribedBy.filter(id => id && !exclude.includes(id)));
+      } else {
+        toAssign = ids;
+      }
+
+      this._control.setDescribedByIds(toAssign);
+      this._describedByIds = ids;
+    }
+  }
+
+  /** Initializes subscriptions and type class for the projected form field control. */
+  private _initializeControl(previousControl: MatFormFieldControl<unknown> | null) {
+    const control = this._control;
+    const classPrefix = 'mat-form-field-type-';
+
+    if (previousControl?.controlType) {
+      this._elementRef.nativeElement.classList.remove(classPrefix + previousControl.controlType);
+    }
+
+    if (control.controlType) {
+      this._elementRef.nativeElement.classList.add(classPrefix + control.controlType);
+    }
+
+    // Subscribe to changes in the child control state in order to update the form field UI.
+    // Initial validation runs outside subscribe so RxJS does not swallow synchronous throws.
+    this._stateChanges?.unsubscribe();
+    this._stateChanges = control.stateChanges.subscribe(() => {
+      this._validatePlaceholders();
+      this._changeDetectorRef.markForCheck();
+    });
+    this._validatePlaceholders();
+
+    // Updating aria-describedby touches the DOM. Only do it when error/user ids change.
+    this._describedByChanges?.unsubscribe();
+    this._describedByChanges = control.stateChanges
+      .pipe(
+        startWith([undefined, undefined] as const),
+        map(() => [control.errorState, control.userAriaDescribedBy] as const),
+        pairwise(),
+        filter(([[prevErrorState, prevDescribedBy], [currentErrorState, currentDescribedBy]]) => {
+          return prevErrorState !== currentErrorState || prevDescribedBy !== currentDescribedBy;
+        }),
+      )
+      .subscribe(() => this._syncDescribedByIds());
+    this._syncDescribedByIds();
+
+    this._valueChanges?.unsubscribe();
+    if (control.ngControl && control.ngControl.valueChanges) {
+      this._valueChanges = control.ngControl.valueChanges
+        .pipe(takeUntil(this._destroyed))
+        .subscribe(() => this._changeDetectorRef.markForCheck());
     }
   }
 

@@ -69,6 +69,13 @@ $chip-remove-size: 18px;
     -moz-appearance: none;
     padding: 0;
     background: none;
+    position: relative;
+    box-sizing: content-box;
+
+    // Expand the interactive hit target to 48px while keeping the visible icon at 18px.
+    $_touch-target-size: 48px;
+    padding: calc((#{$_touch-target-size} - #{$chip-remove-size}) / 2);
+    margin: calc((#{$_touch-target-size} - #{$chip-remove-size}) / 2 * -1);
 
     &.mat-icon, .mat-icon {
       width: $chip-remove-size;
@@ -116,6 +123,10 @@ $chip-remove-size: 18px;
     .mat-chip-remove,
     .mat-chip-trailing-icon {
       cursor: default;
+    }
+
+    @include cdk.high-contrast(active, off) {
+      forced-color-adjust: none;
     }
   }
 

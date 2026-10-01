@@ -1306,6 +1306,12 @@ export abstract class _MatSelectBase<C>
    * Implemented as part of MatFormFieldControl.
    * @docs-private
    */
+  /** Gets IDs currently on aria-describedby, including ones set outside the form field. */
+  get describedByIds(): string[] {
+    const existing = this._elementRef.nativeElement.getAttribute('aria-describedby');
+    return existing?.split(' ') || [];
+  }
+
   setDescribedByIds(ids: string[]) {
     if (ids.length) {
       this._elementRef.nativeElement.setAttribute('aria-describedby', ids.join(' '));

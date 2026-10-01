@@ -150,9 +150,7 @@ export abstract class _MatTabNavBase
       }
     }
 
-    // The ink bar should hide itself if no items are active.
     this.selectedIndex = -1;
-    this._inkBar.hide();
   }
 
   _getRole(): string | null {
@@ -260,6 +258,12 @@ export class _MatTabLinkBase
       if (this.disabled) {
         event.preventDefault();
       } else if (this._tabNavBar.tabPanel) {
+        // Only prevent the default action on space since it can scroll the page.
+        // Don't prevent enter since it can break link navigation.
+        if (event.keyCode === SPACE) {
+          event.preventDefault();
+        }
+
         this.elementRef.nativeElement.click();
       }
     }

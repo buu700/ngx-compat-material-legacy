@@ -30,6 +30,7 @@ import {DOCUMENT} from '@angular/common';
 import {Directionality} from '@angular/cdk/bidi';
 import {BooleanInput, coerceBooleanProperty} from '@angular/cdk/coercion';
 import {DOWN_ARROW, ENTER, ESCAPE, TAB, UP_ARROW, hasModifierKey} from '@angular/cdk/keycodes';
+import {_getFocusedElementPierceShadowDom} from '@angular/cdk/platform';
 import {legacyGetEventTarget} from '@ngx-compat/material-legacy/legacy-core';
 import {TemplatePortal} from '@angular/cdk/portal';
 import {ViewportRuler} from '@angular/cdk/scrolling';
@@ -141,8 +142,7 @@ export abstract class _MatAutocompleteTriggerBase
     // If the user blurred the window while the autocomplete is focused, it means that it'll be
     // refocused when they come back. In this case we want to skip the first focus event, if the
     // pane was closed, in order to avoid reopening it unintentionally.
-    this._canOpenOnNextFocus =
-      this._document.activeElement !== this._element.nativeElement || this.panelOpen;
+    this._canOpenOnNextFocus = this.panelOpen || !this._hasFocus();
   };
 
   /** `View -> model callback called when value changes` */
@@ -383,7 +383,7 @@ export abstract class _MatAutocompleteTriggerBase
           // true. Its main purpose is to handle the case where the input is focused from an
           // outside click which propagates up to the `body` listener within the same sequence
           // and causes the panel to close immediately (see #3106).
-          this._document.activeElement !== this._element.nativeElement &&
+          !this._hasFocus() &&
           (!formField || !formField.contains(clickTarget)) &&
           (!customOrigin || !customOrigin.contains(clickTarget)) &&
           !!this._overlayRef &&
@@ -497,13 +497,18 @@ export abstract class _MatAutocompleteTriggerBase
         }
       }
 
-      if (this._canOpen() && this._document.activeElement === event.target) {
+      if (this._canOpen() && this._hasFocus()) {
         // Capture pre-input value from keydown so requireSelection compares correctly.
         const valueOnAttach = this._valueOnLastKeydown ?? this._element.nativeElement.value;
         this._valueOnLastKeydown = null;
         this._openPanelInternal(valueOnAttach);
       }
     }
+  }
+
+  /** Whether the input currently has focus (pierces shadow DOM). */
+  private _hasFocus(): boolean {
+    return _getFocusedElementPierceShadowDom() === this._element.nativeElement;
   }
 
   _handleFocus(): void {

@@ -322,6 +322,7 @@ export class MatLegacyChipList
   set disabled(value: BooleanInput) {
     this._disabled = coerceBooleanProperty(value);
     this._syncChipsState();
+    this.stateChanges.next();
   }
   protected _disabled: boolean = false;
 
@@ -480,6 +481,12 @@ export class MatLegacyChipList
    * Implemented as part of MatFormFieldControl.
    * @docs-private
    */
+  /** Gets IDs currently on aria-describedby, including ones set outside the form field. */
+  get describedByIds(): string[] {
+    const existing = this._elementRef.nativeElement.getAttribute('aria-describedby');
+    return existing?.split(' ') || [];
+  }
+
   setDescribedByIds(ids: string[]) {
     if (ids.length) {
       this._elementRef.nativeElement.setAttribute('aria-describedby', ids.join(' '));
@@ -535,7 +542,10 @@ export class MatLegacyChipList
     if (this._chipInput && this._chipInput.focused) {
       // do nothing
     } else if (this.chips.length > 0) {
-      if (this._keyManager.activeItemIndex !== 0) {
+      const activeItem = this._keyManager.activeItem;
+      if (activeItem) {
+        activeItem.focus();
+      } else {
         this._keyManager.setFirstItemActive();
       }
       this.stateChanges.next();

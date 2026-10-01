@@ -41,6 +41,7 @@ export class MatInkBar {
   /** Hides the ink bar. */
   hide() {
     this._items.forEach(item => item.deactivateInkBar());
+    this._currentItem = undefined;
   }
 
   /** Aligns the ink bar to a DOM node. */
