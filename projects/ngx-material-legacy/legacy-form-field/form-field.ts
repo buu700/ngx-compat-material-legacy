@@ -718,6 +718,16 @@ export class MatLegacyFormField
       }
       startWidth = Math.abs(labelStart - containerStart) - outlineGapPadding;
       gapWidth = labelWidth > 0 ? labelWidth * floatingLabelScale + outlineGapPadding * 2 : 0;
+
+      // Cap the notch so a long floating label cannot grow past the infix between prefix/suffix.
+      const prefixEl = container.querySelector('.mat-form-field-prefix') as HTMLElement | null;
+      const suffixEl = container.querySelector('.mat-form-field-suffix') as HTMLElement | null;
+      const prefixWidth = prefixEl?.getBoundingClientRect().width ?? 0;
+      const suffixWidth = suffixEl?.getBoundingClientRect().width ?? 0;
+      const maxGap = Math.max(0, containerRect.width - prefixWidth - suffixWidth);
+      if (gapWidth > maxGap) {
+        gapWidth = maxGap;
+      }
     }
 
     for (let i = 0; i < startEls.length; i++) {

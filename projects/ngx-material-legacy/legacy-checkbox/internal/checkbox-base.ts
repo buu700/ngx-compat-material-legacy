@@ -20,6 +20,7 @@ import {
   NgZone,
   Output,
   ViewChild,
+  booleanAttribute,
 } from '@angular/core';
 import {ControlValueAccessor} from '@angular/forms';
 import {MatRipple} from '@angular/material/core';
@@ -110,6 +111,19 @@ export abstract class _MatCheckboxBase<E>
 
   /** The 'aria-describedby' attribute is read after the element's label and field type. */
   @Input('aria-describedby') ariaDescribedby: string;
+
+  /**
+   * Users can specify the `aria-expanded` attribute on the host for better a11y when the checkbox
+   * controls the visibility of another element.
+   */
+  @Input({alias: 'aria-expanded', transform: booleanAttribute})
+  ariaExpanded: boolean | null = null;
+
+  /** Users can specify the `aria-controls` attribute on the host for better a11y. */
+  @Input('aria-controls') ariaControls: string | null = null;
+
+  /** Users can specify the `aria-owns` attribute on the host for better a11y. */
+  @Input('aria-owns') ariaOwns: string | null = null;
 
   private _uniqueId: string;
 

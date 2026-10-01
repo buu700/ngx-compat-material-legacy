@@ -140,6 +140,13 @@
   .mat-button-wrapper > * {
     vertical-align: middle;
   }
+
+  // Content (including icons) should appear over the state and ripple layers.
+  .mat-button-wrapper .mat-icon,
+  .mat-button-wrapper > i {
+    z-index: 1;
+    position: relative;
+  }
 }
 
 // Align icon-buttons correctly inside of standard, fill, and outline form-field appearances.
@@ -185,3 +192,13 @@
 }
 
 @include datepicker-legacy-compat.legacy-button-compat();
+
+// Inherit the button shape in the focus indicator. FAB keeps the default indicator radius
+// because inheriting the circular shape looks off.
+.mat-button.mat-focus-indicator::before,
+.mat-flat-button.mat-focus-indicator::before,
+.mat-stroked-button.mat-focus-indicator::before,
+.mat-raised-button.mat-focus-indicator::before,
+.mat-icon-button.mat-focus-indicator::before {
+  border-radius: inherit;
+}

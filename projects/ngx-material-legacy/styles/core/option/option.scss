@@ -40,14 +40,18 @@
     }
 
     &.mdc-list-item--selected:not(.mdc-list-item--disabled) {
-      .mdc-list-item__primary-text {
-        @include token-utils.create-token-slot(color, selected-state-label-text-color);
-      }
-
-      // We don't change the background in multiple mode since
+      // We don't change the background & text color in multiple mode since
       // it has the checkbox to show the selected state.
       &:not(.mat-mdc-option-multiple) {
         @include token-utils.create-token-slot(background-color, selected-state-layer-color);
+        .mdc-list-item__primary-text {
+          @include token-utils.create-token-slot(color, selected-state-label-text-color);
+        }
+      }
+
+      .mat-pseudo-checkbox {
+        --mat-minimal-pseudo-checkbox-selected-checkmark-color: #{
+            token-utils.get-token-variable(selected-state-label-text-color)};
       }
     }
   }
@@ -163,7 +167,7 @@
     // In single selection mode, the selected option is indicated by changing its
     // background color, but that doesn't work in high contrast mode. We add an
     // alternate indication by rendering out a circle.
-    &.mdc-list-item--selected:not(.mat-mdc-option-multiple)::after {
+    &.mdc-list-item--selected:not(:has(.mat-mdc-option-pseudo-checkbox))::after {
       $size: 10px;
       content: '';
       position: absolute;
@@ -176,7 +180,7 @@
       border-radius: $size;
     }
 
-    [dir='rtl'] &.mdc-list-item--selected:not(.mat-mdc-option-multiple)::after {
+    [dir='rtl'] &.mdc-list-item--selected:not(:has(.mat-mdc-option-pseudo-checkbox))::after {
       right: auto;
       left: mdc-list-variables.$side-padding;
     }

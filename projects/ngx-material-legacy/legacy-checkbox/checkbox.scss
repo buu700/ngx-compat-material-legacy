@@ -521,3 +521,15 @@ $_mark-stroke-size: math.div(2, 15) * checkbox-common.$legacy-size !default;
 .mat-checkbox-input:focus ~ .mat-focus-indicator::before {
   content: '';
 }
+
+// Checkbox components have to set `border-radius: 50%` in order to support density scaling
+// which will clip a square focus indicator so we have to turn it into a circle. Needs extra
+// specificity in case the ripple styles are loaded later which can override the shape.
+.mat-checkbox .mat-checkbox-ripple::before {
+  border-radius: 50%;
+}
+
+// Raise ripple container specificity so later ripple styles cannot override position/size.
+.mat-checkbox .mat-checkbox-ripple {
+  position: absolute;
+}

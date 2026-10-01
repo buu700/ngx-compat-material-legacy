@@ -47,7 +47,7 @@
     // In single selection mode, the selected option is indicated by changing its
     // background color, but that doesn't work in high contrast mode. We add an
     // alternate indication by rendering out a circle.
-    &.mat-selected:not(.mat-option-multiple)::after {
+    &.mat-selected:not(:has(.mat-option-pseudo-checkbox))::after {
       $size: 10px;
       content: '';
       position: absolute;
@@ -60,7 +60,7 @@
       border-radius: $size;
     }
 
-    [dir='rtl'] &.mat-selected:not(.mat-option-multiple)::after {
+    [dir='rtl'] &.mat-selected:not(:has(.mat-option-pseudo-checkbox))::after {
       right: auto;
       left: menu-common.$side-padding;
     }

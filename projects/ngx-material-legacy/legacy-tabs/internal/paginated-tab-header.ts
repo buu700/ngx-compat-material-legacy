@@ -23,6 +23,7 @@ import {
   Directive,
   Inject,
   Input,
+  inject,
 } from '@angular/core';
 import {Direction, Directionality} from '@angular/cdk/bidi';
 import {
@@ -31,6 +32,7 @@ import {
   coerceNumberProperty,
   NumberInput,
 } from '@angular/cdk/coercion';
+import {SharedResizeObserver} from '@angular/cdk/observers/private';
 import {ViewportRuler} from '@angular/cdk/scrolling';
 import {FocusKeyManager, FocusableOption} from '@angular/cdk/a11y';
 import {ENTER, SPACE, hasModifierKey} from '@angular/cdk/keycodes';
@@ -44,7 +46,7 @@ import {
   timer,
   fromEvent,
 } from 'rxjs';
-import {take, switchMap, startWith, skip, takeUntil, filter} from 'rxjs/operators';
+import {debounceTime, take, switchMap, startWith, skip, takeUntil, filter} from 'rxjs/operators';
 import {Platform, normalizePassiveListenerOptions} from '@angular/cdk/platform';
 
 /** Config used to bind passive event listeners */
@@ -169,6 +171,8 @@ export abstract class MatPaginatedTabHeader
   /** Event emitted when a label is focused. */
   readonly indexFocused: EventEmitter<number> = new EventEmitter<number>();
 
+  private _sharedResizeObserver = inject(SharedResizeObserver);
+
   constructor(
     protected _elementRef: ElementRef<HTMLElement>,
     protected _changeDetectorRef: ChangeDetectorRef,
@@ -208,7 +212,12 @@ export abstract class MatPaginatedTabHeader
 
   ngAfterContentInit() {
     const dirChange = this._dir ? this._dir.change : observableOf('ltr');
-    const resize = this._viewportRuler.change(150);
+    // Debounce resize events because the alignment logic is expensive.
+    const resize = this._sharedResizeObserver
+      .observe(this._elementRef.nativeElement)
+      .pipe(debounceTime(32), takeUntil(this._destroyed));
+    // Viewport resize retained for screenshot-test compatibility with historical layouts.
+    const viewportResize = this._viewportRuler.change(150).pipe(takeUntil(this._destroyed));
     const realign = () => {
       this.updatePagination();
       this._alignInkBarToSelectedTab();
@@ -229,9 +238,9 @@ export abstract class MatPaginatedTabHeader
     // can hold up tests that are in a background tab.
     this._ngZone.onStable.pipe(take(1)).subscribe(realign);
 
-    // On dir change or window resize, realign the ink bar and update the orientation of
+    // On dir change or resize, realign the ink bar and update the orientation of
     // the key manager if the direction has changed.
-    merge(dirChange, resize, this._items.changes, this._itemsResized())
+    merge(dirChange, viewportResize, resize, this._items.changes, this._itemsResized())
       .pipe(takeUntil(this._destroyed))
       .subscribe(() => {
         // We need to defer this to give the browser some time to recalculate
