@@ -1,38 +1,36 @@
 {
   "template": false,
   "packet_id": "RC-06",
-  "substep_id": "RC-06.overlay-families-dialog-menu-snack-bar-tooltip",
-  "source_commit": "ce888084cad980c946ce6a2e8e4a9572824dcfdf",
+  "substep_id": "RC-06.tabs-chips-table-paginator",
+  "source_commit": "a392e56201331d3688dba473c6700278572c35f5",
   "worktree_line": "main",
   "line_21_commit": "cbf86f3faccb240e7beeb6a1e2af727b5d9a674d",
   "owned_paths": [
-    "projects/ngx-material-legacy/legacy-dialog/",
-    "projects/ngx-material-legacy/legacy-menu/",
-    "projects/ngx-material-legacy/legacy-snack-bar/",
-    "testing/legacy-runner/shims/event-objects.ts",
-    "compatibility/rc/reports/legacy-dialog.json",
-    "compatibility/rc/reports/legacy-menu.json",
-    "compatibility/rc/reports/legacy-snack-bar.json",
-    "compatibility/rc/reports/legacy-tooltip.json",
+    "projects/ngx-material-legacy/legacy-tabs/internal/tab-body-base.ts",
+    "projects/ngx-material-legacy/legacy-tabs/tab-body.html",
+    "compatibility/rc/reports/legacy-tabs.json",
+    "compatibility/rc/reports/legacy-chips.json",
+    "compatibility/rc/reports/legacy-table.json",
+    "compatibility/rc/reports/legacy-paginator.json",
     "compatibility/rc/session-handoff.json",
     "compatibility/rc/status.json"
   ],
   "last_command": [
-    "node scripts/rc-test-legacy-family.mjs --family dialog",
-    "node scripts/rc-test-legacy-family.mjs --family menu",
-    "node scripts/rc-test-legacy-family.mjs --family snack-bar",
-    "node scripts/rc-test-legacy-family.mjs --family tooltip"
+    "node scripts/rc-test-legacy-family.mjs --family tabs",
+    "node scripts/rc-test-legacy-family.mjs --family chips",
+    "node scripts/rc-test-legacy-family.mjs --family table",
+    "node scripts/rc-test-legacy-family.mjs --family paginator"
   ],
-  "outcome": "rc06-overlay-dialog-131;menu-141;snack-bar-70;tooltip-79;workspace-dist;ci-tip-green;g-gates-not-claimed",
-  "first_actionable_error": "Full RC-06 artifact-bound suite and remaining families not run; RC-02 full verify still a stub.",
+  "outcome": "rc06-tabs-164;chips-173;table-45;paginator-49;workspace-dist;tabs-product-fix;g-gates-not-claimed",
+  "first_actionable_error": "Full RC-06 artifact-bound suite and remaining control/core families not run; RC-02 full verify still a stub.",
   "failed_case_ids": [],
   "report_paths": [
     "compatibility/rc/status.json",
     "compatibility/rc/session-handoff.json",
-    "compatibility/rc/reports/legacy-dialog.json",
-    "compatibility/rc/reports/legacy-menu.json",
-    "compatibility/rc/reports/legacy-snack-bar.json",
-    "compatibility/rc/reports/legacy-tooltip.json"
+    "compatibility/rc/reports/legacy-tabs.json",
+    "compatibility/rc/reports/legacy-chips.json",
+    "compatibility/rc/reports/legacy-table.json",
+    "compatibility/rc/reports/legacy-paginator.json"
   ],
   "completed_acceptance_ids": [],
   "not_run_scope": [
@@ -41,19 +39,23 @@
     "21.x line not retested for these families",
     "G01-G13 not claimed",
     "Family greens are workspace-dist iteration, not artifact --run mode",
-    "Next risk tiers: tabs/chips; table/paginator; remaining controls/core",
+    "Remaining: button, checkbox, list, progress-bar, progress-spinner, radio, slide-toggle, slider, core",
     "Audit cursor preserved at 5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
   ],
-  "next_action": "Continue RC-06 tabs/chips (or table/paginator) and/or artifact-bound --run mode; or RC-02.04 verify orchestration. Do not claim G01-G13 or RC engineering ready.",
+  "next_action": "Continue RC-06 remaining controls/core and/or artifact-bound --run mode; or RC-02.04 verify orchestration. Do not claim G01-G13 or RC engineering ready.",
   "blocked_owner_decisions": [
     "cyph-rc-age-admission",
     "registry-publish-authority",
     "github-protection-read"
   ],
-  "recorded_at_utc": "2026-10-01T15:31:37Z",
+  "recorded_at_utc": "2026-10-01T15:36:26Z",
   "clock_confidence": "verified",
   "family_iteration": {
     "mode": "workspace-dist",
+    "tabs": "164/164",
+    "chips": "173/173",
+    "table": "45/45",
+    "paginator": "49/49",
     "dialog": "131/131",
     "menu": "141/141",
     "snack_bar": "70/70",
@@ -64,14 +66,8 @@
     "card": "14/14",
     "select": "270/270"
   },
-  "overlay_fixes": {
-    "dialog_product": "MatLegacyDialogConfig ariaModal/maxWidth; open() uses dialogConfigClass; microtask autofocus; container _state; harness getText",
-    "dialog_test": "post-open focus-origin asserts adapted to blur/null (Material-current)",
-    "snack_bar_product": "duration subscribe before enter; MatLegacySnackBarConfig politeness assertive; module default options factory",
-    "snack_bar_test": "Infinity setTimeout spy before open",
-    "menu_product": "booleanAttribute disabled/disableRipple; focus restore program fallback; panel max-height 100vh",
-    "menu_test": "viewport test calls updatePosition after content growth",
-    "shim": "createMouseEvent buttons bitmask matches button"
+  "tabs_fixes": {
+    "product": "Restore historical left/right-origin-center _position in ngOnInit; treat origin-center as center for active class; bind inline visibility for left/right so animation-equivalent and [style*=visibility] fallback work; origin-center no longer applies left/right transform classes"
   },
   "audit_cursor": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
   "harness_blockers": [
@@ -79,11 +75,11 @@
     "local iteration used host node/pnpm PATH, not declared Chainman profile"
   ],
   "ci": {
-    "tested_commit": "ce888084cad980c946ce6a2e8e4a9572824dcfdf",
-    "product_commit": "ce888084cad980c946ce6a2e8e4a9572824dcfdf",
-    "run_id": 36884658550,
-    "url": "https://github.com/buu700/ngx-compat-material-legacy/actions/runs/36884658550",
-    "outcome": "success",
+    "tested_commit": "a392e56201331d3688dba473c6700278572c35f5",
+    "product_commit": "a392e56201331d3688dba473c6700278572c35f5",
+    "run_id": null,
+    "url": null,
+    "outcome": "pending-push",
     "jobs": [
       "Chainman verify-lite",
       "Packed-consumer AOT and harness"
