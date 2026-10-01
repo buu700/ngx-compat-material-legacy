@@ -1,7 +1,7 @@
 {
   "template": false,
   "packet_id": "RC-08",
-  "substep_id": "RC-08.02-bounded-disposition-batch-c",
+  "substep_id": "RC-08.02-bounded-disposition-batch-d",
   "source_commit": "235f2f6e508a2b4da596e06a30fe2d782859bfbe",
   "worktree_line": "main",
   "line_21_commit": "cbf86f3faccb240e7beeb6a1e2af727b5d9a674d",
@@ -16,8 +16,8 @@
     "node",
     "scripts/check-upstream-audit-disposition.mjs"
   ],
-  "outcome": "Bounded ledger batch closed 195 rows (docs-build remainder + already-present + strong-evidence material not-owned). Ledger 219/1697. Cell still unimplemented. Cursor preserved. G01-G13 not claimed.",
-  "first_actionable_error": "Remaining full-verify cell unimplemented: upstream-audit-disposition (1478 seed SHAs without final ledger rows)",
+  "outcome": "Bounded ledger batch closed 97 rows (73 CDK not-owned inherited with peer-floor, 10 material not-owned remainder, 14 clear historical owned-retained not-applicable). Ledger 316/1697. Cell still unimplemented. Cursor preserved. G01-G13 not claimed.",
+  "first_actionable_error": "Remaining full-verify cell unimplemented: upstream-audit-disposition (1381 seed SHAs without final ledger rows)",
   "failed_case_ids": [],
   "report_paths": [
     "compatibility/rc/status.json",
@@ -32,19 +32,19 @@
     "G02 full overload/generics/protected/DI identity",
     "Full browser matrix (Firefox/WebKit/all families/CSP/SSR)",
     "G06-G08 companion bridges beyond sealed values",
-    "G11 full disposition coverage (1478 seed SHAs remaining)",
+    "G11 full disposition coverage (1381 seed SHAs remaining)",
     "21.x line not retested",
     "G01-G13 not claimed",
     "Audit cursor preserved at 5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-    "CDK not-owned, owned-retained, not-applied, unread triage/test-only not dispositioned this batch"
+    "Remaining owned-retained/not-applied and unread triage/test-only/semantic not dispositioned this batch"
   ],
-  "next_action": "Continue bounded dispositions from already-read notes (CDK not-owned with inheritance/peer-floor evidence; owned-retained decisions). Do not binge unread. Keep cell open until seed coverage is honest. Keep G01 unclaimed.",
+  "next_action": "Continue bounded dispositions from already-read notes (remaining owned-retained carefully; not-applied with applicability evidence). Do not binge unread. Keep cell open until seed coverage is honest. Keep G01 unclaimed.",
   "blocked_owner_decisions": [
     "cyph-rc-age-admission",
     "registry-publish-authority",
     "github-protection-read"
   ],
-  "recorded_at_utc": "2026-10-01T16:46:56Z",
+  "recorded_at_utc": "2026-10-01T16:49:36Z",
   "clock_confidence": "verified",
   "rc_02_04": {
     "status": "incremental-orchestration-api-completeness-ci-green-audit-open",
@@ -72,11 +72,23 @@
   ],
   "audit_cursor": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
   "ledger": {
-    "closed": 219,
+    "closed": 316,
     "seed": 1697,
-    "missing": 1478,
-    "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
-    "added_this_batch": 195
+    "missing": 1381,
+    "batch_id": "cdk-inherited-not-owned-retain-2026-10-01-d",
+    "added_this_batch": 97,
+    "by_final_this_batch": {
+      "inherited": 75,
+      "irrelevant": 7,
+      "not-applicable": 15
+    }
+  },
+  "criterion_gap_by_category": {
+    "unread:needs-triage": 407,
+    "unread:behavior-semantic": 397,
+    "read:behavior-semantic:owned-retained": 234,
+    "unread:test-only-batch-candidate": 182,
+    "read:behavior-semantic:not-applied": 161
   },
   "harness_blockers": [
     "nix unavailable on box; Chainman host-nix cannot run locally",
