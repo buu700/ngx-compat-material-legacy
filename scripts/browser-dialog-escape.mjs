@@ -8,7 +8,7 @@ import {createHash} from 'node:crypto';
 import {spawn, spawnSync} from 'node:child_process';
 import {createRequire} from 'node:module';
 import {createServer} from 'node:http';
-import {mkdtempSync, mkdirSync, readFileSync, realpathSync, writeFileSync} from 'node:fs';
+import {existsSync, mkdtempSync, mkdirSync, readFileSync, realpathSync, writeFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {dirname, join, relative, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -52,6 +52,21 @@ for (let i = 2; i < process.argv.length; i += 1) {
   fail(2, `Unknown argument: ${process.argv[i]}`);
 }
 if (!tarball) fail(2, '--tarball is required');
+
+function resolveChromeBin() {
+  if (process.env.CHROME_BIN && existsSync(process.env.CHROME_BIN)) return process.env.CHROME_BIN;
+  for (const candidate of [
+    '/usr/bin/google-chrome',
+    '/usr/bin/google-chrome-stable',
+    '/usr/bin/chromium-browser',
+    '/usr/bin/chromium',
+    '/snap/bin/chromium',
+  ]) {
+    if (existsSync(candidate)) return candidate;
+  }
+  fail(1, 'No Chrome/Chromium binary found; set CHROME_BIN');
+}
+const chromeBin = resolveChromeBin();
 
 const consumer = mkdtempSync(join(tmpdir(), 'ngx-compat-dialog-browser-'));
 const installTarball = join(consumer, 'library.tgz');
@@ -214,7 +229,7 @@ await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
 const {port} = server.address();
 const pageUrl = `http://127.0.0.1:${port}/${csp ? 'missing.html' : ''}`;
 const chromeDir = mkdtempSync(join(tmpdir(), 'ngx-compat-chrome-'));
-const chrome = spawn('/usr/bin/chromium-browser', [
+const chrome = spawn(chromeBin, [
   '--headless=new',
   '--remote-debugging-port=9333',
   '--user-data-dir=' + chromeDir,

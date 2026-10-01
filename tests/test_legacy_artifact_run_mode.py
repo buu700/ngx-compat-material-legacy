@@ -83,12 +83,12 @@ class LegacyArtifactRunModeTests(unittest.TestCase):
             "packed-exports",
             "packed-consumer",
             "motion-smoke",
+            "sass-seal",
+            "browser-matrix",
         ):
             self.assertIn(check_id, implemented)
         # Remaining open automatic cells keep verify failed / refuse silent G01.
         for check_id in (
-            "sass-seal",
-            "browser-matrix",
             "api-completeness",
             "upstream-audit-disposition",
         ):

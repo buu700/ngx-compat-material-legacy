@@ -240,6 +240,47 @@ def main() -> int:
     results["migration-packaged"] = "pass" if code == 0 else "fail"
     implemented_ran.append("migration-packaged")
 
+    # sass-seal: peer-aware packed Sass isolation + sealed values + archived negative.
+    code = run_node("scripts/sass-seal.mjs", ["--run", str(run_path)])
+    seal_detail = ROOT / "compatibility/rc/reports/sass-seal.json"
+    if seal_detail.is_file():
+        (out_dir / "reports").mkdir(parents=True, exist_ok=True)
+        (out_dir / "reports" / "sass-seal-detail.json").write_text(seal_detail.read_text())
+    write_check_report(
+        out_dir,
+        run_id,
+        line,
+        "sass-seal",
+        exit_code=code,
+        limitations=[
+            "Peer-aware packed facade compile, three sealed value fixtures, archived @material negative.",
+            "Does not close companion bridge computed styles or G06-G08.",
+        ],
+    )
+    results["sass-seal"] = "pass" if code == 0 else "fail"
+    implemented_ran.append("sass-seal")
+
+    # browser-matrix: real Chromium dialog/select PR-slice; not the full 3584 matrix.
+    code = run_node("scripts/run-browser-matrix-slice.mjs", ["--run", str(run_path)])
+    browser_detail = ROOT / "compatibility/rc/reports/browser-matrix-slice.json"
+    if browser_detail.is_file():
+        (out_dir / "reports").mkdir(parents=True, exist_ok=True)
+        (out_dir / "reports" / "browser-matrix-slice-detail.json").write_text(browser_detail.read_text())
+    write_check_report(
+        out_dir,
+        run_id,
+        line,
+        "browser-matrix",
+        exit_code=code,
+        limitations=[
+            "Executes dialog/select Chromium PR-slice only; does not fan out to unexecuted cells.",
+            "Firefox/WebKit, remaining families, CSP, SSR expansion remain not-executed.",
+            "Does not claim G10.",
+        ],
+    )
+    results["browser-matrix"] = "pass" if code == 0 else "fail"
+    implemented_ran.append("browser-matrix")
+
     # historical-legacy-artifact: all inventory families against the packed --run.
     code = run_node("scripts/rc-test-legacy-family.mjs", ["--run", str(run_path)])
     write_check_report(

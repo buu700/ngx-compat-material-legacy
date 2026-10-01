@@ -17,7 +17,10 @@ const reportPath = join(root, 'compatibility/rc/reports/sass-value-comparison.js
 const env = mkdtempSync(join(tmpdir(), 'ngx-compat-sass-values-'));
 const out = join(env, 'out');
 mkdirSync(join(env, 'node_modules/@ngx-compat'), {recursive: true});
+mkdirSync(join(env, 'node_modules/@angular'), {recursive: true});
 symlinkSync(join(root, 'node_modules/sass'), join(env, 'node_modules/sass'));
+symlinkSync(join(root, 'node_modules/@angular/material'), join(env, 'node_modules/@angular/material'));
+symlinkSync(join(root, 'node_modules/@angular/cdk'), join(env, 'node_modules/@angular/cdk'));
 symlinkSync(join(root, 'projects/ngx-material-legacy'), join(env, 'node_modules/@ngx-compat/material-legacy'));
 writeFileSync(join(env, 'package.json'), '{"name":"sass-value-env","private":true}\n');
 
@@ -53,7 +56,7 @@ const report = {
     'styles/bridges/_companion-overrides.scss imports @angular/material',
   ],
   limitations: [
-    'The owned root facade did not compile, so sealed debug strings were not compared.',
+    'Source-tree peer-aware compare; packed artifact seal is scripts/sass-seal.mjs.',
     'The sealed report was not rewritten.',
     'This is not G06.',
   ],
