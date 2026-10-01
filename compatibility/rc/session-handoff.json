@@ -1,95 +1,89 @@
 {
   "template": false,
   "packet_id": "RC-06",
-  "substep_id": "RC-06.all-families-workspace-dist",
-  "source_commit": "4f9f20f03f0bd87c5bec79f6c28a4fadd300e10c",
+  "substep_id": "RC-06.02-artifact-bound-run",
+  "source_commit": "c3bf02af211472f2fae6455a5ebd676e1d2f3aea",
   "worktree_line": "main",
   "line_21_commit": "cbf86f3faccb240e7beeb6a1e2af727b5d9a674d",
   "owned_paths": [
-    "projects/ngx-material-legacy/legacy-tabs/",
-    "projects/ngx-material-legacy/legacy-list/testing/public-api.ts",
-    "projects/ngx-material-legacy/legacy-progress-bar/progress-bar.spec.ts",
-    "testing/legacy-runner/shims/harness/core/option-shared.spec.ts",
-    "compatibility/rc/reports/",
+    "scripts/resolve-run-library.mjs",
+    "scripts/rc-test-legacy-family.mjs",
+    "scripts/run-legacy-tests.mjs",
+    "scripts/run-legacy-artifact-suite.mjs",
+    "scripts/rc-verify.py",
+    "scripts/rc-verify-lite.py",
+    "testing/legacy-runner/build.mjs",
+    "testing/legacy-runner/adapt-spec.mjs",
+    "testing/legacy-runner/karma-legacy-json-reporter.cjs",
+    "compatibility/rc/matrices/full-verify.json",
+    ".github/workflows/ci.yml",
+    "tests/test_legacy_artifact_run_mode.py",
+    "tests/test_ci_fresh_pack_path.py",
+    "AGENTS.md",
     "compatibility/rc/session-handoff.json",
     "compatibility/rc/status.json"
   ],
   "last_command": [
-    "node scripts/rc-test-legacy-family.mjs --family <each of 22>"
+    "node scripts/rc-test-legacy-family.mjs --family card --run artifacts/local/entry-overlay-20261001T152019Z/run.json"
   ],
-  "outcome": "rc06-all-22-families-workspace-dist-green;ci-tip-green;g-gates-not-claimed",
-  "first_actionable_error": "Artifact-bound --run full suite and RC-02 full verify still open; 21.x not retested.",
+  "outcome": "artifact-bound --run wired; local card/button/core/progress-bar/checkbox/radio green on packed tarball; RC-02.04 verify orchestration incremental; CI card smoke + entry upload added; G01-G13 not claimed",
+  "first_actionable_error": "Full 57-path artifact-bound suite and complete verify matrix still open; CI tip run pending after push; 21.x untouched.",
   "failed_case_ids": [],
   "report_paths": [
     "compatibility/rc/status.json",
     "compatibility/rc/session-handoff.json",
-    "compatibility/rc/reports/legacy-*.json"
+    "compatibility/rc/matrices/full-verify.json"
   ],
   "completed_acceptance_ids": [],
   "not_run_scope": [
-    "RC-02 full verify / complete G01 matrix",
-    "RC-06 full 57-path artifact-bound --run suite",
-    "21.x line not retested for these families",
+    "RC-02 full verify / complete G01 matrix (missing required cells remain failed)",
+    "RC-06 full 57-path artifact-bound suite on tip SHA pack",
+    "21.x line not retested",
     "G01-G13 not claimed",
-    "Family greens are workspace-dist iteration, not artifact --run mode",
+    "historical-legacy-artifact check still unimplemented in full-verify matrix",
     "Audit cursor preserved at 5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
   ],
-  "next_action": "RC-06 artifact-bound --run mode and/or RC-02.04 verify orchestration. Do not claim G01-G13 or RC engineering ready.",
+  "next_action": "Wait for tip CI artifact-bound card smoke; then run remaining families via run-legacy-artifact-suite against the uploaded entry artifact. Do not claim G01-G13 or RC engineering ready.",
   "blocked_owner_decisions": [
     "cyph-rc-age-admission",
     "registry-publish-authority",
     "github-protection-read"
   ],
-  "recorded_at_utc": "2026-10-01T15:41:35Z",
+  "recorded_at_utc": "2026-10-01T15:46:50Z",
   "clock_confidence": "verified",
-  "family_iteration": {
-    "mode": "workspace-dist",
-    "autocomplete": "184/184",
-    "button": "34/34",
-    "card": "14/14",
-    "checkbox": "100/100",
-    "chips": "173/173",
-    "core": "29/29",
-    "dialog": "131/131",
-    "form_field": "25/25",
-    "input": "149/149",
-    "list": "189/189",
-    "menu": "141/141",
-    "paginator": "49/49",
-    "progress_bar": "24/24",
-    "progress_spinner": "36/36",
-    "radio": "87/87",
-    "select": "270/270",
-    "slide_toggle": "72/72",
-    "slider": "130/130",
-    "snack_bar": "70/70",
-    "table": "45/45",
-    "tabs": "164/164",
-    "tooltip": "79/79"
+  "artifact_run_local": {
+    "mode": "artifact",
+    "tarball_source_sha": "8bca071597f4b3b83e0400396c461aa9224c303c",
+    "tarball_sha256_prefix": "da954e85bac6",
+    "families_passed": {
+      "card": "14/14",
+      "button": "34/34",
+      "core": "29/29",
+      "progress-bar": "24/24",
+      "checkbox": "100/100",
+      "radio": "87/87"
+    },
+    "note": "Local packed tarball is older than tip; CI must rehash tip entry-${GITHUB_SHA}."
   },
-  "fixes_this_tranche": {
-    "tabs_product": "origin-center _position; inline visibility for off-center bodies",
-    "list_product": "export MatLegacyListItemHarnessBase/MatLegacySubheaderHarness/ListSection for harness instanceof",
-    "core_test_shim": "option-shared uses MAT_LEGACY_OPTION_PARENT_COMPONENT",
-    "progress_bar_test": "observer gate asserts NgZone.run instead of ApplicationRef.tick"
-  },
-  "prior_ci": {
-    "tested_commit": "6a38d6f2bb22342782be1b3a8d874f0badeac173",
-    "product_commit": "8fdb1fd0e4cfe0631ed71201d6281511cca918d1",
-    "run_id": 36885618999,
-    "url": "https://github.com/buu700/ngx-compat-material-legacy/actions/runs/36885618999",
-    "outcome": "success"
-  },
-  "ci": {
-    "tested_commit": "d1cde7ee334028f8500264e234b5c78a8a70ba94",
-    "product_commit": "4f9f20f03f0bd87c5bec79f6c28a4fadd300e10c",
-    "run_id": 36885993389,
-    "url": "https://github.com/buu700/ngx-compat-material-legacy/actions/runs/36885993389",
-    "outcome": "success",
-    "jobs": [
-      "Chainman verify-lite",
-      "Packed-consumer AOT and harness"
-    ]
+  "rc_02_04": {
+    "status": "incremental-orchestration-landed",
+    "matrix": "compatibility/rc/matrices/full-verify.json",
+    "implemented_checks": [
+      "pack-library",
+      "packed-exports",
+      "packed-consumer",
+      "motion-smoke"
+    ],
+    "missing_required": [
+      "historical-legacy-artifact",
+      "sass-seal",
+      "migration-packaged",
+      "browser-matrix",
+      "api-completeness",
+      "engine-free-consumer",
+      "upstream-audit-disposition"
+    ],
+    "g01_claimed": false
   },
   "audit_cursor": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
   "harness_blockers": [

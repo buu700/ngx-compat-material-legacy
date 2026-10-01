@@ -1,10 +1,26 @@
 const fs = require('fs');
 const path = require('path');
 
-function readHistoricalSpecs() {
+function readBundledMeta() {
   const bundled = path.resolve(__dirname, 'out/bundled-specs.json');
   const file = fs.existsSync(bundled) ? bundled : path.resolve(__dirname, 'historical-specs.json');
-  return JSON.parse(fs.readFileSync(file, 'utf8'));
+  const raw = JSON.parse(fs.readFileSync(file, 'utf8'));
+  if (Array.isArray(raw)) {
+    return {
+      subject_mode: process.env.LEGACY_SUBJECT_MODE || 'workspace-dist',
+      package_root: process.env.LEGACY_PACKAGE_ROOT || null,
+      run_id: process.env.LEGACY_RUN_ID || null,
+      artifact_sha256: process.env.LEGACY_ARTIFACT_SHA256 || null,
+      rows: raw,
+    };
+  }
+  return {
+    subject_mode: raw.subject_mode || process.env.LEGACY_SUBJECT_MODE || 'workspace-dist',
+    package_root: raw.package_root || process.env.LEGACY_PACKAGE_ROOT || null,
+    run_id: raw.run_id || process.env.LEGACY_RUN_ID || null,
+    artifact_sha256: raw.artifact_sha256 || process.env.LEGACY_ARTIFACT_SHA256 || null,
+    rows: raw.rows || [],
+  };
 }
 
 function LegacyJsonReporter(baseReporterDecorator, config) {
@@ -21,7 +37,7 @@ function LegacyJsonReporter(baseReporterDecorator, config) {
     total += 1;
     const suite = (result.suite || []).join(' > ') || '(root)';
     if (!suites[suite]) {
-      suites[suite] = {executed: 0, passed: 0, failed: 0, skipped: 0, source_path: suite};
+      suites[suite] = {executed: 0, passed: 0, failed: 0, skipped: 0, description_path: suite};
     }
     suites[suite].executed += 1;
     if (result.skipped) {
@@ -48,15 +64,20 @@ function LegacyJsonReporter(baseReporterDecorator, config) {
   };
 
   this.onRunComplete = function () {
+    const meta = readBundledMeta();
     const payload = {
       schema_version: 1,
       runner: 'karma+jasmine+esbuild',
       mode: expectFail ? 'deliberate-fail' : 'normal',
+      subject_mode: meta.subject_mode,
+      package_root: meta.package_root,
+      run_id: meta.run_id,
+      artifact_sha256: meta.artifact_sha256,
       totals: {executed: total, passed, failed, skipped},
       by_suite: Object.values(suites),
       failures,
       deliberate_fail_observed: deliberateFailSeen,
-      mapped_specs: readHistoricalSpecs().map(row => ({
+      mapped_specs: meta.rows.map(row => ({
         historical_path: row.historical_path,
         candidate: row.candidate,
         disposition: 'executed',

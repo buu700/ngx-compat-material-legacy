@@ -26,6 +26,10 @@ class CiFreshPackPathTests(unittest.TestCase):
         self.assertIn("steps.pack.outputs.run_dir", CI)
         self.assertIn("packed-consumer -- --run", CI)
 
+    def test_ci_runs_artifact_bound_legacy_family(self):
+        self.assertIn("test-legacy -- --family card --run", CI)
+        self.assertIn("Upload entry run directory", CI)
+
 
 if __name__ == "__main__":
     unittest.main()

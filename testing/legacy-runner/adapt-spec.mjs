@@ -16,20 +16,25 @@ import {fileURLToPath} from 'node:url';
 const runnerDir = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(runnerDir, '../..');
 const libRoot = path.join(repoRoot, 'projects/ngx-material-legacy');
-const distTypes = path.join(repoRoot, 'dist/ngx-material-legacy/types');
+const defaultTypes = path.join(repoRoot, 'dist/ngx-material-legacy/types');
 const cdkShim = path.join(runnerDir, 'shims/cdk-testing-private.ts');
 const harnessRoot = path.join(runnerDir, 'shims/harness');
 
 const exportCache = new Map();
 
-function dtsPath(entry) {
-  const slug = entry.replaceAll('/', '-');
-  return path.join(distTypes, `ngx-compat-material-legacy-${slug}.d.ts`);
+function activeTypesRoot(typesRoot) {
+  return typesRoot || process.env.LEGACY_TYPES_ROOT || defaultTypes;
 }
 
-export function exportsOf(entry) {
-  if (exportCache.has(entry)) return exportCache.get(entry);
-  const file = dtsPath(entry);
+function dtsPath(entry, typesRoot) {
+  const slug = entry.replaceAll('/', '-');
+  return path.join(activeTypesRoot(typesRoot), `ngx-compat-material-legacy-${slug}.d.ts`);
+}
+
+export function exportsOf(entry, typesRoot) {
+  const cacheKey = `${activeTypesRoot(typesRoot)}::${entry}`;
+  if (exportCache.has(cacheKey)) return exportCache.get(cacheKey);
+  const file = dtsPath(entry, typesRoot);
   const names = new Set();
   if (fs.existsSync(file)) {
     const text = fs.readFileSync(file, 'utf8');
@@ -58,7 +63,7 @@ export function exportsOf(entry) {
       cursor = close + 1;
     }
   }
-  exportCache.set(entry, names);
+  exportCache.set(cacheKey, names);
   return names;
 }
 
@@ -115,7 +120,10 @@ function vendoredShared(spec) {
   return [file, `${file}.ts`].find(candidate => fs.existsSync(candidate)) ?? null;
 }
 
-function mapSpecifier(filename, spec, names, problems) {
+function mapSpecifier(filename, spec, names, problems, options = {}) {
+  const typesRoot = options.typesRoot;
+  const subjectMode = options.subjectMode || process.env.LEGACY_SUBJECT_MODE || 'workspace-dist';
+
   if (spec === '@angular/cdk/testing/private' || spec.endsWith('cdk/testing/private')) {
     return cdkShim;
   }
@@ -161,7 +169,7 @@ function mapSpecifier(filename, spec, names, problems) {
   const entry = entryFor(resolved);
   const allExported = target =>
     !!target && names.length > 0 && !names.includes('*') && !names.includes('default') &&
-    names.every(name => exportsOf(target).has(name));
+    names.every(name => exportsOf(target, typesRoot).has(name));
   if (allExported(entry)) return `@ngx-compat/material-legacy/${entry}`;
   const alt = entry?.endsWith('/testing') ? entry.replace(/\/testing$/, '') : entry ? `${entry}/testing` : null;
   if (allExported(alt)) return `@ngx-compat/material-legacy/${alt}`;
@@ -169,8 +177,12 @@ function mapSpecifier(filename, spec, names, problems) {
   if (resolved.includes(`${path.sep}testing${path.sep}`) && !/@Component\s*\(|templateUrl\s*:|template\s*:/.test(fs.readFileSync(resolved, 'utf8'))) {
     return null;
   }
+  const label =
+    subjectMode === 'artifact'
+      ? `unmapped (artifact mode forbids workspace implementation) ${spec}`
+      : `unmapped ${spec}`;
   problems.push(
-    `unmapped ${spec} [${names.join(', ')}] in ${path.relative(repoRoot, filename)} -> ${path.relative(repoRoot, resolved)}`,
+    `${label} [${names.join(', ')}] in ${path.relative(repoRoot, filename)} -> ${path.relative(repoRoot, resolved)}`,
   );
   return spec;
 }
@@ -200,7 +212,7 @@ function decoratorInjection(node, sourceFile) {
   return {start, end: start, text};
 }
 
-export function adaptSpec(source, filename) {
+export function adaptSpec(source, filename, options = {}) {
   const problems = [];
   const sourceFile = ts.createSourceFile(filename, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
   const replacements = [];
@@ -213,7 +225,7 @@ export function adaptSpec(source, filename) {
       ts.isStringLiteral(statement.moduleSpecifier)
     ) {
       const spec = statement.moduleSpecifier.text;
-      const next = mapSpecifier(filename, spec, importedNames(statement), problems);
+      const next = mapSpecifier(filename, spec, importedNames(statement), problems, options);
       if (next && next !== spec) {
         const literal = statement.moduleSpecifier;
         replacements.push({start: literal.getStart(sourceFile) + 1, end: literal.end - 1, text: next});

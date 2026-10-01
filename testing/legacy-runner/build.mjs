@@ -13,22 +13,33 @@ const outDir = path.join(__dirname, 'out');
 const expectFail = process.env.LEGACY_TESTS_EXPECT_FAIL === '1';
 const filter = process.env.LEGACY_SPEC_FILTER || '';
 const family = process.env.LEGACY_SPEC_FAMILY || '';
+const subjectMode = process.env.LEGACY_SUBJECT_MODE || 'workspace-dist';
+const distPkg =
+  process.env.LEGACY_PACKAGE_ROOT || path.join(root, 'dist/ngx-material-legacy');
+const typesRoot =
+  process.env.LEGACY_TYPES_ROOT || path.join(distPkg, 'types');
 
 fs.mkdirSync(outDir, {recursive: true});
 
-const distPkg = path.join(root, 'dist/ngx-material-legacy');
 if (!fs.existsSync(path.join(distPkg, 'package.json'))) {
-  console.error('Missing dist/ngx-material-legacy — run pack/build first.');
+  console.error(`Missing package at ${distPkg} — run pack/build or pass an extracted --run artifact.`);
   process.exit(1);
 }
 
 const pkgJson = JSON.parse(fs.readFileSync(path.join(distPkg, 'package.json'), 'utf8'));
 const pkgName = pkgJson.name; // @ngx-compat/material-legacy
+const workspaceDist = path.resolve(root, 'dist/ngx-material-legacy');
+const workspaceProjects = path.resolve(root, 'projects/ngx-material-legacy');
+
+function under(parent, target) {
+  const rel = path.relative(parent, target);
+  return rel === '' || (!rel.startsWith('..') && !path.isAbsolute(rel));
+}
 
 function resolveDistExport(subpath) {
   const key = subpath === '' ? '.' : `./${subpath}`;
   const exp = pkgJson.exports?.[key];
-  if (!exp) throw new Error(`No export ${key} in dist package`);
+  if (!exp) throw new Error(`No export ${key} in package ${distPkg}`);
   const rel = typeof exp === 'string' ? exp : exp.default || exp.import;
   return path.join(distPkg, rel);
 }
@@ -61,6 +72,8 @@ for (const row of rows) {
 const entryLines = [
   "import '../init-test-env';",
   `globalThis.__LEGACY_EXPECTED_SPECS__ = ${JSON.stringify(rows.map(row => row.historical_path))};`,
+  `globalThis.__LEGACY_SUBJECT_MODE__ = ${JSON.stringify(subjectMode)};`,
+  `globalThis.__LEGACY_PACKAGE_ROOT__ = ${JSON.stringify(distPkg)};`,
   ...rows.map(row => `import '${path.join(root, row.candidate).replaceAll('\\', '/')}';`),
   "import '../specs/discovery.spec';",
   "import '../specs/deliberate-fail.spec';",
@@ -68,7 +81,20 @@ const entryLines = [
 ];
 const generatedEntry = path.join(outDir, 'entry.generated.ts');
 fs.writeFileSync(generatedEntry, entryLines.join('\n'));
-fs.writeFileSync(path.join(outDir, 'bundled-specs.json'), JSON.stringify(rows, null, 2) + '\n');
+fs.writeFileSync(
+  path.join(outDir, 'bundled-specs.json'),
+  JSON.stringify(
+    {
+      subject_mode: subjectMode,
+      package_root: distPkg,
+      run_id: process.env.LEGACY_RUN_ID || null,
+      artifact_sha256: process.env.LEGACY_ARTIFACT_SHA256 || null,
+      rows,
+    },
+    null,
+    2,
+  ) + '\n',
+);
 
 const aliasPlugin = {
   name: 'legacy-aliases',
@@ -81,14 +107,52 @@ const aliasPlugin = {
       exact[`@angular/material/${sub}`] = resolveDistExport(sub);
     }
     for (const [prefix, target] of Object.entries(exact)) {
-      const filter = new RegExp(`^${prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`);
-      build.onResolve({filter}, () => ({path: target}));
+      const filterRe = new RegExp(`^${prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`);
+      build.onResolve({filter: filterRe}, () => ({path: target}));
     }
     build.onResolve({filter: /^zone\.js\/testing$/}, () => ({path: require.resolve('zone.js/testing')}));
     build.onResolve({filter: /^zone\.js$/}, () => ({path: require.resolve('zone.js')}));
+
+    if (subjectMode === 'artifact') {
+      // Refuse packaged-public bypass via workspace implementation files.
+      // Specs, runner shims, and non-component local test helpers may still load.
+      build.onLoad({filter: /\.(ts|js|mjs)$/}, args => {
+        const resolved = path.resolve(args.path);
+        const isSpec = /\.spec\.ts$/.test(resolved);
+        const isShim = resolved.includes(
+          `${path.sep}testing${path.sep}legacy-runner${path.sep}shims${path.sep}`,
+        );
+        if (under(workspaceDist, resolved) && !under(path.resolve(distPkg), resolved)) {
+          return {
+            errors: [
+              {
+                text:
+                  `artifact mode refused workspace-dist import: ${path.relative(root, resolved)}`,
+              },
+            ],
+          };
+        }
+        if (under(workspaceProjects, resolved) && !isSpec && !isShim) {
+          const text = fs.readFileSync(resolved, 'utf8');
+          if (/@Component\s*\(|@Directive\s*\(|@NgModule\s*\(|templateUrl\s*:/.test(text)) {
+            return {
+              errors: [
+                {
+                  text:
+                    `artifact mode refused workspace component/module import: ` +
+                    `${path.relative(root, resolved)} (package root is ${distPkg})`,
+                },
+              ],
+            };
+          }
+        }
+        return undefined;
+      });
+    }
+
     build.onLoad({filter: /\.spec\.ts$/}, args => {
       const source = fs.readFileSync(args.path, 'utf8');
-      const adapted = adaptSpec(source, args.path);
+      const adapted = adaptSpec(source, args.path, {typesRoot, subjectMode});
       if (adapted.problems.length) {
         return {errors: adapted.problems.map(text => ({text}))};
       }
@@ -132,4 +196,6 @@ await esbuild.build({
   logOverride: {'direct-eval': 'silent'},
 });
 
-console.log(`Bundled → testing/legacy-runner/out/legacy-tests.iife.js (expectFail=${expectFail})`);
+console.log(
+  `Bundled → testing/legacy-runner/out/legacy-tests.iife.js (expectFail=${expectFail} mode=${subjectMode})`,
+);

@@ -76,6 +76,10 @@ CHECKS = (
     ["node", "scripts/check-behavior-semantic-one-diff.mjs"],
     ["node", "--check", "scripts/motion-lifecycle-smoke.mjs"],
     ["node", "--check", "scripts/packed-consumer-aot-smoke.mjs"],
+    ["node", "--check", "scripts/resolve-run-library.mjs"],
+    ["node", "--check", "scripts/rc-test-legacy-family.mjs"],
+    ["node", "--check", "scripts/run-legacy-tests.mjs"],
+    ["node", "--check", "scripts/run-legacy-artifact-suite.mjs"],
     ["node", "scripts/fresh-artifact-negative-tests.mjs"],
     ["node", "--experimental-strip-types", "tests/motion/host-motion-event.test.mjs"],
     ["python3", "scripts/check-workflow-pins.py", "."],
@@ -87,19 +91,40 @@ CHECKS = (
 
 
 def check_full_verify_refuses_subsets() -> None:
+    """Evidence-aware bootstrap: incomplete automatic matrix must not look like G01."""
     result = subprocess.run(
-        [sys.executable, "scripts/rc-verify.py", "--out", "compatibility/rc/reports/verify-not-written"],
+        [sys.executable, "scripts/rc-verify.py"],
         cwd=ROOT,
         capture_output=True,
         text=True,
     )
     combined = result.stdout + result.stderr
     if result.returncode != 2:
-        fail(f"verify exited {result.returncode}; a full gate must not succeed on a subset")
-    if "did not run verify-lite" not in combined:
-        fail("verify did not record that it skipped verify-lite and families")
+        fail(f"verify without --out exited {result.returncode}; expected usage refusal 2")
+    if "requires --out" not in combined and "usage:" not in combined:
+        fail("verify without --out did not print usage/refusal")
+
+    matrix_path = ROOT / "compatibility/rc/matrices/full-verify.json"
+    if not matrix_path.is_file():
+        fail("missing compatibility/rc/matrices/full-verify.json")
+    matrix = json.loads(matrix_path.read_text())
+    required = [c for c in matrix.get("checks", []) if c.get("required")]
+    if not required:
+        fail("full-verify matrix has no required checks")
+    missing_impl = [
+        c.get("check_id")
+        for c in required
+        if not c.get("implemented") and isinstance(c.get("check_id"), str)
+    ]
+    # While product gates remain open, the matrix must keep at least one required
+    # unimplemented cell so an accidental green subset cannot claim completion.
+    if not missing_impl:
+        fail(
+            "full-verify matrix has no unimplemented required checks; "
+            "refuse silent completion until seal/release-set evidence exists"
+        )
     if (ROOT / "compatibility/rc/reports/verify-not-written").exists():
-        fail("verify wrote a run directory")
+        fail("verify wrote the obsolete verify-not-written path")
 
 
 def run_checks() -> None:
