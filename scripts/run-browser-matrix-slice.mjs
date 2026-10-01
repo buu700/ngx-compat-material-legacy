@@ -6,9 +6,11 @@
  * PR-stage Chromium main-line slice: dialog/select (zoneful/zoneless/CSP/
  * reduced-motion), menu/snack-bar/tooltip/autocomplete/tabs defaults
  * (zoneful and zoneless), chips/form-field defaults (zoneful and
- * zoneless), plus input/list/slider/radio/checkbox/slide-toggle
- * default+focused/disabled (zoneful and zoneless). Does not fan success
- * into unexecuted engines/families. Does not claim G10.
+ * zoneless), input/list/slider/radio/checkbox/slide-toggle
+ * default+focused/disabled (zoneful and zoneless), plus button/card/
+ * progress-bar/progress-spinner default+disabled/focused (zoneful and
+ * zoneless). Does not fan success into unexecuted engines/families.
+ * Does not claim G10.
  *
  *   node scripts/run-browser-matrix-slice.mjs --tarball <path>
  *   node scripts/run-browser-matrix-slice.mjs --run <run.json>
@@ -273,8 +275,61 @@ const scenarios = [
       && report.families?.['slide-toggle']?.present
       && report.families?.['slide-toggle']?.disabled_class
       && !report.error,
+  },  {
+    id: 'surface-families-zoneful',
+    script: 'scripts/browser-surface-families.mjs',
+    args: [],
+    cells: [
+      'pr/main/chromium/zoneful/button/default',
+      'pr/main/chromium/zoneful/button/disabled',
+      'pr/main/chromium/zoneful/button/focused',
+      'pr/main/chromium/zoneful/card/default',
+      'pr/main/chromium/zoneful/progress-bar/default',
+      'pr/main/chromium/zoneful/progress-spinner/default',
+    ],
+    detail: 'compatibility/rc/reports/browser-surface-families.json',
+    require: report => Array.isArray(report.credited_cell_ids)
+      && report.credited_cell_ids.length >= 6
+      && report.families?.button?.present
+      && report.families?.button?.disabled_class
+      && report.families?.button?.focused
+      && report.families?.card?.present
+      && report.families?.['progress-bar']?.present
+      && report.families?.['progress-bar']?.value_reflected
+      && report.families?.['progress-spinner']?.present
+      && report.families?.['progress-spinner']?.value_reflected
+      && !report.error,
+  },
+  {
+    id: 'surface-families-zoneless',
+    script: 'scripts/browser-surface-families.mjs',
+    args: ['--zoneless'],
+    cells: [
+      'pr/main/chromium/zoneless/button/default',
+      'pr/main/chromium/zoneless/button/disabled',
+      'pr/main/chromium/zoneless/button/focused',
+      'pr/main/chromium/zoneless/card/default',
+      'pr/main/chromium/zoneless/progress-bar/default',
+      'pr/main/chromium/zoneless/progress-spinner/default',
+    ],
+    detail: 'compatibility/rc/reports/browser-surface-families-zoneless.json',
+    require: report => Array.isArray(report.credited_cell_ids)
+      && report.credited_cell_ids.length >= 6
+      && report.zoneless === true
+      && report.bundle_has_zone === false
+      && report.zone_global === 'undefined'
+      && report.families?.button?.present
+      && report.families?.button?.disabled_class
+      && report.families?.button?.focused
+      && report.families?.card?.present
+      && report.families?.['progress-bar']?.present
+      && report.families?.['progress-bar']?.value_reflected
+      && report.families?.['progress-spinner']?.present
+      && report.families?.['progress-spinner']?.value_reflected
+      && !report.error,
   },
 ];
+
 
 const executed = [];
 const failed = [];
@@ -292,13 +347,15 @@ function freeCdpPort(port) {
 }
 
 for (const scenario of scenarios) {
-  const cdpPort = scenario.script.includes('control-families')
+  const cdpPort = scenario.script.includes('surface-families')
     ? 9336
-    : scenario.script.includes('form-families')
-      ? 9335
-      : scenario.script.includes('overlay')
-        ? 9334
-        : 9333;
+    : scenario.script.includes('control-families')
+      ? 9336
+      : scenario.script.includes('form-families')
+        ? 9335
+        : scenario.script.includes('overlay')
+          ? 9334
+          : 9333;
   freeCdpPort(cdpPort);
   process.env.CDP_PORT = String(cdpPort);
   const result = spawnSync(
@@ -352,7 +409,7 @@ const report = {
   result: ok ? 'pass' : 'fail',
   matrix_updated: false,
   limitations: [
-    'Chromium PR-slice: dialog/select (zoneful/zoneless/CSP/reduced-motion), menu/snack-bar/tooltip/autocomplete/tabs defaults (zoneful+zoneless), chips/form-field defaults (zoneful+zoneless), input/list/slider default+focused/disabled (zoneful+zoneless).',
+    'Chromium PR-slice: dialog/select (zoneful/zoneless/CSP/reduced-motion), menu/snack-bar/tooltip/autocomplete/tabs defaults (zoneful+zoneless), chips/form-field defaults (zoneful+zoneless), input/list/slider/radio/checkbox/slide-toggle default+focused/disabled (zoneful+zoneless), button/card/progress-bar/progress-spinner default+disabled/focused (zoneful+zoneless).',
     'Firefox/WebKit, remaining families/states, SSR, enabled-motion, and other CSP cells stay not-executed.',
     'Success is not copied to unexecuted cells.',
     'Does not claim G10.',
