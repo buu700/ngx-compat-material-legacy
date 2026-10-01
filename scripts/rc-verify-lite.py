@@ -110,35 +110,64 @@ def run_checks() -> None:
             fail(f"check failed ({result.returncode}): {' '.join(command)}")
 
 
-def check_family_reports(candidates: set[str]) -> None:
-    reports = sorted((ROOT / "compatibility/rc/reports").glob("legacy-*.json"))
-    for path in reports:
-        report = json.loads(path.read_text())
-        totals = report.get("totals")
-        if not isinstance(totals, dict):
-            fail(f"{path.name} is missing totals")
-        numbers = []
-        for key in ("executed", "passed", "failed", "skipped"):
-            value = totals.get(key)
-            if not isinstance(value, int):
-                fail(f"{path.name} totals.{key} is not an integer")
-            numbers.append(value)
-        if numbers[0] != sum(numbers[1:]):
-            fail(f"{path.name} totals do not add up")
-        failures = report.get("failures")
-        if not isinstance(failures, list):
-            fail(f"{path.name} is missing a failures list")
-        if numbers[2] == 0 and failures:
-            fail(f"{path.name} lists failures while totals.failed is 0")
-        mapped = report.get("mapped_specs")
-        if not isinstance(mapped, list) or not mapped:
-            fail(f"{path.name} is missing mapped specs")
-        for spec in mapped:
-            candidate = spec.get("candidate")
-            if candidate not in candidates:
-                fail(f"{path.name} maps unknown candidate {candidate}")
-            if not (ROOT / candidate).is_file():
-                fail(f"{path.name} maps missing candidate {candidate}")
+def inventory_families(rows: list) -> set[str]:
+    """Explicit historical-family registry from the inventory (not a legacy-*.json glob)."""
+    families: set[str] = set()
+    for row in rows:
+        family = row.get("family")
+        if not isinstance(family, str) or not family:
+            fail("historical inventory row is missing a family name")
+        families.add(family)
+    return families
+
+
+def family_report_path(reports_dir: Path, family: str) -> Path:
+    return reports_dir / f"legacy-{family}.json"
+
+
+def check_family_report(path: Path, candidates: set[str], *, root: Path = ROOT) -> None:
+    report = json.loads(path.read_text())
+    totals = report.get("totals")
+    if not isinstance(totals, dict):
+        fail(f"{path.name} is missing totals")
+    numbers = []
+    for key in ("executed", "passed", "failed", "skipped"):
+        value = totals.get(key)
+        if not isinstance(value, int):
+            fail(f"{path.name} totals.{key} is not an integer")
+        numbers.append(value)
+    if numbers[0] != sum(numbers[1:]):
+        fail(f"{path.name} totals do not add up")
+    failures = report.get("failures")
+    if not isinstance(failures, list):
+        fail(f"{path.name} is missing a failures list")
+    if numbers[2] == 0 and failures:
+        fail(f"{path.name} lists failures while totals.failed is 0")
+    mapped = report.get("mapped_specs")
+    if not isinstance(mapped, list) or not mapped:
+        fail(f"{path.name} is missing mapped specs")
+    for spec in mapped:
+        candidate = spec.get("candidate")
+        if candidate not in candidates:
+            fail(f"{path.name} maps unknown candidate {candidate}")
+        if not (root / candidate).is_file():
+            fail(f"{path.name} maps missing candidate {candidate}")
+
+
+def check_family_reports(
+    candidates: set[str],
+    families: set[str],
+    *,
+    reports_dir: Path | None = None,
+    root: Path = ROOT,
+) -> None:
+    """Validate only registry family reports. Sass aggregates (e.g. legacy-aggregate.json) are not family reports."""
+    directory = reports_dir if reports_dir is not None else root / "compatibility/rc/reports"
+    for family in sorted(families):
+        path = family_report_path(directory, family)
+        if not path.is_file():
+            continue
+        check_family_report(path, candidates, root=root)
 
 
 def main() -> None:
@@ -165,7 +194,8 @@ def main() -> None:
         fail("port-manifest still depends on the planning directory")
     if manifest.get("inventory") != "testing/legacy-runner/historical-inventory.json":
         fail("port-manifest does not point at the repository inventory")
-    check_family_reports(inventory_candidates)
+    families = inventory_families(inventory["rows"])
+    check_family_reports(inventory_candidates, families)
     check_full_verify_refuses_subsets()
     run_checks()
     print("verify-lite: coherence checks passed")

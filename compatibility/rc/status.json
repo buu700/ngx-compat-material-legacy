@@ -1,29 +1,31 @@
 {
   "schema_version": 1,
   "role": "single RC status index",
-  "observed_at": "2026-10-01T14:54:16Z",
+  "observed_at": "2026-10-01T14:56:59Z",
   "main": {
-    "commit": "1a47e7f9c29de3fd44505d4ab481204de2a25ab0",
-    "identity_role": "inspected_content_checkpoint",
-    "worktree": "/workspace/ngx-plan/rc-h00-backup/audit-consolidated-worktree",
+    "commit": "2328380006fe9305f7d1d9b07a1b1710812ee077",
+    "identity_role": "verified_normalized_execution_tip_pre_rc01_push",
+    "worktree": "/workspace/ngx-compat/material",
     "branch": "main",
-    "checkout_branch": "rc/audit-consolidated-11ee5b9-20261001T105342"
+    "checkout_branch": "main"
   },
   "line_21": {
     "commit": "cbf86f3faccb240e7beeb6a1e2af727b5d9a674d",
     "branch": "21.x",
-    "worktree": "/workspace/ngx-compat/material-21"
+    "worktree": "/workspace/ngx-compat/material-21",
+    "note": "origin/21.x at expected tip; local worktree currently behind with dirty pnpm-lock.yaml and was not reset"
   },
   "packets": {
+    "RC-H00": "verified-local-and-promoted",
     "RC-00": "in-progress",
     "RC-01": "in-progress",
-    "RC-02": "in-progress",
-    "RC-03": "in-progress",
-    "RC-04": "in-progress",
-    "RC-05": "in-progress",
-    "RC-06": "in-progress",
-    "RC-07": "in-progress",
-    "RC-08": "in-progress",
+    "RC-02": "not-started",
+    "RC-03": "not-started",
+    "RC-04": "not-started",
+    "RC-05": "not-started",
+    "RC-06": "not-started",
+    "RC-07": "not-started",
+    "RC-08": "deferred-audit-cursor-preserved",
     "RC-09": "not-started",
     "RC-10": "not-started",
     "RC-11": "not-started",
@@ -38,33 +40,45 @@
     "session_handoff": "compatibility/rc/session-handoff.json"
   },
   "acceptance": {
-    "RC-00-A01": "recorded",
-    "RC-00-A02": "recorded",
-    "RC-00-A03": "recorded",
-    "RC-00-A04": "recorded-blocker",
-    "RC-00-A05": "recorded-protection-unread",
-    "RC-01-A01": "recorded",
-    "RC-01-A02": "recorded",
-    "RC-01-A03": "recorded",
-    "RC-01-A04": "recorded",
-    "RC-01-A05": "recorded"
+    "RC-00-A01": "partial-reentry-recorded",
+    "RC-00-A02": "historical-not-revalidated",
+    "RC-00-A03": "historical-not-revalidated",
+    "RC-00-A04": "blocked-owner-age-admission",
+    "RC-00-A05": "protection-unread",
+    "RC-01-A01": "local-patch-awaiting-ci",
+    "RC-01-A02": "not-proven-host-nix-unavailable",
+    "RC-01-A03": "classifier-regression-added-full-gate-refusal-retained",
+    "RC-01-A04": "blocked-host-nix-unavailable",
+    "RC-01-A05": "minimal-ci-and-classifier-only"
   },
   "not_claims": [
     "No G01-G13 gate is passed.",
     "No historical spec is bound to the current HEAD.",
     "Publication, registry ownership, and branch protection were not authorized or fully queried.",
-    "Cyph RC age admission is not approved."
+    "Cyph RC age admission is not approved.",
+    "Prior status acceptance labels marked recorded are historical and not revalidated by this session.",
+    "Local python3 scripts/rc-verify-lite.py success is not Chainman/host-nix CI proof."
   ],
   "clock_confidence": {
     "status": "verified",
-    "source": "box Thu Oct  1 14:54:16 UTC 2026 in America/New_York harness; agrees with session user_info date 2026-10-01",
-    "verified_at_utc": "2026-10-01T14:54:16Z"
+    "source": "box Thu Oct  1 10:56:59 EDT 2026 harness; agrees with session user_info date 2026-10-01",
+    "verified_at_utc": "2026-10-01T14:56:59Z"
   },
   "history_transition": {
-    "role": "local_content_checkpoint_before_metadata_normalize",
+    "role": "promoted_normalized_tip",
     "old_head": "11ee5b9690b245739f84393e37e1157ab557660c",
     "content_tip": "1a47e7f9c29de3fd44505d4ab481204de2a25ab0",
     "content_tree": "022b1403c6ca51b100f45bb8b9ef82f0a2934b5a",
-    "note": "CONTENT is the inspected predecessor; this status file does not claim its own commit SHA."
+    "normalized_tip": "2328380006fe9305f7d1d9b07a1b1710812ee077",
+    "normalized_tree": "f478d3c050068835dbb4d184b587955c7b376123",
+    "receipt": "/workspace/ngx-plan/rc-h00-backup/history-transition.json",
+    "note": "RC-H00 promoted; this status indexes the execution tip before the RC-01 bootstrap commit."
+  },
+  "harness": {
+    "just": "1.46.0 installed to ~/.local/bin for probing",
+    "nix": "unavailable",
+    "node": "v20.19.2 host PATH (not declared Chainman artifact)",
+    "network": "github.com reachable",
+    "chainman_blocker": "Host mode requires Nix; no host-language fallback is used."
   }
 }

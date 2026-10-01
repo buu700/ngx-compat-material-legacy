@@ -1,96 +1,93 @@
 {
   "template": false,
-  "packet_id": "RC-00",
-  "substep_id": "RC-00.01",
-  "source_commit": "39cbc812e28620a79a5355e3c0064813756a35b6",
-  "source_content_digest": "eac85dbb9e6b46dc71a41a4790b6e32e5e291eed1f19edad1dd9c765deb79eb6",
+  "packet_id": "RC-01",
+  "substep_id": "RC-01.01+RC-01.02",
+  "source_commit": "2328380006fe9305f7d1d9b07a1b1710812ee077",
+  "source_content_digest": null,
   "worktree_line": "main",
   "line_21_commit": "cbf86f3faccb240e7beeb6a1e2af727b5d9a674d",
   "owned_paths": [
+    ".github/workflows/ci.yml",
+    "scripts/rc-verify-lite.py",
+    "tests/test_rc_verify_lite_family_reports.py",
     "compatibility/rc/status.json",
     "compatibility/rc/session-handoff.json"
   ],
   "last_command": [
-    "python3 tools/history_check.py --repo <worktree> --content-tip 1a47e7f9c29de3fd44505d4ab481204de2a25ab0"
+    "python3 scripts/rc-verify-lite.py",
+    "just chainman setup javascript"
   ],
-  "outcome": "history-content-preserved;product-not-run",
-  "first_actionable_error": "History content preserved with exact tree equality to old tip; product CI/bootstrap still broken (known fetch-depth/report-classifier defects). Resume RC-00 re-entry then RC-01 repair. Prior Sass/select/motion product failures remain open and are not revalidated by this history step.",
+  "outcome": "rc00-reentry-ok;rc01-patches-local;chainman-blocked-no-nix;ci-not-yet-read",
+  "first_actionable_error": "just chainman setup javascript -> Chainman bootstrap: Host mode requires Nix; no host-language fallback is used. (exit 2). Direct python3 scripts/rc-verify-lite.py passed locally after classifier fix.",
   "failed_case_ids": [
     "MatSelect > core > overlay panel > should set the width of the overlay based on the trigger",
     "MatSelect > core > overlay panel > should set the width of the overlay based on a larger trigger width"
   ],
   "report_paths": [
     "compatibility/rc/status.json",
-    "compatibility/rc/reports/legacy-card.json",
-    "compatibility/rc/reports/legacy-tooltip.json",
-    "compatibility/rc/reports/setup-invalidation.json",
-    "compatibility/rc/reports/rc01-negative.json",
-    "compatibility/rc/reports/legacy-select.json",
-    "compatibility/rc/reports/pack-draft.json",
-    "compatibility/rc/reports/pack-isolation.json",
-    "compatibility/pack-proof/motion-lifecycle-smoke.json",
-    "compatibility/rc/reports/core-declarations.json",
-    "compatibility/rc/reports/owned-helper-trace.json",
-    "compatibility/rc/reports/engine-free-consumer.json",
-    "compatibility/rc/reports/migration-cli-ownership.json",
-    "compatibility/rc/reports/migration-transaction.json",
-    "compatibility/rc/reports/migration-schematic.json",
-    "compatibility/rc/reports/sass-facade-inventory.json",
-    "compatibility/rc/reports/sass-value-comparison.json",
-    "compatibility/rc/reports/companion-bridges.json",
+    "compatibility/rc/session-handoff.json",
     "compatibility/rc/reports/legacy-aggregate.json",
-    "compatibility/rc/reports/packed-sass-isolation.json",
-    "compatibility/rc/reports/select-panel-width.json",
-    "compatibility/rc/reports/aot-same-selector.json",
-    "compatibility/rc/reports/aot-historical-scenario.json",
-    "compatibility/rc/matrices/browser-matrix.json",
-    "compatibility/rc/reports/browser-dialog-escape.json",
-    "compatibility/rc/reports/browser-dialog-reduced-motion.json",
-    "compatibility/rc/reports/browser-dialog-zoneless.json",
-    "compatibility/rc/reports/browser-dialog-csp.json",
-    "compatibility/rc/reports/ssr-dialog.json",
-    "compatibility/rc/reports/upstream-audit-freeze.json",
-    "compatibility/rc/reports/security-deep-review.json",
-    "compatibility/rc/reports/docs-build-batch.json",
-    "compatibility/rc/reports/docs-build-one-diff.json",
-    "compatibility/rc/reports/behavior-semantic-one-diff.json"
+    "compatibility/rc/reports/legacy-card.json",
+    "compatibility/rc/reports/legacy-select.json",
+    "compatibility/rc/reports/legacy-tooltip.json"
   ],
-  "completed_acceptance_ids": [
-    "RC-00-A01",
-    "RC-00-A02",
-    "RC-00-A03",
-    "RC-01-A01",
-    "RC-01-A02",
-    "RC-01-A03",
-    "RC-01-A04",
-    "RC-01-A05"
-  ],
+  "completed_acceptance_ids": [],
   "not_run_scope": [
-    "RC-00-A04 remains blocked on an owner age-admission decision",
-    "GitHub branch protection and rulesets",
-    "Historical families other than card, tooltip, and select",
-    "RC-02-A01 through RC-02-A05 are not closed; the broken-pack probe refuses before ng-packagr instead of compiling a mutated tree",
-    "RC-03 through RC-05 and RC-07 through RC-12"
+    "RC-01-A01 through RC-01-A05 not closed; CI run must be read after push",
+    "Warm setup / lock invalidation not proven (host-nix unavailable on box)",
+    "RC-02 draft pack/consumer not started this session",
+    "G01-G13 not claimed",
+    "Audit cursor preserved; no 656-note binge"
   ],
-  "next_action": "RC-01: repair CI fetch-depth:0 and pack-lane setup; fix legacy-*.json report classifier so legacy-aggregate.json is not misclassified; then verify-lite / bootstrap.",
+  "next_action": "Push RC-01 CI/classifier fix; read resulting Actions run; if green bootstrap, start RC-02 fresh draft pack path. Do not claim RC engineering ready.",
   "blocked_owner_decisions": [
     "cyph-rc-age-admission",
     "registry-publish-authority",
     "github-protection-read"
   ],
-  "source_identity_role": "historical_artifact_receipt",
+  "recorded_at_utc": "2026-10-01T14:56:59Z",
+  "clock_confidence": "verified",
+  "source_role": "actual-editing-checkout-not-an-older-artifact-subject",
+  "source_identity_role": "verified_normalized_tip_pre_push",
   "current_source_checkpoint": {
-    "commit": "1a47e7f9c29de3fd44505d4ab481204de2a25ab0",
-    "tree": "022b1403c6ca51b100f45bb8b9ef82f0a2934b5a",
-    "identity_role": "inspected_content_checkpoint"
+    "commit": "2328380006fe9305f7d1d9b07a1b1710812ee077",
+    "tree": "f478d3c050068835dbb4d184b587955c7b376123",
+    "identity_role": "verified_normalized_execution_tip"
+  },
+  "audit_checkpoint": {
+    "read_notes": 711,
+    "formal_dispositions_closed": null,
+    "unread": 986,
+    "behavior_semantic_read": 643,
+    "behavior_semantic_total": 1040,
+    "next_semantic_cursor": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+    "input_hashes": {
+      "compatibility/f10/upstream-sha-risk-bootstrap.json": "400e89f53e41975dd5056158c60bdac2e4a2c9dcabaee1204eda782492f5f456",
+      "compatibility/rc/reports/behavior-semantic-one-diff.json": "e407a0c71f67a8a85a8dc7b887a5e37349915549e34ac720783072fa7729be19",
+      "compatibility/rc/reports/docs-build-one-diff.json": "b41963fbfd4eddc62393af63b34c6d87288108ccf762ccf6b3c810ec1626570f",
+      "compatibility/rc/reports/security-deep-review.json": "f3de39cbf22534b04ac850681654b92373e7d9706b1176cca5e85abb70dfb09f"
+    }
   },
   "audit_cursor": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-  "completed_acceptance_identity_role": "historical_reported_not_revalidated",
+  "ci": {
+    "tested_commit": null,
+    "run_id": null,
+    "outcome": "not_queried_pre_push"
+  },
   "history_transition": {
+    "normalized_tip": "2328380006fe9305f7d1d9b07a1b1710812ee077",
     "content_tip": "1a47e7f9c29de3fd44505d4ab481204de2a25ab0",
-    "content_tree": "022b1403c6ca51b100f45bb8b9ef82f0a2934b5a",
     "old_head": "11ee5b9690b245739f84393e37e1157ab557660c",
-    "replacement_commits": 5,
-    "notes_unique_total": 711
-  }
+    "notes_unique_total": 711,
+    "receipt": "/workspace/ngx-plan/rc-h00-backup/history-transition.json"
+  },
+  "f01_wip": {
+    "branch": "wip/f01-fresh-artifact-with-changes",
+    "commit": "fd3ca4e68530d1be1b32827f91c794112d54dad8",
+    "note": "preserved; may cherry-pick into RC-01/02; do not replay as history rewrite"
+  },
+  "harness_blockers": [
+    "nix unavailable on box; Chainman host-nix cannot run",
+    "just 1.46.0 available after manual pin install; not sufficient without Nix"
+  ]
 }

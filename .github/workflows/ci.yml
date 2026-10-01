@@ -21,6 +21,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
 
       - name: Install pinned Nix
         uses: DeterminateSystems/nix-installer-action@3138316df39ed29be04236d7ffc686fa525866aa # v23
@@ -47,6 +49,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
 
       - name: Install pinned Nix
         uses: DeterminateSystems/nix-installer-action@3138316df39ed29be04236d7ffc686fa525866aa # v23
@@ -59,6 +63,9 @@ jobs:
           tar -xzf /tmp/just.tar.gz -C /tmp just
           sudo mv /tmp/just /usr/local/bin/just
           just --version
+
+      - name: Set up JavaScript toolchain
+        run: just chainman setup javascript
 
       - name: Pack a draft run
         run: just chainman run pack-draft -- --line main --out artifacts/main/draft
