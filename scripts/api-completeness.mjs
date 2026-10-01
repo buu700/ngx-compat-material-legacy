@@ -9,7 +9,7 @@
  * Applies F04 recipe-removal exceptions and the reviewed export-name allowlist.
  * Does not claim G02.
  */
-import {existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync} from 'node:fs';
+import {existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync, rmSync} from 'node:fs';
 import {spawnSync} from 'node:child_process';
 import {dirname, join, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -17,11 +17,39 @@ import ts from 'typescript';
 import {parseLegacyArgs, resolveLibraryFromRun, sha256File} from './resolve-run-library.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const refRoot = process.env.REFERENCE_MATERIAL_SRC
-  || join(root, '../reference/angular-components/src/material');
 const exceptionsPath = join(root, 'compatibility/compatibility-exceptions.json');
 const allowlistPath = join(root, 'compatibility/rc/api/export-name-allowlist.json');
 const reportPath = join(root, 'compatibility/rc/reports/api-completeness.json');
+const baselineTag = process.env.REFERENCE_BASELINE_TAG || 'baseline/angular-components-16.2.x';
+
+function resolveReferenceRoot() {
+  const envRoot = process.env.REFERENCE_MATERIAL_SRC;
+  if (envRoot && existsSync(envRoot)) return resolve(envRoot);
+  const sibling = join(root, '../reference/angular-components/src/material');
+  if (existsSync(sibling)) return sibling;
+  // CI / hosts without the sibling checkout: export legacy barrels from the
+  // immutable baseline tag preserved in this repository.
+  const cache = join(root, 'artifacts/local/ref-material-16.2.14');
+  const marker = join(cache, '.baseline-tag');
+  const materialRoot = join(cache, 'src/material');
+  if (!(existsSync(marker) && readFileSync(marker, 'utf8').trim() === baselineTag
+    && existsSync(join(materialRoot, 'legacy-button/public-api.ts')))) {
+    rmSync(cache, {recursive: true, force: true});
+    mkdirSync(cache, {recursive: true});
+    const archived = spawnSync('git', ['archive', baselineTag, 'src/material'], {
+      cwd: root,
+      encoding: 'buffer',
+      maxBuffer: 64 * 1024 * 1024,
+    });
+    if (archived.status !== 0) {
+      fail(2, `Unable to export ${baselineTag}:src/material (${archived.stderr?.toString() || 'git archive failed'})`);
+    }
+    const extracted = spawnSync('tar', ['-x', '-C', cache], {input: archived.stdout, cwd: root});
+    if (extracted.status !== 0) fail(2, 'Failed to extract baseline material sources');
+    writeFileSync(marker, baselineTag + '\n');
+  }
+  return materialRoot;
+}
 
 function fail(code, message) {
   console.error(message);
@@ -42,8 +70,9 @@ if (runPath) {
   fail(2, '--tarball or --run is required');
 }
 if (!existsSync(tarball)) fail(2, `Missing tarball: ${tarball}`);
-if (!existsSync(refRoot)) fail(2, `Missing 16.2.14 reference sources: ${refRoot}`);
 if (!existsSync(allowlistPath)) fail(2, `Missing allowlist: ${allowlistPath}`);
+const refRoot = resolveReferenceRoot();
+if (!existsSync(refRoot)) fail(2, `Missing 16.2.14 reference sources: ${refRoot}`);
 
 function resolveSpecifier(fromFile, spec) {
   const base = resolve(dirname(fromFile), spec);

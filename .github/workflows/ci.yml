@@ -108,6 +108,12 @@ jobs:
           just chainman exec -- node scripts/build-migrate-legacy-cli.mjs --verify
           just chainman exec -- node scripts/migration-cli-isolation.mjs
 
+      - name: API completeness against tip pack
+        run: |
+          set -euo pipefail
+          RUN="${{ steps.pack.outputs.run_dir }}"
+          just chainman exec -- node scripts/api-completeness.mjs --run "${RUN}/run.json"
+
       - name: Sass seal against tip pack
         run: |
           set -euo pipefail

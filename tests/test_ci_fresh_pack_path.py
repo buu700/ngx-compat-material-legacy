@@ -35,6 +35,7 @@ class CiFreshPackPathTests(unittest.TestCase):
         self.assertIn("engine-free-consumer.mjs --tarball", CI)
         self.assertIn("build-migrate-legacy-cli.mjs --verify", CI)
         self.assertIn("migration-cli-isolation.mjs", CI)
+        self.assertIn("api-completeness.mjs --run", CI)
         self.assertIn("sass-seal.mjs --run", CI)
         self.assertIn("run-browser-matrix-slice.mjs --run", CI)
 
