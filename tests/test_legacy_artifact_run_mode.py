@@ -63,8 +63,9 @@ class LegacyArtifactRunModeTests(unittest.TestCase):
         self.assertIn("Missing run manifest", result.stdout + result.stderr)
 
     def test_ci_wires_artifact_bound_family_against_entry_run(self):
-        self.assertIn("Artifact-bound historical family", CI)
-        self.assertIn("test-legacy -- --family card --run", CI)
+        self.assertIn("Artifact-bound historical families (all 22)", CI)
+        self.assertIn("test-legacy -- --run", CI)
+        self.assertNotIn("test-legacy -- --family card --run", CI)
         self.assertIn("Upload entry run directory", CI)
         self.assertIn("entry-${{ github.sha }}", CI)
 
@@ -72,8 +73,26 @@ class LegacyArtifactRunModeTests(unittest.TestCase):
         matrix = json.loads(MATRIX.read_text())
         required = [c for c in matrix["checks"] if c.get("required")]
         self.assertTrue(required)
+        implemented = {c["check_id"] for c in required if c.get("implemented")}
         missing = [c["check_id"] for c in required if not c.get("implemented")]
-        self.assertIn("historical-legacy-artifact", missing)
+        for check_id in (
+            "historical-legacy-artifact",
+            "engine-free-consumer",
+            "migration-packaged",
+            "pack-library",
+            "packed-exports",
+            "packed-consumer",
+            "motion-smoke",
+        ):
+            self.assertIn(check_id, implemented)
+        # Remaining open automatic cells keep verify failed / refuse silent G01.
+        for check_id in (
+            "sass-seal",
+            "browser-matrix",
+            "api-completeness",
+            "upstream-audit-disposition",
+        ):
+            self.assertIn(check_id, missing)
 
     def test_verify_without_out_refuses(self):
         result = subprocess.run(

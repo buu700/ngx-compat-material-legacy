@@ -45,7 +45,7 @@ jobs:
   packed-consumer-aot:
     name: Packed-consumer AOT and harness
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 90
     steps:
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -95,6 +95,36 @@ jobs:
           RUN="${{ steps.pack.outputs.run_dir }}"
           just chainman run packed-consumer -- --run "${RUN}/run.json"
 
+      - name: Engine-free required consumer against tip pack
+        run: |
+          set -euo pipefail
+          RUN="${{ steps.pack.outputs.run_dir }}"
+          tarball=$(python3 -c "import json; print(json.load(open('${RUN}/pack-meta.json'))['tarball'])")
+          just chainman exec -- node scripts/engine-free-consumer.mjs --tarball "${RUN}/${tarball}"
+
+      - name: Migration packaged CLI verify and isolation
+        run: |
+          set -euo pipefail
+          just chainman exec -- node scripts/build-migrate-legacy-cli.mjs --verify
+          just chainman exec -- node scripts/migration-cli-isolation.mjs
+
+      - name: Install Chromium for historical runner
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y chromium-browser || sudo apt-get install -y chromium
+
+      - name: Artifact-bound historical families (all 22)
+        run: |
+          set -euo pipefail
+          RUN="${{ steps.pack.outputs.run_dir }}"
+          CHROME_BIN="$(command -v chromium-browser || command -v chromium || command -v google-chrome || true)"
+          test -n "$CHROME_BIN"
+          export CHROME_BIN
+          # One extract + all inventory families; unselected families are not omitted.
+          # Host Chrome with Chainman Node; absolute CHROME_BIN avoids flake PATH gaps.
+          just chainman run test-legacy -- --run "${RUN}/run.json"
+
       - name: Upload entry run directory
         if: always() && steps.pack.outcome == 'success'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
@@ -103,20 +133,4 @@ jobs:
           path: ${{ steps.pack.outputs.run_dir }}
           if-no-files-found: error
           retention-days: 14
-
-      - name: Install Chromium for historical runner
-        run: |
-          set -euo pipefail
-          sudo apt-get update
-          sudo apt-get install -y chromium-browser || sudo apt-get install -y chromium
-
-      - name: Artifact-bound historical family (card smoke)
-        run: |
-          set -euo pipefail
-          RUN="${{ steps.pack.outputs.run_dir }}"
-          CHROME_BIN="$(command -v chromium-browser || command -v chromium || command -v google-chrome || true)"
-          test -n "$CHROME_BIN"
-          export CHROME_BIN
-          # Host Chrome with Chainman Node; absolute CHROME_BIN avoids flake PATH gaps.
-          just chainman run test-legacy -- --family card --run "${RUN}/run.json"
 

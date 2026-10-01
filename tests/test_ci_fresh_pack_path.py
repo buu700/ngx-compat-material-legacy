@@ -27,8 +27,14 @@ class CiFreshPackPathTests(unittest.TestCase):
         self.assertIn("packed-consumer -- --run", CI)
 
     def test_ci_runs_artifact_bound_legacy_family(self):
-        self.assertIn("test-legacy -- --family card --run", CI)
+        # Full inventory suite under --run (no single-family smoke-only step).
+        self.assertIn("test-legacy -- --run", CI)
+        self.assertNotIn("test-legacy -- --family card --run", CI)
+        self.assertIn("Artifact-bound historical families (all 22)", CI)
         self.assertIn("Upload entry run directory", CI)
+        self.assertIn("engine-free-consumer.mjs --tarball", CI)
+        self.assertIn("build-migrate-legacy-cli.mjs --verify", CI)
+        self.assertIn("migration-cli-isolation.mjs", CI)
 
 
 if __name__ == "__main__":

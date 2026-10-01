@@ -201,6 +201,62 @@ def main() -> int:
     results["motion-smoke"] = "pass" if code == 0 else "fail"
     implemented_ran.append("motion-smoke")
 
+    # engine-free-consumer: required consumer of the packed library bytes.
+    code = run_node("scripts/engine-free-consumer.mjs", ["--tarball", str(tarball)])
+    engine_report = ROOT / "compatibility/rc/reports/engine-free-consumer.json"
+    if engine_report.is_file():
+        (out_dir / "reports").mkdir(parents=True, exist_ok=True)
+        (out_dir / "reports" / "engine-free-consumer-detail.json").write_text(engine_report.read_text())
+    write_check_report(
+        out_dir,
+        run_id,
+        line,
+        "engine-free-consumer",
+        exit_code=code,
+        limitations=[
+            "Installs declared peers without @angular/animations.",
+            "Does not compile templates; not a sealed release certificate by itself.",
+        ],
+    )
+    results["engine-free-consumer"] = "pass" if code == 0 else "fail"
+    implemented_ran.append("engine-free-consumer")
+
+    # migration-packaged: committed peer-light CLI artifact verify + isolation.
+    code_verify = run_node("scripts/build-migrate-legacy-cli.mjs", ["--verify"])
+    code_iso = run_node("scripts/migration-cli-isolation.mjs", [])
+    code = 0 if code_verify == 0 and code_iso == 0 else (code_verify or code_iso or 1)
+    write_check_report(
+        out_dir,
+        run_id,
+        line,
+        "migration-packaged",
+        exit_code=code,
+        limitations=[
+            "Checks the committed migrate-legacy CLI tarball identity and isolation.",
+            "CLI is not yet packed into the same library run.json as a sibling artifact.",
+            "Schematic runner / old-workspace migration fixtures remain separate.",
+        ],
+    )
+    results["migration-packaged"] = "pass" if code == 0 else "fail"
+    implemented_ran.append("migration-packaged")
+
+    # historical-legacy-artifact: all inventory families against the packed --run.
+    code = run_node("scripts/rc-test-legacy-family.mjs", ["--run", str(run_path)])
+    write_check_report(
+        out_dir,
+        run_id,
+        line,
+        "historical-legacy-artifact",
+        exit_code=code,
+        limitations=[
+            "Runs the inventory family suite against the rehashed packed library.",
+            "Requires a usable Chromium/Chrome (CHROME_BIN).",
+            "Passing this cell alone is not G09 or G01 closure.",
+        ],
+    )
+    results["historical-legacy-artifact"] = "pass" if code == 0 else "fail"
+    implemented_ran.append("historical-legacy-artifact")
+
     missing: list[str] = []
     failed: list[str] = []
     for check in required:
