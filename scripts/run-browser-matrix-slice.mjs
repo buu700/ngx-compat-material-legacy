@@ -4,8 +4,9 @@
  * only the declared matrix cells that actually ran.
  *
  * PR-stage Chromium main-line slice: dialog/select (zoneful/zoneless/CSP/
- * reduced-motion) plus menu/snack-bar/tooltip/autocomplete/tabs defaults.
- * Does not fan success into unexecuted engines/families. Does not claim G10.
+ * reduced-motion) plus menu/snack-bar/tooltip/autocomplete/tabs defaults
+ * (zoneful and zoneless). Does not fan success into unexecuted engines/
+ * families. Does not claim G10.
  *
  *   node scripts/run-browser-matrix-slice.mjs --tarball <path>
  *   node scripts/run-browser-matrix-slice.mjs --run <run.json>
@@ -127,6 +128,32 @@ const scenarios = [
       && report.families?.tabs?.second_selected
       && !report.error,
   },
+  {
+    id: 'overlay-families-zoneless',
+    script: 'scripts/browser-overlay-families.mjs',
+    args: ['--zoneless'],
+    cells: [
+      'pr/main/chromium/zoneless/menu/default',
+      'pr/main/chromium/zoneless/snack-bar/default',
+      'pr/main/chromium/zoneless/tooltip/default',
+      'pr/main/chromium/zoneless/autocomplete/default',
+      'pr/main/chromium/zoneless/tabs/default',
+    ],
+    detail: 'compatibility/rc/reports/browser-overlay-families-zoneless.json',
+    require: report => Array.isArray(report.credited_cell_ids)
+      && report.credited_cell_ids.length >= 5
+      && report.zoneless === true
+      && report.bundle_has_zone === false
+      && report.zone_global === 'undefined'
+      && report.families?.menu?.opened
+      && (report.families?.menu?.closed_by_escape || report.families?.menu?.closed_by_backdrop)
+      && report.families?.['snack-bar']?.opened
+      && report.families?.['snack-bar']?.dismissed
+      && report.families?.tooltip?.shown
+      && report.families?.autocomplete?.panel_opened
+      && report.families?.tabs?.second_selected
+      && !report.error,
+  },
 ];
 
 const executed = [];
@@ -138,9 +165,9 @@ const nodeArgs = typeof globalThis.WebSocket === 'function'
   : ['--experimental-websocket'];
 
 function freeCdpPort(port) {
-  spawnSync('bash', ['-lc', `fuser -k ${port}/tcp >/dev/null 2>&1 || true`], {
+  spawnSync('bash', ['-lc', `fuser -k ${port}/tcp >/dev/null 2>&1 || true; sleep 0.2; fuser -k ${port}/tcp >/dev/null 2>&1 || true`], {
     encoding: 'utf8',
-    timeout: 5000,
+    timeout: 8000,
   });
 }
 
@@ -197,7 +224,7 @@ const report = {
   result: ok ? 'pass' : 'fail',
   matrix_updated: false,
   limitations: [
-    'Chromium PR-slice: dialog/select (zoneful/zoneless/CSP/reduced-motion) plus menu/snack-bar/tooltip/autocomplete/tabs defaults.',
+    'Chromium PR-slice: dialog/select (zoneful/zoneless/CSP/reduced-motion) plus menu/snack-bar/tooltip/autocomplete/tabs defaults (zoneful+zoneless).',
     'Firefox/WebKit, remaining families/states, SSR, enabled-motion, and other CSP cells stay not-executed.',
     'Success is not copied to unexecuted cells.',
     'Does not claim G10.',

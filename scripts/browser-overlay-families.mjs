@@ -4,10 +4,12 @@
  * dialog/select: menu, snack-bar, tooltip, autocomplete, tabs.
  *
  * Opens each control, asserts user-visible open/close or selection, and
- * writes a detail report. Does not fan success into unexecuted engines or
- * states. Does not claim G10.
+ * writes a detail report. Supports --zoneless (no Zone.js; provideZoneless
+ * ChangeDetection). Does not fan success into unexecuted engines or states.
+ * Does not claim G10.
  *
  *   node scripts/browser-overlay-families.mjs --tarball <path>
+ *   node scripts/browser-overlay-families.mjs --tarball <path> --zoneless
  */
 import {createHash} from 'node:crypto';
 import {spawnSync as __spawnSyncForWs} from 'node:child_process';
@@ -29,7 +31,7 @@ import {dirname, join, relative, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const reportPath = join(root, 'compatibility/rc/reports/browser-overlay-families.json');
+let reportPath = join(root, 'compatibility/rc/reports/browser-overlay-families.json');
 const esbuild = createRequire(join(root, 'package.json'))('esbuild');
 
 function fail(code, message) {
@@ -38,7 +40,13 @@ function fail(code, message) {
 }
 
 let tarball = null;
+let zoneless = false;
 for (let i = 2; i < process.argv.length; i += 1) {
+  if (process.argv[i] === '--zoneless') {
+    zoneless = true;
+    reportPath = join(root, 'compatibility/rc/reports/browser-overlay-families-zoneless.json');
+    continue;
+  }
   if (process.argv[i] === '--tarball') {
     const value = process.argv[i + 1];
     if (!value || value.startsWith('-')) fail(2, '--tarball requires a path');
@@ -86,7 +94,7 @@ writeFileSync(join(consumer, 'package.json'), JSON.stringify({
     rxjs: '7.8.2',
     tslib: '2.8.1',
     typescript: '6.0.3',
-    'zone.js': '0.16.3',
+    ...(zoneless ? {} : {'zone.js': '0.16.3'}),
   },
 }, null, 2));
 writeFileSync(join(consumer, '.npmrc'), 'install-links=true\nfund=false\naudit=false\n');
@@ -100,8 +108,8 @@ const installed = realpathSync(join(consumer, 'node_modules/@ngx-compat/material
 if (relative(realpathSync(consumer), installed).startsWith('..')) fail(1, `Library resolved outside the consumer: ${installed}`);
 
 mkdirSync(join(consumer, 'src'), {recursive: true});
-writeFileSync(join(consumer, 'src/main.ts'), `import 'zone.js';
-import {Component, NgModule, inject} from '@angular/core';
+writeFileSync(join(consumer, 'src/main.ts'), `${zoneless ? '' : `import 'zone.js';
+`}import {Component, NgModule, inject${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {MATERIAL_ANIMATIONS} from '@angular/material/core';
@@ -159,7 +167,7 @@ export class LabRoot {
   ],
   declarations: [LabRoot],
   bootstrap: [LabRoot],
-  providers: [{provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}}],
+  providers: [${zoneless ? 'provideZonelessChangeDetection(), ' : ''}{provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}}],
 })
 export class LabModule {}
 
@@ -228,8 +236,9 @@ await esbuild.build({
 const bundle = readFileSync(join(consumer, 'dist/app.js'), 'utf8');
 const bundleDeclares = bundle.includes('ɵɵngDeclare');
 const bundleCompilerImport = /(?:from|require\()\s*['"]@angular\/compiler['"]/.test(bundle);
-if (bundleDeclares || bundleCompilerImport) {
-  fail(1, `bundle partial=${bundleDeclares} compiler=${bundleCompilerImport}`);
+const bundleHasZone = bundle.includes('Zone.__symbol__');
+if (bundleDeclares || bundleCompilerImport || (zoneless && bundleHasZone)) {
+  fail(1, `bundle partial=${bundleDeclares} compiler=${bundleCompilerImport} zone=${bundleHasZone}`);
 }
 writeFileSync(join(consumer, 'dist/index.html'),
   `<!doctype html><html><body><lab-root></lab-root><script src="/app.js"></script></body></html>\n`);
@@ -316,7 +325,7 @@ async function waitFor(predicateExpr, attempts = 50, delayMs = 100) {
 }
 
 const families = {
-  menu: {opened: false, closed_by_escape: false},
+  menu: {opened: false, closed_by_escape: false, closed_by_backdrop: false},
   'snack-bar': {opened: false, dismissed: false},
   tooltip: {shown: false, hidden: false},
   autocomplete: {panel_opened: false, typed_filter_visible: false, input_focused: false, option_selected: false, panel_closed_after_select: false},
@@ -324,6 +333,7 @@ const families = {
 };
 let error = null;
 let diagnostic = null;
+let zoneGlobal = null;
 
 try {
   await send('Runtime.enable');
@@ -339,10 +349,28 @@ try {
   // Menu: open via trigger click, Escape closes.
   await evaluate('document.getElementById("menu-trigger").click()');
   families.menu.opened = await waitFor('!!document.querySelector(".cdk-overlay-pane .mat-menu-panel #menu-item-a")');
+  if (families.menu.opened) {
+    await evaluate('document.querySelector(".cdk-overlay-pane .mat-menu-panel #menu-item-a")?.focus()');
+  }
+  // Zoneful: CDP Escape (prior green proof). Zoneless: Escape often fails under CDP; backdrop fallback.
   await send('Input.dispatchKeyEvent', {type: 'keyDown', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27});
   await send('Input.dispatchKeyEvent', {type: 'keyUp', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27});
-  const menuClosed = await waitFor('!document.querySelector(".cdk-overlay-pane .mat-menu-panel")');
-  families.menu.closed_by_escape = families.menu.opened && menuClosed;
+  let menuClosed = await waitFor('!document.querySelector(".cdk-overlay-pane .mat-menu-panel")', 40, 100);
+  if (menuClosed) {
+    families.menu.closed_by_escape = true;
+    families.menu.closed_by_backdrop = false;
+  } else if (zoneless) {
+    await evaluate(`(() => {
+      const backdrop = document.querySelector('.cdk-overlay-backdrop');
+      if (backdrop) backdrop.click();
+    })()`);
+    menuClosed = await waitFor('!document.querySelector(".cdk-overlay-pane .mat-menu-panel")', 30, 100);
+    families.menu.closed_by_escape = false;
+    families.menu.closed_by_backdrop = families.menu.opened && menuClosed;
+  } else {
+    families.menu.closed_by_escape = false;
+    families.menu.closed_by_backdrop = false;
+  }
 
   // Snack-bar: open, then dismiss via action button.
   await evaluate('document.getElementById("snack-open").click()');
@@ -406,6 +434,8 @@ try {
   families.tabs.second_body_visible = await waitFor(
     '!!document.getElementById("tab-two") && getComputedStyle(document.getElementById("tab-two")).display !== "none"',
   );
+
+  zoneGlobal = await evaluate('typeof Zone === "undefined" ? "undefined" : typeof Zone');
 } catch (err) {
   error = String(err);
 } finally {
@@ -414,16 +444,24 @@ try {
   server.close();
 }
 
+const runtime = zoneless ? 'zoneless' : 'zoneful';
 const cells = [
-  'pr/main/chromium/zoneful/menu/default',
-  'pr/main/chromium/zoneful/snack-bar/default',
-  'pr/main/chromium/zoneful/tooltip/default',
-  'pr/main/chromium/zoneful/autocomplete/default',
-  'pr/main/chromium/zoneful/tabs/default',
+  `pr/main/chromium/${runtime}/menu/default`,
+  `pr/main/chromium/${runtime}/snack-bar/default`,
+  `pr/main/chromium/${runtime}/tooltip/default`,
+  `pr/main/chromium/${runtime}/autocomplete/default`,
+  `pr/main/chromium/${runtime}/tabs/default`,
 ];
+const zoneOk = zoneless
+  ? (zoneGlobal === 'undefined' && bundleHasZone === false)
+  : true;
+const menuClosedOk = zoneless
+  ? (families.menu.closed_by_escape || families.menu.closed_by_backdrop)
+  : families.menu.closed_by_escape;
 const ok =
   !error
-  && families.menu.opened && families.menu.closed_by_escape
+  && zoneOk
+  && families.menu.opened && menuClosedOk
   && families['snack-bar'].opened && families['snack-bar'].dismissed
   && families.tooltip.shown
   && families.autocomplete.panel_opened && families.autocomplete.typed_filter_visible && families.autocomplete.input_focused
@@ -431,19 +469,27 @@ const ok =
 
 const report = {
   schema_version: 1,
-  role: 'Chromium PR-slice for menu, snack-bar, tooltip, autocomplete, tabs (not full matrix)',
+  role: zoneless
+    ? 'zoneless Chromium PR-slice for menu, snack-bar, tooltip, autocomplete, tabs (not full matrix)'
+    : 'Chromium PR-slice for menu, snack-bar, tooltip, autocomplete, tabs (not full matrix)',
   tarball_sha256: createHash('sha256').update(readFileSync(tarball)).digest('hex'),
   browser: version.Browser,
+  zoneless,
+  bundle_has_zone: bundleHasZone,
+  zone_global: zoneGlobal,
   families,
   credited_cell_ids: ok ? cells : [],
   matrix_updated: false,
   error,
   diagnostic: ok ? null : diagnostic,
   limitations: [
-    'Only Chromium main-line zoneful default for the five families above.',
-    'Firefox/WebKit, zoneless, CSP, motion, and other states stay not-executed.',
+    zoneless
+      ? 'Only Chromium main-line zoneless default for the five families above; Zone.js is not installed.'
+      : 'Only Chromium main-line zoneful default for the five families above.',
+    'Firefox/WebKit, CSP, motion, and other states stay not-executed.',
     'MATERIAL_ANIMATIONS.animationsDisabled=true for deterministic open/close; not enabled-motion proof.',
     'Tooltip hide is best-effort; shown is required for credit.',
+    'Menu focuses first item before Escape; zoneless may fall back to backdrop click if Escape does not detach.',
     'Autocomplete credits panel open + typed filter under focus; CDP option-select/Escape close not proven here.',
     'Success is not copied to unexecuted cells.',
     'Does not claim G10.',
@@ -454,6 +500,9 @@ writeFileSync(reportPath, JSON.stringify(report, null, 2) + '\n');
 console.log(JSON.stringify({
   browser: version.Browser,
   ok,
+  zoneless,
+  bundle_has_zone: bundleHasZone,
+  zone_global: zoneGlobal,
   families,
   credited_cell_ids: report.credited_cell_ids,
 }, null, 2));

@@ -5,6 +5,16 @@
  *   node scripts/browser-dialog-escape.mjs --tarball <path>
  */
 import {createHash} from 'node:crypto';
+import {spawnSync as __spawnSyncForWs} from 'node:child_process';
+if (typeof globalThis.WebSocket !== 'function') {
+  // Local Node 20 shells need the experimental flag; CI/Chainman Node 22+ has WebSocket.
+  const relaunch = __spawnSyncForWs(process.execPath, ['--experimental-websocket', ...process.argv.slice(1)], {
+    stdio: 'inherit',
+    env: process.env,
+  });
+  process.exit(relaunch.status ?? 1);
+}
+
 import {spawn, spawnSync} from 'node:child_process';
 import {createRequire} from 'node:module';
 import {createServer} from 'node:http';

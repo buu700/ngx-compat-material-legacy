@@ -1,109 +1,240 @@
 {
   "schema_version": 1,
-  "role": "needs-triage diffs that were read",
+  "role": "needs-triage one-diff inspection batch (not G11)",
   "g11_claim": "not-passed",
   "batch_reviewed": true,
-  "batch_id": "needs-triage-docs-m3-color-cdk-jsdoc-2026-10-01",
-  "count": 6,
-  "selection_policy": {
-    "include": "needs-triage docs(subject) with inspected small current-Material M3 color docs/examples or CDK/doc-string-only patches",
-    "fail_closed_excluded": [
-      "large multi-file docs/example rewrites without full read",
-      "mixed production Sass/theme or fab.scss path edits",
-      "unread behavior-semantic bucket",
-      "M3 color binge across many components in one SHA"
-    ],
-    "prior_batch": "companion-all13-owned-jsdoc-unused-2026-10-01"
-  },
+  "batch_id": "needs-triage-docs-build-test-m3-theming-2026-10-01",
+  "count": 11,
+  "selection_policy": "Bounded needs-triage docs/build/test/M3-theming inspection; fail-closed; no deferred=pass; cursor preserved.",
   "reviews": [
     {
-      "sha": "5fa8f6795ba77dd3ef0927b490afbe5f92923bfe",
-      "subject": "docs(material/button): update button documentation and examples for M3 (#29252)",
+      "sha": "7ed70fe4422e4324ea450604514337fa5e0ad880",
+      "subject": "build: add tokens test for form field (#27589)",
       "files": [
-        "src/components-examples/material/button/button-overview/button-overview-example.html",
-        "src/components-examples/material/button/button-types/button-types-example.css",
-        "src/components-examples/material/button/button-types/button-types-example.html",
-        "src/components-examples/material/button/button-types/button-types-example.ts",
-        "src/components-examples/material/button/index.ts",
-        "src/material/button/button-base.ts",
-        "src/material/button/button.md"
+        "package.json",
+        "packages.bzl",
+        "src/material/core/tokens/tests/test-validate-tokens.scss",
+        "yarn.lock"
       ],
-      "patch_sha256": "ad429167af17bcda9e13a02da5ca935213cacaed70e848835fc752bd5e1e159c",
-      "patch_bytes": 17221,
-      "disposition": "not-applicable",
-      "evidence": "Inspected upstream patch content (sha256=ad429167af17bcda9e13a02da5ca935213cacaed70e848835fc752bd5e1e159c, bytes=17221). Changed paths: src/components-examples/material/button/button-overview/button-overview-example.html, src/components-examples/material/button/button-types/button-types-example.css, src/components-examples/material/button/button-types/button-types-example.html, src/components-examples/material/button/button-types/button-types-example.ts, src/components-examples/material/button/index.ts, src/material/button/button-base.ts, src/material/button/button.md. Updates current Material button examples/docs and expands button-base.ts color @Input JSDoc with an M3-themes-have-no-effect disclaimer. This package does not ship components-examples or current Material button.md/button-base.ts; owned legacy-button retains the historical M2 color palette model and wording. The current-Material M3 color-variant docs/examples rename is not applicable to retained legacy product behavior."
-    },
-    {
-      "sha": "e254b2f953c94a72a7c6cce696b4e1d214248e6f",
-      "subject": "docs(material/progress-bar): Update description and examples for color input description on API page (#29331)",
-      "files": [
-        "src/components-examples/material/progress-bar/progress-bar-configurable/progress-bar-configurable-example.html",
-        "src/components-examples/material/progress-bar/progress-bar-configurable/progress-bar-configurable-example.ts",
-        "src/material/progress-bar/progress-bar.md",
-        "src/material/progress-bar/progress-bar.ts"
-      ],
-      "patch_sha256": "24ce7f814d08455d9b13c99618eb0a41443109b0c3aa4a88e3178ac6a0314885",
-      "patch_bytes": 6271,
-      "disposition": "not-applicable",
-      "evidence": "Inspected upstream patch content (sha256=24ce7f814d08455d9b13c99618eb0a41443109b0c3aa4a88e3178ac6a0314885, bytes=6271). Changed paths: src/components-examples/material/progress-bar/progress-bar-configurable/progress-bar-configurable-example.html, src/components-examples/material/progress-bar/progress-bar-configurable/progress-bar-configurable-example.ts, src/material/progress-bar/progress-bar.md, src/material/progress-bar/progress-bar.ts. Removes color knobs from current Material progress-bar examples/docs and expands progress-bar.ts color JSDoc with an M3-no-effect disclaimer. This package does not ship those examples or current Material progress-bar.ts/md; owned legacy-progress-bar retains historical M2 color theming. Not applicable to retained legacy product behavior."
-    },
-    {
-      "sha": "0f8e887f9b8824c0b5eab154ebce7c1e7f29c3cc",
-      "subject": "docs(material/progress-spinner): Update description and examples for color input description on API page (#29332)",
-      "files": [
-        "src/components-examples/material/progress-spinner/progress-spinner-configurable/progress-spinner-configurable-example.html",
-        "src/components-examples/material/progress-spinner/progress-spinner-configurable/progress-spinner-configurable-example.ts",
-        "src/material/progress-spinner/progress-spinner.md",
-        "src/material/progress-spinner/progress-spinner.ts"
-      ],
-      "patch_sha256": "8b5b61666afbe7ecd005467f8989b1e3b715058559b45c2fdb9636b1e0b89fcf",
-      "patch_bytes": 4869,
-      "disposition": "not-applicable",
-      "evidence": "Inspected upstream patch content (sha256=8b5b61666afbe7ecd005467f8989b1e3b715058559b45c2fdb9636b1e0b89fcf, bytes=4869). Changed paths: src/components-examples/material/progress-spinner/progress-spinner-configurable/progress-spinner-configurable-example.html, src/components-examples/material/progress-spinner/progress-spinner-configurable/progress-spinner-configurable-example.ts, src/material/progress-spinner/progress-spinner.md, src/material/progress-spinner/progress-spinner.ts. Removes color knobs from current Material progress-spinner examples/docs and expands progress-spinner.ts color JSDoc with an M3-no-effect disclaimer. This package does not ship those examples or current Material progress-spinner.ts/md; owned legacy-progress-spinner retains historical M2 color theming. Not applicable to retained legacy product behavior."
-    },
-    {
-      "sha": "caeb3e8c4c81c383260bbc0156a1c3deb38005ef",
-      "subject": "docs(material/slide-toggle): Update description and examples for color input description on API page (#29334)",
-      "files": [
-        "src/components-examples/material/slide-toggle/slide-toggle-configurable/slide-toggle-configurable-example.html",
-        "src/components-examples/material/slide-toggle/slide-toggle-configurable/slide-toggle-configurable-example.ts",
-        "src/material/slide-toggle/slide-toggle-config.ts",
-        "src/material/slide-toggle/slide-toggle.md"
-      ],
-      "patch_sha256": "26cc9dc962236e9ab1166d260dcdb753437fcd32f6498b0cb507e520c01bce38",
-      "patch_bytes": 4202,
-      "disposition": "not-applicable",
-      "evidence": "Inspected upstream patch content (sha256=26cc9dc962236e9ab1166d260dcdb753437fcd32f6498b0cb507e520c01bce38, bytes=4202). Changed paths: src/components-examples/material/slide-toggle/slide-toggle-configurable/slide-toggle-configurable-example.html, src/components-examples/material/slide-toggle/slide-toggle-configurable/slide-toggle-configurable-example.ts, src/material/slide-toggle/slide-toggle-config.ts, src/material/slide-toggle/slide-toggle.md. Removes color knobs from current Material slide-toggle examples/docs and expands slide-toggle-config.ts color JSDoc with an M3-no-effect disclaimer. This package does not ship those examples or current Material slide-toggle sources; owned legacy-slide-toggle retains historical M2 color theming. Not applicable to retained legacy product behavior."
-    },
-    {
-      "sha": "91557c1ae91245aa4887dfcc8d96fc64bdf25ad9",
-      "subject": "docs(material/radio): Update description for color input description on API page (#29333)",
-      "files": [
-        "src/material/radio/radio.md",
-        "src/material/radio/radio.ts",
-        "tools/public_api_guard/material/radio.md"
-      ],
-      "patch_sha256": "cf890829561b8d756e8e215d4ae009c1ee01054767c2e6453a505b93e3c98730",
-      "patch_bytes": 3314,
-      "disposition": "not-applicable",
-      "evidence": "Inspected upstream patch content (sha256=cf890829561b8d756e8e215d4ae009c1ee01054767c2e6453a505b93e3c98730, bytes=3314). Changed paths: src/material/radio/radio.md, src/material/radio/radio.ts, tools/public_api_guard/material/radio.md. Removes Default Color Configuration docs from current Material radio.md, expands radio.ts MatRadioDefaultOptions color JSDoc with an M3-no-effect disclaimer, and updates public_api_guard markdown. This package does not ship current Material radio.ts/md or tools/public_api_guard; owned legacy-radio retains historical M2 color defaults. Not applicable to retained legacy product behavior."
-    },
-    {
-      "sha": "ede6331377b053edd3ecd53da5e4cce79bb3ba63",
-      "subject": "docs(multiple): remove invalid tags from doc strings (#31317)",
-      "files": [
-        "src/cdk/collections/dispose-view-repeater-strategy.ts",
-        "src/cdk/collections/recycle-view-repeater-strategy.ts",
-        "src/cdk/collections/view-repeater.ts",
-        "src/cdk/scrolling/virtual-scrollable.ts",
-        "src/cdk/table/table.ts",
-        "src/google-maps/map-marker-clusterer/map-marker-clusterer-types.ts",
-        "src/material/datepicker/datepicker-base.ts"
-      ],
-      "patch_sha256": "cc2d8d3eba68ab17ea05c811fb3cc825e7013945c052a3699b4b78ecf872561c",
-      "patch_bytes": 7577,
+      "patch_sha256": "d1926003454707d9afbbe4a1b11d0e5737e60b08951bbf5663ccbdcd2e839e3b",
+      "patch_bytes": 82750,
       "disposition": "irrelevant",
-      "evidence": "Inspected upstream patch content (sha256=cc2d8d3eba68ab17ea05c811fb3cc825e7013945c052a3699b4b78ecf872561c, bytes=7577). Changed paths: src/cdk/collections/dispose-view-repeater-strategy.ts, src/cdk/collections/recycle-view-repeater-strategy.ts, src/cdk/collections/view-repeater.ts, src/cdk/scrolling/virtual-scrollable.ts, src/cdk/table/table.ts, src/google-maps/map-marker-clusterer/map-marker-clusterer-types.ts, src/material/datepicker/datepicker-base.ts. Replaces invalid JSDoc link tags with backtick type names in CDK collections/scrolling/table, google-maps marker-clusterer types, and current Material datepicker-base.ts. This package does not ship those CDK/google-maps/datepicker sources (datepicker is outside the legacy family set; CDK remains an installed peer). Doc-string tag formatting only; irrelevant to retained legacy product behavior."
+      "evidence": "Inspected upstream patch content (sha256=d1926003454707d9afbbe4a1b11d0e5737e60b08951bbf5663ccbdcd2e839e3b, bytes=82750). Changed paths: package.json, packages.bzl, src/material/core/tokens/tests/test-validate-tokens.scss, yarn.lock. build/tokens validation test + lockfile only; current Material tokens test infrastructure; not retained legacy source. Fail-closed: not deferred=pass; g11_claim remains not-passed."
+    },
+    {
+      "sha": "a7dbf08148467ce7b2f132eba32f9517e39e336f",
+      "subject": "test: Add tests for theming inspection API",
+      "files": [
+        "src/material/_index.scss",
+        "src/material/core/theming/tests/BUILD.bazel",
+        "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+        "src/material/core/theming/tests/theming-mixin-api.spec.ts"
+      ],
+      "patch_sha256": "767cb33de0a2937b187751451086254705afb8886925c960f9546f197f160cc8",
+      "patch_bytes": 5973,
+      "disposition": "irrelevant",
+      "evidence": "Inspected upstream patch content (sha256=767cb33de0a2937b187751451086254705afb8886925c960f9546f197f160cc8, bytes=5973). Changed paths: src/material/_index.scss, src/material/core/theming/tests/BUILD.bazel, src/material/core/theming/tests/theming-inspection-api.spec.ts, src/material/core/theming/tests/theming-mixin-api.spec.ts. adds theming-inspection API unit tests only under src/material/core/theming/tests; no product-runtime change for legacy. Fail-closed: not deferred=pass; g11_claim remains not-passed."
+    },
+    {
+      "sha": "b6e50c631b8f8131f494d57b0b806777da8d4efd",
+      "subject": "test: Add additional tests and validation for theme definitions",
+      "files": [
+        "src/material-experimental/theming/_config-validation.scss",
+        "src/material-experimental/theming/_definition.scss",
+        "src/material-experimental/theming/_m3-palettes.scss",
+        "src/material/core/style/_validation.scss",
+        "src/material/core/theming/tests/BUILD.bazel",
+        "src/material/core/theming/tests/theming-definition-api.spec.ts"
+      ],
+      "patch_sha256": "4361f36e75397e2be883426506daaa68a2e6c0fdc71e690ddc8438515e4fe8bb",
+      "patch_bytes": 20143,
+      "disposition": "irrelevant",
+      "evidence": "Inspected upstream patch content (sha256=4361f36e75397e2be883426506daaa68a2e6c0fdc71e690ddc8438515e4fe8bb, bytes=20143). Changed paths: src/material-experimental/theming/_config-validation.scss, src/material-experimental/theming/_definition.scss, src/material-experimental/theming/_m3-palettes.scss, src/material/core/style/_validation.scss, src/material/core/theming/tests/BUILD.bazel, src/material/core/theming/tests/theming-definition-api.spec.ts. additional theme-definition validation tests + experimental theming fixtures; test/experimental-only. Fail-closed: not deferred=pass; g11_claim remains not-passed."
+    },
+    {
+      "sha": "305af4f0e0e0f68e929b6aeb328296ac42295c16",
+      "subject": "build: Report duplicate style warnings for M3 themes",
+      "files": [
+        ".github/CODEOWNERS",
+        "src/material-experimental/theming/_config-validation.scss",
+        "src/material-experimental/theming/_definition.scss",
+        "src/material/card/_card-theme.scss",
+        "src/material/checkbox/_checkbox-theme.scss",
+        "src/material/core/theming/_theming.scss"
+      ],
+      "patch_sha256": "a59c3583b11d24528d66c7ac3f2eb7c16e242a06a47f94eaab9a06eef763db7b",
+      "patch_bytes": 14156,
+      "disposition": "not-applicable",
+      "evidence": "Inspected upstream patch content (sha256=a59c3583b11d24528d66c7ac3f2eb7c16e242a06a47f94eaab9a06eef763db7b, bytes=14156). Changed paths: .github/CODEOWNERS, src/material-experimental/theming/_config-validation.scss, src/material-experimental/theming/_definition.scss, src/material/card/_card-theme.scss, src/material/checkbox/_checkbox-theme.scss, src/material/core/theming/_theming.scss. current Material M3 duplicate-theme-style warning infrastructure in core theming + card/checkbox theme wrappers; legacy owns separate M2 facade and does not ship these current theme SCSS helpers. Fail-closed: not deferred=pass; g11_claim remains not-passed."
+    },
+    {
+      "sha": "0df4d082e0aab1958fdbe5aa48fef0203079abc2",
+      "subject": "fixup! build: Report duplicate style warnings for M3 themes",
+      "files": [
+        "src/material/core/theming/_inspection.scss"
+      ],
+      "patch_sha256": "df60fc08c66be94872c2040dec31e9d1bd2aa1fa6f994a76e9cdb0c8f9e93402",
+      "patch_bytes": 1711,
+      "disposition": "not-applicable",
+      "evidence": "Inspected upstream patch content (sha256=df60fc08c66be94872c2040dec31e9d1bd2aa1fa6f994a76e9cdb0c8f9e93402, bytes=1711). Changed paths: src/material/core/theming/_inspection.scss. fixup JSDoc for current theming inspection helpers (_inspection.scss); not used by legacy Sass facade. Fail-closed: not deferred=pass; g11_claim remains not-passed."
+    },
+    {
+      "sha": "de4b13afe80e02ec04a73d39ca57bd2f9e0d362c",
+      "subject": "docs(material/datepicker): Update datepicker docs & examples (#29236)",
+      "files": [
+        "src/components-examples/material/datepicker/date-range-picker-comparison/date-range-picker-comparison-example.ts",
+        "src/components-examples/material/datepicker/date-range-picker-forms/date-range-picker-forms-example.ts",
+        "src/components-examples/material/datepicker/date-range-picker-overview/date-range-picker-overview-example.ts",
+        "src/components-examples/material/datepicker/date-range-picker-selection-strategy/date-range-picker-selection-strategy-example.ts",
+        "src/components-examples/material/datepicker/datepicker-actions/datepicker-actions-example.html",
+        "src/components-examples/material/datepicker/datepicker-actions/datepicker-actions-example.ts",
+        "src/components-examples/material/datepicker/datepicker-api/datepicker-api-example.ts",
+        "src/components-examples/material/datepicker/datepicker-color/datepicker-color-example.css",
+        "src/components-examples/material/datepicker/datepicker-color/datepicker-color-example.html",
+        "src/components-examples/material/datepicker/datepicker-color/datepicker-color-example.ts",
+        "src/components-examples/material/datepicker/datepicker-custom-header/datepicker-custom-header-example.ts",
+        "src/components-examples/material/datepicker/datepicker-custom-icon/datepicker-custom-icon-example.ts",
+        "src/components-examples/material/datepicker/datepicker-date-class/datepicker-date-class-example.ts",
+        "src/components-examples/material/datepicker/datepicker-disabled/datepicker-disabled-example.ts",
+        "src/components-examples/material/datepicker/datepicker-events/datepicker-events-example.html",
+        "src/components-examples/material/datepicker/datepicker-events/datepicker-events-example.ts",
+        "src/components-examples/material/datepicker/datepicker-filter/datepicker-filter-example.ts",
+        "src/components-examples/material/datepicker/datepicker-formats/datepicker-formats-example.ts",
+        "src/components-examples/material/datepicker/datepicker-harness/datepicker-harness-example.html",
+        "src/components-examples/material/datepicker/datepicker-harness/datepicker-harness-example.ts",
+        "src/components-examples/material/datepicker/datepicker-inline-calendar/datepicker-inline-calendar-example.html",
+        "src/components-examples/material/datepicker/datepicker-inline-calendar/datepicker-inline-calendar-example.ts",
+        "src/components-examples/material/datepicker/datepicker-locale/datepicker-locale-example.html",
+        "src/components-examples/material/datepicker/datepicker-locale/datepicker-locale-example.ts",
+        "src/components-examples/material/datepicker/datepicker-min-max/datepicker-min-max-example.html",
+        "src/components-examples/material/datepicker/datepicker-min-max/datepicker-min-max-example.ts",
+        "src/components-examples/material/datepicker/datepicker-moment/datepicker-moment-example.ts",
+        "src/components-examples/material/datepicker/datepicker-overview/datepicker-overview-example.ts",
+        "src/components-examples/material/datepicker/datepicker-start-view/datepicker-start-view-example.ts",
+        "src/components-examples/material/datepicker/datepicker-touch/datepicker-touch-example.ts",
+        "src/components-examples/material/datepicker/datepicker-value/datepicker-value-example.ts",
+        "src/components-examples/material/datepicker/datepicker-views-selection/datepicker-views-selection-example.ts",
+        "src/components-examples/material/datepicker/index.ts",
+        "src/material/datepicker/datepicker-base.ts",
+        "src/material/datepicker/datepicker.md"
+      ],
+      "patch_sha256": "29f8228a16d12910e49a474b7053de9e6ad8a107b77dc0d09ed112e86ae81f2b",
+      "patch_bytes": 58822,
+      "disposition": "irrelevant",
+      "evidence": "Inspected upstream patch content (sha256=29f8228a16d12910e49a474b7053de9e6ad8a107b77dc0d09ed112e86ae81f2b, bytes=58822). Changed paths: src/components-examples/material/datepicker/date-range-picker-comparison/date-range-picker-comparison-example.ts, src/components-examples/material/datepicker/date-range-picker-forms/date-range-picker-forms-example.ts, src/components-examples/material/datepicker/date-range-picker-overview/date-range-picker-overview-example.ts, src/components-examples/material/datepicker/date-range-picker-selection-strategy/date-range-picker-selection-strategy-example.ts, src/components-examples/material/datepicker/datepicker-actions/datepicker-actions-example.html, src/components-examples/material/datepicker/datepicker-actions/datepicker-actions-example.ts, src/components-examples/material/datepicker/datepicker-api/datepicker-api-example.ts, src/components-examples/material/datepicker/datepicker-color/datepicker-color-example.css, src/components-examples/material/datepicker/datepicker-color/datepicker-color-example.html, src/components-examples/material/datepicker/datepicker-color/datepicker-color-example.ts, src/components-examples/material/datepicker/datepicker-custom-header/datepicker-custom-header-example.ts, src/components-examples/material/datepicker/datepicker-custom-icon/datepicker-custom-icon-example.ts, src/components-examples/material/datepicker/datepicker-date-class/datepicker-date-class-example.ts, src/components-examples/material/datepicker/datepicker-disabled/datepicker-disabled-example.ts, src/components-examples/material/datepicker/datepicker-events/datepicker-events-example.html, src/components-examples/material/datepicker/datepicker-events/datepicker-events-example.ts, src/components-examples/material/datepicker/datepicker-filter/datepicker-filter-example.ts, src/components-examples/material/datepicker/datepicker-formats/datepicker-formats-example.ts, src/components-examples/material/datepicker/datepicker-harness/datepicker-harness-example.html, src/components-examples/material/datepicker/datepicker-harness/datepicker-harness-example.ts, src/components-examples/material/datepicker/datepicker-inline-calendar/datepicker-inline-calendar-example.html, src/components-examples/material/datepicker/datepicker-inline-calendar/datepicker-inline-calendar-example.ts, src/components-examples/material/datepicker/datepicker-locale/datepicker-locale-example.html, src/components-examples/material/datepicker/datepicker-locale/datepicker-locale-example.ts, src/components-examples/material/datepicker/datepicker-min-max/datepicker-min-max-example.html, src/components-examples/material/datepicker/datepicker-min-max/datepicker-min-max-example.ts, src/components-examples/material/datepicker/datepicker-moment/datepicker-moment-example.ts, src/components-examples/material/datepicker/datepicker-overview/datepicker-overview-example.ts, src/components-examples/material/datepicker/datepicker-start-view/datepicker-start-view-example.ts, src/components-examples/material/datepicker/datepicker-touch/datepicker-touch-example.ts, src/components-examples/material/datepicker/datepicker-value/datepicker-value-example.ts, src/components-examples/material/datepicker/datepicker-views-selection/datepicker-views-selection-example.ts, src/components-examples/material/datepicker/index.ts, src/material/datepicker/datepicker-base.ts, src/material/datepicker/datepicker.md. datepicker docs and components-examples only; datepicker is companion outside this browser family set; no legacy runtime change. Fail-closed: not deferred=pass; g11_claim remains not-passed."
+    },
+    {
+      "sha": "ec4e974887289e518a0c7348595e9ceac7e3f26f",
+      "subject": "docs(material/chips): Update chips docs & examples (#29235)",
+      "files": [
+        "src/components-examples/material/chips/chips-autocomplete/chips-autocomplete-example.html",
+        "src/components-examples/material/chips/chips-autocomplete/chips-autocomplete-example.ts",
+        "src/components-examples/material/chips/chips-avatar/chips-avatar-example.html",
+        "src/components-examples/material/chips/chips-avatar/chips-avatar-example.ts",
+        "src/components-examples/material/chips/chips-drag-drop/chips-drag-drop-example.html",
+        "src/components-examples/material/chips/chips-drag-drop/chips-drag-drop-example.ts",
+        "src/components-examples/material/chips/chips-form-control/chips-form-control-example.html",
+        "src/components-examples/material/chips/chips-form-control/chips-form-control-example.ts",
+        "src/components-examples/material/chips/chips-harness/chips-harness-example.ts",
+        "src/components-examples/material/chips/chips-input/chips-input-example.html",
+        "src/components-examples/material/chips/chips-input/chips-input-example.ts",
+        "src/components-examples/material/chips/chips-overview/chips-overview-example.ts",
+        "src/components-examples/material/chips/chips-stacked/chips-stacked-example.html",
+        "src/components-examples/material/chips/chips-stacked/chips-stacked-example.ts",
+        "src/material/chips/chip.ts",
+        "src/material/chips/chips.md"
+      ],
+      "patch_sha256": "a87bc6261a1de3bcd32bc64b33c372da089b6da5efea64429bcc48ab96f8ea33",
+      "patch_bytes": 27774,
+      "disposition": "irrelevant",
+      "evidence": "Inspected upstream patch content (sha256=a87bc6261a1de3bcd32bc64b33c372da089b6da5efea64429bcc48ab96f8ea33, bytes=27774). Changed paths: src/components-examples/material/chips/chips-autocomplete/chips-autocomplete-example.html, src/components-examples/material/chips/chips-autocomplete/chips-autocomplete-example.ts, src/components-examples/material/chips/chips-avatar/chips-avatar-example.html, src/components-examples/material/chips/chips-avatar/chips-avatar-example.ts, src/components-examples/material/chips/chips-drag-drop/chips-drag-drop-example.html, src/components-examples/material/chips/chips-drag-drop/chips-drag-drop-example.ts, src/components-examples/material/chips/chips-form-control/chips-form-control-example.html, src/components-examples/material/chips/chips-form-control/chips-form-control-example.ts, src/components-examples/material/chips/chips-harness/chips-harness-example.ts, src/components-examples/material/chips/chips-input/chips-input-example.html, src/components-examples/material/chips/chips-input/chips-input-example.ts, src/components-examples/material/chips/chips-overview/chips-overview-example.ts, src/components-examples/material/chips/chips-stacked/chips-stacked-example.html, src/components-examples/material/chips/chips-stacked/chips-stacked-example.ts, src/material/chips/chip.ts, src/material/chips/chips.md. current chips docs and components-examples only; no legacy-chips runtime/source change. Fail-closed: not deferred=pass; g11_claim remains not-passed."
+    },
+    {
+      "sha": "243cdf0ab6f88fdcdd58d27f602ab1795329b1de",
+      "subject": "docs(material/form-field): Update form-field docs & examples (#29245)",
+      "files": [
+        "src/components-examples/material/form-field/form-field-appearance/form-field-appearance-example.ts",
+        "src/components-examples/material/form-field/form-field-custom-control/example-tel-input-example.html",
+        "src/components-examples/material/form-field/form-field-custom-control/form-field-custom-control-example.html",
+        "src/components-examples/material/form-field/form-field-custom-control/form-field-custom-control-example.ts",
+        "src/components-examples/material/form-field/form-field-error/form-field-error-example.html",
+        "src/components-examples/material/form-field/form-field-error/form-field-error-example.ts",
+        "src/components-examples/material/form-field/form-field-harness/form-field-harness-example.ts",
+        "src/components-examples/material/form-field/form-field-hint/form-field-hint-example.html",
+        "src/components-examples/material/form-field/form-field-hint/form-field-hint-example.ts",
+        "src/components-examples/material/form-field/form-field-label/form-field-label-example.html",
+        "src/components-examples/material/form-field/form-field-label/form-field-label-example.ts",
+        "src/components-examples/material/form-field/form-field-overview/form-field-overview-example.ts",
+        "src/components-examples/material/form-field/form-field-prefix-suffix/form-field-prefix-suffix-example.html",
+        "src/components-examples/material/form-field/form-field-prefix-suffix/form-field-prefix-suffix-example.ts",
+        "src/components-examples/material/form-field/form-field-theming/form-field-theming-example.css",
+        "src/components-examples/material/form-field/form-field-theming/form-field-theming-example.html",
+        "src/components-examples/material/form-field/form-field-theming/form-field-theming-example.ts",
+        "src/components-examples/material/form-field/index.ts",
+        "src/material/form-field/form-field.md",
+        "src/material/form-field/form-field.ts"
+      ],
+      "patch_sha256": "d42d4449cd922fe6fbc0b86952005f9e4dfc1932830f4edf956edf0a64acbbd2",
+      "patch_bytes": 38627,
+      "disposition": "irrelevant",
+      "evidence": "Inspected upstream patch content (sha256=d42d4449cd922fe6fbc0b86952005f9e4dfc1932830f4edf956edf0a64acbbd2, bytes=38627). Changed paths: src/components-examples/material/form-field/form-field-appearance/form-field-appearance-example.ts, src/components-examples/material/form-field/form-field-custom-control/example-tel-input-example.html, src/components-examples/material/form-field/form-field-custom-control/form-field-custom-control-example.html, src/components-examples/material/form-field/form-field-custom-control/form-field-custom-control-example.ts, src/components-examples/material/form-field/form-field-error/form-field-error-example.html, src/components-examples/material/form-field/form-field-error/form-field-error-example.ts, src/components-examples/material/form-field/form-field-harness/form-field-harness-example.ts, src/components-examples/material/form-field/form-field-hint/form-field-hint-example.html, src/components-examples/material/form-field/form-field-hint/form-field-hint-example.ts, src/components-examples/material/form-field/form-field-label/form-field-label-example.html, src/components-examples/material/form-field/form-field-label/form-field-label-example.ts, src/components-examples/material/form-field/form-field-overview/form-field-overview-example.ts, src/components-examples/material/form-field/form-field-prefix-suffix/form-field-prefix-suffix-example.html, src/components-examples/material/form-field/form-field-prefix-suffix/form-field-prefix-suffix-example.ts, src/components-examples/material/form-field/form-field-theming/form-field-theming-example.css, src/components-examples/material/form-field/form-field-theming/form-field-theming-example.html, src/components-examples/material/form-field/form-field-theming/form-field-theming-example.ts, src/components-examples/material/form-field/index.ts, src/material/form-field/form-field.md, src/material/form-field/form-field.ts. current form-field docs and components-examples only; no legacy form-field runtime change. Fail-closed: not deferred=pass; g11_claim remains not-passed."
+    },
+    {
+      "sha": "27503ed285f3ba964cc861443a7bc1ab7b2cf19a",
+      "subject": "docs(multiple): Update color input comments to standarize across the components (#29254)",
+      "files": [
+        "src/material/button/button-base.ts",
+        "src/material/checkbox/checkbox.ts",
+        "src/material/chips/chip.ts",
+        "src/material/datepicker/datepicker-base.ts",
+        "src/material/form-field/form-field.ts",
+        "src/material/list/selection-list.ts",
+        "src/material/paginator/paginator.ts",
+        "src/material/radio/radio.ts",
+        "src/material/slide-toggle/slide-toggle.ts",
+        "src/material/stepper/step-header.ts",
+        "src/material/stepper/stepper.ts",
+        "src/material/tabs/tab-nav-bar/tab-nav-bar.ts",
+        "src/material/toolbar/toolbar.ts"
+      ],
+      "patch_sha256": "062d812e324679493236c1834100560491a0d87aa3be55d2633b2bd42aee377e",
+      "patch_bytes": 11571,
+      "disposition": "irrelevant",
+      "evidence": "Inspected upstream patch content (sha256=062d812e324679493236c1834100560491a0d87aa3be55d2633b2bd42aee377e, bytes=11571). Changed paths: src/material/button/button-base.ts, src/material/checkbox/checkbox.ts, src/material/chips/chip.ts, src/material/datepicker/datepicker-base.ts, src/material/form-field/form-field.ts, src/material/list/selection-list.ts, src/material/paginator/paginator.ts, src/material/radio/radio.ts, src/material/slide-toggle/slide-toggle.ts, src/material/stepper/step-header.ts, src/material/stepper/stepper.ts, src/material/tabs/tab-nav-bar/tab-nav-bar.ts, src/material/toolbar/toolbar.ts. JSDoc-only standardization of Theme color comments on current Material components; no behavior/API signature change. Fail-closed: not deferred=pass; g11_claim remains not-passed."
+    },
+    {
+      "sha": "69d39a8c86ef3d10020d3b342f8b979b242e1d45",
+      "subject": "docs: remove the MDC migration guide (#29232)",
+      "files": [
+        "guides/v15-mdc-migration.md",
+        "src/material/core/m2/_typography.scss",
+        "src/material/slider/slider-interface.ts"
+      ],
+      "patch_sha256": "17cdc9dcd628b53f4cb6895db844ce01af93154cf305f565e2d6e27fc65ff46e",
+      "patch_bytes": 31638,
+      "disposition": "irrelevant",
+      "evidence": "Inspected upstream patch content (sha256=17cdc9dcd628b53f4cb6895db844ce01af93154cf305f565e2d6e27fc65ff46e, bytes=31638). Changed paths: guides/v15-mdc-migration.md, src/material/core/m2/_typography.scss, src/material/slider/slider-interface.ts. removes MDC migration guide; only URL retargets in deprecated comments (m2 typography + slider-interface); docs-only. Fail-closed: not deferred=pass; g11_claim remains not-passed."
+    },
+    {
+      "sha": "d7832334214cb66b57033c936b4b669e6094ab33",
+      "subject": "docs(material/checkbox): Update checkbox docs & examples (#29234)",
+      "files": [
+        "src/components-examples/material/checkbox/checkbox-configurable/checkbox-configurable-example.html",
+        "src/components-examples/material/checkbox/checkbox-configurable/checkbox-configurable-example.ts",
+        "src/components-examples/material/checkbox/checkbox-harness/checkbox-harness-example.html",
+        "src/components-examples/material/checkbox/checkbox-harness/checkbox-harness-example.spec.ts",
+        "src/components-examples/material/checkbox/checkbox-harness/checkbox-harness-example.ts",
+        "src/components-examples/material/checkbox/checkbox-overview/checkbox-overview-example.html",
+        "src/components-examples/material/checkbox/checkbox-overview/checkbox-overview-example.ts",
+        "src/components-examples/material/checkbox/checkbox-reactive-forms/checkbox-reactive-forms-example.ts",
+        "src/material/checkbox/checkbox-config.ts",
+        "src/material/checkbox/checkbox.md",
+        "src/material/checkbox/checkbox.ts"
+      ],
+      "patch_sha256": "145fa971e3e1546074664c710e14822774806e2acc55accbbf0bab60100dca73",
+      "patch_bytes": 16367,
+      "disposition": "irrelevant",
+      "evidence": "Inspected upstream patch content (sha256=145fa971e3e1546074664c710e14822774806e2acc55accbbf0bab60100dca73, bytes=16367). Changed paths: src/components-examples/material/checkbox/checkbox-configurable/checkbox-configurable-example.html, src/components-examples/material/checkbox/checkbox-configurable/checkbox-configurable-example.ts, src/components-examples/material/checkbox/checkbox-harness/checkbox-harness-example.html, src/components-examples/material/checkbox/checkbox-harness/checkbox-harness-example.spec.ts, src/components-examples/material/checkbox/checkbox-harness/checkbox-harness-example.ts, src/components-examples/material/checkbox/checkbox-overview/checkbox-overview-example.html, src/components-examples/material/checkbox/checkbox-overview/checkbox-overview-example.ts, src/components-examples/material/checkbox/checkbox-reactive-forms/checkbox-reactive-forms-example.ts, src/material/checkbox/checkbox-config.ts, src/material/checkbox/checkbox.md, src/material/checkbox/checkbox.ts. checkbox docs/examples plus JSDoc on color inputs and import reorder in current checkbox.ts/config; no behavior change. Fail-closed: not deferred=pass; g11_claim remains not-passed."
     }
   ]
 }
