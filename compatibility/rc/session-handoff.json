@@ -1,9 +1,8 @@
 {
   "template": false,
   "packet_id": "RC-02+RC-06",
-  "substep_id": "RC-02.fresh-entry-path+RC-06.select-width-iteration",
-  "source_commit": "0cf327c11a2f4293019f4010e3c20c5b0b062bc5",
-  "source_content_digest": null,
+  "substep_id": "RC-02.fresh-entry-ci-green+RC-06.select-width-local-green",
+  "source_commit": "ca2b084d1469dd275786739d548fbdd7e9b6885e",
   "worktree_line": "main",
   "line_21_commit": "cbf86f3faccb240e7beeb6a1e2af727b5d9a674d",
   "owned_paths": [
@@ -20,13 +19,12 @@
     "compatibility/rc/session-handoff.json"
   ],
   "last_command": [
-    "python3 scripts/rc-verify-lite.py",
+    "gh run watch 36881780441",
     "node scripts/rc-test-legacy-family.mjs --family select",
-    "node scripts/rc-test-legacy-family.mjs --family card",
-    "node scripts/pack-library.mjs --out /tmp/ngx-rc02-pack-probe --line main"
+    "node scripts/rc-test-legacy-family.mjs --family card"
   ],
-  "outcome": "rc02-ci-entry-path-wired;rc06-select-width-css-restored;local-select-270-pass;local-card-14-pass;g-gates-not-claimed;ci-pending-push",
-  "first_actionable_error": "Remote CI for the new entry-${GITHUB_SHA} pack path not yet observed; local host-nix Chainman still unavailable.",
+  "outcome": "rc02-entry-sha-pack-ci-green;rc06-select-width-restored;local-select-270;local-card-14;g-gates-not-claimed",
+  "first_actionable_error": "Full RC-06 artifact-bound suite and remaining families not run; RC-02 full verify still a stub.",
   "failed_case_ids": [],
   "report_paths": [
     "compatibility/rc/status.json",
@@ -37,39 +35,50 @@
   ],
   "completed_acceptance_ids": [],
   "not_run_scope": [
-    "RC-02 full verify / G01 matrix still unimplemented",
-    "RC-06 full 57-path / 21-family artifact-bound suite not run",
-    "21.x line not retested",
+    "RC-02 full verify / complete G01 matrix",
+    "RC-06 full 57-path / 21-family artifact-bound suite",
+    "21.x line not retested for select width",
     "G01-G13 not claimed",
-    "Select/card runs are workspace-dist iteration, not artifact-bound --run mode",
+    "Select/card greens are workspace-dist iteration, not artifact --run mode",
     "Audit cursor preserved at 5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
   ],
-  "next_action": "Push; wait for Actions on entry-${GITHUB_SHA} pack+consumer. Then continue RC-06 remaining families / artifact-bound mode, or RC-02.04 verify orchestration. Do not claim G01-G13 or RC engineering ready.",
+  "next_action": "Continue RC-06 remaining families and/or artifact-bound --run mode; or RC-02.04 verify orchestration. Do not claim G01-G13 or RC engineering ready.",
   "blocked_owner_decisions": [
     "cyph-rc-age-admission",
     "registry-publish-authority",
     "github-protection-read"
   ],
-  "recorded_at_utc": "2026-10-01T15:07:01Z",
+  "recorded_at_utc": "2026-10-01T15:09:22Z",
   "clock_confidence": "verified",
-  "source_role": "actual-editing-checkout-not-an-older-artifact-subject",
   "select_width": {
-    "root_cause": "Historical +32/+64px came from Angular transformPanel animation minWidth states; engine-free CSS keyframes omitted them.",
-    "fix": "Candidate SCSS restores min-width: calc(100% + 32px) and +64px for .mat-select-panel-multiple.",
+    "root_cause": "Historical +32/+64px from Angular transformPanel animation minWidth states; engine-free CSS keyframes omitted them.",
+    "fix_commit": "0cf327c11a2f4293019f4010e3c20c5b0b062bc5",
+    "fix": "SCSS min-width: calc(100% + 32px) and +64px for .mat-select-panel-multiple",
     "local_iteration": {
-      "select": "270/270 pass",
-      "card": "14/14 pass",
+      "select": "270/270",
+      "card": "14/14",
       "mode": "workspace-dist"
     }
   },
   "rc02": {
     "ci_pack_path": "artifacts/main/entry-${GITHUB_SHA}",
+    "wiring_commit": "ca2b084d1469dd275786739d548fbdd7e9b6885e",
     "pack_meta_fields_added": [
       "source_sha",
       "source_tree_hash",
       "dirty"
     ],
-    "f01_wip_reuse": "ideas only (source identity + unique path); did not replay F01 Chainman-less CI or rewrite history"
+    "f01_wip_reuse": "ideas only; did not replay F01 Chainman-less CI or history rewrite"
+  },
+  "ci": {
+    "tested_commit": "ca2b084d1469dd275786739d548fbdd7e9b6885e",
+    "run_id": 36881780441,
+    "url": "https://github.com/buu700/ngx-compat-material-legacy/actions/runs/36881780441",
+    "outcome": "success",
+    "jobs": [
+      "Chainman verify-lite",
+      "Packed-consumer AOT and harness"
+    ]
   },
   "audit_cursor": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
   "history_transition": {
@@ -79,14 +88,7 @@
     "receipt": "/workspace/ngx-plan/rc-h00-backup/history-transition.json"
   },
   "harness_blockers": [
-    "nix unavailable on box; Chainman host-nix cannot run",
+    "nix unavailable on box; Chainman host-nix cannot run locally",
     "local iteration used host node/pnpm PATH, not declared Chainman profile"
-  ],
-  "source_identity_role": "select_width_fix_commit",
-  "pending_ci_wiring_commit": "tip-after-push",
-  "current_source_checkpoint": {
-    "select_fix_commit": "0cf327c11a2f4293019f4010e3c20c5b0b062bc5",
-    "identity_role": "rc06_select_width_then_rc02_ci_wiring",
-    "note": "ci wiring commit is the tip after this handoff file; updated again after push/CI"
-  }
+  ]
 }
