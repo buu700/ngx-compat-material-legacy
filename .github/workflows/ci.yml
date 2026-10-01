@@ -67,14 +67,31 @@ jobs:
       - name: Set up JavaScript toolchain
         run: just chainman setup javascript
 
-      - name: Pack a draft run
-        run: just chainman run pack-draft -- --line main --out artifacts/main/draft
+      - name: Pack a fresh entry run
+        id: pack
+        run: |
+          set -euo pipefail
+          # Unique non-draft identity per FIRST-SESSION / FRESH-ARTIFACT.
+          # Do not reuse a fixed draft directory (pack-draft cleans a reused dir).
+          RUN="artifacts/main/entry-${GITHUB_SHA}"
+          test ! -e "$RUN"
+          just chainman run pack-draft -- --line main --out "$RUN"
+          META="$RUN/pack-meta.json"
+          test -f "$META"
+          test -f "$RUN/run.json"
+          python3 -c "import json; m=json.load(open('$META')); assert m.get('tarball') and m.get('sha256'); print(m.get('source_sha'), m['sha256'][:12], m['tarball'])"
+          echo "run_dir=$RUN" >> "$GITHUB_OUTPUT"
 
       - name: Require the packed export map
         run: |
-          tarball=$(python3 -c 'import json; print(json.load(open("artifacts/main/draft/pack-meta.json"))["tarball"])')
-          just chainman exec -- node scripts/check-packed-exports.mjs --tarball "artifacts/main/draft/${tarball}"
+          set -euo pipefail
+          RUN="${{ steps.pack.outputs.run_dir }}"
+          tarball=$(python3 -c "import json; print(json.load(open('${RUN}/pack-meta.json'))['tarball'])")
+          just chainman exec -- node scripts/check-packed-exports.mjs --tarball "${RUN}/${tarball}"
 
       - name: Packed-consumer AOT + harness smoke
-        run: just chainman run packed-consumer -- --run artifacts/main/draft/run.json
+        run: |
+          set -euo pipefail
+          RUN="${{ steps.pack.outputs.run_dir }}"
+          just chainman run packed-consumer -- --run "${RUN}/run.json"
 

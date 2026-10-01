@@ -1,94 +1,92 @@
 {
   "template": false,
-  "packet_id": "RC-01",
-  "substep_id": "RC-01.01+RC-01.02-landed",
-  "source_commit": "7b237a9f26795bac4ca2ad42c7424eb4019f3b34",
+  "packet_id": "RC-02+RC-06",
+  "substep_id": "RC-02.fresh-entry-path+RC-06.select-width-iteration",
+  "source_commit": "0cf327c11a2f4293019f4010e3c20c5b0b062bc5",
   "source_content_digest": null,
   "worktree_line": "main",
   "line_21_commit": "cbf86f3faccb240e7beeb6a1e2af727b5d9a674d",
   "owned_paths": [
     ".github/workflows/ci.yml",
-    "scripts/rc-verify-lite.py",
-    "tests/test_rc_verify_lite_family_reports.py",
+    "AGENTS.md",
+    "scripts/pack-library.mjs",
+    "scripts/check-select-panel-width.mjs",
+    "projects/ngx-material-legacy/legacy-select/select.scss",
+    "tests/test_ci_fresh_pack_path.py",
+    "compatibility/rc/reports/legacy-select.json",
+    "compatibility/rc/reports/legacy-card.json",
+    "compatibility/rc/reports/select-panel-width.json",
     "compatibility/rc/status.json",
     "compatibility/rc/session-handoff.json"
   ],
   "last_command": [
     "python3 scripts/rc-verify-lite.py",
-    "just chainman setup javascript"
+    "node scripts/rc-test-legacy-family.mjs --family select",
+    "node scripts/rc-test-legacy-family.mjs --family card",
+    "node scripts/pack-library.mjs --out /tmp/ngx-rc02-pack-probe --line main"
   ],
-  "outcome": "rc00-reentry-ok;rc01-ci-bootstrap-green;local-nix-blocked;g-gates-not-claimed",
-  "first_actionable_error": "Local just chainman setup javascript blocked: Host mode requires Nix. CI run 36880411818 succeeded for verify-lite, motion-smoke, pack-draft, and packed-consumer.",
-  "failed_case_ids": [
-    "MatSelect > core > overlay panel > should set the width of the overlay based on the trigger",
-    "MatSelect > core > overlay panel > should set the width of the overlay based on a larger trigger width"
-  ],
+  "outcome": "rc02-ci-entry-path-wired;rc06-select-width-css-restored;local-select-270-pass;local-card-14-pass;g-gates-not-claimed;ci-pending-push",
+  "first_actionable_error": "Remote CI for the new entry-${GITHUB_SHA} pack path not yet observed; local host-nix Chainman still unavailable.",
+  "failed_case_ids": [],
   "report_paths": [
     "compatibility/rc/status.json",
     "compatibility/rc/session-handoff.json",
-    "compatibility/rc/reports/legacy-aggregate.json",
-    "compatibility/rc/reports/legacy-card.json",
     "compatibility/rc/reports/legacy-select.json",
-    "compatibility/rc/reports/legacy-tooltip.json"
+    "compatibility/rc/reports/legacy-card.json",
+    "compatibility/rc/reports/select-panel-width.json"
   ],
   "completed_acceptance_ids": [],
   "not_run_scope": [
-    "RC-01 warm-setup/invalidation not proven on this box (no Nix)",
-    "RC-02 local fresh draft path blocked without Nix; CI pack lane already green as smoke only",
+    "RC-02 full verify / G01 matrix still unimplemented",
+    "RC-06 full 57-path / 21-family artifact-bound suite not run",
+    "21.x line not retested",
     "G01-G13 not claimed",
-    "Select width failures remain open product work",
+    "Select/card runs are workspace-dist iteration, not artifact-bound --run mode",
     "Audit cursor preserved at 5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
   ],
-  "next_action": "RC-02: produce one fresh local-or-CI draft artifact identity beyond the fixed artifacts/main/draft CI path if needed, then proceed to RC-06 card/select iteration. Do not claim G01-G13 or RC engineering ready.",
+  "next_action": "Push; wait for Actions on entry-${GITHUB_SHA} pack+consumer. Then continue RC-06 remaining families / artifact-bound mode, or RC-02.04 verify orchestration. Do not claim G01-G13 or RC engineering ready.",
   "blocked_owner_decisions": [
     "cyph-rc-age-admission",
     "registry-publish-authority",
     "github-protection-read"
   ],
-  "recorded_at_utc": "2026-10-01T14:59:51Z",
+  "recorded_at_utc": "2026-10-01T15:07:01Z",
   "clock_confidence": "verified",
   "source_role": "actual-editing-checkout-not-an-older-artifact-subject",
-  "source_identity_role": "verified_normalized_tip_pre_push",
-  "current_source_checkpoint": {
-    "commit": "7b237a9f26795bac4ca2ad42c7424eb4019f3b34",
-    "tree": "e78921eeadd443d8ef90307e6210f5589f26cd28",
-    "identity_role": "rc01_bootstrap_commit"
-  },
-  "audit_checkpoint": {
-    "read_notes": 711,
-    "formal_dispositions_closed": null,
-    "unread": 986,
-    "behavior_semantic_read": 643,
-    "behavior_semantic_total": 1040,
-    "next_semantic_cursor": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-    "input_hashes": {
-      "compatibility/f10/upstream-sha-risk-bootstrap.json": "400e89f53e41975dd5056158c60bdac2e4a2c9dcabaee1204eda782492f5f456",
-      "compatibility/rc/reports/behavior-semantic-one-diff.json": "e407a0c71f67a8a85a8dc7b887a5e37349915549e34ac720783072fa7729be19",
-      "compatibility/rc/reports/docs-build-one-diff.json": "b41963fbfd4eddc62393af63b34c6d87288108ccf762ccf6b3c810ec1626570f",
-      "compatibility/rc/reports/security-deep-review.json": "f3de39cbf22534b04ac850681654b92373e7d9706b1176cca5e85abb70dfb09f"
+  "select_width": {
+    "root_cause": "Historical +32/+64px came from Angular transformPanel animation minWidth states; engine-free CSS keyframes omitted them.",
+    "fix": "Candidate SCSS restores min-width: calc(100% + 32px) and +64px for .mat-select-panel-multiple.",
+    "local_iteration": {
+      "select": "270/270 pass",
+      "card": "14/14 pass",
+      "mode": "workspace-dist"
     }
   },
-  "audit_cursor": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-  "ci": {
-    "tested_commit": "7b237a9f26795bac4ca2ad42c7424eb4019f3b34",
-    "run_id": 36880411818,
-    "url": "https://github.com/buu700/ngx-compat-material-legacy/actions/runs/36880411818",
-    "outcome": "success"
+  "rc02": {
+    "ci_pack_path": "artifacts/main/entry-${GITHUB_SHA}",
+    "pack_meta_fields_added": [
+      "source_sha",
+      "source_tree_hash",
+      "dirty"
+    ],
+    "f01_wip_reuse": "ideas only (source identity + unique path); did not replay F01 Chainman-less CI or rewrite history"
   },
+  "audit_cursor": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
   "history_transition": {
     "normalized_tip": "2328380006fe9305f7d1d9b07a1b1710812ee077",
     "content_tip": "1a47e7f9c29de3fd44505d4ab481204de2a25ab0",
     "old_head": "11ee5b9690b245739f84393e37e1157ab557660c",
-    "notes_unique_total": 711,
     "receipt": "/workspace/ngx-plan/rc-h00-backup/history-transition.json"
-  },
-  "f01_wip": {
-    "branch": "wip/f01-fresh-artifact-with-changes",
-    "commit": "fd3ca4e68530d1be1b32827f91c794112d54dad8",
-    "note": "preserved; may cherry-pick into RC-01/02; do not replay as history rewrite"
   },
   "harness_blockers": [
     "nix unavailable on box; Chainman host-nix cannot run",
-    "just 1.46.0 available after manual pin install; not sufficient without Nix"
-  ]
+    "local iteration used host node/pnpm PATH, not declared Chainman profile"
+  ],
+  "source_identity_role": "select_width_fix_commit",
+  "pending_ci_wiring_commit": "tip-after-push",
+  "current_source_checkpoint": {
+    "select_fix_commit": "0cf327c11a2f4293019f4010e3c20c5b0b062bc5",
+    "identity_role": "rc06_select_width_then_rc02_ci_wiring",
+    "note": "ci wiring commit is the tip after this handoff file; updated again after push/CI"
+  }
 }
