@@ -1,28 +1,17 @@
 {
   "schema_version": 1,
   "role": "adaptation-required queue from sensitive already-read notes",
-  "batch_id": "sensitive-owned-retain-2026-10-01-h",
-  "recorded_at_utc": "2026-10-01T17:05:21Z",
+  "batch_id": "product-adapt-a11y-overlay-2026-10-01-i",
+  "recorded_at_utc": "2026-10-01T17:10:57Z",
   "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
   "g11_claim": "not-passed",
-  "count": 91,
+  "count": 74,
   "by_read_note_disposition": {
-    "owned-retained": 71,
-    "not-applied": 20
+    "owned-retained": 58,
+    "not-applied": 16
   },
   "policy": "Each row has a read note proving owned sources still lack the upstream fix. Rows stay missing from the final disposition ledger until an adaptation (or an evidence-backed not-applicable/inherited/already-adapted decision) lands. Not unread binge; not G11.",
   "items": [
-    {
-      "sha": "4d0719a6a0d0472ee1729750100167d9941b1641",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/paginator): match visual and reading order (#28285)",
-      "files": [
-        "src/material/paginator/paginator.scss"
-      ],
-      "evidence": "The patch changes the paginator container from flex-wrap wrap-reverse to wrap so the narrow-screen visual order matches the DOM order. The owned paginator container still uses wrap-reverse. That wrap was not changed.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
     {
       "sha": "1b6db8c89b00ace8aaa0e0824866acec5369635f",
       "read_note_disposition": "owned-retained",
@@ -58,17 +47,6 @@
       "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
     },
     {
-      "sha": "a3b28df38c393d47de6dd88b50a3a587869241fa",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/menu): prevent icon from collapsing when text is long (#28541)",
-      "files": [
-        "src/material/menu/menu.scss"
-      ],
-      "evidence": "The patch sets flex-shrink to 0 on the menu item icon so a long label does not collapse it. The owned icon rule sets the margin and vertical alignment. The flex-shrink rule was not added.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
       "sha": "4f518f9fffd1c85cddef9d573ae7bbda4981f7cb",
       "read_note_disposition": "owned-retained",
       "subject": "fix(material/list): use direction-agnostic text-align",
@@ -87,17 +65,6 @@
         "src/material/autocomplete/autocomplete-trigger.ts"
       ],
       "evidence": "The patch stores the input value from the previous keydown and uses that value when the panel attaches, so requireSelection sees the value before the latest keystroke. The owned trigger still records the current input value when the panel attaches. The keydown capture was not added.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
-      "sha": "979e903020ec8e23747fa35414708be2c99e7e99",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/autocomplete): prevent hidden overlay from blocking clicks (#28677)",
-      "files": [
-        "src/material/autocomplete/autocomplete.scss"
-      ],
-      "evidence": "The patch sets pointer-events to none on the hidden autocomplete panel so it does not block clicks. The owned hidden panel still only sets visibility to hidden. The pointer-events rule was not added.",
       "status": "adaptation-required",
       "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
     },
@@ -121,28 +88,6 @@
         "src/material/autocomplete/autocomplete.ts"
       ],
       "evidence": "The patch closes the autocomplete only when the closing trigger is the latest one that opened it. The owned trigger still clears the open flag together with the overlay attachment. The latest-trigger field was not added.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
-      "sha": "01540bb924472fd22276b62a9d72b401a13bfe77",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/tooltip): Tooltip should mark for check when visibility changes (#29000)",
-      "files": [
-        "src/material/tooltip/tooltip.ts"
-      ],
-      "evidence": "The patch marks the tooltip for check when its visibility flag changes. The owned toggle still sets the animation classes and the flag without that check. markForCheck was not added there.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
-      "sha": "842047133fb50be85fc67d4e9109f965277ae2c4",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/core): ripple element not destroyed after trigger change (#29010) (#29012)",
-      "files": [
-        "src/material/core/ripple/ripple-renderer.ts"
-      ],
-      "evidence": "The patch clears the pointer-up registration flag after removing those listeners. The owned renderer removes the listeners and leaves the flag set. The flag reset was not added.",
       "status": "adaptation-required",
       "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
     },
@@ -177,17 +122,6 @@
         "src/material/form-field/form-field.ts"
       ],
       "evidence": "The patch treats a form field as attached only when its root is the document or its shadow root. The owned check still accepts any root other than the element itself. The stricter check was not added.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
-      "sha": "71297ad7ef74baa058607356692b8e955791c484",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/radio): Ensure focus and selected states stay linked (#29082)",
-      "files": [
-        "src/material/radio/radio.ts"
-      ],
-      "evidence": "The patch moves focus to the newly selected radio after a tabindex change, and blurs the previous input if the selected one is disabled. The owned tab-index update only writes the tabindex attribute. The focus transfer was not added.",
       "status": "adaptation-required",
       "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
     },
@@ -260,17 +194,6 @@
       "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
     },
     {
-      "sha": "674538b778e75d229ada06d19c362752db3a18cc",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/core): add fallback if ripples get stuck (#29323)",
-      "files": [
-        "src/material/core/ripple/ripple-renderer.ts"
-      ],
-      "evidence": "The patch adds a fallback timer that destroys a ripple if neither transition event fires. The owned renderer only listens for transitionend and transitioncancel. The timer was not added.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
       "sha": "051917432ad18aadd1747c5b6e8d5af0e861cc52",
       "read_note_disposition": "owned-retained",
       "subject": "fix(material/chips): navigate between rows on up/down arrow (#29364)",
@@ -278,17 +201,6 @@
         "src/material/chips/chip-grid.ts"
       ],
       "evidence": "The patch moves chip focus between rows with the same primary flag on the up and down arrows. The owned keydown delegates every chip key to the key manager. The row filter was not added.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
-      "sha": "e69b2b09efaf577cd5fe92b70808479f975913af",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/chips): fix focus issue (#29427)",
-      "files": [
-        "src/material/chips/chip-grid.ts"
-      ],
-      "evidence": "The patch skips focusing the first chip when that chip is already active. The owned focus path still activates the first chip whenever the list has chips and the input is not focused. The index check was not added.",
       "status": "adaptation-required",
       "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
     },
@@ -349,17 +261,6 @@
       "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
     },
     {
-      "sha": "fd416a30e8de0e741ac45f3fb45e695abecf5ded",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/tooltip): remove aria-describedby when disabled (#29520)",
-      "files": [
-        "src/material/tooltip/tooltip.ts"
-      ],
-      "evidence": "The patch describes the trigger only when the tooltip is enabled and resyncs that description when disabled changes. The owned disabled setter only hides the tooltip. The owned message setter still describes the trigger when the tooltip is disabled. The disabled skip was not added.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
       "sha": "d22a24d667a16c39d4a4ec5f59b248f990fa029e",
       "read_note_disposition": "owned-retained",
       "subject": "fix(material/list): checkmark not visible in high contrast mode (#29546)",
@@ -379,18 +280,6 @@
         "src/material/form-field/form-field.ts"
       ],
       "evidence": "The patch reinitializes the form field when the projected control changes, swaps the type class, and resubscribes to state and value changes. The owned field still subscribes once in ngAfterContentInit and only validates the control in ngAfterContentChecked. The resubscription was not added.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
-      "sha": "1968cc4e0ffeec12e7067318fc2391fcf5b59dfc",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/tabs): allow for tablist aria-label and aria-labelledby to be set (#29562)",
-      "files": [
-        "src/material/tabs/tab-group.ts",
-        "src/material/tabs/tab-header.html"
-      ],
-      "evidence": "The patch adds aria-label and aria-labelledby inputs on the tab group and header and binds them on the tablist. The owned tablist has no those attributes. Individual tabs already accept their own labels. The tablist inputs were not added.",
       "status": "adaptation-required",
       "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
     },
@@ -466,17 +355,6 @@
       "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
     },
     {
-      "sha": "60776637ee78cd942a3527402e3e8f9f25d871c1",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/select): remove incompatible aria-autocomplete attribute (#29645)",
-      "files": [
-        "src/material/select/select.ts"
-      ],
-      "evidence": "The patch removes aria-autocomplete none from the select host. The owned select still sets that attribute. It was not removed.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
       "sha": "777d1d295aaa8bc6e47a7c76e8fe9246ed30db2e",
       "read_note_disposition": "owned-retained",
       "subject": "fix(material/chips): increase chip remove touch target size (#29452)",
@@ -495,17 +373,6 @@
         "src/material/chips/chip-grid.ts"
       ],
       "evidence": "The patch re-focuses the chip grid's active chip when the grid receives focus, and only activates the first chip when none is active. The owned chip list still activates the first chip whenever the list has chips. That focus change was not applied.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
-      "sha": "8e1711216f7d07324e311e0f6ada3d2426c7891e",
-      "read_note_disposition": "owned-retained",
-      "subject": "fix(material/chips): focus escape not working consistently",
-      "files": [
-        "src/material/chips/chip-set.ts"
-      ],
-      "evidence": "The patch sets the chip set tabindex directly on the element so focus can escape before change detection. The owned chip list still clears and restores its bound tab index. That escape change was not applied.",
       "status": "adaptation-required",
       "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
     },
@@ -776,17 +643,6 @@
       "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
     },
     {
-      "sha": "f573ce8aff4fa2b25889b973c4a0282c0b1ad932",
-      "read_note_disposition": "owned-retained",
-      "subject": " fix(material/select): remove value from aria-labelledby (#30374)",
-      "files": [
-        "src/material/select/select.ts"
-      ],
-      "evidence": "The patch stops including the select value id in the trigger aria-labelledby when a label exists. Owned select still appends the value id (legacy-select/internal/select-base.ts). That id was not removed.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
       "sha": "c63b1fe7b340796d21492b9ccc28e91df6464f37",
       "read_note_disposition": "owned-retained",
       "subject": "fix(material/tabs): flicker when animationDuration is set to zero (#30966)",
@@ -805,41 +661,6 @@
         "src/material/button/_button-base.scss"
       ],
       "evidence": "The patch makes the button focus indicator inherit the button border radius, and turns that off for the FAB. Owned buttons size the focus indicator with a negative margin (legacy-button/button.scss). That inherited radius was not added.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
-      "sha": "cf456a2d43837497367662e7de22f1b2bcbf4f00",
-      "read_note_disposition": "not-applied",
-      "subject": "fix(material/form-field): don't toggle hover state over subscript (#27683)",
-      "files": [
-        "src/material/form-field/_form-field-focus-overlay.scss"
-      ],
-      "evidence": "The patch moves the hover opacity from .mat-mdc-form-field:hover to .mat-mdc-text-field-wrapper:hover so the subscript does not show the hover state. styles/form-field/_form-field-focus-overlay.scss line 29 still uses .mat-mdc-form-field:hover. That selector was not changed.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
-      "sha": "726fc069e3bed2fcbc9b53de02ee7ce18c2fce5d",
-      "read_note_disposition": "not-applied",
-      "subject": "fix(material/tabs): add aria-hidden to inactive tabs (#27742)",
-      "files": [
-        "src/material/tabs/tab-group.html",
-        "src/material/tabs/tab-group.spec.ts"
-      ],
-      "evidence": "The patch sets aria-hidden on an inactive MDC tab panel. legacy-tabs/tab-group.html binds aria-labelledby on mat-tab-body and does not bind aria-hidden from selectedIndex. That binding was not added.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
-      "sha": "cc2f2c5ed5cd6692af516db1a47eb047149f1194",
-      "read_note_disposition": "not-applied",
-      "subject": "fix(material/checkbox): add aria-checked (#27970)",
-      "files": [
-        "src/material/checkbox/checkbox.html",
-        "src/material/checkbox/checkbox.spec.ts"
-      ],
-      "evidence": "The patch binds aria-checked to mixed on the checkbox input while it is indeterminate. The owned legacy checkbox input binds aria-label, aria-labelledby, and aria-describedby and does not bind aria-checked. That binding was not added.",
       "status": "adaptation-required",
       "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
     },
@@ -951,17 +772,6 @@
         "src/material/dialog/dialog-content-directives.ts"
       ],
       "evidence": "The patch adds markForCheck methods on the CDK dialog container and has the title call them instead of mutating the labelled-by queue. The owned title still pushes and splices that queue. Those calls were not changed.",
-      "status": "adaptation-required",
-      "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
-    },
-    {
-      "sha": "a643a2ed42b7751087c59ff55a61c7e14f262604",
-      "read_note_disposition": "not-applied",
-      "subject": "fix(material/snack-bar): Ensure snackbar open animation works with OnPush ancestor (#28331)",
-      "files": [
-        "src/material/snack-bar/snack-bar-container.ts"
-      ],
-      "evidence": "The patch calls markForCheck when the snack-bar animation state changes so an OnPush ancestor refreshes the host bindings. The owned enter method still calls detectChanges and does not call markForCheck. The owned exit method sets the state inside the zone and does not call markForCheck. Those calls were not added.",
       "status": "adaptation-required",
       "note": "Read note shows owned sources still lack the upstream fix. Closing would require product adaptation and regression coverage; left missing from final ledger until that work lands."
     },

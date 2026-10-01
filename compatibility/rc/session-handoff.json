@@ -1,24 +1,40 @@
 {
   "template": false,
   "packet_id": "RC-08",
-  "substep_id": "RC-08.02-bounded-disposition-batch-h",
-  "source_commit": "235f2f6e508a2b4da596e06a30fe2d782859bfbe",
+  "substep_id": "RC-08.03-product-adapt-a11y-overlay-i",
+  "source_commit": "05568bc663a6e957d7779299d8c4ccde95b6f533",
   "worktree_line": "main",
   "line_21_commit": "cbf86f3faccb240e7beeb6a1e2af727b5d9a674d",
   "owned_paths": [
+    "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.scss",
+    "projects/ngx-material-legacy/styles/core/style/_menu-common.scss",
+    "projects/ngx-material-legacy/legacy-paginator/paginator.scss",
+    "projects/ngx-material-legacy/styles/form-field/_form-field-focus-overlay.scss",
+    "projects/ngx-material-legacy/legacy-select/select.ts",
+    "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+    "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+    "projects/ngx-material-legacy/legacy-checkbox/checkbox.html",
+    "projects/ngx-material-legacy/legacy-tabs/",
+    "projects/ngx-material-legacy/legacy-core/ripple/ripple-renderer.ts",
+    "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts",
+    "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
+    "projects/ngx-material-legacy/legacy-radio/internal/radio-base.ts",
+    "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
     "compatibility/f10/disposition-ledger/ledger.json",
+    "compatibility/rc/reports/upstream-audit-adaptation-queue.json",
     "compatibility/rc/reports/upstream-audit-disposition.json",
     "compatibility/rc/reports/upstream-audit-disposition-progress.json",
-    "compatibility/rc/reports/upstream-audit-adaptation-queue.json",
     "compatibility/rc/status.json",
     "compatibility/rc/session-handoff.json"
   ],
   "last_command": [
     "node",
-    "scripts/check-upstream-audit-disposition.mjs"
+    "scripts/rc-test-legacy-family.mjs",
+    "--family",
+    "chips"
   ],
-  "outcome": "Bounded sensitive ledger batch closed 9 rows (8 owned-retained with per-SHA evidence; 1 not-applied Closure tooling). 91 already-read sensitive rows left missing with adaptation queue. Ledger 620/1697. Cell still unimplemented. Cursor preserved. G01-G13 not claimed.",
-  "first_actionable_error": "Remaining full-verify cell unimplemented: upstream-audit-disposition (1077 seed SHAs without final ledger rows)",
+  "outcome": "Product-adapted 17 adaptation-queue SHAs (a11y/focus/overlay/aria/OnPush/ripple). Ledger 637/1697. Queue remaining 74. Cell still open. Cursor preserved. G01-G13 not claimed.",
+  "first_actionable_error": "Remaining full-verify cell unimplemented: upstream-audit-disposition (1060 seed SHAs without final ledger rows)",
   "failed_case_ids": [],
   "report_paths": [
     "compatibility/rc/status.json",
@@ -34,19 +50,19 @@
     "G02 full overload/generics/protected/DI identity",
     "Full browser matrix (Firefox/WebKit/all families/CSP/SSR)",
     "G06-G08 companion bridges beyond sealed values",
-    "G11 full disposition coverage (1077 seed SHAs remaining)",
+    "G11 full disposition coverage (1060 seed SHAs remaining)",
     "21.x line not retested",
     "G01-G13 not claimed",
     "Audit cursor preserved at 5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-    "91 already-read sensitive adaptation-required rows left missing (see adaptation queue); unread triage/test-only/semantic not dispositioned"
+    "74 already-read sensitive adaptation-required rows left missing (see adaptation queue); unread triage/test-only/semantic not dispositioned"
   ],
-  "next_action": "Product adaptations for adaptation-queue SHAs (a11y/focus/overlay/aria/OnPush/Safari/requireSelection/ripple-lifecycle and residual ambiguous not-applied), then re-disposition. Do not binge unread. Keep cell open until seed coverage is honest. Keep G01 unclaimed.",
+  "next_action": "Continue product adaptations for remaining adaptation-queue SHAs (autocomplete requireSelection/multi-trigger/landscape, form-field outline/label, dialog OnPush/scale, Safari slide-toggle, residual chips/tabs polish), then re-disposition. Do not binge unread. Keep cell open until seed coverage is honest. Keep G01 unclaimed.",
   "blocked_owner_decisions": [
     "cyph-rc-age-admission",
     "registry-publish-authority",
     "github-protection-read"
   ],
-  "recorded_at_utc": "2026-10-01T17:05:21Z",
+  "recorded_at_utc": "2026-10-01T17:11:10Z",
   "clock_confidence": "verified",
   "rc_02_04": {
     "status": "incremental-orchestration-api-completeness-ci-green-audit-open",
@@ -74,35 +90,24 @@
   ],
   "audit_cursor": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
   "ledger": {
-    "closed": 620,
+    "closed": 637,
     "seed": 1697,
-    "missing": 1077,
-    "batch_id": "sensitive-owned-retain-2026-10-01-h",
-    "added_this_batch": 9,
+    "missing": 1060,
+    "batch_id": "product-adapt-a11y-overlay-2026-10-01-i",
+    "added_this_batch": 17,
     "by_final_this_batch": {
-      "inherited": 1,
-      "not-applicable": 7,
-      "already-adapted": 1
+      "already-adapted": 17
     },
-    "adaptation_required_remaining": 91
+    "adaptation_required_remaining": 74
   },
   "criterion_gap_by_category": {
     "unread:needs-triage": 407,
     "unread:behavior-semantic": 397,
-    "read:behavior-semantic:owned-retained:adaptation-required": 71,
+    "read:behavior-semantic:owned-retained:adaptation-required": 58,
     "unread:test-only-batch-candidate": 182,
-    "read:behavior-semantic:not-applied:adaptation-required": 20
+    "read:behavior-semantic:not-applied:adaptation-required": 16
   },
   "harness_blockers": [
-    "nix unavailable on box; Chainman host-nix cannot run locally",
-    "local iteration used host node/pnpm PATH, not declared Chainman profile"
-  ],
-  "ci": {
-    "tested_commit": "235f2f6e508a2b4da596e06a30fe2d782859bfbe",
-    "product_commit": "235f2f6e508a2b4da596e06a30fe2d782859bfbe",
-    "run_id": 36893743023,
-    "url": "https://github.com/buu700/ngx-compat-material-legacy/actions/runs/36893743023",
-    "outcome": "success",
-    "note": "No CI/verify wiring change this session; product tip CI remains the prior green run."
-  }
+    "nix unavailable on box; Chainman host-nix recipes not exercised this session"
+  ]
 }
