@@ -136,7 +136,6 @@ export class MatLegacySelectTrigger {}
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     'role': 'combobox',
-    'aria-autocomplete': 'none',
     // TODO(crisbeto): the value for aria-haspopup should be `listbox`, but currently it's difficult
     // to sync into Google, because of an outdated automated a11y check which flags it as an invalid
     // value. At some point we should try to switch it back to being `listbox`.

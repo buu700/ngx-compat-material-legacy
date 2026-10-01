@@ -645,6 +645,21 @@ export abstract class _MatRadioButtonBase
       if (input) {
         input.setAttribute('tabindex', value + '');
         this._previousTabIndex = value;
+        // Selection-follows-focus: if this input still holds focus after another radio
+        // became selected, move focus to the selected radio (or blur if it is disabled).
+        queueMicrotask(() => {
+          if (
+            group &&
+            group.selected &&
+            group.selected !== this &&
+            document.activeElement === input
+          ) {
+            group.selected._inputElement.nativeElement.focus();
+            if (document.activeElement === input) {
+              this._inputElement.nativeElement.blur();
+            }
+          }
+        });
       }
     }
   }

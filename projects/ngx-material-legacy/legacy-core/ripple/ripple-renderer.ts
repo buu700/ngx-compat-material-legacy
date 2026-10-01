@@ -44,6 +44,7 @@ const pointerUpEvents = ['mouseup', 'mouseleave', 'touchend', 'touchcancel'];
 interface RippleEventListeners {
   onTransitionEnd: EventListener;
   onTransitionCancel: EventListener;
+  fallbackTimer: ReturnType<typeof setTimeout> | null;
 }
 
 /**
@@ -128,11 +129,19 @@ export class LegacyRippleRenderer implements EventListenerObject {
 
     if (!animationForciblyDisabledThroughCss && (enterDuration || animationConfig.exitDuration)) {
       this._ngZone.runOutsideAngular(() => {
-        const onTransitionEnd = () => this._finishRippleTransition(rippleRef);
+        const onTransitionEnd = () => {
+          if (eventListeners) {
+            eventListeners.fallbackTimer = null;
+          }
+          clearTimeout(fallbackTimer);
+          this._finishRippleTransition(rippleRef);
+        };
         const onTransitionCancel = () => this._destroyRipple(rippleRef);
+        // Fallback when neither transitionend nor transitioncancel fires under load.
+        const fallbackTimer = setTimeout(onTransitionCancel, enterDuration + 100);
         ripple.addEventListener('transitionend', onTransitionEnd);
         ripple.addEventListener('transitioncancel', onTransitionCancel);
-        eventListeners = {onTransitionEnd, onTransitionCancel};
+        eventListeners = {onTransitionEnd, onTransitionCancel, fallbackTimer};
       });
     }
 
@@ -243,6 +252,9 @@ export class LegacyRippleRenderer implements EventListenerObject {
     if (eventListeners !== null) {
       rippleRef.element.removeEventListener('transitionend', eventListeners.onTransitionEnd);
       rippleRef.element.removeEventListener('transitioncancel', eventListeners.onTransitionCancel);
+      if (eventListeners.fallbackTimer !== null) {
+        clearTimeout(eventListeners.fallbackTimer);
+      }
     }
     rippleRef.element.remove();
   }
@@ -300,6 +312,7 @@ export class LegacyRippleRenderer implements EventListenerObject {
         pointerUpEvents.forEach(type =>
           trigger.removeEventListener(type, this, passiveCapturingEventOptions),
         );
+        this._pointerUpEventsRegistered = false;
       }
     }
   }

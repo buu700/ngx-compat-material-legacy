@@ -535,7 +535,9 @@ export class MatLegacyChipList
     if (this._chipInput && this._chipInput.focused) {
       // do nothing
     } else if (this.chips.length > 0) {
-      this._keyManager.setFirstItemActive();
+      if (this._keyManager.activeItemIndex !== 0) {
+        this._keyManager.setFirstItemActive();
+      }
       this.stateChanges.next();
     } else {
       this._focusInput(options);
@@ -731,10 +733,14 @@ export class MatLegacyChipList
    */
   _allowFocusEscape() {
     if (this._tabIndex !== -1) {
+      // Set tabindex on the DOM node immediately so focus can escape before CD runs,
+      // and keep the bound field in sync for consumers/tests reading tabIndex.
       this._tabIndex = -1;
+      this._elementRef.nativeElement.tabIndex = -1;
 
       setTimeout(() => {
         this._tabIndex = this._userTabIndex || 0;
+        this._elementRef.nativeElement.tabIndex = this._tabIndex;
         this._changeDetectorRef.markForCheck();
       });
     }

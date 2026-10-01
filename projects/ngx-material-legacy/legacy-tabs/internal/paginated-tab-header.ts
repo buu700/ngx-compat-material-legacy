@@ -139,6 +139,12 @@ export abstract class MatPaginatedTabHeader
   }
   private _disablePagination: boolean = false;
 
+  /** Aria label of the tab list. */
+  @Input('aria-label') ariaLabel: string;
+
+  /** Sets the `aria-labelledby` of the tab list. */
+  @Input('aria-labelledby') ariaLabelledby: string;
+
   /** The index of the active tab. */
   get selectedIndex(): number {
     return this._selectedIndex;

@@ -188,6 +188,9 @@ export abstract class _MatSnackBarContainerBase extends BasePortalOutlet impleme
   enter(): void {
     if (!this._destroyed) {
       this._animationState = 'visible';
+      // Host bindings (animation classes) need markForCheck; detectChanges alone is not enough
+      // when an OnPush ancestor owns the host view.
+      this._changeDetectorRef.markForCheck();
       this._changeDetectorRef.detectChanges();
       this._screenReaderAnnounce();
       this._afterEnterMotionStarted();
@@ -208,6 +211,7 @@ export abstract class _MatSnackBarContainerBase extends BasePortalOutlet impleme
       // where multiple snack bars are opened in quick succession (e.g. two consecutive calls to
       // `MatSnackBar.open`).
       this._animationState = 'hidden';
+      this._changeDetectorRef.markForCheck();
 
       // Mark this element with an 'exit' attribute to indicate that the snackbar has
       // been dismissed and will soon be removed from the DOM. This is used by the snackbar

@@ -128,6 +128,12 @@ export abstract class _MatTabGroupBase
   /** Position of the tab header. */
   @Input() headerPosition: MatTabHeaderPosition = 'above';
 
+  /** Aria label of the inner `tablist` of the group. */
+  @Input('aria-label') ariaLabel: string;
+
+  /** Sets the `aria-labelledby` of the inner `tablist` of the group. */
+  @Input('aria-labelledby') ariaLabelledby: string;
+
   /** Duration for the tab animation. Will be normalized to milliseconds if no units are set. */
   @Input()
   get animationDuration(): string {

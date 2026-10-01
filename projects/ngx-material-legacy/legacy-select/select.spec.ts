@@ -139,7 +139,7 @@ describe('MatSelect', () => {
 
         it('should set the role of the select to combobox', fakeAsync(() => {
           expect(select.getAttribute('role')).toEqual('combobox');
-          expect(select.getAttribute('aria-autocomplete')).toBe('none');
+          expect(select.hasAttribute('aria-autocomplete')).toBe(false);
           expect(select.getAttribute('aria-haspopup')).toBe('true');
         }));
 
@@ -191,17 +191,15 @@ describe('MatSelect', () => {
           fixture.detectChanges();
 
           const labelId = fixture.nativeElement.querySelector('.mat-form-field-label').id;
-          const valueId = fixture.nativeElement.querySelector('.mat-select-value').id;
 
-          expect(select.getAttribute('aria-labelledby')).toBe(`${labelId} ${valueId} myLabelId`);
+          expect(select.getAttribute('aria-labelledby')).toBe(`${labelId} myLabelId`);
         }));
 
-        it('should set aria-labelledby to the value and label IDs', fakeAsync(() => {
+        it('should set aria-labelledby to the label ID', fakeAsync(() => {
           fixture.detectChanges();
 
           const labelId = fixture.nativeElement.querySelector('.mat-form-field-label').id;
-          const valueId = fixture.nativeElement.querySelector('.mat-select-value').id;
-          expect(select.getAttribute('aria-labelledby')).toBe(`${labelId} ${valueId}`);
+          expect(select.getAttribute('aria-labelledby')).toBe(labelId);
         }));
 
         it('should trim the trigger aria-labelledby when there is no label', fakeAsync(() => {

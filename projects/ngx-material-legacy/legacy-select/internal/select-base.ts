@@ -1279,14 +1279,19 @@ export abstract class _MatSelectBase<C>
       return null;
     }
 
-    const labelId = this._parentFormField?.getLabelId();
-    let value = (labelId ? labelId + ' ' : '') + this._valueId;
+    let value = this._parentFormField?.getLabelId() || '';
 
     if (this.ariaLabelledby) {
       value += ' ' + this.ariaLabelledby;
     }
 
-    return value;
+    // Prefer label/aria-labelledby only. Fall back to the value id when neither is set so
+    // existing unlabeled selects still expose a labelledby target for a11y checkers.
+    if (!value) {
+      value = this._valueId;
+    }
+
+    return value.trim();
   }
 
   /** Called when the overlay panel is done animating. */

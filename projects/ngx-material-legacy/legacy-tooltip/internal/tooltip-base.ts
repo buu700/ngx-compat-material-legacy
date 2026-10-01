@@ -115,6 +115,7 @@ export abstract class _MatTooltipBase<T extends _TooltipComponentBase>
   private _position: TooltipPosition = 'below';
   private _positionAtOrigin: boolean = false;
   private _disabled: boolean = false;
+  private _ariaDescriptionPending = false;
   private _tooltipClass: string | string[] | Set<string> | {[key: string]: any};
   private _scrollStrategy: () => ScrollStrategy;
   private _viewInitialized = false;
@@ -164,13 +165,19 @@ export abstract class _MatTooltipBase<T extends _TooltipComponentBase>
   }
 
   set disabled(value: BooleanInput) {
-    this._disabled = coerceBooleanProperty(value);
+    const isDisabled = coerceBooleanProperty(value);
 
-    // If tooltip is disabled, hide immediately.
-    if (this._disabled) {
-      this.hide(0);
-    } else {
-      this._setupPointerEnterEventsIfNeeded();
+    if (this._disabled !== isDisabled) {
+      this._disabled = isDisabled;
+
+      // If tooltip is disabled, hide immediately.
+      if (isDisabled) {
+        this.hide(0);
+      } else {
+        this._setupPointerEnterEventsIfNeeded();
+      }
+
+      this._syncAriaDescription(this.message);
     }
   }
 
@@ -225,7 +232,7 @@ export abstract class _MatTooltipBase<T extends _TooltipComponentBase>
   }
 
   set message(value: string) {
-    this._ariaDescriber.removeDescription(this._elementRef.nativeElement, this._message, 'tooltip');
+    const oldMessage = this._message;
 
     // If the message is not a string (e.g. number), convert it to a string and trim it.
     // Must convert with `String(value)`, not `${value}`, otherwise Closure Compiler optimises
@@ -237,16 +244,9 @@ export abstract class _MatTooltipBase<T extends _TooltipComponentBase>
     } else {
       this._setupPointerEnterEventsIfNeeded();
       this._updateTooltipMessage();
-      this._ngZone.runOutsideAngular(() => {
-        // The `AriaDescriber` has some functionality that avoids adding a description if it's the
-        // same as the `aria-label` of an element, however we can't know whether the tooltip trigger
-        // has a data-bound `aria-label` or when it'll be set for the first time. We can avoid the
-        // issue by deferring the description by a tick so Angular has time to set the `aria-label`.
-        Promise.resolve().then(() => {
-          this._ariaDescriber.describe(this._elementRef.nativeElement, this.message, 'tooltip');
-        });
-      });
     }
+
+    this._syncAriaDescription(oldMessage);
   }
 
   private _message = '';
@@ -789,6 +789,27 @@ export abstract class _MatTooltipBase<T extends _TooltipComponentBase>
       (style as any).webkitTapHighlightColor = 'transparent';
     }
   }
+
+  /** Updates the tooltip's ARIA description based on its current state. */
+  private _syncAriaDescription(oldMessage: string): void {
+    if (this._ariaDescriptionPending) {
+      return;
+    }
+
+    this._ariaDescriptionPending = true;
+    this._ariaDescriber.removeDescription(this._elementRef.nativeElement, oldMessage, 'tooltip');
+
+    this._ngZone.runOutsideAngular(() => {
+      // Defer so data-bound aria-label can land before AriaDescriber compares.
+      Promise.resolve().then(() => {
+        this._ariaDescriptionPending = false;
+
+        if (this.message && !this.disabled) {
+          this._ariaDescriber.describe(this._elementRef.nativeElement, this.message, 'tooltip');
+        }
+      });
+    });
+  }
 }
 
 @Directive()
@@ -968,7 +989,10 @@ export abstract class _TooltipComponentBase implements OnDestroy {
     const hideClass = this._hideAnimation;
     tooltip.classList.remove(isVisible ? hideClass : showClass);
     tooltip.classList.add(isVisible ? showClass : hideClass);
-    this._isVisible = isVisible;
+    if (this._isVisible !== isVisible) {
+      this._isVisible = isVisible;
+      this._changeDetectorRef.markForCheck();
+    }
 
     // It's common for internal apps to disable animations using `* { animation: none !important }`
     // which can break the opening sequence. Try to detect such cases and work around them.
