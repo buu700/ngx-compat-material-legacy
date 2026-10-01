@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
   "role": "single RC status index",
-  "observed_at": "2026-10-01T14:56:59Z",
+  "observed_at": "2026-10-01T14:59:51Z",
   "main": {
-    "commit": "2328380006fe9305f7d1d9b07a1b1710812ee077",
-    "identity_role": "verified_normalized_execution_tip_pre_rc01_push",
+    "commit": "7b237a9f26795bac4ca2ad42c7424eb4019f3b34",
+    "identity_role": "rc01_bootstrap_commit_ci_green",
     "worktree": "/workspace/ngx-compat/material",
     "branch": "main",
     "checkout_branch": "main"
@@ -18,7 +18,7 @@
   "packets": {
     "RC-H00": "verified-local-and-promoted",
     "RC-00": "in-progress",
-    "RC-01": "in-progress",
+    "RC-01": "bootstrap-landed-awaiting-full-acceptance",
     "RC-02": "not-started",
     "RC-03": "not-started",
     "RC-04": "not-started",
@@ -45,10 +45,10 @@
     "RC-00-A03": "historical-not-revalidated",
     "RC-00-A04": "blocked-owner-age-admission",
     "RC-00-A05": "protection-unread",
-    "RC-01-A01": "local-patch-awaiting-ci",
-    "RC-01-A02": "not-proven-host-nix-unavailable",
-    "RC-01-A03": "classifier-regression-added-full-gate-refusal-retained",
-    "RC-01-A04": "blocked-host-nix-unavailable",
+    "RC-01-A01": "ci-setup-verify-lite-and-pack-consumer-green",
+    "RC-01-A02": "not-proven-locally-host-nix-unavailable",
+    "RC-01-A03": "classifier-regression-present-ci-verify-lite-green",
+    "RC-01-A04": "ci-path-qualified-local-host-nix-unavailable",
     "RC-01-A05": "minimal-ci-and-classifier-only"
   },
   "not_claims": [
@@ -56,13 +56,13 @@
     "No historical spec is bound to the current HEAD.",
     "Publication, registry ownership, and branch protection were not authorized or fully queried.",
     "Cyph RC age admission is not approved.",
-    "Prior status acceptance labels marked recorded are historical and not revalidated by this session.",
-    "Local python3 scripts/rc-verify-lite.py success is not Chainman/host-nix CI proof."
+    "CI green covers bootstrap/fast-check/draft-pack/packed-consumer smoke only, not full product gates.",
+    "Local host-nix Chainman remains unavailable on this box."
   ],
   "clock_confidence": {
     "status": "verified",
-    "source": "box Thu Oct  1 10:56:59 EDT 2026 harness; agrees with session user_info date 2026-10-01",
-    "verified_at_utc": "2026-10-01T14:56:59Z"
+    "source": "box Thu Oct  1 10:59:51 EDT 2026 harness; agrees with session user_info date 2026-10-01",
+    "verified_at_utc": "2026-10-01T14:59:51Z"
   },
   "history_transition": {
     "role": "promoted_normalized_tip",
@@ -72,7 +72,7 @@
     "normalized_tip": "2328380006fe9305f7d1d9b07a1b1710812ee077",
     "normalized_tree": "f478d3c050068835dbb4d184b587955c7b376123",
     "receipt": "/workspace/ngx-plan/rc-h00-backup/history-transition.json",
-    "note": "RC-H00 promoted; this status indexes the execution tip before the RC-01 bootstrap commit."
+    "note": "RC-H00 promoted; RC-01 bootstrap commit is current main tip."
   },
   "harness": {
     "just": "1.46.0 installed to ~/.local/bin for probing",
@@ -80,5 +80,15 @@
     "node": "v20.19.2 host PATH (not declared Chainman artifact)",
     "network": "github.com reachable",
     "chainman_blocker": "Host mode requires Nix; no host-language fallback is used."
+  },
+  "ci": {
+    "tested_commit": "7b237a9f26795bac4ca2ad42c7424eb4019f3b34",
+    "run_id": 36880411818,
+    "url": "https://github.com/buu700/ngx-compat-material-legacy/actions/runs/36880411818",
+    "outcome": "success",
+    "jobs": [
+      "Chainman verify-lite:success",
+      "Packed-consumer AOT and harness:success"
+    ]
   }
 }
