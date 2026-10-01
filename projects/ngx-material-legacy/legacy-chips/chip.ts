@@ -35,6 +35,7 @@ import {
 } from '@ngx-compat/material-legacy/legacy-core';
 import {CanColor, CanDisable, CanDisableRipple, HasTabIndex, mixinColor, mixinDisableRipple, mixinTabIndex} from './internal/common-behaviors';
 import {Subject} from 'rxjs';
+import {take} from 'rxjs/operators';
 
 /**
  * Represents an event fired on an individual `mat-chip`.
@@ -463,9 +464,8 @@ export class MatLegacyChip
     // When animations are enabled, Angular may end up removing the chip from the DOM a little
     // earlier than usual, causing it to be blurred and throwing off the logic in the chip list
     // that moves focus to the next item. To work around the issue, we defer marking the chip
-    // as not focused until after a macrotask (matches current Material chip blur timing).
-    this._changeDetectorRef.markForCheck();
-    setTimeout(() => {
+    // as not focused until the next time the zone stabilizes.
+    this._ngZone.onStable.pipe(take(1)).subscribe(() => {
       this._ngZone.run(() => {
         this._hasFocus = false;
         this._onBlur.next({chip: this});

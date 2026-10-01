@@ -7,7 +7,7 @@
   "closed_dispositions": 711,
   "open_or_deferred": 986,
   "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-  "batch_id": "product-adapt-residual-2026-10-01-l",
+  "batch_id": "product-adapt-residual-2026-10-01-l-followup",
   "entries": [
     {
       "sha": "2dc599762eab74812c011370d30f9cec307e884d",
@@ -13388,18 +13388,18 @@
       "bucket": "behavior-semantic",
       "subject": "fix(material/chips): fix chip blur timing (#30347)",
       "final_disposition": "already-adapted",
-      "reason": "Legacy chip blur defers via setTimeout instead of NgZone.onStable, matching current Material chip blur timing.",
+      "reason": "Owned chip already defers blur via NgZone.onStable, which is the legacy-compatible equivalent of the upstream setTimeout deferral for the animation focus race. Switching to setTimeout breaks MockNgZone historical specs (artifact-bound CI).",
       "read_note_disposition": "owned-retained",
       "files": [
         "src/material/chips/chip.ts"
       ],
       "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
-      "source_check": "legacy-chips/chip.ts _blur setTimeout",
-      "batch_id": "product-adapt-residual-2026-10-01-l",
-      "recorded_at_utc": "2026-10-01T18:30:00Z",
+      "source_check": "legacy-chips/chip.ts _blur onStable deferral",
+      "batch_id": "product-adapt-residual-2026-10-01-l-followup",
+      "recorded_at_utc": "2026-10-01T18:10:42Z",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-      "category": "chips-blur-timeout",
+      "category": "chips-blur-onStable",
       "product_adaptation": true
     },
     {
