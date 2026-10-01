@@ -83,6 +83,19 @@ const scenarios = [
       && (report.zone_global === false || report.zone_global === 'undefined' || report.zone_global == null)
       && !report.error,
   },
+  {
+    id: 'dialog-csp-nonce',
+    args: ['--csp'],
+    cells: [
+      'pr/main/chromium/zoneful/dialog/csp-nonce',
+    ],
+    credit_as: 'csp-nonce-dialog',
+    require: report => report.missing_nonce_detected === true
+      && report.dialog_opened_with_nonce === true
+      && report.nonce_clean === true
+      && report.styles_with_nonce > 0
+      && !report.error,
+  },
 ];
 
 const executed = [];
@@ -101,6 +114,8 @@ for (const scenario of scenarios) {
     detailPath = join(root, 'compatibility/rc/reports/browser-dialog-reduced-motion.json');
   } else if (scenario.args.includes('--zoneless')) {
     detailPath = join(root, 'compatibility/rc/reports/browser-dialog-zoneless.json');
+  } else if (scenario.args.includes('--csp')) {
+    detailPath = join(root, 'compatibility/rc/reports/browser-dialog-csp.json');
   }
   let detail = null;
   if (existsSync(detailPath)) {
@@ -150,8 +165,8 @@ const report = {
   result: ok ? 'pass' : 'fail',
   matrix_updated: false,
   limitations: [
-    'Only the dialog/select Chromium PR-slice above was executed.',
-    'Firefox/WebKit, remaining families/states, CSP, SSR, and enabled-motion expansion stay not-executed.',
+    'Only the dialog/select Chromium PR-slice plus dialog CSP-nonce above was executed.',
+    'Firefox/WebKit, remaining families/states, SSR, enabled-motion, and non-dialog CSP cells stay not-executed.',
     'Success is not copied to unexecuted cells.',
     'Does not claim G10.',
   ],

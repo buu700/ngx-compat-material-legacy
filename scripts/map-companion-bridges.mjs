@@ -20,7 +20,7 @@ function fail(code, message) {
   process.exit(code);
 }
 
-let line21 = '/home/parallels/ngx-compat-material-legacy-21';
+let line21 = '/workspace/ngx-compat/material-21';
 for (let i = 2; i < process.argv.length; i += 1) {
   const arg = process.argv[i];
   if (arg === '--line21') {

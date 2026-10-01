@@ -80,6 +80,30 @@ for (const cell of cells) {
     notApplicable.set(cell.reason, ids);
   }
 }
+// Cross-cutting CSP-nonce cells (PR Chromium dialog only; not a full CSP roster).
+const cspCells = [];
+for (const line of lines) {
+  for (const runtime of runtimes) {
+    cspCells.push({
+      id: `pr/${line}/chromium/${runtime}/dialog/csp-nonce`,
+      stage: 'pr',
+      line,
+      engine: 'chromium',
+      runtime,
+      family: 'dialog',
+      state: 'csp-nonce',
+      applicability: 'required',
+      reason: null,
+      status: 'not-executed',
+      cross_cutting: 'csp-nonce',
+    });
+  }
+}
+for (const cell of cspCells) {
+  cells.push(cell);
+  requiredIds.push(cell.id);
+}
+
 const declared = {
   schema_version: 1,
   role: 'declared browser matrix',
@@ -88,7 +112,13 @@ const declared = {
   high_risk: highRisk,
   lines,
   hydration: 'not claimed',
-  unexpanded: ['enabled-motion', 'csp-nonce', 'ssr'],
+  unexpanded: ['enabled-motion', 'ssr'],
+  partially_expanded: {
+    'csp-nonce': {
+      scope: 'pr/chromium/dialog/{zoneful,zoneless} on both lines',
+      cell_ids: cspCells.map(cell => cell.id),
+    },
+  },
   cell_count: cells.length,
   required_count: requiredIds.length,
   not_applicable_count: cells.length - requiredIds.length,
@@ -97,7 +127,8 @@ const declared = {
   not_applicable: [...notApplicable.entries()].map(([reason, ids]) => ({reason, ids})),
   limitations: [
     'No browser was launched.',
-    'Motion, CSP, and SSR rosters are named and not expanded.',
+    'CSP-nonce is partially expanded (PR Chromium dialog only); Firefox/WebKit and other families stay out.',
+    'Enabled-motion and SSR rosters remain unexpanded.',
     'This is not RC-07-A02.',
   ],
 };

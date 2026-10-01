@@ -260,7 +260,27 @@ def main() -> int:
     results["sass-seal"] = "pass" if code == 0 else "fail"
     implemented_ran.append("sass-seal")
 
-    # browser-matrix: real Chromium dialog/select PR-slice; not the full 3584 matrix.
+    # companion-bridge-tokens: compiled per-companion override token receipts (not G07).
+    code = run_node("scripts/check-companion-bridges.mjs", [])
+    token_detail = ROOT / "compatibility/rc/reports/companion-bridge-tokens.json"
+    if token_detail.is_file():
+        (out_dir / "reports").mkdir(parents=True, exist_ok=True)
+        (out_dir / "reports" / "companion-bridge-tokens-detail.json").write_text(token_detail.read_text())
+    write_check_report(
+        out_dir,
+        run_id,
+        line,
+        "companion-bridge-tokens",
+        exit_code=code,
+        limitations=[
+            "Compiled token inventory only; no rendered computed styles.",
+            "Does not claim G06-G08.",
+        ],
+    )
+    results["companion-bridge-tokens"] = "pass" if code == 0 else "fail"
+    implemented_ran.append("companion-bridge-tokens")
+
+    # browser-matrix: real Chromium dialog/select PR-slice + dialog CSP-nonce; not the full matrix.
     code = run_node("scripts/run-browser-matrix-slice.mjs", ["--run", str(run_path)])
     browser_detail = ROOT / "compatibility/rc/reports/browser-matrix-slice.json"
     if browser_detail.is_file():
@@ -273,8 +293,8 @@ def main() -> int:
         "browser-matrix",
         exit_code=code,
         limitations=[
-            "Executes dialog/select Chromium PR-slice only; does not fan out to unexecuted cells.",
-            "Firefox/WebKit, remaining families, CSP, SSR expansion remain not-executed.",
+            "Executes dialog/select Chromium PR-slice plus dialog CSP-nonce; does not fan out to unexecuted cells.",
+            "Firefox/WebKit, remaining families, SSR, enabled-motion, and non-dialog CSP remain not-executed.",
             "Does not claim G10.",
         ],
     )

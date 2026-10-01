@@ -120,6 +120,11 @@ jobs:
           RUN="${{ steps.pack.outputs.run_dir }}"
           just chainman exec -- node scripts/sass-seal.mjs --run "${RUN}/run.json"
 
+      - name: Companion bridge compiled token receipts
+        run: |
+          set -euo pipefail
+          just chainman exec -- node scripts/check-companion-bridges.mjs
+
       - name: Install Chromium for historical runner
         run: |
           set -euo pipefail
