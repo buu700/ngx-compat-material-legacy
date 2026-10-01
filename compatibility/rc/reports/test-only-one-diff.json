@@ -3,19 +3,19 @@
   "role": "test-only diffs that were read",
   "g11_claim": "not-passed",
   "batch_reviewed": true,
-  "batch_id": "test-only-refactor-wave2-2026-10-01",
-  "count": 130,
+  "batch_id": "test-only-residual-needs-triage-docs-2026-10-01",
+  "count": 134,
   "selection_policy": {
-    "include": "unread test-only-batch-candidate with subject refactor(...) whose inspected paths are limited to *.spec.ts / shared.spec / testing BUILD.bazel (wave2 plumbing)",
+    "include": "residual unread test-only-batch-candidate whose inspected paths are only *.spec.ts despite build:/fix: subject prefixes",
     "fail_closed_excluded": [
-      "fix/feat/build/perf/security/docs subjects",
       "harness implementation (.ts harness sources)",
       "production runtime/style paths",
-      "config files (tslint/eslint/package.json)",
+      "config files",
       "public_api_guard / api goldens",
-      "needs-triage and behavior-semantic buckets"
+      "mixed prod+spec patches",
+      "needs-triage and behavior-semantic except separately evidenced docs rows"
     ],
-    "prior_batch": "test-only-clear-wave1-2026-10-01"
+    "prior_batch": "test-only-refactor-wave2-2026-10-01"
   },
   "reviews": [
     {
@@ -2231,6 +2231,50 @@
       "patch_bytes": 16418,
       "disposition": "irrelevant",
       "evidence": "Inspected upstream patch content (sha256=2e4894d31585966892767b49e827cbff835f3917ad1d2af5c4b7e58c002673d5, bytes=16418). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk/table/table.spec.ts). No production runtime, style, public API, or harness implementation sources. Subject is refactor test-plumbing (fakeAsync/standalone/change-detection), not fix/feat/build. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior."
+    },
+    {
+      "sha": "47ac55fcdc5178f094ad5e8bb2d378f1525d02a8",
+      "subject": "build: fix lint failure (#27876)",
+      "files": [
+        "src/material/autocomplete/autocomplete.spec.ts"
+      ],
+      "patch_sha256": "2abf0b0f59100e16bac4928c4186f6611248b70c959e4e4107d02e03f612d2e3",
+      "patch_bytes": 616,
+      "disposition": "irrelevant",
+      "evidence": "Inspected upstream patch content (sha256=2abf0b0f59100e16bac4928c4186f6611248b70c959e4e4107d02e03f612d2e3, bytes=616). Changed paths are only unit specs (src/material/autocomplete/autocomplete.spec.ts). Subject prefix is 'build', but the patch body has no production runtime, style, public API, harness implementation, or config hunks. This package does not ship or depend on upstream Material unit-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior."
+    },
+    {
+      "sha": "917f0026b1c0b0d80672b0ea1a79a2f0a4bd6e7b",
+      "subject": "build: fix broken build (#29699)",
+      "files": [
+        "src/material/core/theming/tests/m3-theme.spec.ts"
+      ],
+      "patch_sha256": "9104a5a5bbf54b846afaff77ee0d08aa1037e1fb18bfdfd868262b56980ca489",
+      "patch_bytes": 454,
+      "disposition": "irrelevant",
+      "evidence": "Inspected upstream patch content (sha256=9104a5a5bbf54b846afaff77ee0d08aa1037e1fb18bfdfd868262b56980ca489, bytes=454). Changed paths are only unit specs (src/material/core/theming/tests/m3-theme.spec.ts). Subject prefix is 'build', but the patch body has no production runtime, style, public API, harness implementation, or config hunks. This package does not ship or depend on upstream Material unit-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior."
+    },
+    {
+      "sha": "8e091797f8664cf99af86a5c7c4d5615734fcaf1",
+      "subject": "build: fix failing test (#30443)",
+      "files": [
+        "src/material/chips/chip-listbox.spec.ts"
+      ],
+      "patch_sha256": "ea6ca035de473f34fe3408e15c490b8733452e3e81d529307040baaf6a02aa9c",
+      "patch_bytes": 496,
+      "disposition": "irrelevant",
+      "evidence": "Inspected upstream patch content (sha256=ea6ca035de473f34fe3408e15c490b8733452e3e81d529307040baaf6a02aa9c, bytes=496). Changed paths are only unit specs (src/material/chips/chip-listbox.spec.ts). Subject prefix is 'build', but the patch body has no production runtime, style, public API, harness implementation, or config hunks. This package does not ship or depend on upstream Material unit-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior."
+    },
+    {
+      "sha": "307ad0c8abf346232796e17ca7b05e4673ef9ac5",
+      "subject": "fix(material/table): add missing sort tests (#30876)",
+      "files": [
+        "src/material/table/table-data-source.spec.ts"
+      ],
+      "patch_sha256": "43f4f8f78dee89f5d270427e55457424c6ee34bd02ab2efc54d05a12f4b4fa26",
+      "patch_bytes": 3758,
+      "disposition": "irrelevant",
+      "evidence": "Inspected upstream patch content (sha256=43f4f8f78dee89f5d270427e55457424c6ee34bd02ab2efc54d05a12f4b4fa26, bytes=3758). Changed paths are only unit specs (src/material/table/table-data-source.spec.ts). Subject prefix is 'fix(material/table)', but the patch body has no production runtime, style, public API, harness implementation, or config hunks. This package does not ship or depend on upstream Material unit-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior."
     }
   ],
   "deferred_unread_in_bucket": [
@@ -2255,11 +2299,6 @@
       "reason": "prod-harness-or-subject-escalate"
     },
     {
-      "sha": "47ac55fcdc5178f094ad5e8bb2d378f1525d02a8",
-      "subject": "build: fix lint failure (#27876)",
-      "reason": "prod-harness-or-subject-escalate"
-    },
-    {
       "sha": "487c4537847c68638811063adff7c59d8a5d6f7a",
       "subject": "docs(material/dialog): use standalone imports in docs (#28110)",
       "reason": "prod-harness-or-subject-escalate"
@@ -2273,11 +2312,6 @@
       "sha": "1735032610eec0cb4d9695b2fd621a71346495c7",
       "subject": "fix(material-experimental/theming): Update M3 palettes (#28109)",
       "reason": "prod-harness-or-subject-escalate"
-    },
-    {
-      "sha": "3e092f10d49a274d79ca73222510eb45de098a6a",
-      "subject": "refactor(material/datepicker): switch tests to standalone",
-      "reason": "non-test-subject-deferred-wave2"
     },
     {
       "sha": "47b3be5f6fe9bc23e62b2036210ec31f79ab22d4",
@@ -2297,7 +2331,7 @@
     {
       "sha": "14d5de1f2f4d262df9c7afd1e1a1677f7886ec85",
       "subject": "docs(material/dialog): use h2 for dialog title (#28519)",
-      "reason": "non-test-subject-deferred-wave2"
+      "reason": "prod-harness-or-subject-escalate"
     },
     {
       "sha": "d38798a474278c3d4b1533ae3ad7273786be9372",
@@ -2312,7 +2346,7 @@
     {
       "sha": "16d946e7ef8a0908d3b3b65820f757f832b7d646",
       "subject": "test: Fix invalid test that breaks in zoneless (#28815)",
-      "reason": "config-file-escalate"
+      "reason": "prod-harness-or-subject-escalate"
     },
     {
       "sha": "d8a6c3edd8d406b3f1b1c26805612eac8856b745",
@@ -2332,7 +2366,7 @@
     {
       "sha": "263dadf4f2865d93a3455edca87496625a9d538e",
       "subject": "test: Make tests fail on errors and fix newly uncovered failures (#29110)",
-      "reason": "prod-harness-or-subject-escalate"
+      "reason": "deferred"
     },
     {
       "sha": "32c53088d171b949477df8198c26b51ebb8caa74",
@@ -2362,7 +2396,7 @@
     {
       "sha": "2c88e9ba9f9b037683e166ecf0d825ee7e39a79c",
       "subject": "test: Convert some material tests to zoneless (#29309)",
-      "reason": "config-file-escalate"
+      "reason": "prod-harness-or-subject-escalate"
     },
     {
       "sha": "1f992d06c693a6e09332ac83d837c9ff8e1fdf7b",
@@ -2370,18 +2404,8 @@
       "reason": "prod-harness-or-subject-escalate"
     },
     {
-      "sha": "917f0026b1c0b0d80672b0ea1a79a2f0a4bd6e7b",
-      "subject": "build: fix broken build (#29699)",
-      "reason": "prod-harness-or-subject-escalate"
-    },
-    {
       "sha": "cc5332259611bd59dcca3bebf4b99f8052c9c36a",
       "subject": "fix(cdk/tree): warn if mixed node types are used within the same tree",
-      "reason": "prod-harness-or-subject-escalate"
-    },
-    {
-      "sha": "8e091797f8664cf99af86a5c7c4d5615734fcaf1",
-      "subject": "build: fix failing test (#30443)",
       "reason": "prod-harness-or-subject-escalate"
     },
     {
@@ -2432,12 +2456,7 @@
     {
       "sha": "544257ad0f58e70688abe0d80eccaa73d25ba5d8",
       "subject": "test(multiple): remove unnecessary compileComponents calls",
-      "reason": "prod-harness-or-subject-escalate"
-    },
-    {
-      "sha": "307ad0c8abf346232796e17ca7b05e4673ef9ac5",
-      "subject": "fix(material/table): add missing sort tests (#30876)",
-      "reason": "prod-harness-or-subject-escalate"
+      "reason": "deferred"
     },
     {
       "sha": "54d514df66b9a1ea544df0aacc7069defcd78dcd",
@@ -2465,29 +2484,9 @@
       "reason": "prod-harness-or-subject-escalate"
     },
     {
-      "sha": "69e1369c99df0d28a8f305a64fe90d5b58dd8b6a",
-      "subject": "refactor(material/divider): fix strict property initialization errors",
-      "reason": "non-test-subject-deferred-wave2"
-    },
-    {
       "sha": "c16f55921aebbf4c3f07be0c68e85eab1e408867",
       "subject": "build: enable strict property initialization for entire repo (#32567)",
       "reason": "prod-harness-or-subject-escalate"
-    },
-    {
-      "sha": "60ad14c1a25aa57d10e8755168bc90b2b3cb4f4d",
-      "subject": "refactor(material/menu): switch tests away from fakeAsync (#32909)",
-      "reason": "non-test-subject-deferred-wave2"
-    },
-    {
-      "sha": "0affe5aaa704fa0bf923b1be3266515e41d5e350",
-      "subject": "refactor(material/datepicker): switch tests away from fakeAsync (#32903)",
-      "reason": "non-test-subject-deferred-wave2"
-    },
-    {
-      "sha": "1597a2d85049e53e67eabdaa7f37efd1cfaad93e",
-      "subject": "refactor(material/select): move tests away from fakeAsync (#32901)",
-      "reason": "non-test-subject-deferred-wave2"
     },
     {
       "sha": "3da71ce7f921f16392bf454eddbd1c421bfbdd32",
@@ -2495,64 +2494,9 @@
       "reason": "prod-harness-or-subject-escalate"
     },
     {
-      "sha": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7",
-      "subject": "refactor(material/dialog): switch tests away from fakeAsync (#32914)",
-      "reason": "non-test-subject-deferred-wave2"
-    },
-    {
-      "sha": "2ad427438e903cb9f40666207287b13b132a2bc1",
-      "subject": "refactor(material/input): switch tests away from fakeAsync (#32938)",
-      "reason": "non-test-subject-deferred-wave2"
-    },
-    {
-      "sha": "dba28ae0ac585cede26b3846e87c0e1169a4ce73",
-      "subject": "refactor(cdk/a11y): switch tests away from fakeAsync (#32942)",
-      "reason": "non-test-subject-deferred-wave2"
-    },
-    {
-      "sha": "5ad259a25e4b6d6346ee62954fe461f4500c9cee",
-      "subject": "refactor(material/slider): switch tests away from fakeAsync (#32952)",
-      "reason": "non-test-subject-deferred-wave2"
-    },
-    {
-      "sha": "75ef78451f2ae49b916c494d7a898707d7051acf",
-      "subject": "refactor(material/checkbox): switch tests away from fakeAsync (#32960)",
-      "reason": "non-test-subject-deferred-wave2"
-    },
-    {
       "sha": "780639853242381b4fa307f913a49241e9514ba6",
       "subject": "build: add explicit change detection to tests (#33010)",
       "reason": "prod-harness-or-subject-escalate"
-    },
-    {
-      "sha": "046e1a2789c2a18cc14707d7a78a0efab6a2fdd0",
-      "subject": "refactor(material/slide-toggle): switch tests away from fakeAsync (#33033)",
-      "reason": "non-test-subject-deferred-wave2"
-    },
-    {
-      "sha": "1afcedeaf622d300a1238823e1376d1633c50074",
-      "subject": "refactor(material/bottom-sheet): switch tests away from fakeAsync (#33108)",
-      "reason": "non-test-subject-deferred-wave2"
-    },
-    {
-      "sha": "a36374c4ff809ba5c181f74feb26fce232ebb068",
-      "subject": "refactor(material/autocomplete): switch tests away from fakeAsync (#33105)",
-      "reason": "non-test-subject-deferred-wave2"
-    },
-    {
-      "sha": "39b0f5521960f93af96943968961f1ba3e241307",
-      "subject": "refactor(material/tooltip): switch tests away from fakeAsync (#33100)",
-      "reason": "non-test-subject-deferred-wave2"
-    },
-    {
-      "sha": "b04751caf2ec3f0b8f8d8ef17dd6e5a8c34adfd6",
-      "subject": "refactor(material/chips): switch tests away from fakeAsync (#33112)",
-      "reason": "non-test-subject-deferred-wave2"
-    },
-    {
-      "sha": "cb820b1d8a8d942965790b75b48c21e345c86219",
-      "subject": "refactor(material/sidenav): switch tests away from fakeAsync (#33121)",
-      "reason": "non-test-subject-deferred-wave2"
     },
     {
       "sha": "3ef56a682fa797563d3269f18769ddceda05f760",
@@ -2560,69 +2504,14 @@
       "reason": "prod-harness-or-subject-escalate"
     },
     {
-      "sha": "fccc2ef9bbe9875eaa6ca2cc137f78aa95ef4dd2",
-      "subject": "refactor(cdk/scrolling): switch tests away from fakeAsync (#33150)",
-      "reason": "non-test-subject-deferred-wave2"
-    },
-    {
       "sha": "7798bb7c64233db5e5d27a192c060ae52fc413d9",
       "subject": "docs(material/chips): clean up forms examples (#33185)",
-      "reason": "non-test-subject-deferred-wave2"
-    },
-    {
-      "sha": "45582795cc29c3bcb1265b7f6c541b165be3ef9d",
-      "subject": "refactor(material/list): switch tests away from fakeAsync (#33189)",
-      "reason": "non-test-subject-deferred-wave2"
-    },
-    {
-      "sha": "a3479f74eedcba962c642cb297f4d37028d8c023",
-      "subject": "refactor(cdk/overlay): switch tests away from fakeAsync (#33192)",
-      "reason": "non-test-subject-deferred-wave2"
-    },
-    {
-      "sha": "2f4a2b4c003594f64f6e9b17bf38b929739fd535",
-      "subject": "refactor(cdk/table): remove explicit change detection",
-      "reason": "non-test-subject-deferred-wave2"
-    },
-    {
-      "sha": "658952712df682e26130b754fa19c041712ad747",
-      "subject": "refactor(material/input): remove explicit change detection",
-      "reason": "non-test-subject-deferred-wave2"
-    },
-    {
-      "sha": "f35961a095dc2fbee6bfeb09878a82d391932cf7",
-      "subject": "refactor(material/snack-bar): switch tests away from fakeAsync (#33261)",
-      "reason": "non-test-subject-deferred-wave2"
-    },
-    {
-      "sha": "96503186a6316cf2811eaa885f64cb5ab1ffed6e",
-      "subject": "refactor(material/tabs): switch tests away from fakeAsync (#33234)",
-      "reason": "non-test-subject-deferred-wave2"
-    },
-    {
-      "sha": "01cc137b512f34af97f1adb40fc95043329beef2",
-      "subject": "refactor(material/icon): switch tests away from fakeAsync (#33301)",
-      "reason": "non-test-subject-deferred-wave2"
-    },
-    {
-      "sha": "23914beeb3c369bcd6fe1ab72469e252a78b963b",
-      "subject": "refactor(material/button-toggle): switch tests away from fakeAsync (#33302)",
-      "reason": "non-test-subject-deferred-wave2"
+      "reason": "prod-harness-or-subject-escalate"
     },
     {
       "sha": "2b82d638c90df83d44613b81c2eeeab24821e8b2",
       "subject": "build: fix build failure (#33408)",
       "reason": "prod-harness-or-subject-escalate"
-    },
-    {
-      "sha": "72fb9d2d47d52a570a1d81c287244a52e53a5b93",
-      "subject": "refactor(cdk/layout): switch tests away from fakeAsync (#33446)",
-      "reason": "non-test-subject-deferred-wave2"
-    },
-    {
-      "sha": "85a81a614992ec9a42f40d525cda8a265291fcbe",
-      "subject": "refactor(cdk/table): switch tests away from fakeAsync (#33456)",
-      "reason": "non-test-subject-deferred-wave2"
     },
     {
       "sha": "ec2dbff5ec67bd2ceb36283bfc5c5f0526c9e51e",
@@ -2632,8 +2521,8 @@
   ],
   "limitations": [
     "Titles/paths alone did not close rows; each selected SHA has an inspected patch hash.",
+    "Subject prefixes build:/fix: were allowed only when the patch body was limited to unit specs.",
     "Escalated/deferred members remain missing from the ledger.",
-    "Does not claim G11 or flip upstream-audit-disposition unless missing=0.",
-    "Tests can encode behavior; this batch is limited to harness/unit test reorganization without production hunks."
+    "Does not claim G11 or flip upstream-audit-disposition unless missing=0."
   ]
 }

@@ -288,9 +288,12 @@ if (existsSync(mapReportPath)) {
     map.token_receipts = 'compatibility/rc/reports/companion-bridge-tokens.json';
     map.limitations = [
       'Name/mixin presence plus compiled token receipts (companion-bridge-tokens.json).',
-      'No component was rendered; not RC-05-A02 / G07.',
+      'Partial rendered computed-style slice may exist in companion-computed-styles.json; not RC-05-A02 / G07.',
       'Does not claim G06–G08.',
     ];
+    if (existsSync(path.join(root, 'compatibility/rc/reports/companion-computed-styles.json'))) {
+      map.computed_styles_slice = 'compatibility/rc/reports/companion-computed-styles.json';
+    }
     writeFileSync(mapReportPath, JSON.stringify(map, null, 2) + '\n');
   } catch {
     // map report refresh is best-effort; token report is authoritative

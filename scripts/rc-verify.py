@@ -280,6 +280,26 @@ def main() -> int:
     results["companion-bridge-tokens"] = "pass" if code == 0 else "fail"
     implemented_ran.append("companion-bridge-tokens")
 
+    # companion-computed-styles: Chromium rendered CSS-var slice (badge/divider/icon/toolbar); not G07.
+    code = run_node("scripts/check-companion-computed-styles.mjs", ["--run", str(run_path)])
+    computed_detail = ROOT / "compatibility/rc/reports/companion-computed-styles.json"
+    if computed_detail.is_file():
+        (out_dir / "reports").mkdir(parents=True, exist_ok=True)
+        (out_dir / "reports" / "companion-computed-styles-detail.json").write_text(computed_detail.read_text())
+    write_check_report(
+        out_dir,
+        run_id,
+        line,
+        "companion-computed-styles",
+        exit_code=code,
+        limitations=[
+            "Rendered badge/divider/icon/toolbar CSS custom-property rows only.",
+            "Does not claim RC-05-A02 / G06-G08.",
+        ],
+    )
+    results["companion-computed-styles"] = "pass" if code == 0 else "fail"
+    implemented_ran.append("companion-computed-styles")
+
     # browser-matrix: real Chromium dialog/select PR-slice + dialog CSP-nonce; not the full matrix.
     code = run_node("scripts/run-browser-matrix-slice.mjs", ["--run", str(run_path)])
     browser_detail = ROOT / "compatibility/rc/reports/browser-matrix-slice.json"
