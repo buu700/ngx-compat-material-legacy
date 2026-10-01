@@ -3,11 +3,11 @@
   "role": "canonical upstream disposition ledger (partial)",
   "g11_claim": "not-passed",
   "seed_rows": 1697,
-  "ledger_rows": 611,
-  "closed_dispositions": 611,
+  "ledger_rows": 620,
+  "closed_dispositions": 620,
   "open_or_deferred": 0,
   "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-  "batch_id": "owned-retain-not-applied-2026-10-01-g",
+  "batch_id": "sensitive-owned-retain-2026-10-01-h",
   "entries": [
     {
       "sha": "2dc599762eab74812c011370d30f9cec307e884d",
@@ -2238,7 +2238,7 @@
     {
       "sha": "46db6a6ba5619cddffc1dbf7a78696d5249abf50",
       "bucket": "behavior-semantic",
-      "subject": "fix(material/button-toggle): standard button toggle strong focus bord… (#28790)",
+      "subject": "fix(material/button-toggle): standard button toggle strong focus bord\u2026 (#28790)",
       "final_disposition": "irrelevant",
       "reason": "The patch rounds the standard button toggle focus indicator to the toggle shape. The package does not define that structural stylesheet. The focus-indicator radius slots were not added.",
       "read_note_disposition": "not-owned",
@@ -2910,7 +2910,7 @@
     {
       "sha": "d7fc5601405f83e5418121382b7647d4dcc7793c",
       "bucket": "behavior-semantic",
-      "subject": "fix(docs): add example for adding icon in meta section using matListI… (#30068)",
+      "subject": "fix(docs): add example for adding icon in meta section using matListI\u2026 (#30068)",
       "final_disposition": "irrelevant",
       "reason": "The patch adds a matListItemMeta example to the list guide. This package does not ship that guide and does not define matListItemMeta. That example was not added.",
       "read_note_disposition": "not-owned",
@@ -5484,7 +5484,7 @@
       "bucket": "behavior-semantic",
       "subject": "fix(cdk/overlay): ensure re-exported transitive `Dir` directive can be imported (#30679)",
       "final_disposition": "inherited",
-      "reason": "The patch re-exports Dir as ɵɵDir from the CDK overlay module so the compiler can import it. This package does not define OverlayModule. That re-export was not added. Inherited via installed peer @angular/cdk@22.1.7 (advertised floor ^22.1.7); upstream SHA is an ancestor of v22.1.7.",
+      "reason": "The patch re-exports Dir as \u0275\u0275Dir from the CDK overlay module so the compiler can import it. This package does not define OverlayModule. That re-export was not added. Inherited via installed peer @angular/cdk@22.1.7 (advertised floor ^22.1.7); upstream SHA is an ancestor of v22.1.7.",
       "read_note_disposition": "not-owned",
       "files": [
         "src/cdk/overlay/overlay-module.ts"
@@ -11668,11 +11668,182 @@
       "recorded_at_utc": "2026-10-01T17:00:24Z",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "f4a02adb779968ab1e696aa93dc69b62e7a18929",
+      "bucket": "behavior-semantic",
+      "subject": "feat(cdk/a11y): use native media query for high contrast detection (#29678)",
+      "final_disposition": "inherited",
+      "reason": "The patch retargets the CDK high-contrast mixin and HighContrastModeDetector to the forced-colors media query. Owned SCSS includes cdk.high-contrast from the installed peer; installed @angular/cdk@22.1.7 a11y/_index.scss emits @media (forced-colors: ...) and HighContrastModeDetector observes (forced-colors: active). MatLegacy does not reimplement that detector. Inherited via installed peer @angular/cdk@22.1.7 (advertised floor ^22.1.7); upstream SHA is an ancestor of v22.1.7.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/cdk/a11y/_index.scss",
+        "src/material/core/option/option.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "peer_floor": {
+        "package": "@angular/cdk",
+        "advertised_range": "^22.1.7",
+        "installed_version": "22.1.7",
+        "contains_fix_tag": "v22.1.7",
+        "sha_is_ancestor_of_tag": true,
+        "cdk_modules": [
+          "a11y"
+        ],
+        "owned_import_intersection": [
+          "a11y"
+        ],
+        "source_check": "node_modules/@angular/cdk/a11y/_index.scss high-contrast mixin uses forced-colors; HighContrastModeDetector observes forced-colors: active"
+      },
+      "batch_id": "sensitive-owned-retain-2026-10-01-h",
+      "recorded_at_utc": "2026-10-01T17:05:21Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "fead293e907f40a37e478779c6b0b3b50992262b",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/badge): change legacy container size default (#29713)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch hardcodes M3 legacy badge container sizes to 16px and stops the line-height from falling back to the current size token. The owned badge still sizes from the 22px default and has no M3 badge tokens. Those sizes were not changed. Upstream change is not applicable: this package has no badge entry (projects/ngx-material-legacy has no *badge* directory among the 22 legacy families). Verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/badge/badge.scss",
+        "src/material/core/tokens/m3/mat/_badge.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "glob projects/ngx-material-legacy/*badge* \u2192 empty; badge not in 22-family surface",
+      "batch_id": "sensitive-owned-retain-2026-10-01-h",
+      "recorded_at_utc": "2026-10-01T17:05:21Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "cc0532bb26106691b5fcd5a159d66b4adfa8cf1b",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/badge): content incorrectly truncated in M3 (#29854)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch emits badge width, height, and line-height from token slots and adds M3 line-height tokens. The owned badge still sets those dimensions from the 22px size. Those tokens were not added. Upstream change is not applicable: this package has no badge entry (projects/ngx-material-legacy has no *badge* directory among the 22 legacy families). Verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/badge/badge.scss",
+        "src/material/core/tokens/m3/mat/_badge.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "glob projects/ngx-material-legacy/*badge* \u2192 empty; badge not in 22-family surface",
+      "batch_id": "sensitive-owned-retain-2026-10-01-h",
+      "recorded_at_utc": "2026-10-01T17:05:21Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "c1ff40f3bfdfc8dcbe073aa86896bb17d6f97de0",
+      "bucket": "behavior-semantic",
+      "subject": "fix(cdk/dialog): default aria-modal to false (#30411)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch defaults CDK/Material dialog and bottom-sheet aria-modal to false. Installed @angular/cdk@22.1.7 dialog defaults ariaModal = false, but owned legacy-dialog/dialog-config.ts intentionally overrides ariaModal to true (legacy a11y contract). That default was not changed to false. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change dialog aria-modal contract, verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/dialog/dialog-config.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-dialog/dialog-config.ts L21: ariaModal: boolean = true",
+      "batch_id": "sensitive-owned-retain-2026-10-01-h",
+      "recorded_at_utc": "2026-10-01T17:05:21Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "8f0369a27faa7cd6758d78a0a4e1c40811747e49",
+      "bucket": "behavior-semantic",
+      "subject": "fix(mat/paginator): fix focus issues with paginator buttons (#29379)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch marks paginator buttons disabledInteractive and styles them from aria-disabled instead of the disabled attribute. The owned paginator still binds the disabled attribute and does not set disabledInteractive. That change was not applied. Upstream change targets MatButton disabledInteractive behavior. Owned legacy paginator does not use disabledInteractive: disabledInteractive and aria-disabled styling for focus; owned paginator binds native [disabled] only (5 bindings) and has no disabledInteractive. Upstream change is not applicable to the native-disabled paginator path, verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/paginator/paginator.html",
+        "src/material/paginator/paginator.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "paginator.html: disabledInteractive=0; [disabled]=5",
+      "batch_id": "sensitive-owned-retain-2026-10-01-h",
+      "recorded_at_utc": "2026-10-01T17:05:21Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "8d3bca5eb0cc304075c85aa56ecdd6785e7e2a2d",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/paginator): ignore clicks on disabled buttons (#30138)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch routes paginator button clicks through _buttonClicked so a disabledInteractive button does not change the page. Owned paginator buttons still bind [disabled] and call firstPage, previousPage, nextPage, and lastPage directly (legacy-paginator/paginator.html). That click path was not changed. Upstream change targets MatButton disabledInteractive behavior. Owned legacy paginator does not use disabledInteractive: _buttonClicked so disabledInteractive buttons do not change the page; owned buttons bind [disabled] and call firstPage/previousPage/nextPage/lastPage directly, so native disabled already blocks activation. Upstream change is not applicable to the native-disabled paginator path, verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/paginator/paginator.html",
+        "src/material/paginator/paginator.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "paginator.html: no _buttonClicked; direct page methods with [disabled]",
+      "batch_id": "sensitive-owned-retain-2026-10-01-h",
+      "recorded_at_utc": "2026-10-01T17:05:21Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "75713b0a0ae95c8a54d381ffbf91e28fbf2db89a",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/paginator): prevent keyboard nav to disabled buttons (#30627)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch sets tabindex to -1 on disabled paginator buttons so keyboard navigation skips them while disabledInteractive keeps focus. Owned paginator buttons still bind disabled only (legacy-paginator/paginator.html). That tabindex was not added. Upstream change targets MatButton disabledInteractive behavior. Owned legacy paginator does not use disabledInteractive: tabindex -1 while disabledInteractive keeps focus; owned buttons bind disabled only, and native disabled already removes them from sequential focus. Upstream change is not applicable to the native-disabled paginator path, verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/paginator/paginator.html"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "paginator.html: no tabindex/-1; [disabled] only",
+      "batch_id": "sensitive-owned-retain-2026-10-01-h",
+      "recorded_at_utc": "2026-10-01T17:05:21Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "3465f9271811733fb623536af0e53cd529b4b2a9",
+      "bucket": "behavior-semantic",
+      "subject": "fix(multiple): ensure mat-option parents are the offsetParent (#30977)",
+      "final_disposition": "already-adapted",
+      "reason": "The patch changes MDC autocomplete/select panels from position static to relative so nested options use the panel as offsetParent. Owned autocomplete panel already sets position: relative (legacy-autocomplete/autocomplete.scss). Owned select panel uses menu-common.base(), which sets position: absolute \u2014 also a non-static containing block for offsetParent. Neither owned panel uses the pre-fix static positioning the patch addressed. Already adapted for offsetParent purposes.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/select/select.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "autocomplete.scss position:relative; menu-common.scss position:absolute (select panel)",
+      "batch_id": "sensitive-owned-retain-2026-10-01-h",
+      "recorded_at_utc": "2026-10-01T17:05:21Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "9e438901555eaedc6617dd241ffabe391cba3b64",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/form-field): work around closure compiler issue (#28185)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch aliases MatFormFieldControl and adds a local interface that extends it so Closure property renaming keeps the control shape. legacy-form-field/form-field.ts queries ContentChild(MatFormFieldControl) directly. That alias and interface were not added. Upstream change is not applicable: it is a Closure Compiler property-renaming workaround. This package does not use Closure Compiler for the form-field build path. Verified legacy-form-field/form-field.ts still queries ContentChild(MatFormFieldControl) directly with no alias.",
+      "read_note_disposition": "not-applied",
+      "files": [
+        "src/material/form-field/form-field.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "legacy-form-field/form-field.ts: no MatFormFieldControl alias/interface; ContentChild direct",
+      "batch_id": "sensitive-owned-retain-2026-10-01-h",
+      "recorded_at_utc": "2026-10-01T17:05:21Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
     }
   ],
   "limitations": [
     "Observations converted only with linked read-note evidence and owned source_check; not auto-approval of unread SHAs.",
     "Does not claim G11 or flip upstream-audit-disposition.",
-    "Sensitive a11y/focus/overlay/aria/OnPush/Safari/requireSelection fix-subjects left open for individual review; missing=1086."
+    "Sensitive a11y/focus/overlay adaptation-required rows left missing (91); see adaptation queue."
   ]
 }
