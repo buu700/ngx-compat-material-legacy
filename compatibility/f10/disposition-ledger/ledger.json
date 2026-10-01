@@ -3,11 +3,11 @@
   "role": "canonical upstream disposition ledger (partial)",
   "g11_claim": "not-passed",
   "seed_rows": 1697,
-  "ledger_rows": 509,
-  "closed_dispositions": 509,
+  "ledger_rows": 611,
+  "closed_dispositions": 611,
   "open_or_deferred": 0,
   "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-  "batch_id": "owned-retain-not-applied-2026-10-01-f",
+  "batch_id": "owned-retain-not-applied-2026-10-01-g",
   "entries": [
     {
       "sha": "2dc599762eab74812c011370d30f9cec307e884d",
@@ -2238,7 +2238,7 @@
     {
       "sha": "46db6a6ba5619cddffc1dbf7a78696d5249abf50",
       "bucket": "behavior-semantic",
-      "subject": "fix(material/button-toggle): standard button toggle strong focus bord\u2026 (#28790)",
+      "subject": "fix(material/button-toggle): standard button toggle strong focus bord… (#28790)",
       "final_disposition": "irrelevant",
       "reason": "The patch rounds the standard button toggle focus indicator to the toggle shape. The package does not define that structural stylesheet. The focus-indicator radius slots were not added.",
       "read_note_disposition": "not-owned",
@@ -2910,7 +2910,7 @@
     {
       "sha": "d7fc5601405f83e5418121382b7647d4dcc7793c",
       "bucket": "behavior-semantic",
-      "subject": "fix(docs): add example for adding icon in meta section using matListI\u2026 (#30068)",
+      "subject": "fix(docs): add example for adding icon in meta section using matListI… (#30068)",
       "final_disposition": "irrelevant",
       "reason": "The patch adds a matListItemMeta example to the list guide. This package does not ship that guide and does not define matListItemMeta. That example was not added.",
       "read_note_disposition": "not-owned",
@@ -5484,7 +5484,7 @@
       "bucket": "behavior-semantic",
       "subject": "fix(cdk/overlay): ensure re-exported transitive `Dir` directive can be imported (#30679)",
       "final_disposition": "inherited",
-      "reason": "The patch re-exports Dir as \u0275\u0275Dir from the CDK overlay module so the compiler can import it. This package does not define OverlayModule. That re-export was not added. Inherited via installed peer @angular/cdk@22.1.7 (advertised floor ^22.1.7); upstream SHA is an ancestor of v22.1.7.",
+      "reason": "The patch re-exports Dir as ɵɵDir from the CDK overlay module so the compiler can import it. This package does not define OverlayModule. That re-export was not added. Inherited via installed peer @angular/cdk@22.1.7 (advertised floor ^22.1.7); upstream SHA is an ancestor of v22.1.7.",
       "read_note_disposition": "not-owned",
       "files": [
         "src/cdk/overlay/overlay-module.ts"
@@ -9867,11 +9867,1812 @@
       "recorded_at_utc": "2026-10-01T16:57:12Z",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "064415be3912667c94ba898ce4bc66ccc1131b59",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/progress-bar): remove track color workaround (#28416)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch stops setting the progress-bar track color through theme-styles and lets the token theme emit it. styles/progress-bar/_progress-bar-theme.scss still passes track-color to theme-styles before calling theme. That workaround was not removed. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/progress-bar/_progress-bar-theme.scss",
+        "src/material/progress-bar/progress-bar.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned M2 tokens remain under styles/core/tokens/m2; create-token-values-mixed=0.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "cbeeb3ae1771c4ccbd6c5677cf73ac3d21c593c5",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/checkbox): use token for disabled label color",
+      "final_disposition": "not-applicable",
+      "reason": "The patch moves the disabled checkbox label color into a token slot. The owned theme still sets that color from the foreground disabled-text palette. The package has no mat checkbox token file. That color was not moved. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/checkbox/_checkbox-theme.scss",
+        "src/material/checkbox/checkbox.scss",
+        "src/material/core/tokens/m2/mat/_checkbox.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned M2 tokens remain under styles/core/tokens/m2; create-token-values-mixed=0.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "e05795dde0ca56be3398f34cb834df007f18da1a",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/button): calculate icon button padding based on tokens",
+      "final_disposition": "not-applicable",
+      "reason": "The patch moves the icon-button state-layer size into density tokens and calculates padding from token variables. The owned unthemable map still sets state-layer-size to 48px, and the density function still returns an empty map. The owned theme still computes padding from a Sass size. That calculation was not changed. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/button/icon-button.scss",
+        "src/material/core/tokens/m2/mdc/_icon-button.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned M2 tokens remain under styles/core/tokens/m2; create-token-values-mixed=0.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "23e2f3eeb29e39229cb56b4fd58852bd484e6da5",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/badge): move structural styles out of theme (#28452)",
+      "final_disposition": "irrelevant",
+      "reason": "The patch moves the badge size and content rules into a structural stylesheet loaded by a private component. The owned theme still contains those rules. This package has no badge component. The rules were not moved. Upstream change is irrelevant to this package: the touched files/APIs are absent from the owned legacy tree.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/badge/_badge-theme.scss",
+        "src/material/badge/badge.scss",
+        "src/material/badge/badge.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Package has styles/badge theme helpers but no legacy-badge component/entry.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "957bc487bf8077cd4b657baa3d4ed64aebff9196",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material-experimental/theming): align fab with M3 spec",
+      "final_disposition": "not-applicable",
+      "reason": "The patch sets the extended fab container height to 48px and its shape to 24px. The owned token map still sets both values to null. Those values were not changed. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/tokens/m2/mdc/_extended-fab.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Package has no M3 token/system definitions under styles/core/tokens (only m2).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "056e2221ecfd75808c74e2ef9a783bcb82a25c03",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material-experimental/theming): implement M3 badge (#28460)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch moves badge size and offset into unthemable tokens, including a container shape and legacy size tokens. The owned unthemable function still returns an empty map, and the theme still contains the size rules. Those tokens were not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/badge/_badge-theme.scss",
+        "src/material/badge/badge.scss",
+        "src/material/core/tokens/m2/mat/_badge.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Package has no M3 token/system definitions under styles/core/tokens (only m2).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "3ccee77d14e2808791240123f312609a7c7647d0",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material-experimental/theming): align form field icons with M3 (#28463)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch adds leading and trailing icon color tokens and paints them on the form-field icon prefix and suffix. The owned mat form-field token map has no leading-icon-color, and the filled and outlined text-field maps still leave the hover label colors null. Those icon tokens were not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/tokens/m2/mat/_form-field.scss",
+        "src/material/core/tokens/m2/mdc/_filled-text-field.scss",
+        "src/material/form-field/form-field.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Package has no M3 token/system definitions under styles/core/tokens (only m2).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "76f43e4df0a2f9af5f3288ebd0635fb6945180c0",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/slide-toggle): use css var for disabled label color (#28471)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch stores the disabled slide-toggle label color in a CSS variable and reads that variable from the structural stylesheet. The owned theme still sets the color directly on the disabled label. The variable was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/slide-toggle/_slide-toggle-theme.scss",
+        "src/material/slide-toggle/slide-toggle.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned M2 tokens remain under styles/core/tokens/m2; create-token-values-mixed=0.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "2744a4cbfa4d4335d7f682de3509f834bde8d04e",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/slide-toggle): move state-layer-size token (#28397)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch moves the switch state-layer size into density tokens and stops calling the MDC density mixin. The owned unthemable map still sets state-layer-size to 40px, the density function still returns an empty map, and the theme still calls the MDC density mixin. The token was not moved. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/tokens/m2/mdc/_switch.scss",
+        "src/material/slide-toggle/_slide-toggle-theme.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned M2 tokens remain under styles/core/tokens/m2; create-token-values-mixed=0.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "2d43f93fe4beb8bfd27fd7a48e3e811e11f99bcc",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/slide-toggle): Emit token values under current selector or root (#28390)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch emits the slide-toggle base, color, typography, and density tokens under current-selector-or-root. The owned mixins still nest those styles under .mat-mdc-slide-toggle. The emission selector was not changed. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/slide-toggle/_slide-toggle-theme.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned M2 tokens remain under styles/core/tokens/m2; create-token-values-mixed=0.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "0a1c8eedb45c3e24247539abe489ea835d19a0d7",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/chips): Tokenize chip outline and disabled opacity (#28488)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch adds a mat chip token for the disabled container opacity and sets the outline width and colors to concrete values. The package has no mat chip token file. The owned MDC chip map still leaves the outline width and colors null. Those values were not changed. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/chips/chip.scss",
+        "src/material/core/tokens/m2/mat/_chip.scss",
+        "src/material/core/tokens/m2/mdc/_chip.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned M2 tokens remain under styles/core/tokens/m2; create-token-values-mixed=0.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "58764afec2b181c6be1b21f952215c3aa0a160f0",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/chips): Tokenize the hover & focus overlays (#28497)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch replaces the hardcoded chip hover and focus overlay opacities with token slots and sets the hover opacity to 0.04. The owned chip map still leaves the hover state-layer color and opacity null. Those values were not changed. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/chips/chip.scss",
+        "src/material/core/tokens/m2/mdc/_chip.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned M2 tokens remain under styles/core/tokens/m2; create-token-values-mixed=0.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "fca43aa49b060e77d27b9286740c9535b4ae42c2",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/select): styles for m3 (#28492)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch adds an elevation shadow token for the select panel and paints it from the token slot. The owned unthemable function still returns an empty map. The shadow token was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/tokens/m2/mat/_select.scss",
+        "src/material/select/select.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Package has no M3 token/system definitions under styles/core/tokens (only m2).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "32f86e48e17caa316baa4738e0f458a64e16e4e5",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/chips): Tokenize the selected state (#28498)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch adds selected chip color tokens and sets the selected outline width and hover overlay opacity to concrete values. The package has no mat chip token file. The owned MDC chip map still leaves the selected outline width and hover opacity null. Those values were not changed. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/chips/chip.scss",
+        "src/material/core/tokens/m2/mat/_chip.scss",
+        "src/material/core/tokens/m2/mdc/_chip.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned M2 tokens remain under styles/core/tokens/m2; create-token-values-mixed=0.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "b6e0b20e1f72f48622179f0a8859b76df056b484",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material-experimental/theming): Fix chip trailing icon opacity in M3 (#28530)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch sets the disabled trailing-icon opacity to 1 and adds trailing-action opacities of 0.54 and 1. The package has no mat chip token file. The owned MDC chip map still leaves the disabled trailing-icon opacity null. Those values were not changed. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/chips/chip.scss",
+        "src/material/core/tokens/m2/mat/_chip.scss",
+        "src/material/core/tokens/m2/mdc/_chip.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Package has no M3 token/system definitions under styles/core/tokens (only m2).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "e8bfb8649e3b016c1d4ae358378fed6debd9dc86",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/menu): Update token values and styles for M3 (#28470)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch adds menu item spacing, icon size, and divider spacing tokens, and changes the submenu icon mixin to take those sizes. The owned unthemable map still returns only the container shape. The submenu mixins still take a side padding. Those tokens were not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/style/_menu-common.scss",
+        "src/material/core/tokens/m2/mat/_menu.scss",
+        "src/material/menu/menu.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Package has no M3 token/system definitions under styles/core/tokens (only m2).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "9a16aa134d5fba97eadb56f11c56984bfb85cec4",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/select): fix m3 arrow alignment (#28545)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch moves the filled-select arrow offset into a density token that is translateY(-8px) at the default scale and none at the lowest scale. The owned density mixin still clears the transform when the filled field is shorter than the label minimum. The arrow token was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/tokens/m2/mat/_select.scss",
+        "src/material/select/_select-theme.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Package has no M3 token/system definitions under styles/core/tokens (only m2).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "01536671fbcc19d4bdec1d2f6edcddbfc4244ff2",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/slide-toggle): m3 track outline and handle opacity (#28565)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch moves the disabled handle opacity to a mat switch token and adds track outline width and color. The owned MDC switch still sets disabled-handle-opacity to 0.38. The package has no mat switch token file. Those tokens were not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/tokens/m2/mat/_switch.scss",
+        "src/material/core/tokens/m2/mdc/_switch.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Package has no M3 token/system definitions under styles/core/tokens (only m2).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "208fab2901223e51ece59160a325f3f0c4e27dab",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/button-toggle): Add remaining typography tokens needed for M3 (#28578)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch replaces the button-toggle text-font token with label font, size, line height, weight, and tracking. The owned legacy and standard maps still set text-font from the typography config. Those label tokens were not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/tokens/m2/mat/_legacy-button-toggle.scss",
+        "src/material/core/tokens/m2/mat/_standard-button-toggle.scss",
+        "src/material/button-toggle/button-toggle.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Package has no M3 token/system definitions under styles/core/tokens (only m2).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "cfdfa9a672c4edd5136edb7054d55eff3debe4e1",
+      "bucket": "behavior-semantic",
+      "subject": "fix(multiple): derive all token values from theme (#28664)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch derives token text colors from the theme foreground palette, with a private flag that keeps the old hardcoded colors for internal builds. The owned tokens still use rgba of the hardcoded on-surface color. The theme lookup was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/tokens/m2/mat/_select.scss",
+        "src/material/core/tokens/m2/mdc/_dialog.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned M2 tokens remain under styles/core/tokens/m2; create-token-values-mixed=0.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "c20bac78fbd69734ded68e2c411adb2c2913ce02",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/checkbox): derive checkmark color from palette",
+      "final_disposition": "not-applicable",
+      "reason": "The patch derives the selected checkbox checkmark from the palette contrast color, unless a private internal-build flag keeps the old contrast tone. The owned checkbox still sets the checkmark with its contrast-tone helper. The palette lookup was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/tokens/m2/mdc/_checkbox.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned M2 tokens remain under styles/core/tokens/m2; create-token-values-mixed=0.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "577d070ffeb637df89879b2fdee261f280530e9a",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/chips): derive surface color from palette",
+      "final_disposition": "not-applicable",
+      "reason": "The patch mixes the chip state-layer color into the card surface instead of mixing a contrast tone of that surface. The owned chip color function still takes a palette config and sets the elevated container from the primary palette. That surface mix was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/tokens/m2/mdc/_chip.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned M2 tokens remain under styles/core/tokens/m2; create-token-values-mixed=0.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "a99d8e929fbf786001b2ba49387c95799359b456",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/core): mark fields on HasErrorState as nullable (#28689)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch marks the error-state form group, form, and ngControl fields as nullable. The owned interface still types those fields as required. The null unions were not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/common-behaviors/error-state.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned HasErrorState interface still types form/group/ngControl as required.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "e524567a7bfe850dfd2408249dcc3eaaaa8e3593",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/core): theming validation for m2 themes firing incorrectly (#28707)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch reads the stored M2 color, density, and typography maps before falling back to the public getters, so the duplicate-style check does not treat every M2 theme as the same. The owned check still reads those configs through the public getters. The stored-map lookup was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/theming/_theming.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned theming still uses historical public getters for duplicate-style checks.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "3e91f91139147e0441bc561457b23e998a23d514",
+      "bucket": "behavior-semantic",
+      "subject": "refactor(material/tooltip): Remove use of zone onStable for overlay positioning (#28668)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch updates the tooltip overlay position in afterNextRender instead of waiting for the zone microtask queue to empty. The owned tooltip still waits for onMicrotaskEmpty. The render hook was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/tooltip/tooltip.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned tooltip/menu still wait on NgZone onStable/onMicrotaskEmpty; afterNextRender path not ported.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "b9d4048c5ff14bbad260fff5e635785233d9c294",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/chips): use concrete value for remove icon size (#28751)",
+      "final_disposition": "already-adapted",
+      "reason": "Owned chip remove icon already uses a concrete 18px size; the MDC trailing-action size substitution is already satisfied historically.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/chips/chip.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned chip remove icon already uses concrete 18px size per read note.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "58f047b37a1b5a547749f7b071fef6bd251e5f8d",
+      "bucket": "behavior-semantic",
+      "subject": "refactor(material/menu): Remove use of zone onStable to focus items (#28663)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch focuses the first menu item from afterNextRender instead of NgZone.onStable. The owned menu still waits on onStable in menu-base.ts. afterNextRender was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/menu/menu.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned tooltip/menu still wait on NgZone onStable/onMicrotaskEmpty; afterNextRender path not ported.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "752f5607ccf1fe4890984d62e4358b758ad9d004",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/menu): invert arrow in RTL (#28830)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch drops right: auto on the submenu icon and scales a nested polygon in RTL. The owned icon still sets right: auto and inverts with scaleX(-1) on the icon itself. The polygon rule was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/style/_menu-common.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned submenu icon still uses historical scaleX(-1)/translateY RTL path.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "b3298f1b8eba33087bda2d72ae85e2d5f99e67b2",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/tabs): remove dependency on NgClass (#28875)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch binds tab label and body classes with the class attribute instead of ngClass. The owned tab group still uses ngClass, and the label and body class inputs still accept string arrays. The binding was not changed. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/tabs/tab-group.html",
+        "src/material/tabs/tab.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned templates still bind ngClass on class maps (historical NgModule tree).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "d3ea71d30de65a22874d1f931e7eb550170997cb",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/autocomplete): remove dependency on NgClass (#28849)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch binds autocomplete panel classes with class attributes instead of an ngClass map. The owned panel still uses ngClass on a class map, including the historical visible class. The class bindings were not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/autocomplete/autocomplete.html",
+        "src/material/autocomplete/autocomplete.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned templates still bind ngClass on class maps (historical NgModule tree).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "9381f90653c8e43d470f9f364f46744e04356c02",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/menu): remove dependency on NgClass (#28877)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch binds the menu panel class with the class attribute and copies the class map before changing it. The owned menu still uses ngClass and mutates the class map in place. The copy and class binding were not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/menu/menu.html",
+        "src/material/menu/menu.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned templates still bind ngClass on class maps (historical NgModule tree).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "94a083408dbedb9ee18b0ce793ea8ef364d0e8bd",
+      "bucket": "behavior-semantic",
+      "subject": "fix(multiple): remove label for attribute on non-native elements (#28948)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch omits the form-field label for attribute when a control sets disableAutomaticLabeling. The owned label still always uses the control id. The flag was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/form-field/form-field.html",
+        "src/material/form-field/form-field-control.ts",
+        "src/material/select/select.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned form-field label always uses control id; disableAutomaticLabeling not present.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "d0a2d3a6e99507344d30765a70d7dd77de8fe12b",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/dialog): mark dialog content as scrollable (#28963)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch adds CdkScrollable as a host directive on standalone dialog content. The owned content directive stays non-standalone and does not host CdkScrollable. The host directive was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/dialog/dialog-content-directives.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned dialog content directive stays non-standalone without CdkScrollable host.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "233c8a329d229c02cb0252a0022f588437336d80",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/core): M3 themes not inserting loaded marker",
+      "final_disposition": "not-applicable",
+      "reason": "The patch emits the theme loaded marker once from both the base and M3 theme mixins. The owned core theme still emits the marker from the historical theme mixin. The once-only mixin was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/_core-theme.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Package has no M3 token/system definitions under styles/core/tokens (only m2).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "a4846a961924442649f0b19a3979fa92922b5b5f",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/core): implement elevation classes in M3",
+      "final_disposition": "not-applicable",
+      "reason": "The patch moves elevation classes into tokenized app styles and M3 shadow tokens. The owned theme still emits mat-elevation-z0 through z24 from the historical elevation mixin. The token classes were not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/_core-theme.scss",
+        "src/material/core/_core.scss",
+        "src/material/core/tokens/m2/mat/_app.scss",
+        "src/material/core/tokens/m3/mat/_app.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Package has no M3 token/system definitions under styles/core/tokens (only m2).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "03d00f57347bf6f0669dd2fc8fdb70fee4b22afd",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/menu): update elevation logic for M3",
+      "final_disposition": "not-applicable",
+      "reason": "The patch resolves menu elevation from a CSS custom property and sets the M3 base level to 2. The owned menu keeps a fixed base elevation of 4. The runtime lookup was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/tokens/m2/mat/_menu.scss",
+        "src/material/core/tokens/m3/mat/_menu.scss",
+        "src/material/menu/menu.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Package has no M3 token/system definitions under styles/core/tokens (only m2).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "b116643a062749fa2c964820ae9f9c0e76c40717",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/core): require theme for option typography (#29416)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch removes the null-theme fallback from option and optgroup typography tokens. The owned functions still substitute the MDC fallback when the config is null. The fallback was kept. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/tokens/m2/mat/_option.scss",
+        "src/material/core/tokens/m2/mat/_optgroup.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned M2 tokens remain under styles/core/tokens/m2; create-token-values-mixed=0.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "92ab713a65e2d622f975a6e610f981563a12b592",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/tabs): prevent tab header from collapsing when empty inside a drop list (#29418)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch gives a drop-list tab header a token min-height so it does not collapse when empty. The owned tab header styles have no that drop-list rule. The min-height was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/tabs/_tabs-common.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned tab header styles have no drop-list min-height rule; CDK drop-list integration not in legacy contract.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "56b977f9fd911bb4a83094d41338753ea304afb8",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/checkbox): account for disabledInteractive in harness",
+      "final_disposition": "not-applicable",
+      "reason": "The patch treats a missing disabled attribute as disabled when aria-disabled is true, so a disabledInteractive checkbox still reports disabled. The owned harness still reads only the disabled attribute. The aria-disabled fallback was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/checkbox/testing/checkbox-harness.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned tree lacks new APIs (disabledInteractive=0, canSelectNullable=0, HOST_TAG_NAME=0, closePredicate=1).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "002b0541a9ec6bc389aef7cfa6d136e832e67f62",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/radio): account for disabledInteractive in harness",
+      "final_disposition": "not-applicable",
+      "reason": "The patch treats a missing disabled attribute as disabled when aria-disabled is true, so a disabledInteractive radio still reports disabled. The owned harness still reads only the disabled attribute. The aria-disabled fallback was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/radio/testing/radio-harness.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned tree lacks new APIs (disabledInteractive=0, canSelectNullable=0, HOST_TAG_NAME=0, closePredicate=1).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "c3e02797421c58e3f4e83edc06a3d56365e5f2c6",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/slide-toggle): account for disabledInteractive in harness",
+      "final_disposition": "not-applicable",
+      "reason": "The patch sets aria-disabled when the slide toggle is disabled and disabledInteractive, and the harness falls back to that attribute. The owned template has no disabledInteractive binding. The owned harness still reads only the disabled attribute. Those changes were not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/slide-toggle/slide-toggle.html",
+        "src/material/slide-toggle/testing/slide-toggle-harness.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned tree lacks new APIs (disabledInteractive=0, canSelectNullable=0, HOST_TAG_NAME=0, closePredicate=1).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "adf413670fe10bcfbfff1ec424fcfe2b76d66bdb",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/menu): inconsistent layout of submenu icon (#29603)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch sets transform-origin center on the RTL submenu arrow polygon so the flip stays centered. The owned submenu icon flips with translateY and scaleX on the icon itself and has no that polygon rule. The origin was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/style/_menu-common.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned submenu icon still uses historical scaleX(-1)/translateY RTL path.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "855ed49482b1e215f43e1e9b96f1b28eded94640",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/core): avoid having to manually load ripple styles",
+      "final_disposition": "not-applicable",
+      "reason": "The patch removes the ripple include from the core mixin and loads the ripple structure stylesheet through a private style loader when a ripple is created. The owned core mixin still includes the ripple styles. The style loader was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/_core.scss",
+        "src/material/core/ripple/ripple-renderer.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned core still emits historical structural styles (visually-hidden refs=2, strong-focus=3, mat-mdc-focus=2).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "df21d2b0915ee54fbf04b93ccba512a9161f5008",
+      "bucket": "behavior-semantic",
+      "subject": "fix(cdk/overlay): avoid having to manually load structural styles",
+      "final_disposition": "not-applicable",
+      "reason": "The patch removes the overlay include from the core mixin and loads overlay structural styles through a private CDK style loader. The owned core mixin still includes the overlay styles. The CDK loader was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/_core.scss",
+        "src/cdk/overlay/overlay-container.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned core still emits historical structural styles (visually-hidden refs=2, strong-focus=3, mat-mdc-focus=2).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "ad18e6d74e57e4980a411f0ac9d0b502d5fc577f",
+      "bucket": "behavior-semantic",
+      "subject": "fix(cdk/text-field): avoid having to manually load text field styles",
+      "final_disposition": "not-applicable",
+      "reason": "The patch removes the text-field autosize and autofill includes from the core mixin and loads those styles through a private CDK style loader. The owned core mixin still includes both text-field styles. The CDK loader was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/_core.scss",
+        "src/cdk/text-field/text-field-style-loader.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned core still emits historical structural styles (visually-hidden refs=2, strong-focus=3, mat-mdc-focus=2).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "a9da72ed1551601b22b1a509f2e50227ac23f432",
+      "bucket": "behavior-semantic",
+      "subject": "fix(multiple): consolidate strong focus indicators (#29623)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch collapses the mat and mat-mdc focus indicators into one mat-focus-indicator class and drops the public strong-focus-indicators wrappers. The owned core still emits both prefixes, and the public strong-focus-indicators export stays. The consolidation was not applied. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/focus-indicators/_private.scss",
+        "src/material/core/_core.scss",
+        "src/material/_index.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned core still emits historical structural styles (visually-hidden refs=2, strong-focus=3, mat-mdc-focus=2).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "9333de0537e7b905407999820bf283f4943c986b",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/tooltip): remove old IE workaround (#29674)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch removes the tooltip host zoom binding that forced a layout in IE and Edge. The owned tooltip still sets that zoom when the tooltip is visible. The binding was not removed. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/tooltip/tooltip.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned sources retain historical APIs/workarounds/elevation/sanity marker paths verified by read note.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "54875a3258a89a5326d7e224b6550c96e5801cd5",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/core): drop sanity checks (#29688)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch removes the theme-loaded marker from the core theme mixin and deprecates the sanity-check token. The owned core theme still emits .mat-theme-loaded-marker. The marker was not removed. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/_core-theme.scss",
+        "src/material/core/common-behaviors/common-module.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned sources retain historical APIs/workarounds/elevation/sanity marker paths verified by read note.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "d206225c58d071e6cb6b680ef11d1c7bab7a73cc",
+      "bucket": "behavior-semantic",
+      "subject": "feat(material/core): create focus-indicator structural styles loader (#29763)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch loads focus-indicator structural styles from a private style loader. The owned core mixin still emits both the mat and mat-mdc prefixes. The style loader was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/focus-indicators/structural-styles.ts",
+        "src/material/core/focus-indicators/structural-styles.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned core still emits historical structural styles (visually-hidden refs=2, strong-focus=3, mat-mdc-focus=2).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "5242169ebd53598f4fe1c5e05de72e852777b76a",
+      "bucket": "behavior-semantic",
+      "subject": "refactor(multiple): remove focus indicators structural styles from core (#29804)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch removes focus-indicator structural styles from the core mixin and loads them from each component through a private style loader. The owned core mixin still emits both the mat and mat-mdc prefixes. The loader was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/_core.scss",
+        "src/material/button/button-base.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned core still emits historical structural styles (visually-hidden refs=2, strong-focus=3, mat-mdc-focus=2).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "e975bb94996ad4031d0207e7d7af66c601e708b1",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/radio): use tokens for focused border color (#29716)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch fills the M2 radio unselected-focus-icon-color token and reads it from a token slot on the focused outer circle. The owned M2 radio token still leaves that color null (styles/core/tokens/m2/mdc/_radio.scss). That token was not filled. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/tokens/m2/mdc/_radio.scss",
+        "src/material/radio/radio.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned M2 tokens remain under styles/core/tokens/m2; create-token-values-mixed=0.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "57d9a2fa2d574dd79be3b1595768825c958265c9",
+      "bucket": "behavior-semantic",
+      "subject": "refactor(multiple): remove visually hidden styles from core (#29812)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch empties the core mixin by removing cdk.a11y-visually-hidden() and loads those styles through a private CDK style loader. Owned core still includes cdk.a11y-visually-hidden() (styles/core/_core.scss and styles/legacy-core/_core.scss). That include was not removed. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/_core.scss",
+        "src/cdk/a11y"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned core still emits historical structural styles (visually-hidden refs=2, strong-focus=3, mat-mdc-focus=2).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "6b3a371686ff90f6f7f5c301ec23797840007620",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/button): anchor not handling disabledInteractive correctly (#29938)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch omits aria-disabled on a button anchor unless it is disabled. Owned MatLegacyAnchor still sets aria-disabled from disabled.toString() (legacy-button/button.ts). That binding was not changed. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/button/button-base.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned tree lacks new APIs (disabledInteractive=0, canSelectNullable=0, HOST_TAG_NAME=0, closePredicate=1).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "b072047b8a909ac51cf39bef2d5333264f05633d",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/menu): use static elevation (#29968)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch replaces the menu's depth-based elevation class with a static box-shadow token. Owned menu still raises elevation from a base of 4 by submenu depth, capped at 24 (legacy-menu/menu.ts and legacy-menu/internal/menu-base.ts). That elevation was not made static. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/menu/menu.ts",
+        "src/material/menu/menu-trigger.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned sources retain historical APIs/workarounds/elevation/sanity marker paths verified by read note.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "3a3be4c851cf1c0cdae42bae3a57c00f4d90991f",
+      "bucket": "behavior-semantic",
+      "subject": "fix(multiple): remove usages of Sass globals (#29972)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch replaces Sass global mix, opacity, and map-merge calls with the color and map module functions, and raises the Sass range to 1.80.6. Owned private-rgba-to-hex still calls the global mix function (styles/core/theming/_theming.scss). The owned Sass pin stays 1.104.1. Those calls were not rewritten. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/theming/_theming.scss",
+        "src/material/core/tokens/_m3-tokens.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned Sass still uses historical global mix/opacity/map-merge helpers in private paths.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "3a7724e9580c64dd4a9f4d3eb7b3cad2182cea2f",
+      "bucket": "behavior-semantic",
+      "subject": "fix(multiple): remove webkit-overflow-scrolling (#30003)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch removes -webkit-overflow-scrolling: touch from the CDK virtual scroll viewport, the menu common styles, and the drawer. Owned menu common styles still set that property (styles/core/style/_menu-common.scss). That property was not removed. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/cdk/scrolling/virtual-scroll-viewport.scss",
+        "src/material/core/style/_menu-common.scss",
+        "src/material/sidenav/drawer.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned sources retain historical APIs/workarounds/elevation/sanity marker paths verified by read note.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "26a817ccb3b7391b1baed6693adfb80a88cdd9c1",
+      "bucket": "behavior-semantic",
+      "subject": "fix(multiple): use cross-compatible type for setTimeout (#30073)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch types timeout ids as ReturnType<typeof setTimeout> instead of number. Owned snack-bar still types its duration and announce timeout ids as number (legacy-snack-bar/internal/snack-bar-ref.ts and snack-bar-container-base.ts). Those types were not changed. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/snack-bar/snack-bar-ref.ts",
+        "src/material/snack-bar/snack-bar-container.ts",
+        "src/material/dialog/dialog-ref.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned snack-bar/dialog still type timeout ids as number.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "02967137f3aba759811e81bc7be5acc6cc6ebc6d",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/select): add opt-in input that allows selection of nullable options (#30142)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch adds canSelectNullableOptions so a null option can stay selected instead of resetting the select. Owned select still treats a null option as a reset (legacy-select/internal/select-base.ts). That input was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/select/select.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned tree lacks new APIs (disabledInteractive=0, canSelectNullable=0, HOST_TAG_NAME=0, closePredicate=1).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "c12b73ee6648723fb900607ff8c8095163957e92",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/table): improve filter predicate efficiency (#30172)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch matches a table filter against each property value instead of one concatenated string. Owned filterPredicate still joins values with the triangle delimiter and searches that string (legacy-table/internal/table-data-source-base.ts). That predicate was not changed. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/table/table-data-source.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned table filterPredicate still joins values with historical delimiter search.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "b924e869c548850caf9d511a5fa56ab402d435bb",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/theming): fix not found error in the guide duplicate theming styles document (#30108)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch points the duplicate theming styles warning at the v18 Material guide instead of a GitHub blob that 404s. Owned theming still cites the GitHub blob (styles/core/theming/_theming.scss). That URL was not changed. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/theming/_theming.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned theming warning still cites historical GitHub blob URL.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "af29a92c01fd425537a8f28fc71b24aeb027b0ab",
+      "bucket": "behavior-semantic",
+      "subject": "perf(material/tooltip): Tiny but measurable optimization to MatTooltip construction. Defer hooking up to directionality changes until overlay is created. (#30214)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch waits to subscribe to direction changes until the tooltip overlay is created. Owned tooltip still subscribes in the constructor (legacy-tooltip/internal/tooltip-base.ts). That subscription was not moved. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/tooltip/tooltip.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned tooltip still subscribes to directionality in constructor (legacy-tooltip).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "d8d3987e015120f5572f09a6643222eb3ebdeb34",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/select): remove color transition w/ no animations module (#30304)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch also disables the select placeholder color transition under .mat-form-field-no-animations. Owned placeholder already disables that transition under ._mat-animation-noopable (legacy-select/select.scss). The no-animations class was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/select/select.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned sources retain historical APIs/workarounds/elevation/sanity marker paths verified by read note.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "013fe04564fc7eb83cec112c9893163ab431cff1",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/autocomplete): switch away from animations module (#30356)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch replaces the autocomplete panel animation with a 120ms scale enter and clears the form value immediately. Owned panel still toggles visibility and clears immediately because _animationDone is null (legacy-autocomplete/autocomplete.scss, autocomplete.ts). That scale animation was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/autocomplete/autocomplete.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned select/autocomplete still use historical animationend / animations-module paths.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "b7c377bd517ae31bd65ed7f445931ef349392033",
+      "bucket": "behavior-semantic",
+      "subject": "fixup! fix(material/select): switch away from animations module",
+      "final_disposition": "not-applicable",
+      "reason": "The patch emits select openedChange on a microtask and closes on overlay Escape instead of the panel animationend. Owned select still emits openedChange when the panel animation finishes and still binds detach to close (legacy-select/internal/select-base.ts, select.html). That timing was not changed. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/select/select.ts",
+        "src/material/select/select.html"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned select/autocomplete still use historical animationend / animations-module paths.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "3d7f2714afd4a8acdbb292296a491b1992dc5088",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/snack-bar): snack-bar action button does not follow material guidelines (#27769)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch colors the snack-bar action from the primary palette instead of black or the accent text color. Owned snack-bar tokens still use black on a dark theme and the accent text color otherwise (styles/core/tokens/m2/mat/_snack-bar.scss). That color was not changed. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/tokens/m2/mat/_snack-bar.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned M2 tokens remain under styles/core/tokens/m2; create-token-values-mixed=0.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "f0d6658263083fe8737a8ebd9299c90106faad8b",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/checkbox): ensure native control receives clicks (#30511)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch raises the MDC checkbox input above other layers so it receives clicks. Owned checkbox input does not set that z-index (legacy-checkbox/checkbox.scss). That stacking was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/checkbox/_checkbox-common.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Read note + owned source: change targets current MDC/M3 surface; legacy historical styles retained.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "29e67e63d02cd113e8724b24f1682d7390f2b751",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/radio): Optional typing of MatRadioChange (#30477)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch makes MatRadioChange generic so the value type is a type parameter. Owned radio change events stay untyped (legacy-radio/internal/radio-base.ts). That type parameter was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/radio/radio.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned tree lacks new APIs (disabledInteractive=0, canSelectNullable=0, HOST_TAG_NAME=0, closePredicate=1).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "dc8f98e9e34f9af6572a6cf08f9c263f7e42a118",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/select): Optional typing of MatSelectChange (#30324)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch makes MatSelectChange generic so the value type is a type parameter. Owned select change events stay untyped (legacy-select/select.ts). That type parameter was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/select/select.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned tree lacks new APIs (disabledInteractive=0, canSelectNullable=0, HOST_TAG_NAME=0, closePredicate=1).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "32353fb3ab97de9a5617115b92dafa667d53f1e0",
+      "bucket": "behavior-semantic",
+      "subject": "fix(multiple): resolve directive host binding issues (#30606)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch widens autocomplete, datepicker, and timepicker input handlers from a string or KeyboardEvent to Event, and optional-chains menu.panelId. Owned autocomplete still types those handlers as KeyboardEvent (legacy-autocomplete/internal/autocomplete-trigger-base.ts). Owned menu already optional-chains panelId. Datepicker and timepicker inputs are not defined here. The handler signatures were not widened. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/autocomplete/autocomplete-trigger.ts",
+        "src/material/menu/menu-trigger.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned autocomplete/menu keep historical Event/string handler typing and panelId access.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "810495ce0085c4faff49143e340f8bf46a02fe31",
+      "bucket": "behavior-semantic",
+      "subject": "fix(multiple): deprecate exported factories (#30608)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch marks exported factories for removal in version 21. Owned factories still carry only the docs-private comment (legacy-checkbox/internal/checkbox-base.ts). That removal notice was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/checkbox/checkbox-config.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned tree lacks new APIs (disabledInteractive=0, canSelectNullable=0, HOST_TAG_NAME=0, closePredicate=1).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "2c7199c02886ebf0c8c668f9290ed47a1b7b20ab",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/button): align harness with new terminology",
+      "final_disposition": "not-applicable",
+      "reason": "The patch replaces raised, flat, and stroked button harness variants with an appearance filter and MDC selectors. Owned button harness still returns those historical variants from the attribute selectors (legacy-button/testing/button-harness.ts). That harness was not changed. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/button/testing/button-harness.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned tree lacks new APIs (disabledInteractive=0, canSelectNullable=0, HOST_TAG_NAME=0, closePredicate=1).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "d5ba63d00a635059ac0c8dcc5ebb495a55777f0a",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/select): use flexible overlay dimensions (#30628)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch sets cdkConnectedOverlayFlexibleDimensions on the select overlay. Owned select does not set that input (legacy-select/select.html). That binding was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/select/select.html"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned select overlay template does not set cdkConnectedOverlayFlexibleDimensions.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "097f49d90f5fe079a0399fd499202a8bdd1542cf",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/autocomplete): allow overlay backdrop by setting hasBackdrop option (#30631)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch adds hasBackdrop and backdropClass to the autocomplete defaults and passes them to the overlay. Owned autocomplete does not define those options. Those overlay settings were not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/autocomplete/autocomplete.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned tree lacks new APIs (disabledInteractive=0, canSelectNullable=0, HOST_TAG_NAME=0, closePredicate=1).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "e1cf2844f047bfd044cb8b5306faad4bdc09bdbd",
+      "bucket": "behavior-semantic",
+      "subject": "fix(multiple): avoid repeating selectors in m3 themes (#30645)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch emits M3 theme tokens through create-token-values-mixed so selectors are not repeated around mixed declarations. Owned themes still call create-token-values (styles/core/tokens/_token-utils.scss). That mixed mixin was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/tokens/_token-utils.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Package has no M3 token/system definitions under styles/core/tokens (only m2).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "33795a1a138cb4930b9e20773403ec712e0ace73",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/chips): implement disabledInteractive in chip input (#30665)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch keeps a disabled chip input interactive through disabledInteractive, aria-disabled, and readonly. Owned chip input still sets the disabled attribute from disabled (legacy-chips/chip-input.ts). That interactive-disabled mode was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/chips/chip-input.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned tree lacks new APIs (disabledInteractive=0, canSelectNullable=0, HOST_TAG_NAME=0, closePredicate=1).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "387313fc4112399d05d2b677c9e5fcf7f2424e49",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/tabs): allow ID to be set on tab (#30768)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch lets a tab supply its own label id. Owned tab labels still use the generated group id and index (legacy-tabs/internal/tab-group-base.ts). That id input was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/tabs/tab.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned tree lacks new APIs (disabledInteractive=0, canSelectNullable=0, HOST_TAG_NAME=0, closePredicate=1).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "9bf4be9e231add2698324f020ef2c8c3c28769cc",
+      "bucket": "behavior-semantic",
+      "subject": "fix(multiple): rename token prefixes to match components (#30802)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch renames token prefixes so the component name comes first, including legacy-button-toggle to button-toggle-legacy. Owned tokens still use legacy-button-toggle and standard-button-toggle (styles/core/tokens/m2/mat/_legacy-button-toggle.scss). Those prefixes were not renamed. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/button-toggle/_m2-legacy-button-toggle.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned M2 tokens remain under styles/core/tokens/m2; create-token-values-mixed=0.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "5229fe0a0824a94baf1c595b798ae11fd19f1a09",
+      "bucket": "behavior-semantic",
+      "subject": "fix(multiple): rename hardcoded tokens that were renamed (#30807)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch renames hardcoded custom properties and density prefixes to the new component-first names, including circular-progress to progress-spinner. Owned progress spinner still sets width and height from diameter (legacy-progress-spinner/progress-spinner.ts). Owned tokens still use the circular-progress prefix (styles/core/tokens/m2/mdc/_circular-progress.scss). Those names were not renamed. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/progress-spinner/progress-spinner.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned M2 tokens remain under styles/core/tokens/m2; create-token-values-mixed=0.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "48894ad5570e3dfdbd3e2128ebcd88c206d80733",
+      "bucket": "behavior-semantic",
+      "subject": "fix(multiple): use DI token for tag name (#30892)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch reads the host tag through the HOST_TAG_NAME injection token instead of the element. Owned chip still reads element.tagName (legacy-chips/chip.ts). This package does not define the badge or combobox classes. That token was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/chips/chip.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "HOST_TAG_NAME absent (0); owned chip reads element.tagName.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "d3a8c5b8921c057a7655b44e2e6fc7c282b66b0b",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/slide-toggle): opacity tokens not being used (#30946)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch replaces hardcoded slide-toggle state-layer opacities with token slots. Owned slide toggle still uses the historical ripple opacities (legacy-slide-toggle/slide-toggle.scss). Those slots were not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/slide-toggle/slide-toggle.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned M2 tokens remain under styles/core/tokens/m2; create-token-values-mixed=0.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "764a1ccd15f5f231058789eb98cdcf4e40dc69db",
+      "bucket": "behavior-semantic",
+      "subject": "feat(material/dialog): add closePredicate option",
+      "final_disposition": "not-applicable",
+      "reason": "The patch adds a dialog closePredicate and returns early from close when it rejects the result. Owned dialog still closes through the animation path and passes closePredicate undefined to the CDK dialog (legacy-dialog/internal/dialog-base.ts). The option and the close guard were not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/dialog/dialog-config.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned dialog passes closePredicate: undefined into CDK dialog; public closePredicate option not exposed.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "48644f56a134fd1c78847bae01ab9e35f6ad9320",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/chips): icon cut off when text-spacing is increased (#30867)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch gives MDC chip icons min-height fit-content so increased text spacing does not clip them. Owned chip remove and trailing icons stay 18px (legacy-chips/chips.scss). That min-height was not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/chips/chip.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned chip remove/trailing icons stay fixed 18px; MDC min-height fit-content not applied.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "2d28807a0d50e8c065ff4900516dce560636112d",
+      "bucket": "behavior-semantic",
+      "subject": "refactor(material/autocomplete): switch to tree shakeable overlay APIs",
+      "final_disposition": "not-applicable",
+      "reason": "The patch creates the autocomplete overlay through createOverlayRef and createRepositionScrollStrategy. Owned autocomplete still creates the overlay with Overlay.create and uses scrollStrategies.reposition (legacy-autocomplete/internal/autocomplete-trigger-base.ts). Those calls were not switched. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/autocomplete/autocomplete-trigger.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned overlay paths still use Overlay.create/scrollStrategies (createOverlayRef=0).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "d9b91de2eb82cd46ff039d43f38ede73f735bf69",
+      "bucket": "behavior-semantic",
+      "subject": "refactor(material/dialog): switch to tree shakeable overlay APIs",
+      "final_disposition": "not-applicable",
+      "reason": "The patch opens the dialog with createBlockScrollStrategy and createGlobalPositionStrategy. Owned dialog still uses scrollStrategies.block and position().global() (legacy-dialog/internal/dialog-base.ts). Those calls were not switched. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/dialog/dialog.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned overlay paths still use Overlay.create/scrollStrategies (createOverlayRef=0).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "c9ccc21f21a1c71ff597ce541870f9ff5258a921",
+      "bucket": "behavior-semantic",
+      "subject": "refactor(material/menu): switch to tree shakeable overlay APIs",
+      "final_disposition": "not-applicable",
+      "reason": "The patch creates the menu overlay through createOverlayRef and createRepositionScrollStrategy, and listens on overlay keydownEvents. Owned menu still creates the overlay with Overlay.create and uses scrollStrategies.reposition (legacy-menu/internal/menu-trigger-base.ts). Those calls were not switched. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/menu/menu-trigger.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned overlay paths still use Overlay.create/scrollStrategies (createOverlayRef=0).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "f5c4f632d04556c0452ea4aff01297ae5f79c106",
+      "bucket": "behavior-semantic",
+      "subject": "refactor(material/select): switch to tree shakeable overlay APIs",
+      "final_disposition": "not-applicable",
+      "reason": "The patch builds the select scroll strategy with createRepositionScrollStrategy. Owned select still returns overlay.scrollStrategies.reposition (legacy-select/internal/select-base.ts). That call was not switched. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/select/select.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned overlay paths still use Overlay.create/scrollStrategies (createOverlayRef=0).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "16eb87cc96bffe705816dfb3bde6ba0937bb12fe",
+      "bucket": "behavior-semantic",
+      "subject": "refactor(material/snack-bar): switch to tree shakeable overlay APIs",
+      "final_disposition": "not-applicable",
+      "reason": "The patch creates the snack-bar overlay through createOverlayRef and createGlobalPositionStrategy. Owned snack bar still uses Overlay.position().global() and Overlay.create (legacy-snack-bar/internal/snack-bar-base.ts). Those calls were not switched. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/snack-bar/snack-bar.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned overlay paths still use Overlay.create/scrollStrategies (createOverlayRef=0).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "21b4a60ca59d6673328bf54a540aa54fec54a188",
+      "bucket": "behavior-semantic",
+      "subject": "refactor(material/tooltip): switch to tree shakeable overlay APIs",
+      "final_disposition": "not-applicable",
+      "reason": "The patch creates the tooltip overlay through createOverlayRef, createFlexibleConnectedPositionStrategy, and createRepositionScrollStrategy. Owned tooltip still uses Overlay.create, flexibleConnectedTo, and scrollStrategies.reposition (legacy-tooltip/internal/tooltip-base.ts). Those calls were not switched. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/tooltip/tooltip.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned overlay paths still use Overlay.create/scrollStrategies (createOverlayRef=0).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "50a9a9b9daabc06e16a63f03668df2fde192ab44",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/table): height tokens not applying to flex table (#30978)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch reads flex table row heights from token slots, with the historical heights as fallbacks. Owned flex table still sets the header to 56px and the row and footer to 48px (styles/table/_table-flex-styles.scss). Those slots were not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/table/_table-flex-styles.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned M2 tokens remain under styles/core/tokens/m2; create-token-values-mixed=0.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "2455a42d3c5866e122421f144f08ae6fa4df4198",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/stepper): Update token values for M3 and add color variant support (#28430)",
+      "final_disposition": "irrelevant",
+      "reason": "The patch adds stepper header shape tokens and an options rest parameter so the color mixin can take an M3 color variant. The owned unthemable function still returns an empty map, and the color mixin still takes a single config. Those tokens and the rest parameter were not added. Upstream change is irrelevant to this package: the touched files/APIs are absent from the owned legacy tree.",
+      "read_note_disposition": "not-applied",
+      "files": [
+        "src/material/core/tokens/m2/mat/_stepper.scss",
+        "src/material/stepper/_stepper-theme.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Package has no M3 token/system definitions under styles/core/tokens (only m2).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "095947c8c3a79fecf4e56fc39ab61b0cc6e03eea",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/button): support palettes for icon button in M3 (#29433)",
+      "final_disposition": "irrelevant",
+      "reason": "The patch adds color-variant rest parameters and M3 icon-button palettes. The owned color mixin still takes a single config. The rest parameters and M3 palettes were not added. Upstream change is irrelevant to this package: the touched files/APIs are absent from the owned legacy tree.",
+      "read_note_disposition": "not-applied",
+      "files": [
+        "src/material/button/_icon-button-theme.scss",
+        "src/material/core/tokens/m3/mat/_icon-button.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Package has no M3 token/system definitions under styles/core/tokens (only m2).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "01711b180404ad029bef54e81bdc90fb158dc506",
+      "bucket": "behavior-semantic",
+      "subject": "fix(multiple): account for mixed declarations in latest Sass version (#29596)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch bumps Sass to 1.77 and moves CSS declarations ahead of nested rules so newer Sass accepts mixed declarations. The owned styles keep their historical nesting. The declaration reorder was not applied. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "not-applied",
+      "files": [
+        "package.json",
+        "src/material/button/button.scss",
+        "src/material/checkbox/checkbox.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned styles keep historical nesting order; Sass mixed-declaration reorder not applied.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "cb1450fc76998426111e150a983deb31ecbe42ce",
+      "bucket": "behavior-semantic",
+      "subject": "fix(multiple): change fallbacks to use m3 (#29528)",
+      "final_disposition": "irrelevant",
+      "reason": "The patch makes unresolved tokens fall back to M3 system values and sets --mat-app-on-surface to initial in the core mixin. The owned core mixin does not set that variable, and the owned token utilities do not return an M3 system fallback. Those fallbacks were not added. Upstream change is irrelevant to this package: the touched files/APIs are absent from the owned legacy tree.",
+      "read_note_disposition": "not-applied",
+      "files": [
+        "src/material/core/_core.scss",
+        "src/material/core/tokens/_token-utils.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Package has no M3 token/system definitions under styles/core/tokens (only m2).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "23789d21f5440ebb365f441ba1c825bd69179897",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/form-field): incorrect form field border radius with system-level themes (#29966)",
+      "final_disposition": "irrelevant",
+      "reason": "The patch remaps the M3 filled text field container shape from the system top-corner token to corner-extra-small. The owned package has no M3 filled text field tokens. That radius was not remapped. Upstream change is irrelevant to this package: the touched files/APIs are absent from the owned legacy tree.",
+      "read_note_disposition": "not-applied",
+      "files": [
+        "src/material/core/tokens/m3/mdc/_filled-text-field.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Package has no M3 token/system definitions under styles/core/tokens (only m2).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "1568ac287911c3d8f02e9c54d80d8cda4bd40873",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/core): update prebuilt themes to use mat.theme (#29989)",
+      "final_disposition": "irrelevant",
+      "reason": "The patch rebuilds the M3 prebuilt themes through m3-system.theme. The owned prebuilt themes stay on define-light-theme (styles/core/theming/prebuilt/indigo-pink.scss). Those themes were not rebuilt. Upstream change is irrelevant to this package: the touched files/APIs are absent from the owned legacy tree.",
+      "read_note_disposition": "not-applied",
+      "files": [
+        "src/material/core/theming/prebuilt/azure-blue.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Package has no M3 token/system definitions under styles/core/tokens (only m2).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "5f238ab1a9b81a615671b319ef2361d7c4fc5ae2",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/slider): active vs inactive tick mark count (#30319)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch counts one more active tick and one fewer inactive tick on the MDC slider. Owned slider draws ticks with a repeating background and does not count active and inactive ticks (legacy-slider/slider.ts). That count was not changed. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "not-applied",
+      "files": [
+        "src/material/slider/slider.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned legacy-slider uses repeating background ticks; MDC tick counting/positioning not applicable.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "b5076f77f2a50a17a8dd6d02f163d9030eb66e69",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/slider): tick mark positioning (#30329)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch positions MDC slider ticks from the track width minus 6px and mirrors them in RTL without reversing the array. Owned slider positions ticks with a percentage background and a half-interval translate (legacy-slider/slider.ts). That positioning was not changed. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "not-applied",
+      "files": [
+        "src/material/slider/slider.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned legacy-slider uses repeating background ticks; MDC tick counting/positioning not applicable.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "2d86ad441eeb3ec5fac3e99d7c9081db356615b3",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/slider): fix clobbered token for hover/focus/pressed (#30754)",
+      "final_disposition": "irrelevant",
+      "reason": "The patch removes M3 slider focus and hover state-layer colors that were overwriting the pressed state. This package has no M3 slider token file. Those tokens were not removed. Upstream change is irrelevant to this package: the touched files/APIs are absent from the owned legacy tree.",
+      "read_note_disposition": "not-applied",
+      "files": [
+        "src/material/core/tokens/m3/mdc/_slider.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Package has no M3 token/system definitions under styles/core/tokens (only m2).",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "00e70fd8e3542cc7a64c555a84f8092016c5236e",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/slide-toggle): delete custom typography tokens (#28365)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch deletes the slide-toggle token map and stops emitting label-text font, size, tracking, line-height, and weight. styles/core/tokens/m2/mat/_slide-toggle.scss still returns those tokens, and the theme still writes them. The token file was not deleted. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/tokens/m2/mat/_slide-toggle.scss",
+        "src/material/slide-toggle/_slide-toggle-theme.scss",
+        "src/material/slide-toggle/slide-toggle.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned styles/core/tokens/m2/mat/_slide-toggle.scss still returns label-text typography tokens; theme still writes them.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "edce90652ade6715b4404db284f684b1b511fae4",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/core): delete deprecated APIs (#29651)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch deletes the color, disabled, ripple, tabindex, and initialized mixins and removes HasElementRef, HasErrorState, and mixinErrorState. The owned common behaviors still export those mixins and interfaces. The deletion was not applied. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "owned-retained",
+      "files": [
+        "src/material/core/common-behaviors/index.ts",
+        "src/material/core/common-behaviors/error-state.ts",
+        "src/material/core/common-behaviors/color.ts"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned common-behaviors still export color/disabled/ripple/tabindex/initialized mixins and HasErrorState.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "09111d00299c7747ed6543d91e257f7224e1119e",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/button-toggle): Add checkmark indicators with hideSingleSelectionIndicator and hideMultipleSelectionIndicator input and config options (#28553)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch renders a checkmark on a checked button toggle and adds inputs that hide the single-selection and multiple-selection indicators. The owned button toggle does not render that checkmark. Those inputs were not added. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "not-applied",
+      "files": [
+        "src/material/button-toggle/button-toggle.ts",
+        "src/material/button-toggle/button-toggle.html"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned button-toggle does not render selection checkmark or hideSingle/MultipleSelectionIndicator inputs.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+    },
+    {
+      "sha": "fea07a750bd7eac11d56209ddc5f8e70da98c51a",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/button): incorrect outlined focus overlay shape when border radius is customized (#30513)",
+      "final_disposition": "not-applicable",
+      "reason": "The patch removes the transparent border on the MDC outlined button ripple and outlines that ripple in high contrast. Owned button styles do not set that ripple border. That border was not removed. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "read_note_disposition": "not-applied",
+      "files": [
+        "src/material/button/button.scss"
+      ],
+      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "source_check": "Owned button styles do not set MDC outlined ripple transparent border; current-only.",
+      "batch_id": "owned-retain-not-applied-2026-10-01-g",
+      "recorded_at_utc": "2026-10-01T17:00:24Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
     }
   ],
   "limitations": [
     "Observations converted only with linked read-note evidence and owned source_check; not auto-approval of unread SHAs.",
     "Does not claim G11 or flip upstream-audit-disposition.",
-    "Remaining owned-retained/not-applied and unread classes still open (missing=1188)."
+    "Sensitive a11y/focus/overlay/aria/OnPush/Safari/requireSelection fix-subjects left open for individual review; missing=1086."
   ]
 }
