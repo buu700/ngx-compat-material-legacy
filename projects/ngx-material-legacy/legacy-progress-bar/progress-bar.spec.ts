@@ -1,5 +1,5 @@
 import {TestBed, ComponentFixture} from '@angular/core/testing';
-import {ApplicationRef, Component, DebugElement, Provider, Type} from '@angular/core';
+import {ApplicationRef, Component, DebugElement, NgZone, Provider, Type} from '@angular/core';
 import {By} from '@angular/platform-browser';
 import {dispatchFakeEvent} from '../../cdk/testing/private';
 import {
@@ -343,15 +343,17 @@ describe('MatProgressBar', () => {
         fixture.detectChanges();
 
         const animationEndSpy = jasmine.createSpy();
-        const appRef = TestBed.inject(ApplicationRef);
-        spyOn(appRef, 'tick');
+        // Angular 22 test zones no longer reliably surface zone.run as ApplicationRef.tick;
+        // assert the owned gate: skip NgZone.run when nobody listens, enter it when they do.
+        const zone = TestBed.inject(NgZone);
+        const runSpy = spyOn(zone, 'run').and.callThrough();
 
         progressComponent.value = 30;
         progressComponent.bufferValue = 60;
         // On animation end, output should be emitted.
         dispatchFakeEvent(primaryValueBar.nativeElement, 'transitionend');
 
-        expect(appRef.tick).not.toHaveBeenCalled();
+        expect(runSpy).not.toHaveBeenCalled();
 
         progressComponent.animationEnd.subscribe(animationEndSpy);
 
@@ -360,7 +362,7 @@ describe('MatProgressBar', () => {
         // On animation end, output should be emitted.
         dispatchFakeEvent(primaryValueBar.nativeElement, 'transitionend');
 
-        expect(appRef.tick).toHaveBeenCalled();
+        expect(runSpy).toHaveBeenCalled();
         expect(animationEndSpy).toHaveBeenCalledWith({value: 40});
       });
     });

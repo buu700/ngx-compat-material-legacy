@@ -1,82 +1,88 @@
 {
   "template": false,
   "packet_id": "RC-06",
-  "substep_id": "RC-06.tabs-chips-table-paginator",
-  "source_commit": "8fdb1fd0e4cfe0631ed71201d6281511cca918d1",
+  "substep_id": "RC-06.all-families-workspace-dist",
+  "source_commit": "PENDING",
   "worktree_line": "main",
   "line_21_commit": "cbf86f3faccb240e7beeb6a1e2af727b5d9a674d",
   "owned_paths": [
-    "projects/ngx-material-legacy/legacy-tabs/internal/tab-body-base.ts",
-    "projects/ngx-material-legacy/legacy-tabs/tab-body.html",
-    "compatibility/rc/reports/legacy-tabs.json",
-    "compatibility/rc/reports/legacy-chips.json",
-    "compatibility/rc/reports/legacy-table.json",
-    "compatibility/rc/reports/legacy-paginator.json",
+    "projects/ngx-material-legacy/legacy-tabs/",
+    "projects/ngx-material-legacy/legacy-list/testing/public-api.ts",
+    "projects/ngx-material-legacy/legacy-progress-bar/progress-bar.spec.ts",
+    "testing/legacy-runner/shims/harness/core/option-shared.spec.ts",
+    "compatibility/rc/reports/",
     "compatibility/rc/session-handoff.json",
     "compatibility/rc/status.json"
   ],
   "last_command": [
-    "node scripts/rc-test-legacy-family.mjs --family tabs",
-    "node scripts/rc-test-legacy-family.mjs --family chips",
-    "node scripts/rc-test-legacy-family.mjs --family table",
-    "node scripts/rc-test-legacy-family.mjs --family paginator"
+    "node scripts/rc-test-legacy-family.mjs --family <each of 22>"
   ],
-  "outcome": "rc06-tabs-164;chips-173;table-45;paginator-49;workspace-dist;tabs-product-fix;g-gates-not-claimed",
-  "first_actionable_error": "Full RC-06 artifact-bound suite and remaining control/core families not run; RC-02 full verify still a stub.",
+  "outcome": "rc06-all-22-families-workspace-dist-green;prior-tip-ci-success;g-gates-not-claimed",
+  "first_actionable_error": "Artifact-bound --run full suite and RC-02 full verify still open; 21.x not retested.",
   "failed_case_ids": [],
   "report_paths": [
     "compatibility/rc/status.json",
     "compatibility/rc/session-handoff.json",
-    "compatibility/rc/reports/legacy-tabs.json",
-    "compatibility/rc/reports/legacy-chips.json",
-    "compatibility/rc/reports/legacy-table.json",
-    "compatibility/rc/reports/legacy-paginator.json"
+    "compatibility/rc/reports/legacy-*.json"
   ],
   "completed_acceptance_ids": [],
   "not_run_scope": [
     "RC-02 full verify / complete G01 matrix",
-    "RC-06 full 57-path / 21-family artifact-bound suite",
+    "RC-06 full 57-path artifact-bound --run suite",
     "21.x line not retested for these families",
     "G01-G13 not claimed",
     "Family greens are workspace-dist iteration, not artifact --run mode",
-    "Remaining: button, checkbox, list, progress-bar, progress-spinner, radio, slide-toggle, slider, core",
     "Audit cursor preserved at 5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
   ],
-  "next_action": "Continue RC-06 remaining controls/core and/or artifact-bound --run mode; or RC-02.04 verify orchestration. Do not claim G01-G13 or RC engineering ready.",
+  "next_action": "RC-06 artifact-bound --run mode and/or RC-02.04 verify orchestration. Do not claim G01-G13 or RC engineering ready.",
   "blocked_owner_decisions": [
     "cyph-rc-age-admission",
     "registry-publish-authority",
     "github-protection-read"
   ],
-  "recorded_at_utc": "2026-10-01T15:36:44Z",
+  "recorded_at_utc": "2026-10-01T15:39:33Z",
   "clock_confidence": "verified",
   "family_iteration": {
     "mode": "workspace-dist",
-    "tabs": "164/164",
-    "chips": "173/173",
-    "table": "45/45",
-    "paginator": "49/49",
-    "dialog": "131/131",
-    "menu": "141/141",
-    "snack_bar": "70/70",
-    "tooltip": "79/79",
     "autocomplete": "184/184",
+    "button": "34/34",
+    "card": "14/14",
+    "checkbox": "100/100",
+    "chips": "173/173",
+    "core": "29/29",
+    "dialog": "131/131",
     "form_field": "25/25",
     "input": "149/149",
-    "card": "14/14",
-    "select": "270/270"
+    "list": "189/189",
+    "menu": "141/141",
+    "paginator": "49/49",
+    "progress_bar": "24/24",
+    "progress_spinner": "36/36",
+    "radio": "87/87",
+    "select": "270/270",
+    "slide_toggle": "72/72",
+    "slider": "130/130",
+    "snack_bar": "70/70",
+    "table": "45/45",
+    "tabs": "164/164",
+    "tooltip": "79/79"
   },
-  "tabs_fixes": {
-    "product": "Restore historical left/right-origin-center _position in ngOnInit; treat origin-center as center for active class; bind inline visibility for left/right so animation-equivalent and [style*=visibility] fallback work; origin-center no longer applies left/right transform classes"
+  "fixes_this_tranche": {
+    "tabs_product": "origin-center _position; inline visibility for off-center bodies",
+    "list_product": "export MatLegacyListItemHarnessBase/MatLegacySubheaderHarness/ListSection for harness instanceof",
+    "core_test_shim": "option-shared uses MAT_LEGACY_OPTION_PARENT_COMPONENT",
+    "progress_bar_test": "observer gate asserts NgZone.run instead of ApplicationRef.tick"
   },
-  "audit_cursor": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-  "harness_blockers": [
-    "nix unavailable on box; Chainman host-nix cannot run locally",
-    "local iteration used host node/pnpm PATH, not declared Chainman profile"
-  ],
-  "ci": {
-    "tested_commit": "8fdb1fd0e4cfe0631ed71201d6281511cca918d1",
+  "prior_ci": {
+    "tested_commit": "6a38d6f2bb22342782be1b3a8d874f0badeac173",
     "product_commit": "8fdb1fd0e4cfe0631ed71201d6281511cca918d1",
+    "run_id": 36885618999,
+    "url": "https://github.com/buu700/ngx-compat-material-legacy/actions/runs/36885618999",
+    "outcome": "success"
+  },
+  "ci": {
+    "tested_commit": "PENDING",
+    "product_commit": "PENDING",
     "run_id": null,
     "url": null,
     "outcome": "pending-push",
@@ -84,5 +90,10 @@
       "Chainman verify-lite",
       "Packed-consumer AOT and harness"
     ]
-  }
+  },
+  "audit_cursor": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+  "harness_blockers": [
+    "nix unavailable on box; Chainman host-nix cannot run locally",
+    "local iteration used host node/pnpm PATH, not declared Chainman profile"
+  ]
 }

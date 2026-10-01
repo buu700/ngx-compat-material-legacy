@@ -3,11 +3,11 @@ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
 import {Component, ViewChildren, QueryList} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {
-  MatOption,
-  MatOptionModule,
-  MAT_OPTION_PARENT_COMPONENT,
-  MatOptionParentComponent,
-} from '@angular/material/core';
+  MatLegacyOption as MatOption,
+  MatLegacyOptionModule as MatOptionModule,
+  MAT_LEGACY_OPTION_PARENT_COMPONENT as MAT_OPTION_PARENT_COMPONENT,
+  MatLegacyOptionParentComponent as MatOptionParentComponent,
+} from '@angular/material/legacy-core';
 import {MatOptionHarness} from './option-harness';
 
 /** Shared tests to run on both the original and MDC-based options. */
