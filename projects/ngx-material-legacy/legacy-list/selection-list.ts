@@ -585,7 +585,7 @@ export class MatLegacySelectionList
         if (
           keyCode === A &&
           this.multiple &&
-          hasModifierKey(event, 'ctrlKey') &&
+          hasModifierKey(event, 'ctrlKey', 'metaKey') &&
           !manager.isTyping()
         ) {
           const shouldSelect = this.options.some(option => !option.disabled && !option.selected);
@@ -635,6 +635,7 @@ export class MatLegacySelectionList
   /** Implemented as a part of ControlValueAccessor. */
   setDisabledState(isDisabled: boolean): void {
     this.disabled = isDisabled;
+    this._markOptionsForCheck();
   }
 
   /** Implemented as part of ControlValueAccessor. */

@@ -26,7 +26,6 @@ import {
 import {CdkPortalOutlet, TemplatePortal} from '@angular/cdk/portal';
 import {Direction, Directionality} from '@angular/cdk/bidi';
 import {Subject, Subscription} from 'rxjs';
-import {distinctUntilChanged} from 'rxjs/operators';
 import {legacyAnimationsDisabled} from '@ngx-compat/material-legacy/legacy-core';
 
 /**
@@ -112,33 +111,27 @@ export abstract class _MatTabBodyBase implements OnInit, OnDestroy {
       });
     }
 
-    this._translateTabComplete
-      .pipe(
-        distinctUntilChanged((x, y) => {
-          return x.fromState === y.fromState && x.toState === y.toState;
-        }),
-      )
-      .subscribe(event => {
-        if (this._isCenterPosition(event.toState) && this._isCenterPosition(this._position)) {
-          this._onCentered.emit();
-        }
+    this._translateTabComplete.subscribe(event => {
+      if (this._isCenterPosition(event.toState) && this._isCenterPosition(this._position)) {
+        this._onCentered.emit();
+      }
 
-        if (this._isCenterPosition(event.fromState) && !this._isCenterPosition(this._position)) {
-          this._afterLeavingCenter.emit();
-        }
-      });
+      if (this._isCenterPosition(event.fromState) && !this._isCenterPosition(this._position)) {
+        this._afterLeavingCenter.emit();
+      }
+    });
   }
 
   ngOnInit() {
     if (this._position == 'center' && this.origin != null) {
-      // Seed previous side so CSS can animate into center on first paint.
-      const originState = this._computePositionFromOrigin(this.origin);
+      // Preserve historical origin-center position names (animation states) while
+      // seeding previous side so CSS can animate into the centered transform.
+      this._position = this._computePositionFromOrigin(this.origin);
       this._previousPosition =
-        originState === 'left-origin-center' ? 'left' : 'right';
-      this._position = 'center';
+        this._position === 'left-origin-center' ? 'left' : 'right';
       this._setActiveClass(true);
-      this._transitionStarted('center');
-      this._scheduleTransitionDone('center');
+      this._transitionStarted(this._position);
+      this._scheduleTransitionDone(this._position);
     } else if (this._position === 'center') {
       this._setActiveClass(true);
       this._onCentering.emit(this._elementRef.nativeElement.clientHeight);
@@ -238,7 +231,7 @@ export abstract class _MatTabBodyBase implements OnInit, OnDestroy {
       this._position = 'center';
     }
 
-    if (this._position === 'center') {
+    if (this._isCenterPosition(this._position)) {
       this._setActiveClass(true);
     } else if (this._initialized) {
       this._setActiveClass(false);
@@ -249,7 +242,7 @@ export abstract class _MatTabBodyBase implements OnInit, OnDestroy {
       this._scheduleTransitionDone(this._position);
     } else if (
       this._initialized &&
-      (this._position === 'center' || this._previousPosition === 'center')
+      (this._isCenterPosition(this._position) || this._isCenterPosition(this._previousPosition || ''))
     ) {
       this._scheduleTransitionDone(this._position);
     }

@@ -21,7 +21,9 @@
     @include private.private-theme-elevation(6, $config);
   }
 
-  .mat-simple-snackbar-action {
+  // Only apply the default action color when the button is unthemed so an
+  // explicitly colored action button is not overridden.
+  .mat-simple-snackbar-action .mat-button:not(.mat-primary):not(.mat-accent):not(.mat-warn) {
     color: if($is-dark-theme, inherit, theming.get-color-from-palette($accent, text));
   }
 }

@@ -24,14 +24,17 @@ import {
   Optional,
   SimpleChanges,
   ViewContainerRef,
+  inject,
 } from '@angular/core';
 import {DOCUMENT} from '@angular/common';
 import {Directionality} from '@angular/cdk/bidi';
 import {BooleanInput, coerceBooleanProperty} from '@angular/cdk/coercion';
 import {DOWN_ARROW, ENTER, ESCAPE, TAB, UP_ARROW, hasModifierKey} from '@angular/cdk/keycodes';
+import {_getFocusedElementPierceShadowDom} from '@angular/cdk/platform';
 import {legacyGetEventTarget} from '@ngx-compat/material-legacy/legacy-core';
 import {TemplatePortal} from '@angular/cdk/portal';
 import {ViewportRuler} from '@angular/cdk/scrolling';
+import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
 import {
   FlexibleConnectedPositionStrategy,
   Overlay,
@@ -91,6 +94,9 @@ export abstract class _MatAutocompleteTriggerBase
   /** Value of the input element when the panel was attached (even if there are no options). */
   private _valueOnAttach: string | number | null;
 
+  /** Value on the previous keydown event (requireSelection attach timing). */
+  private _valueOnLastKeydown: string | null;
+
   /** Strategy that is used to position the panel. */
   private _positionStrategy: FlexibleConnectedPositionStrategy;
 
@@ -102,6 +108,12 @@ export abstract class _MatAutocompleteTriggerBase
 
   /** Subscription to viewport size changes. */
   private _viewportSubscription = Subscription.EMPTY;
+
+  /** Detect handset landscape so the panel can grow into the viewport. */
+  private _breakpointObserver = inject(BreakpointObserver);
+
+  /** Subscription to handset-landscape breakpoint changes. */
+  private _handsetLandscapeSubscription = Subscription.EMPTY;
 
   /**
    * Whether the autocomplete can open the next time it is focused. Used to prevent a focused,
@@ -130,8 +142,7 @@ export abstract class _MatAutocompleteTriggerBase
     // If the user blurred the window while the autocomplete is focused, it means that it'll be
     // refocused when they come back. In this case we want to skip the first focus event, if the
     // pane was closed, in order to avoid reopening it unintentionally.
-    this._canOpenOnNextFocus =
-      this._document.activeElement !== this._element.nativeElement || this.panelOpen;
+    this._canOpenOnNextFocus = this.panelOpen || !this._hasFocus();
   };
 
   /** `View -> model callback called when value changes` */
@@ -223,6 +234,7 @@ export abstract class _MatAutocompleteTriggerBase
     }
 
     this._viewportSubscription.unsubscribe();
+    this._handsetLandscapeSubscription.unsubscribe();
     this._componentDestroyed = true;
     this._destroyPanel();
     this._closeKeyEventStream.complete();
@@ -237,13 +249,7 @@ export abstract class _MatAutocompleteTriggerBase
 
   /** Opens the autocomplete suggestion panel. */
   openPanel(): void {
-    this._attachOverlay();
-    this._floatLabel();
-    // Add aria-owns attribute when the autocomplete becomes visible.
-    if (this._trackedModal) {
-      const panelId = this.autocomplete.id;
-      addAriaReferencedId(this._trackedModal, 'aria-owns', panelId);
-    }
+    this._openPanelInternal();
   }
 
   /** Closes the autocomplete suggestion panel. */
@@ -264,7 +270,13 @@ export abstract class _MatAutocompleteTriggerBase
       });
     }
 
-    this.autocomplete._isOpen = this._overlayAttached = false;
+    // Only reset panel open state if this trigger is still the latest one that opened it.
+    if (this.autocomplete._latestOpeningTrigger === this) {
+      this.autocomplete._isOpen = false;
+      this.autocomplete._latestOpeningTrigger = null;
+    }
+
+    this._overlayAttached = false;
     this._pendingAutoselectedOption = null;
 
     if (this._overlayRef && this._overlayRef.hasAttached()) {
@@ -359,7 +371,9 @@ export abstract class _MatAutocompleteTriggerBase
         // If we're in the Shadow DOM, the event target will be the shadow root, so we have to
         // fall back to check the first element in the path of the click event.
         const clickTarget = legacyGetEventTarget<HTMLElement>(event)!;
-        const formField = this._formField ? this._formField._elementRef.nativeElement : null;
+        const formField = this._formField
+          ? this._formField.getConnectedOverlayOrigin().nativeElement
+          : null;
         const customOrigin = this.connectedTo ? this.connectedTo.elementRef.nativeElement : null;
 
         return (
@@ -369,7 +383,7 @@ export abstract class _MatAutocompleteTriggerBase
           // true. Its main purpose is to handle the case where the input is focused from an
           // outside click which propagates up to the `body` listener within the same sequence
           // and causes the panel to close immediately (see #3106).
-          this._document.activeElement !== this._element.nativeElement &&
+          !this._hasFocus() &&
           (!formField || !formField.contains(clickTarget)) &&
           (!customOrigin || !customOrigin.contains(clickTarget)) &&
           !!this._overlayRef &&
@@ -411,6 +425,8 @@ export abstract class _MatAutocompleteTriggerBase
       event.preventDefault();
     }
 
+    this._valueOnLastKeydown = this._element.nativeElement.value;
+
     if (this.activeOption && keyCode === ENTER && this.panelOpen && !hasModifier) {
       this.activeOption._selectViaInteraction();
       this._resetActiveItem();
@@ -422,7 +438,7 @@ export abstract class _MatAutocompleteTriggerBase
       if (keyCode === TAB || (isArrowKey && !hasModifier && this.panelOpen)) {
         this.autocomplete._keyManager.onKeydown(event);
       } else if (isArrowKey && this._canOpen()) {
-        this.openPanel();
+        this._openPanelInternal(this._valueOnLastKeydown ?? this._element.nativeElement.value);
       }
 
       if (isArrowKey || this.autocomplete._keyManager.activeItem !== prevActiveItem) {
@@ -430,7 +446,7 @@ export abstract class _MatAutocompleteTriggerBase
 
         if (this.autocomplete.autoSelectActiveOption && this.activeOption) {
           if (!this._pendingAutoselectedOption) {
-            this._valueBeforeAutoSelection = this._element.nativeElement.value;
+            this._valueBeforeAutoSelection = this._valueOnLastKeydown;
           }
 
           this._pendingAutoselectedOption = this.activeOption;
@@ -467,12 +483,32 @@ export abstract class _MatAutocompleteTriggerBase
 
       if (!value) {
         this._clearPreviousSelectedOption(null, false);
+      } else if (this.panelOpen && !this.autocomplete.requireSelection) {
+        // Clear a selected option that no longer matches typed text (unless requireSelection,
+        // which clears on panel close instead).
+        const selectedOption = this.autocomplete.options?.find(option => option.selected);
+
+        if (selectedOption) {
+          const display = this._getDisplayValue(selectedOption.value);
+
+          if (value !== display) {
+            selectedOption.deselect(false);
+          }
+        }
       }
 
-      if (this._canOpen() && this._document.activeElement === event.target) {
-        this.openPanel();
+      if (this._canOpen() && this._hasFocus()) {
+        // Capture pre-input value from keydown so requireSelection compares correctly.
+        const valueOnAttach = this._valueOnLastKeydown ?? this._element.nativeElement.value;
+        this._valueOnLastKeydown = null;
+        this._openPanelInternal(valueOnAttach);
       }
     }
+  }
+
+  /** Whether the input currently has focus (pierces shadow DOM). */
+  private _hasFocus(): boolean {
+    return _getFocusedElementPierceShadowDom() === this._element.nativeElement;
   }
 
   _handleFocus(): void {
@@ -480,14 +516,14 @@ export abstract class _MatAutocompleteTriggerBase
       this._canOpenOnNextFocus = true;
     } else if (this._canOpen()) {
       this._previousValue = this._element.nativeElement.value;
-      this._attachOverlay();
+      this._attachOverlay(this._previousValue as string);
       this._floatLabel(true);
     }
   }
 
   _handleClick(): void {
     if (this._canOpen() && !this.panelOpen) {
-      this.openPanel();
+      this._openPanelInternal();
     }
   }
 
@@ -561,7 +597,6 @@ export abstract class _MatAutocompleteTriggerBase
                 //   of the available options,
                 // - if a valid string is entered after an invalid one.
                 if (this.panelOpen) {
-                  this._captureValueOnAttach();
                   this._emitOpened();
                 } else {
                   this.autocomplete.closed.emit();
@@ -587,11 +622,6 @@ export abstract class _MatAutocompleteTriggerBase
     this.autocomplete.opened.emit();
   }
 
-  /** Intended to be called when the panel is attached. Captures the current value of the input. */
-  private _captureValueOnAttach() {
-    this._valueOnAttach = this._element.nativeElement.value;
-  }
-
   /** Destroys the autocomplete suggestion panel. */
   private _destroyPanel(): void {
     if (this._overlayRef) {
@@ -601,11 +631,18 @@ export abstract class _MatAutocompleteTriggerBase
     }
   }
 
+  /** Given a value, returns the string that should be shown within the input. */
+  private _getDisplayValue<T>(value: T): T | string {
+    const autocomplete = this.autocomplete;
+    return autocomplete && autocomplete.displayWith ? autocomplete.displayWith(value) : value;
+  }
+
   private _assignOptionValue(value: any): void {
-    const toDisplay =
-      this.autocomplete && this.autocomplete.displayWith
-        ? this.autocomplete.displayWith(value)
-        : value;
+    const toDisplay = this._getDisplayValue(value);
+
+    if (value == null) {
+      this._clearPreviousSelectedOption(null, false);
+    }
 
     // Simply falling back to an empty string if the display value is falsy does not work properly.
     // The display value can also be the number zero and shouldn't fall back to an empty string.
@@ -673,7 +710,16 @@ export abstract class _MatAutocompleteTriggerBase
     });
   }
 
-  private _attachOverlay(): void {
+  private _openPanelInternal(valueOnAttach = this._element.nativeElement.value) {
+    this._attachOverlay(valueOnAttach);
+    this._floatLabel();
+    // Add aria-owns attribute when the autocomplete becomes visible.
+    if (this._trackedModal) {
+      addAriaReferencedId(this._trackedModal, 'aria-owns', this.autocomplete.id);
+    }
+  }
+
+  private _attachOverlay(valueOnAttach: string): void {
     if (!this.autocomplete && (typeof ngDevMode === 'undefined' || ngDevMode)) {
       throw getMatAutocompleteMissingPanelError();
     }
@@ -691,6 +737,23 @@ export abstract class _MatAutocompleteTriggerBase
           overlayRef.updateSize({width: this._getPanelWidth()});
         }
       });
+      // Grow the panel into the viewport in handset landscape to avoid clipping.
+      this._handsetLandscapeSubscription = this._breakpointObserver
+        .observe(Breakpoints.HandsetLandscape)
+        .subscribe(result => {
+          const isHandsetLandscape = result.matches;
+          if (isHandsetLandscape) {
+            this._positionStrategy
+              .withFlexibleDimensions(true)
+              .withGrowAfterOpen(true)
+              .withViewportMargin(8);
+          } else {
+            this._positionStrategy
+              .withFlexibleDimensions(false)
+              .withGrowAfterOpen(false)
+              .withViewportMargin(0);
+          }
+        });
     } else {
       // Update the trigger, panel width and direction, in case anything has changed.
       this._positionStrategy.setOrigin(this._getConnectedElement());
@@ -699,16 +762,18 @@ export abstract class _MatAutocompleteTriggerBase
 
     if (overlayRef && !overlayRef.hasAttached()) {
       overlayRef.attach(this._portal);
+      this._valueOnAttach = valueOnAttach;
+      this._valueOnLastKeydown = null;
       this._closingActionsSubscription = this._subscribeToClosingActions();
     }
 
     const wasOpen = this.panelOpen;
 
     this.autocomplete._isOpen = this._overlayAttached = true;
+    this.autocomplete._latestOpeningTrigger = this;
     this.autocomplete._setColor(this._formField?.color);
     this._updatePanelState();
     this._applyModalPanelOwnership();
-    this._captureValueOnAttach();
 
     // We need to do an extra `panelOpen` check in here, because the
     // autocomplete won't be shown if there are no options.

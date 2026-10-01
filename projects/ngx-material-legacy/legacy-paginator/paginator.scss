@@ -27,7 +27,7 @@ $button-icon-size: 28px;
   align-items: center;
   justify-content: flex-end;
   padding: $padding;
-  flex-wrap: wrap-reverse;
+  flex-wrap: wrap;
   width: 100%;
 }
 
@@ -47,6 +47,7 @@ $button-icon-size: 28px;
 }
 
 .mat-paginator-page-size-select {
+  position: relative;
   margin: $selector-margin;
   width: $selector-trigger-width;
 
@@ -78,8 +79,30 @@ $button-icon-size: 28px;
   }
 
   @include cdk.high-contrast(active, off) {
-    // On Chromium browsers the `currentColor` blends in with the
-    // background for SVGs so we have to fall back to `CanvasText`.
-    fill: CanvasText;
+    fill: currentColor;
   }
+}
+
+@include cdk.high-contrast(active, off) {
+  .mat-paginator-range-actions .mat-icon-button {
+    outline: solid 1px;
+
+    &[disabled] {
+      color: GrayText;
+    }
+  }
+}
+
+$touch-target-height: 48px;
+$touch-target-width: 84px;
+
+.mat-paginator-touch-target {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: $touch-target-width;
+  height: $touch-target-height;
+  background-color: transparent;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
 }

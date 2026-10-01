@@ -237,6 +237,7 @@ export abstract class _MatRadioGroupBase<T extends _MatRadioButtonBase>
   _touch() {
     if (this.onTouched) {
       this.onTouched();
+      this._changeDetector.markForCheck();
     }
   }
 
@@ -610,7 +611,8 @@ export abstract class _MatRadioButtonBase
     if (!this.disabled) {
       // Normally the input should be focused already, but if the click
       // comes from the touch target, then we might have to focus it ourselves.
-      this._inputElement.nativeElement.focus();
+      // Null-check in case the button was destroyed before view init.
+      this._inputElement?.nativeElement.focus();
     }
   }
 
@@ -645,6 +647,21 @@ export abstract class _MatRadioButtonBase
       if (input) {
         input.setAttribute('tabindex', value + '');
         this._previousTabIndex = value;
+        // Selection-follows-focus: if this input still holds focus after another radio
+        // became selected, move focus to the selected radio (or blur if it is disabled).
+        queueMicrotask(() => {
+          if (
+            group &&
+            group.selected &&
+            group.selected !== this &&
+            document.activeElement === input
+          ) {
+            group.selected._inputElement.nativeElement.focus();
+            if (document.activeElement === input) {
+              this._inputElement.nativeElement.blur();
+            }
+          }
+        });
       }
     }
   }

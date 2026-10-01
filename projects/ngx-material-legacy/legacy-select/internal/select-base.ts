@@ -38,6 +38,7 @@ import {
   ScrollStrategy,
 } from '@angular/cdk/overlay';
 import {ViewportRuler} from '@angular/cdk/scrolling';
+import {MAT_SELECT_CONFIG} from '@angular/material/select';
 import {
   AfterContentInit,
   Attribute,
@@ -110,6 +111,7 @@ import {
   getMatSelectNonArrayValueError,
   getMatSelectNonFunctionValueError,
 } from '../select-errors';
+import {legacyHostMotionEvent} from '@ngx-compat/material-legacy/legacy-core';
 
 let nextUniqueId = 0;
 
@@ -145,9 +147,6 @@ export interface MatSelectConfig {
    */
   panelWidth?: string | number | null;
 }
-
-/** Injection token that can be used to provide the default options the select module. */
-export const MAT_SELECT_CONFIG = new InjectionToken<MatSelectConfig>('MAT_SELECT_CONFIG');
 
 /** @docs-private */
 export const MAT_SELECT_SCROLL_STRATEGY_PROVIDER = {
@@ -624,18 +623,21 @@ export abstract class _MatSelectBase<C>
 
   /** Opens the overlay panel. */
   open(): void {
-    if (this._canOpen()) {
-      this._applyModalPanelOwnership();
-      this._exitCleanup?.();
-      this._exitCleanup = undefined;
-      this._panelExiting = false;
-
-      this._panelOpen = true;
-      this._overlayAttached = true;
-      this._keyManager.withHorizontalOrientation(null);
-      this._highlightCorrectOption();
-      this._changeDetectorRef.markForCheck();
+    // Early return avoids measuring/toggling when open cannot proceed (e.g. focus+click flicker).
+    if (!this._canOpen()) {
+      return;
     }
+
+    this._applyModalPanelOwnership();
+    this._exitCleanup?.();
+    this._exitCleanup = undefined;
+    this._panelExiting = false;
+
+    this._panelOpen = true;
+    this._overlayAttached = true;
+    this._keyManager.withHorizontalOrientation(null);
+    this._highlightCorrectOption();
+    this._changeDetectorRef.markForCheck();
   }
 
   /**
@@ -747,6 +749,9 @@ export abstract class _MatSelectBase<C>
 
     const fallback = setTimeout(() => onEnd(), 200);
     const handler = (event: Event) => {
+      if (!legacyHostMotionEvent(event)) {
+        return;
+      }
       onEnd((event as {animationName?: string}).animationName);
     };
     panelEl.addEventListener('animationend', handler);
@@ -762,7 +767,14 @@ export abstract class _MatSelectBase<C>
   }
 
   /** Enter animation completion from template `(animationend)`. */
-  _onPanelAnimationEnd(animationName: string): void {
+  _onPanelAnimationEnd(animationNameOrEvent: string | Event): void {
+    if (typeof animationNameOrEvent !== 'string' && !legacyHostMotionEvent(animationNameOrEvent)) {
+      return;
+    }
+    const animationName =
+      typeof animationNameOrEvent === 'string'
+        ? animationNameOrEvent
+        : (animationNameOrEvent as AnimationEvent).animationName;
     if (animationName === 'mat-legacy-select-enter' && this._panelOpen) {
       this._panelDoneAnimatingStream.next(this.multiple ? 'showing-multiple' : 'showing');
     } else if (animationName === 'mat-legacy-select-exit') {
@@ -1270,14 +1282,19 @@ export abstract class _MatSelectBase<C>
       return null;
     }
 
-    const labelId = this._parentFormField?.getLabelId();
-    let value = (labelId ? labelId + ' ' : '') + this._valueId;
+    let value = this._parentFormField?.getLabelId() || '';
 
     if (this.ariaLabelledby) {
       value += ' ' + this.ariaLabelledby;
     }
 
-    return value;
+    // Prefer label/aria-labelledby only. Fall back to the value id when neither is set so
+    // existing unlabeled selects still expose a labelledby target for a11y checkers.
+    if (!value) {
+      value = this._valueId;
+    }
+
+    return value.trim();
   }
 
   /** Called when the overlay panel is done animating. */
@@ -1289,6 +1306,12 @@ export abstract class _MatSelectBase<C>
    * Implemented as part of MatFormFieldControl.
    * @docs-private
    */
+  /** Gets IDs currently on aria-describedby, including ones set outside the form field. */
+  get describedByIds(): string[] {
+    const existing = this._elementRef.nativeElement.getAttribute('aria-describedby');
+    return existing?.split(' ') || [];
+  }
+
   setDescribedByIds(ids: string[]) {
     if (ids.length) {
       this._elementRef.nativeElement.setAttribute('aria-describedby', ids.join(' '));

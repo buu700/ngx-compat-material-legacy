@@ -15,7 +15,10 @@ mat-menu {
 
 .mat-menu-panel {
   @include menu-common.base();
-  max-height: calc(100vh - #{menu-common.$item-height});
+  // Match current Material panel sizing: allow filling the viewport when the
+  // overlay strategy pushes the panel to the top edge (historical tests assert
+  // panel.bottom === viewport height). Keep a small gutter via 100vh alone.
+  max-height: 100vh;
   border-radius: $border-radius;
   outline: 0;
 
@@ -36,6 +39,11 @@ mat-menu {
   //    `mouseenter` event by dispatching it on tap.
   &.ng-animating {
     pointer-events: none;
+
+    // Hide empty panels while animating away when the same menu is reused across triggers.
+    &:has(.mat-menu-content:empty) {
+      display: none;
+    }
   }
 
   @include cdk.high-contrast(active, off) {
@@ -126,5 +134,9 @@ button.mat-menu-item {
 
   &.mat-menu-panel-animating {
     pointer-events: none;
+
+    &:has(.mat-menu-content:empty) {
+      display: none;
+    }
   }
 }

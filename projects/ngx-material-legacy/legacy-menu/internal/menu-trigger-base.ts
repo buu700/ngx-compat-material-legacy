@@ -54,7 +54,7 @@ import {
 } from '@angular/core';
 import {normalizePassiveListenerOptions} from '@angular/cdk/platform';
 import {asapScheduler, merge, Observable, of as observableOf, Subscription} from 'rxjs';
-import {delay, filter, take, takeUntil} from 'rxjs/operators';
+import {delay, filter, takeUntil} from 'rxjs/operators';
 import {_MatMenuBase} from './menu-base';
 import {_MatMenuContentBase} from './menu-content-base';
 import {throwMatMenuRecursiveError} from './menu-errors';
@@ -334,9 +334,10 @@ export abstract class _MatMenuTriggerBase implements AfterContentInit, OnDestroy
     this._closingActionsSubscription = this._menuClosingActions().subscribe(() => this.closeMenu());
     this._initMenu(menu);
 
-    if (menu instanceof _MatMenuBase) {
-      menu._startAnimation();
-      menu._directDescendantItems.changes.pipe(takeUntil(menu.close)).subscribe(() => {
+    if (typeof (menu as _MatMenuBase)._startAnimation === 'function') {
+      const materialMenu = menu as _MatMenuBase;
+      materialMenu._startAnimation();
+      materialMenu._directDescendantItems.changes.pipe(takeUntil(materialMenu.close)).subscribe(() => {
         // Re-adjust the position without locking when the amount of items
         // changes so that the overlay is allowed to pick a new optimal position.
         positionStrategy.withLockedPosition(false).reapplyLastPosition();
@@ -384,34 +385,20 @@ export abstract class _MatMenuTriggerBase implements AfterContentInit, OnDestroy
     // from making it back to the root trigger when closing a long chain of menus by clicking
     // on the backdrop.
     if (this.restoreFocus && (reason === 'keydown' || !this._openedBy || !this.triggersSubmenu())) {
-      this.focus(this._openedBy);
+      // Fall back to program like focusFirstItem when open was not from mouse/touch
+      // (e.g. click after a non-primary mousedown). Native focus() can otherwise
+      // inherit a stale FocusMonitor mouse origin from that mousedown.
+      this.focus(this._openedBy || 'program');
     }
 
     this._openedBy = undefined;
 
+    // Detach immediately; do not bind semantic close to the exit animation.
+    this._setIsMenuOpen(false);
     if (menu instanceof _MatMenuBase) {
       menu._resetAnimation();
-
-      if (menu.lazyContent) {
-        const lazyContent = menu.lazyContent as _MatMenuContentBase;
-        // Wait for the exit animation to finish before detaching the content.
-        menu._animationDone
-          .pipe(
-            filter(event => event.toState === 'void'),
-            take(1),
-            // Interrupt if the content got re-attached.
-            takeUntil(lazyContent._attached),
-          )
-          .subscribe({
-            next: () => lazyContent.detach(),
-            // No matter whether the content got re-attached, reset the menu.
-            complete: () => this._setIsMenuOpen(false),
-          });
-      } else {
-        this._setIsMenuOpen(false);
-      }
+      (menu.lazyContent as _MatMenuContentBase | undefined)?.detach();
     } else {
-      this._setIsMenuOpen(false);
       menu?.lazyContent?.detach();
     }
   }
@@ -470,10 +457,12 @@ export abstract class _MatMenuTriggerBase implements AfterContentInit, OnDestroy
       );
       this._overlayRef = this._overlay.create(config);
 
-      // Consume the `keydownEvents` in order to prevent them from going to another overlay.
-      // Ideally we'd also have our keyboard event logic in here, however doing so will
-      // break anybody that may have implemented the `MatMenuPanel` themselves.
-      this._overlayRef.keydownEvents().subscribe();
+      // Handle keyboard events through the overlay keydown stream so stacking context is respected.
+      this._overlayRef.keydownEvents().subscribe(event => {
+        if (this.menu instanceof _MatMenuBase) {
+          this.menu._handleKeydown(event);
+        }
+      });
     }
 
     return this._overlayRef;
@@ -655,19 +644,8 @@ export abstract class _MatMenuTriggerBase implements AfterContentInit, OnDestroy
       )
       .subscribe(() => {
         this._openedBy = 'mouse';
-
-        // If the same menu is used between multiple triggers, it might still be animating
-        // while the new trigger tries to re-open it. Wait for the animation to finish
-        // before doing so. Also interrupt if the user moves to another item.
-        if (this.menu instanceof _MatMenuBase && this.menu._isAnimating) {
-          // We need the `delay(0)` here in order to avoid
-          // 'changed after checked' errors in some cases. See #12194.
-          this.menu._animationDone
-            .pipe(take(1), delay(0, asapScheduler), takeUntil(this._parentMaterialMenu!._hovered()))
-            .subscribe(() => this.openMenu());
-        } else {
-          this.openMenu();
-        }
+        // Open without waiting for a previous panel animation to finish.
+        this.openMenu();
       });
   }
 

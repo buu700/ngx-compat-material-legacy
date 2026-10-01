@@ -322,6 +322,7 @@ export class MatLegacyChipList
   set disabled(value: BooleanInput) {
     this._disabled = coerceBooleanProperty(value);
     this._syncChipsState();
+    this.stateChanges.next();
   }
   protected _disabled: boolean = false;
 
@@ -480,6 +481,12 @@ export class MatLegacyChipList
    * Implemented as part of MatFormFieldControl.
    * @docs-private
    */
+  /** Gets IDs currently on aria-describedby, including ones set outside the form field. */
+  get describedByIds(): string[] {
+    const existing = this._elementRef.nativeElement.getAttribute('aria-describedby');
+    return existing?.split(' ') || [];
+  }
+
   setDescribedByIds(ids: string[]) {
     if (ids.length) {
       this._elementRef.nativeElement.setAttribute('aria-describedby', ids.join(' '));
@@ -535,7 +542,12 @@ export class MatLegacyChipList
     if (this._chipInput && this._chipInput.focused) {
       // do nothing
     } else if (this.chips.length > 0) {
-      this._keyManager.setFirstItemActive();
+      const activeItem = this._keyManager.activeItem;
+      if (activeItem) {
+        activeItem.focus();
+      } else {
+        this._keyManager.setFirstItemActive();
+      }
       this.stateChanges.next();
     } else {
       this._focusInput(options);
@@ -731,10 +743,14 @@ export class MatLegacyChipList
    */
   _allowFocusEscape() {
     if (this._tabIndex !== -1) {
+      // Set tabindex on the DOM node immediately so focus can escape before CD runs,
+      // and keep the bound field in sync for consumers/tests reading tabIndex.
       this._tabIndex = -1;
+      this._elementRef.nativeElement.tabIndex = -1;
 
       setTimeout(() => {
         this._tabIndex = this._userTabIndex || 0;
+        this._elementRef.nativeElement.tabIndex = this._tabIndex;
         this._changeDetectorRef.markForCheck();
       });
     }

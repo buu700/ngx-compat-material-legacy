@@ -34,8 +34,14 @@ $handset-margin: 24px;
   padding-right: $handset-horizontal-padding;
 }
 
-.mat-tooltip-panel-non-interactive {
-  pointer-events: none;
+.mat-tooltip-panel {
+  // Body line-height can throw off the tooltip gap.
+  line-height: normal;
+
+  // Extra specificity so cdk-overlay-panel cannot override pointer-events.
+  &.mat-tooltip-panel-non-interactive {
+    pointer-events: none;
+  }
 }
 
 @keyframes mat-tooltip-show {

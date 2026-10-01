@@ -436,10 +436,16 @@ export class MatLegacyChip
 
     switch (event.keyCode) {
       case DELETE:
-      case BACKSPACE:
         // If we are removable, remove the focused chip
         this.remove();
         // Always prevent so page navigation does not occur
+        event.preventDefault();
+        break;
+      case BACKSPACE:
+        // Ignore key-repeat so holding backspace does not remove multiple chips.
+        if (!event.repeat) {
+          this.remove();
+        }
         event.preventDefault();
         break;
       case SPACE:
@@ -457,7 +463,7 @@ export class MatLegacyChip
   _blur(): void {
     // When animations are enabled, Angular may end up removing the chip from the DOM a little
     // earlier than usual, causing it to be blurred and throwing off the logic in the chip list
-    // that moves focus not the next item. To work around the issue, we defer marking the chip
+    // that moves focus to the next item. To work around the issue, we defer marking the chip
     // as not focused until the next time the zone stabilizes.
     this._ngZone.onStable.pipe(take(1)).subscribe(() => {
       this._ngZone.run(() => {

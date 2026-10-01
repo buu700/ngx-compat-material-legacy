@@ -128,6 +128,12 @@ export abstract class _MatTabGroupBase
   /** Position of the tab header. */
   @Input() headerPosition: MatTabHeaderPosition = 'above';
 
+  /** Aria label of the inner `tablist` of the group. */
+  @Input('aria-label') ariaLabel: string;
+
+  /** Sets the `aria-labelledby` of the inner `tablist` of the group. */
+  @Input('aria-labelledby') ariaLabelledby: string;
+
   /** Duration for the tab animation. Will be normalized to milliseconds if no units are set. */
   @Input()
   get animationDuration(): string {
@@ -495,6 +501,15 @@ export abstract class _MatTabGroupBase
     if (focusOrigin && focusOrigin !== 'mouse' && focusOrigin !== 'touch') {
       this._tabHeader.focusIndex = index;
     }
+  }
+
+  /** True when animations are disabled globally or animationDuration is zero. */
+  _animationsDisabled(): boolean {
+    return (
+      this._animationMode === 'NoopAnimations' ||
+      this.animationDuration === '0' ||
+      this.animationDuration === '0ms'
+    );
   }
 }
 

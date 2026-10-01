@@ -30,7 +30,11 @@ import {
   OnInit,
   ChangeDetectorRef,
 } from '@angular/core';
-import {legacyAnimationsDisabled} from '@ngx-compat/material-legacy/legacy-core';
+import {
+  legacyAnimationsDisabled,
+  legacyHostMotionEvent,
+  legacyNextMotionCompletion,
+} from '@ngx-compat/material-legacy/legacy-core';
 
 /** Minimal shape emitted when CSS panel motion completes (replaces Angular AnimationEvent). */
 export interface LegacyMenuAnimationEvent {
@@ -100,6 +104,7 @@ export class _MatMenuBase
   readonly _animationsEnabled = !this._legacyAnimationsDisabled;
 
   private _exitFallbackTimeout: ReturnType<typeof setTimeout> | undefined;
+  private _completedAnimation: string | undefined;
 
   /** Emits whenever an animation on the menu completes. */
   readonly _animationDone = new Subject<LegacyMenuAnimationEvent>();
@@ -389,10 +394,6 @@ export class _MatMenuBase
         manager.onKeydown(event);
         return;
     }
-
-    // Don't allow the event to propagate if we've already handled it, or it may
-    // end up reaching other overlays that were opened earlier (see #22694).
-    event.stopPropagation();
   }
 
   /**
@@ -480,6 +481,7 @@ export class _MatMenuBase
 
   /** Starts the enter animation (CSS keyframes). */
   _startAnimation() {
+    this._completedAnimation = undefined;
     this._panelAnimationState = 'enter';
     if (!this._animationsEnabled) {
       // Microtask so listeners subscribed after open still observe completion.
@@ -490,6 +492,7 @@ export class _MatMenuBase
 
   /** Resets the panel animation to its initial (exit) state. */
   _resetAnimation() {
+    this._completedAnimation = undefined;
     this._panelAnimationState = 'void';
     if (!this._animationsEnabled) {
       Promise.resolve().then(() => this._onCssAnimationDone(EXIT_ANIMATION));
@@ -502,7 +505,14 @@ export class _MatMenuBase
     this._changeDetectorRef?.markForCheck();
   }
 
-  _onCssAnimationStart(animationName: string) {
+  _onCssAnimationStart(animationNameOrEvent: string | Event) {
+    if (typeof animationNameOrEvent !== 'string' && !legacyHostMotionEvent(animationNameOrEvent)) {
+      return;
+    }
+    const animationName =
+      typeof animationNameOrEvent === 'string'
+        ? animationNameOrEvent
+        : (animationNameOrEvent as AnimationEvent).animationName;
     if (animationName === ENTER_ANIMATION || animationName === EXIT_ANIMATION) {
       this._isAnimating = true;
       if (animationName === ENTER_ANIMATION && this._keyManager?.activeItemIndex === 0) {
@@ -518,11 +528,23 @@ export class _MatMenuBase
     }
   }
 
-  _onCssAnimationDone(animationName: string) {
+  _onCssAnimationDone(animationNameOrEvent: string | Event) {
+    if (typeof animationNameOrEvent !== 'string' && !legacyHostMotionEvent(animationNameOrEvent)) {
+      return;
+    }
+    const animationName =
+      typeof animationNameOrEvent === 'string'
+        ? animationNameOrEvent
+        : (animationNameOrEvent as AnimationEvent).animationName;
     const isExit = animationName === EXIT_ANIMATION;
     if (!isExit && animationName !== ENTER_ANIMATION) {
       return;
     }
+    const completion = legacyNextMotionCompletion(this._completedAnimation, animationName);
+    if (!completion) {
+      return;
+    }
+    this._completedAnimation = completion;
     if (isExit && this._exitFallbackTimeout !== undefined) {
       clearTimeout(this._exitFallbackTimeout);
       this._exitFallbackTimeout = undefined;

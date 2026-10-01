@@ -54,6 +54,11 @@ $default-infix-width: 180px !default;
   min-width: 0;
   width: $default-infix-width;
 
+  // Do not force the default width when a textarea declares cols.
+  &:has(textarea[cols]) {
+    width: auto;
+  }
+
   // In high contrast mode IE/Edge will render all of the borders, even if they're transparent.
   // Since we can't remove the border altogether or replace it with a margin, because it'll throw
   // off the baseline, and we can't use a base64-encoded 1x1 transparent image because of CSP,

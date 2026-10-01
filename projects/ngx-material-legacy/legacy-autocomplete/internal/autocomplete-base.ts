@@ -64,6 +64,16 @@ export interface MatAutocompleteActivatedEvent {
   option: _MatOptionBase | null;
 }
 
+/** @docs-private Historical factory; peer Material no longer exports it. */
+export function MAT_AUTOCOMPLETE_DEFAULT_OPTIONS_FACTORY(): MatAutocompleteDefaultOptions {
+  return {
+    autoActiveFirstOption: false,
+    autoSelectActiveOption: false,
+    hideSingleSelectionIndicator: false,
+    requireSelection: false,
+  };
+}
+
 /** @docs-private */
 const _MatAutocompleteMixinBase = mixinDisableRipple(class {});
 
@@ -95,6 +105,9 @@ export abstract class _MatAutocompleteBase
     return this._isOpen && this.showPanel;
   }
   _isOpen: boolean = false;
+
+  /** Latest trigger that opened the autocomplete (multi-trigger safety). */
+  _latestOpeningTrigger: unknown;
 
   /** @docs-private Sets the theme color of the panel. */
   _setColor(value: ThemePalette) {

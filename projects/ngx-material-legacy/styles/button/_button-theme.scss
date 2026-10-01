@@ -189,6 +189,14 @@
   @include mdc-helpers.using-mdc-typography($config) {
     @include mdc-button.without-ripple($query: mdc-helpers.$mdc-typography-styles-query);
   }
+
+  // Keep button line-height inherited so typography tokens do not clip labels.
+  .mat-mdc-button,
+  .mat-mdc-raised-button,
+  .mat-mdc-unelevated-button,
+  .mat-mdc-outlined-button {
+    line-height: inherit;
+  }
 }
 
 @mixin density($config-or-theme) {
