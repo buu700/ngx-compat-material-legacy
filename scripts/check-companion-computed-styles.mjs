@@ -4,7 +4,7 @@
  * getComputedStyle CSS custom-property rows after applying
  * all-current-companion-bridges.
  *
- * Slice: badge, divider, icon, toolbar (main / Chromium / zoneful).
+ * Slice: badge, divider, icon, toolbar, sort, grid-list, button-toggle (main / Chromium / zoneful).
  * Does not claim RC-05-A02 / G06–G08 or full thirteen-companion coverage.
  *
  *   node scripts/check-companion-computed-styles.mjs --tarball <path>
@@ -86,6 +86,21 @@ const slice = [
     host_id: 'toolbar-host',
     tokens: ['container-background-color', 'container-text-color'],
   },
+  {
+    component: 'sort',
+    host_id: 'sort-host',
+    tokens: ['arrow-color'],
+  },
+  {
+    component: 'grid-list',
+    host_id: 'grid-list-host',
+    tokens: ['tile-header-primary-text-size', 'tile-footer-primary-text-size'],
+  },
+  {
+    component: 'button-toggle',
+    host_id: 'button-toggle-host',
+    tokens: ['background-color', 'text-color'],
+  },
 ];
 
 const consumer = mkdtempSync(join(tmpdir(), 'ngx-compat-companion-computed-'));
@@ -166,6 +181,15 @@ try {
 if (!bridgeCss.includes('--mat-badge-background-color')) {
   fail(1, 'Compiled theme missing badge background token');
 }
+if (!bridgeCss.includes('--mat-sort-arrow-color')) {
+  fail(1, 'Compiled theme missing sort arrow token');
+}
+if (!bridgeCss.includes('--mat-button-toggle-background-color')) {
+  fail(1, 'Compiled theme missing button-toggle background token');
+}
+if (!bridgeCss.includes('--mat-grid-list-tile-header-primary-text-size')) {
+  fail(1, 'Compiled theme missing grid-list tile header token');
+}
 writeFileSync(join(consumer, 'theme.css'), bridgeCss);
 
 mkdirSync(join(consumer, 'src'), {recursive: true});
@@ -174,8 +198,11 @@ import {Component, NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {MatBadgeModule} from '@angular/material/badge';
+import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatDividerModule} from '@angular/material/divider';
+import {MatGridListModule} from '@angular/material/grid-list';
 import {MatIconModule} from '@angular/material/icon';
+import {MatSortModule} from '@angular/material/sort';
 import {MatToolbarModule} from '@angular/material/toolbar';
 
 @Component({
@@ -187,13 +214,31 @@ import {MatToolbarModule} from '@angular/material/toolbar';
       <mat-divider id="divider-host"></mat-divider>
       <mat-icon id="icon-host" color="primary" fontIcon="home">home</mat-icon>
       <mat-toolbar id="toolbar-host" color="primary"><span>Toolbar</span></mat-toolbar>
+      <table matSort>
+        <thead>
+          <tr>
+            <th id="sort-host" mat-sort-header="name">Name</th>
+          </tr>
+        </thead>
+      </table>
+      <mat-grid-list id="grid-list-host" cols="1" rowHeight="80px">
+        <mat-grid-tile>
+          <mat-grid-tile-header>Header</mat-grid-tile-header>
+          Tile
+          <mat-grid-tile-footer>Footer</mat-grid-tile-footer>
+        </mat-grid-tile>
+      </mat-grid-list>
+      <mat-button-toggle-group id="button-toggle-host">
+        <mat-button-toggle value="a" checked>A</mat-button-toggle>
+        <mat-button-toggle value="b">B</mat-button-toggle>
+      </mat-button-toggle-group>
     </div>
   \`,
 })
 export class LabRoot {}
 
 @NgModule({
-  imports: [BrowserModule, MatBadgeModule, MatDividerModule, MatIconModule, MatToolbarModule],
+  imports: [BrowserModule, MatBadgeModule, MatButtonToggleModule, MatDividerModule, MatGridListModule, MatIconModule, MatSortModule, MatToolbarModule],
   declarations: [LabRoot],
   bootstrap: [LabRoot],
 })
@@ -431,7 +476,7 @@ const report = {
   g06_g07_g08_claim: 'not-passed',
   error,
   limitations: [
-    'Only badge, divider, icon, and toolbar were rendered on main/Chromium/zoneful.',
+    'Only badge, divider, icon, toolbar, sort, grid-list, and button-toggle were rendered on main/Chromium/zoneful.',
     'Captures getComputedStyle CSS custom properties after all-current-companion-bridges; not full dimension matrix or peer M2 oracle equality.',
     'Remaining companions, 21.x line, density/typography/dark/RTL state grids remain not-executed.',
     'Does not claim RC-05-A02 / G06–G08.',

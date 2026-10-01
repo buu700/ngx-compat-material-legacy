@@ -280,7 +280,7 @@ def main() -> int:
     results["companion-bridge-tokens"] = "pass" if code == 0 else "fail"
     implemented_ran.append("companion-bridge-tokens")
 
-    # companion-computed-styles: Chromium rendered CSS-var slice (badge/divider/icon/toolbar); not G07.
+    # companion-computed-styles: Chromium rendered CSS-var slice (badge/divider/icon/toolbar/sort/grid-list/button-toggle); not G07.
     code = run_node("scripts/check-companion-computed-styles.mjs", ["--run", str(run_path)])
     computed_detail = ROOT / "compatibility/rc/reports/companion-computed-styles.json"
     if computed_detail.is_file():
@@ -293,7 +293,7 @@ def main() -> int:
         "companion-computed-styles",
         exit_code=code,
         limitations=[
-            "Rendered badge/divider/icon/toolbar CSS custom-property rows only.",
+            "Rendered badge/divider/icon/toolbar/sort/grid-list/button-toggle CSS custom-property rows only.",
             "Does not claim RC-05-A02 / G06-G08.",
         ],
     )
