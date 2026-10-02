@@ -72,6 +72,7 @@ CHECKS = (
     ["node", "--check", "scripts/compile-packed-sass.mjs"],
     ["node", "--check", "scripts/sass-seal.mjs"],
     ["node", "--check", "scripts/run-browser-matrix-slice.mjs"],
+    ["node", "--check", "scripts/browser-required-cells.mjs"],
     ["node", "--check", "scripts/browser-overlay-families.mjs"],
     ["node", "--check", "scripts/api-completeness.mjs"],
     ["node", "--check", "scripts/check-upstream-audit-disposition.mjs"],

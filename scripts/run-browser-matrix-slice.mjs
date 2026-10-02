@@ -21,6 +21,12 @@ import {dirname, join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {parseLegacyArgs, resolveLibraryFromRun, sha256File} from './resolve-run-library.mjs';
 
+if (process.argv.includes('--all-required')) {
+  const {main} = await import('./browser-required-cells.mjs');
+  const code = await main(process.argv.slice(2).filter(arg => arg !== '--all-required'));
+  process.exit(code);
+}
+
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const matrixPath = join(root, 'compatibility/rc/matrices/browser-matrix.json');
 const reportPath = join(root, 'compatibility/rc/reports/browser-matrix-slice.json');
