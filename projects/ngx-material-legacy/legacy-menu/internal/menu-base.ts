@@ -110,7 +110,7 @@ export class _MatMenuBase
   readonly _animationDone = new Subject<LegacyMenuAnimationEvent>();
 
   /** Whether the menu is animating. */
-  _isAnimating: boolean;
+  _isAnimating = false;
 
   /** Parent menu of the current menu panel. */
   parentMenu: MatMenuPanel | undefined;

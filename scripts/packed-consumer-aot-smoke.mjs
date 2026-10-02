@@ -23,7 +23,7 @@ import {
 } from 'node:fs';
 import {createHash} from 'node:crypto';
 import {tmpdir} from 'node:os';
-import {dirname, join, resolve} from 'node:path';
+import {dirname, join, relative, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {spawnSync} from 'node:child_process';
 
@@ -31,7 +31,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const outPath = join(root, 'compatibility/pack-proof/aot-harness-smoke.json');
 const defaultTarball = join(
   root,
-  'compatibility/pack-proof/ngx-compat-material-legacy-22.0.0-rc.0.tgz',
+  'compatibility/pack-proof-21/ngx-compat-material-legacy-21.0.0-rc.0.tgz',
 );
 
 const args = process.argv.slice(2);
@@ -61,7 +61,7 @@ const consumer = mkdtempSync(join(tmpdir(), 'ngx-compat-aot-harness_'));
 const result = {
   schema_version: 1,
   captured_at: new Date().toISOString(),
-  tarball: {path: tarball, sha256: sha256File(tarball)},
+  tarball: {path: relative(root, tarball), sha256: sha256File(tarball)},
   consumer_dir: consumer,
   aot: {status: 'pending'},
   harness: {status: skipHarness ? 'skipped' : 'pending'},
@@ -74,21 +74,21 @@ try {
     private: true,
     type: 'module',
     dependencies: {
-      '@angular/animations': '22.1.7',
-      '@angular/cdk': '22.1.7',
-      '@angular/common': '22.1.7',
-      '@angular/compiler': '22.1.7',
-      '@angular/compiler-cli': '22.1.7',
-      '@angular/core': '22.1.7',
-      '@angular/forms': '22.1.7',
-      '@angular/material': '22.1.7',
-      '@angular/platform-browser': '22.1.7',
-      '@angular/platform-browser-dynamic': '22.1.7',
+      '@angular/animations': '21.2.23',
+      '@angular/cdk': '21.2.14',
+      '@angular/common': '21.2.23',
+      '@angular/compiler': '21.2.23',
+      '@angular/compiler-cli': '21.2.23',
+      '@angular/core': '21.2.23',
+      '@angular/forms': '21.2.23',
+      '@angular/material': '21.2.14',
+      '@angular/platform-browser': '21.2.23',
+      '@angular/platform-browser-dynamic': '21.2.23',
       '@ngx-compat/material-legacy': `file:${tarball}`,
       rxjs: '7.8.2',
       tslib: '2.8.1',
-      typescript: '6.0.3',
-      'zone.js': '0.16.3',
+      typescript: '5.9.2',
+      'zone.js': '0.15.1',
       jsdom: '26.1.0',
     },
   };
@@ -175,7 +175,6 @@ platformBrowserDynamic().bootstrapModule(AotSmokeModule).catch(err => console.er
           declaration: false,
           importHelpers: true,
           useDefineForClassFields: false,
-          ignoreDeprecations: '6.0',
         },
         files: ['src/app.module.ts', 'src/main.ts'],
         angularCompilerOptions: {
