@@ -1,19 +1,30 @@
 {
   "schema_version": 1,
   "role": "packaged migration transaction",
-  "captured_at": "2026-09-29T03:47:26.761Z",
+  "captured_at": "2026-10-02T21:49:53.644Z",
+  "fixture": "old-workspace with @angular/material 16.2.14 and a legacy-button import",
   "blocked": {
     "exit": 1,
     "applied": 0,
     "blocking": 1,
-    "files_unchanged": true
+    "files_unchanged": true,
+    "dry_apply_parity": true
   },
   "clean": {
     "first_safe_edits": 1,
-    "second_safe_edits": 0
+    "second_safe_edits": 0,
+    "dry_apply_safe_edits": 1,
+    "idempotent": true
+  },
+  "concurrent_edit": {
+    "exit": 1,
+    "applied": 0,
+    "concurrent_edit": true,
+    "legacy_import_preserved": true,
+    "cli_rewrite_absent": true
   },
   "limitations": [
-    "Does not fault-inject a mid-write failure or detect a concurrent edit.",
+    "The concurrent edit is injected by MIGRATE_LEGACY_BEFORE_WRITE between the read and the re-read. The CLI writes nothing when the bytes differ.",
     "Does not run the Angular schematic factory.",
     "This is not RC-04-A02."
   ]

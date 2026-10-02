@@ -11,10 +11,26 @@
  */
 import {existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync, rmSync} from 'node:fs';
 import {spawnSync} from 'node:child_process';
-import {dirname, join, resolve} from 'node:path';
+import {dirname, join, relative, resolve} from 'node:path';
+import {createRequire} from 'node:module';
 import {fileURLToPath} from 'node:url';
-import ts from 'typescript';
 import {parseLegacyArgs, resolveLibraryFromRun, sha256File} from './resolve-run-library.mjs';
+
+// verify-lite imports this module before node_modules exists. Load the parser
+// on first use so compareContracts can be unit-tested without typescript.
+const require = createRequire(import.meta.url);
+let typescriptModule;
+function loadTypescript() {
+  if (!typescriptModule) typescriptModule = require('typescript');
+  return typescriptModule;
+}
+const ts = new Proxy({}, {
+  get(_target, property) {
+    const loaded = loadTypescript();
+    const value = loaded[property];
+    return typeof value === 'function' ? value.bind(loaded) : value;
+  },
+});
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const exceptionsPath = join(root, 'compatibility/compatibility-exceptions.json');
@@ -55,24 +71,6 @@ function fail(code, message) {
   console.error(message);
   process.exit(code);
 }
-
-const {runPath, tarball: tarballArg, unknown} = parseLegacyArgs(process.argv.slice(2));
-if (unknown.length) fail(2, `Unknown argument: ${unknown[0]}`);
-let tarball;
-let runId = null;
-if (runPath) {
-  const resolved = resolveLibraryFromRun(runPath);
-  tarball = resolved.tarball;
-  runId = resolved.runId;
-} else if (tarballArg) {
-  tarball = tarballArg;
-} else {
-  fail(2, '--tarball or --run is required');
-}
-if (!existsSync(tarball)) fail(2, `Missing tarball: ${tarball}`);
-if (!existsSync(allowlistPath)) fail(2, `Missing allowlist: ${allowlistPath}`);
-const refRoot = resolveReferenceRoot();
-if (!existsSync(refRoot)) fail(2, `Missing 16.2.14 reference sources: ${refRoot}`);
 
 function resolveSpecifier(fromFile, spec) {
   const base = resolve(dirname(fromFile), spec);
@@ -251,6 +249,124 @@ function sourceSymbolShape(file, symbolName, seen = new Set()) {
   return null;
 }
 
+export function normalizeType(type) {
+  return String(type || '')
+    .replace(/import\([^)]*\)\./g, '')
+    .replace(/\s+/g, '');
+}
+
+function decoratorsOf(node) {
+  if (typeof ts.getDecorators === 'function') return ts.getDecorators(node) || [];
+  return node.decorators || [];
+}
+
+function paramFact(param, sourceFile) {
+  let inject = '';
+  for (const decorator of decoratorsOf(param)) {
+    const expr = decorator.expression;
+    if (!ts.isCallExpression(expr)) continue;
+    const called = expr.expression.getText(sourceFile);
+    if (called === 'Inject' || called.endsWith('.Inject')) {
+      inject = expr.arguments[0] ? normalizeType(expr.arguments[0].getText(sourceFile)) : '';
+    }
+  }
+  return {
+    type: normalizeType(param.type ? param.type.getText(sourceFile) : ''),
+    inject,
+    optional: Boolean(param.questionToken),
+  };
+}
+
+export function contractFromText(text, fileName, name) {
+  const sourceFile = ts.createSourceFile(fileName, text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+  let node = null;
+  for (const statement of sourceFile.statements) {
+    if ((ts.isClassDeclaration(statement) || ts.isInterfaceDeclaration(statement))
+      && statement.name && statement.name.text === name) {
+      node = statement;
+      break;
+    }
+  }
+  if (!node) return null;
+  const ctor = (node.members || []).find(member => ts.isConstructorDeclaration(member));
+  const methods = [];
+  for (const member of node.members || []) {
+    if (!ts.isMethodDeclaration(member) && !ts.isMethodSignature(member)) continue;
+    if (!member.name || !ts.isIdentifier(member.name)) continue;
+    const methodName = member.name.text;
+    if (methodName.startsWith('_') || methodName.startsWith('ɵ')) continue;
+    const mods = member.modifiers ?? [];
+    if (mods.some(mod => mod.kind === ts.SyntaxKind.PrivateKeyword || mod.kind === ts.SyntaxKind.ProtectedKeyword)) continue;
+    methods.push({
+      name: methodName,
+      params: (member.parameters || []).map(param => normalizeType(param.type ? param.type.getText(sourceFile) : '')),
+    });
+  }
+  methods.sort((a, b) => a.name.localeCompare(b.name) || a.params.join().localeCompare(b.params.join()));
+  return {
+    kind: ts.isInterfaceDeclaration(node) ? 'interface' : 'class',
+    constructor: ctor ? ctor.parameters.map(param => paramFact(param, sourceFile)) : null,
+    methods,
+  };
+}
+
+export function compareContracts(refContract, packContract) {
+  if (!refContract || !packContract) {
+    return {di_status: 'skipped', method_status: 'skipped', missing_methods: [], extra_methods: []};
+  }
+  const refCtor = refContract.constructor;
+  const packCtor = packContract.constructor;
+  let diStatus = 'absent';
+  if (refCtor && packCtor) {
+    const same = refCtor.length === packCtor.length
+      && refCtor.every((param, index) => param.type === packCtor[index].type);
+    diStatus = same ? 'match' : 'mismatch';
+  } else if (refCtor || packCtor) {
+    diStatus = 'one-sided';
+  }
+  const refMethods = refContract.methods.map(method => `${method.name}(${method.params.join(',')})`);
+  const packMethods = packContract.methods.map(method => `${method.name}(${method.params.join(',')})`);
+  const missing = refMethods.filter(method => !packMethods.includes(method));
+  const extra = packMethods.filter(method => !refMethods.includes(method));
+  return {
+    di_status: diStatus,
+    ref_constructor: refCtor,
+    pack_constructor: packCtor,
+    method_status: missing.length || extra.length ? 'mismatch' : 'match',
+    missing_methods: missing,
+    extra_methods: extra,
+  };
+}
+
+function loadRefContract(file, symbolName, seen = new Set()) {
+  const real = resolve(file);
+  if (seen.has(real) || !existsSync(real)) return null;
+  seen.add(real);
+  const text = readFileSync(real, 'utf8');
+  const direct = contractFromText(text, real, symbolName);
+  if (direct) return direct;
+  const source = ts.createSourceFile(real, text, ts.ScriptTarget.Latest, true);
+  for (const statement of source.statements) {
+    if (!ts.isExportDeclaration(statement) || !statement.moduleSpecifier) continue;
+    const spec = statement.moduleSpecifier.text;
+    if (!spec.startsWith('.')) continue;
+    const next = resolveSpecifier(real, spec);
+    if (!next) continue;
+    if (statement.exportClause && ts.isNamedExports(statement.exportClause)) {
+      for (const element of statement.exportClause.elements) {
+        const exported = (element.name ?? element.propertyName).text;
+        if (exported !== symbolName) continue;
+        const localName = (element.propertyName ?? element.name).text;
+        return loadRefContract(next, localName, seen);
+      }
+    } else if (!statement.exportClause) {
+      const nested = loadRefContract(next, symbolName, seen);
+      if (nested) return nested;
+    }
+  }
+  return null;
+}
+
 function packSymbolShape(dtsText, name) {
   const block = extractDeclareBlock(dtsText, name);
   if (!block) {
@@ -270,6 +386,25 @@ function packSymbolShape(dtsText, name) {
   };
 }
 
+const isMain = process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+if (isMain) {
+const {runPath, tarball: tarballArg, unknown} = parseLegacyArgs(process.argv.slice(2));
+if (unknown.length) fail(2, `Unknown argument: ${unknown[0]}`);
+let tarball;
+let runId = null;
+if (runPath) {
+  const resolved = resolveLibraryFromRun(runPath);
+  tarball = resolved.tarball;
+  runId = resolved.runId;
+} else if (tarballArg) {
+  tarball = tarballArg;
+} else {
+  fail(2, '--tarball or --run is required');
+}
+if (!existsSync(tarball)) fail(2, `Missing tarball: ${tarball}`);
+if (!existsSync(allowlistPath)) fail(2, `Missing allowlist: ${allowlistPath}`);
+const refRoot = resolveReferenceRoot();
+if (!existsSync(refRoot)) fail(2, `Missing 16.2.14 reference sources: ${refRoot}`);
 const exceptions = JSON.parse(readFileSync(exceptionsPath, 'utf8'));
 const allowlist = JSON.parse(readFileSync(allowlistPath, 'utf8'));
 const allowedExtras = new Map((allowlist.extras || []).map(e => [e.name, e]));
@@ -307,6 +442,14 @@ let unclassifiedExtra = 0;
 const signatureRows = [];
 let signatureMismatchTotal = 0;
 let signatureCompared = 0;
+let diCompared = 0;
+let diMatch = 0;
+let diMismatch = 0;
+let diOneSided = 0;
+let methodCompared = 0;
+let methodMismatch = 0;
+const diMismatchRows = [];
+const methodMismatchRows = [];
 
 for (const fam of families) {
   for (const kind of ['primary', 'testing']) {
@@ -381,6 +524,39 @@ for (const fam of families) {
         extra_members: extraMembers,
       });
     }
+    for (const name of shared) {
+      const refContract = loadRefContract(refPath, name);
+      const block = extractDeclareBlock(dtsText, name);
+      const packContract = block ? contractFromText(block, 'pack.d.ts', name) : null;
+      if (!refContract || !packContract) continue;
+      if (refContract.kind !== 'class' && refContract.kind !== 'interface') continue;
+      const compared = compareContracts(refContract, packContract);
+      if (refContract.kind === 'class') {
+        diCompared += 1;
+        if (compared.di_status === 'match') diMatch += 1;
+        else if (compared.di_status === 'mismatch') {
+          diMismatch += 1;
+          diMismatchRows.push({
+            family: fam,
+            kind,
+            name,
+            ref_constructor: compared.ref_constructor,
+            pack_constructor: compared.pack_constructor,
+          });
+        } else if (compared.di_status === 'one-sided') diOneSided += 1;
+      }
+      methodCompared += 1;
+      if (compared.method_status === 'mismatch') {
+        methodMismatch += 1;
+        methodMismatchRows.push({
+          family: fam,
+          kind,
+          name,
+          missing_methods: compared.missing_methods,
+          extra_methods: compared.extra_methods,
+        });
+      }
+    }
     const mismatches = familySig.filter(s => s.status === 'mismatch');
     signatureRows.push({
       family: fam,
@@ -419,7 +595,7 @@ const report = {
   check_id: 'api-completeness',
   run_id: runId,
   tarball_sha256: sha256File(tarball),
-  reference_root: refRoot,
+  reference_root: refRoot.startsWith(`${root}/`) ? relative(root, refRoot) : baselineTag,
   allowlist_path: 'compatibility/rc/api/export-name-allowlist.json',
   allowlist_sha256: sha256File(allowlistPath),
   families: families.length,
@@ -429,17 +605,32 @@ const report = {
   allowed_extra_total: rows.reduce((n, r) => n + (r.allowed_extra?.length || 0), 0),
   unused_allowlist_entries: unusedAllowlist,
   recipe_removals_applied: [...removedSymbols].sort(),
+  reference_baseline: baselineTag,
   signatures: {
     compared: signatureCompared,
     mismatches: signatureMismatchTotal,
     rows: signatureRows,
   },
+  dependency_identity: {
+    compared: diCompared,
+    matches: diMatch,
+    mismatches: diMismatch,
+    one_sided: diOneSided,
+    rows: diMismatchRows,
+  },
+  method_signatures: {
+    compared: methodCompared,
+    mismatches: methodMismatch,
+    rows: methodMismatchRows,
+  },
   result: sealed ? 'pass' : 'fail',
   g02_claim: 'not-passed',
   limitations: [
-    'Structural member-name comparison for shared class/interface exports; not full overload/generics/protected/DI identity.',
-    'Peer re-exports and type/const aliases are name-only in this cell.',
-    'Does not claim G02.',
+    'Member names, constructor parameter types, and public method parameter types are compared.',
+    'Constructor @Inject tokens are recorded on the reference side. Emitted parameter types are the packed identity.',
+    'One-sided constructors are recorded and do not fail the name seal. Protected and private members are omitted.',
+    'An optional parameter emitted as T|undefined, and a public method present only on the packed declaration, stays in the recorded rows and does not fail the name seal.',
+    'Peer re-exports and type/const aliases stay name-only. Does not claim G02.',
   ],
 };
 
@@ -452,8 +643,13 @@ console.log(JSON.stringify({
   allowed_extra: report.allowed_extra_total,
   signature_compared: signatureCompared,
   signature_mismatches: signatureMismatchTotal,
+  di_compared: diCompared,
+  di_mismatches: diMismatch,
+  di_one_sided: diOneSided,
+  method_signature_mismatches: methodMismatch,
   families: families.length,
 }, null, 2));
 if (!sealed) {
   fail(1, `api-completeness not sealed: missing=${unclassifiedMissing} extra=${unclassifiedExtra} signature_mismatches=${signatureMismatchTotal}`);
+}
 }
