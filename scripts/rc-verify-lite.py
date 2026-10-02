@@ -68,6 +68,7 @@ CHECKS = (
     ["node", "--check", "scripts/map-companion-bridges.mjs"],
     ["node", "--check", "scripts/check-companion-bridges.mjs"],
     ["node", "--check", "scripts/check-companion-computed-styles.mjs"],
+    ["node", "--check", "scripts/check-m3-inclusion-order.mjs"],
     ["node", "--check", "scripts/compare-legacy-aggregate.mjs"],
     ["node", "--check", "scripts/compile-packed-sass.mjs"],
     ["node", "--check", "scripts/sass-seal.mjs"],
