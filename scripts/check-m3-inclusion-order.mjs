@@ -19,7 +19,6 @@ import {dirname, join, resolve} from 'node:path';
 import {fileURLToPath, pathToFileURL} from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const sass = createRequire(join(root, 'package.json'))('sass');
 const defaultReport = join(root, 'compatibility/rc/reports/m3-inclusion-order.json');
 const M3_MARKER = '--mat-app-background-color';
 const M2_MARKER = '.mat-raised-button';
@@ -69,7 +68,12 @@ function stagePackage(tarball) {
   return join(dir, 'nm', 'node_modules');
 }
 
+function loadSass() {
+  return createRequire(join(root, 'package.json'))('sass');
+}
+
 function compileCss(source, loadPaths, urlName) {
+  const sass = loadSass();
   const result = sass.compileString(source, {
     loadPaths,
     style: 'expanded',
@@ -108,7 +112,7 @@ $m3: mat.define-theme((
 `;
 }
 
-function orderFacts(css) {
+export function orderFacts(css) {
   const m3 = css.indexOf(M3_MARKER);
   const m2 = css.indexOf(M2_MARKER);
   return {
@@ -122,24 +126,32 @@ function orderFacts(css) {
   };
 }
 
-function compileLine({line, loadPaths, sourceKind, tarball}) {
-  const orders = ['current-only', 'legacy-only', 'current-then-legacy', 'legacy-then-current'];
-  const compiled = {};
-  for (const order of orders) {
-    compiled[order] = orderFacts(compileCss(themeSource(order), loadPaths, `inclusion-${line}-${order}.scss`));
-  }
+export function lineErrors(line, compiled) {
   const currentOnly = compiled['current-only'];
   const legacyOnly = compiled['legacy-only'];
   const currentFirst = compiled['current-then-legacy'];
   const legacyFirst = compiled['legacy-then-current'];
   const errors = [];
-  if (!currentOnly.m3_present || currentOnly.m2_present) errors.push(`${line}: current theme marker is not distinct`);
-  if (!legacyOnly.m2_present || legacyOnly.m3_present) errors.push(`${line}: legacy theme marker is not distinct`);
-  if (!(currentFirst.m3_present && currentFirst.m2_present && currentFirst.m3_index < currentFirst.m2_index)) {
+  if (!currentOnly?.m3_present || currentOnly?.m2_present) {
+    errors.push(`${line}: current theme marker is not distinct`);
+  }
+  if (!legacyOnly?.m2_present || legacyOnly?.m3_present) {
+    errors.push(`${line}: legacy theme marker is not distinct`);
+  }
+  if (!(currentFirst?.m3_present && currentFirst?.m2_present && currentFirst.m3_index < currentFirst.m2_index)) {
     errors.push(`${line}: current-then-legacy did not emit M3 before M2`);
   }
-  if (!(legacyFirst.m3_present && legacyFirst.m2_present && legacyFirst.m2_index < legacyFirst.m3_index)) {
+  if (!(legacyFirst?.m3_present && legacyFirst?.m2_present && legacyFirst.m2_index < legacyFirst.m3_index)) {
     errors.push(`${line}: legacy-then-current did not emit M2 before M3`);
+  }
+  return errors;
+}
+
+function compileLine({line, loadPaths, sourceKind, tarball}) {
+  const orders = ['current-only', 'legacy-only', 'current-then-legacy', 'legacy-then-current'];
+  const compiled = {};
+  for (const order of orders) {
+    compiled[order] = orderFacts(compileCss(themeSource(order), loadPaths, `inclusion-${line}-${order}.scss`));
   }
   return {
     line,
@@ -147,7 +159,7 @@ function compileLine({line, loadPaths, sourceKind, tarball}) {
     tarball_sha256: tarball ? sha256File(tarball) : null,
     material_version: materialVersion(loadPaths.find(path => existsSync(join(path, '@angular/material/package.json')))),
     orders: compiled,
-    errors,
+    errors: lineErrors(line, compiled),
   };
 }
 
