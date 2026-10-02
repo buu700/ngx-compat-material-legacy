@@ -3,12 +3,16 @@
 from __future__ import annotations
 
 import json
+import copy
+import sys
 import subprocess
 import tempfile
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'scripts'))
+from rc_acceptance import validate_matrix
 CI = (ROOT / ".github" / "workflows" / "ci.yml").read_text()
 FAMILY = ROOT / "scripts" / "rc-test-legacy-family.mjs"
 RESOLVE = ROOT / "scripts" / "resolve-run-library.mjs"
@@ -69,12 +73,11 @@ class LegacyArtifactRunModeTests(unittest.TestCase):
         self.assertIn("Upload entry run directory", CI)
         self.assertIn("entry-${{ github.sha }}", CI)
 
-    def test_full_verify_matrix_keeps_missing_cells(self):
+    def test_full_verify_matrix_requires_acceptance_contracts(self):
         matrix = json.loads(MATRIX.read_text())
         required = [c for c in matrix["checks"] if c.get("required")]
         self.assertTrue(required)
         implemented = {c["check_id"] for c in required if c.get("implemented")}
-        missing = [c["check_id"] for c in required if not c.get("implemented")]
         for check_id in (
             "historical-legacy-artifact",
             "engine-free-consumer",
@@ -88,11 +91,13 @@ class LegacyArtifactRunModeTests(unittest.TestCase):
             "api-completeness",
         ):
             self.assertIn(check_id, implemented)
-        # Remaining open automatic cells keep verify failed / refuse silent G01.
-        for check_id in (
-            "upstream-audit-disposition",
-        ):
-            self.assertIn(check_id, missing)
+        validate_matrix(matrix)
+        # Availability may become complete without weakening coverage checks.
+        # The synthetic positive/negative evidence tests enforce that distinction.
+        available = copy.deepcopy(matrix)
+        for row in available['checks']:
+            row['implemented'] = True
+        validate_matrix(available)
 
     def test_verify_without_out_refuses(self):
         result = subprocess.run(

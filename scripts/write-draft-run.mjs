@@ -9,7 +9,7 @@
  */
 import {spawnSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
-import {existsSync, mkdirSync, readFileSync, statSync, writeFileSync} from 'node:fs';
+import {constants, copyFileSync, existsSync, mkdirSync, readFileSync, statSync, writeFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {dirname, isAbsolute, join, relative, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -83,6 +83,7 @@ function sha256File(path) {
 }
 
 const {outDir, line, tarball} = parseArgs(process.argv.slice(2));
+if (existsSync(join(outDir, 'run.json'))) fail('Refusing to overwrite an existing run manifest');
 if (!allowedOut(outDir)) {
   fail('--out must be a subdirectory of artifacts/ or the system temp directory');
 }
@@ -113,7 +114,21 @@ const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
 const peers = pkg.devDependencies ?? {};
 const chainmanRevision = readFileSync(join(root, 'chainman.lock'), 'utf8').trim();
 const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
-const runId = `draft-${line === '21.x' ? '21x' : 'main'}-${commit.slice(0, 12)}-${stamp}`;
+let runId = `draft-${line === '21.x' ? '21x' : 'main'}-${commit.slice(0, 12)}-${stamp}`;
+if (process.env.RC_CHECK_ID === 'pack-library') {
+  let prepack;
+  try { prepack = JSON.parse(process.env.RC_EVIDENCE_BINDING || 'null'); }
+  catch { fail('Invalid coordinator prepack binding'); }
+  const selected = process.env.RC_RUN_ID;
+  if (!selected || !/^[A-Za-z0-9][A-Za-z0-9_.-]{0,191}$/.test(selected) ||
+      !prepack || prepack.phase !== 'prepack' || prepack.run_id !== selected ||
+      prepack.source_commit !== commit || prepack.source_tree !== gitTree || prepack.source_line !== line ||
+      !/^[0-9a-f]{64}$/.test(prepack.matrix_sha256 || '') || !process.env.RC_INVOCATION_ID) {
+    fail('Coordinator prepack identity does not match this writer/source');
+  }
+  runId = selected;
+}
+
 const artifactStat = statSync(tarball);
 
 const manifest = {
@@ -141,7 +156,7 @@ const manifest = {
       pnpm: toolVersion('pnpm'),
       npm: toolVersion('npm'),
     },
-    mode: process.env.CHAINMAN_MODE || 'host-nix',
+    mode: process.env.CHAINMAN_MODE || 'unqualified-host',
     platform: `${process.platform}-${process.arch}`,
   },
   oracles: {
@@ -168,13 +183,21 @@ const manifest = {
       const cliRel = 'migration/dist/ngx-compat-material-legacy-migrate-cli-22.0.0-rc.0.tgz';
       const cliPath = join(root, cliRel);
       if (!existsSync(cliPath)) return [];
-      const st = statSync(cliPath);
+      // All artifact paths in run.json are relative to this run, including
+      // the separately identified CLI. Do not point at a repository-relative
+      // path that becomes missing or ambiguous after CI artifact transport.
+      const runCliRel = 'inputs/migrate-cli.tgz';
+      const runCliPath = join(outDir, runCliRel);
+      mkdirSync(dirname(runCliPath), {recursive: true});
+      copyFileSync(cliPath, runCliPath, constants.COPYFILE_EXCL);
+      const st = statSync(runCliPath);
       return [{
         id: 'migrate-cli',
-        path: cliRel,
+        path: runCliRel,
         bytes: st.size,
-        sha256: sha256File(cliPath),
-        note: 'Committed peer-light CLI sibling; not rebuilt by this draft pack.',
+        sha256: sha256File(runCliPath),
+        source_path: cliRel,
+        note: 'Committed peer-light CLI copy; its build/source qualification is a separate migration obligation.',
       }];
     })(),
   ],

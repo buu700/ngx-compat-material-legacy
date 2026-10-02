@@ -1,62 +1,519 @@
 {
   "schema_version": 1,
   "id": "full-verify",
-  "note": "Finite automatic product matrix for just verify. Missing or red required checks keep verify failed. Private Cyph, registry auth, and publication stay out of this matrix.",
+  "note": "Automatic prerequisite completeness, not publication or reviewer authorization. Runner availability and finite case coverage are separate. Null case groups are unresolved obligations, never empty passing sets.",
   "checks": [
     {
       "check_id": "pack-library",
       "required": true,
-      "implemented": true
+      "implemented": true,
+      "acceptance": {
+        "gates": [
+          "G01"
+        ],
+        "subject_kind": "artifact",
+        "subject_ids": [
+          "library"
+        ],
+        "cases_by_line": {
+          "main": {
+            "fresh-build": null,
+            "artifact-negatives": null
+          },
+          "21.x": {
+            "fresh-build": null,
+            "artifact-negatives": null
+          }
+        }
+      }
     },
     {
       "check_id": "packed-exports",
       "required": true,
-      "implemented": true
+      "implemented": true,
+      "acceptance": {
+        "gates": [
+          "G01",
+          "G02"
+        ],
+        "subject_kind": "artifact",
+        "subject_ids": [
+          "library"
+        ],
+        "cases_by_line": {
+          "main": {
+            "entrypoints": null
+          },
+          "21.x": {
+            "entrypoints": null
+          }
+        }
+      }
     },
     {
       "check_id": "packed-consumer",
       "required": true,
-      "implemented": true
+      "implemented": true,
+      "acceptance": {
+        "gates": [
+          "G01",
+          "G02"
+        ],
+        "subject_kind": "artifact",
+        "subject_ids": [
+          "library"
+        ],
+        "cases_by_line": {
+          "main": {
+            "aot": null,
+            "declarations": null,
+            "harness": null
+          },
+          "21.x": {
+            "aot": null,
+            "declarations": null,
+            "harness": null
+          }
+        }
+      }
     },
     {
       "check_id": "motion-smoke",
       "required": true,
-      "implemented": true
+      "implemented": true,
+      "acceptance": {
+        "gates": [
+          "G04"
+        ],
+        "subject_kind": "source",
+        "subject_ids": [
+          "source"
+        ],
+        "cases_by_line": {
+          "main": {
+            "host-motion": null
+          },
+          "21.x": {
+            "host-motion": null
+          }
+        }
+      }
     },
     {
       "check_id": "historical-legacy-artifact",
       "required": true,
-      "implemented": true
+      "implemented": true,
+      "acceptance": {
+        "gates": [
+          "G09"
+        ],
+        "subject_kind": "artifact",
+        "subject_ids": [
+          "library"
+        ],
+        "cases_by_line": {
+          "main": {
+            "original-and-shared-cases": null,
+            "discovery-negatives": null
+          },
+          "21.x": {
+            "original-and-shared-cases": null,
+            "discovery-negatives": null
+          }
+        }
+      }
     },
     {
       "check_id": "sass-seal",
       "required": true,
-      "implemented": true
+      "implemented": true,
+      "acceptance": {
+        "gates": [
+          "G06",
+          "G08"
+        ],
+        "subject_kind": "artifact",
+        "subject_ids": [
+          "library"
+        ],
+        "cases_by_line": {
+          "main": {
+            "sass-api-and-values": null,
+            "ordered-css-dom": null,
+            "isolation-negatives": null
+          },
+          "21.x": {
+            "sass-api-and-values": null,
+            "ordered-css-dom": null,
+            "isolation-negatives": null
+          }
+        }
+      }
     },
     {
       "check_id": "migration-packaged",
       "required": true,
-      "implemented": true
+      "implemented": true,
+      "acceptance": {
+        "gates": [
+          "G04",
+          "G05"
+        ],
+        "subject_kind": "artifact",
+        "subject_ids": [
+          "library",
+          "migrate-cli"
+        ],
+        "cases_by_line": {
+          "main": {
+            "old-workspace-cli": null,
+            "packaged-schematic": null,
+            "transaction-negatives": null,
+            "frontend-parity": null
+          },
+          "21.x": {
+            "old-workspace-cli": null,
+            "packaged-schematic": null,
+            "transaction-negatives": null,
+            "frontend-parity": null
+          }
+        }
+      }
     },
     {
       "check_id": "browser-matrix",
       "required": true,
-      "implemented": true
+      "implemented": true,
+      "acceptance": {
+        "gates": [
+          "G10"
+        ],
+        "subject_kind": "artifact",
+        "subject_ids": [
+          "library"
+        ],
+        "cases_by_line": {
+          "main": {
+            "release-engine-runtime-state-matrix": null
+          },
+          "21.x": {
+            "release-engine-runtime-state-matrix": null
+          }
+        }
+      }
     },
     {
       "check_id": "api-completeness",
       "required": true,
-      "implemented": true
+      "implemented": true,
+      "acceptance": {
+        "gates": [
+          "G02"
+        ],
+        "subject_kind": "artifact",
+        "subject_ids": [
+          "library"
+        ],
+        "cases_by_line": {
+          "main": {
+            "export-contract": null,
+            "typescript-signatures": null,
+            "runtime-di-identity": null
+          },
+          "21.x": {
+            "export-contract": null,
+            "typescript-signatures": null,
+            "runtime-di-identity": null
+          }
+        }
+      }
     },
     {
       "check_id": "engine-free-consumer",
       "required": true,
-      "implemented": true
+      "implemented": true,
+      "acceptance": {
+        "gates": [
+          "G04"
+        ],
+        "subject_kind": "artifact",
+        "subject_ids": [
+          "library"
+        ],
+        "cases_by_line": {
+          "main": {
+            "engine-absence": null,
+            "strict-consumer": null,
+            "testing-entrypoints": null
+          },
+          "21.x": {
+            "engine-absence": null,
+            "strict-consumer": null,
+            "testing-entrypoints": null
+          }
+        }
+      }
     },
     {
       "check_id": "upstream-audit-disposition",
       "required": true,
-      "implemented": false
+      "implemented": false,
+      "acceptance": {
+        "gates": [
+          "G03",
+          "G08",
+          "G11"
+        ],
+        "subject_kind": "source",
+        "subject_ids": [
+          "source"
+        ],
+        "cases_by_line": {
+          "main": {
+            "upstream-shas": null,
+            "authored-symbols": null,
+            "installed-peer-fixes": null,
+            "current-advisories": null
+          },
+          "21.x": {
+            "upstream-shas": null,
+            "authored-symbols": null,
+            "installed-peer-fixes": null,
+            "current-advisories": null
+          }
+        }
+      }
+    },
+    {
+      "check_id": "source-policy",
+      "required": true,
+      "implemented": false,
+      "acceptance": {
+        "gates": [
+          "G03"
+        ],
+        "subject_kind": "source",
+        "subject_ids": [
+          "source"
+        ],
+        "cases_by_line": {
+          "main": {
+            "authored-boundary": null,
+            "packed-boundary": null
+          },
+          "21.x": {
+            "authored-boundary": null,
+            "packed-boundary": null
+          }
+        }
+      }
+    },
+    {
+      "check_id": "companion-bridge-tokens",
+      "required": true,
+      "implemented": true,
+      "acceptance": {
+        "gates": [
+          "G07"
+        ],
+        "subject_kind": "source",
+        "subject_ids": [
+          "source"
+        ],
+        "cases_by_line": {
+          "main": {
+            "compiled-override-tokens": null
+          },
+          "21.x": {
+            "compiled-override-tokens": null
+          }
+        }
+      }
+    },
+    {
+      "check_id": "companion-computed-styles",
+      "required": true,
+      "implemented": true,
+      "acceptance": {
+        "gates": [
+          "G07"
+        ],
+        "subject_kind": "artifact",
+        "subject_ids": [
+          "library"
+        ],
+        "cases_by_line": {
+          "main": {
+            "thirteen-companion-dimensions": null,
+            "independent-peer-oracle": null
+          },
+          "21.x": {
+            "thirteen-companion-dimensions": null,
+            "independent-peer-oracle": null
+          }
+        }
+      }
+    },
+    {
+      "check_id": "m3-coexistence",
+      "required": true,
+      "implemented": false,
+      "acceptance": {
+        "gates": [
+          "G07"
+        ],
+        "subject_kind": "artifact",
+        "subject_ids": [
+          "library"
+        ],
+        "cases_by_line": {
+          "main": {
+            "inclusion-order": null,
+            "nested-lazy-overlay": null,
+            "shared-style-boundary": null
+          },
+          "21.x": {
+            "inclusion-order": null,
+            "nested-lazy-overlay": null,
+            "shared-style-boundary": null
+          }
+        }
+      }
+    },
+    {
+      "check_id": "native-motion",
+      "required": true,
+      "implemented": false,
+      "acceptance": {
+        "gates": [
+          "G04",
+          "G10"
+        ],
+        "subject_kind": "artifact",
+        "subject_ids": [
+          "library"
+        ],
+        "cases_by_line": {
+          "main": {
+            "enabled-disabled-reduced": null,
+            "interruption-destruction": null,
+            "exactly-once-notification": null
+          },
+          "21.x": {
+            "enabled-disabled-reduced": null,
+            "interruption-destruction": null,
+            "exactly-once-notification": null
+          }
+        }
+      }
+    },
+    {
+      "check_id": "csp-ssr",
+      "required": true,
+      "implemented": false,
+      "acceptance": {
+        "gates": [
+          "G04",
+          "G10"
+        ],
+        "subject_kind": "artifact",
+        "subject_ids": [
+          "library"
+        ],
+        "cases_by_line": {
+          "main": {
+            "nonce-and-negative": null,
+            "dom-free-server-and-leaks": null
+          },
+          "21.x": {
+            "nonce-and-negative": null,
+            "dom-free-server-and-leaks": null
+          }
+        }
+      }
+    },
+    {
+      "check_id": "consumer-floors",
+      "required": true,
+      "implemented": false,
+      "acceptance": {
+        "gates": [
+          "G12"
+        ],
+        "subject_kind": "artifact",
+        "subject_ids": [
+          "library",
+          "migrate-cli"
+        ],
+        "cases_by_line": {
+          "main": {
+            "public-engines-peers": null,
+            "cli-runtime": null,
+            "line-isolation": null
+          },
+          "21.x": {
+            "public-engines-peers": null,
+            "cli-runtime": null,
+            "line-isolation": null
+          }
+        }
+      }
+    },
+    {
+      "check_id": "dependency-eligibility",
+      "required": true,
+      "implemented": false,
+      "acceptance": {
+        "gates": [
+          "G08",
+          "G11",
+          "G13"
+        ],
+        "subject_kind": "source",
+        "subject_ids": [
+          "source"
+        ],
+        "cases_by_line": {
+          "main": {
+            "locks-tools-maturity": null,
+            "vendor-provenance-license": null
+          },
+          "21.x": {
+            "locks-tools-maturity": null,
+            "vendor-provenance-license": null
+          }
+        }
+      }
+    },
+    {
+      "check_id": "release-metadata",
+      "required": true,
+      "implemented": false,
+      "acceptance": {
+        "gates": [
+          "G01",
+          "G13"
+        ],
+        "subject_kind": "artifact",
+        "subject_ids": [
+          "library",
+          "migrate-cli"
+        ],
+        "cases_by_line": {
+          "main": {
+            "package-metadata-license": null,
+            "instructions-provenance": null
+          },
+          "21.x": {
+            "package-metadata-license": null,
+            "instructions-provenance": null
+          }
+        }
+      }
     }
+  ],
+  "required_reviews": [
+    "independent-release-review",
+    "applicable-exception-authorizations"
   ]
 }

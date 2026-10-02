@@ -8,6 +8,10 @@ import subprocess
 import sys
 from pathlib import Path
 
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+from rc_acceptance import EvidenceError, checked_file, contained_file, read_json, validate_matrix
+
 ROOT = Path(__file__).resolve().parents[1]
 OMITTED = (
     "G01-G13",
@@ -42,6 +46,7 @@ CHECKS = (
         "scripts/source-closure.py",
         "scripts/rc-verify-lite.py",
         "scripts/rc-verify.py",
+        "scripts/rc_acceptance.py",
     ],
     ["node", "--check", "scripts/run-sass-fixtures.mjs"],
     ["node", "--check", "scripts/run-sass-value-fixtures.mjs"],
@@ -98,7 +103,7 @@ CHECKS = (
 
 
 def check_full_verify_refuses_subsets() -> None:
-    """Evidence-aware bootstrap: incomplete automatic matrix must not look like G01."""
+    """Validate the contract without requiring perpetual incompleteness."""
     result = subprocess.run(
         [sys.executable, "scripts/rc-verify.py"],
         cwd=ROOT,
@@ -114,22 +119,12 @@ def check_full_verify_refuses_subsets() -> None:
     matrix_path = ROOT / "compatibility/rc/matrices/full-verify.json"
     if not matrix_path.is_file():
         fail("missing compatibility/rc/matrices/full-verify.json")
-    matrix = json.loads(matrix_path.read_text())
-    required = [c for c in matrix.get("checks", []) if c.get("required")]
-    if not required:
-        fail("full-verify matrix has no required checks")
-    missing_impl = [
-        c.get("check_id")
-        for c in required
-        if not c.get("implemented") and isinstance(c.get("check_id"), str)
-    ]
-    # While product gates remain open, the matrix must keep at least one required
-    # unimplemented cell so an accidental green subset cannot claim completion.
-    if not missing_impl:
-        fail(
-            "full-verify matrix has no unimplemented required checks; "
-            "refuse silent completion until seal/release-set evidence exists"
-        )
+    try:
+        validate_matrix(read_json(matrix_path))
+    except EvidenceError as error:
+        fail(str(error))
+    # A fully implemented matrix is valid configuration. Completeness is tested
+    # against actual finite case evidence by rc-verify, not a dummy missing cell.
     if (ROOT / "compatibility/rc/reports/verify-not-written").exists():
         fail("verify wrote the obsolete verify-not-written path")
 
@@ -165,8 +160,8 @@ def check_family_report(path: Path, candidates: set[str], *, root: Path = ROOT) 
     numbers = []
     for key in ("executed", "passed", "failed", "skipped"):
         value = totals.get(key)
-        if not isinstance(value, int):
-            fail(f"{path.name} totals.{key} is not an integer")
+        if type(value) is not int or value < 0:
+            fail(f"{path.name} totals.{key} must be a nonnegative integer")
         numbers.append(value)
     if numbers[0] != sum(numbers[1:]):
         fail(f"{path.name} totals do not add up")
@@ -202,6 +197,47 @@ def check_family_reports(
         check_family_report(path, candidates, root=root)
 
 
+def check_current_binding(row: dict, *, root: Path = ROOT) -> None:
+    """A current-source claim needs a real receipt; this is not G09 admission."""
+    execution = row.get('execution', {})
+    if not execution.get('bound_to_current_head'):
+        return
+    try:
+        receipt = execution.get('receipt')
+        if not isinstance(receipt, dict):
+            raise EvidenceError('current-source claim has no receipt identity')
+        run_path = contained_file(root, receipt.get('run_manifest'))
+        run = read_json(run_path)
+        if run.get('template') is not False or run.get('stage') not in ('draft', 'sealed'):
+            raise EvidenceError('current-source receipt is not an executed run')
+        def git(value):
+            return subprocess.run(['git', 'rev-parse', value], cwd=root, capture_output=True,
+                                  text=True, check=True).stdout.strip()
+        source = run.get('source', {})
+        if source.get('commit') != git('HEAD') or source.get('git_tree_sha') != git('HEAD^{tree}'):
+            raise EvidenceError('receipt does not identify current source/tree')
+        report_path = checked_file(run_path.parent, receipt.get('report'), 'historical report')
+        report = read_json(report_path)
+        if (report.get('run_id') != run.get('run_id') or not run.get('run_id') or
+                report.get('line') != source.get('line') or source.get('line') not in ('main', '21.x') or
+                report.get('subject_mode') != 'artifact'):
+            raise EvidenceError('historical report has wrong run/line/subject mode')
+        libraries = [a for a in run.get('artifacts', []) if a.get('id') == 'library']
+        if len(libraries) != 1:
+            raise EvidenceError('receipt needs exactly one library artifact')
+        checked_file(run_path.parent, libraries[0], 'historical library')
+        if report.get('artifact_sha256') != libraries[0]['sha256']:
+            raise EvidenceError('historical report names other library bytes')
+        check_family_report(report_path, {r['candidate'] for r in report.get('mapped_specs', [])}, root=root)
+        if report['totals']['executed'] <= 0:
+            raise EvidenceError('historical receipt executed no cases')
+        if not any(s.get('candidate') == row.get('candidate') and s.get('historical_path') == row.get('historical_path')
+                   for s in report.get('mapped_specs', [])):
+            raise EvidenceError('historical receipt does not map this original/candidate path')
+    except (EvidenceError, KeyError, TypeError, OSError, subprocess.CalledProcessError) as error:
+        fail(f"{row.get('candidate')}: {error}")
+
+
 def main() -> None:
     if len(sys.argv) != 1:
         fail(f"unknown arguments: {sys.argv[1:]}")
@@ -219,8 +255,7 @@ def main() -> None:
     for row in inventory["rows"]:
         if not (ROOT / row["candidate"]).is_file():
             fail(f"missing candidate {row['candidate']}")
-        if row["execution"].get("bound_to_current_head"):
-            fail(f"{row['candidate']} claims a current-HEAD receipt without a fresh run record")
+        check_current_binding(row)
     blob = json.dumps(manifest)
     if "/workspace/ngx-plan" in blob or "ngx-plan" in blob:
         fail("port-manifest still depends on the planning directory")
