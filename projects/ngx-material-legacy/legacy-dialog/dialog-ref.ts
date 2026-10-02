@@ -19,7 +19,7 @@ import {
   MatDialogConfig,
   MatDialogState,
 } from '@angular/material/dialog';
-import {Observable, Subject, merge} from 'rxjs';
+import {Observable, ReplaySubject, merge} from 'rxjs';
 import {filter, take} from 'rxjs/operators';
 import {_MatDialogContainerBase} from './internal/dialog-container-base';
 
@@ -45,10 +45,10 @@ export class MatLegacyDialogRef<T, R = any> {
   id: string;
 
   /** Subject for notifying the user that the dialog has finished opening. */
-  private readonly _afterOpened = new Subject<void>();
+  private readonly _afterOpened = new ReplaySubject<void>(1);
 
   /** Subject for notifying the user that the dialog has started closing. */
-  private readonly _beforeClosed = new Subject<R | undefined>();
+  private readonly _beforeClosed = new ReplaySubject<R | undefined>(1);
 
   /** Result to be passed to afterClosed. */
   private _result: R | undefined;

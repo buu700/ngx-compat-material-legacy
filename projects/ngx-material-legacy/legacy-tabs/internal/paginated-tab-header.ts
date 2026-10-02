@@ -230,7 +230,9 @@ export abstract class MatPaginatedTabHeader
       // Allow focus to land on disabled tabs, as per https://w3c.github.io/aria-practices/#kbd_disabled_controls
       .skipPredicate(() => false);
 
-    this._keyManager.updateActiveItem(this._selectedIndex);
+    // A tab nav bar can have no selected index. Fall back to the first item
+    // so keyboard focus still has a tabindex target.
+    this._keyManager.updateActiveItem(Math.max(this._selectedIndex, 0));
 
     // Defer the first call in order to allow for slower browsers to lay out the elements.
     // This helps in cases where the user lands directly on a page with paginated tabs.
