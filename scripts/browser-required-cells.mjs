@@ -25,7 +25,6 @@ const matrixPath = join(root, 'compatibility/rc/matrices/browser-matrix.json');
 const reportPath = join(root, 'compatibility/rc/reports/browser-matrix-required.json');
 const probePath = join(root, 'scripts/browser-required-probe.js');
 const webkitScript = join(root, 'scripts/browser-webkit-session.py');
-const esbuild = createRequire(join(root, 'package.json'))('esbuild');
 const CSP_NONCE = 'rc07csp';
 
 export function summarizeCells(requiredIds, outcomes) {
@@ -485,6 +484,7 @@ async function buildConsumer(tarball, zoneless) {
   const {transformSync} = linkerRequire('@babel/core');
   const linkerPlugin = linkerRequire('@angular/compiler-cli/linker/babel').default;
   const {needsLinking} = linkerRequire('@angular/compiler-cli/linker');
+  const esbuild = createRequire(join(root, 'package.json'))('esbuild');
   await esbuild.build({
     absWorkingDir: consumer,
     entryPoints: ['out/main.js'],
