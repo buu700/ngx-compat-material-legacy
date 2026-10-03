@@ -2,8 +2,7 @@
 """Drive one WebKitGTK page for the required-cell browser runner.
 
 Speaks newline-delimited JSON on stdin/stdout. Hardware acceleration stays off
-because this host's GDK backend has no GL context. This is the system
-WebKitGTK, not a title check.
+because this host's GDK backend has no GL context. This is system WebKitGTK (WebKit2 4.1), not Safari.
 """
 from __future__ import annotations
 
@@ -51,6 +50,17 @@ def on_stdin(_source, _condition) -> bool:
         reply({'ok': False, 'error': f'bad json: {exc}'})
         return True
     command = message.get('cmd')
+    if command == 'identity':
+        reply({
+            'ok': True,
+            'backend': 'webkitgtk',
+            'api': 'WebKit2-4.1',
+            'major': WebKit2.get_major_version(),
+            'minor': WebKit2.get_minor_version(),
+            'micro': WebKit2.get_micro_version(),
+            'safari_certification': False,
+        })
+        return True
     if command == 'quit':
         reply({'ok': True})
         Gtk.main_quit()

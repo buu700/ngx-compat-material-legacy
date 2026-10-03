@@ -195,6 +195,27 @@ jobs:
       - name: Set up JavaScript toolchain
         run: just chainman setup javascript
 
+      - name: Install Chromium, Firefox, and WebKitGTK
+        run: |
+          set -euo pipefail
+          sudo install -d -m 0755 /etc/apt/keyrings
+          wget -q https://packages.mozilla.org/apt/repo-signing-key.gpg -O- | sudo tee /etc/apt/keyrings/packages.mozilla.org.asc > /dev/null
+          echo "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main" | sudo tee /etc/apt/sources.list.d/mozilla.list > /dev/null
+          printf 'Package: *\nPin: origin packages.mozilla.org\nPin-Priority: 1000\n' | sudo tee /etc/apt/preferences.d/mozilla > /dev/null
+          sudo apt-get update
+          sudo apt-get install -y chromium-browser || sudo apt-get install -y chromium || true
+          sudo apt-get install -y firefox
+          sudo apt-get install -y python3-gi gir1.2-gtk-3.0 gir1.2-webkit2-4.1 xvfb
+          firefox --version
+          python3 -c 'import gi; gi.require_version("WebKit2", "4.1"); from gi.repository import WebKit2; print("webkitgtk", WebKit2.get_major_version(), WebKit2.get_minor_version(), WebKit2.get_micro_version())'
+          Xvfb :99 -screen 0 1280x900x24 >/tmp/xvfb.log 2>&1 &
+          echo "DISPLAY=:99" >> "$GITHUB_ENV"
+          echo "FIREFOX_BIN=$(command -v firefox)" >> "$GITHUB_ENV"
+          CHROME_BIN="$(command -v chromium-browser || command -v chromium || command -v google-chrome || true)"
+          test -n "$CHROME_BIN"
+          test -x "$CHROME_BIN"
+          echo "CHROME_BIN=$CHROME_BIN" >> "$GITHUB_ENV"
+
       - name: Run the full verifier
         id: verify
         run: |

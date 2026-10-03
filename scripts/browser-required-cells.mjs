@@ -26,6 +26,13 @@ const reportPath = join(root, 'compatibility/rc/reports/browser-matrix-required.
 const probePath = join(root, 'scripts/browser-required-probe.js');
 const webkitScript = join(root, 'scripts/browser-webkit-session.py');
 const CSP_NONCE = 'rc07csp';
+const CDP_PORTS = {chromium: 9333, firefox: 9334};
+
+function firefoxBin() {
+  if (process.env.FIREFOX_BIN && existsSync(process.env.FIREFOX_BIN)) return process.env.FIREFOX_BIN;
+  if (existsSync('/usr/bin/firefox')) return '/usr/bin/firefox';
+  throw new Error('No Firefox binary found; set FIREFOX_BIN');
+}
 
 export function summarizeCells(requiredIds, outcomes) {
   const required = new Set(requiredIds);
@@ -567,7 +574,7 @@ function chromeBin() {
 async function withChromium(origin, fn) {
   const bin = chromeBin();
   const userDir = mkdtempSync(join(cacheRoot, 'chrome-'));
-  const port = 9342;
+  const port = CDP_PORTS.chromium;
   spawnSync('bash', ['-lc', `fuser -k ${port}/tcp >/dev/null 2>&1 || true`], {timeout: 5000});
   const chrome = spawn(bin, [
     '--headless=new',
@@ -631,7 +638,14 @@ async function withChromium(origin, fn) {
       throw new Error(`navigation did not finish: ${url}`);
     };
     await goto(`${origin}/`);
-    await fn({evaluate, goto, browser: version.Browser || 'chromium'});
+    await fn({evaluate, goto, browser: {
+      launched: true,
+      engine: 'chromium',
+      product: version.Browser || '',
+      protocol: 'cdp',
+      port,
+      binary: bin,
+    }});
     browserWs.close();
   } finally {
     chrome.kill();
@@ -641,11 +655,12 @@ async function withChromium(origin, fn) {
 async function withFirefox(origin, fn) {
   const profile = mkdtempSync(join(cacheRoot, 'ff-'));
   const name = `ngx${Date.now()}`;
-  const created = spawnSync('/usr/bin/firefox', ['--headless', '--createprofile', `${name} ${profile}`], {encoding: 'utf8', timeout: 30000});
+  const bin = firefoxBin();
+  const created = spawnSync(bin, ['--headless', '--createprofile', `${name} ${profile}`], {encoding: 'utf8', timeout: 30000});
   if (created.status !== 0) throw new Error((created.stderr || created.stdout || 'createprofile failed').slice(-500));
-  const port = 9341;
+  const port = CDP_PORTS.firefox;
   spawnSync('bash', ['-lc', `fuser -k ${port}/tcp >/dev/null 2>&1 || true`], {timeout: 5000});
-  const firefox = spawn('/usr/bin/firefox', [
+  const firefox = spawn(bin, [
     '--headless',
     '--profile', profile,
     `--remote-debugging-port=${port}`,
@@ -700,8 +715,16 @@ async function withFirefox(origin, fn) {
       await send('browsingContext.navigate', {context, url, wait: 'complete'});
     };
     await goto(`${origin}/`);
-    const browser = session.result?.capabilities?.browserName || 'firefox';
-    await fn({evaluate, goto, browser});
+    const capabilities = session.result?.capabilities || {};
+    await fn({evaluate, goto, browser: {
+      launched: true,
+      engine: 'firefox',
+      browserName: capabilities.browserName || '',
+      version: capabilities.browserVersion || '',
+      protocol: 'bidi',
+      port,
+      binary: bin,
+    }});
     socket.close();
   } finally {
     firefox.kill();
@@ -746,6 +769,10 @@ function withWebKit(origin, fn) {
       child.stdin.write(JSON.stringify(payload) + '\n');
     });
     (async () => {
+      const identity = await request({cmd: 'identity'});
+      if (!identity.ok || identity.backend !== 'webkitgtk' || identity.api !== 'WebKit2-4.1') {
+        throw new Error(identity.error || 'webkitgtk identity missing');
+      }
       const loaded = await request({cmd: 'load', url: `${origin}/`});
       if (!loaded.ok) throw new Error(loaded.error || 'webkit load failed');
       const evaluate = async expression => {
@@ -760,7 +787,16 @@ function withWebKit(origin, fn) {
           const response = await request({cmd: 'load', url});
           if (!response.ok) throw new Error(response.error || 'webkit goto failed');
         },
-        browser: typeof agent === 'string' ? agent : 'webkitgtk',
+        browser: {
+          launched: true,
+          engine: 'webkit',
+          backend: 'webkitgtk',
+          api: 'WebKit2-4.1',
+          version: `${identity.major}.${identity.minor}.${identity.micro}`,
+          userAgent: typeof agent === 'string' ? agent : '',
+          safari_certification: false,
+          protocol: 'webkitgtk-session',
+        },
       });
       await request({cmd: 'quit'}).catch(() => {});
       child.kill();
@@ -853,6 +889,41 @@ const DRIVERS = {
   firefox: withFirefox,
   webkit: withWebKit,
 };
+
+export async function executeIds(tarball, ids) {
+  const outcomes = [];
+  const engines = {};
+  const groups = new Map();
+  for (const id of ids) {
+    const parts = id.split('/');
+    if (parts[1] === '21.x') throw new Error('refusing to execute a 21.x browser cell from the main roster');
+    const engine = parts[2];
+    const runtime = parts[3];
+    const key = `main|${runtime}|${engine}`;
+    const bucket = groups.get(key) || [];
+    bucket.push(id);
+    groups.set(key, bucket);
+  }
+  for (const [key, bucket] of groups) {
+    const [, runtime, engine] = key.split('|');
+    console.error(`building main ${runtime} for ${bucket.length} ${engine} cells`);
+    const built = await buildConsumer(tarball, runtime === 'zoneless');
+    if (runtime === 'zoneless' && built.bundleHasZone) throw new Error('zoneless bundle contains Zone');
+    const {server, origin} = await startServer(built.consumer);
+    try {
+      const drive = DRIVERS[engine];
+      if (!drive) throw new Error(`no driver for ${engine}`);
+      await drive(origin, async driver => {
+        engines[engine] = driver.browser;
+        await waitReady(driver);
+        outcomes.push(...await runCells(driver, bucket));
+      });
+    } finally {
+      server.close();
+    }
+  }
+  return {outcomes, engines};
+}
 
 export async function main(argv) {
   const args = parseArgs(argv);

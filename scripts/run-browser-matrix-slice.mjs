@@ -53,6 +53,12 @@ if (runPath) {
 if (!existsSync(tarball)) fail(2, `Missing tarball: ${tarball}`);
 if (!existsSync(matrixPath)) fail(2, `Missing declared matrix: ${matrixPath}`);
 
+if (process.env.RC_CHECK_ID === 'browser-matrix') {
+  const {runAcceptance} = await import('./browser-matrix-acceptance.mjs');
+  const code = await runAcceptance({tarball, runPath});
+  process.exit(code);
+}
+
 const matrix = JSON.parse(readFileSync(matrixPath, 'utf8'));
 const tarballSha = sha256File(tarball);
 
