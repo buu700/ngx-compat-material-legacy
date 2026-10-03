@@ -269,13 +269,17 @@ describe('MatMenu', () => {
 
     const items = overlayContainerElement.querySelectorAll('.mat-menu-panel .mat-menu-item');
 
-    expect(document.activeElement).toBe(items[0]);
+    expect(document.activeElement)
+      .withContext('opening the menu should focus the first item')
+      .toBe(items[0]);
 
     fixture.componentInstance.items.shift();
     fixture.detectChanges();
     tick(500);
 
-    expect(document.activeElement).toBe(items[1]);
+    expect(document.activeElement)
+      .withContext('destroying the active item should focus the next item, not body')
+      .toBe(items[1]);
   }));
 
   it('should be able to set a custom class on the backdrop', fakeAsync(() => {

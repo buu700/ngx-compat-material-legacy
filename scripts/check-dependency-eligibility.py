@@ -271,6 +271,75 @@ def _vuln_rows(packages: list[tuple[str, str]], results: list) -> tuple[dict, li
     return rows, unresolved
 
 
+def load_finding_dispositions(root: Path) -> dict[str, list[dict]]:
+    """Reviewed per-finding records. A missing file leaves the finding unresolved."""
+    directory = root / "compatibility/rc/dependency-dispositions"
+    found: dict[str, list[dict]] = {}
+    if not directory.is_dir() or directory.is_symlink():
+        return found
+    for path in sorted(directory.glob("*.json")):
+        if not path.is_file() or path.is_symlink():
+            continue
+        data = json.loads(path.read_text())
+        if not isinstance(data, dict):
+            continue
+        key = f"{data.get('package')}@{data.get('version')}"
+        data["_file"] = path.name
+        found.setdefault(key, []).append(data)
+    return found
+
+
+def _disposition_matches(record: dict, advisory_id: str) -> bool:
+    if record.get("advisory_id") != advisory_id:
+        return False
+    if record.get("classification") not in {"blocked", "not-applicable"}:
+        return False
+    path = record.get("dependency_path")
+    reason = record.get("reason")
+    if not isinstance(path, list) or not path or not all(isinstance(item, str) and item for item in path):
+        return False
+    if not isinstance(reason, str) or len(reason.strip()) < 40:
+        return False
+    if "fixed_version" not in record:
+        return False
+    return True
+
+
+def classify_live_findings(rows: dict, unresolved: list[str], dispositions: dict[str, list[dict]]) -> dict:
+    """A reviewed blocked record stays blocking. Unknown findings stay unresolved."""
+    still = []
+    blocked = []
+    classified = []
+    seen = set()
+    for key in unresolved:
+        if key in seen:
+            continue
+        seen.add(key)
+        row = rows.get(key) or {}
+        vulns = row.get("vulns") if isinstance(row, dict) else None
+        ids = [item.get("id") for item in vulns or [] if isinstance(item, dict) and isinstance(item.get("id"), str)]
+        records = [record for record in dispositions.get(key, []) if any(_disposition_matches(record, advisory) for advisory in ids)]
+        matched_ids = {record.get("advisory_id") for record in records}
+        if not ids or any(advisory not in matched_ids for advisory in ids):
+            still.append(key)
+            continue
+        if any(record.get("classification") == "blocked" for record in records):
+            blocked.append(key)
+            classified.append({
+                "package": key,
+                "classification": "blocked",
+                "advisories": ids,
+                "file": records[0].get("_file"),
+                "dependency_path": records[0].get("dependency_path"),
+                "fixed_version": records[0].get("fixed_version"),
+            })
+            continue
+        # not-applicable does not clear a finding that is still in the lock.
+        # There is no patched release to substitute, so it stays unresolved.
+        still.append(key)
+    return {"unresolved": still, "blocked": blocked, "classified": classified}
+
+
 def perform_lookup(root: Path, now: datetime) -> dict:
     """Live advisory, registry-age, and vendor lookup. Failure stays unknown."""
     packages = lock_packages((root / "pnpm-lock.yaml").read_text())
@@ -350,6 +419,9 @@ def perform_lookup(root: Path, now: datetime) -> dict:
     if vendor_unknown:
         vendor_queried = False
 
+    classified = classify_live_findings(rows, unresolved, load_finding_dispositions(root))
+    unresolved = classified["unresolved"]
+    blocked = classified["blocked"]
     http_known = status == 200 and not truncated and not error and bool(rows or not queried)
     result = "queried" if http_known else "unknown"
     return {
@@ -371,7 +443,9 @@ def perform_lookup(root: Path, now: datetime) -> dict:
             f"vendor_packages={len(vendor_packages)} unknown={vendor_unknown[:6]}"
             if vendor_packages else "vendor manifest has no packages"
         ),
-        "unresolved": unresolved,
+        "unresolved": unresolved + blocked,
+        "blocked_findings": blocked,
+        "finding_dispositions": classified["classified"],
         "lock_packages": len(packages),
         "security_clearance": "not-passed",
     }
@@ -457,7 +531,7 @@ def evaluate(root: Path, now: datetime, *, lookup_performed: bool, lookup: dict 
         ),
         "dependency-eligibility/locks-tools-maturity/unresolved-findings-block": (
             http_known and not unresolved and not live_uncovered,
-            "unresolved findings: " + ", ".join(unresolved[:8]) if unresolved else (
+            "unresolved or blocked findings: " + ", ".join(unresolved[:8]) if unresolved else (
                 "findings stay unknown until the lock, toolchain, and vendor set are queried"
                 if live is None or not http_known else "queried set has no unresolved finding; this is not security clearance"
             ),

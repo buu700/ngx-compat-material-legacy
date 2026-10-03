@@ -124,5 +124,44 @@ class Fresh03AdmissionTests(unittest.TestCase):
         self.assertIn("dependency-eligibility/locks-tools-maturity/lookup-http-known", 
                       {item["case_id"] for item in observed["cases"] if item["result"] == "pass"})
 
+    def test_symlinked_peer_declarations_are_compared(self) -> None:
+        import os
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            real = root / "node_modules" / ".pnpm" / "core"
+            real.mkdir(parents=True)
+            (real / "index.d.ts").write_text(
+                "/** @docs-private */\nexport class PrivateThing {}\n"
+                "/** @deprecated */\nexport class OldThing {}\n"
+            )
+            linked_root = root / "node_modules" / "@angular"
+            linked_root.mkdir(parents=True)
+            os.symlink(real, linked_root / "core")
+            names, files = POLICY.annotated_names(linked_root, "@docs-private")
+            self.assertEqual(files, 1)
+            self.assertIn("PrivateThing", names)
+            authored = root / "src"
+            authored.mkdir()
+            (authored / "use.ts").write_text("export const x = 1;\n")
+            observed = POLICY.evaluate(authored, {"rules": []}, None, linked_root)
+            case = next(item for item in observed["cases"] if item["case_id"].endswith("installed-annotation-comparison"))
+            self.assertEqual(case["result"], "pass", case)
+            self.assertGreater(observed["annotation_files"], 0)
+
+    def test_blocked_braces_disposition_stays_blocking(self) -> None:
+        rows = {"braces@3.0.3": {"name": "braces", "version": "3.0.3", "vulns": [{"id": "GHSA-vfj7-8cjw-p6xm"}]}}
+        dispositions = ELIGIBILITY.load_finding_dispositions(ROOT)
+        classified = ELIGIBILITY.classify_live_findings(rows, ["braces@3.0.3"], dispositions)
+        self.assertEqual(classified["blocked"], ["braces@3.0.3"])
+        self.assertEqual(classified["unresolved"], [])
+        combined = classified["unresolved"] + classified["blocked"]
+        self.assertIn("braces@3.0.3", combined)
+        record = dispositions["braces@3.0.3"][0]
+        self.assertEqual(record["classification"], "blocked")
+        self.assertIsNone(record["fixed_version"])
+        self.assertEqual(record["registry_latest"], "3.0.3")
+
+
 if __name__ == "__main__":
     unittest.main()

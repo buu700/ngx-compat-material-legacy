@@ -3,7 +3,8 @@
 
 The reviewed case ids are fixed in MAIN_CASES. A regex hit is an observation.
 Installed peer annotation comparison runs only when declaration files are
-actually present. A missing node_modules tree stays unknown, not clean.
+actually present. pnpm's symlinked @angular packages are followed. A missing
+node_modules tree stays unknown, not clean.
 coverage stays incomplete unless every case passes.
 """
 from __future__ import annotations
@@ -63,14 +64,40 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def declaration_files(directory: Path):
+    """Yield real .d.ts files. pnpm package directories are symlinks into .pnpm."""
+    if not directory.is_dir():
+        return
+    fence = directory.resolve()
+    for parent in [directory, *directory.parents]:
+        if parent.name == "node_modules":
+            fence = parent.resolve()
+            break
+    seen: set[str] = set()
+    for dirpath, dirnames, filenames in os.walk(directory, followlinks=True):
+        current = Path(dirpath).resolve()
+        if current != fence and fence not in current.parents:
+            dirnames[:] = []
+            continue
+        for name in filenames:
+            if not name.endswith(".d.ts"):
+                continue
+            path = Path(dirpath) / name
+            if path.is_symlink():
+                continue
+            key = str(path.resolve())
+            if key in seen:
+                continue
+            seen.add(key)
+            yield path
+
+
 def annotated_names(directory: Path, marker: str) -> tuple[set[str], int]:
     names: set[str] = set()
     files = 0
     if not directory.is_dir():
         return names, files
-    for path in directory.rglob("*.d.ts"):
-        if path.is_symlink():
-            continue
+    for path in declaration_files(directory):
         files += 1
         lines = path.read_text(errors="replace").splitlines()
         for index, line in enumerate(lines):
