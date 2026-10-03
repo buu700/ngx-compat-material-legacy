@@ -37,6 +37,8 @@ CHECKS = (
         "scripts/bootstrap-material.py",
         "scripts/check-toolchain.py",
         "scripts/check-upstream-api-policy.py",
+        "scripts/check-source-policy.py",
+        "scripts/check-dependency-eligibility.py",
         "scripts/check-workflow-pins.py",
         "scripts/compare-css.py",
         "scripts/inspect-packed-package.py",

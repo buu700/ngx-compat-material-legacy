@@ -49,6 +49,9 @@ SCRIPT_CHECKS = {
     "scripts/pack-draft-run.mjs": "pack-library",
     "scripts/check-pack-library.mjs": "pack-library",
     "scripts/check-packed-exports.mjs": "packed-exports",
+    "scripts/check-upstream-audit-disposition.mjs": "upstream-audit-disposition",
+    "scripts/check-source-policy.py": "source-policy",
+    "scripts/check-dependency-eligibility.py": "dependency-eligibility",
     "scripts/packed-consumer-aot-smoke.mjs": "packed-consumer",
     "scripts/motion-lifecycle-smoke.mjs": "motion-smoke",
     "scripts/build-migrate-legacy-cli.mjs": "migration-packaged",
@@ -331,7 +334,10 @@ def parse_args(argv: list[str]) -> tuple[Path, str]:
 
 
 def run_node(script: str, args: list[str], *, record: bool = True) -> int:
-    cmd = ["node", str(ROOT / script), *args]
+    if script.endswith(".py"):
+        cmd = [sys.executable, str(ROOT / script), *args]
+    else:
+        cmd = ["node", str(ROOT / script), *args]
     print("verify:", " ".join(cmd), flush=True)
     if ACTIVE_RUN is None:
         return subprocess.run(cmd, cwd=ROOT).returncode
@@ -725,6 +731,53 @@ def main() -> int:
     )
     results["historical-legacy-artifact"] = "pass" if code == 0 else "fail"
     implemented_ran.append("historical-legacy-artifact")
+
+    # FRESH-03 producers. Nonzero means the admission gap is still open.
+    # A structural ledger pass is not security clearance and is not copied forward.
+    code = run_node(
+        "scripts/check-upstream-audit-disposition.mjs",
+        ["--admission", "--line", line, "--report", str(out_dir / "upstream-audit-structural.json")],
+    )
+    write_check_report(
+        out_dir, run_id, line, "upstream-audit-disposition", exit_code=code,
+        limitations=[
+            "Structural seed coverage is not disposition admission or security clearance.",
+            "Sensitive, inherited, and material behavior rows still lack individual proof; the symbol seed is open.",
+            "This check does not query advisories. g11_claim stays not-passed.",
+        ],
+    )
+    results["upstream-audit-disposition"] = "pass" if code == 0 else "fail"
+    implemented_ran.append("upstream-audit-disposition")
+
+    code = run_node(
+        "scripts/check-source-policy.py",
+        ["--root", "projects/ngx-material-legacy", "--tarball", str(tarball),
+         "--report", str(out_dir / "source-policy-observation.json")],
+    )
+    write_check_report(
+        out_dir, run_id, line, "source-policy", exit_code=code,
+        limitations=[
+            "Authored animations imports, private namespace members, and deep internal modules remain.",
+            "Installed peer annotation comparison is unknown unless declaration files are present, and a clean packed digest does not erase authored failures.",
+        ],
+    )
+    results["source-policy"] = "pass" if code == 0 else "fail"
+    implemented_ran.append("source-policy")
+
+    code = run_node(
+        "scripts/check-dependency-eligibility.py",
+        ["--report", str(out_dir / "dependency-eligibility-observation.json")],
+    )
+    write_check_report(
+        out_dir, run_id, line, "dependency-eligibility", exit_code=code,
+        limitations=[
+            "No advisory lookup was performed by this run. Stored http status is not a current result.",
+            "Lock packages absent from the stored direct-pin query, toolchain age, unresolved findings, and vendor advisories stay unknown.",
+            "Vendor hash and license-file observations do not clear G08, G11, or G13.",
+        ],
+    )
+    results["dependency-eligibility"] = "pass" if code == 0 else "fail"
+    implemented_ran.append("dependency-eligibility")
 
     missing: list[str] = []
     failed: list[str] = []

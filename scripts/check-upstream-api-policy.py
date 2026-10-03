@@ -44,6 +44,8 @@ _NAMESPACE_MEMBER = re.compile(
 
 _SASS_USE = re.compile(r"""@(?:use|forward)\s+['"]([^'"]+)['"](?:\s+as\s+([\w*]+))?""")
 _SASS_IMPORT = re.compile(r"""@import\s+['"]([^'"]+)['"]""")
+_EXTENDS = re.compile(r"""\bclass\s+[A-Za-z_$][\w$]*(?:\s*<[^;{]*>)?\s+extends\s+([A-Za-z_$][\w$]*)""")
+_DTS_REF = re.compile(r"""///\s*<reference\s+(?:path|types)\s*=\s*['"]([^'"]+)['"]""")
 _BLOCK_COMMENT = re.compile(r"/\*.*?\*/", re.DOTALL)
 _LINE_COMMENT = re.compile(r"(^|[^:])//.*?$", re.MULTILINE)
 
@@ -135,6 +137,7 @@ def _scan_tree(root: Path, policy: dict) -> dict:
     forbidden_substrings = policy.get('forbidden_module_substrings', [])
     prefixes = tuple(policy.get('forbidden_imported_symbol_prefixes', []))
     forbidden_symbols = set(policy.get('forbidden_imported_symbols', []))
+    deprecated_symbols = set(policy.get('forbidden_deprecated_symbols', []))
     sass_patterns = policy.get('forbidden_sass_patterns', [])
     exceptions = policy.get('exceptions', [])
 
@@ -165,6 +168,58 @@ def _scan_tree(root: Path, policy: dict) -> dict:
                                 'needle': needle,
                             }
                         )
+                if module.startswith('@angular/'):
+                    segments = [part for part in module.split('/') if part]
+                    if any(part in {'private', 'src'} for part in segments) and not exempt(
+                        rel, 'forbidden-deep-internal', module
+                    ):
+                        violations.append(
+                            {'path': rel, 'rule': 'forbidden-deep-internal', 'value': module}
+                        )
+            imported: dict[str, str] = {}
+            for names, module in _NAMED_FROM.findall(text):
+                if module.startswith('@angular/'):
+                    for name in imported_names(names):
+                        imported.setdefault(name, module)
+            for base in _EXTENDS.findall(text):
+                module = imported.get(base)
+                if not module:
+                    continue
+                if prefixes and base.startswith(prefixes) and not exempt(rel, 'forbidden-symbol-prefix', base):
+                    violations.append(
+                        {
+                            'path': rel,
+                            'rule': 'forbidden-symbol-prefix',
+                            'value': base,
+                            'module': module,
+                            'access': 'inheritance',
+                        }
+                    )
+                if base in forbidden_symbols and not exempt(rel, 'forbidden-symbol', base):
+                    violations.append(
+                        {
+                            'path': rel,
+                            'rule': 'forbidden-symbol',
+                            'value': base,
+                            'module': module,
+                            'access': 'inheritance',
+                        }
+                    )
+                if base in deprecated_symbols and not exempt(rel, 'forbidden-deprecated-symbol', base):
+                    violations.append(
+                        {
+                            'path': rel,
+                            'rule': 'forbidden-deprecated-symbol',
+                            'value': base,
+                            'module': module,
+                            'access': 'inheritance',
+                        }
+                    )
+            for ref in _DTS_REF.findall(raw):
+                if '@angular/' in ref and (
+                    '/private' in ref or '/src/' in ref or ref.endswith('/src')
+                ) and not exempt(rel, 'forbidden-dts-reference', ref):
+                    violations.append({'path': rel, 'rule': 'forbidden-dts-reference', 'value': ref})
             bindings = {alias: module for alias, module in _NAMESPACE_IMPORT.findall(text)}
             bindings.update({alias: module for alias, module in _REQUIRE_ALIAS.findall(text)})
             for alias, member, computed in _NAMESPACE_MEMBER.findall(text):
@@ -198,6 +253,17 @@ def _scan_tree(root: Path, policy: dict) -> dict:
                 if not module.startswith(('@angular/', 'rxjs', 'typescript')):
                     continue
                 for name in imported_names(names):
+                    if name in deprecated_symbols and module.startswith('@angular/') and not exempt(
+                        rel, 'forbidden-deprecated-symbol', name
+                    ):
+                        violations.append(
+                            {
+                                'path': rel,
+                                'rule': 'forbidden-deprecated-symbol',
+                                'value': name,
+                                'module': module,
+                            }
+                        )
                     if prefixes and name.startswith(prefixes) and not exempt(
                         rel, 'forbidden-symbol-prefix', name
                     ):
@@ -237,6 +303,14 @@ def _scan_tree(root: Path, policy: dict) -> dict:
                         violations.append({'path': rel, 'rule': 'forbidden-sass-pattern', 'value': pat})
                     else:
                         violations.append({'path': rel, 'rule': 'forbidden-sass-pattern', 'value': pat})
+            for mod in [item[0] for item in _SASS_USE.findall(text)] + _SASS_IMPORT.findall(text):
+                concealed = (
+                    mod.startswith('@material/')
+                    or '/node_modules/@material/' in mod
+                    or (mod.startswith('@angular/') and ('/src/' in mod or '/private' in mod))
+                )
+                if concealed and not exempt(rel, 'forbidden-sass-dependency', mod):
+                    violations.append({'path': rel, 'rule': 'forbidden-sass-dependency', 'value': mod})
             for mod, alias in _SASS_USE.findall(text):
                 if '@angular/material' in mod:
                     # Namespace-agnostic m2- usage: `<alias>.m2-` or `*` members still appear as m2-

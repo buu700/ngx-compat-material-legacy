@@ -119,6 +119,28 @@ export const x = 1;
         result = scan_source(src)
         self.assertTrue(result['ok'], result)
 
+    def test_trailing_private_segment_inheritance_deprecated_and_concealed_sass(self):
+        private = scan_source("import {SharedResizeObserver} from '@angular/cdk/observers/private';\n")
+        self.assertTrue(any(v['rule'] == 'forbidden-deep-internal' for v in private['violations']), private)
+        inherited = scan_source(
+            "import {_PrivateBase} from '@angular/cdk/a11y';\nexport class Local extends _PrivateBase {}\n"
+        )
+        self.assertTrue(any(v.get('access') == 'inheritance' and v['value'] == '_PrivateBase' for v in inherited['violations']), inherited)
+        local = scan_source("class LocalBase {}\nexport class Owned extends LocalBase {}\n")
+        self.assertTrue(local['ok'], local)
+        reference = scan_source('/// <reference path="node_modules/@angular/cdk/a11y/private/index.d.ts" />\nexport const x = 1;\n')
+        self.assertTrue(any(v['rule'] == 'forbidden-dts-reference' for v in reference['violations']), reference)
+        policy = json.loads(json.dumps(POLICY))
+        policy['forbidden_deprecated_symbols'] = ['LegacyDateAdapter']
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / 'use.ts').write_text("import {LegacyDateAdapter} from '@angular/material/core';\n")
+            (root / 'hidden.scss').write_text("@use '@material/ripple/ripple';\n")
+            result = MOD.scan(root, policy)
+        rules = {v['rule'] for v in result['violations']}
+        self.assertIn('forbidden-deprecated-symbol', rules)
+        self.assertIn('forbidden-sass-dependency', rules)
+
 
 if __name__ == '__main__':
     raise SystemExit(unittest.main())
