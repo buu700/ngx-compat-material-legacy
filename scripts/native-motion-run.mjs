@@ -292,6 +292,11 @@ export async function executeNativeMotion(tarball) {
     const problems = assertCase(id, observation);
     return {id, ok: problems.length === 0, observation, evidence: problems.length === 0 ? evidenceOf(observation) : problems.join('; ')};
   });
+  const failed = outcomes.filter(item => !item.ok);
+  if (failed.length) {
+    console.error(`native-motion failed ${failed.length}`);
+    for (const row of failed.slice(0, 24)) console.error(`${row.id} ${row.evidence}`);
+  }
   return {outcomes, engines};
 }
 

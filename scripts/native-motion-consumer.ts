@@ -45,6 +45,7 @@ export class DialogBody {}
       <button id="interrupt-tooltip-destroy" type="button" (click)="interruptTooltip()">Tooltip destroy</button>
       <button id="interrupt-tabs" type="button" (click)="interruptTabs()">Tabs interrupt</button>
       <button id="remove-gone" type="button" (click)="showGone = false">Remove tip</button>
+      <ng-container *ngIf="showSurfaces">
       <button id="open-menu" type="button" [matMenuTriggerFor]="labMenu">Menu</button>
       <mat-menu #labMenu="matMenu"><button mat-menu-item type="button">Item</button></mat-menu>
       <mat-form-field>
@@ -64,6 +65,7 @@ export class DialogBody {}
       </mat-tab-group>
       <button id="tip" type="button" #tip="matTooltip" matTooltip="Hello">Tip</button>
       <button *ngIf="showGone" id="tip-gone" type="button" #tipGone="matTooltip" matTooltip="Gone">Gone</button>
+      </ng-container>
     </div>
   `,
 })
@@ -71,6 +73,7 @@ export class MotionRoot {
   name = new FormControl('');
   tabDuration = '500ms';
   showGone = true;
+  showSurfaces = false;
   @ViewChild(MatLegacyMenuTrigger) menuTrigger!: MatLegacyMenuTrigger;
   @ViewChild(MatLegacyMenu) menu!: MatLegacyMenu;
   @ViewChild(MatLegacySelect) select!: MatLegacySelect;
@@ -130,6 +133,16 @@ export class MotionRoot {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
+  private async ensureSurfaces(): Promise<void> {
+    if (!this.showSurfaces) {
+      this.showSurfaces = true;
+      await this.wait(60);
+    }
+    if (!this.menuTrigger || !this.select || !this.tabs || !this.tip) {
+      throw new Error('motion surfaces were not constructed');
+    }
+  }
+
   private async waitFor(predicate: () => boolean, limit = 1200): Promise<void> {
     const started = Date.now();
     while (!predicate()) {
@@ -184,7 +197,9 @@ export class MotionRoot {
     try { this.snack.dismiss(); } catch { /* none open */ }
     let notifications = 0;
     const ref = this.snack.open('Saved', 'OK', {duration: 30000});
-    ref.afterOpened().subscribe(() => { notifications += 1; });
+    const opened = ref.afterOpened() as {closed: boolean; subscribe: (fn: () => void) => void};
+    if (opened.closed) notifications = 1;
+    else opened.subscribe(() => { notifications += 1; });
     await this.waitFor(() => {
       const el = document.querySelector('snack-bar-container');
       return !!el && notifications >= 1;
@@ -209,6 +224,7 @@ export class MotionRoot {
   }
 
   private async measureMenu(): Promise<unknown> {
+    await this.ensureSurfaces();
     try { this.menuTrigger.closeMenu(); } catch { /* closed */ }
     let notifications = 0;
     this.menuTrigger.menuOpened.subscribe(() => { notifications += 1; });
@@ -235,6 +251,7 @@ export class MotionRoot {
   }
 
   private async measureSelect(): Promise<unknown> {
+    await this.ensureSurfaces();
     try { this.select.close(); } catch { /* closed */ }
     let notifications = 0;
     this.select.openedChange.subscribe(open => { if (open) notifications += 1; });
@@ -261,6 +278,7 @@ export class MotionRoot {
   }
 
   private async measureTooltip(): Promise<unknown> {
+    await this.ensureSurfaces();
     this.tip.show(0);
     await this.wait(350);
     const el = document.querySelector('.mat-tooltip') as HTMLElement | null;
@@ -279,6 +297,7 @@ export class MotionRoot {
   }
 
   private async measureTabs(zero: boolean): Promise<unknown> {
+    await this.ensureSurfaces();
     this.tabDuration = zero ? '0ms' : '500ms';
     this.tabs.selectedIndex = 0;
     await this.wait(40);
@@ -300,6 +319,7 @@ export class MotionRoot {
   }
 
   private async measureField(): Promise<unknown> {
+    await this.ensureSurfaces();
     this.name.setErrors({required: true});
     this.name.markAsTouched();
     await this.waitFor(() => (document.querySelector('.mat-form-field-subscript-message')?.textContent || '').includes('Required'));
@@ -401,6 +421,7 @@ export class MotionRoot {
   }
 
   private async menuDuplicate(): Promise<unknown> {
+    await this.ensureSurfaces();
     let completions = 0;
     const sub = this.menu._animationDone.subscribe(() => { completions += 1; });
     this.menuTrigger.openMenu();
@@ -416,6 +437,7 @@ export class MotionRoot {
   }
 
   private async menuDescendant(): Promise<unknown> {
+    await this.ensureSurfaces();
     let completions = 0;
     const sub = this.menu._animationDone.subscribe(() => { completions += 1; });
     this.menuTrigger.openMenu();
@@ -433,6 +455,7 @@ export class MotionRoot {
   }
 
   private async selectDescendant(): Promise<unknown> {
+    await this.ensureSurfaces();
     let completions = 0;
     const sub = this.select._panelDoneAnimatingStream.subscribe(() => { completions += 1; });
     this.select.open();
@@ -450,6 +473,7 @@ export class MotionRoot {
   }
 
   private async selectFallback(): Promise<unknown> {
+    await this.ensureSurfaces();
     this.select.open();
     await this.waitFor(() => !!document.querySelector('.mat-select-panel'));
     this.select.close();
@@ -461,6 +485,7 @@ export class MotionRoot {
   }
 
   private async tooltipDestroy(): Promise<unknown> {
+    await this.ensureSurfaces();
     this.showGone = true;
     await this.wait(20);
     if (!this.tipGone) throw new Error('tooltip host missing');
@@ -474,6 +499,7 @@ export class MotionRoot {
   }
 
   private async tabsRapid(): Promise<unknown> {
+    await this.ensureSurfaces();
     this.tabDuration = '500ms';
     await this.wait(20);
     const el = document.querySelector('.mat-tab-body-content') as HTMLElement;

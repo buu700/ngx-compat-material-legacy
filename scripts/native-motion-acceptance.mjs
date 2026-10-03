@@ -112,6 +112,7 @@ export async function runAcceptance({runPath}) {
   const problems = [...identity, ...observed.problems.filter(item => !identity.includes(item))];
   const accepted = problems.length === 0 && observed.skipped.length === 0;
   const byId = new Map(outcomes.filter(item => item && item.ok === true).map(item => [item.id, item]));
+  const evidenceById = new Map(outcomes.filter(item => item && item.id).map(item => [item.id, item.evidence || '']));
   if (!request || request.error) {
     console.error(problems.join('\n'));
     return 1;
@@ -133,7 +134,7 @@ export async function runAcceptance({runPath}) {
     cases: roster.ids.map(id => ({
       case_id: id,
       result: byId.has(id) ? 'pass' : 'fail',
-      evidence: byId.has(id) ? byId.get(id).evidence : '',
+      evidence: evidenceById.get(id) || '',
     })),
   };
   const assertionPath = join(request.outputDir, 'motion-observations.json');
