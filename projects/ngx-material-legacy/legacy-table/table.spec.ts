@@ -8,7 +8,7 @@ import {
   TestBed,
   tick,
 } from '@angular/core/testing';
-import {LegacyNoopAnimationsModule} from '../internal/testing/owned-animation-modules';
+import {LEGACY_NOOP_ANIMATIONS} from '../internal/testing/owned-animation-modules';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {MatLegacyPaginator, MatLegacyPaginatorModule} from '../legacy-paginator/index';
 import {MatSort, MatSortHeader, MatSortModule} from '../sort/index';
@@ -22,9 +22,8 @@ describe('MatTable', () => {
       imports: [
         MatLegacyTableModule,
         MatLegacyPaginatorModule,
-        MatSortModule,
-        LegacyNoopAnimationsModule,
-      ],
+        MatSortModule
+        ],
       declarations: [
         MatTableApp,
         MatTableWithWhenRowApp,
@@ -34,9 +33,8 @@ describe('MatTable', () => {
         MatTableWithPaginatorApp,
         StickyTableApp,
         TableWithNgContainerRow,
-        NestedHtmlTableApp,
-      ],
-    }).compileComponents();
+        NestedHtmlTableApp
+      ], providers: [LEGACY_NOOP_ANIMATIONS]}).compileComponents();
   }));
 
   describe('with basic data source', () => {

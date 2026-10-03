@@ -6,7 +6,7 @@ import {Component, DebugElement, ViewChild} from '@angular/core';
 import {waitForAsync, ComponentFixture, fakeAsync, TestBed, tick} from '@angular/core/testing';
 import {MatLegacyFormFieldModule} from '@angular/material/legacy-form-field';
 import {By} from '@angular/platform-browser';
-import {LegacyNoopAnimationsModule} from '../internal/testing/owned-animation-modules';
+import {LEGACY_NOOP_ANIMATIONS} from '../internal/testing/owned-animation-modules';
 import {Subject} from 'rxjs';
 import {
   MAT_LEGACY_CHIPS_DEFAULT_OPTIONS,
@@ -29,11 +29,10 @@ describe('MatChipInput', () => {
       imports: [
         PlatformModule,
         MatLegacyChipsModule,
-        MatLegacyFormFieldModule,
-        LegacyNoopAnimationsModule,
-      ],
+        MatLegacyFormFieldModule
+        ],
       declarations: [TestChipInput],
-      providers: [
+      providers: [LEGACY_NOOP_ANIMATIONS,
         {
           provide: Directionality,
           useFactory: () => {
@@ -42,7 +41,7 @@ describe('MatChipInput', () => {
               change: new Subject(),
             };
           },
-        },
+        }
       ],
     });
 
@@ -222,15 +221,14 @@ describe('MatChipInput', () => {
           imports: [
             MatLegacyChipsModule,
             MatLegacyFormFieldModule,
-            PlatformModule,
-            LegacyNoopAnimationsModule,
-          ],
+            PlatformModule
+            ],
           declarations: [TestChipInput],
-          providers: [
+          providers: [LEGACY_NOOP_ANIMATIONS,
             {
               provide: MAT_LEGACY_CHIPS_DEFAULT_OPTIONS,
               useValue: {separatorKeyCodes: [COMMA]} as MatLegacyChipsDefaultOptions,
-            },
+            }
           ],
         })
         .compileComponents();

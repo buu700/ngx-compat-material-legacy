@@ -10,7 +10,7 @@ import {
   flush,
 } from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
-import {LegacyEnabledAnimationsModule, LegacyNoopAnimationsModule} from '../internal/testing/owned-animation-modules';
+import {LEGACY_ENABLED_ANIMATIONS, LEGACY_NOOP_ANIMATIONS} from '../internal/testing/owned-animation-modules';
 import {CommonModule} from '@angular/common';
 import {Observable} from 'rxjs';
 import {
@@ -25,7 +25,7 @@ import {MatLegacyTabHeaderPosition} from '@angular/material/legacy-tabs';
 describe('MatTabGroup', () => {
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [MatLegacyTabsModule, CommonModule, LegacyNoopAnimationsModule],
+      imports: [MatLegacyTabsModule, CommonModule],
       declarations: [
         SimpleTabsTestApp,
         SimpleDynamicTabsTestApp,
@@ -40,9 +40,8 @@ describe('MatTabGroup', () => {
         TabGroupWithIndirectDescendantTabs,
         TabGroupWithSpaceAbove,
         NestedTabGroupWithLabel,
-        TabsWithClassesTestApp,
-      ],
-    });
+        TabsWithClassesTestApp
+      ], providers: [LEGACY_NOOP_ANIMATIONS]});
 
     TestBed.compileComponents();
   }));
@@ -960,9 +959,9 @@ describe('MatTabNavBar with a default config', () => {
 
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [MatLegacyTabsModule, LegacyEnabledAnimationsModule],
+      imports: [MatLegacyTabsModule],
       declarations: [SimpleTabsTestApp],
-      providers: [{provide: MAT_LEGACY_TABS_CONFIG, useValue: {dynamicHeight: true}}],
+      providers: [LEGACY_ENABLED_ANIMATIONS, {provide: MAT_LEGACY_TABS_CONFIG, useValue: {dynamicHeight: true}}],
     });
 
     TestBed.compileComponents();
@@ -981,9 +980,8 @@ describe('MatTabNavBar with a default config', () => {
 describe('nested MatTabGroup with enabled animations', () => {
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [MatLegacyTabsModule, LegacyEnabledAnimationsModule],
-      declarations: [NestedTabs, TabsWithCustomAnimationDuration],
-    });
+      imports: [MatLegacyTabsModule],
+      declarations: [NestedTabs, TabsWithCustomAnimationDuration], providers: [LEGACY_ENABLED_ANIMATIONS]});
 
     TestBed.compileComponents();
   }));

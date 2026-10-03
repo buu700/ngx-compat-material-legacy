@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {LegacyNoopAnimationsModule} from '../../internal/testing/owned-animation-modules';
+import {LEGACY_NOOP_ANIMATIONS} from '../../internal/testing/owned-animation-modules';
 import {HarnessLoader, parallel, TestKey} from '@angular/cdk/testing';
 import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
@@ -31,9 +31,8 @@ export function runHarnessTests(
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [chipsModule, MatLegacyFormFieldModule, LegacyNoopAnimationsModule, iconModule],
-      declarations: [ChipsHarnessTest],
-    }).compileComponents();
+      imports: [chipsModule, MatLegacyFormFieldModule, iconModule],
+      declarations: [ChipsHarnessTest], providers: [LEGACY_NOOP_ANIMATIONS]}).compileComponents();
 
     fixture = TestBed.createComponent(ChipsHarnessTest);
     fixture.detectChanges();

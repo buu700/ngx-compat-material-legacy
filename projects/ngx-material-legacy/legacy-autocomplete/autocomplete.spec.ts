@@ -39,7 +39,7 @@ import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatLegacyOption, MatLegacyOptionSelectionChange} from '@angular/material/legacy-core';
 import {MatLegacyFormField, MatLegacyFormFieldModule} from '@angular/material/legacy-form-field';
 import {By} from '@angular/platform-browser';
-import {LegacyNoopAnimationsModule} from '../internal/testing/owned-animation-modules';
+import {LEGACY_NOOP_ANIMATIONS} from '../internal/testing/owned-animation-modules';
 import {EMPTY, Observable, Subject, Subscription} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 
@@ -69,11 +69,10 @@ describe('MatAutocomplete', () => {
         MatLegacyFormFieldModule,
         MatLegacyInputModule,
         FormsModule,
-        ReactiveFormsModule,
-        LegacyNoopAnimationsModule,
-      ],
+        ReactiveFormsModule
+        ],
       declarations: [component],
-      providers: [{provide: NgZone, useFactory: () => (zone = new MockNgZone())}, ...providers],
+      providers: [LEGACY_NOOP_ANIMATIONS, {provide: NgZone, useFactory: () => (zone = new MockNgZone())}, ...providers],
     });
 
     TestBed.compileComponents();

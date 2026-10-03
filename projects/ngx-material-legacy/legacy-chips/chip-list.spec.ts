@@ -44,7 +44,7 @@ import {
 } from '@angular/forms';
 import {MatLegacyFormFieldModule} from '@angular/material/legacy-form-field';
 import {By} from '@angular/platform-browser';
-import {LegacyEnabledAnimationsModule, LegacyNoopAnimationsModule} from '../internal/testing/owned-animation-modules';
+import {LEGACY_ENABLED_ANIMATIONS, LEGACY_NOOP_ANIMATIONS} from '../internal/testing/owned-animation-modules';
 import {Subject} from 'rxjs';
 import {MatLegacyInputModule} from '../legacy-input/index';
 import {MatLegacyChip} from './chip';
@@ -320,7 +320,7 @@ describe('MatChipList', () => {
           fakeAsync(() => {
             fixture.destroy();
             TestBed.resetTestingModule();
-            fixture = createComponent(StandardChipListWithAnimations, [], LegacyEnabledAnimationsModule);
+            fixture = createComponent(StandardChipListWithAnimations, [], LEGACY_ENABLED_ANIMATIONS);
             fixture.detectChanges();
 
             chipListDebugElement = fixture.debugElement.query(By.directive(MatLegacyChipList))!;
@@ -1509,9 +1509,7 @@ describe('MatChipList', () => {
   function createComponent<T>(
     component: Type<T>,
     providers: Provider[] = [],
-    animationsModule:
-      | Type<LegacyNoopAnimationsModule>
-      | Type<LegacyEnabledAnimationsModule> = LegacyNoopAnimationsModule,
+    animations: Provider = LEGACY_NOOP_ANIMATIONS,
   ): ComponentFixture<T> {
     TestBed.configureTestingModule({
       imports: [
@@ -1520,10 +1518,9 @@ describe('MatChipList', () => {
         MatLegacyChipsModule,
         MatLegacyFormFieldModule,
         MatLegacyInputModule,
-        animationsModule,
       ],
       declarations: [component],
-      providers: [{provide: NgZone, useFactory: () => (zone = new MockNgZone())}, ...providers],
+      providers: [animations, {provide: NgZone, useFactory: () => (zone = new MockNgZone())}, ...providers],
     }).compileComponents();
 
     return TestBed.createComponent<T>(component);

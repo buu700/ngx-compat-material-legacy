@@ -43,7 +43,7 @@ import {
   LegacyFloatLabelType,
 } from '@angular/material/legacy-form-field';
 import {By} from '@angular/platform-browser';
-import {LegacyEnabledAnimationsModule} from '../internal/testing/owned-animation-modules';
+import {LEGACY_ENABLED_ANIMATIONS} from '../internal/testing/owned-animation-modules';
 import {Directionality, Direction} from '@angular/cdk/bidi';
 import {Subject} from 'rxjs';
 import {MatLegacyInputModule, MatLegacyInput, MAT_LEGACY_INPUT_VALUE_ACCESSOR} from './index';
@@ -1886,12 +1886,11 @@ function createComponent<T>(
       FormsModule,
       MatLegacyFormFieldModule,
       MatLegacyInputModule,
-      LegacyEnabledAnimationsModule,
       ReactiveFormsModule,
-      ...imports,
+      ...imports
     ],
     declarations: [component, ...declarations],
-    providers,
+    providers: [LEGACY_ENABLED_ANIMATIONS, ...providers],
   }).compileComponents();
 
   return TestBed.createComponent<T>(component);

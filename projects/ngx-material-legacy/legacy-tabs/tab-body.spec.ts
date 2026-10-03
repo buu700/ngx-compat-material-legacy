@@ -4,7 +4,7 @@ import {CommonModule} from '@angular/common';
 import {AfterContentInit, Component, TemplateRef, ViewChild, ViewContainerRef} from '@angular/core';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {MatRippleModule} from '@angular/material/core';
-import {LegacyNoopAnimationsModule} from '../internal/testing/owned-animation-modules';
+import {LEGACY_NOOP_ANIMATIONS} from '../internal/testing/owned-animation-modules';
 import {By} from '@angular/platform-browser';
 import {ScrollingModule, CdkScrollable} from '@angular/cdk/scrolling';
 import {MatLegacyTabBody, MatLegacyTabBodyPortal} from './tab-body';
@@ -17,9 +17,9 @@ describe('MatTabBody', () => {
   beforeEach(waitForAsync(() => {
     dir = 'ltr';
     TestBed.configureTestingModule({
-      imports: [CommonModule, PortalModule, MatRippleModule, LegacyNoopAnimationsModule],
+      imports: [CommonModule, PortalModule, MatRippleModule],
       declarations: [MatLegacyTabBody, MatLegacyTabBodyPortal, SimpleTabBodyApp],
-      providers: [{provide: Directionality, useFactory: () => ({value: dir, change: dirChange})}],
+      providers: [LEGACY_NOOP_ANIMATIONS, {provide: Directionality, useFactory: () => ({value: dir, change: dirChange})}],
     });
 
     TestBed.compileComponents();
@@ -180,11 +180,9 @@ describe('MatTabBody', () => {
           CommonModule,
           PortalModule,
           MatRippleModule,
-          LegacyNoopAnimationsModule,
-          ScrollingModule,
+          ScrollingModule
         ],
-        declarations: [MatLegacyTabBody, MatLegacyTabBodyPortal, SimpleTabBodyApp],
-      })
+        declarations: [MatLegacyTabBody, MatLegacyTabBodyPortal, SimpleTabBodyApp], providers: [LEGACY_NOOP_ANIMATIONS]})
       .compileComponents();
 
     const fixture = TestBed.createComponent(SimpleTabBodyApp);

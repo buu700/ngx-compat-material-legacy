@@ -25,7 +25,7 @@ import {
   createNgModuleRef,
 } from '@angular/core';
 import {By} from '@angular/platform-browser';
-import {LegacyEnabledAnimationsModule, LegacyNoopAnimationsModule} from '../internal/testing/owned-animation-modules';
+import {LEGACY_ENABLED_ANIMATIONS, LEGACY_NOOP_ANIMATIONS} from '../internal/testing/owned-animation-modules';
 import {Location} from '@angular/common';
 import {SpyLocation} from '@angular/common/testing';
 import {Directionality} from '@angular/cdk/bidi';
@@ -62,7 +62,7 @@ describe('MatDialog', () => {
 
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [MatLegacyDialogModule, LegacyNoopAnimationsModule],
+      imports: [MatLegacyDialogModule],
       declarations: [
         ComponentWithChildViewContainer,
         ComponentWithTemplateRef,
@@ -71,16 +71,16 @@ describe('MatDialog', () => {
         DialogWithInjectedData,
         DialogWithoutFocusableElements,
         DirectiveWithViewContainer,
-        ComponentWithContentElementTemplateRef,
+        ComponentWithContentElementTemplateRef
       ],
-      providers: [
+      providers: [LEGACY_NOOP_ANIMATIONS,
         {provide: Location, useClass: SpyLocation},
         {
           provide: ScrollDispatcher,
           useFactory: () => ({
             scrolled: () => scrolledSubject,
           }),
-        },
+        }
       ],
     });
 
@@ -1851,9 +1851,9 @@ describe('MatDialog with a parent MatDialog', () => {
 
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [MatLegacyDialogModule, LegacyNoopAnimationsModule],
+      imports: [MatLegacyDialogModule],
       declarations: [ComponentThatProvidesMatDialog, DirectiveWithViewContainer],
-      providers: [
+      providers: [LEGACY_NOOP_ANIMATIONS,
         {
           provide: OverlayContainer,
           useFactory: () => {
@@ -1861,7 +1861,7 @@ describe('MatDialog with a parent MatDialog', () => {
             return {getContainerElement: () => overlayContainerElement};
           },
         },
-        {provide: Location, useClass: SpyLocation},
+        {provide: Location, useClass: SpyLocation}
       ],
     });
 
@@ -1967,8 +1967,8 @@ describe('MatDialog with default options', () => {
     };
 
     TestBed.configureTestingModule({
-      imports: [MatLegacyDialogModule, LegacyNoopAnimationsModule],
-      providers: [{provide: MAT_LEGACY_DIALOG_DEFAULT_OPTIONS, useValue: defaultConfig}],
+      imports: [MatLegacyDialogModule],
+      providers: [LEGACY_NOOP_ANIMATIONS, {provide: MAT_LEGACY_DIALOG_DEFAULT_OPTIONS, useValue: defaultConfig}],
       declarations: [ComponentWithChildViewContainer, DirectiveWithViewContainer],
     });
 
@@ -2038,9 +2038,8 @@ describe('MatDialog with animations enabled', () => {
 
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [MatLegacyDialogModule, LegacyEnabledAnimationsModule],
-      declarations: [ComponentWithChildViewContainer, DirectiveWithViewContainer],
-    });
+      imports: [MatLegacyDialogModule],
+      declarations: [ComponentWithChildViewContainer, DirectiveWithViewContainer], providers: [LEGACY_ENABLED_ANIMATIONS]});
 
     TestBed.compileComponents();
   }));
@@ -2086,9 +2085,8 @@ describe('MatDialog with explicit injector provided', () => {
 
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [MatLegacyDialogModule, LegacyEnabledAnimationsModule],
-      declarations: [ModuleBoundDialogParentComponent],
-    });
+      imports: [MatLegacyDialogModule],
+      declarations: [ModuleBoundDialogParentComponent], providers: [LEGACY_ENABLED_ANIMATIONS]});
 
     TestBed.compileComponents();
   }));

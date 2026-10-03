@@ -40,7 +40,7 @@ import {
   LegacyTooltipPosition,
   LegacyTooltipTouchGestures,
 } from './index';
-import {LegacyNoopAnimationsModule} from '../internal/testing/owned-animation-modules';
+import {LEGACY_NOOP_ANIMATIONS} from '../internal/testing/owned-animation-modules';
 
 const initialTooltipMessage = 'initial tooltip message';
 
@@ -306,13 +306,13 @@ describe('MatTooltip', () => {
     it('should be able to disable tooltip interactivity', fakeAsync(() => {
       TestBed.resetTestingModule()
         .configureTestingModule({
-          imports: [MatLegacyTooltipModule, OverlayModule, LegacyNoopAnimationsModule],
+          imports: [MatLegacyTooltipModule, OverlayModule],
           declarations: [TooltipDemoWithoutPositionBinding],
-          providers: [
+          providers: [LEGACY_NOOP_ANIMATIONS,
             {
               provide: MAT_LEGACY_TOOLTIP_DEFAULT_OPTIONS,
               useValue: {disableTooltipInteractivity: true},
-            },
+            }
           ],
         })
         .compileComponents();

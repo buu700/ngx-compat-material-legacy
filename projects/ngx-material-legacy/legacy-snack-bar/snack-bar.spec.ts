@@ -10,7 +10,7 @@ import {
   ViewContainerRef,
 } from '@angular/core';
 import {ComponentFixture, fakeAsync, flush, inject, TestBed, tick} from '@angular/core/testing';
-import {LegacyNoopAnimationsModule} from '../internal/testing/owned-animation-modules';
+import {LEGACY_NOOP_ANIMATIONS} from '../internal/testing/owned-animation-modules';
 import {
   MAT_LEGACY_SNACK_BAR_DATA,
   MatLegacySnackBar,
@@ -38,13 +38,12 @@ describe('MatSnackBar', () => {
 
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [MatLegacySnackBarModule, CommonModule, LegacyNoopAnimationsModule],
+      imports: [MatLegacySnackBarModule, CommonModule],
       declarations: [
         ComponentWithChildViewContainer,
         BurritosNotification,
-        DirectiveWithViewContainer,
-      ],
-    }).compileComponents();
+        DirectiveWithViewContainer
+      ], providers: [LEGACY_NOOP_ANIMATIONS]}).compileComponents();
   }));
 
   beforeEach(inject(
@@ -614,7 +613,7 @@ describe('MatSnackBar', () => {
         deps: [],
         useFactory: () => ({panelClass: 'custom-class'}),
       })
-      .configureTestingModule({imports: [MatLegacySnackBarModule, LegacyNoopAnimationsModule]})
+      .configureTestingModule({imports: [MatLegacySnackBarModule], providers: [LEGACY_NOOP_ANIMATIONS]})
       .compileComponents();
 
     inject([MatLegacySnackBar, OverlayContainer], (sb: MatLegacySnackBar, oc: OverlayContainer) => {
@@ -766,9 +765,8 @@ describe('MatSnackBar with parent MatSnackBar', () => {
 
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [MatLegacySnackBarModule, CommonModule, LegacyNoopAnimationsModule],
-      declarations: [ComponentThatProvidesMatSnackBar, DirectiveWithViewContainer],
-    }).compileComponents();
+      imports: [MatLegacySnackBarModule, CommonModule],
+      declarations: [ComponentThatProvidesMatSnackBar, DirectiveWithViewContainer], providers: [LEGACY_NOOP_ANIMATIONS]}).compileComponents();
   }));
 
   beforeEach(inject(
@@ -843,9 +841,8 @@ describe('MatSnackBar Positioning', () => {
 
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [MatLegacySnackBarModule, CommonModule, LegacyNoopAnimationsModule],
-      declarations: [ComponentWithChildViewContainer, DirectiveWithViewContainer],
-    }).compileComponents();
+      imports: [MatLegacySnackBarModule, CommonModule],
+      declarations: [ComponentWithChildViewContainer, DirectiveWithViewContainer], providers: [LEGACY_NOOP_ANIMATIONS]}).compileComponents();
   }));
 
   beforeEach(inject(
