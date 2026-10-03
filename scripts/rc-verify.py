@@ -54,6 +54,7 @@ SCRIPT_CHECKS = {
     "scripts/check-dependency-eligibility.py": "dependency-eligibility",
     "scripts/packed-consumer-aot-smoke.mjs": "packed-consumer",
     "scripts/motion-lifecycle-smoke.mjs": "motion-smoke",
+    "scripts/native-motion-acceptance.mjs": "native-motion",
     "scripts/build-migrate-legacy-cli.mjs": "migration-packaged",
     "scripts/migration-cli-isolation.mjs": "migration-packaged",
     "scripts/rc-test-legacy-family.mjs": "historical-legacy-artifact",
@@ -697,6 +698,23 @@ def main() -> int:
     )
     results["browser-matrix"] = "pass" if code == 0 else "fail"
     implemented_ran.append("browser-matrix")
+
+    # native-motion: packed artifact on Chromium, Firefox, and WebKitGTK.
+    # WebKitGTK is the webkit engine only. motion-smoke stays source-level.
+    code = run_node("scripts/native-motion-acceptance.mjs", ["--run", str(run_path)])
+    write_check_report(
+        out_dir,
+        run_id,
+        line,
+        "native-motion",
+        exit_code=code,
+        limitations=[
+            "Artifact-native motion on Chromium, Firefox, and WebKitGTK. WebKitGTK is not Safari.",
+            "Does not claim G04 or G10.",
+        ],
+    )
+    results["native-motion"] = "pass" if code == 0 else "fail"
+    implemented_ran.append("native-motion")
 
     # api-completeness: packed vs 16.2.14 names + allowlist + structural signatures.
     code = run_node("scripts/api-completeness.mjs", ["--run", str(run_path)])

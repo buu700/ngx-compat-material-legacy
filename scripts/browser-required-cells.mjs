@@ -571,10 +571,10 @@ function chromeBin() {
   throw new Error('No Chrome/Chromium binary found; set CHROME_BIN');
 }
 
-async function withChromium(origin, fn) {
+export async function withChromium(origin, fn, options = {}) {
   const bin = chromeBin();
   const userDir = mkdtempSync(join(cacheRoot, 'chrome-'));
-  const port = CDP_PORTS.chromium;
+  const port = options.port || CDP_PORTS.chromium;
   spawnSync('bash', ['-lc', `fuser -k ${port}/tcp >/dev/null 2>&1 || true`], {timeout: 5000});
   const chrome = spawn(bin, [
     '--headless=new',
@@ -637,7 +637,10 @@ async function withChromium(origin, fn) {
       }
       throw new Error(`navigation did not finish: ${url}`);
     };
-    await goto(`${origin}/`);
+    if (options.reduced) {
+      await send('Emulation.setEmulatedMedia', {features: [{name: 'prefers-reduced-motion', value: 'reduce'}]}, sessionId);
+    }
+    await goto(`${origin}${options.startPath || '/'}`);
     await fn({evaluate, goto, browser: {
       launched: true,
       engine: 'chromium',
@@ -652,13 +655,16 @@ async function withChromium(origin, fn) {
   }
 }
 
-async function withFirefox(origin, fn) {
+export async function withFirefox(origin, fn, options = {}) {
   const profile = mkdtempSync(join(cacheRoot, 'ff-'));
   const name = `ngx${Date.now()}`;
   const bin = firefoxBin();
   const created = spawnSync(bin, ['--headless', '--createprofile', `${name} ${profile}`], {encoding: 'utf8', timeout: 30000});
   if (created.status !== 0) throw new Error((created.stderr || created.stdout || 'createprofile failed').slice(-500));
-  const port = CDP_PORTS.firefox;
+  if (options.reduced) {
+    writeFileSync(join(profile, 'user.js'), 'user_pref("ui.prefersReducedMotion", 1);\n');
+  }
+  const port = options.port || CDP_PORTS.firefox;
   spawnSync('bash', ['-lc', `fuser -k ${port}/tcp >/dev/null 2>&1 || true`], {timeout: 5000});
   const firefox = spawn(bin, [
     '--headless',
@@ -714,7 +720,7 @@ async function withFirefox(origin, fn) {
     const goto = async url => {
       await send('browsingContext.navigate', {context, url, wait: 'complete'});
     };
-    await goto(`${origin}/`);
+    await goto(`${origin}${options.startPath || '/'}`);
     const capabilities = session.result?.capabilities || {};
     await fn({evaluate, goto, browser: {
       launched: true,
@@ -731,7 +737,7 @@ async function withFirefox(origin, fn) {
   }
 }
 
-function withWebKit(origin, fn) {
+export function withWebKit(origin, fn, options = {}) {
   return new Promise((resolveDone, rejectDone) => {
     const runtimeDir = mkdtempSync(join(cacheRoot, 'webkit-runtime-'));
     chmodSync(runtimeDir, 0o700);
@@ -747,6 +753,7 @@ function withWebKit(origin, fn) {
         WEBKIT_DISABLE_DMABUF_RENDERER: '1',
         XDG_DATA_DIRS: '/usr/share:/usr/local/share',
         GSETTINGS_SCHEMA_DIR: '/usr/share/glib-2.0/schemas',
+        ...(options.reduced ? {WEBKIT_REDUCED_MOTION: '1'} : {}),
       },
     });
     let buffer = '';
@@ -780,7 +787,7 @@ function withWebKit(origin, fn) {
       if (!identity.ok || identity.backend !== 'webkitgtk' || identity.api !== 'WebKit2-4.1') {
         throw new Error(identity.error || 'webkitgtk identity missing');
       }
-      const loaded = await request({cmd: 'load', url: `${origin}/`});
+      const loaded = await request({cmd: 'load', url: `${origin}${options.startPath || '/'}`});
       if (!loaded.ok) throw new Error(loaded.error || 'webkit load failed');
       const evaluate = async expression => {
         const response = await request({cmd: 'eval', expression});

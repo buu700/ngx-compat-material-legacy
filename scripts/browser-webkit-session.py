@@ -7,6 +7,7 @@ because this host's GDK backend has no GL context. This is system WebKitGTK (Web
 from __future__ import annotations
 
 import json
+import os
 import sys
 
 import gi
@@ -23,6 +24,10 @@ def reply(payload: dict) -> None:
 
 window = Gtk.Window(title='ngx-required-webkit')
 window.set_default_size(1280, 900)
+if os.environ.get('WEBKIT_REDUCED_MOTION') == '1':
+    gtk_settings = Gtk.Settings.get_default()
+    if gtk_settings is not None:
+        gtk_settings.set_property('gtk-enable-animations', False)
 view = WebKit2.WebView()
 settings = view.get_settings()
 settings.set_hardware_acceleration_policy(WebKit2.HardwareAccelerationPolicy.NEVER)
@@ -74,6 +79,7 @@ def on_stdin(_source, _condition) -> bool:
             'minor': WebKit2.get_minor_version(),
             'micro': WebKit2.get_micro_version(),
             'safari_certification': False,
+            'reduced_motion': os.environ.get('WEBKIT_REDUCED_MOTION') == '1',
         })
         return True
     if command == 'quit':
