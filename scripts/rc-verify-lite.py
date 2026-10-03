@@ -89,7 +89,7 @@ CHECKS = (
     ["node", "--check", "scripts/api-completeness.mjs"],
     ["node", "--check", "scripts/api-surface.mjs"],
     ["node", "--check", "scripts/api-di-observe.mjs"],
-    ["node", "scripts/api-completeness-regressions.mjs"],
+    ["node", "--check", "scripts/api-completeness-regressions.mjs"],
     ["node", "--check", "scripts/check-upstream-audit-disposition.mjs"],
     ["node", "scripts/check-select-panel-width.mjs"],
     ["node", "--check", "scripts/aot-same-selector.mjs"],
