@@ -1,7 +1,9 @@
 import {existsSync} from 'node:fs';
 import {pathToFileURL} from 'node:url';
 import {join} from 'node:path';
-import {Injector, runInInjectionContext} from '@angular/core';
+
+// verify-lite imports the checker before node_modules exists. Load Angular
+// only when a packed factory is actually executed.
 
 const modules = new Map();
 
@@ -28,7 +30,7 @@ async function loadModule(packageRoot, family, kind) {
   return loaded;
 }
 
-function runFactory(factory) {
+function runFactory(factory, Injector, runInInjectionContext) {
   const requests = [];
   const injector = Injector.create({providers: []});
   const proto = Object.getPrototypeOf(injector);
@@ -53,6 +55,7 @@ function runFactory(factory) {
 }
 
 export async function observeRuntimeDi(packageRoot, symbols, differences = []) {
+  const {Injector, runInInjectionContext} = await import('@angular/core');
   await import('@angular/compiler');
   const results = [];
   for (const symbol of symbols) {
@@ -79,7 +82,7 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = []) {
       results.push({symbol, problems, observed: []});
       continue;
     }
-    const observed = runFactory(value.ɵfac);
+    const observed = runFactory(value.ɵfac, Injector, runInInjectionContext);
     const expected = symbol.shape.diParams || [];
     if (observed.length !== expected.length) {
       problems.push(`token count ${symbol.symbol_id} expected ${expected.length} observed ${observed.length} [${observed.map(item => item.label).join(', ')}]`);
