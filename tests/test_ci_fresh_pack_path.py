@@ -39,6 +39,15 @@ class CiFreshPackPathTests(unittest.TestCase):
         self.assertIn("sass-seal.mjs --run", CI)
         self.assertIn("run-browser-matrix-slice.mjs --run", CI)
 
+    def test_full_acceptance_lane_keeps_its_own_exit(self):
+        lane = CI.split("name: Full acceptance coordinator", 1)[1]
+        self.assertNotIn("continue-on-error", lane)
+        self.assertIn('exit "$code"', lane)
+        self.assertIn("reports/pack-library.json", lane)
+        self.assertIn("reports/packed-consumer.json", lane)
+        self.assertIn("reports/engine-free-consumer.json", lane)
+        self.assertIn("just verify --out", lane)
+
 
 if __name__ == "__main__":
     unittest.main()

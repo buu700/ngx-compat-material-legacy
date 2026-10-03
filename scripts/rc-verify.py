@@ -47,6 +47,7 @@ FIXED_DETAILS = {
 SCRIPT_CHECKS = {
     **{script: item[0] for script, item in FIXED_DETAILS.items()},
     "scripts/pack-draft-run.mjs": "pack-library",
+    "scripts/check-pack-library.mjs": "pack-library",
     "scripts/check-packed-exports.mjs": "packed-exports",
     "scripts/packed-consumer-aot-smoke.mjs": "packed-consumer",
     "scripts/motion-lifecycle-smoke.mjs": "motion-smoke",
@@ -547,9 +548,10 @@ def main() -> int:
         fail('source/checker inputs changed during packing')
     run_path.write_text(json.dumps(draft, indent=2) + '\n')
     ACTIVE_RUN = RunEvidence(draft, out_dir, expected_matrix_digest, pack_execution=pack_execution)
-    write_check_report(out_dir, run_id, line, "pack-library", exit_code=0)
+    pack_report_code = run_node("scripts/check-pack-library.mjs", ["--run", str(run_path)])
+    write_check_report(out_dir, run_id, line, "pack-library", exit_code=pack_report_code)
 
-    results: dict[str, str] = {"pack-library": "pass"}
+    results: dict[str, str] = {"pack-library": "pass" if pack_report_code == 0 else "fail"}
     implemented_ran: list[str] = ["pack-library"]
 
     # packed-exports

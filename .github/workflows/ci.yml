@@ -210,7 +210,8 @@ jobs:
           if [ -f "$RUN/verify-summary.json" ]; then
             python3 -c 'import json,sys; s=json.load(open(sys.argv[1])); c=s.get("completeness") or {}; print("complete_checks:", ", ".join(c.get("complete_checks") or [])); print("automatic_product_result:", c.get("automatic_product_result")); inc=c.get("incomplete_checks") or {}; print("incomplete_count:", len(inc)); [print("incomplete", i, (r or [""])[0]) for i,r in list(inc.items())[:8]]' "$RUN/verify-summary.json" || true
           fi
-          # Keep the verifier's own exit. Nonzero means the run is still incomplete.
+          # Distinct full-acceptance lane. A nonzero verifier exit stays the job result.
+          # That result is incompleteness, not release success.
           exit "$code"
 
       - name: Upload full-verifier evidence
@@ -222,5 +223,11 @@ jobs:
             ${{ steps.verify.outputs.run_dir }}/verify-summary.json
             ${{ steps.verify.outputs.run_dir }}/reports/packed-exports.json
             ${{ steps.verify.outputs.run_dir }}/evidence/packed-exports
+            ${{ steps.verify.outputs.run_dir }}/reports/pack-library.json
+            ${{ steps.verify.outputs.run_dir }}/evidence/pack-library
+            ${{ steps.verify.outputs.run_dir }}/reports/packed-consumer.json
+            ${{ steps.verify.outputs.run_dir }}/evidence/packed-consumer
+            ${{ steps.verify.outputs.run_dir }}/reports/engine-free-consumer.json
+            ${{ steps.verify.outputs.run_dir }}/evidence/engine-free-consumer
           if-no-files-found: warn
           retention-days: 14

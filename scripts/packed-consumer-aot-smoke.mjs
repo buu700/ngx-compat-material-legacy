@@ -30,6 +30,19 @@ import {tmpdir} from 'node:os';
 import {dirname, isAbsolute, join, relative, resolve, sep} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {spawnSync} from 'node:child_process';
+import {
+  allConsumerCaseIds,
+  coordinatorRequest,
+  declarationKeys,
+  declarationObservations,
+  harnessCaseIds,
+  librarySpec as packagedSpec,
+  lineForPackageVersion,
+  loadExportKeys,
+  projectFacts,
+  readPackedIdentity,
+  writeAcceptanceReport,
+} from './packed-consumer-evidence.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const outPath = join(root, 'compatibility/pack-proof/aot-harness-smoke.json');
@@ -63,6 +76,14 @@ for (let i = 0; i < args.length; i += 1) {
   process.exit(2);
 }
 
+const coordinator = coordinatorRequest('packed-consumer');
+if (coordinator && coordinator.error) {
+  console.error(`packed-consumer: refusing acceptance report: ${coordinator.error}`);
+  process.exit(2);
+}
+const exportKeys = loadExportKeys();
+console.log(`packed-consumer: derived ${allConsumerCaseIds(exportKeys).length} cases before reading the candidate`);
+
 function sha256File(path) {
   return createHash('sha256').update(readFileSync(path)).digest('hex');
 }
@@ -92,8 +113,62 @@ function isInside(parent, target) {
 }
 
 function librarySpec(exportKey) {
-  if (exportKey === '.') return '@ngx-compat/material-legacy';
-  return `@ngx-compat/material-legacy/${exportKey.slice(2)}`;
+  return packagedSpec(exportKey);
+}
+
+function compilePeerHarness(consumer, rootReal) {
+  const legacySpec = '@ngx-compat/material-legacy/legacy-button/testing';
+  const peerSpec = '@angular/material/button/testing';
+  writeFileSync(
+    join(consumer, 'src/peer-harness.ts'),
+    "import {MatButtonHarness} from '@angular/material/button/testing';\nexport const peerHarness = MatButtonHarness;\n",
+  );
+  const config = {
+    compilerOptions: {
+      target: 'ES2022',
+      module: 'ES2022',
+      moduleResolution: 'bundler',
+      strict: true,
+      skipLibCheck: false,
+      noEmit: true,
+      experimentalDecorators: true,
+      lib: ['ES2022', 'DOM'],
+      types: [],
+    },
+    files: ['src/peer-harness.ts'],
+  };
+  writeFileSync(join(consumer, 'tsconfig.peer-harness.json'), JSON.stringify(config, null, 2));
+  const compiled = run(
+    process.execPath,
+    [join(consumer, 'node_modules/typescript/lib/tsc.js'), '-p', 'tsconfig.peer-harness.json', '--pretty', 'false'],
+    {cwd: consumer, timeout: 180000, env: isolatedEnv()},
+  );
+  const resolveSpec = spec => {
+    const probe = run(
+      process.execPath,
+      ['--input-type=module', '-e', `
+        import {createRequire} from 'node:module';
+        import {pathToFileURL} from 'node:url';
+        const require = createRequire(pathToFileURL(process.cwd() + '/'));
+        console.log(require.resolve(process.env.LEGACY_SPEC));
+      `],
+      {cwd: consumer, env: {...isolatedEnv(), LEGACY_SPEC: spec}},
+    );
+    if (probe.status !== 0) return null;
+    return realpathSync(probe.stdout.trim());
+  };
+  const legacyPath = resolveSpec(legacySpec);
+  const peerPath = resolveSpec(peerSpec);
+  const legacyOwned = Boolean(legacyPath && legacyPath.includes(`${sep}@ngx-compat${sep}material-legacy${sep}`) && !isInside(rootReal, legacyPath));
+  const peerOwned = Boolean(peerPath && peerPath.includes(`${sep}@angular${sep}material${sep}`) && !legacyPath?.startsWith(peerPath) && peerPath !== legacyPath);
+  const ok = compiled.status === 0 && legacyOwned && peerOwned;
+  return {
+    ok,
+    exit_code: compiled.status,
+    legacy_path: legacyPath,
+    peer_path: peerPath,
+    failure: ok ? null : `peer/owned harness scope failed\n${(compiled.stdout || '').slice(-800)}\n${(compiled.stderr || '').slice(-800)}`,
+  };
 }
 
 function assertIsolatedInstall(consumer, consumerReal, rootReal) {
@@ -156,7 +231,7 @@ function assertIsolatedInstall(consumer, consumerReal, rootReal) {
     ) {
       throw new Error(`${spec} resolved outside the installed library: ${found}`);
     }
-    resolved.push(spec);
+    resolved.push({spec, path: found, insideWorkspace: isInside(rootReal, found), insideConsumer: isInside(consumerReal, found)});
   }
 
   const animationHits = [];
@@ -294,11 +369,20 @@ export class ModernStrictModule {}
     }
   }
 
+  const projects = ['tsconfig.entries.json', 'tsconfig.legacy-strict.json', 'tsconfig.modern.json'].map(name => {
+    const facts = projectFacts(JSON.parse(readFileSync(join(consumer, name), 'utf8')));
+    if (!facts.skipLibCheckFalse) throw new Error(`${name} did not keep skipLibCheck:false`);
+    if (facts.paths.length) throw new Error(`${name} introduced a paths alias`);
+    return {name, ...facts};
+  });
   return {
     consumer_outside_repository: true,
     node_path: 'unset',
     workspace_symlinks: [],
+    resolved,
     resolved_entries: resolved.length,
+    declaration_program_ok: true,
+    projects,
     declaration_check: 'skipLibCheck:false',
     strict_templates: ['legacy-button', 'modern-button'],
     separate_compilation_scopes: true,
@@ -307,6 +391,84 @@ export class ModernStrictModule {}
     sass_include_paths: [],
     sass_compile: 'not run in this consumer',
   };
+}
+
+
+function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
+  const isolation = result.isolation || {};
+  const resolved = new Map((isolation.resolved || []).map(item => [item.spec, item]));
+  const projects = isolation.projects || [];
+  const mainFacts = result.mainProjectFacts || {skipLibCheckFalse: false, paths: []};
+  const peerFacts = result.peerProjectFacts || {skipLibCheckFalse: false, paths: []};
+  const aliasKeys = [...projects.flatMap(item => item.paths || []), ...(mainFacts.paths || []), ...(peerFacts.paths || [])];
+  const declarations = declarationObservations(keys, resolved, {
+    programOk: isolation.declaration_program_ok === true,
+    aliasKeys,
+    nodePathUnset: isolation.node_path === 'unset',
+    skipLibCheckFalse: projects.length > 0 && projects.every(item => item.skipLibCheckFalse === true) && mainFacts.skipLibCheckFalse === true && peerFacts.skipLibCheckFalse === true,
+    projects: [...projects.map(item => item.name), 'tsconfig.json', 'tsconfig.peer-harness.json'],
+  });
+  const aot = [
+    {
+      case_id: 'packed-consumer/aot/legacy-button-strict-template',
+      result: isolation.separate_compilation_scopes && (isolation.strict_templates || []).includes('legacy-button') ? 'pass' : 'fail',
+      selector: 'mat-button',
+      scope: 'legacy-strict-root',
+      failure: null,
+    },
+    {
+      case_id: 'packed-consumer/aot/current-button-separate-scope',
+      result: isolation.separate_compilation_scopes && (isolation.strict_templates || []).includes('modern-button') ? 'pass' : 'fail',
+      selector: 'mat-button',
+      scope: 'modern-strict-root',
+      failure: null,
+    },
+    {
+      case_id: 'packed-consumer/aot/legacy-dialog-select-module',
+      result: result.aot && result.aot.status === 'ok' ? 'pass' : 'fail',
+      entries: result.aot ? result.aot.entries : [],
+      strict_templates: true,
+      skip_lib_check: false,
+      failure: result.aot && result.aot.status === 'ok' ? null : 'module AOT did not succeed',
+    },
+    {
+      case_id: 'packed-consumer/aot/standalone-harness-host',
+      result: result.harness && result.harness.status === 'ok' ? 'pass' : 'fail',
+      standalone: true,
+      failure: result.harness && result.harness.status === 'ok' ? null : 'standalone harness host did not compile and run',
+    },
+  ];
+  for (const item of aot) {
+    if (item.result !== 'pass' && !item.failure) item.failure = 'AOT scope did not succeed';
+  }
+  const parsed = result.harness && result.harness.result ? result.harness.result : {};
+  const harnessMap = {
+    'packed-consumer/harness/legacy-button': parsed.buttonText === 'Go',
+    'packed-consumer/harness/legacy-select': parsed.selectOpened === true && parsed.selectClosed === true,
+    'packed-consumer/harness/legacy-dialog': typeof parsed.dialogText === 'string' && parsed.dialogText.includes('Hello dialog') && parsed.dialogsAfterClose === 0,
+    'packed-consumer/harness/legacy-menu': parsed.menuOpen === true,
+    'packed-consumer/harness/legacy-snack-bar': typeof parsed.snackText === 'string' && parsed.snackText.includes('Snack message'),
+    'packed-consumer/harness/legacy-tooltip': parsed.tipVisible === true && typeof parsed.tipText === 'string' && parsed.tipText.includes('Tip text'),
+    'packed-consumer/harness/legacy-tabs': parsed.tabCount === 2 && parsed.selectedTab === 'Two',
+  };
+  const owned = declarationKeys(keys)
+    .filter(key => key.endsWith('/testing'))
+    .every(key => {
+      const found = resolved.get(packagedSpec(key));
+      return found && found.insideConsumer && !found.insideWorkspace;
+    });
+  const harness = harnessCaseIds().map(caseId => {
+    if (caseId === 'packed-consumer/harness/owned-resolution') {
+      return {case_id: caseId, result: owned ? 'pass' : 'fail', failure: owned ? null : 'owned testing entry resolved outside the packed library'};
+    }
+    if (caseId === 'packed-consumer/harness/peer-harness-separate-scope') {
+      const ok = Boolean(result.peer && result.peer.ok);
+      return {case_id: caseId, result: ok ? 'pass' : 'fail', legacy_path: result.peer ? result.peer.legacy_path : null, peer_path: result.peer ? result.peer.peer_path : null, failure: ok ? null : 'peer harness was not compiled in a separate scope'};
+    }
+    const ok = harnessMap[caseId] === true;
+    return {case_id: caseId, result: ok ? 'pass' : 'fail', failure: ok ? null : 'harness behavior did not match the reviewed fixture'};
+  });
+  return [...aot, ...declarations, ...harness];
 }
 
 let draftRun = null;
@@ -386,6 +548,18 @@ if (runManifestPath) {
         2,
       ) + '\n',
     );
+    process.exit(1);
+  }
+  let packedIdentity;
+  try {
+    packedIdentity = readPackedIdentity(tarball);
+  } catch (error) {
+    console.error(error && error.message ? error.message : error);
+    process.exit(1);
+  }
+  const expectedLine = lineForPackageVersion(packedIdentity.version);
+  if (packedIdentity.name !== '@ngx-compat/material-legacy' || expectedLine !== draftRun.line) {
+    console.error(`packed library ${packedIdentity.name}@${packedIdentity.version} does not match run line ${draftRun.line}`);
     process.exit(1);
   }
 }
@@ -471,6 +645,11 @@ try {
     throw new Error('Consumer install changed the repository pnpm-lock.yaml');
   }
   result.isolation = assertIsolatedInstall(consumer, consumerReal, rootReal);
+  result.peer = compilePeerHarness(consumer, rootReal);
+  if (existsSync(join(consumer, 'tsconfig.peer-harness.json'))) {
+    result.peerProjectFacts = projectFacts(JSON.parse(readFileSync(join(consumer, 'tsconfig.peer-harness.json'), 'utf8')));
+  }
+  if (!result.peer.ok) result.errors.push(result.peer.failure || 'peer harness scope failed');
 
   mkdirSync(join(consumer, 'src'), {recursive: true});
 
@@ -535,8 +714,8 @@ platformBrowserDynamic().bootstrapModule(AotSmokeModule).catch(err => console.er
           moduleResolution: 'bundler',
           experimentalDecorators: true,
           emitDecoratorMetadata: false,
-          strict: false,
-          skipLibCheck: true,
+          strict: true,
+          skipLibCheck: false,
           lib: ['ES2022', 'DOM'],
           rootDir: 'src',
           outDir: 'out-tsc',
@@ -549,7 +728,7 @@ platformBrowserDynamic().bootstrapModule(AotSmokeModule).catch(err => console.er
         angularCompilerOptions: {
           enableIvy: true,
           compilationMode: 'full',
-          strictTemplates: false,
+          strictTemplates: true,
         },
       },
       null,
@@ -565,9 +744,13 @@ platformBrowserDynamic().bootstrapModule(AotSmokeModule).catch(err => console.er
     timeout: 180000,
     env: isolatedEnv(),
   });
+  result.mainProjectFacts = projectFacts(JSON.parse(readFileSync(join(consumer, 'tsconfig.json'), 'utf8')));
   const aotOk =
     aot.status === 0 &&
-    existsSync(join(consumer, 'out-tsc/app.module.js'));
+    existsSync(join(consumer, 'out-tsc/app.module.js')) &&
+    result.mainProjectFacts.skipLibCheckFalse &&
+    result.mainProjectFacts.strictTemplates &&
+    result.mainProjectFacts.paths.length === 0;
   result.aot = {
     status: aotOk ? 'ok' : 'fail',
     exit_code: aot.status,
@@ -834,6 +1017,9 @@ main().catch(err => {
     // Recompile including harness-runtime.ts
     const tsconfig = JSON.parse(readFileSync(join(consumer, 'tsconfig.json'), 'utf8'));
     tsconfig.files = ['src/app.module.ts', 'src/main.ts', 'src/harness-runtime.ts'];
+    tsconfig.compilerOptions.strict = false;
+    tsconfig.compilerOptions.skipLibCheck = false;
+    tsconfig.angularCompilerOptions.strictTemplates = false;
     writeFileSync(join(consumer, 'tsconfig.json'), JSON.stringify(tsconfig, null, 2));
     const aot2 = run(process.execPath, [ngcCmd, '-p', 'tsconfig.json'], {
       cwd: consumer,
@@ -884,6 +1070,10 @@ main().catch(err => {
   }
 
 
+  result.acceptanceCases = collectAcceptanceCases(result, exportKeys, consumerReal, rootReal);
+  if (coordinator && result.acceptanceCases.some(item => item.result !== 'pass')) {
+    result.errors.push('one or more packed-consumer acceptance cases failed');
+  }
   result.status = result.errors.length ? 'fail' : 'ok';
 } catch (err) {
   result.status = 'fail';
@@ -901,7 +1091,35 @@ main().catch(err => {
       /* ignore */
     }
   }
-  if (draftRun) {
+  if (draftRun && coordinator && result.status === 'ok' && Array.isArray(result.acceptanceCases)) {
+    if (coordinator.runId !== draftRun.run_id) {
+      console.error('coordinator run id does not match the draft manifest');
+      result.status = 'fail';
+      result.errors.push('run id mismatch');
+    } else if (resolve(coordinator.runDir) !== resolve(draftRun.runDir)) {
+      console.error('coordinator assertion directory is not in this run');
+      result.status = 'fail';
+      result.errors.push('run directory mismatch');
+    } else {
+      const written = writeAcceptanceReport({
+        checkId: 'packed-consumer',
+        request: coordinator,
+        cases: result.acceptanceCases,
+        expectedIds: allConsumerCaseIds(exportKeys),
+        library: {sha256: draftRun.artifact.sha256, bytes: draftRun.artifact.bytes},
+        assertionName: 'consumer-observations.json',
+        assertionBody: {
+          peer: result.peer || null,
+          harness: result.harness && result.harness.result ? result.harness.result : null,
+        },
+        command: ['node', 'scripts/packed-consumer-aot-smoke.mjs', '--run', runManifestPath],
+      });
+      if (!written.passed) {
+        result.status = 'fail';
+        result.errors.push('acceptance report was not complete');
+      }
+    }
+  } else if (draftRun) {
     const exitCode = result.status === 'ok' ? 0 : 1;
     const report = {
       schema_version: 1,
@@ -928,7 +1146,7 @@ main().catch(err => {
       ],
       limitations: [
         'Rehashed the draft library artifact before install.',
-        'Does not seal run.json or claim the rest of the product matrix.',
+        'Diagnostic slice only. Coordinator mode writes the acceptance report.',
       ],
       artifact: {
         id: 'library',
