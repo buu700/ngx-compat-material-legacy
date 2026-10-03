@@ -4,7 +4,7 @@ import {CommonModule} from '@angular/common';
 import {AfterContentInit, Component, TemplateRef, ViewChild, ViewContainerRef} from '@angular/core';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {MatRippleModule} from '@angular/material/core';
-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {LegacyNoopAnimationsModule} from '../internal/testing/owned-animation-modules';
 import {By} from '@angular/platform-browser';
 import {ScrollingModule, CdkScrollable} from '@angular/cdk/scrolling';
 import {MatLegacyTabBody, MatLegacyTabBodyPortal} from './tab-body';
@@ -17,7 +17,7 @@ describe('MatTabBody', () => {
   beforeEach(waitForAsync(() => {
     dir = 'ltr';
     TestBed.configureTestingModule({
-      imports: [CommonModule, PortalModule, MatRippleModule, NoopAnimationsModule],
+      imports: [CommonModule, PortalModule, MatRippleModule, LegacyNoopAnimationsModule],
       declarations: [MatLegacyTabBody, MatLegacyTabBodyPortal, SimpleTabBodyApp],
       providers: [{provide: Directionality, useFactory: () => ({value: dir, change: dirChange})}],
     });
@@ -180,7 +180,7 @@ describe('MatTabBody', () => {
           CommonModule,
           PortalModule,
           MatRippleModule,
-          NoopAnimationsModule,
+          LegacyNoopAnimationsModule,
           ScrollingModule,
         ],
         declarations: [MatLegacyTabBody, MatLegacyTabBodyPortal, SimpleTabBodyApp],

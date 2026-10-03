@@ -1,0 +1,522 @@
+From 199e8d833e5d0fd8850d662a808f4bc3e474129d Mon Sep 17 00:00:00 2001
+From: Kristiyan Kostadinov <crisbeto@abv.bg>
+Date: Mon, 20 Nov 2023 09:15:55 +0100
+Subject: [PATCH] refactor(cdk/a11y): convert to standalone
+
+Converts `cdk/a11y` to standalone.
+---
+ src/cdk/a11y/a11y-module.ts                   |  3 +-
+ .../aria-describer/aria-describer.spec.ts     |  5 +--
+ .../a11y/focus-monitor/focus-monitor.spec.ts  | 35 ++++++++++++-------
+ src/cdk/a11y/focus-monitor/focus-monitor.ts   |  1 +
+ .../configurable-focus-trap.spec.ts           |  6 ++--
+ .../event-listener-inert-strategy.spec.ts     |  6 ++--
+ src/cdk/a11y/focus-trap/focus-trap.spec.ts    | 27 ++++++++++++--
+ src/cdk/a11y/focus-trap/focus-trap.ts         |  1 +
+ .../live-announcer/live-announcer.spec.ts     | 29 ++++++++-------
+ src/cdk/a11y/live-announcer/live-announcer.ts |  1 +
+ tools/public_api_guard/cdk/a11y.md            | 10 +++---
+ 11 files changed, 81 insertions(+), 43 deletions(-)
+
+diff --git a/src/cdk/a11y/a11y-module.ts b/src/cdk/a11y/a11y-module.ts
+index b83eacd7f1f3..58e478bc9779 100644
+--- a/src/cdk/a11y/a11y-module.ts
++++ b/src/cdk/a11y/a11y-module.ts
+@@ -14,8 +14,7 @@ import {HighContrastModeDetector} from './high-contrast-mode/high-contrast-mode-
+ import {CdkAriaLive} from './live-announcer/live-announcer';
+ 
+ @NgModule({
+-  imports: [ObserversModule],
+-  declarations: [CdkAriaLive, CdkTrapFocus, CdkMonitorFocus],
++  imports: [ObserversModule, CdkAriaLive, CdkTrapFocus, CdkMonitorFocus],
+   exports: [CdkAriaLive, CdkTrapFocus, CdkMonitorFocus],
+ })
+ export class A11yModule {
+diff --git a/src/cdk/a11y/aria-describer/aria-describer.spec.ts b/src/cdk/a11y/aria-describer/aria-describer.spec.ts
+index 28f70523ba6a..7991f830b423 100644
+--- a/src/cdk/a11y/aria-describer/aria-describer.spec.ts
++++ b/src/cdk/a11y/aria-describer/aria-describer.spec.ts
+@@ -10,8 +10,7 @@ describe('AriaDescriber', () => {
+ 
+   function createFixture(providers: Provider[] = []) {
+     TestBed.configureTestingModule({
+-      imports: [A11yModule],
+-      declarations: [TestApp],
++      imports: [A11yModule, TestApp],
+       providers: [AriaDescriber, ...providers],
+     }).compileComponents();
+ 
+@@ -401,6 +400,8 @@ function expectMessage(el: Element, message: string) {
+     <div id="description-with-existing-id">Hello</div>
+     <div description-without-id>Hey</div>
+   `,
++  standalone: true,
++  imports: [A11yModule],
+ })
+ class TestApp {
+   @ViewChild('element1') _element1: ElementRef<HTMLElement>;
+diff --git a/src/cdk/a11y/focus-monitor/focus-monitor.spec.ts b/src/cdk/a11y/focus-monitor/focus-monitor.spec.ts
+index b1472a5809f5..f1d6e387d9f9 100644
+--- a/src/cdk/a11y/focus-monitor/focus-monitor.spec.ts
++++ b/src/cdk/a11y/focus-monitor/focus-monitor.spec.ts
+@@ -32,15 +32,13 @@ describe('FocusMonitor', () => {
+     fakeActiveElement = null;
+ 
+     TestBed.configureTestingModule({
+-      imports: [A11yModule],
+-      declarations: [PlainButton],
++      imports: [A11yModule, PlainButton],
+       providers: [
+         {
+           provide: DOCUMENT,
+           useFactory: () => {
+             // We have to stub out the `document` in order to be able to fake `activeElement`.
+             const fakeDocument = {body: document.body};
+-
+             [
+               'createElement',
+               'dispatchEvent',
+@@ -54,11 +52,9 @@ describe('FocusMonitor', () => {
+                 return (document as any)[method].apply(document, arguments);
+               };
+             });
+-
+             Object.defineProperty(fakeDocument, 'activeElement', {
+               get: () => fakeActiveElement || document.activeElement,
+             });
+-
+             return fakeDocument;
+           },
+         },
+@@ -473,8 +469,7 @@ describe('FocusMonitor with "eventual" detection', () => {
+ 
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+-      imports: [A11yModule],
+-      declarations: [PlainButton],
++      imports: [A11yModule, PlainButton],
+       providers: [
+         {
+           provide: FOCUS_MONITOR_DEFAULT_OPTIONS,
+@@ -511,8 +506,8 @@ describe('FocusMonitor with "eventual" detection', () => {
+ describe('cdkMonitorFocus', () => {
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+-      imports: [A11yModule],
+-      declarations: [
++      imports: [
++        A11yModule,
+         ButtonWithFocusClasses,
+         ComplexComponentWithMonitorElementFocus,
+         ComplexComponentWithMonitorSubtreeFocus,
+@@ -830,8 +825,7 @@ describe('FocusMonitor observable stream', () => {
+   beforeEach(() => {
+     fakePlatform = {isBrowser: true} as Platform;
+     TestBed.configureTestingModule({
+-      imports: [A11yModule],
+-      declarations: [PlainButton],
++      imports: [A11yModule, PlainButton],
+       providers: [{provide: Platform, useValue: fakePlatform}],
+     }).compileComponents();
+   });
+@@ -880,8 +874,7 @@ describe('FocusMonitor input label detection', () => {
+ 
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+-      imports: [A11yModule],
+-      declarations: [CheckboxWithLabel],
++      imports: [A11yModule, CheckboxWithLabel],
+     }).compileComponents();
+   });
+ 
+@@ -919,11 +912,15 @@ describe('FocusMonitor input label detection', () => {
+ 
+ @Component({
+   template: `<div class="parent"><button>focus me!</button></div>`,
++  standalone: true,
++  imports: [A11yModule],
+ })
+ class PlainButton {}
+ 
+ @Component({
+   template: `<button cdkMonitorElementFocus (cdkFocusChange)="focusChanged($event)"></button>`,
++  standalone: true,
++  imports: [A11yModule],
+ })
+ class ButtonWithFocusClasses {
+   focusChanged(_origin: FocusOrigin) {}
+@@ -931,21 +928,29 @@ class ButtonWithFocusClasses {
+ 
+ @Component({
+   template: `<div tabindex="0" cdkMonitorElementFocus><button></button></div>`,
++  standalone: true,
++  imports: [A11yModule],
+ })
+ class ComplexComponentWithMonitorElementFocus {}
+ 
+ @Component({
+   template: `<div tabindex="0" cdkMonitorSubtreeFocus><button></button></div>`,
++  standalone: true,
++  imports: [A11yModule],
+ })
+ class ComplexComponentWithMonitorSubtreeFocus {}
+ 
+ @Component({
+   template: `<div cdkMonitorSubtreeFocus><button cdkMonitorElementFocus></button></div>`,
++  standalone: true,
++  imports: [A11yModule],
+ })
+ class ComplexComponentWithMonitorSubtreeFocusAndMonitorElementFocus {}
+ 
+ @Component({
+   template: `<ng-container cdkMonitorElementFocus></ng-container>`,
++  standalone: true,
++  imports: [A11yModule],
+ })
+ class FocusMonitorOnCommentNode {}
+ 
+@@ -954,11 +959,15 @@ class FocusMonitorOnCommentNode {}
+     <label for="test-checkbox">Check me</label>
+     <input id="test-checkbox" type="checkbox">
+   `,
++  standalone: true,
++  imports: [A11yModule],
+ })
+ class CheckboxWithLabel {}
+ 
+ @Component({
+   template: `<button cdkMonitorElementFocus #exportedDir="cdkMonitorFocus"></button>`,
++  standalone: true,
++  imports: [A11yModule],
+ })
+ class ExportedFocusMonitor {
+   @ViewChild('exportedDir') exportedDirRef: CdkMonitorFocus;
+diff --git a/src/cdk/a11y/focus-monitor/focus-monitor.ts b/src/cdk/a11y/focus-monitor/focus-monitor.ts
+index 1c5b5706b71a..b22dbc458e55 100644
+--- a/src/cdk/a11y/focus-monitor/focus-monitor.ts
++++ b/src/cdk/a11y/focus-monitor/focus-monitor.ts
+@@ -616,6 +616,7 @@ export class FocusMonitor implements OnDestroy {
+ @Directive({
+   selector: '[cdkMonitorElementFocus], [cdkMonitorSubtreeFocus]',
+   exportAs: 'cdkMonitorFocus',
++  standalone: true,
+ })
+ export class CdkMonitorFocus implements AfterViewInit, OnDestroy {
+   private _monitorSubscription: Subscription;
+diff --git a/src/cdk/a11y/focus-trap/configurable-focus-trap.spec.ts b/src/cdk/a11y/focus-trap/configurable-focus-trap.spec.ts
+index 87dbfe35542d..b695deacaaca 100644
+--- a/src/cdk/a11y/focus-trap/configurable-focus-trap.spec.ts
++++ b/src/cdk/a11y/focus-trap/configurable-focus-trap.spec.ts
+@@ -93,8 +93,7 @@ function createComponent<T>(
+   providers: Provider[] = [],
+ ): ComponentFixture<T> {
+   TestBed.configureTestingModule({
+-    imports: [A11yModule],
+-    declarations: [componentType],
++    imports: [A11yModule, componentType],
+     providers: providers,
+   }).compileComponents();
+ 
+@@ -107,7 +106,8 @@ function createComponent<T>(
+       <input>
+       <button>SAVE</button>
+     </div>
+-    `,
++  `,
++  standalone: true,
+ })
+ class SimpleFocusTrap implements AfterViewInit {
+   @ViewChild('focusTrapElement') focusTrapElement!: ElementRef;
+diff --git a/src/cdk/a11y/focus-trap/event-listener-inert-strategy.spec.ts b/src/cdk/a11y/focus-trap/event-listener-inert-strategy.spec.ts
+index 8959530e935c..5f28cf5ab768 100644
+--- a/src/cdk/a11y/focus-trap/event-listener-inert-strategy.spec.ts
++++ b/src/cdk/a11y/focus-trap/event-listener-inert-strategy.spec.ts
+@@ -60,8 +60,7 @@ function createComponent<T>(
+   providers: Provider[] = [],
+ ): ComponentFixture<T> {
+   TestBed.configureTestingModule({
+-    imports: [A11yModule],
+-    declarations: [componentType],
++    imports: [A11yModule, componentType],
+     providers: providers,
+   }).compileComponents();
+ 
+@@ -75,7 +74,8 @@ function createComponent<T>(
+       <input #firstFocusable>
+       <button #secondFocusable>SAVE</button>
+     </div>
+-    `,
++  `,
++  standalone: true,
+ })
+ class SimpleFocusTrap implements AfterViewInit {
+   @ViewChild('focusTrapElement') focusTrapElement!: ElementRef<HTMLElement>;
+diff --git a/src/cdk/a11y/focus-trap/focus-trap.spec.ts b/src/cdk/a11y/focus-trap/focus-trap.spec.ts
+index 6038356b930a..c92b80e77685 100644
+--- a/src/cdk/a11y/focus-trap/focus-trap.spec.ts
++++ b/src/cdk/a11y/focus-trap/focus-trap.spec.ts
+@@ -14,8 +14,9 @@ import {By} from '@angular/platform-browser';
+ describe('FocusTrap', () => {
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+-      imports: [A11yModule, PortalModule],
+-      declarations: [
++      imports: [
++        A11yModule,
++        PortalModule,
+         FocusTrapWithBindings,
+         SimpleFocusTrap,
+         FocusTrapTargets,
+@@ -332,6 +333,8 @@ function getActiveElement() {
+       <button>SAVE</button>
+     </div>
+     `,
++  standalone: true,
++  imports: [A11yModule, PortalModule],
+ })
+ class SimpleFocusTrap {
+   @ViewChild(CdkTrapFocus) focusTrapDirective: CdkTrapFocus;
+@@ -347,7 +350,11 @@ const AUTO_FOCUS_TEMPLATE = `
+   }
+ `;
+ 
+-@Component({template: AUTO_FOCUS_TEMPLATE})
++@Component({
++  template: AUTO_FOCUS_TEMPLATE,
++  standalone: true,
++  imports: [A11yModule, PortalModule],
++})
+ class FocusTrapWithAutoCapture {
+   @ViewChild(CdkTrapFocus) focusTrapDirective: CdkTrapFocus;
+   showTrappedRegion = false;
+@@ -357,6 +364,8 @@ class FocusTrapWithAutoCapture {
+ @Component({
+   template: AUTO_FOCUS_TEMPLATE,
+   encapsulation: ViewEncapsulation.ShadowDom,
++  standalone: true,
++  imports: [A11yModule, PortalModule],
+ })
+ class FocusTrapWithAutoCaptureInShadowDom extends FocusTrapWithAutoCapture {}
+ 
+@@ -369,6 +378,8 @@ class FocusTrapWithAutoCaptureInShadowDom extends FocusTrapWithAutoCapture {}
+       </div>
+     }
+   `,
++  standalone: true,
++  imports: [A11yModule, PortalModule],
+ })
+ class FocusTrapWithBindings {
+   @ViewChild(CdkTrapFocus) focusTrapDirective: CdkTrapFocus;
+@@ -388,6 +399,8 @@ class FocusTrapWithBindings {
+       <input>
+     </div>
+     `,
++  standalone: true,
++  imports: [A11yModule, PortalModule],
+ })
+ class FocusTrapTargets {
+   @ViewChild(CdkTrapFocus) focusTrapDirective: CdkTrapFocus;
+@@ -399,6 +412,8 @@ class FocusTrapTargets {
+       <div cdkFocusInitial></div>
+     </div>
+     `,
++  standalone: true,
++  imports: [A11yModule, PortalModule],
+ })
+ class FocusTrapUnfocusableTarget {
+   @ViewChild(CdkTrapFocus) focusTrapDirective: CdkTrapFocus;
+@@ -412,6 +427,8 @@ class FocusTrapUnfocusableTarget {
+       </svg>
+     </div>
+     `,
++  standalone: true,
++  imports: [A11yModule, PortalModule],
+ })
+ class FocusTrapWithSvg {
+   @ViewChild(CdkTrapFocus) focusTrapDirective: CdkTrapFocus;
+@@ -423,6 +440,8 @@ class FocusTrapWithSvg {
+       <p>Hello</p>
+     </div>
+     `,
++  standalone: true,
++  imports: [A11yModule, PortalModule],
+ })
+ class FocusTrapWithoutFocusableElements {
+   @ViewChild(CdkTrapFocus) focusTrapDirective: CdkTrapFocus;
+@@ -440,6 +459,8 @@ class FocusTrapWithoutFocusableElements {
+     </div>
+   </ng-template>
+   `,
++  standalone: true,
++  imports: [A11yModule, PortalModule],
+ })
+ class FocusTrapInsidePortal {
+   @ViewChild('template') template: TemplateRef<any>;
+diff --git a/src/cdk/a11y/focus-trap/focus-trap.ts b/src/cdk/a11y/focus-trap/focus-trap.ts
+index 9578898e9259..09e570b164d2 100644
+--- a/src/cdk/a11y/focus-trap/focus-trap.ts
++++ b/src/cdk/a11y/focus-trap/focus-trap.ts
+@@ -404,6 +404,7 @@ export class FocusTrapFactory {
+ @Directive({
+   selector: '[cdkTrapFocus]',
+   exportAs: 'cdkTrapFocus',
++  standalone: true,
+ })
+ export class CdkTrapFocus implements OnDestroy, AfterContentInit, OnChanges, DoCheck {
+   /** Underlying FocusTrap instance. */
+diff --git a/src/cdk/a11y/live-announcer/live-announcer.spec.ts b/src/cdk/a11y/live-announcer/live-announcer.spec.ts
+index 03fa51d0c496..60fb25a0e973 100644
+--- a/src/cdk/a11y/live-announcer/live-announcer.spec.ts
++++ b/src/cdk/a11y/live-announcer/live-announcer.spec.ts
+@@ -21,8 +21,7 @@ describe('LiveAnnouncer', () => {
+   describe('with default element', () => {
+     beforeEach(() =>
+       TestBed.configureTestingModule({
+-        imports: [A11yModule],
+-        declarations: [TestApp, TestModal],
++        imports: [A11yModule, TestApp, TestModal],
+       }),
+     );
+ 
+@@ -129,7 +128,6 @@ describe('LiveAnnouncer', () => {
+ 
+       TestBed.resetTestingModule().configureTestingModule({
+         imports: [A11yModule],
+-        declarations: [TestApp],
+       });
+ 
+       const extraElement = document.createElement('div');
+@@ -226,8 +224,7 @@ describe('LiveAnnouncer', () => {
+       customLiveElement = document.createElement('div');
+ 
+       return TestBed.configureTestingModule({
+-        imports: [A11yModule],
+-        declarations: [TestApp],
++        imports: [A11yModule, TestApp],
+         providers: [{provide: LIVE_ANNOUNCER_ELEMENT_TOKEN, useValue: customLiveElement}],
+       });
+     });
+@@ -250,8 +247,7 @@ describe('LiveAnnouncer', () => {
+   describe('with a default options', () => {
+     beforeEach(() => {
+       return TestBed.configureTestingModule({
+-        imports: [A11yModule],
+-        declarations: [TestApp],
++        imports: [A11yModule, TestApp],
+         providers: [
+           {
+             provide: LIVE_ANNOUNCER_DEFAULT_OPTIONS,
+@@ -299,15 +295,13 @@ describe('CdkAriaLive', () => {
+ 
+   beforeEach(fakeAsync(() => {
+     TestBed.configureTestingModule({
+-      imports: [A11yModule],
+-      declarations: [DivWithCdkAriaLive],
++      imports: [A11yModule, DivWithCdkAriaLive],
+       providers: [
+         {
+           provide: MutationObserverFactory,
+           useValue: {
+             create: (callback: Function) => {
+               mutationCallbacks.push(callback);
+-
+               return {
+                 observe: () => {},
+                 disconnect: () => {},
+@@ -395,7 +389,11 @@ function getLiveElement(): Element {
+   return document.body.querySelector('.cdk-live-announcer-element')!;
+ }
+ 
+-@Component({template: `<button (click)="announceText('Test')">Announce</button>`})
++@Component({
++  template: `<button (click)="announceText('Test')">Announce</button>`,
++  standalone: true,
++  imports: [A11yModule],
++})
+ class TestApp {
+   constructor(public live: LiveAnnouncer) {}
+ 
+@@ -404,7 +402,12 @@ class TestApp {
+   }
+ }
+ 
+-@Component({template: '', host: {'[attr.aria-owns]': 'ariaOwns', 'aria-modal': 'true'}})
++@Component({
++  template: '',
++  host: {'[attr.aria-owns]': 'ariaOwns', 'aria-modal': 'true'},
++  standalone: true,
++  imports: [A11yModule],
++})
+ class TestModal {
+   ariaOwns: string | null = null;
+ }
+@@ -414,6 +417,8 @@ class TestModal {
+     <div
+       [cdkAriaLive]="politeness ? politeness : null"
+       [cdkAriaLiveDuration]="duration">{{content}}</div>`,
++  standalone: true,
++  imports: [A11yModule],
+ })
+ class DivWithCdkAriaLive {
+   politeness = 'polite';
+diff --git a/src/cdk/a11y/live-announcer/live-announcer.ts b/src/cdk/a11y/live-announcer/live-announcer.ts
+index 08cf51f750aa..1dc5ac20dd93 100644
+--- a/src/cdk/a11y/live-announcer/live-announcer.ts
++++ b/src/cdk/a11y/live-announcer/live-announcer.ts
+@@ -220,6 +220,7 @@ export class LiveAnnouncer implements OnDestroy {
+ @Directive({
+   selector: '[cdkAriaLive]',
+   exportAs: 'cdkAriaLive',
++  standalone: true,
+ })
+ export class CdkAriaLive implements OnDestroy {
+   /** The aria-live politeness level to use when announcing messages. */
+diff --git a/tools/public_api_guard/cdk/a11y.md b/tools/public_api_guard/cdk/a11y.md
+index 27e889542dce..b7e6a0677b3c 100644
+--- a/tools/public_api_guard/cdk/a11y.md
++++ b/tools/public_api_guard/cdk/a11y.md
+@@ -11,7 +11,7 @@ import { DoCheck } from '@angular/core';
+ import { ElementRef } from '@angular/core';
+ import { EventEmitter } from '@angular/core';
+ import * as i0 from '@angular/core';
+-import * as i4 from '@angular/cdk/observers';
++import * as i1 from '@angular/cdk/observers';
+ import { InjectionToken } from '@angular/core';
+ import { NgZone } from '@angular/core';
+ import { Observable } from 'rxjs';
+@@ -30,7 +30,7 @@ export class A11yModule {
+     // (undocumented)
+     static ɵinj: i0.ɵɵInjectorDeclaration<A11yModule>;
+     // (undocumented)
+-    static ɵmod: i0.ɵɵNgModuleDeclaration<A11yModule, [typeof i1.CdkAriaLive, typeof i2.CdkTrapFocus, typeof i3.CdkMonitorFocus], [typeof i4.ObserversModule], [typeof i1.CdkAriaLive, typeof i2.CdkTrapFocus, typeof i3.CdkMonitorFocus]>;
++    static ɵmod: i0.ɵɵNgModuleDeclaration<A11yModule, never, [typeof i1.ObserversModule, typeof i2.CdkAriaLive, typeof i3.CdkTrapFocus, typeof i4.CdkMonitorFocus], [typeof i2.CdkAriaLive, typeof i3.CdkTrapFocus, typeof i4.CdkMonitorFocus]>;
+ }
+ 
+ // @public (undocumented)
+@@ -75,7 +75,7 @@ export class CdkAriaLive implements OnDestroy {
+     get politeness(): AriaLivePoliteness;
+     set politeness(value: AriaLivePoliteness);
+     // (undocumented)
+-    static ɵdir: i0.ɵɵDirectiveDeclaration<CdkAriaLive, "[cdkAriaLive]", ["cdkAriaLive"], { "politeness": { "alias": "cdkAriaLive"; "required": false; }; "duration": { "alias": "cdkAriaLiveDuration"; "required": false; }; }, {}, never, never, false, never>;
++    static ɵdir: i0.ɵɵDirectiveDeclaration<CdkAriaLive, "[cdkAriaLive]", ["cdkAriaLive"], { "politeness": { "alias": "cdkAriaLive"; "required": false; }; "duration": { "alias": "cdkAriaLiveDuration"; "required": false; }; }, {}, never, never, true, never>;
+     // (undocumented)
+     static ɵfac: i0.ɵɵFactoryDeclaration<CdkAriaLive, never>;
+ }
+@@ -92,7 +92,7 @@ export class CdkMonitorFocus implements AfterViewInit, OnDestroy {
+     // (undocumented)
+     ngOnDestroy(): void;
+     // (undocumented)
+-    static ɵdir: i0.ɵɵDirectiveDeclaration<CdkMonitorFocus, "[cdkMonitorElementFocus], [cdkMonitorSubtreeFocus]", ["cdkMonitorFocus"], {}, { "cdkFocusChange": "cdkFocusChange"; }, never, never, false, never>;
++    static ɵdir: i0.ɵɵDirectiveDeclaration<CdkMonitorFocus, "[cdkMonitorElementFocus], [cdkMonitorSubtreeFocus]", ["cdkMonitorFocus"], {}, { "cdkFocusChange": "cdkFocusChange"; }, never, never, true, never>;
+     // (undocumented)
+     static ɵfac: i0.ɵɵFactoryDeclaration<CdkMonitorFocus, never>;
+ }
+@@ -118,7 +118,7 @@ export class CdkTrapFocus implements OnDestroy, AfterContentInit, OnChanges, DoC
+     // (undocumented)
+     ngOnDestroy(): void;
+     // (undocumented)
+-    static ɵdir: i0.ɵɵDirectiveDeclaration<CdkTrapFocus, "[cdkTrapFocus]", ["cdkTrapFocus"], { "enabled": { "alias": "cdkTrapFocus"; "required": false; }; "autoCapture": { "alias": "cdkTrapFocusAutoCapture"; "required": false; }; }, {}, never, never, false, never>;
++    static ɵdir: i0.ɵɵDirectiveDeclaration<CdkTrapFocus, "[cdkTrapFocus]", ["cdkTrapFocus"], { "enabled": { "alias": "cdkTrapFocus"; "required": false; }; "autoCapture": { "alias": "cdkTrapFocusAutoCapture"; "required": false; }; }, {}, never, never, true, never>;
+     // (undocumented)
+     static ɵfac: i0.ɵɵFactoryDeclaration<CdkTrapFocus, never>;
+ }

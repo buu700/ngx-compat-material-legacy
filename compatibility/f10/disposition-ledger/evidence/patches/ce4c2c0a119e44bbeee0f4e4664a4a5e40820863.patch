@@ -1,0 +1,4838 @@
+From ce4c2c0a119e44bbeee0f4e4664a4a5e40820863 Mon Sep 17 00:00:00 2001
+From: Kristiyan Kostadinov <crisbeto@users.noreply.github.com>
+Date: Wed, 8 Apr 2026 19:21:47 +0000
+Subject: [PATCH] fix(multiple): remove empty constructors (#33048)
+
+When we made the transition to `inject`, we added some constructors for backwards compatibility. These changes remove them since they weren't used for anything.
+
+BREAKING CHANGE:
+* A bunch of constructors that with rest arguments have been removed. If you were extending Material/CDK components, you may have to update your `super` calls accordingly.
+---
+ goldens/cdk/a11y/index.api.md                 | 20 ++++++------
+ goldens/cdk/accordion/index.api.md            |  1 -
+ goldens/cdk/bidi/index.api.md                 |  2 +-
+ goldens/cdk/clipboard/index.api.md            |  3 +-
+ goldens/cdk/dialog/index.api.md               |  3 +-
+ goldens/cdk/drag-drop/index.api.md            | 12 +++----
+ goldens/cdk/layout/index.api.md               |  3 +-
+ goldens/cdk/observers/index.api.md            |  2 --
+ goldens/cdk/overlay/index.api.md              | 12 ++-----
+ goldens/cdk/platform/index.api.md             |  1 -
+ goldens/cdk/portal/index.api.md               |  3 +-
+ goldens/cdk/scrolling/index.api.md            | 12 +++----
+ goldens/cdk/stepper/index.api.md              |  7 +----
+ goldens/cdk/table/index.api.md                | 29 ++++++-----------
+ goldens/cdk/text-field/index.api.md           |  4 +--
+ goldens/cdk/tree/index.api.md                 |  9 ++----
+ goldens/google-maps/index.api.md              | 18 +----------
+ goldens/material/autocomplete/index.api.md    |  8 ++---
+ goldens/material/badge/index.api.md           |  2 +-
+ goldens/material/bottom-sheet/index.api.md    |  3 +-
+ goldens/material/button-toggle/index.api.md   |  4 +--
+ goldens/material/button/index.api.md          |  8 ++---
+ goldens/material/card/index.api.md            |  2 +-
+ goldens/material/checkbox/index.api.md        |  2 +-
+ goldens/material/chips/index.api.md           | 10 +++---
+ goldens/material/core/index.api.md            |  9 +++---
+ goldens/material/datepicker/index.api.md      | 23 ++++++--------
+ goldens/material/dialog/index.api.md          |  3 +-
+ goldens/material/dialog/testing/index.api.md  |  2 +-
+ goldens/material/expansion/index.api.md       |  5 ++-
+ goldens/material/form-field/index.api.md      |  3 +-
+ goldens/material/grid-list/index.api.md       |  3 --
+ goldens/material/icon/index.api.md            |  2 +-
+ goldens/material/input/index.api.md           |  5 ++-
+ goldens/material/list/index.api.md            |  5 +--
+ goldens/material/menu/index.api.md            |  7 ++---
+ goldens/material/paginator/index.api.md       |  2 +-
+ goldens/material/progress-bar/index.api.md    |  2 +-
+ .../material/progress-spinner/index.api.md    |  2 +-
+ goldens/material/radio/index.api.md           |  3 +-
+ goldens/material/select/index.api.md          |  9 +++---
+ goldens/material/sidenav/index.api.md         |  5 ++-
+ goldens/material/slide-toggle/index.api.md    |  2 +-
+ goldens/material/slider/index.api.md          |  7 ++---
+ goldens/material/snack-bar/index.api.md       |  4 +--
+ goldens/material/sort/index.api.md            |  2 +-
+ goldens/material/stepper/index.api.md         |  6 ++--
+ goldens/material/tabs/index.api.md            | 14 ++++-----
+ goldens/material/toolbar/index.api.md         |  1 -
+ goldens/material/tooltip/index.api.md         |  3 +-
+ goldens/material/tree/index.api.md            |  2 +-
+ goldens/youtube-player/index.api.md           |  2 +-
+ .../coalesced-style-scheduler.ts              |  3 --
+ src/cdk/a11y/aria-describer/aria-describer.ts |  2 --
+ src/cdk/a11y/focus-monitor/focus-monitor.ts   |  5 ---
+ .../configurable-focus-trap-factory.ts        |  2 --
+ src/cdk/a11y/focus-trap/focus-trap.ts         |  3 --
+ .../high-contrast-mode-detector.ts            |  2 --
+ .../input-modality/input-modality-detector.ts |  2 --
+ .../interactivity-checker.ts                  |  3 --
+ src/cdk/a11y/live-announcer/live-announcer.ts |  4 ---
+ src/cdk/accordion/accordion-item.ts           |  3 --
+ src/cdk/bidi/directionality.ts                |  2 --
+ src/cdk/clipboard/clipboard.ts                |  3 --
+ src/cdk/clipboard/copy-to-clipboard.ts        |  2 --
+ src/cdk/dialog/dialog-container.ts            |  2 --
+ src/cdk/dialog/dialog.ts                      |  4 ---
+ src/cdk/drag-drop/directives/drag-handle.ts   |  2 --
+ .../drag-drop/directives/drag-placeholder.ts  |  2 --
+ src/cdk/drag-drop/directives/drag-preview.ts  |  2 --
+ src/cdk/drag-drop/directives/drag.ts          |  2 --
+ .../directives/drop-list-shared.spec.ts       |  4 ---
+ src/cdk/drag-drop/directives/drop-list.ts     |  2 --
+ src/cdk/drag-drop/drag-drop-registry.ts       |  3 --
+ src/cdk/drag-drop/drag-drop.ts                |  3 --
+ src/cdk/layout/breakpoints-observer.ts        |  3 --
+ src/cdk/layout/media-matcher.ts               |  2 --
+ src/cdk/observers/observe-content.ts          |  6 ----
+ .../dispatchers/base-overlay-dispatcher.ts    |  4 ---
+ .../overlay/fullscreen-overlay-container.ts   |  6 ----
+ src/cdk/overlay/overlay-container.ts          |  3 --
+ src/cdk/overlay/overlay-directives.ts         |  5 ---
+ src/cdk/overlay/overlay.ts                    |  3 --
+ .../position/overlay-position-builder.ts      |  3 --
+ .../overlay/scroll/scroll-strategy-options.ts |  3 --
+ src/cdk/platform/platform.ts                  |  5 ---
+ src/cdk/portal/portal-directives.ts           |  8 -----
+ src/cdk/scrolling/scroll-dispatcher.ts        |  3 --
+ src/cdk/scrolling/scrollable.ts               |  3 --
+ src/cdk/scrolling/viewport-ruler.ts           |  2 --
+ src/cdk/scrolling/virtual-for-of.ts           |  2 --
+ src/cdk/scrolling/virtual-scroll-viewport.ts  |  2 --
+ .../scrolling/virtual-scrollable-element.ts   |  6 ----
+ .../scrolling/virtual-scrollable-window.ts    |  2 --
+ src/cdk/scrolling/virtual-scrollable.ts       |  5 ---
+ src/cdk/stepper/step-header.ts                |  3 --
+ src/cdk/stepper/step-label.ts                 |  3 --
+ src/cdk/stepper/stepper-button.ts             |  6 ----
+ src/cdk/stepper/stepper.ts                    |  5 ---
+ src/cdk/table/cell.ts                         | 18 -----------
+ src/cdk/table/row.ts                          | 31 ++-----------------
+ src/cdk/table/table.ts                        | 10 ------
+ src/cdk/table/text-column.ts                  |  2 --
+ src/cdk/text-field/autofill.ts                |  6 ----
+ src/cdk/text-field/autosize.ts                |  2 --
+ src/cdk/tree/nested-node.ts                   |  6 ----
+ src/cdk/tree/node.ts                          |  3 --
+ src/cdk/tree/outlet.ts                        |  3 --
+ src/cdk/tree/padding.ts                       |  2 --
+ src/cdk/tree/toggle.ts                        |  3 --
+ src/cdk/tree/tree.ts                          |  5 ---
+ .../grid/grid-table/grid-table-example.ts     |  2 --
+ .../deprecated-map-marker-clusterer.ts        |  3 --
+ src/google-maps/google-map/google-map.ts      |  2 --
+ .../map-advanced-marker.ts                    |  3 --
+ src/google-maps/map-base-layer.ts             |  3 --
+ src/google-maps/map-circle/map-circle.ts      |  3 --
+ .../map-directions-renderer.ts                |  3 --
+ .../map-directions-service.ts                 |  3 --
+ src/google-maps/map-geocoder/map-geocoder.ts  |  3 --
+ .../map-ground-overlay/map-ground-overlay.ts  |  3 --
+ .../map-heatmap-layer/map-heatmap-layer.ts    |  3 --
+ .../map-info-window/map-info-window.ts        |  3 --
+ .../map-kml-layer/map-kml-layer.ts            |  3 --
+ src/google-maps/map-marker/map-marker.ts      |  3 --
+ src/google-maps/map-polygon/map-polygon.ts    |  3 --
+ src/google-maps/map-polyline/map-polyline.ts  |  3 --
+ .../map-rectangle/map-rectangle.ts            |  3 --
+ .../map-traffic-layer/map-traffic-layer.ts    |  3 --
+ .../adapter/date-fns-adapter.ts               |  2 --
+ .../adapter/luxon-date-adapter.ts             |  2 --
+ .../adapter/moment-date-adapter.ts            |  2 --
+ .../autocomplete/autocomplete-origin.ts       |  3 --
+ .../autocomplete/autocomplete-trigger.ts      |  3 --
+ src/material/autocomplete/autocomplete.ts     |  2 --
+ src/material/badge/badge.ts                   |  2 --
+ .../bottom-sheet/bottom-sheet-container.ts    |  2 --
+ src/material/bottom-sheet/bottom-sheet.ts     |  3 --
+ src/material/button-toggle/button-toggle.ts   |  4 ---
+ src/material/button/button-base.ts            |  2 --
+ src/material/button/button.ts                 |  2 --
+ src/material/button/fab.ts                    |  4 ---
+ src/material/button/icon-button.ts            |  2 --
+ src/material/card/card.ts                     |  2 --
+ src/material/checkbox/checkbox.ts             |  2 --
+ src/material/chips/chip-action.ts             |  2 --
+ src/material/chips/chip-edit-input.ts         |  3 --
+ src/material/chips/chip-grid.ts               |  2 --
+ src/material/chips/chip-input.ts              |  2 --
+ src/material/chips/chip-row.ts                |  2 --
+ src/material/chips/chip-set.ts                |  3 --
+ src/material/chips/chip.ts                    |  2 --
+ .../core/datetime/native-date-adapter.ts      |  2 --
+ src/material/core/option/optgroup.ts          |  2 --
+ src/material/core/option/option.ts            |  1 -
+ src/material/core/ripple/ripple.ts            |  2 --
+ .../pseudo-checkbox/pseudo-checkbox.ts        |  3 --
+ src/material/datepicker/calendar-body.ts      |  2 --
+ src/material/datepicker/calendar.ts           |  4 ---
+ .../datepicker/date-range-input-parts.ts      |  2 --
+ src/material/datepicker/date-range-input.ts   |  2 --
+ src/material/datepicker/datepicker-actions.ts | 10 ------
+ src/material/datepicker/datepicker-base.ts    |  4 ---
+ .../datepicker/datepicker-input-base.ts       |  2 --
+ src/material/datepicker/datepicker-input.ts   |  2 --
+ src/material/datepicker/datepicker-toggle.ts  |  2 --
+ src/material/datepicker/month-view.ts         |  2 --
+ src/material/datepicker/multi-year-view.ts    |  2 --
+ src/material/datepicker/year-view.ts          |  2 --
+ .../dialog/dialog-content-directives.ts       |  7 -----
+ src/material/dialog/dialog.ts                 |  2 --
+ src/material/dialog/testing/dialog-opener.ts  |  2 --
+ .../expansion/expansion-panel-content.ts      |  3 --
+ .../expansion/expansion-panel-header.ts       |  2 --
+ src/material/expansion/expansion-panel.ts     |  2 --
+ src/material/form-field/directives/error.ts   |  4 ---
+ .../form-field/directives/floating-label.ts   |  3 --
+ .../form-field/directives/line-ripple.ts      |  2 --
+ src/material/form-field/form-field.ts         |  2 --
+ src/material/grid-list/grid-list.ts           |  3 --
+ src/material/grid-list/grid-tile.ts           |  6 ----
+ src/material/icon/icon.ts                     |  2 --
+ src/material/input/input.ts                   |  2 --
+ src/material/list/list-base.ts                |  2 --
+ src/material/list/list-item-sections.ts       |  9 ------
+ src/material/list/selection-list.ts           |  2 --
+ src/material/menu/menu-content.ts             |  4 ---
+ src/material/menu/menu-item.ts                |  2 --
+ src/material/menu/menu-trigger.ts             |  2 --
+ src/material/menu/menu.ts                     |  2 --
+ src/material/paginator/paginator.ts           |  2 --
+ src/material/progress-bar/progress-bar.ts     |  2 --
+ .../progress-spinner/progress-spinner.ts      |  2 --
+ src/material/radio/radio.ts                   |  6 ----
+ src/material/select/select.ts                 |  2 --
+ src/material/sidenav/drawer.ts                | 16 +---------
+ src/material/slide-toggle/slide-toggle.ts     |  2 --
+ src/material/slider/slider-input.ts           |  4 ---
+ src/material/slider/slider-thumb.ts           |  3 --
+ src/material/slider/slider.ts                 |  2 --
+ src/material/snack-bar/simple-snack-bar.ts    |  3 --
+ src/material/snack-bar/snack-bar-container.ts |  2 --
+ src/material/snack-bar/snack-bar.ts           |  3 --
+ src/material/sort/sort-header.ts              |  2 --
+ src/material/stepper/step-content.ts          |  3 --
+ src/material/stepper/step-header.ts           |  2 --
+ src/material/stepper/stepper-icon.ts          |  3 --
+ src/material/stepper/stepper.ts               |  2 --
+ src/material/tabs/paginated-tab-header.ts     |  2 --
+ src/material/tabs/tab-body.ts                 |  8 -----
+ src/material/tabs/tab-content.ts              |  3 --
+ src/material/tabs/tab-group.ts                |  2 --
+ src/material/tabs/tab-nav-bar/tab-nav-bar.ts  |  4 ---
+ src/material/tabs/tab.ts                      |  1 -
+ src/material/toolbar/toolbar.ts               |  3 --
+ src/material/tooltip/tooltip.ts               |  6 ----
+ src/material/tree/node.ts                     |  2 --
+ src/youtube-player/youtube-player.ts          |  2 --
+ 218 files changed, 114 insertions(+), 757 deletions(-)
+
+diff --git a/goldens/cdk/a11y/index.api.md b/goldens/cdk/a11y/index.api.md
+index cf953fe46b0a..0219011a0edf 100644
+--- a/goldens/cdk/a11y/index.api.md
++++ b/goldens/cdk/a11y/index.api.md
+@@ -46,7 +46,7 @@ export function addAriaReferencedId(el: Element, attr: `aria-${string}`, id: str
+ 
+ // @public
+ export class AriaDescriber implements OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     describe(hostElement: Element, message: string, role?: string): void;
+     describe(hostElement: Element, message: HTMLElement): void;
+     ngOnDestroy(): void;
+@@ -69,7 +69,7 @@ export const CDK_DESCRIBEDBY_ID_PREFIX = "cdk-describedby-message";
+ 
+ // @public
+ export class CdkAriaLive implements OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     duration: number;
+     // (undocumented)
+     ngOnDestroy(): void;
+@@ -83,7 +83,6 @@ export class CdkAriaLive implements OnDestroy {
+ 
+ // @public
+ export class CdkMonitorFocus implements AfterViewInit, OnDestroy {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     readonly cdkFocusChange: EventEmitter<FocusOrigin>;
+     // (undocumented)
+@@ -100,7 +99,7 @@ export class CdkMonitorFocus implements AfterViewInit, OnDestroy {
+ 
+ // @public
+ export class CdkTrapFocus implements OnDestroy, AfterContentInit, OnChanges, DoCheck {
+-    constructor(...args: unknown[]);
++    constructor();
+     autoCapture: boolean;
+     get enabled(): boolean;
+     set enabled(value: boolean);
+@@ -140,7 +139,7 @@ export interface ConfigurableFocusTrapConfig {
+ 
+ // @public
+ export class ConfigurableFocusTrapFactory {
+-    constructor(...args: unknown[]);
++    constructor();
+     create(element: HTMLElement, config?: ConfigurableFocusTrapConfig): ConfigurableFocusTrap;
+     // @deprecated (undocumented)
+     create(element: HTMLElement, deferCaptureElements: boolean): ConfigurableFocusTrap;
+@@ -177,7 +176,7 @@ export class FocusKeyManager<T> extends ListKeyManager<FocusableOption & T> {
+ 
+ // @public
+ export class FocusMonitor implements OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     protected _document: Document;
+     focusVia(element: HTMLElement, origin: FocusOrigin, options?: FocusOptions_2): void;
+     focusVia(element: ElementRef<HTMLElement>, origin: FocusOrigin, options?: FocusOptions_2): void;
+@@ -248,7 +247,7 @@ export class FocusTrap {
+ 
+ // @public
+ export class FocusTrapFactory {
+-    constructor(...args: unknown[]);
++    constructor();
+     create(element: HTMLElement, deferCaptureElements?: boolean): FocusTrap;
+     // (undocumented)
+     static ɵfac: i0.ɵɵFactoryDeclaration<FocusTrapFactory, never>;
+@@ -277,7 +276,7 @@ export enum HighContrastMode {
+ 
+ // @public
+ export class HighContrastModeDetector implements OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     _applyBodyHighContrastModeCssClasses(): void;
+     getHighContrastMode(): HighContrastMode;
+     // (undocumented)
+@@ -314,7 +313,7 @@ export type InputModality = 'keyboard' | 'mouse' | 'touch' | null;
+ 
+ // @public
+ export class InputModalityDetector implements OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     readonly modalityChanged: Observable<InputModality>;
+     readonly modalityDetected: Observable<InputModality>;
+     get mostRecentModality(): InputModality;
+@@ -334,7 +333,6 @@ export interface InputModalityDetectorOptions {
+ 
+ // @public
+ export class InteractivityChecker {
+-    constructor(...args: unknown[]);
+     isDisabled(element: HTMLElement): boolean;
+     isFocusable(element: HTMLElement, config?: IsFocusableConfig): boolean;
+     isTabbable(element: HTMLElement): boolean;
+@@ -404,7 +402,7 @@ export const LIVE_ANNOUNCER_ELEMENT_TOKEN: InjectionToken<HTMLElement | null>;
+ 
+ // @public (undocumented)
+ export class LiveAnnouncer implements OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     announce(message: LiveAnnouncerMessage): Promise<void>;
+     announce(message: LiveAnnouncerMessage, politeness?: AriaLivePoliteness): Promise<void>;
+     announce(message: LiveAnnouncerMessage, duration?: number): Promise<void>;
+diff --git a/goldens/cdk/accordion/index.api.md b/goldens/cdk/accordion/index.api.md
+index bcbc53b00160..5e2c57f5bddd 100644
+--- a/goldens/cdk/accordion/index.api.md
++++ b/goldens/cdk/accordion/index.api.md
+@@ -38,7 +38,6 @@ export class CdkAccordion implements OnDestroy, OnChanges {
+ 
+ // @public
+ export class CdkAccordionItem implements OnInit, OnDestroy {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     accordion: CdkAccordion;
+     close(): void;
+diff --git a/goldens/cdk/bidi/index.api.md b/goldens/cdk/bidi/index.api.md
+index 5ca0f0661766..31e4318ca8a8 100644
+--- a/goldens/cdk/bidi/index.api.md
++++ b/goldens/cdk/bidi/index.api.md
+@@ -46,7 +46,7 @@ export type Direction = 'ltr' | 'rtl';
+ 
+ // @public
+ export class Directionality implements OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     readonly change: EventEmitter<Direction>;
+     // (undocumented)
+     ngOnDestroy(): void;
+diff --git a/goldens/cdk/clipboard/index.api.md b/goldens/cdk/clipboard/index.api.md
+index 12d1d5eb1ca5..b1df9b4f5483 100644
+--- a/goldens/cdk/clipboard/index.api.md
++++ b/goldens/cdk/clipboard/index.api.md
+@@ -14,7 +14,7 @@ export const CDK_COPY_TO_CLIPBOARD_CONFIG: InjectionToken<CdkCopyToClipboardConf
+ 
+ // @public
+ export class CdkCopyToClipboard implements OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     attempts: number;
+     readonly copied: EventEmitter<boolean>;
+     copy(attempts?: number): void;
+@@ -34,7 +34,6 @@ export interface CdkCopyToClipboardConfig {
+ 
+ // @public
+ class Clipboard_2 {
+-    constructor(...args: unknown[]);
+     beginCopy(text: string): PendingCopy;
+     copy(text: string): boolean;
+     // (undocumented)
+diff --git a/goldens/cdk/dialog/index.api.md b/goldens/cdk/dialog/index.api.md
+index 4a5b14e94831..3a84074f0660 100644
+--- a/goldens/cdk/dialog/index.api.md
++++ b/goldens/cdk/dialog/index.api.md
+@@ -40,7 +40,7 @@ export type AutoFocusTarget = 'dialog' | 'first-tabbable' | 'first-heading';
+ 
+ // @public
+ export class CdkDialogContainer<C extends DialogConfig = DialogConfig> extends BasePortalOutlet implements DialogContainer, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     // (undocumented)
+     _addAriaLabelledBy(id: string): void;
+     _ariaLabelledByQueue: string[];
+@@ -84,7 +84,6 @@ export const DEFAULT_DIALOG_CONFIG: InjectionToken<DialogConfig<unknown, unknown
+ 
+ // @public (undocumented)
+ export class Dialog implements OnDestroy {
+-    constructor(...args: unknown[]);
+     readonly afterAllClosed: Observable<void>;
+     get afterOpened(): Subject<DialogRef<any, any>>;
+     closeAll(): void;
+diff --git a/goldens/cdk/drag-drop/index.api.md b/goldens/cdk/drag-drop/index.api.md
+index 664941618cdc..447e3af988fd 100644
+--- a/goldens/cdk/drag-drop/index.api.md
++++ b/goldens/cdk/drag-drop/index.api.md
+@@ -45,7 +45,7 @@ export const CDK_DROP_LIST_GROUP: InjectionToken<CdkDropListGroup<CdkDropList<an
+ 
+ // @public
+ export class CdkDrag<T = any> implements AfterViewInit, OnChanges, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     // (undocumented)
+     _addHandle(handle: CdkDragHandle): void;
+     boundaryElement: string | ElementRef<HTMLElement> | HTMLElement;
+@@ -152,7 +152,7 @@ export interface CdkDragExit<T = any, I = T> {
+ 
+ // @public
+ export class CdkDragHandle implements AfterViewInit, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     get disabled(): boolean;
+     set disabled(value: boolean);
+     // (undocumented)
+@@ -190,7 +190,7 @@ export interface CdkDragMove<T = any> {
+ 
+ // @public
+ export class CdkDragPlaceholder<T = any> implements OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     data: T;
+     // (undocumented)
+     ngOnDestroy(): void;
+@@ -204,7 +204,7 @@ export class CdkDragPlaceholder<T = any> implements OnDestroy {
+ 
+ // @public
+ export class CdkDragPreview<T = any> implements OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     data: T;
+     matchSize: boolean;
+     // (undocumented)
+@@ -241,7 +241,7 @@ export interface CdkDragStart<T = any> {
+ 
+ // @public
+ export class CdkDropList<T = any> implements OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     addItem(item: CdkDrag): void;
+     autoScrollDisabled: boolean;
+     autoScrollStep: NumberInput;
+@@ -313,7 +313,6 @@ export type DragConstrainPosition = (userPointerPosition: Point, dragRef: DragRe
+ 
+ // @public @deprecated
+ export class DragDrop {
+-    constructor(...args: unknown[]);
+     // @deprecated
+     createDrag<T = any>(element: ElementRef<HTMLElement> | HTMLElement, config?: DragRefConfig): DragRef<T>;
+     // @deprecated
+@@ -364,7 +363,6 @@ export class DragDropModule {
+ 
+ // @public
+ export class DragDropRegistry implements OnDestroy {
+-    constructor(...args: unknown[]);
+     getDragDirectiveForNode(node: Node): CdkDrag | null;
+     isDragging(drag: DragRef): boolean;
+     // (undocumented)
+diff --git a/goldens/cdk/layout/index.api.md b/goldens/cdk/layout/index.api.md
+index 173e2673ad8a..ab1df4a45870 100644
+--- a/goldens/cdk/layout/index.api.md
++++ b/goldens/cdk/layout/index.api.md
+@@ -10,7 +10,6 @@ import { OnDestroy } from '@angular/core';
+ 
+ // @public
+ export class BreakpointObserver implements OnDestroy {
+-    constructor(...args: unknown[]);
+     isMatched(value: string | readonly string[]): boolean;
+     ngOnDestroy(): void;
+     observe(value: string | readonly string[]): Observable<BreakpointState>;
+@@ -58,7 +57,7 @@ export class LayoutModule {
+ 
+ // @public
+ export class MediaMatcher {
+-    constructor(...args: unknown[]);
++    constructor();
+     matchMedia(query: string): MediaQueryList;
+     // (undocumented)
+     static ɵfac: i0.ɵɵFactoryDeclaration<MediaMatcher, never>;
+diff --git a/goldens/cdk/observers/index.api.md b/goldens/cdk/observers/index.api.md
+index 7d59da63abe7..19c3895d5372 100644
+--- a/goldens/cdk/observers/index.api.md
++++ b/goldens/cdk/observers/index.api.md
+@@ -13,7 +13,6 @@ import { OnDestroy } from '@angular/core';
+ 
+ // @public
+ export class CdkObserveContent implements AfterContentInit, OnDestroy {
+-    constructor(...args: unknown[]);
+     get debounce(): number;
+     set debounce(value: NumberInput);
+     get disabled(): boolean;
+@@ -33,7 +32,6 @@ export class CdkObserveContent implements AfterContentInit, OnDestroy {
+ 
+ // @public
+ export class ContentObserver implements OnDestroy {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     ngOnDestroy(): void;
+     observe(element: Element): Observable<MutationRecord[]>;
+diff --git a/goldens/cdk/overlay/index.api.md b/goldens/cdk/overlay/index.api.md
+index 8690212162f8..699cb0dd04a1 100644
+--- a/goldens/cdk/overlay/index.api.md
++++ b/goldens/cdk/overlay/index.api.md
+@@ -44,7 +44,7 @@ export const CDK_CONNECTED_OVERLAY_DEFAULT_CONFIG: InjectionToken<CdkConnectedOv
+ 
+ // @public
+ export class CdkConnectedOverlay implements OnDestroy, OnChanges {
+-    constructor(...args: unknown[]);
++    constructor();
+     readonly attach: EventEmitter<void>;
+     attachOverlay(): void;
+     backdropClass: string | string[];
+@@ -158,7 +158,6 @@ export interface CdkConnectedOverlayConfig {
+ 
+ // @public
+ export class CdkOverlayOrigin {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     elementRef: ElementRef<any>;
+     // (undocumented)
+@@ -169,7 +168,6 @@ export class CdkOverlayOrigin {
+ 
+ // @public
+ export class CdkScrollable implements OnInit, OnDestroy {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     protected readonly _destroyed: Subject<void>;
+     // (undocumented)
+@@ -322,7 +320,6 @@ export type FlexibleOverlayPopoverLocation = 'global' | 'inline' | {
+ 
+ // @public
+ export class FullscreenOverlayContainer extends OverlayContainer implements OnDestroy {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     protected _createContainer(): void;
+     getFullscreenElement(): Element;
+@@ -374,7 +371,6 @@ export interface OriginConnectionPosition {
+ 
+ // @public
+ export class Overlay {
+-    constructor(...args: unknown[]);
+     create(config?: OverlayConfig): OverlayRef;
+     position(): OverlayPositionBuilder;
+     // (undocumented)
+@@ -419,7 +415,6 @@ export interface OverlayConnectionPosition {
+ 
+ // @public
+ export class OverlayContainer implements OnDestroy {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     protected _containerElement: HTMLElement | undefined;
+     protected _createContainer(): void;
+@@ -477,7 +472,6 @@ export class OverlayOutsideClickDispatcher extends BaseOverlayDispatcher {
+ 
+ // @public
+ export class OverlayPositionBuilder {
+-    constructor(...args: unknown[]);
+     flexibleConnectedTo(origin: FlexibleConnectedPositionStrategyOrigin): FlexibleConnectedPositionStrategy;
+     global(): GlobalPositionStrategy;
+     // (undocumented)
+@@ -567,7 +561,6 @@ export interface RepositionScrollStrategyConfig {
+ 
+ // @public
+ export class ScrollDispatcher implements OnDestroy {
+-    constructor(...args: unknown[]);
+     ancestorScrolled(elementOrElementRef: ElementRef | HTMLElement, auditTimeInMs?: number): Observable<CdkScrollable | void>;
+     deregister(scrollable: CdkScrollable): void;
+     getAncestorScrollContainers(elementOrElementRef: ElementRef | HTMLElement): CdkScrollable[];
+@@ -604,7 +597,6 @@ export interface ScrollStrategy {
+ 
+ // @public
+ export class ScrollStrategyOptions {
+-    constructor(...args: unknown[]);
+     block: () => BlockScrollStrategy;
+     close: (config?: CloseScrollStrategyConfig) => CloseScrollStrategy;
+     noop: () => NoopScrollStrategy;
+@@ -640,7 +632,7 @@ export type ViewportMargin = number | {
+ 
+ // @public
+ export class ViewportRuler implements OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     change(throttleTime?: number): Observable<Event>;
+     protected _document: Document;
+     getViewportRect(): {
+diff --git a/goldens/cdk/platform/index.api.md b/goldens/cdk/platform/index.api.md
+index 21144f237ded..dcc2005103a3 100644
+--- a/goldens/cdk/platform/index.api.md
++++ b/goldens/cdk/platform/index.api.md
+@@ -29,7 +29,6 @@ export function normalizePassiveListenerOptions(options: AddEventListenerOptions
+ 
+ // @public
+ export class Platform {
+-    constructor(..._args: unknown[]);
+     ANDROID: boolean;
+     BLINK: boolean;
+     EDGE: boolean;
+diff --git a/goldens/cdk/portal/index.api.md b/goldens/cdk/portal/index.api.md
+index 5f044b53cb2f..4f87dba62dfb 100644
+--- a/goldens/cdk/portal/index.api.md
++++ b/goldens/cdk/portal/index.api.md
+@@ -40,7 +40,7 @@ export abstract class BasePortalOutlet implements PortalOutlet {
+ 
+ // @public
+ export class CdkPortal extends TemplatePortal {
+-    constructor(...args: unknown[]);
++    constructor();
+     // (undocumented)
+     static ɵdir: i0.ɵɵDirectiveDeclaration<CdkPortal, "[cdkPortal]", ["cdkPortal"], {}, {}, never, never, true, never>;
+     // (undocumented)
+@@ -49,7 +49,6 @@ export class CdkPortal extends TemplatePortal {
+ 
+ // @public
+ export class CdkPortalOutlet extends BasePortalOutlet implements OnInit, OnDestroy {
+-    constructor(...args: unknown[]);
+     attachComponentPortal<T>(portal: ComponentPortal<T>): ComponentRef<T>;
+     // @deprecated
+     attachDomPortal: (portal: DomPortal) => void;
+diff --git a/goldens/cdk/scrolling/index.api.md b/goldens/cdk/scrolling/index.api.md
+index 81b2cde9f891..6329b30634cb 100644
+--- a/goldens/cdk/scrolling/index.api.md
++++ b/goldens/cdk/scrolling/index.api.md
+@@ -54,7 +54,6 @@ export class CdkFixedSizeVirtualScroll implements OnChanges {
+ 
+ // @public
+ export class CdkScrollable implements OnInit, OnDestroy {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     protected readonly _destroyed: Subject<void>;
+     // (undocumented)
+@@ -93,7 +92,7 @@ export class CdkScrollableModule {
+ 
+ // @public
+ export class CdkVirtualForOf<T> implements CdkVirtualScrollRepeater<T>, CollectionViewer, DoCheck, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     get cdkVirtualForOf(): DataSource<T> | Observable<T[]> | NgIterable<T> | null | undefined;
+     set cdkVirtualForOf(value: DataSource<T> | Observable<T[]> | NgIterable<T> | null | undefined);
+     // (undocumented)
+@@ -132,7 +131,6 @@ export type CdkVirtualForOfContext<T> = {
+ 
+ // @public
+ export abstract class CdkVirtualScrollable extends CdkScrollable {
+-    constructor(...args: unknown[]);
+     abstract measureBoundingClientRectWithScrollOffset(from: 'left' | 'top' | 'right' | 'bottom'): number;
+     measureViewportSize(orientation: 'horizontal' | 'vertical'): number;
+     // (undocumented)
+@@ -143,7 +141,6 @@ export abstract class CdkVirtualScrollable extends CdkScrollable {
+ 
+ // @public
+ export class CdkVirtualScrollableElement extends CdkVirtualScrollable {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     measureBoundingClientRectWithScrollOffset(from: 'left' | 'top' | 'right' | 'bottom'): number;
+     // (undocumented)
+@@ -154,7 +151,7 @@ export class CdkVirtualScrollableElement extends CdkVirtualScrollable {
+ 
+ // @public
+ export class CdkVirtualScrollableWindow extends CdkVirtualScrollable {
+-    constructor(...args: unknown[]);
++    constructor();
+     // (undocumented)
+     measureBoundingClientRectWithScrollOffset(from: 'left' | 'top' | 'right' | 'bottom'): number;
+     // (undocumented)
+@@ -173,7 +170,7 @@ export interface CdkVirtualScrollRepeater<T> {
+ 
+ // @public
+ export class CdkVirtualScrollViewport extends CdkVirtualScrollable implements OnInit, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     appendOnly: boolean;
+     attach(forOf: CdkVirtualScrollRepeater<any>): void;
+     checkViewportSize(): void;
+@@ -260,7 +257,6 @@ export type _Right = {
+ 
+ // @public
+ export class ScrollDispatcher implements OnDestroy {
+-    constructor(...args: unknown[]);
+     ancestorScrolled(elementOrElementRef: ElementRef | HTMLElement, auditTimeInMs?: number): Observable<CdkScrollable | void>;
+     deregister(scrollable: CdkScrollable): void;
+     getAncestorScrollContainers(elementOrElementRef: ElementRef | HTMLElement): CdkScrollable[];
+@@ -297,7 +293,7 @@ export type _Top = {
+ 
+ // @public
+ export class ViewportRuler implements OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     change(throttleTime?: number): Observable<Event>;
+     protected _document: Document;
+     getViewportRect(): {
+diff --git a/goldens/cdk/stepper/index.api.md b/goldens/cdk/stepper/index.api.md
+index e2c4a2e16794..d45cc6768f7a 100644
+--- a/goldens/cdk/stepper/index.api.md
++++ b/goldens/cdk/stepper/index.api.md
+@@ -21,7 +21,7 @@ import { TemplateRef } from '@angular/core';
+ 
+ // @public (undocumented)
+ export class CdkStep implements OnChanges {
+-    constructor(...args: unknown[]);
++    constructor();
+     ariaLabel: string;
+     ariaLabelledby: string;
+     protected _childForms: QueryList<Partial<NgForm | FormGroupDirective>> | undefined;
+@@ -75,7 +75,6 @@ export class CdkStep implements OnChanges {
+ 
+ // @public (undocumented)
+ export class CdkStepHeader implements FocusableOption {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     _elementRef: ElementRef<HTMLElement>;
+     focus(): void;
+@@ -87,7 +86,6 @@ export class CdkStepHeader implements FocusableOption {
+ 
+ // @public (undocumented)
+ export class CdkStepLabel {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     template: TemplateRef<any>;
+     // (undocumented)
+@@ -98,7 +96,6 @@ export class CdkStepLabel {
+ 
+ // @public (undocumented)
+ export class CdkStepper implements AfterContentInit, AfterViewInit, OnDestroy {
+-    constructor(...args: unknown[]);
+     protected readonly _destroyed: Subject<void>;
+     // (undocumented)
+     protected _elementRef: ElementRef<HTMLElement>;
+@@ -153,7 +150,6 @@ export class CdkStepperModule {
+ 
+ // @public
+ export class CdkStepperNext {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     _stepper: CdkStepper;
+     type: string;
+@@ -165,7 +161,6 @@ export class CdkStepperNext {
+ 
+ // @public
+ export class CdkStepperPrevious {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     _stepper: CdkStepper;
+     type: string;
+diff --git a/goldens/cdk/table/index.api.md b/goldens/cdk/table/index.api.md
+index 62fded353b25..04402f70d1e2 100644
+--- a/goldens/cdk/table/index.api.md
++++ b/goldens/cdk/table/index.api.md
+@@ -38,7 +38,6 @@ export class BaseCdkCell {
+ 
+ // @public
+ export abstract class BaseRowDef implements OnChanges {
+-    constructor(...args: unknown[]);
+     columns: Iterable<string>;
+     protected _columnsDiffer: IterableDiffer<any>;
+     // (undocumented)
+@@ -63,7 +62,7 @@ export const CDK_TABLE: InjectionToken<any>;
+ 
+ // @public
+ export class CdkCell extends BaseCdkCell {
+-    constructor(...args: unknown[]);
++    constructor();
+     // (undocumented)
+     static ɵdir: i0.ɵɵDirectiveDeclaration<CdkCell, "cdk-cell, td[cdk-cell]", never, {}, {}, never, never, true, never>;
+     // (undocumented)
+@@ -72,7 +71,6 @@ export class CdkCell extends BaseCdkCell {
+ 
+ // @public
+ export class CdkCellDef implements CellDef {
+-    constructor(...args: unknown[]);
+     template: TemplateRef<any>;
+     // (undocumented)
+     static ɵdir: i0.ɵɵDirectiveDeclaration<CdkCellDef, "[cdkCellDef]", never, {}, {}, never, never, true, never>;
+@@ -82,7 +80,7 @@ export class CdkCellDef implements CellDef {
+ 
+ // @public
+ export class CdkCellOutlet implements OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     cells: CdkCellDef[];
+     context: any;
+     static mostRecentCellOutlet: CdkCellOutlet | null;
+@@ -121,7 +119,6 @@ export interface CdkCellOutletRowContext<T> {
+ 
+ // @public
+ export class CdkColumnDef implements CanStick {
+-    constructor(...args: unknown[]);
+     cell: CdkCellDef;
+     _columnCssClassName: string[];
+     cssClassFriendlyName: string;
+@@ -155,7 +152,7 @@ export class CdkColumnDef implements CanStick {
+ 
+ // @public
+ export class CdkFooterCell extends BaseCdkCell {
+-    constructor(...args: unknown[]);
++    constructor();
+     // (undocumented)
+     static ɵdir: i0.ɵɵDirectiveDeclaration<CdkFooterCell, "cdk-footer-cell, td[cdk-footer-cell]", never, {}, {}, never, never, true, never>;
+     // (undocumented)
+@@ -164,7 +161,6 @@ export class CdkFooterCell extends BaseCdkCell {
+ 
+ // @public
+ export class CdkFooterCellDef implements CellDef {
+-    constructor(...args: unknown[]);
+     template: TemplateRef<any>;
+     // (undocumented)
+     static ɵdir: i0.ɵɵDirectiveDeclaration<CdkFooterCellDef, "[cdkFooterCellDef]", never, {}, {}, never, never, true, never>;
+@@ -182,7 +178,6 @@ export class CdkFooterRow {
+ 
+ // @public
+ export class CdkFooterRowDef extends BaseRowDef implements CanStick, OnChanges {
+-    constructor(...args: unknown[]);
+     hasStickyChanged(): boolean;
+     // (undocumented)
+     static ngAcceptInputType_sticky: unknown;
+@@ -201,7 +196,7 @@ export class CdkFooterRowDef extends BaseRowDef implements CanStick, OnChanges {
+ 
+ // @public
+ export class CdkHeaderCell extends BaseCdkCell {
+-    constructor(...args: unknown[]);
++    constructor();
+     // (undocumented)
+     static ɵdir: i0.ɵɵDirectiveDeclaration<CdkHeaderCell, "cdk-header-cell, th[cdk-header-cell]", never, {}, {}, never, never, true, never>;
+     // (undocumented)
+@@ -210,7 +205,6 @@ export class CdkHeaderCell extends BaseCdkCell {
+ 
+ // @public
+ export class CdkHeaderCellDef implements CellDef {
+-    constructor(...args: unknown[]);
+     template: TemplateRef<any>;
+     // (undocumented)
+     static ɵdir: i0.ɵɵDirectiveDeclaration<CdkHeaderCellDef, "[cdkHeaderCellDef]", never, {}, {}, never, never, true, never>;
+@@ -228,7 +222,6 @@ export class CdkHeaderRow {
+ 
+ // @public
+ export class CdkHeaderRowDef extends BaseRowDef implements CanStick, OnChanges {
+-    constructor(...args: unknown[]);
+     hasStickyChanged(): boolean;
+     // (undocumented)
+     static ngAcceptInputType_sticky: unknown;
+@@ -247,7 +240,6 @@ export class CdkHeaderRowDef extends BaseRowDef implements CanStick, OnChanges {
+ 
+ // @public
+ export class CdkNoDataRow {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     _cellClassNames: string[];
+     // (undocumented)
+@@ -280,7 +272,6 @@ export class CdkRow {
+ 
+ // @public
+ export class CdkRowDef<T> extends BaseRowDef {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     _table?: any;
+     when: (index: number, rowData: T) => boolean;
+@@ -292,7 +283,7 @@ export class CdkRowDef<T> extends BaseRowDef {
+ 
+ // @public
+ export class CdkTable<T> implements AfterContentInit, AfterContentChecked, CollectionViewer, OnDestroy, OnInit, StickyPositioningListener {
+-    constructor(...args: unknown[]);
++    constructor();
+     addColumnDef(columnDef: CdkColumnDef): void;
+     addFooterRowDef(footerRowDef: CdkFooterRowDef): void;
+     addHeaderRowDef(headerRowDef: CdkHeaderRowDef): void;
+@@ -393,7 +384,7 @@ export class CdkTableModule {
+ 
+ // @public
+ export class CdkTextColumn<T> implements OnDestroy, OnInit {
+-    constructor(...args: unknown[]);
++    constructor();
+     cell: CdkCellDef;
+     columnDef: CdkColumnDef;
+     _createDefaultHeaderText(): string;
+@@ -423,7 +414,7 @@ export interface CellDef {
+ 
+ // @public
+ export class DataRowOutlet implements RowOutlet {
+-    constructor(...args: unknown[]);
++    constructor();
+     // (undocumented)
+     elementRef: ElementRef<any>;
+     // (undocumented)
+@@ -442,7 +433,7 @@ export abstract class DataSource<T> {
+ 
+ // @public
+ export class FooterRowOutlet implements RowOutlet {
+-    constructor(...args: unknown[]);
++    constructor();
+     // (undocumented)
+     elementRef: ElementRef<any>;
+     // (undocumented)
+@@ -455,7 +446,7 @@ export class FooterRowOutlet implements RowOutlet {
+ 
+ // @public
+ export class HeaderRowOutlet implements RowOutlet {
+-    constructor(...args: unknown[]);
++    constructor();
+     // (undocumented)
+     elementRef: ElementRef<any>;
+     // (undocumented)
+@@ -468,7 +459,7 @@ export class HeaderRowOutlet implements RowOutlet {
+ 
+ // @public
+ export class NoDataRowOutlet implements RowOutlet {
+-    constructor(...args: unknown[]);
++    constructor();
+     // (undocumented)
+     elementRef: ElementRef<any>;
+     // (undocumented)
+diff --git a/goldens/cdk/text-field/index.api.md b/goldens/cdk/text-field/index.api.md
+index b9ab33d29cf3..d8cc224be674 100644
+--- a/goldens/cdk/text-field/index.api.md
++++ b/goldens/cdk/text-field/index.api.md
+@@ -21,7 +21,6 @@ export type AutofillEvent = {
+ 
+ // @public
+ export class AutofillMonitor implements OnDestroy {
+-    constructor(...args: unknown[]);
+     monitor(element: Element): Observable<AutofillEvent>;
+     monitor(element: ElementRef<Element>): Observable<AutofillEvent>;
+     // (undocumented)
+@@ -36,7 +35,6 @@ export class AutofillMonitor implements OnDestroy {
+ 
+ // @public
+ export class CdkAutofill implements OnDestroy, OnInit {
+-    constructor(...args: unknown[]);
+     readonly cdkAutofill: EventEmitter<AutofillEvent>;
+     // (undocumented)
+     ngOnDestroy(): void;
+@@ -50,7 +48,7 @@ export class CdkAutofill implements OnDestroy, OnInit {
+ 
+ // @public
+ export class CdkTextareaAutosize implements AfterViewInit, DoCheck, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     protected _document: Document;
+     get enabled(): boolean;
+     set enabled(value: boolean);
+diff --git a/goldens/cdk/tree/index.api.md b/goldens/cdk/tree/index.api.md
+index 9698b0bc6529..3f3e5912dce3 100644
+--- a/goldens/cdk/tree/index.api.md
++++ b/goldens/cdk/tree/index.api.md
+@@ -50,7 +50,6 @@ export const CDK_TREE_NODE_OUTLET_NODE: InjectionToken<{}>;
+ 
+ // @public
+ export class CdkNestedTreeNode<T, K = T> extends CdkTreeNode<T, K> implements AfterContentInit, OnDestroy {
+-    constructor(...args: unknown[]);
+     protected _children: T[];
+     protected _clear(): void;
+     // (undocumented)
+@@ -71,7 +70,6 @@ export class CdkNestedTreeNode<T, K = T> extends CdkTreeNode<T, K> implements Af
+ 
+ // @public
+ export class CdkTree<T, K = T> implements AfterContentChecked, AfterContentInit, AfterViewInit, CollectionViewer, OnDestroy, OnInit {
+-    constructor(...args: unknown[]);
+     childrenAccessor?: (dataNode: T) => T[] | Observable<T[]>;
+     collapse(dataNode: T): void;
+     collapseAll(): void;
+@@ -142,7 +140,7 @@ export class CdkTreeModule {
+ 
+ // @public
+ export class CdkTreeNode<T, K = T> implements OnDestroy, OnInit, TreeKeyManagerItem {
+-    constructor(...args: unknown[]);
++    constructor();
+     activate(): void;
+     readonly activation: EventEmitter<T>;
+     collapse(): void;
+@@ -212,7 +210,6 @@ export class CdkTreeNode<T, K = T> implements OnDestroy, OnInit, TreeKeyManagerI
+ 
+ // @public
+ export class CdkTreeNodeDef<T> {
+-    constructor(...args: unknown[]);
+     template: TemplateRef<any>;
+     when: (index: number, nodeData: T) => boolean;
+     // (undocumented)
+@@ -223,7 +220,6 @@ export class CdkTreeNodeDef<T> {
+ 
+ // @public
+ export class CdkTreeNodeOutlet {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     _node?: {} | null | undefined;
+     // (undocumented)
+@@ -245,7 +241,7 @@ export class CdkTreeNodeOutletContext<T> {
+ 
+ // @public
+ export class CdkTreeNodePadding<T, K = T> implements OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     get indent(): number | string;
+     set indent(indent: number | string);
+     // (undocumented)
+@@ -272,7 +268,6 @@ export class CdkTreeNodePadding<T, K = T> implements OnDestroy {
+ 
+ // @public
+ export class CdkTreeNodeToggle<T, K = T> {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     static ngAcceptInputType_recursive: unknown;
+     recursive: boolean;
+diff --git a/goldens/google-maps/index.api.md b/goldens/google-maps/index.api.md
+index 4fde363d0611..c6b22ae40f04 100644
+--- a/goldens/google-maps/index.api.md
++++ b/goldens/google-maps/index.api.md
+@@ -131,7 +131,6 @@ export const defaultOnClusterClickHandler: onClusterClickHandler;
+ 
+ // @public @deprecated
+ export class DeprecatedMapMarkerClusterer implements OnInit, AfterContentInit, OnChanges, OnDestroy {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     ariaLabelFn: AriaLabelFn;
+     // (undocumented)
+@@ -233,7 +232,7 @@ export class DeprecatedMapMarkerClusterer implements OnInit, AfterContentInit, O
+ 
+ // @public
+ export class GoogleMap implements OnChanges, OnInit, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     readonly authFailure: EventEmitter<void>;
+     readonly boundsChanged: Observable<void>;
+     // (undocumented)
+@@ -311,7 +310,6 @@ export type HeatmapData = google.maps.MVCArray<google.maps.LatLng | google.maps.
+ 
+ // @public
+ export class MapAdvancedMarker implements OnInit, OnChanges, OnDestroy, MapAnchorPoint, MarkerDirective {
+-    constructor(...args: unknown[]);
+     advancedMarker: google.maps.marker.AdvancedMarkerElement;
+     set content(content: Node | google.maps.marker.PinElement | null);
+     // (undocumented)
+@@ -352,7 +350,6 @@ export interface MapAnchorPoint {
+ 
+ // @public (undocumented)
+ export class MapBaseLayer implements OnInit, OnDestroy {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     protected _initializeObject(): void;
+     // (undocumented)
+@@ -389,7 +386,6 @@ export class MapBicyclingLayer implements OnInit, OnDestroy {
+ 
+ // @public
+ export class MapCircle implements OnInit, OnDestroy {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     set center(center: google.maps.LatLng | google.maps.LatLngLiteral);
+     // (undocumented)
+@@ -448,7 +444,6 @@ export class MapCircle implements OnInit, OnDestroy {
+ 
+ // @public
+ export class MapDirectionsRenderer implements OnInit, OnChanges, OnDestroy {
+-    constructor(...args: unknown[]);
+     set directions(directions: google.maps.DirectionsResult);
+     readonly directionsChanged: Observable<void>;
+     directionsRenderer?: google.maps.DirectionsRenderer;
+@@ -479,7 +474,6 @@ export interface MapDirectionsResponse {
+ 
+ // @public
+ export class MapDirectionsService {
+-    constructor(...args: unknown[]);
+     route(request: google.maps.DirectionsRequest): Observable<MapDirectionsResponse>;
+     // (undocumented)
+     static ɵfac: i0.ɵɵFactoryDeclaration<MapDirectionsService, never>;
+@@ -497,7 +491,6 @@ export class MapEventManager {
+ 
+ // @public
+ export class MapGeocoder {
+-    constructor(...args: unknown[]);
+     geocode(request: google.maps.GeocoderRequest): Observable<MapGeocoderResponse>;
+     // (undocumented)
+     static ɵfac: i0.ɵɵFactoryDeclaration<MapGeocoder, never>;
+@@ -515,7 +508,6 @@ export interface MapGeocoderResponse {
+ 
+ // @public
+ export class MapGroundOverlay implements OnInit, OnDestroy {
+-    constructor(...args: unknown[]);
+     get bounds(): google.maps.LatLngBounds | google.maps.LatLngBoundsLiteral;
+     set bounds(bounds: google.maps.LatLngBounds | google.maps.LatLngBoundsLiteral);
+     clickable: boolean;
+@@ -540,7 +532,6 @@ export class MapGroundOverlay implements OnInit, OnDestroy {
+ 
+ // @public
+ export class MapHeatmapLayer implements OnInit, OnChanges, OnDestroy {
+-    constructor(...args: unknown[]);
+     set data(data: HeatmapData);
+     getData(): HeatmapData;
+     heatmap?: google.maps.visualization.HeatmapLayer;
+@@ -560,7 +551,6 @@ export class MapHeatmapLayer implements OnInit, OnChanges, OnDestroy {
+ 
+ // @public
+ export class MapInfoWindow implements OnInit, OnDestroy {
+-    constructor(...args: unknown[]);
+     close(): void;
+     readonly closeclick: Observable<void>;
+     readonly contentChanged: Observable<void>;
+@@ -591,7 +581,6 @@ export class MapInfoWindow implements OnInit, OnDestroy {
+ 
+ // @public
+ export class MapKmlLayer implements OnInit, OnDestroy {
+-    constructor(...args: unknown[]);
+     readonly defaultviewportChanged: Observable<void>;
+     getDefaultViewport(): google.maps.LatLngBounds | null;
+     getMetadata(): google.maps.KmlLayerMetadata | null;
+@@ -618,7 +607,6 @@ export class MapKmlLayer implements OnInit, OnDestroy {
+ 
+ // @public
+ export class MapMarker implements OnInit, OnChanges, OnDestroy, MapAnchorPoint, MarkerDirective {
+-    constructor(...args: unknown[]);
+     readonly animationChanged: Observable<void>;
+     set clickable(clickable: boolean);
+     readonly clickableChanged: Observable<void>;
+@@ -700,7 +688,6 @@ export class MapMarkerClusterer implements OnInit, OnChanges, OnDestroy {
+ 
+ // @public
+ export class MapPolygon implements OnInit, OnDestroy {
+-    constructor(...args: unknown[]);
+     getDraggable(): boolean;
+     getEditable(): boolean;
+     getPath(): google.maps.MVCArray<google.maps.LatLng>;
+@@ -735,7 +722,6 @@ export class MapPolygon implements OnInit, OnDestroy {
+ 
+ // @public
+ export class MapPolyline implements OnInit, OnDestroy {
+-    constructor(...args: unknown[]);
+     getDraggable(): boolean;
+     getEditable(): boolean;
+     getPath(): google.maps.MVCArray<google.maps.LatLng>;
+@@ -769,7 +755,6 @@ export class MapPolyline implements OnInit, OnDestroy {
+ 
+ // @public
+ export class MapRectangle implements OnInit, OnDestroy {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     set bounds(bounds: google.maps.LatLngBounds | google.maps.LatLngBoundsLiteral);
+     readonly boundsChanged: Observable<void>;
+@@ -804,7 +789,6 @@ export class MapRectangle implements OnInit, OnDestroy {
+ 
+ // @public
+ export class MapTrafficLayer implements OnInit, OnDestroy {
+-    constructor(...args: unknown[]);
+     set autoRefresh(autoRefresh: boolean);
+     // (undocumented)
+     ngOnDestroy(): void;
+diff --git a/goldens/material/autocomplete/index.api.md b/goldens/material/autocomplete/index.api.md
+index 7e7d11c6f811..f4b99c0778cf 100644
+--- a/goldens/material/autocomplete/index.api.md
++++ b/goldens/material/autocomplete/index.api.md
+@@ -43,7 +43,7 @@ export const MAT_AUTOCOMPLETE_VALUE_ACCESSOR: any;
+ 
+ // @public
+ export class MatAutocomplete implements AfterContentInit, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     // (undocumented)
+     protected _animationsDisabled: boolean;
+     ariaLabel: string;
+@@ -136,7 +136,6 @@ export class MatAutocompleteModule {
+ 
+ // @public
+ export class MatAutocompleteOrigin {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     elementRef: ElementRef<HTMLElement>;
+     // (undocumented)
+@@ -156,7 +155,6 @@ export class MatAutocompleteSelectedEvent {
+ 
+ // @public
+ export class MatAutocompleteTrigger implements ControlValueAccessor, AfterViewInit, OnChanges, OnDestroy {
+-    constructor(...args: unknown[]);
+     get activeOption(): MatOption | null;
+     autocomplete: MatAutocomplete;
+     autocompleteAttribute: string;
+@@ -204,7 +202,7 @@ export class MatAutocompleteTrigger implements ControlValueAccessor, AfterViewIn
+ 
+ // @public
+ export class MatOptgroup {
+-    constructor(...args: unknown[]);
++    constructor();
+     disabled: boolean;
+     _inert: boolean;
+     label: string;
+@@ -219,7 +217,7 @@ export class MatOptgroup {
+ 
+ // @public
+ export class MatOption<T = any> implements FocusableOption, AfterViewChecked, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     get active(): boolean;
+     // (undocumented)
+     _changeDetectorRef: ChangeDetectorRef;
+diff --git a/goldens/material/badge/index.api.md b/goldens/material/badge/index.api.md
+index 69f6b8665104..d5a3c59eae67 100644
+--- a/goldens/material/badge/index.api.md
++++ b/goldens/material/badge/index.api.md
+@@ -13,7 +13,7 @@ import { OnInit } from '@angular/core';
+ 
+ // @public
+ export class MatBadge implements OnInit, AfterViewInit, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     get color(): ThemePalette;
+     set color(value: ThemePalette);
+     get content(): string | number | undefined | null;
+diff --git a/goldens/material/bottom-sheet/index.api.md b/goldens/material/bottom-sheet/index.api.md
+index 989bbea60343..372d9a9a5e4a 100644
+--- a/goldens/material/bottom-sheet/index.api.md
++++ b/goldens/material/bottom-sheet/index.api.md
+@@ -34,7 +34,6 @@ export const MAT_BOTTOM_SHEET_DEFAULT_OPTIONS: InjectionToken<MatBottomSheetConf
+ 
+ // @public
+ export class MatBottomSheet implements OnDestroy {
+-    constructor(...args: unknown[]);
+     dismiss<R = any>(result?: R): void;
+     // (undocumented)
+     ngOnDestroy(): void;
+@@ -71,7 +70,7 @@ export class MatBottomSheetConfig<D = any> {
+ 
+ // @public
+ export class MatBottomSheetContainer extends CdkDialogContainer implements OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     // (undocumented)
+     protected _animationsDisabled: boolean;
+     _animationState: 'void' | 'visible' | 'hidden';
+diff --git a/goldens/material/button-toggle/index.api.md b/goldens/material/button-toggle/index.api.md
+index 80118072368e..e50988be35d0 100644
+--- a/goldens/material/button-toggle/index.api.md
++++ b/goldens/material/button-toggle/index.api.md
+@@ -28,7 +28,7 @@ export const MAT_BUTTON_TOGGLE_GROUP_VALUE_ACCESSOR: any;
+ 
+ // @public
+ export class MatButtonToggle implements OnInit, AfterViewInit, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     get appearance(): MatButtonToggleAppearance;
+     set appearance(value: MatButtonToggleAppearance);
+     ariaLabel: string;
+@@ -96,7 +96,7 @@ export interface MatButtonToggleDefaultOptions {
+ 
+ // @public
+ export class MatButtonToggleGroup implements ControlValueAccessor, OnInit, AfterContentInit {
+-    constructor(...args: unknown[]);
++    constructor();
+     appearance: MatButtonToggleAppearance;
+     _buttonToggles: QueryList<MatButtonToggle>;
+     readonly change: EventEmitter<MatButtonToggleChange>;
+diff --git a/goldens/material/button/index.api.md b/goldens/material/button/index.api.md
+index f8956808ac19..ee1a2044088d 100644
+--- a/goldens/material/button/index.api.md
++++ b/goldens/material/button/index.api.md
+@@ -28,7 +28,7 @@ export type MatAnchor = MatButton;
+ 
+ // @public
+ export class MatButton extends MatButtonBase {
+-    constructor(...args: unknown[]);
++    constructor();
+     get appearance(): MatButtonAppearance | null;
+     set appearance(value: MatButtonAppearance | '');
+     setAppearance(appearance: MatButtonAppearance): void;
+@@ -66,7 +66,7 @@ export type MatFabAnchor = MatFabButton;
+ 
+ // @public
+ export class MatFabButton extends MatButtonBase {
+-    constructor(...args: unknown[]);
++    constructor();
+     // (undocumented)
+     extended: boolean;
+     // (undocumented)
+@@ -92,7 +92,7 @@ export type MatIconAnchor = MatIconButton;
+ 
+ // @public
+ export class MatIconButton extends MatButtonBase {
+-    constructor(...args: unknown[]);
++    constructor();
+     // (undocumented)
+     static ɵcmp: i0.ɵɵComponentDeclaration<MatIconButton, "button[mat-icon-button], a[mat-icon-button], button[matIconButton], a[matIconButton]", ["matButton", "matAnchor"], {}, {}, never, ["*", "[progressIndicator]"], true, never>;
+     // (undocumented)
+@@ -107,7 +107,7 @@ export type MatMiniFabAnchor = MatMiniFabButton;
+ 
+ // @public
+ export class MatMiniFabButton extends MatButtonBase {
+-    constructor(...args: unknown[]);
++    constructor();
+     // (undocumented)
+     _isFab: boolean;
+     // (undocumented)
+diff --git a/goldens/material/card/index.api.md b/goldens/material/card/index.api.md
+index 0a87a3c7039d..5cb831a40816 100644
+--- a/goldens/material/card/index.api.md
++++ b/goldens/material/card/index.api.md
+@@ -13,7 +13,7 @@ export const MAT_CARD_CONFIG: InjectionToken<MatCardConfig>;
+ 
+ // @public
+ export class MatCard {
+-    constructor(...args: unknown[]);
++    constructor();
+     // (undocumented)
+     appearance: MatCardAppearance;
+     // (undocumented)
+diff --git a/goldens/material/checkbox/index.api.md b/goldens/material/checkbox/index.api.md
+index 300d77106239..9e72c1808591 100644
+--- a/goldens/material/checkbox/index.api.md
++++ b/goldens/material/checkbox/index.api.md
+@@ -23,7 +23,7 @@ export const MAT_CHECKBOX_DEFAULT_OPTIONS: InjectionToken<MatCheckboxDefaultOpti
+ 
+ // @public (undocumented)
+ export class MatCheckbox implements AfterViewInit, OnChanges, ControlValueAccessor, Validator, FocusableOption {
+-    constructor(...args: unknown[]);
++    constructor();
+     protected _animationClasses: {
+         uncheckedToChecked: string;
+         uncheckedToIndeterminate: string;
+diff --git a/goldens/material/chips/index.api.md b/goldens/material/chips/index.api.md
+index bf55f4351391..03eaadd8b43d 100644
+--- a/goldens/material/chips/index.api.md
++++ b/goldens/material/chips/index.api.md
+@@ -53,7 +53,7 @@ export const MAT_CHIPS_DEFAULT_OPTIONS: InjectionToken<MatChipsDefaultOptions>;
+ 
+ // @public
+ export class MatChip implements OnInit, AfterViewInit, AfterContentInit, DoCheck, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     protected _allEditIcons: QueryList<MatChipEdit>;
+     protected _allLeadingIcons: QueryList<MatChipAvatar>;
+     protected _allRemoveIcons: QueryList<MatChipRemove>;
+@@ -163,7 +163,6 @@ export interface MatChipEditedEvent extends MatChipEvent {
+ 
+ // @public
+ export class MatChipEditInput {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     getNativeElement(): HTMLElement;
+     // (undocumented)
+@@ -185,7 +184,7 @@ export interface MatChipEvent {
+ 
+ // @public
+ export class MatChipGrid extends MatChipSet implements AfterContentInit, AfterViewInit, ControlValueAccessor, DoCheck, MatFormFieldControl<any>, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     protected _allowFocusEscape(): void;
+     _blur(): void;
+     readonly change: EventEmitter<MatChipGridChange>;
+@@ -264,7 +263,7 @@ export class MatChipGridChange {
+ 
+ // @public
+ export class MatChipInput implements MatChipTextControl, OnChanges, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     addOnBlur: boolean;
+     _blur(): void;
+     readonly chipEnd: EventEmitter<MatChipInputEvent>;
+@@ -436,7 +435,7 @@ export class MatChipRemove extends MatChipAction {
+ 
+ // @public
+ export class MatChipRow extends MatChip implements AfterViewInit, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     // (undocumented)
+     protected basicChipAttrName: string;
+     contentEditInput?: MatChipEditInput;
+@@ -491,7 +490,6 @@ export class MatChipSelectionChange {
+ 
+ // @public
+ export class MatChipSet implements AfterViewInit, OnDestroy {
+-    constructor(...args: unknown[]);
+     protected _allowFocusEscape(): void;
+     // (undocumented)
+     protected _changeDetectorRef: ChangeDetectorRef;
+diff --git a/goldens/material/core/index.api.md b/goldens/material/core/index.api.md
+index 7bb4d1cf2464..5780910542d4 100644
+--- a/goldens/material/core/index.api.md
++++ b/goldens/material/core/index.api.md
+@@ -193,7 +193,7 @@ export class MatNativeDateModule {
+ 
+ // @public
+ export class MatOptgroup {
+-    constructor(...args: unknown[]);
++    constructor();
+     disabled: boolean;
+     _inert: boolean;
+     label: string;
+@@ -208,7 +208,7 @@ export class MatOptgroup {
+ 
+ // @public
+ export class MatOption<T = any> implements FocusableOption, AfterViewChecked, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     get active(): boolean;
+     // (undocumented)
+     _changeDetectorRef: ChangeDetectorRef;
+@@ -281,7 +281,6 @@ export class MatOptionSelectionChange<T = any> {
+ 
+ // @public
+ export class MatPseudoCheckbox {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     _animationsDisabled: boolean;
+     appearance: 'minimal' | 'full';
+@@ -308,7 +307,7 @@ export type MatPseudoCheckboxState = 'unchecked' | 'checked' | 'indeterminate';
+ 
+ // @public (undocumented)
+ export class MatRipple implements OnInit, OnDestroy, RippleTarget {
+-    constructor(...args: unknown[]);
++    constructor();
+     animation: RippleAnimationConfig;
+     centered: boolean;
+     color: string;
+@@ -366,7 +365,7 @@ export class MatRippleModule {
+ 
+ // @public
+ export class NativeDateAdapter extends DateAdapter<Date> {
+-    constructor(...args: unknown[]);
++    constructor();
+     // (undocumented)
+     addCalendarDays(date: Date, days: number): Date;
+     // (undocumented)
+diff --git a/goldens/material/datepicker/index.api.md b/goldens/material/datepicker/index.api.md
+index be953c180000..da4b5977dba6 100644
+--- a/goldens/material/datepicker/index.api.md
++++ b/goldens/material/datepicker/index.api.md
+@@ -99,7 +99,7 @@ export const MAT_DATEPICKER_VALUE_ACCESSOR: any;
+ 
+ // @public
+ export class MatCalendar<D> implements AfterContentInit, AfterViewChecked, OnDestroy, OnChanges {
+-    constructor(...args: unknown[]);
++    constructor();
+     get activeDate(): D;
+     set activeDate(value: D);
+     protected _activeDrag: MatCalendarUserEvent<D> | null;
+@@ -156,7 +156,7 @@ export class MatCalendar<D> implements AfterContentInit, AfterViewChecked, OnDes
+ 
+ // @public
+ export class MatCalendarBody<D = any> implements OnChanges, OnDestroy, AfterViewChecked {
+-    constructor(...args: unknown[]);
++    constructor();
+     activeCell: number;
+     // (undocumented)
+     readonly activeDateChange: EventEmitter<MatCalendarUserEvent<number>>;
+@@ -250,7 +250,7 @@ export type MatCalendarCellCssClasses = string | string[] | Set<string> | Record
+ 
+ // @public
+ export class MatCalendarHeader<D> {
+-    constructor(...args: unknown[]);
++    constructor();
+     // (undocumented)
+     calendar: MatCalendar<D>;
+     currentPeriodClicked(): void;
+@@ -292,7 +292,6 @@ export class MatDatepicker<D> extends MatDatepickerBase<MatDatepickerControl<D>,
+ 
+ // @public
+ export class MatDatepickerActions implements AfterViewInit, OnDestroy {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     ngAfterViewInit(): void;
+     // (undocumented)
+@@ -307,7 +306,6 @@ export class MatDatepickerActions implements AfterViewInit, OnDestroy {
+ 
+ // @public
+ export class MatDatepickerApply {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     _applySelection(): void;
+     // (undocumented)
+@@ -318,7 +316,6 @@ export class MatDatepickerApply {
+ 
+ // @public
+ export class MatDatepickerCancel {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     _datepicker: MatDatepickerBase<MatDatepickerControl<any>, unknown, {}>;
+     // (undocumented)
+@@ -329,7 +326,7 @@ export class MatDatepickerCancel {
+ 
+ // @public
+ export class MatDatepickerContent<S, D = ExtractDateTypeFromSelection<S>> implements AfterViewInit, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     _actionsPortal: TemplatePortal | null;
+     readonly _animationDone: Subject<void>;
+     // (undocumented)
+@@ -392,7 +389,7 @@ export interface MatDatepickerControl<D> {
+ 
+ // @public
+ export class MatDatepickerInput<D> extends MatDatepickerInputBase<D | null, D> implements MatDatepickerControl<D | null>, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     protected _ariaOwns: i0.WritableSignal<string | null>;
+     // (undocumented)
+     protected _assignValueToModel(value: D | null): void;
+@@ -489,7 +486,7 @@ export interface MatDatepickerPanel<C extends MatDatepickerControl<D>, S, D = Ex
+ 
+ // @public (undocumented)
+ export class MatDatepickerToggle<D> implements AfterContentInit, OnChanges, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     ariaLabel: string;
+     _button: MatButton;
+     _customIcon: MatDatepickerToggleIcon;
+@@ -526,7 +523,7 @@ export class MatDatepickerToggleIcon {
+ 
+ // @public (undocumented)
+ export class MatDateRangeInput<D> implements MatFormFieldControl<DateRange<D>>, MatDatepickerControl<D>, MatDateRangePickerInput<D>, AfterContentInit, OnChanges, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     _ariaDescribedBy: string | null;
+     _ariaOwns: i0.WritableSignal<string | null>;
+     comparisonEnd: D | null;
+@@ -657,7 +654,7 @@ export class MatEndDate<D> extends MatDateRangeInputPartBase<D> {
+ 
+ // @public
+ export class MatMonthView<D> implements AfterContentInit, OnChanges, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     get activeDate(): D;
+     set activeDate(value: D);
+     readonly activeDateChange: EventEmitter<D>;
+@@ -722,7 +719,7 @@ export class MatMonthView<D> implements AfterContentInit, OnChanges, OnDestroy {
+ 
+ // @public
+ export class MatMultiYearView<D> implements AfterContentInit, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     get activeDate(): D;
+     set activeDate(value: D);
+     readonly activeDateChange: EventEmitter<D>;
+@@ -809,7 +806,7 @@ export class MatStartDate<D> extends MatDateRangeInputPartBase<D> {
+ 
+ // @public
+ export class MatYearView<D> implements AfterContentInit, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     get activeDate(): D;
+     set activeDate(value: D);
+     readonly activeDateChange: EventEmitter<D>;
+diff --git a/goldens/material/dialog/index.api.md b/goldens/material/dialog/index.api.md
+index 3264b6953a07..bff4cccabb64 100644
+--- a/goldens/material/dialog/index.api.md
++++ b/goldens/material/dialog/index.api.md
+@@ -61,7 +61,7 @@ export const MAT_DIALOG_SCROLL_STRATEGY: InjectionToken<() => ScrollStrategy>;
+ 
+ // @public
+ export class MatDialog implements OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     readonly afterAllClosed: Observable<void>;
+     get afterOpened(): Subject<MatDialogRef<any>>;
+     closeAll(): void;
+@@ -98,7 +98,6 @@ export class MatDialogActions extends MatDialogLayoutSection {
+ 
+ // @public
+ export class MatDialogClose implements OnInit, OnChanges {
+-    constructor(...args: unknown[]);
+     ariaLabel: string;
+     // (undocumented)
+     dialogRef: MatDialogRef<any, any>;
+diff --git a/goldens/material/dialog/testing/index.api.md b/goldens/material/dialog/testing/index.api.md
+index 56cd33f4eb61..5ee65ad0b2aa 100644
+--- a/goldens/material/dialog/testing/index.api.md
++++ b/goldens/material/dialog/testing/index.api.md
+@@ -66,7 +66,7 @@ export enum MatDialogSection {
+ 
+ // @public
+ export class MatTestDialogOpener<T = unknown, R = unknown> implements OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     closedResult: R | undefined;
+     protected static component: ComponentType<unknown> | undefined;
+     protected static config: MatDialogConfig | undefined;
+diff --git a/goldens/material/expansion/index.api.md b/goldens/material/expansion/index.api.md
+index 790e15254563..b2b134b9a589 100644
+--- a/goldens/material/expansion/index.api.md
++++ b/goldens/material/expansion/index.api.md
+@@ -82,7 +82,7 @@ export class MatExpansionModule {
+ 
+ // @public
+ export class MatExpansionPanel extends CdkAccordionItem implements AfterContentInit, OnChanges, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     accordion: MatAccordionBase;
+     readonly afterCollapse: EventEmitter<void>;
+     readonly afterExpand: EventEmitter<void>;
+@@ -156,7 +156,6 @@ export class MatExpansionPanelActionRow {
+ 
+ // @public
+ export class MatExpansionPanelContent {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     _expansionPanel: MatExpansionPanelBase | null;
+     // (undocumented)
+@@ -184,7 +183,7 @@ export class MatExpansionPanelDescription {
+ 
+ // @public
+ export class MatExpansionPanelHeader implements AfterViewInit, OnDestroy, FocusableOption {
+-    constructor(...args: unknown[]);
++    constructor();
+     collapsedHeight: string;
+     get disabled(): boolean;
+     expandedHeight: string;
+diff --git a/goldens/material/form-field/index.api.md b/goldens/material/form-field/index.api.md
+index 2533e80b18c2..f22a18d98f33 100644
+--- a/goldens/material/form-field/index.api.md
++++ b/goldens/material/form-field/index.api.md
+@@ -48,7 +48,6 @@ export const MAT_SUFFIX: InjectionToken<MatSuffix>;
+ 
+ // @public
+ export class MatError {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     id: string;
+     // (undocumented)
+@@ -59,7 +58,7 @@ export class MatError {
+ 
+ // @public
+ export class MatFormField implements FloatingLabelParent, AfterContentInit, AfterContentChecked, AfterViewInit, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     _animateAndLockLabel(): void;
+     // (undocumented)
+     protected readonly _animationsDisabled: boolean;
+diff --git a/goldens/material/grid-list/index.api.md b/goldens/material/grid-list/index.api.md
+index 0956f0b0b485..ae19837c0c71 100644
+--- a/goldens/material/grid-list/index.api.md
++++ b/goldens/material/grid-list/index.api.md
+@@ -22,7 +22,6 @@ export class MatGridAvatarCssMatStyler {
+ 
+ // @public (undocumented)
+ export class MatGridList implements MatGridListBase, OnInit, AfterContentChecked, TileStyleTarget {
+-    constructor(...args: unknown[]);
+     get cols(): number;
+     set cols(value: NumberInput);
+     get gutterSize(): string;
+@@ -52,7 +51,6 @@ export class MatGridListModule {
+ 
+ // @public (undocumented)
+ export class MatGridTile {
+-    constructor(...args: unknown[]);
+     get colspan(): number;
+     set colspan(value: NumberInput);
+     // (undocumented)
+@@ -88,7 +86,6 @@ export class MatGridTileHeaderCssMatStyler {
+ 
+ // @public (undocumented)
+ export class MatGridTileText implements AfterContentInit {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     _lines: QueryList<MatLine>;
+     // (undocumented)
+diff --git a/goldens/material/icon/index.api.md b/goldens/material/icon/index.api.md
+index ac06730c2129..3bd4f8e72541 100644
+--- a/goldens/material/icon/index.api.md
++++ b/goldens/material/icon/index.api.md
+@@ -47,7 +47,7 @@ export const MAT_ICON_LOCATION: InjectionToken<MatIconLocation>;
+ 
+ // @public
+ export class MatIcon implements OnInit, AfterViewChecked, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     get color(): string | null | undefined;
+     set color(value: string | null | undefined);
+     // (undocumented)
+diff --git a/goldens/material/input/index.api.md b/goldens/material/input/index.api.md
+index bf4e3eff4ae4..378d872cfbaa 100644
+--- a/goldens/material/input/index.api.md
++++ b/goldens/material/input/index.api.md
+@@ -41,7 +41,6 @@ export const MAT_INPUT_VALUE_ACCESSOR: InjectionToken<{
+ 
+ // @public
+ export class MatError {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     id: string;
+     // (undocumented)
+@@ -52,7 +51,7 @@ export class MatError {
+ 
+ // @public
+ export class MatFormField implements FloatingLabelParent, AfterContentInit, AfterContentChecked, AfterViewInit, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     _animateAndLockLabel(): void;
+     // (undocumented)
+     protected readonly _animationsDisabled: boolean;
+@@ -149,7 +148,7 @@ export class MatHint {
+ 
+ // @public (undocumented)
+ export class MatInput implements MatFormFieldControl_2<any>, OnChanges, OnDestroy, AfterViewInit, DoCheck {
+-    constructor(...args: unknown[]);
++    constructor();
+     autofilled: boolean;
+     controlType: string;
+     get describedByIds(): string[];
+diff --git a/goldens/material/list/index.api.md b/goldens/material/list/index.api.md
+index a34fc60a9d12..4d2063b77e85 100644
+--- a/goldens/material/list/index.api.md
++++ b/goldens/material/list/index.api.md
+@@ -103,7 +103,6 @@ export class MatListItemAvatar extends _MatListItemGraphicBase {
+ 
+ // @public
+ export class _MatListItemGraphicBase {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     _isAlignedAtStart(): boolean;
+     // (undocumented)
+@@ -124,7 +123,6 @@ export class MatListItemIcon extends _MatListItemGraphicBase {
+ 
+ // @public
+ export class MatListItemLine {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     _elementRef: ElementRef<HTMLElement>;
+     // (undocumented)
+@@ -143,7 +141,6 @@ export class MatListItemMeta {
+ 
+ // @public
+ export class MatListItemTitle {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     _elementRef: ElementRef<HTMLElement>;
+     // (undocumented)
+@@ -234,7 +231,7 @@ export class MatNavList extends MatListBase {
+ 
+ // @public (undocumented)
+ export class MatSelectionList extends MatListBase implements SelectionList, ControlValueAccessor, AfterViewInit, OnChanges, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     color: ThemePalette;
+     compareWith: (o1: any, o2: any) => boolean;
+     deselectAll(): MatListOption[];
+diff --git a/goldens/material/menu/index.api.md b/goldens/material/menu/index.api.md
+index 2b79df3d1af9..9cbce4760179 100644
+--- a/goldens/material/menu/index.api.md
++++ b/goldens/material/menu/index.api.md
+@@ -75,7 +75,7 @@ export class MatContextMenuTrigger extends MatMenuTriggerBase implements OnDestr
+ 
+ // @public (undocumented)
+ export class MatMenu implements AfterContentInit, MatMenuPanel<MatMenuItem>, OnInit, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     // (undocumented)
+     addItem(_item: MatMenuItem): void;
+     _allItems: QueryList<MatMenuItem>;
+@@ -145,7 +145,6 @@ export class MatMenu implements AfterContentInit, MatMenuPanel<MatMenuItem>, OnI
+ 
+ // @public
+ export class MatMenuContent implements OnDestroy {
+-    constructor(...args: unknown[]);
+     attach(context?: any): void;
+     readonly _attached: Subject<void>;
+     detach(): void;
+@@ -169,7 +168,7 @@ export interface MatMenuDefaultOptions {
+ 
+ // @public
+ export class MatMenuItem implements FocusableOption, AfterViewInit, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     _checkDisabled(event: Event): void;
+     disabled: boolean;
+     disableRipple: boolean;
+@@ -257,7 +256,7 @@ export interface MatMenuPanel<T = any> {
+ 
+ // @public
+ export class MatMenuTrigger extends MatMenuTriggerBase implements AfterContentInit, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     closeMenu(): void;
+     // @deprecated (undocumented)
+     get _deprecatedMatMenuTriggerFor(): MatMenuPanel | null;
+diff --git a/goldens/material/paginator/index.api.md b/goldens/material/paginator/index.api.md
+index 9c2af36ee2de..f26a0c6b664b 100644
+--- a/goldens/material/paginator/index.api.md
++++ b/goldens/material/paginator/index.api.md
+@@ -55,7 +55,7 @@ export const MAT_PAGINATOR_DEFAULT_OPTIONS: InjectionToken<MatPaginatorDefaultOp
+ 
+ // @public
+ export class MatPaginator implements OnInit, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     protected _buttonClicked(targetIndex: number, isDisabled: boolean): void;
+     _changePageSize(pageSize: number): void;
+     color: ThemePalette;
+diff --git a/goldens/material/progress-bar/index.api.md b/goldens/material/progress-bar/index.api.md
+index 402e4b7b5816..5209a969c2ef 100644
+--- a/goldens/material/progress-bar/index.api.md
++++ b/goldens/material/progress-bar/index.api.md
+@@ -20,7 +20,7 @@ export const MAT_PROGRESS_BAR_LOCATION: InjectionToken<MatProgressBarLocation>;
+ 
+ // @public (undocumented)
+ export class MatProgressBar implements AfterViewInit, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     readonly animationEnd: EventEmitter<ProgressAnimationEnd>;
+     get bufferValue(): number;
+     set bufferValue(v: number);
+diff --git a/goldens/material/progress-spinner/index.api.md b/goldens/material/progress-spinner/index.api.md
+index cbe9e2d37f91..9960232877ef 100644
+--- a/goldens/material/progress-spinner/index.api.md
++++ b/goldens/material/progress-spinner/index.api.md
+@@ -14,7 +14,7 @@ export const MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS: InjectionToken<MatProgressSpi
+ 
+ // @public (undocumented)
+ export class MatProgressSpinner {
+-    constructor(...args: unknown[]);
++    constructor();
+     _circleRadius(): number;
+     _circleStrokeWidth(): number;
+     get color(): string | null | undefined;
+diff --git a/goldens/material/radio/index.api.md b/goldens/material/radio/index.api.md
+index 2b741095c53f..c3f04b0c930b 100644
+--- a/goldens/material/radio/index.api.md
++++ b/goldens/material/radio/index.api.md
+@@ -29,7 +29,7 @@ export const MAT_RADIO_GROUP_CONTROL_VALUE_ACCESSOR: any;
+ 
+ // @public (undocumented)
+ export class MatRadioButton implements OnInit, AfterViewInit, DoCheck, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     ariaDescribedby: string | null;
+     ariaLabel: string | null;
+     ariaLabelledby: string | null;
+@@ -109,7 +109,6 @@ export interface MatRadioDefaultOptions {
+ 
+ // @public
+ export class MatRadioGroup implements AfterContentInit, OnDestroy, ControlValueAccessor {
+-    constructor(...args: unknown[]);
+     readonly change: EventEmitter<MatRadioChange>;
+     // (undocumented)
+     _checkSelectedRadioButton(): void;
+diff --git a/goldens/material/select/index.api.md b/goldens/material/select/index.api.md
+index 81b6ceb0e60c..58da7072077a 100644
+--- a/goldens/material/select/index.api.md
++++ b/goldens/material/select/index.api.md
+@@ -54,7 +54,6 @@ export const MAT_SELECT_TRIGGER: InjectionToken<MatSelectTrigger>;
+ 
+ // @public
+ export class MatError {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     id: string;
+     // (undocumented)
+@@ -65,7 +64,7 @@ export class MatError {
+ 
+ // @public
+ export class MatFormField implements FloatingLabelParent, AfterContentInit, AfterContentChecked, AfterViewInit, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     _animateAndLockLabel(): void;
+     // (undocumented)
+     protected readonly _animationsDisabled: boolean;
+@@ -170,7 +169,7 @@ export class MatLabel {
+ 
+ // @public
+ export class MatOptgroup {
+-    constructor(...args: unknown[]);
++    constructor();
+     disabled: boolean;
+     _inert: boolean;
+     label: string;
+@@ -185,7 +184,7 @@ export class MatOptgroup {
+ 
+ // @public
+ export class MatOption<T = any> implements FocusableOption, AfterViewChecked, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     get active(): boolean;
+     // (undocumented)
+     _changeDetectorRef: ChangeDetectorRef;
+@@ -239,7 +238,7 @@ export class MatPrefix {
+ 
+ // @public (undocumented)
+ export class MatSelect implements AfterContentInit, OnChanges, OnDestroy, OnInit, DoCheck, ControlValueAccessor, MatFormFieldControl_2<any> {
+-    constructor(...args: unknown[]);
++    constructor();
+     // (undocumented)
+     protected _animationsDisabled: boolean;
+     ariaLabel: string;
+diff --git a/goldens/material/sidenav/index.api.md b/goldens/material/sidenav/index.api.md
+index 306745f23dab..e36372526a06 100644
+--- a/goldens/material/sidenav/index.api.md
++++ b/goldens/material/sidenav/index.api.md
+@@ -27,7 +27,7 @@ export const MAT_DRAWER_DEFAULT_AUTOSIZE: InjectionToken<boolean>;
+ 
+ // @public
+ export class MatDrawer implements AfterViewInit, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     readonly _animationEnd: Subject<unknown>;
+     readonly _animationStarted: Subject<unknown>;
+     get autoFocus(): AutoFocusTarget | string | boolean;
+@@ -68,7 +68,7 @@ export class MatDrawer implements AfterViewInit, OnDestroy {
+ 
+ // @public
+ export class MatDrawerContainer implements AfterContentInit, DoCheck, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     _allDrawers: QueryList<MatDrawer>;
+     get autosize(): boolean;
+     set autosize(value: BooleanInput);
+@@ -119,7 +119,6 @@ export class MatDrawerContainer implements AfterContentInit, DoCheck, OnDestroy
+ 
+ // @public (undocumented)
+ export class MatDrawerContent extends CdkScrollable implements AfterContentInit {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     _container: MatDrawerContainer;
+     // (undocumented)
+diff --git a/goldens/material/slide-toggle/index.api.md b/goldens/material/slide-toggle/index.api.md
+index a48c32ac93d2..8bdf602a80a9 100644
+--- a/goldens/material/slide-toggle/index.api.md
++++ b/goldens/material/slide-toggle/index.api.md
+@@ -25,7 +25,7 @@ export const MAT_SLIDE_TOGGLE_DEFAULT_OPTIONS: InjectionToken<MatSlideToggleDefa
+ 
+ // @public (undocumented)
+ export class MatSlideToggle implements OnDestroy, AfterContentInit, OnChanges, ControlValueAccessor, Validator {
+-    constructor(...args: unknown[]);
++    constructor();
+     ariaDescribedby: string;
+     ariaLabel: string | null;
+     ariaLabelledby: string | null;
+diff --git a/goldens/material/slider/index.api.md b/goldens/material/slider/index.api.md
+index b7b959d28602..283b2ed2dfc8 100644
+--- a/goldens/material/slider/index.api.md
++++ b/goldens/material/slider/index.api.md
+@@ -22,7 +22,7 @@ import { WritableSignal } from '@angular/core';
+ 
+ // @public
+ export class MatSlider implements AfterViewInit, OnDestroy, _MatSlider {
+-    constructor(...args: unknown[]);
++    constructor();
+     // (undocumented)
+     _cachedLeft: number;
+     // (undocumented)
+@@ -152,7 +152,7 @@ export class MatSliderModule {
+ 
+ // @public (undocumented)
+ export class MatSliderRangeThumb extends MatSliderThumb implements _MatSliderRangeThumb {
+-    constructor(...args: unknown[]);
++    constructor();
+     // (undocumented)
+     readonly _cdr: ChangeDetectorRef;
+     // (undocumented)
+@@ -197,7 +197,7 @@ export class MatSliderRangeThumb extends MatSliderThumb implements _MatSliderRan
+ 
+ // @public
+ export class MatSliderThumb implements _MatSliderThumb, OnDestroy, ControlValueAccessor {
+-    constructor(...args: unknown[]);
++    constructor();
+     // (undocumented)
+     blur(): void;
+     // (undocumented)
+@@ -301,7 +301,6 @@ export class MatSliderThumb implements _MatSliderThumb, OnDestroy, ControlValueA
+ 
+ // @public
+ export class MatSliderVisualThumb implements _MatSliderVisualThumb, AfterViewInit, OnDestroy {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     readonly _cdr: ChangeDetectorRef;
+     discrete: boolean;
+diff --git a/goldens/material/snack-bar/index.api.md b/goldens/material/snack-bar/index.api.md
+index 47dd8b7bcac1..f10d49a9ce48 100644
+--- a/goldens/material/snack-bar/index.api.md
++++ b/goldens/material/snack-bar/index.api.md
+@@ -39,7 +39,6 @@ export const MAT_SNACK_BAR_DEFAULT_OPTIONS: InjectionToken<MatSnackBarConfig<any
+ 
+ // @public
+ export class MatSnackBar implements OnDestroy {
+-    constructor(...args: unknown[]);
+     dismiss(): void;
+     handsetCssClass: string;
+     // (undocumented)
+@@ -88,7 +87,7 @@ export class MatSnackBarConfig<D = any> {
+ 
+ // @public
+ export class MatSnackBarContainer extends BasePortalOutlet implements OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     // (undocumented)
+     protected _animationsDisabled: boolean;
+     _animationState: string;
+@@ -165,7 +164,6 @@ export type MatSnackBarVerticalPosition = 'top' | 'bottom';
+ 
+ // @public (undocumented)
+ export class SimpleSnackBar implements TextOnlySnackBar {
+-    constructor(...args: unknown[]);
+     action(): void;
+     // (undocumented)
+     data: any;
+diff --git a/goldens/material/sort/index.api.md b/goldens/material/sort/index.api.md
+index e0a4397b8c2b..e471450dd1fb 100644
+--- a/goldens/material/sort/index.api.md
++++ b/goldens/material/sort/index.api.md
+@@ -77,7 +77,7 @@ export interface MatSortDefaultOptions {
+ 
+ // @public
+ export class MatSortHeader implements MatSortable, OnDestroy, OnInit, AfterViewInit {
+-    constructor(...args: unknown[]);
++    constructor();
+     // (undocumented)
+     protected _animationsDisabled: boolean;
+     arrowPosition: SortHeaderArrowPosition;
+diff --git a/goldens/material/stepper/index.api.md b/goldens/material/stepper/index.api.md
+index c9661064d98e..346224f47d6a 100644
+--- a/goldens/material/stepper/index.api.md
++++ b/goldens/material/stepper/index.api.md
+@@ -51,7 +51,6 @@ export class MatStep extends CdkStep implements ErrorStateMatcher, AfterContentI
+ 
+ // @public
+ export class MatStepContent<C = unknown> {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     _template: TemplateRef<C>;
+     // (undocumented)
+@@ -62,7 +61,7 @@ export class MatStepContent<C = unknown> {
+ 
+ // @public (undocumented)
+ export class MatStepHeader extends CdkStepHeader implements AfterViewInit, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     active: boolean;
+     color: ThemePalette;
+     disableRipple: boolean;
+@@ -109,7 +108,7 @@ export class MatStepLabel extends CdkStepLabel {
+ 
+ // @public (undocumented)
+ export class MatStepper extends CdkStepper implements AfterViewInit, AfterContentInit, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     _animatedContainers: QueryList<ElementRef>;
+     readonly animationDone: EventEmitter<void>;
+     get animationDuration(): string;
+@@ -143,7 +142,6 @@ export class MatStepper extends CdkStepper implements AfterViewInit, AfterConten
+ 
+ // @public
+ export class MatStepperIcon {
+-    constructor(...args: unknown[]);
+     name: StepState;
+     // (undocumented)
+     templateRef: TemplateRef<MatStepperIconContext>;
+diff --git a/goldens/material/tabs/index.api.md b/goldens/material/tabs/index.api.md
+index 231655887eeb..19ff1d0b4786 100644
+--- a/goldens/material/tabs/index.api.md
++++ b/goldens/material/tabs/index.api.md
+@@ -65,7 +65,7 @@ export interface _MatInkBarPositioner {
+ 
+ // @public
+ export abstract class MatPaginatedTabHeader implements AfterContentChecked, AfterContentInit, AfterViewInit, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     _alignInkBarToSelectedTab(): void;
+     // (undocumented)
+     _animationsDisabled: boolean;
+@@ -143,7 +143,7 @@ export abstract class MatPaginatedTabHeader implements AfterContentChecked, Afte
+ 
+ // @public (undocumented)
+ export class MatTab implements OnInit, OnChanges, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     ariaLabel: string;
+     ariaLabelledby: string;
+     bodyClass: string | string[];
+@@ -177,7 +177,7 @@ export class MatTab implements OnInit, OnChanges, OnDestroy {
+ 
+ // @public
+ export class MatTabBody implements OnInit, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     readonly _afterLeavingCenter: EventEmitter<void>;
+     animationDuration: string;
+     readonly _beforeCentering: EventEmitter<boolean>;
+@@ -208,7 +208,6 @@ export type MatTabBodyOriginState = 'left' | 'right';
+ 
+ // @public
+ export class MatTabBodyPortal extends CdkPortalOutlet implements OnInit, OnDestroy {
+-    constructor(...args: unknown[]);
+     ngOnDestroy(): void;
+     ngOnInit(): void;
+     // (undocumented)
+@@ -228,7 +227,6 @@ export class MatTabChangeEvent {
+ 
+ // @public
+ export class MatTabContent {
+-    constructor(...args: unknown[]);
+     // (undocumented)
+     template: TemplateRef<any>;
+     // (undocumented)
+@@ -239,7 +237,7 @@ export class MatTabContent {
+ 
+ // @public
+ export class MatTabGroup implements AfterViewInit, AfterContentInit, AfterContentChecked, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     alignTabs: string | null;
+     _allTabs: QueryList<MatTab>;
+     readonly animationDone: EventEmitter<void>;
+@@ -398,7 +396,7 @@ export class MatTabLabelWrapper extends InkBarItem {
+ 
+ // @public
+ export class MatTabLink extends InkBarItem implements AfterViewInit, OnDestroy, RippleTarget, FocusableOption {
+-    constructor(...args: unknown[]);
++    constructor();
+     get active(): boolean;
+     set active(value: boolean);
+     disabled: boolean;
+@@ -447,7 +445,7 @@ export class MatTabLink extends InkBarItem implements AfterViewInit, OnDestroy,
+ 
+ // @public
+ export class MatTabNav extends MatPaginatedTabHeader implements AfterContentInit, AfterViewInit {
+-    constructor(...args: unknown[]);
++    constructor();
+     // (undocumented)
+     get animationDuration(): string;
+     set animationDuration(value: string | number);
+diff --git a/goldens/material/toolbar/index.api.md b/goldens/material/toolbar/index.api.md
+index 2e4c99245b42..6ae619e36b78 100644
+--- a/goldens/material/toolbar/index.api.md
++++ b/goldens/material/toolbar/index.api.md
+@@ -12,7 +12,6 @@ import { QueryList } from '@angular/core';
+ 
+ // @public (undocumented)
+ export class MatToolbar implements AfterViewInit {
+-    constructor(...args: unknown[]);
+     color?: string | null;
+     // (undocumented)
+     protected _elementRef: ElementRef<any>;
+diff --git a/goldens/material/tooltip/index.api.md b/goldens/material/tooltip/index.api.md
+index bcf5273172e6..8f5d9bf5b799 100644
+--- a/goldens/material/tooltip/index.api.md
++++ b/goldens/material/tooltip/index.api.md
+@@ -34,7 +34,7 @@ export const MAT_TOOLTIP_SCROLL_STRATEGY: InjectionToken<() => ScrollStrategy>;
+ 
+ // @public
+ export class MatTooltip implements OnDestroy, AfterViewInit {
+-    constructor(...args: unknown[]);
++    constructor();
+     protected _addOffset(position: ConnectedPosition): ConnectedPosition;
+     // (undocumented)
+     protected _dir: Directionality;
+@@ -122,7 +122,6 @@ export const TOOLTIP_PANEL_CLASS = "mat-mdc-tooltip-panel";
+ 
+ // @public
+ export class TooltipComponent implements OnDestroy {
+-    constructor(...args: unknown[]);
+     afterHidden(): Observable<void>;
+     _cancelPendingAnimations(): void;
+     // (undocumented)
+diff --git a/goldens/material/tree/index.api.md b/goldens/material/tree/index.api.md
+index b5c3ee46e791..ebb0566fc935 100644
+--- a/goldens/material/tree/index.api.md
++++ b/goldens/material/tree/index.api.md
+@@ -112,7 +112,7 @@ export class MatTreeNestedDataSource<T> extends DataSource<T> {
+ 
+ // @public
+ export class MatTreeNode<T, K = T> extends CdkTreeNode<T, K> implements OnInit, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     // @deprecated
+     defaultTabIndex: number;
+     // @deprecated
+diff --git a/goldens/youtube-player/index.api.md b/goldens/youtube-player/index.api.md
+index f09a7496d45c..23da012a13c9 100644
+--- a/goldens/youtube-player/index.api.md
++++ b/goldens/youtube-player/index.api.md
+@@ -23,7 +23,7 @@ export const YOUTUBE_PLAYER_CONFIG: InjectionToken<YouTubePlayerConfig>;
+ 
+ // @public
+ export class YouTubePlayer implements AfterViewInit, OnChanges, OnDestroy {
+-    constructor(...args: unknown[]);
++    constructor();
+     readonly apiChange: Observable<YT.PlayerEvent>;
+     disableCookies: boolean;
+     disablePlaceholder: boolean;
+diff --git a/src/cdk-experimental/column-resize/coalesced-style-scheduler.ts b/src/cdk-experimental/column-resize/coalesced-style-scheduler.ts
+index 35d107229320..b736feee68f2 100644
+--- a/src/cdk-experimental/column-resize/coalesced-style-scheduler.ts
++++ b/src/cdk-experimental/column-resize/coalesced-style-scheduler.ts
+@@ -33,9 +33,6 @@ export class _CoalescedStyleScheduler {
+   private _currentSchedule: _Schedule | null = null;
+   private _ngZone = inject(NgZone);
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   /**
+    * Schedules the specified task to run at the end of the current VM turn.
+    */
+diff --git a/src/cdk/a11y/aria-describer/aria-describer.ts b/src/cdk/a11y/aria-describer/aria-describer.ts
+index 85118572193e..4826ac83a372 100644
+--- a/src/cdk/a11y/aria-describer/aria-describer.ts
++++ b/src/cdk/a11y/aria-describer/aria-describer.ts
+@@ -66,8 +66,6 @@ export class AriaDescriber implements OnDestroy {
+   /** Unique ID for the service. */
+   private readonly _id = `${nextId++}`;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     inject(_CdkPrivateStyleLoader).load(_VisuallyHiddenLoader);
+     this._id = inject(APP_ID) + '-' + nextId++;
+diff --git a/src/cdk/a11y/focus-monitor/focus-monitor.ts b/src/cdk/a11y/focus-monitor/focus-monitor.ts
+index 7d23d712b828..8a0b9258f588 100644
+--- a/src/cdk/a11y/focus-monitor/focus-monitor.ts
++++ b/src/cdk/a11y/focus-monitor/focus-monitor.ts
+@@ -147,8 +147,6 @@ export class FocusMonitor implements OnDestroy {
+   /** Subject for stopping our InputModalityDetector subscription. */
+   private readonly _stopInputModalityDetector = new Subject<void>();
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const options = inject<FocusMonitorOptions | null>(FOCUS_MONITOR_DEFAULT_OPTIONS, {
+       optional: true,
+@@ -622,9 +620,6 @@ export class CdkMonitorFocus implements AfterViewInit, OnDestroy {
+ 
+   @Output() readonly cdkFocusChange = new EventEmitter<FocusOrigin>();
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   get focusOrigin(): FocusOrigin {
+     return this._focusOrigin;
+   }
+diff --git a/src/cdk/a11y/focus-trap/configurable-focus-trap-factory.ts b/src/cdk/a11y/focus-trap/configurable-focus-trap-factory.ts
+index c51f8cbaa814..fb02187d0258 100644
+--- a/src/cdk/a11y/focus-trap/configurable-focus-trap-factory.ts
++++ b/src/cdk/a11y/focus-trap/configurable-focus-trap-factory.ts
+@@ -26,8 +26,6 @@ export class ConfigurableFocusTrapFactory {
+ 
+   private readonly _injector = inject(Injector);
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const inertStrategy = inject(FOCUS_TRAP_INERT_STRATEGY, {optional: true});
+ 
+diff --git a/src/cdk/a11y/focus-trap/focus-trap.ts b/src/cdk/a11y/focus-trap/focus-trap.ts
+index f0c027e25e8a..679a69d0d4a7 100644
+--- a/src/cdk/a11y/focus-trap/focus-trap.ts
++++ b/src/cdk/a11y/focus-trap/focus-trap.ts
+@@ -379,7 +379,6 @@ export class FocusTrapFactory {
+   private _document = inject(DOCUMENT);
+   private _injector = inject(Injector);
+ 
+-  constructor(...args: unknown[]);
+   constructor() {
+     inject(_CdkPrivateStyleLoader).load(_VisuallyHiddenLoader);
+   }
+@@ -436,8 +435,6 @@ export class CdkTrapFocus implements OnDestroy, AfterContentInit, OnChanges, DoC
+   @Input({alias: 'cdkTrapFocusAutoCapture', transform: booleanAttribute})
+   autoCapture: boolean = false;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const platform = inject(Platform);
+ 
+diff --git a/src/cdk/a11y/high-contrast-mode/high-contrast-mode-detector.ts b/src/cdk/a11y/high-contrast-mode/high-contrast-mode-detector.ts
+index 6595ee81fd57..d729f12e0d6c 100644
+--- a/src/cdk/a11y/high-contrast-mode/high-contrast-mode-detector.ts
++++ b/src/cdk/a11y/high-contrast-mode/high-contrast-mode-detector.ts
+@@ -51,8 +51,6 @@ export class HighContrastModeDetector implements OnDestroy {
+   private _document = inject(DOCUMENT);
+   private _breakpointSubscription: Subscription;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     this._breakpointSubscription = inject(BreakpointObserver)
+       .observe('(forced-colors: active)')
+diff --git a/src/cdk/a11y/input-modality/input-modality-detector.ts b/src/cdk/a11y/input-modality/input-modality-detector.ts
+index ccd463f831f6..88e1e3b80715 100644
+--- a/src/cdk/a11y/input-modality/input-modality-detector.ts
++++ b/src/cdk/a11y/input-modality/input-modality-detector.ts
+@@ -183,8 +183,6 @@ export class InputModalityDetector implements OnDestroy {
+     this._mostRecentTarget = _getEventTarget(event);
+   };
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const ngZone = inject(NgZone);
+     const document = inject<Document>(DOCUMENT);
+diff --git a/src/cdk/a11y/interactivity-checker/interactivity-checker.ts b/src/cdk/a11y/interactivity-checker/interactivity-checker.ts
+index fb31fe4b989e..0c245a370b3d 100644
+--- a/src/cdk/a11y/interactivity-checker/interactivity-checker.ts
++++ b/src/cdk/a11y/interactivity-checker/interactivity-checker.ts
+@@ -31,9 +31,6 @@ export class IsFocusableConfig {
+ export class InteractivityChecker {
+   private _platform = inject(Platform);
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   /**
+    * Gets whether an element is disabled.
+    *
+diff --git a/src/cdk/a11y/live-announcer/live-announcer.ts b/src/cdk/a11y/live-announcer/live-announcer.ts
+index 355e99c9b33f..ba0f5db72edd 100644
+--- a/src/cdk/a11y/live-announcer/live-announcer.ts
++++ b/src/cdk/a11y/live-announcer/live-announcer.ts
+@@ -47,8 +47,6 @@ export class LiveAnnouncer implements OnDestroy {
+   private _currentPromise: Promise<void> | undefined;
+   private _currentResolve: (() => void) | undefined;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const elementToken = inject(LIVE_ANNOUNCER_ELEMENT_TOKEN, {optional: true});
+     this._liveElement = elementToken || this._createLiveElement();
+@@ -276,8 +274,6 @@ export class CdkAriaLive implements OnDestroy {
+   private _previousAnnouncedText?: string;
+   private _subscription: Subscription | undefined;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     inject(_CdkPrivateStyleLoader).load(_VisuallyHiddenLoader);
+   }
+diff --git a/src/cdk/accordion/accordion-item.ts b/src/cdk/accordion/accordion-item.ts
+index bd32f3f10d8c..6a11fd652dcf 100644
+--- a/src/cdk/accordion/accordion-item.ts
++++ b/src/cdk/accordion/accordion-item.ts
+@@ -103,9 +103,6 @@ export class CdkAccordionItem implements OnInit, OnDestroy {
+   /** Unregister function for _expansionDispatcher. */
+   private _removeUniqueSelectionListener: () => void = () => {};
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   ngOnInit() {
+     this._removeUniqueSelectionListener = this._expansionDispatcher.listen(
+       (id: string, accordionId: string) => {
+diff --git a/src/cdk/bidi/directionality.ts b/src/cdk/bidi/directionality.ts
+index 4c74b0734320..3185fdb9080e 100644
+--- a/src/cdk/bidi/directionality.ts
++++ b/src/cdk/bidi/directionality.ts
+@@ -45,8 +45,6 @@ export class Directionality implements OnDestroy {
+   /** Stream that emits whenever the 'ltr' / 'rtl' state changes. */
+   readonly change = new EventEmitter<Direction>();
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const _document = inject(DIR_DOCUMENT, {optional: true});
+ 
+diff --git a/src/cdk/clipboard/clipboard.ts b/src/cdk/clipboard/clipboard.ts
+index c8e8f279ff4f..351ef48e3e4e 100644
+--- a/src/cdk/clipboard/clipboard.ts
++++ b/src/cdk/clipboard/clipboard.ts
+@@ -16,9 +16,6 @@ import {PendingCopy} from './pending-copy';
+ export class Clipboard {
+   private readonly _document = inject(DOCUMENT);
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   /**
+    * Copies the provided text into the user's clipboard.
+    *
+diff --git a/src/cdk/clipboard/copy-to-clipboard.ts b/src/cdk/clipboard/copy-to-clipboard.ts
+index d0fb44cc2421..3c3711642143 100644
+--- a/src/cdk/clipboard/copy-to-clipboard.ts
++++ b/src/cdk/clipboard/copy-to-clipboard.ts
+@@ -68,8 +68,6 @@ export class CdkCopyToClipboard implements OnDestroy {
+   /** Timeout for the current copy attempt. */
+   private _currentTimeout: any;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const config = inject(CDK_COPY_TO_CLIPBOARD_CONFIG, {optional: true});
+ 
+diff --git a/src/cdk/dialog/dialog-container.ts b/src/cdk/dialog/dialog-container.ts
+index 8f1e3bf2254d..2de483206a06 100644
+--- a/src/cdk/dialog/dialog-container.ts
++++ b/src/cdk/dialog/dialog-container.ts
+@@ -114,8 +114,6 @@ export class CdkDialogContainer<C extends DialogConfig = DialogConfig>
+ 
+   private _isDestroyed = false;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     super();
+ 
+diff --git a/src/cdk/dialog/dialog.ts b/src/cdk/dialog/dialog.ts
+index 93ea177750bf..41a3cfde4051 100644
+--- a/src/cdk/dialog/dialog.ts
++++ b/src/cdk/dialog/dialog.ts
+@@ -86,10 +86,6 @@ export class Dialog implements OnDestroy {
+       : this._getAfterAllClosed().pipe(startWith(undefined)),
+   );
+ 
+-  constructor(...args: unknown[]);
+-
+-  constructor() {}
+-
+   /**
+    * Opens a modal dialog containing the given component.
+    * @param component Type of the component to load into the dialog.
+diff --git a/src/cdk/drag-drop/directives/drag-handle.ts b/src/cdk/drag-drop/directives/drag-handle.ts
+index 01d11aa430c8..488ad6e1803d 100644
+--- a/src/cdk/drag-drop/directives/drag-handle.ts
++++ b/src/cdk/drag-drop/directives/drag-handle.ts
+@@ -57,8 +57,6 @@ export class CdkDragHandle implements AfterViewInit, OnDestroy {
+   }
+   private _disabled = false;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     if (typeof ngDevMode === 'undefined' || ngDevMode) {
+       assertElementNode(this.element.nativeElement, 'cdkDragHandle');
+diff --git a/src/cdk/drag-drop/directives/drag-placeholder.ts b/src/cdk/drag-drop/directives/drag-placeholder.ts
+index 7f9a916a0b56..bf86a7155c0f 100644
+--- a/src/cdk/drag-drop/directives/drag-placeholder.ts
++++ b/src/cdk/drag-drop/directives/drag-placeholder.ts
+@@ -32,8 +32,6 @@ export class CdkDragPlaceholder<T = any> implements OnDestroy {
+   /** Context data to be added to the placeholder template instance. */
+   @Input() data!: T;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     this._drag?._setPlaceholderTemplate(this);
+   }
+diff --git a/src/cdk/drag-drop/directives/drag-preview.ts b/src/cdk/drag-drop/directives/drag-preview.ts
+index 10131d5b4ff8..c0d7e1816ecc 100644
+--- a/src/cdk/drag-drop/directives/drag-preview.ts
++++ b/src/cdk/drag-drop/directives/drag-preview.ts
+@@ -43,8 +43,6 @@ export class CdkDragPreview<T = any> implements OnDestroy {
+   /** Whether the preview should preserve the same size as the item that is being dragged. */
+   @Input({transform: booleanAttribute}) matchSize: boolean = false;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     this._drag?._setPreviewTemplate(this);
+   }
+diff --git a/src/cdk/drag-drop/directives/drag.ts b/src/cdk/drag-drop/directives/drag.ts
+index 05ab3c2eb747..886cfbeac622 100644
+--- a/src/cdk/drag-drop/directives/drag.ts
++++ b/src/cdk/drag-drop/directives/drag.ts
+@@ -216,8 +216,6 @@ export class CdkDrag<T = any> implements AfterViewInit, OnChanges, OnDestroy {
+ 
+   private _injector = inject(Injector);
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const dropContainer = this.dropContainer;
+     const config = inject<DragDropConfig>(CDK_DRAG_CONFIG, {optional: true});
+diff --git a/src/cdk/drag-drop/directives/drop-list-shared.spec.ts b/src/cdk/drag-drop/directives/drop-list-shared.spec.ts
+index 6d865420db52..4c99c3bd728f 100644
+--- a/src/cdk/drag-drop/directives/drop-list-shared.spec.ts
++++ b/src/cdk/drag-drop/directives/drop-list-shared.spec.ts
+@@ -5035,10 +5035,6 @@ export function getHorizontalFixtures(listOrientation: Exclude<DropListOrientati
+       moveItemInArray(this.items, event.previousIndex, event.currentIndex);
+     });
+ 
+-    constructor(...args: unknown[]);
+-
+-    constructor() {}
+-
+     ngAfterViewInit() {
+       // Firefox preserves the `scrollLeft` value from previous similar containers. This
+       // could throw off test assertions and result in flaky results.
+diff --git a/src/cdk/drag-drop/directives/drop-list.ts b/src/cdk/drag-drop/directives/drop-list.ts
+index 8ff7eb3654fb..56b0561dfc57 100644
+--- a/src/cdk/drag-drop/directives/drop-list.ts
++++ b/src/cdk/drag-drop/directives/drop-list.ts
+@@ -194,8 +194,6 @@ export class CdkDropList<T = any> implements OnDestroy {
+    */
+   private _unsortedItems = new Set<CdkDrag>();
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const config = inject<DragDropConfig>(CDK_DRAG_CONFIG, {optional: true});
+     const injector = inject(Injector);
+diff --git a/src/cdk/drag-drop/drag-drop-registry.ts b/src/cdk/drag-drop/drag-drop-registry.ts
+index 358b4a23daaf..085f85a3f465 100644
+--- a/src/cdk/drag-drop/drag-drop-registry.ts
++++ b/src/cdk/drag-drop/drag-drop-registry.ts
+@@ -102,9 +102,6 @@ export class DragDropRegistry implements OnDestroy {
+    */
+   readonly pointerUp: Subject<TouchEvent | MouseEvent> = new Subject<TouchEvent | MouseEvent>();
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   /** Adds a drop container to the registry. */
+   registerDropContainer(drop: DropListRef) {
+     if (!this._dropInstances.has(drop)) {
+diff --git a/src/cdk/drag-drop/drag-drop.ts b/src/cdk/drag-drop/drag-drop.ts
+index 5b253e26069f..c27a47824961 100644
+--- a/src/cdk/drag-drop/drag-drop.ts
++++ b/src/cdk/drag-drop/drag-drop.ts
+@@ -20,9 +20,6 @@ import {createDropListRef, DropListRef} from './drop-list-ref';
+ export class DragDrop {
+   private _injector = inject(Injector);
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   /**
+    * Turns an element into a draggable item.
+    * @param element Element to which to attach the dragging functionality.
+diff --git a/src/cdk/layout/breakpoints-observer.ts b/src/cdk/layout/breakpoints-observer.ts
+index 5373c85ecd63..e329e2848ce7 100644
+--- a/src/cdk/layout/breakpoints-observer.ts
++++ b/src/cdk/layout/breakpoints-observer.ts
+@@ -49,9 +49,6 @@ export class BreakpointObserver implements OnDestroy {
+   /** A subject for all other observables to takeUntil based on. */
+   private readonly _destroySubject = new Subject<void>();
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   /** Completes the active subject, signalling to all other observables to complete. */
+   ngOnDestroy() {
+     this._destroySubject.next();
+diff --git a/src/cdk/layout/media-matcher.ts b/src/cdk/layout/media-matcher.ts
+index 1dcad6ef72d0..cf6c7fe83fb9 100644
+--- a/src/cdk/layout/media-matcher.ts
++++ b/src/cdk/layout/media-matcher.ts
+@@ -23,8 +23,6 @@ export class MediaMatcher {
+   /** The internal matchMedia method to return back a MediaQueryList like object. */
+   private _matchMedia: (query: string) => MediaQueryList;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     this._matchMedia =
+       this._platform.isBrowser && window.matchMedia
+diff --git a/src/cdk/observers/observe-content.ts b/src/cdk/observers/observe-content.ts
+index 3fa0664a7aac..9c5fb6d82424 100644
+--- a/src/cdk/observers/observe-content.ts
++++ b/src/cdk/observers/observe-content.ts
+@@ -79,9 +79,6 @@ export class ContentObserver implements OnDestroy {
+ 
+   private _ngZone = inject(NgZone);
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   ngOnDestroy() {
+     this._observedElements.forEach((_, element) => this._cleanupObserver(element));
+   }
+@@ -213,9 +210,6 @@ export class CdkObserveContent implements AfterContentInit, OnDestroy {
+ 
+   private _currentSubscription: Subscription | null = null;
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   ngAfterContentInit() {
+     if (!this._currentSubscription && !this.disabled) {
+       this._subscribe();
+diff --git a/src/cdk/overlay/dispatchers/base-overlay-dispatcher.ts b/src/cdk/overlay/dispatchers/base-overlay-dispatcher.ts
+index 4d56a65ef244..c9e3276a13d8 100644
+--- a/src/cdk/overlay/dispatchers/base-overlay-dispatcher.ts
++++ b/src/cdk/overlay/dispatchers/base-overlay-dispatcher.ts
+@@ -23,10 +23,6 @@ export abstract class BaseOverlayDispatcher implements OnDestroy {
+   protected _document = inject(DOCUMENT);
+   protected _isAttached = false;
+ 
+-  constructor(...args: unknown[]);
+-
+-  constructor() {}
+-
+   ngOnDestroy(): void {
+     this.detach();
+   }
+diff --git a/src/cdk/overlay/fullscreen-overlay-container.ts b/src/cdk/overlay/fullscreen-overlay-container.ts
+index 301e1a1eca29..4985383fb319 100644
+--- a/src/cdk/overlay/fullscreen-overlay-container.ts
++++ b/src/cdk/overlay/fullscreen-overlay-container.ts
+@@ -22,12 +22,6 @@ export class FullscreenOverlayContainer extends OverlayContainer implements OnDe
+   private _fullScreenEventName: string | undefined;
+   private _cleanupFullScreenListener: (() => void) | undefined;
+ 
+-  constructor(...args: unknown[]);
+-
+-  constructor() {
+-    super();
+-  }
+-
+   override ngOnDestroy() {
+     super.ngOnDestroy();
+     this._cleanupFullScreenListener?.();
+diff --git a/src/cdk/overlay/overlay-container.ts b/src/cdk/overlay/overlay-container.ts
+index 5b2f8a69f86c..489646767833 100644
+--- a/src/cdk/overlay/overlay-container.ts
++++ b/src/cdk/overlay/overlay-container.ts
+@@ -36,9 +36,6 @@ export class OverlayContainer implements OnDestroy {
+   protected _document = inject(DOCUMENT);
+   protected _styleLoader = inject(_CdkPrivateStyleLoader);
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   ngOnDestroy() {
+     this._containerElement?.remove();
+   }
+diff --git a/src/cdk/overlay/overlay-directives.ts b/src/cdk/overlay/overlay-directives.ts
+index a38d28973132..dba42a15754b 100644
+--- a/src/cdk/overlay/overlay-directives.ts
++++ b/src/cdk/overlay/overlay-directives.ts
+@@ -92,9 +92,6 @@ export const CDK_CONNECTED_OVERLAY_SCROLL_STRATEGY = new InjectionToken<() => Sc
+ })
+ export class CdkOverlayOrigin {
+   elementRef = inject(ElementRef);
+-
+-  constructor(...args: unknown[]);
+-  constructor() {}
+ }
+ 
+ /**
+@@ -286,8 +283,6 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {
+   /** Emits when there are mouse outside click events that are targeted at the overlay. */
+   @Output() readonly overlayOutsideClick = new EventEmitter<MouseEvent>();
+ 
+-  constructor(...args: unknown[]);
+-
+   // TODO(jelbourn): inputs for size, scroll behavior, animation, etc.
+ 
+   constructor() {
+diff --git a/src/cdk/overlay/overlay.ts b/src/cdk/overlay/overlay.ts
+index ef13c0013395..e81919c8a78a 100644
+--- a/src/cdk/overlay/overlay.ts
++++ b/src/cdk/overlay/overlay.ts
+@@ -128,9 +128,6 @@ export class Overlay {
+   private _positionBuilder = inject(OverlayPositionBuilder);
+   private _injector = inject(Injector);
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   /**
+    * Creates an overlay.
+    * @param config Configuration applied to the overlay.
+diff --git a/src/cdk/overlay/position/overlay-position-builder.ts b/src/cdk/overlay/position/overlay-position-builder.ts
+index 671bbe2953da..3987c4eb9ac8 100644
+--- a/src/cdk/overlay/position/overlay-position-builder.ts
++++ b/src/cdk/overlay/position/overlay-position-builder.ts
+@@ -19,9 +19,6 @@ import {createGlobalPositionStrategy, GlobalPositionStrategy} from './global-pos
+ export class OverlayPositionBuilder {
+   private _injector = inject(Injector);
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   /**
+    * Creates a global position strategy.
+    */
+diff --git a/src/cdk/overlay/scroll/scroll-strategy-options.ts b/src/cdk/overlay/scroll/scroll-strategy-options.ts
+index d57971387339..f0125991a9c7 100644
+--- a/src/cdk/overlay/scroll/scroll-strategy-options.ts
++++ b/src/cdk/overlay/scroll/scroll-strategy-options.ts
+@@ -25,9 +25,6 @@ import {
+ export class ScrollStrategyOptions {
+   private _injector = inject(Injector);
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   /** Do nothing on scroll. */
+   noop = () => new NoopScrollStrategy();
+ 
+diff --git a/src/cdk/platform/platform.ts b/src/cdk/platform/platform.ts
+index 8fe902f9ffb6..e47359e4e9d6 100755
+--- a/src/cdk/platform/platform.ts
++++ b/src/cdk/platform/platform.ts
+@@ -85,9 +85,4 @@ export class Platform {
+   // Safari browser should also use Webkit as its layout engine.
+   /** Whether the current browser is Safari. */
+   SAFARI: boolean = this.isBrowser && /safari/i.test(navigator.userAgent) && this.WEBKIT;
+-
+-  /** Backwards-compatible constructor. */
+-  constructor(..._args: unknown[]);
+-
+-  constructor() {}
+ }
+diff --git a/src/cdk/portal/portal-directives.ts b/src/cdk/portal/portal-directives.ts
+index 7dcb0433417a..d234ed8f14d2 100644
+--- a/src/cdk/portal/portal-directives.ts
++++ b/src/cdk/portal/portal-directives.ts
+@@ -34,8 +34,6 @@ import {BasePortalOutlet, ComponentPortal, Portal, TemplatePortal, DomPortal} fr
+   exportAs: 'cdkPortal',
+ })
+ export class CdkPortal extends TemplatePortal {
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const templateRef = inject<TemplateRef<any>>(TemplateRef);
+     const viewContainerRef = inject(ViewContainerRef);
+@@ -71,12 +69,6 @@ export class CdkPortalOutlet extends BasePortalOutlet implements OnInit, OnDestr
+   /** Reference to the currently-attached component/view ref. */
+   private _attachedRef: CdkPortalOutletAttachedRef = null;
+ 
+-  constructor(...args: unknown[]);
+-
+-  constructor() {
+-    super();
+-  }
+-
+   /** Portal associated with the Portal outlet. */
+   @Input('cdkPortalOutlet')
+   get portal(): Portal<any> | null {
+diff --git a/src/cdk/scrolling/scroll-dispatcher.ts b/src/cdk/scrolling/scroll-dispatcher.ts
+index 912cb3f79e52..a7b20bdfaed1 100644
+--- a/src/cdk/scrolling/scroll-dispatcher.ts
++++ b/src/cdk/scrolling/scroll-dispatcher.ts
+@@ -27,9 +27,6 @@ export class ScrollDispatcher implements OnDestroy {
+   private _renderer = inject(RendererFactory2).createRenderer(null, null);
+   private _cleanupGlobalListener: (() => void) | undefined;
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   /** Subject for notifying that a registered scrollable reference element has been scrolled. */
+   private readonly _scrolled = new Subject<CdkScrollable | void>();
+ 
+diff --git a/src/cdk/scrolling/scrollable.ts b/src/cdk/scrolling/scrollable.ts
+index 1469e210e3db..f1e675d825f6 100644
+--- a/src/cdk/scrolling/scrollable.ts
++++ b/src/cdk/scrolling/scrollable.ts
+@@ -50,9 +50,6 @@ export class CdkScrollable implements OnInit, OnDestroy {
+   private _cleanupScroll: (() => void) | undefined;
+   private _elementScrolled = new Subject<Event>();
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   ngOnInit() {
+     this._cleanupScroll = this.ngZone.runOutsideAngular(() =>
+       this._renderer.listen(this._scrollElement, 'scroll', event =>
+diff --git a/src/cdk/scrolling/viewport-ruler.ts b/src/cdk/scrolling/viewport-ruler.ts
+index b4de195f7495..7f7503125ee7 100644
+--- a/src/cdk/scrolling/viewport-ruler.ts
++++ b/src/cdk/scrolling/viewport-ruler.ts
+@@ -38,8 +38,6 @@ export class ViewportRuler implements OnDestroy {
+   /** Used to reference correct document/window */
+   protected _document = inject(DOCUMENT);
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const ngZone = inject(NgZone);
+     const renderer = inject(RendererFactory2).createRenderer(null, null);
+diff --git a/src/cdk/scrolling/virtual-for-of.ts b/src/cdk/scrolling/virtual-for-of.ts
+index 2173510ea50b..8469c68e94b7 100644
+--- a/src/cdk/scrolling/virtual-for-of.ts
++++ b/src/cdk/scrolling/virtual-for-of.ts
+@@ -182,8 +182,6 @@ export class CdkVirtualForOf<T>
+ 
+   private readonly _destroyed = new Subject<void>();
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const ngZone = inject(NgZone);
+ 
+diff --git a/src/cdk/scrolling/virtual-scroll-viewport.ts b/src/cdk/scrolling/virtual-scroll-viewport.ts
+index 27f8ae2ea710..a0a93216dbd3 100644
+--- a/src/cdk/scrolling/virtual-scroll-viewport.ts
++++ b/src/cdk/scrolling/virtual-scroll-viewport.ts
+@@ -200,8 +200,6 @@ export class CdkVirtualScrollViewport extends CdkVirtualScrollable implements On
+ 
+   private _isDestroyed = false;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     super();
+     const viewportRuler = inject(ViewportRuler);
+diff --git a/src/cdk/scrolling/virtual-scrollable-element.ts b/src/cdk/scrolling/virtual-scrollable-element.ts
+index 72f08fbdc4d8..d1f75dfa8816 100644
+--- a/src/cdk/scrolling/virtual-scrollable-element.ts
++++ b/src/cdk/scrolling/virtual-scrollable-element.ts
+@@ -20,12 +20,6 @@ import {CdkVirtualScrollable, VIRTUAL_SCROLLABLE} from './virtual-scrollable';
+   },
+ })
+ export class CdkVirtualScrollableElement extends CdkVirtualScrollable {
+-  constructor(...args: unknown[]);
+-
+-  constructor() {
+-    super();
+-  }
+-
+   override measureBoundingClientRectWithScrollOffset(
+     from: 'left' | 'top' | 'right' | 'bottom',
+   ): number {
+diff --git a/src/cdk/scrolling/virtual-scrollable-window.ts b/src/cdk/scrolling/virtual-scrollable-window.ts
+index c7db8340cd6b..cd3da9a466d4 100644
+--- a/src/cdk/scrolling/virtual-scrollable-window.ts
++++ b/src/cdk/scrolling/virtual-scrollable-window.ts
+@@ -18,8 +18,6 @@ import {CdkVirtualScrollable, VIRTUAL_SCROLLABLE} from './virtual-scrollable';
+   providers: [{provide: VIRTUAL_SCROLLABLE, useExisting: CdkVirtualScrollableWindow}],
+ })
+ export class CdkVirtualScrollableWindow extends CdkVirtualScrollable {
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     super();
+     const document = inject(DOCUMENT);
+diff --git a/src/cdk/scrolling/virtual-scrollable.ts b/src/cdk/scrolling/virtual-scrollable.ts
+index 78c3ceead357..7dda88627d4f 100644
+--- a/src/cdk/scrolling/virtual-scrollable.ts
++++ b/src/cdk/scrolling/virtual-scrollable.ts
+@@ -16,11 +16,6 @@ export const VIRTUAL_SCROLLABLE = new InjectionToken<CdkVirtualScrollable>('VIRT
+  */
+ @Directive()
+ export abstract class CdkVirtualScrollable extends CdkScrollable {
+-  constructor(...args: unknown[]);
+-  constructor() {
+-    super();
+-  }
+-
+   /**
+    * Measure the viewport size for the provided orientation.
+    *
+diff --git a/src/cdk/stepper/step-header.ts b/src/cdk/stepper/step-header.ts
+index f0709e3f9878..f8bf5dfd1a6c 100644
+--- a/src/cdk/stepper/step-header.ts
++++ b/src/cdk/stepper/step-header.ts
+@@ -18,9 +18,6 @@ import {FocusableOption} from '../a11y';
+ export class CdkStepHeader implements FocusableOption {
+   _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   /** Focuses the step header. */
+   focus() {
+     this._elementRef.nativeElement.focus();
+diff --git a/src/cdk/stepper/step-label.ts b/src/cdk/stepper/step-label.ts
+index 786294780e78..0d3cbc41fa49 100644
+--- a/src/cdk/stepper/step-label.ts
++++ b/src/cdk/stepper/step-label.ts
+@@ -13,7 +13,4 @@ import {Directive, TemplateRef, inject} from '@angular/core';
+ })
+ export class CdkStepLabel {
+   template = inject<TemplateRef<any>>(TemplateRef);
+-
+-  constructor(...args: unknown[]);
+-  constructor() {}
+ }
+diff --git a/src/cdk/stepper/stepper-button.ts b/src/cdk/stepper/stepper-button.ts
+index ab6926caaf3d..864fa31a0789 100644
+--- a/src/cdk/stepper/stepper-button.ts
++++ b/src/cdk/stepper/stepper-button.ts
+@@ -23,9 +23,6 @@ export class CdkStepperNext {
+ 
+   /** Type of the next button. Defaults to "submit" if not specified. */
+   @Input() type: string = 'submit';
+-
+-  constructor(...args: unknown[]);
+-  constructor() {}
+ }
+ 
+ /** Button that moves to the previous step in a stepper workflow. */
+@@ -41,7 +38,4 @@ export class CdkStepperPrevious {
+ 
+   /** Type of the previous button. Defaults to "button" if not specified. */
+   @Input() type: string = 'button';
+-
+-  constructor(...args: unknown[]);
+-  constructor() {}
+ }
+diff --git a/src/cdk/stepper/stepper.ts b/src/cdk/stepper/stepper.ts
+index bf52d9521030..5ffa86c62ca5 100644
+--- a/src/cdk/stepper/stepper.ts
++++ b/src/cdk/stepper/stepper.ts
+@@ -258,8 +258,6 @@ export class CdkStep implements OnChanges {
+     return this.interacted && !!this.stepControl?.invalid;
+   }
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const stepperOptions = inject<StepperOptions>(STEPPER_GLOBAL_OPTIONS, {optional: true});
+     this._stepperOptions = stepperOptions ? stepperOptions : {};
+@@ -411,9 +409,6 @@ export class CdkStepper implements AfterContentInit, AfterViewInit, OnDestroy {
+   }
+   private _orientation: StepperOrientation = 'horizontal';
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   ngAfterContentInit() {
+     this._steps.changes
+       .pipe(startWith(this._steps), takeUntil(this._destroyed))
+diff --git a/src/cdk/table/cell.ts b/src/cdk/table/cell.ts
+index 92b9c069760a..5bea35e8cfa7 100644
+--- a/src/cdk/table/cell.ts
++++ b/src/cdk/table/cell.ts
+@@ -33,9 +33,6 @@ export interface CellDef {
+ export class CdkCellDef implements CellDef {
+   /** @docs-private */
+   template = inject<TemplateRef<any>>(TemplateRef);
+-
+-  constructor(...args: unknown[]);
+-  constructor() {}
+ }
+ 
+ /**
+@@ -48,9 +45,6 @@ export class CdkCellDef implements CellDef {
+ export class CdkHeaderCellDef implements CellDef {
+   /** @docs-private */
+   template = inject<TemplateRef<any>>(TemplateRef);
+-
+-  constructor(...args: unknown[]);
+-  constructor() {}
+ }
+ 
+ /**
+@@ -63,9 +57,6 @@ export class CdkHeaderCellDef implements CellDef {
+ export class CdkFooterCellDef implements CellDef {
+   /** @docs-private */
+   template = inject<TemplateRef<any>>(TemplateRef);
+-
+-  constructor(...args: unknown[]);
+-  constructor() {}
+ }
+ 
+ /**
+@@ -140,9 +131,6 @@ export class CdkColumnDef implements CanStick {
+    */
+   _columnCssClassName!: string[];
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   /** Whether the sticky state has changed. */
+   hasStickyChanged(): boolean {
+     const hasStickyChanged = this._hasStickyChanged;
+@@ -199,8 +187,6 @@ export class BaseCdkCell {
+   },
+ })
+ export class CdkHeaderCell extends BaseCdkCell {
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     super(inject(CdkColumnDef), inject(ElementRef));
+   }
+@@ -214,8 +200,6 @@ export class CdkHeaderCell extends BaseCdkCell {
+   },
+ })
+ export class CdkFooterCell extends BaseCdkCell {
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const columnDef = inject(CdkColumnDef);
+     const elementRef = inject(ElementRef);
+@@ -237,8 +221,6 @@ export class CdkFooterCell extends BaseCdkCell {
+   },
+ })
+ export class CdkCell extends BaseCdkCell {
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const columnDef = inject(CdkColumnDef);
+     const elementRef = inject(ElementRef);
+diff --git a/src/cdk/table/row.ts b/src/cdk/table/row.ts
+index c11cb58c8a7d..34e9853c2c3f 100644
+--- a/src/cdk/table/row.ts
++++ b/src/cdk/table/row.ts
+@@ -48,9 +48,6 @@ export abstract class BaseRowDef implements OnChanges {
+   /** Differ used to check if any changes were made to the columns. */
+   protected _columnsDiffer!: IterableDiffer<any>;
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   ngOnChanges(changes: SimpleChanges<this>): void {
+     // Create a new columns differ if one does not yet exist. Initialize it based on initial value
+     // of the columns property or an empty array if none is provided.
+@@ -108,12 +105,6 @@ export class CdkHeaderRowDef extends BaseRowDef implements CanStick, OnChanges {
+   }
+   private _sticky = false;
+ 
+-  constructor(...args: unknown[]);
+-
+-  constructor() {
+-    super(inject<TemplateRef<any>>(TemplateRef), inject(IterableDiffers));
+-  }
+-
+   // Prerender fails to recognize that ngOnChanges in a part of this class through inheritance.
+   // Explicitly define it so that the method is called as part of the Angular lifecycle.
+   override ngOnChanges(changes: SimpleChanges<this>): void {
+@@ -159,12 +150,6 @@ export class CdkFooterRowDef extends BaseRowDef implements CanStick, OnChanges {
+   }
+   private _sticky = false;
+ 
+-  constructor(...args: unknown[]);
+-
+-  constructor() {
+-    super(inject<TemplateRef<any>>(TemplateRef), inject(IterableDiffers));
+-  }
+-
+   // Prerender fails to recognize that ngOnChanges in a part of this class through inheritance.
+   // Explicitly define it so that the method is called as part of the Angular lifecycle.
+   override ngOnChanges(changes: SimpleChanges<this>): void {
+@@ -199,6 +184,9 @@ export class CdkFooterRowDef extends BaseRowDef implements CanStick, OnChanges {
+ export class CdkRowDef<T> extends BaseRowDef {
+   _table? = inject(CDK_TABLE, {optional: true});
+ 
++  // TODO(andrewseguin): Add an input for providing a switch function to determine
++  //   if this template should be used.
++
+   /**
+    * Function that should return true if this row template should be used for the provided index
+    * and row data. If left undefined, this row will be considered the default row template to use
+@@ -206,14 +194,6 @@ export class CdkRowDef<T> extends BaseRowDef {
+    * For every row, there must be at least one when function that passes or an undefined to default.
+    */
+   when!: (index: number, rowData: T) => boolean;
+-
+-  constructor(...args: unknown[]);
+-
+-  constructor() {
+-    // TODO(andrewseguin): Add an input for providing a switch function to determine
+-    //   if this template should be used.
+-    super(inject<TemplateRef<any>>(TemplateRef), inject(IterableDiffers));
+-  }
+ }
+ 
+ /** Context provided to the row cells when `multiTemplateDataRows` is false */
+@@ -296,8 +276,6 @@ export class CdkCellOutlet implements OnDestroy {
+    */
+   static mostRecentCellOutlet: CdkCellOutlet | null = null;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     CdkCellOutlet.mostRecentCellOutlet = this;
+   }
+@@ -369,7 +347,4 @@ export class CdkNoDataRow {
+   _contentClassNames = ['cdk-no-data-row', 'cdk-row'];
+   _cellClassNames = ['cdk-cell', 'cdk-no-data-cell'];
+   _cellSelector = 'td, cdk-cell, [cdk-cell], .cdk-cell';
+-
+-  constructor(...args: unknown[]);
+-  constructor() {}
+ }
+diff --git a/src/cdk/table/table.ts b/src/cdk/table/table.ts
+index dc294eff9bb0..00a97f70f153 100644
+--- a/src/cdk/table/table.ts
++++ b/src/cdk/table/table.ts
+@@ -124,8 +124,6 @@ export class DataRowOutlet implements RowOutlet {
+   viewContainer = inject(ViewContainerRef);
+   elementRef = inject(ElementRef);
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const table = inject<CdkTable<unknown>>(CDK_TABLE);
+     table._rowOutlet = this;
+@@ -144,8 +142,6 @@ export class HeaderRowOutlet implements RowOutlet {
+   viewContainer = inject(ViewContainerRef);
+   elementRef = inject(ElementRef);
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const table = inject<CdkTable<unknown>>(CDK_TABLE);
+     table._headerRowOutlet = this;
+@@ -164,8 +160,6 @@ export class FooterRowOutlet implements RowOutlet {
+   viewContainer = inject(ViewContainerRef);
+   elementRef = inject(ElementRef);
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const table = inject<CdkTable<unknown>>(CDK_TABLE);
+     table._footerRowOutlet = this;
+@@ -185,8 +179,6 @@ export class NoDataRowOutlet implements RowOutlet {
+   viewContainer = inject(ViewContainerRef);
+   elementRef = inject(ElementRef);
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const table = inject<CdkTable<unknown>>(CDK_TABLE);
+     table._noDataRowOutlet = this;
+@@ -642,8 +634,6 @@ export class CdkTable<T>
+   /** Row definition that will only be rendered if there's no data in the table. */
+   @ContentChild(CdkNoDataRow) _noDataRow!: CdkNoDataRow;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const role = inject(new HostAttributeToken('role'), {optional: true});
+ 
+diff --git a/src/cdk/table/text-column.ts b/src/cdk/table/text-column.ts
+index 9964a71708e0..cafa071b8752 100644
+--- a/src/cdk/table/text-column.ts
++++ b/src/cdk/table/text-column.ts
+@@ -111,8 +111,6 @@ export class CdkTextColumn<T> implements OnDestroy, OnInit {
+    */
+   @ViewChild(CdkHeaderCellDef, {static: true}) headerCell!: CdkHeaderCellDef;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     this._options = this._options || {};
+   }
+diff --git a/src/cdk/text-field/autofill.ts b/src/cdk/text-field/autofill.ts
+index 5c2506e67fae..0d8c6b4141a2 100644
+--- a/src/cdk/text-field/autofill.ts
++++ b/src/cdk/text-field/autofill.ts
+@@ -55,9 +55,6 @@ export class AutofillMonitor implements OnDestroy {
+   private _styleLoader = inject(_CdkPrivateStyleLoader);
+   private _monitoredElements = new Map<Element, MonitoredElementInfo>();
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   /**
+    * Monitor for changes in the autofill state of the given input element.
+    * @param element The element to monitor.
+@@ -159,9 +156,6 @@ export class CdkAutofill implements OnDestroy, OnInit {
+   /** Emits when the autofill state of the element changes. */
+   @Output() readonly cdkAutofill = new EventEmitter<AutofillEvent>();
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   ngOnInit() {
+     this._autofillMonitor
+       .monitor(this._elementRef)
+diff --git a/src/cdk/text-field/autosize.ts b/src/cdk/text-field/autosize.ts
+index 4dab985073e1..4573a39b65c4 100644
+--- a/src/cdk/text-field/autosize.ts
++++ b/src/cdk/text-field/autosize.ts
+@@ -126,8 +126,6 @@ export class CdkTextareaAutosize implements AfterViewInit, DoCheck, OnDestroy {
+ 
+   private _isViewInited = false;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const styleLoader = inject(_CdkPrivateStyleLoader);
+     styleLoader.load(_CdkTextFieldStyleLoader);
+diff --git a/src/cdk/tree/nested-node.ts b/src/cdk/tree/nested-node.ts
+index 978433b50338..3cc5b57e7713 100644
+--- a/src/cdk/tree/nested-node.ts
++++ b/src/cdk/tree/nested-node.ts
+@@ -58,12 +58,6 @@ export class CdkNestedTreeNode<T, K = T>
+   })
+   nodeOutlet!: QueryList<CdkTreeNodeOutlet>;
+ 
+-  constructor(...args: unknown[]);
+-
+-  constructor() {
+-    super();
+-  }
+-
+   ngAfterContentInit() {
+     this._dataDiffer = this._differs.find([]).create(this._tree.trackBy);
+     this._tree
+diff --git a/src/cdk/tree/node.ts b/src/cdk/tree/node.ts
+index 738ba8627479..df2141fd6c21 100644
+--- a/src/cdk/tree/node.ts
++++ b/src/cdk/tree/node.ts
+@@ -47,7 +47,4 @@ export class CdkTreeNodeDef<T> {
+    * default.
+    */
+   when!: (index: number, nodeData: T) => boolean;
+-
+-  constructor(...args: unknown[]);
+-  constructor() {}
+ }
+diff --git a/src/cdk/tree/outlet.ts b/src/cdk/tree/outlet.ts
+index 02144dca8461..0bfdbdec6a06 100644
+--- a/src/cdk/tree/outlet.ts
++++ b/src/cdk/tree/outlet.ts
+@@ -24,7 +24,4 @@ export const CDK_TREE_NODE_OUTLET_NODE = new InjectionToken<{}>('CDK_TREE_NODE_O
+ export class CdkTreeNodeOutlet {
+   viewContainer = inject(ViewContainerRef);
+   _node? = inject(CDK_TREE_NODE_OUTLET_NODE, {optional: true});
+-
+-  constructor(...args: unknown[]);
+-  constructor() {}
+ }
+diff --git a/src/cdk/tree/padding.ts b/src/cdk/tree/padding.ts
+index ded80bb31ad1..50972e8a736b 100644
+--- a/src/cdk/tree/padding.ts
++++ b/src/cdk/tree/padding.ts
+@@ -60,8 +60,6 @@ export class CdkTreeNodePadding<T, K = T> implements OnDestroy {
+   }
+   _indent: number = 40;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     this._setPadding();
+     this._dir?.change.pipe(takeUntil(this._destroyed)).subscribe(() => this._setPadding(true));
+diff --git a/src/cdk/tree/toggle.ts b/src/cdk/tree/toggle.ts
+index ddc7ca2abffe..3d18948f59a3 100644
+--- a/src/cdk/tree/toggle.ts
++++ b/src/cdk/tree/toggle.ts
+@@ -30,9 +30,6 @@ export class CdkTreeNodeToggle<T, K = T> {
+   @Input({alias: 'cdkTreeNodeToggleRecursive', transform: booleanAttribute})
+   recursive: boolean = false;
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   // Toggle the expanded or collapsed state of this node.
+   //
+   // Focus this node with expanding or collapsing it. This ensures that the active node will always
+diff --git a/src/cdk/tree/tree.ts b/src/cdk/tree/tree.ts
+index 30d393939c14..fc133e58cc8b 100644
+--- a/src/cdk/tree/tree.ts
++++ b/src/cdk/tree/tree.ts
+@@ -267,9 +267,6 @@ export class CdkTree<T, K = T>
+   _keyManager!: TreeKeyManagerStrategy<CdkTreeNode<T, K>>;
+   private _viewInit = false;
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   ngAfterContentInit() {
+     this._initializeKeyManager();
+   }
+@@ -1388,8 +1385,6 @@ export class CdkTreeNode<T, K = T> implements OnDestroy, OnInit, TreeKeyManagerI
+ 
+   private _changeDetectorRef = inject(ChangeDetectorRef);
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     CdkTreeNode.mostRecentTreeNode = this as CdkTreeNode<T, K>;
+   }
+diff --git a/src/components-examples/aria/grid/grid-table/grid-table-example.ts b/src/components-examples/aria/grid/grid-table/grid-table-example.ts
+index 35337e74688f..30f10fa539f6 100644
+--- a/src/components-examples/aria/grid/grid-table/grid-table-example.ts
++++ b/src/components-examples/aria/grid/grid-table/grid-table-example.ts
+@@ -59,8 +59,6 @@ export class GridTableExample {
+ 
+   readonly tasks: WritableSignal<TaskRow[]> = signal(this._createRows());
+ 
+-  constructor() {}
+-
+   startEdit(
+     event: KeyboardEvent | FocusEvent | undefined,
+     task: TaskRow,
+diff --git a/src/google-maps/deprecated-map-marker-clusterer/deprecated-map-marker-clusterer.ts b/src/google-maps/deprecated-map-marker-clusterer/deprecated-map-marker-clusterer.ts
+index 033980f0ccf9..98ca47e5c540 100644
+--- a/src/google-maps/deprecated-map-marker-clusterer/deprecated-map-marker-clusterer.ts
++++ b/src/google-maps/deprecated-map-marker-clusterer/deprecated-map-marker-clusterer.ts
+@@ -216,9 +216,6 @@ export class DeprecatedMapMarkerClusterer
+   @Output() readonly markerClustererInitialized: EventEmitter<MarkerClustererInstance> =
+     new EventEmitter<MarkerClustererInstance>();
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   ngOnInit() {
+     if (this._canInitialize) {
+       this._ngZone.runOutsideAngular(() => {
+diff --git a/src/google-maps/google-map/google-map.ts b/src/google-maps/google-map/google-map.ts
+index c00a2502b2ec..4e0e611eb1b0 100644
+--- a/src/google-maps/google-map/google-map.ts
++++ b/src/google-maps/google-map/google-map.ts
+@@ -247,8 +247,6 @@ export class GoogleMap implements OnChanges, OnInit, OnDestroy {
+   @Output() readonly zoomChanged: Observable<void> =
+     this._eventManager.getLazyEmitter<void>('zoom_changed');
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const platformId = inject<Object>(PLATFORM_ID);
+     this._isBrowser = isPlatformBrowser(platformId);
+diff --git a/src/google-maps/map-advanced-marker/map-advanced-marker.ts b/src/google-maps/map-advanced-marker/map-advanced-marker.ts
+index a43171e5459d..6fdfec61aa80 100644
+--- a/src/google-maps/map-advanced-marker/map-advanced-marker.ts
++++ b/src/google-maps/map-advanced-marker/map-advanced-marker.ts
+@@ -194,9 +194,6 @@ export class MapAdvancedMarker
+    */
+   advancedMarker!: google.maps.marker.AdvancedMarkerElement;
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   ngOnInit() {
+     if (!this._googleMap._isBrowser) {
+       return;
+diff --git a/src/google-maps/map-base-layer.ts b/src/google-maps/map-base-layer.ts
+index 4756efec1bc7..26863dfdc415 100644
+--- a/src/google-maps/map-base-layer.ts
++++ b/src/google-maps/map-base-layer.ts
+@@ -18,9 +18,6 @@ export class MapBaseLayer implements OnInit, OnDestroy {
+   protected readonly _map = inject(GoogleMap);
+   protected readonly _ngZone = inject(NgZone);
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   ngOnInit() {
+     if (this._map._isBrowser) {
+       this._ngZone.runOutsideAngular(() => {
+diff --git a/src/google-maps/map-circle/map-circle.ts b/src/google-maps/map-circle/map-circle.ts
+index e5c029ace825..39d469f78bc8 100644
+--- a/src/google-maps/map-circle/map-circle.ts
++++ b/src/google-maps/map-circle/map-circle.ts
+@@ -158,9 +158,6 @@ export class MapCircle implements OnInit, OnDestroy {
+   @Output() readonly circleInitialized: EventEmitter<google.maps.Circle> =
+     new EventEmitter<google.maps.Circle>();
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   ngOnInit() {
+     if (!this._map._isBrowser) {
+       return;
+diff --git a/src/google-maps/map-directions-renderer/map-directions-renderer.ts b/src/google-maps/map-directions-renderer/map-directions-renderer.ts
+index 9bd7a1312138..a67af711c637 100644
+--- a/src/google-maps/map-directions-renderer/map-directions-renderer.ts
++++ b/src/google-maps/map-directions-renderer/map-directions-renderer.ts
+@@ -72,9 +72,6 @@ export class MapDirectionsRenderer implements OnInit, OnChanges, OnDestroy {
+   /** The underlying google.maps.DirectionsRenderer object. */
+   directionsRenderer?: google.maps.DirectionsRenderer;
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   ngOnInit() {
+     if (this._googleMap._isBrowser) {
+       if (google.maps.DirectionsRenderer && this._googleMap.googleMap) {
+diff --git a/src/google-maps/map-directions-renderer/map-directions-service.ts b/src/google-maps/map-directions-renderer/map-directions-service.ts
+index b9aec16cb1b0..023b49e05893 100644
+--- a/src/google-maps/map-directions-renderer/map-directions-service.ts
++++ b/src/google-maps/map-directions-renderer/map-directions-service.ts
+@@ -25,9 +25,6 @@ export class MapDirectionsService {
+   private readonly _ngZone = inject(NgZone);
+   private _directionsService: google.maps.DirectionsService | undefined;
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   /**
+    * See
+    * developers.google.com/maps/documentation/javascript/reference/directions
+diff --git a/src/google-maps/map-geocoder/map-geocoder.ts b/src/google-maps/map-geocoder/map-geocoder.ts
+index 412977d0287d..e26908d01f00 100644
+--- a/src/google-maps/map-geocoder/map-geocoder.ts
++++ b/src/google-maps/map-geocoder/map-geocoder.ts
+@@ -23,9 +23,6 @@ export class MapGeocoder {
+   private readonly _ngZone = inject(NgZone);
+   private _geocoder: google.maps.Geocoder | undefined;
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   /**
+    * See developers.google.com/maps/documentation/javascript/reference/geocoder#Geocoder.geocode
+    */
+diff --git a/src/google-maps/map-ground-overlay/map-ground-overlay.ts b/src/google-maps/map-ground-overlay/map-ground-overlay.ts
+index 450cc9006e1a..e7eba1d06f3e 100644
+--- a/src/google-maps/map-ground-overlay/map-ground-overlay.ts
++++ b/src/google-maps/map-ground-overlay/map-ground-overlay.ts
+@@ -93,9 +93,6 @@ export class MapGroundOverlay implements OnInit, OnDestroy {
+   @Output() readonly groundOverlayInitialized: EventEmitter<google.maps.GroundOverlay> =
+     new EventEmitter<google.maps.GroundOverlay>();
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   ngOnInit() {
+     if (this._map._isBrowser) {
+       // The ground overlay setup is slightly different from the other Google Maps objects in that
+diff --git a/src/google-maps/map-heatmap-layer/map-heatmap-layer.ts b/src/google-maps/map-heatmap-layer/map-heatmap-layer.ts
+index 9fa8fad544bd..201b1acbd8f1 100644
+--- a/src/google-maps/map-heatmap-layer/map-heatmap-layer.ts
++++ b/src/google-maps/map-heatmap-layer/map-heatmap-layer.ts
+@@ -72,9 +72,6 @@ export class MapHeatmapLayer implements OnInit, OnChanges, OnDestroy {
+   @Output() readonly heatmapInitialized: EventEmitter<google.maps.visualization.HeatmapLayer> =
+     new EventEmitter<google.maps.visualization.HeatmapLayer>();
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   ngOnInit() {
+     if (this._googleMap._isBrowser) {
+       if (
+diff --git a/src/google-maps/map-info-window/map-info-window.ts b/src/google-maps/map-info-window/map-info-window.ts
+index f1232e52dc8e..407c9f3d3fe0 100644
+--- a/src/google-maps/map-info-window/map-info-window.ts
++++ b/src/google-maps/map-info-window/map-info-window.ts
+@@ -104,9 +104,6 @@ export class MapInfoWindow implements OnInit, OnDestroy {
+   @Output() readonly infoWindowInitialized: EventEmitter<google.maps.InfoWindow> =
+     new EventEmitter<google.maps.InfoWindow>();
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   ngOnInit() {
+     if (this._googleMap._isBrowser) {
+       this._combineOptions()
+diff --git a/src/google-maps/map-kml-layer/map-kml-layer.ts b/src/google-maps/map-kml-layer/map-kml-layer.ts
+index b2459cd4c0e8..23b1aae84960 100644
+--- a/src/google-maps/map-kml-layer/map-kml-layer.ts
++++ b/src/google-maps/map-kml-layer/map-kml-layer.ts
+@@ -81,9 +81,6 @@ export class MapKmlLayer implements OnInit, OnDestroy {
+   @Output() readonly kmlLayerInitialized: EventEmitter<google.maps.KmlLayer> =
+     new EventEmitter<google.maps.KmlLayer>();
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   ngOnInit() {
+     if (this._map._isBrowser) {
+       this._combineOptions()
+diff --git a/src/google-maps/map-marker/map-marker.ts b/src/google-maps/map-marker/map-marker.ts
+index 41321367ac2a..9aa999b0d3ff 100644
+--- a/src/google-maps/map-marker/map-marker.ts
++++ b/src/google-maps/map-marker/map-marker.ts
+@@ -282,9 +282,6 @@ export class MapMarker implements OnInit, OnChanges, OnDestroy, MapAnchorPoint,
+    */
+   marker?: google.maps.Marker;
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   ngOnInit() {
+     if (!this._googleMap._isBrowser) {
+       return;
+diff --git a/src/google-maps/map-polygon/map-polygon.ts b/src/google-maps/map-polygon/map-polygon.ts
+index 007e9fac1627..9297a3b5383c 100644
+--- a/src/google-maps/map-polygon/map-polygon.ts
++++ b/src/google-maps/map-polygon/map-polygon.ts
+@@ -139,9 +139,6 @@ export class MapPolygon implements OnInit, OnDestroy {
+   @Output() readonly polygonInitialized: EventEmitter<google.maps.Polygon> =
+     new EventEmitter<google.maps.Polygon>();
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   ngOnInit() {
+     if (this._map._isBrowser) {
+       this._combineOptions()
+diff --git a/src/google-maps/map-polyline/map-polyline.ts b/src/google-maps/map-polyline/map-polyline.ts
+index fc5c048dcfd3..877913b0c60c 100644
+--- a/src/google-maps/map-polyline/map-polyline.ts
++++ b/src/google-maps/map-polyline/map-polyline.ts
+@@ -137,9 +137,6 @@ export class MapPolyline implements OnInit, OnDestroy {
+   @Output() readonly polylineInitialized: EventEmitter<google.maps.Polyline> =
+     new EventEmitter<google.maps.Polyline>();
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   ngOnInit() {
+     if (this._map._isBrowser) {
+       this._combineOptions()
+diff --git a/src/google-maps/map-rectangle/map-rectangle.ts b/src/google-maps/map-rectangle/map-rectangle.ts
+index b8877bb21dc6..e3444343c187 100644
+--- a/src/google-maps/map-rectangle/map-rectangle.ts
++++ b/src/google-maps/map-rectangle/map-rectangle.ts
+@@ -146,9 +146,6 @@ export class MapRectangle implements OnInit, OnDestroy {
+   @Output() readonly rectangleInitialized: EventEmitter<google.maps.Rectangle> =
+     new EventEmitter<google.maps.Rectangle>();
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   ngOnInit() {
+     if (this._map._isBrowser) {
+       this._combineOptions()
+diff --git a/src/google-maps/map-traffic-layer/map-traffic-layer.ts b/src/google-maps/map-traffic-layer/map-traffic-layer.ts
+index 6427c763d260..8f29a32ed9fa 100644
+--- a/src/google-maps/map-traffic-layer/map-traffic-layer.ts
++++ b/src/google-maps/map-traffic-layer/map-traffic-layer.ts
+@@ -55,9 +55,6 @@ export class MapTrafficLayer implements OnInit, OnDestroy {
+   @Output() readonly trafficLayerInitialized: EventEmitter<google.maps.TrafficLayer> =
+     new EventEmitter<google.maps.TrafficLayer>();
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   ngOnInit() {
+     if (this._map._isBrowser) {
+       this._combineOptions()
+diff --git a/src/material-date-fns-adapter/adapter/date-fns-adapter.ts b/src/material-date-fns-adapter/adapter/date-fns-adapter.ts
+index 3201880f33dc..e841f3758434 100644
+--- a/src/material-date-fns-adapter/adapter/date-fns-adapter.ts
++++ b/src/material-date-fns-adapter/adapter/date-fns-adapter.ts
+@@ -57,8 +57,6 @@ const DAY_OF_WEEK_FORMATS = {
+ /** Adds date-fns support to Angular Material. */
+ @Injectable()
+ export class DateFnsAdapter extends DateAdapter<Date, Locale> {
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     super();
+     const matDateLocale = inject(MAT_DATE_LOCALE, {optional: true});
+diff --git a/src/material-luxon-adapter/adapter/luxon-date-adapter.ts b/src/material-luxon-adapter/adapter/luxon-date-adapter.ts
+index b0a7b26cd805..07983c58c401 100644
+--- a/src/material-luxon-adapter/adapter/luxon-date-adapter.ts
++++ b/src/material-luxon-adapter/adapter/luxon-date-adapter.ts
+@@ -64,8 +64,6 @@ export class LuxonDateAdapter extends DateAdapter<LuxonDateTime> {
+   private _firstDayOfWeek: number | undefined;
+   private _defaultOutputCalendar: LuxonCalendarSystem;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     super();
+ 
+diff --git a/src/material-moment-adapter/adapter/moment-date-adapter.ts b/src/material-moment-adapter/adapter/moment-date-adapter.ts
+index 1820657d2136..e14b42c3c83e 100644
+--- a/src/material-moment-adapter/adapter/moment-date-adapter.ts
++++ b/src/material-moment-adapter/adapter/moment-date-adapter.ts
+@@ -75,8 +75,6 @@ export class MomentDateAdapter extends DateAdapter<Moment> {
+     narrowDaysOfWeek: string[];
+   };
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     super();
+     const dateLocale = inject<string>(MAT_DATE_LOCALE, {optional: true});
+diff --git a/src/material/autocomplete/autocomplete-origin.ts b/src/material/autocomplete/autocomplete-origin.ts
+index 832570dd72cf..daeeeb80e641 100644
+--- a/src/material/autocomplete/autocomplete-origin.ts
++++ b/src/material/autocomplete/autocomplete-origin.ts
+@@ -18,7 +18,4 @@ import {Directive, ElementRef, inject} from '@angular/core';
+ })
+ export class MatAutocompleteOrigin {
+   elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
+-
+-  constructor(...args: unknown[]);
+-  constructor() {}
+ }
+diff --git a/src/material/autocomplete/autocomplete-trigger.ts b/src/material/autocomplete/autocomplete-trigger.ts
+index cd38ee392f15..4e0facbb508c 100644
+--- a/src/material/autocomplete/autocomplete-trigger.ts
++++ b/src/material/autocomplete/autocomplete-trigger.ts
+@@ -243,9 +243,6 @@ export class MatAutocompleteTrigger
+   @Input({alias: 'matAutocompleteDisabled', transform: booleanAttribute})
+   autocompleteDisabled: boolean = false;
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   /** Class to apply to the panel when it's above the input. */
+   private _aboveClass = 'mat-mdc-autocomplete-panel-above';
+ 
+diff --git a/src/material/autocomplete/autocomplete.ts b/src/material/autocomplete/autocomplete.ts
+index 44dec71748ae..403592e9036f 100644
+--- a/src/material/autocomplete/autocomplete.ts
++++ b/src/material/autocomplete/autocomplete.ts
+@@ -246,8 +246,6 @@ export class MatAutocomplete implements AfterContentInit, OnDestroy {
+    */
+   readonly inertGroups: boolean;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const platform = inject(Platform);
+ 
+diff --git a/src/material/badge/badge.ts b/src/material/badge/badge.ts
+index 482d107625a3..baacdfb68a0d 100644
+--- a/src/material/badge/badge.ts
++++ b/src/material/badge/badge.ts
+@@ -149,8 +149,6 @@ export class MatBadge implements OnInit, AfterViewInit, OnDestroy {
+ 
+   private _document = inject(DOCUMENT);
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const styleLoader = inject(_CdkPrivateStyleLoader);
+     styleLoader.load(_MatBadgeStyleLoader);
+diff --git a/src/material/bottom-sheet/bottom-sheet-container.ts b/src/material/bottom-sheet/bottom-sheet-container.ts
+index 1b27314407c8..49bbc54d830f 100644
+--- a/src/material/bottom-sheet/bottom-sheet-container.ts
++++ b/src/material/bottom-sheet/bottom-sheet-container.ts
+@@ -68,8 +68,6 @@ export class MatBottomSheetContainer extends CdkDialogContainer implements OnDes
+   /** Whether the component has been destroyed. */
+   private _destroyed = false;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     super();
+ 
+diff --git a/src/material/bottom-sheet/bottom-sheet.ts b/src/material/bottom-sheet/bottom-sheet.ts
+index 2edd0b25574b..a9446f51d83c 100644
+--- a/src/material/bottom-sheet/bottom-sheet.ts
++++ b/src/material/bottom-sheet/bottom-sheet.ts
+@@ -49,9 +49,6 @@ export class MatBottomSheet implements OnDestroy {
+     }
+   }
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   /**
+    * Opens a bottom sheet containing the given component.
+    * @param component Type of the component to load into the bottom sheet.
+diff --git a/src/material/button-toggle/button-toggle.ts b/src/material/button-toggle/button-toggle.ts
+index 0b1da176f916..0f97249c052d 100644
+--- a/src/material/button-toggle/button-toggle.ts
++++ b/src/material/button-toggle/button-toggle.ts
+@@ -279,8 +279,6 @@ export class MatButtonToggleGroup implements ControlValueAccessor, OnInit, After
+   }
+   private _hideMultipleSelectionIndicator: boolean;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const defaultOptions = inject<MatButtonToggleDefaultOptions>(
+       MAT_BUTTON_TOGGLE_DEFAULT_OPTIONS,
+@@ -677,8 +675,6 @@ export class MatButtonToggle implements OnInit, AfterViewInit, OnDestroy {
+   @Output() readonly change: EventEmitter<MatButtonToggleChange> =
+     new EventEmitter<MatButtonToggleChange>();
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     inject(_CdkPrivateStyleLoader).load(_StructuralStylesLoader);
+     const toggleGroup = inject<MatButtonToggleGroup>(MAT_BUTTON_TOGGLE_GROUP, {optional: true})!;
+diff --git a/src/material/button/button-base.ts b/src/material/button/button-base.ts
+index 2c48ba787740..5eca45356df9 100644
+--- a/src/material/button/button-base.ts
++++ b/src/material/button/button-base.ts
+@@ -155,8 +155,6 @@ export class MatButtonBase implements AfterViewInit, OnDestroy {
+   /** Whether the button is showing a progress indicator. */
+   readonly showProgress = input(false, {transform: booleanAttribute});
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     inject(_CdkPrivateStyleLoader).load(_StructuralStylesLoader);
+     const element = this._elementRef.nativeElement;
+diff --git a/src/material/button/button.ts b/src/material/button/button.ts
+index f6146519acc3..1f4e6a7bfda6 100644
+--- a/src/material/button/button.ts
++++ b/src/material/button/button.ts
+@@ -53,8 +53,6 @@ export class MatButton extends MatButtonBase {
+   }
+   private _appearance: MatButtonAppearance | null = null;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     super();
+     const inferredAppearance = _inferAppearance(this._elementRef.nativeElement);
+diff --git a/src/material/button/fab.ts b/src/material/button/fab.ts
+index bf63ceac6652..5011b55d5227 100644
+--- a/src/material/button/fab.ts
++++ b/src/material/button/fab.ts
+@@ -73,8 +73,6 @@ export class MatFabButton extends MatButtonBase {
+ 
+   @Input({transform: booleanAttribute}) extended: boolean = false;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     super();
+     this._options = this._options || defaults;
+@@ -103,8 +101,6 @@ export class MatMiniFabButton extends MatButtonBase {
+ 
+   override _isFab = true;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     super();
+     this._options = this._options || defaults;
+diff --git a/src/material/button/icon-button.ts b/src/material/button/icon-button.ts
+index 8a3fd22671fb..4af84257846f 100644
+--- a/src/material/button/icon-button.ts
++++ b/src/material/button/icon-button.ts
+@@ -26,8 +26,6 @@ import {MatButtonBase} from './button-base';
+   changeDetection: ChangeDetectionStrategy.OnPush,
+ })
+ export class MatIconButton extends MatButtonBase {
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     super();
+     this._rippleLoader.configureRipple(this._elementRef.nativeElement, {centered: true});
+diff --git a/src/material/card/card.ts b/src/material/card/card.ts
+index a0197b3c48ca..6b39287ebec9 100644
+--- a/src/material/card/card.ts
++++ b/src/material/card/card.ts
+@@ -51,8 +51,6 @@ export const MAT_CARD_CONFIG = new InjectionToken<MatCardConfig>('MAT_CARD_CONFI
+ export class MatCard {
+   @Input() appearance: MatCardAppearance;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const config = inject<MatCardConfig>(MAT_CARD_CONFIG, {optional: true});
+     this.appearance = config?.appearance || 'raised';
+diff --git a/src/material/checkbox/checkbox.ts b/src/material/checkbox/checkbox.ts
+index 0411d49642e6..67f5a30f700a 100644
+--- a/src/material/checkbox/checkbox.ts
++++ b/src/material/checkbox/checkbox.ts
+@@ -240,8 +240,6 @@ export class MatCheckbox
+   private _controlValueAccessorChangeFn: (value: any) => void = () => {};
+   private _validatorChangeFn = () => {};
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     inject(_CdkPrivateStyleLoader).load(_StructuralStylesLoader);
+     const tabIndex = inject(new HostAttributeToken('tabindex'), {optional: true});
+diff --git a/src/material/chips/chip-action.ts b/src/material/chips/chip-action.ts
+index 4e48e700d368..ae633cbbd2a0 100644
+--- a/src/material/chips/chip-action.ts
++++ b/src/material/chips/chip-action.ts
+@@ -82,8 +82,6 @@ export class MatChipContent {
+     return this.disabled && !this._allowFocusWhenDisabled ? '' : null;
+   }
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     inject(_CdkPrivateStyleLoader).load(_StructuralStylesLoader);
+     if (this._elementRef.nativeElement.nodeName === 'BUTTON') {
+diff --git a/src/material/chips/chip-edit-input.ts b/src/material/chips/chip-edit-input.ts
+index 759243e8416f..7f8ba611eea3 100644
+--- a/src/material/chips/chip-edit-input.ts
++++ b/src/material/chips/chip-edit-input.ts
+@@ -25,9 +25,6 @@ export class MatChipEditInput {
+   private readonly _elementRef = inject(ElementRef);
+   private readonly _document = inject(DOCUMENT);
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   initialize(initialValue: string) {
+     this.getNativeElement().focus();
+     this.setValue(initialValue);
+diff --git a/src/material/chips/chip-grid.ts b/src/material/chips/chip-grid.ts
+index d168684c1638..a178fd2eb8fe 100644
+--- a/src/material/chips/chip-grid.ts
++++ b/src/material/chips/chip-grid.ts
+@@ -254,8 +254,6 @@ export class MatChipGrid
+     this._errorStateTracker.errorState = value;
+   }
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     super();
+ 
+diff --git a/src/material/chips/chip-input.ts b/src/material/chips/chip-input.ts
+index eb872f9c32c5..314da69b8208 100644
+--- a/src/material/chips/chip-input.ts
++++ b/src/material/chips/chip-input.ts
+@@ -135,8 +135,6 @@ export class MatChipInput implements MatChipTextControl, OnChanges, OnDestroy {
+   /** The native input element to which this directive is attached. */
+   readonly inputElement!: HTMLInputElement;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const defaultOptions = inject<MatChipsDefaultOptions>(MAT_CHIPS_DEFAULT_OPTIONS);
+     const formField = inject<MatFormField>(MAT_FORM_FIELD, {optional: true});
+diff --git a/src/material/chips/chip-row.ts b/src/material/chips/chip-row.ts
+index 0b545be2a364..57e67a44ef73 100644
+--- a/src/material/chips/chip-row.ts
++++ b/src/material/chips/chip-row.ts
+@@ -110,8 +110,6 @@ export class MatChipRow extends MatChip implements AfterViewInit, OnDestroy {
+ 
+   _isEditing = false;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     super();
+ 
+diff --git a/src/material/chips/chip-set.ts b/src/material/chips/chip-set.ts
+index 87efb5f2f8d5..ca4ebc246af4 100644
+--- a/src/material/chips/chip-set.ts
++++ b/src/material/chips/chip-set.ts
+@@ -134,9 +134,6 @@ export class MatChipSet implements AfterViewInit, OnDestroy {
+   /** Flat list of all the actions contained within the chips. */
+   _chipActions = new QueryList<MatChipAction>();
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   ngAfterViewInit() {
+     this._setUpFocusManagement();
+     this._trackChipSetChanges();
+diff --git a/src/material/chips/chip.ts b/src/material/chips/chip.ts
+index dfe0ad1c4264..9442686b0174 100644
+--- a/src/material/chips/chip.ts
++++ b/src/material/chips/chip.ts
+@@ -255,8 +255,6 @@ export class MatChip implements OnInit, AfterViewInit, AfterContentInit, DoCheck
+ 
+   protected _injector = inject(Injector);
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const styleLoader = inject(_CdkPrivateStyleLoader);
+     styleLoader.load(_StructuralStylesLoader);
+diff --git a/src/material/core/datetime/native-date-adapter.ts b/src/material/core/datetime/native-date-adapter.ts
+index 2e956c10507d..d6a220748831 100644
+--- a/src/material/core/datetime/native-date-adapter.ts
++++ b/src/material/core/datetime/native-date-adapter.ts
+@@ -45,8 +45,6 @@ export class NativeDateAdapter extends DateAdapter<Date> {
+   /** The injected locale. */
+   private readonly _matDateLocale = inject(MAT_DATE_LOCALE, {optional: true});
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     super();
+ 
+diff --git a/src/material/core/option/optgroup.ts b/src/material/core/option/optgroup.ts
+index 0609c04ea7d6..b10abc878382 100644
+--- a/src/material/core/option/optgroup.ts
++++ b/src/material/core/option/optgroup.ts
+@@ -76,8 +76,6 @@ export class MatOptgroup {
+   /** Whether the group is in inert a11y mode. */
+   _inert: boolean;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const parent = inject<MatOptionParentComponent>(MAT_OPTION_PARENT_COMPONENT, {optional: true});
+     this._inert = parent?.inertGroups ?? false;
+diff --git a/src/material/core/option/option.ts b/src/material/core/option/option.ts
+index e5c590345edc..e22498045e45 100644
+--- a/src/material/core/option/option.ts
++++ b/src/material/core/option/option.ts
+@@ -138,7 +138,6 @@ export class MatOption<T = any> implements FocusableOption, AfterViewChecked, On
+   /** Emits when the state of the option changes and any parents have to be notified. */
+   readonly _stateChanges = new Subject<void>();
+ 
+-  constructor(...args: unknown[]);
+   constructor() {
+     const styleLoader = inject(_CdkPrivateStyleLoader);
+     styleLoader.load(_StructuralStylesLoader);
+diff --git a/src/material/core/ripple/ripple.ts b/src/material/core/ripple/ripple.ts
+index de84c5506365..36bfc40213d7 100644
+--- a/src/material/core/ripple/ripple.ts
++++ b/src/material/core/ripple/ripple.ts
+@@ -133,8 +133,6 @@ export class MatRipple implements OnInit, OnDestroy, RippleTarget {
+   /** @docs-private Whether ripple directive is initialized and the input bindings are set. */
+   _isInitialized: boolean = false;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const ngZone = inject(NgZone);
+     const platform = inject(Platform);
+diff --git a/src/material/core/selection/pseudo-checkbox/pseudo-checkbox.ts b/src/material/core/selection/pseudo-checkbox/pseudo-checkbox.ts
+index 79962f379ef6..59b76d6176fe 100644
+--- a/src/material/core/selection/pseudo-checkbox/pseudo-checkbox.ts
++++ b/src/material/core/selection/pseudo-checkbox/pseudo-checkbox.ts
+@@ -58,7 +58,4 @@ export class MatPseudoCheckbox {
+    * indicator inside a square box. 'minimal' appearance only renders the checkmark/mixedmark.
+    */
+   @Input() appearance: 'minimal' | 'full' = 'full';
+-
+-  constructor(...args: unknown[]);
+-  constructor() {}
+ }
+diff --git a/src/material/datepicker/calendar-body.ts b/src/material/datepicker/calendar-body.ts
+index b2c08a8151bc..7970d0b107cf 100644
+--- a/src/material/datepicker/calendar-body.ts
++++ b/src/material/datepicker/calendar-body.ts
+@@ -224,8 +224,6 @@ export class MatCalendarBody<D = any> implements OnChanges, OnDestroy, AfterView
+    */
+   _trackRow = (row: MatCalendarCell[]) => row;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const renderer = inject(Renderer2);
+     const idGenerator = inject(_IdGenerator);
+diff --git a/src/material/datepicker/calendar.ts b/src/material/datepicker/calendar.ts
+index 47aec431d21b..8b5d2a13b704 100644
+--- a/src/material/datepicker/calendar.ts
++++ b/src/material/datepicker/calendar.ts
+@@ -71,8 +71,6 @@ export class MatCalendarHeader<D> {
+   private _prevButtonLabel!: string;
+   private _nextButtonLabel!: string;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     inject(_CdkPrivateStyleLoader).load(_VisuallyHiddenLoader);
+     const changeDetectorRef = inject(ChangeDetectorRef);
+@@ -420,8 +418,6 @@ export class MatCalendar<D> implements AfterContentInit, AfterViewChecked, OnDes
+    */
+   readonly stateChanges = new Subject<void>();
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     if (typeof ngDevMode === 'undefined' || ngDevMode) {
+       if (!this._dateAdapter) {
+diff --git a/src/material/datepicker/date-range-input-parts.ts b/src/material/datepicker/date-range-input-parts.ts
+index f5f29cdf1be7..a8aa585bb2f4 100644
+--- a/src/material/datepicker/date-range-input-parts.ts
++++ b/src/material/datepicker/date-range-input-parts.ts
+@@ -82,8 +82,6 @@ abstract class MatDateRangeInputPartBase<D>
+     this._errorStateTracker.errorState = value;
+   }
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     super();
+ 
+diff --git a/src/material/datepicker/date-range-input.ts b/src/material/datepicker/date-range-input.ts
+index 52f7e9ceecdb..c71958edbbae 100644
+--- a/src/material/datepicker/date-range-input.ts
++++ b/src/material/datepicker/date-range-input.ts
+@@ -263,8 +263,6 @@ export class MatDateRangeInput<D>
+    */
+   readonly disableAutomaticLabeling = true;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     if (!this._dateAdapter && (typeof ngDevMode === 'undefined' || ngDevMode)) {
+       throw createMissingDateImplError('DateAdapter');
+diff --git a/src/material/datepicker/datepicker-actions.ts b/src/material/datepicker/datepicker-actions.ts
+index ac453675405c..5b21c9d47cae 100644
+--- a/src/material/datepicker/datepicker-actions.ts
++++ b/src/material/datepicker/datepicker-actions.ts
+@@ -30,10 +30,6 @@ export class MatDatepickerApply {
+   private _datepicker =
+     inject<MatDatepickerBase<MatDatepickerControl<any>, unknown>>(MatDatepickerBase);
+ 
+-  constructor(...args: unknown[]);
+-
+-  constructor() {}
+-
+   _applySelection() {
+     this._datepicker._applyPendingSelection();
+     this._datepicker.close();
+@@ -47,9 +43,6 @@ export class MatDatepickerApply {
+ })
+ export class MatDatepickerCancel {
+   _datepicker = inject<MatDatepickerBase<MatDatepickerControl<any>, unknown>>(MatDatepickerBase);
+-
+-  constructor(...args: unknown[]);
+-  constructor() {}
+ }
+ 
+ /**
+@@ -77,9 +70,6 @@ export class MatDatepickerActions implements AfterViewInit, OnDestroy {
+   @ViewChild(TemplateRef) _template!: TemplateRef<unknown>;
+   private _portal!: TemplatePortal;
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   ngAfterViewInit() {
+     this._portal = new TemplatePortal(this._template, this._viewContainerRef);
+     this._datepicker.registerActions(this._portal);
+diff --git a/src/material/datepicker/datepicker-base.ts b/src/material/datepicker/datepicker-base.ts
+index 7aad4971a977..8ff4a52ebeb8 100644
+--- a/src/material/datepicker/datepicker-base.ts
++++ b/src/material/datepicker/datepicker-base.ts
+@@ -187,8 +187,6 @@ export class MatDatepickerContent<S, D = ExtractDateTypeFromSelection<S>>
+   /** Id of the label for the `role="dialog"` element. */
+   _dialogLabelId: string | null = null;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     inject(_CdkPrivateStyleLoader).load(_VisuallyHiddenLoader);
+     this._closeButtonText = inject(MatDatepickerIntl).closeCalendarLabel;
+@@ -551,8 +549,6 @@ export abstract class MatDatepickerBase<
+ 
+   private readonly _changeDetectorRef = inject(ChangeDetectorRef);
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     if (!this._dateAdapter && (typeof ngDevMode === 'undefined' || ngDevMode)) {
+       throw createMissingDateImplError('DateAdapter');
+diff --git a/src/material/datepicker/datepicker-input-base.ts b/src/material/datepicker/datepicker-input-base.ts
+index d1f17a98b3d4..70b879464e2e 100644
+--- a/src/material/datepicker/datepicker-input-base.ts
++++ b/src/material/datepicker/datepicker-input-base.ts
+@@ -245,8 +245,6 @@ export abstract class MatDatepickerInputBase<S, D = ExtractDateTypeFromSelection
+   /** Whether the last value set on the input was valid. */
+   protected _lastValueValid = false;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     if (typeof ngDevMode === 'undefined' || ngDevMode) {
+       if (!this._dateAdapter) {
+diff --git a/src/material/datepicker/datepicker-input.ts b/src/material/datepicker/datepicker-input.ts
+index 644e7293e377..65a69d434128 100644
+--- a/src/material/datepicker/datepicker-input.ts
++++ b/src/material/datepicker/datepicker-input.ts
+@@ -132,8 +132,6 @@ export class MatDatepickerInput<D>
+   /** The combined form control validator for this input. */
+   protected _validator: ValidatorFn | null = null;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     super();
+     this._validator = Validators.compose(super._getValidators());
+diff --git a/src/material/datepicker/datepicker-toggle.ts b/src/material/datepicker/datepicker-toggle.ts
+index 9f438554c1db..c68741145a49 100644
+--- a/src/material/datepicker/datepicker-toggle.ts
++++ b/src/material/datepicker/datepicker-toggle.ts
+@@ -93,8 +93,6 @@ export class MatDatepickerToggle<D> implements AfterContentInit, OnChanges, OnDe
+   /** Underlying button element. */
+   @ViewChild('button') _button!: MatButton;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const defaultTabIndex = inject(new HostAttributeToken('tabindex'), {optional: true});
+     const parsedTabIndex = Number(defaultTabIndex);
+diff --git a/src/material/datepicker/month-view.ts b/src/material/datepicker/month-view.ts
+index fb7a71d13b0c..1943b1f6d403 100644
+--- a/src/material/datepicker/month-view.ts
++++ b/src/material/datepicker/month-view.ts
+@@ -219,8 +219,6 @@ export class MatMonthView<D> implements AfterContentInit, OnChanges, OnDestroy {
+   /** The names of the weekdays. */
+   _weekdays = signal<{long: string; narrow: string; id: number}[]>([]);
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     inject(_CdkPrivateStyleLoader).load(_VisuallyHiddenLoader);
+     if (typeof ngDevMode === 'undefined' || ngDevMode) {
+diff --git a/src/material/datepicker/multi-year-view.ts b/src/material/datepicker/multi-year-view.ts
+index 53cd055b03c4..8c547de3e559 100644
+--- a/src/material/datepicker/multi-year-view.ts
++++ b/src/material/datepicker/multi-year-view.ts
+@@ -159,8 +159,6 @@ export class MatMultiYearView<D> implements AfterContentInit, OnDestroy {
+   /** The year of the selected date. Null if the selected date is null. */
+   _selectedYear = signal<number | null>(null);
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     if (!this._dateAdapter && (typeof ngDevMode === 'undefined' || ngDevMode)) {
+       throw createMissingDateImplError('DateAdapter');
+diff --git a/src/material/datepicker/year-view.ts b/src/material/datepicker/year-view.ts
+index 10a5d170df9c..f841ec72eb8a 100644
+--- a/src/material/datepicker/year-view.ts
++++ b/src/material/datepicker/year-view.ts
+@@ -154,8 +154,6 @@ export class MatYearView<D> implements AfterContentInit, OnDestroy {
+    */
+   _selectedMonth = signal<number | null>(null);
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     if (typeof ngDevMode === 'undefined' || ngDevMode) {
+       if (!this._dateAdapter) {
+diff --git a/src/material/dialog/dialog-content-directives.ts b/src/material/dialog/dialog-content-directives.ts
+index de31e3470e49..261fc1ba17b7 100644
+--- a/src/material/dialog/dialog-content-directives.ts
++++ b/src/material/dialog/dialog-content-directives.ts
+@@ -50,9 +50,6 @@ export class MatDialogClose implements OnInit, OnChanges {
+ 
+   @Input('matDialogClose') _matDialogClose: any;
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   ngOnInit() {
+     if (!this.dialogRef) {
+       // When this directive is included in a dialog via TemplateRef (rather than being
+@@ -91,10 +88,6 @@ export abstract class MatDialogLayoutSection implements OnInit, OnDestroy {
+   private _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
+   private _dialog = inject(MatDialog);
+ 
+-  constructor(...args: unknown[]);
+-
+-  constructor() {}
+-
+   protected abstract _onAdd(): void;
+   protected abstract _onRemove(): void;
+ 
+diff --git a/src/material/dialog/dialog.ts b/src/material/dialog/dialog.ts
+index 1452db39b75e..9cea4c095a0d 100644
+--- a/src/material/dialog/dialog.ts
++++ b/src/material/dialog/dialog.ts
+@@ -98,8 +98,6 @@ export class MatDialog implements OnDestroy {
+       : this._getAfterAllClosed().pipe(startWith(undefined)),
+   ) as Observable<any>;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     this._dialogRefConstructor = MatDialogRef;
+     this._dialogContainerType = MatDialogContainer;
+diff --git a/src/material/dialog/testing/dialog-opener.ts b/src/material/dialog/testing/dialog-opener.ts
+index 6f2fdf81a47c..11ba7b4ee6a7 100644
+--- a/src/material/dialog/testing/dialog-opener.ts
++++ b/src/material/dialog/testing/dialog-opener.ts
+@@ -56,8 +56,6 @@ export class MatTestDialogOpener<T = unknown, R = unknown> implements OnDestroy
+     return MatTestDialogOpener as ComponentType<MatTestDialogOpener<T, R>>;
+   }
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     if (!MatTestDialogOpener.component) {
+       throw new Error(`MatTestDialogOpener does not have a component provided.`);
+diff --git a/src/material/expansion/expansion-panel-content.ts b/src/material/expansion/expansion-panel-content.ts
+index e16915cd8a2f..aadf20ef1963 100644
+--- a/src/material/expansion/expansion-panel-content.ts
++++ b/src/material/expansion/expansion-panel-content.ts
+@@ -19,7 +19,4 @@ import {MAT_EXPANSION_PANEL, MatExpansionPanelBase} from './expansion-panel-base
+ export class MatExpansionPanelContent {
+   _template = inject<TemplateRef<any>>(TemplateRef);
+   _expansionPanel = inject<MatExpansionPanelBase>(MAT_EXPANSION_PANEL, {optional: true});
+-
+-  constructor(...args: unknown[]);
+-  constructor() {}
+ }
+diff --git a/src/material/expansion/expansion-panel-header.ts b/src/material/expansion/expansion-panel-header.ts
+index 548d013c3d93..cba5eb006f31 100644
+--- a/src/material/expansion/expansion-panel-header.ts
++++ b/src/material/expansion/expansion-panel-header.ts
+@@ -66,8 +66,6 @@ export class MatExpansionPanelHeader implements AfterViewInit, OnDestroy, Focusa
+ 
+   private _parentChangeSubscription = Subscription.EMPTY;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     inject(_CdkPrivateStyleLoader).load(_StructuralStylesLoader);
+     const panel = this.panel;
+diff --git a/src/material/expansion/expansion-panel.ts b/src/material/expansion/expansion-panel.ts
+index 354d143bf0c8..70ff86e07b2f 100644
+--- a/src/material/expansion/expansion-panel.ts
++++ b/src/material/expansion/expansion-panel.ts
+@@ -150,8 +150,6 @@ export class MatExpansionPanel
+   /** ID for the associated header element. Used for a11y labelling. */
+   _headerId: string = inject(_IdGenerator).getId('mat-expansion-panel-header-');
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     super();
+ 
+diff --git a/src/material/form-field/directives/error.ts b/src/material/form-field/directives/error.ts
+index 9d474d478ad8..ab56e375f76c 100644
+--- a/src/material/form-field/directives/error.ts
++++ b/src/material/form-field/directives/error.ts
+@@ -27,8 +27,4 @@ export const MAT_ERROR = new InjectionToken<MatError>('MatError');
+ })
+ export class MatError {
+   @Input() id: string = inject(_IdGenerator).getId('mat-mdc-error-');
+-
+-  constructor(...args: unknown[]);
+-
+-  constructor() {}
+ }
+diff --git a/src/material/form-field/directives/floating-label.ts b/src/material/form-field/directives/floating-label.ts
+index 0af52fbb7058..7f5f9bd2f2ec 100644
+--- a/src/material/form-field/directives/floating-label.ts
++++ b/src/material/form-field/directives/floating-label.ts
+@@ -89,9 +89,6 @@ export class MatFormFieldFloatingLabel implements OnDestroy {
+   /** The current resize event subscription. */
+   private _resizeSubscription = new Subscription();
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   ngOnDestroy() {
+     this._resizeSubscription.unsubscribe();
+   }
+diff --git a/src/material/form-field/directives/line-ripple.ts b/src/material/form-field/directives/line-ripple.ts
+index f334b3314dd4..4197ed37f70f 100644
+--- a/src/material/form-field/directives/line-ripple.ts
++++ b/src/material/form-field/directives/line-ripple.ts
+@@ -32,8 +32,6 @@ export class MatFormFieldLineRipple implements OnDestroy {
+   private _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
+   private _cleanupTransitionEnd!: () => void;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const ngZone = inject(NgZone);
+     const renderer = inject(Renderer2);
+diff --git a/src/material/form-field/form-field.ts b/src/material/form-field/form-field.ts
+index d098211b2c85..2615dedaec20 100644
+--- a/src/material/form-field/form-field.ts
++++ b/src/material/form-field/form-field.ts
+@@ -343,8 +343,6 @@ export class MatFormField
+   private _outlineLabelOffsetResizeObserver: ResizeObserver | null = null;
+   protected readonly _animationsDisabled = _animationsDisabled();
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const defaults = this._defaults;
+     const dir = inject(Directionality);
+diff --git a/src/material/grid-list/grid-list.ts b/src/material/grid-list/grid-list.ts
+index 295494d796ff..321c3db883bb 100644
+--- a/src/material/grid-list/grid-list.ts
++++ b/src/material/grid-list/grid-list.ts
+@@ -84,9 +84,6 @@ export class MatGridList implements MatGridListBase, OnInit, AfterContentChecked
+   /** Query list of tiles that are being rendered. */
+   @ContentChildren(MatGridTile, {descendants: true}) _tiles!: QueryList<MatGridTile>;
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   /** Amount of columns in the grid list. */
+   @Input()
+   get cols(): number {
+diff --git a/src/material/grid-list/grid-tile.ts b/src/material/grid-list/grid-tile.ts
+index 555526b51625..a25ec41ec8dc 100644
+--- a/src/material/grid-list/grid-tile.ts
++++ b/src/material/grid-list/grid-tile.ts
+@@ -44,9 +44,6 @@ export class MatGridTile {
+   _rowspan: number = 1;
+   _colspan: number = 1;
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   /** Amount of rows that the grid tile takes up. */
+   @Input()
+   get rowspan(): number {
+@@ -85,9 +82,6 @@ export class MatGridTileText implements AfterContentInit {
+ 
+   @ContentChildren(MatLine, {descendants: true}) _lines!: QueryList<MatLine>;
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   ngAfterContentInit() {
+     setLines(this._lines, this._element);
+   }
+diff --git a/src/material/icon/icon.ts b/src/material/icon/icon.ts
+index ce772d1b5668..bff17d27c887 100644
+--- a/src/material/icon/icon.ts
++++ b/src/material/icon/icon.ts
+@@ -239,8 +239,6 @@ export class MatIcon implements OnInit, AfterViewChecked, OnDestroy {
+   /** Subscription to the current in-progress SVG icon request. */
+   private _currentIconFetch = Subscription.EMPTY;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const ariaHidden = inject(new HostAttributeToken('aria-hidden'), {optional: true});
+     const defaults = inject<MatIconDefaultOptions>(MAT_ICON_DEFAULT_OPTIONS, {optional: true});
+diff --git a/src/material/input/input.ts b/src/material/input/input.ts
+index 41f116828a17..d0ba16102861 100644
+--- a/src/material/input/input.ts
++++ b/src/material/input/input.ts
+@@ -294,8 +294,6 @@ export class MatInput
+     'week',
+   ].filter(t => getSupportedInputTypes().has(t));
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const parentForm = inject(NgForm, {optional: true});
+     const parentFormGroup = inject(FormGroupDirective, {optional: true});
+diff --git a/src/material/list/list-base.ts b/src/material/list/list-base.ts
+index cca24c2d5dbd..7bb840b814c8 100644
+--- a/src/material/list/list-base.ts
++++ b/src/material/list/list-base.ts
+@@ -177,8 +177,6 @@ export abstract class MatListItemBase implements AfterViewInit, OnDestroy, Rippl
+     return this.disableRipple || !!this.rippleConfig.disabled;
+   }
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     inject(_CdkPrivateStyleLoader).load(_StructuralStylesLoader);
+     const globalRippleOptions = inject<RippleGlobalOptions>(MAT_RIPPLE_GLOBAL_OPTIONS, {
+diff --git a/src/material/list/list-item-sections.ts b/src/material/list/list-item-sections.ts
+index c2e77af868bb..14bf83ba3c35 100644
+--- a/src/material/list/list-item-sections.ts
++++ b/src/material/list/list-item-sections.ts
+@@ -21,9 +21,6 @@ import {LIST_OPTION, ListOption} from './list-option-types';
+ })
+ export class MatListItemTitle {
+   _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
+-
+-  constructor(...args: unknown[]);
+-  constructor() {}
+ }
+ 
+ /**
+@@ -38,9 +35,6 @@ export class MatListItemTitle {
+ })
+ export class MatListItemLine {
+   _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
+-
+-  constructor(...args: unknown[]);
+-  constructor() {}
+ }
+ 
+ /**
+@@ -76,9 +70,6 @@ export class MatListItemMeta {}
+ export class _MatListItemGraphicBase {
+   _listOption = inject<ListOption>(LIST_OPTION, {optional: true});
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   _isAlignedAtStart() {
+     // By default, in all list items the graphic is aligned at start. In list options,
+     // the graphic is only aligned at start if the checkbox/radio is at the end.
+diff --git a/src/material/list/selection-list.ts b/src/material/list/selection-list.ts
+index 0d989bef164f..1d6d073f1a6c 100644
+--- a/src/material/list/selection-list.ts
++++ b/src/material/list/selection-list.ts
+@@ -161,8 +161,6 @@ export class MatSelectionList
+ 
+   private readonly _changeDetectorRef = inject(ChangeDetectorRef);
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     super();
+     this._isNonInteractive = false;
+diff --git a/src/material/menu/menu-content.ts b/src/material/menu/menu-content.ts
+index ef6a3e3683a6..ff99bda85d31 100644
+--- a/src/material/menu/menu-content.ts
++++ b/src/material/menu/menu-content.ts
+@@ -48,10 +48,6 @@ export class MatMenuContent implements OnDestroy {
+   /** Emits when the menu content has been attached. */
+   readonly _attached = new Subject<void>();
+ 
+-  constructor(...args: unknown[]);
+-
+-  constructor() {}
+-
+   /**
+    * Attaches the content with a particular context.
+    * @docs-private
+diff --git a/src/material/menu/menu-item.ts b/src/material/menu/menu-item.ts
+index d59e34a54f1a..fc776e943a6b 100644
+--- a/src/material/menu/menu-item.ts
++++ b/src/material/menu/menu-item.ts
+@@ -76,8 +76,6 @@ export class MatMenuItem implements FocusableOption, AfterViewInit, OnDestroy {
+   /** Whether the menu item acts as a trigger for a sub-menu. */
+   _triggersSubmenu: boolean = false;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     inject(_CdkPrivateStyleLoader).load(_StructuralStylesLoader);
+     this._parentMenu?.addItem?.(this);
+diff --git a/src/material/menu/menu-trigger.ts b/src/material/menu/menu-trigger.ts
+index 7d4cb842557a..16b56ae4b12e 100644
+--- a/src/material/menu/menu-trigger.ts
++++ b/src/material/menu/menu-trigger.ts
+@@ -97,8 +97,6 @@ export class MatMenuTrigger extends MatMenuTriggerBase implements AfterContentIn
+   // tslint:disable-next-line:no-output-on-prefix
+   @Output() readonly onMenuClose: EventEmitter<void> = this.menuClosed;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     super(true);
+ 
+diff --git a/src/material/menu/menu.ts b/src/material/menu/menu.ts
+index 8f6810fc7a12..9368dc81c3aa 100644
+--- a/src/material/menu/menu.ts
++++ b/src/material/menu/menu.ts
+@@ -272,8 +272,6 @@ export class MatMenu implements AfterContentInit, MatMenuPanel<MatMenuItem>, OnI
+ 
+   readonly panelId: string = inject(_IdGenerator).getId('mat-menu-panel-');
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const defaultOptions = inject<MatMenuDefaultOptions>(MAT_MENU_DEFAULT_OPTIONS);
+     this.overlayPanelClass = defaultOptions.overlayPanelClass || '';
+diff --git a/src/material/paginator/paginator.ts b/src/material/paginator/paginator.ts
+index f4f910f0167e..ff5c63bd80cb 100644
+--- a/src/material/paginator/paginator.ts
++++ b/src/material/paginator/paginator.ts
+@@ -200,8 +200,6 @@ export class MatPaginator implements OnInit, OnDestroy {
+   initialized: Observable<void> = this._initializedStream;
+ 
+   /** Inserted by Angular inject() migration for backwards compatibility */
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const _intl = this._intl;
+     const defaults = inject<MatPaginatorDefaultOptions>(MAT_PAGINATOR_DEFAULT_OPTIONS, {
+diff --git a/src/material/progress-bar/progress-bar.ts b/src/material/progress-bar/progress-bar.ts
+index cb086420c588..65a0402257ba 100644
+--- a/src/material/progress-bar/progress-bar.ts
++++ b/src/material/progress-bar/progress-bar.ts
+@@ -114,8 +114,6 @@ export class MatProgressBar implements AfterViewInit, OnDestroy {
+   private _renderer = inject(Renderer2);
+   private _cleanupTransitionEnd: (() => void) | undefined;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const animationsState = _getAnimationsState();
+ 
+diff --git a/src/material/progress-spinner/progress-spinner.ts b/src/material/progress-spinner/progress-spinner.ts
+index d8c48f828a91..a82c39b27e72 100644
+--- a/src/material/progress-spinner/progress-spinner.ts
++++ b/src/material/progress-spinner/progress-spinner.ts
+@@ -115,8 +115,6 @@ export class MatProgressSpinner {
+   /** The element of the determinate spinner. */
+   @ViewChild('determinateSpinner') _determinateCircle!: ElementRef<HTMLElement>;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const defaults = inject<MatProgressSpinnerDefaultOptions>(MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS);
+     const animationsState = _getAnimationsState();
+diff --git a/src/material/radio/radio.ts b/src/material/radio/radio.ts
+index 0e142fc33718..576150f7e3a7 100644
+--- a/src/material/radio/radio.ts
++++ b/src/material/radio/radio.ts
+@@ -263,10 +263,6 @@ export class MatRadioGroup implements AfterContentInit, OnDestroy, ControlValueA
+   }
+   private _disabledInteractive = false;
+ 
+-  constructor(...args: unknown[]);
+-
+-  constructor() {}
+-
+   /**
+    * Initialize properties once content children are available.
+    * This allows us to propagate relevant attributes to associated buttons.
+@@ -600,8 +596,6 @@ export class MatRadioButton implements OnInit, AfterViewInit, DoCheck, OnDestroy
+ 
+   private _injector = inject(Injector);
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     inject(_CdkPrivateStyleLoader).load(_StructuralStylesLoader);
+     const radioGroup = inject<MatRadioGroup>(MAT_RADIO_GROUP, {optional: true})!;
+diff --git a/src/material/select/select.ts b/src/material/select/select.ts
+index 6e517130e5de..72389a431936 100644
+--- a/src/material/select/select.ts
++++ b/src/material/select/select.ts
+@@ -597,8 +597,6 @@ export class MatSelect
+    */
+   @Output() readonly valueChange: EventEmitter<any> = new EventEmitter<any>();
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const defaultErrorStateMatcher = inject(ErrorStateMatcher);
+     const parentForm = inject(NgForm, {optional: true});
+diff --git a/src/material/sidenav/drawer.ts b/src/material/sidenav/drawer.ts
+index 50b1aa8a6b55..0703559ac05d 100644
+--- a/src/material/sidenav/drawer.ts
++++ b/src/material/sidenav/drawer.ts
+@@ -16,7 +16,7 @@ import {Directionality} from '@angular/cdk/bidi';
+ import {BooleanInput, coerceBooleanProperty} from '@angular/cdk/coercion';
+ import {ESCAPE, hasModifierKey} from '@angular/cdk/keycodes';
+ import {Platform} from '@angular/cdk/platform';
+-import {CdkScrollable, ScrollDispatcher, ViewportRuler} from '@angular/cdk/scrolling';
++import {CdkScrollable, ViewportRuler} from '@angular/cdk/scrolling';
+ 
+ import {
+   AfterContentInit,
+@@ -103,16 +103,6 @@ export class MatDrawerContent extends CdkScrollable implements AfterContentInit
+   private _changeDetectorRef = inject(ChangeDetectorRef);
+   _container = inject(MatDrawerContainer);
+ 
+-  constructor(...args: unknown[]);
+-
+-  constructor() {
+-    const elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
+-    const scrollDispatcher = inject(ScrollDispatcher);
+-    const ngZone = inject(NgZone);
+-
+-    super(elementRef, scrollDispatcher, ngZone);
+-  }
+-
+   ngAfterContentInit() {
+     this._container._contentMarginChanges.subscribe(() => {
+       this._changeDetectorRef.markForCheck();
+@@ -333,8 +323,6 @@ export class MatDrawer implements AfterViewInit, OnDestroy {
+   private _injector = inject(Injector);
+   private _changeDetectorRef = inject(ChangeDetectorRef);
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     this.openedChange.pipe(takeUntil(this._destroyed)).subscribe((opened: boolean) => {
+       if (opened) {
+@@ -788,8 +776,6 @@ export class MatDrawerContainer implements AfterContentInit, DoCheck, OnDestroy
+ 
+   private _injector = inject(Injector);
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const platform = inject(Platform);
+     const viewportRuler = inject(ViewportRuler);
+diff --git a/src/material/slide-toggle/slide-toggle.ts b/src/material/slide-toggle/slide-toggle.ts
+index c0cde77814af..66bb0586db8c 100644
+--- a/src/material/slide-toggle/slide-toggle.ts
++++ b/src/material/slide-toggle/slide-toggle.ts
+@@ -204,8 +204,6 @@ export class MatSlideToggle
+     return `${this.id || this._uniqueId}-input`;
+   }
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     inject(_CdkPrivateStyleLoader).load(_StructuralStylesLoader);
+     const tabIndex = inject(new HostAttributeToken('tabindex'), {optional: true});
+diff --git a/src/material/slider/slider-input.ts b/src/material/slider/slider-input.ts
+index e0e82ff579a2..7eed0cf99a90 100644
+--- a/src/material/slider/slider-input.ts
++++ b/src/material/slider/slider-input.ts
+@@ -281,8 +281,6 @@ export class MatSliderThumb implements _MatSliderThumb, OnDestroy, ControlValueA
+    */
+   protected _isControlInitialized = false;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const renderer = inject(Renderer2);
+ 
+@@ -661,8 +659,6 @@ export class MatSliderRangeThumb extends MatSliderThumb implements _MatSliderRan
+   /** Whether this slider corresponds to the input with greater value. */
+   _isEndThumb = false;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     super();
+ 
+diff --git a/src/material/slider/slider-thumb.ts b/src/material/slider/slider-thumb.ts
+index a3d891d212d1..4ed7c0ef34d2 100644
+--- a/src/material/slider/slider-thumb.ts
++++ b/src/material/slider/slider-thumb.ts
+@@ -105,9 +105,6 @@ export class MatSliderVisualThumb implements _MatSliderVisualThumb, AfterViewIni
+ 
+   private _platform = inject(Platform);
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   ngAfterViewInit() {
+     const sliderInput = this._slider._getInput(this.thumbPosition);
+ 
+diff --git a/src/material/slider/slider.ts b/src/material/slider/slider.ts
+index 76b3e267d792..104ede8c6966 100644
+--- a/src/material/slider/slider.ts
++++ b/src/material/slider/slider.ts
+@@ -415,8 +415,6 @@ export class MatSlider implements AfterViewInit, OnDestroy, _MatSlider {
+ 
+   private _platform = inject(Platform);
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     inject(_CdkPrivateStyleLoader).load(_StructuralStylesLoader);
+ 
+diff --git a/src/material/snack-bar/simple-snack-bar.ts b/src/material/snack-bar/simple-snack-bar.ts
+index 09070641000e..b005fba0deaf 100644
+--- a/src/material/snack-bar/simple-snack-bar.ts
++++ b/src/material/snack-bar/simple-snack-bar.ts
+@@ -38,9 +38,6 @@ export class SimpleSnackBar implements TextOnlySnackBar {
+   snackBarRef = inject<MatSnackBarRef<SimpleSnackBar>>(MatSnackBarRef);
+   data = inject(MAT_SNACK_BAR_DATA);
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   /** Performs the action on the snack bar. */
+   action(): void {
+     this.snackBarRef.dismissWithAction();
+diff --git a/src/material/snack-bar/snack-bar-container.ts b/src/material/snack-bar/snack-bar-container.ts
+index 8b5e59ab6aec..e8615579c951 100644
+--- a/src/material/snack-bar/snack-bar-container.ts
++++ b/src/material/snack-bar/snack-bar-container.ts
+@@ -120,8 +120,6 @@ export class MatSnackBarContainer extends BasePortalOutlet implements OnDestroy
+   /** Unique ID of the aria-live element. */
+   readonly _liveElementId = inject(_IdGenerator).getId('mat-snack-bar-container-live-');
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     super();
+     const config = this.snackBarConfig;
+diff --git a/src/material/snack-bar/snack-bar.ts b/src/material/snack-bar/snack-bar.ts
+index 5ebca0059f8f..3442f9b949d0 100644
+--- a/src/material/snack-bar/snack-bar.ts
++++ b/src/material/snack-bar/snack-bar.ts
+@@ -84,9 +84,6 @@ export class MatSnackBar implements OnDestroy {
+     }
+   }
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   /**
+    * Creates and dispatches a snack bar with a custom component for the content, removing any
+    * currently opened snack bars.
+diff --git a/src/material/sort/sort-header.ts b/src/material/sort/sort-header.ts
+index 9b735bbfd411..344369355fec 100644
+--- a/src/material/sort/sort-header.ts
++++ b/src/material/sort/sort-header.ts
+@@ -143,8 +143,6 @@ export class MatSortHeader implements MatSortable, OnDestroy, OnInit, AfterViewI
+   @Input({transform: booleanAttribute})
+   disableClear!: boolean;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     inject(_CdkPrivateStyleLoader).load(_StructuralStylesLoader);
+     const defaultOptions = inject<MatSortDefaultOptions>(MAT_SORT_DEFAULT_OPTIONS, {
+diff --git a/src/material/stepper/step-content.ts b/src/material/stepper/step-content.ts
+index 569f22e23fb3..21b660a91cc9 100644
+--- a/src/material/stepper/step-content.ts
++++ b/src/material/stepper/step-content.ts
+@@ -16,7 +16,4 @@ import {Directive, TemplateRef, inject} from '@angular/core';
+ })
+ export class MatStepContent<C = unknown> {
+   _template = inject<TemplateRef<C>>(TemplateRef);
+-
+-  constructor(...args: unknown[]);
+-  constructor() {}
+ }
+diff --git a/src/material/stepper/step-header.ts b/src/material/stepper/step-header.ts
+index 64dd1a54d329..189ecacd8071 100644
+--- a/src/material/stepper/step-header.ts
++++ b/src/material/stepper/step-header.ts
+@@ -84,8 +84,6 @@ export class MatStepHeader extends CdkStepHeader implements AfterViewInit, OnDes
+    */
+   @Input() color!: ThemePalette;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     super();
+ 
+diff --git a/src/material/stepper/stepper-icon.ts b/src/material/stepper/stepper-icon.ts
+index b392cf6f16d1..3f55c8829d6c 100644
+--- a/src/material/stepper/stepper-icon.ts
++++ b/src/material/stepper/stepper-icon.ts
+@@ -30,7 +30,4 @@ export class MatStepperIcon {
+ 
+   /** Name of the icon to be overridden. */
+   @Input('matStepperIcon') name!: StepState;
+-
+-  constructor(...args: unknown[]);
+-  constructor() {}
+ }
+diff --git a/src/material/stepper/stepper.ts b/src/material/stepper/stepper.ts
+index 1189d3d9965c..db4cfb1e34bf 100644
+--- a/src/material/stepper/stepper.ts
++++ b/src/material/stepper/stepper.ts
+@@ -207,8 +207,6 @@ export class MatStepper extends CdkStepper implements AfterViewInit, AfterConten
+   /** Whether the stepper is rendering on the server. */
+   protected _isServer: boolean = !inject(Platform).isBrowser;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     super();
+ 
+diff --git a/src/material/tabs/paginated-tab-header.ts b/src/material/tabs/paginated-tab-header.ts
+index ffae76b49494..4614d59fbe78 100644
+--- a/src/material/tabs/paginated-tab-header.ts
++++ b/src/material/tabs/paginated-tab-header.ts
+@@ -159,8 +159,6 @@ export abstract class MatPaginatedTabHeader
+   /** Event emitted when a label is focused. */
+   @Output() readonly indexFocused: EventEmitter<number> = new EventEmitter<number>();
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     // Bind the `mouseleave` event on the outside since it doesn't change anything in the view.
+     this._eventCleanups = this._ngZone.runOutsideAngular(() => [
+diff --git a/src/material/tabs/tab-body.ts b/src/material/tabs/tab-body.ts
+index 63dbf6fc921e..8319c2d0a72e 100644
+--- a/src/material/tabs/tab-body.ts
++++ b/src/material/tabs/tab-body.ts
+@@ -46,12 +46,6 @@ export class MatTabBodyPortal extends CdkPortalOutlet implements OnInit, OnDestr
+   /** Subscription to events for when the tab body finishes leaving from center position. */
+   private _leavingSub = Subscription.EMPTY;
+ 
+-  constructor(...args: unknown[]);
+-
+-  constructor() {
+-    super();
+-  }
+-
+   /** Set initial visibility or set up subscription for changing visibility. */
+   override ngOnInit(): void {
+     super.ngOnInit();
+@@ -192,8 +186,6 @@ export class MatTabBody implements OnInit, OnDestroy {
+     this._computePositionAnimationState();
+   }
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     if (this._dir) {
+       const changeDetectorRef = inject(ChangeDetectorRef);
+diff --git a/src/material/tabs/tab-content.ts b/src/material/tabs/tab-content.ts
+index f148342fdad0..7d774b5ecaad 100644
+--- a/src/material/tabs/tab-content.ts
++++ b/src/material/tabs/tab-content.ts
+@@ -22,7 +22,4 @@ export const MAT_TAB_CONTENT = new InjectionToken<MatTabContent>('MatTabContent'
+ })
+ export class MatTabContent {
+   template = inject<TemplateRef<any>>(TemplateRef);
+-
+-  constructor(...args: unknown[]);
+-  constructor() {}
+ }
+diff --git a/src/material/tabs/tab-group.ts b/src/material/tabs/tab-group.ts
+index 0fe5c529e8d6..e86509146ad4 100644
+--- a/src/material/tabs/tab-group.ts
++++ b/src/material/tabs/tab-group.ts
+@@ -288,8 +288,6 @@ export class MatTabGroup
+   /** Whether the tab group is rendered on the server. */
+   protected _isServer: boolean = !inject(Platform).isBrowser;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const defaultConfig = inject<MatTabsConfig>(MAT_TABS_CONFIG, {optional: true});
+ 
+diff --git a/src/material/tabs/tab-nav-bar/tab-nav-bar.ts b/src/material/tabs/tab-nav-bar/tab-nav-bar.ts
+index 4809340113eb..a61c8acd939c 100644
+--- a/src/material/tabs/tab-nav-bar/tab-nav-bar.ts
++++ b/src/material/tabs/tab-nav-bar/tab-nav-bar.ts
+@@ -163,8 +163,6 @@ export class MatTabNav extends MatPaginatedTabHeader implements AfterContentInit
+   @ViewChild('previousPaginator') _previousPaginator!: ElementRef<HTMLElement>;
+   _inkBar!: MatInkBar;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const defaultConfig = inject<MatTabsConfig>(MAT_TABS_CONFIG, {optional: true});
+ 
+@@ -341,8 +339,6 @@ export class MatTabLink
+   /** Unique id for the tab. */
+   @Input() id: string = inject(_IdGenerator).getId('mat-tab-link-');
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     super();
+ 
+diff --git a/src/material/tabs/tab.ts b/src/material/tabs/tab.ts
+index 62a972c0f55b..2d59fd953c12 100644
+--- a/src/material/tabs/tab.ts
++++ b/src/material/tabs/tab.ts
+@@ -137,7 +137,6 @@ export class MatTab implements OnInit, OnChanges, OnDestroy {
+    */
+   isActive = false;
+ 
+-  constructor(...args: unknown[]);
+   constructor() {
+     inject(_CdkPrivateStyleLoader).load(_StructuralStylesLoader);
+   }
+diff --git a/src/material/toolbar/toolbar.ts b/src/material/toolbar/toolbar.ts
+index 645c774c49f8..6e9b55d3898e 100644
+--- a/src/material/toolbar/toolbar.ts
++++ b/src/material/toolbar/toolbar.ts
+@@ -61,9 +61,6 @@ export class MatToolbar implements AfterViewInit {
+   /** Reference to all toolbar row elements that have been projected. */
+   @ContentChildren(MatToolbarRow, {descendants: true}) _toolbarRows!: QueryList<MatToolbarRow>;
+ 
+-  constructor(...args: unknown[]);
+-  constructor() {}
+-
+   ngAfterViewInit() {
+     if (this._platform.isBrowser) {
+       this._checkToolbarMixedModes();
+diff --git a/src/material/tooltip/tooltip.ts b/src/material/tooltip/tooltip.ts
+index 2058f39a8d46..4c15b145e839 100644
+--- a/src/material/tooltip/tooltip.ts
++++ b/src/material/tooltip/tooltip.ts
+@@ -378,8 +378,6 @@ export class MatTooltip implements OnDestroy, AfterViewInit {
+   /** Whether ngOnDestroyed has been called. */
+   private _isDestroyed = false;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const defaultOptions = this._defaultOptions;
+ 
+@@ -1020,10 +1018,6 @@ export class TooltipComponent implements OnDestroy {
+   /** Name of the hide animation and the class that toggles it. */
+   private readonly _hideAnimation = 'mat-mdc-tooltip-hide';
+ 
+-  constructor(...args: unknown[]);
+-
+-  constructor() {}
+-
+   /**
+    * Shows the tooltip with an animation originating from the provided origin
+    * @param delay Amount of milliseconds to the delay showing the tooltip.
+diff --git a/src/material/tree/node.ts b/src/material/tree/node.ts
+index 608d63da6943..f09fbe0fa71f 100644
+--- a/src/material/tree/node.ts
++++ b/src/material/tree/node.ts
+@@ -105,8 +105,6 @@ export class MatTreeNode<T, K = T> extends CdkTreeNode<T, K> implements OnInit,
+     this.isDisabled = value;
+   }
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     super();
+ 
+diff --git a/src/youtube-player/youtube-player.ts b/src/youtube-player/youtube-player.ts
+index 6321df360d33..985ec087e4ec 100644
+--- a/src/youtube-player/youtube-player.ts
++++ b/src/youtube-player/youtube-player.ts
+@@ -250,8 +250,6 @@ export class YouTubePlayer implements AfterViewInit, OnChanges, OnDestroy {
+   @ViewChild('youtubeContainer', {static: true})
+   youtubeContainer!: ElementRef<HTMLElement>;
+ 
+-  constructor(...args: unknown[]);
+-
+   constructor() {
+     const platformId = inject<Object>(PLATFORM_ID);
+     const config = inject(YOUTUBE_PLAYER_CONFIG, {optional: true});

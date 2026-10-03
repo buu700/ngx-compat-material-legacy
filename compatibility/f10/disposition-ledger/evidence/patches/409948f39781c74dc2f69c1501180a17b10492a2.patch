@@ -1,0 +1,1223 @@
+From 409948f39781c74dc2f69c1501180a17b10492a2 Mon Sep 17 00:00:00 2001
+From: Kristiyan Kostadinov <crisbeto@users.noreply.github.com>
+Date: Tue, 29 Jul 2025 22:23:47 +0200
+Subject: [PATCH] test(multiple): clean up some unnecessary imports (#31605)
+
+Cleaning up some `imports` from `configureTestingModule` that aren't necessary now that we're fully standalone. This is an initial test to see if anything goes wrong. I'll roll it out to the other tests in a follow-up.
+---
+ .../accordion/accordion.spec.ts               |  2 -
+ .../combobox/combobox.spec.ts                 | 18 +--------
+ .../deferred-content/deferred-content.spec.ts |  8 +---
+ src/cdk-experimental/listbox/listbox.spec.ts  |  4 +-
+ .../radio-group/radio-group.spec.ts           |  4 +-
+ .../scrolling/virtual-scroll-viewport.spec.ts |  8 +---
+ .../selection/selection.spec.ts               | 26 +------------
+ .../table-scroll-container.spec.ts            | 13 ++-----
+ src/cdk-experimental/tabs/tabs.spec.ts        |  3 +-
+ src/cdk-experimental/tree/tree.spec.ts        |  3 +-
+ .../aria-describer/aria-describer.spec.ts     |  1 -
+ .../a11y/focus-monitor/focus-monitor.spec.ts  | 20 ----------
+ .../focus-monitor/focus-monitor.zone.spec.ts  |  1 -
+ .../configurable-focus-trap.spec.ts           |  2 -
+ .../event-listener-inert-strategy.spec.ts     |  6 +--
+ src/cdk/a11y/focus-trap/focus-trap.spec.ts    | 18 ---------
+ .../high-contrast-mode-detector.spec.ts       |  3 +-
+ .../live-announcer/live-announcer.spec.ts     | 14 +------
+ src/cdk/accordion/accordion-item.spec.ts      |  8 +---
+ src/cdk/accordion/accordion.spec.ts           |  8 +---
+ src/cdk/bidi/directionality.spec.ts           |  7 ----
+ src/cdk/clipboard/copy-to-clipboard.spec.ts   |  6 ---
+ src/cdk/dialog/dialog.spec.ts                 |  1 -
+ .../drag-drop/directives/test-utils.spec.ts   |  1 -
+ src/cdk/drag-drop/drag-drop-registry.spec.ts  |  4 --
+ src/cdk/drag-drop/drag-drop.spec.ts           |  5 ---
+ src/cdk/layout/breakpoints-observer.spec.ts   |  2 -
+ src/cdk/menu/menu-bar.spec.ts                 | 38 +------------------
+ src/cdk/menu/menu-group.spec.ts               |  8 ----
+ src/cdk/menu/menu-item-checkbox.spec.ts       |  1 -
+ src/cdk/menu/menu-item-radio.spec.ts          |  1 -
+ src/cdk/menu/menu-stack.spec.ts               |  8 +---
+ src/cdk/menu/menu.spec.ts                     | 28 --------------
+ src/cdk/menu/pointer-focus-tracker.spec.ts    |  8 +---
+ src/cdk/observers/observe-content.spec.ts     | 12 +-----
+ .../private/shared-resize-observer.spec.ts    |  3 --
+ src/cdk/overlay/overlay-directives.spec.ts    |  1 -
+ .../overlay/overlay-directives.zone.spec.ts   | 12 ------
+ src/cdk/overlay/overlay.spec.ts               |  2 +-
+ ...exible-connected-position-strategy.spec.ts |  4 --
+ .../position/global-position-strategy.spec.ts |  4 --
+ .../scroll/block-scroll-strategy.spec.ts      |  2 -
+ .../scroll/close-scroll-strategy.spec.ts      |  1 -
+ .../scroll/close-scroll-strategy.zone.spec.ts |  1 -
+ .../scroll/reposition-scroll-strategy.spec.ts |  1 -
+ src/cdk/portal/portal.spec.ts                 | 13 -------
+ 46 files changed, 23 insertions(+), 321 deletions(-)
+
+diff --git a/src/cdk-experimental/accordion/accordion.spec.ts b/src/cdk-experimental/accordion/accordion.spec.ts
+index 60f721d72ee1..54da825ad6d7 100644
+--- a/src/cdk-experimental/accordion/accordion.spec.ts
++++ b/src/cdk-experimental/accordion/accordion.spec.ts
+@@ -1,7 +1,6 @@
+ import {Component, DebugElement, signal, model} from '@angular/core';
+ import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+-import {BidiModule} from '@angular/cdk/bidi';
+ import {provideFakeDirectionality, runAccessibilityChecks} from '@angular/cdk/testing/private';
+ import {_IdGenerator} from '@angular/cdk/a11y';
+ import {
+@@ -97,7 +96,6 @@ describe('CdkAccordionGroup', () => {
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+       providers: [provideFakeDirectionality('ltr'), _IdGenerator],
+-      imports: [BidiModule, AccordionGroupExample],
+     });
+ 
+     fixture = TestBed.createComponent(AccordionGroupExample);
+diff --git a/src/cdk-experimental/combobox/combobox.spec.ts b/src/cdk-experimental/combobox/combobox.spec.ts
+index f264de9024d0..0b6e0ea1ec01 100644
+--- a/src/cdk-experimental/combobox/combobox.spec.ts
++++ b/src/cdk-experimental/combobox/combobox.spec.ts
+@@ -23,12 +23,6 @@ describe('Combobox', () => {
+     let applyButton: DebugElement;
+     let applyButtonElement: HTMLElement;
+ 
+-    beforeEach(waitForAsync(() => {
+-      TestBed.configureTestingModule({
+-        imports: [CdkComboboxModule, ComboboxToggle],
+-      });
+-    }));
+-
+     beforeEach(() => {
+       fixture = TestBed.createComponent(ComboboxToggle);
+       fixture.detectChanges();
+@@ -189,11 +183,7 @@ describe('Combobox', () => {
+     let combobox: DebugElement;
+     let comboboxInstance: CdkCombobox;
+ 
+-    beforeEach(waitForAsync(() => {
+-      TestBed.configureTestingModule({
+-        imports: [CdkComboboxModule, ComboboxToggle],
+-      });
+-    }));
++    beforeEach(waitForAsync(() => {}));
+ 
+     beforeEach(() => {
+       fixture = TestBed.createComponent(ComboboxToggle);
+@@ -259,11 +249,7 @@ describe('Combobox', () => {
+     let comboboxInstance: CdkCombobox;
+     let comboboxElement: HTMLElement;
+ 
+-    beforeEach(waitForAsync(() => {
+-      TestBed.configureTestingModule({
+-        imports: [CdkComboboxModule, ComboboxToggle],
+-      });
+-    }));
++    beforeEach(waitForAsync(() => {}));
+ 
+     beforeEach(() => {
+       fixture = TestBed.createComponent(ComboboxToggle);
+diff --git a/src/cdk-experimental/deferred-content/deferred-content.spec.ts b/src/cdk-experimental/deferred-content/deferred-content.spec.ts
+index 88a8d5e3b95f..75262e77ae34 100644
+--- a/src/cdk-experimental/deferred-content/deferred-content.spec.ts
++++ b/src/cdk-experimental/deferred-content/deferred-content.spec.ts
+@@ -1,5 +1,5 @@
+ import {Component, DebugElement, Directive, effect, inject, signal} from '@angular/core';
+-import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
++import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {DeferredContent, DeferredContentAware} from './deferred-content';
+ import {By} from '@angular/platform-browser';
+ 
+@@ -7,12 +7,6 @@ describe('DeferredContent', () => {
+   let fixture: ComponentFixture<TestComponent>;
+   let collapsible: DebugElement;
+ 
+-  beforeEach(waitForAsync(() => {
+-    TestBed.configureTestingModule({
+-      imports: [TestComponent],
+-    });
+-  }));
+-
+   beforeEach(() => {
+     fixture = TestBed.createComponent(TestComponent);
+     collapsible = fixture.debugElement.query(By.directive(Collapsible));
+diff --git a/src/cdk-experimental/listbox/listbox.spec.ts b/src/cdk-experimental/listbox/listbox.spec.ts
+index 0d89b5705c17..4aa1935e4063 100644
+--- a/src/cdk-experimental/listbox/listbox.spec.ts
++++ b/src/cdk-experimental/listbox/listbox.spec.ts
+@@ -2,7 +2,7 @@ import {Component, DebugElement, signal} from '@angular/core';
+ import {CdkListbox, CdkOption} from './listbox';
+ import {ComponentFixture, TestBed, fakeAsync, tick} from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+-import {BidiModule, Direction} from '@angular/cdk/bidi';
++import {Direction} from '@angular/cdk/bidi';
+ import {provideFakeDirectionality, runAccessibilityChecks} from '@angular/cdk/testing/private';
+ 
+ interface ModifierKeys {
+@@ -65,7 +65,6 @@ describe('CdkListbox', () => {
+   }) {
+     TestBed.configureTestingModule({
+       providers: [provideFakeDirectionality(opts?.textDirection ?? 'ltr')],
+-      imports: [BidiModule, ListboxExample],
+     });
+ 
+     fixture = TestBed.createComponent(ListboxExample);
+@@ -98,7 +97,6 @@ describe('CdkListbox', () => {
+   function setupDefaultListbox() {
+     TestBed.configureTestingModule({
+       providers: [provideFakeDirectionality('ltr')],
+-      imports: [BidiModule, DefaultListboxExample],
+     });
+ 
+     const defaultFixture = TestBed.createComponent(DefaultListboxExample);
+diff --git a/src/cdk-experimental/radio-group/radio-group.spec.ts b/src/cdk-experimental/radio-group/radio-group.spec.ts
+index d4bfed343f3f..ac2639fbf84a 100644
+--- a/src/cdk-experimental/radio-group/radio-group.spec.ts
++++ b/src/cdk-experimental/radio-group/radio-group.spec.ts
+@@ -2,7 +2,7 @@ import {Component, DebugElement, signal} from '@angular/core';
+ import {CdkRadioButton, CdkRadioGroup} from './radio-group';
+ import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+-import {BidiModule, Direction} from '@angular/cdk/bidi';
++import {Direction} from '@angular/cdk/bidi';
+ import {provideFakeDirectionality, runAccessibilityChecks} from '@angular/cdk/testing/private';
+ 
+ describe('CdkRadioGroup', () => {
+@@ -45,7 +45,6 @@ describe('CdkRadioGroup', () => {
+   }) {
+     TestBed.configureTestingModule({
+       providers: [provideFakeDirectionality(opts?.textDirection ?? 'ltr')],
+-      imports: [BidiModule, RadioGroupExample],
+     });
+ 
+     fixture = TestBed.createComponent(RadioGroupExample);
+@@ -85,7 +84,6 @@ describe('CdkRadioGroup', () => {
+   function setupDefaultRadioGroup() {
+     TestBed.configureTestingModule({
+       providers: [provideFakeDirectionality('ltr')],
+-      imports: [BidiModule, DefaultRadioGroupExample],
+     });
+ 
+     const fixture = TestBed.createComponent(DefaultRadioGroupExample);
+diff --git a/src/cdk-experimental/scrolling/virtual-scroll-viewport.spec.ts b/src/cdk-experimental/scrolling/virtual-scroll-viewport.spec.ts
+index e0aa8068ac75..7692cbc5c2b3 100644
+--- a/src/cdk-experimental/scrolling/virtual-scroll-viewport.spec.ts
++++ b/src/cdk-experimental/scrolling/virtual-scroll-viewport.spec.ts
+@@ -1,6 +1,6 @@
+ import {CdkVirtualScrollViewport, ScrollingModule} from '@angular/cdk/scrolling';
+ import {Component, Input, ViewChild, ViewEncapsulation} from '@angular/core';
+-import {ComponentFixture, TestBed, fakeAsync, flush, waitForAsync} from '@angular/core/testing';
++import {ComponentFixture, TestBed, fakeAsync, flush} from '@angular/core/testing';
+ import {ScrollingModule as ExperimentalScrollingModule} from './scrolling-module';
+ 
+ describe('CdkVirtualScrollViewport', () => {
+@@ -9,12 +9,6 @@ describe('CdkVirtualScrollViewport', () => {
+     let testComponent: AutoSizeVirtualScroll;
+     let viewport: CdkVirtualScrollViewport;
+ 
+-    beforeEach(waitForAsync(() => {
+-      TestBed.configureTestingModule({
+-        imports: [ScrollingModule, ExperimentalScrollingModule, AutoSizeVirtualScroll],
+-      });
+-    }));
+-
+     beforeEach(() => {
+       fixture = TestBed.createComponent(AutoSizeVirtualScroll);
+       testComponent = fixture.componentInstance;
+diff --git a/src/cdk-experimental/selection/selection.spec.ts b/src/cdk-experimental/selection/selection.spec.ts
+index 179688d1615e..c9742d3ad3f1 100644
+--- a/src/cdk-experimental/selection/selection.spec.ts
++++ b/src/cdk-experimental/selection/selection.spec.ts
+@@ -1,7 +1,7 @@
+ import {AsyncPipe} from '@angular/common';
+ import {CdkTableModule} from '@angular/cdk/table';
+ import {ChangeDetectorRef, Component, ElementRef, ViewChild, inject} from '@angular/core';
+-import {waitForAsync, ComponentFixture, fakeAsync, flush, TestBed} from '@angular/core/testing';
++import {ComponentFixture, fakeAsync, flush, TestBed} from '@angular/core/testing';
+ 
+ import {CdkSelection} from './selection';
+ import {CdkSelectionModule} from './selection-module';
+@@ -11,12 +11,6 @@ describe('CdkSelection', () => {
+   let fixture: ComponentFixture<ListWithMultiSelection>;
+   let component: ListWithMultiSelection;
+ 
+-  beforeEach(waitForAsync(() => {
+-    TestBed.configureTestingModule({
+-      imports: [CdkSelectionModule, ListWithMultiSelection],
+-    });
+-  }));
+-
+   beforeEach(() => {
+     fixture = TestBed.createComponent(ListWithMultiSelection);
+     component = fixture.componentInstance;
+@@ -237,12 +231,6 @@ describe('CdkSelection with multiple = false', () => {
+   let fixture: ComponentFixture<ListWithSingleSelection>;
+   let component: ListWithSingleSelection;
+ 
+-  beforeEach(waitForAsync(() => {
+-    TestBed.configureTestingModule({
+-      imports: [CdkSelectionModule, ListWithSingleSelection],
+-    });
+-  }));
+-
+   beforeEach(() => {
+     fixture = TestBed.createComponent(ListWithSingleSelection);
+     component = fixture.componentInstance;
+@@ -302,12 +290,6 @@ describe('cdkSelectionColumn', () => {
+   let fixture: ComponentFixture<MultiSelectTableWithSelectionColumn>;
+   let component: MultiSelectTableWithSelectionColumn;
+ 
+-  beforeEach(waitForAsync(() => {
+-    TestBed.configureTestingModule({
+-      imports: [CdkSelectionModule, CdkTableModule, MultiSelectTableWithSelectionColumn],
+-    });
+-  }));
+-
+   beforeEach(fakeAsync(() => {
+     fixture = TestBed.createComponent(MultiSelectTableWithSelectionColumn);
+     component = fixture.componentInstance;
+@@ -397,12 +379,6 @@ describe('cdkSelectionColumn with multiple = false', () => {
+   let fixture: ComponentFixture<SingleSelectTableWithSelectionColumn>;
+   let component: SingleSelectTableWithSelectionColumn;
+ 
+-  beforeEach(waitForAsync(() => {
+-    TestBed.configureTestingModule({
+-      imports: [CdkSelectionModule, CdkTableModule, SingleSelectTableWithSelectionColumn],
+-    });
+-  }));
+-
+   beforeEach(() => {
+     fixture = TestBed.createComponent(SingleSelectTableWithSelectionColumn);
+     component = fixture.componentInstance;
+diff --git a/src/cdk-experimental/table-scroll-container/table-scroll-container.spec.ts b/src/cdk-experimental/table-scroll-container/table-scroll-container.spec.ts
+index cf83cb16bd5e..dea23f2b09b9 100644
+--- a/src/cdk-experimental/table-scroll-container/table-scroll-container.spec.ts
++++ b/src/cdk-experimental/table-scroll-container/table-scroll-container.spec.ts
+@@ -18,19 +18,12 @@ describe('CdkTableScrollContainer', () => {
+   let headerRows: HTMLElement[];
+   let footerRows: HTMLElement[];
+ 
+-  function createComponent<T>(
+-    componentType: Type<T>,
+-    declarations: any[] = [],
+-  ): ComponentFixture<T> {
+-    TestBed.configureTestingModule({
+-      imports: [CdkTableModule, CdkTableScrollContainerModule, componentType, ...declarations],
+-    });
+-
++  function createComponent<T>(componentType: Type<T>): ComponentFixture<T> {
+     return TestBed.createComponent<T>(componentType);
+   }
+ 
+-  function setupTableTestApp(componentType: Type<any>, declarations: any[] = []) {
+-    fixture = createComponent(componentType, declarations);
++  function setupTableTestApp(componentType: Type<any>) {
++    fixture = createComponent(componentType);
+     component = fixture.componentInstance;
+     fixture.detectChanges();
+ 
+diff --git a/src/cdk-experimental/tabs/tabs.spec.ts b/src/cdk-experimental/tabs/tabs.spec.ts
+index f90d8aba1e55..e341089fa9ac 100644
+--- a/src/cdk-experimental/tabs/tabs.spec.ts
++++ b/src/cdk-experimental/tabs/tabs.spec.ts
+@@ -1,7 +1,7 @@
+ import {Component, DebugElement, signal} from '@angular/core';
+ import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+-import {BidiModule, Direction} from '@angular/cdk/bidi';
++import {Direction} from '@angular/cdk/bidi';
+ import {provideFakeDirectionality, runAccessibilityChecks} from '@angular/cdk/testing/private';
+ import {CdkTabs, CdkTabList, CdkTab, CdkTabPanel, CdkTabContent} from './tabs';
+ 
+@@ -63,7 +63,6 @@ describe('CdkTabs', () => {
+   function setupTestTabs(options: {textDirection?: Direction} = {}) {
+     TestBed.configureTestingModule({
+       providers: [provideFakeDirectionality(options.textDirection ?? 'ltr')],
+-      imports: [BidiModule, TestTabsComponent],
+     });
+ 
+     fixture = TestBed.createComponent(TestTabsComponent);
+diff --git a/src/cdk-experimental/tree/tree.spec.ts b/src/cdk-experimental/tree/tree.spec.ts
+index 8728c8bf5005..a5d6818b7b20 100644
+--- a/src/cdk-experimental/tree/tree.spec.ts
++++ b/src/cdk-experimental/tree/tree.spec.ts
+@@ -1,7 +1,7 @@
+ import {Component, signal} from '@angular/core';
+ import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+-import {BidiModule, Direction} from '@angular/cdk/bidi';
++import {Direction} from '@angular/cdk/bidi';
+ import {provideFakeDirectionality, runAccessibilityChecks} from '@angular/cdk/testing/private';
+ import {CdkTree, CdkTreeItem, CdkTreeItemGroup, CdkTreeItemGroupContent} from './tree';
+ 
+@@ -53,7 +53,6 @@ describe('CdkTree', () => {
+ 
+   function setupTestTree(textDirection: Direction = 'ltr') {
+     TestBed.configureTestingModule({
+-      imports: [TestTreeComponent, BidiModule],
+       providers: [provideFakeDirectionality(textDirection)],
+     });
+ 
+diff --git a/src/cdk/a11y/aria-describer/aria-describer.spec.ts b/src/cdk/a11y/aria-describer/aria-describer.spec.ts
+index eea223a7f2a6..787dc25d3a76 100644
+--- a/src/cdk/a11y/aria-describer/aria-describer.spec.ts
++++ b/src/cdk/a11y/aria-describer/aria-describer.spec.ts
+@@ -10,7 +10,6 @@ describe('AriaDescriber', () => {
+ 
+   function createFixture(providers: Provider[] = []) {
+     TestBed.configureTestingModule({
+-      imports: [A11yModule, TestApp],
+       providers: [AriaDescriber, ...providers],
+     });
+ 
+diff --git a/src/cdk/a11y/focus-monitor/focus-monitor.spec.ts b/src/cdk/a11y/focus-monitor/focus-monitor.spec.ts
+index 67e20cd8237d..e2cc98c05010 100644
+--- a/src/cdk/a11y/focus-monitor/focus-monitor.spec.ts
++++ b/src/cdk/a11y/focus-monitor/focus-monitor.spec.ts
+@@ -31,7 +31,6 @@ describe('FocusMonitor', () => {
+     fakeActiveElement = null;
+ 
+     TestBed.configureTestingModule({
+-      imports: [A11yModule, PlainButton],
+       providers: [
+         {
+           provide: DOCUMENT,
+@@ -466,7 +465,6 @@ describe('FocusMonitor with "eventual" detection', () => {
+ 
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+-      imports: [A11yModule, PlainButton],
+       providers: [
+         {
+           provide: FOCUS_MONITOR_DEFAULT_OPTIONS,
+@@ -499,20 +497,6 @@ describe('FocusMonitor with "eventual" detection', () => {
+ });
+ 
+ describe('cdkMonitorFocus', () => {
+-  beforeEach(() => {
+-    TestBed.configureTestingModule({
+-      imports: [
+-        A11yModule,
+-        ButtonWithFocusClasses,
+-        ComplexComponentWithMonitorElementFocus,
+-        ComplexComponentWithMonitorSubtreeFocus,
+-        ComplexComponentWithMonitorSubtreeFocusAndMonitorElementFocus,
+-        FocusMonitorOnCommentNode,
+-        ExportedFocusMonitor,
+-      ],
+-    });
+-  });
+-
+   describe('button with cdkMonitorElementFocus', () => {
+     let fixture: ComponentFixture<ButtonWithFocusClasses>;
+     let buttonElement: HTMLElement;
+@@ -820,7 +804,6 @@ describe('FocusMonitor observable stream', () => {
+   beforeEach(() => {
+     fakePlatform = {isBrowser: true} as Platform;
+     TestBed.configureTestingModule({
+-      imports: [A11yModule, PlainButton],
+       providers: [{provide: Platform, useValue: fakePlatform}],
+     });
+     fixture = TestBed.createComponent(PlainButton);
+@@ -854,9 +837,6 @@ describe('FocusMonitor input label detection', () => {
+   let focusMonitor: FocusMonitor;
+ 
+   beforeEach(() => {
+-    TestBed.configureTestingModule({
+-      imports: [A11yModule, CheckboxWithLabel],
+-    });
+     fixture = TestBed.createComponent(CheckboxWithLabel);
+     focusMonitor = TestBed.inject(FocusMonitor);
+     fixture.detectChanges();
+diff --git a/src/cdk/a11y/focus-monitor/focus-monitor.zone.spec.ts b/src/cdk/a11y/focus-monitor/focus-monitor.zone.spec.ts
+index d599886e5201..fda5a31dd5c4 100644
+--- a/src/cdk/a11y/focus-monitor/focus-monitor.zone.spec.ts
++++ b/src/cdk/a11y/focus-monitor/focus-monitor.zone.spec.ts
+@@ -14,7 +14,6 @@ describe('FocusMonitor observable stream Zone.js integration', () => {
+   beforeEach(() => {
+     fakePlatform = {isBrowser: true} as Platform;
+     TestBed.configureTestingModule({
+-      imports: [A11yModule, PlainButton],
+       providers: [{provide: Platform, useValue: fakePlatform}, provideZoneChangeDetection()],
+     });
+     fixture = TestBed.createComponent(PlainButton);
+diff --git a/src/cdk/a11y/focus-trap/configurable-focus-trap.spec.ts b/src/cdk/a11y/focus-trap/configurable-focus-trap.spec.ts
+index b19ad2c90ad6..88f441664f80 100644
+--- a/src/cdk/a11y/focus-trap/configurable-focus-trap.spec.ts
++++ b/src/cdk/a11y/focus-trap/configurable-focus-trap.spec.ts
+@@ -9,7 +9,6 @@ import {
+ } from '@angular/core';
+ import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {
+-  A11yModule,
+   ConfigurableFocusTrap,
+   ConfigurableFocusTrapFactory,
+   FOCUS_TRAP_INERT_STRATEGY,
+@@ -101,7 +100,6 @@ function createComponent<T>(
+   providers: Provider[] = [],
+ ): ComponentFixture<T> {
+   TestBed.configureTestingModule({
+-    imports: [A11yModule, componentType],
+     providers: providers,
+   });
+ 
+diff --git a/src/cdk/a11y/focus-trap/event-listener-inert-strategy.spec.ts b/src/cdk/a11y/focus-trap/event-listener-inert-strategy.spec.ts
+index 709877c1219c..7d4dd3d53c2f 100644
+--- a/src/cdk/a11y/focus-trap/event-listener-inert-strategy.spec.ts
++++ b/src/cdk/a11y/focus-trap/event-listener-inert-strategy.spec.ts
+@@ -10,7 +10,6 @@ import {
+ import {ComponentFixture, TestBed, fakeAsync, flush} from '@angular/core/testing';
+ import {patchElementFocus} from '../../testing/private';
+ import {
+-  A11yModule,
+   ConfigurableFocusTrap,
+   ConfigurableFocusTrapFactory,
+   EventListenerFocusTrapInertStrategy,
+@@ -69,10 +68,7 @@ function createComponent<T>(
+   componentType: Type<T>,
+   providers: Provider[] = [],
+ ): ComponentFixture<T> {
+-  TestBed.configureTestingModule({
+-    imports: [A11yModule, componentType],
+-    providers: providers,
+-  });
++  TestBed.configureTestingModule({providers});
+ 
+   return TestBed.createComponent<T>(componentType);
+ }
+diff --git a/src/cdk/a11y/focus-trap/focus-trap.spec.ts b/src/cdk/a11y/focus-trap/focus-trap.spec.ts
+index fac1eb3cc9d8..428ca86c3337 100644
+--- a/src/cdk/a11y/focus-trap/focus-trap.spec.ts
++++ b/src/cdk/a11y/focus-trap/focus-trap.spec.ts
+@@ -13,24 +13,6 @@ import {By} from '@angular/platform-browser';
+ import {A11yModule, CdkTrapFocus, FocusTrap} from '../index';
+ 
+ describe('FocusTrap', () => {
+-  beforeEach(waitForAsync(() => {
+-    TestBed.configureTestingModule({
+-      imports: [
+-        A11yModule,
+-        PortalModule,
+-        FocusTrapWithBindings,
+-        SimpleFocusTrap,
+-        FocusTrapTargets,
+-        FocusTrapWithSvg,
+-        FocusTrapWithoutFocusableElements,
+-        FocusTrapWithAutoCapture,
+-        FocusTrapUnfocusableTarget,
+-        FocusTrapInsidePortal,
+-        FocusTrapWithAutoCaptureInShadowDom,
+-      ],
+-    });
+-  }));
+-
+   describe('with default element', () => {
+     let fixture: ComponentFixture<SimpleFocusTrap>;
+     let focusTrapInstance: FocusTrap;
+diff --git a/src/cdk/a11y/high-contrast-mode/high-contrast-mode-detector.spec.ts b/src/cdk/a11y/high-contrast-mode/high-contrast-mode-detector.spec.ts
+index 607e2d8fef48..1bb990251adf 100644
+--- a/src/cdk/a11y/high-contrast-mode/high-contrast-mode-detector.spec.ts
++++ b/src/cdk/a11y/high-contrast-mode/high-contrast-mode-detector.spec.ts
+@@ -8,7 +8,6 @@ import {
+ import {Platform} from '../../platform';
+ import {TestBed} from '@angular/core/testing';
+ import {Provider, DOCUMENT} from '@angular/core';
+-import {A11yModule} from '../a11y-module';
+ 
+ describe('HighContrastModeDetector', () => {
+   function getDetector(document: unknown, platform?: Platform) {
+@@ -18,7 +17,7 @@ describe('HighContrastModeDetector', () => {
+       providers.push({provide: Platform, useValue: platform});
+     }
+ 
+-    TestBed.configureTestingModule({imports: [A11yModule], providers});
++    TestBed.configureTestingModule({providers});
+     return TestBed.inject(HighContrastModeDetector);
+   }
+ 
+diff --git a/src/cdk/a11y/live-announcer/live-announcer.spec.ts b/src/cdk/a11y/live-announcer/live-announcer.spec.ts
+index 7c9195fbd6a7..0be11cf45cf4 100644
+--- a/src/cdk/a11y/live-announcer/live-announcer.spec.ts
++++ b/src/cdk/a11y/live-announcer/live-announcer.spec.ts
+@@ -18,12 +18,6 @@ describe('LiveAnnouncer', () => {
+   let fixture: ComponentFixture<TestApp>;
+ 
+   describe('with default element', () => {
+-    beforeEach(() =>
+-      TestBed.configureTestingModule({
+-        imports: [A11yModule, TestApp, TestModal],
+-      }),
+-    );
+-
+     beforeEach(fakeAsync(() => {
+       announcer = TestBed.inject(LiveAnnouncer);
+       ariaLiveElement = getLiveElement();
+@@ -123,10 +117,7 @@ describe('LiveAnnouncer', () => {
+ 
+     it('should ensure that there is only one live element at a time', fakeAsync(() => {
+       fixture.destroy();
+-
+-      TestBed.resetTestingModule().configureTestingModule({
+-        imports: [A11yModule],
+-      });
++      TestBed.resetTestingModule().configureTestingModule({});
+ 
+       const extraElement = document.createElement('div');
+       extraElement.classList.add('cdk-live-announcer-element');
+@@ -219,7 +210,6 @@ describe('LiveAnnouncer', () => {
+       customLiveElement = document.createElement('div');
+ 
+       return TestBed.configureTestingModule({
+-        imports: [A11yModule, TestApp],
+         providers: [{provide: LIVE_ANNOUNCER_ELEMENT_TOKEN, useValue: customLiveElement}],
+       });
+     });
+@@ -242,7 +232,6 @@ describe('LiveAnnouncer', () => {
+   describe('with a default options', () => {
+     beforeEach(() => {
+       return TestBed.configureTestingModule({
+-        imports: [A11yModule, TestApp],
+         providers: [
+           {
+             provide: LIVE_ANNOUNCER_DEFAULT_OPTIONS,
+@@ -290,7 +279,6 @@ describe('CdkAriaLive', () => {
+ 
+   beforeEach(fakeAsync(() => {
+     TestBed.configureTestingModule({
+-      imports: [A11yModule, DivWithCdkAriaLive],
+       providers: [
+         {
+           provide: MutationObserverFactory,
+diff --git a/src/cdk/accordion/accordion-item.spec.ts b/src/cdk/accordion/accordion-item.spec.ts
+index 441ec3f46f3c..688e54dbb828 100644
+--- a/src/cdk/accordion/accordion-item.spec.ts
++++ b/src/cdk/accordion/accordion-item.spec.ts
+@@ -1,15 +1,9 @@
+-import {waitForAsync, TestBed, ComponentFixture} from '@angular/core/testing';
++import {TestBed, ComponentFixture} from '@angular/core/testing';
+ import {Component} from '@angular/core';
+ import {By} from '@angular/platform-browser';
+ import {CdkAccordionModule, CdkAccordionItem} from './public-api';
+ 
+ describe('CdkAccordionItem', () => {
+-  beforeEach(waitForAsync(() => {
+-    TestBed.configureTestingModule({
+-      imports: [CdkAccordionModule, SingleItem, ItemGroupWithoutAccordion, ItemGroupWithAccordion],
+-    });
+-  }));
+-
+   describe('single item', () => {
+     let fixture: ComponentFixture<SingleItem>;
+     let item: CdkAccordionItem;
+diff --git a/src/cdk/accordion/accordion.spec.ts b/src/cdk/accordion/accordion.spec.ts
+index 81984fe39c80..024fe4f3ad01 100644
+--- a/src/cdk/accordion/accordion.spec.ts
++++ b/src/cdk/accordion/accordion.spec.ts
+@@ -1,4 +1,4 @@
+-import {waitForAsync, TestBed} from '@angular/core/testing';
++import {TestBed} from '@angular/core/testing';
+ import {Component, QueryList, ViewChild, ViewChildren} from '@angular/core';
+ import {By} from '@angular/platform-browser';
+ import {CdkAccordion} from './accordion';
+@@ -6,12 +6,6 @@ import {CdkAccordionItem} from './accordion-item';
+ import {CdkAccordionModule} from './accordion-module';
+ 
+ describe('CdkAccordion', () => {
+-  beforeEach(waitForAsync(() => {
+-    TestBed.configureTestingModule({
+-      imports: [CdkAccordionModule, SetOfItems, NestedItems],
+-    });
+-  }));
+-
+   it('should ensure only one item is expanded at a time', () => {
+     const fixture = TestBed.createComponent(SetOfItems);
+     const [firstPanel, secondPanel] = fixture.debugElement
+diff --git a/src/cdk/bidi/directionality.spec.ts b/src/cdk/bidi/directionality.spec.ts
+index a4b3f03b6af5..ea813342008b 100644
+--- a/src/cdk/bidi/directionality.spec.ts
++++ b/src/cdk/bidi/directionality.spec.ts
+@@ -10,13 +10,6 @@ describe('Directionality', () => {
+     fakeDocument = {body: {}, documentElement: {}};
+ 
+     TestBed.configureTestingModule({
+-      imports: [
+-        BidiModule,
+-        ElementWithDir,
+-        ElementWithPredefinedAutoDir,
+-        InjectsDirectionality,
+-        ElementWithPredefinedUppercaseDir,
+-      ],
+       providers: [{provide: DIR_DOCUMENT, useFactory: () => fakeDocument}],
+     });
+   }));
+diff --git a/src/cdk/clipboard/copy-to-clipboard.spec.ts b/src/cdk/clipboard/copy-to-clipboard.spec.ts
+index 215f832838e7..56724a76df1b 100644
+--- a/src/cdk/clipboard/copy-to-clipboard.spec.ts
++++ b/src/cdk/clipboard/copy-to-clipboard.spec.ts
+@@ -26,12 +26,6 @@ describe('CdkCopyToClipboard', () => {
+   let fixture: ComponentFixture<CopyToClipboardHost>;
+   let clipboard: Clipboard;
+ 
+-  beforeEach(fakeAsync(() => {
+-    TestBed.configureTestingModule({
+-      imports: [ClipboardModule, CopyToClipboardHost],
+-    });
+-  }));
+-
+   beforeEach(() => {
+     fixture = TestBed.createComponent(CopyToClipboardHost);
+ 
+diff --git a/src/cdk/dialog/dialog.spec.ts b/src/cdk/dialog/dialog.spec.ts
+index c36e70516fb4..1f9e65b3b891 100644
+--- a/src/cdk/dialog/dialog.spec.ts
++++ b/src/cdk/dialog/dialog.spec.ts
+@@ -1306,7 +1306,6 @@ describe('Dialog with a parent Dialog', () => {
+ 
+   beforeEach(fakeAsync(() => {
+     TestBed.configureTestingModule({
+-      imports: [DialogModule, ComponentThatProvidesMatDialog],
+       providers: [
+         {
+           provide: OverlayContainer,
+diff --git a/src/cdk/drag-drop/directives/test-utils.spec.ts b/src/cdk/drag-drop/directives/test-utils.spec.ts
+index 77d741971b5c..9a8874e95d3c 100644
+--- a/src/cdk/drag-drop/directives/test-utils.spec.ts
++++ b/src/cdk/drag-drop/directives/test-utils.spec.ts
+@@ -30,7 +30,6 @@ export function createComponent<T>(
+   };
+ 
+   TestBed.configureTestingModule({
+-    imports: [componentType],
+     providers: [
+       {
+         provide: CDK_DRAG_CONFIG,
+diff --git a/src/cdk/drag-drop/drag-drop-registry.spec.ts b/src/cdk/drag-drop/drag-drop-registry.spec.ts
+index 8a85a6b2537f..f32e9d295153 100644
+--- a/src/cdk/drag-drop/drag-drop-registry.spec.ts
++++ b/src/cdk/drag-drop/drag-drop-registry.spec.ts
+@@ -16,10 +16,6 @@ describe('DragDropRegistry', () => {
+   let registry: DragDropRegistry;
+ 
+   beforeEach(fakeAsync(() => {
+-    TestBed.configureTestingModule({
+-      imports: [DragDropModule, BlankComponent],
+-    });
+-
+     fixture = TestBed.createComponent(BlankComponent);
+     fixture.detectChanges();
+     registry = TestBed.inject(DragDropRegistry);
+diff --git a/src/cdk/drag-drop/drag-drop.spec.ts b/src/cdk/drag-drop/drag-drop.spec.ts
+index 89f67d796dc8..12c797f49345 100644
+--- a/src/cdk/drag-drop/drag-drop.spec.ts
++++ b/src/cdk/drag-drop/drag-drop.spec.ts
+@@ -1,7 +1,6 @@
+ import {Component, ElementRef, inject} from '@angular/core';
+ import {TestBed, fakeAsync} from '@angular/core/testing';
+ import {DragDrop} from './drag-drop';
+-import {DragDropModule} from './drag-drop-module';
+ import {DragRef} from './drag-ref';
+ import {DropListRef} from './drop-list-ref';
+ 
+@@ -9,10 +8,6 @@ describe('DragDrop', () => {
+   let service: DragDrop;
+ 
+   beforeEach(fakeAsync(() => {
+-    TestBed.configureTestingModule({
+-      imports: [DragDropModule, TestComponent],
+-    });
+-
+     service = TestBed.inject(DragDrop);
+   }));
+ 
+diff --git a/src/cdk/layout/breakpoints-observer.spec.ts b/src/cdk/layout/breakpoints-observer.spec.ts
+index db2619b51ddd..89374f8bff19 100644
+--- a/src/cdk/layout/breakpoints-observer.spec.ts
++++ b/src/cdk/layout/breakpoints-observer.spec.ts
+@@ -6,7 +6,6 @@
+  * found in the LICENSE file at https://angular.dev/license
+  */
+ 
+-import {LayoutModule} from './layout-module';
+ import {BreakpointObserver, BreakpointState} from './breakpoints-observer';
+ import {MediaMatcher} from './media-matcher';
+ import {fakeAsync, TestBed, flush, tick} from '@angular/core/testing';
+@@ -20,7 +19,6 @@ describe('BreakpointObserver', () => {
+ 
+   beforeEach(fakeAsync(() => {
+     TestBed.configureTestingModule({
+-      imports: [LayoutModule],
+       providers: [{provide: MediaMatcher, useClass: FakeMediaMatcher}],
+     });
+     breakpointObserver = TestBed.inject(BreakpointObserver);
+diff --git a/src/cdk/menu/menu-bar.spec.ts b/src/cdk/menu/menu-bar.spec.ts
+index ea016465a9e1..b396f0e7a2a0 100644
+--- a/src/cdk/menu/menu-bar.spec.ts
++++ b/src/cdk/menu/menu-bar.spec.ts
+@@ -45,9 +45,7 @@ describe('MenuBar', () => {
+     let menuItems: CdkMenuItemRadio[];
+ 
+     beforeEach(waitForAsync(() => {
+-      TestBed.configureTestingModule({
+-        imports: [CdkMenuModule, MenuBarRadioGroup],
+-      });
++      TestBed.configureTestingModule({});
+ 
+       fixture = TestBed.createComponent(MenuBarRadioGroup);
+       fixture.detectChanges();
+@@ -105,9 +103,7 @@ describe('MenuBar', () => {
+       }
+ 
+       beforeEach(waitForAsync(() => {
+-        TestBed.configureTestingModule({
+-          imports: [CdkMenuModule, MultiMenuWithSubmenu],
+-        });
++        TestBed.configureTestingModule({});
+       }));
+ 
+       beforeEach(() => {
+@@ -528,12 +524,6 @@ describe('MenuBar', () => {
+         detectChanges();
+       }
+ 
+-      beforeEach(waitForAsync(() => {
+-        TestBed.configureTestingModule({
+-          imports: [CdkMenuModule, MultiMenuWithSubmenu],
+-        });
+-      }));
+-
+       beforeEach(() => {
+         fixture = TestBed.createComponent(MultiMenuWithSubmenu);
+         detectChanges();
+@@ -655,12 +645,6 @@ describe('MenuBar', () => {
+         detectChanges();
+       }
+ 
+-      beforeEach(waitForAsync(() => {
+-        TestBed.configureTestingModule({
+-          imports: [CdkMenuModule, MenuWithCheckboxes],
+-        });
+-      }));
+-
+       beforeEach(() => {
+         fixture = TestBed.createComponent(MenuWithCheckboxes);
+         detectChanges();
+@@ -721,12 +705,6 @@ describe('MenuBar', () => {
+         detectChanges();
+       }
+ 
+-      beforeEach(waitForAsync(() => {
+-        TestBed.configureTestingModule({
+-          imports: [CdkMenuModule, MenuWithRadioButtons],
+-        });
+-      }));
+-
+       beforeEach(() => {
+         fixture = TestBed.createComponent(MenuWithRadioButtons);
+         detectChanges();
+@@ -776,12 +754,6 @@ describe('MenuBar', () => {
+       grabElementsForTesting();
+     }
+ 
+-    beforeEach(waitForAsync(() => {
+-      TestBed.configureTestingModule({
+-        imports: [CdkMenuModule, MenuBarWithMenusAndInlineMenu],
+-      });
+-    }));
+-
+     beforeEach(() => {
+       fixture = TestBed.createComponent(MenuBarWithMenusAndInlineMenu);
+       detectChanges();
+@@ -895,12 +867,6 @@ describe('MenuBar', () => {
+       detectChanges();
+     }
+ 
+-    beforeEach(waitForAsync(() => {
+-      TestBed.configureTestingModule({
+-        imports: [CdkMenuModule, MultiMenuWithSubmenu],
+-      });
+-    }));
+-
+     beforeEach(() => {
+       fixture = TestBed.createComponent(MultiMenuWithSubmenu);
+       detectChanges();
+diff --git a/src/cdk/menu/menu-group.spec.ts b/src/cdk/menu/menu-group.spec.ts
+index 4b0659e00011..f23620d3d379 100644
+--- a/src/cdk/menu/menu-group.spec.ts
++++ b/src/cdk/menu/menu-group.spec.ts
+@@ -12,10 +12,6 @@ describe('MenuGroup', () => {
+     let menuItems: CdkMenuItemCheckbox[];
+ 
+     beforeEach(waitForAsync(() => {
+-      TestBed.configureTestingModule({
+-        imports: [CdkMenuModule, CheckboxMenu],
+-      });
+-
+       fixture = TestBed.createComponent(CheckboxMenu);
+       fixture.detectChanges();
+ 
+@@ -39,10 +35,6 @@ describe('MenuGroup', () => {
+     let menuItems: CdkMenuItemRadio[];
+ 
+     beforeEach(waitForAsync(() => {
+-      TestBed.configureTestingModule({
+-        imports: [CdkMenuModule, MenuWithMultipleRadioGroups],
+-      });
+-
+       fixture = TestBed.createComponent(MenuWithMultipleRadioGroups);
+       fixture.detectChanges();
+ 
+diff --git a/src/cdk/menu/menu-item-checkbox.spec.ts b/src/cdk/menu/menu-item-checkbox.spec.ts
+index d811b89f0178..d35bb43976e3 100644
+--- a/src/cdk/menu/menu-item-checkbox.spec.ts
++++ b/src/cdk/menu/menu-item-checkbox.spec.ts
+@@ -10,7 +10,6 @@ describe('MenuItemCheckbox', () => {
+   let checkboxElement: HTMLButtonElement;
+ 
+   beforeEach(() => {
+-    TestBed.configureTestingModule({imports: [CdkMenuModule, SingleCheckboxButton]});
+     fixture = TestBed.createComponent(SingleCheckboxButton);
+     fixture.detectChanges();
+ 
+diff --git a/src/cdk/menu/menu-item-radio.spec.ts b/src/cdk/menu/menu-item-radio.spec.ts
+index 47b685ebd370..84fc0a845427 100644
+--- a/src/cdk/menu/menu-item-radio.spec.ts
++++ b/src/cdk/menu/menu-item-radio.spec.ts
+@@ -10,7 +10,6 @@ describe('MenuItemRadio', () => {
+   let radioElement: HTMLButtonElement;
+ 
+   beforeEach(() => {
+-    TestBed.configureTestingModule({imports: [CdkMenuModule, SimpleRadioButton]});
+     fixture = TestBed.createComponent(SimpleRadioButton);
+     fixture.detectChanges();
+ 
+diff --git a/src/cdk/menu/menu-stack.spec.ts b/src/cdk/menu/menu-stack.spec.ts
+index e2e946869e3b..4cedd983fc2c 100644
+--- a/src/cdk/menu/menu-stack.spec.ts
++++ b/src/cdk/menu/menu-stack.spec.ts
+@@ -1,7 +1,7 @@
+ import {QueryList, ViewChild, ViewChildren, Component} from '@angular/core';
+ import {CdkMenu} from './menu';
+ import {CdkMenuBar} from './menu-bar';
+-import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
++import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {CdkMenuTrigger} from './menu-trigger';
+ import {MenuStack} from './menu-stack';
+ import {CdkMenuModule} from './menu-module';
+@@ -20,12 +20,6 @@ describe('MenuStack', () => {
+     menuStack = fixture.componentInstance.menuBar.menuStack;
+   }
+ 
+-  beforeEach(waitForAsync(() => {
+-    TestBed.configureTestingModule({
+-      imports: [CdkMenuModule, MultiMenuWithSubmenu],
+-    });
+-  }));
+-
+   beforeEach(() => {
+     fixture = TestBed.createComponent(MultiMenuWithSubmenu);
+     fixture.detectChanges();
+diff --git a/src/cdk/menu/menu.spec.ts b/src/cdk/menu/menu.spec.ts
+index c602ff677f22..27e27ba0daf9 100644
+--- a/src/cdk/menu/menu.spec.ts
++++ b/src/cdk/menu/menu.spec.ts
+@@ -26,10 +26,6 @@ describe('Menu', () => {
+     let menuItems: CdkMenuItemCheckbox[];
+ 
+     beforeEach(waitForAsync(() => {
+-      TestBed.configureTestingModule({
+-        imports: [CdkMenuModule, MenuCheckboxGroup],
+-      });
+-
+       fixture = TestBed.createComponent(MenuCheckboxGroup);
+       fixture.detectChanges();
+ 
+@@ -60,12 +56,6 @@ describe('Menu', () => {
+     let nativeMenu: HTMLElement;
+     let nativeMenuItems: HTMLElement[];
+ 
+-    beforeEach(waitForAsync(() => {
+-      TestBed.configureTestingModule({
+-        imports: [CdkMenuModule, InlineMenu],
+-      });
+-    }));
+-
+     beforeEach(() => {
+       fixture = TestBed.createComponent(InlineMenu);
+       fixture.detectChanges();
+@@ -135,12 +125,6 @@ describe('Menu', () => {
+ 
+       let nativeMenus: HTMLElement[];
+ 
+-      beforeEach(waitForAsync(() => {
+-        TestBed.configureTestingModule({
+-          imports: [CdkMenuModule, WithComplexNestedMenus],
+-        });
+-      }));
+-
+       beforeEach(() => {
+         fixture = TestBed.createComponent(WithComplexNestedMenus);
+         detectChanges();
+@@ -326,12 +310,6 @@ describe('Menu', () => {
+ 
+       let nativeMenus: HTMLElement[];
+ 
+-      beforeEach(waitForAsync(() => {
+-        TestBed.configureTestingModule({
+-          imports: [CdkMenuModule, WithComplexNestedMenusOnBottom],
+-        });
+-      }));
+-
+       beforeEach(() => {
+         fixture = TestBed.createComponent(WithComplexNestedMenusOnBottom);
+         detectChanges();
+@@ -507,12 +485,6 @@ describe('Menu', () => {
+     let fixture: ComponentFixture<MenuWithActiveItem>;
+     let nativeMenuItems: HTMLElement[];
+ 
+-    beforeEach(waitForAsync(() => {
+-      TestBed.configureTestingModule({
+-        imports: [CdkMenuModule, MenuWithActiveItem],
+-      });
+-    }));
+-
+     beforeEach(() => {
+       fixture = TestBed.createComponent(MenuWithActiveItem);
+       fixture.detectChanges();
+diff --git a/src/cdk/menu/pointer-focus-tracker.spec.ts b/src/cdk/menu/pointer-focus-tracker.spec.ts
+index b747512e442a..6fba4431e432 100644
+--- a/src/cdk/menu/pointer-focus-tracker.spec.ts
++++ b/src/cdk/menu/pointer-focus-tracker.spec.ts
+@@ -7,7 +7,7 @@ import {
+   inject,
+   Renderer2,
+ } from '@angular/core';
+-import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
++import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {createMouseEvent, dispatchEvent} from '../../cdk/testing/private';
+ import {Observable} from 'rxjs';
+ import {FocusableElement, PointerFocusTracker} from './pointer-focus-tracker';
+@@ -25,12 +25,6 @@ describe('FocusMouseManger', () => {
+     mockElements = fixture.componentInstance._allItems.toArray();
+   }
+ 
+-  beforeEach(waitForAsync(() => {
+-    TestBed.configureTestingModule({
+-      imports: [MultiElementWithConditionalComponent, MockWrapper],
+-    });
+-  }));
+-
+   beforeEach(() => {
+     fixture = TestBed.createComponent(MultiElementWithConditionalComponent);
+     fixture.detectChanges();
+diff --git a/src/cdk/observers/observe-content.spec.ts b/src/cdk/observers/observe-content.spec.ts
+index ba7543a4fa35..82a6ea4678c5 100644
+--- a/src/cdk/observers/observe-content.spec.ts
++++ b/src/cdk/observers/observe-content.spec.ts
+@@ -4,12 +4,6 @@ import {ContentObserver, MutationObserverFactory, ObserversModule} from './obser
+ 
+ describe('Observe content directive', () => {
+   describe('basic usage', () => {
+-    beforeEach(waitForAsync(() => {
+-      TestBed.configureTestingModule({
+-        imports: [ObserversModule, ComponentWithTextContent, ComponentWithChildTextContent],
+-      });
+-    }));
+-
+     it('should trigger the callback when the content of the element changes', done => {
+       let fixture = TestBed.createComponent(ComponentWithTextContent);
+       fixture.detectChanges();
+@@ -82,7 +76,6 @@ describe('Observe content directive', () => {
+       callbacks = [];
+ 
+       TestBed.configureTestingModule({
+-        imports: [ObserversModule, ComponentWithDebouncedListener],
+         providers: [
+           {
+             provide: MutationObserverFactory,
+@@ -124,7 +117,6 @@ describe('ContentObserver injectable', () => {
+       callbacks = [];
+ 
+       TestBed.configureTestingModule({
+-        imports: [ObserversModule, UnobservedComponentWithTextContent],
+         providers: [
+           {
+             provide: MutationObserverFactory,
+@@ -193,9 +185,7 @@ describe('ContentObserver injectable', () => {
+     let contentObserver: ContentObserver;
+ 
+     beforeEach(waitForAsync(() => {
+-      TestBed.configureTestingModule({
+-        imports: [ObserversModule, UnobservedComponentWithTextContent],
+-      });
++      TestBed.configureTestingModule({});
+ 
+       const fixture = TestBed.createComponent(UnobservedComponentWithTextContent);
+       fixture.autoDetectChanges();
+diff --git a/src/cdk/observers/private/shared-resize-observer.spec.ts b/src/cdk/observers/private/shared-resize-observer.spec.ts
+index 73ef98a55ba8..15e38cbdb79b 100644
+--- a/src/cdk/observers/private/shared-resize-observer.spec.ts
++++ b/src/cdk/observers/private/shared-resize-observer.spec.ts
+@@ -50,9 +50,6 @@ describe('SharedResizeObserver', () => {
+   beforeEach(() => {
+     originalResizeObserver = ResizeObserver;
+     window.ResizeObserver = MockResizeObserver;
+-    TestBed.configureTestingModule({
+-      imports: [TestComponent],
+-    });
+     fixture = TestBed.createComponent(TestComponent);
+     fixture.detectChanges();
+     instance = fixture.componentInstance;
+diff --git a/src/cdk/overlay/overlay-directives.spec.ts b/src/cdk/overlay/overlay-directives.spec.ts
+index 1969e38e05ed..7db6aa293b4a 100644
+--- a/src/cdk/overlay/overlay-directives.spec.ts
++++ b/src/cdk/overlay/overlay-directives.spec.ts
+@@ -35,7 +35,6 @@ describe('Overlay directives', () => {
+     dir = signal<Direction>('ltr');
+ 
+     TestBed.configureTestingModule({
+-      imports: [OverlayModule, ConnectedOverlayDirectiveTest, ConnectedOverlayPropertyInitOrder],
+       providers: [
+         provideFakeDirectionality(dir),
+         {
+diff --git a/src/cdk/overlay/overlay-directives.zone.spec.ts b/src/cdk/overlay/overlay-directives.zone.spec.ts
+index 3cec7fd804f0..53907bac554d 100644
+--- a/src/cdk/overlay/overlay-directives.zone.spec.ts
++++ b/src/cdk/overlay/overlay-directives.zone.spec.ts
+@@ -14,7 +14,6 @@ describe('Overlay directives Zone.js integration', () => {
+ 
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+-      imports: [OverlayModule, ConnectedOverlayDirectiveTest, ConnectedOverlayPropertyInitOrder],
+       providers: [provideZoneChangeDetection()],
+     });
+   });
+@@ -111,14 +110,3 @@ class ConnectedOverlayDirectiveTest {
+   attachResult: HTMLElement;
+   transformOriginSelector: string;
+ }
+-
+-@Component({
+-  template: `
+-    <button cdk-overlay-origin #trigger="cdkOverlayOrigin">Toggle menu</button>
+-    <ng-template cdk-connected-overlay>Menu content</ng-template>`,
+-  imports: [OverlayModule],
+-})
+-class ConnectedOverlayPropertyInitOrder {
+-  @ViewChild(CdkConnectedOverlay) connectedOverlayDirective: CdkConnectedOverlay;
+-  @ViewChild('trigger') trigger: CdkOverlayOrigin;
+-}
+diff --git a/src/cdk/overlay/overlay.spec.ts b/src/cdk/overlay/overlay.spec.ts
+index b63cefa746ef..b33f7514bb91 100644
+--- a/src/cdk/overlay/overlay.spec.ts
++++ b/src/cdk/overlay/overlay.spec.ts
+@@ -50,7 +50,7 @@ describe('Overlay', () => {
+   function setup(imports: Type<unknown>[] = []) {
+     dir = signal<Direction>('ltr');
+     TestBed.configureTestingModule({
+-      imports: [OverlayModule, ...imports],
++      imports,
+       providers: [
+         provideFakeDirectionality(dir),
+         {
+diff --git a/src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts b/src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts
+index 757dd8f92038..cc96b41fec7e 100644
+--- a/src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts
++++ b/src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts
+@@ -35,10 +35,6 @@ describe('FlexibleConnectedPositionStrategy', () => {
+   let injector: Injector;
+ 
+   beforeEach(() => {
+-    TestBed.configureTestingModule({
+-      imports: [ScrollingModule, OverlayModule, PortalModule, TestOverlay],
+-    });
+-
+     injector = TestBed.inject(Injector);
+     overlayContainer = TestBed.inject(OverlayContainer);
+     viewport = TestBed.inject(ViewportRuler);
+diff --git a/src/cdk/overlay/position/global-position-strategy.spec.ts b/src/cdk/overlay/position/global-position-strategy.spec.ts
+index e0c7f8080420..7897d619beb2 100644
+--- a/src/cdk/overlay/position/global-position-strategy.spec.ts
++++ b/src/cdk/overlay/position/global-position-strategy.spec.ts
+@@ -14,10 +14,6 @@ describe('GlobalPositonStrategy', () => {
+   let injector: Injector;
+ 
+   beforeEach(() => {
+-    TestBed.configureTestingModule({
+-      imports: [OverlayModule, PortalModule, BlankPortal],
+-    });
+-
+     injector = TestBed.inject(Injector);
+   });
+ 
+diff --git a/src/cdk/overlay/scroll/block-scroll-strategy.spec.ts b/src/cdk/overlay/scroll/block-scroll-strategy.spec.ts
+index c7aaa6a2b826..fdc60bcbe89f 100644
+--- a/src/cdk/overlay/scroll/block-scroll-strategy.spec.ts
++++ b/src/cdk/overlay/scroll/block-scroll-strategy.spec.ts
+@@ -22,8 +22,6 @@ describe('BlockScrollStrategy', () => {
+   let overlayContainer: OverlayContainer;
+ 
+   beforeEach(waitForAsync(() => {
+-    TestBed.configureTestingModule({imports: [OverlayModule, PortalModule, FocacciaMsg]});
+-
+     const injector = TestBed.inject(Injector);
+     const overlayConfig = new OverlayConfig({scrollStrategy: createBlockScrollStrategy(injector)});
+ 
+diff --git a/src/cdk/overlay/scroll/close-scroll-strategy.spec.ts b/src/cdk/overlay/scroll/close-scroll-strategy.spec.ts
+index 60c338a39fa6..5fe2444268ba 100644
+--- a/src/cdk/overlay/scroll/close-scroll-strategy.spec.ts
++++ b/src/cdk/overlay/scroll/close-scroll-strategy.spec.ts
+@@ -24,7 +24,6 @@ describe('CloseScrollStrategy', () => {
+     scrollPosition = 0;
+ 
+     TestBed.configureTestingModule({
+-      imports: [OverlayModule, PortalModule, MozarellaMsg],
+       providers: [
+         {
+           provide: ScrollDispatcher,
+diff --git a/src/cdk/overlay/scroll/close-scroll-strategy.zone.spec.ts b/src/cdk/overlay/scroll/close-scroll-strategy.zone.spec.ts
+index d695f1a309ff..3fd78945b815 100644
+--- a/src/cdk/overlay/scroll/close-scroll-strategy.zone.spec.ts
++++ b/src/cdk/overlay/scroll/close-scroll-strategy.zone.spec.ts
+@@ -25,7 +25,6 @@ describe('CloseScrollStrategy Zone.js integration', () => {
+     scrollPosition = 0;
+ 
+     TestBed.configureTestingModule({
+-      imports: [OverlayModule, PortalModule, MozarellaMsg],
+       providers: [
+         provideZoneChangeDetection(),
+         {
+diff --git a/src/cdk/overlay/scroll/reposition-scroll-strategy.spec.ts b/src/cdk/overlay/scroll/reposition-scroll-strategy.spec.ts
+index 8a1c9effce12..f822c91971b3 100644
+--- a/src/cdk/overlay/scroll/reposition-scroll-strategy.spec.ts
++++ b/src/cdk/overlay/scroll/reposition-scroll-strategy.spec.ts
+@@ -21,7 +21,6 @@ describe('RepositionScrollStrategy', () => {
+ 
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+-      imports: [OverlayModule, PortalModule, PastaMsg],
+       providers: [
+         {
+           provide: ScrollDispatcher,
+diff --git a/src/cdk/portal/portal.spec.ts b/src/cdk/portal/portal.spec.ts
+index 44f4a37992d0..8726f014d4f0 100644
+--- a/src/cdk/portal/portal.spec.ts
++++ b/src/cdk/portal/portal.spec.ts
+@@ -22,19 +22,6 @@ import {ComponentPortal, DomPortal, Portal, TemplatePortal} from './portal';
+ import {CdkPortal, CdkPortalOutlet, PortalModule} from './portal-directives';
+ 
+ describe('Portals', () => {
+-  beforeEach(() => {
+-    TestBed.configureTestingModule({
+-      imports: [
+-        PortalModule,
+-        PortalTestApp,
+-        UnboundPortalTestApp,
+-        ArbitraryViewContainerRefComponent,
+-        PizzaMsg,
+-        SaveParentNodeOnInit,
+-      ],
+-    });
+-  });
+-
+   describe('CdkPortalOutlet', () => {
+     let fixture: ComponentFixture<PortalTestApp>;
+ 

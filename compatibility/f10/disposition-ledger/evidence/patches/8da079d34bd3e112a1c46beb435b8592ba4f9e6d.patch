@@ -1,0 +1,150 @@
+From 8da079d34bd3e112a1c46beb435b8592ba4f9e6d Mon Sep 17 00:00:00 2001
+From: Andrey Dolgachev <adolgachev@users.noreply.github.com>
+Date: Thu, 7 Aug 2025 10:41:46 -0700
+Subject: [PATCH] fix(material/chips): remove extra span for aria-description
+ (#31609)
+
+---
+ goldens/material/chips/index.api.md    |  1 -
+ src/material/chips/chip-option.html    |  6 ++----
+ src/material/chips/chip-option.spec.ts | 21 +++------------------
+ src/material/chips/chip-row.html       |  6 ++----
+ src/material/chips/chip-row.spec.ts    | 21 +++------------------
+ src/material/chips/chip.ts             |  3 ---
+ 6 files changed, 10 insertions(+), 48 deletions(-)
+
+diff --git a/goldens/material/chips/index.api.md b/goldens/material/chips/index.api.md
+index d25d49bc2bcb..d4cb5e82385b 100644
+--- a/goldens/material/chips/index.api.md
++++ b/goldens/material/chips/index.api.md
+@@ -59,7 +59,6 @@ export class MatChip implements OnInit, AfterViewInit, AfterContentInit, DoCheck
+     protected _allTrailingIcons: QueryList<MatChipTrailingIcon>;
+     _animationsDisabled: boolean;
+     ariaDescription: string | null;
+-    _ariaDescriptionId: string;
+     ariaLabel: string | null;
+     protected basicChipAttrName: string;
+     // (undocumented)
+diff --git a/src/material/chips/chip-option.html b/src/material/chips/chip-option.html
+index 5df5e6a6e110..a24ad97fd148 100644
+--- a/src/material/chips/chip-option.html
++++ b/src/material/chips/chip-option.html
+@@ -4,9 +4,9 @@
+   <button
+     matChipAction
+     [_allowFocusWhenDisabled]="true"
+-    [attr.aria-selected]="ariaSelected"
++    [attr.aria-description]="ariaDescription"
+     [attr.aria-label]="ariaLabel"
+-    [attr.aria-describedby]="_ariaDescriptionId"
++    [attr.aria-selected]="ariaSelected"
+     role="option">
+     @if (_hasLeadingGraphic()) {
+       <span class="mdc-evolution-chip__graphic mat-mdc-chip-graphic">
+@@ -35,5 +35,3 @@
+     <ng-content select="mat-chip-trailing-icon,[matChipRemove],[matChipTrailingIcon]"></ng-content>
+   </span>
+ }
+-
+-<span class="cdk-visually-hidden" [id]="_ariaDescriptionId">{{ariaDescription}}</span>
+diff --git a/src/material/chips/chip-option.spec.ts b/src/material/chips/chip-option.spec.ts
+index 70338f81d215..7ec1a4cb1f03 100644
+--- a/src/material/chips/chip-option.spec.ts
++++ b/src/material/chips/chip-option.spec.ts
+@@ -337,25 +337,10 @@ describe('Option Chips', () => {
+ 
+         expect(optionElement.getAttribute('aria-label')).toMatch(/option name/i);
+ 
+-        const optionElementDescribedBy = optionElement!.getAttribute('aria-describedby');
+-        expect(optionElementDescribedBy)
+-          .withContext('expected primary grid cell to have a non-empty aria-describedby attribute')
++        const optionElementDescription = optionElement!.getAttribute('aria-description');
++        expect(optionElementDescription)
++          .withContext('expected primary grid cell to have a non-empty aria-description attribute')
+           .toBeTruthy();
+-
+-        const optionElementDescriptions = Array.from(
+-          (fixture.nativeElement as HTMLElement).querySelectorAll(
+-            optionElementDescribedBy!
+-              .split(/\s+/g)
+-              .map(x => `#${x}`)
+-              .join(','),
+-          ),
+-        );
+-
+-        const optionElementDescription = optionElementDescriptions
+-          .map(x => x.textContent?.trim())
+-          .join(' ')
+-          .trim();
+-
+         expect(optionElementDescription).toMatch(/option description/i);
+       });
+ 
+diff --git a/src/material/chips/chip-row.html b/src/material/chips/chip-row.html
+index 47f53c59b303..c1715e7e4344 100644
+--- a/src/material/chips/chip-row.html
++++ b/src/material/chips/chip-row.html
+@@ -10,8 +10,8 @@
+ <span class="mdc-evolution-chip__cell mdc-evolution-chip__cell--primary" role="gridcell"
+     matChipAction
+     [disabled]="disabled"
+-    [attr.aria-label]="ariaLabel"
+-    [attr.aria-describedby]="_ariaDescriptionId">
++    [attr.aria-description]="ariaDescription"
++    [attr.aria-label]="ariaLabel">
+   @if (leadingIcon) {
+     <span class="mdc-evolution-chip__graphic mat-mdc-chip-graphic">
+       <ng-content select="mat-chip-avatar, [matChipAvatar]"></ng-content>
+@@ -40,5 +40,3 @@
+     <ng-content select="mat-chip-trailing-icon,[matChipRemove],[matChipTrailingIcon]"></ng-content>
+   </span>
+ }
+-
+-<span class="cdk-visually-hidden" [id]="_ariaDescriptionId">{{ariaDescription}}</span>
+diff --git a/src/material/chips/chip-row.spec.ts b/src/material/chips/chip-row.spec.ts
+index 22c1aa7dcd06..516de4216ff1 100644
+--- a/src/material/chips/chip-row.spec.ts
++++ b/src/material/chips/chip-row.spec.ts
+@@ -505,25 +505,10 @@ describe('Row Chips', () => {
+ 
+         expect(primaryGridCell!.getAttribute('aria-label')).toMatch(/chip name/i);
+ 
+-        const primaryGridCellDescribedBy = primaryGridCell!.getAttribute('aria-describedby');
+-        expect(primaryGridCellDescribedBy)
+-          .withContext('expected primary grid cell to have a non-empty aria-describedby attribute')
++        const primaryGridCellDescription = primaryGridCell!.getAttribute('aria-description');
++        expect(primaryGridCellDescription)
++          .withContext('expected primary grid cell to have a non-empty aria-description attribute')
+           .toBeTruthy();
+-
+-        const primaryGridCellDescriptions = Array.from(
+-          (fixture.nativeElement as HTMLElement).querySelectorAll(
+-            primaryGridCellDescribedBy!
+-              .split(/\s+/g)
+-              .map(x => `#${x}`)
+-              .join(','),
+-          ),
+-        );
+-
+-        const primaryGridCellDescription = primaryGridCellDescriptions
+-          .map(x => x.textContent?.trim())
+-          .join(' ')
+-          .trim();
+-
+         expect(primaryGridCellDescription).toMatch(/chip description/i);
+       });
+     });
+diff --git a/src/material/chips/chip.ts b/src/material/chips/chip.ts
+index 58bbd9822b52..ea062e091791 100644
+--- a/src/material/chips/chip.ts
++++ b/src/material/chips/chip.ts
+@@ -166,9 +166,6 @@ export class MatChip implements OnInit, AfterViewInit, AfterContentInit, DoCheck
+   /** ARIA description for the content of the chip. */
+   @Input('aria-description') ariaDescription: string | null = null;
+ 
+-  /** Id of a span that contains this chip's aria description. */
+-  _ariaDescriptionId = `${this.id}-aria-description`;
+-
+   /** Whether the chip list is disabled. */
+   _chipListDisabled: boolean = false;
+ 

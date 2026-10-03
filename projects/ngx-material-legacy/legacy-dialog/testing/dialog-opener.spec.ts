@@ -9,12 +9,12 @@ import {
   MatLegacyDialogRef,
   MatLegacyDialogState,
 } from '@angular/material/legacy-dialog';
-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {LegacyNoopAnimationsModule} from '../../internal/testing/owned-animation-modules';
 
 describe('MDC-based MatTestDialogOpener', () => {
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [MatTestLegacyDialogOpenerModule, NoopAnimationsModule],
+      imports: [MatTestLegacyDialogOpenerModule, LegacyNoopAnimationsModule],
       declarations: [ExampleComponent],
     });
 

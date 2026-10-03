@@ -1,0 +1,129 @@
+From 204788b9458a24145cce55cc3744b0bc793fbb0f Mon Sep 17 00:00:00 2001
+From: Andrey Dolgachev <adolgachev@users.noreply.github.com>
+Date: Tue, 16 Dec 2025 13:47:34 -0800
+Subject: [PATCH] fix(material/slide-toggle): Fix a11y issues by hiding label
+ when it has no content. (#32480)
+
+---
+ .../slide-toggle/slide-toggle-demo.html       | 24 +++++++++++++++----
+ src/material/slide-toggle/slide-toggle.scss   | 24 +++++++++++++++----
+ .../slide-toggle/slide-toggle.spec.ts         |  2 ++
+ 3 files changed, 40 insertions(+), 10 deletions(-)
+
+diff --git a/src/dev-app/slide-toggle/slide-toggle-demo.html b/src/dev-app/slide-toggle/slide-toggle-demo.html
+index 59b711ac3e9f..fff54d790328 100644
+--- a/src/dev-app/slide-toggle/slide-toggle-demo.html
++++ b/src/dev-app/slide-toggle/slide-toggle-demo.html
+@@ -1,16 +1,30 @@
+ <div class="demo-slide-toggle">
+-  <mat-slide-toggle color="primary" [(ngModel)]="firstToggle">Default Slide Toggle</mat-slide-toggle>
++  <mat-slide-toggle color="primary" [(ngModel)]="firstToggle"
++    >Default Slide Toggle</mat-slide-toggle
++  >
+   <mat-slide-toggle [(ngModel)]="firstToggle" disabled>Disabled Slide Toggle</mat-slide-toggle>
+   <mat-slide-toggle [disabled]="firstToggle">Disable Bound</mat-slide-toggle>
+-  <mat-slide-toggle disabled disabledInteractive [(ngModel)]="firstToggle">Disabled Interactive Toggle</mat-slide-toggle>
++  <mat-slide-toggle disabled disabledInteractive [(ngModel)]="firstToggle"
++    >Disabled Interactive Toggle</mat-slide-toggle
++  >
+   <mat-slide-toggle hideIcon [(ngModel)]="firstToggle">No icon</mat-slide-toggle>
+ 
+   <p>With label before the slide toggle.</p>
+ 
+-  <mat-slide-toggle labelPosition="before" color="primary" [(ngModel)]="firstToggle">Default Slide Toggle</mat-slide-toggle>
+-  <mat-slide-toggle labelPosition="before" [(ngModel)]="firstToggle" disabled>Disabled Slide Toggle</mat-slide-toggle>
++  <mat-slide-toggle labelPosition="before" color="primary" [(ngModel)]="firstToggle"
++    >Default Slide Toggle</mat-slide-toggle
++  >
++  <mat-slide-toggle labelPosition="before" [(ngModel)]="firstToggle" disabled
++    >Disabled Slide Toggle</mat-slide-toggle
++  >
+   <mat-slide-toggle labelPosition="before" [disabled]="firstToggle">Disable Bound</mat-slide-toggle>
+-  <mat-slide-toggle labelPosition="before" hideIcon [(ngModel)]="firstToggle">No icon</mat-slide-toggle>
++  <mat-slide-toggle labelPosition="before" hideIcon [(ngModel)]="firstToggle"
++    >No icon</mat-slide-toggle
++  >
++
++  <p>With no label.</p>
++
++  <mat-slide-toggle aria-label="Toggle only" hideLabel color="primary" [(ngModel)]="firstToggle" />
+ 
+   <p>Example where the slide toggle is required inside of a form.</p>
+ 
+diff --git a/src/material/slide-toggle/slide-toggle.scss b/src/material/slide-toggle/slide-toggle.scss
+index babf986b0f8d..dfc10d88bc9f 100644
+--- a/src/material/slide-toggle/slide-toggle.scss
++++ b/src/material/slide-toggle/slide-toggle.scss
+@@ -33,6 +33,11 @@ $fallbacks: m3-slide-toggle.get-tokens();
+   }
+ }
+ 
++// Ensure no label element (with a click handler) present to ensure hidden from screen readers.
++label:empty {
++  display: none;
++}
++
+ .mdc-switch__track {
+   overflow: hidden;
+   position: relative;
+@@ -66,9 +71,13 @@ $fallbacks: m3-slide-toggle.get-tokens();
+ 
+     .mdc-switch--disabled & {
+       border-width: token-utils.slot(
+-          slide-toggle-disabled-unselected-track-outline-width, $fallbacks);
++        slide-toggle-disabled-unselected-track-outline-width,
++        $fallbacks
++      );
+       border-color: token-utils.slot(
+-          slide-toggle-disabled-unselected-track-outline-color, $fallbacks);
++        slide-toggle-disabled-unselected-track-outline-color,
++        $fallbacks
++      );
+     }
+   }
+ 
+@@ -223,7 +232,9 @@ $fallbacks: m3-slide-toggle.get-tokens();
+ 
+     &:has(.mdc-switch__icons) {
+       margin: token-utils.slot(
+-          slide-toggle-unselected-with-icon-handle-horizontal-margin, $fallbacks);
++        slide-toggle-unselected-with-icon-handle-horizontal-margin,
++        $fallbacks
++      );
+     }
+   }
+ 
+@@ -234,7 +245,9 @@ $fallbacks: m3-slide-toggle.get-tokens();
+ 
+     &:has(.mdc-switch__icons) {
+       margin: token-utils.slot(
+-          slide-toggle-selected-with-icon-handle-horizontal-margin, $fallbacks);
++        slide-toggle-selected-with-icon-handle-horizontal-margin,
++        $fallbacks
++      );
+     }
+   }
+ 
+@@ -275,7 +288,8 @@ $fallbacks: m3-slide-toggle.get-tokens();
+     left: 0;
+     position: absolute;
+     top: 0;
+-    transition: background-color 75ms 0ms cubic-bezier(0.4, 0, 0.2, 1),
++    transition:
++      background-color 75ms 0ms cubic-bezier(0.4, 0, 0.2, 1),
+       border-color 75ms 0ms cubic-bezier(0.4, 0, 0.2, 1);
+     z-index: -1;
+ 
+diff --git a/src/material/slide-toggle/slide-toggle.spec.ts b/src/material/slide-toggle/slide-toggle.spec.ts
+index 58b9332262b9..3af4a67d3a80 100644
+--- a/src/material/slide-toggle/slide-toggle.spec.ts
++++ b/src/material/slide-toggle/slide-toggle.spec.ts
+@@ -654,6 +654,8 @@ describe('MatSlideToggle with forms', () => {
+ 
+     it('should update checked state on click if control is checked initially', fakeAsync(() => {
+       fixture = TestBed.createComponent(SlideToggleWithModel);
++      fixture.detectChanges();
++
+       slideToggle = fixture.debugElement.query(By.directive(MatSlideToggle))!.componentInstance;
+       labelElement = fixture.debugElement.query(By.css('label'))!.nativeElement;
+ 

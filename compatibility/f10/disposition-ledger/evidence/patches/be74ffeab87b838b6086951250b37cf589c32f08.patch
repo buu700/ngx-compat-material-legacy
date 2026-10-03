@@ -1,0 +1,57 @@
+From be74ffeab87b838b6086951250b37cf589c32f08 Mon Sep 17 00:00:00 2001
+From: Naji <54370141+naaajii@users.noreply.github.com>
+Date: Tue, 28 Jan 2025 20:10:52 +0500
+Subject: [PATCH] refactor(cdk/a11y): explicitly add `Provider` type (#30393)
+
+add `Provider` type to `NOOP_TREE_KEY_MANAGER_FACTORY_PROVIDER` as the
+inferred type throws error when running dev-app locally
+---
+ src/cdk/a11y/key-manager/noop-tree-key-manager.ts | 3 ++-
+ tools/public_api_guard/cdk/a11y.md                | 6 ++----
+ 2 files changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/src/cdk/a11y/key-manager/noop-tree-key-manager.ts b/src/cdk/a11y/key-manager/noop-tree-key-manager.ts
+index b8a243d0ae99..e58e397e1e9e 100644
+--- a/src/cdk/a11y/key-manager/noop-tree-key-manager.ts
++++ b/src/cdk/a11y/key-manager/noop-tree-key-manager.ts
+@@ -13,6 +13,7 @@ import {
+   TreeKeyManagerItem,
+   TreeKeyManagerStrategy,
+ } from './tree-key-manager-strategy';
++import {Provider} from '@angular/core';
+ 
+ // NoopTreeKeyManager is a "noop" implementation of TreeKeyMangerStrategy. Methods are noops. Does
+ // not emit to streams.
+@@ -102,7 +103,7 @@ export function NOOP_TREE_KEY_MANAGER_FACTORY<
+  *
+  * @breaking-change 21.0.0
+  */
+-export const NOOP_TREE_KEY_MANAGER_FACTORY_PROVIDER = {
++export const NOOP_TREE_KEY_MANAGER_FACTORY_PROVIDER: Provider = {
+   provide: TREE_KEY_MANAGER,
+   useFactory: NOOP_TREE_KEY_MANAGER_FACTORY,
+ };
+diff --git a/tools/public_api_guard/cdk/a11y.md b/tools/public_api_guard/cdk/a11y.md
+index d447dca237d1..ce3629d5b870 100644
+--- a/tools/public_api_guard/cdk/a11y.md
++++ b/tools/public_api_guard/cdk/a11y.md
+@@ -17,6 +17,7 @@ import { NgZone } from '@angular/core';
+ import { Observable } from 'rxjs';
+ import { OnChanges } from '@angular/core';
+ import { OnDestroy } from '@angular/core';
++import { Provider } from '@angular/core';
+ import { QueryList } from '@angular/core';
+ import { Signal } from '@angular/core';
+ import { SimpleChanges } from '@angular/core';
+@@ -430,10 +431,7 @@ export const MESSAGES_CONTAINER_ID = "cdk-describedby-message-container";
+ export function NOOP_TREE_KEY_MANAGER_FACTORY<T extends TreeKeyManagerItem>(): TreeKeyManagerFactory<T>;
+ 
+ // @public @deprecated
+-export const NOOP_TREE_KEY_MANAGER_FACTORY_PROVIDER: {
+-    provide: InjectionToken<TreeKeyManagerFactory<any>>;
+-    useFactory: typeof NOOP_TREE_KEY_MANAGER_FACTORY;
+-};
++export const NOOP_TREE_KEY_MANAGER_FACTORY_PROVIDER: Provider;
+ 
+ // @public @deprecated
+ export class NoopTreeKeyManager<T extends TreeKeyManagerItem> implements TreeKeyManagerStrategy<T> {

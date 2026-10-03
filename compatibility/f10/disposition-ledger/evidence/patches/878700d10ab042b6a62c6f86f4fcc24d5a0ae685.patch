@@ -1,0 +1,53 @@
+From 878700d10ab042b6a62c6f86f4fcc24d5a0ae685 Mon Sep 17 00:00:00 2001
+From: Kristiyan Kostadinov <crisbeto@users.noreply.github.com>
+Date: Thu, 4 Sep 2025 14:26:20 +0200
+Subject: [PATCH] fix(material/progress-bar): avoid CSP issues due to buffer
+ dots (#31818)
+
+Currently the way we render the buffer dots in the progress bar is by using a `data:` URL with an inline SVG. The problem with this approach is that it can trigger CSP errors and require users to allow all `data:` URLs, even if they don't use the buffer mode.
+
+These changes work around the issue by rendering the dots using a radial gradient instead.
+
+Fixes #31808.
+---
+ src/material/progress-bar/progress-bar.scss | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
+
+diff --git a/src/material/progress-bar/progress-bar.scss b/src/material/progress-bar/progress-bar.scss
+index 235cb73664da..d5bf593c296f 100644
+--- a/src/material/progress-bar/progress-bar.scss
++++ b/src/material/progress-bar/progress-bar.scss
+@@ -1,7 +1,6 @@
+ @use '@angular/cdk';
+ @use './m3-progress-bar';
+ @use '../core/tokens/token-utils';
+-@use '../core/style/vendor-prefixes';
+ 
+ $fallbacks: m3-progress-bar.get-tokens();
+ 
+@@ -104,18 +103,18 @@ $fallbacks: m3-progress-bar.get-tokens();
+ }
+ 
+ .mdc-linear-progress__buffer-dots {
+-  $mask: "data:image/svg+xml,%3Csvg version='1.1' xmlns='http://www.w3.org/2000/svg' " +
+-         "xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' " +
+-         "enable-background='new 0 0 5 2' xml:space='preserve' viewBox='0 0 5 2' " +
+-         "preserveAspectRatio='xMinYMin slice'%3E%3Ccircle cx='1' cy='1' r='1'/%3E%3C/svg%3E";
+-
+-  @include vendor-prefixes.mask-image(url($mask));
++  $circle-color: token-utils.slot(progress-bar-track-color, $fallbacks);
++  $circle-size: calc(#{token-utils.slot(progress-bar-track-height, $fallbacks)} / 2);
++  background-image: radial-gradient(circle, #{$circle-color} #{$circle-size}, transparent 0);
+   background-repeat: repeat-x;
++  background-size: calc(#{$circle-size} * 5);
++  // The `background-position` prevents the animation from jumping around when the progress
++  // changes. Note that we shouldn't invert it in RTL, because the animation direction is reversed.
++  background-position: left;
+   flex: auto;
+   transform: rotate(180deg);
+   animation: mdc-linear-progress-buffering
+     calc(250ms * var(--mat-progress-bar-animation-multiplier)) infinite linear;
+-  background-color: token-utils.slot(progress-bar-track-color, $fallbacks);
+ 
+   @include cdk.high-contrast {
+     background-color: ButtonBorder;

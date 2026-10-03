@@ -1,0 +1,61 @@
+From dc64d7d793c8035d6912e72447d116b34e71b41c Mon Sep 17 00:00:00 2001
+From: Kristiyan Kostadinov <crisbeto@users.noreply.github.com>
+Date: Wed, 10 Jun 2026 19:06:13 +0200
+Subject: [PATCH] fix(material/dialog): ignore clicks on aria-disabled close
+ buttons (#33373)
+
+For compatibility with the `disabledInteractive` input that we have in other components, these changes add some logic that will skip click events on `MatDialogClose` if it's `aria-disabled`. I went with this approach, as opposed to introducing another input, because it would also involve implementing `disabledInteractive` for the close button and may introduce conflicts with its host bindings.
+
+Fixes #33368.
+---
+ .../dialog/dialog-content-directives.ts       |  6 ++++++
+ src/material/dialog/dialog.spec.ts            | 19 +++++++++++++++++++
+ 2 files changed, 25 insertions(+)
+
+diff --git a/src/material/dialog/dialog-content-directives.ts b/src/material/dialog/dialog-content-directives.ts
+index 261fc1ba17b7..190bcb2664b4 100644
+--- a/src/material/dialog/dialog-content-directives.ts
++++ b/src/material/dialog/dialog-content-directives.ts
+@@ -70,6 +70,12 @@ export class MatDialogClose implements OnInit, OnChanges {
+   }
+ 
+   _onButtonClick(event: MouseEvent) {
++    // For compatibility with `disabledInteractive`. We don't need to handle plain `disabled`,
++    // because disabled buttons don't dispatch click events by default. See #33366.
++    if (this._elementRef.nativeElement.getAttribute('aria-disabled') === 'true') {
++      return;
++    }
++
+     // Determinate the focus origin using the click event, because using the FocusMonitor will
+     // result in incorrect origins. Most of the time, close buttons will be auto focused in the
+     // dialog, and therefore clicking the button won't result in a focus change. This means that
+diff --git a/src/material/dialog/dialog.spec.ts b/src/material/dialog/dialog.spec.ts
+index 504a0a7aeadc..47ba393a2ba5 100644
+--- a/src/material/dialog/dialog.spec.ts
++++ b/src/material/dialog/dialog.spec.ts
+@@ -1835,6 +1835,25 @@ describe('MatDialog', () => {
+         );
+       });
+ 
++      it('should not close when clicking on an aria-disabled close button', async () => {
++        expect(overlayContainerElement.querySelectorAll('.mat-mdc-dialog-container').length).toBe(
++          1,
++        );
++
++        const closeButton = overlayContainerElement.querySelector(
++          'button[mat-dialog-close]',
++        ) as HTMLElement;
++
++        closeButton.setAttribute('aria-disabled', 'true');
++        closeButton.click();
++        viewContainerFixture.detectChanges();
++        await viewContainerFixture.whenStable();
++
++        expect(overlayContainerElement.querySelectorAll('.mat-mdc-dialog-container').length).toBe(
++          1,
++        );
++      });
++
+       it('should not close if [mat-dialog-close] is applied on a non-button node', () => {
+         expect(overlayContainerElement.querySelectorAll('.mat-mdc-dialog-container').length).toBe(
+           1,

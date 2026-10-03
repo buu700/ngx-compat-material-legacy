@@ -1,0 +1,115 @@
+From 737c7a8f1a5bc4df0e790d3ecdd227f8342499f8 Mon Sep 17 00:00:00 2001
+From: Miles Malerba <mmalerba@google.com>
+Date: Sun, 5 Nov 2023 20:13:11 +0000
+Subject: [PATCH] perf(cdk/a11y): Don't trigger re-layout when detecting fake
+ mousedown (#28029)
+
+---
+ src/cdk/a11y/fake-event-detection.ts                   | 10 ++++------
+ src/cdk/a11y/focus-monitor/focus-monitor.spec.ts       |  2 +-
+ .../input-modality/input-modality-detector.spec.ts     |  2 +-
+ src/cdk/drag-drop/directives/drag.spec.ts              |  4 ++--
+ src/cdk/testing/testbed/fake-events/event-objects.ts   |  6 +++---
+ src/material/core/ripple/ripple.spec.ts                |  2 +-
+ 6 files changed, 12 insertions(+), 14 deletions(-)
+
+diff --git a/src/cdk/a11y/fake-event-detection.ts b/src/cdk/a11y/fake-event-detection.ts
+index d4d6e80ae2af..6a2dca02ecc3 100644
+--- a/src/cdk/a11y/fake-event-detection.ts
++++ b/src/cdk/a11y/fake-event-detection.ts
+@@ -9,13 +9,11 @@
+ /** Gets whether an event could be a faked `mousedown` event dispatched by a screen reader. */
+ export function isFakeMousedownFromScreenReader(event: MouseEvent): boolean {
+   // Some screen readers will dispatch a fake `mousedown` event when pressing enter or space on
+-  // a clickable element. We can distinguish these events when both `offsetX` and `offsetY` are
+-  // zero or `event.buttons` is zero, depending on the browser:
++  // a clickable element. We can distinguish these events when `event.buttons` is zero, or
++  // `event.detail` is zero depending on the browser:
+   // - `event.buttons` works on Firefox, but fails on Chrome.
+-  // - `offsetX` and `offsetY` work on Chrome, but fail on Firefox.
+-  // Note that there's an edge case where the user could click the 0x0 spot of the
+-  // screen themselves, but that is unlikely to contain interactive elements.
+-  return event.buttons === 0 || (event.offsetX === 0 && event.offsetY === 0);
++  // - `detail` works on Chrome, but fails on Firefox.
++  return event.buttons === 0 || event.detail === 0;
+ }
+ 
+ /** Gets whether an event could be a faked `touchstart` event dispatched by a screen reader. */
+diff --git a/src/cdk/a11y/focus-monitor/focus-monitor.spec.ts b/src/cdk/a11y/focus-monitor/focus-monitor.spec.ts
+index 8fc89c9b46d0..b1472a5809f5 100644
+--- a/src/cdk/a11y/focus-monitor/focus-monitor.spec.ts
++++ b/src/cdk/a11y/focus-monitor/focus-monitor.spec.ts
+@@ -168,7 +168,7 @@ describe('FocusMonitor', () => {
+     // Simulate focus via a fake mousedown from a screen reader.
+     dispatchMouseEvent(buttonElement, 'mousedown');
+     const event = createMouseEvent('mousedown');
+-    Object.defineProperties(event, {offsetX: {get: () => 0}, offsetY: {get: () => 0}});
++    Object.defineProperties(event, {detail: {get: () => 0}});
+     dispatchEvent(buttonElement, event);
+ 
+     buttonElement.focus();
+diff --git a/src/cdk/a11y/input-modality/input-modality-detector.spec.ts b/src/cdk/a11y/input-modality/input-modality-detector.spec.ts
+index b403c0d48937..a7dee553b5cf 100644
+--- a/src/cdk/a11y/input-modality/input-modality-detector.spec.ts
++++ b/src/cdk/a11y/input-modality/input-modality-detector.spec.ts
+@@ -138,7 +138,7 @@ describe('InputModalityDetector', () => {
+ 
+     // Create a fake screen-reader mouse event.
+     const event = createMouseEvent('mousedown');
+-    Object.defineProperties(event, {offsetX: {get: () => 0}, offsetY: {get: () => 0}});
++    Object.defineProperties(event, {detail: {get: () => 0}});
+     dispatchEvent(document, event);
+ 
+     expect(detector.mostRecentModality).toBe('keyboard');
+diff --git a/src/cdk/drag-drop/directives/drag.spec.ts b/src/cdk/drag-drop/directives/drag.spec.ts
+index b318dd989094..8c5ca6a3d05b 100644
+--- a/src/cdk/drag-drop/directives/drag.spec.ts
++++ b/src/cdk/drag-drop/directives/drag.spec.ts
+@@ -240,8 +240,8 @@ describe('CdkDrag', () => {
+         const event = createMouseEvent('mousedown', 0, 0);
+ 
+         Object.defineProperties(event, {
+-          offsetX: {get: () => 0},
+-          offsetY: {get: () => 0},
++          buttons: {get: () => 0},
++          detail: {get: () => 0},
+         });
+ 
+         expect(dragElement.style.transform).toBeFalsy();
+diff --git a/src/cdk/testing/testbed/fake-events/event-objects.ts b/src/cdk/testing/testbed/fake-events/event-objects.ts
+index 4bbc10e03f48..aeee1ec151dc 100644
+--- a/src/cdk/testing/testbed/fake-events/event-objects.ts
++++ b/src/cdk/testing/testbed/fake-events/event-objects.ts
+@@ -19,8 +19,8 @@ export function createMouseEvent(
+   type: string,
+   clientX = 0,
+   clientY = 0,
+-  offsetX = 1,
+-  offsetY = 1,
++  offsetX = 0,
++  offsetY = 0,
+   button = 0,
+   modifiers: ModifierKeys = {},
+ ) {
+@@ -36,7 +36,7 @@ export function createMouseEvent(
+     cancelable: true,
+     composed: true, // Required for shadow DOM events.
+     view: window,
+-    detail: 0,
++    detail: 1,
+     relatedTarget: null,
+     screenX,
+     screenY,
+diff --git a/src/material/core/ripple/ripple.spec.ts b/src/material/core/ripple/ripple.spec.ts
+index cc7a31120bcd..a38158cc68b4 100644
+--- a/src/material/core/ripple/ripple.spec.ts
++++ b/src/material/core/ripple/ripple.spec.ts
+@@ -201,7 +201,7 @@ describe('MatRipple', () => {
+ 
+     it('should ignore fake mouse events from screen readers', () => {
+       const event = createMouseEvent('mousedown');
+-      Object.defineProperties(event, {offsetX: {get: () => 0}, offsetY: {get: () => 0}});
++      Object.defineProperties(event, {buttons: {get: () => 0}, detail: {get: () => 0}});
+ 
+       dispatchEvent(rippleTarget, event);
+ 

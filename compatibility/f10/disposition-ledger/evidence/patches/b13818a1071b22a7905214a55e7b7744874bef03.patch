@@ -1,0 +1,28 @@
+From b13818a1071b22a7905214a55e7b7744874bef03 Mon Sep 17 00:00:00 2001
+From: Andrew Scott <atscott01@gmail.com>
+Date: Mon, 11 Mar 2024 08:44:49 -0700
+Subject: [PATCH] refactor(cdk/a11y): only call currentResolve if defined
+ (#28701)
+
+Should it be possible for it to be undefined within the timeout body?
+No. But ZoneJS and test environments do weird things so it's better to
+be safe.
+---
+ src/cdk/a11y/live-announcer/live-announcer.ts | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/cdk/a11y/live-announcer/live-announcer.ts b/src/cdk/a11y/live-announcer/live-announcer.ts
+index 1dc5ac20dd93..b9ec9e6fe652 100644
+--- a/src/cdk/a11y/live-announcer/live-announcer.ts
++++ b/src/cdk/a11y/live-announcer/live-announcer.ts
+@@ -135,7 +135,9 @@ export class LiveAnnouncer implements OnDestroy {
+           this._previousTimeout = setTimeout(() => this.clear(), duration);
+         }
+ 
+-        this._currentResolve!();
++        // For some reason in tests this can be undefined
++        // Probably related to ZoneJS and every other thing that patches browser APIs in tests
++        this._currentResolve?.();
+         this._currentPromise = this._currentResolve = undefined;
+       }, 100);
+ 

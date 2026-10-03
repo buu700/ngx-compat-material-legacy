@@ -1,4 +1,5 @@
-import {getSupportedInputTypes, _supportsShadowDom} from '@angular/cdk/platform';
+import {getSupportedInputTypes} from '@angular/cdk/platform';
+import {supportsShadowDom} from '../internal/owned-shadow-dom';
 import {
   createFakeEvent,
   dispatchFakeEvent,
@@ -42,7 +43,7 @@ import {
   LegacyFloatLabelType,
 } from '@angular/material/legacy-form-field';
 import {By} from '@angular/platform-browser';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {LegacyEnabledAnimationsModule} from '../internal/testing/owned-animation-modules';
 import {Directionality, Direction} from '@angular/cdk/bidi';
 import {Subject} from 'rxjs';
 import {MatLegacyInputModule, MatLegacyInput, MAT_LEGACY_INPUT_VALUE_ACCESSOR} from './index';
@@ -1754,7 +1755,7 @@ describe('MatInput with appearance', () => {
   }));
 
   it('should calculate the outline gaps inside the shadow DOM', fakeAsync(() => {
-    if (!_supportsShadowDom()) {
+    if (!supportsShadowDom()) {
       return;
     }
 
@@ -1885,7 +1886,7 @@ function createComponent<T>(
       FormsModule,
       MatLegacyFormFieldModule,
       MatLegacyInputModule,
-      BrowserAnimationsModule,
+      LegacyEnabledAnimationsModule,
       ReactiveFormsModule,
       ...imports,
     ],

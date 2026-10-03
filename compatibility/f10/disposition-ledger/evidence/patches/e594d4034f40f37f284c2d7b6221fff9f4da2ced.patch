@@ -1,0 +1,189 @@
+From e594d4034f40f37f284c2d7b6221fff9f4da2ced Mon Sep 17 00:00:00 2001
+From: Yogeshwaran C <84272111+yogeshwaran-c@users.noreply.github.com>
+Date: Wed, 25 Mar 2026 19:31:12 +0530
+Subject: [PATCH] docs(cdk): use inject() and remove unnecessary module
+ references (#32830)
+
+Update CDK documentation to use the inject() function instead of
+constructor injection, and remove misleading module import requirements
+for services that are providedIn: 'root' (LiveAnnouncer, Clipboard,
+MediaMatcher, BreakpointObserver). Also replace A11yModule references
+with direct directive import guidance for CdkTrapFocus.
+---
+ src/cdk/a11y/a11y.md                          |  9 +++++----
+ src/cdk/a11y/focus-trap/focus-trap.md         |  2 +-
+ src/cdk/a11y/live-announcer/live-announcer.md | 10 +++++-----
+ src/cdk/clipboard/clipboard.md                |  6 +++---
+ src/cdk/layout/breakpoints-observer.md        | 12 ++++++------
+ src/cdk/layout/layout.md                      |  5 ++---
+ src/cdk/layout/media-matcher.md               | 18 ++++++++++--------
+ 7 files changed, 32 insertions(+), 30 deletions(-)
+
+diff --git a/src/cdk/a11y/a11y.md b/src/cdk/a11y/a11y.md
+index ac989804d0aa..b436a1820b2c 100644
+--- a/src/cdk/a11y/a11y.md
++++ b/src/cdk/a11y/a11y.md
+@@ -87,7 +87,7 @@ be used to create accessible experience for components like
+ [modal dialogs](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/), where focus must be
+ constrained.
+ 
+-This directive is declared in `A11yModule`.
++Import `CdkTrapFocus` in your component to use this directive.
+ 
+ #### Example
+ 
+@@ -139,10 +139,11 @@ for more information on aria-live regions.
+ ```ts
+ @Component({...})
+ export class MyComponent {
++  private liveAnnouncer = inject(LiveAnnouncer);
+ 
+- constructor(liveAnnouncer: LiveAnnouncer) {
+-   liveAnnouncer.announce("Hey Google");
+- }
++  announceMessage() {
++    this.liveAnnouncer.announce("Hey Google");
++  }
+ }
+ ```
+ 
+diff --git a/src/cdk/a11y/focus-trap/focus-trap.md b/src/cdk/a11y/focus-trap/focus-trap.md
+index 8269c5979d93..4379836fbebf 100644
+--- a/src/cdk/a11y/focus-trap/focus-trap.md
++++ b/src/cdk/a11y/focus-trap/focus-trap.md
+@@ -5,7 +5,7 @@ be used to create accessible experience for components like
+ [modal dialogs](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/), where focus must be
+ constrained.
+ 
+-This directive is declared in `A11yModule`.
++Import `CdkTrapFocus` in your component to use this directive.
+ 
+ #### Example
+ 
+diff --git a/src/cdk/a11y/live-announcer/live-announcer.md b/src/cdk/a11y/live-announcer/live-announcer.md
+index c58adaa6f9f1..2068bb56c503 100644
+--- a/src/cdk/a11y/live-announcer/live-announcer.md
++++ b/src/cdk/a11y/live-announcer/live-announcer.md
+@@ -10,16 +10,16 @@ Announce the given message via aria-live region. The politeness argument determi
+ `aria-live` attribute on the announcer element, defaulting to 'polite'.
+ 
+ #### Examples
+-The LiveAnnouncer is injected into a component:
++The `LiveAnnouncer` is injected into a component:
+ ```ts
+ @Component({
+-  selector: 'my-component'
+-  providers: [LiveAnnouncer]
++  selector: 'my-component',
+ })
+ export class MyComponent {
++  private liveAnnouncer = inject(LiveAnnouncer);
+ 
+-  constructor(liveAnnouncer: LiveAnnouncer) {
+-    liveAnnouncer.announce("Hey Google");
++  announceMessage() {
++    this.liveAnnouncer.announce("Hey Google");
+   }
+ }
+ ```
+diff --git a/src/cdk/clipboard/clipboard.md b/src/cdk/clipboard/clipboard.md
+index d1217a0349b7..82ac543ae136 100644
+--- a/src/cdk/clipboard/clipboard.md
++++ b/src/cdk/clipboard/clipboard.md
+@@ -21,7 +21,7 @@ directly to place it on the clipboard.
+ import {Clipboard} from '@angular/cdk/clipboard';
+ 
+ class HeroProfile {
+-  constructor(private clipboard: Clipboard) {}
++  private clipboard = inject(Clipboard);
+ 
+   copyHeroName() {
+     this.clipboard.copy('Alphonso');
+@@ -39,9 +39,9 @@ the text that was buffered. Please note, if you call `beginCopy`, you must clean
+ import {Clipboard} from '@angular/cdk/clipboard';
+ 
+ class HeroProfile {
+-  lifetimeAchievements: string;
++  private clipboard = inject(Clipboard);
+ 
+-  constructor(private clipboard: Clipboard) {}
++  lifetimeAchievements: string;
+ 
+   copyAchievements() {
+     const pending = this.clipboard.beginCopy(this.lifetimeAchievements);
+diff --git a/src/cdk/layout/breakpoints-observer.md b/src/cdk/layout/breakpoints-observer.md
+index c5dfc710b58b..d8156e437a4c 100644
+--- a/src/cdk/layout/breakpoints-observer.md
++++ b/src/cdk/layout/breakpoints-observer.md
+@@ -1,7 +1,7 @@
+-### BreakpointsModule
++### BreakpointObserver
+ 
+-When including the CDK's `LayoutModule`, components can inject `BreakpointsObserver` to request
+-the matching state of a CSS Media Query.
++`BreakpointObserver` is an injectable service that lets you evaluate media queries to determine
++the current screen size and react to changes when the viewport size crosses a breakpoint.
+ 
+ A set of breakpoints is provided based on the Material Design
+ [breakpoint system](https://material.io/guidelines/layout/responsive-ui.html#responsive-ui-breakpoints).
+@@ -10,10 +10,10 @@ A set of breakpoints is provided based on the Material Design
+ ```ts
+ @Component({ ... })
+ export class MyWidget {
+-  isHandset: Observable<BreakpointState>;
++  private breakpointObserver = inject(BreakpointObserver);
+ 
+-  constructor(bm: BreakpointObserver) {
+-    bm.observe(Handset).subscribe((state: BreakpointState) => {
++  constructor() {
++    this.breakpointObserver.observe(Handset).subscribe((state: BreakpointState) => {
+       if (state.matches) {
+         this.makeEverythingFitOnSmallScreen();
+       } else {
+diff --git a/src/cdk/layout/layout.md b/src/cdk/layout/layout.md
+index 888476bfc40a..adbb2c711c55 100644
+--- a/src/cdk/layout/layout.md
++++ b/src/cdk/layout/layout.md
+@@ -79,8 +79,7 @@ The `matchMedia` method can be used to get a native
+ ```ts
+ @Component({...})
+ class MyComponent {
+-  constructor(mediaMatcher: MediaMatcher) {
+-    const mediaQueryList = mediaMatcher.matchMedia('(min-width: 1px)');
+-  }
++  private mediaMatcher = inject(MediaMatcher);
++  private mediaQueryList = this.mediaMatcher.matchMedia('(min-width: 1px)');
+ }
+ ```
+diff --git a/src/cdk/layout/media-matcher.md b/src/cdk/layout/media-matcher.md
+index 6e071b5bd226..6dd2ba38dc75 100644
+--- a/src/cdk/layout/media-matcher.md
++++ b/src/cdk/layout/media-matcher.md
+@@ -1,17 +1,19 @@
+ ### MediaMatcher
+- 
+-When including the CDK's `LayoutModule`, components can inject `MediaMatcher` to access the 
+-matchMedia method, if available on the platform.
++
++`MediaMatcher` is an injectable service that provides access to the `matchMedia` method, if
++available on the platform.
+ 
+ #### Example
+ ```ts
+-@Component({ ... }) 
+-export class MyWidget {  
+-  constructor(mm: MediaMatcher) {
+-    mm.matchMedia('(orientation: landscape)').matches ? 
++@Component({ ... })
++export class MyWidget {
++  private mediaMatcher = inject(MediaMatcher);
++
++  checkOrientation() {
++    this.mediaMatcher.matchMedia('(orientation: landscape)').matches ?
+       this.setLandscapeMode() :
+       this.setPortraitMode();
+   }
+-}  
++}
+ ```
+ 

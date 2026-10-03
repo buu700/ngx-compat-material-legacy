@@ -21,7 +21,7 @@ import {
   dispatchMouseEvent,
   MockNgZone,
   patchElementFocus,
-} from '@angular/cdk/testing/private';
+} from '../internal/testing/owned-test-events';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -40,7 +40,7 @@ import {
 import {ComponentFixture, fakeAsync, flush, TestBed, tick} from '@angular/core/testing';
 import {MatRipple} from '@angular/material/core';
 import {By} from '@angular/platform-browser';
-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {LegacyNoopAnimationsModule} from '../internal/testing/owned-animation-modules';
 import {Subject} from 'rxjs';
 import {
   MAT_MENU_DEFAULT_OPTIONS,
@@ -64,7 +64,7 @@ describe('MatMenu', () => {
     declarations: any[] = [],
   ): ComponentFixture<T> {
     TestBed.configureTestingModule({
-      imports: [MatLegacyMenuModule, NoopAnimationsModule],
+      imports: [MatLegacyMenuModule, LegacyNoopAnimationsModule],
       declarations: [component, ...declarations],
       providers,
     }).compileComponents();
@@ -2673,7 +2673,7 @@ describe('MatMenu', () => {
 describe('MatMenu default overrides', () => {
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [MatLegacyMenuModule, NoopAnimationsModule],
+      imports: [MatLegacyMenuModule, LegacyNoopAnimationsModule],
       declarations: [SimpleMenu, FakeIcon],
       providers: [
         {

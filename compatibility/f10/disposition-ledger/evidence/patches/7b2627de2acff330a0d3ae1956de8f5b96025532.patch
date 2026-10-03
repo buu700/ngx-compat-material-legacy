@@ -1,0 +1,215 @@
+From 7b2627de2acff330a0d3ae1956de8f5b96025532 Mon Sep 17 00:00:00 2001
+From: Karl Seamon <bannanafiend@gmail.com>
+Date: Mon, 5 Jan 2026 16:13:40 -0500
+Subject: [PATCH] fix(material/menu): Do not open the menu when trigger is
+ aria-disabled (properly handle disabledInteractive) (#32601)
+
+---
+ src/dev-app/menu/menu-demo.html        | 49 +++++++++++++++++++-------
+ src/material/menu/BUILD.bazel          |  1 +
+ src/material/menu/menu-trigger-base.ts | 13 +++++++
+ src/material/menu/menu.spec.ts         | 34 +++++++++++++++++-
+ 4 files changed, 84 insertions(+), 13 deletions(-)
+
+diff --git a/src/dev-app/menu/menu-demo.html b/src/dev-app/menu/menu-demo.html
+index d4cc3801ed01..6f42f60caa10 100644
+--- a/src/dev-app/menu/menu-demo.html
++++ b/src/dev-app/menu/menu-demo.html
+@@ -105,9 +105,7 @@
+     </mat-menu>
+   </div>
+   <div class="demo-menu-section">
+-    <p>
+-      Position x: before
+-    </p>
++    <p>Position x: before</p>
+     <mat-toolbar class="demo-end-icon">
+       <button matIconButton [matMenuTriggerFor]="posXMenu" aria-label="Open x-positioned menu">
+         <mat-icon>more_vert</mat-icon>
+@@ -124,9 +122,7 @@
+     </mat-menu>
+   </div>
+   <div class="demo-menu-section">
+-    <p>
+-      Position y: above
+-    </p>
++    <p>Position y: above</p>
+     <mat-toolbar>
+       <button matIconButton [matMenuTriggerFor]="posYMenu" aria-label="Open y-positioned menu">
+         <mat-icon>more_vert</mat-icon>
+@@ -158,9 +154,7 @@
+     </mat-menu>
+   </div>
+   <div class="demo-menu-section">
+-    <p>
+-      Position x: before, overlapTrigger: true
+-    </p>
++    <p>Position x: before, overlapTrigger: true</p>
+     <mat-toolbar class="demo-end-icon">
+       <button matIconButton [mat-menu-trigger-for]="posXMenuOverlay">
+         <mat-icon>more_vert</mat-icon>
+@@ -177,9 +171,7 @@
+     </mat-menu>
+   </div>
+   <div class="demo-menu-section">
+-    <p>
+-      Position y: above, overlapTrigger: true
+-    </p>
++    <p>Position y: above, overlapTrigger: true</p>
+     <mat-toolbar>
+       <button matIconButton [mat-menu-trigger-for]="posYMenuOverlay">
+         <mat-icon>more_vert</mat-icon>
+@@ -192,6 +184,39 @@
+       }
+     </mat-menu>
+   </div>
++  <div class="demo-menu-section">
++    <p>disabledInteractive (should not open)</p>
++    <mat-toolbar>
++      <button
++        disabled
++        [disabledInteractive]="true"
++        matIconButton
++        [mat-menu-trigger-for]="disabledInteractiveMenu"
++      >
++        <mat-icon>more_vert</mat-icon>
++      </button>
++    </mat-toolbar>
++
++    <mat-menu #disabledInteractiveMenu="matMenu">
++      @for (item of items; track item) {
++        <button mat-menu-item [disabled]="item.disabled">{{ item.text }}</button>
++      }
++    </mat-menu>
++  </div>
++  <div class="demo-menu-section">
++    <p>vanilla button disabled binding</p>
++    <mat-toolbar>
++      <button [disabled]="true" [mat-menu-trigger-for]="disabledInteractiveMenu">
++        <mat-icon>more_vert</mat-icon>
++      </button>
++    </mat-toolbar>
++
++    <mat-menu #disabledInteractiveMenu="matMenu">
++      @for (item of items; track item) {
++        <button mat-menu-item [disabled]="item.disabled">{{ item.text }}</button>
++      }
++    </mat-menu>
++  </div>
+ </div>
+ 
+ <div class="demo-context-menu-area" [matContextMenuTriggerFor]="contextMenu">
+diff --git a/src/material/menu/BUILD.bazel b/src/material/menu/BUILD.bazel
+index 4fb81fba46b5..9b8ab63420f1 100644
+--- a/src/material/menu/BUILD.bazel
++++ b/src/material/menu/BUILD.bazel
+@@ -111,6 +111,7 @@ ng_project(
+         "//src/cdk/overlay",
+         "//src/cdk/scrolling",
+         "//src/cdk/testing/private",
++        "//src/material/button",
+         "//src/material/core",
+     ],
+ )
+diff --git a/src/material/menu/menu-trigger-base.ts b/src/material/menu/menu-trigger-base.ts
+index efdf997a3b88..1519ceeccd4d 100644
+--- a/src/material/menu/menu-trigger-base.ts
++++ b/src/material/menu/menu-trigger-base.ts
+@@ -22,6 +22,7 @@ import {
+ } from '@angular/cdk/overlay';
+ import {TemplatePortal} from '@angular/cdk/portal';
+ import {
++  booleanAttribute,
+   ChangeDetectorRef,
+   Directive,
+   ElementRef,
+@@ -191,6 +192,10 @@ export abstract class MatMenuTriggerBase implements OnDestroy {
+ 
+   /** Internal method to open menu providing option to auto focus on first item. */
+   protected _openMenu(autoFocus: boolean): void {
++    if (this._triggerIsAriaDisabled()) {
++      return;
++    }
++
+     const menu = this._menu;
+ 
+     if (this._menuOpen || !menu) {
+@@ -477,4 +482,12 @@ export abstract class MatMenuTriggerBase implements OnDestroy {
+   private _ownsMenu(menu: MatMenuPanel): boolean {
+     return PANELS_TO_TRIGGERS.get(menu) === this;
+   }
++
++  /**
++   * Detect if the trigger element is aria-disabled, indicating it should behave as
++   * disabled and not open the menu.
++   */
++  private _triggerIsAriaDisabled() {
++    return booleanAttribute(this._element.nativeElement.getAttribute('aria-disabled'));
++  }
+ }
+diff --git a/src/material/menu/menu.spec.ts b/src/material/menu/menu.spec.ts
+index 28a0d50fd10e..14c1ecb99d97 100644
+--- a/src/material/menu/menu.spec.ts
++++ b/src/material/menu/menu.spec.ts
+@@ -42,6 +42,7 @@ import {
+   provideFakeDirectionality,
+ } from '../../cdk/testing/private';
+ import {MATERIAL_ANIMATIONS, MatRipple} from '../core';
++import {MatButton} from '@angular/material/button';
+ import {MatMenu, MatMenuItem} from './index';
+ import {
+   MAT_MENU_DEFAULT_OPTIONS,
+@@ -1279,6 +1280,23 @@ describe('MatMenu', () => {
+     }));
+   });
+ 
++  it('does not open if the trigger element is disabled (including disabledInteractive)', fakeAsync(() => {
++    const fixture = TestBed.createComponent(DisabledMenu);
++    fixture.detectChanges();
++
++    const trigger = fixture.componentInstance.triggerEl.nativeElement;
++    trigger.click();
++    fixture.detectChanges();
++    tick(500);
++    expect(overlayContainerElement.querySelector('.mat-mdc-menu-panel [mat-menu-item]')).toBeNull();
++
++    dispatchKeyboardEvent(trigger, 'keydown', ENTER);
++    trigger.click();
++    fixture.detectChanges();
++    tick(500);
++    expect(overlayContainerElement.querySelector('.mat-mdc-menu-panel [mat-menu-item]')).toBeNull();
++  }));
++
+   describe('positions', () => {
+     let fixture: ComponentFixture<PositionedMenu>;
+     let trigger: HTMLElement;
+@@ -2634,6 +2652,20 @@ class SimpleMenu {
+ })
+ class SimpleMenuOnPush extends SimpleMenu {}
+ 
++@Component({
++  template: `
++    <button mat-button disabled [disabledInteractive]="true"
++        [matMenuTriggerFor]="menu" #triggerEl>Toggle menu</button>
++    <mat-menu #menu="matMenu">
++      <button mat-menu-item> Action! </button>
++    </mat-menu>
++  `,
++  imports: [MatButton, MatMenuTrigger, MatMenu, MatMenuItem],
++})
++class DisabledMenu {
++  @ViewChild('triggerEl', {read: ElementRef}) triggerEl!: ElementRef<HTMLElement>;
++}
++
+ @Component({
+   template: `
+     <button [matMenuTriggerFor]="menu" #triggerEl>Toggle menu</button>
+@@ -2666,7 +2698,7 @@ interface TestableMenu {
+ class OverlapMenu implements TestableMenu {
+   @Input() overlapTrigger: boolean = false;
+   @ViewChild(MatMenuTrigger) trigger!: MatMenuTrigger;
+-  @ViewChild('triggerEl') triggerEl!: ElementRef<HTMLElement>;
++  @ViewChild('triggerEl', {read: ElementRef}) triggerEl!: ElementRef<HTMLElement>;
+ }
+ 
+ @Component({

@@ -1,0 +1,80 @@
+From b423c0e0b754b1f1d118d17e022981c357c3aa68 Mon Sep 17 00:00:00 2001
+From: Miles Malerba <mmalerba@google.com>
+Date: Thu, 17 Aug 2023 10:58:15 -0700
+Subject: [PATCH] fix(material/datepicker): deprecate constructor injection in
+ NativeDateAdapter (#26144)
+
+BREAKING CHANGE: `NativeDateAdapter` no longer takes `Platform` in its
+constructor. It also now uses the `inject` function, and therefore
+cannot be instantiated directly (must go through Angular's DI system
+instead).
+---
+ .../core/datetime/native-date-adapter.ts       | 18 +++++++++++-------
+ tools/public_api_guard/material/core.md        |  6 +++---
+ 2 files changed, 14 insertions(+), 10 deletions(-)
+
+diff --git a/src/material/core/datetime/native-date-adapter.ts b/src/material/core/datetime/native-date-adapter.ts
+index abdaf3cd6db7..dd73203450fe 100644
+--- a/src/material/core/datetime/native-date-adapter.ts
++++ b/src/material/core/datetime/native-date-adapter.ts
+@@ -6,8 +6,7 @@
+  * found in the LICENSE file at https://angular.io/license
+  */
+ 
+-import {Platform} from '@angular/cdk/platform';
+-import {Inject, Injectable, Optional} from '@angular/core';
++import {inject, Inject, Injectable, Optional} from '@angular/core';
+ import {DateAdapter, MAT_DATE_LOCALE} from './date-adapter';
+ 
+ /**
+@@ -36,16 +35,21 @@ export class NativeDateAdapter extends DateAdapter<Date> {
+    */
+   useUtcForDisplay: boolean = false;
+ 
++  /** The injected locale. */
++  private readonly _matDateLocale = inject(MAT_DATE_LOCALE, {optional: true});
++
+   constructor(
+-    @Optional() @Inject(MAT_DATE_LOCALE) matDateLocale: string,
+     /**
+-     * @deprecated No longer being used. To be removed.
+-     * @breaking-change 14.0.0
++     * @deprecated Now injected via inject(), param to be removed.
++     * @breaking-change 18.0.0
+      */
+-    _platform?: Platform,
++    @Optional() @Inject(MAT_DATE_LOCALE) matDateLocale?: string,
+   ) {
+     super();
+-    super.setLocale(matDateLocale);
++    if (matDateLocale !== undefined) {
++      this._matDateLocale = matDateLocale;
++    }
++    super.setLocale(this._matDateLocale);
+   }
+ 
+   getYear(date: Date): number {
+diff --git a/tools/public_api_guard/material/core.md b/tools/public_api_guard/material/core.md
+index 880c0f6d8177..58b40bed13c1 100644
+--- a/tools/public_api_guard/material/core.md
++++ b/tools/public_api_guard/material/core.md
+@@ -429,8 +429,8 @@ export function mixinTabIndex<T extends _AbstractConstructor<CanDisable>>(base:
+ 
+ // @public
+ export class NativeDateAdapter extends DateAdapter<Date> {
+-    constructor(matDateLocale: string,
+-    _platform?: Platform);
++    constructor(
++    matDateLocale?: string);
+     // (undocumented)
+     addCalendarDays(date: Date, days: number): Date;
+     // (undocumented)
+@@ -479,7 +479,7 @@ export class NativeDateAdapter extends DateAdapter<Date> {
+     // @deprecated (undocumented)
+     useUtcForDisplay: boolean;
+     // (undocumented)
+-    static ɵfac: i0.ɵɵFactoryDeclaration<NativeDateAdapter, [{ optional: true; }, null]>;
++    static ɵfac: i0.ɵɵFactoryDeclaration<NativeDateAdapter, [{ optional: true; }]>;
+     // (undocumented)
+     static ɵprov: i0.ɵɵInjectableDeclaration<NativeDateAdapter>;
+ }

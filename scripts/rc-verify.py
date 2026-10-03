@@ -757,8 +757,8 @@ def main() -> int:
     write_check_report(
         out_dir, run_id, line, "source-policy", exit_code=code,
         limitations=[
-            "Authored animations imports, private namespace members, and deep internal modules remain.",
-            "Installed peer annotation comparison is unknown unless declaration files are present, and a clean packed digest does not erase authored failures.",
+            "Installed peer annotation comparison is unknown unless declaration files from node_modules/@angular are present.",
+            "Owned helpers replace animations-module imports, deep private modules, and underscore platform imports. A packed digest is still scanned separately.",
         ],
     )
     results["source-policy"] = "pass" if code == 0 else "fail"
@@ -766,14 +766,14 @@ def main() -> int:
 
     code = run_node(
         "scripts/check-dependency-eligibility.py",
-        ["--report", str(out_dir / "dependency-eligibility-observation.json")],
+        ["--lookup", "--report", str(out_dir / "dependency-eligibility-observation.json")],
     )
     write_check_report(
         out_dir, run_id, line, "dependency-eligibility", exit_code=code,
         limitations=[
-            "No advisory lookup was performed by this run. Stored http status is not a current result.",
-            "Lock packages absent from the stored direct-pin query, toolchain age, unresolved findings, and vendor advisories stay unknown.",
-            "Vendor hash and license-file observations do not clear G08, G11, or G13.",
+            "This run queries OSV and registry publish times. A non-200, stale, truncated, or missing-time result stays unknown.",
+            "HTTP 200 metadata is not security clearance. Unresolved findings and packages younger than seven days block the check.",
+            "Vendor hash and license-file observations do not clear G08, G11, or G13. g11_claim stays not-passed.",
         ],
     )
     results["dependency-eligibility"] = "pass" if code == 0 else "fail"

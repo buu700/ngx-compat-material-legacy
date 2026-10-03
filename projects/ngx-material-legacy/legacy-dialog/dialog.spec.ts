@@ -25,11 +25,11 @@ import {
   createNgModuleRef,
 } from '@angular/core';
 import {By} from '@angular/platform-browser';
-import {BrowserAnimationsModule, NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {LegacyEnabledAnimationsModule, LegacyNoopAnimationsModule} from '../internal/testing/owned-animation-modules';
 import {Location} from '@angular/common';
 import {SpyLocation} from '@angular/common/testing';
 import {Directionality} from '@angular/cdk/bidi';
-import {_supportsShadowDom} from '@angular/cdk/platform';
+import {supportsShadowDom} from '../internal/owned-shadow-dom';
 import {MatLegacyDialogContainer} from './dialog-container';
 import {OverlayContainer, ScrollStrategy, Overlay} from '@angular/cdk/overlay';
 import {ScrollDispatcher} from '@angular/cdk/scrolling';
@@ -62,7 +62,7 @@ describe('MatDialog', () => {
 
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [MatLegacyDialogModule, NoopAnimationsModule],
+      imports: [MatLegacyDialogModule, LegacyNoopAnimationsModule],
       declarations: [
         ComponentWithChildViewContainer,
         ComponentWithTemplateRef,
@@ -1344,7 +1344,7 @@ describe('MatDialog', () => {
     }));
 
     it('should re-focus trigger element inside the shadow DOM when dialog closes', fakeAsync(() => {
-      if (!_supportsShadowDom()) {
+      if (!supportsShadowDom()) {
         return;
       }
 
@@ -1851,7 +1851,7 @@ describe('MatDialog with a parent MatDialog', () => {
 
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [MatLegacyDialogModule, NoopAnimationsModule],
+      imports: [MatLegacyDialogModule, LegacyNoopAnimationsModule],
       declarations: [ComponentThatProvidesMatDialog, DirectiveWithViewContainer],
       providers: [
         {
@@ -1967,7 +1967,7 @@ describe('MatDialog with default options', () => {
     };
 
     TestBed.configureTestingModule({
-      imports: [MatLegacyDialogModule, NoopAnimationsModule],
+      imports: [MatLegacyDialogModule, LegacyNoopAnimationsModule],
       providers: [{provide: MAT_LEGACY_DIALOG_DEFAULT_OPTIONS, useValue: defaultConfig}],
       declarations: [ComponentWithChildViewContainer, DirectiveWithViewContainer],
     });
@@ -2038,7 +2038,7 @@ describe('MatDialog with animations enabled', () => {
 
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [MatLegacyDialogModule, BrowserAnimationsModule],
+      imports: [MatLegacyDialogModule, LegacyEnabledAnimationsModule],
       declarations: [ComponentWithChildViewContainer, DirectiveWithViewContainer],
     });
 
@@ -2086,7 +2086,7 @@ describe('MatDialog with explicit injector provided', () => {
 
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [MatLegacyDialogModule, BrowserAnimationsModule],
+      imports: [MatLegacyDialogModule, LegacyEnabledAnimationsModule],
       declarations: [ModuleBoundDialogParentComponent],
     });
 

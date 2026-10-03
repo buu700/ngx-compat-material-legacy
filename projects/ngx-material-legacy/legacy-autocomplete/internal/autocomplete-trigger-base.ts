@@ -30,7 +30,7 @@ import {DOCUMENT} from '@angular/common';
 import {Directionality} from '@angular/cdk/bidi';
 import {BooleanInput, coerceBooleanProperty} from '@angular/cdk/coercion';
 import {DOWN_ARROW, ENTER, ESCAPE, TAB, UP_ARROW, hasModifierKey} from '@angular/cdk/keycodes';
-import {_getFocusedElementPierceShadowDom} from '@angular/cdk/platform';
+import {focusedElementPierceShadowDom} from '../../internal/owned-shadow-dom';
 import {legacyGetEventTarget} from '@ngx-compat/material-legacy/legacy-core';
 import {TemplatePortal} from '@angular/cdk/portal';
 import {ViewportRuler} from '@angular/cdk/scrolling';
@@ -508,7 +508,7 @@ export abstract class _MatAutocompleteTriggerBase
 
   /** Whether the input currently has focus (pierces shadow DOM). */
   private _hasFocus(): boolean {
-    return _getFocusedElementPierceShadowDom() === this._element.nativeElement;
+    return focusedElementPierceShadowDom() === this._element.nativeElement;
   }
 
   _handleFocus(): void {

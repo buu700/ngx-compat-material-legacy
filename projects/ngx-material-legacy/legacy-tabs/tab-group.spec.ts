@@ -10,7 +10,7 @@ import {
   flush,
 } from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
-import {BrowserAnimationsModule, NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {LegacyEnabledAnimationsModule, LegacyNoopAnimationsModule} from '../internal/testing/owned-animation-modules';
 import {CommonModule} from '@angular/common';
 import {Observable} from 'rxjs';
 import {
@@ -25,7 +25,7 @@ import {MatLegacyTabHeaderPosition} from '@angular/material/legacy-tabs';
 describe('MatTabGroup', () => {
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [MatLegacyTabsModule, CommonModule, NoopAnimationsModule],
+      imports: [MatLegacyTabsModule, CommonModule, LegacyNoopAnimationsModule],
       declarations: [
         SimpleTabsTestApp,
         SimpleDynamicTabsTestApp,
@@ -960,7 +960,7 @@ describe('MatTabNavBar with a default config', () => {
 
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [MatLegacyTabsModule, BrowserAnimationsModule],
+      imports: [MatLegacyTabsModule, LegacyEnabledAnimationsModule],
       declarations: [SimpleTabsTestApp],
       providers: [{provide: MAT_LEGACY_TABS_CONFIG, useValue: {dynamicHeight: true}}],
     });
@@ -981,7 +981,7 @@ describe('MatTabNavBar with a default config', () => {
 describe('nested MatTabGroup with enabled animations', () => {
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [MatLegacyTabsModule, BrowserAnimationsModule],
+      imports: [MatLegacyTabsModule, LegacyEnabledAnimationsModule],
       declarations: [NestedTabs, TabsWithCustomAnimationDuration],
     });
 

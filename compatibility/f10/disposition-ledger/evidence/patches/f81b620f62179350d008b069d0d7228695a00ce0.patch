@@ -1,0 +1,469 @@
+From f81b620f62179350d008b069d0d7228695a00ce0 Mon Sep 17 00:00:00 2001
+From: Paul Gschwendtner <paulgschwendtner@gmail.com>
+Date: Wed, 9 Apr 2025 18:40:50 +0200
+Subject: [PATCH] build: switch karma tests to `rules_browsers` (#30820)
+
+* build: switch karma tests to `rules_browsers`
+
+Switches Karma tests to our new browser testing ruleset, that is using
+much more recent browser versions, and a more up-to-date future-proof
+test runner called `@web/test-runner`; that is also one of the options
+for Angular CLI.
+
+Also updates the browsers because now we are using Puppeteer, yay! this
+should allow us to stay up-to-date much easier!
+
+* build: speed up legacy tests bundle
+
+I've noticed a speed up from 4min to like 30seconds that way.
+Sass also recommends the sync variant.
+---
+ WORKSPACE                                     | 22 +++++++++---
+ scripts/create-legacy-tests-bundle.mjs        | 35 ++++++++++---------
+ src/BUILD.bazel                               | 10 +++---
+ .../a11y/key-manager/list-key-manager.spec.ts | 30 +++++++++-------
+ src/cdk/testing/tests/webdriver-test.bzl      |  6 ++--
+ src/cdk/testing/tests/webdriver.e2e.spec.ts   |  2 +-
+ test/BUILD.bazel                              |  4 ++-
+ ...test-init-spec.ts => angular-test.init.ts} |  4 +++
+ test/karma.conf.js                            | 15 --------
+ tools/defaults.bzl                            | 26 ++++----------
+ tools/defaults2.bzl                           | 27 +++++---------
+ 11 files changed, 86 insertions(+), 95 deletions(-)
+ rename test/{angular-test-init-spec.ts => angular-test.init.ts} (93%)
+
+diff --git a/WORKSPACE b/WORKSPACE
+index 371d8a2690f5..86e1d2a59262 100644
+--- a/WORKSPACE
++++ b/WORKSPACE
+@@ -65,9 +65,9 @@ build_bazel_rules_nodejs_dependencies()
+ 
+ http_archive(
+     name = "aspect_rules_js",
+-    sha256 = "75c25a0f15a9e4592bbda45b57aa089e4bf17f9176fd735351e8c6444df87b52",
+-    strip_prefix = "rules_js-2.1.0",
+-    url = "https://github.com/aspect-build/rules_js/releases/download/v2.1.0/rules_js-v2.1.0.tar.gz",
++    sha256 = "3388abe9b9728ef68ea8d8301f932b11b2c9a271d74741ddd5f3b34d1db843ac",
++    strip_prefix = "rules_js-2.1.1",
++    url = "https://github.com/aspect-build/rules_js/releases/download/v2.1.1/rules_js-v2.1.1.tar.gz",
+ )
+ 
+ load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
+@@ -249,7 +249,7 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+ 
+ git_repository(
+     name = "devinfra",
+-    commit = "e4bf37af223483ce00f9316d227fd62cd744dc4b",
++    commit = "b45dfa77df2021b23eeda5928ca6cd8bb89b21e7",
+     remote = "https://github.com/angular/dev-infra.git",
+ )
+ 
+@@ -299,3 +299,17 @@ esbuild_register_toolchains(
+     name = "esbuild",
+     esbuild_version = LATEST_ESBUILD_VERSION,
+ )
++
++git_repository(
++    name = "rules_browsers",
++    commit = "7e23dc705680369a323f520909d3984ae794965e",
++    remote = "https://github.com/devversion/rules_browsers.git",
++)
++
++load("@rules_browsers//setup:step_1.bzl", "rules_browsers_setup_1")
++
++rules_browsers_setup_1()
++
++load("@rules_browsers//setup:step_2.bzl", "rules_browsers_setup_2")
++
++rules_browsers_setup_2()
+diff --git a/scripts/create-legacy-tests-bundle.mjs b/scripts/create-legacy-tests-bundle.mjs
+index 061037c20448..6d0a8ebd4bf2 100644
+--- a/scripts/create-legacy-tests-bundle.mjs
++++ b/scripts/create-legacy-tests-bundle.mjs
+@@ -7,7 +7,7 @@ import fs from 'fs';
+ import glob from 'glob';
+ import module from 'module';
+ import {dirname, join, relative} from 'path';
+-import sass from 'sass';
++import * as sass from 'sass';
+ import url from 'url';
+ import tsNode from 'ts-node';
+ 
+@@ -65,6 +65,7 @@ async function main() {
+     format: 'iife',
+     target: 'es2015',
+     outfile: outFile,
++    treeShaking: false,
+     plugins: [esbuildResolvePlugin, esbuildLinkerPlugin],
+     stdin: {contents: specEntryPointFile, resolveDir: projectDir},
+   });
+@@ -85,22 +86,26 @@ async function main() {
+  */
+ async function compileSassFiles() {
+   const sassFiles = glob.sync('src/**/!(_*|theme).scss', {cwd: projectDir, absolute: true});
+-  const sassTasks = [];
++  const writeTasks = [];
+ 
++  let count = 0;
+   for (const file of sassFiles) {
+     const outRelativePath = relative(projectDir, file).replace(/\.scss$/, '.css');
+     const outPath = join(projectDir, outRelativePath);
+-    const task = renderSassFileAsync(file).then(async content => {
++    const content = renderSassFile(file).css;
++
++    count++;
++    console.error(`Compiled ${count}/${sassFiles.length} files`);
++
++    writeTasks.push(async () => {
+       console.info('Compiled, now writing:', outRelativePath);
+       await fs.promises.mkdir(dirname(outPath), {recursive: true});
+       await fs.promises.writeFile(outPath, content);
+     });
+-
+-    sassTasks.push(task);
+   }
+ 
+-  // Wait for all Sass compilations to finish.
+-  await Promise.all(sassTasks);
++  // Start all writes and wait for them to finish.
++  await Promise.all(writeTasks.map(task => task()));
+ }
+ 
+ /**
+@@ -131,7 +136,7 @@ async function compileProjectWithNgtsc() {
+ async function createEntryPointSpecFile() {
+   const testFiles = glob.sync('**/*.spec.js', {absolute: true, cwd: legacyOutputDir});
+ 
+-  let specEntryPointFile = `import './test/angular-test-init-spec.ts';`;
++  let specEntryPointFile = `import './test/angular-test.init.ts';`;
+   let i = 0;
+   const testNamespaces = [];
+ 
+@@ -155,14 +160,12 @@ async function createEntryPointSpecFile() {
+   return specEntryPointFile;
+ }
+ 
+-/** Helper function to render a Sass file asynchronously using promises. */
+-async function renderSassFileAsync(inputFile) {
+-  return sass
+-    .compileAsync(inputFile, {
+-      loadPaths: [nodeModulesDir, projectDir],
+-      importers: [localPackageSassImporter],
+-    })
+-    .then(result => result.css);
++/** Helper function to render a Sass file. */
++function renderSassFile(inputFile) {
++  return sass.compile(inputFile, {
++    loadPaths: [nodeModulesDir, projectDir],
++    importers: [localPackageSassImporter],
++  });
+ }
+ 
+ /**
+diff --git a/src/BUILD.bazel b/src/BUILD.bazel
+index 7fc1547649d3..ce3549ed1771 100644
+--- a/src/BUILD.bazel
++++ b/src/BUILD.bazel
+@@ -49,11 +49,11 @@ dgeni_api_docs(
+         # Add all Angular packages to the sources because some Material exports use
+         # Angular exports and these should not cause any warnings when Dgeni uses the
+         # type checker to parse our TypeScript sources.
+-        "@npm//@angular/core",
+-        "@npm//@angular/common",
+-        "@npm//@angular/forms",
+-        "@npm//@angular/animations",
+-        "@npm//@angular/platform-browser",
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/common",
++        "//:node_modules/@angular/forms",
++        "//:node_modules/@angular/animations",
++        "//:node_modules/@angular/platform-browser",
+     ],
+     entry_points = {
+         "cdk": cdkApiEntryPoints,
+diff --git a/src/cdk/a11y/key-manager/list-key-manager.spec.ts b/src/cdk/a11y/key-manager/list-key-manager.spec.ts
+index 51821330ed06..e40f5aae1c12 100644
+--- a/src/cdk/a11y/key-manager/list-key-manager.spec.ts
++++ b/src/cdk/a11y/key-manager/list-key-manager.spec.ts
+@@ -272,34 +272,40 @@ describe('Key managers', () => {
+         });
+       });
+ 
+-      describe('with `vertical` direction', function (this: KeyEventTestContext) {
++      describe('with `vertical` direction', () => {
++        let context: KeyEventTestContext = {} as KeyEventTestContext;
++
+         beforeEach(() => {
+           keyManager.withVerticalOrientation();
+-          this.nextKeyEvent = createKeyboardEvent('keydown', DOWN_ARROW);
+-          this.prevKeyEvent = createKeyboardEvent('keydown', UP_ARROW);
++          context.nextKeyEvent = createKeyboardEvent('keydown', DOWN_ARROW);
++          context.prevKeyEvent = createKeyboardEvent('keydown', UP_ARROW);
+         });
+ 
+-        runDirectionalKeyTests.call(this);
++        runDirectionalKeyTests.call(context);
+       });
+ 
+-      describe('with `ltr` direction', function (this: KeyEventTestContext) {
++      describe('with `ltr` direction', () => {
++        let context: KeyEventTestContext = {} as KeyEventTestContext;
++
+         beforeEach(() => {
+           keyManager.withHorizontalOrientation('ltr');
+-          this.nextKeyEvent = createKeyboardEvent('keydown', RIGHT_ARROW);
+-          this.prevKeyEvent = createKeyboardEvent('keydown', LEFT_ARROW);
++          context.nextKeyEvent = createKeyboardEvent('keydown', RIGHT_ARROW);
++          context.prevKeyEvent = createKeyboardEvent('keydown', LEFT_ARROW);
+         });
+ 
+-        runDirectionalKeyTests.call(this);
++        runDirectionalKeyTests.call(context);
+       });
+ 
+-      describe('with `rtl` direction', function (this: KeyEventTestContext) {
++      describe('with `rtl` direction', () => {
++        let context: KeyEventTestContext = {} as KeyEventTestContext;
++
+         beforeEach(() => {
+           keyManager.withHorizontalOrientation('rtl');
+-          this.nextKeyEvent = createKeyboardEvent('keydown', LEFT_ARROW);
+-          this.prevKeyEvent = createKeyboardEvent('keydown', RIGHT_ARROW);
++          context.nextKeyEvent = createKeyboardEvent('keydown', LEFT_ARROW);
++          context.prevKeyEvent = createKeyboardEvent('keydown', RIGHT_ARROW);
+         });
+ 
+-        runDirectionalKeyTests.call(this);
++        runDirectionalKeyTests.call(context);
+       });
+ 
+       /**
+diff --git a/src/cdk/testing/tests/webdriver-test.bzl b/src/cdk/testing/tests/webdriver-test.bzl
+index 22ef96c78b9e..895facd7e726 100644
+--- a/src/cdk/testing/tests/webdriver-test.bzl
++++ b/src/cdk/testing/tests/webdriver-test.bzl
+@@ -12,13 +12,13 @@ def webdriver_test(name, deps, tags = [], **kwargs):
+         tags = tags + ["manual"],
+         data = [
+             ":%s_bundle" % name,
+-            "@npm//@angular/build-tooling/bazel/browsers/chromium",
++            "@rules_browsers//src/browsers/chromium",
+         ],
+         env = {
+-            "CHROMIUM_BIN": "$(CHROMIUM)",
++            "CHROME_HEADLESS_BIN": "$(CHROME-HEADLESS-SHELL)",
+             "CHROMEDRIVER": "$(CHROMEDRIVER)",
+         },
+-        toolchains = ["@npm//@angular/build-tooling/bazel/browsers/chromium:toolchain_alias"],
++        toolchains = ["@rules_browsers//src/browsers/chromium:toolchain_alias"],
+         **kwargs
+     )
+ 
+diff --git a/src/cdk/testing/tests/webdriver.e2e.spec.ts b/src/cdk/testing/tests/webdriver.e2e.spec.ts
+index 9db630d6f068..b1629e67156f 100644
+--- a/src/cdk/testing/tests/webdriver.e2e.spec.ts
++++ b/src/cdk/testing/tests/webdriver.e2e.spec.ts
+@@ -21,7 +21,7 @@ const projectRoot = path.resolve(__dirname, '../../../');
+ const port = process.env['TEST_SERVER_PORT'];
+ 
+ const chromeDriver = path.join(projectRoot, process.env['CHROMEDRIVER']!);
+-const chromiumBin = path.join(projectRoot, process.env['CHROMIUM_BIN']!);
++const chromiumBin = path.join(projectRoot, process.env['CHROME_HEADLESS_BIN']!);
+ 
+ setDefaultService(
+   new ServiceBuilder(chromeDriver).enableVerboseLogging().loggingTo('/tmp/test.txt').build(),
+diff --git a/test/BUILD.bazel b/test/BUILD.bazel
+index 47c5b667c77c..d7f3caf8dff0 100644
+--- a/test/BUILD.bazel
++++ b/test/BUILD.bazel
+@@ -16,10 +16,12 @@ ts_project(
+     name = "angular_test_init",
+     testonly = True,
+     # This file *must* end with "spec" in order for "karma_web_test_suite" to load it.
+-    srcs = ["angular-test-init-spec.ts"],
++    srcs = ["angular-test.init.ts"],
+     tsconfig = ":tsconfig",
+     deps = [
+         "//:node_modules/@angular/core",
+         "//:node_modules/@angular/platform-browser",
++        "//:node_modules/reflect-metadata",
++        "//:node_modules/zone.js",
+     ],
+ )
+diff --git a/test/angular-test-init-spec.ts b/test/angular-test.init.ts
+similarity index 93%
+rename from test/angular-test-init-spec.ts
+rename to test/angular-test.init.ts
+index ae9b810a769c..6961b9c7effc 100644
+--- a/test/angular-test-init-spec.ts
++++ b/test/angular-test.init.ts
+@@ -6,6 +6,10 @@
+  * found in the LICENSE file at https://angular.dev/license
+  */
+ 
++import 'zone.js';
++import 'zone.js/testing';
++import 'reflect-metadata';
++
+ import {ErrorHandler, NgModule, provideExperimentalZonelessChangeDetection} from '@angular/core';
+ import {TestBed} from '@angular/core/testing';
+ import {BrowserTestingModule, platformBrowserTesting} from '@angular/platform-browser/testing';
+diff --git a/test/karma.conf.js b/test/karma.conf.js
+index 7b769afd5f49..7f6ce9a77ae4 100644
+--- a/test/karma.conf.js
++++ b/test/karma.conf.js
+@@ -29,21 +29,6 @@ module.exports = config => {
+       },
+     ],
+     files: [
+-      {pattern: 'node_modules/reflect-metadata/Reflect.js', included: true, watched: false},
+-      {pattern: 'node_modules/zone.js/bundles/zone.umd.min.js', included: true, watched: false},
+-      {pattern: 'node_modules/zone.js/bundles/proxy.umd.min.js', included: true, watched: false},
+-      {pattern: 'node_modules/zone.js/bundles/sync-test.umd.js', included: true, watched: false},
+-      {
+-        pattern: 'node_modules/zone.js/bundles/jasmine-patch.umd.min.js',
+-        included: true,
+-        watched: false,
+-      },
+-      {pattern: 'node_modules/zone.js/bundles/async-test.umd.js', included: true, watched: false},
+-      {
+-        pattern: 'node_modules/zone.js/bundles/fake-async-test.umd.js',
+-        included: true,
+-        watched: false,
+-      },
+       {
+         pattern: 'node_modules/moment/min/moment-with-locales.min.js',
+         included: false,
+diff --git a/tools/defaults.bzl b/tools/defaults.bzl
+index 9d3563e39f05..050d4efc6f8a 100644
+--- a/tools/defaults.bzl
++++ b/tools/defaults.bzl
+@@ -8,13 +8,13 @@ load("@npm//@angular/build-tooling/bazel/integration:index.bzl", _integration_te
+ load("@npm//@angular/build-tooling/bazel/esbuild:index.bzl", _esbuild = "esbuild", _esbuild_config = "esbuild_config")
+ load("@npm//@angular/build-tooling/bazel/http-server:index.bzl", _http_server = "http_server")
+ load("@npm//@angular/build-tooling/bazel:extract_js_module_output.bzl", "extract_js_module_output")
+-load("@npm//@bazel/protractor:index.bzl", _protractor_web_test_suite = "protractor_web_test_suite")
+ load("//:packages.bzl", "NO_STAMP_NPM_PACKAGE_SUBSTITUTIONS", "NPM_PACKAGE_SUBSTITUTIONS")
+ load("//:pkg-externals.bzl", "PKG_EXTERNALS")
+ load("//tools/markdown-to-html:index.bzl", _markdown_to_html = "markdown_to_html")
+ load("//tools/extract-tokens:index.bzl", _extract_tokens = "extract_tokens")
+ load("//tools/bazel:ng_package_interop.bzl", "ng_package_interop")
+ load("//tools:defaults2.bzl", "spec_bundle", _karma_web_test_suite = "karma_web_test_suite")
++load("@npm//@bazel/protractor:index.bzl", _protractor_web_test_suite = "protractor_web_test_suite")
+ 
+ npmPackageSubstitutions = select({
+     "//tools:stamp": NPM_PACKAGE_SUBSTITUTIONS,
+@@ -190,21 +190,7 @@ def node_integration_test(setup_chromium = False, node_repository = "nodejs", **
+         **kwargs
+     )
+ 
+-def ng_web_test_suite(deps = [], static_css = [], exclude_init_script = False, **kwargs):
+-    bootstrap = [
+-        # This matches the ZoneJS bundles used in default CLI projects. See:
+-        # https://github.com/angular/angular-cli/blob/main/packages/schematics/angular/application/files/src/polyfills.ts.template#L58
+-        # https://github.com/angular/angular-cli/blob/main/packages/schematics/angular/application/files/src/test.ts.template#L3
+-        # Note `zone.js/dist/zone.js` is aliased in the CLI to point to the evergreen
+-        # output that does not include legacy patches. See: https://github.com/angular/angular/issues/35157.
+-        # TODO: Consider adding the legacy patches when testing Saucelabs/Browserstack with Bazel.
+-        # CLI loads the legacy patches conditionally for ES5 legacy browsers. See:
+-        # https://github.com/angular/angular-cli/blob/277bad3895cbce6de80aa10a05c349b10d9e09df/packages/angular_devkit/build_angular/src/angular-cli-files/models/webpack-configs/common.ts#L141
+-        "@npm//:node_modules/zone.js/bundles/zone.umd.js",
+-        "@npm//:node_modules/zone.js/bundles/zone-testing.umd.js",
+-        "@npm//:node_modules/reflect-metadata/Reflect.js",
+-    ] + kwargs.pop("bootstrap", [])
+-
++def ng_web_test_suite(deps = [], static_css = [], **kwargs):
+     # Always include a prebuilt theme in the test suite because otherwise tests, which depend on CSS
+     # that is needed for measuring, will unexpectedly fail. Also always adding a prebuilt theme
+     # reduces the amount of setup that is needed to create a test suite Bazel target. Note that the
+@@ -213,6 +199,8 @@ def ng_web_test_suite(deps = [], static_css = [], exclude_init_script = False, *
+         "//src/material/prebuilt-themes:azure-blue",
+     ]
+ 
++    bootstrap = []
++
+     # Workaround for https://github.com/bazelbuild/rules_typescript/issues/301
+     # Since some of our tests depend on CSS files which are not part of the `ng_project` rule,
+     # we need to somehow load static CSS files within Karma (e.g. overlay prebuilt). Those styles
+@@ -226,7 +214,7 @@ def ng_web_test_suite(deps = [], static_css = [], exclude_init_script = False, *
+         native.genrule(
+             name = css_id,
+             srcs = [css_label],
+-            outs = ["%s.css.js" % css_id],
++            outs = ["%s.css.init.js" % css_id],
+             output_to_bindir = True,
+             cmd = """
+         files=($(execpaths %s))
+@@ -244,8 +232,8 @@ def ng_web_test_suite(deps = [], static_css = [], exclude_init_script = False, *
+ 
+     karma_web_test_suite(
+         # Depend on our custom test initialization script. This needs to be the first dependency.
+-        deps = deps if exclude_init_script else ["//test:angular_test_init"] + deps,
+-        bootstrap = bootstrap,
++        deps = deps,
++        bootstrap = ["//test:angular_test_init"] + bootstrap,
+         **kwargs
+     )
+ 
+diff --git a/tools/defaults2.bzl b/tools/defaults2.bzl
+index 793349e37aa0..2039548b0a78 100644
+--- a/tools/defaults2.bzl
++++ b/tools/defaults2.bzl
+@@ -3,8 +3,8 @@ load("//tools/bazel:ts_project_interop.bzl", _ts_project = "ts_project")
+ load("//tools/bazel:module_name.bzl", "compute_module_name")
+ load("@aspect_rules_js//npm:defs.bzl", _npm_package = "npm_package")
+ load("@rules_angular//src/ng_project:index.bzl", _ng_project = "ng_project")
+-load("@devinfra//bazel/spec-bundling:index_rjs.bzl", "spec_bundle_amd", _spec_bundle = "spec_bundle")
+-load("@devinfra//bazel/karma:index.bzl", _karma_web_test_suite = "karma_web_test_suite")
++load("@devinfra//bazel/spec-bundling:index_rjs.bzl", _spec_bundle = "spec_bundle")
++load("@rules_browsers//src/wtr:index.bzl", "wtr_test")
+ 
+ spec_bundle = _spec_bundle
+ 
+@@ -56,7 +56,7 @@ def ng_project(
+     # if False and not testonly:
+     #    _make_tsec_test(kwargs["name"])
+ 
+-def jasmine_test(name, data = [], args = [], external = [], **kwargs):
++def jasmine_test(name, data = [], args = [], **kwargs):
+     # Create relative path to root, from current package dir. Necessary as
+     # we change the `chdir` below to the package directory.
+     relative_to_root = "/".join([".."] * len(native.package_name().split("/")))
+@@ -77,11 +77,11 @@ def jasmine_test(name, data = [], args = [], external = [], **kwargs):
+         **kwargs
+     )
+ 
+-def karma_web_test_suite(name, tags = [], deps = [], browsers = None, **kwargs):
+-    spec_bundle_amd(
++def karma_web_test_suite(name, tags = [], deps = [], bootstrap = [], **kwargs):
++    spec_bundle(
+         name = "%s_bundle" % name,
+-        workspace_name = "angular_material",
+         srcs = ["//src:build-tsconfig"],
++        bootstrap = bootstrap,
+         deps = deps,
+         config = {
+             "resolveExtensions": [".js"],
+@@ -91,20 +91,9 @@ def karma_web_test_suite(name, tags = [], deps = [], browsers = None, **kwargs):
+ 
+     test_tags = ["partial-compilation-integration"] + tags
+ 
+-    # Set up default browsers if no explicit `browsers` have been specified.
+-    if browsers == None:
+-        test_tags.append("native")
+-        browsers = [
+-            # Note: when changing the browser names here, also update the "yarn test"
+-            # script to reflect the new browser names.
+-            "@npm//@angular/build-tooling/bazel/browsers/chromium:chromium",
+-            "@npm//@angular/build-tooling/bazel/browsers/firefox:firefox",
+-        ]
+-
+-    _karma_web_test_suite(
++    wtr_test(
+         name = name,
+-        tags = test_tags,
+         deps = [":%s_bundle" % name],
+-        browsers = browsers,
++        tags = test_tags,
+         **kwargs
+     )

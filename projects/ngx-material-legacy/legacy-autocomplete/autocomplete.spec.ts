@@ -1,7 +1,7 @@
 import {Directionality} from '@angular/cdk/bidi';
 import {DOWN_ARROW, ENTER, ESCAPE, SPACE, TAB, UP_ARROW} from '@angular/cdk/keycodes';
 import {Overlay, OverlayContainer} from '@angular/cdk/overlay';
-import {_supportsShadowDom} from '@angular/cdk/platform';
+import {supportsShadowDom} from '../internal/owned-shadow-dom';
 import {ScrollDispatcher} from '@angular/cdk/scrolling';
 import {
   MockNgZone,
@@ -12,7 +12,7 @@ import {
   dispatchKeyboardEvent,
   typeInElement,
   dispatchMouseEvent,
-} from '@angular/cdk/testing/private';
+} from '../internal/testing/owned-test-events';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -39,7 +39,7 @@ import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatLegacyOption, MatLegacyOptionSelectionChange} from '@angular/material/legacy-core';
 import {MatLegacyFormField, MatLegacyFormFieldModule} from '@angular/material/legacy-form-field';
 import {By} from '@angular/platform-browser';
-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {LegacyNoopAnimationsModule} from '../internal/testing/owned-animation-modules';
 import {EMPTY, Observable, Subject, Subscription} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 
@@ -70,7 +70,7 @@ describe('MatAutocomplete', () => {
         MatLegacyInputModule,
         FormsModule,
         ReactiveFormsModule,
-        NoopAnimationsModule,
+        LegacyNoopAnimationsModule,
       ],
       declarations: [component],
       providers: [{provide: NgZone, useFactory: () => (zone = new MockNgZone())}, ...providers],
@@ -613,7 +613,7 @@ describe('MatAutocomplete', () => {
 
   it('should not close the panel when clicking on the input inside shadow DOM', fakeAsync(() => {
     // This test is only relevant for Shadow DOM-capable browsers.
-    if (!_supportsShadowDom()) {
+    if (!supportsShadowDom()) {
       return;
     }
 

@@ -8,7 +8,7 @@ import {
   TestBed,
   tick,
 } from '@angular/core/testing';
-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {LegacyNoopAnimationsModule} from '../internal/testing/owned-animation-modules';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {MatLegacyPaginator, MatLegacyPaginatorModule} from '../legacy-paginator/index';
 import {MatSort, MatSortHeader, MatSortModule} from '../sort/index';
@@ -23,7 +23,7 @@ describe('MatTable', () => {
         MatLegacyTableModule,
         MatLegacyPaginatorModule,
         MatSortModule,
-        NoopAnimationsModule,
+        LegacyNoopAnimationsModule,
       ],
       declarations: [
         MatTableApp,

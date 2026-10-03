@@ -1,0 +1,59 @@
+From cc2f2c5ed5cd6692af516db1a47eb047149f1194 Mon Sep 17 00:00:00 2001
+From: Andrew Seguin <andrewseguin@users.noreply.github.com>
+Date: Mon, 23 Oct 2023 11:10:49 -0600
+Subject: [PATCH] fix(material/checkbox): add aria-checked (#27970)
+
+* fix(material/checkbox): add aria-checked
+
+* fix(material/checkbox): move aria-checked test
+---
+ src/material/checkbox/checkbox.html    | 1 +
+ src/material/checkbox/checkbox.spec.ts | 9 +++------
+ 2 files changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/src/material/checkbox/checkbox.html b/src/material/checkbox/checkbox.html
+index 33159a3f7052..74fb757299e0 100644
+--- a/src/material/checkbox/checkbox.html
++++ b/src/material/checkbox/checkbox.html
+@@ -11,6 +11,7 @@
+            [attr.aria-label]="ariaLabel || null"
+            [attr.aria-labelledby]="ariaLabelledby"
+            [attr.aria-describedby]="ariaDescribedby"
++           [attr.aria-checked]="indeterminate ? 'mixed' : null"
+            [attr.name]="name"
+            [attr.value]="value"
+            [checked]="checked"
+diff --git a/src/material/checkbox/checkbox.spec.ts b/src/material/checkbox/checkbox.spec.ts
+index 8942f597ffa2..ebb3a4321248 100644
+--- a/src/material/checkbox/checkbox.spec.ts
++++ b/src/material/checkbox/checkbox.spec.ts
+@@ -55,6 +55,9 @@ describe('MDC-based MatCheckbox', () => {
+ 
+       expect(checkboxInstance.checked).toBe(true);
+       expect(inputElement.checked).toBe(true);
++      expect(inputElement.hasAttribute('aria-checked'))
++        .withContext('Expect aria-checked attribute to not be used')
++        .toBe(false);
+ 
+       testComponent.isChecked = false;
+       fixture.detectChanges();
+@@ -103,9 +106,6 @@ describe('MDC-based MatCheckbox', () => {
+ 
+       expect(inputElement.checked).toBe(false);
+       expect(inputElement.indeterminate).toBe(true);
+-      expect(inputElement.hasAttribute('aria-checked'))
+-        .withContext('Expect aria-checked attribute to not be used')
+-        .toBe(false);
+ 
+       testComponent.isIndeterminate = false;
+       fixture.detectChanges();
+@@ -145,9 +145,6 @@ describe('MDC-based MatCheckbox', () => {
+       expect(inputElement.indeterminate).toBe(true);
+       expect(inputElement.checked).toBe(true);
+       expect(testComponent.isIndeterminate).toBe(true);
+-      expect(inputElement.hasAttribute('aria-checked'))
+-        .withContext('Expect aria-checked attribute to not be used')
+-        .toBe(false);
+ 
+       inputElement.click();
+       fixture.detectChanges();

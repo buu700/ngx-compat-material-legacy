@@ -1,0 +1,198 @@
+From da980a80b8775dac782eae0df468de4157550ca6 Mon Sep 17 00:00:00 2001
+From: Kristiyan Kostadinov <crisbeto@users.noreply.github.com>
+Date: Thu, 21 Mar 2024 17:12:28 +0100
+Subject: [PATCH] fix(cdk/a11y): support signals in ListKeyManager (#28757)
+
+Updates the `ListKeyManager` to support passing in a signal. Also expands the type to allow readonly arrays.
+
+Fixes #28710.
+---
+ .../a11y/key-manager/list-key-manager.spec.ts | 31 +++++++++-
+ src/cdk/a11y/key-manager/list-key-manager.ts  | 56 +++++++++++++------
+ tools/public_api_guard/cdk/a11y.md            |  5 +-
+ 3 files changed, 71 insertions(+), 21 deletions(-)
+
+diff --git a/src/cdk/a11y/key-manager/list-key-manager.spec.ts b/src/cdk/a11y/key-manager/list-key-manager.spec.ts
+index 8dd47c94db2a..7fdc53380b90 100644
+--- a/src/cdk/a11y/key-manager/list-key-manager.spec.ts
++++ b/src/cdk/a11y/key-manager/list-key-manager.spec.ts
+@@ -1,7 +1,7 @@
+ import {DOWN_ARROW, END, HOME, LEFT_ARROW, RIGHT_ARROW, TAB, UP_ARROW} from '@angular/cdk/keycodes';
+ import {createKeyboardEvent} from '../../testing/private';
+-import {QueryList} from '@angular/core';
+-import {fakeAsync, tick} from '@angular/core/testing';
++import {Component, QueryList, signal} from '@angular/core';
++import {TestBed, fakeAsync, tick} from '@angular/core/testing';
+ import {take} from 'rxjs/operators';
+ import {FocusOrigin} from '../focus-monitor/focus-monitor';
+ import {ActiveDescendantKeyManager} from './activedescendant-key-manager';
+@@ -106,6 +106,33 @@ describe('Key managers', () => {
+       expect(keyManager.activeItem).toBeNull();
+     });
+ 
++    it('should maintain the active item when the signal-based items change', () => {
++      keyManager.destroy();
++
++      @Component({template: '', standalone: true})
++      class App {}
++
++      const fixture = TestBed.createComponent(App);
++      fixture.detectChanges();
++      const items = signal([
++        new FakeFocusable('one'),
++        new FakeFocusable('two'),
++        new FakeFocusable('three'),
++      ]);
++
++      keyManager = new ListKeyManager<FakeFocusable>(items, fixture.componentRef.injector);
++      keyManager.setFirstItemActive();
++      spyOn(keyManager, 'setActiveItem').and.callThrough();
++
++      expect(keyManager.activeItemIndex).toBe(0);
++      expect(keyManager.activeItem!.getLabel()).toBe('one');
++      items.update(current => [new FakeFocusable('zero'), ...current]);
++      fixture.detectChanges();
++
++      expect(keyManager.activeItemIndex).toBe(1);
++      expect(keyManager.activeItem!.getLabel()).toBe('one');
++    });
++
+     describe('Key events', () => {
+       it('should emit tabOut when the tab key is pressed', () => {
+         const spy = jasmine.createSpy('tabOut spy');
+diff --git a/src/cdk/a11y/key-manager/list-key-manager.ts b/src/cdk/a11y/key-manager/list-key-manager.ts
+index 49522b7d82ab..1792c2945f1d 100644
+--- a/src/cdk/a11y/key-manager/list-key-manager.ts
++++ b/src/cdk/a11y/key-manager/list-key-manager.ts
+@@ -6,7 +6,7 @@
+  * found in the LICENSE file at https://angular.io/license
+  */
+ 
+-import {QueryList} from '@angular/core';
++import {EffectRef, Injector, QueryList, Signal, effect, isSignal} from '@angular/core';
+ import {Subject, Subscription} from 'rxjs';
+ import {
+   UP_ARROW,
+@@ -54,6 +54,7 @@ export class ListKeyManager<T extends ListKeyManagerOption> {
+   private _allowedModifierKeys: ListKeyManagerModifierKey[] = [];
+   private _homeAndEnd = false;
+   private _pageUpAndDown = {enabled: false, delta: 10};
++  private _effectRef: EffectRef | undefined;
+ 
+   /**
+    * Predicate function that can be used to check whether an item should be skipped
+@@ -64,21 +65,25 @@ export class ListKeyManager<T extends ListKeyManagerOption> {
+   // Buffer for the letters that the user has pressed when the typeahead option is turned on.
+   private _pressedLetters: string[] = [];
+ 
+-  constructor(private _items: QueryList<T> | T[]) {
++  constructor(items: QueryList<T> | T[] | readonly T[]);
++  constructor(items: Signal<T[]> | Signal<readonly T[]>, injector: Injector);
++  constructor(
++    private _items: QueryList<T> | T[] | readonly T[] | Signal<T[]> | Signal<readonly T[]>,
++    injector?: Injector,
++  ) {
+     // We allow for the items to be an array because, in some cases, the consumer may
+     // not have access to a QueryList of the items they want to manage (e.g. when the
+     // items aren't being collected via `ViewChildren` or `ContentChildren`).
+     if (_items instanceof QueryList) {
+-      this._itemChangesSubscription = _items.changes.subscribe((newItems: QueryList<T>) => {
+-        if (this._activeItem) {
+-          const itemArray = newItems.toArray();
+-          const newIndex = itemArray.indexOf(this._activeItem);
++      this._itemChangesSubscription = _items.changes.subscribe((newItems: QueryList<T>) =>
++        this._itemsChanged(newItems.toArray()),
++      );
++    } else if (isSignal(_items)) {
++      if (!injector && (typeof ngDevMode === 'undefined' || ngDevMode)) {
++        throw new Error('ListKeyManager constructed with a signal must receive an injector');
++      }
+ 
+-          if (newIndex > -1 && newIndex !== this._activeItemIndex) {
+-            this._activeItemIndex = newIndex;
+-          }
+-        }
+-      });
++      this._effectRef = effect(() => this._itemsChanged(_items()), {injector});
+     }
+   }
+ 
+@@ -144,12 +149,11 @@ export class ListKeyManager<T extends ListKeyManagerOption> {
+    * @param debounceInterval Time to wait after the last keystroke before setting the active item.
+    */
+   withTypeAhead(debounceInterval: number = 200): this {
+-    if (
+-      (typeof ngDevMode === 'undefined' || ngDevMode) &&
+-      this._items.length &&
+-      this._items.some(item => typeof item.getLabel !== 'function')
+-    ) {
+-      throw Error('ListKeyManager items in typeahead mode must implement the `getLabel` method.');
++    if (typeof ngDevMode === 'undefined' || ngDevMode) {
++      const items = this._getItemsArray();
++      if (items.length > 0 && items.some(item => typeof item.getLabel !== 'function')) {
++        throw Error('ListKeyManager items in typeahead mode must implement the `getLabel` method.');
++      }
+     }
+ 
+     this._typeaheadSubscription.unsubscribe();
+@@ -403,6 +407,7 @@ export class ListKeyManager<T extends ListKeyManagerOption> {
+   destroy() {
+     this._typeaheadSubscription.unsubscribe();
+     this._itemChangesSubscription?.unsubscribe();
++    this._effectRef?.destroy();
+     this._letterKeyStream.complete();
+     this.tabOut.complete();
+     this.change.complete();
+@@ -470,7 +475,22 @@ export class ListKeyManager<T extends ListKeyManagerOption> {
+   }
+ 
+   /** Returns the items as an array. */
+-  private _getItemsArray(): T[] {
++  private _getItemsArray(): T[] | readonly T[] {
++    if (isSignal(this._items)) {
++      return this._items();
++    }
++
+     return this._items instanceof QueryList ? this._items.toArray() : this._items;
+   }
++
++  /** Callback for when the items have changed. */
++  private _itemsChanged(newItems: T[] | readonly T[]) {
++    if (this._activeItem) {
++      const newIndex = newItems.indexOf(this._activeItem);
++
++      if (newIndex > -1 && newIndex !== this._activeItemIndex) {
++        this._activeItemIndex = newIndex;
++      }
++    }
++  }
+ }
+diff --git a/tools/public_api_guard/cdk/a11y.md b/tools/public_api_guard/cdk/a11y.md
+index b7e6a0677b3c..c54465c9f897 100644
+--- a/tools/public_api_guard/cdk/a11y.md
++++ b/tools/public_api_guard/cdk/a11y.md
+@@ -13,12 +13,14 @@ import { EventEmitter } from '@angular/core';
+ import * as i0 from '@angular/core';
+ import * as i1 from '@angular/cdk/observers';
+ import { InjectionToken } from '@angular/core';
++import { Injector } from '@angular/core';
+ import { NgZone } from '@angular/core';
+ import { Observable } from 'rxjs';
+ import { OnChanges } from '@angular/core';
+ import { OnDestroy } from '@angular/core';
+ import { Platform } from '@angular/cdk/platform';
+ import { QueryList } from '@angular/core';
++import { Signal } from '@angular/core';
+ import { SimpleChanges } from '@angular/core';
+ import { Subject } from 'rxjs';
+ 
+@@ -347,7 +349,8 @@ export class IsFocusableConfig {
+ 
+ // @public
+ export class ListKeyManager<T extends ListKeyManagerOption> {
+-    constructor(_items: QueryList<T> | T[]);
++    constructor(items: QueryList<T> | T[] | readonly T[]);
++    constructor(items: Signal<T[]> | Signal<readonly T[]>, injector: Injector);
+     get activeItem(): T | null;
+     get activeItemIndex(): number | null;
+     cancelTypeahead(): this;

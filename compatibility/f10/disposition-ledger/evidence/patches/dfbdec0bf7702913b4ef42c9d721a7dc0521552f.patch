@@ -1,0 +1,30 @@
+From dfbdec0bf7702913b4ef42c9d721a7dc0521552f Mon Sep 17 00:00:00 2001
+From: Kristiyan Kostadinov <crisbeto@users.noreply.github.com>
+Date: Wed, 8 Oct 2025 11:24:07 -0400
+Subject: [PATCH] docs: remove inaccurate note from focus monitor docs (#31991)
+
+Removes a note from the focus monitor docs that is no longer valid.
+
+Fixes #30529.
+---
+ src/cdk/a11y/a11y.md | 7 -------
+ 1 file changed, 7 deletions(-)
+
+diff --git a/src/cdk/a11y/a11y.md b/src/cdk/a11y/a11y.md
+index 82c1df7c4649..ac989804d0aa 100644
+--- a/src/cdk/a11y/a11y.md
++++ b/src/cdk/a11y/a11y.md
+@@ -170,13 +170,6 @@ to the element when focused. It will add `.cdk-focused` if the element is focuse
+ add `.cdk-${origin}-focused` (with `${origin}` being `mouse`, `keyboard`, `touch`, or `program`) to
+ indicate how the element was focused.
+ 
+-Note: currently the `FocusMonitor` emits on the observable _outside_ of the Angular zone. Therefore,
+-if you `markForCheck` in the subscription you must put yourself back in the Angular zone.
+-
+-```ts
+-focusMonitor.monitor(el).subscribe(origin => this.ngZone.run(() => /* ... */ ));
+-```
+-
+ Any element that is monitored by calling `monitor` should eventually be unmonitored by calling
+ `stopMonitoring` with the same element.
+ 

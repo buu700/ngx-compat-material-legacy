@@ -1,0 +1,4223 @@
+From 4718718e3f66e0de2341c9f46bae59be1470b971 Mon Sep 17 00:00:00 2001
+From: Kristiyan Kostadinov <crisbeto@users.noreply.github.com>
+Date: Tue, 6 Aug 2024 17:57:03 +0200
+Subject: [PATCH] test: remove compileComponent calls (#29535)
+
+Calls to `compileComponent` aren't necessary in the vast majority of cases. These changes clean them up frm our codebase.
+---
+ .../combobox/combobox.spec.ts                 |   6 +-
+ .../popover-edit/popover-edit.spec.ts         |   2 +-
+ .../scrolling/virtual-scroll-viewport.spec.ts |   2 +-
+ .../selection/selection.spec.ts               |   8 +-
+ .../table-scroll-container.spec.ts            |   2 +-
+ .../aria-describer/aria-describer.spec.ts     |   2 +-
+ .../a11y/focus-monitor/focus-monitor.spec.ts  |  10 +-
+ .../focus-monitor/focus-monitor.zone.spec.ts  |   2 +-
+ .../configurable-focus-trap.spec.ts           |   2 +-
+ .../event-listener-inert-strategy.spec.ts     |   2 +-
+ src/cdk/a11y/focus-trap/focus-trap.spec.ts    |   2 -
+ src/cdk/accordion/accordion-item.spec.ts      |   1 -
+ src/cdk/accordion/accordion.spec.ts           |   1 -
+ src/cdk/bidi/directionality.spec.ts           |   2 +-
+ src/cdk/clipboard/copy-to-clipboard.spec.ts   |   2 -
+ src/cdk/dialog/dialog.spec.ts                 |   3 -
+ .../drag-drop/directives/test-utils.spec.ts   |   1 -
+ src/cdk/drag-drop/drag-drop-registry.spec.ts  |   2 +-
+ src/cdk/drag-drop/drag-drop.spec.ts           |   1 -
+ src/cdk/listbox/listbox.spec.ts               |   2 +-
+ src/cdk/menu/context-menu-trigger.spec.ts     |  12 +-
+ src/cdk/menu/menu-bar.spec.ts                 |  14 +-
+ src/cdk/menu/menu-group.spec.ts               |   4 +-
+ src/cdk/menu/menu-item-checkbox.spec.ts       |   2 +-
+ src/cdk/menu/menu-item-radio.spec.ts          |   2 +-
+ src/cdk/menu/menu-item.spec.ts                |   4 +-
+ src/cdk/menu/menu-stack.spec.ts               |   2 +-
+ src/cdk/menu/menu-trigger.spec.ts             |  14 +-
+ src/cdk/menu/menu.spec.ts                     |   8 +-
+ src/cdk/menu/pointer-focus-tracker.spec.ts    |   2 +-
+ src/cdk/observers/observe-content.spec.ts     |   7 -
+ .../fullscreen-overlay-container.spec.ts      |   2 +-
+ src/cdk/overlay/overlay-container.spec.ts     |   2 +-
+ src/cdk/overlay/overlay.spec.ts               |   2 +-
+ .../scroll/block-scroll-strategy.spec.ts      |   2 +-
+ .../scroll/close-scroll-strategy.spec.ts      |   2 -
+ .../scroll/close-scroll-strategy.zone.spec.ts |   2 -
+ .../scroll/reposition-scroll-strategy.spec.ts |   2 -
+ src/cdk/portal/portal.spec.ts                 |   2 +-
+ src/cdk/scrolling/scroll-dispatcher.spec.ts   |   2 -
+ .../scrolling/scroll-dispatcher.zone.spec.ts  |   2 -
+ src/cdk/scrolling/scrollable.spec.ts          |   2 +-
+ .../scrolling/virtual-scroll-viewport.spec.ts |  18 +--
+ .../virtual-scroll-viewport.zone.spec.ts      |   2 +-
+ src/cdk/table/table.spec.ts                   |   2 +-
+ src/cdk/table/text-column.spec.ts             |   2 +-
+ src/cdk/text-field/autofill.spec.ts           |   4 +-
+ src/cdk/text-field/autofill.zone.spec.ts      |   2 +-
+ src/cdk/text-field/autosize.spec.ts           |   2 -
+ .../tree-using-legacy-key-manager.spec.ts     |   2 +-
+ src/cdk/tree/tree-with-tree-control.spec.ts   |   2 +-
+ src/cdk/tree/tree.spec.ts                     |   2 +-
+ .../autocomplete-harness-example.spec.ts      |   2 +-
+ .../bottom-sheet-harness-example.spec.ts      |   2 +-
+ .../datepicker-harness-example.spec.ts        |   2 +-
+ .../dialog-harness-example.spec.ts            |   2 +-
+ .../expansion-harness-example.spec.ts         |   2 +-
+ .../form-field-harness-example.spec.ts        |   2 +-
+ .../grid-list-harness-example.spec.ts         |   2 +-
+ .../icon-harness/icon-harness-example.spec.ts |   2 +-
+ .../input-harness-example.spec.ts             |   2 +-
+ .../menu-harness/menu-harness-example.spec.ts |   2 +-
+ .../paginator-harness-example.spec.ts         |   2 +-
+ .../select-harness-example.spec.ts            |   2 +-
+ .../sidenav-harness-example.spec.ts           |   2 +-
+ .../slider-harness-example.spec.ts            |   2 +-
+ .../snack-bar-harness-example.spec.ts         |   2 +-
+ .../sort-harness/sort-harness-example.spec.ts |   2 +-
+ .../stepper-harness-example.spec.ts           |   2 +-
+ .../tab-group-harness-example.spec.ts         |   2 +-
+ .../tooltip-harness-example.spec.ts           |   2 +-
+ .../adapter/date-fns-adapter.spec.ts          |   4 +-
+ .../column-resize/column-resize.spec.ts       |   2 +-
+ .../menubar/menubar-item.spec.ts              |   2 +-
+ .../menubar/menubar.spec.ts                   |   2 +-
+ .../popover-edit/popover-edit.spec.ts         |   2 +-
+ .../adapter/luxon-date-adapter.spec.ts        |  10 +-
+ .../adapter/moment-date-adapter.spec.ts       |  10 +-
+ .../autocomplete/autocomplete.spec.ts         |   2 -
+ .../autocomplete/autocomplete.zone.spec.ts    |   2 -
+ .../testing/autocomplete-harness.spec.ts      |   6 +-
+ src/material/badge/badge.spec.ts              |  12 +-
+ .../badge/testing/badge-harness.spec.ts       |   6 +-
+ .../bottom-sheet/bottom-sheet.spec.ts         |   6 +-
+ .../testing/bottom-sheet-harness.spec.ts      |   6 +-
+ .../button-toggle/button-toggle.spec.ts       |   6 -
+ .../testing/button-toggle-group.spec.ts       |   6 +-
+ .../testing/button-toggle-harness.spec.ts     |   6 +-
+ src/material/button/button.spec.ts            |   4 -
+ .../button/testing/button-harness.spec.ts     |   6 +-
+ src/material/card/card.spec.ts                |   2 +-
+ .../card/testing/card-harness.spec.ts         |   6 +-
+ src/material/checkbox/checkbox.spec.ts        |   4 +-
+ .../checkbox/testing/checkbox-harness.spec.ts |   6 +-
+ src/material/chips/chip-edit-input.spec.ts    |   2 -
+ src/material/chips/chip-grid.spec.ts          |   2 +-
+ src/material/chips/chip-input.spec.ts         |  24 ++-
+ src/material/chips/chip-listbox.spec.ts       |   2 +-
+ src/material/chips/chip-option.spec.ts        |   2 -
+ src/material/chips/chip-remove.spec.ts        |   2 -
+ src/material/chips/chip-row.spec.ts           |   2 -
+ src/material/chips/chip-set.spec.ts           |   2 -
+ src/material/chips/chip.spec.ts               |   2 -
+ .../chips/testing/chip-grid-harness.spec.ts   |   6 +-
+ .../chips/testing/chip-harness.spec.ts        |   6 +-
+ .../chips/testing/chip-input-harness.spec.ts  |   6 +-
+ .../testing/chip-listbox-harness.spec.ts      |   6 +-
+ .../chips/testing/chip-option-harness.spec.ts |   6 +-
+ .../chips/testing/chip-row-harness.spec.ts    |   6 +-
+ .../chips/testing/chip-set-harness.spec.ts    |   6 +-
+ .../core/datetime/native-date-adapter.spec.ts |   6 +-
+ src/material/core/option/option.spec.ts       |   4 +-
+ .../core/testing/optgroup-harness.spec.ts     |   6 +-
+ .../core/testing/option-harness.spec.ts       |   6 +-
+ src/material/datepicker/calendar-body.spec.ts |   2 -
+ .../datepicker/calendar-header.spec.ts        |   2 -
+ src/material/datepicker/calendar.spec.ts      |   2 -
+ src/material/datepicker/month-view.spec.ts    |   4 -
+ .../datepicker/multi-year-view.spec.ts        |   2 -
+ .../testing/calendar-harness.spec.ts          |   6 +-
+ .../testing/date-range-input-harness.spec.ts  |   6 +-
+ .../testing/datepicker-input-harness.spec.ts  |   6 +-
+ .../testing/datepicker-toggle-harness.spec.ts |   6 +-
+ src/material/datepicker/year-view.spec.ts     |   2 -
+ src/material/dialog/dialog.spec.ts            |  10 --
+ src/material/dialog/dialog.zone.spec.ts       |   2 -
+ .../dialog/testing/dialog-harness.spec.ts     |   6 +-
+ .../dialog/testing/dialog-opener.spec.ts      |   2 -
+ src/material/divider/divider.spec.ts          |   1 -
+ .../divider/testing/divider-harness.spec.ts   |   6 +-
+ src/material/expansion/accordion.spec.ts      |   1 -
+ src/material/expansion/expansion.spec.ts      |  27 ++--
+ .../testing/expansion-harness.spec.ts         |   6 +-
+ .../testing/form-field-harness.spec.ts        |   6 +-
+ src/material/grid-list/grid-list.spec.ts      |   2 +-
+ .../testing/grid-list-harness.spec.ts         |   6 +-
+ src/material/icon/icon.spec.ts                |   6 -
+ .../icon/testing/icon-harness.spec.ts         |   6 +-
+ src/material/input/input.spec.ts              |   2 +-
+ .../input/testing/input-harness.spec.ts       |   6 +-
+ .../testing/native-select-harness.spec.ts     |   6 +-
+ src/material/list/list.spec.ts                |   2 -
+ src/material/list/selection-list.spec.ts      |  22 +--
+ .../list/testing/list-harness.spec.ts         |  16 +-
+ src/material/menu/menu.spec.ts                |   4 +-
+ .../menu/testing/menu-harness.spec.ts         |  12 +-
+ src/material/paginator/paginator.spec.ts      |   2 +-
+ .../testing/paginator-harness.spec.ts         |   6 +-
+ .../progress-bar/progress-bar.spec.ts         |   2 +-
+ .../testing/progress-bar-harness.spec.ts      |   6 +-
+ .../progress-spinner/progress-spinner.spec.ts |  62 ++++----
+ .../testing/progress-spinner-harness.spec.ts  |   6 +-
+ src/material/radio/radio.spec.ts              |   4 -
+ .../radio/testing/radio-harness.spec.ts       |   6 +-
+ src/material/select/select.spec.ts            |   2 +-
+ .../select/testing/select-harness.spec.ts     |   6 +-
+ src/material/sidenav/drawer.spec.ts           |  22 +--
+ src/material/sidenav/sidenav.spec.ts          |   2 -
+ .../sidenav/testing/sidenav-harness.spec.ts   |  12 +-
+ .../slide-toggle/slide-toggle.spec.ts         |   4 -
+ .../testing/slide-toggle-harness.spec.ts      |   6 +-
+ src/material/slider/slider.spec.ts            |   2 +-
+ .../slider/testing/slider-harness.spec.ts     |   6 +-
+ src/material/snack-bar/snack-bar.spec.ts      |   9 +-
+ src/material/snack-bar/snack-bar.zone.spec.ts |   2 +-
+ .../testing/snack-bar-harness.spec.ts         |   6 +-
+ src/material/sort/sort.spec.ts                |   6 +-
+ .../sort/testing/sort-harness.spec.ts         |   6 +-
+ src/material/stepper/stepper.spec.ts          |   1 -
+ .../stepper/testing/stepper-harness.spec.ts   |   6 +-
+ src/material/table/table.spec.ts              |   2 +-
+ .../table/testing/table-harness.spec.ts       |   6 +-
+ src/material/tabs/tab-body.spec.ts            |  24 ++-
+ src/material/tabs/tab-group.spec.ts           |   8 -
+ src/material/tabs/tab-header.spec.ts          |   2 -
+ .../tabs/tab-nav-bar/tab-nav-bar.spec.ts      |   6 -
+ .../tabs/testing/tab-group-harness.spec.ts    |   6 +-
+ .../tabs/testing/tab-nav-bar-harness.spec.ts  |   6 +-
+ .../toolbar/testing/toolbar-harness.spec.ts   |   6 +-
+ src/material/toolbar/toolbar.spec.ts          |   2 -
+ .../tooltip/testing/tooltip-harness.spec.ts   |   6 +-
+ src/material/tooltip/tooltip.spec.ts          | 142 ++++++++----------
+ src/material/tooltip/tooltip.zone.spec.ts     |   2 -
+ .../tree/testing/tree-harness.spec.ts         |   6 +-
+ .../tree-using-legacy-key-manager.spec.ts     |   2 +-
+ .../tree/tree-using-tree-control.spec.ts      |   2 +-
+ src/material/tree/tree.spec.ts                |   2 +-
+ 187 files changed, 438 insertions(+), 625 deletions(-)
+
+diff --git a/src/cdk-experimental/combobox/combobox.spec.ts b/src/cdk-experimental/combobox/combobox.spec.ts
+index 39de9126ba2b..456f1a53aba7 100644
+--- a/src/cdk-experimental/combobox/combobox.spec.ts
++++ b/src/cdk-experimental/combobox/combobox.spec.ts
+@@ -26,7 +26,7 @@ describe('Combobox', () => {
+     beforeEach(waitForAsync(() => {
+       TestBed.configureTestingModule({
+         imports: [CdkComboboxModule, ComboboxToggle],
+-      }).compileComponents();
++      });
+     }));
+ 
+     beforeEach(() => {
+@@ -192,7 +192,7 @@ describe('Combobox', () => {
+     beforeEach(waitForAsync(() => {
+       TestBed.configureTestingModule({
+         imports: [CdkComboboxModule, ComboboxToggle],
+-      }).compileComponents();
++      });
+     }));
+ 
+     beforeEach(() => {
+@@ -262,7 +262,7 @@ describe('Combobox', () => {
+     beforeEach(waitForAsync(() => {
+       TestBed.configureTestingModule({
+         imports: [CdkComboboxModule, ComboboxToggle],
+-      }).compileComponents();
++      });
+     }));
+ 
+     beforeEach(() => {
+diff --git a/src/cdk-experimental/popover-edit/popover-edit.spec.ts b/src/cdk-experimental/popover-edit/popover-edit.spec.ts
+index cd1f666b72d3..5e83d9bd24f0 100644
+--- a/src/cdk-experimental/popover-edit/popover-edit.spec.ts
++++ b/src/cdk-experimental/popover-edit/popover-edit.spec.ts
+@@ -397,7 +397,7 @@ describe('CDK Popover Edit', () => {
+         TestBed.configureTestingModule({
+           imports: [CdkTableModule, CdkPopoverEditModule, CommonModule, FormsModule, BidiModule],
+           declarations: [componentClass],
+-        }).compileComponents();
++        });
+         fixture = TestBed.createComponent<BaseTestComponent>(componentClass);
+         component = fixture.componentInstance;
+         fixture.detectChanges();
+diff --git a/src/cdk-experimental/scrolling/virtual-scroll-viewport.spec.ts b/src/cdk-experimental/scrolling/virtual-scroll-viewport.spec.ts
+index c362e8003c79..c233eabfc777 100644
+--- a/src/cdk-experimental/scrolling/virtual-scroll-viewport.spec.ts
++++ b/src/cdk-experimental/scrolling/virtual-scroll-viewport.spec.ts
+@@ -12,7 +12,7 @@ describe('CdkVirtualScrollViewport', () => {
+     beforeEach(waitForAsync(() => {
+       TestBed.configureTestingModule({
+         imports: [ScrollingModule, ExperimentalScrollingModule, AutoSizeVirtualScroll],
+-      }).compileComponents();
++      });
+     }));
+ 
+     beforeEach(() => {
+diff --git a/src/cdk-experimental/selection/selection.spec.ts b/src/cdk-experimental/selection/selection.spec.ts
+index b542ec850557..821e57e784ee 100644
+--- a/src/cdk-experimental/selection/selection.spec.ts
++++ b/src/cdk-experimental/selection/selection.spec.ts
+@@ -14,7 +14,7 @@ describe('CdkSelection', () => {
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+       imports: [CdkSelectionModule, ListWithMultiSelection],
+-    }).compileComponents();
++    });
+   }));
+ 
+   beforeEach(() => {
+@@ -240,7 +240,7 @@ describe('CdkSelection with multiple = false', () => {
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+       imports: [CdkSelectionModule, ListWithSingleSelection],
+-    }).compileComponents();
++    });
+   }));
+ 
+   beforeEach(() => {
+@@ -305,7 +305,7 @@ describe('cdkSelectionColumn', () => {
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+       imports: [CdkSelectionModule, CdkTableModule, MultiSelectTableWithSelectionColumn],
+-    }).compileComponents();
++    });
+   }));
+ 
+   beforeEach(() => {
+@@ -399,7 +399,7 @@ describe('cdkSelectionColumn with multiple = false', () => {
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+       imports: [CdkSelectionModule, CdkTableModule, SingleSelectTableWithSelectionColumn],
+-    }).compileComponents();
++    });
+   }));
+ 
+   beforeEach(() => {
+diff --git a/src/cdk-experimental/table-scroll-container/table-scroll-container.spec.ts b/src/cdk-experimental/table-scroll-container/table-scroll-container.spec.ts
+index d5da839296a6..009e971b6b20 100644
+--- a/src/cdk-experimental/table-scroll-container/table-scroll-container.spec.ts
++++ b/src/cdk-experimental/table-scroll-container/table-scroll-container.spec.ts
+@@ -24,7 +24,7 @@ describe('CdkTableScrollContainer', () => {
+   ): ComponentFixture<T> {
+     TestBed.configureTestingModule({
+       imports: [CdkTableModule, CdkTableScrollContainerModule, componentType, ...declarations],
+-    }).compileComponents();
++    });
+ 
+     return TestBed.createComponent<T>(componentType);
+   }
+diff --git a/src/cdk/a11y/aria-describer/aria-describer.spec.ts b/src/cdk/a11y/aria-describer/aria-describer.spec.ts
+index 7991f830b423..c5ec92b8b89a 100644
+--- a/src/cdk/a11y/aria-describer/aria-describer.spec.ts
++++ b/src/cdk/a11y/aria-describer/aria-describer.spec.ts
+@@ -12,7 +12,7 @@ describe('AriaDescriber', () => {
+     TestBed.configureTestingModule({
+       imports: [A11yModule, TestApp],
+       providers: [AriaDescriber, ...providers],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(TestApp);
+     component = fixture.componentInstance;
+diff --git a/src/cdk/a11y/focus-monitor/focus-monitor.spec.ts b/src/cdk/a11y/focus-monitor/focus-monitor.spec.ts
+index 3e03eba9de0b..3f9f04265f91 100644
+--- a/src/cdk/a11y/focus-monitor/focus-monitor.spec.ts
++++ b/src/cdk/a11y/focus-monitor/focus-monitor.spec.ts
+@@ -59,7 +59,7 @@ describe('FocusMonitor', () => {
+           },
+         },
+       ],
+-    }).compileComponents();
++    });
+   });
+ 
+   beforeEach(inject([FocusMonitor], (fm: FocusMonitor) => {
+@@ -478,7 +478,7 @@ describe('FocusMonitor with "eventual" detection', () => {
+           },
+         },
+       ],
+-    }).compileComponents();
++    });
+   });
+ 
+   beforeEach(inject([FocusMonitor], (fm: FocusMonitor) => {
+@@ -515,7 +515,7 @@ describe('cdkMonitorFocus', () => {
+         FocusMonitorOnCommentNode,
+         ExportedFocusMonitor,
+       ],
+-    }).compileComponents();
++    });
+   });
+ 
+   describe('button with cdkMonitorElementFocus', () => {
+@@ -827,7 +827,7 @@ describe('FocusMonitor observable stream', () => {
+     TestBed.configureTestingModule({
+       imports: [A11yModule, PlainButton],
+       providers: [{provide: Platform, useValue: fakePlatform}],
+-    }).compileComponents();
++    });
+   });
+ 
+   beforeEach(inject([FocusMonitor], (fm: FocusMonitor) => {
+@@ -864,7 +864,7 @@ describe('FocusMonitor input label detection', () => {
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+       imports: [A11yModule, CheckboxWithLabel],
+-    }).compileComponents();
++    });
+   });
+ 
+   beforeEach(inject([FocusMonitor], (fm: FocusMonitor) => {
+diff --git a/src/cdk/a11y/focus-monitor/focus-monitor.zone.spec.ts b/src/cdk/a11y/focus-monitor/focus-monitor.zone.spec.ts
+index 7b8c2638ca49..b8297208c6b0 100644
+--- a/src/cdk/a11y/focus-monitor/focus-monitor.zone.spec.ts
++++ b/src/cdk/a11y/focus-monitor/focus-monitor.zone.spec.ts
+@@ -16,7 +16,7 @@ describe('FocusMonitor observable stream Zone.js integration', () => {
+     TestBed.configureTestingModule({
+       imports: [A11yModule, PlainButton],
+       providers: [{provide: Platform, useValue: fakePlatform}, provideZoneChangeDetection()],
+-    }).compileComponents();
++    });
+   });
+ 
+   beforeEach(inject([FocusMonitor], (fm: FocusMonitor) => {
+diff --git a/src/cdk/a11y/focus-trap/configurable-focus-trap.spec.ts b/src/cdk/a11y/focus-trap/configurable-focus-trap.spec.ts
+index b695deacaaca..1fd923f9ecd4 100644
+--- a/src/cdk/a11y/focus-trap/configurable-focus-trap.spec.ts
++++ b/src/cdk/a11y/focus-trap/configurable-focus-trap.spec.ts
+@@ -95,7 +95,7 @@ function createComponent<T>(
+   TestBed.configureTestingModule({
+     imports: [A11yModule, componentType],
+     providers: providers,
+-  }).compileComponents();
++  });
+ 
+   return TestBed.createComponent<T>(componentType);
+ }
+diff --git a/src/cdk/a11y/focus-trap/event-listener-inert-strategy.spec.ts b/src/cdk/a11y/focus-trap/event-listener-inert-strategy.spec.ts
+index 5aadb345a618..6434cc3f51e5 100644
+--- a/src/cdk/a11y/focus-trap/event-listener-inert-strategy.spec.ts
++++ b/src/cdk/a11y/focus-trap/event-listener-inert-strategy.spec.ts
+@@ -64,7 +64,7 @@ function createComponent<T>(
+   TestBed.configureTestingModule({
+     imports: [A11yModule, componentType],
+     providers: providers,
+-  }).compileComponents();
++  });
+ 
+   return TestBed.createComponent<T>(componentType);
+ }
+diff --git a/src/cdk/a11y/focus-trap/focus-trap.spec.ts b/src/cdk/a11y/focus-trap/focus-trap.spec.ts
+index a0d3b07df439..96b1078f32e3 100644
+--- a/src/cdk/a11y/focus-trap/focus-trap.spec.ts
++++ b/src/cdk/a11y/focus-trap/focus-trap.spec.ts
+@@ -28,8 +28,6 @@ describe('FocusTrap', () => {
+         FocusTrapWithAutoCaptureInShadowDom,
+       ],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   describe('with default element', () => {
+diff --git a/src/cdk/accordion/accordion-item.spec.ts b/src/cdk/accordion/accordion-item.spec.ts
+index d6197ec06e82..253311a687ad 100644
+--- a/src/cdk/accordion/accordion-item.spec.ts
++++ b/src/cdk/accordion/accordion-item.spec.ts
+@@ -15,7 +15,6 @@ describe('CdkAccordionItem', () => {
+         ItemGroupWithAccordion,
+       ],
+     });
+-    TestBed.compileComponents();
+   }));
+ 
+   describe('single item', () => {
+diff --git a/src/cdk/accordion/accordion.spec.ts b/src/cdk/accordion/accordion.spec.ts
+index 4285a1b97310..3a263d9f47cb 100644
+--- a/src/cdk/accordion/accordion.spec.ts
++++ b/src/cdk/accordion/accordion.spec.ts
+@@ -11,7 +11,6 @@ describe('CdkAccordion', () => {
+     TestBed.configureTestingModule({
+       imports: [BrowserAnimationsModule, CdkAccordionModule, SetOfItems, NestedItems],
+     });
+-    TestBed.compileComponents();
+   }));
+ 
+   it('should ensure only one item is expanded at a time', () => {
+diff --git a/src/cdk/bidi/directionality.spec.ts b/src/cdk/bidi/directionality.spec.ts
+index 68c85630de86..41330a27b495 100644
+--- a/src/cdk/bidi/directionality.spec.ts
++++ b/src/cdk/bidi/directionality.spec.ts
+@@ -18,7 +18,7 @@ describe('Directionality', () => {
+         ElementWithPredefinedUppercaseDir,
+       ],
+       providers: [{provide: DIR_DOCUMENT, useFactory: () => fakeDocument}],
+-    }).compileComponents();
++    });
+   }));
+ 
+   describe('Service', () => {
+diff --git a/src/cdk/clipboard/copy-to-clipboard.spec.ts b/src/cdk/clipboard/copy-to-clipboard.spec.ts
+index 337dcaa01fc5..073b4df1bded 100644
+--- a/src/cdk/clipboard/copy-to-clipboard.spec.ts
++++ b/src/cdk/clipboard/copy-to-clipboard.spec.ts
+@@ -31,8 +31,6 @@ describe('CdkCopyToClipboard', () => {
+     TestBed.configureTestingModule({
+       imports: [ClipboardModule, CopyToClipboardHost],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   beforeEach(() => {
+diff --git a/src/cdk/dialog/dialog.spec.ts b/src/cdk/dialog/dialog.spec.ts
+index f3a7b7f95dda..72506a79ba86 100644
+--- a/src/cdk/dialog/dialog.spec.ts
++++ b/src/cdk/dialog/dialog.spec.ts
+@@ -69,8 +69,6 @@ describe('Dialog', () => {
+       ],
+     });
+ 
+-    TestBed.compileComponents();
+-
+     dialog = TestBed.inject(Dialog);
+     mockLocation = TestBed.inject(Location) as SpyLocation;
+     overlay = TestBed.inject(Overlay);
+@@ -1131,7 +1129,6 @@ describe('Dialog with a parent Dialog', () => {
+       ],
+     });
+ 
+-    TestBed.compileComponents();
+     parentDialog = TestBed.inject(Dialog);
+     fixture = TestBed.createComponent(ComponentThatProvidesMatDialog);
+     childDialog = fixture.componentInstance.dialog;
+diff --git a/src/cdk/drag-drop/directives/test-utils.spec.ts b/src/cdk/drag-drop/directives/test-utils.spec.ts
+index 2c0c12027eac..7ec7189a63f0 100644
+--- a/src/cdk/drag-drop/directives/test-utils.spec.ts
++++ b/src/cdk/drag-drop/directives/test-utils.spec.ts
+@@ -46,7 +46,6 @@ export function createComponent<T>(
+     });
+   }
+ 
+-  TestBed.compileComponents();
+   return TestBed.createComponent<T>(componentType);
+ }
+ 
+diff --git a/src/cdk/drag-drop/drag-drop-registry.spec.ts b/src/cdk/drag-drop/drag-drop-registry.spec.ts
+index e53b4893f1e8..935b94ba5908 100644
+--- a/src/cdk/drag-drop/drag-drop-registry.spec.ts
++++ b/src/cdk/drag-drop/drag-drop-registry.spec.ts
+@@ -18,7 +18,7 @@ describe('DragDropRegistry', () => {
+   beforeEach(fakeAsync(() => {
+     TestBed.configureTestingModule({
+       imports: [DragDropModule, BlankComponent],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(BlankComponent);
+     fixture.detectChanges();
+diff --git a/src/cdk/drag-drop/drag-drop.spec.ts b/src/cdk/drag-drop/drag-drop.spec.ts
+index 0755c0388b17..5919e929144b 100644
+--- a/src/cdk/drag-drop/drag-drop.spec.ts
++++ b/src/cdk/drag-drop/drag-drop.spec.ts
+@@ -13,7 +13,6 @@ describe('DragDrop', () => {
+       imports: [DragDropModule, TestComponent],
+     });
+ 
+-    TestBed.compileComponents();
+     service = TestBed.inject(DragDrop);
+   }));
+ 
+diff --git a/src/cdk/listbox/listbox.spec.ts b/src/cdk/listbox/listbox.spec.ts
+index e49c7951d14a..1edaedf7035d 100644
+--- a/src/cdk/listbox/listbox.spec.ts
++++ b/src/cdk/listbox/listbox.spec.ts
+@@ -21,7 +21,7 @@ function setupComponent<T, O = string>(component: Type<T>, imports: any[] = [])
+   TestBed.configureTestingModule({
+     imports: [CdkListboxModule, ...imports],
+     declarations: [component],
+-  }).compileComponents();
++  });
+   const fixture = TestBed.createComponent(component);
+   fixture.detectChanges();
+ 
+diff --git a/src/cdk/menu/context-menu-trigger.spec.ts b/src/cdk/menu/context-menu-trigger.spec.ts
+index 7691d1ac3c27..99757aaa2737 100644
+--- a/src/cdk/menu/context-menu-trigger.spec.ts
++++ b/src/cdk/menu/context-menu-trigger.spec.ts
+@@ -18,7 +18,7 @@ describe('CdkContextMenuTrigger', () => {
+       TestBed.configureTestingModule({
+         imports: [CdkMenuModule],
+         declarations: [SimpleContextMenu],
+-      }).compileComponents();
++      });
+     }));
+ 
+     beforeEach(() => {
+@@ -152,7 +152,7 @@ describe('CdkContextMenuTrigger', () => {
+       TestBed.configureTestingModule({
+         imports: [CdkMenuModule],
+         declarations: [NestedContextMenu],
+-      }).compileComponents();
++      });
+     }));
+ 
+     beforeEach(() => {
+@@ -267,7 +267,7 @@ describe('CdkContextMenuTrigger', () => {
+       TestBed.configureTestingModule({
+         imports: [CdkMenuModule],
+         declarations: [ContextMenuWithSubmenu],
+-      }).compileComponents();
++      });
+     }));
+ 
+     beforeEach(() => {
+@@ -298,7 +298,7 @@ describe('CdkContextMenuTrigger', () => {
+       TestBed.configureTestingModule({
+         imports: [CdkMenuModule],
+         declarations: [ContextMenuWithMenuBarAndInlineMenu],
+-      }).compileComponents();
++      });
+     }));
+ 
+     beforeEach(() => {
+@@ -402,7 +402,7 @@ describe('CdkContextMenuTrigger', () => {
+       TestBed.configureTestingModule({
+         imports: [CdkMenuModule],
+         declarations: [componentClass],
+-      }).compileComponents();
++      });
+ 
+       const fixture = TestBed.createComponent(componentClass);
+       fixture.detectChanges();
+@@ -428,7 +428,7 @@ describe('CdkContextMenuTrigger', () => {
+     TestBed.configureTestingModule({
+       imports: [CdkMenuModule],
+       declarations: [ContextTriggerWithData],
+-    }).compileComponents();
++    });
+ 
+     const fixture = TestBed.createComponent(ContextTriggerWithData);
+     fixture.componentInstance.menuData = {message: 'Hello!'};
+diff --git a/src/cdk/menu/menu-bar.spec.ts b/src/cdk/menu/menu-bar.spec.ts
+index ab9900741cd4..03d3b7f993bd 100644
+--- a/src/cdk/menu/menu-bar.spec.ts
++++ b/src/cdk/menu/menu-bar.spec.ts
+@@ -47,7 +47,7 @@ describe('MenuBar', () => {
+     beforeEach(waitForAsync(() => {
+       TestBed.configureTestingModule({
+         imports: [CdkMenuModule, MenuBarRadioGroup],
+-      }).compileComponents();
++      });
+ 
+       fixture = TestBed.createComponent(MenuBarRadioGroup);
+       fixture.detectChanges();
+@@ -107,7 +107,7 @@ describe('MenuBar', () => {
+       beforeEach(waitForAsync(() => {
+         TestBed.configureTestingModule({
+           imports: [CdkMenuModule, MultiMenuWithSubmenu],
+-        }).compileComponents();
++        });
+       }));
+ 
+       beforeEach(() => {
+@@ -531,7 +531,7 @@ describe('MenuBar', () => {
+       beforeEach(waitForAsync(() => {
+         TestBed.configureTestingModule({
+           imports: [CdkMenuModule, MultiMenuWithSubmenu],
+-        }).compileComponents();
++        });
+       }));
+ 
+       beforeEach(() => {
+@@ -658,7 +658,7 @@ describe('MenuBar', () => {
+       beforeEach(waitForAsync(() => {
+         TestBed.configureTestingModule({
+           imports: [CdkMenuModule, MenuWithCheckboxes],
+-        }).compileComponents();
++        });
+       }));
+ 
+       beforeEach(() => {
+@@ -724,7 +724,7 @@ describe('MenuBar', () => {
+       beforeEach(waitForAsync(() => {
+         TestBed.configureTestingModule({
+           imports: [CdkMenuModule, MenuWithRadioButtons],
+-        }).compileComponents();
++        });
+       }));
+ 
+       beforeEach(() => {
+@@ -779,7 +779,7 @@ describe('MenuBar', () => {
+     beforeEach(waitForAsync(() => {
+       TestBed.configureTestingModule({
+         imports: [CdkMenuModule, MenuBarWithMenusAndInlineMenu],
+-      }).compileComponents();
++      });
+     }));
+ 
+     beforeEach(() => {
+@@ -898,7 +898,7 @@ describe('MenuBar', () => {
+     beforeEach(waitForAsync(() => {
+       TestBed.configureTestingModule({
+         imports: [CdkMenuModule, MultiMenuWithSubmenu],
+-      }).compileComponents();
++      });
+     }));
+ 
+     beforeEach(() => {
+diff --git a/src/cdk/menu/menu-group.spec.ts b/src/cdk/menu/menu-group.spec.ts
+index f80d8b59e02f..6c01b4439e90 100644
+--- a/src/cdk/menu/menu-group.spec.ts
++++ b/src/cdk/menu/menu-group.spec.ts
+@@ -14,7 +14,7 @@ describe('MenuGroup', () => {
+     beforeEach(waitForAsync(() => {
+       TestBed.configureTestingModule({
+         imports: [CdkMenuModule, CheckboxMenu],
+-      }).compileComponents();
++      });
+ 
+       fixture = TestBed.createComponent(CheckboxMenu);
+       fixture.detectChanges();
+@@ -41,7 +41,7 @@ describe('MenuGroup', () => {
+     beforeEach(waitForAsync(() => {
+       TestBed.configureTestingModule({
+         imports: [CdkMenuModule, MenuWithMultipleRadioGroups],
+-      }).compileComponents();
++      });
+ 
+       fixture = TestBed.createComponent(MenuWithMultipleRadioGroups);
+       fixture.detectChanges();
+diff --git a/src/cdk/menu/menu-item-checkbox.spec.ts b/src/cdk/menu/menu-item-checkbox.spec.ts
+index 365184fc52b2..0dea58151748 100644
+--- a/src/cdk/menu/menu-item-checkbox.spec.ts
++++ b/src/cdk/menu/menu-item-checkbox.spec.ts
+@@ -21,7 +21,7 @@ describe('MenuItemCheckbox', () => {
+         // View engine can't figure out the ElementRef to inject so we need to provide a fake
+         {provide: ElementRef, useValue: new ElementRef<null>(null)},
+       ],
+-    }).compileComponents();
++    });
+   }));
+ 
+   beforeEach(() => {
+diff --git a/src/cdk/menu/menu-item-radio.spec.ts b/src/cdk/menu/menu-item-radio.spec.ts
+index b7fd137dcd64..9bfd95826c4c 100644
+--- a/src/cdk/menu/menu-item-radio.spec.ts
++++ b/src/cdk/menu/menu-item-radio.spec.ts
+@@ -25,7 +25,7 @@ describe('MenuItemRadio', () => {
+         // View engine can't figure out the ElementRef to inject so we need to provide a fake
+         {provide: ElementRef, useValue: new ElementRef<null>(null)},
+       ],
+-    }).compileComponents();
++    });
+   }));
+ 
+   beforeEach(() => {
+diff --git a/src/cdk/menu/menu-item.spec.ts b/src/cdk/menu/menu-item.spec.ts
+index 3a14c93b5605..52f7e41cacd6 100644
+--- a/src/cdk/menu/menu-item.spec.ts
++++ b/src/cdk/menu/menu-item.spec.ts
+@@ -25,7 +25,7 @@ describe('MenuItem', () => {
+           // View engine can't figure out the ElementRef to inject so we need to provide a fake
+           {provide: ElementRef, useValue: new ElementRef<null>(null)},
+         ],
+-      }).compileComponents();
++      });
+     }));
+ 
+     beforeEach(() => {
+@@ -90,7 +90,7 @@ describe('MenuItem', () => {
+           {provide: ElementRef, useValue: new ElementRef<null>(null)},
+         ],
+         declarations: [componentClass],
+-      }).compileComponents();
++      });
+ 
+       fixture = TestBed.createComponent(componentClass);
+       fixture.detectChanges();
+diff --git a/src/cdk/menu/menu-stack.spec.ts b/src/cdk/menu/menu-stack.spec.ts
+index 78c9630f5f80..dca51dd9fc2f 100644
+--- a/src/cdk/menu/menu-stack.spec.ts
++++ b/src/cdk/menu/menu-stack.spec.ts
+@@ -23,7 +23,7 @@ describe('MenuStack', () => {
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+       imports: [CdkMenuModule, MultiMenuWithSubmenu],
+-    }).compileComponents();
++    });
+   }));
+ 
+   beforeEach(() => {
+diff --git a/src/cdk/menu/menu-trigger.spec.ts b/src/cdk/menu/menu-trigger.spec.ts
+index a7a681d236e3..522a667d7d33 100644
+--- a/src/cdk/menu/menu-trigger.spec.ts
++++ b/src/cdk/menu/menu-trigger.spec.ts
+@@ -19,7 +19,7 @@ describe('MenuTrigger', () => {
+       TestBed.configureTestingModule({
+         imports: [CdkMenuModule],
+         declarations: [TriggerForEmptyMenu],
+-      }).compileComponents();
++      });
+     }));
+ 
+     beforeEach(() => {
+@@ -114,7 +114,7 @@ describe('MenuTrigger', () => {
+       TestBed.configureTestingModule({
+         imports: [CdkMenuModule],
+         declarations: [MenuBarWithNestedSubMenus],
+-      }).compileComponents();
++      });
+     }));
+ 
+     beforeEach(() => {
+@@ -334,7 +334,7 @@ describe('MenuTrigger', () => {
+       TestBed.configureTestingModule({
+         imports: [CdkMenuModule],
+         declarations: [componentClass],
+-      }).compileComponents();
++      });
+ 
+       const fixture = TestBed.createComponent(componentClass);
+       fixture.detectChanges();
+@@ -407,7 +407,7 @@ describe('MenuTrigger', () => {
+       TestBed.configureTestingModule({
+         imports: [CdkMenuModule],
+         declarations: [StandaloneTriggerWithInlineMenu],
+-      }).compileComponents();
++      });
+     }));
+ 
+     beforeEach(() => {
+@@ -490,7 +490,7 @@ describe('MenuTrigger', () => {
+     TestBed.configureTestingModule({
+       imports: [CdkMenuModule],
+       declarations: [TriggerWithData],
+-    }).compileComponents();
++    });
+ 
+     const fixture = TestBed.createComponent(TriggerWithData);
+     fixture.componentInstance.menuData = {message: 'Hello!'};
+@@ -510,7 +510,7 @@ describe('MenuTrigger', () => {
+       TestBed.configureTestingModule({
+         imports: [CdkMenuModule],
+         declarations: [TriggerWithNullValue],
+-      }).compileComponents();
++      });
+     }));
+ 
+     beforeEach(() => {
+@@ -549,7 +549,7 @@ describe('MenuTrigger', () => {
+     TestBed.configureTestingModule({
+       imports: [CdkMenuModule],
+       declarations: [TriggersWithSameMenuDifferentMenuBars],
+-    }).compileComponents();
++    });
+ 
+     const fixture = TestBed.createComponent(TriggersWithSameMenuDifferentMenuBars);
+     fixture.detectChanges();
+diff --git a/src/cdk/menu/menu.spec.ts b/src/cdk/menu/menu.spec.ts
+index ce117ca6bf62..08176e13521a 100644
+--- a/src/cdk/menu/menu.spec.ts
++++ b/src/cdk/menu/menu.spec.ts
+@@ -28,7 +28,7 @@ describe('Menu', () => {
+     beforeEach(waitForAsync(() => {
+       TestBed.configureTestingModule({
+         imports: [CdkMenuModule, MenuCheckboxGroup],
+-      }).compileComponents();
++      });
+ 
+       fixture = TestBed.createComponent(MenuCheckboxGroup);
+       fixture.detectChanges();
+@@ -63,7 +63,7 @@ describe('Menu', () => {
+     beforeEach(waitForAsync(() => {
+       TestBed.configureTestingModule({
+         imports: [CdkMenuModule, InlineMenu],
+-      }).compileComponents();
++      });
+     }));
+ 
+     beforeEach(() => {
+@@ -138,7 +138,7 @@ describe('Menu', () => {
+       beforeEach(waitForAsync(() => {
+         TestBed.configureTestingModule({
+           imports: [CdkMenuModule, WithComplexNestedMenus],
+-        }).compileComponents();
++        });
+       }));
+ 
+       beforeEach(() => {
+@@ -329,7 +329,7 @@ describe('Menu', () => {
+       beforeEach(waitForAsync(() => {
+         TestBed.configureTestingModule({
+           imports: [CdkMenuModule, WithComplexNestedMenusOnBottom],
+-        }).compileComponents();
++        });
+       }));
+ 
+       beforeEach(() => {
+diff --git a/src/cdk/menu/pointer-focus-tracker.spec.ts b/src/cdk/menu/pointer-focus-tracker.spec.ts
+index 0fe8b7a88b53..607d5473f351 100644
+--- a/src/cdk/menu/pointer-focus-tracker.spec.ts
++++ b/src/cdk/menu/pointer-focus-tracker.spec.ts
+@@ -20,7 +20,7 @@ describe('FocusMouseManger', () => {
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+       imports: [MultiElementWithConditionalComponent, MockWrapper],
+-    }).compileComponents();
++    });
+   }));
+ 
+   beforeEach(() => {
+diff --git a/src/cdk/observers/observe-content.spec.ts b/src/cdk/observers/observe-content.spec.ts
+index 05d3c483f6c5..709cf4c5850b 100644
+--- a/src/cdk/observers/observe-content.spec.ts
++++ b/src/cdk/observers/observe-content.spec.ts
+@@ -15,8 +15,6 @@ describe('Observe content directive', () => {
+       TestBed.configureTestingModule({
+         imports: [ObserversModule, ComponentWithTextContent, ComponentWithChildTextContent],
+       });
+-
+-      TestBed.compileComponents();
+     }));
+ 
+     it('should trigger the callback when the content of the element changes', done => {
+@@ -108,8 +106,6 @@ describe('Observe content directive', () => {
+         ],
+       });
+ 
+-      TestBed.compileComponents();
+-
+       fixture = TestBed.createComponent(ComponentWithDebouncedListener);
+       fixture.detectChanges();
+     }));
+@@ -151,8 +147,6 @@ describe('ContentObserver injectable', () => {
+           },
+         ],
+       });
+-
+-      TestBed.compileComponents();
+     }));
+ 
+     beforeEach(inject([ContentObserver], (co: ContentObserver) => {
+@@ -213,7 +207,6 @@ describe('ContentObserver injectable', () => {
+         imports: [ObserversModule, UnobservedComponentWithTextContent],
+       });
+ 
+-      TestBed.compileComponents();
+       const fixture = TestBed.createComponent(UnobservedComponentWithTextContent);
+       fixture.autoDetectChanges();
+       spy = jasmine.createSpy('content observer');
+diff --git a/src/cdk/overlay/fullscreen-overlay-container.spec.ts b/src/cdk/overlay/fullscreen-overlay-container.spec.ts
+index 8a4d373dfe64..02500dfb91c6 100644
+--- a/src/cdk/overlay/fullscreen-overlay-container.spec.ts
++++ b/src/cdk/overlay/fullscreen-overlay-container.spec.ts
+@@ -56,7 +56,7 @@ describe('FullscreenOverlayContainer', () => {
+           },
+         },
+       ],
+-    }).compileComponents();
++    });
+   }));
+ 
+   beforeEach(inject([Overlay], (o: Overlay) => {
+diff --git a/src/cdk/overlay/overlay-container.spec.ts b/src/cdk/overlay/overlay-container.spec.ts
+index c8b8ad1e71a8..61b01dcc8958 100644
+--- a/src/cdk/overlay/overlay-container.spec.ts
++++ b/src/cdk/overlay/overlay-container.spec.ts
+@@ -10,7 +10,7 @@ describe('OverlayContainer', () => {
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+       imports: [OverlayTestModule],
+-    }).compileComponents();
++    });
+   }));
+ 
+   beforeEach(inject([Overlay, OverlayContainer], (o: Overlay, oc: OverlayContainer) => {
+diff --git a/src/cdk/overlay/overlay.spec.ts b/src/cdk/overlay/overlay.spec.ts
+index 47a700d22740..77048fdc5dc0 100644
+--- a/src/cdk/overlay/overlay.spec.ts
++++ b/src/cdk/overlay/overlay.spec.ts
+@@ -59,7 +59,7 @@ describe('Overlay', () => {
+           useClass: SpyLocation,
+         },
+       ],
+-    }).compileComponents();
++    });
+ 
+     overlay = TestBed.inject(Overlay);
+     overlayContainer = TestBed.inject(OverlayContainer);
+diff --git a/src/cdk/overlay/scroll/block-scroll-strategy.spec.ts b/src/cdk/overlay/scroll/block-scroll-strategy.spec.ts
+index e4fed7c84b54..bafe9541229e 100644
+--- a/src/cdk/overlay/scroll/block-scroll-strategy.spec.ts
++++ b/src/cdk/overlay/scroll/block-scroll-strategy.spec.ts
+@@ -21,7 +21,7 @@ describe('BlockScrollStrategy', () => {
+ 
+     TestBed.configureTestingModule({
+       imports: [OverlayModule, PortalModule, FocacciaMsg],
+-    }).compileComponents();
++    });
+   }));
+ 
+   beforeEach(inject(
+diff --git a/src/cdk/overlay/scroll/close-scroll-strategy.spec.ts b/src/cdk/overlay/scroll/close-scroll-strategy.spec.ts
+index 54c404ff8f11..8f5828c872bc 100644
+--- a/src/cdk/overlay/scroll/close-scroll-strategy.spec.ts
++++ b/src/cdk/overlay/scroll/close-scroll-strategy.spec.ts
+@@ -31,8 +31,6 @@ describe('CloseScrollStrategy', () => {
+         },
+       ],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   beforeEach(inject([Overlay], (overlay: Overlay) => {
+diff --git a/src/cdk/overlay/scroll/close-scroll-strategy.zone.spec.ts b/src/cdk/overlay/scroll/close-scroll-strategy.zone.spec.ts
+index 85c85a5dd92c..163b9bea5672 100644
+--- a/src/cdk/overlay/scroll/close-scroll-strategy.zone.spec.ts
++++ b/src/cdk/overlay/scroll/close-scroll-strategy.zone.spec.ts
+@@ -36,8 +36,6 @@ describe('CloseScrollStrategy Zone.js integration', () => {
+         },
+       ],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   beforeEach(inject([Overlay], (overlay: Overlay) => {
+diff --git a/src/cdk/overlay/scroll/reposition-scroll-strategy.spec.ts b/src/cdk/overlay/scroll/reposition-scroll-strategy.spec.ts
+index cbed6a919a52..c5c27b13535c 100644
+--- a/src/cdk/overlay/scroll/reposition-scroll-strategy.spec.ts
++++ b/src/cdk/overlay/scroll/reposition-scroll-strategy.spec.ts
+@@ -29,8 +29,6 @@ describe('RepositionScrollStrategy', () => {
+         },
+       ],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   beforeEach(inject([Overlay], (o: Overlay) => {
+diff --git a/src/cdk/portal/portal.spec.ts b/src/cdk/portal/portal.spec.ts
+index e7d4fe54d1b0..93f8edce0693 100644
+--- a/src/cdk/portal/portal.spec.ts
++++ b/src/cdk/portal/portal.spec.ts
+@@ -33,7 +33,7 @@ describe('Portals', () => {
+         PizzaMsg,
+         SaveParentNodeOnInit,
+       ],
+-    }).compileComponents();
++    });
+   });
+ 
+   describe('CdkPortalOutlet', () => {
+diff --git a/src/cdk/scrolling/scroll-dispatcher.spec.ts b/src/cdk/scrolling/scroll-dispatcher.spec.ts
+index d46f649d366f..be4372e9188a 100644
+--- a/src/cdk/scrolling/scroll-dispatcher.spec.ts
++++ b/src/cdk/scrolling/scroll-dispatcher.spec.ts
+@@ -15,8 +15,6 @@ describe('ScrollDispatcher', () => {
+     TestBed.configureTestingModule({
+       imports: [ScrollingModule, ScrollingComponent, NestedScrollingComponent],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   describe('Basic usage', () => {
+diff --git a/src/cdk/scrolling/scroll-dispatcher.zone.spec.ts b/src/cdk/scrolling/scroll-dispatcher.zone.spec.ts
+index b50d0a6a5099..99859c345b01 100644
+--- a/src/cdk/scrolling/scroll-dispatcher.zone.spec.ts
++++ b/src/cdk/scrolling/scroll-dispatcher.zone.spec.ts
+@@ -11,8 +11,6 @@ describe('ScrollDispatcher Zone.js integration', () => {
+       imports: [ScrollingModule, ScrollingComponent],
+       providers: [provideZoneChangeDetection()],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   describe('Basic usage', () => {
+diff --git a/src/cdk/scrolling/scrollable.spec.ts b/src/cdk/scrolling/scrollable.spec.ts
+index 2a09d7863ef7..539369f27f94 100644
+--- a/src/cdk/scrolling/scrollable.spec.ts
++++ b/src/cdk/scrolling/scrollable.spec.ts
+@@ -27,7 +27,7 @@ describe('CdkScrollable', () => {
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+       imports: [ScrollingModule, ScrollableViewport],
+-    }).compileComponents();
++    });
+   }));
+ 
+   beforeEach(() => {
+diff --git a/src/cdk/scrolling/virtual-scroll-viewport.spec.ts b/src/cdk/scrolling/virtual-scroll-viewport.spec.ts
+index fca855affe4b..c3233c3eafef 100644
+--- a/src/cdk/scrolling/virtual-scroll-viewport.spec.ts
++++ b/src/cdk/scrolling/virtual-scroll-viewport.spec.ts
+@@ -37,7 +37,7 @@ describe('CdkVirtualScrollViewport', () => {
+     beforeEach(waitForAsync(() => {
+       TestBed.configureTestingModule({
+         imports: [ScrollingModule, FixedSizeVirtualScroll],
+-      }).compileComponents();
++      });
+     }));
+ 
+     beforeEach(() => {
+@@ -847,7 +847,7 @@ describe('CdkVirtualScrollViewport', () => {
+     beforeEach(() => {
+       TestBed.configureTestingModule({
+         imports: [ScrollingModule, FixedSizeVirtualScrollWithRtlDirection],
+-      }).compileComponents();
++      });
+ 
+       fixture = TestBed.createComponent(FixedSizeVirtualScrollWithRtlDirection);
+       testComponent = fixture.componentInstance;
+@@ -947,7 +947,7 @@ describe('CdkVirtualScrollViewport', () => {
+     beforeEach(() => {
+       TestBed.configureTestingModule({
+         imports: [ScrollingModule, VirtualScrollWithNoStrategy],
+-      }).compileComponents();
++      });
+     });
+ 
+     it('should fail on construction', fakeAsync(() => {
+@@ -969,7 +969,7 @@ describe('CdkVirtualScrollViewport', () => {
+           VirtualScrollWithItemInjectingViewContainer,
+           InjectsViewContainer,
+         ],
+-      }).compileComponents();
++      });
+     }));
+ 
+     beforeEach(() => {
+@@ -1003,7 +1003,7 @@ describe('CdkVirtualScrollViewport', () => {
+     beforeEach(waitForAsync(() => {
+       TestBed.configureTestingModule({
+         imports: [ScrollingModule, CommonModule, DelayedInitializationVirtualScroll],
+-      }).compileComponents();
++      });
+       fixture = TestBed.createComponent(DelayedInitializationVirtualScroll);
+       testComponent = fixture.componentInstance;
+       viewport = testComponent.viewport;
+@@ -1033,7 +1033,7 @@ describe('CdkVirtualScrollViewport', () => {
+     beforeEach(waitForAsync(() => {
+       TestBed.configureTestingModule({
+         imports: [ScrollingModule, CommonModule, VirtualScrollWithAppendOnly],
+-      }).compileComponents();
++      });
+       fixture = TestBed.createComponent(VirtualScrollWithAppendOnly);
+       testComponent = fixture.componentInstance;
+       viewport = testComponent.viewport;
+@@ -1111,7 +1111,7 @@ describe('CdkVirtualScrollViewport', () => {
+     beforeEach(waitForAsync(() => {
+       TestBed.configureTestingModule({
+         imports: [ScrollingModule, VirtualScrollWithCustomScrollingElement],
+-      }).compileComponents();
++      });
+     }));
+ 
+     beforeEach(() => {
+@@ -1148,7 +1148,7 @@ describe('CdkVirtualScrollViewport', () => {
+     beforeEach(waitForAsync(() => {
+       TestBed.configureTestingModule({
+         imports: [ScrollingModule, VirtualScrollWithScrollableWindow],
+-      }).compileComponents();
++      });
+     }));
+ 
+     beforeEach(() => {
+@@ -1174,7 +1174,7 @@ describe('CdkVirtualScrollViewport', () => {
+   it('should be able to query for a virtual scroll viewport as a CdkScrollable', () => {
+     TestBed.configureTestingModule({
+       imports: [ScrollingModule, VirtualScrollableQuery],
+-    }).compileComponents();
++    });
+ 
+     const fixture = TestBed.createComponent(VirtualScrollableQuery);
+     fixture.detectChanges();
+diff --git a/src/cdk/scrolling/virtual-scroll-viewport.zone.spec.ts b/src/cdk/scrolling/virtual-scroll-viewport.zone.spec.ts
+index a1d9dfbb055d..b0547d767973 100644
+--- a/src/cdk/scrolling/virtual-scroll-viewport.zone.spec.ts
++++ b/src/cdk/scrolling/virtual-scroll-viewport.zone.spec.ts
+@@ -31,7 +31,7 @@ describe('CdkVirtualScrollViewport Zone.js intergation', () => {
+       TestBed.configureTestingModule({
+         providers: [provideZoneChangeDetection()],
+         imports: [ScrollingModule, FixedSizeVirtualScroll],
+-      }).compileComponents();
++      });
+     }));
+ 
+     beforeEach(() => {
+diff --git a/src/cdk/table/table.spec.ts b/src/cdk/table/table.spec.ts
+index 41b3cb86254f..66cbe031481a 100644
+--- a/src/cdk/table/table.spec.ts
++++ b/src/cdk/table/table.spec.ts
+@@ -47,7 +47,7 @@ describe('CdkTable', () => {
+     TestBed.configureTestingModule({
+       imports: [CdkTableModule, BidiModule],
+       declarations: [componentType, ...declarations],
+-    }).compileComponents();
++    });
+ 
+     return TestBed.createComponent<T>(componentType);
+   }
+diff --git a/src/cdk/table/text-column.spec.ts b/src/cdk/table/text-column.spec.ts
+index 3bdd9616204f..ffb4a54a3e85 100644
+--- a/src/cdk/table/text-column.spec.ts
++++ b/src/cdk/table/text-column.spec.ts
+@@ -17,7 +17,7 @@ describe('CdkTextColumn', () => {
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+       imports: [CdkTableModule, BasicTextColumnApp, MissingTableApp, TextColumnWithoutNameApp],
+-    }).compileComponents();
++    });
+   }));
+ 
+   beforeEach(() => {
+diff --git a/src/cdk/text-field/autofill.spec.ts b/src/cdk/text-field/autofill.spec.ts
+index 6f14e907430c..0a0e31a41cab 100644
+--- a/src/cdk/text-field/autofill.spec.ts
++++ b/src/cdk/text-field/autofill.spec.ts
+@@ -23,7 +23,7 @@ describe('AutofillMonitor', () => {
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+       imports: [TextFieldModule, Inputs],
+-    }).compileComponents();
++    });
+   });
+ 
+   beforeEach(inject([AutofillMonitor], (afm: AutofillMonitor) => {
+@@ -175,7 +175,7 @@ describe('cdkAutofill', () => {
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+       imports: [TextFieldModule, InputWithCdkAutofilled],
+-    }).compileComponents();
++    });
+   });
+ 
+   beforeEach(inject([AutofillMonitor], (afm: AutofillMonitor) => {
+diff --git a/src/cdk/text-field/autofill.zone.spec.ts b/src/cdk/text-field/autofill.zone.spec.ts
+index 31a8d5a87b3e..70882a2067b2 100644
+--- a/src/cdk/text-field/autofill.zone.spec.ts
++++ b/src/cdk/text-field/autofill.zone.spec.ts
+@@ -12,7 +12,7 @@ describe('AutofillMonitor Zone.js integration', () => {
+     TestBed.configureTestingModule({
+       providers: [provideZoneChangeDetection()],
+       imports: [TextFieldModule, Inputs],
+-    }).compileComponents();
++    });
+   });
+ 
+   beforeEach(inject([AutofillMonitor], (afm: AutofillMonitor) => {
+diff --git a/src/cdk/text-field/autosize.spec.ts b/src/cdk/text-field/autosize.spec.ts
+index ad3b159484d9..df0efd201ba1 100644
+--- a/src/cdk/text-field/autosize.spec.ts
++++ b/src/cdk/text-field/autosize.spec.ts
+@@ -31,8 +31,6 @@ describe('CdkTextareaAutosize', () => {
+         AutosizeTextareaWithoutAutosize,
+       ],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   beforeEach(() => {
+diff --git a/src/cdk/tree/tree-using-legacy-key-manager.spec.ts b/src/cdk/tree/tree-using-legacy-key-manager.spec.ts
+index bf63a8929cec..bf0a6f71f448 100644
+--- a/src/cdk/tree/tree-using-legacy-key-manager.spec.ts
++++ b/src/cdk/tree/tree-using-legacy-key-manager.spec.ts
+@@ -12,7 +12,7 @@ describe('CdkTree when provided LegacyTreeKeyManager', () => {
+       imports: [CdkTreeModule],
+       declarations: [SimpleCdkTreeApp],
+       providers: [NOOP_TREE_KEY_MANAGER_FACTORY_PROVIDER],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(SimpleCdkTreeApp);
+     fixture.detectChanges();
+diff --git a/src/cdk/tree/tree-with-tree-control.spec.ts b/src/cdk/tree/tree-with-tree-control.spec.ts
+index 35cc33714f84..1cfcff3f447f 100644
+--- a/src/cdk/tree/tree-with-tree-control.spec.ts
++++ b/src/cdk/tree/tree-with-tree-control.spec.ts
+@@ -59,7 +59,7 @@ describe('CdkTree with TreeControl', () => {
+         },
+       ],
+       declarations: declarations,
+-    }).compileComponents();
++    });
+   }
+ 
+   it('should clear out the `mostRecentTreeNode` on destroy', () => {
+diff --git a/src/cdk/tree/tree.spec.ts b/src/cdk/tree/tree.spec.ts
+index 20484f2e3da6..ccde2b218e8c 100644
+--- a/src/cdk/tree/tree.spec.ts
++++ b/src/cdk/tree/tree.spec.ts
+@@ -63,7 +63,7 @@ describe('CdkTree', () => {
+         },
+       ],
+       declarations: declarations,
+-    }).compileComponents();
++    });
+   }
+ 
+   describe('onDestroy', () => {
+diff --git a/src/components-examples/material/autocomplete/autocomplete-harness/autocomplete-harness-example.spec.ts b/src/components-examples/material/autocomplete/autocomplete-harness/autocomplete-harness-example.spec.ts
+index 83ce2bce8f68..f58dab2d92da 100644
+--- a/src/components-examples/material/autocomplete/autocomplete-harness/autocomplete-harness-example.spec.ts
++++ b/src/components-examples/material/autocomplete/autocomplete-harness/autocomplete-harness-example.spec.ts
+@@ -13,7 +13,7 @@ describe('AutocompleteHarnessExample', () => {
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+       imports: [MatAutocompleteModule, NoopAnimationsModule],
+-    }).compileComponents();
++    });
+     fixture = TestBed.createComponent(AutocompleteHarnessExample);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.loader(fixture);
+diff --git a/src/components-examples/material/bottom-sheet/bottom-sheet-harness/bottom-sheet-harness-example.spec.ts b/src/components-examples/material/bottom-sheet/bottom-sheet-harness/bottom-sheet-harness-example.spec.ts
+index dc6892d6cc19..e592441add3c 100644
+--- a/src/components-examples/material/bottom-sheet/bottom-sheet-harness/bottom-sheet-harness-example.spec.ts
++++ b/src/components-examples/material/bottom-sheet/bottom-sheet-harness/bottom-sheet-harness-example.spec.ts
+@@ -13,7 +13,7 @@ describe('BottomSheetHarnessExample', () => {
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+       imports: [MatBottomSheetModule, NoopAnimationsModule],
+-    }).compileComponents();
++    });
+     fixture = TestBed.createComponent(BottomSheetHarnessExample);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.documentRootLoader(fixture);
+diff --git a/src/components-examples/material/datepicker/datepicker-harness/datepicker-harness-example.spec.ts b/src/components-examples/material/datepicker/datepicker-harness/datepicker-harness-example.spec.ts
+index d4cde558682c..72f8f5faa41a 100644
+--- a/src/components-examples/material/datepicker/datepicker-harness/datepicker-harness-example.spec.ts
++++ b/src/components-examples/material/datepicker/datepicker-harness/datepicker-harness-example.spec.ts
+@@ -14,7 +14,7 @@ describe('DatepickerHarnessExample', () => {
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+       imports: [MatDatepickerModule, NoopAnimationsModule, MatNativeDateModule],
+-    }).compileComponents();
++    });
+     fixture = TestBed.createComponent(DatepickerHarnessExample);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.loader(fixture);
+diff --git a/src/components-examples/material/dialog/dialog-harness/dialog-harness-example.spec.ts b/src/components-examples/material/dialog/dialog-harness/dialog-harness-example.spec.ts
+index 2ecb060ed113..58943abfa8fd 100644
+--- a/src/components-examples/material/dialog/dialog-harness/dialog-harness-example.spec.ts
++++ b/src/components-examples/material/dialog/dialog-harness/dialog-harness-example.spec.ts
+@@ -12,7 +12,7 @@ describe('DialogHarnessExample', () => {
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+       imports: [NoopAnimationsModule],
+-    }).compileComponents();
++    });
+     fixture = TestBed.createComponent(DialogHarnessExample);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.documentRootLoader(fixture);
+diff --git a/src/components-examples/material/expansion/expansion-harness/expansion-harness-example.spec.ts b/src/components-examples/material/expansion/expansion-harness/expansion-harness-example.spec.ts
+index fb700249b321..f08ba713a939 100644
+--- a/src/components-examples/material/expansion/expansion-harness/expansion-harness-example.spec.ts
++++ b/src/components-examples/material/expansion/expansion-harness/expansion-harness-example.spec.ts
+@@ -12,7 +12,7 @@ describe('ExpansionHarnessExample', () => {
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+       imports: [NoopAnimationsModule],
+-    }).compileComponents();
++    });
+     fixture = TestBed.createComponent(ExpansionHarnessExample);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.loader(fixture);
+diff --git a/src/components-examples/material/form-field/form-field-harness/form-field-harness-example.spec.ts b/src/components-examples/material/form-field/form-field-harness/form-field-harness-example.spec.ts
+index cad03470d89b..74e58d9cac81 100644
+--- a/src/components-examples/material/form-field/form-field-harness/form-field-harness-example.spec.ts
++++ b/src/components-examples/material/form-field/form-field-harness/form-field-harness-example.spec.ts
+@@ -13,7 +13,7 @@ describe('FormFieldHarnessExample', () => {
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+       imports: [NoopAnimationsModule],
+-    }).compileComponents();
++    });
+     fixture = TestBed.createComponent(FormFieldHarnessExample);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.loader(fixture);
+diff --git a/src/components-examples/material/grid-list/grid-list-harness/grid-list-harness-example.spec.ts b/src/components-examples/material/grid-list/grid-list-harness/grid-list-harness-example.spec.ts
+index 6f1bf963895a..698ad125d69a 100644
+--- a/src/components-examples/material/grid-list/grid-list-harness/grid-list-harness-example.spec.ts
++++ b/src/components-examples/material/grid-list/grid-list-harness/grid-list-harness-example.spec.ts
+@@ -12,7 +12,7 @@ describe('GridListHarnessExample', () => {
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+       imports: [MatGridListModule, GridListHarnessExample],
+-    }).compileComponents();
++    });
+     fixture = TestBed.createComponent(GridListHarnessExample);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.loader(fixture);
+diff --git a/src/components-examples/material/icon/icon-harness/icon-harness-example.spec.ts b/src/components-examples/material/icon/icon-harness/icon-harness-example.spec.ts
+index 47e81fb6ffd6..79441357ac03 100644
+--- a/src/components-examples/material/icon/icon-harness/icon-harness-example.spec.ts
++++ b/src/components-examples/material/icon/icon-harness/icon-harness-example.spec.ts
+@@ -13,7 +13,7 @@ describe('IconHarnessExample', () => {
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+       imports: [MatIconModule],
+-    }).compileComponents();
++    });
+     const registry = TestBed.inject(MatIconRegistry);
+     const sanitizer = TestBed.inject(DomSanitizer);
+ 
+diff --git a/src/components-examples/material/input/input-harness/input-harness-example.spec.ts b/src/components-examples/material/input/input-harness/input-harness-example.spec.ts
+index 25baadb30c40..bb5a817e61da 100644
+--- a/src/components-examples/material/input/input-harness/input-harness-example.spec.ts
++++ b/src/components-examples/material/input/input-harness/input-harness-example.spec.ts
+@@ -12,7 +12,7 @@ describe('InputHarnessExample', () => {
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+       imports: [NoopAnimationsModule],
+-    }).compileComponents();
++    });
+     fixture = TestBed.createComponent(InputHarnessExample);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.loader(fixture);
+diff --git a/src/components-examples/material/menu/menu-harness/menu-harness-example.spec.ts b/src/components-examples/material/menu/menu-harness/menu-harness-example.spec.ts
+index b7ebe8c61fc8..0015e75c1987 100644
+--- a/src/components-examples/material/menu/menu-harness/menu-harness-example.spec.ts
++++ b/src/components-examples/material/menu/menu-harness/menu-harness-example.spec.ts
+@@ -13,7 +13,7 @@ describe('MenuHarnessExample', () => {
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+       imports: [MatMenuModule, NoopAnimationsModule, MenuHarnessExample],
+-    }).compileComponents();
++    });
+     fixture = TestBed.createComponent(MenuHarnessExample);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.loader(fixture);
+diff --git a/src/components-examples/material/paginator/paginator-harness/paginator-harness-example.spec.ts b/src/components-examples/material/paginator/paginator-harness/paginator-harness-example.spec.ts
+index 567d89281c4a..ae343a8ce795 100644
+--- a/src/components-examples/material/paginator/paginator-harness/paginator-harness-example.spec.ts
++++ b/src/components-examples/material/paginator/paginator-harness/paginator-harness-example.spec.ts
+@@ -14,7 +14,7 @@ describe('PaginatorHarnessExample', () => {
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+       imports: [MatPaginatorModule, NoopAnimationsModule],
+-    }).compileComponents();
++    });
+     fixture = TestBed.createComponent(PaginatorHarnessExample);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.loader(fixture);
+diff --git a/src/components-examples/material/select/select-harness/select-harness-example.spec.ts b/src/components-examples/material/select/select-harness/select-harness-example.spec.ts
+index ef217b97b816..6b3008ce78fc 100644
+--- a/src/components-examples/material/select/select-harness/select-harness-example.spec.ts
++++ b/src/components-examples/material/select/select-harness/select-harness-example.spec.ts
+@@ -13,7 +13,7 @@ describe('SelectHarnessExample', () => {
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+       imports: [MatSelectModule, NoopAnimationsModule],
+-    }).compileComponents();
++    });
+     fixture = TestBed.createComponent(SelectHarnessExample);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.loader(fixture);
+diff --git a/src/components-examples/material/sidenav/sidenav-harness/sidenav-harness-example.spec.ts b/src/components-examples/material/sidenav/sidenav-harness/sidenav-harness-example.spec.ts
+index b89a4795b930..95c79753d136 100644
+--- a/src/components-examples/material/sidenav/sidenav-harness/sidenav-harness-example.spec.ts
++++ b/src/components-examples/material/sidenav/sidenav-harness/sidenav-harness-example.spec.ts
+@@ -16,7 +16,7 @@ describe('SidenavHarnessExample', () => {
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+       imports: [NoopAnimationsModule],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(SidenavHarnessExample);
+     fixture.detectChanges();
+diff --git a/src/components-examples/material/slider/slider-harness/slider-harness-example.spec.ts b/src/components-examples/material/slider/slider-harness/slider-harness-example.spec.ts
+index 058e57fb95ae..7ddcdbf4038e 100644
+--- a/src/components-examples/material/slider/slider-harness/slider-harness-example.spec.ts
++++ b/src/components-examples/material/slider/slider-harness/slider-harness-example.spec.ts
+@@ -12,7 +12,7 @@ describe('SliderHarnessExample', () => {
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+       imports: [MatSliderModule, SliderHarnessExample],
+-    }).compileComponents();
++    });
+     fixture = TestBed.createComponent(SliderHarnessExample);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.loader(fixture);
+diff --git a/src/components-examples/material/snack-bar/snack-bar-harness/snack-bar-harness-example.spec.ts b/src/components-examples/material/snack-bar/snack-bar-harness/snack-bar-harness-example.spec.ts
+index 72cd81317f0a..79124ee65578 100644
+--- a/src/components-examples/material/snack-bar/snack-bar-harness/snack-bar-harness-example.spec.ts
++++ b/src/components-examples/material/snack-bar/snack-bar-harness/snack-bar-harness-example.spec.ts
+@@ -12,7 +12,7 @@ describe('SnackBarHarnessExample', () => {
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+       imports: [NoopAnimationsModule],
+-    }).compileComponents();
++    });
+     fixture = TestBed.createComponent(SnackBarHarnessExample);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.documentRootLoader(fixture);
+diff --git a/src/components-examples/material/sort/sort-harness/sort-harness-example.spec.ts b/src/components-examples/material/sort/sort-harness/sort-harness-example.spec.ts
+index 74ee34131a80..4dded206b073 100644
+--- a/src/components-examples/material/sort/sort-harness/sort-harness-example.spec.ts
++++ b/src/components-examples/material/sort/sort-harness/sort-harness-example.spec.ts
+@@ -12,7 +12,7 @@ describe('SortHarnessExample', () => {
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+       imports: [NoopAnimationsModule],
+-    }).compileComponents();
++    });
+     fixture = TestBed.createComponent(SortHarnessExample);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.loader(fixture);
+diff --git a/src/components-examples/material/stepper/stepper-harness/stepper-harness-example.spec.ts b/src/components-examples/material/stepper/stepper-harness/stepper-harness-example.spec.ts
+index decb140bae8a..ac0a4ba48213 100644
+--- a/src/components-examples/material/stepper/stepper-harness/stepper-harness-example.spec.ts
++++ b/src/components-examples/material/stepper/stepper-harness/stepper-harness-example.spec.ts
+@@ -12,7 +12,7 @@ describe('StepperHarnessExample', () => {
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+       imports: [NoopAnimationsModule],
+-    }).compileComponents();
++    });
+     fixture = TestBed.createComponent(StepperHarnessExample);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.loader(fixture);
+diff --git a/src/components-examples/material/tabs/tab-group-harness/tab-group-harness-example.spec.ts b/src/components-examples/material/tabs/tab-group-harness/tab-group-harness-example.spec.ts
+index 4b534d08b1c2..fd61f739af85 100644
+--- a/src/components-examples/material/tabs/tab-group-harness/tab-group-harness-example.spec.ts
++++ b/src/components-examples/material/tabs/tab-group-harness/tab-group-harness-example.spec.ts
+@@ -12,7 +12,7 @@ describe('TabGroupHarnessExample', () => {
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+       imports: [NoopAnimationsModule],
+-    }).compileComponents();
++    });
+     fixture = TestBed.createComponent(TabGroupHarnessExample);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.loader(fixture);
+diff --git a/src/components-examples/material/tooltip/tooltip-harness/tooltip-harness-example.spec.ts b/src/components-examples/material/tooltip/tooltip-harness/tooltip-harness-example.spec.ts
+index 7489641d725f..e46f2c647edd 100644
+--- a/src/components-examples/material/tooltip/tooltip-harness/tooltip-harness-example.spec.ts
++++ b/src/components-examples/material/tooltip/tooltip-harness/tooltip-harness-example.spec.ts
+@@ -13,7 +13,7 @@ describe('TooltipHarnessExample', () => {
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+       imports: [MatTooltipModule, NoopAnimationsModule],
+-    }).compileComponents();
++    });
+     fixture = TestBed.createComponent(TooltipHarnessExample);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.loader(fixture);
+diff --git a/src/material-date-fns-adapter/adapter/date-fns-adapter.spec.ts b/src/material-date-fns-adapter/adapter/date-fns-adapter.spec.ts
+index 5917d726e8a1..8685ea45a114 100644
+--- a/src/material-date-fns-adapter/adapter/date-fns-adapter.spec.ts
++++ b/src/material-date-fns-adapter/adapter/date-fns-adapter.spec.ts
+@@ -23,7 +23,7 @@ describe('DateFnsAdapter', () => {
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+       imports: [DateFnsModule],
+-    }).compileComponents();
++    });
+ 
+     adapter = TestBed.inject(DateAdapter);
+     adapter.setLocale(enUS);
+@@ -461,7 +461,7 @@ describe('DateFnsAdapter with MAT_DATE_LOCALE override', () => {
+     TestBed.configureTestingModule({
+       imports: [DateFnsModule],
+       providers: [{provide: MAT_DATE_LOCALE, useValue: da}],
+-    }).compileComponents();
++    });
+ 
+     adapter = TestBed.inject(DateAdapter);
+   }));
+diff --git a/src/material-experimental/column-resize/column-resize.spec.ts b/src/material-experimental/column-resize/column-resize.spec.ts
+index d78e1524cfd1..2ea243f4ee93 100644
+--- a/src/material-experimental/column-resize/column-resize.spec.ts
++++ b/src/material-experimental/column-resize/column-resize.spec.ts
+@@ -375,7 +375,7 @@ describe('Material Popover Edit', () => {
+         TestBed.configureTestingModule({
+           imports: [BidiModule, MatTableModule, resizeModule],
+           declarations: [componentClass],
+-        }).compileComponents();
++        });
+         fixture = TestBed.createComponent(componentClass);
+         component = fixture.componentInstance;
+         fixture.detectChanges();
+diff --git a/src/material-experimental/menubar/menubar-item.spec.ts b/src/material-experimental/menubar/menubar-item.spec.ts
+index 2336c09404ab..40b610c24de7 100644
+--- a/src/material-experimental/menubar/menubar-item.spec.ts
++++ b/src/material-experimental/menubar/menubar-item.spec.ts
+@@ -11,7 +11,7 @@ describe('MatMenuBarItem', () => {
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+       imports: [MatMenuBarModule, CdkMenuModule, SimpleMenuBarItem],
+-    }).compileComponents();
++    });
+   }));
+ 
+   beforeEach(() => {
+diff --git a/src/material-experimental/menubar/menubar.spec.ts b/src/material-experimental/menubar/menubar.spec.ts
+index ee348d0e7670..f690dd033e31 100644
+--- a/src/material-experimental/menubar/menubar.spec.ts
++++ b/src/material-experimental/menubar/menubar.spec.ts
+@@ -13,7 +13,7 @@ describe('MatMenuBar', () => {
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+       imports: [MatMenuBarModule, SimpleMatMenuBar],
+-    }).compileComponents();
++    });
+   }));
+ 
+   beforeEach(() => {
+diff --git a/src/material-experimental/popover-edit/popover-edit.spec.ts b/src/material-experimental/popover-edit/popover-edit.spec.ts
+index 45436648234a..5b1fe4b5aded 100644
+--- a/src/material-experimental/popover-edit/popover-edit.spec.ts
++++ b/src/material-experimental/popover-edit/popover-edit.spec.ts
+@@ -302,7 +302,7 @@ describe('Material Popover Edit', () => {
+         TestBed.configureTestingModule({
+           imports: [MatTableModule, MatPopoverEditModule, CommonModule, FormsModule],
+           declarations: [componentClass],
+-        }).compileComponents();
++        });
+         fixture = TestBed.createComponent(componentClass);
+         component = fixture.componentInstance;
+         fixture.detectChanges();
+diff --git a/src/material-luxon-adapter/adapter/luxon-date-adapter.spec.ts b/src/material-luxon-adapter/adapter/luxon-date-adapter.spec.ts
+index c896c9406dbd..fb6594a18209 100644
+--- a/src/material-luxon-adapter/adapter/luxon-date-adapter.spec.ts
++++ b/src/material-luxon-adapter/adapter/luxon-date-adapter.spec.ts
+@@ -24,7 +24,7 @@ describe('LuxonDateAdapter', () => {
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+       imports: [LuxonDateModule],
+-    }).compileComponents();
++    });
+ 
+     adapter = TestBed.inject(DateAdapter);
+     adapter.setLocale('en-US');
+@@ -559,7 +559,7 @@ describe('LuxonDateAdapter with MAT_DATE_LOCALE override', () => {
+     TestBed.configureTestingModule({
+       imports: [LuxonDateModule],
+       providers: [{provide: MAT_DATE_LOCALE, useValue: 'da-DK'}],
+-    }).compileComponents();
++    });
+ 
+     adapter = TestBed.inject(DateAdapter);
+   }));
+@@ -577,7 +577,7 @@ describe('LuxonDateAdapter with LOCALE_ID override', () => {
+     TestBed.configureTestingModule({
+       imports: [LuxonDateModule],
+       providers: [{provide: LOCALE_ID, useValue: 'fr-FR'}],
+-    }).compileComponents();
++    });
+ 
+     adapter = TestBed.inject(DateAdapter);
+   }));
+@@ -600,7 +600,7 @@ describe('LuxonDateAdapter with MAT_LUXON_DATE_ADAPTER_OPTIONS override', () =>
+           useValue: {useUtc: true, firstDayOfWeek: 1},
+         },
+       ],
+-    }).compileComponents();
++    });
+ 
+     adapter = TestBed.inject(DateAdapter);
+   }));
+@@ -646,7 +646,7 @@ describe('LuxonDateAdapter with MAT_LUXON_DATE_ADAPTER_OPTIONS override for defa
+           useValue: {defaultOutputCalendar: calendarExample},
+         },
+       ],
+-    }).compileComponents();
++    });
+ 
+     adapter = TestBed.inject(DateAdapter);
+   }));
+diff --git a/src/material-moment-adapter/adapter/moment-date-adapter.spec.ts b/src/material-moment-adapter/adapter/moment-date-adapter.spec.ts
+index 98d3fd18b3ad..64e34eb45595 100644
+--- a/src/material-moment-adapter/adapter/moment-date-adapter.spec.ts
++++ b/src/material-moment-adapter/adapter/moment-date-adapter.spec.ts
+@@ -25,7 +25,7 @@ describe('MomentDateAdapter', () => {
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+       imports: [MomentDateModule],
+-    }).compileComponents();
++    });
+   }));
+ 
+   beforeEach(inject([DateAdapter], (dateAdapter: MomentDateAdapter) => {
+@@ -543,7 +543,7 @@ describe('MomentDateAdapter with MAT_DATE_LOCALE override', () => {
+     TestBed.configureTestingModule({
+       imports: [MomentDateModule],
+       providers: [{provide: MAT_DATE_LOCALE, useValue: 'ja-JP'}],
+-    }).compileComponents();
++    });
+   }));
+ 
+   beforeEach(inject([DateAdapter], (d: MomentDateAdapter) => {
+@@ -562,7 +562,7 @@ describe('MomentDateAdapter with LOCALE_ID override', () => {
+     TestBed.configureTestingModule({
+       imports: [MomentDateModule],
+       providers: [{provide: LOCALE_ID, useValue: 'fr'}],
+-    }).compileComponents();
++    });
+   }));
+ 
+   beforeEach(inject([DateAdapter], (d: MomentDateAdapter) => {
+@@ -586,7 +586,7 @@ describe('MomentDateAdapter with MAT_MOMENT_DATE_ADAPTER_OPTIONS override', () =
+           useValue: {useUtc: true},
+         },
+       ],
+-    }).compileComponents();
++    });
+   }));
+ 
+   beforeEach(inject([DateAdapter], (d: MomentDateAdapter) => {
+@@ -624,7 +624,7 @@ describe('MomentDateAdapter with MAT_MOMENT_DATE_ADAPTER_OPTIONS override', () =
+             },
+           },
+         ],
+-      }).compileComponents();
++      });
+     }));
+ 
+     beforeEach(inject([DateAdapter], (d: MomentDateAdapter) => {
+diff --git a/src/material/autocomplete/autocomplete.spec.ts b/src/material/autocomplete/autocomplete.spec.ts
+index 04ba3638a894..ef8b4f4b56c7 100644
+--- a/src/material/autocomplete/autocomplete.spec.ts
++++ b/src/material/autocomplete/autocomplete.spec.ts
+@@ -73,8 +73,6 @@ describe('MDC-based MatAutocomplete', () => {
+       declarations: [component],
+     });
+ 
+-    TestBed.compileComponents();
+-
+     inject([OverlayContainer], (oc: OverlayContainer) => {
+       overlayContainerElement = oc.getContainerElement();
+     })();
+diff --git a/src/material/autocomplete/autocomplete.zone.spec.ts b/src/material/autocomplete/autocomplete.zone.spec.ts
+index 2daf7166eea5..af545d4ccd14 100644
+--- a/src/material/autocomplete/autocomplete.zone.spec.ts
++++ b/src/material/autocomplete/autocomplete.zone.spec.ts
+@@ -39,8 +39,6 @@ describe('MDC-based MatAutocomplete Zone.js integration', () => {
+       declarations: [component],
+     });
+ 
+-    TestBed.compileComponents();
+-
+     return TestBed.createComponent<T>(component);
+   }
+ 
+diff --git a/src/material/autocomplete/testing/autocomplete-harness.spec.ts b/src/material/autocomplete/testing/autocomplete-harness.spec.ts
+index 788694ee4e3a..3fedab3f7c40 100644
+--- a/src/material/autocomplete/testing/autocomplete-harness.spec.ts
++++ b/src/material/autocomplete/testing/autocomplete-harness.spec.ts
+@@ -10,10 +10,10 @@ describe('MatAutocompleteHarness', () => {
+   let fixture: ComponentFixture<AutocompleteHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [NoopAnimationsModule, MatAutocompleteModule, AutocompleteHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(AutocompleteHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/badge/badge.spec.ts b/src/material/badge/badge.spec.ts
+index 5c4834fa7531..7c5a6ca9da22 100644
+--- a/src/material/badge/badge.spec.ts
++++ b/src/material/badge/badge.spec.ts
+@@ -12,8 +12,8 @@ describe('MatBadge', () => {
+   describe('on an interative host', () => {
+     let testComponent: BadgeOnInteractiveElement;
+ 
+-    beforeEach(async () => {
+-      await TestBed.configureTestingModule({
++    beforeEach(() => {
++      TestBed.configureTestingModule({
+         imports: [
+           MatBadgeModule,
+           BadgeOnInteractiveElement,
+@@ -21,7 +21,7 @@ describe('MatBadge', () => {
+           NestedBadge,
+           BadgeOnTemplate,
+         ],
+-      }).compileComponents();
++      });
+ 
+       fixture = TestBed.createComponent(BadgeOnInteractiveElement);
+       testComponent = fixture.debugElement.componentInstance;
+@@ -230,10 +230,10 @@ describe('MatBadge', () => {
+   describe('on an non-interactive host', () => {
+     let testComponent: BadgeOnNonInteractiveElement;
+ 
+-    beforeEach(async () => {
+-      await TestBed.configureTestingModule({
++    beforeEach(() => {
++      TestBed.configureTestingModule({
+         imports: [MatBadgeModule, BadgeOnNonInteractiveElement],
+-      }).compileComponents();
++      });
+ 
+       fixture = TestBed.createComponent(BadgeOnNonInteractiveElement);
+       testComponent = fixture.debugElement.componentInstance;
+diff --git a/src/material/badge/testing/badge-harness.spec.ts b/src/material/badge/testing/badge-harness.spec.ts
+index d44c0fa337ea..48838b343d94 100644
+--- a/src/material/badge/testing/badge-harness.spec.ts
++++ b/src/material/badge/testing/badge-harness.spec.ts
+@@ -9,10 +9,10 @@ describe('MatBadgeHarness', () => {
+   let fixture: ComponentFixture<BadgeHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatBadgeModule, BadgeHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(BadgeHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/bottom-sheet/bottom-sheet.spec.ts b/src/material/bottom-sheet/bottom-sheet.spec.ts
+index 5fe16b33781b..6ff758e2fa96 100644
+--- a/src/material/bottom-sheet/bottom-sheet.spec.ts
++++ b/src/material/bottom-sheet/bottom-sheet.spec.ts
+@@ -62,7 +62,7 @@ describe('MatBottomSheet', () => {
+         ShadowDomComponent,
+       ],
+       providers: [{provide: Location, useClass: SpyLocation}],
+-    }).compileComponents();
++    });
+   }));
+ 
+   beforeEach(inject(
+@@ -871,7 +871,7 @@ describe('MatBottomSheet with parent MatBottomSheet', () => {
+   beforeEach(fakeAsync(() => {
+     TestBed.configureTestingModule({
+       imports: [MatBottomSheetModule, NoopAnimationsModule, ComponentThatProvidesMatBottomSheet],
+-    }).compileComponents();
++    });
+   }));
+ 
+   beforeEach(inject(
+@@ -963,8 +963,6 @@ describe('MatBottomSheet with default options', () => {
+       ],
+       providers: [{provide: MAT_BOTTOM_SHEET_DEFAULT_OPTIONS, useValue: defaultConfig}],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   beforeEach(inject(
+diff --git a/src/material/bottom-sheet/testing/bottom-sheet-harness.spec.ts b/src/material/bottom-sheet/testing/bottom-sheet-harness.spec.ts
+index 9a07a8b57c7c..9c77996ed34d 100644
+--- a/src/material/bottom-sheet/testing/bottom-sheet-harness.spec.ts
++++ b/src/material/bottom-sheet/testing/bottom-sheet-harness.spec.ts
+@@ -14,10 +14,10 @@ describe('MatBottomSheetHarness', () => {
+   let fixture: ComponentFixture<BottomSheetHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatBottomSheetModule, NoopAnimationsModule, BottomSheetHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(BottomSheetHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/button-toggle/button-toggle.spec.ts b/src/material/button-toggle/button-toggle.spec.ts
+index bba68c81416c..7501b549c8ce 100644
+--- a/src/material/button-toggle/button-toggle.spec.ts
++++ b/src/material/button-toggle/button-toggle.spec.ts
+@@ -26,8 +26,6 @@ describe('MatButtonToggle with forms', () => {
+         ButtonToggleGroupWithFormControlAndDynamicButtons,
+       ],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   describe('using FormControl', () => {
+@@ -334,8 +332,6 @@ describe('MatButtonToggle without forms', () => {
+         ButtonToggleWithStaticAriaAttributes,
+       ],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   describe('inside of an exclusive selection group', () => {
+@@ -942,8 +938,6 @@ describe('MatButtonToggle without forms', () => {
+           },
+         ],
+       });
+-
+-      TestBed.compileComponents();
+     });
+ 
+     it('should hide checkmark indicator for single selection', () => {
+diff --git a/src/material/button-toggle/testing/button-toggle-group.spec.ts b/src/material/button-toggle/testing/button-toggle-group.spec.ts
+index 02802b67fdb0..70377498cac4 100644
+--- a/src/material/button-toggle/testing/button-toggle-group.spec.ts
++++ b/src/material/button-toggle/testing/button-toggle-group.spec.ts
+@@ -9,10 +9,10 @@ describe('MatButtonToggleGroupHarness', () => {
+   let fixture: ComponentFixture<ButtonToggleGroupHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatButtonToggleModule, ButtonToggleGroupHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(ButtonToggleGroupHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/button-toggle/testing/button-toggle-harness.spec.ts b/src/material/button-toggle/testing/button-toggle-harness.spec.ts
+index 595f87b045c2..f5e2316732b9 100644
+--- a/src/material/button-toggle/testing/button-toggle-harness.spec.ts
++++ b/src/material/button-toggle/testing/button-toggle-harness.spec.ts
+@@ -9,10 +9,10 @@ describe('MatButtonToggleHarness', () => {
+   let fixture: ComponentFixture<ButtonToggleHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatButtonToggleModule, ButtonToggleHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(ButtonToggleHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/button/button.spec.ts b/src/material/button/button.spec.ts
+index 123f7b1eb4d4..31325fa087de 100644
+--- a/src/material/button/button.spec.ts
++++ b/src/material/button/button.spec.ts
+@@ -16,8 +16,6 @@ describe('MDC-based MatButton', () => {
+     TestBed.configureTestingModule({
+       imports: [MatButtonModule, TestApp],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   // General button tests
+@@ -454,8 +452,6 @@ describe('MatFabDefaultOptions', () => {
+       imports: [MatButtonModule, TestApp],
+       providers: [{provide: MAT_FAB_DEFAULT_OPTIONS, useValue: defaults}],
+     });
+-
+-    TestBed.compileComponents();
+   }
+ 
+   it('should override default color in component', () => {
+diff --git a/src/material/button/testing/button-harness.spec.ts b/src/material/button/testing/button-harness.spec.ts
+index cfd12e6caa4d..e19db0e5ea21 100644
+--- a/src/material/button/testing/button-harness.spec.ts
++++ b/src/material/button/testing/button-harness.spec.ts
+@@ -13,10 +13,10 @@ describe('MatButtonHarness', () => {
+   let loader: HarnessLoader;
+   let platform: Platform;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatButtonModule, MatIconModule, PlatformModule, ButtonHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(ButtonHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/card/card.spec.ts b/src/material/card/card.spec.ts
+index eb5c72604e9e..5b6c47ee3ff4 100644
+--- a/src/material/card/card.spec.ts
++++ b/src/material/card/card.spec.ts
+@@ -8,7 +8,7 @@ describe('MDC-based MatCard', () => {
+     TestBed.configureTestingModule({
+       imports: [MatCardModule, component],
+       providers,
+-    }).compileComponents();
++    });
+ 
+     return TestBed.createComponent<T>(component);
+   }
+diff --git a/src/material/card/testing/card-harness.spec.ts b/src/material/card/testing/card-harness.spec.ts
+index 3ce6d2b7cf1c..7837c73794eb 100644
+--- a/src/material/card/testing/card-harness.spec.ts
++++ b/src/material/card/testing/card-harness.spec.ts
+@@ -9,10 +9,10 @@ describe('MatCardHarness', () => {
+   let fixture: ComponentFixture<CardHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatCardModule, CardHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(CardHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/checkbox/checkbox.spec.ts b/src/material/checkbox/checkbox.spec.ts
+index dc751b271d7f..6ed36bd39897 100644
+--- a/src/material/checkbox/checkbox.spec.ts
++++ b/src/material/checkbox/checkbox.spec.ts
+@@ -18,7 +18,7 @@ describe('MDC-based MatCheckbox', () => {
+   function createComponent<T>(componentType: Type<T>) {
+     TestBed.configureTestingModule({
+       imports: [MatCheckboxModule, FormsModule, ReactiveFormsModule, componentType],
+-    }).compileComponents();
++    });
+ 
+     return TestBed.createComponent<T>(componentType);
+   }
+@@ -1096,8 +1096,6 @@ describe('MatCheckboxDefaultOptions', () => {
+         imports: [MatCheckboxModule, FormsModule, SingleCheckbox, SingleCheckbox],
+         providers: [{provide: MAT_CHECKBOX_DEFAULT_OPTIONS, useValue: defaults}],
+       });
+-
+-      TestBed.compileComponents();
+     }
+ 
+     it('should override default color in component', () => {
+diff --git a/src/material/checkbox/testing/checkbox-harness.spec.ts b/src/material/checkbox/testing/checkbox-harness.spec.ts
+index 451d291f5da6..dadfad5e56af 100644
+--- a/src/material/checkbox/testing/checkbox-harness.spec.ts
++++ b/src/material/checkbox/testing/checkbox-harness.spec.ts
+@@ -10,10 +10,10 @@ describe('MatCheckboxHarness', () => {
+   let fixture: ComponentFixture<CheckboxHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatCheckboxModule, ReactiveFormsModule, CheckboxHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(CheckboxHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/chips/chip-edit-input.spec.ts b/src/material/chips/chip-edit-input.spec.ts
+index d93d22594310..71e2c954bf8c 100644
+--- a/src/material/chips/chip-edit-input.spec.ts
++++ b/src/material/chips/chip-edit-input.spec.ts
+@@ -15,8 +15,6 @@ describe('MDC-based MatChipEditInput', () => {
+       imports: [MatChipsModule, ChipEditInputContainer],
+     });
+ 
+-    TestBed.compileComponents();
+-
+     fixture = TestBed.createComponent(ChipEditInputContainer);
+     inputDebugElement = fixture.debugElement.query(By.directive(MatChipEditInput))!;
+     inputInstance = inputDebugElement.injector.get<MatChipEditInput>(MatChipEditInput);
+diff --git a/src/material/chips/chip-grid.spec.ts b/src/material/chips/chip-grid.spec.ts
+index 264675e33f49..806b9103e474 100644
+--- a/src/material/chips/chip-grid.spec.ts
++++ b/src/material/chips/chip-grid.spec.ts
+@@ -1056,7 +1056,7 @@ describe('MDC-based MatChipGrid', () => {
+       ],
+       providers: [{provide: Directionality, useValue: directionality}],
+       declarations: [component],
+-    }).compileComponents();
++    });
+ 
+     const fixture = TestBed.createComponent<T>(component);
+     fixture.detectChanges();
+diff --git a/src/material/chips/chip-input.spec.ts b/src/material/chips/chip-input.spec.ts
+index 32e5d203743e..98dafca74c15 100644
+--- a/src/material/chips/chip-input.spec.ts
++++ b/src/material/chips/chip-input.spec.ts
+@@ -41,8 +41,6 @@ describe('MDC-based MatChipInput', () => {
+       ],
+       declarations: [TestChipInput],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   beforeEach(waitForAsync(() => {
+@@ -195,18 +193,16 @@ describe('MDC-based MatChipInput', () => {
+     it('emits (chipEnd) when the separator keys are configured globally', () => {
+       fixture.destroy();
+ 
+-      TestBed.resetTestingModule()
+-        .configureTestingModule({
+-          imports: [MatChipsModule, MatFormFieldModule, PlatformModule, NoopAnimationsModule],
+-          declarations: [TestChipInput],
+-          providers: [
+-            {
+-              provide: MAT_CHIPS_DEFAULT_OPTIONS,
+-              useValue: {separatorKeyCodes: [COMMA]} as MatChipsDefaultOptions,
+-            },
+-          ],
+-        })
+-        .compileComponents();
++      TestBed.resetTestingModule().configureTestingModule({
++        imports: [MatChipsModule, MatFormFieldModule, PlatformModule, NoopAnimationsModule],
++        declarations: [TestChipInput],
++        providers: [
++          {
++            provide: MAT_CHIPS_DEFAULT_OPTIONS,
++            useValue: {separatorKeyCodes: [COMMA]} as MatChipsDefaultOptions,
++          },
++        ],
++      });
+ 
+       fixture = TestBed.createComponent(TestChipInput);
+       testChipInput = fixture.debugElement.componentInstance;
+diff --git a/src/material/chips/chip-listbox.spec.ts b/src/material/chips/chip-listbox.spec.ts
+index 34159fd46cde..c3d9c2621e0f 100644
+--- a/src/material/chips/chip-listbox.spec.ts
++++ b/src/material/chips/chip-listbox.spec.ts
+@@ -870,7 +870,7 @@ describe('MDC-based MatChipListbox', () => {
+       imports: [FormsModule, ReactiveFormsModule, MatChipsModule],
+       providers: [{provide: Directionality, useValue: directionality}],
+       declarations: [component],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent<T>(component);
+     beforeInitialChangeDetection?.(fixture);
+diff --git a/src/material/chips/chip-option.spec.ts b/src/material/chips/chip-option.spec.ts
+index f2a29a30ff9f..eb4a2f6b1e6a 100644
+--- a/src/material/chips/chip-option.spec.ts
++++ b/src/material/chips/chip-option.spec.ts
+@@ -49,8 +49,6 @@ describe('MDC-based Option Chips', () => {
+       ],
+       declarations: [SingleChip],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   describe('MatChipOption', () => {
+diff --git a/src/material/chips/chip-remove.spec.ts b/src/material/chips/chip-remove.spec.ts
+index 1393c84b078a..745e167a2e82 100644
+--- a/src/material/chips/chip-remove.spec.ts
++++ b/src/material/chips/chip-remove.spec.ts
+@@ -14,8 +14,6 @@ describe('MDC-based Chip Remove', () => {
+     TestBed.configureTestingModule({
+       imports: [MatChipsModule, TestChip],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   beforeEach(waitForAsync(() => {
+diff --git a/src/material/chips/chip-row.spec.ts b/src/material/chips/chip-row.spec.ts
+index 2c139c17cb95..06d4936c0e46 100644
+--- a/src/material/chips/chip-row.spec.ts
++++ b/src/material/chips/chip-row.spec.ts
+@@ -40,8 +40,6 @@ describe('MDC-based Row Chips', () => {
+         },
+       ],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   describe('MatChipRow', () => {
+diff --git a/src/material/chips/chip-set.spec.ts b/src/material/chips/chip-set.spec.ts
+index bf556874b336..a737c3a40621 100644
+--- a/src/material/chips/chip-set.spec.ts
++++ b/src/material/chips/chip-set.spec.ts
+@@ -9,8 +9,6 @@ describe('MDC-based MatChipSet', () => {
+     TestBed.configureTestingModule({
+       imports: [MatChipsModule, CommonModule, BasicChipSet, IndirectDescendantsChipSet],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   describe('BasicChipSet', () => {
+diff --git a/src/material/chips/chip.spec.ts b/src/material/chips/chip.spec.ts
+index 9d4037038bdd..0cf818a2ca20 100644
+--- a/src/material/chips/chip.spec.ts
++++ b/src/material/chips/chip.spec.ts
+@@ -32,8 +32,6 @@ describe('MDC-based MatChip', () => {
+         },
+       ],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   describe('MatBasicChip', () => {
+diff --git a/src/material/chips/testing/chip-grid-harness.spec.ts b/src/material/chips/testing/chip-grid-harness.spec.ts
+index 7751683e33b0..0e022287be52 100644
+--- a/src/material/chips/testing/chip-grid-harness.spec.ts
++++ b/src/material/chips/testing/chip-grid-harness.spec.ts
+@@ -10,10 +10,10 @@ describe('MatChipGridHarness', () => {
+   let fixture: ComponentFixture<ChipGridHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatChipsModule, ReactiveFormsModule, ChipGridHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(ChipGridHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/chips/testing/chip-harness.spec.ts b/src/material/chips/testing/chip-harness.spec.ts
+index 877c2a073ee3..64c2ec44e4c4 100644
+--- a/src/material/chips/testing/chip-harness.spec.ts
++++ b/src/material/chips/testing/chip-harness.spec.ts
+@@ -11,10 +11,10 @@ describe('MatChipHarness', () => {
+   let fixture: ComponentFixture<ChipHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatChipsModule, MatIconModule, ChipHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(ChipHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/chips/testing/chip-input-harness.spec.ts b/src/material/chips/testing/chip-input-harness.spec.ts
+index 9b0e60d6e44d..913087581098 100644
+--- a/src/material/chips/testing/chip-input-harness.spec.ts
++++ b/src/material/chips/testing/chip-input-harness.spec.ts
+@@ -10,10 +10,10 @@ describe('MatChipInputHarness', () => {
+   let fixture: ComponentFixture<ChipInputHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatChipsModule, ChipInputHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(ChipInputHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/chips/testing/chip-listbox-harness.spec.ts b/src/material/chips/testing/chip-listbox-harness.spec.ts
+index 6c36fce9f32e..237706b1e8eb 100644
+--- a/src/material/chips/testing/chip-listbox-harness.spec.ts
++++ b/src/material/chips/testing/chip-listbox-harness.spec.ts
+@@ -9,10 +9,10 @@ describe('MatChipListboxHarness', () => {
+   let fixture: ComponentFixture<ChipListboxHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatChipsModule, ChipListboxHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(ChipListboxHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/chips/testing/chip-option-harness.spec.ts b/src/material/chips/testing/chip-option-harness.spec.ts
+index 79bf52814a27..44a1a21eb721 100644
+--- a/src/material/chips/testing/chip-option-harness.spec.ts
++++ b/src/material/chips/testing/chip-option-harness.spec.ts
+@@ -9,10 +9,10 @@ describe('MatChipOptionHarness', () => {
+   let fixture: ComponentFixture<ChipOptionHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatChipsModule, ChipOptionHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(ChipOptionHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/chips/testing/chip-row-harness.spec.ts b/src/material/chips/testing/chip-row-harness.spec.ts
+index 489cd9a896cd..6f62fc3b0453 100644
+--- a/src/material/chips/testing/chip-row-harness.spec.ts
++++ b/src/material/chips/testing/chip-row-harness.spec.ts
+@@ -9,10 +9,10 @@ describe('MatChipRowHarness', () => {
+   let fixture: ComponentFixture<ChipRowHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatChipsModule, ChipRowHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(ChipRowHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/chips/testing/chip-set-harness.spec.ts b/src/material/chips/testing/chip-set-harness.spec.ts
+index 9500d5b1bd0e..576784f358df 100644
+--- a/src/material/chips/testing/chip-set-harness.spec.ts
++++ b/src/material/chips/testing/chip-set-harness.spec.ts
+@@ -9,10 +9,10 @@ describe('MatChipSetHarness', () => {
+   let fixture: ComponentFixture<ChipSetHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatChipsModule, ChipSetHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(ChipSetHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/core/datetime/native-date-adapter.spec.ts b/src/material/core/datetime/native-date-adapter.spec.ts
+index 43febe89027b..ed3c997f00c1 100644
+--- a/src/material/core/datetime/native-date-adapter.spec.ts
++++ b/src/material/core/datetime/native-date-adapter.spec.ts
+@@ -10,7 +10,7 @@ describe('NativeDateAdapter', () => {
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+       imports: [NativeDateModule],
+-    }).compileComponents();
++    });
+   }));
+ 
+   beforeEach(inject([DateAdapter], (dateAdapter: NativeDateAdapter) => {
+@@ -473,7 +473,7 @@ describe('NativeDateAdapter with MAT_DATE_LOCALE override', () => {
+     TestBed.configureTestingModule({
+       imports: [NativeDateModule],
+       providers: [{provide: MAT_DATE_LOCALE, useValue: 'da-DK'}],
+-    }).compileComponents();
++    });
+   }));
+ 
+   beforeEach(inject([DateAdapter], (d: NativeDateAdapter) => {
+@@ -493,7 +493,7 @@ describe('NativeDateAdapter with LOCALE_ID override', () => {
+     TestBed.configureTestingModule({
+       imports: [NativeDateModule],
+       providers: [{provide: LOCALE_ID, useValue: 'da-DK'}],
+-    }).compileComponents();
++    });
+   }));
+ 
+   beforeEach(inject([DateAdapter], (d: NativeDateAdapter) => {
+diff --git a/src/material/core/option/option.spec.ts b/src/material/core/option/option.spec.ts
+index b9d79837e46b..c026664b42ac 100644
+--- a/src/material/core/option/option.spec.ts
++++ b/src/material/core/option/option.spec.ts
+@@ -14,7 +14,7 @@ describe('MatOption component', () => {
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+       imports: [MatOptionModule, BasicOption],
+-    }).compileComponents();
++    });
+   }));
+ 
+   it('should complete the `stateChanges` stream on destroy', () => {
+@@ -221,7 +221,7 @@ describe('MatOption component', () => {
+             useValue: {inertGroups: true},
+           },
+         ],
+-      }).compileComponents();
++      });
+ 
+       fixture = TestBed.createComponent(InsideGroup);
+       fixture.detectChanges();
+diff --git a/src/material/core/testing/optgroup-harness.spec.ts b/src/material/core/testing/optgroup-harness.spec.ts
+index 37c2f079b1ad..465418099898 100644
+--- a/src/material/core/testing/optgroup-harness.spec.ts
++++ b/src/material/core/testing/optgroup-harness.spec.ts
+@@ -9,10 +9,10 @@ describe('MatOptgroupHarness', () => {
+   let fixture: ComponentFixture<OptgroupHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatOptionModule, OptgroupHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(OptgroupHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/core/testing/option-harness.spec.ts b/src/material/core/testing/option-harness.spec.ts
+index 8e8bbd5db1c2..1d94e7cff299 100644
+--- a/src/material/core/testing/option-harness.spec.ts
++++ b/src/material/core/testing/option-harness.spec.ts
+@@ -14,10 +14,10 @@ describe('MatOptionHarness', () => {
+   let fixture: ComponentFixture<OptionHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatOptionModule, OptionHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(OptionHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/datepicker/calendar-body.spec.ts b/src/material/datepicker/calendar-body.spec.ts
+index b9a5e7d5d0ef..1e40e18d6ab1 100644
+--- a/src/material/datepicker/calendar-body.spec.ts
++++ b/src/material/datepicker/calendar-body.spec.ts
+@@ -13,8 +13,6 @@ describe('MatCalendarBody', () => {
+     TestBed.configureTestingModule({
+       imports: [MatCalendarBody, StandardCalendarBody, RangeCalendarBody],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   describe('standard calendar body', () => {
+diff --git a/src/material/datepicker/calendar-header.spec.ts b/src/material/datepicker/calendar-header.spec.ts
+index 6c25947d4835..a03bbcaf935f 100644
+--- a/src/material/datepicker/calendar-header.spec.ts
++++ b/src/material/datepicker/calendar-header.spec.ts
+@@ -21,8 +21,6 @@ describe('MatCalendarHeader', () => {
+       ],
+       providers: [MatDatepickerIntl, {provide: Directionality, useFactory: () => ({value: 'ltr'})}],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   describe('standard calendar', () => {
+diff --git a/src/material/datepicker/calendar.spec.ts b/src/material/datepicker/calendar.spec.ts
+index af306229a7bf..34884398a48d 100644
+--- a/src/material/datepicker/calendar.spec.ts
++++ b/src/material/datepicker/calendar.spec.ts
+@@ -27,8 +27,6 @@ describe('MatCalendar', () => {
+         CalendarWithSelectableMinDate,
+       ],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   describe('standard calendar', () => {
+diff --git a/src/material/datepicker/month-view.spec.ts b/src/material/datepicker/month-view.spec.ts
+index 12e1d9e38c67..aa3bdf732e84 100644
+--- a/src/material/datepicker/month-view.spec.ts
++++ b/src/material/datepicker/month-view.spec.ts
+@@ -52,8 +52,6 @@ describe('MatMonthView', () => {
+           {provide: MAT_DATE_RANGE_SELECTION_STRATEGY, useClass: DefaultMatCalendarRangeStrategy},
+         ],
+       });
+-
+-      TestBed.compileComponents();
+     }));
+ 
+     describe('standard month view', () => {
+@@ -835,8 +833,6 @@ describe('MatMonthView', () => {
+         ],
+       });
+ 
+-      TestBed.compileComponents();
+-
+       fixture = TestBed.createComponent(StandardMonthView);
+       fixture.detectChanges();
+ 
+diff --git a/src/material/datepicker/multi-year-view.spec.ts b/src/material/datepicker/multi-year-view.spec.ts
+index cafcb2835bca..bf1bcf5f0449 100644
+--- a/src/material/datepicker/multi-year-view.spec.ts
++++ b/src/material/datepicker/multi-year-view.spec.ts
+@@ -35,8 +35,6 @@ describe('MatMultiYearView', () => {
+       ],
+       providers: [{provide: Directionality, useFactory: () => (dir = {value: 'ltr'})}],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   describe('standard multi-year view', () => {
+diff --git a/src/material/datepicker/testing/calendar-harness.spec.ts b/src/material/datepicker/testing/calendar-harness.spec.ts
+index f6b52bea1669..e4963994d7ae 100644
+--- a/src/material/datepicker/testing/calendar-harness.spec.ts
++++ b/src/material/datepicker/testing/calendar-harness.spec.ts
+@@ -18,8 +18,8 @@ describe('MatCalendarHarness', () => {
+   let fixture: ComponentFixture<CalendarHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatNativeDateModule, MatDatepickerModule, CalendarHarnessTest],
+       providers: [
+         {
+@@ -29,7 +29,7 @@ describe('MatCalendarHarness', () => {
+           useClass: DefaultMatCalendarRangeStrategy,
+         },
+       ],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(CalendarHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/datepicker/testing/date-range-input-harness.spec.ts b/src/material/datepicker/testing/date-range-input-harness.spec.ts
+index a4997805da1b..fab9074154e0 100644
+--- a/src/material/datepicker/testing/date-range-input-harness.spec.ts
++++ b/src/material/datepicker/testing/date-range-input-harness.spec.ts
+@@ -23,8 +23,8 @@ describe('matDateRangeInputHarness', () => {
+   let fixture: ComponentFixture<DateRangeInputHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [
+         NoopAnimationsModule,
+         MatNativeDateModule,
+@@ -32,7 +32,7 @@ describe('matDateRangeInputHarness', () => {
+         FormsModule,
+         DateRangeInputHarnessTest,
+       ],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(DateRangeInputHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/datepicker/testing/datepicker-input-harness.spec.ts b/src/material/datepicker/testing/datepicker-input-harness.spec.ts
+index f9a34c1d40a5..178aeeb15ccc 100644
+--- a/src/material/datepicker/testing/datepicker-input-harness.spec.ts
++++ b/src/material/datepicker/testing/datepicker-input-harness.spec.ts
+@@ -13,8 +13,8 @@ describe('MatDatepickerInputHarness', () => {
+   let fixture: ComponentFixture<DatepickerInputHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [
+         NoopAnimationsModule,
+         MatNativeDateModule,
+@@ -22,7 +22,7 @@ describe('MatDatepickerInputHarness', () => {
+         FormsModule,
+         DatepickerInputHarnessTest,
+       ],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(DatepickerInputHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/datepicker/testing/datepicker-toggle-harness.spec.ts b/src/material/datepicker/testing/datepicker-toggle-harness.spec.ts
+index ee68c85b9da7..ab72b88fb2ee 100644
+--- a/src/material/datepicker/testing/datepicker-toggle-harness.spec.ts
++++ b/src/material/datepicker/testing/datepicker-toggle-harness.spec.ts
+@@ -12,15 +12,15 @@ describe('MatDatepickerToggleHarness', () => {
+   let fixture: ComponentFixture<DatepickerToggleHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [
+         NoopAnimationsModule,
+         MatNativeDateModule,
+         MatDatepickerModule,
+         DatepickerToggleHarnessTest,
+       ],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(DatepickerToggleHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/datepicker/year-view.spec.ts b/src/material/datepicker/year-view.spec.ts
+index e6f8c0699e3d..ce8b3aec18f6 100644
+--- a/src/material/datepicker/year-view.spec.ts
++++ b/src/material/datepicker/year-view.spec.ts
+@@ -34,8 +34,6 @@ describe('MatYearView', () => {
+       ],
+       providers: [{provide: Directionality, useFactory: () => (dir = {value: 'ltr'})}],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   describe('standard year view', () => {
+diff --git a/src/material/dialog/dialog.spec.ts b/src/material/dialog/dialog.spec.ts
+index 0a472e363fa5..47933beae2d4 100644
+--- a/src/material/dialog/dialog.spec.ts
++++ b/src/material/dialog/dialog.spec.ts
+@@ -93,8 +93,6 @@ describe('MDC-based MatDialog', () => {
+         },
+       ],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   beforeEach(inject(
+@@ -1912,8 +1910,6 @@ describe('MDC-based MatDialog with a parent MatDialog', () => {
+         {provide: Location, useClass: SpyLocation},
+       ],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   beforeEach(inject([MatDialog], (d: MatDialog) => {
+@@ -2021,8 +2017,6 @@ describe('MDC-based MatDialog with default options', () => {
+       ],
+       providers: [{provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: defaultConfig}],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   beforeEach(inject([MatDialog, OverlayContainer], (d: MatDialog, oc: OverlayContainer) => {
+@@ -2092,8 +2086,6 @@ describe('MDC-based MatDialog with animations enabled', () => {
+         DirectiveWithViewContainer,
+       ],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   beforeEach(inject([MatDialog], (d: MatDialog) => {
+@@ -2151,8 +2143,6 @@ describe('MatDialog with explicit injector provided', () => {
+     TestBed.configureTestingModule({
+       imports: [MatDialogModule, BrowserAnimationsModule, ModuleBoundDialogParentComponent],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   beforeEach(inject([OverlayContainer], (oc: OverlayContainer) => {
+diff --git a/src/material/dialog/dialog.zone.spec.ts b/src/material/dialog/dialog.zone.spec.ts
+index a9f493444620..9963e17a8fcf 100644
+--- a/src/material/dialog/dialog.zone.spec.ts
++++ b/src/material/dialog/dialog.zone.spec.ts
+@@ -44,8 +44,6 @@ describe('MDC-based MatDialog', () => {
+         },
+       ],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   beforeEach(inject([MatDialog], (d: MatDialog) => {
+diff --git a/src/material/dialog/testing/dialog-harness.spec.ts b/src/material/dialog/testing/dialog-harness.spec.ts
+index ddd3de3dad79..28a92ec87edc 100644
+--- a/src/material/dialog/testing/dialog-harness.spec.ts
++++ b/src/material/dialog/testing/dialog-harness.spec.ts
+@@ -16,10 +16,10 @@ describe('MatDialogHarness', () => {
+   let fixture: ComponentFixture<DialogHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [NoopAnimationsModule],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(DialogHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/dialog/testing/dialog-opener.spec.ts b/src/material/dialog/testing/dialog-opener.spec.ts
+index a53aa54804bc..ad4e90673b45 100644
+--- a/src/material/dialog/testing/dialog-opener.spec.ts
++++ b/src/material/dialog/testing/dialog-opener.spec.ts
+@@ -9,8 +9,6 @@ describe('MDC-based MatTestDialogOpener', () => {
+     TestBed.configureTestingModule({
+       imports: [MatTestDialogOpenerModule, NoopAnimationsModule, ExampleComponent],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   it('should open a dialog when created', fakeAsync(() => {
+diff --git a/src/material/divider/divider.spec.ts b/src/material/divider/divider.spec.ts
+index 5351ee13b318..c5e7b0057551 100644
+--- a/src/material/divider/divider.spec.ts
++++ b/src/material/divider/divider.spec.ts
+@@ -11,7 +11,6 @@ describe('MatDivider', () => {
+       imports: [MatDividerModule, MatDividerTestComponent],
+     });
+ 
+-    TestBed.compileComponents();
+     fixture = TestBed.createComponent(MatDividerTestComponent);
+   }));
+ 
+diff --git a/src/material/divider/testing/divider-harness.spec.ts b/src/material/divider/testing/divider-harness.spec.ts
+index dd5462e7a733..bb4e8a911bbb 100644
+--- a/src/material/divider/testing/divider-harness.spec.ts
++++ b/src/material/divider/testing/divider-harness.spec.ts
+@@ -9,10 +9,10 @@ describe('MatLegacyButtonHarness', () => {
+   let fixture: ComponentFixture<DividerHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatDividerModule, DividerHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(DividerHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/expansion/accordion.spec.ts b/src/material/expansion/accordion.spec.ts
+index af4f59f82cc7..cfbfa993da27 100644
+--- a/src/material/expansion/accordion.spec.ts
++++ b/src/material/expansion/accordion.spec.ts
+@@ -31,7 +31,6 @@ describe('MatAccordion', () => {
+         NestedAccordions,
+       ],
+     });
+-    TestBed.compileComponents();
+ 
+     inject([FocusMonitor], (fm: FocusMonitor) => {
+       focusMonitor = fm;
+diff --git a/src/material/expansion/expansion.spec.ts b/src/material/expansion/expansion.spec.ts
+index 7cb44fba580a..157507f935f9 100644
+--- a/src/material/expansion/expansion.spec.ts
++++ b/src/material/expansion/expansion.spec.ts
+@@ -38,7 +38,6 @@ describe('MatExpansionPanel', () => {
+         NestedLazyPanelWithContent,
+       ],
+     });
+-    TestBed.compileComponents();
+   }));
+ 
+   it('should expand and collapse the panel', fakeAsync(() => {
+@@ -419,21 +418,19 @@ describe('MatExpansionPanel', () => {
+   }));
+ 
+   it('should be able to set the default options through the injection token', () => {
+-    TestBed.resetTestingModule()
+-      .configureTestingModule({
+-        imports: [MatExpansionModule, NoopAnimationsModule],
+-        providers: [
+-          {
+-            provide: MAT_EXPANSION_PANEL_DEFAULT_OPTIONS,
+-            useValue: {
+-              hideToggle: true,
+-              expandedHeight: '10px',
+-              collapsedHeight: '16px',
+-            },
++    TestBed.resetTestingModule().configureTestingModule({
++      imports: [MatExpansionModule, NoopAnimationsModule],
++      providers: [
++        {
++          provide: MAT_EXPANSION_PANEL_DEFAULT_OPTIONS,
++          useValue: {
++            hideToggle: true,
++            expandedHeight: '10px',
++            collapsedHeight: '16px',
+           },
+-        ],
+-      })
+-      .compileComponents();
++        },
++      ],
++    });
+ 
+     const fixture = TestBed.createComponent(PanelWithTwoWayBinding);
+     fixture.detectChanges();
+diff --git a/src/material/expansion/testing/expansion-harness.spec.ts b/src/material/expansion/testing/expansion-harness.spec.ts
+index f97090ee8452..807462e41b47 100644
+--- a/src/material/expansion/testing/expansion-harness.spec.ts
++++ b/src/material/expansion/testing/expansion-harness.spec.ts
+@@ -11,10 +11,10 @@ describe('MatExpansionHarness', () => {
+   let fixture: ComponentFixture<ExpansionHarnessTestComponent>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatExpansionModule, NoopAnimationsModule, ExpansionHarnessTestComponent],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(ExpansionHarnessTestComponent);
+     fixture.detectChanges();
+diff --git a/src/material/form-field/testing/form-field-harness.spec.ts b/src/material/form-field/testing/form-field-harness.spec.ts
+index fc2ff1a3ccfa..b5d7642b1041 100644
+--- a/src/material/form-field/testing/form-field-harness.spec.ts
++++ b/src/material/form-field/testing/form-field-harness.spec.ts
+@@ -39,15 +39,15 @@ describe('MatFormFieldHarness', () => {
+   let fixture: ComponentFixture<FormFieldHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [
+         NoopAnimationsModule,
+         MatNativeDateModule,
+         FormFieldHarnessTest,
+         MatDatepickerModule,
+       ],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(FormFieldHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/grid-list/grid-list.spec.ts b/src/material/grid-list/grid-list.spec.ts
+index 23754b9e931b..4cf4ed0d152d 100644
+--- a/src/material/grid-list/grid-list.spec.ts
++++ b/src/material/grid-list/grid-list.spec.ts
+@@ -10,7 +10,7 @@ describe('MatGridList', () => {
+     TestBed.configureTestingModule({
+       imports: [MatGridListModule],
+       declarations: [componentType],
+-    }).compileComponents();
++    });
+ 
+     return TestBed.createComponent<T>(componentType);
+   }
+diff --git a/src/material/grid-list/testing/grid-list-harness.spec.ts b/src/material/grid-list/testing/grid-list-harness.spec.ts
+index d4f0d3213eda..621f39a86e69 100644
+--- a/src/material/grid-list/testing/grid-list-harness.spec.ts
++++ b/src/material/grid-list/testing/grid-list-harness.spec.ts
+@@ -11,10 +11,10 @@ describe('MatGridListHarness', () => {
+   let fixture: ComponentFixture<GridListHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatGridListModule, NoopAnimationsModule, GridListHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(GridListHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/icon/icon.spec.ts b/src/material/icon/icon.spec.ts
+index 5affeb3d7e74..0a704615161a 100644
+--- a/src/material/icon/icon.spec.ts
++++ b/src/material/icon/icon.spec.ts
+@@ -48,8 +48,6 @@ function createComponent<T>(component: Type<T>, providers: Provider[] = []) {
+     providers: [...providers],
+   });
+ 
+-  TestBed.compileComponents();
+-
+   return TestBed.createComponent<T>(component);
+ }
+ 
+@@ -89,8 +87,6 @@ describe('MatIcon', () => {
+       ],
+     });
+ 
+-    TestBed.compileComponents();
+-
+     iconRegistry = TestBed.inject(MatIconRegistry);
+     http = TestBed.inject(HttpTestingController);
+     sanitizer = TestBed.inject(DomSanitizer);
+@@ -1378,8 +1374,6 @@ describe('MatIcon without HttpClientModule', () => {
+       imports: [MatIconModule],
+       declarations: [IconFromSvgName],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   beforeEach(inject([MatIconRegistry, DomSanitizer], (mir: MatIconRegistry, ds: DomSanitizer) => {
+diff --git a/src/material/icon/testing/icon-harness.spec.ts b/src/material/icon/testing/icon-harness.spec.ts
+index 33b698321f3e..892badea88fc 100644
+--- a/src/material/icon/testing/icon-harness.spec.ts
++++ b/src/material/icon/testing/icon-harness.spec.ts
+@@ -11,10 +11,10 @@ describe('MatIconHarness', () => {
+   let fixture: ComponentFixture<IconHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatIconModule, IconHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     const registry = TestBed.inject(MatIconRegistry);
+     const sanitizer = TestBed.inject(DomSanitizer);
+diff --git a/src/material/input/input.spec.ts b/src/material/input/input.spec.ts
+index 4158c0162001..e5bd47857ba1 100644
+--- a/src/material/input/input.spec.ts
++++ b/src/material/input/input.spec.ts
+@@ -1625,7 +1625,7 @@ function configureTestingModule(
+       },
+       ...providers,
+     ],
+-  }).compileComponents();
++  });
+ }
+ 
+ function createComponent<T>(
+diff --git a/src/material/input/testing/input-harness.spec.ts b/src/material/input/testing/input-harness.spec.ts
+index c455d6310284..4cc75f52117f 100644
+--- a/src/material/input/testing/input-harness.spec.ts
++++ b/src/material/input/testing/input-harness.spec.ts
+@@ -12,10 +12,10 @@ describe('MatInputHarness', () => {
+   let fixture: ComponentFixture<InputHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [NoopAnimationsModule, MatInputModule, FormsModule, InputHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(InputHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/input/testing/native-select-harness.spec.ts b/src/material/input/testing/native-select-harness.spec.ts
+index 34236a68e30c..5e2249fcf580 100644
+--- a/src/material/input/testing/native-select-harness.spec.ts
++++ b/src/material/input/testing/native-select-harness.spec.ts
+@@ -11,10 +11,10 @@ describe('MatNativeSelectHarness', () => {
+   let fixture: ComponentFixture<SelectHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [NoopAnimationsModule, MatInputModule, FormsModule, SelectHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(SelectHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/list/list.spec.ts b/src/material/list/list.spec.ts
+index 82bd7d801f77..45fe8f7e2ded 100644
+--- a/src/material/list/list.spec.ts
++++ b/src/material/list/list.spec.ts
+@@ -27,8 +27,6 @@ describe('MDC-based MatList', () => {
+         StandaloneListItem,
+       ],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   it('should apply an additional class to lists without lines', () => {
+diff --git a/src/material/list/selection-list.spec.ts b/src/material/list/selection-list.spec.ts
+index fc994be547aa..7949377ba77a 100644
+--- a/src/material/list/selection-list.spec.ts
++++ b/src/material/list/selection-list.spec.ts
+@@ -54,8 +54,6 @@ describe('MDC-based MatSelectionList without forms', () => {
+           SelectionListWithSelectedOptionAndValue,
+         ],
+       });
+-
+-      TestBed.compileComponents();
+     }));
+ 
+     beforeEach(waitForAsync(() => {
+@@ -688,8 +686,6 @@ describe('MDC-based MatSelectionList without forms', () => {
+       TestBed.configureTestingModule({
+         imports: [MatListModule, SelectionListWithSelectedOption],
+       });
+-
+-      TestBed.compileComponents();
+     }));
+ 
+     beforeEach(waitForAsync(() => {
+@@ -726,8 +722,6 @@ describe('MDC-based MatSelectionList without forms', () => {
+       TestBed.configureTestingModule({
+         imports: [MatListModule, SingleSelectionListWithSelectedOption],
+       });
+-
+-      TestBed.compileComponents();
+     }));
+ 
+     beforeEach(waitForAsync(() => {
+@@ -764,8 +758,6 @@ describe('MDC-based MatSelectionList without forms', () => {
+         imports: [MatListModule, SingleSelectionListWithSelectedOption],
+         providers: [{provide: MAT_LIST_CONFIG, useValue: matListConfig}],
+       });
+-
+-      TestBed.compileComponents();
+     }));
+ 
+     beforeEach(waitForAsync(() => {
+@@ -798,8 +790,6 @@ describe('MDC-based MatSelectionList without forms', () => {
+       TestBed.configureTestingModule({
+         imports: [MatListModule, SelectionListWithDisabledOption],
+       });
+-
+-      TestBed.compileComponents();
+     }));
+ 
+     beforeEach(waitForAsync(() => {
+@@ -853,8 +843,6 @@ describe('MDC-based MatSelectionList without forms', () => {
+           SelectionListWithOnlyOneOption,
+         ],
+       });
+-
+-      TestBed.compileComponents();
+     }));
+ 
+     beforeEach(waitForAsync(() => {
+@@ -954,8 +942,6 @@ describe('MDC-based MatSelectionList without forms', () => {
+           SelectionListWithOnlyOneOption,
+         ],
+       });
+-
+-      TestBed.compileComponents();
+     }));
+ 
+     beforeEach(waitForAsync(() => {
+@@ -977,7 +963,7 @@ describe('MDC-based MatSelectionList without forms', () => {
+     beforeEach(waitForAsync(() => {
+       TestBed.configureTestingModule({
+         imports: [MatListModule, SelectionListWithAvatar, SelectionListWithIcon],
+-      }).compileComponents();
++      });
+     }));
+ 
+     function expectCheckboxAtPosition(
+@@ -1109,7 +1095,7 @@ describe('MDC-based MatSelectionList without forms', () => {
+     beforeEach(waitForAsync(() => {
+       TestBed.configureTestingModule({
+         imports: [MatListModule, SelectionListWithListOptions],
+-      }).compileComponents();
++      });
+ 
+       fixture = TestBed.createComponent(SelectionListWithListOptions);
+       fixture.componentInstance.multiple = false;
+@@ -1235,7 +1221,7 @@ describe('MDC-based MatSelectionList without forms', () => {
+     beforeEach(waitForAsync(() => {
+       TestBed.configureTestingModule({
+         imports: [MatListModule, ListOptionWithTwoWayBinding],
+-      }).compileComponents();
++      });
+ 
+       fixture = TestBed.createComponent(ListOptionWithTwoWayBinding);
+       fixture.detectChanges();
+@@ -1280,8 +1266,6 @@ describe('MDC-based MatSelectionList with forms', () => {
+         SelectionListWithCustomComparator,
+       ],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   describe('and ngModel', () => {
+diff --git a/src/material/list/testing/list-harness.spec.ts b/src/material/list/testing/list-harness.spec.ts
+index 58fab042ec03..16ee4d12e22c 100644
+--- a/src/material/list/testing/list-harness.spec.ts
++++ b/src/material/list/testing/list-harness.spec.ts
+@@ -45,9 +45,9 @@ function runBaseListFunctionalityTests<
+ 
+     beforeEach(async () => {
+       const testComponent = testComponentFn();
+-      await TestBed.configureTestingModule({
++      TestBed.configureTestingModule({
+         imports: [MatListModule, testComponent],
+-      }).compileComponents();
++      });
+ 
+       fixture = TestBed.createComponent(testComponent);
+       fixture.detectChanges();
+@@ -319,9 +319,9 @@ describe('MatActionListHarness', () => {
+     let fixture: ComponentFixture<ActionListHarnessTest>;
+ 
+     beforeEach(async () => {
+-      await TestBed.configureTestingModule({
++      TestBed.configureTestingModule({
+         imports: [MatListModule, ActionListHarnessTest],
+-      }).compileComponents();
++      });
+ 
+       fixture = TestBed.createComponent(ActionListHarnessTest);
+       fixture.detectChanges();
+@@ -352,9 +352,9 @@ describe('MatNavListHarness', () => {
+     let fixture: ComponentFixture<NavListHarnessTest>;
+ 
+     beforeEach(async () => {
+-      await TestBed.configureTestingModule({
++      TestBed.configureTestingModule({
+         imports: [MatListModule, NavListHarnessTest],
+-      }).compileComponents();
++      });
+ 
+       fixture = TestBed.createComponent(NavListHarnessTest);
+       fixture.detectChanges();
+@@ -421,9 +421,9 @@ describe('MatSelectionListHarness', () => {
+     let fixture: ComponentFixture<SelectionListHarnessTest>;
+ 
+     beforeEach(async () => {
+-      await TestBed.configureTestingModule({
++      TestBed.configureTestingModule({
+         imports: [MatListModule, SelectionListHarnessTest],
+-      }).compileComponents();
++      });
+ 
+       fixture = TestBed.createComponent(SelectionListHarnessTest);
+       fixture.detectChanges();
+diff --git a/src/material/menu/menu.spec.ts b/src/material/menu/menu.spec.ts
+index d3854e1b22b4..bc2f4401e8be 100644
+--- a/src/material/menu/menu.spec.ts
++++ b/src/material/menu/menu.spec.ts
+@@ -66,7 +66,7 @@ describe('MDC-based MatMenu', () => {
+       providers,
+       imports: [MatMenuModule, NoopAnimationsModule],
+       declarations: [component, ...declarations],
+-    }).compileComponents();
++    });
+ 
+     overlayContainerElement = TestBed.inject(OverlayContainer).getContainerElement();
+     focusMonitor = TestBed.inject(FocusMonitor);
+@@ -2725,7 +2725,7 @@ describe('MatMenu default overrides', () => {
+         },
+       ],
+       declarations: [SimpleMenu, FakeIcon],
+-    }).compileComponents();
++    });
+   }));
+ 
+   it('should allow for the default menu options to be overridden', fakeAsync(() => {
+diff --git a/src/material/menu/testing/menu-harness.spec.ts b/src/material/menu/testing/menu-harness.spec.ts
+index fcf08e06857a..3178dec315cd 100644
+--- a/src/material/menu/testing/menu-harness.spec.ts
++++ b/src/material/menu/testing/menu-harness.spec.ts
+@@ -11,10 +11,10 @@ describe('MatMenuHarness', () => {
+     let fixture: ComponentFixture<MenuHarnessTest>;
+     let loader: HarnessLoader;
+ 
+-    beforeEach(async () => {
+-      await TestBed.configureTestingModule({
++    beforeEach(() => {
++      TestBed.configureTestingModule({
+         imports: [MatMenuModule, NoopAnimationsModule, MenuHarnessTest],
+-      }).compileComponents();
++      });
+ 
+       fixture = TestBed.createComponent(MenuHarnessTest);
+       fixture.detectChanges();
+@@ -91,10 +91,10 @@ describe('MatMenuHarness', () => {
+     let fixture: ComponentFixture<NestedMenuHarnessTest>;
+     let loader: HarnessLoader;
+ 
+-    beforeEach(async () => {
+-      await TestBed.configureTestingModule({
++    beforeEach(() => {
++      TestBed.configureTestingModule({
+         imports: [MatMenuModule, NoopAnimationsModule, NestedMenuHarnessTest],
+-      }).compileComponents();
++      });
+ 
+       fixture = TestBed.createComponent(NestedMenuHarnessTest);
+       fixture.detectChanges();
+diff --git a/src/material/paginator/paginator.spec.ts b/src/material/paginator/paginator.spec.ts
+index 4be8f59d2f3d..a3eb9ee67564 100644
+--- a/src/material/paginator/paginator.spec.ts
++++ b/src/material/paginator/paginator.spec.ts
+@@ -19,7 +19,7 @@ describe('MDC-based MatPaginator', () => {
+       imports: [MatPaginatorModule, NoopAnimationsModule],
+       providers: [MatPaginatorIntl, ...providers],
+       declarations: [type],
+-    }).compileComponents();
++    });
+ 
+     const fixture = TestBed.createComponent(type);
+     fixture.detectChanges();
+diff --git a/src/material/paginator/testing/paginator-harness.spec.ts b/src/material/paginator/testing/paginator-harness.spec.ts
+index 19b37a713328..3f728f9ab474 100644
+--- a/src/material/paginator/testing/paginator-harness.spec.ts
++++ b/src/material/paginator/testing/paginator-harness.spec.ts
+@@ -11,10 +11,10 @@ describe('MatPaginatorHarness', () => {
+   let loader: HarnessLoader;
+   let instance: PaginatorHarnessTest;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatPaginatorModule, NoopAnimationsModule, PaginatorHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(PaginatorHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/progress-bar/progress-bar.spec.ts b/src/material/progress-bar/progress-bar.spec.ts
+index 45148f3ec721..98d38e10d243 100644
+--- a/src/material/progress-bar/progress-bar.spec.ts
++++ b/src/material/progress-bar/progress-bar.spec.ts
+@@ -20,7 +20,7 @@ describe('MDC-based MatProgressBar', () => {
+     TestBed.configureTestingModule({
+       imports: [MatProgressBarModule, componentType],
+       providers,
+-    }).compileComponents();
++    });
+ 
+     return TestBed.createComponent<T>(componentType);
+   }
+diff --git a/src/material/progress-bar/testing/progress-bar-harness.spec.ts b/src/material/progress-bar/testing/progress-bar-harness.spec.ts
+index 87429579890d..2d20a2666ab9 100644
+--- a/src/material/progress-bar/testing/progress-bar-harness.spec.ts
++++ b/src/material/progress-bar/testing/progress-bar-harness.spec.ts
+@@ -9,10 +9,10 @@ describe('MatProgressBarHarness', () => {
+   let fixture: ComponentFixture<ProgressBarHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatProgressBarModule, ProgressBarHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(ProgressBarHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/progress-spinner/progress-spinner.spec.ts b/src/material/progress-spinner/progress-spinner.spec.ts
+index da504fa26bbe..63e7eaa4cedc 100644
+--- a/src/material/progress-spinner/progress-spinner.spec.ts
++++ b/src/material/progress-spinner/progress-spinner.spec.ts
+@@ -23,7 +23,7 @@ describe('MDC-based MatProgressSpinner', () => {
+         IndeterminateSpinnerInShadowDomWithNgIf,
+         SpinnerWithMode,
+       ],
+-    }).compileComponents();
++    });
+   }));
+ 
+   it('should apply a mode of "determinate" if no mode is provided.', () => {
+@@ -296,17 +296,15 @@ describe('MDC-based MatProgressSpinner', () => {
+   });
+ 
+   it('should be able to set a default diameter', () => {
+-    TestBed.resetTestingModule()
+-      .configureTestingModule({
+-        imports: [MatProgressSpinnerModule, BasicProgressSpinner],
+-        providers: [
+-          {
+-            provide: MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS,
+-            useValue: {diameter: 23},
+-          },
+-        ],
+-      })
+-      .compileComponents();
++    TestBed.resetTestingModule().configureTestingModule({
++      imports: [MatProgressSpinnerModule, BasicProgressSpinner],
++      providers: [
++        {
++          provide: MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS,
++          useValue: {diameter: 23},
++        },
++      ],
++    });
+ 
+     const fixture = TestBed.createComponent(BasicProgressSpinner);
+     fixture.detectChanges();
+@@ -316,17 +314,15 @@ describe('MDC-based MatProgressSpinner', () => {
+   });
+ 
+   it('should be able to set a default stroke width', () => {
+-    TestBed.resetTestingModule()
+-      .configureTestingModule({
+-        imports: [MatProgressSpinnerModule, BasicProgressSpinner],
+-        providers: [
+-          {
+-            provide: MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS,
+-            useValue: {strokeWidth: 7},
+-          },
+-        ],
+-      })
+-      .compileComponents();
++    TestBed.resetTestingModule().configureTestingModule({
++      imports: [MatProgressSpinnerModule, BasicProgressSpinner],
++      providers: [
++        {
++          provide: MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS,
++          useValue: {strokeWidth: 7},
++        },
++      ],
++    });
+ 
+     const fixture = TestBed.createComponent(BasicProgressSpinner);
+     fixture.detectChanges();
+@@ -336,17 +332,15 @@ describe('MDC-based MatProgressSpinner', () => {
+   });
+ 
+   it('should be able to set a default color', () => {
+-    TestBed.resetTestingModule()
+-      .configureTestingModule({
+-        imports: [MatProgressSpinnerModule, BasicProgressSpinner],
+-        providers: [
+-          {
+-            provide: MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS,
+-            useValue: {color: 'warn'},
+-          },
+-        ],
+-      })
+-      .compileComponents();
++    TestBed.resetTestingModule().configureTestingModule({
++      imports: [MatProgressSpinnerModule, BasicProgressSpinner],
++      providers: [
++        {
++          provide: MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS,
++          useValue: {color: 'warn'},
++        },
++      ],
++    });
+ 
+     const fixture = TestBed.createComponent(BasicProgressSpinner);
+     fixture.detectChanges();
+diff --git a/src/material/progress-spinner/testing/progress-spinner-harness.spec.ts b/src/material/progress-spinner/testing/progress-spinner-harness.spec.ts
+index 3c578afc38c0..bac8d2eb0d60 100644
+--- a/src/material/progress-spinner/testing/progress-spinner-harness.spec.ts
++++ b/src/material/progress-spinner/testing/progress-spinner-harness.spec.ts
+@@ -9,10 +9,10 @@ describe('MatProgressSpinnerHarness', () => {
+   let fixture: ComponentFixture<ProgressSpinnerHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatProgressSpinnerModule, ProgressSpinnerHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(ProgressSpinnerHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/radio/radio.spec.ts b/src/material/radio/radio.spec.ts
+index 55db22baf8aa..d7586df918c5 100644
+--- a/src/material/radio/radio.spec.ts
++++ b/src/material/radio/radio.spec.ts
+@@ -34,8 +34,6 @@ describe('MDC-based MatRadio', () => {
+         PreselectedRadioWithStaticValueAndNgIf,
+       ],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   describe('inside of a group', () => {
+@@ -1046,8 +1044,6 @@ describe('MatRadioDefaultOverrides', () => {
+           },
+         ],
+       });
+-
+-      TestBed.compileComponents();
+     }));
+     it('should override default color in Component', () => {
+       const fixture: ComponentFixture<DefaultRadioButton> =
+diff --git a/src/material/radio/testing/radio-harness.spec.ts b/src/material/radio/testing/radio-harness.spec.ts
+index 7df8ca8c37dc..60855009842a 100644
+--- a/src/material/radio/testing/radio-harness.spec.ts
++++ b/src/material/radio/testing/radio-harness.spec.ts
+@@ -10,10 +10,10 @@ describe('radio harness', () => {
+   let fixture: ComponentFixture<MultipleRadioButtonsHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatRadioModule, ReactiveFormsModule, MultipleRadioButtonsHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(MultipleRadioButtonsHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/select/select.spec.ts b/src/material/select/select.spec.ts
+index 4732bab51ad8..3f00c40d82bc 100644
+--- a/src/material/select/select.spec.ts
++++ b/src/material/select/select.spec.ts
+@@ -111,7 +111,7 @@ describe('MDC-based MatSelect', () => {
+         ...providers,
+       ],
+       declarations: declarations,
+-    }).compileComponents();
++    });
+ 
+     overlayContainerElement = TestBed.inject(OverlayContainer).getContainerElement();
+   }
+diff --git a/src/material/select/testing/select-harness.spec.ts b/src/material/select/testing/select-harness.spec.ts
+index 80c7a02b25f6..b08b9a8d992e 100644
+--- a/src/material/select/testing/select-harness.spec.ts
++++ b/src/material/select/testing/select-harness.spec.ts
+@@ -14,8 +14,8 @@ describe('MatSelectHarness', () => {
+   let loader: HarnessLoader;
+   let overlayContainer: OverlayContainer;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [
+         MatSelectModule,
+         MatFormFieldModule,
+@@ -23,7 +23,7 @@ describe('MatSelectHarness', () => {
+         ReactiveFormsModule,
+         SelectHarnessTest,
+       ],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(SelectHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/sidenav/drawer.spec.ts b/src/material/sidenav/drawer.spec.ts
+index c917f06356b8..ec410a2c7b44 100644
+--- a/src/material/sidenav/drawer.spec.ts
++++ b/src/material/sidenav/drawer.spec.ts
+@@ -42,8 +42,6 @@ describe('MatDrawer', () => {
+         NestedDrawerContainers,
+       ],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   describe('methods', () => {
+@@ -476,7 +474,7 @@ describe('MatDrawer', () => {
+             useValue: errorHandler,
+           },
+         ],
+-      }).compileComponents();
++      });
+ 
+       const fixture = TestBed.createComponent(DrawerDynamicPosition);
+       fixture.detectChanges();
+@@ -520,11 +518,9 @@ describe('MatDrawer', () => {
+     }));
+ 
+     it('should not throw when a two-way binding is toggled quickly while animating', fakeAsync(() => {
+-      TestBed.resetTestingModule()
+-        .configureTestingModule({
+-          imports: [MatSidenavModule, BrowserAnimationsModule, DrawerOpenBinding],
+-        })
+-        .compileComponents();
++      TestBed.resetTestingModule().configureTestingModule({
++        imports: [MatSidenavModule, BrowserAnimationsModule, DrawerOpenBinding],
++      });
+ 
+       const fixture = TestBed.createComponent(DrawerOpenBinding);
+       fixture.detectChanges();
+@@ -889,8 +885,6 @@ describe('MatDrawerContainer', () => {
+         DrawerContainerWithContent,
+       ],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   it('should be able to open and close all drawers', fakeAsync(() => {
+@@ -1003,11 +997,9 @@ describe('MatDrawerContainer', () => {
+   }));
+ 
+   it('should not animate when the sidenav is open on load', fakeAsync(() => {
+-    TestBed.resetTestingModule()
+-      .configureTestingModule({
+-        imports: [MatSidenavModule, BrowserAnimationsModule, DrawerSetToOpenedTrue],
+-      })
+-      .compileComponents();
++    TestBed.resetTestingModule().configureTestingModule({
++      imports: [MatSidenavModule, BrowserAnimationsModule, DrawerSetToOpenedTrue],
++    });
+ 
+     const fixture = TestBed.createComponent(DrawerSetToOpenedTrue);
+ 
+diff --git a/src/material/sidenav/sidenav.spec.ts b/src/material/sidenav/sidenav.spec.ts
+index 2d4d9ad28756..03276ab69de1 100644
+--- a/src/material/sidenav/sidenav.spec.ts
++++ b/src/material/sidenav/sidenav.spec.ts
+@@ -17,8 +17,6 @@ describe('MatSidenav', () => {
+         NestedSidenavContainers,
+       ],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   it('should be fixed position when in fixed mode', () => {
+diff --git a/src/material/sidenav/testing/sidenav-harness.spec.ts b/src/material/sidenav/testing/sidenav-harness.spec.ts
+index a92d4761b741..33d5db19b037 100644
+--- a/src/material/sidenav/testing/sidenav-harness.spec.ts
++++ b/src/material/sidenav/testing/sidenav-harness.spec.ts
+@@ -16,10 +16,10 @@ describe('MatSidenavHarness', () => {
+     let fixture: ComponentFixture<DrawerHarnessTest>;
+     let loader: HarnessLoader;
+ 
+-    beforeEach(async () => {
+-      await TestBed.configureTestingModule({
++    beforeEach(() => {
++      TestBed.configureTestingModule({
+         imports: [MatSidenavModule, NoopAnimationsModule, DrawerHarnessTest],
+-      }).compileComponents();
++      });
+ 
+       fixture = TestBed.createComponent(DrawerHarnessTest);
+       fixture.detectChanges();
+@@ -108,10 +108,10 @@ describe('MatSidenavHarness', () => {
+     let fixture: ComponentFixture<SidenavHarnessTest>;
+     let loader: HarnessLoader;
+ 
+-    beforeEach(async () => {
+-      await TestBed.configureTestingModule({
++    beforeEach(() => {
++      TestBed.configureTestingModule({
+         imports: [MatSidenavModule, NoopAnimationsModule, SidenavHarnessTest],
+-      }).compileComponents();
++      });
+ 
+       fixture = TestBed.createComponent(SidenavHarnessTest);
+       fixture.detectChanges();
+diff --git a/src/material/slide-toggle/slide-toggle.spec.ts b/src/material/slide-toggle/slide-toggle.spec.ts
+index 1cf3b83a6973..0e6e24a659e2 100644
+--- a/src/material/slide-toggle/slide-toggle.spec.ts
++++ b/src/material/slide-toggle/slide-toggle.spec.ts
+@@ -31,8 +31,6 @@ describe('MDC-based MatSlideToggle without forms', () => {
+         SlideToggleWithStaticAriaAttributes,
+       ],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   describe('basic behavior', () => {
+@@ -555,8 +553,6 @@ describe('MDC-based MatSlideToggle with forms', () => {
+         SlideToggleWithModelAndChangeEvent,
+       ],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   describe('using ngModel', () => {
+diff --git a/src/material/slide-toggle/testing/slide-toggle-harness.spec.ts b/src/material/slide-toggle/testing/slide-toggle-harness.spec.ts
+index 9a447e84bc27..f8bdb1e6acb9 100644
+--- a/src/material/slide-toggle/testing/slide-toggle-harness.spec.ts
++++ b/src/material/slide-toggle/testing/slide-toggle-harness.spec.ts
+@@ -10,10 +10,10 @@ describe('MatSlideToggleHarness', () => {
+   let fixture: ComponentFixture<SlideToggleHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatSlideToggleModule, ReactiveFormsModule, SlideToggleHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(SlideToggleHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/slider/slider.spec.ts b/src/material/slider/slider.spec.ts
+index 6da54806fdf8..a0974625bc7c 100644
+--- a/src/material/slider/slider.spec.ts
++++ b/src/material/slider/slider.spec.ts
+@@ -40,7 +40,7 @@ describe('MDC-based MatSlider', () => {
+       imports: [FormsModule, MatSliderModule, ReactiveFormsModule, BidiModule],
+       providers: [...providers],
+       declarations: [component],
+-    }).compileComponents();
++    });
+     platform = TestBed.inject(Platform);
+     return TestBed.createComponent<T>(component);
+   }
+diff --git a/src/material/slider/testing/slider-harness.spec.ts b/src/material/slider/testing/slider-harness.spec.ts
+index c53a456dd958..06299b385b25 100644
+--- a/src/material/slider/testing/slider-harness.spec.ts
++++ b/src/material/slider/testing/slider-harness.spec.ts
+@@ -19,10 +19,10 @@ describe('MDC-based MatSliderHarness', () => {
+   let fixture: ComponentFixture<SliderHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatSliderModule, SliderHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(SliderHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/snack-bar/snack-bar.spec.ts b/src/material/snack-bar/snack-bar.spec.ts
+index fc9305db4144..3fdff3f77c7a 100644
+--- a/src/material/snack-bar/snack-bar.spec.ts
++++ b/src/material/snack-bar/snack-bar.spec.ts
+@@ -47,7 +47,7 @@ describe('MatSnackBar', () => {
+         BurritosNotification,
+         DirectiveWithViewContainer,
+       ],
+-    }).compileComponents();
++    });
+   }));
+ 
+   beforeEach(inject(
+@@ -591,8 +591,7 @@ describe('MatSnackBar', () => {
+         deps: [],
+         useFactory: () => ({panelClass: 'custom-class'}),
+       })
+-      .configureTestingModule({imports: [MatSnackBarModule, NoopAnimationsModule]})
+-      .compileComponents();
++      .configureTestingModule({imports: [MatSnackBarModule, NoopAnimationsModule]});
+ 
+     inject([MatSnackBar, OverlayContainer], (sb: MatSnackBar, oc: OverlayContainer) => {
+       snackBar = sb;
+@@ -754,7 +753,7 @@ describe('MatSnackBar with parent MatSnackBar', () => {
+         ComponentThatProvidesMatSnackBar,
+         DirectiveWithViewContainer,
+       ],
+-    }).compileComponents();
++    });
+   }));
+ 
+   beforeEach(inject([MatSnackBar, OverlayContainer], (sb: MatSnackBar, oc: OverlayContainer) => {
+@@ -832,7 +831,7 @@ describe('MatSnackBar Positioning', () => {
+         ComponentWithChildViewContainer,
+         DirectiveWithViewContainer,
+       ],
+-    }).compileComponents();
++    });
+   }));
+ 
+   beforeEach(inject([MatSnackBar, OverlayContainer], (sb: MatSnackBar, oc: OverlayContainer) => {
+diff --git a/src/material/snack-bar/snack-bar.zone.spec.ts b/src/material/snack-bar/snack-bar.zone.spec.ts
+index 3f26f168f708..c344b38eb69f 100644
+--- a/src/material/snack-bar/snack-bar.zone.spec.ts
++++ b/src/material/snack-bar/snack-bar.zone.spec.ts
+@@ -27,7 +27,7 @@ describe('MatSnackBar Zone.js integration', () => {
+         DirectiveWithViewContainer,
+       ],
+       providers: [provideZoneChangeDetection()],
+-    }).compileComponents();
++    });
+   }));
+ 
+   beforeEach(inject([MatSnackBar], (sb: MatSnackBar) => {
+diff --git a/src/material/snack-bar/testing/snack-bar-harness.spec.ts b/src/material/snack-bar/testing/snack-bar-harness.spec.ts
+index fc83c3c6b6ce..7f61a48733bf 100644
+--- a/src/material/snack-bar/testing/snack-bar-harness.spec.ts
++++ b/src/material/snack-bar/testing/snack-bar-harness.spec.ts
+@@ -16,10 +16,10 @@ describe('MatSnackBarHarness', () => {
+   let fixture: ComponentFixture<SnackbarHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [NoopAnimationsModule],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(SnackbarHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/sort/sort.spec.ts b/src/material/sort/sort.spec.ts
+index ba170e422b91..1bb9fc45f483 100644
+--- a/src/material/sort/sort.spec.ts
++++ b/src/material/sort/sort.spec.ts
+@@ -50,7 +50,7 @@ describe('MatSort', () => {
+           MatSortableInvalidDirection,
+           MatSortWithArrowPosition,
+         ],
+-      }).compileComponents();
++      });
+     }));
+ 
+     beforeEach(() => {
+@@ -537,7 +537,7 @@ describe('MatSort', () => {
+             },
+           },
+         ],
+-      }).compileComponents();
++      });
+     }));
+ 
+     beforeEach(() => {
+@@ -577,7 +577,7 @@ describe('MatSort', () => {
+             },
+           },
+         ],
+-      }).compileComponents();
++      });
+     }));
+ 
+     beforeEach(() => {
+diff --git a/src/material/sort/testing/sort-harness.spec.ts b/src/material/sort/testing/sort-harness.spec.ts
+index 561ff9378fd4..f14d405aa46d 100644
+--- a/src/material/sort/testing/sort-harness.spec.ts
++++ b/src/material/sort/testing/sort-harness.spec.ts
+@@ -10,10 +10,10 @@ describe('MatSortHarness', () => {
+   let fixture: ComponentFixture<SortHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatSortModule, NoopAnimationsModule, SortHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(SortHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/stepper/stepper.spec.ts b/src/material/stepper/stepper.spec.ts
+index e67e627732ff..3bf6d247ee60 100644
+--- a/src/material/stepper/stepper.spec.ts
++++ b/src/material/stepper/stepper.spec.ts
+@@ -1799,7 +1799,6 @@ function createComponent<T>(
+     });
+   }
+ 
+-  TestBed.compileComponents();
+   return TestBed.createComponent<T>(component);
+ }
+ 
+diff --git a/src/material/stepper/testing/stepper-harness.spec.ts b/src/material/stepper/testing/stepper-harness.spec.ts
+index cff1c83cd627..dbe03cf1159c 100644
+--- a/src/material/stepper/testing/stepper-harness.spec.ts
++++ b/src/material/stepper/testing/stepper-harness.spec.ts
+@@ -14,8 +14,8 @@ describe('MatStepperHarness', () => {
+   let fixture: ComponentFixture<StepperHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatStepperModule, NoopAnimationsModule, ReactiveFormsModule, StepperHarnessTest],
+       providers: [
+         {
+@@ -23,7 +23,7 @@ describe('MatStepperHarness', () => {
+           useValue: {showError: true}, // Required so the error state shows up in tests.
+         },
+       ],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(StepperHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/table/table.spec.ts b/src/material/table/table.spec.ts
+index 1ca2060e4b9b..9dc238a66d03 100644
+--- a/src/material/table/table.spec.ts
++++ b/src/material/table/table.spec.ts
+@@ -33,7 +33,7 @@ describe('MDC-based MatTable', () => {
+         NestedTableApp,
+         MatFlexTableApp,
+       ],
+-    }).compileComponents();
++    });
+   }));
+ 
+   describe('with basic data source', () => {
+diff --git a/src/material/table/testing/table-harness.spec.ts b/src/material/table/testing/table-harness.spec.ts
+index 56c28f65e36d..b2c4c41b650e 100644
+--- a/src/material/table/testing/table-harness.spec.ts
++++ b/src/material/table/testing/table-harness.spec.ts
+@@ -9,10 +9,10 @@ describe('MatTableHarness', () => {
+   let fixture: ComponentFixture<TableHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatTableModule, TableHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(TableHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/tabs/tab-body.spec.ts b/src/material/tabs/tab-body.spec.ts
+index 52b44b0bb8cf..1b1b4bba0b92 100644
+--- a/src/material/tabs/tab-body.spec.ts
++++ b/src/material/tabs/tab-body.spec.ts
+@@ -36,8 +36,6 @@ describe('MDC-based MatTabBody', () => {
+       ],
+       providers: [{provide: Directionality, useFactory: () => ({value: dir, change: dirChange})}],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   describe('when initialized as center', () => {
+@@ -195,18 +193,16 @@ describe('MDC-based MatTabBody', () => {
+   });
+ 
+   it('should mark the tab body content as a scrollable container', () => {
+-    TestBed.resetTestingModule()
+-      .configureTestingModule({
+-        imports: [
+-          CommonModule,
+-          PortalModule,
+-          MatRippleModule,
+-          NoopAnimationsModule,
+-          ScrollingModule,
+-          SimpleTabBodyApp,
+-        ],
+-      })
+-      .compileComponents();
++    TestBed.resetTestingModule().configureTestingModule({
++      imports: [
++        CommonModule,
++        PortalModule,
++        MatRippleModule,
++        NoopAnimationsModule,
++        ScrollingModule,
++        SimpleTabBodyApp,
++      ],
++    });
+ 
+     const fixture = TestBed.createComponent(SimpleTabBodyApp);
+     const tabBodyContent = fixture.nativeElement.querySelector('.mat-mdc-tab-body-content');
+diff --git a/src/material/tabs/tab-group.spec.ts b/src/material/tabs/tab-group.spec.ts
+index bcd7ce602283..94e573b47e64 100644
+--- a/src/material/tabs/tab-group.spec.ts
++++ b/src/material/tabs/tab-group.spec.ts
+@@ -45,8 +45,6 @@ describe('MDC-based MatTabGroup', () => {
+         TabsWithClassesTestApp,
+       ],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   describe('basic behavior', () => {
+@@ -1043,8 +1041,6 @@ describe('nested MatTabGroup with enabled animations', () => {
+         TabsWithCustomAnimationDuration,
+       ],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   it('should not throw when creating a component with nested tab groups', fakeAsync(() => {
+@@ -1080,8 +1076,6 @@ describe('MatTabGroup with ink bar fit to content', () => {
+     TestBed.configureTestingModule({
+       imports: [MatTabsModule, BrowserAnimationsModule, TabGroupWithInkBarFitToContent],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   beforeEach(() => {
+@@ -1130,8 +1124,6 @@ describe('MatTabNavBar with a default config', () => {
+         },
+       ],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   beforeEach(() => {
+diff --git a/src/material/tabs/tab-header.spec.ts b/src/material/tabs/tab-header.spec.ts
+index a0171dfdd508..5b22fc1dcd54 100644
+--- a/src/material/tabs/tab-header.spec.ts
++++ b/src/material/tabs/tab-header.spec.ts
+@@ -48,8 +48,6 @@ describe('MDC-based MatTabHeader', () => {
+       providers: [ViewportRuler],
+     });
+ 
+-    TestBed.compileComponents();
+-
+     resizeEvents = new Subject();
+     spyOn(TestBed.inject(SharedResizeObserver), 'observe').and.returnValue(resizeEvents);
+   }));
+diff --git a/src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts b/src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts
+index da5fd0b060b1..492541665f1a 100644
+--- a/src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts
++++ b/src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts
+@@ -38,8 +38,6 @@ describe('MDC-based MatTabNavBar', () => {
+       ],
+     });
+ 
+-    TestBed.compileComponents();
+-
+     resizeEvents = new Subject();
+     spyOn(TestBed.inject(SharedResizeObserver), 'observe').and.returnValue(resizeEvents);
+   }));
+@@ -497,8 +495,6 @@ describe('MatTabNavBar with a default config', () => {
+       imports: [MatTabsModule, BrowserAnimationsModule, TabLinkWithNgIf],
+       providers: [{provide: MAT_TABS_CONFIG, useValue: {fitInkBarToContent: true}}],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   beforeEach(() => {
+@@ -520,8 +516,6 @@ describe('MatTabNavBar with enabled animations', () => {
+     TestBed.configureTestingModule({
+       imports: [MatTabsModule, BrowserAnimationsModule, TabsWithCustomAnimationDuration],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   it('should not throw when setting an animationDuration without units', fakeAsync(() => {
+diff --git a/src/material/tabs/testing/tab-group-harness.spec.ts b/src/material/tabs/testing/tab-group-harness.spec.ts
+index 265c49f79733..eaf0d73490ef 100644
+--- a/src/material/tabs/testing/tab-group-harness.spec.ts
++++ b/src/material/tabs/testing/tab-group-harness.spec.ts
+@@ -11,10 +11,10 @@ describe('MatTabGroupHarness', () => {
+   let fixture: ComponentFixture<TabGroupHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatTabsModule, NoopAnimationsModule, TabGroupHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(TabGroupHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/tabs/testing/tab-nav-bar-harness.spec.ts b/src/material/tabs/testing/tab-nav-bar-harness.spec.ts
+index e6ad05fa2c8a..259add2a8fe6 100644
+--- a/src/material/tabs/testing/tab-nav-bar-harness.spec.ts
++++ b/src/material/tabs/testing/tab-nav-bar-harness.spec.ts
+@@ -10,10 +10,10 @@ describe('MatTabNavBarHarness', () => {
+   let fixture: ComponentFixture<TabNavBarHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatTabsModule, NoopAnimationsModule, TabNavBarHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(TabNavBarHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/toolbar/testing/toolbar-harness.spec.ts b/src/material/toolbar/testing/toolbar-harness.spec.ts
+index 9bf47df8fa86..2344bb9bec7b 100644
+--- a/src/material/toolbar/testing/toolbar-harness.spec.ts
++++ b/src/material/toolbar/testing/toolbar-harness.spec.ts
+@@ -9,10 +9,10 @@ describe('MatToolbarHarness', () => {
+   let fixture: ComponentFixture<ToolbarHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatToolbarModule, ToolbarHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(ToolbarHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/toolbar/toolbar.spec.ts b/src/material/toolbar/toolbar.spec.ts
+index b8cbb95de67e..52f00ab82d6f 100644
+--- a/src/material/toolbar/toolbar.spec.ts
++++ b/src/material/toolbar/toolbar.spec.ts
+@@ -16,8 +16,6 @@ describe('MatToolbar', () => {
+         ToolbarMultipleIndirectRows,
+       ],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   describe('with single row', () => {
+diff --git a/src/material/tooltip/testing/tooltip-harness.spec.ts b/src/material/tooltip/testing/tooltip-harness.spec.ts
+index 9440321b586e..246417390db9 100644
+--- a/src/material/tooltip/testing/tooltip-harness.spec.ts
++++ b/src/material/tooltip/testing/tooltip-harness.spec.ts
+@@ -15,10 +15,10 @@ describe('MatTooltipHarness', () => {
+     });
+   });
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatTooltipModule, NoopAnimationsModule, TooltipHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(TooltipHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/tooltip/tooltip.spec.ts b/src/material/tooltip/tooltip.spec.ts
+index bc4c93464d3b..b0d795045fb0 100644
+--- a/src/material/tooltip/tooltip.spec.ts
++++ b/src/material/tooltip/tooltip.spec.ts
+@@ -72,8 +72,6 @@ describe('MDC-based MatTooltip', () => {
+       ],
+     });
+ 
+-    TestBed.compileComponents();
+-
+     inject(
+       [OverlayContainer, FocusMonitor, Platform],
+       (oc: OverlayContainer, fm: FocusMonitor, pl: Platform) => {
+@@ -170,17 +168,15 @@ describe('MDC-based MatTooltip', () => {
+     }));
+ 
+     it('should be able to override the default show and hide delays', fakeAsync(() => {
+-      TestBed.resetTestingModule()
+-        .configureTestingModule({
+-          imports: [MatTooltipModule, OverlayModule, BasicTooltipDemo],
+-          providers: [
+-            {
+-              provide: MAT_TOOLTIP_DEFAULT_OPTIONS,
+-              useValue: {showDelay: 1337, hideDelay: 7331},
+-            },
+-          ],
+-        })
+-        .compileComponents();
++      TestBed.resetTestingModule().configureTestingModule({
++        imports: [MatTooltipModule, OverlayModule, BasicTooltipDemo],
++        providers: [
++          {
++            provide: MAT_TOOLTIP_DEFAULT_OPTIONS,
++            useValue: {showDelay: 1337, hideDelay: 7331},
++          },
++        ],
++      });
+ 
+       fixture = TestBed.createComponent(BasicTooltipDemo);
+       fixture.detectChanges();
+@@ -206,18 +202,16 @@ describe('MDC-based MatTooltip', () => {
+     }));
+ 
+     it('should be able to override the default position', fakeAsync(() => {
+-      TestBed.resetTestingModule()
+-        .configureTestingModule({
+-          imports: [MatTooltipModule, OverlayModule],
+-          declarations: [TooltipDemoWithoutPositionBinding],
+-          providers: [
+-            {
+-              provide: MAT_TOOLTIP_DEFAULT_OPTIONS,
+-              useValue: {position: 'right'},
+-            },
+-          ],
+-        })
+-        .compileComponents();
++      TestBed.resetTestingModule().configureTestingModule({
++        imports: [MatTooltipModule, OverlayModule],
++        declarations: [TooltipDemoWithoutPositionBinding],
++        providers: [
++          {
++            provide: MAT_TOOLTIP_DEFAULT_OPTIONS,
++            useValue: {position: 'right'},
++          },
++        ],
++      });
+ 
+       const newFixture = TestBed.createComponent(TooltipDemoWithoutPositionBinding);
+       newFixture.detectChanges();
+@@ -235,18 +229,16 @@ describe('MDC-based MatTooltip', () => {
+     }));
+ 
+     it('should be able to define a default (global) tooltip class', fakeAsync(() => {
+-      TestBed.resetTestingModule()
+-        .configureTestingModule({
+-          declarations: [TooltipDemoWithoutTooltipClassBinding],
+-          imports: [MatTooltipModule, OverlayModule],
+-          providers: [
+-            {
+-              provide: MAT_TOOLTIP_DEFAULT_OPTIONS,
+-              useValue: {tooltipClass: 'my-default-tooltip-class'},
+-            },
+-          ],
+-        })
+-        .compileComponents();
++      TestBed.resetTestingModule().configureTestingModule({
++        declarations: [TooltipDemoWithoutTooltipClassBinding],
++        imports: [MatTooltipModule, OverlayModule],
++        providers: [
++          {
++            provide: MAT_TOOLTIP_DEFAULT_OPTIONS,
++            useValue: {tooltipClass: 'my-default-tooltip-class'},
++          },
++        ],
++      });
+ 
+       const fixture = TestBed.createComponent(TooltipDemoWithoutTooltipClassBinding);
+       fixture.detectChanges();
+@@ -264,18 +256,16 @@ describe('MDC-based MatTooltip', () => {
+     }));
+ 
+     it('should be able to provide tooltip class over the custom default one', fakeAsync(() => {
+-      TestBed.resetTestingModule()
+-        .configureTestingModule({
+-          declarations: [TooltipDemoWithTooltipClassBinding],
+-          imports: [MatTooltipModule, OverlayModule],
+-          providers: [
+-            {
+-              provide: MAT_TOOLTIP_DEFAULT_OPTIONS,
+-              useValue: {tooltipClass: 'my-default-tooltip-class'},
+-            },
+-          ],
+-        })
+-        .compileComponents();
++      TestBed.resetTestingModule().configureTestingModule({
++        declarations: [TooltipDemoWithTooltipClassBinding],
++        imports: [MatTooltipModule, OverlayModule],
++        providers: [
++          {
++            provide: MAT_TOOLTIP_DEFAULT_OPTIONS,
++            useValue: {tooltipClass: 'my-default-tooltip-class'},
++          },
++        ],
++      });
+ 
+       const fixture = TestBed.createComponent(TooltipDemoWithTooltipClassBinding);
+       fixture.detectChanges();
+@@ -299,12 +289,10 @@ describe('MDC-based MatTooltip', () => {
+         return;
+       }
+ 
+-      TestBed.resetTestingModule()
+-        .configureTestingModule({
+-          imports: [MatTooltipModule, OverlayModule],
+-          declarations: [WideTooltipDemo],
+-        })
+-        .compileComponents();
++      TestBed.resetTestingModule().configureTestingModule({
++        imports: [MatTooltipModule, OverlayModule],
++        declarations: [WideTooltipDemo],
++      });
+ 
+       const wideFixture = TestBed.createComponent(WideTooltipDemo);
+       wideFixture.detectChanges();
+@@ -333,18 +321,16 @@ describe('MDC-based MatTooltip', () => {
+         return;
+       }
+ 
+-      await TestBed.resetTestingModule()
+-        .configureTestingModule({
+-          imports: [MatTooltipModule, OverlayModule],
+-          declarations: [WideTooltipDemo],
+-          providers: [
+-            {
+-              provide: MAT_TOOLTIP_DEFAULT_OPTIONS,
+-              useValue: {positionAtOrigin: true},
+-            },
+-          ],
+-        })
+-        .compileComponents();
++      TestBed.resetTestingModule().configureTestingModule({
++        imports: [MatTooltipModule, OverlayModule],
++        declarations: [WideTooltipDemo],
++        providers: [
++          {
++            provide: MAT_TOOLTIP_DEFAULT_OPTIONS,
++            useValue: {positionAtOrigin: true},
++          },
++        ],
++      });
+ 
+       const wideFixture = TestBed.createComponent(WideTooltipDemo);
+       wideFixture.detectChanges();
+@@ -367,18 +353,16 @@ describe('MDC-based MatTooltip', () => {
+     });
+ 
+     it('should be able to disable tooltip interactivity', fakeAsync(() => {
+-      TestBed.resetTestingModule()
+-        .configureTestingModule({
+-          imports: [MatTooltipModule, OverlayModule, NoopAnimationsModule],
+-          declarations: [TooltipDemoWithoutPositionBinding],
+-          providers: [
+-            {
+-              provide: MAT_TOOLTIP_DEFAULT_OPTIONS,
+-              useValue: {disableTooltipInteractivity: true},
+-            },
+-          ],
+-        })
+-        .compileComponents();
++      TestBed.resetTestingModule().configureTestingModule({
++        imports: [MatTooltipModule, OverlayModule, NoopAnimationsModule],
++        declarations: [TooltipDemoWithoutPositionBinding],
++        providers: [
++          {
++            provide: MAT_TOOLTIP_DEFAULT_OPTIONS,
++            useValue: {disableTooltipInteractivity: true},
++          },
++        ],
++      });
+ 
+       const newFixture = TestBed.createComponent(TooltipDemoWithoutPositionBinding);
+       newFixture.detectChanges();
+diff --git a/src/material/tooltip/tooltip.zone.spec.ts b/src/material/tooltip/tooltip.zone.spec.ts
+index bc3b7d0edaca..70b5b6858306 100644
+--- a/src/material/tooltip/tooltip.zone.spec.ts
++++ b/src/material/tooltip/tooltip.zone.spec.ts
+@@ -28,8 +28,6 @@ describe('MDC-based MatTooltip Zone.js integration', () => {
+         },
+       ],
+     });
+-
+-    TestBed.compileComponents();
+   }));
+ 
+   describe('scrollable usage', () => {
+diff --git a/src/material/tree/testing/tree-harness.spec.ts b/src/material/tree/testing/tree-harness.spec.ts
+index b4f02089d043..a5dd4e17fd44 100644
+--- a/src/material/tree/testing/tree-harness.spec.ts
++++ b/src/material/tree/testing/tree-harness.spec.ts
+@@ -15,10 +15,10 @@ describe('MatTreeHarness', () => {
+   let fixture: ComponentFixture<TreeHarnessTest>;
+   let loader: HarnessLoader;
+ 
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
++  beforeEach(() => {
++    TestBed.configureTestingModule({
+       imports: [MatTreeModule, TreeHarnessTest],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(TreeHarnessTest);
+     fixture.detectChanges();
+diff --git a/src/material/tree/tree-using-legacy-key-manager.spec.ts b/src/material/tree/tree-using-legacy-key-manager.spec.ts
+index 332e41056e23..6589ade142a1 100644
+--- a/src/material/tree/tree-using-legacy-key-manager.spec.ts
++++ b/src/material/tree/tree-using-legacy-key-manager.spec.ts
+@@ -14,7 +14,7 @@ describe('MatTree when provided LegacyTreeKeyManager', () => {
+       imports: [MatTreeModule],
+       declarations: [SimpleMatTreeApp],
+       providers: [NOOP_TREE_KEY_MANAGER_FACTORY_PROVIDER],
+-    }).compileComponents();
++    });
+ 
+     fixture = TestBed.createComponent(SimpleMatTreeApp);
+     fixture.detectChanges();
+diff --git a/src/material/tree/tree-using-tree-control.spec.ts b/src/material/tree/tree-using-tree-control.spec.ts
+index 1ae36c939b00..6161ab4ff234 100644
+--- a/src/material/tree/tree-using-tree-control.spec.ts
++++ b/src/material/tree/tree-using-tree-control.spec.ts
+@@ -29,7 +29,7 @@ describe('MatTree', () => {
+     TestBed.configureTestingModule({
+       imports: [MatTreeModule],
+       declarations: declarations,
+-    }).compileComponents();
++    });
+   }
+ 
+   describe('flat tree', () => {
+diff --git a/src/material/tree/tree.spec.ts b/src/material/tree/tree.spec.ts
+index 58cfb0226373..5284dfdb846e 100644
+--- a/src/material/tree/tree.spec.ts
++++ b/src/material/tree/tree.spec.ts
+@@ -22,7 +22,7 @@ describe('MatTree', () => {
+     TestBed.configureTestingModule({
+       imports: [MatTreeModule],
+       declarations: declarations,
+-    }).compileComponents();
++    });
+   }
+ 
+   describe('flat tree', () => {

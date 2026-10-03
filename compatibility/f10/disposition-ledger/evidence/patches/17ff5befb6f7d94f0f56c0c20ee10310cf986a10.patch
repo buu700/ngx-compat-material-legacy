@@ -1,0 +1,230 @@
+From 17ff5befb6f7d94f0f56c0c20ee10310cf986a10 Mon Sep 17 00:00:00 2001
+From: Miles Malerba <mmalerba@google.com>
+Date: Thu, 7 Nov 2024 09:04:45 -0800
+Subject: [PATCH] fix(cdk/listbox): make tabindex zoneless compatible (#29970)
+
+---
+ src/cdk/a11y/key-manager/list-key-manager.ts | 29 +++++++--------
+ src/cdk/listbox/listbox.ts                   | 37 +++++++++++++-------
+ tools/public_api_guard/cdk/listbox.md        | 18 +++++-----
+ 3 files changed, 50 insertions(+), 34 deletions(-)
+
+diff --git a/src/cdk/a11y/key-manager/list-key-manager.ts b/src/cdk/a11y/key-manager/list-key-manager.ts
+index 63fbc268c0e9..ef40642b7f25 100644
+--- a/src/cdk/a11y/key-manager/list-key-manager.ts
++++ b/src/cdk/a11y/key-manager/list-key-manager.ts
+@@ -6,20 +6,20 @@
+  * found in the LICENSE file at https://angular.dev/license
+  */
+ 
+-import {EffectRef, Injector, QueryList, Signal, effect, isSignal} from '@angular/core';
+-import {Subject, Subscription} from 'rxjs';
+ import {
+-  UP_ARROW,
+   DOWN_ARROW,
++  END,
++  HOME,
+   LEFT_ARROW,
++  PAGE_DOWN,
++  PAGE_UP,
+   RIGHT_ARROW,
+   TAB,
++  UP_ARROW,
+   hasModifierKey,
+-  HOME,
+-  END,
+-  PAGE_UP,
+-  PAGE_DOWN,
+ } from '@angular/cdk/keycodes';
++import {EffectRef, Injector, QueryList, Signal, effect, isSignal, signal} from '@angular/core';
++import {Subject, Subscription} from 'rxjs';
+ import {Typeahead} from './typeahead';
+ 
+ /** This interface is for items that can be passed to a ListKeyManager. */
+@@ -40,7 +40,7 @@ export type ListKeyManagerModifierKey = 'altKey' | 'ctrlKey' | 'metaKey' | 'shif
+  */
+ export class ListKeyManager<T extends ListKeyManagerOption> {
+   private _activeItemIndex = -1;
+-  private _activeItem: T | null = null;
++  private _activeItem = signal<T | null>(null);
+   private _wrap = false;
+   private _typeaheadSubscription = Subscription.EMPTY;
+   private _itemChangesSubscription?: Subscription;
+@@ -204,11 +204,11 @@ export class ListKeyManager<T extends ListKeyManagerOption> {
+   setActiveItem(item: T): void;
+ 
+   setActiveItem(item: any): void {
+-    const previousActiveItem = this._activeItem;
++    const previousActiveItem = this._activeItem();
+ 
+     this.updateActiveItem(item);
+ 
+-    if (this._activeItem !== previousActiveItem) {
++    if (this._activeItem() !== previousActiveItem) {
+       this.change.next(this._activeItemIndex);
+     }
+   }
+@@ -317,7 +317,7 @@ export class ListKeyManager<T extends ListKeyManagerOption> {
+ 
+   /** The active item. */
+   get activeItem(): T | null {
+-    return this._activeItem;
++    return this._activeItem();
+   }
+ 
+   /** Gets whether the user is currently typing into the manager using the typeahead feature. */
+@@ -365,7 +365,7 @@ export class ListKeyManager<T extends ListKeyManagerOption> {
+     const activeItem = itemArray[index];
+ 
+     // Explicitly check for `null` and `undefined` because other falsy values are valid.
+-    this._activeItem = activeItem == null ? null : activeItem;
++    this._activeItem.set(activeItem == null ? null : activeItem);
+     this._activeItemIndex = index;
+     this._typeahead?.setCurrentSelectedItemIndex(index);
+   }
+@@ -452,8 +452,9 @@ export class ListKeyManager<T extends ListKeyManagerOption> {
+   /** Callback for when the items have changed. */
+   private _itemsChanged(newItems: T[] | readonly T[]) {
+     this._typeahead?.setItems(newItems);
+-    if (this._activeItem) {
+-      const newIndex = newItems.indexOf(this._activeItem);
++    const activeItem = this._activeItem();
++    if (activeItem) {
++      const newIndex = newItems.indexOf(activeItem);
+ 
+       if (newIndex > -1 && newIndex !== this._activeItemIndex) {
+         this._activeItemIndex = newIndex;
+diff --git a/src/cdk/listbox/listbox.ts b/src/cdk/listbox/listbox.ts
+index 8a342736674f..6ab6a87595ec 100644
+--- a/src/cdk/listbox/listbox.ts
++++ b/src/cdk/listbox/listbox.ts
+@@ -42,6 +42,7 @@ import {
+   OnDestroy,
+   Output,
+   QueryList,
++  signal,
+ } from '@angular/core';
+ import {ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
+ import {defer, fromEvent, merge, Observable, Subject} from 'rxjs';
+@@ -120,24 +121,24 @@ export class CdkOption<T = unknown> implements ListKeyManagerOption, Highlightab
+   /** Whether this option is disabled. */
+   @Input({alias: 'cdkOptionDisabled', transform: booleanAttribute})
+   get disabled(): boolean {
+-    return this.listbox.disabled || this._disabled;
++    return this.listbox.disabled || this._disabled();
+   }
+   set disabled(value: boolean) {
+-    this._disabled = value;
++    this._disabled.set(value);
+   }
+-  private _disabled: boolean = false;
++  private _disabled = signal(false);
+ 
+   /** The tabindex of the option when it is enabled. */
+   @Input('tabindex')
+   get enabledTabIndex() {
+-    return this._enabledTabIndex === undefined
++    return this._enabledTabIndex() === undefined
+       ? this.listbox.enabledTabIndex
+-      : this._enabledTabIndex;
++      : this._enabledTabIndex();
+   }
+   set enabledTabIndex(value) {
+-    this._enabledTabIndex = value;
++    this._enabledTabIndex.set(value);
+   }
+-  private _enabledTabIndex?: number | null;
++  private _enabledTabIndex = signal<number | null | undefined>(undefined);
+ 
+   /** The option's host element */
+   readonly element: HTMLElement = inject(ElementRef).nativeElement;
+@@ -269,12 +270,12 @@ export class CdkListbox<T = unknown> implements AfterContentInit, OnDestroy, Con
+   /** The tabindex to use when the listbox is enabled. */
+   @Input('tabindex')
+   get enabledTabIndex() {
+-    return this._enabledTabIndex === undefined ? 0 : this._enabledTabIndex;
++    return this._enabledTabIndex() === undefined ? 0 : this._enabledTabIndex();
+   }
+   set enabledTabIndex(value) {
+-    this._enabledTabIndex = value;
++    this._enabledTabIndex.set(value);
+   }
+-  private _enabledTabIndex?: number | null;
++  private _enabledTabIndex = signal<number | null | undefined>(undefined);
+ 
+   /** The value selected in the listbox, represented as an array of option values. */
+   @Input('cdkListboxValue')
+@@ -303,11 +304,23 @@ export class CdkListbox<T = unknown> implements AfterContentInit, OnDestroy, Con
+ 
+   /** Whether the listbox is disabled. */
+   @Input({alias: 'cdkListboxDisabled', transform: booleanAttribute})
+-  disabled: boolean = false;
++  get disabled() {
++    return this._disabled();
++  }
++  set disabled(value: boolean) {
++    this._disabled.set(value);
++  }
++  private _disabled = signal(false);
+ 
+   /** Whether the listbox will use active descendant or will move focus onto the options. */
+   @Input({alias: 'cdkListboxUseActiveDescendant', transform: booleanAttribute})
+-  useActiveDescendant: boolean = false;
++  get useActiveDescendant() {
++    return this._useActiveDescendant();
++  }
++  set useActiveDescendant(value: boolean) {
++    this._useActiveDescendant.set(value);
++  }
++  private _useActiveDescendant = signal(false);
+ 
+   /** The orientation of the listbox. Only affects keyboard interaction, not visual layout. */
+   @Input('cdkListboxOrientation')
+diff --git a/tools/public_api_guard/cdk/listbox.md b/tools/public_api_guard/cdk/listbox.md
+index 8855be392fb9..e3d0e1b391fd 100644
+--- a/tools/public_api_guard/cdk/listbox.md
++++ b/tools/public_api_guard/cdk/listbox.md
+@@ -26,13 +26,14 @@ export class CdkListbox<T = unknown> implements AfterContentInit, OnDestroy, Con
+     deselect(option: CdkOption<T>): void;
+     deselectValue(value: T): void;
+     protected readonly destroyed: Subject<void>;
+-    disabled: boolean;
++    get disabled(): boolean;
++    set disabled(value: boolean);
+     protected readonly element: HTMLElement;
+-    get enabledTabIndex(): number | null;
+-    set enabledTabIndex(value: number | null);
++    get enabledTabIndex(): number | null | undefined;
++    set enabledTabIndex(value: number | null | undefined);
+     focus(): void;
+     protected _getAriaActiveDescendant(): string | null | undefined;
+-    protected _getTabIndex(): number | null;
++    protected _getTabIndex(): number | null | undefined;
+     protected _handleFocus(): void;
+     protected _handleFocusIn(): void;
+     protected _handleFocusOut(event: FocusEvent): void;
+@@ -79,7 +80,8 @@ export class CdkListbox<T = unknown> implements AfterContentInit, OnDestroy, Con
+     toggleValue(value: T): void;
+     protected triggerOption(option: CdkOption<T> | null): void;
+     protected triggerRange(trigger: CdkOption<T> | null, from: number, to: number, on: boolean): void;
+-    useActiveDescendant: boolean;
++    get useActiveDescendant(): boolean;
++    set useActiveDescendant(value: boolean);
+     get value(): readonly T[];
+     set value(value: readonly T[]);
+     readonly valueChange: Subject<ListboxValueChangeEvent<T>>;
+@@ -108,11 +110,11 @@ export class CdkOption<T = unknown> implements ListKeyManagerOption, Highlightab
+     get disabled(): boolean;
+     set disabled(value: boolean);
+     readonly element: HTMLElement;
+-    get enabledTabIndex(): number | null;
+-    set enabledTabIndex(value: number | null);
++    get enabledTabIndex(): number | null | undefined;
++    set enabledTabIndex(value: number | null | undefined);
+     focus(): void;
+     getLabel(): string;
+-    protected _getTabIndex(): number | null;
++    protected _getTabIndex(): number | null | undefined;
+     protected _handleFocus(): void;
+     get id(): string;
+     set id(value: string);

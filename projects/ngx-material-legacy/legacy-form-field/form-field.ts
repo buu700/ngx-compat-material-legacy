@@ -38,7 +38,8 @@ import {MatLegacyLabel} from './label';
 import {MatLegacyPlaceholder} from './placeholder';
 import {MatLegacyPrefix} from './prefix';
 import {MatLegacySuffix} from './suffix';
-import {Platform, _getShadowRoot} from '@angular/cdk/platform';
+import {Platform} from '@angular/cdk/platform';
+import {getShadowRoot} from '../internal/owned-shadow-dom';
 import {AbstractControlDirective, ValidatorFn} from '@angular/forms';
 import {ANIMATION_MODULE_TYPE} from '@angular/core';
 import {
@@ -769,7 +770,7 @@ export class MatLegacyFormField
   /** Lazily resolve the host shadow root (or null when not in shadow DOM). */
   private _resolveShadowRoot(): ShadowRoot | null {
     if (this._cachedShadowRoot === undefined) {
-      this._cachedShadowRoot = _getShadowRoot(this._elementRef.nativeElement);
+      this._cachedShadowRoot = getShadowRoot(this._elementRef.nativeElement);
     }
     return this._cachedShadowRoot;
   }

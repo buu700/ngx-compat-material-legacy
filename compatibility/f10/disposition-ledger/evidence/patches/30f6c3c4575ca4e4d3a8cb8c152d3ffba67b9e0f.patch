@@ -1,0 +1,168 @@
+From 30f6c3c4575ca4e4d3a8cb8c152d3ffba67b9e0f Mon Sep 17 00:00:00 2001
+From: Kristiyan Kostadinov <crisbeto@abv.bg>
+Date: Mon, 1 Sep 2025 09:31:00 +0200
+Subject: [PATCH] fix(cdk/a11y): remove deprecated factory functions
+
+Removes factory functions that we had marked as deprecated for v21. These functions aren't necessary since we switched to standalone.
+
+BREAKING CHANGE:
+* `LIVE_ANNOUNCER_ELEMENT_TOKEN_FACTORY` has been removed.
+* `TREE_KEY_MANAGER_FACTORY` has been removed.
+* `TREE_KEY_MANAGER_FACTORY_PROVIDER` has been removed.
+---
+ goldens/cdk/a11y/index.api.md                 | 15 ----------
+ .../a11y/key-manager/noop-tree-key-manager.ts | 29 ++-----------------
+ src/cdk/a11y/key-manager/tree-key-manager.ts  | 21 +-------------
+ .../live-announcer/live-announcer-tokens.ts   | 11 +------
+ 4 files changed, 4 insertions(+), 72 deletions(-)
+
+diff --git a/goldens/cdk/a11y/index.api.md b/goldens/cdk/a11y/index.api.md
+index 316a8b14d8d2..ea7039d26cd3 100644
+--- a/goldens/cdk/a11y/index.api.md
++++ b/goldens/cdk/a11y/index.api.md
+@@ -401,9 +401,6 @@ export const LIVE_ANNOUNCER_DEFAULT_OPTIONS: InjectionToken<LiveAnnouncerDefault
+ // @public (undocumented)
+ export const LIVE_ANNOUNCER_ELEMENT_TOKEN: InjectionToken<HTMLElement | null>;
+ 
+-// @public @deprecated
+-export function LIVE_ANNOUNCER_ELEMENT_TOKEN_FACTORY(): null;
+-
+ // @public (undocumented)
+ export class LiveAnnouncer implements OnDestroy {
+     constructor(...args: unknown[]);
+@@ -429,9 +426,6 @@ export interface LiveAnnouncerDefaultOptions {
+ // @public @deprecated
+ export const MESSAGES_CONTAINER_ID = "cdk-describedby-message-container";
+ 
+-// @public @deprecated
+-export function NOOP_TREE_KEY_MANAGER_FACTORY<T extends TreeKeyManagerItem>(): TreeKeyManagerFactory<T>;
+-
+ // @public @deprecated
+ export const NOOP_TREE_KEY_MANAGER_FACTORY_PROVIDER: Provider;
+ 
+@@ -465,15 +459,6 @@ export function removeAriaReferencedId(el: Element, attr: `aria-${string}`, id:
+ // @public
+ export const TREE_KEY_MANAGER: InjectionToken<TreeKeyManagerFactory<any>>;
+ 
+-// @public @deprecated
+-export function TREE_KEY_MANAGER_FACTORY<T extends TreeKeyManagerItem>(): TreeKeyManagerFactory<T>;
+-
+-// @public @deprecated
+-export const TREE_KEY_MANAGER_FACTORY_PROVIDER: {
+-    provide: InjectionToken<TreeKeyManagerFactory<any>>;
+-    useFactory: typeof TREE_KEY_MANAGER_FACTORY;
+-};
+-
+ // @public
+ export class TreeKeyManager<T extends TreeKeyManagerItem> implements TreeKeyManagerStrategy<T> {
+     constructor(items: Observable<T[]> | QueryList<T> | T[], config: TreeKeyManagerOptions<T>);
+diff --git a/src/cdk/a11y/key-manager/noop-tree-key-manager.ts b/src/cdk/a11y/key-manager/noop-tree-key-manager.ts
+index e58e397e1e9e..b080a137da85 100644
+--- a/src/cdk/a11y/key-manager/noop-tree-key-manager.ts
++++ b/src/cdk/a11y/key-manager/noop-tree-key-manager.ts
+@@ -8,11 +8,7 @@
+ 
+ import {Subject} from 'rxjs';
+ import {TREE_KEY_MANAGER} from './tree-key-manager';
+-import {
+-  TreeKeyManagerFactory,
+-  TreeKeyManagerItem,
+-  TreeKeyManagerStrategy,
+-} from './tree-key-manager-strategy';
++import {TreeKeyManagerItem, TreeKeyManagerStrategy} from './tree-key-manager-strategy';
+ import {Provider} from '@angular/core';
+ 
+ // NoopTreeKeyManager is a "noop" implementation of TreeKeyMangerStrategy. Methods are noops. Does
+@@ -67,27 +63,6 @@ export class NoopTreeKeyManager<T extends TreeKeyManagerItem> implements TreeKey
+   }
+ }
+ 
+-/**
+- * @docs-private
+- *
+- * Opt-out of Tree of key manager behavior.
+- *
+- * When provided, Tree has same focus management behavior as before TreeKeyManager was introduced.
+- *  - Tree does not respond to keyboard interaction
+- *  - Tree node allows tabindex to be set by Input binding
+- *  - Tree node allows tabindex to be set by attribute binding
+- *
+- * @deprecated NoopTreeKeyManager deprecated. Use TreeKeyManager or inject a
+- * TreeKeyManagerStrategy instead. To be removed in a future version.
+- *
+- * @breaking-change 21.0.0
+- */
+-export function NOOP_TREE_KEY_MANAGER_FACTORY<
+-  T extends TreeKeyManagerItem,
+->(): TreeKeyManagerFactory<T> {
+-  return () => new NoopTreeKeyManager<T>();
+-}
+-
+ /**
+  * @docs-private
+  *
+@@ -105,5 +80,5 @@ export function NOOP_TREE_KEY_MANAGER_FACTORY<
+  */
+ export const NOOP_TREE_KEY_MANAGER_FACTORY_PROVIDER: Provider = {
+   provide: TREE_KEY_MANAGER,
+-  useFactory: NOOP_TREE_KEY_MANAGER_FACTORY,
++  useFactory: () => () => new NoopTreeKeyManager(),
+ };
+diff --git a/src/cdk/a11y/key-manager/tree-key-manager.ts b/src/cdk/a11y/key-manager/tree-key-manager.ts
+index 28318cd1ee94..27d6f190b504 100644
+--- a/src/cdk/a11y/key-manager/tree-key-manager.ts
++++ b/src/cdk/a11y/key-manager/tree-key-manager.ts
+@@ -411,27 +411,8 @@ export class TreeKeyManager<T extends TreeKeyManagerItem> implements TreeKeyMana
+   }
+ }
+ 
+-/**
+- * @docs-private
+- * @deprecated No longer used, will be removed.
+- * @breaking-change 21.0.0
+- */
+-export function TREE_KEY_MANAGER_FACTORY<T extends TreeKeyManagerItem>(): TreeKeyManagerFactory<T> {
+-  return (items, options) => new TreeKeyManager(items, options);
+-}
+-
+ /** Injection token that determines the key manager to use. */
+ export const TREE_KEY_MANAGER = new InjectionToken<TreeKeyManagerFactory<any>>('tree-key-manager', {
+   providedIn: 'root',
+-  factory: TREE_KEY_MANAGER_FACTORY,
++  factory: () => (items, options) => new TreeKeyManager(items, options),
+ });
+-
+-/**
+- * @docs-private
+- * @deprecated No longer used, will be removed.
+- * @breaking-change 21.0.0
+- */
+-export const TREE_KEY_MANAGER_FACTORY_PROVIDER = {
+-  provide: TREE_KEY_MANAGER,
+-  useFactory: TREE_KEY_MANAGER_FACTORY,
+-};
+diff --git a/src/cdk/a11y/live-announcer/live-announcer-tokens.ts b/src/cdk/a11y/live-announcer/live-announcer-tokens.ts
+index 8294bb4a7144..a36b21b8cb73 100644
+--- a/src/cdk/a11y/live-announcer/live-announcer-tokens.ts
++++ b/src/cdk/a11y/live-announcer/live-announcer-tokens.ts
+@@ -18,19 +18,10 @@ export const LIVE_ANNOUNCER_ELEMENT_TOKEN = new InjectionToken<HTMLElement | nul
+   'liveAnnouncerElement',
+   {
+     providedIn: 'root',
+-    factory: LIVE_ANNOUNCER_ELEMENT_TOKEN_FACTORY,
++    factory: () => null,
+   },
+ );
+ 
+-/**
+- * @docs-private
+- * @deprecated No longer used, will be removed.
+- * @breaking-change 21.0.0
+- */
+-export function LIVE_ANNOUNCER_ELEMENT_TOKEN_FACTORY(): null {
+-  return null;
+-}
+-
+ /** Object that can be used to configure the default options for the LiveAnnouncer. */
+ export interface LiveAnnouncerDefaultOptions {
+   /** Default politeness for the announcements. */

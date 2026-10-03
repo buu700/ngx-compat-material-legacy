@@ -1,0 +1,23 @@
+From d9c8813ca1478374cb2b8113467b50faf63752ac Mon Sep 17 00:00:00 2001
+From: Tobias Wittwer <t.wittwer95@gmail.com>
+Date: Thu, 18 Apr 2024 21:28:15 +0200
+Subject: [PATCH] fix(cdk/a11y): handle signal based items in list key manager
+ (#28854)
+
+---
+ src/cdk/a11y/key-manager/list-key-manager.ts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/cdk/a11y/key-manager/list-key-manager.ts b/src/cdk/a11y/key-manager/list-key-manager.ts
+index 1792c2945f1d..78295d135f8f 100644
+--- a/src/cdk/a11y/key-manager/list-key-manager.ts
++++ b/src/cdk/a11y/key-manager/list-key-manager.ts
+@@ -366,7 +366,7 @@ export class ListKeyManager<T extends ListKeyManagerOption> {
+ 
+   /** Sets the active item to the last enabled item in the list. */
+   setLastItemActive(): void {
+-    this._setActiveItemByIndex(this._items.length - 1, -1);
++    this._setActiveItemByIndex(this._getItemsArray().length - 1, -1);
+   }
+ 
+   /** Sets the active item to the next enabled item in the list. */

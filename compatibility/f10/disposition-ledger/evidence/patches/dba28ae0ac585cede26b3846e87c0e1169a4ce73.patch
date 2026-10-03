@@ -1,0 +1,1797 @@
+From dba28ae0ac585cede26b3846e87c0e1169a4ce73 Mon Sep 17 00:00:00 2001
+From: Kristiyan Kostadinov <crisbeto@users.noreply.github.com>
+Date: Wed, 18 Mar 2026 10:30:41 +0100
+Subject: [PATCH] refactor(cdk/a11y): switch tests away from fakeAsync (#32942)
+
+Reworks the `cdk/a11y` tests not to depend on `fakeAsync` anymore.
+---
+ .../a11y/focus-monitor/focus-monitor.spec.ts  | 242 +++++++++---------
+ .../focus-monitor/focus-monitor.zone.spec.ts  |   8 +-
+ .../event-listener-inert-strategy.spec.ts     |  27 +-
+ .../input-modality-detector.spec.ts           |   8 +-
+ .../a11y/key-manager/list-key-manager.spec.ts | 110 ++++----
+ .../a11y/key-manager/tree-key-manager.spec.ts |  99 +++----
+ .../live-announcer/live-announcer.spec.ts     | 172 +++++++------
+ 7 files changed, 341 insertions(+), 325 deletions(-)
+
+diff --git a/src/cdk/a11y/focus-monitor/focus-monitor.spec.ts b/src/cdk/a11y/focus-monitor/focus-monitor.spec.ts
+index 1fa26e29dd22..7149fc9568e4 100644
+--- a/src/cdk/a11y/focus-monitor/focus-monitor.spec.ts
++++ b/src/cdk/a11y/focus-monitor/focus-monitor.spec.ts
+@@ -1,7 +1,7 @@
+ import {TAB} from '../../keycodes';
+ import {Platform} from '../../platform';
+ import {Component, ViewChild, DOCUMENT} from '@angular/core';
+-import {ComponentFixture, TestBed, fakeAsync, flush, tick} from '@angular/core/testing';
++import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+ import {
+   createMouseEvent,
+@@ -20,6 +20,10 @@ import {
+   FocusOrigin,
+ } from './focus-monitor';
+ 
++function wait(ms: number) {
++  return new Promise(resolve => setTimeout(resolve, ms));
++}
++
+ describe('FocusMonitor', () => {
+   let fixture: ComponentFixture<PlainButton>;
+   let buttonElement: HTMLElement;
+@@ -70,23 +74,23 @@ describe('FocusMonitor', () => {
+     patchElementFocus(buttonElement);
+   });
+ 
+-  it('manually registered element should receive focus classes', fakeAsync(() => {
++  it('manually registered element should receive focus classes', async () => {
+     buttonElement.focus();
+     fixture.detectChanges();
+-    tick();
++    await fixture.whenStable();
+ 
+     expect(buttonElement.classList.contains('cdk-focused'))
+       .withContext('button should have cdk-focused class')
+       .toBe(true);
+     expect(changeHandler).toHaveBeenCalledTimes(1);
+-  }));
++  });
+ 
+-  it('should detect focus via keyboard', fakeAsync(() => {
++  it('should detect focus via keyboard', async () => {
+     // Simulate focus via keyboard.
+     dispatchKeyboardEvent(document, 'keydown', TAB);
+     buttonElement.focus();
+     fixture.detectChanges();
+-    flush();
++    await fixture.whenStable();
+ 
+     expect(buttonElement.classList.length)
+       .withContext('button should have exactly 2 focus classes')
+@@ -98,14 +102,14 @@ describe('FocusMonitor', () => {
+       .withContext('button should have cdk-keyboard-focused class')
+       .toBe(true);
+     expect(changeHandler).toHaveBeenCalledWith('keyboard');
+-  }));
++  });
+ 
+-  it('should detect focus via mouse', fakeAsync(() => {
++  it('should detect focus via mouse', async () => {
+     // Simulate focus via mouse.
+     dispatchMouseEvent(buttonElement, 'mousedown');
+     buttonElement.focus();
+     fixture.detectChanges();
+-    flush();
++    await fixture.whenStable();
+ 
+     expect(buttonElement.classList.length)
+       .withContext('button should have exactly 2 focus classes')
+@@ -117,14 +121,14 @@ describe('FocusMonitor', () => {
+       .withContext('button should have cdk-mouse-focused class')
+       .toBe(true);
+     expect(changeHandler).toHaveBeenCalledWith('mouse');
+-  }));
++  });
+ 
+-  it('should detect focus via touch', fakeAsync(() => {
++  it('should detect focus via touch', async () => {
+     // Simulate focus via touch.
+     dispatchFakeEvent(buttonElement, 'touchstart');
+     buttonElement.focus();
+     fixture.detectChanges();
+-    tick(TOUCH_BUFFER_MS);
++    await wait(TOUCH_BUFFER_MS);
+ 
+     expect(buttonElement.classList.length)
+       .withContext('button should have exactly 2 focus classes')
+@@ -136,13 +140,13 @@ describe('FocusMonitor', () => {
+       .withContext('button should have cdk-touch-focused class')
+       .toBe(true);
+     expect(changeHandler).toHaveBeenCalledWith('touch');
+-  }));
++  });
+ 
+-  it('should detect programmatic focus', fakeAsync(() => {
++  it('should detect programmatic focus', async () => {
+     // Programmatically focus.
+     buttonElement.focus();
+     fixture.detectChanges();
+-    tick();
++    await fixture.whenStable();
+ 
+     expect(buttonElement.classList.length)
+       .withContext('button should have exactly 2 focus classes')
+@@ -154,9 +158,9 @@ describe('FocusMonitor', () => {
+       .withContext('button should have cdk-program-focused class')
+       .toBe(true);
+     expect(changeHandler).toHaveBeenCalledWith('program');
+-  }));
++  });
+ 
+-  it('should detect fake mousedown from a screen reader on Chrome', fakeAsync(() => {
++  it('should detect fake mousedown from a screen reader on Chrome', async () => {
+     // Simulate focus via a fake mousedown from a screen reader.
+     dispatchMouseEvent(buttonElement, 'mousedown');
+     const event = createMouseEvent('mousedown');
+@@ -165,7 +169,7 @@ describe('FocusMonitor', () => {
+ 
+     buttonElement.focus();
+     fixture.detectChanges();
+-    flush();
++    await fixture.whenStable();
+ 
+     expect(buttonElement.classList.length)
+       .withContext('button should have exactly 2 focus classes')
+@@ -177,9 +181,9 @@ describe('FocusMonitor', () => {
+       .withContext('button should have cdk-keyboard-focused class')
+       .toBe(true);
+     expect(changeHandler).toHaveBeenCalledWith('keyboard');
+-  }));
++  });
+ 
+-  it('should detect fake mousedown from a screen reader on Firefox', fakeAsync(() => {
++  it('should detect fake mousedown from a screen reader on Firefox', async () => {
+     // Simulate focus via a fake mousedown from a screen reader.
+     dispatchMouseEvent(buttonElement, 'mousedown');
+     const event = createMouseEvent('mousedown');
+@@ -188,7 +192,7 @@ describe('FocusMonitor', () => {
+ 
+     buttonElement.focus();
+     fixture.detectChanges();
+-    flush();
++    await fixture.whenStable();
+ 
+     expect(buttonElement.classList.length)
+       .withContext('button should have exactly 2 focus classes')
+@@ -200,11 +204,11 @@ describe('FocusMonitor', () => {
+       .withContext('button should have cdk-keyboard-focused class')
+       .toBe(true);
+     expect(changeHandler).toHaveBeenCalledWith('keyboard');
+-  }));
++  });
+ 
+-  it('focusVia keyboard should simulate keyboard focus', fakeAsync(() => {
++  it('focusVia keyboard should simulate keyboard focus', async () => {
+     focusMonitor.focusVia(buttonElement, 'keyboard');
+-    flush();
++    await fixture.whenStable();
+ 
+     expect(buttonElement.classList.length)
+       .withContext('button should have exactly 2 focus classes')
+@@ -216,12 +220,12 @@ describe('FocusMonitor', () => {
+       .withContext('button should have cdk-keyboard-focused class')
+       .toBe(true);
+     expect(changeHandler).toHaveBeenCalledWith('keyboard');
+-  }));
++  });
+ 
+-  it('focusVia mouse should simulate mouse focus', fakeAsync(() => {
++  it('focusVia mouse should simulate mouse focus', async () => {
+     focusMonitor.focusVia(buttonElement, 'mouse');
+     fixture.detectChanges();
+-    flush();
++    await fixture.whenStable();
+ 
+     expect(buttonElement.classList.length)
+       .withContext('button should have exactly 2 focus classes')
+@@ -233,12 +237,12 @@ describe('FocusMonitor', () => {
+       .withContext('button should have cdk-mouse-focused class')
+       .toBe(true);
+     expect(changeHandler).toHaveBeenCalledWith('mouse');
+-  }));
++  });
+ 
+-  it('focusVia touch should simulate touch focus', fakeAsync(() => {
++  it('focusVia touch should simulate touch focus', async () => {
+     focusMonitor.focusVia(buttonElement, 'touch');
+     fixture.detectChanges();
+-    flush();
++    await fixture.whenStable();
+ 
+     expect(buttonElement.classList.length)
+       .withContext('button should have exactly 2 focus classes')
+@@ -250,12 +254,12 @@ describe('FocusMonitor', () => {
+       .withContext('button should have cdk-touch-focused class')
+       .toBe(true);
+     expect(changeHandler).toHaveBeenCalledWith('touch');
+-  }));
++  });
+ 
+-  it('focusVia program should simulate programmatic focus', fakeAsync(() => {
++  it('focusVia program should simulate programmatic focus', async () => {
+     focusMonitor.focusVia(buttonElement, 'program');
+     fixture.detectChanges();
+-    flush();
++    await fixture.whenStable();
+ 
+     expect(buttonElement.classList.length)
+       .withContext('button should have exactly 2 focus classes')
+@@ -267,12 +271,12 @@ describe('FocusMonitor', () => {
+       .withContext('button should have cdk-program-focused class')
+       .toBe(true);
+     expect(changeHandler).toHaveBeenCalledWith('program');
+-  }));
++  });
+ 
+-  it('should remove focus classes on blur', fakeAsync(() => {
++  it('should remove focus classes on blur', async () => {
+     buttonElement.focus();
+     fixture.detectChanges();
+-    tick();
++    await fixture.whenStable();
+ 
+     expect(buttonElement.classList.length)
+       .withContext('button should have exactly 2 focus classes')
+@@ -288,12 +292,12 @@ describe('FocusMonitor', () => {
+       .withContext('button should not have any focus classes')
+       .toBe(0);
+     expect(changeHandler).toHaveBeenCalledWith(null);
+-  }));
++  });
+ 
+-  it('should remove classes on stopMonitoring', fakeAsync(() => {
++  it('should remove classes on stopMonitoring', async () => {
+     buttonElement.focus();
+     fixture.detectChanges();
+-    tick();
++    await fixture.whenStable();
+ 
+     expect(buttonElement.classList.length)
+       .withContext('button should have exactly 2 focus classes')
+@@ -305,12 +309,12 @@ describe('FocusMonitor', () => {
+     expect(buttonElement.classList.length)
+       .withContext('button should not have any focus classes')
+       .toBe(0);
+-  }));
++  });
+ 
+-  it('should remove classes when destroyed', fakeAsync(() => {
++  it('should remove classes when destroyed', async () => {
+     buttonElement.focus();
+     fixture.detectChanges();
+-    tick();
++    await fixture.whenStable();
+ 
+     expect(buttonElement.classList.length)
+       .withContext('button should have exactly 2 focus classes')
+@@ -323,27 +327,27 @@ describe('FocusMonitor', () => {
+     expect(buttonElement.classList.length)
+       .withContext('button should not have any focus classes')
+       .toBe(0);
+-  }));
++  });
+ 
+-  it('should pass focus options to the native focus method', fakeAsync(() => {
++  it('should pass focus options to the native focus method', async () => {
+     spyOn(buttonElement, 'focus');
+ 
+     focusMonitor.focusVia(buttonElement, 'program', {preventScroll: true});
+     fixture.detectChanges();
+-    flush();
++    await fixture.whenStable();
+ 
+     expect(buttonElement.focus).toHaveBeenCalledWith(
+       jasmine.objectContaining({
+         preventScroll: true,
+       }),
+     );
+-  }));
++  });
+ 
+-  it('should not clear the focus origin too early in the current event loop', fakeAsync(() => {
++  it('should not clear the focus origin too early in the current event loop', async () => {
+     dispatchKeyboardEvent(document, 'keydown', TAB);
+ 
+     // Simulate the behavior of Firefox 57 where the focus event sometimes happens *one* tick later.
+-    tick();
++    await fixture.whenStable();
+ 
+     buttonElement.focus();
+ 
+@@ -351,19 +355,19 @@ describe('FocusMonitor', () => {
+     // focus origin should be reported properly.
+     expect(changeHandler).toHaveBeenCalledWith('keyboard');
+ 
+-    flush();
+-  }));
++    await fixture.whenStable();
++  });
+ 
+-  it('should clear the focus origin after one tick with "immediate" detection', fakeAsync(() => {
++  it('should clear the focus origin after one tick with "immediate" detection', async () => {
+     dispatchKeyboardEvent(document, 'keydown', TAB);
+-    tick(2);
++    await wait(2);
+     buttonElement.focus();
+ 
+     // After 2 ticks, the timeout has cleared the origin. Default is 'program'.
+     expect(changeHandler).toHaveBeenCalledWith('program');
+-  }));
++  });
+ 
+-  it('should check children if monitor was called with different checkChildren', fakeAsync(() => {
++  it('should check children if monitor was called with different checkChildren', async () => {
+     const parent = fixture.nativeElement.querySelector('.parent');
+ 
+     focusMonitor.monitor(parent, true);
+@@ -373,16 +377,16 @@ describe('FocusMonitor', () => {
+     dispatchMouseEvent(buttonElement, 'mousedown');
+     buttonElement.focus();
+     fixture.detectChanges();
+-    flush();
++    await fixture.whenStable();
+ 
+     expect(parent.classList).toContain('cdk-focused');
+     expect(parent.classList).toContain('cdk-mouse-focused');
+-  }));
++  });
+ 
+-  it('focusVia should change the focus origin when called on the focused node', fakeAsync(() => {
++  it('focusVia should change the focus origin when called on the focused node', async () => {
+     spyOn(buttonElement, 'focus').and.callThrough();
+     focusMonitor.focusVia(buttonElement, 'keyboard');
+-    flush();
++    await fixture.whenStable();
+     fakeActiveElement = buttonElement;
+ 
+     expect(buttonElement.classList.length)
+@@ -399,7 +403,7 @@ describe('FocusMonitor', () => {
+     expect(buttonElement.focus).toHaveBeenCalledTimes(1);
+ 
+     focusMonitor.focusVia(buttonElement, 'mouse');
+-    flush();
++    await fixture.whenStable();
+     fakeActiveElement = buttonElement;
+ 
+     expect(buttonElement.classList.length)
+@@ -414,15 +418,15 @@ describe('FocusMonitor', () => {
+     expect(changeHandler).toHaveBeenCalledTimes(2);
+     expect(changeHandler).toHaveBeenCalledWith('mouse');
+     expect(buttonElement.focus).toHaveBeenCalledTimes(1);
+-  }));
++  });
+ 
+-  it('focusVia should change the focus origin when called a focused child node', fakeAsync(() => {
++  it('focusVia should change the focus origin when called a focused child node', async () => {
+     const parent = fixture.nativeElement.querySelector('.parent');
+     focusMonitor.stopMonitoring(buttonElement); // The button gets monitored by default.
+     focusMonitor.monitor(parent, true).subscribe(changeHandler);
+     spyOn(buttonElement, 'focus').and.callThrough();
+     focusMonitor.focusVia(buttonElement, 'keyboard');
+-    flush();
++    await fixture.whenStable();
+     fakeActiveElement = buttonElement;
+ 
+     expect(parent.classList.length)
+@@ -439,7 +443,7 @@ describe('FocusMonitor', () => {
+     expect(buttonElement.focus).toHaveBeenCalledTimes(1);
+ 
+     focusMonitor.focusVia(buttonElement, 'mouse');
+-    flush();
++    await fixture.whenStable();
+     fakeActiveElement = buttonElement;
+ 
+     expect(parent.classList.length)
+@@ -454,7 +458,7 @@ describe('FocusMonitor', () => {
+     expect(changeHandler).toHaveBeenCalledTimes(2);
+     expect(changeHandler).toHaveBeenCalledWith('mouse');
+     expect(buttonElement.focus).toHaveBeenCalledTimes(1);
+-  }));
++  });
+ });
+ 
+ describe('FocusMonitor with "eventual" detection', () => {
+@@ -486,14 +490,14 @@ describe('FocusMonitor with "eventual" detection', () => {
+     patchElementFocus(buttonElement);
+   });
+ 
+-  it('should not clear the focus origin, even after a few seconds', fakeAsync(() => {
++  it('should not clear the focus origin, even after a few seconds', async () => {
+     dispatchKeyboardEvent(document, 'keydown', TAB);
+-    tick(2000);
++    await wait(2000);
+ 
+     buttonElement.focus();
+ 
+     expect(changeHandler).toHaveBeenCalledWith('keyboard');
+-  }));
++  });
+ });
+ 
+ describe('cdkMonitorFocus', () => {
+@@ -516,12 +520,12 @@ describe('cdkMonitorFocus', () => {
+         .toBe(0);
+     });
+ 
+-    it('should detect focus via keyboard (directive)', fakeAsync(() => {
++    it('should detect focus via keyboard (directive)', async () => {
+       // Simulate focus via keyboard.
+       dispatchKeyboardEvent(document, 'keydown', TAB);
+       buttonElement.focus();
+       fixture.detectChanges();
+-      flush();
++      await fixture.whenStable();
+ 
+       expect(buttonElement.classList.length)
+         .withContext('button should have exactly 2 focus classes')
+@@ -533,14 +537,14 @@ describe('cdkMonitorFocus', () => {
+         .withContext('button should have cdk-keyboard-focused class')
+         .toBe(true);
+       expect(fixture.componentInstance.focusChanged).toHaveBeenCalledWith('keyboard');
+-    }));
++    });
+ 
+-    it('should detect focus via mouse (directive)', fakeAsync(() => {
++    it('should detect focus via mouse (directive)', async () => {
+       // Simulate focus via mouse.
+       dispatchMouseEvent(buttonElement, 'mousedown');
+       buttonElement.focus();
+       fixture.detectChanges();
+-      flush();
++      await fixture.whenStable();
+ 
+       expect(buttonElement.classList.length)
+         .withContext('button should have exactly 2 focus classes')
+@@ -552,14 +556,14 @@ describe('cdkMonitorFocus', () => {
+         .withContext('button should have cdk-mouse-focused class')
+         .toBe(true);
+       expect(fixture.componentInstance.focusChanged).toHaveBeenCalledWith('mouse');
+-    }));
++    });
+ 
+-    it('should detect focus via touch (directive)', fakeAsync(() => {
++    it('should detect focus via touch (directive)', async () => {
+       // Simulate focus via touch.
+       dispatchFakeEvent(buttonElement, 'touchstart');
+       buttonElement.focus();
+       fixture.detectChanges();
+-      tick(TOUCH_BUFFER_MS);
++      await wait(TOUCH_BUFFER_MS);
+ 
+       expect(buttonElement.classList.length)
+         .withContext('button should have exactly 2 focus classes')
+@@ -571,13 +575,13 @@ describe('cdkMonitorFocus', () => {
+         .withContext('button should have cdk-touch-focused class')
+         .toBe(true);
+       expect(fixture.componentInstance.focusChanged).toHaveBeenCalledWith('touch');
+-    }));
++    });
+ 
+-    it('should detect programmatic focus (directive)', fakeAsync(() => {
++    it('should detect programmatic focus (directive)', async () => {
+       // Programmatically focus.
+       buttonElement.focus();
+       fixture.detectChanges();
+-      tick();
++      await fixture.whenStable();
+ 
+       expect(buttonElement.classList.length)
+         .withContext('button should have exactly 2 focus classes')
+@@ -589,12 +593,12 @@ describe('cdkMonitorFocus', () => {
+         .withContext('button should have cdk-program-focused class')
+         .toBe(true);
+       expect(fixture.componentInstance.focusChanged).toHaveBeenCalledWith('program');
+-    }));
++    });
+ 
+-    it('should remove focus classes on blur (directive)', fakeAsync(() => {
++    it('should remove focus classes on blur (directive)', async () => {
+       buttonElement.focus();
+       fixture.detectChanges();
+-      tick();
++      await fixture.whenStable();
+ 
+       expect(buttonElement.classList.length)
+         .withContext('button should have exactly 2 focus classes')
+@@ -608,7 +612,7 @@ describe('cdkMonitorFocus', () => {
+         .withContext('button should not have any focus classes')
+         .toBe(0);
+       expect(fixture.componentInstance.focusChanged).toHaveBeenCalledWith(null);
+-    }));
++    });
+   });
+ 
+   describe('complex component with cdkMonitorElementFocus', () => {
+@@ -627,25 +631,25 @@ describe('cdkMonitorFocus', () => {
+       patchElementFocus(childElement);
+     });
+ 
+-    it('should add focus classes on parent focus', fakeAsync(() => {
++    it('should add focus classes on parent focus', async () => {
+       parentElement.focus();
+       fixture.detectChanges();
+-      tick();
++      await fixture.whenStable();
+ 
+       expect(parentElement.classList.length)
+         .withContext('button should have exactly 2 focus classes')
+         .toBe(2);
+-    }));
++    });
+ 
+-    it('should not add focus classes on child focus', fakeAsync(() => {
++    it('should not add focus classes on child focus', async () => {
+       childElement.focus();
+       fixture.detectChanges();
+-      tick();
++      await fixture.whenStable();
+ 
+       expect(parentElement.classList.length)
+         .withContext('button should not have any focus classes')
+         .toBe(0);
+-    }));
++    });
+   });
+ 
+   describe('complex component with cdkMonitorSubtreeFocus', () => {
+@@ -664,25 +668,25 @@ describe('cdkMonitorFocus', () => {
+       patchElementFocus(childElement);
+     });
+ 
+-    it('should add focus classes on parent focus', fakeAsync(() => {
++    it('should add focus classes on parent focus', async () => {
+       parentElement.focus();
+       fixture.detectChanges();
+-      tick();
++      await fixture.whenStable();
+ 
+       expect(parentElement.classList.length)
+         .withContext('button should have exactly 2 focus classes')
+         .toBe(2);
+-    }));
++    });
+ 
+-    it('should add focus classes on child focus', fakeAsync(() => {
++    it('should add focus classes on child focus', async () => {
+       childElement.focus();
+       fixture.detectChanges();
+-      tick();
++      await fixture.whenStable();
+ 
+       expect(parentElement.classList.length)
+         .withContext('button should have exactly 2 focus classes')
+         .toBe(2);
+-    }));
++    });
+   });
+ 
+   describe('complex component with cdkMonitorSubtreeFocus and cdkMonitorElementFocus', () => {
+@@ -705,14 +709,14 @@ describe('cdkMonitorFocus', () => {
+       patchElementFocus(childElement);
+     });
+ 
+-    it('should add keyboard focus classes on both elements when child is focused via keyboard', fakeAsync(() => {
++    it('should add keyboard focus classes on both elements when child is focused via keyboard', async () => {
+       focusMonitor.focusVia(childElement, 'keyboard');
+       fixture.detectChanges();
+-      flush();
++      await fixture.whenStable();
+ 
+       expect(parentElement.classList).toContain('cdk-keyboard-focused');
+       expect(childElement.classList).toContain('cdk-keyboard-focused');
+-    }));
++    });
+   });
+ 
+   describe('button with exported cdkMonitorElementFocus', () => {
+@@ -733,49 +737,49 @@ describe('cdkMonitorFocus', () => {
+         .toBeNull();
+     });
+ 
+-    it('should detect focus via keyboard (exported directive)', fakeAsync(() => {
++    it('should detect focus via keyboard (exported directive)', async () => {
+       // Simulate focus via keyboard.
+       dispatchKeyboardEvent(document, 'keydown', TAB);
+       buttonElement.focus();
+       fixture.detectChanges();
+-      flush();
++      await fixture.whenStable();
+ 
+       expect(fixture.componentInstance.exportedDirRef.focusOrigin).toEqual('keyboard');
+-    }));
++    });
+ 
+-    it('should detect focus via mouse (exported directive)', fakeAsync(() => {
++    it('should detect focus via mouse (exported directive)', async () => {
+       // Simulate focus via mouse.
+       dispatchMouseEvent(buttonElement, 'mousedown');
+       buttonElement.focus();
+       fixture.detectChanges();
+-      flush();
++      await fixture.whenStable();
+ 
+       expect(fixture.componentInstance.exportedDirRef.focusOrigin).toEqual('mouse');
+-    }));
++    });
+ 
+-    it('should detect focus via touch (exported directive)', fakeAsync(() => {
++    it('should detect focus via touch (exported directive)', async () => {
+       // Simulate focus via touch.
+       dispatchFakeEvent(buttonElement, 'touchstart');
+       buttonElement.focus();
+       fixture.detectChanges();
+-      tick(TOUCH_BUFFER_MS);
++      await wait(TOUCH_BUFFER_MS);
+ 
+       expect(fixture.componentInstance.exportedDirRef.focusOrigin).toEqual('touch');
+-    }));
++    });
+ 
+-    it('should detect programmatic focus (exported directive)', fakeAsync(() => {
++    it('should detect programmatic focus (exported directive)', async () => {
+       // Programmatically focus.
+       buttonElement.focus();
+       fixture.detectChanges();
+-      tick();
++      await fixture.whenStable();
+ 
+       expect(fixture.componentInstance.exportedDirRef.focusOrigin).toEqual('program');
+-    }));
++    });
+ 
+-    it('should remove focus classes on blur (exported directive)', fakeAsync(() => {
++    it('should remove focus classes on blur (exported directive)', async () => {
+       buttonElement.focus();
+       fixture.detectChanges();
+-      tick();
++      await fixture.whenStable();
+ 
+       expect(fixture.componentInstance.exportedDirRef.focusOrigin).toEqual('program');
+ 
+@@ -783,7 +787,7 @@ describe('cdkMonitorFocus', () => {
+       fixture.detectChanges();
+ 
+       expect(fixture.componentInstance.exportedDirRef.focusOrigin).toEqual(null);
+-    }));
++    });
+   });
+ 
+   it('should not throw when trying to monitor focus on a non-element node', () => {
+@@ -813,7 +817,7 @@ describe('FocusMonitor observable stream', () => {
+     patchElementFocus(buttonElement);
+   });
+ 
+-  it('should not emit on the server', fakeAsync(() => {
++  it('should not emit on the server', async () => {
+     fakePlatform.isBrowser = false;
+     const emitSpy = jasmine.createSpy('emit spy');
+     const completeSpy = jasmine.createSpy('complete spy');
+@@ -824,10 +828,10 @@ describe('FocusMonitor observable stream', () => {
+ 
+     buttonElement.focus();
+     fixture.detectChanges();
+-    tick();
++    await fixture.whenStable();
+     expect(emitSpy).not.toHaveBeenCalled();
+     expect(completeSpy).toHaveBeenCalled();
+-  }));
++  });
+ });
+ 
+ describe('FocusMonitor input label detection', () => {
+@@ -845,7 +849,7 @@ describe('FocusMonitor input label detection', () => {
+     patchElementFocus(inputElement);
+   });
+ 
+-  it('should detect label click focus as `mouse`', fakeAsync(() => {
++  it('should detect label click focus as `mouse`', async () => {
+     const spy = jasmine.createSpy('monitor spy');
+     focusMonitor.monitor(inputElement).subscribe(spy);
+     expect(spy).not.toHaveBeenCalled();
+@@ -856,16 +860,16 @@ describe('FocusMonitor input label detection', () => {
+     dispatchMouseEvent(labelElement, 'mousedown');
+     labelElement.click();
+     fixture.detectChanges();
+-    flush();
++    await fixture.whenStable();
+ 
+     // The programmatic click from above won't move focus so we have to focus the input ourselves.
+     inputElement.focus();
+     fixture.detectChanges();
+-    tick();
++    await fixture.whenStable();
+ 
+     expect(inputElement.classList).toContain('cdk-mouse-focused');
+     expect(spy.calls.mostRecent()?.args[0]).toBe('mouse');
+-  }));
++  });
+ });
+ 
+ @Component({
+diff --git a/src/cdk/a11y/focus-monitor/focus-monitor.zone.spec.ts b/src/cdk/a11y/focus-monitor/focus-monitor.zone.spec.ts
+index fda5a31dd5c4..e1a315bbe2db 100644
+--- a/src/cdk/a11y/focus-monitor/focus-monitor.zone.spec.ts
++++ b/src/cdk/a11y/focus-monitor/focus-monitor.zone.spec.ts
+@@ -1,7 +1,7 @@
+ import {Platform} from '../../platform';
+ import {patchElementFocus} from '../../testing/private';
+ import {Component, NgZone, provideZoneChangeDetection} from '@angular/core';
+-import {ComponentFixture, TestBed, fakeAsync, tick} from '@angular/core/testing';
++import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {A11yModule} from '../a11y-module';
+ import {FocusMonitor} from './focus-monitor';
+ 
+@@ -23,16 +23,16 @@ describe('FocusMonitor observable stream Zone.js integration', () => {
+     patchElementFocus(buttonElement);
+   });
+ 
+-  it('should emit inside the NgZone', fakeAsync(() => {
++  it('should emit inside the NgZone', async () => {
+     const spy = jasmine.createSpy('zone spy');
+     focusMonitor.monitor(buttonElement).subscribe(() => spy(NgZone.isInAngularZone()));
+     expect(spy).not.toHaveBeenCalled();
+ 
+     buttonElement.focus();
+     fixture.detectChanges();
+-    tick();
++    await fixture.whenStable();
+     expect(spy).toHaveBeenCalledWith(true);
+-  }));
++  });
+ });
+ 
+ @Component({
+diff --git a/src/cdk/a11y/focus-trap/event-listener-inert-strategy.spec.ts b/src/cdk/a11y/focus-trap/event-listener-inert-strategy.spec.ts
+index 42f8659f25ed..4b33a33d04c8 100644
+--- a/src/cdk/a11y/focus-trap/event-listener-inert-strategy.spec.ts
++++ b/src/cdk/a11y/focus-trap/event-listener-inert-strategy.spec.ts
+@@ -7,7 +7,7 @@ import {
+   ViewChild,
+   inject,
+ } from '@angular/core';
+-import {ComponentFixture, TestBed, fakeAsync, flush} from '@angular/core/testing';
++import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {patchElementFocus} from '../../testing/private';
+ import {
+   ConfigurableFocusTrap,
+@@ -21,47 +21,48 @@ describe('EventListenerFocusTrapInertStrategy', () => {
+     {provide: FOCUS_TRAP_INERT_STRATEGY, useValue: new EventListenerFocusTrapInertStrategy()},
+   ];
+ 
+-  it('refocuses the first FocusTrap element when focus moves outside the FocusTrap', fakeAsync(() => {
++  it('refocuses the first FocusTrap element when focus moves outside the FocusTrap', async () => {
+     const fixture = createComponent(SimpleFocusTrap, providers);
+     const componentInstance = fixture.componentInstance;
+     fixture.detectChanges();
+ 
+-    componentInstance.outsideFocusableElement.nativeElement.focus();
+-    flush();
++    // Focus something outside the FocusTrap.
++    document.body.focus();
++    await new Promise(resolve => setTimeout(resolve, 10));
+ 
+     expect(componentInstance.activeElement)
+       .withContext('Expected first focusable element to be focused')
+       .toBe(componentInstance.firstFocusableElement.nativeElement);
+-  }));
++  });
+ 
+-  it('does not intercept focus when focus moves to another element in the FocusTrap', fakeAsync(() => {
++  it('does not intercept focus when focus moves to another element in the FocusTrap', async () => {
+     const fixture = createComponent(SimpleFocusTrap, providers);
+     const componentInstance = fixture.componentInstance;
+     fixture.detectChanges();
+-    flush();
++    await fixture.whenStable();
+ 
+     componentInstance.secondFocusableElement.nativeElement.focus();
+-    flush();
++    await fixture.whenStable();
+ 
+     expect(componentInstance.activeElement)
+       .withContext('Expected second focusable element to be focused')
+       .toBe(componentInstance.secondFocusableElement.nativeElement);
+-  }));
++  });
+ 
+-  it('should not intercept focus if it moved outside the trap and back in again', fakeAsync(() => {
++  it('should not intercept focus if it moved outside the trap and back in again', async () => {
+     const fixture = createComponent(SimpleFocusTrap, providers);
+     fixture.detectChanges();
+-    flush();
++    await fixture.whenStable();
+     const {secondFocusableElement, outsideFocusableElement} = fixture.componentInstance;
+ 
+     outsideFocusableElement.nativeElement.focus();
+     secondFocusableElement.nativeElement.focus();
+-    flush();
++    await fixture.whenStable();
+ 
+     expect(fixture.componentInstance.activeElement)
+       .withContext('Expected second focusable element to be focused')
+       .toBe(secondFocusableElement.nativeElement);
+-  }));
++  });
+ });
+ 
+ function createComponent<T>(
+diff --git a/src/cdk/a11y/input-modality/input-modality-detector.spec.ts b/src/cdk/a11y/input-modality/input-modality-detector.spec.ts
+index 32279e699e47..fc980918467a 100644
+--- a/src/cdk/a11y/input-modality/input-modality-detector.spec.ts
++++ b/src/cdk/a11y/input-modality/input-modality-detector.spec.ts
+@@ -9,7 +9,7 @@ import {
+   dispatchEvent,
+   createTouchEvent,
+ } from '../../testing/private';
+-import {fakeAsync, TestBed, tick} from '@angular/core/testing';
++import {TestBed} from '@angular/core/testing';
+ import {
+   InputModality,
+   InputModalityDetector,
+@@ -194,17 +194,17 @@ describe('InputModalityDetector', () => {
+     expect(detector.mostRecentModality).toBe(null);
+   });
+ 
+-  it('should ignore mouse events that occur too closely after a touch event', fakeAsync(() => {
++  it('should ignore mouse events that occur too closely after a touch event', async () => {
+     setupTest();
+ 
+     dispatchTouchEvent(document, 'touchstart');
+     dispatchMouseEvent(document, 'mousedown');
+     expect(detector.mostRecentModality).toBe('touch');
+ 
+-    tick(TOUCH_BUFFER_MS);
++    await new Promise(resolve => setTimeout(resolve, TOUCH_BUFFER_MS));
+     dispatchMouseEvent(document, 'mousedown');
+     expect(detector.mostRecentModality).toBe('mouse');
+-  }));
++  });
+ 
+   it('should complete the various observables on destroy', () => {
+     setupTest();
+diff --git a/src/cdk/a11y/key-manager/list-key-manager.spec.ts b/src/cdk/a11y/key-manager/list-key-manager.spec.ts
+index e40f5aae1c12..8d18e35540d5 100644
+--- a/src/cdk/a11y/key-manager/list-key-manager.spec.ts
++++ b/src/cdk/a11y/key-manager/list-key-manager.spec.ts
+@@ -1,7 +1,7 @@
+ import {DOWN_ARROW, END, HOME, LEFT_ARROW, RIGHT_ARROW, TAB, UP_ARROW} from '../../keycodes';
+ import {createKeyboardEvent} from '../../testing/private';
+ import {Component, QueryList, signal} from '@angular/core';
+-import {TestBed, fakeAsync, tick} from '@angular/core/testing';
++import {TestBed} from '@angular/core/testing';
+ import {take} from 'rxjs/operators';
+ import {FocusOrigin} from '../focus-monitor/focus-monitor';
+ import {ActiveDescendantKeyManager} from './activedescendant-key-manager';
+@@ -44,6 +44,10 @@ describe('Key managers', () => {
+     unsupported: KeyboardEvent;
+   };
+ 
++  function wait(ms: number) {
++    return new Promise(resolve => setTimeout(resolve, ms));
++  }
++
+   beforeEach(() => {
+     itemList = new QueryList<any>();
+     fakeKeyEvents = {
+@@ -816,68 +820,68 @@ describe('Key managers', () => {
+         expect(() => invalidManager.withTypeAhead()).toThrowError(/must implement/);
+       });
+ 
+-      it('should debounce the input key presses', fakeAsync(() => {
++      it('should debounce the input key presses', async () => {
+         keyManager.onKeydown(createKeyboardEvent('keydown', 79, 'o')); // types "o"
+         keyManager.onKeydown(createKeyboardEvent('keydown', 78, 'n')); // types "n"
+         keyManager.onKeydown(createKeyboardEvent('keydown', 69, 'e')); // types "e"
+ 
+         expect(keyManager.activeItem).not.toBe(itemList.toArray()[0]);
+ 
+-        tick(debounceInterval);
++        await wait(debounceInterval + 100);
+ 
+         expect(keyManager.activeItem).toBe(itemList.toArray()[0]);
+-      }));
++      });
+ 
+-      it('should focus the first item that starts with a letter', fakeAsync(() => {
++      it('should focus the first item that starts with a letter', async () => {
+         keyManager.onKeydown(createKeyboardEvent('keydown', 84, 't')); // types "t"
+ 
+-        tick(debounceInterval);
++        await wait(debounceInterval + 100);
+ 
+         expect(keyManager.activeItem).toBe(itemList.toArray()[1]);
+-      }));
++      });
+ 
+-      it('should not move focus if a modifier, that is not allowed, is pressed', fakeAsync(() => {
++      it('should not move focus if a modifier, that is not allowed, is pressed', async () => {
+         const tEvent = createKeyboardEvent('keydown', 84, 't', {control: true});
+ 
+         expect(keyManager.activeItem).toBeFalsy();
+ 
+         keyManager.onKeydown(tEvent); // types "t"
+-        tick(debounceInterval);
++        await wait(debounceInterval + 100);
+ 
+         expect(keyManager.activeItem).toBeFalsy();
+-      }));
++      });
+ 
+-      it('should always allow the shift key', fakeAsync(() => {
++      it('should always allow the shift key', async () => {
+         const tEvent = createKeyboardEvent('keydown', 84, 't', {shift: true});
+ 
+         expect(keyManager.activeItem).toBeFalsy();
+ 
+         keyManager.onKeydown(tEvent); // types "t"
+-        tick(debounceInterval);
++        await wait(debounceInterval + 100);
+ 
+         expect(keyManager.activeItem).toBeTruthy();
+-      }));
++      });
+ 
+-      it('should focus the first item that starts with sequence of letters', fakeAsync(() => {
++      it('should focus the first item that starts with sequence of letters', async () => {
+         keyManager.onKeydown(createKeyboardEvent('keydown', 84, 't')); // types "t"
+         keyManager.onKeydown(createKeyboardEvent('keydown', 72, 'h')); // types "h"
+ 
+-        tick(debounceInterval);
++        await wait(debounceInterval + 100);
+ 
+         expect(keyManager.activeItem).toBe(itemList.toArray()[2]);
+-      }));
++      });
+ 
+-      it('should cancel any pending timers if a navigation key is pressed', fakeAsync(() => {
++      it('should cancel any pending timers if a navigation key is pressed', async () => {
+         keyManager.onKeydown(createKeyboardEvent('keydown', 84, 't')); // types "t"
+         keyManager.onKeydown(createKeyboardEvent('keydown', 72, 'h')); // types "h"
+         keyManager.onKeydown(fakeKeyEvents.downArrow);
+ 
+-        tick(debounceInterval);
++        await wait(debounceInterval + 100);
+ 
+         expect(keyManager.activeItem).toBe(itemList.toArray()[0]);
+-      }));
++      });
+ 
+-      it('should handle non-English input', fakeAsync(() => {
++      it('should handle non-English input', async () => {
+         itemList.reset([
+           new FakeFocusable('едно'),
+           new FakeFocusable('две'),
+@@ -888,12 +892,12 @@ describe('Key managers', () => {
+         const keyboardEvent = createKeyboardEvent('keydown', 68, 'д');
+ 
+         keyManager.onKeydown(keyboardEvent); // types "д"
+-        tick(debounceInterval);
++        await wait(debounceInterval + 100);
+ 
+         expect(keyManager.activeItem).toBe(itemList.toArray()[1]);
+-      }));
++      });
+ 
+-      it('should handle non-letter characters', fakeAsync(() => {
++      it('should handle non-letter characters', async () => {
+         itemList.reset([
+           new FakeFocusable('[]'),
+           new FakeFocusable('321'),
+@@ -902,19 +906,19 @@ describe('Key managers', () => {
+         itemList.notifyOnChanges();
+ 
+         keyManager.onKeydown(createKeyboardEvent('keydown', 192, '`')); // types "`"
+-        tick(debounceInterval);
++        await wait(debounceInterval + 100);
+         expect(keyManager.activeItem).toBe(itemList.toArray()[2]);
+ 
+         keyManager.onKeydown(createKeyboardEvent('keydown', 51, '3')); // types "3"
+-        tick(debounceInterval);
++        await wait(debounceInterval + 100);
+         expect(keyManager.activeItem).toBe(itemList.toArray()[1]);
+ 
+         keyManager.onKeydown(createKeyboardEvent('keydown', 219, '[')); // types "["
+-        tick(debounceInterval);
++        await wait(debounceInterval + 100);
+         expect(keyManager.activeItem).toBe(itemList.toArray()[0]);
+-      }));
++      });
+ 
+-      it('should not focus disabled items', fakeAsync(() => {
++      it('should not focus disabled items', async () => {
+         expect(keyManager.activeItem).toBeFalsy();
+ 
+         const items = itemList.toArray();
+@@ -923,12 +927,12 @@ describe('Key managers', () => {
+         itemList.notifyOnChanges();
+ 
+         keyManager.onKeydown(createKeyboardEvent('keydown', 79, 'o')); // types "o"
+-        tick(debounceInterval);
++        await wait(debounceInterval + 100);
+ 
+         expect(keyManager.activeItem).toBeFalsy();
+-      }));
++      });
+ 
+-      it('should start looking for matches after the active item', fakeAsync(() => {
++      it('should start looking for matches after the active item', async () => {
+         itemList.reset([
+           new FakeFocusable('Bilbo'),
+           new FakeFocusable('Frodo'),
+@@ -940,12 +944,12 @@ describe('Key managers', () => {
+ 
+         keyManager.setActiveItem(1);
+         keyManager.onKeydown(createKeyboardEvent('keydown', 66, 'b'));
+-        tick(debounceInterval);
++        await wait(debounceInterval + 100);
+ 
+         expect(keyManager.activeItem).toBe(itemList.toArray()[3]);
+-      }));
++      });
+ 
+-      it('should wrap back around if there were no matches after the active item', fakeAsync(() => {
++      it('should wrap back around if there were no matches after the active item', async () => {
+         itemList.reset([
+           new FakeFocusable('Bilbo'),
+           new FakeFocusable('Frodo'),
+@@ -957,48 +961,48 @@ describe('Key managers', () => {
+ 
+         keyManager.setActiveItem(3);
+         keyManager.onKeydown(createKeyboardEvent('keydown', 66, 'b'));
+-        tick(debounceInterval);
++        await wait(debounceInterval + 100);
+ 
+         expect(keyManager.activeItem).toBe(itemList.toArray()[0]);
+-      }));
++      });
+ 
+-      it('should wrap back around if the last item is active', fakeAsync(() => {
++      it('should wrap back around if the last item is active', async () => {
+         keyManager.setActiveItem(2);
+         keyManager.onKeydown(createKeyboardEvent('keydown', 79, 'o'));
+-        tick(debounceInterval);
++        await wait(debounceInterval + 100);
+ 
+         expect(keyManager.activeItem).toBe(itemList.toArray()[0]);
+-      }));
++      });
+ 
+-      it('should be able to select the first item', fakeAsync(() => {
++      it('should be able to select the first item', async () => {
+         keyManager.setActiveItem(-1);
+         keyManager.onKeydown(createKeyboardEvent('keydown', 79, 'o'));
+-        tick(debounceInterval);
++        await wait(debounceInterval + 100);
+ 
+         expect(keyManager.activeItem).toBe(itemList.toArray()[0]);
+-      }));
++      });
+ 
+-      it('should not do anything if there is no match', fakeAsync(() => {
++      it('should not do anything if there is no match', async () => {
+         keyManager.setActiveItem(1);
+         keyManager.onKeydown(createKeyboardEvent('keydown', 87, 'w'));
+-        tick(debounceInterval);
++        await wait(debounceInterval + 100);
+ 
+         expect(keyManager.activeItem).toBe(itemList.toArray()[1]);
+-      }));
++      });
+ 
+-      it('should expose whether the user is currently typing', fakeAsync(() => {
++      it('should expose whether the user is currently typing', async () => {
+         expect(keyManager.isTyping()).toBe(false);
+ 
+         keyManager.onKeydown(createKeyboardEvent('keydown', 79, 'o')); // types "o"
+ 
+         expect(keyManager.isTyping()).toBe(true);
+ 
+-        tick(debounceInterval);
++        await wait(debounceInterval + 100);
+ 
+         expect(keyManager.isTyping()).toBe(false);
+-      }));
++      });
+ 
+-      it('should reset isTyping if the key manager is destroyed', fakeAsync(() => {
++      it('should reset isTyping if the key manager is destroyed', async () => {
+         expect(keyManager.isTyping()).toBe(false);
+ 
+         keyManager.onKeydown(createKeyboardEvent('keydown', 79, 'o')); // types "o"
+@@ -1006,18 +1010,18 @@ describe('Key managers', () => {
+ 
+         keyManager.destroy();
+         expect(keyManager.isTyping()).toBe(false);
+-      }));
++      });
+ 
+-      it('should be able to cancel the typeahead sequence', fakeAsync(() => {
++      it('should be able to cancel the typeahead sequence', async () => {
+         expect(keyManager.activeItem).toBeFalsy();
+ 
+         keyManager.onKeydown(createKeyboardEvent('keydown', 79, 'o')); // types "o"
+         expect(keyManager.activeItem).toBeFalsy();
+         keyManager.cancelTypeahead();
+-        tick(debounceInterval);
++        await wait(debounceInterval + 100);
+ 
+         expect(keyManager.activeItem).toBeFalsy();
+-      }));
++      });
+     });
+   });
+ 
+diff --git a/src/cdk/a11y/key-manager/tree-key-manager.spec.ts b/src/cdk/a11y/key-manager/tree-key-manager.spec.ts
+index b5c2d83bc87e..c96deaf0fa1e 100644
+--- a/src/cdk/a11y/key-manager/tree-key-manager.spec.ts
++++ b/src/cdk/a11y/key-manager/tree-key-manager.spec.ts
+@@ -3,7 +3,6 @@ import {QueryList} from '@angular/core';
+ import {TreeKeyManager} from './tree-key-manager';
+ import {TreeKeyManagerItem} from './tree-key-manager-strategy';
+ import {Observable, of as observableOf, Subscription} from 'rxjs';
+-import {fakeAsync, tick} from '@angular/core/testing';
+ 
+ class FakeBaseTreeKeyManagerItem implements TreeKeyManagerItem {
+   _isExpanded = false;
+@@ -100,6 +99,10 @@ describe('TreeKeyManager', () => {
+     };
+   });
+ 
++  function wait(ms: number) {
++    return new Promise(resolve => setTimeout(resolve, ms));
++  }
++
+   const itemParameters: ItemConstructorTestContext[] = [
+     {description: 'Observable children', constructor: FakeObservableTreeKeyManagerItem},
+     {description: 'array children', constructor: FakeArrayTreeKeyManagerItem},
+@@ -694,87 +697,87 @@ describe('TreeKeyManager', () => {
+           ).toThrowError(/must implement/);
+         });
+ 
+-        it('should debounce the input key presses', fakeAsync(() => {
++        it('should debounce the input key presses', async () => {
+           keyManager.onKeydown(createKeyboardEvent('keydown', 79, 'o')); // types "o"
+-          tick(1);
++          await wait(1);
+           keyManager.onKeydown(createKeyboardEvent('keydown', 78, 'n')); // types "n"
+-          tick(1);
++          await wait(1);
+           keyManager.onKeydown(createKeyboardEvent('keydown', 69, 'e')); // types "e"
+ 
+           expect(keyManager.getActiveItemIndex())
+             .withContext('active item index, before debounce interval')
+             .not.toBe(0);
+ 
+-          tick(debounceInterval - 1);
++          await wait(debounceInterval - 1);
+ 
+           expect(keyManager.getActiveItemIndex())
+             .withContext('active item index, after partial debounce interval')
+             .not.toBe(0);
+ 
+-          tick(1);
++          await wait(100);
+ 
+           expect(keyManager.getActiveItemIndex())
+             .withContext('active item index, after full debounce interval')
+             .toBe(0);
+-        }));
++        });
+ 
+-        it('uses a default debounce interval', fakeAsync(() => {
++        it('uses a default debounce interval', async () => {
+           const defaultInterval = 200;
+           keyManager = new TreeKeyManager(itemList, {
+             typeAheadDebounceInterval: true,
+           });
+ 
+           keyManager.onKeydown(createKeyboardEvent('keydown', 79, 'o')); // types "o"
+-          tick(1);
++          await wait(1);
+           keyManager.onKeydown(createKeyboardEvent('keydown', 78, 'n')); // types "n"
+-          tick(1);
++          await wait(1);
+           keyManager.onKeydown(createKeyboardEvent('keydown', 69, 'e')); // types "e"
+ 
+           expect(keyManager.getActiveItemIndex())
+             .withContext('active item index, before debounce interval')
+             .not.toBe(0);
+ 
+-          tick(defaultInterval - 1);
++          await wait(defaultInterval - 1);
+ 
+           expect(keyManager.getActiveItemIndex())
+             .withContext('active item index, after partial debounce interval')
+             .not.toBe(0);
+ 
+-          tick(1);
++          await wait(100);
+ 
+           expect(keyManager.getActiveItemIndex())
+             .withContext('active item index, after full debounce interval')
+             .toBe(0);
+-        }));
++        });
+ 
+-        it('should focus the first item that starts with a letter', fakeAsync(() => {
++        it('should focus the first item that starts with a letter', async () => {
+           keyManager.onKeydown(createKeyboardEvent('keydown', 84, 't')); // types "t"
+ 
+-          tick(debounceInterval);
++          await wait(debounceInterval + 100);
+ 
+           expect(keyManager.getActiveItemIndex()).withContext('active item index').toBe(1);
+-        }));
++        });
+ 
+-        it('should focus the first item that starts with sequence of letters', fakeAsync(() => {
++        it('should focus the first item that starts with sequence of letters', async () => {
+           keyManager.onKeydown(createKeyboardEvent('keydown', 84, 't')); // types "t"
+           keyManager.onKeydown(createKeyboardEvent('keydown', 72, 'h')); // types "h"
+ 
+-          tick(debounceInterval);
++          await wait(debounceInterval + 100);
+ 
+           expect(keyManager.getActiveItemIndex()).withContext('active item index').toBe(2);
+-        }));
++        });
+ 
+-        it('should cancel any pending timers if a navigation key is pressed', fakeAsync(() => {
++        it('should cancel any pending timers if a navigation key is pressed', async () => {
+           keyManager.onKeydown(createKeyboardEvent('keydown', 84, 't')); // types "t"
+           keyManager.onKeydown(createKeyboardEvent('keydown', 72, 'h')); // types "h"
+           keyManager.onKeydown(fakeKeyEvents.downArrow);
+ 
+-          tick(debounceInterval);
++          await wait(debounceInterval + 100);
+ 
+           expect(keyManager.getActiveItemIndex()).withContext('active item index').toBe(0);
+-        }));
++        });
+ 
+-        it('should handle non-English input', fakeAsync(() => {
++        it('should handle non-English input', async () => {
+           itemList.reset([
+             new itemParam.constructor('едно'),
+             new itemParam.constructor('две'),
+@@ -785,12 +788,12 @@ describe('TreeKeyManager', () => {
+           const keyboardEvent = createKeyboardEvent('keydown', 68, 'д');
+ 
+           keyManager.onKeydown(keyboardEvent); // types "д"
+-          tick(debounceInterval);
++          await wait(debounceInterval + 100);
+ 
+           expect(keyManager.getActiveItemIndex()).withContext('active item index').toBe(1);
+-        }));
++        });
+ 
+-        it('should handle non-letter characters', fakeAsync(() => {
++        it('should handle non-letter characters', async () => {
+           itemList.reset([
+             new itemParam.constructor('[]'),
+             new itemParam.constructor('321'),
+@@ -799,30 +802,30 @@ describe('TreeKeyManager', () => {
+           itemList.notifyOnChanges();
+ 
+           keyManager.onKeydown(createKeyboardEvent('keydown', 192, '`')); // types "`"
+-          tick(debounceInterval);
++          await wait(debounceInterval + 100);
+           expect(keyManager.getActiveItemIndex()).withContext('active item index').toBe(2);
+ 
+           keyManager.onKeydown(createKeyboardEvent('keydown', 51, '3')); // types "3"
+-          tick(debounceInterval);
++          await wait(debounceInterval + 100);
+           expect(keyManager.getActiveItemIndex()).withContext('active item index').toBe(1);
+ 
+           keyManager.onKeydown(createKeyboardEvent('keydown', 219, '[')); // types "["
+-          tick(debounceInterval);
++          await wait(debounceInterval + 100);
+           expect(keyManager.getActiveItemIndex()).withContext('active item index').toBe(0);
+-        }));
++        });
+ 
+-        it('should allow focus to disabled items', fakeAsync(() => {
++        it('should allow focus to disabled items', async () => {
+           expect(keyManager.getActiveItemIndex()).withContext('initial active item index').toBe(-1);
+ 
+           parentItem.isDisabled = true;
+ 
+           keyManager.onKeydown(createKeyboardEvent('keydown', 79, 'o')); // types "o"
+-          tick(debounceInterval);
++          await wait(debounceInterval + 100);
+ 
+           expect(keyManager.getActiveItemIndex()).withContext('initial active item index').toBe(0);
+-        }));
++        });
+ 
+-        it('should start looking for matches after the active item', fakeAsync(() => {
++        it('should start looking for matches after the active item', async () => {
+           const frodo = new itemParam.constructor('Frodo');
+           itemList.reset([
+             new itemParam.constructor('Bilbo'),
+@@ -835,12 +838,12 @@ describe('TreeKeyManager', () => {
+ 
+           keyManager.focusItem(frodo);
+           keyManager.onKeydown(createKeyboardEvent('keydown', 66, 'b'));
+-          tick(debounceInterval);
++          await wait(debounceInterval + 100);
+ 
+           expect(keyManager.getActiveItemIndex()).withContext('active item index').toBe(3);
+-        }));
++        });
+ 
+-        it('should wrap back around if there were no matches after the active item', fakeAsync(() => {
++        it('should wrap back around if there were no matches after the active item', async () => {
+           const boromir = new itemParam.constructor('Boromir');
+           itemList.reset([
+             new itemParam.constructor('Bilbo'),
+@@ -853,32 +856,32 @@ describe('TreeKeyManager', () => {
+ 
+           keyManager.focusItem(boromir);
+           keyManager.onKeydown(createKeyboardEvent('keydown', 66, 'b'));
+-          tick(debounceInterval);
++          await wait(debounceInterval + 100);
+ 
+           expect(keyManager.getActiveItemIndex()).withContext('active item index').toBe(0);
+-        }));
++        });
+ 
+-        it('should wrap back around if the last item is active', fakeAsync(() => {
++        it('should wrap back around if the last item is active', async () => {
+           keyManager.focusItem(lastItem);
+           keyManager.onKeydown(createKeyboardEvent('keydown', 79, 'o'));
+-          tick(debounceInterval);
++          await wait(debounceInterval + 100);
+ 
+           expect(keyManager.getActiveItemIndex()).withContext('active item index').toBe(0);
+-        }));
++        });
+ 
+-        it('should be able to select the first item', fakeAsync(() => {
++        it('should be able to select the first item', async () => {
+           keyManager.onKeydown(createKeyboardEvent('keydown', 79, 'o'));
+-          tick(debounceInterval);
++          await wait(debounceInterval + 100);
+ 
+           expect(keyManager.getActiveItemIndex()).withContext('active item index').toBe(0);
+-        }));
++        });
+ 
+-        it('should not do anything if there is no match', fakeAsync(() => {
++        it('should not do anything if there is no match', async () => {
+           keyManager.onKeydown(createKeyboardEvent('keydown', 87, 'w'));
+-          tick(debounceInterval);
++          await wait(debounceInterval + 100);
+ 
+           expect(keyManager.getActiveItemIndex()).withContext('active item index').toBe(-1);
+-        }));
++        });
+       });
+ 
+       describe('focusItem', () => {
+diff --git a/src/cdk/a11y/live-announcer/live-announcer.spec.ts b/src/cdk/a11y/live-announcer/live-announcer.spec.ts
+index f640fb8513a1..1d12c3667e8f 100644
+--- a/src/cdk/a11y/live-announcer/live-announcer.spec.ts
++++ b/src/cdk/a11y/live-announcer/live-announcer.spec.ts
+@@ -1,7 +1,7 @@
+ import {MutationObserverFactory} from '../../observers';
+ import {ComponentPortal} from '../../portal';
+ import {Component, inject, Injector} from '@angular/core';
+-import {ComponentFixture, TestBed, fakeAsync, flush, tick} from '@angular/core/testing';
++import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {By, DomSanitizer} from '@angular/platform-browser';
+ import {A11yModule} from '../index';
+ import {LiveAnnouncer, LiveAnnouncerMessage} from './live-announcer';
+@@ -18,76 +18,80 @@ describe('LiveAnnouncer', () => {
+   let ariaLiveElement: Element;
+   let fixture: ComponentFixture<TestApp>;
+ 
++  function wait(ms: number) {
++    return new Promise(resolve => setTimeout(resolve, ms));
++  }
++
+   describe('with default element', () => {
+-    beforeEach(fakeAsync(() => {
++    beforeEach(async () => {
+       announcer = TestBed.inject(LiveAnnouncer);
+       ariaLiveElement = getLiveElement();
+       fixture = TestBed.createComponent(TestApp);
+-    }));
++    });
+ 
+-    it('should correctly update the announce text', fakeAsync(() => {
++    it('should correctly update the announce text', async () => {
+       let buttonElement = fixture.debugElement.query(By.css('button'))!.nativeElement;
+       buttonElement.click();
+ 
+       // This flushes our 100ms timeout for the screenreaders.
+-      tick(100);
++      await wait(110);
+ 
+       expect(ariaLiveElement.textContent).toBe('Test');
+-    }));
++    });
+ 
+-    it('should correctly update the politeness attribute', fakeAsync(() => {
++    it('should correctly update the politeness attribute', async () => {
+       announcer.announce('Hey Google', 'assertive');
+ 
+       // This flushes our 100ms timeout for the screenreaders.
+-      tick(100);
++      await wait(110);
+ 
+       expect(ariaLiveElement.textContent).toBe('Hey Google');
+       expect(ariaLiveElement.getAttribute('aria-live')).toBe('assertive');
+-    }));
++    });
+ 
+-    it('should apply the aria-live value polite by default', fakeAsync(() => {
++    it('should apply the aria-live value polite by default', async () => {
+       announcer.announce('Hey Google');
+ 
+       // This flushes our 100ms timeout for the screenreaders.
+-      tick(100);
++      await wait(110);
+ 
+       expect(ariaLiveElement.textContent).toBe('Hey Google');
+       expect(ariaLiveElement.getAttribute('aria-live')).toBe('polite');
+-    }));
++    });
+ 
+-    it('should be able to clear out the aria-live element manually', fakeAsync(() => {
++    it('should be able to clear out the aria-live element manually', async () => {
+       announcer.announce('Hey Google');
+-      tick(100);
++      await wait(110);
+       expect(ariaLiveElement.textContent).toBe('Hey Google');
+ 
+       announcer.clear();
+       expect(ariaLiveElement.textContent).toBeFalsy();
+-    }));
++    });
+ 
+-    it('should be able to clear out the aria-live element by setting a duration', fakeAsync(() => {
++    it('should be able to clear out the aria-live element by setting a duration', async () => {
+       announcer.announce('Hey Google', 2000);
+-      tick(100);
++      await wait(110);
+       expect(ariaLiveElement.textContent).toBe('Hey Google');
+ 
+-      tick(2000);
++      await wait(2010);
+       expect(ariaLiveElement.textContent).toBeFalsy();
+-    }));
++    });
+ 
+-    it('should clear the duration of previous messages when announcing a new one', fakeAsync(() => {
++    it('should clear the duration of previous messages when announcing a new one', async () => {
+       announcer.announce('Hey Google', 2000);
+-      tick(100);
++      await wait(100);
+       expect(ariaLiveElement.textContent).toBe('Hey Google');
+ 
+       announcer.announce('Hello there');
+-      tick(2500);
++      await wait(2500);
+       expect(ariaLiveElement.textContent).toBe('Hello there');
+-    }));
++    });
+ 
+-    it('should remove the aria-live element from the DOM on destroy', fakeAsync(() => {
++    it('should remove the aria-live element from the DOM on destroy', async () => {
+       announcer.announce('Hey Google');
+ 
+       // This flushes our 100ms timeout for the screenreaders.
+-      tick(100);
++      await wait(100);
+ 
+       // Call the lifecycle hook manually since Angular won't do it in tests.
+       announcer.ngOnDestroy();
+@@ -95,28 +99,28 @@ describe('LiveAnnouncer', () => {
+       expect(document.body.querySelector('.cdk-live-announcer-element'))
+         .withContext('Expected that the aria-live element was remove from the DOM.')
+         .toBeFalsy();
+-    }));
++    });
+ 
+-    it('should return a promise that resolves after the text has been announced', fakeAsync(() => {
++    it('should return a promise that resolves after the text has been announced', async () => {
+       const spy = jasmine.createSpy('announce spy');
+       announcer.announce('something').then(spy);
+ 
+       expect(spy).not.toHaveBeenCalled();
+-      tick(100);
++      await wait(110);
+       expect(spy).toHaveBeenCalled();
+-    }));
++    });
+ 
+-    it('should resolve the returned promise if another announcement is made before the timeout has expired', fakeAsync(() => {
++    it('should resolve the returned promise if another announcement is made before the timeout has expired', async () => {
+       const spy = jasmine.createSpy('announce spy');
+       announcer.announce('something').then(spy);
+-      tick(10);
++      await wait(10);
+       announcer.announce('something').then(spy);
+-      tick(100);
++      await wait(110);
+ 
+       expect(spy).toHaveBeenCalledTimes(2);
+-    }));
++    });
+ 
+-    it('should ensure that there is only one live element at a time', fakeAsync(() => {
++    it('should ensure that there is only one live element at a time', async () => {
+       fixture.destroy();
+       TestBed.resetTestingModule().configureTestingModule({});
+ 
+@@ -128,39 +132,39 @@ describe('LiveAnnouncer', () => {
+       fixture = TestBed.createComponent(TestApp);
+ 
+       announcer.announce('Hey Google');
+-      tick(100);
++      await wait(110);
+ 
+       expect(document.body.querySelectorAll('.cdk-live-announcer-element').length)
+         .withContext('Expected only one live announcer element in the DOM.')
+         .toBe(1);
+       extraElement.remove();
+-    }));
++    });
+ 
+-    it('should clear any previous timers when a new one is started', fakeAsync(() => {
++    it('should clear any previous timers when a new one is started', async () => {
+       expect(ariaLiveElement.textContent).toBeFalsy();
+ 
+       announcer.announce('One');
+-      tick(50);
++      await wait(50);
+ 
+       announcer.announce('Two');
+-      tick(75);
++      await wait(75);
+ 
+       expect(ariaLiveElement.textContent).toBeFalsy();
+ 
+-      tick(25);
++      await wait(100);
+ 
+       expect(ariaLiveElement.textContent).toBe('Two');
+-    }));
++    });
+ 
+-    it('should clear pending timeouts on destroy', fakeAsync(() => {
++    it('should clear pending timeouts on destroy', async () => {
+       announcer.announce('Hey Google');
+       announcer.ngOnDestroy();
+ 
+       // Since we're testing whether the timeouts were flushed, we don't need any
+       // assertions here. `fakeAsync` will fail the test if a timer was left over.
+-    }));
++    });
+ 
+-    it('should add aria-owns to open aria-modal elements', fakeAsync(() => {
++    it('should add aria-owns to open aria-modal elements', async () => {
+       const portal = new ComponentPortal(TestModal);
+       const overlayRef = createOverlayRef(TestBed.inject(Injector));
+       const componentRef = overlayRef.attach(portal);
+@@ -171,16 +175,16 @@ describe('LiveAnnouncer', () => {
+       expect(modal.hasAttribute('aria-owns')).toBe(false);
+ 
+       announcer.announce('Hey Google', 'assertive');
+-      tick(100);
++      await wait(110);
+       expect(modal.getAttribute('aria-owns')).toBe(ariaLiveElement.id);
+ 
+       // Verify that the ID isn't duplicated.
+       announcer.announce('Hey Google again', 'assertive');
+-      tick(100);
++      await wait(110);
+       expect(modal.getAttribute('aria-owns')).toBe(ariaLiveElement.id);
+-    }));
++    });
+ 
+-    it('should expand aria-owns of open aria-modal elements', fakeAsync(() => {
++    it('should expand aria-owns of open aria-modal elements', async () => {
+       const portal = new ComponentPortal(TestModal);
+       const overlayRef = createOverlayRef(TestBed.inject(Injector));
+       const componentRef = overlayRef.attach(portal);
+@@ -194,16 +198,16 @@ describe('LiveAnnouncer', () => {
+       expect(modal.getAttribute('aria-owns')).toBe('foo bar');
+ 
+       announcer.announce('Hey Google', 'assertive');
+-      tick(100);
++      await wait(110);
+       expect(modal.getAttribute('aria-owns')).toBe(`foo bar ${ariaLiveElement.id}`);
+ 
+       // Verify that the ID isn't duplicated.
+       announcer.announce('Hey Google again', 'assertive');
+-      tick(100);
++      await wait(110);
+       expect(modal.getAttribute('aria-owns')).toBe(`foo bar ${ariaLiveElement.id}`);
+-    }));
++    });
+ 
+-    it('should be able to announce safe HTML', fakeAsync(() => {
++    it('should be able to announce safe HTML', async () => {
+       const sanitizer = TestBed.inject(DomSanitizer);
+       const message = sanitizer.bypassSecurityTrustHtml(
+         '<span class="message" lang="fr">Bonjour</span>',
+@@ -211,10 +215,10 @@ describe('LiveAnnouncer', () => {
+       fixture.componentInstance.announce(message);
+ 
+       // This flushes our 100ms timeout for the screenreaders.
+-      tick(100);
++      await wait(110);
+ 
+       expect(ariaLiveElement.querySelector('.message')?.textContent).toBe('Bonjour');
+-    }));
++    });
+   });
+ 
+   describe('with a custom element', () => {
+@@ -233,14 +237,14 @@ describe('LiveAnnouncer', () => {
+       ariaLiveElement = getLiveElement();
+     });
+ 
+-    it('should allow to use a custom live element', fakeAsync(() => {
++    it('should allow to use a custom live element', async () => {
+       announcer.announce('Custom Element');
+ 
+       // This flushes our 100ms timeout for the screenreaders.
+-      tick(100);
++      await wait(110);
+ 
+       expect(customLiveElement.textContent).toBe('Custom Element');
+-    }));
++    });
+   });
+ 
+   describe('with a default options', () => {
+@@ -263,23 +267,23 @@ describe('LiveAnnouncer', () => {
+       ariaLiveElement = getLiveElement();
+     });
+ 
+-    it('should pick up the default politeness from the injection token', fakeAsync(() => {
++    it('should pick up the default politeness from the injection token', async () => {
+       announcer.announce('Hello');
+ 
+-      tick(2000);
++      await wait(2000);
+ 
+       expect(ariaLiveElement.getAttribute('aria-live')).toBe('assertive');
+-    }));
++    });
+ 
+-    it('should pick up the default duration from the injection token', fakeAsync(() => {
++    it('should pick up the default duration from the injection token', async () => {
+       announcer.announce('Hello');
+ 
+-      tick(100);
++      await wait(110);
+       expect(ariaLiveElement.textContent).toBe('Hello');
+ 
+-      tick(1337);
++      await wait(1500);
+       expect(ariaLiveElement.textContent).toBeFalsy();
+-    }));
++    });
+   });
+ });
+ 
+@@ -291,7 +295,7 @@ describe('CdkAriaLive', () => {
+ 
+   const invokeMutationCallbacks = () => mutationCallbacks.forEach(cb => cb([{type: 'fake'}]));
+ 
+-  beforeEach(fakeAsync(() => {
++  beforeEach(async () => {
+     TestBed.configureTestingModule({
+       providers: [
+         {
+@@ -308,32 +312,32 @@ describe('CdkAriaLive', () => {
+         },
+       ],
+     });
+-  }));
++  });
+ 
+-  beforeEach(fakeAsync(() => {
++  beforeEach(async () => {
+     announcer = TestBed.inject(LiveAnnouncer);
+     announcerSpy = spyOn(announcer, 'announce').and.callThrough();
+     fixture = TestBed.createComponent(DivWithCdkAriaLive);
+     fixture.detectChanges();
+-    flush();
+-  }));
++    await fixture.whenStable();
++  });
+ 
+-  it('should default politeness to polite', fakeAsync(() => {
++  it('should default politeness to polite', async () => {
+     fixture.componentInstance.content = 'New content';
+     fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+     invokeMutationCallbacks();
+-    flush();
++    await fixture.whenStable();
+ 
+     expect(announcer.announce).toHaveBeenCalledWith('New content', 'polite', undefined);
+-  }));
++  });
+ 
+-  it('should dynamically update the politeness', fakeAsync(() => {
++  it('should dynamically update the politeness', async () => {
+     fixture.componentInstance.content = 'New content';
+     fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+     invokeMutationCallbacks();
+-    flush();
++    await fixture.whenStable();
+ 
+     expect(announcer.announce).toHaveBeenCalledWith('New content', 'polite', undefined);
+ 
+@@ -343,7 +347,7 @@ describe('CdkAriaLive', () => {
+     fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+     invokeMutationCallbacks();
+-    flush();
++    await fixture.whenStable();
+ 
+     expect(announcer.announce).not.toHaveBeenCalled();
+ 
+@@ -353,37 +357,37 @@ describe('CdkAriaLive', () => {
+     fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+     invokeMutationCallbacks();
+-    flush();
++    await fixture.whenStable();
+ 
+     expect(announcer.announce).toHaveBeenCalledWith('Newest content', 'assertive', undefined);
+-  }));
++  });
+ 
+-  it('should not announce the same text multiple times', fakeAsync(() => {
++  it('should not announce the same text multiple times', async () => {
+     fixture.componentInstance.content = 'Content';
+     fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+     invokeMutationCallbacks();
+-    flush();
++    await fixture.whenStable();
+ 
+     expect(announcer.announce).toHaveBeenCalledTimes(1);
+ 
+     fixture.detectChanges();
+     invokeMutationCallbacks();
+-    flush();
++    await fixture.whenStable();
+ 
+     expect(announcer.announce).toHaveBeenCalledTimes(1);
+-  }));
++  });
+ 
+-  it('should be able to pass in a duration', fakeAsync(() => {
++  it('should be able to pass in a duration', async () => {
+     fixture.componentInstance.content = 'New content';
+     fixture.componentInstance.duration = 1337;
+     fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+     invokeMutationCallbacks();
+-    flush();
++    await fixture.whenStable();
+ 
+     expect(announcer.announce).toHaveBeenCalledWith('New content', 'polite', 1337);
+-  }));
++  });
+ });
+ 
+ function getLiveElement(): Element {

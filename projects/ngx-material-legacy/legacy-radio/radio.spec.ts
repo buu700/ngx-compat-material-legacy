@@ -3,7 +3,7 @@ import {FormControl, FormsModule, NgModel, ReactiveFormsModule} from '@angular/f
 import {Component, DebugElement, ViewChild} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {By} from '@angular/platform-browser';
-import {dispatchFakeEvent} from '@angular/cdk/testing/private';
+import {dispatchFakeEvent} from '../internal/testing/owned-test-events';
 
 import {MAT_RADIO_DEFAULT_OPTIONS, MatRadioChange} from '@angular/material/radio';
 import {MatLegacyRadioButton, MatLegacyRadioGroup, MatLegacyRadioModule} from './index';

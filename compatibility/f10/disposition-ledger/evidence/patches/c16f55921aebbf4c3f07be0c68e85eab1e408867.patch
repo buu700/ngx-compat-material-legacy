@@ -1,0 +1,338 @@
+From c16f55921aebbf4c3f07be0c68e85eab1e408867 Mon Sep 17 00:00:00 2001
+From: Kristiyan Kostadinov <crisbeto@users.noreply.github.com>
+Date: Thu, 18 Dec 2025 16:06:32 +0200
+Subject: [PATCH] build: enable strict property initialization for entire repo
+ (#32567)
+
+Enables strict property initialization for the whole repo and fixes a few failures that weren't caught earlier.
+---
+ docs/src/assets/stackblitz/tsconfig.json                    | 1 +
+ src/aria/tree/tree-item.ts                                  | 2 +-
+ src/bazel-tsconfig-build.json                               | 1 +
+ src/cdk-experimental/tsconfig.json                          | 1 -
+ src/cdk/a11y/focus-trap/configurable-focus-trap.spec.ts     | 2 +-
+ .../a11y/focus-trap/event-listener-inert-strategy.spec.ts   | 4 ++--
+ src/cdk/a11y/live-announcer/live-announcer.spec.ts          | 2 +-
+ src/cdk/menu/menu-item.spec.ts                              | 2 +-
+ src/cdk/overlay/overlay.spec.ts                             | 6 +++---
+ src/cdk/portal/portal.spec.ts                               | 4 ++--
+ src/cdk/schematics/tsconfig.json                            | 1 +
+ src/cdk/table/text-column.spec.ts                           | 4 ++--
+ src/cdk/tsconfig.json                                       | 1 -
+ src/components-examples/tsconfig.json                       | 1 -
+ src/dev-app/tsconfig.json                                   | 1 -
+ src/google-maps/tsconfig.json                               | 3 +--
+ src/material-experimental/tsconfig.json                     | 1 -
+ src/material-moment-adapter/tsconfig.json                   | 1 -
+ src/material/timepicker/timepicker.ts                       | 4 ++--
+ src/material/tsconfig.json                                  | 1 -
+ src/youtube-player/tsconfig.json                            | 3 +--
+ tsconfig.json                                               | 1 +
+ 22 files changed, 21 insertions(+), 26 deletions(-)
+
+diff --git a/docs/src/assets/stackblitz/tsconfig.json b/docs/src/assets/stackblitz/tsconfig.json
+index 11d2566f1033..c5a3ce073bae 100644
+--- a/docs/src/assets/stackblitz/tsconfig.json
++++ b/docs/src/assets/stackblitz/tsconfig.json
+@@ -19,6 +19,7 @@
+     "noUnusedLocals": false,
+     "useDefineForClassFields": false,
+     "strictNullChecks": true,
++    "strictPropertyInitialization": true,
+     "noImplicitReturns": true,
+     "strictFunctionTypes": true,
+     "noImplicitOverride": true,
+diff --git a/src/aria/tree/tree-item.ts b/src/aria/tree/tree-item.ts
+index 34b5fc44ad4a..9fadb6a97ca9 100644
+--- a/src/aria/tree/tree-item.ts
++++ b/src/aria/tree/tree-item.ts
+@@ -119,7 +119,7 @@ export class TreeItem<V> extends DeferredContentAware implements OnInit, OnDestr
+   );
+ 
+   /** The UI pattern for this item. */
+-  _pattern: TreeItemPattern<V>;
++  _pattern!: TreeItemPattern<V>;
+ 
+   constructor() {
+     super();
+diff --git a/src/bazel-tsconfig-build.json b/src/bazel-tsconfig-build.json
+index 0695aed97b2f..cdbd7160610f 100644
+--- a/src/bazel-tsconfig-build.json
++++ b/src/bazel-tsconfig-build.json
+@@ -11,6 +11,7 @@
+     "noUnusedParameters": false,
+     "noUnusedLocals": false,
+     "strictNullChecks": true,
++    "strictPropertyInitialization": true,
+     "noPropertyAccessFromIndexSignature": true,
+     "noImplicitReturns": true,
+     "strictFunctionTypes": true,
+diff --git a/src/cdk-experimental/tsconfig.json b/src/cdk-experimental/tsconfig.json
+index 26757472786e..9dd6206feb19 100644
+--- a/src/cdk-experimental/tsconfig.json
++++ b/src/cdk-experimental/tsconfig.json
+@@ -4,7 +4,6 @@
+   "compilerOptions": {
+     "rootDir": "..",
+     "baseUrl": ".",
+-    "strictPropertyInitialization": true,
+     "paths": {
+       "@angular/cdk/*": ["../cdk/*"],
+       "@angular/cdk-experimental/*": ["../cdk-experimental/*"]
+diff --git a/src/cdk/a11y/focus-trap/configurable-focus-trap.spec.ts b/src/cdk/a11y/focus-trap/configurable-focus-trap.spec.ts
+index 88f441664f80..6a6930deb90d 100644
+--- a/src/cdk/a11y/focus-trap/configurable-focus-trap.spec.ts
++++ b/src/cdk/a11y/focus-trap/configurable-focus-trap.spec.ts
+@@ -119,7 +119,7 @@ class SimpleFocusTrap implements AfterViewInit {
+ 
+   @ViewChild('focusTrapElement') focusTrapElement!: ElementRef;
+ 
+-  focusTrap: ConfigurableFocusTrap;
++  focusTrap!: ConfigurableFocusTrap;
+ 
+   ngAfterViewInit() {
+     this.focusTrap = this._focusTrapFactory.create(this.focusTrapElement.nativeElement);
+diff --git a/src/cdk/a11y/focus-trap/event-listener-inert-strategy.spec.ts b/src/cdk/a11y/focus-trap/event-listener-inert-strategy.spec.ts
+index 7d4dd3d53c2f..42f8659f25ed 100644
+--- a/src/cdk/a11y/focus-trap/event-listener-inert-strategy.spec.ts
++++ b/src/cdk/a11y/focus-trap/event-listener-inert-strategy.spec.ts
+@@ -90,11 +90,11 @@ class SimpleFocusTrap implements AfterViewInit {
+   @ViewChild('firstFocusable') firstFocusableElement!: ElementRef<HTMLElement>;
+   @ViewChild('secondFocusable') secondFocusableElement!: ElementRef<HTMLElement>;
+ 
+-  focusTrap: ConfigurableFocusTrap;
++  focusTrap!: ConfigurableFocusTrap;
+ 
+   // Since our custom stubbing in `patchElementFocus` won't update
+   // the `document.activeElement`, we need to keep track of it here.
+-  activeElement: Element | null;
++  activeElement: Element | null = null;
+ 
+   ngAfterViewInit() {
+     // Ensure consistent focus timing across browsers.
+diff --git a/src/cdk/a11y/live-announcer/live-announcer.spec.ts b/src/cdk/a11y/live-announcer/live-announcer.spec.ts
+index fd88a16f9a12..0ce4d0cf391a 100644
+--- a/src/cdk/a11y/live-announcer/live-announcer.spec.ts
++++ b/src/cdk/a11y/live-announcer/live-announcer.spec.ts
+@@ -421,5 +421,5 @@ class TestModal {
+ class DivWithCdkAriaLive {
+   politeness: AriaLivePoliteness = 'polite';
+   content = 'Initial content';
+-  duration: number;
++  duration!: number;
+ }
+diff --git a/src/cdk/menu/menu-item.spec.ts b/src/cdk/menu/menu-item.spec.ts
+index f2081486dffa..4476fdc86d9f 100644
+--- a/src/cdk/menu/menu-item.spec.ts
++++ b/src/cdk/menu/menu-item.spec.ts
+@@ -210,5 +210,5 @@ class MenuItemWithBoldElement {}
+   imports: [CdkMenuModule, FakeMatIcon],
+ })
+ class MenuItemWithMultipleNestings {
+-  typeahead: string;
++  typeahead = '';
+ }
+diff --git a/src/cdk/overlay/overlay.spec.ts b/src/cdk/overlay/overlay.spec.ts
+index 3a529b2051ab..5fe8399135ec 100644
+--- a/src/cdk/overlay/overlay.spec.ts
++++ b/src/cdk/overlay/overlay.spec.ts
+@@ -1135,10 +1135,10 @@ class TestComponentWithTemplatePortals {
+ }
+ 
+ class FakePositionStrategy implements PositionStrategy {
+-  element: HTMLElement;
++  element: HTMLElement | undefined;
+ 
+   apply(): void {
+-    this.element.classList.add('fake-positioned');
++    this.element?.classList.add('fake-positioned');
+   }
+ 
+   attach(overlayRef: OverlayRef) {
+@@ -1150,7 +1150,7 @@ class FakePositionStrategy implements PositionStrategy {
+ 
+ class FakeScrollStrategy implements ScrollStrategy {
+   isEnabled = false;
+-  overlayRef: OverlayRef;
++  overlayRef: OverlayRef | undefined;
+ 
+   attach(overlayRef: OverlayRef) {
+     this.overlayRef = overlayRef;
+diff --git a/src/cdk/portal/portal.spec.ts b/src/cdk/portal/portal.spec.ts
+index c7159875b4b7..1d660f4291fd 100644
+--- a/src/cdk/portal/portal.spec.ts
++++ b/src/cdk/portal/portal.spec.ts
+@@ -756,10 +756,10 @@ class PizzaMsg {
+ class SaveParentNodeOnInit implements AfterViewInit {
+   private _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
+ 
+-  parentOnViewInit: HTMLElement;
++  parentOnViewInit: HTMLElement | null = null;
+ 
+   ngAfterViewInit() {
+-    this.parentOnViewInit = this._elementRef.nativeElement.parentElement!;
++    this.parentOnViewInit = this._elementRef.nativeElement.parentElement;
+   }
+ }
+ 
+diff --git a/src/cdk/schematics/tsconfig.json b/src/cdk/schematics/tsconfig.json
+index f1bdd2b85206..afc015d66989 100644
+--- a/src/cdk/schematics/tsconfig.json
++++ b/src/cdk/schematics/tsconfig.json
+@@ -6,6 +6,7 @@
+     "moduleResolution": "node",
+     "rootDir": ".",
+     "strictNullChecks": true,
++    "strictPropertyInitialization": true,
+     "noPropertyAccessFromIndexSignature": true,
+     "strict": true,
+     "useUnknownInCatchVariables": true,
+diff --git a/src/cdk/table/text-column.spec.ts b/src/cdk/table/text-column.spec.ts
+index c1ab00ac808f..15ec097b5855 100644
+--- a/src/cdk/table/text-column.spec.ts
++++ b/src/cdk/table/text-column.spec.ts
+@@ -170,8 +170,8 @@ class BasicTextColumnApp {
+     {propertyA: 'a_2', propertyB: 'b_2', propertyC: 'c_2'},
+   ];
+ 
+-  headerTextB: string;
+-  dataAccessorA: (data: TestData) => string;
++  headerTextB!: string;
++  dataAccessorA!: (data: TestData) => string;
+   justifyC = 'start' as const;
+ }
+ 
+diff --git a/src/cdk/tsconfig.json b/src/cdk/tsconfig.json
+index 8a9bdb848d33..52b341bde973 100644
+--- a/src/cdk/tsconfig.json
++++ b/src/cdk/tsconfig.json
+@@ -4,7 +4,6 @@
+   "compilerOptions": {
+     "rootDir": "..",
+     "baseUrl": ".",
+-    "strictPropertyInitialization": true,
+     "paths": {
+       "@angular/cdk/*": ["./*"]
+     }
+diff --git a/src/components-examples/tsconfig.json b/src/components-examples/tsconfig.json
+index 299e1436bad2..98d71f1cadb9 100644
+--- a/src/components-examples/tsconfig.json
++++ b/src/components-examples/tsconfig.json
+@@ -4,7 +4,6 @@
+   "compilerOptions": {
+     "rootDir": "..",
+     "baseUrl": ".",
+-    "strictPropertyInitialization": true,
+     "paths": {
+       "@angular/aria/*": ["../aria/*"],
+       "@angular/cdk/*": ["../cdk/*"],
+diff --git a/src/dev-app/tsconfig.json b/src/dev-app/tsconfig.json
+index b1a26e70a1f4..b5603f11cb1b 100644
+--- a/src/dev-app/tsconfig.json
++++ b/src/dev-app/tsconfig.json
+@@ -5,7 +5,6 @@
+     // Needed for Moment.js since it doesn't have a default export.
+     "rootDir": "..",
+     "baseUrl": ".",
+-    "strictPropertyInitialization": true,
+     "paths": {
+       "@angular/aria": ["../aria"],
+       "@angular/aria/*": ["../aria/*"],
+diff --git a/src/google-maps/tsconfig.json b/src/google-maps/tsconfig.json
+index 1cc24ea1c1f4..3d34fe24db16 100644
+--- a/src/google-maps/tsconfig.json
++++ b/src/google-maps/tsconfig.json
+@@ -5,8 +5,7 @@
+     "rootDir": "..",
+     "baseUrl": ".",
+     "paths": {},
+-    "types": ["jasmine", "google.maps"],
+-    "strictPropertyInitialization": true
++    "types": ["jasmine", "google.maps"]
+   },
+   "include": ["./**/*.ts", "../dev-mode-types.d.ts"]
+ }
+diff --git a/src/material-experimental/tsconfig.json b/src/material-experimental/tsconfig.json
+index 34e5f8cbbc86..cb9426ac26a8 100644
+--- a/src/material-experimental/tsconfig.json
++++ b/src/material-experimental/tsconfig.json
+@@ -4,7 +4,6 @@
+   "compilerOptions": {
+     "rootDir": "..",
+     "baseUrl": ".",
+-    "strictPropertyInitialization": true,
+     "paths": {
+       "@angular/cdk/*": ["../cdk/*"],
+       "@angular/material/*": ["../material/*"],
+diff --git a/src/material-moment-adapter/tsconfig.json b/src/material-moment-adapter/tsconfig.json
+index d4898d64d70a..a8acc041c9ca 100644
+--- a/src/material-moment-adapter/tsconfig.json
++++ b/src/material-moment-adapter/tsconfig.json
+@@ -4,7 +4,6 @@
+   "compilerOptions": {
+     "rootDir": "..",
+     "baseUrl": ".",
+-    "strictPropertyInitialization": true,
+     "paths": {
+       "@angular/cdk/*": ["../cdk/*"],
+       "@angular/material/*": ["../material/*"],
+diff --git a/src/material/timepicker/timepicker.ts b/src/material/timepicker/timepicker.ts
+index eee9a66f51f7..ca6b04f9a023 100644
+--- a/src/material/timepicker/timepicker.ts
++++ b/src/material/timepicker/timepicker.ts
+@@ -143,7 +143,7 @@ export class MatTimepicker<D> implements OnDestroy, MatOptionParentComponent {
+   private _overlayRef: OverlayRef | null = null;
+   private _portal: TemplatePortal<unknown> | null = null;
+   private _optionsCacheKey: string | null = null;
+-  private _localeChanges: Subscription;
++  private _localeChanges: Subscription | undefined;
+   private _onOpenRender: AfterRenderRef | null = null;
+ 
+   protected _panelTemplate = viewChild.required<TemplateRef<unknown>>('panelTemplate');
+@@ -307,7 +307,7 @@ export class MatTimepicker<D> implements OnDestroy, MatOptionParentComponent {
+ 
+   ngOnDestroy(): void {
+     this._keyManager.destroy();
+-    this._localeChanges.unsubscribe();
++    this._localeChanges?.unsubscribe();
+     this._onOpenRender?.destroy();
+     this._overlayRef?.dispose();
+   }
+diff --git a/src/material/tsconfig.json b/src/material/tsconfig.json
+index efd5045f3ac1..c35c1edc5783 100644
+--- a/src/material/tsconfig.json
++++ b/src/material/tsconfig.json
+@@ -4,7 +4,6 @@
+   "compilerOptions": {
+     "rootDirs": ["..", "../../tools"],
+     "baseUrl": ".",
+-    "strictPropertyInitialization": true,
+     "paths": {
+       "@angular/cdk": ["../cdk"],
+       "@angular/cdk/*": ["../cdk/*"],
+diff --git a/src/youtube-player/tsconfig.json b/src/youtube-player/tsconfig.json
+index 3f6e883e1860..19ef7205e54f 100644
+--- a/src/youtube-player/tsconfig.json
++++ b/src/youtube-player/tsconfig.json
+@@ -5,8 +5,7 @@
+     "rootDir": "..",
+     "baseUrl": ".",
+     "paths": {},
+-    "types": ["jasmine"],
+-    "strictPropertyInitialization": true
++    "types": ["jasmine"]
+   },
+   "include": ["*.ts", "../dev-mode-types.d.ts"]
+ }
+diff --git a/tsconfig.json b/tsconfig.json
+index 083e223cc09c..8692821f3f6d 100644
+--- a/tsconfig.json
++++ b/tsconfig.json
+@@ -11,6 +11,7 @@
+     "noFallthroughCasesInSwitch": true,
+     "noUnusedLocals": false,
+     "strictNullChecks": true,
++    "strictPropertyInitialization": true,
+     "noPropertyAccessFromIndexSignature": true,
+     "useUnknownInCatchVariables": true,
+     "noImplicitOverride": true,

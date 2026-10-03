@@ -1,7 +1,7 @@
 import {ComponentFixture, fakeAsync, TestBed, tick} from '@angular/core/testing';
 import {Component, Provider, Type, ViewChild} from '@angular/core';
-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
-import {dispatchMouseEvent} from '@angular/cdk/testing/private';
+import {LegacyNoopAnimationsModule} from '../internal/testing/owned-animation-modules';
+import {dispatchMouseEvent} from '../internal/testing/owned-test-events';
 import {ThemePalette} from '@angular/material/core';
 import {MatLegacySelect} from '@angular/material/legacy-select';
 import {By} from '@angular/platform-browser';
@@ -12,7 +12,7 @@ import {MatPaginatorSelectConfig} from '@angular/material/paginator';
 describe('MatPaginator', () => {
   function createComponent<T>(type: Type<T>, providers: Provider[] = []): ComponentFixture<T> {
     TestBed.configureTestingModule({
-      imports: [MatLegacyPaginatorModule, NoopAnimationsModule],
+      imports: [MatLegacyPaginatorModule, LegacyNoopAnimationsModule],
       declarations: [type],
       providers: [MatLegacyPaginatorIntl, ...providers],
     }).compileComponents();

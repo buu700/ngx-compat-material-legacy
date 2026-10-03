@@ -1,0 +1,874 @@
+From f4a02adb779968ab1e696aa93dc69b62e7a18929 Mon Sep 17 00:00:00 2001
+From: Kristiyan Kostadinov <crisbeto@users.noreply.github.com>
+Date: Tue, 3 Sep 2024 17:06:05 +0200
+Subject: [PATCH] feat(cdk/a11y): use native media query for high contrast
+ detection (#29678)
+
+Changes the `cdk.high-contrast` mixin to use a native media query instead of a custom CSS classes. The advantage is that we no longer need to depend on the `HighContrastModeDetector` to add a class that we can target.
+
+BREAKING CHANGE:
+* Since `cdk.high-contrast` targets a media query instead of a class, the specificity of the styles it emits is lower than before.
+---
+ src/cdk/a11y/_index.scss                      | 66 ++++---------------
+ src/cdk/a11y/a11y.md                          | 25 ++-----
+ .../popover-edit/_popover-edit-theme.scss     |  2 +-
+ src/material/autocomplete/autocomplete.scss   |  2 +-
+ src/material/badge/badge.scss                 |  2 +-
+ .../bottom-sheet/bottom-sheet-container.scss  |  2 +-
+ src/material/button-toggle/button-toggle.scss |  6 +-
+ src/material/button/button-high-contrast.scss |  4 +-
+ src/material/checkbox/_checkbox-common.scss   |  8 +--
+ src/material/chips/chip.scss                  |  6 +-
+ .../core/focus-indicators/_private.scss       |  2 +-
+ src/material/core/option/option.scss          |  2 +-
+ src/material/core/ripple/_ripple.scss         |  2 +-
+ src/material/core/style/_menu-common.scss     |  2 +-
+ src/material/datepicker/calendar-body.scss    |  6 +-
+ src/material/datepicker/calendar.scss         |  2 +-
+ src/material/datepicker/date-range-input.scss |  2 +-
+ .../datepicker/datepicker-toggle.scss         |  2 +-
+ src/material/dialog/dialog.scss               |  2 +-
+ .../expansion/expansion-panel-header.scss     |  2 +-
+ src/material/expansion/expansion-panel.scss   |  2 +-
+ .../form-field/_form-field-high-contrast.scss |  8 +--
+ .../form-field/_mdc-text-field-structure.scss |  4 +-
+ .../list/_list-inherited-structure.scss       |  2 +-
+ .../list/_list-item-hcm-indicator.scss        |  2 +-
+ src/material/menu/menu.scss                   |  4 +-
+ src/material/paginator/paginator.scss         |  2 +-
+ src/material/progress-bar/progress-bar.scss   |  4 +-
+ .../progress-spinner/progress-spinner.scss    |  4 +-
+ src/material/select/select.scss               |  4 +-
+ src/material/sidenav/drawer.scss              |  6 +-
+ src/material/slide-toggle/slide-toggle.scss   |  4 +-
+ src/material/slider/slider.scss               |  4 +-
+ .../snack-bar/snack-bar-container.scss        |  2 +-
+ src/material/sort/sort-header.scss            |  6 +-
+ src/material/stepper/step-header.scss         |  2 +-
+ src/material/stepper/stepper.scss             |  4 +-
+ src/material/tabs/tab-header.scss             |  2 +-
+ src/material/toolbar/toolbar.scss             |  2 +-
+ 39 files changed, 79 insertions(+), 136 deletions(-)
+
+diff --git a/src/cdk/a11y/_index.scss b/src/cdk/a11y/_index.scss
+index f102614966ea..10c3d8402490 100644
+--- a/src/cdk/a11y/_index.scss
++++ b/src/cdk/a11y/_index.scss
+@@ -40,63 +40,21 @@
+   @include a11y-visually-hidden;
+ }
+ 
+-/// Emits the mixin's content nested under `$selector-context` if `$selector-context`
+-/// is non-empty.
+-/// @param {String} selector-context The selector under which to nest the mixin's content.
+-@mixin _optionally-nest-content($selector-context) {
+-  @if ($selector-context == '') {
+-    @content;
+-  }
+-  @else {
+-    #{$selector-context} {
+-      @content;
+-    }
+-  }
+-}
+-
+-/// Applies styles for users in high contrast mode. Note that this only applies
+-/// to Microsoft browsers. Chrome can be included by checking for the `html[hc]`
+-/// attribute, however Chrome handles high contrast differently.
++/// Applies styles for users in high contrast mode.
+ ///
+-/// @param {String} target Type of high contrast setting to target. Defaults to `active`, can be
+-///     `white-on-black` or `black-on-white`.
+-/// @param {String} encapsulation Whether to emit styles for view encapsulation. Values are:
+-///     * `on` - works for `Emulated`, `Native`, and `ShadowDom`
+-///     * `off` - works for `None`
+-///     * `any` - works for all encapsulation modes by emitting the CSS twice (default).
+-@mixin high-contrast($target: active, $encapsulation: 'any') {
+-  @if ($target != 'active' and $target != 'black-on-white' and $target != 'white-on-black') {
++/// @param {String} target Type of high contrast setting to target. Can be `active` or `none`.
++///   Defaults to `active`.
++/// @param {String} encapsulation No longer used and will be removed.
++@mixin high-contrast($target: active, $encapsulation: null) {
++  // Historically we used to support `black-on-white` and `white-on-black` so we
++  // allow them here anyway. They'll be coerced to `active` below.
++  @if ($target != 'active' and $target != 'none' and $target != 'black-on-white' and
++    $target != 'white-on-black') {
+     @error 'Unknown cdk-high-contrast value "#{$target}" provided. ' +
+-           'Allowed values are "active", "black-on-white", and "white-on-black"';
++           'Allowed values are "active" and "none"';
+   }
+ 
+-  @if ($encapsulation != 'on' and $encapsulation != 'off' and $encapsulation != 'any') {
+-    @error 'Unknown cdk-high-contrast encapsulation "#{$encapsulation}" provided. ' +
+-           'Allowed values are "on", "off", and "any"';
+-  }
+-
+-  // If the selector context has multiple parts, such as `.section, .region`, just doing
+-  // `.cdk-high-contrast-xxx #{&}` will only apply the parent selector to the first part of the
+-  // context. We address this by nesting the selector context under .cdk-high-contrast.
+-  @at-root {
+-    $selector-context: #{&};
+-
+-    @if ($encapsulation != 'on') {
+-      // Note that if this selector is updated, the same change has to be made inside
+-      // `_overlay.scss` which can't depend on this mixin due to some infrastructure limitations.
+-      .cdk-high-contrast-#{$target} {
+-        @include _optionally-nest-content($selector-context) {
+-          @content;
+-        }
+-      }
+-    }
+-
+-    @if ($encapsulation != 'off') {
+-      .cdk-high-contrast-#{$target} :host {
+-        @include _optionally-nest-content($selector-context) {
+-          @content;
+-        }
+-      }
+-    }
++  @media (forced-colors: #{if($target == none, none, active)}) {
++    @content;
+   }
+ }
+diff --git a/src/cdk/a11y/a11y.md b/src/cdk/a11y/a11y.md
+index 2c9b89570e68..82c1df7c4649 100644
+--- a/src/cdk/a11y/a11y.md
++++ b/src/cdk/a11y/a11y.md
+@@ -229,36 +229,21 @@ system. Otherwise, you can include this mixin in a global stylesheet.
+ 
+ #### Targeting high contrast users
+ 
+-Microsoft Windows includes an accessibility feature called [Windows High Contrast Mode][]. The
++Some operating systems include an accessibility feature called High Contrast Mode. The
+ `cdk/a11y` package provides a Sass mixin that lets you define styles that only apply in high
+ contrast mode. To create a high contrast style, define your style inside the `high-contrast` mixin.
+ 
+-The mixin works by targeting a CSS class which is added to the `body` by the CDK when high contrast
+-mode is detected at runtime, via the `HighContrastModeDetector` service.
++The mixin works by targeting the `forced-colors` media query.
+ 
+ ```scss
+ @use '@angular/cdk';
+ 
+ button {
+-  @include cdk.high-contrast() {
++  @include cdk.high-contrast {
+     outline: solid 1px;
+   }
+ }
+ ```
+ 
+-The `high-contrast` mixin accepts two optional parameters, `$target` and `$encapsulation`.
+-
+-The `$target` parameter allows you to specify which variation of high contrast mode your style
+-targets. The accepted values are `active` (default), `black-on-white`, and `white-on-black`. These
+-values correspond to the supported values for the
+-[`-ms-high-contrast` media query][ms-high-contrast].
+-
+-The `$encapsulation` parameter affects how the emitted styles interact with style encapsulation.
+-The supported values are `on`, `off`, and `any`. The default value is `any`, which works for any
+-encapsulation scenario by emitting two selectors. Specifying either `on` or `off` slightly reduces
+-the amount of CSS emitted by limiting the styles to components with encapsulation enabled or
+-disabled, respectively. The styles emitted for encapsulated components work for both Angular's
+-emulated style encapsulation and for native Shadow DOM encapsulation.
+-
+-[Windows High Contrast Mode]: https://support.microsoft.com/en-us/windows/use-high-contrast-mode-in-windows-10-fedc744c-90ac-69df-aed5-c8a90125e696
+-[ms-high-contrast]: https://blogs.windows.com/msedgedev/2020/09/17/styling-for-windows-high-contrast-with-new-standards-for-forced-colors/
++The `high-contrast` mixin accepts the optional `$target` parameter which allows you to specify
++the value of the `forced-color` media query. Its value can be either `active` or `none`.
+diff --git a/src/material-experimental/popover-edit/_popover-edit-theme.scss b/src/material-experimental/popover-edit/_popover-edit-theme.scss
+index a5ca15aac76a..f5478b376faa 100644
+--- a/src/material-experimental/popover-edit/_popover-edit-theme.scss
++++ b/src/material-experimental/popover-edit/_popover-edit-theme.scss
+@@ -82,7 +82,7 @@
+     display: block;
+     padding: 16px 24px;
+ 
+-    @include cdk.high-contrast(active, off) {
++    @include cdk.high-contrast {
+       // Note that normally we use 1px for high contrast outline, however here we use 3,
+       // because the popover is rendered on top of a table which already has some borders
+       // and doesn't have a backdrop. The thicker outline makes it easier to differentiate.
+diff --git a/src/material/autocomplete/autocomplete.scss b/src/material/autocomplete/autocomplete.scss
+index 09cf50fcf1ed..0bd237c70422 100644
+--- a/src/material/autocomplete/autocomplete.scss
++++ b/src/material/autocomplete/autocomplete.scss
+@@ -24,7 +24,7 @@ div.mat-mdc-autocomplete-panel {
+     @include token-utils.create-token-slot(background-color, background-color);
+   }
+ 
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     outline: solid 1px;
+   }
+ 
+diff --git a/src/material/badge/badge.scss b/src/material/badge/badge.scss
+index cdab2b58a360..14b62fa60612 100644
+--- a/src/material/badge/badge.scss
++++ b/src/material/badge/badge.scss
+@@ -97,7 +97,7 @@ $large-size: $default-size + 6;
+     }
+   }
+ 
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     outline: solid 1px;
+     border-radius: 0;
+   }
+diff --git a/src/material/bottom-sheet/bottom-sheet-container.scss b/src/material/bottom-sheet/bottom-sheet-container.scss
+index 2b623d1b1b30..c76039aa1c3b 100644
+--- a/src/material/bottom-sheet/bottom-sheet-container.scss
++++ b/src/material/bottom-sheet/bottom-sheet-container.scss
+@@ -32,7 +32,7 @@ $container-horizontal-padding: 16px !default;
+     @include token-utils.create-token-slot(letter-spacing, container-text-tracking);
+   }
+ 
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     outline: 1px solid;
+   }
+ }
+diff --git a/src/material/button-toggle/button-toggle.scss b/src/material/button-toggle/button-toggle.scss
+index 09080f5f2037..4df361e165f3 100644
+--- a/src/material/button-toggle/button-toggle.scss
++++ b/src/material/button-toggle/button-toggle.scss
+@@ -44,7 +44,7 @@ $_standard-tokens: (
+ 
+   @include elevation.overridable-elevation(2);
+ 
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     outline: solid 1px;
+   }
+ }
+@@ -65,7 +65,7 @@ $_standard-tokens: (
+     box-shadow: none;
+   }
+ 
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     outline: 0;
+   }
+ }
+@@ -255,7 +255,7 @@ $_standard-tokens: (
+   }
+ }
+ 
+-@include cdk.high-contrast(active, off) {
++@include cdk.high-contrast {
+   // Changing the background color for the selected item won't be visible in high contrast mode.
+   // We fall back to using the overlay to draw a brighter, semi-transparent tint on top instead.
+   // It uses a border, because the browser will render it using a brighter color.
+diff --git a/src/material/button/button-high-contrast.scss b/src/material/button/button-high-contrast.scss
+index dffac1830765..881365eb537a 100644
+--- a/src/material/button/button-high-contrast.scss
++++ b/src/material/button/button-high-contrast.scss
+@@ -6,8 +6,8 @@
+ .mat-mdc-unelevated-button:not(.mdc-button--outlined),
+ .mat-mdc-raised-button:not(.mdc-button--outlined),
+ .mat-mdc-outlined-button:not(.mdc-button--outlined),
+-.mat-mdc-icon-button {
+-  @include cdk.high-contrast(active, off) {
++.mat-mdc-icon-button.mat-mdc-icon-button {
++  @include cdk.high-contrast {
+     outline: solid 1px;
+   }
+ }
+diff --git a/src/material/checkbox/_checkbox-common.scss b/src/material/checkbox/_checkbox-common.scss
+index 730f3ee659d9..221c116ef439 100644
+--- a/src/material/checkbox/_checkbox-common.scss
++++ b/src/material/checkbox/_checkbox-common.scss
+@@ -66,7 +66,7 @@ $_fallback-size: 40px;
+     cursor: default;
+     pointer-events: none;
+ 
+-    @include cdk.high-contrast(active, off) {
++    @include cdk.high-contrast {
+       opacity: 0.5;
+     }
+   }
+@@ -177,7 +177,7 @@ $_fallback-size: 40px;
+       @include token-utils.create-token-slot(color, selected-checkmark-color);
+     }
+ 
+-    @include cdk.high-contrast(active, off) {
++    @include cdk.high-contrast {
+       color: CanvasText;
+     }
+   }
+@@ -188,7 +188,7 @@ $_fallback-size: 40px;
+         .mdc-checkbox__checkmark {
+           @include token-utils.create-token-slot(color, disabled-selected-checkmark-color);
+ 
+-          @include cdk.high-contrast(active, off) {
++          @include cdk.high-contrast {
+             color: CanvasText;
+           }
+         }
+@@ -220,7 +220,7 @@ $_fallback-size: 40px;
+       @include token-utils.create-token-slot(border-color, selected-checkmark-color);
+     }
+ 
+-    @include cdk.high-contrast(active, off) {
++    @include cdk.high-contrast {
+       margin: 0 1px;
+     }
+   }
+diff --git a/src/material/chips/chip.scss b/src/material/chips/chip.scss
+index 9568b85be151..7e99bacad768 100644
+--- a/src/material/chips/chip.scss
++++ b/src/material/chips/chip.scss
+@@ -351,7 +351,7 @@ $_avatar-trailing-padding: 8px;
+     stroke-dashoffset: 0;
+   }
+ 
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     // SVG colors won't be changed in high contrast mode and since the checkmark is white
+     // by default, it'll blend in with the background in black-on-white mode. Override the
+     // color to ensure that it's visible. We need !important, because the theme styles are
+@@ -411,7 +411,7 @@ $_avatar-trailing-padding: 8px;
+     }
+   }
+ 
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     outline: solid 1px;
+   }
+ }
+@@ -721,7 +721,7 @@ $_avatar-trailing-padding: 8px;
+ // Single-selection chips show their selected state using a background color which won't be visible
+ // in high contrast mode. This isn't necessary in multi-selection since there's a checkmark.
+ .mat-mdc-chip-selected:not(.mat-mdc-chip-multiple) {
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     outline-width: 3px;
+   }
+ }
+diff --git a/src/material/core/focus-indicators/_private.scss b/src/material/core/focus-indicators/_private.scss
+index b27376a9ee09..3370f75d348f 100644
+--- a/src/material/core/focus-indicators/_private.scss
++++ b/src/material/core/focus-indicators/_private.scss
+@@ -35,7 +35,7 @@ $default-border-radius: 4px;
+   }
+ 
+   // Enable the indicator in high contrast mode.
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     @include _customize-focus-indicators((display: block));
+   }
+ }
+diff --git a/src/material/core/option/option.scss b/src/material/core/option/option.scss
+index 3d4ac4d719ba..6d4641a635af 100644
+--- a/src/material/core/option/option.scss
++++ b/src/material/core/option/option.scss
+@@ -153,7 +153,7 @@ $_side-padding: 16px;
+     }
+   }
+ 
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     // In single selection mode, the selected option is indicated by changing its
+     // background color, but that doesn't work in high contrast mode. We add an
+     // alternate indication by rendering out a circle.
+diff --git a/src/material/core/ripple/_ripple.scss b/src/material/core/ripple/_ripple.scss
+index aab4329f33d4..6e5289422eee 100644
+--- a/src/material/core/ripple/_ripple.scss
++++ b/src/material/core/ripple/_ripple.scss
+@@ -44,7 +44,7 @@
+     }
+ 
+     // In high contrast mode the ripple is opaque, causing it to obstruct the content.
+-    @include cdk.high-contrast(active, off) {
++    @include cdk.high-contrast {
+       display: none;
+     }
+ 
+diff --git a/src/material/core/style/_menu-common.scss b/src/material/core/style/_menu-common.scss
+index 58ce104ce9d0..72082a71e066 100644
+--- a/src/material/core/style/_menu-common.scss
++++ b/src/material/core/style/_menu-common.scss
+@@ -79,7 +79,7 @@ $icon-margin: 16px !default;
+   }
+ 
+   // Fix for Chromium-based browsers blending in the `currentColor` with the background.
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     fill: CanvasText;
+   }
+ }
+diff --git a/src/material/datepicker/calendar-body.scss b/src/material/datepicker/calendar-body.scss
+index e71068c1c915..46d5ad63a5af 100644
+--- a/src/material/datepicker/calendar-body.scss
++++ b/src/material/datepicker/calendar-body.scss
+@@ -237,7 +237,7 @@ $_tokens: (tokens-mat-datepicker.$prefix, tokens-mat-datepicker.get-token-slots(
+   // Fade out the disabled cells so that they can be distinguished from the enabled ones. Note that
+   // ideally we'd use `color: GreyText` here which is what the browser uses for disabled buttons,
+   // but we can't because Firefox doesn't recognize it.
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     opacity: 0.5;
+   }
+ }
+@@ -276,7 +276,7 @@ $_tokens: (tokens-mat-datepicker.$prefix, tokens-mat-datepicker.get-token-slots(
+     position: absolute;
+   }
+ 
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     border: none;
+   }
+ }
+@@ -361,7 +361,7 @@ $_tokens: (tokens-mat-datepicker.$prefix, tokens-mat-datepicker.get-token-slots(
+   }
+ }
+ 
+-@include cdk.high-contrast(active, off) {
++@include cdk.high-contrast {
+   $main-range-border: solid 1px;
+   $comparison-range-border: dashed 1px;
+ 
+diff --git a/src/material/datepicker/calendar.scss b/src/material/datepicker/calendar.scss
+index 627b4c2c5b1e..2d45a130b15f 100644
+--- a/src/material/datepicker/calendar.scss
++++ b/src/material/datepicker/calendar.scss
+@@ -83,7 +83,7 @@ $_tokens: tokens-mat-datepicker.$prefix, tokens-mat-datepicker.get-token-slots()
+     margin: 0 $calendar-arrow-size 0 0;
+   }
+ 
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     // Setting the fill to `currentColor` doesn't work on Chromium browsers.
+     fill: CanvasText;
+   }
+diff --git a/src/material/datepicker/date-range-input.scss b/src/material/datepicker/date-range-input.scss
+index 4326cc08160f..49f652f48920 100644
+--- a/src/material/datepicker/date-range-input.scss
++++ b/src/material/datepicker/date-range-input.scss
+@@ -121,7 +121,7 @@ $_tokens: tokens-mat-datepicker.$prefix, tokens-mat-datepicker.get-token-slots()
+       -webkit-text-fill-color: transparent;
+       transition: none;
+ 
+-      @include cdk.high-contrast(active, off) {
++      @include cdk.high-contrast {
+         // In high contrast mode the browser will render the
+         // placeholder despite the `color: transparent` above.
+         opacity: 0;
+diff --git a/src/material/datepicker/datepicker-toggle.scss b/src/material/datepicker/datepicker-toggle.scss
+index af61dd5d3173..7263655e329f 100644
+--- a/src/material/datepicker/datepicker-toggle.scss
++++ b/src/material/datepicker/datepicker-toggle.scss
+@@ -20,7 +20,7 @@ $_tokens: (tokens-mat-datepicker.$prefix, tokens-mat-datepicker.get-token-slots(
+   }
+ }
+ 
+-@include cdk.high-contrast(active, off) {
++@include cdk.high-contrast {
+   .mat-datepicker-toggle-default-icon {
+     // On Chromium-based browsers the icon doesn't appear to inherit the text color in high
+     // contrast mode so we have to set it explicitly. This is a no-op on IE and Firefox.
+diff --git a/src/material/dialog/dialog.scss b/src/material/dialog/dialog.scss
+index 13072c7aee18..98ebb7dd78aa 100644
+--- a/src/material/dialog/dialog.scss
++++ b/src/material/dialog/dialog.scss
+@@ -254,7 +254,7 @@ $_emit-fallbacks: true;
+     @include token-utils.create-token-slot(justify-content, actions-alignment, $_emit-fallbacks);
+   }
+ 
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     border-top-color: CanvasText;
+   }
+ 
+diff --git a/src/material/expansion/expansion-panel-header.scss b/src/material/expansion/expansion-panel-header.scss
+index 9cf896fa6e19..24108e4c2d0d 100644
+--- a/src/material/expansion/expansion-panel-header.scss
++++ b/src/material/expansion/expansion-panel-header.scss
+@@ -178,7 +178,7 @@
+   }
+ }
+ 
+-@include cdk.high-contrast(active, off) {
++@include cdk.high-contrast {
+   .mat-expansion-panel-content {
+     border-top: 1px solid;
+     border-top-left-radius: 0;
+diff --git a/src/material/expansion/expansion-panel.scss b/src/material/expansion/expansion-panel.scss
+index 1c5f8e029730..fc8f348802f0 100644
+--- a/src/material/expansion/expansion-panel.scss
++++ b/src/material/expansion/expansion-panel.scss
+@@ -45,7 +45,7 @@
+     }
+   }
+ 
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     outline: solid 1px;
+   }
+ 
+diff --git a/src/material/form-field/_form-field-high-contrast.scss b/src/material/form-field/_form-field-high-contrast.scss
+index 33e4eb589f03..40ea6551c28a 100644
+--- a/src/material/form-field/_form-field-high-contrast.scss
++++ b/src/material/form-field/_form-field-high-contrast.scss
+@@ -8,14 +8,14 @@
+     // The outline of the `fill` appearance is achieved through a background color
+     // which won't be visible in high contrast mode. Add an outline to replace it.
+     .mat-mdc-text-field-wrapper {
+-      @include cdk.high-contrast(active, off) {
++      @include cdk.high-contrast {
+         outline: solid 1px;
+       }
+     }
+ 
+     // Use GreyText for the disabled outline color which will account for the user's configuration.
+     &.mat-form-field-disabled .mat-mdc-text-field-wrapper {
+-      @include cdk.high-contrast(active, off) {
++      @include cdk.high-contrast {
+         outline-color: GrayText;
+       }
+     }
+@@ -24,7 +24,7 @@
+   // If a form field with fill appearance is focused, update the outline to be
+   // dashed and thicker to indicate focus.
+   .mat-form-field-appearance-fill.mat-focused .mat-mdc-text-field-wrapper {
+-    @include cdk.high-contrast(active, off) {
++    @include cdk.high-contrast {
+       outline: $focus-indicator-style $focus-indicator-width;
+     }
+   }
+@@ -32,7 +32,7 @@
+   // For form fields with outline appearance, we show a dashed thick border on top
+   // of the solid notched-outline border to indicate focus.
+   .mat-mdc-form-field.mat-focused .mdc-notched-outline {
+-    @include cdk.high-contrast(active, off) {
++    @include cdk.high-contrast {
+       border: $focus-indicator-style $focus-indicator-width;
+     }
+   }
+diff --git a/src/material/form-field/_mdc-text-field-structure.scss b/src/material/form-field/_mdc-text-field-structure.scss
+index 536dd9f1a280..96744b786bf6 100644
+--- a/src/material/form-field/_mdc-text-field-structure.scss
++++ b/src/material/form-field/_mdc-text-field-structure.scss
+@@ -101,7 +101,7 @@
+       @include _input-tokens('.mdc-text-field--outlined');
+     }
+ 
+-    @include cdk.high-contrast(active, off) {
++    @include cdk.high-contrast {
+       .mdc-text-field--disabled & {
+         background-color: Window;
+       }
+@@ -201,7 +201,7 @@
+     .mdc-text-field--disabled & {
+       cursor: default;
+ 
+-      @include cdk.high-contrast(active, off) {
++      @include cdk.high-contrast {
+         z-index: 1;
+       }
+     }
+diff --git a/src/material/list/_list-inherited-structure.scss b/src/material/list/_list-inherited-structure.scss
+index f8dea90da71d..b6c060100425 100644
+--- a/src/material/list/_list-inherited-structure.scss
++++ b/src/material/list/_list-inherited-structure.scss
+@@ -108,7 +108,7 @@
+       content: '';
+       pointer-events: none;
+ 
+-      @include cdk.high-contrast(active, off) {
++      @include cdk.high-contrast {
+         border-color: CanvasText;
+       }
+     }
+diff --git a/src/material/list/_list-item-hcm-indicator.scss b/src/material/list/_list-item-hcm-indicator.scss
+index 90e80eb13846..86fafc2ddccf 100644
+--- a/src/material/list/_list-item-hcm-indicator.scss
++++ b/src/material/list/_list-item-hcm-indicator.scss
+@@ -5,7 +5,7 @@
+ // its background color. Since that doesn't work in HCM, this mixin provides an alternative by
+ // rendering a circle.
+ @mixin private-high-contrast-list-item-indicator() {
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     &::after {
+       $size: 10px;
+       content: '';
+diff --git a/src/material/menu/menu.scss b/src/material/menu/menu.scss
+index 49b460b8c90d..bb3c77431ac4 100644
+--- a/src/material/menu/menu.scss
++++ b/src/material/menu/menu.scss
+@@ -65,7 +65,7 @@ mat-menu {
+     }
+   }
+ 
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     outline: solid 1px;
+   }
+ 
+@@ -201,7 +201,7 @@ mat-menu {
+     }
+   }
+ 
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     $outline-width: 1px;
+ 
+     // We need to move the item 1px down, because Firefox seems to have
+diff --git a/src/material/paginator/paginator.scss b/src/material/paginator/paginator.scss
+index f2488a36d07e..f9c6ec8bedfa 100644
+--- a/src/material/paginator/paginator.scss
++++ b/src/material/paginator/paginator.scss
+@@ -129,7 +129,7 @@ $button-icon-size: 28px;
+   }
+ }
+ 
+-@include cdk.high-contrast(active, off) {
++@include cdk.high-contrast {
+   // The disabled button icon has to be set explicitly since the selector is too specific.
+   .mat-mdc-icon-button[disabled] .mat-mdc-paginator-icon,
+   .mat-mdc-paginator-icon {
+diff --git a/src/material/progress-bar/progress-bar.scss b/src/material/progress-bar/progress-bar.scss
+index 62cb5bb77b72..4e5c61a57dd7 100644
+--- a/src/material/progress-bar/progress-bar.scss
++++ b/src/material/progress-bar/progress-bar.scss
+@@ -50,7 +50,7 @@
+     height: max(#{$track-variable}, #{$indicator-height-variable});
+   }
+ 
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     outline-color: CanvasText;
+   }
+ }
+@@ -135,7 +135,7 @@
+     @include token-utils.create-token-slot(background-color, track-color);
+   }
+ 
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     background-color: ButtonBorder;
+   }
+ 
+diff --git a/src/material/progress-spinner/progress-spinner.scss b/src/material/progress-spinner/progress-spinner.scss
+index 3651d178509a..fe43cdee532c 100644
+--- a/src/material/progress-spinner/progress-spinner.scss
++++ b/src/material/progress-spinner/progress-spinner.scss
+@@ -44,7 +44,7 @@
+     }
+   }
+ 
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     .mdc-circular-progress__indeterminate-circle-graphic,
+     .mdc-circular-progress__determinate-circle {
+       // SVG colors aren't inverted automatically in high contrast mode. Set the
+@@ -100,7 +100,7 @@
+     @include token-utils.create-token-slot(stroke, active-indicator-color);
+   }
+ 
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     stroke: CanvasText;
+   }
+ }
+diff --git a/src/material/select/select.scss b/src/material/select/select.scss
+index 4654f3a06172..9f8e740fd283 100644
+--- a/src/material/select/select.scss
++++ b/src/material/select/select.scss
+@@ -113,7 +113,7 @@ $scale: 0.75 !default;
+     left: 50%;
+     transform: translate(-50%, -50%);
+ 
+-    @include cdk.high-contrast(active, off) {
++    @include cdk.high-contrast {
+       // On Chromium browsers the `currentColor` blends in with the
+       // background for SVGs so we have to fall back to `CanvasText`.
+       fill: CanvasText;
+@@ -145,7 +145,7 @@ div.mat-mdc-select-panel {
+     @include token-utils.create-token-slot(background-color, panel-background-color);
+   }
+ 
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     outline: solid 1px;
+   }
+ 
+diff --git a/src/material/sidenav/drawer.scss b/src/material/sidenav/drawer.scss
+index 1877ef8a2223..f7e89895a873 100644
+--- a/src/material/sidenav/drawer.scss
++++ b/src/material/sidenav/drawer.scss
+@@ -97,7 +97,7 @@ $drawer-over-drawer-z-index: 4;
+     }
+   }
+ 
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     opacity: 0.5;
+   }
+ }
+@@ -145,13 +145,13 @@ $drawer-over-drawer-z-index: 4;
+ 
+ 
+   &, [dir='rtl'] &.mat-drawer-end {
+-    @include cdk.high-contrast(active, off) {
++    @include cdk.high-contrast {
+       border-right: $high-contrast-border;
+     }
+   }
+ 
+   [dir='rtl'] &, &.mat-drawer-end {
+-    @include cdk.high-contrast(active, off) {
++    @include cdk.high-contrast {
+       border-left: $high-contrast-border;
+       border-right: none;
+     }
+diff --git a/src/material/slide-toggle/slide-toggle.scss b/src/material/slide-toggle/slide-toggle.scss
+index a58e44e98095..c9754e7b04ad 100644
+--- a/src/material/slide-toggle/slide-toggle.scss
++++ b/src/material/slide-toggle/slide-toggle.scss
+@@ -79,7 +79,7 @@ $_interactive-disabled-selector: '.mat-mdc-slide-toggle-disabled-interactive.mdc
+     }
+   }
+ 
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     border-color: currentColor;
+   }
+ 
+@@ -303,7 +303,7 @@ $_interactive-disabled-selector: '.mat-mdc-slide-toggle-disabled-interactive.mdc
+       border-color 75ms 0ms cubic-bezier(0.4, 0, 0.2, 1);
+     z-index: -1;
+ 
+-    @include cdk.high-contrast(active, off) {
++    @include cdk.high-contrast {
+       border-color: currentColor;
+     }
+   }
+diff --git a/src/material/slider/slider.scss b/src/material/slider/slider.scss
+index cd3c5a3b636e..0e282262ca1a 100644
+--- a/src/material/slider/slider.scss
++++ b/src/material/slider/slider.scss
+@@ -93,7 +93,7 @@ $_mat-slots: (tokens-mat-slider.$prefix, tokens-mat-slider.get-token-slots());
+     content: '';
+     pointer-events: none;
+ 
+-    @include cdk.high-contrast(active, off) {
++    @include cdk.high-contrast {
+       border-color: CanvasText;
+     }
+   }
+@@ -181,7 +181,7 @@ $_mat-slots: (tokens-mat-slider.$prefix, tokens-mat-slider.get-token-slots());
+     content: '';
+     pointer-events: none;
+ 
+-    @include cdk.high-contrast(active, off) {
++    @include cdk.high-contrast {
+       border-color: CanvasText;
+     }
+   }
+diff --git a/src/material/snack-bar/snack-bar-container.scss b/src/material/snack-bar/snack-bar-container.scss
+index d06b0af9cf04..6e1f29084cd0 100644
+--- a/src/material/snack-bar/snack-bar-container.scss
++++ b/src/material/snack-bar/snack-bar-container.scss
+@@ -45,7 +45,7 @@ $_side-padding: 8px;
+     min-width: 0;
+   }
+ 
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     outline: solid 1px;
+   }
+ 
+diff --git a/src/material/sort/sort-header.scss b/src/material/sort/sort-header.scss
+index 204b76ee66d4..0e1818717f69 100644
+--- a/src/material/sort/sort-header.scss
++++ b/src/material/sort/sort-header.scss
+@@ -85,7 +85,7 @@ $header-arrow-hint-opacity: 0.38;
+   display: flex;
+   align-items: center;
+ 
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     width: 0;
+     border-left: solid $header-arrow-thickness;
+   }
+@@ -108,7 +108,7 @@ $header-arrow-hint-opacity: 0.38;
+   background: currentColor;
+   transform: rotate(45deg);
+ 
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     width: 0;
+     height: 0;
+     border-top: solid $header-arrow-thickness;
+@@ -124,7 +124,7 @@ $header-arrow-hint-opacity: 0.38;
+   position: absolute;
+   top: 0;
+ 
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     width: 0;
+     height: 0;
+     border-left: solid $header-arrow-pointer-length;
+diff --git a/src/material/stepper/step-header.scss b/src/material/stepper/step-header.scss
+index 0597692d5098..deb5c063c0af 100644
+--- a/src/material/stepper/step-header.scss
++++ b/src/material/stepper/step-header.scss
+@@ -47,7 +47,7 @@
+     }
+   }
+ 
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     outline: solid 1px;
+ 
+     &[aria-selected='true'] {
+diff --git a/src/material/stepper/stepper.scss b/src/material/stepper/stepper.scss
+index 3ae896c55f3a..20537d4d55c6 100644
+--- a/src/material/stepper/stepper.scss
++++ b/src/material/stepper/stepper.scss
+@@ -199,7 +199,7 @@
+   overflow: hidden;
+   padding: 0 stepper-variables.$side-gap stepper-variables.$side-gap stepper-variables.$side-gap;
+ 
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     outline: solid 1px;
+   }
+ 
+@@ -213,7 +213,7 @@
+   border: 0;
+   position: relative;
+ 
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     outline: solid 1px;
+   }
+ 
+diff --git a/src/material/tabs/tab-header.scss b/src/material/tabs/tab-header.scss
+index 2dfe19723a02..05c2a61c79e1 100644
+--- a/src/material/tabs/tab-header.scss
++++ b/src/material/tabs/tab-header.scss
+@@ -18,7 +18,7 @@
+     margin: 5px;
+   }
+ 
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     // When a tab is disabled in high contrast mode, set the text color to the disabled
+     // color, which is (unintuitively) named "GrayText".
+     &[aria-disabled='true'] {
+diff --git a/src/material/toolbar/toolbar.scss b/src/material/toolbar/toolbar.scss
+index c632d61759d0..2078816fbe09 100644
+--- a/src/material/toolbar/toolbar.scss
++++ b/src/material/toolbar/toolbar.scss
+@@ -27,7 +27,7 @@ $height-mobile-portrait: 56px !default;
+     }
+   }
+ 
+-  @include cdk.high-contrast(active, off) {
++  @include cdk.high-contrast {
+     outline: solid 1px;
+   }
+ 

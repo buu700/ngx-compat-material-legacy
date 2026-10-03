@@ -1,0 +1,230 @@
+From f3e6276c969f33e527b616ef8bf7b0404685721d Mon Sep 17 00:00:00 2001
+From: Kristiyan Kostadinov <crisbeto@users.noreply.github.com>
+Date: Mon, 10 Aug 2026 20:33:27 +0200
+Subject: [PATCH] fix(cdk/a11y): move focus to root if there are no focusable
+ elements in focus trap (#33654)
+
+When focus lands on a focus trap anchor, it looks for focusable elements inside the root element, however if there are none, focus can escape the trap.
+
+These changes include additional logic that will move focus to the root element, if it is focusable, and focus trapping didn't find any focusable descendants.
+
+Fixes #33622.
+---
+ goldens/cdk/a11y/index.api.md              |  4 +-
+ src/cdk/a11y/focus-trap/focus-trap.spec.ts | 71 +++++++++++++---------
+ src/cdk/a11y/focus-trap/focus-trap.ts      | 19 +++++-
+ 3 files changed, 59 insertions(+), 35 deletions(-)
+
+diff --git a/goldens/cdk/a11y/index.api.md b/goldens/cdk/a11y/index.api.md
+index 3459b6d58d38..abbb18b63915 100644
+--- a/goldens/cdk/a11y/index.api.md
++++ b/goldens/cdk/a11y/index.api.md
+@@ -220,7 +220,7 @@ export class FocusTrap {
+     // (undocumented)
+     protected _enabled: boolean;
+     // (undocumented)
+-    protected endAnchorListener: () => boolean;
++    protected endAnchorListener: () => void;
+     focusFirstTabbableElement(options?: FocusOptions): boolean;
+     focusFirstTabbableElementWhenReady(options?: FocusOptions): Promise<boolean>;
+     focusInitialElement(options?: FocusOptions): boolean;
+@@ -233,7 +233,7 @@ export class FocusTrap {
+     // (undocumented)
+     readonly _ngZone: NgZone;
+     // (undocumented)
+-    protected startAnchorListener: () => boolean;
++    protected startAnchorListener: () => void;
+     protected toggleAnchors(enabled: boolean): void;
+ }
+ 
+diff --git a/src/cdk/a11y/focus-trap/focus-trap.spec.ts b/src/cdk/a11y/focus-trap/focus-trap.spec.ts
+index ee0c5b254861..a196f6715273 100644
+--- a/src/cdk/a11y/focus-trap/focus-trap.spec.ts
++++ b/src/cdk/a11y/focus-trap/focus-trap.spec.ts
+@@ -15,19 +15,14 @@ import {A11yModule, CdkTrapFocus, FocusTrap} from '../index';
+ 
+ describe('FocusTrap', () => {
+   describe('with default element', () => {
+-    let fixture: ComponentFixture<SimpleFocusTrap>;
+-    let focusTrapInstance: FocusTrap;
+-
+-    beforeEach(() => {
+-      fixture = TestBed.createComponent(SimpleFocusTrap);
++    it('wrap focus from end to start', () => {
++      const fixture = TestBed.createComponent(SimpleFocusTrap);
+       fixture.detectChanges();
+-      focusTrapInstance = fixture.componentInstance.focusTrapDirective.focusTrap;
+-    });
+ 
+-    it('wrap focus from end to start', () => {
+       // Because we can't mimic a real tab press focus change in a unit test, just call the
+       // focus event handler directly.
+-      const result = focusTrapInstance.focusFirstTabbableElement();
++      const result =
++        fixture.componentInstance.focusTrapDirective.focusTrap.focusFirstTabbableElement();
+ 
+       expect(getActiveElement().nodeName.toLowerCase())
+         .withContext('Expected input element to be focused')
+@@ -38,9 +33,13 @@ describe('FocusTrap', () => {
+     });
+ 
+     it('should wrap focus from start to end', () => {
++      const fixture = TestBed.createComponent(SimpleFocusTrap);
++      fixture.detectChanges();
++
+       // Because we can't mimic a real tab press focus change in a unit test, just call the
+       // focus event handler directly.
+-      const result = focusTrapInstance.focusLastTabbableElement();
++      const result =
++        fixture.componentInstance.focusTrapDirective.focusTrap.focusLastTabbableElement();
+ 
+       const platform = TestBed.inject(Platform);
+       // In iOS button elements are never tabbable, so the last element will be the input.
+@@ -56,19 +55,31 @@ describe('FocusTrap', () => {
+     });
+ 
+     it('should return false if it did not manage to find a focusable element', () => {
+-      fixture.destroy();
+-
+-      const newFixture = TestBed.createComponent(FocusTrapWithoutFocusableElements);
+-      newFixture.detectChanges();
++      const fixture = TestBed.createComponent(FocusTrapWithoutFocusableElements);
++      fixture.detectChanges();
+ 
+-      const focusTrap = newFixture.componentInstance.focusTrapDirective.focusTrap;
++      const focusTrap = fixture.componentInstance.focusTrapDirective.focusTrap;
+       const result = focusTrap.focusFirstTabbableElement();
+ 
+       expect(result).toBe(false);
+     });
+ 
+     it('should be enabled by default', () => {
+-      expect(focusTrapInstance.enabled).toBe(true);
++      const fixture = TestBed.createComponent(SimpleFocusTrap);
++      fixture.detectChanges();
++      expect(fixture.componentInstance.focusTrapDirective.focusTrap.enabled).toBe(true);
++    });
++
++    it('should focus the root node if there are no focusable elements, but the root is focusable', () => {
++      const fixture = TestBed.createComponent(FocusTrapWithoutFocusableElements);
++      fixture.detectChanges();
++      const root = fixture.nativeElement.querySelector('.trap') as HTMLElement;
++      root.setAttribute('tabindex', '-1');
++
++      fixture.nativeElement.querySelector('.cdk-focus-trap-anchor').focus();
++      fixture.detectChanges();
++
++      expect(getActiveElement()).withContext('Expected focus trap root to be focused').toBe(root);
+     });
+   });
+ 
+@@ -322,7 +333,7 @@ function getActiveElement() {
+       <input>
+       <button>SAVE</button>
+     </div>
+-    `,
++  `,
+   imports: [A11yModule, PortalModule],
+   changeDetection: ChangeDetectionStrategy.Eager,
+ })
+@@ -388,7 +399,7 @@ class FocusTrapWithBindings {
+       <button>after</button>
+       <input>
+     </div>
+-    `,
++  `,
+   imports: [A11yModule, PortalModule],
+   changeDetection: ChangeDetectionStrategy.Eager,
+ })
+@@ -401,7 +412,7 @@ class FocusTrapTargets {
+     <div cdkTrapFocus>
+       <div cdkFocusInitial></div>
+     </div>
+-    `,
++  `,
+   imports: [A11yModule, PortalModule],
+   changeDetection: ChangeDetectionStrategy.Eager,
+ })
+@@ -416,7 +427,7 @@ class FocusTrapUnfocusableTarget {
+         <circle cx="100" cy="100" r="100"/>
+       </svg>
+     </div>
+-    `,
++  `,
+   imports: [A11yModule, PortalModule],
+   changeDetection: ChangeDetectionStrategy.Eager,
+ })
+@@ -426,10 +437,10 @@ class FocusTrapWithSvg {
+ 
+ @Component({
+   template: `
+-    <div cdkTrapFocus>
++    <div class="trap" cdkTrapFocus>
+       <p>Hello</p>
+     </div>
+-    `,
++  `,
+   imports: [A11yModule, PortalModule],
+   changeDetection: ChangeDetectionStrategy.Eager,
+ })
+@@ -439,15 +450,15 @@ class FocusTrapWithoutFocusableElements {
+ 
+ @Component({
+   template: `
+-  <div class="portal-outlet">
+-    <ng-template cdkPortalOutlet></ng-template>
+-  </div>
+-
+-  <ng-template #template>
+-    <div cdkTrapFocus>
+-      <button>Click me</button>
++    <div class="portal-outlet">
++      <ng-template cdkPortalOutlet></ng-template>
+     </div>
+-  </ng-template>
++
++    <ng-template #template>
++      <div cdkTrapFocus>
++        <button>Click me</button>
++      </div>
++    </ng-template>
+   `,
+   imports: [A11yModule, PortalModule],
+   changeDetection: ChangeDetectionStrategy.Eager,
+diff --git a/src/cdk/a11y/focus-trap/focus-trap.ts b/src/cdk/a11y/focus-trap/focus-trap.ts
+index 18567653f3e6..8d82ae8a303e 100644
+--- a/src/cdk/a11y/focus-trap/focus-trap.ts
++++ b/src/cdk/a11y/focus-trap/focus-trap.ts
+@@ -41,8 +41,21 @@ export class FocusTrap {
+   private _hasAttached = false;
+ 
+   // Event listeners for the anchors. Need to be regular functions so that we can unbind them later.
+-  protected startAnchorListener = () => this.focusLastTabbableElement();
+-  protected endAnchorListener = () => this.focusFirstTabbableElement();
++  protected startAnchorListener = () => {
++    const isSuccess = this.focusLastTabbableElement();
++
++    if (!isSuccess && this._checker.isFocusable(this._element)) {
++      this._element.focus();
++    }
++  };
++
++  protected endAnchorListener = () => {
++    const isSuccess = this.focusFirstTabbableElement();
++
++    if (!isSuccess && this._checker.isFocusable(this._element)) {
++      this._element.focus();
++    }
++  };
+ 
+   /** Whether the focus trap is active. */
+   get enabled(): boolean {
+@@ -166,7 +179,7 @@ export class FocusTrap {
+   private _getRegionBoundary(bound: 'start' | 'end'): HTMLElement | null {
+     // Contains the deprecated version of selector, for temporary backwards comparability.
+     const markers = this._element.querySelectorAll(
+-      `[cdk-focus-region-${bound}], ` + `[cdkFocusRegion${bound}], ` + `[cdk-focus-${bound}]`,
++      `[cdk-focus-region-${bound}], [cdkFocusRegion${bound}], [cdk-focus-${bound}]`,
+     ) as NodeListOf<HTMLElement>;
+ 
+     if (typeof ngDevMode === 'undefined' || ngDevMode) {

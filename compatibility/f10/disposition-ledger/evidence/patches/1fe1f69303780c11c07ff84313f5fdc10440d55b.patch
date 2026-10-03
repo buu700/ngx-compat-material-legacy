@@ -1,0 +1,109 @@
+From 1fe1f69303780c11c07ff84313f5fdc10440d55b Mon Sep 17 00:00:00 2001
+From: Karl Seamon <bannanafiend@gmail.com>
+Date: Mon, 8 Jan 2024 13:47:06 -0500
+Subject: [PATCH] perf(cdk/table): Optimize a11y role logic in CdkCell.
+ (#28336)
+
+---
+ src/cdk/table/cell.ts               | 10 ++++------
+ src/cdk/table/table.spec.ts         | 21 +++++++++++++++++++++
+ src/cdk/table/table.ts              | 13 +++++++++++++
+ tools/public_api_guard/cdk/table.md |  1 +
+ 4 files changed, 39 insertions(+), 6 deletions(-)
+
+diff --git a/src/cdk/table/cell.ts b/src/cdk/table/cell.ts
+index fdf8db43d82a..d19afa8ee25d 100644
+--- a/src/cdk/table/cell.ts
++++ b/src/cdk/table/cell.ts
+@@ -191,9 +191,8 @@ export class CdkHeaderCell extends BaseCdkCell {
+ export class CdkFooterCell extends BaseCdkCell {
+   constructor(columnDef: CdkColumnDef, elementRef: ElementRef) {
+     super(columnDef, elementRef);
+-    if (columnDef._table?._elementRef.nativeElement.nodeType === 1) {
+-      const tableRole = columnDef._table._elementRef.nativeElement.getAttribute('role');
+-      const role = tableRole === 'grid' || tableRole === 'treegrid' ? 'gridcell' : 'cell';
++    const role = columnDef._table?._cellRole;
++    if (role) {
+       elementRef.nativeElement.setAttribute('role', role);
+     }
+   }
+@@ -210,9 +209,8 @@ export class CdkFooterCell extends BaseCdkCell {
+ export class CdkCell extends BaseCdkCell {
+   constructor(columnDef: CdkColumnDef, elementRef: ElementRef) {
+     super(columnDef, elementRef);
+-    if (columnDef._table?._elementRef.nativeElement.nodeType === 1) {
+-      const tableRole = columnDef._table._elementRef.nativeElement.getAttribute('role');
+-      const role = tableRole === 'grid' || tableRole === 'treegrid' ? 'gridcell' : 'cell';
++    const role = columnDef._table?._cellRole;
++    if (role) {
+       elementRef.nativeElement.setAttribute('role', role);
+     }
+   }
+diff --git a/src/cdk/table/table.spec.ts b/src/cdk/table/table.spec.ts
+index 1ac2f5cb3dce..fd30f25a35dc 100644
+--- a/src/cdk/table/table.spec.ts
++++ b/src/cdk/table/table.spec.ts
+@@ -537,6 +537,27 @@ describe('CdkTable', () => {
+     ]);
+   });
+ 
++  it('defaults to table role in native HTML table', () => {
++    const fixture = createComponent(NativeHtmlTableApp);
++    const tableElement = fixture.nativeElement.querySelector('table');
++    fixture.detectChanges();
++    expect(tableElement.getAttribute('role')).toBe('table');
++
++    expect(getHeaderRows(tableElement)[0].getAttribute('role')).toBe('row');
++    const header = getHeaderRows(tableElement)[0];
++    getHeaderCells(header).forEach(cell => {
++      expect(cell.getAttribute('role')).toBe('columnheader');
++    });
++
++    getRows(tableElement).forEach(row => {
++      expect(row.getAttribute('role')).toBe('row');
++      getCells(row).forEach(cell => {
++        // Native role of TD elements is row.
++        expect(cell.getAttribute('role')).toBe(null);
++      });
++    });
++  });
++
+   it('should be able to nest tables', () => {
+     const thisFixture = createComponent(NestedHtmlTableApp);
+     thisFixture.detectChanges();
+diff --git a/src/cdk/table/table.ts b/src/cdk/table/table.ts
+index 8a93aeba1524..e367385b3b0c 100644
+--- a/src/cdk/table/table.ts
++++ b/src/cdk/table/table.ts
+@@ -435,6 +435,19 @@ export class CdkTable<T> implements AfterContentChecked, CollectionViewer, OnDes
+   /** Whether the table has rendered out all the outlets for the first time. */
+   private _hasRendered = false;
+ 
++  /** Aria role to apply to the table's cells based on the table's own role. */
++  get _cellRole(): string | null {
++    if (this._cellRoleInternal === undefined) {
++      // Perform this lazily in case the table's role was updated by a directive after construction.
++      const role = this._elementRef.nativeElement.getAttribute('role');
++      const cellRole = role === 'grid' || role === 'treegrid' ? 'gridcell' : 'cell';
++      this._cellRoleInternal = this._isNativeHtmlTable && cellRole === 'cell' ? null : cellRole;
++    }
++
++    return this._cellRoleInternal;
++  }
++  private _cellRoleInternal: string | null | undefined = undefined;
++
+   /**
+    * Tracking function that will be used to check the differences in data changes. Used similarly
+    * to `ngFor` `trackBy` function. Optimize row operations by identifying a row based on its data
+diff --git a/tools/public_api_guard/cdk/table.md b/tools/public_api_guard/cdk/table.md
+index a3f7a7cc1439..3997f57e2d0e 100644
+--- a/tools/public_api_guard/cdk/table.md
++++ b/tools/public_api_guard/cdk/table.md
+@@ -296,6 +296,7 @@ export class CdkTable<T> implements AfterContentChecked, CollectionViewer, OnDes
+     addFooterRowDef(footerRowDef: CdkFooterRowDef): void;
+     addHeaderRowDef(headerRowDef: CdkHeaderRowDef): void;
+     addRowDef(rowDef: CdkRowDef<T>): void;
++    get _cellRole(): string | null;
+     // (undocumented)
+     protected readonly _changeDetectorRef: ChangeDetectorRef;
+     // (undocumented)

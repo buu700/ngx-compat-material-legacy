@@ -1,0 +1,163 @@
+From 2085a1e9472ae380ea537d4d4cada01a0227dfe1 Mon Sep 17 00:00:00 2001
+From: Kristiyan Kostadinov <crisbeto@abv.bg>
+Date: Mon, 15 Dec 2025 12:09:55 +0200
+Subject: [PATCH] refactor(cdk/a11y): fix strict property initialization errors
+
+Updates the code to be compatible with strict property initialization.
+---
+ src/cdk/a11y/focus-monitor/focus-monitor.ts         | 13 +++++--------
+ src/cdk/a11y/focus-trap/focus-trap.ts               |  9 +++++----
+ .../high-contrast-mode-detector.ts                  |  2 +-
+ src/cdk/a11y/key-manager/list-key-manager.ts        |  2 +-
+ src/cdk/a11y/live-announcer/live-announcer.ts       | 12 +++++-------
+ 5 files changed, 17 insertions(+), 21 deletions(-)
+
+diff --git a/src/cdk/a11y/focus-monitor/focus-monitor.ts b/src/cdk/a11y/focus-monitor/focus-monitor.ts
+index 948d0b78cf87..7d23d712b828 100644
+--- a/src/cdk/a11y/focus-monitor/focus-monitor.ts
++++ b/src/cdk/a11y/focus-monitor/focus-monitor.ts
+@@ -93,16 +93,16 @@ export class FocusMonitor implements OnDestroy {
+   private _origin: FocusOrigin = null;
+ 
+   /** The FocusOrigin of the last focus event tracked by the FocusMonitor. */
+-  private _lastFocusOrigin: FocusOrigin;
++  private _lastFocusOrigin: FocusOrigin = null;
+ 
+   /** Whether the window has just been focused. */
+   private _windowFocused = false;
+ 
+   /** The timeout id of the window focus timeout. */
+-  private _windowFocusTimeoutId: ReturnType<typeof setTimeout>;
++  private _windowFocusTimeoutId: ReturnType<typeof setTimeout> | undefined;
+ 
+   /** The timeout id of the origin clearing timeout. */
+-  private _originTimeoutId: ReturnType<typeof setTimeout>;
++  private _originTimeoutId: ReturnType<typeof setTimeout> | undefined;
+ 
+   /**
+    * Whether the origin was determined via a touch interaction. Necessary as properly attributing
+@@ -617,7 +617,7 @@ export class CdkMonitorFocus implements AfterViewInit, OnDestroy {
+   private _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
+   private _focusMonitor = inject(FocusMonitor);
+ 
+-  private _monitorSubscription: Subscription;
++  private _monitorSubscription: Subscription | undefined;
+   private _focusOrigin: FocusOrigin = null;
+ 
+   @Output() readonly cdkFocusChange = new EventEmitter<FocusOrigin>();
+@@ -641,9 +641,6 @@ export class CdkMonitorFocus implements AfterViewInit, OnDestroy {
+ 
+   ngOnDestroy() {
+     this._focusMonitor.stopMonitoring(this._elementRef);
+-
+-    if (this._monitorSubscription) {
+-      this._monitorSubscription.unsubscribe();
+-    }
++    this._monitorSubscription?.unsubscribe();
+   }
+ }
+diff --git a/src/cdk/a11y/focus-trap/focus-trap.ts b/src/cdk/a11y/focus-trap/focus-trap.ts
+index 225410192f8b..9e9f44ea76b0 100644
+--- a/src/cdk/a11y/focus-trap/focus-trap.ts
++++ b/src/cdk/a11y/focus-trap/focus-trap.ts
+@@ -36,8 +36,8 @@ import {_CdkPrivateStyleLoader, _VisuallyHiddenLoader} from '../../private';
+  * Things like `tabIndex > 0`, flex `order`, and shadow roots can cause the two to be misaligned.
+  */
+ export class FocusTrap {
+-  private _startAnchor: HTMLElement | null;
+-  private _endAnchor: HTMLElement | null;
++  private _startAnchor: HTMLElement | null = null;
++  private _endAnchor: HTMLElement | null = null;
+   private _hasAttached = false;
+ 
+   // Event listeners for the anchors. Need to be regular functions so that we can unbind them later.
+@@ -413,7 +413,7 @@ export class CdkTrapFocus implements OnDestroy, AfterContentInit, OnChanges, DoC
+   private _focusTrapFactory = inject(FocusTrapFactory);
+ 
+   /** Underlying FocusTrap instance. */
+-  focusTrap: FocusTrap;
++  focusTrap: FocusTrap = undefined!;
+ 
+   /** Previously focused element to restore focus to upon destroy when using autoCapture. */
+   private _previouslyFocusedElement: HTMLElement | null = null;
+@@ -433,7 +433,8 @@ export class CdkTrapFocus implements OnDestroy, AfterContentInit, OnChanges, DoC
+    * Whether the directive should automatically move focus into the trapped region upon
+    * initialization and return focus to the previous activeElement upon destruction.
+    */
+-  @Input({alias: 'cdkTrapFocusAutoCapture', transform: booleanAttribute}) autoCapture: boolean;
++  @Input({alias: 'cdkTrapFocusAutoCapture', transform: booleanAttribute})
++  autoCapture: boolean = false;
+ 
+   constructor(...args: unknown[]);
+ 
+diff --git a/src/cdk/a11y/high-contrast-mode/high-contrast-mode-detector.ts b/src/cdk/a11y/high-contrast-mode/high-contrast-mode-detector.ts
+index dbcdfa1de28f..6595ee81fd57 100644
+--- a/src/cdk/a11y/high-contrast-mode/high-contrast-mode-detector.ts
++++ b/src/cdk/a11y/high-contrast-mode/high-contrast-mode-detector.ts
+@@ -47,7 +47,7 @@ export class HighContrastModeDetector implements OnDestroy {
+    * Figuring out the high contrast mode and adding the body classes can cause
+    * some expensive layouts. This flag is used to ensure that we only do it once.
+    */
+-  private _hasCheckedHighContrastMode: boolean;
++  private _hasCheckedHighContrastMode = false;
+   private _document = inject(DOCUMENT);
+   private _breakpointSubscription: Subscription;
+ 
+diff --git a/src/cdk/a11y/key-manager/list-key-manager.ts b/src/cdk/a11y/key-manager/list-key-manager.ts
+index f2f9b398e462..8e5b8ad5a10f 100644
+--- a/src/cdk/a11y/key-manager/list-key-manager.ts
++++ b/src/cdk/a11y/key-manager/list-key-manager.ts
+@@ -45,7 +45,7 @@ export class ListKeyManager<T extends ListKeyManagerOption> {
+   private _typeaheadSubscription = Subscription.EMPTY;
+   private _itemChangesSubscription?: Subscription;
+   private _vertical = true;
+-  private _horizontal: 'ltr' | 'rtl' | null;
++  private _horizontal: 'ltr' | 'rtl' | null = null;
+   private _allowedModifierKeys: ListKeyManagerModifierKey[] = [];
+   private _homeAndEnd = false;
+   private _pageUpAndDown = {enabled: false, delta: 10};
+diff --git a/src/cdk/a11y/live-announcer/live-announcer.ts b/src/cdk/a11y/live-announcer/live-announcer.ts
+index 2005f9ee4406..355e99c9b33f 100644
+--- a/src/cdk/a11y/live-announcer/live-announcer.ts
++++ b/src/cdk/a11y/live-announcer/live-announcer.ts
+@@ -43,7 +43,7 @@ export class LiveAnnouncer implements OnDestroy {
+   private _liveElement: HTMLElement;
+   private _document = inject(DOCUMENT);
+   private _sanitizer = inject(DomSanitizer);
+-  private _previousTimeout: ReturnType<typeof setTimeout>;
++  private _previousTimeout: ReturnType<typeof setTimeout> | undefined;
+   private _currentPromise: Promise<void> | undefined;
+   private _currentResolve: (() => void) | undefined;
+ 
+@@ -250,7 +250,7 @@ export class CdkAriaLive implements OnDestroy {
+     if (this._politeness === 'off') {
+       if (this._subscription) {
+         this._subscription.unsubscribe();
+-        this._subscription = null;
++        this._subscription = undefined;
+       }
+     } else if (!this._subscription) {
+       this._subscription = this._ngZone.runOutsideAngular(() => {
+@@ -271,10 +271,10 @@ export class CdkAriaLive implements OnDestroy {
+   private _politeness: AriaLivePoliteness = 'polite';
+ 
+   /** Time in milliseconds after which to clear out the announcer element. */
+-  @Input('cdkAriaLiveDuration') duration: number;
++  @Input('cdkAriaLiveDuration') duration!: number;
+ 
+   private _previousAnnouncedText?: string;
+-  private _subscription: Subscription | null;
++  private _subscription: Subscription | undefined;
+ 
+   constructor(...args: unknown[]);
+ 
+@@ -283,8 +283,6 @@ export class CdkAriaLive implements OnDestroy {
+   }
+ 
+   ngOnDestroy() {
+-    if (this._subscription) {
+-      this._subscription.unsubscribe();
+-    }
++    this._subscription?.unsubscribe();
+   }
+ }

@@ -19,7 +19,7 @@ import {
   dispatchMouseEvent,
   createKeyboardEvent,
   createTouchEvent,
-} from '@angular/cdk/testing/private';
+} from '../internal/testing/owned-test-events';
 import {Component, DebugElement, Type, ViewChild} from '@angular/core';
 import {ComponentFixture, fakeAsync, flush, TestBed} from '@angular/core/testing';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';

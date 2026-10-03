@@ -1,0 +1,88 @@
+From 938f478efdc96ef0de1217e806f98939beb027cd Mon Sep 17 00:00:00 2001
+From: Kristiyan Kostadinov <crisbeto@abv.bg>
+Date: Thu, 31 Oct 2024 12:50:52 +0100
+Subject: [PATCH] refactor(cdk/a11y): add ID generator service
+
+Adds a service to generate unique IDs.
+---
+ src/cdk/a11y/id-generator.ts       | 40 ++++++++++++++++++++++++++++++
+ src/cdk/a11y/public-api.ts         |  1 +
+ tools/public_api_guard/cdk/a11y.md |  9 +++++++
+ 3 files changed, 50 insertions(+)
+ create mode 100644 src/cdk/a11y/id-generator.ts
+
+diff --git a/src/cdk/a11y/id-generator.ts b/src/cdk/a11y/id-generator.ts
+new file mode 100644
+index 000000000000..55bae7a0a551
+--- /dev/null
++++ b/src/cdk/a11y/id-generator.ts
+@@ -0,0 +1,40 @@
++/**
++ * @license
++ * Copyright Google LLC All Rights Reserved.
++ *
++ * Use of this source code is governed by an MIT-style license that can be
++ * found in the LICENSE file at https://angular.dev/license
++ */
++
++import {APP_ID, inject, Injectable} from '@angular/core';
++
++/**
++ * Keeps track of the ID count per prefix. This helps us make the IDs a bit more deterministic
++ * like they were before the service was introduced. Note that ideally we wouldn't have to do
++ * this, but there are some internal tests that rely on the IDs.
++ */
++const counters: Record<string, number> = {};
++
++/** Service that generates unique IDs for DOM nodes. */
++@Injectable({providedIn: 'root'})
++export class _IdGenerator {
++  private _appId = inject(APP_ID);
++
++  /**
++   * Generates a unique ID with a specific prefix.
++   * @param prefix Prefix to add to the ID.
++   */
++  getId(prefix: string): string {
++    // Omit the app ID if it's the default `ng`. Since the vast majority of pages have one
++    // Angular app on them, we can reduce the amount of breakages by not adding it.
++    if (this._appId !== 'ng') {
++      prefix += this._appId;
++    }
++
++    if (!counters.hasOwnProperty(prefix)) {
++      counters[prefix] = 0;
++    }
++
++    return `${prefix}${counters[prefix]++}`;
++  }
++}
+diff --git a/src/cdk/a11y/public-api.ts b/src/cdk/a11y/public-api.ts
+index ead2d81e9b63..df192ec2c339 100644
+--- a/src/cdk/a11y/public-api.ts
++++ b/src/cdk/a11y/public-api.ts
+@@ -36,3 +36,4 @@ export {
+   HighContrastModeDetector,
+   HighContrastMode,
+ } from './high-contrast-mode/high-contrast-mode-detector';
++export {_IdGenerator} from './id-generator';
+diff --git a/tools/public_api_guard/cdk/a11y.md b/tools/public_api_guard/cdk/a11y.md
+index 22d42d45c361..d447dca237d1 100644
+--- a/tools/public_api_guard/cdk/a11y.md
++++ b/tools/public_api_guard/cdk/a11y.md
+@@ -291,6 +291,15 @@ export interface Highlightable extends ListKeyManagerOption {
+     setInactiveStyles(): void;
+ }
+ 
++// @public
++export class _IdGenerator {
++    getId(prefix: string): string;
++    // (undocumented)
++    static ɵfac: i0.ɵɵFactoryDeclaration<_IdGenerator, never>;
++    // (undocumented)
++    static ɵprov: i0.ɵɵInjectableDeclaration<_IdGenerator>;
++}
++
+ // @public
+ export const INPUT_MODALITY_DETECTOR_DEFAULT_OPTIONS: InputModalityDetectorOptions;
+ 

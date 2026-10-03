@@ -1,0 +1,239 @@
+From ab02cc1b713c760085a8b4877f994dd4920836d4 Mon Sep 17 00:00:00 2001
+From: Kristiyan Kostadinov <crisbeto@abv.bg>
+Date: Fri, 24 Apr 2026 11:50:34 +0200
+Subject: [PATCH] refactor(cdk/a11y): switch to service decorator
+
+Switches all injectables to use the new `@Service` decorator.
+---
+ src/cdk/a11y/aria-describer/aria-describer.ts                 | 4 ++--
+ src/cdk/a11y/focus-monitor/focus-monitor.ts                   | 4 ++--
+ src/cdk/a11y/focus-trap/configurable-focus-trap-factory.ts    | 4 ++--
+ src/cdk/a11y/focus-trap/focus-trap-manager.ts                 | 4 ++--
+ src/cdk/a11y/focus-trap/focus-trap.ts                         | 4 ++--
+ .../a11y/high-contrast-mode/high-contrast-mode-detector.ts    | 4 ++--
+ src/cdk/a11y/id-generator.ts                                  | 4 ++--
+ src/cdk/a11y/input-modality/input-modality-detector.ts        | 4 ++--
+ src/cdk/a11y/interactivity-checker/interactivity-checker.ts   | 4 ++--
+ src/cdk/a11y/live-announcer/live-announcer.ts                 | 4 ++--
+ 10 files changed, 20 insertions(+), 20 deletions(-)
+
+diff --git a/src/cdk/a11y/aria-describer/aria-describer.ts b/src/cdk/a11y/aria-describer/aria-describer.ts
+index 4826ac83a372..fa34bcff3315 100644
+--- a/src/cdk/a11y/aria-describer/aria-describer.ts
++++ b/src/cdk/a11y/aria-describer/aria-describer.ts
+@@ -6,7 +6,7 @@
+  * found in the LICENSE file at https://angular.dev/license
+  */
+ 
+-import {Injectable, OnDestroy, APP_ID, inject, DOCUMENT} from '@angular/core';
++import {Service, OnDestroy, APP_ID, inject, DOCUMENT} from '@angular/core';
+ import {Platform} from '../../platform';
+ import {addAriaReferencedId, getAriaReferenceIds, removeAriaReferencedId} from './aria-reference';
+ import {_CdkPrivateStyleLoader, _VisuallyHiddenLoader} from '../../private';
+@@ -52,7 +52,7 @@ let nextId = 0;
+  * want to use aria-describedby to further describe themselves without adding additional visual
+  * content.
+  */
+-@Injectable({providedIn: 'root'})
++@Service()
+ export class AriaDescriber implements OnDestroy {
+   private _platform = inject(Platform);
+   private _document = inject(DOCUMENT);
+diff --git a/src/cdk/a11y/focus-monitor/focus-monitor.ts b/src/cdk/a11y/focus-monitor/focus-monitor.ts
+index 8a0b9258f588..3a91121ca191 100644
+--- a/src/cdk/a11y/focus-monitor/focus-monitor.ts
++++ b/src/cdk/a11y/focus-monitor/focus-monitor.ts
+@@ -16,7 +16,7 @@ import {
+   Directive,
+   ElementRef,
+   EventEmitter,
+-  Injectable,
++  Service,
+   InjectionToken,
+   NgZone,
+   OnDestroy,
+@@ -83,7 +83,7 @@ const captureEventListenerOptions = normalizePassiveListenerOptions({
+ });
+ 
+ /** Monitors mouse and keyboard events to determine the cause of focus events. */
+-@Injectable({providedIn: 'root'})
++@Service()
+ export class FocusMonitor implements OnDestroy {
+   private _ngZone = inject(NgZone);
+   private _platform = inject(Platform);
+diff --git a/src/cdk/a11y/focus-trap/configurable-focus-trap-factory.ts b/src/cdk/a11y/focus-trap/configurable-focus-trap-factory.ts
+index fb02187d0258..c23a7582236f 100644
+--- a/src/cdk/a11y/focus-trap/configurable-focus-trap-factory.ts
++++ b/src/cdk/a11y/focus-trap/configurable-focus-trap-factory.ts
+@@ -6,7 +6,7 @@
+  * found in the LICENSE file at https://angular.dev/license
+  */
+ 
+-import {Injectable, Injector, NgZone, inject, DOCUMENT} from '@angular/core';
++import {Service, Injector, NgZone, inject, DOCUMENT} from '@angular/core';
+ import {InteractivityChecker} from '../interactivity-checker/interactivity-checker';
+ import {ConfigurableFocusTrap} from './configurable-focus-trap';
+ import {ConfigurableFocusTrapConfig} from './configurable-focus-trap-config';
+@@ -15,7 +15,7 @@ import {FOCUS_TRAP_INERT_STRATEGY, FocusTrapInertStrategy} from './focus-trap-in
+ import {FocusTrapManager} from './focus-trap-manager';
+ 
+ /** Factory that allows easy instantiation of configurable focus traps. */
+-@Injectable({providedIn: 'root'})
++@Service()
+ export class ConfigurableFocusTrapFactory {
+   private _checker = inject(InteractivityChecker);
+   private _ngZone = inject(NgZone);
+diff --git a/src/cdk/a11y/focus-trap/focus-trap-manager.ts b/src/cdk/a11y/focus-trap/focus-trap-manager.ts
+index 61360f6af476..916101e61670 100644
+--- a/src/cdk/a11y/focus-trap/focus-trap-manager.ts
++++ b/src/cdk/a11y/focus-trap/focus-trap-manager.ts
+@@ -6,7 +6,7 @@
+  * found in the LICENSE file at https://angular.dev/license
+  */
+ 
+-import {Injectable} from '@angular/core';
++import {Service} from '@angular/core';
+ 
+ /**
+  * A FocusTrap managed by FocusTrapManager.
+@@ -19,7 +19,7 @@ export interface ManagedFocusTrap {
+ }
+ 
+ /** Injectable that ensures only the most recently enabled FocusTrap is active. */
+-@Injectable({providedIn: 'root'})
++@Service()
+ export class FocusTrapManager {
+   // A stack of the FocusTraps on the page. Only the FocusTrap at the
+   // top of the stack is active.
+diff --git a/src/cdk/a11y/focus-trap/focus-trap.ts b/src/cdk/a11y/focus-trap/focus-trap.ts
+index 679a69d0d4a7..abe0dae50c02 100644
+--- a/src/cdk/a11y/focus-trap/focus-trap.ts
++++ b/src/cdk/a11y/focus-trap/focus-trap.ts
+@@ -13,7 +13,7 @@ import {
+   Directive,
+   DoCheck,
+   ElementRef,
+-  Injectable,
++  Service,
+   Injector,
+   Input,
+   NgZone,
+@@ -371,7 +371,7 @@ export class FocusTrap {
+ /**
+  * Factory that allows easy instantiation of focus traps.
+  */
+-@Injectable({providedIn: 'root'})
++@Service()
+ export class FocusTrapFactory {
+   private _checker = inject(InteractivityChecker);
+   private _ngZone = inject(NgZone);
+diff --git a/src/cdk/a11y/high-contrast-mode/high-contrast-mode-detector.ts b/src/cdk/a11y/high-contrast-mode/high-contrast-mode-detector.ts
+index d729f12e0d6c..623c312c46e7 100644
+--- a/src/cdk/a11y/high-contrast-mode/high-contrast-mode-detector.ts
++++ b/src/cdk/a11y/high-contrast-mode/high-contrast-mode-detector.ts
+@@ -6,7 +6,7 @@
+  * found in the LICENSE file at https://angular.dev/license
+  */
+ 
+-import {inject, Injectable, OnDestroy, DOCUMENT} from '@angular/core';
++import {inject, Service, OnDestroy, DOCUMENT} from '@angular/core';
+ import {BreakpointObserver} from '../../layout';
+ import {Platform} from '../../platform';
+ 
+@@ -39,7 +39,7 @@ export const HIGH_CONTRAST_MODE_ACTIVE_CSS_CLASS = 'cdk-high-contrast-active';
+  * Mode. This service does not detect high-contrast mode as added by the Chrome "High Contrast"
+  * browser extension.
+  */
+-@Injectable({providedIn: 'root'})
++@Service()
+ export class HighContrastModeDetector implements OnDestroy {
+   private _platform = inject(Platform);
+ 
+diff --git a/src/cdk/a11y/id-generator.ts b/src/cdk/a11y/id-generator.ts
+index 843940cf0b85..8d75a7d0f50c 100644
+--- a/src/cdk/a11y/id-generator.ts
++++ b/src/cdk/a11y/id-generator.ts
+@@ -6,7 +6,7 @@
+  * found in the LICENSE file at https://angular.dev/license
+  */
+ 
+-import {APP_ID, inject, Injectable} from '@angular/core';
++import {APP_ID, inject, Service} from '@angular/core';
+ 
+ /**
+  * Keeps track of the ID count per prefix. This helps us make the IDs a bit more deterministic
+@@ -16,7 +16,7 @@ import {APP_ID, inject, Injectable} from '@angular/core';
+ const counters: Record<string, number> = {};
+ 
+ /** Service that generates unique IDs for DOM nodes. */
+-@Injectable({providedIn: 'root'})
++@Service()
+ export class _IdGenerator {
+   private _appId = inject(APP_ID);
+   private static _infix = `a${Math.floor(Math.random() * 100000).toString()}`;
+diff --git a/src/cdk/a11y/input-modality/input-modality-detector.ts b/src/cdk/a11y/input-modality/input-modality-detector.ts
+index 88e1e3b80715..7d3a6434cd79 100644
+--- a/src/cdk/a11y/input-modality/input-modality-detector.ts
++++ b/src/cdk/a11y/input-modality/input-modality-detector.ts
+@@ -8,7 +8,7 @@
+ 
+ import {ALT, CONTROL, MAC_META, META, SHIFT} from '../../keycodes';
+ import {
+-  Injectable,
++  Service,
+   InjectionToken,
+   OnDestroy,
+   NgZone,
+@@ -96,7 +96,7 @@ const modalityEventListenerOptions = {
+  * update the input modality to keyboard, but in general this service's behavior is largely
+  * undefined.
+  */
+-@Injectable({providedIn: 'root'})
++@Service()
+ export class InputModalityDetector implements OnDestroy {
+   private readonly _platform = inject(Platform);
+   private readonly _listenerCleanups: (() => void)[] | undefined;
+diff --git a/src/cdk/a11y/interactivity-checker/interactivity-checker.ts b/src/cdk/a11y/interactivity-checker/interactivity-checker.ts
+index 0c245a370b3d..a43143541310 100644
+--- a/src/cdk/a11y/interactivity-checker/interactivity-checker.ts
++++ b/src/cdk/a11y/interactivity-checker/interactivity-checker.ts
+@@ -7,7 +7,7 @@
+  */
+ 
+ import {Platform} from '../../platform';
+-import {Injectable, inject} from '@angular/core';
++import {Service, inject} from '@angular/core';
+ 
+ /**
+  * Configuration for the isFocusable method.
+@@ -27,7 +27,7 @@ export class IsFocusableConfig {
+  * Utility for checking the interactivity of an element, such as whether it is focusable or
+  * tabbable.
+  */
+-@Injectable({providedIn: 'root'})
++@Service()
+ export class InteractivityChecker {
+   private _platform = inject(Platform);
+ 
+diff --git a/src/cdk/a11y/live-announcer/live-announcer.ts b/src/cdk/a11y/live-announcer/live-announcer.ts
+index ba0f5db72edd..55437de36ebc 100644
+--- a/src/cdk/a11y/live-announcer/live-announcer.ts
++++ b/src/cdk/a11y/live-announcer/live-announcer.ts
+@@ -11,7 +11,7 @@ import {ContentObserver} from '../../observers';
+ import {
+   Directive,
+   ElementRef,
+-  Injectable,
++  Service,
+   Input,
+   NgZone,
+   OnDestroy,
+@@ -33,7 +33,7 @@ let uniqueIds = 0;
+ /** Possible types for a message that can be announced by the `LiveAnnouncer`. */
+ export type LiveAnnouncerMessage = string | SafeHtml;
+ 
+-@Injectable({providedIn: 'root'})
++@Service()
+ export class LiveAnnouncer implements OnDestroy {
+   private _ngZone = inject(NgZone);
+   private _defaultOptions = inject<LiveAnnouncerDefaultOptions>(LIVE_ANNOUNCER_DEFAULT_OPTIONS, {

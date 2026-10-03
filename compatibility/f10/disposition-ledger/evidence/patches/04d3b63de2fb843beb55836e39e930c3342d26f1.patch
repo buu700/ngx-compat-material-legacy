@@ -1,0 +1,1288 @@
+From 04d3b63de2fb843beb55836e39e930c3342d26f1 Mon Sep 17 00:00:00 2001
+From: Miles Malerba <mmalerba@google.com>
+Date: Fri, 31 May 2024 10:15:10 -0700
+Subject: [PATCH] test: Move more CDK tests to zoneless (#29144)
+
+---
+ src/cdk/a11y/focus-trap/focus-trap.spec.ts | 38 ++++++++---
+ src/cdk/menu/menu-base.ts                  | 30 +++++----
+ src/cdk/menu/menu-trigger.spec.ts          | 12 +---
+ src/cdk/menu/menu.spec.ts                  | 11 +---
+ src/cdk/table/table.spec.ts                | 74 ++++++++++++++++++----
+ src/cdk/table/text-column.spec.ts          | 11 ++--
+ src/cdk/text-field/autofill.spec.ts        | 21 +-----
+ src/cdk/text-field/autofill.zone.spec.ts   | 61 ++++++++++++++++++
+ src/cdk/text-field/autosize.spec.ts        | 25 ++++++--
+ src/cdk/tree/tree.spec.ts                  | 43 ++++++++-----
+ src/cdk/tree/tree.ts                       | 19 +++++-
+ 11 files changed, 241 insertions(+), 104 deletions(-)
+ create mode 100644 src/cdk/text-field/autofill.zone.spec.ts
+
+diff --git a/src/cdk/a11y/focus-trap/focus-trap.spec.ts b/src/cdk/a11y/focus-trap/focus-trap.spec.ts
+index 8af57b940bd1..a0d3b07df439 100644
+--- a/src/cdk/a11y/focus-trap/focus-trap.spec.ts
++++ b/src/cdk/a11y/focus-trap/focus-trap.spec.ts
+@@ -1,21 +1,19 @@
+ import {Platform, _supportsShadowDom} from '@angular/cdk/platform';
++import {CdkPortalOutlet, PortalModule, TemplatePortal} from '@angular/cdk/portal';
+ import {
+   Component,
+-  ViewChild,
+   TemplateRef,
++  ViewChild,
+   ViewContainerRef,
+   ViewEncapsulation,
+-  provideZoneChangeDetection,
+ } from '@angular/core';
+-import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
+-import {PortalModule, CdkPortalOutlet, TemplatePortal} from '@angular/cdk/portal';
+-import {A11yModule, FocusTrap, CdkTrapFocus} from '../index';
++import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
++import {A11yModule, CdkTrapFocus, FocusTrap} from '../index';
+ 
+ describe('FocusTrap', () => {
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+-      providers: [provideZoneChangeDetection()],
+       imports: [
+         A11yModule,
+         PortalModule,
+@@ -106,6 +104,7 @@ describe('FocusTrap', () => {
+       expect(rootElement.querySelectorAll('div.cdk-visually-hidden').length).toBe(2);
+ 
+       fixture.componentInstance.renderFocusTrap = false;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(rootElement.querySelectorAll('div.cdk-visually-hidden').length).toBe(0);
+@@ -120,6 +119,7 @@ describe('FocusTrap', () => {
+       expect(anchors.every(current => current.getAttribute('aria-hidden') === 'true')).toBe(true);
+ 
+       fixture.componentInstance._isFocusTrapEnabled = false;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(anchors.every(current => !current.hasAttribute('tabindex'))).toBe(true);
+@@ -216,12 +216,16 @@ describe('FocusTrap', () => {
+       expect(getActiveElement()).toBe(buttonOutsideTrappedRegion);
+ 
+       fixture.componentInstance.showTrappedRegion = true;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       fixture.whenStable().then(() => {
+         expect(getActiveElement().id).toBe('auto-capture-target');
+ 
+-        fixture.destroy();
++        fixture.componentInstance.showTrappedRegion = false;
++        fixture.changeDetectorRef.markForCheck();
++        fixture.detectChanges();
++
+         expect(getActiveElement()).toBe(buttonOutsideTrappedRegion);
+       });
+     }));
+@@ -230,6 +234,7 @@ describe('FocusTrap', () => {
+       const fixture = TestBed.createComponent(FocusTrapWithAutoCapture);
+       fixture.componentInstance.autoCaptureEnabled = false;
+       fixture.componentInstance.showTrappedRegion = true;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       const buttonOutsideTrappedRegion = fixture.nativeElement.querySelector('button');
+@@ -237,12 +242,16 @@ describe('FocusTrap', () => {
+       expect(getActiveElement()).toBe(buttonOutsideTrappedRegion);
+ 
+       fixture.componentInstance.autoCaptureEnabled = true;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       fixture.whenStable().then(() => {
+         expect(getActiveElement().id).toBe('auto-capture-target');
+ 
+-        fixture.destroy();
++        fixture.componentInstance.showTrappedRegion = false;
++        fixture.changeDetectorRef.markForCheck();
++        fixture.detectChanges();
++
+         expect(getActiveElement()).toBe(buttonOutsideTrappedRegion);
+       });
+     }));
+@@ -260,12 +269,16 @@ describe('FocusTrap', () => {
+       expect(getActiveElement()).toBe(buttonOutsideTrappedRegion);
+ 
+       fixture.componentInstance.showTrappedRegion = true;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       fixture.whenStable().then(() => {
+         expect(getActiveElement().id).toBe('auto-capture-target');
+ 
+-        fixture.destroy();
++        fixture.componentInstance.showTrappedRegion = false;
++        fixture.changeDetectorRef.markForCheck();
++        fixture.detectChanges();
++
+         expect(getActiveElement()).toBe(buttonOutsideTrappedRegion);
+       });
+     }));
+@@ -278,6 +291,7 @@ describe('FocusTrap', () => {
+       const fixture = TestBed.createComponent(FocusTrapWithAutoCaptureInShadowDom);
+       fixture.componentInstance.autoCaptureEnabled = false;
+       fixture.componentInstance.showTrappedRegion = true;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       const buttonOutsideTrappedRegion = fixture.debugElement.query(By.css('button')).nativeElement;
+@@ -285,12 +299,16 @@ describe('FocusTrap', () => {
+       expect(getActiveElement()).toBe(buttonOutsideTrappedRegion);
+ 
+       fixture.componentInstance.autoCaptureEnabled = true;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       fixture.whenStable().then(() => {
+         expect(getActiveElement().id).toBe('auto-capture-target');
+ 
+-        fixture.destroy();
++        fixture.componentInstance.showTrappedRegion = false;
++        fixture.changeDetectorRef.markForCheck();
++        fixture.detectChanges();
++
+         expect(getActiveElement()).toBe(buttonOutsideTrappedRegion);
+       });
+     }));
+diff --git a/src/cdk/menu/menu-base.ts b/src/cdk/menu/menu-base.ts
+index 4af909003931..031e323abec3 100644
+--- a/src/cdk/menu/menu-base.ts
++++ b/src/cdk/menu/menu-base.ts
+@@ -6,27 +6,29 @@
+  * found in the LICENSE file at https://angular.io/license
+  */
+ 
+-import {CdkMenuGroup} from './menu-group';
++import {FocusKeyManager, FocusOrigin} from '@angular/cdk/a11y';
++import {Directionality} from '@angular/cdk/bidi';
+ import {
+   AfterContentInit,
+   ContentChildren,
+   Directive,
+   ElementRef,
+-  inject,
+   Input,
+   NgZone,
+   OnDestroy,
+   QueryList,
++  computed,
++  inject,
++  signal,
+ } from '@angular/core';
+-import {FocusKeyManager, FocusOrigin} from '@angular/cdk/a11y';
+-import {CdkMenuItem} from './menu-item';
+-import {merge, Subject} from 'rxjs';
+-import {Directionality} from '@angular/cdk/bidi';
++import {Subject, merge} from 'rxjs';
+ import {mapTo, mergeAll, mergeMap, startWith, switchMap, takeUntil} from 'rxjs/operators';
+-import {MENU_STACK, MenuStack, MenuStackItem} from './menu-stack';
++import {MENU_AIM} from './menu-aim';
++import {CdkMenuGroup} from './menu-group';
+ import {Menu} from './menu-interface';
++import {CdkMenuItem} from './menu-item';
++import {MENU_STACK, MenuStack, MenuStackItem} from './menu-stack';
+ import {PointerFocusTracker} from './pointer-focus-tracker';
+-import {MENU_AIM} from './menu-aim';
+ 
+ /** Counter used to create unique IDs for menus. */
+ let nextId = 0;
+@@ -97,7 +99,12 @@ export abstract class CdkMenuBase
+   protected pointerTracker?: PointerFocusTracker<CdkMenuItem>;
+ 
+   /** Whether this menu's menu stack has focus. */
+-  private _menuStackHasFocus = false;
++  private _menuStackHasFocus = signal(false);
++
++  private _tabIndexSignal = computed(() => {
++    const tabindexIfInline = this._menuStackHasFocus() ? -1 : 0;
++    return this.isInline ? tabindexIfInline : null;
++  });
+ 
+   ngAfterContentInit() {
+     if (!this.isInline) {
+@@ -137,8 +144,7 @@ export abstract class CdkMenuBase
+ 
+   /** Gets the tabindex for this menu. */
+   _getTabIndex() {
+-    const tabindexIfInline = this._menuStackHasFocus ? -1 : 0;
+-    return this.isInline ? tabindexIfInline : null;
++    return this._tabIndexSignal();
+   }
+ 
+   /**
+@@ -211,7 +217,7 @@ export abstract class CdkMenuBase
+   private _subscribeToMenuStackHasFocus() {
+     if (this.isInline) {
+       this.menuStack.hasFocus.pipe(takeUntil(this.destroyed)).subscribe(hasFocus => {
+-        this._menuStackHasFocus = hasFocus;
++        this._menuStackHasFocus.set(hasFocus);
+       });
+     }
+   }
+diff --git a/src/cdk/menu/menu-trigger.spec.ts b/src/cdk/menu/menu-trigger.spec.ts
+index 00f0a902171a..a7a681d236e3 100644
+--- a/src/cdk/menu/menu-trigger.spec.ts
++++ b/src/cdk/menu/menu-trigger.spec.ts
+@@ -1,13 +1,5 @@
+ import {ENTER, SPACE, TAB} from '@angular/cdk/keycodes';
+-import {
+-  Component,
+-  ElementRef,
+-  QueryList,
+-  Type,
+-  ViewChild,
+-  ViewChildren,
+-  provideZoneChangeDetection,
+-} from '@angular/core';
++import {Component, ElementRef, QueryList, Type, ViewChild, ViewChildren} from '@angular/core';
+ import {ComponentFixture, TestBed, fakeAsync, tick, waitForAsync} from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+ import {dispatchKeyboardEvent} from '../../cdk/testing/private';
+@@ -122,7 +114,6 @@ describe('MenuTrigger', () => {
+       TestBed.configureTestingModule({
+         imports: [CdkMenuModule],
+         declarations: [MenuBarWithNestedSubMenus],
+-        providers: [provideZoneChangeDetection()],
+       }).compileComponents();
+     }));
+ 
+@@ -161,6 +152,7 @@ describe('MenuTrigger', () => {
+ 
+     it('should not open the menu when menu item disabled', () => {
+       menuItems[0].disabled = true;
++      fixture.changeDetectorRef.markForCheck();
+ 
+       menuItems[0].trigger();
+       detectChanges();
+diff --git a/src/cdk/menu/menu.spec.ts b/src/cdk/menu/menu.spec.ts
+index 122d8bef7795..ce117ca6bf62 100644
+--- a/src/cdk/menu/menu.spec.ts
++++ b/src/cdk/menu/menu.spec.ts
+@@ -1,12 +1,5 @@
+ import {TAB} from '@angular/cdk/keycodes';
+-import {
+-  Component,
+-  ElementRef,
+-  QueryList,
+-  ViewChild,
+-  ViewChildren,
+-  provideZoneChangeDetection,
+-} from '@angular/core';
++import {Component, ElementRef, QueryList, ViewChild, ViewChildren} from '@angular/core';
+ import {
+   ComponentFixture,
+   TestBed,
+@@ -145,7 +138,6 @@ describe('Menu', () => {
+       beforeEach(waitForAsync(() => {
+         TestBed.configureTestingModule({
+           imports: [CdkMenuModule, WithComplexNestedMenus],
+-          providers: [provideZoneChangeDetection()],
+         }).compileComponents();
+       }));
+ 
+@@ -337,7 +329,6 @@ describe('Menu', () => {
+       beforeEach(waitForAsync(() => {
+         TestBed.configureTestingModule({
+           imports: [CdkMenuModule, WithComplexNestedMenusOnBottom],
+-          providers: [provideZoneChangeDetection()],
+         }).compileComponents();
+       }));
+ 
+diff --git a/src/cdk/table/table.spec.ts b/src/cdk/table/table.spec.ts
+index 247163a324e1..41b3cb86254f 100644
+--- a/src/cdk/table/table.spec.ts
++++ b/src/cdk/table/table.spec.ts
+@@ -1,6 +1,10 @@
++import {BidiModule} from '@angular/cdk/bidi';
+ import {CollectionViewer, DataSource} from '@angular/cdk/collections';
+ import {
+   AfterContentInit,
++  AfterViewInit,
++  ChangeDetectionStrategy,
++  ChangeDetectorRef,
+   Component,
+   ContentChild,
+   ContentChildren,
+@@ -8,12 +12,10 @@ import {
+   QueryList,
+   Type,
+   ViewChild,
+-  AfterViewInit,
+-  ChangeDetectionStrategy,
+-  provideZoneChangeDetection,
++  inject,
+ } from '@angular/core';
+-import {ComponentFixture, fakeAsync, flush, TestBed, waitForAsync} from '@angular/core/testing';
+-import {BehaviorSubject, combineLatest, Observable, of as observableOf} from 'rxjs';
++import {ComponentFixture, TestBed, fakeAsync, flush, waitForAsync} from '@angular/core/testing';
++import {BehaviorSubject, Observable, combineLatest, of as observableOf} from 'rxjs';
+ import {map} from 'rxjs/operators';
+ import {CdkColumnDef} from './cell';
+ import {
+@@ -22,7 +24,7 @@ import {
+   StickyPositioningListener,
+   StickyUpdate,
+ } from './index';
+-import {CdkHeaderRowDef, CdkRowDef, CdkCellOutlet, CdkNoDataRow} from './row';
++import {CdkCellOutlet, CdkHeaderRowDef, CdkNoDataRow, CdkRowDef} from './row';
+ import {CdkTable} from './table';
+ import {
+   getTableDuplicateColumnNameError,
+@@ -32,7 +34,6 @@ import {
+   getTableUnknownColumnError,
+   getTableUnknownDataSourceError,
+ } from './table-errors';
+-import {BidiModule} from '@angular/cdk/bidi';
+ 
+ describe('CdkTable', () => {
+   let fixture: ComponentFixture<any>;
+@@ -44,7 +45,6 @@ describe('CdkTable', () => {
+     declarations: any[] = [],
+   ): ComponentFixture<T> {
+     TestBed.configureTestingModule({
+-      providers: [provideZoneChangeDetection()],
+       imports: [CdkTableModule, BidiModule],
+       declarations: [componentType, ...declarations],
+     }).compileComponents();
+@@ -285,6 +285,7 @@ describe('CdkTable', () => {
+ 
+       // Remove column_a and swap column_b/column_c.
+       component.columnsToRender = ['column_c', 'column_b'];
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       let changedTableContent = [['Column C', 'Column B']];
+@@ -389,6 +390,7 @@ describe('CdkTable', () => {
+     it('should render with data array input', () => {
+       const data = baseData.slice();
+       component.dataSource = data;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       const expectedRender = [
+@@ -420,12 +422,14 @@ describe('CdkTable', () => {
+ 
+       // Remove the data input entirely and expect no rows - just header.
+       component.dataSource = null;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expectTableToMatchContent(tableElement, [expectedRender[0]]);
+ 
+       // Add back the data to verify that it renders rows
+       component.dataSource = data;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expectTableToMatchContent(tableElement, expectedRender);
+@@ -435,6 +439,7 @@ describe('CdkTable', () => {
+       const data = baseData.slice();
+       const stream = new BehaviorSubject<TestData[]>(data);
+       component.dataSource = stream;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       const expectedRender = [
+@@ -470,12 +475,14 @@ describe('CdkTable', () => {
+ 
+       // Remove the data input entirely and expect no rows - just header.
+       component.dataSource = null;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expectTableToMatchContent(tableElement, [expectedRender[0]]);
+ 
+       // Add back the data to verify that it renders rows
+       component.dataSource = stream;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expectTableToMatchContent(tableElement, expectedRender);
+@@ -483,12 +490,14 @@ describe('CdkTable', () => {
+ 
+     it('should throw an error if the data source is not valid', () => {
+       component.dataSource = {invalid: 'dataSource'};
++      fixture.changeDetectorRef.markForCheck();
+ 
+       expect(() => fixture.detectChanges()).toThrowError(getTableUnknownDataSourceError().message);
+     });
+ 
+     it('should throw an error if the data source is not valid', () => {
+       component.dataSource = undefined;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       // Expect the table to render just the header, no rows
+@@ -720,6 +729,7 @@ describe('CdkTable', () => {
+     // Add a new column and expect it to show up in the table
+     let columnA = 'columnA';
+     component.dynamicColumns.push(columnA);
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+     expectTableToMatchContent(tableElement, [
+       [columnA], // Header row
+@@ -731,6 +741,7 @@ describe('CdkTable', () => {
+     // Add another new column and expect it to show up in the table
+     let columnB = 'columnB';
+     component.dynamicColumns.push(columnB);
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+     expectTableToMatchContent(tableElement, [
+       [columnA, columnB], // Header row
+@@ -741,6 +752,7 @@ describe('CdkTable', () => {
+ 
+     // Remove column A expect only column B to be rendered
+     component.dynamicColumns.shift();
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+     expectTableToMatchContent(tableElement, [
+       [columnB], // Header row
+@@ -791,12 +803,9 @@ describe('CdkTable', () => {
+       const whenRowWithoutDefaultFixture = createComponent(WhenRowWithoutDefaultCdkTableApp);
+       const data = whenRowWithoutDefaultFixture.componentInstance.dataSource.data;
+       expect(() => {
+-        try {
+-          whenRowWithoutDefaultFixture.detectChanges();
+-          flush();
+-        } catch {
+-          flush();
+-        }
++        whenRowWithoutDefaultFixture.detectChanges();
++        flush();
++        fixture.detectChanges();
+       }).toThrowError(getTableMissingMatchingRowDefError(data[0]).message);
+     }));
+ 
+@@ -812,6 +821,7 @@ describe('CdkTable', () => {
+       it('should be able to render multiple rows per data object', () => {
+         setupTableTestApp(WhenRowCdkTableApp);
+         component.multiTemplateDataRows = true;
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+ 
+         const data = component.dataSource.data;
+@@ -829,6 +839,7 @@ describe('CdkTable', () => {
+       it('should have the correct data and row indicies', () => {
+         setupTableTestApp(WhenRowCdkTableApp);
+         component.multiTemplateDataRows = true;
++        fixture.changeDetectorRef.markForCheck();
+         component.showIndexColumns();
+         fixture.detectChanges();
+ 
+@@ -849,6 +860,7 @@ describe('CdkTable', () => {
+         () => {
+           setupTableTestApp(WhenRowCdkTableApp);
+           component.multiTemplateDataRows = true;
++          fixture.changeDetectorRef.markForCheck();
+           component.showIndexColumns();
+ 
+           const obj = {value: true};
+@@ -970,6 +982,7 @@ describe('CdkTable', () => {
+ 
+       it('should stick and unstick headers', waitForAsync(async () => {
+         component.stickyHeaders = ['header-1', 'header-3'];
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         await new Promise(r => setTimeout(r));
+ 
+@@ -998,6 +1011,7 @@ describe('CdkTable', () => {
+         expect(component.mostRecentStickyEndColumnsUpdate).toEqual({sizes: []});
+ 
+         component.stickyHeaders = [];
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         await new Promise(r => setTimeout(r));
+         expectNoStickyStyles(headerRows);
+@@ -1017,6 +1031,7 @@ describe('CdkTable', () => {
+ 
+       it('should stick and unstick footers', waitForAsync(async () => {
+         component.stickyFooters = ['footer-1', 'footer-3'];
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         await new Promise(r => setTimeout(r));
+ 
+@@ -1045,6 +1060,7 @@ describe('CdkTable', () => {
+         expect(component.mostRecentStickyEndColumnsUpdate).toEqual({sizes: []});
+ 
+         component.stickyFooters = [];
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         await new Promise(r => setTimeout(r));
+         expectNoStickyStyles(footerRows);
+@@ -1064,6 +1080,7 @@ describe('CdkTable', () => {
+ 
+       it('should stick the correct footer row', waitForAsync(async () => {
+         component.stickyFooters = ['footer-3'];
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         await new Promise(r => setTimeout(r));
+ 
+@@ -1074,6 +1091,7 @@ describe('CdkTable', () => {
+ 
+       it('should stick and unstick left columns', waitForAsync(async () => {
+         component.stickyStartColumns = ['column-1', 'column-3'];
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         await new Promise(r => setTimeout(r));
+ 
+@@ -1121,6 +1139,7 @@ describe('CdkTable', () => {
+         expect(component.mostRecentStickyEndColumnsUpdate).toEqual({sizes: []});
+ 
+         component.stickyStartColumns = [];
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         await new Promise(r => setTimeout(r));
+         headerRows.forEach(row => expectNoStickyStyles(getHeaderCells(row)));
+@@ -1142,6 +1161,7 @@ describe('CdkTable', () => {
+ 
+       it('should stick and unstick right columns', waitForAsync(async () => {
+         component.stickyEndColumns = ['column-4', 'column-6'];
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         await new Promise(r => setTimeout(r));
+ 
+@@ -1189,6 +1209,7 @@ describe('CdkTable', () => {
+         });
+ 
+         component.stickyEndColumns = [];
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         await new Promise(r => setTimeout(r));
+         headerRows.forEach(row => expectNoStickyStyles(getHeaderCells(row)));
+@@ -1212,6 +1233,7 @@ describe('CdkTable', () => {
+         component.dir = 'rtl';
+         component.stickyStartColumns = ['column-1', 'column-2'];
+         component.stickyEndColumns = ['column-5', 'column-6'];
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         await new Promise(r => setTimeout(r));
+ 
+@@ -1256,6 +1278,7 @@ describe('CdkTable', () => {
+         component.stickyFooters = ['footer-3'];
+         component.stickyStartColumns = ['column-1'];
+         component.stickyEndColumns = ['column-6'];
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         await new Promise(r => setTimeout(r));
+ 
+@@ -1309,6 +1332,7 @@ describe('CdkTable', () => {
+         component.stickyFooters = [];
+         component.stickyStartColumns = [];
+         component.stickyEndColumns = [];
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         await new Promise(r => setTimeout(r));
+ 
+@@ -1346,6 +1370,7 @@ describe('CdkTable', () => {
+ 
+       it('should stick and unstick headers', waitForAsync(async () => {
+         component.stickyHeaders = ['header-1', 'header-3'];
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         await new Promise(r => setTimeout(r));
+ 
+@@ -1378,6 +1403,7 @@ describe('CdkTable', () => {
+         expect(component.mostRecentStickyEndColumnsUpdate).toEqual({sizes: []});
+ 
+         component.stickyHeaders = [];
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         await new Promise(r => setTimeout(r));
+         expectNoStickyStyles(headerRows); // No sticky styles on rows for native table
+@@ -1398,6 +1424,7 @@ describe('CdkTable', () => {
+ 
+       it('should stick and unstick footers', waitForAsync(async () => {
+         component.stickyFooters = ['footer-1', 'footer-3'];
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         await new Promise(r => setTimeout(r));
+ 
+@@ -1430,6 +1457,7 @@ describe('CdkTable', () => {
+         expect(component.mostRecentStickyEndColumnsUpdate).toEqual({sizes: []});
+ 
+         component.stickyFooters = [];
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         await new Promise(r => setTimeout(r));
+         expectNoStickyStyles(footerRows); // No sticky styles on rows for native table
+@@ -1451,17 +1479,20 @@ describe('CdkTable', () => {
+       it('should stick tfoot when all rows are stuck', waitForAsync(async () => {
+         const tfoot = tableElement.querySelector('tfoot');
+         component.stickyFooters = ['footer-1'];
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         await new Promise(r => setTimeout(r));
+         expectNoStickyStyles([tfoot]);
+ 
+         component.stickyFooters = ['footer-1', 'footer-2', 'footer-3'];
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         await new Promise(r => setTimeout(r));
+         expectStickyStyles(tfoot, '10', {bottom: '0px'});
+         expectStickyBorderClass(tfoot);
+ 
+         component.stickyFooters = ['footer-1', 'footer-2'];
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         await new Promise(r => setTimeout(r));
+         expectNoStickyStyles([tfoot]);
+@@ -1469,6 +1500,7 @@ describe('CdkTable', () => {
+ 
+       it('should stick and unstick left columns', waitForAsync(async () => {
+         component.stickyStartColumns = ['column-1', 'column-3'];
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         await new Promise(r => setTimeout(r));
+ 
+@@ -1516,6 +1548,7 @@ describe('CdkTable', () => {
+         expect(component.mostRecentStickyEndColumnsUpdate).toEqual({sizes: []});
+ 
+         component.stickyStartColumns = [];
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         await new Promise(r => setTimeout(r));
+         headerRows.forEach(row => expectNoStickyStyles(getHeaderCells(row)));
+@@ -1537,6 +1570,7 @@ describe('CdkTable', () => {
+ 
+       it('should stick and unstick right columns', waitForAsync(async () => {
+         component.stickyEndColumns = ['column-4', 'column-6'];
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         await new Promise(r => setTimeout(r));
+ 
+@@ -1584,6 +1618,7 @@ describe('CdkTable', () => {
+         });
+ 
+         component.stickyEndColumns = [];
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         await new Promise(r => setTimeout(r));
+         headerRows.forEach(row => expectNoStickyStyles(getHeaderCells(row)));
+@@ -1608,6 +1643,7 @@ describe('CdkTable', () => {
+         component.stickyFooters = ['footer-3'];
+         component.stickyStartColumns = ['column-1'];
+         component.stickyEndColumns = ['column-6'];
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         await new Promise(r => setTimeout(r));
+ 
+@@ -1671,6 +1707,7 @@ describe('CdkTable', () => {
+         component.stickyFooters = [];
+         component.stickyStartColumns = [];
+         component.stickyEndColumns = [];
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         await new Promise(r => setTimeout(r));
+ 
+@@ -1837,6 +1874,7 @@ describe('CdkTable', () => {
+     // Add a data source that has initialized data. Expect that the table shows this data.
+     const dynamicDataSource = new FakeDataSource();
+     component.dataSource = dynamicDataSource;
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+     expect(dynamicDataSource.isConnected).toBe(true);
+ 
+@@ -1845,6 +1883,7 @@ describe('CdkTable', () => {
+ 
+     // Remove the data source and check to make sure the table is empty again.
+     component.dataSource = undefined;
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+ 
+     // Expect that the old data source has been disconnected.
+@@ -1854,6 +1893,7 @@ describe('CdkTable', () => {
+     // Reconnect a data source and check that the table is populated
+     const newDynamicDataSource = new FakeDataSource();
+     component.dataSource = newDynamicDataSource;
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+     expect(newDynamicDataSource.isConnected).toBe(true);
+ 
+@@ -1881,6 +1921,7 @@ describe('CdkTable', () => {
+ 
+     // Enable all the context classes
+     component.enableRowContextClasses = true;
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+ 
+     expect(rowElements[0].classList.contains('custom-row-class-first')).toBe(true);
+@@ -1917,6 +1958,7 @@ describe('CdkTable', () => {
+ 
+     // Enable the context classes
+     component.enableCellContextClasses = true;
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+ 
+     let cellElement = rowElements[0].querySelectorAll('cdk-cell')[0];
+@@ -2205,6 +2247,7 @@ class WhenRowCdkTableApp {
+   columnsForHasC3Row = ['c3Column'];
+   isIndex1 = (index: number, _rowData: TestData) => index == 1;
+   hasC3 = (_index: number, rowData: TestData) => rowData.c == 'c_3';
++  cdr = inject(ChangeDetectorRef);
+ 
+   constructor() {
+     this.dataSource.addData();
+@@ -2217,6 +2260,7 @@ class WhenRowCdkTableApp {
+     this.columnsToRender = indexColumns;
+     this.columnsForIsIndex1Row = indexColumns;
+     this.columnsForHasC3Row = indexColumns;
++    this.cdr.markForCheck();
+   }
+ }
+ 
+@@ -2669,10 +2713,12 @@ class MissingColumnDefCdkTableApp {
+ class MissingColumnDefAfterRenderCdkTableApp implements AfterViewInit {
+   dataSource: FakeDataSource | null = null;
+   displayedColumns: string[] = [];
++  cdr = inject(ChangeDetectorRef);
+ 
+   ngAfterViewInit() {
+     setTimeout(() => {
+       this.displayedColumns = ['column_a'];
++      this.cdr.markForCheck();
+     }, 0);
+   }
+ }
+diff --git a/src/cdk/table/text-column.spec.ts b/src/cdk/table/text-column.spec.ts
+index 9d0f06f89ae7..3bdd9616204f 100644
+--- a/src/cdk/table/text-column.spec.ts
++++ b/src/cdk/table/text-column.spec.ts
+@@ -1,9 +1,9 @@
+-import {Component, provideZoneChangeDetection} from '@angular/core';
+-import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
++import {Component} from '@angular/core';
++import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+ 
+ import {
+-  getTableTextColumnMissingParentTableError,
+   getTableTextColumnMissingNameError,
++  getTableTextColumnMissingParentTableError,
+ } from './table-errors';
+ import {CdkTableModule} from './table-module';
+ import {expectTableToMatchContent} from './table.spec';
+@@ -16,7 +16,6 @@ describe('CdkTextColumn', () => {
+ 
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+-      providers: [provideZoneChangeDetection()],
+       imports: [CdkTableModule, BasicTextColumnApp, MissingTableApp, TextColumnWithoutNameApp],
+     }).compileComponents();
+   }));
+@@ -51,6 +50,7 @@ describe('CdkTextColumn', () => {
+ 
+   it('should allow for alternate header text', () => {
+     component.headerTextB = 'column-b';
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+ 
+     expectTableToMatchContent(tableElement, [
+@@ -62,6 +62,7 @@ describe('CdkTextColumn', () => {
+ 
+   it('should allow for custom data accessor', () => {
+     component.dataAccessorA = (data: TestData) => data.propertyA + '!';
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+ 
+     expectTableToMatchContent(tableElement, [
+@@ -73,6 +74,7 @@ describe('CdkTextColumn', () => {
+ 
+   it('should allow for custom data accessor', () => {
+     component.dataAccessorA = (data: TestData) => data.propertyA + '!';
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+ 
+     expectTableToMatchContent(tableElement, [
+@@ -87,6 +89,7 @@ describe('CdkTextColumn', () => {
+       {propertyA: 'changed-a_1', propertyB: 'b_1', propertyC: 'c_1'},
+       {propertyA: 'changed-a_2', propertyB: 'b_2', propertyC: 'c_2'},
+     ];
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+ 
+     expectTableToMatchContent(tableElement, [
+diff --git a/src/cdk/text-field/autofill.spec.ts b/src/cdk/text-field/autofill.spec.ts
+index 2268559e1ac4..6f14e907430c 100644
+--- a/src/cdk/text-field/autofill.spec.ts
++++ b/src/cdk/text-field/autofill.spec.ts
+@@ -7,8 +7,8 @@
+  */
+ 
+ import {normalizePassiveListenerOptions} from '@angular/cdk/platform';
+-import {Component, ElementRef, NgZone, ViewChild, provideZoneChangeDetection} from '@angular/core';
+-import {ComponentFixture, inject, TestBed} from '@angular/core/testing';
++import {Component, ElementRef, ViewChild} from '@angular/core';
++import {ComponentFixture, TestBed, inject} from '@angular/core/testing';
+ import {EMPTY} from 'rxjs';
+ import {AutofillEvent, AutofillMonitor} from './autofill';
+ import {TextFieldModule} from './text-field-module';
+@@ -22,7 +22,6 @@ describe('AutofillMonitor', () => {
+ 
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+-      providers: [provideZoneChangeDetection()],
+       imports: [TextFieldModule, Inputs],
+     }).compileComponents();
+   });
+@@ -154,22 +153,6 @@ describe('AutofillMonitor', () => {
+     expect(spy).toHaveBeenCalled();
+   });
+ 
+-  it('should emit on stream inside the NgZone', () => {
+-    const inputEl = testComponent.input1.nativeElement;
+-    let animationStartCallback: Function = () => {};
+-    inputEl.addEventListener.and.callFake(
+-      (_: string, cb: Function) => (animationStartCallback = cb),
+-    );
+-    const autofillStream = autofillMonitor.monitor(inputEl);
+-    const spy = jasmine.createSpy('autofill spy');
+-
+-    autofillStream.subscribe(() => spy(NgZone.isInAngularZone()));
+-    expect(spy).not.toHaveBeenCalled();
+-
+-    animationStartCallback({animationName: 'cdk-text-field-autofill-start', target: inputEl});
+-    expect(spy).toHaveBeenCalledWith(true);
+-  });
+-
+   it('should not emit on init if input is unfilled', () => {
+     const inputEl = testComponent.input1.nativeElement;
+     let animationStartCallback: Function = () => {};
+diff --git a/src/cdk/text-field/autofill.zone.spec.ts b/src/cdk/text-field/autofill.zone.spec.ts
+new file mode 100644
+index 000000000000..5efa4704cca5
+--- /dev/null
++++ b/src/cdk/text-field/autofill.zone.spec.ts
+@@ -0,0 +1,61 @@
++import {Component, ElementRef, NgZone, ViewChild, provideZoneChangeDetection} from '@angular/core';
++import {ComponentFixture, TestBed, inject} from '@angular/core/testing';
++import {AutofillMonitor} from './autofill';
++import {TextFieldModule} from './text-field-module';
++
++describe('AutofillMonitor', () => {
++  let autofillMonitor: AutofillMonitor;
++  let fixture: ComponentFixture<Inputs>;
++  let testComponent: Inputs;
++
++  beforeEach(() => {
++    TestBed.configureTestingModule({
++      providers: [provideZoneChangeDetection()],
++      imports: [TextFieldModule, Inputs],
++    }).compileComponents();
++  });
++
++  beforeEach(inject([AutofillMonitor], (afm: AutofillMonitor) => {
++    autofillMonitor = afm;
++    fixture = TestBed.createComponent(Inputs);
++    testComponent = fixture.componentInstance;
++    fixture.detectChanges();
++
++    for (const input of [testComponent.input1, testComponent.input2, testComponent.input3]) {
++      spyOn(input.nativeElement, 'addEventListener');
++      spyOn(input.nativeElement, 'removeEventListener');
++    }
++  }));
++
++  it('should emit on stream inside the NgZone', () => {
++    const inputEl = testComponent.input1.nativeElement;
++    let animationStartCallback: Function = () => {};
++    inputEl.addEventListener.and.callFake(
++      (_: string, cb: Function) => (animationStartCallback = cb),
++    );
++    const autofillStream = autofillMonitor.monitor(inputEl);
++    const spy = jasmine.createSpy('autofill spy');
++
++    autofillStream.subscribe(() => spy(NgZone.isInAngularZone()));
++    expect(spy).not.toHaveBeenCalled();
++
++    animationStartCallback({animationName: 'cdk-text-field-autofill-start', target: inputEl});
++    expect(spy).toHaveBeenCalledWith(true);
++  });
++});
++
++@Component({
++  template: `
++      <input #input1>
++      <input #input2>
++      <input #input3>
++    `,
++  standalone: true,
++  imports: [TextFieldModule],
++})
++class Inputs {
++  // Cast to `any` so we can stub out some methods in the tests.
++  @ViewChild('input1') input1: ElementRef<any>;
++  @ViewChild('input2') input2: ElementRef<any>;
++  @ViewChild('input3') input3: ElementRef<any>;
++}
+diff --git a/src/cdk/text-field/autosize.spec.ts b/src/cdk/text-field/autosize.spec.ts
+index 7338b5dc5faa..ad3b159484d9 100644
+--- a/src/cdk/text-field/autosize.spec.ts
++++ b/src/cdk/text-field/autosize.spec.ts
+@@ -1,16 +1,16 @@
+-import {dispatchFakeEvent} from '../testing/private';
+-import {Component, ViewChild, provideZoneChangeDetection} from '@angular/core';
++import {Component, ViewChild} from '@angular/core';
+ import {
+-  waitForAsync,
+   ComponentFixture,
++  TestBed,
+   fakeAsync,
+   flush,
+-  TestBed,
+   tick,
++  waitForAsync,
+ } from '@angular/core/testing';
+ import {FormsModule} from '@angular/forms';
+ import {By} from '@angular/platform-browser';
+ import {NoopAnimationsModule} from '@angular/platform-browser/animations';
++import {dispatchFakeEvent} from '../testing/private';
+ import {CdkTextareaAutosize} from './autosize';
+ import {TextFieldModule} from './text-field-module';
+ 
+@@ -21,7 +21,6 @@ describe('CdkTextareaAutosize', () => {
+ 
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+-      providers: [provideZoneChangeDetection()],
+       imports: [
+         FormsModule,
+         TextFieldModule,
+@@ -103,6 +102,7 @@ describe('CdkTextareaAutosize', () => {
+     As of some one gently rapping, rapping at my chamber door.
+     “’Tis some visitor,” I muttered, “tapping at my chamber door—
+                 Only this and nothing more.”`;
++    fixture.changeDetectorRef.markForCheck();
+ 
+     fixture.detectChanges();
+ 
+@@ -127,6 +127,7 @@ describe('CdkTextareaAutosize', () => {
+     expect(textarea.style.minHeight).toBeFalsy();
+ 
+     fixture.componentInstance.minRows = 4;
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+ 
+     expect(textarea.style.minHeight)
+@@ -135,6 +136,7 @@ describe('CdkTextareaAutosize', () => {
+ 
+     let previousMinHeight = parseInt(textarea.style.minHeight as string);
+     fixture.componentInstance.minRows = 6;
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+ 
+     expect(parseInt(textarea.style.minHeight as string))
+@@ -146,6 +148,7 @@ describe('CdkTextareaAutosize', () => {
+     expect(textarea.style.maxHeight).toBeFalsy();
+ 
+     fixture.componentInstance.maxRows = 4;
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+ 
+     expect(textarea.style.maxHeight)
+@@ -154,6 +157,7 @@ describe('CdkTextareaAutosize', () => {
+ 
+     let previousMaxHeight = parseInt(textarea.style.maxHeight as string);
+     fixture.componentInstance.maxRows = 6;
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+ 
+     expect(parseInt(textarea.style.maxHeight as string))
+@@ -165,6 +169,7 @@ describe('CdkTextareaAutosize', () => {
+     expect(textarea.style.minHeight).toBeFalsy();
+ 
+     fixture.componentInstance.minRows = 6;
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+ 
+     expect(textarea.style.minHeight)
+@@ -173,6 +178,7 @@ describe('CdkTextareaAutosize', () => {
+ 
+     let previousHeight = parseInt(textarea.style.height!);
+     fixture.componentInstance.minRows = 3;
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+ 
+     expect(parseInt(textarea.style.height!))
+@@ -191,6 +197,7 @@ describe('CdkTextareaAutosize', () => {
+       .toBe(1);
+ 
+     fixture.componentInstance.minRows = 1;
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+ 
+     expect(textarea.rows)
+@@ -200,6 +207,7 @@ describe('CdkTextareaAutosize', () => {
+     const previousMinHeight = parseInt(textarea.style.minHeight as string);
+ 
+     fixture.componentInstance.minRows = 2;
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+ 
+     expect(textarea.rows)
+@@ -224,6 +232,7 @@ describe('CdkTextareaAutosize', () => {
+       .toBe(textarea.scrollHeight);
+ 
+     fixture.componentInstance.maxRows = 5;
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+ 
+     expect(textarea.clientHeight)
+@@ -246,6 +255,7 @@ describe('CdkTextareaAutosize', () => {
+       Line
+       Line
+       Line`;
++    fixture.changeDetectorRef.markForCheck();
+ 
+     fixture.detectChanges();
+ 
+@@ -269,6 +279,7 @@ describe('CdkTextareaAutosize', () => {
+       Line
+       Line
+       Line`;
++    fixture.changeDetectorRef.markForCheck();
+ 
+     fixture.detectChanges();
+ 
+@@ -291,6 +302,7 @@ describe('CdkTextareaAutosize', () => {
+         “’Tis some visitor entreating entrance at my chamber door—
+     Some late visitor entreating entrance at my chamber door;—
+                 This it is and nothing more.” `;
++    fixtureWithForms.changeDetectorRef.markForCheck();
+     fixtureWithForms.detectChanges();
+     flush();
+     fixtureWithForms.detectChanges();
+@@ -308,6 +320,7 @@ describe('CdkTextareaAutosize', () => {
+       if a woodchuck could chuck wood?
+     `;
+ 
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+     flush();
+     fixture.detectChanges();
+@@ -343,6 +356,7 @@ describe('CdkTextareaAutosize', () => {
+     Line
+     Line
+     Line`;
++    fixtureWithoutAutosize.changeDetectorRef.markForCheck();
+ 
+     // Manually call resizeToFitContent instead of faking an `input` event.
+     fixtureWithoutAutosize.detectChanges();
+@@ -377,6 +391,7 @@ describe('CdkTextareaAutosize', () => {
+ 
+   it('should handle an undefined placeholder', () => {
+     fixture.componentInstance.placeholder = undefined!;
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+ 
+     expect(textarea.hasAttribute('placeholder')).toBe(false);
+diff --git a/src/cdk/tree/tree.spec.ts b/src/cdk/tree/tree.spec.ts
+index 2e21b1bb1a62..db8d9eedbb15 100644
+--- a/src/cdk/tree/tree.spec.ts
++++ b/src/cdk/tree/tree.spec.ts
+@@ -5,28 +5,29 @@
+  * Use of this source code is governed by an MIT-style license that can be
+  * found in the LICENSE file at https://angular.io/license
+  */
+-import {ComponentFixture, TestBed, fakeAsync, flush} from '@angular/core/testing';
+ import {
++  ChangeDetectorRef,
+   Component,
+   ErrorHandler,
+-  ViewChild,
++  EventEmitter,
++  QueryList,
+   TrackByFunction,
+   Type,
+-  EventEmitter,
++  ViewChild,
+   ViewChildren,
+-  QueryList,
+-  provideZoneChangeDetection,
++  inject,
+ } from '@angular/core';
++import {ComponentFixture, TestBed, fakeAsync, flush} from '@angular/core/testing';
+ 
++import {Direction, Directionality} from '@angular/cdk/bidi';
+ import {CollectionViewer, DataSource} from '@angular/cdk/collections';
+-import {Directionality, Direction} from '@angular/cdk/bidi';
+-import {combineLatest, BehaviorSubject, Observable} from 'rxjs';
++import {BehaviorSubject, Observable, combineLatest} from 'rxjs';
+ import {map} from 'rxjs/operators';
+ 
+ import {BaseTreeControl} from './control/base-tree-control';
+-import {TreeControl} from './control/tree-control';
+ import {FlatTreeControl} from './control/flat-tree-control';
+ import {NestedTreeControl} from './control/nested-tree-control';
++import {TreeControl} from './control/tree-control';
+ import {CdkTreeModule, CdkTreeNodePadding} from './index';
+ import {CdkTree, CdkTreeNode} from './tree';
+ import {getTreeControlFunctionsMissingError} from './tree-errors';
+@@ -43,7 +44,6 @@ describe('CdkTree', () => {
+     TestBed.configureTestingModule({
+       imports: [CdkTreeModule],
+       providers: [
+-        provideZoneChangeDetection(),
+         {
+           provide: Directionality,
+           useFactory: () => (dir = {value: 'ltr', change: new EventEmitter<Direction>()}),
+@@ -134,6 +134,7 @@ describe('CdkTree', () => {
+         // add a child to the first node
+         let data = dataSource.data;
+         dataSource.addChild(data[0], true);
++        fixture.detectChanges();
+ 
+         const ariaLevels = getNodes(treeElement).map(n => n.getAttribute('aria-level'));
+         expect(ariaLevels).toEqual(['2', '3', '2', '2']);
+@@ -191,6 +192,7 @@ describe('CdkTree', () => {
+ 
+       it('should be able to use units different from px for the indentation', () => {
+         component.indent = '15rem';
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+ 
+         const data = dataSource.data;
+@@ -207,6 +209,7 @@ describe('CdkTree', () => {
+ 
+       it('should default to px if no unit is set for string value indentation', () => {
+         component.indent = '17';
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+ 
+         const data = dataSource.data;
+@@ -241,6 +244,7 @@ describe('CdkTree', () => {
+         const node = getNodes(treeElement)[0];
+ 
+         component.indent = 10;
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+ 
+         expect(node.style.paddingLeft).toBe('10px');
+@@ -279,6 +283,7 @@ describe('CdkTree', () => {
+           .toBe(0);
+ 
+         component.toggleRecursively = false;
++        fixture.changeDetectorRef.markForCheck();
+         let data = dataSource.data;
+         dataSource.addChild(data[2]);
+         fixture.detectChanges();
+@@ -807,6 +812,7 @@ describe('CdkTree', () => {
+         ).toBe(true);
+ 
+         component.toggleRecursively = false;
++        fixture.changeDetectorRef.markForCheck();
+         let data = dataSource.data;
+         const child = dataSource.addChild(data[1], false);
+         dataSource.addChild(child, false);
+@@ -821,6 +827,7 @@ describe('CdkTree', () => {
+ 
+       it('should expand/collapse the node multiple times', () => {
+         component.toggleRecursively = false;
++        fixture.changeDetectorRef.markForCheck();
+         let data = dataSource.data;
+         const child = dataSource.addChild(data[1], false);
+         dataSource.addChild(child, false);
+@@ -1136,8 +1143,6 @@ describe('CdkTree', () => {
+         try {
+           TestBed.createComponent(NestedCdkErrorTreeApp).detectChanges();
+           flush();
+-        } catch {
+-          flush();
+         } finally {
+           flush();
+         }
+@@ -1147,12 +1152,8 @@ describe('CdkTree', () => {
+     it('should throw an error when missing function in flat tree', fakeAsync(() => {
+       configureCdkTreeTestingModule([FlatCdkErrorTreeApp]);
+       expect(() => {
+-        try {
+-          TestBed.createComponent(FlatCdkErrorTreeApp).detectChanges();
+-          flush();
+-        } catch {
+-          flush();
+-        }
++        TestBed.createComponent(FlatCdkErrorTreeApp).detectChanges();
++        flush();
+       }).toThrowError(getTreeControlFunctionsMissingError().message);
+     }));
+   });
+@@ -1574,6 +1575,14 @@ class ArrayDataSourceCdkTreeApp {
+   }
+ 
+   @ViewChild(CdkTree) tree: CdkTree<TestData>;
++
++  cdr = inject(ChangeDetectorRef);
++
++  constructor() {
++    this.dataSource._dataChange.subscribe(() => {
++      this.cdr.markForCheck();
++    });
++  }
+ }
+ 
+ @Component({
+diff --git a/src/cdk/tree/tree.ts b/src/cdk/tree/tree.ts
+index 2b1ee04a1772..9746981bdf4f 100644
+--- a/src/cdk/tree/tree.ts
++++ b/src/cdk/tree/tree.ts
+@@ -26,17 +26,18 @@ import {
+   ViewChild,
+   ViewContainerRef,
+   ViewEncapsulation,
++  inject,
+   numberAttribute,
+ } from '@angular/core';
+ import {
+   BehaviorSubject,
+-  isObservable,
+   Observable,
+-  of as observableOf,
+   Subject,
+   Subscription,
++  isObservable,
++  of as observableOf,
+ } from 'rxjs';
+-import {takeUntil} from 'rxjs/operators';
++import {distinctUntilChanged, map, takeUntil} from 'rxjs/operators';
+ import {TreeControl} from './control/tree-control';
+ import {CdkTreeNodeDef, CdkTreeNodeOutletContext} from './node';
+ import {CdkTreeNodeOutlet} from './outlet';
+@@ -255,6 +256,8 @@ export class CdkTree<T, K = T> implements AfterContentChecked, CollectionViewer,
+       },
+     );
+ 
++    // TODO: change to `this._changeDetectorRef.markForCheck()`, or just switch this component to
++    // use signals.
+     this._changeDetectorRef.detectChanges();
+   }
+ 
+@@ -381,6 +384,8 @@ export class CdkTreeNode<T, K = T> implements FocusableOption, OnDestroy, OnInit
+       : this._parentNodeAriaLevel;
+   }
+ 
++  private _changeDetectorRef = inject(ChangeDetectorRef);
++
+   constructor(
+     protected _elementRef: ElementRef<HTMLElement>,
+     protected _tree: CdkTree<T, K>,
+@@ -392,6 +397,14 @@ export class CdkTreeNode<T, K = T> implements FocusableOption, OnDestroy, OnInit
+   ngOnInit(): void {
+     this._parentNodeAriaLevel = getParentNodeAriaLevel(this._elementRef.nativeElement);
+     this._elementRef.nativeElement.setAttribute('aria-level', `${this.level + 1}`);
++    this._tree.treeControl.expansionModel.changed
++      .pipe(
++        map(() => this.isExpanded),
++        distinctUntilChanged(),
++      )
++      .subscribe(() => {
++        this._changeDetectorRef.markForCheck();
++      });
+   }
+ 
+   ngOnDestroy() {

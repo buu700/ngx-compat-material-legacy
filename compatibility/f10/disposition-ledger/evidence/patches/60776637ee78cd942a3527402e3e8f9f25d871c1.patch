@@ -1,0 +1,29 @@
+From 60776637ee78cd942a3527402e3e8f9f25d871c1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Joy=20Serqui=C3=B1a?=
+ <44146839+essjay05@users.noreply.github.com>
+Date: Wed, 18 Sep 2024 17:51:04 +0000
+Subject: [PATCH] fix(material/select): remove incompatible aria-autocomplete
+ attribute (#29645)
+
+Fixes a bug reported in MatSelect where the usage of aria-autocomplete
+is not a valid attribute that can be used with aria role=listbox.
+Removes the aria-autocomplete attribute to fix the violation:
+aria-allowed-attr.
+
+Fixes b/352496530
+---
+ src/material/select/select.ts | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/src/material/select/select.ts b/src/material/select/select.ts
+index e78fbf0c13a1..f498580343d8 100644
+--- a/src/material/select/select.ts
++++ b/src/material/select/select.ts
+@@ -178,7 +178,6 @@ export class MatSelectChange {
+   changeDetection: ChangeDetectionStrategy.OnPush,
+   host: {
+     'role': 'combobox',
+-    'aria-autocomplete': 'none',
+     'aria-haspopup': 'listbox',
+     'class': 'mat-mdc-select',
+     '[attr.id]': 'id',

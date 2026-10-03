@@ -166,7 +166,218 @@ def vendor_observations(manifest_path: Path) -> dict:
     }
 
 
-def evaluate(root: Path, now: datetime, *, lookup_performed: bool) -> dict:
+def _http_json(url: str, method: str = "GET", payload: bytes | None = None, timeout: int = 60) -> tuple[int | None, object | None, str]:
+    """Return (status, parsed JSON or None, error). Network failure stays unknown."""
+    import urllib.error
+    import urllib.request
+
+    request = urllib.request.Request(
+        url,
+        data=payload,
+        method=method,
+        headers={
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "User-Agent": "ngx-compat-dependency-eligibility",
+        },
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            raw = response.read()
+            status = getattr(response, "status", None) or response.getcode()
+    except urllib.error.HTTPError as exc:
+        raw = exc.read()
+        status = exc.code
+    except Exception as exc:  # noqa: BLE001 — lookup failure is an unknown result, not a crash
+        return None, None, f"{type(exc).__name__}: {exc}"
+    try:
+        return int(status), json.loads(raw.decode("utf-8")), ""
+    except Exception as exc:  # noqa: BLE001
+        return int(status) if status is not None else None, None, f"json: {exc}"
+
+
+def _npm_publish_time(name: str, version: str) -> tuple[datetime | None, str]:
+    from urllib.parse import quote
+
+    url = f"https://registry.npmjs.org/{quote(name, safe='@')}"
+    status, body, error = _http_json(url, timeout=45)
+    if status != 200 or not isinstance(body, dict):
+        return None, error or f"http_status={status}"
+    published = (body.get("time") or {}).get(version)
+    parsed = parse_time(published) if isinstance(published, str) else None
+    if parsed is None:
+        return None, "publish time missing"
+    return parsed, ""
+
+
+def _node_publish_time(version: str) -> tuple[datetime | None, str]:
+    status, body, error = _http_json("https://nodejs.org/dist/index.json", timeout=45)
+    if status != 200 or not isinstance(body, list):
+        return None, error or f"http_status={status}"
+    for row in body:
+        if isinstance(row, dict) and row.get("version") == f"v{version}":
+            parsed = parse_time(row.get("date") or "")
+            if parsed is None:
+                return None, "node publish date missing"
+            return parsed, ""
+    return None, f"node {version} not in index"
+
+
+def _osv_batch(packages: list[tuple[str, str]]) -> tuple[int | None, list | None, str]:
+    queries = [
+        {"package": {"name": name, "ecosystem": "npm"}, "version": version}
+        for name, version in packages
+    ]
+    payload = json.dumps({"queries": queries}).encode()
+    status, body, error = _http_json(
+        "https://api.osv.dev/v1/querybatch", method="POST", payload=payload, timeout=120,
+    )
+    if error and status is None:
+        return None, None, error
+    if not isinstance(body, dict):
+        return status, None, error or "advisory body is not an object"
+    results = body.get("results")
+    if not isinstance(results, list):
+        return status, None, "advisory results missing"
+    return status, results, ""
+
+
+def _vuln_rows(packages: list[tuple[str, str]], results: list) -> tuple[dict, list[str]]:
+    rows = {}
+    unresolved = []
+    if len(results) != len(packages):
+        return rows, [f"truncated advisory batch {len(results)}/{len(packages)}"]
+    for (name, version), result in zip(packages, results):
+        vulns_in = result.get("vulns") if isinstance(result, dict) else None
+        if vulns_in is None:
+            vulns = []
+        elif not isinstance(vulns_in, list):
+            return rows, [f"advisory row {name}@{version} is not a list"]
+        else:
+            vulns = []
+            for vuln in vulns_in:
+                if not isinstance(vuln, dict):
+                    unresolved.append(f"{name}@{version}")
+                    continue
+                item = {
+                    "id": vuln.get("id"),
+                    "summary": (vuln.get("summary") or "")[:240],
+                    # A returned finding is unresolved until a reviewed disposition exists.
+                    # Query success is not a disposition.
+                }
+                vulns.append(item)
+                unresolved.append(f"{name}@{version}")
+        rows[f"{name}@{version}"] = {"name": name, "version": version, "vulns": vulns}
+    return rows, unresolved
+
+
+def perform_lookup(root: Path, now: datetime) -> dict:
+    """Live advisory, registry-age, and vendor lookup. Failure stays unknown."""
+    packages = lock_packages((root / "pnpm-lock.yaml").read_text())
+    manifest = json.loads((root / "compatibility/vendored-sass-manifest.json").read_text())
+    vendor_version = manifest.get("version")
+    vendor_packages = [
+        (f"@material/{name}", vendor_version)
+        for name in (manifest.get("packages") or [])
+        if isinstance(name, str) and isinstance(vendor_version, str)
+    ]
+    toolchain = json.loads((root / "toolchain-lock.json").read_text())
+    queried = packages + [item for item in vendor_packages if item not in packages]
+    status, results, error = _osv_batch(queried) if queried else (None, [], "no packages")
+    truncated = bool(results is not None and len(results) != len(queried))
+    rows, unresolved = ({}, [error or "advisory lookup failed"])
+    if results is not None and status == 200 and not truncated:
+        rows, unresolved = _vuln_rows(queried, results)
+    elif status != 200:
+        unresolved = [error or f"advisory http_status={status}"]
+    covered = set(rows)
+    uncovered = [f"{name}@{version}" for name, version in packages if f"{name}@{version}" not in covered]
+
+    age_unknown = []
+    age_young = []
+    if status == 200 and not truncated and not error:
+        from concurrent.futures import ThreadPoolExecutor
+
+        def _age(item: tuple[str, str]) -> tuple[str, datetime | None, str]:
+            name, version = item
+            published, age_error = _npm_publish_time(name, version)
+            return f"{name}@{version}", published, age_error
+
+        with ThreadPoolExecutor(max_workers=12) as pool:
+            for key, published, age_error in pool.map(_age, packages):
+                if published is None:
+                    age_unknown.append(f"{key}: {age_error}")
+                elif published > now:
+                    age_unknown.append(f"{key}: publish time is in the future")
+                elif (now - published).total_seconds() < MAX_AGE_SECONDS:
+                    age_young.append(key)
+
+    tool_detail = []
+    tool_ok = status == 200 and not truncated
+    repo = toolchain.get("repository") or {}
+    release = toolchain.get("release") or {}
+    checks = {
+        "node": _node_publish_time(repo.get("node") or ""),
+        "pnpm": _npm_publish_time("pnpm", repo.get("pnpm") or ""),
+        "npm": _npm_publish_time("npm", release.get("npm") or ""),
+    }
+    toolchain_report = {}
+    for label, (published, age_error) in checks.items():
+        if published is None:
+            tool_ok = False
+            tool_detail.append(f"{label} unknown ({age_error})")
+            toolchain_report[label] = {"published": None, "error": age_error}
+            continue
+        age_days = (now - published).total_seconds() / 86400
+        young = age_days < 7 or published > now
+        if young:
+            tool_ok = False
+        toolchain_report[label] = {"published": published.isoformat(), "age_days": round(age_days, 2), "young": young}
+        tool_detail.append(f"{label} published {published.date().isoformat()} age_days={age_days:.1f}")
+
+    vendor_unknown = []
+    vendor_queried = bool(vendor_packages) and status == 200 and not truncated and not error
+    for name, version in vendor_packages:
+        key = f"{name}@{version}"
+        if key not in rows:
+            vendor_unknown.append(key)
+            vendor_queried = False
+            continue
+        published, age_error = _npm_publish_time(name, version)
+        if published is None:
+            vendor_unknown.append(f"{key}: {age_error}")
+            vendor_queried = False
+    if vendor_unknown:
+        vendor_queried = False
+
+    http_known = status == 200 and not truncated and not error and bool(rows or not queried)
+    result = "queried" if http_known else "unknown"
+    return {
+        "http_status": status,
+        "result": result,
+        "truncated": truncated or bool(error and "truncated" in error),
+        "cutoff": now.isoformat(),
+        "endpoint": "https://api.osv.dev/v1/querybatch",
+        "error": error,
+        "rows": rows,
+        "uncovered": uncovered,
+        "age_unknown": age_unknown,
+        "age_young": age_young,
+        "toolchain_ok": tool_ok and http_known,
+        "toolchain_detail": "; ".join(tool_detail) or error or "toolchain was not queried",
+        "toolchain": toolchain_report,
+        "vendor_ok": vendor_queried and http_known and not vendor_unknown,
+        "vendor_detail": (
+            f"vendor_packages={len(vendor_packages)} unknown={vendor_unknown[:6]}"
+            if vendor_packages else "vendor manifest has no packages"
+        ),
+        "unresolved": unresolved,
+        "lock_packages": len(packages),
+        "security_clearance": "not-passed",
+    }
+
+
+def evaluate(root: Path, now: datetime, *, lookup_performed: bool, lookup: dict | None = None) -> dict:
     peers = json.loads((root / "compatibility/peers-22.proposed.json").read_text())
     stored_path = root / "compatibility/rc/reports/pinned-dependency-advisories.json"
     stored = json.loads(stored_path.read_text()) if stored_path.is_file() else {}
@@ -178,32 +389,78 @@ def evaluate(root: Path, now: datetime, *, lookup_performed: bool) -> dict:
     uncovered = [f"{name}@{version}" for name, version in packages if f"{name}@{version}" not in covered]
     toolchain = json.loads((root / "toolchain-lock.json").read_text())
     vendor = vendor_observations(root / "compatibility/vendored-sass-manifest.json")
-    # This producer does not open a socket. A stored 200 is not this run's lookup.
-    lookup_result = "not-run"
+    # A stored file is not this run. Only an explicit lookup dict from this process counts.
+    live = lookup if lookup_performed and isinstance(lookup, dict) else None
+    if lookup_performed and live is None:
+        live = {
+            "result": "unknown",
+            "http_status": None,
+            "error": "lookup was requested but no result was returned",
+            "rows": {},
+            "uncovered": [f"{name}@{version}" for name, version in packages],
+            "age_unknown": ["not queried"],
+            "age_young": [],
+            "toolchain_ok": False,
+            "toolchain_detail": "toolchain age was not queried",
+            "vendor_ok": False,
+            "vendor_detail": "vendor packages were not queried",
+            "unresolved": ["lookup missing"],
+        }
+    lookup_result = "not-run" if live is None else live.get("result") or "unknown"
+    live_rows = (live or {}).get("rows") or {}
+    pin_errors = []
+    if live is not None:
+        if live.get("http_status") != 200 or live.get("result") != "queried":
+            pin_errors.append(f"this run advisory query is unknown (http_status={live.get('http_status')})")
+        for name, version in (peers.get("exact_packages") or {}).items():
+            row = live_rows.get(f"{name}@{version}")
+            if row is None:
+                pin_errors.append(f"missing query row for {name}@{version}")
+            elif not isinstance(row.get("vulns"), list):
+                pin_errors.append(f"queried row {name}@{version} has no vuln list")
+    direct_ok = (not pin_errors) if live is not None else stored_assessment["ok"]
+    direct_detail = (
+        "; ".join(pin_errors[:4]) if pin_errors else "this run direct-pin rows are present"
+    ) if live is not None else ("; ".join(stored_assessment["errors"][:4]) or "stored direct-pin record is internally consistent")
+    http_known = live is not None and live.get("http_status") == 200 and live.get("result") == "queried" and not live.get("truncated")
+    age_unknown = (live or {}).get("age_unknown") or []
+    age_young = (live or {}).get("age_young") or []
+    live_uncovered = (live or {}).get("uncovered")
+    if live is None:
+        live_uncovered = uncovered
+    unresolved = (live or {}).get("unresolved") or []
     observations = {
         "dependency-eligibility/locks-tools-maturity/direct-pin-shape": (
-            stored_assessment["ok"],
-            "; ".join(stored_assessment["errors"][:4]) or "stored direct-pin record is internally consistent",
+            direct_ok,
+            direct_detail,
         ),
         "dependency-eligibility/locks-tools-maturity/lookup-http-known": (
-            lookup_performed and stored.get("http_status") == 200,
-            f"this run lookup is {lookup_result}; stored http_status={stored.get('http_status')}",
+            http_known,
+            f"this run lookup is {lookup_result}; http_status={(live or {}).get('http_status')}; stored http_status={stored.get('http_status')} is not this run",
         ),
         "dependency-eligibility/locks-tools-maturity/cutoff-not-stale": (
-            lookup_performed and stored_assessment["ok"],
-            f"this run lookup is {lookup_result}; stored result={stored_assessment['result']}",
+            http_known and not pin_errors,
+            f"this run lookup is {lookup_result}; cutoff={(live or {}).get('cutoff')}",
         ),
         "dependency-eligibility/locks-tools-maturity/lock-transitive-coverage": (
-            lookup_performed and not uncovered,
-            f"lock_packages={len(packages)} absent_from_stored_query={len(uncovered)}",
+            http_known and not live_uncovered and not age_unknown and not age_young,
+            (
+                f"lock_packages={len(packages)} absent={len(live_uncovered or [])} "
+                f"age_unknown={len(age_unknown)} age_young={len(age_young)}"
+                if live is not None else
+                f"lock_packages={len(packages)} absent_from_stored_query={len(uncovered)}; this run did not query"
+            ),
         ),
         "dependency-eligibility/locks-tools-maturity/toolchain-age-known": (
-            False,
-            f"toolchain checked_on={toolchain.get('checked_on')} was not re-queried; registry age stays unknown",
+            bool(live and live.get("toolchain_ok")),
+            (live or {}).get("toolchain_detail") or f"toolchain checked_on={toolchain.get('checked_on')} was not re-queried; registry age stays unknown",
         ),
         "dependency-eligibility/locks-tools-maturity/unresolved-findings-block": (
-            lookup_performed and stored_assessment["result"] == "queried" and not uncovered,
-            "findings stay unknown until the lock, toolchain, and vendor set are queried",
+            http_known and not unresolved and not live_uncovered,
+            "unresolved findings: " + ", ".join(unresolved[:8]) if unresolved else (
+                "findings stay unknown until the lock, toolchain, and vendor set are queried"
+                if live is None or not http_known else "queried set has no unresolved finding; this is not security clearance"
+            ),
         ),
         "dependency-eligibility/vendor-provenance-license/manifest-hashes": (
             not vendor["hash_mismatches"] and not vendor["missing_files"] and vendor["files"] > 0,
@@ -214,8 +471,8 @@ def evaluate(root: Path, now: datetime, *, lookup_performed: bool) -> dict:
             f"license={vendor['license']} missing_files={vendor['license_missing'][:8]}",
         ),
         "dependency-eligibility/vendor-provenance-license/vendor-advisory": (
-            False,
-            "retained vendor code was not in an advisory lookup",
+            bool(live and live.get("vendor_ok")) and not any(item.startswith("@material/") for item in unresolved),
+            (live or {}).get("vendor_detail") or "retained vendor code was not in an advisory lookup",
         ),
     }
     cases = []
@@ -234,8 +491,12 @@ def evaluate(root: Path, now: datetime, *, lookup_performed: bool) -> dict:
         "stored_result": stored_assessment["result"],
         "stored_errors": stored_assessment["errors"],
         "lock_packages": len(packages),
-        "uncovered_lock_packages": len(uncovered),
-        "uncovered_sample": uncovered[:12],
+        "uncovered_lock_packages": len(live_uncovered or []),
+        "uncovered_sample": (live_uncovered or [])[:12],
+        "lookup_http_status": None if live is None else live.get("http_status"),
+        "age_unknown": len(age_unknown),
+        "age_young": len(age_young),
+        "unresolved_findings": len(unresolved),
         "vendor": {key: vendor[key] for key in ("files", "hash_mismatches", "missing_files", "license_missing", "origin", "git_head", "license")},
         "security_clearance": "not-passed",
     }
@@ -347,11 +608,13 @@ def main() -> int:
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--now", default="")
     parser.add_argument("--report", type=Path)
+    parser.add_argument("--lookup", action="store_true", help="Query OSV, npm publish times, and Node release age. Failure stays unknown.")
     args = parser.parse_args()
     now = parse_time(args.now) if args.now else datetime.now(timezone.utc)
     if now is None:
         raise SystemExit("dependency-eligibility: --now is not a timestamp")
-    observation = evaluate(args.root, now, lookup_performed=False)
+    live_lookup = perform_lookup(args.root, now) if args.lookup else None
+    observation = evaluate(args.root, now, lookup_performed=args.lookup, lookup=live_lookup)
     failed = [item["case_id"] for item in observation["cases"] if item["result"] != "pass"]
     summary = {
         "ok": not failed,

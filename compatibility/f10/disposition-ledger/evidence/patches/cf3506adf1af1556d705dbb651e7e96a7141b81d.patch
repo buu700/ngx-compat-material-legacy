@@ -1,0 +1,29 @@
+From cf3506adf1af1556d705dbb651e7e96a7141b81d Mon Sep 17 00:00:00 2001
+From: Kristiyan Kostadinov <crisbeto@users.noreply.github.com>
+Date: Wed, 24 Apr 2024 16:46:01 +0200
+Subject: [PATCH] fix(material/progress-bar): avoid CSP issues for apps not
+ using buffer mode (#28946)
+
+The `buffer` mode requires an element that uses a `data:` URI in its styles. This can be problematic for CSP.
+
+Fixes #28938.
+---
+ src/material/progress-bar/progress-bar.html | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/material/progress-bar/progress-bar.html b/src/material/progress-bar/progress-bar.html
+index c903f19305bc..f9d596ab7283 100644
+--- a/src/material/progress-bar/progress-bar.html
++++ b/src/material/progress-bar/progress-bar.html
+@@ -6,7 +6,10 @@
+   <div
+     class="mdc-linear-progress__buffer-bar"
+     [style.flex-basis]="_getBufferBarFlexBasis()"></div>
+-  <div class="mdc-linear-progress__buffer-dots"></div>
++  <!-- Remove the dots outside of buffer mode since they can cause CSP issues (see #28938) -->
++  @if (mode === 'buffer') {
++    <div class="mdc-linear-progress__buffer-dots"></div>
++  }
+ </div>
+ <div
+   class="mdc-linear-progress__bar mdc-linear-progress__primary-bar"

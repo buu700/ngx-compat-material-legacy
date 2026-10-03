@@ -2,7 +2,7 @@ import {Component, DebugElement} from '@angular/core';
 import {By} from '@angular/platform-browser';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {MatLegacyChip, MatLegacyChipsModule} from './index';
-import {dispatchMouseEvent} from '@angular/cdk/testing/private';
+import {dispatchMouseEvent} from '../internal/testing/owned-test-events';
 
 describe('Chip Remove', () => {
   let fixture: ComponentFixture<TestChip>;

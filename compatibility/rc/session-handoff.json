@@ -2,7 +2,7 @@
   "template": false,
   "packet_id": "FRESH-03",
   "substep_id": "audit-policy-eligibility",
-  "source_commit": "5a4756b35a312e4c042114592d74291d6f1d5891",
+  "source_commit": "4d5752f41ffe4082bc957545d63ff9ec928f042c",
   "worktree_line": "main",
   "line_21_commit": "59fd6823e1817b1e0867dc285364c0e08848dbe8",
   "owned_paths": [
@@ -16,9 +16,9 @@
     ".github/workflows/ci.yml",
     "compatibility/rc/session-handoff.json"
   ],
-  "last_command": "python3 -m unittest discover -s tests",
-  "outcome": "FRESH-03 keeps the 1697-row ledger. Structural inventory still passes and is not security clearance. Admission stays incomplete: 99 sensitive rows, 437 inherited rows, and 115 material behavior rows lack individual proof; 169 rows have no evidence file; 523 cite the coverage report itself; 1736 symbol uses remain open. Source policy records 34 authored boundary violations and does not compare installed annotations unless declaration files are present. Dependency eligibility does not perform a lookup; 475 of 492 lock packages are outside the stored direct-pin query. Vendor manifest hashes and license files match. No check is coverage complete. 21.x rosters stay null. Not engineering ready. Not published.",
-  "first_actionable_error": "upstream-audit-disposition admission incomplete: sensitive=99 inherited=437 behavior=115 missing_evidence=169 circular_evidence=523 symbol_uses_open=1736",
+  "last_command": "python3 scripts/check-dependency-eligibility.py --lookup",
+  "outcome": "Authored source-policy scan is 0 violations after owned replacements for animations modules, deep private modules, and underscore platform imports. Installed peer declaration comparison is still unknown (no node_modules/@angular .d.ts). Packed tarball was not rebuilt here. Live OSV querybatch HTTP 200 covered 492 lock packages plus vendor @material versions; registry age was known and older than seven days for node 24.21.0 (2026-09-07), pnpm 12.4.2 (2026-09-15), and npm 11.19.0 (2026-07-29). braces@3.0.3 has unresolved GHSA-vfj7-8cjw-p6xm, so eligibility stays not admitted and is not clearance. Sensitive evidence files exist for 99 rows. 46 non-inherited non-behavior rows have per-commit patch proof. 53 inherited or already-adapted sensitive rows stay open. Inherited 437 and material behavior 115 were not closed. Symbol uses 1736 remain open. 21.x was not touched.",
+  "first_actionable_error": "dependency-eligibility unresolved advisory braces@3.0.3 GHSA-vfj7-8cjw-p6xm; source-policy installed annotations unknown; upstream-audit sensitive=53 inherited=437 behavior=115",
   "failed_case_ids": [
     "upstream-audit/upstream-shas/sensitive-individual-proof",
     "upstream-audit/upstream-shas/independent-evidence",
@@ -26,13 +26,8 @@
     "upstream-audit/installed-peer-fixes/content-not-ancestry",
     "upstream-audit/installed-peer-fixes/branch-applicability",
     "upstream-audit/current-advisories/not-satisfied-by-ledger",
-    "source-policy/authored-boundary/no-animations-module",
-    "source-policy/authored-boundary/no-private-namespace-member",
-    "source-policy/authored-boundary/no-deep-internal",
     "source-policy/authored-boundary/installed-annotation-comparison",
-    "dependency-eligibility/locks-tools-maturity/lookup-http-known",
-    "dependency-eligibility/locks-tools-maturity/lock-transitive-coverage",
-    "dependency-eligibility/vendor-provenance-license/vendor-advisory"
+    "dependency-eligibility/locks-tools-maturity/unresolved-findings-block"
   ],
   "report_paths": [
     "compatibility/f10/disposition-ledger/ledger.json",
@@ -44,12 +39,13 @@
     "npm publish",
     "21.x execution",
     "host-nix full verify in this workspace",
-    "current advisory network lookup",
+    "installed peer .d.ts comparison",
+    "disposition of GHSA-vfj7-8cjw-p6xm",
     "Cyph qualification"
   ],
-  "next_action": "Read the full-acceptance CI job. Do not add a status commit after it. Next producer work is individual proof for sensitive and inherited ledger rows, or an independent FRESH-04/05 card. Do not restart the unread-SHA conveyor.",
-  "recorded_at_utc": "2026-10-03T18:20:00Z",
+  "next_action": "Read the full-acceptance CI job for this push. Do not add a status commit after it. Next producer work is a reviewed disposition for braces@3.0.3, installed peer declarations, or individual proof for the remaining 53 sensitive rows that are inherited or already-adapted. Do not restart the unread-SHA conveyor.",
+  "recorded_at_utc": "2026-10-03T18:36:26Z",
   "g11_claim": "not-passed",
-  "ledger": "1697/1697 structural pass; disposition admission incomplete",
+  "ledger": "1697/1697 structural pass; sensitive proof 46/99; inherited and behavior not closed",
   "publication": "not-published"
 }

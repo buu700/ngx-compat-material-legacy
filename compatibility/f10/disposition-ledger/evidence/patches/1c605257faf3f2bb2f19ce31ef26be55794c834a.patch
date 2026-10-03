@@ -1,0 +1,35 @@
+From 1c605257faf3f2bb2f19ce31ef26be55794c834a Mon Sep 17 00:00:00 2001
+From: Kristiyan Kostadinov <crisbeto@abv.bg>
+Date: Fri, 22 Aug 2025 17:14:43 +0200
+Subject: [PATCH] test(cdk/a11y): clean up unnecessary imports in tests
+
+Removes imports from tests that aren't necessary anymore, because we're using standalone.
+---
+ src/cdk/a11y/aria-describer/aria-describer.spec.ts | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/src/cdk/a11y/aria-describer/aria-describer.spec.ts b/src/cdk/a11y/aria-describer/aria-describer.spec.ts
+index 787dc25d3a76..739f8e605e87 100644
+--- a/src/cdk/a11y/aria-describer/aria-describer.spec.ts
++++ b/src/cdk/a11y/aria-describer/aria-describer.spec.ts
+@@ -1,18 +1,14 @@
+ import {A11yModule, CDK_DESCRIBEDBY_HOST_ATTRIBUTE} from '../index';
+ import {AriaDescriber} from './aria-describer';
+ import {ComponentFixture, TestBed} from '@angular/core/testing';
+-import {Component, ElementRef, ViewChild, Provider, inject} from '@angular/core';
++import {Component, ElementRef, ViewChild, inject} from '@angular/core';
+ 
+ describe('AriaDescriber', () => {
+   let ariaDescriber: AriaDescriber;
+   let component: TestApp;
+   let fixture: ComponentFixture<TestApp>;
+ 
+-  function createFixture(providers: Provider[] = []) {
+-    TestBed.configureTestingModule({
+-      providers: [AriaDescriber, ...providers],
+-    });
+-
++  function createFixture() {
+     fixture = TestBed.createComponent(TestApp);
+     component = fixture.componentInstance;
+     ariaDescriber = component.ariaDescriber;

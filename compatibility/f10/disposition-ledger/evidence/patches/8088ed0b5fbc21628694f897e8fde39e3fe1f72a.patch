@@ -1,0 +1,219 @@
+From 8088ed0b5fbc21628694f897e8fde39e3fe1f72a Mon Sep 17 00:00:00 2001
+From: Kristiyan Kostadinov <crisbeto@users.noreply.github.com>
+Date: Tue, 25 Nov 2025 11:06:00 +0100
+Subject: [PATCH] Revert "feat(cdk/a11y): allow safe HTML to be passed to live
+ announcer" (#32403)
+
+This reverts commit 3b80628eca7c49edebfd489557e1edea91b45bd7.
+---
+ goldens/cdk/a11y/index.api.md                 | 12 ++----
+ src/cdk/a11y/BUILD.bazel                      |  1 -
+ .../live-announcer/live-announcer.spec.ts     | 21 ++--------
+ src/cdk/a11y/live-announcer/live-announcer.ts | 39 ++++---------------
+ 4 files changed, 15 insertions(+), 58 deletions(-)
+
+diff --git a/goldens/cdk/a11y/index.api.md b/goldens/cdk/a11y/index.api.md
+index 55978ba40ffe..0a68560adbda 100644
+--- a/goldens/cdk/a11y/index.api.md
++++ b/goldens/cdk/a11y/index.api.md
+@@ -18,7 +18,6 @@ import { OnChanges } from '@angular/core';
+ import { OnDestroy } from '@angular/core';
+ import { Provider } from '@angular/core';
+ import { QueryList } from '@angular/core';
+-import { SafeHtml } from '@angular/platform-browser';
+ import { Signal } from '@angular/core';
+ import { SimpleChanges } from '@angular/core';
+ import { Subject } from 'rxjs';
+@@ -405,10 +404,10 @@ export const LIVE_ANNOUNCER_ELEMENT_TOKEN: InjectionToken<HTMLElement | null>;
+ // @public (undocumented)
+ export class LiveAnnouncer implements OnDestroy {
+     constructor(...args: unknown[]);
+-    announce(message: LiveAnnouncerMessage): Promise<void>;
+-    announce(message: LiveAnnouncerMessage, politeness?: AriaLivePoliteness): Promise<void>;
+-    announce(message: LiveAnnouncerMessage, duration?: number): Promise<void>;
+-    announce(message: LiveAnnouncerMessage, politeness?: AriaLivePoliteness, duration?: number): Promise<void>;
++    announce(message: string): Promise<void>;
++    announce(message: string, politeness?: AriaLivePoliteness): Promise<void>;
++    announce(message: string, duration?: number): Promise<void>;
++    announce(message: string, politeness?: AriaLivePoliteness, duration?: number): Promise<void>;
+     clear(): void;
+     // (undocumented)
+     ngOnDestroy(): void;
+@@ -424,9 +423,6 @@ export interface LiveAnnouncerDefaultOptions {
+     politeness?: AriaLivePoliteness;
+ }
+ 
+-// @public
+-export type LiveAnnouncerMessage = string | SafeHtml;
+-
+ // @public @deprecated
+ export const MESSAGES_CONTAINER_ID = "cdk-describedby-message-container";
+ 
+diff --git a/src/cdk/a11y/BUILD.bazel b/src/cdk/a11y/BUILD.bazel
+index 29c2ab199e75..1ae4f86e5f44 100644
+--- a/src/cdk/a11y/BUILD.bazel
++++ b/src/cdk/a11y/BUILD.bazel
+@@ -18,7 +18,6 @@ ng_project(
+     deps = [
+         "//:node_modules/@angular/common",
+         "//:node_modules/@angular/core",
+-        "//:node_modules/@angular/platform-browser",
+         "//:node_modules/rxjs",
+         "//src:dev_mode_types",
+         "//src/cdk/coercion",
+diff --git a/src/cdk/a11y/live-announcer/live-announcer.spec.ts b/src/cdk/a11y/live-announcer/live-announcer.spec.ts
+index fd88a16f9a12..2ebbfa266c13 100644
+--- a/src/cdk/a11y/live-announcer/live-announcer.spec.ts
++++ b/src/cdk/a11y/live-announcer/live-announcer.spec.ts
+@@ -2,9 +2,9 @@ import {MutationObserverFactory} from '../../observers';
+ import {ComponentPortal} from '../../portal';
+ import {Component, inject, Injector} from '@angular/core';
+ import {ComponentFixture, TestBed, fakeAsync, flush, tick} from '@angular/core/testing';
+-import {By, DomSanitizer} from '@angular/platform-browser';
++import {By} from '@angular/platform-browser';
+ import {A11yModule} from '../index';
+-import {LiveAnnouncer, LiveAnnouncerMessage} from './live-announcer';
++import {LiveAnnouncer} from './live-announcer';
+ import {
+   AriaLivePoliteness,
+   LIVE_ANNOUNCER_DEFAULT_OPTIONS,
+@@ -202,19 +202,6 @@ describe('LiveAnnouncer', () => {
+       tick(100);
+       expect(modal.getAttribute('aria-owns')).toBe(`foo bar ${ariaLiveElement.id}`);
+     }));
+-
+-    it('should be able to announce safe HTML', fakeAsync(() => {
+-      const sanitizer = TestBed.inject(DomSanitizer);
+-      const message = sanitizer.bypassSecurityTrustHtml(
+-        '<span class="message" lang="fr">Bonjour</span>',
+-      );
+-      fixture.componentInstance.announce(message);
+-
+-      // This flushes our 100ms timeout for the screenreaders.
+-      tick(100);
+-
+-      expect(ariaLiveElement.querySelector('.message')?.textContent).toBe('Bonjour');
+-    }));
+   });
+ 
+   describe('with a custom element', () => {
+@@ -391,13 +378,13 @@ function getLiveElement(): Element {
+ }
+ 
+ @Component({
+-  template: `<button (click)="announce('Test')">Announce</button>`,
++  template: `<button (click)="announceText('Test')">Announce</button>`,
+   imports: [A11yModule],
+ })
+ class TestApp {
+   live = inject(LiveAnnouncer);
+ 
+-  announce(message: LiveAnnouncerMessage) {
++  announceText(message: string) {
+     this.live.announce(message);
+   }
+ }
+diff --git a/src/cdk/a11y/live-announcer/live-announcer.ts b/src/cdk/a11y/live-announcer/live-announcer.ts
+index 1e9188186c4c..b18a86f98576 100644
+--- a/src/cdk/a11y/live-announcer/live-announcer.ts
++++ b/src/cdk/a11y/live-announcer/live-announcer.ts
+@@ -17,9 +17,7 @@ import {
+   OnDestroy,
+   inject,
+   DOCUMENT,
+-  SecurityContext,
+ } from '@angular/core';
+-import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
+ import {Subscription} from 'rxjs';
+ import {
+   AriaLivePoliteness,
+@@ -27,13 +25,10 @@ import {
+   LIVE_ANNOUNCER_ELEMENT_TOKEN,
+   LIVE_ANNOUNCER_DEFAULT_OPTIONS,
+ } from './live-announcer-tokens';
+-import {_CdkPrivateStyleLoader, _VisuallyHiddenLoader, trustedHTMLFromString} from '../../private';
++import {_CdkPrivateStyleLoader, _VisuallyHiddenLoader} from '../../private';
+ 
+ let uniqueIds = 0;
+ 
+-/** Possible types for a message that can be announced by the `LiveAnnouncer`. */
+-export type LiveAnnouncerMessage = string | SafeHtml;
+-
+ @Injectable({providedIn: 'root'})
+ export class LiveAnnouncer implements OnDestroy {
+   private _ngZone = inject(NgZone);
+@@ -43,7 +38,6 @@ export class LiveAnnouncer implements OnDestroy {
+ 
+   private _liveElement: HTMLElement;
+   private _document = inject(DOCUMENT);
+-  private _sanitizer = inject(DomSanitizer);
+   private _previousTimeout: ReturnType<typeof setTimeout>;
+   private _currentPromise: Promise<void> | undefined;
+   private _currentResolve: (() => void) | undefined;
+@@ -60,7 +54,7 @@ export class LiveAnnouncer implements OnDestroy {
+    * @param message Message to be announced to the screen reader.
+    * @returns Promise that will be resolved when the message is added to the DOM.
+    */
+-  announce(message: LiveAnnouncerMessage): Promise<void>;
++  announce(message: string): Promise<void>;
+ 
+   /**
+    * Announces a message to screen readers.
+@@ -68,7 +62,7 @@ export class LiveAnnouncer implements OnDestroy {
+    * @param politeness The politeness of the announcer element.
+    * @returns Promise that will be resolved when the message is added to the DOM.
+    */
+-  announce(message: LiveAnnouncerMessage, politeness?: AriaLivePoliteness): Promise<void>;
++  announce(message: string, politeness?: AriaLivePoliteness): Promise<void>;
+ 
+   /**
+    * Announces a message to screen readers.
+@@ -78,7 +72,7 @@ export class LiveAnnouncer implements OnDestroy {
+    *   100ms after `announce` has been called.
+    * @returns Promise that will be resolved when the message is added to the DOM.
+    */
+-  announce(message: LiveAnnouncerMessage, duration?: number): Promise<void>;
++  announce(message: string, duration?: number): Promise<void>;
+ 
+   /**
+    * Announces a message to screen readers.
+@@ -89,13 +83,9 @@ export class LiveAnnouncer implements OnDestroy {
+    *   100ms after `announce` has been called.
+    * @returns Promise that will be resolved when the message is added to the DOM.
+    */
+-  announce(
+-    message: LiveAnnouncerMessage,
+-    politeness?: AriaLivePoliteness,
+-    duration?: number,
+-  ): Promise<void>;
++  announce(message: string, politeness?: AriaLivePoliteness, duration?: number): Promise<void>;
+ 
+-  announce(message: LiveAnnouncerMessage, ...args: any[]): Promise<void> {
++  announce(message: string, ...args: any[]): Promise<void> {
+     const defaultOptions = this._defaultOptions;
+     let politeness: AriaLivePoliteness | undefined;
+     let duration: number | undefined;
+@@ -137,22 +127,7 @@ export class LiveAnnouncer implements OnDestroy {
+ 
+       clearTimeout(this._previousTimeout);
+       this._previousTimeout = setTimeout(() => {
+-        if (!message || typeof message === 'string') {
+-          this._liveElement.textContent = message;
+-        } else {
+-          const cleanMessage = this._sanitizer.sanitize(SecurityContext.HTML, message);
+-
+-          if (cleanMessage === null && (typeof ngDevMode === 'undefined' || ngDevMode)) {
+-            throw new Error(
+-              `The message provided to LiveAnnouncer was not trusted as safe HTML by ` +
+-                `Angular's DomSanitizer. Attempted message was "${message}".`,
+-            );
+-          }
+-
+-          this._liveElement.innerHTML = trustedHTMLFromString(
+-            cleanMessage || '',
+-          ) as unknown as string;
+-        }
++        this._liveElement.textContent = message;
+ 
+         if (typeof duration === 'number') {
+           this._previousTimeout = setTimeout(() => this.clear(), duration);

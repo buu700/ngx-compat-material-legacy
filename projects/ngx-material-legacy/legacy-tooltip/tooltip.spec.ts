@@ -40,7 +40,7 @@ import {
   LegacyTooltipPosition,
   LegacyTooltipTouchGestures,
 } from './index';
-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {LegacyNoopAnimationsModule} from '../internal/testing/owned-animation-modules';
 
 const initialTooltipMessage = 'initial tooltip message';
 
@@ -306,7 +306,7 @@ describe('MatTooltip', () => {
     it('should be able to disable tooltip interactivity', fakeAsync(() => {
       TestBed.resetTestingModule()
         .configureTestingModule({
-          imports: [MatLegacyTooltipModule, OverlayModule, NoopAnimationsModule],
+          imports: [MatLegacyTooltipModule, OverlayModule, LegacyNoopAnimationsModule],
           declarations: [TooltipDemoWithoutPositionBinding],
           providers: [
             {

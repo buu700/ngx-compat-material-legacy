@@ -1,0 +1,468 @@
+From 487c4537847c68638811063adff7c59d8a5d6f7a Mon Sep 17 00:00:00 2001
+From: Kristiyan Kostadinov <crisbeto@users.noreply.github.com>
+Date: Mon, 13 Nov 2023 15:21:39 +0100
+Subject: [PATCH] docs(material/dialog): use standalone imports in docs
+ (#28110)
+
+Now that `@angular/material/dialog` was reworked for standalone, we can update the docs not to have to import the `MatDialogModule` anymore.
+---
+ .../dialog-animations-example.ts              | 13 ++++++++---
+ .../dialog/dialog-data/dialog-data-example.ts | 11 ++++++---
+ .../dialog-elements-example.ts                | 12 +++++++---
+ .../dialog-from-menu-example.ts               | 11 ++++++---
+ .../dialog-harness-example.spec.ts            |  3 +--
+ .../dialog-harness/dialog-harness-example.ts  |  3 +--
+ .../dialog-overview-example.ts                | 23 ++++++++++++++++---
+ src/dev-app/autocomplete/autocomplete-demo.ts | 12 ++--------
+ src/dev-app/dialog/dialog-demo.ts             | 15 ++++++++----
+ src/dev-app/focus-trap/focus-trap-demo.ts     | 11 ++++++---
+ src/dev-app/slider/slider-demo.ts             | 10 +++++---
+ .../dialog/testing/dialog-harness.spec.ts     | 13 ++++++++---
+ .../kitchen-sink/kitchen-sink.ts              |  3 +--
+ 13 files changed, 95 insertions(+), 45 deletions(-)
+
+diff --git a/src/components-examples/material/dialog/dialog-animations/dialog-animations-example.ts b/src/components-examples/material/dialog/dialog-animations/dialog-animations-example.ts
+index 52945c20f35f..5d4a10edd112 100644
+--- a/src/components-examples/material/dialog/dialog-animations/dialog-animations-example.ts
++++ b/src/components-examples/material/dialog/dialog-animations/dialog-animations-example.ts
+@@ -1,5 +1,12 @@
+ import {Component} from '@angular/core';
+-import {MatDialog, MatDialogRef, MatDialogModule} from '@angular/material/dialog';
++import {
++  MatDialog,
++  MatDialogRef,
++  MatDialogActions,
++  MatDialogClose,
++  MatDialogTitle,
++  MatDialogContent,
++} from '@angular/material/dialog';
+ import {MatButtonModule} from '@angular/material/button';
+ 
+ /**
+@@ -10,7 +17,7 @@ import {MatButtonModule} from '@angular/material/button';
+   styleUrls: ['dialog-animations-example.css'],
+   templateUrl: 'dialog-animations-example.html',
+   standalone: true,
+-  imports: [MatButtonModule, MatDialogModule],
++  imports: [MatButtonModule],
+ })
+ export class DialogAnimationsExample {
+   constructor(public dialog: MatDialog) {}
+@@ -28,7 +35,7 @@ export class DialogAnimationsExample {
+   selector: 'dialog-animations-example-dialog',
+   templateUrl: 'dialog-animations-example-dialog.html',
+   standalone: true,
+-  imports: [MatDialogModule, MatButtonModule],
++  imports: [MatButtonModule, MatDialogActions, MatDialogClose, MatDialogTitle, MatDialogContent],
+ })
+ export class DialogAnimationsExampleDialog {
+   constructor(public dialogRef: MatDialogRef<DialogAnimationsExampleDialog>) {}
+diff --git a/src/components-examples/material/dialog/dialog-data/dialog-data-example.ts b/src/components-examples/material/dialog/dialog-data/dialog-data-example.ts
+index 4b604892a7b2..edbe500323ec 100644
+--- a/src/components-examples/material/dialog/dialog-data/dialog-data-example.ts
++++ b/src/components-examples/material/dialog/dialog-data/dialog-data-example.ts
+@@ -1,5 +1,10 @@
+ import {Component, Inject} from '@angular/core';
+-import {MatDialog, MAT_DIALOG_DATA, MatDialogModule} from '@angular/material/dialog';
++import {
++  MatDialog,
++  MAT_DIALOG_DATA,
++  MatDialogTitle,
++  MatDialogContent,
++} from '@angular/material/dialog';
+ import {MatButtonModule} from '@angular/material/button';
+ 
+ export interface DialogData {
+@@ -13,7 +18,7 @@ export interface DialogData {
+   selector: 'dialog-data-example',
+   templateUrl: 'dialog-data-example.html',
+   standalone: true,
+-  imports: [MatButtonModule, MatDialogModule],
++  imports: [MatButtonModule],
+ })
+ export class DialogDataExample {
+   constructor(public dialog: MatDialog) {}
+@@ -31,7 +36,7 @@ export class DialogDataExample {
+   selector: 'dialog-data-example-dialog',
+   templateUrl: 'dialog-data-example-dialog.html',
+   standalone: true,
+-  imports: [MatDialogModule],
++  imports: [MatDialogTitle, MatDialogContent],
+ })
+ export class DialogDataExampleDialog {
+   constructor(@Inject(MAT_DIALOG_DATA) public data: DialogData) {}
+diff --git a/src/components-examples/material/dialog/dialog-elements/dialog-elements-example.ts b/src/components-examples/material/dialog/dialog-elements/dialog-elements-example.ts
+index 31622570d141..9bffc07754f0 100644
+--- a/src/components-examples/material/dialog/dialog-elements/dialog-elements-example.ts
++++ b/src/components-examples/material/dialog/dialog-elements/dialog-elements-example.ts
+@@ -1,5 +1,11 @@
+ import {Component} from '@angular/core';
+-import {MatDialog, MatDialogModule} from '@angular/material/dialog';
++import {
++  MatDialog,
++  MatDialogActions,
++  MatDialogClose,
++  MatDialogContent,
++  MatDialogTitle,
++} from '@angular/material/dialog';
+ import {MatButtonModule} from '@angular/material/button';
+ 
+ /**
+@@ -9,7 +15,7 @@ import {MatButtonModule} from '@angular/material/button';
+   selector: 'dialog-elements-example',
+   templateUrl: 'dialog-elements-example.html',
+   standalone: true,
+-  imports: [MatButtonModule, MatDialogModule],
++  imports: [MatButtonModule],
+ })
+ export class DialogElementsExample {
+   constructor(public dialog: MatDialog) {}
+@@ -23,6 +29,6 @@ export class DialogElementsExample {
+   selector: 'dialog-elements-example-dialog',
+   templateUrl: 'dialog-elements-example-dialog.html',
+   standalone: true,
+-  imports: [MatDialogModule, MatButtonModule],
++  imports: [MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, MatButtonModule],
+ })
+ export class DialogElementsExampleDialog {}
+diff --git a/src/components-examples/material/dialog/dialog-from-menu/dialog-from-menu-example.ts b/src/components-examples/material/dialog/dialog-from-menu/dialog-from-menu-example.ts
+index 91d46cf29262..ec26842ee4b4 100644
+--- a/src/components-examples/material/dialog/dialog-from-menu/dialog-from-menu-example.ts
++++ b/src/components-examples/material/dialog/dialog-from-menu/dialog-from-menu-example.ts
+@@ -1,5 +1,10 @@
+ import {Component, ViewChild} from '@angular/core';
+-import {MatDialog, MatDialogModule} from '@angular/material/dialog';
++import {
++  MatDialog,
++  MatDialogActions,
++  MatDialogClose,
++  MatDialogContent,
++} from '@angular/material/dialog';
+ import {MatMenuTrigger, MatMenuModule} from '@angular/material/menu';
+ import {MatButtonModule} from '@angular/material/button';
+ /**
+@@ -9,7 +14,7 @@ import {MatButtonModule} from '@angular/material/button';
+   selector: 'dialog-from-menu-example',
+   templateUrl: 'dialog-from-menu-example.html',
+   standalone: true,
+-  imports: [MatButtonModule, MatMenuModule, MatDialogModule],
++  imports: [MatButtonModule, MatMenuModule],
+ })
+ export class DialogFromMenuExample {
+   @ViewChild('menuTrigger') menuTrigger: MatMenuTrigger;
+@@ -31,6 +36,6 @@ export class DialogFromMenuExample {
+   selector: 'dialog-from-menu-dialog',
+   templateUrl: 'dialog-from-menu-example-dialog.html',
+   standalone: true,
+-  imports: [MatDialogModule, MatButtonModule],
++  imports: [MatDialogContent, MatDialogActions, MatDialogClose, MatButtonModule],
+ })
+ export class DialogFromMenuExampleDialog {}
+diff --git a/src/components-examples/material/dialog/dialog-harness/dialog-harness-example.spec.ts b/src/components-examples/material/dialog/dialog-harness/dialog-harness-example.spec.ts
+index e189230450c7..2ecb060ed113 100644
+--- a/src/components-examples/material/dialog/dialog-harness/dialog-harness-example.spec.ts
++++ b/src/components-examples/material/dialog/dialog-harness/dialog-harness-example.spec.ts
+@@ -4,7 +4,6 @@ import {MatDialogHarness} from '@angular/material/dialog/testing';
+ import {HarnessLoader} from '@angular/cdk/testing';
+ import {DialogHarnessExample} from './dialog-harness-example';
+ import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+-import {MatDialogModule} from '@angular/material/dialog';
+ 
+ describe('DialogHarnessExample', () => {
+   let fixture: ComponentFixture<DialogHarnessExample>;
+@@ -12,7 +11,7 @@ describe('DialogHarnessExample', () => {
+ 
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+-      imports: [MatDialogModule, NoopAnimationsModule],
++      imports: [NoopAnimationsModule],
+     }).compileComponents();
+     fixture = TestBed.createComponent(DialogHarnessExample);
+     fixture.detectChanges();
+diff --git a/src/components-examples/material/dialog/dialog-harness/dialog-harness-example.ts b/src/components-examples/material/dialog/dialog-harness/dialog-harness-example.ts
+index befd3295ab34..59b73d324af9 100644
+--- a/src/components-examples/material/dialog/dialog-harness/dialog-harness-example.ts
++++ b/src/components-examples/material/dialog/dialog-harness/dialog-harness-example.ts
+@@ -1,5 +1,5 @@
+ import {Component, TemplateRef, ViewChild} from '@angular/core';
+-import {MatDialog, MatDialogConfig, MatDialogModule} from '@angular/material/dialog';
++import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
+ 
+ /**
+  * @title Testing with MatDialogHarness
+@@ -8,7 +8,6 @@ import {MatDialog, MatDialogConfig, MatDialogModule} from '@angular/material/dia
+   selector: 'dialog-harness-example',
+   templateUrl: 'dialog-harness-example.html',
+   standalone: true,
+-  imports: [MatDialogModule],
+ })
+ export class DialogHarnessExample {
+   @ViewChild(TemplateRef) dialogTemplate: TemplateRef<any>;
+diff --git a/src/components-examples/material/dialog/dialog-overview/dialog-overview-example.ts b/src/components-examples/material/dialog/dialog-overview/dialog-overview-example.ts
+index 84a6739e3ad9..93812eb3f4eb 100644
+--- a/src/components-examples/material/dialog/dialog-overview/dialog-overview-example.ts
++++ b/src/components-examples/material/dialog/dialog-overview/dialog-overview-example.ts
+@@ -1,5 +1,13 @@
+ import {Component, Inject} from '@angular/core';
+-import {MatDialog, MAT_DIALOG_DATA, MatDialogRef, MatDialogModule} from '@angular/material/dialog';
++import {
++  MatDialog,
++  MAT_DIALOG_DATA,
++  MatDialogRef,
++  MatDialogTitle,
++  MatDialogContent,
++  MatDialogActions,
++  MatDialogClose,
++} from '@angular/material/dialog';
+ import {MatButtonModule} from '@angular/material/button';
+ import {FormsModule} from '@angular/forms';
+ import {MatInputModule} from '@angular/material/input';
+@@ -17,7 +25,7 @@ export interface DialogData {
+   selector: 'dialog-overview-example',
+   templateUrl: 'dialog-overview-example.html',
+   standalone: true,
+-  imports: [MatFormFieldModule, MatInputModule, FormsModule, MatButtonModule, MatDialogModule],
++  imports: [MatFormFieldModule, MatInputModule, FormsModule, MatButtonModule],
+ })
+ export class DialogOverviewExample {
+   animal: string;
+@@ -41,7 +49,16 @@ export class DialogOverviewExample {
+   selector: 'dialog-overview-example-dialog',
+   templateUrl: 'dialog-overview-example-dialog.html',
+   standalone: true,
+-  imports: [MatDialogModule, MatFormFieldModule, MatInputModule, FormsModule, MatButtonModule],
++  imports: [
++    MatFormFieldModule,
++    MatInputModule,
++    FormsModule,
++    MatButtonModule,
++    MatDialogTitle,
++    MatDialogContent,
++    MatDialogActions,
++    MatDialogClose,
++  ],
+ })
+ export class DialogOverviewExampleDialog {
+   constructor(
+diff --git a/src/dev-app/autocomplete/autocomplete-demo.ts b/src/dev-app/autocomplete/autocomplete-demo.ts
+index af551041dcde..0dab0a9af026 100644
+--- a/src/dev-app/autocomplete/autocomplete-demo.ts
++++ b/src/dev-app/autocomplete/autocomplete-demo.ts
+@@ -15,7 +15,7 @@ import {MatCardModule} from '@angular/material/card';
+ import {MatCheckboxModule} from '@angular/material/checkbox';
+ import {MatInputModule} from '@angular/material/input';
+ import {ThemePalette} from '@angular/material/core';
+-import {MatDialog, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
++import {MatDialog, MatDialogRef} from '@angular/material/dialog';
+ 
+ export interface State {
+   code: string;
+@@ -42,7 +42,6 @@ type DisableStateOption = 'none' | 'first-middle-last' | 'all';
+     MatButtonModule,
+     MatCardModule,
+     MatCheckboxModule,
+-    MatDialogModule,
+     MatInputModule,
+     ReactiveFormsModule,
+   ],
+@@ -248,14 +247,7 @@ export class AutocompleteDemo {
+   `,
+   ],
+   standalone: true,
+-  imports: [
+-    CommonModule,
+-    FormsModule,
+-    MatAutocompleteModule,
+-    MatButtonModule,
+-    MatDialogModule,
+-    MatInputModule,
+-  ],
++  imports: [CommonModule, FormsModule, MatAutocompleteModule, MatButtonModule, MatInputModule],
+ })
+ export class AutocompleteDemoExampleDialog {
+   constructor(public dialogRef: MatDialogRef<AutocompleteDemoExampleDialog>) {}
+diff --git a/src/dev-app/dialog/dialog-demo.ts b/src/dev-app/dialog/dialog-demo.ts
+index aab8a6680829..c7f36cfe3252 100644
+--- a/src/dev-app/dialog/dialog-demo.ts
++++ b/src/dev-app/dialog/dialog-demo.ts
+@@ -11,9 +11,12 @@ import {Component, Inject, TemplateRef, ViewChild, ViewEncapsulation} from '@ang
+ import {
+   MAT_DIALOG_DATA,
+   MatDialog,
++  MatDialogActions,
++  MatDialogClose,
+   MatDialogConfig,
++  MatDialogContent,
+   MatDialogRef,
+-  MatDialogModule,
++  MatDialogTitle,
+ } from '@angular/material/dialog';
+ import {FormsModule} from '@angular/forms';
+ import {MatButtonModule} from '@angular/material/button';
+@@ -39,7 +42,6 @@ const defaultDialogConfig = new MatDialogConfig();
+     MatButtonModule,
+     MatCardModule,
+     MatCheckboxModule,
+-    MatDialogModule,
+     MatFormFieldModule,
+     MatInputModule,
+     MatSelectModule,
+@@ -76,7 +78,10 @@ export class DialogDemo {
+ 
+   @ViewChild(TemplateRef) template: TemplateRef<any>;
+ 
+-  constructor(public dialog: MatDialog, @Inject(DOCUMENT) doc: any) {
++  constructor(
++    public dialog: MatDialog,
++    @Inject(DOCUMENT) doc: any,
++  ) {
+     // Possible useful example for the open and closeAll events.
+     // Adding a class to the body if a dialog opens and
+     // removing it after all open dialogs are closed
+@@ -230,7 +235,7 @@ export class JazzDialog {
+     </mat-dialog-actions>
+   `,
+   standalone: true,
+-  imports: [MatDialogModule, MatButtonModule],
++  imports: [MatButtonModule, MatDialogTitle, MatDialogContent, MatDialogClose, MatDialogActions],
+ })
+ export class ContentElementDialog {
+   actionsAlignment: 'start' | 'center' | 'end';
+@@ -266,6 +271,6 @@ export class ContentElementDialog {
+     </mat-dialog-actions>
+   `,
+   standalone: true,
+-  imports: [MatDialogModule, MatButtonModule],
++  imports: [MatButtonModule, MatDialogTitle, MatDialogContent, MatDialogClose, MatDialogActions],
+ })
+ export class IFrameDialog {}
+diff --git a/src/dev-app/focus-trap/focus-trap-demo.ts b/src/dev-app/focus-trap/focus-trap-demo.ts
+index 995f3ed9656d..d6731cb57151 100644
+--- a/src/dev-app/focus-trap/focus-trap-demo.ts
++++ b/src/dev-app/focus-trap/focus-trap-demo.ts
+@@ -16,7 +16,13 @@ import {
+   QueryList,
+ } from '@angular/core';
+ import {A11yModule, CdkTrapFocus} from '@angular/cdk/a11y';
+-import {MatDialog, MatDialogModule} from '@angular/material/dialog';
++import {
++  MatDialog,
++  MatDialogActions,
++  MatDialogClose,
++  MatDialogContent,
++  MatDialogTitle,
++} from '@angular/material/dialog';
+ import {_supportsShadowDom} from '@angular/cdk/platform';
+ import {CommonModule} from '@angular/common';
+ import {MatButtonModule} from '@angular/material/button';
+@@ -42,7 +48,6 @@ export class FocusTrapShadowDomDemo {}
+     CommonModule,
+     MatButtonModule,
+     MatCardModule,
+-    MatDialogModule,
+     MatToolbarModule,
+     FocusTrapShadowDomDemo,
+   ],
+@@ -91,7 +96,7 @@ let dialogCount = 0;
+   styleUrls: ['focus-trap-dialog-demo.css'],
+   templateUrl: 'focus-trap-dialog-demo.html',
+   standalone: true,
+-  imports: [MatDialogModule],
++  imports: [MatDialogTitle, MatDialogContent, MatDialogClose, MatDialogActions],
+ })
+ export class FocusTrapDialogDemo {
+   id = dialogCount++;
+diff --git a/src/dev-app/slider/slider-demo.ts b/src/dev-app/slider/slider-demo.ts
+index 3f74bda5e271..e27f681ba74b 100644
+--- a/src/dev-app/slider/slider-demo.ts
++++ b/src/dev-app/slider/slider-demo.ts
+@@ -12,7 +12,12 @@ import {MatSliderModule} from '@angular/material/slider';
+ import {MatTabsModule} from '@angular/material/tabs';
+ import {MatButtonToggleModule} from '@angular/material/button-toggle';
+ import {MatCheckboxModule} from '@angular/material/checkbox';
+-import {MatDialog, MatDialogModule, MAT_DIALOG_DATA} from '@angular/material/dialog';
++import {
++  MatDialog,
++  MAT_DIALOG_DATA,
++  MatDialogTitle,
++  MatDialogContent,
++} from '@angular/material/dialog';
+ import {MatButtonModule} from '@angular/material/button';
+ import {ThemePalette} from '@angular/material/core';
+ 
+@@ -31,7 +36,6 @@ interface DialogData {
+     MatButtonModule,
+     MatButtonToggleModule,
+     MatCheckboxModule,
+-    MatDialogModule,
+     MatSliderModule,
+     MatTabsModule,
+     ReactiveFormsModule,
+@@ -131,7 +135,7 @@ export class SliderDemo {
+   </div>
+   `,
+   standalone: true,
+-  imports: [MatDialogModule, MatSliderModule],
++  imports: [MatSliderModule, MatDialogTitle, MatDialogContent],
+ })
+ export class SliderDialogDemo {
+   constructor(@Inject(MAT_DIALOG_DATA) public data: DialogData) {}
+diff --git a/src/material/dialog/testing/dialog-harness.spec.ts b/src/material/dialog/testing/dialog-harness.spec.ts
+index 237691f52c91..ddd3de3dad79 100644
+--- a/src/material/dialog/testing/dialog-harness.spec.ts
++++ b/src/material/dialog/testing/dialog-harness.spec.ts
+@@ -2,7 +2,13 @@ import {Component, TemplateRef, ViewChild} from '@angular/core';
+ import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {HarnessLoader} from '@angular/cdk/testing';
+ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+-import {MatDialog, MatDialogModule, MatDialogConfig} from '@angular/material/dialog';
++import {
++  MatDialog,
++  MatDialogActions,
++  MatDialogConfig,
++  MatDialogContent,
++  MatDialogTitle,
++} from '@angular/material/dialog';
+ import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MatDialogHarness} from './dialog-harness';
+ 
+@@ -12,8 +18,7 @@ describe('MatDialogHarness', () => {
+ 
+   beforeEach(async () => {
+     await TestBed.configureTestingModule({
+-      imports: [MatDialogModule, NoopAnimationsModule],
+-      declarations: [DialogHarnessTest],
++      imports: [NoopAnimationsModule],
+     }).compileComponents();
+ 
+     fixture = TestBed.createComponent(DialogHarnessTest);
+@@ -117,6 +122,8 @@ describe('MatDialogHarness', () => {
+     </div>
+   </ng-template>
+   `,
++  standalone: true,
++  imports: [MatDialogTitle, MatDialogContent, MatDialogActions],
+ })
+ class DialogHarnessTest {
+   @ViewChild(TemplateRef) dialogTmpl: TemplateRef<any>;
+diff --git a/src/universal-app/kitchen-sink/kitchen-sink.ts b/src/universal-app/kitchen-sink/kitchen-sink.ts
+index 3331925e8ee7..ee0a82360597 100644
+--- a/src/universal-app/kitchen-sink/kitchen-sink.ts
++++ b/src/universal-app/kitchen-sink/kitchen-sink.ts
+@@ -12,7 +12,7 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
+ import {MatChipsModule} from '@angular/material/chips';
+ import {MatTableModule} from '@angular/material/table';
+ import {MatDatepickerModule} from '@angular/material/datepicker';
+-import {MatDialogModule, MatDialog} from '@angular/material/dialog';
++import {MatDialog} from '@angular/material/dialog';
+ import {MatExpansionModule} from '@angular/material/expansion';
+ import {MatGridListModule} from '@angular/material/grid-list';
+ import {MatIconModule} from '@angular/material/icon';
+@@ -75,7 +75,6 @@ export class TestEntryComponent {}
+     MatCheckboxModule,
+     MatChipsModule,
+     MatDatepickerModule,
+-    MatDialogModule,
+     MatDividerModule,
+     MatFormFieldModule,
+     MatGridListModule,

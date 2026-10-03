@@ -1,0 +1,145 @@
+From 8b34fb7e8d6276de269a9c1dc2507458eaf7d594 Mon Sep 17 00:00:00 2001
+From: Kristiyan Kostadinov <crisbeto@users.noreply.github.com>
+Date: Mon, 26 Aug 2024 22:27:24 +0200
+Subject: [PATCH] fix(cdk/tree): capturing focus on load (#29641)
+
+The tree implements a roving tabindex which needs to have an initial item with `tabindex = 0` to work correctly. This happens by waiting for the data to be initialized in the `TreeKeyManager` and focusing the active/first item. The problem is that this ends up stealing focus on load. We didn't notice this issue in the demo app, because all the tree are `visibility: hidden` since they're inside closed `mat-expansion-panel`, but the issue is visible in the docs site.
+
+These changes resolve the issue by setting the `tabindex` without actually moving focus.
+
+Fixes #29628.
+---
+ .../key-manager/tree-key-manager-strategy.ts  |  5 +++
+ src/cdk/a11y/key-manager/tree-key-manager.ts  | 34 ++++++++++++-------
+ src/cdk/tree/tree.ts                          |  6 ++++
+ tools/public_api_guard/cdk/a11y.md            |  1 +
+ tools/public_api_guard/cdk/tree.md            |  1 +
+ 5 files changed, 35 insertions(+), 12 deletions(-)
+
+diff --git a/src/cdk/a11y/key-manager/tree-key-manager-strategy.ts b/src/cdk/a11y/key-manager/tree-key-manager-strategy.ts
+index 084f031462ae..f04fcec0d420 100644
+--- a/src/cdk/a11y/key-manager/tree-key-manager-strategy.ts
++++ b/src/cdk/a11y/key-manager/tree-key-manager-strategy.ts
+@@ -44,6 +44,11 @@ export interface TreeKeyManagerItem {
+    * Unfocus the item. This should remove the focus state.
+    */
+   unfocus(): void;
++
++  /**
++   * Sets the item to be focusable without actually focusing it.
++   */
++  makeFocusable?(): void;
+ }
+ 
+ /**
+diff --git a/src/cdk/a11y/key-manager/tree-key-manager.ts b/src/cdk/a11y/key-manager/tree-key-manager.ts
+index 23274a3c839f..1b0f19be5526 100644
+--- a/src/cdk/a11y/key-manager/tree-key-manager.ts
++++ b/src/cdk/a11y/key-manager/tree-key-manager.ts
+@@ -57,24 +57,34 @@ export class TreeKeyManager<T extends TreeKeyManagerItem> implements TreeKeyMana
+ 
+   private _hasInitialFocused = false;
+ 
+-  private _initialFocus() {
+-    if (this._hasInitialFocused) {
++  private _initializeFocus(): void {
++    if (this._hasInitialFocused || this._items.length === 0) {
+       return;
+     }
+ 
+-    if (!this._items.length) {
+-      return;
+-    }
+-
+-    let focusIndex = 0;
++    let activeIndex = 0;
+     for (let i = 0; i < this._items.length; i++) {
+       if (!this._skipPredicateFn(this._items[i]) && !this._isItemDisabled(this._items[i])) {
+-        focusIndex = i;
++        activeIndex = i;
+         break;
+       }
+     }
+ 
+-    this.focusItem(focusIndex);
++    const activeItem = this._items[activeIndex];
++
++    // Use `makeFocusable` here, because we want the item to just be focusable, not actually
++    // capture the focus since the user isn't interacting with it. See #29628.
++    if (activeItem.makeFocusable) {
++      this._activeItem?.unfocus();
++      this._activeItemIndex = activeIndex;
++      this._activeItem = activeItem;
++      this._typeahead?.setCurrentSelectedItemIndex(activeIndex);
++      activeItem.makeFocusable();
++    } else {
++      // Backwards compatibility for items that don't implement `makeFocusable`.
++      this.focusItem(activeIndex);
++    }
++
+     this._hasInitialFocused = true;
+   }
+ 
+@@ -96,18 +106,18 @@ export class TreeKeyManager<T extends TreeKeyManagerItem> implements TreeKeyMana
+         this._items = newItems.toArray();
+         this._typeahead?.setItems(this._items);
+         this._updateActiveItemIndex(this._items);
+-        this._initialFocus();
++        this._initializeFocus();
+       });
+     } else if (isObservable(items)) {
+       items.subscribe(newItems => {
+         this._items = newItems;
+         this._typeahead?.setItems(newItems);
+         this._updateActiveItemIndex(newItems);
+-        this._initialFocus();
++        this._initializeFocus();
+       });
+     } else {
+       this._items = items;
+-      this._initialFocus();
++      this._initializeFocus();
+     }
+ 
+     if (typeof config.shouldActivationFollowFocus === 'boolean') {
+diff --git a/src/cdk/tree/tree.ts b/src/cdk/tree/tree.ts
+index 9e1bd40e04f7..c604ddaf2838 100644
+--- a/src/cdk/tree/tree.ts
++++ b/src/cdk/tree/tree.ts
+@@ -1414,6 +1414,12 @@ export class CdkTreeNode<T, K = T> implements OnDestroy, OnInit, TreeKeyManagerI
+     }
+   }
+ 
++  /** Makes the node focusable. Implemented for TreeKeyManagerItem. */
++  makeFocusable(): void {
++    this._tabindex = 0;
++    this._changeDetectorRef.markForCheck();
++  }
++
+   _focusItem() {
+     if (this.isDisabled) {
+       return;
+diff --git a/tools/public_api_guard/cdk/a11y.md b/tools/public_api_guard/cdk/a11y.md
+index e07a7d6a6f3b..dc743ad41854 100644
+--- a/tools/public_api_guard/cdk/a11y.md
++++ b/tools/public_api_guard/cdk/a11y.md
+@@ -505,6 +505,7 @@ export interface TreeKeyManagerItem {
+     getParent(): TreeKeyManagerItem | null;
+     isDisabled?: (() => boolean) | boolean;
+     isExpanded: (() => boolean) | boolean;
++    makeFocusable?(): void;
+     unfocus(): void;
+ }
+ 
+diff --git a/tools/public_api_guard/cdk/tree.md b/tools/public_api_guard/cdk/tree.md
+index f31f1332f7ed..482af800bcf7 100644
+--- a/tools/public_api_guard/cdk/tree.md
++++ b/tools/public_api_guard/cdk/tree.md
+@@ -188,6 +188,7 @@ export class CdkTreeNode<T, K = T> implements OnDestroy, OnInit, TreeKeyManagerI
+     get isLeafNode(): boolean;
+     // (undocumented)
+     get level(): number;
++    makeFocusable(): void;
+     static mostRecentTreeNode: CdkTreeNode<any> | null;
+     // (undocumented)
+     static ngAcceptInputType_isDisabled: unknown;

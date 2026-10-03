@@ -1,0 +1,116 @@
+From 6dc2f3ba50ba4a42708b32c8ae67461bdf982eaa Mon Sep 17 00:00:00 2001
+From: Kristiyan Kostadinov <crisbeto@users.noreply.github.com>
+Date: Tue, 1 Jul 2025 07:15:21 +0200
+Subject: [PATCH] fix(cdk/a11y): allow mixed types to be passed into
+ setActiveItem (#31462)
+
+This is a follow-up to https://github.com/angular/components/pull/31371#discussion_r2163199446. `ListKeyManager.setActiveItem` supports both a reference to an item or an index, however there's no override that allows `T | number` which can be inconvenient.
+
+These changes add extra overrides to resolve the issue.
+---
+ goldens/cdk/a11y/index.api.md                            | 3 +++
+ src/cdk/a11y/key-manager/activedescendant-key-manager.ts | 7 +++++++
+ src/cdk/a11y/key-manager/focus-key-manager.ts            | 6 ++++++
+ src/cdk/a11y/key-manager/list-key-manager.ts             | 6 ++++++
+ src/cdk/menu/menu-base.ts                                | 8 +-------
+ 5 files changed, 23 insertions(+), 7 deletions(-)
+
+diff --git a/goldens/cdk/a11y/index.api.md b/goldens/cdk/a11y/index.api.md
+index ecd9b7654403..b084dded37e2 100644
+--- a/goldens/cdk/a11y/index.api.md
++++ b/goldens/cdk/a11y/index.api.md
+@@ -37,6 +37,7 @@ export class A11yModule {
+ export class ActiveDescendantKeyManager<T> extends ListKeyManager<Highlightable & T> {
+     setActiveItem(index: number): void;
+     setActiveItem(item: T): void;
++    setActiveItem(item: T | number): void;
+ }
+ 
+ // @public
+@@ -169,6 +170,7 @@ export interface FocusableOption extends ListKeyManagerOption {
+ export class FocusKeyManager<T> extends ListKeyManager<FocusableOption & T> {
+     setActiveItem(index: number): void;
+     setActiveItem(item: T): void;
++    setActiveItem(item: T | number): void;
+     setFocusOrigin(origin: FocusOrigin): this;
+ }
+ 
+@@ -366,6 +368,7 @@ export class ListKeyManager<T extends ListKeyManagerOption> {
+     onKeydown(event: KeyboardEvent): void;
+     setActiveItem(index: number): void;
+     setActiveItem(item: T): void;
++    setActiveItem(item: T | number): void;
+     setFirstItemActive(): void;
+     setLastItemActive(): void;
+     setNextItemActive(): void;
+diff --git a/src/cdk/a11y/key-manager/activedescendant-key-manager.ts b/src/cdk/a11y/key-manager/activedescendant-key-manager.ts
+index 3bc4d85606c0..d02fb120e58b 100644
+--- a/src/cdk/a11y/key-manager/activedescendant-key-manager.ts
++++ b/src/cdk/a11y/key-manager/activedescendant-key-manager.ts
+@@ -37,6 +37,13 @@ export class ActiveDescendantKeyManager<T> extends ListKeyManager<Highlightable
+    * @param item Item to be set as active.
+    */
+   override setActiveItem(item: T): void;
++  /**
++   * Sets the active item to the item to the specified one and adds the
++   * active styles to the it. Also removes active styles from the
++   * previously active item.
++   * @param item Item to be set as active.
++   */
++  override setActiveItem(item: T | number): void;
+ 
+   override setActiveItem(index: any): void {
+     if (this.activeItem) {
+diff --git a/src/cdk/a11y/key-manager/focus-key-manager.ts b/src/cdk/a11y/key-manager/focus-key-manager.ts
+index 609ff9604607..4e2a25f64226 100644
+--- a/src/cdk/a11y/key-manager/focus-key-manager.ts
++++ b/src/cdk/a11y/key-manager/focus-key-manager.ts
+@@ -44,6 +44,12 @@ export class FocusKeyManager<T> extends ListKeyManager<FocusableOption & T> {
+    */
+   override setActiveItem(item: T): void;
+ 
++  /**
++   * Sets the active item to the item that is specified and focuses it.
++   * @param item Item to be set as active.
++   */
++  override setActiveItem(item: T | number): void;
++
+   override setActiveItem(item: any): void {
+     super.setActiveItem(item);
+ 
+diff --git a/src/cdk/a11y/key-manager/list-key-manager.ts b/src/cdk/a11y/key-manager/list-key-manager.ts
+index c52ebb9697e8..f2f9b398e462 100644
+--- a/src/cdk/a11y/key-manager/list-key-manager.ts
++++ b/src/cdk/a11y/key-manager/list-key-manager.ts
+@@ -203,6 +203,12 @@ export class ListKeyManager<T extends ListKeyManagerOption> {
+    */
+   setActiveItem(item: T): void;
+ 
++  /**
++   * Sets the active item to the specified item.
++   * @param item The item to be set as active.
++   */
++  setActiveItem(item: T | number): void;
++
+   setActiveItem(item: any): void {
+     const previousActiveItem = this._activeItem();
+ 
+diff --git a/src/cdk/menu/menu-base.ts b/src/cdk/menu/menu-base.ts
+index 7b0184c6ed9e..3fbe591977cd 100644
+--- a/src/cdk/menu/menu-base.ts
++++ b/src/cdk/menu/menu-base.ts
+@@ -146,13 +146,7 @@ export abstract class CdkMenuBase
+    * @param item The index of the item to be set as active, or the CdkMenuItem instance.
+    */
+   setActiveMenuItem(item: number | CdkMenuItem) {
+-    if (this.keyManager) {
+-      if (typeof item === 'number') {
+-        this.keyManager.setActiveItem(item);
+-      } else {
+-        this.keyManager.setActiveItem(item);
+-      }
+-    }
++    this.keyManager?.setActiveItem(item);
+   }
+ 
+   /** Gets the tabindex for this menu. */

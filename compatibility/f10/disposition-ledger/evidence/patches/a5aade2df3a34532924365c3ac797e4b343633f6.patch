@@ -1,0 +1,437 @@
+From a5aade2df3a34532924365c3ac797e4b343633f6 Mon Sep 17 00:00:00 2001
+From: Andrey Dolgachev <adolgachev@users.noreply.github.com>
+Date: Wed, 16 Apr 2025 04:35:53 -0700
+Subject: [PATCH] fix(material/form-field): preserve aria-describedby set
+ externally across all form controls (#30699)
+
+fix(material/form-field): preserve aria-describedby set externally across all form controls
+
+add describedbyids and use to preserve existing ids
+
+add describedByIds to input
+
+add comment
+
+Move better sync logic to formfield
+
+add describedByIds to other controls
+
+update api goldens
+
+tweak comment
+
+add more tests
+---
+ goldens/material/chips/index.api.md           |  3 ++
+ goldens/material/datepicker/index.api.md      |  1 +
+ goldens/material/form-field/index.api.md      |  1 +
+ goldens/material/input/index.api.md           |  1 +
+ goldens/material/select/index.api.md          |  1 +
+ src/material/chips/chip-grid.ts               |  8 +++++
+ src/material/chips/chip-input.spec.ts         | 35 ++++++++++++++++++-
+ src/material/chips/chip-input.ts              | 11 ++++++
+ src/material/chips/chip-text-control.ts       |  3 ++
+ .../datepicker/date-range-input.spec.ts       | 14 +++++++-
+ src/material/datepicker/date-range-input.ts   | 11 ++++++
+ src/material/form-field/form-field-control.ts |  3 ++
+ src/material/form-field/form-field.ts         | 20 ++++++++++-
+ src/material/input/input.ts                   | 33 +++++++----------
+ src/material/select/select.spec.ts            | 10 ++++++
+ src/material/select/select.ts                 | 11 ++++++
+ 16 files changed, 142 insertions(+), 24 deletions(-)
+
+diff --git a/goldens/material/chips/index.api.md b/goldens/material/chips/index.api.md
+index a46a68404f9f..9ff35385222d 100644
+--- a/goldens/material/chips/index.api.md
++++ b/goldens/material/chips/index.api.md
+@@ -172,6 +172,7 @@ export class MatChipGrid extends MatChipSet implements AfterContentInit, AfterVi
+     readonly controlType: string;
+     // (undocumented)
+     protected _defaultRole: string;
++    get describedByIds(): string[];
+     get disabled(): boolean;
+     set disabled(value: boolean);
+     get empty(): boolean;
+@@ -250,6 +251,7 @@ export class MatChipInput implements MatChipTextControl, OnChanges, OnDestroy {
+     // (undocumented)
+     protected _chipGrid: MatChipGrid;
+     clear(): void;
++    get describedByIds(): string[];
+     get disabled(): boolean;
+     set disabled(value: boolean);
+     disabledInteractive: boolean;
+@@ -514,6 +516,7 @@ export class MatChipsModule {
+ 
+ // @public
+ export interface MatChipTextControl {
++    readonly describedByIds?: string[];
+     empty: boolean;
+     focus(): void;
+     focused: boolean;
+diff --git a/goldens/material/datepicker/index.api.md b/goldens/material/datepicker/index.api.md
+index aed65904949b..df896702802f 100644
+--- a/goldens/material/datepicker/index.api.md
++++ b/goldens/material/datepicker/index.api.md
+@@ -566,6 +566,7 @@ export class MatDateRangeInput<D> implements MatFormFieldControl<DateRange<D>>,
+     controlType: string;
+     get dateFilter(): DateFilterFn<D>;
+     set dateFilter(value: DateFilterFn<D>);
++    get describedByIds(): string[];
+     readonly disableAutomaticLabeling = true;
+     get disabled(): boolean;
+     set disabled(value: boolean);
+diff --git a/goldens/material/form-field/index.api.md b/goldens/material/form-field/index.api.md
+index a9ef59692e37..927940c1be22 100644
+--- a/goldens/material/form-field/index.api.md
++++ b/goldens/material/form-field/index.api.md
+@@ -156,6 +156,7 @@ export type MatFormFieldAppearance = 'fill' | 'outline';
+ export abstract class MatFormFieldControl<T> {
+     readonly autofilled?: boolean;
+     readonly controlType?: string;
++    readonly describedByIds?: string[];
+     readonly disableAutomaticLabeling?: boolean;
+     readonly disabled: boolean;
+     readonly empty: boolean;
+diff --git a/goldens/material/input/index.api.md b/goldens/material/input/index.api.md
+index ebebf92f5181..d0ab82b1bab6 100644
+--- a/goldens/material/input/index.api.md
++++ b/goldens/material/input/index.api.md
+@@ -152,6 +152,7 @@ export class MatInput implements MatFormFieldControl_2<any>, OnChanges, OnDestro
+     constructor(...args: unknown[]);
+     autofilled: boolean;
+     controlType: string;
++    get describedByIds(): string[];
+     protected _dirtyCheckNativeValue(): void;
+     get disabled(): boolean;
+     set disabled(value: BooleanInput);
+diff --git a/goldens/material/select/index.api.md b/goldens/material/select/index.api.md
+index 7a4abc9a00da..084750dd1a86 100644
+--- a/goldens/material/select/index.api.md
++++ b/goldens/material/select/index.api.md
+@@ -266,6 +266,7 @@ export class MatSelect implements AfterContentInit, OnChanges, OnDestroy, OnInit
+     customTrigger: MatSelectTrigger;
+     // (undocumented)
+     protected _defaultOptions: MatSelectConfig | null;
++    get describedByIds(): string[];
+     protected readonly _destroy: Subject<void>;
+     readonly disableAutomaticLabeling = true;
+     disabled: boolean;
+diff --git a/src/material/chips/chip-grid.ts b/src/material/chips/chip-grid.ts
+index 9741ca8453e9..5dfe91e9233e 100644
+--- a/src/material/chips/chip-grid.ts
++++ b/src/material/chips/chip-grid.ts
+@@ -349,6 +349,14 @@ export class MatChipGrid
+     this.stateChanges.next();
+   }
+ 
++  /**
++   * Implemented as part of MatFormFieldControl.
++   * @docs-private
++   */
++  get describedByIds(): string[] {
++    return this._chipInput?.describedByIds || [];
++  }
++
+   /**
+    * Implemented as part of MatFormFieldControl.
+    * @docs-private
+diff --git a/src/material/chips/chip-input.spec.ts b/src/material/chips/chip-input.spec.ts
+index 02944f92c2be..efc62a96fd40 100644
+--- a/src/material/chips/chip-input.spec.ts
++++ b/src/material/chips/chip-input.spec.ts
+@@ -156,6 +156,38 @@ describe('MatChipInput', () => {
+       expect(inputNativeElement.classList).toContain('mat-mdc-chip-input');
+       expect(inputNativeElement.classList).toContain('mdc-text-field__input');
+     });
++
++    it('should set `aria-describedby` to the id of the mat-hint', () => {
++      expect(inputNativeElement.getAttribute('aria-describedby')).toBeNull();
++
++      fixture.componentInstance.hint = 'test';
++      fixture.changeDetectorRef.markForCheck();
++      fixture.detectChanges();
++      const hint = fixture.debugElement.query(By.css('mat-hint')).nativeElement;
++
++      expect(inputNativeElement.getAttribute('aria-describedby')).toBe(hint.getAttribute('id'));
++      expect(inputNativeElement.getAttribute('aria-describedby')).toMatch(/^mat-mdc-hint-\w+\d+$/);
++    });
++
++    it('should support user binding to `aria-describedby`', () => {
++      inputNativeElement.setAttribute('aria-describedby', 'test');
++      fixture.changeDetectorRef.markForCheck();
++      fixture.detectChanges();
++
++      expect(inputNativeElement.getAttribute('aria-describedby')).toBe('test');
++    });
++
++    it('should preserve aria-describedby set directly in the DOM', fakeAsync(() => {
++      inputNativeElement.setAttribute('aria-describedby', 'custom');
++      fixture.componentInstance.hint = 'test';
++      fixture.changeDetectorRef.markForCheck();
++      fixture.detectChanges();
++      const hint = fixture.debugElement.query(By.css('mat-hint')).nativeElement;
++
++      expect(inputNativeElement.getAttribute('aria-describedby')).toBe(
++        `${hint.getAttribute('id')} custom`,
++      );
++    }));
+   });
+ 
+   describe('[addOnBlur]', () => {
+@@ -291,7 +323,7 @@ describe('MatChipInput', () => {
+ 
+ @Component({
+   template: `
+-    <mat-form-field>
++    <mat-form-field [hintLabel]="hint">
+       <mat-chip-grid #chipGrid [required]="required">
+         <mat-chip-row>Hello</mat-chip-row>
+         <input
+@@ -311,6 +343,7 @@ class TestChipInput {
+   placeholder = '';
+   required = false;
+   disabledInteractive = false;
++  hint: string;
+ 
+   add(_: MatChipInputEvent) {}
+ }
+diff --git a/src/material/chips/chip-input.ts b/src/material/chips/chip-input.ts
+index e02a5ea5b98e..db6134d4d9fc 100644
+--- a/src/material/chips/chip-input.ts
++++ b/src/material/chips/chip-input.ts
+@@ -218,6 +218,17 @@ export class MatChipInput implements MatChipTextControl, OnChanges, OnDestroy {
+     this.inputElement.value = '';
+   }
+ 
++  /**
++   * Implemented as part of MatChipTextControl.
++   * @docs-private
++   */
++  get describedByIds(): string[] {
++    const element = this._elementRef.nativeElement;
++    const existingDescribedBy = element.getAttribute('aria-describedby');
++
++    return existingDescribedBy?.split(' ') || [];
++  }
++
+   setDescribedByIds(ids: string[]): void {
+     const element = this._elementRef.nativeElement;
+ 
+diff --git a/src/material/chips/chip-text-control.ts b/src/material/chips/chip-text-control.ts
+index 5cc80f363ddd..cf7b9e7a20d2 100644
+--- a/src/material/chips/chip-text-control.ts
++++ b/src/material/chips/chip-text-control.ts
+@@ -23,6 +23,9 @@ export interface MatChipTextControl {
+   /** Focuses the text control. */
+   focus(): void;
+ 
++  /** Gets the list of ids the input is described by. */
++  readonly describedByIds?: string[];
++
+   /** Sets the list of ids the input is described by. */
+   setDescribedByIds(ids: string[]): void;
+ }
+diff --git a/src/material/datepicker/date-range-input.spec.ts b/src/material/datepicker/date-range-input.spec.ts
+index 4a62ea7edc5d..e1a1f7d58362 100644
+--- a/src/material/datepicker/date-range-input.spec.ts
++++ b/src/material/datepicker/date-range-input.spec.ts
+@@ -170,7 +170,7 @@ describe('MatDateRangeInput', () => {
+     expect(rangeInput.getAttribute('aria-labelledby')).toBe(labelId);
+   });
+ 
+-  it('should point the range input aria-labelledby to the form field hint element', () => {
++  it('should point the range input aria-describedby to the form field hint element', () => {
+     const fixture = createComponent(StandardRangePicker);
+     fixture.detectChanges();
+     const labelId = fixture.nativeElement.querySelector('.mat-mdc-form-field-hint').id;
+@@ -180,6 +180,18 @@ describe('MatDateRangeInput', () => {
+     expect(rangeInput.getAttribute('aria-describedby')).toBe(labelId);
+   });
+ 
++  it('should preserve aria-describedby set directly in the DOM', fakeAsync(() => {
++    const fixture = createComponent(StandardRangePicker);
++    const rangeInput = fixture.nativeElement.querySelector('.mat-date-range-input');
++
++    rangeInput.setAttribute('aria-describedby', 'custom');
++    fixture.changeDetectorRef.markForCheck();
++    fixture.detectChanges();
++    const hint = fixture.nativeElement.querySelector('.mat-mdc-form-field-hint');
++
++    expect(rangeInput.getAttribute('aria-describedby')).toBe(`${hint.getAttribute('id')} custom`);
++  }));
++
+   it('should not set aria-labelledby if the form field does not have a label', () => {
+     const fixture = createComponent(RangePickerNoLabel);
+     fixture.detectChanges();
+diff --git a/src/material/datepicker/date-range-input.ts b/src/material/datepicker/date-range-input.ts
+index d3260df328d9..0d507fd3c24a 100644
+--- a/src/material/datepicker/date-range-input.ts
++++ b/src/material/datepicker/date-range-input.ts
+@@ -284,6 +284,17 @@ export class MatDateRangeInput<D>
+     this.ngControl = inject(ControlContainer, {optional: true, self: true}) as any;
+   }
+ 
++  /**
++   * Implemented as part of MatFormFieldControl.
++   * @docs-private
++   */
++  get describedByIds(): string[] {
++    const element = this._elementRef.nativeElement;
++    const existingDescribedBy = element.getAttribute('aria-describedby');
++
++    return existingDescribedBy?.split(' ') || [];
++  }
++
+   /**
+    * Implemented as a part of `MatFormFieldControl`.
+    * @docs-private
+diff --git a/src/material/form-field/form-field-control.ts b/src/material/form-field/form-field-control.ts
+index c828280f5565..afcaab9c69b0 100644
+--- a/src/material/form-field/form-field-control.ts
++++ b/src/material/form-field/form-field-control.ts
+@@ -75,6 +75,9 @@ export abstract class MatFormFieldControl<T> {
+    */
+   readonly disableAutomaticLabeling?: boolean;
+ 
++  /** Gets the list of element IDs that currently describe this control. */
++  readonly describedByIds?: string[];
++
+   /** Sets the list of element IDs that currently describe this control. */
+   abstract setDescribedByIds(ids: string[]): void;
+ 
+diff --git a/src/material/form-field/form-field.ts b/src/material/form-field/form-field.ts
+index 0c0c28d00c7f..bed240595668 100644
+--- a/src/material/form-field/form-field.ts
++++ b/src/material/form-field/form-field.ts
+@@ -316,6 +316,9 @@ export class MatFormField
+   // Unique id for the hint label.
+   readonly _hintLabelId = this._idGenerator.getId('mat-mdc-hint-');
+ 
++  // Ids obtained from the error and hint fields
++  private _describedByIds: string[] | undefined;
++
+   /** Gets the current form field control */
+   get _control(): MatFormFieldControl<any> {
+     return this._explicitFormFieldControl || this._formFieldControl;
+@@ -717,7 +720,22 @@ export class MatFormField
+         ids.push(...this._errorChildren.map(error => error.id));
+       }
+ 
+-      this._control.setDescribedByIds(ids);
++      const existingDescribedBy = this._control.describedByIds;
++      let toAssign: string[];
++
++      // In some cases there might be some `aria-describedby` IDs that were assigned directly,
++      // like by the `AriaDescriber` (see #30011). Attempt to preserve them by taking the previous
++      // attribute value and filtering out the IDs that came from the previous `setDescribedByIds`
++      // call. Note the `|| ids` here allows us to avoid duplicating IDs on the first render.
++      if (existingDescribedBy) {
++        const exclude = this._describedByIds || ids;
++        toAssign = ids.concat(existingDescribedBy.filter(id => id && !exclude.includes(id)));
++      } else {
++        toAssign = ids;
++      }
++
++      this._control.setDescribedByIds(toAssign);
++      this._describedByIds = ids;
+     }
+   }
+ 
+diff --git a/src/material/input/input.ts b/src/material/input/input.ts
+index 869b38abb0aa..b286d3aad979 100644
+--- a/src/material/input/input.ts
++++ b/src/material/input/input.ts
+@@ -114,9 +114,6 @@ export class MatInput
+   private _cleanupIosKeyup: (() => void) | undefined;
+   private _cleanupWebkitWheel: (() => void) | undefined;
+ 
+-  /** `aria-describedby` IDs assigned by the form field. */
+-  private _formFieldDescribedBy: string[] | undefined;
+-
+   /** Whether the component is being rendered on the server. */
+   readonly _isServer: boolean;
+ 
+@@ -554,28 +551,22 @@ export class MatInput
+    * Implemented as part of MatFormFieldControl.
+    * @docs-private
+    */
+-  setDescribedByIds(ids: string[]) {
++  get describedByIds(): string[] {
+     const element = this._elementRef.nativeElement;
+     const existingDescribedBy = element.getAttribute('aria-describedby');
+-    let toAssign: string[];
+-
+-    // In some cases there might be some `aria-describedby` IDs that were assigned directly,
+-    // like by the `AriaDescriber` (see #30011). Attempt to preserve them by taking the previous
+-    // attribute value and filtering out the IDs that came from the previous `setDescribedByIds`
+-    // call. Note the `|| ids` here allows us to avoid duplicating IDs on the first render.
+-    if (existingDescribedBy) {
+-      const exclude = this._formFieldDescribedBy || ids;
+-      toAssign = ids.concat(
+-        existingDescribedBy.split(' ').filter(id => id && !exclude.includes(id)),
+-      );
+-    } else {
+-      toAssign = ids;
+-    }
+ 
+-    this._formFieldDescribedBy = ids;
++    return existingDescribedBy?.split(' ') || [];
++  }
++
++  /**
++   * Implemented as part of MatFormFieldControl.
++   * @docs-private
++   */
++  setDescribedByIds(ids: string[]) {
++    const element = this._elementRef.nativeElement;
+ 
+-    if (toAssign.length) {
+-      element.setAttribute('aria-describedby', toAssign.join(' '));
++    if (ids.length) {
++      element.setAttribute('aria-describedby', ids.join(' '));
+     } else {
+       element.removeAttribute('aria-describedby');
+     }
+diff --git a/src/material/select/select.spec.ts b/src/material/select/select.spec.ts
+index 30d9916a751a..33aa81ee0028 100644
+--- a/src/material/select/select.spec.ts
++++ b/src/material/select/select.spec.ts
+@@ -225,6 +225,16 @@ describe('MatSelect', () => {
+           expect(select.getAttribute('aria-describedby')).toBe('test');
+         });
+ 
++        it('should preserve aria-describedby set directly in the DOM', fakeAsync(() => {
++          select.setAttribute('aria-describedby', 'custom');
++          fixture.componentInstance.hint = 'test';
++          fixture.changeDetectorRef.markForCheck();
++          fixture.detectChanges();
++          const hint = fixture.debugElement.query(By.css('mat-hint')).nativeElement;
++
++          expect(select.getAttribute('aria-describedby')).toBe(`${hint.getAttribute('id')} custom`);
++        }));
++
+         it('should be able to override the tabindex', () => {
+           fixture.componentInstance.tabIndexOverride = 3;
+           fixture.changeDetectorRef.markForCheck();
+diff --git a/src/material/select/select.ts b/src/material/select/select.ts
+index 005312acbe1b..e19a8c4142e4 100644
+--- a/src/material/select/select.ts
++++ b/src/material/select/select.ts
+@@ -1449,6 +1449,17 @@ export class MatSelect
+     return value;
+   }
+ 
++  /**
++   * Implemented as part of MatFormFieldControl.
++   * @docs-private
++   */
++  get describedByIds(): string[] {
++    const element = this._elementRef.nativeElement;
++    const existingDescribedBy = element.getAttribute('aria-describedby');
++
++    return existingDescribedBy?.split(' ') || [];
++  }
++
+   /**
+    * Implemented as part of MatFormFieldControl.
+    * @docs-private

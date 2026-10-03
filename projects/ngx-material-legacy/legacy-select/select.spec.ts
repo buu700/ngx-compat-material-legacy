@@ -20,7 +20,7 @@ import {
   dispatchFakeEvent,
   dispatchKeyboardEvent,
   wrappedErrorMessage,
-} from '@angular/cdk/testing/private';
+} from '../internal/testing/owned-test-events';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -59,7 +59,7 @@ import {
   MAT_LEGACY_FORM_FIELD_DEFAULT_OPTIONS,
 } from '@angular/material/legacy-form-field';
 import {By} from '@angular/platform-browser';
-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {LegacyNoopAnimationsModule} from '../internal/testing/owned-animation-modules';
 import {LiveAnnouncer} from '@angular/cdk/a11y';
 import {MAT_SELECT_CONFIG, MatSelectConfig} from '@angular/material/select';
 import {Subject, Subscription, EMPTY, Observable} from 'rxjs';
@@ -95,7 +95,7 @@ describe('MatSelect', () => {
         MatLegacySelectModule,
         ReactiveFormsModule,
         FormsModule,
-        NoopAnimationsModule,
+        LegacyNoopAnimationsModule,
       ],
       declarations: declarations,
       providers: [
@@ -2713,7 +2713,7 @@ describe('MatSelect', () => {
           MatLegacySelectModule,
           ReactiveFormsModule,
           FormsModule,
-          NoopAnimationsModule,
+          LegacyNoopAnimationsModule,
         ],
         declarations: [FloatLabelSelect],
         providers: [
@@ -3092,7 +3092,7 @@ describe('MatSelect', () => {
       fixture.destroy();
 
       TestBed.resetTestingModule().configureTestingModule({
-        imports: [MatLegacySelectModule, ReactiveFormsModule, FormsModule, NoopAnimationsModule],
+        imports: [MatLegacySelectModule, ReactiveFormsModule, FormsModule, LegacyNoopAnimationsModule],
         declarations: [SelectInsideFormGroup],
         providers: [{provide: ErrorStateMatcher, useValue: errorStateMatcher}],
       });

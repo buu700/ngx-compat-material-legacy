@@ -10,7 +10,7 @@ import {
   ViewContainerRef,
 } from '@angular/core';
 import {ComponentFixture, fakeAsync, flush, inject, TestBed, tick} from '@angular/core/testing';
-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {LegacyNoopAnimationsModule} from '../internal/testing/owned-animation-modules';
 import {
   MAT_LEGACY_SNACK_BAR_DATA,
   MatLegacySnackBar,
@@ -38,7 +38,7 @@ describe('MatSnackBar', () => {
 
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [MatLegacySnackBarModule, CommonModule, NoopAnimationsModule],
+      imports: [MatLegacySnackBarModule, CommonModule, LegacyNoopAnimationsModule],
       declarations: [
         ComponentWithChildViewContainer,
         BurritosNotification,
@@ -614,7 +614,7 @@ describe('MatSnackBar', () => {
         deps: [],
         useFactory: () => ({panelClass: 'custom-class'}),
       })
-      .configureTestingModule({imports: [MatLegacySnackBarModule, NoopAnimationsModule]})
+      .configureTestingModule({imports: [MatLegacySnackBarModule, LegacyNoopAnimationsModule]})
       .compileComponents();
 
     inject([MatLegacySnackBar, OverlayContainer], (sb: MatLegacySnackBar, oc: OverlayContainer) => {
@@ -766,7 +766,7 @@ describe('MatSnackBar with parent MatSnackBar', () => {
 
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [MatLegacySnackBarModule, CommonModule, NoopAnimationsModule],
+      imports: [MatLegacySnackBarModule, CommonModule, LegacyNoopAnimationsModule],
       declarations: [ComponentThatProvidesMatSnackBar, DirectiveWithViewContainer],
     }).compileComponents();
   }));
@@ -843,7 +843,7 @@ describe('MatSnackBar Positioning', () => {
 
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [MatLegacySnackBarModule, CommonModule, NoopAnimationsModule],
+      imports: [MatLegacySnackBarModule, CommonModule, LegacyNoopAnimationsModule],
       declarations: [ComponentWithChildViewContainer, DirectiveWithViewContainer],
     }).compileComponents();
   }));

@@ -1,5 +1,5 @@
 import {fakeAsync, TestBed, waitForAsync} from '@angular/core/testing';
-import {dispatchFakeEvent, dispatchMouseEvent} from '@angular/cdk/testing/private';
+import {dispatchFakeEvent, dispatchMouseEvent} from '../internal/testing/owned-test-events';
 import {Component, QueryList, ViewChildren} from '@angular/core';
 import {By} from '@angular/platform-browser';
 import {MatLegacyListItem, MatLegacyListModule} from './index';

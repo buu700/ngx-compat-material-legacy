@@ -1,0 +1,701 @@
+From 8a5302a5f942144a83d8b0336262e7559f0eef6f Mon Sep 17 00:00:00 2001
+From: Payam Valadkhan <pmvald@yahoo.com>
+Date: Mon, 6 Nov 2023 12:03:05 -0500
+Subject: [PATCH] refactor: use enum instead of const enum (#28052)
+
+Const enums prevent enabling the `isolatedModules` check which is needed for fast TS compilation based on transpileModule API.
+---
+ src/cdk-experimental/popover-edit/edit-event-dispatcher.ts | 2 +-
+ src/cdk-experimental/popover-edit/focus-escape-notifier.ts | 2 +-
+ src/cdk/a11y/focus-monitor/focus-monitor.ts                | 7 +++++--
+ .../a11y/high-contrast-mode/high-contrast-mode-detector.ts | 7 +++++--
+ src/cdk/collections/view-repeater.ts                       | 2 +-
+ src/cdk/drag-drop/drop-list-ref.ts                         | 4 ++--
+ src/cdk/menu/menu-stack.ts                                 | 2 +-
+ src/cdk/platform/features/scrolling.ts                     | 2 +-
+ src/cdk/schematics/update-tool/target-version.ts           | 2 +-
+ src/material/card/testing/card-harness.ts                  | 2 +-
+ src/material/checkbox/checkbox.ts                          | 2 +-
+ src/material/core/ripple/ripple-ref.ts                     | 2 +-
+ src/material/datepicker/testing/calendar-harness.ts        | 2 +-
+ src/material/dialog/dialog-ref.ts                          | 2 +-
+ src/material/dialog/testing/dialog-harness.ts              | 2 +-
+ src/material/expansion/testing/expansion-harness.ts        | 2 +-
+ src/material/grid-list/testing/grid-tile-harness.ts        | 2 +-
+ src/material/icon/testing/icon-harness-filters.ts          | 2 +-
+ src/material/list/testing/list-item-harness-base.ts        | 4 ++--
+ .../rules/components/slider/slider-template.ts             | 2 +-
+ src/material/slider/slider-interface.ts                    | 4 ++--
+ src/material/slider/slider.e2e.spec.ts                     | 2 +-
+ src/material/slider/testing/slider-harness-filters.ts      | 2 +-
+ src/material/stepper/testing/step-harness-filters.ts       | 2 +-
+ src/material/toolbar/testing/toolbar-harness.ts            | 2 +-
+ tools/public_api_guard/cdk/a11y.md                         | 4 ++--
+ tools/public_api_guard/cdk/collections.md                  | 2 +-
+ tools/public_api_guard/cdk/menu.md                         | 2 +-
+ tools/public_api_guard/cdk/platform.md                     | 2 +-
+ tools/public_api_guard/material/card-testing.md            | 2 +-
+ tools/public_api_guard/material/checkbox.md                | 2 +-
+ tools/public_api_guard/material/core.md                    | 2 +-
+ tools/public_api_guard/material/datepicker-testing.md      | 2 +-
+ tools/public_api_guard/material/dialog-testing.md          | 2 +-
+ tools/public_api_guard/material/dialog.md                  | 2 +-
+ tools/public_api_guard/material/expansion-testing.md       | 2 +-
+ tools/public_api_guard/material/grid-list-testing.md       | 2 +-
+ tools/public_api_guard/material/icon-testing.md            | 2 +-
+ tools/public_api_guard/material/list-testing.md            | 4 ++--
+ tools/public_api_guard/material/slider-testing.md          | 2 +-
+ tools/public_api_guard/material/stepper-testing.md         | 2 +-
+ tools/public_api_guard/material/toolbar-testing.md         | 2 +-
+ .../{preferConstEnumRule.ts => preferPlainEnumRule.ts}     | 6 +++---
+ tslint.json                                                | 2 +-
+ 44 files changed, 59 insertions(+), 53 deletions(-)
+ rename tools/tslint-rules/{preferConstEnumRule.ts => preferPlainEnumRule.ts} (61%)
+
+diff --git a/src/cdk-experimental/popover-edit/edit-event-dispatcher.ts b/src/cdk-experimental/popover-edit/edit-event-dispatcher.ts
+index 76cef0f1915d..cc9999a3bedc 100644
+--- a/src/cdk-experimental/popover-edit/edit-event-dispatcher.ts
++++ b/src/cdk-experimental/popover-edit/edit-event-dispatcher.ts
+@@ -35,7 +35,7 @@ const FOCUS_DELAY = 0;
+  * FOCUSABLE - Rendered in the dom and styled for its contents to be focusable but invisible.
+  * ON - Rendered and fully visible.
+  */
+-export const enum HoverContentState {
++export enum HoverContentState {
+   OFF = 0,
+   FOCUSABLE,
+   ON,
+diff --git a/src/cdk-experimental/popover-edit/focus-escape-notifier.ts b/src/cdk-experimental/popover-edit/focus-escape-notifier.ts
+index d03bbf7dd44e..970c79c784d5 100644
+--- a/src/cdk-experimental/popover-edit/focus-escape-notifier.ts
++++ b/src/cdk-experimental/popover-edit/focus-escape-notifier.ts
+@@ -12,7 +12,7 @@ import {FocusTrap, InteractivityChecker} from '@angular/cdk/a11y';
+ import {Observable, Subject} from 'rxjs';
+ 
+ /** Value indicating whether focus left the target area before or after the enclosed elements. */
+-export const enum FocusEscapeNotifierDirection {
++export enum FocusEscapeNotifierDirection {
+   START,
+   END,
+ }
+diff --git a/src/cdk/a11y/focus-monitor/focus-monitor.ts b/src/cdk/a11y/focus-monitor/focus-monitor.ts
+index d1da1c165a11..1c5b5706b71a 100644
+--- a/src/cdk/a11y/focus-monitor/focus-monitor.ts
++++ b/src/cdk/a11y/focus-monitor/focus-monitor.ts
+@@ -43,7 +43,7 @@ export interface FocusOptions {
+ }
+ 
+ /** Detection mode used for attributing the origin of a focus event. */
+-export const enum FocusMonitorDetectionMode {
++export enum FocusMonitorDetectionMode {
+   /**
+    * Any mousedown, keydown, or touchstart event that happened in the previous
+    * tick or the current tick will be used to assign a focus event's origin (to
+@@ -623,7 +623,10 @@ export class CdkMonitorFocus implements AfterViewInit, OnDestroy {
+ 
+   @Output() readonly cdkFocusChange = new EventEmitter<FocusOrigin>();
+ 
+-  constructor(private _elementRef: ElementRef<HTMLElement>, private _focusMonitor: FocusMonitor) {}
++  constructor(
++    private _elementRef: ElementRef<HTMLElement>,
++    private _focusMonitor: FocusMonitor,
++  ) {}
+ 
+   get focusOrigin(): FocusOrigin {
+     return this._focusOrigin;
+diff --git a/src/cdk/a11y/high-contrast-mode/high-contrast-mode-detector.ts b/src/cdk/a11y/high-contrast-mode/high-contrast-mode-detector.ts
+index 13d4d0a98e96..238d0ddbc3ea 100644
+--- a/src/cdk/a11y/high-contrast-mode/high-contrast-mode-detector.ts
++++ b/src/cdk/a11y/high-contrast-mode/high-contrast-mode-detector.ts
+@@ -13,7 +13,7 @@ import {DOCUMENT} from '@angular/common';
+ import {Subscription} from 'rxjs';
+ 
+ /** Set of possible high-contrast mode backgrounds. */
+-export const enum HighContrastMode {
++export enum HighContrastMode {
+   NONE,
+   BLACK_ON_WHITE,
+   WHITE_ON_BLACK,
+@@ -49,7 +49,10 @@ export class HighContrastModeDetector implements OnDestroy {
+   private _document: Document;
+   private _breakpointSubscription: Subscription;
+ 
+-  constructor(private _platform: Platform, @Inject(DOCUMENT) document: any) {
++  constructor(
++    private _platform: Platform,
++    @Inject(DOCUMENT) document: any,
++  ) {
+     this._document = document;
+ 
+     this._breakpointSubscription = inject(BreakpointObserver)
+diff --git a/src/cdk/collections/view-repeater.ts b/src/cdk/collections/view-repeater.ts
+index b380d59deb96..78b3e086cbfa 100644
+--- a/src/cdk/collections/view-repeater.ts
++++ b/src/cdk/collections/view-repeater.ts
+@@ -58,7 +58,7 @@ export type _ViewRepeaterItemContextFactory<T, R, C extends _ViewRepeaterItemCon
+ export type _ViewRepeaterItemValueResolver<T, R> = (record: IterableChangeRecord<R>) => T;
+ 
+ /** Indicates how a view was changed by a {@link _ViewRepeater}. */
+-export const enum _ViewRepeaterOperation {
++export enum _ViewRepeaterOperation {
+   /** The content of an existing view was replaced with another item. */
+   REPLACED,
+   /** A new view was created with `createEmbeddedView`. */
+diff --git a/src/cdk/drag-drop/drop-list-ref.ts b/src/cdk/drag-drop/drop-list-ref.ts
+index e03a07af0186..8717f09fd20a 100644
+--- a/src/cdk/drag-drop/drop-list-ref.ts
++++ b/src/cdk/drag-drop/drop-list-ref.ts
+@@ -34,14 +34,14 @@ const DROP_PROXIMITY_THRESHOLD = 0.05;
+ const SCROLL_PROXIMITY_THRESHOLD = 0.05;
+ 
+ /** Vertical direction in which we can auto-scroll. */
+-const enum AutoScrollVerticalDirection {
++enum AutoScrollVerticalDirection {
+   NONE,
+   UP,
+   DOWN,
+ }
+ 
+ /** Horizontal direction in which we can auto-scroll. */
+-const enum AutoScrollHorizontalDirection {
++enum AutoScrollHorizontalDirection {
+   NONE,
+   LEFT,
+   RIGHT,
+diff --git a/src/cdk/menu/menu-stack.ts b/src/cdk/menu/menu-stack.ts
+index eabdc5640af9..d38ba4056ba7 100644
+--- a/src/cdk/menu/menu-stack.ts
++++ b/src/cdk/menu/menu-stack.ts
+@@ -11,7 +11,7 @@ import {Observable, Subject} from 'rxjs';
+ import {debounceTime, distinctUntilChanged, startWith} from 'rxjs/operators';
+ 
+ /** The relative item in the inline menu to focus after closing all popup menus. */
+-export const enum FocusNext {
++export enum FocusNext {
+   nextItem,
+   previousItem,
+   currentItem,
+diff --git a/src/cdk/platform/features/scrolling.ts b/src/cdk/platform/features/scrolling.ts
+index 84f3ed729f3f..e20d77dc181c 100644
+--- a/src/cdk/platform/features/scrolling.ts
++++ b/src/cdk/platform/features/scrolling.ts
+@@ -7,7 +7,7 @@
+  */
+ 
+ /** The possible ways the browser may handle the horizontal scroll axis in RTL languages. */
+-export const enum RtlScrollAxisType {
++export enum RtlScrollAxisType {
+   /**
+    * scrollLeft is 0 when scrolled all the way left and (scrollWidth - clientWidth) when scrolled
+    * all the way right.
+diff --git a/src/cdk/schematics/update-tool/target-version.ts b/src/cdk/schematics/update-tool/target-version.ts
+index 71d63ee1a92e..73953eccc769 100644
+--- a/src/cdk/schematics/update-tool/target-version.ts
++++ b/src/cdk/schematics/update-tool/target-version.ts
+@@ -7,7 +7,7 @@
+  */
+ 
+ /** Possible versions that can be automatically migrated by `ng update`. */
+-// Used in an `Object.keys` call below so it can't be `const enum`.
++
+ // tslint:disable-next-line:prefer-const-enum
+ export enum TargetVersion {
+   V17 = 'version 17',
+diff --git a/src/material/card/testing/card-harness.ts b/src/material/card/testing/card-harness.ts
+index a79c87098582..28627fed744f 100644
+--- a/src/material/card/testing/card-harness.ts
++++ b/src/material/card/testing/card-harness.ts
+@@ -14,7 +14,7 @@ import {
+ import {CardHarnessFilters} from './card-harness-filters';
+ 
+ /** Selectors for different sections of the mat-card that can container user content. */
+-export const enum MatCardSection {
++export enum MatCardSection {
+   HEADER = '.mat-mdc-card-header',
+   CONTENT = '.mat-mdc-card-content',
+   ACTIONS = '.mat-mdc-card-actions',
+diff --git a/src/material/checkbox/checkbox.ts b/src/material/checkbox/checkbox.ts
+index 77fdfdc12378..44836988ec23 100644
+--- a/src/material/checkbox/checkbox.ts
++++ b/src/material/checkbox/checkbox.ts
+@@ -39,7 +39,7 @@ import {
+  * Represents the different states that require custom transitions between them.
+  * @docs-private
+  */
+-export const enum TransitionCheckState {
++export enum TransitionCheckState {
+   /** The initial state of the component before any user interaction. */
+   Init,
+   /** The state representing the component when it's becoming checked. */
+diff --git a/src/material/core/ripple/ripple-ref.ts b/src/material/core/ripple/ripple-ref.ts
+index 38887a71a4aa..68964a357780 100644
+--- a/src/material/core/ripple/ripple-ref.ts
++++ b/src/material/core/ripple/ripple-ref.ts
+@@ -7,7 +7,7 @@
+  */
+ 
+ /** Possible states for a ripple element. */
+-export const enum RippleState {
++export enum RippleState {
+   FADING_IN,
+   VISIBLE,
+   FADING_OUT,
+diff --git a/src/material/datepicker/testing/calendar-harness.ts b/src/material/datepicker/testing/calendar-harness.ts
+index dffe7a0a2f2d..44bfd9d04be3 100644
+--- a/src/material/datepicker/testing/calendar-harness.ts
++++ b/src/material/datepicker/testing/calendar-harness.ts
+@@ -11,7 +11,7 @@ import {CalendarHarnessFilters, CalendarCellHarnessFilters} from './datepicker-h
+ import {MatCalendarCellHarness} from './calendar-cell-harness';
+ 
+ /** Possible views of a `MatCalendarHarness`. */
+-export const enum CalendarView {
++export enum CalendarView {
+   MONTH,
+   YEAR,
+   MULTI_YEAR,
+diff --git a/src/material/dialog/dialog-ref.ts b/src/material/dialog/dialog-ref.ts
+index c4280bbc611a..348ab75cdf5d 100644
+--- a/src/material/dialog/dialog-ref.ts
++++ b/src/material/dialog/dialog-ref.ts
+@@ -17,7 +17,7 @@ import {ESCAPE, hasModifierKey} from '@angular/cdk/keycodes';
+ import {GlobalPositionStrategy} from '@angular/cdk/overlay';
+ import {ComponentRef} from '@angular/core';
+ 
+-export const enum MatDialogState {
++export enum MatDialogState {
+   OPEN,
+   CLOSING,
+   CLOSED,
+diff --git a/src/material/dialog/testing/dialog-harness.ts b/src/material/dialog/testing/dialog-harness.ts
+index 08579b772c07..03f4aeeff2bb 100644
+--- a/src/material/dialog/testing/dialog-harness.ts
++++ b/src/material/dialog/testing/dialog-harness.ts
+@@ -16,7 +16,7 @@ import {DialogHarnessFilters} from './dialog-harness-filters';
+ import {DialogRole} from '@angular/material/dialog';
+ 
+ /** Selectors for different sections of the mat-dialog that can contain user content. */
+-export const enum MatDialogSection {
++export enum MatDialogSection {
+   TITLE = '.mat-mdc-dialog-title',
+   CONTENT = '.mat-mdc-dialog-content',
+   ACTIONS = '.mat-mdc-dialog-actions',
+diff --git a/src/material/expansion/testing/expansion-harness.ts b/src/material/expansion/testing/expansion-harness.ts
+index 37e2865516ee..fa80761895c2 100644
+--- a/src/material/expansion/testing/expansion-harness.ts
++++ b/src/material/expansion/testing/expansion-harness.ts
+@@ -14,7 +14,7 @@ import {
+ import {ExpansionPanelHarnessFilters} from './expansion-harness-filters';
+ 
+ /** Selectors for the various `mat-expansion-panel` sections that may contain user content. */
+-export const enum MatExpansionPanelSection {
++export enum MatExpansionPanelSection {
+   HEADER = '.mat-expansion-panel-header',
+   TITLE = '.mat-expansion-panel-header-title',
+   DESCRIPTION = '.mat-expansion-panel-header-description',
+diff --git a/src/material/grid-list/testing/grid-tile-harness.ts b/src/material/grid-list/testing/grid-tile-harness.ts
+index 2d51dc95b343..ac2243008a8c 100644
+--- a/src/material/grid-list/testing/grid-tile-harness.ts
++++ b/src/material/grid-list/testing/grid-tile-harness.ts
+@@ -10,7 +10,7 @@ import {ContentContainerComponentHarness, HarnessPredicate} from '@angular/cdk/t
+ import {GridTileHarnessFilters} from './grid-list-harness-filters';
+ 
+ /** Selectors for the various `mat-grid-tile` sections that may contain user content. */
+-export const enum MatGridTileSection {
++export enum MatGridTileSection {
+   HEADER = '.mat-grid-tile-header',
+   FOOTER = '.mat-grid-tile-footer',
+ }
+diff --git a/src/material/icon/testing/icon-harness-filters.ts b/src/material/icon/testing/icon-harness-filters.ts
+index 849ec9d7f052..913ca10a8a68 100644
+--- a/src/material/icon/testing/icon-harness-filters.ts
++++ b/src/material/icon/testing/icon-harness-filters.ts
+@@ -9,7 +9,7 @@
+ import {BaseHarnessFilters} from '@angular/cdk/testing';
+ 
+ /** Possible types of icons. */
+-export const enum IconType {
++export enum IconType {
+   SVG,
+   FONT,
+ }
+diff --git a/src/material/list/testing/list-item-harness-base.ts b/src/material/list/testing/list-item-harness-base.ts
+index 03f9457b0df8..b89097860419 100644
+--- a/src/material/list/testing/list-item-harness-base.ts
++++ b/src/material/list/testing/list-item-harness-base.ts
+@@ -67,12 +67,12 @@ export class MatSubheaderHarness extends ComponentHarness {
+ }
+ 
+ /** Selectors for the various list item sections that may contain user content. */
+-export const enum MatListItemSection {
++export enum MatListItemSection {
+   CONTENT = '.mdc-list-item__content',
+ }
+ 
+ /** Enum describing the possible variants of a list item. */
+-export const enum MatListItemType {
++export enum MatListItemType {
+   ONE_LINE_ITEM,
+   TWO_LINE_ITEM,
+   THREE_LINE_ITEM,
+diff --git a/src/material/schematics/ng-generate/mdc-migration/rules/components/slider/slider-template.ts b/src/material/schematics/ng-generate/mdc-migration/rules/components/slider/slider-template.ts
+index 47ac87af2beb..122946862cfe 100644
+--- a/src/material/schematics/ng-generate/mdc-migration/rules/components/slider/slider-template.ts
++++ b/src/material/schematics/ng-generate/mdc-migration/rules/components/slider/slider-template.ts
+@@ -24,7 +24,7 @@ interface Binding {
+ }
+ 
+ /** Describes the different types of bindings we care about. */
+-const enum BindingType {
++enum BindingType {
+   INPUT,
+   OUTPUT,
+   ATTRIBUTE,
+diff --git a/src/material/slider/slider-interface.ts b/src/material/slider/slider-interface.ts
+index c0b037447942..9eb2f4d1e2e0 100644
+--- a/src/material/slider/slider-interface.ts
++++ b/src/material/slider/slider-interface.ts
+@@ -13,13 +13,13 @@ import {MatRipple, RippleGlobalOptions} from '@angular/material/core';
+  * Thumb types: range slider has two thumbs (START, END) whereas single point
+  * slider only has one thumb (END).
+  */
+-export const enum _MatThumb {
++export enum _MatThumb {
+   START = 1,
+   END = 2,
+ }
+ 
+ /** Tick mark enum, for discrete sliders. */
+-export const enum _MatTickMark {
++export enum _MatTickMark {
+   ACTIVE = 0,
+   INACTIVE = 1,
+ }
+diff --git a/src/material/slider/slider.e2e.spec.ts b/src/material/slider/slider.e2e.spec.ts
+index e7d6fcb45ba0..2590734142ef 100644
+--- a/src/material/slider/slider.e2e.spec.ts
++++ b/src/material/slider/slider.e2e.spec.ts
+@@ -168,7 +168,7 @@ async function getCoordsForValue(slider: ElementFinder, value: number): Promise<
+   return {x, y};
+ }
+ 
+-const enum Thumb {
++enum Thumb {
+   START = 1,
+   END = 2,
+ }
+diff --git a/src/material/slider/testing/slider-harness-filters.ts b/src/material/slider/testing/slider-harness-filters.ts
+index b652cf56a26e..118a58d9572d 100644
+--- a/src/material/slider/testing/slider-harness-filters.ts
++++ b/src/material/slider/testing/slider-harness-filters.ts
+@@ -8,7 +8,7 @@
+ import {BaseHarnessFilters} from '@angular/cdk/testing';
+ 
+ /** Possible positions of a slider thumb. */
+-export const enum ThumbPosition {
++export enum ThumbPosition {
+   START,
+   END,
+ }
+diff --git a/src/material/stepper/testing/step-harness-filters.ts b/src/material/stepper/testing/step-harness-filters.ts
+index 7b67c56e8bca..f13034f32c45 100644
+--- a/src/material/stepper/testing/step-harness-filters.ts
++++ b/src/material/stepper/testing/step-harness-filters.ts
+@@ -8,7 +8,7 @@
+ import {BaseHarnessFilters} from '@angular/cdk/testing';
+ 
+ /** Possible orientations for a stepper. */
+-export const enum StepperOrientation {
++export enum StepperOrientation {
+   HORIZONTAL,
+   VERTICAL,
+ }
+diff --git a/src/material/toolbar/testing/toolbar-harness.ts b/src/material/toolbar/testing/toolbar-harness.ts
+index 597564058f25..1e3c3a5a5948 100644
+--- a/src/material/toolbar/testing/toolbar-harness.ts
++++ b/src/material/toolbar/testing/toolbar-harness.ts
+@@ -10,7 +10,7 @@ import {ContentContainerComponentHarness, HarnessPredicate, parallel} from '@ang
+ import {ToolbarHarnessFilters} from './toolbar-harness-filters';
+ 
+ /** Selectors for different sections of the mat-toolbar that contain user content. */
+-export const enum MatToolbarSection {
++export enum MatToolbarSection {
+   ROW = '.mat-toolbar-row',
+ }
+ 
+diff --git a/tools/public_api_guard/cdk/a11y.md b/tools/public_api_guard/cdk/a11y.md
+index 42111b519039..27e889542dce 100644
+--- a/tools/public_api_guard/cdk/a11y.md
++++ b/tools/public_api_guard/cdk/a11y.md
+@@ -195,7 +195,7 @@ export class FocusMonitor implements OnDestroy {
+ }
+ 
+ // @public
+-export const enum FocusMonitorDetectionMode {
++export enum FocusMonitorDetectionMode {
+     EVENTUAL = 1,
+     IMMEDIATE = 0
+ }
+@@ -264,7 +264,7 @@ export interface FocusTrapInertStrategy {
+ export function getAriaReferenceIds(el: Element, attr: string): string[];
+ 
+ // @public
+-export const enum HighContrastMode {
++export enum HighContrastMode {
+     // (undocumented)
+     BLACK_ON_WHITE = 1,
+     // (undocumented)
+diff --git a/tools/public_api_guard/cdk/collections.md b/tools/public_api_guard/cdk/collections.md
+index 5fe8f1feec32..9c29898a18e4 100644
+--- a/tools/public_api_guard/cdk/collections.md
++++ b/tools/public_api_guard/cdk/collections.md
+@@ -154,7 +154,7 @@ export interface _ViewRepeaterItemInsertArgs<C> {
+ export type _ViewRepeaterItemValueResolver<T, R> = (record: IterableChangeRecord<R>) => T;
+ 
+ // @public
+-export const enum _ViewRepeaterOperation {
++export enum _ViewRepeaterOperation {
+     INSERTED = 1,
+     MOVED = 2,
+     REMOVED = 3,
+diff --git a/tools/public_api_guard/cdk/menu.md b/tools/public_api_guard/cdk/menu.md
+index d640aca085b6..a3e127dcc32a 100644
+--- a/tools/public_api_guard/cdk/menu.md
++++ b/tools/public_api_guard/cdk/menu.md
+@@ -275,7 +275,7 @@ export interface FocusableElement {
+ }
+ 
+ // @public
+-export const enum FocusNext {
++export enum FocusNext {
+     // (undocumented)
+     currentItem = 2,
+     // (undocumented)
+diff --git a/tools/public_api_guard/cdk/platform.md b/tools/public_api_guard/cdk/platform.md
+index 054d150551a0..096ec373aafc 100644
+--- a/tools/public_api_guard/cdk/platform.md
++++ b/tools/public_api_guard/cdk/platform.md
+@@ -56,7 +56,7 @@ export class PlatformModule {
+ }
+ 
+ // @public
+-export const enum RtlScrollAxisType {
++export enum RtlScrollAxisType {
+     INVERTED = 2,
+     NEGATED = 1,
+     NORMAL = 0
+diff --git a/tools/public_api_guard/material/card-testing.md b/tools/public_api_guard/material/card-testing.md
+index babc3816028f..b97462c527ef 100644
+--- a/tools/public_api_guard/material/card-testing.md
++++ b/tools/public_api_guard/material/card-testing.md
+@@ -26,7 +26,7 @@ export class MatCardHarness extends ContentContainerComponentHarness<MatCardSect
+ }
+ 
+ // @public
+-export const enum MatCardSection {
++export enum MatCardSection {
+     // (undocumented)
+     ACTIONS = ".mat-mdc-card-actions",
+     // (undocumented)
+diff --git a/tools/public_api_guard/material/checkbox.md b/tools/public_api_guard/material/checkbox.md
+index 98cc1ae82ed4..8d28873758d5 100644
+--- a/tools/public_api_guard/material/checkbox.md
++++ b/tools/public_api_guard/material/checkbox.md
+@@ -161,7 +161,7 @@ export class _MatCheckboxRequiredValidatorModule {
+ }
+ 
+ // @public
+-export const enum TransitionCheckState {
++export enum TransitionCheckState {
+     Checked = 1,
+     Indeterminate = 3,
+     Init = 0,
+diff --git a/tools/public_api_guard/material/core.md b/tools/public_api_guard/material/core.md
+index a3734ebc1751..6e1d062079b6 100644
+--- a/tools/public_api_guard/material/core.md
++++ b/tools/public_api_guard/material/core.md
+@@ -546,7 +546,7 @@ export class RippleRenderer implements EventListenerObject {
+ }
+ 
+ // @public
+-export const enum RippleState {
++export enum RippleState {
+     // (undocumented)
+     FADING_IN = 0,
+     // (undocumented)
+diff --git a/tools/public_api_guard/material/datepicker-testing.md b/tools/public_api_guard/material/datepicker-testing.md
+index d971eaaf3290..e58538ebf732 100644
+--- a/tools/public_api_guard/material/datepicker-testing.md
++++ b/tools/public_api_guard/material/datepicker-testing.md
+@@ -26,7 +26,7 @@ export interface CalendarHarnessFilters extends BaseHarnessFilters {
+ }
+ 
+ // @public
+-export const enum CalendarView {
++export enum CalendarView {
+     // (undocumented)
+     MONTH = 0,
+     // (undocumented)
+diff --git a/tools/public_api_guard/material/dialog-testing.md b/tools/public_api_guard/material/dialog-testing.md
+index 00c2404ebaaf..317a912fc96a 100644
+--- a/tools/public_api_guard/material/dialog-testing.md
++++ b/tools/public_api_guard/material/dialog-testing.md
+@@ -44,7 +44,7 @@ export class MatDialogHarness extends ContentContainerComponentHarness<MatDialog
+ }
+ 
+ // @public
+-export const enum MatDialogSection {
++export enum MatDialogSection {
+     // (undocumented)
+     ACTIONS = ".mat-mdc-dialog-actions",
+     // (undocumented)
+diff --git a/tools/public_api_guard/material/dialog.md b/tools/public_api_guard/material/dialog.md
+index 1f845155050a..d11b0312321d 100644
+--- a/tools/public_api_guard/material/dialog.md
++++ b/tools/public_api_guard/material/dialog.md
+@@ -243,7 +243,7 @@ export class MatDialogRef<T, R = any> {
+ }
+ 
+ // @public (undocumented)
+-export const enum MatDialogState {
++export enum MatDialogState {
+     // (undocumented)
+     CLOSED = 2,
+     // (undocumented)
+diff --git a/tools/public_api_guard/material/expansion-testing.md b/tools/public_api_guard/material/expansion-testing.md
+index e3d7c5f349a5..781338c2b25f 100644
+--- a/tools/public_api_guard/material/expansion-testing.md
++++ b/tools/public_api_guard/material/expansion-testing.md
+@@ -60,7 +60,7 @@ export class MatExpansionPanelHarness extends ContentContainerComponentHarness<M
+ }
+ 
+ // @public
+-export const enum MatExpansionPanelSection {
++export enum MatExpansionPanelSection {
+     // (undocumented)
+     CONTENT = ".mat-expansion-panel-content",
+     // (undocumented)
+diff --git a/tools/public_api_guard/material/grid-list-testing.md b/tools/public_api_guard/material/grid-list-testing.md
+index 55cc256bcabf..eeab39079af5 100644
+--- a/tools/public_api_guard/material/grid-list-testing.md
++++ b/tools/public_api_guard/material/grid-list-testing.md
+@@ -45,7 +45,7 @@ export class MatGridTileHarness extends ContentContainerComponentHarness<MatGrid
+ }
+ 
+ // @public
+-export const enum MatGridTileSection {
++export enum MatGridTileSection {
+     // (undocumented)
+     FOOTER = ".mat-grid-tile-footer",
+     // (undocumented)
+diff --git a/tools/public_api_guard/material/icon-testing.md b/tools/public_api_guard/material/icon-testing.md
+index 919ce2e72d5f..d6baf30d75eb 100644
+--- a/tools/public_api_guard/material/icon-testing.md
++++ b/tools/public_api_guard/material/icon-testing.md
+@@ -60,7 +60,7 @@ export interface IconHarnessFilters extends BaseHarnessFilters {
+ }
+ 
+ // @public
+-export const enum IconType {
++export enum IconType {
+     // (undocumented)
+     FONT = 1,
+     // (undocumented)
+diff --git a/tools/public_api_guard/material/list-testing.md b/tools/public_api_guard/material/list-testing.md
+index 8f85468dbc2f..279f855de780 100644
+--- a/tools/public_api_guard/material/list-testing.md
++++ b/tools/public_api_guard/material/list-testing.md
+@@ -82,13 +82,13 @@ export class MatListItemHarness extends MatListItemHarnessBase {
+ }
+ 
+ // @public
+-export const enum MatListItemSection {
++export enum MatListItemSection {
+     // (undocumented)
+     CONTENT = ".mdc-list-item__content"
+ }
+ 
+ // @public
+-export const enum MatListItemType {
++export enum MatListItemType {
+     // (undocumented)
+     ONE_LINE_ITEM = 0,
+     // (undocumented)
+diff --git a/tools/public_api_guard/material/slider-testing.md b/tools/public_api_guard/material/slider-testing.md
+index 48e8e41fe714..5183a0eb337e 100644
+--- a/tools/public_api_guard/material/slider-testing.md
++++ b/tools/public_api_guard/material/slider-testing.md
+@@ -55,7 +55,7 @@ export interface SliderThumbHarnessFilters extends BaseHarnessFilters {
+ }
+ 
+ // @public
+-export const enum ThumbPosition {
++export enum ThumbPosition {
+     // (undocumented)
+     END = 1,
+     // (undocumented)
+diff --git a/tools/public_api_guard/material/stepper-testing.md b/tools/public_api_guard/material/stepper-testing.md
+index 0ce427142b12..95f789c6fe1d 100644
+--- a/tools/public_api_guard/material/stepper-testing.md
++++ b/tools/public_api_guard/material/stepper-testing.md
+@@ -66,7 +66,7 @@ export interface StepperHarnessFilters extends BaseHarnessFilters {
+ }
+ 
+ // @public
+-export const enum StepperOrientation {
++export enum StepperOrientation {
+     // (undocumented)
+     HORIZONTAL = 0,
+     // (undocumented)
+diff --git a/tools/public_api_guard/material/toolbar-testing.md b/tools/public_api_guard/material/toolbar-testing.md
+index ef7bf7f14a76..8bce42a06557 100644
+--- a/tools/public_api_guard/material/toolbar-testing.md
++++ b/tools/public_api_guard/material/toolbar-testing.md
+@@ -18,7 +18,7 @@ export class MatToolbarHarness extends ContentContainerComponentHarness<MatToolb
+ }
+ 
+ // @public
+-export const enum MatToolbarSection {
++export enum MatToolbarSection {
+     // (undocumented)
+     ROW = ".mat-toolbar-row"
+ }
+diff --git a/tools/tslint-rules/preferConstEnumRule.ts b/tools/tslint-rules/preferPlainEnumRule.ts
+similarity index 61%
+rename from tools/tslint-rules/preferConstEnumRule.ts
+rename to tools/tslint-rules/preferPlainEnumRule.ts
+index 0e7f7bbfe136..4471d8df62d0 100644
+--- a/tools/tslint-rules/preferConstEnumRule.ts
++++ b/tools/tslint-rules/preferPlainEnumRule.ts
+@@ -2,7 +2,7 @@ import ts from 'typescript';
+ import * as Lint from 'tslint';
+ 
+ /**
+- * Rule that enforces that we use `const enum` rather than a plain `enum`.
++ * Rule that enforces that we use plain `enum` rather than `const enum`.
+  */
+ export class Rule extends Lint.Rules.AbstractRule {
+   apply(sourceFile: ts.SourceFile): Lint.RuleFailure[] {
+@@ -12,8 +12,8 @@ export class Rule extends Lint.Rules.AbstractRule {
+ 
+ class Walker extends Lint.RuleWalker {
+   override visitEnumDeclaration(node: ts.EnumDeclaration) {
+-    if (!node.modifiers?.some(({kind}) => kind === ts.SyntaxKind.ConstKeyword)) {
+-      this.addFailureAtNode(node.name, 'Enums should be declared as `const enum`.');
++    if (node.modifiers?.some(({kind}) => kind === ts.SyntaxKind.ConstKeyword)) {
++      this.addFailureAtNode(node.name, 'Const enums are not allowed! Prefer plain `enum` instead.');
+     }
+ 
+     super.visitEnumDeclaration(node);
+diff --git a/tslint.json b/tslint.json
+index a4231a4d61f5..30188ce90a60 100644
+--- a/tslint.json
++++ b/tslint.json
+@@ -68,7 +68,7 @@
+     "lifecycle-hook-interface": true,
+     "require-breaking-change-version": true,
+     "no-nested-ternary": true,
+-    "prefer-const-enum": true,
++    "prefer-plain-enum": true,
+     "no-lifecycle-invocation": [true, "**/!(*.spec).ts"],
+     "lightweight-tokens": [
+       true,

@@ -1,0 +1,102 @@
+From ce87e555789fbeccf6a6feae3e494cf2cf5af68e Mon Sep 17 00:00:00 2001
+From: Andrew Scott <atscott01@gmail.com>
+Date: Wed, 15 May 2024 14:20:06 -0700
+Subject: [PATCH] fix(material/slider): aria-valuetext host binding should be
+ onPush compatible (#29042)
+
+`MatSlider` updates `_valuetext` without marking for check. The easiest
+way to fix these types of issues when values are not part of the public
+API is to switch them to signals.
+---
+ src/material/slider/slider-input.ts       | 5 +++--
+ src/material/slider/slider-interface.ts   | 4 ++--
+ src/material/slider/slider.ts             | 2 +-
+ tools/public_api_guard/material/slider.md | 3 ++-
+ 4 files changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/src/material/slider/slider-input.ts b/src/material/slider/slider-input.ts
+index 18480d7a7070..a0d840d93b00 100644
+--- a/src/material/slider/slider-input.ts
++++ b/src/material/slider/slider-input.ts
+@@ -20,6 +20,7 @@ import {
+   numberAttribute,
+   OnDestroy,
+   Output,
++  signal,
+ } from '@angular/core';
+ import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from '@angular/forms';
+ import {Subject} from 'rxjs';
+@@ -69,7 +70,7 @@ export const MAT_SLIDER_RANGE_THUMB_VALUE_ACCESSOR: any = {
+   host: {
+     'class': 'mdc-slider__input',
+     'type': 'range',
+-    '[attr.aria-valuetext]': '_valuetext',
++    '[attr.aria-valuetext]': '_valuetext()',
+     '(change)': '_onChange()',
+     '(input)': '_onInput()',
+     // TODO(wagnermaciel): Consider using a global event listener instead.
+@@ -211,7 +212,7 @@ export class MatSliderThumb implements _MatSliderThumb, OnDestroy, ControlValueA
+   _hostElement: HTMLInputElement;
+ 
+   /** The aria-valuetext string representation of the input's value. */
+-  _valuetext: string;
++  _valuetext = signal('');
+ 
+   /** The radius of a native html slider's knob. */
+   _knobRadius: number = 8;
+diff --git a/src/material/slider/slider-interface.ts b/src/material/slider/slider-interface.ts
+index de7c3feb1afd..16c0a3e6f386 100644
+--- a/src/material/slider/slider-interface.ts
++++ b/src/material/slider/slider-interface.ts
+@@ -6,7 +6,7 @@
+  * found in the LICENSE file at https://angular.io/license
+  */
+ 
+-import {InjectionToken, ChangeDetectorRef} from '@angular/core';
++import {InjectionToken, ChangeDetectorRef, WritableSignal} from '@angular/core';
+ import {MatRipple, RippleGlobalOptions} from '@angular/material/core';
+ 
+ /**
+@@ -183,7 +183,7 @@ export interface _MatSliderThumb {
+   _isFocused: boolean;
+ 
+   /** The aria-valuetext string representation of the input's value. */
+-  _valuetext: string;
++  _valuetext: WritableSignal<string>;
+ 
+   /**
+    * Indicates whether UI updates should be skipped.
+diff --git a/src/material/slider/slider.ts b/src/material/slider/slider.ts
+index b5363a261b3c..7d2219cc4c7b 100644
+--- a/src/material/slider/slider.ts
++++ b/src/material/slider/slider.ts
+@@ -726,7 +726,7 @@ export class MatSlider implements AfterViewInit, OnDestroy, _MatSlider {
+     const valuetext = this.displayWith(source.value);
+ 
+     this._hasViewInitialized
+-      ? (source._valuetext = valuetext)
++      ? source._valuetext.set(valuetext)
+       : source._hostElement.setAttribute('aria-valuetext', valuetext);
+ 
+     if (this.discrete) {
+diff --git a/tools/public_api_guard/material/slider.md b/tools/public_api_guard/material/slider.md
+index 27a27cd9a1d3..4f48a3b3c369 100644
+--- a/tools/public_api_guard/material/slider.md
++++ b/tools/public_api_guard/material/slider.md
+@@ -19,6 +19,7 @@ import { QueryList } from '@angular/core';
+ import { RippleGlobalOptions } from '@angular/material/core';
+ import { Subject } from 'rxjs';
+ import { ThemePalette } from '@angular/material/core';
++import { WritableSignal } from '@angular/core';
+ 
+ // @public
+ export class MatSlider implements AfterViewInit, OnDestroy, _MatSlider {
+@@ -290,7 +291,7 @@ export class MatSliderThumb implements _MatSliderThumb, OnDestroy, ControlValueA
+     get value(): number;
+     set value(value: number);
+     readonly valueChange: EventEmitter<number>;
+-    _valuetext: string;
++    _valuetext: WritableSignal<string>;
+     writeValue(value: any): void;
+     // (undocumented)
+     static ɵdir: i0.ɵɵDirectiveDeclaration<MatSliderThumb, "input[matSliderThumb]", ["matSliderThumb"], { "value": { "alias": "value"; "required": false; }; }, { "valueChange": "valueChange"; "dragStart": "dragStart"; "dragEnd": "dragEnd"; }, never, never, true, never>;

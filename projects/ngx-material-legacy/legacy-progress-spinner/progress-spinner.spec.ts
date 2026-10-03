@@ -1,7 +1,7 @@
 import {TestBed, waitForAsync} from '@angular/core/testing';
 import {Component, ViewEncapsulation, ViewChild, ElementRef} from '@angular/core';
 import {By} from '@angular/platform-browser';
-import {_getShadowRoot, _supportsShadowDom} from '@angular/cdk/platform';
+import {getShadowRoot, supportsShadowDom} from '../internal/owned-shadow-dom';
 import {CommonModule} from '@angular/common';
 import {
   MatLegacyProgressSpinnerModule,
@@ -455,7 +455,7 @@ describe('MatLegacyProgressSpinner', () => {
 
   it('should add the indeterminate animation style tag to the Shadow root', () => {
     // The test is only relevant in browsers that support Shadow DOM.
-    if (!_supportsShadowDom()) {
+    if (!supportsShadowDom()) {
       return;
     }
 
@@ -464,7 +464,7 @@ describe('MatLegacyProgressSpinner', () => {
     fixture.detectChanges();
 
     const spinner = fixture.debugElement.query(By.css('mat-progress-spinner'))!.nativeElement;
-    const shadowRoot = _getShadowRoot(spinner)!;
+    const shadowRoot = getShadowRoot(spinner)!;
 
     expect(shadowRoot.querySelector('style[mat-spinner-animation="27"]')).toBeTruthy();
 
@@ -476,7 +476,7 @@ describe('MatLegacyProgressSpinner', () => {
 
   it('should not duplicate style tags inside the Shadow root', () => {
     // The test is only relevant in browsers that support Shadow DOM.
-    if (!_supportsShadowDom()) {
+    if (!supportsShadowDom()) {
       return;
     }
 
@@ -485,7 +485,7 @@ describe('MatLegacyProgressSpinner', () => {
     fixture.detectChanges();
 
     const spinner = fixture.debugElement.query(By.css('mat-progress-spinner'))!.nativeElement;
-    const shadowRoot = _getShadowRoot(spinner)!;
+    const shadowRoot = getShadowRoot(spinner)!;
 
     expect(shadowRoot.querySelectorAll('style[mat-spinner-animation="39"]').length).toBe(1);
 
@@ -509,7 +509,7 @@ describe('MatLegacyProgressSpinner', () => {
       'inside an ngIf',
     () => {
       // The test is only relevant in browsers that support Shadow DOM.
-      if (!_supportsShadowDom()) {
+      if (!supportsShadowDom()) {
         return;
       }
 
@@ -518,7 +518,7 @@ describe('MatLegacyProgressSpinner', () => {
       fixture.detectChanges();
 
       const spinner = fixture.componentInstance.spinner.nativeElement;
-      const shadowRoot = _getShadowRoot(spinner)!;
+      const shadowRoot = getShadowRoot(spinner)!;
 
       expect(shadowRoot.querySelector('style[mat-spinner-animation="27"]')).toBeTruthy();
 

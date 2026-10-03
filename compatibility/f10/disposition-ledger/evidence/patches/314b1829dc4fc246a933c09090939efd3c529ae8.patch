@@ -1,0 +1,216 @@
+From 314b1829dc4fc246a933c09090939efd3c529ae8 Mon Sep 17 00:00:00 2001
+From: Cheng-Hsuan Tsai <webcat@google.com>
+Date: Tue, 28 Oct 2025 15:22:21 -0700
+Subject: [PATCH] refactor: add optional random infix to generated id (#32173)
+
+---
+ goldens/cdk/a11y/index.api.md       | 2 +-
+ src/aria/accordion/accordion.ts     | 4 ++--
+ src/aria/grid/grid.ts               | 2 +-
+ src/aria/listbox/listbox.ts         | 4 ++--
+ src/aria/menu/menu.ts               | 5 +++--
+ src/aria/radio-group/radio-group.ts | 2 +-
+ src/aria/tabs/tabs.ts               | 2 +-
+ src/aria/toolbar/toolbar.ts         | 4 ++--
+ src/aria/tree/tree.ts               | 4 ++--
+ src/cdk/a11y/id-generator.ts        | 6 ++++--
+ 10 files changed, 19 insertions(+), 16 deletions(-)
+
+diff --git a/goldens/cdk/a11y/index.api.md b/goldens/cdk/a11y/index.api.md
+index ea7039d26cd3..0a68560adbda 100644
+--- a/goldens/cdk/a11y/index.api.md
++++ b/goldens/cdk/a11y/index.api.md
+@@ -295,7 +295,7 @@ export interface Highlightable extends ListKeyManagerOption {
+ 
+ // @public
+ export class _IdGenerator {
+-    getId(prefix: string): string;
++    getId(prefix: string, randomize?: boolean): string;
+     // (undocumented)
+     static ɵfac: i0.ɵɵFactoryDeclaration<_IdGenerator, never>;
+     // (undocumented)
+diff --git a/src/aria/accordion/accordion.ts b/src/aria/accordion/accordion.ts
+index 099380ef1b7e..0d2a0148f80e 100644
+--- a/src/aria/accordion/accordion.ts
++++ b/src/aria/accordion/accordion.ts
+@@ -54,7 +54,7 @@ export class AccordionPanel {
+   private readonly _deferredContentAware = inject(DeferredContentAware);
+ 
+   /** A global unique identifier for the panel. */
+-  private readonly _id = inject(_IdGenerator).getId('accordion-trigger-');
++  private readonly _id = inject(_IdGenerator).getId('accordion-trigger-', true);
+ 
+   /** A local unique identifier for the panel, used to match with its trigger's value. */
+   value = input.required<string>();
+@@ -102,7 +102,7 @@ export class AccordionPanel {
+ })
+ export class AccordionTrigger {
+   /** A global unique identifier for the trigger. */
+-  private readonly _id = inject(_IdGenerator).getId('ng-accordion-trigger-');
++  private readonly _id = inject(_IdGenerator).getId('ng-accordion-trigger-', true);
+ 
+   /** A reference to the trigger element. */
+   private readonly _elementRef = inject(ElementRef);
+diff --git a/src/aria/grid/grid.ts b/src/aria/grid/grid.ts
+index 5408d8cf332b..80802ff2cbc0 100644
+--- a/src/aria/grid/grid.ts
++++ b/src/aria/grid/grid.ts
+@@ -184,7 +184,7 @@ export class GridCell {
+   private readonly _row = inject(GridRow);
+ 
+   /** A unique identifier for the cell. */
+-  private readonly _id = inject(_IdGenerator).getId('ng-grid-cell-');
++  private readonly _id = inject(_IdGenerator).getId('ng-grid-cell-', true);
+ 
+   /** The host native element. */
+   readonly element = computed(() => this._elementRef.nativeElement);
+diff --git a/src/aria/listbox/listbox.ts b/src/aria/listbox/listbox.ts
+index edfad643f061..70954e3c7c64 100644
+--- a/src/aria/listbox/listbox.ts
++++ b/src/aria/listbox/listbox.ts
+@@ -60,7 +60,7 @@ import {ComboboxPopup} from '../combobox';
+ })
+ export class Listbox<V> {
+   /** A unique identifier for the listbox. */
+-  private readonly _generatedId = inject(_IdGenerator).getId('ng-listbox-');
++  private readonly _generatedId = inject(_IdGenerator).getId('ng-listbox-', true);
+ 
+   // TODO(wagnermaciel): https://github.com/angular/components/pull/30495#discussion_r1972601144.
+   /** A unique identifier for the listbox. */
+@@ -211,7 +211,7 @@ export class Option<V> {
+   private readonly _listbox = inject(Listbox);
+ 
+   /** A unique identifier for the option. */
+-  private readonly _generatedId = inject(_IdGenerator).getId('ng-option-');
++  private readonly _generatedId = inject(_IdGenerator).getId('ng-option-', true);
+ 
+   // TODO(wagnermaciel): https://github.com/angular/components/pull/30495#discussion_r1972601144.
+   /** A unique identifier for the option. */
+diff --git a/src/aria/menu/menu.ts b/src/aria/menu/menu.ts
+index 882206b6d8d6..1c7fd14508bb 100644
+--- a/src/aria/menu/menu.ts
++++ b/src/aria/menu/menu.ts
+@@ -27,6 +27,7 @@ import {
+   MenuPattern,
+   MenuTriggerPattern,
+ } from '@angular/aria/private';
++import {_IdGenerator} from '@angular/cdk/a11y';
+ import {toSignal} from '@angular/core/rxjs-interop';
+ import {Directionality} from '@angular/cdk/bidi';
+ 
+@@ -132,7 +133,7 @@ export class Menu<V> {
+   readonly submenu = input<Menu<V> | undefined>(undefined);
+ 
+   /** The unique ID of the menu. */
+-  readonly id = input<string>(Math.random().toString(36).substring(2, 10));
++  readonly id = input<string>(inject(_IdGenerator).getId('ng-menu-', true));
+ 
+   /** Whether the menu should wrap its items. */
+   readonly wrap = input<boolean>(true);
+@@ -325,7 +326,7 @@ export class MenuItem<V> {
+   readonly element: HTMLElement = this._elementRef.nativeElement;
+ 
+   /** The unique ID of the menu item. */
+-  readonly id = input<string>(Math.random().toString(36).substring(2, 10));
++  readonly id = input<string>(inject(_IdGenerator).getId('ng-menu-item-', true));
+ 
+   /** The value of the menu item. */
+   readonly value = input.required<V>();
+diff --git a/src/aria/radio-group/radio-group.ts b/src/aria/radio-group/radio-group.ts
+index d7f84fe2872b..028babb89cf1 100644
+--- a/src/aria/radio-group/radio-group.ts
++++ b/src/aria/radio-group/radio-group.ts
+@@ -221,7 +221,7 @@ export class RadioButton<V> {
+   private readonly _radioGroup = inject(RadioGroup);
+ 
+   /** A unique identifier for the radio button. */
+-  private readonly _generatedId = inject(_IdGenerator).getId('ng-radio-button-');
++  private readonly _generatedId = inject(_IdGenerator).getId('ng-radio-button-', true);
+ 
+   /** A unique identifier for the radio button. */
+   readonly id = computed(() => this._generatedId);
+diff --git a/src/aria/tabs/tabs.ts b/src/aria/tabs/tabs.ts
+index fe1322f3d239..c249d0a18095 100644
+--- a/src/aria/tabs/tabs.ts
++++ b/src/aria/tabs/tabs.ts
+@@ -315,7 +315,7 @@ export class TabPanel implements OnInit, OnDestroy {
+   private readonly _Tabs = inject(Tabs);
+ 
+   /** A global unique identifier for the tab. */
+-  private readonly _id = inject(_IdGenerator).getId('ng-tabpanel-');
++  private readonly _id = inject(_IdGenerator).getId('ng-tabpanel-', true);
+ 
+   /** The Tab UIPattern associated with the tabpanel */
+   readonly tab = computed(() => this._Tabs.tabs()?.find(tab => tab.value() === this.value()));
+diff --git a/src/aria/toolbar/toolbar.ts b/src/aria/toolbar/toolbar.ts
+index cad2ec4ca83c..f36a6fc2caca 100644
+--- a/src/aria/toolbar/toolbar.ts
++++ b/src/aria/toolbar/toolbar.ts
+@@ -185,7 +185,7 @@ export class ToolbarWidget<V> implements OnInit, OnDestroy {
+   private readonly _toolbar = inject(Toolbar);
+ 
+   /** A unique identifier for the widget. */
+-  private readonly _generatedId = inject(_IdGenerator).getId('ng-toolbar-widget-');
++  private readonly _generatedId = inject(_IdGenerator).getId('ng-toolbar-widget-', true);
+ 
+   /** A unique identifier for the widget. */
+   readonly id = computed(() => this._generatedId);
+@@ -236,7 +236,7 @@ export class ToolbarWidgetGroup<V> implements OnInit, OnDestroy {
+   private readonly _toolbar = inject(Toolbar, {optional: true});
+ 
+   /** A unique identifier for the widget. */
+-  private readonly _generatedId = inject(_IdGenerator).getId('ng-toolbar-widget-group-');
++  private readonly _generatedId = inject(_IdGenerator).getId('ng-toolbar-widget-group-', true);
+ 
+   /** A unique identifier for the widget. */
+   readonly id = computed(() => this._generatedId);
+diff --git a/src/aria/tree/tree.ts b/src/aria/tree/tree.ts
+index 6a265f2d3c1a..8946496ac3ed 100644
+--- a/src/aria/tree/tree.ts
++++ b/src/aria/tree/tree.ts
+@@ -82,7 +82,7 @@ function sortDirectives(a: HasElement, b: HasElement) {
+ })
+ export class Tree<V> {
+   /** A unique identifier for the tree. */
+-  private readonly _generatedId = inject(_IdGenerator).getId('ng-tree-');
++  private readonly _generatedId = inject(_IdGenerator).getId('ng-tree-', true);
+ 
+   // TODO(wagnermaciel): https://github.com/angular/components/pull/30495#discussion_r1972601144.
+   /** A unique identifier for the tree. */
+@@ -233,7 +233,7 @@ export class TreeItem<V> extends DeferredContentAware implements OnInit, OnDestr
+   private readonly _elementRef = inject(ElementRef);
+ 
+   /** A unique identifier for the tree item. */
+-  private readonly _id = inject(_IdGenerator).getId('ng-tree-item-');
++  private readonly _id = inject(_IdGenerator).getId('ng-tree-item-', true);
+ 
+   /** The owned tree item group. */
+   private readonly _group = signal<TreeItemGroup<V> | undefined>(undefined);
+diff --git a/src/cdk/a11y/id-generator.ts b/src/cdk/a11y/id-generator.ts
+index 55bae7a0a551..843940cf0b85 100644
+--- a/src/cdk/a11y/id-generator.ts
++++ b/src/cdk/a11y/id-generator.ts
+@@ -19,12 +19,14 @@ const counters: Record<string, number> = {};
+ @Injectable({providedIn: 'root'})
+ export class _IdGenerator {
+   private _appId = inject(APP_ID);
++  private static _infix = `a${Math.floor(Math.random() * 100000).toString()}`;
+ 
+   /**
+    * Generates a unique ID with a specific prefix.
+    * @param prefix Prefix to add to the ID.
++   * @param randomize Add a randomized infix string.
+    */
+-  getId(prefix: string): string {
++  getId(prefix: string, randomize: boolean = false): string {
+     // Omit the app ID if it's the default `ng`. Since the vast majority of pages have one
+     // Angular app on them, we can reduce the amount of breakages by not adding it.
+     if (this._appId !== 'ng') {
+@@ -35,6 +37,6 @@ export class _IdGenerator {
+       counters[prefix] = 0;
+     }
+ 
+-    return `${prefix}${counters[prefix]++}`;
++    return `${prefix}${randomize ? _IdGenerator._infix + '-' : ''}${counters[prefix]++}`;
+   }
+ }

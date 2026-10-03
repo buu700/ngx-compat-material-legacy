@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {LegacyNoopAnimationsModule} from '../../internal/testing/owned-animation-modules';
 import {HarnessLoader, parallel, TestKey} from '@angular/cdk/testing';
 import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
@@ -31,7 +31,7 @@ export function runHarnessTests(
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [chipsModule, MatLegacyFormFieldModule, NoopAnimationsModule, iconModule],
+      imports: [chipsModule, MatLegacyFormFieldModule, LegacyNoopAnimationsModule, iconModule],
       declarations: [ChipsHarnessTest],
     }).compileComponents();
 

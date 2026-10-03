@@ -6,7 +6,7 @@ import {
 import {runHarnessTests} from '@angular/material/snack-bar/testing/shared.spec';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {HarnessLoader} from '@angular/cdk/testing';
-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {LegacyNoopAnimationsModule} from '../../internal/testing/owned-animation-modules';
 import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
 import {Component, TemplateRef, ViewChild} from '@angular/core';
 import {MatLegacySnackBarHarness} from './snack-bar-harness';
@@ -25,7 +25,7 @@ describe('Non-MDC-based MatSnackBarHarness (non-MDC only behavior)', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MatLegacySnackBarModule, NoopAnimationsModule],
+      imports: [MatLegacySnackBarModule, LegacyNoopAnimationsModule],
       declarations: [SnackbarHarnessTest],
     }).compileComponents();
 

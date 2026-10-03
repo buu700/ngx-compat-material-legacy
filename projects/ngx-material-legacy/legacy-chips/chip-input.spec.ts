@@ -6,7 +6,7 @@ import {Component, DebugElement, ViewChild} from '@angular/core';
 import {waitForAsync, ComponentFixture, fakeAsync, TestBed, tick} from '@angular/core/testing';
 import {MatLegacyFormFieldModule} from '@angular/material/legacy-form-field';
 import {By} from '@angular/platform-browser';
-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {LegacyNoopAnimationsModule} from '../internal/testing/owned-animation-modules';
 import {Subject} from 'rxjs';
 import {
   MAT_LEGACY_CHIPS_DEFAULT_OPTIONS,
@@ -30,7 +30,7 @@ describe('MatChipInput', () => {
         PlatformModule,
         MatLegacyChipsModule,
         MatLegacyFormFieldModule,
-        NoopAnimationsModule,
+        LegacyNoopAnimationsModule,
       ],
       declarations: [TestChipInput],
       providers: [
@@ -223,7 +223,7 @@ describe('MatChipInput', () => {
             MatLegacyChipsModule,
             MatLegacyFormFieldModule,
             PlatformModule,
-            NoopAnimationsModule,
+            LegacyNoopAnimationsModule,
           ],
           declarations: [TestChipInput],
           providers: [

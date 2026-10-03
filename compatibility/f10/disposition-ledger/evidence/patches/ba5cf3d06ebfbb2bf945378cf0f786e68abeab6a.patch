@@ -1,0 +1,5985 @@
+From ba5cf3d06ebfbb2bf945378cf0f786e68abeab6a Mon Sep 17 00:00:00 2001
+From: Paul Gschwendtner <paulgschwendtner@gmail.com>
+Date: Tue, 25 Mar 2025 13:47:26 +0100
+Subject: [PATCH] More changes to migrate to `ts_project` (#30704)
+
+* build: fix `ts_project` interop causing conflicting mappings
+
+The `ts_project` interop currently conflicts with some mappings from
+e.g. `ts_library`. This can happen when the same target is transitively
+referenced via the interop, or directly in e.g. `ng_module` still.
+
+* build: migrate all `ng_test_library` targets to `ts_project`
+
+Migrates all `ng_test_library` targets to `ts_project`.
+---
+ src/bazel-tsconfig-build.json                 |  5 +++-
+ src/cdk-experimental/combobox/BUILD.bazel     | 13 ++++++---
+ src/cdk-experimental/popover-edit/BUILD.bazel | 17 +++++++-----
+ src/cdk-experimental/scrolling/BUILD.bazel    | 11 +++++---
+ src/cdk-experimental/selection/BUILD.bazel    | 13 ++++++---
+ .../table-scroll-container/BUILD.bazel        | 12 ++++++---
+ .../behaviors/list-focus/BUILD.bazel          | 10 ++++---
+ .../behaviors/list-navigation/BUILD.bazel     | 10 ++++---
+ .../behaviors/list-selection/BUILD.bazel      | 10 ++++---
+ .../behaviors/list-typeahead/BUILD.bazel      | 10 ++++---
+ src/cdk/a11y/BUILD.bazel                      | 16 ++++++-----
+ src/cdk/accordion/BUILD.bazel                 | 12 ++++++---
+ src/cdk/bidi/BUILD.bazel                      | 12 ++++++---
+ src/cdk/clipboard/BUILD.bazel                 | 15 +++++++----
+ src/cdk/coercion/private/BUILD.bazel          | 12 ++++++---
+ src/cdk/collections/BUILD.bazel               | 10 ++++---
+ src/cdk/dialog/BUILD.bazel                    | 16 ++++++-----
+ src/cdk/drag-drop/BUILD.bazel                 | 14 ++++++----
+ src/cdk/keycodes/BUILD.bazel                  |  1 +
+ src/cdk/layout/BUILD.bazel                    | 12 ++++++---
+ src/cdk/listbox/BUILD.bazel                   | 17 +++++++-----
+ src/cdk/menu/BUILD.bazel                      | 14 ++++++----
+ src/cdk/observers/BUILD.bazel                 |  8 +++---
+ src/cdk/observers/private/BUILD.bazel         | 10 ++++---
+ src/cdk/overlay/BUILD.bazel                   | 16 ++++++-----
+ src/cdk/portal/BUILD.bazel                    | 12 ++++++---
+ src/cdk/schematics/testing/BUILD.bazel        |  1 +
+ src/cdk/scrolling/BUILD.bazel                 | 14 ++++++----
+ src/cdk/table/BUILD.bazel                     | 12 ++++++---
+ src/cdk/testing/protractor/BUILD.bazel        |  2 ++
+ src/cdk/testing/testbed/BUILD.bazel           | 10 ++++---
+ src/cdk/testing/tests/BUILD.bazel             | 22 ++++++++++-----
+ src/cdk/text-field/BUILD.bazel                | 16 ++++++-----
+ src/cdk/tree/BUILD.bazel                      | 12 ++++++---
+ .../material/autocomplete/BUILD.bazel         | 13 ++++++---
+ .../material/badge/BUILD.bazel                | 11 +++++---
+ .../material/bottom-sheet/BUILD.bazel         | 13 ++++++---
+ .../material/button-toggle/BUILD.bazel        | 11 +++++---
+ .../material/button/BUILD.bazel               | 11 +++++---
+ .../material/card/BUILD.bazel                 | 11 +++++---
+ .../material/checkbox/BUILD.bazel             | 13 ++++++---
+ .../material/chips/BUILD.bazel                | 13 ++++++---
+ .../material/datepicker/BUILD.bazel           | 15 +++++++----
+ .../material/dialog/BUILD.bazel               | 13 ++++++---
+ .../material/divider/BUILD.bazel              | 13 ++++++---
+ .../material/expansion/BUILD.bazel            | 13 ++++++---
+ .../material/form-field/BUILD.bazel           | 15 +++++++----
+ .../material/grid-list/BUILD.bazel            | 11 +++++---
+ .../material/icon/BUILD.bazel                 | 13 ++++++---
+ .../material/input/BUILD.bazel                | 15 +++++++----
+ .../material/list/BUILD.bazel                 | 13 ++++++---
+ .../material/menu/BUILD.bazel                 | 13 ++++++---
+ .../material/paginator/BUILD.bazel            | 13 ++++++---
+ .../material/progress-bar/BUILD.bazel         | 11 +++++---
+ .../material/progress-spinner/BUILD.bazel     | 11 +++++---
+ .../material/radio/BUILD.bazel                | 13 ++++++---
+ .../material/select/BUILD.bazel               | 13 ++++++---
+ .../material/sidenav/BUILD.bazel              | 13 ++++++---
+ .../material/slide-toggle/BUILD.bazel         | 13 ++++++---
+ .../material/slider/BUILD.bazel               | 11 +++++---
+ .../material/snack-bar/BUILD.bazel            | 13 ++++++---
+ .../material/sort/BUILD.bazel                 | 13 ++++++---
+ .../material/stepper/BUILD.bazel              | 15 +++++++----
+ .../material/table/BUILD.bazel                | 11 +++++---
+ .../material/tabs/BUILD.bazel                 | 13 ++++++---
+ .../material/timepicker/BUILD.bazel           | 13 ++++++---
+ .../material/toolbar/BUILD.bazel              | 11 +++++---
+ .../material/tooltip/BUILD.bazel              | 13 ++++++---
+ .../material/tree/BUILD.bazel                 | 12 ++++++---
+ src/google-maps/BUILD.bazel                   | 26 +++++++++++++++---
+ .../map-directions-service.spec.ts            |  2 +-
+ .../map-geocoder/map-geocoder.spec.ts         |  2 +-
+ src/google-maps/testing/BUILD.bazel           |  1 +
+ src/google-maps/tsconfig-test.json            |  6 +++++
+ src/material-date-fns-adapter/BUILD.bazel     | 13 ++++++---
+ .../schematics/BUILD.bazel                    |  1 +
+ .../column-resize/BUILD.bazel                 | 13 ++++++---
+ src/material-experimental/menubar/BUILD.bazel | 12 ++++++---
+ .../popover-edit/BUILD.bazel                  | 15 ++++++-----
+ src/material-luxon-adapter/BUILD.bazel        | 15 +++++++----
+ src/material-moment-adapter/BUILD.bazel       | 13 ++++++---
+ src/material/autocomplete/BUILD.bazel         | 16 ++++++-----
+ src/material/autocomplete/testing/BUILD.bazel | 14 ++++++----
+ src/material/badge/BUILD.bazel                | 12 ++++++---
+ src/material/badge/testing/BUILD.bazel        | 12 ++++++---
+ src/material/bottom-sheet/BUILD.bazel         | 14 ++++++----
+ src/material/bottom-sheet/testing/BUILD.bazel | 12 ++++++---
+ src/material/button-toggle/BUILD.bazel        | 16 ++++++-----
+ .../button-toggle/testing/BUILD.bazel         | 10 ++++---
+ src/material/button/BUILD.bazel               | 12 ++++++---
+ src/material/button/testing/BUILD.bazel       | 14 ++++++----
+ src/material/card/BUILD.bazel                 | 10 ++++---
+ src/material/card/testing/BUILD.bazel         | 12 ++++++---
+ src/material/checkbox/BUILD.bazel             | 14 ++++++----
+ src/material/checkbox/testing/BUILD.bazel     | 14 ++++++----
+ src/material/chips/BUILD.bazel                | 20 ++++++++------
+ src/material/chips/testing/BUILD.bazel        | 12 ++++++---
+ src/material/core/BUILD.bazel                 | 12 ++++++---
+ src/material/core/testing/BUILD.bazel         | 10 ++++---
+ src/material/datepicker/BUILD.bazel           | 18 ++++++++-----
+ src/material/datepicker/testing/BUILD.bazel   | 14 ++++++----
+ src/material/dialog/BUILD.bazel               | 16 ++++++-----
+ src/material/dialog/testing/BUILD.bazel       | 12 ++++++---
+ src/material/divider/BUILD.bazel              | 12 ++++++---
+ src/material/divider/testing/BUILD.bazel      | 12 ++++++---
+ src/material/expansion/BUILD.bazel            | 12 ++++++---
+ src/material/expansion/testing/BUILD.bazel    | 12 ++++++---
+ src/material/form-field/testing/BUILD.bazel   | 14 ++++++----
+ src/material/grid-list/BUILD.bazel            | 12 ++++++---
+ src/material/grid-list/testing/BUILD.bazel    | 12 ++++++---
+ src/material/icon/BUILD.bazel                 | 14 ++++++----
+ src/material/icon/icon.spec.ts                |  6 ++---
+ src/material/icon/testing/BUILD.bazel         | 13 ++++++---
+ src/material/input/BUILD.bazel                | 14 ++++++----
+ src/material/input/testing/BUILD.bazel        | 24 ++++++++++-------
+ src/material/list/BUILD.bazel                 | 14 ++++++----
+ src/material/list/testing/BUILD.bazel         | 10 ++++---
+ src/material/menu/BUILD.bazel                 | 14 ++++++----
+ src/material/menu/testing/BUILD.bazel         | 12 ++++++---
+ src/material/paginator/BUILD.bazel            | 12 ++++++---
+ src/material/paginator/testing/BUILD.bazel    | 12 ++++++---
+ src/material/progress-bar/BUILD.bazel         | 12 ++++++---
+ src/material/progress-bar/testing/BUILD.bazel | 13 ++++++---
+ src/material/progress-spinner/BUILD.bazel     | 14 ++++++----
+ .../progress-spinner/testing/BUILD.bazel      | 13 ++++++---
+ src/material/radio/BUILD.bazel                | 16 ++++++-----
+ src/material/radio/testing/BUILD.bazel        | 14 ++++++----
+ src/material/select/BUILD.bazel               | 16 ++++++-----
+ src/material/select/testing/BUILD.bazel       | 14 ++++++----
+ src/material/sidenav/BUILD.bazel              | 14 ++++++----
+ src/material/sidenav/testing/BUILD.bazel      | 12 ++++++---
+ src/material/slide-toggle/BUILD.bazel         | 14 ++++++----
+ src/material/slide-toggle/testing/BUILD.bazel | 14 ++++++----
+ src/material/slider/BUILD.bazel               | 16 ++++++-----
+ src/material/slider/testing/BUILD.bazel       | 10 ++++---
+ src/material/snack-bar/BUILD.bazel            | 14 ++++++----
+ src/material/snack-bar/testing/BUILD.bazel    | 12 ++++++---
+ src/material/sort/BUILD.bazel                 | 14 ++++++----
+ src/material/sort/testing/BUILD.bazel         | 12 ++++++---
+ src/material/stepper/BUILD.bazel              | 16 ++++++-----
+ src/material/stepper/testing/BUILD.bazel      | 14 ++++++----
+ src/material/table/BUILD.bazel                | 14 ++++++----
+ src/material/table/testing/BUILD.bazel        | 10 ++++---
+ src/material/tabs/BUILD.bazel                 | 16 ++++++-----
+ src/material/tabs/testing/BUILD.bazel         | 14 ++++++----
+ src/material/timepicker/BUILD.bazel           | 16 ++++++-----
+ src/material/timepicker/testing/BUILD.bazel   | 12 ++++++---
+ src/material/toolbar/BUILD.bazel              | 14 ++++++----
+ src/material/toolbar/testing/BUILD.bazel      | 12 ++++++---
+ src/material/tooltip/BUILD.bazel              | 14 ++++++----
+ src/material/tooltip/testing/BUILD.bazel      | 12 ++++++---
+ src/material/tree/BUILD.bazel                 | 12 ++++++---
+ src/material/tree/testing/BUILD.bazel         | 10 ++++---
+ src/youtube-player/BUILD.bazel                | 27 +++++++++++++++----
+ src/youtube-player/tsconfig-test.json         |  6 +++++
+ tools/bazel/ts_project_interop.bzl            |  2 +-
+ tools/defaults.bzl                            | 14 ----------
+ 157 files changed, 1314 insertions(+), 650 deletions(-)
+ create mode 100644 src/google-maps/tsconfig-test.json
+ create mode 100644 src/youtube-player/tsconfig-test.json
+
+diff --git a/src/bazel-tsconfig-build.json b/src/bazel-tsconfig-build.json
+index 84a96225df9c..2c9df00e2e86 100644
+--- a/src/bazel-tsconfig-build.json
++++ b/src/bazel-tsconfig-build.json
+@@ -31,9 +31,12 @@
+     "inlineSources": true,
+     "target": "es2022",
+     "lib": ["es2020", "dom"],
++    "types": [],
+     "skipLibCheck": true,
+     "paths": {
+-      "@angular/cdk/*": ["./cdk/*"]
++      "@angular/cdk/*": ["./cdk/*"],
++      "@angular/cdk-experimental/*": ["./cdk-experimental/*"],
++      "@angular/material/*": ["./material/*"]
+     }
+   },
+   "angularCompilerOptions": {
+diff --git a/src/cdk-experimental/combobox/BUILD.bazel b/src/cdk-experimental/combobox/BUILD.bazel
+index 866a7641d09a..be5f90536393 100644
+--- a/src/cdk-experimental/combobox/BUILD.bazel
++++ b/src/cdk-experimental/combobox/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -17,17 +18,21 @@ ng_module(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":combobox",
+         "//src/cdk/keycodes",
+         "//src/cdk/testing/private",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/cdk-experimental/popover-edit/BUILD.bazel b/src/cdk-experimental/popover-edit/BUILD.bazel
+index a298b44cacd3..f1a94f478cc5 100644
+--- a/src/cdk-experimental/popover-edit/BUILD.bazel
++++ b/src/cdk-experimental/popover-edit/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -22,13 +23,14 @@ ng_module(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":popover-edit",
+         "//src/cdk/bidi",
+         "//src/cdk/collections",
+@@ -36,9 +38,12 @@ ng_test_library(
+         "//src/cdk/overlay",
+         "//src/cdk/table",
+         "//src/cdk/testing/private",
+-        "@npm//@angular/common",
+-        "@npm//@angular/forms",
+-        "@npm//rxjs",
++    ],
++    deps = [
++        "//:node_modules/@angular/common",
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
++        "//:node_modules/rxjs",
+     ],
+ )
+ 
+diff --git a/src/cdk-experimental/scrolling/BUILD.bazel b/src/cdk-experimental/scrolling/BUILD.bazel
+index c70179ce893c..cbdd980c8f40 100644
+--- a/src/cdk-experimental/scrolling/BUILD.bazel
++++ b/src/cdk-experimental/scrolling/BUILD.bazel
+@@ -1,5 +1,6 @@
+ load("//src/e2e-app:test_suite.bzl", "e2e_test_suite")
+-load("//tools:defaults.bzl", "ng_e2e_test_library", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_e2e_test_library", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -19,16 +20,20 @@ ng_module(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":scrolling",
+         "//src/cdk/scrolling",
+     ],
++    deps = [
++        "//:node_modules/@angular/core",
++    ],
+ )
+ 
+ ng_web_test_suite(
+diff --git a/src/cdk-experimental/selection/BUILD.bazel b/src/cdk-experimental/selection/BUILD.bazel
+index 850f41f74a4f..4683a3a6c22f 100644
+--- a/src/cdk-experimental/selection/BUILD.bazel
++++ b/src/cdk-experimental/selection/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -19,17 +20,21 @@ ng_module(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":selection",
+         "//src/cdk/table",
+         "//src/cdk/testing/private",
+-        "@npm//@angular/common",
++    ],
++    deps = [
++        "//:node_modules/@angular/common",
++        "//:node_modules/@angular/core",
+     ],
+ )
+ 
+diff --git a/src/cdk-experimental/table-scroll-container/BUILD.bazel b/src/cdk-experimental/table-scroll-container/BUILD.bazel
+index e624e99e819f..dc19ab44b9da 100644
+--- a/src/cdk-experimental/table-scroll-container/BUILD.bazel
++++ b/src/cdk-experimental/table-scroll-container/BUILD.bazel
+@@ -1,9 +1,9 @@
+ load(
+     "//tools:defaults.bzl",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -24,18 +24,22 @@ ng_module(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":table-scroll-container",
+         "//src/cdk/collections",
+         "//src/cdk/platform",
+         "//src/cdk/table",
+-        "@npm//rxjs",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/rxjs",
+     ],
+ )
+ 
+diff --git a/src/cdk-experimental/ui-patterns/behaviors/list-focus/BUILD.bazel b/src/cdk-experimental/ui-patterns/behaviors/list-focus/BUILD.bazel
+index b5ee34e7ee2a..8a3769cbb12c 100644
+--- a/src/cdk-experimental/ui-patterns/behaviors/list-focus/BUILD.bazel
++++ b/src/cdk-experimental/ui-patterns/behaviors/list-focus/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -15,14 +15,18 @@ ts_project(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":list-focus",
+         "//src/cdk-experimental/ui-patterns/behaviors/list-navigation",
+         "//src/cdk-experimental/ui-patterns/behaviors/signal-like",
+     ],
++    deps = [
++        "//:node_modules/@angular/core",
++    ],
+ )
+ 
+ ng_web_test_suite(
+diff --git a/src/cdk-experimental/ui-patterns/behaviors/list-navigation/BUILD.bazel b/src/cdk-experimental/ui-patterns/behaviors/list-navigation/BUILD.bazel
+index b65828fec5c2..83e2463919a1 100644
+--- a/src/cdk-experimental/ui-patterns/behaviors/list-navigation/BUILD.bazel
++++ b/src/cdk-experimental/ui-patterns/behaviors/list-navigation/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -15,13 +15,17 @@ ts_project(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":list-navigation",
+         "//src/cdk-experimental/ui-patterns/behaviors/signal-like",
+     ],
++    deps = [
++        "//:node_modules/@angular/core",
++    ],
+ )
+ 
+ ng_web_test_suite(
+diff --git a/src/cdk-experimental/ui-patterns/behaviors/list-selection/BUILD.bazel b/src/cdk-experimental/ui-patterns/behaviors/list-selection/BUILD.bazel
+index 706019611729..fad561d676a7 100644
+--- a/src/cdk-experimental/ui-patterns/behaviors/list-selection/BUILD.bazel
++++ b/src/cdk-experimental/ui-patterns/behaviors/list-selection/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -16,14 +16,18 @@ ts_project(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":list-selection",
+         "//src/cdk-experimental/ui-patterns/behaviors/list-navigation",
+         "//src/cdk-experimental/ui-patterns/behaviors/signal-like",
+     ],
++    deps = [
++        "//:node_modules/@angular/core",
++    ],
+ )
+ 
+ ng_web_test_suite(
+diff --git a/src/cdk-experimental/ui-patterns/behaviors/list-typeahead/BUILD.bazel b/src/cdk-experimental/ui-patterns/behaviors/list-typeahead/BUILD.bazel
+index f7b3e5b768d8..3048234a901e 100644
+--- a/src/cdk-experimental/ui-patterns/behaviors/list-typeahead/BUILD.bazel
++++ b/src/cdk-experimental/ui-patterns/behaviors/list-typeahead/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -16,14 +16,18 @@ ts_project(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":list-typeahead",
+         "//src/cdk-experimental/ui-patterns/behaviors/list-navigation",
+         "//src/cdk-experimental/ui-patterns/behaviors/signal-like",
+     ],
++    deps = [
++        "//:node_modules/@angular/core",
++    ],
+ )
+ 
+ ng_web_test_suite(
+diff --git a/src/cdk/a11y/BUILD.bazel b/src/cdk/a11y/BUILD.bazel
+index 1075a8b9d957..e494afc9f8a3 100644
+--- a/src/cdk/a11y/BUILD.bazel
++++ b/src/cdk/a11y/BUILD.bazel
+@@ -2,11 +2,11 @@ load(
+     "//tools:defaults.bzl",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -41,13 +41,14 @@ sass_binary(
+     deps = [":a11y_scss_lib"],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":a11y",
+         "//src/cdk/keycodes",
+         "//src/cdk/observers",
+@@ -55,9 +56,12 @@ ng_test_library(
+         "//src/cdk/platform",
+         "//src/cdk/portal",
+         "//src/cdk/testing/private",
+-        "@npm//@angular/common",
+-        "@npm//@angular/platform-browser",
+-        "@npm//rxjs",
++    ],
++    deps = [
++        "//:node_modules/@angular/common",
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
++        "//:node_modules/rxjs",
+     ],
+ )
+ 
+diff --git a/src/cdk/accordion/BUILD.bazel b/src/cdk/accordion/BUILD.bazel
+index 7b1065d33951..2b7af9dfb63c 100644
+--- a/src/cdk/accordion/BUILD.bazel
++++ b/src/cdk/accordion/BUILD.bazel
+@@ -2,9 +2,9 @@ load(
+     "//tools:defaults.bzl",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -22,15 +22,19 @@ ng_module(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":accordion",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/cdk/bidi/BUILD.bazel b/src/cdk/bidi/BUILD.bazel
+index 777eea6b1934..4ee1e5592e6e 100644
+--- a/src/cdk/bidi/BUILD.bazel
++++ b/src/cdk/bidi/BUILD.bazel
+@@ -2,9 +2,9 @@ load(
+     "//tools:defaults.bzl",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -20,15 +20,19 @@ ng_module(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":bidi",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/cdk/clipboard/BUILD.bazel b/src/cdk/clipboard/BUILD.bazel
+index a4cacf82e4c4..82d4114865d0 100644
+--- a/src/cdk/clipboard/BUILD.bazel
++++ b/src/cdk/clipboard/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "markdown_to_html", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "markdown_to_html", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -16,17 +17,21 @@ ng_module(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":clipboard",
+         "//src/cdk/testing",
+-        "@npm//@angular/common",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/common",
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/cdk/coercion/private/BUILD.bazel b/src/cdk/coercion/private/BUILD.bazel
+index a488f49f66a3..c12a93ef6aae 100644
+--- a/src/cdk/coercion/private/BUILD.bazel
++++ b/src/cdk/coercion/private/BUILD.bazel
+@@ -1,9 +1,9 @@
+ load(
+     "//tools:defaults.bzl",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -20,15 +20,19 @@ ng_module(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "private_tests_lib",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":private",
+-        "@npm//rxjs",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/rxjs",
+     ],
+ )
+ 
+diff --git a/src/cdk/collections/BUILD.bazel b/src/cdk/collections/BUILD.bazel
+index 23a0384de3a9..1d4477110aaf 100644
+--- a/src/cdk/collections/BUILD.bazel
++++ b/src/cdk/collections/BUILD.bazel
+@@ -2,9 +2,9 @@ load(
+     "//tools:defaults.bzl",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -21,15 +21,19 @@ ng_module(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":collections",
+     ],
++    deps = [
++        "//:node_modules/@angular/core",
++    ],
+ )
+ 
+ ng_web_test_suite(
+diff --git a/src/cdk/dialog/BUILD.bazel b/src/cdk/dialog/BUILD.bazel
+index ac98a7537e58..ce18346a35df 100644
+--- a/src/cdk/dialog/BUILD.bazel
++++ b/src/cdk/dialog/BUILD.bazel
+@@ -2,10 +2,10 @@ load(
+     "//tools:defaults.bzl",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -30,22 +30,26 @@ ng_module(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":dialog",
+         "//src/cdk/bidi",
+         "//src/cdk/keycodes",
+         "//src/cdk/overlay",
+         "//src/cdk/platform",
+         "//src/cdk/testing/private",
+-        "@npm//@angular/common",
+-        "@npm//@angular/platform-browser",
+-        "@npm//rxjs",
++    ],
++    deps = [
++        "//:node_modules/@angular/common",
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
++        "//:node_modules/rxjs",
+     ],
+ )
+ 
+diff --git a/src/cdk/drag-drop/BUILD.bazel b/src/cdk/drag-drop/BUILD.bazel
+index c7220d4a3844..175765751029 100644
+--- a/src/cdk/drag-drop/BUILD.bazel
++++ b/src/cdk/drag-drop/BUILD.bazel
+@@ -2,10 +2,10 @@ load(
+     "//tools:defaults.bzl",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -32,20 +32,24 @@ ng_module(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":drag-drop",
+         "//src/cdk/bidi",
+         "//src/cdk/platform",
+         "//src/cdk/scrolling",
+         "//src/cdk/testing/private",
+-        "@npm//@angular/common",
+-        "@npm//rxjs",
++    ],
++    deps = [
++        "//:node_modules/@angular/common",
++        "//:node_modules/@angular/core",
++        "//:node_modules/rxjs",
+     ],
+ )
+ 
+diff --git a/src/cdk/keycodes/BUILD.bazel b/src/cdk/keycodes/BUILD.bazel
+index c7c4a1198f02..8788c670c359 100644
+--- a/src/cdk/keycodes/BUILD.bazel
++++ b/src/cdk/keycodes/BUILD.bazel
+@@ -27,6 +27,7 @@ ts_project(
+         "//src/cdk/testing/private",
+     ],
+     deps = [
++        "//:node_modules/@angular/core",
+         "//:node_modules/@types/jasmine",
+     ],
+ )
+diff --git a/src/cdk/layout/BUILD.bazel b/src/cdk/layout/BUILD.bazel
+index 458c3141b8cd..6be0d445d23e 100644
+--- a/src/cdk/layout/BUILD.bazel
++++ b/src/cdk/layout/BUILD.bazel
+@@ -2,9 +2,9 @@ load(
+     "//tools:defaults.bzl",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -22,16 +22,20 @@ ng_module(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":layout",
+         "//src/cdk/platform",
+-        "@npm//rxjs",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/rxjs",
+     ],
+ )
+ 
+diff --git a/src/cdk/listbox/BUILD.bazel b/src/cdk/listbox/BUILD.bazel
+index 2dce7906ce96..12d13fa61713 100644
+--- a/src/cdk/listbox/BUILD.bazel
++++ b/src/cdk/listbox/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "markdown_to_html", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "markdown_to_html", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -17,19 +18,23 @@ ng_module(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":listbox",
+         "//src/cdk/keycodes",
+         "//src/cdk/testing/private",
+-        "@npm//@angular/common",
+-        "@npm//@angular/forms",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/common",
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/cdk/menu/BUILD.bazel b/src/cdk/menu/BUILD.bazel
+index 34f7208c7ea9..64906fd114a7 100644
+--- a/src/cdk/menu/BUILD.bazel
++++ b/src/cdk/menu/BUILD.bazel
+@@ -2,9 +2,9 @@ load(
+     "//tools:defaults.bzl",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -27,19 +27,23 @@ ng_module(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":menu",
+         "//src/cdk/collections",
+         "//src/cdk/keycodes",
+         "//src/cdk/testing/private",
+-        "@npm//@angular/platform-browser",
+-        "@npm//rxjs",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
++        "//:node_modules/rxjs",
+     ],
+ )
+ 
+diff --git a/src/cdk/observers/BUILD.bazel b/src/cdk/observers/BUILD.bazel
+index 9f680245cd26..f315f955b87a 100644
+--- a/src/cdk/observers/BUILD.bazel
++++ b/src/cdk/observers/BUILD.bazel
+@@ -2,9 +2,9 @@ load(
+     "//tools:defaults.bzl",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -21,13 +21,15 @@ ng_module(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [":observers"],
++    interop_deps = [":observers"],
++    deps = ["//:node_modules/@angular/core"],
+ )
+ 
+ ng_web_test_suite(
+diff --git a/src/cdk/observers/private/BUILD.bazel b/src/cdk/observers/private/BUILD.bazel
+index 8074d72ae0e8..96005df38953 100644
+--- a/src/cdk/observers/private/BUILD.bazel
++++ b/src/cdk/observers/private/BUILD.bazel
+@@ -1,9 +1,9 @@
+ load(
+     "//tools:defaults.bzl",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -20,15 +20,19 @@ ng_module(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "private_tests_lib",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":private",
+     ],
++    deps = [
++        "//:node_modules/@angular/core",
++    ],
+ )
+ 
+ ng_web_test_suite(
+diff --git a/src/cdk/overlay/BUILD.bazel b/src/cdk/overlay/BUILD.bazel
+index d3a7e69da539..cd10b3a14b79 100644
+--- a/src/cdk/overlay/BUILD.bazel
++++ b/src/cdk/overlay/BUILD.bazel
+@@ -4,11 +4,11 @@ load(
+     "markdown_to_html",
+     "ng_e2e_test_library",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -58,13 +58,14 @@ sass_binary(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":overlay",
+         "//src/cdk/bidi",
+         "//src/cdk/keycodes",
+@@ -72,9 +73,12 @@ ng_test_library(
+         "//src/cdk/portal",
+         "//src/cdk/scrolling",
+         "//src/cdk/testing/private",
+-        "@npm//@angular/common",
+-        "@npm//@angular/platform-browser",
+-        "@npm//rxjs",
++    ],
++    deps = [
++        "//:node_modules/@angular/common",
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
++        "//:node_modules/rxjs",
+     ],
+ )
+ 
+diff --git a/src/cdk/portal/BUILD.bazel b/src/cdk/portal/BUILD.bazel
+index f3747461c3b5..c3f01412dd38 100644
+--- a/src/cdk/portal/BUILD.bazel
++++ b/src/cdk/portal/BUILD.bazel
+@@ -2,9 +2,9 @@ load(
+     "//tools:defaults.bzl",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -21,15 +21,19 @@ ng_module(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":portal",
+-        "@npm//@angular/common",
++    ],
++    deps = [
++        "//:node_modules/@angular/common",
++        "//:node_modules/@angular/core",
+     ],
+ )
+ 
+diff --git a/src/cdk/schematics/testing/BUILD.bazel b/src/cdk/schematics/testing/BUILD.bazel
+index e2dc4351252d..cd573fd516ad 100644
+--- a/src/cdk/schematics/testing/BUILD.bazel
++++ b/src/cdk/schematics/testing/BUILD.bazel
+@@ -14,6 +14,7 @@ ts_project(
+     deps = [
+         "//:node_modules/@angular-devkit/core",
+         "//:node_modules/@angular-devkit/schematics",
++        "//:node_modules/@angular/core",
+         "//:node_modules/@bazel/runfiles",
+         "//:node_modules/@schematics/angular",
+         "//:node_modules/@types/fs-extra",
+diff --git a/src/cdk/scrolling/BUILD.bazel b/src/cdk/scrolling/BUILD.bazel
+index 98764fe9f9d9..a20df36b5a04 100644
+--- a/src/cdk/scrolling/BUILD.bazel
++++ b/src/cdk/scrolling/BUILD.bazel
+@@ -2,10 +2,10 @@ load(
+     "//tools:defaults.bzl",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -33,19 +33,23 @@ sass_binary(
+     src = "virtual-scroll-viewport.scss",
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":scrolling",
+         "//src/cdk/bidi",
+         "//src/cdk/collections",
+         "//src/cdk/testing/private",
+-        "@npm//@angular/common",
+-        "@npm//rxjs",
++    ],
++    deps = [
++        "//:node_modules/@angular/common",
++        "//:node_modules/@angular/core",
++        "//:node_modules/rxjs",
+     ],
+ )
+ 
+diff --git a/src/cdk/table/BUILD.bazel b/src/cdk/table/BUILD.bazel
+index 919bc59e7fad..7c74e0eb4982 100644
+--- a/src/cdk/table/BUILD.bazel
++++ b/src/cdk/table/BUILD.bazel
+@@ -2,10 +2,10 @@ load(
+     "//tools:defaults.bzl",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -33,17 +33,21 @@ sass_binary(
+     src = "table.scss",
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":table",
+         "//src/cdk/bidi",
+         "//src/cdk/collections",
+-        "@npm//rxjs",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/rxjs",
+     ],
+ )
+ 
+diff --git a/src/cdk/testing/protractor/BUILD.bazel b/src/cdk/testing/protractor/BUILD.bazel
+index 043383573e7b..c8cf8de5fd25 100644
+--- a/src/cdk/testing/protractor/BUILD.bazel
++++ b/src/cdk/testing/protractor/BUILD.bazel
+@@ -4,6 +4,7 @@ package(default_visibility = ["//visibility:public"])
+ 
+ ts_project(
+     name = "protractor",
++    testonly = True,
+     srcs = glob(
+         ["**/*.ts"],
+         exclude = ["**/*.spec.ts"],
+@@ -12,6 +13,7 @@ ts_project(
+         "//src/cdk/testing",
+     ],
+     deps = [
++        "//:node_modules/@angular/core",
+         "//:node_modules/protractor",
+     ],
+ )
+diff --git a/src/cdk/testing/testbed/BUILD.bazel b/src/cdk/testing/testbed/BUILD.bazel
+index 65980379140b..3a8d7e524daf 100644
+--- a/src/cdk/testing/testbed/BUILD.bazel
++++ b/src/cdk/testing/testbed/BUILD.bazel
+@@ -1,5 +1,5 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -24,12 +24,16 @@ filegroup(
+     srcs = glob(["**/*.ts"]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testbed",
+     ],
++    deps = [
++        "//:node_modules/@angular/core",
++    ],
+ )
+ 
+ ng_web_test_suite(
+diff --git a/src/cdk/testing/tests/BUILD.bazel b/src/cdk/testing/tests/BUILD.bazel
+index 115a65df68d1..3e47ce4b6711 100644
+--- a/src/cdk/testing/tests/BUILD.bazel
++++ b/src/cdk/testing/tests/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_e2e_test_library", "ng_module", "ng_test_library")
++load("//tools:defaults.bzl", "ng_e2e_test_library", "ng_module")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -29,17 +29,22 @@ ts_project(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "cross_environment_specs",
++    testonly = True,
+     srcs = ["cross-environment.spec.ts"],
+-    deps = [
++    interop_deps = [
+         ":test_harnesses",
+         "//src/cdk/testing",
+     ],
++    deps = [
++        "//:node_modules/@angular/core",
++    ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         [
+             "**/*.spec.ts",
+@@ -49,7 +54,7 @@ ng_test_library(
+             "**/*.e2e.spec.ts",
+         ],
+     ),
+-    deps = [
++    interop_deps = [
+         ":cross_environment_specs",
+         ":test_components",
+         ":test_harnesses",
+@@ -57,8 +62,11 @@ ng_test_library(
+         "//src/cdk/testing",
+         "//src/cdk/testing/private",
+         "//src/cdk/testing/testbed",
+-        "@npm//@angular/platform-browser",
+-        "@npm//kagekiri",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
++        "//:node_modules/kagekiri",
+     ],
+ )
+ 
+diff --git a/src/cdk/text-field/BUILD.bazel b/src/cdk/text-field/BUILD.bazel
+index edbeab8b7623..990431374b3a 100644
+--- a/src/cdk/text-field/BUILD.bazel
++++ b/src/cdk/text-field/BUILD.bazel
+@@ -2,11 +2,11 @@ load(
+     "//tools:defaults.bzl",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -39,19 +39,23 @@ sass_binary(
+     deps = [":text_field_scss_lib"],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":text-field",
+         "//src/cdk/platform",
+         "//src/cdk/testing/private",
+-        "@npm//@angular/forms",
+-        "@npm//@angular/platform-browser",
+-        "@npm//rxjs",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
++        "//:node_modules/@angular/platform-browser",
++        "//:node_modules/rxjs",
+     ],
+ )
+ 
+diff --git a/src/cdk/tree/BUILD.bazel b/src/cdk/tree/BUILD.bazel
+index 4434c52a254b..d2a1af9060db 100644
+--- a/src/cdk/tree/BUILD.bazel
++++ b/src/cdk/tree/BUILD.bazel
+@@ -2,9 +2,9 @@ load(
+     "//tools:defaults.bzl",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -26,20 +26,24 @@ ng_module(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":tree",
+         "//src/cdk/a11y",
+         "//src/cdk/bidi",
+         "//src/cdk/collections",
+         "//src/cdk/keycodes",
+         "//src/cdk/testing/testbed",
+-        "@npm//rxjs",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/rxjs",
+     ],
+ )
+ 
+diff --git a/src/components-examples/material/autocomplete/BUILD.bazel b/src/components-examples/material/autocomplete/BUILD.bazel
+index 929d9c09c4e7..e59798a43a0a 100644
+--- a/src/components-examples/material/autocomplete/BUILD.bazel
++++ b/src/components-examples/material/autocomplete/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -36,16 +37,20 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":autocomplete",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/autocomplete",
+         "//src/material/autocomplete/testing",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/components-examples/material/badge/BUILD.bazel b/src/components-examples/material/badge/BUILD.bazel
+index 676c7baa8b5a..9c8c2abb0a62 100644
+--- a/src/components-examples/material/badge/BUILD.bazel
++++ b/src/components-examples/material/badge/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -33,16 +34,20 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":badge",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/badge",
+         "//src/material/badge/testing",
+     ],
++    deps = [
++        "//:node_modules/@angular/core",
++    ],
+ )
+ 
+ ng_web_test_suite(
+diff --git a/src/components-examples/material/bottom-sheet/BUILD.bazel b/src/components-examples/material/bottom-sheet/BUILD.bazel
+index 1d8ae7609bbc..165067237585 100644
+--- a/src/components-examples/material/bottom-sheet/BUILD.bazel
++++ b/src/components-examples/material/bottom-sheet/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -34,16 +35,20 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":bottom-sheet",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/bottom-sheet",
+         "//src/material/bottom-sheet/testing",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/components-examples/material/button-toggle/BUILD.bazel b/src/components-examples/material/button-toggle/BUILD.bazel
+index f90609b1be27..ea878f8a103b 100644
+--- a/src/components-examples/material/button-toggle/BUILD.bazel
++++ b/src/components-examples/material/button-toggle/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -33,16 +34,20 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":button-toggle",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/button-toggle",
+         "//src/material/button-toggle/testing",
+     ],
++    deps = [
++        "//:node_modules/@angular/core",
++    ],
+ )
+ 
+ ng_web_test_suite(
+diff --git a/src/components-examples/material/button/BUILD.bazel b/src/components-examples/material/button/BUILD.bazel
+index 3fe1af2e8cc7..23ae27060387 100644
+--- a/src/components-examples/material/button/BUILD.bazel
++++ b/src/components-examples/material/button/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -34,16 +35,20 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":button",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/button",
+         "//src/material/button/testing",
+     ],
++    deps = [
++        "//:node_modules/@angular/core",
++    ],
+ )
+ 
+ ng_web_test_suite(
+diff --git a/src/components-examples/material/card/BUILD.bazel b/src/components-examples/material/card/BUILD.bazel
+index a946d615e6aa..6e72de01f55e 100644
+--- a/src/components-examples/material/card/BUILD.bazel
++++ b/src/components-examples/material/card/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -36,10 +37,11 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":card",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+@@ -47,6 +49,9 @@ ng_test_library(
+         "//src/material/card",
+         "//src/material/card/testing",
+     ],
++    deps = [
++        "//:node_modules/@angular/core",
++    ],
+ )
+ 
+ ng_web_test_suite(
+diff --git a/src/components-examples/material/checkbox/BUILD.bazel b/src/components-examples/material/checkbox/BUILD.bazel
+index a32439674394..89c31e2e505b 100644
+--- a/src/components-examples/material/checkbox/BUILD.bazel
++++ b/src/components-examples/material/checkbox/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -34,16 +35,20 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":checkbox",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/checkbox",
+         "//src/material/checkbox/testing",
+-        "@npm//@angular/forms",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
+     ],
+ )
+ 
+diff --git a/src/components-examples/material/chips/BUILD.bazel b/src/components-examples/material/chips/BUILD.bazel
+index a8165fbd2f5d..1f1111f435f3 100644
+--- a/src/components-examples/material/chips/BUILD.bazel
++++ b/src/components-examples/material/chips/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -37,16 +38,20 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":chips",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/chips",
+         "//src/material/chips/testing",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/components-examples/material/datepicker/BUILD.bazel b/src/components-examples/material/datepicker/BUILD.bazel
+index 433d3241a235..4c0a1a3b6587 100644
+--- a/src/components-examples/material/datepicker/BUILD.bazel
++++ b/src/components-examples/material/datepicker/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -40,18 +41,22 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":datepicker",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/core",
+         "//src/material/datepicker",
+         "//src/material/datepicker/testing",
+-        "@npm//@angular/forms",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/components-examples/material/dialog/BUILD.bazel b/src/components-examples/material/dialog/BUILD.bazel
+index 80be9dbfebd3..4d29116f2283 100644
+--- a/src/components-examples/material/dialog/BUILD.bazel
++++ b/src/components-examples/material/dialog/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -35,16 +36,20 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":dialog",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/dialog",
+         "//src/material/dialog/testing",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/components-examples/material/divider/BUILD.bazel b/src/components-examples/material/divider/BUILD.bazel
+index 3b5026c21c98..ac4cf8218c72 100644
+--- a/src/components-examples/material/divider/BUILD.bazel
++++ b/src/components-examples/material/divider/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -32,16 +33,22 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":divider",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/divider",
+         "//src/material/divider/testing",
+     ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
++        "//:node_modules/@types/jasmine",
++    ],
+ )
+ 
+ ng_web_test_suite(
+diff --git a/src/components-examples/material/expansion/BUILD.bazel b/src/components-examples/material/expansion/BUILD.bazel
+index 0ae679f9aacd..fa2c11a2b61d 100644
+--- a/src/components-examples/material/expansion/BUILD.bazel
++++ b/src/components-examples/material/expansion/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -35,16 +36,20 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":expansion",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/expansion",
+         "//src/material/expansion/testing",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/components-examples/material/form-field/BUILD.bazel b/src/components-examples/material/form-field/BUILD.bazel
+index 315aa5398812..fc02d3b22b97 100644
+--- a/src/components-examples/material/form-field/BUILD.bazel
++++ b/src/components-examples/material/form-field/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -39,10 +40,11 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":form-field",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+@@ -50,8 +52,11 @@ ng_test_library(
+         "//src/material/form-field/testing",
+         "//src/material/input",
+         "//src/material/input/testing",
+-        "@npm//@angular/forms",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/components-examples/material/grid-list/BUILD.bazel b/src/components-examples/material/grid-list/BUILD.bazel
+index 322e05aad82d..72ea1197b61d 100644
+--- a/src/components-examples/material/grid-list/BUILD.bazel
++++ b/src/components-examples/material/grid-list/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -31,16 +32,20 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":grid-list",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/grid-list",
+         "//src/material/grid-list/testing",
+     ],
++    deps = [
++        "//:node_modules/@angular/core",
++    ],
+ )
+ 
+ ng_web_test_suite(
+diff --git a/src/components-examples/material/icon/BUILD.bazel b/src/components-examples/material/icon/BUILD.bazel
+index 33f11bccaaff..24645c5f3637 100644
+--- a/src/components-examples/material/icon/BUILD.bazel
++++ b/src/components-examples/material/icon/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -31,16 +32,20 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":icon",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/icon",
+         "//src/material/icon/testing",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/components-examples/material/input/BUILD.bazel b/src/components-examples/material/input/BUILD.bazel
+index 5471757156a0..26083e0dc9f2 100644
+--- a/src/components-examples/material/input/BUILD.bazel
++++ b/src/components-examples/material/input/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -34,17 +35,21 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":input",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/input",
+         "//src/material/input/testing",
+-        "@npm//@angular/forms",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/components-examples/material/list/BUILD.bazel b/src/components-examples/material/list/BUILD.bazel
+index 46bf9b9eb366..bd15f6d5b07f 100644
+--- a/src/components-examples/material/list/BUILD.bazel
++++ b/src/components-examples/material/list/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -32,16 +33,22 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":list",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/list",
+         "//src/material/list/testing",
+     ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
++        "//:node_modules/@types/jasmine",
++    ],
+ )
+ 
+ ng_web_test_suite(
+diff --git a/src/components-examples/material/menu/BUILD.bazel b/src/components-examples/material/menu/BUILD.bazel
+index 47469491e46b..9e4023488f9c 100644
+--- a/src/components-examples/material/menu/BUILD.bazel
++++ b/src/components-examples/material/menu/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -34,16 +35,20 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":menu",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/menu",
+         "//src/material/menu/testing",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/components-examples/material/paginator/BUILD.bazel b/src/components-examples/material/paginator/BUILD.bazel
+index 50790d9b5126..53468bcd7767 100644
+--- a/src/components-examples/material/paginator/BUILD.bazel
++++ b/src/components-examples/material/paginator/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -37,16 +38,20 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":paginator",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/paginator",
+         "//src/material/paginator/testing",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/components-examples/material/progress-bar/BUILD.bazel b/src/components-examples/material/progress-bar/BUILD.bazel
+index 0d41b51e8c40..1ab3eb2b0bcb 100644
+--- a/src/components-examples/material/progress-bar/BUILD.bazel
++++ b/src/components-examples/material/progress-bar/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -35,16 +36,20 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":progress-bar",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/progress-bar",
+         "//src/material/progress-bar/testing",
+     ],
++    deps = [
++        "//:node_modules/@angular/core",
++    ],
+ )
+ 
+ ng_web_test_suite(
+diff --git a/src/components-examples/material/progress-spinner/BUILD.bazel b/src/components-examples/material/progress-spinner/BUILD.bazel
+index 44bf6db98d0b..65f4c779a6b8 100644
+--- a/src/components-examples/material/progress-spinner/BUILD.bazel
++++ b/src/components-examples/material/progress-spinner/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -35,16 +36,20 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":progress-spinner",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/progress-spinner",
+         "//src/material/progress-spinner/testing",
+     ],
++    deps = [
++        "//:node_modules/@angular/core",
++    ],
+ )
+ 
+ ng_web_test_suite(
+diff --git a/src/components-examples/material/radio/BUILD.bazel b/src/components-examples/material/radio/BUILD.bazel
+index a07fb27df62d..b805d2dcc8ad 100644
+--- a/src/components-examples/material/radio/BUILD.bazel
++++ b/src/components-examples/material/radio/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -32,16 +33,20 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":radio",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/radio",
+         "//src/material/radio/testing",
+-        "@npm//@angular/forms",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
+     ],
+ )
+ 
+diff --git a/src/components-examples/material/select/BUILD.bazel b/src/components-examples/material/select/BUILD.bazel
+index f5066d2369d2..5da787ba2d56 100644
+--- a/src/components-examples/material/select/BUILD.bazel
++++ b/src/components-examples/material/select/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -35,16 +36,20 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":select",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/select",
+         "//src/material/select/testing",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/components-examples/material/sidenav/BUILD.bazel b/src/components-examples/material/sidenav/BUILD.bazel
+index f2846cc92196..42563983cbc7 100644
+--- a/src/components-examples/material/sidenav/BUILD.bazel
++++ b/src/components-examples/material/sidenav/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -41,16 +42,20 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":sidenav",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/sidenav",
+         "//src/material/sidenav/testing",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/components-examples/material/slide-toggle/BUILD.bazel b/src/components-examples/material/slide-toggle/BUILD.bazel
+index aebd0c7fcb52..0fd7bad1de43 100644
+--- a/src/components-examples/material/slide-toggle/BUILD.bazel
++++ b/src/components-examples/material/slide-toggle/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -36,16 +37,20 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":slide-toggle",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/slide-toggle",
+         "//src/material/slide-toggle/testing",
+-        "@npm//@angular/forms",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
+     ],
+ )
+ 
+diff --git a/src/components-examples/material/slider/BUILD.bazel b/src/components-examples/material/slider/BUILD.bazel
+index 3c4e0e0affd5..00fc92a75c02 100644
+--- a/src/components-examples/material/slider/BUILD.bazel
++++ b/src/components-examples/material/slider/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -35,16 +36,20 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":slider",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/slider",
+         "//src/material/slider/testing",
+     ],
++    deps = [
++        "//:node_modules/@angular/core",
++    ],
+ )
+ 
+ ng_web_test_suite(
+diff --git a/src/components-examples/material/snack-bar/BUILD.bazel b/src/components-examples/material/snack-bar/BUILD.bazel
+index defa1e3d837e..3c1e6dce83aa 100644
+--- a/src/components-examples/material/snack-bar/BUILD.bazel
++++ b/src/components-examples/material/snack-bar/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -35,16 +36,20 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":snack-bar",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/snack-bar",
+         "//src/material/snack-bar/testing",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/components-examples/material/sort/BUILD.bazel b/src/components-examples/material/sort/BUILD.bazel
+index 828a75c32cfa..498c5b0cbb6c 100644
+--- a/src/components-examples/material/sort/BUILD.bazel
++++ b/src/components-examples/material/sort/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -31,16 +32,20 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":sort",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/sort",
+         "//src/material/sort/testing",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/components-examples/material/stepper/BUILD.bazel b/src/components-examples/material/stepper/BUILD.bazel
+index 59cd225b039a..00b82d0d7e1f 100644
+--- a/src/components-examples/material/stepper/BUILD.bazel
++++ b/src/components-examples/material/stepper/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -39,17 +40,21 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":stepper",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/stepper",
+         "//src/material/stepper/testing",
+-        "@npm//@angular/forms",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/components-examples/material/table/BUILD.bazel b/src/components-examples/material/table/BUILD.bazel
+index 7ffa4e0bb932..f87641cc9ee2 100644
+--- a/src/components-examples/material/table/BUILD.bazel
++++ b/src/components-examples/material/table/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -42,16 +43,20 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":table",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/table",
+         "//src/material/table/testing",
+     ],
++    deps = [
++        "//:node_modules/@angular/core",
++    ],
+ )
+ 
+ ng_web_test_suite(
+diff --git a/src/components-examples/material/tabs/BUILD.bazel b/src/components-examples/material/tabs/BUILD.bazel
+index 076ab91e5466..cacb1740a62a 100644
+--- a/src/components-examples/material/tabs/BUILD.bazel
++++ b/src/components-examples/material/tabs/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -37,16 +38,20 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":tabs",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/tabs",
+         "//src/material/tabs/testing",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/components-examples/material/timepicker/BUILD.bazel b/src/components-examples/material/timepicker/BUILD.bazel
+index 09a215458152..c81760e99d09 100644
+--- a/src/components-examples/material/timepicker/BUILD.bazel
++++ b/src/components-examples/material/timepicker/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -38,17 +39,21 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":timepicker",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/core",
+         "//src/material/timepicker",
+         "//src/material/timepicker/testing",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/components-examples/material/toolbar/BUILD.bazel b/src/components-examples/material/toolbar/BUILD.bazel
+index a9bee7f33148..2d92a782ac3f 100644
+--- a/src/components-examples/material/toolbar/BUILD.bazel
++++ b/src/components-examples/material/toolbar/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -33,10 +34,11 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":toolbar",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+@@ -44,6 +46,9 @@ ng_test_library(
+         "//src/material/toolbar",
+         "//src/material/toolbar/testing",
+     ],
++    deps = [
++        "//:node_modules/@angular/core",
++    ],
+ )
+ 
+ ng_web_test_suite(
+diff --git a/src/components-examples/material/tooltip/BUILD.bazel b/src/components-examples/material/tooltip/BUILD.bazel
+index 7b2b510076c0..639c37e58d20 100644
+--- a/src/components-examples/material/tooltip/BUILD.bazel
++++ b/src/components-examples/material/tooltip/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -37,16 +38,20 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":tooltip",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/tooltip",
+         "//src/material/tooltip/testing",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/components-examples/material/tree/BUILD.bazel b/src/components-examples/material/tree/BUILD.bazel
+index 361507e2e26d..b7e5a6bd11b2 100644
+--- a/src/components-examples/material/tree/BUILD.bazel
++++ b/src/components-examples/material/tree/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -36,10 +37,11 @@ filegroup(
+     ]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":tree",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+@@ -47,6 +49,10 @@ ng_test_library(
+         "//src/material/tree",
+         "//src/material/tree/testing",
+     ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
++    ],
+ )
+ 
+ ng_web_test_suite(
+diff --git a/src/google-maps/BUILD.bazel b/src/google-maps/BUILD.bazel
+index a9eee1143f64..7537374bad4f 100644
+--- a/src/google-maps/BUILD.bazel
++++ b/src/google-maps/BUILD.bazel
+@@ -1,7 +1,20 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_package", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_package", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
++load("@aspect_rules_ts//ts:defs.bzl", rules_js_tsconfig = "ts_config")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
++rules_js_tsconfig(
++    name = "tsconfig-test",
++    src = "tsconfig-test.json",
++    deps = [
++        "//:node_modules/@types/google.maps",
++        "//:node_modules/@types/jasmine",
++        "//:node_modules/@types/node",
++        "//src:test-tsconfig",
++    ],
++)
++
+ ng_module(
+     name = "google-maps",
+     srcs = glob(
+@@ -33,16 +46,21 @@ filegroup(
+     srcs = glob(["**/*.ts"]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":google-maps",
+         "//src/google-maps/testing",
+-        "@npm//@angular/platform-browser",
++    ],
++    tsconfig = ":tsconfig-test",
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/google-maps/map-directions-renderer/map-directions-service.spec.ts b/src/google-maps/map-directions-renderer/map-directions-service.spec.ts
+index ac9765d03506..aab2e7b48ce6 100644
+--- a/src/google-maps/map-directions-renderer/map-directions-service.spec.ts
++++ b/src/google-maps/map-directions-renderer/map-directions-service.spec.ts
+@@ -57,7 +57,7 @@ describe('MapDirectionsService', () => {
+         destination: 'work',
+         travelMode: 'BICYCLING' as google.maps.TravelMode,
+       })
+-      .subscribe(response => {
++      .subscribe((response: MapDirectionsResponse) => {
+         expect(response).toEqual({result, status} as MapDirectionsResponse);
+       });
+   });
+diff --git a/src/google-maps/map-geocoder/map-geocoder.spec.ts b/src/google-maps/map-geocoder/map-geocoder.spec.ts
+index 3bc234d2dc09..c93d1cd56e16 100644
+--- a/src/google-maps/map-geocoder/map-geocoder.spec.ts
++++ b/src/google-maps/map-geocoder/map-geocoder.spec.ts
+@@ -34,7 +34,7 @@ describe('MapGeocoder', () => {
+       return Promise.resolve({results});
+     });
+ 
+-    geocoder.geocode({region: 'Europe'}).subscribe(response => {
++    geocoder.geocode({region: 'Europe'}).subscribe((response: MapGeocoderResponse) => {
+       expect(response).toEqual({results, status} as MapGeocoderResponse);
+     });
+   });
+diff --git a/src/google-maps/testing/BUILD.bazel b/src/google-maps/testing/BUILD.bazel
+index 2f31d31981cf..e6980ecafeac 100644
+--- a/src/google-maps/testing/BUILD.bazel
++++ b/src/google-maps/testing/BUILD.bazel
+@@ -10,6 +10,7 @@ ts_project(
+         "//src/google-maps",
+     ],
+     deps = [
++        "//:node_modules/@angular/core",
+         "//:node_modules/@types/google.maps",
+         "//:node_modules/@types/jasmine",
+     ],
+diff --git a/src/google-maps/tsconfig-test.json b/src/google-maps/tsconfig-test.json
+new file mode 100644
+index 000000000000..e787674db16b
+--- /dev/null
++++ b/src/google-maps/tsconfig-test.json
+@@ -0,0 +1,6 @@
++{
++  "extends": "../bazel-tsconfig-test.json",
++  "compilerOptions": {
++    "types": ["google.maps", "jasmine", "node"]
++  }
++}
+diff --git a/src/material-date-fns-adapter/BUILD.bazel b/src/material-date-fns-adapter/BUILD.bazel
+index 308681f7b51d..abdb087e5bff 100644
+--- a/src/material-date-fns-adapter/BUILD.bazel
++++ b/src/material-date-fns-adapter/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_package", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_package", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -16,16 +17,20 @@ ng_module(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":material-date-fns-adapter",
+         "//src/material/core",
+-        "@npm//date-fns",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/date-fns",
+     ],
+ )
+ 
+diff --git a/src/material-date-fns-adapter/schematics/BUILD.bazel b/src/material-date-fns-adapter/schematics/BUILD.bazel
+index 7c72a96aef47..33a61c5449e0 100644
+--- a/src/material-date-fns-adapter/schematics/BUILD.bazel
++++ b/src/material-date-fns-adapter/schematics/BUILD.bazel
+@@ -21,6 +21,7 @@ ts_project(
+     tsconfig = "tsconfig.json",
+     deps = [
+         "//:node_modules/@angular-devkit/schematics",
++        "//:node_modules/@angular/core",
+         "//:node_modules/@types/node",
+     ],
+ )
+diff --git a/src/material-experimental/column-resize/BUILD.bazel b/src/material-experimental/column-resize/BUILD.bazel
+index 9ba3b4bed00d..8841a2838751 100644
+--- a/src/material-experimental/column-resize/BUILD.bazel
++++ b/src/material-experimental/column-resize/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite", "sass_library")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite", "sass_library")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -25,10 +26,11 @@ sass_library(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "column_resize_test_sources",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":column-resize",
+         "//src/cdk-experimental/column-resize",
+         "//src/cdk/bidi",
+@@ -37,7 +39,10 @@ ng_test_library(
+         "//src/cdk/overlay",
+         "//src/cdk/testing/private",
+         "//src/material/table",
+-        "@npm//rxjs",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/rxjs",
+     ],
+ )
+ 
+diff --git a/src/material-experimental/menubar/BUILD.bazel b/src/material-experimental/menubar/BUILD.bazel
+index a4824bb574e0..7398057f40fd 100644
+--- a/src/material-experimental/menubar/BUILD.bazel
++++ b/src/material-experimental/menubar/BUILD.bazel
+@@ -1,11 +1,11 @@
+ load(
+     "//tools:defaults.bzl",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -40,18 +40,22 @@ sass_binary(
+     src = "menubar-item.scss",
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":menubar",
+         "//src/cdk/keycodes",
+         "//src/cdk/menu",
+         "//src/cdk/testing/private",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material-experimental/popover-edit/BUILD.bazel b/src/material-experimental/popover-edit/BUILD.bazel
+index c9e1a637f656..a65ed4d10ee1 100644
+--- a/src/material-experimental/popover-edit/BUILD.bazel
++++ b/src/material-experimental/popover-edit/BUILD.bazel
+@@ -1,10 +1,10 @@
+ load(
+     "//tools:defaults.bzl",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -31,13 +31,14 @@ sass_library(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":popover-edit",
+         "//src/cdk-experimental/popover-edit",
+         "//src/cdk/collections",
+@@ -45,9 +46,11 @@ ng_test_library(
+         "//src/cdk/overlay",
+         "//src/cdk/testing/private",
+         "//src/material/table",
+-        "@npm//@angular/common",
+-        "@npm//@angular/forms",
+-        "@npm//rxjs",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
++        "//:node_modules/rxjs",
+     ],
+ )
+ 
+diff --git a/src/material-luxon-adapter/BUILD.bazel b/src/material-luxon-adapter/BUILD.bazel
+index 65e855aa2c1e..fccfd47c28de 100644
+--- a/src/material-luxon-adapter/BUILD.bazel
++++ b/src/material-luxon-adapter/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_package", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_package", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -17,17 +18,21 @@ ng_module(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":material-luxon-adapter",
+         "//src/material/core",
+-        "@npm//@types/luxon",
+-        "@npm//luxon",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@types/luxon",
++        "//:node_modules/luxon",
+     ],
+ )
+ 
+diff --git a/src/material-moment-adapter/BUILD.bazel b/src/material-moment-adapter/BUILD.bazel
+index b70191d45752..c6728d7d0d88 100644
+--- a/src/material-moment-adapter/BUILD.bazel
++++ b/src/material-moment-adapter/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_package", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_package", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -16,17 +17,21 @@ ng_module(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":material-moment-adapter",
+         "//src/material/core",
+         "//src/material/testing",
+-        "@npm//moment",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/moment",
+     ],
+ )
+ 
+diff --git a/src/material/autocomplete/BUILD.bazel b/src/material/autocomplete/BUILD.bazel
+index 441886c84958..f307f931f0d4 100644
+--- a/src/material/autocomplete/BUILD.bazel
++++ b/src/material/autocomplete/BUILD.bazel
+@@ -3,11 +3,11 @@ load(
+     "extract_tokens",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -50,15 +50,16 @@ sass_binary(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "autocomplete_tests_lib",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = [
+             "**/*.e2e.spec.ts",
+         ],
+     ),
+-    deps = [
++    interop_deps = [
+         ":autocomplete",
+         "//src/cdk/bidi",
+         "//src/cdk/keycodes",
+@@ -69,9 +70,12 @@ ng_test_library(
+         "//src/material/core",
+         "//src/material/form-field",
+         "//src/material/input",
+-        "@npm//@angular/forms",
+-        "@npm//@angular/platform-browser",
+-        "@npm//rxjs",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
++        "//:node_modules/@angular/platform-browser",
++        "//:node_modules/rxjs",
+     ],
+ )
+ 
+diff --git a/src/material/autocomplete/testing/BUILD.bazel b/src/material/autocomplete/testing/BUILD.bazel
+index 34e93ade6416..2d592d7ee233 100644
+--- a/src/material/autocomplete/testing/BUILD.bazel
++++ b/src/material/autocomplete/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -21,16 +21,20 @@ filegroup(
+     srcs = glob(["**/*.ts"]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/autocomplete",
+-        "@npm//@angular/forms",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/badge/BUILD.bazel b/src/material/badge/BUILD.bazel
+index f5b8da274bf3..c0fe04318375 100644
+--- a/src/material/badge/BUILD.bazel
++++ b/src/material/badge/BUILD.bazel
+@@ -3,11 +3,11 @@ load(
+     "extract_tokens",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -50,16 +50,20 @@ sass_library(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":badge",
+         "//src/material/core",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/badge/testing/BUILD.bazel b/src/material/badge/testing/BUILD.bazel
+index 8b9b236b7c92..055288a9ff8e 100644
+--- a/src/material/badge/testing/BUILD.bazel
++++ b/src/material/badge/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -20,15 +20,19 @@ filegroup(
+     srcs = glob(["**/*.ts"]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/badge",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/bottom-sheet/BUILD.bazel b/src/material/bottom-sheet/BUILD.bazel
+index 24252352e85f..1a014bd75c49 100644
+--- a/src/material/bottom-sheet/BUILD.bazel
++++ b/src/material/bottom-sheet/BUILD.bazel
+@@ -3,11 +3,11 @@ load(
+     "extract_tokens",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -52,13 +52,14 @@ sass_binary(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":bottom-sheet",
+         "//src/cdk/bidi",
+         "//src/cdk/keycodes",
+@@ -66,8 +67,11 @@ ng_test_library(
+         "//src/cdk/platform",
+         "//src/cdk/scrolling",
+         "//src/cdk/testing/private",
+-        "@npm//@angular/common",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/common",
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/bottom-sheet/testing/BUILD.bazel b/src/material/bottom-sheet/testing/BUILD.bazel
+index 01f422e44ac6..77a65b275d23 100644
+--- a/src/material/bottom-sheet/testing/BUILD.bazel
++++ b/src/material/bottom-sheet/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -20,16 +20,20 @@ filegroup(
+     srcs = glob(["**/*.ts"]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/overlay",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/bottom-sheet",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/button-toggle/BUILD.bazel b/src/material/button-toggle/BUILD.bazel
+index 6747c969f3de..32e0f519594d 100644
+--- a/src/material/button-toggle/BUILD.bazel
++++ b/src/material/button-toggle/BUILD.bazel
+@@ -3,11 +3,11 @@ load(
+     "extract_tokens",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -46,18 +46,22 @@ sass_binary(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":button-toggle",
+         "//src/cdk/testing",
+         "//src/cdk/testing/private",
+-        "@npm//@angular/common",
+-        "@npm//@angular/forms",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/common",
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/button-toggle/testing/BUILD.bazel b/src/material/button-toggle/testing/BUILD.bazel
+index 1473c3997105..c394ed96cc6b 100644
+--- a/src/material/button-toggle/testing/BUILD.bazel
++++ b/src/material/button-toggle/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -21,15 +21,19 @@ filegroup(
+     srcs = glob(["**/*.ts"]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/button-toggle",
+     ],
++    deps = [
++        "//:node_modules/@angular/core",
++    ],
+ )
+ 
+ ng_web_test_suite(
+diff --git a/src/material/button/BUILD.bazel b/src/material/button/BUILD.bazel
+index 2f71c888a923..c3c09ddec4af 100644
+--- a/src/material/button/BUILD.bazel
++++ b/src/material/button/BUILD.bazel
+@@ -3,11 +3,11 @@ load(
+     "extract_tokens",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -81,17 +81,21 @@ sass_binary(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "button_tests_lib",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":button",
+         "//src/cdk/platform",
+         "//src/cdk/testing/private",
+         "//src/material/core",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/button/testing/BUILD.bazel b/src/material/button/testing/BUILD.bazel
+index 6fc3605f8f4e..234423ed4e13 100644
+--- a/src/material/button/testing/BUILD.bazel
++++ b/src/material/button/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -20,10 +20,11 @@ filegroup(
+     srcs = glob(["**/*.ts"]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/platform",
+         "//src/cdk/testing",
+@@ -31,8 +32,11 @@ ng_test_library(
+         "//src/material/button",
+         "//src/material/icon",
+         "//src/material/icon/testing",
+-        "@npm//@angular/forms",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/card/BUILD.bazel b/src/material/card/BUILD.bazel
+index 0c8ad558d287..1b23295c9ced 100644
+--- a/src/material/card/BUILD.bazel
++++ b/src/material/card/BUILD.bazel
+@@ -3,11 +3,11 @@ load(
+     "extract_tokens",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -39,14 +39,18 @@ sass_binary(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":card",
+     ],
++    deps = [
++        "//:node_modules/@angular/core",
++    ],
+ )
+ 
+ ng_web_test_suite(
+diff --git a/src/material/card/testing/BUILD.bazel b/src/material/card/testing/BUILD.bazel
+index a08afd1538cc..7598701ce11c 100644
+--- a/src/material/card/testing/BUILD.bazel
++++ b/src/material/card/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -19,15 +19,19 @@ filegroup(
+     srcs = glob(["**/*.ts"]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/card",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/checkbox/BUILD.bazel b/src/material/checkbox/BUILD.bazel
+index 98e3e228cdb0..bf287b978854 100644
+--- a/src/material/checkbox/BUILD.bazel
++++ b/src/material/checkbox/BUILD.bazel
+@@ -3,11 +3,11 @@ load(
+     "extract_tokens",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -46,18 +46,22 @@ sass_binary(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "checkbox_tests_lib",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":checkbox",
+         "//src/cdk/testing/private",
+         "//src/cdk/testing/testbed",
+         "//src/material/core",
+-        "@npm//@angular/forms",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/checkbox/testing/BUILD.bazel b/src/material/checkbox/testing/BUILD.bazel
+index a9ce7fdc0811..c5e097133875 100644
+--- a/src/material/checkbox/testing/BUILD.bazel
++++ b/src/material/checkbox/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -20,16 +20,20 @@ filegroup(
+     srcs = glob(["**/*.ts"]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/checkbox",
+-        "@npm//@angular/forms",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/chips/BUILD.bazel b/src/material/chips/BUILD.bazel
+index 4bc02f1ce534..82a612a97218 100644
+--- a/src/material/chips/BUILD.bazel
++++ b/src/material/chips/BUILD.bazel
+@@ -3,11 +3,11 @@ load(
+     "extract_tokens",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -58,13 +58,14 @@ sass_binary(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "chips_tests_lib",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":chips",
+         "//src/cdk/a11y",
+         "//src/cdk/bidi",
+@@ -75,11 +76,14 @@ ng_test_library(
+         "//src/material/core",
+         "//src/material/form-field",
+         "//src/material/input",
+-        "@npm//@angular/animations",
+-        "@npm//@angular/common",
+-        "@npm//@angular/forms",
+-        "@npm//@angular/platform-browser",
+-        "@npm//rxjs",
++    ],
++    deps = [
++        "//:node_modules/@angular/animations",
++        "//:node_modules/@angular/common",
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
++        "//:node_modules/@angular/platform-browser",
++        "//:node_modules/rxjs",
+     ],
+ )
+ 
+diff --git a/src/material/chips/testing/BUILD.bazel b/src/material/chips/testing/BUILD.bazel
+index 1e2f0628a3d5..c69398bbdae0 100644
+--- a/src/material/chips/testing/BUILD.bazel
++++ b/src/material/chips/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -17,10 +17,11 @@ ts_project(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/keycodes",
+         "//src/cdk/testing",
+@@ -28,7 +29,10 @@ ng_test_library(
+         "//src/material/chips",
+         "//src/material/icon",
+         "//src/material/icon/testing",
+-        "@npm//@angular/forms",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
+     ],
+ )
+ 
+diff --git a/src/material/core/BUILD.bazel b/src/material/core/BUILD.bazel
+index 8c6c5af1347f..123bf5806e1d 100644
+--- a/src/material/core/BUILD.bazel
++++ b/src/material/core/BUILD.bazel
+@@ -4,11 +4,11 @@ load(
+     "extract_tokens",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -176,19 +176,23 @@ sass_binary(
+ #  Test targets
+ #################
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":core",
+         "//src/cdk/keycodes",
+         "//src/cdk/platform",
+         "//src/cdk/testing/private",
+         "//src/material/testing",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/core/testing/BUILD.bazel b/src/material/core/testing/BUILD.bazel
+index 620b7401ab4d..096c04b191d9 100644
+--- a/src/material/core/testing/BUILD.bazel
++++ b/src/material/core/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -19,15 +19,19 @@ filegroup(
+     srcs = glob(["**/*.ts"]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/core",
+     ],
++    deps = [
++        "//:node_modules/@angular/core",
++    ],
+ )
+ 
+ ng_web_test_suite(
+diff --git a/src/material/datepicker/BUILD.bazel b/src/material/datepicker/BUILD.bazel
+index adb127523203..ee9874fdee98 100644
+--- a/src/material/datepicker/BUILD.bazel
++++ b/src/material/datepicker/BUILD.bazel
+@@ -3,11 +3,11 @@ load(
+     "extract_tokens",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -101,13 +101,14 @@ sass_binary(
+     src = "datepicker-actions.scss",
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":datepicker",
+         "//src/cdk/a11y",
+         "//src/cdk/bidi",
+@@ -120,10 +121,13 @@ ng_test_library(
+         "//src/material/form-field",
+         "//src/material/input",
+         "//src/material/testing",
+-        "@npm//@angular/common",
+-        "@npm//@angular/forms",
+-        "@npm//@angular/platform-browser",
+-        "@npm//rxjs",
++    ],
++    deps = [
++        "//:node_modules/@angular/common",
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
++        "//:node_modules/@angular/platform-browser",
++        "//:node_modules/rxjs",
+     ],
+ )
+ 
+diff --git a/src/material/datepicker/testing/BUILD.bazel b/src/material/datepicker/testing/BUILD.bazel
+index cb6e2924af53..ffa35bd0e6ab 100644
+--- a/src/material/datepicker/testing/BUILD.bazel
++++ b/src/material/datepicker/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -21,17 +21,21 @@ filegroup(
+     srcs = glob(["**/*.ts"]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/core",
+         "//src/material/datepicker",
+-        "@npm//@angular/forms",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/dialog/BUILD.bazel b/src/material/dialog/BUILD.bazel
+index 5112e15cab9e..ea9444565f00 100644
+--- a/src/material/dialog/BUILD.bazel
++++ b/src/material/dialog/BUILD.bazel
+@@ -3,11 +3,11 @@ load(
+     "extract_tokens",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -47,12 +47,13 @@ sass_binary(
+ # Testing
+ ###########
+ 
+-ng_test_library(
++ts_project(
+     name = "dialog_tests_lib",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":dialog",
+         "//src/cdk/a11y",
+         "//src/cdk/bidi",
+@@ -62,9 +63,12 @@ ng_test_library(
+         "//src/cdk/platform",
+         "//src/cdk/scrolling",
+         "//src/cdk/testing/private",
+-        "@npm//@angular/common",
+-        "@npm//@angular/platform-browser",
+-        "@npm//rxjs",
++    ],
++    deps = [
++        "//:node_modules/@angular/common",
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
++        "//:node_modules/rxjs",
+     ],
+ )
+ 
+diff --git a/src/material/dialog/testing/BUILD.bazel b/src/material/dialog/testing/BUILD.bazel
+index a8e5fb0a7d2e..bf430fac8408 100644
+--- a/src/material/dialog/testing/BUILD.bazel
++++ b/src/material/dialog/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -26,16 +26,20 @@ filegroup(
+     srcs = glob(["**/*.ts"]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/overlay",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/dialog",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/divider/BUILD.bazel b/src/material/divider/BUILD.bazel
+index 911d869a015b..94c460d4c4cc 100644
+--- a/src/material/divider/BUILD.bazel
++++ b/src/material/divider/BUILD.bazel
+@@ -3,11 +3,11 @@ load(
+     "extract_tokens",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -40,15 +40,19 @@ sass_binary(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":divider",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/divider/testing/BUILD.bazel b/src/material/divider/testing/BUILD.bazel
+index 68efbb212de3..0694f48f1386 100644
+--- a/src/material/divider/testing/BUILD.bazel
++++ b/src/material/divider/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -19,15 +19,19 @@ filegroup(
+     srcs = glob(["**/*.ts"]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/divider",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/expansion/BUILD.bazel b/src/material/expansion/BUILD.bazel
+index 9519a0091545..18d4e4e090e1 100644
+--- a/src/material/expansion/BUILD.bazel
++++ b/src/material/expansion/BUILD.bazel
+@@ -3,11 +3,11 @@ load(
+     "extract_tokens",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -58,17 +58,21 @@ sass_binary(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":expansion",
+         "//src/cdk/a11y",
+         "//src/cdk/keycodes",
+         "//src/cdk/testing/private",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/expansion/testing/BUILD.bazel b/src/material/expansion/testing/BUILD.bazel
+index 57bb80c1dd91..61200e54a154 100644
+--- a/src/material/expansion/testing/BUILD.bazel
++++ b/src/material/expansion/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -19,15 +19,19 @@ filegroup(
+     srcs = glob(["**/*.ts"]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/expansion",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/form-field/testing/BUILD.bazel b/src/material/form-field/testing/BUILD.bazel
+index a8188b4de4ec..57af2ea6f979 100644
+--- a/src/material/form-field/testing/BUILD.bazel
++++ b/src/material/form-field/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -23,10 +23,11 @@ filegroup(
+     srcs = glob(["**/*.ts"]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/testing",
+         "//src/cdk/testing/private",
+@@ -40,8 +41,11 @@ ng_test_library(
+         "//src/material/input/testing",
+         "//src/material/select",
+         "//src/material/select/testing",
+-        "@npm//@angular/forms",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/grid-list/BUILD.bazel b/src/material/grid-list/BUILD.bazel
+index e483276f3ff5..695dd15c6f89 100644
+--- a/src/material/grid-list/BUILD.bazel
++++ b/src/material/grid-list/BUILD.bazel
+@@ -3,11 +3,11 @@ load(
+     "extract_tokens",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -39,15 +39,19 @@ sass_binary(
+     deps = ["//src/material/core:core_scss_lib"],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":grid-list",
+         "//src/cdk/bidi",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/grid-list/testing/BUILD.bazel b/src/material/grid-list/testing/BUILD.bazel
+index ed7784a66ff1..fef3898f6bb8 100644
+--- a/src/material/grid-list/testing/BUILD.bazel
++++ b/src/material/grid-list/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -20,16 +20,20 @@ filegroup(
+     srcs = glob(["**/*.ts"]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/testing",
+         "//src/cdk/testing/private",
+         "//src/cdk/testing/testbed",
+         "//src/material/grid-list",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/icon/BUILD.bazel b/src/material/icon/BUILD.bazel
+index 3637bc7c9818..d91fad058479 100644
+--- a/src/material/icon/BUILD.bazel
++++ b/src/material/icon/BUILD.bazel
+@@ -3,11 +3,11 @@ load(
+     "extract_tokens",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -40,17 +40,21 @@ sass_binary(
+     deps = ["//src/material/core:core_scss_lib"],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":icon",
+         "//src/cdk/testing",
+         "//src/cdk/testing/private",
+-        "@npm//@angular/common",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/common",
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/icon/icon.spec.ts b/src/material/icon/icon.spec.ts
+index 3649f4aa94ee..d1b41a9d92a3 100644
+--- a/src/material/icon/icon.spec.ts
++++ b/src/material/icon/icon.spec.ts
+@@ -368,7 +368,7 @@ describe('MatIcon', () => {
+       verifyPathChildElement(svgElement, 'meow');
+ 
+       // Assert that a registered icon can be looked-up by url.
+-      iconRegistry.getSvgIconFromUrl(trustUrl('cat.svg')).subscribe(element => {
++      iconRegistry.getSvgIconFromUrl(trustUrl('cat.svg')).subscribe((element: SVGElement) => {
+         verifyPathChildElement(element, 'meow');
+       });
+ 
+@@ -836,7 +836,7 @@ describe('MatIcon', () => {
+       verifyPathChildElement(svgElement, 'meow');
+ 
+       // Assert that a registered icon can be looked-up by name.
+-      iconRegistry.getNamedSvgIcon('fluffy').subscribe(element => {
++      iconRegistry.getNamedSvgIcon('fluffy').subscribe((element: SVGElement) => {
+         verifyPathChildElement(element, 'meow');
+       });
+ 
+@@ -1264,7 +1264,7 @@ describe('MatIcon', () => {
+       verifyPathChildElement(svgElement, 'meow');
+ 
+       // Assert that a registered icon can be looked-up by url.
+-      iconRegistry.getSvgIconFromUrl(trustUrl('cat.svg')).subscribe(element => {
++      iconRegistry.getSvgIconFromUrl(trustUrl('cat.svg')).subscribe((element: SVGElement) => {
+         verifyPathChildElement(element, 'meow');
+       });
+ 
+diff --git a/src/material/icon/testing/BUILD.bazel b/src/material/icon/testing/BUILD.bazel
+index e06226855b45..26e39ed373b5 100644
+--- a/src/material/icon/testing/BUILD.bazel
++++ b/src/material/icon/testing/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -22,16 +23,20 @@ filegroup(
+     srcs = glob(["**/*.ts"]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/platform",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/icon",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/input/BUILD.bazel b/src/material/input/BUILD.bazel
+index 59a60896ab11..641def3bdde5 100644
+--- a/src/material/input/BUILD.bazel
++++ b/src/material/input/BUILD.bazel
+@@ -3,10 +3,10 @@ load(
+     "extract_tokens",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -35,21 +35,25 @@ sass_library(
+ # Testing
+ ###########
+ 
+-ng_test_library(
++ts_project(
+     name = "input_tests_lib",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":input",
+         "//src/cdk/platform",
+         "//src/cdk/testing/private",
+         "//src/material/core",
+         "//src/material/form-field",
+         "//src/material/icon",
+-        "@npm//@angular/forms",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/input/testing/BUILD.bazel b/src/material/input/testing/BUILD.bazel
+index e267b0c3950c..ff13871f14df 100644
+--- a/src/material/input/testing/BUILD.bazel
++++ b/src/material/input/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -16,15 +16,11 @@ ts_project(
+     ],
+ )
+ 
+-filegroup(
+-    name = "source-files",
+-    srcs = glob(["**/*.ts"]),
+-)
+-
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/platform",
+         "//src/cdk/testing",
+@@ -32,9 +28,17 @@ ng_test_library(
+         "//src/material/form-field",
+         "//src/material/form-field/testing/control",
+         "//src/material/input",
+-        "@npm//@angular/forms",
+-        "@npm//@angular/platform-browser",
+     ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
++        "//:node_modules/@angular/platform-browser",
++    ],
++)
++
++filegroup(
++    name = "source-files",
++    srcs = glob(["**/*.ts"]),
+ )
+ 
+ ng_web_test_suite(
+diff --git a/src/material/list/BUILD.bazel b/src/material/list/BUILD.bazel
+index 5ab52fbecd5d..077a71cbaa85 100644
+--- a/src/material/list/BUILD.bazel
++++ b/src/material/list/BUILD.bazel
+@@ -3,11 +3,11 @@ load(
+     "extract_tokens",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -82,19 +82,23 @@ sass_binary(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "list_tests_lib",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":list",
+         "//src/cdk/keycodes",
+         "//src/cdk/testing/private",
+         "//src/cdk/testing/testbed",
+         "//src/material/core",
+-        "@npm//@angular/forms",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/list/testing/BUILD.bazel b/src/material/list/testing/BUILD.bazel
+index ed06bcc011a9..c04dfb99ba86 100644
+--- a/src/material/list/testing/BUILD.bazel
++++ b/src/material/list/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -22,16 +22,20 @@ filegroup(
+     srcs = glob(["**/*.ts"]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/divider/testing",
+         "//src/material/list",
+     ],
++    deps = [
++        "//:node_modules/@angular/core",
++    ],
+ )
+ 
+ ng_web_test_suite(
+diff --git a/src/material/menu/BUILD.bazel b/src/material/menu/BUILD.bazel
+index 61b0c11819af..855cafd59001 100644
+--- a/src/material/menu/BUILD.bazel
++++ b/src/material/menu/BUILD.bazel
+@@ -3,11 +3,11 @@ load(
+     "extract_tokens",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -46,12 +46,13 @@ sass_binary(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "menu_tests_lib",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":menu",
+         "//src/cdk/a11y",
+         "//src/cdk/bidi",
+@@ -60,8 +61,11 @@ ng_test_library(
+         "//src/cdk/scrolling",
+         "//src/cdk/testing/private",
+         "//src/material/core",
+-        "@npm//@angular/platform-browser",
+-        "@npm//rxjs",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
++        "//:node_modules/rxjs",
+     ],
+ )
+ 
+diff --git a/src/material/menu/testing/BUILD.bazel b/src/material/menu/testing/BUILD.bazel
+index 931be02f4ce0..1e3ccc0fd0d5 100644
+--- a/src/material/menu/testing/BUILD.bazel
++++ b/src/material/menu/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -20,17 +20,21 @@ filegroup(
+     srcs = glob(["**/*.ts"]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/overlay",
+         "//src/cdk/testing",
+         "//src/cdk/testing/private",
+         "//src/cdk/testing/testbed",
+         "//src/material/menu",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/paginator/BUILD.bazel b/src/material/paginator/BUILD.bazel
+index 56436d96ad8f..3cfa15168c18 100644
+--- a/src/material/paginator/BUILD.bazel
++++ b/src/material/paginator/BUILD.bazel
+@@ -3,11 +3,11 @@ load(
+     "extract_tokens",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -46,18 +46,22 @@ sass_binary(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "paginator_tests_lib",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":paginator",
+         "//src/cdk/testing/private",
+         "//src/material/core",
+         "//src/material/select",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/paginator/testing/BUILD.bazel b/src/material/paginator/testing/BUILD.bazel
+index a09338d9689f..feae923842a6 100644
+--- a/src/material/paginator/testing/BUILD.bazel
++++ b/src/material/paginator/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -16,16 +16,20 @@ ts_project(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/testing",
+         "//src/cdk/testing/private",
+         "//src/cdk/testing/testbed",
+         "//src/material/paginator",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/progress-bar/BUILD.bazel b/src/material/progress-bar/BUILD.bazel
+index 7c78a5f3a5a9..fbb9cee92fb6 100644
+--- a/src/material/progress-bar/BUILD.bazel
++++ b/src/material/progress-bar/BUILD.bazel
+@@ -3,11 +3,11 @@ load(
+     "extract_tokens",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -42,15 +42,19 @@ sass_binary(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "progress_bar_tests_lib",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":progress-bar",
+         "//src/cdk/testing/private",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/progress-bar/testing/BUILD.bazel b/src/material/progress-bar/testing/BUILD.bazel
+index 344c9a954598..e95667db25b3 100644
+--- a/src/material/progress-bar/testing/BUILD.bazel
++++ b/src/material/progress-bar/testing/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -14,15 +15,19 @@ ng_module(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/progress-bar",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/progress-spinner/BUILD.bazel b/src/material/progress-spinner/BUILD.bazel
+index c0baf5708989..613396bcfe79 100644
+--- a/src/material/progress-spinner/BUILD.bazel
++++ b/src/material/progress-spinner/BUILD.bazel
+@@ -3,11 +3,11 @@ load(
+     "extract_tokens",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -45,16 +45,20 @@ sass_binary(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "progress_spinner_tests_lib",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":progress-spinner",
+         "//src/cdk/platform",
+-        "@npm//@angular/common",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/common",
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/progress-spinner/testing/BUILD.bazel b/src/material/progress-spinner/testing/BUILD.bazel
+index 210f2f380c90..26e2e022d45d 100644
+--- a/src/material/progress-spinner/testing/BUILD.bazel
++++ b/src/material/progress-spinner/testing/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_module", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_module", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -20,15 +21,19 @@ filegroup(
+     srcs = glob(["**/*.ts"]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/progress-spinner",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/radio/BUILD.bazel b/src/material/radio/BUILD.bazel
+index a96c2a5f4e0f..daa5a73880e6 100644
+--- a/src/material/radio/BUILD.bazel
++++ b/src/material/radio/BUILD.bazel
+@@ -3,11 +3,11 @@ load(
+     "extract_tokens",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -62,17 +62,21 @@ filegroup(
+ # Testing
+ ###########
+ 
+-ng_test_library(
++ts_project(
+     name = "radio_tests_lib",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":radio",
+         "//src/cdk/testing/private",
+-        "@npm//@angular/common",
+-        "@npm//@angular/forms",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/common",
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/radio/testing/BUILD.bazel b/src/material/radio/testing/BUILD.bazel
+index 491e599078eb..6fd48f221c5e 100644
+--- a/src/material/radio/testing/BUILD.bazel
++++ b/src/material/radio/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -15,17 +15,21 @@ ts_project(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/testing",
+         "//src/cdk/testing/private",
+         "//src/cdk/testing/testbed",
+         "//src/material/radio",
+-        "@npm//@angular/forms",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/select/BUILD.bazel b/src/material/select/BUILD.bazel
+index 25fe19fa9d0c..0362c4768620 100644
+--- a/src/material/select/BUILD.bazel
++++ b/src/material/select/BUILD.bazel
+@@ -3,11 +3,11 @@ load(
+     "extract_tokens",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -54,12 +54,13 @@ sass_binary(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "select_tests_lib",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":select",
+         "//src/cdk/a11y",
+         "//src/cdk/bidi",
+@@ -69,9 +70,12 @@ ng_test_library(
+         "//src/cdk/testing/private",
+         "//src/material/core",
+         "//src/material/form-field",
+-        "@npm//@angular/forms",
+-        "@npm//@angular/platform-browser",
+-        "@npm//rxjs",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
++        "//:node_modules/@angular/platform-browser",
++        "//:node_modules/rxjs",
+     ],
+ )
+ 
+diff --git a/src/material/select/testing/BUILD.bazel b/src/material/select/testing/BUILD.bazel
+index 30c5ce2ec513..ed439b8f4fae 100644
+--- a/src/material/select/testing/BUILD.bazel
++++ b/src/material/select/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -21,10 +21,11 @@ filegroup(
+     srcs = glob(["**/*.ts"]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/overlay",
+         "//src/cdk/testing",
+@@ -32,8 +33,11 @@ ng_test_library(
+         "//src/material/form-field",
+         "//src/material/form-field/testing/control",
+         "//src/material/select",
+-        "@npm//@angular/forms",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/sidenav/BUILD.bazel b/src/material/sidenav/BUILD.bazel
+index 52b318181a63..f904f8053fbe 100644
+--- a/src/material/sidenav/BUILD.bazel
++++ b/src/material/sidenav/BUILD.bazel
+@@ -3,11 +3,11 @@ load(
+     "extract_tokens",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -47,12 +47,13 @@ sass_binary(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":sidenav",
+         "//src/cdk/a11y",
+         "//src/cdk/bidi",
+@@ -61,8 +62,11 @@ ng_test_library(
+         "//src/cdk/scrolling",
+         "//src/cdk/testing",
+         "//src/cdk/testing/private",
+-        "@npm//@angular/common",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/common",
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/sidenav/testing/BUILD.bazel b/src/material/sidenav/testing/BUILD.bazel
+index a8ca460c2061..998b560ed4e1 100644
+--- a/src/material/sidenav/testing/BUILD.bazel
++++ b/src/material/sidenav/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -20,15 +20,19 @@ filegroup(
+     srcs = glob(["**/*.ts"]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/sidenav",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/slide-toggle/BUILD.bazel b/src/material/slide-toggle/BUILD.bazel
+index cf94f56eb392..5e4d9e48fb61 100644
+--- a/src/material/slide-toggle/BUILD.bazel
++++ b/src/material/slide-toggle/BUILD.bazel
+@@ -3,11 +3,11 @@ load(
+     "extract_tokens",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -46,18 +46,22 @@ sass_binary(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "slide_toggle_tests_lib",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":slide-toggle",
+         "//src/cdk/a11y",
+         "//src/cdk/bidi",
+         "//src/cdk/testing/private",
+-        "@npm//@angular/forms",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/slide-toggle/testing/BUILD.bazel b/src/material/slide-toggle/testing/BUILD.bazel
+index bcd4b02c4454..da329cd0eab7 100644
+--- a/src/material/slide-toggle/testing/BUILD.bazel
++++ b/src/material/slide-toggle/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -22,16 +22,20 @@ ts_project(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/slide-toggle",
+-        "@npm//@angular/forms",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/slider/BUILD.bazel b/src/material/slider/BUILD.bazel
+index afc3c4da9d43..ccbbe0ab4dd7 100644
+--- a/src/material/slider/BUILD.bazel
++++ b/src/material/slider/BUILD.bazel
+@@ -5,11 +5,11 @@ load(
+     "markdown_to_html",
+     "ng_e2e_test_library",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -72,22 +72,26 @@ filegroup(
+ # Testing
+ ###########
+ 
+-ng_test_library(
++ts_project(
+     name = "slider_tests_lib",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":slider",
+         "//src/cdk/bidi",
+         "//src/cdk/keycodes",
+         "//src/cdk/platform",
+         "//src/cdk/testing/private",
+         "//src/material/core",
+-        "@npm//@angular/forms",
+-        "@npm//@angular/platform-browser",
+-        "@npm//rxjs",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
++        "//:node_modules/@angular/platform-browser",
++        "//:node_modules/rxjs",
+     ],
+ )
+ 
+diff --git a/src/material/slider/testing/BUILD.bazel b/src/material/slider/testing/BUILD.bazel
+index 2eeddfde10d7..a811e7222ad8 100644
+--- a/src/material/slider/testing/BUILD.bazel
++++ b/src/material/slider/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -18,15 +18,19 @@ ts_project(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/slider",
+     ],
++    deps = [
++        "//:node_modules/@angular/core",
++    ],
+ )
+ 
+ ng_web_test_suite(
+diff --git a/src/material/snack-bar/BUILD.bazel b/src/material/snack-bar/BUILD.bazel
+index 7c6ba68eac81..3199510827ae 100644
+--- a/src/material/snack-bar/BUILD.bazel
++++ b/src/material/snack-bar/BUILD.bazel
+@@ -3,11 +3,11 @@ load(
+     "extract_tokens",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -57,19 +57,23 @@ sass_binary(
+ # Testing
+ ###########
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":snack-bar",
+         "//src/cdk/a11y",
+         "//src/cdk/overlay",
+         "//src/cdk/platform",
+-        "@npm//@angular/common",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/common",
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/snack-bar/testing/BUILD.bazel b/src/material/snack-bar/testing/BUILD.bazel
+index 3462d049f2e0..aa76aada3b2f 100644
+--- a/src/material/snack-bar/testing/BUILD.bazel
++++ b/src/material/snack-bar/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -22,17 +22,21 @@ filegroup(
+     srcs = glob(["**/*.ts"]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/overlay",
+         "//src/cdk/testing",
+         "//src/cdk/testing/private",
+         "//src/cdk/testing/testbed",
+         "//src/material/snack-bar",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/sort/BUILD.bazel b/src/material/sort/BUILD.bazel
+index 357c6d4bb850..38f999b04a26 100644
+--- a/src/material/sort/BUILD.bazel
++++ b/src/material/sort/BUILD.bazel
+@@ -3,11 +3,11 @@ load(
+     "extract_tokens",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -45,20 +45,24 @@ sass_binary(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":sort",
+         "//src/cdk/collections",
+         "//src/cdk/table",
+         "//src/cdk/testing/private",
+         "//src/material/table",
+-        "@npm//@angular/platform-browser",
+-        "@npm//rxjs",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
++        "//:node_modules/rxjs",
+     ],
+ )
+ 
+diff --git a/src/material/sort/testing/BUILD.bazel b/src/material/sort/testing/BUILD.bazel
+index 167b4eb69956..cc5f3f2cd999 100644
+--- a/src/material/sort/testing/BUILD.bazel
++++ b/src/material/sort/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -22,15 +22,19 @@ filegroup(
+     srcs = glob(["**/*.ts"]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/sort",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/stepper/BUILD.bazel b/src/material/stepper/BUILD.bazel
+index d793ac741638..f7cb1a082285 100644
+--- a/src/material/stepper/BUILD.bazel
++++ b/src/material/stepper/BUILD.bazel
+@@ -3,11 +3,11 @@ load(
+     "extract_tokens",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -64,12 +64,13 @@ sass_binary(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":stepper",
+         "//src/cdk/bidi",
+         "//src/cdk/keycodes",
+@@ -79,9 +80,12 @@ ng_test_library(
+         "//src/material/core",
+         "//src/material/form-field",
+         "//src/material/input",
+-        "@npm//@angular/forms",
+-        "@npm//@angular/platform-browser",
+-        "@npm//rxjs",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
++        "//:node_modules/@angular/platform-browser",
++        "//:node_modules/rxjs",
+     ],
+ )
+ 
+diff --git a/src/material/stepper/testing/BUILD.bazel b/src/material/stepper/testing/BUILD.bazel
+index 28172633b4d0..8fddfc06fd00 100644
+--- a/src/material/stepper/testing/BUILD.bazel
++++ b/src/material/stepper/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -19,18 +19,22 @@ filegroup(
+     srcs = glob(["**/*.ts"]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/stepper",
+         "//src/cdk/testing",
+         "//src/cdk/testing/private",
+         "//src/cdk/testing/testbed",
+         "//src/material/stepper",
+-        "@npm//@angular/forms",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/table/BUILD.bazel b/src/material/table/BUILD.bazel
+index 54a64f6d5909..0fd77559e53e 100644
+--- a/src/material/table/BUILD.bazel
++++ b/src/material/table/BUILD.bazel
+@@ -3,11 +3,11 @@ load(
+     "extract_tokens",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -56,18 +56,22 @@ sass_library(
+ # Testing
+ ###########
+ 
+-ng_test_library(
++ts_project(
+     name = "table_tests_lib",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":table",
+         "//src/cdk/table",
+         "//src/material/paginator",
+         "//src/material/sort",
+-        "@npm//@angular/platform-browser",
+-        "@npm//rxjs",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
++        "//:node_modules/rxjs",
+     ],
+ )
+ 
+diff --git a/src/material/table/testing/BUILD.bazel b/src/material/table/testing/BUILD.bazel
+index 3ff3a06c0a10..9450e9713afb 100644
+--- a/src/material/table/testing/BUILD.bazel
++++ b/src/material/table/testing/BUILD.bazel
+@@ -1,5 +1,5 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -19,15 +19,19 @@ filegroup(
+     srcs = glob(["**/*.ts"]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/table",
+     ],
++    deps = [
++        "//:node_modules/@angular/core",
++    ],
+ )
+ 
+ ng_web_test_suite(
+diff --git a/src/material/tabs/BUILD.bazel b/src/material/tabs/BUILD.bazel
+index e957c0b46b54..0523d95c7a8f 100644
+--- a/src/material/tabs/BUILD.bazel
++++ b/src/material/tabs/BUILD.bazel
+@@ -3,11 +3,11 @@ load(
+     "extract_tokens",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -85,12 +85,13 @@ sass_binary(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "tabs_tests_lib",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":tabs",
+         "//src/cdk/bidi",
+         "//src/cdk/keycodes",
+@@ -101,9 +102,12 @@ ng_test_library(
+         "//src/cdk/testing/private",
+         "//src/cdk/testing/testbed",
+         "//src/material/core",
+-        "@npm//@angular/common",
+-        "@npm//@angular/platform-browser",
+-        "@npm//rxjs",
++    ],
++    deps = [
++        "//:node_modules/@angular/common",
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
++        "//:node_modules/rxjs",
+     ],
+ )
+ 
+diff --git a/src/material/tabs/testing/BUILD.bazel b/src/material/tabs/testing/BUILD.bazel
+index 0dbf07a93ce1..49ebe089fdd6 100644
+--- a/src/material/tabs/testing/BUILD.bazel
++++ b/src/material/tabs/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -19,17 +19,21 @@ filegroup(
+     srcs = glob(["**/*.ts"]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/testing",
+         "//src/cdk/testing/private",
+         "//src/cdk/testing/testbed",
+         "//src/material/tabs",
+-        "@npm//@angular/forms",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/timepicker/BUILD.bazel b/src/material/timepicker/BUILD.bazel
+index 880e63549c0a..9f6fead739c4 100644
+--- a/src/material/timepicker/BUILD.bazel
++++ b/src/material/timepicker/BUILD.bazel
+@@ -3,11 +3,11 @@ load(
+     "extract_tokens",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -46,12 +46,13 @@ sass_binary(
+     deps = ["//src/material/core:core_scss_lib"],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":timepicker",
+         "//src/cdk/keycodes",
+         "//src/cdk/overlay",
+@@ -60,9 +61,12 @@ ng_test_library(
+         "//src/material/core",
+         "//src/material/form-field",
+         "//src/material/input",
+-        "@npm//@angular/forms",
+-        "@npm//@angular/platform-browser",
+-        "@npm//rxjs",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
++        "//:node_modules/@angular/platform-browser",
++        "//:node_modules/rxjs",
+     ],
+ )
+ 
+diff --git a/src/material/timepicker/testing/BUILD.bazel b/src/material/timepicker/testing/BUILD.bazel
+index a7ecb90a6f33..3cb687097b53 100644
+--- a/src/material/timepicker/testing/BUILD.bazel
++++ b/src/material/timepicker/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -22,17 +22,21 @@ filegroup(
+     srcs = glob(["**/*.ts"]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/testing",
+         "//src/cdk/testing/private",
+         "//src/cdk/testing/testbed",
+         "//src/material/core",
+         "//src/material/timepicker",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/toolbar/BUILD.bazel b/src/material/toolbar/BUILD.bazel
+index 3d6b47fb7519..8afec0e742c4 100644
+--- a/src/material/toolbar/BUILD.bazel
++++ b/src/material/toolbar/BUILD.bazel
+@@ -3,11 +3,11 @@ load(
+     "extract_tokens",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -44,15 +44,19 @@ sass_binary(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":toolbar",
+-        "@npm//@angular/common",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/common",
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/toolbar/testing/BUILD.bazel b/src/material/toolbar/testing/BUILD.bazel
+index 2ea7f58fe430..5290a71122f3 100644
+--- a/src/material/toolbar/testing/BUILD.bazel
++++ b/src/material/toolbar/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -19,15 +19,19 @@ filegroup(
+     srcs = glob(["**/*.ts"]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/toolbar",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/tooltip/BUILD.bazel b/src/material/tooltip/BUILD.bazel
+index 17842fa193fc..3a643a65761a 100644
+--- a/src/material/tooltip/BUILD.bazel
++++ b/src/material/tooltip/BUILD.bazel
+@@ -3,11 +3,11 @@ load(
+     "extract_tokens",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -46,15 +46,16 @@ sass_binary(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "tooltip_tests_lib",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = [
+             "**/*.e2e.spec.ts",
+         ],
+     ),
+-    deps = [
++    interop_deps = [
+         ":tooltip",
+         "//src/cdk/a11y",
+         "//src/cdk/bidi",
+@@ -62,8 +63,11 @@ ng_test_library(
+         "//src/cdk/overlay",
+         "//src/cdk/platform",
+         "//src/cdk/testing/private",
+-        "@npm//@angular/platform-browser",
+-        "@npm//rxjs",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
++        "//:node_modules/rxjs",
+     ],
+ )
+ 
+diff --git a/src/material/tooltip/testing/BUILD.bazel b/src/material/tooltip/testing/BUILD.bazel
+index d64338e6ec9b..03fc64f6cf37 100644
+--- a/src/material/tooltip/testing/BUILD.bazel
++++ b/src/material/tooltip/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -19,15 +19,19 @@ filegroup(
+     srcs = glob(["**/*.ts"]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/tooltip",
+-        "@npm//@angular/platform-browser",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
+     ],
+ )
+ 
+diff --git a/src/material/tree/BUILD.bazel b/src/material/tree/BUILD.bazel
+index f0a0aeec14be..6056ba0232f4 100644
+--- a/src/material/tree/BUILD.bazel
++++ b/src/material/tree/BUILD.bazel
+@@ -3,11 +3,11 @@ load(
+     "extract_tokens",
+     "markdown_to_html",
+     "ng_module",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
+ )
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -43,19 +43,23 @@ sass_binary(
+     ],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":tree",
+         "//src/cdk/a11y",
+         "//src/cdk/keycodes",
+         "//src/cdk/testing/private",
+         "//src/cdk/tree",
+-        "@npm//rxjs",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/rxjs",
+     ],
+ )
+ 
+diff --git a/src/material/tree/testing/BUILD.bazel b/src/material/tree/testing/BUILD.bazel
+index 9cfa9ade3dff..97007b861df5 100644
+--- a/src/material/tree/testing/BUILD.bazel
++++ b/src/material/tree/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite")
+ load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+@@ -20,16 +20,20 @@ filegroup(
+     srcs = glob(["**/*.ts"]),
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_tests_lib",
++    testonly = True,
+     srcs = glob(["**/*.spec.ts"]),
+-    deps = [
++    interop_deps = [
+         ":testing",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/cdk/tree",
+         "//src/material/tree",
+     ],
++    deps = [
++        "//:node_modules/@angular/core",
++    ],
+ )
+ 
+ ng_web_test_suite(
+diff --git a/src/youtube-player/BUILD.bazel b/src/youtube-player/BUILD.bazel
+index d5d65d4e7fce..4d8a161ce9ff 100644
+--- a/src/youtube-player/BUILD.bazel
++++ b/src/youtube-player/BUILD.bazel
+@@ -2,13 +2,25 @@ load(
+     "//tools:defaults.bzl",
+     "ng_module",
+     "ng_package",
+-    "ng_test_library",
+     "ng_web_test_suite",
+     "sass_binary",
+ )
++load("//tools:defaults2.bzl", "ts_project")
++load("@aspect_rules_ts//ts:defs.bzl", rules_js_tsconfig = "ts_config")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
++rules_js_tsconfig(
++    name = "tsconfig-test",
++    src = "tsconfig-test.json",
++    deps = [
++        "//:node_modules/@types/jasmine",
++        "//:node_modules/@types/node",
++        "//:node_modules/@types/youtube",
++        "//src:test-tsconfig",
++    ],
++)
++
+ ng_module(
+     name = "youtube-player",
+     srcs = glob(
+@@ -49,16 +61,21 @@ ng_package(
+     deps = [":youtube-player"],
+ )
+ 
+-ng_test_library(
++ts_project(
+     name = "unit_test_sources",
++    testonly = True,
+     srcs = ["fake-youtube-player.ts"] + glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":youtube-player",
+-        "@npm//@angular/platform-browser",
+-        "@npm//rxjs",
++    ],
++    tsconfig = ":tsconfig-test",
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
++        "//:node_modules/rxjs",
+     ],
+ )
+ 
+diff --git a/src/youtube-player/tsconfig-test.json b/src/youtube-player/tsconfig-test.json
+new file mode 100644
+index 000000000000..9465f7d61564
+--- /dev/null
++++ b/src/youtube-player/tsconfig-test.json
+@@ -0,0 +1,6 @@
++{
++  "extends": "../bazel-tsconfig-test.json",
++  "compilerOptions": {
++    "types": ["jasmine", "node", "youtube"]
++  }
++}
+diff --git a/tools/bazel/ts_project_interop.bzl b/tools/bazel/ts_project_interop.bzl
+index 72e4f28e64cb..ae2b75d6a586 100644
+--- a/tools/bazel/ts_project_interop.bzl
++++ b/tools/bazel/ts_project_interop.bzl
+@@ -77,7 +77,7 @@ def _ts_project_module_impl(ctx):
+             LinkablePackageInfo(
+                 package_name = ctx.attr.module_name,
+                 package_path = "",
+-                path = "%s/%s/%s" % (ctx.bin_dir.path, ctx.label.workspace_root, ctx.label.package),
++                path = "%s/%s" % (ctx.bin_dir.path, ctx.label.package),
+                 files = info.sources,
+             ),
+         )
+diff --git a/tools/defaults.bzl b/tools/defaults.bzl
+index e8707662d57c..8ffd8018a657 100644
+--- a/tools/defaults.bzl
++++ b/tools/defaults.bzl
+@@ -236,20 +236,6 @@ def jasmine_node_test(**kwargs):
+     kwargs["templated_args"] = ["--bazel_patch_module_resolver"] + kwargs.get("templated_args", [])
+     _jasmine_node_test(**kwargs)
+ 
+-def ng_test_library(deps = [], **kwargs):
+-    local_deps = [
+-        # We declare "@angular/core" as default dependencies because
+-        # all Angular component unit tests use the `TestBed` and `Component` exports.
+-        "@npm//@angular/core",
+-        "@npm//@types/jasmine",
+-    ] + deps
+-
+-    ts_library(
+-        testonly = True,
+-        deps = local_deps,
+-        **kwargs
+-    )
+-
+ def ng_e2e_test_library(deps = [], **kwargs):
+     local_deps = [
+         "@npm//@types/jasmine",

@@ -1,0 +1,179 @@
+From 004a9436d325dc87bde2a4bd37d821dfc6375745 Mon Sep 17 00:00:00 2001
+From: Andrew Seguin <andrewseguin@users.noreply.github.com>
+Date: Mon, 17 Jun 2024 14:22:22 -0600
+Subject: [PATCH] Revert "fix(material/tree): aria-expanded attribute should
+ not appear in the leaf node (#29096)" (#29272)
+
+This reverts commit 43b8dcbb1f17a9d5fcedc88e996c241ab9e28dd8.
+---
+ src/cdk/tree/tree.spec.ts          | 24 ++++++++++++++++--------
+ src/cdk/tree/tree.ts               | 22 +---------------------
+ src/material/tree/tree.spec.ts     | 23 ++++++++++++++++-------
+ tools/public_api_guard/cdk/tree.md |  2 --
+ 4 files changed, 33 insertions(+), 38 deletions(-)
+
+diff --git a/src/cdk/tree/tree.spec.ts b/src/cdk/tree/tree.spec.ts
+index 093b4be86af5..db8d9eedbb15 100644
+--- a/src/cdk/tree/tree.spec.ts
++++ b/src/cdk/tree/tree.spec.ts
+@@ -145,14 +145,20 @@ describe('CdkTree', () => {
+         let data = dataSource.data;
+         dataSource.addChild(data[2]);
+         fixture.detectChanges();
+-        let ariaExpandedStates = getNodes(treeElement).map(n => n.getAttribute('aria-expanded'));
+-        expect(ariaExpandedStates).toEqual([null, null, 'false', null]);
++        expect(
++          getNodes(treeElement).every(node => {
++            return node.getAttribute('aria-expanded') === 'false';
++          }),
++        ).toBe(true);
+ 
+         component.treeControl.expandAll();
+         fixture.detectChanges();
+ 
+-        ariaExpandedStates = getNodes(treeElement).map(n => n.getAttribute('aria-expanded'));
+-        expect(ariaExpandedStates).toEqual([null, null, 'true', null]);
++        expect(
++          getNodes(treeElement).every(node => {
++            return node.getAttribute('aria-expanded') === 'true';
++          }),
++        ).toBe(true);
+       });
+ 
+       it('with the right data', () => {
+@@ -799,8 +805,11 @@ describe('CdkTree', () => {
+       });
+ 
+       it('with the right aria-expanded attrs', () => {
+-        let ariaExpandedStates = getNodes(treeElement).map(n => n.getAttribute('aria-expanded'));
+-        expect(ariaExpandedStates).toEqual([null, null, null]);
++        expect(
++          getNodes(treeElement).every(node => {
++            return node.getAttribute('aria-expanded') === 'false';
++          }),
++        ).toBe(true);
+ 
+         component.toggleRecursively = false;
+         fixture.changeDetectorRef.markForCheck();
+@@ -813,7 +822,7 @@ describe('CdkTree', () => {
+         fixture.detectChanges();
+ 
+         const ariaExpanded = getNodes(treeElement).map(n => n.getAttribute('aria-expanded'));
+-        expect(ariaExpanded).toEqual([null, 'true', 'false', null]);
++        expect(ariaExpanded).toEqual(['false', 'true', 'false', 'false']);
+       });
+ 
+       it('should expand/collapse the node multiple times', () => {
+@@ -877,7 +886,6 @@ describe('CdkTree', () => {
+       });
+ 
+       it('should expand/collapse the node recursively', () => {
+-        fixture.changeDetectorRef.markForCheck();
+         let data = dataSource.data;
+         const child = dataSource.addChild(data[1], false);
+         dataSource.addChild(child, false);
+diff --git a/src/cdk/tree/tree.ts b/src/cdk/tree/tree.ts
+index 16b2a21bc06f..9746981bdf4f 100644
+--- a/src/cdk/tree/tree.ts
++++ b/src/cdk/tree/tree.ts
+@@ -324,7 +324,7 @@ export class CdkTree<T, K = T> implements AfterContentChecked, CollectionViewer,
+   exportAs: 'cdkTreeNode',
+   host: {
+     'class': 'cdk-tree-node',
+-    '[attr.aria-expanded]': 'isLeafNode ? null : isExpanded',
++    '[attr.aria-expanded]': 'isExpanded',
+   },
+   standalone: true,
+ })
+@@ -375,26 +375,6 @@ export class CdkTreeNode<T, K = T> implements FocusableOption, OnDestroy, OnInit
+     return this._tree.treeControl.isExpanded(this._data);
+   }
+ 
+-  /* If leaf node, return true to not assign aria-expanded attribute */
+-  get isLeafNode(): boolean {
+-    // If flat tree node data returns false for expandable property, it's a leaf node
+-    if (
+-      this._tree.treeControl.isExpandable !== undefined &&
+-      !this._tree.treeControl.isExpandable(this._data)
+-    ) {
+-      return true;
+-
+-      // If nested tree node data returns 0 descendants, it's a leaf node
+-    } else if (
+-      this._tree.treeControl.isExpandable === undefined &&
+-      this._tree.treeControl.getDescendants(this._data).length === 0
+-    ) {
+-      return true;
+-    }
+-
+-    return false;
+-  }
+-
+   get level(): number {
+     // If the treeControl has a getLevel method, use it to get the level. Otherwise read the
+     // aria-level off the parent node and use it as the level for this node (note aria-level is
+diff --git a/src/material/tree/tree.spec.ts b/src/material/tree/tree.spec.ts
+index fc6e29073623..7091498106cc 100644
+--- a/src/material/tree/tree.spec.ts
++++ b/src/material/tree/tree.spec.ts
+@@ -78,14 +78,20 @@ describe('MatTree', () => {
+         const data = underlyingDataSource.data;
+         underlyingDataSource.addChild(data[2]);
+         fixture.detectChanges();
+-        let ariaExpandedStates = getNodes(treeElement).map(n => n.getAttribute('aria-expanded'));
+-        expect(ariaExpandedStates).toEqual([null, null, 'false']);
++        expect(
++          getNodes(treeElement).every(node => {
++            return node.getAttribute('aria-expanded') === 'false';
++          }),
++        ).toBe(true);
+ 
+         component.treeControl.expandAll();
+         fixture.detectChanges();
+ 
+-        ariaExpandedStates = getNodes(treeElement).map(n => n.getAttribute('aria-expanded'));
+-        expect(ariaExpandedStates).toEqual([null, null, 'true', null]);
++        expect(
++          getNodes(treeElement).every(node => {
++            return node.getAttribute('aria-expanded') === 'true';
++          }),
++        ).toBe(true);
+       });
+ 
+       it('with the right data', () => {
+@@ -464,8 +470,11 @@ describe('MatTree', () => {
+       });
+ 
+       it('with the right aria-expanded attrs', () => {
+-        let ariaExpandedStates = getNodes(treeElement).map(n => n.getAttribute('aria-expanded'));
+-        expect(ariaExpandedStates).toEqual([null, null, null]);
++        expect(
++          getNodes(treeElement).every(node => {
++            return node.getAttribute('aria-expanded') === 'false';
++          }),
++        ).toBe(true);
+ 
+         component.toggleRecursively = false;
+         const data = underlyingDataSource.data;
+@@ -477,7 +486,7 @@ describe('MatTree', () => {
+         fixture.detectChanges();
+ 
+         const ariaExpanded = getNodes(treeElement).map(n => n.getAttribute('aria-expanded'));
+-        expect(ariaExpanded).toEqual([null, 'true', 'false', null]);
++        expect(ariaExpanded).toEqual(['false', 'true', 'false', 'false']);
+       });
+ 
+       it('should expand/collapse the node', () => {
+diff --git a/tools/public_api_guard/cdk/tree.md b/tools/public_api_guard/cdk/tree.md
+index 92d38fefc764..693d41f1c2f3 100644
+--- a/tools/public_api_guard/cdk/tree.md
++++ b/tools/public_api_guard/cdk/tree.md
+@@ -127,8 +127,6 @@ export class CdkTreeNode<T, K = T> implements FocusableOption, OnDestroy, OnInit
+     // (undocumented)
+     get isExpanded(): boolean;
+     // (undocumented)
+-    get isLeafNode(): boolean;
+-    // (undocumented)
+     get level(): number;
+     static mostRecentTreeNode: CdkTreeNode<any> | null;
+     // (undocumented)

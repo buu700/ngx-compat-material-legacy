@@ -1,0 +1,81 @@
+From 9db29c9b7922a7d11aeab85ae7fb6b627f808341 Mon Sep 17 00:00:00 2001
+From: Kristiyan Kostadinov <crisbeto@abv.bg>
+Date: Thu, 14 Nov 2024 13:36:19 +0100
+Subject: [PATCH] fix(material/input): preserve aria-describedby set externally
+
+Currently there are two sources of an `aria-describedby` for a `matInput`: the IDs of the hint/error message in the form field and any custom ones set through `aria-describedby`. This is insufficient, because the ID can also come from a direct DOM manupulation like in the `AriaDescriber`.
+
+These changes tweak the logic to try and preserve them, because currently they get overwritten.
+
+Fixes #30011.
+---
+ src/material/input/input.spec.ts | 12 ++++++++++++
+ src/material/input/input.ts      | 24 ++++++++++++++++++++++--
+ 2 files changed, 34 insertions(+), 2 deletions(-)
+
+diff --git a/src/material/input/input.spec.ts b/src/material/input/input.spec.ts
+index 93ed2c7a723a..611cdc3320f2 100644
+--- a/src/material/input/input.spec.ts
++++ b/src/material/input/input.spec.ts
+@@ -643,6 +643,18 @@ describe('MatMdcInput without forms', () => {
+     expect(input.getAttribute('aria-describedby')).toBe('start end');
+   }));
+ 
++  it('should preserve aria-describedby set directly in the DOM', fakeAsync(() => {
++    const fixture = createComponent(MatInputHintLabel2TestController);
++    const input = fixture.nativeElement.querySelector('input');
++    input.setAttribute('aria-describedby', 'custom');
++    fixture.componentInstance.label = 'label';
++    fixture.changeDetectorRef.markForCheck();
++    fixture.detectChanges();
++    const hint = fixture.nativeElement.querySelector('.mat-mdc-form-field-hint');
++
++    expect(input.getAttribute('aria-describedby')).toBe(`${hint.getAttribute('id')} custom`);
++  }));
++
+   it('should set a class on the hint element based on its alignment', fakeAsync(() => {
+     const fixture = createComponent(MatInputMultipleHintTestController);
+ 
+diff --git a/src/material/input/input.ts b/src/material/input/input.ts
+index a1914bb91967..3be8e80a1ebe 100644
+--- a/src/material/input/input.ts
++++ b/src/material/input/input.ts
+@@ -111,6 +111,9 @@ export class MatInput
+   private _webkitBlinkWheelListenerAttached = false;
+   private _config = inject(MAT_INPUT_CONFIG, {optional: true});
+ 
++  /** `aria-describedby` IDs assigned by the form field. */
++  private _formFieldDescribedBy: string[] | undefined;
++
+   /** Whether the component is being rendered on the server. */
+   readonly _isServer: boolean;
+ 
+@@ -552,9 +555,26 @@ export class MatInput
+    */
+   setDescribedByIds(ids: string[]) {
+     const element = this._elementRef.nativeElement;
++    const existingDescribedBy = element.getAttribute('aria-describedby');
++    let toAssign: string[];
++
++    // In some cases there might be some `aria-describedby` IDs that were assigned directly,
++    // like by the `AriaDescriber` (see #30011). Attempt to preserve them by taking the previous
++    // attribute value and filtering out the IDs that came from the previous `setDescribedByIds`
++    // call. Note the `|| ids` here allows us to avoid duplicating IDs on the first render.
++    if (existingDescribedBy) {
++      const exclude = this._formFieldDescribedBy || ids;
++      toAssign = ids.concat(
++        existingDescribedBy.split(' ').filter(id => id && !exclude.includes(id)),
++      );
++    } else {
++      toAssign = ids;
++    }
++
++    this._formFieldDescribedBy = ids;
+ 
+-    if (ids.length) {
+-      element.setAttribute('aria-describedby', ids.join(' '));
++    if (toAssign.length) {
++      element.setAttribute('aria-describedby', toAssign.join(' '));
+     } else {
+       element.removeAttribute('aria-describedby');
+     }

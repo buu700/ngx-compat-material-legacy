@@ -1,0 +1,261 @@
+From 57d9a2fa2d574dd79be3b1595768825c958265c9 Mon Sep 17 00:00:00 2001
+From: Wagner Maciel <wagnermaciel@google.com>
+Date: Fri, 18 Oct 2024 17:00:08 +0000
+Subject: [PATCH] refactor(multiple): remove visually hidden styles from core
+ (#29812)
+
+---
+ src/cdk/a11y/BUILD.bazel                      | 1 +
+ src/cdk/a11y/aria-describer/aria-describer.ts | 2 ++
+ src/cdk/a11y/focus-trap/focus-trap.ts         | 5 ++++-
+ src/cdk/a11y/live-announcer/live-announcer.ts | 5 ++++-
+ src/material/badge/badge.ts                   | 3 ++-
+ src/material/chips/chip.ts                    | 3 ++-
+ src/material/core/_core.scss                  | 5 +----
+ src/material/core/option/option.ts            | 3 ++-
+ src/material/datepicker/calendar.ts           | 2 ++
+ src/material/datepicker/datepicker-base.ts    | 2 ++
+ src/material/datepicker/month-view.ts         | 2 ++
+ src/material/stepper/step-header.ts           | 3 ++-
+ 12 files changed, 26 insertions(+), 10 deletions(-)
+
+diff --git a/src/cdk/a11y/BUILD.bazel b/src/cdk/a11y/BUILD.bazel
+index 710ea578423d..1075a8b9d957 100644
+--- a/src/cdk/a11y/BUILD.bazel
++++ b/src/cdk/a11y/BUILD.bazel
+@@ -24,6 +24,7 @@ ng_module(
+         "//src/cdk/layout",
+         "//src/cdk/observers",
+         "//src/cdk/platform",
++        "//src/cdk/private",
+         "@npm//@angular/core",
+         "@npm//rxjs",
+     ],
+diff --git a/src/cdk/a11y/aria-describer/aria-describer.ts b/src/cdk/a11y/aria-describer/aria-describer.ts
+index a940df4f024a..4302739500d0 100644
+--- a/src/cdk/a11y/aria-describer/aria-describer.ts
++++ b/src/cdk/a11y/aria-describer/aria-describer.ts
+@@ -10,6 +10,7 @@ import {DOCUMENT} from '@angular/common';
+ import {Injectable, OnDestroy, APP_ID, inject} from '@angular/core';
+ import {Platform} from '@angular/cdk/platform';
+ import {addAriaReferencedId, getAriaReferenceIds, removeAriaReferencedId} from './aria-reference';
++import {_CdkPrivateStyleLoader, _VisuallyHiddenLoader} from '@angular/cdk/private';
+ 
+ /**
+  * Interface used to register message elements and keep a count of how many registrations have
+@@ -69,6 +70,7 @@ export class AriaDescriber implements OnDestroy {
+   constructor(...args: unknown[]);
+ 
+   constructor() {
++    inject(_CdkPrivateStyleLoader).load(_VisuallyHiddenLoader);
+     this._id = inject(APP_ID) + '-' + nextId++;
+   }
+ 
+diff --git a/src/cdk/a11y/focus-trap/focus-trap.ts b/src/cdk/a11y/focus-trap/focus-trap.ts
+index 252aa3a5261f..b367d5c428a5 100644
+--- a/src/cdk/a11y/focus-trap/focus-trap.ts
++++ b/src/cdk/a11y/focus-trap/focus-trap.ts
+@@ -25,6 +25,7 @@ import {
+   inject,
+ } from '@angular/core';
+ import {InteractivityChecker} from '../interactivity-checker/interactivity-checker';
++import {_CdkPrivateStyleLoader, _VisuallyHiddenLoader} from '@angular/cdk/private';
+ 
+ /**
+  * Class that allows for trapping focus within a DOM element.
+@@ -378,7 +379,9 @@ export class FocusTrapFactory {
+   private _injector = inject(Injector);
+ 
+   constructor(...args: unknown[]);
+-  constructor() {}
++  constructor() {
++    inject(_CdkPrivateStyleLoader).load(_VisuallyHiddenLoader);
++  }
+ 
+   /**
+    * Creates a focus-trapped region around the given element.
+diff --git a/src/cdk/a11y/live-announcer/live-announcer.ts b/src/cdk/a11y/live-announcer/live-announcer.ts
+index 28887c7c2f0c..ed16913ffd96 100644
+--- a/src/cdk/a11y/live-announcer/live-announcer.ts
++++ b/src/cdk/a11y/live-announcer/live-announcer.ts
+@@ -16,6 +16,7 @@ import {
+   LIVE_ANNOUNCER_ELEMENT_TOKEN,
+   LIVE_ANNOUNCER_DEFAULT_OPTIONS,
+ } from './live-announcer-tokens';
++import {_CdkPrivateStyleLoader, _VisuallyHiddenLoader} from '@angular/cdk/private';
+ 
+ let uniqueIds = 0;
+ 
+@@ -255,7 +256,9 @@ export class CdkAriaLive implements OnDestroy {
+ 
+   constructor(...args: unknown[]);
+ 
+-  constructor() {}
++  constructor() {
++    inject(_CdkPrivateStyleLoader).load(_VisuallyHiddenLoader);
++  }
+ 
+   ngOnDestroy() {
+     if (this._subscription) {
+diff --git a/src/material/badge/badge.ts b/src/material/badge/badge.ts
+index a492647bad8f..f6d8b2b44eee 100644
+--- a/src/material/badge/badge.ts
++++ b/src/material/badge/badge.ts
+@@ -24,7 +24,7 @@ import {
+   ANIMATION_MODULE_TYPE,
+ } from '@angular/core';
+ import {ThemePalette} from '@angular/material/core';
+-import {_CdkPrivateStyleLoader} from '@angular/cdk/private';
++import {_CdkPrivateStyleLoader, _VisuallyHiddenLoader} from '@angular/cdk/private';
+ 
+ let nextId = 0;
+ 
+@@ -156,6 +156,7 @@ export class MatBadge implements OnInit, OnDestroy {
+ 
+   constructor() {
+     inject(_CdkPrivateStyleLoader).load(_MatBadgeStyleLoader);
++    inject(_CdkPrivateStyleLoader).load(_VisuallyHiddenLoader);
+ 
+     if (typeof ngDevMode === 'undefined' || ngDevMode) {
+       const nativeElement = this._elementRef.nativeElement;
+diff --git a/src/material/chips/chip.ts b/src/material/chips/chip.ts
+index a1a6143c5aa2..9f6434ac5d5d 100644
+--- a/src/material/chips/chip.ts
++++ b/src/material/chips/chip.ts
+@@ -44,7 +44,7 @@ import {Subject, Subscription, merge} from 'rxjs';
+ import {MatChipAction} from './chip-action';
+ import {MatChipAvatar, MatChipRemove, MatChipTrailingIcon} from './chip-icons';
+ import {MAT_CHIP, MAT_CHIP_AVATAR, MAT_CHIP_REMOVE, MAT_CHIP_TRAILING_ICON} from './tokens';
+-import {_CdkPrivateStyleLoader} from '@angular/cdk/private';
++import {_CdkPrivateStyleLoader, _VisuallyHiddenLoader} from '@angular/cdk/private';
+ 
+ let uid = 0;
+ 
+@@ -246,6 +246,7 @@ export class MatChip implements OnInit, AfterViewInit, AfterContentInit, DoCheck
+ 
+   constructor() {
+     inject(_CdkPrivateStyleLoader).load(_StructuralStylesLoader);
++    inject(_CdkPrivateStyleLoader).load(_VisuallyHiddenLoader);
+     const animationMode = inject(ANIMATION_MODULE_TYPE, {optional: true});
+     this._animationsDisabled = animationMode === 'NoopAnimations';
+     this._monitorFocus();
+diff --git a/src/material/core/_core.scss b/src/material/core/_core.scss
+index b2207ae93492..2b115746784e 100644
+--- a/src/material/core/_core.scss
++++ b/src/material/core/_core.scss
+@@ -1,12 +1,9 @@
+-@use '@angular/cdk';
+ @use './tokens/m2/mat/app' as tokens-mat-app;
+ @use './tokens/token-utils';
+ @use './style/elevation';
+ 
+ // Mixin that renders all of the core styles that are not theme-dependent.
+-@mixin core() {
+-  @include cdk.a11y-visually-hidden();
+-}
++@mixin core() {}
+ 
+ // Emits the mat-app-background CSS class. This predefined class sets the
+ // background color and text color of an element.
+diff --git a/src/material/core/option/option.ts b/src/material/core/option/option.ts
+index 1700c8dbe020..987bccfcbde6 100644
+--- a/src/material/core/option/option.ts
++++ b/src/material/core/option/option.ts
+@@ -32,7 +32,7 @@ import {MatOptionParentComponent, MAT_OPTION_PARENT_COMPONENT} from './option-pa
+ import {MatRipple} from '../ripple/ripple';
+ import {MatPseudoCheckbox} from '../selection/pseudo-checkbox/pseudo-checkbox';
+ import {_StructuralStylesLoader} from '../focus-indicators/structural-styles';
+-import {_CdkPrivateStyleLoader} from '@angular/cdk/private';
++import {_CdkPrivateStyleLoader, _VisuallyHiddenLoader} from '@angular/cdk/private';
+ 
+ /**
+  * Option IDs need to be unique across components, so this counter exists outside of
+@@ -146,6 +146,7 @@ export class MatOption<T = any> implements FocusableOption, AfterViewChecked, On
+   constructor(...args: unknown[]);
+   constructor() {
+     inject(_CdkPrivateStyleLoader).load(_StructuralStylesLoader);
++    inject(_CdkPrivateStyleLoader).load(_VisuallyHiddenLoader);
+     this._signalDisableRipple = !!this._parent && isSignal(this._parent.disableRipple);
+   }
+ 
+diff --git a/src/material/datepicker/calendar.ts b/src/material/datepicker/calendar.ts
+index c1b4b05c09bc..7e4302d2e90a 100644
+--- a/src/material/datepicker/calendar.ts
++++ b/src/material/datepicker/calendar.ts
+@@ -40,6 +40,7 @@ import {MatYearView} from './year-view';
+ import {MAT_SINGLE_DATE_SELECTION_MODEL_PROVIDER, DateRange} from './date-selection-model';
+ import {MatIconButton, MatButton} from '@angular/material/button';
+ import {CdkMonitorFocus} from '@angular/cdk/a11y';
++import {_CdkPrivateStyleLoader, _VisuallyHiddenLoader} from '@angular/cdk/private';
+ 
+ let calendarHeaderId = 1;
+ 
+@@ -67,6 +68,7 @@ export class MatCalendarHeader<D> {
+   constructor(...args: unknown[]);
+ 
+   constructor() {
++    inject(_CdkPrivateStyleLoader).load(_VisuallyHiddenLoader);
+     const changeDetectorRef = inject(ChangeDetectorRef);
+     this.calendar.stateChanges.subscribe(() => changeDetectorRef.markForCheck());
+   }
+diff --git a/src/material/datepicker/datepicker-base.ts b/src/material/datepicker/datepicker-base.ts
+index 66a20fdd0898..b63170cad814 100644
+--- a/src/material/datepicker/datepicker-base.ts
++++ b/src/material/datepicker/datepicker-base.ts
+@@ -74,6 +74,7 @@ import {matDatepickerAnimations} from './datepicker-animations';
+ import {createMissingDateImplError} from './datepicker-errors';
+ import {DateFilterFn} from './datepicker-input-base';
+ import {MatDatepickerIntl} from './datepicker-intl';
++import {_CdkPrivateStyleLoader, _VisuallyHiddenLoader} from '@angular/cdk/private';
+ 
+ /** Used to generate a unique ID for each datepicker instance. */
+ let datepickerUid = 0;
+@@ -201,6 +202,7 @@ export class MatDatepickerContent<S, D = ExtractDateTypeFromSelection<S>>
+   constructor(...args: unknown[]);
+ 
+   constructor() {
++    inject(_CdkPrivateStyleLoader).load(_VisuallyHiddenLoader);
+     const intl = inject(MatDatepickerIntl);
+ 
+     this._closeButtonText = intl.closeCalendarLabel;
+diff --git a/src/material/datepicker/month-view.ts b/src/material/datepicker/month-view.ts
+index b85dd4a6413e..655549c702b2 100644
+--- a/src/material/datepicker/month-view.ts
++++ b/src/material/datepicker/month-view.ts
+@@ -51,6 +51,7 @@ import {
+   MatDateRangeSelectionStrategy,
+   MAT_DATE_RANGE_SELECTION_STRATEGY,
+ } from './date-range-selection-strategy';
++import {_CdkPrivateStyleLoader, _VisuallyHiddenLoader} from '@angular/cdk/private';
+ 
+ const DAYS_PER_WEEK = 7;
+ 
+@@ -220,6 +221,7 @@ export class MatMonthView<D> implements AfterContentInit, OnChanges, OnDestroy {
+   constructor(...args: unknown[]);
+ 
+   constructor() {
++    inject(_CdkPrivateStyleLoader).load(_VisuallyHiddenLoader);
+     if (typeof ngDevMode === 'undefined' || ngDevMode) {
+       if (!this._dateAdapter) {
+         throw createMissingDateImplError('DateAdapter');
+diff --git a/src/material/stepper/step-header.ts b/src/material/stepper/step-header.ts
+index 33fd764d0447..8ea45ff83158 100644
+--- a/src/material/stepper/step-header.ts
++++ b/src/material/stepper/step-header.ts
+@@ -26,7 +26,7 @@ import {CdkStepHeader, StepState} from '@angular/cdk/stepper';
+ import {_StructuralStylesLoader, MatRipple, ThemePalette} from '@angular/material/core';
+ import {MatIcon} from '@angular/material/icon';
+ import {NgTemplateOutlet} from '@angular/common';
+-import {_CdkPrivateStyleLoader} from '@angular/cdk/private';
++import {_CdkPrivateStyleLoader, _VisuallyHiddenLoader} from '@angular/cdk/private';
+ 
+ @Component({
+   selector: 'mat-step-header',
+@@ -89,6 +89,7 @@ export class MatStepHeader extends CdkStepHeader implements AfterViewInit, OnDes
+     super();
+ 
+     inject(_CdkPrivateStyleLoader).load(_StructuralStylesLoader);
++    inject(_CdkPrivateStyleLoader).load(_VisuallyHiddenLoader);
+     const changeDetectorRef = inject(ChangeDetectorRef);
+     this._intlSubscription = this._intl.changes.subscribe(() => changeDetectorRef.markForCheck());
+   }

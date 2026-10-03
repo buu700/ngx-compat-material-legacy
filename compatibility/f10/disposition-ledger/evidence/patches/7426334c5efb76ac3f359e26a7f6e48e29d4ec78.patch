@@ -1,0 +1,278 @@
+From 7426334c5efb76ac3f359e26a7f6e48e29d4ec78 Mon Sep 17 00:00:00 2001
+From: Kristiyan Kostadinov <crisbeto@abv.bg>
+Date: Mon, 27 Apr 2026 14:49:41 +0200
+Subject: [PATCH] fix(cdk/a11y): breaking changes for v22
+
+Removes deprecated APIs for v22 in the `cdk/a11y` package.
+
+BREAKING CHANGE:
+* `CDK_DESCRIBEDBY_HOST_ATTRIBUTE` has been removed.
+* `CDK_DESCRIBEDBY_ID_PREFIX` has been removed.
+* The `injector` parameter of the `ConfigurableFocusTrap` and `FocusTrap` constructors is now required.
+* The boolean parameter of `ConfigurableFocusTrapFactory.create` has been replaced with a config object.
+* `MESSAGES_CONTAINER_ID` has been removed.
+---
+ goldens/cdk/a11y/index.api.md                 | 19 ++++-------------
+ .../popover-edit/focus-escape-notifier.ts     | 14 ++++++++++---
+ .../aria-describer/aria-describer.spec.ts     |  4 +---
+ src/cdk/a11y/aria-describer/aria-describer.ts | 21 +++----------------
+ .../configurable-focus-trap-factory.ts        | 16 ++------------
+ .../focus-trap/configurable-focus-trap.ts     |  2 +-
+ src/cdk/a11y/focus-trap/focus-trap.ts         | 10 ++-------
+ src/cdk/a11y/public-api.ts                    |  2 +-
+ 8 files changed, 25 insertions(+), 63 deletions(-)
+
+diff --git a/goldens/cdk/a11y/index.api.md b/goldens/cdk/a11y/index.api.md
+index 0219011a0edf..3459b6d58d38 100644
+--- a/goldens/cdk/a11y/index.api.md
++++ b/goldens/cdk/a11y/index.api.md
+@@ -61,12 +61,6 @@ export class AriaDescriber implements OnDestroy {
+ // @public
+ export type AriaLivePoliteness = 'off' | 'polite' | 'assertive';
+ 
+-// @public @deprecated
+-export const CDK_DESCRIBEDBY_HOST_ATTRIBUTE = "cdk-describedby-host";
+-
+-// @public @deprecated
+-export const CDK_DESCRIBEDBY_ID_PREFIX = "cdk-describedby-message";
+-
+ // @public
+ export class CdkAriaLive implements OnDestroy {
+     constructor();
+@@ -124,7 +118,7 @@ export class CdkTrapFocus implements OnDestroy, AfterContentInit, OnChanges, DoC
+ 
+ // @public
+ export class ConfigurableFocusTrap extends FocusTrap implements ManagedFocusTrap {
+-    constructor(_element: HTMLElement, _checker: InteractivityChecker, _ngZone: NgZone, _document: Document, _focusTrapManager: FocusTrapManager, _inertStrategy: FocusTrapInertStrategy, config: ConfigurableFocusTrapConfig, injector?: Injector);
++    constructor(_element: HTMLElement, _checker: InteractivityChecker, _ngZone: NgZone, _document: Document, _focusTrapManager: FocusTrapManager, _inertStrategy: FocusTrapInertStrategy, config: ConfigurableFocusTrapConfig, injector: Injector);
+     destroy(): void;
+     _disable(): void;
+     _enable(): void;
+@@ -141,8 +135,6 @@ export interface ConfigurableFocusTrapConfig {
+ export class ConfigurableFocusTrapFactory {
+     constructor();
+     create(element: HTMLElement, config?: ConfigurableFocusTrapConfig): ConfigurableFocusTrap;
+-    // @deprecated (undocumented)
+-    create(element: HTMLElement, deferCaptureElements: boolean): ConfigurableFocusTrap;
+     // (undocumented)
+     static ɵfac: i0.ɵɵFactoryDeclaration<ConfigurableFocusTrapFactory, never>;
+     // (undocumented)
+@@ -216,8 +208,7 @@ export type FocusOrigin = 'touch' | 'mouse' | 'keyboard' | 'program' | null;
+ 
+ // @public
+ export class FocusTrap {
+-    constructor(_element: HTMLElement, _checker: InteractivityChecker, _ngZone: NgZone, _document: Document, deferAnchors?: boolean,
+-    _injector?: Injector | undefined);
++    constructor(_element: HTMLElement, _checker: InteractivityChecker, _ngZone: NgZone, _document: Document, deferAnchors: boolean | undefined, _injector: Injector);
+     attachAnchors(): boolean;
+     destroy(): void;
+     // (undocumented)
+@@ -237,7 +228,8 @@ export class FocusTrap {
+     focusLastTabbableElement(options?: FocusOptions): boolean;
+     focusLastTabbableElementWhenReady(options?: FocusOptions): Promise<boolean>;
+     hasAttached(): boolean;
+-    readonly _injector?: Injector | undefined;
++    // (undocumented)
++    readonly _injector: Injector;
+     // (undocumented)
+     readonly _ngZone: NgZone;
+     // (undocumented)
+@@ -425,9 +417,6 @@ export interface LiveAnnouncerDefaultOptions {
+ // @public
+ export type LiveAnnouncerMessage = string | SafeHtml;
+ 
+-// @public @deprecated
+-export const MESSAGES_CONTAINER_ID = "cdk-describedby-message-container";
+-
+ // @public @deprecated
+ export const NOOP_TREE_KEY_MANAGER_FACTORY_PROVIDER: Provider;
+ 
+diff --git a/src/cdk-experimental/popover-edit/focus-escape-notifier.ts b/src/cdk-experimental/popover-edit/focus-escape-notifier.ts
+index 37c29b3ae753..f6bf344f0ca0 100644
+--- a/src/cdk-experimental/popover-edit/focus-escape-notifier.ts
++++ b/src/cdk-experimental/popover-edit/focus-escape-notifier.ts
+@@ -6,7 +6,7 @@
+  * found in the LICENSE file at https://angular.dev/license
+  */
+ 
+-import {Service, NgZone, inject, DOCUMENT} from '@angular/core';
++import {Service, NgZone, inject, DOCUMENT, Injector} from '@angular/core';
+ 
+ import {FocusTrap, InteractivityChecker} from '@angular/cdk/a11y';
+ import {Observable, Subject} from 'rxjs';
+@@ -29,8 +29,9 @@ export class FocusEscapeNotifier extends FocusTrap {
+     checker: InteractivityChecker,
+     ngZone: NgZone,
+     document: Document,
++    injector: Injector,
+   ) {
+-    super(element, checker, ngZone, document, true /* deferAnchors */);
++    super(element, checker, ngZone, document, true /* deferAnchors */, injector);
+ 
+     // The focus trap adds "anchors" at the beginning and end of a trapped region that redirect
+     // focus. We override that redirect behavior here with simply emitting on a stream.
+@@ -57,6 +58,7 @@ export class FocusEscapeNotifierFactory {
+   private _checker = inject(InteractivityChecker);
+   private _ngZone = inject(NgZone);
+   private _document = inject(DOCUMENT);
++  private _injector = inject(Injector);
+ 
+   /**
+    * Creates a focus escape notifier region around the given element.
+@@ -64,6 +66,12 @@ export class FocusEscapeNotifierFactory {
+    * @returns The created focus escape notifier instance.
+    */
+   create(element: HTMLElement): FocusEscapeNotifier {
+-    return new FocusEscapeNotifier(element, this._checker, this._ngZone, this._document);
++    return new FocusEscapeNotifier(
++      element,
++      this._checker,
++      this._ngZone,
++      this._document,
++      this._injector,
++    );
+   }
+ }
+diff --git a/src/cdk/a11y/aria-describer/aria-describer.spec.ts b/src/cdk/a11y/aria-describer/aria-describer.spec.ts
+index 56cf5212b69d..2dc7403287e8 100644
+--- a/src/cdk/a11y/aria-describer/aria-describer.spec.ts
++++ b/src/cdk/a11y/aria-describer/aria-describer.spec.ts
+@@ -1,5 +1,4 @@
+-import {A11yModule, CDK_DESCRIBEDBY_HOST_ATTRIBUTE} from '../index';
+-import {AriaDescriber} from './aria-describer';
++import {AriaDescriber, CDK_DESCRIBEDBY_HOST_ATTRIBUTE} from './aria-describer';
+ import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {Component, ElementRef, ViewChild, inject, ChangeDetectionStrategy} from '@angular/core';
+ 
+@@ -395,7 +394,6 @@ function expectMessage(el: Element, message: string) {
+     <div id="description-with-existing-id">Hello</div>
+     <div description-without-id>Hey</div>
+   `,
+-  imports: [A11yModule],
+   changeDetection: ChangeDetectionStrategy.Eager,
+ })
+ class TestApp {
+diff --git a/src/cdk/a11y/aria-describer/aria-describer.ts b/src/cdk/a11y/aria-describer/aria-describer.ts
+index fa34bcff3315..82782cbb7c6b 100644
+--- a/src/cdk/a11y/aria-describer/aria-describer.ts
++++ b/src/cdk/a11y/aria-describer/aria-describer.ts
+@@ -23,25 +23,10 @@ export interface RegisteredMessage {
+   referenceCount: number;
+ }
+ 
+-/**
+- * ID used for the body container where all messages are appended.
+- * @deprecated No longer being used. To be removed.
+- * @breaking-change 14.0.0
+- */
+-export const MESSAGES_CONTAINER_ID = 'cdk-describedby-message-container';
++/** ID prefix used for each created message element. */
++const CDK_DESCRIBEDBY_ID_PREFIX = 'cdk-describedby-message';
+ 
+-/**
+- * ID prefix used for each created message element.
+- * @deprecated To be turned into a private variable.
+- * @breaking-change 14.0.0
+- */
+-export const CDK_DESCRIBEDBY_ID_PREFIX = 'cdk-describedby-message';
+-
+-/**
+- * Attribute given to each host element that is described by a message element.
+- * @deprecated To be turned into a private variable.
+- * @breaking-change 14.0.0
+- */
++/** Attribute given to each host element that is described by a message element. */
+ export const CDK_DESCRIBEDBY_HOST_ATTRIBUTE = 'cdk-describedby-host';
+ 
+ /** Global incremental identifier for each registered message element. */
+diff --git a/src/cdk/a11y/focus-trap/configurable-focus-trap-factory.ts b/src/cdk/a11y/focus-trap/configurable-focus-trap-factory.ts
+index c23a7582236f..b165956ef2ee 100644
+--- a/src/cdk/a11y/focus-trap/configurable-focus-trap-factory.ts
++++ b/src/cdk/a11y/focus-trap/configurable-focus-trap-factory.ts
+@@ -41,22 +41,10 @@ export class ConfigurableFocusTrapFactory {
+    */
+   create(element: HTMLElement, config?: ConfigurableFocusTrapConfig): ConfigurableFocusTrap;
+ 
+-  /**
+-   * @deprecated Pass a config object instead of the `deferCaptureElements` flag.
+-   * @breaking-change 11.0.0
+-   */
+-  create(element: HTMLElement, deferCaptureElements: boolean): ConfigurableFocusTrap;
+-
+   create(
+     element: HTMLElement,
+-    config: ConfigurableFocusTrapConfig | boolean = {defer: false},
++    config: ConfigurableFocusTrapConfig = {defer: false},
+   ): ConfigurableFocusTrap {
+-    let configObject: ConfigurableFocusTrapConfig;
+-    if (typeof config === 'boolean') {
+-      configObject = {defer: config};
+-    } else {
+-      configObject = config;
+-    }
+     return new ConfigurableFocusTrap(
+       element,
+       this._checker,
+@@ -64,7 +52,7 @@ export class ConfigurableFocusTrapFactory {
+       this._document,
+       this._focusTrapManager,
+       this._inertStrategy,
+-      configObject,
++      config,
+       this._injector,
+     );
+   }
+diff --git a/src/cdk/a11y/focus-trap/configurable-focus-trap.ts b/src/cdk/a11y/focus-trap/configurable-focus-trap.ts
+index e95a81b6a7dc..26b817879e4e 100644
+--- a/src/cdk/a11y/focus-trap/configurable-focus-trap.ts
++++ b/src/cdk/a11y/focus-trap/configurable-focus-trap.ts
+@@ -41,7 +41,7 @@ export class ConfigurableFocusTrap extends FocusTrap implements ManagedFocusTrap
+     private _focusTrapManager: FocusTrapManager,
+     private _inertStrategy: FocusTrapInertStrategy,
+     config: ConfigurableFocusTrapConfig,
+-    injector?: Injector,
++    injector: Injector,
+   ) {
+     super(_element, _checker, _ngZone, _document, config.defer, injector);
+     this._focusTrapManager.register(this);
+diff --git a/src/cdk/a11y/focus-trap/focus-trap.ts b/src/cdk/a11y/focus-trap/focus-trap.ts
+index abe0dae50c02..18567653f3e6 100644
+--- a/src/cdk/a11y/focus-trap/focus-trap.ts
++++ b/src/cdk/a11y/focus-trap/focus-trap.ts
+@@ -64,8 +64,7 @@ export class FocusTrap {
+     readonly _ngZone: NgZone,
+     readonly _document: Document,
+     deferAnchors = false,
+-    /** @breaking-change 20.0.0 param to become required */
+-    readonly _injector?: Injector,
++    readonly _injector: Injector,
+   ) {
+     if (!deferAnchors) {
+       this.attachAnchors();
+@@ -359,12 +358,7 @@ export class FocusTrap {
+ 
+   /** Executes a function when the zone is stable. */
+   private _executeOnStable(fn: () => any): void {
+-    // TODO: remove this conditional when injector is required in the constructor.
+-    if (this._injector) {
+-      afterNextRender(fn, {injector: this._injector});
+-    } else {
+-      setTimeout(fn);
+-    }
++    afterNextRender(fn, {injector: this._injector});
+   }
+ }
+ 
+diff --git a/src/cdk/a11y/public-api.ts b/src/cdk/a11y/public-api.ts
+index df192ec2c339..9b0534690742 100644
+--- a/src/cdk/a11y/public-api.ts
++++ b/src/cdk/a11y/public-api.ts
+@@ -5,7 +5,7 @@
+  * Use of this source code is governed by an MIT-style license that can be
+  * found in the LICENSE file at https://angular.dev/license
+  */
+-export * from './aria-describer/aria-describer';
++export {AriaDescriber, RegisteredMessage} from './aria-describer/aria-describer';
+ export * from './aria-describer/aria-reference';
+ export * from './key-manager/activedescendant-key-manager';
+ export * from './key-manager/focus-key-manager';

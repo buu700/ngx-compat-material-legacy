@@ -1,0 +1,28 @@
+From 231f94f5557bb58afc0070585688b3014d541eb2 Mon Sep 17 00:00:00 2001
+From: Kristiyan Kostadinov <crisbeto@abv.bg>
+Date: Thu, 11 Jun 2026 09:38:13 +0200
+Subject: [PATCH] fix(cdk/layout): avoid CSS injection attacks in media matcher
+
+The media matcher needs to create a dummy stylesheet to work around some browser quirks. These changes ensure we don't accidentally inject malicious CSS into the page.
+---
+ src/cdk/layout/media-matcher.ts | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/src/cdk/layout/media-matcher.ts b/src/cdk/layout/media-matcher.ts
+index 8459b90021be..cdce864b36e3 100644
+--- a/src/cdk/layout/media-matcher.ts
++++ b/src/cdk/layout/media-matcher.ts
+@@ -73,7 +73,12 @@ function createEmptyStyleRule(query: string, nonce: string | undefined | null) {
+     }
+ 
+     if (mediaQueryStyleNode.sheet) {
+-      mediaQueryStyleNode.sheet.insertRule(`@media ${query} {body{ }}`, 0);
++      mediaQueryStyleNode.sheet.insertRule(
++        // Drop the curly braces to avoid injection attacks. Curly braces aren't
++        // valid media query syntax so this should be a no-op in valid cases.
++        `@media ${query.replace(/[{}]/g, '')} {body{ }}`,
++        0,
++      );
+       mediaQueriesForWebkitCompatibility.add(query);
+     }
+   } catch (e) {

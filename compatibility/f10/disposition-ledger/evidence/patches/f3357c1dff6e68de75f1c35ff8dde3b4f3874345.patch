@@ -1,0 +1,832 @@
+From f3357c1dff6e68de75f1c35ff8dde3b4f3874345 Mon Sep 17 00:00:00 2001
+From: Kristiyan Kostadinov <crisbeto@users.noreply.github.com>
+Date: Tue, 20 Jan 2026 07:37:44 +0100
+Subject: [PATCH] fix(multiple): resolve sass if function deprecation warnings
+ (#32674)
+
+[Sass has deprecated the `if` function](https://sass-lang.com/documentation/breaking-changes/if-function) in order to support the native CSS `if()`. These changes update all of our usages so users don't get deprecation warnings.
+
+Note that I decided to replace it with `@if`/`@else`, instead of the new syntax, because the new syntax is:
+1. Harder to follow, in my opinion.
+2. Likely going to break users that aren't on the absolute latest version of Sass.
+---
+ .stylelintrc.json                             |  1 +
+ package.json                                  |  2 +-
+ pnpm-lock.yaml                                |  2 +-
+ src/cdk/a11y/_index.scss                      |  8 +++-
+ .../scrolling/virtual-scroll-viewport.scss    | 12 ++++-
+ src/material/badge/badge.scss                 |  7 ++-
+ src/material/button/_m2-button.scss           |  6 ++-
+ src/material/button/_m2-fab.scss              |  9 +++-
+ src/material/button/_m2-icon-button.scss      |  7 ++-
+ src/material/checkbox/_m2-checkbox.scss       |  7 ++-
+ src/material/core/m2/_theming.scss            | 37 +++++++++++-----
+ src/material/core/m2/_typography-utils.scss   |  6 ++-
+ src/material/core/style/_elevation.scss       |  6 ++-
+ src/material/core/style/_validation.scss      | 15 +++++--
+ .../_color-api-backwards-compatibility.scss   |  6 ++-
+ src/material/core/theming/_inspection.scss    | 20 ++++++---
+ src/material/core/theming/_m2-inspection.scss | 10 ++++-
+ src/material/core/theming/_theming.scss       |  5 ++-
+ src/material/core/tokens/_m3-tokens.scss      | 10 +++--
+ src/material/core/tokens/_system.scss         | 12 +++--
+ src/material/core/tokens/_token-utils.scss    |  7 ++-
+ src/material/core/typography/_versioning.scss |  5 +--
+ src/material/form-field/_m2-form-field.scss   | 44 ++++++++++++-------
+ src/material/paginator/_m2-paginator.scss     | 14 +++++-
+ .../progress-bar/_m2-progress-bar.scss        | 11 ++---
+ src/material/radio/_m2-radio.scss             |  7 ++-
+ src/material/sidenav/_m2-sidenav.scss         | 21 +++++----
+ .../slide-toggle/_m2-slide-toggle.scss        |  7 ++-
+ tools/extract-tokens/extract-tokens.mts       | 23 ++++++++--
+ 29 files changed, 243 insertions(+), 84 deletions(-)
+
+diff --git a/.stylelintrc.json b/.stylelintrc.json
+index 2c610bce3151..399384c2239f 100644
+--- a/.stylelintrc.json
++++ b/.stylelintrc.json
+@@ -71,6 +71,7 @@
+     "function-url-quotes": "always",
+     "function-url-scheme-disallowed-list": ["data"],
+     "function-whitespace-after": "always",
++    "function-disallowed-list": ["if"],
+ 
+     "number-leading-zero": "always",
+     "number-no-trailing-zeros": true,
+diff --git a/package.json b/package.json
+index be618fd4e740..f9405903a039 100644
+--- a/package.json
++++ b/package.json
+@@ -132,7 +132,7 @@
+     "rollup": "^4.52.3",
+     "rollup-plugin-dts": "6.3.0",
+     "rollup-plugin-sourcemaps2": "0.5.4",
+-    "sass": "^1.80.6",
++    "sass": "^1.97.2",
+     "selenium-webdriver": "^3.6.0",
+     "semver": "^7.3.5",
+     "shelljs": "^0.10.0",
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+index aab532e0922b..a155ac79cdf5 100644
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -294,7 +294,7 @@ importers:
+         specifier: 0.5.4
+         version: 0.5.4(@types/node@22.19.5)(rollup@4.55.1)
+       sass:
+-        specifier: ^1.80.6
++        specifier: ^1.97.2
+         version: 1.97.2
+       selenium-webdriver:
+         specifier: ^3.6.0
+diff --git a/src/cdk/a11y/_index.scss b/src/cdk/a11y/_index.scss
+index 10c3d8402490..df98b14c650d 100644
+--- a/src/cdk/a11y/_index.scss
++++ b/src/cdk/a11y/_index.scss
+@@ -54,7 +54,13 @@
+            'Allowed values are "active" and "none"';
+   }
+ 
+-  @media (forced-colors: #{if($target == none, none, active)}) {
++  $query-value: active;
++
++  @if ($target == none) {
++    $query-value: none;
++  }
++
++  @media (forced-colors: #{$query-value}) {
+     @content;
+   }
+ }
+diff --git a/src/cdk/scrolling/virtual-scroll-viewport.scss b/src/cdk/scrolling/virtual-scroll-viewport.scss
+index f4c620caa5a6..47a102b6a2ed 100644
+--- a/src/cdk/scrolling/virtual-scroll-viewport.scss
++++ b/src/cdk/scrolling/virtual-scroll-viewport.scss
+@@ -3,8 +3,16 @@
+ // well. We reset some properties here to prevent these container elements from introducing
+ // additional space that would throw off the scrolling calculations.
+ @mixin _clear-container-space($direction) {
+-  $start: if($direction == horizontal, 'left', 'top');
+-  $end: if($direction == horizontal, 'right', 'bottom');
++  $start: '';
++  $end: '';
++
++  @if ($direction == horizontal) {
++    $start: 'left';
++    $end: 'right';
++  } @else {
++    $start: 'top';
++    $end: 'bottom';
++  }
+ 
+   & > dl:not([cdkVirtualFor]),
+   & > ol:not([cdkVirtualFor]),
+diff --git a/src/material/badge/badge.scss b/src/material/badge/badge.scss
+index ee771a08aa7f..79da874efc0c 100644
+--- a/src/material/badge/badge.scss
++++ b/src/material/badge/badge.scss
+@@ -10,7 +10,12 @@ $large-size: $default-size + 6;
+ $fallbacks: m3-badge.get-tokens();
+ 
+ @mixin _badge-size($size) {
+-  $prefix: if($size == 'medium', '', $size + '-size-');
++  $prefix: '';
++
++  @if ($size != 'medium') {
++    $prefix: $size + '-size-';
++  }
++
+   $legacy-size-var-name: 'badge-legacy-#{$prefix}container-size';
+   $size-var-name: 'badge-#{$prefix}container-size';
+ 
+diff --git a/src/material/button/_m2-button.scss b/src/material/button/_m2-button.scss
+index 5a792eb543b4..f3d19287d4bd 100644
+--- a/src/material/button/_m2-button.scss
++++ b/src/material/button/_m2-button.scss
+@@ -16,8 +16,12 @@
+     -2: 28px,
+     -3: 24px,
+   ), $scale);
+-  $touch-target-display: if($scale < -1, none, block);
+   $touch-target-size: 48px;
++  $touch-target-display: block;
++
++  @if ($scale < -1) {
++    $touch-target-display: none;
++  }
+ 
+   @return (
+     base: (
+diff --git a/src/material/button/_m2-fab.scss b/src/material/button/_m2-fab.scss
+index 1653cf1f9c88..d1bea7db9823 100644
+--- a/src/material/button/_m2-fab.scss
++++ b/src/material/button/_m2-fab.scss
+@@ -17,6 +17,11 @@
+   $disabled-container : m3-utils.color-with-opacity(map.get($system, on-surface), 12%);
+   $density-scale: theming.clamp-density(map.get($system, density-scale), -3);
+   $touch-target-size: 48px;
++  $touch-target-display: block;
++
++  @if ($density-scale < -1) {
++    $touch-target-display: none;
++  }
+ 
+   @return (
+     base: (
+@@ -70,8 +75,8 @@
+       fab-extended-label-text-weight: map.get($system, label-small-weight)
+     ),
+     density: (
+-      fab-small-touch-target-display: if($density-scale < -1, none, block),
+-      fab-touch-target-display: if($density-scale < -1, none, block),
++      fab-small-touch-target-display: $touch-target-display,
++      fab-touch-target-display: $touch-target-display,
+     ),
+   );
+ }
+diff --git a/src/material/button/_m2-icon-button.scss b/src/material/button/_m2-icon-button.scss
+index 22d6e3582846..f6a420e052d6 100644
+--- a/src/material/button/_m2-icon-button.scss
++++ b/src/material/button/_m2-icon-button.scss
+@@ -6,6 +6,11 @@
+ @function get-tokens($theme) {
+   $system: m2-utils.get-system($theme);
+   $density-scale: theming.clamp-density(map.get($system, density-scale), -3);
++  $touch-target-display: block;
++
++  @if ($density-scale < -1) {
++    $touch-target-display: none;
++  }
+ 
+   @return (
+     base: (
+@@ -27,7 +32,7 @@
+     ),
+     typography: (),
+     density: (
+-      icon-button-touch-target-display: if($density-scale < -1, none, block),
++      icon-button-touch-target-display: $touch-target-display,
+       icon-button-state-layer-size: map.get((
+         0: 48px,
+         -1: 44px,
+diff --git a/src/material/checkbox/_m2-checkbox.scss b/src/material/checkbox/_m2-checkbox.scss
+index 18dd374d6f0d..d36da29f792e 100644
+--- a/src/material/checkbox/_m2-checkbox.scss
++++ b/src/material/checkbox/_m2-checkbox.scss
+@@ -6,6 +6,11 @@
+ @function get-tokens($theme) {
+   $system: m2-utils.get-system($theme);
+   $density-scale: theming.clamp-density(map.get($system, density-scale), -3);
++  $touch-target-display: block;
++
++  @if ($density-scale < -1) {
++    $touch-target-display: none;
++  }
+ 
+   @return (
+     base: (
+@@ -28,7 +33,7 @@
+       checkbox-label-text-weight: map.get($system, body-medium-weight)
+     ),
+     density: (
+-      checkbox-touch-target-display: if($density-scale < -1, none, block),
++      checkbox-touch-target-display: $touch-target-display,
+       checkbox-state-layer-size: map.get((
+         0: 40px,
+         -1: 36px,
+diff --git a/src/material/core/m2/_theming.scss b/src/material/core/m2/_theming.scss
+index 96d234c8e05f..0154ee1d29a1 100644
+--- a/src/material/core/m2/_theming.scss
++++ b/src/material/core/m2/_theming.scss
+@@ -84,7 +84,13 @@
+ 
+   // We cast the $hue to a string, because some hues starting with a number, like `700-contrast`,
+   // might be inferred as numbers by Sass. Casting them to string fixes the map lookup.
+-  $color: if(map.has-key($palette, $hue), map.get($palette, $hue), map.get($palette, $hue + ''));
++  $color: null;
++
++  @if (map.has-key($palette, $hue)) {
++    $color: map.get($palette, $hue);
++  } @else {
++    $color: map.get($palette, $hue + '');
++  }
+ 
+   @if ($opacity == null) {
+     @return $color;
+@@ -121,12 +127,15 @@
+     warn: $warn,
+   );
+ 
+-  $sys-color: if(
+-      $is-dark,
+-      m2.md-sys-color-values-dark($palettes),
+-      m2.md-sys-color-values-light($palettes));
+   $sys-state: m2.md-sys-state-values();
+   $sys-typography: m2.md-sys-typescale-values($typography);
++  $sys-color: null;
++
++  @if ($is-dark) {
++    $sys-color: m2.md-sys-color-values-dark($palettes);
++  } @else {
++    $sys-color: m2.md-sys-color-values-light($palettes);
++  }
+ 
+   $system: (density-scale: $density-scale);
+   @each $map in ($sys-color, $sys-state, $sys-typography) {
+@@ -139,16 +148,22 @@
+ // Creates a color configuration from the specified
+ // primary, accent and warn palettes.
+ @function _mat-create-color-config($primary, $accent, $warn: null, $is-dark) {
+-  $warn: if($warn != null, $warn, define-palette(palette.$red-palette));
+-  $foreground:
+-      if($is-dark, palette.$dark-theme-foreground-palette, palette.$light-theme-foreground-palette);
+-  $background:
+-      if($is-dark, palette.$dark-theme-background-palette, palette.$light-theme-background-palette);
++  $foreground: null;
++  $background: null;
++  $warn-palette: $warn or define-palette(palette.$red-palette);
++
++  @if ($is-dark) {
++    $foreground: palette.$dark-theme-foreground-palette;
++    $background: palette.$dark-theme-background-palette;
++  } @else {
++    $foreground: palette.$light-theme-foreground-palette;
++    $background: palette.$light-theme-background-palette;
++  }
+ 
+   @return (
+     primary: $primary,
+     accent: $accent,
+-    warn: $warn,
++    warn: $warn-palette,
+     is-dark: $is-dark,
+     foreground: $foreground,
+     background: $background,
+diff --git a/src/material/core/m2/_typography-utils.scss b/src/material/core/m2/_typography-utils.scss
+index 163b8aa3b98a..0f5ada1b2149 100644
+--- a/src/material/core/m2/_typography-utils.scss
++++ b/src/material/core/m2/_typography-utils.scss
+@@ -73,5 +73,9 @@
+   }
+ 
+   // Guard against unquoting non-string values, because it's deprecated.
+-  @return if(meta.type-of($font-family) == string, string.unquote($font-family), $font-family);
++  @if (meta.type-of($font-family) == string) {
++    $font-family: string.unquote($font-family);
++  }
++
++  @return $font-family;
+ }
+diff --git a/src/material/core/style/_elevation.scss b/src/material/core/style/_elevation.scss
+index 1702cfb095f8..5a3d8c98b0ea 100644
+--- a/src/material/core/style/_elevation.scss
++++ b/src/material/core/style/_elevation.scss
+@@ -159,8 +159,12 @@ $prefix: 'mat-elevation-z';
+   $umbra-z-value: map.get($_umbra-map, $zValue);
+   $penumbra-z-value: map.get($_penumbra-map, $zValue);
+   $ambient-z-value: map.get($_ambient-map, $zValue);
++  $color-opacity: 1;
++
++  @if ($opacity != null) {
++    $color-opacity: $opacity;
++  }
+ 
+-  $color-opacity: if($opacity != null, $opacity, 1);
+   $umbra-color: _compute-color-opacity($shadow-color, $_umbra-opacity * $color-opacity);
+   $penumbra-color: _compute-color-opacity($shadow-color, $_penumbra-opacity * $color-opacity);
+   $ambient-color: _compute-color-opacity($shadow-color, $_ambient-opacity * $color-opacity);
+diff --git a/src/material/core/style/_validation.scss b/src/material/core/style/_validation.scss
+index 41b9eafe4e1f..40502504912f 100644
+--- a/src/material/core/style/_validation.scss
++++ b/src/material/core/style/_validation.scss
+@@ -11,7 +11,10 @@
+   @if ($result == list and list.index($types, map) and list.length($obj) == 0) {
+     @return null;
+   }
+-  @return if(list.index($types, $result), null, $result);
++  @if (list.index($types, $result)) {
++    @return null;
++  }
++  @return $result;
+ }
+ 
+ /// Validates that a list contains only values from the allowed list of values.
+@@ -25,7 +28,10 @@
+       $invalid: list.append($invalid, $element);
+     }
+   }
+-  @return if(list.length($invalid) > 0, $invalid, null);
++  @if (list.length($invalid) > 0) {
++    @return $invalid;
++  }
++  @return null;
+ }
+ 
+ /// Validates that a list contains all values from the required list of values.
+@@ -39,5 +45,8 @@
+       $invalid: list.append($invalid, $element);
+     }
+   }
+-  @return if(list.length($invalid) > 0, $invalid, null);
++  @if (list.length($invalid) > 0) {
++    @return $invalid;
++  }
++  @return null;
+ }
+diff --git a/src/material/core/theming/_color-api-backwards-compatibility.scss b/src/material/core/theming/_color-api-backwards-compatibility.scss
+index 0b90e7adcfb5..1e1b75af91f2 100644
+--- a/src/material/core/theming/_color-api-backwards-compatibility.scss
++++ b/src/material/core/theming/_color-api-backwards-compatibility.scss
+@@ -24,7 +24,11 @@
+ $_overrides-only: true;
+ 
+ @mixin _color-variant-styles($theme, $color-variant) {
+-  $secondary-when-primary: if($color-variant == primary, secondary, $color-variant);
++  $secondary-when-primary: $color-variant;
++
++  @if ($color-variant == primary) {
++    $secondary-when-primary: secondary;
++  }
+ 
+   & {
+     @if ($color-variant != primary) {
+diff --git a/src/material/core/theming/_inspection.scss b/src/material/core/theming/_inspection.scss
+index 107d7f580038..ec096c59c8fb 100644
+--- a/src/material/core/theming/_inspection.scss
++++ b/src/material/core/theming/_inspection.scss
+@@ -31,7 +31,10 @@ $_typography-properties: (font, font-family, line-height, font-size, letter-spac
+ @function _validate-theme-object($theme) {
+   $err: validation.validate-type($theme, 'map') or
+         map.get($theme, $internals, theme-version) == null;
+-  @return if($err, true, null);
++  @if ($err) {
++    @return true;
++  }
++  @return null;
+ }
+ 
+ /// Gets the version number of a theme object. A theme that is not a valid versioned theme object is
+@@ -40,7 +43,12 @@ $_typography-properties: (font, font-family, line-height, font-size, letter-spac
+ /// @return {Number} The version number of the theme (0 if unknown).
+ @function get-theme-version($theme) {
+   $err: _validate-theme-object($theme);
+-  @return if($err, 0, map.get($theme, $internals, theme-version) or 0);
++
++  @if ($err) {
++    @return 0;
++  }
++
++  @return map.get($theme, $internals, theme-version) or 0;
+ }
+ 
+ /// Gets the type of theme represented by a theme object (light or dark).
+@@ -99,10 +107,10 @@ $_typography-properties: (font, font-family, line-height, font-size, letter-spac
+     @if $args-count < 2 or $args-count > 3 {
+       @error 'Expected either 2 or 3 arguments when working with an M3 theme. Got: #{$args-count}';
+     }
+-    @return if($args-count == 2,
+-      _get-theme-role-color($theme, $args...),
+-      _get-theme-palette-color($theme, $args...)
+-    );
++    @if ($args-count == 2) {
++      @return _get-theme-role-color($theme, $args...);
++    }
++    @return _get-theme-palette-color($theme, $args...);
+   }
+ 
+   @error 'Unrecognized theme version: #{$version}';
+diff --git a/src/material/core/theming/_m2-inspection.scss b/src/material/core/theming/_m2-inspection.scss
+index 60e8a30fd655..f6ef37ef6f88 100644
+--- a/src/material/core/theming/_m2-inspection.scss
++++ b/src/material/core/theming/_m2-inspection.scss
+@@ -49,7 +49,10 @@ $_typography-properties: (font, font-family, line-height, font-size, letter-spac
+   }
+   $internal: map.get($theme, $_internals, m2-config);
+   $theme: map.remove($theme, $_internals);
+-  @return if(_is-error-theme($theme), $internal, $theme);
++  @if (_is-error-theme($theme)) {
++    @return $internal;
++  }
++  @return $theme;
+ }
+ 
+ /// Checks whether the given theme contains error values.
+@@ -99,7 +102,10 @@ $_typography-properties: (font, font-family, line-height, font-size, letter-spac
+   @if theme-has($colors, color) {
+     $colors: m2-theming.get-color-config($colors);
+   }
+-  @return if(map.get($colors, is-dark), dark, light);
++  @if (map.get($colors, is-dark)) {
++    @return dark;
++  }
++  @return light;
+ }
+ 
+ /// Gets a color from a theme object. This function can take between 2 and 4 arguments. The first
+diff --git a/src/material/core/theming/_theming.scss b/src/material/core/theming/_theming.scss
+index 98a1f9cc217b..0b9ffa7eb2a7 100644
+--- a/src/material/core/theming/_theming.scss
++++ b/src/material/core/theming/_theming.scss
+@@ -45,7 +45,10 @@ $private-internal-name: _mat-theming-internals-do-not-access;
+       $result: map.set($result, $key, $value);
+     }
+   }
+-  @return if($result == (), null, $result);
++  @if ($result == ()) {
++    @return null;
++  }
++  @return $result;
+ }
+ 
+ // Checks whether the given value resolves to a theme object. Theme objects are always
+diff --git a/src/material/core/tokens/_m3-tokens.scss b/src/material/core/tokens/_m3-tokens.scss
+index 2b1334a9b7d1..e8a35fe94b78 100644
+--- a/src/material/core/tokens/_m3-tokens.scss
++++ b/src/material/core/tokens/_m3-tokens.scss
+@@ -39,9 +39,13 @@
+ }
+ 
+ @function get-sys-color($type, $palettes, $prefix) {
+-  $sys-color: if($type == dark,
+-    m3.md-sys-color-values-dark($palettes),
+-    m3.md-sys-color-values-light($palettes));
++  $sys-color: null;
++
++  @if ($type == dark) {
++    $sys-color: m3.md-sys-color-values-dark($palettes);
++  } @else {
++    $sys-color: m3.md-sys-color-values-light($palettes);
++  }
+ 
+   @if (sass-utils.$use-system-color-variables) {
+     $var-values: ();
+diff --git a/src/material/core/tokens/_system.scss b/src/material/core/tokens/_system.scss
+index 3d4e72af14f5..7cc7cd463dc4 100644
+--- a/src/material/core/tokens/_system.scss
++++ b/src/material/core/tokens/_system.scss
+@@ -347,10 +347,14 @@
+ 
+   $color: map.get($config, color);
+   @if (m2-inspection.theme-has($theme-config, color)) {
+-    $system-colors: if(map.get($color, is-dark),
+-      m2.md-sys-color-values-dark($color),
+-      m2.md-sys-color-values-light($color),
+-    );
++    $system-colors: null;
++
++    @if (map.get($color, is-dark)) {
++      $system-colors: m2.md-sys-color-values-dark($color);
++    } @else {
++      $system-colors: m2.md-sys-color-values-light($color);
++    }
++
+     @include _define-m2-system-vars($system-colors, $overrides);
+ 
+     $shadow: map.get($theme-config, _mat-system, shadow);
+diff --git a/src/material/core/tokens/_token-utils.scss b/src/material/core/tokens/_token-utils.scss
+index fdc07754e4d9..56be21d0df12 100644
+--- a/src/material/core/tokens/_token-utils.scss
++++ b/src/material/core/tokens/_token-utils.scss
+@@ -90,8 +90,13 @@
+ 
+     @each $config in $namespace-configs {
+       $namespace: map.get($config, namespace);
+-      $prefix: if(map.has-key($config, prefix), map.get($config, prefix), '');
+       $tokens: map.get(map.get($config, tokens), all);
++      $prefix: '';
++
++      @if (map.has-key($config, prefix)) {
++        $prefix: map.get($config, prefix);
++      }
++
+       @each $name, $value in $tokens {
+         $prefixed-name: $prefix + $name;
+         $all-names: list.append($all-names, $prefixed-name, $separator: comma);
+diff --git a/src/material/core/typography/_versioning.scss b/src/material/core/typography/_versioning.scss
+index 1cd1011d84c4..0d4c09dd4e53 100644
+--- a/src/material/core/typography/_versioning.scss
++++ b/src/material/core/typography/_versioning.scss
+@@ -82,9 +82,8 @@
+       body-2: map.get($config, body-1),
+       button: map.get($config, button),
+       caption: map.get($config, caption),
+-      overline: if(map.get($config, overline), map.get($config, overline),
+-        m2-typography.define-typography-level(12px, 32px, 500)
+-      )
++      overline:
++        map.get($config, overline) or m2-typography.define-typography-level(12px, 32px, 500),
+     );
+   }
+   @return $config;
+diff --git a/src/material/form-field/_m2-form-field.scss b/src/material/form-field/_m2-form-field.scss
+index 1a3731bd8aee..0c946f1d0e17 100644
+--- a/src/material/form-field/_m2-form-field.scss
++++ b/src/material/form-field/_m2-form-field.scss
+@@ -18,6 +18,21 @@
+     $is-dark: inspection.get-theme-type($theme) == dark;
+   }
+ 
++  // Note the spelling of the `GrayText` here which is a system color. See:
++  // https://developer.mozilla.org/en-US/docs/Web/CSS/system-color
++  $select-disabled-option-text-color: GrayText;
++  $select-option-text-color: inherit;
++
++  @if ($is-dark) {
++    // On dark themes we set the native `select` color to some shade of white,
++    // however the color propagates to all of the `option` elements, which are
++    // always on a white background inside the dropdown, causing them to blend in.
++    // Since we can't change background of the dropdown, we need to explicitly
++    // reset the color of the options to something dark.
++    $select-option-text-color: m2-palette.$dark-primary-text;
++    $select-disabled-option-text-color: m2-palette.$dark-disabled-text;
++  }
++
+   @return (
+     base: (
+       form-field-filled-active-indicator-height: 1px,
+@@ -32,17 +47,8 @@
+       form-field-disabled-input-text-placeholder-color: $disabled,
+       form-field-state-layer-color: map.get($system, on-surface),
+       form-field-error-text-color: map.get($system, error),
+-
+-      // On dark themes we set the native `select` color to some shade of white,
+-      // however the color propagates to all of the `option` elements, which are
+-      // always on a white background inside the dropdown, causing them to blend in.
+-      // Since we can't change background of the dropdown, we need to explicitly
+-      // reset the color of the options to something dark.
+-      form-field-select-option-text-color: if($is-dark, m2-palette.$dark-primary-text, inherit),
+-      // Note the spelling of the `GrayText` here which is a system color. See:
+-      // https://developer.mozilla.org/en-US/docs/Web/CSS/system-color
+-      form-field-select-disabled-option-text-color:
+-          if($is-dark, m2-palette.$dark-disabled-text, GrayText),
++      form-field-select-option-text-color: $select-option-text-color,
++      form-field-select-disabled-option-text-color: $select-disabled-option-text-color,
+ 
+       // These tokens are necessary for M3. MDC has them built in already, but:
+       // 1. They are too specific, breaking a lot of internal clients.
+@@ -199,14 +205,22 @@
+   $filled-with-label-padding-top: 24px - $vertical-deduction;
+   $filled-with-label-padding-bottom: 8px - $vertical-deduction;
+   $vertical-padding: 16px - $vertical-deduction;
++  $filled-label-display: block;
++  $filled-with-label-container-padding-top: $filled-with-label-padding-top;
++  $filled-with-label-container-padding-bottom: $filled-with-label-padding-bottom;
++
++  @if ($hide-label) {
++    $filled-label-display: none;
++    $filled-with-label-container-padding-top: $vertical-padding;
++    $filled-with-label-container-padding-bottom: $vertical-padding;
++  }
+ 
+   @return (
+     form-field-container-height: $height,
+-    form-field-filled-label-display: if($hide-label, none, block),
++    form-field-filled-label-display: $filled-label-display,
+     form-field-container-vertical-padding: $vertical-padding,
+-    form-field-filled-with-label-container-padding-top:
+-      if($hide-label, $vertical-padding, $filled-with-label-padding-top),
++    form-field-filled-with-label-container-padding-top: $filled-with-label-container-padding-top,
+     form-field-filled-with-label-container-padding-bottom:
+-      if($hide-label, $vertical-padding, $filled-with-label-padding-bottom),
++      $filled-with-label-container-padding-bottom,
+   );
+ }
+diff --git a/src/material/paginator/_m2-paginator.scss b/src/material/paginator/_m2-paginator.scss
+index 8af8916314d9..3674e11dc2ec 100644
+--- a/src/material/paginator/_m2-paginator.scss
++++ b/src/material/paginator/_m2-paginator.scss
+@@ -7,6 +7,16 @@
+ @function get-tokens($theme) {
+   $system: m2-utils.get-system($theme);
+   $density-scale: theming.clamp-density(map.get($system, density-scale), -5);
++  $touch-target-display: block;
++  $form-field-density-scale: $density-scale;
++
++  @if ($form-field-density-scale > -4) {
++    $form-field-density-scale: -4;
++  }
++
++  @if ($density-scale < -2) {
++    $touch-target-display: none;
++  }
+ 
+   $form-field-height: map.get((
+     0: 56px,
+@@ -15,7 +25,7 @@
+     -3: 44px,
+     -4: 40px,
+     -5: 36px,
+-  ), if($density-scale > -4, -4, $density-scale));
++  ), $form-field-density-scale);
+ 
+   @return (
+     base: (
+@@ -53,7 +63,7 @@
+       // padding that is provided by the Material Design specification.
+       paginator-form-field-container-vertical-padding:
+           16px - math.div(56px - $form-field-height, 2),
+-      paginator-touch-target-display: if($density-scale < -2, none, block),
++      paginator-touch-target-display: $touch-target-display,
+     ),
+   );
+ }
+diff --git a/src/material/progress-bar/_m2-progress-bar.scss b/src/material/progress-bar/_m2-progress-bar.scss
+index c14c9fdbc1b8..7308b9e6f036 100644
+--- a/src/material/progress-bar/_m2-progress-bar.scss
++++ b/src/material/progress-bar/_m2-progress-bar.scss
+@@ -23,13 +23,14 @@
+ @function private-get-color-palette-color-tokens($theme, $color-variant) {
+   $system: m2-utils.get-system($theme);
+   $system: m3-utils.replace-colors-with-variant($system, primary, $color-variant);
++  $track-color: map.get($system, primary);
++
++  @if (meta.type-of($track-color) == color) {
++    $track-color: color.adjust($track-color, $alpha: -0.75);
++  }
+ 
+   @return (
+     progress-bar-active-indicator-color: map.get($system, primary),
+-    progress-bar-track-color: if(
+-        meta.type-of(map.get($system, primary)) == color,
+-        color.adjust(map.get($system, primary), $alpha: -0.75),
+-        map.get($system, primary)
+-    )
++    progress-bar-track-color: $track-color,
+   );
+ }
+diff --git a/src/material/radio/_m2-radio.scss b/src/material/radio/_m2-radio.scss
+index 9e4ba08b2197..4f60a4643bcd 100644
+--- a/src/material/radio/_m2-radio.scss
++++ b/src/material/radio/_m2-radio.scss
+@@ -6,6 +6,11 @@
+ @function get-tokens($theme) {
+   $system: m2-utils.get-system($theme);
+   $density-scale: theming.clamp-density(map.get($system, density-scale), -3);
++  $touch-target-display: block;
++
++  @if ($density-scale < -1) {
++    $touch-target-display: none;
++  }
+ 
+   @return (
+     base: (
+@@ -32,7 +37,7 @@
+         -2: 32px,
+         -3: 28px,
+       ), $density-scale),
+-      radio-touch-target-display: if($density-scale < -1, none, block)
++      radio-touch-target-display: $touch-target-display,
+     ),
+   );
+ }
+diff --git a/src/material/sidenav/_m2-sidenav.scss b/src/material/sidenav/_m2-sidenav.scss
+index b4efaccfa671..8c5f4a50819d 100644
+--- a/src/material/sidenav/_m2-sidenav.scss
++++ b/src/material/sidenav/_m2-sidenav.scss
+@@ -15,7 +15,18 @@
+   }
+   $scrim-opacity: 0.6;
+   $scrim-color: m3-utils.color-with-opacity(map.get($system, surface), 60%);
+-  $fallback-scrim-color: if($is-dark, rgba(#fff, $scrim-opacity), rgba(#000, $scrim-opacity));
++
++  @if (meta.type-of($scrim-color) == color) {
++    // We use invert() here to have the darken the background color expected to be used.
++    // If the background is light, we use a dark backdrop. If the background is dark, we
++    // use a light backdrop. If the value isn't a color, Sass will throw an error so we
++    // fall back to something generic.
++    $scrim-color: color.invert($scrim-color);
++  } @else if ($is-dark) {
++    $scrim-color: rgba(#fff, $scrim-opacity);
++  } @else {
++    $scrim-color: rgba(#000, $scrim-opacity);
++  }
+ 
+   @return (
+     base: (
+@@ -29,13 +40,7 @@
+       sidenav-container-text-color: map.get($system, on-surface),
+       sidenav-content-background-color: map.get($system, background),
+       sidenav-content-text-color: map.get($system, on-surface),
+-
+-      // We use invert() here to have the darken the background color expected to be used.
+-      // If the background is light, we use a dark backdrop. If the background is dark, we
+-      // use a light backdrop. If the value isn't a color, Sass will throw an error so we
+-      // fall back to something generic.
+-      sidenav-scrim-color: if(meta.type-of($scrim-color) == color,
+-        color.invert($scrim-color), $fallback-scrim-color),
++      sidenav-scrim-color: $scrim-color,
+     ),
+     typography: (),
+     density: (),
+diff --git a/src/material/slide-toggle/_m2-slide-toggle.scss b/src/material/slide-toggle/_m2-slide-toggle.scss
+index 2d8aa565c5db..0ff3c251d305 100644
+--- a/src/material/slide-toggle/_m2-slide-toggle.scss
++++ b/src/material/slide-toggle/_m2-slide-toggle.scss
+@@ -7,6 +7,11 @@
+ @function get-tokens($theme) {
+   $system: m2-utils.get-system($theme);
+   $density-scale: theming.clamp-density(map.get($system, density-scale), -3);
++  $touch-target-display: block;
++
++  @if ($density-scale < -1) {
++    $touch-target-display: none;
++  }
+ 
+   @return (
+     base: (
+@@ -101,7 +106,7 @@
+         -2: 32px,
+         -3: 28px,
+       ), $density-scale),
+-      slide-toggle-touch-target-display: if($density-scale < -1, none, block)
++      slide-toggle-touch-target-display: $touch-target-display
+     ),
+   );
+ }
+diff --git a/tools/extract-tokens/extract-tokens.mts b/tools/extract-tokens/extract-tokens.mts
+index d0b2e3b82cbc..a0e5d2aadda9 100644
+--- a/tools/extract-tokens/extract-tokens.mts
++++ b/tools/extract-tokens/extract-tokens.mts
+@@ -247,7 +247,11 @@ function getTokenExtractionCode(
+     @function ${stringJoin}($value, $separator) {
+       $result: '';
+       @each $part in $value {
+-        $result: if($result == '', $part, '#{$result}#{$separator}#{$part}');
++        @if ($result == '') {
++          $result: $part;
++        } @else {
++          $result: '#{$result}#{$separator}#{$part}';
++        }
+       }
+       @return $result;
+     }
+@@ -326,15 +330,26 @@ function jsonStringifyImplementation(
+         $current: '';
+ 
+         @each $key, $inner in $value {
+-          $pair: if($current == '', '', ', ') + '"#{${stringJoin}($key, '-')}":#{${name}($inner)}';
+-          $current: $current + $pair;
++          $to-append: '"#{${stringJoin}($key, '-')}":#{${name}($inner)}';
++
++          @if ($current == '') {
++            $current: $to-append;
++          } @else {
++            $current: $current + ', ' + $to-append;
++          }
+         }
+ 
+         @return '{#{$current}}';
+       } @else if ($type == 'list') {
+         $current: '';
+         @each $inner in $value {
+-          $current: $current + (if($current == '', '', ', ') + ${name}($inner));
++          $to-append: ${name}($inner);
++
++          @if ($current == '') {
++            $current: $to-append;
++          } @else {
++            $current: $current + ', ' + $to-append;
++          }
+         }
+         @return '[#{$current}]';
+       } @else if (($type == 'number' and ${math}.is-unitless($value)) or $type == 'bool' or $type == 'null') {

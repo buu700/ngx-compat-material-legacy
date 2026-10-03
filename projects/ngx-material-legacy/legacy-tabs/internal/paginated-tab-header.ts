@@ -23,7 +23,6 @@ import {
   Directive,
   Inject,
   Input,
-  inject,
 } from '@angular/core';
 import {Direction, Directionality} from '@angular/cdk/bidi';
 import {
@@ -32,7 +31,7 @@ import {
   coerceNumberProperty,
   NumberInput,
 } from '@angular/cdk/coercion';
-import {SharedResizeObserver} from '@angular/cdk/observers/private';
+import {ownedHeaderResize} from './owned-header-resize';
 import {ViewportRuler} from '@angular/cdk/scrolling';
 import {FocusKeyManager, FocusableOption} from '@angular/cdk/a11y';
 import {ENTER, SPACE, hasModifierKey} from '@angular/cdk/keycodes';
@@ -171,8 +170,6 @@ export abstract class MatPaginatedTabHeader
   /** Event emitted when a label is focused. */
   readonly indexFocused: EventEmitter<number> = new EventEmitter<number>();
 
-  private _sharedResizeObserver = inject(SharedResizeObserver);
-
   constructor(
     protected _elementRef: ElementRef<HTMLElement>,
     protected _changeDetectorRef: ChangeDetectorRef,
@@ -213,9 +210,10 @@ export abstract class MatPaginatedTabHeader
   ngAfterContentInit() {
     const dirChange = this._dir ? this._dir.change : observableOf('ltr');
     // Debounce resize events because the alignment logic is expensive.
-    const resize = this._sharedResizeObserver
-      .observe(this._elementRef.nativeElement)
-      .pipe(debounceTime(32), takeUntil(this._destroyed));
+    const resize = ownedHeaderResize(this._elementRef.nativeElement, this._ngZone).pipe(
+      debounceTime(32),
+      takeUntil(this._destroyed),
+    );
     // Viewport resize retained for screenshot-test compatibility with historical layouts.
     const viewportResize = this._viewportRuler.change(150).pipe(takeUntil(this._destroyed));
     const realign = () => {

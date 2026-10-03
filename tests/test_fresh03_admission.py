@@ -85,11 +85,44 @@ class Fresh03AdmissionTests(unittest.TestCase):
         self.assertIn("dependency-eligibility/vendor-provenance-license/manifest-hashes", passed)
         policy = POLICY.evaluate(ROOT / "projects/ngx-material-legacy", POLICY.load_policy(POLICY.POLICY), None, None)
         policy_failed = {item["case_id"] for item in policy["cases"] if item["result"] != "pass"}
-        self.assertIn("source-policy/authored-boundary/no-animations-module", policy_failed)
-        self.assertIn("source-policy/authored-boundary/no-deep-internal", policy_failed)
+        self.assertNotIn("source-policy/authored-boundary/no-animations-module", policy_failed)
+        self.assertNotIn("source-policy/authored-boundary/no-deep-internal", policy_failed)
+        self.assertNotIn("source-policy/authored-boundary/no-private-namespace-member", policy_failed)
         self.assertIn("source-policy/authored-boundary/installed-annotation-comparison", policy_failed)
-        self.assertGreater(policy["authored_violation_count"], 0)
+        self.assertEqual(policy["authored_violation_count"], 0)
+        self.assertEqual(policy["annotation_files"], 0)
 
+
+    def test_http_200_lookup_is_not_clearance(self) -> None:
+        now = datetime(2026, 10, 3, tzinfo=timezone.utc)
+        peers = json.loads((ROOT / "compatibility/peers-22.proposed.json").read_text())
+        rows = {
+            f"{name}@{version}": {"name": name, "version": version, "vulns": []}
+            for name, version in peers["exact_packages"].items()
+        }
+        lookup = {
+            "http_status": 200,
+            "result": "queried",
+            "truncated": False,
+            "cutoff": "2026-10-03T12:00:00+00:00",
+            "rows": rows,
+            "uncovered": ["left-out@1.0.0"],
+            "age_unknown": ["left-out@1.0.0: publish time missing"],
+            "age_young": [],
+            "toolchain_ok": False,
+            "toolchain_detail": "node unknown",
+            "vendor_ok": False,
+            "vendor_detail": "vendor version was not on the registry",
+            "unresolved": [],
+        }
+        observed = ELIGIBILITY.evaluate(ROOT, now, lookup_performed=True, lookup=lookup)
+        self.assertEqual(observed["security_clearance"], "not-passed")
+        failed = {item["case_id"] for item in observed["cases"] if item["result"] != "pass"}
+        self.assertIn("dependency-eligibility/locks-tools-maturity/lock-transitive-coverage", failed)
+        self.assertIn("dependency-eligibility/locks-tools-maturity/toolchain-age-known", failed)
+        self.assertIn("dependency-eligibility/vendor-provenance-license/vendor-advisory", failed)
+        self.assertIn("dependency-eligibility/locks-tools-maturity/lookup-http-known", 
+                      {item["case_id"] for item in observed["cases"] if item["result"] == "pass"})
 
 if __name__ == "__main__":
     unittest.main()

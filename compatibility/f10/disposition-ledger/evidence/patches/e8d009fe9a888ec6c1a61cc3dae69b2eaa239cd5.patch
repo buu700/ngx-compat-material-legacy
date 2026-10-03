@@ -1,0 +1,157 @@
+From e8d009fe9a888ec6c1a61cc3dae69b2eaa239cd5 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Joy=20Serqui=C3=B1a?=
+ <44146839+essjay05@users.noreply.github.com>
+Date: Tue, 19 Nov 2024 13:11:44 -0800
+Subject: [PATCH] fix(material/datepicker): adds comparison ids and
+ aria-describedby spans (#30040)
+
+* fix(material/datepicker): adds comparison ids and aria-describedby spans
+
+Updates Angular Components Datepicker calendar-body .ts and
+.html files to add id values for if there is a comparison
+start/end date and to provide values to their respective
+html values to provide an aria-describedby value to be
+announced for screenreaders when comparison dates are present.
+
+Fixes b/195600299
+
+* refactor(material/datepicker): removes '-' for proper id recognition
+
+Updates previous fix to remove '-' from the comparison date labels
+to allow proper id recognition for the aria-describedby.
+
+Fixes b/195600299
+
+* fix(material/datepicker): update goldens
+
+Updates goldens for previous fix.
+---
+ src/material/datepicker/calendar-body.html    |  6 +++++
+ src/material/datepicker/calendar-body.ts      | 25 ++++++++++++++++++-
+ src/material/datepicker/datepicker-intl.ts    |  5 ++++
+ tools/public_api_guard/material/datepicker.md |  5 ++++
+ 4 files changed, 40 insertions(+), 1 deletion(-)
+
+diff --git a/src/material/datepicker/calendar-body.html b/src/material/datepicker/calendar-body.html
+index 98b63b03410a..4bd24d90fa83 100644
+--- a/src/material/datepicker/calendar-body.html
++++ b/src/material/datepicker/calendar-body.html
+@@ -90,3 +90,9 @@
+ <span [id]="_endDateLabelId" class="mat-calendar-body-hidden-label">
+   {{endDateAccessibleName}}
+ </span>
++<span [id]="_comparisonStartDateLabelId" class="mat-calendar-body-hidden-label">
++  {{comparisonDateAccessibleName}} {{startDateAccessibleName}}
++</span>
++<span [id]="_comparisonEndDateLabelId" class="mat-calendar-body-hidden-label">
++  {{comparisonDateAccessibleName}} {{endDateAccessibleName}}
++</span>
+diff --git a/src/material/datepicker/calendar-body.ts b/src/material/datepicker/calendar-body.ts
+index 6e67911f0f1d..7de7a8125adb 100644
+--- a/src/material/datepicker/calendar-body.ts
++++ b/src/material/datepicker/calendar-body.ts
+@@ -28,6 +28,7 @@ import {_IdGenerator} from '@angular/cdk/a11y';
+ import {NgClass} from '@angular/common';
+ import {_CdkPrivateStyleLoader} from '@angular/cdk/private';
+ import {_StructuralStylesLoader} from '@angular/material/core';
++import {MatDatepickerIntl} from './datepicker-intl';
+ 
+ /** Extra CSS classes that can be associated with a calendar cell. */
+ export type MatCalendarCellCssClasses = string | string[] | Set<string> | {[key: string]: any};
+@@ -99,6 +100,7 @@ export class MatCalendarBody<D = any> implements OnChanges, OnDestroy, AfterView
+   private _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
+   private _ngZone = inject(NgZone);
+   private _platform = inject(Platform);
++  private _intl = inject(MatDatepickerIntl);
+ 
+   /**
+    * Used to skip the next focus event when rendering the preview range.
+@@ -200,10 +202,18 @@ export class MatCalendarBody<D = any> implements OnChanges, OnDestroy, AfterView
+   /** ID for the end date label. */
+   _endDateLabelId: string;
+ 
++  /** ID for the comparison start date label. */
++  _comparisonStartDateLabelId: string;
++
++  /** ID for the comparison end date label. */
++  _comparisonEndDateLabelId: string;
++
+   private _didDragSinceMouseDown = false;
+ 
+   private _injector = inject(Injector);
+ 
++  comparisonDateAccessibleName = this._intl.comparisonDateLabel;
++
+   /**
+    * Tracking function for rows based on their identity. Ideally we would use some sort of
+    * key on the row, but that would require a breaking change for the `rows` input. We don't
+@@ -216,7 +226,9 @@ export class MatCalendarBody<D = any> implements OnChanges, OnDestroy, AfterView
+   constructor() {
+     const idGenerator = inject(_IdGenerator);
+     this._startDateLabelId = idGenerator.getId('mat-calendar-body-start-');
+-    this._endDateLabelId = idGenerator.getId('mat-calendar-body-start-');
++    this._endDateLabelId = idGenerator.getId('mat-calendar-body-end-');
++    this._comparisonStartDateLabelId = idGenerator.getId('mat-calendar-body-comparison-start-');
++    this._comparisonEndDateLabelId = idGenerator.getId('mat-calendar-body-comparison-end-');
+ 
+     inject(_CdkPrivateStyleLoader).load(_StructuralStylesLoader);
+ 
+@@ -467,6 +479,17 @@ export class MatCalendarBody<D = any> implements OnChanges, OnDestroy, AfterView
+     } else if (this.endValue === value) {
+       return this._endDateLabelId;
+     }
++
++    if (this.comparisonStart !== null && this.comparisonEnd !== null) {
++      if (value === this.comparisonStart && value === this.comparisonEnd) {
++        return `${this._comparisonStartDateLabelId} ${this._comparisonEndDateLabelId}`;
++      } else if (value === this.comparisonStart) {
++        return this._comparisonStartDateLabelId;
++      } else if (value === this.comparisonEnd) {
++        return this._comparisonEndDateLabelId;
++      }
++    }
++
+     return null;
+   }
+ 
+diff --git a/src/material/datepicker/datepicker-intl.ts b/src/material/datepicker/datepicker-intl.ts
+index a6b95dc93048..3faeafff9838 100644
+--- a/src/material/datepicker/datepicker-intl.ts
++++ b/src/material/datepicker/datepicker-intl.ts
+@@ -65,6 +65,11 @@ export class MatDatepickerIntl {
+    */
+   endDateLabel = 'End date';
+ 
++  /**
++   * A label for the Comparison date of a range of dates (used by screen readers).
++   */
++  comparisonDateLabel = 'Comparison range';
++
+   /** Formats a range of years (used for visuals). */
+   formatYearRange(start: string, end: string): string {
+     return `${start} \u2013 ${end}`;
+diff --git a/tools/public_api_guard/material/datepicker.md b/tools/public_api_guard/material/datepicker.md
+index a0c8a859fdad..3123e6584977 100644
+--- a/tools/public_api_guard/material/datepicker.md
++++ b/tools/public_api_guard/material/datepicker.md
+@@ -196,8 +196,12 @@ export class MatCalendarBody<D = any> implements OnChanges, OnDestroy, AfterView
+     _cellClicked(cell: MatCalendarCell, event: MouseEvent): void;
+     _cellPadding: string;
+     _cellWidth: string;
++    // (undocumented)
++    comparisonDateAccessibleName: string;
+     comparisonEnd: number | null;
++    _comparisonEndDateLabelId: string;
+     comparisonStart: number | null;
++    _comparisonStartDateLabelId: string;
+     readonly dragEnded: EventEmitter<MatCalendarUserEvent<D | null>>;
+     readonly dragStarted: EventEmitter<MatCalendarUserEvent<D>>;
+     // (undocumented)
+@@ -480,6 +484,7 @@ export class MatDatepickerIntl {
+     calendarLabel: string;
+     readonly changes: Subject<void>;
+     closeCalendarLabel: string;
++    comparisonDateLabel: string;
+     // @deprecated
+     endDateLabel: string;
+     formatYearRange(start: string, end: string): string;

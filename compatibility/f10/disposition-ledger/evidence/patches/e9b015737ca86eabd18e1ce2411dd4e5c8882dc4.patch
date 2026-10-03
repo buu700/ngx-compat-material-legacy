@@ -1,0 +1,224 @@
+From e9b015737ca86eabd18e1ce2411dd4e5c8882dc4 Mon Sep 17 00:00:00 2001
+From: Andrey Dolgachev <adolgachev@users.noreply.github.com>
+Date: Fri, 28 Mar 2025 15:24:16 -0700
+Subject: [PATCH] fix(material/form-field): move error aria-live to parent
+ container (#30678)
+
+fix(material/form-field): move error aria-live to parent container
+
+restructure errors
+
+Use single wrapper with aria-live
+
+update specs
+
+fix error
+
+update api goldens
+
+Add comment for new div
+---
+ goldens/material/form-field/index.api.md    |  2 +-
+ goldens/material/input/index.api.md         |  2 +-
+ goldens/material/select/index.api.md        |  2 +-
+ src/material/chips/chip-grid.spec.ts        |  4 ++-
+ src/material/form-field/directives/error.ts | 21 ++-------------
+ src/material/form-field/form-field.html     | 30 +++++++++++++--------
+ src/material/form-field/form-field.ts       |  6 ++---
+ src/material/input/input.spec.ts            |  6 +++--
+ 8 files changed, 34 insertions(+), 39 deletions(-)
+
+diff --git a/goldens/material/form-field/index.api.md b/goldens/material/form-field/index.api.md
+index d61325f57c02..a9ef59692e37 100644
+--- a/goldens/material/form-field/index.api.md
++++ b/goldens/material/form-field/index.api.md
+@@ -80,8 +80,8 @@ export class MatFormField implements FloatingLabelParent, AfterContentInit, Afte
+     // (undocumented)
+     _formFieldControl: MatFormFieldControl_2<any>;
+     getConnectedOverlayOrigin(): ElementRef;
+-    _getDisplayedMessages(): 'error' | 'hint';
+     getLabelId: i0.Signal<string | null>;
++    _getSubscriptMessageType(): 'error' | 'hint';
+     _handleLabelResized(): void;
+     // (undocumented)
+     _hasFloatingLabel: i0.Signal<boolean>;
+diff --git a/goldens/material/input/index.api.md b/goldens/material/input/index.api.md
+index da333f3049a1..ebebf92f5181 100644
+--- a/goldens/material/input/index.api.md
++++ b/goldens/material/input/index.api.md
+@@ -73,8 +73,8 @@ export class MatFormField implements FloatingLabelParent, AfterContentInit, Afte
+     // (undocumented)
+     _formFieldControl: MatFormFieldControl<any>;
+     getConnectedOverlayOrigin(): ElementRef;
+-    _getDisplayedMessages(): 'error' | 'hint';
+     getLabelId: i0.Signal<string | null>;
++    _getSubscriptMessageType(): 'error' | 'hint';
+     _handleLabelResized(): void;
+     // (undocumented)
+     _hasFloatingLabel: i0.Signal<boolean>;
+diff --git a/goldens/material/select/index.api.md b/goldens/material/select/index.api.md
+index 2dfac47d5448..7a4abc9a00da 100644
+--- a/goldens/material/select/index.api.md
++++ b/goldens/material/select/index.api.md
+@@ -96,8 +96,8 @@ export class MatFormField implements FloatingLabelParent, AfterContentInit, Afte
+     // (undocumented)
+     _formFieldControl: MatFormFieldControl_2<any>;
+     getConnectedOverlayOrigin(): ElementRef;
+-    _getDisplayedMessages(): 'error' | 'hint';
+     getLabelId: i0.Signal<string | null>;
++    _getSubscriptMessageType(): 'error' | 'hint';
+     _handleLabelResized(): void;
+     // (undocumented)
+     _hasFloatingLabel: i0.Signal<boolean>;
+diff --git a/src/material/chips/chip-grid.spec.ts b/src/material/chips/chip-grid.spec.ts
+index d536692baebb..7b9357f6b2b5 100644
+--- a/src/material/chips/chip-grid.spec.ts
++++ b/src/material/chips/chip-grid.spec.ts
+@@ -983,7 +983,9 @@ describe('MatChipGrid', () => {
+       errorTestComponent.formControl.markAsTouched();
+       fixture.detectChanges();
+ 
+-      expect(containerEl.querySelector('mat-error')!.getAttribute('aria-live')).toBe('polite');
++      expect(
++        containerEl.querySelector('[aria-live]:has(mat-error)')!.getAttribute('aria-live'),
++      ).toBe('polite');
+     });
+ 
+     it('sets the aria-describedby on the input to reference errors when in error state', fakeAsync(() => {
+diff --git a/src/material/form-field/directives/error.ts b/src/material/form-field/directives/error.ts
+index a304e90a8171..9d474d478ad8 100644
+--- a/src/material/form-field/directives/error.ts
++++ b/src/material/form-field/directives/error.ts
+@@ -6,14 +6,7 @@
+  * found in the LICENSE file at https://angular.dev/license
+  */
+ 
+-import {
+-  Directive,
+-  ElementRef,
+-  InjectionToken,
+-  Input,
+-  HostAttributeToken,
+-  inject,
+-} from '@angular/core';
++import {Directive, InjectionToken, Input, inject} from '@angular/core';
+ import {_IdGenerator} from '@angular/cdk/a11y';
+ 
+ /**
+@@ -28,7 +21,6 @@ export const MAT_ERROR = new InjectionToken<MatError>('MatError');
+   selector: 'mat-error, [matError]',
+   host: {
+     'class': 'mat-mdc-form-field-error mat-mdc-form-field-bottom-align',
+-    'aria-atomic': 'true',
+     '[id]': 'id',
+   },
+   providers: [{provide: MAT_ERROR, useExisting: MatError}],
+@@ -38,14 +30,5 @@ export class MatError {
+ 
+   constructor(...args: unknown[]);
+ 
+-  constructor() {
+-    const ariaLive = inject(new HostAttributeToken('aria-live'), {optional: true});
+-
+-    // If no aria-live value is set add 'polite' as a default. This is preferred over setting
+-    // role='alert' so that screen readers do not interrupt the current task to read this aloud.
+-    if (!ariaLive) {
+-      const elementRef = inject(ElementRef);
+-      elementRef.nativeElement.setAttribute('aria-live', 'polite');
+-    }
+-  }
++  constructor() {}
+ }
+diff --git a/src/material/form-field/form-field.html b/src/material/form-field/form-field.html
+index f1a46075b46b..2697be0d764c 100644
+--- a/src/material/form-field/form-field.html
++++ b/src/material/form-field/form-field.html
+@@ -96,25 +96,33 @@
+ </div>
+ 
+ <div
+-  class="mat-mdc-form-field-subscript-wrapper mat-mdc-form-field-bottom-align"
+-  [class.mat-mdc-form-field-subscript-dynamic-size]="subscriptSizing === 'dynamic'"
++    class="mat-mdc-form-field-subscript-wrapper mat-mdc-form-field-bottom-align"
++    [class.mat-mdc-form-field-subscript-dynamic-size]="subscriptSizing === 'dynamic'"
+ >
+-  @switch (_getDisplayedMessages()) {
+-    @case ('error') {
+-      <div class="mat-mdc-form-field-error-wrapper">
++  @let subscriptMessageType = _getSubscriptMessageType();
++
++  <!-- 
++    Use a single permanent wrapper for both hints and errors so aria-live works correctly,
++    as having it appear post render will not consistently work. We also do not want to add
++    additional divs as it causes styling regressions.
++    -->
++  <div aria-atomic="true" aria-live="polite" 
++      [class.mat-mdc-form-field-error-wrapper]="subscriptMessageType === 'error'"
++      [class.mat-mdc-form-field-hint-wrapper]="subscriptMessageType === 'hint'"
++    >
++    @switch (subscriptMessageType) {
++      @case ('error') {
+         <ng-content select="mat-error, [matError]"></ng-content>
+-      </div>
+-    }
++      }
+ 
+-    @case ('hint') {
+-      <div class="mat-mdc-form-field-hint-wrapper">
++      @case ('hint') {
+         @if (hintLabel) {
+           <mat-hint [id]="_hintLabelId">{{hintLabel}}</mat-hint>
+         }
+         <ng-content select="mat-hint:not([align='end'])"></ng-content>
+         <div class="mat-mdc-form-field-hint-spacer"></div>
+         <ng-content select="mat-hint[align='end']"></ng-content>
+-      </div>
++      }
+     }
+-  }
++  </div>
+ </div>
+diff --git a/src/material/form-field/form-field.ts b/src/material/form-field/form-field.ts
+index bf553f9be85a..0c0c28d00c7f 100644
+--- a/src/material/form-field/form-field.ts
++++ b/src/material/form-field/form-field.ts
+@@ -627,8 +627,8 @@ export class MatFormField
+     return control && control[prop];
+   }
+ 
+-  /** Determines whether to display hints or errors. */
+-  _getDisplayedMessages(): 'error' | 'hint' {
++  /** Gets the type of subscript message to render (error or hint). */
++  _getSubscriptMessageType(): 'error' | 'hint' {
+     return this._errorChildren && this._errorChildren.length > 0 && this._control.errorState
+       ? 'error'
+       : 'hint';
+@@ -696,7 +696,7 @@ export class MatFormField
+         ids.push(...this._control.userAriaDescribedBy.split(' '));
+       }
+ 
+-      if (this._getDisplayedMessages() === 'hint') {
++      if (this._getSubscriptMessageType() === 'hint') {
+         const startHint = this._hintChildren
+           ? this._hintChildren.find(hint => hint.align === 'start')
+           : null;
+diff --git a/src/material/input/input.spec.ts b/src/material/input/input.spec.ts
+index b019faca0fc0..4b29f4f3a61f 100644
+--- a/src/material/input/input.spec.ts
++++ b/src/material/input/input.spec.ts
+@@ -1266,11 +1266,13 @@ describe('MatMdcInput with forms', () => {
+         .toBe(1);
+     }));
+ 
+-    it('should set the proper aria-live attribute on the error messages', fakeAsync(() => {
++    it('should be in a parent element with the an aria-live attribute to announce the error', fakeAsync(() => {
+       testComponent.formControl.markAsTouched();
+       fixture.detectChanges();
+ 
+-      expect(containerEl.querySelector('mat-error')!.getAttribute('aria-live')).toBe('polite');
++      expect(
++        containerEl.querySelector('[aria-live]:has(mat-error)')!.getAttribute('aria-live'),
++      ).toBe('polite');
+     }));
+ 
+     it('sets the aria-describedby to reference errors when in error state', fakeAsync(() => {

@@ -1,0 +1,153 @@
+From a6a385c887c994563af5ae7600c928ae0cae6718 Mon Sep 17 00:00:00 2001
+From: Kristiyan Kostadinov <crisbeto@users.noreply.github.com>
+Date: Tue, 1 Jul 2025 07:15:48 +0200
+Subject: [PATCH] refactor(multiple): clean up usages of DOCUMENT (#31461)
+
+We had several places that were optionally injecting `DOCUMENT`, because historically it wasn't guaranteed to be there. That shouldn't be the case anymore so we can clean them up.
+---
+ goldens/cdk/a11y/index.api.md               |  2 +-
+ goldens/cdk/text-field/index.api.md         |  2 +-
+ src/cdk/a11y/focus-monitor/focus-monitor.ts | 14 ++++----------
+ src/cdk/dialog/dialog-container.ts          |  2 +-
+ src/cdk/scrolling/viewport-ruler.ts         |  2 +-
+ src/cdk/text-field/autosize.ts              |  2 +-
+ src/material/sidenav/drawer.ts              |  6 ++----
+ 7 files changed, 11 insertions(+), 19 deletions(-)
+
+diff --git a/goldens/cdk/a11y/index.api.md b/goldens/cdk/a11y/index.api.md
+index b084dded37e2..316a8b14d8d2 100644
+--- a/goldens/cdk/a11y/index.api.md
++++ b/goldens/cdk/a11y/index.api.md
+@@ -177,7 +177,7 @@ export class FocusKeyManager<T> extends ListKeyManager<FocusableOption & T> {
+ // @public
+ export class FocusMonitor implements OnDestroy {
+     constructor(...args: unknown[]);
+-    protected _document?: Document | null | undefined;
++    protected _document: Document;
+     focusVia(element: HTMLElement, origin: FocusOrigin, options?: FocusOptions_2): void;
+     focusVia(element: ElementRef<HTMLElement>, origin: FocusOrigin, options?: FocusOptions_2): void;
+     monitor(element: HTMLElement, checkChildren?: boolean): Observable<FocusOrigin>;
+diff --git a/goldens/cdk/text-field/index.api.md b/goldens/cdk/text-field/index.api.md
+index cb1f19df72e8..b9ab33d29cf3 100644
+--- a/goldens/cdk/text-field/index.api.md
++++ b/goldens/cdk/text-field/index.api.md
+@@ -51,7 +51,7 @@ export class CdkAutofill implements OnDestroy, OnInit {
+ // @public
+ export class CdkTextareaAutosize implements AfterViewInit, DoCheck, OnDestroy {
+     constructor(...args: unknown[]);
+-    protected _document?: Document | null | undefined;
++    protected _document: Document;
+     get enabled(): boolean;
+     set enabled(value: boolean);
+     get maxRows(): number;
+diff --git a/src/cdk/a11y/focus-monitor/focus-monitor.ts b/src/cdk/a11y/focus-monitor/focus-monitor.ts
+index dc1770436476..948d0b78cf87 100644
+--- a/src/cdk/a11y/focus-monitor/focus-monitor.ts
++++ b/src/cdk/a11y/focus-monitor/focus-monitor.ts
+@@ -142,7 +142,7 @@ export class FocusMonitor implements OnDestroy {
+   };
+ 
+   /** Used to reference correct document/window */
+-  protected _document? = inject(DOCUMENT, {optional: true});
++  protected _document = inject(DOCUMENT);
+ 
+   /** Subject for stopping our InputModalityDetector subscription. */
+   private readonly _stopInputModalityDetector = new Subject<void>();
+@@ -206,7 +206,7 @@ export class FocusMonitor implements OnDestroy {
+     // If the element is inside the shadow DOM, we need to bind our focus/blur listeners to
+     // the shadow root, rather than the `document`, because the browser won't emit focus events
+     // to the `document`, if focus is moving within the same shadow root.
+-    const rootNode = _getShadowRoot(nativeElement) || this._getDocument();
++    const rootNode = _getShadowRoot(nativeElement) || this._document;
+     const cachedInfo = this._elementInfo.get(nativeElement);
+ 
+     // Check if we're already monitoring this element.
+@@ -280,7 +280,7 @@ export class FocusMonitor implements OnDestroy {
+     options?: FocusOptions,
+   ): void {
+     const nativeElement = coerceElement(element);
+-    const focusedElement = this._getDocument().activeElement;
++    const focusedElement = this._document.activeElement;
+ 
+     // If the element is focused already, calling `focus` again won't trigger the event listener
+     // which means that the focus classes won't be updated. If that's the case, update the classes
+@@ -303,15 +303,9 @@ export class FocusMonitor implements OnDestroy {
+     this._elementInfo.forEach((_info, element) => this.stopMonitoring(element));
+   }
+ 
+-  /** Access injected document if available or fallback to global document reference */
+-  private _getDocument(): Document {
+-    return this._document || document;
+-  }
+-
+   /** Use defaultView of injected document if available or fallback to global window reference */
+   private _getWindow(): Window {
+-    const doc = this._getDocument();
+-    return doc.defaultView || window;
++    return this._document.defaultView || window;
+   }
+ 
+   private _getFocusOrigin(focusEventTarget: HTMLElement | null): FocusOrigin {
+diff --git a/src/cdk/dialog/dialog-container.ts b/src/cdk/dialog/dialog-container.ts
+index 433582a1f4ee..c9b33c7b91f6 100644
+--- a/src/cdk/dialog/dialog-container.ts
++++ b/src/cdk/dialog/dialog-container.ts
+@@ -84,7 +84,7 @@ export class CdkDialogContainer<C extends DialogConfig = DialogConfig>
+   protected readonly _changeDetectorRef = inject(ChangeDetectorRef);
+   private _injector = inject(Injector);
+   private _platform = inject(Platform);
+-  protected _document = inject(DOCUMENT, {optional: true})!;
++  protected _document = inject(DOCUMENT);
+ 
+   /** The portal outlet inside of this container into which the dialog content will be loaded. */
+   @ViewChild(CdkPortalOutlet, {static: true}) _portalOutlet: CdkPortalOutlet;
+diff --git a/src/cdk/scrolling/viewport-ruler.ts b/src/cdk/scrolling/viewport-ruler.ts
+index bd477c3ede4b..66ea77dd9f79 100644
+--- a/src/cdk/scrolling/viewport-ruler.ts
++++ b/src/cdk/scrolling/viewport-ruler.ts
+@@ -36,7 +36,7 @@ export class ViewportRuler implements OnDestroy {
+   private readonly _change = new Subject<Event>();
+ 
+   /** Used to reference correct document/window */
+-  protected _document = inject(DOCUMENT, {optional: true})!;
++  protected _document = inject(DOCUMENT);
+ 
+   constructor(...args: unknown[]);
+ 
+diff --git a/src/cdk/text-field/autosize.ts b/src/cdk/text-field/autosize.ts
+index 5abb0be0f97a..f7dd3cc9f267 100644
+--- a/src/cdk/text-field/autosize.ts
++++ b/src/cdk/text-field/autosize.ts
+@@ -122,7 +122,7 @@ export class CdkTextareaAutosize implements AfterViewInit, DoCheck, OnDestroy {
+   private _cachedScrollTop: number;
+ 
+   /** Used to reference correct document/window */
+-  protected _document? = inject(DOCUMENT, {optional: true});
++  protected _document = inject(DOCUMENT);
+ 
+   private _hasFocus: boolean;
+ 
+diff --git a/src/material/sidenav/drawer.ts b/src/material/sidenav/drawer.ts
+index 7b0bfe914e34..f3b288ef7f9c 100644
+--- a/src/material/sidenav/drawer.ts
++++ b/src/material/sidenav/drawer.ts
+@@ -182,7 +182,7 @@ export class MatDrawer implements AfterViewInit, OnDestroy {
+   private _ngZone = inject(NgZone);
+   private _renderer = inject(Renderer2);
+   private readonly _interactivityChecker = inject(InteractivityChecker);
+-  private _doc = inject(DOCUMENT, {optional: true})!;
++  private _doc = inject(DOCUMENT);
+   _container? = inject<MatDrawerContainer>(MAT_DRAWER_CONTAINER, {optional: true});
+ 
+   private _focusTrap: FocusTrap | null = null;
+@@ -347,9 +347,7 @@ export class MatDrawer implements AfterViewInit, OnDestroy {
+   constructor() {
+     this.openedChange.pipe(takeUntil(this._destroyed)).subscribe((opened: boolean) => {
+       if (opened) {
+-        if (this._doc) {
+-          this._elementFocusedBeforeDrawerWasOpened = this._doc.activeElement as HTMLElement;
+-        }
++        this._elementFocusedBeforeDrawerWasOpened = this._doc.activeElement as HTMLElement;
+         this._takeFocus();
+       } else if (this._isFocusWithinDrawer()) {
+         this._restoreFocus(this._openedVia || 'program');

@@ -1,0 +1,533 @@
+From 357cfd3b8d5fa9505215914b10de27c148f7a02d Mon Sep 17 00:00:00 2001
+From: Kristiyan Kostadinov <crisbeto@users.noreply.github.com>
+Date: Wed, 16 Apr 2025 21:17:34 +0200
+Subject: [PATCH] test(multiple): rework whenStable usages (#30878)
+
+We have some really old tests that were depending on `fixture.whenStable` even though they don't need to. These changes clean them up.
+---
+ src/cdk/a11y/focus-trap/focus-trap.spec.ts    | 56 ++++++-------
+ src/cdk/overlay/overlay.spec.ts               |  2 -
+ .../scrolling/virtual-scroll-viewport.spec.ts |  6 +-
+ .../bottom-sheet/bottom-sheet.spec.ts         | 26 +++----
+ src/material/chips/chip-grid.spec.ts          | 78 +++++++++----------
+ src/material/datepicker/datepicker.spec.ts    | 55 ++++++-------
+ .../dialog/testing/dialog-opener.spec.ts      |  3 +-
+ src/material/menu/menu.spec.ts                |  6 +-
+ src/material/tabs/tab-group.spec.ts           | 20 ++---
+ src/material/toolbar/toolbar.spec.ts          | 20 ++---
+ src/material/tooltip/tooltip.spec.ts          |  8 +-
+ 11 files changed, 114 insertions(+), 166 deletions(-)
+
+diff --git a/src/cdk/a11y/focus-trap/focus-trap.spec.ts b/src/cdk/a11y/focus-trap/focus-trap.spec.ts
+index 129b8fb881ea..fac1eb3cc9d8 100644
+--- a/src/cdk/a11y/focus-trap/focus-trap.spec.ts
++++ b/src/cdk/a11y/focus-trap/focus-trap.spec.ts
+@@ -6,7 +6,7 @@ import {
+   ViewChild,
+   ViewContainerRef,
+   ViewEncapsulation,
+-  inject as inject_1,
++  inject,
+ } from '@angular/core';
+ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+@@ -217,16 +217,13 @@ describe('FocusTrap', () => {
+       fixture.componentInstance.showTrappedRegion = true;
+       fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
++      expect(getActiveElement().id).toBe('auto-capture-target');
+ 
+-      fixture.whenStable().then(() => {
+-        expect(getActiveElement().id).toBe('auto-capture-target');
+-
+-        fixture.componentInstance.showTrappedRegion = false;
+-        fixture.changeDetectorRef.markForCheck();
+-        fixture.detectChanges();
++      fixture.componentInstance.showTrappedRegion = false;
++      fixture.changeDetectorRef.markForCheck();
++      fixture.detectChanges();
+ 
+-        expect(getActiveElement()).toBe(buttonOutsideTrappedRegion);
+-      });
++      expect(getActiveElement()).toBe(buttonOutsideTrappedRegion);
+     }));
+ 
+     it('should capture focus if auto capture is enabled later on', waitForAsync(() => {
+@@ -243,16 +240,13 @@ describe('FocusTrap', () => {
+       fixture.componentInstance.autoCaptureEnabled = true;
+       fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
++      expect(getActiveElement().id).toBe('auto-capture-target');
+ 
+-      fixture.whenStable().then(() => {
+-        expect(getActiveElement().id).toBe('auto-capture-target');
+-
+-        fixture.componentInstance.showTrappedRegion = false;
+-        fixture.changeDetectorRef.markForCheck();
+-        fixture.detectChanges();
++      fixture.componentInstance.showTrappedRegion = false;
++      fixture.changeDetectorRef.markForCheck();
++      fixture.detectChanges();
+ 
+-        expect(getActiveElement()).toBe(buttonOutsideTrappedRegion);
+-      });
++      expect(getActiveElement()).toBe(buttonOutsideTrappedRegion);
+     }));
+ 
+     it('should automatically capture and return focus on init / destroy inside the shadow DOM', waitForAsync(() => {
+@@ -270,16 +264,13 @@ describe('FocusTrap', () => {
+       fixture.componentInstance.showTrappedRegion = true;
+       fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
++      expect(getActiveElement().id).toBe('auto-capture-target');
+ 
+-      fixture.whenStable().then(() => {
+-        expect(getActiveElement().id).toBe('auto-capture-target');
+-
+-        fixture.componentInstance.showTrappedRegion = false;
+-        fixture.changeDetectorRef.markForCheck();
+-        fixture.detectChanges();
++      fixture.componentInstance.showTrappedRegion = false;
++      fixture.changeDetectorRef.markForCheck();
++      fixture.detectChanges();
+ 
+-        expect(getActiveElement()).toBe(buttonOutsideTrappedRegion);
+-      });
++      expect(getActiveElement()).toBe(buttonOutsideTrappedRegion);
+     }));
+ 
+     it('should capture focus if auto capture is enabled later on inside the shadow DOM', waitForAsync(() => {
+@@ -300,16 +291,13 @@ describe('FocusTrap', () => {
+       fixture.componentInstance.autoCaptureEnabled = true;
+       fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
++      expect(getActiveElement().id).toBe('auto-capture-target');
+ 
+-      fixture.whenStable().then(() => {
+-        expect(getActiveElement().id).toBe('auto-capture-target');
+-
+-        fixture.componentInstance.showTrappedRegion = false;
+-        fixture.changeDetectorRef.markForCheck();
+-        fixture.detectChanges();
++      fixture.componentInstance.showTrappedRegion = false;
++      fixture.changeDetectorRef.markForCheck();
++      fixture.detectChanges();
+ 
+-        expect(getActiveElement()).toBe(buttonOutsideTrappedRegion);
+-      });
++      expect(getActiveElement()).toBe(buttonOutsideTrappedRegion);
+     }));
+   });
+ 
+@@ -473,7 +461,7 @@ class FocusTrapWithoutFocusableElements {
+   imports: [A11yModule, PortalModule],
+ })
+ class FocusTrapInsidePortal {
+-  viewContainerRef = inject_1(ViewContainerRef);
++  viewContainerRef = inject(ViewContainerRef);
+ 
+   @ViewChild('template') template: TemplateRef<any>;
+   @ViewChild(CdkPortalOutlet) portalOutlet: CdkPortalOutlet;
+diff --git a/src/cdk/overlay/overlay.spec.ts b/src/cdk/overlay/overlay.spec.ts
+index 6de5ca46f759..53f6b36fa3c7 100644
+--- a/src/cdk/overlay/overlay.spec.ts
++++ b/src/cdk/overlay/overlay.spec.ts
+@@ -955,7 +955,6 @@ describe('Overlay', () => {
+       const overlayRef = overlay.create(config);
+ 
+       overlayRef.attach(componentPortal);
+-      await viewContainerFixture.whenStable();
+ 
+       const pane = overlayContainerElement.querySelector('.cdk-overlay-pane') as HTMLElement;
+       expect(pane.classList)
+@@ -968,7 +967,6 @@ describe('Overlay', () => {
+       expect(pane.classList)
+         .withContext('Expected class not to be removed immediately')
+         .toContain('custom-panel-class');
+-      await viewContainerFixture.whenStable();
+ 
+       pane.children[0].remove();
+       await new Promise(r => setTimeout(r));
+diff --git a/src/cdk/scrolling/virtual-scroll-viewport.spec.ts b/src/cdk/scrolling/virtual-scroll-viewport.spec.ts
+index 4f3137f7ac39..a023cb718439 100644
+--- a/src/cdk/scrolling/virtual-scroll-viewport.spec.ts
++++ b/src/cdk/scrolling/virtual-scroll-viewport.spec.ts
+@@ -237,7 +237,7 @@ describe('CdkVirtualScrollViewport', () => {
+       expect(viewport.getOffsetToRenderedContentStart()).toBe(10);
+     }));
+ 
+-    it('should set content offset to bottom of content', fakeAsync(async () => {
++    it('should set content offset to bottom of content', fakeAsync(() => {
+       finishInit(fixture);
+       const contentSize = viewport.measureRenderedContentSize();
+ 
+@@ -245,7 +245,6 @@ describe('CdkVirtualScrollViewport', () => {
+ 
+       viewport.setRenderedContentOffset(contentSize + 10, 'to-end');
+       flush();
+-      await fixture.whenStable();
+ 
+       expect(viewport.getOffsetToRenderedContentStart()).toBe(10);
+     }));
+@@ -1066,7 +1065,7 @@ describe('CdkVirtualScrollViewport', () => {
+         .toBe(0);
+     }));
+ 
+-    it('should set content offset to bottom of content', fakeAsync(async () => {
++    it('should set content offset to bottom of content', fakeAsync(() => {
+       finishInit(fixture);
+       const contentSize = viewport.measureRenderedContentSize();
+ 
+@@ -1074,7 +1073,6 @@ describe('CdkVirtualScrollViewport', () => {
+ 
+       viewport.setRenderedContentOffset(contentSize + 10, 'to-end');
+       flush();
+-      await fixture.whenStable();
+ 
+       expect(viewport.getOffsetToRenderedContentStart()).toBe(0);
+     }));
+diff --git a/src/material/bottom-sheet/bottom-sheet.spec.ts b/src/material/bottom-sheet/bottom-sheet.spec.ts
+index 16fcd939b9c4..f0de4f69426b 100644
+--- a/src/material/bottom-sheet/bottom-sheet.spec.ts
++++ b/src/material/bottom-sheet/bottom-sheet.spec.ts
+@@ -650,24 +650,18 @@ describe('MatBottomSheet', () => {
+       expect(focusTrapAnchors.length).toBeGreaterThan(0);
+     }));
+ 
+-    it(
+-      'should focus the first tabbable element of the bottom sheet on open when' +
+-        'autoFocus is set to "first-tabbable"',
+-      async () => {
+-        bottomSheet.open(PizzaMsg, {
+-          viewContainerRef: testViewContainerRef,
+-          autoFocus: 'first-tabbable',
+-        });
++    it('should focus the first tabbable element of the bottom sheet on open when autoFocus is set to "first-tabbable"', () => {
++      bottomSheet.open(PizzaMsg, {
++        viewContainerRef: testViewContainerRef,
++        autoFocus: 'first-tabbable',
++      });
+ 
+-        viewContainerFixture.detectChanges();
+-        await viewContainerFixture.whenStable();
+-        viewContainerFixture.detectChanges();
++      viewContainerFixture.detectChanges();
+ 
+-        expect(document.activeElement!.tagName)
+-          .withContext('Expected first tabbable element (input) in the dialog to be focused.')
+-          .toBe('INPUT');
+-      },
+-    );
++      expect(document.activeElement!.tagName)
++        .withContext('Expected first tabbable element (input) in the dialog to be focused.')
++        .toBe('INPUT');
++    });
+ 
+     it('should focus the bottom sheet element on open when autoFocus is set to "dialog"', fakeAsync(() => {
+       bottomSheet.open(PizzaMsg, {
+diff --git a/src/material/chips/chip-grid.spec.ts b/src/material/chips/chip-grid.spec.ts
+index f11f2691735d..476d19ef4c50 100644
+--- a/src/material/chips/chip-grid.spec.ts
++++ b/src/material/chips/chip-grid.spec.ts
+@@ -935,20 +935,18 @@ describe('MatChipGrid', () => {
+       flush();
+       fixture.detectChanges();
+ 
+-      fixture.whenStable().then(() => {
+-        expect(errorTestComponent.form.submitted)
+-          .withContext('Expected form to have been submitted')
+-          .toBe(true);
+-        expect(containerEl.classList)
+-          .withContext('Expected container to have the invalid CSS class.')
+-          .toContain('mat-form-field-invalid');
+-        expect(containerEl.querySelectorAll('mat-error').length)
+-          .withContext('Expected one error message to have been rendered.')
+-          .toBe(1);
+-        expect(chipGridEl.getAttribute('aria-invalid'))
+-          .withContext('Expected aria-invalid to be set to "true".')
+-          .toBe('true');
+-      });
++      expect(errorTestComponent.form.submitted)
++        .withContext('Expected form to have been submitted')
++        .toBe(true);
++      expect(containerEl.classList)
++        .withContext('Expected container to have the invalid CSS class.')
++        .toContain('mat-form-field-invalid');
++      expect(containerEl.querySelectorAll('mat-error').length)
++        .withContext('Expected one error message to have been rendered.')
++        .toBe(1);
++      expect(chipGridEl.getAttribute('aria-invalid'))
++        .withContext('Expected aria-invalid to be set to "true".')
++        .toBe('true');
+       flush();
+     }));
+ 
+@@ -957,36 +955,32 @@ describe('MatChipGrid', () => {
+       flush();
+       fixture.detectChanges();
+ 
+-      fixture.whenStable().then(() => {
+-        expect(containerEl.classList)
+-          .withContext('Expected container to have the invalid CSS class.')
+-          .toContain('mat-form-field-invalid');
+-        expect(containerEl.querySelectorAll('mat-error').length)
+-          .withContext('Expected one error message to have been rendered.')
+-          .toBe(1);
+-        expect(containerEl.querySelectorAll('mat-hint').length)
+-          .withContext('Expected no hints to be shown.')
+-          .toBe(0);
+-
+-        errorTestComponent.formControl.setValue('something');
+-        flush();
+-        fixture.detectChanges();
++      expect(containerEl.classList)
++        .withContext('Expected container to have the invalid CSS class.')
++        .toContain('mat-form-field-invalid');
++      expect(containerEl.querySelectorAll('mat-error').length)
++        .withContext('Expected one error message to have been rendered.')
++        .toBe(1);
++      expect(containerEl.querySelectorAll('mat-hint').length)
++        .withContext('Expected no hints to be shown.')
++        .toBe(0);
+ 
+-        fixture.whenStable().then(() => {
+-          expect(containerEl.classList).not.toContain(
+-            'mat-form-field-invalid',
+-            'Expected container not to have the invalid class when valid.',
+-          );
+-          expect(containerEl.querySelectorAll('mat-error').length)
+-            .withContext('Expected no error messages when the input is valid.')
+-            .toBe(0);
+-          expect(containerEl.querySelectorAll('mat-hint').length)
+-            .withContext('Expected one hint to be shown once the input is valid.')
+-            .toBe(1);
+-        });
++      errorTestComponent.formControl.setValue('something');
++      flush();
++      fixture.detectChanges();
+ 
+-        flush();
+-      });
++      expect(containerEl.classList).not.toContain(
++        'mat-form-field-invalid',
++        'Expected container not to have the invalid class when valid.',
++      );
++      expect(containerEl.querySelectorAll('mat-error').length)
++        .withContext('Expected no error messages when the input is valid.')
++        .toBe(0);
++      expect(containerEl.querySelectorAll('mat-hint').length)
++        .withContext('Expected one hint to be shown once the input is valid.')
++        .toBe(1);
++
++      flush();
+     }));
+ 
+     it('should set the proper aria-live attribute on the error messages', () => {
+diff --git a/src/material/datepicker/datepicker.spec.ts b/src/material/datepicker/datepicker.spec.ts
+index 54be77ddf40e..1b4675bf3705 100644
+--- a/src/material/datepicker/datepicker.spec.ts
++++ b/src/material/datepicker/datepicker.spec.ts
+@@ -389,34 +389,28 @@ describe('MatDatepicker', () => {
+         }),
+       );
+ 
+-      it(
+-        'pressing enter on the currently selected date should close the calendar without ' +
+-          'firing selectedChanged',
+-        fakeAsync(() => {
+-          const spy = jasmine.createSpy('selectionChanged spy');
+-          const selectedSubscription = model.selectionChanged.subscribe(spy);
++      it('pressing enter on the currently selected date should close the calendar without firing selectedChanged', fakeAsync(() => {
++        const spy = jasmine.createSpy('selectionChanged spy');
++        const selectedSubscription = model.selectionChanged.subscribe(spy);
+ 
+-          testComponent.datepicker.open();
+-          fixture.detectChanges();
+-          tick();
+-          flush();
++        testComponent.datepicker.open();
++        fixture.detectChanges();
++        tick();
++        flush();
+ 
+-          let calendarBodyEl = document.querySelector('.mat-calendar-body') as HTMLElement;
+-          expect(calendarBodyEl).not.toBeNull();
+-          expect(testComponent.datepickerInput.value).toEqual(new Date(2020, JAN, 1));
++        let calendarBodyEl = document.querySelector('.mat-calendar-body') as HTMLElement;
++        expect(calendarBodyEl).not.toBeNull();
++        expect(testComponent.datepickerInput.value).toEqual(new Date(2020, JAN, 1));
+ 
+-          dispatchKeyboardEvent(calendarBodyEl, 'keydown', ENTER);
+-          fixture.detectChanges();
+-          flush();
++        dispatchKeyboardEvent(calendarBodyEl, 'keydown', ENTER);
++        fixture.detectChanges();
++        flush();
+ 
+-          fixture.whenStable().then(() => {
+-            expect(spy).not.toHaveBeenCalled();
+-            expect(document.querySelector('.mat-datepicker-dialog')).toBeNull();
+-            expect(testComponent.datepickerInput.value).toEqual(new Date(2020, JAN, 1));
+-            selectedSubscription.unsubscribe();
+-          });
+-        }),
+-      );
++        expect(spy).not.toHaveBeenCalled();
++        expect(document.querySelector('.mat-datepicker-dialog')).toBeNull();
++        expect(testComponent.datepickerInput.value).toEqual(new Date(2020, JAN, 1));
++        selectedSubscription.unsubscribe();
++      }));
+ 
+       it('startAt should fallback to input value', () => {
+         expect(testComponent.datepicker.startAt).toEqual(new Date(2020, JAN, 1));
+@@ -885,15 +879,10 @@ describe('MatDatepicker', () => {
+       beforeEach(fakeAsync(() => {
+         fixture = createComponent(DatepickerWithNgModel, [MatNativeDateModule]);
+         fixture.detectChanges();
+-
+-        fixture.whenStable().then(() => {
+-          fixture.detectChanges();
+-
+-          testComponent = fixture.componentInstance;
+-          model = fixture.debugElement
+-            .query(By.directive(MatDatepicker))
+-            .injector.get(MatDateSelectionModel);
+-        });
++        testComponent = fixture.componentInstance;
++        model = fixture.debugElement
++          .query(By.directive(MatDatepicker))
++          .injector.get(MatDateSelectionModel);
+       }));
+ 
+       afterEach(fakeAsync(() => {
+diff --git a/src/material/dialog/testing/dialog-opener.spec.ts b/src/material/dialog/testing/dialog-opener.spec.ts
+index 7f8877f310ba..c4c6a6bcada3 100644
+--- a/src/material/dialog/testing/dialog-opener.spec.ts
++++ b/src/material/dialog/testing/dialog-opener.spec.ts
+@@ -17,13 +17,12 @@ describe('MatTestDialogOpener', () => {
+     );
+   });
+ 
+-  it('should pass data to the component', async () => {
++  it('should pass data to the component', () => {
+     const config = {data: 'test'};
+     const fixture = TestBed.createComponent(
+       MatTestDialogOpener.withComponent(ExampleComponent, config),
+     );
+     fixture.detectChanges();
+-    await fixture.whenStable();
+     const dialogContainer = document.querySelector('mat-dialog-container');
+     expect(dialogContainer!.innerHTML).toContain('Data: test');
+   });
+diff --git a/src/material/menu/menu.spec.ts b/src/material/menu/menu.spec.ts
+index ee8f79e6acff..d9920dcaefb4 100644
+--- a/src/material/menu/menu.spec.ts
++++ b/src/material/menu/menu.spec.ts
+@@ -1261,13 +1261,13 @@ describe('MatMenu', () => {
+       expect(destroyCount).withContext('Expected ngOnDestroy to have been called').toBe(2);
+     }));
+ 
+-    it('should focus the first menu item when opening a lazy menu via keyboard', async () => {
++    it('should focus the first menu item when opening a lazy menu via keyboard', () => {
+       const fixture = createComponent(SimpleLazyMenu);
+-      fixture.autoDetectChanges();
++      fixture.detectChanges();
+ 
+       // A click without a mousedown before it is considered a keyboard open.
+       fixture.componentInstance.triggerEl.nativeElement.click();
+-      await fixture.whenStable();
++      fixture.detectChanges();
+ 
+       const item = document.querySelector('.mat-mdc-menu-panel [mat-menu-item]')!;
+ 
+diff --git a/src/material/tabs/tab-group.spec.ts b/src/material/tabs/tab-group.spec.ts
+index dee6686d6af7..785ab4452365 100644
+--- a/src/material/tabs/tab-group.spec.ts
++++ b/src/material/tabs/tab-group.spec.ts
+@@ -102,20 +102,14 @@ describe('MatTabGroup', () => {
+       fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+-      setTimeout(() => {
+-        component.selectedIndex = 1;
+-        fixture.changeDetectorRef.markForCheck();
+-        fixture.detectChanges();
++      component.selectedIndex = 1;
++      fixture.changeDetectorRef.markForCheck();
++      fixture.detectChanges();
+ 
+-        setTimeout(() => {
+-          component.selectedIndex = 0;
+-          fixture.changeDetectorRef.markForCheck();
+-          fixture.detectChanges();
+-          fixture.whenStable().then(() => {
+-            expect(component.selectedIndex).toBe(0);
+-          });
+-        }, 1);
+-      }, 1);
++      component.selectedIndex = 0;
++      fixture.changeDetectorRef.markForCheck();
++      fixture.detectChanges();
++      expect(component.selectedIndex).toBe(0);
+     }));
+ 
+     it('should change tabs based on selectedIndex', fakeAsync(() => {
+diff --git a/src/material/toolbar/toolbar.spec.ts b/src/material/toolbar/toolbar.spec.ts
+index 42f2e5a053a9..e6bd242f6293 100644
+--- a/src/material/toolbar/toolbar.spec.ts
++++ b/src/material/toolbar/toolbar.spec.ts
+@@ -72,20 +72,16 @@ describe('MatToolbar', () => {
+       }).toThrowError(/attempting to combine different/i);
+     });
+ 
+-    it('should throw an error if a toolbar-row is added later', async () => {
++    it('should throw an error if a toolbar-row is added later', () => {
+       const fixture = TestBed.createComponent(ToolbarMixedRowModes);
+ 
+-      await expectAsync(
+-        (async () => {
+-          fixture.componentInstance.showToolbarRow.set(false);
+-          fixture.detectChanges();
+-          await fixture.whenStable();
+-
+-          fixture.componentInstance.showToolbarRow.set(true);
+-          fixture.detectChanges();
+-          await fixture.whenStable();
+-        })(),
+-      ).toBeRejectedWithError(/attempting to combine different/i);
++      expect(() => {
++        fixture.componentInstance.showToolbarRow.set(false);
++        fixture.detectChanges();
++
++        fixture.componentInstance.showToolbarRow.set(true);
++        fixture.detectChanges();
++      }).toThrowError(/attempting to combine different/i);
+     });
+ 
+     it('should pick up indirect descendant rows', () => {
+diff --git a/src/material/tooltip/tooltip.spec.ts b/src/material/tooltip/tooltip.spec.ts
+index d8b60d5d8cb9..6f11bfd899c8 100644
+--- a/src/material/tooltip/tooltip.spec.ts
++++ b/src/material/tooltip/tooltip.spec.ts
+@@ -434,7 +434,7 @@ describe('MatTooltip', () => {
+       expect(tooltipDirective._isTooltipVisible()).toBe(false);
+     }));
+ 
+-    it('should not show if hide is called before delay finishes', waitForAsync(() => {
++    it('should not show if hide is called before delay finishes', () => {
+       assertTooltipInstance(tooltipDirective, false);
+ 
+       const tooltipDelay = 1000;
+@@ -446,10 +446,8 @@ describe('MatTooltip', () => {
+       expect(overlayContainerElement.textContent).toContain('');
+       tooltipDirective.hide();
+ 
+-      fixture.whenStable().then(() => {
+-        expect(tooltipDirective._isTooltipVisible()).toBe(false);
+-      });
+-    }));
++      expect(tooltipDirective._isTooltipVisible()).toBe(false);
++    });
+ 
+     it('should not show tooltip if message is not present or empty', () => {
+       assertTooltipInstance(tooltipDirective, false);

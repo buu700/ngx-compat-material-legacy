@@ -1,0 +1,5288 @@
+From 209176990ce1d70e904a3169460d18f081e26b76 Mon Sep 17 00:00:00 2001
+From: Kristiyan Kostadinov <crisbeto@users.noreply.github.com>
+Date: Mon, 16 Dec 2024 18:25:40 +0200
+Subject: [PATCH] test(multiple): clean up standalone flags (#30189)
+
+Removes all the remaining `standalone: true` usages since standalone is the default now.
+---
+ .../combobox/combobox.spec.ts                 |  1 -
+ .../scrolling/virtual-scroll-viewport.spec.ts |  1 -
+ .../selection/selection.spec.ts               |  4 ---
+ .../table-scroll-container.spec.ts            |  1 -
+ .../aria-describer/aria-describer.spec.ts     |  1 -
+ .../a11y/focus-monitor/focus-monitor.spec.ts  |  8 -----
+ .../focus-monitor/focus-monitor.zone.spec.ts  |  1 -
+ .../configurable-focus-trap.spec.ts           |  1 -
+ .../event-listener-inert-strategy.spec.ts     |  1 -
+ src/cdk/a11y/focus-trap/focus-trap.spec.ts    |  9 -----
+ .../a11y/key-manager/list-key-manager.spec.ts |  2 +-
+ .../live-announcer/live-announcer.spec.ts     |  3 --
+ src/cdk/accordion/accordion-item.spec.ts      |  3 --
+ src/cdk/accordion/accordion.spec.ts           |  2 --
+ src/cdk/bidi/directionality.spec.ts           |  4 ---
+ src/cdk/clipboard/copy-to-clipboard.spec.ts   |  1 -
+ src/cdk/dialog/dialog.spec.ts                 | 10 ------
+ .../directives/drop-list-shared.spec.ts       | 36 -------------------
+ .../directives/mixed-drop-list.spec.ts        |  1 -
+ .../directives/standalone-drag.spec.ts        | 17 ---------
+ .../directives/standalone-drag.zone.spec.ts   |  1 -
+ src/cdk/drag-drop/drag-drop-registry.spec.ts  |  1 -
+ src/cdk/drag-drop/drag-drop.spec.ts           |  1 -
+ src/cdk/menu/menu-bar.spec.ts                 |  5 ---
+ src/cdk/menu/menu-group.spec.ts               |  2 --
+ src/cdk/menu/menu-item-checkbox.spec.ts       |  1 -
+ src/cdk/menu/menu-item-radio.spec.ts          |  1 -
+ src/cdk/menu/menu-item.spec.ts                |  1 -
+ src/cdk/menu/menu-stack.spec.ts               |  1 -
+ src/cdk/menu/menu.spec.ts                     |  4 ---
+ src/cdk/menu/pointer-focus-tracker.spec.ts    |  2 --
+ src/cdk/observers/observe-content.spec.ts     |  4 ---
+ .../private/shared-resize-observer.spec.ts    |  1 -
+ .../overlay-keyboard-dispatcher.spec.ts       |  1 -
+ .../overlay-outside-click-dispatcher.spec.ts  |  1 -
+ .../fullscreen-overlay-container.spec.ts      |  1 -
+ src/cdk/overlay/overlay-container.spec.ts     |  1 -
+ src/cdk/overlay/overlay-directives.spec.ts    |  2 --
+ .../overlay/overlay-directives.zone.spec.ts   |  2 --
+ src/cdk/overlay/overlay.spec.ts               |  2 --
+ ...exible-connected-position-strategy.spec.ts |  1 -
+ .../position/global-position-strategy.spec.ts |  1 -
+ .../scroll/block-scroll-strategy.spec.ts      |  1 -
+ .../scroll/close-scroll-strategy.spec.ts      |  1 -
+ .../scroll/close-scroll-strategy.zone.spec.ts |  1 -
+ .../scroll/reposition-scroll-strategy.spec.ts |  1 -
+ src/cdk/portal/portal.spec.ts                 |  5 ---
+ src/cdk/scrolling/scroll-dispatcher.spec.ts   |  2 --
+ .../scrolling/scroll-dispatcher.zone.spec.ts  |  1 -
+ src/cdk/scrolling/scrollable.spec.ts          |  1 -
+ .../scrolling/virtual-scroll-viewport.spec.ts | 10 ------
+ .../virtual-scroll-viewport.zone.spec.ts      |  1 -
+ src/cdk/table/text-column.spec.ts             |  3 --
+ src/cdk/text-field/autofill.spec.ts           |  2 --
+ src/cdk/text-field/autofill.zone.spec.ts      |  1 -
+ src/cdk/text-field/autosize.spec.ts           |  4 ---
+ .../deprecated-map-marker-clusterer.spec.ts   |  1 -
+ src/google-maps/google-map/google-map.spec.ts |  1 -
+ .../map-advanced-marker.spec.ts               |  1 -
+ .../map-bicycling-layer.spec.ts               |  1 -
+ src/google-maps/map-circle/map-circle.spec.ts |  1 -
+ .../map-directions-renderer.spec.ts           |  1 -
+ .../map-ground-overlay.spec.ts                |  1 -
+ .../map-heatmap-layer.spec.ts                 |  1 -
+ .../map-info-window/map-info-window.spec.ts   |  1 -
+ .../map-kml-layer/map-kml-layer.spec.ts       |  1 -
+ .../map-marker-clusterer.spec.ts              |  1 -
+ src/google-maps/map-marker/map-marker.spec.ts |  1 -
+ .../map-polygon/map-polygon.spec.ts           |  1 -
+ .../map-polyline/map-polyline.spec.ts         |  1 -
+ .../map-rectangle/map-rectangle.spec.ts       |  1 -
+ .../map-traffic-layer.spec.ts                 |  1 -
+ .../map-transit-layer.spec.ts                 |  1 -
+ .../menubar/menubar-item.spec.ts              |  1 -
+ .../menubar/menubar.spec.ts                   |  1 -
+ .../testing/autocomplete-harness.spec.ts      |  1 -
+ src/material/badge/badge.spec.ts              |  5 ---
+ .../badge/testing/badge-harness.spec.ts       |  1 -
+ .../bottom-sheet/bottom-sheet.spec.ts         |  9 -----
+ .../testing/bottom-sheet-harness.spec.ts      |  1 -
+ .../button-toggle/button-toggle.spec.ts       | 17 ---------
+ .../testing/button-toggle-group.spec.ts       |  1 -
+ .../testing/button-toggle-harness.spec.ts     |  1 -
+ src/material/button/button.spec.ts            |  2 --
+ .../button/testing/button-harness.spec.ts     |  1 -
+ src/material/card/card.spec.ts                |  2 --
+ .../card/testing/card-harness.spec.ts         |  1 -
+ src/material/checkbox/checkbox.spec.ts        | 18 ----------
+ .../checkbox/testing/checkbox-harness.spec.ts |  1 -
+ src/material/chips/chip-edit-input.spec.ts    |  1 -
+ src/material/chips/chip-remove.spec.ts        |  1 -
+ src/material/chips/chip-row.spec.ts           |  1 -
+ src/material/chips/chip-set.spec.ts           |  2 --
+ src/material/chips/chip.spec.ts               |  4 ---
+ .../chips/testing/chip-grid-harness.spec.ts   |  1 -
+ .../chips/testing/chip-harness.spec.ts        |  1 -
+ .../chips/testing/chip-input-harness.spec.ts  |  1 -
+ .../testing/chip-listbox-harness.spec.ts      |  1 -
+ .../chips/testing/chip-option-harness.spec.ts |  1 -
+ .../chips/testing/chip-row-harness.spec.ts    |  1 -
+ .../chips/testing/chip-set-harness.spec.ts    |  1 -
+ src/material/core/option/option.spec.ts       |  2 --
+ src/material/core/ripple/ripple.spec.ts       |  7 ----
+ src/material/core/ripple/ripple.zone.spec.ts  |  1 -
+ .../core/testing/optgroup-harness.spec.ts     |  1 -
+ .../core/testing/option-harness.spec.ts       |  1 -
+ src/material/datepicker/calendar-body.spec.ts |  2 --
+ .../datepicker/calendar-header.spec.ts        |  2 --
+ .../datepicker/date-range-input.spec.ts       |  8 -----
+ src/material/datepicker/month-view.spec.ts    |  3 --
+ .../datepicker/multi-year-view.spec.ts        |  4 ---
+ .../testing/calendar-harness.spec.ts          |  1 -
+ .../testing/date-range-input-harness.spec.ts  |  1 -
+ .../testing/datepicker-input-harness.spec.ts  |  1 -
+ .../testing/datepicker-toggle-harness.spec.ts |  1 -
+ src/material/datepicker/year-view.spec.ts     |  3 --
+ src/material/dialog/dialog.spec.ts            | 15 --------
+ src/material/dialog/dialog.zone.spec.ts       |  3 --
+ .../dialog/testing/dialog-harness.spec.ts     |  1 -
+ .../dialog/testing/dialog-opener.spec.ts      |  1 -
+ src/material/divider/divider.spec.ts          |  1 -
+ .../divider/testing/divider-harness.spec.ts   |  1 -
+ src/material/expansion/accordion.spec.ts      |  5 ---
+ src/material/expansion/expansion.spec.ts      |  8 -----
+ .../testing/expansion-harness.spec.ts         |  1 -
+ .../testing/form-field-harness.spec.ts        |  1 -
+ .../testing/grid-list-harness.spec.ts         |  1 -
+ src/material/icon/icon.spec.ts                | 11 ------
+ .../icon/testing/icon-harness.spec.ts         |  1 -
+ .../input/testing/input-harness.spec.ts       |  1 -
+ .../testing/native-select-harness.spec.ts     |  1 -
+ src/material/list/list.spec.ts                | 16 ---------
+ src/material/list/selection-list.spec.ts      | 18 ----------
+ .../list/testing/list-harness.spec.ts         |  4 ---
+ .../menu/testing/menu-harness.spec.ts         |  2 --
+ .../testing/paginator-harness.spec.ts         |  1 -
+ .../progress-bar/progress-bar.spec.ts         |  2 --
+ .../testing/progress-bar-harness.spec.ts      |  1 -
+ .../progress-spinner/progress-spinner.spec.ts | 11 ------
+ .../testing/progress-spinner-harness.spec.ts  |  1 -
+ src/material/radio/radio.spec.ts              | 14 --------
+ .../radio/testing/radio-harness.spec.ts       |  1 -
+ .../select/testing/select-harness.spec.ts     |  1 -
+ src/material/sidenav/drawer.spec.ts           | 15 --------
+ src/material/sidenav/sidenav.spec.ts          |  3 --
+ .../sidenav/testing/sidenav-harness.spec.ts   |  2 --
+ .../slide-toggle/slide-toggle.spec.ts         | 11 ------
+ .../testing/slide-toggle-harness.spec.ts      |  1 -
+ .../slider/testing/slider-harness.spec.ts     |  1 -
+ src/material/snack-bar/snack-bar.spec.ts      |  5 ---
+ src/material/snack-bar/snack-bar.zone.spec.ts |  2 --
+ .../testing/snack-bar-harness.spec.ts         |  1 -
+ src/material/sort/sort.spec.ts                | 10 ------
+ .../sort/testing/sort-harness.spec.ts         |  1 -
+ src/material/stepper/stepper.spec.ts          |  1 -
+ .../stepper/testing/stepper-harness.spec.ts   |  1 -
+ src/material/table/table.spec.ts              | 10 ------
+ .../table/testing/table-harness.spec.ts       |  1 -
+ src/material/tabs/tab-body.spec.ts            |  1 -
+ src/material/tabs/tab-group.spec.ts           | 18 ----------
+ src/material/tabs/tab-header.spec.ts          |  1 -
+ .../tabs/tab-nav-bar/tab-nav-bar.spec.ts      |  4 ---
+ .../tabs/testing/tab-group-harness.spec.ts    |  1 -
+ .../tabs/testing/tab-nav-bar-harness.spec.ts  |  1 -
+ .../testing/timepicker-harness.spec.ts        |  1 -
+ .../testing/timepicker-input-harness.spec.ts  |  1 -
+ .../testing/timepicker-toggle-harness.spec.ts |  1 -
+ src/material/timepicker/timepicker.spec.ts    |  6 ----
+ .../toolbar/testing/toolbar-harness.spec.ts   |  1 -
+ src/material/toolbar/toolbar.spec.ts          |  4 ---
+ .../tooltip/testing/tooltip-harness.spec.ts   |  1 -
+ src/material/tooltip/tooltip.spec.ts          |  7 ----
+ src/material/tooltip/tooltip.zone.spec.ts     |  1 -
+ .../tree/testing/tree-harness.spec.ts         |  1 -
+ src/youtube-player/youtube-player.spec.ts     |  3 --
+ 175 files changed, 1 insertion(+), 553 deletions(-)
+
+diff --git a/src/cdk-experimental/combobox/combobox.spec.ts b/src/cdk-experimental/combobox/combobox.spec.ts
+index 456f1a53aba7..88656cbb2bf8 100644
+--- a/src/cdk-experimental/combobox/combobox.spec.ts
++++ b/src/cdk-experimental/combobox/combobox.spec.ts
+@@ -385,7 +385,6 @@ describe('Combobox', () => {
+       <button id="applyButton" (click)="toggleCombobox.updateAndClose(input.value)">Apply</button>
+     </div>
+   </ng-template>`,
+-  standalone: true,
+   imports: [CdkComboboxModule],
+ })
+ class ComboboxToggle {
+diff --git a/src/cdk-experimental/scrolling/virtual-scroll-viewport.spec.ts b/src/cdk-experimental/scrolling/virtual-scroll-viewport.spec.ts
+index c233eabfc777..e0aa8068ac75 100644
+--- a/src/cdk-experimental/scrolling/virtual-scroll-viewport.spec.ts
++++ b/src/cdk-experimental/scrolling/virtual-scroll-viewport.spec.ts
+@@ -95,7 +95,6 @@ function finishInit(fixture: ComponentFixture<any>) {
+     }
+   `,
+   encapsulation: ViewEncapsulation.None,
+-  standalone: true,
+   imports: [ScrollingModule, ExperimentalScrollingModule],
+ })
+ class AutoSizeVirtualScroll {
+diff --git a/src/cdk-experimental/selection/selection.spec.ts b/src/cdk-experimental/selection/selection.spec.ts
+index 1661251b78be..179688d1615e 100644
+--- a/src/cdk-experimental/selection/selection.spec.ts
++++ b/src/cdk-experimental/selection/selection.spec.ts
+@@ -452,7 +452,6 @@ describe('cdkSelectionColumn with multiple = false', () => {
+         </li>
+       }
+     </ul>`,
+-  standalone: true,
+   imports: [CdkSelectionModule, AsyncPipe],
+ })
+ class ListWithMultiSelection {
+@@ -517,7 +516,6 @@ class ListWithMultiSelection {
+         </li>
+       }
+     </ul>`,
+-  standalone: true,
+   imports: [CdkSelectionModule, AsyncPipe],
+ })
+ class ListWithSingleSelection {
+@@ -559,7 +557,6 @@ class ListWithSingleSelection {
+           cdkRowSelection [cdkRowSelectionValue]="row"></tr>
+     </table>
+     `,
+-  standalone: true,
+   imports: [CdkSelectionModule, CdkTableModule],
+ })
+ class MultiSelectTableWithSelectionColumn {
+@@ -627,7 +624,6 @@ class MultiSelectTableWithSelectionColumn {
+           cdkRowSelection [cdkRowSelectionValue]="row"></tr>
+     </table>
+     `,
+-  standalone: true,
+   imports: [CdkSelectionModule, CdkTableModule],
+ })
+ class SingleSelectTableWithSelectionColumn {
+diff --git a/src/cdk-experimental/table-scroll-container/table-scroll-container.spec.ts b/src/cdk-experimental/table-scroll-container/table-scroll-container.spec.ts
+index 009e971b6b20..cf83cb16bd5e 100644
+--- a/src/cdk-experimental/table-scroll-container/table-scroll-container.spec.ts
++++ b/src/cdk-experimental/table-scroll-container/table-scroll-container.spec.ts
+@@ -293,7 +293,6 @@ class FakeDataSource extends DataSource<TestData> {
+     </table>
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkTableModule, CdkTableScrollContainerModule],
+   styles: `
+     .cdk-header-cell, .cdk-cell, .cdk-footer-cell {
+diff --git a/src/cdk/a11y/aria-describer/aria-describer.spec.ts b/src/cdk/a11y/aria-describer/aria-describer.spec.ts
+index ebb74d1ff8dc..eea223a7f2a6 100644
+--- a/src/cdk/a11y/aria-describer/aria-describer.spec.ts
++++ b/src/cdk/a11y/aria-describer/aria-describer.spec.ts
+@@ -400,7 +400,6 @@ function expectMessage(el: Element, message: string) {
+     <div id="description-with-existing-id">Hello</div>
+     <div description-without-id>Hey</div>
+   `,
+-  standalone: true,
+   imports: [A11yModule],
+ })
+ class TestApp {
+diff --git a/src/cdk/a11y/focus-monitor/focus-monitor.spec.ts b/src/cdk/a11y/focus-monitor/focus-monitor.spec.ts
+index 3f9f04265f91..1bed0e280003 100644
+--- a/src/cdk/a11y/focus-monitor/focus-monitor.spec.ts
++++ b/src/cdk/a11y/focus-monitor/focus-monitor.spec.ts
+@@ -901,14 +901,12 @@ describe('FocusMonitor input label detection', () => {
+ 
+ @Component({
+   template: `<div class="parent"><button>focus me!</button></div>`,
+-  standalone: true,
+   imports: [A11yModule],
+ })
+ class PlainButton {}
+ 
+ @Component({
+   template: `<button cdkMonitorElementFocus (cdkFocusChange)="focusChanged($event)"></button>`,
+-  standalone: true,
+   imports: [A11yModule],
+ })
+ class ButtonWithFocusClasses {
+@@ -917,28 +915,24 @@ class ButtonWithFocusClasses {
+ 
+ @Component({
+   template: `<div tabindex="0" cdkMonitorElementFocus><button></button></div>`,
+-  standalone: true,
+   imports: [A11yModule],
+ })
+ class ComplexComponentWithMonitorElementFocus {}
+ 
+ @Component({
+   template: `<div tabindex="0" cdkMonitorSubtreeFocus><button></button></div>`,
+-  standalone: true,
+   imports: [A11yModule],
+ })
+ class ComplexComponentWithMonitorSubtreeFocus {}
+ 
+ @Component({
+   template: `<div cdkMonitorSubtreeFocus><button cdkMonitorElementFocus></button></div>`,
+-  standalone: true,
+   imports: [A11yModule],
+ })
+ class ComplexComponentWithMonitorSubtreeFocusAndMonitorElementFocus {}
+ 
+ @Component({
+   template: `<ng-container cdkMonitorElementFocus></ng-container>`,
+-  standalone: true,
+   imports: [A11yModule],
+ })
+ class FocusMonitorOnCommentNode {}
+@@ -948,14 +942,12 @@ class FocusMonitorOnCommentNode {}
+     <label for="test-checkbox">Check me</label>
+     <input id="test-checkbox" type="checkbox">
+   `,
+-  standalone: true,
+   imports: [A11yModule],
+ })
+ class CheckboxWithLabel {}
+ 
+ @Component({
+   template: `<button cdkMonitorElementFocus #exportedDir="cdkMonitorFocus"></button>`,
+-  standalone: true,
+   imports: [A11yModule],
+ })
+ class ExportedFocusMonitor {
+diff --git a/src/cdk/a11y/focus-monitor/focus-monitor.zone.spec.ts b/src/cdk/a11y/focus-monitor/focus-monitor.zone.spec.ts
+index b8297208c6b0..33c1e386b953 100644
+--- a/src/cdk/a11y/focus-monitor/focus-monitor.zone.spec.ts
++++ b/src/cdk/a11y/focus-monitor/focus-monitor.zone.spec.ts
+@@ -41,7 +41,6 @@ describe('FocusMonitor observable stream Zone.js integration', () => {
+ 
+ @Component({
+   template: `<div class="parent"><button>focus me!</button></div>`,
+-  standalone: true,
+   imports: [A11yModule],
+ })
+ class PlainButton {}
+diff --git a/src/cdk/a11y/focus-trap/configurable-focus-trap.spec.ts b/src/cdk/a11y/focus-trap/configurable-focus-trap.spec.ts
+index dfecc2cc111e..b19ad2c90ad6 100644
+--- a/src/cdk/a11y/focus-trap/configurable-focus-trap.spec.ts
++++ b/src/cdk/a11y/focus-trap/configurable-focus-trap.spec.ts
+@@ -115,7 +115,6 @@ function createComponent<T>(
+       <button>SAVE</button>
+     </div>
+   `,
+-  standalone: true,
+ })
+ class SimpleFocusTrap implements AfterViewInit {
+   private _focusTrapFactory = inject(ConfigurableFocusTrapFactory);
+diff --git a/src/cdk/a11y/focus-trap/event-listener-inert-strategy.spec.ts b/src/cdk/a11y/focus-trap/event-listener-inert-strategy.spec.ts
+index f31bb3a1995f..709877c1219c 100644
+--- a/src/cdk/a11y/focus-trap/event-listener-inert-strategy.spec.ts
++++ b/src/cdk/a11y/focus-trap/event-listener-inert-strategy.spec.ts
+@@ -85,7 +85,6 @@ function createComponent<T>(
+       <button #secondFocusable>SAVE</button>
+     </div>
+   `,
+-  standalone: true,
+ })
+ class SimpleFocusTrap implements AfterViewInit {
+   private _focusTrapFactory = inject(ConfigurableFocusTrapFactory);
+diff --git a/src/cdk/a11y/focus-trap/focus-trap.spec.ts b/src/cdk/a11y/focus-trap/focus-trap.spec.ts
+index 4ae11ebd29ca..ec480249c73a 100644
+--- a/src/cdk/a11y/focus-trap/focus-trap.spec.ts
++++ b/src/cdk/a11y/focus-trap/focus-trap.spec.ts
+@@ -352,7 +352,6 @@ function getActiveElement() {
+       <button>SAVE</button>
+     </div>
+     `,
+-  standalone: true,
+   imports: [A11yModule, PortalModule],
+ })
+ class SimpleFocusTrap {
+@@ -371,7 +370,6 @@ const AUTO_FOCUS_TEMPLATE = `
+ 
+ @Component({
+   template: AUTO_FOCUS_TEMPLATE,
+-  standalone: true,
+   imports: [A11yModule, PortalModule],
+ })
+ class FocusTrapWithAutoCapture {
+@@ -383,7 +381,6 @@ class FocusTrapWithAutoCapture {
+ @Component({
+   template: AUTO_FOCUS_TEMPLATE,
+   encapsulation: ViewEncapsulation.ShadowDom,
+-  standalone: true,
+   imports: [A11yModule, PortalModule],
+ })
+ class FocusTrapWithAutoCaptureInShadowDom extends FocusTrapWithAutoCapture {}
+@@ -397,7 +394,6 @@ class FocusTrapWithAutoCaptureInShadowDom extends FocusTrapWithAutoCapture {}
+       </div>
+     }
+   `,
+-  standalone: true,
+   imports: [A11yModule, PortalModule],
+ })
+ class FocusTrapWithBindings {
+@@ -418,7 +414,6 @@ class FocusTrapWithBindings {
+       <input>
+     </div>
+     `,
+-  standalone: true,
+   imports: [A11yModule, PortalModule],
+ })
+ class FocusTrapTargets {
+@@ -431,7 +426,6 @@ class FocusTrapTargets {
+       <div cdkFocusInitial></div>
+     </div>
+     `,
+-  standalone: true,
+   imports: [A11yModule, PortalModule],
+ })
+ class FocusTrapUnfocusableTarget {
+@@ -446,7 +440,6 @@ class FocusTrapUnfocusableTarget {
+       </svg>
+     </div>
+     `,
+-  standalone: true,
+   imports: [A11yModule, PortalModule],
+ })
+ class FocusTrapWithSvg {
+@@ -459,7 +452,6 @@ class FocusTrapWithSvg {
+       <p>Hello</p>
+     </div>
+     `,
+-  standalone: true,
+   imports: [A11yModule, PortalModule],
+ })
+ class FocusTrapWithoutFocusableElements {
+@@ -478,7 +470,6 @@ class FocusTrapWithoutFocusableElements {
+     </div>
+   </ng-template>
+   `,
+-  standalone: true,
+   imports: [A11yModule, PortalModule],
+ })
+ class FocusTrapInsidePortal {
+diff --git a/src/cdk/a11y/key-manager/list-key-manager.spec.ts b/src/cdk/a11y/key-manager/list-key-manager.spec.ts
+index cb37338a1117..ab4ca61e7087 100644
+--- a/src/cdk/a11y/key-manager/list-key-manager.spec.ts
++++ b/src/cdk/a11y/key-manager/list-key-manager.spec.ts
+@@ -109,7 +109,7 @@ describe('Key managers', () => {
+     it('should maintain the active item when the signal-based items change', () => {
+       keyManager.destroy();
+ 
+-      @Component({template: '', standalone: true})
++      @Component({template: ''})
+       class App {}
+ 
+       const fixture = TestBed.createComponent(App);
+diff --git a/src/cdk/a11y/live-announcer/live-announcer.spec.ts b/src/cdk/a11y/live-announcer/live-announcer.spec.ts
+index 13ad187f006e..2dbf2000fa4f 100644
+--- a/src/cdk/a11y/live-announcer/live-announcer.spec.ts
++++ b/src/cdk/a11y/live-announcer/live-announcer.spec.ts
+@@ -392,7 +392,6 @@ function getLiveElement(): Element {
+ 
+ @Component({
+   template: `<button (click)="announceText('Test')">Announce</button>`,
+-  standalone: true,
+   imports: [A11yModule],
+ })
+ class TestApp {
+@@ -406,7 +405,6 @@ class TestApp {
+ @Component({
+   template: '',
+   host: {'[attr.aria-owns]': 'ariaOwns', 'aria-modal': 'true'},
+-  standalone: true,
+   imports: [A11yModule],
+ })
+ class TestModal {
+@@ -418,7 +416,6 @@ class TestModal {
+     <div
+       [cdkAriaLive]="politeness ? politeness : null"
+       [cdkAriaLiveDuration]="duration">{{content}}</div>`,
+-  standalone: true,
+   imports: [A11yModule],
+ })
+ class DivWithCdkAriaLive {
+diff --git a/src/cdk/accordion/accordion-item.spec.ts b/src/cdk/accordion/accordion-item.spec.ts
+index 253311a687ad..cbf5c7bfbc4d 100644
+--- a/src/cdk/accordion/accordion-item.spec.ts
++++ b/src/cdk/accordion/accordion-item.spec.ts
+@@ -238,7 +238,6 @@ describe('CdkAccordionItem', () => {
+ 
+ @Component({
+   template: `<cdk-accordion-item #item1></cdk-accordion-item>`,
+-  standalone: true,
+   imports: [CdkAccordionModule],
+ })
+ class SingleItem {}
+@@ -248,7 +247,6 @@ class SingleItem {}
+     <cdk-accordion-item #item1></cdk-accordion-item>
+     <cdk-accordion-item #item2></cdk-accordion-item>
+   `,
+-  standalone: true,
+   imports: [CdkAccordionModule],
+ })
+ class ItemGroupWithoutAccordion {}
+@@ -260,7 +258,6 @@ class ItemGroupWithoutAccordion {}
+       <cdk-accordion-item #item2></cdk-accordion-item>
+     </cdk-accordion>
+   `,
+-  standalone: true,
+   imports: [CdkAccordionModule],
+ })
+ class ItemGroupWithAccordion {}
+diff --git a/src/cdk/accordion/accordion.spec.ts b/src/cdk/accordion/accordion.spec.ts
+index 3a263d9f47cb..f0e137a50b7f 100644
+--- a/src/cdk/accordion/accordion.spec.ts
++++ b/src/cdk/accordion/accordion.spec.ts
+@@ -115,7 +115,6 @@ describe('CdkAccordion', () => {
+     <cdk-accordion-item></cdk-accordion-item>
+     <cdk-accordion-item></cdk-accordion-item>
+   </cdk-accordion>`,
+-  standalone: true,
+   imports: [CdkAccordionModule],
+ })
+ class SetOfItems {
+@@ -131,7 +130,6 @@ class SetOfItems {
+       <cdk-accordion-item #innerItem="cdkAccordionItem"></cdk-accordion-item>
+     </cdk-accordion-item>
+   </cdk-accordion>`,
+-  standalone: true,
+   imports: [CdkAccordionModule],
+ })
+ class NestedItems {
+diff --git a/src/cdk/bidi/directionality.spec.ts b/src/cdk/bidi/directionality.spec.ts
+index 72166e369169..a4b3f03b6af5 100644
+--- a/src/cdk/bidi/directionality.spec.ts
++++ b/src/cdk/bidi/directionality.spec.ts
+@@ -162,7 +162,6 @@ describe('Directionality', () => {
+ @Component({
+   selector: 'injects-directionality',
+   template: `<div></div>`,
+-  standalone: true,
+   imports: [BidiModule],
+ })
+ class InjectsDirectionality {
+@@ -175,7 +174,6 @@ class InjectsDirectionality {
+       <injects-directionality></injects-directionality>
+     </div>
+   `,
+-  standalone: true,
+   imports: [Dir, InjectsDirectionality],
+ })
+ class ElementWithDir {
+@@ -186,7 +184,6 @@ class ElementWithDir {
+ 
+ @Component({
+   template: '<div dir="auto"></div>',
+-  standalone: true,
+   imports: [Dir],
+ })
+ class ElementWithPredefinedAutoDir {
+@@ -195,7 +192,6 @@ class ElementWithPredefinedAutoDir {
+ 
+ @Component({
+   template: '<div dir="RTL"></div>',
+-  standalone: true,
+   imports: [Dir],
+ })
+ class ElementWithPredefinedUppercaseDir {
+diff --git a/src/cdk/clipboard/copy-to-clipboard.spec.ts b/src/cdk/clipboard/copy-to-clipboard.spec.ts
+index 073b4df1bded..215f832838e7 100644
+--- a/src/cdk/clipboard/copy-to-clipboard.spec.ts
++++ b/src/cdk/clipboard/copy-to-clipboard.spec.ts
+@@ -14,7 +14,6 @@ const COPY_CONTENT = 'copy content';
+     [cdkCopyToClipboard]="content"
+     [cdkCopyToClipboardAttempts]="attempts"
+     (cdkCopyToClipboardCopied)="copied($event)"></button>`,
+-  standalone: true,
+   imports: [ClipboardModule],
+ })
+ class CopyToClipboardHost {
+diff --git a/src/cdk/dialog/dialog.spec.ts b/src/cdk/dialog/dialog.spec.ts
+index 06a83753853b..f224117dea08 100644
+--- a/src/cdk/dialog/dialog.spec.ts
++++ b/src/cdk/dialog/dialog.spec.ts
+@@ -1205,7 +1205,6 @@ describe('Dialog with a parent Dialog', () => {
+ 
+ @Directive({
+   selector: 'dir-with-view-container',
+-  standalone: true,
+ })
+ class DirectiveWithViewContainer {
+   viewContainerRef = inject(ViewContainerRef);
+@@ -1223,7 +1222,6 @@ class ComponentWithOnPushViewContainer {
+ @Component({
+   selector: 'arbitrary-component',
+   template: `<dir-with-view-container></dir-with-view-container>`,
+-  standalone: true,
+   imports: [DirectiveWithViewContainer],
+ })
+ class ComponentWithChildViewContainer {
+@@ -1238,7 +1236,6 @@ class ComponentWithChildViewContainer {
+   selector: 'arbitrary-component-with-template-ref',
+   template: `<ng-template let-data let-dialogRef="dialogRef">
+       Cheese {{localValue}} {{data?.value}}{{setDialogRef(dialogRef)}}</ng-template>`,
+-  standalone: true,
+   imports: [DialogModule],
+ })
+ class ComponentWithTemplateRef {
+@@ -1256,7 +1253,6 @@ class ComponentWithTemplateRef {
+ /** Simple component for testing ComponentPortal. */
+ @Component({
+   template: '<p>Pizza</p> <input> <button>Close</button>',
+-  standalone: true,
+   imports: [DialogModule],
+ })
+ class PizzaMsg {
+@@ -1269,7 +1265,6 @@ class PizzaMsg {
+   template: `
+     <h2>This is the title</h2>
+   `,
+-  standalone: true,
+   imports: [DialogModule],
+ })
+ class ContentElementDialog {
+@@ -1279,7 +1274,6 @@ class ContentElementDialog {
+ @Component({
+   template: '',
+   providers: [Dialog],
+-  standalone: true,
+   imports: [DialogModule],
+ })
+ class ComponentThatProvidesMatDialog {
+@@ -1289,7 +1283,6 @@ class ComponentThatProvidesMatDialog {
+ /** Simple component for testing ComponentPortal. */
+ @Component({
+   template: '',
+-  standalone: true,
+   imports: [DialogModule],
+ })
+ class DialogWithInjectedData {
+@@ -1298,7 +1291,6 @@ class DialogWithInjectedData {
+ 
+ @Component({
+   template: '<p>Pasta</p>',
+-  standalone: true,
+   imports: [DialogModule],
+ })
+ class DialogWithoutFocusableElements {}
+@@ -1314,7 +1306,6 @@ const TEMPLATE_INJECTOR_TEST_TOKEN = new InjectionToken<string>('TEMPLATE_INJECT
+ 
+ @Directive({
+   selector: 'template-injector-inner',
+-  standalone: true,
+ })
+ class TemplateInjectorInnerDirective {
+   constructor() {
+@@ -1331,7 +1322,6 @@ class TemplateInjectorInnerDirective {
+       useValue: 'hello from parent component',
+     },
+   ],
+-  standalone: true,
+   imports: [TemplateInjectorInnerDirective],
+ })
+ class TemplateInjectorParentComponent {
+diff --git a/src/cdk/drag-drop/directives/drop-list-shared.spec.ts b/src/cdk/drag-drop/directives/drop-list-shared.spec.ts
+index 139ec0f00efb..e8b123c199a8 100644
+--- a/src/cdk/drag-drop/directives/drop-list-shared.spec.ts
++++ b/src/cdk/drag-drop/directives/drop-list-shared.spec.ts
+@@ -4886,7 +4886,6 @@ export function getHorizontalFixtures(listOrientation: Exclude<DropListOrientati
+     encapsulation: ViewEncapsulation.None,
+     styles: HORIZONTAL_FIXTURE_STYLES,
+     template: HORIZONTAL_FIXTURE_TEMPLATE,
+-    standalone: true,
+     imports: [CdkDropList, CdkDrag],
+   })
+   class DraggableInHorizontalDropZone implements AfterViewInit {
+@@ -4918,7 +4917,6 @@ export function getHorizontalFixtures(listOrientation: Exclude<DropListOrientati
+   }
+ 
+   @Component({
+-    standalone: true,
+     imports: [CdkDropList, CdkDrag],
+     template: HORIZONTAL_FIXTURE_TEMPLATE,
+ 
+@@ -4973,7 +4971,6 @@ export function getHorizontalFixtures(listOrientation: Exclude<DropListOrientati
+         }
+       </div>
+     `,
+-    standalone: true,
+     imports: [CdkDropList, CdkDrag, CdkDragPreview],
+   })
+   class DraggableInHorizontalFlexDropZoneWithMatchSizePreview {
+@@ -5019,7 +5016,6 @@ const DROP_ZONE_FIXTURE_TEMPLATE = `
+ 
+ @Component({
+   template: DROP_ZONE_FIXTURE_TEMPLATE,
+-  standalone: true,
+   imports: [CdkDropList, CdkDrag, NgFor],
+ })
+ export class DraggableInDropZone implements AfterViewInit {
+@@ -5059,7 +5055,6 @@ export class DraggableInDropZone implements AfterViewInit {
+   selector: 'draggable-in-on-push-zone',
+   template: DROP_ZONE_FIXTURE_TEMPLATE,
+   changeDetection: ChangeDetectionStrategy.OnPush,
+-  standalone: true,
+   imports: [CdkDropList, CdkDrag, NgFor],
+ })
+ class DraggableInOnPushDropZone extends DraggableInDropZone {}
+@@ -5071,7 +5066,6 @@ class DraggableInOnPushDropZone extends DraggableInDropZone {}
+       <draggable-in-on-push-zone></draggable-in-on-push-zone>
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkDropListGroup, DraggableInOnPushDropZone],
+ })
+ class ConnectedDropListsInOnPush {}
+@@ -5088,7 +5082,6 @@ class ConnectedDropListsInOnPush {}
+       margin: 10vw 0 0 10vw;
+     }
+   `,
+-  standalone: true,
+   imports: [CdkDropList, CdkDrag, NgFor],
+ })
+ export class DraggableInScrollableVerticalDropZone extends DraggableInDropZone {
+@@ -5117,7 +5110,6 @@ export class DraggableInScrollableVerticalDropZone extends DraggableInDropZone {
+       margin: 10vw 0 0 10vw;
+     }
+   `,
+-  standalone: true,
+   imports: [CdkDropList, CdkDrag, NgFor, CdkScrollable],
+ })
+ class DraggableInScrollableParentContainer extends DraggableInDropZone implements AfterViewInit {
+@@ -5165,7 +5157,6 @@ class DraggableInScrollableParentContainer extends DraggableInDropZone implement
+         }
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkDropList, CdkDrag],
+ })
+ class DraggableInDropZoneWithContainer extends DraggableInDropZone {}
+@@ -5196,7 +5187,6 @@ class DraggableInDropZoneWithContainer extends DraggableInDropZone {}
+       }
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkDropList, CdkDrag, CdkDragPreview, NgIf],
+ })
+ class DraggableInDropZoneWithCustomPreview {
+@@ -5231,7 +5221,6 @@ class DraggableInDropZoneWithCustomPreview {
+       }
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkDropList, CdkDrag, CdkDragPreview],
+ })
+ class DraggableInDropZoneWithCustomTextOnlyPreview {
+@@ -5254,7 +5243,6 @@ class DraggableInDropZoneWithCustomTextOnlyPreview {
+       }
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkDropList, CdkDrag, CdkDragPreview],
+ })
+ class DraggableInDropZoneWithCustomMultiNodePreview {
+@@ -5287,7 +5275,6 @@ class DraggableInDropZoneWithCustomMultiNodePreview {
+       height: ${ITEM_HEIGHT * 3}px;
+     }
+   `,
+-  standalone: true,
+   imports: [CdkDropList, CdkDrag, CdkDragPlaceholder, NgClass],
+ })
+ class DraggableInDropZoneWithCustomPlaceholder {
+@@ -5309,7 +5296,6 @@ class DraggableInDropZoneWithCustomPlaceholder {
+       }
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkDropList, CdkDrag, CdkDragPlaceholder],
+ })
+ class DraggableInDropZoneWithCustomTextOnlyPlaceholder {
+@@ -5331,7 +5317,6 @@ class DraggableInDropZoneWithCustomTextOnlyPlaceholder {
+       }
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkDropList, CdkDrag, CdkDragPlaceholder],
+ })
+ class DraggableInDropZoneWithCustomMultiNodePlaceholder {
+@@ -5407,7 +5392,6 @@ const CONNECTED_DROP_ZONES_TEMPLATE = `
+   encapsulation: ViewEncapsulation.None,
+   styles: CONNECTED_DROP_ZONES_STYLES,
+   template: CONNECTED_DROP_ZONES_TEMPLATE,
+-  standalone: true,
+   imports: [CdkDropList, CdkDrag],
+ })
+ export class ConnectedDropZones implements AfterViewInit {
+@@ -5442,7 +5426,6 @@ export class ConnectedDropZones implements AfterViewInit {
+   encapsulation: ViewEncapsulation.ShadowDom,
+   styles: CONNECTED_DROP_ZONES_STYLES,
+   template: `@if (true) {${CONNECTED_DROP_ZONES_TEMPLATE}}`,
+-  standalone: true,
+   imports: [CdkDropList, CdkDrag],
+ })
+ class ConnectedDropZonesInsideShadowRootWithNgIf extends ConnectedDropZones {}
+@@ -5484,7 +5467,6 @@ class ConnectedDropZonesInsideShadowRootWithNgIf extends ConnectedDropZones {}
+       </div>
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkDropList, CdkDrag, CdkDropListGroup],
+ })
+ class ConnectedDropZonesViaGroupDirective extends ConnectedDropZones {
+@@ -5524,7 +5506,6 @@ class ConnectedDropZonesViaGroupDirective extends ConnectedDropZones {
+       <div cdkDrag>Two</div>
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkDropList, CdkDrag],
+ })
+ class ConnectedDropZonesWithSingleItems {
+@@ -5545,7 +5526,6 @@ class ConnectedDropZonesWithSingleItems {
+       <div cdkDropList #listTwo="cdkDropList"></div>
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkDropList, CdkDropListGroup],
+ })
+ class NestedDropListGroups {
+@@ -5558,14 +5538,12 @@ class NestedDropListGroups {
+   template: `
+     <ng-container cdkDropList></ng-container>
+   `,
+-  standalone: true,
+   imports: [CdkDropList],
+ })
+ class DropListOnNgContainer {}
+ 
+ @Component({
+   changeDetection: ChangeDetectionStrategy.OnPush,
+-  standalone: true,
+   imports: [CdkDropList, CdkDrag],
+   template: `
+     <div cdkDropList style="width: 100px; background: pink;">
+@@ -5599,7 +5577,6 @@ class DraggableInDropZoneWithoutEvents {
+       }
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkDropList, CdkDrag],
+   changeDetection: ChangeDetectionStrategy.OnPush,
+ })
+@@ -5629,7 +5606,6 @@ class WrappedDropContainerComponent {
+       <wrapped-drop-container [items]="done"></wrapped-drop-container>
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkDropListGroup, WrappedDropContainerComponent],
+ })
+ class ConnectedWrappedDropZones {
+@@ -5660,7 +5636,6 @@ class ConnectedWrappedDropZones {
+         }
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkDropList, CdkDrag],
+ })
+ class DraggableWithCanvasInDropZone extends DraggableInDropZone implements AfterViewInit {
+@@ -5702,7 +5677,6 @@ class DraggableWithCanvasInDropZone extends DraggableInDropZone implements After
+         }
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkDropList, CdkDrag],
+ })
+ class DraggableWithInvalidCanvasInDropZone extends DraggableInDropZone {}
+@@ -5742,7 +5716,6 @@ class DraggableWithInvalidCanvasInDropZone extends DraggableInDropZone {}
+         (cdkDragReleased)="itemDragReleasedSpy($event)">
+       </div>
+     </div>`,
+-  standalone: true,
+   imports: [CdkDrag],
+ })
+ class NestedDragsComponent {
+@@ -5797,7 +5770,6 @@ class NestedDragsComponent {
+       </div>
+     </ng-template>
+   `,
+-  standalone: true,
+   imports: [CdkDrag, NgTemplateOutlet],
+ })
+ class NestedDragsThroughTemplate {
+@@ -5823,7 +5795,6 @@ class NestedDragsThroughTemplate {
+       </div>
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkDropList, CdkDrag],
+ })
+ class NestedDropZones {
+@@ -5835,7 +5806,6 @@ class NestedDropZones {
+ 
+ @Component({
+   template: `<div cdkDropList></div>`,
+-  standalone: true,
+   imports: [CdkDropList],
+ })
+ class PlainStandaloneDropList {
+@@ -5878,7 +5848,6 @@ class PlainStandaloneDropList {
+       </div>
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkDropList, CdkDrag],
+ })
+ class ConnectedDropZonesWithIntermediateSibling extends ConnectedDropZones {}
+@@ -5911,7 +5880,6 @@ class ConnectedDropZonesWithIntermediateSibling extends ConnectedDropZones {}
+       }
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkDropList, CdkDrag],
+ })
+ class DraggableWithInputsInDropZone extends DraggableInDropZone {
+@@ -5934,7 +5902,6 @@ class DraggableWithInputsInDropZone extends DraggableInDropZone {
+       }
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkDropList, CdkDrag],
+ })
+ class DraggableWithRadioInputsInDropZone {
+@@ -5986,7 +5953,6 @@ class DraggableWithRadioInputsInDropZone {
+       </div>
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkDropList, CdkDrag],
+ })
+ class ConnectedDropZonesWithAlternateContainer extends ConnectedDropZones {
+@@ -6009,7 +5975,6 @@ class ConnectedDropZonesWithAlternateContainer extends ConnectedDropZones {
+       }
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkDropList, CdkDrag],
+ })
+ class DraggableWithInvalidAlternateContainer {
+@@ -6032,7 +5997,6 @@ class DraggableWithInvalidAlternateContainer {
+       }
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkDropList, CdkDrag],
+ })
+ class DraggableWithMissingAlternateContainer {
+diff --git a/src/cdk/drag-drop/directives/mixed-drop-list.spec.ts b/src/cdk/drag-drop/directives/mixed-drop-list.spec.ts
+index 8deaae351dd5..ae2f7b480a99 100644
+--- a/src/cdk/drag-drop/directives/mixed-drop-list.spec.ts
++++ b/src/cdk/drag-drop/directives/mixed-drop-list.spec.ts
+@@ -131,7 +131,6 @@ function getSortedSiblings(item: Element) {
+       }
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkDropList, CdkDrag],
+ })
+ class DraggableInHorizontalWrappingDropZone {
+diff --git a/src/cdk/drag-drop/directives/standalone-drag.spec.ts b/src/cdk/drag-drop/directives/standalone-drag.spec.ts
+index d6b6be72a72b..049637833356 100644
+--- a/src/cdk/drag-drop/directives/standalone-drag.spec.ts
++++ b/src/cdk/drag-drop/directives/standalone-drag.spec.ts
+@@ -1783,7 +1783,6 @@ describe('Standalone CdkDrag', () => {
+         style="width: 100px; height: 100px; background: red;"></div>
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkDrag],
+ })
+ class StandaloneDraggable {
+@@ -1811,7 +1810,6 @@ class StandaloneDraggable {
+   template: `
+     <div cdkDrag #dragElement style="width: 100px; height: 100px; background: red;"></div>
+   `,
+-  standalone: true,
+   imports: [CdkDrag],
+ })
+ class StandaloneDraggableWithOnPush {
+@@ -1826,7 +1824,6 @@ class StandaloneDraggableWithOnPush {
+       <div #handleElement cdkDragHandle style="width: 10px; height: 10px; background: green;"></div>
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkDrag, CdkDragHandle],
+ })
+ class StandaloneDraggableWithHandle {
+@@ -1848,7 +1845,6 @@ class StandaloneDraggableWithHandle {
+         style="width: 10px; height: 10px; background: green;"></div>
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkDrag, CdkDragHandle],
+ })
+ class StandaloneDraggableWithPreDisabledHandle {
+@@ -1869,7 +1865,6 @@ class StandaloneDraggableWithPreDisabledHandle {
+       }
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkDrag, CdkDragHandle],
+ })
+ class StandaloneDraggableWithDelayedHandle {
+@@ -1885,7 +1880,6 @@ class StandaloneDraggableWithDelayedHandle {
+ @Component({
+   selector: 'passthrough-component',
+   template: '<ng-content></ng-content>',
+-  standalone: true,
+ })
+ class PassthroughComponent {}
+ 
+@@ -1902,7 +1896,6 @@ class PassthroughComponent {}
+       </passthrough-component>
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkDrag, CdkDragHandle, PassthroughComponent],
+ })
+ class StandaloneDraggableWithIndirectHandle {
+@@ -1914,7 +1907,6 @@ class StandaloneDraggableWithIndirectHandle {
+   selector: 'shadow-wrapper',
+   template: '<ng-content></ng-content>',
+   encapsulation: ViewEncapsulation.ShadowDom,
+-  standalone: true,
+ })
+ class ShadowWrapper {}
+ 
+@@ -1928,7 +1920,6 @@ class ShadowWrapper {}
+       </div>
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkDrag, CdkDragHandle, ShadowWrapper],
+ })
+ class StandaloneDraggableWithShadowInsideHandle {
+@@ -1954,7 +1945,6 @@ class StandaloneDraggableWithShadowInsideHandle {
+       <div cdkDragHandle style="right: 0;"></div>
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkDrag, CdkDragHandle],
+ })
+ class StandaloneDraggableWithMultipleHandles {
+@@ -1972,7 +1962,6 @@ class StandaloneDraggableWithMultipleHandles {
+         style="width: 100px; height: 100px; background: red;"></div>
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkDrag],
+ })
+ class DraggableWithAlternateRoot {
+@@ -1986,7 +1975,6 @@ class DraggableWithAlternateRoot {
+   template: `
+     <ng-container cdkDrag></ng-container>
+   `,
+-  standalone: true,
+   imports: [CdkDrag],
+ })
+ class DraggableOnNgContainer {}
+@@ -1997,7 +1985,6 @@ class DraggableOnNgContainer {}
+       <ng-container cdkDragHandle></ng-container>
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkDrag, CdkDragHandle],
+ })
+ class DragHandleOnNgContainer {}
+@@ -2013,7 +2000,6 @@ class DragHandleOnNgContainer {}
+         style="width: 100px; height: 100px; background: red;"></div>
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkDrag, CdkDragHandle],
+ })
+ class DraggableWithAlternateRootAndSelfHandle {
+@@ -2030,7 +2016,6 @@ class DraggableWithAlternateRootAndSelfHandle {
+       </ng-container>
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkDrag],
+ })
+ class DraggableNgContainerWithAlternateRoot {
+@@ -2040,7 +2025,6 @@ class DraggableNgContainerWithAlternateRoot {
+ 
+ @Component({
+   template: `<div cdkDrag></div>`,
+-  standalone: true,
+   imports: [CdkDrag],
+ })
+ class PlainStandaloneDraggable {
+@@ -2058,7 +2042,6 @@ class PlainStandaloneDraggable {
+       <div cdkDragHandle class="handle" style="width: 10px; height: 10px; background: green;"></div>
+     </ng-template>
+   `,
+-  standalone: true,
+   imports: [CdkDrag, CdkDragHandle, NgTemplateOutlet],
+ })
+ class StandaloneDraggableWithExternalTemplateHandle {
+diff --git a/src/cdk/drag-drop/directives/standalone-drag.zone.spec.ts b/src/cdk/drag-drop/directives/standalone-drag.zone.spec.ts
+index 50e9ba0eb46f..19fe5f7b2ce8 100644
+--- a/src/cdk/drag-drop/directives/standalone-drag.zone.spec.ts
++++ b/src/cdk/drag-drop/directives/standalone-drag.zone.spec.ts
+@@ -51,7 +51,6 @@ describe('Standalone CdkDrag Zone.js integration', () => {
+         style="width: 100px; height: 100px; background: red;"></div>
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkDrag],
+ })
+ class StandaloneDraggable {
+diff --git a/src/cdk/drag-drop/drag-drop-registry.spec.ts b/src/cdk/drag-drop/drag-drop-registry.spec.ts
+index 5d12b15e5c42..956d3238a266 100644
+--- a/src/cdk/drag-drop/drag-drop-registry.spec.ts
++++ b/src/cdk/drag-drop/drag-drop-registry.spec.ts
+@@ -267,7 +267,6 @@ describe('DragDropRegistry', () => {
+ 
+   @Component({
+     template: ``,
+-    standalone: true,
+     imports: [DragDropModule],
+   })
+   class BlankComponent {}
+diff --git a/src/cdk/drag-drop/drag-drop.spec.ts b/src/cdk/drag-drop/drag-drop.spec.ts
+index 7cd74cd9c435..89f67d796dc8 100644
+--- a/src/cdk/drag-drop/drag-drop.spec.ts
++++ b/src/cdk/drag-drop/drag-drop.spec.ts
+@@ -35,7 +35,6 @@ describe('DragDrop', () => {
+ 
+ @Component({
+   template: '<div></div>',
+-  standalone: true,
+ })
+ class TestComponent {
+   elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
+diff --git a/src/cdk/menu/menu-bar.spec.ts b/src/cdk/menu/menu-bar.spec.ts
+index 03d3b7f993bd..10f0d7c1b895 100644
+--- a/src/cdk/menu/menu-bar.spec.ts
++++ b/src/cdk/menu/menu-bar.spec.ts
+@@ -1116,7 +1116,6 @@ describe('MenuBar', () => {
+       </li>
+     </ul>
+   `,
+-  standalone: true,
+   imports: [CdkMenuModule],
+ })
+ class MenuBarRadioGroup {}
+@@ -1152,7 +1151,6 @@ class MenuBarRadioGroup {}
+       </ng-template>
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkMenuModule],
+ })
+ class MultiMenuWithSubmenu {
+@@ -1179,7 +1177,6 @@ class MultiMenuWithSubmenu {
+       </ng-template>
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkMenuModule],
+ })
+ class MenuWithCheckboxes {
+@@ -1207,7 +1204,6 @@ class MenuWithCheckboxes {
+       </ng-template>
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkMenuModule],
+ })
+ class MenuWithRadioButtons {
+@@ -1241,7 +1237,6 @@ class MenuWithRadioButtons {
+       <button #inline_menu_item cdkMenuItem></button>
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkMenuModule],
+ })
+ class MenuBarWithMenusAndInlineMenu {
+diff --git a/src/cdk/menu/menu-group.spec.ts b/src/cdk/menu/menu-group.spec.ts
+index 6c01b4439e90..4b0659e00011 100644
+--- a/src/cdk/menu/menu-group.spec.ts
++++ b/src/cdk/menu/menu-group.spec.ts
+@@ -103,7 +103,6 @@ describe('MenuGroup', () => {
+       </ul>
+     </ng-template>
+   `,
+-  standalone: true,
+   imports: [CdkMenuModule],
+ })
+ class CheckboxMenu {
+@@ -148,7 +147,6 @@ class CheckboxMenu {
+       </ul>
+     </ng-template>
+   `,
+-  standalone: true,
+   imports: [CdkMenuModule],
+ })
+ class MenuWithMultipleRadioGroups {
+diff --git a/src/cdk/menu/menu-item-checkbox.spec.ts b/src/cdk/menu/menu-item-checkbox.spec.ts
+index 0dea58151748..cadbb23762b5 100644
+--- a/src/cdk/menu/menu-item-checkbox.spec.ts
++++ b/src/cdk/menu/menu-item-checkbox.spec.ts
+@@ -100,7 +100,6 @@ describe('MenuItemCheckbox', () => {
+ 
+ @Component({
+   template: `<button cdkMenuItemCheckbox>Click me!</button>`,
+-  standalone: true,
+   imports: [CdkMenuModule],
+ })
+ class SingleCheckboxButton {}
+diff --git a/src/cdk/menu/menu-item-radio.spec.ts b/src/cdk/menu/menu-item-radio.spec.ts
+index 9bfd95826c4c..5a7a77c59711 100644
+--- a/src/cdk/menu/menu-item-radio.spec.ts
++++ b/src/cdk/menu/menu-item-radio.spec.ts
+@@ -94,7 +94,6 @@ describe('MenuItemRadio', () => {
+ 
+ @Component({
+   template: `<button cdkMenuItemRadio>Click me!</button>`,
+-  standalone: true,
+   imports: [CdkMenuModule],
+ })
+ class SimpleRadioButton {}
+diff --git a/src/cdk/menu/menu-item.spec.ts b/src/cdk/menu/menu-item.spec.ts
+index bc3ee5ac753a..0d20cdab6fb0 100644
+--- a/src/cdk/menu/menu-item.spec.ts
++++ b/src/cdk/menu/menu-item.spec.ts
+@@ -206,7 +206,6 @@ class MenuItemWithMultipleNestings {
+ @Component({
+   selector: 'mat-icon',
+   template: '<ng-content></ng-content>',
+-  standalone: true,
+   imports: [CdkMenuModule],
+ })
+ class MatIcon {}
+diff --git a/src/cdk/menu/menu-stack.spec.ts b/src/cdk/menu/menu-stack.spec.ts
+index dca51dd9fc2f..e2e946869e3b 100644
+--- a/src/cdk/menu/menu-stack.spec.ts
++++ b/src/cdk/menu/menu-stack.spec.ts
+@@ -100,7 +100,6 @@ describe('MenuStack', () => {
+       </ng-template>
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkMenuModule],
+ })
+ class MultiMenuWithSubmenu {
+diff --git a/src/cdk/menu/menu.spec.ts b/src/cdk/menu/menu.spec.ts
+index 08176e13521a..11e9b6bf5acd 100644
+--- a/src/cdk/menu/menu.spec.ts
++++ b/src/cdk/menu/menu.spec.ts
+@@ -520,7 +520,6 @@ describe('Menu', () => {
+       </ul>
+     </ng-template>
+   `,
+-  standalone: true,
+   imports: [CdkMenuModule],
+ })
+ class MenuCheckboxGroup {
+@@ -534,7 +533,6 @@ class MenuCheckboxGroup {
+       <button cdkMenuItem>Starred</button>
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkMenuModule],
+ })
+ class InlineMenu {}
+@@ -588,7 +586,6 @@ class InlineMenu {}
+       </div>
+     </ng-template>
+   `,
+-  standalone: true,
+   imports: [CdkMenuModule],
+ })
+ class WithComplexNestedMenus {
+@@ -649,7 +646,6 @@ class WithComplexNestedMenus {
+       </div>
+     </ng-template>
+   `,
+-  standalone: true,
+   imports: [CdkMenuModule],
+ })
+ class WithComplexNestedMenusOnBottom {
+diff --git a/src/cdk/menu/pointer-focus-tracker.spec.ts b/src/cdk/menu/pointer-focus-tracker.spec.ts
+index 8aac6c578a18..12797c27cf76 100644
+--- a/src/cdk/menu/pointer-focus-tracker.spec.ts
++++ b/src/cdk/menu/pointer-focus-tracker.spec.ts
+@@ -99,7 +99,6 @@ describe('FocusMouseManger', () => {
+ @Component({
+   selector: 'wrapper',
+   template: `<ng-content></ng-content>`,
+-  standalone: true,
+ })
+ class MockWrapper implements FocusableElement {
+   readonly _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
+@@ -115,7 +114,6 @@ class MockWrapper implements FocusableElement {
+       }
+     </div>
+   `,
+-  standalone: true,
+   imports: [MockWrapper],
+ })
+ class MultiElementWithConditionalComponent implements AfterViewInit {
+diff --git a/src/cdk/observers/observe-content.spec.ts b/src/cdk/observers/observe-content.spec.ts
+index 709cf4c5850b..93f5b60491dc 100644
+--- a/src/cdk/observers/observe-content.spec.ts
++++ b/src/cdk/observers/observe-content.spec.ts
+@@ -274,7 +274,6 @@ describe('ContentObserver injectable', () => {
+       (cdkObserveContent)="doSomething()"
+       [cdkObserveContentDisabled]="disabled">{{text}}</div>
+   `,
+-  standalone: true,
+   imports: [ObserversModule],
+ })
+ class ComponentWithTextContent {
+@@ -285,7 +284,6 @@ class ComponentWithTextContent {
+ 
+ @Component({
+   template: `<div (cdkObserveContent)="doSomething()"><div>{{text}}</div></div>`,
+-  standalone: true,
+   imports: [ObserversModule],
+ })
+ class ComponentWithChildTextContent {
+@@ -295,7 +293,6 @@ class ComponentWithChildTextContent {
+ 
+ @Component({
+   template: `<div (cdkObserveContent)="spy($event)" [debounce]="debounce">{{text}}</div>`,
+-  standalone: true,
+   imports: [ObserversModule],
+ })
+ class ComponentWithDebouncedListener {
+@@ -305,7 +302,6 @@ class ComponentWithDebouncedListener {
+ 
+ @Component({
+   template: `<div #contentEl>{{text}}</div>`,
+-  standalone: true,
+   imports: [ObserversModule],
+ })
+ class UnobservedComponentWithTextContent {
+diff --git a/src/cdk/observers/private/shared-resize-observer.spec.ts b/src/cdk/observers/private/shared-resize-observer.spec.ts
+index 7b6b3071eecb..73ef98a55ba8 100644
+--- a/src/cdk/observers/private/shared-resize-observer.spec.ts
++++ b/src/cdk/observers/private/shared-resize-observer.spec.ts
+@@ -138,7 +138,6 @@ describe('SharedResizeObserver', () => {
+     <div #el1></div>
+     <div #el2></div>
+   `,
+-  standalone: true,
+ })
+ export class TestComponent {
+   @ViewChild('el1') el1: ElementRef<Element>;
+diff --git a/src/cdk/overlay/dispatchers/overlay-keyboard-dispatcher.spec.ts b/src/cdk/overlay/dispatchers/overlay-keyboard-dispatcher.spec.ts
+index a15c226ca71b..afc1f93512b6 100644
+--- a/src/cdk/overlay/dispatchers/overlay-keyboard-dispatcher.spec.ts
++++ b/src/cdk/overlay/dispatchers/overlay-keyboard-dispatcher.spec.ts
+@@ -199,7 +199,6 @@ describe('OverlayKeyboardDispatcher', () => {
+ 
+ @Component({
+   template: 'Hello',
+-  standalone: true,
+   imports: [OverlayModule],
+ })
+ class TestComponent {}
+diff --git a/src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.spec.ts b/src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.spec.ts
+index b738ab16194e..e97458f96a17 100644
+--- a/src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.spec.ts
++++ b/src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.spec.ts
+@@ -420,7 +420,6 @@ describe('OverlayOutsideClickDispatcher', () => {
+ 
+ @Component({
+   template: 'Hello',
+-  standalone: true,
+   imports: [OverlayModule],
+ })
+ class TestComponent {}
+diff --git a/src/cdk/overlay/fullscreen-overlay-container.spec.ts b/src/cdk/overlay/fullscreen-overlay-container.spec.ts
+index 38680cefbe6f..0d18a687b77f 100644
+--- a/src/cdk/overlay/fullscreen-overlay-container.spec.ts
++++ b/src/cdk/overlay/fullscreen-overlay-container.spec.ts
+@@ -113,7 +113,6 @@ describe('FullscreenOverlayContainer', () => {
+ @Component({
+   template: `<ng-template cdk-portal>Cake</ng-template>`,
+   providers: [Overlay],
+-  standalone: true,
+   imports: [TemplatePortalDirective],
+ })
+ class TestComponentWithTemplatePortals {
+diff --git a/src/cdk/overlay/overlay-container.spec.ts b/src/cdk/overlay/overlay-container.spec.ts
+index 47b586c6c2cd..5f41778c0f1a 100644
+--- a/src/cdk/overlay/overlay-container.spec.ts
++++ b/src/cdk/overlay/overlay-container.spec.ts
+@@ -89,7 +89,6 @@ describe('OverlayContainer', () => {
+ @Component({
+   template: `<ng-template cdkPortal>Cake</ng-template>`,
+   providers: [Overlay],
+-  standalone: true,
+   imports: [CdkPortal],
+ })
+ class TestComponentWithTemplatePortals {
+diff --git a/src/cdk/overlay/overlay-directives.spec.ts b/src/cdk/overlay/overlay-directives.spec.ts
+index e562e01c3fdb..43f9272d1b61 100644
+--- a/src/cdk/overlay/overlay-directives.spec.ts
++++ b/src/cdk/overlay/overlay-directives.spec.ts
+@@ -783,7 +783,6 @@ describe('Overlay directives', () => {
+             [cdkConnectedOverlayTransformOriginOn]="transformOriginSelector">
+     <p>Menu content</p>
+   </ng-template>`,
+-  standalone: true,
+   imports: [OverlayModule],
+ })
+ class ConnectedOverlayDirectiveTest {
+@@ -825,7 +824,6 @@ class ConnectedOverlayDirectiveTest {
+   template: `
+   <button cdk-overlay-origin #trigger="cdkOverlayOrigin">Toggle menu</button>
+   <ng-template cdk-connected-overlay>Menu content</ng-template>`,
+-  standalone: true,
+   imports: [OverlayModule],
+ })
+ class ConnectedOverlayPropertyInitOrder {
+diff --git a/src/cdk/overlay/overlay-directives.zone.spec.ts b/src/cdk/overlay/overlay-directives.zone.spec.ts
+index 3f3768f77b2d..3cec7fd804f0 100644
+--- a/src/cdk/overlay/overlay-directives.zone.spec.ts
++++ b/src/cdk/overlay/overlay-directives.zone.spec.ts
+@@ -75,7 +75,6 @@ describe('Overlay directives Zone.js integration', () => {
+               [cdkConnectedOverlayTransformOriginOn]="transformOriginSelector">
+       <p>Menu content</p>
+     </ng-template>`,
+-  standalone: true,
+   imports: [OverlayModule],
+ })
+ class ConnectedOverlayDirectiveTest {
+@@ -117,7 +116,6 @@ class ConnectedOverlayDirectiveTest {
+   template: `
+     <button cdk-overlay-origin #trigger="cdkOverlayOrigin">Toggle menu</button>
+     <ng-template cdk-connected-overlay>Menu content</ng-template>`,
+-  standalone: true,
+   imports: [OverlayModule],
+ })
+ class ConnectedOverlayPropertyInitOrder {
+diff --git a/src/cdk/overlay/overlay.spec.ts b/src/cdk/overlay/overlay.spec.ts
+index 94ed51dea804..e4c32cba3907 100644
+--- a/src/cdk/overlay/overlay.spec.ts
++++ b/src/cdk/overlay/overlay.spec.ts
+@@ -1101,14 +1101,12 @@ describe('Overlay', () => {
+ @Component({
+   selector: 'pizza',
+   template: '<p>Pizza</p>',
+-  standalone: true,
+ })
+ class PizzaMsg {}
+ 
+ /** Test-bed component that contains a TempatePortal and an ElementRef. */
+ @Component({
+   template: `<ng-template cdkPortal>Cake</ng-template>`,
+-  standalone: true,
+   imports: [CdkPortal],
+ })
+ class TestComponentWithTemplatePortals {
+diff --git a/src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts b/src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts
+index 61bc0a212cad..d9f4bf0754ea 100644
+--- a/src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts
++++ b/src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts
+@@ -2959,7 +2959,6 @@ function createOverflowContainerElement() {
+       class="transform-origin"
+       style="width: ${DEFAULT_WIDTH}px; height: ${DEFAULT_HEIGHT}px;"></div>
+   `,
+-  standalone: true,
+   imports: [ScrollingModule, OverlayModule, PortalModule],
+ })
+ class TestOverlay {}
+diff --git a/src/cdk/overlay/position/global-position-strategy.spec.ts b/src/cdk/overlay/position/global-position-strategy.spec.ts
+index 0e7b6d2ef7c0..fa70c2bb67f3 100644
+--- a/src/cdk/overlay/position/global-position-strategy.spec.ts
++++ b/src/cdk/overlay/position/global-position-strategy.spec.ts
+@@ -457,7 +457,6 @@ describe('GlobalPositonStrategy', () => {
+ 
+ @Component({
+   template: '',
+-  standalone: true,
+   imports: [OverlayModule, PortalModule],
+ })
+ class BlankPortal {}
+diff --git a/src/cdk/overlay/scroll/block-scroll-strategy.spec.ts b/src/cdk/overlay/scroll/block-scroll-strategy.spec.ts
+index bafe9541229e..af8bfe4e8501 100644
+--- a/src/cdk/overlay/scroll/block-scroll-strategy.spec.ts
++++ b/src/cdk/overlay/scroll/block-scroll-strategy.spec.ts
+@@ -215,7 +215,6 @@ describe('BlockScrollStrategy', () => {
+ /** Simple component that we can attach to the overlay. */
+ @Component({
+   template: '<p>Focaccia</p>',
+-  standalone: true,
+   imports: [OverlayModule, PortalModule],
+ })
+ class FocacciaMsg {}
+diff --git a/src/cdk/overlay/scroll/close-scroll-strategy.spec.ts b/src/cdk/overlay/scroll/close-scroll-strategy.spec.ts
+index 8f5828c872bc..22b501164df9 100644
+--- a/src/cdk/overlay/scroll/close-scroll-strategy.spec.ts
++++ b/src/cdk/overlay/scroll/close-scroll-strategy.spec.ts
+@@ -135,7 +135,6 @@ describe('CloseScrollStrategy', () => {
+ /** Simple component that we can attach to the overlay. */
+ @Component({
+   template: '<p>Mozarella</p>',
+-  standalone: true,
+   imports: [OverlayModule, PortalModule],
+ })
+ class MozarellaMsg {}
+diff --git a/src/cdk/overlay/scroll/close-scroll-strategy.zone.spec.ts b/src/cdk/overlay/scroll/close-scroll-strategy.zone.spec.ts
+index 163b9bea5672..396428f9f4a3 100644
+--- a/src/cdk/overlay/scroll/close-scroll-strategy.zone.spec.ts
++++ b/src/cdk/overlay/scroll/close-scroll-strategy.zone.spec.ts
+@@ -64,7 +64,6 @@ describe('CloseScrollStrategy Zone.js integration', () => {
+ /** Simple component that we can attach to the overlay. */
+ @Component({
+   template: '<p>Mozarella</p>',
+-  standalone: true,
+   imports: [OverlayModule, PortalModule],
+ })
+ class MozarellaMsg {}
+diff --git a/src/cdk/overlay/scroll/reposition-scroll-strategy.spec.ts b/src/cdk/overlay/scroll/reposition-scroll-strategy.spec.ts
+index c5c27b13535c..261e4754f429 100644
+--- a/src/cdk/overlay/scroll/reposition-scroll-strategy.spec.ts
++++ b/src/cdk/overlay/scroll/reposition-scroll-strategy.spec.ts
+@@ -115,7 +115,6 @@ describe('RepositionScrollStrategy', () => {
+ /** Simple component that we can attach to the overlay. */
+ @Component({
+   template: '<p>Pasta</p>',
+-  standalone: true,
+   imports: [OverlayModule, PortalModule],
+ })
+ class PastaMsg {}
+diff --git a/src/cdk/portal/portal.spec.ts b/src/cdk/portal/portal.spec.ts
+index 7d6d05810a6e..913801ff3d4b 100644
+--- a/src/cdk/portal/portal.spec.ts
++++ b/src/cdk/portal/portal.spec.ts
+@@ -725,7 +725,6 @@ class ChocolateInjector {
+ @Component({
+   selector: 'pizza-msg',
+   template: '<p>Pizza</p><p>{{snack}}</p><ng-content></ng-content>',
+-  standalone: true,
+   imports: [PortalModule],
+ })
+ class PizzaMsg {
+@@ -738,7 +737,6 @@ class PizzaMsg {
+  */
+ @Directive({
+   selector: '[savesParentNodeOnInit]',
+-  standalone: true,
+ })
+ class SaveParentNodeOnInit implements AfterViewInit {
+   private _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
+@@ -760,7 +758,6 @@ class SaveParentNodeOnInit implements AfterViewInit {
+       <div savesParentNodeOnInit></div>
+     </ng-template>
+   `,
+-  standalone: true,
+   imports: [SaveParentNodeOnInit],
+ })
+ class ArbitraryViewContainerRefComponent {
+@@ -802,7 +799,6 @@ class ArbitraryViewContainerRefComponent {
+     </div>
+   </div>
+   `,
+-  standalone: true,
+   imports: [CdkPortal, CdkPortalOutlet, PizzaMsg],
+ })
+ class PortalTestApp {
+@@ -845,7 +841,6 @@ class PortalTestApp {
+       <ng-template cdkPortalOutlet></ng-template>
+     </div>
+   `,
+-  standalone: true,
+   imports: [CdkPortalOutlet],
+ })
+ class UnboundPortalTestApp {
+diff --git a/src/cdk/scrolling/scroll-dispatcher.spec.ts b/src/cdk/scrolling/scroll-dispatcher.spec.ts
+index be4372e9188a..4c7b59d4259f 100644
+--- a/src/cdk/scrolling/scroll-dispatcher.spec.ts
++++ b/src/cdk/scrolling/scroll-dispatcher.spec.ts
+@@ -271,7 +271,6 @@ describe('ScrollDispatcher', () => {
+ /** Simple component that contains a large div and can be scrolled. */
+ @Component({
+   template: `<div #scrollingElement cdkScrollable style="height: 9999px"></div>`,
+-  standalone: true,
+   imports: [ScrollingModule],
+ })
+ class ScrollingComponent {
+@@ -290,7 +289,6 @@ class ScrollingComponent {
+     </div>
+     <div id="scrollable-2" cdkScrollable></div>
+   `,
+-  standalone: true,
+   imports: [ScrollingModule],
+ })
+ class NestedScrollingComponent {
+diff --git a/src/cdk/scrolling/scroll-dispatcher.zone.spec.ts b/src/cdk/scrolling/scroll-dispatcher.zone.spec.ts
+index 99859c345b01..e7b2b8fc7690 100644
+--- a/src/cdk/scrolling/scroll-dispatcher.zone.spec.ts
++++ b/src/cdk/scrolling/scroll-dispatcher.zone.spec.ts
+@@ -41,7 +41,6 @@ describe('ScrollDispatcher Zone.js integration', () => {
+ /** Simple component that contains a large div and can be scrolled. */
+ @Component({
+   template: `<div #scrollingElement cdkScrollable style="height: 9999px"></div>`,
+-  standalone: true,
+   imports: [ScrollingModule],
+ })
+ class ScrollingComponent {
+diff --git a/src/cdk/scrolling/scrollable.spec.ts b/src/cdk/scrolling/scrollable.spec.ts
+index 539369f27f94..de0db2eabdc5 100644
+--- a/src/cdk/scrolling/scrollable.spec.ts
++++ b/src/cdk/scrolling/scrollable.spec.ts
+@@ -246,7 +246,6 @@ describe('CdkScrollable', () => {
+       height: 100px;
+     }
+   `,
+-  standalone: true,
+   imports: [ScrollingModule],
+ })
+ class ScrollableViewport {
+diff --git a/src/cdk/scrolling/virtual-scroll-viewport.spec.ts b/src/cdk/scrolling/virtual-scroll-viewport.spec.ts
+index 54000570d720..796fbad2ffa5 100644
+--- a/src/cdk/scrolling/virtual-scroll-viewport.spec.ts
++++ b/src/cdk/scrolling/virtual-scroll-viewport.spec.ts
+@@ -1248,7 +1248,6 @@ function triggerScroll(viewport: CdkVirtualScrollViewport, offset?: number) {
+     }
+   `,
+   encapsulation: ViewEncapsulation.None,
+-  standalone: true,
+   imports: [ScrollingModule],
+ })
+ class FixedSizeVirtualScroll {
+@@ -1314,7 +1313,6 @@ class FixedSizeVirtualScroll {
+     }
+   `,
+   encapsulation: ViewEncapsulation.None,
+-  standalone: true,
+   imports: [ScrollingModule],
+ })
+ class FixedSizeVirtualScrollWithRtlDirection {
+@@ -1359,7 +1357,6 @@ class FixedSizeVirtualScrollWithRtlDirection {
+       border: 1px dashed #ccc;
+     }
+   `,
+-  standalone: true,
+   imports: [ScrollingModule],
+ })
+ class VirtualScrollWithNoStrategy {
+@@ -1368,7 +1365,6 @@ class VirtualScrollWithNoStrategy {
+ 
+ @Directive({
+   selector: '[injects-view-container]',
+-  standalone: true,
+ })
+ class InjectsViewContainer {
+   viewContainerRef = inject(ViewContainerRef);
+@@ -1400,7 +1396,6 @@ class InjectsViewContainer {
+     }
+   `,
+   encapsulation: ViewEncapsulation.None,
+-  standalone: true,
+   imports: [ScrollingModule],
+ })
+ class VirtualScrollWithItemInjectingViewContainer {
+@@ -1439,7 +1434,6 @@ class VirtualScrollWithItemInjectingViewContainer {
+     }
+   `,
+   encapsulation: ViewEncapsulation.None,
+-  standalone: true,
+   imports: [ScrollingModule],
+ })
+ class DelayedInitializationVirtualScroll {
+@@ -1478,7 +1472,6 @@ class DelayedInitializationVirtualScroll {
+     }
+   `,
+   encapsulation: ViewEncapsulation.None,
+-  standalone: true,
+   imports: [ScrollingModule],
+ })
+ class VirtualScrollWithAppendOnly {
+@@ -1521,7 +1514,6 @@ class VirtualScrollWithAppendOnly {
+         }
+     `,
+   encapsulation: ViewEncapsulation.None,
+-  standalone: true,
+   imports: [ScrollingModule],
+ })
+ class VirtualScrollWithCustomScrollingElement {
+@@ -1563,7 +1555,6 @@ class VirtualScrollWithCustomScrollingElement {
+         }
+     `,
+   encapsulation: ViewEncapsulation.None,
+-  standalone: true,
+   imports: [ScrollingModule],
+ })
+ class VirtualScrollWithScrollableWindow {
+@@ -1576,7 +1567,6 @@ class VirtualScrollWithScrollableWindow {
+ 
+ @Component({
+   template: '<cdk-virtual-scroll-viewport itemSize="50"></cdk-virtual-scroll-viewport>',
+-  standalone: true,
+   imports: [ScrollingModule],
+ })
+ class VirtualScrollableQuery {
+diff --git a/src/cdk/scrolling/virtual-scroll-viewport.zone.spec.ts b/src/cdk/scrolling/virtual-scroll-viewport.zone.spec.ts
+index b0547d767973..f4b893ed251c 100644
+--- a/src/cdk/scrolling/virtual-scroll-viewport.zone.spec.ts
++++ b/src/cdk/scrolling/virtual-scroll-viewport.zone.spec.ts
+@@ -112,7 +112,6 @@ describe('CdkVirtualScrollViewport Zone.js intergation', () => {
+       }
+     `,
+   encapsulation: ViewEncapsulation.None,
+-  standalone: true,
+   imports: [ScrollingModule],
+ })
+ class FixedSizeVirtualScroll {
+diff --git a/src/cdk/table/text-column.spec.ts b/src/cdk/table/text-column.spec.ts
+index ffb4a54a3e85..aae3304a4a0f 100644
+--- a/src/cdk/table/text-column.spec.ts
++++ b/src/cdk/table/text-column.spec.ts
+@@ -167,7 +167,6 @@ interface TestData {
+       <cdk-row *cdkRowDef="let row; columns: displayedColumns"></cdk-row>
+     </cdk-table>
+   `,
+-  standalone: true,
+   imports: [CdkTableModule],
+ })
+ class BasicTextColumnApp {
+@@ -187,7 +186,6 @@ class BasicTextColumnApp {
+   template: `
+     <cdk-text-column name="column-a"></cdk-text-column>
+   `,
+-  standalone: true,
+   imports: [CdkTableModule],
+ })
+ class MissingTableApp {}
+@@ -201,7 +199,6 @@ class MissingTableApp {}
+       <cdk-row *cdkRowDef="let row; columns: displayedColumns"></cdk-row>
+     </cdk-table>
+   `,
+-  standalone: true,
+   imports: [CdkTableModule],
+ })
+ class TextColumnWithoutNameApp extends BasicTextColumnApp {}
+diff --git a/src/cdk/text-field/autofill.spec.ts b/src/cdk/text-field/autofill.spec.ts
+index 85d21d707a32..cb9f2965e7e6 100644
+--- a/src/cdk/text-field/autofill.spec.ts
++++ b/src/cdk/text-field/autofill.spec.ts
+@@ -204,7 +204,6 @@ describe('cdkAutofill', () => {
+     <input #input2>
+     <input #input3>
+   `,
+-  standalone: true,
+   imports: [TextFieldModule],
+ })
+ class Inputs {
+@@ -216,7 +215,6 @@ class Inputs {
+ 
+ @Component({
+   template: `<input #input cdkAutofill>`,
+-  standalone: true,
+   imports: [TextFieldModule],
+ })
+ class InputWithCdkAutofilled {
+diff --git a/src/cdk/text-field/autofill.zone.spec.ts b/src/cdk/text-field/autofill.zone.spec.ts
+index 70882a2067b2..adec28c6ed1f 100644
+--- a/src/cdk/text-field/autofill.zone.spec.ts
++++ b/src/cdk/text-field/autofill.zone.spec.ts
+@@ -50,7 +50,6 @@ describe('AutofillMonitor Zone.js integration', () => {
+       <input #input2>
+       <input #input3>
+     `,
+-  standalone: true,
+   imports: [TextFieldModule],
+ })
+ class Inputs {
+diff --git a/src/cdk/text-field/autosize.spec.ts b/src/cdk/text-field/autosize.spec.ts
+index df0efd201ba1..5e9ae7cb59ba 100644
+--- a/src/cdk/text-field/autosize.spec.ts
++++ b/src/cdk/text-field/autosize.spec.ts
+@@ -409,7 +409,6 @@ const textareaStyleReset = `
+     <textarea cdkTextareaAutosize [cdkAutosizeMinRows]="minRows" [cdkAutosizeMaxRows]="maxRows"
+         #autosize="cdkTextareaAutosize" [placeholder]="placeholder">{{content}}</textarea>`,
+   styles: textareaStyleReset,
+-  standalone: true,
+   imports: [FormsModule, TextFieldModule],
+ })
+ class AutosizeTextAreaWithContent {
+@@ -423,7 +422,6 @@ class AutosizeTextAreaWithContent {
+ @Component({
+   template: `<textarea cdkTextareaAutosize [value]="value"></textarea>`,
+   styles: textareaStyleReset,
+-  standalone: true,
+   imports: [FormsModule, TextFieldModule],
+ })
+ class AutosizeTextAreaWithValue {
+@@ -433,7 +431,6 @@ class AutosizeTextAreaWithValue {
+ @Component({
+   template: `<textarea cdkTextareaAutosize [(ngModel)]="model"></textarea>`,
+   styles: textareaStyleReset,
+-  standalone: true,
+   imports: [FormsModule, TextFieldModule],
+ })
+ class AutosizeTextareaWithNgModel {
+@@ -443,7 +440,6 @@ class AutosizeTextareaWithNgModel {
+ @Component({
+   template: `<textarea [cdkTextareaAutosize]="false">{{content}}</textarea>`,
+   styles: textareaStyleReset,
+-  standalone: true,
+   imports: [FormsModule, TextFieldModule],
+ })
+ class AutosizeTextareaWithoutAutosize {
+diff --git a/src/google-maps/deprecated-map-marker-clusterer/deprecated-map-marker-clusterer.spec.ts b/src/google-maps/deprecated-map-marker-clusterer/deprecated-map-marker-clusterer.spec.ts
+index 9b1d297b9536..2f4eb9f60821 100644
+--- a/src/google-maps/deprecated-map-marker-clusterer/deprecated-map-marker-clusterer.spec.ts
++++ b/src/google-maps/deprecated-map-marker-clusterer/deprecated-map-marker-clusterer.spec.ts
+@@ -342,7 +342,6 @@ describe('DeprecatedMapMarkerClusterer', () => {
+       </deprecated-map-marker-clusterer>
+     </google-map>
+   `,
+-  standalone: true,
+   imports: [GoogleMap, MapMarker, DeprecatedMapMarkerClusterer],
+ })
+ class TestApp {
+diff --git a/src/google-maps/google-map/google-map.spec.ts b/src/google-maps/google-map/google-map.spec.ts
+index 5eef67bce344..d693c793286a 100644
+--- a/src/google-maps/google-map/google-map.spec.ts
++++ b/src/google-maps/google-map/google-map.spec.ts
+@@ -444,7 +444,6 @@ describe('GoogleMap', () => {
+       (mapRightclick)="handleRightclick($event)"
+       (mapInitialized)="mapInitializedSpy($event)" />
+   `,
+-  standalone: true,
+   imports: [GoogleMap],
+ })
+ class TestApp {
+diff --git a/src/google-maps/map-advanced-marker/map-advanced-marker.spec.ts b/src/google-maps/map-advanced-marker/map-advanced-marker.spec.ts
+index 47686bb860e7..2f6cf7acd71b 100644
+--- a/src/google-maps/map-advanced-marker/map-advanced-marker.spec.ts
++++ b/src/google-maps/map-advanced-marker/map-advanced-marker.spec.ts
+@@ -176,7 +176,6 @@ describe('MapAdvancedMarker', () => {
+         [options]="options" />
+     </google-map>
+   `,
+-  standalone: true,
+   imports: [GoogleMap, MapAdvancedMarker],
+ })
+ class TestApp {
+diff --git a/src/google-maps/map-bicycling-layer/map-bicycling-layer.spec.ts b/src/google-maps/map-bicycling-layer/map-bicycling-layer.spec.ts
+index b090236e7cce..1832fdf8709d 100644
+--- a/src/google-maps/map-bicycling-layer/map-bicycling-layer.spec.ts
++++ b/src/google-maps/map-bicycling-layer/map-bicycling-layer.spec.ts
+@@ -42,7 +42,6 @@ describe('MapBicyclingLayer', () => {
+       <map-bicycling-layer />
+     </google-map>
+   `,
+-  standalone: true,
+   imports: [GoogleMap, MapBicyclingLayer],
+ })
+ class TestApp {}
+diff --git a/src/google-maps/map-circle/map-circle.spec.ts b/src/google-maps/map-circle/map-circle.spec.ts
+index d7cefaebf4c1..c92e9558049e 100644
+--- a/src/google-maps/map-circle/map-circle.spec.ts
++++ b/src/google-maps/map-circle/map-circle.spec.ts
+@@ -166,7 +166,6 @@ describe('MapCircle', () => {
+         (circleClick)="handleClick()"
+         (circleRightclick)="handleRightclick()" />
+     </google-map>`,
+-  standalone: true,
+   imports: [GoogleMap, MapCircle],
+ })
+ class TestApp {
+diff --git a/src/google-maps/map-directions-renderer/map-directions-renderer.spec.ts b/src/google-maps/map-directions-renderer/map-directions-renderer.spec.ts
+index 83b9181db769..e0eeb5b9e589 100644
+--- a/src/google-maps/map-directions-renderer/map-directions-renderer.spec.ts
++++ b/src/google-maps/map-directions-renderer/map-directions-renderer.spec.ts
+@@ -136,7 +136,6 @@ describe('MapDirectionsRenderer', () => {
+         (directionsChanged)="handleDirectionsChanged()" />
+     </google-map>
+   `,
+-  standalone: true,
+   imports: [GoogleMap, MapDirectionsRenderer],
+ })
+ class TestApp {
+diff --git a/src/google-maps/map-ground-overlay/map-ground-overlay.spec.ts b/src/google-maps/map-ground-overlay/map-ground-overlay.spec.ts
+index eb2e41c19055..373c8e6e1c55 100644
+--- a/src/google-maps/map-ground-overlay/map-ground-overlay.spec.ts
++++ b/src/google-maps/map-ground-overlay/map-ground-overlay.spec.ts
+@@ -168,7 +168,6 @@ describe('MapGroundOverlay', () => {
+         (mapClick)="handleClick()" />
+     </google-map>
+   `,
+-  standalone: true,
+   imports: [GoogleMap, MapGroundOverlay],
+ })
+ class TestApp {
+diff --git a/src/google-maps/map-heatmap-layer/map-heatmap-layer.spec.ts b/src/google-maps/map-heatmap-layer/map-heatmap-layer.spec.ts
+index 21c57e35e8a6..17a13b021737 100644
+--- a/src/google-maps/map-heatmap-layer/map-heatmap-layer.spec.ts
++++ b/src/google-maps/map-heatmap-layer/map-heatmap-layer.spec.ts
+@@ -163,7 +163,6 @@ describe('MapHeatmapLayer', () => {
+       <map-heatmap-layer [data]="data" [options]="options" />
+     </google-map>
+   `,
+-  standalone: true,
+   imports: [GoogleMap, MapHeatmapLayer],
+ })
+ class TestApp {
+diff --git a/src/google-maps/map-info-window/map-info-window.spec.ts b/src/google-maps/map-info-window/map-info-window.spec.ts
+index 82497407123c..9d5c4bad5412 100644
+--- a/src/google-maps/map-info-window/map-info-window.spec.ts
++++ b/src/google-maps/map-info-window/map-info-window.spec.ts
+@@ -258,7 +258,6 @@ describe('MapInfoWindow', () => {
+       </map-info-window>
+     </google-map>
+   `,
+-  standalone: true,
+   imports: [GoogleMap, MapInfoWindow],
+ })
+ class TestApp {
+diff --git a/src/google-maps/map-kml-layer/map-kml-layer.spec.ts b/src/google-maps/map-kml-layer/map-kml-layer.spec.ts
+index 35491897b0e5..4f479b6dc1f2 100644
+--- a/src/google-maps/map-kml-layer/map-kml-layer.spec.ts
++++ b/src/google-maps/map-kml-layer/map-kml-layer.spec.ts
+@@ -154,7 +154,6 @@ describe('MapKmlLayer', () => {
+         (statusChanged)="handleStatusChange()" />
+     </google-map>
+   `,
+-  standalone: true,
+   imports: [GoogleMap, MapKmlLayer],
+ })
+ class TestApp {
+diff --git a/src/google-maps/map-marker-clusterer/map-marker-clusterer.spec.ts b/src/google-maps/map-marker-clusterer/map-marker-clusterer.spec.ts
+index 01629f6ed952..0dfd6074a6a4 100644
+--- a/src/google-maps/map-marker-clusterer/map-marker-clusterer.spec.ts
++++ b/src/google-maps/map-marker-clusterer/map-marker-clusterer.spec.ts
+@@ -177,7 +177,6 @@ describe('MapMarkerClusterer', () => {
+ 
+ @Component({
+   selector: 'test-app',
+-  standalone: true,
+   imports: [GoogleMapsModule],
+   template: `
+     <google-map>
+diff --git a/src/google-maps/map-marker/map-marker.spec.ts b/src/google-maps/map-marker/map-marker.spec.ts
+index 3f0e102e10ea..de00b590e6d9 100644
+--- a/src/google-maps/map-marker/map-marker.spec.ts
++++ b/src/google-maps/map-marker/map-marker.spec.ts
+@@ -233,7 +233,6 @@ describe('MapMarker', () => {
+         (positionChanged)="handlePositionChanged()" />
+     </google-map>
+   `,
+-  standalone: true,
+   imports: [GoogleMap, MapMarker],
+ })
+ class TestApp {
+diff --git a/src/google-maps/map-polygon/map-polygon.spec.ts b/src/google-maps/map-polygon/map-polygon.spec.ts
+index 09d4ec277f29..bf012834f116 100644
+--- a/src/google-maps/map-polygon/map-polygon.spec.ts
++++ b/src/google-maps/map-polygon/map-polygon.spec.ts
+@@ -157,7 +157,6 @@ describe('MapPolygon', () => {
+       </map-polygon>
+     </google-map>
+   `,
+-  standalone: true,
+   imports: [GoogleMap, MapPolygon],
+ })
+ class TestApp {
+diff --git a/src/google-maps/map-polyline/map-polyline.spec.ts b/src/google-maps/map-polyline/map-polyline.spec.ts
+index 095be84dd9f1..a8a788e1a22e 100644
+--- a/src/google-maps/map-polyline/map-polyline.spec.ts
++++ b/src/google-maps/map-polyline/map-polyline.spec.ts
+@@ -157,7 +157,6 @@ describe('MapPolyline', () => {
+         (polylineRightclick)="handleRightclick()" />
+     </google-map>
+   `,
+-  standalone: true,
+   imports: [GoogleMap, MapPolyline],
+ })
+ class TestApp {
+diff --git a/src/google-maps/map-rectangle/map-rectangle.spec.ts b/src/google-maps/map-rectangle/map-rectangle.spec.ts
+index 3ad2bf32a6fe..50cc24e83304 100644
+--- a/src/google-maps/map-rectangle/map-rectangle.spec.ts
++++ b/src/google-maps/map-rectangle/map-rectangle.spec.ts
+@@ -151,7 +151,6 @@ describe('MapRectangle', () => {
+         (rectangleRightclick)="handleRightclick()" />
+     </google-map>
+   `,
+-  standalone: true,
+   imports: [GoogleMap, MapRectangle],
+ })
+ class TestApp {
+diff --git a/src/google-maps/map-traffic-layer/map-traffic-layer.spec.ts b/src/google-maps/map-traffic-layer/map-traffic-layer.spec.ts
+index a11bc123e3d6..9561b07ed911 100644
+--- a/src/google-maps/map-traffic-layer/map-traffic-layer.spec.ts
++++ b/src/google-maps/map-traffic-layer/map-traffic-layer.spec.ts
+@@ -44,7 +44,6 @@ describe('MapTrafficLayer', () => {
+       <map-traffic-layer [autoRefresh]="autoRefresh" />
+     </google-map>
+   `,
+-  standalone: true,
+   imports: [GoogleMap, MapTrafficLayer],
+ })
+ class TestApp {
+diff --git a/src/google-maps/map-transit-layer/map-transit-layer.spec.ts b/src/google-maps/map-transit-layer/map-transit-layer.spec.ts
+index 708821aa5b7d..19fcd60f67ba 100644
+--- a/src/google-maps/map-transit-layer/map-transit-layer.spec.ts
++++ b/src/google-maps/map-transit-layer/map-transit-layer.spec.ts
+@@ -43,7 +43,6 @@ describe('MapTransitLayer', () => {
+       <map-transit-layer />
+     </google-map>
+   `,
+-  standalone: true,
+   imports: [GoogleMap, MapTransitLayer],
+ })
+ class TestApp {}
+diff --git a/src/material-experimental/menubar/menubar-item.spec.ts b/src/material-experimental/menubar/menubar-item.spec.ts
+index 40b610c24de7..cd76be6616e7 100644
+--- a/src/material-experimental/menubar/menubar-item.spec.ts
++++ b/src/material-experimental/menubar/menubar-item.spec.ts
+@@ -62,7 +62,6 @@ describe('MatMenuBarItem', () => {
+       </div>
+     </ng-template>
+   `,
+-  standalone: true,
+   imports: [MatMenuBarModule, CdkMenuModule],
+ })
+ class SimpleMenuBarItem {
+diff --git a/src/material-experimental/menubar/menubar.spec.ts b/src/material-experimental/menubar/menubar.spec.ts
+index f690dd033e31..9adab6e6666a 100644
+--- a/src/material-experimental/menubar/menubar.spec.ts
++++ b/src/material-experimental/menubar/menubar.spec.ts
+@@ -55,7 +55,6 @@ describe('MatMenuBar', () => {
+       <mat-menubar-item id="second"></mat-menubar-item>
+     </mat-menubar>
+   `,
+-  standalone: true,
+   imports: [MatMenuBarModule],
+ })
+ class SimpleMatMenuBar {
+diff --git a/src/material/autocomplete/testing/autocomplete-harness.spec.ts b/src/material/autocomplete/testing/autocomplete-harness.spec.ts
+index 3fedab3f7c40..1f034a97716c 100644
+--- a/src/material/autocomplete/testing/autocomplete-harness.spec.ts
++++ b/src/material/autocomplete/testing/autocomplete-harness.spec.ts
+@@ -176,7 +176,6 @@ describe('MatAutocompleteHarness', () => {
+     <input id="prefilled" [matAutocomplete]="autocomplete" value="Prefilled value">
+     <input id="grouped" [matAutocomplete]="groupedAutocomplete">
+   `,
+-  standalone: true,
+   imports: [MatAutocompleteModule],
+ })
+ class AutocompleteHarnessTest {
+diff --git a/src/material/badge/badge.spec.ts b/src/material/badge/badge.spec.ts
+index 7c5a6ca9da22..2e0e1a996b9e 100644
+--- a/src/material/badge/badge.spec.ts
++++ b/src/material/badge/badge.spec.ts
+@@ -291,7 +291,6 @@ describe('MatBadge', () => {
+       home
+     </button>
+   `,
+-  standalone: true,
+   imports: [MatBadgeModule],
+ })
+ class BadgeOnInteractiveElement {
+@@ -308,7 +307,6 @@ class BadgeOnInteractiveElement {
+ 
+ @Component({
+   template: '<span matBadge="7" [matBadgeDescription]="description()">Hello</span>',
+-  standalone: true,
+   imports: [MatBadgeModule],
+ })
+ class BadgeOnNonInteractiveElement {
+@@ -322,7 +320,6 @@ class BadgeOnNonInteractiveElement {
+       <div class="mat-badge-content">Pre-existing badge</div>
+     </span>
+   `,
+-  standalone: true,
+   imports: [MatBadgeModule],
+ })
+ class PreExistingBadge {}
+@@ -334,7 +331,6 @@ class PreExistingBadge {}
+       <span matBadge="Hi">Something</span>
+     </span>
+   `,
+-  standalone: true,
+   imports: [MatBadgeModule],
+ })
+ class NestedBadge {}
+@@ -342,7 +338,6 @@ class NestedBadge {}
+ @Component({
+   template: `
+     <ng-template matBadge="1">Notifications</ng-template>`,
+-  standalone: true,
+   imports: [MatBadgeModule],
+ })
+ class BadgeOnTemplate {}
+diff --git a/src/material/badge/testing/badge-harness.spec.ts b/src/material/badge/testing/badge-harness.spec.ts
+index 48838b343d94..71261c9c3acd 100644
+--- a/src/material/badge/testing/badge-harness.spec.ts
++++ b/src/material/badge/testing/badge-harness.spec.ts
+@@ -136,7 +136,6 @@ describe('MatBadgeHarness', () => {
+       matBadge="Disabled badge"
+       [matBadgeDisabled]="disabled">Disabled</button>
+   `,
+-  standalone: true,
+   imports: [MatBadgeModule],
+ })
+ class BadgeHarnessTest {
+diff --git a/src/material/bottom-sheet/bottom-sheet.spec.ts b/src/material/bottom-sheet/bottom-sheet.spec.ts
+index fcaafe103355..4f978f23767d 100644
+--- a/src/material/bottom-sheet/bottom-sheet.spec.ts
++++ b/src/material/bottom-sheet/bottom-sheet.spec.ts
+@@ -1009,7 +1009,6 @@ describe('MatBottomSheet with default options', () => {
+ 
+ @Directive({
+   selector: 'dir-with-view-container',
+-  standalone: true,
+ })
+ class DirectiveWithViewContainer {
+   viewContainerRef = inject(ViewContainerRef);
+@@ -1017,7 +1016,6 @@ class DirectiveWithViewContainer {
+ 
+ @Component({
+   template: `<dir-with-view-container></dir-with-view-container>`,
+-  standalone: true,
+   imports: [DirectiveWithViewContainer],
+ })
+ class ComponentWithChildViewContainer {
+@@ -1032,7 +1030,6 @@ class ComponentWithChildViewContainer {
+   selector: 'arbitrary-component-with-template-ref',
+   template: `<ng-template let-data let-bottomSheetRef="bottomSheetRef">
+       Cheese {{localValue}} {{data?.value}}{{setRef(bottomSheetRef)}}</ng-template>`,
+-  standalone: true,
+ })
+ class ComponentWithTemplateRef {
+   localValue: string;
+@@ -1048,7 +1045,6 @@ class ComponentWithTemplateRef {
+ 
+ @Component({
+   template: '<p>Pizza</p> <input> <button>Close</button>',
+-  standalone: true,
+ })
+ class PizzaMsg {
+   bottomSheetRef = inject<MatBottomSheetRef<PizzaMsg>>(MatBottomSheetRef);
+@@ -1058,7 +1054,6 @@ class PizzaMsg {
+ 
+ @Component({
+   template: '<p>Taco</p>',
+-  standalone: true,
+ })
+ class TacoMsg {}
+ 
+@@ -1067,14 +1062,12 @@ class TacoMsg {}
+     <h1>This is the title</h1>
+     <p>This is the paragraph</p>
+   `,
+-  standalone: true,
+ })
+ class ContentElementDialog {}
+ 
+ @Component({
+   template: '',
+   providers: [MatBottomSheet],
+-  standalone: true,
+   imports: [MatBottomSheetModule],
+ })
+ class ComponentThatProvidesMatBottomSheet {
+@@ -1083,7 +1076,6 @@ class ComponentThatProvidesMatBottomSheet {
+ 
+ @Component({
+   template: '',
+-  standalone: true,
+ })
+ class BottomSheetWithInjectedData {
+   data = inject(MAT_BOTTOM_SHEET_DATA);
+@@ -1092,6 +1084,5 @@ class BottomSheetWithInjectedData {
+ @Component({
+   template: `<button>I'm a button</button>`,
+   encapsulation: ViewEncapsulation.ShadowDom,
+-  standalone: true,
+ })
+ class ShadowDomComponent {}
+diff --git a/src/material/bottom-sheet/testing/bottom-sheet-harness.spec.ts b/src/material/bottom-sheet/testing/bottom-sheet-harness.spec.ts
+index 39ec594a2bda..cf3fe77b1a5c 100644
+--- a/src/material/bottom-sheet/testing/bottom-sheet-harness.spec.ts
++++ b/src/material/bottom-sheet/testing/bottom-sheet-harness.spec.ts
+@@ -54,7 +54,6 @@ describe('MatBottomSheetHarness', () => {
+       Hello from the bottom sheet!
+     </ng-template>
+   `,
+-  standalone: true,
+   imports: [MatBottomSheetModule],
+ })
+ class BottomSheetHarnessTest {
+diff --git a/src/material/button-toggle/button-toggle.spec.ts b/src/material/button-toggle/button-toggle.spec.ts
+index f223feaaa33d..cc66f085dd50 100644
+--- a/src/material/button-toggle/button-toggle.spec.ts
++++ b/src/material/button-toggle/button-toggle.spec.ts
+@@ -1096,7 +1096,6 @@ describe('MatButtonToggle without forms', () => {
+     <mat-button-toggle value="test3">Test3</mat-button-toggle>
+   </mat-button-toggle-group>
+   `,
+-  standalone: true,
+   imports: [MatButtonToggleModule],
+ })
+ class ButtonTogglesInsideButtonToggleGroup {
+@@ -1121,7 +1120,6 @@ class ButtonTogglesInsideButtonToggleGroup {
+     }
+   </mat-button-toggle-group>
+   `,
+-  standalone: true,
+   imports: [MatButtonToggleModule, FormsModule, ReactiveFormsModule],
+ })
+ class ButtonToggleGroupWithNgModel {
+@@ -1144,7 +1142,6 @@ class ButtonToggleGroupWithNgModel {
+     <mat-button-toggle value="sugar">Sugar</mat-button-toggle>
+   </mat-button-toggle-group>
+   `,
+-  standalone: true,
+   imports: [MatButtonToggleModule],
+ })
+ class ButtonTogglesInsideButtonToggleGroupMultiple {
+@@ -1161,7 +1158,6 @@ class ButtonTogglesInsideButtonToggleGroupMultiple {
+     <mat-button-toggle>Sugar</mat-button-toggle>
+   </mat-button-toggle-group>
+   `,
+-  standalone: true,
+   imports: [MatButtonToggleModule],
+ })
+ class FalsyButtonTogglesInsideButtonToggleGroupMultiple {
+@@ -1173,7 +1169,6 @@ class FalsyButtonTogglesInsideButtonToggleGroupMultiple {
+   template: `
+   <mat-button-toggle>Yes</mat-button-toggle>
+   `,
+-  standalone: true,
+   imports: [MatButtonToggleModule],
+ })
+ class StandaloneButtonToggle {}
+@@ -1185,7 +1180,6 @@ class StandaloneButtonToggle {}
+     <mat-button-toggle value="green">Value Green</mat-button-toggle>
+   </mat-button-toggle-group>
+   `,
+-  standalone: true,
+   imports: [MatButtonToggleModule],
+ })
+ class ButtonToggleGroupWithInitialValue {
+@@ -1200,7 +1194,6 @@ class ButtonToggleGroupWithInitialValue {
+     <mat-button-toggle value="blue">Value Blue</mat-button-toggle>
+   </mat-button-toggle-group>
+   `,
+-  standalone: true,
+   imports: [MatButtonToggleModule, FormsModule, ReactiveFormsModule],
+ })
+ class ButtonToggleGroupWithFormControl {
+@@ -1218,7 +1211,6 @@ class ButtonToggleGroupWithFormControl {
+       }
+     </mat-button-toggle-group>
+   `,
+-  standalone: true,
+   imports: [MatButtonToggleModule, FormsModule, ReactiveFormsModule],
+ })
+ class ButtonToggleGroupWithIndirectDescendantToggles {
+@@ -1228,7 +1220,6 @@ class ButtonToggleGroupWithIndirectDescendantToggles {
+ /** Simple test component with an aria-label set. */
+ @Component({
+   template: `<mat-button-toggle aria-label="Super effective"></mat-button-toggle>`,
+-  standalone: true,
+   imports: [MatButtonToggleModule],
+ })
+ class ButtonToggleWithAriaLabel {}
+@@ -1236,7 +1227,6 @@ class ButtonToggleWithAriaLabel {}
+ /** Simple test component with an aria-label set. */
+ @Component({
+   template: `<mat-button-toggle aria-labelledby="some-id"></mat-button-toggle>`,
+-  standalone: true,
+   imports: [MatButtonToggleModule],
+ })
+ class ButtonToggleWithAriaLabelledby {}
+@@ -1249,7 +1239,6 @@ class ButtonToggleWithAriaLabelledby {}
+       }
+     </mat-button-toggle-group>
+   `,
+-  standalone: true,
+   imports: [MatButtonToggleModule],
+ })
+ class RepeatedButtonTogglesWithPreselectedValue {
+@@ -1262,14 +1251,12 @@ class RepeatedButtonTogglesWithPreselectedValue {
+ 
+ @Component({
+   template: `<mat-button-toggle tabindex="3"></mat-button-toggle>`,
+-  standalone: true,
+   imports: [MatButtonToggleModule],
+ })
+ class ButtonToggleWithTabindex {}
+ 
+ @Component({
+   template: `<mat-button-toggle name="custom-name"></mat-button-toggle>`,
+-  standalone: true,
+   imports: [MatButtonToggleModule],
+ })
+ class ButtonToggleWithStaticName {}
+@@ -1281,7 +1268,6 @@ class ButtonToggleWithStaticName {}
+       <mat-button-toggle value="2" checked>Two</mat-button-toggle>
+     </mat-button-toggle-group>
+   `,
+-  standalone: true,
+   imports: [MatButtonToggleModule],
+ })
+ class ButtonToggleWithStaticChecked {
+@@ -1293,7 +1279,6 @@ class ButtonToggleWithStaticChecked {
+   template: `
+     <mat-button-toggle aria-label="Toggle me" aria-labelledby="something"></mat-button-toggle>
+   `,
+-  standalone: true,
+   imports: [MatButtonToggleModule],
+ })
+ class ButtonToggleWithStaticAriaAttributes {}
+@@ -1306,7 +1291,6 @@ class ButtonToggleWithStaticAriaAttributes {}
+     }
+   </mat-button-toggle-group>
+   `,
+-  standalone: true,
+   imports: [MatButtonToggleModule, FormsModule, ReactiveFormsModule],
+ })
+ class ButtonToggleGroupWithFormControlAndDynamicButtons {
+@@ -1323,7 +1307,6 @@ class ButtonToggleGroupWithFormControlAndDynamicButtons {
+       <mat-button-toggle value="3">Three</mat-button-toggle>
+     </mat-button-toggle-group>
+   `,
+-  standalone: true,
+   imports: [MatButtonToggleModule, FormsModule],
+ })
+ class ButtonToggleGroupWithNgModelAndStaticOptions {
+diff --git a/src/material/button-toggle/testing/button-toggle-group.spec.ts b/src/material/button-toggle/testing/button-toggle-group.spec.ts
+index 70377498cac4..178451dd8964 100644
+--- a/src/material/button-toggle/testing/button-toggle-group.spec.ts
++++ b/src/material/button-toggle/testing/button-toggle-group.spec.ts
+@@ -85,7 +85,6 @@ describe('MatButtonToggleGroupHarness', () => {
+       <mat-button-toggle value="2">Two</mat-button-toggle>
+     </mat-button-toggle-group>
+   `,
+-  standalone: true,
+   imports: [MatButtonToggleModule],
+ })
+ class ButtonToggleGroupHarnessTest {
+diff --git a/src/material/button-toggle/testing/button-toggle-harness.spec.ts b/src/material/button-toggle/testing/button-toggle-harness.spec.ts
+index c7fc5f6cdd8f..a712846a45f0 100644
+--- a/src/material/button-toggle/testing/button-toggle-harness.spec.ts
++++ b/src/material/button-toggle/testing/button-toggle-harness.spec.ts
+@@ -154,7 +154,6 @@ describe('MatButtonToggleHarness', () => {
+         appearance="legacy">Second</mat-button-toggle>
+       <span id="second-label">Second toggle</span>
+   `,
+-  standalone: true,
+   imports: [MatButtonToggleModule],
+ })
+ class ButtonToggleHarnessTest {
+diff --git a/src/material/button/button.spec.ts b/src/material/button/button.spec.ts
+index eb4599299386..74ec8821cc81 100644
+--- a/src/material/button/button.spec.ts
++++ b/src/material/button/button.spec.ts
+@@ -292,7 +292,6 @@ describe('MatButton', () => {
+   it('should be able to configure the default color of buttons', () => {
+     @Component({
+       template: `<button mat-button>Click me</button>`,
+-      standalone: true,
+       imports: [MatButtonModule],
+     })
+     class ConfigTestApp {}
+@@ -424,7 +423,6 @@ describe('MatFabDefaultOptions', () => {
+     <button mat-fab [extended]="extended" class="extended-fab-test">Extended</button>
+     <button mat-mini-fab>Mini Fab Button</button>
+   `,
+-  standalone: true,
+   imports: [MatButtonModule],
+ })
+ class TestApp {
+diff --git a/src/material/button/testing/button-harness.spec.ts b/src/material/button/testing/button-harness.spec.ts
+index e19db0e5ea21..ab4a01fa4c6e 100644
+--- a/src/material/button/testing/button-harness.spec.ts
++++ b/src/material/button/testing/button-harness.spec.ts
+@@ -174,7 +174,6 @@ describe('MatButtonHarness', () => {
+     <a id="anchor-fab" mat-fab>Fab anchor</a>
+     <a id="anchor-mini-fab" mat-mini-fab>Mini Fab anchor</a>
+   `,
+-  standalone: true,
+   imports: [MatButtonModule, MatIconModule, PlatformModule],
+ })
+ class ButtonHarnessTest {
+diff --git a/src/material/card/card.spec.ts b/src/material/card/card.spec.ts
+index 0273ecfef51a..eadb812356ed 100644
+--- a/src/material/card/card.spec.ts
++++ b/src/material/card/card.spec.ts
+@@ -48,7 +48,6 @@ describe('MatCard', () => {
+ 
+ @Component({
+   template: '<mat-card [appearance]="appearance()"></mat-card>',
+-  standalone: true,
+   imports: [MatCard],
+ })
+ class BasicCard {
+@@ -57,7 +56,6 @@ class BasicCard {
+ 
+ @Component({
+   template: '<mat-card></mat-card>',
+-  standalone: true,
+   imports: [MatCard],
+ })
+ class BasicCardNoAppearance {}
+diff --git a/src/material/card/testing/card-harness.spec.ts b/src/material/card/testing/card-harness.spec.ts
+index 7837c73794eb..06ebb6a3cd93 100644
+--- a/src/material/card/testing/card-harness.spec.ts
++++ b/src/material/card/testing/card-harness.spec.ts
+@@ -123,7 +123,6 @@ describe('MatCardHarness', () => {
+         </mat-card-footer>
+       </mat-card>
+   `,
+-  standalone: true,
+   imports: [MatCardModule],
+ })
+ class CardHarnessTest {}
+diff --git a/src/material/checkbox/checkbox.spec.ts b/src/material/checkbox/checkbox.spec.ts
+index 9b2c2aa5b4f4..ac44a8beb73b 100644
+--- a/src/material/checkbox/checkbox.spec.ts
++++ b/src/material/checkbox/checkbox.spec.ts
+@@ -1233,7 +1233,6 @@ describe('MatCheckboxDefaultOptions', () => {
+       Simple checkbox
+     </mat-checkbox>
+   </div>`,
+-  standalone: true,
+   imports: [MatCheckbox],
+ })
+ class SingleCheckbox {
+@@ -1258,7 +1257,6 @@ class SingleCheckbox {
+ @Component({
+   template: `<mat-checkbox [required]="isRequired" [(ngModel)]="isGood"
+                            [disabled]="isDisabled">Be good</mat-checkbox>`,
+-  standalone: true,
+   imports: [MatCheckbox, FormsModule],
+ })
+ class CheckboxWithNgModel {
+@@ -1270,7 +1268,6 @@ class CheckboxWithNgModel {
+ @Component({
+   template: `<mat-checkbox [required]="isRequired" [(ngModel)]="isGood">Be good</mat-checkbox>`,
+   changeDetection: ChangeDetectionStrategy.OnPush,
+-  standalone: true,
+   imports: [MatCheckbox, FormsModule],
+ })
+ class CheckboxWithNgModelAndOnPush extends CheckboxWithNgModel {}
+@@ -1281,7 +1278,6 @@ class CheckboxWithNgModelAndOnPush extends CheckboxWithNgModel {}
+     <mat-checkbox>Option 1</mat-checkbox>
+     <mat-checkbox>Option 2</mat-checkbox>
+   `,
+-  standalone: true,
+   imports: [MatCheckbox],
+ })
+ class MultipleCheckboxes {}
+@@ -1293,7 +1289,6 @@ class MultipleCheckboxes {}
+         [tabIndex]="customTabIndex"
+         [disabled]="isDisabled">
+     </mat-checkbox>`,
+-  standalone: true,
+   imports: [MatCheckbox],
+ })
+ class CheckboxWithTabIndex {
+@@ -1304,7 +1299,6 @@ class CheckboxWithTabIndex {
+ /** Simple test component with an aria-label set. */
+ @Component({
+   template: `<mat-checkbox aria-label="Super effective"></mat-checkbox>`,
+-  standalone: true,
+   imports: [MatCheckbox],
+ })
+ class CheckboxWithAriaLabel {}
+@@ -1312,7 +1306,6 @@ class CheckboxWithAriaLabel {}
+ /** Simple test component with an aria-label set. */
+ @Component({
+   template: `<mat-checkbox aria-labelledby="some-id"></mat-checkbox>`,
+-  standalone: true,
+   imports: [MatCheckbox],
+ })
+ class CheckboxWithAriaLabelledby {}
+@@ -1320,7 +1313,6 @@ class CheckboxWithAriaLabelledby {}
+ /** Simple test component with an aria-describedby set. */
+ @Component({
+   template: `<mat-checkbox aria-describedby="some-id"></mat-checkbox>`,
+-  standalone: true,
+   imports: [MatCheckbox],
+ })
+ class CheckboxWithAriaDescribedby {}
+@@ -1328,7 +1320,6 @@ class CheckboxWithAriaDescribedby {}
+ /** Simple test component with an aria-expanded set with true. */
+ @Component({
+   template: `<mat-checkbox aria-expanded="true"></mat-checkbox>`,
+-  standalone: true,
+   imports: [MatCheckbox],
+ })
+ class CheckboxWithPositiveAriaExpanded {}
+@@ -1336,7 +1327,6 @@ class CheckboxWithPositiveAriaExpanded {}
+ /** Simple test component with an aria-expanded set with false. */
+ @Component({
+   template: `<mat-checkbox aria-expanded="false"></mat-checkbox>`,
+-  standalone: true,
+   imports: [MatCheckbox],
+ })
+ class CheckboxWithNegativeAriaExpanded {}
+@@ -1344,7 +1334,6 @@ class CheckboxWithNegativeAriaExpanded {}
+ /** Simple test component with an aria-controls set. */
+ @Component({
+   template: `<mat-checkbox aria-controls="some-id"></mat-checkbox>`,
+-  standalone: true,
+   imports: [MatCheckbox],
+ })
+ class CheckboxWithAriaControls {}
+@@ -1352,7 +1341,6 @@ class CheckboxWithAriaControls {}
+ /** Simple test component with an aria-owns set. */
+ @Component({
+   template: `<mat-checkbox aria-owns="some-id"></mat-checkbox>`,
+-  standalone: true,
+   imports: [MatCheckbox],
+ })
+ class CheckboxWithAriaOwns {}
+@@ -1360,7 +1348,6 @@ class CheckboxWithAriaOwns {}
+ /** Simple test component with name attribute */
+ @Component({
+   template: `<mat-checkbox name="test-name"></mat-checkbox>`,
+-  standalone: true,
+   imports: [MatCheckbox],
+ })
+ class CheckboxWithNameAttribute {}
+@@ -1368,7 +1355,6 @@ class CheckboxWithNameAttribute {}
+ /** Simple test component with change event */
+ @Component({
+   template: `<mat-checkbox (change)="lastEvent = $event"></mat-checkbox>`,
+-  standalone: true,
+   imports: [MatCheckbox],
+ })
+ class CheckboxWithChangeEvent {
+@@ -1378,7 +1364,6 @@ class CheckboxWithChangeEvent {
+ /** Test component with reactive forms */
+ @Component({
+   template: `<mat-checkbox [formControl]="formControl"></mat-checkbox>`,
+-  standalone: true,
+   imports: [MatCheckbox, ReactiveFormsModule],
+ })
+ class CheckboxWithFormControl {
+@@ -1388,7 +1373,6 @@ class CheckboxWithFormControl {
+ /** Test component without label */
+ @Component({
+   template: `<mat-checkbox>{{ label }}</mat-checkbox>`,
+-  standalone: true,
+   imports: [MatCheckbox],
+ })
+ class CheckboxWithoutLabel {
+@@ -1398,14 +1382,12 @@ class CheckboxWithoutLabel {
+ /** Test component with the native tabindex attribute. */
+ @Component({
+   template: `<mat-checkbox tabindex="5"></mat-checkbox>`,
+-  standalone: true,
+   imports: [MatCheckbox],
+ })
+ class CheckboxWithTabindexAttr {}
+ 
+ @Component({
+   template: `<mat-checkbox aria-label="Checkbox" aria-labelledby="something"></mat-checkbox>`,
+-  standalone: true,
+   imports: [MatCheckbox],
+ })
+ class CheckboxWithStaticAriaAttributes {}
+diff --git a/src/material/checkbox/testing/checkbox-harness.spec.ts b/src/material/checkbox/testing/checkbox-harness.spec.ts
+index 5d5d9fc2fcbc..aabff5d91b00 100644
+--- a/src/material/checkbox/testing/checkbox-harness.spec.ts
++++ b/src/material/checkbox/testing/checkbox-harness.spec.ts
+@@ -199,7 +199,6 @@ describe('MatCheckboxHarness', () => {
+     </mat-checkbox>
+     <span id="second-label">Second checkbox</span>
+   `,
+-  standalone: true,
+   imports: [MatCheckboxModule, ReactiveFormsModule],
+ })
+ class CheckboxHarnessTest {
+diff --git a/src/material/chips/chip-edit-input.spec.ts b/src/material/chips/chip-edit-input.spec.ts
+index e7207d94529f..5a056f48fc0e 100644
+--- a/src/material/chips/chip-edit-input.spec.ts
++++ b/src/material/chips/chip-edit-input.spec.ts
+@@ -42,7 +42,6 @@ describe('MatChipEditInput', () => {
+ 
+ @Component({
+   template: `<mat-chip><span matChipEditInput></span></mat-chip>`,
+-  standalone: true,
+   imports: [MatChipsModule],
+ })
+ class ChipEditInputContainer {}
+diff --git a/src/material/chips/chip-remove.spec.ts b/src/material/chips/chip-remove.spec.ts
+index 4c05cf46d9ec..3e7525af81f4 100644
+--- a/src/material/chips/chip-remove.spec.ts
++++ b/src/material/chips/chip-remove.spec.ts
+@@ -116,7 +116,6 @@ describe('Chip Remove', () => {
+       </mat-chip>
+     </mat-chip-set>
+   `,
+-  standalone: true,
+   imports: [MatChipsModule],
+ })
+ class TestChip {
+diff --git a/src/material/chips/chip-row.spec.ts b/src/material/chips/chip-row.spec.ts
+index 545e22d86171..57f55050a712 100644
+--- a/src/material/chips/chip-row.spec.ts
++++ b/src/material/chips/chip-row.spec.ts
+@@ -424,7 +424,6 @@ describe('Row Chips', () => {
+         </div>
+       }
+     </mat-chip-grid>`,
+-  standalone: true,
+   imports: [MatChipsModule],
+ })
+ class SingleChip {
+diff --git a/src/material/chips/chip-set.spec.ts b/src/material/chips/chip-set.spec.ts
+index 61192a4328a7..c64eef460db0 100644
+--- a/src/material/chips/chip-set.spec.ts
++++ b/src/material/chips/chip-set.spec.ts
+@@ -115,7 +115,6 @@ describe('MatChipSet', () => {
+         }
+       </mat-chip-set>
+   `,
+-  standalone: true,
+   imports: [MatChipsModule],
+ })
+ class BasicChipSet {
+@@ -133,7 +132,6 @@ class BasicChipSet {
+       }
+     </mat-chip-set>
+   `,
+-  standalone: true,
+   imports: [MatChipsModule],
+ })
+ class IndirectDescendantsChipSet extends BasicChipSet {}
+diff --git a/src/material/chips/chip.spec.ts b/src/material/chips/chip.spec.ts
+index cd022b7ec7a3..35b54129637a 100644
+--- a/src/material/chips/chip.spec.ts
++++ b/src/material/chips/chip.spec.ts
+@@ -164,7 +164,6 @@ describe('MatChip', () => {
+         </div>
+       }
+     </mat-chip-set>`,
+-  standalone: true,
+   imports: [MatChipsModule],
+ })
+ class SingleChip {
+@@ -183,21 +182,18 @@ class SingleChip {
+ 
+ @Component({
+   template: `<mat-basic-chip>Hello</mat-basic-chip>`,
+-  standalone: true,
+   imports: [MatChipsModule],
+ })
+ class BasicChip {}
+ 
+ @Component({
+   template: `<mat-basic-chip role="button" tabindex="3">Hello</mat-basic-chip>`,
+-  standalone: true,
+   imports: [MatChipsModule],
+ })
+ class BasicChipWithStaticTabindex {}
+ 
+ @Component({
+   template: `<mat-basic-chip role="button" [tabIndex]="tabindex">Hello</mat-basic-chip>`,
+-  standalone: true,
+   imports: [MatChipsModule],
+ })
+ class BasicChipWithBoundTabindex {
+diff --git a/src/material/chips/testing/chip-grid-harness.spec.ts b/src/material/chips/testing/chip-grid-harness.spec.ts
+index 0e022287be52..30fb679e7389 100644
+--- a/src/material/chips/testing/chip-grid-harness.spec.ts
++++ b/src/material/chips/testing/chip-grid-harness.spec.ts
+@@ -135,7 +135,6 @@ describe('MatChipGridHarness', () => {
+       <input [matChipInputFor]="grid"/>
+     </mat-chip-grid>
+   `,
+-  standalone: true,
+   imports: [MatChipsModule, ReactiveFormsModule],
+ })
+ class ChipGridHarnessTest {
+diff --git a/src/material/chips/testing/chip-harness.spec.ts b/src/material/chips/testing/chip-harness.spec.ts
+index 64c2ec44e4c4..2509afa602e3 100644
+--- a/src/material/chips/testing/chip-harness.spec.ts
++++ b/src/material/chips/testing/chip-harness.spec.ts
+@@ -94,7 +94,6 @@ describe('MatChipHarness', () => {
+     </mat-chip>
+     <mat-chip-row (removed)="removeChip()">Chip Row</mat-chip-row>
+   `,
+-  standalone: true,
+   imports: [MatChipsModule, MatIconModule],
+ })
+ class ChipHarnessTest {
+diff --git a/src/material/chips/testing/chip-input-harness.spec.ts b/src/material/chips/testing/chip-input-harness.spec.ts
+index 913087581098..2172c1b1aa18 100644
+--- a/src/material/chips/testing/chip-input-harness.spec.ts
++++ b/src/material/chips/testing/chip-input-harness.spec.ts
+@@ -94,7 +94,6 @@ describe('MatChipInputHarness', () => {
+       <input [matChipInputFor]="grid2" disabled />
+     </mat-chip-grid>
+   `,
+-  standalone: true,
+   imports: [MatChipsModule],
+ })
+ class ChipInputHarnessTest {
+diff --git a/src/material/chips/testing/chip-listbox-harness.spec.ts b/src/material/chips/testing/chip-listbox-harness.spec.ts
+index 237706b1e8eb..c3db9add005f 100644
+--- a/src/material/chips/testing/chip-listbox-harness.spec.ts
++++ b/src/material/chips/testing/chip-listbox-harness.spec.ts
+@@ -125,7 +125,6 @@ describe('MatChipListboxHarness', () => {
+       }
+     </mat-chip-listbox>
+   `,
+-  standalone: true,
+   imports: [MatChipsModule],
+ })
+ class ChipListboxHarnessTest {
+diff --git a/src/material/chips/testing/chip-option-harness.spec.ts b/src/material/chips/testing/chip-option-harness.spec.ts
+index 44a1a21eb721..5f5be693bcd8 100644
+--- a/src/material/chips/testing/chip-option-harness.spec.ts
++++ b/src/material/chips/testing/chip-option-harness.spec.ts
+@@ -88,7 +88,6 @@ describe('MatChipOptionHarness', () => {
+       </mat-chip-option>
+     </mat-chip-listbox>
+   `,
+-  standalone: true,
+   imports: [MatChipsModule],
+ })
+ class ChipOptionHarnessTest {}
+diff --git a/src/material/chips/testing/chip-row-harness.spec.ts b/src/material/chips/testing/chip-row-harness.spec.ts
+index 6f62fc3b0453..419e96d104eb 100644
+--- a/src/material/chips/testing/chip-row-harness.spec.ts
++++ b/src/material/chips/testing/chip-row-harness.spec.ts
+@@ -41,7 +41,6 @@ describe('MatChipRowHarness', () => {
+       <input [matChipInputFor]="grid" />
+     </mat-chip-grid>
+   `,
+-  standalone: true,
+   imports: [MatChipsModule],
+ })
+ class ChipRowHarnessTest {
+diff --git a/src/material/chips/testing/chip-set-harness.spec.ts b/src/material/chips/testing/chip-set-harness.spec.ts
+index 576784f358df..2d5bc7b3af14 100644
+--- a/src/material/chips/testing/chip-set-harness.spec.ts
++++ b/src/material/chips/testing/chip-set-harness.spec.ts
+@@ -39,7 +39,6 @@ describe('MatChipSetHarness', () => {
+       <mat-chip> Chip C </mat-chip>
+     </mat-chip-set>
+   `,
+-  standalone: true,
+   imports: [MatChipsModule],
+ })
+ class ChipSetHarnessTest {}
+diff --git a/src/material/core/option/option.spec.ts b/src/material/core/option/option.spec.ts
+index cd0fd98aaf65..a358a65f93a5 100644
+--- a/src/material/core/option/option.spec.ts
++++ b/src/material/core/option/option.spec.ts
+@@ -243,7 +243,6 @@ describe('MatOption component', () => {
+ 
+ @Component({
+   template: `<mat-option [id]="id()" [disabled]="disabled()"></mat-option>`,
+-  standalone: true,
+   imports: [MatOptionModule],
+ })
+ class BasicOption {
+@@ -257,7 +256,6 @@ class BasicOption {
+       <mat-option>Option</mat-option>
+     </mat-optgroup>
+   `,
+-  standalone: true,
+   imports: [MatOptionModule],
+ })
+ class InsideGroup {}
+diff --git a/src/material/core/ripple/ripple.spec.ts b/src/material/core/ripple/ripple.spec.ts
+index 96019a45fcd8..5a42b6eb9920 100644
+--- a/src/material/core/ripple/ripple.spec.ts
++++ b/src/material/core/ripple/ripple.spec.ts
+@@ -836,7 +836,6 @@ describe('MatRipple', () => {
+          style="position: relative; width:300px; height:200px;">
+     </div>
+   `,
+-  standalone: true,
+   imports: [MatRippleModule],
+ })
+ class BasicRippleContainer {
+@@ -856,7 +855,6 @@ class BasicRippleContainer {
+     </div>
+     <div class="alternateTrigger"></div>
+   `,
+-  standalone: true,
+   imports: [MatRippleModule],
+ })
+ class RippleContainerWithInputBindings {
+@@ -871,14 +869,12 @@ class RippleContainerWithInputBindings {
+ 
+ @Component({
+   template: `<div id="container" #ripple="matRipple" matRipple></div>`,
+-  standalone: true,
+   imports: [MatRippleModule],
+ })
+ class RippleContainerWithoutBindings {}
+ 
+ @Component({
+   template: `@if (!isDestroyed) {<div id="container" matRipple></div>}`,
+-  standalone: true,
+   imports: [MatRippleModule],
+ })
+ class RippleContainerWithNgIf {
+@@ -890,7 +886,6 @@ class RippleContainerWithNgIf {
+   styles: `* { transition: none !important; }`,
+   template: `<div id="container" matRipple></div>`,
+   encapsulation: ViewEncapsulation.None,
+-  standalone: true,
+   imports: [MatRippleModule],
+ })
+ class RippleCssTransitionNone {}
+@@ -899,7 +894,6 @@ class RippleCssTransitionNone {}
+   styles: `* { transition-duration: 0ms !important; }`,
+   template: `<div id="container" matRipple></div>`,
+   encapsulation: ViewEncapsulation.None,
+-  standalone: true,
+   imports: [MatRippleModule],
+ })
+ class RippleCssTransitionDurationZero {}
+@@ -910,7 +904,6 @@ class RippleCssTransitionDurationZero {}
+       <div (click)="show = false" matRipple>Click to remove this element.</div>
+     }
+   `,
+-  standalone: true,
+   imports: [MatRippleModule],
+ })
+ class RippleWithDomRemovalOnClick {
+diff --git a/src/material/core/ripple/ripple.zone.spec.ts b/src/material/core/ripple/ripple.zone.spec.ts
+index 3ec711a2536a..01dbc761c150 100644
+--- a/src/material/core/ripple/ripple.zone.spec.ts
++++ b/src/material/core/ripple/ripple.zone.spec.ts
+@@ -52,7 +52,6 @@ describe('MatRipple Zone.js integration', () => {
+            style="position: relative; width:300px; height:200px;">
+       </div>
+     `,
+-  standalone: true,
+   imports: [MatRippleModule],
+ })
+ class BasicRippleContainer {
+diff --git a/src/material/core/testing/optgroup-harness.spec.ts b/src/material/core/testing/optgroup-harness.spec.ts
+index 465418099898..f2fc0492d5ae 100644
+--- a/src/material/core/testing/optgroup-harness.spec.ts
++++ b/src/material/core/testing/optgroup-harness.spec.ts
+@@ -72,7 +72,6 @@ describe('MatOptgroupHarness', () => {
+       <mat-option>Disabled option 1</mat-option>
+     </mat-optgroup>
+   `,
+-  standalone: true,
+   imports: [MatOptionModule],
+ })
+ class OptgroupHarnessTest {}
+diff --git a/src/material/core/testing/option-harness.spec.ts b/src/material/core/testing/option-harness.spec.ts
+index 1d94e7cff299..c10cba3afc89 100644
+--- a/src/material/core/testing/option-harness.spec.ts
++++ b/src/material/core/testing/option-harness.spec.ts
+@@ -112,7 +112,6 @@ describe('MatOptionHarness', () => {
+     <mat-option>Plain option</mat-option>
+     <mat-option disabled>Disabled option</mat-option>
+   `,
+-  standalone: true,
+   imports: [MatOptionModule],
+ })
+ class OptionHarnessTest implements MatOptionParentComponent {
+diff --git a/src/material/datepicker/calendar-body.spec.ts b/src/material/datepicker/calendar-body.spec.ts
+index 1e40e18d6ab1..99c3cf246955 100644
+--- a/src/material/datepicker/calendar-body.spec.ts
++++ b/src/material/datepicker/calendar-body.spec.ts
+@@ -726,7 +726,6 @@ describe('MatCalendarBody', () => {
+           [activeCell]="10"
+           (selectedValueChange)="onSelect($event)">
+     </table>`,
+-  standalone: true,
+   imports: [MatCalendarBody],
+ })
+ class StandardCalendarBody {
+@@ -759,7 +758,6 @@ class StandardCalendarBody {
+           (dragEnded)="dragEnded($event)"
+           >
+     </table>`,
+-  standalone: true,
+   imports: [MatCalendarBody],
+ })
+ class RangeCalendarBody {
+diff --git a/src/material/datepicker/calendar-header.spec.ts b/src/material/datepicker/calendar-header.spec.ts
+index c899dcd1285b..d9ed1edf6415 100644
+--- a/src/material/datepicker/calendar-header.spec.ts
++++ b/src/material/datepicker/calendar-header.spec.ts
+@@ -384,7 +384,6 @@ describe('MatCalendarHeader', () => {
+         (yearSelected)="selectedYear=$event"
+         (monthSelected)="selectedMonth=$event">
+     </mat-calendar>`,
+-  standalone: true,
+   imports: [MatNativeDateModule, MatDatepickerModule],
+ })
+ class StandardCalendar {
+@@ -402,7 +401,6 @@ class StandardCalendar {
+       [maxDate]="maxDate">
+     </mat-calendar>
+   `,
+-  standalone: true,
+   imports: [MatNativeDateModule, MatDatepickerModule],
+ })
+ class CalendarWithMinMaxDate {
+diff --git a/src/material/datepicker/date-range-input.spec.ts b/src/material/datepicker/date-range-input.spec.ts
+index b56002e368cf..b5f594457af4 100644
+--- a/src/material/datepicker/date-range-input.spec.ts
++++ b/src/material/datepicker/date-range-input.spec.ts
+@@ -1176,7 +1176,6 @@ describe('MatDateRangeInput', () => {
+         #rangePicker></mat-date-range-picker>
+     </mat-form-field>
+   `,
+-  standalone: true,
+   imports: [
+     MatDateRangeInput,
+     MatStartDate,
+@@ -1219,7 +1218,6 @@ class StandardRangePicker {
+       <mat-date-range-picker #rangePicker></mat-date-range-picker>
+     </mat-form-field>
+   `,
+-  standalone: true,
+   imports: [MatDateRangeInput, MatStartDate, MatEndDate, MatFormField, MatDateRangePicker],
+ })
+ class RangePickerNoStart {}
+@@ -1234,7 +1232,6 @@ class RangePickerNoStart {}
+       <mat-date-range-picker #rangePicker></mat-date-range-picker>
+     </mat-form-field>
+   `,
+-  standalone: true,
+   imports: [MatDateRangeInput, MatStartDate, MatEndDate, MatFormField, MatDateRangePicker],
+ })
+ class RangePickerNoEnd {}
+@@ -1250,7 +1247,6 @@ class RangePickerNoEnd {}
+       <mat-date-range-picker #rangePicker></mat-date-range-picker>
+     </mat-form-field>
+   `,
+-  standalone: true,
+   imports: [
+     MatDateRangeInput,
+     MatStartDate,
+@@ -1297,7 +1293,6 @@ class RangePickerNgModel {
+       <mat-date-range-picker #rangePicker></mat-date-range-picker>
+     </mat-form-field>
+   `,
+-  standalone: true,
+   imports: [MatDateRangeInput, MatStartDate, MatEndDate, MatFormField, MatDateRangePicker],
+ })
+ class RangePickerNoLabel {
+@@ -1314,7 +1309,6 @@ class RangePickerNoLabel {
+       multi: true,
+     },
+   ],
+-  standalone: true,
+ })
+ class CustomValidator implements Validator {
+   validate = jasmine.createSpy('validate spy').and.returnValue(null);
+@@ -1331,7 +1325,6 @@ class CustomValidator implements Validator {
+       <mat-date-range-picker #rangePicker></mat-date-range-picker>
+     </mat-form-field>
+   `,
+-  standalone: true,
+   imports: [
+     MatDateRangeInput,
+     MatStartDate,
+@@ -1361,7 +1354,6 @@ class RangePickerWithCustomValidator {
+       <mat-date-range-picker #rangePicker></mat-date-range-picker>
+     </mat-form-field>
+   `,
+-  standalone: true,
+   imports: [MatDateRangeInput, MatStartDate, MatEndDate, MatFormField, MatDateRangePicker],
+ })
+ class RangePickerErrorStateMatcher {
+diff --git a/src/material/datepicker/month-view.spec.ts b/src/material/datepicker/month-view.spec.ts
+index aa3bdf732e84..45823af1fd8f 100644
+--- a/src/material/datepicker/month-view.spec.ts
++++ b/src/material/datepicker/month-view.spec.ts
+@@ -858,7 +858,6 @@ describe('MatMonthView', () => {
+       (dragEnded)="dragEnded($event)"
+       [activeDrag]="activeDrag"></mat-month-view>
+       `,
+-  standalone: true,
+   imports: [MatMonthView],
+ })
+ class StandardMonthView {
+@@ -890,7 +889,6 @@ class StandardMonthView {
+       [dateFilter]="dateFilter"
+       [minDate]="minDate"
+       [maxDate]="maxDate"></mat-month-view>`,
+-  standalone: true,
+   imports: [MatMonthView],
+ })
+ class MonthViewWithDateFilter {
+@@ -904,7 +902,6 @@ class MonthViewWithDateFilter {
+ 
+ @Component({
+   template: `<mat-month-view [activeDate]="activeDate" [dateClass]="dateClass"></mat-month-view>`,
+-  standalone: true,
+   imports: [MatMonthView],
+ })
+ class MonthViewWithDateClass {
+diff --git a/src/material/datepicker/multi-year-view.spec.ts b/src/material/datepicker/multi-year-view.spec.ts
+index bf1bcf5f0449..f305f4008daa 100644
+--- a/src/material/datepicker/multi-year-view.spec.ts
++++ b/src/material/datepicker/multi-year-view.spec.ts
+@@ -401,7 +401,6 @@ describe('MatMultiYearView', () => {
+   template: `
+     <mat-multi-year-view [(activeDate)]="date" [(selected)]="selected"
+                          (yearSelected)="selectedYear=$event"></mat-multi-year-view>`,
+-  standalone: true,
+   imports: [MatMultiYearView],
+ })
+ class StandardMultiYearView {
+@@ -420,7 +419,6 @@ class StandardMultiYearView {
+       [minDate]="minDate"
+       [maxDate]="maxDate"></mat-multi-year-view>
+     `,
+-  standalone: true,
+   imports: [MatMultiYearView],
+ })
+ class MultiYearViewWithDateFilter {
+@@ -437,7 +435,6 @@ class MultiYearViewWithDateFilter {
+     <mat-multi-year-view [(activeDate)]="activeDate" [minDate]="minDate" [maxDate]="maxDate">
+     </mat-multi-year-view>
+     `,
+-  standalone: true,
+   imports: [MatMultiYearView],
+ })
+ class MultiYearViewWithMinMaxDate {
+@@ -450,7 +447,6 @@ class MultiYearViewWithMinMaxDate {
+   template: `
+     <mat-multi-year-view [activeDate]="activeDate" [dateClass]="dateClass"></mat-multi-year-view>
+   `,
+-  standalone: true,
+   imports: [MatMultiYearView],
+ })
+ class MultiYearViewWithDateClass {
+diff --git a/src/material/datepicker/testing/calendar-harness.spec.ts b/src/material/datepicker/testing/calendar-harness.spec.ts
+index e4963994d7ae..31bab381a5f9 100644
+--- a/src/material/datepicker/testing/calendar-harness.spec.ts
++++ b/src/material/datepicker/testing/calendar-harness.spec.ts
+@@ -329,7 +329,6 @@ describe('MatCalendarHarness', () => {
+       [comparisonEnd]="comparisonEnd"
+       (selectedChange)="rangeChanged($event)"></mat-calendar>
+   `,
+-  standalone: true,
+   imports: [MatNativeDateModule, MatDatepickerModule],
+ })
+ class CalendarHarnessTest {
+diff --git a/src/material/datepicker/testing/date-range-input-harness.spec.ts b/src/material/datepicker/testing/date-range-input-harness.spec.ts
+index fab9074154e0..0877e381e76d 100644
+--- a/src/material/datepicker/testing/date-range-input-harness.spec.ts
++++ b/src/material/datepicker/testing/date-range-input-harness.spec.ts
+@@ -269,7 +269,6 @@ describe('matDateRangeInputHarness', () => {
+       <input matEndDate>
+     </mat-date-range-input>
+   `,
+-  standalone: true,
+   imports: [
+     MatNativeDateModule,
+     MatDateRangeInput,
+diff --git a/src/material/datepicker/testing/datepicker-input-harness.spec.ts b/src/material/datepicker/testing/datepicker-input-harness.spec.ts
+index 178aeeb15ccc..25cca010c24c 100644
+--- a/src/material/datepicker/testing/datepicker-input-harness.spec.ts
++++ b/src/material/datepicker/testing/datepicker-input-harness.spec.ts
+@@ -208,7 +208,6 @@ describe('MatDatepickerInputHarness', () => {
+     <mat-datepicker #picker [touchUi]="touchUi"></mat-datepicker>
+     <input id="no-datepicker" matDatepicker>
+   `,
+-  standalone: true,
+   imports: [MatNativeDateModule, MatDatepickerModule, FormsModule],
+ })
+ class DatepickerInputHarnessTest {
+diff --git a/src/material/datepicker/testing/datepicker-toggle-harness.spec.ts b/src/material/datepicker/testing/datepicker-toggle-harness.spec.ts
+index ab72b88fb2ee..238b643686d2 100644
+--- a/src/material/datepicker/testing/datepicker-toggle-harness.spec.ts
++++ b/src/material/datepicker/testing/datepicker-toggle-harness.spec.ts
+@@ -89,7 +89,6 @@ describe('MatDatepickerToggleHarness', () => {
+ 
+     <mat-datepicker-toggle id="no-calendar"></mat-datepicker-toggle>
+   `,
+-  standalone: true,
+   imports: [MatNativeDateModule, MatDatepickerModule],
+ })
+ class DatepickerToggleHarnessTest {
+diff --git a/src/material/datepicker/year-view.spec.ts b/src/material/datepicker/year-view.spec.ts
+index ce8b3aec18f6..e833fa5153f0 100644
+--- a/src/material/datepicker/year-view.spec.ts
++++ b/src/material/datepicker/year-view.spec.ts
+@@ -397,7 +397,6 @@ describe('MatYearView', () => {
+   template: `
+     <mat-year-view [(activeDate)]="date" [(selected)]="selected"
+                    (monthSelected)="selectedMonth=$event"></mat-year-view>`,
+-  standalone: true,
+   imports: [MatYearView],
+ })
+ class StandardYearView {
+@@ -415,7 +414,6 @@ class StandardYearView {
+       [dateFilter]="dateFilter"
+       [minDate]="minDate"
+       [maxDate]="maxDate"></mat-year-view>`,
+-  standalone: true,
+   imports: [MatYearView],
+ })
+ class YearViewWithDateFilter {
+@@ -435,7 +433,6 @@ class YearViewWithDateFilter {
+ 
+ @Component({
+   template: `<mat-year-view [activeDate]="activeDate" [dateClass]="dateClass"></mat-year-view>`,
+-  standalone: true,
+   imports: [MatYearView],
+ })
+ class YearViewWithDateClass {
+diff --git a/src/material/dialog/dialog.spec.ts b/src/material/dialog/dialog.spec.ts
+index 1523e8ba9892..1aa69b524ff6 100644
+--- a/src/material/dialog/dialog.spec.ts
++++ b/src/material/dialog/dialog.spec.ts
+@@ -1581,7 +1581,6 @@ describe('MatDialog', () => {
+ 
+     it('should set the aria-labelledby attribute to the id of the title under OnPush host', fakeAsync(() => {
+       @Component({
+-        standalone: true,
+         imports: [MatDialogTitle],
+         template: `@if (showTitle()) { <h2 mat-dialog-title>This is the first title</h2> }`,
+       })
+@@ -1592,7 +1591,6 @@ describe('MatDialog', () => {
+       @Component({
+         template: '',
+         selector: 'child',
+-        standalone: true,
+       })
+       class Child {
+         readonly viewContainerRef = inject(ViewContainerRef);
+@@ -1606,7 +1604,6 @@ describe('MatDialog', () => {
+       }
+ 
+       @Component({
+-        standalone: true,
+         imports: [Child],
+         template: `<child></child>`,
+         changeDetection: ChangeDetectionStrategy.OnPush,
+@@ -2113,7 +2110,6 @@ describe('MatDialog with explicit injector provided', () => {
+ 
+ @Directive({
+   selector: 'dir-with-view-container',
+-  standalone: true,
+ })
+ class DirectiveWithViewContainer {
+   viewContainerRef = inject(ViewContainerRef);
+@@ -2131,7 +2127,6 @@ class ComponentWithOnPushViewContainer {
+ @Component({
+   selector: 'arbitrary-component',
+   template: `@if (showChildView) {<dir-with-view-container></dir-with-view-container>}`,
+-  standalone: true,
+   imports: [DirectiveWithViewContainer],
+ })
+ class ComponentWithChildViewContainer {
+@@ -2148,7 +2143,6 @@ class ComponentWithChildViewContainer {
+   selector: 'arbitrary-component-with-template-ref',
+   template: `<ng-template let-data let-dialogRef="dialogRef">
+     Cheese {{localValue}} {{data?.value}}{{setDialogRef(dialogRef)}}</ng-template>`,
+-  standalone: true,
+ })
+ class ComponentWithTemplateRef {
+   localValue: string;
+@@ -2165,7 +2159,6 @@ class ComponentWithTemplateRef {
+ /** Simple component for testing ComponentPortal. */
+ @Component({
+   template: '<p>Pizza</p> <input> <button>Close</button>',
+-  standalone: true,
+ })
+ class PizzaMsg {
+   dialogRef = inject<MatDialogRef<PizzaMsg>>(MatDialogRef);
+@@ -2196,7 +2189,6 @@ class PizzaMsg {
+       <button class="with-submit" type="submit" mat-dialog-close>Should have submit</button>
+     </mat-dialog-actions>
+   `,
+-  standalone: true,
+   imports: [MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose],
+ })
+ class ContentElementDialog {
+@@ -2232,7 +2224,6 @@ class ContentElementDialog {
+       </mat-dialog-actions>
+     </ng-template>
+   `,
+-  standalone: true,
+   imports: [MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose],
+ })
+ class ComponentWithContentElementTemplateRef {
+@@ -2248,7 +2239,6 @@ class ComponentWithContentElementTemplateRef {
+ @Component({
+   template: '',
+   providers: [MatDialog],
+-  standalone: true,
+ })
+ class ComponentThatProvidesMatDialog {
+   dialog = inject(MatDialog);
+@@ -2257,7 +2247,6 @@ class ComponentThatProvidesMatDialog {
+ /** Simple component for testing ComponentPortal. */
+ @Component({
+   template: '',
+-  standalone: true,
+ })
+ class DialogWithInjectedData {
+   data = inject(MAT_DIALOG_DATA);
+@@ -2265,7 +2254,6 @@ class DialogWithInjectedData {
+ 
+ @Component({
+   template: '<p>Pasta</p>',
+-  standalone: true,
+ })
+ class DialogWithoutFocusableElements {}
+ 
+@@ -2278,7 +2266,6 @@ class ShadowDomComponent {}
+ 
+ @Component({
+   template: '',
+-  standalone: true,
+ })
+ class ModuleBoundDialogParentComponent {
+   private _injector = inject(Injector);
+@@ -2301,7 +2288,6 @@ class ModuleBoundDialogService {
+ 
+ @Component({
+   template: '<module-bound-dialog-child-component></module-bound-dialog-child-component>',
+-  standalone: true,
+   imports: [forwardRef(() => ModuleBoundDialogChildComponent)],
+ })
+ class ModuleBoundDialogComponent {}
+@@ -2309,7 +2295,6 @@ class ModuleBoundDialogComponent {}
+ @Component({
+   selector: 'module-bound-dialog-child-component',
+   template: '<p>{{service.name}}</p>',
+-  standalone: true,
+ })
+ class ModuleBoundDialogChildComponent {
+   service = inject(ModuleBoundDialogService);
+diff --git a/src/material/dialog/dialog.zone.spec.ts b/src/material/dialog/dialog.zone.spec.ts
+index 4369949cfbe6..efbbb3496553 100644
+--- a/src/material/dialog/dialog.zone.spec.ts
++++ b/src/material/dialog/dialog.zone.spec.ts
+@@ -73,7 +73,6 @@ describe('MatDialog', () => {
+ 
+ @Directive({
+   selector: 'dir-with-view-container',
+-  standalone: true,
+ })
+ class DirectiveWithViewContainer {
+   viewContainerRef = inject(ViewContainerRef);
+@@ -82,7 +81,6 @@ class DirectiveWithViewContainer {
+ @Component({
+   selector: 'arbitrary-component',
+   template: `@if (showChildView) {<dir-with-view-container></dir-with-view-container>}`,
+-  standalone: true,
+   imports: [DirectiveWithViewContainer],
+ })
+ class ComponentWithChildViewContainer {
+@@ -98,7 +96,6 @@ class ComponentWithChildViewContainer {
+ /** Simple component for testing ComponentPortal. */
+ @Component({
+   template: '<p>Pizza</p> <input> <button>Close</button>',
+-  standalone: true,
+ })
+ class PizzaMsg {
+   dialogRef = inject<MatDialogRef<PizzaMsg>>(MatDialogRef);
+diff --git a/src/material/dialog/testing/dialog-harness.spec.ts b/src/material/dialog/testing/dialog-harness.spec.ts
+index 9a166ebd0037..174529ffc617 100644
+--- a/src/material/dialog/testing/dialog-harness.spec.ts
++++ b/src/material/dialog/testing/dialog-harness.spec.ts
+@@ -122,7 +122,6 @@ describe('MatDialogHarness', () => {
+     </div>
+   </ng-template>
+   `,
+-  standalone: true,
+   imports: [MatDialogTitle, MatDialogContent, MatDialogActions],
+ })
+ class DialogHarnessTest {
+diff --git a/src/material/dialog/testing/dialog-opener.spec.ts b/src/material/dialog/testing/dialog-opener.spec.ts
+index 81666539af4e..8d87ef7d0fed 100644
+--- a/src/material/dialog/testing/dialog-opener.spec.ts
++++ b/src/material/dialog/testing/dialog-opener.spec.ts
+@@ -61,7 +61,6 @@ interface ExampleDialogResult {
+     Data: {{data}}
+     <button id="close-btn" (click)="close()">Close</button>
+   `,
+-  standalone: true,
+ })
+ class ExampleComponent {
+   dialogRef = inject<MatDialogRef<ExampleComponent, ExampleDialogResult>>(MatDialogRef);
+diff --git a/src/material/divider/divider.spec.ts b/src/material/divider/divider.spec.ts
+index 3bb8c08c8aee..1884b94bcb5f 100644
+--- a/src/material/divider/divider.spec.ts
++++ b/src/material/divider/divider.spec.ts
+@@ -63,7 +63,6 @@ describe('MatDivider', () => {
+ 
+ @Component({
+   template: `<mat-divider [vertical]="vertical" [inset]="inset"></mat-divider>`,
+-  standalone: true,
+   imports: [MatDividerModule],
+ })
+ class MatDividerTestComponent {
+diff --git a/src/material/divider/testing/divider-harness.spec.ts b/src/material/divider/testing/divider-harness.spec.ts
+index bb4e8a911bbb..c0b784c62488 100644
+--- a/src/material/divider/testing/divider-harness.spec.ts
++++ b/src/material/divider/testing/divider-harness.spec.ts
+@@ -42,7 +42,6 @@ describe('MatLegacyButtonHarness', () => {
+     <mat-divider></mat-divider>
+     <mat-divider inset vertical></mat-divider>
+   `,
+-  standalone: true,
+   imports: [MatDividerModule],
+ })
+ class DividerHarnessTest {}
+diff --git a/src/material/expansion/accordion.spec.ts b/src/material/expansion/accordion.spec.ts
+index cfbfa993da27..64cb07a80b7d 100644
+--- a/src/material/expansion/accordion.spec.ts
++++ b/src/material/expansion/accordion.spec.ts
+@@ -320,7 +320,6 @@ describe('MatAccordion', () => {
+       </mat-expansion-panel>
+     }
+   </mat-accordion>`,
+-  standalone: true,
+   imports: [MatExpansionModule],
+ })
+ class SetOfItems {
+@@ -349,7 +348,6 @@ class SetOfItems {
+       Content 1
+     </mat-expansion-panel>
+   </mat-accordion>`,
+-  standalone: true,
+   imports: [MatExpansionModule],
+ })
+ class NestedAccordions {
+@@ -369,7 +367,6 @@ class NestedAccordions {
+       </mat-expansion-panel>
+     </mat-expansion-panel>
+   </mat-accordion>`,
+-  standalone: true,
+   imports: [MatExpansionModule],
+ })
+ class NestedPanel {
+@@ -385,7 +382,6 @@ class NestedPanel {
+       <p>Content</p>
+     </mat-expansion-panel>
+   </mat-accordion>`,
+-  standalone: true,
+   imports: [MatExpansionModule],
+ })
+ class AccordionWithHideToggle {
+@@ -400,7 +396,6 @@ class AccordionWithHideToggle {
+       <p>Content</p>
+     </mat-expansion-panel>
+   </mat-accordion>`,
+-  standalone: true,
+   imports: [MatExpansionModule],
+ })
+ class AccordionWithTogglePosition {
+diff --git a/src/material/expansion/expansion.spec.ts b/src/material/expansion/expansion.spec.ts
+index 6931cde188b3..2fedd3188d8a 100644
+--- a/src/material/expansion/expansion.spec.ts
++++ b/src/material/expansion/expansion.spec.ts
+@@ -561,7 +561,6 @@ describe('MatExpansionPanel', () => {
+     <p>Some content</p>
+     <button>I am a button</button>
+   </mat-expansion-panel>`,
+-  standalone: true,
+   imports: [MatExpansionModule],
+ })
+ class PanelWithContent {
+@@ -583,7 +582,6 @@ class PanelWithContent {
+       </div>
+     }
+   `,
+-  standalone: true,
+   imports: [MatExpansionModule],
+ })
+ class PanelWithContentInNgIf {
+@@ -600,7 +598,6 @@ class PanelWithContentInNgIf {
+     Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolores officia, aliquam dicta
+     corrupti maxime voluptate accusamus impedit atque incidunt pariatur.
+   </mat-expansion-panel>`,
+-  standalone: true,
+   imports: [MatExpansionModule],
+ })
+ class PanelWithCustomMargin {
+@@ -617,7 +614,6 @@ class PanelWithCustomMargin {
+       <button>I am a button</button>
+     </ng-template>
+   </mat-expansion-panel>`,
+-  standalone: true,
+   imports: [MatExpansionModule],
+ })
+ class LazyPanelWithContent {
+@@ -633,7 +629,6 @@ class LazyPanelWithContent {
+       <p>Some content</p>
+     </ng-template>
+   </mat-expansion-panel>`,
+-  standalone: true,
+   imports: [MatExpansionModule],
+ })
+ class LazyPanelOpenOnLoad {}
+@@ -643,7 +638,6 @@ class LazyPanelOpenOnLoad {}
+   <mat-expansion-panel [(expanded)]="expanded">
+     <mat-expansion-panel-header>Panel Title</mat-expansion-panel-header>
+   </mat-expansion-panel>`,
+-  standalone: true,
+   imports: [MatExpansionModule],
+ })
+ class PanelWithTwoWayBinding {
+@@ -655,7 +649,6 @@ class PanelWithTwoWayBinding {
+   <mat-expansion-panel>
+     <mat-expansion-panel-header tabindex="7">Panel Title</mat-expansion-panel-header>
+   </mat-expansion-panel>`,
+-  standalone: true,
+   imports: [MatExpansionModule],
+ })
+ class PanelWithHeaderTabindex {}
+@@ -670,7 +663,6 @@ class PanelWithHeaderTabindex {}
+       </mat-expansion-panel>
+     </mat-expansion-panel>
+   `,
+-  standalone: true,
+   imports: [MatExpansionModule],
+ })
+ class NestedLazyPanelWithContent {
+diff --git a/src/material/expansion/testing/expansion-harness.spec.ts b/src/material/expansion/testing/expansion-harness.spec.ts
+index 807462e41b47..cc93787cf573 100644
+--- a/src/material/expansion/testing/expansion-harness.spec.ts
++++ b/src/material/expansion/testing/expansion-harness.spec.ts
+@@ -328,7 +328,6 @@ function getActiveElementTag() {
+ 
+     <div class="test-content-harness">Outside of expansion panel</div>
+   `,
+-  standalone: true,
+   imports: [MatExpansionModule],
+ })
+ class ExpansionHarnessTestComponent {
+diff --git a/src/material/form-field/testing/form-field-harness.spec.ts b/src/material/form-field/testing/form-field-harness.spec.ts
+index b5d7642b1041..dc6a8e34aad2 100644
+--- a/src/material/form-field/testing/form-field-harness.spec.ts
++++ b/src/material/form-field/testing/form-field-harness.spec.ts
+@@ -357,7 +357,6 @@ describe('MatFormFieldHarness', () => {
+       <mat-date-range-picker #rangePicker></mat-date-range-picker>
+     </mat-form-field>
+   `,
+-  standalone: true,
+   imports: [
+     ReactiveFormsModule,
+     MatNativeDateModule,
+diff --git a/src/material/grid-list/testing/grid-list-harness.spec.ts b/src/material/grid-list/testing/grid-list-harness.spec.ts
+index 621f39a86e69..f0ceb23f1918 100644
+--- a/src/material/grid-list/testing/grid-list-harness.spec.ts
++++ b/src/material/grid-list/testing/grid-list-harness.spec.ts
+@@ -182,7 +182,6 @@ describe('MatGridListHarness', () => {
+       </mat-grid-tile>
+     </mat-grid-list>
+   `,
+-  standalone: true,
+   imports: [MatGridListModule],
+ })
+ class GridListHarnessTest {
+diff --git a/src/material/icon/icon.spec.ts b/src/material/icon/icon.spec.ts
+index 84f9971285b9..3649f4aa94ee 100644
+--- a/src/material/icon/icon.spec.ts
++++ b/src/material/icon/icon.spec.ts
+@@ -1464,7 +1464,6 @@ describe('MatIcon with default options', () => {
+ 
+ @Component({
+   template: `<mat-icon>{{iconName}}</mat-icon>`,
+-  standalone: true,
+   imports: [HttpClientTestingModule, MatIconModule],
+ })
+ class IconWithLigature {
+@@ -1473,7 +1472,6 @@ class IconWithLigature {
+ 
+ @Component({
+   template: `<mat-icon [fontIcon]="iconName"></mat-icon>`,
+-  standalone: true,
+   imports: [HttpClientTestingModule, MatIconModule],
+ })
+ class IconWithLigatureByAttribute {
+@@ -1482,7 +1480,6 @@ class IconWithLigatureByAttribute {
+ 
+ @Component({
+   template: `<mat-icon [color]="iconColor">{{iconName}}</mat-icon>`,
+-  standalone: true,
+   imports: [HttpClientTestingModule, MatIconModule],
+ })
+ class IconWithColor {
+@@ -1492,7 +1489,6 @@ class IconWithColor {
+ 
+ @Component({
+   template: `<mat-icon [fontSet]="fontSet" [fontIcon]="fontIcon"></mat-icon>`,
+-  standalone: true,
+   imports: [HttpClientTestingModule, MatIconModule],
+ })
+ class IconWithCustomFontCss {
+@@ -1502,7 +1498,6 @@ class IconWithCustomFontCss {
+ 
+ @Component({
+   template: `<mat-icon [svgIcon]="iconName"></mat-icon>`,
+-  standalone: true,
+   imports: [HttpClientTestingModule, MatIconModule],
+ })
+ class IconFromSvgName {
+@@ -1511,14 +1506,12 @@ class IconFromSvgName {
+ 
+ @Component({
+   template: '<mat-icon aria-hidden="false">face</mat-icon>',
+-  standalone: true,
+   imports: [HttpClientTestingModule, MatIconModule],
+ })
+ class IconWithAriaHiddenFalse {}
+ 
+ @Component({
+   template: `@if (showIcon) {<mat-icon [svgIcon]="iconName">{{iconName}}</mat-icon>}`,
+-  standalone: true,
+   imports: [HttpClientTestingModule, MatIconModule],
+ })
+ class IconWithBindingAndNgIf {
+@@ -1528,7 +1521,6 @@ class IconWithBindingAndNgIf {
+ 
+ @Component({
+   template: `<mat-icon [inline]="inline">{{iconName}}</mat-icon>`,
+-  standalone: true,
+   imports: [HttpClientTestingModule, MatIconModule],
+ })
+ class InlineIcon {
+@@ -1537,7 +1529,6 @@ class InlineIcon {
+ 
+ @Component({
+   template: `<mat-icon [svgIcon]="iconName"><div>Hello</div></mat-icon>`,
+-  standalone: true,
+   imports: [HttpClientTestingModule, MatIconModule],
+ })
+ class SvgIconWithUserContent {
+@@ -1546,7 +1537,6 @@ class SvgIconWithUserContent {
+ 
+ @Component({
+   template: '<mat-icon [svgIcon]="iconName">house</mat-icon>',
+-  standalone: true,
+   imports: [HttpClientTestingModule, MatIconModule],
+ })
+ class IconWithLigatureAndSvgBinding {
+@@ -1555,7 +1545,6 @@ class IconWithLigatureAndSvgBinding {
+ 
+ @Component({
+   template: `<mat-icon></mat-icon>`,
+-  standalone: true,
+   imports: [HttpClientTestingModule, MatIconModule],
+ })
+ class BlankIcon {
+diff --git a/src/material/icon/testing/icon-harness.spec.ts b/src/material/icon/testing/icon-harness.spec.ts
+index 892badea88fc..f966db30c634 100644
+--- a/src/material/icon/testing/icon-harness.spec.ts
++++ b/src/material/icon/testing/icon-harness.spec.ts
+@@ -114,7 +114,6 @@ describe('MatIconHarness', () => {
+     <mat-icon>ligature_icon_with_additional_content <span class="fake-badge">Hello</span></mat-icon>
+     <mat-icon><span>ligature_icon_with_indirect_name</span></mat-icon>
+   `,
+-  standalone: true,
+   imports: [MatIconModule],
+ })
+ class IconHarnessTest {}
+diff --git a/src/material/input/testing/input-harness.spec.ts b/src/material/input/testing/input-harness.spec.ts
+index 49232e69ae02..e546a4561b1d 100644
+--- a/src/material/input/testing/input-harness.spec.ts
++++ b/src/material/input/testing/input-harness.spec.ts
+@@ -279,7 +279,6 @@ describe('MatInputHarness', () => {
+       <input matNativeControl placeholder="Color control" id="colorControl" type="color">
+     </mat-form-field>
+   `,
+-  standalone: true,
+   imports: [MatInputModule, FormsModule],
+ })
+ class InputHarnessTest {
+diff --git a/src/material/input/testing/native-select-harness.spec.ts b/src/material/input/testing/native-select-harness.spec.ts
+index 5e2249fcf580..4bc7b6c0d5a4 100644
+--- a/src/material/input/testing/native-select-harness.spec.ts
++++ b/src/material/input/testing/native-select-harness.spec.ts
+@@ -219,7 +219,6 @@ describe('MatNativeSelectHarness', () => {
+       </select>
+     </mat-form-field>
+   `,
+-  standalone: true,
+   imports: [MatInputModule, FormsModule],
+ })
+ class SelectHarnessTest {
+diff --git a/src/material/list/list.spec.ts b/src/material/list/list.spec.ts
+index 6ba78e3d5508..171467313070 100644
+--- a/src/material/list/list.spec.ts
++++ b/src/material/list/list.spec.ts
+@@ -434,7 +434,6 @@ class BaseTestList {
+       Paprika
+     </a>
+   </mat-list>`,
+-  standalone: true,
+   imports: [MatListModule],
+ })
+ class ListWithOneAnchorItem extends BaseTestList {
+@@ -450,7 +449,6 @@ class ListWithOneAnchorItem extends BaseTestList {
+       Paprika
+     </a>
+   </mat-nav-list>`,
+-  standalone: true,
+   imports: [MatListModule],
+ })
+ class NavListWithOneAnchorItem extends BaseTestList {
+@@ -469,7 +467,6 @@ class NavListWithOneAnchorItem extends BaseTestList {
+       </a>
+     }
+   </mat-nav-list>`,
+-  standalone: true,
+   imports: [MatListModule],
+ })
+ class NavListWithActivatedItem extends BaseTestList {
+@@ -488,7 +485,6 @@ class NavListWithActivatedItem extends BaseTestList {
+       Paprika
+     </button>
+   </mat-action-list>`,
+-  standalone: true,
+   imports: [MatListModule],
+ })
+ class ActionListWithoutType extends BaseTestList {
+@@ -504,7 +500,6 @@ class ActionListWithoutType extends BaseTestList {
+       Paprika
+     </button>
+   </mat-action-list>`,
+-  standalone: true,
+   imports: [MatListModule],
+ })
+ class ActionListWithType extends BaseTestList {
+@@ -518,7 +513,6 @@ class ActionListWithType extends BaseTestList {
+       <button mat-list-item>{{item.name}}</button>
+     }
+   </mat-action-list>`,
+-  standalone: true,
+   imports: [MatListModule],
+ })
+ class ActionListWithDisabledList extends BaseTestList {
+@@ -532,7 +526,6 @@ class ActionListWithDisabledList extends BaseTestList {
+       Paprika
+     </button>
+   </mat-action-list>`,
+-  standalone: true,
+   imports: [MatListModule],
+ })
+ class ActionListWithDisabledItem extends BaseTestList {
+@@ -547,7 +540,6 @@ class ActionListWithDisabledItem extends BaseTestList {
+       Paprika
+     </mat-list-item>
+   </mat-list>`,
+-  standalone: true,
+   imports: [MatListModule],
+ })
+ class ListWithOneItem extends BaseTestList {}
+@@ -563,7 +555,6 @@ class ListWithOneItem extends BaseTestList {}
+       </mat-list-item>
+     }
+   </mat-list>`,
+-  standalone: true,
+   imports: [MatListModule],
+ })
+ class ListWithTwoLineItem extends BaseTestList {}
+@@ -579,7 +570,6 @@ class ListWithTwoLineItem extends BaseTestList {}
+       </mat-list-item>
+     }
+   </mat-list>`,
+-  standalone: true,
+   imports: [MatListModule],
+ })
+ class ListWithThreeLineItem extends BaseTestList {}
+@@ -595,7 +585,6 @@ class ListWithThreeLineItem extends BaseTestList {}
+       Pepper
+     </mat-list-item>
+   </mat-list>`,
+-  standalone: true,
+   imports: [MatListModule],
+ })
+ class ListWithAvatar extends BaseTestList {}
+@@ -610,7 +599,6 @@ class ListWithAvatar extends BaseTestList {}
+       </mat-list-item>
+     }
+   </mat-list>`,
+-  standalone: true,
+   imports: [MatListModule],
+ })
+ class ListWithItemWithCssClass extends BaseTestList {}
+@@ -628,7 +616,6 @@ class ListWithItemWithCssClass extends BaseTestList {}
+       </mat-list-item>
+     }
+   </mat-list>`,
+-  standalone: true,
+   imports: [MatListModule],
+ })
+ class ListWithDynamicNumberOfLines extends BaseTestList {}
+@@ -640,7 +627,6 @@ class ListWithDynamicNumberOfLines extends BaseTestList {}
+       <mat-list-item>{{item.name}}</mat-list-item>
+     }
+   </mat-list>`,
+-  standalone: true,
+   imports: [MatListModule],
+ })
+ class ListWithMultipleItems extends BaseTestList {}
+@@ -652,7 +638,6 @@ class ListWithMultipleItems extends BaseTestList {}
+     <mat-list-item>Two</mat-list-item>
+     <mat-list-item>Three</mat-list-item>
+   </mat-list>`,
+-  standalone: true,
+   imports: [MatListModule],
+ })
+ class ListWithDisabledItems {
+@@ -662,7 +647,6 @@ class ListWithDisabledItems {
+ 
+ @Component({
+   template: `<mat-list-item></mat-list-item>`,
+-  standalone: true,
+   imports: [MatListModule],
+ })
+ class StandaloneListItem {}
+diff --git a/src/material/list/selection-list.spec.ts b/src/material/list/selection-list.spec.ts
+index ec13b1283864..3bff0576717d 100644
+--- a/src/material/list/selection-list.spec.ts
++++ b/src/material/list/selection-list.spec.ts
+@@ -1762,7 +1762,6 @@ describe('MatSelectionList with forms', () => {
+       </mat-list-option>
+     }
+   </mat-selection-list>`,
+-  standalone: true,
+   imports: [MatListModule],
+ })
+ class SelectionListWithListOptions {
+@@ -1791,7 +1790,6 @@ class SelectionListWithListOptions {
+       Drafts
+     </mat-list-option>
+   </mat-selection-list>`,
+-  standalone: true,
+   imports: [MatListModule],
+ })
+ class SelectionListWithCheckboxPositionAfter {}
+@@ -1812,7 +1810,6 @@ class SelectionListWithCheckboxPositionAfter {}
+       Drafts
+     </mat-list-option>
+   </mat-selection-list>`,
+-  standalone: true,
+   imports: [MatListModule],
+ })
+ class SelectionListWithListDisabled {
+@@ -1825,7 +1822,6 @@ class SelectionListWithListDisabled {
+     <mat-list-option [disabled]="disableItem">Item</mat-list-option>
+   </mat-selection-list>
+   `,
+-  standalone: true,
+   imports: [MatListModule],
+ })
+ class SelectionListWithDisabledOption {
+@@ -1840,7 +1836,6 @@ class SelectionListWithDisabledOption {
+     <mat-list-option [selected]="true">Pre-selected - Item #3</mat-list-option>
+     <mat-list-option>Not selected - Item #4</mat-list-option>
+   </mat-selection-list>`,
+-  standalone: true,
+   imports: [MatListModule],
+ })
+ class SelectionListWithSelectedOption {}
+@@ -1851,7 +1846,6 @@ class SelectionListWithSelectedOption {}
+     <mat-list-option>Not selected - Item #1</mat-list-option>
+     <mat-list-option [selected]="true">Pre-selected - Item #2</mat-list-option>
+   </mat-selection-list>`,
+-  standalone: true,
+   imports: [MatListModule],
+ })
+ class SingleSelectionListWithSelectedOption {}
+@@ -1861,7 +1855,6 @@ class SingleSelectionListWithSelectedOption {}
+   <mat-selection-list>
+     <mat-list-option [selected]="true" [value]="itemValue">Item</mat-list-option>
+   </mat-selection-list>`,
+-  standalone: true,
+   imports: [MatListModule],
+ })
+ class SelectionListWithSelectedOptionAndValue {
+@@ -1875,7 +1868,6 @@ class SelectionListWithSelectedOptionAndValue {
+       Inbox
+     </mat-list-option>
+   </mat-selection-list>`,
+-  standalone: true,
+   imports: [MatListModule],
+ })
+ class SelectionListWithOnlyOneOption {}
+@@ -1890,7 +1882,6 @@ class SelectionListWithOnlyOneOption {}
+         <mat-list-option [value]="option">{{option}}</mat-list-option>
+       }
+     </mat-selection-list>`,
+-  standalone: true,
+   imports: [MatListModule, FormsModule, ReactiveFormsModule],
+ })
+ class SelectionListWithModel {
+@@ -1913,7 +1904,6 @@ class SelectionListWithModel {
+       </mat-selection-list>
+     }
+   `,
+-  standalone: true,
+   imports: [MatListModule, FormsModule, ReactiveFormsModule],
+ })
+ class SelectionListWithFormControl {
+@@ -1928,7 +1918,6 @@ class SelectionListWithFormControl {
+       <mat-list-option value="opt1">Option 1</mat-list-option>
+       <mat-list-option value="opt2" selected>Option 2</mat-list-option>
+     </mat-selection-list>`,
+-  standalone: true,
+   imports: [MatListModule, FormsModule, ReactiveFormsModule],
+ })
+ class SelectionListWithPreselectedOption {
+@@ -1941,7 +1930,6 @@ class SelectionListWithPreselectedOption {
+       <mat-list-option value="opt1">Option 1</mat-list-option>
+       <mat-list-option value="opt2" selected>Option 2</mat-list-option>
+     </mat-selection-list>`,
+-  standalone: true,
+   imports: [MatListModule, FormsModule, ReactiveFormsModule],
+ })
+ class SelectionListWithPreselectedOptionAndModel {
+@@ -1957,7 +1945,6 @@ class SelectionListWithPreselectedOptionAndModel {
+       }
+     </mat-selection-list>
+   `,
+-  standalone: true,
+   imports: [MatListModule, FormsModule, ReactiveFormsModule],
+ })
+ class SelectionListWithPreselectedFormControlOnPush {
+@@ -1972,7 +1959,6 @@ class SelectionListWithPreselectedFormControlOnPush {
+         <mat-list-option [value]="option">{{option.label}}</mat-list-option>
+       }
+     </mat-selection-list>`,
+-  standalone: true,
+   imports: [MatListModule, FormsModule, ReactiveFormsModule],
+ })
+ class SelectionListWithCustomComparator {
+@@ -1995,7 +1981,6 @@ class SelectionListWithCustomComparator {
+       </mat-list-option>
+     </mat-selection-list>
+   `,
+-  standalone: true,
+   imports: [MatListModule],
+ })
+ class SelectionListWithAvatar {
+@@ -2011,7 +1996,6 @@ class SelectionListWithAvatar {
+       </mat-list-option>
+     </mat-selection-list>
+   `,
+-  standalone: true,
+   imports: [MatListModule],
+ })
+ class SelectionListWithIcon {
+@@ -2027,7 +2011,6 @@ class SelectionListWithIcon {
+         <mat-list-option [value]="2">Two</mat-list-option>
+       }
+     </mat-selection-list>`,
+-  standalone: true,
+   imports: [MatListModule],
+ })
+ class SelectionListWithIndirectChildOptions {
+@@ -2040,7 +2023,6 @@ class SelectionListWithIndirectChildOptions {
+     <mat-list-option [(selected)]="selected">Item</mat-list-option>
+   </mat-selection-list>
+ `,
+-  standalone: true,
+   imports: [MatListModule],
+ })
+ class ListOptionWithTwoWayBinding {
+diff --git a/src/material/list/testing/list-harness.spec.ts b/src/material/list/testing/list-harness.spec.ts
+index 16ee4d12e22c..d39f4d650588 100644
+--- a/src/material/list/testing/list-harness.spec.ts
++++ b/src/material/list/testing/list-harness.spec.ts
+@@ -541,7 +541,6 @@ describe('MatSelectionListHarness', () => {
+ 
+       <mat-list class="test-empty"></mat-list>
+   `,
+-  standalone: true,
+   imports: [MatListModule],
+ })
+ class ListHarnessTest {
+@@ -582,7 +581,6 @@ class ListHarnessTest {
+ 
+       <mat-action-list class="test-empty"></mat-action-list>
+   `,
+-  standalone: true,
+   imports: [MatListModule],
+ })
+ class ActionListHarnessTest {
+@@ -625,7 +623,6 @@ class ActionListHarnessTest {
+ 
+       <mat-nav-list class="test-empty"></mat-nav-list>
+   `,
+-  standalone: true,
+   imports: [MatListModule],
+ })
+ class NavListHarnessTest {
+@@ -669,7 +666,6 @@ class NavListHarnessTest {
+ 
+     <mat-selection-list class="test-empty" disabled></mat-selection-list>
+   `,
+-  standalone: true,
+   imports: [MatListModule],
+ })
+ class SelectionListHarnessTest {
+diff --git a/src/material/menu/testing/menu-harness.spec.ts b/src/material/menu/testing/menu-harness.spec.ts
+index 3178dec315cd..3238f0b85b3d 100644
+--- a/src/material/menu/testing/menu-harness.spec.ts
++++ b/src/material/menu/testing/menu-harness.spec.ts
+@@ -163,7 +163,6 @@ describe('MatMenuHarness', () => {
+         <menu mat-menu-item>Account</menu>
+       </mat-menu>
+   `,
+-  standalone: true,
+   imports: [MatMenuModule],
+ })
+ class MenuHarnessTest {}
+@@ -190,7 +189,6 @@ class MenuHarnessTest {}
+         <button mat-menu-item (click)="lastClickedLeaf = 3">Leaf Item 3</button>
+       </mat-menu>
+   `,
+-  standalone: true,
+   imports: [MatMenuModule],
+ })
+ class NestedMenuHarnessTest {
+diff --git a/src/material/paginator/testing/paginator-harness.spec.ts b/src/material/paginator/testing/paginator-harness.spec.ts
+index 3f728f9ab474..1b77d893f510 100644
+--- a/src/material/paginator/testing/paginator-harness.spec.ts
++++ b/src/material/paginator/testing/paginator-harness.spec.ts
+@@ -137,7 +137,6 @@ describe('MatPaginatorHarness', () => {
+       [pageIndex]="pageIndex()">
+     </mat-paginator>
+   `,
+-  standalone: true,
+   imports: [MatPaginatorModule],
+ })
+ class PaginatorHarnessTest {
+diff --git a/src/material/progress-bar/progress-bar.spec.ts b/src/material/progress-bar/progress-bar.spec.ts
+index 265b6811e64f..0ef8a0fd48ea 100644
+--- a/src/material/progress-bar/progress-bar.spec.ts
++++ b/src/material/progress-bar/progress-bar.spec.ts
+@@ -336,14 +336,12 @@ describe('MatProgressBar', () => {
+ 
+ @Component({
+   template: '<mat-progress-bar></mat-progress-bar>',
+-  standalone: true,
+   imports: [MatProgressBar],
+ })
+ class BasicProgressBar {}
+ 
+ @Component({
+   template: '<mat-progress-bar mode="buffer"></mat-progress-bar>',
+-  standalone: true,
+   imports: [MatProgressBar],
+ })
+ class BufferProgressBar {}
+diff --git a/src/material/progress-bar/testing/progress-bar-harness.spec.ts b/src/material/progress-bar/testing/progress-bar-harness.spec.ts
+index 2d20a2666ab9..3415805f14ac 100644
+--- a/src/material/progress-bar/testing/progress-bar-harness.spec.ts
++++ b/src/material/progress-bar/testing/progress-bar-harness.spec.ts
+@@ -44,7 +44,6 @@ describe('MatProgressBarHarness', () => {
+     <mat-progress-bar mode="determinate" [value]="value()"></mat-progress-bar>
+     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+   `,
+-  standalone: true,
+   imports: [MatProgressBarModule],
+ })
+ class ProgressBarHarnessTest {
+diff --git a/src/material/progress-spinner/progress-spinner.spec.ts b/src/material/progress-spinner/progress-spinner.spec.ts
+index 60a337d3a248..0bd90174d129 100644
+--- a/src/material/progress-spinner/progress-spinner.spec.ts
++++ b/src/material/progress-spinner/progress-spinner.spec.ts
+@@ -395,14 +395,12 @@ describe('MatProgressSpinner', () => {
+ 
+ @Component({
+   template: '<mat-progress-spinner></mat-progress-spinner>',
+-  standalone: true,
+   imports: [MatProgressSpinnerModule],
+ })
+ class BasicProgressSpinner {}
+ 
+ @Component({
+   template: '<mat-progress-spinner [strokeWidth]="strokeWidth"></mat-progress-spinner>',
+-  standalone: true,
+   imports: [MatProgressSpinnerModule],
+ })
+ class ProgressSpinnerCustomStrokeWidth {
+@@ -411,7 +409,6 @@ class ProgressSpinnerCustomStrokeWidth {
+ 
+ @Component({
+   template: '<mat-progress-spinner [diameter]="diameter"></mat-progress-spinner>',
+-  standalone: true,
+   imports: [MatProgressSpinnerModule],
+ })
+ class ProgressSpinnerCustomDiameter {
+@@ -420,14 +417,12 @@ class ProgressSpinnerCustomDiameter {
+ 
+ @Component({
+   template: '<mat-progress-spinner mode="indeterminate"></mat-progress-spinner>',
+-  standalone: true,
+   imports: [MatProgressSpinnerModule],
+ })
+ class IndeterminateProgressSpinner {}
+ 
+ @Component({
+   template: '<mat-progress-spinner [value]="value()" [mode]="mode()"></mat-progress-spinner>',
+-  standalone: true,
+   imports: [MatProgressSpinnerModule],
+ })
+ class ProgressSpinnerWithValueAndBoundMode {
+@@ -438,7 +433,6 @@ class ProgressSpinnerWithValueAndBoundMode {
+ @Component({
+   template: `
+     <mat-spinner [color]="color()"></mat-spinner>`,
+-  standalone: true,
+   imports: [MatProgressSpinnerModule],
+ })
+ class SpinnerWithColor {
+@@ -448,7 +442,6 @@ class SpinnerWithColor {
+ @Component({
+   template: `
+     <mat-progress-spinner value="50" [color]="color()"></mat-progress-spinner>`,
+-  standalone: true,
+   imports: [MatProgressSpinnerModule],
+ })
+ class ProgressSpinnerWithColor {
+@@ -459,7 +452,6 @@ class ProgressSpinnerWithColor {
+   template: `
+     <mat-progress-spinner value="25" diameter="37" strokeWidth="11"></mat-progress-spinner>
+   `,
+-  standalone: true,
+   imports: [MatProgressSpinnerModule],
+ })
+ class ProgressSpinnerWithStringValues {}
+@@ -469,7 +461,6 @@ class ProgressSpinnerWithStringValues {}
+     <mat-progress-spinner mode="indeterminate" [diameter]="diameter"></mat-progress-spinner>
+   `,
+   encapsulation: ViewEncapsulation.ShadowDom,
+-  standalone: true,
+   imports: [MatProgressSpinnerModule],
+ })
+ class IndeterminateSpinnerInShadowDom {
+@@ -485,7 +476,6 @@ class IndeterminateSpinnerInShadowDom {
+     }
+   `,
+   encapsulation: ViewEncapsulation.ShadowDom,
+-  standalone: true,
+   imports: [MatProgressSpinnerModule],
+ })
+ class IndeterminateSpinnerInShadowDomWithNgIf {
+@@ -497,7 +487,6 @@ class IndeterminateSpinnerInShadowDomWithNgIf {
+ 
+ @Component({
+   template: '<mat-spinner mode="determinate"></mat-spinner>',
+-  standalone: true,
+   imports: [MatProgressSpinnerModule],
+ })
+ class SpinnerWithMode {}
+diff --git a/src/material/progress-spinner/testing/progress-spinner-harness.spec.ts b/src/material/progress-spinner/testing/progress-spinner-harness.spec.ts
+index bac8d2eb0d60..5ddd5d1ce558 100644
+--- a/src/material/progress-spinner/testing/progress-spinner-harness.spec.ts
++++ b/src/material/progress-spinner/testing/progress-spinner-harness.spec.ts
+@@ -48,7 +48,6 @@ describe('MatProgressSpinnerHarness', () => {
+     <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+     <mat-spinner></mat-spinner>
+   `,
+-  standalone: true,
+   imports: [MatProgressSpinnerModule],
+ })
+ class ProgressSpinnerHarnessTest {
+diff --git a/src/material/radio/radio.spec.ts b/src/material/radio/radio.spec.ts
+index a1c8f235dad9..0d2e0ccb5af4 100644
+--- a/src/material/radio/radio.spec.ts
++++ b/src/material/radio/radio.spec.ts
+@@ -1089,7 +1089,6 @@ describe('MatRadioDefaultOverrides', () => {
+     </mat-radio-button>
+   </mat-radio-group>
+   `,
+-  standalone: true,
+   imports: [MatRadioModule, FormsModule, ReactiveFormsModule],
+ })
+ class RadiosInsideRadioGroup {
+@@ -1112,7 +1111,6 @@ class RadiosInsideRadioGroup {
+     <mat-radio-button value="leaf" checked>Bulbasaur</mat-radio-button>
+   </mat-radio-group>
+   `,
+-  standalone: true,
+   imports: [MatRadioModule, FormsModule, ReactiveFormsModule],
+ })
+ class RadiosInsidePreCheckedRadioGroup {}
+@@ -1138,7 +1136,6 @@ class RadiosInsidePreCheckedRadioGroup {}
+     <mat-radio-button name="fruit" value="raspberry">Raspberry</mat-radio-button>
+     <mat-radio-button id="nameless" value="no-name">No name</mat-radio-button>
+   `,
+-  standalone: true,
+   imports: [MatRadioModule, FormsModule, ReactiveFormsModule],
+ })
+ class StandaloneRadioButtons {
+@@ -1155,7 +1152,6 @@ class StandaloneRadioButtons {
+     }
+   </mat-radio-group>
+   `,
+-  standalone: true,
+   imports: [MatRadioModule, FormsModule, ReactiveFormsModule],
+ })
+ class RadioGroupWithNgModel {
+@@ -1174,7 +1170,6 @@ class RadioGroupWithNgModel {
+     <mat-radio-button
+       [disabled]="disabled"
+       [disabledInteractive]="disabledInteractive">One</mat-radio-button>`,
+-  standalone: true,
+   imports: [MatRadioModule, FormsModule, ReactiveFormsModule],
+ })
+ class DisableableRadioButton {
+@@ -1191,7 +1186,6 @@ class DisableableRadioButton {
+       <mat-radio-button value="2">Two</mat-radio-button>
+     </mat-radio-group>
+   `,
+-  standalone: true,
+   imports: [MatRadioModule, FormsModule, ReactiveFormsModule],
+ })
+ class RadioGroupWithFormControl {
+@@ -1201,7 +1195,6 @@ class RadioGroupWithFormControl {
+ 
+ @Component({
+   template: `<mat-radio-button [disabled]="disabled" [tabIndex]="tabIndex"></mat-radio-button>`,
+-  standalone: true,
+   imports: [MatRadioModule, FormsModule, ReactiveFormsModule],
+ })
+ class FocusableRadioButton {
+@@ -1214,7 +1207,6 @@ class FocusableRadioButton {
+   template: `
+     <div><ng-content></ng-content></div>
+   `,
+-  standalone: true,
+   imports: [MatRadioModule, FormsModule, ReactiveFormsModule],
+ })
+ class TranscludingWrapper {}
+@@ -1229,7 +1221,6 @@ class TranscludingWrapper {}
+     }
+   </mat-radio-group>
+   `,
+-  standalone: true,
+   imports: [MatRadioModule, FormsModule, ReactiveFormsModule, TranscludingWrapper],
+ })
+ class InterleavedRadioGroup {
+@@ -1243,21 +1234,18 @@ class InterleavedRadioGroup {
+ 
+ @Component({
+   template: `<mat-radio-button tabindex="5"></mat-radio-button>`,
+-  standalone: true,
+   imports: [MatRadioModule, FormsModule, ReactiveFormsModule],
+ })
+ class RadioButtonWithPredefinedTabindex {}
+ 
+ @Component({
+   template: `<mat-radio-button></mat-radio-button>`,
+-  standalone: true,
+   imports: [MatRadioModule, FormsModule],
+ })
+ class DefaultRadioButton {}
+ 
+ @Component({
+   template: `<mat-radio-button color="warn"></mat-radio-button>`,
+-  standalone: true,
+   imports: [MatRadioModule, FormsModule],
+ })
+ class RadioButtonWithColorBinding {}
+@@ -1268,7 +1256,6 @@ class RadioButtonWithColorBinding {}
+       aria-label="Radio button"
+       aria-describedby="something"
+       aria-labelledby="something-else"></mat-radio-button>`,
+-  standalone: true,
+   imports: [MatRadioModule, FormsModule, ReactiveFormsModule],
+ })
+ class RadioButtonWithPredefinedAriaAttributes {}
+@@ -1289,7 +1276,6 @@ class RadioButtonWithPredefinedAriaAttributes {}
+         }
+     </mat-radio-group>
+   `,
+-  standalone: true,
+   imports: [MatRadioModule, FormsModule, ReactiveFormsModule],
+ })
+ class PreselectedRadioWithStaticValueAndNgIf {
+diff --git a/src/material/radio/testing/radio-harness.spec.ts b/src/material/radio/testing/radio-harness.spec.ts
+index 0a448b8a2ddc..929a1f5b8537 100644
+--- a/src/material/radio/testing/radio-harness.spec.ts
++++ b/src/material/radio/testing/radio-harness.spec.ts
+@@ -312,7 +312,6 @@ describe('radio harness', () => {
+       <mat-radio-button [value]="false" [name]="thirdGroupButtonName"></mat-radio-button>
+     </mat-radio-group>
+   `,
+-  standalone: true,
+   imports: [MatRadioModule, ReactiveFormsModule],
+ })
+ class MultipleRadioButtonsHarnessTest {
+diff --git a/src/material/select/testing/select-harness.spec.ts b/src/material/select/testing/select-harness.spec.ts
+index b08b9a8d992e..01a48d30617d 100644
+--- a/src/material/select/testing/select-harness.spec.ts
++++ b/src/material/select/testing/select-harness.spec.ts
+@@ -306,7 +306,6 @@ describe('MatSelectHarness', () => {
+       </mat-select>
+     </mat-form-field>
+   `,
+-  standalone: true,
+   imports: [MatSelectModule, MatFormFieldModule, ReactiveFormsModule],
+ })
+ class SelectHarnessTest {
+diff --git a/src/material/sidenav/drawer.spec.ts b/src/material/sidenav/drawer.spec.ts
+index 71cbbc619868..144207131276 100644
+--- a/src/material/sidenav/drawer.spec.ts
++++ b/src/material/sidenav/drawer.spec.ts
+@@ -1207,7 +1207,6 @@ describe('MatDrawerContainer', () => {
+ /** Test component that contains an MatDrawerContainer but no MatDrawer. */
+ @Component({
+   template: `<mat-drawer-container></mat-drawer-container>`,
+-  standalone: true,
+   imports: [MatSidenavModule, A11yModule],
+ })
+ class DrawerContainerNoDrawerTestApp {}
+@@ -1219,7 +1218,6 @@ class DrawerContainerNoDrawerTestApp {}
+       <mat-drawer position="start"></mat-drawer>
+       <mat-drawer position="end"></mat-drawer>
+     </mat-drawer-container>`,
+-  standalone: true,
+   imports: [MatSidenavModule, A11yModule],
+ })
+ class DrawerContainerTwoDrawerTestApp {
+@@ -1248,7 +1246,6 @@ class DrawerContainerTwoDrawerTestApp {
+         <circle cx="50" cy="50" r="50"/>
+       </svg>
+     </mat-drawer-container>`,
+-  standalone: true,
+   imports: [MatSidenavModule, A11yModule],
+ })
+ class BasicTestApp {
+@@ -1294,7 +1291,6 @@ class BasicTestApp {
+         Closed Drawer.
+       </mat-drawer>
+     </mat-drawer-container>`,
+-  standalone: true,
+   imports: [MatSidenavModule, A11yModule],
+ })
+ class DrawerSetToOpenedFalse {}
+@@ -1306,7 +1302,6 @@ class DrawerSetToOpenedFalse {}
+         Closed Drawer.
+       </mat-drawer>
+     </mat-drawer-container>`,
+-  standalone: true,
+   imports: [MatSidenavModule, A11yModule],
+ })
+ class DrawerSetToOpenedTrue {
+@@ -1320,7 +1315,6 @@ class DrawerSetToOpenedTrue {
+         Closed Drawer.
+       </mat-drawer>
+     </mat-drawer-container>`,
+-  standalone: true,
+   imports: [MatSidenavModule, A11yModule],
+ })
+ class DrawerOpenBinding {
+@@ -1333,7 +1327,6 @@ class DrawerOpenBinding {
+       <mat-drawer #drawer1 [position]="drawer1Position"></mat-drawer>
+       <mat-drawer #drawer2 [position]="drawer2Position"></mat-drawer>
+     </mat-drawer-container>`,
+-  standalone: true,
+   imports: [MatSidenavModule, A11yModule],
+ })
+ class DrawerDynamicPosition {
+@@ -1351,7 +1344,6 @@ class DrawerDynamicPosition {
+       </mat-drawer>
+       <input type="text" class="input2"/>
+     </mat-drawer-container>`,
+-  standalone: true,
+   imports: [MatSidenavModule, A11yModule],
+ })
+ class DrawerWithFocusableElements {
+@@ -1366,7 +1358,6 @@ class DrawerWithFocusableElements {
+         <button disabled>Not focusable</button>
+       </mat-drawer>
+     </mat-drawer-container>`,
+-  standalone: true,
+   imports: [MatSidenavModule, A11yModule],
+ })
+ class DrawerWithoutFocusableElements {}
+@@ -1379,7 +1370,6 @@ class DrawerWithoutFocusableElements {}
+       }
+     </mat-drawer-container>
+   `,
+-  standalone: true,
+   imports: [MatSidenavModule, A11yModule],
+ })
+ class DrawerDelayed {
+@@ -1394,7 +1384,6 @@ class DrawerDelayed {
+         <mat-drawer [mode]="mode" style="width:100px"></mat-drawer>
+       }
+     </mat-drawer-container>`,
+-  standalone: true,
+   imports: [MatSidenavModule, A11yModule],
+ })
+ class DrawerContainerStateChangesTestApp {
+@@ -1414,7 +1403,6 @@ class DrawerContainerStateChangesTestApp {
+         <div [style.width.px]="fillerWidth" style="height: 200px; background: red;"></div>
+       </mat-drawer>
+     </mat-drawer-container>`,
+-  standalone: true,
+   imports: [MatSidenavModule, A11yModule],
+ })
+ class AutosizeDrawer {
+@@ -1430,7 +1418,6 @@ class AutosizeDrawer {
+       <mat-drawer-content>Content</mat-drawer-content>
+     </mat-drawer-container>
+   `,
+-  standalone: true,
+   imports: [MatSidenavModule, A11yModule],
+ })
+ class DrawerContainerWithContent {
+@@ -1446,7 +1433,6 @@ class DrawerContainerWithContent {
+         <mat-drawer #drawer>Drawer</mat-drawer>
+       }
+     </mat-drawer-container>`,
+-  standalone: true,
+   imports: [MatSidenavModule, A11yModule],
+ })
+ class IndirectDescendantDrawer {
+@@ -1465,7 +1451,6 @@ class IndirectDescendantDrawer {
+       </mat-drawer-content>
+     </mat-drawer-container>
+   `,
+-  standalone: true,
+   imports: [MatSidenavModule, A11yModule],
+ })
+ class NestedDrawerContainers {
+diff --git a/src/material/sidenav/sidenav.spec.ts b/src/material/sidenav/sidenav.spec.ts
+index 93cc5b9599ca..d325d20a51ad 100644
+--- a/src/material/sidenav/sidenav.spec.ts
++++ b/src/material/sidenav/sidenav.spec.ts
+@@ -101,7 +101,6 @@ describe('MatSidenav', () => {
+         Some content.
+       </mat-sidenav-content>
+     </mat-sidenav-container>`,
+-  standalone: true,
+   imports: [MatSidenavModule],
+ })
+ class SidenavWithFixedPosition {
+@@ -120,7 +119,6 @@ class SidenavWithFixedPosition {
+       }
+       <mat-sidenav-content>Some content.</mat-sidenav-content>
+     </mat-sidenav-container>`,
+-  standalone: true,
+   imports: [MatSidenavModule],
+ })
+ class IndirectDescendantSidenav {
+@@ -139,7 +137,6 @@ class IndirectDescendantSidenav {
+       </mat-sidenav-content>
+     </mat-sidenav-container>
+   `,
+-  standalone: true,
+   imports: [MatSidenavModule],
+ })
+ class NestedSidenavContainers {
+diff --git a/src/material/sidenav/testing/sidenav-harness.spec.ts b/src/material/sidenav/testing/sidenav-harness.spec.ts
+index 33d5db19b037..14d42b2761e5 100644
+--- a/src/material/sidenav/testing/sidenav-harness.spec.ts
++++ b/src/material/sidenav/testing/sidenav-harness.spec.ts
+@@ -176,7 +176,6 @@ describe('MatSidenavHarness', () => {
+       <mat-drawer-content>Content</mat-drawer-content>
+     </mat-drawer-container>
+   `,
+-  standalone: true,
+   imports: [MatSidenavModule],
+ })
+ class DrawerHarnessTest {
+@@ -196,7 +195,6 @@ class DrawerHarnessTest {
+       <mat-sidenav-content>Content</mat-sidenav-content>
+     </mat-sidenav-container>
+   `,
+-  standalone: true,
+   imports: [MatSidenavModule],
+ })
+ class SidenavHarnessTest {}
+diff --git a/src/material/slide-toggle/slide-toggle.spec.ts b/src/material/slide-toggle/slide-toggle.spec.ts
+index 8a775f2f66f8..facc0f15038d 100644
+--- a/src/material/slide-toggle/slide-toggle.spec.ts
++++ b/src/material/slide-toggle/slide-toggle.spec.ts
+@@ -883,7 +883,6 @@ describe('MatSlideToggle with forms', () => {
+       (click)="onSlideClick($event)">
+       <span>Test Slide Toggle</span>
+     </mat-slide-toggle>`,
+-  standalone: true,
+   imports: [MatSlideToggleModule, BidiModule],
+ })
+ class SlideToggleBasic {
+@@ -918,7 +917,6 @@ class SlideToggleBasic {
+       <mat-slide-toggle name="slide" ngModel [required]="isRequired">Required</mat-slide-toggle>
+       <button type="submit"></button>
+     </form>`,
+-  standalone: true,
+   imports: [MatSlideToggleModule, FormsModule, ReactiveFormsModule],
+ })
+ class SlideToggleWithForm {
+@@ -929,7 +927,6 @@ class SlideToggleWithForm {
+ @Component({
+   template: `<mat-slide-toggle [(ngModel)]="modelValue" [disabled]="isDisabled"
+                                [checked]="isChecked"></mat-slide-toggle>`,
+-  standalone: true,
+   imports: [MatSlideToggleModule, FormsModule, ReactiveFormsModule],
+ })
+ class SlideToggleWithModel {
+@@ -940,7 +937,6 @@ class SlideToggleWithModel {
+ 
+ @Component({
+   template: `<mat-slide-toggle checked disabled>Label</mat-slide-toggle>`,
+-  standalone: true,
+   imports: [MatSlideToggleModule, BidiModule],
+ })
+ class SlideToggleCheckedAndDisabledAttr {}
+@@ -950,7 +946,6 @@ class SlideToggleCheckedAndDisabledAttr {}
+     <mat-slide-toggle [formControl]="formControl">
+       <span>Test Slide Toggle</span>
+     </mat-slide-toggle>`,
+-  standalone: true,
+   imports: [MatSlideToggleModule, FormsModule, ReactiveFormsModule],
+ })
+ class SlideToggleWithFormControl {
+@@ -959,7 +954,6 @@ class SlideToggleWithFormControl {
+ 
+ @Component({
+   template: `<mat-slide-toggle tabindex="5" [disabled]="disabled"></mat-slide-toggle>`,
+-  standalone: true,
+   imports: [MatSlideToggleModule, BidiModule],
+ })
+ class SlideToggleWithTabindexAttr {
+@@ -968,7 +962,6 @@ class SlideToggleWithTabindexAttr {
+ 
+ @Component({
+   template: `<mat-slide-toggle>{{label}}</mat-slide-toggle>`,
+-  standalone: true,
+   imports: [MatSlideToggleModule, BidiModule],
+ })
+ class SlideToggleWithoutLabel {
+@@ -977,7 +970,6 @@ class SlideToggleWithoutLabel {
+ 
+ @Component({
+   template: `<mat-slide-toggle [(ngModel)]="checked" (change)="onChange()"></mat-slide-toggle>`,
+-  standalone: true,
+   imports: [MatSlideToggleModule, FormsModule, ReactiveFormsModule],
+ })
+ class SlideToggleWithModelAndChangeEvent {
+@@ -987,7 +979,6 @@ class SlideToggleWithModelAndChangeEvent {
+ 
+ @Component({
+   template: `<mat-slide-toggle><some-text></some-text></mat-slide-toggle>`,
+-  standalone: true,
+   imports: [MatSlideToggleModule, BidiModule],
+ })
+ class SlideToggleProjectedLabel {}
+@@ -995,7 +986,6 @@ class SlideToggleProjectedLabel {}
+ @Component({
+   selector: 'some-text',
+   template: `<span>{{text}}</span>`,
+-  standalone: true,
+   imports: [MatSlideToggleModule, BidiModule],
+ })
+ class TextBindingComponent {
+@@ -1006,7 +996,6 @@ class TextBindingComponent {
+   template: `
+     <mat-slide-toggle aria-label="Slide toggle" aria-labelledby="something"></mat-slide-toggle>
+   `,
+-  standalone: true,
+   imports: [MatSlideToggleModule, BidiModule],
+ })
+ class SlideToggleWithStaticAriaAttributes {}
+diff --git a/src/material/slide-toggle/testing/slide-toggle-harness.spec.ts b/src/material/slide-toggle/testing/slide-toggle-harness.spec.ts
+index d1aabd8a8819..aa2e6e64220d 100644
+--- a/src/material/slide-toggle/testing/slide-toggle-harness.spec.ts
++++ b/src/material/slide-toggle/testing/slide-toggle-harness.spec.ts
+@@ -190,7 +190,6 @@ describe('MatSlideToggleHarness', () => {
+       </mat-slide-toggle>
+       <span id="second-label">Second slide-toggle</span>
+   `,
+-  standalone: true,
+   imports: [MatSlideToggleModule, ReactiveFormsModule],
+ })
+ class SlideToggleHarnessTest {
+diff --git a/src/material/slider/testing/slider-harness.spec.ts b/src/material/slider/testing/slider-harness.spec.ts
+index 4237f95b8f43..6a264b827b2f 100644
+--- a/src/material/slider/testing/slider-harness.spec.ts
++++ b/src/material/slider/testing/slider-harness.spec.ts
+@@ -202,7 +202,6 @@ describe('MatSliderHarness', () => {
+       <input [value]="rangeSliderEndValue" matSliderEndThumb>
+     </mat-slider>
+   `,
+-  standalone: true,
+   imports: [MatSliderModule],
+ })
+ class SliderHarnessTest {
+diff --git a/src/material/snack-bar/snack-bar.spec.ts b/src/material/snack-bar/snack-bar.spec.ts
+index 28a54c2fd5bb..17a6b72b5915 100644
+--- a/src/material/snack-bar/snack-bar.spec.ts
++++ b/src/material/snack-bar/snack-bar.spec.ts
+@@ -1057,7 +1057,6 @@ describe('MatSnackBar Positioning', () => {
+ 
+ @Directive({
+   selector: 'dir-with-view-container',
+-  standalone: true,
+ })
+ class DirectiveWithViewContainer {
+   viewContainerRef = inject(ViewContainerRef);
+@@ -1066,7 +1065,6 @@ class DirectiveWithViewContainer {
+ @Component({
+   selector: 'arbitrary-component',
+   template: `@if (childComponentExists()) {<dir-with-view-container></dir-with-view-container>}`,
+-  standalone: true,
+   imports: [DirectiveWithViewContainer],
+   changeDetection: ChangeDetectionStrategy.OnPush,
+ })
+@@ -1087,7 +1085,6 @@ class ComponentWithChildViewContainer {
+       Fries {{localValue}} {{data?.value}}
+     </ng-template>
+   `,
+-  standalone: true,
+ })
+ class ComponentWithTemplateRef {
+   @ViewChild(TemplateRef) templateRef: TemplateRef<any>;
+@@ -1097,7 +1094,6 @@ class ComponentWithTemplateRef {
+ /** Simple component for testing ComponentPortal. */
+ @Component({
+   template: '<p>Burritos are on the way.</p>',
+-  standalone: true,
+ })
+ class BurritosNotification {
+   snackBarRef = inject<MatSnackBarRef<BurritosNotification>>(MatSnackBarRef);
+@@ -1107,7 +1103,6 @@ class BurritosNotification {
+ @Component({
+   template: '',
+   providers: [MatSnackBar],
+-  standalone: true,
+ })
+ class ComponentThatProvidesMatSnackBar {
+   snackBar = inject(MatSnackBar);
+diff --git a/src/material/snack-bar/snack-bar.zone.spec.ts b/src/material/snack-bar/snack-bar.zone.spec.ts
+index 403cdf9be9e9..1db0ee44e135 100644
+--- a/src/material/snack-bar/snack-bar.zone.spec.ts
++++ b/src/material/snack-bar/snack-bar.zone.spec.ts
+@@ -64,7 +64,6 @@ describe('MatSnackBar Zone.js integration', () => {
+ 
+ @Directive({
+   selector: 'dir-with-view-container',
+-  standalone: true,
+ })
+ class DirectiveWithViewContainer {
+   viewContainerRef = inject(ViewContainerRef);
+@@ -73,7 +72,6 @@ class DirectiveWithViewContainer {
+ @Component({
+   selector: 'arbitrary-component',
+   template: `@if (childComponentExists()) {<dir-with-view-container></dir-with-view-container>}`,
+-  standalone: true,
+   imports: [DirectiveWithViewContainer],
+   changeDetection: ChangeDetectionStrategy.OnPush,
+ })
+diff --git a/src/material/snack-bar/testing/snack-bar-harness.spec.ts b/src/material/snack-bar/testing/snack-bar-harness.spec.ts
+index 869e0e8f719a..e876df34dcc6 100644
+--- a/src/material/snack-bar/testing/snack-bar-harness.spec.ts
++++ b/src/material/snack-bar/testing/snack-bar-harness.spec.ts
+@@ -171,7 +171,6 @@ describe('MatSnackBarHarness', () => {
+       <div matSnackBarActions><button matSnackBarAction>Ok</button></div>
+     </ng-template>
+   `,
+-  standalone: true,
+   imports: [MatSnackBarLabel, MatSnackBarActions, MatSnackBarAction],
+ })
+ class SnackbarHarnessTest {
+diff --git a/src/material/sort/sort.spec.ts b/src/material/sort/sort.spec.ts
+index 383721086209..55d21297694e 100644
+--- a/src/material/sort/sort.spec.ts
++++ b/src/material/sort/sort.spec.ts
+@@ -510,7 +510,6 @@ type SimpleMatSortAppColumnIds = 'defaultA' | 'defaultB' | 'overrideStart' | 'ov
+       </div>
+     </div>
+   `,
+-  standalone: true,
+   imports: [MatSortModule, MatTableModule, CdkTableModule],
+ })
+ class SimpleMatSortApp {
+@@ -569,7 +568,6 @@ class FakeDataSource extends DataSource<any> {
+       <cdk-row *cdkRowDef="let row; columns: columnsToRender"></cdk-row>
+     </cdk-table>
+   `,
+-  standalone: true,
+   imports: [MatSortModule, MatTableModule, CdkTableModule],
+ })
+ class CdkTableMatSortApp {
+@@ -601,7 +599,6 @@ class CdkTableMatSortApp {
+       <mat-row *matRowDef="let row; columns: columnsToRender"></mat-row>
+     </mat-table>
+   `,
+-  standalone: true,
+   imports: [MatSortModule, MatTableModule, CdkTableModule],
+ })
+ class MatTableMatSortApp {
+@@ -613,7 +610,6 @@ class MatTableMatSortApp {
+ 
+ @Component({
+   template: `<div mat-sort-header="a"> A </div>`,
+-  standalone: true,
+   imports: [MatSortModule, MatTableModule, CdkTableModule],
+ })
+ class MatSortHeaderMissingMatSortApp {}
+@@ -625,7 +621,6 @@ class MatSortHeaderMissingMatSortApp {}
+       <div mat-sort-header="duplicateId"> A </div>
+     </div>
+   `,
+-  standalone: true,
+   imports: [MatSortModule, MatTableModule, CdkTableModule],
+ })
+ class MatSortDuplicateMatSortableIdsApp {}
+@@ -636,7 +631,6 @@ class MatSortDuplicateMatSortableIdsApp {}
+       <div mat-sort-header> A </div>
+     </div>
+   `,
+-  standalone: true,
+   imports: [MatSortModule, MatTableModule, CdkTableModule],
+ })
+ class MatSortableMissingIdApp {}
+@@ -647,7 +641,6 @@ class MatSortableMissingIdApp {}
+       <div mat-sort-header="a"> A </div>
+     </div>
+   `,
+-  standalone: true,
+   imports: [MatSortModule, MatTableModule, CdkTableModule],
+ })
+ class MatSortableInvalidDirection {}
+@@ -663,7 +656,6 @@ class MatSortableInvalidDirection {}
+       </div>
+     </div>
+   `,
+-  standalone: true,
+   imports: [MatSortModule, MatTableModule, CdkTableModule],
+ })
+ class MatSortWithoutExplicitInputs {
+@@ -696,7 +688,6 @@ class MatSortWithoutExplicitInputs {
+       </div>
+     </div>
+   `,
+-  standalone: true,
+   imports: [MatSortModule, MatTableModule, CdkTableModule],
+ })
+ class MatSortWithArrowPosition {
+@@ -717,7 +708,6 @@ class MatSortWithArrowPosition {
+       </div>
+     </div>
+   `,
+-  standalone: true,
+   imports: [MatSortModule, MatTableModule, CdkTableModule],
+ })
+ class MatSortWithoutInputs {
+diff --git a/src/material/sort/testing/sort-harness.spec.ts b/src/material/sort/testing/sort-harness.spec.ts
+index f14d405aa46d..b5afa713b56c 100644
+--- a/src/material/sort/testing/sort-harness.spec.ts
++++ b/src/material/sort/testing/sort-harness.spec.ts
+@@ -137,7 +137,6 @@ describe('MatSortHarness', () => {
+       }
+     </table>
+   `,
+-  standalone: true,
+   imports: [MatSortModule],
+ })
+ class SortHarnessTest {
+diff --git a/src/material/stepper/stepper.spec.ts b/src/material/stepper/stepper.spec.ts
+index a57c5bb326cd..ea1d4a38050e 100644
+--- a/src/material/stepper/stepper.spec.ts
++++ b/src/material/stepper/stepper.spec.ts
+@@ -1923,7 +1923,6 @@ class SimpleMatVerticalStepperApp {
+ }
+ 
+ @Component({
+-  standalone: true,
+   template: `
+     <mat-stepper orientation="vertical" linear>
+       <mat-step [stepControl]="oneGroup">
+diff --git a/src/material/stepper/testing/stepper-harness.spec.ts b/src/material/stepper/testing/stepper-harness.spec.ts
+index dbe03cf1159c..3755becf1e5e 100644
+--- a/src/material/stepper/testing/stepper-harness.spec.ts
++++ b/src/material/stepper/testing/stepper-harness.spec.ts
+@@ -301,7 +301,6 @@ describe('MatStepperHarness', () => {
+       </mat-step>
+     </mat-stepper>
+   `,
+-  standalone: true,
+   imports: [MatStepperModule, ReactiveFormsModule],
+ })
+ class StepperHarnessTest {
+diff --git a/src/material/table/table.spec.ts b/src/material/table/table.spec.ts
+index fee8085f6fa8..2dbc82426740 100644
+--- a/src/material/table/table.spec.ts
++++ b/src/material/table/table.spec.ts
+@@ -720,7 +720,6 @@ class FakeDataSource extends DataSource<TestData> {
+       <tr mat-footer-row *matFooterRowDef="columnsToRender"></tr>
+     </table>
+   `,
+-  standalone: true,
+   imports: [MatTableModule, MatPaginatorModule, MatSortModule],
+ })
+ class MatTableApp {
+@@ -756,7 +755,6 @@ class MatTableApp {
+       </tr>
+     </table>
+   `,
+-  standalone: true,
+   imports: [MatTableModule, MatPaginatorModule, MatSortModule],
+ })
+ class NativeHtmlTableApp {
+@@ -811,7 +809,6 @@ class NativeHtmlTableApp {
+       <tr mat-row *matRowDef="let row; columns: columnsToRender"></tr>
+     </table>
+   `,
+-  standalone: true,
+   imports: [MatTableModule, MatPaginatorModule, MatSortModule],
+ })
+ class NestedTableApp {
+@@ -831,7 +828,6 @@ class NestedTableApp {
+       <tr mat-row *matRowDef="let row; columns: columnsToRender"></tr>
+     </table>
+   `,
+-  standalone: true,
+   imports: [MatTableModule, MatPaginatorModule, MatSortModule],
+ })
+ class StickyTableApp {
+@@ -860,7 +856,6 @@ class StickyTableApp {
+       <tr mat-footer-row *matFooterRowDef="['column_a']"></tr>
+     </table>
+   `,
+-  standalone: true,
+   imports: [MatTableModule, MatPaginatorModule, MatSortModule],
+ })
+ class MatTableWithWhenRowApp {
+@@ -899,7 +894,6 @@ class MatTableWithWhenRowApp {
+ 
+     <mat-paginator [pageSize]="5"></mat-paginator>
+   `,
+-  standalone: true,
+   imports: [MatTableModule, MatPaginatorModule, MatSortModule],
+ })
+ class ArrayDataSourceMatTableApp implements AfterViewInit {
+@@ -953,7 +947,6 @@ class ArrayDataSourceMatTableApp implements AfterViewInit {
+       <tr mat-row *matRowDef="let row; columns: columnsToRender"></tr>
+     </table>
+   `,
+-  standalone: true,
+   imports: [MatTableModule, MatPaginatorModule, MatSortModule],
+ })
+ class MatTableWithSortApp implements OnInit {
+@@ -1006,7 +999,6 @@ class MatTableWithSortApp implements OnInit {
+ 
+     <mat-paginator [pageSize]="5"></mat-paginator>
+   `,
+-  standalone: true,
+   imports: [MatTableModule, MatPaginatorModule, MatSortModule],
+ })
+ class MatTableWithPaginatorApp implements OnInit {
+@@ -1049,7 +1041,6 @@ class MatTableWithPaginatorApp implements OnInit {
+       </ng-container>
+     </table>
+   `,
+-  standalone: true,
+   imports: [MatTableModule, MatPaginatorModule, MatSortModule],
+ })
+ class TableWithNgContainerRow {
+@@ -1088,7 +1079,6 @@ class TableWithNgContainerRow {
+       <mat-footer-row *matFooterRowDef="columnsToRender"></mat-footer-row>
+     </mat-table>
+   `,
+-  standalone: true,
+   imports: [MatTableModule, MatPaginatorModule, MatSortModule],
+ })
+ class MatFlexTableApp {
+diff --git a/src/material/table/testing/table-harness.spec.ts b/src/material/table/testing/table-harness.spec.ts
+index b2c4c41b650e..eb8426f88120 100644
+--- a/src/material/table/testing/table-harness.spec.ts
++++ b/src/material/table/testing/table-harness.spec.ts
+@@ -214,7 +214,6 @@ describe('MatTableHarness', () => {
+       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+     </table>
+   `,
+-  standalone: true,
+   imports: [MatTableModule],
+ })
+ class TableHarnessTest {
+diff --git a/src/material/tabs/tab-body.spec.ts b/src/material/tabs/tab-body.spec.ts
+index 3511c7939ed3..71ac2ffdb376 100644
+--- a/src/material/tabs/tab-body.spec.ts
++++ b/src/material/tabs/tab-body.spec.ts
+@@ -215,7 +215,6 @@ describe('MatTabBody', () => {
+     <ng-template>Tab Body Content</ng-template>
+     <mat-tab-body [content]="content()" [position]="position" [origin]="origin"></mat-tab-body>
+   `,
+-  standalone: true,
+   imports: [PortalModule, MatRippleModule, MatTabBody],
+ })
+ class SimpleTabBodyApp implements AfterViewInit {
+diff --git a/src/material/tabs/tab-group.spec.ts b/src/material/tabs/tab-group.spec.ts
+index e70bad58464e..f60b3c232df2 100644
+--- a/src/material/tabs/tab-group.spec.ts
++++ b/src/material/tabs/tab-group.spec.ts
+@@ -1301,7 +1301,6 @@ describe('MatTabGroup labels aligned with a config', () => {
+       </mat-tab>
+     </mat-tab-group>
+   `,
+-  standalone: true,
+   imports: [MatTabsModule],
+ })
+ class SimpleTabsTestApp {
+@@ -1339,7 +1338,6 @@ class SimpleTabsTestApp {
+       }
+     </mat-tab-group>
+   `,
+-  standalone: true,
+   imports: [MatTabsModule],
+ })
+ class SimpleDynamicTabsTestApp {
+@@ -1368,7 +1366,6 @@ class SimpleDynamicTabsTestApp {
+       }
+     </mat-tab-group>
+   `,
+-  standalone: true,
+   imports: [MatTabsModule],
+ })
+ class BindedTabsTestApp {
+@@ -1404,7 +1401,6 @@ class BindedTabsTestApp {
+       </mat-tab>
+     </mat-tab-group>
+   `,
+-  standalone: true,
+   imports: [MatTabsModule],
+ })
+ class DisabledTabsTestApp {
+@@ -1423,7 +1419,6 @@ class DisabledTabsTestApp {
+       }
+    </mat-tab-group>
+   `,
+-  standalone: true,
+   imports: [MatTabsModule, AsyncPipe],
+ })
+ class AsyncTabsTestApp implements OnInit {
+@@ -1451,7 +1446,6 @@ class AsyncTabsTestApp implements OnInit {
+     <mat-tab label="Legumes"> <p #legumes>Peanuts</p> </mat-tab>
+   </mat-tab-group>
+   `,
+-  standalone: true,
+   imports: [MatTabsModule],
+ })
+ class TabGroupWithSimpleApi {
+@@ -1474,7 +1468,6 @@ class TabGroupWithSimpleApi {
+       </mat-tab>
+     </mat-tab-group>
+   `,
+-  standalone: true,
+   imports: [MatTabsModule],
+ })
+ class NestedTabs {
+@@ -1494,7 +1487,6 @@ class NestedTabs {
+       </mat-tab>
+     </mat-tab-group>
+   `,
+-  standalone: true,
+   imports: [MatTabsModule],
+ })
+ class TemplateTabs {}
+@@ -1505,7 +1497,6 @@ class TemplateTabs {}
+     <mat-tab [aria-label]="ariaLabel" [aria-labelledby]="ariaLabelledby"></mat-tab>
+   </mat-tab-group>
+   `,
+-  standalone: true,
+   imports: [MatTabsModule],
+ })
+ class TabGroupWithAriaInputs {
+@@ -1524,7 +1515,6 @@ class TabGroupWithAriaInputs {
+       <div>pizza is active</div>
+     }
+   `,
+-  standalone: true,
+   imports: [MatTabsModule],
+ })
+ class TabGroupWithIsActiveBinding {}
+@@ -1536,7 +1526,6 @@ class TabGroupWithIsActiveBinding {}
+       <mat-tab label="Two">Tab two content</mat-tab>
+     </mat-tab-group>
+   `,
+-  standalone: true,
+   imports: [MatTabsModule],
+ })
+ class TabsWithCustomAnimationDuration {}
+@@ -1550,7 +1539,6 @@ class TabsWithCustomAnimationDuration {}
+       }
+     </mat-tab-group>
+   `,
+-  standalone: true,
+   imports: [MatTabsModule],
+ })
+ class TabGroupWithIndirectDescendantTabs {
+@@ -1564,7 +1552,6 @@ class TabGroupWithIndirectDescendantTabs {
+       <mat-tab label="Two">Tab two content</mat-tab>
+     </mat-tab-group>
+   `,
+-  standalone: true,
+   imports: [MatTabsModule],
+ })
+ class TabGroupWithInkBarFitToContent {
+@@ -1587,7 +1574,6 @@ class TabGroupWithInkBarFitToContent {
+       </ng-container>
+     </mat-tab-group>
+   `,
+-  standalone: true,
+   imports: [MatTabsModule],
+ })
+ class TabGroupWithSpaceAbove {
+@@ -1611,7 +1597,6 @@ class TabGroupWithSpaceAbove {
+       <mat-tab label="Parent 3">Parent 3</mat-tab>
+     </mat-tab-group>
+   `,
+-  standalone: true,
+   imports: [MatTabsModule],
+ })
+ class NestedTabGroupWithLabel {}
+@@ -1628,7 +1613,6 @@ class NestedTabGroupWithLabel {}
+       </mat-tab>
+     </mat-tab-group>
+   `,
+-  standalone: true,
+   imports: [MatTabsModule],
+ })
+ class TabsWithClassesTestApp {
+@@ -1647,7 +1631,6 @@ class TabsWithClassesTestApp {
+       </mat-tab>
+     </mat-tab-group>
+   `,
+-  standalone: true,
+   imports: [MatTabsModule],
+ })
+ class TabsWithAlignConfig {}
+@@ -1663,7 +1646,6 @@ class TabsWithAlignConfig {}
+       </mat-tab>
+     </mat-tab-group>
+   `,
+-  standalone: true,
+   imports: [MatTabsModule],
+ })
+ class TabsWithAlignCenter {}
+diff --git a/src/material/tabs/tab-header.spec.ts b/src/material/tabs/tab-header.spec.ts
+index 2b2e41dc4797..2e56a2f211f6 100644
+--- a/src/material/tabs/tab-header.spec.ts
++++ b/src/material/tabs/tab-header.spec.ts
+@@ -754,7 +754,6 @@ interface Tab {
+       width: 130px;
+     }
+   `,
+-  standalone: true,
+   imports: [Dir, MatTabHeader, MatTabLabelWrapper],
+ })
+ class SimpleTabHeaderApp {
+diff --git a/src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts b/src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts
+index ce75ae3ed058..f3cb50704c18 100644
+--- a/src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts
++++ b/src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts
+@@ -573,7 +573,6 @@ describe('MatTabNavBar with enabled animations', () => {
+     </nav>
+     <mat-tab-nav-panel #tabPanel id="tab-panel">Tab panel</mat-tab-nav-panel>
+   `,
+-  standalone: true,
+   imports: [MatTabsModule],
+ })
+ class SimpleTabNavBarTestApp {
+@@ -599,7 +598,6 @@ class SimpleTabNavBarTestApp {
+     </nav>
+     <mat-tab-nav-panel #tabPanel>Tab panel</mat-tab-nav-panel>
+   `,
+-  standalone: true,
+   imports: [MatTabsModule],
+ })
+ class TabLinkWithNgIf {
+@@ -615,7 +613,6 @@ class TabLinkWithNgIf {
+     </nav>
+     <mat-tab-nav-panel #tabPanel>Tab panel</mat-tab-nav-panel>
+   `,
+-  standalone: true,
+   imports: [MatTabsModule],
+ })
+ class TabBarWithInactiveTabsOnInit {
+@@ -631,7 +628,6 @@ class TabBarWithInactiveTabsOnInit {
+   </nav>
+   <mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>,
+   `,
+-  standalone: true,
+   imports: [MatTabsModule],
+ })
+ class TabsWithCustomAnimationDuration {
+diff --git a/src/material/tabs/testing/tab-group-harness.spec.ts b/src/material/tabs/testing/tab-group-harness.spec.ts
+index eaf0d73490ef..1bb0abfc32f1 100644
+--- a/src/material/tabs/testing/tab-group-harness.spec.ts
++++ b/src/material/tabs/testing/tab-group-harness.spec.ts
+@@ -174,7 +174,6 @@ describe('MatTabGroupHarness', () => {
+       </mat-tab>
+     </mat-tab-group>
+   `,
+-  standalone: true,
+   imports: [MatTabsModule],
+ })
+ class TabGroupHarnessTest {
+diff --git a/src/material/tabs/testing/tab-nav-bar-harness.spec.ts b/src/material/tabs/testing/tab-nav-bar-harness.spec.ts
+index 259add2a8fe6..510abdb65c4d 100644
+--- a/src/material/tabs/testing/tab-nav-bar-harness.spec.ts
++++ b/src/material/tabs/testing/tab-nav-bar-harness.spec.ts
+@@ -111,7 +111,6 @@ describe('MatTabNavBarHarness', () => {
+       Tab content
+     </mat-tab-nav-panel>
+   `,
+-  standalone: true,
+   imports: [MatTabsModule],
+ })
+ class TabNavBarHarnessTest {
+diff --git a/src/material/timepicker/testing/timepicker-harness.spec.ts b/src/material/timepicker/testing/timepicker-harness.spec.ts
+index bc670144dc6c..838dba190b21 100644
+--- a/src/material/timepicker/testing/timepicker-harness.spec.ts
++++ b/src/material/timepicker/testing/timepicker-harness.spec.ts
+@@ -74,7 +74,6 @@ describe('MatTimepickerHarness', () => {
+     <input id="two" [matTimepicker]="twoPicker">
+     <mat-timepicker #twoPicker [interval]="interval()"/>
+   `,
+-  standalone: true,
+   imports: [MatTimepickerInput, MatTimepicker],
+ })
+ class TimepickerHarnessTest {
+diff --git a/src/material/timepicker/testing/timepicker-input-harness.spec.ts b/src/material/timepicker/testing/timepicker-input-harness.spec.ts
+index 5ee6a178a985..90c14aaeaabc 100644
+--- a/src/material/timepicker/testing/timepicker-input-harness.spec.ts
++++ b/src/material/timepicker/testing/timepicker-input-harness.spec.ts
+@@ -170,7 +170,6 @@ describe('MatTimepickerInputHarness', () => {
+     <input [matTimepicker]="basicPicker" id="basic" placeholder="Select a time">
+     <mat-timepicker #basicPicker/>
+   `,
+-  standalone: true,
+   imports: [MatTimepickerInput, MatTimepicker],
+ })
+ class TimepickerInputHarnessTest {
+diff --git a/src/material/timepicker/testing/timepicker-toggle-harness.spec.ts b/src/material/timepicker/testing/timepicker-toggle-harness.spec.ts
+index d6d87b8ca072..c1e48bbb0898 100644
+--- a/src/material/timepicker/testing/timepicker-toggle-harness.spec.ts
++++ b/src/material/timepicker/testing/timepicker-toggle-harness.spec.ts
+@@ -56,7 +56,6 @@ describe('MatTimepickerToggleHarness', () => {
+     <mat-timepicker #twoPicker/>
+     <mat-timepicker-toggle id="two" [for]="twoPicker" [disabled]="disabled()"/>
+   `,
+-  standalone: true,
+   imports: [MatTimepickerInput, MatTimepicker, MatTimepickerToggle],
+ })
+ class TimepickerHarnessTest {
+diff --git a/src/material/timepicker/timepicker.spec.ts b/src/material/timepicker/timepicker.spec.ts
+index 24198da61930..080745926f98 100644
+--- a/src/material/timepicker/timepicker.spec.ts
++++ b/src/material/timepicker/timepicker.spec.ts
+@@ -1274,7 +1274,6 @@ describe('MatTimepicker', () => {
+       [disabled]="toggleDisabled()"
+       [tabIndex]="toggleTabIndex()"/>
+   `,
+-  standalone: true,
+   imports: [MatTimepicker, MatTimepickerInput, MatTimepickerToggle],
+ })
+ class StandaloneTimepicker {
+@@ -1305,7 +1304,6 @@ class StandaloneTimepicker {
+       <mat-timepicker-toggle [for]="picker" matSuffix/>
+     </mat-form-field>
+   `,
+-  standalone: true,
+   imports: [
+     MatTimepicker,
+     MatTimepickerInput,
+@@ -1326,7 +1324,6 @@ class TimepickerInFormField {
+     <input [matTimepicker]="picker" [(value)]="value"/>
+     <mat-timepicker #picker/>
+   `,
+-  standalone: true,
+   imports: [MatTimepicker, MatTimepickerInput],
+ })
+ class TimepickerTwoWayBinding {
+@@ -1343,7 +1340,6 @@ class TimepickerTwoWayBinding {
+       [matTimepickerMax]="max()"/>
+     <mat-timepicker #picker/>
+   `,
+-  standalone: true,
+   imports: [MatTimepicker, MatTimepickerInput, ReactiveFormsModule],
+ })
+ class TimepickerWithForms {
+@@ -1359,14 +1355,12 @@ class TimepickerWithForms {
+     <input [matTimepicker]="picker"/>
+     <mat-timepicker #picker/>
+   `,
+-  standalone: true,
+   imports: [MatTimepicker, MatTimepickerInput],
+ })
+ class TimepickerWithMultipleInputs {}
+ 
+ @Component({
+   template: '<mat-timepicker/>',
+-  standalone: true,
+   imports: [MatTimepicker],
+ })
+ class TimepickerWithoutInput {
+diff --git a/src/material/toolbar/testing/toolbar-harness.spec.ts b/src/material/toolbar/testing/toolbar-harness.spec.ts
+index 2344bb9bec7b..81315d1984db 100644
+--- a/src/material/toolbar/testing/toolbar-harness.spec.ts
++++ b/src/material/toolbar/testing/toolbar-harness.spec.ts
+@@ -74,7 +74,6 @@ describe('MatToolbarHarness', () => {
+       </mat-toolbar-row>
+     </mat-toolbar>
+   `,
+-  standalone: true,
+   imports: [MatToolbarModule],
+ })
+ class ToolbarHarnessTest {}
+diff --git a/src/material/toolbar/toolbar.spec.ts b/src/material/toolbar/toolbar.spec.ts
+index ce1d0df979c2..42f2e5a053a9 100644
+--- a/src/material/toolbar/toolbar.spec.ts
++++ b/src/material/toolbar/toolbar.spec.ts
+@@ -104,7 +104,6 @@ describe('MatToolbar', () => {
+       <span>First Row</span>
+     </mat-toolbar>
+   `,
+-  standalone: true,
+   imports: [MatToolbarModule],
+ })
+ class ToolbarSingleRow {
+@@ -118,7 +117,6 @@ class ToolbarSingleRow {
+       <mat-toolbar-row>Second Row</mat-toolbar-row>
+     </mat-toolbar>
+   `,
+-  standalone: true,
+   imports: [MatToolbarModule],
+ })
+ class ToolbarMultipleRows {}
+@@ -132,7 +130,6 @@ class ToolbarMultipleRows {}
+       }
+     </mat-toolbar>
+   `,
+-  standalone: true,
+   imports: [MatToolbarModule],
+ })
+ class ToolbarMixedRowModes {
+@@ -149,7 +146,6 @@ class ToolbarMixedRowModes {
+       }
+     </mat-toolbar>
+   `,
+-  standalone: true,
+   imports: [MatToolbarModule],
+ })
+ class ToolbarMultipleIndirectRows {}
+diff --git a/src/material/tooltip/testing/tooltip-harness.spec.ts b/src/material/tooltip/testing/tooltip-harness.spec.ts
+index 246417390db9..538433b8090a 100644
+--- a/src/material/tooltip/testing/tooltip-harness.spec.ts
++++ b/src/material/tooltip/testing/tooltip-harness.spec.ts
+@@ -72,7 +72,6 @@ describe('MatTooltipHarness', () => {
+     <button matTooltip='Static message' id='two'>Trigger 2</button>
+     <button matTooltip='Disabled Tooltip' [matTooltipDisabled]='true' id='three'>Trigger 3</button>
+   `,
+-  standalone: true,
+   imports: [MatTooltipModule],
+ })
+ class TooltipHarnessTest {
+diff --git a/src/material/tooltip/tooltip.spec.ts b/src/material/tooltip/tooltip.spec.ts
+index 3aff10c8f728..fccac2350c6b 100644
+--- a/src/material/tooltip/tooltip.spec.ts
++++ b/src/material/tooltip/tooltip.spec.ts
+@@ -1604,7 +1604,6 @@ describe('MatTooltip', () => {
+         [matTooltipTouchGestures]="touchGestures"
+         [matTooltipDisabled]="tooltipDisabled">Button</button>
+     }`,
+-  standalone: true,
+   imports: [MatTooltipModule, OverlayModule],
+ })
+ class BasicTooltipDemo {
+@@ -1629,7 +1628,6 @@ class BasicTooltipDemo {
+               [matTooltipPosition]="position">Button</button>
+       }
+     </div>`,
+-  standalone: true,
+   imports: [MatTooltipModule, OverlayModule],
+ })
+ class ScrollableTooltipDemo {
+@@ -1658,7 +1656,6 @@ class ScrollableTooltipDemo {
+       Button
+     </button>`,
+   changeDetection: ChangeDetectionStrategy.OnPush,
+-  standalone: true,
+   imports: [MatTooltipModule, OverlayModule],
+ })
+ class OnPushTooltipDemo {
+@@ -1673,7 +1670,6 @@ class OnPushTooltipDemo {
+       <button [matTooltip]="tooltip">Button {{tooltip}}</button>
+     }
+   `,
+-  standalone: true,
+   imports: [MatTooltipModule, OverlayModule],
+ })
+ class DynamicTooltipsDemo {
+@@ -1682,7 +1678,6 @@ class DynamicTooltipsDemo {
+ 
+ @Component({
+   template: `<button [matTooltip]="message" [attr.aria-label]="message">Click me</button>`,
+-  standalone: true,
+   imports: [MatTooltipModule, OverlayModule],
+ })
+ class DataBoundAriaLabelTooltip {
+@@ -1701,7 +1696,6 @@ class DataBoundAriaLabelTooltip {
+       matTooltip="Another thing"
+       [matTooltipTouchGestures]="touchGestures"></textarea>
+   `,
+-  standalone: true,
+   imports: [MatTooltipModule, OverlayModule],
+ })
+ class TooltipOnTextFields {
+@@ -1718,7 +1712,6 @@ class TooltipOnTextFields {
+       matTooltip="Drag me"
+       [matTooltipTouchGestures]="touchGestures"></button>
+   `,
+-  standalone: true,
+   imports: [MatTooltipModule, OverlayModule],
+ })
+ class TooltipOnDraggableElement {
+diff --git a/src/material/tooltip/tooltip.zone.spec.ts b/src/material/tooltip/tooltip.zone.spec.ts
+index e519ca5af276..4d8c8cf1de4d 100644
+--- a/src/material/tooltip/tooltip.zone.spec.ts
++++ b/src/material/tooltip/tooltip.zone.spec.ts
+@@ -74,7 +74,6 @@ describe('MatTooltip Zone.js integration', () => {
+                 [matTooltipPosition]="position">Button</button>
+         }
+       </div>`,
+-  standalone: true,
+   imports: [MatTooltipModule, OverlayModule],
+ })
+ class ScrollableTooltipDemo {
+diff --git a/src/material/tree/testing/tree-harness.spec.ts b/src/material/tree/testing/tree-harness.spec.ts
+index c281d4d28b4e..222ab037abaa 100644
+--- a/src/material/tree/testing/tree-harness.spec.ts
++++ b/src/material/tree/testing/tree-harness.spec.ts
+@@ -250,7 +250,6 @@ interface ExampleFlatNode {
+       </mat-nested-tree-node>
+     </mat-tree>
+   `,
+-  standalone: true,
+   imports: [MatTreeModule],
+ })
+ class TreeHarnessTest {
+diff --git a/src/youtube-player/youtube-player.spec.ts b/src/youtube-player/youtube-player.spec.ts
+index 9e37727eecb9..757baf8bf435 100644
+--- a/src/youtube-player/youtube-player.spec.ts
++++ b/src/youtube-player/youtube-player.spec.ts
+@@ -758,7 +758,6 @@ describe('YoutubePlayer', () => {
+ /** Test component that contains a YouTubePlayer. */
+ @Component({
+   selector: 'test-app',
+-  standalone: true,
+   imports: [YouTubePlayer],
+   template: `
+     @if (visible) {
+@@ -806,7 +805,6 @@ class TestApp {
+ }
+ 
+ @Component({
+-  standalone: true,
+   imports: [YouTubePlayer],
+   template: `
+     <youtube-player [videoId]="videoId" [startSeconds]="42" [endSeconds]="1337"/>
+@@ -817,7 +815,6 @@ class StaticStartEndSecondsApp {
+ }
+ 
+ @Component({
+-  standalone: true,
+   imports: [YouTubePlayer],
+   template: `<youtube-player [videoId]="videoId"/>`,
+ })

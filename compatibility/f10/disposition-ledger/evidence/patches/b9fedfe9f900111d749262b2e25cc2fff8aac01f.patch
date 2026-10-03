@@ -1,0 +1,30 @@
+From b9fedfe9f900111d749262b2e25cc2fff8aac01f Mon Sep 17 00:00:00 2001
+From: Amy Sorto <8575252+amysorto@users.noreply.github.com>
+Date: Mon, 3 Jun 2024 12:13:24 -0700
+Subject: [PATCH] fix(material/datepicker): Move aria-live attribute so month
+ can also be announced when using previous and next month buttons (#29137)
+
+---
+ src/material/datepicker/calendar-header.html | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/material/datepicker/calendar-header.html b/src/material/datepicker/calendar-header.html
+index 8302fc166bef..d6cc038e68ed 100644
+--- a/src/material/datepicker/calendar-header.html
++++ b/src/material/datepicker/calendar-header.html
+@@ -1,12 +1,12 @@
+ <div class="mat-calendar-header">
+   <div class="mat-calendar-controls">
+-    <!-- [Firefox Issue: https://bugzilla.mozilla.org/show_bug.cgi?id=1880533] 
++    <!-- [Firefox Issue: https://bugzilla.mozilla.org/show_bug.cgi?id=1880533]
+       Relocated label next to related button and made visually hidden via cdk-visually-hidden
+       to enable label to appear in a11y tree for SR when using Firefox -->
+-    <label [id]="_periodButtonLabelId" class="cdk-visually-hidden">{{periodButtonDescription}}</label>
++    <label [id]="_periodButtonLabelId" class="cdk-visually-hidden" aria-live="polite">{{periodButtonDescription}}</label>
+     <button mat-button type="button" class="mat-calendar-period-button"
+             (click)="currentPeriodClicked()" [attr.aria-label]="periodButtonLabel"
+-            [attr.aria-describedby]="_periodButtonLabelId" aria-live="polite">
++            [attr.aria-describedby]="_periodButtonLabelId">
+       <span aria-hidden="true">{{periodButtonText}}</span>
+       <svg class="mat-calendar-arrow" [class.mat-calendar-invert]="calendar.currentView !== 'month'"
+            viewBox="0 0 10 5" focusable="false" aria-hidden="true">

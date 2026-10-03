@@ -1,0 +1,65 @@
+From 726fc069e3bed2fcbc9b53de02ee7ce18c2fce5d Mon Sep 17 00:00:00 2001
+From: Zach Arend <zarend@users.noreply.github.com>
+Date: Mon, 4 Sep 2023 02:14:56 -0700
+Subject: [PATCH] fix(material/tabs): add aria-hidden to inactive tabs (#27742)
+
+Make accessibility fix for Tabs component. Add `aria-hidden="true"` to
+inactive tab panels. Fix issue where chromevox would read the names of
+inactive tab panels when navigating past the active tab panel (#27741).
+Fix this by adding `aria-hidden="true"` to inactive tab panels to
+exclude them from the a11y tree.
+
+I believe what was happening is that the inactive tab panels had an
+aria-labelled by references that pointed to the tab header. Existing
+behavior seems to be that Chromevox was following the aria-labelledby
+references and announcing the labels of the inactive tabs. With this
+commit applied, Chromevox no longer reads panels of inactive tabs.
+
+Fix #27741
+---
+ src/material/tabs/tab-group.html    |  1 +
+ src/material/tabs/tab-group.spec.ts | 19 +++++++++++++++++++
+ 2 files changed, 20 insertions(+)
+
+diff --git a/src/material/tabs/tab-group.html b/src/material/tabs/tab-group.html
+index 27648e3ae6d8..1d43663f984f 100644
+--- a/src/material/tabs/tab-group.html
++++ b/src/material/tabs/tab-group.html
+@@ -58,6 +58,7 @@
+                [id]="_getTabContentId(i)"
+                [attr.tabindex]="(contentTabIndex != null && selectedIndex === i) ? contentTabIndex : null"
+                [attr.aria-labelledby]="_getTabLabelId(i)"
++               [attr.aria-hidden]="selectedIndex !== i"
+                [class.mat-mdc-tab-body-active]="selectedIndex === i"
+                [ngClass]="tab.bodyClass"
+                [content]="tab.content!"
+diff --git a/src/material/tabs/tab-group.spec.ts b/src/material/tabs/tab-group.spec.ts
+index 0b092d81f4b7..31b468ec456a 100644
+--- a/src/material/tabs/tab-group.spec.ts
++++ b/src/material/tabs/tab-group.spec.ts
+@@ -441,6 +441,25 @@ describe('MDC-based MatTabGroup', () => {
+     });
+   });
+ 
++  describe('aria labelling of tab panels', () => {
++    let fixture: ComponentFixture<BindedTabsTestApp>;
++    let tabPanels: HTMLElement[];
++
++    beforeEach(fakeAsync(() => {
++      fixture = TestBed.createComponent(BindedTabsTestApp);
++      fixture.detectChanges();
++      tick();
++      tabPanels = Array.from(fixture.nativeElement.querySelectorAll('.mat-mdc-tab-body'));
++    }));
++
++    it('should set `aria-hidden="true"` on inactive tab panels', () => {
++      fixture.detectChanges();
++
++      expect(tabPanels[0].getAttribute('aria-hidden')).not.toBe('true');
++      expect(tabPanels[1].getAttribute('aria-hidden')).toBe('true');
++    });
++  });
++
+   describe('disable tabs', () => {
+     let fixture: ComponentFixture<DisabledTabsTestApp>;
+ 

@@ -1,13 +1,13 @@
 import {MatLegacyTableDataSource} from './table-data-source';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {MatSort, MatSortModule} from '@angular/material/sort';
-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {LegacyNoopAnimationsModule} from '../internal/testing/owned-animation-modules';
 import {Component, ViewChild} from '@angular/core';
 
 describe('MatTableDataSource', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [MatSortModule, NoopAnimationsModule],
+      imports: [MatSortModule, LegacyNoopAnimationsModule],
       declarations: [MatSortApp],
     }).compileComponents();
   }));

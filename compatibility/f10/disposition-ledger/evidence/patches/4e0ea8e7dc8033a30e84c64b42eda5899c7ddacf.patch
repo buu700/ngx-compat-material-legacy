@@ -1,0 +1,1735 @@
+From 4e0ea8e7dc8033a30e84c64b42eda5899c7ddacf Mon Sep 17 00:00:00 2001
+From: Kristiyan Kostadinov <crisbeto@users.noreply.github.com>
+Date: Fri, 11 Apr 2025 22:48:11 +0200
+Subject: [PATCH] test(multiple): clean up DI in tests (#30848)
+
+We have some tests that are using the `inject` function from `@angular/core/testing` to inject services. This hasn't been the standard for a while and leads to a lot of boilerplate. These changes switch to using `TestBed.inject` and clean up the existing code.
+---
+ .../shared/guide-items/guide-items.spec.ts    |   6 +-
+ .../style-manager/style-manager.spec.ts       |  19 ++-
+ .../a11y/focus-monitor/focus-monitor.spec.ts  |  34 ++----
+ .../focus-monitor/focus-monitor.zone.spec.ts  |   9 +-
+ src/cdk/drag-drop/drag-drop-registry.spec.ts  |   7 +-
+ src/cdk/layout/breakpoints-observer.spec.ts   |  12 +-
+ src/cdk/layout/media-matcher.spec.ts          |  45 ++++---
+ src/cdk/observers/observe-content.spec.ts     |  54 ++++-----
+ .../overlay-keyboard-dispatcher.spec.ts       |  18 +--
+ .../overlay-outside-click-dispatcher.spec.ts  |  18 +--
+ .../fullscreen-overlay-container.spec.ts      |  10 +-
+ src/cdk/overlay/overlay-directives.spec.ts    |  18 +--
+ .../scroll/block-scroll-strategy.spec.ts      |  48 ++++----
+ .../scroll/close-scroll-strategy.spec.ts      | 110 +++++++++---------
+ .../scroll/close-scroll-strategy.zone.spec.ts |  15 +--
+ .../scroll/reposition-scroll-strategy.spec.ts |  14 +--
+ src/cdk/scrolling/scroll-dispatcher.spec.ts   |  27 ++---
+ .../scrolling/scroll-dispatcher.zone.spec.ts  |  37 +++---
+ src/cdk/scrolling/viewport-ruler.spec.ts      |  16 +--
+ src/cdk/scrolling/viewport-ruler.zone.spec.ts |  19 +--
+ .../virtual-scroll-viewport.zone.spec.ts      |  20 +---
+ src/cdk/text-field/autofill.spec.ts           |  22 +---
+ src/cdk/text-field/autofill.zone.spec.ts      |  14 +--
+ .../autocomplete/autocomplete.spec.ts         |   5 +-
+ src/material/core/ripple/ripple.spec.ts       |   8 +-
+ src/material/datepicker/calendar.spec.ts      |  92 +++++++--------
+ .../datepicker/date-range-input.spec.ts       |  25 +---
+ src/material/datepicker/datepicker.spec.ts    |  20 ++--
+ src/material/expansion/accordion.spec.ts      |   6 +-
+ src/material/icon/icon.spec.ts                |   8 +-
+ .../select/testing/select-harness.spec.ts     |   6 +-
+ .../slide-toggle/slide-toggle.spec.ts         |  26 ++---
+ src/material/tooltip/tooltip.spec.ts          |  12 +-
+ 33 files changed, 310 insertions(+), 490 deletions(-)
+
+diff --git a/material.angular.io/src/app/shared/guide-items/guide-items.spec.ts b/material.angular.io/src/app/shared/guide-items/guide-items.spec.ts
+index 3b30a773587b..703c79165d52 100644
+--- a/material.angular.io/src/app/shared/guide-items/guide-items.spec.ts
++++ b/material.angular.io/src/app/shared/guide-items/guide-items.spec.ts
+@@ -1,4 +1,4 @@
+-import {TestBed, inject, waitForAsync} from '@angular/core/testing';
++import {TestBed, waitForAsync} from '@angular/core/testing';
+ import {GuideItems} from './guide-items';
+ 
+ describe('GuideItems', () => {
+@@ -9,10 +9,6 @@ describe('GuideItems', () => {
+     guideItems = TestBed.inject(GuideItems);
+   }));
+ 
+-  beforeEach(inject([GuideItems], (gi: GuideItems) => {
+-    guideItems = gi;
+-  }));
+-
+   it('should get a list of all guide items', () => {
+     expect(guideItems.getAllItems()).toBeDefined();
+     expect(guideItems.getAllItems().length).toBeGreaterThan(0);
+diff --git a/material.angular.io/src/app/shared/style-manager/style-manager.spec.ts b/material.angular.io/src/app/shared/style-manager/style-manager.spec.ts
+index 31a4b4309ff6..dde7fb0dd0eb 100644
+--- a/material.angular.io/src/app/shared/style-manager/style-manager.spec.ts
++++ b/material.angular.io/src/app/shared/style-manager/style-manager.spec.ts
+@@ -1,28 +1,27 @@
+ import {HttpClientTestingModule} from '@angular/common/http/testing';
+-import {inject, TestBed} from '@angular/core/testing';
++import {TestBed} from '@angular/core/testing';
+ import {StyleManager} from './style-manager';
+ 
+ describe('StyleManager', () => {
+   let styleManager: StyleManager;
+ 
+-  beforeEach(() =>
++  beforeEach(() => {
+     TestBed.configureTestingModule({
+       imports: [HttpClientTestingModule],
+       providers: [StyleManager],
+-    }),
+-  );
++    });
+ 
+-  beforeEach(inject([StyleManager], (sm: StyleManager) => {
+-    styleManager = sm;
+-  }));
++    styleManager = TestBed.inject(StyleManager);
++  });
+ 
+   afterEach(() => {
+     const links = document.head.querySelectorAll('link');
+-    for (const link of Array.prototype.slice.call(links)) {
++
++    Array.from(links).forEach(link => {
+       if (link.className.includes('style-manager-')) {
+-        document.head.removeChild(link);
++        link.remove();
+       }
+-    }
++    });
+   });
+ 
+   it('should add stylesheet to head', () => {
+diff --git a/src/cdk/a11y/focus-monitor/focus-monitor.spec.ts b/src/cdk/a11y/focus-monitor/focus-monitor.spec.ts
+index 56b8f03cefa2..5bea5faa943d 100644
+--- a/src/cdk/a11y/focus-monitor/focus-monitor.spec.ts
++++ b/src/cdk/a11y/focus-monitor/focus-monitor.spec.ts
+@@ -2,7 +2,7 @@ import {TAB} from '../../keycodes';
+ import {Platform} from '../../platform';
+ import {DOCUMENT} from '@angular/common';
+ import {Component, ViewChild} from '@angular/core';
+-import {ComponentFixture, TestBed, fakeAsync, flush, inject, tick} from '@angular/core/testing';
++import {ComponentFixture, TestBed, fakeAsync, flush, tick} from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+ import {
+   createMouseEvent,
+@@ -60,19 +60,17 @@ describe('FocusMonitor', () => {
+         },
+       ],
+     });
+-  });
+ 
+-  beforeEach(inject([FocusMonitor], (fm: FocusMonitor) => {
+     fixture = TestBed.createComponent(PlainButton);
+     fixture.detectChanges();
+ 
+     buttonElement = fixture.debugElement.query(By.css('button'))!.nativeElement;
+-    focusMonitor = fm;
++    focusMonitor = TestBed.inject(FocusMonitor);
+ 
+     changeHandler = jasmine.createSpy('focus origin change handler');
+     focusMonitor.monitor(buttonElement).subscribe(changeHandler);
+     patchElementFocus(buttonElement);
+-  }));
++  });
+ 
+   it('manually registered element should receive focus classes', fakeAsync(() => {
+     buttonElement.focus();
+@@ -479,19 +477,17 @@ describe('FocusMonitor with "eventual" detection', () => {
+         },
+       ],
+     });
+-  });
+ 
+-  beforeEach(inject([FocusMonitor], (fm: FocusMonitor) => {
+     fixture = TestBed.createComponent(PlainButton);
+     fixture.detectChanges();
+ 
+     buttonElement = fixture.debugElement.query(By.css('button'))!.nativeElement;
+-    focusMonitor = fm;
++    focusMonitor = TestBed.inject(FocusMonitor);
+ 
+     changeHandler = jasmine.createSpy('focus origin change handler');
+     focusMonitor.monitor(buttonElement).subscribe(changeHandler);
+     patchElementFocus(buttonElement);
+-  }));
++  });
+ 
+   it('should not clear the focus origin, even after a few seconds', fakeAsync(() => {
+     dispatchKeyboardEvent(document, 'keydown', TAB);
+@@ -712,8 +708,8 @@ describe('cdkMonitorFocus', () => {
+     let childElement: HTMLElement;
+     let focusMonitor: FocusMonitor;
+ 
+-    beforeEach(inject([FocusMonitor], (fm: FocusMonitor) => {
+-      focusMonitor = fm;
++    beforeEach(() => {
++      focusMonitor = TestBed.inject(FocusMonitor);
+       fixture = TestBed.createComponent(
+         ComplexComponentWithMonitorSubtreeFocusAndMonitorElementFocus,
+       );
+@@ -724,7 +720,7 @@ describe('cdkMonitorFocus', () => {
+ 
+       patchElementFocus(parentElement);
+       patchElementFocus(childElement);
+-    }));
++    });
+ 
+     it('should add keyboard focus classes on both elements when child is focused via keyboard', fakeAsync(() => {
+       focusMonitor.focusVia(childElement, 'keyboard');
+@@ -828,15 +824,12 @@ describe('FocusMonitor observable stream', () => {
+       imports: [A11yModule, PlainButton],
+       providers: [{provide: Platform, useValue: fakePlatform}],
+     });
+-  });
+-
+-  beforeEach(inject([FocusMonitor], (fm: FocusMonitor) => {
+     fixture = TestBed.createComponent(PlainButton);
+-    focusMonitor = fm;
++    focusMonitor = TestBed.inject(FocusMonitor);
+     fixture.detectChanges();
+     buttonElement = fixture.debugElement.nativeElement.querySelector('button');
+     patchElementFocus(buttonElement);
+-  }));
++  });
+ 
+   it('should not emit on the server', fakeAsync(() => {
+     fakePlatform.isBrowser = false;
+@@ -865,16 +858,13 @@ describe('FocusMonitor input label detection', () => {
+     TestBed.configureTestingModule({
+       imports: [A11yModule, CheckboxWithLabel],
+     });
+-  });
+-
+-  beforeEach(inject([FocusMonitor], (fm: FocusMonitor) => {
+     fixture = TestBed.createComponent(CheckboxWithLabel);
+-    focusMonitor = fm;
++    focusMonitor = TestBed.inject(FocusMonitor);
+     fixture.detectChanges();
+     inputElement = fixture.nativeElement.querySelector('input');
+     labelElement = fixture.nativeElement.querySelector('label');
+     patchElementFocus(inputElement);
+-  }));
++  });
+ 
+   it('should detect label click focus as `mouse`', fakeAsync(() => {
+     const spy = jasmine.createSpy('monitor spy');
+diff --git a/src/cdk/a11y/focus-monitor/focus-monitor.zone.spec.ts b/src/cdk/a11y/focus-monitor/focus-monitor.zone.spec.ts
+index 7865bbf9d834..d599886e5201 100644
+--- a/src/cdk/a11y/focus-monitor/focus-monitor.zone.spec.ts
++++ b/src/cdk/a11y/focus-monitor/focus-monitor.zone.spec.ts
+@@ -1,7 +1,7 @@
+ import {Platform} from '../../platform';
+ import {patchElementFocus} from '../../testing/private';
+ import {Component, NgZone, provideZoneChangeDetection} from '@angular/core';
+-import {ComponentFixture, TestBed, fakeAsync, inject, tick} from '@angular/core/testing';
++import {ComponentFixture, TestBed, fakeAsync, tick} from '@angular/core/testing';
+ import {A11yModule} from '../a11y-module';
+ import {FocusMonitor} from './focus-monitor';
+ 
+@@ -17,15 +17,12 @@ describe('FocusMonitor observable stream Zone.js integration', () => {
+       imports: [A11yModule, PlainButton],
+       providers: [{provide: Platform, useValue: fakePlatform}, provideZoneChangeDetection()],
+     });
+-  });
+-
+-  beforeEach(inject([FocusMonitor], (fm: FocusMonitor) => {
+     fixture = TestBed.createComponent(PlainButton);
+-    focusMonitor = fm;
++    focusMonitor = TestBed.inject(FocusMonitor);
+     fixture.detectChanges();
+     buttonElement = fixture.debugElement.nativeElement.querySelector('button');
+     patchElementFocus(buttonElement);
+-  }));
++  });
+ 
+   it('should emit inside the NgZone', fakeAsync(() => {
+     const spy = jasmine.createSpy('zone spy');
+diff --git a/src/cdk/drag-drop/drag-drop-registry.spec.ts b/src/cdk/drag-drop/drag-drop-registry.spec.ts
+index 956d3238a266..8a85a6b2537f 100644
+--- a/src/cdk/drag-drop/drag-drop-registry.spec.ts
++++ b/src/cdk/drag-drop/drag-drop-registry.spec.ts
+@@ -1,5 +1,5 @@
+ import {Component} from '@angular/core';
+-import {fakeAsync, TestBed, ComponentFixture, inject} from '@angular/core/testing';
++import {fakeAsync, TestBed, ComponentFixture} from '@angular/core/testing';
+ import {
+   createMouseEvent,
+   dispatchMouseEvent,
+@@ -22,10 +22,7 @@ describe('DragDropRegistry', () => {
+ 
+     fixture = TestBed.createComponent(BlankComponent);
+     fixture.detectChanges();
+-
+-    inject([DragDropRegistry], (c: DragDropRegistry) => {
+-      registry = c;
+-    })();
++    registry = TestBed.inject(DragDropRegistry);
+   }));
+ 
+   it('should be able to start dragging an item', () => {
+diff --git a/src/cdk/layout/breakpoints-observer.spec.ts b/src/cdk/layout/breakpoints-observer.spec.ts
+index e3af90acdd5c..db2619b51ddd 100644
+--- a/src/cdk/layout/breakpoints-observer.spec.ts
++++ b/src/cdk/layout/breakpoints-observer.spec.ts
+@@ -9,7 +9,7 @@
+ import {LayoutModule} from './layout-module';
+ import {BreakpointObserver, BreakpointState} from './breakpoints-observer';
+ import {MediaMatcher} from './media-matcher';
+-import {fakeAsync, TestBed, inject, flush, tick} from '@angular/core/testing';
++import {fakeAsync, TestBed, flush, tick} from '@angular/core/testing';
+ import {Injectable} from '@angular/core';
+ import {Subscription} from 'rxjs';
+ import {skip, take} from 'rxjs/operators';
+@@ -23,16 +23,10 @@ describe('BreakpointObserver', () => {
+       imports: [LayoutModule],
+       providers: [{provide: MediaMatcher, useClass: FakeMediaMatcher}],
+     });
++    breakpointObserver = TestBed.inject(BreakpointObserver);
++    mediaMatcher = TestBed.inject(MediaMatcher) as unknown as FakeMediaMatcher;
+   }));
+ 
+-  beforeEach(inject(
+-    [BreakpointObserver, MediaMatcher],
+-    (bm: BreakpointObserver, mm: FakeMediaMatcher) => {
+-      breakpointObserver = bm;
+-      mediaMatcher = mm;
+-    },
+-  ));
+-
+   afterEach(() => {
+     mediaMatcher.clear();
+   });
+diff --git a/src/cdk/layout/media-matcher.spec.ts b/src/cdk/layout/media-matcher.spec.ts
+index 50eb7b1ab548..de468de07704 100644
+--- a/src/cdk/layout/media-matcher.spec.ts
++++ b/src/cdk/layout/media-matcher.spec.ts
+@@ -6,41 +6,40 @@
+  * found in the LICENSE file at https://angular.dev/license
+  */
+ import {MediaMatcher} from './media-matcher';
+-import {inject} from '@angular/core/testing';
++import {TestBed} from '@angular/core/testing';
+ import {Platform} from '../platform';
+ 
+ describe('MediaMatcher', () => {
+   let mediaMatcher: MediaMatcher;
++  let platform: Platform;
+ 
+-  beforeEach(inject([MediaMatcher], (mm: MediaMatcher) => {
+-    mediaMatcher = mm;
+-  }));
++  beforeEach(() => {
++    mediaMatcher = TestBed.inject(MediaMatcher);
++    platform = TestBed.inject(Platform);
++  });
+ 
+   it('correctly returns a MediaQueryList to check for matches', () => {
+     expect(mediaMatcher.matchMedia('(min-width: 1px)').matches).toBeTruthy();
+     expect(mediaMatcher.matchMedia('(max-width: 1px)').matches).toBeFalsy();
+   });
+ 
+-  it('should add CSS rules for provided queries when the platform is webkit or blink', inject(
+-    [Platform],
+-    (platform: Platform) => {
+-      const width = '123456px';
++  it('should add CSS rules for provided queries when the platform is webkit or blink', () => {
++    const width = '123456px';
+ 
+-      expect(getStyleTagByString(width)).toBeFalsy();
+-      mediaMatcher.matchMedia(`(width: ${width})`);
++    expect(getStyleTagByString(width)).toBeFalsy();
++    mediaMatcher.matchMedia(`(width: ${width})`);
+ 
+-      if (platform.WEBKIT || platform.BLINK) {
+-        expect(getStyleTagByString(width)).toBeTruthy();
+-      } else {
+-        expect(getStyleTagByString(width)).toBeFalsy();
+-      }
++    if (platform.WEBKIT || platform.BLINK) {
++      expect(getStyleTagByString(width)).toBeTruthy();
++    } else {
++      expect(getStyleTagByString(width)).toBeFalsy();
++    }
+ 
+-      function getStyleTagByString(str: string): HTMLStyleElement | undefined {
+-        return Array.from(document.head!.querySelectorAll('style')).find(tag => {
+-          const rules = tag.sheet ? Array.from((tag.sheet as CSSStyleSheet).cssRules) : [];
+-          return !!rules.find(rule => rule.cssText.includes(str));
+-        });
+-      }
+-    },
+-  ));
++    function getStyleTagByString(str: string): HTMLStyleElement | undefined {
++      return Array.from(document.head!.querySelectorAll('style')).find(tag => {
++        const rules = tag.sheet ? Array.from((tag.sheet as CSSStyleSheet).cssRules) : [];
++        return !!rules.find(rule => rule.cssText.includes(str));
++      });
++    }
++  });
+ });
+diff --git a/src/cdk/observers/observe-content.spec.ts b/src/cdk/observers/observe-content.spec.ts
+index 93f5b60491dc..ba7543a4fa35 100644
+--- a/src/cdk/observers/observe-content.spec.ts
++++ b/src/cdk/observers/observe-content.spec.ts
+@@ -1,12 +1,5 @@
+ import {Component, ElementRef, ViewChild} from '@angular/core';
+-import {
+-  ComponentFixture,
+-  TestBed,
+-  fakeAsync,
+-  inject,
+-  tick,
+-  waitForAsync,
+-} from '@angular/core/testing';
++import {ComponentFixture, TestBed, fakeAsync, tick, waitForAsync} from '@angular/core/testing';
+ import {ContentObserver, MutationObserverFactory, ObserversModule} from './observe-content';
+ 
+ describe('Observe content directive', () => {
+@@ -147,10 +140,8 @@ describe('ContentObserver injectable', () => {
+           },
+         ],
+       });
+-    }));
+ 
+-    beforeEach(inject([ContentObserver], (co: ContentObserver) => {
+-      contentObserver = co;
++      contentObserver = TestBed.inject(ContentObserver);
+     }));
+ 
+     it('should trigger the callback when the content of the element changes', fakeAsync(() => {
+@@ -168,33 +159,32 @@ describe('ContentObserver injectable', () => {
+       expect(spy).toHaveBeenCalled();
+     }));
+ 
+-    it('should only create one MutationObserver when observing the same element twice', fakeAsync(
+-      inject([MutationObserverFactory], (mof: MutationObserverFactory) => {
+-        const spy = jasmine.createSpy('content observer');
+-        spyOn(mof, 'create').and.callThrough();
+-        const fixture = TestBed.createComponent(UnobservedComponentWithTextContent);
+-        fixture.detectChanges();
++    it('should only create one MutationObserver when observing the same element twice', fakeAsync(() => {
++      const observerFactory = TestBed.inject(MutationObserverFactory);
++      const spy = jasmine.createSpy('content observer');
++      spyOn(observerFactory, 'create').and.callThrough();
++      const fixture = TestBed.createComponent(UnobservedComponentWithTextContent);
++      fixture.detectChanges();
+ 
+-        const sub1 = contentObserver
+-          .observe(fixture.componentInstance.contentEl)
+-          .subscribe(() => spy());
+-        contentObserver.observe(fixture.componentInstance.contentEl).subscribe(() => spy());
++      const sub1 = contentObserver
++        .observe(fixture.componentInstance.contentEl)
++        .subscribe(() => spy());
++      contentObserver.observe(fixture.componentInstance.contentEl).subscribe(() => spy());
+ 
+-        expect(mof.create).toHaveBeenCalledTimes(1);
++      expect(observerFactory.create).toHaveBeenCalledTimes(1);
+ 
+-        fixture.componentInstance.text = 'text';
+-        invokeCallbacks([{type: 'fake'}]);
++      fixture.componentInstance.text = 'text';
++      invokeCallbacks([{type: 'fake'}]);
+ 
+-        expect(spy).toHaveBeenCalledTimes(2);
++      expect(spy).toHaveBeenCalledTimes(2);
+ 
+-        spy.calls.reset();
+-        sub1.unsubscribe();
+-        fixture.componentInstance.text = 'text text';
+-        invokeCallbacks([{type: 'fake'}]);
++      spy.calls.reset();
++      sub1.unsubscribe();
++      fixture.componentInstance.text = 'text text';
++      invokeCallbacks([{type: 'fake'}]);
+ 
+-        expect(spy).toHaveBeenCalledTimes(1);
+-      }),
+-    ));
++      expect(spy).toHaveBeenCalledTimes(1);
++    }));
+   });
+ 
+   describe('real behavior', () => {
+diff --git a/src/cdk/overlay/dispatchers/overlay-keyboard-dispatcher.spec.ts b/src/cdk/overlay/dispatchers/overlay-keyboard-dispatcher.spec.ts
+index 7f031daca3f5..58de3a09b69d 100644
+--- a/src/cdk/overlay/dispatchers/overlay-keyboard-dispatcher.spec.ts
++++ b/src/cdk/overlay/dispatchers/overlay-keyboard-dispatcher.spec.ts
+@@ -1,7 +1,7 @@
+ import {ESCAPE} from '../../keycodes';
+ import {ComponentPortal} from '../../portal';
+ import {ApplicationRef, Component} from '@angular/core';
+-import {TestBed, inject} from '@angular/core/testing';
++import {TestBed} from '@angular/core/testing';
+ import {dispatchKeyboardEvent} from '../../testing/private';
+ import {Overlay, OverlayModule} from '../index';
+ import {OverlayKeyboardDispatcher} from './overlay-keyboard-dispatcher';
+@@ -12,18 +12,10 @@ describe('OverlayKeyboardDispatcher', () => {
+   let overlay: Overlay;
+ 
+   beforeEach(() => {
+-    TestBed.configureTestingModule({
+-      imports: [OverlayModule, TestComponent],
+-    });
+-
+-    inject(
+-      [ApplicationRef, OverlayKeyboardDispatcher, Overlay],
+-      (ar: ApplicationRef, kbd: OverlayKeyboardDispatcher, o: Overlay) => {
+-        appRef = ar;
+-        keyboardDispatcher = kbd;
+-        overlay = o;
+-      },
+-    )();
++    TestBed.configureTestingModule({imports: [OverlayModule, TestComponent]});
++    appRef = TestBed.inject(ApplicationRef);
++    keyboardDispatcher = TestBed.inject(OverlayKeyboardDispatcher);
++    overlay = TestBed.inject(Overlay);
+   });
+ 
+   it('should track overlays in order as they are attached and detached', () => {
+diff --git a/src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.spec.ts b/src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.spec.ts
+index 5b2af9d39c35..c07dab73120a 100644
+--- a/src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.spec.ts
++++ b/src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.spec.ts
+@@ -1,5 +1,5 @@
+ import {ApplicationRef, Component} from '@angular/core';
+-import {TestBed, inject} from '@angular/core/testing';
++import {TestBed} from '@angular/core/testing';
+ import {filter, take} from 'rxjs/operators';
+ import {ComponentPortal} from '../../portal';
+ import {dispatchFakeEvent, dispatchMouseEvent} from '../../testing/private';
+@@ -12,18 +12,10 @@ describe('OverlayOutsideClickDispatcher', () => {
+   let overlay: Overlay;
+ 
+   beforeEach(() => {
+-    TestBed.configureTestingModule({
+-      imports: [OverlayModule, TestComponent],
+-    });
+-
+-    inject(
+-      [ApplicationRef, OverlayOutsideClickDispatcher, Overlay],
+-      (ar: ApplicationRef, ocd: OverlayOutsideClickDispatcher, o: Overlay) => {
+-        appRef = ar;
+-        outsideClickDispatcher = ocd;
+-        overlay = o;
+-      },
+-    )();
++    TestBed.configureTestingModule({imports: [OverlayModule, TestComponent]});
++    appRef = TestBed.inject(ApplicationRef);
++    outsideClickDispatcher = TestBed.inject(OverlayOutsideClickDispatcher);
++    overlay = TestBed.inject(Overlay);
+   });
+ 
+   it('should track overlays in order as they are attached and detached', () => {
+diff --git a/src/cdk/overlay/fullscreen-overlay-container.spec.ts b/src/cdk/overlay/fullscreen-overlay-container.spec.ts
+index 237d5694f5b8..adae85839ece 100644
+--- a/src/cdk/overlay/fullscreen-overlay-container.spec.ts
++++ b/src/cdk/overlay/fullscreen-overlay-container.spec.ts
+@@ -1,6 +1,6 @@
+ import {DOCUMENT} from '@angular/common';
+-import {waitForAsync, inject, TestBed} from '@angular/core/testing';
+-import {Component, NgModule, ViewChild, ViewContainerRef, inject as inject_1} from '@angular/core';
++import {waitForAsync, TestBed} from '@angular/core/testing';
++import {Component, NgModule, ViewChild, ViewContainerRef, inject} from '@angular/core';
+ import {PortalModule, CdkPortal} from '../portal';
+ import {Overlay, OverlayContainer, OverlayModule, FullscreenOverlayContainer} from './index';
+ import {TemplatePortalDirective} from '../portal/portal-directives';
+@@ -58,10 +58,8 @@ describe('FullscreenOverlayContainer', () => {
+         },
+       ],
+     });
+-  }));
+ 
+-  beforeEach(inject([Overlay], (o: Overlay) => {
+-    overlay = o;
++    overlay = TestBed.inject(Overlay);
+   }));
+ 
+   afterEach(() => {
+@@ -116,7 +114,7 @@ describe('FullscreenOverlayContainer', () => {
+   imports: [TemplatePortalDirective],
+ })
+ class TestComponentWithTemplatePortals {
+-  viewContainerRef = inject_1(ViewContainerRef);
++  viewContainerRef = inject(ViewContainerRef);
+ 
+   @ViewChild(CdkPortal) templatePortal: CdkPortal;
+ }
+diff --git a/src/cdk/overlay/overlay-directives.spec.ts b/src/cdk/overlay/overlay-directives.spec.ts
+index 8f51b0f61cb2..a2b9675071e0 100644
+--- a/src/cdk/overlay/overlay-directives.spec.ts
++++ b/src/cdk/overlay/overlay-directives.spec.ts
+@@ -1,14 +1,7 @@
+ import {Directionality} from '../bidi';
+ import {A, ESCAPE} from '../keycodes';
+ import {Component, ElementRef, ViewChild} from '@angular/core';
+-import {
+-  ComponentFixture,
+-  TestBed,
+-  fakeAsync,
+-  inject,
+-  tick,
+-  waitForAsync,
+-} from '@angular/core/testing';
++import {ComponentFixture, TestBed, fakeAsync, tick, waitForAsync} from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+ import {Subject} from 'rxjs';
+ import {createKeyboardEvent, dispatchEvent, dispatchKeyboardEvent} from '../testing/private';
+@@ -50,18 +43,13 @@ describe('Overlay directives', () => {
+         },
+       ],
+     });
+-  });
+ 
+-  beforeEach(() => {
++    overlay = TestBed.inject(Overlay);
++    overlayContainerElement = TestBed.inject(OverlayContainer).getContainerElement();
+     fixture = TestBed.createComponent(ConnectedOverlayDirectiveTest);
+     fixture.detectChanges();
+   });
+ 
+-  beforeEach(inject([OverlayContainer, Overlay], (oc: OverlayContainer, o: Overlay) => {
+-    overlay = o;
+-    overlayContainerElement = oc.getContainerElement();
+-  }));
+-
+   /** Returns the current open overlay pane element. */
+   function getPaneElement() {
+     return overlayContainerElement.querySelector('.cdk-overlay-pane') as HTMLElement;
+diff --git a/src/cdk/overlay/scroll/block-scroll-strategy.spec.ts b/src/cdk/overlay/scroll/block-scroll-strategy.spec.ts
+index d6063546d31f..464cdc307d6b 100644
+--- a/src/cdk/overlay/scroll/block-scroll-strategy.spec.ts
++++ b/src/cdk/overlay/scroll/block-scroll-strategy.spec.ts
+@@ -1,5 +1,5 @@
+ import {Component} from '@angular/core';
+-import {waitForAsync, inject, TestBed} from '@angular/core/testing';
++import {waitForAsync, TestBed} from '@angular/core/testing';
+ import {ComponentPortal, PortalModule} from '../../portal';
+ import {Platform} from '../../platform';
+ import {ViewportRuler} from '../../scrolling';
+@@ -12,42 +12,34 @@ describe('BlockScrollStrategy', () => {
+   let overlayRef: OverlayRef;
+   let componentPortal: ComponentPortal<FocacciaMsg>;
+   let forceScrollElement: HTMLElement;
++  let overlayContainer: OverlayContainer;
+ 
+   beforeEach(waitForAsync(() => {
+-    documentElement = document.documentElement!;
++    TestBed.configureTestingModule({imports: [OverlayModule, PortalModule, FocacciaMsg]});
+ 
+-    // Ensure a clean state for every test.
+-    documentElement.classList.remove('cdk-global-scrollblock');
++    const overlay = TestBed.inject(Overlay);
++    const overlayConfig = new OverlayConfig({scrollStrategy: overlay.scrollStrategies.block()});
+ 
+-    TestBed.configureTestingModule({
+-      imports: [OverlayModule, PortalModule, FocacciaMsg],
+-    });
++    viewport = TestBed.inject(ViewportRuler);
++    platform = TestBed.inject(Platform);
++    overlayContainer = TestBed.inject(OverlayContainer);
++    overlayRef = overlay.create(overlayConfig);
++    componentPortal = new ComponentPortal(FocacciaMsg);
++    documentElement = document.documentElement!;
++    documentElement.classList.remove('cdk-global-scrollblock');
++    forceScrollElement = document.createElement('div');
++    document.body.appendChild(forceScrollElement);
++    forceScrollElement.style.width = '100px';
++    forceScrollElement.style.height = '3000px';
++    forceScrollElement.style.background = 'rebeccapurple';
+   }));
+ 
+-  beforeEach(inject(
+-    [Overlay, ViewportRuler, Platform],
+-    (overlay: Overlay, viewportRuler: ViewportRuler, _platform: Platform) => {
+-      let overlayConfig = new OverlayConfig({scrollStrategy: overlay.scrollStrategies.block()});
+-
+-      overlayRef = overlay.create(overlayConfig);
+-      componentPortal = new ComponentPortal(FocacciaMsg);
+-
+-      viewport = viewportRuler;
+-      forceScrollElement = document.createElement('div');
+-      document.body.appendChild(forceScrollElement);
+-      forceScrollElement.style.width = '100px';
+-      forceScrollElement.style.height = '3000px';
+-      forceScrollElement.style.background = 'rebeccapurple';
+-      platform = _platform;
+-    },
+-  ));
+-
+-  afterEach(inject([OverlayContainer], (container: OverlayContainer) => {
++  afterEach(() => {
+     overlayRef.dispose();
+     forceScrollElement.remove();
+     window.scroll(0, 0);
+-    container.getContainerElement().remove();
+-  }));
++    overlayContainer.getContainerElement().remove();
++  });
+ 
+   it(
+     'should toggle scroll blocking along the y axis',
+diff --git a/src/cdk/overlay/scroll/close-scroll-strategy.spec.ts b/src/cdk/overlay/scroll/close-scroll-strategy.spec.ts
+index 0b1fb8b267c8..2eac586b25ea 100644
+--- a/src/cdk/overlay/scroll/close-scroll-strategy.spec.ts
++++ b/src/cdk/overlay/scroll/close-scroll-strategy.spec.ts
+@@ -1,7 +1,7 @@
+ import {ComponentPortal, PortalModule} from '../../portal';
+ import {CdkScrollable, ScrollDispatcher, ViewportRuler} from '../../scrolling';
+ import {Component, ElementRef} from '@angular/core';
+-import {TestBed, fakeAsync, inject} from '@angular/core/testing';
++import {TestBed, fakeAsync} from '@angular/core/testing';
+ import {Subject} from 'rxjs';
+ import {Overlay, OverlayConfig, OverlayContainer, OverlayModule, OverlayRef} from '../index';
+ 
+@@ -10,6 +10,8 @@ describe('CloseScrollStrategy', () => {
+   let componentPortal: ComponentPortal<MozarellaMsg>;
+   let scrolledSubject = new Subject<CdkScrollable | undefined>();
+   let scrollPosition: number;
++  let overlayContainer: OverlayContainer;
++  let overlay: Overlay;
+ 
+   beforeEach(fakeAsync(() => {
+     scrollPosition = 0;
+@@ -31,18 +33,18 @@ describe('CloseScrollStrategy', () => {
+         },
+       ],
+     });
+-  }));
+ 
+-  beforeEach(inject([Overlay], (overlay: Overlay) => {
+-    let overlayConfig = new OverlayConfig({scrollStrategy: overlay.scrollStrategies.close()});
++    overlayContainer = TestBed.inject(OverlayContainer);
++    overlay = TestBed.inject(Overlay);
++    const overlayConfig = new OverlayConfig({scrollStrategy: overlay.scrollStrategies.close()});
+     overlayRef = overlay.create(overlayConfig);
+     componentPortal = new ComponentPortal(MozarellaMsg);
+   }));
+ 
+-  afterEach(inject([OverlayContainer], (container: OverlayContainer) => {
++  afterEach(() => {
+     overlayRef.dispose();
+-    container.getContainerElement().remove();
+-  }));
++    overlayContainer.getContainerElement().remove();
++  });
+ 
+   it('should detach the overlay as soon as the user scrolls', () => {
+     overlayRef.attach(componentPortal);
+@@ -72,64 +74,58 @@ describe('CloseScrollStrategy', () => {
+     expect(overlayRef.detach).not.toHaveBeenCalled();
+   });
+ 
+-  it('should be able to reposition the overlay up to a certain threshold before closing', inject(
+-    [Overlay],
+-    (overlay: Overlay) => {
+-      overlayRef.dispose();
++  it('should be able to reposition the overlay up to a certain threshold before closing', () => {
++    overlayRef.dispose();
+ 
+-      overlayRef = overlay.create({
+-        scrollStrategy: overlay.scrollStrategies.close({threshold: 50}),
+-      });
++    overlayRef = overlay.create({
++      scrollStrategy: overlay.scrollStrategies.close({threshold: 50}),
++    });
+ 
+-      overlayRef.attach(componentPortal);
+-      spyOn(overlayRef, 'updatePosition');
+-      spyOn(overlayRef, 'detach');
++    overlayRef.attach(componentPortal);
++    spyOn(overlayRef, 'updatePosition');
++    spyOn(overlayRef, 'detach');
+ 
+-      for (let i = 0; i < 50; i++) {
+-        scrollPosition++;
+-        scrolledSubject.next();
+-      }
++    for (let i = 0; i < 50; i++) {
++      scrollPosition++;
++      scrolledSubject.next();
++    }
++
++    expect(overlayRef.updatePosition).toHaveBeenCalledTimes(50);
++    expect(overlayRef.detach).not.toHaveBeenCalled();
+ 
+-      expect(overlayRef.updatePosition).toHaveBeenCalledTimes(50);
+-      expect(overlayRef.detach).not.toHaveBeenCalled();
++    scrollPosition++;
++    scrolledSubject.next();
+ 
++    expect(overlayRef.detach).toHaveBeenCalledTimes(1);
++  });
++
++  it('should not close if the user starts scrolling away and comes back', () => {
++    overlayRef.dispose();
++    scrollPosition = 100;
++
++    overlayRef = overlay.create({
++      scrollStrategy: overlay.scrollStrategies.close({threshold: 50}),
++    });
++
++    overlayRef.attach(componentPortal);
++    spyOn(overlayRef, 'updatePosition');
++    spyOn(overlayRef, 'detach');
++
++    // Scroll down 30px.
++    for (let i = 0; i < 30; i++) {
+       scrollPosition++;
+       scrolledSubject.next();
++    }
++
++    // Scroll back up 30px.
++    for (let i = 0; i < 30; i++) {
++      scrollPosition--;
++      scrolledSubject.next();
++    }
+ 
+-      expect(overlayRef.detach).toHaveBeenCalledTimes(1);
+-    },
+-  ));
+-
+-  it('should not close if the user starts scrolling away and comes back', inject(
+-    [Overlay],
+-    (overlay: Overlay) => {
+-      overlayRef.dispose();
+-      scrollPosition = 100;
+-
+-      overlayRef = overlay.create({
+-        scrollStrategy: overlay.scrollStrategies.close({threshold: 50}),
+-      });
+-
+-      overlayRef.attach(componentPortal);
+-      spyOn(overlayRef, 'updatePosition');
+-      spyOn(overlayRef, 'detach');
+-
+-      // Scroll down 30px.
+-      for (let i = 0; i < 30; i++) {
+-        scrollPosition++;
+-        scrolledSubject.next();
+-      }
+-
+-      // Scroll back up 30px.
+-      for (let i = 0; i < 30; i++) {
+-        scrollPosition--;
+-        scrolledSubject.next();
+-      }
+-
+-      expect(overlayRef.updatePosition).toHaveBeenCalledTimes(60);
+-      expect(overlayRef.detach).not.toHaveBeenCalled();
+-    },
+-  ));
++    expect(overlayRef.updatePosition).toHaveBeenCalledTimes(60);
++    expect(overlayRef.detach).not.toHaveBeenCalled();
++  });
+ });
+ 
+ /** Simple component that we can attach to the overlay. */
+diff --git a/src/cdk/overlay/scroll/close-scroll-strategy.zone.spec.ts b/src/cdk/overlay/scroll/close-scroll-strategy.zone.spec.ts
+index 12f46b81701d..99a2572bcbdb 100644
+--- a/src/cdk/overlay/scroll/close-scroll-strategy.zone.spec.ts
++++ b/src/cdk/overlay/scroll/close-scroll-strategy.zone.spec.ts
+@@ -1,6 +1,6 @@
+ import {ComponentPortal, PortalModule} from '../../portal';
+ import {Component, NgZone, provideZoneChangeDetection} from '@angular/core';
+-import {TestBed, fakeAsync, inject} from '@angular/core/testing';
++import {TestBed, fakeAsync} from '@angular/core/testing';
+ import {Subject} from 'rxjs';
+ import {Overlay} from '../overlay';
+ import {OverlayConfig} from '../overlay-config';
+@@ -14,6 +14,7 @@ describe('CloseScrollStrategy Zone.js integration', () => {
+   let componentPortal: ComponentPortal<MozarellaMsg>;
+   let scrolledSubject = new Subject<CdkScrollable | undefined>();
+   let scrollPosition: number;
++  let overlayContainer: OverlayContainer;
+ 
+   beforeEach(fakeAsync(() => {
+     scrollPosition = 0;
+@@ -36,18 +37,18 @@ describe('CloseScrollStrategy Zone.js integration', () => {
+         },
+       ],
+     });
+-  }));
+ 
+-  beforeEach(inject([Overlay], (overlay: Overlay) => {
+-    let overlayConfig = new OverlayConfig({scrollStrategy: overlay.scrollStrategies.close()});
++    const overlay = TestBed.inject(Overlay);
++    const overlayConfig = new OverlayConfig({scrollStrategy: overlay.scrollStrategies.close()});
+     overlayRef = overlay.create(overlayConfig);
+     componentPortal = new ComponentPortal(MozarellaMsg);
++    overlayContainer = TestBed.inject(OverlayContainer);
+   }));
+ 
+-  afterEach(inject([OverlayContainer], (container: OverlayContainer) => {
++  afterEach(() => {
+     overlayRef.dispose();
+-    container.getContainerElement().remove();
+-  }));
++    overlayContainer.getContainerElement().remove();
++  });
+ 
+   it('should detach inside the NgZone', () => {
+     const spy = jasmine.createSpy('detachment spy');
+diff --git a/src/cdk/overlay/scroll/reposition-scroll-strategy.spec.ts b/src/cdk/overlay/scroll/reposition-scroll-strategy.spec.ts
+index 3bcd476a8a68..412051b9feff 100644
+--- a/src/cdk/overlay/scroll/reposition-scroll-strategy.spec.ts
++++ b/src/cdk/overlay/scroll/reposition-scroll-strategy.spec.ts
+@@ -1,4 +1,4 @@
+-import {waitForAsync, inject, TestBed} from '@angular/core/testing';
++import {waitForAsync, TestBed} from '@angular/core/testing';
+ import {Component} from '@angular/core';
+ import {Subject} from 'rxjs';
+ import {ComponentPortal, PortalModule} from '../../portal';
+@@ -14,6 +14,7 @@ import {
+ describe('RepositionScrollStrategy', () => {
+   let overlayRef: OverlayRef;
+   let overlay: Overlay;
++  let overlayContainer: OverlayContainer;
+   let componentPortal: ComponentPortal<PastaMsg>;
+   let scrolledSubject = new Subject();
+ 
+@@ -29,17 +30,16 @@ describe('RepositionScrollStrategy', () => {
+         },
+       ],
+     });
+-  }));
+ 
+-  beforeEach(inject([Overlay], (o: Overlay) => {
+-    overlay = o;
++    overlay = TestBed.inject(Overlay);
++    overlayContainer = TestBed.inject(OverlayContainer);
+     componentPortal = new ComponentPortal(PastaMsg);
+   }));
+ 
+-  afterEach(inject([OverlayContainer], (container: OverlayContainer) => {
++  afterEach(() => {
+     overlayRef.dispose();
+-    container.getContainerElement().remove();
+-  }));
++    overlayContainer.getContainerElement().remove();
++  });
+ 
+   it('should update the overlay position when the page is scrolled', () => {
+     const overlayConfig = new OverlayConfig({
+diff --git a/src/cdk/scrolling/scroll-dispatcher.spec.ts b/src/cdk/scrolling/scroll-dispatcher.spec.ts
+index 530547bccd51..35a7ed9777f0 100644
+--- a/src/cdk/scrolling/scroll-dispatcher.spec.ts
++++ b/src/cdk/scrolling/scroll-dispatcher.spec.ts
+@@ -1,32 +1,26 @@
+-import {
+-  inject,
+-  TestBed,
+-  waitForAsync,
+-  fakeAsync,
+-  ComponentFixture,
+-  tick,
+-} from '@angular/core/testing';
++import {TestBed, waitForAsync, fakeAsync, ComponentFixture, tick} from '@angular/core/testing';
+ import {Component, ViewChild, ElementRef} from '@angular/core';
+ import {CdkScrollable, ScrollDispatcher, ScrollingModule} from './public-api';
+ import {dispatchFakeEvent} from '../testing/private';
+ 
+ describe('ScrollDispatcher', () => {
++  let scroll: ScrollDispatcher;
++
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+       imports: [ScrollingModule, ScrollingComponent, NestedScrollingComponent],
+     });
++
++    scroll = TestBed.inject(ScrollDispatcher);
+   }));
+ 
+   describe('Basic usage', () => {
+-    let scroll: ScrollDispatcher;
+     let fixture: ComponentFixture<ScrollingComponent>;
+ 
+-    beforeEach(inject([ScrollDispatcher], (s: ScrollDispatcher) => {
+-      scroll = s;
+-
++    beforeEach(() => {
+       fixture = TestBed.createComponent(ScrollingComponent);
+       fixture.detectChanges();
+-    }));
++    });
+ 
+     it('should be registered with the scrollable directive with the scroll service', () => {
+       const componentScrollable = fixture.componentInstance.scrollable;
+@@ -122,17 +116,14 @@ describe('ScrollDispatcher', () => {
+   });
+ 
+   describe('Nested scrollables', () => {
+-    let scroll: ScrollDispatcher;
+     let fixture: ComponentFixture<NestedScrollingComponent>;
+     let element: ElementRef<HTMLElement>;
+ 
+-    beforeEach(inject([ScrollDispatcher], (s: ScrollDispatcher) => {
+-      scroll = s;
+-
++    beforeEach(() => {
+       fixture = TestBed.createComponent(NestedScrollingComponent);
+       fixture.detectChanges();
+       element = fixture.componentInstance.interestingElement;
+-    }));
++    });
+ 
+     it('should be able to identify the containing scrollables of an element', () => {
+       const scrollContainers = scroll.getAncestorScrollContainers(element);
+diff --git a/src/cdk/scrolling/scroll-dispatcher.zone.spec.ts b/src/cdk/scrolling/scroll-dispatcher.zone.spec.ts
+index e7b2b8fc7690..5807f90ae2c0 100644
+--- a/src/cdk/scrolling/scroll-dispatcher.zone.spec.ts
++++ b/src/cdk/scrolling/scroll-dispatcher.zone.spec.ts
+@@ -1,40 +1,35 @@
+ import {Component, ElementRef, ViewChild, provideZoneChangeDetection} from '@angular/core';
+-import {ComponentFixture, TestBed, inject, waitForAsync} from '@angular/core/testing';
++import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+ import {dispatchFakeEvent} from '../testing/private';
+ import {ScrollDispatcher} from './scroll-dispatcher';
+ import {CdkScrollable} from './scrollable';
+ import {ScrollingModule} from './scrolling-module';
+ 
+ describe('ScrollDispatcher Zone.js integration', () => {
++  let scroll: ScrollDispatcher;
++  let fixture: ComponentFixture<ScrollingComponent>;
++
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+       imports: [ScrollingModule, ScrollingComponent],
+       providers: [provideZoneChangeDetection()],
+     });
+-  }));
+-
+-  describe('Basic usage', () => {
+-    let scroll: ScrollDispatcher;
+-    let fixture: ComponentFixture<ScrollingComponent>;
+-
+-    beforeEach(inject([ScrollDispatcher], (s: ScrollDispatcher) => {
+-      scroll = s;
+ 
+-      fixture = TestBed.createComponent(ScrollingComponent);
+-      fixture.detectChanges();
+-    }));
++    scroll = TestBed.inject(ScrollDispatcher);
++    fixture = TestBed.createComponent(ScrollingComponent);
++    fixture.detectChanges();
++  }));
+ 
+-    it('should not execute the global events in the Angular zone', () => {
+-      scroll.scrolled(0).subscribe(() => {});
+-      dispatchFakeEvent(document, 'scroll', false);
++  it('should not execute the global events in the Angular zone', () => {
++    scroll.scrolled(0).subscribe(() => {});
++    dispatchFakeEvent(document, 'scroll', false);
+ 
+-      expect(fixture.ngZone!.isStable).toBe(true);
+-    });
++    expect(fixture.ngZone!.isStable).toBe(true);
++  });
+ 
+-    it('should not execute the scrollable events in the Angular zone', () => {
+-      dispatchFakeEvent(fixture.componentInstance.scrollingElement.nativeElement, 'scroll');
+-      expect(fixture.ngZone!.isStable).toBe(true);
+-    });
++  it('should not execute the scrollable events in the Angular zone', () => {
++    dispatchFakeEvent(fixture.componentInstance.scrollingElement.nativeElement, 'scroll');
++    expect(fixture.ngZone!.isStable).toBe(true);
+   });
+ });
+ 
+diff --git a/src/cdk/scrolling/viewport-ruler.spec.ts b/src/cdk/scrolling/viewport-ruler.spec.ts
+index 1b33803e9c16..bf068b6d23c3 100644
+--- a/src/cdk/scrolling/viewport-ruler.spec.ts
++++ b/src/cdk/scrolling/viewport-ruler.spec.ts
+@@ -1,6 +1,5 @@
+-import {TestBed, fakeAsync, inject, tick} from '@angular/core/testing';
++import {TestBed, fakeAsync, tick} from '@angular/core/testing';
+ import {dispatchFakeEvent} from '../testing/private';
+-import {ScrollingModule} from './public-api';
+ import {ViewportRuler} from './viewport-ruler';
+ 
+ describe('ViewportRuler', () => {
+@@ -14,17 +13,10 @@ describe('ViewportRuler', () => {
+   veryLargeElement.style.width = '6000px';
+   veryLargeElement.style.height = '6000px';
+ 
+-  beforeEach(() =>
+-    TestBed.configureTestingModule({
+-      imports: [ScrollingModule],
+-      providers: [ViewportRuler],
+-    }),
+-  );
+-
+-  beforeEach(inject([ViewportRuler], (v: ViewportRuler) => {
+-    viewportRuler = v;
++  beforeEach(() => {
++    viewportRuler = TestBed.inject(ViewportRuler);
+     scrollTo(0, 0);
+-  }));
++  });
+ 
+   it('should get the viewport size', () => {
+     let size = viewportRuler.getViewportSize();
+diff --git a/src/cdk/scrolling/viewport-ruler.zone.spec.ts b/src/cdk/scrolling/viewport-ruler.zone.spec.ts
+index ef68ae5de9c5..dccbd069ef32 100644
+--- a/src/cdk/scrolling/viewport-ruler.zone.spec.ts
++++ b/src/cdk/scrolling/viewport-ruler.zone.spec.ts
+@@ -1,8 +1,7 @@
+ import {NgZone, provideZoneChangeDetection} from '@angular/core';
+-import {TestBed, inject} from '@angular/core/testing';
++import {TestBed} from '@angular/core/testing';
+ import {Subscription} from 'rxjs';
+ import {dispatchFakeEvent} from '../testing/private';
+-import {ScrollingModule} from './scrolling-module';
+ import {ViewportRuler} from './viewport-ruler';
+ 
+ describe('ViewportRuler', () => {
+@@ -14,18 +13,12 @@ describe('ViewportRuler', () => {
+   veryLargeElement.style.width = '6000px';
+   veryLargeElement.style.height = '6000px';
+ 
+-  beforeEach(() =>
+-    TestBed.configureTestingModule({
+-      imports: [ScrollingModule],
+-      providers: [provideZoneChangeDetection(), ViewportRuler],
+-    }),
+-  );
+-
+-  beforeEach(inject([ViewportRuler, NgZone], (v: ViewportRuler, n: NgZone) => {
+-    viewportRuler = v;
+-    ngZone = n;
++  beforeEach(() => {
++    TestBed.configureTestingModule({providers: [provideZoneChangeDetection()]});
++    viewportRuler = TestBed.inject(ViewportRuler);
++    ngZone = TestBed.inject(NgZone);
+     scrollTo(0, 0);
+-  }));
++  });
+ 
+   describe('changed event', () => {
+     it('should run the resize event outside the NgZone', () => {
+diff --git a/src/cdk/scrolling/virtual-scroll-viewport.zone.spec.ts b/src/cdk/scrolling/virtual-scroll-viewport.zone.spec.ts
+index f4b893ed251c..b423312ba20d 100644
+--- a/src/cdk/scrolling/virtual-scroll-viewport.zone.spec.ts
++++ b/src/cdk/scrolling/virtual-scroll-viewport.zone.spec.ts
+@@ -7,14 +7,7 @@ import {
+   ViewEncapsulation,
+   provideZoneChangeDetection,
+ } from '@angular/core';
+-import {
+-  ComponentFixture,
+-  TestBed,
+-  fakeAsync,
+-  flush,
+-  inject,
+-  waitForAsync,
+-} from '@angular/core/testing';
++import {ComponentFixture, TestBed, fakeAsync, flush, waitForAsync} from '@angular/core/testing';
+ import {animationFrameScheduler} from 'rxjs';
+ import {dispatchFakeEvent} from '../testing/private';
+ import {ScrollingModule} from './scrolling-module';
+@@ -32,13 +25,11 @@ describe('CdkVirtualScrollViewport Zone.js intergation', () => {
+         providers: [provideZoneChangeDetection()],
+         imports: [ScrollingModule, FixedSizeVirtualScroll],
+       });
+-    }));
+ 
+-    beforeEach(() => {
+       fixture = TestBed.createComponent(FixedSizeVirtualScroll);
+       testComponent = fixture.componentInstance;
+       viewport = testComponent.viewport;
+-    });
++    }));
+ 
+     it('should emit on viewChange inside the Angular zone', fakeAsync(() => {
+       const zoneTest = jasmine.createSpy('zone test');
+@@ -48,13 +39,8 @@ describe('CdkVirtualScrollViewport Zone.js intergation', () => {
+     }));
+ 
+     describe('viewChange change detection behavior', () => {
+-      let appRef: ApplicationRef;
+-
+-      beforeEach(inject([ApplicationRef], (ar: ApplicationRef) => {
+-        appRef = ar;
+-      }));
+-
+       it('should run change detection if there are any viewChange listeners', fakeAsync(() => {
++        const appRef = TestBed.inject(ApplicationRef);
+         testComponent.virtualForOf.viewChange.subscribe();
+         finishInit(fixture);
+         testComponent.items = Array(10).fill(0);
+diff --git a/src/cdk/text-field/autofill.spec.ts b/src/cdk/text-field/autofill.spec.ts
+index 7031298c06f5..1c91d44d0e41 100644
+--- a/src/cdk/text-field/autofill.spec.ts
++++ b/src/cdk/text-field/autofill.spec.ts
+@@ -8,7 +8,7 @@
+ 
+ import {normalizePassiveListenerOptions} from '../platform';
+ import {Component, ElementRef, ViewChild} from '@angular/core';
+-import {ComponentFixture, TestBed, inject} from '@angular/core/testing';
++import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {EMPTY} from 'rxjs';
+ import {AutofillEvent, AutofillMonitor} from './autofill';
+ import {TextFieldModule} from './text-field-module';
+@@ -21,13 +21,7 @@ describe('AutofillMonitor', () => {
+   let testComponent: Inputs;
+ 
+   beforeEach(() => {
+-    TestBed.configureTestingModule({
+-      imports: [TextFieldModule, Inputs],
+-    });
+-  });
+-
+-  beforeEach(inject([AutofillMonitor], (afm: AutofillMonitor) => {
+-    autofillMonitor = afm;
++    autofillMonitor = TestBed.inject(AutofillMonitor);
+     fixture = TestBed.createComponent(Inputs);
+     testComponent = fixture.componentInstance;
+     fixture.detectChanges();
+@@ -36,7 +30,7 @@ describe('AutofillMonitor', () => {
+       spyOn(input.nativeElement, 'addEventListener');
+       spyOn(input.nativeElement, 'removeEventListener');
+     }
+-  }));
++  });
+ 
+   it('should add monitored class and listener upon monitoring', () => {
+     const inputEl = testComponent.input1.nativeElement;
+@@ -173,19 +167,13 @@ describe('cdkAutofill', () => {
+   let testComponent: InputWithCdkAutofilled;
+ 
+   beforeEach(() => {
+-    TestBed.configureTestingModule({
+-      imports: [TextFieldModule, InputWithCdkAutofilled],
+-    });
+-  });
+-
+-  beforeEach(inject([AutofillMonitor], (afm: AutofillMonitor) => {
+-    autofillMonitor = afm;
++    autofillMonitor = TestBed.inject(AutofillMonitor);
+     spyOn(autofillMonitor, 'monitor').and.returnValue(EMPTY);
+     spyOn(autofillMonitor, 'stopMonitoring');
+     fixture = TestBed.createComponent(InputWithCdkAutofilled);
+     testComponent = fixture.componentInstance;
+     fixture.detectChanges();
+-  }));
++  });
+ 
+   it('should monitor host element on init', () => {
+     expect(autofillMonitor.monitor).toHaveBeenCalledWith(testComponent.input);
+diff --git a/src/cdk/text-field/autofill.zone.spec.ts b/src/cdk/text-field/autofill.zone.spec.ts
+index adec28c6ed1f..e3cfd319d6f9 100644
+--- a/src/cdk/text-field/autofill.zone.spec.ts
++++ b/src/cdk/text-field/autofill.zone.spec.ts
+@@ -1,5 +1,5 @@
+ import {Component, ElementRef, NgZone, ViewChild, provideZoneChangeDetection} from '@angular/core';
+-import {ComponentFixture, TestBed, inject} from '@angular/core/testing';
++import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {AutofillMonitor} from './autofill';
+ import {TextFieldModule} from './text-field-module';
+ 
+@@ -9,14 +9,8 @@ describe('AutofillMonitor Zone.js integration', () => {
+   let testComponent: Inputs;
+ 
+   beforeEach(() => {
+-    TestBed.configureTestingModule({
+-      providers: [provideZoneChangeDetection()],
+-      imports: [TextFieldModule, Inputs],
+-    });
+-  });
+-
+-  beforeEach(inject([AutofillMonitor], (afm: AutofillMonitor) => {
+-    autofillMonitor = afm;
++    TestBed.configureTestingModule({providers: [provideZoneChangeDetection()]});
++    autofillMonitor = TestBed.inject(AutofillMonitor);
+     fixture = TestBed.createComponent(Inputs);
+     testComponent = fixture.componentInstance;
+     fixture.detectChanges();
+@@ -25,7 +19,7 @@ describe('AutofillMonitor Zone.js integration', () => {
+       spyOn(input.nativeElement, 'addEventListener');
+       spyOn(input.nativeElement, 'removeEventListener');
+     }
+-  }));
++  });
+ 
+   it('should emit on stream inside the NgZone', () => {
+     const inputEl = testComponent.input1.nativeElement;
+diff --git a/src/material/autocomplete/autocomplete.spec.ts b/src/material/autocomplete/autocomplete.spec.ts
+index 9bea4d09486c..63f062d90f48 100644
+--- a/src/material/autocomplete/autocomplete.spec.ts
++++ b/src/material/autocomplete/autocomplete.spec.ts
+@@ -30,7 +30,6 @@ import {
+   TestBed,
+   fakeAsync,
+   flush,
+-  inject,
+   tick,
+   waitForAsync,
+ } from '@angular/core/testing';
+@@ -73,9 +72,7 @@ describe('MatAutocomplete', () => {
+       declarations: [component],
+     });
+ 
+-    inject([OverlayContainer], (oc: OverlayContainer) => {
+-      overlayContainerElement = oc.getContainerElement();
+-    })();
++    overlayContainerElement = TestBed.inject(OverlayContainer).getContainerElement();
+ 
+     return TestBed.createComponent<T>(component);
+   }
+diff --git a/src/material/core/ripple/ripple.spec.ts b/src/material/core/ripple/ripple.spec.ts
+index 5a42b6eb9920..cf04a674a4a4 100644
+--- a/src/material/core/ripple/ripple.spec.ts
++++ b/src/material/core/ripple/ripple.spec.ts
+@@ -8,7 +8,7 @@ import {
+   dispatchTouchEvent,
+ } from '@angular/cdk/testing/private';
+ import {Component, ViewChild, ViewEncapsulation} from '@angular/core';
+-import {ComponentFixture, TestBed, inject} from '@angular/core/testing';
++import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {
+   MAT_RIPPLE_GLOBAL_OPTIONS,
+@@ -48,15 +48,13 @@ describe('MatRipple', () => {
+         RippleWithDomRemovalOnClick,
+       ],
+     });
+-  });
+ 
+-  beforeEach(inject([Platform], (p: Platform) => {
+-    platform = p;
++    platform = TestBed.inject(Platform);
+ 
+     // Set body margin to 0 during tests so it doesn't mess up position calculations.
+     originalBodyMargin = document.body.style.margin;
+     document.body.style.margin = '0';
+-  }));
++  });
+ 
+   afterEach(() => {
+     document.body.style.margin = originalBodyMargin!;
+diff --git a/src/material/datepicker/calendar.spec.ts b/src/material/datepicker/calendar.spec.ts
+index cb49c37c304e..7ec08bdf71b1 100644
+--- a/src/material/datepicker/calendar.spec.ts
++++ b/src/material/datepicker/calendar.spec.ts
+@@ -6,7 +6,7 @@ import {
+   dispatchMouseEvent,
+ } from '@angular/cdk/testing/private';
+ import {Component} from '@angular/core';
+-import {ComponentFixture, TestBed, inject, waitForAsync} from '@angular/core/testing';
++import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+ import {DateAdapter, MatNativeDateModule} from '../core';
+ import {By} from '@angular/platform-browser';
+ import {DEC, FEB, JAN, JUL, NOV} from '../testing';
+@@ -15,6 +15,9 @@ import {MatDatepickerIntl} from './datepicker-intl';
+ import {MatDatepickerModule} from './datepicker-module';
+ 
+ describe('MatCalendar', () => {
++  let adapter: DateAdapter<Date>;
++  let intl: MatDatepickerIntl;
++
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+       imports: [MatNativeDateModule, MatDatepickerModule],
+@@ -27,6 +30,9 @@ describe('MatCalendar', () => {
+         CalendarWithSelectableMinDate,
+       ],
+     });
++
++    adapter = TestBed.inject(DateAdapter);
++    intl = TestBed.inject(MatDatepickerIntl);
+   }));
+ 
+   describe('standard calendar', () => {
+@@ -48,7 +54,7 @@ describe('MatCalendar', () => {
+       testComponent = fixture.componentInstance;
+     });
+ 
+-    it(`should update today's date`, inject([DateAdapter], (adapter: DateAdapter<Date>) => {
++    it(`should update today's date`, () => {
+       let fakeToday = new Date(2018, 0, 1);
+       spyOn(adapter, 'today').and.callFake(() => fakeToday);
+ 
+@@ -67,7 +73,7 @@ describe('MatCalendar', () => {
+       todayCell = calendarElement.querySelector('.mat-calendar-body-today')!;
+       expect(todayCell).not.toBeNull();
+       expect(todayCell.innerHTML.trim()).toBe('10');
+-    }));
++    });
+ 
+     it('should be in month view with specified month active', () => {
+       expect(calendarInstance.currentView).toBe('month');
+@@ -117,20 +123,17 @@ describe('MatCalendar', () => {
+       expect(normalizedYear.getFullYear()).toEqual(2017);
+     });
+ 
+-    it('should re-render when the i18n labels have changed', inject(
+-      [MatDatepickerIntl],
+-      (intl: MatDatepickerIntl) => {
+-        const button = fixture.debugElement.nativeElement.querySelector(
+-          '.mat-calendar-period-button',
+-        );
++    it('should re-render when the i18n labels have changed', () => {
++      const button = fixture.debugElement.nativeElement.querySelector(
++        '.mat-calendar-period-button',
++      );
+ 
+-        intl.switchToMultiYearViewLabel = 'Go to multi-year view?';
+-        intl.changes.next();
+-        fixture.detectChanges();
++      intl.switchToMultiYearViewLabel = 'Go to multi-year view?';
++      intl.changes.next();
++      fixture.detectChanges();
+ 
+-        expect(button.getAttribute('aria-label')).toBe('Go to multi-year view?');
+-      },
+-    ));
++      expect(button.getAttribute('aria-label')).toBe('Go to multi-year view?');
++    });
+ 
+     it('should set all buttons to be `type="button"`', () => {
+       const invalidButtons = calendarElement.querySelectorAll('button:not([type="button"])');
+@@ -282,51 +285,42 @@ describe('MatCalendar', () => {
+       });
+     });
+ 
+-    it('should re-render the month view when the locale changes', inject(
+-      [DateAdapter],
+-      (adapter: DateAdapter<Date>) => {
+-        fixture.detectChanges();
+-        spyOn(calendarInstance.monthView, '_init').and.callThrough();
++    it('should re-render the month view when the locale changes', () => {
++      fixture.detectChanges();
++      spyOn(calendarInstance.monthView, '_init').and.callThrough();
+ 
+-        adapter.setLocale('bg-BG');
+-        fixture.detectChanges();
++      adapter.setLocale('bg-BG');
++      fixture.detectChanges();
+ 
+-        expect(calendarInstance.monthView._init).toHaveBeenCalled();
+-      },
+-    ));
++      expect(calendarInstance.monthView._init).toHaveBeenCalled();
++    });
+ 
+-    it('should re-render the year view when the locale changes', inject(
+-      [DateAdapter],
+-      (adapter: DateAdapter<Date>) => {
+-        periodButton.click();
+-        fixture.detectChanges();
++    it('should re-render the year view when the locale changes', () => {
++      periodButton.click();
++      fixture.detectChanges();
+ 
+-        (calendarElement.querySelector('.mat-calendar-body-active') as HTMLElement).click();
+-        fixture.detectChanges();
++      (calendarElement.querySelector('.mat-calendar-body-active') as HTMLElement).click();
++      fixture.detectChanges();
+ 
+-        spyOn(calendarInstance.yearView, '_init').and.callThrough();
++      spyOn(calendarInstance.yearView, '_init').and.callThrough();
+ 
+-        adapter.setLocale('bg-BG');
+-        fixture.detectChanges();
++      adapter.setLocale('bg-BG');
++      fixture.detectChanges();
+ 
+-        expect(calendarInstance.yearView._init).toHaveBeenCalled();
+-      },
+-    ));
++      expect(calendarInstance.yearView._init).toHaveBeenCalled();
++    });
+ 
+-    it('should re-render the multi-year view when the locale changes', inject(
+-      [DateAdapter],
+-      (adapter: DateAdapter<Date>) => {
+-        periodButton.click();
+-        fixture.detectChanges();
++    it('should re-render the multi-year view when the locale changes', () => {
++      periodButton.click();
++      fixture.detectChanges();
+ 
+-        spyOn(calendarInstance.multiYearView, '_init').and.callThrough();
++      spyOn(calendarInstance.multiYearView, '_init').and.callThrough();
+ 
+-        adapter.setLocale('bg-BG');
+-        fixture.detectChanges();
++      adapter.setLocale('bg-BG');
++      fixture.detectChanges();
+ 
+-        expect(calendarInstance.multiYearView._init).toHaveBeenCalled();
+-      },
+-    ));
++      expect(calendarInstance.multiYearView._init).toHaveBeenCalled();
++    });
+   });
+ 
+   describe('calendar with min and max date', () => {
+diff --git a/src/material/datepicker/date-range-input.spec.ts b/src/material/datepicker/date-range-input.spec.ts
+index 326f0203400a..de0eea56fc81 100644
+--- a/src/material/datepicker/date-range-input.spec.ts
++++ b/src/material/datepicker/date-range-input.spec.ts
+@@ -4,7 +4,7 @@ import {BACKSPACE, LEFT_ARROW, RIGHT_ARROW} from '@angular/cdk/keycodes';
+ import {OverlayContainer} from '@angular/cdk/overlay';
+ import {dispatchFakeEvent, dispatchKeyboardEvent} from '@angular/cdk/testing/private';
+ import {Component, Directive, ElementRef, Provider, signal, Type, ViewChild} from '@angular/core';
+-import {ComponentFixture, fakeAsync, flush, inject, TestBed, tick} from '@angular/core/testing';
++import {ComponentFixture, fakeAsync, flush, TestBed, tick} from '@angular/core/testing';
+ import {
+   FormControl,
+   FormGroup,
+@@ -209,12 +209,7 @@ describe('MatDateRangeInput', () => {
+     const fixture = createComponent(StandardRangePicker);
+     fixture.detectChanges();
+     const {rangeInput, end} = fixture.componentInstance;
+-    let focusMonitor: FocusMonitor;
+-
+-    inject([FocusMonitor], (fm: FocusMonitor) => {
+-      focusMonitor = fm;
+-    })();
+-
++    const focusMonitor = TestBed.inject(FocusMonitor);
+     expect(rangeInput.shouldLabelFloat).toBe(false);
+ 
+     focusMonitor!.focusVia(end, 'keyboard');
+@@ -518,12 +513,9 @@ describe('MatDateRangeInput', () => {
+   it('should pass the range input value through to the calendar', fakeAsync(() => {
+     const fixture = createComponent(StandardRangePicker);
+     const {start, end} = fixture.componentInstance.range.controls;
+-    let overlayContainerElement: HTMLElement;
++    const overlayContainerElement = TestBed.inject(OverlayContainer).getContainerElement();
+     start.setValue(new Date(2020, 1, 2));
+     end.setValue(new Date(2020, 1, 5));
+-    inject([OverlayContainer], (overlayContainer: OverlayContainer) => {
+-      overlayContainerElement = overlayContainer.getContainerElement();
+-    })();
+     fixture.detectChanges();
+     tick();
+ 
+@@ -547,12 +539,10 @@ describe('MatDateRangeInput', () => {
+   it("should have aria-desciredby on start and end date cells that point to the <input/>'s accessible name", fakeAsync(() => {
+     const fixture = createComponent(StandardRangePicker);
+     const {start, end} = fixture.componentInstance.range.controls;
+-    let overlayContainerElement: HTMLElement;
++    const overlayContainerElement = TestBed.inject(OverlayContainer).getContainerElement();
++
+     start.setValue(new Date(2020, 1, 2));
+     end.setValue(new Date(2020, 1, 5));
+-    inject([OverlayContainer], (overlayContainer: OverlayContainer) => {
+-      overlayContainerElement = overlayContainer.getContainerElement();
+-    })();
+     fixture.detectChanges();
+     tick();
+ 
+@@ -605,7 +595,7 @@ describe('MatDateRangeInput', () => {
+ 
+   it('should pass the comparison range through to the calendar', fakeAsync(() => {
+     const fixture = createComponent(StandardRangePicker);
+-    let overlayContainerElement: HTMLElement;
++    const overlayContainerElement = TestBed.inject(OverlayContainer).getContainerElement();
+ 
+     // Set startAt to guarantee that the calendar opens on the proper month.
+     fixture.componentInstance.comparisonStart = fixture.componentInstance.startAt = new Date(
+@@ -615,9 +605,6 @@ describe('MatDateRangeInput', () => {
+     );
+     fixture.componentInstance.comparisonEnd = new Date(2020, 1, 5);
+     fixture.changeDetectorRef.markForCheck();
+-    inject([OverlayContainer], (overlayContainer: OverlayContainer) => {
+-      overlayContainerElement = overlayContainer.getContainerElement();
+-    })();
+     fixture.detectChanges();
+ 
+     fixture.componentInstance.rangePicker.open();
+diff --git a/src/material/datepicker/datepicker.spec.ts b/src/material/datepicker/datepicker.spec.ts
+index d721ce5d05f0..3c54d7b4220c 100644
+--- a/src/material/datepicker/datepicker.spec.ts
++++ b/src/material/datepicker/datepicker.spec.ts
+@@ -21,7 +21,7 @@ import {
+   typeInElement,
+ } from '@angular/cdk/testing/private';
+ import {Component, Directive, Provider, Type, ViewChild, ViewEncapsulation} from '@angular/core';
+-import {ComponentFixture, TestBed, fakeAsync, flush, inject, tick} from '@angular/core/testing';
++import {ComponentFixture, TestBed, fakeAsync, flush, tick} from '@angular/core/testing';
+ import {
+   FormControl,
+   FormsModule,
+@@ -1408,18 +1408,16 @@ describe('MatDatepicker', () => {
+         subscription.unsubscribe();
+       }));
+ 
+-      it('should re-render when the i18n labels change', inject(
+-        [MatDatepickerIntl],
+-        (intl: MatDatepickerIntl) => {
+-          const toggle = fixture.debugElement.query(By.css('button'))!.nativeElement;
++      it('should re-render when the i18n labels change', () => {
++        const intl = TestBed.inject(MatDatepickerIntl);
++        const toggle = fixture.debugElement.query(By.css('button'))!.nativeElement;
+ 
+-          intl.openCalendarLabel = 'Open the calendar, perhaps?';
+-          intl.changes.next();
+-          fixture.detectChanges();
++        intl.openCalendarLabel = 'Open the calendar, perhaps?';
++        intl.changes.next();
++        fixture.detectChanges();
+ 
+-          expect(toggle.getAttribute('aria-label')).toBe('Open the calendar, perhaps?');
+-        },
+-      ));
++        expect(toggle.getAttribute('aria-label')).toBe('Open the calendar, perhaps?');
++      });
+ 
+       it('should toggle the active state of the datepicker toggle', fakeAsync(() => {
+         const toggle = fixture.debugElement.query(By.css('mat-datepicker-toggle'))!.nativeElement;
+diff --git a/src/material/expansion/accordion.spec.ts b/src/material/expansion/accordion.spec.ts
+index 5f846d66c6ed..1cb2987d6c6b 100644
+--- a/src/material/expansion/accordion.spec.ts
++++ b/src/material/expansion/accordion.spec.ts
+@@ -6,7 +6,7 @@ import {
+   dispatchKeyboardEvent,
+ } from '@angular/cdk/testing/private';
+ import {Component, QueryList, ViewChild, ViewChildren} from '@angular/core';
+-import {TestBed, inject, waitForAsync} from '@angular/core/testing';
++import {TestBed, waitForAsync} from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+ import {
+   MatAccordion,
+@@ -30,9 +30,7 @@ describe('MatAccordion', () => {
+       ],
+     });
+ 
+-    inject([FocusMonitor], (fm: FocusMonitor) => {
+-      focusMonitor = fm;
+-    })();
++    focusMonitor = TestBed.inject(FocusMonitor);
+   }));
+ 
+   it('should ensure only one item is expanded at a time', () => {
+diff --git a/src/material/icon/icon.spec.ts b/src/material/icon/icon.spec.ts
+index d1b41a9d92a3..a0f9aa45ca16 100644
+--- a/src/material/icon/icon.spec.ts
++++ b/src/material/icon/icon.spec.ts
+@@ -5,7 +5,7 @@ import {
+   TestRequest,
+ } from '@angular/common/http/testing';
+ import {Component, ErrorHandler, Provider, Type, ViewChild} from '@angular/core';
+-import {TestBed, fakeAsync, inject, tick, waitForAsync} from '@angular/core/testing';
++import {TestBed, fakeAsync, tick, waitForAsync} from '@angular/core/testing';
+ import {DomSanitizer, SafeHtml, SafeResourceUrl} from '@angular/platform-browser';
+ import {FAKE_SVGS} from './fake-svgs';
+ import {MatIcon} from './icon';
+@@ -1375,11 +1375,9 @@ describe('MatIcon without HttpClientModule', () => {
+       imports: [MatIconModule],
+       declarations: [IconFromSvgName],
+     });
+-  }));
+ 
+-  beforeEach(inject([MatIconRegistry, DomSanitizer], (mir: MatIconRegistry, ds: DomSanitizer) => {
+-    iconRegistry = mir;
+-    sanitizer = ds;
++    iconRegistry = TestBed.inject(MatIconRegistry);
++    sanitizer = TestBed.inject(DomSanitizer);
+   }));
+ 
+   it('should throw an error when trying to load a remote icon', () => {
+diff --git a/src/material/select/testing/select-harness.spec.ts b/src/material/select/testing/select-harness.spec.ts
+index 8e3f7b1622b7..18e1e66ff738 100644
+--- a/src/material/select/testing/select-harness.spec.ts
++++ b/src/material/select/testing/select-harness.spec.ts
+@@ -1,5 +1,5 @@
+ import {Component, signal} from '@angular/core';
+-import {ComponentFixture, inject, TestBed} from '@angular/core/testing';
++import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {OverlayContainer} from '@angular/cdk/overlay';
+ import {HarnessLoader, parallel} from '@angular/cdk/testing';
+ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+@@ -28,9 +28,7 @@ describe('MatSelectHarness', () => {
+     fixture = TestBed.createComponent(SelectHarnessTest);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.loader(fixture);
+-    inject([OverlayContainer], (oc: OverlayContainer) => {
+-      overlayContainer = oc;
+-    })();
++    overlayContainer = TestBed.inject(OverlayContainer);
+   });
+ 
+   afterEach(() => {
+diff --git a/src/material/slide-toggle/slide-toggle.spec.ts b/src/material/slide-toggle/slide-toggle.spec.ts
+index facc0f15038d..7ef13fc56555 100644
+--- a/src/material/slide-toggle/slide-toggle.spec.ts
++++ b/src/material/slide-toggle/slide-toggle.spec.ts
+@@ -8,7 +8,6 @@ import {
+   fakeAsync,
+   flush,
+   flushMicrotasks,
+-  inject,
+   tick,
+ } from '@angular/core/testing';
+ import {FormControl, FormsModule, NgModel, ReactiveFormsModule} from '@angular/forms';
+@@ -306,21 +305,20 @@ describe('MatSlideToggle without forms', () => {
+       expect(document.activeElement).toBe(buttonElement);
+     }));
+ 
+-    it('should not manually move focus to underlying when focus comes from mouse or touch', fakeAsync(
+-      inject([FocusMonitor], (focusMonitor: FocusMonitor) => {
+-        expect(document.activeElement).not.toBe(buttonElement);
++    it('should not manually move focus to underlying when focus comes from mouse or touch', fakeAsync(() => {
++      const focusMonitor = TestBed.inject(FocusMonitor);
++      expect(document.activeElement).not.toBe(buttonElement);
+ 
+-        focusMonitor.focusVia(slideToggleElement, 'mouse');
+-        fixture.detectChanges();
+-        flush();
+-        expect(document.activeElement).not.toBe(buttonElement);
++      focusMonitor.focusVia(slideToggleElement, 'mouse');
++      fixture.detectChanges();
++      flush();
++      expect(document.activeElement).not.toBe(buttonElement);
+ 
+-        focusMonitor.focusVia(slideToggleElement, 'touch');
+-        fixture.detectChanges();
+-        flush();
+-        expect(document.activeElement).not.toBe(buttonElement);
+-      }),
+-    ));
++      focusMonitor.focusVia(slideToggleElement, 'touch');
++      fixture.detectChanges();
++      flush();
++      expect(document.activeElement).not.toBe(buttonElement);
++    }));
+ 
+     it('should set a element class if labelPosition is set to before', fakeAsync(() => {
+       const formField = slideToggleElement.querySelector('.mdc-form-field')!;
+diff --git a/src/material/tooltip/tooltip.spec.ts b/src/material/tooltip/tooltip.spec.ts
+index fccac2350c6b..4e22c64eead3 100644
+--- a/src/material/tooltip/tooltip.spec.ts
++++ b/src/material/tooltip/tooltip.spec.ts
+@@ -25,7 +25,6 @@ import {
+   TestBed,
+   fakeAsync,
+   flush,
+-  inject,
+   tick,
+   waitForAsync,
+ } from '@angular/core/testing';
+@@ -72,14 +71,9 @@ describe('MatTooltip', () => {
+       ],
+     });
+ 
+-    inject(
+-      [OverlayContainer, FocusMonitor, Platform],
+-      (oc: OverlayContainer, fm: FocusMonitor, pl: Platform) => {
+-        overlayContainerElement = oc.getContainerElement();
+-        focusMonitor = fm;
+-        platform = pl;
+-      },
+-    )();
++    overlayContainerElement = TestBed.inject(OverlayContainer).getContainerElement();
++    focusMonitor = TestBed.inject(FocusMonitor);
++    platform = TestBed.inject(Platform);
+   }));
+ 
+   describe('basic usage', () => {

@@ -1,0 +1,132 @@
+From 10fbe362cac0d59a6e78d155eb17f02a53350421 Mon Sep 17 00:00:00 2001
+From: Kristiyan Kostadinov <crisbeto@abv.bg>
+Date: Tue, 26 Dec 2023 09:42:57 +0200
+Subject: [PATCH] fix(cdk/a11y): resolve hydration error in focus trap
+
+Disables focus traps on the server, because they insert DOM nodes that can throw off hydration.
+---
+ src/cdk/a11y/focus-trap/focus-trap.ts         | 25 ++++++++++++-------
+ .../kitchen-sink/kitchen-sink.html            |  2 +-
+ .../kitchen-sink/kitchen-sink.ts              |  3 ++-
+ 3 files changed, 19 insertions(+), 11 deletions(-)
+
+diff --git a/src/cdk/a11y/focus-trap/focus-trap.ts b/src/cdk/a11y/focus-trap/focus-trap.ts
+index 09e570b164d2..cb7726f8d48d 100644
+--- a/src/cdk/a11y/focus-trap/focus-trap.ts
++++ b/src/cdk/a11y/focus-trap/focus-trap.ts
+@@ -6,7 +6,7 @@
+  * found in the LICENSE file at https://angular.io/license
+  */
+ 
+-import {_getFocusedElementPierceShadowDom} from '@angular/cdk/platform';
++import {Platform, _getFocusedElementPierceShadowDom} from '@angular/cdk/platform';
+ import {DOCUMENT} from '@angular/common';
+ import {
+   AfterContentInit,
+@@ -21,6 +21,7 @@ import {
+   SimpleChanges,
+   OnChanges,
+   booleanAttribute,
++  inject,
+ } from '@angular/core';
+ import {take} from 'rxjs/operators';
+ import {InteractivityChecker} from '../interactivity-checker/interactivity-checker';
+@@ -416,10 +417,12 @@ export class CdkTrapFocus implements OnDestroy, AfterContentInit, OnChanges, DoC
+   /** Whether the focus trap is active. */
+   @Input({alias: 'cdkTrapFocus', transform: booleanAttribute})
+   get enabled(): boolean {
+-    return this.focusTrap.enabled;
++    return this.focusTrap?.enabled || false;
+   }
+   set enabled(value: boolean) {
+-    this.focusTrap.enabled = value;
++    if (this.focusTrap) {
++      this.focusTrap.enabled = value;
++    }
+   }
+ 
+   /**
+@@ -437,11 +440,15 @@ export class CdkTrapFocus implements OnDestroy, AfterContentInit, OnChanges, DoC
+      */
+     @Inject(DOCUMENT) _document: any,
+   ) {
+-    this.focusTrap = this._focusTrapFactory.create(this._elementRef.nativeElement, true);
++    const platform = inject(Platform);
++
++    if (platform.isBrowser) {
++      this.focusTrap = this._focusTrapFactory.create(this._elementRef.nativeElement, true);
++    }
+   }
+ 
+   ngOnDestroy() {
+-    this.focusTrap.destroy();
++    this.focusTrap?.destroy();
+ 
+     // If we stored a previously focused element when using autoCapture, return focus to that
+     // element now that the trapped region is being destroyed.
+@@ -452,7 +459,7 @@ export class CdkTrapFocus implements OnDestroy, AfterContentInit, OnChanges, DoC
+   }
+ 
+   ngAfterContentInit() {
+-    this.focusTrap.attachAnchors();
++    this.focusTrap?.attachAnchors();
+ 
+     if (this.autoCapture) {
+       this._captureFocus();
+@@ -460,7 +467,7 @@ export class CdkTrapFocus implements OnDestroy, AfterContentInit, OnChanges, DoC
+   }
+ 
+   ngDoCheck() {
+-    if (!this.focusTrap.hasAttached()) {
++    if (this.focusTrap && !this.focusTrap.hasAttached()) {
+       this.focusTrap.attachAnchors();
+     }
+   }
+@@ -472,7 +479,7 @@ export class CdkTrapFocus implements OnDestroy, AfterContentInit, OnChanges, DoC
+       autoCaptureChange &&
+       !autoCaptureChange.firstChange &&
+       this.autoCapture &&
+-      this.focusTrap.hasAttached()
++      this.focusTrap?.hasAttached()
+     ) {
+       this._captureFocus();
+     }
+@@ -480,6 +487,6 @@ export class CdkTrapFocus implements OnDestroy, AfterContentInit, OnChanges, DoC
+ 
+   private _captureFocus() {
+     this._previouslyFocusedElement = _getFocusedElementPierceShadowDom();
+-    this.focusTrap.focusInitialElementWhenReady();
++    this.focusTrap?.focusInitialElementWhenReady();
+   }
+ }
+diff --git a/src/universal-app/kitchen-sink/kitchen-sink.html b/src/universal-app/kitchen-sink/kitchen-sink.html
+index 727c97babba7..35a25eec146f 100644
+--- a/src/universal-app/kitchen-sink/kitchen-sink.html
++++ b/src/universal-app/kitchen-sink/kitchen-sink.html
+@@ -449,7 +449,7 @@ <h2>Horizontal Stepper</h2>
+ 
+ <h2>Focus trap</h2>
+ 
+-<div cdkTrapFocus cdkTrapFocusAutoCapture>
++<div cdkTrapFocus [cdkTrapFocusAutoCapture]="isAutomated">
+   <button>Oh no, I'm trapped!</button>
+ </div>
+ 
+diff --git a/src/universal-app/kitchen-sink/kitchen-sink.ts b/src/universal-app/kitchen-sink/kitchen-sink.ts
+index 288513968919..b41e1d8d36dc 100644
+--- a/src/universal-app/kitchen-sink/kitchen-sink.ts
++++ b/src/universal-app/kitchen-sink/kitchen-sink.ts
+@@ -1,4 +1,4 @@
+-import {FocusMonitor} from '@angular/cdk/a11y';
++import {A11yModule, FocusMonitor} from '@angular/cdk/a11y';
+ import {DragDropModule} from '@angular/cdk/drag-drop';
+ import {ScrollingModule, ViewportRuler} from '@angular/cdk/scrolling';
+ import {CdkTableModule, DataSource} from '@angular/cdk/table';
+@@ -122,6 +122,7 @@ export class TestEntryComponent {}
+     // CDK Modules
+     CdkTableModule,
+     DragDropModule,
++    A11yModule,
+ 
+     // Other modules
+     YouTubePlayer,

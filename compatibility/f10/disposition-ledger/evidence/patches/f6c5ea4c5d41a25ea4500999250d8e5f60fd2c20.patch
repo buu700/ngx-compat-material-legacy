@@ -1,0 +1,79 @@
+From f6c5ea4c5d41a25ea4500999250d8e5f60fd2c20 Mon Sep 17 00:00:00 2001
+From: Emily Nguyen <emilyhuongnguyen@gmail.com>
+Date: Sun, 1 Oct 2023 10:40:05 -0700
+Subject: [PATCH] Toggle aria-modal attribute in parent modal when autocomplete
+ panel opens / closes (#27663)
+
+* Toggle parent modal aria-owns attribute when autocomplete is closed
+
+* Add unit tests and update comments
+---
+ .../autocomplete/autocomplete-trigger.ts      | 11 ++++++++
+ .../autocomplete/autocomplete.spec.ts         | 25 +++++++++++++++++++
+ 2 files changed, 36 insertions(+)
+
+diff --git a/src/material/autocomplete/autocomplete-trigger.ts b/src/material/autocomplete/autocomplete-trigger.ts
+index 5e881a9f9ae6..d08bd6bd3f28 100644
+--- a/src/material/autocomplete/autocomplete-trigger.ts
++++ b/src/material/autocomplete/autocomplete-trigger.ts
+@@ -278,6 +278,11 @@ export class MatAutocompleteTrigger
+   openPanel(): void {
+     this._attachOverlay();
+     this._floatLabel();
++    // Add aria-owns attribute when the autocomplete becomes visible.
++    if (this._trackedModal) {
++      const panelId = this.autocomplete.id;
++      addAriaReferencedId(this._trackedModal, 'aria-owns', panelId);
++    }
+   }
+ 
+   /** Closes the autocomplete suggestion panel. */
+@@ -317,6 +322,12 @@ export class MatAutocompleteTrigger
+       // user clicks outside.
+       this._changeDetectorRef.detectChanges();
+     }
++
++    // Remove aria-owns attribute when the autocomplete is no longer visible.
++    if (this._trackedModal) {
++      const panelId = this.autocomplete.id;
++      removeAriaReferencedId(this._trackedModal, 'aria-owns', panelId);
++    }
+   }
+ 
+   /**
+diff --git a/src/material/autocomplete/autocomplete.spec.ts b/src/material/autocomplete/autocomplete.spec.ts
+index 41e51dd5a3d7..4ec0c3470218 100644
+--- a/src/material/autocomplete/autocomplete.spec.ts
++++ b/src/material/autocomplete/autocomplete.spec.ts
+@@ -3729,6 +3729,31 @@ describe('MDC-based MatAutocomplete', () => {
+         .withContext('expecting modal to own the autocommplete panel')
+         .toContain(panelId);
+     }));
++
++    it('should remove the aria-owns attribute of the modal when the autocomplete panel closes', fakeAsync(() => {
++      fixture.componentInstance.trigger.openPanel();
++      fixture.componentInstance.trigger.closePanel();
++      fixture.detectChanges();
++
++      const panelId = fixture.componentInstance.autocomplete.id;
++      const modalElement = fixture.componentInstance.modal.nativeElement;
++
++      expect(modalElement.getAttribute('aria-owns')).toBeFalsy();
++    }));
++
++    it('should readd the aria-owns attribute of the modal when the autocomplete panel opens again', fakeAsync(() => {
++      fixture.componentInstance.trigger.openPanel();
++      fixture.componentInstance.trigger.closePanel();
++      fixture.componentInstance.trigger.openPanel();
++      fixture.detectChanges();
++
++      const panelId = fixture.componentInstance.autocomplete.id;
++      const modalElement = fixture.componentInstance.modal.nativeElement;
++
++      expect(modalElement.getAttribute('aria-owns')?.split(' '))
++        .withContext('expecting modal to own the autocommplete panel')
++        .toContain(panelId);
++    }));
+   });
+ });
+ 
