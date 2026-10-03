@@ -31,6 +31,21 @@ window.add(view)
 window.show_all()
 view.grab_focus()
 
+
+def on_terminated(_webview, reason) -> None:
+    sys.stderr.write(f'webkit web-process-terminated reason={int(reason)}\n')
+    sys.stderr.flush()
+
+
+def on_load_failed(_webview, _event, uri, error) -> bool:
+    sys.stderr.write(f'webkit load-failed uri={uri} error={error}\n')
+    sys.stderr.flush()
+    return False
+
+
+view.connect('web-process-terminated', on_terminated)
+view.connect('load-failed', on_load_failed)
+
 busy = {'on': False}
 
 

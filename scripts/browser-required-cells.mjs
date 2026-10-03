@@ -14,7 +14,7 @@ import {createHash} from 'node:crypto';
 import {spawn, spawnSync} from 'node:child_process';
 import {createRequire} from 'node:module';
 import {createServer} from 'node:http';
-import {copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync} from 'node:fs';
+import {chmodSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync} from 'node:fs';
 import {dirname, join, relative, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {sha256File} from './resolve-run-library.mjs';
@@ -733,13 +733,18 @@ async function withFirefox(origin, fn) {
 
 function withWebKit(origin, fn) {
   return new Promise((resolveDone, rejectDone) => {
+    const runtimeDir = mkdtempSync(join(cacheRoot, 'webkit-runtime-'));
+    chmodSync(runtimeDir, 0o700);
     const child = spawn('/usr/bin/python3', [webkitScript], {
       stdio: ['pipe', 'pipe', 'pipe'],
       env: {
         ...process.env,
         PYTHONUNBUFFERED: '1',
-        WEBKIT_DISABLE_COMPOSITING_MODE: '1',
         DISPLAY: process.env.DISPLAY || ':0',
+        GDK_BACKEND: 'x11',
+        XDG_RUNTIME_DIR: runtimeDir,
+        WEBKIT_DISABLE_COMPOSITING_MODE: '1',
+        WEBKIT_DISABLE_DMABUF_RENDERER: '1',
       },
     });
     let buffer = '';
@@ -802,8 +807,10 @@ function withWebKit(origin, fn) {
       child.kill();
       resolveDone();
     })().catch(err => {
+      const detail = errLog.trim().slice(-800);
+      const message = err instanceof Error ? err.message : String(err);
       child.kill();
-      rejectDone(err);
+      rejectDone(new Error(detail ? `${message}\n${detail}` : message));
     });
   });
 }
