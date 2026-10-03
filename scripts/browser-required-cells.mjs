@@ -814,14 +814,16 @@ function asJson(raw) {
 }
 
 async function waitReady(driver) {
-  for (let i = 0; i < 80; i += 1) {
-    const raw = await driver.evaluate('JSON.stringify({ready: document.documentElement.dataset.labReady || "", error: (document.getElementById("bootstrap-error") || {}).textContent || ""})');
+  let last = '';
+  for (let i = 0; i < 90; i += 1) {
+    const raw = await driver.evaluate('JSON.stringify({ready: document.documentElement.dataset.labReady || "", error: (document.getElementById("bootstrap-error") || {}).textContent || "", state: document.readyState, text: (document.body && document.body.innerText || "").slice(0, 180)})');
     const status = asJson(raw);
+    last = JSON.stringify(status).slice(0, 400);
     if (status.error) throw new Error(`bootstrap failed: ${status.error}`);
     if (status.ready === '1') return;
-    await sleep(100);
+    await sleep(500);
   }
-  throw new Error('lab did not become ready');
+  throw new Error(`lab did not become ready: ${last}`);
 }
 
 async function runCells(driver, ids) {
@@ -918,6 +920,10 @@ export async function executeIds(tarball, ids) {
         await waitReady(driver);
         outcomes.push(...await runCells(driver, bucket));
       });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      engines[engine] = {...(engines[engine] || {}), engine, launched: !!(engines[engine] && engines[engine].launched), error: message};
+      console.error(`${engine} ${runtime} failed: ${message}`);
     } finally {
       server.close();
     }

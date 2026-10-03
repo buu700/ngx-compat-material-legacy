@@ -129,6 +129,9 @@ export async function runAcceptance({tarball, runPath}) {
   if (matrixMismatch) identity.push('matrix roster is not the derived main release roster');
   if (launch.missing.length) identity.push(`missing browser ${launch.missing.join(', ')}`);
   if (launchError) identity.push(launchError);
+  for (const [name, info] of Object.entries(engines)) {
+    if (info && info.error) identity.push(`${name}: ${info.error}`);
+  }
   const problems = [...identity, ...observed.problems.filter(item => !identity.includes(item))];
   const accepted = problems.length === 0 && observed.skipped.length === 0;
   const byId = new Map(outcomes.filter(item => item && item.ok === true).map(item => [item.id, item]));
