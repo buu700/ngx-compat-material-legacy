@@ -473,7 +473,17 @@
       "batch_id": "security-already-present-2026-10-01-b",
       "recorded_at_utc": "2026-10-01T16:30:02Z",
       "g11_claim": "not-passed",
-      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "individual_proof": {
+        "diff_sha256": "0dc033d32b29ee675dcbb3c6410bec70839a1ec03599a3fb24875181837d7374",
+        "review_depth": "individual-semantic",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Read upstream patch 8a5302a5f942144a83d8b0336262e7559f0eef6f (refactor: use enum instead of const enum (#28052)), patch sha256 0dc033d32b29ee675dcbb3c6410bec70839a1ec03599a3fb24875181837d7374. Owned counterparts are plain enums: LegacyRippleState in projects/ngx-material-legacy/legacy-core/ripple/ripple-ref.ts and MatDialogSection in projects/ngx-material-legacy/legacy-dialog/testing/dialog-harness-base.ts. projects/ngx-material-legacy contains no const enum. legacy-checkbox and legacy-dialog/dialog-ref.ts import TransitionCheckState and MatDialogState from the peer packages instead of declaring const enums. This proof does not hash installed CDK focus-monitor bytes and does not close inherited rows. Disposition stays already-adapted. This is one commit, not a batch, and not an import-path claim.",
+        "proof_kind": "diff-read",
+        "owned_file": "projects/ngx-material-legacy/legacy-core/ripple/ripple-ref.ts"
+      }
     },
     {
       "sha": "ff4f9a093715b9552f2c2dfa1cb69656c70db182",
@@ -12127,18 +12137,28 @@
       "bucket": "behavior-semantic",
       "subject": " fix(material/select): remove value from aria-labelledby (#30374)",
       "final_disposition": "already-adapted",
-      "reason": "Trigger aria-labelledby now uses form-field label + ariaLabelledby only; falls back to value id when unlabeled.",
+      "reason": "Trigger aria-labelledby uses the form-field label and aria-labelledby only. An empty result removes the attribute instead of substituting the value id.",
       "read_note_disposition": "owned-retained",
       "files": [
         "src/material/select/select.ts"
       ],
       "evidence_report": "compatibility/f10/disposition-ledger/evidence/f573ce8aff4fa2b25889b973c4a0282c0b1ad932.json",
-      "source_check": "legacy-select/internal/select-base.ts _getTriggerAriaLabelledby",
+      "source_check": "legacy-select/internal/select-base.ts _getTriggerAriaLabelledby; select.spec.ts unlabeled and no-form-field regressions",
       "batch_id": "product-adapt-a11y-overlay-2026-10-01-i",
       "recorded_at_utc": "2026-10-01T17:10:57Z",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-      "product_adaptation": true
+      "product_adaptation": true,
+      "individual_proof": {
+        "diff_sha256": "9c73395799395290fb6cac691e61bf4281a807334f76b717a08026d96d54c048",
+        "review_depth": "individual-semantic",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Read upstream patch f573ce8aff4fa2b25889b973c4a0282c0b1ad932 (fix(material/select): remove value from aria-labelledby (#30374)), patch sha256 9c73395799395290fb6cac691e61bf4281a807334f76b717a08026d96d54c048. The landed function stops concatenating the value id when a label or aria-labelledby is present, and its comment says the value should not be the trigger name. Owned _getTriggerAriaLabelledby in legacy-select/internal/select-base.ts still substituted _valueId when both were empty. That fallback is removed, so an unlabeled select drops aria-labelledby instead of pointing it at the value element. select.spec.ts asserts the unlabeled trigger and the no-form-field select do not contain the value id; those assertions fail while the fallback remains. Disposition stays already-adapted. This is one commit, not a batch, and not an import-path claim.",
+        "proof_kind": "diff-read",
+        "owned_file": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts"
+      }
     },
     {
       "sha": "726fc069e3bed2fcbc9b53de02ee7ce18c2fce5d",

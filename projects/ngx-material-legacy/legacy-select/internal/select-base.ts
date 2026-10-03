@@ -1288,13 +1288,10 @@ export abstract class _MatSelectBase<C>
       value += ' ' + this.ariaLabelledby;
     }
 
-    // Prefer label/aria-labelledby only. Fall back to the value id when neither is set so
-    // existing unlabeled selects still expose a labelledby target for a11y checkers.
-    if (!value) {
-      value = this._valueId;
-    }
-
-    return value.trim();
+    // The value element is the current value, not an accessible name. Upstream
+    // f573ce8aff4f stopped putting it in aria-labelledby. An unlabeled select
+    // removes the attribute instead of substituting _valueId.
+    return value.trim() || null;
   }
 
   /** Called when the overlay panel is done animating. */
