@@ -435,11 +435,16 @@ function epilogue(payloadExpr) {
   return `
 const payload = ${payloadExpr};
 await new Promise(resolve => setTimeout(resolve, 40));
-const timers = process._getActiveHandles().map(handle => handle && handle.constructor && handle.constructor.name).filter(name => name === 'Timeout' || name === 'Immediate').length;
-process.stdout.write('\\n__CSPSSR__' + JSON.stringify({
+const nodeProcess = (globalThis as unknown as {process: {stdout: {write(value: string): void}; _getActiveHandles(): Array<{constructor?: {name?: string}}>}}).process;
+const timers = nodeProcess._getActiveHandles().map(handle => {
+  const name = handle && handle.constructor && handle.constructor.name;
+  return typeof name === 'string' ? name : '';
+}).filter(name => name === 'Timeout' || name === 'Immediate').length;
+const host = globalThis as unknown as {__cspDocumentBefore?: string; __cspWindowBefore?: string};
+nodeProcess.stdout.write('\\n__CSPSSR__' + JSON.stringify({
   ...payload,
-  documentBefore: globalThis.__cspDocumentBefore,
-  windowBefore: globalThis.__cspWindowBefore,
+  documentBefore: host.__cspDocumentBefore,
+  windowBefore: host.__cspWindowBefore,
   documentAfter: typeof globalThis.document,
   windowAfter: typeof globalThis.window,
   timers,
