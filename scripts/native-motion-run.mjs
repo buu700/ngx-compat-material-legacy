@@ -215,7 +215,10 @@ async function clickProbe(driver, button) {
 }
 
 function absorb(bucket, step) {
-  if (!step || step.error) return;
+  if (!step || step.error) {
+    if (step && step.error) console.error(`native-motion probe error: ${step.error}`);
+    return;
+  }
   const store = (key, observation) => { if (key && observation) bucket[key] = observation; };
   if (step.results && typeof step.results === 'object') {
     for (const [key, observation] of Object.entries(step.results)) store(key, observation);

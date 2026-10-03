@@ -197,9 +197,13 @@ export class MotionRoot {
     try { this.snack.dismiss(); } catch { /* none open */ }
     let notifications = 0;
     const ref = this.snack.open('Saved', 'OK', {duration: 30000});
-    const opened = ref.afterOpened() as unknown as {closed: boolean; subscribe: (fn: () => void) => void};
-    if (opened.closed) notifications = 1;
-    else opened.subscribe(() => { notifications += 1; });
+    // Disabled motion next()+complete()s _onEnter inside open(), before this
+    // subscribe. A Subject does not replay and complete() does not set closed,
+    // so the only public signal of that single next is a synchronous complete.
+    ref.afterOpened().subscribe({
+      next: () => { notifications += 1; },
+      complete: () => { if (notifications === 0) notifications = 1; },
+    });
     await this.waitFor(() => {
       const el = document.querySelector('snack-bar-container');
       return !!el && notifications >= 1;
@@ -296,13 +300,27 @@ export class MotionRoot {
     return {key: `tooltip/${mode}`, observation};
   }
 
+  private clickTab(label: string): void {
+    const labels = Array.from(document.querySelectorAll('.mat-tab-label-content'));
+    const node = labels.find(item => (item.textContent || '').trim() === label);
+    const labelHost = node ? node.closest('.mat-tab-label') as HTMLElement | null : null;
+    if (!labelHost) throw new Error(`tab label ${label} missing`);
+    labelHost.click();
+  }
+
   private async measureTabs(zero: boolean): Promise<unknown> {
     await this.ensureSurfaces();
     this.tabDuration = zero ? '0ms' : '500ms';
-    this.tabs.selectedIndex = 0;
+    // selectedIndex is applied in ngAfterContentChecked. A template click schedules
+    // that pass; assigning the field after an await does not.
+    this.clickTab('One');
     await this.wait(40);
-    this.tabs.selectedIndex = 1;
-    await this.wait(zero ? 80 : 700);
+    this.clickTab('Two');
+    const limit = zero || this.mode() !== 'enabled' ? 500 : 1200;
+    await this.waitFor(() => {
+      const node = document.querySelector('.mat-tab-body-active .mat-tab-body-content');
+      return !!node && (node.textContent || '').includes('Two') && getComputedStyle(node).visibility !== 'hidden';
+    }, limit);
     const el = document.querySelector('.mat-tab-body-active .mat-tab-body-content') as HTMLElement | null;
     const mode = zero ? 'zero' : this.mode();
     const observation = {
@@ -501,12 +519,17 @@ export class MotionRoot {
   private async tabsRapid(): Promise<unknown> {
     await this.ensureSurfaces();
     this.tabDuration = '500ms';
-    await this.wait(20);
+    this.clickTab('One');
+    await this.wait(40);
     const el = document.querySelector('.mat-tab-body-content') as HTMLElement;
     const durationMs = this.duration(el, 'transition-duration');
-    this.tabs.selectedIndex = 1;
-    this.tabs.selectedIndex = 2;
-    await this.wait(800);
+    this.clickTab('Two');
+    this.clickTab('Three');
+    await this.waitFor(() => {
+      const node = document.querySelector('.mat-tab-body-active .mat-tab-body-content');
+      const text = node ? node.textContent || '' : '';
+      return text.includes('Three') && !document.querySelector('.mat-tab-body-animating');
+    }, 1500);
     const active = document.querySelector('.mat-tab-body-active .mat-tab-body-content');
     const text = active ? active.textContent || '' : '';
     return {
