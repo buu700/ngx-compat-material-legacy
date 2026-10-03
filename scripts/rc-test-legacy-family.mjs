@@ -96,6 +96,7 @@ fs.mkdirSync(path.dirname(absReport), {recursive: true});
 if (fs.existsSync(absReport)) fs.rmSync(absReport);
 
 let roster = null;
+let deriveHistoricalRoster;
 let discoveryNegativeResults;
 let isRunnerControl;
 let rejectionReasons;
