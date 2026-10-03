@@ -39,7 +39,7 @@ import {MatLegacyPlaceholder} from './placeholder';
 import {MatLegacyPrefix} from './prefix';
 import {MatLegacySuffix} from './suffix';
 import {Platform} from '@angular/cdk/platform';
-import {getShadowRoot} from '../internal/owned-shadow-dom';
+import {getShadowRoot} from './owned-shadow-dom';
 import {AbstractControlDirective, ValidatorFn} from '@angular/forms';
 import {ANIMATION_MODULE_TYPE} from '@angular/core';
 import {
