@@ -20,13 +20,6 @@ import {
   resolveLibraryFromRun,
   workspaceDistPackage,
 } from './resolve-run-library.mjs';
-import {
-  deriveHistoricalRoster,
-  discoveryNegativeResults,
-  isRunnerControl,
-  rejectionReasons,
-} from './historical-case-roster.mjs';
-
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const inventory = JSON.parse(
   fs.readFileSync(path.join(root, 'testing/legacy-runner/historical-inventory.json'), 'utf8'),
@@ -103,7 +96,16 @@ fs.mkdirSync(path.dirname(absReport), {recursive: true});
 if (fs.existsSync(absReport)) fs.rmSync(absReport);
 
 let roster = null;
+let discoveryNegativeResults;
+let isRunnerControl;
+let rejectionReasons;
 if (!family) {
+  ({
+    deriveHistoricalRoster,
+    discoveryNegativeResults,
+    isRunnerControl,
+    rejectionReasons,
+  } = await import('./historical-case-roster.mjs'));
   roster = deriveHistoricalRoster(root);
   const specCases = roster.cases.filter(testCase => testCase.kind !== 'shared-export').length;
   console.log(
