@@ -55,6 +55,7 @@ SCRIPT_CHECKS = {
     "scripts/packed-consumer-aot-smoke.mjs": "packed-consumer",
     "scripts/motion-lifecycle-smoke.mjs": "motion-smoke",
     "scripts/native-motion-acceptance.mjs": "native-motion",
+    "scripts/csp-ssr-acceptance.mjs": "csp-ssr",
     "scripts/build-migrate-legacy-cli.mjs": "migration-packaged",
     "scripts/migration-cli-isolation.mjs": "migration-packaged",
     "scripts/rc-test-legacy-family.mjs": "historical-legacy-artifact",
@@ -715,6 +716,24 @@ def main() -> int:
     )
     results["native-motion"] = "pass" if code == 0 else "fail"
     implemented_ran.append("native-motion")
+
+    # csp-ssr: Chromium nonce/hash policy and dom-free server renders.
+    # WebKitGTK is not Safari and is not launched here. Hydration is unclaimed.
+    code = run_node("scripts/csp-ssr-acceptance.mjs", ["--run", str(run_path)])
+    write_check_report(
+        out_dir,
+        run_id,
+        line,
+        "csp-ssr",
+        exit_code=code,
+        limitations=[
+            "Chromium CSP nonce and style hash. No unsafe-inline. WebKitGTK is not Safari and is not this check.",
+            "Server imports and renders start without a document. Hydration is unclaimed.",
+            "Does not claim G04 or G10.",
+        ],
+    )
+    results["csp-ssr"] = "pass" if code == 0 else "fail"
+    implemented_ran.append("csp-ssr")
 
     # api-completeness: packed vs 16.2.14 names + allowlist + structural signatures.
     code = run_node("scripts/api-completeness.mjs", ["--run", str(run_path)])

@@ -1,8 +1,8 @@
 {
   "template": false,
   "packet_id": "FRESH-03",
-  "substep_id": "native-motion",
-  "source_commit": "c261d0840517276f6bbc7667e3b4016c99afb1a9",
+  "substep_id": "csp-ssr",
+  "source_commit": "3322ddd1c144b9be2d71159a31327a4e1c925926",
   "worktree_line": "main",
   "line_21_commit": "59fd6823e1817b1e0867dc285364c0e08848dbe8",
   "owned_paths": [
@@ -18,11 +18,16 @@
     "scripts/rc-verify-lite.py",
     ".github/workflows/ci.yml",
     "compatibility/rc/matrices/full-verify.json",
-    "projects/ngx-material-legacy/legacy-tabs/internal/tab-body-base.ts"
+    "projects/ngx-material-legacy/legacy-tabs/internal/tab-body-base.ts",
+    "scripts/csp-ssr-roster.mjs",
+    "scripts/csp-ssr-consumer.ts",
+    "scripts/csp-ssr-run.mjs",
+    "scripts/csp-ssr-acceptance.mjs",
+    "scripts/csp-ssr-regressions.mjs"
   ],
-  "last_command": "node scripts/native-motion-regressions.mjs",
-  "outcome": "Main native-motion roster stays 282 derived cases, 94 each for Chromium, Firefox, and WebKitGTK. WebKitGTK is not Safari. 21.x stays null. Enabled tab bodies now attach their portal when centering starts, because transitionstart does not fire for a display:none pane. dependency-eligibility and the 42 sensitive rows were not retried.",
-  "first_actionable_error": "native-motion awaits the full-acceptance CI job before it can enter complete_checks",
+  "last_command": "node scripts/csp-ssr-regressions.mjs",
+  "outcome": "Main csp-ssr roster is 83 derived cases: 23 Chromium nonce and policy cases, 60 server import, testing, and render cases. 21.x stays null. Hydration is unclaimed. WebKitGTK is not Safari and is not the CSP engine. The policy has no unsafe-inline. dependency-eligibility and the 42 sensitive rows were not retried.",
+  "first_actionable_error": "csp-ssr awaits the full-acceptance CI job before it can enter complete_checks",
   "failed_case_ids": [
     "dependency-eligibility/locks-tools-maturity/unresolved-findings-block",
     "upstream-audit/upstream-shas/sensitive-individual-proof"
@@ -41,8 +46,8 @@
     "disposition of GHSA-vfj7-8cjw-p6xm",
     "Cyph qualification"
   ],
-  "next_action": "Read the full-acceptance CI job. Do not treat WebKitGTK as Safari. Do not start csp-ssr, motion-smoke, sass, migration, or 21.x.",
-  "recorded_at_utc": "2026-10-03T23:15:00Z",
+  "next_action": "Read the full-acceptance CI job. Do not treat WebKitGTK as Safari. Do not start motion-smoke, sass-seal, migration, companion tokens, or 21.x.",
+  "recorded_at_utc": "2026-10-03T23:45:00Z",
   "g11_claim": "not-passed",
   "ledger": "1697/1697 structural pass; sensitive 42 inherited still open; behavior 104",
   "publication": "not-published"
