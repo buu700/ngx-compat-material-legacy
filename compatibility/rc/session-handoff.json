@@ -1,24 +1,24 @@
 {
   "template": false,
   "packet_id": "FRESH-03",
-  "substep_id": "audit-policy-eligibility",
-  "source_commit": "1ae986f16237bf0f5078c341b3957a9ba0de76b4",
+  "substep_id": "api-completeness",
+  "source_commit": "f328b60d89ca416a5e35194b3497e77a264df3b6",
   "worktree_line": "main",
   "line_21_commit": "59fd6823e1817b1e0867dc285364c0e08848dbe8",
   "owned_paths": [
-    "scripts/check-upstream-audit-disposition.mjs",
-    "scripts/check-source-policy.py",
-    "scripts/check-dependency-eligibility.py",
-    "scripts/check-pinned-advisories.mjs",
-    "scripts/check-upstream-api-policy.py",
-    "scripts/rc-verify.py",
+    "scripts/api-completeness.mjs",
+    "scripts/api-surface.mjs",
+    "scripts/api-di-observe.mjs",
+    "scripts/api-completeness-regressions.mjs",
     "compatibility/rc/matrices/full-verify.json",
-    ".github/workflows/ci.yml",
-    "compatibility/rc/session-handoff.json"
+    "compatibility/rc/api/signature-differences.json",
+    "compatibility/rc/api/di-differences.json",
+    "compatibility/rc/api/export-removals.json",
+    "compatibility/rc/api/export-name-allowlist.json"
   ],
-  "last_command": "node scripts/historical-legacy-regressions.mjs",
-  "outcome": "Historical case ids are derived from the 57 inventory paths plus shared suites before execution. The main roster is 2150 component specs and 2 shared-export originals (chips and list shared.spec.ts). Discovery negatives reject a missing path, a forged id, aggregate-only success, dirty source, and an unbound artifact. 2152 SUCCESS remains an execution total, including 2 runner controls, and is not acceptance by itself. dependency-eligibility and the 42 inherited sensitive rows were not retried. 21.x was not touched.",
-  "first_actionable_error": "historical-legacy-artifact awaits a clean artifact-bound verify before it can enter complete_checks",
+  "last_command": "node scripts/api-completeness-regressions.mjs",
+  "outcome": "api-completeness cases are derived from the 16.2.14 public-api barrels before the packed artifact is read. Main roster is finite for export-contract, typescript-signatures, and runtime-di-identity. 21.x groups stay null. Protected members and constructors are reported. Name-only, missing members, signature mismatches, forged source, and unbound artifacts are rejected. Six method rows were traced: button harness filter/variant renames, dialog ref inlined peer methods, dialog container and snack-bar motion members, error-harness base, and tab-portal ComponentFactoryResolver are recorded as exact intentional differences, not matches. dependency-eligibility and the 42 sensitive rows were not retried.",
+  "first_actionable_error": "api-completeness awaits the full-acceptance CI job before it can enter complete_checks",
   "failed_case_ids": [
     "dependency-eligibility/locks-tools-maturity/unresolved-findings-block",
     "upstream-audit/upstream-shas/sensitive-individual-proof"
@@ -37,8 +37,8 @@
     "disposition of GHSA-vfj7-8cjw-p6xm",
     "Cyph qualification"
   ],
-  "next_action": "Read the full-acceptance CI job for this commit. Do not treat a local workspace-dist run as acceptance.",
-  "recorded_at_utc": "2026-10-03T19:50:00Z",
+  "next_action": "Read the full-acceptance CI job. Do not treat a local dist tarball seal as complete_checks. Do not start browser-matrix, sass, migration, motion, or 21.x.",
+  "recorded_at_utc": "2026-10-03T20:40:00Z",
   "g11_claim": "not-passed",
   "ledger": "1697/1697 structural pass; sensitive 42 inherited still open; behavior 104",
   "publication": "not-published"

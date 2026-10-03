@@ -9,12 +9,25 @@
  * Applies F04 recipe-removal exceptions and the reviewed export-name allowlist.
  * Does not claim G02.
  */
-import {existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync, rmSync} from 'node:fs';
+import {existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync, rmSync, lstatSync} from 'node:fs';
 import {spawnSync} from 'node:child_process';
+import {createHash} from 'node:crypto';
 import {dirname, join, relative, resolve} from 'node:path';
 import {createRequire} from 'node:module';
 import {fileURLToPath} from 'node:url';
 import {parseLegacyArgs, resolveLibraryFromRun, sha256File} from './resolve-run-library.mjs';
+import {extractLibraryPackage} from './resolve-run-library.mjs';
+import {
+  deriveSurface,
+  caseGroups,
+  readDts,
+  observeDeclarations,
+  loadDifferences,
+  summarizeDiscrepancies,
+  negativeResults,
+  bindingProblems,
+} from './api-surface.mjs';
+import {observeRuntimeDi} from './api-di-observe.mjs';
 
 // verify-lite imports this module before node_modules exists. Load the parser
 // on first use so compareContracts can be unit-tested without typescript.
@@ -386,270 +399,256 @@ function packSymbolShape(dtsText, name) {
   };
 }
 
+
 const isMain = process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 if (isMain) {
-const {runPath, tarball: tarballArg, unknown} = parseLegacyArgs(process.argv.slice(2));
-if (unknown.length) fail(2, `Unknown argument: ${unknown[0]}`);
-let tarball;
-let runId = null;
-if (runPath) {
-  const resolved = resolveLibraryFromRun(runPath);
-  tarball = resolved.tarball;
-  runId = resolved.runId;
-} else if (tarballArg) {
-  tarball = tarballArg;
-} else {
-  fail(2, '--tarball or --run is required');
-}
-if (!existsSync(tarball)) fail(2, `Missing tarball: ${tarball}`);
-if (!existsSync(allowlistPath)) fail(2, `Missing allowlist: ${allowlistPath}`);
-const refRoot = resolveReferenceRoot();
-if (!existsSync(refRoot)) fail(2, `Missing 16.2.14 reference sources: ${refRoot}`);
-const exceptions = JSON.parse(readFileSync(exceptionsPath, 'utf8'));
-const allowlist = JSON.parse(readFileSync(allowlistPath, 'utf8'));
-const allowedExtras = new Map((allowlist.extras || []).map(e => [e.name, e]));
+  const {runPath, tarball: tarballArg, unknown} = parseLegacyArgs(process.argv.slice(2));
+  if (unknown.length) fail(2, `Unknown argument: ${unknown[0]}`);
+  const refRoot = resolveReferenceRoot();
+  const surface = deriveSurface(refRoot);
+  const groups = caseGroups(surface);
+  const derivedCount = groups['export-contract'].length + groups['typescript-signatures'].length + groups['runtime-di-identity'].length;
+  console.log(`api-completeness: derived ${derivedCount} cases from the historical public API before reading the packed artifact`);
 
-const removedSymbols = new Set();
-for (const ex of exceptions.exceptions || []) {
-  if (ex.disposition === 'removed-with-native-migration' && typeof ex.symbol_or_selector === 'string') {
-    for (const part of ex.symbol_or_selector.split('/')) {
-      const cleaned = part.trim().replace(/\s+/g, '');
-      if (cleaned) removedSymbols.add(cleaned);
-    }
+  let tarball;
+  let library = null;
+  if (runPath) {
+    const resolved = resolveLibraryFromRun(runPath);
+    tarball = resolved.tarball;
+    library = {sha256: resolved.digest, bytes: resolved.bytes, runId: resolved.runId};
+  } else if (tarballArg) {
+    tarball = tarballArg;
+    if (!existsSync(tarball)) fail(2, `Missing tarball: ${tarball}`);
+    const bytes = lstatSync(tarball).size;
+    library = {sha256: sha256File(tarball), bytes, runId: null};
+  } else {
+    fail(2, '--tarball or --run is required');
   }
-}
-for (const name of [
-  'matLegacyDialogAnimations', 'matDialogAnimations', 'defaultParams',
-  'matLegacyFormFieldAnimations', 'matFormFieldAnimations',
-  'matLegacyMenuAnimations', 'matMenuAnimations', 'fadeInLegacyItems', 'transformLegacyMenu',
-  'fadeInItems', 'transformMenu',
-  'matLegacySelectAnimations', 'matSelectAnimations',
-  'matLegacySnackBarAnimations', 'matSnackBarAnimations',
-  'matLegacyTabsAnimations', 'matTabsAnimations',
-  'matLegacyTooltipAnimations', 'matTooltipAnimations',
-]) {
-  removedSymbols.add(name);
-}
-
-const listing = spawnSync('tar', ['-tzf', tarball], {encoding: 'utf8'});
-if (listing.status !== 0) fail(1, listing.stderr || 'tar listing failed');
-const members = listing.stdout.split('\n').filter(Boolean);
-
-const families = readdirSync(refRoot).filter(n => n.startsWith('legacy-')).sort();
-const rows = [];
-let unclassifiedMissing = 0;
-let unclassifiedExtra = 0;
-const signatureRows = [];
-let signatureMismatchTotal = 0;
-let signatureCompared = 0;
-let diCompared = 0;
-let diMatch = 0;
-let diMismatch = 0;
-let diOneSided = 0;
-let methodCompared = 0;
-let methodMismatch = 0;
-const diMismatchRows = [];
-const methodMismatchRows = [];
-
-for (const fam of families) {
-  for (const kind of ['primary', 'testing']) {
-    const refPath = kind === 'primary'
-      ? join(refRoot, fam, 'public-api.ts')
-      : join(refRoot, fam, 'testing', 'public-api.ts');
-    if (!existsSync(refPath)) continue;
-    const refNames = [...collectExports(refPath)].sort();
-    const needle = kind === 'primary'
-      ? `ngx-compat-material-legacy-${fam}.d.ts`
-      : `ngx-compat-material-legacy-${fam}-testing.d.ts`;
-    const member = members.find(n => n.endsWith(`/${needle}`) || n.endsWith(needle));
-    let packNames = [];
-    let dtsText = '';
-    if (member) {
-      const extracted = spawnSync('tar', ['-xOf', tarball, member], {
-        encoding: 'utf8',
-        maxBuffer: 32 * 1024 * 1024,
-      });
-      if (extracted.status !== 0) fail(1, `unable to read ${member}`);
-      dtsText = extracted.stdout;
-      packNames = [...packExportNames(dtsText)].sort();
-    }
-    const missing = refNames.filter(n => !packNames.includes(n) && !removedSymbols.has(n));
-    const rawExtra = packNames.filter(n => !refNames.includes(n));
-    const allowedExtra = [];
-    const extra = [];
-    for (const name of rawExtra) {
-      if (allowedExtras.has(name)) allowedExtra.push(name);
-      else extra.push(name);
-    }
-    unclassifiedMissing += missing.length;
-    unclassifiedExtra += extra.length;
-
-    const shared = refNames.filter(n => packNames.includes(n) && !removedSymbols.has(n));
-    const familySig = [];
-    for (const name of shared) {
-      const packShape = packSymbolShape(dtsText, name);
-      const refShape = sourceSymbolShape(refPath, name);
-      signatureCompared += 1;
-      if (!packShape || !refShape) {
-        familySig.push({
-          name,
-          status: 'skipped',
-          reason: !packShape ? 'no-pack-declare' : 'no-ref-declare',
-        });
-        continue;
-      }
-      // Peer re-exports and aliases: name presence is the contract for this cell.
-      if (refShape.kind === 'peer-reexport' || packShape.kind === 'reexport-or-alias'
-        || refShape.kind === 'function-or-const' || packShape.kind === 'function-const-or-type'
-        || refShape.kind === 'type-or-enum') {
-        familySig.push({name, status: 'name-only', pack_kind: packShape.kind, ref_kind: refShape.kind});
-        continue;
-      }
-      const packSet = new Set(packShape.members);
-      const refSet = new Set(refShape.members);
-      // Ignore Angular private/protected underscore implementation details that
-      // 16.2.14 source exposes as protected but pack .d.ts may omit or rename.
-      const refPublic = [...refSet].filter(m => !m.startsWith('_'));
-      const packPublic = [...packSet].filter(m => !m.startsWith('_'));
-      const missingMembers = refPublic.filter(m => !packSet.has(m));
-      const extraMembers = packPublic.filter(m => !refSet.has(m) && !m.startsWith('ng'));
-      const status = missingMembers.length === 0 ? 'match' : 'mismatch';
-      if (status === 'mismatch') signatureMismatchTotal += 1;
-      familySig.push({
-        name,
-        status,
-        pack_kind: packShape.kind,
-        ref_kind: refShape.kind,
-        missing_members: missingMembers,
-        extra_members: extraMembers,
-      });
-    }
-    for (const name of shared) {
-      const refContract = loadRefContract(refPath, name);
-      const block = extractDeclareBlock(dtsText, name);
-      const packContract = block ? contractFromText(block, 'pack.d.ts', name) : null;
-      if (!refContract || !packContract) continue;
-      if (refContract.kind !== 'class' && refContract.kind !== 'interface') continue;
-      const compared = compareContracts(refContract, packContract);
-      if (refContract.kind === 'class') {
-        diCompared += 1;
-        if (compared.di_status === 'match') diMatch += 1;
-        else if (compared.di_status === 'mismatch') {
-          diMismatch += 1;
-          diMismatchRows.push({
-            family: fam,
-            kind,
-            name,
-            ref_constructor: compared.ref_constructor,
-            pack_constructor: compared.pack_constructor,
-          });
-        } else if (compared.di_status === 'one-sided') diOneSided += 1;
-      }
-      methodCompared += 1;
-      if (compared.method_status === 'mismatch') {
-        methodMismatch += 1;
-        methodMismatchRows.push({
-          family: fam,
-          kind,
-          name,
-          missing_methods: compared.missing_methods,
-          extra_methods: compared.extra_methods,
-        });
-      }
-    }
-    const mismatches = familySig.filter(s => s.status === 'mismatch');
-    signatureRows.push({
-      family: fam,
-      kind,
-      compared: familySig.length,
-      mismatch_count: mismatches.length,
-      // Keep mismatch details only; full per-symbol traces stay out of the committed report.
-      mismatches,
-    });
-
-    rows.push({
-      family: fam,
-      kind,
-      packed_member: member || null,
-      ref_count: refNames.length,
-      pack_count: packNames.length,
-      missing,
-      extra,
-      allowed_extra: allowedExtra,
-    });
+  const extracted = extractLibraryPackage(tarball, {parentDir: join(root, 'artifacts/local/api-di-consumer')});
+  const differences = loadDifferences();
+  const allowlist = JSON.parse(readFileSync(allowlistPath, 'utf8'));
+  const declared = observeDeclarations(surface, readDts(extracted.packageRoot), differences, allowlist);
+  const diRows = await observeRuntimeDi(extracted.packageRoot, surface.symbols);
+  const diRecords = JSON.parse(readFileSync(join(root, 'compatibility/rc/api/di-differences.json'), 'utf8')).differences || [];
+  const diSettled = diRows.map(row => settleDi(row, diRecords));
+  const summary = summarizeDiscrepancies(declared.observations);
+  const exportFails = [
+    ...declared.entryResults.filter(item => item.result !== 'pass'),
+    ...declared.observations.filter(item => item.export_result !== 'pass'),
+  ];
+  const signatureFails = declared.observations.filter(item => item.signature_result !== 'pass');
+  const diFails = diSettled.filter(item => item.result !== 'pass');
+  const sealed = exportFails.length === 0 && signatureFails.length === 0 && diFails.length === 0 && summary.open.length === 0;
+  const detail = {
+    schema_version: 1,
+    check_id: 'api-completeness',
+    role: 'diagnostic api-completeness detail; acceptance is the coordinator report',
+    result: sealed ? 'pass' : 'fail',
+    g02_claim: 'not-passed',
+    derived_cases: derivedCount,
+    open_discrepancies: summary.open.length,
+    recorded_differences: summary.recorded.length + diSettled.filter(item => item.status === 'intentional-legacy-difference').length,
+    export_failures: exportFails.slice(0, 20),
+    signature_failures: signatureFails.slice(0, 20).map(item => item.symbol.symbol_id),
+    di_failures: diFails.slice(0, 20).map(item => ({symbol_id: item.symbol.symbol_id, problems: item.problems})),
+  };
+  mkdirSync(dirname(reportPath), {recursive: true});
+  writeFileSync(reportPath, `${JSON.stringify(detail, null, 2)}\n`);
+  console.log(JSON.stringify({
+    ok: sealed,
+    open_discrepancies: summary.open.length,
+    export_failures: exportFails.length,
+    signature_failures: signatureFails.length,
+    di_failures: diFails.length,
+  }, null, 2));
+  const request = coordinatorRequest();
+  if (request && request.error) fail(2, `api-completeness: refusing acceptance report: ${request.error}`);
+  if (request) {
+    const accepted = writeAcceptance(request, surface, groups, declared, diSettled, summary, library, sealed);
+    if (!accepted) fail(1, 'api-completeness observations were not accepted');
+  } else if (!sealed) {
+    fail(1, 'api-completeness not sealed');
   }
 }
 
-const unusedAllowlist = [...allowedExtras.keys()].filter(name =>
-  !rows.some(r => (r.allowed_extra || []).includes(name) || (r.extra || []).includes(name)
-    || (r.missing || []).includes(name)));
-
-const okNames = unclassifiedMissing === 0 && unclassifiedExtra === 0
-  && rows.every(r => r.packed_member);
-const okSignatures = signatureMismatchTotal === 0;
-const sealed = okNames && okSignatures;
-
-const report = {
-  schema_version: 1,
-  role: 'packed vs 16.2.14 export-name completeness plus structural member signatures',
-  check_id: 'api-completeness',
-  run_id: runId,
-  tarball_sha256: sha256File(tarball),
-  reference_root: refRoot.startsWith(`${root}/`) ? relative(root, refRoot) : baselineTag,
-  allowlist_path: 'compatibility/rc/api/export-name-allowlist.json',
-  allowlist_sha256: sha256File(allowlistPath),
-  families: families.length,
-  rows,
-  unclassified_missing_total: unclassifiedMissing,
-  unclassified_extra_total: unclassifiedExtra,
-  allowed_extra_total: rows.reduce((n, r) => n + (r.allowed_extra?.length || 0), 0),
-  unused_allowlist_entries: unusedAllowlist,
-  recipe_removals_applied: [...removedSymbols].sort(),
-  reference_baseline: baselineTag,
-  signatures: {
-    compared: signatureCompared,
-    mismatches: signatureMismatchTotal,
-    rows: signatureRows,
-  },
-  dependency_identity: {
-    compared: diCompared,
-    matches: diMatch,
-    mismatches: diMismatch,
-    one_sided: diOneSided,
-    rows: diMismatchRows,
-  },
-  method_signatures: {
-    compared: methodCompared,
-    mismatches: methodMismatch,
-    rows: methodMismatchRows,
-  },
-  result: sealed ? 'pass' : 'fail',
-  g02_claim: 'not-passed',
-  limitations: [
-    'Member names, constructor parameter types, and public method parameter types are compared.',
-    'Constructor @Inject tokens are recorded on the reference side. Emitted parameter types are the packed identity.',
-    'One-sided constructors are recorded and do not fail the name seal. Protected and private members are omitted.',
-    'An optional parameter emitted as T|undefined, and a public method present only on the packed declaration, stays in the recorded rows and does not fail the name seal.',
-    'Peer re-exports and type/const aliases stay name-only. Does not claim G02.',
-  ],
-};
-
-mkdirSync(dirname(reportPath), {recursive: true});
-writeFileSync(reportPath, JSON.stringify(report, null, 2) + '\n');
-console.log(JSON.stringify({
-  ok: sealed,
-  missing: unclassifiedMissing,
-  extra: unclassifiedExtra,
-  allowed_extra: report.allowed_extra_total,
-  signature_compared: signatureCompared,
-  signature_mismatches: signatureMismatchTotal,
-  di_compared: diCompared,
-  di_mismatches: diMismatch,
-  di_one_sided: diOneSided,
-  method_signature_mismatches: methodMismatch,
-  families: families.length,
-}, null, 2));
-if (!sealed) {
-  fail(1, `api-completeness not sealed: missing=${unclassifiedMissing} extra=${unclassifiedExtra} signature_mismatches=${signatureMismatchTotal}`);
+function settleDi(row, records) {
+  const historical = row.symbol.shape.token
+    ? `token ${row.symbol.shape.tokenDescription || ''}`
+    : (row.symbol.shape.diParams || []).map(param => `${param.ident}${param.optional ? '?' : ''}`).join('|');
+  const owned = row.observed.join('|');
+  if (!row.problems.length) {
+    return {...row, result: 'pass', status: 'match', historical, owned};
+  }
+  const record = records.find(item => item.symbol_id === row.symbol.symbol_id
+    && item.historical === historical
+    && item.owned === owned
+    && item.classification === 'intentional-legacy-difference'
+    && item.rationale);
+  if (record) return {...row, result: 'pass', status: 'intentional-legacy-difference', historical, owned, rationale: record.rationale};
+  return {...row, result: 'fail', status: 'mismatch', historical, owned};
 }
+
+function gitValue(args) {
+  const result = spawnSync(gitBin(), args, {cwd: root, encoding: 'utf8'});
+  return result.status === 0 ? result.stdout.trim() : '';
+}
+
+function gitBin() {
+  return 'git';
+}
+
+function coordinatorRequest() {
+  const names = ['RC_CHECK_ID', 'RC_RUN_ID', 'RC_INVOCATION_ID', 'RC_EVIDENCE_BINDING', 'RC_ASSERTION_OUTPUT_DIR'];
+  const present = names.filter(name => process.env[name]);
+  if (present.length === 0) return null;
+  if (present.length !== names.length) return {error: `incomplete coordinator environment: ${present.join(', ')}`};
+  if (process.env.RC_CHECK_ID !== 'api-completeness') return {error: 'RC_CHECK_ID is not api-completeness'};
+  const invocation = process.env.RC_INVOCATION_ID;
+  if (!/^[A-Za-z0-9][A-Za-z0-9_-]{0,191}$/.test(invocation)) return {error: 'invalid invocation identity'};
+  let binding;
+  try {
+    binding = JSON.parse(process.env.RC_EVIDENCE_BINDING);
+  } catch {
+    return {error: 'RC_EVIDENCE_BINDING is not JSON'};
+  }
+  if (!binding || typeof binding !== 'object' || Array.isArray(binding)) return {error: 'binding is not an object'};
+  if (binding.run_id !== process.env.RC_RUN_ID) return {error: 'binding run_id does not match RC_RUN_ID'};
+  const outputDir = process.env.RC_ASSERTION_OUTPUT_DIR;
+  if (!outputDir || !existsSync(outputDir)) return {error: 'assertion output directory is missing'};
+  const stat = lstatSync(outputDir);
+  if (!stat.isDirectory() || stat.isSymbolicLink()) return {error: 'assertion output directory is not a real directory'};
+  if (!outputDir.endsWith(join('evidence', 'api-completeness', invocation))) return {error: 'assertion directory is not check-owned'};
+  return {
+    binding,
+    invocation,
+    runId: process.env.RC_RUN_ID,
+    outputDir,
+    runDir: resolve(outputDir, '..', '..', '..'),
+    line: binding.source_line,
+  };
+}
+
+function writeAcceptance(request, surface, groups, declared, diSettled, summary, library, sealed) {
+  const commit = gitValue(['rev-parse', 'HEAD']);
+  const tree = gitValue(['rev-parse', 'HEAD^{tree}']);
+  const context = {
+    source_clean: request.binding.source_clean === true,
+    source_commit: request.binding.source_commit,
+    source_tree: request.binding.source_tree,
+    observed_commit: commit,
+    observed_tree: tree,
+    library_sha256: library.sha256,
+    library_bytes: library.bytes,
+    artifact_sha256: library.sha256,
+    artifact_bytes: library.bytes,
+    line: request.line,
+  };
+  const identity = bindingProblems(context);
+  const sampleSignature = declared.observations.find(item => item.signature && item.signature.reported_signatures) || declared.observations[0];
+  const negatives = negativeResults({
+    symbol: sampleSignature.symbol,
+    signature: sampleSignature.signature,
+    context,
+    tokenMatch: true,
+  });
+  const cases = [];
+  for (const entry of declared.entryResults) cases.push({case_id: entry.case_id, result: entry.result, detail: entry.problems || []});
+  for (const item of declared.observations) {
+    cases.push({case_id: item.symbol.export_id, result: item.export_result, detail: item.export_problems});
+    cases.push({
+      case_id: item.symbol.signature_id,
+      result: item.signature_result,
+      detail: item.signature.rows || [],
+      comparison: item.signature.comparison,
+    });
+    if (item.symbol.di_id) {
+      const di = diSettled.find(row => row.symbol.symbol_id === item.symbol.symbol_id);
+      cases.push({case_id: item.symbol.di_id, result: di ? di.result : 'fail', detail: di ? di.problems : ['missing di observation'], status: di && di.status});
+    }
+  }
+  cases.push(...negatives.map(item => ({case_id: item.case_id, result: item.result, detail: item.problems})));
+  const expected = [
+    ...groups['export-contract'],
+    ...groups['typescript-signatures'],
+    ...groups['runtime-di-identity'],
+  ];
+  const byId = new Map(cases.map(item => [item.case_id, item]));
+  const coverageMismatch = expected.length !== byId.size || expected.some(id => !byId.has(id));
+  const matrix = JSON.parse(readFileSync(join(root, 'compatibility/rc/matrices/full-verify.json'), 'utf8'));
+  const row = matrix.checks.find(item => item.check_id === 'api-completeness');
+  const matrixMismatch = JSON.stringify(row.acceptance.cases_by_line.main) !== JSON.stringify(groups)
+    || row.acceptance.cases_by_line['21.x']['export-contract'] !== null
+    || row.acceptance.cases_by_line['21.x']['typescript-signatures'] !== null
+    || row.acceptance.cases_by_line['21.x']['runtime-di-identity'] !== null;
+  const failed = cases.filter(item => item.result !== 'pass').map(item => item.case_id);
+  const accepted = sealed && identity.length === 0 && !coverageMismatch && !matrixMismatch && failed.length === 0 && request.line === 'main';
+  const assertion = {
+    kind: 'api-completeness-observations',
+    check_id: 'api-completeness',
+    run_id: request.runId,
+    invocation_id: request.invocation,
+    library_sha256: library.sha256,
+    source_clean: context.source_clean,
+    open_discrepancies: summary.open,
+    recorded_signature_differences: summary.recorded,
+    recorded_di_differences: diSettled.filter(item => item.status === 'intentional-legacy-difference').map(item => ({
+      symbol_id: item.symbol.symbol_id,
+      historical: item.historical,
+      owned: item.owned,
+      rationale: item.rationale,
+    })),
+    note: 'Cases were derived from historical public-api barrels before this tarball was read. Name-only comparison is rejected. Discrepancy rows are intentional-legacy-difference records, not matches.',
+    cases,
+  };
+  const assertionPath = join(request.outputDir, 'api-observations.json');
+  const assertionBytes = Buffer.from(`${JSON.stringify(assertion, null, 2)}\n`);
+  writeFileSync(assertionPath, assertionBytes);
+  const {createHash} = require('node:crypto');
+  const relativeAssertion = relative(request.runDir, assertionPath).split('\\').join('/');
+  const output = {path: relativeAssertion, sha256: createHash('sha256').update(assertionBytes).digest('hex'), bytes: assertionBytes.length};
+  const ordered = expected.map(id => byId.get(id)).filter(Boolean);
+  const report = {
+    schema_version: 1,
+    template: false,
+    run_id: request.runId,
+    check_id: 'api-completeness',
+    line: request.line,
+    invocation_id: request.invocation,
+    binding: request.binding,
+    coverage: accepted ? 'complete' : 'incomplete',
+    result: accepted ? 'pass' : 'fail',
+    exit_code: accepted ? 0 : 1,
+    subject_kind: 'artifact',
+    subject_ids: ['library'],
+    artifacts: {library: {sha256: library.sha256, bytes: library.bytes}},
+    expected_case_ids: expected,
+    discovered_case_ids: expected,
+    executed_case_ids: expected,
+    passed_case_ids: ordered.filter(item => item.result === 'pass').map(item => item.case_id),
+    failed_case_ids: failed,
+    skipped_case_ids: [],
+    unresolved_case_ids: [],
+    exceptions: [],
+    passed: ordered.filter(item => item.result === 'pass').length,
+    failed: failed.length,
+    skipped: 0,
+    outputs: [output],
+    case_results: ordered.map(item => ({
+      case_id: item.case_id,
+      result: item.result,
+      kind: 'assertion',
+      output_paths: [relativeAssertion],
+    })),
+    command: ['node', 'scripts/api-completeness.mjs', '--run', request.runId],
+    limitations: accepted ? [] : [
+      coverageMismatch ? 'observations did not cover the derived roster' : '',
+      matrixMismatch ? 'matrix roster is not the derived roster' : '',
+      identity.join('; '),
+    ].filter(Boolean),
+  };
+  if (!accepted) report.coverage = 'incomplete';
+  mkdirSync(join(request.runDir, 'reports'), {recursive: true});
+  writeFileSync(join(request.runDir, 'reports', 'api-completeness.json'), `${JSON.stringify(report, null, 2)}\n`);
+  console.log(`api-completeness: bound ${expected.length} cases; open discrepancies ${summary.open.length}; accepted=${accepted}`);
+  return accepted;
 }
