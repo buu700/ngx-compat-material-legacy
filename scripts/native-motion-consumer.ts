@@ -197,7 +197,7 @@ export class MotionRoot {
     try { this.snack.dismiss(); } catch { /* none open */ }
     let notifications = 0;
     const ref = this.snack.open('Saved', 'OK', {duration: 30000});
-    const opened = ref.afterOpened() as {closed: boolean; subscribe: (fn: () => void) => void};
+    const opened = ref.afterOpened() as unknown as {closed: boolean; subscribe: (fn: () => void) => void};
     if (opened.closed) notifications = 1;
     else opened.subscribe(() => { notifications += 1; });
     await this.waitFor(() => {
