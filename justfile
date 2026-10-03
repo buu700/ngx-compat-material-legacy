@@ -51,4 +51,5 @@ test-legacy *args:
 [positional-arguments]
 verify *args:
     #!/bin/sh
-    exec just chainman run verify "$@"
+    # "--" keeps task arguments from being parsed as chainman flags.
+    exec just chainman run verify -- "$@"

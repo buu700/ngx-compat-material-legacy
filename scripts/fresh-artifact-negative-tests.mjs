@@ -9,6 +9,7 @@ import {existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync}
 import {tmpdir} from 'node:os';
 import {dirname, join} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {PACKAGE_NAME, expectedConditions, filesForRegistry} from './check-packed-exports.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const failures = [];
@@ -174,9 +175,17 @@ const required = JSON.parse(
 ).exports;
 function writeExportTar(name, keys) {
   const pkgDir = join(exportDir, name);
-  mkdirSync(join(pkgDir, 'package'), {recursive: true});
-  const exportsMap = Object.fromEntries(keys.map(key => [key, {default: './fesm2022/entry.mjs'}]));
-  writeFileSync(join(pkgDir, 'package/package.json'), JSON.stringify({name: 'sample', exports: exportsMap}));
+  const packageDir = join(pkgDir, 'package');
+  mkdirSync(packageDir, {recursive: true});
+  const exportsMap = {};
+  for (const key of keys) exportsMap[key] = expectedConditions(key);
+  writeFileSync(join(packageDir, 'package.json'), JSON.stringify({name: PACKAGE_NAME, exports: exportsMap}));
+  for (const target of filesForRegistry(keys)) {
+    if (target === './package.json') continue;
+    const dest = join(packageDir, target.slice(2));
+    mkdirSync(dirname(dest), {recursive: true});
+    writeFileSync(dest, `reviewed target ${target}\n`);
+  }
   const tarPath = join(exportDir, `${name}.tgz`);
   const packed = spawnSync('tar', ['-czf', tarPath, '-C', pkgDir, 'package'], {encoding: 'utf8'});
   if (packed.status !== 0) throw new Error(packed.stderr || 'tar failed');

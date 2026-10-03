@@ -169,3 +169,55 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+
+  full-acceptance:
+    name: Full acceptance coordinator
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Install pinned Nix
+        uses: DeterminateSystems/nix-installer-action@3138316df39ed29be04236d7ffc686fa525866aa # v23
+
+      - name: Install pinned just 1.46.0
+        run: |
+          set -euo pipefail
+          curl -fsSL -o /tmp/just.tar.gz https://github.com/casey/just/releases/download/1.46.0/just-1.46.0-x86_64-unknown-linux-musl.tar.gz
+          echo "79966e6e353f535ee7d1c6221641bcc8e3381c55b0d0a6dc6e54b34f9db36eaa  /tmp/just.tar.gz" | sha256sum -c
+          tar -xzf /tmp/just.tar.gz -C /tmp just
+          sudo mv /tmp/just /usr/local/bin/just
+          just --version
+
+      - name: Run the full verifier
+        id: verify
+        run: |
+          set -euo pipefail
+          RUN="artifacts/main/closure-${GITHUB_SHA}-${GITHUB_RUN_ID}"
+          test ! -e "$RUN"
+          set +e
+          just verify --out "$RUN" --line main
+          code=$?
+          set -e
+          printf 'full verify exit: %s\n' "$code"
+          echo "run_dir=$RUN" >> "$GITHUB_OUTPUT"
+          if [ -f "$RUN/verify-summary.json" ]; then
+            python3 -c 'import json,sys; s=json.load(open(sys.argv[1])); c=s.get("completeness") or {}; print("complete_checks:", ", ".join(c.get("complete_checks") or [])); print("automatic_product_result:", c.get("automatic_product_result")); inc=c.get("incomplete_checks") or {}; print("incomplete_count:", len(inc)); [print("incomplete", i, (r or [""])[0]) for i,r in list(inc.items())[:8]]' "$RUN/verify-summary.json" || true
+          fi
+          # Keep the verifier's own exit. Nonzero means the run is still incomplete.
+          exit "$code"
+
+      - name: Upload full-verifier evidence
+        if: always() && steps.verify.outputs.run_dir != ''
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: closure-${{ github.sha }}-${{ github.run_id }}
+          path: |
+            ${{ steps.verify.outputs.run_dir }}/verify-summary.json
+            ${{ steps.verify.outputs.run_dir }}/reports/packed-exports.json
+            ${{ steps.verify.outputs.run_dir }}/evidence/packed-exports
+          if-no-files-found: warn
+          retention-days: 14
