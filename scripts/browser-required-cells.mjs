@@ -745,6 +745,8 @@ function withWebKit(origin, fn) {
         XDG_RUNTIME_DIR: runtimeDir,
         WEBKIT_DISABLE_COMPOSITING_MODE: '1',
         WEBKIT_DISABLE_DMABUF_RENDERER: '1',
+        XDG_DATA_DIRS: '/usr/share:/usr/local/share',
+        GSETTINGS_SCHEMA_DIR: '/usr/share/glib-2.0/schemas',
       },
     });
     let buffer = '';
