@@ -188,6 +188,13 @@ main().catch((err: unknown) => {
   throw err;
 });
 `;
+  writeFileSync(join(consumer, 'src/jsdom.d.ts'), `declare module 'jsdom' {
+  export class JSDOM {
+    constructor(html?: string, options?: object);
+    readonly window: any;
+  }
+}
+`);
   writeFileSync(join(consumer, 'src/runtime-button.ts'), source);
   const config = {
     compilerOptions: {
@@ -205,7 +212,7 @@ main().catch((err: unknown) => {
       useDefineForClassFields: false,
       ignoreDeprecations: '6.0',
     },
-    files: ['src/runtime-button.ts'],
+    files: ['src/jsdom.d.ts', 'src/runtime-button.ts'],
     angularCompilerOptions: {compilationMode: 'full', strictTemplates: true},
   };
   writeFileSync(join(consumer, 'tsconfig.runtime-button.json'), JSON.stringify(config, null, 2));
@@ -245,12 +252,16 @@ function probeTestingEntries(consumer, slugs) {
     import {readFileSync} from 'node:fs';
     import {JSDOM} from 'jsdom';
     const dom = new JSDOM('<!doctype html><html><body></body></html>', {url: 'http://localhost/'});
-    globalThis.window = dom.window;
-    globalThis.document = dom.window.document;
-    globalThis.HTMLElement = dom.window.HTMLElement;
-    globalThis.Node = dom.window.Node;
-    globalThis.navigator = dom.window.navigator;
+    const define = (key, value) => {
+      Object.defineProperty(globalThis, key, {configurable: true, writable: true, value});
+    };
+    define('window', dom.window);
+    define('document', dom.window.document);
+    define('HTMLElement', dom.window.HTMLElement);
+    define('Node', dom.window.Node);
+    define('navigator', dom.window.navigator);
     await import('zone.js');
+    await import('@angular/compiler');
     const require = createRequire(pathToFileURL(process.cwd() + '/'));
     const specs = JSON.parse(process.env.SPECS);
     const out = [];
@@ -265,8 +276,12 @@ function probeTestingEntries(consumer, slugs) {
         out.push({spec, ok: false, resolved, failure: 'testing entry resolved outside the packed library'});
         continue;
       }
-      await import(pathToFileURL(resolved).href);
-      out.push({spec, ok: true, resolved, failure: null});
+      try {
+        await import(pathToFileURL(resolved).href);
+        out.push({spec, ok: true, resolved, failure: null});
+      } catch (error) {
+        out.push({spec, ok: false, resolved, failure: String(error && error.stack || error).slice(0, 800)});
+      }
     }
     process.stdout.write(JSON.stringify(out));
   `;
@@ -567,7 +582,9 @@ export class EngineFreeCheckboxModule {}
   });
   if (coordinator) emit(coordinator, tarball, cases, expectedIds, failed.length ? 1 : 0);
   if (failed.length) {
-    console.error(`engine-free-consumer observations failed: ${failed.map(item => item.case_id).join(', ')}`);
+    for (const item of failed) {
+      console.error(`FAIL ${item.case_id}\n${String(item.failure || '').slice(0, 500)}`);
+    }
     process.exit(1);
   }
   if (coordinator && line !== 'main') {

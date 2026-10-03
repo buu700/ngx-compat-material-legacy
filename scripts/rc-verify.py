@@ -330,7 +330,7 @@ def parse_args(argv: list[str]) -> tuple[Path, str]:
     return out, line
 
 
-def run_node(script: str, args: list[str]) -> int:
+def run_node(script: str, args: list[str], *, record: bool = True) -> int:
     cmd = ["node", str(ROOT / script), *args]
     print("verify:", " ".join(cmd), flush=True)
     if ACTIVE_RUN is None:
@@ -358,7 +358,8 @@ def run_node(script: str, args: list[str]) -> int:
     except (EvidenceError, OSError) as error:
         print(f'verify: {error}', file=sys.stderr)
         code = code or 1
-    ACTIVE_RUN.record_exit(check_id, code)
+    if record:
+        ACTIVE_RUN.record_exit(check_id, code)
     return code
 
 
@@ -548,7 +549,17 @@ def main() -> int:
         fail('source/checker inputs changed during packing')
     run_path.write_text(json.dumps(draft, indent=2) + '\n')
     ACTIVE_RUN = RunEvidence(draft, out_dir, expected_matrix_digest, pack_execution=pack_execution)
-    pack_report_code = run_node("scripts/check-pack-library.mjs", ["--run", str(run_path)])
+    # The pack child's exit stays in the execution record. Observation failures
+    # keep this check incomplete without claiming the pack itself did not finish.
+    pack_report_code = run_node("scripts/check-pack-library.mjs", ["--run", str(run_path)], record=False)
+    pack_report_path = out_dir / "reports" / "pack-library.json"
+    if pack_report_code != 0 and pack_report_path.is_file():
+        observed = read_json(pack_report_path)
+        if observed.get("coverage") == "complete":
+            observed["coverage"] = "incomplete"
+            observed["result"] = "fail"
+            observed["exit_code"] = pack_report_code
+            pack_report_path.write_text(json.dumps(observed, indent=2) + "\n")
     write_check_report(out_dir, run_id, line, "pack-library", exit_code=pack_report_code)
 
     results: dict[str, str] = {"pack-library": "pass" if pack_report_code == 0 else "fail"}

@@ -284,9 +284,14 @@ function writeMiniRun(dir, mutate) {
 }
 
 function probeConsumer(args) {
+  const env = {...process.env};
+  for (const key of Object.keys(env)) {
+    if (key.startsWith('RC_')) delete env[key];
+  }
   return spawnSync(process.execPath, ['scripts/packed-consumer-aot-smoke.mjs', ...args], {
     cwd: root,
     encoding: 'utf8',
+    env,
   });
 }
 

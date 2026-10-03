@@ -25,7 +25,11 @@ expect('main fresh-build roster', JSON.stringify(mainGroups['fresh-build']) === 
 expect('main artifact-negative roster', JSON.stringify(mainGroups['artifact-negatives']) === JSON.stringify(derived.filter(id => id.includes('/artifact-negatives/'))));
 expect('21.x pack roster stays unresolved', mainGroups === undefined || (row.acceptance.cases_by_line['21.x']['fresh-build'] === null && row.acceptance.cases_by_line['21.x']['artifact-negatives'] === null));
 
+process.env.RC_CHECK_ID = 'pack-library';
+process.env.RC_RUN_ID = 'coordinator-must-not-leak';
 const negatives = artifactNegativeObservations();
+delete process.env.RC_CHECK_ID;
+delete process.env.RC_RUN_ID;
 expect('negative probes pass', negatives.every(item => item.result === 'pass'), negatives.filter(item => item.result !== 'pass').map(item => item.case_id).join(','));
 
 const scratch = mkdtempSync(join(tmpdir(), 'pack-library-reg-'));
