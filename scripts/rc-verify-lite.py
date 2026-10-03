@@ -60,6 +60,7 @@ CHECKS = (
     ["node", "--check", "scripts/seal-draft-run.mjs"],
     ["node", "--check", "scripts/check-packed-exports.mjs"],
     ["node", "--check", "scripts/packed-exports-regressions.mjs"],
+    ["node", "scripts/historical-legacy-regressions.mjs"],
     ["node", "--check", "scripts/check-pack-library.mjs"],
     ["node", "scripts/pack-library-regressions.mjs"],
     ["node", "--check", "scripts/packed-consumer-evidence.mjs"],

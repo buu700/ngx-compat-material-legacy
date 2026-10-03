@@ -283,6 +283,18 @@ export function adaptSpec(source, filename, options = {}) {
   return {code, problems};
 }
 
+export function resolveSpecModule(filename, spec) {
+  if (spec.startsWith('.')) return resolveTs(filename, spec);
+  const shared = vendoredShared(spec);
+  if (shared) return shared;
+  const legacyShared = spec.match(/^@angular\/material\/(legacy-[a-z0-9-]+)\/testing\/(.+\.spec)$/);
+  if (legacyShared) {
+    const projectSpec = path.join(libRoot, legacyShared[1], 'testing', legacyShared[2]);
+    return [projectSpec, `${projectSpec}.ts`].find(candidate => fs.existsSync(candidate)) ?? null;
+  }
+  return null;
+}
+
 export function historicalPathFor(filename, rows) {
   const rel = path.relative(repoRoot, filename).split(path.sep).join('/');
   return rows.find(row => row.candidate === rel)?.historical_path ?? null;

@@ -31,6 +31,7 @@ function LegacyJsonReporter(baseReporterDecorator, config) {
   const suites = Object.create(null);
   let total = 0, passed = 0, failed = 0, skipped = 0;
   const failures = [];
+  const specs = [];
   let deliberateFailSeen = false;
 
   this.onSpecComplete = function (browser, result) {
@@ -40,6 +41,12 @@ function LegacyJsonReporter(baseReporterDecorator, config) {
       suites[suite] = {executed: 0, passed: 0, failed: 0, skipped: 0, description_path: suite};
     }
     suites[suite].executed += 1;
+    const fullName = suite && suite !== '(root)' ? `${suite} > ${result.description}` : result.description;
+    specs.push({
+      full_name: fullName,
+      success: !!result.success && !result.skipped,
+      skipped: !!result.skipped,
+    });
     if (result.skipped) {
       skipped += 1;
       suites[suite].skipped += 1;
@@ -75,6 +82,7 @@ function LegacyJsonReporter(baseReporterDecorator, config) {
       artifact_sha256: meta.artifact_sha256,
       totals: {executed: total, passed, failed, skipped},
       by_suite: Object.values(suites),
+      specs,
       failures,
       deliberate_fail_observed: deliberateFailSeen,
       mapped_specs: meta.rows.map(row => ({
