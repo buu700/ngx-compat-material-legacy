@@ -240,6 +240,7 @@ const {port} = server.address();
 const pageUrl = `http://127.0.0.1:${port}/${csp ? 'missing.html' : ''}`;
 const chromeDir = mkdtempSync(join(tmpdir(), 'ngx-compat-chrome-'));
 const debugPort = Number(process.env.CDP_PORT || '9333');
+spawnSync('bash', ['-lc', `fuser -k ${debugPort}/tcp >/dev/null 2>&1 || true`], {timeout: 5000});
 const chrome = spawn(chromeBin, [
 
   '--headless=new',
@@ -259,15 +260,18 @@ async function jsonGet(url) {
   return response.json();
 }
 let version = null;
-for (let i = 0; i < 50; i += 1) {
+for (let i = 0; i < 80; i += 1) {
   try {
     version = await jsonGet(`http://127.0.0.1:${debugPort}/json/version`);
     break;
   } catch {
-    await sleep(100);
+    await sleep(250);
   }
 }
-if (!version) fail(1, `Chromium did not open a debugging port\n${chromeLog.slice(-1000)}`);
+if (!version) {
+  chrome.kill();
+  fail(1, `Chromium did not open a debugging port\n${chromeLog.slice(-1000)}`);
+}
 const targets = await jsonGet(`http://127.0.0.1:${debugPort}/json/list`);
 const page = targets.find(target => target.type === 'page');
 if (!page) fail(1, 'Chromium opened no page');
