@@ -89,7 +89,7 @@ console.log(JSON.stringify({
         matrix = json.loads((ROOT / "compatibility/rc/matrices/full-verify.json").read_text())
         validate_matrix(matrix)
         row = next(item for item in matrix["checks"] if item["check_id"] == "release-metadata")
-        self.assertFalse(row["implemented"])
+        self.assertTrue(row["implemented"])
         self.assertTrue(row["required"])
         expected = node_eval(
             """

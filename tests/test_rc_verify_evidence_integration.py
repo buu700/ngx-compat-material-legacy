@@ -238,6 +238,136 @@ class CoordinatorTests(unittest.TestCase):
         self.assertEqual(report["coverage"], "slice")
         self.assertEqual(report["line"], "21.x")
 
+    def _real_line_ids(self, check_id):
+        matrix = acceptance.read_json(verify.MATRIX_PATH)
+        row = next(item for item in matrix["checks"] if item["check_id"] == check_id)
+        return row, acceptance.expected_cases(row, "main")
+
+    def _write_line_assertions(self, check_id, ids):
+        invocation = self.run.invocation(check_id)
+        directory = self.f.run_dir / acceptance.assertion_directory(check_id, invocation)
+        directory.mkdir(parents=True, exist_ok=True)
+        for case_id in ids:
+            write_json(directory / f"{case_id.replace('/', '__')}.json", {
+                "case_id": case_id,
+                "result": "pass",
+                "kind": "assertion",
+                "line": "main",
+            })
+        return directory
+
+    def test_complete_main_line_reports_use_real_ids_and_are_not_overwritten(self):
+        forbidden = ("approved", "g01_claim", "g07_claim", "g12_claim", "g13_claim")
+        for check_id in ("m3-coexistence", "consumer-floors", "release-metadata"):
+            with self.subTest(check_id=check_id):
+                row, ids = self._real_line_ids(check_id)
+                self.assertTrue(row["implemented"])
+                for group, group_ids in row["acceptance"]["cases_by_line"]["21.x"].items():
+                    self.assertIsNone(group_ids, group)
+                self._write_line_assertions(check_id, ids)
+                path = self.f.run_dir / f"reports/{check_id}.json"
+                path.unlink()
+                verify.write_line_coordinator_report(
+                    self.f.run_dir, self.f.run["run_id"], "main", check_id, exit_code=0,
+                )
+                report = acceptance.read_json(path)
+                self.assertEqual(report["coverage"], "complete")
+                self.assertEqual(report["line"], "main")
+                self.assertEqual(report["result"], "pass")
+                self.assertEqual(report["exit_code"], 0)
+                self.assertEqual(report["subject_kind"], row["acceptance"]["subject_kind"])
+                self.assertEqual(report["subject_ids"], row["acceptance"]["subject_ids"])
+                self.assertEqual(set(report["expected_case_ids"]), set(ids))
+                self.assertEqual(set(report["discovered_case_ids"]), set(ids))
+                self.assertEqual(set(report["executed_case_ids"]), set(ids))
+                self.assertEqual(set(report["passed_case_ids"]), set(ids))
+                self.assertEqual(report["passed"], len(ids))
+                self.assertEqual(report["failed"], 0)
+                self.assertEqual(report["skipped"], 0)
+                self.assertEqual(report["failed_case_ids"], [])
+                self.assertEqual(report["skipped_case_ids"], [])
+                self.assertEqual(report["unresolved_case_ids"], [])
+                self.assertEqual(report["exceptions"], [])
+                for item in self.f.run["artifacts"]:
+                    if item["id"] in report["subject_ids"]:
+                        self.assertEqual(report["artifacts"][item["id"]], {"sha256": item["sha256"], "bytes": item["bytes"]})
+                self.assertEqual(set(report["artifacts"]), set(report["subject_ids"]))
+                self.assertEqual(len(report["case_results"]), len(ids))
+                paths = {item["path"] for item in report["outputs"]}
+                prefix = acceptance.assertion_directory(check_id, report["invocation_id"]) + "/"
+                self.assertTrue(paths)
+                for item in report["case_results"]:
+                    self.assertEqual(item["result"], "pass")
+                    self.assertEqual(item["kind"], "assertion")
+                    self.assertTrue(set(item["output_paths"]) <= paths)
+                    self.assertTrue(item["output_paths"][0].startswith(prefix))
+                for output in report["outputs"]:
+                    self.assertTrue(output["path"].startswith(prefix))
+                    acceptance.checked_file(self.f.run_dir, output, "assertion")
+                for name in forbidden:
+                    self.assertNotIn(name, report)
+                if check_id == "consumer-floors":
+                    self.assertIn("current-runtime-satisfies", ids)
+                    self.assertIn("below-floor-rejected", ids)
+                    self.assertTrue(any("not recorded as a Node 18 floor run" in item for item in report["limitations"]))
+                if check_id == "release-metadata":
+                    self.assertTrue(any("No instruction file was compared" in item for item in report["limitations"]))
+                    self.assertEqual(
+                        [item for item in ids if item in {
+                            "baseline-repository", "baseline-tag", "baseline-commit", "baseline-git-tag", "repository",
+                        }],
+                        ["baseline-repository", "baseline-tag", "baseline-commit", "baseline-git-tag", "repository"],
+                    )
+                if check_id == "m3-coexistence":
+                    self.assertTrue(any("not rostered" in item for item in report["limitations"]))
+                    self.assertFalse(any("contamination" in case_id for case_id in ids))
+                before = path.read_bytes()
+                verify.write_check_report(self.f.run_dir, self.f.run["run_id"], "main", check_id, exit_code=0)
+                self.assertEqual(path.read_bytes(), before)
+
+    def test_failed_or_non_main_line_report_stays_incomplete_slice(self):
+        for check_id in ("m3-coexistence", "consumer-floors", "release-metadata"):
+            with self.subTest(check_id=check_id):
+                _, ids = self._real_line_ids(check_id)
+                self._write_line_assertions(check_id, ids)
+                path = self.f.run_dir / f"reports/{check_id}.json"
+                path.unlink()
+                verify.write_line_coordinator_report(
+                    self.f.run_dir, self.f.run["run_id"], "main", check_id, exit_code=7,
+                )
+                report = acceptance.read_json(path)
+                self.assertEqual(report["coverage"], "slice")
+                self.assertEqual(report["result"], "fail")
+                self.assertEqual(report["exit_code"], 7)
+                path.unlink()
+                with patch.object(verify, "expected_cases", side_effect=AssertionError("21.x must not roster main cases")):
+                    verify.write_line_coordinator_report(
+                        self.f.run_dir, self.f.run["run_id"], "21.x", check_id, exit_code=0,
+                    )
+                report = acceptance.read_json(path)
+                self.assertEqual(report["coverage"], "slice")
+                self.assertEqual(report["line"], "21.x")
+
+    def test_missing_presence_or_copied_line_assertion_stays_slice(self):
+        for check_id in ("m3-coexistence", "consumer-floors", "release-metadata"):
+            with self.subTest(check_id=check_id):
+                _, ids = self._real_line_ids(check_id)
+                directory = self._write_line_assertions(check_id, ids[:-1])
+                presence = directory / f"{ids[-1].replace('/', '__')}.json"
+                write_json(presence, {"case_id": ids[-1], "result": "pass", "kind": "presence", "line": "main"})
+                path = self.f.run_dir / f"reports/{check_id}.json"
+                path.unlink()
+                verify.write_line_coordinator_report(
+                    self.f.run_dir, self.f.run["run_id"], "main", check_id, exit_code=0,
+                )
+                self.assertEqual(acceptance.read_json(path)["coverage"], "slice")
+                presence.write_bytes(self.f.run_path.read_bytes())
+                path.unlink()
+                verify.write_line_coordinator_report(
+                    self.f.run_dir, self.f.run["run_id"], "main", check_id, exit_code=0,
+                )
+                self.assertEqual(acceptance.read_json(path)["coverage"], "slice")
+
     def test_cli_slice_does_not_claim_packaged_schematic_subject(self):
         path = self.f.run_dir / 'reports/migration-packaged.json'
         path.unlink()

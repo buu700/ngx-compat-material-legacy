@@ -800,6 +800,199 @@ def write_migration_packaged_report(
         raise EvidenceError("write_check_report overwrote a complete migration-packaged report")
 
 
+_LINE_COORDINATOR_LIMITATIONS = {
+    "m3-coexistence": [
+        "Coordinator report for the line being verified. Each rostered main case has an assertion file written by this run.",
+        "Contamination fixtures are rejected and are not rostered. The report keeps the executed scope ids only.",
+        "21.x m3 groups stay null. A main run does not copy them and does not call expected_cases for 21.x.",
+        "This report is the acceptance input. It does not add a G07 claim field.",
+    ],
+    "consumer-floors": [
+        "Coordinator report for the line being verified. Each rostered main case has an assertion file written by this run.",
+        "cli-runtime executes the migrate CLI on the current Node and rejects 17.0.0 by the CLI engines range. The current runtime is not recorded as a Node 18 floor run.",
+        "line-isolation maps this checkout library version to main and rejects --line 21.x. It is not a 21.x checkout run.",
+        "21.x consumer-floors groups stay null. A main run does not copy them and does not call expected_cases for 21.x.",
+        "This report is the acceptance input. It does not add a G12 claim field.",
+    ],
+    "release-metadata": [
+        "Coordinator report for the line being verified. Each rostered main case has an assertion file written by this run.",
+        "instructions-provenance rosters only provenance fields that were compared. No instruction file was compared.",
+        "21.x release-metadata groups stay null. A main run does not copy them and does not call expected_cases for 21.x.",
+        "This report is the acceptance input. It does not add a G01 or G13 claim field.",
+    ],
+}
+
+
+def _contract_artifacts(row: dict) -> dict | None:
+    wanted = row["acceptance"]["subject_ids"]
+    if not isinstance(wanted, list) or not wanted:
+        return None
+    by_id: dict = {}
+    for item in ACTIVE_RUN.manifest.get("artifacts", []):
+        aid = item.get("id")
+        if aid not in wanted:
+            continue
+        if aid in by_id:
+            return None
+        digest = item.get("sha256")
+        size = item.get("bytes")
+        if not isinstance(digest, str) or type(size) is not int or size <= 0:
+            return None
+        by_id[aid] = {"sha256": digest, "bytes": size}
+    if set(by_id) != set(wanted):
+        return None
+    return {aid: by_id[aid] for aid in wanted}
+
+
+def _roster_assertion_records(run_dir: Path, check_id: str, invocation: str, expected: list[str]) -> dict | None:
+    """Map rostered case ids to assertion files this run wrote.
+
+    Copies of the manifest or other control files are not assertion evidence.
+    """
+    prefix = assertion_directory(check_id, invocation)
+    directory = run_dir / prefix
+    if not directory.is_dir() or directory.is_symlink():
+        return None
+    reserved = _reserved_evidence(run_dir)
+    allowed = set(expected)
+    found: dict = {}
+    for path in sorted(directory.iterdir()):
+        if not path.is_file() or path.is_symlink() or path.stat().st_nlink != 1:
+            continue
+        if path.name in _MIGRATION_RESERVED_NAMES or path.suffix != ".json":
+            continue
+        if path.name.endswith((".sha256", ".sha512", ".sha1")):
+            continue
+        identity = (evidence_sha256(path), path.stat().st_size)
+        if identity in reserved:
+            continue
+        try:
+            body = read_json(path)
+        except EvidenceError:
+            continue
+        case_id = body.get("case_id")
+        if body.get("result") != "pass" or body.get("kind") != "assertion":
+            continue
+        if not isinstance(case_id, str) or case_id not in allowed or case_id in found:
+            if isinstance(case_id, str) and case_id in found:
+                return None
+            continue
+        relative = path.relative_to(run_dir).as_posix()
+        if not relative.startswith(prefix + "/"):
+            continue
+        found[case_id] = {"path": relative, "sha256": identity[0], "bytes": identity[1]}
+    if set(found) != allowed:
+        return None
+    return found
+
+
+def _complete_line_report(run_dir: Path, run_id: str, check_id: str) -> dict | None:
+    """Coverage complete only for main, and only from the matrix roster.
+
+    A main run calls expected_cases for main. Null 21.x groups are not filled
+    and are not passed to expected_cases.
+    """
+    if ACTIVE_RUN is None or check_id not in _LINE_COORDINATOR_LIMITATIONS:
+        return None
+    matrix = read_json(MATRIX_PATH)
+    row = validate_matrix(matrix)[check_id]
+    groups = row["acceptance"]["cases_by_line"].get("main")
+    if not isinstance(groups, dict) or any(ids is None for ids in groups.values()):
+        return None
+    other = row["acceptance"]["cases_by_line"].get("21.x")
+    if not isinstance(other, dict) or any(ids is not None for ids in other.values()):
+        return None
+    expected = expected_cases(row, "main")
+    invocation = ACTIVE_RUN.invocation(check_id)
+    records = _roster_assertion_records(run_dir, check_id, invocation, expected)
+    artifacts = _contract_artifacts(row)
+    if records is None or artifacts is None:
+        return None
+    outputs = []
+    seen: set[str] = set()
+    case_results = []
+    for case_id in expected:
+        record = records[case_id]
+        if record["path"] not in seen:
+            outputs.append(record)
+            seen.add(record["path"])
+        case_results.append({
+            "case_id": case_id,
+            "result": "pass",
+            "kind": "assertion",
+            "output_paths": [record["path"]],
+        })
+    spec = row["acceptance"]
+    return {
+        "schema_version": 1,
+        "template": False,
+        "run_id": run_id,
+        "check_id": check_id,
+        "line": "main",
+        "invocation_id": invocation,
+        "binding": ACTIVE_RUN.binding,
+        "coverage": "complete",
+        "result": "pass",
+        "exit_code": 0,
+        "subject_kind": spec["subject_kind"],
+        "subject_ids": list(spec["subject_ids"]),
+        "artifacts": artifacts,
+        "expected_case_ids": expected,
+        "discovered_case_ids": list(expected),
+        "executed_case_ids": list(expected),
+        "passed_case_ids": list(expected),
+        "failed_case_ids": [],
+        "skipped_case_ids": [],
+        "unresolved_case_ids": [],
+        "exceptions": [],
+        "passed": len(expected),
+        "failed": 0,
+        "skipped": 0,
+        "outputs": outputs,
+        "case_results": case_results,
+        "command": ["rc-verify.py", check_id],
+        "limitations": list(_LINE_COORDINATOR_LIMITATIONS[check_id]),
+    }
+
+
+def write_line_coordinator_report(
+    run_dir: Path,
+    run_id: str,
+    line: str,
+    check_id: str,
+    *,
+    exit_code: int,
+    limitations: list[str] | None = None,
+) -> None:
+    """Write one main-line coordinator report for a check that already asserts.
+
+    Coverage is complete only when this main run's child exit is zero and every
+    rostered main case has a passing assertion file in the check-owned
+    invocation directory. Any other outcome, including a 21.x line, stays the
+    incomplete slice. write_check_report must not replace a complete report.
+    """
+    if check_id not in _LINE_COORDINATOR_LIMITATIONS:
+        raise EvidenceError(f"no line coordinator report for {check_id}")
+    report_path = run_dir / "reports" / f"{check_id}.json"
+    complete = _complete_line_report(run_dir, run_id, check_id) if exit_code == 0 and line == "main" else None
+    if complete is None:
+        write_check_report(
+            run_dir, run_id, line, check_id,
+            exit_code=exit_code, limitations=limitations,
+        )
+        return
+    reports = report_path.parent
+    reports.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(json.dumps(complete, indent=2) + "\n")
+    before = report_path.read_bytes()
+    write_check_report(
+        run_dir, run_id, line, check_id,
+        exit_code=exit_code, limitations=limitations,
+    )
+    if report_path.read_bytes() != before:
+        raise EvidenceError(f"write_check_report overwrote a complete {check_id} report")
+
+
 def main() -> int:
     global ACTIVE_RUN
     ACTIVE_RUN = None
@@ -1027,14 +1220,15 @@ def main() -> int:
     implemented_ran.append("companion-computed-styles")
 
     # m3-coexistence: fresh main workspace compile of inclusion order plus the
-    # nested/lazy/overlay and shared-style cases. The matrix implemented flag
-    # stays false, and every 21.x m3 group stays null, so this slice is not
-    # acceptance and does not claim G07.
+    # nested/lazy/overlay and shared-style cases. When every rostered main case
+    # has an assertion file from this run, write one coordinator report. A
+    # failed child or a 21.x line stays an incomplete slice. Contamination
+    # negatives stay unrostered. The report does not add a G07 claim field.
     code = run_node(
         "scripts/check-m3-inclusion-order.mjs",
         ["--out", str(out_dir / "m3-inclusion-order-workspace.json")],
     )
-    write_check_report(
+    write_line_coordinator_report(
         out_dir,
         run_id,
         line,
@@ -1043,7 +1237,7 @@ def main() -> int:
         limitations=[
             "Main workspace compiles the four inclusion orders, nested-theme-scope, lazy-body-overlay, and separate current/legacy shared-style scopes.",
             "Contamination fixtures are rejected and are not rostered.",
-            "21.x m3 groups stay null. implemented stays false. Does not mark m3-coexistence accepted. Does not claim G07.",
+            "21.x m3 groups stay null. A 21.x line stays an incomplete slice. Does not mark m3-coexistence accepted. Does not claim G07.",
         ],
     )
     results["m3-coexistence"] = "pass" if code == 0 else "fail"
@@ -1183,13 +1377,15 @@ def main() -> int:
     implemented_ran.append("dependency-eligibility")
 
     # consumer-floors: library engines/peers, the migrate CLI runtime, and --line isolation.
-    # The matrix implemented flag stays false. Every 21.x group stays null, so this
-    # check stays incomplete and does not claim G12.
+    # When every rostered main case has an assertion file from this run, write one
+    # coordinator report. A failed child or a 21.x line stays an incomplete slice.
+    # The current runtime is not recorded as a Node 18 floor run. The report does
+    # not add a G12 claim field.
     code = run_node(
         "scripts/check-consumer-floors.mjs",
         ["--out", str(out_dir / "consumer-floors-workspace.json")],
     )
-    write_check_report(
+    write_line_coordinator_report(
         out_dir,
         run_id,
         line,
@@ -1200,20 +1396,21 @@ def main() -> int:
             "Library Node floor uses toolchain-lock.json / .node-version, not process.version.",
             "cli-runtime executes the migrate CLI on the current Node and rejects 17.0.0 by the CLI engines range. The current runtime is not recorded as a Node 18 floor run.",
             "line-isolation maps this checkout library version to main and rejects --line 21.x. It is not a 21.x checkout run.",
-            "21.x consumer-floors groups stay null. Does not mark consumer-floors accepted. Does not claim G12.",
+            "21.x consumer-floors groups stay null. A 21.x line stays an incomplete slice. Does not mark consumer-floors accepted. Does not claim G12.",
         ],
     )
     results["consumer-floors"] = "pass" if code == 0 else "fail"
     implemented_ran.append("consumer-floors")
 
     # release-metadata: declared name/version/license/provenance only.
-    # The matrix implemented flag stays false. 21.x groups stay null, so this
-    # slice is not acceptance and does not claim G01 or G13.
+    # When every rostered main case has an assertion file from this run, write one
+    # coordinator report. A failed child or a 21.x line stays an incomplete slice.
+    # No instruction file is compared. The report does not add a G01 or G13 claim field.
     code = run_node(
         "scripts/check-release-metadata.mjs",
         ["--out", str(out_dir / "release-metadata-workspace.json")],
     )
-    write_check_report(
+    write_line_coordinator_report(
         out_dir,
         run_id,
         line,
@@ -1222,7 +1419,7 @@ def main() -> int:
         limitations=[
             "Compares declared library and migrate-cli name, version, and license fields, plus the existing provenance file.",
             "instructions-provenance rosters only provenance fields that were compared. No instruction file was compared.",
-            "21.x release-metadata groups stay null. Does not mark release-metadata accepted. Does not claim G01 or G13.",
+            "21.x release-metadata groups stay null. A 21.x line stays an incomplete slice. Does not mark release-metadata accepted. Does not claim G01 or G13.",
         ],
     )
     results["release-metadata"] = "pass" if code == 0 else "fail"

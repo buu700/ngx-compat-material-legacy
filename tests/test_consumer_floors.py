@@ -113,7 +113,7 @@ console.log(JSON.stringify({
     def test_main_roster_matches_executed_cli_and_line(self):
         matrix = json.loads((ROOT / "compatibility/rc/matrices/full-verify.json").read_text())
         row = next(item for item in matrix["checks"] if item["check_id"] == "consumer-floors")
-        self.assertFalse(row["implemented"])
+        self.assertTrue(row["implemented"])
         manifest = json.loads((ROOT / "projects/ngx-material-legacy/package.json").read_text())
         expected = node_eval(
             """

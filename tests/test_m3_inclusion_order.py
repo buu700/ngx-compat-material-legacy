@@ -190,7 +190,7 @@ class M3InclusionOrderTests(unittest.TestCase):
         })["ids"]
         matrix = json.loads((ROOT / "compatibility/rc/matrices/full-verify.json").read_text())
         row = next(item for item in matrix["checks"] if item["check_id"] == "m3-coexistence")
-        self.assertFalse(row["implemented"])
+        self.assertTrue(row["implemented"])
         main = row["acceptance"]["cases_by_line"]["main"]
         self.assertEqual(main["inclusion-order"], ids["inclusion"])
         self.assertEqual(main["nested-lazy-overlay"], ids["nested"])
