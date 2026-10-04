@@ -134,6 +134,110 @@ class CoordinatorTests(unittest.TestCase):
         self.assertEqual(report['artifacts'], {})
         self.assertEqual(report['coverage'], 'slice')
 
+    def _real_migration_ids(self):
+        matrix = acceptance.read_json(verify.MATRIX_PATH)
+        row = next(item for item in matrix["checks"] if item["check_id"] == "migration-packaged")
+        return row, acceptance.expected_cases(row, "main")
+
+    def _write_migration_assertions(self, ids):
+        invocation = self.run.invocation("migration-packaged")
+        directory = self.f.run_dir / acceptance.assertion_directory("migration-packaged", invocation)
+        directory.mkdir(parents=True, exist_ok=True)
+        for case_id in ids:
+            write_json(directory / f"{case_id.replace('/', '__')}.json", {
+                "case_id": case_id,
+                "result": "pass",
+                "kind": "assertion",
+                "line": "main",
+            })
+        return directory
+
+    def test_complete_main_migration_report_uses_real_ids_and_is_not_overwritten(self):
+        row, ids = self._real_migration_ids()
+        for group, group_ids in row["acceptance"]["cases_by_line"]["21.x"].items():
+            self.assertIsNone(group_ids, group)
+        self._write_migration_assertions(ids)
+        path = self.f.run_dir / "reports/migration-packaged.json"
+        path.unlink()
+        verify.write_migration_packaged_report(self.f.run_dir, self.f.run["run_id"], "main", exit_code=0)
+        report = acceptance.read_json(path)
+        self.assertEqual(report["coverage"], "complete")
+        self.assertEqual(report["line"], "main")
+        self.assertEqual(report["result"], "pass")
+        self.assertEqual(report["exit_code"], 0)
+        self.assertEqual(set(report["expected_case_ids"]), set(ids))
+        self.assertEqual(set(report["discovered_case_ids"]), set(ids))
+        self.assertEqual(set(report["executed_case_ids"]), set(ids))
+        self.assertEqual(set(report["passed_case_ids"]), set(ids))
+        self.assertEqual(report["passed"], len(ids))
+        self.assertEqual(report["failed"], 0)
+        self.assertEqual(report["skipped"], 0)
+        self.assertEqual(report["failed_case_ids"], [])
+        self.assertEqual(report["skipped_case_ids"], [])
+        self.assertEqual(report["unresolved_case_ids"], [])
+        self.assertEqual(report["exceptions"], [])
+        self.assertEqual(report["subject_kind"], "artifact")
+        self.assertEqual(report["subject_ids"], ["library", "migrate-cli"])
+        for item in self.f.run["artifacts"]:
+            self.assertEqual(report["artifacts"][item["id"]], {"sha256": item["sha256"], "bytes": item["bytes"]})
+        self.assertEqual(len(report["case_results"]), len(ids))
+        paths = {item["path"] for item in report["outputs"]}
+        prefix = acceptance.assertion_directory("migration-packaged", report["invocation_id"]) + "/"
+        self.assertTrue(paths)
+        for item in report["case_results"]:
+            self.assertEqual(item["result"], "pass")
+            self.assertEqual(item["kind"], "assertion")
+            self.assertTrue(set(item["output_paths"]) <= paths)
+        for output in report["outputs"]:
+            self.assertTrue(output["path"].startswith(prefix))
+            self.assertNotEqual(Path(output["path"]).name, "run.json")
+            acceptance.checked_file(self.f.run_dir, output, "assertion")
+        self.assertNotIn("g04_claim", report)
+        self.assertNotIn("g05_claim", report)
+        self.assertNotIn("approved", report)
+        before = path.read_bytes()
+        verify.write_check_report(self.f.run_dir, self.f.run["run_id"], "main", "migration-packaged", exit_code=0)
+        self.assertEqual(path.read_bytes(), before)
+
+    def test_failed_migration_child_stays_incomplete_slice(self):
+        _, ids = self._real_migration_ids()
+        self._write_migration_assertions(ids)
+        path = self.f.run_dir / "reports/migration-packaged.json"
+        path.unlink()
+        verify.write_migration_packaged_report(
+            self.f.run_dir, self.f.run["run_id"], "main", exit_code=7,
+        )
+        report = acceptance.read_json(path)
+        self.assertEqual(report["coverage"], "slice")
+        self.assertEqual(report["result"], "fail")
+        self.assertEqual(report["exit_code"], 7)
+
+    def test_missing_or_copied_migration_assertion_stays_slice(self):
+        _, ids = self._real_migration_ids()
+        directory = self._write_migration_assertions(ids[:-1])
+        path = self.f.run_dir / "reports/migration-packaged.json"
+        path.unlink()
+        verify.write_migration_packaged_report(self.f.run_dir, self.f.run["run_id"], "main", exit_code=0)
+        self.assertEqual(acceptance.read_json(path)["coverage"], "slice")
+        copied = directory / f"{ids[-1].replace('/', '__')}.json"
+        copied.write_bytes(self.f.run_path.read_bytes())
+        path.unlink()
+        verify.write_migration_packaged_report(self.f.run_dir, self.f.run["run_id"], "main", exit_code=0)
+        self.assertEqual(acceptance.read_json(path)["coverage"], "slice")
+
+    def test_21x_migration_report_does_not_roster_main_cases(self):
+        _, ids = self._real_migration_ids()
+        self._write_migration_assertions(ids)
+        path = self.f.run_dir / "reports/migration-packaged.json"
+        path.unlink()
+        with patch.object(verify, "expected_cases", side_effect=AssertionError("21.x must not roster main cases")):
+            verify.write_migration_packaged_report(
+                self.f.run_dir, self.f.run["run_id"], "21.x", exit_code=0,
+            )
+        report = acceptance.read_json(path)
+        self.assertEqual(report["coverage"], "slice")
+        self.assertEqual(report["line"], "21.x")
+
     def test_cli_slice_does_not_claim_packaged_schematic_subject(self):
         path = self.f.run_dir / 'reports/migration-packaged.json'
         path.unlink()

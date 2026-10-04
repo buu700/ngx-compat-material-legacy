@@ -158,6 +158,79 @@ class AcceptanceTests(unittest.TestCase):
         acceptance.validate_matrix(self.f.matrix)
         self.assertTrue(all(r["implemented"] for r in self.f.matrix["checks"]))
 
+    def test_real_migration_case_ids_pass_structural_checks_and_slice_is_rejected(self):
+        real = acceptance.read_json(ROOT / "compatibility/rc/matrices/full-verify.json")
+        real_row = next(item for item in real["checks"] if item["check_id"] == "migration-packaged")
+        for group, group_ids in real_row["acceptance"]["cases_by_line"]["21.x"].items():
+            self.assertIsNone(group_ids, group)
+        ids = acceptance.expected_cases(real_row, "main")
+        self.assertEqual(
+            set(real_row["acceptance"]["cases_by_line"]["main"]),
+            {"old-workspace-cli", "packaged-schematic", "transaction-negatives", "frontend-parity"},
+        )
+        cid = "migration-packaged"
+        row = next(item for item in self.f.matrix["checks"] if item["check_id"] == cid)
+        row["acceptance"]["cases_by_line"]["main"] = real_row["acceptance"]["cases_by_line"]["main"]
+        write_json(self.f.matrix_path, self.f.matrix)
+        self.f.matrix_sha = acceptance.sha256_file(self.f.matrix_path)
+        self.f.run["expected_matrix"]["sha256"] = self.f.matrix_sha
+        self.f.write_pack_record()
+        self.f.binding = acceptance.binding_for(self.f.run, self.f.matrix_sha)
+        for report_id, report in self.f.reports.items():
+            report["binding"] = self.f.binding
+            if report_id == "pack-library":
+                report["prepack_binding"] = self.f.pack_record["binding"]
+            self.f.save_report(report_id)
+        invocation = self.f.invocations[cid]
+        out_dir = self.f.run_dir / acceptance.assertion_directory(cid, invocation)
+        records = []
+        case_results = []
+        for case_id in ids:
+            path = out_dir / f"{case_id.replace('/', '__')}.json"
+            write_json(path, {"case_id": case_id, "result": "pass", "kind": "assertion", "line": "main"})
+            record = {
+                "path": path.relative_to(self.f.run_dir).as_posix(),
+                "sha256": acceptance.sha256_file(path),
+                "bytes": path.stat().st_size,
+            }
+            records.append(record)
+            case_results.append({"case_id": case_id, "result": "pass", "kind": "assertion", "output_paths": [record["path"]]})
+        report = self.f.reports[cid]
+        artifacts = {item["id"]: {"sha256": item["sha256"], "bytes": item["bytes"]} for item in self.f.run["artifacts"]}
+        report.update({
+            "coverage": "complete",
+            "result": "pass",
+            "exit_code": 0,
+            "subject_kind": "artifact",
+            "subject_ids": ["library", "migrate-cli"],
+            "artifacts": artifacts,
+            "expected_case_ids": ids,
+            "discovered_case_ids": list(ids),
+            "executed_case_ids": list(ids),
+            "passed_case_ids": list(ids),
+            "failed_case_ids": [],
+            "skipped_case_ids": [],
+            "unresolved_case_ids": [],
+            "exceptions": [],
+            "passed": len(ids),
+            "failed": 0,
+            "skipped": 0,
+            "outputs": records,
+            "case_results": case_results,
+        })
+        self.assertNotIn("g04_claim", report)
+        self.assertNotIn("g05_claim", report)
+        self.assertNotIn("approved", report)
+        self.f.save_report(cid)
+        result = self.f.evaluate()
+        self.assertIn(cid, result["complete_checks"], result["incomplete_checks"].get(cid))
+        self.assertNotIn(cid, result["incomplete_checks"])
+        report["coverage"] = "slice"
+        self.f.save_report(cid)
+        result = self.f.evaluate()
+        self.assertEqual(result["automatic_product_result"], "incomplete")
+        self.assertIn("passing slice is not full acceptance", json.dumps(result["incomplete_checks"][cid]))
+
     def test_passing_slice_cannot_certify_full_browser_api_sass_or_migration(self):
         for cid in ("browser-matrix", "api-completeness", "sass-seal", "migration-packaged"):
             self.f.reports[cid]["coverage"] = "slice"
