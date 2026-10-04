@@ -9,11 +9,23 @@
  */
 import {readFileSync, writeFileSync, mkdirSync} from 'node:fs';
 import {createHash} from 'node:crypto';
-import {join, dirname} from 'node:path';
+import {join, dirname, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const outPath = join(root, 'compatibility/pack-proof/motion-lifecycle-smoke.json');
+const trackedReceipt = join(root, 'compatibility/pack-proof/motion-lifecycle-smoke.json');
+
+function receiptPath() {
+  const directed = process.env.RC_ASSERTION_OUTPUT_DIR;
+  if (process.env.RC_CHECK_ID === 'motion-smoke' && directed) {
+    const target = join(directed, 'motion-lifecycle-smoke.json');
+    if (resolve(target) === resolve(trackedReceipt)) {
+      throw new Error('motion receipt must not overwrite the tracked pack-proof file');
+    }
+    return target;
+  }
+  return trackedReceipt;
+}
 
 function sha256(text) {
   return createHash('sha256').update(text).digest('hex');
@@ -139,6 +151,7 @@ const result = {
     'Deleted /animations recipe modules are not required.',
   ],
 };
+const outPath = receiptPath();
 mkdirSync(dirname(outPath), {recursive: true});
 writeFileSync(outPath, JSON.stringify(result, null, 2) + '\n');
 if (errors.length) {

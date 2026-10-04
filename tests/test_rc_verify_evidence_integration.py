@@ -269,5 +269,97 @@ class CurrentBindingTests(unittest.TestCase):
             lite.check_current_binding(self.row, root=self.f.root)
 
 
+class InputDriftTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory(prefix='rc-input-drift-')
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        package = self.root / 'projects/ngx-material-legacy/package.json'
+        package.parent.mkdir(parents=True)
+        package.write_text('{"version":"22.0.0-rc.0"}\n')
+        source = self.root / 'projects/ngx-material-legacy/legacy-button/button.ts'
+        source.parent.mkdir(parents=True)
+        source.write_text('export const button = 1;\n')
+        checker = self.root / 'scripts/checker.py'
+        checker.parent.mkdir(parents=True)
+        checker.write_text('print(1)\n')
+        (self.root / 'pnpm-lock.yaml').write_text('lock: 1\n')
+        (self.root / 'toolchain-lock.json').write_text('{"node":"24.21.0"}\n')
+        (self.root / 'chainman.lock').write_text('b' * 40 + '\n')
+        matrix = self.root / 'compatibility/rc/matrices/full-verify.json'
+        matrix.parent.mkdir(parents=True)
+        matrix.write_text('{"checks":[]}\n')
+        self.git = self._git()
+        self.git('add', '.')
+        self.git('commit', '-qm', 'Synthetic input fixture')
+
+    def _git(self):
+        env = {**os.environ, 'GIT_CONFIG_NOSYSTEM': '1', 'GIT_CONFIG_GLOBAL': '/dev/null'}
+        def git(*args):
+            return subprocess.run(['git', *args], cwd=self.root, env=env, capture_output=True, text=True, check=True).stdout.strip()
+        git('init', '-q')
+        git('config', 'user.name', 'Synthetic verifier test')
+        git('config', 'user.email', 'synthetic@example.invalid')
+        git('config', 'core.hooksPath', '/dev/null')
+        return git
+
+    def _change(self, relative, text):
+        before = verify.observe_inputs(self.root)
+        path = self.root / relative
+        path.write_text(text)
+        after = verify.observe_inputs(self.root)
+        named = {item['path']: item for item in verify.describe_input_drift(before, after)}
+        self.assertIn(relative, named)
+        row = named[relative]
+        self.assertEqual(row['change'], 'changed')
+        self.assertNotEqual(row['before_sha256'], row['after_sha256'])
+        self.assertNotEqual(before['fingerprint']['inputs_sha256'], after['fingerprint']['inputs_sha256'])
+        return row
+
+    def test_unchanged_observation_has_no_drift(self):
+        before = verify.observe_inputs(self.root)
+        after = verify.observe_inputs(self.root)
+        self.assertEqual(verify.describe_input_drift(before, after), [])
+        self.assertEqual(before['fingerprint'], after['fingerprint'])
+
+    def test_product_lock_matrix_and_checker_mutations_are_named(self):
+        self.assertEqual(self._change('projects/ngx-material-legacy/legacy-button/button.ts', 'export const button = 2;\n')['role'], 'product-source')
+        self.git('checkout', '--', '.')
+        self.assertEqual(self._change('pnpm-lock.yaml', 'lock: 2\n')['role'], 'lock')
+        self.git('checkout', '--', '.')
+        self.assertEqual(self._change('compatibility/rc/matrices/full-verify.json', '{"checks":["x"]}\n')['role'], 'matrix')
+        self.git('checkout', '--', '.')
+        self.assertEqual(self._change('scripts/checker.py', 'print(2)\n')['role'], 'checker')
+
+    def test_deleted_and_new_paths_are_named(self):
+        before = verify.observe_inputs(self.root)
+        (self.root / 'projects/ngx-material-legacy/legacy-button/button.ts').unlink()
+        after = verify.observe_inputs(self.root)
+        missing = {item['path']: item for item in verify.describe_input_drift(before, after)}
+        self.assertEqual(missing['projects/ngx-material-legacy/legacy-button/button.ts']['change'], 'missing')
+        self.assertIsNone(missing['projects/ngx-material-legacy/legacy-button/button.ts']['after_sha256'])
+        self.git('checkout', '--', '.')
+        before = verify.observe_inputs(self.root)
+        (self.root / 'scripts/new-checker.py').write_text('print(3)\n')
+        after = verify.observe_inputs(self.root)
+        created = {item['path']: item for item in verify.describe_input_drift(before, after)}
+        self.assertEqual(created['scripts/new-checker.py']['change'], 'new')
+        self.assertEqual(created['scripts/new-checker.py']['role'], 'checker')
+        self.assertIsNone(created['scripts/new-checker.py']['before_sha256'])
+
+    def test_motion_receipt_is_not_rewritten_for_a_coordinated_run(self):
+        receipt = ROOT / 'compatibility/pack-proof/motion-lifecycle-smoke.json'
+        original = receipt.read_bytes()
+        self.addCleanup(lambda: receipt.write_bytes(original))
+        out = self.root / 'motion-out'
+        out.mkdir()
+        env = {**os.environ, 'RC_CHECK_ID': 'motion-smoke', 'RC_ASSERTION_OUTPUT_DIR': str(out)}
+        result = subprocess.run(['node', 'scripts/motion-lifecycle-smoke.mjs'], cwd=ROOT, env=env, capture_output=True, text=True, timeout=60)
+        self.assertEqual(result.returncode, 0, result.stderr[-2000:])
+        self.assertEqual(receipt.read_bytes(), original)
+        written = json.loads((out / 'motion-lifecycle-smoke.json').read_text())
+        self.assertEqual(written['status'], 'ok')
+
+
 if __name__ == '__main__':
     unittest.main()

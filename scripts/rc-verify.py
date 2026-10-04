@@ -160,8 +160,38 @@ def verifier_lock(root):
             fcntl.flock(stream.fileno(), fcntl.LOCK_UN)
 
 
-def source_fingerprint(root):
-    """Detect source/tool/test changes during execution; no synthetic Git fallback."""
+def classify_input(path):
+    """Role of a fingerprinted path. Reports stay excluded; this does not ignore locks or checkers."""
+    name = path.replace('\\', '/')
+    if name.startswith('compatibility/rc/reports/') or name == 'compatibility/pack-proof/motion-lifecycle-smoke.json':
+        return 'derived-diagnostic'
+    if name in {'pnpm-lock.yaml', 'toolchain-lock.json', 'chainman.lock', '.npm-version', '.node-version'}:
+        return 'lock'
+    if name.startswith('compatibility/rc/matrices/'):
+        return 'matrix'
+    if name == 'compatibility/provenance.json' or name.startswith('compatibility/pack-proof/historical-unbound/'):
+        return 'oracle'
+    if name.startswith('projects/'):
+        return 'product-source'
+    if name.startswith('scripts/') or name.startswith('tests/') or name == 'justfile':
+        return 'checker'
+    return 'consumed-input'
+
+
+def _file_record(path, role):
+    if path.is_symlink():
+        payload = b'link:' + os.readlink(path).encode()
+        return {'sha256': hashlib.sha256(payload).hexdigest(), 'role': role, 'payload': payload, 'missing': False}
+    if not path.exists():
+        return {'sha256': None, 'role': role, 'payload': b'missing', 'missing': True}
+    if path.is_dir():
+        return {'sha256': None, 'role': role, 'payload': b'directory', 'missing': False}
+    payload = str(path.stat().st_mode).encode() + b'\0' + path.read_bytes()
+    return {'sha256': hashlib.sha256(payload).hexdigest(), 'role': role, 'payload': payload, 'missing': False}
+
+
+def observe_inputs(root):
+    """Fingerprint plus per-path hashes. The aggregate digest matches the historical tracked-file loop."""
     def git(*args):
         result = subprocess.run(['git', *args], cwd=root, capture_output=True, check=True)
         return result.stdout
@@ -169,24 +199,95 @@ def source_fingerprint(root):
     tree = git('rev-parse', 'HEAD^{tree}').decode().strip()
     names = git('ls-files', '-z').decode().split('\0')
     digest = hashlib.sha256()
+    files = {}
     for name in sorted(filter(None, names)):
         if name.startswith('compatibility/rc/reports/'):
             continue  # Legacy generated outputs, not the contract/runner inputs.
-        path = root / name
+        record = _file_record(root / name, classify_input(name))
         digest.update(name.encode() + b'\0')
-        if path.is_symlink():
-            digest.update(b'link:' + os.readlink(path).encode())
-        else:
-            digest.update(str(path.stat().st_mode).encode() + b'\0' + path.read_bytes())
+        digest.update(record['payload'])
+        files[name] = {'sha256': record['sha256'], 'role': record['role'], 'missing': record['missing']}
     status = git('status', '--porcelain', '--untracked-files=all', '--', '.', ':(exclude)compatibility/rc/reports')
     digest.update(status)
+    status_lines = [line for line in status.decode().splitlines() if line]
+    for line in status_lines:
+        if not line.startswith('?? '):
+            continue
+        name = line[3:]
+        if name in files or name.startswith('compatibility/rc/reports/'):
+            continue
+        record = _file_record(root / name, classify_input(name))
+        files[name] = {'sha256': record['sha256'], 'role': record['role'], 'missing': record['missing']}
     package = read_json(root / 'projects/ngx-material-legacy/package.json')
     version = package.get('version', '')
     major = version.split('.', 1)[0] if isinstance(version, str) else ''
     if major not in ('21', '22'):
         raise EvidenceError('cannot determine the supported source line from library version')
-    return {'commit': commit, 'tree': tree, 'inputs_sha256': digest.hexdigest(),
-            'clean': not status.strip(), 'line': '21.x' if major == '21' else 'main'}
+    locks = {}
+    for name in ('chainman.lock', 'pnpm-lock.yaml', 'toolchain-lock.json', '.node-version', '.npm-version'):
+        candidate = root / name
+        if candidate.is_file() and not candidate.is_symlink():
+            locks[name] = hashlib.sha256(candidate.read_bytes()).hexdigest()
+    fingerprint = {'commit': commit, 'tree': tree, 'inputs_sha256': digest.hexdigest(),
+                   'clean': not status.strip(), 'line': '21.x' if major == '21' else 'main'}
+    return {'fingerprint': fingerprint, 'files': files, 'status_lines': status_lines, 'locks': locks}
+
+
+def source_fingerprint(root):
+    """Detect source/tool/test changes during execution; no synthetic Git fallback."""
+    return observe_inputs(root)['fingerprint']
+
+
+def describe_input_drift(before, after):
+    """Changed, missing, and new input paths with before/after hashes. No file contents."""
+    changes = []
+    for path in sorted(set(before['files']) | set(after['files'])):
+        left = before['files'].get(path)
+        right = after['files'].get(path)
+        if left == right:
+            continue
+        if left is None:
+            change = 'new'
+        elif right is None or right.get('missing') is True:
+            change = 'missing'
+        else:
+            change = 'changed'
+        role = (right or left).get('role') or classify_input(path)
+        changes.append({
+            'path': path,
+            'change': change,
+            'role': role,
+            'before_sha256': None if left is None else left.get('sha256'),
+            'after_sha256': None if right is None else right.get('sha256'),
+        })
+    explained = {item['path'] for item in changes}
+    for line in sorted(set(after.get('status_lines') or []) - set(before.get('status_lines') or [])):
+        path = line[3:] if len(line) > 3 else line
+        if path in explained:
+            continue
+        changes.append({
+            'path': path,
+            'change': 'status',
+            'role': classify_input(path),
+            'before_sha256': None,
+            'after_sha256': None,
+        })
+    if not changes and before['fingerprint'] != after['fingerprint']:
+        changes.append({
+            'path': '(aggregate)',
+            'change': 'changed',
+            'role': 'consumed-input',
+            'before_sha256': before['fingerprint'].get('inputs_sha256'),
+            'after_sha256': after['fingerprint'].get('inputs_sha256'),
+        })
+    return changes
+
+
+def format_input_drift(changes):
+    return [
+        f"{item['change']} {item['role']} {item['path']} before={item['before_sha256']} after={item['after_sha256']}"
+        for item in changes
+    ]
 
 
 
@@ -289,8 +390,14 @@ def check_existing_run(argv):
     record = read_json(record_path)
     if record.get('run_id') != run.get('run_id'):
         fail('coordinator record belongs to another run')
-    if source_fingerprint(ROOT) != run.get('execution_inputs'):
-        fail('source/checker inputs differ from the recorded execution')
+    recorded_inputs = run.get('execution_inputs') or {}
+    current_inputs = source_fingerprint(ROOT)
+    if current_inputs != recorded_inputs:
+        bits = []
+        for key in ('commit', 'tree', 'inputs_sha256', 'clean', 'line'):
+            if current_inputs.get(key) != recorded_inputs.get(key):
+                bits.append(f"{key} recorded={recorded_inputs.get(key)} current={current_inputs.get(key)}")
+        fail('source/checker inputs differ from the recorded execution: ' + '; '.join(bits))
     result = evaluate_run(ROOT, run_path, matrix_sha256=values['--expected-matrix-sha256'],
         binding=record.get('binding', {}), process_results=record.get('process_results', {}),
         invocation_ids=record.get('invocation_ids', {}))
@@ -517,7 +624,8 @@ def main() -> int:
     matrix = read_json(MATRIX_PATH)
     required = list(validate_matrix(matrix).values())
     expected_matrix_digest = evidence_sha256(MATRIX_PATH)
-    source_before = source_fingerprint(ROOT)
+    source_before_obs = observe_inputs(ROOT)
+    source_before = source_before_obs['fingerprint']
     if source_before['line'] != line:
         fail('--line does not match this checkout library version')
 
@@ -553,8 +661,10 @@ def main() -> int:
                                'bytes': pack_record_path.stat().st_size}
     draft['pack_metadata'] = {'path': meta_path.name, 'sha256': evidence_sha256(meta_path),
                               'bytes': meta_path.stat().st_size}
-    if source_fingerprint(ROOT) != source_before:
-        fail('source/checker inputs changed during packing')
+    packed_obs = observe_inputs(ROOT)
+    packed_drift = describe_input_drift(source_before_obs, packed_obs)
+    if packed_drift or packed_obs['fingerprint'] != source_before:
+        fail('source/checker inputs changed during packing\n' + '\n'.join(format_input_drift(packed_drift)))
     run_path.write_text(json.dumps(draft, indent=2) + '\n')
     ACTIVE_RUN = RunEvidence(draft, out_dir, expected_matrix_digest, pack_execution=pack_execution)
     # The pack child's exit stays in the execution record. Observation failures
@@ -860,9 +970,21 @@ def main() -> int:
     completeness = evaluate_run(ROOT, run_path, matrix_sha256=expected_matrix_digest,
         binding=ACTIVE_RUN.binding, process_results=ACTIVE_RUN.exit_codes,
         invocation_ids=ACTIVE_RUN.invocations)
-    if source_fingerprint(ROOT) != source_before:
-        completeness['incomplete_checks']['source-drift'] = ['source, checker or tool inputs changed during execution']
+    source_after_obs = observe_inputs(ROOT)
+    source_drift = describe_input_drift(source_before_obs, source_after_obs)
+    (out_dir / 'source-inputs.json').write_text(json.dumps({
+        'schema_version': 1,
+        'role': 'source input observation',
+        'run_id': run_id,
+        'before': {'fingerprint': source_before, 'locks': source_before_obs['locks']},
+        'after': {'fingerprint': source_after_obs['fingerprint'], 'locks': source_after_obs['locks']},
+        'changes': source_drift,
+    }, indent=2) + '\n')
+    if source_drift or source_after_obs['fingerprint'] != source_before:
+        named = format_input_drift(source_drift) or ['source, checker or tool inputs changed during execution']
+        completeness['incomplete_checks']['source-drift'] = named
         completeness['automatic_product_result'] = 'incomplete'
+        print('verify: source drift\n' + '\n'.join(named), file=sys.stderr)
     summary = {
         "schema_version": 1,
         "role": "rc-verify-orchestration",
