@@ -83,6 +83,8 @@ export class _MatMenuBase
   private _xPosition: MenuPositionX;
   private _yPosition: MenuPositionY;
   private _firstItemFocusSubscription?: Subscription;
+  /** Item whose focus() ran. Detach moves document.activeElement to body before QueryList.changes. */
+  private _focusCarryItem: MatMenuItem | null = null;
   private _previousElevation: string;
   protected _elevationPrefix: string;
   protected _baseElevation: number;
@@ -307,16 +309,28 @@ export class _MatMenuBase
         startWith(this._directDescendantItems),
         switchMap(items => merge(...items.map((item: MatMenuItem) => item._focused))),
       )
-      .subscribe(focusedItem => this._keyManager.updateActiveItem(focusedItem as MatMenuItem));
+      .subscribe(focusedItem => {
+        const item = focusedItem as MatMenuItem;
+        this._keyManager.updateActiveItem(item);
+        this._focusCarryItem = item;
+      });
 
     this._directDescendantItems.changes.subscribe((itemsList: QueryList<MatMenuItem>) => {
       // Move focus to another item, if the active item is removed from the list.
       // We need to debounce the callback, because multiple items might be removed
       // in quick succession.
       const manager = this._keyManager;
-
-      if (this._panelAnimationState === 'enter' && manager.activeItem?._hasFocus()) {
-        const items = itemsList.toArray();
+      const items = itemsList.toArray();
+      const carried = this._focusCarryItem;
+      const carriedRemoved = !!carried && !items.includes(carried);
+      const activeElement = typeof document === 'undefined' ? null : document.activeElement;
+      // Removing the focused node blurs it before this callback, so _hasFocus() is already false.
+      const focusFellToBody =
+        carriedRemoved &&
+        (activeElement == null ||
+          activeElement === document.body ||
+          activeElement === document.documentElement);
+      if (this._panelAnimationState === 'enter' && (manager.activeItem?._hasFocus() || focusFellToBody)) {
         const index = Math.max(0, Math.min(items.length - 1, manager.activeItemIndex || 0));
 
         if (items[index] && !items[index].disabled) {
@@ -324,6 +338,9 @@ export class _MatMenuBase
         } else {
           manager.setNextItemActive();
         }
+        this._focusCarryItem = manager.activeItem;
+      } else if (carriedRemoved) {
+        this._focusCarryItem = null;
       }
     });
   }
@@ -402,31 +419,47 @@ export class _MatMenuBase
    */
   focusFirstItem(origin: FocusOrigin = 'program'): void {
     // Wait for `onStable` to ensure iOS VoiceOver screen reader focuses the first item (#24735).
+    // An already-stable zone never emits onStable. Noop token providers do not schedule an
+    // animation task, so a click-open would otherwise leave focus on document.body.
     this._firstItemFocusSubscription?.unsubscribe();
-    this._firstItemFocusSubscription = this._ngZone.onStable.pipe(take(1)).subscribe(() => {
-      let menuPanel: HTMLElement | null = null;
-
-      if (this._directDescendantItems.length) {
-        // Because the `mat-menuPanel` is at the DOM insertion point, not inside the overlay, we don't
-        // have a nice way of getting a hold of the menuPanel panel. We can't use a `ViewChild` either
-        // because the panel is inside an `ng-template`. We work around it by starting from one of
-        // the items and walking up the DOM.
-        menuPanel = this._directDescendantItems.first!._getHostElement().closest('[role="menu"]');
+    let applied = false;
+    const apply = () => {
+      if (applied) {
+        return;
       }
+      applied = true;
+      this._firstItemFocusSubscription?.unsubscribe();
+      this._applyFirstItemFocus(origin);
+    };
+    this._firstItemFocusSubscription = this._ngZone.onStable.pipe(take(1)).subscribe(apply);
+    if (this._ngZone.isStable) {
+      Promise.resolve().then(apply);
+    }
+  }
 
-      // If an item in the menuPanel is already focused, avoid overriding the focus.
-      if (!menuPanel || !menuPanel.contains(document.activeElement)) {
-        const manager = this._keyManager;
-        manager.setFocusOrigin(origin).setFirstItemActive();
+  private _applyFirstItemFocus(origin: FocusOrigin): void {
+    let menuPanel: HTMLElement | null = null;
 
-        // If there's no active item at this point, it means that all the items are disabled.
-        // Move focus to the menuPanel panel so keyboard events like Escape still work. Also this will
-        // give _some_ feedback to screen readers.
-        if (!manager.activeItem && menuPanel) {
-          menuPanel.focus();
-        }
+    if (this._directDescendantItems.length) {
+      // Because the `mat-menuPanel` is at the DOM insertion point, not inside the overlay, we don't
+      // have a nice way of getting a hold of the menuPanel panel. We can't use a `ViewChild` either
+      // because the panel is inside an `ng-template`. We work around it by starting from one of
+      // the items and walking up the DOM.
+      menuPanel = this._directDescendantItems.first!._getHostElement().closest('[role="menu"]');
+    }
+
+    // If an item in the menuPanel is already focused, avoid overriding the focus.
+    if (!menuPanel || !menuPanel.contains(document.activeElement)) {
+      const manager = this._keyManager;
+      manager.setFocusOrigin(origin).setFirstItemActive();
+
+      // If there's no active item at this point, it means that all the items are disabled.
+      // Move focus to the menuPanel panel so keyboard events like Escape still work. Also this will
+      // give _some_ feedback to screen readers.
+      if (!manager.activeItem && menuPanel) {
+        menuPanel.focus();
       }
-    });
+    }
   }
 
   /**

@@ -244,6 +244,10 @@ export abstract class _MatTabBodyBase implements OnInit, OnDestroy {
       this._initialized &&
       (this._isCenterPosition(this._position) || this._isCenterPosition(this._previousPosition || ''))
     ) {
+      // Attach the body when centering starts. CSS transitionstart never fires
+      // while the off-center pane is display:none, so waiting for it leaves the
+      // active tab empty.
+      this._transitionStarted(this._position);
       this._scheduleTransitionDone(this._position);
     }
   }
