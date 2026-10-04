@@ -62,5 +62,58 @@ class BrowserRequiredCellCreditTests(unittest.TestCase):
         self.assertIn('not-in-matrix', summary['unknown_cell_ids'])
 
 
+
+
+def allocate(parent, prefix='chrome-'):
+    script = """
+import {allocateLauncherDir} from './scripts/browser-required-cells.mjs';
+const parent = process.argv[1];
+const prefix = process.argv[2];
+console.log(allocateLauncherDir(prefix, parent));
+"""
+    result = subprocess.run(
+        ['node', '--input-type=module', '-e', script, parent, prefix],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    return result
+
+
+class LauncherParentTests(unittest.TestCase):
+    def test_absent_owned_parent_is_created_without_touching_shared_tmp(self):
+        import tempfile
+        owned = Path(tempfile.mkdtemp(prefix='ngx-launcher-owned-'))
+        absent = owned / 'missing-parent'
+        self.assertFalse(absent.exists())
+        shared = Path('/tmp/ngx-required-cells')
+        shared_before = shared.exists()
+        try:
+            result = allocate(str(absent))
+            self.assertEqual(result.returncode, 0, result.stderr)
+            created = Path(result.stdout.strip())
+            self.assertTrue(created.is_dir())
+            self.assertEqual(created.parent, absent)
+            self.assertTrue(str(created.name).startswith('chrome-'))
+            self.assertEqual(shared.exists(), shared_before)
+        finally:
+            import shutil
+            shutil.rmtree(owned, ignore_errors=True)
+
+    def test_parent_collision_fails_without_spawning(self):
+        import tempfile
+        owned = Path(tempfile.mkdtemp(prefix='ngx-launcher-collide-'))
+        blocker = owned / 'not-a-directory'
+        blocker.write_text('occupied', encoding='utf8')
+        try:
+            result = allocate(str(blocker), 'ff-')
+            self.assertNotEqual(result.returncode, 0)
+            self.assertTrue(blocker.is_file())
+            self.assertIn('EEXIST', result.stderr + result.stdout)
+        finally:
+            import shutil
+            shutil.rmtree(owned, ignore_errors=True)
+
 if __name__ == '__main__':
     unittest.main()

@@ -21,6 +21,18 @@ import {sha256File} from './resolve-run-library.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const cacheRoot = '/tmp/ngx-required-cells';
+
+export function sessionRoot() {
+  return process.env.NGX_REQUIRED_CELLS_ROOT || cacheRoot;
+}
+
+/** Create an owned session parent if needed, then a unique child directory.
+ *  mkdtemp does not create a missing parent, so a cold start must do this
+ *  before Chromium, Firefox, or WebKit profile setup. */
+export function allocateLauncherDir(prefix, parent = sessionRoot()) {
+  mkdirSync(parent, {recursive: true});
+  return mkdtempSync(join(parent, prefix));
+}
 const matrixPath = join(root, 'compatibility/rc/matrices/browser-matrix.json');
 const reportPath = join(root, 'compatibility/rc/reports/browser-matrix-required.json');
 const probePath = join(root, 'scripts/browser-required-probe.js');
@@ -636,7 +648,7 @@ function chromeBin() {
 
 export async function withChromium(origin, fn, options = {}) {
   const bin = chromeBin();
-  const userDir = mkdtempSync(join(cacheRoot, 'chrome-'));
+  const userDir = allocateLauncherDir('chrome-');
   const port = options.port || CDP_PORTS.chromium;
   spawnSync('bash', ['-lc', `fuser -k ${port}/tcp >/dev/null 2>&1 || true`], {timeout: 5000});
   const chrome = spawn(bin, [
@@ -719,7 +731,7 @@ export async function withChromium(origin, fn, options = {}) {
 }
 
 export async function withFirefox(origin, fn, options = {}) {
-  const profile = mkdtempSync(join(cacheRoot, 'ff-'));
+  const profile = allocateLauncherDir('ff-');
   const name = `ngx${Date.now()}`;
   const bin = firefoxBin();
   const created = spawnSync(bin, ['--headless', '--createprofile', `${name} ${profile}`], {encoding: 'utf8', timeout: 30000});
@@ -802,7 +814,7 @@ export async function withFirefox(origin, fn, options = {}) {
 
 export function withWebKit(origin, fn, options = {}) {
   return new Promise((resolveDone, rejectDone) => {
-    const runtimeDir = mkdtempSync(join(cacheRoot, 'webkit-runtime-'));
+    const runtimeDir = allocateLauncherDir('webkit-runtime-');
     chmodSync(runtimeDir, 0o700);
     const child = spawn('/usr/bin/python3', [webkitScript], {
       stdio: ['pipe', 'pipe', 'pipe'],
