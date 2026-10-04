@@ -149,12 +149,14 @@ function policyProblem(name, obs) {
 
 function serverProblem(kind, family, obs) {
   if (!obs || typeof obs !== 'object') return 'missing observation';
+  if (obs.framingError) return `server observation ${obs.framingError}`;
   if (obs.hydration === true) return 'hydration is not claimed';
   if (clientOnly(obs)) return 'client-only render presented as SSR';
   if (obs.renderedOnServer === true && obs.documentBefore !== 'undefined') return 'client-only render presented as SSR';
   if (obs.documentAfter !== 'undefined' || obs.windowAfter !== 'undefined') return 'server process leaked a browser global';
-  if (obs.timers !== 0) return 'server process leaked a timer';
   if (obs.exitCode !== 0 || obs.threw === true) return 'server process exit was not successful';
+  if (typeof obs.timers !== 'number' || obs.timers < 0) return 'server observation invalid-payload';
+  if (obs.timers !== 0) return 'server process leaked a timer';
   if (kind === 'render') {
     if (obs.renderedOnServer !== true || obs.clientOnly !== false) return 'client-only render presented as SSR';
     if (obs.marker !== true) return 'server render did not include the component';

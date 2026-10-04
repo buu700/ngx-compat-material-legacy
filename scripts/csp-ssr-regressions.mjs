@@ -8,7 +8,8 @@
 import {readFileSync} from 'node:fs';
 import {dirname, join} from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {deriveMainRoster, observationProblems, samplePass, PUBLIC_ENTRIES, RENDER_FAMILIES} from './csp-ssr-roster.mjs';
+import {assertCase, deriveMainRoster, observationProblems, samplePass, PUBLIC_ENTRIES, RENDER_FAMILIES} from './csp-ssr-roster.mjs';
+import {CSP_SSR_MARKER, parseCspSsrStdout, serverObservation} from './csp-ssr-run.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const failures = [];
@@ -77,6 +78,26 @@ expect('unbound artifact', observationProblems({
 expect('missing engine', observationProblems({
   requiredIds: roster.ids, outcomes: goodOutcomes, sourceClean: true, artifactSha: 'abc', boundSha: 'abc', chromiumLaunched: false,
 }).problems.includes('missing required engine'));
+
+const serverId = roster.ids.find(id => id.includes('/server/dom-free-server-and-leaks/import/'));
+const frameBody = {
+  timers: 0, documentBefore: 'undefined', windowBefore: 'undefined', documentAfter: 'undefined', windowAfter: 'undefined',
+  exitCode: 0, renderedOnServer: false, serverImport: true, clientOnly: false, hydration: false, threw: false,
+};
+const framed = `npm warn before\n${CSP_SSR_MARKER}${JSON.stringify(frameBody)}\nchild log after\n`;
+const parsed = parseCspSsrStdout(framed);
+expect('marker length', CSP_SSR_MARKER.length === 10);
+expect('frame with surrounding logs', parsed.ok === true && parsed.payload.timers === 0);
+expect('missing frame', parseCspSsrStdout('no marker\n').error === 'missing-frame');
+expect('truncated json', parseCspSsrStdout(`${CSP_SSR_MARKER}{"timers":`).error === 'malformed-json');
+expect('invalid payload', parseCspSsrStdout(`${CSP_SSR_MARKER}{"timers":"none"}`).error === 'invalid-payload');
+expect('conflicting frames', parseCspSsrStdout(`${CSP_SSR_MARKER}${JSON.stringify(frameBody)}\n${CSP_SSR_MARKER}${JSON.stringify({...frameBody, timers: 1})}`).error === 'conflicting-frames');
+const missingObs = serverObservation({ok: false, error: 'missing-frame', code: 1});
+expect('framing is not a timer leak', !('timers' in missingObs) && assertCase(serverId, missingObs).join(' ').includes('server observation missing-frame') && !assertCase(serverId, missingObs).join(' ').includes('leaked a timer'));
+const exitObs = serverObservation({ok: true, payload: {...frameBody, timers: 0}, code: 1});
+expect('exit failure stays an exit failure', assertCase(serverId, exitObs).join(' ').includes('exit was not successful') && !assertCase(serverId, exitObs).join(' ').includes('leaked a timer'));
+const leakObs = serverObservation({ok: true, payload: {...frameBody, timers: 1}, code: 0});
+expect('retained timer still fails', assertCase(serverId, leakObs).join(' ').includes('leaked a timer'));
 
 if (failures.length) {
   console.error(failures.join('\n'));

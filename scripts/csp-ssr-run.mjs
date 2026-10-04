@@ -15,6 +15,7 @@ import {PUBLIC_ENTRIES, RENDER_FAMILIES, SURFACES} from './csp-ssr-roster.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const POLICY_NONCE = 'cspssrnonce';
+export const CSP_SSR_MARKER = '__CSPSSR__';
 const HASH_STYLE = 'body{background-color:rgb(4,5,6)}';
 const BAD_STYLE = 'body{background-color:rgb(1,2,3)}';
 const MISMATCH_STYLE = 'body{background-color:rgb(7,8,9)}';
@@ -515,6 +516,88 @@ async function bundleServer(consumer, files) {
   });
 }
 
+function firstJsonValue(source) {
+  let index = 0;
+  while (index < source.length && /\s/.test(source[index])) index += 1;
+  if (index >= source.length || (source[index] !== '{' && source[index] !== '[')) return {ok: false, error: 'invalid-payload'};
+  const open = source[index];
+  const close = open === '{' ? '}' : ']';
+  let depth = 0;
+  let inString = false;
+  let escape = false;
+  for (let end = index; end < source.length; end += 1) {
+    const char = source[end];
+    if (inString) {
+      if (escape) escape = false;
+      else if (char === '\\') escape = true;
+      else if (char === '"') inString = false;
+      continue;
+    }
+    if (char === '"') {
+      inString = true;
+      continue;
+    }
+    if (char === open) depth += 1;
+    else if (char === close) {
+      depth -= 1;
+      if (depth === 0) {
+        try {
+          return {ok: true, value: JSON.parse(source.slice(index, end + 1))};
+        } catch {
+          return {ok: false, error: 'malformed-json'};
+        }
+      }
+    }
+  }
+  return {ok: false, error: 'malformed-json'};
+}
+
+function payloadShape(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  if (typeof value.timers !== 'number' || !Number.isFinite(value.timers) || value.timers < 0) return false;
+  for (const key of ['documentBefore', 'windowBefore', 'documentAfter', 'windowAfter']) {
+    if (typeof value[key] !== 'string') return false;
+  }
+  return true;
+}
+
+export function parseCspSsrStdout(stdout) {
+  const text = String(stdout ?? '');
+  const starts = [];
+  let from = 0;
+  while (from <= text.length) {
+    const at = text.indexOf(CSP_SSR_MARKER, from);
+    if (at < 0) break;
+    starts.push(at);
+    from = at + CSP_SSR_MARKER.length;
+  }
+  if (starts.length === 0) return {ok: false, error: 'missing-frame', payload: null};
+  if (starts.length > 1) return {ok: false, error: 'conflicting-frames', payload: null};
+  const parsed = firstJsonValue(text.slice(starts[0] + CSP_SSR_MARKER.length));
+  if (!parsed.ok) return {ok: false, error: parsed.error, payload: null};
+  if (!payloadShape(parsed.value)) return {ok: false, error: 'invalid-payload', payload: null};
+  return {ok: true, error: null, payload: parsed.value};
+}
+
+export function serverObservation(result) {
+  const code = result?.code ?? 1;
+  if (!result || result.ok !== true || !result.payload) {
+    return {
+      framingError: result?.error || 'missing-frame',
+      threw: true,
+      exitCode: code,
+      renderedOnServer: false,
+      clientOnly: false,
+      hydration: false,
+      documentBefore: 'undefined',
+      windowBefore: 'undefined',
+      documentAfter: 'undefined',
+      windowAfter: 'undefined',
+    };
+  }
+  return {...result.payload, exitCode: code, threw: code !== 0 || result.payload.threw === true};
+}
+
 function runProcess(preload, bundle, env) {
   return new Promise(resolve => {
     const child = spawn(process.execPath, ['--import', pathToFileURL(preload).href, bundle], {cwd: dirname(bundle), env});
@@ -523,10 +606,8 @@ function runProcess(preload, bundle, env) {
     child.stdout.on('data', chunk => { stdout += chunk; });
     child.stderr.on('data', chunk => { stderr += chunk; });
     child.on('close', code => {
-      const marker = stdout.lastIndexOf('__CSPSSR__');
-      let payload = null;
-      try { payload = JSON.parse(marker >= 0 ? stdout.slice(marker + 9) : ''); } catch { payload = null; }
-      resolve({code: code ?? 1, payload, stderr: stderr.slice(-500)});
+      const parsed = parseCspSsrStdout(stdout);
+      resolve({code: code ?? 1, ...parsed, stderr: stderr.slice(-500)});
     });
   });
 }
@@ -548,8 +629,7 @@ async function runServers(consumer, env) {
   }
   for (const [id, bundle] of jobs) {
     const result = await runProcess(preload, bundle, env);
-    const payload = result.payload || {threw: true, renderedOnServer: false, clientOnly: false, hydration: false, documentBefore: 'undefined', windowBefore: 'undefined', documentAfter: typeof globalThis.document, windowAfter: typeof globalThis.window, timers: -1};
-    observations[id] = {...payload, exitCode: result.code, threw: result.code !== 0 || payload.threw === true};
+    observations[id] = serverObservation(result);
     if (result.code !== 0) console.error(`csp-ssr ${id} exit ${result.code} ${result.stderr}`);
   }
   return observations;
@@ -569,6 +649,6 @@ export async function executeCspSsr(tarball) {
 
 export function evidenceOf(observation) {
   if (!observation || typeof observation !== 'object') return '';
-  const keys = ['opened', 'styleSrcViolations', 'scriptSrcViolations', 'spinnerNonce', 'spinnerRules', 'inlineScriptRan', 'inlineStyleApplied', 'hashStyleApplied', 'driverEvaluated', 'marker', 'timers', 'documentBefore', 'exitCode'];
+  const keys = ['opened', 'styleSrcViolations', 'scriptSrcViolations', 'spinnerNonce', 'spinnerRules', 'inlineScriptRan', 'inlineStyleApplied', 'hashStyleApplied', 'driverEvaluated', 'marker', 'timers', 'documentBefore', 'exitCode', 'framingError'];
   return keys.filter(key => observation[key] !== undefined).map(key => `${key}=${observation[key]}`).join(' ');
 }
