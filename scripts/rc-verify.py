@@ -61,6 +61,7 @@ SCRIPT_CHECKS = {
     "scripts/migration-cli-isolation.mjs": "migration-packaged",
     "scripts/rc-test-legacy-family.mjs": "historical-legacy-artifact",
     "scripts/check-m3-inclusion-order.mjs": "m3-coexistence",
+    "scripts/check-consumer-floors.mjs": "consumer-floors",
 }
 
 
@@ -950,6 +951,28 @@ def main() -> int:
     )
     results["dependency-eligibility"] = "pass" if code == 0 else "fail"
     implemented_ran.append("dependency-eligibility")
+
+    # consumer-floors: advertised library engines/peers vs lock and installed versions.
+    # The matrix implemented flag stays false. Null cli-runtime / line-isolation and
+    # every 21.x group keep this check incomplete.
+    code = run_node(
+        "scripts/check-consumer-floors.mjs",
+        ["--out", str(out_dir / "consumer-floors-workspace.json")],
+    )
+    write_check_report(
+        out_dir,
+        run_id,
+        line,
+        "consumer-floors",
+        exit_code=code,
+        limitations=[
+            "Compares advertised library engines.node and peerDependencies to lock/installed versions.",
+            "Node floor uses toolchain-lock.json / .node-version, not process.version.",
+            "cli-runtime, line-isolation, and 21.x consumer-floors groups stay null. Does not mark consumer-floors accepted. Does not claim G12.",
+        ],
+    )
+    results["consumer-floors"] = "pass" if code == 0 else "fail"
+    implemented_ran.append("consumer-floors")
 
     missing: list[str] = []
     failed: list[str] = []
