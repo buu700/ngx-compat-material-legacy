@@ -289,10 +289,8 @@ def load_finding_dispositions(root: Path) -> dict[str, list[dict]]:
     return found
 
 
-def _disposition_matches(record: dict, advisory_id: str) -> bool:
+def _record_shape(record: dict, advisory_id: str) -> bool:
     if record.get("advisory_id") != advisory_id:
-        return False
-    if record.get("classification") not in {"blocked", "not-applicable"}:
         return False
     path = record.get("dependency_path")
     reason = record.get("reason")
@@ -305,10 +303,58 @@ def _disposition_matches(record: dict, advisory_id: str) -> bool:
     return True
 
 
-def classify_live_findings(rows: dict, unresolved: list[str], dispositions: dict[str, list[dict]]) -> dict:
-    """A reviewed blocked record stays blocking. Unknown findings stay unresolved."""
+def _disposition_matches(record: dict, advisory_id: str) -> bool:
+    if record.get("classification") not in {"blocked", "not-applicable"}:
+        return False
+    return _record_shape(record, advisory_id)
+
+
+def _parse_day(value: object):
+    if not isinstance(value, str) or not value:
+        return None
+    try:
+        return datetime.fromisoformat(value).date()
+    except ValueError:
+        return None
+
+
+def _temporary_exception_applies(record: dict, advisory_id: str, now: datetime) -> bool:
+    """A dated owner exception can defer one exact finding. It is not a fix."""
+    if record.get("classification") != "temporary-exception":
+        return False
+    if not _record_shape(record, advisory_id):
+        return False
+    if record.get("fixed_version") is not None:
+        return False
+    authority = record.get("authority")
+    granted_by = record.get("granted_by")
+    if not isinstance(authority, str) or len(authority.strip()) < 40:
+        return False
+    if not isinstance(granted_by, str) or not granted_by.strip():
+        return False
+    granted_on = _parse_day(record.get("granted_on"))
+    expires_on = _parse_day(record.get("expires_on"))
+    if granted_on is None or expires_on is None:
+        return False
+    today = now.date()
+    if granted_on > today or today > expires_on:
+        return False
+    if (expires_on - granted_on).days > 90:
+        return False
+    return True
+
+
+def classify_live_findings(rows: dict, unresolved: list[str], dispositions: dict[str, list[dict]], now: datetime | None = None) -> dict:
+    """A reviewed blocked record stays blocking. Unknown findings stay unresolved.
+
+    A temporary exception removes one exact advisory only while it is unexpired,
+    names a grantor, and records no patched release. It does not clear the
+    finding and it is not security clearance.
+    """
+    now = now or datetime.now(timezone.utc)
     still = []
     blocked = []
+    excepted = []
     classified = []
     seen = set()
     for key in unresolved:
@@ -318,26 +364,42 @@ def classify_live_findings(rows: dict, unresolved: list[str], dispositions: dict
         row = rows.get(key) or {}
         vulns = row.get("vulns") if isinstance(row, dict) else None
         ids = [item.get("id") for item in vulns or [] if isinstance(item, dict) and isinstance(item.get("id"), str)]
-        records = [record for record in dispositions.get(key, []) if any(_disposition_matches(record, advisory) for advisory in ids)]
-        matched_ids = {record.get("advisory_id") for record in records}
-        if not ids or any(advisory not in matched_ids for advisory in ids):
+        records = dispositions.get(key, [])
+        reviewed = [record for record in records if any(_disposition_matches(record, advisory) for advisory in ids)]
+        temporary = [record for record in records if any(_temporary_exception_applies(record, advisory, now) for advisory in ids)]
+        matched_ids = {record.get("advisory_id") for record in reviewed}
+        excepted_ids = {record.get("advisory_id") for record in temporary}
+        if not ids or any(advisory not in matched_ids | excepted_ids for advisory in ids):
             still.append(key)
             continue
-        if any(record.get("classification") == "blocked" for record in records):
+        if any(record.get("classification") == "blocked" for record in reviewed):
             blocked.append(key)
             classified.append({
                 "package": key,
                 "classification": "blocked",
                 "advisories": ids,
-                "file": records[0].get("_file"),
-                "dependency_path": records[0].get("dependency_path"),
-                "fixed_version": records[0].get("fixed_version"),
+                "file": reviewed[0].get("_file"),
+                "dependency_path": reviewed[0].get("dependency_path"),
+                "fixed_version": reviewed[0].get("fixed_version"),
             })
             continue
-        # not-applicable does not clear a finding that is still in the lock.
-        # There is no patched release to substitute, so it stays unresolved.
+        if temporary and all(advisory in excepted_ids for advisory in ids):
+            excepted.append(key)
+            classified.append({
+                "package": key,
+                "classification": "temporary-exception",
+                "advisories": ids,
+                "file": temporary[0].get("_file"),
+                "dependency_path": temporary[0].get("dependency_path"),
+                "fixed_version": None,
+                "expires_on": temporary[0].get("expires_on"),
+                "granted_by": temporary[0].get("granted_by"),
+            })
+            continue
+        # not-applicable, or a temporary record that has expired or lacks a
+        # grant, does not clear a finding that is still in the lock.
         still.append(key)
-    return {"unresolved": still, "blocked": blocked, "classified": classified}
+    return {"unresolved": still, "blocked": blocked, "excepted": excepted, "classified": classified}
 
 
 def perform_lookup(root: Path, now: datetime) -> dict:
@@ -419,7 +481,7 @@ def perform_lookup(root: Path, now: datetime) -> dict:
     if vendor_unknown:
         vendor_queried = False
 
-    classified = classify_live_findings(rows, unresolved, load_finding_dispositions(root))
+    classified = classify_live_findings(rows, unresolved, load_finding_dispositions(root), now)
     unresolved = classified["unresolved"]
     blocked = classified["blocked"]
     http_known = status == 200 and not truncated and not error and bool(rows or not queried)
@@ -445,6 +507,7 @@ def perform_lookup(root: Path, now: datetime) -> dict:
         ),
         "unresolved": unresolved + blocked,
         "blocked_findings": blocked,
+        "excepted_findings": classified["excepted"],
         "finding_dispositions": classified["classified"],
         "lock_packages": len(packages),
         "security_clearance": "not-passed",
@@ -666,6 +729,7 @@ def write_acceptance(request: dict, observation: dict) -> bool:
         "limitations": [
             f"lookup={observation['lookup']}; stored_result={observation['stored_result']}; uncovered_lock_packages={observation['uncovered_lock_packages']}",
             "Vendor hash equality is not an advisory clearance.",
+            "A temporary exception defers one exact unpatched finding until its expiry. It is not a fix, not security clearance, and not a G11 claim.",
             "Does not claim G08, G11, or G13.",
         ],
     }

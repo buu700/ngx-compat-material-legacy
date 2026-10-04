@@ -149,18 +149,61 @@ class Fresh03AdmissionTests(unittest.TestCase):
             self.assertEqual(case["result"], "pass", case)
             self.assertGreater(observed["annotation_files"], 0)
 
-    def test_blocked_braces_disposition_stays_blocking(self) -> None:
+    def test_blocked_record_stays_blocking(self) -> None:
+        rows = {"braces@3.0.3": {"name": "braces", "version": "3.0.3", "vulns": [{"id": "GHSA-vfj7-8cjw-p6xm"}]}}
+        record = {
+            "package": "braces",
+            "version": "3.0.3",
+            "advisory_id": "GHSA-vfj7-8cjw-p6xm",
+            "classification": "blocked",
+            "fixed_version": None,
+            "dependency_path": ["devDependency karma@6.4.4", "braces@3.0.3"],
+            "reason": "No patched release exists, so a blocked classification stays blocking.",
+        }
+        classified = ELIGIBILITY.classify_live_findings(rows, ["braces@3.0.3"], {"braces@3.0.3": [record]})
+        self.assertEqual(classified["blocked"], ["braces@3.0.3"])
+        self.assertEqual(classified["excepted"], [])
+        self.assertEqual(classified["unresolved"], [])
+
+    def test_recorded_braces_exception_is_temporary(self) -> None:
+        from datetime import datetime, timezone
         rows = {"braces@3.0.3": {"name": "braces", "version": "3.0.3", "vulns": [{"id": "GHSA-vfj7-8cjw-p6xm"}]}}
         dispositions = ELIGIBILITY.load_finding_dispositions(ROOT)
-        classified = ELIGIBILITY.classify_live_findings(rows, ["braces@3.0.3"], dispositions)
-        self.assertEqual(classified["blocked"], ["braces@3.0.3"])
-        self.assertEqual(classified["unresolved"], [])
-        combined = classified["unresolved"] + classified["blocked"]
-        self.assertIn("braces@3.0.3", combined)
         record = dispositions["braces@3.0.3"][0]
-        self.assertEqual(record["classification"], "blocked")
+        self.assertEqual(record["classification"], "temporary-exception")
         self.assertIsNone(record["fixed_version"])
         self.assertEqual(record["registry_latest"], "3.0.3")
+        self.assertEqual(record["expires_on"], "2026-11-04")
+        during = datetime(2026, 10, 4, tzinfo=timezone.utc)
+        classified = ELIGIBILITY.classify_live_findings(rows, ["braces@3.0.3"], dispositions, during)
+        self.assertEqual(classified["excepted"], ["braces@3.0.3"])
+        self.assertEqual(classified["blocked"], [])
+        self.assertEqual(classified["unresolved"], [])
+        after = datetime(2026, 11, 5, tzinfo=timezone.utc)
+        expired = ELIGIBILITY.classify_live_findings(rows, ["braces@3.0.3"], dispositions, after)
+        self.assertEqual(expired["excepted"], [])
+        self.assertIn("braces@3.0.3", expired["unresolved"])
+
+    def test_temporary_exception_rejects_a_standing_waiver(self) -> None:
+        from datetime import datetime, timezone
+        rows = {"braces@3.0.3": {"name": "braces", "version": "3.0.3", "vulns": [{"id": "GHSA-vfj7-8cjw-p6xm"}]}}
+        record = {
+            "package": "braces",
+            "version": "3.0.3",
+            "advisory_id": "GHSA-vfj7-8cjw-p6xm",
+            "classification": "temporary-exception",
+            "fixed_version": None,
+            "granted_by": "someone",
+            "granted_on": "2026-10-04",
+            "expires_on": "2027-10-04",
+            "authority": "A date more than ninety days out is a standing waiver, not a temporary exception.",
+            "dependency_path": ["devDependency karma@6.4.4", "braces@3.0.3"],
+            "reason": "The advisory is still present and this record must not retire it.",
+        }
+        now = datetime(2026, 10, 4, tzinfo=timezone.utc)
+        classified = ELIGIBILITY.classify_live_findings(rows, ["braces@3.0.3"], {"braces@3.0.3": [record]}, now)
+        self.assertEqual(classified["excepted"], [])
+        self.assertIn("braces@3.0.3", classified["unresolved"])
 
 
 if __name__ == "__main__":
