@@ -19,21 +19,26 @@ export class DialogBody {}
   standalone: false,
   selector: 'csp-root',
   template: `
-    <button id="open-dialog" type="button" (click)="openDialog()">Dialog</button>
-    <button id="open-menu" type="button" [matMenuTriggerFor]="labMenu">Menu</button>
-    <mat-menu #labMenu="matMenu"><button mat-menu-item type="button">Item</button></mat-menu>
-    <mat-select id="choice">
+    <button *ngIf="surface === 'dialog'" id="open-dialog" type="button" (click)="openDialog()">Dialog</button>
+    <ng-container *ngIf="surface === 'menu'">
+      <button id="open-menu" type="button" [matMenuTriggerFor]="labMenu">Menu</button>
+      <mat-menu #labMenu="matMenu"><button mat-menu-item type="button">Item</button></mat-menu>
+    </ng-container>
+    <mat-select *ngIf="surface === 'select'" id="choice">
       <mat-option value="a">Alpha</mat-option>
     </mat-select>
-    <button id="tip" type="button" #tip="matTooltip" matTooltip="Hello">Tip</button>
-    <button id="open-snack" type="button" (click)="openSnack()">Snack</button>
-    <mat-progress-spinner id="spinner" mode="indeterminate"></mat-progress-spinner>
+    <button *ngIf="surface === 'tooltip'" id="tip" type="button" #tip="matTooltip" matTooltip="Hello">Tip</button>
+    <button *ngIf="surface === 'snack-bar'" id="open-snack" type="button" (click)="openSnack()">Snack</button>
+    <mat-progress-spinner *ngIf="surface === 'progress-spinner'" id="spinner" mode="indeterminate" [diameter]="spinnerDiameter"></mat-progress-spinner>
   `,
 })
 export class CspRoot {
-  @ViewChild(MatLegacyMenuTrigger) menuTrigger!: MatLegacyMenuTrigger;
-  @ViewChild(MatLegacySelect) select!: MatLegacySelect;
-  @ViewChild('tip') tip!: MatLegacyTooltip;
+  /** Structural CSS owns the 100px keyframes. Another diameter emits the dynamic style tag. */
+  readonly spinnerDiameter = 48;
+  readonly surface = page.get('surface') || '';
+  @ViewChild(MatLegacyMenuTrigger) menuTrigger?: MatLegacyMenuTrigger;
+  @ViewChild(MatLegacySelect) select?: MatLegacySelect;
+  @ViewChild('tip') tip?: MatLegacyTooltip;
   private dialog = inject(MatLegacyDialog);
   private snack = inject(MatLegacySnackBar);
 
@@ -43,11 +48,13 @@ export class CspRoot {
   ngAfterViewInit(): void {
     const mode = page.get('mode') || 'correct';
     if (mode === 'correct' || mode === 'missing' || mode === 'wrong') {
-      try { this.openDialog(); } catch { /* recorded by the missing container */ }
-      try { this.menuTrigger.openMenu(); } catch { /* recorded by the missing panel */ }
-      try { this.select.open(); } catch { /* recorded by the missing panel */ }
-      try { this.tip.show(0); } catch { /* recorded by the missing tooltip */ }
-      try { this.openSnack(); } catch { /* recorded by the missing container */ }
+      try {
+        if (this.surface === 'dialog') this.openDialog();
+        else if (this.surface === 'menu') this.menuTrigger?.openMenu();
+        else if (this.surface === 'select') this.select?.open();
+        else if (this.surface === 'tooltip') this.tip?.show(0);
+        else if (this.surface === 'snack-bar') this.openSnack();
+      } catch { /* recorded by the missing overlay */ }
     }
     setTimeout(() => this.publish(), 500);
   }
@@ -72,6 +79,7 @@ export class CspRoot {
       styleSrcViolations: violations.filter(item => item.startsWith('style-src')).length,
       scriptSrcViolations: violations.filter(item => item.startsWith('script-src')).length,
       stylesWithPolicyNonce: styles.filter(style => style.nonce === policyNonce && policyNonce !== '').length,
+      rejectedStyles: styles.filter(style => style.nonce === 'wrong-nonce').length,
       spinnerNonce: !spinner ? '' : (spinner.nonce === policyNonce && policyNonce !== '' ? 'policy' : (spinner.nonce === 'wrong-nonce' ? 'wrong' : spinner.nonce)),
       spinnerRules,
       providerNonce: providerNonce || '',

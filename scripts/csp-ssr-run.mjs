@@ -27,6 +27,14 @@ function styleHash(text) {
 
 const HASH_POLICY = `default-src 'none'; script-src 'nonce-${POLICY_NONCE}'; style-src 'sha256-${styleHash(HASH_STYLE)}'`;
 
+/** An overlay is open only when its marker survives outside style and script text. */
+export function serverOverlayOpen(html, markers) {
+  const markup = String(html ?? '')
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, '')
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '');
+  return (markers || []).every(marker => markup.includes(marker));
+}
+
 function chromeBin() {
   if (process.env.CHROME_BIN && existsSync(process.env.CHROME_BIN)) return process.env.CHROME_BIN;
   for (const candidate of ['/usr/bin/chromium-browser', '/usr/bin/chromium', '/usr/bin/google-chrome', '/usr/bin/google-chrome-stable']) {
@@ -234,6 +242,7 @@ function nonceObservation(surface, raw, unsafeInline) {
     stylesWithPolicyNonce: raw ? raw.stylesWithPolicyNonce : 0,
     spinnerNonce: raw ? raw.spinnerNonce : '',
     spinnerRules: raw ? raw.spinnerRules : -1,
+    rejectedStyles: raw && typeof raw.rejectedStyles === 'number' ? raw.rejectedStyles : -1,
   };
 }
 
@@ -248,13 +257,14 @@ async function runBrowser(consumer) {
         ['missing', `${origin}/missing.html?mode=missing`, NONCE_POLICY],
         ['wrong', `${origin}/wrong.html?mode=wrong`, NONCE_POLICY],
       ];
-      const rawByMode = {};
-      for (const [mode, url] of pages) {
-        await driver.send('Page.navigate', {url});
-        await readReady(driver.evaluate, driver.sleep);
-        rawByMode[mode] = await driver.evaluate('window.__cspResult || null');
-      }
       for (const surface of SURFACES) {
+        const rawByMode = {};
+        for (const [mode, url] of pages) {
+          const separator = url.includes('?') ? '&' : '?';
+          await driver.send('Page.navigate', {url: `${url}${separator}surface=${encodeURIComponent(surface)}`});
+          await readReady(driver.evaluate, driver.sleep);
+          rawByMode[mode] = await driver.evaluate('window.__cspResult || null');
+        }
         observations[`csp-ssr/main/chromium/nonce-and-negative/${surface}/correct-nonce`] = nonceObservation(surface, rawByMode.correct, unsafe(NONCE_POLICY));
         observations[`csp-ssr/main/chromium/nonce-and-negative/${surface}/missing-nonce`] = nonceObservation(surface, rawByMode.missing, unsafe(NONCE_POLICY));
         observations[`csp-ssr/main/chromium/nonce-and-negative/${surface}/wrong-nonce`] = nonceObservation(surface, rawByMode.wrong, unsafe(NONCE_POLICY));
@@ -308,7 +318,7 @@ const RENDER = {
     extra: 'constructor(private dialog: MatLegacyDialog) {}',
     template: '<button id="dialog-host" type="button">Open</button>',
     marker: 'dialog-host',
-    overlay: `html.includes('mat-dialog-container')`,
+    overlayMarkers: ['mat-dialog-container'],
   },
   'menu-host': {
     imports: `import {MatLegacyMenuModule} from '@ngx-compat/material-legacy/legacy-menu';`,
@@ -316,7 +326,7 @@ const RENDER = {
     extra: '',
     template: '<button id="menu-host" type="button" [matMenuTriggerFor]="menu">Menu</button><mat-menu #menu="matMenu"><button mat-menu-item type="button">Item</button></mat-menu>',
     marker: 'menu-host',
-    overlay: `html.includes('mat-menu-panel')`,
+    overlayMarkers: ['mat-menu-panel'],
   },
   select: {
     imports: `import {MatLegacySelectModule} from '@ngx-compat/material-legacy/legacy-select';`,
@@ -324,7 +334,6 @@ const RENDER = {
     extra: '',
     template: '<mat-select id="choice"><mat-option value="a">A</mat-option></mat-select>',
     marker: 'mat-select',
-    overlay: 'false',
   },
   'tooltip-host': {
     imports: `import {MatLegacyTooltipModule} from '@ngx-compat/material-legacy/legacy-tooltip';`,
@@ -332,7 +341,7 @@ const RENDER = {
     extra: '',
     template: '<button id="tip" type="button" matTooltip="Hello">Tip</button>',
     marker: 'id="tip"',
-    overlay: `html.includes('mat-tooltip') && html.includes('cdk-overlay')`,
+    overlayMarkers: ['mat-tooltip', 'cdk-overlay'],
   },
   'snack-host': {
     imports: `import {MatLegacySnackBar, MatLegacySnackBarModule} from '@ngx-compat/material-legacy/legacy-snack-bar';`,
@@ -340,7 +349,7 @@ const RENDER = {
     extra: 'constructor(private snack: MatLegacySnackBar) {}',
     template: '<button id="snack-host" type="button">Snack</button>',
     marker: 'snack-host',
-    overlay: `html.includes('snack-bar-container')`,
+    overlayMarkers: ['snack-bar-container'],
   },
   'form-field': {
     imports: `import {MatLegacyFormFieldModule} from '@ngx-compat/material-legacy/legacy-form-field';\nimport {MatLegacyInputModule} from '@ngx-compat/material-legacy/legacy-input';`,
@@ -348,7 +357,6 @@ const RENDER = {
     extra: '',
     template: '<mat-form-field id="field"><input matInput></mat-form-field>',
     marker: 'mat-form-field',
-    overlay: 'false',
   },
   tabs: {
     imports: `import {MatLegacyTabsModule} from '@ngx-compat/material-legacy/legacy-tabs';`,
@@ -356,7 +364,6 @@ const RENDER = {
     extra: '',
     template: '<mat-tab-group id="tabs"><mat-tab label="One">One</mat-tab></mat-tab-group>',
     marker: 'mat-tab-group',
-    overlay: 'false',
   },
   'progress-spinner': {
     imports: `import {MatLegacyProgressSpinnerModule} from '@ngx-compat/material-legacy/legacy-progress-spinner';`,
@@ -364,7 +371,6 @@ const RENDER = {
     extra: '',
     template: '<mat-progress-spinner id="spinner" mode="determinate" value="40"></mat-progress-spinner>',
     marker: 'mat-progress-spinner',
-    overlay: 'false',
   },
   autocomplete: {
     imports: `import {MatLegacyAutocompleteModule} from '@ngx-compat/material-legacy/legacy-autocomplete';\nimport {MatLegacyInputModule} from '@ngx-compat/material-legacy/legacy-input';`,
@@ -372,7 +378,6 @@ const RENDER = {
     extra: '',
     template: '<input id="auto" [matAutocomplete]="auto"><mat-autocomplete #auto="matAutocomplete"><mat-option value="a">A</mat-option></mat-autocomplete>',
     marker: 'mat-autocomplete',
-    overlay: 'false',
   },
   checkbox: {
     imports: `import {MatLegacyCheckboxModule} from '@ngx-compat/material-legacy/legacy-checkbox';`,
@@ -380,7 +385,6 @@ const RENDER = {
     extra: '',
     template: '<mat-checkbox id="check">Yes</mat-checkbox>',
     marker: 'mat-checkbox',
-    overlay: 'false',
   },
   button: {
     imports: `import {MatLegacyButtonModule} from '@ngx-compat/material-legacy/legacy-button';`,
@@ -388,7 +392,6 @@ const RENDER = {
     extra: '',
     template: '<button id="button" mat-button type="button">Go</button>',
     marker: 'id="button"',
-    overlay: 'false',
   },
   radio: {
     imports: `import {MatLegacyRadioModule} from '@ngx-compat/material-legacy/legacy-radio';`,
@@ -396,7 +399,6 @@ const RENDER = {
     extra: '',
     template: '<mat-radio-group id="radio"><mat-radio-button value="a">A</mat-radio-button></mat-radio-group>',
     marker: 'mat-radio-group',
-    overlay: 'false',
   },
   list: {
     imports: `import {MatLegacyListModule} from '@ngx-compat/material-legacy/legacy-list';`,
@@ -404,7 +406,6 @@ const RENDER = {
     extra: '',
     template: '<mat-list id="list"><mat-list-item>One</mat-list-item></mat-list>',
     marker: 'mat-list',
-    overlay: 'false',
   },
   card: {
     imports: `import {MatLegacyCardModule} from '@ngx-compat/material-legacy/legacy-card';`,
@@ -412,7 +413,6 @@ const RENDER = {
     extra: '',
     template: '<mat-card id="card"><mat-card-content>Card</mat-card-content></mat-card>',
     marker: 'mat-card',
-    overlay: 'false',
   },
   paginator: {
     imports: `import {MatLegacyPaginatorModule} from '@ngx-compat/material-legacy/legacy-paginator';`,
@@ -420,7 +420,6 @@ const RENDER = {
     extra: '',
     template: '<mat-paginator id="pages" [length]="10" [pageSize]="5"></mat-paginator>',
     marker: 'mat-paginator',
-    overlay: 'false',
   },
   'progress-bar': {
     imports: `import {MatLegacyProgressBarModule} from '@ngx-compat/material-legacy/legacy-progress-bar';`,
@@ -428,7 +427,6 @@ const RENDER = {
     extra: '',
     template: '<mat-progress-bar id="bar" mode="determinate" value="40"></mat-progress-bar>',
     marker: 'mat-progress-bar',
-    overlay: 'false',
   },
 };
 
@@ -482,8 +480,14 @@ export class LabRoot { ${spec.extra} }
 @NgModule({imports: [BrowserModule, ${spec.modules}], declarations: [LabRoot], bootstrap: [LabRoot]})
 export class LabModule {}
 
+function overlayOpen(html: string, markers: string[]): boolean {
+  const markup = String(html ?? '')
+    .replace(/<style\\b[^>]*>[\\s\\S]*?<\\/style>/gi, '')
+    .replace(/<script\\b[^>]*>[\\s\\S]*?<\\/script>/gi, '');
+  return markers.every(marker => markup.includes(marker));
+}
 const html = await renderModule(LabModule, {document: '<!doctype html><html><head></head><body><lab-root></lab-root></body></html>'});
-${epilogue(`{renderedOnServer: true, clientOnly: false, hydration: false, threw: false, marker: html.includes(${JSON.stringify(spec.marker)}), overlayOpened: ${spec.overlay}}`)}\n`);
+${epilogue(`{renderedOnServer: true, clientOnly: false, hydration: false, threw: false, marker: html.includes(${JSON.stringify(spec.marker)}), overlayOpened: ${spec.overlayMarkers ? `overlayOpen(html, ${JSON.stringify(spec.overlayMarkers)})` : 'false'}}`)}\n`);
     files.push(`src/${name}`);
   }
   return files;
@@ -649,6 +653,6 @@ export async function executeCspSsr(tarball) {
 
 export function evidenceOf(observation) {
   if (!observation || typeof observation !== 'object') return '';
-  const keys = ['opened', 'styleSrcViolations', 'scriptSrcViolations', 'spinnerNonce', 'spinnerRules', 'inlineScriptRan', 'inlineStyleApplied', 'hashStyleApplied', 'driverEvaluated', 'marker', 'timers', 'documentBefore', 'exitCode', 'framingError'];
+  const keys = ['opened', 'styleSrcViolations', 'scriptSrcViolations', 'spinnerNonce', 'spinnerRules', 'rejectedStyles', 'inlineScriptRan', 'inlineStyleApplied', 'hashStyleApplied', 'driverEvaluated', 'marker', 'timers', 'documentBefore', 'exitCode', 'framingError'];
   return keys.filter(key => observation[key] !== undefined).map(key => `${key}=${observation[key]}`).join(' ');
 }

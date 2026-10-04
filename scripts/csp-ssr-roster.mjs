@@ -90,7 +90,7 @@ function clientOnly(obs) {
   return obs.clientOnly === true || obs.documentBefore !== 'undefined' || obs.windowBefore !== 'undefined' || obs.hydration === true;
 }
 
-function nonceProblem(mode, obs) {
+function nonceProblem(surface, mode, obs) {
   if (!obs || typeof obs !== 'object') return 'missing observation';
   if (obs.hydration === true) return 'hydration is not claimed';
   if (obs.clientOnly === true) return 'client-only render presented as SSR';
@@ -100,15 +100,22 @@ function nonceProblem(mode, obs) {
     if (obs.opened !== true) return 'surface did not open under the nonce';
     if (obs.styleSrcViolations !== 0 || obs.scriptSrcViolations !== 0) return 'policy blocked an approved nonce';
     if (!(obs.stylesWithPolicyNonce > 0)) return 'missing nonce';
-    if (obs.spinnerRules < 1 || obs.spinnerNonce !== 'policy') return 'dynamic style was not nonce-approved';
+    if (surface === 'progress-spinner' && (obs.spinnerRules < 1 || obs.spinnerNonce !== 'policy')) {
+      return 'dynamic style was not nonce-approved';
+    }
     return null;
   }
   if (mode === 'missing-nonce' || mode === 'wrong-nonce') {
     if (obs.styleSrcViolations < 1) return 'missing nonce was not rejected';
     if (obs.stylesWithPolicyNonce !== 0) return 'wrong nonce was accepted';
-    if (obs.spinnerRules !== 0) return 'inline style the policy would block was applied';
-    if (mode === 'missing-nonce' && obs.spinnerNonce !== '') return 'missing nonce was present';
-    if (mode === 'wrong-nonce' && obs.spinnerNonce !== 'wrong') return 'wrong nonce was not the rejected nonce';
+    if (surface === 'progress-spinner') {
+      if (obs.spinnerRules !== 0) return 'inline style the policy would block was applied';
+      if (mode === 'missing-nonce' && obs.spinnerNonce !== '') return 'missing nonce was present';
+      if (mode === 'wrong-nonce' && obs.spinnerNonce !== 'wrong') return 'wrong nonce was not the rejected nonce';
+      return null;
+    }
+    if (mode === 'missing-nonce' && obs.rejectedStyles !== 0) return 'missing nonce was present';
+    if (mode === 'wrong-nonce' && !(obs.rejectedStyles > 0)) return 'wrong nonce was not the rejected nonce';
     return null;
   }
   return 'unknown nonce mode';
@@ -178,7 +185,7 @@ export function assertCase(caseId, obs) {
       const problem = policyProblem(parts[5], obs);
       return problem ? [problem] : [];
     }
-    const problem = nonceProblem(parts[5], obs);
+    const problem = nonceProblem(parts[4], parts[5], obs);
     return problem ? [problem] : [];
   }
   if (parts[2] === 'server' && parts[3] === 'dom-free-server-and-leaks') {
@@ -194,8 +201,8 @@ export function samplePass(caseId) {
     const mode = parts[5];
     const base = {engine: 'chromium', unsafeInline: false, clientOnly: false, hydration: false, stylesWithPolicyNonce: mode === 'correct-nonce' ? 1 : 0};
     if (mode === 'correct-nonce') return {...base, opened: true, styleSrcViolations: 0, scriptSrcViolations: 0, spinnerRules: 1, spinnerNonce: 'policy'};
-    if (mode === 'missing-nonce') return {...base, opened: true, styleSrcViolations: 1, scriptSrcViolations: 0, spinnerRules: 0, spinnerNonce: ''};
-    return {...base, opened: true, styleSrcViolations: 1, scriptSrcViolations: 0, spinnerRules: 0, spinnerNonce: 'wrong'};
+    if (mode === 'missing-nonce') return {...base, opened: true, styleSrcViolations: 1, scriptSrcViolations: 0, spinnerRules: 0, spinnerNonce: '', rejectedStyles: 0};
+    return {...base, opened: true, styleSrcViolations: 1, scriptSrcViolations: 0, spinnerRules: 0, spinnerNonce: 'wrong', rejectedStyles: 1};
   }
   if (parts[4] === 'policy') {
     const name = parts[5];

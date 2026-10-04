@@ -9,7 +9,7 @@ import {readFileSync} from 'node:fs';
 import {dirname, join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {assertCase, deriveMainRoster, observationProblems, samplePass, PUBLIC_ENTRIES, RENDER_FAMILIES} from './csp-ssr-roster.mjs';
-import {CSP_SSR_MARKER, parseCspSsrStdout, serverObservation} from './csp-ssr-run.mjs';
+import {CSP_SSR_MARKER, parseCspSsrStdout, serverObservation, serverOverlayOpen} from './csp-ssr-run.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const failures = [];
@@ -59,12 +59,21 @@ function problems(id, mutate, extra = {}) {
 }
 
 const correct = roster.ids.find(id => id.endsWith('/dialog/correct-nonce'));
+const spinnerCorrect = roster.ids.find(id => id.endsWith('/progress-spinner/correct-nonce'));
+const dialogWrong = roster.ids.find(id => id.endsWith('/dialog/wrong-nonce'));
 const missing = roster.ids.find(id => id.endsWith('/progress-spinner/missing-nonce'));
 const inlineScript = roster.ids.find(id => id.endsWith('/policy/unapproved-inline-script'));
 const inlineStyle = roster.ids.find(id => id.endsWith('/policy/unapproved-inline-style'));
 const render = roster.ids.find(id => id.endsWith('/render/dialog-host'));
 
 expect('missing nonce', problems(missing, () => ({styleSrcViolations: 0, spinnerRules: 1, spinnerNonce: 'policy', stylesWithPolicyNonce: 1})).includes('missing nonce'));
+expect('dialog does not borrow the spinner style', problems(correct, () => ({spinnerRules: 0, spinnerNonce: ''})) === '');
+expect('spinner dynamic style', problems(spinnerCorrect, () => ({spinnerRules: 0, spinnerNonce: ''})).includes('dynamic style was not nonce-approved'));
+expect('rejected nonce is the surface nonce', problems(dialogWrong, () => ({rejectedStyles: 0})).includes('wrong nonce was not the rejected nonce'));
+const closedMenu = '<style>.mat-menu-panel { color: red; }</style><button id="menu-host">Menu</button>';
+const openMenu = `${closedMenu}<div class="mat-menu-panel" role="menu"></div>`;
+expect('stylesheet is not an open menu', serverOverlayOpen(closedMenu, ['mat-menu-panel']) === false);
+expect('panel element is an open menu', serverOverlayOpen(openMenu, ['mat-menu-panel']) === true);
 expect('blocked inline style', problems(inlineStyle, () => ({inlineStyleApplied: true, styleSrcViolations: 0})).includes('inline style the policy would block'));
 expect('blocked inline script', problems(inlineScript, () => ({inlineScriptRan: true, scriptSrcViolations: 0})).includes('inline script the policy would block'));
 expect('client-only render', problems(render, () => ({clientOnly: true, documentBefore: 'object', renderedOnServer: true})).includes('client-only render presented as SSR'));
