@@ -61,6 +61,7 @@ SCRIPT_CHECKS = {
     "scripts/migration-cli-isolation.mjs": "migration-packaged",
     "scripts/check-old-workspace-cli.mjs": "migration-packaged",
     "scripts/migration-transaction.mjs": "migration-packaged",
+    "scripts/check-frontend-parity.mjs": "migration-packaged",
     "scripts/rc-test-legacy-family.mjs": "historical-legacy-artifact",
     "scripts/check-m3-inclusion-order.mjs": "m3-coexistence",
     "scripts/check-consumer-floors.mjs": "consumer-floors",
@@ -97,8 +98,9 @@ class RunEvidence:
     def subject(self, check_id):
         _, kind, ids, _ = CHECK_CONTRACT[check_id]
         if check_id == 'migration-packaged':
-            # The current slice only checks the independent CLI. The full
-            # contract also requires the library's packaged schematic.
+            # frontend-parity consumes the packed library via ng generate, but
+            # packaged-schematic is not rostered, so this slice still does not
+            # claim the library as an acceptance subject.
             ids = ('migrate-cli',)
         artifacts = {
             item['id']: {'sha256': item['sha256'], 'bytes': item['bytes']}
@@ -748,9 +750,10 @@ def main() -> int:
     implemented_ran.append("engine-free-consumer")
 
     # migration-packaged: CLI artifact verify, isolation, the temp old workspace,
-    # and transaction cases the extracted CLI bin actually executes. coverage
-    # stays slice. packaged-schematic, frontend-parity, and every 21.x migration
-    # group stay null, so this slice is not acceptance and does not claim G04 or G05.
+    # transaction cases the extracted CLI bin actually executes, and frontend
+    # parity between that CLI and ng generate of the packed library. coverage
+    # stays slice. packaged-schematic and every 21.x migration group stay null,
+    # so this slice is not acceptance and does not claim G04 or G05.
     code_verify = run_node("scripts/build-migrate-legacy-cli.mjs", ["--verify"])
     code_iso = run_node("scripts/migration-cli-isolation.mjs", [])
     code_workspace = run_node(
@@ -761,7 +764,11 @@ def main() -> int:
         "scripts/migration-transaction.mjs",
         ["--out", str(out_dir / "migration-transaction.json")],
     )
-    code = 0 if code_verify == 0 and code_iso == 0 and code_workspace == 0 and code_tx == 0 else (code_verify or code_iso or code_workspace or code_tx or 1)
+    code_parity = run_node(
+        "scripts/check-frontend-parity.mjs",
+        ["--library-tarball", str(tarball), "--out", str(out_dir / "frontend-parity.json")],
+    )
+    code = 0 if code_verify == 0 and code_iso == 0 and code_workspace == 0 and code_tx == 0 and code_parity == 0 else (code_verify or code_iso or code_workspace or code_tx or code_parity or 1)
     write_check_report(
         out_dir,
         run_id,
@@ -774,7 +781,8 @@ def main() -> int:
             "transaction-negatives runs node on package/bin/migrate-legacy.js extracted from that tarball. It does not import a transform function and does not run the schematic runner.",
             "Rostered transaction cases are blocked-file-writes-nothing, dry-apply-parity, second-apply-noop, concurrent-edit-rejected, and before-write-hook-refuses. The before-write refusal is MIGRATE_LEGACY_BEFORE_WRITE, not a production fault.",
             "An uncaught write error is not rostered when an earlier file remains rewritten.",
-            "packaged-schematic and frontend-parity stay null. Every 21.x migration group stays null. coverage stays slice. Does not mark migration-packaged accepted. Does not claim G04 or G05.",
+            "frontend-parity runs the extracted CLI bin and ng generate of the packed library collection on two copies of one temp fixture. It does not use an in-memory schematic host.",
+            "packaged-schematic stays null. Every 21.x migration group stays null. coverage stays slice. Does not mark migration-packaged accepted. Does not claim G04 or G05.",
         ],
     )
     results["migration-packaged"] = "pass" if code == 0 else "fail"

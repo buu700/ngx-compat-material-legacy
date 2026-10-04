@@ -165,7 +165,7 @@ console.log(JSON.stringify(assertionOutputDir()));
             "concurrent-edit-rejected",
             "before-write-hook-refuses",
         ])
-        self.assertIsNone(main["frontend-parity"])
+        self.assertEqual(main["frontend-parity"], [f"frontend-parity/{case_id}" for case_id in expected_ids])
         for group, ids in row["acceptance"]["cases_by_line"]["21.x"].items():
             self.assertIsNone(ids, group)
         self.assertEqual(row["acceptance"]["gates"], ["G04", "G05"])

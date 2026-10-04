@@ -115,7 +115,10 @@ class MigrationTransactionTests(unittest.TestCase):
         self.assertEqual(main["transaction-negatives"], CASE_IDS)
         self.assertEqual(main["old-workspace-cli"][0], "legacy-named-alias")
         self.assertIsNone(main["packaged-schematic"])
-        self.assertIsNone(main["frontend-parity"])
+        self.assertEqual(main["frontend-parity"][0], "frontend-parity/legacy-named-alias")
+        self.assertTrue(all(item.startswith("frontend-parity/") for item in main["frontend-parity"]))
+        self.assertFalse(set(main["frontend-parity"]) & set(main["old-workspace-cli"]))
+        self.assertFalse(set(main["frontend-parity"]) & set(CASE_IDS))
         for group, ids in row["acceptance"]["cases_by_line"]["21.x"].items():
             self.assertIsNone(ids, group)
         verify = (ROOT / "scripts/rc-verify.py").read_text()
