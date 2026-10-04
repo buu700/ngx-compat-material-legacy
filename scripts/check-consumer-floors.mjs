@@ -6,15 +6,24 @@
  *   node scripts/check-consumer-floors.mjs --out <report.json>
  *
  * Reads engines.node and peerDependencies from projects/ngx-material-legacy.
- * Node is compared to toolchain-lock.json / .node-version, not process.version.
- * Each peer is compared to the projects/ngx-material-legacy lock importer and
- * the matching installed package.json version. One assertion per declared floor.
- * Does not claim G12. Leaves cli-runtime, line-isolation, and every 21.x group
- * null. Does not mark consumer-floors accepted.
+ * The library Node floor is compared to toolchain-lock.json / .node-version,
+ * not process.version. Each peer is compared to the projects/ngx-material-legacy
+ * lock importer and the matching installed package.json version.
+ * cli-runtime executes migration/dist/package/bin/migrate-legacy.js on the Node
+ * that launches this process and checks that version against the CLI engines.node
+ * range. It also rejects 17.0.0 with that same range check. It does not execute
+ * Node 18 and does not treat the current runtime as a Node 18 floor run.
+ * line-isolation uses scripts/rc-verify.py: this checkout's library version must
+ * map to main, and --line 21.x against that mapped line must be rejected. It does
+ * not copy or run a 21.x manifest.
+ * Does not claim G12. Leaves every 21.x consumer-floors group null. Does not mark
+ * consumer-floors accepted.
  * A missing installed peer exits 1. Full verify installs node_modules and always
  * runs this script. verify-lite does not execute it.
  */
-import {existsSync, lstatSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
+import {spawnSync} from 'node:child_process';
+import {existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync} from 'node:fs';
+import {tmpdir} from 'node:os';
 import {dirname, join, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 
@@ -269,14 +278,257 @@ export function writePublicEnginesPeersAssertions(outputDir, comparisons) {
       lock_matches_installed: true,
       g12_claim: 'not-passed',
       not_executed: {
-        'cli-runtime': null,
-        'line-isolation': null,
         '21.x': null,
       },
     };
     const name = `${comparison.case_id.replaceAll('/', '__')}.json`;
     writeFileSync(join(outputDir, name), `${JSON.stringify(body, null, 2)}\n`);
     written.push(name);
+  }
+  return written;
+}
+
+const cliManifestPath = join(root, 'migration/dist/package/package.json');
+const cliBinPath = join(root, 'migration/dist/package/bin/migrate-legacy.js');
+
+const LINE_ISOLATION_PY = `
+import importlib.util
+import json
+import sys
+from pathlib import Path
+
+root = Path(sys.argv[1])
+path = root / "scripts" / "rc-verify.py"
+spec = importlib.util.spec_from_file_location("rc_verify_line", path)
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+version = json.loads((root / "projects/ngx-material-legacy/package.json").read_text(encoding="utf-8"))["version"]
+mapped = module.source_line_for_library_version(version)
+rejection = {"rejected": False, "exit_code": None}
+try:
+    module.require_line_matches_checkout("21.x", mapped)
+except SystemExit as exc:
+    rejection = {"rejected": True, "exit_code": exc.code}
+print(json.dumps({
+    "library_version": version,
+    "mapped_line": mapped,
+    "rejection": rejection,
+}))
+`;
+
+function writeAssertionFile(outputDir, body) {
+  if (body.result !== 'pass' || body.kind !== 'assertion') {
+    throw new Error(`refusing to emit a non-pass assertion for ${body.case_id}`);
+  }
+  if (body.g12_claim !== 'not-passed') {
+    throw new Error(`refusing to claim G12 for ${body.case_id}`);
+  }
+  if (!body.not_executed || body.not_executed['21.x'] !== null || Object.keys(body.not_executed).some(key => key !== '21.x')) {
+    throw new Error(`refusing to roster a 21.x result for ${body.case_id}`);
+  }
+  const name = `${String(body.case_id).replaceAll('/', '__')}.json`;
+  writeFileSync(join(outputDir, name), `${JSON.stringify(body, null, 2)}\n`);
+  return name;
+}
+
+/** Run the bundled migrate CLI with this Node. Does not launch Node 18 or Node 17. */
+export function executeCliRuntime() {
+  const manifest = JSON.parse(readFileSync(cliManifestPath, 'utf8'));
+  const enginesRange = manifest?.engines?.node;
+  if (typeof enginesRange !== 'string' || !enginesRange.trim()) {
+    throw new Error('migrate CLI package.json does not advertise engines.node');
+  }
+  const range = enginesRange.trim();
+  if (!existsSync(cliBinPath)) {
+    throw new Error('migrate CLI bin is missing');
+  }
+  const dir = mkdtempSync(join(tmpdir(), 'ngx-cli-runtime-'));
+  let payload;
+  try {
+    writeFileSync(join(dir, 'sample.scss'), '.ok { color: red; }\n');
+    const child = spawnSync(process.execPath, [
+      '--input-type=module',
+      '-e',
+      `import {spawnSync} from 'node:child_process';
+const [bin, target] = process.argv.slice(1);
+const cli = spawnSync(process.execPath, [bin, target, '--json'], {encoding: 'utf8'});
+let summary = null;
+try { summary = JSON.parse(cli.stdout); } catch { summary = null; }
+console.log(JSON.stringify({
+  node: process.version,
+  execPath: process.execPath,
+  status: cli.status,
+  summary,
+}));`,
+      cliBinPath,
+      dir,
+    ], {encoding: 'utf8', cwd: root});
+    if (child.status !== 0) {
+      throw new Error(child.stderr || child.stdout || 'cli runtime probe failed');
+    }
+    payload = JSON.parse(child.stdout);
+  } finally {
+    rmSync(dir, {recursive: true, force: true});
+  }
+  const summary = payload.summary && typeof payload.summary === 'object' ? payload.summary : {};
+  const nodeVersion = typeof payload.node === 'string' ? payload.node : '';
+  const comparable = nodeVersion.replace(/^v/i, '');
+  const nodeMajor = parseVersion(comparable)?.[0] ?? null;
+  const ran = payload.status === 0
+    && payload.execPath === process.execPath
+    && summary.distribution === 'bundled-cli'
+    && summary.mode === 'dry-run'
+    && summary.files_scanned === 1
+    && summary.engines?.node === range
+    && summary.blocking === 0;
+  const rangeOk = Boolean(comparable) && satisfies(comparable, range);
+  const belowSatisfies = satisfies('17.0.0', range);
+  return {
+    node_18_executed: nodeMajor === 18,
+    cases: [
+      {
+        case_id: 'current-runtime-satisfies',
+        group: 'cli-runtime',
+        node_version: nodeVersion,
+        exec_path: payload.execPath ?? null,
+        engines_range: range,
+        range_satisfied: rangeOk,
+        cli_exit_code: payload.status ?? null,
+        cli_distribution: summary.distribution ?? null,
+        cli_mode: summary.mode ?? null,
+        files_scanned: summary.files_scanned ?? null,
+        cli_engines_node: summary.engines?.node ?? null,
+        node_18_executed: nodeMajor === 18,
+        result: ran && rangeOk ? 'pass' : 'fail',
+      },
+      {
+        case_id: 'below-floor-rejected',
+        group: 'cli-runtime',
+        probed_version: '17.0.0',
+        engines_range: range,
+        range_satisfied: belowSatisfies,
+        runtime_executed: false,
+        result: belowSatisfies === false ? 'pass' : 'fail',
+      },
+    ],
+  };
+}
+
+/** Ask rc-verify whether this checkout version maps to main and rejects --line 21.x. */
+export function executeLineIsolation() {
+  const child = spawnSync('python3', ['-c', LINE_ISOLATION_PY, root], {
+    encoding: 'utf8',
+    cwd: root,
+  });
+  if (child.status !== 0) {
+    throw new Error(child.stderr || child.stdout || 'line isolation probe failed');
+  }
+  const payload = JSON.parse(child.stdout);
+  const stderr = child.stderr || '';
+  const version = payload.library_version;
+  const mapped = payload.mapped_line;
+  const maps = version === '22.0.0-rc.0' && mapped === 'main';
+  const rejected = payload.rejection?.rejected === true
+    && payload.rejection?.exit_code === 2
+    && mapped === 'main'
+    && version === '22.0.0-rc.0'
+    && stderr.includes('verify: --line does not match this checkout library version');
+  return {
+    copied_21x_manifest: false,
+    cases: [
+      {
+        case_id: 'checkout-22-maps-to-main',
+        group: 'line-isolation',
+        library_version: version ?? null,
+        mapped_line: mapped ?? null,
+        result: maps ? 'pass' : 'fail',
+      },
+      {
+        case_id: 'requested-21x-rejected',
+        group: 'line-isolation',
+        requested_line: '21.x',
+        checkout_line: mapped ?? null,
+        library_version: version ?? null,
+        rejected: payload.rejection?.rejected === true,
+        exit_code: payload.rejection?.exit_code ?? null,
+        verifier_message: stderr.trim(),
+        result: rejected ? 'pass' : 'fail',
+      },
+    ],
+  };
+}
+
+export function passingCaseIds(cases) {
+  return cases.filter(item => item.result === 'pass').map(item => item.case_id);
+}
+
+export function writeCliAndLineAssertions(outputDir, cliRuntime, lineIsolation) {
+  const written = [];
+  const cliIds = cliRuntime.cases.map(item => item.case_id);
+  const lineIds = lineIsolation.cases.map(item => item.case_id);
+  if (cliIds.join(',') !== 'current-runtime-satisfies,below-floor-rejected') {
+    throw new Error('refusing to emit cli-runtime cases that were not the executed pair');
+  }
+  if (lineIds.join(',') !== 'checkout-22-maps-to-main,requested-21x-rejected') {
+    throw new Error('refusing to emit line-isolation cases that were not the executed pair');
+  }
+  if (lineIsolation.copied_21x_manifest !== false) {
+    throw new Error('refusing to treat a copied 21.x manifest as line isolation');
+  }
+  for (const item of [...cliRuntime.cases, ...lineIsolation.cases]) {
+    if (item.result !== 'pass') {
+      throw new Error(`refusing to emit a pass assertion for ${item.case_id}`);
+    }
+    const body = {
+      ...item,
+      result: 'pass',
+      kind: 'assertion',
+      line: 'main',
+      g12_claim: 'not-passed',
+      separate_node_18_floor_case: false,
+      copied_21x_manifest: false,
+      not_executed: {'21.x': null},
+    };
+    if (item.case_id === 'current-runtime-satisfies') {
+      if (item.range_satisfied !== true || item.cli_exit_code !== 0 || item.files_scanned !== 1) {
+        throw new Error('refusing to emit current-runtime-satisfies without a real CLI run');
+      }
+      if (!satisfies(String(item.node_version), item.engines_range)) {
+        throw new Error('refusing to emit current-runtime-satisfies: runtime fails the CLI range');
+      }
+      const major = parseVersion(String(item.node_version))?.[0] ?? null;
+      if ((major === 18) !== (item.node_18_executed === true)) {
+        throw new Error('refusing to emit current-runtime-satisfies: node_18_executed does not match the runtime');
+      }
+      if (item.case_id !== 'current-runtime-satisfies') {
+        throw new Error('refusing to rename the current runtime into a Node 18 floor case');
+      }
+    }
+    if (item.case_id === 'below-floor-rejected') {
+      if (item.probed_version !== '17.0.0' || item.range_satisfied !== false || item.runtime_executed !== false) {
+        throw new Error('refusing to emit below-floor-rejected without a real range rejection');
+      }
+      if (satisfies('17.0.0', item.engines_range)) {
+        throw new Error('refusing to emit below-floor-rejected: 17.0.0 satisfies the CLI range');
+      }
+    }
+    if (item.case_id === 'checkout-22-maps-to-main') {
+      if (item.library_version !== '22.0.0-rc.0' || item.mapped_line !== 'main') {
+        throw new Error('refusing to emit checkout-22-maps-to-main for a different checkout');
+      }
+    }
+    if (item.case_id === 'requested-21x-rejected') {
+      if (item.requested_line !== '21.x' || item.rejected !== true || item.exit_code !== 2) {
+        throw new Error('refusing to emit requested-21x-rejected without the verifier rejection');
+      }
+      if (item.library_version !== '22.0.0-rc.0' || item.checkout_line !== 'main') {
+        throw new Error('refusing to emit requested-21x-rejected against a different checkout');
+      }
+      if (!String(item.verifier_message || '').includes('--line does not match this checkout library version')) {
+        throw new Error('refusing to emit requested-21x-rejected without the verifier message');
+      }
+    }
+    written.push(writeAssertionFile(outputDir, body));
   }
   return written;
 }
@@ -321,6 +573,8 @@ function assertionOutputDir() {
 
 function main(argv) {
   const args = parseArgs(argv);
+  const cliRuntime = executeCliRuntime();
+  const lineIsolation = executeLineIsolation();
   const manifest = JSON.parse(readFileSync(libraryManifest, 'utf8'));
   const floors = collectDeclaredFloors(manifest);
   const lockVersions = libraryLockVersions(readFileSync(lockPath, 'utf8'));
@@ -340,6 +594,11 @@ function main(argv) {
     nodeLockVersion,
     installed,
   });
+  for (const item of [...cliRuntime.cases, ...lineIsolation.cases]) {
+    if (item.result !== 'pass') errors.push(`${item.case_id} did not pass`);
+  }
+  const cliCaseIds = passingCaseIds(cliRuntime.cases);
+  const lineCaseIds = passingCaseIds(lineIsolation.cases);
   const report = {
     schema_version: 1,
     role: 'Advertised consumer engines/peers vs lock and installed versions',
@@ -348,15 +607,36 @@ function main(argv) {
     source_manifest: 'projects/ngx-material-legacy/package.json',
     process_node: process.version,
     process_node_used_for_floor: false,
+    process_node_used_for_cli_runtime: true,
+    node_18_executed: cliRuntime.node_18_executed,
     rostered_group: 'public-engines-peers',
     case_ids: publicEnginesPeersIds(floors),
+    cli_runtime: {
+      node_18_executed: cliRuntime.node_18_executed,
+      case_ids: cliCaseIds,
+      cases: cliRuntime.cases,
+    },
+    line_isolation: {
+      copied_21x_manifest: false,
+      case_ids: lineCaseIds,
+      cases: lineIsolation.cases,
+    },
+    cases_by_line_21x: {
+      'public-engines-peers': null,
+      'cli-runtime': null,
+      'line-isolation': null,
+    },
     comparisons,
     result: errors.length ? 'fail' : 'pass',
     g12_claim: 'not-passed',
     limitations: [
-      'Compares advertised library engines.node and peerDependencies only.',
-      'Node floor uses toolchain-lock.json / .node-version, not process.version.',
-      'cli-runtime, line-isolation, and every 21.x consumer-floors group stay null.',
+      'Compares advertised library engines.node and peerDependencies to lock and installed versions.',
+      'Library Node floor uses toolchain-lock.json / .node-version, not process.version.',
+      cliRuntime.node_18_executed
+        ? 'cli-runtime ran on Node 18 and records that version as current-runtime-satisfies. It still does not add a separate floor case.'
+        : 'cli-runtime is the migrate CLI on the Node that ran it, not the library engines floor and not a Node 18 execution.',
+      'line-isolation maps this checkout library version through rc-verify and rejects --line 21.x. It is not a 21.x run.',
+      'Every 21.x consumer-floors group stays null.',
       'Does not claim G12. Does not mark consumer-floors accepted.',
     ],
   };
@@ -364,19 +644,23 @@ function main(argv) {
   writeFileSync(args.out, `${JSON.stringify(report, null, 2)}\n`);
   let assertion_files = null;
   const outputDir = assertionOutputDir();
-  if (outputDir) {
-    if (errors.length === 0) {
-      try {
-        assertion_files = writePublicEnginesPeersAssertions(outputDir, comparisons);
-      } catch (error) {
-        fail(1, error instanceof Error ? error.message : String(error));
-      }
+  if (outputDir && errors.length === 0) {
+    try {
+      assertion_files = [
+        ...writePublicEnginesPeersAssertions(outputDir, comparisons),
+        ...writeCliAndLineAssertions(outputDir, cliRuntime, lineIsolation),
+      ];
+    } catch (error) {
+      fail(1, error instanceof Error ? error.message : String(error));
     }
   }
   console.log(JSON.stringify({
     ok: errors.length === 0,
     assertion_files,
     case_ids: report.case_ids,
+    cli_runtime_case_ids: cliCaseIds,
+    line_isolation_case_ids: lineCaseIds,
+    node_18_executed: cliRuntime.node_18_executed,
     comparisons: comparisons.map(item => ({
       case_id: item.case_id,
       declared_range: item.declared_range,

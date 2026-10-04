@@ -194,6 +194,24 @@ def _file_record(path, role):
     return {'sha256': hashlib.sha256(payload).hexdigest(), 'role': role, 'payload': payload, 'missing': False}
 
 
+def source_line_for_library_version(version):
+    """Map an advertised library version to the checkout line this verifier accepts.
+
+    Major 21 is the 21.x line. Major 22 is main. Any other major is not a
+    supported checkout line. A synthetic version string is not a checkout.
+    """
+    major = version.split('.', 1)[0] if isinstance(version, str) else ''
+    if major not in ('21', '22'):
+        raise EvidenceError('cannot determine the supported source line from library version')
+    return '21.x' if major == '21' else 'main'
+
+
+def require_line_matches_checkout(requested_line, checkout_line):
+    """Reject --line when it disagrees with the checkout library version's line."""
+    if checkout_line != requested_line:
+        fail('--line does not match this checkout library version')
+
+
 def observe_inputs(root):
     """Fingerprint plus per-path hashes. The aggregate digest matches the historical tracked-file loop."""
     def git(*args):
@@ -224,16 +242,14 @@ def observe_inputs(root):
         files[name] = {'sha256': record['sha256'], 'role': record['role'], 'missing': record['missing']}
     package = read_json(root / 'projects/ngx-material-legacy/package.json')
     version = package.get('version', '')
-    major = version.split('.', 1)[0] if isinstance(version, str) else ''
-    if major not in ('21', '22'):
-        raise EvidenceError('cannot determine the supported source line from library version')
+    checkout_line = source_line_for_library_version(version)
     locks = {}
     for name in ('chainman.lock', 'pnpm-lock.yaml', 'toolchain-lock.json', '.node-version', '.npm-version'):
         candidate = root / name
         if candidate.is_file() and not candidate.is_symlink():
             locks[name] = hashlib.sha256(candidate.read_bytes()).hexdigest()
     fingerprint = {'commit': commit, 'tree': tree, 'inputs_sha256': digest.hexdigest(),
-                   'clean': not status.strip(), 'line': '21.x' if major == '21' else 'main'}
+                   'clean': not status.strip(), 'line': checkout_line}
     return {'fingerprint': fingerprint, 'files': files, 'status_lines': status_lines, 'locks': locks}
 
 
@@ -630,8 +646,7 @@ def main() -> int:
     expected_matrix_digest = evidence_sha256(MATRIX_PATH)
     source_before_obs = observe_inputs(ROOT)
     source_before = source_before_obs['fingerprint']
-    if source_before['line'] != line:
-        fail('--line does not match this checkout library version')
+    require_line_matches_checkout(line, source_before['line'])
 
     print("verify: packing once into", out_dir)
     pack_execution = execute_pack(out_dir, line, source_before, expected_matrix_digest)
@@ -954,9 +969,9 @@ def main() -> int:
     results["dependency-eligibility"] = "pass" if code == 0 else "fail"
     implemented_ran.append("dependency-eligibility")
 
-    # consumer-floors: advertised library engines/peers vs lock and installed versions.
-    # The matrix implemented flag stays false. Null cli-runtime / line-isolation and
-    # every 21.x group keep this check incomplete.
+    # consumer-floors: library engines/peers, the migrate CLI runtime, and --line isolation.
+    # The matrix implemented flag stays false. Every 21.x group stays null, so this
+    # check stays incomplete and does not claim G12.
     code = run_node(
         "scripts/check-consumer-floors.mjs",
         ["--out", str(out_dir / "consumer-floors-workspace.json")],
@@ -969,8 +984,10 @@ def main() -> int:
         exit_code=code,
         limitations=[
             "Compares advertised library engines.node and peerDependencies to lock/installed versions.",
-            "Node floor uses toolchain-lock.json / .node-version, not process.version.",
-            "cli-runtime, line-isolation, and 21.x consumer-floors groups stay null. Does not mark consumer-floors accepted. Does not claim G12.",
+            "Library Node floor uses toolchain-lock.json / .node-version, not process.version.",
+            "cli-runtime executes the migrate CLI on the current Node and rejects 17.0.0 by the CLI engines range. The current runtime is not recorded as a Node 18 floor run.",
+            "line-isolation maps this checkout library version to main and rejects --line 21.x. It is not a 21.x checkout run.",
+            "21.x consumer-floors groups stay null. Does not mark consumer-floors accepted. Does not claim G12.",
         ],
     )
     results["consumer-floors"] = "pass" if code == 0 else "fail"

@@ -110,7 +110,7 @@ console.log(JSON.stringify({
         self.assertFalse(report["bad_results"][0][2])
         self.assertFalse(report["bad_results"][1][2])
 
-    def test_main_roster_is_only_public_engines_peers(self):
+    def test_main_roster_matches_executed_cli_and_line(self):
         matrix = json.loads((ROOT / "compatibility/rc/matrices/full-verify.json").read_text())
         row = next(item for item in matrix["checks"] if item["check_id"] == "consumer-floors")
         self.assertFalse(row["implemented"])
@@ -123,10 +123,79 @@ console.log(JSON.stringify(publicEnginesPeersIds(floors)));
 """,
             manifest,
         )
+        executed = node_eval(
+            """
+import {executeCliRuntime, executeLineIsolation, passingCaseIds} from './scripts/check-consumer-floors.mjs';
+const cli = executeCliRuntime();
+const line = executeLineIsolation();
+console.log(JSON.stringify({
+  cli,
+  line,
+  cli_ids: passingCaseIds(cli.cases),
+  line_ids: passingCaseIds(line.cases),
+}));
+"""
+        )
         main = row["acceptance"]["cases_by_line"]["main"]
         self.assertEqual(main["public-engines-peers"], expected)
-        self.assertIsNone(main["cli-runtime"])
-        self.assertIsNone(main["line-isolation"])
+        self.assertEqual(main["cli-runtime"], executed["cli_ids"])
+        self.assertEqual(main["line-isolation"], executed["line_ids"])
+        self.assertEqual(executed["cli_ids"], ["current-runtime-satisfies", "below-floor-rejected"])
+        self.assertEqual(executed["line_ids"], ["checkout-22-maps-to-main", "requested-21x-rejected"])
+        current = next(item for item in executed["cli"]["cases"] if item["case_id"] == "current-runtime-satisfies")
+        below = next(item for item in executed["cli"]["cases"] if item["case_id"] == "below-floor-rejected")
+        self.assertEqual(current["result"], "pass")
+        self.assertEqual(current["cli_exit_code"], 0)
+        self.assertEqual(current["files_scanned"], 1)
+        self.assertEqual(current["cli_distribution"], "bundled-cli")
+        self.assertEqual(current["engines_range"], ">=18.0.0")
+        self.assertTrue(current["range_satisfied"])
+        self.assertTrue(str(current["node_version"]).startswith("v"))
+        self.assertFalse(current["node_18_executed"])
+        self.assertFalse(str(current["node_version"]).startswith("v18."))
+        self.assertEqual(below["result"], "pass")
+        self.assertEqual(below["probed_version"], "17.0.0")
+        self.assertFalse(below["range_satisfied"])
+        self.assertFalse(below["runtime_executed"])
+        self.assertFalse(executed["cli"]["node_18_executed"])
+        mapped = next(item for item in executed["line"]["cases"] if item["case_id"] == "checkout-22-maps-to-main")
+        rejected = next(item for item in executed["line"]["cases"] if item["case_id"] == "requested-21x-rejected")
+        self.assertEqual(mapped["result"], "pass")
+        self.assertEqual(mapped["library_version"], "22.0.0-rc.0")
+        self.assertEqual(mapped["mapped_line"], "main")
+        self.assertEqual(rejected["result"], "pass")
+        self.assertEqual(rejected["requested_line"], "21.x")
+        self.assertEqual(rejected["checkout_line"], "main")
+        self.assertTrue(rejected["rejected"])
+        self.assertEqual(rejected["exit_code"], 2)
+        self.assertIn("--line does not match this checkout library version", rejected["verifier_message"])
+        self.assertFalse(executed["line"]["copied_21x_manifest"])
+        for group, ids in row["acceptance"]["cases_by_line"]["21.x"].items():
+            self.assertIsNone(ids, group)
+
+    def test_synthetic_version_is_not_a_21x_run(self):
+        import importlib.util
+        from contextlib import redirect_stderr
+        from io import StringIO
+
+        spec = importlib.util.spec_from_file_location("rc_verify_line_test", ROOT / "scripts/rc-verify.py")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        self.assertEqual(module.source_line_for_library_version("22.0.0-rc.0"), "main")
+        # A synthetic 21 version maps in the function, but this checkout did not run it.
+        self.assertEqual(module.source_line_for_library_version("21.0.0"), "21.x")
+        with self.assertRaises(module.EvidenceError):
+            module.source_line_for_library_version("99.0.0")
+        stderr = StringIO()
+        with redirect_stderr(stderr):
+            with self.assertRaises(SystemExit) as caught:
+                module.require_line_matches_checkout("21.x", "main")
+        self.assertEqual(caught.exception.code, 2)
+        self.assertIn("--line does not match this checkout library version", stderr.getvalue())
+        matrix = json.loads((ROOT / "compatibility/rc/matrices/full-verify.json").read_text())
+        row = next(item for item in matrix["checks"] if item["check_id"] == "consumer-floors")
+        self.assertNotIn("99.0.0", row["acceptance"]["cases_by_line"]["main"]["line-isolation"])
+        self.assertNotIn("21.0.0", row["acceptance"]["cases_by_line"]["main"]["line-isolation"])
         for group, ids in row["acceptance"]["cases_by_line"]["21.x"].items():
             self.assertIsNone(ids, group)
 
@@ -163,6 +232,13 @@ console.log(JSON.stringify(publicEnginesPeersIds(floors)));
             self.assertEqual(report["coverage"], "slice")
             self.assertEqual(report["g12_claim"], "not-passed")
             self.assertFalse(report["process_node_used_for_floor"])
+            self.assertTrue(report["process_node_used_for_cli_runtime"])
+            self.assertFalse(report["node_18_executed"])
+            self.assertEqual(report["cli_runtime"]["case_ids"], ["current-runtime-satisfies", "below-floor-rejected"])
+            self.assertEqual(report["line_isolation"]["case_ids"], ["checkout-22-maps-to-main", "requested-21x-rejected"])
+            self.assertFalse(report["line_isolation"]["copied_21x_manifest"])
+            for group, ids in report["cases_by_line_21x"].items():
+                self.assertIsNone(ids, group)
             self.assertTrue(report["comparisons"])
             for comparison in report["comparisons"]:
                 self.assertEqual(comparison["result"], "pass")
@@ -171,8 +247,13 @@ console.log(JSON.stringify(publicEnginesPeersIds(floors)));
                 self.assertIsInstance(comparison["declared_range"], str)
                 self.assertIsInstance(comparison["lock_version"], str)
                 self.assertIsInstance(comparison["installed_version"], str)
+            executed_ids = [
+                *report["case_ids"],
+                *report["cli_runtime"]["case_ids"],
+                *report["line_isolation"]["case_ids"],
+            ]
             names = sorted(path.name for path in assertion_dir.iterdir())
-            self.assertEqual(len(names), len(report["case_ids"]))
+            self.assertEqual(names, sorted(f"{case_id.replace('/', '__')}.json" for case_id in executed_ids))
             for case_id in report["case_ids"]:
                 body = json.loads((assertion_dir / f"{case_id.replace('/', '__')}.json").read_text())
                 self.assertEqual(body["case_id"], case_id)
@@ -180,9 +261,29 @@ console.log(JSON.stringify(publicEnginesPeersIds(floors)));
                 self.assertEqual(body["kind"], "assertion")
                 self.assertEqual(body["g12_claim"], "not-passed")
                 self.assertTrue(body["range_satisfied"])
-                self.assertIsNone(body["not_executed"]["cli-runtime"])
-                self.assertIsNone(body["not_executed"]["line-isolation"])
+                self.assertNotIn("cli-runtime", body["not_executed"])
+                self.assertNotIn("line-isolation", body["not_executed"])
                 self.assertIsNone(body["not_executed"]["21.x"])
+            current = json.loads((assertion_dir / "current-runtime-satisfies.json").read_text())
+            self.assertEqual(current["cli_exit_code"], 0)
+            self.assertEqual(current["node_version"], report["process_node"])
+            self.assertFalse(current["node_18_executed"])
+            self.assertFalse(current["separate_node_18_floor_case"])
+            self.assertIsNone(current["not_executed"]["21.x"])
+            below = json.loads((assertion_dir / "below-floor-rejected.json").read_text())
+            self.assertEqual(below["probed_version"], "17.0.0")
+            self.assertFalse(below["range_satisfied"])
+            self.assertFalse(below["runtime_executed"])
+            self.assertFalse(below["separate_node_18_floor_case"])
+            mapped = json.loads((assertion_dir / "checkout-22-maps-to-main.json").read_text())
+            self.assertEqual(mapped["library_version"], "22.0.0-rc.0")
+            self.assertEqual(mapped["mapped_line"], "main")
+            self.assertFalse(mapped["copied_21x_manifest"])
+            rejected = json.loads((assertion_dir / "requested-21x-rejected.json").read_text())
+            self.assertEqual(rejected["exit_code"], 2)
+            self.assertTrue(rejected["rejected"])
+            self.assertIn("--line does not match this checkout library version", rejected["verifier_message"])
+            self.assertIsNone(rejected["not_executed"]["21.x"])
 
 
 if __name__ == "__main__":
