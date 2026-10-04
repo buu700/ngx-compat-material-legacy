@@ -157,7 +157,10 @@ console.log(JSON.stringify(assertionOutputDir()));
         self.assertTrue(row["implemented"])
         main = row["acceptance"]["cases_by_line"]["main"]
         self.assertEqual(main["old-workspace-cli"], expected_ids)
-        self.assertIsNone(main["packaged-schematic"])
+        self.assertEqual(main["packaged-schematic"], [f"packaged-schematic/{case_id}" for case_id in expected_ids])
+        self.assertFalse(set(main["packaged-schematic"]) & set(expected_ids))
+        self.assertFalse(set(main["packaged-schematic"]) & set(main["frontend-parity"]))
+        self.assertFalse(set(main["packaged-schematic"]) & set(main["transaction-negatives"]))
         self.assertEqual(main["transaction-negatives"], [
             "blocked-file-writes-nothing",
             "dry-apply-parity",

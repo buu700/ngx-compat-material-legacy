@@ -51,11 +51,11 @@ function fail(message) {
   process.exit(1);
 }
 
-function sha256(bytes) {
+export function sha256(bytes) {
   return createHash('sha256').update(bytes).digest('hex');
 }
 
-function extensionFor(language) {
+export function extensionFor(language) {
   if (language === 'typescript') return 'ts';
   if (language === 'scss') return 'scss';
   if (language === 'sass') return 'sass';
@@ -73,7 +73,7 @@ export function rewriteCases(catalog) {
   return selected;
 }
 
-function flagsFor(cases) {
+export function flagsFor(cases) {
   const flags = [];
   for (const [key, flag] of OPTION_FLAGS) {
     if (cases.some(item => item.options && item.options[key] === true)) flags.push(flag);
@@ -81,20 +81,20 @@ function flagsFor(cases) {
   return flags;
 }
 
-function nodeVersionSupported(version) {
+export function nodeVersionSupported(version) {
   const [major, minor, patch] = version.split('.').map(part => Number(part));
   if (major === 22) return minor > 22 || (minor === 22 && patch >= 3);
   if (major === 24) return minor > 15 || (minor === 15 && patch >= 0);
   return major >= 26;
 }
 
-function readNodeVersion(bin) {
+export function readNodeVersion(bin) {
   const result = spawnSync(bin, ['-p', 'process.versions.node'], {encoding: 'utf8'});
   if (result.status !== 0) return null;
   return result.stdout.trim();
 }
 
-function ensureAngularNode() {
+export function ensureAngularNode() {
   const version = readNodeVersion(process.execPath);
   if (version && nodeVersionSupported(version)) return process.execPath;
   const candidates = [
@@ -144,7 +144,7 @@ function parseArgs(argv) {
   return {out, libraryTarball};
 }
 
-function packLibrary(destination) {
+export function packLibrary(destination) {
   if (!existsSync(join(distPackage, 'package.json'))) {
     throw new Error('dist/ngx-material-legacy is missing; pass --library-tarball');
   }
@@ -160,14 +160,14 @@ function packLibrary(destination) {
   return join(destination, entry.filename);
 }
 
-function extractTarball(tarball, destination) {
+export function extractTarball(tarball, destination) {
   mkdirSync(destination, {recursive: true});
   const extracted = spawnSync('tar', ['-xzf', tarball, '-C', destination], {encoding: 'utf8'});
   if (extracted.status !== 0) throw new Error(extracted.stderr || `tar extract failed: ${tarball}`);
   return join(destination, 'package');
 }
 
-function writeFixture(dir, cases) {
+export function writeFixture(dir, cases) {
   mkdirSync(join(dir, 'src'), {recursive: true});
   const files = [];
   for (const item of cases) {
@@ -186,6 +186,46 @@ function snapshot(files) {
     out[file.rel] = {sha256: sha256(bytes), text: bytes.toString('utf8')};
   }
   return out;
+}
+
+
+export function installAndNgGenerate({schematicDir, libraryPackage, angularNode, flags, packageName = 'frontend-parity-fixture'}) {
+  const installed = join(schematicDir, 'node_modules/@ngx-compat/material-legacy');
+  mkdirSync(dirname(installed), {recursive: true});
+  cpSync(libraryPackage, installed, {recursive: true});
+  const packageJson = JSON.stringify({name: packageName, private: true, version: '0.0.0'}, null, 2) + '\n';
+  const angularJson = JSON.stringify({
+    version: 1,
+    newProjectRoot: 'projects',
+    projects: {
+      app: {projectType: 'application', root: '', sourceRoot: 'src', prefix: 'app', architect: {}},
+    },
+  }, null, 2) + '\n';
+  writeFileSync(join(schematicDir, 'package.json'), packageJson);
+  writeFileSync(join(schematicDir, 'angular.json'), angularJson);
+  const installedCollection = readFileSync(join(installed, 'schematics/collection.json'));
+  const ngArgv = [
+    angularNode,
+    ngJs,
+    'generate',
+    '@ngx-compat/material-legacy:migrate-legacy',
+    ...flags,
+    '--defaults',
+  ];
+  const ng = spawnSync(angularNode, ngArgv.slice(1), {cwd: schematicDir, encoding: 'utf8'});
+  if (ng.status !== 0) {
+    throw new Error(`ng generate failed (${ng.status})\n${ng.stderr || ''}\n${ng.stdout || ''}`);
+  }
+  if (readFileSync(join(schematicDir, 'package.json'), 'utf8') !== packageJson) {
+    throw new Error('ng generate changed package.json');
+  }
+  if (readFileSync(join(schematicDir, 'angular.json'), 'utf8') !== angularJson) {
+    throw new Error('ng generate changed angular.json');
+  }
+  if (!readFileSync(join(installed, 'schematics/collection.json')).equals(installedCollection)) {
+    throw new Error('ng generate changed the installed collection');
+  }
+  return {ngArgv, ngStatus: ng.status, packageName};
 }
 
 export function assertionOutputDir() {
@@ -375,41 +415,12 @@ export function executeFrontendParity(libraryTarball) {
       throw new Error(`packaged CLI failed (${cli.status})\n${cli.stderr || ''}\n${cli.stdout || ''}`);
     }
 
-    const installed = join(schematicDir, 'node_modules/@ngx-compat/material-legacy');
-    mkdirSync(dirname(installed), {recursive: true});
-    cpSync(libraryPackage, installed, {recursive: true});
-    const packageJson = JSON.stringify({name: 'frontend-parity-fixture', private: true, version: '0.0.0'}, null, 2) + '\n';
-    const angularJson = JSON.stringify({
-      version: 1,
-      newProjectRoot: 'projects',
-      projects: {
-        app: {projectType: 'application', root: '', sourceRoot: 'src', prefix: 'app', architect: {}},
-      },
-    }, null, 2) + '\n';
-    writeFileSync(join(schematicDir, 'package.json'), packageJson);
-    writeFileSync(join(schematicDir, 'angular.json'), angularJson);
-    const installedCollection = readFileSync(join(installed, 'schematics/collection.json'));
-    const ngArgv = [
+    const {ngArgv, ngStatus} = installAndNgGenerate({
+      schematicDir,
+      libraryPackage,
       angularNode,
-      ngJs,
-      'generate',
-      '@ngx-compat/material-legacy:migrate-legacy',
-      ...flags,
-      '--defaults',
-    ];
-    const ng = spawnSync(angularNode, ngArgv.slice(1), {cwd: schematicDir, encoding: 'utf8'});
-    if (ng.status !== 0) {
-      throw new Error(`ng generate failed (${ng.status})\n${ng.stderr || ''}\n${ng.stdout || ''}`);
-    }
-    if (readFileSync(join(schematicDir, 'package.json'), 'utf8') !== packageJson) {
-      throw new Error('ng generate changed package.json');
-    }
-    if (readFileSync(join(schematicDir, 'angular.json'), 'utf8') !== angularJson) {
-      throw new Error('ng generate changed angular.json');
-    }
-    if (!readFileSync(join(installed, 'schematics/collection.json')).equals(installedCollection)) {
-      throw new Error('ng generate changed the installed collection');
-    }
+      flags,
+    });
 
     const matches = [];
     const disagreements = [];
@@ -491,7 +502,7 @@ export function executeFrontendParity(libraryTarball) {
         distribution: cliSummary.distribution,
         mode: cliSummary.mode,
       },
-      ng_exit: ng.status,
+      ng_exit: ngStatus,
       not_rostered: {
         'packaged-schematic': null,
       },

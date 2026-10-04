@@ -11,6 +11,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 MATRIX = ROOT / "compatibility/rc/matrices/full-verify.json"
+CATALOG = ROOT / "fixtures/migration/cases.json"
 CASE_IDS = [
     "blocked-file-writes-nothing",
     "dry-apply-parity",
@@ -18,6 +19,16 @@ CASE_IDS = [
     "concurrent-edit-rejected",
     "before-write-hook-refuses",
 ]
+
+
+def packaged_ids() -> list[str]:
+    catalog = json.loads(CATALOG.read_text())
+    ids = []
+    for case in catalog["cases"]:
+        expected = case.get("expected_after")
+        if isinstance(expected, str) and expected != case.get("before") and case.get("expect_ok") is not False:
+            ids.append(f"packaged-schematic/{case['id']}")
+    return ids
 
 
 class MigrationTransactionTests(unittest.TestCase):
@@ -114,7 +125,10 @@ class MigrationTransactionTests(unittest.TestCase):
         main = row["acceptance"]["cases_by_line"]["main"]
         self.assertEqual(main["transaction-negatives"], CASE_IDS)
         self.assertEqual(main["old-workspace-cli"][0], "legacy-named-alias")
-        self.assertIsNone(main["packaged-schematic"])
+        self.assertEqual(main["packaged-schematic"], packaged_ids())
+        self.assertFalse(set(main["packaged-schematic"]) & set(CASE_IDS))
+        self.assertFalse(set(main["packaged-schematic"]) & set(main["old-workspace-cli"]))
+        self.assertFalse(set(main["packaged-schematic"]) & set(main["frontend-parity"]))
         self.assertEqual(main["frontend-parity"][0], "frontend-parity/legacy-named-alias")
         self.assertTrue(all(item.startswith("frontend-parity/") for item in main["frontend-parity"]))
         self.assertFalse(set(main["frontend-parity"]) & set(main["old-workspace-cli"]))
