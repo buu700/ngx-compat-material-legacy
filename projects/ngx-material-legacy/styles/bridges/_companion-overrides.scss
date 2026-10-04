@@ -224,26 +224,35 @@ $tree-allowed: (
   ));
   $color: theming.get-color-config($theme);
   @if $color != null {
-    @each $name in (accent, warn) {
-      $palette-color: theming.get-color-from-palette(map.get($color, $name));
-      $range: datepicker-tokens.private-get-range-background-color($palette-color);
-      $tokens: _qualify(
-        datepicker,
-        map.merge(
-          datepicker-tokens.private-get-calendar-color-palette-color-tokens($color, $name),
-          datepicker-tokens.get-range-color-tokens($range)
-        ),
-        $datepicker-allowed
-      );
-      .mat-datepicker-content.mat-#{$name} {
-        @include mat.datepicker-overrides($tokens);
-      }
-      .mat-datepicker-toggle-active.mat-#{$name} {
-        @include mat.datepicker-overrides(_qualify(
+    // Content palettes, then toggle palettes. 16.2.14 emitted the two groups
+    // separately; interleaving them inside one loop only reorders the CSS.
+    .mat-datepicker-content {
+      @each $name in (accent, warn) {
+        $palette-color: theming.get-color-from-palette(map.get($color, $name));
+        $range: datepicker-tokens.private-get-range-background-color($palette-color);
+        $tokens: _qualify(
           datepicker,
-          datepicker-tokens.private-get-toggle-color-palette-color-tokens($color, $name),
+          map.merge(
+            datepicker-tokens.private-get-calendar-color-palette-color-tokens($color, $name),
+            datepicker-tokens.get-range-color-tokens($range)
+          ),
           $datepicker-allowed
-        ));
+        );
+        &.mat-#{$name} {
+          @include mat.datepicker-overrides($tokens);
+        }
+      }
+    }
+
+    .mat-datepicker-toggle-active {
+      @each $name in (accent, warn) {
+        &.mat-#{$name} {
+          @include mat.datepicker-overrides(_qualify(
+            datepicker,
+            datepicker-tokens.private-get-toggle-color-palette-color-tokens($color, $name),
+            $datepicker-allowed
+          ));
+        }
       }
     }
   }

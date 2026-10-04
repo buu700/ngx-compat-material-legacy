@@ -80,6 +80,15 @@ $calendar-weekday-table-font-size: 11px !default;
   $theme: theming.private-legacy-get-theme($theme-or-color-config);
   @include theming.private-check-duplicate-theme-styles($theme, 'mat-datepicker') {
     @include bridges.datepicker($theme);
+
+    // theme() includes density. The companion bridge does not emit the
+    // calendar icon-button rules; previous/next buttons stay at density -2.
+    $density: theming.get-density-config($theme);
+    @if $density != null {
+      .mat-calendar-controls {
+        @include icon-button-theme.density(-2);
+      }
+    }
   }
 }
 
