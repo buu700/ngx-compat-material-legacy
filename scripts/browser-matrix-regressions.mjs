@@ -6,6 +6,8 @@ import {readFileSync} from 'node:fs';
 import {dirname, join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {deriveReleaseIds, familiesFromInventory, loadMainReleaseRoster, observationProblems} from './browser-matrix-roster.mjs';
+import {candidateInstallSpec, candidateQualificationDefects, fixtureQualificationDefects} from './browser-required-cells.mjs';
+import {qualifyRelease} from './browser-matrix-acceptance.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const failures = [];
@@ -106,6 +108,65 @@ const unbound = observationProblems({
   boundSha: 'def',
 });
 expect('unbound artifact', unbound.problems.includes('unbound artifact'));
+
+const versions = {
+  core: '22.1.7',
+  cdk: '22.1.7',
+  material: '22.1.7',
+  rxjs: '7.8.2',
+  typescript: '6.0.3',
+  zone: '0.16.3',
+  tslib: '2.8.1',
+  sass: '1.104.1',
+};
+const liveDefects = fixtureQualificationDefects(null);
+for (const zoneless of [false, true]) {
+  const spec = candidateInstallSpec(versions, zoneless);
+  const defects = candidateQualificationDefects(spec);
+  expect(`${zoneless ? 'zoneless' : 'zoneful'} animations`, defects.includes('candidate installs @angular/animations'));
+  expect(`${zoneless ? 'zoneless' : 'zoneful'} peer bypass`, defects.includes('candidate sets legacy-peer-deps=true'));
+  expect(`${zoneless ? 'zoneless' : 'zoneful'} skipLibCheck`, defects.includes('candidate sets skipLibCheck'));
+  expect(`${zoneless ? 'zoneless' : 'zoneful'} detectChanges`, defects.includes('candidate drives operations with detectChanges()'));
+  expect(`${zoneless ? 'zoneless' : 'zoneful'} matches fixture scan`, JSON.stringify(defects) === JSON.stringify(liveDefects));
+}
+const opened = candidateQualificationDefects({
+  dependencies: {'@angular/core': versions.core, '@angular/material': versions.material},
+  npmrc: 'install-links=true\nfund=false\naudit=false\n',
+  tsconfig: {compilerOptions: {strict: true, skipLibCheck: false}},
+  labSource: 'openDialog(): void { this.dialog.open(DialogBody); }\n',
+});
+expect('guard opens when the fixture assumptions are gone', opened.length === 0);
+
+const blocked = qualifyRelease({
+  expectedIds: roster.ids,
+  outcomes: goodOutcomes,
+  defects: liveDefects,
+});
+expect('live defects block complete coverage', blocked.coverage === 'incomplete' && blocked.accepted === false);
+expect('live defects are recorded', JSON.stringify(blocked.qualification_defects) === JSON.stringify(liveDefects));
+
+const unrun = qualifyRelease({expectedIds: roster.ids, outcomes: [], defects: []});
+expect('failed launch discovers nothing', unrun.discovered_case_ids.length === 0);
+expect('failed launch executes nothing', unrun.executed_case_ids.length === 0);
+expect('failed launch passes nothing', unrun.passed_case_ids.length === 0);
+expect('failed launch leaves the roster unresolved', unrun.unresolved_case_ids.length === roster.ids.length);
+expect('failed launch is not complete', unrun.coverage === 'incomplete');
+
+const chromiumIds = roster.ids.filter(id => id.split('/')[2] === 'chromium');
+const partial = qualifyRelease({
+  expectedIds: roster.ids,
+  outcomes: chromiumIds.map(id => ({id, ok: true, evidence: 'observed'})),
+  defects: [],
+});
+expect('partial execution is only the returned cells', partial.executed_case_ids.length === chromiumIds.length);
+expect('partial execution stays on chromium', partial.executed_case_ids.every(id => id.split('/')[2] === 'chromium'));
+expect('partial discovery matches execution', JSON.stringify(partial.discovered_case_ids) === JSON.stringify(partial.executed_case_ids));
+expect('partial run is not complete', partial.coverage === 'incomplete' && partial.unresolved_case_ids.length === roster.ids.length - chromiumIds.length);
+
+const qualified = qualifyRelease({expectedIds: roster.ids, outcomes: goodOutcomes, defects: []});
+expect('roster without fixture defects can be complete', qualified.coverage === 'complete' && qualified.accepted === true);
+expect('complete executed set matches expected', JSON.stringify(qualified.executed_case_ids) === JSON.stringify(roster.ids));
+expect('complete passed set matches expected', JSON.stringify(qualified.passed_case_ids) === JSON.stringify(roster.ids));
 
 if (failures.length) {
   console.error(failures.join('\n'));

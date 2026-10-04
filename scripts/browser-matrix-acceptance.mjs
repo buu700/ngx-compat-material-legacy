@@ -11,7 +11,7 @@ import {dirname, join, relative, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {resolveLibraryFromRun} from './resolve-run-library.mjs';
 import {loadMainReleaseRoster, observationProblems} from './browser-matrix-roster.mjs';
-import {executeIds} from './browser-required-cells.mjs';
+import {executeIds, fixtureQualificationDefects, fixtureQualificationDefectsFromTarball} from './browser-required-cells.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const detailPath = join(root, 'compatibility/rc/reports/browser-matrix-slice.json');
@@ -84,6 +84,55 @@ function writeDetail(payload) {
   writeFileSync(detailPath, `${JSON.stringify(payload, null, 2)}\n`);
 }
 
+/**
+ * Separate expected, discovered, executed, and passed ids.
+ * Qualification defects keep coverage incomplete even when every expected id was returned.
+ * An empty outcome list does not count the expected roster as executed.
+ */
+export function qualifyRelease({expectedIds, outcomes, defects}) {
+  const expected = Array.isArray(expectedIds) ? expectedIds : [];
+  const expectedSet = new Set(expected);
+  const seen = new Set();
+  const discovered = [];
+  const executed = [];
+  const passed = [];
+  const failed = [];
+  const unexpected = [];
+  for (const row of outcomes || []) {
+    if (!row || typeof row.id !== 'string' || row.id.length === 0 || seen.has(row.id)) continue;
+    seen.add(row.id);
+    discovered.push(row.id);
+    if (!expectedSet.has(row.id)) {
+      unexpected.push(row.id);
+      continue;
+    }
+    executed.push(row.id);
+    if (row.ok === true && typeof row.evidence === 'string' && row.evidence.length > 0) passed.push(row.id);
+    else failed.push(row.id);
+  }
+  const order = new Map(expected.map((id, index) => [id, index]));
+  const byExpectedOrder = ids => ids.filter(id => order.has(id)).sort((left, right) => order.get(left) - order.get(right));
+  const executedSet = new Set(executed);
+  const qualification = (Array.isArray(defects) ? defects : []).filter(item => typeof item === 'string' && item.length > 0);
+  const covered = unexpected.length === 0
+    && failed.length === 0
+    && passed.length === expected.length
+    && executed.length === expected.length
+    && discovered.length === expected.length;
+  const accepted = qualification.length === 0 && covered;
+  return {
+    accepted,
+    coverage: accepted ? 'complete' : 'incomplete',
+    discovered_case_ids: discovered,
+    executed_case_ids: byExpectedOrder(executed),
+    passed_case_ids: byExpectedOrder(passed),
+    failed_case_ids: byExpectedOrder(failed),
+    unresolved_case_ids: expected.filter(id => !executedSet.has(id)),
+    unexpected_case_ids: unexpected,
+    qualification_defects: qualification,
+  };
+}
+
 export async function runAcceptance({tarball, runPath}) {
   const request = coordinatorRequest();
   const roster = loadMainReleaseRoster();
@@ -99,7 +148,18 @@ export async function runAcceptance({tarball, runPath}) {
   let outcomes = [];
   let engines = {};
   let launchError = '';
-  if (!matrixMismatch && request && !request.error && launch.missing.length === 0 && library && request.line === 'main') {
+  let qualificationDefects = [];
+  try {
+    const packed = (library && library.tarball) || tarball;
+    qualificationDefects = packed
+      ? fixtureQualificationDefectsFromTarball(packed)
+      : fixtureQualificationDefects(null);
+  } catch (error) {
+    launchError = error instanceof Error ? error.message : String(error);
+    qualificationDefects = ['candidate qualification unreadable'];
+  }
+  const qualifiedFixture = qualificationDefects.length === 0;
+  if (qualifiedFixture && !matrixMismatch && request && !request.error && launch.missing.length === 0 && library && request.line === 'main') {
     try {
       const executed = await executeIds(library.tarball || tarball, roster.ids);
       outcomes = executed.outcomes;
@@ -127,14 +187,22 @@ export async function runAcceptance({tarball, runPath}) {
     if (request.line !== 'main') identity.push('line is not main');
   }
   if (matrixMismatch) identity.push('matrix roster is not the derived main release roster');
+  for (const defect of qualificationDefects) identity.push(defect);
   if (launch.missing.length) identity.push(`missing browser ${launch.missing.join(', ')}`);
   if (launchError) identity.push(launchError);
   for (const [name, info] of Object.entries(engines)) {
     if (info && info.error) identity.push(`${name}: ${info.error}`);
   }
+  const qualification = qualifyRelease({expectedIds: roster.ids, outcomes, defects: qualificationDefects});
   const problems = [...identity, ...observed.problems.filter(item => !identity.includes(item))];
-  const accepted = problems.length === 0 && observed.skipped.length === 0;
-  const byId = new Map(outcomes.filter(item => item && item.ok === true).map(item => [item.id, item]));
+  const accepted = problems.length === 0 && observed.skipped.length === 0 && qualification.accepted && qualification.coverage === 'complete';
+  const outcomeById = new Map();
+  for (const item of outcomes) {
+    if (item && typeof item.id === 'string' && !outcomeById.has(item.id)) outcomeById.set(item.id, item);
+  }
+  const failedSet = new Set(qualification.failed_case_ids);
+  const passedSet = new Set(qualification.passed_case_ids);
+  const caseResult = id => (passedSet.has(id) ? 'pass' : failedSet.has(id) ? 'fail' : 'unresolved');
   writeDetail({
     schema_version: 1,
     role: 'diagnostic browser-matrix detail; acceptance is the coordinator report',
@@ -165,11 +233,14 @@ export async function runAcceptance({tarball, runPath}) {
     engines,
     per_engine: roster.perEngine,
     note: 'Release cells were derived before the browsers launched. WebKitGTK is not Safari. A Chromium-only run is not this roster.',
-    cases: roster.ids.map(id => ({
-      case_id: id,
-      result: byId.has(id) ? 'pass' : 'fail',
-      evidence: byId.has(id) ? byId.get(id).evidence : '',
-    })),
+    cases: roster.ids.map(id => {
+      const row = outcomeById.get(id);
+      return {
+        case_id: id,
+        result: caseResult(id),
+        evidence: row && typeof row.evidence === 'string' ? row.evidence : '',
+      };
+    }),
   };
   const assertionPath = join(request.outputDir, 'browser-observations.json');
   const assertionBytes = Buffer.from(`${JSON.stringify(assertion)}\n`);
@@ -180,8 +251,6 @@ export async function runAcceptance({tarball, runPath}) {
     sha256: createHash('sha256').update(assertionBytes).digest('hex'),
     bytes: assertionBytes.length,
   };
-  const passedIds = roster.ids.filter(id => byId.has(id));
-  const failedIds = roster.ids.filter(id => !byId.has(id));
   const report = {
     schema_version: 1,
     template: false,
@@ -197,21 +266,21 @@ export async function runAcceptance({tarball, runPath}) {
     subject_ids: ['library'],
     artifacts: {library: {sha256: artifactSha, bytes: artifactBytes}},
     expected_case_ids: roster.ids,
-    discovered_case_ids: roster.ids,
-    executed_case_ids: roster.ids,
-    passed_case_ids: passedIds,
-    failed_case_ids: accepted ? [] : failedIds.slice(0, 50),
+    discovered_case_ids: qualification.discovered_case_ids,
+    executed_case_ids: qualification.executed_case_ids,
+    passed_case_ids: qualification.passed_case_ids,
+    failed_case_ids: qualification.failed_case_ids,
     skipped_case_ids: [],
-    unresolved_case_ids: [],
+    unresolved_case_ids: qualification.unresolved_case_ids,
     exceptions: [],
-    passed: passedIds.length,
-    failed: accepted ? 0 : failedIds.length,
+    passed: qualification.passed_case_ids.length,
+    failed: qualification.failed_case_ids.length,
     skipped: 0,
     outputs: [output],
     case_results: roster.ids.map(id => ({
       case_id: id,
-      result: byId.has(id) ? 'pass' : 'fail',
-      kind: 'assertion',
+      result: caseResult(id),
+      kind: passedSet.has(id) || failedSet.has(id) ? 'assertion' : 'not-executed',
       output_paths: [relativeAssertion],
     })),
     command: ['node', 'scripts/run-browser-matrix-slice.mjs', '--run', request.runId],

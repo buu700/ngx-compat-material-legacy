@@ -91,6 +91,18 @@ function versionsFor(pkg) {
   };
 }
 
+function dependenciesWithLibrary(dependencies, librarySpec) {
+  const deps = {};
+  for (const [key, value] of Object.entries(dependencies)) {
+    if (key === 'rxjs') deps['@ngx-compat/material-legacy'] = librarySpec;
+    deps[key] = value;
+  }
+  if (!Object.prototype.hasOwnProperty.call(deps, '@ngx-compat/material-legacy')) {
+    deps['@ngx-compat/material-legacy'] = librarySpec;
+  }
+  return deps;
+}
+
 function labHtml() {
   return [
     '<div id="surface" class="lab-light mat-app-background" dir="ltr">',
@@ -410,21 +422,9 @@ function parseArgs(argv) {
   return {tarball, tarball21, buildOnly, runSsr, families, lines};
 }
 
-async function buildConsumer(tarball, zoneless) {
-  const versions = versionsFor(readPackedPackage(tarball));
-  const stamp = createHash('sha256')
-    .update(JSON.stringify(versions) + labSource(zoneless) + themeSource() + readFileSync(probePath, 'utf8') + (zoneless ? 'z' : 's'))
-    .digest('hex')
-    .slice(0, 12);
-  const tarballSha = sha256File(tarball).slice(0, 12);
-  const consumer = join(cacheRoot, `ngx-required-${tarballSha}-${zoneless ? 'zoneless' : 'zoneful'}-${stamp}`);
-  if (existsSync(join(consumer, 'dist/app.js')) && existsSync(join(consumer, 'dist/theme.css'))) {
-    return {consumer, versions, bundleHasZone: readFileSync(join(consumer, 'dist/app.js'), 'utf8').includes('Zone.__symbol__')};
-  }
-  mkdirSync(consumer, {recursive: true});
-  const installTarball = join(consumer, 'library.tgz');
-  writeFileSync(installTarball, readFileSync(tarball));
-  const deps = {
+/** Install inputs buildConsumer writes. Qualification reads this object, not a parallel copy. */
+export function candidateInstallSpec(versions, zoneless) {
+  const dependencies = {
     '@angular/animations': versions.core,
     '@angular/cdk': versions.cdk,
     '@angular/common': versions.core,
@@ -435,24 +435,12 @@ async function buildConsumer(tarball, zoneless) {
     '@angular/material': versions.material,
     '@angular/platform-browser': versions.core,
     '@angular/platform-browser-dynamic': versions.core,
-    '@ngx-compat/material-legacy': `file:${installTarball}`,
     rxjs: versions.rxjs,
     sass: versions.sass,
     tslib: versions.tslib,
     typescript: versions.typescript,
   };
-  if (!zoneless) deps['zone.js'] = versions.zone;
-  writeFileSync(join(consumer, 'package.json'), JSON.stringify({name: 'ngx-required-cells', private: true, dependencies: deps}, null, 2));
-  writeFileSync(join(consumer, '.npmrc'), 'install-links=true\nfund=false\naudit=false\nlegacy-peer-deps=true\n');
-  const env = {...process.env, NODE_OPTIONS: ''};
-  delete env.NODE_PATH;
-  const install = spawnSync('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock'], {
-    cwd: consumer, encoding: 'utf8', timeout: 300000, env,
-  });
-  if (install.status !== 0) throw new Error((install.stderr || install.stdout || 'npm install failed').slice(-2000));
-  mkdirSync(join(consumer, 'src'), {recursive: true});
-  writeFileSync(join(consumer, 'src/main.ts'), labSource(zoneless));
-  writeFileSync(join(consumer, 'src/theme.scss'), themeSource());
+  if (!zoneless) dependencies['zone.js'] = versions.zone;
   const tsconfig = {
     compilerOptions: {
       target: 'ES2022',
@@ -469,8 +457,79 @@ async function buildConsumer(tarball, zoneless) {
     files: ['src/main.ts'],
     angularCompilerOptions: {compilationMode: 'full', strictTemplates: true},
   };
-  if (Number(versions.typescript.split('.')[0]) >= 6) tsconfig.compilerOptions.ignoreDeprecations = '6.0';
-  writeFileSync(join(consumer, 'tsconfig.json'), JSON.stringify(tsconfig, null, 2));
+  if (Number(String(versions.typescript).split('.')[0]) >= 6) tsconfig.compilerOptions.ignoreDeprecations = '6.0';
+  return {
+    dependencies,
+    npmrc: 'install-links=true\nfund=false\naudit=false\nlegacy-peer-deps=true\n',
+    tsconfig,
+    labSource: labSource(zoneless),
+    themeSource: themeSource(),
+  };
+}
+
+/** Defects of the candidate fixture. An empty list means those assumptions are gone and the guard opens. */
+export function candidateQualificationDefects(spec) {
+  const defects = [];
+  const dependencies = spec && spec.dependencies && typeof spec.dependencies === 'object' ? spec.dependencies : {};
+  if (Object.prototype.hasOwnProperty.call(dependencies, '@angular/animations')) {
+    defects.push('candidate installs @angular/animations');
+  }
+  if (String(spec && spec.npmrc || '').split('\n').includes('legacy-peer-deps=true')) {
+    defects.push('candidate sets legacy-peer-deps=true');
+  }
+  const skipLibCheck = spec && spec.tsconfig && spec.tsconfig.compilerOptions
+    ? spec.tsconfig.compilerOptions.skipLibCheck
+    : false;
+  if (skipLibCheck === true) defects.push('candidate sets skipLibCheck');
+  if (typeof (spec && spec.labSource) === 'string' && /\.detectChanges\s*\(/.test(spec.labSource)) {
+    defects.push('candidate drives operations with detectChanges()');
+  }
+  return defects;
+}
+
+export function fixtureQualificationDefects(pkg) {
+  const versions = versionsFor(pkg || {peerDependencies: {}});
+  const defects = [];
+  for (const zoneless of [false, true]) {
+    for (const defect of candidateQualificationDefects(candidateInstallSpec(versions, zoneless))) {
+      if (!defects.includes(defect)) defects.push(defect);
+    }
+  }
+  return defects;
+}
+
+export function fixtureQualificationDefectsFromTarball(tarball) {
+  return fixtureQualificationDefects(readPackedPackage(tarball));
+}
+
+async function buildConsumer(tarball, zoneless) {
+  const versions = versionsFor(readPackedPackage(tarball));
+  const spec = candidateInstallSpec(versions, zoneless);
+  const stamp = createHash('sha256')
+    .update(JSON.stringify(versions) + spec.labSource + spec.themeSource + readFileSync(probePath, 'utf8') + (zoneless ? 'z' : 's'))
+    .digest('hex')
+    .slice(0, 12);
+  const tarballSha = sha256File(tarball).slice(0, 12);
+  const consumer = join(cacheRoot, `ngx-required-${tarballSha}-${zoneless ? 'zoneless' : 'zoneful'}-${stamp}`);
+  if (existsSync(join(consumer, 'dist/app.js')) && existsSync(join(consumer, 'dist/theme.css'))) {
+    return {consumer, versions, bundleHasZone: readFileSync(join(consumer, 'dist/app.js'), 'utf8').includes('Zone.__symbol__')};
+  }
+  mkdirSync(consumer, {recursive: true});
+  const installTarball = join(consumer, 'library.tgz');
+  writeFileSync(installTarball, readFileSync(tarball));
+  const deps = dependenciesWithLibrary(spec.dependencies, `file:${installTarball}`);
+  writeFileSync(join(consumer, 'package.json'), JSON.stringify({name: 'ngx-required-cells', private: true, dependencies: deps}, null, 2));
+  writeFileSync(join(consumer, '.npmrc'), spec.npmrc);
+  const env = {...process.env, NODE_OPTIONS: ''};
+  delete env.NODE_PATH;
+  const install = spawnSync('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock'], {
+    cwd: consumer, encoding: 'utf8', timeout: 300000, env,
+  });
+  if (install.status !== 0) throw new Error((install.stderr || install.stdout || 'npm install failed').slice(-2000));
+  mkdirSync(join(consumer, 'src'), {recursive: true});
+  writeFileSync(join(consumer, 'src/main.ts'), spec.labSource);
+  writeFileSync(join(consumer, 'src/theme.scss'), spec.themeSource);
+  writeFileSync(join(consumer, 'tsconfig.json'), JSON.stringify(spec.tsconfig, null, 2));
   const sass = createRequire(join(consumer, 'node_modules/sass/package.json'))('sass');
   let css;
   try {
