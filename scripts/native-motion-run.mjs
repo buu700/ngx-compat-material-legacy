@@ -8,7 +8,7 @@ import {createHash} from 'node:crypto';
 import {spawnSync} from 'node:child_process';
 import {createRequire} from 'node:module';
 import {createServer} from 'node:http';
-import {existsSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
+import {existsSync, mkdirSync, readFileSync, rmSync, writeFileSync} from 'node:fs';
 import {dirname, join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {sha256File} from './resolve-run-library.mjs';
@@ -17,13 +17,14 @@ import {assertCase, buttonsFor, deriveMainRoster, ENGINES, RUNTIMES} from './nat
 import {motionSource} from './native-motion-page.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const cacheRoot = '/tmp/ngx-native-motion';
+const cacheRoot = '/tmp/ngx-native-motion-strict';
 const PORTS = {chromium: 9335, firefox: 9336};
 const DRIVERS = {chromium: withChromium, firefox: withFirefox, webkit: withWebKit};
 
 function exactVersion(spec, fallback) {
-  const match = String(spec || '').match(/(\d+\.\d+\.\d+)/);
-  return match ? match[1] : fallback;
+  const text = String(spec || '').trim();
+  if (/^\d+\.\d+\.\d+$/.test(text)) return text;
+  return fallback;
 }
 
 function readPackedPackage(tarball) {
@@ -32,7 +33,7 @@ function readPackedPackage(tarball) {
   return JSON.parse(result.stdout);
 }
 
-function versionsFor(pkg) {
+export function versionsFor(pkg) {
   const peers = pkg.peerDependencies || {};
   const core = exactVersion(peers['@angular/core'], '22.1.7');
   return {
@@ -63,28 +64,14 @@ $light: mat.define-light-theme((
 `;
 }
 
-function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
-
-function asJson(raw) {
-  if (typeof raw !== 'string') return raw;
-  const once = JSON.parse(raw);
-  return typeof once === 'string' ? JSON.parse(once) : once;
+export function nativeMotionCacheRoot() {
+  return cacheRoot;
 }
 
-async function buildConsumer(tarball, zoneless) {
-  const versions = versionsFor(readPackedPackage(tarball));
-  const source = motionSource(zoneless);
-  const stamp = createHash('sha256').update(source + themeSource() + (zoneless ? 'z' : 's')).digest('hex').slice(0, 12);
-  const tarballSha = sha256File(tarball).slice(0, 12);
-  const consumer = join(cacheRoot, `ngx-motion-${tarballSha}-${zoneless ? 'zoneless' : 'zoneful'}-${stamp}`);
-  if (existsSync(join(consumer, 'dist/app.js')) && existsSync(join(consumer, 'dist/theme.css'))) {
-    const bundle = readFileSync(join(consumer, 'dist/app.js'), 'utf8');
-    return {consumer, bundleHasZone: bundle.includes('Zone.__symbol__')};
-  }
-  mkdirSync(consumer, {recursive: true});
-  const installTarball = join(consumer, 'library.tgz');
-  writeFileSync(installTarball, readFileSync(tarball));
-  const deps = {
+export const NATIVE_MOTION_INSTALL_ARGS = ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock'];
+
+export function nativeMotionConsumerSpec(versions, zoneless) {
+  const dependencies = {
     '@angular/cdk': versions.cdk,
     '@angular/common': versions.core,
     '@angular/compiler': versions.core,
@@ -94,34 +81,137 @@ async function buildConsumer(tarball, zoneless) {
     '@angular/material': versions.material,
     '@angular/platform-browser': versions.core,
     '@angular/platform-browser-dynamic': versions.core,
-    '@ngx-compat/material-legacy': `file:${installTarball}`,
     rxjs: versions.rxjs,
     sass: versions.sass,
     tslib: versions.tslib,
     typescript: versions.typescript,
   };
-  if (!zoneless) deps['zone.js'] = versions.zone;
+  if (!zoneless) dependencies['zone.js'] = versions.zone;
+  return {
+    dependencies,
+    npmrc: 'install-links=true\nfund=false\naudit=false\n',
+    tsconfig: {
+      compilerOptions: {
+        target: 'ES2022',
+        module: 'ES2022',
+        moduleResolution: 'bundler',
+        experimentalDecorators: true,
+        strict: true,
+        skipLibCheck: false,
+        lib: ['ES2022', 'DOM'],
+        rootDir: 'src',
+        outDir: 'out',
+        types: [],
+        ignoreDeprecations: '6.0',
+      },
+      files: ['src/main.ts'],
+      angularCompilerOptions: {compilationMode: 'full', strictTemplates: true},
+    },
+    source: motionSource(zoneless),
+    theme: themeSource(),
+  };
+}
+
+export function readNativeMotionLinkedTooling() {
+  const scriptDir = dirname(fileURLToPath(import.meta.url));
+  let esbuild = 'unresolved';
+  try {
+    const pkgPath = createRequire(join(root, 'package.json')).resolve('esbuild/package.json');
+    const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'));
+    esbuild = `${pkg.name}@${pkg.version}`;
+  } catch {
+    esbuild = 'unresolved';
+  }
+  return {
+    page: readFileSync(join(scriptDir, 'native-motion-page.mjs'), 'utf8'),
+    template: readFileSync(join(scriptDir, 'native-motion-consumer.ts'), 'utf8'),
+    esbuild,
+  };
+}
+
+export function nativeMotionCacheStamp(identity) {
+  return createHash('sha256').update(JSON.stringify({
+    dependencies: identity.dependencies,
+    npmrc: identity.npmrc,
+    tsconfig: identity.tsconfig,
+    source: identity.source,
+    theme: identity.theme,
+    linkedTooling: identity.linkedTooling,
+    zoneless: identity.zoneless === true,
+    tarball: identity.tarball,
+  })).digest('hex');
+}
+
+export function assessNativeMotionCache(recorded, expected) {
+  if (!recorded || typeof recorded !== 'object' || !expected || typeof expected !== 'object') return false;
+  if (recorded.stamp !== expected.stamp) return false;
+  if (recorded.npmrc !== expected.npmrc) return false;
+  if (JSON.stringify(recorded.tsconfig) !== JSON.stringify(expected.tsconfig)) return false;
+  if (JSON.stringify(recorded.dependencies) !== JSON.stringify(expected.dependencies)) return false;
+  if (JSON.stringify(recorded.linkedTooling) !== JSON.stringify(expected.linkedTooling)) return false;
+  if (recorded.source !== expected.source) return false;
+  if (recorded.theme !== expected.theme) return false;
+  if (recorded.tarball !== expected.tarball) return false;
+  if (recorded.zoneless !== (expected.zoneless === true)) return false;
+  const bundles = recorded.bundles;
+  return !!bundles && bundles.app === true && bundles.theme === true;
+}
+
+function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+
+function asJson(raw) {
+  if (typeof raw !== 'string') return raw;
+  const once = JSON.parse(raw);
+  return typeof once === 'string' ? JSON.parse(once) : once;
+}
+
+export async function buildConsumer(tarball, zoneless) {
+  const versions = versionsFor(readPackedPackage(tarball));
+  const spec = nativeMotionConsumerSpec(versions, zoneless);
+  const linkedTooling = readNativeMotionLinkedTooling();
+  const tarballDigest = sha256File(tarball);
+  const identity = {
+    dependencies: spec.dependencies,
+    npmrc: spec.npmrc,
+    tsconfig: spec.tsconfig,
+    source: spec.source,
+    theme: spec.theme,
+    linkedTooling,
+    zoneless,
+    tarball: tarballDigest,
+  };
+  const stamp = nativeMotionCacheStamp(identity);
+  const expected = {...identity, stamp, zoneless: zoneless === true};
+  const consumer = join(cacheRoot, `ngx-motion-strict-${tarballDigest.slice(0, 12)}-${zoneless ? 'zoneless' : 'zoneful'}-${stamp.slice(0, 12)}`);
+  const readyPath = join(consumer, 'dist/cache-ready.json');
+  if (existsSync(readyPath) && existsSync(join(consumer, 'dist/app.js')) && existsSync(join(consumer, 'dist/theme.css'))) {
+    try {
+      const recorded = JSON.parse(readFileSync(readyPath, 'utf8'));
+      if (assessNativeMotionCache(recorded, expected)) {
+        const bundle = readFileSync(join(consumer, 'dist/app.js'), 'utf8');
+        return {consumer, bundleHasZone: bundle.includes('Zone.__symbol__')};
+      }
+    } catch {
+      // The directory is not a ready bundle for this identity.
+    }
+  }
+  rmSync(consumer, {recursive: true, force: true});
+  mkdirSync(consumer, {recursive: true});
+  const installTarball = join(consumer, 'library.tgz');
+  writeFileSync(installTarball, readFileSync(tarball));
+  const deps = {...spec.dependencies, '@ngx-compat/material-legacy': `file:${installTarball}`};
   writeFileSync(join(consumer, 'package.json'), JSON.stringify({name: 'ngx-native-motion', private: true, dependencies: deps}, null, 2));
-  writeFileSync(join(consumer, '.npmrc'), 'install-links=true\nfund=false\naudit=false\nlegacy-peer-deps=true\n');
+  writeFileSync(join(consumer, '.npmrc'), spec.npmrc);
   const env = {...process.env, NODE_OPTIONS: ''};
   delete env.NODE_PATH;
-  const install = spawnSync('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock'], {
+  const install = spawnSync('npm', NATIVE_MOTION_INSTALL_ARGS, {
     cwd: consumer, encoding: 'utf8', timeout: 300000, env,
   });
   if (install.status !== 0) throw new Error((install.stderr || install.stdout || 'npm install failed').slice(-2000));
   mkdirSync(join(consumer, 'src'), {recursive: true});
-  writeFileSync(join(consumer, 'src/main.ts'), source);
-  writeFileSync(join(consumer, 'src/theme.scss'), themeSource());
-  const tsconfig = {
-    compilerOptions: {
-      target: 'ES2022', module: 'ES2022', moduleResolution: 'bundler', experimentalDecorators: true,
-      strict: true, skipLibCheck: true, lib: ['ES2022', 'DOM'], rootDir: 'src', outDir: 'out', types: [],
-      ignoreDeprecations: '6.0',
-    },
-    files: ['src/main.ts'],
-    angularCompilerOptions: {compilationMode: 'full', strictTemplates: true},
-  };
-  writeFileSync(join(consumer, 'tsconfig.json'), JSON.stringify(tsconfig, null, 2));
+  writeFileSync(join(consumer, 'src/main.ts'), spec.source);
+  writeFileSync(join(consumer, 'src/theme.scss'), spec.theme);
+  writeFileSync(join(consumer, 'tsconfig.json'), JSON.stringify(spec.tsconfig, null, 2));
   const sass = createRequire(join(consumer, 'node_modules/sass/package.json'))('sass');
   const css = sass.compile(join(consumer, 'src/theme.scss'), {
     loadPaths: [join(consumer, 'node_modules')],
@@ -167,6 +257,18 @@ async function buildConsumer(tarball, zoneless) {
   mkdirSync(join(consumer, 'dist'), {recursive: true});
   writeFileSync(join(consumer, 'dist/theme.css'), css);
   writeFileSync(join(consumer, 'dist/index.html'), '<!doctype html><html><head><link rel="stylesheet" href="/theme.css"></head><body><motion-root></motion-root><script src="/app.js"></script></body></html>\n');
+  writeFileSync(readyPath, JSON.stringify({
+    stamp,
+    dependencies: spec.dependencies,
+    npmrc: spec.npmrc,
+    tsconfig: spec.tsconfig,
+    source: spec.source,
+    theme: spec.theme,
+    linkedTooling,
+    zoneless: zoneless === true,
+    tarball: tarballDigest,
+    bundles: {app: true, theme: true},
+  }));
   return {consumer, bundleHasZone};
 }
 

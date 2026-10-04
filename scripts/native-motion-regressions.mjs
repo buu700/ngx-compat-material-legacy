@@ -16,6 +16,14 @@ import {
   samplePass,
   ZERO_BUTTONS,
 } from './native-motion-roster.mjs';
+import {
+  NATIVE_MOTION_INSTALL_ARGS,
+  assessNativeMotionCache,
+  nativeMotionCacheRoot,
+  nativeMotionCacheStamp,
+  nativeMotionConsumerSpec,
+  versionsFor,
+} from './native-motion-run.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const failures = [];
@@ -133,6 +141,81 @@ const fallback = observationProblems({
   engines: goodEngines, sourceClean: true, artifactSha: 'abc', boundSha: 'abc',
 });
 expect('missing fallback', fallback.problems.some(item => item.includes('missing fallback completion')));
+
+
+const runner = readFileSync(join(root, 'scripts/native-motion-run.mjs'), 'utf8');
+expect('no legacy-peer-deps bypass', !runner.includes('legacy-peer-deps'));
+expect('skipLibCheck stays false', /skipLibCheck:\s*false/.test(runner) && !/skipLibCheck:\s*true/.test(runner));
+expect('fresh strict cache root', nativeMotionCacheRoot() === '/tmp/ngx-native-motion-strict');
+expect('install args omit the peer bypass', NATIVE_MOTION_INSTALL_ARGS.every(arg => !String(arg).includes('legacy-peer-deps')));
+
+const peerVersions = {
+  core: '22.1.7',
+  cdk: '22.1.7',
+  material: '22.1.7',
+  rxjs: '7.8.2',
+  typescript: '6.0.3',
+  zone: '0.16.3',
+  tslib: '2.8.1',
+  sass: '1.104.1',
+};
+const tooling = {page: 'page-marker', template: 'template-marker', esbuild: 'esbuild@0.25.5'};
+function cacheIdentity(spec, zoneless, patch = {}) {
+  return {
+    dependencies: spec.dependencies,
+    npmrc: spec.npmrc,
+    tsconfig: spec.tsconfig,
+    source: spec.source,
+    theme: spec.theme,
+    linkedTooling: tooling,
+    zoneless,
+    tarball: 'tarball-marker',
+    ...patch,
+  };
+}
+const variantStamps = [];
+for (const zoneless of [false, true]) {
+  const label = zoneless ? 'zoneless' : 'zoneful';
+  const spec = nativeMotionConsumerSpec(peerVersions, zoneless);
+  expect(`${label} npmrc has no legacy-peer-deps`, !spec.npmrc.split('\n').includes('legacy-peer-deps=true'));
+  expect(`${label} skipLibCheck is false`, spec.tsconfig.compilerOptions.skipLibCheck === false);
+  expect(`${label} peers are exact`, Object.values(spec.dependencies).every(value => /^\d+\.\d+\.\d+$/.test(value)));
+  expect(`${label} core peer`, spec.dependencies['@angular/core'] === peerVersions.core);
+  expect(`${label} material peer`, spec.dependencies['@angular/material'] === peerVersions.material);
+  expect(`${label} rxjs peer`, spec.dependencies.rxjs === peerVersions.rxjs);
+  expect(`${label} zone peer`, zoneless ? spec.dependencies['zone.js'] === undefined : spec.dependencies['zone.js'] === peerVersions.zone);
+  const identity = cacheIdentity(spec, zoneless);
+  const stamp = nativeMotionCacheStamp(identity);
+  variantStamps.push(stamp);
+  const recorded = {...identity, stamp, zoneless, bundles: {app: true, theme: true}};
+  expect(`${label} matching bundle is ready`, assessNativeMotionCache(recorded, {...identity, stamp}));
+  const changed = [
+    ['dependencies', {dependencies: {...identity.dependencies, rxjs: '7.8.1'}}],
+    ['npmrc', {npmrc: `${identity.npmrc}legacy-peer-deps=true\n`}],
+    ['tsconfig', {tsconfig: {...identity.tsconfig, compilerOptions: {...identity.tsconfig.compilerOptions, skipLibCheck: true}}}],
+    ['source', {source: `${identity.source}\n`}],
+    ['linked tooling', {linkedTooling: {...identity.linkedTooling, page: 'edited-page'}}],
+  ];
+  for (const [name, patch] of changed) {
+    const next = {...identity, ...patch};
+    const nextStamp = nativeMotionCacheStamp(next);
+    expect(`${label} ${name} changes the stamp`, nextStamp !== stamp);
+    expect(`${label} ${name} cannot reuse the bundle`, assessNativeMotionCache(recorded, {...next, stamp: nextStamp}) === false);
+    expect(`${label} ${name} blocks on the recorded field`, assessNativeMotionCache(recorded, {...next, stamp}) === false);
+  }
+}
+expect('runtime variants do not share a stamp', variantStamps[0] !== variantStamps[1]);
+const resolved = versionsFor({peerDependencies: {
+  '@angular/core': '^22.1.7',
+  '@angular/cdk': '^22.1.7',
+  '@angular/material': '^22.1.7',
+  rxjs: '^6.5.3 || ^7.4.0',
+}});
+expect('angular range uses the supported exact peer', resolved.core === '22.1.7' && resolved.cdk === '22.1.7' && resolved.material === '22.1.7');
+expect('rxjs range uses the supported exact peer', resolved.rxjs === '7.8.2');
+expect('exact peer spec is kept', versionsFor({peerDependencies: {'@angular/core': '22.1.7', rxjs: '7.8.2'}}).rxjs === '7.8.2');
+
+expect('missing bundles are not ready', assessNativeMotionCache({stamp: 'x', bundles: {app: true, theme: false}}, {stamp: 'x'}) === false);
 
 if (failures.length) {
   console.error(failures.join('\n'));
