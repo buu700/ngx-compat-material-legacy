@@ -11,6 +11,8 @@
  * the matching installed package.json version. One assertion per declared floor.
  * Does not claim G12. Leaves cli-runtime, line-isolation, and every 21.x group
  * null. Does not mark consumer-floors accepted.
+ * A missing installed peer exits 1. Full verify installs node_modules and always
+ * runs this script. verify-lite does not execute it.
  */
 import {existsSync, lstatSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
 import {dirname, join, resolve} from 'node:path';

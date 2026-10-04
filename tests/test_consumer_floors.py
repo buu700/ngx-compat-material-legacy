@@ -12,6 +12,24 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def workspace_packages_ready() -> bool:
+    """True when every advertised peer is installed.
+
+    verify-lite does not install node_modules and does not execute the checker.
+    Full verify installs peers, then always runs the checker. A missing peer
+    must still fail that run, so this skip stays in the test.
+    """
+    manifest = json.loads((ROOT / "projects/ngx-material-legacy/package.json").read_text())
+    peers = manifest.get("peerDependencies")
+    if not isinstance(peers, dict) or not peers:
+        return False
+    for name in peers:
+        package_json = ROOT.joinpath("node_modules", *str(name).split("/"), "package.json")
+        if not package_json.is_file():
+            return False
+    return True
+
+
 def node_eval(script: str, payload: dict | None = None) -> dict:
     args = ["node", "--input-type=module", "-e", script]
     if payload is not None:
@@ -112,6 +130,10 @@ console.log(JSON.stringify(publicEnginesPeersIds(floors)));
         for group, ids in row["acceptance"]["cases_by_line"]["21.x"].items():
             self.assertIsNone(ids, group)
 
+    @unittest.skipUnless(
+        workspace_packages_ready(),
+        "workspace node_modules is missing installed peer packages",
+    )
     def test_workspace_compares_declared_floors(self):
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
