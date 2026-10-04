@@ -49,6 +49,7 @@ console.log(JSON.stringify(assertionOutputDir()));
         self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
         self.assertEqual(result.stdout.strip(), "null")
 
+    @unittest.skipUnless((ROOT / 'node_modules/@angular/cli/bin/ng.js').is_file(), 'Angular CLI is not installed; full verify runs ng generate')
     def test_ng_generate_matches_expected_after(self):
         source = (ROOT / "scripts/check-packaged-schematic.mjs").read_text()
         parity = (ROOT / "scripts/check-frontend-parity.mjs").read_text()
