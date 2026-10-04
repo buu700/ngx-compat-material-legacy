@@ -158,7 +158,13 @@ console.log(JSON.stringify(assertionOutputDir()));
         main = row["acceptance"]["cases_by_line"]["main"]
         self.assertEqual(main["old-workspace-cli"], expected_ids)
         self.assertIsNone(main["packaged-schematic"])
-        self.assertIsNone(main["transaction-negatives"])
+        self.assertEqual(main["transaction-negatives"], [
+            "blocked-file-writes-nothing",
+            "dry-apply-parity",
+            "second-apply-noop",
+            "concurrent-edit-rejected",
+            "before-write-hook-refuses",
+        ])
         self.assertIsNone(main["frontend-parity"])
         for group, ids in row["acceptance"]["cases_by_line"]["21.x"].items():
             self.assertIsNone(ids, group)

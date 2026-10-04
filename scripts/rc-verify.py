@@ -60,6 +60,7 @@ SCRIPT_CHECKS = {
     "scripts/build-migrate-legacy-cli.mjs": "migration-packaged",
     "scripts/migration-cli-isolation.mjs": "migration-packaged",
     "scripts/check-old-workspace-cli.mjs": "migration-packaged",
+    "scripts/migration-transaction.mjs": "migration-packaged",
     "scripts/rc-test-legacy-family.mjs": "historical-legacy-artifact",
     "scripts/check-m3-inclusion-order.mjs": "m3-coexistence",
     "scripts/check-consumer-floors.mjs": "consumer-floors",
@@ -746,16 +747,21 @@ def main() -> int:
     results["engine-free-consumer"] = "pass" if code == 0 else "fail"
     implemented_ran.append("engine-free-consumer")
 
-    # migration-packaged: CLI artifact verify, isolation, and the temp old workspace.
-    # old-workspace-cli is the only executed group. The other groups and every
-    # 21.x migration group stay null, so this slice does not claim G04 or G05.
+    # migration-packaged: CLI artifact verify, isolation, the temp old workspace,
+    # and transaction cases the extracted CLI bin actually executes. coverage
+    # stays slice. packaged-schematic, frontend-parity, and every 21.x migration
+    # group stay null, so this slice is not acceptance and does not claim G04 or G05.
     code_verify = run_node("scripts/build-migrate-legacy-cli.mjs", ["--verify"])
     code_iso = run_node("scripts/migration-cli-isolation.mjs", [])
     code_workspace = run_node(
         "scripts/check-old-workspace-cli.mjs",
         ["--out", str(out_dir / "old-workspace-cli.json")],
     )
-    code = 0 if code_verify == 0 and code_iso == 0 and code_workspace == 0 else (code_verify or code_iso or code_workspace or 1)
+    code_tx = run_node(
+        "scripts/migration-transaction.mjs",
+        ["--out", str(out_dir / "migration-transaction.json")],
+    )
+    code = 0 if code_verify == 0 and code_iso == 0 and code_workspace == 0 and code_tx == 0 else (code_verify or code_iso or code_workspace or code_tx or 1)
     write_check_report(
         out_dir,
         run_id,
@@ -765,8 +771,10 @@ def main() -> int:
         limitations=[
             "Checks the committed migrate-legacy CLI tarball identity and isolation. That tarball is not old-workspace-cli acceptance.",
             "old-workspace-cli runs node on migration/dist/package/bin/migrate-legacy.js in a temp workspace installed from the sealed Material 16.2.14 environment.",
-            "Only fixture rewrites the CLI applied are rostered. packaged-schematic, transaction-negatives, and frontend-parity stay null.",
-            "Every 21.x migration group stays null. Does not claim G04 or G05.",
+            "transaction-negatives runs node on package/bin/migrate-legacy.js extracted from that tarball. It does not import a transform function and does not run the schematic runner.",
+            "Rostered transaction cases are blocked-file-writes-nothing, dry-apply-parity, second-apply-noop, concurrent-edit-rejected, and before-write-hook-refuses. The before-write refusal is MIGRATE_LEGACY_BEFORE_WRITE, not a production fault.",
+            "An uncaught write error is not rostered when an earlier file remains rewritten.",
+            "packaged-schematic and frontend-parity stay null. Every 21.x migration group stays null. coverage stays slice. Does not mark migration-packaged accepted. Does not claim G04 or G05.",
         ],
     )
     results["migration-packaged"] = "pass" if code == 0 else "fail"
