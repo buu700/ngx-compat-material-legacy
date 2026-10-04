@@ -126,7 +126,8 @@ for (const zoneless of [false, true]) {
   expect(`${zoneless ? 'zoneless' : 'zoneful'} animations`, !defects.includes('candidate installs @angular/animations'));
   expect(`${zoneless ? 'zoneless' : 'zoneful'} peer bypass`, !defects.includes('candidate sets legacy-peer-deps=true'));
   expect(`${zoneless ? 'zoneless' : 'zoneful'} skipLibCheck`, !defects.includes('candidate sets skipLibCheck'));
-  expect(`${zoneless ? 'zoneless' : 'zoneful'} detectChanges`, defects.includes('candidate drives operations with detectChanges()'));
+  expect(`${zoneless ? 'zoneless' : 'zoneful'} detectChanges gone`, !defects.includes('candidate drives operations with detectChanges()'));
+  expect(`${zoneless ? 'zoneless' : 'zoneful'} api overlay`, defects.includes('candidate opens overlays through the component API'));
   expect(`${zoneless ? 'zoneless' : 'zoneful'} matches fixture scan`, JSON.stringify(defects) === JSON.stringify(liveDefects));
 }
 const opened = candidateQualificationDefects({

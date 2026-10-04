@@ -314,14 +314,16 @@
       return;
     }
     if (family === 'slider') {
-      lab.setSliderInvalid(true);
+      const button = query('#p-slider-invalidate');
+      if (button) button.click();
       waitFor(() => {
         const flag = query('#slider-invalid');
         return flag && flag.textContent.trim() === 'true' ? flag : null;
       }, 1000, node => finish(!!node, 'slider ngModel invalid'));
       return;
     }
-    lab.setInvalid(true);
+    const mark = query('#p-mark-invalid');
+    if (mark) mark.click();
     const selectors = {
       autocomplete: '#p-auto-field.mat-form-field-invalid',
       chips: '#wrap-chips .mat-chip-list-invalid',

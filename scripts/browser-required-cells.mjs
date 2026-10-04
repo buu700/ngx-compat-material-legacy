@@ -118,6 +118,7 @@ function labHtml() {
     '<mat-checkbox id="p-checkbox-invalid" required>Req</mat-checkbox>',
     '</div>',
     '<div id="wrap-chips" *ngIf="!cspOnly">',
+    '<button id="p-mark-invalid" type="button" (click)="markInvalid()">Mark invalid</button>',
     '<mat-chip-list [errorStateMatcher]="matcher"><mat-chip>One</mat-chip></mat-chip-list>',
     '<mat-chip-list disabled><mat-chip>Off</mat-chip></mat-chip-list>',
     '</div>',
@@ -166,6 +167,7 @@ function labHtml() {
     '<mat-slide-toggle id="p-toggle-invalid" required>Req</mat-slide-toggle>',
     '</div>',
     '<div id="wrap-slider" *ngIf="!cspOnly">',
+    '<button id="p-slider-invalidate" type="button" (click)="forceSliderInvalid = true">Invalidate</button>',
     '<mat-slider id="p-slider" #sl="ngModel" name="slider" [labForceInvalid]="forceSliderInvalid" [(ngModel)]="sliderValue" min="0" max="100"></mat-slider>',
     '<span id="slider-invalid">{{sl.invalid}}</span>',
     '<mat-slider id="p-slider-disabled" disabled [value]="10"></mat-slider>',
@@ -248,7 +250,6 @@ export class DialogBody {}
 export class LabRoot {
   private dialog = inject(MatLegacyDialog);
   private snack = inject(MatLegacySnackBar);
-  private cdr = inject(ChangeDetectorRef);
   cspOnly = typeof window !== 'undefined' && !!(window as unknown as {__cspOnly?: boolean}).__cspOnly;
   matcher = new LabMatcher();
   forceSliderInvalid = false;
@@ -268,6 +269,15 @@ export class LabRoot {
   openDialog(): void { this.dialog.open(DialogBody); }
   openMenu(): void { this.menuTrigger.openMenu(); }
   openSnack(): void { this.snack.open('Saved', 'OK'); }
+  markInvalid(): void {
+    this.matcher.on = true;
+    this.inputs.forEach(input => input.updateErrorState());
+    this.selects.forEach(select => select.updateErrorState());
+    this.chipLists.forEach(list => list.updateErrorState());
+    this.selectDetectors.forEach(detector => detector.markForCheck());
+    this.chipDetectors.forEach(detector => detector.markForCheck());
+    this.fieldDetectors.forEach(detector => detector.markForCheck());
+  }
   ngAfterViewInit(): void {
     const lab = this;
     (window as unknown as {__lab: unknown}).__lab = {
@@ -279,7 +289,6 @@ export class LabRoot {
         try { lab.tip && lab.tip.hide(0); } catch { /* tooltip already hidden */ }
         lab.matcher.on = false;
         lab.forceSliderInvalid = false;
-        lab.cdr.detectChanges();
       },
       openDialog() { lab.openDialog(); },
       openMenu() { lab.openMenu(); },
@@ -287,22 +296,13 @@ export class LabRoot {
       showTip() { lab.tip.show(0); },
       showTipOff() { lab.tipOff.show(0); },
       openSnack() { lab.openSnack(); },
+      matcher: lab.matcher,
+      setSliderFlag(on: boolean) { lab.forceSliderInvalid = on; },
       selectSecondTab() {
         const label = document.querySelectorAll('#wrap-tabs .mat-tab-label')[1] as HTMLElement | undefined;
         if (label) label.click();
       },
-      setInvalid(on: boolean) {
-        lab.matcher.on = on;
-        lab.inputs.forEach(input => input.updateErrorState());
-        lab.selects.forEach(select => select.updateErrorState());
-        lab.chipLists.forEach(list => list.updateErrorState());
-        lab.selectDetectors.forEach(detector => detector.markForCheck());
-        lab.chipDetectors.forEach(detector => detector.markForCheck());
-        lab.fieldDetectors.forEach(detector => detector.markForCheck());
-        lab.cdr.detectChanges();
-        lab.cdr.detectChanges();
-      },
-      setSliderInvalid(on: boolean) { lab.forceSliderInvalid = on; lab.cdr.detectChanges(); lab.cdr.detectChanges(); },
+
     };
     document.documentElement.dataset.labReady = '1';
   }
@@ -475,6 +475,9 @@ export function candidateQualificationDefects(spec) {
   if (skipLibCheck === true) defects.push('candidate sets skipLibCheck');
   if (typeof (spec && spec.labSource) === 'string' && /\.detectChanges\s*\(/.test(spec.labSource)) {
     defects.push('candidate drives operations with detectChanges()');
+  }
+  if (typeof (spec && spec.labSource) === 'string' && /\.openPanel\s*\(|\.show\s*\(/.test(spec.labSource)) {
+    defects.push('candidate opens overlays through the component API');
   }
   return defects;
 }
