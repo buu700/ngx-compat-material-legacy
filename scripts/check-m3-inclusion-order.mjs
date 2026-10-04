@@ -9,11 +9,13 @@
  * Workspace mode uses this checkout and its installed @angular/material.
  * A tarball is extracted and compiled against the material root for that line.
  * This does not claim G07. Nested, lazy, and overlay cases stay unexecuted.
+ * Shared-style boundary and every 21.x m3 group stay unexecuted.
+ * A coordinator invocation on main writes one assertion file per compiled order.
  */
 import {createHash} from 'node:crypto';
 import {spawnSync} from 'node:child_process';
 import {createRequire} from 'node:module';
-import {existsSync, mkdirSync, mkdtempSync, readFileSync, symlinkSync, writeFileSync} from 'node:fs';
+import {existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, symlinkSync, writeFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {dirname, join, resolve} from 'node:path';
 import {fileURLToPath, pathToFileURL} from 'node:url';
@@ -163,6 +165,110 @@ function compileLine({line, loadPaths, sourceKind, tarball}) {
   };
 }
 
+
+export const INCLUSION_ORDER_IDS = Object.freeze([
+  'current-only',
+  'legacy-only',
+  'current-then-legacy',
+  'legacy-then-current',
+]);
+
+export function orderPassed(order, facts) {
+  if (!facts) return false;
+  if (order === 'current-only') return facts.m3_present === true && facts.m2_present === false;
+  if (order === 'legacy-only') return facts.m2_present === true && facts.m3_present === false;
+  if (order === 'current-then-legacy') {
+    return facts.m3_present === true && facts.m2_present === true && facts.m3_index < facts.m2_index;
+  }
+  if (order === 'legacy-then-current') {
+    return facts.m3_present === true && facts.m2_present === true && facts.m2_index < facts.m3_index;
+  }
+  return false;
+}
+
+export function writeInclusionOrderAssertions(outputDir, line) {
+  if (line?.line !== 'main' || line?.source_kind !== 'workspace') {
+    throw new Error('inclusion-order assertions are only the fresh main workspace compile');
+  }
+  if (!Array.isArray(line.errors) || line.errors.length !== 0) {
+    throw new Error('refusing to emit inclusion-order assertions for a failed compile');
+  }
+  const orders = line.orders;
+  if (!orders || INCLUSION_ORDER_IDS.some(id => !orders[id]) || Object.keys(orders).length !== INCLUSION_ORDER_IDS.length) {
+    throw new Error('inclusion-order compile did not record exactly the four executed orders');
+  }
+  const written = [];
+  for (const id of INCLUSION_ORDER_IDS) {
+    if (!orderPassed(id, orders[id])) {
+      throw new Error(`refusing to emit a pass assertion for ${id}`);
+    }
+    const facts = orders[id];
+    const body = {
+      case_id: id,
+      result: 'pass',
+      kind: 'assertion',
+      line: 'main',
+      source_kind: 'workspace',
+      material_version: line.material_version,
+      bytes: facts.bytes,
+      m3_marker: facts.m3_marker,
+      m2_marker: facts.m2_marker,
+      m3_index: facts.m3_index,
+      m2_index: facts.m2_index,
+      m3_present: facts.m3_present,
+      m2_present: facts.m2_present,
+      g07_claim: 'not-passed',
+      not_executed: {
+        'nested-lazy-overlay': null,
+        'shared-style-boundary': null,
+        '21.x': null,
+      },
+    };
+    const name = `${id}.json`;
+    writeFileSync(join(outputDir, name), `${JSON.stringify(body, null, 2)}\n`);
+    written.push(name);
+  }
+  return written;
+}
+
+function assertionOutputDir() {
+  const names = ['RC_CHECK_ID', 'RC_RUN_ID', 'RC_INVOCATION_ID', 'RC_EVIDENCE_BINDING', 'RC_ASSERTION_OUTPUT_DIR'];
+  const present = names.filter(name => process.env[name]);
+  if (present.length === 0) return null;
+  if (present.length !== names.length || process.env.RC_CHECK_ID !== 'm3-coexistence') {
+    fail(2, 'm3-coexistence: incomplete coordinator environment');
+  }
+  const invocation = process.env.RC_INVOCATION_ID;
+  if (!/^[A-Za-z0-9][A-Za-z0-9_-]{0,191}$/.test(invocation)) {
+    fail(2, 'm3-coexistence: invalid invocation identity');
+  }
+  let binding;
+  try {
+    binding = JSON.parse(process.env.RC_EVIDENCE_BINDING);
+  } catch {
+    fail(2, 'm3-coexistence: RC_EVIDENCE_BINDING is not JSON');
+  }
+  if (!binding || typeof binding !== 'object' || Array.isArray(binding)) {
+    fail(2, 'm3-coexistence: binding is not an object');
+  }
+  if (binding.source_line === '21.x') return null;
+  if (binding.source_line !== 'main') fail(2, 'm3-coexistence: binding source line is not main');
+  const outputDir = process.env.RC_ASSERTION_OUTPUT_DIR;
+  let stat;
+  try {
+    stat = lstatSync(outputDir);
+  } catch {
+    fail(2, 'm3-coexistence: assertion output directory is missing');
+  }
+  if (!stat.isDirectory() || stat.isSymbolicLink()) {
+    fail(2, 'm3-coexistence: assertion output directory is not a real directory');
+  }
+  if (!outputDir.endsWith(join('evidence', 'm3-coexistence', invocation))) {
+    fail(2, 'm3-coexistence: assertion directory is not check-owned');
+  }
+  return outputDir;
+}
+
 function main(argv) {
   const args = parseArgs(argv);
   const workspaceModules = [
@@ -204,14 +310,30 @@ function main(argv) {
     g07_claim: 'not-passed',
     limitations: [
       'Both include orders compile and the theme markers follow that order.',
-      'Nested themes, lazy content, and body-level overlays are not executed.',
-      'Does not claim G07. The full-verify inclusion-order roster stays null.',
+      'Nested themes, lazy content, body-level overlays, and the shared style boundary are not executed.',
+      'Only a fresh main workspace compile of the four inclusion orders is rostered.',
+      '21.x inclusion-order, nested-lazy-overlay, and shared-style-boundary stay null.',
+      'Does not claim G07. Does not mark m3-coexistence accepted.',
     ],
   };
   mkdirSync(dirname(args.out), {recursive: true});
   writeFileSync(args.out, JSON.stringify(report, null, 2) + '\n');
+  let assertion_files = null;
+  const outputDir = assertionOutputDir();
+  if (outputDir) {
+    const mainLine = lines.find(line => line.line === 'main' && line.source_kind === 'workspace');
+    if (!mainLine) fail(2, 'm3-coexistence: main workspace compile did not run');
+    if (errors.length === 0) {
+      try {
+        assertion_files = writeInclusionOrderAssertions(outputDir, mainLine);
+      } catch (error) {
+        fail(1, error instanceof Error ? error.message : String(error));
+      }
+    }
+  }
   console.log(JSON.stringify({
     ok: errors.length === 0,
+    assertion_files,
     lines: lines.map(line => ({
       line: line.line,
       source_kind: line.source_kind,

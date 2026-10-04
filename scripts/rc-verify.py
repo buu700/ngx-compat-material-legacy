@@ -60,6 +60,7 @@ SCRIPT_CHECKS = {
     "scripts/build-migrate-legacy-cli.mjs": "migration-packaged",
     "scripts/migration-cli-isolation.mjs": "migration-packaged",
     "scripts/rc-test-legacy-family.mjs": "historical-legacy-artifact",
+    "scripts/check-m3-inclusion-order.mjs": "m3-coexistence",
 }
 
 
@@ -794,6 +795,28 @@ def main() -> int:
     )
     results["companion-computed-styles"] = "pass" if code == 0 else "fail"
     implemented_ran.append("companion-computed-styles")
+
+    # m3-coexistence: fresh workspace compile of the four main inclusion orders.
+    # The matrix implemented flag stays false. Null nested/lazy/overlay and
+    # shared-style groups, and every 21.x group, keep this check incomplete.
+    code = run_node(
+        "scripts/check-m3-inclusion-order.mjs",
+        ["--out", str(out_dir / "m3-inclusion-order-workspace.json")],
+    )
+    write_check_report(
+        out_dir,
+        run_id,
+        line,
+        "m3-coexistence",
+        exit_code=code,
+        limitations=[
+            "Workspace compile of the four main inclusion orders only.",
+            "Does not execute nested themes, lazy content, body-level overlays, or the shared style boundary.",
+            "21.x m3 groups stay null. Does not mark m3-coexistence accepted. Does not claim G07.",
+        ],
+    )
+    results["m3-coexistence"] = "pass" if code == 0 else "fail"
+    implemented_ran.append("m3-coexistence")
 
     # browser-matrix: Chromium dialog/select + overlay families (zoneful/zoneless) PR-slice; not the full matrix.
     code = run_node("scripts/run-browser-matrix-slice.mjs", ["--run", str(run_path)])
