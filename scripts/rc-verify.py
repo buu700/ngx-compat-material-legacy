@@ -755,7 +755,8 @@ def main() -> int:
         "sass-seal",
         exit_code=code,
         limitations=[
-            "Peer-aware packed facade compile, three sealed value fixtures, archived @material negative.",
+            "Peer-aware packed facade compile, three sealed value fixtures, archived @material negative, and the finite exact ordered-CSS fixtures.",
+            "Does not execute sass-api-and-values, isolation-negatives, unresolved strict CSS diffs, DOM, or 21.x.",
             "Does not close companion bridge computed styles or G06-G08.",
         ],
     )

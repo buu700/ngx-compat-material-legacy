@@ -5,8 +5,12 @@
  * Installs the identified tarball plus exact public peers in an isolated
  * consumer, compiles the packed facade allowing only declared @angular/material
  * (and @angular/cdk) public Sass, rejects archived @material/* and undeclared
- * workspace loads, runs the three sealed value fixtures, and proves a
- * forbidden-import negative.
+ * workspace loads, runs the three sealed value fixtures, compares the finite
+ * exact ordered-CSS fixtures, and proves a forbidden-import negative.
+ *
+ * The ordered-CSS roster is only the strict nonempty fixtures that match the
+ * sealed reference. It does not close sass-api-and-values, isolation-negatives,
+ * DOM, or 21.x, and it does not mark sass-seal accepted.
  *
  *   node scripts/sass-seal.mjs --tarball <path>
  *   node scripts/sass-seal.mjs --run <run.json>
@@ -18,6 +22,7 @@ import {spawnSync} from 'node:child_process';
 import {createRequire} from 'node:module';
 import {
   existsSync,
+  lstatSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
@@ -29,6 +34,7 @@ import {tmpdir} from 'node:os';
 import {dirname, join, relative, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {parseLegacyArgs, resolveLibraryFromRun, sha256File} from './resolve-run-library.mjs';
+import {ORDERED_CSS_FIXTURE_IDS, UNRESOLVED_STRICT_CSS, runOrderedCss, writeOrderedCssAssertions} from './sass-ordered-css.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const sealedPath = join(root, 'reference/material-16.2.14/sass-values/sass-value-report.json');
@@ -214,8 +220,52 @@ if (existsSync(valuesReportPath)) {
   valuesOk = valueComparisons.length > 0 && valueComparisons.every(c => c.debug_matches_sealed);
 }
 
+const orderedCss = runOrderedCss(consumer);
+const orderedCssOk = orderedCss.ok;
+
+
 const materialRequested = requested.some(isAllowed);
-const ok = compiled && !compileError && negativeRejected && valuesOk && materialRequested;
+const ok = compiled && !compileError && negativeRejected && valuesOk && orderedCssOk && materialRequested;
+
+
+function writeOrderedCssAssertionFiles(results) {
+  const names = ['RC_CHECK_ID', 'RC_RUN_ID', 'RC_INVOCATION_ID', 'RC_EVIDENCE_BINDING', 'RC_ASSERTION_OUTPUT_DIR'];
+  const present = names.filter(name => process.env[name]);
+  if (present.length === 0) return null;
+  if (present.length !== names.length || process.env.RC_CHECK_ID !== 'sass-seal') {
+    fail(2, 'sass-seal: incomplete coordinator environment');
+  }
+  const invocation = process.env.RC_INVOCATION_ID;
+  if (!/^[A-Za-z0-9][A-Za-z0-9_-]{0,191}$/.test(invocation)) {
+    fail(2, 'sass-seal: invalid invocation identity');
+  }
+  let binding;
+  try {
+    binding = JSON.parse(process.env.RC_EVIDENCE_BINDING);
+  } catch {
+    fail(2, 'sass-seal: RC_EVIDENCE_BINDING is not JSON');
+  }
+  if (!binding || typeof binding !== 'object' || Array.isArray(binding)) {
+    fail(2, 'sass-seal: binding is not an object');
+  }
+  if (binding.source_line === '21.x') return null;
+  if (binding.source_line !== 'main') fail(2, 'sass-seal: binding source line is not main');
+  const outputDir = process.env.RC_ASSERTION_OUTPUT_DIR;
+  let stat;
+  try {
+    stat = lstatSync(outputDir);
+  } catch {
+    fail(2, 'sass-seal: assertion output directory is missing');
+  }
+  if (!stat.isDirectory() || stat.isSymbolicLink()) {
+    fail(2, 'sass-seal: assertion output directory is not a real directory');
+  }
+  if (!outputDir.endsWith(join('evidence', 'sass-seal', invocation))) {
+    fail(2, 'sass-seal: assertion directory is not check-owned');
+  }
+  writeOrderedCssAssertions(outputDir, results);
+  return outputDir;
+}
 
 const report = {
   schema_version: 1,
@@ -242,21 +292,38 @@ const report = {
   sealed_values_match: valuesOk,
   values_runner_exit: valuesRun.status,
   result: ok ? 'pass' : 'fail',
+  ordered_css_case_ids: ORDERED_CSS_FIXTURE_IDS,
+  ordered_css_results: orderedCss.results,
+  ordered_css_exact: orderedCssOk,
+  ordered_css_compile_status: orderedCss.compile_status,
+  ordered_css_compare_status: orderedCss.compare_status,
+  ordered_css_compile_error: orderedCss.compile_error,
+  not_executed: {
+    'sass-api-and-values': null,
+    'isolation-negatives': null,
+    'ordered-css-dom-unresolved-strict': UNRESOLVED_STRICT_CSS,
+    '21.x': null,
+  },
   limitations: [
-    'Seals packed facade compile + three sealed value fixtures under exact public peers.',
+    'Seals packed facade compile, three sealed value fixtures, and the finite exact ordered-CSS fixtures under exact public peers.',
+    'Ordered CSS cases are only the strict nonempty fixtures that match the sealed reference. Unresolved strict diffs are not rostered and their expected CSS was not rewritten.',
+    'Does not execute sass-api-and-values, isolation-negatives, bridge-review fixtures, empty debug CSS, or DOM.',
     'Does not execute the thirteen companion bridge computed-style rows (G07).',
-    'Does not claim ordered CSS aggregate/M3 noninterference closure (G06–G08).',
-    'Does not claim G06–G08.',
+    '21.x sass-seal groups stay null. Does not mark sass-seal accepted. Does not claim G06–G08.',
   ],
 };
 
 mkdirSync(dirname(reportPath), {recursive: true});
 writeFileSync(reportPath, JSON.stringify(report, null, 2) + '\n');
+const assertionDir = writeOrderedCssAssertionFiles(orderedCss.results);
 console.log(JSON.stringify({
   ok,
   compiled,
   sealed_values_match: valuesOk,
+  ordered_css_exact: orderedCssOk,
+  ordered_css_cases: ORDERED_CSS_FIXTURE_IDS.length,
   negative_archived_material_rejected: negativeRejected,
+  assertion_dir: assertionDir,
   tarball_sha256: tarballSha,
 }, null, 2));
 
@@ -265,6 +332,7 @@ if (!ok) {
   if (!compiled) reasons.push(`compile failed: ${compileError}`);
   if (!negativeRejected) reasons.push('archived @material negative did not refuse');
   if (!valuesOk) reasons.push('sealed value fixtures did not match');
+  if (!orderedCssOk) reasons.push('ordered CSS fixtures did not match the sealed reference');
   if (!materialRequested) reasons.push('compile never requested @angular/material peer');
   fail(1, `sass-seal failed: ${reasons.join('; ')}`);
 }

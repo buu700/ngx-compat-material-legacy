@@ -83,6 +83,8 @@ CHECKS = (
     ["node", "--check", "scripts/compare-legacy-aggregate.mjs"],
     ["node", "--check", "scripts/compile-packed-sass.mjs"],
     ["node", "--check", "scripts/sass-seal.mjs"],
+    ["node", "--check", "scripts/sass-ordered-css.mjs"],
+    ["node", "scripts/sass-seal-regressions.mjs"],
     ["node", "--check", "scripts/run-browser-matrix-slice.mjs"],
     ["node", "--check", "scripts/browser-required-cells.mjs"],
     ["node", "--check", "scripts/browser-matrix-roster.mjs"],
