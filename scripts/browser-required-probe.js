@@ -217,12 +217,14 @@
       return;
     }
     if (family === 'dialog') {
-      lab.openDialog();
+      const opener = query('#p-dialog-open');
+      if (opener) opener.click();
       waitFor(() => query('mat-dialog-container #dialog-body'), 1500, node => finish(!!node, 'mat-dialog-container'));
       return;
     }
     if (family === 'menu') {
-      lab.openMenu();
+      const trigger = query('#p-menu-trigger');
+      if (trigger) trigger.click();
       waitFor(() => query('.mat-menu-panel #p-menu-item'), 1500, node => finish(!!node, 'mat-menu-panel'));
       return;
     }
@@ -246,7 +248,8 @@
       return;
     }
     if (family === 'snack-bar') {
-      lab.openSnack();
+      const opener = query('#p-snack');
+      if (opener) opener.click();
       waitFor(() => query('.mat-snack-bar-container'), 1500, node => finish(!!node, 'mat-snack-bar-container'));
       return;
     }
@@ -336,7 +339,8 @@
 
   function runFocused(family, _root, lab) {
     if (family === 'dialog') {
-      lab.openDialog();
+      const opener = query('#p-dialog-open');
+      if (opener) opener.click();
       waitFor(() => {
         const active = document.activeElement;
         if (!active || active.id === 'p-dialog-open') return null;
@@ -346,7 +350,8 @@
       return;
     }
     if (family === 'menu') {
-      lab.openMenu();
+      const trigger = query('#p-menu-trigger');
+      if (trigger) trigger.click();
       waitFor(() => query('.mat-menu-panel #p-menu-item'), 1500, node => {
         if (!node) {
           finish(false, 'menu item missing');
@@ -368,7 +373,8 @@
       return;
     }
     if (family === 'snack-bar') {
-      lab.openSnack();
+      const opener = query('#p-snack');
+      if (opener) opener.click();
       waitFor(() => query('.mat-snack-bar-container .mat-simple-snackbar-action button'), 1500, node => {
         if (!node) {
           finish(false, 'snack action missing');

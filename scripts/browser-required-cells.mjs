@@ -189,7 +189,7 @@ function labSource(zoneless) {
   const zoneImport = zoneless ? '' : "import 'zone.js';\n";
   const zoneNamed = zoneless ? ', provideZonelessChangeDetection' : '';
   const zoneProvider = zoneless ? 'provideZonelessChangeDetection(), ' : '';
-  return `${zoneImport}import {CSP_NONCE, ChangeDetectorRef, Component, Directive, Input, NgModule, NgZone, QueryList, ViewChild, ViewChildren, forwardRef, inject${zoneNamed}} from '@angular/core';
+  return `${zoneImport}import {CSP_NONCE, ChangeDetectorRef, Component, Directive, Input, NgModule, QueryList, ViewChild, ViewChildren, forwardRef, inject${zoneNamed}} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {AbstractControl, FormsModule, NG_VALIDATORS, ValidationErrors, Validator} from '@angular/forms';
@@ -249,7 +249,6 @@ export class LabRoot {
   private dialog = inject(MatLegacyDialog);
   private snack = inject(MatLegacySnackBar);
   private cdr = inject(ChangeDetectorRef);
-  private zone = inject(NgZone);
   cspOnly = typeof window !== 'undefined' && !!(window as unknown as {__cspOnly?: boolean}).__cspOnly;
   matcher = new LabMatcher();
   forceSliderInvalid = false;
@@ -266,14 +265,9 @@ export class LabRoot {
   @ViewChildren(MatLegacySelect, {read: ChangeDetectorRef}) selectDetectors!: QueryList<ChangeDetectorRef>;
   @ViewChildren(MatLegacyChipList, {read: ChangeDetectorRef}) chipDetectors!: QueryList<ChangeDetectorRef>;
   @ViewChildren(MatLegacyFormField, {read: ChangeDetectorRef}) fieldDetectors!: QueryList<ChangeDetectorRef>;
-  openDialog(): void { this.dialog.open(DialogBody); this.cdr.detectChanges(); }
-  openMenu(): void {
-    this.zone.run(() => {
-      this.menuTrigger.openMenu();
-      this.cdr.detectChanges();
-    });
-  }
-  openSnack(): void { this.snack.open('Saved', 'OK'); this.cdr.detectChanges(); }
+  openDialog(): void { this.dialog.open(DialogBody); }
+  openMenu(): void { this.menuTrigger.openMenu(); }
+  openSnack(): void { this.snack.open('Saved', 'OK'); }
   ngAfterViewInit(): void {
     const lab = this;
     (window as unknown as {__lab: unknown}).__lab = {
@@ -289,14 +283,13 @@ export class LabRoot {
       },
       openDialog() { lab.openDialog(); },
       openMenu() { lab.openMenu(); },
-      openAuto() { lab.autoTrigger.openPanel(); lab.cdr.detectChanges(); },
-      showTip() { lab.tip.show(0); lab.cdr.detectChanges(); },
-      showTipOff() { lab.tipOff.show(0); lab.cdr.detectChanges(); },
+      openAuto() { lab.autoTrigger.openPanel(); },
+      showTip() { lab.tip.show(0); },
+      showTipOff() { lab.tipOff.show(0); },
       openSnack() { lab.openSnack(); },
       selectSecondTab() {
         const label = document.querySelectorAll('#wrap-tabs .mat-tab-label')[1] as HTMLElement | undefined;
         if (label) label.click();
-        lab.cdr.detectChanges();
       },
       setInvalid(on: boolean) {
         lab.matcher.on = on;
