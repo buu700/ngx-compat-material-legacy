@@ -122,6 +122,7 @@ CHECKS = (
     ["node", "--check", "scripts/run-legacy-artifact-suite.mjs"],
     ["node", "scripts/fresh-artifact-negative-tests.mjs"],
     ["node", "--experimental-strip-types", "tests/motion/host-motion-event.test.mjs"],
+    ["node", "scripts/motion-smoke-regressions.mjs"],
     ["python3", "scripts/check-workflow-pins.py", "."],
     ["python3", "scripts/check-toolchain.py", "--root", "."],
     ["python3", "scripts/check-toolchain.py", "--root", ".", "--runtime", "--release"],
