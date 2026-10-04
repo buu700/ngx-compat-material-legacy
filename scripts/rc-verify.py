@@ -62,6 +62,7 @@ SCRIPT_CHECKS = {
     "scripts/rc-test-legacy-family.mjs": "historical-legacy-artifact",
     "scripts/check-m3-inclusion-order.mjs": "m3-coexistence",
     "scripts/check-consumer-floors.mjs": "consumer-floors",
+    "scripts/check-release-metadata.mjs": "release-metadata",
 }
 
 
@@ -973,6 +974,28 @@ def main() -> int:
     )
     results["consumer-floors"] = "pass" if code == 0 else "fail"
     implemented_ran.append("consumer-floors")
+
+    # release-metadata: declared name/version/license/provenance only.
+    # The matrix implemented flag stays false. 21.x groups stay null, so this
+    # slice is not acceptance and does not claim G01 or G13.
+    code = run_node(
+        "scripts/check-release-metadata.mjs",
+        ["--out", str(out_dir / "release-metadata-workspace.json")],
+    )
+    write_check_report(
+        out_dir,
+        run_id,
+        line,
+        "release-metadata",
+        exit_code=code,
+        limitations=[
+            "Compares declared library and migrate-cli name, version, and license fields, plus the existing provenance file.",
+            "instructions-provenance rosters only provenance fields that were compared. No instruction file was compared.",
+            "21.x release-metadata groups stay null. Does not mark release-metadata accepted. Does not claim G01 or G13.",
+        ],
+    )
+    results["release-metadata"] = "pass" if code == 0 else "fail"
+    implemented_ran.append("release-metadata")
 
     missing: list[str] = []
     failed: list[str] = []
