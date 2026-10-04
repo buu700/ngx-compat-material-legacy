@@ -59,6 +59,7 @@ SCRIPT_CHECKS = {
     "scripts/csp-ssr-acceptance.mjs": "csp-ssr",
     "scripts/build-migrate-legacy-cli.mjs": "migration-packaged",
     "scripts/migration-cli-isolation.mjs": "migration-packaged",
+    "scripts/check-old-workspace-cli.mjs": "migration-packaged",
     "scripts/rc-test-legacy-family.mjs": "historical-legacy-artifact",
     "scripts/check-m3-inclusion-order.mjs": "m3-coexistence",
     "scripts/check-consumer-floors.mjs": "consumer-floors",
@@ -745,10 +746,16 @@ def main() -> int:
     results["engine-free-consumer"] = "pass" if code == 0 else "fail"
     implemented_ran.append("engine-free-consumer")
 
-    # migration-packaged: committed peer-light CLI artifact verify + isolation.
+    # migration-packaged: CLI artifact verify, isolation, and the temp old workspace.
+    # old-workspace-cli is the only executed group. The other groups and every
+    # 21.x migration group stay null, so this slice does not claim G04 or G05.
     code_verify = run_node("scripts/build-migrate-legacy-cli.mjs", ["--verify"])
     code_iso = run_node("scripts/migration-cli-isolation.mjs", [])
-    code = 0 if code_verify == 0 and code_iso == 0 else (code_verify or code_iso or 1)
+    code_workspace = run_node(
+        "scripts/check-old-workspace-cli.mjs",
+        ["--out", str(out_dir / "old-workspace-cli.json")],
+    )
+    code = 0 if code_verify == 0 and code_iso == 0 and code_workspace == 0 else (code_verify or code_iso or code_workspace or 1)
     write_check_report(
         out_dir,
         run_id,
@@ -756,9 +763,10 @@ def main() -> int:
         "migration-packaged",
         exit_code=code,
         limitations=[
-            "Checks the committed migrate-legacy CLI tarball identity and isolation.",
-            "CLI identity is the committed migration/dist tarball; draft run.json records it as migrate-cli when present.",
-            "Schematic runner / old-workspace migration fixtures remain separate.",
+            "Checks the committed migrate-legacy CLI tarball identity and isolation. That tarball is not old-workspace-cli acceptance.",
+            "old-workspace-cli runs node on migration/dist/package/bin/migrate-legacy.js in a temp workspace installed from the sealed Material 16.2.14 environment.",
+            "Only fixture rewrites the CLI applied are rostered. packaged-schematic, transaction-negatives, and frontend-parity stay null.",
+            "Every 21.x migration group stays null. Does not claim G04 or G05.",
         ],
     )
     results["migration-packaged"] = "pass" if code == 0 else "fail"

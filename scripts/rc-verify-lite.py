@@ -72,6 +72,7 @@ CHECKS = (
     ["node", "--check", "scripts/trace-owned-helpers.mjs"],
     ["node", "--check", "scripts/engine-free-consumer.mjs"],
     ["node", "--check", "scripts/migration-cli-isolation.mjs"],
+    ["node", "--check", "scripts/check-old-workspace-cli.mjs"],
     ["node", "--check", "scripts/migration-transaction.mjs"],
     ["node", "--check", "scripts/migration-schematic-runner.mjs"],
     ["node", "--check", "scripts/inventory-sass-facade.mjs"],
