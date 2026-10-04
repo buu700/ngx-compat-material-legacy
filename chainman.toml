@@ -9,6 +9,9 @@ name = "ngx-compat-material-legacy"
 default_profile = "default"
 
 [profiles.default]
+# The official Node tarball needs the host dynamic linker. Container mode
+# cannot execute it, so RC tasks use the host Nix mode that can.
+allowed_modes = ["host-nix"]
 flake = "flake.nix#default"
 
 [setup.javascript]
@@ -28,3 +31,11 @@ artifacts = ["node_modules/.modules.yaml"]
 
 [tasks.toolchain]
 commands = [["node", "-v"], ["pnpm", "-v"]]
+
+[tasks.verify]
+setup = ["javascript"]
+commands = [["python3", "scripts/rc-verify.py"]]
+
+[tasks.pack-draft]
+setup = ["javascript"]
+commands = [["node", "scripts/pack-draft-run.mjs"]]

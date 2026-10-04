@@ -7,8 +7,9 @@
  * Always pass projects/ngx-material-legacy/tsconfig.lib.json.
  *
  * Usage:
- *   node scripts/pack-library.mjs [--out compatibility/pack-proof]
- * No npm publish.
+ *   node scripts/pack-library.mjs [--out compatibility/pack-proof] [--line main|21.x]
+ * No npm publish. The ng-packagr invocation stays the 21.x project tsconfig;
+ * --line and npm pack --json only name the run. They do not change the toolchain.
  */
 import {spawnSync} from 'node:child_process';
 import {cpSync, existsSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
@@ -21,9 +22,36 @@ const project = join(root, 'projects/ngx-material-legacy/ng-package.json');
 const tsconfig = join(root, 'projects/ngx-material-legacy/tsconfig.lib.json');
 const dist = join(root, 'dist/ngx-material-legacy');
 
-const args = process.argv.slice(2);
-const outIdx = args.indexOf('--out');
-const outDir = resolve(root, outIdx >= 0 ? args[outIdx + 1] : 'compatibility/pack-proof');
+function parseArgs(argv) {
+  let outDir = 'compatibility/pack-proof';
+  let line = null;
+  for (let i = 0; i < argv.length; i += 1) {
+    const arg = argv[i];
+    if (arg === '--out') {
+      const value = argv[i + 1];
+      if (!value || value.startsWith('-')) {
+        console.error('--out requires a directory');
+        process.exit(2);
+      }
+      outDir = value;
+      i += 1;
+    } else if (arg === '--line') {
+      const value = argv[i + 1];
+      if (value !== 'main' && value !== '21.x') {
+        console.error('--line must be main or 21.x');
+        process.exit(2);
+      }
+      line = value;
+      i += 1;
+    } else {
+      console.error(`Unknown argument: ${arg}`);
+      process.exit(2);
+    }
+  }
+  return {outDir: resolve(root, outDir), line};
+}
+
+const {outDir, line} = parseArgs(process.argv.slice(2));
 
 function run(cmd, cmdline, opts = {}) {
   const res = spawnSync(cmd, cmdline, {stdio: 'inherit', cwd: root, ...opts});
@@ -48,9 +76,34 @@ const pkg = JSON.parse(readFileSync(join(dist, 'package.json'), 'utf8'));
 const version = pkg.version;
 mkdirSync(outDir, {recursive: true});
 
-run('npm', ['pack', dist, '--pack-destination', outDir]);
+function npmPack(packageDir, destination) {
+  const res = spawnSync(
+    'npm',
+    ['pack', packageDir, '--json', '--pack-destination', destination],
+    {cwd: root, encoding: 'utf8'},
+  );
+  if (res.status !== 0) {
+    console.error(res.stderr || res.stdout);
+    process.exit(res.status ?? 1);
+  }
+  let parsed;
+  try {
+    parsed = JSON.parse(res.stdout);
+  } catch {
+    console.error('npm pack --json did not return JSON');
+    console.error(res.stdout);
+    process.exit(1);
+  }
+  const entries = Array.isArray(parsed) ? parsed : [parsed];
+  if (entries.length !== 1 || typeof entries[0]?.filename !== 'string') {
+    console.error(`npm pack --json returned ${entries.length} entries; expected one tarball`);
+    process.exit(1);
+  }
+  return entries[0];
+}
 
-const tarballName = `${pkg.name.replace('@', '').replace('/', '-')}-${version}.tgz`;
+const packed = npmPack(dist, outDir);
+const tarballName = packed.filename;
 const tarballPath = join(outDir, tarballName);
 if (!existsSync(tarballPath)) {
   console.error(`Expected tarball missing: ${tarballPath}`);
@@ -63,8 +116,9 @@ const meta = {
   package: `${pkg.name}@${version}`,
   tarball: tarballName,
   sha256: sha,
+  line,
   tsconfig: 'projects/ngx-material-legacy/tsconfig.lib.json',
-  note: 'Built via scripts/pack-library.mjs (explicit -c). No npm publish.',
+  note: 'Built via scripts/pack-library.mjs (explicit -c, npm pack --json). No npm publish. --line records the requested line and does not select another toolchain.',
 };
 writeFileSync(join(outDir, 'pack-meta.json'), JSON.stringify(meta, null, 2) + '\n');
-console.log(`Packed ${tarballName} sha256=${sha}`);
+console.log(`Packed ${tarballName} sha256=${sha} line=${line ?? 'unset'}`);

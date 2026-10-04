@@ -95,3 +95,83 @@ jobs:
       - name: Packed-consumer AOT + harness smoke
         run: node scripts/packed-consumer-aot-smoke.mjs
 
+
+  full-acceptance:
+    name: Full acceptance coordinator
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Install pinned Nix
+        uses: DeterminateSystems/nix-installer-action@3138316df39ed29be04236d7ffc686fa525866aa # v23
+
+      - name: Install pinned just 1.46.0
+        run: |
+          set -euo pipefail
+          curl -fsSL -o /tmp/just.tar.gz https://github.com/casey/just/releases/download/1.46.0/just-1.46.0-x86_64-unknown-linux-musl.tar.gz
+          echo "79966e6e353f535ee7d1c6221641bcc8e3381c55b0d0a6dc6e54b34f9db36eaa  /tmp/just.tar.gz" | sha256sum -c
+          tar -xzf /tmp/just.tar.gz -C /tmp just
+          sudo mv /tmp/just /usr/local/bin/just
+          just --version
+
+      - name: Set up JavaScript toolchain
+        run: just chainman setup javascript
+
+      - name: Install Chromium, Firefox, and WebKitGTK
+        run: |
+          set -euo pipefail
+          sudo install -d -m 0755 /etc/apt/keyrings
+          wget -q https://packages.mozilla.org/apt/repo-signing-key.gpg -O- | sudo tee /etc/apt/keyrings/packages.mozilla.org.asc > /dev/null
+          echo "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main" | sudo tee /etc/apt/sources.list.d/mozilla.list > /dev/null
+          printf 'Package: *\nPin: origin packages.mozilla.org\nPin-Priority: 1000\n' | sudo tee /etc/apt/preferences.d/mozilla > /dev/null
+          sudo apt-get update
+          sudo apt-get install -y chromium-browser || sudo apt-get install -y chromium || true
+          sudo apt-get install -y firefox
+          sudo apt-get install -y python3-gi gir1.2-gtk-3.0 gir1.2-webkit2-4.1 xvfb bubblewrap xdg-dbus-proxy gsettings-desktop-schemas
+          command -v bwrap
+          firefox --version
+          python3 -c 'import gi; gi.require_version("WebKit2", "4.1"); from gi.repository import WebKit2; print("webkitgtk", WebKit2.get_major_version(), WebKit2.get_minor_version(), WebKit2.get_micro_version())'
+          Xvfb :99 -screen 0 1280x900x24 >/tmp/xvfb.log 2>&1 &
+          echo "DISPLAY=:99" >> "$GITHUB_ENV"
+          echo "FIREFOX_BIN=$(command -v firefox)" >> "$GITHUB_ENV"
+          CHROME_BIN="$(command -v chromium-browser || command -v chromium || command -v google-chrome || true)"
+          test -n "$CHROME_BIN"
+          test -x "$CHROME_BIN"
+          echo "CHROME_BIN=$CHROME_BIN" >> "$GITHUB_ENV"
+
+      - name: Run the full verifier
+        id: verify
+        run: |
+          set -euo pipefail
+          RUN="artifacts/21.x/closure-${GITHUB_SHA}-${GITHUB_RUN_ID}"
+          test ! -e "$RUN"
+          set +e
+          just verify --out "$RUN" --line 21.x
+          code=$?
+          set -e
+          printf 'full verify exit: %s\n' "$code"
+          echo "run_dir=$RUN" >> "$GITHUB_OUTPUT"
+          if [ -f "$RUN/verify-summary.json" ]; then
+            python3 -c 'import json,sys; s=json.load(open(sys.argv[1])); c=s.get("completeness") or {}; print("complete_checks:", ", ".join(c.get("complete_checks") or [])); print("automatic_product_result:", c.get("automatic_product_result")); inc=c.get("incomplete_checks") or {}; print("incomplete_count:", len(inc)); [print("incomplete", i, (r or [""])[0]) for i,r in list(inc.items())[:8]]' "$RUN/verify-summary.json" || true
+          fi
+          # Distinct full-acceptance lane. A nonzero verifier exit stays the job result.
+          # That result is incompleteness, not release success.
+          exit "$code"
+
+      - name: Index the full-verifier closure
+        id: closure
+        if: always() && steps.verify.outputs.run_dir != ''
+        run: python3 scripts/archive_run_closure.py --write "${{ steps.verify.outputs.run_dir }}"
+
+      - name: Upload full-verifier evidence
+        if: always() && steps.closure.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: closure-${{ github.sha }}-${{ github.run_id }}
+          path: ${{ steps.verify.outputs.run_dir }}
+          if-no-files-found: error
+          retention-days: 14
