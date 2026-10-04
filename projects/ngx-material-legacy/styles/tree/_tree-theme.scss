@@ -6,7 +6,51 @@
 @use '../core/typography/typography-utils';
 @use './tree-variables';
 
+@mixin _m2-color($config-or-theme) {
+  $config: theming.get-color-config($config-or-theme);
+  $background: map.get($config, background);
+  $foreground: map.get($config, foreground);
+
+  .mat-tree {
+    background: theming.get-color-from-palette($background, 'card');
+  }
+
+  .mat-tree-node,
+  .mat-nested-tree-node {
+    color: theming.get-color-from-palette($foreground, text);
+  }
+}
+
+@mixin _m2-typography($config-or-theme) {
+  $config: typography.private-typography-to-2014-config(
+      theming.get-typography-config($config-or-theme));
+  .mat-tree {
+    font-family: typography-utils.font-family($config);
+  }
+
+  .mat-tree-node,
+  .mat-nested-tree-node {
+    font-weight: typography-utils.font-weight($config, body-1);
+    font-size: typography-utils.font-size($config, body-1);
+  }
+}
+
+@mixin _m2-density($config-or-theme) {
+  $density-scale: theming.get-density-config($config-or-theme);
+  $height: compatibility.private-density-prop-value(tree-variables.$density-config,
+    $density-scale, height);
+
+  @include compatibility.private-density-legacy-compatibility() {
+    .mat-tree-node {
+      min-height: $height;
+    }
+  }
+}
+
 @mixin color($config-or-theme) {
+  // 16.2.14 color rules, then the companion bridge. The bridge re-emits
+  // historical declarations, so it stays a separate insertion.
+  @include _m2-color($config-or-theme);
   @include bridges.tree((
     color: theming.get-color-config($config-or-theme),
     typography: null,
@@ -14,8 +58,10 @@
   ));
 }
 
-
 @mixin typography($config-or-theme) {
+  // 16.2.14 typography rules, then the companion bridge. The bridge re-emits
+  // historical declarations, so it stays a separate insertion.
+  @include _m2-typography($config-or-theme);
   @include bridges.tree((
     color: null,
     typography: theming.get-typography-config($config-or-theme),
@@ -23,8 +69,10 @@
   ));
 }
 
-
 @mixin density($config-or-theme) {
+  // 16.2.14 density rules, then the companion bridge. The bridge re-emits
+  // historical declarations, so it stays a separate insertion.
+  @include _m2-density($config-or-theme);
   @include bridges.tree((
     color: null,
     typography: null,
@@ -32,12 +80,23 @@
   ));
 }
 
-
 @mixin theme($theme-or-color-config) {
   $theme: theming.private-legacy-get-theme($theme-or-color-config);
   @include theming.private-check-duplicate-theme-styles($theme, 'mat-tree') {
+    $color: theming.get-color-config($theme);
+    $density: theming.get-density-config($theme);
+    $typography: theming.get-typography-config($theme);
+
+    @if $color != null {
+      @include _m2-color($color);
+    }
+    @if $density != null {
+      @include _m2-density($density);
+    }
+    @if $typography != null {
+      @include _m2-typography($typography);
+    }
+    // Companion bridge stays. Its rules follow the 16.2.14 rules.
     @include bridges.tree($theme);
   }
 }
-
-

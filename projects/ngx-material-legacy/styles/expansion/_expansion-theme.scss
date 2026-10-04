@@ -5,7 +5,38 @@
 @use '../core/tokens/token-utils';
 @use '../core/tokens/m2/mat/expansion' as tokens-mat-expansion;
 
+@mixin _m2-color($config-or-theme) {
+  $config: theming.get-color-config($config-or-theme);
+
+  @include sass-utils.current-selector-or-root() {
+    @include token-utils.create-token-values(tokens-mat-expansion.$prefix,
+      tokens-mat-expansion.get-color-tokens($config));
+  }
+}
+
+@mixin _m2-typography($config-or-theme) {
+  $config: typography.private-typography-to-2014-config(
+      theming.get-typography-config($config-or-theme));
+
+  @include sass-utils.current-selector-or-root() {
+    @include token-utils.create-token-values(tokens-mat-expansion.$prefix,
+      tokens-mat-expansion.get-typography-tokens($config));
+  }
+}
+
+@mixin _m2-density($config-or-theme) {
+  $density-scale: theming.get-density-config($config-or-theme);
+
+  @include sass-utils.current-selector-or-root() {
+    @include token-utils.create-token-values(tokens-mat-expansion.$prefix,
+      tokens-mat-expansion.get-density-tokens($density-scale));
+  }
+}
+
 @mixin color($config-or-theme) {
+  // 16.2.14 color rules, then the companion bridge. The bridge re-emits
+  // historical declarations, so it stays a separate insertion.
+  @include _m2-color($config-or-theme);
   @include bridges.expansion((
     color: theming.get-color-config($config-or-theme),
     typography: null,
@@ -13,8 +44,10 @@
   ));
 }
 
-
 @mixin typography($config-or-theme) {
+  // 16.2.14 typography rules, then the companion bridge. The bridge re-emits
+  // historical declarations, so it stays a separate insertion.
+  @include _m2-typography($config-or-theme);
   @include bridges.expansion((
     color: null,
     typography: theming.get-typography-config($config-or-theme),
@@ -22,8 +55,10 @@
   ));
 }
 
-
 @mixin density($config-or-theme) {
+  // 16.2.14 density rules, then the companion bridge. The bridge re-emits
+  // historical declarations, so it stays a separate insertion.
+  @include _m2-density($config-or-theme);
   @include bridges.expansion((
     color: null,
     typography: null,
@@ -31,11 +66,23 @@
   ));
 }
 
-
 @mixin theme($theme-or-color-config) {
   $theme: theming.private-legacy-get-theme($theme-or-color-config);
   @include theming.private-check-duplicate-theme-styles($theme, 'mat-expansion') {
+    $color: theming.get-color-config($theme);
+    $density: theming.get-density-config($theme);
+    $typography: theming.get-typography-config($theme);
+
+    @if $color != null {
+      @include _m2-color($color);
+    }
+    @if $density != null {
+      @include _m2-density($density);
+    }
+    @if $typography != null {
+      @include _m2-typography($typography);
+    }
+    // Companion bridge stays. Its rules follow the 16.2.14 rules.
     @include bridges.expansion($theme);
   }
 }
-
