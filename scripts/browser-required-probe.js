@@ -235,12 +235,23 @@
       return;
     }
     if (family === 'autocomplete') {
-      lab.openAuto();
+      const input = query('#p-auto');
+      if (input) {
+        input.focus();
+        input.dispatchEvent(new FocusEvent('focus', {bubbles: false}));
+        input.value = 'A';
+        input.dispatchEvent(new InputEvent('input', {bubbles: true, data: 'A'}));
+        input.dispatchEvent(new KeyboardEvent('keydown', {key: 'ArrowDown', bubbles: true}));
+      }
       waitFor(() => query('.mat-autocomplete-panel'), 1500, node => finish(!!node, 'mat-autocomplete-panel'));
       return;
     }
     if (family === 'tooltip') {
-      lab.showTip();
+      const button = query('#p-tooltip');
+      if (button) {
+        button.focus();
+        button.dispatchEvent(new MouseEvent('mouseenter', {bubbles: true}));
+      }
       waitFor(() => {
         const tip = query('.mat-tooltip');
         return tip && (tip.textContent || '').includes('Hello tip') ? tip : null;
@@ -282,7 +293,11 @@
       tabs: '#wrap-tabs .mat-tab-disabled',
     };
     if (family === 'tooltip') {
-      window.__lab.showTipOff();
+      const button = query('#p-tooltip-off');
+      if (button) {
+        button.focus();
+        button.dispatchEvent(new MouseEvent('mouseenter', {bubbles: true}));
+      }
       waitFor(() => true, 200, () => {
         const tip = query('.mat-tooltip');
         const text = tip ? tip.textContent || '' : '';

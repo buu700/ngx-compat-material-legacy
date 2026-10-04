@@ -127,7 +127,7 @@ for (const zoneless of [false, true]) {
   expect(`${zoneless ? 'zoneless' : 'zoneful'} peer bypass`, !defects.includes('candidate sets legacy-peer-deps=true'));
   expect(`${zoneless ? 'zoneless' : 'zoneful'} skipLibCheck`, !defects.includes('candidate sets skipLibCheck'));
   expect(`${zoneless ? 'zoneless' : 'zoneful'} detectChanges gone`, !defects.includes('candidate drives operations with detectChanges()'));
-  expect(`${zoneless ? 'zoneless' : 'zoneful'} api overlay`, defects.includes('candidate opens overlays through the component API'));
+  expect(`${zoneless ? 'zoneless' : 'zoneful'} api overlay gone`, !defects.includes('candidate opens overlays through the component API'));
   expect(`${zoneless ? 'zoneless' : 'zoneful'} matches fixture scan`, JSON.stringify(defects) === JSON.stringify(liveDefects));
 }
 const opened = candidateQualificationDefects({
@@ -148,13 +148,14 @@ expect('peer bypass still blocks', stillClosed.includes('candidate sets legacy-p
 expect('skipLibCheck still blocks', stillClosed.includes('candidate sets skipLibCheck'));
 expect('detectChanges still blocks', stillClosed.includes('candidate drives operations with detectChanges()'));
 
-const blocked = qualifyRelease({
+expect('live fixture has no qualification defects', liveDefects.length === 0);
+const cleared = qualifyRelease({
   expectedIds: roster.ids,
   outcomes: goodOutcomes,
   defects: liveDefects,
 });
-expect('live defects block complete coverage', blocked.coverage === 'incomplete' && blocked.accepted === false);
-expect('live defects are recorded', JSON.stringify(blocked.qualification_defects) === JSON.stringify(liveDefects));
+expect('cleared fixture does not block coverage', cleared.coverage === 'complete' && cleared.accepted === true);
+expect('cleared defects are recorded', JSON.stringify(cleared.qualification_defects) === JSON.stringify(liveDefects));
 
 const unrun = qualifyRelease({expectedIds: roster.ids, outcomes: [], defects: []});
 expect('failed launch discovers nothing', unrun.discovered_case_ids.length === 0);
