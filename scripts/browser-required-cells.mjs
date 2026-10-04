@@ -425,7 +425,6 @@ function parseArgs(argv) {
 /** Install inputs buildConsumer writes. Qualification reads this object, not a parallel copy. */
 export function candidateInstallSpec(versions, zoneless) {
   const dependencies = {
-    '@angular/animations': versions.core,
     '@angular/cdk': versions.cdk,
     '@angular/common': versions.core,
     '@angular/compiler': versions.core,
@@ -448,7 +447,7 @@ export function candidateInstallSpec(versions, zoneless) {
       moduleResolution: 'bundler',
       experimentalDecorators: true,
       strict: true,
-      skipLibCheck: true,
+      skipLibCheck: false,
       lib: ['ES2022', 'DOM'],
       rootDir: 'src',
       outDir: 'out',
@@ -460,7 +459,7 @@ export function candidateInstallSpec(versions, zoneless) {
   if (Number(String(versions.typescript).split('.')[0]) >= 6) tsconfig.compilerOptions.ignoreDeprecations = '6.0';
   return {
     dependencies,
-    npmrc: 'install-links=true\nfund=false\naudit=false\nlegacy-peer-deps=true\n',
+    npmrc: 'install-links=true\nfund=false\naudit=false\n',
     tsconfig,
     labSource: labSource(zoneless),
     themeSource: themeSource(),
@@ -502,11 +501,20 @@ export function fixtureQualificationDefectsFromTarball(tarball) {
   return fixtureQualificationDefects(readPackedPackage(tarball));
 }
 
-async function buildConsumer(tarball, zoneless) {
+export async function buildConsumer(tarball, zoneless) {
   const versions = versionsFor(readPackedPackage(tarball));
   const spec = candidateInstallSpec(versions, zoneless);
   const stamp = createHash('sha256')
-    .update(JSON.stringify(versions) + spec.labSource + spec.themeSource + readFileSync(probePath, 'utf8') + (zoneless ? 'z' : 's'))
+    .update(JSON.stringify({
+      versions,
+      dependencies: spec.dependencies,
+      npmrc: spec.npmrc,
+      tsconfig: spec.tsconfig,
+      labSource: spec.labSource,
+      themeSource: spec.themeSource,
+      probe: readFileSync(probePath, 'utf8'),
+      zoneless,
+    }))
     .digest('hex')
     .slice(0, 12);
   const tarballSha = sha256File(tarball).slice(0, 12);

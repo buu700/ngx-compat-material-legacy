@@ -123,9 +123,9 @@ const liveDefects = fixtureQualificationDefects(null);
 for (const zoneless of [false, true]) {
   const spec = candidateInstallSpec(versions, zoneless);
   const defects = candidateQualificationDefects(spec);
-  expect(`${zoneless ? 'zoneless' : 'zoneful'} animations`, defects.includes('candidate installs @angular/animations'));
-  expect(`${zoneless ? 'zoneless' : 'zoneful'} peer bypass`, defects.includes('candidate sets legacy-peer-deps=true'));
-  expect(`${zoneless ? 'zoneless' : 'zoneful'} skipLibCheck`, defects.includes('candidate sets skipLibCheck'));
+  expect(`${zoneless ? 'zoneless' : 'zoneful'} animations`, !defects.includes('candidate installs @angular/animations'));
+  expect(`${zoneless ? 'zoneless' : 'zoneful'} peer bypass`, !defects.includes('candidate sets legacy-peer-deps=true'));
+  expect(`${zoneless ? 'zoneless' : 'zoneful'} skipLibCheck`, !defects.includes('candidate sets skipLibCheck'));
   expect(`${zoneless ? 'zoneless' : 'zoneful'} detectChanges`, defects.includes('candidate drives operations with detectChanges()'));
   expect(`${zoneless ? 'zoneless' : 'zoneful'} matches fixture scan`, JSON.stringify(defects) === JSON.stringify(liveDefects));
 }
@@ -136,6 +136,16 @@ const opened = candidateQualificationDefects({
   labSource: 'openDialog(): void { this.dialog.open(DialogBody); }\n',
 });
 expect('guard opens when the fixture assumptions are gone', opened.length === 0);
+const stillClosed = candidateQualificationDefects({
+  dependencies: {'@angular/animations': versions.core},
+  npmrc: 'legacy-peer-deps=true\n',
+  tsconfig: {compilerOptions: {skipLibCheck: true}},
+  labSource: 'this.cdr.detectChanges();\n',
+});
+expect('engine install still blocks', stillClosed.includes('candidate installs @angular/animations'));
+expect('peer bypass still blocks', stillClosed.includes('candidate sets legacy-peer-deps=true'));
+expect('skipLibCheck still blocks', stillClosed.includes('candidate sets skipLibCheck'));
+expect('detectChanges still blocks', stillClosed.includes('candidate drives operations with detectChanges()'));
 
 const blocked = qualifyRelease({
   expectedIds: roster.ids,
