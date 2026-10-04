@@ -29,6 +29,7 @@ from rc_acceptance import (
     validate_matrix, checked_file, sha256_file as evidence_sha256,
     assertion_directory, prepack_binding_for,
 )
+from archive_run_closure import ClosureError, write_closure
 
 ROOT = Path(__file__).resolve().parents[1]
 MATRIX_PATH = ROOT / "compatibility/rc/matrices/full-verify.json"
@@ -1007,6 +1008,12 @@ def main() -> int:
         ],
     }
     (out_dir / "verify-summary.json").write_text(json.dumps(summary, indent=2) + "\n")
+    archive_error = ''
+    try:
+        write_closure(out_dir)
+    except ClosureError as error:
+        archive_error = str(error)
+        print(f'verify: {archive_error}', file=sys.stderr)
 
     print("verify: implemented checks:", ", ".join(implemented_ran))
     if missing:
@@ -1023,7 +1030,7 @@ def main() -> int:
 
     for cid, reasons in completeness['incomplete_checks'].items():
         print(f"verify: incomplete {cid}: {reasons[0]}")
-    if missing or failed or completeness['automatic_product_result'] != 'pass':
+    if archive_error or missing or failed or completeness['automatic_product_result'] != 'pass':
         return 2
     print('verify: automatic prerequisites complete; independent review and release admission remain pending')
     return 0

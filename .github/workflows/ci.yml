@@ -236,30 +236,16 @@ jobs:
           # That result is incompleteness, not release success.
           exit "$code"
 
-      - name: Upload full-verifier evidence
+      - name: Index the full-verifier closure
+        id: closure
         if: always() && steps.verify.outputs.run_dir != ''
+        run: python3 scripts/archive_run_closure.py --write "${{ steps.verify.outputs.run_dir }}"
+
+      - name: Upload full-verifier evidence
+        if: always() && steps.closure.outcome == 'success'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: closure-${{ github.sha }}-${{ github.run_id }}
-          path: |
-            ${{ steps.verify.outputs.run_dir }}/verify-summary.json
-            ${{ steps.verify.outputs.run_dir }}/reports/packed-exports.json
-            ${{ steps.verify.outputs.run_dir }}/evidence/packed-exports
-            ${{ steps.verify.outputs.run_dir }}/reports/pack-library.json
-            ${{ steps.verify.outputs.run_dir }}/evidence/pack-library
-            ${{ steps.verify.outputs.run_dir }}/reports/packed-consumer.json
-            ${{ steps.verify.outputs.run_dir }}/evidence/packed-consumer
-            ${{ steps.verify.outputs.run_dir }}/reports/engine-free-consumer.json
-            ${{ steps.verify.outputs.run_dir }}/evidence/engine-free-consumer
-            ${{ steps.verify.outputs.run_dir }}/reports/upstream-audit-disposition.json
-            ${{ steps.verify.outputs.run_dir }}/evidence/upstream-audit-disposition
-            ${{ steps.verify.outputs.run_dir }}/reports/source-policy.json
-            ${{ steps.verify.outputs.run_dir }}/evidence/source-policy
-            ${{ steps.verify.outputs.run_dir }}/reports/dependency-eligibility.json
-            ${{ steps.verify.outputs.run_dir }}/evidence/dependency-eligibility
-            ${{ steps.verify.outputs.run_dir }}/reports/native-motion.json
-            ${{ steps.verify.outputs.run_dir }}/evidence/native-motion
-            ${{ steps.verify.outputs.run_dir }}/reports/csp-ssr.json
-            ${{ steps.verify.outputs.run_dir }}/evidence/csp-ssr
-          if-no-files-found: warn
+          path: ${{ steps.verify.outputs.run_dir }}
+          if-no-files-found: error
           retention-days: 14
