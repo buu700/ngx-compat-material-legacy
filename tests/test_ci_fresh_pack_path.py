@@ -43,10 +43,20 @@ class CiFreshPackPathTests(unittest.TestCase):
         lane = CI.split("name: Full acceptance coordinator", 1)[1]
         self.assertNotIn("continue-on-error", lane)
         self.assertIn('exit "$code"', lane)
-        self.assertIn("reports/pack-library.json", lane)
-        self.assertIn("reports/packed-consumer.json", lane)
-        self.assertIn("reports/engine-free-consumer.json", lane)
         self.assertIn("just verify --out", lane)
+        # The artifact is the whole verifier directory after it is indexed.
+        # A failed verifier still reaches the index when a run directory exists.
+        self.assertIn("if: always() && steps.verify.outputs.run_dir != ''", lane)
+        self.assertIn(
+            'python3 scripts/archive_run_closure.py --write "${{ steps.verify.outputs.run_dir }}"',
+            lane,
+        )
+        self.assertIn("if: always() && steps.closure.outcome == 'success'", lane)
+        self.assertIn("path: ${{ steps.verify.outputs.run_dir }}", lane)
+        self.assertIn("if-no-files-found: error", lane)
+        self.assertNotIn("reports/pack-library.json", lane)
+        self.assertNotIn("reports/packed-consumer.json", lane)
+        self.assertNotIn("reports/engine-free-consumer.json", lane)
 
 
 if __name__ == "__main__":
