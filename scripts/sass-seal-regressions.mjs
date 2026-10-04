@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 /**
- * Ordered-CSS roster regressions for sass-seal.
- * Case ids are existing strict fixture ids. 21.x and unexecuted groups stay null.
+ * Ordered-CSS and isolation-negative roster regressions for sass-seal.
+ * Ordered-CSS ids are existing strict fixture ids. Isolation negatives are only
+ * the archived import and mutated golden cases the seal runner executes.
+ * sass-api-and-values and every 21.x group stay null.
  * A mutated candidate must not match the sealed reference.
  */
 import assert from 'node:assert/strict';
@@ -20,13 +22,26 @@ import {
   orderedCssResults,
   writeOrderedCssAssertions,
 } from './sass-ordered-css.mjs';
+import {
+  ISOLATION_NEGATIVE_IDS,
+  archivedImportAssertion,
+  mutatedGoldenAssertion,
+  runArchivedImportNegative,
+  runMutatedGoldenNegative,
+  writeIsolationNegativeAssertions,
+} from './sass-seal.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const matrix = JSON.parse(readFileSync(join(root, 'compatibility/rc/matrices/full-verify.json'), 'utf8'));
 const row = matrix.checks.find(item => item.check_id === 'sass-seal');
 assert.deepEqual(row.acceptance.cases_by_line.main['ordered-css-dom'], [...ORDERED_CSS_FIXTURE_IDS]);
 assert.equal(row.acceptance.cases_by_line.main['sass-api-and-values'], null);
-assert.equal(row.acceptance.cases_by_line.main['isolation-negatives'], null);
+assert.deepEqual(row.acceptance.cases_by_line.main['isolation-negatives'], [...ISOLATION_NEGATIVE_IDS]);
+assert.deepEqual([...ISOLATION_NEGATIVE_IDS], ['archived-import', 'mutated-golden']);
+for (const id of ['hidden-resolution', '05-custom-map-nested', 'owned-legacy-button', 'owned-legacy-select', 'owned-legacy-snack-bar']) {
+  assert.equal(ISOLATION_NEGATIVE_IDS.includes(id), false, id);
+  assert.equal(ORDERED_CSS_FIXTURE_IDS.includes(id), false, id);
+}
 for (const group of Object.keys(row.acceptance.cases_by_line['21.x'])) {
   assert.equal(row.acceptance.cases_by_line['21.x'][group], null, group);
 }
@@ -67,8 +82,41 @@ try {
   assert.equal(sample.case_id, '01-palette-values');
   assert.equal(sample.kind, 'assertion');
   assert.equal(sample.result, 'pass');
+
+  const sealedCard = join(root, 'reference/material-16.2.14/sass-css/owned-legacy-card.css');
+  const sealedBefore = readFileSync(sealedCard);
+  const emptyLoadPath = join(scratch, 'empty-load-path');
+  mkdirSync(emptyLoadPath);
+  const archived = runArchivedImportNegative([emptyLoadPath]);
+  const mutatedGolden = runMutatedGoldenNegative();
+  assert.equal(readFileSync(sealedCard).equals(sealedBefore), true);
+  assert.equal(archived.case_id, 'archived-import');
+  assert.equal(archived.compiled, false);
+  assert.equal(archived.rejected, true);
+  assert.equal(archived.result, 'pass');
+  assert.match(archived.error, /refused archived import: @material\/button/);
+  assert.equal(archivedImportAssertion({compiled: true, error: null}).result, 'fail');
+  assert.equal(mutatedGolden.case_id, 'mutated-golden');
+  assert.equal(mutatedGolden.result, 'pass');
+  assert.notEqual(mutatedGolden.compare_status, 0);
+  assert.equal(mutatedGolden.mismatched_file, 'owned-legacy-card.css');
+  assert.equal(mutatedGoldenAssertion({compareStatus: 0, cardStatus: 'exact', othersExact: true}).result, 'fail');
+
+  const negativeDir = join(scratch, 'isolation-assertions');
+  mkdirSync(negativeDir, {recursive: true});
+  const negativeWritten = writeIsolationNegativeAssertions(negativeDir, [archived, mutatedGolden]);
+  assert.deepEqual(negativeWritten.map(item => item.name), ['archived-import.json', 'mutated-golden.json']);
+  const archivedFile = JSON.parse(readFileSync(join(negativeDir, 'archived-import.json'), 'utf8'));
+  const mutatedFile = JSON.parse(readFileSync(join(negativeDir, 'mutated-golden.json'), 'utf8'));
+  assert.equal(archivedFile.kind, 'assertion');
+  assert.equal(archivedFile.result, 'pass');
+  assert.equal(archivedFile.compiled, false);
+  assert.equal(mutatedFile.kind, 'assertion');
+  assert.equal(mutatedFile.result, 'pass');
+  assert.notEqual(mutatedFile.compare_status, 0);
+  assert.equal(mutatedFile.mismatched_file, 'owned-legacy-card.css');
 } finally {
   rmSync(scratch, {recursive: true, force: true});
 }
 
-console.log(`sass-seal regressions passed (${ORDERED_CSS_FIXTURE_IDS.length} ordered-css cases)`);
+console.log(`sass-seal regressions passed (${ORDERED_CSS_FIXTURE_IDS.length} ordered-css cases, ${ISOLATION_NEGATIVE_IDS.length} isolation negatives)`);
