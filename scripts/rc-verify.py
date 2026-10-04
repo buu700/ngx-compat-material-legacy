@@ -798,9 +798,10 @@ def main() -> int:
     results["companion-computed-styles"] = "pass" if code == 0 else "fail"
     implemented_ran.append("companion-computed-styles")
 
-    # m3-coexistence: fresh workspace compile of the four main inclusion orders.
-    # The matrix implemented flag stays false. Null nested/lazy/overlay and
-    # shared-style groups, and every 21.x group, keep this check incomplete.
+    # m3-coexistence: fresh main workspace compile of inclusion order plus the
+    # nested/lazy/overlay and shared-style cases. The matrix implemented flag
+    # stays false, and every 21.x m3 group stays null, so this slice is not
+    # acceptance and does not claim G07.
     code = run_node(
         "scripts/check-m3-inclusion-order.mjs",
         ["--out", str(out_dir / "m3-inclusion-order-workspace.json")],
@@ -812,9 +813,9 @@ def main() -> int:
         "m3-coexistence",
         exit_code=code,
         limitations=[
-            "Workspace compile of the four main inclusion orders only.",
-            "Does not execute nested themes, lazy content, body-level overlays, or the shared style boundary.",
-            "21.x m3 groups stay null. Does not mark m3-coexistence accepted. Does not claim G07.",
+            "Main workspace compiles the four inclusion orders, nested-theme-scope, lazy-body-overlay, and separate current/legacy shared-style scopes.",
+            "Contamination fixtures are rejected and are not rostered.",
+            "21.x m3 groups stay null. implemented stays false. Does not mark m3-coexistence accepted. Does not claim G07.",
         ],
     )
     results["m3-coexistence"] = "pass" if code == 0 else "fail"
