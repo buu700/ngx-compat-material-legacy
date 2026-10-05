@@ -8,6 +8,13 @@
  * prove owned-only does not leak companion tokens, and prove a current M3
  * icon theme block is unchanged beside owned-only.
  *
+ * It also runs the current-peer M2 oracle in this invocation
+ * (companion-bridge-peer-oracle.mjs): the installed @angular/material peer is
+ * compiled with its own m2 theme constructors and companion theme mixins, and
+ * every rostered allowed token (root and accent/warn variant declarations)
+ * must equal the peer value. Under rc-verify, one kind:assertion file per
+ * token is written to RC_ASSERTION_OUTPUT_DIR.
+ *
  * Does not render components or claim G06–G08 / RC-05-A02.
  *
  *   node scripts/check-companion-bridges.mjs
@@ -17,6 +24,7 @@ import {createRequire} from 'node:module';
 import {pathToFileURL, fileURLToPath} from 'node:url';
 import {existsSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
 import path from 'node:path';
+import {caseFileName, runPeerOracle, writeAssertions} from './companion-bridge-peer-oracle.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const require = createRequire(path.join(root, 'package.json'));
@@ -253,6 +261,24 @@ for (const component of names) {
   });
 }
 
+const oracle = runPeerOracle(root, {bridgeSource});
+const failedCases = oracle.cases.filter((entry) => entry.result !== 'pass');
+for (const entry of failedCases) {
+  errors.push(`${entry.case_id}: candidate ${entry.candidate} != peer ${entry.expected_peer}`);
+}
+for (const token of oracle.unexpected) errors.push(`${token}: emitted but not in an allowed list`);
+const assertionDir = process.env.RC_ASSERTION_OUTPUT_DIR;
+let assertionsWritten = 0;
+if (assertionDir) {
+  const runId = process.env.RC_RUN_ID;
+  const invocationId = process.env.RC_INVOCATION_ID;
+  if (!runId || !invocationId) {
+    console.error('RC_ASSERTION_OUTPUT_DIR requires RC_RUN_ID and RC_INVOCATION_ID');
+    process.exit(2);
+  }
+  assertionsWritten = writeAssertions(assertionDir, oracle, {runId, invocationId}).length;
+}
+
 const report = {
   schema_version: 1,
   role: 'companion bridge compiled token receipts (not rendered computed styles)',
@@ -268,11 +294,23 @@ const report = {
   historical_aggregate_includes_smoke_tokens: historicalMissing.length === 0,
   bridge_css_bytes: bridges.length,
   owned_css_bytes: owned.length,
+  peer_oracle: {
+    package: oracle.identity.package,
+    version: oracle.identity.version,
+    package_json_sha256: oracle.identity.package_json_sha256,
+    scenarios: oracle.scenarios.map((scenario) => scenario.id),
+    case_count: oracle.cases.length,
+    passed: oracle.cases.length - failedCases.length,
+    failed: failedCases.map((entry) => entry.case_id),
+    unexpected_tokens: oracle.unexpected,
+    assertion_files: oracle.cases.map((entry) => caseFileName(entry.case_id)),
+    assertions_written: assertionsWritten,
+  },
   result: errors.length ? 'fail' : 'pass',
   g06_g07_g08_claim: 'not-passed',
   limitations: [
     'Compiled CSS custom-property inventory against owned $*-allowed lists and public *-overrides forwards.',
-    'Missing allowed tokens are reported; density-0 theme may omit some density-sensitive keys.',
+    'Expected values are the installed current peer M2 output compiled in this run, not v16 output.',
     'No browser/DOM computed-style rows were captured (not RC-05-A02 / G07).',
     'Does not claim ordered aggregate CSS parity or G06–G08.',
   ],
@@ -305,6 +343,9 @@ console.log(JSON.stringify({
   companions: names.length,
   emitted_total: rows.reduce((n, r) => n + r.emitted_token_count, 0),
   missing_allowed_total: rows.reduce((n, r) => n + r.missing_allowed_tokens.length, 0),
+  peer_oracle_cases: oracle.cases.length,
+  peer_oracle_failed: failedCases.length,
+  assertions_written: assertionsWritten,
   report: path.relative(root, reportPath),
   errors,
 }, null, 2));

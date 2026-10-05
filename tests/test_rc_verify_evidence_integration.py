@@ -26,6 +26,10 @@ def load(name, filename):
 
 
 verify = load('rc_verify_test', 'rc-verify.py')
+_BRIDGE_COMPONENTS = (
+    'badge', 'bottom-sheet', 'button-toggle', 'datepicker', 'divider', 'expansion',
+    'grid-list', 'icon', 'sidenav', 'stepper', 'sort', 'toolbar', 'tree',
+)
 lite = load('rc_lite_test', 'rc-verify-lite.py')
 
 
@@ -367,6 +371,157 @@ class CoordinatorTests(unittest.TestCase):
                     self.f.run_dir, self.f.run["run_id"], "main", check_id, exit_code=0,
                 )
                 self.assertEqual(acceptance.read_json(path)["coverage"], "slice")
+
+    def test_source_only_contract_needs_no_manifest_artifact(self):
+        row, _ = self._real_line_ids("companion-bridge-tokens")
+        self.assertEqual(row["acceptance"]["subject_ids"], ["source"])
+        self.assertEqual(verify._contract_artifacts(row), {})
+        library = next(item for item in self.run.manifest["artifacts"] if item["id"] == "library")
+        mixed_row = {"acceptance": {"subject_ids": ["source", "library"]}}
+        self.assertEqual(verify._contract_artifacts(mixed_row),
+                         {"library": {"sha256": library["sha256"], "bytes": library["bytes"]}})
+        self.run.manifest["artifacts"] = []
+        self.assertEqual(verify._contract_artifacts(row), {})
+        # A real artifact subject still needs its manifest artifact.
+        self.assertIsNone(verify._contract_artifacts({"acceptance": {"subject_ids": ["library"]}}))
+        self.assertIsNone(verify._contract_artifacts(mixed_row))
+
+    def _bridge_peer(self):
+        self.run.manifest["oracles"]["current_peer"] = [
+            *self.run.manifest["oracles"]["current_peer"],
+            {"id": "@angular/material", "version": "22.1.7"},
+        ]
+
+    def _bridge_body(self, case_id, invocation, **changes):
+        rest = case_id[len("--mat-"):]
+        component = next(name for name in sorted(_BRIDGE_COMPONENTS, key=len, reverse=True)
+                         if rest.startswith(name + "-"))
+        value = "rgba(0, 0, 0, 0.87)"
+        body = {
+            "schema_version": 1,
+            "kind": "assertion",
+            "check_id": "companion-bridge-tokens",
+            "line": "main",
+            "case_id": case_id,
+            "result": "pass",
+            "run_id": self.f.run["run_id"],
+            "invocation_id": invocation,
+            "token": case_id,
+            "component": component,
+            "allowed_key": rest[len(component) + 1:],
+            "peer_package": "@angular/material",
+            "peer_version": "22.1.7",
+            "peer_source_file": f"{component}/_m2-{component}.scss",
+            "peer_source_sha256": "a" * 64,
+            "expected_peer": value,
+            "candidate": value,
+            "scenarios": [{"id": "contract", "match": True, "selector_checks": [
+                {"selector": ":root", "expected_peer": value, "candidate": value, "match": True}]}],
+        }
+        body.update(changes)
+        return body
+
+    def _write_bridge_assertions(self, ids, overrides=None):
+        invocation = self.run.invocation("companion-bridge-tokens")
+        directory = self.f.run_dir / acceptance.assertion_directory("companion-bridge-tokens", invocation)
+        directory.mkdir(parents=True, exist_ok=True)
+        for case_id in ids:
+            changes = (overrides or {}).get(case_id, {})
+            write_json(directory / f"{case_id[2:]}.json", self._bridge_body(case_id, invocation, **changes))
+        return directory
+
+    def _bridge_report(self, line="main", exit_code=0):
+        path = self.f.run_dir / "reports/companion-bridge-tokens.json"
+        if path.exists():
+            path.unlink()
+        verify.write_line_coordinator_report(
+            self.f.run_dir, self.f.run["run_id"], line, "companion-bridge-tokens", exit_code=exit_code,
+        )
+        return path, acceptance.read_json(path)
+
+    def test_complete_main_bridge_token_report_and_not_overwritten(self):
+        self._bridge_peer()
+        row, ids = self._real_line_ids("companion-bridge-tokens")
+        self.assertTrue(row["implemented"])
+        self.assertEqual(list(row["acceptance"]["cases_by_line"]["main"]), ["compiled-override-tokens"])
+        self.assertEqual(len(ids), 161)
+        self.assertTrue(all(case_id.startswith("--mat-") for case_id in ids))
+        for group, group_ids in row["acceptance"]["cases_by_line"]["21.x"].items():
+            self.assertIsNone(group_ids, group)
+        self._write_bridge_assertions(ids)
+        path, report = self._bridge_report()
+        self.assertEqual(report["coverage"], "complete")
+        self.assertEqual(report["result"], "pass")
+        self.assertEqual(report["subject_kind"], "source")
+        self.assertEqual(report["subject_ids"], ["source"])
+        self.assertEqual(report["artifacts"], {})
+        self.assertEqual(report["expected_case_ids"], ids)
+        self.assertEqual(report["passed"], 161)
+        self.assertEqual(len(report["outputs"]), 161)
+        for name in ("approved", "g06_claim", "g07_claim", "g08_claim", "g06_g07_g08_claim"):
+            self.assertNotIn(name, report)
+        before = path.read_bytes()
+        verify.write_check_report(self.f.run_dir, self.f.run["run_id"], "main", "companion-bridge-tokens", exit_code=0)
+        self.assertEqual(path.read_bytes(), before)
+
+    def test_failed_child_or_21x_bridge_token_report_stays_slice(self):
+        self._bridge_peer()
+        _, ids = self._real_line_ids("companion-bridge-tokens")
+        self._write_bridge_assertions(ids)
+        _, report = self._bridge_report(exit_code=1)
+        self.assertEqual(report["coverage"], "slice")
+        self.assertEqual(report["result"], "fail")
+        with patch.object(verify, "expected_cases", side_effect=AssertionError("21.x must not roster main cases")):
+            _, report = self._bridge_report(line="21.x")
+        self.assertEqual(report["coverage"], "slice")
+        self.assertEqual(report["line"], "21.x")
+
+    def test_missing_copied_or_foreign_bridge_token_assertion_stays_slice(self):
+        self._bridge_peer()
+        _, ids = self._real_line_ids("companion-bridge-tokens")
+        last = ids[-1]
+        directory = self._write_bridge_assertions(ids[:-1])
+        self.assertEqual(self._bridge_report()[1]["coverage"], "slice")
+        (directory / f"{last[2:]}.json").write_bytes(self.f.run_path.read_bytes())
+        self.assertEqual(self._bridge_report()[1]["coverage"], "slice")
+        for changes in (
+            {"run_id": "another-run"},
+            {"invocation_id": "another-invocation"},
+            {"peer_version": "21.2.14"},
+            {"peer_package": "@angular/cdk"},
+            {"peer_source_file": None},
+            {"peer_source_file": "toolbar/_toolbar-theme.scss"},
+            {"scenarios": []},
+        ):
+            with self.subTest(changes=changes):
+                self._write_bridge_assertions(ids, {last: changes})
+                self.assertEqual(self._bridge_report()[1]["coverage"], "slice")
+        self._write_bridge_assertions(ids)
+        self.assertEqual(self._bridge_report()[1]["coverage"], "complete")
+
+    def test_wrong_but_nonempty_bridge_token_stays_slice(self):
+        self._bridge_peer()
+        _, ids = self._real_line_ids("companion-bridge-tokens")
+        token = "--mat-toolbar-container-background-color"
+        self.assertIn(token, ids)
+        wrong = [
+            {"candidate": "whitesmoke", "expected_peer": "white"},
+            {"result": "fail", "candidate": "whitesmoke", "expected_peer": "white"},
+            {"scenarios": [{"id": "contract", "match": True, "selector_checks": [
+                {"selector": ".mat-toolbar.mat-accent", "expected_peer": "#ff4081",
+                 "candidate": "#3f51b5", "match": True}]}]},
+            {"candidate": "", "expected_peer": ""},
+        ]
+        for changes in wrong:
+            with self.subTest(changes=changes):
+                self._write_bridge_assertions(ids, {token: changes})
+                self.assertEqual(self._bridge_report()[1]["coverage"], "slice")
+
+    def test_bridge_token_peer_version_comes_from_run_oracles(self):
+        _, ids = self._real_line_ids("companion-bridge-tokens")
+        self._write_bridge_assertions(ids)
+        # The synthetic manifest names no @angular/material peer, so no assertion binds.
+        self.assertEqual(self._bridge_report()[1]["coverage"], "slice")
 
     def test_cli_slice_does_not_claim_packaged_schematic_subject(self):
         path = self.f.run_dir / 'reports/migration-packaged.json'

@@ -12,6 +12,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -820,13 +821,26 @@ _LINE_COORDINATOR_LIMITATIONS = {
         "21.x release-metadata groups stay null. A main run does not copy them and does not call expected_cases for 21.x.",
         "This report is the acceptance input. It does not add a G01 or G13 claim field.",
     ],
+    "companion-bridge-tokens": [
+        "Coordinator report for the line being verified. Each rostered main token has an assertion file written by this run.",
+        "Each assertion compares the compiled public bridge custom property, root and accent/warn variant declarations, with the installed current @angular/material peer's own M2 theme output compiled in the same invocation. Historical v16 output is not the oracle.",
+        "Compiled CSS custom properties only. No rendered computed styles; companion-computed-styles stays a separate check.",
+        "21.x companion-bridge-tokens groups stay null. A main run does not copy them and does not call expected_cases for 21.x.",
+        "This report is the acceptance input. It does not add a G06, G07 or G08 claim field.",
+    ],
 }
 
 
 def _contract_artifacts(row: dict) -> dict | None:
-    wanted = row["acceptance"]["subject_ids"]
-    if not isinstance(wanted, list) or not wanted:
+    """Manifest artifacts for the row's subjects.
+
+    ``source`` is not a manifest artifact. As in rc_acceptance, it is skipped,
+    so a source-only check binds ``{}`` and needs no run-manifest artifact.
+    """
+    subjects = row["acceptance"]["subject_ids"]
+    if not isinstance(subjects, list) or not subjects:
         return None
+    wanted = [aid for aid in subjects if aid != "source"]
     by_id: dict = {}
     for item in ACTIVE_RUN.manifest.get("artifacts", []):
         aid = item.get("id")
@@ -877,6 +891,9 @@ def _roster_assertion_records(run_dir: Path, check_id: str, invocation: str, exp
             if isinstance(case_id, str) and case_id in found:
                 return None
             continue
+        body_check = _ASSERTION_BODY_CHECKS.get(check_id)
+        if body_check is not None and not body_check(body, invocation):
+            continue
         relative = path.relative_to(run_dir).as_posix()
         if not relative.startswith(prefix + "/"):
             continue
@@ -884,6 +901,69 @@ def _roster_assertion_records(run_dir: Path, check_id: str, invocation: str, exp
     if set(found) != allowed:
         return None
     return found
+
+
+_PEER_SOURCE_FILE = re.compile(r"^([a-z0-9-]+)/_m2-\1\.scss$")
+
+
+def _current_peer_version(package: str) -> str | None:
+    for item in (ACTIVE_RUN.manifest.get("oracles") or {}).get("current_peer") or []:
+        if isinstance(item, dict) and item.get("id") == package:
+            version = item.get("version")
+            return version if isinstance(version, str) and version else None
+    return None
+
+
+def _bridge_token_assertion_ok(body: dict, invocation: str) -> bool:
+    """A companion bridge token assertion from this run's in-run peer oracle.
+
+    It must name this run and invocation, the run's frozen @angular/material
+    peer version, the peer M2 token source for its component, and carry a
+    non-empty candidate value equal to the peer value in every selector of
+    every compared theme scenario.
+    """
+    case_id = body.get("case_id")
+    component = body.get("component")
+    key = body.get("allowed_key")
+    if not all(isinstance(v, str) and v for v in (case_id, component, key)):
+        return False
+    if body.get("token") != case_id or case_id != f"--mat-{component}-{key}":
+        return False
+    if body.get("run_id") != ACTIVE_RUN.manifest.get("run_id") or body.get("invocation_id") != invocation:
+        return False
+    if body.get("peer_package") != "@angular/material":
+        return False
+    peer_version = _current_peer_version("@angular/material")
+    if peer_version is None or body.get("peer_version") != peer_version:
+        return False
+    source = body.get("peer_source_file")
+    match = _PEER_SOURCE_FILE.fullmatch(source) if isinstance(source, str) else None
+    if match is None or match.group(1) != component:
+        return False
+    if not (isinstance(body.get("peer_source_sha256"), str) and re.fullmatch(r"[0-9a-f]{64}", body["peer_source_sha256"])):
+        return False
+    expected, candidate = body.get("expected_peer"), body.get("candidate")
+    if not (isinstance(expected, str) and expected and candidate == expected):
+        return False
+    scenarios = body.get("scenarios")
+    if not isinstance(scenarios, list) or not scenarios:
+        return False
+    for scenario in scenarios:
+        checks = scenario.get("selector_checks") if isinstance(scenario, dict) else None
+        if scenario.get("match") is not True or not isinstance(checks, list) or not checks:
+            return False
+        for check in checks:
+            if not isinstance(check, dict) or check.get("match") is not True:
+                return False
+            value = check.get("expected_peer")
+            if not (isinstance(value, str) and value and check.get("candidate") == value):
+                return False
+    return True
+
+
+_ASSERTION_BODY_CHECKS = {
+    "companion-bridge-tokens": _bridge_token_assertion_ok,
+}
 
 
 def _complete_line_report(run_dir: Path, run_id: str, check_id: str) -> dict | None:
@@ -1187,16 +1267,17 @@ def main() -> int:
     results["sass-seal"] = "pass" if code == 0 else "fail"
     implemented_ran.append("sass-seal")
 
-    # companion-bridge-tokens: compiled per-companion override token receipts (not G07).
+    # companion-bridge-tokens: compiled bridge tokens vs the in-run current-peer M2 oracle (not G07).
     code = run_node("scripts/check-companion-bridges.mjs", [])
-    write_check_report(
+    write_line_coordinator_report(
         out_dir,
         run_id,
         line,
         "companion-bridge-tokens",
         exit_code=code,
         limitations=[
-            "Compiled token inventory only; no rendered computed styles.",
+            "Compiled token inventory plus the in-run current-peer M2 oracle comparison; no rendered computed styles.",
+            "Complete only on main when every rostered token has a passing assertion from this run. 21.x stays a slice.",
             "Does not claim G06-G08.",
         ],
     )
