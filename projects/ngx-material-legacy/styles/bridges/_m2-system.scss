@@ -1,0 +1,212 @@
+// Owned M2 system values for the current-companion bridges.
+//
+// The current @angular/material peer themes its ordinary components from a
+// flat M2 "system" map (md-sys color, typescale, state and density values)
+// that it derives from an M2 theme. The bridges need the same meaning, but the
+// facade must not call through to the peer's private or compatibility-only
+// m2 Sass. This module derives the same flat map from the owned Material 16
+// theme model (owned palettes, color config, typography config and density
+// scale). The values mirror @angular/material 22.1.7
+// (core/tokens/m2/_md-sys-color.scss, _md-sys-typescale.scss,
+// _md-sys-state.scss, core/tokens/_m3-utils.scss and core/style/_elevation.scss).
+// scripts/check-companion-bridges.mjs compares every bridged token against
+// the installed peer's own M2 output, so a drift fails that check.
+@use 'sass:map';
+@use 'sass:meta';
+@use 'sass:string';
+@use '../core/theming/palette';
+@use '../core/theming/theming';
+@use '../vendor/mdc/elevation/elevation-theme' as mdc-elevation;
+
+// md-sys-color, light and dark, keyed by the owned primary/accent/warn palettes.
+@function _color-values($color) {
+  $palettes: (
+    primary: map.get($color, primary),
+    accent: map.get($color, accent),
+    warn: map.get($color, warn),
+  );
+  $is-dark: map.get($color, is-dark) == true;
+  $values: (
+    primary: map.get($palettes, primary, default),
+    on-primary: map.get($palettes, primary, default-contrast),
+    secondary: map.get($palettes, accent, default),
+    on-secondary: map.get($palettes, accent, default-contrast),
+    tertiary: map.get($palettes, accent, default),
+    on-tertiary: map.get($palettes, accent, default-contrast),
+    error: map.get($palettes, warn, default),
+    on-error: map.get($palettes, warn, default-contrast),
+    primary-fixed: map.get($palettes, primary, default),
+    secondary-fixed: map.get($palettes, accent, default),
+    tertiary-fixed: map.get($palettes, accent, default),
+    shadow: black,
+    scrim: black,
+  );
+  @if $is-dark {
+    $surface: map.get(palette.$grey-palette, 800);
+    @return map.merge($values, (
+      inverse-primary: map.get($palettes, primary, 600),
+      inverse-secondary: map.get($palettes, accent, 600),
+      inverse-error: map.get($palettes, warn, 600),
+      primary-container: map.get($palettes, primary, 900),
+      secondary-container: map.get($palettes, accent, 900),
+      tertiary-container: map.get($palettes, accent, 900),
+      error-container: map.get($palettes, warn, 900),
+      on-primary-container: map.get($palettes, primary, 50),
+      on-secondary-container: map.get($palettes, accent, 50),
+      on-tertiary-container: map.get($palettes, accent, 50),
+      on-error-container: map.get($palettes, warn, 50),
+      surface: $surface,
+      on-surface: white,
+      surface-variant: #4a4a4a,
+      on-surface-variant: rgba(white, 0.7),
+      background: #303030,
+      on-background: white,
+      inverse-surface: white,
+      inverse-on-surface: rgba(black, 0.87),
+      outline: rgba(white, 0.12),
+      outline-variant: rgba(white, 0.38),
+      is-dark: true,
+    ));
+  }
+  @return map.merge($values, (
+    inverse-primary: map.get($palettes, primary, 300),
+    inverse-secondary: map.get($palettes, accent, 300),
+    inverse-error: map.get($palettes, warn, 300),
+    primary-container: map.get($palettes, primary, 50),
+    secondary-container: map.get($palettes, accent, 50),
+    tertiary-container: map.get($palettes, accent, 50),
+    error-container: map.get($palettes, warn, 50),
+    on-primary-container: map.get($palettes, primary, 700),
+    on-secondary-container: map.get($palettes, accent, 700),
+    on-tertiary-container: map.get($palettes, accent, 700),
+    on-error-container: map.get($palettes, warn, 700),
+    surface: white,
+    on-surface: rgba(black, 0.87),
+    surface-variant: #f6f6f6,
+    on-surface-variant: rgba(black, 0.54),
+    background: map.get(palette.$grey-palette, 50),
+    on-background: rgba(black, 0.87),
+    inverse-surface: map.get(palette.$grey-palette, 800),
+    inverse-on-surface: white,
+    outline: rgba(black, 0.12),
+    outline-variant: rgba(black, 0.38),
+    is-dark: false,
+  ));
+}
+
+// md-sys-typescale from an owned 2014 or 2018 typography config. The level
+// mapping follows the current peer, which reads the config as given.
+@function _typescale-values($config) {
+  $sys-to-config: (
+    body-large: subheading-1,
+    body-medium: body-1,
+    body-small: caption,
+    display-large: display-4,
+    display-medium: display-4,
+    display-small: display-4,
+    headline-large: display-3,
+    headline-medium: display-2,
+    headline-small: display-1,
+    label-large: subheading-2,
+    label-medium: body-2,
+    label-small: button,
+    title-large: headline,
+    title-medium: headline,
+    title-small: title,
+  );
+  @if map.get($config, headline-1) != null {
+    $sys-to-config: (
+      body-large: body-1,
+      body-medium: body-2,
+      body-small: caption,
+      label-large: subtitle-1,
+      label-medium: subtitle-2,
+      label-small: button,
+      display-large: headline-1,
+      display-medium: headline-1,
+      display-small: headline-1,
+      headline-large: headline-2,
+      headline-medium: headline-3,
+      headline-small: headline-4,
+      title-large: headline-5,
+      title-medium: headline-5,
+      title-small: headline-6,
+    );
+  }
+  $values: ();
+  @each $sys-key, $config-key in $sys-to-config {
+    $font: map.get($config, $config-key, font-family);
+    @if meta.type-of($font) == 'string' {
+      $font: string.unquote($font);
+    }
+    $values: map.merge($values, (
+      #{$sys-key}-font: $font,
+      #{$sys-key}-line-height: map.get($config, $config-key, line-height),
+      #{$sys-key}-size: map.get($config, $config-key, font-size),
+      #{$sys-key}-tracking: map.get($config, $config-key, letter-spacing),
+      #{$sys-key}-weight: map.get($config, $config-key, font-weight),
+    ));
+  }
+  @return $values;
+}
+
+/// Flat M2 system values for an owned theme. Missing color, typography or
+/// density configs contribute nothing.
+@function get-system($theme) {
+  $color: theming.get-color-config($theme);
+  $typography: theming.get-typography-config($theme);
+  $density: theming.get-density-config($theme);
+  $system: (
+    focus-state-layer-opacity: 0.12,
+    hover-state-layer-opacity: 0.04,
+    pressed-state-layer-opacity: 0.12,
+    dragged-state-layer-opacity: 0.16,
+  );
+  @if $color != null {
+    $system: map.merge($system, _color-values($color));
+  }
+  @if $typography != null {
+    $system: map.merge($system, _typescale-values($typography));
+  }
+  @if $density != null {
+    $system: map.set($system, density-scale, $density);
+  }
+  @return $system;
+}
+
+/// Points the $color role (e.g. primary) at the $variant role (e.g. secondary).
+@function replace-colors-with-variant($system, $color, $variant) {
+  $system: map.set($system, on-#{$color}, map.get($system, on-#{$variant}));
+  $system: map.set($system, on-#{$color}-container, map.get($system, on-#{$variant}-container));
+  $system: map.set($system, #{$color}, map.get($system, #{$variant}));
+  $system: map.set($system, #{$color}-container, map.get($system, #{$variant}-container));
+  $system: map.set($system, inverse-#{$color}, map.get($system, inverse-#{$variant}));
+  @return $system;
+}
+
+/// A color at an opacity, as the same color-mix() expression the peer emits.
+@function color-with-opacity($color, $opacity) {
+  @if $color == null or $opacity == null {
+    @return null;
+  }
+  @if meta.type-of($color) == string and string.index($color, '--') == 1 {
+    $color: var($color);
+  }
+  @if meta.type-of($opacity) == number and $opacity < 1 {
+    $opacity: '#{$opacity * 100}%';
+  }
+  @return color-mix(in srgb, #{$color} #{$opacity}, transparent);
+}
+
+/// Density scale clamped to [$min, 0], or null without a density config.
+@function density-scale($system, $min) {
+  @if not map.has-key($system, density-scale) {
+    @return null;
+  }
+  @return theming.clamp-density(map.get($system, density-scale), $min);
+}
+
+/// Black elevation shadow for a level, as the peer's get-box-shadow() emits it.
+@function box-shadow($level) {
+  @return mdc-elevation.elevation-box-shadow($level, black);
+}

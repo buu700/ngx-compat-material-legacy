@@ -62,6 +62,9 @@
 }
 
 @mixin typography($config-or-theme) {
+  // 16.2.14 typography rules, then the companion bridge. The bridge carries the
+  // current peer's token values, so it stays a separate insertion.
+  @include _m2-typography($config-or-theme);
   @include bridges.stepper((
     color: null,
     typography: theming.get-typography-config($config-or-theme),
@@ -70,6 +73,9 @@
 }
 
 @mixin density($config-or-theme) {
+  // 16.2.14 density rules, then the companion bridge. The bridge carries the
+  // current peer's token values, so it stays a separate insertion.
+  @include _m2-density($config-or-theme);
   @include bridges.stepper((
     color: null,
     typography: null,

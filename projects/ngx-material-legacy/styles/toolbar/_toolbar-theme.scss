@@ -59,6 +59,9 @@
 }
 
 @mixin color($config-or-theme) {
+  // 16.2.14 color rules, then the companion bridge. The bridge carries the
+  // current peer's token values, so it stays a separate insertion.
+  @include _m2-color($config-or-theme);
   @include bridges.toolbar((
     color: theming.get-color-config($config-or-theme),
     typography: null,

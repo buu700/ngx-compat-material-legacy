@@ -165,7 +165,43 @@ $_emit-fallback-vars: true;
   }
 }
 
+@mixin _m2-color($config-or-theme) {
+  $config: theming.get-color-config($config-or-theme);
+  $accent: map.get($config, accent);
+  $warn: map.get($config, warn);
+
+  @include sass-utils.current-selector-or-root() {
+    @include token-utils.create-token-values(tokens-mat-badge.$prefix,
+      tokens-mat-badge.get-color-tokens($config));
+  }
+
+  .mat-badge-accent {
+    @include token-utils.create-token-values(tokens-mat-badge.$prefix,
+      tokens-mat-badge.private-get-color-palette-color-tokens($accent));
+  }
+
+  .mat-badge-warn {
+    @include token-utils.create-token-values(tokens-mat-badge.$prefix,
+      tokens-mat-badge.private-get-color-palette-color-tokens($warn));
+  }
+}
+
+@mixin _m2-typography($config-or-theme) {
+  $config: typography.private-typography-to-2014-config(
+      theming.get-typography-config($config-or-theme));
+
+  @include sass-utils.current-selector-or-root() {
+    @include token-utils.create-token-values(tokens-mat-badge.$prefix,
+      tokens-mat-badge.get-typography-tokens($config));
+  }
+}
+
+@mixin _m2-density($config-or-theme) {}
+
 @mixin color($config-or-theme) {
+  // 16.2.14 color rules, then the companion bridge. The bridge carries the
+  // current peer's token values, so it stays a separate insertion.
+  @include _m2-color($config-or-theme);
   @include bridges.badge((
     color: theming.get-color-config($config-or-theme),
     typography: null,
@@ -173,8 +209,10 @@ $_emit-fallback-vars: true;
   ));
 }
 
-
 @mixin typography($config-or-theme) {
+  // 16.2.14 typography rules, then the companion bridge. The bridge carries the
+  // current peer's token values, so it stays a separate insertion.
+  @include _m2-typography($config-or-theme);
   @include bridges.badge((
     color: null,
     typography: theming.get-typography-config($config-or-theme),
@@ -195,6 +233,10 @@ $_emit-fallback-vars: true;
 @mixin theme($theme-or-color-config) {
   $theme: theming.private-legacy-get-theme($theme-or-color-config);
   @include theming.private-check-duplicate-theme-styles($theme, 'mat-badge') {
+    $color: theming.get-color-config($theme);
+    $density: theming.get-density-config($theme);
+    $typography: theming.get-typography-config($theme);
+
     @if not $_badge-structure-emitted {
       @include _badge-structure;
 
@@ -202,7 +244,17 @@ $_emit-fallback-vars: true;
         $_badge-structure-emitted: true !global;
       }
     }
+
+    @if $color != null {
+      @include _m2-color($color);
+    }
+    @if $density != null {
+      @include _m2-density($density);
+    }
+    @if $typography != null {
+      @include _m2-typography($typography);
+    }
+    // Companion bridge stays. Its rules follow the 16.2.14 rules.
     @include bridges.badge($theme);
   }
 }
-

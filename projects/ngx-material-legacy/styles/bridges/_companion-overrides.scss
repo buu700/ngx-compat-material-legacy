@@ -1,26 +1,15 @@
 // Public bridges from the owned Material 16 theme maps to current
-// @angular/material *-overrides. Historical theme() mixins are unchanged.
+// @angular/material *-overrides. Each bridged token takes the meaning the
+// current peer gives it in M2 (computed from the owned theme by
+// ./_m2-system.scss), so a different palette keeps the right meaning.
+// Historical v16 output is not the oracle for these current tokens.
 @use 'sass:color';
 @use 'sass:list';
 @use 'sass:map';
 @use 'sass:meta';
 @use '@angular/material' as mat;
 @use '../core/theming/theming';
-@use '../core/typography/typography';
-@use '../core/tokens/m2/mat/badge' as badge-tokens;
-@use '../core/tokens/m2/mat/bottom-sheet' as bottom-sheet-tokens;
-@use '../core/tokens/m2/mat/standard-button-toggle' as button-toggle-tokens;
-@use '../core/tokens/m2/mat/datepicker' as datepicker-tokens;
-@use '../core/tokens/m2/mat/divider' as divider-tokens;
-@use '../core/tokens/m2/mat/expansion' as expansion-tokens;
-@use '../core/tokens/m2/mat/grid-list' as grid-list-tokens;
-@use '../core/tokens/m2/mat/icon' as icon-tokens;
-@use '../core/tokens/m2/mat/sidenav' as sidenav-tokens;
-@use '../core/tokens/m2/mat/stepper' as stepper-tokens;
-@use '../core/tokens/m2/mat/toolbar' as toolbar-tokens;
-@use '../core/typography/typography-utils';
-@use '../core/density/private/compatibility';
-@use '../tree/tree-variables';
+@use './m2-system';
 @use '../legacy-button/button-theme' as legacy-button;
 @use '../legacy-card/card-theme' as legacy-card;
 @use '../legacy-progress-bar/progress-bar-theme' as legacy-progress-bar;
@@ -145,42 +134,399 @@ $tree-allowed: (
   @return $out;
 }
 
-@function _collect($prefix, $theme, $allowed, $color-fn, $typo-fn, $density-fn, $base-fn) {
-  $out: ();
-  $color: theming.get-color-config($theme);
-  $typography: typography.private-typography-to-2014-config(theming.get-typography-config($theme));
-  $density: theming.get-density-config($theme);
-  @if $base-fn != null {
-    $out: map.merge($out, _qualify($prefix, meta.call($base-fn), $allowed));
+// Merges the token groups that apply to $theme. Base tokens always apply;
+// color, typography and density tokens apply when the theme has that config.
+@function _collect($prefix, $theme, $allowed, $tokens-fn) {
+  $groups: meta.call($tokens-fn, m2-system.get-system($theme));
+  $out: _qualify($prefix, map.get($groups, base), $allowed);
+  @if theming.get-color-config($theme) != null {
+    $out: map.merge($out, _qualify($prefix, map.get($groups, color), $allowed));
   }
-  @if $color != null and $color-fn != null {
-    $out: map.merge($out, _qualify($prefix, meta.call($color-fn, $color), $allowed));
+  @if theming.get-typography-config($theme) != null {
+    $out: map.merge($out, _qualify($prefix, map.get($groups, typography), $allowed));
   }
-  @if $typography != null and $typo-fn != null {
-    $out: map.merge($out, _qualify($prefix, meta.call($typo-fn, $typography), $allowed));
-  }
-  @if $density != null and $density-fn != null {
-    $out: map.merge($out, _qualify($prefix, meta.call($density-fn, $density), $allowed));
+  @if theming.get-density-config($theme) != null {
+    $out: map.merge($out, _qualify($prefix, map.get($groups, density), $allowed));
   }
   @return $out;
 }
 
+// Variant palette tokens (accent -> secondary, warn -> error) for $palette-fn.
+@function _variant($prefix, $theme, $allowed, $palette-fn, $variant) {
+  $system: m2-system.get-system($theme);
+  $system: m2-system.replace-colors-with-variant($system, primary, $variant);
+  @return _qualify($prefix, meta.call($palette-fn, $system), $allowed);
+}
+
+$_variants: (accent: secondary, warn: error);
+
+// Token groups below use the component-local names of the current peer's M2
+// tokens, computed from the owned system map (see ./_m2-system.scss).
+
+@function _badge-palette-tokens($system) {
+  @return (
+    background-color: map.get($system, primary),
+    text-color: map.get($system, on-primary),
+  );
+}
+
+@function _badge-tokens($system) {
+  $default-size: 22px;
+  $base-size: 12px;
+  @return (
+    base: (),
+    color: map.merge(_badge-palette-tokens($system), (
+      disabled-state-background-color:
+          m2-system.color-with-opacity(map.get($system, on-surface), 12%),
+      disabled-state-text-color: m2-system.color-with-opacity(map.get($system, on-surface), 38%),
+    )),
+    typography: (
+      text-font: map.get($system, body-medium-font),
+      line-height: $default-size,
+      text-size: $base-size,
+      text-weight: 600,
+      small-size-text-size: $base-size * 0.75,
+      small-size-line-height: $default-size - 6px,
+      large-size-text-size: $base-size * 2,
+      large-size-line-height: $default-size + 6px,
+    ),
+    density: (),
+  );
+}
+
+@function _bottom-sheet-tokens($system) {
+  @return (
+    base: (
+      container-shape: 4px,
+    ),
+    color: (
+      container-text-color: map.get($system, on-surface),
+      container-background-color: map.get($system, surface),
+    ),
+    typography: (
+      container-text-font: map.get($system, body-medium-font),
+      container-text-line-height: map.get($system, body-medium-line-height),
+      container-text-size: map.get($system, body-medium-size),
+      container-text-tracking: map.get($system, body-medium-tracking),
+      container-text-weight: map.get($system, body-medium-weight),
+    ),
+    density: (),
+  );
+}
+
+@function _button-toggle-tokens($system) {
+  $on-surface: map.get($system, on-surface);
+  $scale: m2-system.density-scale($system, -4);
+  @return (
+    base: (
+      focus-state-layer-opacity: map.get($system, focus-state-layer-opacity),
+      hover-state-layer-opacity: map.get($system, hover-state-layer-opacity),
+      shape: 4px,
+    ),
+    color: (
+      background-color: map.get($system, surface),
+      disabled-selected-state-background-color: m2-system.color-with-opacity($on-surface, 12%),
+      disabled-selected-state-text-color: m2-system.color-with-opacity($on-surface, 38%),
+      disabled-state-background-color: map.get($system, surface),
+      disabled-state-text-color: m2-system.color-with-opacity($on-surface, 38%),
+      divider-color: map.get($system, outline),
+      selected-state-background-color: m2-system.color-with-opacity($on-surface, 12%),
+      selected-state-text-color: $on-surface,
+      state-layer-color: $on-surface,
+      text-color: $on-surface,
+    ),
+    typography: (
+      label-text-font: map.get($system, body-large-font),
+      label-text-line-height: map.get($system, body-large-line-height),
+      label-text-size: map.get($system, body-large-size),
+      label-text-tracking: map.get($system, body-large-tracking),
+      label-text-weight: map.get($system, body-large-weight),
+    ),
+    density: (
+      height: map.get((0: 48px, -1: 44px, -2: 40px, -3: 36px, -4: 24px), $scale),
+    ),
+  );
+}
+
+@function _datepicker-palette-tokens($system) {
+  $on-surface: map.get($system, on-surface);
+  $disabled: m2-system.color-with-opacity($on-surface, 38%);
+  $primary: map.get($system, primary);
+  $overlap: #a8dab5;
+  @return (
+    calendar-date-in-range-state-background-color: m2-system.color-with-opacity($primary, 20%),
+    calendar-date-in-comparison-range-state-background-color:
+        m2-system.color-with-opacity(map.get($system, secondary), 20%),
+    calendar-date-in-overlap-range-state-background-color: $overlap,
+    calendar-date-in-overlap-range-selected-state-background-color:
+        color.adjust($overlap, $lightness: -30%),
+    calendar-date-selected-state-text-color: map.get($system, on-primary),
+    calendar-date-selected-state-background-color: $primary,
+    calendar-date-selected-disabled-state-background-color:
+        m2-system.color-with-opacity($primary, 38%),
+    calendar-date-today-selected-state-outline-color: map.get($system, on-primary),
+    calendar-date-focus-state-background-color:
+        m2-system.color-with-opacity($primary, map.get($system, focus-state-layer-opacity)),
+    calendar-date-hover-state-background-color:
+        m2-system.color-with-opacity($primary, map.get($system, hover-state-layer-opacity)),
+    toggle-active-state-icon-color: $primary,
+    toggle-icon-color: map.get($system, on-surface-variant),
+    calendar-body-label-text-color: map.get($system, on-surface-variant),
+    calendar-period-button-text-color: $on-surface,
+    calendar-period-button-icon-color: map.get($system, on-surface-variant),
+    calendar-navigation-button-icon-color: map.get($system, on-surface-variant),
+    calendar-header-divider-color: map.get($system, outline),
+    calendar-header-text-color: map.get($system, on-surface-variant),
+    calendar-date-today-outline-color: map.get($system, on-surface-variant),
+    calendar-date-today-disabled-state-outline-color: $disabled,
+    calendar-date-text-color: $on-surface,
+    calendar-date-outline-color: transparent,
+    calendar-date-disabled-state-text-color: $disabled,
+    calendar-date-preview-state-outline-color: map.get($system, on-surface-variant),
+    range-input-separator-color: $on-surface,
+    range-input-disabled-state-separator-color: $disabled,
+    range-input-disabled-state-text-color: $disabled,
+    calendar-container-background-color: map.get($system, surface),
+    calendar-container-text-color: $on-surface,
+  );
+}
+
+@function _datepicker-tokens($system) {
+  @return (
+    base: (
+      calendar-container-shape: 4px,
+      calendar-container-touch-shape: 4px,
+      calendar-container-elevation-shadow: m2-system.box-shadow(4),
+      calendar-container-touch-elevation-shadow: m2-system.box-shadow(24),
+    ),
+    color: _datepicker-palette-tokens($system),
+    typography: (
+      calendar-text-font: map.get($system, body-large-font),
+      calendar-text-size: 13px,
+      calendar-body-label-text-size: map.get($system, label-small-size),
+      calendar-body-label-text-weight: map.get($system, label-small-weight),
+      calendar-period-button-text-size: map.get($system, label-small-size),
+      calendar-period-button-text-weight: map.get($system, label-small-weight),
+      calendar-header-text-size: 11px,
+      calendar-header-text-weight: map.get($system, body-large-weight),
+    ),
+    density: (),
+  );
+}
+
+@function _divider-tokens($system) {
+  @return (
+    base: (
+      width: 1px,
+    ),
+    color: (
+      color: map.get($system, outline),
+    ),
+    typography: (),
+    density: (),
+  );
+}
+
+@function _expansion-tokens($system) {
+  $on-surface: map.get($system, on-surface);
+  $scale: m2-system.density-scale($system, -3);
+  @return (
+    base: (
+      container-shape: 4px,
+      legacy-header-indicator-display: inline-block,
+      header-indicator-display: none,
+    ),
+    color: (
+      container-elevation-shadow: m2-system.box-shadow(2),
+      container-background-color: map.get($system, surface),
+      container-text-color: $on-surface,
+      actions-divider-color: map.get($system, outline),
+      header-hover-state-layer-color:
+          m2-system.color-with-opacity($on-surface, map.get($system, hover-state-layer-opacity)),
+      header-focus-state-layer-color:
+          m2-system.color-with-opacity($on-surface, map.get($system, focus-state-layer-opacity)),
+      header-disabled-state-text-color: m2-system.color-with-opacity($on-surface, 38%),
+      header-text-color: $on-surface,
+      header-description-color: map.get($system, on-surface-variant),
+      header-indicator-color: map.get($system, on-surface-variant),
+    ),
+    typography: (
+      header-text-font: map.get($system, label-medium-font),
+      header-text-size: map.get($system, label-medium-size),
+      header-text-weight: map.get($system, label-medium-weight),
+      header-text-line-height: inherit,
+      header-text-tracking: inherit,
+      container-text-font: map.get($system, body-medium-font),
+      container-text-line-height: map.get($system, body-medium-line-height),
+      container-text-size: map.get($system, body-medium-size),
+      container-text-tracking: map.get($system, body-medium-tracking),
+      container-text-weight: map.get($system, body-medium-weight),
+    ),
+    density: (
+      header-collapsed-state-height: map.get((0: 48px, -1: 44px, -2: 40px, -3: 36px), $scale),
+      header-expanded-state-height: map.get((0: 64px, -1: 60px, -2: 56px, -3: 48px), $scale),
+    ),
+  );
+}
+
+@function _grid-list-tokens($system) {
+  @return (
+    base: (),
+    color: (),
+    typography: (
+      tile-header-primary-text-size: map.get($system, body-medium-size),
+      tile-header-secondary-text-size: map.get($system, body-small-size),
+      tile-footer-primary-text-size: map.get($system, body-medium-size),
+      tile-footer-secondary-text-size: map.get($system, body-small-size),
+    ),
+    density: (),
+  );
+}
+
+@function _icon-tokens($system) {
+  @return (
+    base: (),
+    color: (
+      color: inherit,
+    ),
+    typography: (),
+    density: (),
+  );
+}
+
+@function _sidenav-tokens($system) {
+  // The peer's scrim is the inverted surface at 60%. Its color-mix() surface is
+  // not a Sass color, so the peer settles on black (light) or white (dark).
+  $scrim: if(map.get($system, is-dark) == true, rgba(#fff, 0.6), rgba(#000, 0.6));
+  @return (
+    base: (
+      container-shape: 0,
+      container-width: auto,
+    ),
+    color: (
+      container-elevation-shadow: m2-system.box-shadow(16),
+      container-divider-color: map.get($system, outline),
+      container-background-color: map.get($system, surface),
+      container-text-color: map.get($system, on-surface),
+      content-background-color: map.get($system, background),
+      content-text-color: map.get($system, on-surface),
+      scrim-color: $scrim,
+    ),
+    typography: (),
+    density: (),
+  );
+}
+
+@function _stepper-palette-tokens($system) {
+  @return (
+    header-icon-foreground-color: map.get($system, on-primary),
+    header-selected-state-icon-background-color: map.get($system, primary),
+    header-selected-state-icon-foreground-color: map.get($system, on-primary),
+    header-done-state-icon-background-color: map.get($system, primary),
+    header-done-state-icon-foreground-color: map.get($system, on-primary),
+    header-edit-state-icon-background-color: map.get($system, primary),
+    header-edit-state-icon-foreground-color: map.get($system, on-primary),
+  );
+}
+
+@function _stepper-tokens($system) {
+  $on-surface: map.get($system, on-surface);
+  $scale: m2-system.density-scale($system, -4);
+  @return (
+    base: (
+      header-focus-state-layer-shape: 4px,
+      header-hover-state-layer-shape: 4px,
+    ),
+    color: map.merge(_stepper-palette-tokens($system), (
+      container-color: map.get($system, surface),
+      line-color: map.get($system, outline),
+      header-hover-state-layer-color:
+          m2-system.color-with-opacity($on-surface, map.get($system, hover-state-layer-opacity)),
+      header-focus-state-layer-color:
+          m2-system.color-with-opacity($on-surface, map.get($system, focus-state-layer-opacity)),
+      header-label-text-color: map.get($system, on-surface-variant),
+      header-optional-label-text-color: map.get($system, on-surface-variant),
+      header-selected-state-label-text-color: $on-surface,
+      header-error-state-label-text-color: map.get($system, error),
+      header-icon-background-color: map.get($system, on-surface-variant),
+      header-error-state-icon-foreground-color: map.get($system, error),
+      header-error-state-icon-background-color: transparent,
+    )),
+    typography: (
+      container-text-font: map.get($system, body-medium-font),
+      header-label-text-font: map.get($system, body-medium-font),
+      header-label-text-size: map.get($system, body-medium-size),
+      header-label-text-weight: map.get($system, body-medium-weight),
+      header-error-state-label-text-size: map.get($system, body-large-size),
+      header-selected-state-label-text-size: map.get($system, body-large-size),
+      header-selected-state-label-text-weight: map.get($system, body-large-weight),
+    ),
+    density: (
+      header-height: map.get((0: 72px, -1: 68px, -2: 64px, -3: 60px, -4: 42px), $scale),
+    ),
+  );
+}
+
+@function _sort-tokens($system) {
+  @return (
+    base: (),
+    color: (
+      arrow-color: map.get($system, on-surface),
+    ),
+    typography: (),
+    density: (),
+  );
+}
+
+@function _toolbar-tokens($system) {
+  $scale: m2-system.density-scale($system, -3);
+  @return (
+    base: (),
+    color: (
+      container-background-color: map.get($system, surface),
+      container-text-color: map.get($system, on-surface),
+    ),
+    typography: (
+      title-text-font: map.get($system, title-small-font),
+      title-text-line-height: map.get($system, title-small-line-height),
+      title-text-size: map.get($system, title-small-size),
+      title-text-tracking: map.get($system, title-small-tracking),
+      title-text-weight: map.get($system, title-small-weight),
+    ),
+    density: (
+      standard-height: map.get((0: 64px, -1: 60px, -2: 56px, -3: 52px), $scale),
+      mobile-height: map.get((0: 56px, -1: 52px, -2: 48px, -3: 44px), $scale),
+    ),
+  );
+}
+
+@function _tree-tokens($system) {
+  $scale: m2-system.density-scale($system, -4);
+  @return (
+    base: (),
+    color: (
+      container-background-color: map.get($system, surface),
+      node-text-color: map.get($system, on-surface),
+    ),
+    typography: (
+      node-text-font: map.get($system, body-medium-font),
+      node-text-size: map.get($system, body-medium-size),
+      node-text-weight: map.get($system, body-medium-weight),
+    ),
+    density: (
+      node-min-height: map.get((0: 48px, -1: 44px, -2: 40px, -3: 36px, -4: 28px), $scale),
+    ),
+  );
+}
+
 @mixin badge($theme) {
   @include mat.badge-overrides(_collect(
-    badge, $theme, $badge-allowed,
-    meta.get-function('get-color-tokens', $module: 'badge-tokens'),
-    meta.get-function('get-typography-tokens', $module: 'badge-tokens'),
-    null, null
-  ));
-  $color: theming.get-color-config($theme);
-  @if $color != null {
-    @each $name in (accent, warn) {
+    badge, $theme, $badge-allowed, meta.get-function('_badge-tokens')));
+  @if theming.get-color-config($theme) != null {
+    @each $name, $variant in $_variants {
       .mat-badge-#{$name} {
-        @include mat.badge-overrides(_qualify(
-          badge,
-          badge-tokens.private-get-color-palette-color-tokens(map.get($color, $name)),
-          $badge-allowed
-        ));
+        @include mat.badge-overrides(_variant(
+          badge, $theme, $badge-allowed, meta.get-function('_badge-palette-tokens'), $variant));
       }
     }
   }
@@ -188,70 +534,25 @@ $tree-allowed: (
 
 @mixin bottom-sheet($theme) {
   @include mat.bottom-sheet-overrides(_collect(
-    bottom-sheet, $theme, $bottom-sheet-allowed,
-    meta.get-function('get-color-tokens', $module: 'bottom-sheet-tokens'),
-    meta.get-function('get-typography-tokens', $module: 'bottom-sheet-tokens'),
-    null,
-    meta.get-function('get-unthemable-tokens', $module: 'bottom-sheet-tokens')
-  ));
+    bottom-sheet, $theme, $bottom-sheet-allowed, meta.get-function('_bottom-sheet-tokens')));
 }
 
 @mixin button-toggle($theme) {
-  $tokens: _collect(
-    button-toggle, $theme, $button-toggle-allowed,
-    meta.get-function('get-color-tokens', $module: 'button-toggle-tokens'),
-    null,
-    meta.get-function('get-density-tokens', $module: 'button-toggle-tokens'),
-    meta.get-function('get-unthemable-tokens', $module: 'button-toggle-tokens')
-  );
-  $typography: typography.private-typography-to-2014-config(theming.get-typography-config($theme));
-  @if $typography != null {
-    $font: typography-utils.font-family($typography);
-    @if $font != null {
-      $tokens: map.set($tokens, label-text-font, $font);
-    }
-  }
-  @include mat.button-toggle-overrides($tokens);
+  @include mat.button-toggle-overrides(_collect(
+    button-toggle, $theme, $button-toggle-allowed, meta.get-function('_button-toggle-tokens')));
 }
 
 @mixin datepicker($theme) {
   @include mat.datepicker-overrides(_collect(
-    datepicker, $theme, $datepicker-allowed,
-    meta.get-function('get-color-tokens', $module: 'datepicker-tokens'),
-    meta.get-function('get-typography-tokens', $module: 'datepicker-tokens'),
-    meta.get-function('get-density-tokens', $module: 'datepicker-tokens'),
-    null
-  ));
-  $color: theming.get-color-config($theme);
-  @if $color != null {
-    // Content palettes, then toggle palettes. 16.2.14 emitted the two groups
-    // separately; interleaving them inside one loop only reorders the CSS.
-    .mat-datepicker-content {
-      @each $name in (accent, warn) {
-        $palette-color: theming.get-color-from-palette(map.get($color, $name));
-        $range: datepicker-tokens.private-get-range-background-color($palette-color);
-        $tokens: _qualify(
-          datepicker,
-          map.merge(
-            datepicker-tokens.private-get-calendar-color-palette-color-tokens($color, $name),
-            datepicker-tokens.get-range-color-tokens($range)
-          ),
-          $datepicker-allowed
-        );
+    datepicker, $theme, $datepicker-allowed, meta.get-function('_datepicker-tokens')));
+  @if theming.get-color-config($theme) != null {
+    $palette-fn: meta.get-function('_datepicker-palette-tokens');
+    // Same selector shape and token set as the peer's M2 datepicker color mixin.
+    .mat-datepicker-content, .mat-datepicker-toggle-active {
+      @each $name, $variant in $_variants {
         &.mat-#{$name} {
-          @include mat.datepicker-overrides($tokens);
-        }
-      }
-    }
-
-    .mat-datepicker-toggle-active {
-      @each $name in (accent, warn) {
-        &.mat-#{$name} {
-          @include mat.datepicker-overrides(_qualify(
-            datepicker,
-            datepicker-tokens.private-get-toggle-color-palette-color-tokens($color, $name),
-            $datepicker-allowed
-          ));
+          @include mat.datepicker-overrides(
+            _variant(datepicker, $theme, $datepicker-allowed, $palette-fn, $variant));
         }
       }
     }
@@ -260,38 +561,22 @@ $tree-allowed: (
 
 @mixin divider($theme) {
   @include mat.divider-overrides(_collect(
-    divider, $theme, $divider-allowed,
-    meta.get-function('get-color-tokens', $module: 'divider-tokens'),
-    null, null,
-    meta.get-function('get-unthemable-tokens', $module: 'divider-tokens')
-  ));
+    divider, $theme, $divider-allowed, meta.get-function('_divider-tokens')));
 }
 
 @mixin expansion($theme) {
   @include mat.expansion-overrides(_collect(
-    expansion, $theme, $expansion-allowed,
-    meta.get-function('get-color-tokens', $module: 'expansion-tokens'),
-    meta.get-function('get-typography-tokens', $module: 'expansion-tokens'),
-    meta.get-function('get-density-tokens', $module: 'expansion-tokens'),
-    meta.get-function('get-unthemable-tokens', $module: 'expansion-tokens')
-  ));
+    expansion, $theme, $expansion-allowed, meta.get-function('_expansion-tokens')));
 }
 
 @mixin grid-list($theme) {
   @include mat.grid-list-overrides(_collect(
-    grid-list, $theme, $grid-list-allowed,
-    null,
-    meta.get-function('get-typography-tokens', $module: 'grid-list-tokens'),
-    null, null
-  ));
+    grid-list, $theme, $grid-list-allowed, meta.get-function('_grid-list-tokens')));
 }
 
 @mixin icon($theme) {
   @include mat.icon-overrides(_collect(
-    icon, $theme, $icon-allowed,
-    meta.get-function('get-color-tokens', $module: 'icon-tokens'),
-    null, null, null
-  ));
+    icon, $theme, $icon-allowed, meta.get-function('_icon-tokens')));
   $color: theming.get-color-config($theme);
   @if $color != null {
     .mat-icon {
@@ -308,75 +593,41 @@ $tree-allowed: (
 
 @mixin sidenav($theme) {
   @include mat.sidenav-overrides(_collect(
-    sidenav, $theme, $sidenav-allowed,
-    meta.get-function('get-color-tokens', $module: 'sidenav-tokens'),
-    null, null,
-    meta.get-function('get-unthemable-tokens', $module: 'sidenav-tokens')
-  ));
+    sidenav, $theme, $sidenav-allowed, meta.get-function('_sidenav-tokens')));
 }
 
 @mixin stepper($theme) {
   @include mat.stepper-overrides(_collect(
-    stepper, $theme, $stepper-allowed,
-    meta.get-function('get-color-tokens', $module: 'stepper-tokens'),
-    meta.get-function('get-typography-tokens', $module: 'stepper-tokens'),
-    meta.get-function('get-density-tokens', $module: 'stepper-tokens'),
-    meta.get-function('get-unthemable-tokens', $module: 'stepper-tokens')
-  ));
-  $color: theming.get-color-config($theme);
-  @if $color != null {
-    @each $name in (accent, warn) {
+    stepper, $theme, $stepper-allowed, meta.get-function('_stepper-tokens')));
+  @if theming.get-color-config($theme) != null {
+    @each $name, $variant in $_variants {
       .mat-step-header.mat-#{$name} {
-        @include mat.stepper-overrides(_qualify(
-          stepper,
-          stepper-tokens.private-get-color-palette-color-tokens(map.get($color, $name)),
-          $stepper-allowed
-        ));
+        @include mat.stepper-overrides(_variant(
+          stepper, $theme, $stepper-allowed, meta.get-function('_stepper-palette-tokens'),
+          $variant));
       }
     }
   }
 }
 
 @mixin sort($theme) {
-  $color: theming.get-color-config($theme);
-  $tokens: ();
-  @if $color != null {
-    $background: map.get($color, background);
-    $foreground: map.get($color, foreground);
-    $table-background: theming.get-color-from-palette($background, card);
-    $text-color: theming.get-color-from-palette($foreground, secondary-text);
-    $arrow: $text-color;
-    @if meta.type-of($table-background) == color and meta.type-of($text-color) == color {
-      $text-opacity: color.opacity($text-color);
-      $arrow: color.mix($table-background, rgba($text-color, 1), (1 - $text-opacity) * 100%);
-    }
-    $tokens: (arrow-color: $arrow);
-  }
-  @include mat.sort-overrides($tokens);
+  @include mat.sort-overrides(_collect(
+    sort, $theme, $sort-allowed, meta.get-function('_sort-tokens')));
 }
 
 @mixin toolbar($theme) {
   @include mat.toolbar-overrides(_collect(
-    toolbar, $theme, $toolbar-allowed,
-    meta.get-function('get-color-tokens', $module: 'toolbar-tokens'),
-    meta.get-function('get-typography-tokens', $module: 'toolbar-tokens'),
-    meta.get-function('get-density-tokens', $module: 'toolbar-tokens'),
-    null
-  ));
+    toolbar, $theme, $toolbar-allowed, meta.get-function('_toolbar-tokens')));
   $color: theming.get-color-config($theme);
   @if $color != null {
     .mat-toolbar {
       @each $name in (primary, accent, warn) {
         $palette: map.get($color, $name);
         &.mat-#{$name} {
-          @include mat.toolbar-overrides(_qualify(
-            toolbar,
-            toolbar-tokens.private-get-color-palette-color-tokens(
-              $background-color: theming.get-color-from-palette($palette),
-              $text-color: theming.get-color-from-palette($palette, default-contrast)
-            ),
-            $toolbar-allowed
-          ));
+          @include mat.toolbar-overrides(_qualify(toolbar, (
+            container-background-color: theming.get-color-from-palette($palette),
+            container-text-color: theming.get-color-from-palette($palette, default-contrast),
+          ), $toolbar-allowed));
         }
       }
     }
@@ -384,31 +635,8 @@ $tree-allowed: (
 }
 
 @mixin tree($theme) {
-  $color: theming.get-color-config($theme);
-  $typography: typography.private-typography-to-2014-config(theming.get-typography-config($theme));
-  $density: theming.get-density-config($theme);
-  $tokens: ();
-  @if $color != null {
-    $tokens: map.merge($tokens, (
-      container-background-color: theming.get-color-from-palette(map.get($color, background), card),
-      node-text-color: theming.get-color-from-palette(map.get($color, foreground), text),
-    ));
-  }
-  @if $typography != null {
-    $tokens: map.merge($tokens, (
-      node-text-font: typography-utils.font-family($typography),
-      node-text-size: typography-utils.font-size($typography, body-1),
-      node-text-weight: typography-utils.font-weight($typography, body-1),
-    ));
-  }
-  @if $density != null {
-    $height: compatibility.private-density-prop-value(
-      tree-variables.$density-config, $density, height);
-    @if $height != null {
-      $tokens: map.set($tokens, node-min-height, $height);
-    }
-  }
-  @include mat.tree-overrides($tokens);
+  @include mat.tree-overrides(_collect(
+    tree, $theme, $tree-allowed, meta.get-function('_tree-tokens')));
 }
 
 /// Themes the thirteen current ordinary companions through public *-overrides.
