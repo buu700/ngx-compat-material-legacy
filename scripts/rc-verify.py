@@ -785,6 +785,10 @@ def _bridge_token_assertion_ok(body: dict, invocation: str) -> bool:
     return True
 
 
+_CSS_WIDE_KEYWORDS = ("inherit", "initial", "unset", "revert", "revert-layer")
+
+_COMPUTED_FOREIGN_TOKEN_PREFIXES = {("datepicker", "density"): ("--mat-icon-button-",)}
+
 _COMPUTED_DIMENSIONS = ("base", "color", "typography", "density")
 
 _SHA256_HEX = re.compile(r"^[0-9a-f]{64}$")

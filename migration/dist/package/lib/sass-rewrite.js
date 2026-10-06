@@ -38,14 +38,18 @@ function rewriteSassModuleSource(content, options) {
   /** @type {string[]} */
   const acknowledgements = [];
 
+  if (options && options.syntax === 'indented') {
+    diagnostics.push(
+      'indented-sass: indented Sass is not rewritten. Convert the file to SCSS before migrate-legacy.',
+    );
+    return {ok: false, content, diagnostics, changed: false, acknowledgements};
+  }
+
   // Already migrated and no remaining Angular Material root @use → idempotent.
   const usePattern =
     /@use\s+(['"])@angular\/material\1(\s+as\s+([A-Za-z_][\w-]*|\*))?(\s+with\s*\([^;]*\))?(\s*;)/g;
 
   const hasAngularMaterialUse = /@use\s+(['"])@angular\/material\1/.test(content);
-  if (!hasAngularMaterialUse) {
-    return {ok: true, content, diagnostics, changed: false, acknowledgements};
-  }
 
   // Ambiguous / unsupported constructs → diagnostic, no edit.
   if (/@use\s+(['"])@angular\/material\1\s+as\s+\*/.test(content)) {
@@ -65,6 +69,9 @@ function rewriteSassModuleSource(content, options) {
       'old-import: deprecated `@import` of @angular/material is not auto-migrated; no rewrite.',
     );
     return {ok: false, content, diagnostics, changed: false, acknowledgements};
+  }
+  if (!hasAngularMaterialUse) {
+    return {ok: true, content, diagnostics, changed: false, acknowledgements};
   }
 
   // Generation / companion signals (only when migrating the root module).
@@ -178,6 +185,9 @@ function applyFixtureCase(testCase) {
         result,
       };
     }
+    if (pass && testCase.expect_diagnostic && !diagnosticMatches(result, testCase.expect_diagnostic)) {
+      return {pass: false, detail: `diagnostic mismatch: ${JSON.stringify(result.diagnostics)}`, result};
+    }
     return {pass, detail, result};
   }
   const pass =
@@ -197,7 +207,14 @@ function applyFixtureCase(testCase) {
       result,
     };
   }
+  if (pass && testCase.expect_diagnostic && !diagnosticMatches(result, testCase.expect_diagnostic)) {
+    return {pass: false, detail: `diagnostic mismatch: ${JSON.stringify(result.diagnostics)}`, result};
+  }
   return {pass, detail, result};
+}
+
+function diagnosticMatches(result, needle) {
+  return (result.diagnostics || []).some(item => item.includes(needle));
 }
 
 module.exports = {

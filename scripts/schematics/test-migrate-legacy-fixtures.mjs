@@ -21,7 +21,7 @@ const {applyFixtureCase: applyTs} = require(
 const data = JSON.parse(readFileSync(casesPath, 'utf8'));
 let failed = 0;
 for (const c of data.cases) {
-  const apply = c.language === 'scss' ? applySass : applyTs;
+  const apply = c.language === 'scss' || c.language === 'sass' ? applySass : applyTs;
   // Skip TS cases that are explicitly out of migrate-legacy default scope when
   // they are ordinary/non-legacy (ordinary-import, app-provider, arbitrary-string, shadowed-require).
   const result = apply(c);
