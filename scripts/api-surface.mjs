@@ -7,6 +7,7 @@
  * tarball. A name-only or key-presence observation is not acceptance.
  */
 import {existsSync, readFileSync, readdirSync} from 'node:fs';
+import {createHash} from 'node:crypto';
 import {dirname, join, resolve} from 'node:path';
 import {createRequire} from 'node:module';
 import {fileURLToPath} from 'node:url';
@@ -26,6 +27,20 @@ const ts = new Proxy({}, {
 });
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+
+const FACTORY_REFERENCE = 'reference/material-16.2.14/factory-metadata.json';
+const FACTORY_REFERENCE_SHA256 = '1b124aab1f570e111647f8142cdea8066ae9db673efc405a6999c178709602b6';
+let factoryReference;
+export function originalFactoryContract(file, name) {
+  const family = file.split('\\').join('/').match(/\/material\/([^/]+)\//)?.[1];
+  if (!family) return null;
+  if (!factoryReference) {
+    const bytes = readFileSync(join(root, FACTORY_REFERENCE));
+    if (createHash('sha256').update(bytes).digest('hex') !== FACTORY_REFERENCE_SHA256) throw new Error('untouched16 factory metadata identity mismatch');
+    factoryReference = JSON.parse(bytes);
+  }
+  return factoryReference.factories[family+'/'+name] || null;
+}
 
 export const NEGATIVE_IDS = {
   missingMember: 'api-completeness/export-contract/negatives/missing-member',
@@ -353,12 +368,14 @@ export function diParamsOf(node, sourceFile) {
   const bindings = importBindings(sourceFile);
   return ctor.parameters.map(param => {
     let inject = '';
+    let attribute = null;
     // TypeScript permits an omitted argument; Angular DI still requires its token
     // unless the original constructor actually declares @Optional().
     let optional = false;
     for (const call of decoratorCalls(param)) {
       const called = call.expression.getText(sourceFile);
       if (called === 'Optional' || called.endsWith('.Optional')) optional = true;
+      if (called === 'Attribute' || called.endsWith('.Attribute')) attribute = call.arguments[0] ? call.arguments[0].getText(sourceFile).replace(/^['"]|['"]$/g, '') : null;
       if (called === 'Inject' || called.endsWith('.Inject')) {
         inject = call.arguments[0] ? call.arguments[0].getText(sourceFile) : '';
       }
@@ -371,6 +388,7 @@ export function diParamsOf(node, sourceFile) {
     return {
       ident,
       optional,
+      attribute,
       spec: binding ? binding.spec : null,
       imported: binding ? binding.imported : ident,
     };
@@ -498,6 +516,7 @@ function shapeFromFound(found, refRoot) {
     flat.ownConstructor = own.requiredConstructor;
     flat.heritage = heritageNames(node, found.sourceFile);
     flat.diParams = diParamsOf(node, found.sourceFile);
+    flat.originalFactory = originalFactoryContract(found.file, node.name?.text);
     if (found.reexport) flat.reexport = found.reexport;
     return flat;
   }

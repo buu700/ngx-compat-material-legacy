@@ -30,7 +30,7 @@ async function loadModule(packageRoot, family, kind) {
   return loaded;
 }
 
-function runFactory(factory, Injector, runInInjectionContext) {
+export function runFactory(factory, Injector, runInInjectionContext) {
   const requests = [];
   const injector = Injector.create({providers: []});
   const proto = Object.getPrototypeOf(injector);
@@ -44,14 +44,17 @@ function runFactory(factory, Injector, runInInjectionContext) {
       return {stub: labelOf(token)};
     }
   };
+  let outcome = 'returned';
+  let error = null;
   try {
     runInInjectionContext(injector, () => factory());
-  } catch {
-    // Constructor bodies run after every parameter inject.
+  } catch (caught) {
+    outcome = 'threw';
+    error = String(caught?.message || caught);
   } finally {
     proto.get = original;
   }
-  return requests;
+  return {requests, outcome, error};
 }
 
 export async function observeRuntimeDi(packageRoot, symbols, differences = []) {
@@ -82,8 +85,13 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = []) {
       results.push({symbol, problems, observed: []});
       continue;
     }
-    const observed = runFactory(value.ɵfac, Injector, runInInjectionContext);
-    const expected = symbol.shape.diParams || [];
+    const factory = runFactory(value.ɵfac, Injector, runInInjectionContext);
+    const observed = factory.requests;
+    const invalidReference = symbol.shape.originalFactory?.deps_kind === 'invalid';
+    const expected = invalidReference ? [] : (symbol.shape.diParams || []).filter(param => !param.attribute);
+    if (invalidReference && !(factory.outcome === 'threw' && /constructor was not compatible with Dependency Injection/.test(factory.error || ''))) {
+      problems.push(`factory ${symbol.symbol_id} did not preserve the original non-injectable factory contract`);
+    }
     if (observed.length !== expected.length) {
       problems.push(`token count ${symbol.symbol_id} expected ${expected.length} observed ${observed.length} [${observed.map(item => item.label).join(', ')}]`);
     } else {
@@ -106,7 +114,7 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = []) {
         }
       }
     }
-    results.push({symbol, problems, observed: observed.map(item => `${item.label}${item.optional ? '?' : ''}`)});
+    results.push({symbol, problems, factory_outcome:factory.outcome, factory_error:factory.error, original_factory_kind:symbol.shape.originalFactory?.deps_kind ?? null, constructor_attributes:(symbol.shape.diParams || []).filter(param=>param.attribute).map(param=>param.attribute), observed: observed.map(item => `${item.label}${item.optional ? '?' : ''}`)});
   }
   return results;
 }
