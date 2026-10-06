@@ -28,6 +28,9 @@ class PeerAnnotationTests(unittest.TestCase):
         result,case=self.observe(authored,peers);self.assertEqual(case['result'],'fail')
         self.assertEqual([(x['package'],x['name']) for x in result['annotation_private_hits']],[('@angular/cdk','InternalContainer')])
         self.assertEqual([(x['package'],x['name']) for x in result['annotation_deprecated_hits']],[('@angular/core','OLD_MOTION')])
+        states={c['case_id'].split('/')[-1]:c['result'] for c in result['cases']}
+        self.assertEqual(states['no-docs-private-symbol'],'fail')
+        self.assertEqual(states['no-deprecated-symbol'],'fail')
 
     def test_namespace_dot_and_bracket_access_are_observed(self):
         for expression in ('core.OLD_MOTION', "core['OLD_MOTION']"):
