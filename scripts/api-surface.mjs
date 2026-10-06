@@ -347,13 +347,15 @@ function decoratorCalls(node) {
   return list.map(decorator => decorator.expression).filter(expr => ts.isCallExpression(expr));
 }
 
-function diParamsOf(node, sourceFile) {
+export function diParamsOf(node, sourceFile) {
   const ctor = (node.members || []).find(member => ts.isConstructorDeclaration(member));
   if (!ctor) return [];
   const bindings = importBindings(sourceFile);
   return ctor.parameters.map(param => {
     let inject = '';
-    let optional = Boolean(param.questionToken || param.initializer);
+    // TypeScript permits an omitted argument; Angular DI still requires its token
+    // unless the original constructor actually declares @Optional().
+    let optional = false;
     for (const call of decoratorCalls(param)) {
       const called = call.expression.getText(sourceFile);
       if (called === 'Optional' || called.endsWith('.Optional')) optional = true;

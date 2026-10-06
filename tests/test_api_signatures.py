@@ -121,6 +121,33 @@ class ApiSignatureTests(unittest.TestCase):
         return json.loads(result.stdout)
 
     @unittest.skipUnless(typescript_resolves(), "typescript is not installed")
+    def test_typescript_optional_and_default_do_not_waive_di_dependency(self):
+        script = r"""
+import assert from 'node:assert/strict';
+import {createRequire} from 'node:module';
+import {diParamsOf} from './scripts/api-surface.mjs';
+const ts=createRequire(process.cwd()+'/package.json')('typescript');
+function observe(parameter) {
+ const text=`import {Inject, Optional} from '@angular/core';
+import {Service} from 'fixture-service';
+class Fixture {constructor(@Optional() @Inject(TOKEN) token: unknown, ${parameter}) {}}`;
+ const source=ts.createSourceFile('fixture.ts',text,ts.ScriptTarget.Latest,true);
+ const node=source.statements.find(ts.isClassDeclaration);
+ return diParamsOf(node,source);
+}
+for(const argument of ['service: Service','service?: Service','service: Service = fallback']) {
+ const params=observe(argument);
+ assert.equal(params[0].optional,true);
+ assert.equal(params[0].ident,'TOKEN');
+ assert.equal(params[1].optional,false,argument);
+ assert.equal(params[1].imported,'Service');
+}
+assert.equal(observe('@Optional() service?: Service')[1].optional,true);
+"""
+        result=subprocess.run(['node','--input-type=module','-e',script],cwd=ROOT,capture_output=True,text=True)
+        self.assertEqual(result.returncode,0,result.stderr or result.stdout)
+
+    @unittest.skipUnless(typescript_resolves(), "typescript is not installed")
     def test_constructor_types_match_and_inject_token_is_kept(self):
         report = compare("match")
         self.assertEqual(report["di_status"], "match")

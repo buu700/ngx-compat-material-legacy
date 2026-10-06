@@ -460,6 +460,7 @@ if (isMain) {
     export_failures: exportFails.length,
     signature_failures: signatureFails.length,
     di_failures: diFails.length,
+    di_mismatches: detail.di_failures,
   }, null, 2));
   const request = coordinatorRequest();
   if (request && request.error) fail(2, `api-completeness: refusing acceptance report: ${request.error}`);
