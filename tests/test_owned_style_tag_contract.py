@@ -27,3 +27,18 @@ class OwnedStyleTagContractTests(unittest.TestCase):
             self.assertRegex(facade, re.escape("@forward './styles/"+family+'/'+mixin+"'"))
             public_source=ROOT/'projects/ngx-material-legacy/styles'/family/Path(record['path']).name
             self.assertEqual(public_source.read_bytes(),data)
+
+    def test_datepicker_button_compat_keeps_original_typography(self):
+        reference=ROOT/'reference/material-16.2.14/owned-style-sources/button/_button-theme.scss'
+        source=reference.read_bytes()
+        provenance=json.loads((ROOT/'reference/material-16.2.14/button-source-provenance.json').read_text())
+        self.assertEqual(hashlib.sha256(source).hexdigest(),'b93e286acf1b868ac911ad1d82adcc0d23752edea047e92e45ae3570980e034a')
+        self.assertEqual(provenance['sha256'],'b93e286acf1b868ac911ad1d82adcc0d23752edea047e92e45ae3570980e034a')
+        self.assertEqual(len(source),provenance['bytes'])
+        self.assertEqual(provenance['package_tarball_sha256'],'de41309d20b1d98a7fd6d028a7de42853ea2d453a329c7a8815aaf73ea7f365b')
+        candidate=(ROOT/provenance['candidate']).read_text()
+        self.assertEqual(candidate,source.decode().replace("@use '@material/", "@use '../vendor/mdc/"))
+        self.assertNotIn('line-height: inherit',candidate)
+        compat=(ROOT/'projects/ngx-material-legacy/styles/datepicker/_datepicker-legacy-compat.scss').read_text()
+        self.assertIn('@include button-theme.theme($theme)',compat)
+        self.assertIn('.mat-datepicker-content',compat)

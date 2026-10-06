@@ -16,7 +16,8 @@ class OwnedRenderedStylesTests(unittest.TestCase):
 import assert from 'node:assert/strict';
 import {OWNED_STYLE_PROBES, assessOwnedStyles} from './scripts/sass-owned-rendered.mjs';
 const reference=Object.fromEntries(Object.entries(OWNED_STYLE_PROBES).map(([id,p])=>[id,{found:true,values:Object.fromEntries(p.properties.map(k=>[k,'tagged-value']))}]));
-const negative={'light/disabled-placeholder':{found:true,values:{color:'wrong-but-nonempty'}}};
+const negative=structuredClone(reference);
+for(const [id,p] of Object.entries(OWNED_STYLE_PROBES)){const property=p.properties.includes('line-height')?'line-height':p.properties[0];negative[id].values[property]='wrong-but-nonempty';}
 assert.ok(Object.values(assessOwnedStyles(reference,reference,negative)).every(r=>r.result==='pass'));
 for(const [id,p] of Object.entries(OWNED_STYLE_PROBES)){
  const bad=structuredClone(reference);bad[id].values[p.properties[0]]='unrelated-wrong-value';
@@ -25,6 +26,7 @@ for(const [id,p] of Object.entries(OWNED_STYLE_PROBES)){
  bad[id]={found:false,values:{}};assert.equal(assessOwnedStyles(reference,bad,negative)[id].result,'fail');
 }
 assert.ok(Object.values(assessOwnedStyles(reference,reference,reference)).every(r=>r.result==='fail'));
+for(const id of Object.keys(negative)){const inert=structuredClone(negative);inert[id]=structuredClone(reference[id]);assert.equal(assessOwnedStyles(reference,reference,inert)[id].result,'fail');}
 '''
         result=subprocess.run(['node','--input-type=module','-e',code],cwd=ROOT,capture_output=True,text=True)
         self.assertEqual(result.returncode,0,result.stdout+result.stderr)
