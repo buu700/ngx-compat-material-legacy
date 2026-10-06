@@ -27,6 +27,7 @@
  * Does not claim G06–G08.
  */
 import {createHash} from 'node:crypto';
+import {runFunctionContracts} from './sass-function-contracts.mjs';
 import {ownedStyleCaseIds, renderOwnedStyles} from './sass-owned-rendered.mjs';
 import {coordinatorRequest} from './packed-consumer-evidence.mjs';
 import {spawnSync} from 'node:child_process';
@@ -474,6 +475,10 @@ async function main() {
     fail(1, 'sass-api-and-values results do not match the predeclared case ids');
   }
   const drift = apiDriftNegative(oracle, api.members, api.css);
+  let functions;
+  try {functions = runFunctionContracts({sass,entry,loadPaths:[join(consumer,'node_modules')],allowedRoots,
+    importers:[makeImporter({requested,denied})],line:'21.x'});}
+  catch (error) {functions={ok:false,error:error.message,results:[]};}
 
   // Isolation negatives actually executed by this seal: archived import refusal,
   // a temp-copy declaration mutation that compare-css.py must reject, a hidden
@@ -532,7 +537,7 @@ async function main() {
   const apiPassed = apiResults.filter(item => item.result === 'pass');
   // Exit nonzero on anything unexplained. Pending cases keep the check incomplete
   // because they write no passing assertion; they are never passes.
-  const ok = ownedRenderedOk && compiled && !compileError && isolationOk && valuesOk && materialRequested && unexplained.length === 0
+  const ok = functions.ok && ownedRenderedOk && compiled && !compileError && isolationOk && valuesOk && materialRequested && unexplained.length === 0
     && orderedCss.compile_status === 0;
 
 
@@ -576,6 +581,12 @@ async function main() {
     const identity = {
       oracleSha256: sha256Text(oracleText), tarballSha256: tarballSha, runId, invocationId: invocation,
     };
+    for (const item of functions.results) {
+      if (item.result !== 'pass' || !functions.mutation_rejected) continue;
+      const body = {...item,kind:'assertion',check_id:'sass-seal',group:'sass-api-and-values',exit_code:0,
+        run_id:runId,invocation_id:invocation,binding,tarball_sha256:tarballSha,mutation_rejected:true};
+      writeFileSync(join(outputDir,apiAssertionFileName(item.case_id)),JSON.stringify(body,null,2)+'\n');
+    }
     for (const item of apiPassed) {
       writeFileSync(join(outputDir, apiAssertionFileName(item.case_id)),
         `${JSON.stringify(apiAssertionBody(item, identity), null, 2)}\n`);
@@ -595,6 +606,7 @@ async function main() {
     schema_version: 1,
     role: 'peer-aware packed Sass seal',
     owned_rendered: ownedRendered,
+    function_contracts: functions,
     check_id: 'sass-seal',
     run_id: runId,
     tarball_sha256: tarballSha,
@@ -674,6 +686,10 @@ async function main() {
     owned_rendered_error: ownedRendered.error ?? null,
     ordered_css_cases: ORDERED_CSS_FIXTURE_IDS.length,
     sass_api_cases: apiIds.length,
+    sass_function_cases: functions.results.length,
+    sass_function_passed: functions.results.filter(r=>r.result==='pass').length,
+    sass_function_error: functions.error ?? null,
+    sass_function_failures: functions.results.filter(r=>r.result!=='pass').map(r=>({case_id:r.case_id,error:r.error,expected_sha256:r.expected?.value_sha256 ?? null,actual_sha256:r.actual?.value_sha256 ?? null})),
     sass_api_passed: apiPassed.length,
     pending_cases: pending.length,
     unexplained_failures: unexplained.map(item => item.case_id),
