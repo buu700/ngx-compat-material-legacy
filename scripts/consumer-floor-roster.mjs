@@ -31,3 +31,12 @@ export function floorConfigurations(plan, line, manifest) {
   if (new Set(configurations.map(item => item.case_id)).size !== configurations.length) throw new Error('duplicate floor configuration');
   return configurations;
 }
+
+// Investigation of a proposed peer floor. Never part of the advertised roster.
+export const RXJS_CANDIDATE = Object.freeze({version:'7.5.5',integrity:'sha512-sy+H0pQofO95VDmFLzyaw9xNJU4KTRSwQIGM6+iG3SypAtCiLDzpeG8sJrNCWn2Up9km+KhkvTdbkrdy+yzZdw=='});
+export function candidateFloorConfigurations(plan,line,manifest) {
+  return floorConfigurations(plan,line,manifest)
+    .filter(c=>c.group==='library-runtime'&&c.rxjs==='7.4.0')
+    .map(c=>({...c,group:'candidate-peer-experiment',case_id:`experiment/node-${c.node}/rxjs-${RXJS_CANDIDATE.version}/ts-${c.typescript}`,
+      rxjs:RXJS_CANDIDATE.version,rxjs_integrity:RXJS_CANDIDATE.integrity,advertised_rxjs:manifest.peerDependencies.rxjs,acceptance_credit:false}));
+}
