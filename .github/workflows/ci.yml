@@ -134,7 +134,7 @@ jobs:
         run: |
           set -euo pipefail
           RUN="${{ steps.pack.outputs.run_dir }}"
-          just chainman run packed-consumer -- --run "${RUN}/run.json"
+          just chainman exec -- node scripts/packed-consumer-aot-smoke.mjs --run "${RUN}/run.json"
 
       - name: Engine-free required consumer against tip pack
         run: |
