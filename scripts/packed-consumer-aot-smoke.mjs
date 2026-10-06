@@ -464,6 +464,8 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
     'packed-consumer/harness/legacy-tabs': parsed.tabCount === 2 && parsed.selectedTab === 'Two',
     'packed-consumer/harness/native-date-constructor': parsed.nativeDateConstructor === true,
     'packed-consumer/harness/native-date-provider': parsed.nativeDateProvider === true,
+    'packed-consumer/harness/chip-tabindex-attribute': parsed.chipTabIndex === 6,
+    'packed-consumer/harness/radio-tabindex-attribute': parsed.radioTabIndex === 8,
   };
   const owned = declarationKeys(keys)
     .filter(key => key.endsWith('/testing'))
@@ -887,6 +889,8 @@ import {MatLegacySnackBarHarness} from '@ngx-compat/material-legacy/legacy-snack
 import {MatLegacyTooltipModule} from '@ngx-compat/material-legacy/legacy-tooltip';
 import {MatLegacyTooltipHarness} from '@ngx-compat/material-legacy/legacy-tooltip/testing';
 import {MatLegacyTabsModule} from '@ngx-compat/material-legacy/legacy-tabs';
+import {MatLegacyChipsModule} from '@ngx-compat/material-legacy/legacy-chips';
+import {MatLegacyRadioModule} from '@ngx-compat/material-legacy/legacy-radio';
 import {MatLegacyTabGroupHarness} from '@ngx-compat/material-legacy/legacy-tabs/testing';
 import {LegacyNativeDateAdapter, LegacyNativeDateModule, MatLegacyNativeDateModule, LegacyDateAdapter, MAT_LEGACY_DATE_LOCALE, MAT_LEGACY_DATE_FORMATS, MAT_LEGACY_NATIVE_DATE_FORMATS} from '@ngx-compat/material-legacy/legacy-core';
 
@@ -913,9 +917,13 @@ class SmokeDialogContent {}
     MatLegacySnackBarModule,
     MatLegacyTooltipModule,
     MatLegacyTabsModule,
+    MatLegacyChipsModule,
+    MatLegacyRadioModule,
   ],
   template: \`
     <button mat-button id="h">Go</button>
+    <mat-chip id="attribute-chip" tabindex="6">Attribute chip</mat-chip>
+    <mat-radio-button id="attribute-radio" tabindex="8">Attribute radio</mat-radio-button>
     <mat-form-field>
       <mat-label>Choice</mat-label>
       <mat-select>
@@ -1043,6 +1051,8 @@ async function main() {
   await sleep(30);
   const selected = await (await tabGroup.getSelectedTab()).getLabel();
 
+  const chipTabIndex = (fixture.nativeElement.querySelector('#attribute-chip') as HTMLElement).tabIndex;
+  const radioTabIndex = (fixture.nativeElement.querySelector('#attribute-radio input') as HTMLInputElement).tabIndex;
   const out = {
     ok:
       text === 'Go' &&
@@ -1056,7 +1066,7 @@ async function main() {
       selectOpened === true &&
       selectClosed === true &&
       tabCount === 2 &&
-      selected === 'Two' && nativeDateConstructor && nativeDateProvider,
+      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8,
     buttonText: text,
     selectIsOpen: isOpen,
     dialogText,
@@ -1071,6 +1081,8 @@ async function main() {
     selectedTab: selected,
     nativeDateConstructor,
     nativeDateProvider,
+    chipTabIndex,
+    radioTabIndex,
     harnesses: [
       'MatLegacyButtonHarness',
       'MatLegacySelectHarness',

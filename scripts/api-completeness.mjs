@@ -475,7 +475,8 @@ if (isMain) {
 function settleDi(row, records) {
   const historical = row.symbol.shape.token
     ? `token ${row.symbol.shape.tokenDescription || ''}`
-    : (row.symbol.shape.diParams || []).map(param => `${param.ident}${param.optional ? '?' : ''}`).join('|');
+    : row.symbol.shape.originalFactory?.deps_kind === 'invalid' ? 'original-non-injectable-factory'
+    : (row.symbol.shape.diParams || []).filter(param=>!param.attribute).map(param => `${param.ident}${param.optional ? '?' : ''}`).join('|');
   const owned = row.observed.join('|');
   if (!row.problems.length) {
     return {...row, result: 'pass', status: 'match', historical, owned};
