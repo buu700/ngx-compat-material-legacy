@@ -671,6 +671,7 @@ try {
       typescript: '5.9.2',
       'zone.js': '0.15.1',
       jsdom: '26.1.0',
+      esbuild: JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).devDependencies.esbuild,
     },
   };
   if (floorConfiguration) {

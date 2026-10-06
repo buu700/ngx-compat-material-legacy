@@ -686,6 +686,7 @@ async function main() {
   if (!ok) {
     const reasons = [];
     if (!ownedRenderedOk) reasons.push(`owned rendered styles failed: ${ownedRendered.error || 'probe/negative mismatch'}`);
+    if (!ownedRenderedOk && !ownedRendered.error) console.error(JSON.stringify({owned_style_mismatches: Object.values(ownedRendered.results).filter(item => item.result !== 'pass')}, null, 2));
     if (!compiled) reasons.push(`compile failed: ${compileError}`);
     if (!negativeRejected) reasons.push('archived @material negative did not refuse');
     if (mutatedNegative.result !== 'pass') reasons.push(`mutated golden negative did not detect a compare-css mismatch (status=${mutatedNegative.compare_status})`);
