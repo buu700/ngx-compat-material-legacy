@@ -31,6 +31,10 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const FACTORY_REFERENCE = 'reference/material-16.2.14/factory-metadata.json';
 const FACTORY_REFERENCE_SHA256 = '1b124aab1f570e111647f8142cdea8066ae9db673efc405a6999c178709602b6';
 let factoryReference;
+let cdkFactoryReference;
+const CDK_FACTORY_REFERENCE = 'reference/material-16.2.14/cdk-factory-metadata.json';
+const CDK_FACTORY_REFERENCE_SHA256 = '86a98330dda8255dfd6666363aecc2b08ea0730cd39f8f31af998dd0987d4a72';
+const INHERITED_TABLE_FACTORIES = Object.freeze({MatLegacyHeaderRowDef:'CdkHeaderRowDef',MatLegacyFooterRowDef:'CdkFooterRowDef',MatLegacyRowDef:'CdkRowDef'});
 export function originalFactoryContract(file, name) {
   const family = file.split('\\').join('/').match(/\/material\/([^/]+)\//)?.[1];
   if (!family) return null;
@@ -39,7 +43,18 @@ export function originalFactoryContract(file, name) {
     if (createHash('sha256').update(bytes).digest('hex') !== FACTORY_REFERENCE_SHA256) throw new Error('untouched16 factory metadata identity mismatch');
     factoryReference = JSON.parse(bytes);
   }
-  return factoryReference.factories[family+'/'+name] || null;
+  const contract = factoryReference.factories[family+'/'+name] || null;
+  if (family === 'legacy-table' && INHERITED_TABLE_FACTORIES[name] && contract?.deps_kind === 'inherited') {
+    if (!cdkFactoryReference) {
+      const bytes = readFileSync(join(root, CDK_FACTORY_REFERENCE));
+      if (createHash('sha256').update(bytes).digest('hex') !== CDK_FACTORY_REFERENCE_SHA256) throw new Error('untouched16 CDK factory metadata identity mismatch');
+      cdkFactoryReference = JSON.parse(bytes);
+    }
+    const inherited = cdkFactoryReference.factories['table/'+INHERITED_TABLE_FACTORIES[name]];
+    if (!inherited || inherited.deps_kind !== 'dependencies') throw new Error('original table inheritance factory contract unavailable');
+    return {...contract,inherited_factory:inherited};
+  }
+  return contract;
 }
 
 export const NEGATIVE_IDS = {

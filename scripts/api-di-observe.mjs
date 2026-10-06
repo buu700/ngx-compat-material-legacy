@@ -1,6 +1,6 @@
 import {existsSync} from 'node:fs';
 import {pathToFileURL} from 'node:url';
-import {join} from 'node:path';
+import {join,resolve} from 'node:path';
 
 // verify-lite imports the checker before node_modules exists. Load Angular
 // only when a packed factory is actually executed.
@@ -14,18 +14,15 @@ function labelOf(token) {
   return text.replace(/^InjectionToken /, '');
 }
 
-async function loadModule(packageRoot, family, kind) {
-  const key = `${family}/${kind}`;
-  if (modules.has(key)) return modules.get(key);
+export async function loadRuntimeModule(packageRoot, family, kind) {
   const name = kind === 'primary'
     ? `ngx-compat-material-legacy-${family}.mjs`
     : `ngx-compat-material-legacy-${family}-testing.mjs`;
-  const file = join(packageRoot, 'fesm2022', name);
-  if (!existsSync(file)) {
-    modules.set(key, null);
-    return null;
-  }
-  const loaded = await import(pathToFileURL(file).href);
+  const file = resolve(packageRoot, 'fesm2022', name);
+  const key = pathToFileURL(file).href;
+  if (modules.has(key)) return modules.get(key);
+  if (!existsSync(file)) return null;
+  const loaded = await import(key);
   modules.set(key, loaded);
   return loaded;
 }
@@ -57,13 +54,27 @@ export function runFactory(factory, Injector, runInInjectionContext) {
   return {requests, outcome, error};
 }
 
+export function expectedFactoryDi(shape) {
+  const inherited = shape.originalFactory?.inherited_factory;
+  if (!inherited) return (shape.diParams || []).filter(param => !param.attribute);
+  // These are the three authenticated original CDK table constructors, not
+  // guessed zero-dependency Material factories whose deps:null delegates upward.
+  const expected = 'deps: [{ token: i0.TemplateRef }, { token: i0.IterableDiffers }, { token: CDK_TABLE, optional: true }]';
+  if (inherited.family !== 'table' || !['CdkHeaderRowDef','CdkFooterRowDef','CdkRowDef'].includes(inherited.name) || !inherited.declaration.includes(expected)) throw new Error('unrecognized authentic table DI declaration');
+  return [
+    {ident:'TemplateRef',imported:'TemplateRef',spec:'@angular/core',optional:false},
+    {ident:'IterableDiffers',imported:'IterableDiffers',spec:'@angular/core',optional:false},
+    {ident:'CDK_TABLE',imported:'CDK_TABLE',spec:'@angular/cdk/table',optional:true},
+  ];
+}
+
 export async function observeRuntimeDi(packageRoot, symbols, differences = []) {
   const {Injector, runInInjectionContext} = await import('@angular/core');
   await import('@angular/compiler');
   const results = [];
   for (const symbol of symbols) {
     if (!symbol.di_id) continue;
-    const loaded = await loadModule(packageRoot, symbol.family, symbol.kind);
+    const loaded = await loadRuntimeModule(packageRoot, symbol.family, symbol.kind);
     const problems = [];
     if (!loaded || !loaded[symbol.name]) {
       problems.push(`missing runtime export ${symbol.symbol_id}`);
@@ -88,7 +99,7 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = []) {
     const factory = runFactory(value.ɵfac, Injector, runInInjectionContext);
     const observed = factory.requests;
     const invalidReference = symbol.shape.originalFactory?.deps_kind === 'invalid';
-    const expected = invalidReference ? [] : (symbol.shape.diParams || []).filter(param => !param.attribute);
+    const expected = invalidReference ? [] : expectedFactoryDi(symbol.shape);
     if (invalidReference && !(factory.outcome === 'threw' && /constructor was not compatible with Dependency Injection/.test(factory.error || ''))) {
       problems.push(`factory ${symbol.symbol_id} did not preserve the original non-injectable factory contract`);
     }
@@ -114,7 +125,7 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = []) {
         }
       }
     }
-    results.push({symbol, problems, factory_outcome:factory.outcome, factory_error:factory.error, original_factory_kind:symbol.shape.originalFactory?.deps_kind ?? null, constructor_attributes:(symbol.shape.diParams || []).filter(param=>param.attribute).map(param=>param.attribute), observed: observed.map(item => `${item.label}${item.optional ? '?' : ''}`)});
+    results.push({symbol, problems, factory_outcome:factory.outcome, factory_error:factory.error, original_factory_kind:symbol.shape.originalFactory?.deps_kind ?? null, original_inherited_factory:symbol.shape.originalFactory?.inherited_factory?.name ?? null, constructor_attributes:(symbol.shape.diParams || []).filter(param=>param.attribute).map(param=>param.attribute), observed: observed.map(item => `${item.label}${item.optional ? '?' : ''}`)});
   }
   return results;
 }
