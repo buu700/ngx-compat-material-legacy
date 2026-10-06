@@ -26,9 +26,9 @@ import {
 } from '@angular/core';
 import {ControlValueAccessor} from '@angular/forms';
 import {MatRipple} from '@angular/material/core';
+import {TransitionCheckState} from '../owned-transition-state';
 import {
   MatCheckboxDefaultOptions,
-  TransitionCheckState,
 } from '@angular/material/checkbox';
 import {
   CanColor,
