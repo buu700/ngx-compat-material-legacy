@@ -3,20 +3,13 @@ import hashlib
 import json
 import re
 
-def mixin_argument_assertion_ok(root,active,body,invocation):
-    if not str(body.get('case_id','')).startswith('mixin-argument/'):
-        return True
+def mixin_argument_measurements_ok(root,body):
     try:
         path='fixtures/sass/mixin-argument-contracts.json';raw=(root/path).read_bytes();catalog=json.loads(raw)
         probes=[p for p in catalog['cases'] if p['case_id']==body['case_id']]
         if len(probes)!=1:return False
         probe=probes[0]
-        required=dict(**probe,kind='assertion',check_id='sass-seal',group='sass-api-and-values',result='pass',exit_code=0,
-            line=active.binding['source_line'],run_id=active.manifest['run_id'],invocation_id=invocation,binding=active.binding,
-            mutation_rejected=True,error=None)
-        if any(body.get(k)!=v or type(body.get(k))!=type(v) for k,v in required.items()):return False
-        library=[a for a in active.manifest['artifacts'] if a['id']=='library']
-        if len(library)!=1 or body['tarball_sha256']!=library[0]['sha256']:return False
+        if any(body.get(k)!=v for k,v in probe.items()) or body.get('error') is not None:return False
         identity=body['identity'];provenance=json.loads((root/'reference/material-16.2.14/PROVENANCE.json').read_text())['isolated_environment']
         lock=json.loads((root/'reference/material-16.2.14/environment-package-lock.json').read_text())
         original=json.loads((root/'fixtures/sass/function-contracts.json').read_text())['original_entry_identity']
@@ -41,7 +34,21 @@ def mixin_argument_assertion_ok(root,active,body,invocation):
                 if any(s['root']!=0 for s in sources) or dict(root=0,**original) not in sources:return False
             elif not any(s['root']==0 and s['path']=='_index.scss' for s in sources):return False
             values.append(css)
-        if values[0]!=values[1]:return False
-        mutation=body['mutation'];wrong=values[1]+'\n.wrong-nonempty-mixin { color: red; }\n'
-        return wrong!=values[0] and mutation==dict(css=wrong,css_sha256=hashlib.sha256(wrong.encode()).hexdigest(),css_bytes=len(wrong.encode()))
+        return True
+    except (KeyError,TypeError,ValueError,OSError):return False
+
+def mixin_argument_assertion_ok(root,active,body,invocation):
+    if not str(body.get('case_id','')).startswith('mixin-argument/'):
+        return True
+    try:
+        envelope=dict(kind='assertion',check_id='sass-seal',group='sass-api-and-values',result='pass',exit_code=0,
+            line=active.binding['source_line'],run_id=active.manifest['run_id'],invocation_id=invocation,binding=active.binding,
+            mutation_rejected=True,error=None)
+        if any(body.get(k)!=v or type(body.get(k))!=type(v) for k,v in envelope.items()):return False
+        library=[a for a in active.manifest['artifacts'] if a['id']=='library']
+        if len(library)!=1 or body['tarball_sha256']!=library[0]['sha256'] or not mixin_argument_measurements_ok(root,body):return False
+        original=body['expected']['css'];actual=body['actual']['css']
+        if original!=actual:return False
+        wrong=actual+'\n.wrong-nonempty-mixin { color: red; }\n'
+        return wrong!=original and body['mutation']==dict(css=wrong,css_sha256=hashlib.sha256(wrong.encode()).hexdigest(),css_bytes=len(wrong.encode()))
     except (KeyError,TypeError,ValueError,OSError):return False
