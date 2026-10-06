@@ -20,7 +20,7 @@ class SuiteSelectionTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         (self.root / "scripts").mkdir()
         (self.root / "testing/legacy-runner").mkdir(parents=True)
-        for name in ("run-legacy-artifact-suite.mjs", "resolve-run-library.mjs"):
+        for name in ("run-legacy-artifact-suite.mjs", "resolve-run-library.mjs", "safe-package-extract.mjs"):
             shutil.copy2(ROOT / "scripts" / name, self.root / "scripts" / name)
         self.inventory = self.root / "testing/legacy-runner/historical-inventory.json"
         self.inventory.write_text(json.dumps({"rows": [{"family": "card"}, {"family": "button"}]}))
