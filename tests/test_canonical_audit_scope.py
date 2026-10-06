@@ -27,5 +27,8 @@ class CanonicalAuditScopeTests(unittest.TestCase):
         self.assertEqual(manifest['peerDependencies']['@angular/cdk'],'^'+floor['cdk'])
         self.assertEqual(manifest['peerDependencies']['@angular/core'],'^'+floor['framework'])
         if line=='21.x':
-            self.assertEqual(ledger['closed_dispositions'],0);self.assertEqual(ledger['open_or_deferred'],1697)
-            self.assertTrue(all(e['final_disposition']=='needs-individual-review' and not e.get('individual_proof') for e in ledger['entries']))
+            final=[e for e in ledger['entries'] if e['final_disposition']!='needs-individual-review']
+            self.assertEqual(ledger['closed_dispositions'],len(final));self.assertEqual(ledger['open_or_deferred'],1697-len(final))
+            for entry in final:
+                evidence=json.loads((ROOT/entry['evidence_report']).read_text())
+                self.assertTrue(any(r['sha']==entry['sha'] and r['decision']==entry['reason'] for r in evidence['reviews']))

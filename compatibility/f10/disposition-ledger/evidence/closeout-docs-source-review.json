@@ -1,0 +1,279 @@
+{
+  "schema_version": 1,
+  "reviewer": "Codex primary implementer",
+  "method": "Read every complete original hunk for each listed SHA; enumerate all changed paths; distinguish current API documentation from historical owned controls. Shared identical upstream content reviewed once with both branch ownership contexts.",
+  "recorded_at_utc": "2026-10-06T18:19:43.542048+00:00",
+  "scope": "15 explicitly listed documentation-only SHAs; not all62 bootstrap batch candidates",
+  "source_repository": "https://github.com/angular/components",
+  "scope_input_sha256": "400e89f53e41975dd5056158c60bdac2e4a2c9dcabaee1204eda782492f5f456",
+  "g11_claim": "not-passed",
+  "limitations": [
+    "No runtime behavior or installed-peer delegation proof is claimed by this documentation-only review.",
+    "Other SHAs, accessibility guidance and authored uses remain independently accountable.",
+    "Maintained documentation applicability and obsolete upstream links require A10 review."
+  ],
+  "reviews": [
+    {
+      "sha": "2dc599762eab74812c011370d30f9cec307e884d",
+      "subject": "docs(material/snack-bar): fix broken doc example (#27686)",
+      "files": [
+        "src/material/snack-bar/snack-bar.md"
+      ],
+      "diff": "diff --git a/src/material/snack-bar/snack-bar.md b/src/material/snack-bar/snack-bar.md\nindex 8f6bfaee0..dc52bae46 100644\n--- a/src/material/snack-bar/snack-bar.md\n+++ b/src/material/snack-bar/snack-bar.md\n@@ -84,10 +84,7 @@ snackbars  opened via `snackBar.open`.\n \n If no annotations are used, all the content will be treated as text content.\n \n-<!-- example({\n-  \"example\": \"snack-bar-annotated-component-example\",\n-  \"file\": \"snack-bar-annotated-component-example-snack.html\"\n-}) -->\n+<!-- example(snack-bar-annotated-component) -->\n \n ### Setting the global configuration defaults\n If you want to override the default snack bar options, you can do so using the\n",
+      "diff_sha256": "b25c8cde3df7c4f965b0237fe3a63c1c34c1d5cb8a60352ab3e9f0cbbf42021a",
+      "review_depth": "bounded-documentation-source-review",
+      "decision": "Replaces only the upstream snack-bar annotated-example directive. No such upstream example or markdown is maintained by the add-on; no runtime/API change is in this patch.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": false
+    },
+    {
+      "sha": "891e3a0db1f571e9dfae2d9a0a3df1d4f4faa92a",
+      "subject": "docs(material/slider): clarify behavior of slider range thumbs (#27846)",
+      "files": [
+        "src/material/slider/slider.md"
+      ],
+      "diff": "diff --git a/src/material/slider/slider.md b/src/material/slider/slider.md\nindex 3392b9372..d00a6595f 100644\n--- a/src/material/slider/slider.md\n+++ b/src/material/slider/slider.md\n@@ -16,9 +16,11 @@ respectively. The initial value is set to the minimum value unless otherwise spe\n ```\n \n ### Selecting a range\n-A `<mat-slider>` can be converted into a range slider by projecting both a `matStartThumb` and a\n-`matEndThumb` into it. Each of the thumbs has an independent value, but they won't be allowed to\n-overlap and they're still bound by the same `min` and `max` from the slider.\n+A `<mat-slider>` can be converted into a range slider by projecting both a `matSliderStartThumb` and a\n+`matSliderEndThumb` into it. Each thumb has its own value, but both are still\n+constrained by the slider's `min` and `max` values. The `matSliderStartThumb` cannot have a value\n+greater than that of the `matSliderEndThumb` and the `matSliderEndThumb` cannot have a value less than\n+that of the `matSliderStartThumb`, though they both may have the same value.\n \n ```html\n <mat-slider>\n",
+      "diff_sha256": "32bfa3b83f59c44b2e5455ef1b9caf926080c28370c62ad235ea31407ec9f3cf",
+      "review_depth": "bounded-documentation-source-review",
+      "decision": "Clarifies modern projected matSliderStartThumb/EndThumb range values. The historical single-thumb legacy-slider does not implement these selectors; copying the modern explanation would misdescribe the frozen API.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": false
+    },
+    {
+      "sha": "ae0b9e1c1bae5e937d039ea53652fe1656bc4623",
+      "subject": "docs(material/datepicker): recommend installing adapters through ng add",
+      "files": [
+        "src/material/datepicker/datepicker.md"
+      ],
+      "diff": "diff --git a/src/material/datepicker/datepicker.md b/src/material/datepicker/datepicker.md\nindex 9783f8afc..8cec8afbb 100644\n--- a/src/material/datepicker/datepicker.md\n+++ b/src/material/datepicker/datepicker.md\n@@ -161,7 +161,7 @@ that point.\n \n <!-- example(datepicker-filter) -->\n \n-In this example the user cannot select any date that falls on a Saturday or Sunday, but all of the \n+In this example the user cannot select any date that falls on a Saturday or Sunday, but all of the\n dates which fall on other days of the week are selectable.\n \n Each validation property has a different error that can be checked:\n@@ -336,7 +336,7 @@ The easiest way to ensure this is to import one of the provided date modules:\n   </tbody>\n </table>\n \n-`MatDateFnsModule` (installed via `@angular/material-date-fns-adapter`)\n+`MatDateFnsModule` (installed via `ng add @angular/material-date-fns-adapter`)\n \n <table>\n   <tbody>\n@@ -359,7 +359,7 @@ The easiest way to ensure this is to import one of the provided date modules:\n   </tbody>\n </table>\n \n-`MatLuxonDateModule` (installed via `@angular/material-luxon-adapter`)\n+`MatLuxonDateModule` (installed via `ng add @angular/material-luxon-adapter`)\n \n <table>\n   <tbody>\n@@ -382,7 +382,7 @@ The easiest way to ensure this is to import one of the provided date modules:\n   </tbody>\n </table>\n \n-`MatMomentDateModule` (installed via `@angular/material-moment-adapter`)\n+`MatMomentDateModule` (installed via `ng add @angular/material-moment-adapter`)\n \n <table>\n   <tbody>\n",
+      "diff_sha256": "87708f1a29129d412fae91ec231066b4c0d79b11f7c84d3e3afc465ba246c0c1",
+      "review_depth": "bounded-documentation-source-review",
+      "decision": "Changes only installation prose for current date adapters to ng add. Date adapters and their ng-add implementation remain peer-owned; this patch adds no dependency or shipped adapter code.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": false
+    },
+    {
+      "sha": "22bd09a0e6cb156d3dfefc89f1d3a06afecea4b6",
+      "subject": "docs(cdk/scrolling): fix typo (#28549)",
+      "files": [
+        "src/cdk/scrolling/scrolling.md"
+      ],
+      "diff": "diff --git a/src/cdk/scrolling/scrolling.md b/src/cdk/scrolling/scrolling.md\nindex bc993cad9..40d430032 100644\n--- a/src/cdk/scrolling/scrolling.md\n+++ b/src/cdk/scrolling/scrolling.md\n@@ -140,7 +140,7 @@ element, apply `cdkVirtualScrollingElement` to the scrolling parent element.\n \n <!-- example(cdk-virtual-scroll-parent-scrolling) -->\n \n-Another common scenario is using the window itself as the scrolling element. This often a better\n+Another common scenario is using the window itself as the scrolling element. This is often a better\n user experience on mobile devices, as it allows the browser chrome to scroll away. To use the\n window as the scrolling element, add the `scrollWindow` attribute to the \n `cdk-virtual-scroll-viewport`.\n",
+      "diff_sha256": "bf5d40be29ed52378b04f45855b33b3050c3c3a99ff87aaa3fc5c91fff952e64",
+      "review_depth": "bounded-documentation-source-review",
+      "decision": "Adds the missing word is to CDK window-scrolling prose. The add-on does not own or distribute CDK scrolling documentation or code.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": false
+    },
+    {
+      "sha": "d1128dd256943413ccd6761ba78879757ef20e06",
+      "subject": "docs(material/progress-bar): remove old MDC guide",
+      "files": [
+        "src/material/progress-bar/README.md"
+      ],
+      "diff": "diff --git a/src/material/progress-bar/README.md b/src/material/progress-bar/README.md\nindex bc2f91504..01fc8153b 100644\n--- a/src/material/progress-bar/README.md\n+++ b/src/material/progress-bar/README.md\n@@ -1,65 +1 @@\n-This version of `<mat-progress-bar>` is built on top of\n-[MDC Web](https://github.com/material-components/material-components-web).\n-\n-## How to use\n-Assuming your application is already up and running using Angular Material, you can add this\n-component by following these steps:\n-\n-1. Install Angular Material & MDC WEB:\n-\n-   ```bash\n-   npm i material-components-web @angular/material\n-   ```\n-\n-2. In your `angular.json`, make sure `node_modules/` is listed as a Sass include path. This is\n-   needed for the Sass compiler to be able to find the MDC Web Sass files.\n-\n-   ```json\n-   ...\n-   \"styles\": [\n-     \"src/styles.scss\"\n-   ],\n-   \"stylePreprocessorOptions\": {\n-     \"includePaths\": [\n-       \"node_modules/\"\n-     ]\n-   },\n-   ...\n-   ```\n-\n-3. Import the `MatProgressBarModule` and add it to the module that declares your component:\n-\n-   ```ts\n-   import {MatProgressBarModule} from '@angular/material/progress-bar';\n-\n-   @NgModule({\n-     declarations: [MyComponent],\n-     imports: [MatProgressBarModule],\n-   })\n-   export class MyModule {}\n-   ```\n-\n-4. Add use `<mat-progress-bar>` in your component's template, just like you would the normal\n-   `<mat-progress-bar>`:\n-\n-   ```html\n-   <mat-progress-bar [value]=\"42\"></mat-progress-bar>\n-   ```\n-\n-5. Add the theme and typography mixins to your Sass:\n-\n-   ```scss\n-   @use '@angular/material' as mat;\n-\n-   $my-primary: mat.define-palette(mat.$indigo-palette);\n-   $my-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);\n-   $my-theme: mat.define-light-theme((\n-     color: (\n-       primary: $my-primary,\n-       accent: $my-accent\n-     )\n-   ));\n-\n-   @include mat.progress-bar-theme($my-theme);\n-   @include mat.progress-bar-typography($my-theme);\n-   ```\n+Please see the official documentation at https://material.angular.io/components/component/progress-bar\n",
+      "diff_sha256": "c493c2c4d4bc0549dacb5afb6139a67502db054a075cd95bf7d3d9d9601ce92b",
+      "review_depth": "bounded-documentation-source-review",
+      "decision": "Removes an obsolete upstream MDC progress-bar setup guide. The historical progress-bar implementation and M2 styles are independently owned, and its README is already a documentation pointer; no code change is contained in this deletion.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": false
+    },
+    {
+      "sha": "1999e203c5853272faff77f54372939e550f6e2a",
+      "subject": "docs(material/slider): value should go in the input tag (#28257)",
+      "files": [
+        "src/material/slider/slider.md"
+      ],
+      "diff": "diff --git a/src/material/slider/slider.md b/src/material/slider/slider.md\nindex 240d44b0c..5d0919d3b 100644\n--- a/src/material/slider/slider.md\n+++ b/src/material/slider/slider.md\n@@ -10,8 +10,8 @@ in increments of `1`. These values can be changed by setting the `min`, `max`, a\n respectively. The initial value is set to the minimum value unless otherwise specified.\n \n ```html\n-<mat-slider min=\"1\" max=\"5\" step=\"0.5\" value=\"1.5\">\n-  <input matSliderThumb>\n+<mat-slider min=\"1\" max=\"5\" step=\"0.5\">\n+  <input matSliderThumb value=\"1.5\">\n </mat-slider>\n ```\n \n",
+      "diff_sha256": "7fce0f7c45c7f0cff7bf855679bd0c681690eb6c8e007f8a87e4630a750e2977",
+      "review_depth": "bounded-documentation-source-review",
+      "decision": "Moves value from the modern slider host to its projected matSliderThumb input in a documentation example. Legacy slider uses the historical host-value contract; do not transplant modern input markup.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": false
+    },
+    {
+      "sha": "5fa8101f7bf67ab58f61d426d5f7ee15bdb6214b",
+      "subject": "docs(material/chips): wrong example name (#29572)",
+      "files": [
+        "src/material/chips/chips.md"
+      ],
+      "diff": "diff --git a/src/material/chips/chips.md b/src/material/chips/chips.md\nindex 235e76453..373672b0c 100644\n--- a/src/material/chips/chips.md\n+++ b/src/material/chips/chips.md\n@@ -44,8 +44,8 @@ Chips are always used inside a container. To create chips connected to an input\n Chips are compatible with `@angular/forms` and supports both `FormsModule`\n and `ReactiveFormsModule`.\n \n-<!-- example(chips-template-form-example) -->\n-<!-- example(chips-reactive-form-example) -->\n+<!-- example(chips-template-form) -->\n+<!-- example(chips-reactive-form) -->\n \n #### Disabled `<mat-chip-row>`\n \n",
+      "diff_sha256": "086522a1730f831defd63d9b9c56639a3abe0831e4ed351a293248a432048689",
+      "review_depth": "bounded-documentation-source-review",
+      "decision": "Corrects two upstream chips example directive names. Those upstream examples and the markdown are absent from the owned legacy package; no component change is present.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": false
+    },
+    {
+      "sha": "34aa01dc97b5d75249bae0cf817392e1b7c3426a",
+      "subject": "docs(material/form-field): update document refs to mat-chip-set (#30064)",
+      "files": [
+        "src/material/form-field/form-field.md"
+      ],
+      "diff": "diff --git a/src/material/form-field/form-field.md b/src/material/form-field/form-field.md\nindex 83d0b2b2f..fb5e1335d 100644\n--- a/src/material/form-field/form-field.md\n+++ b/src/material/form-field/form-field.md\n@@ -11,7 +11,7 @@ The following Angular Material components are designed to work inside a `<mat-fo\n - [`<input matNativeControl>` &amp; `<textarea matNativeControl>`](https://material.angular.io/components/input/overview)\n - [`<select matNativeControl>`](https://material.angular.io/components/select/overview)\n - [`<mat-select>`](https://material.angular.io/components/select/overview)\n-- [`<mat-chip-list>`](https://material.angular.io/components/chips/overview)\n+- [`<mat-chip-set>`](https://material.angular.io/components/chips/overview)\n \n <!-- example(form-field-overview) -->\n \n",
+      "diff_sha256": "207cf9854c766ff6a71704ea88a52d67ebcc798a95ce059ffb9b86339fa0149e",
+      "review_depth": "bounded-documentation-source-review",
+      "decision": "Changes the modern form-field documentation list from mat-chip-list to mat-chip-set. Historical legacy-chip-list remains its distinct form-field control; adopting the modern list would erase the historical contract.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": false
+    },
+    {
+      "sha": "e482240fc857e034e08af38fcfe7d6d5857c3aa7",
+      "subject": "docs: fix typo in autocomplete by removing redundant word (#30644)",
+      "files": [
+        "src/material/autocomplete/autocomplete.md"
+      ],
+      "diff": "diff --git a/src/material/autocomplete/autocomplete.md b/src/material/autocomplete/autocomplete.md\nindex 5f8549c54..12306f3f9 100644\n--- a/src/material/autocomplete/autocomplete.md\n+++ b/src/material/autocomplete/autocomplete.md\n@@ -64,7 +64,7 @@ desired display value. Then bind it to the autocomplete's `displayWith` property\n ### Require an option to be selected\n \n By default, the autocomplete will accept the value that the user typed into the input field.\n-Instead, if you want to instead ensure that an option from the autocomplete was selected, you can\n+Instead, if you want to ensure that an option from the autocomplete was selected, you can\n enable the `requireSelection` input on `mat-autocomplete`. This will change the behavior of\n the autocomplete in the following ways:\n 1. If the user opens the autocomplete, changes its value, but doesn't select anything, the\n",
+      "diff_sha256": "aafa8d07d296fcd59f21927972c42cd0457e5adebe620a2d67d9262a9fc998c1",
+      "review_depth": "bounded-documentation-source-review",
+      "decision": "Removes a duplicated instead in modern autocomplete requireSelection prose. This is a wording change and does not introduce requireSelection into the frozen legacy surface.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": false
+    },
+    {
+      "sha": "01ec1e0e1e0a9d62c1f7d294bc91ed9e0e3c7e7d",
+      "subject": "docs(material/button): variants table not rendering (#31274)",
+      "files": [
+        "src/material/button/button.md"
+      ],
+      "diff": "diff --git a/src/material/button/button.md b/src/material/button/button.md\nindex a06348334..6f9baa201 100644\n--- a/src/material/button/button.md\n+++ b/src/material/button/button.md\n@@ -9,6 +9,7 @@ is performed. An `<a>` element should be used whenever the user will _navigate_\n \n \n There are several button variants, each applied as an attribute:\n+\n | Attribute            | Description                                                              |\n |----------------------|--------------------------------------------------------------------------|\n | `matButton`          | Rectangular button that can contain text and icons                       |\n",
+      "diff_sha256": "9cdfb70b8fad763b62a0effe241e82a88c4467224d225fd86969fcaea30748f6",
+      "review_depth": "bounded-documentation-source-review",
+      "decision": "Adds a blank line before the modern matButton variant table so Markdown renders it. The upstream Markdown table is not maintained here and no implementation changes occur.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": false
+    },
+    {
+      "sha": "b5fbf52fff33101a16595d274c425a377dfc9228",
+      "subject": "docs: correct treeNodeDef selectors (#31421)",
+      "files": [
+        "src/cdk/tree/tree.md",
+        "src/material/tree/tree.md"
+      ],
+      "diff": "diff --git a/src/cdk/tree/tree.md b/src/cdk/tree/tree.md\nindex 30de3315c..9f8e0c716 100644\n--- a/src/cdk/tree/tree.md\n+++ b/src/cdk/tree/tree.md\n@@ -55,11 +55,11 @@ In order to use the tree, you must define a tree node template. There are two ty\n template defines the look of the tree node, expansion/collapsing control and the structure for\n nested children nodes.\n \n-A node definition is specified via any element with `cdkNodeDef`. This directive exports the node\n+A node definition is specified via any element with `cdkTreeNodeDef`. This directive exports the node\n data to be used in any bindings in the node template.\n \n ```html\n-<cdk-tree-node *cdkNodeDef=\"let node\">\n+<cdk-tree-node *cdkTreeNodeDef=\"let node\">\n   {{node.key}}: {{node.value}}\n </cdk-tree-node>\n ```\n@@ -80,7 +80,7 @@ When using nested tree nodes, the node template must contain a `cdkTreeNodeOutle\n where the children of the node will be rendered.\n \n ```html\n-<cdk-nested-tree-node *cdkNodeDef=\"let node\">\n+<cdk-nested-tree-node *cdkTreeNodeDef=\"let node\">\n   {{node.value}}\n   <ng-container cdkTreeNodeOutlet></ng-container>\n </cdk-nested-tree-node>\n@@ -96,7 +96,7 @@ a tree node recursively by setting `[cdkTreeNodeToggleRecursive]` to true.\n activation. For icon buttons, ensure that `aria-label` is provided.\n \n ```html\n-<cdk-tree-node *cdkNodeDef=\"let node\">\n+<cdk-tree-node *cdkTreeNodeDef=\"let node\">\n   <button cdkTreeNodeToggle aria-label=\"toggle tree node\" [cdkTreeNodeToggleRecursive]=\"true\">\n     <mat-icon>expand</mat-icon>\n   </button>\n@@ -110,7 +110,7 @@ The `cdkTreeNodePadding` directive can be placed in a flat tree's node template\n information of a flat tree node.\n \n ```html\n-<cdk-tree-node *cdkNodeDef=\"let node\" cdkNodePadding>\n+<cdk-tree-node *cdkTreeNodeDef=\"let node\" cdkNodePadding>\n   {{node.value}}\n </cdk-tree-node>\n ```\n@@ -125,10 +125,10 @@ The tree may include multiple node templates, where a template is chosen\n for a particular data node via the `when` predicate of the template.\n \n ```html\n-<cdk-tree-node *cdkNodeDef=\"let node\" cdkTreeNodePadding>\n+<cdk-tree-node *cdkTreeNodeDef=\"let node\" cdkTreeNodePadding>\n   {{node.value}}\n </cdk-tree-node>\n-<cdk-tree-node *cdkNodeDef=\"let node; when: isSpecial\" cdkTreeNodePadding>\n+<cdk-tree-node *cdkTreeNodeDef=\"let node; when: isSpecial\" cdkTreeNodePadding>\n   [ A special node {{node.value}} ]\n </cdk-tree-node>\n ```\n@@ -200,11 +200,11 @@ interaction.\n \n ```html\n <cdk-tree-node\n-    *cdkNodeDef=\"let node\"\n+    *cdkTreeNodeDef=\"let node\"\n     (click)=\"performAction(node)\"\n     (activation)=\"performAction($event)\">\n </cdk-tree-node>\n ```\n \n In this example, `$event` contains the node's data and is equivalent to the implicit data passed in\n-the `cdkNodeDef` context.\n+the `cdkTreeNodeDef` context.\ndiff --git a/src/material/tree/tree.md b/src/material/tree/tree.md\nindex a9eba1238..e2411fa4c 100644\n--- a/src/material/tree/tree.md\n+++ b/src/material/tree/tree.md\n@@ -55,11 +55,11 @@ In order to use the tree, you must define a tree node template. There are two ty\n template defines the look of the tree node, expansion/collapsing control and the structure for\n nested children nodes.\n \n-A node definition is specified via any element with `matNodeDef`. This directive exports the node\n+A node definition is specified via any element with `matTreeNodeDef`. This directive exports the node\n data to be used in any bindings in the node template.\n \n ```html\n-<mat-tree-node *matNodeDef=\"let node\">\n+<mat-tree-node *matTreeNodeDef=\"let node\">\n   {{node.key}}: {{node.value}}\n </mat-tree-node>\n ```\n@@ -80,7 +80,7 @@ When using nested tree nodes, the node template must contain a `matTreeNodeOutle\n where the children of the node will be rendered.\n \n ```html\n-<mat-nested-tree-node *matNodeDef=\"let node\">\n+<mat-nested-tree-node *matTreeNodeDef=\"let node\">\n   {{node.value}}\n   <ng-container matTreeNodeOutlet></ng-container>\n </mat-nested-tree-node>\n@@ -96,7 +96,7 @@ a tree node recursively by setting `[matTreeNodeToggleRecursive]` to true.\n activation. For icon buttons, ensure that `aria-label` is provided.\n \n ```html\n-<mat-tree-node *matNodeDef=\"let node\">\n+<mat-tree-node *matTreeNodeDef=\"let node\">\n   <button matTreeNodeToggle aria-label=\"toggle tree node\" [matTreeNodeToggleRecursive]=\"true\">\n     <mat-icon>expand</mat-icon>\n   </button>\n@@ -119,7 +119,7 @@ The `matTreeNodePadding` can be placed in a flat tree's node template to display\n information of a flat tree node.\n \n ```html\n-<mat-tree-node *matNodeDef=\"let node\" matNodePadding>\n+<mat-tree-node *matTreeNodeDef=\"let node\" matNodePadding>\n   {{node.value}}\n </mat-tree-node>\n ```\n@@ -134,10 +134,10 @@ The tree may include multiple node templates, where a template is chosen\n for a particular data node via the `when` predicate of the template.\n \n ```html\n-<mat-tree-node *matNodeDef=\"let node\" matTreeNodePadding>\n+<mat-tree-node *matTreeNodeDef=\"let node\" matTreeNodePadding>\n   {{node.value}}\n </mat-tree-node>\n-<mat-tree-node *matNodeDef=\"let node; when: isSpecial\" matTreeNodePadding>\n+<mat-tree-node *matTreeNodeDef=\"let node; when: isSpecial\" matTreeNodePadding>\n   [ A special node {{node.value}} ]\n </mat-tree-node>\n ```\n@@ -209,11 +209,11 @@ interaction.\n \n ```html\n <mat-tree-node\n-    *matNodeDef=\"let node\"\n+    *matTreeNodeDef=\"let node\"\n     (click)=\"performAction(node)\"\n     (activation)=\"performAction($event)\">\n </mat-tree-node>\n ```\n \n In this example, `$event` contains the node's data and is equivalent to the implicit data passed in\n-the `matNodeDef` context.\n+the `matTreeNodeDef` context.\n",
+      "diff_sha256": "d25a5f1144f2eb61a85081f1f8143f1760beedb7665e57d80a9a0b62ac8563f1",
+      "review_depth": "bounded-documentation-source-review",
+      "decision": "Corrects cdkNodeDef/matNodeDef references to cdkTreeNodeDef/matTreeNodeDef in peer-owned tree documentation. No tree implementation is copied into this legacy add-on; no runtime change occurs.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": false
+    },
+    {
+      "sha": "c713b9b93adcaec054f54605ee95f272de4dd161",
+      "subject": "docs(material/button): document iconPositionEnd and matButtonIcon attributes (#32822)",
+      "files": [
+        "src/material/button/button.md"
+      ],
+      "diff": "diff --git a/src/material/button/button.md b/src/material/button/button.md\nindex fbd8e81ef..bd7b8f423 100644\n--- a/src/material/button/button.md\n+++ b/src/material/button/button.md\n@@ -43,6 +43,47 @@ the `extended` attribute, mini FABs do not.\n </button>\n ```\n \n+### Icon positioning\n+\n+Buttons can contain icons alongside text. By default, icons (`mat-icon`, `.material-icons`, or\n+elements with the `matButtonIcon` attribute) are projected **before** the button label.\n+\n+```html\n+<button matButton>\n+  <mat-icon>favorite</mat-icon>\n+  Like\n+</button>\n+```\n+\n+To place an icon **after** the button label, add the `iconPositionEnd` attribute to the icon element:\n+\n+```html\n+<button matButton>\n+  Send\n+  <mat-icon iconPositionEnd>send</mat-icon>\n+</button>\n+```\n+\n+You can also use both positions at once:\n+\n+```html\n+<button matButton>\n+  <mat-icon>arrow_back</mat-icon>\n+  Navigate\n+  <mat-icon iconPositionEnd>arrow_forward</mat-icon>\n+</button>\n+```\n+\n+If you are using a custom icon element that is not a `mat-icon` or `.material-icons`, add the\n+`matButtonIcon` attribute so that the button can project it into the correct slot:\n+\n+```html\n+<button matButton>\n+  <my-custom-icon matButtonIcon>custom</my-custom-icon>\n+  Action\n+</button>\n+```\n+\n ### Interactive disabled buttons\n Native disabled `<button>` elements cannot receive focus and do not dispatch any events. This can\n be problematic in some cases because it can prevent the app from telling the user why the button is\n",
+      "diff_sha256": "9c36ba964c0bd9192ca8da26329060994c4cd99e442a72db896f603f2e2e9219",
+      "review_depth": "bounded-documentation-source-review",
+      "decision": "Documents modern MDC icon projection selectors matButtonIcon/iconPositionEnd. Historical button content projection is independently preserved; no modern projection attributes are added by this documentation patch.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": false
+    },
+    {
+      "sha": "d829d1c7227f99baef7c858a4e337e362e88933e",
+      "subject": "docs(material/form-field): fix incorrect chip component reference (#33161)",
+      "files": [
+        "src/material/form-field/form-field.md"
+      ],
+      "diff": "diff --git a/src/material/form-field/form-field.md b/src/material/form-field/form-field.md\nindex ea93a7071..bdcf41bcd 100644\n--- a/src/material/form-field/form-field.md\n+++ b/src/material/form-field/form-field.md\n@@ -11,7 +11,9 @@ The following Angular Material components are designed to work inside a `<mat-fo\n - [`<input matNativeControl>` &amp; `<textarea matNativeControl>`](https://material.angular.dev/components/input/overview)\n - [`<select matNativeControl>`](https://material.angular.dev/components/select/overview)\n - [`<mat-select>`](https://material.angular.dev/components/select/overview)\n-- [`<mat-chip-set>`](https://material.angular.dev/components/chips/overview)\n+- [`<mat-chip-grid>`](https://material.angular.dev/components/chips/overview)\n+\n+Note: `<mat-form-field>` requires a child component that implements `MatFormFieldControl`. Among the chips components, only `<mat-chip-grid>` supports this integration.\n \n <!-- example(form-field-overview) -->\n \n",
+      "diff_sha256": "3e4032bc22039a2a5f6b8ee12670f6b4a9b843382d5b0be4451cae1c13447054",
+      "review_depth": "bounded-documentation-source-review",
+      "decision": "Corrects modern form-field chips guidance from mat-chip-set to mat-chip-grid and explains MatFormFieldControl. The owned historical mat-chip-list control must keep its original integration; do not replace it with current chips APIs.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": false
+    },
+    {
+      "sha": "66d9487810573abbbf2e745167807aa604529e6a",
+      "subject": "docs: mention `FormField` in Radio and Slide Toggle (#33624)",
+      "files": [
+        "src/material/radio/radio.md",
+        "src/material/slide-toggle/slide-toggle.md"
+      ],
+      "diff": "diff --git a/src/material/radio/radio.md b/src/material/radio/radio.md\nindex aacf13031..30103908f 100644\n--- a/src/material/radio/radio.md\n+++ b/src/material/radio/radio.md\n@@ -24,8 +24,8 @@ would make that impossible (e.g., radio-buttons inside of table cells). The radi\n Individual radio-buttons inside of a radio-group will inherit the `name` of the group.\n \n \n-### Use with `@angular/forms`\n-`<mat-radio-group>` is compatible with `@angular/forms` and supports both `FormsModule`\n+### Use with Angular Forms\n+`<mat-radio-group>` is compatible with `@angular/forms` and supports `FormField`, `FormsModule`, \n and `ReactiveFormsModule`.\n \n ### Accessibility\ndiff --git a/src/material/slide-toggle/slide-toggle.md b/src/material/slide-toggle/slide-toggle.md\nindex e6359e0da..f95117afb 100644\n--- a/src/material/slide-toggle/slide-toggle.md\n+++ b/src/material/slide-toggle/slide-toggle.md\n@@ -20,8 +20,8 @@ container.\n \n <!-- example(slide-toggle-full-width) -->\n \n-### Use with `@angular/forms`\n-`<mat-slide-toggle>` is compatible with `@angular/forms` and supports both `FormsModule`\n+### Use with Angular Forms\n+`<mat-slide-toggle>` is compatible with `@angular/forms` and supports `FormField`, `FormsModule`, \n and `ReactiveFormsModule`.\n \n ### Accessibility\n",
+      "diff_sha256": "62b09acd72b03abff22af904e4ecb29c6a05f1bc9794d47cd0df4ac0843f9c71",
+      "review_depth": "bounded-documentation-source-review",
+      "decision": "Mentions signal-form FormField support only in modern radio/slide-toggle documentation. This does not establish such support in historical controls and supplies no implementation to adopt.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": false
+    },
+    {
+      "sha": "8189fbe4c8a98cee072f8d0b8774501ff0eded13",
+      "subject": "docs: mention forms support in outstanding controls (#33823)",
+      "files": [
+        "src/material/autocomplete/autocomplete.md",
+        "src/material/datepicker/datepicker.md",
+        "src/material/list/list.md",
+        "src/material/select/select.md",
+        "src/material/slider/slider.md",
+        "src/material/timepicker/timepicker.md"
+      ],
+      "diff": "diff --git a/src/material/autocomplete/autocomplete.md b/src/material/autocomplete/autocomplete.md\nindex 8cda8f887..b2cd5c3d9 100644\n--- a/src/material/autocomplete/autocomplete.md\n+++ b/src/material/autocomplete/autocomplete.md\n@@ -28,6 +28,10 @@ to the input's `matAutocomplete` property.\n               \"file\":\"autocomplete-simple-example.html\",\n               \"region\":\"input\"}) -->\n \n+### Use with Angular Forms\n+\n+`matAutocomplete` is compatible with `@angular/forms` and supports `FormField`, `FormsModule`, and `ReactiveFormsModule`.\n+\n ### Adding a custom filter\n \n At this point, the autocomplete panel should be toggleable on focus and options should be\ndiff --git a/src/material/datepicker/datepicker.md b/src/material/datepicker/datepicker.md\nindex d44c298a0..c4b689c3b 100644\n--- a/src/material/datepicker/datepicker.md\n+++ b/src/material/datepicker/datepicker.md\n@@ -61,10 +61,10 @@ Connect the range picker and range input using the `rangePicker` property:\n \n <!-- example(date-range-picker-overview) -->\n \n-### Date range input forms integration\n+### Use with Angular Forms\n \n-The `mat-date-range-input` component can be used together with the `FormGroup` directive from\n-`@angular/forms` to group the start and end values together and to validate them as a group.\n+The `mat-date-range-input` component can be used together with the `FormField` or `FormGroup` directive \n+from `@angular/forms` to group the start and end values together and to validate them as a group.\n \n <!-- example(date-range-picker-forms) -->\n \ndiff --git a/src/material/list/list.md b/src/material/list/list.md\nindex a6ca84936..e0505a35d 100644\n--- a/src/material/list/list.md\n+++ b/src/material/list/list.md\n@@ -98,6 +98,10 @@ Simple action lists can use the `mat-list-item` attribute on button tag elements\n </mat-action-list>\n ```\n \n+### Use with Angular Forms\n+\n+`<mat-selection-list>` is compatible with `@angular/forms` and supports `FormField`, `FormsModule`, and `ReactiveFormsModule`.\n+\n ### Selection lists\n A selection list provides an interface for selecting values, where each list item is an option.\n \ndiff --git a/src/material/select/select.md b/src/material/select/select.md\nindex 6bedcb29c..27b591e1f 100644\n--- a/src/material/select/select.md\n+++ b/src/material/select/select.md\n@@ -20,15 +20,19 @@ To use a native select inside `<mat-form-field>`, import `MatInputModule` and ad\n \n ### Getting and setting the select value\n \n+#### 2-way binding with `value`\n+\n The `<mat-select>` supports 2-way binding to the `value` property without the need for Angular\n forms.\n \n <!-- example(select-value-binding) -->\n \n-Both`<mat-select>` and `<select>` support all of the form directives from the core `FormsModule` (`NgModel`) and\n-`ReactiveFormsModule` (`FormControl`, `FormGroup`, etc.) As with native `<select>`, `<mat-select>`\n-also supports a `compareWith` function. (Additional information about using a custom `compareWith`\n-function can be found in the\n+#### Use with Angular Forms\n+\n+Both `<mat-select>` and `<select>` support all of the form directives from the core `@angular/forms`. \n+Including `FormField` (signal forms), `FormsModule` (`NgModel`) and `ReactiveFormsModule` \n+(`FormControl`, `FormGroup`, etc.) As with native `<select>`, `<mat-select>` also supports a \n+`compareWith` function. (Additional information about using a custom `compareWith` function can be found in the \n [Angular forms documentation](https://angular.dev/api/forms/SelectControlValueAccessor#compareWith)).\n \n <!-- example(select-form) -->\ndiff --git a/src/material/slider/slider.md b/src/material/slider/slider.md\nindex c8e358b8e..21d041f58 100644\n--- a/src/material/slider/slider.md\n+++ b/src/material/slider/slider.md\n@@ -31,6 +31,10 @@ that of the `matSliderStartThumb`, though they both may have the same value.\n \n <!-- example(slider-range) -->\n \n+### Use with Angular Forms\n+\n+`<mat-slider>` is compatible with `@angular/forms` and supports `FormField`, `FormsModule`, and `ReactiveFormsModule`.\n+\n ### Thumb label\n By default, the exact selected value of a slider is not visible to the user. However, this value can\n be added to the thumb by adding the `discrete` attribute.\ndiff --git a/src/material/timepicker/timepicker.md b/src/material/timepicker/timepicker.md\nindex 1240110c7..3a46a2528 100644\n--- a/src/material/timepicker/timepicker.md\n+++ b/src/material/timepicker/timepicker.md\n@@ -19,7 +19,9 @@ The timepicker input and toggle can be used either on their own or as a part of\n <!-- example({\"example\":\"timepicker-overview\",\n               \"file\":\"timepicker-overview-example.html\"}) -->\n \n-### Timepicker forms integration\n+### Use with Angular Forms\n+\n+`matTimepicker` is compatible with `@angular/forms` and supports `FormField`, `FormsModule`, and `ReactiveFormsModule`.\n \n The timepicker input integrates with the `@angular/forms` module by providing itself as a\n `ControlValueAccessor` and a `Validator` (see [Input validation](#input-validation) below for more\n",
+      "diff_sha256": "b684182fd5bf90bc73940da58cfafb07629d92783480014268bbf7e0cf6947b4",
+      "review_depth": "bounded-documentation-source-review",
+      "decision": "Adds signal-form FormField documentation across modern controls and timepicker. The add-on does not own timepicker or a modern API mirror; preserve its historical NgModel/reactive forms surface without claiming signal forms from this prose.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": false
+    }
+  ]
+}
