@@ -35,24 +35,6 @@ export {
   MatFormFieldControl as MatLegacyFormFieldControl,
 
   /**
-   * @deprecated Use `getMatFormFieldDuplicatedHintError` from `@angular/material/form-field` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
-   * @breaking-change 17.0.0
-   */
-  getMatFormFieldDuplicatedHintError as getMatLegacyFormFieldDuplicatedHintError,
-
-  /**
-   * @deprecated Use `getMatFormFieldMissingControlError` from `@angular/material/form-field` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
-   * @breaking-change 17.0.0
-   */
-  getMatFormFieldMissingControlError as getMatLegacyFormFieldMissingControlError,
-
-  /**
-   * @deprecated Use `getMatFormFieldPlaceholderConflictError` from `@angular/material/form-field` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
-   * @breaking-change 17.0.0
-   */
-  getMatFormFieldPlaceholderConflictError as getMatLegacyFormFieldPlaceholderConflictError,
-
-  /**
    * @deprecated Use `MAT_SUFFIX` from `@angular/material/form-field` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
    * @breaking-change 17.0.0
    */
@@ -74,3 +56,21 @@ export {
 // Historical `/animations` recipe secondary removed (F04); use CSS/Web Animations via MATERIAL_ANIMATIONS.
 
 export {MatCommonModule} from './internal/common-module';
+
+export {
+  /**
+   * @deprecated Use `getMatFormFieldDuplicatedHintError` from `@angular/material/form-field` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
+   * @breaking-change 17.0.0
+   */
+  getMatFormFieldDuplicatedHintError as getMatLegacyFormFieldDuplicatedHintError,
+  /**
+   * @deprecated Use `getMatFormFieldMissingControlError` from `@angular/material/form-field` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
+   * @breaking-change 17.0.0
+   */
+  getMatFormFieldMissingControlError as getMatLegacyFormFieldMissingControlError,
+  /**
+   * @deprecated Use `getMatFormFieldPlaceholderConflictError` from `@angular/material/form-field` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
+   * @breaking-change 17.0.0
+   */
+  getMatFormFieldPlaceholderConflictError as getMatLegacyFormFieldPlaceholderConflictError,
+} from './owned-errors';

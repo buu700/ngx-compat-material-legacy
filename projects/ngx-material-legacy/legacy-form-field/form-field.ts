@@ -43,15 +43,13 @@ import {getShadowRoot} from './owned-shadow-dom';
 import {AbstractControlDirective, ValidatorFn} from '@angular/forms';
 import {ANIMATION_MODULE_TYPE} from '@angular/core';
 import {
-  getMatFormFieldDuplicatedHintError,
-  getMatFormFieldMissingControlError,
-  getMatFormFieldPlaceholderConflictError,
   MatFormFieldControl,
   MAT_ERROR,
   MAT_FORM_FIELD,
   MAT_PREFIX,
   MAT_SUFFIX,
 } from '@angular/material/form-field';
+import {getMatFormFieldDuplicatedHintError, getMatFormFieldMissingControlError, getMatFormFieldPlaceholderConflictError} from './owned-errors';
 import {
   legacyAnimationsDisabled,
 } from '@ngx-compat/material-legacy/legacy-core';
