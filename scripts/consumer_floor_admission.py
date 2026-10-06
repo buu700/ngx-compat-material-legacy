@@ -30,6 +30,9 @@ def floor_support_records(body):
 
 def floor_assertion_ok(root: Path, active, body: dict, invocation: str) -> bool:
     case = body.get('case_id', '')
+    # Candidate experiments have no credit even if copied into an assertion directory.
+    if body.get('kind') == 'candidate-peer-experiment' or body.get('acceptance_credit') is False or case.startswith('experiment/'):
+        return False
     # Existing source-policy diagnostics remain distinct from execution proofs.
     if not case.startswith(('library/', 'cli/')):
         return True

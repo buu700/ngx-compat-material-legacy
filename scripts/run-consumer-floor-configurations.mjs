@@ -5,7 +5,7 @@ import {lstatSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, w
 import {tmpdir} from 'node:os';
 import {dirname, isAbsolute, join, relative, resolve, sep} from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {floorConfigurations} from './consumer-floor-roster.mjs';
+import {floorConfigurations,candidateFloorConfigurations} from './consumer-floor-roster.mjs';
 import {extractMigrationCli} from './migration-run-inputs.mjs';
 import {coordinatorRequest, lineForPackageVersion} from './packed-consumer-evidence.mjs';
 
@@ -19,6 +19,7 @@ const line = lineForPackageVersion(source.version);
 if (line !== request.line) throw new Error('floor request does not match source package line');
 const plan = JSON.parse(readFileSync(join(root, 'compatibility/rc/consumer-floor-plan.json'), 'utf8'));
 const configurations = floorConfigurations(plan, line, source);
+const candidates = candidateFloorConfigurations(plan,line,source);
 const runPath = resolve(args[1]);
 const runDir = dirname(runPath);
 const run = JSON.parse(readFileSync(runPath, 'utf8'));
@@ -89,22 +90,27 @@ function inspectCliArchive() {
 const results = [];
 try {
   const cliBin = inspectCliArchive();
-  for (const configuration of configurations) {
+  const candidateOutput = join(runDir,'reports','candidate-peer-experiments',request.invocation);
+  mkdirSync(candidateOutput,{recursive:true});
+  for (const configuration of [...configurations,...candidates]) {
+    const experiment = configuration.group === 'candidate-peer-experiment';
+    const outputDir = experiment ? candidateOutput : request.outputDir;
     const filename = configuration.case_id.replaceAll('/', '__');
-    const observation = {kind: 'assertion', check_id: 'consumer-floors', group: configuration.group,
+    const observation = {kind: experiment ? 'candidate-peer-experiment' : 'assertion', check_id: experiment ? null : 'consumer-floors', group: configuration.group,
+      acceptance_credit:!experiment,
       case_id: configuration.case_id, run_id: request.runId, invocation_id: request.invocation,
       line, binding: request.binding, configuration, result: 'fail', artifacts: {library: library.sha256, 'migrate-cli': cli.sha256}};
     try {
       const node = await runtime(configuration.node);
       observation.runtime = node;
       const env = {...cleanEnv, NGX_FLOOR_NPM_CLI: npmCli, PATH: `${dirname(node.executable)}:${cleanEnv.PATH ?? ''}`};
-      if (configuration.group === 'library-runtime') {
-        const detailPath = join(request.outputDir, `${filename}.consumer.json`);
+      if (configuration.group === 'library-runtime' || experiment) {
+        const detailPath = join(outputDir, `${filename}.consumer.json`);
         const command = [join(root, 'scripts/packed-consumer-aot-smoke.mjs'), '--tarball', library.path,
-          '--floor-case', configuration.case_id, '--floor-out', detailPath];
+          experiment ? '--candidate-floor-case' : '--floor-case', configuration.case_id, '--floor-out', detailPath];
         child(node.executable, command, {env, timeout: 600000});
         const detail = JSON.parse(readFileSync(detailPath, 'utf8'));
-        if (detail.status !== 'ok' || detail.node_runtime.version !== `v${configuration.node}`
+        if ((experiment && (detail.experimental_peer !== true || detail.advertised_floor_acceptance_credit !== false)) || detail.status !== 'ok' || detail.node_runtime.version !== `v${configuration.node}`
           || detail.tarball.sha256 !== library.sha256 || detail.aot.status !== 'ok' || detail.harness.status !== 'ok'
           || !Array.isArray(detail.acceptanceCases) || !detail.acceptanceCases.length
           || detail.acceptanceCases.some(item => item.result !== 'pass')) throw new Error('floor consumer did not satisfy every probe');
@@ -135,9 +141,9 @@ try {
       observation.exit_code = 0;
       observation.result = 'pass';
     } catch (error) { observation.failure = error.message; }
-    writeFileSync(join(request.outputDir, `${filename}.json`), JSON.stringify(observation, null, 2) + '\n');
-    results.push({case_id: observation.case_id, result: observation.result, failure: observation.failure});
-    console.log(`consumer floor: ${observation.case_id}: ${observation.result}${observation.failure ? `: ${observation.failure}` : ''}`);
+    writeFileSync(join(outputDir, `${filename}.json`), JSON.stringify(observation, null, 2) + '\n');
+    if (!experiment) results.push({case_id: observation.case_id, result: observation.result, failure: observation.failure});
+    console.log(`${experiment?'candidate peer experiment (no acceptance credit)':'consumer floor'}: ${observation.case_id}: ${observation.result}${observation.failure ? `: ${observation.failure}` : ''}`);
   }
 } finally { rmSync(owned, {recursive: true, force: true}); }
 process.exitCode = results.length === configurations.length && results.every(item => item.result === 'pass') ? 0 : 1;

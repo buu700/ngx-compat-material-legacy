@@ -30,7 +30,7 @@ import {tmpdir} from 'node:os';
 import {dirname, isAbsolute, join, relative, resolve, sep} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {spawnSync} from 'node:child_process';
-import {floorConfigurations} from './consumer-floor-roster.mjs';
+import {floorConfigurations,candidateFloorConfigurations} from './consumer-floor-roster.mjs';
 import {bundleConsumerHarness} from './bundle-consumer-harness.mjs';
 import {
   allConsumerCaseIds,
@@ -60,12 +60,13 @@ const skipHarness = args.includes('--skip-harness');
 let tarball = null;
 let runManifestPath = null;
 let floorCaseId = null;
+let candidateFloor = false;
 let floorOutput = null;
 
 for (let i = 0; i < args.length; i += 1) {
   const arg = args[i];
   if (arg === '--skip-harness') continue;
-  if (arg === '--tarball' || arg === '--run' || arg === '--floor-case' || arg === '--floor-out') {
+  if (arg === '--tarball' || arg === '--run' || arg === '--floor-case' || arg === '--candidate-floor-case' || arg === '--floor-out') {
     const value = args[i + 1];
     if (!value || value.startsWith('-')) {
       console.error(`${arg} requires a path`);
@@ -73,7 +74,10 @@ for (let i = 0; i < args.length; i += 1) {
     }
     if (arg === '--tarball') tarball = resolve(value);
     else if (arg === '--run') runManifestPath = resolve(value);
-    else if (arg === '--floor-case') floorCaseId = value;
+    else if (arg === '--floor-case' || arg === '--candidate-floor-case') {
+      if (floorCaseId) {console.error('Duplicate floor mode');process.exit(2);}
+      floorCaseId = value;candidateFloor = arg === '--candidate-floor-case';
+    }
     else floorOutput = resolve(value);
     i += 1;
     continue;
@@ -610,8 +614,8 @@ const sourceLine = lineForPackageVersion(sourceManifest.version);
 let floorConfiguration = null;
 if (floorCaseId) {
   const floorPlan = JSON.parse(readFileSync(join(root, 'compatibility/rc/consumer-floor-plan.json'), 'utf8'));
-  floorConfiguration = floorConfigurations(floorPlan, sourceLine, sourceManifest)
-    .find(item => item.case_id === floorCaseId && item.group === 'library-runtime');
+  floorConfiguration = (candidateFloor ? candidateFloorConfigurations : floorConfigurations)(floorPlan, sourceLine, sourceManifest)
+    .find(item => item.case_id === floorCaseId && item.group === (candidateFloor ? 'candidate-peer-experiment' : 'library-runtime'));
   const identity = readPackedIdentity(tarball);
   if (!floorConfiguration || process.versions.node !== floorConfiguration.node
       || identity.name !== sourceManifest.name || lineForPackageVersion(identity.version) !== sourceLine
@@ -641,6 +645,8 @@ const result = {
   tarball: {path: tarball, sha256: sha256File(tarball)},
   consumer_dir: consumer,
   floor_configuration: floorConfiguration,
+  experimental_peer: candidateFloor,
+  advertised_floor_acceptance_credit: !candidateFloor,
   node_runtime: {version: process.version, exec_path: process.execPath},
   aot: {status: 'pending'},
   harness: {status: skipHarness ? 'skipped' : 'pending'},
@@ -711,6 +717,7 @@ try {
       if (actual !== wanted) throw new Error(`Installed floor ${name}@${actual} differs from ${wanted}`);
     }
     const bytes = readFileSync(join(consumer, 'package-lock.json'));
+    if (candidateFloor && JSON.parse(bytes).packages['node_modules/rxjs']?.integrity !== floorConfiguration.rxjs_integrity) throw new Error('candidate RxJS integrity differs from reviewed registry pin');
     const receipt = `${floorOutput}.package-lock.json`;
     writeFileSync(receipt, bytes);
     result.consumer_lock = {path: receipt, bytes: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex')};
