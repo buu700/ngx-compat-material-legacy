@@ -6,7 +6,7 @@ import {spawnSync} from 'node:child_process';
 import {copyFileSync, mkdtempSync, readFileSync, realpathSync, rmSync} from 'node:fs';
 import {dirname, isAbsolute, join, relative, resolve} from 'node:path';
 import {tmpdir} from 'node:os';
-import {fileURLToPath} from 'node:url';
+import {fileURLToPath,pathToFileURL} from 'node:url';
 import {SILENCE} from './sass-api-inventory.mjs';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const sha = bytes => createHash('sha256').update(bytes).digest('hex');
@@ -24,7 +24,7 @@ export function functionCatalog() {
 }
 export function functionCaseIds() {return functionCatalog().cases.map(c => c.case_id);}
 export function measureFunction(sass, entry, loadPaths, catalog, probe, allowedRoots, importers = []) {
-  const program = `@use 'sass:meta'; @use '${entry.replaceAll('\\', '/')}' as m;\n${catalog.setup}\n@debug meta.inspect(${probe.expression});`;
+  const program = `@use 'sass:meta'; @use '${pathToFileURL(entry).href}' as m;\n${catalog.setup}\n@debug meta.inspect(${probe.expression});`;
   const messages = [];
   const result = sass.compileString(program, {loadPaths,importers,silenceDeprecations:SILENCE,
     logger:{warn(){},debug(message){messages.push(message);}}});

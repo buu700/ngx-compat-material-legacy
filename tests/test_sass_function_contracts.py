@@ -34,7 +34,7 @@ const dir=mkdtempSync(join(tmpdir(),'sass-function-root-'));
 try {
  const allowed=join(dir,'allowed');mkdirSync(allowed);const entry=join(allowed,'_index.scss');writeFileSync(entry,'// synthetic');
  const foreign=join(dir,'foreign.scss');writeFileSync(foreign,'// synthetic foreign');
- const fake=path=>({compileString(program,options){options.logger.debug('source-derived-value');return {loadedUrls:[pathToFileURL(path)]};}});
+ const fake=path=>({compileString(program,options){assert.match(program,/@use 'file:/);options.logger.debug('source-derived-value');return {loadedUrls:[pathToFileURL(path)]};}});
  const catalog=functionCatalog();const probe=catalog.cases[0];
  assert.equal(measureFunction(fake(entry),entry,[],catalog,probe,[allowed]).sources[0].path,'_index.scss');
  assert.throws(()=>measureFunction(fake(foreign),entry,[],catalog,probe,[allowed]),/outside/);
