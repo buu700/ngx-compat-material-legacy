@@ -14,8 +14,11 @@ class OwnedRenderedStylesTests(unittest.TestCase):
     def test_assessment_rejects_wrong_values_and_inert_mutation(self):
         code=r'''
 import assert from 'node:assert/strict';
-import {OWNED_STYLE_PROBES, assessOwnedStyles} from './scripts/sass-owned-rendered.mjs';
-const reference=Object.fromEntries(Object.entries(OWNED_STYLE_PROBES).map(([id,p])=>[id,{found:true,values:Object.fromEntries(p.properties.map(k=>[k,'tagged-value']))}]));
+import {OWNED_STYLE_PROBES, ownedStyleCaseIds, assessOwnedStyles} from './scripts/sass-owned-rendered.mjs';
+assert.equal(ownedStyleCaseIds().length,24);
+assert.equal(Object.values(OWNED_STYLE_PROBES).filter(p=>p.context==='typography').length,4);
+for(const probe of Object.values(OWNED_STYLE_PROBES).filter(p=>p.context==='typography'))for(const property of ['font-family','font-size','line-height','rect-height','rect-width'])assert.ok(probe.properties.includes(property));
+const reference=Object.fromEntries(Object.entries(OWNED_STYLE_PROBES).map(([id,p])=>[id,{found:true,values:Object.fromEntries(p.properties.map(k=>[k,k.startsWith('rect-')?'40':'tagged-value']))}]));
 const negative=structuredClone(reference);
 for(const [id,p] of Object.entries(OWNED_STYLE_PROBES)){const property=p.properties.includes('line-height')?'line-height':p.properties[0];negative[id].values[property]='wrong-but-nonempty';}
 assert.ok(Object.values(assessOwnedStyles(reference,reference,negative)).every(r=>r.result==='pass'));
@@ -43,3 +46,16 @@ for(const id of Object.keys(negative)){const inert=structuredClone(negative);ine
                 bad=copy.deepcopy(body);bad['properties'][0]['candidate']='wrong-value';self.assertFalse(owned_rendered_ok(ROOT,active,bad,'one'))
                 bad=copy.deepcopy(body);bad['identities']['owned-legacy-select']['reference_sha256']='f'*64;self.assertFalse(owned_rendered_ok(ROOT,active,bad,'one'))
                 bad=copy.deepcopy(body);bad['mutation']['observed']=bad['mutation']['reference'];self.assertFalse(owned_rendered_ok(ROOT,active,bad,'one'))
+
+                if body['context']=='typography':
+                    for field,value in [('custom_typography_theme',{}),('reference_kind','untouched-material-16.2.14-css')]:
+                        bad=copy.deepcopy(body);bad[field]=value;self.assertFalse(owned_rendered_ok(ROOT,active,bad,'one'))
+                    for field,value in [('case_id','mixin-argument/all-legacy-component-themes/custom-dark-theme'),('line','foreign'),('identity',{}),('expected',{}),('actual',{})]:
+                        bad=copy.deepcopy(body);bad['custom_typography_theme'][field]=value;self.assertFalse(owned_rendered_ok(ROOT,active,bad,'one'))
+                    bad=copy.deepcopy(body);bad['custom_typography_theme']['expected']=copy.deepcopy(bad['custom_typography_theme']['actual']);self.assertFalse(owned_rendered_ok(ROOT,active,bad,'one'))
+
+                    for value in ('0','NaN','-1','rgba(0,0,0,0.5)'):
+                        bad=copy.deepcopy(body)
+                        for prop in bad['properties']:
+                            if prop['property']=='rect-height':prop.update(reference=value,candidate=value)
+                        self.assertFalse(owned_rendered_ok(ROOT,active,bad,'one'))

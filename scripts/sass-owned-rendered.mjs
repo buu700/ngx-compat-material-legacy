@@ -4,6 +4,7 @@ import {createRequire} from 'node:module';
 import {mkdirSync, readFileSync, realpathSync, rmSync, writeFileSync} from 'node:fs';
 import {join, sep} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {mixinArgumentCatalog,mixinArgumentProgram} from './sass-mixin-arguments.mjs';
 import {installConsumer, buildLab, readPackedPackage, versionsFor, withChromium} from './check-companion-computed-styles.mjs';
 const root = fileURLToPath(new URL('..', import.meta.url));
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
@@ -29,6 +30,11 @@ export const OWNED_STYLE_PROBES = Object.freeze({
   'custom/datepicker-flat-button': {context:'custom', selector:'#s-mdc-flat', properties:['font-size','font-weight','line-height','height']},
   'custom/datepicker-stroked-button': {context:'custom', selector:'#s-mdc-stroked', properties:['font-size','font-weight','line-height','height']},
   'custom/outside-datepicker-button': {context:'custom', selector:'#s-mdc-outside', properties:['font-size','font-weight','line-height','height']},
+  "typography/legacy-button": {"context":"typography","selector":"#s-button","properties":["font-family","font-size","font-weight","line-height","rect-height","rect-width"]},
+  "typography/select-value": {"context":"typography","selector":"#s-disabled .mat-select-value","properties":["font-family","font-size","line-height","rect-height","rect-width"]},
+  "typography/form-field-infix": {"context":"typography","selector":".mat-form-field-infix","properties":["font-family","font-size","line-height","padding-top","padding-bottom","rect-height","rect-width"]},
+  "typography/snack-action": {"context":"typography","selector":".mat-simple-snackbar-action button","properties":["font-family","font-size","font-weight","line-height","rect-height","rect-width"]},
+
 });
 export const ownedStyleCaseIds = () => Object.keys(OWNED_STYLE_PROBES).map(id => `owned-style/${id}`);
 export function assessOwnedStyles(reference, candidate, negative) {
@@ -36,7 +42,7 @@ export function assessOwnedStyles(reference, candidate, negative) {
     const before=reference?.[id], after=candidate?.[id];
     const properties=spec.properties.map(property=>({property,reference:before?.values?.[property]??null,candidate:after?.values?.[property]??null}));
     const found=before?.found===true&&after?.found===true;
-    const match=found&&properties.every(p=>typeof p.reference==='string'&&p.reference!==''&&p.candidate===p.reference);
+    const match=found&&properties.every(p=>typeof p.reference==='string'&&p.reference!==''&&p.candidate===p.reference&&(!p.property.startsWith('rect-')||(Number.isFinite(Number(p.reference))&&Number(p.reference)>0)));
     const mutation=negative?.[id];
     const mutationProperty=spec.properties.includes('line-height')?'line-height':spec.properties[0];
     const mutationReference=before?.values?.[mutationProperty];
@@ -72,7 +78,7 @@ export class OwnedStyleLab implements AfterViewInit {
 }
 bootstrapApplication(OwnedStyleLab,{providers:[provideZoneChangeDetection()]}).catch(error=>{(window as any).__ownedStyleError=String(error);});
 `;
-export async function renderOwnedStyles({tarball}) {
+export async function renderOwnedStyles({tarball,argumentEvidence}) {
   const packed=readPackedPackage(tarball);const line=packed.version.startsWith('22.')?'main':packed.version.startsWith('21.')?'21.x':null;
   if(!line||packed.name!=='@ngx-compat/material-legacy')throw new Error('owned style proof requires the real packed library');
   const versions=versionsFor(packed);
@@ -81,6 +87,19 @@ export async function renderOwnedStyles({tarball}) {
   try {
     await buildLab(consumer,env,versions,source,{strictDeclarations:true});
     const nodeModules=join(consumer,'node_modules');const allowed=[realpathSync(installed),realpathSync(join(nodeModules,'@angular/cdk')),realpathSync(join(nodeModules,'@angular/material'))];
+    const catalog=mixinArgumentCatalog();
+    const customTypography=argumentEvidence?.results?.find(p=>p.case_id==='mixin-argument/all-legacy-component-themes/custom-full-theme');
+    const probe=catalog.cases.find(p=>p.case_id===customTypography?.case_id);
+    const original=catalog.original_entry_identity;
+    const packedIndex=hash(readFileSync(join(installed,'_index.scss')));
+    if(!probe || customTypography.error || customTypography.line!==line
+      || customTypography.identity.catalog_sha256!==catalog.sha256 || customTypography.identity.sass_version!==sass.info
+      || !['expected','actual'].every(role=>typeof customTypography[role]?.css==='string'
+        && customTypography[role].css_sha256===hash(customTypography[role].css)
+        && customTypography[role].program_sha256===hash(mixinArgumentProgram(catalog,probe)))
+      || !customTypography.expected.sources.some(p=>p.root===0&&p.path===original.path&&p.sha256===original.sha256&&p.bytes===original.bytes)
+      || !customTypography.actual.sources.some(p=>p.root===0&&p.path==='_index.scss'&&p.sha256===packedIndex))
+      throw new Error('custom typography requires authenticated original and exact packed mixin measurements');
     const sheets={},identities={};
     for(const id of FIXTURES){
       const referencePath=join(root,'reference/material-16.2.14/sass-css',id+'.css');
@@ -99,25 +118,26 @@ export async function renderOwnedStyles({tarball}) {
     const sheetTexts = Object.fromEntries(['reference','candidate'].flatMap(mode => [
       [`light-${mode}`,light.map(id=>sheets[id][mode]).join('\n')],
       [`custom-${mode}`,sheets['05-custom-map-nested'][mode]],
+      [`typography-${mode}`,customTypography[mode==='reference'?'expected':'actual'].css],
     ]));
-    writeFileSync(join(dist,'index.html'),'<!doctype html><html><head><style id="light-sheet">'+sheetTexts['light-reference']+'</style><style id="custom-sheet"></style></head><body><owned-style-lab></owned-style-lab><script src="app.js"></script></body></html>');
+    writeFileSync(join(dist,'index.html'),'<!doctype html><html><head><style id="light-sheet">'+sheetTexts['light-reference']+'</style><style id="custom-sheet"></style><style id="typography-sheet"></style></head><body><owned-style-lab></owned-style-lab><script src="app.js"></script></body></html>');
     const observations=await withChromium(dist,async({evaluate,browser})=>{
       for(let i=0;i<200;i++){if(await evaluate('!!window.__ownedStyleLab || !!window.__ownedStyleError'))break;await new Promise(r=>setTimeout(r,100));}
       if(!(await evaluate('!!window.__ownedStyleLab')))throw new Error(await evaluate('window.__ownedStyleError||"owned style lab not ready"'));
       await evaluate('window.__ownedStyleLab.prepare()');
       for(let i=0;i<100;i++){if(await evaluate('!!document.querySelector(".mat-simple-snackbar-action button") && !!document.querySelector("#s-invalid.mat-select-invalid")'))break;await new Promise(r=>setTimeout(r,30));}
       if(!(await evaluate('!!document.querySelector("#s-invalid.mat-select-invalid")')))throw new Error('required select did not reach invalid state');
-      const reader=`(() => {const probes=${JSON.stringify(OWNED_STYLE_PROBES)};const context=document.getElementById('style-context').classList.contains('shell')?'custom':'light';return Object.fromEntries(Object.entries(probes).filter(([id,p])=>p.context===context).map(([id,p])=>{const el=document.querySelector(p.selector);const s=el?getComputedStyle(el):null;return [id,{found:!!el,values:Object.fromEntries(p.properties.map(k=>[k,s?s.getPropertyValue(k).trim():null]))}]}));})()`;
+      const reader=`(() => {const probes=${JSON.stringify(OWNED_STYLE_PROBES)};const context=document.body.classList.contains('sass-argument-probe')?'typography':document.getElementById('style-context').classList.contains('shell')?'custom':'light';return Object.fromEntries(Object.entries(probes).filter(([id,p])=>p.context===context).map(([id,p])=>{const el=document.querySelector(p.selector);const s=el?getComputedStyle(el):null;return [id,{found:!!el,values:Object.fromEntries(p.properties.map(k=>[k,s?(k==='rect-height'?String(el.getBoundingClientRect().height):k==='rect-width'?String(el.getBoundingClientRect().width):s.getPropertyValue(k).trim()):null]))}]}));})()`;
       await evaluate('window.__ownedStyleSheets='+JSON.stringify(sheetTexts));
       const captures={reference:{},candidate:{}};
-      for(const mode of ['reference','candidate'])for(const context of ['light','custom']){
-        await evaluate(`(()=>{document.getElementById('light-sheet').textContent=window.__ownedStyleSheets['light-${mode}'];document.getElementById('custom-sheet').textContent=${JSON.stringify(context==='custom')}?window.__ownedStyleSheets['custom-${mode}']:'';document.getElementById('style-context').className=${JSON.stringify(context==='custom'?'shell':'')};document.querySelector('.mat-simple-snackbar-action button').classList.add('mat-primary');return true;})()`);
+      for(const mode of ['reference','candidate'])for(const context of ['light','custom','typography']){
+        await evaluate(`(()=>{document.getElementById('light-sheet').textContent=window.__ownedStyleSheets['light-${mode}'];document.getElementById('custom-sheet').textContent=${JSON.stringify(context==='custom')}?window.__ownedStyleSheets['custom-${mode}']:'';document.getElementById('typography-sheet').textContent=${JSON.stringify(context==='typography')}?window.__ownedStyleSheets['typography-${mode}']:'';document.body.classList.toggle('sass-argument-probe',${JSON.stringify(context==='typography')});document.getElementById('style-context').className=${JSON.stringify(context==='custom'?'shell':'')};document.querySelector('.mat-simple-snackbar-action button').classList.add('mat-primary');return true;})()`);
         await evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(()=>r(true))))');
         Object.assign(captures[mode],await evaluate(reader));
       }
       const negative={};
-      for(const context of ['light','custom']) {
-        await evaluate(`(()=>{document.getElementById('style-context').className=${JSON.stringify(context==='custom'?'shell':'')};document.getElementById('light-sheet').textContent=window.__ownedStyleSheets['light-candidate'];document.getElementById('custom-sheet').textContent=${JSON.stringify(context==='custom')}?window.__ownedStyleSheets['custom-candidate']:'';return true;})()`);
+      for(const context of ['light','custom','typography']) {
+        await evaluate(`(()=>{document.getElementById('typography-sheet').textContent=${JSON.stringify(context==='typography')}?window.__ownedStyleSheets['typography-candidate']:'';document.body.classList.toggle('sass-argument-probe',${JSON.stringify(context==='typography')});document.getElementById('style-context').className=${JSON.stringify(context==='custom'?'shell':'')};document.getElementById('light-sheet').textContent=window.__ownedStyleSheets['light-candidate'];document.getElementById('custom-sheet').textContent=${JSON.stringify(context==='custom')}?window.__ownedStyleSheets['custom-candidate']:'';return true;})()`);
         const css=Object.values(OWNED_STYLE_PROBES).filter(p=>p.context===context).map(p=>{
           const property=p.properties.includes('line-height')?'line-height':p.properties[0];
           return `${p.selector} {${property}: ${property.includes('color')?'rgb(1, 2, 3)':'1px'} !important;}`;
@@ -129,6 +149,6 @@ export async function renderOwnedStyles({tarball}) {
       }
       return {browser,...captures,negative};
     },{debugPort:9349});
-    return {line,versions,tarball_sha256:hash(readFileSync(tarball)),source_kind:'packed',reference_kind:'untouched-material-16.2.14-css',strict_templates:true,skip_lib_check:false,identities,...observations,results:assessOwnedStyles(observations.reference,observations.candidate,observations.negative)};
+    return {line,versions,custom_typography_theme:customTypography,tarball_sha256:hash(readFileSync(tarball)),source_kind:'packed',reference_kind:'untouched-material-16.2.14-css',strict_templates:true,skip_lib_check:false,identities,...observations,results:assessOwnedStyles(observations.reference,observations.candidate,observations.negative)};
   } finally {rmSync(consumer,{recursive:true,force:true});}
 }

@@ -8,7 +8,7 @@ import sys
 from types import SimpleNamespace
 import unittest
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'scripts'))
-from sass_mixin_argument_admission import mixin_argument_assertion_ok
+from sass_mixin_argument_admission import mixin_argument_assertion_ok,mixin_argument_measurements_ok
 from sass_mixin_fixture import mixin_receipt
 class SassMixinArgumentTests(unittest.TestCase):
     def test_complete_argument_roster_and_actual_measurement_fence(self):
@@ -51,4 +51,12 @@ try {
                     wrong=copy.deepcopy(body);wrong[key]=value;self.assertFalse(mixin_argument_assertion_ok(ROOT,active,wrong,'synthetic-invocation'),key)
                 wrong=copy.deepcopy(body);wrong['expected']['sources']=copy.deepcopy(wrong['actual']['sources']);self.assertFalse(mixin_argument_assertion_ok(ROOT,active,wrong,'synthetic-invocation'))
                 wrong=copy.deepcopy(body);wrong['actual']['css']='incorrect nonempty CSS';self.assertFalse(mixin_argument_assertion_ok(ROOT,active,wrong,'synthetic-invocation'))
+    def test_rendered_measurements_do_not_accept_a_full_css_mismatch(self):
+        active=SimpleNamespace(binding={'source_line':'main'},manifest={'run_id':'synthetic','artifacts':[dict(id='library',sha256='c'*64)]})
+        body=mixin_receipt(ROOT,active,'mixin-argument/all-legacy-component-themes/custom-full-theme','one')
+        body['actual']['css']='.different { color: blue; }'
+        body['actual']['css_sha256']=hashlib.sha256(body['actual']['css'].encode()).hexdigest()
+        body['actual']['css_bytes']=len(body['actual']['css'].encode())
+        self.assertTrue(mixin_argument_measurements_ok(ROOT,body))
+        self.assertFalse(mixin_argument_assertion_ok(ROOT,active,body,'one'))
 if __name__=='__main__':unittest.main()

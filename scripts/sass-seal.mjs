@@ -522,7 +522,7 @@ async function main() {
   })), decisions);
 
   let ownedRendered;
-  try { ownedRendered = await renderOwnedStyles({tarball}); }
+  try { ownedRendered = await renderOwnedStyles({tarball,argumentEvidence:functions.mixin_arguments}); }
   catch (error) { ownedRendered = {error: error.message, results: {}}; }
   const ownedRenderedOk = !ownedRendered.error && ownedIds.length === Object.keys(ownedRendered.results).length
     && ownedIds.every(id => Object.values(ownedRendered.results).some(r => r.case_id === id && r.result === 'pass'));
@@ -597,7 +597,8 @@ async function main() {
       if (item.result !== 'pass') continue;
       const body = {...item,check_id:'sass-seal',run_id:runId,invocation_id:invocation,binding,
         line:ownedRendered.line,tarball_sha256:tarballSha,source_kind:'packed',
-        reference_kind:ownedRendered.reference_kind,identities:ownedRendered.identities,
+        reference_kind:item.context==='typography'?'untouched-material-16.2.14-compiled-css':ownedRendered.reference_kind,
+        ...(item.context==='typography'?{custom_typography_theme:ownedRendered.custom_typography_theme}:{}),identities:ownedRendered.identities,
         versions:ownedRendered.versions,browser:ownedRendered.browser,strict_templates:true,skip_lib_check:false};
       writeFileSync(join(outputDir,apiAssertionFileName(item.case_id)),JSON.stringify(body,null,2)+'\n');
     }
