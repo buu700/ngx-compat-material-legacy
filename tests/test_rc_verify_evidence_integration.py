@@ -258,34 +258,12 @@ class CoordinatorTests(unittest.TestCase):
     }
 
     def _m3_body(self, case_id, invocation, **changes):
-        library = next(item for item in self.f.run["artifacts"] if item["id"] == "library")
-        group = self._M3_GROUPS[case_id]
-        if group == "inclusion-order":
-            m3, m2, i3, i2 = self._M3_ORDER_FACTS[case_id]
-            facts = {"bytes": 100, "m3_present": m3, "m2_present": m2, "m3_index": i3, "m2_index": i2}
-        else:
-            facts = {"selectors": 3}
-        themed, plain = "rgb(0, 92, 187)", "rgba(0, 0, 0, 0)"
-        checks = [
-            {"label": "themed", "probe": "cur-button", "expect": "differ", "observed": "a/order",
-             "reference": "none/order", "found": True, "ok": True,
-             "properties": [{"property": "background-color", "observed": themed, "reference": plain}]},
-            {"label": "unchanged", "probe": "cur-button", "expect": "equal", "observed": "b/order",
-             "reference": "a/order", "found": True, "ok": True,
-             "properties": [{"property": "background-color", "observed": themed, "reference": themed}]},
-        ]
-        rendered = {"browser": "Chrome/154", "versions": {"material": "22.1.7"}, "result": "pass", "checks": checks}
-        if case_id == "current-shared-scope":
-            rendered["contamination_negative"] = {"fixture": "root legacy shared styles", "detected": True,
-                                                  "rostered": False, "checks": []}
-        body = {
-            "check_id": "m3-coexistence", "case_id": case_id, "group": group, "result": "pass",
-            "kind": "assertion", "line": "main", "source_kind": "packed",
-            "run_id": self.f.run["run_id"], "invocation_id": invocation,
-            "tarball_sha256": library["sha256"], "material_version": "22.1.7", "peer_version": "22.1.7",
-            "packed_compile": facts, "rendered": rendered,
-            "g07_claim": "not-passed", "not_executed": {"21.x": None},
-        }
+        from test_m3_rendered_coexistence import render
+        if not hasattr(self, "_rendered_fixture_bodies"):
+            library = next(item for item in self.f.run["artifacts"] if item["id"] == "library")
+            self._rendered_fixture_bodies = render(bodies={"tarball": library["sha256"], "run_id": self.f.run["run_id"], "invocation": invocation})["bodies"]
+        body = json.loads(json.dumps(self._rendered_fixture_bodies[case_id]))
+        body["invocation_id"] = invocation
         body.update(changes)
         return body
 
@@ -298,9 +276,10 @@ class CoordinatorTests(unittest.TestCase):
             body = json.loads(json.dumps(body))
             for key, value in changes.items():
                 if key == "equal_observed":
-                    body["checks"][1]["properties"][0]["observed"] = value
+                    next(c for c in body["checks"] if c["expect"] == "equal")["properties"][0]["observed"] = value
                 elif key == "differ_observed":
-                    body["checks"][0]["properties"][0]["observed"] = value
+                    for prop in next(c for c in body["checks"] if c["expect"] == "differ")["properties"]:
+                        prop["observed"] = value
                 else:
                     body[key] = value
             return body
@@ -312,7 +291,7 @@ class CoordinatorTests(unittest.TestCase):
             "missing tarball": ("legacy-only", {"tarball_sha256": None}),
             "wrong peer": ("nested-theme-scope", {"peer_version": "22.0.0"}),
             "wrong-but-nonempty equal": ("lazy-body-overlay", {"rendered": rendered_with("lazy-body-overlay", equal_observed="rgb(1, 2, 3)")}),
-            "unthemed differ": ("current-then-legacy", {"rendered": rendered_with("current-then-legacy", differ_observed="rgba(0, 0, 0, 0)")}),
+            "unthemed differ": ("current-only", {"rendered": rendered_with("current-only", differ_observed="rgba(0, 0, 0, 0)")}),
             "empty observed": ("legacy-then-current", {"rendered": rendered_with("legacy-then-current", equal_observed="")}),
             "no checks": ("legacy-shared-scope", {"rendered": rendered_with("legacy-shared-scope", checks=[])}),
             "failed render": ("legacy-shared-scope", {"rendered": rendered_with("legacy-shared-scope", result="fail")}),

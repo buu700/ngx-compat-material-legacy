@@ -27,6 +27,7 @@ import {tmpdir} from 'node:os';
 import {dirname, join, resolve} from 'node:path';
 import {fileURLToPath, pathToFileURL} from 'node:url';
 
+import {coordinatorRequest, lineForPackageVersion} from './packed-consumer-evidence.mjs';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const defaultReport = join(root, 'compatibility/rc/reports/m3-inclusion-order.json');
 const M3_MARKER = '--mat-app-background-color';
@@ -794,6 +795,11 @@ async function main(argv) {
   if (args.run) {
     const {resolveLibraryFromRun} = await import('./resolve-run-library.mjs');
     library = resolveLibraryFromRun(args.run);
+    const ownLine = lineForPackageVersion(JSON.parse(readFileSync(join(root, 'projects/ngx-material-legacy/package.json'), 'utf8')).version);
+    const request = coordinatorRequest('m3-coexistence');
+    if (!ownLine || library.line !== ownLine || (request && (request.error || request.line !== ownLine || request.runId !== library.runId))) {
+      fail(2, 'm3-coexistence: run does not match the source/coordinator line and identity');
+    }
   }
   const workspaceModules = [
     join(root, 'node_modules'),

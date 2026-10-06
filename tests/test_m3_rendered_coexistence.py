@@ -9,11 +9,15 @@ color so that only the affected case fails.
 from __future__ import annotations
 
 import json
+import copy
+import sys
 import subprocess
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "scripts"))
+from m3_rendered_admission import complete_rendered_checks
 
 _MODEL = r"""
 import * as r from './scripts/m3-rendered-coexistence.mjs';
@@ -172,6 +176,20 @@ class PackedBodyTests(unittest.TestCase):
             self.assertEqual(body["peer_version"], "22.1.7")
             self.assertEqual(body["rendered"]["result"], "pass")
             self.assertTrue(body["packed_compile"])
+
+    def test_admission_rejects_missing_or_borrowed_probes(self):
+        bodies = render(bodies=self.IDENTITY)["bodies"]
+        for case, body in bodies.items():
+            self.assertTrue(complete_rendered_checks(case, body["rendered"]), case)
+            bad = copy.deepcopy(body["rendered"])
+            bad["checks"] = bad["checks"][:1]
+            self.assertFalse(complete_rendered_checks(case, bad), case)
+            bad = copy.deepcopy(body["rendered"])
+            bad["checks"][0]["observed"] = "unrelated/region"
+            self.assertFalse(complete_rendered_checks(case, bad), case)
+        bad = copy.deepcopy(bodies["current-shared-scope"]["rendered"])
+        bad["contamination_negative"]["checks"] = []
+        self.assertFalse(complete_rendered_checks("current-shared-scope", bad))
 
     def test_failed_render_case_gets_no_body(self):
         bodies = render([["nested", "nested-inner", "leg-button", "color", WRONG]], bodies=self.IDENTITY)["bodies"]

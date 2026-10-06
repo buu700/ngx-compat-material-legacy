@@ -31,6 +31,7 @@ from rc_acceptance import (
     assertion_directory, expected_cases, prepack_binding_for,
 )
 from archive_run_closure import ClosureError, write_closure
+from m3_rendered_admission import complete_rendered_checks
 from consumer_floor_admission import floor_assertion_ok, floor_support_records
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -1185,6 +1186,8 @@ def _m3_assertion_ok(body: dict, invocation: str) -> bool:
         return False
     versions = rendered.get("versions")
     if not isinstance(versions, dict) or versions.get("material") != peer_version:
+        return False
+    if not complete_rendered_checks(case_id, rendered):
         return False
     checks = rendered.get("checks")
     if not isinstance(checks, list) or not checks or not all(_m3_rendered_check_ok(c) for c in checks):
