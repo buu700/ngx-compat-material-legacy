@@ -33,6 +33,7 @@ import {dirname, join, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {
   ensureAngularNode,
+  matrixGroups,
   extractTarball,
   flagsFor,
   installAndNgGenerate,
