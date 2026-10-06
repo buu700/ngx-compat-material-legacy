@@ -47,16 +47,11 @@ export {
   MatSnackBarVerticalPosition as MatLegacySnackBarVerticalPosition,
 
   /**
-   * @deprecated Use `MatSnackBarConfig` from `@angular/material/snack-bar` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
-   * @breaking-change 17.0.0
-   */
-  MatSnackBarConfig as MatLegacySnackBarConfig,
-
-  /**
    * @deprecated Use `MAT_SNACK_BAR_DEFAULT_OPTIONS` from `@angular/material/snack-bar` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
    * @breaking-change 17.0.0
    */
   MAT_SNACK_BAR_DEFAULT_OPTIONS as MAT_LEGACY_SNACK_BAR_DEFAULT_OPTIONS,
 
 } from '@angular/material/snack-bar';
+export {MatLegacySnackBarConfig} from './snack-bar-config';
 export {MatCommonModule} from './internal/common-module';

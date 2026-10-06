@@ -22,4 +22,10 @@ export {
 } from './list-harness-filters';
 export {MatLegacyNavListHarness, MatLegacyNavListItemHarness} from './nav-list-harness';
 export {MatLegacySelectionListHarness, MatLegacyListOptionHarness} from './selection-list-harness';
-export {MatLegacyListItemSection} from './list-item-harness-base';
+export {
+  MatLegacyListItemSection,
+  MatLegacyListItemHarnessBase,
+  MatLegacySubheaderHarness,
+  getListItemPredicate,
+} from './list-item-harness-base';
+export {MatLegacyListHarnessBase, ListSection} from './list-harness-base';

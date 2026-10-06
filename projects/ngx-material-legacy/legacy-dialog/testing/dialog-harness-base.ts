@@ -63,6 +63,11 @@ export class _MatDialogHarnessBase extends ContentContainerComponentHarness<
     await (await this.host()).sendKeys(TestKey.ESCAPE);
   }
 
+  /** Gets the dialog's full text content. */
+  async getText(): Promise<string> {
+    return (await this.host()).text();
+  }
+
   /** Gets the text of the dialog's title section. */
   async getTitleText(): Promise<string> {
     return (await this._title())?.text() ?? '';

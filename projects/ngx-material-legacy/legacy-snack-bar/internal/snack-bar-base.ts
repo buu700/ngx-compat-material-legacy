@@ -25,6 +25,7 @@ import {
   Type,
 } from '@angular/core';
 import {MAT_SNACK_BAR_DATA, MAT_SNACK_BAR_DEFAULT_OPTIONS, MatSnackBarConfig} from '@angular/material/snack-bar';
+import {MatLegacySnackBarConfig} from '../snack-bar-config';
 import {LegacyTextOnlySnackBar} from '../simple-snack-bar';
 import {Observable} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
@@ -33,7 +34,7 @@ import {MatSnackBarRef} from './snack-bar-ref';
 
 /** @docs-private */
 export function MAT_SNACK_BAR_DEFAULT_OPTIONS_FACTORY(): MatSnackBarConfig {
-  return new MatSnackBarConfig();
+  return new MatLegacySnackBarConfig();
 }
 
 @Directive()
@@ -178,7 +179,7 @@ export abstract class _MatSnackBarBase implements OnDestroy {
     content: ComponentType<T> | TemplateRef<T>,
     userConfig?: MatSnackBarConfig,
   ): MatSnackBarRef<T | EmbeddedViewRef<any>> {
-    const config = {...new MatSnackBarConfig(), ...this._defaultConfig, ...userConfig};
+    const config = {...new MatLegacySnackBarConfig(), ...this._defaultConfig, ...userConfig};
     const overlayRef = this._createOverlay(config);
     const container = this._attachSnackBarContainer(overlayRef, config);
     const snackBarRef = new MatSnackBarRef<T | EmbeddedViewRef<any>>(container, overlayRef);
@@ -235,6 +236,11 @@ export abstract class _MatSnackBarBase implements OnDestroy {
       }
     });
 
+    // Subscribe before enter() so noop-animation sync _onEnter still arms duration.
+    if (config.duration && config.duration > 0) {
+      snackBarRef.afterOpened().subscribe(() => snackBarRef._dismissAfter(config.duration!));
+    }
+
     if (this._openedSnackBarRef) {
       // If a snack bar is already in view, dismiss it and enter the
       // new snack bar after exit animation is complete.
@@ -245,11 +251,6 @@ export abstract class _MatSnackBarBase implements OnDestroy {
     } else {
       // If no snack bar is in view, enter the new snack bar.
       snackBarRef.containerInstance.enter();
-    }
-
-    // If a dismiss timeout is provided, set up dismiss based on after the snackbar is opened.
-    if (config.duration && config.duration > 0) {
-      snackBarRef.afterOpened().subscribe(() => snackBarRef._dismissAfter(config.duration!));
     }
   }
 
