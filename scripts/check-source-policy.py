@@ -93,21 +93,54 @@ def declaration_files(directory: Path):
 
 
 def annotated_names(directory: Path, marker: str) -> tuple[set[str], int]:
+    """Read declaration-attached JSDoc, including bundled `declare` declarations.
+
+    A marker on a member must not leak onto the following top-level declaration.
+    This is a conservative declaration observation, not a full TS export/member audit.
+    """
     names: set[str] = set()
     files = 0
+    attached = re.compile(
+        r"/\*\*((?:(?!\*/).)*)\*/\s*"
+        r"(?:export\s+)?(?:declare\s+)?(?:abstract\s+)?"
+        r"(?:class|interface|type|enum|function|const|let|var)\s+([A-Za-z_$][\w$]*)",
+        re.S,
+    )
     if not directory.is_dir():
         return names, files
     for path in declaration_files(directory):
         files += 1
-        lines = path.read_text(errors="replace").splitlines()
-        for index, line in enumerate(lines):
-            if marker not in line:
-                continue
-            window = "\n".join(lines[index:index + 12])
-            match = _EXPORT.search(window)
-            if match:
-                names.add(match.group(1))
+        for comment, name in attached.findall(path.read_text(errors="replace")):
+            if re.search(re.escape(marker) + r"(?![\w-])", comment):
+                names.add(name)
     return names, files
+
+
+def imported_angular_references(root: Path) -> list[dict]:
+    """Qualify authored named/namespace references by their Angular package."""
+    named = re.compile(
+        r"(?:import|export)\s*(?:type\s+)?\{([^}]*)\}\s*from\s*['\"](@angular/[^'\"]+)['\"]",
+        re.M | re.S,
+    )
+    namespace = re.compile(
+        r"import\s*\*\s*as\s+(\w+)\s*from\s*['\"](@angular/[^'\"]+)['\"]"
+    )
+    references = []
+    for path in root.rglob("*"):
+        if not path.is_file() or path.suffix.lower() not in {".ts", ".tsx", ".js", ".mjs", ".d.ts"}:
+            continue
+        if path.is_symlink() or "vendor" in path.parts:
+            continue
+        text = _scanner.strip_comments(path.read_text(errors="replace"))
+        relative = path.relative_to(root).as_posix()
+        for block, module in named.findall(text):
+            for name in _scanner.imported_names(block):
+                references.append(dict(name=name, module=module, package="/".join(module.split("/")[:2]), path=relative, access="named"))
+        for alias, module in namespace.findall(text):
+            member = re.compile(r"\b" + re.escape(alias) + r"\s*(?:\.\s*([A-Za-z_$][\w$]*)|\[\s*['\"]([A-Za-z_$][\w$]*)['\"]\s*\])")
+            for a, b in member.findall(text):
+                references.append(dict(name=a or b, module=module, package="/".join(module.split("/")[:2]), path=relative, access="namespace"))
+    return references
 
 
 def imported_angular_names(root: Path) -> dict[str, list[str]]:
@@ -152,15 +185,34 @@ def evaluate(authored: Path, policy: dict, tarball: Path | None, annotations: Pa
     annotation_detail = "installed peer declarations were not compared"
     annotation_pass = False
     compared_files = 0
+    private_hits = []
+    deprecated_hits = []
+    missing_packages = []
     if annotations is not None and annotations.is_dir():
-        private_names, private_files = annotated_names(annotations, "@docs-private")
-        deprecated_names, deprecated_files = annotated_names(annotations, "@deprecated")
-        compared_files = private_files + deprecated_files
-        uses = imported_angular_names(authored)
-        private_hits = sorted(name for name in private_names if name in uses)
-        deprecated_hits = sorted(name for name in deprecated_names if name in uses)
+        uses = imported_angular_references(authored)
+        # Follow each installed Angular package independently, rather than allowing
+        # a same-name annotation from an unrelated package to classify this import.
+        package_roots = {"@angular/"+path.name:path for path in annotations.iterdir() if path.is_dir()} if annotations.name == "@angular" else {"@angular/"+annotations.name:annotations}
+        private_hits = []
+        deprecated_hits = []
+        missing_packages = []
+        private_count = deprecated_count = 0
+        for package, directory in package_roots.items():
+            private_names, private_files = annotated_names(directory, "@docs-private")
+            deprecated_names, deprecated_files = annotated_names(directory, "@deprecated")
+            compared_files += private_files + deprecated_files
+            private_count += len(private_names)
+            deprecated_count += len(deprecated_names)
+            package_uses = [use for use in uses if use['package'] == package]
+            if package_uses and private_files == 0:
+                missing_packages.append(package)
+            private_hits.extend(use for use in package_uses if use['name'] in private_names)
+            deprecated_hits.extend(use for use in package_uses if use['name'] in deprecated_names)
+        missing_packages.extend(sorted({use['package'] for use in uses} - set(package_roots)))
         if compared_files == 0:
             annotation_detail = "annotation directory contained no declaration files"
+        elif missing_packages:
+            annotation_detail = f"imported peer declarations unavailable: {sorted(set(missing_packages))}"
         elif private_hits or deprecated_hits:
             annotation_detail = (
                 f"docs-private={private_hits[:8]} deprecated={deprecated_hits[:8]} "
@@ -170,8 +222,9 @@ def evaluate(authored: Path, policy: dict, tarball: Path | None, annotations: Pa
             annotation_pass = True
             annotation_detail = (
                 f"compared {compared_files} declaration files; "
-                f"{len(private_names)} docs-private and {len(deprecated_names)} deprecated names were not imported"
+                f"{private_count} docs-private and {deprecated_count} deprecated names were not imported"
             )
+
     packed_violations = packed_scan.get("violations", []) if packed_scan else []
     js_packed = [item for item in packed_violations if not str(item.get("path", "")).endswith((".scss", ".sass"))]
     sass_packed = [item for item in packed_violations if str(item.get("path", "")).endswith((".scss", ".sass"))]
@@ -239,6 +292,9 @@ def evaluate(authored: Path, policy: dict, tarball: Path | None, annotations: Pa
         "tarball_sha256": tarball_sha,
         "annotation_files": compared_files,
         "annotation_detail": annotation_detail,
+        "annotation_private_hits": private_hits,
+        "annotation_deprecated_hits": deprecated_hits,
+        "annotation_missing_packages": sorted(set(missing_packages)),
     }
 
 
@@ -285,6 +341,9 @@ def write_acceptance(request: dict, observation: dict) -> bool:
         "authored_violation_count": observation["authored_violation_count"],
         "packed_violation_count": observation["packed_violation_count"],
         "annotation_detail": observation["annotation_detail"],
+        "annotation_private_hits": observation["annotation_private_hits"],
+        "annotation_deprecated_hits": observation["annotation_deprecated_hits"],
+        "annotation_missing_packages": observation["annotation_missing_packages"],
         "note": "Packed bytes are identified by digest. Outer subject remains source. Annotation comparison is unknown when declarations are absent.",
         "violations": observation["authored_violations"][:40],
         "cases": cases,
