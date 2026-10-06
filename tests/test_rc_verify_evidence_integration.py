@@ -523,6 +523,277 @@ class CoordinatorTests(unittest.TestCase):
         # The synthetic manifest names no @angular/material peer, so no assertion binds.
         self.assertEqual(self._bridge_report()[1]["coverage"], "slice")
 
+    _COMPUTED_ROSTER = {
+        "thirteen-companion-dimensions": [
+            "badge/color/content/background-color",
+            "toolbar/color/toolbar/background-color",
+            "badge/density/not-applicable",
+        ],
+        "independent-peer-oracle": ["badge/peer-oracle", "toolbar/peer-oracle"],
+    }
+    _SHA = "ab" * 32
+
+    def _computed_matrix(self):
+        """A fixture matrix that rosters companion-computed-styles main cases."""
+        matrix = acceptance.read_json(verify.MATRIX_PATH)
+        row = next(item for item in matrix["checks"] if item["check_id"] == "companion-computed-styles")
+        real = row["acceptance"]["cases_by_line"]["main"]
+        for group, ids in self._COMPUTED_ROSTER.items():
+            for case_id in ids:
+                self.assertIn(case_id, real[group])
+        row["acceptance"]["cases_by_line"]["main"] = {
+            group: list(ids) for group, ids in self._COMPUTED_ROSTER.items()}
+        path = self.root / "fixture-full-verify.json"
+        write_json(path, matrix)
+        matrix_patch = patch.object(verify, "MATRIX_PATH", path)
+        matrix_patch.start()
+        self.addCleanup(matrix_patch.stop)
+        self._bridge_peer()
+        return [case_id for ids in self._COMPUTED_ROSTER.values() for case_id in ids]
+
+    def _computed_body(self, case_id, invocation, **changes):
+        library = next(item for item in self.f.run["artifacts"] if item["id"] == "library")
+        parts = case_id.split("/")
+        companion = parts[0]
+        body = {
+            "schema_version": 1,
+            "kind": "assertion",
+            "check_id": "companion-computed-styles",
+            "line": "main",
+            "case_id": case_id,
+            "result": "pass",
+            "run_id": self.f.run["run_id"],
+            "invocation_id": invocation,
+            "peer_package": "@angular/material",
+            "peer_version": "22.1.7",
+            "peer_package_json_sha256": self._SHA,
+            "tarball_sha256": library["sha256"],
+            "oracle_css_sha256": self._SHA,
+            "candidate_css_sha256": self._SHA,
+            "companion": companion,
+            "peer_source_file": f"{companion}/_m2-{companion}.scss",
+            "peer_source_sha256": self._SHA,
+        }
+        if parts[1] == "peer-oracle":
+            body.update({
+                "group": "independent-peer-oracle",
+                "oracle_isolation": {"peer_only": True, "legacy_package_loaded": False},
+                "applicable_dimensions": ["color"],
+                "sensitivity": {"color": {"kind": "light-vs-dark", "ok": True, "witness": "x"}},
+            })
+        elif parts[2] == "not-applicable":
+            body.update({
+                "group": "thirteen-companion-dimensions", "dimension": parts[1], "not_applicable": True,
+                "peer_mixin": f"mat.{companion}-{parts[1]}", "peer_emitted_tokens": [],
+            })
+        else:
+            light, dark = "rgb(255, 64, 129)", "rgb(66, 66, 66)"
+            body.update({
+                "group": "thirteen-companion-dimensions", "dimension": parts[1],
+                "element": parts[2], "property": parts[3], "token": f"--mat-{companion}-background-color",
+                "scenarios": [
+                    {"scenario": "light", "oracle": light, "candidate": light, "oracle_token": light, "match": True},
+                    {"scenario": "dark", "oracle": dark, "candidate": dark, "oracle_token": dark, "match": True},
+                ],
+                "negative": {"scenario": "light", "injected": "rgb(1, 2, 3)", "observed": "rgb(1, 2, 3)",
+                             "oracle": light, "sentinel_consumed": True, "mismatch_detected": True},
+            })
+        body.update(changes)
+        return body
+
+    def _write_computed_assertions(self, ids, overrides=None):
+        invocation = self.run.invocation("companion-computed-styles")
+        directory = self.f.run_dir / acceptance.assertion_directory("companion-computed-styles", invocation)
+        directory.mkdir(parents=True, exist_ok=True)
+        for case_id in ids:
+            changes = (overrides or {}).get(case_id, {})
+            write_json(directory / f"{case_id.replace('/', '__')}.json",
+                       self._computed_body(case_id, invocation, **changes))
+        return directory
+
+    def _computed_report(self, line="main", exit_code=0):
+        path = self.f.run_dir / "reports/companion-computed-styles.json"
+        if path.exists():
+            path.unlink()
+        verify.write_line_coordinator_report(
+            self.f.run_dir, self.f.run["run_id"], line, "companion-computed-styles", exit_code=exit_code,
+        )
+        return path, acceptance.read_json(path)
+
+    def test_real_computed_styles_main_roster_and_null_21x(self):
+        row, ids = self._real_line_ids("companion-computed-styles")
+        self.assertTrue(row["implemented"])
+        self.assertEqual(row["acceptance"]["subject_ids"], ["library"])
+        groups = row["acceptance"]["cases_by_line"]["main"]
+        self.assertEqual(len(groups["independent-peer-oracle"]), 13)
+        self.assertEqual(len(ids), len(set(ids)))
+        for group, group_ids in row["acceptance"]["cases_by_line"]["21.x"].items():
+            self.assertIsNone(group_ids, f"21.x/{group}")
+        # Synthetic run: no assertion files were written, so the report stays a slice.
+        self._bridge_peer()
+        _, report = self._computed_report()
+        self.assertEqual(report["coverage"], "slice")
+
+    _PRODUCER_BODIES = """
+import * as cases from './scripts/companion-computed-cases.mjs';
+import * as producer from './scripts/check-companion-computed-styles.mjs';
+const input = JSON.parse(process.argv[1]);
+const dims = input.ids.filter((id) => !id.endsWith('/peer-oracle'));
+const rostered = cases.BINDINGS.filter((b) => dims.includes(b.id));
+const notApplicable = dims.filter((id) => id.endsWith('/not-applicable')).map((id) => {
+  const [companion, dimension] = id.split('/');
+  return {id, companion, dimension, peer_mixin: `mat.${companion}-${dimension}`,
+    peer_source_file: `${companion}/_m2-${companion}.scss`, peer_source_sha256: 'ab'.repeat(32)};
+});
+const sentinels = cases.sentinelTable(rostered);
+const observations = {};
+for (const b of rostered) {
+  const per = Object.fromEntries(b.scenarios.map((s, i) => {
+    const v = `rgb(${i + 10}, 9, 9)`;
+    return [s, {found: true, value: v, token_value: v}];
+  }));
+  observations[b.id] = {oracle: per, candidate: per, negative: {found: true, value: sentinels[b.token].marker}};
+}
+const dimensionTokens = {};
+for (const c of cases.COMPANIONS) {
+  dimensionTokens[c] = {peer_source_file: `${c}/_m2-${c}.scss`, peer_source_sha256: 'ab'.repeat(32),
+    dimensions: Object.fromEntries(cases.DIMENSIONS.map((d) => [d, {tokens: []}]))};
+}
+const identity = {package: '@angular/material', version: '22.1.7', package_json_sha256: 'cd'.repeat(32)};
+const isolation = {peer_only: true, legacy_package_loaded: false};
+const assessed = producer.assessAll({roster: {rostered, notApplicable}, observations, sentinels, dimensionTokens, identity, isolation});
+assessed.oracleCases = assessed.oracleCases.filter((r) => input.ids.includes(r.case_id));
+const bodies = producer.assertionBodies(assessed, {line: 'main', runId: input.run_id, invocationId: input.invocation,
+  identity, dimensionTokens, oracleCssSha256: 'ef'.repeat(32), candidateCssSha256: '01'.repeat(32),
+  tarballSha256: input.tarball_sha256, browser: 'Chrome', isolation});
+producer.writeAssertionFiles(input.dir, bodies);
+console.log(JSON.stringify(bodies.map((b) => [b.case_id, b.result])));
+"""
+
+    def test_producer_assertion_bodies_satisfy_the_coordinator(self):
+        ids = self._computed_matrix()
+        invocation = self.run.invocation("companion-computed-styles")
+        directory = self.f.run_dir / acceptance.assertion_directory("companion-computed-styles", invocation)
+        library = next(item for item in self.f.run["artifacts"] if item["id"] == "library")
+        payload = {"ids": ids, "run_id": self.f.run["run_id"], "invocation": invocation,
+                   "tarball_sha256": library["sha256"], "dir": str(directory)}
+        result = subprocess.run(["node", "--input-type=module", "-e", self._PRODUCER_BODIES, json.dumps(payload)],
+                                cwd=ROOT, text=True, capture_output=True, check=False)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(sorted(json.loads(result.stdout)), sorted([case_id, "pass"] for case_id in ids))
+        self.assertEqual(self._computed_report()[1]["coverage"], "complete")
+
+    def test_null_computed_styles_roster_stays_slice(self):
+        self._computed_matrix()
+        matrix = acceptance.read_json(verify.MATRIX_PATH)
+        row = next(item for item in matrix["checks"] if item["check_id"] == "companion-computed-styles")
+        row["acceptance"]["cases_by_line"]["main"]["independent-peer-oracle"] = None
+        write_json(verify.MATRIX_PATH, matrix)
+        self._write_computed_assertions(self._COMPUTED_ROSTER["thirteen-companion-dimensions"])
+        self.assertEqual(self._computed_report()[1]["coverage"], "slice")
+
+    def test_complete_main_computed_styles_report_and_not_overwritten(self):
+        ids = self._computed_matrix()
+        self._write_computed_assertions(ids)
+        path, report = self._computed_report()
+        self.assertEqual(report["coverage"], "complete")
+        self.assertEqual(report["result"], "pass")
+        self.assertEqual(report["line"], "main")
+        self.assertEqual(report["subject_kind"], "artifact")
+        self.assertEqual(report["subject_ids"], ["library"])
+        library = next(item for item in self.f.run["artifacts"] if item["id"] == "library")
+        self.assertEqual(report["artifacts"], {"library": {"sha256": library["sha256"], "bytes": library["bytes"]}})
+        self.assertEqual(report["expected_case_ids"], ids)
+        self.assertEqual(report["passed"], len(ids))
+        self.assertEqual(len(report["outputs"]), len(ids))
+        prefix = acceptance.assertion_directory("companion-computed-styles", report["invocation_id"]) + "/"
+        for output in report["outputs"]:
+            self.assertTrue(output["path"].startswith(prefix))
+            acceptance.checked_file(self.f.run_dir, output, "assertion")
+        for name in ("approved", "g06_claim", "g07_claim", "g08_claim", "g06_g07_g08_claim"):
+            self.assertNotIn(name, report)
+        before = path.read_bytes()
+        verify.write_check_report(self.f.run_dir, self.f.run["run_id"], "main", "companion-computed-styles", exit_code=0)
+        self.assertEqual(path.read_bytes(), before)
+
+    def test_failed_child_or_21x_computed_styles_report_stays_slice(self):
+        ids = self._computed_matrix()
+        self._write_computed_assertions(ids)
+        _, report = self._computed_report(exit_code=1)
+        self.assertEqual(report["coverage"], "slice")
+        self.assertEqual(report["result"], "fail")
+        self.assertEqual(report["exit_code"], 1)
+        with patch.object(verify, "expected_cases", side_effect=AssertionError("21.x must not roster main cases")):
+            _, report = self._computed_report(line="21.x")
+        self.assertEqual(report["coverage"], "slice")
+        self.assertEqual(report["line"], "21.x")
+
+    def test_missing_copied_or_foreign_computed_styles_assertion_stays_slice(self):
+        ids = self._computed_matrix()
+        last = ids[-1]
+        directory = self._write_computed_assertions(ids[:-1])
+        self.assertEqual(self._computed_report()[1]["coverage"], "slice")
+        missing = directory / f"{last.replace('/', '__')}.json"
+        missing.write_bytes(self.f.run_path.read_bytes())
+        self.assertEqual(self._computed_report()[1]["coverage"], "slice")
+        for changes in (
+            {"run_id": "another-run"},
+            {"invocation_id": "another-invocation"},
+            {"peer_version": "21.2.14"},
+            {"peer_version": None},
+            {"peer_package": "@angular/cdk"},
+            {"kind": "presence"},
+            {"line": "21.x"},
+            {"tarball_sha256": "cd" * 32},
+            {"peer_source_file": "badge/_m2-badge.scss"},
+            {"group": "thirteen-companion-dimensions"},
+            {"oracle_isolation": {"peer_only": False, "legacy_package_loaded": False}},
+            {"oracle_isolation": {"peer_only": True, "legacy_package_loaded": True}},
+            {"sensitivity": {"color": {"ok": False}}},
+            {"sensitivity": {}},
+        ):
+            with self.subTest(changes=changes):
+                self._write_computed_assertions(ids, {last: changes})
+                self.assertEqual(self._computed_report()[1]["coverage"], "slice")
+        self._write_computed_assertions(ids)
+        self.assertEqual(self._computed_report()[1]["coverage"], "complete")
+        # A copied passing assertion gives the case two files, not exactly one.
+        (directory / "copy.json").write_bytes(missing.read_bytes())
+        self.assertEqual(self._computed_report()[1]["coverage"], "slice")
+
+    def test_wrong_but_nonempty_computed_value_stays_slice(self):
+        ids = self._computed_matrix()
+        case_id = "toolbar/color/toolbar/background-color"
+        good = self._computed_body(case_id, "x")
+        light = good["scenarios"][0]
+        wrong_light = {**light, "candidate": "rgb(245, 245, 245)"}
+        wrong = [
+            {"scenarios": [wrong_light, good["scenarios"][1]]},
+            {"scenarios": [{**wrong_light, "match": True}, good["scenarios"][1]]},
+            {"result": "fail"},
+            {"scenarios": [{**light, "oracle": "", "candidate": ""}]},
+            {"scenarios": [{**light, "oracle_token": ""}]},
+            {"scenarios": []},
+            {"scenarios": [light, light]},
+            {"negative": {**good["negative"], "sentinel_consumed": False}},
+            {"negative": {**good["negative"], "mismatch_detected": False}},
+            {"negative": {**good["negative"], "observed": light["oracle"]}},
+            {"negative": None},
+            {"property": "color"},
+            {"token": "--mat-badge-background-color"},
+            {"not_applicable": True},
+        ]
+        for changes in wrong:
+            with self.subTest(changes=changes):
+                self._write_computed_assertions(ids, {case_id: changes})
+                self.assertEqual(self._computed_report()[1]["coverage"], "slice")
+        na = "badge/density/not-applicable"
+        for changes in ({"peer_emitted_tokens": ["--mat-badge-x"]}, {"peer_emitted_tokens": None},
+                        {"peer_mixin": "mat.badge-theme"}, {"peer_source_sha256": None}):
+            with self.subTest(not_applicable=changes):
+                self._write_computed_assertions(ids, {na: changes})
+                self.assertEqual(self._computed_report()[1]["coverage"], "slice")
+
     def test_cli_slice_does_not_claim_packaged_schematic_subject(self):
         path = self.f.run_dir / 'reports/migration-packaged.json'
         path.unlink()
