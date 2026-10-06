@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "reviewer": "Codex primary implementer",
+  "recorded_at_utc": "2026-10-06T18:23:24.711579+00:00",
+  "line": "21.x",
+  "method": "Read each of the six complete original bootstrap security-deep hunks and trace directly relevant owned source/export/style paths. Observations are not a completed security scan.",
+  "owned_sources": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+      "sha256": "da0cffb881145a86d72c72ff286383293c312b7792a138d153b3b6e7e613e680"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts",
+      "sha256": "88812bc9ead98f1fc04fc0d58f38750ac515d8c93b1ad8fc694e6d1a2ea64f1a"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+      "sha256": "5bc94d546786b828e6224db74d6e4ec3475b0d67d1e3fa62b34e497fb4d5f584"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
+      "sha256": "db6dda61947d7718b24170c963e781ed2aaf71fc00e4ba5b7ef8a7a20f4cc2e6"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-bar/progress-bar.html",
+      "sha256": "00f81e3d99f77d0157c006d81f251a6325b26773885dd76c355720a0bf89ff8a"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-bar/progress-bar.ts",
+      "sha256": "3c75bb1addd581980bdc16013a96bb8319a490af4dd9b645dbd487c30282bee0"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-bar/progress-bar.scss",
+      "sha256": "917c782531862714d88ef4e93005b05c697fbc1e1d0769481055aef27cccef22"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/progress-bar/_progress-bar-theme.scss",
+      "sha256": "bdd416333ed093e0d67e3465d0a2f73aad6cf1af77cf0094710e68c95890f93e"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/vendor/mdc/linear-progress/_linear-progress-theme.scss",
+      "sha256": "8f0f8ceb75f565514e11e4579cdfe3a4378255ee4c1b736af589d180156cf802"
+    },
+    {
+      "path": "projects/ngx-material-legacy/_index.scss",
+      "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2"
+    }
+  ],
+  "reviews": [
+    {
+      "sha": "b423c0e0b754b1f1d118d17e022981c357c3aa68",
+      "subject": "fix(material/datepicker): deprecate constructor injection in NativeDateAdapter (#26144)",
+      "diff": "diff --git a/src/material/core/datetime/native-date-adapter.ts b/src/material/core/datetime/native-date-adapter.ts\nindex abdaf3cd6..dd7320345 100644\n--- a/src/material/core/datetime/native-date-adapter.ts\n+++ b/src/material/core/datetime/native-date-adapter.ts\n@@ -6,8 +6,7 @@\n  * found in the LICENSE file at https://angular.io/license\n  */\n \n-import {Platform} from '@angular/cdk/platform';\n-import {Inject, Injectable, Optional} from '@angular/core';\n+import {inject, Inject, Injectable, Optional} from '@angular/core';\n import {DateAdapter, MAT_DATE_LOCALE} from './date-adapter';\n \n /**\n@@ -36,16 +35,21 @@ export class NativeDateAdapter extends DateAdapter<Date> {\n    */\n   useUtcForDisplay: boolean = false;\n \n+  /** The injected locale. */\n+  private readonly _matDateLocale = inject(MAT_DATE_LOCALE, {optional: true});\n+\n   constructor(\n-    @Optional() @Inject(MAT_DATE_LOCALE) matDateLocale: string,\n     /**\n-     * @deprecated No longer being used. To be removed.\n-     * @breaking-change 14.0.0\n+     * @deprecated Now injected via inject(), param to be removed.\n+     * @breaking-change 18.0.0\n      */\n-    _platform?: Platform,\n+    @Optional() @Inject(MAT_DATE_LOCALE) matDateLocale?: string,\n   ) {\n     super();\n-    super.setLocale(matDateLocale);\n+    if (matDateLocale !== undefined) {\n+      this._matDateLocale = matDateLocale;\n+    }\n+    super.setLocale(this._matDateLocale);\n   }\n \n   getYear(date: Date): number {\ndiff --git a/tools/public_api_guard/material/core.md b/tools/public_api_guard/material/core.md\nindex 880c0f6d8..58b40bed1 100644\n--- a/tools/public_api_guard/material/core.md\n+++ b/tools/public_api_guard/material/core.md\n@@ -429,8 +429,8 @@ export function mixinTabIndex<T extends _AbstractConstructor<CanDisable>>(base:\n \n // @public\n export class NativeDateAdapter extends DateAdapter<Date> {\n-    constructor(matDateLocale: string,\n-    _platform?: Platform);\n+    constructor(\n+    matDateLocale?: string);\n     // (undocumented)\n     addCalendarDays(date: Date, days: number): Date;\n     // (undocumented)\n@@ -479,7 +479,7 @@ export class NativeDateAdapter extends DateAdapter<Date> {\n     // @deprecated (undocumented)\n     useUtcForDisplay: boolean;\n     // (undocumented)\n-    static \u0275fac: i0.\u0275\u0275FactoryDeclaration<NativeDateAdapter, [{ optional: true; }, null]>;\n+    static \u0275fac: i0.\u0275\u0275FactoryDeclaration<NativeDateAdapter, [{ optional: true; }]>;\n     // (undocumented)\n     static \u0275prov: i0.\u0275\u0275InjectableDeclaration<NativeDateAdapter>;\n }\n",
+      "diff_sha256": "95cc5faa143b91a73afd065b49867a103959aa12dcb1db23dd882134b78f4826",
+      "review_depth": "individual-source-hunk-read",
+      "source_observation": "Constructor/declaration change applies to the exact NativeDateAdapter currently re-exported as LegacyNativeDateAdapter. The original16 constructor accepts matDateLocale:string and optional Platform; installed main22.1.7 types declare constructor(), with inject(MAT_DATE_LOCALE) inside runtime. Previous not-owned/irrelevant rationale ignored the public alias. Constructor/subclass compatibility requires repair or a substantiated allowed contract decision; no identity proof is claimed.",
+      "status": "pending-compatibility-or-security-proof",
+      "final_disposition": "needs-individual-review",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ]
+    },
+    {
+      "sha": "cf3506adf1af1556d705dbb651e7e96a7141b81d",
+      "subject": "fix(material/progress-bar): avoid CSP issues for apps not using buffer mode (#28946)",
+      "diff": "diff --git a/src/material/progress-bar/progress-bar.html b/src/material/progress-bar/progress-bar.html\nindex c903f1930..f9d596ab7 100644\n--- a/src/material/progress-bar/progress-bar.html\n+++ b/src/material/progress-bar/progress-bar.html\n@@ -6,7 +6,10 @@\n   <div\n     class=\"mdc-linear-progress__buffer-bar\"\n     [style.flex-basis]=\"_getBufferBarFlexBasis()\"></div>\n-  <div class=\"mdc-linear-progress__buffer-dots\"></div>\n+  <!-- Remove the dots outside of buffer mode since they can cause CSP issues (see #28938) -->\n+  @if (mode === 'buffer') {\n+    <div class=\"mdc-linear-progress__buffer-dots\"></div>\n+  }\n </div>\n <div\n   class=\"mdc-linear-progress__bar mdc-linear-progress__primary-bar\"\n",
+      "diff_sha256": "18842b79bf257366ae8e8dcd2c2a2ce43401dfb91d7a2efd29e98598649f6fdf",
+      "review_depth": "individual-source-hunk-read",
+      "source_observation": "The hunk removes modern MDC buffer dots outside buffer mode to avoid CSP problems. Owned legacy markup instead has inline SVG pattern/rect, not modern buffer-dots, but the exported historical ordinary companion progress-bar Sass remains reachable and emits data:image/svg+xml. Review the current companion/runtime combination and CSP behavior individually; modern-template path alone cannot clear the entire reachable style contract.",
+      "status": "pending-compatibility-or-security-proof",
+      "final_disposition": "needs-individual-review",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ]
+    },
+    {
+      "sha": "622152de761b629a426b744ec2ff3e4e79d18889",
+      "subject": "perf(material/tooltip): Defer injection of injectables not needed until tooltip is shown. (#30440)",
+      "diff": "diff --git a/src/material/tooltip/tooltip.ts b/src/material/tooltip/tooltip.ts\nindex 233dab3d1..194637274 100644\n--- a/src/material/tooltip/tooltip.ts\n+++ b/src/material/tooltip/tooltip.ts\n@@ -187,10 +187,7 @@ const MAX_WIDTH = 200;\n   },\n })\n export class MatTooltip implements OnDestroy, AfterViewInit {\n-  private _overlay = inject(Overlay);\n   private _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);\n-  private _scrollDispatcher = inject(ScrollDispatcher);\n-  private _viewContainerRef = inject(ViewContainerRef);\n   private _ngZone = inject(NgZone);\n   private _platform = inject(Platform);\n   private _ariaDescriber = inject(AriaDescriber);\n@@ -209,7 +206,6 @@ export class MatTooltip implements OnDestroy, AfterViewInit {\n   private _positionAtOrigin: boolean = false;\n   private _disabled: boolean = false;\n   private _tooltipClass: string | string[] | Set<string> | {[key: string]: any};\n-  private _scrollStrategy = inject(MAT_TOOLTIP_SCROLL_STRATEGY);\n   private _viewInitialized = false;\n   private _pointerExitEventsInitialized = false;\n   private readonly _tooltipComponent = TooltipComponent;\n@@ -362,9 +358,6 @@ export class MatTooltip implements OnDestroy, AfterViewInit {\n   private readonly _passiveListeners: (readonly [string, EventListenerOrEventListenerObject])[] =\n     [];\n \n-  /** Reference to the current document. */\n-  private _document = inject(DOCUMENT);\n-\n   /** Timer started at the last `touchstart` event. */\n   private _touchstartTimeout: null | ReturnType<typeof setTimeout> = null;\n \n@@ -462,7 +455,8 @@ export class MatTooltip implements OnDestroy, AfterViewInit {\n     const overlayRef = this._createOverlay(origin);\n     this._detach();\n     this._portal =\n-      this._portal || new ComponentPortal(this._tooltipComponent, this._viewContainerRef);\n+      this._portal ||\n+      new ComponentPortal(this._tooltipComponent, this._injector.get(ViewContainerRef));\n     const instance = (this._tooltipInstance = overlayRef.attach(this._portal).instance);\n     instance._triggerElement = this._elementRef.nativeElement;\n     instance._mouseLeaveHideDelay = this._hideDelay;\n@@ -512,12 +506,14 @@ export class MatTooltip implements OnDestroy, AfterViewInit {\n       this._detach();\n     }\n \n-    const scrollableAncestors = this._scrollDispatcher.getAncestorScrollContainers(\n-      this._elementRef,\n-    );\n+    const scrollableAncestors = this._injector\n+      .get(ScrollDispatcher)\n+      .getAncestorScrollContainers(this._elementRef);\n+\n+    const overlay = this._injector.get(Overlay);\n \n     // Create connected position strategy that listens for scroll events to reposition.\n-    const strategy = this._overlay\n+    const strategy = overlay\n       .position()\n       .flexibleConnectedTo(this.positionAtOrigin ? origin || this._elementRef : this._elementRef)\n       .withTransformOriginOn(`.${this._cssClassPrefix}-tooltip`)\n@@ -537,11 +533,11 @@ export class MatTooltip implements OnDestroy, AfterViewInit {\n       }\n     });\n \n-    this._overlayRef = this._overlay.create({\n+    this._overlayRef = overlay.create({\n       direction: this._dir,\n       positionStrategy: strategy,\n       panelClass: `${this._cssClassPrefix}-${PANEL_CLASS}`,\n-      scrollStrategy: this._scrollStrategy(),\n+      scrollStrategy: this._injector.get(MAT_TOOLTIP_SCROLL_STRATEGY)(),\n     });\n \n     this._updatePosition(this._overlayRef);\n@@ -874,7 +870,9 @@ export class MatTooltip implements OnDestroy, AfterViewInit {\n   /** Listener for the `wheel` event on the element. */\n   private _wheelListener(event: WheelEvent) {\n     if (this._isTooltipVisible()) {\n-      const elementUnderPointer = this._document.elementFromPoint(event.clientX, event.clientY);\n+      const elementUnderPointer = this._injector\n+        .get(DOCUMENT)\n+        .elementFromPoint(event.clientX, event.clientY);\n       const element = this._elementRef.nativeElement;\n \n       // On non-touch devices we depend on the `mouseleave` event to close the tooltip, but it\n",
+      "diff_sha256": "f283e97beff1e72d7f283a9851fa5320884ddfc8134b042b075d3ae0e5fdd0f0",
+      "review_depth": "individual-source-hunk-read",
+      "source_observation": "The hunk changes current MatTooltip private injections to lazy Injector lookups. Owned MatLegacyTooltip and local _MatTooltipBase retain historical constructor DI, so the optimization is not inherited through current MatTooltip. No fork of current MatTooltip is needed; preserving the old constructor behavior still needs explicit constructor/provider/lifecycle proof and current public injected-service review. Do not claim security clearance from the bootstrap bucket.",
+      "status": "pending-compatibility-or-security-proof",
+      "final_disposition": "needs-individual-review",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ]
+    },
+    {
+      "sha": "878700d10ab042b6a62c6f86f4fcc24d5a0ae685",
+      "subject": "fix(material/progress-bar): avoid CSP issues due to buffer dots (#31818)",
+      "diff": "diff --git a/src/material/progress-bar/progress-bar.scss b/src/material/progress-bar/progress-bar.scss\nindex 235cb7366..d5bf593c2 100644\n--- a/src/material/progress-bar/progress-bar.scss\n+++ b/src/material/progress-bar/progress-bar.scss\n@@ -1,7 +1,6 @@\n @use '@angular/cdk';\n @use './m3-progress-bar';\n @use '../core/tokens/token-utils';\n-@use '../core/style/vendor-prefixes';\n \n $fallbacks: m3-progress-bar.get-tokens();\n \n@@ -104,18 +103,18 @@ $fallbacks: m3-progress-bar.get-tokens();\n }\n \n .mdc-linear-progress__buffer-dots {\n-  $mask: \"data:image/svg+xml,%3Csvg version='1.1' xmlns='http://www.w3.org/2000/svg' \" +\n-         \"xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' \" +\n-         \"enable-background='new 0 0 5 2' xml:space='preserve' viewBox='0 0 5 2' \" +\n-         \"preserveAspectRatio='xMinYMin slice'%3E%3Ccircle cx='1' cy='1' r='1'/%3E%3C/svg%3E\";\n-\n-  @include vendor-prefixes.mask-image(url($mask));\n+  $circle-color: token-utils.slot(progress-bar-track-color, $fallbacks);\n+  $circle-size: calc(#{token-utils.slot(progress-bar-track-height, $fallbacks)} / 2);\n+  background-image: radial-gradient(circle, #{$circle-color} #{$circle-size}, transparent 0);\n   background-repeat: repeat-x;\n+  background-size: calc(#{$circle-size} * 5);\n+  // The `background-position` prevents the animation from jumping around when the progress\n+  // changes. Note that we shouldn't invert it in RTL, because the animation direction is reversed.\n+  background-position: left;\n   flex: auto;\n   transform: rotate(180deg);\n   animation: mdc-linear-progress-buffering\n     calc(250ms * var(--mat-progress-bar-animation-multiplier)) infinite linear;\n-  background-color: token-utils.slot(progress-bar-track-color, $fallbacks);\n \n   @include cdk.high-contrast {\n     background-color: ButtonBorder;\n",
+      "diff_sha256": "020fb04d57aa9aeb6199fd2d0f6a8ae11a27a4a55312efd3ce9e7134f924aabf",
+      "review_depth": "individual-source-hunk-read",
+      "source_observation": "The modern progress-bar Sass changes a data-SVG mask to a radial-gradient. The facade exports an independently owned historical ordinary progress-bar companion theme, whose reachable vendored linear-progress Sass still constructs data-SVG. The owned legacy inline-SVG control is a distinct path. Resolve the companion emitted-CSS/CSP contract separately without rewriting the legacy reference CSS or hiding its mismatch.",
+      "status": "pending-compatibility-or-security-proof",
+      "final_disposition": "needs-individual-review",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ]
+    },
+    {
+      "sha": "1d42431b2fe745602727eda03338c80c8897850a",
+      "subject": "refactor: move trusted types logic into CDK (#32387)",
+      "diff": "diff --git a/goldens/cdk/private/index.api.md b/goldens/cdk/private/index.api.md\nindex 5ef9ad638..dbe48ac43 100644\n--- a/goldens/cdk/private/index.api.md\n+++ b/goldens/cdk/private/index.api.md\n@@ -16,6 +16,15 @@ export class _CdkPrivateStyleLoader {\n     static \u0275prov: i0.\u0275\u0275InjectableDeclaration<_CdkPrivateStyleLoader>;\n }\n \n+// @public (undocumented)\n+export interface TrustedHTML {\n+    // (undocumented)\n+    __brand__: 'TrustedHTML';\n+}\n+\n+// @public\n+export function trustedHTMLFromString(html: string): TrustedHTML;\n+\n // @public\n export class _VisuallyHiddenLoader {\n     // (undocumented)\ndiff --git a/src/cdk/private/public-api.ts b/src/cdk/private/public-api.ts\nindex daa7b818d..195f75b68 100644\n--- a/src/cdk/private/public-api.ts\n+++ b/src/cdk/private/public-api.ts\n@@ -8,3 +8,4 @@\n \n export * from './style-loader';\n export * from './visually-hidden/visually-hidden';\n+export {TrustedHTML, trustedHTMLFromString} from './trusted-types';\ndiff --git a/src/cdk/private/trusted-types.ts b/src/cdk/private/trusted-types.ts\nnew file mode 100644\nindex 000000000..febe9fa71\n--- /dev/null\n+++ b/src/cdk/private/trusted-types.ts\n@@ -0,0 +1,69 @@\n+/**\n+ * @license\n+ * Copyright Google LLC All Rights Reserved.\n+ *\n+ * Use of this source code is governed by an MIT-style license that can be\n+ * found in the LICENSE file at https://angular.dev/license\n+ */\n+\n+// A module to facilitate use of a Trusted Types policy internally within\n+// Angular Material. It lazily constructs the Trusted Types policy, providing\n+// helper utilities for promoting strings to Trusted Types. When Trusted Types\n+// are not available, strings are used as a fallback.\n+// All use of this module is security-sensitive and should go through security review.\n+\n+export interface TrustedHTML {\n+  __brand__: 'TrustedHTML';\n+}\n+\n+interface TrustedTypePolicyFactory {\n+  createPolicy(\n+    policyName: string,\n+    policyOptions: {\n+      createHTML?: (input: string) => string;\n+    },\n+  ): TrustedTypePolicy;\n+}\n+\n+interface TrustedTypePolicy {\n+  createHTML(input: string): TrustedHTML;\n+}\n+\n+/**\n+ * The Trusted Types policy, or null if Trusted Types are not\n+ * enabled/supported, or undefined if the policy has not been created yet.\n+ */\n+let policy: TrustedTypePolicy | null | undefined;\n+\n+/**\n+ * Returns the Trusted Types policy, or null if Trusted Types are not\n+ * enabled/supported. The first call to this function will create the policy.\n+ */\n+function getPolicy(): TrustedTypePolicy | null {\n+  if (policy === undefined) {\n+    policy = null;\n+    if (typeof window !== 'undefined') {\n+      const ttWindow = window as unknown as {trustedTypes?: TrustedTypePolicyFactory};\n+      if (ttWindow.trustedTypes !== undefined) {\n+        policy = ttWindow.trustedTypes.createPolicy('angular#components', {\n+          createHTML: (s: string) => s,\n+        });\n+      }\n+    }\n+  }\n+  return policy;\n+}\n+\n+/**\n+ * Unsafely promote a string to a TrustedHTML, falling back to strings when\n+ * Trusted Types are not available.\n+ *\n+ * Important!!! This is a security-sensitive function; any use of this function\n+ * must go through security review. In particular, it must be assured that the\n+ * provided string will never cause an XSS vulnerability if used in a context\n+ * that will be interpreted as HTML by a browser, e.g. when assigning to\n+ * element.innerHTML.\n+ */\n+export function trustedHTMLFromString(html: string): TrustedHTML {\n+  return getPolicy()?.createHTML(html) || (html as unknown as TrustedHTML);\n+}\ndiff --git a/src/material/icon/BUILD.bazel b/src/material/icon/BUILD.bazel\nindex bf4df42d2..200496244 100644\n--- a/src/material/icon/BUILD.bazel\n+++ b/src/material/icon/BUILD.bazel\n@@ -68,7 +68,6 @@ ng_project(\n         \"icon-registry.ts\",\n         \"index.ts\",\n         \"public-api.ts\",\n-        \"trusted-types.ts\",\n     ],\n     assets = [\n         \":css\",\n@@ -79,6 +78,7 @@ ng_project(\n         \"//:node_modules/@angular/platform-browser\",\n         \"//:node_modules/rxjs\",\n         \"//src:dev_mode_types\",\n+        \"//src/cdk/private\",\n         \"//src/material/core\",\n     ],\n )\ndiff --git a/src/material/icon/icon-registry.ts b/src/material/icon/icon-registry.ts\nindex 2555b6342..3d69ff4a7 100644\n--- a/src/material/icon/icon-registry.ts\n+++ b/src/material/icon/icon-registry.ts\n@@ -6,6 +6,7 @@\n  * found in the LICENSE file at https://angular.dev/license\n  */\n \n+import {TrustedHTML, trustedHTMLFromString} from '@angular/cdk/private';\n import {HttpClient, HttpErrorResponse} from '@angular/common/http';\n import {\n   ErrorHandler,\n@@ -19,7 +20,6 @@ import {\n import {DomSanitizer, SafeHtml, SafeResourceUrl} from '@angular/platform-browser';\n import {forkJoin, Observable, of as observableOf, throwError as observableThrow} from 'rxjs';\n import {catchError, finalize, map, share, tap} from 'rxjs/operators';\n-import {TrustedHTML, trustedHTMLFromString} from './trusted-types';\n \n /**\n  * Returns an exception to be thrown in the case when attempting to\ndiff --git a/src/material/icon/trusted-types.ts b/src/material/icon/trusted-types.ts\ndeleted file mode 100644\nindex 01f75fa26..000000000\n--- a/src/material/icon/trusted-types.ts\n+++ /dev/null\n@@ -1,72 +0,0 @@\n-/**\n- * @license\n- * Copyright Google LLC All Rights Reserved.\n- *\n- * Use of this source code is governed by an MIT-style license that can be\n- * found in the LICENSE file at https://angular.dev/license\n- */\n-\n-/**\n- * @fileoverview\n- * A module to facilitate use of a Trusted Types policy internally within\n- * Angular Material. It lazily constructs the Trusted Types policy, providing\n- * helper utilities for promoting strings to Trusted Types. When Trusted Types\n- * are not available, strings are used as a fallback.\n- * @security All use of this module is security-sensitive and should go through\n- * security review.\n- */\n-\n-export declare interface TrustedHTML {\n-  __brand__: 'TrustedHTML';\n-}\n-\n-export declare interface TrustedTypePolicyFactory {\n-  createPolicy(\n-    policyName: string,\n-    policyOptions: {\n-      createHTML?: (input: string) => string;\n-    },\n-  ): TrustedTypePolicy;\n-}\n-\n-export declare interface TrustedTypePolicy {\n-  createHTML(input: string): TrustedHTML;\n-}\n-\n-/**\n- * The Trusted Types policy, or null if Trusted Types are not\n- * enabled/supported, or undefined if the policy has not been created yet.\n- */\n-let policy: TrustedTypePolicy | null | undefined;\n-\n-/**\n- * Returns the Trusted Types policy, or null if Trusted Types are not\n- * enabled/supported. The first call to this function will create the policy.\n- */\n-function getPolicy(): TrustedTypePolicy | null {\n-  if (policy === undefined) {\n-    policy = null;\n-    if (typeof window !== 'undefined') {\n-      const ttWindow = window as unknown as {trustedTypes?: TrustedTypePolicyFactory};\n-      if (ttWindow.trustedTypes !== undefined) {\n-        policy = ttWindow.trustedTypes.createPolicy('angular#components', {\n-          createHTML: (s: string) => s,\n-        });\n-      }\n-    }\n-  }\n-  return policy;\n-}\n-\n-/**\n- * Unsafely promote a string to a TrustedHTML, falling back to strings when\n- * Trusted Types are not available.\n- * @security This is a security-sensitive function; any use of this function\n- * must go through security review. In particular, it must be assured that the\n- * provided string will never cause an XSS vulnerability if used in a context\n- * that will be interpreted as HTML by a browser, e.g. when assigning to\n- * element.innerHTML.\n- */\n-export function trustedHTMLFromString(html: string): TrustedHTML {\n-  return getPolicy()?.createHTML(html) || (html as unknown as TrustedHTML);\n-}\n",
+      "diff_sha256": "98d6c76532b51fadb09c6ff6a126e31085370fa0e70ba1b08070d1ae4c679e86",
+      "review_depth": "individual-source-hunk-read",
+      "source_observation": "The hunk relocates trusted-types logic from current Material icon to @angular/cdk/private, including a bypass createHTML policy. The add-on has no authored import of this helper and owns no icon component. Current-peer MatIconRegistry may transitively use it internally, which differs from an authored dependency. Need complete authored-use and reachable input/sink review before closing; never import @angular/cdk/private to follow this relocation.",
+      "status": "pending-compatibility-or-security-proof",
+      "final_disposition": "needs-individual-review",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ]
+    },
+    {
+      "sha": "231f94f5557bb58afc0070585688b3014d541eb2",
+      "subject": "fix(cdk/layout): avoid CSS injection attacks in media matcher",
+      "diff": "diff --git a/src/cdk/layout/media-matcher.ts b/src/cdk/layout/media-matcher.ts\nindex 8459b9002..cdce864b3 100644\n--- a/src/cdk/layout/media-matcher.ts\n+++ b/src/cdk/layout/media-matcher.ts\n@@ -73,7 +73,12 @@ function createEmptyStyleRule(query: string, nonce: string | undefined | null) {\n     }\n \n     if (mediaQueryStyleNode.sheet) {\n-      mediaQueryStyleNode.sheet.insertRule(`@media ${query} {body{ }}`, 0);\n+      mediaQueryStyleNode.sheet.insertRule(\n+        // Drop the curly braces to avoid injection attacks. Curly braces aren't\n+        // valid media query syntax so this should be a no-op in valid cases.\n+        `@media ${query.replace(/[{}]/g, '')} {body{ }}`,\n+        0,\n+      );\n       mediaQueriesForWebkitCompatibility.add(query);\n     }\n   } catch (e) {\n",
+      "diff_sha256": "54ce17afd1b5e1a57d9b33dca0479282cd90006201765971e1de9b65a0a2b65f",
+      "review_depth": "individual-source-hunk-read",
+      "source_observation": "Actual security fix strips braces from media-query strings before style-sheet insertRule in CDK MediaMatcher. The add-on authored direct MediaMatcher call is a fixed (prefers-reduced-motion) query; tooltip also delegates through public BreakpointObserver. Installed main22.1.7 peer source contains the brace stripping. This is useful main-floor source evidence, but actual21.x-floor implementation and exercised delegation remain required; no generic ancestry or cross-line clearance.",
+      "status": "pending-compatibility-or-security-proof",
+      "final_disposition": "needs-individual-review",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ]
+    }
+  ],
+  "g11_claim": "not-passed",
+  "limitations": [
+    "All six final dispositions remain pending; no vulnerability scanner output or generic source-path rationale is treated as clearance.",
+    "Installed main22.1.7 source observation does not establish21.x peer behavior.",
+    "Historical constructor incompatibility and reachable data-SVG companion styles need regression/contract review and repairs."
+  ]
+}
