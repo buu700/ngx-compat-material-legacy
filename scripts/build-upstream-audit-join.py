@@ -503,6 +503,57 @@ AUTHORITY_ITEMS = [
 ]
 
 
+def symbol_closure_plan(rows: list[dict], uses: list[dict]) -> dict:
+    """What each authored symbol use waits on. Proposes no closure; Codex decides the criterion."""
+    open_by_module = defaultdict(set)
+    for row in rows:
+        if not row["defects"]:
+            continue
+        for f in row["files"]:
+            if f.get("kind") == "delegated-peer":
+                open_by_module[f"{f['package']}/{f['module']}"].add(row["sha"])
+    modules = defaultdict(lambda: {"uses": 0, "symbols": set(), "files": set(), "readiness": None})
+    counts = Counter()
+    for use in uses:
+        module = use["module"]
+        base = "/".join(module.split("/")[:3]) if module.startswith("@angular/cdk") or module.startswith("@angular/material") else module
+        if not use["lines"]:
+            readiness = "stale-seed-use"
+        elif module.startswith("@ngx-compat/"):
+            readiness = "self-import-owned"
+        elif not (module.startswith("@angular/cdk") or module.startswith("@angular/material")):
+            readiness = "framework-outside-components-audit"
+        elif not (use["export_present"]["main"] and use["export_present"]["21.x"]):
+            readiness = "export-missing-on-a-floor"
+        elif open_by_module.get(base):
+            readiness = "blocked-by-open-upstream-rows"
+        else:
+            readiness = "mechanically-clear"
+        counts[readiness] += 1
+        entry = modules[module]
+        entry["uses"] += 1
+        entry["symbols"].add(use["symbol"])
+        entry["files"].add(use["file"])
+        entry["readiness"] = readiness if entry["readiness"] in (None, readiness) else "mixed"
+        entry["blocking_upstream_rows"] = sorted(open_by_module.get(base, set())) if readiness == "blocked-by-open-upstream-rows" else []
+    criteria = {
+        "stale-seed-use": "The seed lists an import that the current file does not have. Codex decides whether to drop it from the seed (the seed is frozen input) or to restore it.",
+        "self-import-owned": "Imports between this package's own entry points. These are covered by the owned source and the packed-exports check, not by the upstream audit.",
+        "framework-outside-components-audit": "@angular/core, common or forms. The angular/components audit does not cover them. The criterion would be the framework floor plus the AOT, packed-consumer and API checks. That needs a decision.",
+        "export-missing-on-a-floor": "The symbol is not exported by one installed floor.",
+        "blocked-by-open-upstream-rows": "The import line is located and the export is present on both floors. The use closes when every listed upstream row for the module has an accepted disposition.",
+        "mechanically-clear": "The import line is located, the export is present on both floors, and no upstream row for the module is open.",
+    }
+    return {
+        "decision_requested": "Approve or replace the closure criterion for each readiness class. No symbol use is closed by this plan.",
+        "criteria": criteria,
+        "counts": dict(sorted(counts.items())),
+        "modules": {module: {**{k: v for k, v in entry.items() if k not in ("symbols", "files")},
+                             "symbols": sorted(entry["symbols"]), "file_count": len(entry["files"])}
+                    for module, entry in sorted(modules.items())},
+    }
+
+
 def write_queue(rows: list[dict], report: dict, ctx: Context) -> dict:
     items, groups = [], defaultdict(list)
     for row in rows:
@@ -530,6 +581,7 @@ def write_queue(rows: list[dict], report: dict, ctx: Context) -> dict:
     for group in group_items:
         group["regression_impact"]["count"] = len(group["regression_impact"]["candidate_specs"])
     items.sort(key=lambda item: (item["priority"], {"contradiction": 0, "authority": 0, "ambiguity": 1, "unavailable-evidence": 2}[item["question_kind"]], item["sha"]))
+    symbol_closure = symbol_closure_plan(rows, report.get("symbol_uses") or [])
     queue = {
         "schema_version": 2,
         "role": "FIN-02 finite prioritized review queue (prepared evidence; proposals are not decisions)",
@@ -544,8 +596,10 @@ def write_queue(rows: list[dict], report: dict, ctx: Context) -> dict:
         "counts": {"individual_items": len(items), "authority_items": len(AUTHORITY_ITEMS), "groups": len(group_items),
                    "grouped_members": sum(g["member_count"] for g in group_items),
                    "by_priority": dict(sorted(Counter(str(item["priority"]) for item in items + group_items + AUTHORITY_ITEMS).items())),
-                   "by_question_kind": dict(sorted(Counter(item["question_kind"] for item in items + AUTHORITY_ITEMS).items()))},
+                   "by_question_kind": dict(sorted(Counter(item["question_kind"] for item in items + AUTHORITY_ITEMS).items())),
+                   "symbol_uses_by_readiness": symbol_closure["counts"]},
         "authority": AUTHORITY_ITEMS,
+        "symbol_closure": symbol_closure,
         "items": items,
         "groups": group_items,
     }

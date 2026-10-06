@@ -324,6 +324,12 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
                 self.assertEqual(status["status"], group["mechanical_status"], sha)
                 self.assertEqual(", ".join(status["delegated_modules"]), group["delegated_modules"], sha)
         self.assertEqual({item["question_kind"] for item in queue["authority"]}, {"authority"})
+        closure = queue["symbol_closure"]
+        self.assertEqual(sum(closure["counts"].values()), len(join["symbol_uses"]))
+        self.assertEqual(set(closure["counts"]) - set(closure["criteria"]), set())
+        seed = json.loads((ROOT / "compatibility/f10/authored-dependency-inventory-seed.json").read_text())
+        # The plan proposes criteria only; it closes nothing.
+        self.assertFalse(any(use.get("disposition") == "closed" for use in seed["symbol_uses"]))
         self.assertTrue((ROOT / "compatibility/f10/audit-join/braces-exception-facts.md").is_file())
 
     def test_recorded_candidate_line_proofs_still_match_the_candidate(self) -> None:
