@@ -1,4 +1,3 @@
-import {animate, style, transition, trigger} from '@angular/animations';
 import {FocusKeyManager} from '@angular/cdk/a11y';
 import {Direction, Directionality} from '@angular/cdk/bidi';
 import {
@@ -45,7 +44,7 @@ import {
 } from '@angular/forms';
 import {MatLegacyFormFieldModule} from '@angular/material/legacy-form-field';
 import {By} from '@angular/platform-browser';
-import {BrowserAnimationsModule, NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {LEGACY_ENABLED_ANIMATIONS, LEGACY_NOOP_ANIMATIONS} from '../internal/testing/owned-animation-modules';
 import {Subject} from 'rxjs';
 import {MatLegacyInputModule} from '../legacy-input/index';
 import {MatLegacyChip} from './chip';
@@ -321,7 +320,7 @@ describe('MatChipList', () => {
           fakeAsync(() => {
             fixture.destroy();
             TestBed.resetTestingModule();
-            fixture = createComponent(StandardChipListWithAnimations, [], BrowserAnimationsModule);
+            fixture = createComponent(StandardChipListWithAnimations, [], LEGACY_ENABLED_ANIMATIONS);
             fixture.detectChanges();
 
             chipListDebugElement = fixture.debugElement.query(By.directive(MatLegacyChipList))!;
@@ -1510,9 +1509,7 @@ describe('MatChipList', () => {
   function createComponent<T>(
     component: Type<T>,
     providers: Provider[] = [],
-    animationsModule:
-      | Type<NoopAnimationsModule>
-      | Type<BrowserAnimationsModule> = NoopAnimationsModule,
+    animations: Provider = LEGACY_NOOP_ANIMATIONS,
   ): ComponentFixture<T> {
     TestBed.configureTestingModule({
       imports: [
@@ -1521,10 +1518,9 @@ describe('MatChipList', () => {
         MatLegacyChipsModule,
         MatLegacyFormFieldModule,
         MatLegacyInputModule,
-        animationsModule,
       ],
       declarations: [component],
-      providers: [{provide: NgZone, useFactory: () => (zone = new MockNgZone())}, ...providers],
+      providers: [animations, {provide: NgZone, useFactory: () => (zone = new MockNgZone())}, ...providers],
     }).compileComponents();
 
     return TestBed.createComponent<T>(component);
@@ -1801,13 +1797,7 @@ class ChipListWithFormErrorMessages {
     <mat-chip-list>
       <mat-chip *ngFor="let i of numbers" (removed)="remove(i)">{{i}}</mat-chip>
     </mat-chip-list>`,
-  animations: [
-    // For the case we're testing this animation doesn't
-    // have to be used anywhere, it just has to be defined.
-    trigger('dummyAnimation', [
-      transition(':leave', [style({opacity: 0}), animate('500ms', style({opacity: 1}))]),
-    ]),
-  ],
+  // Engine-free removal is synchronous. This fixture does not declare an animation trigger.
 })
 class StandardChipListWithAnimations {
   numbers = [0, 1, 2, 3, 4];

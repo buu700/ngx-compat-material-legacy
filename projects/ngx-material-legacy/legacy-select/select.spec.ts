@@ -59,7 +59,7 @@ import {
   MAT_LEGACY_FORM_FIELD_DEFAULT_OPTIONS,
 } from '@angular/material/legacy-form-field';
 import {By} from '@angular/platform-browser';
-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {LEGACY_NOOP_ANIMATIONS} from '../internal/testing/owned-animation-modules';
 import {LiveAnnouncer} from '@angular/cdk/a11y';
 import {MAT_SELECT_CONFIG, MatSelectConfig} from '@angular/material/select';
 import {Subject, Subscription, EMPTY, Observable} from 'rxjs';
@@ -94,11 +94,10 @@ describe('MatSelect', () => {
         MatLegacyFormFieldModule,
         MatLegacySelectModule,
         ReactiveFormsModule,
-        FormsModule,
-        NoopAnimationsModule,
-      ],
+        FormsModule
+        ],
       declarations: declarations,
-      providers: [
+      providers: [LEGACY_NOOP_ANIMATIONS,
         {provide: Directionality, useFactory: () => (dir = {value: 'ltr', change: EMPTY})},
         {
           provide: ScrollDispatcher,
@@ -106,7 +105,7 @@ describe('MatSelect', () => {
             scrolled: () => scrolledSubject,
           }),
         },
-        ...providers,
+        ...providers
       ],
     }).compileComponents();
 
@@ -2713,10 +2712,9 @@ describe('MatSelect', () => {
           MatLegacySelectModule,
           ReactiveFormsModule,
           FormsModule,
-          NoopAnimationsModule,
-        ],
+                  ],
         declarations: [FloatLabelSelect],
-        providers: [
+        providers: [LEGACY_NOOP_ANIMATIONS,
           {
             provide: MAT_LEGACY_FORM_FIELD_DEFAULT_OPTIONS,
             useValue: {floatLabel: 'always'},
@@ -3092,9 +3090,9 @@ describe('MatSelect', () => {
       fixture.destroy();
 
       TestBed.resetTestingModule().configureTestingModule({
-        imports: [MatLegacySelectModule, ReactiveFormsModule, FormsModule, NoopAnimationsModule],
+        imports: [MatLegacySelectModule, ReactiveFormsModule, FormsModule],
         declarations: [SelectInsideFormGroup],
-        providers: [{provide: ErrorStateMatcher, useValue: errorStateMatcher}],
+        providers: [LEGACY_NOOP_ANIMATIONS, {provide: ErrorStateMatcher, useValue: errorStateMatcher}],
       });
 
       const errorFixture = TestBed.createComponent(SelectInsideFormGroup);

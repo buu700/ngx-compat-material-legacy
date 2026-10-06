@@ -40,7 +40,7 @@ import {
 import {ComponentFixture, fakeAsync, flush, TestBed, tick} from '@angular/core/testing';
 import {MatRipple} from '@angular/material/core';
 import {By} from '@angular/platform-browser';
-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {LEGACY_NOOP_ANIMATIONS} from '../internal/testing/owned-animation-modules';
 import {Subject} from 'rxjs';
 import {
   MAT_MENU_DEFAULT_OPTIONS,
@@ -64,9 +64,9 @@ describe('MatMenu', () => {
     declarations: any[] = [],
   ): ComponentFixture<T> {
     TestBed.configureTestingModule({
-      imports: [MatLegacyMenuModule, NoopAnimationsModule],
+      imports: [MatLegacyMenuModule],
       declarations: [component, ...declarations],
-      providers,
+      providers: [LEGACY_NOOP_ANIMATIONS, ...providers],
     }).compileComponents();
 
     overlayContainerElement = TestBed.inject(OverlayContainer).getContainerElement();
@@ -2677,13 +2677,13 @@ describe('MatMenu', () => {
 describe('MatMenu default overrides', () => {
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [MatLegacyMenuModule, NoopAnimationsModule],
+      imports: [MatLegacyMenuModule],
       declarations: [SimpleMenu, FakeIcon],
-      providers: [
+      providers: [LEGACY_NOOP_ANIMATIONS,
         {
           provide: MAT_MENU_DEFAULT_OPTIONS,
           useValue: {overlapTrigger: true, xPosition: 'before', yPosition: 'above'},
-        },
+        }
       ],
     }).compileComponents();
   }));
