@@ -4,7 +4,7 @@ import {PlatformModule} from '@angular/cdk/platform';
 import {dispatchKeyboardEvent} from '../../cdk/testing/private';
 import {Component, DebugElement, ViewChild} from '@angular/core';
 import {waitForAsync, ComponentFixture, fakeAsync, TestBed, tick} from '@angular/core/testing';
-import {MatLegacyFormFieldModule} from '@angular/material/legacy-form-field';
+import {MatLegacyFormFieldModule} from '@ngx-compat/material-legacy/legacy-form-field';
 import {By} from '@angular/platform-browser';
 import {LEGACY_NOOP_ANIMATIONS} from '../internal/testing/owned-animation-modules';
 import {Subject} from 'rxjs';

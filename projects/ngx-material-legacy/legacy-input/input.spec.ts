@@ -41,7 +41,7 @@ import {
   MatLegacyFormFieldAppearance,
   MatLegacyFormFieldModule,
   LegacyFloatLabelType,
-} from '@angular/material/legacy-form-field';
+} from '@ngx-compat/material-legacy/legacy-form-field';
 import {By} from '@angular/platform-browser';
 import {LEGACY_ENABLED_ANIMATIONS} from '../internal/testing/owned-animation-modules';
 import {Directionality, Direction} from '@angular/cdk/bidi';

@@ -1,4 +1,4 @@
-import {MatLegacyOptionModule} from '@angular/material/legacy-core';
+import {MatLegacyOptionModule} from '@ngx-compat/material-legacy/legacy-core';
 import {runHarnessTests} from '@angular/material/core/testing/optgroup-shared.spec';
 import {MatLegacyOptgroupHarness} from './optgroup-harness';
 

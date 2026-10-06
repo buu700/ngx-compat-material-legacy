@@ -3,12 +3,12 @@ import {fakeAsync, flush, TestBed} from '@angular/core/testing';
 import {
   MatTestLegacyDialogOpenerModule,
   MatTestLegacyDialogOpener,
-} from '@angular/material/legacy-dialog/testing';
+} from '@ngx-compat/material-legacy/legacy-dialog/testing';
 import {
   MAT_LEGACY_DIALOG_DATA,
   MatLegacyDialogRef,
   MatLegacyDialogState,
-} from '@angular/material/legacy-dialog';
+} from '@ngx-compat/material-legacy/legacy-dialog';
 import {LEGACY_NOOP_ANIMATIONS} from '../../internal/testing/owned-animation-modules';
 
 describe('MDC-based MatTestDialogOpener', () => {

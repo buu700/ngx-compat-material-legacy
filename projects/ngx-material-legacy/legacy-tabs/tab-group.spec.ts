@@ -20,7 +20,7 @@ import {
   MatLegacyTabsModule,
   MAT_LEGACY_TABS_CONFIG,
 } from './index';
-import {MatLegacyTabHeaderPosition} from '@angular/material/legacy-tabs';
+import {MatLegacyTabHeaderPosition} from '@ngx-compat/material-legacy/legacy-tabs';
 
 describe('MatTabGroup', () => {
   beforeEach(fakeAsync(() => {

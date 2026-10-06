@@ -1,5 +1,5 @@
-import {MatLegacyChipsModule} from '@angular/material/legacy-chips';
-import {runHarnessTests} from '@angular/material/legacy-chips/testing/shared.spec';
+import {MatLegacyChipsModule} from '@ngx-compat/material-legacy/legacy-chips';
+import {runHarnessTests} from './shared.spec.ts';
 import {MatIconModule} from '@angular/material/icon';
 import {MatIconHarness} from '@angular/material/icon/testing';
 import {MatLegacyChipListHarness} from './chip-list-harness';

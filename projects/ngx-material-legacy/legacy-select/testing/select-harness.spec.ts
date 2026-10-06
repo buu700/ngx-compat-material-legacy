@@ -1,5 +1,5 @@
-import {MatLegacyFormFieldModule} from '@angular/material/legacy-form-field';
-import {MatLegacySelectModule} from '@angular/material/legacy-select';
+import {MatLegacyFormFieldModule} from '@ngx-compat/material-legacy/legacy-form-field';
+import {MatLegacySelectModule} from '@ngx-compat/material-legacy/legacy-select';
 import {runHarnessTests} from '@angular/material/select/testing/shared.spec';
 import {MatLegacySelectHarness} from './select-harness';
 

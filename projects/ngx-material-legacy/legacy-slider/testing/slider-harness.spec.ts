@@ -2,8 +2,8 @@ import {HarnessLoader} from '@angular/cdk/testing';
 import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
 import {Component} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {MatLegacySliderModule} from '@angular/material/legacy-slider';
-import {MatLegacySliderHarness} from '@angular/material/legacy-slider/testing';
+import {MatLegacySliderModule} from '@ngx-compat/material-legacy/legacy-slider';
+import {MatLegacySliderHarness} from '@ngx-compat/material-legacy/legacy-slider/testing';
 
 describe('Non-MDC-based MatSliderHarness', () => {
   let fixture: ComponentFixture<SliderHarnessTest>;

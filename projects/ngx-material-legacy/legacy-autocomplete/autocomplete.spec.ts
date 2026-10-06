@@ -36,8 +36,8 @@ import {
   tick,
 } from '@angular/core/testing';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {MatLegacyOption, MatLegacyOptionSelectionChange} from '@angular/material/legacy-core';
-import {MatLegacyFormField, MatLegacyFormFieldModule} from '@angular/material/legacy-form-field';
+import {MatLegacyOption, MatLegacyOptionSelectionChange} from '@ngx-compat/material-legacy/legacy-core';
+import {MatLegacyFormField, MatLegacyFormFieldModule} from '@ngx-compat/material-legacy/legacy-form-field';
 import {By} from '@angular/platform-browser';
 import {LEGACY_NOOP_ANIMATIONS} from '../internal/testing/owned-animation-modules';
 import {EMPTY, Observable, Subject, Subscription} from 'rxjs';

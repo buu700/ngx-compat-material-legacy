@@ -1,4 +1,4 @@
-import {MatLegacySlideToggleModule} from '@angular/material/legacy-slide-toggle';
+import {MatLegacySlideToggleModule} from '@ngx-compat/material-legacy/legacy-slide-toggle';
 import {runHarnessTests} from '@angular/material/slide-toggle/testing/shared.spec';
 import {MatLegacySlideToggleHarness} from './slide-toggle-harness';
 

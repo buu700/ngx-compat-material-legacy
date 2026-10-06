@@ -3,8 +3,8 @@ import {LEGACY_NOOP_ANIMATIONS} from '../../internal/testing/owned-animation-mod
 import {HarnessLoader, parallel, TestKey} from '@angular/cdk/testing';
 import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {MatLegacyChipsModule} from '@angular/material/legacy-chips';
-import {MatLegacyFormFieldModule} from '@angular/material/legacy-form-field';
+import {MatLegacyChipsModule} from '@ngx-compat/material-legacy/legacy-chips';
+import {MatLegacyFormFieldModule} from '@ngx-compat/material-legacy/legacy-form-field';
 import {MatIconModule} from '@angular/material/icon';
 import {MatIconHarness} from '@angular/material/icon/testing';
 import {MatLegacyChipListHarness} from './chip-list-harness';
