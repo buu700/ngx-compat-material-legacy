@@ -27,6 +27,8 @@ export const HARNESS_CASE_IDS = [
   'packed-consumer/harness/legacy-snack-bar',
   'packed-consumer/harness/legacy-tooltip',
   'packed-consumer/harness/legacy-tabs',
+  'packed-consumer/harness/native-date-constructor',
+  'packed-consumer/harness/native-date-provider',
   'packed-consumer/harness/owned-resolution',
   'packed-consumer/harness/peer-harness-separate-scope',
 ];
