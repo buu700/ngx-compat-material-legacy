@@ -46,6 +46,16 @@ export function measureMixinArgument(sass,entry,loadPaths,catalog,probe,allowedR
   }).sort((a,b)=>a.root-b.root || a.path.localeCompare(b.path));
   return {css:measured.css,css_sha256:sha(measured.css),css_bytes:Buffer.byteLength(measured.css),program_sha256:sha(program),sources};
 }
+// Diagnostic only: preserve complete CSS comparisons and report a bounded first mismatch.
+export function firstMixinCssDifference(expected,actual) {
+  if(typeof expected?.css!=='string' || typeof actual?.css!=='string' || expected.css===actual.css)return null;
+  const a=expected.css,b=actual.css;let offset=0;
+  while(offset<Math.min(a.length,b.length) && a[offset]===b[offset])offset++;
+  const start=Math.max(0,offset-80),end=offset+240;
+  return {utf16_offset:offset,reference_line:a.slice(0,offset).split('\n').length,
+    expected_excerpt:a.slice(start,end),actual_excerpt:b.slice(start,end),
+    expected_utf16_length:a.length,actual_utf16_length:b.length};
+}
 export function mixinArgumentResultsMatch(expected,actual) {
   return typeof expected?.css==='string' && typeof actual?.css==='string'
     && expected.css===actual.css && expected.css_sha256===sha(expected.css) && actual.css_sha256===sha(actual.css)

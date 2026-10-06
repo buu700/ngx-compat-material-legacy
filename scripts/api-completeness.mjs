@@ -461,6 +461,8 @@ if (isMain) {
     signature_failures: signatureFails.length,
     di_failures: diFails.length,
     di_mismatches: detail.di_failures,
+    signature_failure_symbols: detail.signature_failures,
+    open_discrepancy_details: summary.open.slice(0,20),
   }, null, 2));
   const request = coordinatorRequest();
   if (request && request.error) fail(2, `api-completeness: refusing acceptance report: ${request.error}`);
