@@ -60,8 +60,8 @@ import {
   TooltipPosition,
   TooltipTouchGestures,
   TooltipVisibility,
-  getMatTooltipInvalidPositionError,
 } from '@angular/material/tooltip';
+import {getMatTooltipInvalidPositionError} from '../owned-errors';
 import {Observable, Subject} from 'rxjs';
 import {take, takeUntil} from 'rxjs/operators';
 
