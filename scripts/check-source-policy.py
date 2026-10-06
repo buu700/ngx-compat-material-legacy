@@ -154,9 +154,20 @@ def declaration_export(directory: Path, module: str, name: str, cache=None):
         if path.suffix in ('.js', '.mjs'):
             path = path.with_suffix('.d.ts')
         return path if path.is_file() else None
+    resolving_key = ('resolving', directory, module, name)
+    if cache.get(resolving_key):
+        return None
+    cache[resolving_key] = True
     entry = relative_file(directory, target)
     named = re.compile(r'\b(export|import)\s+(?:type\s+)?\{([^}]*)\}\s*(?:from\s*[\'\"]([^\'\"]+)[\'\"])?\s*;')
     declaration = re.compile(r'\b(?:export\s+)?(?:declare\s+)?(?:abstract\s+)?(?:class|interface|type|enum|function|const|let|var)\s+([A-Za-z_$][\w$]*)\b')
+    def origin_symbols(parent, origin, symbol, trail):
+        if origin.startswith('@angular/'):
+            peer = directory.parent / origin.split('/')[1]
+            found = declaration_export(peer, origin, symbol, cache)
+            return {found} if found else set()
+        return resolve(relative_file(parent, origin), symbol, trail)
+
     def resolve(path, symbol, trail):
         if path is None or (path, symbol) in trail:
             return set()
@@ -185,16 +196,19 @@ def declaration_export(directory: Path, module: str, name: str, cache=None):
             results.add((path, symbol))
         for origin, original in exports:
             if origin:
-                results |= resolve(relative_file(path.parent, origin), original, trail)
+                results |= origin_symbols(path.parent, origin, original, trail)
             elif original in imports:
                 origin, imported = imports[original]
-                results |= resolve(relative_file(path.parent, origin), imported, trail)
+                results |= origin_symbols(path.parent, origin, imported, trail)
             elif original in declarations:
                 results.add((path, original))
         for origin in stars:
-            results |= resolve(relative_file(path.parent, origin), symbol, trail)
+            results |= origin_symbols(path.parent, origin, symbol, trail)
         return results
-    resolved = resolve(entry, name, set())
+    try:
+        resolved = resolve(entry, name, set())
+    finally:
+        cache.pop(resolving_key, None)
     return next(iter(resolved)) if len(resolved) == 1 else None
 
 
@@ -312,7 +326,12 @@ def evaluate(authored: Path, policy: dict, tarball: Path | None, annotations: Pa
             if resolved not in marker_cache:
                 marker_cache[resolved] = declaration_markers(path, name)
             markers = marker_cache[resolved]
-            detail = dict(use, declaration=str(path.relative_to(directory.resolve())), declaration_name=name)
+            owner = next(((package, peer.resolve()) for package, peer in package_roots.items()
+                          if peer.resolve() in path.parents), None)
+            if owner is None:
+                unresolved_exports.append(use)
+                continue
+            detail = dict(use, declaration_package=owner[0], declaration=str(path.relative_to(owner[1])), declaration_name=name)
             if '@docs-private' in markers:
                 private_hits.append(detail)
             if '@deprecated' in markers:
