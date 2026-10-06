@@ -13,7 +13,7 @@ import hashlib
 import json
 import os
 import re
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -271,6 +271,87 @@ def _vuln_rows(packages: list[tuple[str, str]], results: list) -> tuple[dict, li
     return rows, unresolved
 
 
+def _version_key(value: str) -> tuple | None:
+    """Release ordering for plain x.y.z[-pre] npm versions. Anything else is unknown."""
+    import re
+
+    match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?", value or "")
+    if not match:
+        return None
+    major, minor, patch, pre = match.groups()
+    # A prerelease sorts before its release.
+    return (int(major), int(minor), int(patch), 0 if pre else 1, pre or "")
+
+
+def fixed_versions(vuln: dict, name: str, version: str) -> list[str]:
+    """OSV ``fixed`` events of SEMVER ranges for name whose range covers version."""
+    current = _version_key(version)
+    if current is None or not isinstance(vuln, dict):
+        return []
+    found = set()
+    for affected in vuln.get("affected") or []:
+        package = (affected or {}).get("package") or {}
+        if package.get("ecosystem") != "npm" or package.get("name") != name:
+            continue
+        for item in affected.get("ranges") or []:
+            if (item or {}).get("type") != "SEMVER":
+                continue
+            introduced = None
+            for event in item.get("events") or []:
+                if "introduced" in event:
+                    introduced = _version_key("0.0.0" if event["introduced"] == "0" else event["introduced"])
+                elif "fixed" in event:
+                    fixed = _version_key(event["fixed"])
+                    if introduced is not None and fixed is not None and introduced <= current < fixed:
+                        found.add(event["fixed"])
+                    introduced = None
+    return sorted(found, key=_version_key)
+
+
+def remediation_note(key: str, advisory: str, fixes: list[str], published: datetime | None, now: datetime,
+                     error: str = "") -> dict:
+    """Observed remediation state of one unresolved finding. Never a disposition."""
+    note = {"package": key, "advisory": advisory, "fixed_version": fixes[0] if fixes else None}
+    if not fixes:
+        note.update(state="no-fixed-release", detail=f"{key} {advisory}: OSV records no fixed release for this version")
+        return note
+    if published is None:
+        note.update(state="fixed-release-age-unknown",
+                    detail=f"{key} {advisory}: fixed in {fixes[0]}, publish time unknown ({error or 'missing'})")
+        return note
+    eligible_at = published + timedelta(seconds=MAX_AGE_SECONDS)
+    note.update(published=published.isoformat(), eligible_at=eligible_at.isoformat())
+    if published > now or now < eligible_at:
+        note.update(state="fixed-release-under-maturity", detail=(
+            f"{key} {advisory}: fixed in {fixes[0]} published {published.isoformat()}, "
+            f"under the seven-day minimumReleaseAge until {eligible_at.isoformat()}"))
+    else:
+        note.update(state="fixed-release-eligible", detail=(
+            f"{key} {advisory}: fixed in {fixes[0]} published {published.isoformat()}, "
+            "past the seven-day minimumReleaseAge; the lock still pins the vulnerable version"))
+    return note
+
+
+def _remediation_notes(unresolved: list[str], rows: dict, now: datetime) -> list[dict]:
+    notes = []
+    for key in unresolved:
+        row = rows.get(key) or {}
+        name, version = row.get("name"), row.get("version")
+        for item in row.get("vulns") or []:
+            advisory = item.get("id") if isinstance(item, dict) else None
+            if not (isinstance(name, str) and isinstance(version, str) and isinstance(advisory, str)):
+                continue
+            status, body, error = _http_json(f"https://api.osv.dev/v1/vulns/{advisory}", timeout=45)
+            if status != 200 or not isinstance(body, dict):
+                notes.append({"package": key, "advisory": advisory, "fixed_version": None, "state": "advisory-unknown",
+                              "detail": f"{key} {advisory}: advisory detail unknown ({error or f'http_status={status}'})"})
+                continue
+            fixes = fixed_versions(body, name, version)
+            published, age_error = _npm_publish_time(name, fixes[0]) if fixes else (None, "")
+            notes.append(remediation_note(key, advisory, fixes, published, now, age_error))
+    return notes
+
+
 def load_finding_dispositions(root: Path) -> dict[str, list[dict]]:
     """Reviewed per-finding records. A missing file leaves the finding unresolved."""
     directory = root / "compatibility/rc/dependency-dispositions"
@@ -486,6 +567,7 @@ def perform_lookup(root: Path, now: datetime) -> dict:
     blocked = classified["blocked"]
     http_known = status == 200 and not truncated and not error and bool(rows or not queried)
     result = "queried" if http_known else "unknown"
+    remediation = _remediation_notes(unresolved, rows, now) if http_known else []
     return {
         "http_status": status,
         "result": result,
@@ -509,6 +591,7 @@ def perform_lookup(root: Path, now: datetime) -> dict:
         "blocked_findings": blocked,
         "excepted_findings": classified["excepted"],
         "finding_dispositions": classified["classified"],
+        "remediation": remediation,
         "lock_packages": len(packages),
         "security_clearance": "not-passed",
     }
@@ -594,7 +677,10 @@ def evaluate(root: Path, now: datetime, *, lookup_performed: bool, lookup: dict 
         ),
         "dependency-eligibility/locks-tools-maturity/unresolved-findings-block": (
             http_known and not unresolved and not live_uncovered,
-            "unresolved or blocked findings: " + ", ".join(unresolved[:8]) if unresolved else (
+            "unresolved or blocked findings: " + ", ".join(unresolved[:8]) + "".join(
+                f"; {note['detail']}" for note in ((live or {}).get("remediation") or [])[:8]
+                if isinstance(note, dict) and isinstance(note.get("detail"), str)
+            ) if unresolved else (
                 "findings stay unknown until the lock, toolchain, and vendor set are queried"
                 if live is None or not http_known else "queried set has no unresolved finding; this is not security clearance"
             ),

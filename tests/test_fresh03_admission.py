@@ -206,5 +206,42 @@ class Fresh03AdmissionTests(unittest.TestCase):
         self.assertIn("braces@3.0.3", classified["unresolved"])
 
 
+
+class RemediationObservationTests(unittest.TestCase):
+    VULN = {"affected": [
+        {"package": {"ecosystem": "npm", "name": "source-map-js"},
+         "ranges": [{"type": "SEMVER", "events": [{"introduced": "1.0.0"}, {"fixed": "1.2.2"}]}]},
+        {"package": {"ecosystem": "npm", "name": "other"},
+         "ranges": [{"type": "SEMVER", "events": [{"introduced": "0"}, {"fixed": "9.9.9"}]}]},
+    ]}
+
+    def test_fixed_versions_only_cover_the_affected_package_range(self):
+        self.assertEqual(ELIGIBILITY.fixed_versions(self.VULN, "source-map-js", "1.2.1"), ["1.2.2"])
+        self.assertEqual(ELIGIBILITY.fixed_versions(self.VULN, "source-map-js", "1.2.2"), [])
+        self.assertEqual(ELIGIBILITY.fixed_versions(self.VULN, "source-map-js", "0.6.2"), [])
+        self.assertEqual(ELIGIBILITY.fixed_versions(self.VULN, "source-map-js", "not-semver"), [])
+
+    def test_under_maturity_fix_is_observed_not_cleared(self):
+        from datetime import timedelta
+        published = datetime(2026, 9, 30, 14, 8, tzinfo=timezone.utc)
+        young = ELIGIBILITY.remediation_note("source-map-js@1.2.1", "GHSA-x", ["1.2.2"], published,
+                                             published + timedelta(days=6))
+        self.assertEqual(young["state"], "fixed-release-under-maturity")
+        self.assertEqual(young["eligible_at"], (published + timedelta(days=7)).isoformat())
+        self.assertIn("under the seven-day minimumReleaseAge", young["detail"])
+        mature = ELIGIBILITY.remediation_note("source-map-js@1.2.1", "GHSA-x", ["1.2.2"], published,
+                                              published + timedelta(days=8))
+        self.assertEqual(mature["state"], "fixed-release-eligible")
+        none = ELIGIBILITY.remediation_note("source-map-js@1.2.1", "GHSA-x", [], None, published)
+        self.assertEqual(none["state"], "no-fixed-release")
+        for note in (young, mature, none):
+            self.assertNotIn("classification", note)
+
+    def test_remediation_note_does_not_resolve_the_finding(self):
+        rows = {"source-map-js@1.2.1": {"name": "source-map-js", "version": "1.2.1", "vulns": [{"id": "GHSA-x"}]}}
+        classified = ELIGIBILITY.classify_live_findings(rows, ["source-map-js@1.2.1"], {})
+        self.assertEqual(classified["unresolved"], ["source-map-js@1.2.1"])
+
+
 if __name__ == "__main__":
     unittest.main()
