@@ -14,7 +14,7 @@ import {LegacyCardHarnessFilters} from './card-harness-filters';
  * @deprecated Use `MatCardSection` from `@angular/material/card/testing` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
  * @breaking-change 17.0.0
  */
-export const enum MatLegacyCardSection {
+export enum MatLegacyCardSection {
   HEADER = '.mat-card-header',
   CONTENT = '.mat-card-content',
   ACTIONS = '.mat-card-actions',
