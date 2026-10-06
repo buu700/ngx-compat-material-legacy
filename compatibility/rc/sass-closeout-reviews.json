@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "role": "C02 individual owned-style repair findings; not approval of exceptions or G11",
-  "recorded_at_utc": "2026-10-06T17:17:44.855045+00:00",
+  "recorded_at_utc": "2026-10-06T18:26:23.814941+00:00",
   "decisions": [
     {
       "decision_id": "upstream-29870-select-disabled-placeholder",
@@ -22,8 +22,8 @@
       ],
       "classification": "modern-peer-fix-with-unapproved-owned-transplant",
       "owned_resolution": "Restore untouched Material 16.2.14 stylesheet semantics; only historical helper module relocation differs.",
-      "owned_source": "projects/ngx-material-legacy/legacy-select/_select-theme.scss",
-      "owned_source_sha256": "e9180b3c4147955567b531defd61f6746b39286bef827339699e411060bc9ec1",
+      "owned_source": "projects/ngx-material-legacy/styles/legacy-select/_select-theme.scss",
+      "owned_source_sha256": "42f5d0d0aa21b2034cee66aa1b022ffd7b6d7f17ad7f636bc2490cd4ccbdccc8",
       "original_reference": "reference/material-16.2.14/owned-style-source-provenance.json",
       "reason": "The original hunk changes modern mat-mdc select/snack-bar selectors and token slots. It does not touch the removed legacy controls. The previous already-adapted ledger conclusion transferred that modern styling into frozen owned Sass without independent legacy-contract evidence.",
       "owner_authority_required": false,
@@ -31,7 +31,21 @@
       "status": "repair-awaiting-actions-css-and-targeted-rendered-review",
       "peer_fix_status": "Installed-floor modern behavior still needs individual delegation proof on both lines.",
       "coverage_preserved": true,
-      "g11_claim": "not-passed"
+      "g11_claim": "not-passed",
+      "component_side_source": "projects/ngx-material-legacy/legacy-select/_select-theme.scss",
+      "repair_correction": "The first repair changed component-side duplicate Sass files. Actions rendered probes exposed that the public facade imports styles/ copies instead. Restore the actual public source; regression tests now trace its finite facade forward and preserve both copies against the untouched tag.",
+      "actions_observation": {
+        "source_commit": "0eae131777d0e9c84dc0f024cbb7d6716641b009",
+        "line": "main",
+        "workflow_run": 37510015788,
+        "job": 112428430307,
+        "failed_cases": [
+          "owned-style/light/snack-action",
+          "owned-style/custom/disabled-placeholder"
+        ],
+        "other_owned_rendered_cases_passed": 8,
+        "reference_rewritten": false
+      }
     },
     {
       "decision_id": "upstream-27511-snack-bar-action",
@@ -52,8 +66,8 @@
       ],
       "classification": "modern-peer-fix-with-unapproved-owned-transplant",
       "owned_resolution": "Restore untouched Material 16.2.14 stylesheet semantics; only historical helper module relocation differs.",
-      "owned_source": "projects/ngx-material-legacy/legacy-snack-bar/_snack-bar-theme.scss",
-      "owned_source_sha256": "fe3d16c42f28230628478c600dde9f3acedc0cb96a34301f501d6cfa8fb15cc7",
+      "owned_source": "projects/ngx-material-legacy/styles/legacy-snack-bar/_snack-bar-theme.scss",
+      "owned_source_sha256": "b9a6613433a84b02035c6252dd226d31cc74eb71c5dcb68ce76e012579a848bf",
       "original_reference": "reference/material-16.2.14/owned-style-source-provenance.json",
       "reason": "The original hunk changes modern mat-mdc select/snack-bar selectors and token slots. It does not touch the removed legacy controls. The previous already-adapted ledger conclusion transferred that modern styling into frozen owned Sass without independent legacy-contract evidence.",
       "owner_authority_required": false,
@@ -61,7 +75,21 @@
       "status": "repair-awaiting-actions-css-and-targeted-rendered-review",
       "peer_fix_status": "Installed-floor modern behavior still needs individual delegation proof on both lines.",
       "coverage_preserved": true,
-      "g11_claim": "not-passed"
+      "g11_claim": "not-passed",
+      "component_side_source": "projects/ngx-material-legacy/legacy-snack-bar/_snack-bar-theme.scss",
+      "repair_correction": "The first repair changed component-side duplicate Sass files. Actions rendered probes exposed that the public facade imports styles/ copies instead. Restore the actual public source; regression tests now trace its finite facade forward and preserve both copies against the untouched tag.",
+      "actions_observation": {
+        "source_commit": "0eae131777d0e9c84dc0f024cbb7d6716641b009",
+        "line": "main",
+        "workflow_run": 37510015788,
+        "job": 112428430307,
+        "failed_cases": [
+          "owned-style/light/snack-action",
+          "owned-style/custom/disabled-placeholder"
+        ],
+        "other_owned_rendered_cases_passed": 8,
+        "reference_rewritten": false
+      }
     }
   ]
 }
