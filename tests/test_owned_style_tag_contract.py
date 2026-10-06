@@ -1,6 +1,7 @@
 """Owned stylesheet semantics stay equal to the untouched Material 16.2.14 tag."""
 import hashlib
 import json
+import re
 from pathlib import Path
 import unittest
 ROOT=Path(__file__).resolve().parents[1]
@@ -19,3 +20,10 @@ class OwnedStyleTagContractTests(unittest.TestCase):
             expected=data.decode().replace("@use '../core/", "@use '../styles/core/")
             candidate=ROOT/'projects/ngx-material-legacy'/record['path'].removeprefix('owned-style-sources/')
             self.assertEqual(candidate.read_text(),expected)
+            # Follow the actual finite public facade, not only the component-side source copy.
+            family=Path(record['path']).parts[1]
+            mixin=Path(record['path']).name.removeprefix('_').removesuffix('.scss')
+            facade=(ROOT/'projects/ngx-material-legacy/_index.scss').read_text()
+            self.assertRegex(facade, re.escape("@forward './styles/"+family+'/'+mixin+"'"))
+            public_source=ROOT/'projects/ngx-material-legacy/styles'/family/Path(record['path']).name
+            self.assertEqual(public_source.read_bytes(),data)
