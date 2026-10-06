@@ -31,6 +31,7 @@ from rc_acceptance import (
     assertion_directory, expected_cases, prepack_binding_for,
 )
 from archive_run_closure import ClosureError, write_closure
+from owned_rendered_admission import owned_rendered_ok
 from migration_workspace_admission import old_workspace_assertion_ok
 from m3_rendered_admission import complete_rendered_checks
 from consumer_floor_admission import floor_assertion_ok, floor_support_records
@@ -834,6 +835,7 @@ _LINE_COORDINATOR_LIMITATIONS = {
         "This report is the acceptance input. It does not add a G06, G07 or G08 claim field.",
     ],
     "sass-seal": [
+        "Every owned-rendered case requires a real packed control, tagged CSS identities, peer/source binding, exact computed property comparisons and an effective injected wrong-style negative.",
         "Coordinator report for the line being verified. Each rostered main case needs a passing assertion file written by this run against the run library tarball.",
         "sass-api-and-values is the predeclared Material 16.2.14 Sass inventory in compatibility/rc/oracles/material-16.2.14-sass-api.json: variable values, function and mixin signatures, invoked mixin CSS digests and aggregate membership/order.",
         "Cases matching a recorded pending decision in compatibility/rc/sass-pending-decisions.json write no assertion. Pending decisions are owner-visible blockers, so the report stays an incomplete slice until each is decided and resolved.",
@@ -1214,6 +1216,8 @@ def _sass_seal_assertion_ok(body: dict, invocation: str) -> bool:
     Ordered-CSS and isolation-negative ids carry no API prefix and keep their
     existing assertion bodies.
     """
+    if str(body.get('case_id', '')).startswith('owned-style/'):
+        return owned_rendered_ok(ROOT, ACTIVE_RUN, body, invocation)
     case_id = body.get("case_id")
     if not isinstance(case_id, str) or not case_id.startswith(_SASS_API_PREFIXES):
         return True

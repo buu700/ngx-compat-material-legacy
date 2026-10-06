@@ -39,6 +39,9 @@ class CoordinatorTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         self.f = CompleteFixture(self.root)
+        for id in ['owned-legacy-select','owned-legacy-snack-bar','owned-legacy-button','05-custom-map-nested']:
+            for relative in [f'fixtures/sass/{id}.scss',f'reference/material-16.2.14/sass-css/{id}.css']:
+                target=self.root/relative;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes((ROOT/relative).read_bytes())
         for relative in ['fixtures/migration/cases.json','reference/material-16.2.14/PROVENANCE.json','toolchain-lock.json']:
             write_json(self.root / relative, acceptance.read_json(ROOT / relative))
         write_json(self.root / "compatibility/rc/matrices/full-verify.json", acceptance.read_json(ROOT / "compatibility/rc/matrices/full-verify.json"))
@@ -353,12 +356,16 @@ class CoordinatorTests(unittest.TestCase):
 
     def _sass_seal_bodies(self, ids, *, tarball=None):
         invocation = self.run.invocation("sass-seal")
+        self.run.manifest['oracles']['current_peer'] += [{'id':'@angular/material','version':'22.1.7'},{'id':'@angular/cdk','version':'22.1.7'},{'id':'@angular/core','version':'22.1.7'}]
         library = next(item for item in self.f.run["artifacts"] if item["id"] == "library")
         oracle_sha = verify.evidence_sha256(verify.SASS_API_ORACLE)
         bodies = {}
         for case_id in ids:
             body = {"case_id": case_id, "result": "pass", "kind": "assertion"}
-            if case_id.startswith(verify._SASS_API_PREFIXES):
+            if case_id.startswith('owned-style/'):
+                from owned_style_fixture import style_receipt
+                body=style_receipt(ROOT,self.run,case_id,invocation)
+            elif case_id.startswith(verify._SASS_API_PREFIXES):
                 body.update({
                     "group": "sass-api-and-values", "check_id": "sass-seal", "line": "main",
                     "run_id": self.f.run["run_id"], "invocation_id": invocation,

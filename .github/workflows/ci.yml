@@ -119,22 +119,25 @@ jobs:
           RUN="${{ steps.pack.outputs.run_dir }}"
           just chainman exec -- node scripts/api-completeness.mjs --run "${RUN}/run.json"
 
+      - name: Install Chromium for rendered and historical checks
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y chromium-browser || sudo apt-get install -y chromium
+
       - name: Sass seal against tip pack
         run: |
           set -euo pipefail
           RUN="${{ steps.pack.outputs.run_dir }}"
+          CHROME_BIN="$(command -v chromium-browser || command -v chromium || command -v google-chrome || true)"
+          test -n "$CHROME_BIN"
+          export CHROME_BIN
           just chainman exec -- node scripts/sass-seal.mjs --run "${RUN}/run.json"
 
       - name: Companion bridge compiled token receipts
         run: |
           set -euo pipefail
           just chainman exec -- node scripts/check-companion-bridges.mjs
-
-      - name: Install Chromium for historical runner
-        run: |
-          set -euo pipefail
-          sudo apt-get update
-          sudo apt-get install -y chromium-browser || sudo apt-get install -y chromium
 
       - name: Companion rendered computed-style slice
         run: |

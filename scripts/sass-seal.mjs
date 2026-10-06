@@ -18,8 +18,7 @@
  * by a pending decision (compatibility/rc/sass-pending-decisions.json) is
  * reported as pending; it never passes and writes no assertion. Isolation
  * negatives: archived @material/button rejection, a mutated sealed CSS copy,
- * a hidden load-path resolution, and API drift. It does not cover DOM or
- * 21.x, and does not mark sass-seal accepted.
+ * a hidden load-path resolution, and API drift. Targeted real owned-control DOM styles are compared to untouched tagged CSS; the other release line is not credited.
  *
  *   node scripts/sass-seal.mjs --tarball <path>
  *   node scripts/sass-seal.mjs --run <run.json>
@@ -27,6 +26,8 @@
  * Does not claim G06–G08.
  */
 import {createHash} from 'node:crypto';
+import {ownedStyleCaseIds, renderOwnedStyles} from './sass-owned-rendered.mjs';
+import {coordinatorRequest} from './packed-consumer-evidence.mjs';
 import {spawnSync} from 'node:child_process';
 import {createRequire} from 'node:module';
 import {
@@ -364,7 +365,10 @@ export function apiAssertionFileName(caseId) {
   return `${caseId.replace(/\//g, '__')}.json`;
 }
 
-function main() {
+async function main() {
+  const ownedIds = ownedStyleCaseIds();
+  const request = coordinatorRequest('sass-seal');
+  if (request?.error) fail(2, request.error);
   const {runPath, tarball: tarballArg, unknown} = parseLegacyArgs(process.argv.slice(2));
   if (unknown.length) fail(2, `Unknown argument: ${unknown[0]}`);
 
@@ -374,6 +378,7 @@ function main() {
     const resolved = resolveLibraryFromRun(runPath);
     tarball = resolved.tarball;
     runId = resolved.draft?.run_id ?? null;
+    if (request && (request.line !== resolved.line || request.runId !== runId)) fail(2, 'sass-seal: foreign run line or identity');
   } else if (tarballArg) {
     tarball = tarballArg;
   } else {
@@ -507,13 +512,18 @@ function main() {
     ...item, expected_sha256: item.baseline_sha256, actual_sha256: item.candidate_sha256,
   })), decisions);
 
+  let ownedRendered;
+  try { ownedRendered = await renderOwnedStyles({tarball}); }
+  catch (error) { ownedRendered = {error: error.message, results: {}}; }
+  const ownedRenderedOk = !ownedRendered.error && ownedIds.length === Object.keys(ownedRendered.results).length
+    && ownedIds.every(id => Object.values(ownedRendered.results).some(r => r.case_id === id && r.result === 'pass'));
   const materialRequested = requested.some(isAllowed);
   const pending = [...apiResults, ...orderedClassified].filter(item => item.status === 'pending-decision');
   const unexplained = [...apiResults, ...orderedClassified].filter(item => item.status === 'unexplained-failure');
   const apiPassed = apiResults.filter(item => item.result === 'pass');
   // Exit nonzero on anything unexplained. Pending cases keep the check incomplete
   // because they write no passing assertion; they are never passes.
-  const ok = compiled && !compileError && isolationOk && valuesOk && materialRequested && unexplained.length === 0
+  const ok = ownedRenderedOk && compiled && !compileError && isolationOk && valuesOk && materialRequested && unexplained.length === 0
     && orderedCss.compile_status === 0;
 
 
@@ -561,12 +571,21 @@ function main() {
       writeFileSync(join(outputDir, apiAssertionFileName(item.case_id)),
         `${JSON.stringify(apiAssertionBody(item, identity), null, 2)}\n`);
     }
+    for (const item of Object.values(ownedRendered.results || {})) {
+      if (item.result !== 'pass') continue;
+      const body = {...item,check_id:'sass-seal',run_id:runId,invocation_id:invocation,binding,
+        line:ownedRendered.line,tarball_sha256:tarballSha,source_kind:'packed',
+        reference_kind:ownedRendered.reference_kind,identities:ownedRendered.identities,
+        versions:ownedRendered.versions,browser:ownedRendered.browser,strict_templates:true,skip_lib_check:false};
+      writeFileSync(join(outputDir,apiAssertionFileName(item.case_id)),JSON.stringify(body,null,2)+'\n');
+    }
     return outputDir;
   }
 
   const report = {
     schema_version: 1,
     role: 'peer-aware packed Sass seal',
+    owned_rendered: ownedRendered,
     check_id: 'sass-seal',
     run_id: runId,
     tarball_sha256: tarballSha,
@@ -592,6 +611,9 @@ function main() {
     ordered_css_case_ids: ORDERED_CSS_FIXTURE_IDS,
     ordered_css_results: orderedCss.results,
     ordered_css_exact: orderedCssOk,
+    owned_rendered_ok: ownedRenderedOk,
+    owned_rendered_cases: Object.fromEntries(Object.values(ownedRendered.results || {}).map(r => [r.case_id,r.result])),
+    owned_rendered_error: ownedRendered.error ?? null,
     ordered_css_compile_status: orderedCss.compile_status,
     ordered_css_compare_status: orderedCss.compare_status,
     ordered_css_compile_error: orderedCss.compile_error,
@@ -617,14 +639,14 @@ function main() {
     unexplained_failures: unexplained.map(item => item.case_id),
     not_executed: {
       'ordered-css-dom-unresolved-strict': UNRESOLVED_STRICT_CSS,
-      dom: null,
+      dom_beyond_targeted_owned_controls: null,
       '21.x': null,
     },
     limitations: [
       'Seals packed facade compile, three sealed value fixtures, the authentic 16.2.14 Sass API inventory (variables, signatures, invoked mixin CSS, aggregate membership/order) and every non-debug ordered-CSS fixture under exact public peers.',
       'Expected sets are predeclared from the frozen oracle and the fixture manifest. Sealed CSS was not rewritten. A failing case matching a pending decision digest pair is reported pending and writes no assertion; it is not a pass.',
       'Executes four main isolation negatives: archived @material/button rejection, a mutated sealed CSS copy, a hidden load-path resolution, and API drift.',
-      'Does not execute empty debug CSS as CSS (its values are sealed separately) or DOM.',
+      'Empty debug CSS is covered by the value seal. Ten real owned-control DOM probes compare tagged CSS under default/custom-map, disabled/invalid, action-color and inherited typography contexts.',
       'Does not execute the thirteen companion bridge computed-style rows (G07).',
       '21.x sass-seal groups stay null. Does not mark sass-seal accepted. Does not claim G06–G08.',
     ],
@@ -638,6 +660,9 @@ function main() {
     compiled,
     sealed_values_match: valuesOk,
     ordered_css_exact: orderedCssOk,
+    owned_rendered_ok: ownedRenderedOk,
+    owned_rendered_cases: Object.fromEntries(Object.values(ownedRendered.results || {}).map(r => [r.case_id,r.result])),
+    owned_rendered_error: ownedRendered.error ?? null,
     ordered_css_cases: ORDERED_CSS_FIXTURE_IDS.length,
     sass_api_cases: apiIds.length,
     sass_api_passed: apiPassed.length,
@@ -651,6 +676,7 @@ function main() {
 
   if (!ok) {
     const reasons = [];
+    if (!ownedRenderedOk) reasons.push(`owned rendered styles failed: ${ownedRendered.error || 'probe/negative mismatch'}`);
     if (!compiled) reasons.push(`compile failed: ${compileError}`);
     if (!negativeRejected) reasons.push('archived @material negative did not refuse');
     if (mutatedNegative.result !== 'pass') reasons.push(`mutated golden negative did not detect a compare-css mismatch (status=${mutatedNegative.compare_status})`);
@@ -665,4 +691,4 @@ function main() {
 }
 
 const entry = process.argv[1] ? pathToFileURL(resolve(process.argv[1])).href : '';
-if (import.meta.url === entry) main();
+if (import.meta.url === entry) main().catch(error => fail(1, error.message));

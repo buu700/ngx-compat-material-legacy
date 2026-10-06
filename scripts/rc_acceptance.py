@@ -22,7 +22,7 @@ CHECK_CONTRACT = {
     "packed-consumer": (("G01", "G02"), "artifact", ("library",), ("aot", "declarations", "harness")),
     "motion-smoke": (("G04",), "source", ("source",), ("host-motion",)),
     "historical-legacy-artifact": (("G09",), "artifact", ("library",), ("original-and-shared-cases", "discovery-negatives")),
-    "sass-seal": (("G06", "G08"), "artifact", ("library",), ("sass-api-and-values", "ordered-css-dom", "isolation-negatives")),
+    "sass-seal": (("G06", "G08"), "artifact", ("library",), ("sass-api-and-values", "ordered-css-dom", "isolation-negatives", "owned-rendered")),
     "migration-packaged": (("G04", "G05"), "artifact", ("library", "migrate-cli"), ("old-workspace-cli", "packaged-schematic", "transaction-negatives", "frontend-parity")),
     "browser-matrix": (("G10",), "artifact", ("library",), ("release-engine-runtime-state-matrix",)),
     "api-completeness": (("G02",), "artifact", ("library",), ("export-contract", "typescript-signatures", "runtime-di-identity")),
