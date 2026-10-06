@@ -78,6 +78,25 @@ export function normalizeType(type) {
     .replace(/\"/g, "'").replace(/\$\d+/g, '');
 }
 
+// CDK 16's authenticated declaration is exactly AsyncFactoryFn<T> = () => Promise<T>.
+// Expand only that imported property type, never an unrelated same-name alias.
+export function propertyTypeText(node, sourceFile) {
+  const raw = node.getText(sourceFile);
+  if (!ts.isTypeReferenceNode(node) || !ts.isIdentifier(node.typeName)
+      || node.typeArguments?.length !== 1) return raw;
+  const local = node.typeName.text;
+  const imported = sourceFile.statements.some(statement =>
+    ts.isImportDeclaration(statement)
+      && statement.moduleSpecifier.text === '@angular/cdk/testing'
+      && statement.importClause?.namedBindings
+      && ts.isNamedImports(statement.importClause.namedBindings)
+      && statement.importClause.namedBindings.elements.some(element =>
+        element.name.text === local
+          && (element.propertyName || element.name).text === 'AsyncFactoryFn'));
+  if (!imported) return raw;
+  return `() => Promise<${node.typeArguments[0].getText(sourceFile)}>`;
+}
+
 function optionalType(type, optional) {
   let text = normalizeType(type || 'any');
   if (text.startsWith('(') && text.endsWith(')')) text = text.slice(1, -1);
@@ -199,7 +218,7 @@ function signatureOfMember(member, sourceFile, className, classTypeParams) {
   }
   if (ts.isPropertyDeclaration(member) || ts.isPropertySignature(member)) {
     const optional = Boolean(member.questionToken);
-    const type = member.type ? optionalType(member.type.getText(sourceFile), optional) : '*';
+    const type = member.type ? optionalType(propertyTypeText(member.type, sourceFile), optional) : '*';
     const readonly = isReadonly(member) ? 'readonly ' : '';
     return {
       group: `${staticText}prop ${name}`,
