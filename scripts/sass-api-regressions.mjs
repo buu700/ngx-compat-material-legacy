@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import {functionCaseIds} from './sass-function-contracts.mjs';
+import {mixinArgumentCaseIds} from './sass-mixin-arguments.mjs';
 /**
  * Pure regressions for the sass-api-and-values inventory tools. No Sass compile:
  * the frozen 16.2.14 oracle is compared with itself, then mutated.
@@ -44,7 +45,7 @@ assert.deepEqual(oracle.counts, {
 });
 const ids = apiCaseIds(oracle);
 assert.equal(new Set(ids).size, ids.length);
-assert.deepEqual(row.acceptance.cases_by_line.main['sass-api-and-values'], [...ids,...functionCaseIds()]);
+assert.deepEqual(row.acceptance.cases_by_line.main['sass-api-and-values'], [...ids,...functionCaseIds(),...mixinArgumentCaseIds()]);
 assert.equal(row.acceptance.cases_by_line['21.x']['sass-api-and-values'], null);
 const counts = {};
 for (const id of ids) counts[id.split('/')[0]] = (counts[id.split('/')[0]] || 0) + 1;

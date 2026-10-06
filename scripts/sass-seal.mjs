@@ -27,6 +27,7 @@
  */
 import {createHash} from 'node:crypto';
 import {runFunctionContracts} from './sass-function-contracts.mjs';
+import {runMixinArgumentContracts} from './sass-mixin-arguments.mjs';
 import {ownedStyleCaseIds, renderOwnedStyles} from './sass-owned-rendered.mjs';
 import {coordinatorRequest} from './packed-consumer-evidence.mjs';
 import {spawnSync} from 'node:child_process';
@@ -469,7 +470,9 @@ async function main() {
   const drift = apiDriftNegative(oracle, api.members, api.css);
   let functions;
   try {functions = runFunctionContracts({sass,entry,loadPaths:[join(consumer,'node_modules')],allowedRoots,
-    importers:[makeImporter({requested,denied})],line:'main'});}
+    importers:[makeImporter({requested,denied})],line:'main',
+    referenceObserver:reference=>runMixinArgumentContracts({sass,entry,loadPaths:[join(consumer,'node_modules')],allowedRoots,
+      importers:[makeImporter({requested,denied})],line:'main',...reference})});}
   catch (error) {functions={ok:false,error:error.message,results:[]};}
 
   // Isolation negatives actually executed by this seal: archived import refusal,
@@ -529,7 +532,7 @@ async function main() {
   const apiPassed = apiResults.filter(item => item.result === 'pass');
   // Every required API/ordered case must pass. Pending decisions are not
   // acceptance and must also make the child exit nonzero.
-  const ok = functions.ok && ownedRenderedOk && compiled && !compileError && isolationOk && valuesOk && materialRequested && unexplained.length === 0
+  const ok = functions.ok && functions.mixin_arguments?.ok === true && ownedRenderedOk && compiled && !compileError && isolationOk && valuesOk && materialRequested && unexplained.length === 0
     && orderedCss.compile_status === 0 && sassResultsComplete(apiResults,apiIds)
     && sassResultsComplete(orderedClassified,ORDERED_CSS_FIXTURE_IDS);
 
@@ -578,6 +581,12 @@ async function main() {
       if (item.result !== 'pass' || !functions.mutation_rejected) continue;
       const body = {...item,kind:'assertion',check_id:'sass-seal',group:'sass-api-and-values',exit_code:0,
         run_id:runId,invocation_id:invocation,binding,tarball_sha256:tarballSha,mutation_rejected:true};
+      writeFileSync(join(outputDir,apiAssertionFileName(item.case_id)),JSON.stringify(body,null,2)+'\n');
+    }
+    for (const item of functions.mixin_arguments?.results || []) {
+      if (item.result !== 'pass' || !item.mutation_rejected) continue;
+      const body = {...item,kind:'assertion',check_id:'sass-seal',group:'sass-api-and-values',exit_code:0,
+        run_id:runId,invocation_id:invocation,binding,tarball_sha256:tarballSha};
       writeFileSync(join(outputDir,apiAssertionFileName(item.case_id)),JSON.stringify(body,null,2)+'\n');
     }
     for (const item of apiPassed) {
@@ -679,6 +688,9 @@ async function main() {
     owned_rendered_error: ownedRendered.error ?? null,
     ordered_css_cases: ORDERED_CSS_FIXTURE_IDS.length,
     sass_api_cases: apiIds.length,
+    sass_mixin_argument_cases: functions.mixin_arguments?.results.length ?? 0,
+    sass_mixin_argument_passed: functions.mixin_arguments?.results.filter(r=>r.result==='pass').length ?? 0,
+    sass_mixin_argument_failures: functions.mixin_arguments?.results.filter(r=>r.result!=='pass').map(r=>({case_id:r.case_id,error:r.error,expected_sha256:r.expected?.css_sha256??null,actual_sha256:r.actual?.css_sha256??null})) ?? [],
     sass_function_cases: functions.results.length,
     sass_function_passed: functions.results.filter(r=>r.result==='pass').length,
     sass_function_error: functions.error ?? null,
@@ -701,6 +713,7 @@ async function main() {
     if (mutatedNegative.result !== 'pass') reasons.push(`mutated golden negative did not detect a compare-css mismatch (status=${mutatedNegative.compare_status})`);
     if (!valuesOk) reasons.push('sealed value fixtures did not match');
     if (!functions.ok) reasons.push('function semantic probes failed');
+    if (!functions.mixin_arguments?.ok) reasons.push('configurable mixin argument probes failed');
     if (pending.length) reasons.push(`pending decisions are not accepted: ${pending.length} cases`);
     if (!sassResultsComplete(apiResults,apiIds) || !sassResultsComplete(orderedClassified,ORDERED_CSS_FIXTURE_IDS)) reasons.push('required Sass case coverage is not complete');
     if (unexplained.length) reasons.push(`unexplained failures: ${unexplained.slice(0, 8).map(item => item.case_id).join(', ')}`);

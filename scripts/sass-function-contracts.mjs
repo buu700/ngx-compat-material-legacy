@@ -43,7 +43,7 @@ export function functionResultsMatch(expected, actual) {
     && actual.value_sha256 === sha(actual.value) && expected.value_bytes === Buffer.byteLength(expected.value)
     && actual.value_bytes === Buffer.byteLength(actual.value);
 }
-export function runFunctionContracts({sass,entry,loadPaths,allowedRoots,importers=[],line}) {
+export function runFunctionContracts({sass,entry,loadPaths,allowedRoots,importers=[],line,referenceObserver=null}) {
   const catalog = functionCatalog();const referenceDir = join(root,'reference/material-16.2.14');
   const provenance = JSON.parse(readFileSync(join(referenceDir,'PROVENANCE.json'))).isolated_environment;
   for (const [file,key] of [['environment-package.json','package_json_sha256'],['environment-package-lock.json','package_lock_sha256']]) {
@@ -78,6 +78,7 @@ export function runFunctionContracts({sass,entry,loadPaths,allowedRoots,importer
     const success = results.find(r => r.result === 'pass');
     const mutated = success ? {...success.actual,value:'incorrect-but-nonempty',value_sha256:sha('incorrect-but-nonempty'),value_bytes:Buffer.byteLength('incorrect-but-nonempty')} : null;
     const negative = Boolean(success && !functionResultsMatch(success.expected,mutated));
-    return {results,identity,mutation_rejected:negative,ok:negative && results.length===57 && results.every(r=>r.result==='pass')};
+    const mixin_arguments=referenceObserver ? referenceObserver({referenceEntry,referenceRoot,identity}) : null;
+    return {results,identity,mixin_arguments,mutation_rejected:negative,ok:negative && results.length===57 && results.every(r=>r.result==='pass')};
   } finally {rmSync(original,{recursive:true,force:true});}
 }

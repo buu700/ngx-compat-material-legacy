@@ -1,0 +1,3470 @@
+{
+  "schema_version": 1,
+  "role": "Fixed configurable mixin probes; compile untouched Material16 and packed candidate with the same pinned compiler. No candidate expectations or changed goldens.",
+  "setup": "$p: m.define-palette(m.$indigo-palette, 700, 200, 900, 300);\n$a: m.define-palette(m.$pink-palette, A200, A100, A400);\n$w: m.define-palette(m.$red-palette, 900);\n$level: m.define-typography-level(19px, 27px, 600, 'Closeout Font', 0.03em);\n$modern: m.define-typography-config($font-family: 'Custom Family', $body-1: $level, $button: $level);\n$legacy: m.define-legacy-typography-config($font-family: 'Legacy Family', $body-1: $level, $button: $level);\n$modern-light: m.define-light-theme((color: (primary: $p, accent: $a, warn: $w), typography: $modern, density: -2));\n$modern-dark: m.define-dark-theme((color: (primary: $p, accent: $a, warn: $w), typography: $modern, density: -2));\n$legacy-light: m.define-light-theme((color: (primary: $p, accent: $a, warn: $w), typography: $legacy, density: -2));\n$legacy-dark: m.define-dark-theme((color: (primary: $p, accent: $a, warn: $w), typography: $legacy, density: -2));\n",
+  "original_entry_identity": {
+    "path": "@angular/material/_index.scss",
+    "bytes": 13000,
+    "sha256": "1a0f14b6768b883185de92dddff5064b5ab51ecf9516675f4b8929fa167654c7"
+  },
+  "cases": [
+    {
+      "case_id": "mixin-argument/all-component-colors/custom-full-theme",
+      "mixin": "all-component-colors",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.all-component-colors($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/all-component-colors/raw-color-config",
+      "mixin": "all-component-colors",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.all-component-colors(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/all-component-densities/custom-full-theme",
+      "mixin": "all-component-densities",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.all-component-densities($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/all-component-densities/raw-density-config",
+      "mixin": "all-component-densities",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.all-component-densities(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/all-component-themes/custom-full-theme",
+      "mixin": "all-component-themes",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.all-component-themes($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/all-component-themes/custom-dark-theme",
+      "mixin": "all-component-themes",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.all-component-themes($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/all-legacy-component-colors/custom-full-theme",
+      "mixin": "all-legacy-component-colors",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.all-legacy-component-colors($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/all-legacy-component-colors/raw-color-config",
+      "mixin": "all-legacy-component-colors",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($legacy-light)",
+      "call": ".sass-argument-probe { @include m.all-legacy-component-colors(m.get-color-config($legacy-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/all-legacy-component-themes/custom-full-theme",
+      "mixin": "all-legacy-component-themes",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.all-legacy-component-themes($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/all-legacy-component-themes/custom-dark-theme",
+      "mixin": "all-legacy-component-themes",
+      "variant": "custom-dark-theme",
+      "argument": "$legacy-dark",
+      "call": ".sass-argument-probe { @include m.all-legacy-component-themes($legacy-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/autocomplete-color/custom-full-theme",
+      "mixin": "autocomplete-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.autocomplete-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/autocomplete-color/raw-color-config",
+      "mixin": "autocomplete-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.autocomplete-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/autocomplete-density/custom-full-theme",
+      "mixin": "autocomplete-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.autocomplete-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/autocomplete-density/raw-density-config",
+      "mixin": "autocomplete-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.autocomplete-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/autocomplete-theme/custom-full-theme",
+      "mixin": "autocomplete-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.autocomplete-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/autocomplete-theme/custom-dark-theme",
+      "mixin": "autocomplete-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.autocomplete-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/autocomplete-typography/custom-full-theme",
+      "mixin": "autocomplete-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.autocomplete-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/autocomplete-typography/raw-typography-config",
+      "mixin": "autocomplete-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.autocomplete-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/badge-color/custom-full-theme",
+      "mixin": "badge-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.badge-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/badge-color/raw-color-config",
+      "mixin": "badge-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.badge-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/badge-density/custom-full-theme",
+      "mixin": "badge-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.badge-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/badge-density/raw-density-config",
+      "mixin": "badge-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.badge-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/badge-theme/custom-full-theme",
+      "mixin": "badge-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.badge-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/badge-theme/custom-dark-theme",
+      "mixin": "badge-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.badge-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/badge-typography/custom-full-theme",
+      "mixin": "badge-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.badge-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/badge-typography/raw-typography-config",
+      "mixin": "badge-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.badge-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/bottom-sheet-color/custom-full-theme",
+      "mixin": "bottom-sheet-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.bottom-sheet-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/bottom-sheet-color/raw-color-config",
+      "mixin": "bottom-sheet-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.bottom-sheet-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/bottom-sheet-density/custom-full-theme",
+      "mixin": "bottom-sheet-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.bottom-sheet-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/bottom-sheet-density/raw-density-config",
+      "mixin": "bottom-sheet-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.bottom-sheet-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/bottom-sheet-theme/custom-full-theme",
+      "mixin": "bottom-sheet-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.bottom-sheet-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/bottom-sheet-theme/custom-dark-theme",
+      "mixin": "bottom-sheet-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.bottom-sheet-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/bottom-sheet-typography/custom-full-theme",
+      "mixin": "bottom-sheet-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.bottom-sheet-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/bottom-sheet-typography/raw-typography-config",
+      "mixin": "bottom-sheet-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.bottom-sheet-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/button-color/custom-full-theme",
+      "mixin": "button-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.button-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/button-color/raw-color-config",
+      "mixin": "button-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.button-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/button-density/custom-full-theme",
+      "mixin": "button-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.button-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/button-density/raw-density-config",
+      "mixin": "button-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.button-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/button-theme/custom-full-theme",
+      "mixin": "button-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.button-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/button-theme/custom-dark-theme",
+      "mixin": "button-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.button-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/button-toggle-color/custom-full-theme",
+      "mixin": "button-toggle-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.button-toggle-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/button-toggle-color/raw-color-config",
+      "mixin": "button-toggle-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.button-toggle-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/button-toggle-density/custom-full-theme",
+      "mixin": "button-toggle-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.button-toggle-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/button-toggle-density/raw-density-config",
+      "mixin": "button-toggle-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.button-toggle-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/button-toggle-theme/custom-full-theme",
+      "mixin": "button-toggle-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.button-toggle-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/button-toggle-theme/custom-dark-theme",
+      "mixin": "button-toggle-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.button-toggle-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/button-toggle-typography/custom-full-theme",
+      "mixin": "button-toggle-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.button-toggle-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/button-toggle-typography/raw-typography-config",
+      "mixin": "button-toggle-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.button-toggle-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/button-typography/custom-full-theme",
+      "mixin": "button-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.button-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/button-typography/raw-typography-config",
+      "mixin": "button-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.button-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/card-color/custom-full-theme",
+      "mixin": "card-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.card-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/card-color/raw-color-config",
+      "mixin": "card-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.card-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/card-density/custom-full-theme",
+      "mixin": "card-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.card-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/card-density/raw-density-config",
+      "mixin": "card-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.card-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/card-theme/custom-full-theme",
+      "mixin": "card-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.card-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/card-theme/custom-dark-theme",
+      "mixin": "card-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.card-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/card-typography/custom-full-theme",
+      "mixin": "card-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.card-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/card-typography/raw-typography-config",
+      "mixin": "card-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.card-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/checkbox-color/custom-full-theme",
+      "mixin": "checkbox-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.checkbox-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/checkbox-color/raw-color-config",
+      "mixin": "checkbox-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.checkbox-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/checkbox-density/custom-full-theme",
+      "mixin": "checkbox-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.checkbox-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/checkbox-density/raw-density-config",
+      "mixin": "checkbox-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.checkbox-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/checkbox-theme/custom-full-theme",
+      "mixin": "checkbox-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.checkbox-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/checkbox-theme/custom-dark-theme",
+      "mixin": "checkbox-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.checkbox-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/checkbox-typography/custom-full-theme",
+      "mixin": "checkbox-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.checkbox-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/checkbox-typography/raw-typography-config",
+      "mixin": "checkbox-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.checkbox-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/chips-color/custom-full-theme",
+      "mixin": "chips-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.chips-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/chips-color/raw-color-config",
+      "mixin": "chips-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.chips-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/chips-density/custom-full-theme",
+      "mixin": "chips-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.chips-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/chips-density/raw-density-config",
+      "mixin": "chips-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.chips-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/chips-theme/custom-full-theme",
+      "mixin": "chips-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.chips-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/chips-theme/custom-dark-theme",
+      "mixin": "chips-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.chips-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/chips-typography/custom-full-theme",
+      "mixin": "chips-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.chips-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/chips-typography/raw-typography-config",
+      "mixin": "chips-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.chips-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/core-color/custom-full-theme",
+      "mixin": "core-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.core-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/core-color/raw-color-config",
+      "mixin": "core-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.core-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/core-density/custom-full-theme",
+      "mixin": "core-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.core-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/core-density/raw-density-config",
+      "mixin": "core-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.core-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/core-theme/custom-full-theme",
+      "mixin": "core-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.core-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/core-theme/custom-dark-theme",
+      "mixin": "core-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.core-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/core-typography/custom-full-theme",
+      "mixin": "core-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.core-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/core-typography/raw-typography-config",
+      "mixin": "core-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.core-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/datepicker-color/custom-full-theme",
+      "mixin": "datepicker-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.datepicker-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/datepicker-color/raw-color-config",
+      "mixin": "datepicker-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.datepicker-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/datepicker-density/custom-full-theme",
+      "mixin": "datepicker-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.datepicker-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/datepicker-density/raw-density-config",
+      "mixin": "datepicker-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.datepicker-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/datepicker-theme/custom-full-theme",
+      "mixin": "datepicker-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.datepicker-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/datepicker-theme/custom-dark-theme",
+      "mixin": "datepicker-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.datepicker-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/datepicker-typography/custom-full-theme",
+      "mixin": "datepicker-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.datepicker-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/datepicker-typography/raw-typography-config",
+      "mixin": "datepicker-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.datepicker-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/dialog-color/custom-full-theme",
+      "mixin": "dialog-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.dialog-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/dialog-color/raw-color-config",
+      "mixin": "dialog-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.dialog-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/dialog-density/custom-full-theme",
+      "mixin": "dialog-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.dialog-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/dialog-density/raw-density-config",
+      "mixin": "dialog-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.dialog-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/dialog-theme/custom-full-theme",
+      "mixin": "dialog-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.dialog-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/dialog-theme/custom-dark-theme",
+      "mixin": "dialog-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.dialog-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/dialog-typography/custom-full-theme",
+      "mixin": "dialog-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.dialog-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/dialog-typography/raw-typography-config",
+      "mixin": "dialog-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.dialog-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/divider-color/custom-full-theme",
+      "mixin": "divider-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.divider-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/divider-color/raw-color-config",
+      "mixin": "divider-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.divider-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/divider-density/custom-full-theme",
+      "mixin": "divider-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.divider-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/divider-density/raw-density-config",
+      "mixin": "divider-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.divider-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/divider-theme/custom-full-theme",
+      "mixin": "divider-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.divider-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/divider-theme/custom-dark-theme",
+      "mixin": "divider-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.divider-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/divider-typography/custom-full-theme",
+      "mixin": "divider-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.divider-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/divider-typography/raw-typography-config",
+      "mixin": "divider-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.divider-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/expansion-color/custom-full-theme",
+      "mixin": "expansion-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.expansion-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/expansion-color/raw-color-config",
+      "mixin": "expansion-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.expansion-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/expansion-density/custom-full-theme",
+      "mixin": "expansion-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.expansion-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/expansion-density/raw-density-config",
+      "mixin": "expansion-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.expansion-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/expansion-theme/custom-full-theme",
+      "mixin": "expansion-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.expansion-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/expansion-theme/custom-dark-theme",
+      "mixin": "expansion-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.expansion-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/expansion-typography/custom-full-theme",
+      "mixin": "expansion-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.expansion-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/expansion-typography/raw-typography-config",
+      "mixin": "expansion-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.expansion-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/fab-color/custom-full-theme",
+      "mixin": "fab-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.fab-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/fab-color/raw-color-config",
+      "mixin": "fab-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.fab-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/fab-density/custom-full-theme",
+      "mixin": "fab-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.fab-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/fab-density/raw-density-config",
+      "mixin": "fab-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.fab-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/fab-theme/custom-full-theme",
+      "mixin": "fab-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.fab-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/fab-theme/custom-dark-theme",
+      "mixin": "fab-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.fab-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/fab-typography/custom-full-theme",
+      "mixin": "fab-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.fab-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/fab-typography/raw-typography-config",
+      "mixin": "fab-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.fab-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/form-field-color/custom-full-theme",
+      "mixin": "form-field-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.form-field-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/form-field-color/raw-color-config",
+      "mixin": "form-field-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.form-field-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/form-field-density/custom-full-theme",
+      "mixin": "form-field-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.form-field-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/form-field-density/raw-density-config",
+      "mixin": "form-field-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.form-field-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/form-field-theme/custom-full-theme",
+      "mixin": "form-field-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.form-field-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/form-field-theme/custom-dark-theme",
+      "mixin": "form-field-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.form-field-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/form-field-typography/custom-full-theme",
+      "mixin": "form-field-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.form-field-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/form-field-typography/raw-typography-config",
+      "mixin": "form-field-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.form-field-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/grid-list-color/custom-full-theme",
+      "mixin": "grid-list-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.grid-list-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/grid-list-color/raw-color-config",
+      "mixin": "grid-list-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.grid-list-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/grid-list-density/custom-full-theme",
+      "mixin": "grid-list-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.grid-list-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/grid-list-density/raw-density-config",
+      "mixin": "grid-list-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.grid-list-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/grid-list-theme/custom-full-theme",
+      "mixin": "grid-list-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.grid-list-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/grid-list-theme/custom-dark-theme",
+      "mixin": "grid-list-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.grid-list-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/grid-list-typography/custom-full-theme",
+      "mixin": "grid-list-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.grid-list-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/grid-list-typography/raw-typography-config",
+      "mixin": "grid-list-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.grid-list-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/icon-button-color/custom-full-theme",
+      "mixin": "icon-button-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.icon-button-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/icon-button-color/raw-color-config",
+      "mixin": "icon-button-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.icon-button-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/icon-button-density/custom-full-theme",
+      "mixin": "icon-button-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.icon-button-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/icon-button-density/raw-density-config",
+      "mixin": "icon-button-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.icon-button-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/icon-button-theme/custom-full-theme",
+      "mixin": "icon-button-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.icon-button-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/icon-button-theme/custom-dark-theme",
+      "mixin": "icon-button-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.icon-button-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/icon-button-typography/custom-full-theme",
+      "mixin": "icon-button-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.icon-button-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/icon-button-typography/raw-typography-config",
+      "mixin": "icon-button-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.icon-button-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/icon-color/custom-full-theme",
+      "mixin": "icon-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.icon-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/icon-color/raw-color-config",
+      "mixin": "icon-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.icon-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/icon-density/custom-full-theme",
+      "mixin": "icon-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.icon-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/icon-density/raw-density-config",
+      "mixin": "icon-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.icon-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/icon-theme/custom-full-theme",
+      "mixin": "icon-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.icon-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/icon-theme/custom-dark-theme",
+      "mixin": "icon-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.icon-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/icon-typography/custom-full-theme",
+      "mixin": "icon-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.icon-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/icon-typography/raw-typography-config",
+      "mixin": "icon-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.icon-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/input-color/custom-full-theme",
+      "mixin": "input-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.input-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/input-color/raw-color-config",
+      "mixin": "input-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.input-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/input-density/custom-full-theme",
+      "mixin": "input-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.input-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/input-density/raw-density-config",
+      "mixin": "input-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.input-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/input-theme/custom-full-theme",
+      "mixin": "input-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.input-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/input-theme/custom-dark-theme",
+      "mixin": "input-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.input-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/input-typography/custom-full-theme",
+      "mixin": "input-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.input-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/input-typography/raw-typography-config",
+      "mixin": "input-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.input-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-autocomplete-color/custom-full-theme",
+      "mixin": "legacy-autocomplete-color",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-autocomplete-color($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-autocomplete-color/raw-color-config",
+      "mixin": "legacy-autocomplete-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($legacy-light)",
+      "call": ".sass-argument-probe { @include m.legacy-autocomplete-color(m.get-color-config($legacy-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-autocomplete-theme/custom-full-theme",
+      "mixin": "legacy-autocomplete-theme",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-autocomplete-theme($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-autocomplete-theme/custom-dark-theme",
+      "mixin": "legacy-autocomplete-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$legacy-dark",
+      "call": ".sass-argument-probe { @include m.legacy-autocomplete-theme($legacy-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-autocomplete-typography/custom-full-theme",
+      "mixin": "legacy-autocomplete-typography",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-autocomplete-typography($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-autocomplete-typography/raw-typography-config",
+      "mixin": "legacy-autocomplete-typography",
+      "variant": "raw-typography-config",
+      "argument": "$legacy",
+      "call": ".sass-argument-probe { @include m.legacy-autocomplete-typography($legacy); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-button-color/custom-full-theme",
+      "mixin": "legacy-button-color",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-button-color($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-button-color/raw-color-config",
+      "mixin": "legacy-button-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($legacy-light)",
+      "call": ".sass-argument-probe { @include m.legacy-button-color(m.get-color-config($legacy-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-button-theme/custom-full-theme",
+      "mixin": "legacy-button-theme",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-button-theme($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-button-theme/custom-dark-theme",
+      "mixin": "legacy-button-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$legacy-dark",
+      "call": ".sass-argument-probe { @include m.legacy-button-theme($legacy-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-button-typography/custom-full-theme",
+      "mixin": "legacy-button-typography",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-button-typography($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-button-typography/raw-typography-config",
+      "mixin": "legacy-button-typography",
+      "variant": "raw-typography-config",
+      "argument": "$legacy",
+      "call": ".sass-argument-probe { @include m.legacy-button-typography($legacy); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-card-color/custom-full-theme",
+      "mixin": "legacy-card-color",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-card-color($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-card-color/raw-color-config",
+      "mixin": "legacy-card-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($legacy-light)",
+      "call": ".sass-argument-probe { @include m.legacy-card-color(m.get-color-config($legacy-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-card-theme/custom-full-theme",
+      "mixin": "legacy-card-theme",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-card-theme($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-card-theme/custom-dark-theme",
+      "mixin": "legacy-card-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$legacy-dark",
+      "call": ".sass-argument-probe { @include m.legacy-card-theme($legacy-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-card-typography/custom-full-theme",
+      "mixin": "legacy-card-typography",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-card-typography($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-card-typography/raw-typography-config",
+      "mixin": "legacy-card-typography",
+      "variant": "raw-typography-config",
+      "argument": "$legacy",
+      "call": ".sass-argument-probe { @include m.legacy-card-typography($legacy); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-checkbox-color/custom-full-theme",
+      "mixin": "legacy-checkbox-color",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-checkbox-color($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-checkbox-color/raw-color-config",
+      "mixin": "legacy-checkbox-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($legacy-light)",
+      "call": ".sass-argument-probe { @include m.legacy-checkbox-color(m.get-color-config($legacy-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-checkbox-theme/custom-full-theme",
+      "mixin": "legacy-checkbox-theme",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-checkbox-theme($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-checkbox-theme/custom-dark-theme",
+      "mixin": "legacy-checkbox-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$legacy-dark",
+      "call": ".sass-argument-probe { @include m.legacy-checkbox-theme($legacy-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-checkbox-typography/custom-full-theme",
+      "mixin": "legacy-checkbox-typography",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-checkbox-typography($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-checkbox-typography/raw-typography-config",
+      "mixin": "legacy-checkbox-typography",
+      "variant": "raw-typography-config",
+      "argument": "$legacy",
+      "call": ".sass-argument-probe { @include m.legacy-checkbox-typography($legacy); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-chips-color/custom-full-theme",
+      "mixin": "legacy-chips-color",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-chips-color($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-chips-color/raw-color-config",
+      "mixin": "legacy-chips-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($legacy-light)",
+      "call": ".sass-argument-probe { @include m.legacy-chips-color(m.get-color-config($legacy-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-chips-theme/custom-full-theme",
+      "mixin": "legacy-chips-theme",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-chips-theme($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-chips-theme/custom-dark-theme",
+      "mixin": "legacy-chips-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$legacy-dark",
+      "call": ".sass-argument-probe { @include m.legacy-chips-theme($legacy-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-chips-typography/custom-full-theme",
+      "mixin": "legacy-chips-typography",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-chips-typography($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-chips-typography/raw-typography-config",
+      "mixin": "legacy-chips-typography",
+      "variant": "raw-typography-config",
+      "argument": "$legacy",
+      "call": ".sass-argument-probe { @include m.legacy-chips-typography($legacy); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-core-color/custom-full-theme",
+      "mixin": "legacy-core-color",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-core-color($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-core-color/raw-color-config",
+      "mixin": "legacy-core-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($legacy-light)",
+      "call": ".sass-argument-probe { @include m.legacy-core-color(m.get-color-config($legacy-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-core-theme/custom-full-theme",
+      "mixin": "legacy-core-theme",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-core-theme($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-core-theme/custom-dark-theme",
+      "mixin": "legacy-core-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$legacy-dark",
+      "call": ".sass-argument-probe { @include m.legacy-core-theme($legacy-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-dialog-color/custom-full-theme",
+      "mixin": "legacy-dialog-color",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-dialog-color($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-dialog-color/raw-color-config",
+      "mixin": "legacy-dialog-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($legacy-light)",
+      "call": ".sass-argument-probe { @include m.legacy-dialog-color(m.get-color-config($legacy-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-dialog-theme/custom-full-theme",
+      "mixin": "legacy-dialog-theme",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-dialog-theme($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-dialog-theme/custom-dark-theme",
+      "mixin": "legacy-dialog-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$legacy-dark",
+      "call": ".sass-argument-probe { @include m.legacy-dialog-theme($legacy-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-dialog-typography/custom-full-theme",
+      "mixin": "legacy-dialog-typography",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-dialog-typography($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-dialog-typography/raw-typography-config",
+      "mixin": "legacy-dialog-typography",
+      "variant": "raw-typography-config",
+      "argument": "$legacy",
+      "call": ".sass-argument-probe { @include m.legacy-dialog-typography($legacy); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-form-field-color/custom-full-theme",
+      "mixin": "legacy-form-field-color",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-form-field-color($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-form-field-color/raw-color-config",
+      "mixin": "legacy-form-field-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($legacy-light)",
+      "call": ".sass-argument-probe { @include m.legacy-form-field-color(m.get-color-config($legacy-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-form-field-theme/custom-full-theme",
+      "mixin": "legacy-form-field-theme",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-form-field-theme($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-form-field-theme/custom-dark-theme",
+      "mixin": "legacy-form-field-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$legacy-dark",
+      "call": ".sass-argument-probe { @include m.legacy-form-field-theme($legacy-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-form-field-typography/custom-full-theme",
+      "mixin": "legacy-form-field-typography",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-form-field-typography($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-form-field-typography/raw-typography-config",
+      "mixin": "legacy-form-field-typography",
+      "variant": "raw-typography-config",
+      "argument": "$legacy",
+      "call": ".sass-argument-probe { @include m.legacy-form-field-typography($legacy); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-input-color/custom-full-theme",
+      "mixin": "legacy-input-color",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-input-color($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-input-color/raw-color-config",
+      "mixin": "legacy-input-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($legacy-light)",
+      "call": ".sass-argument-probe { @include m.legacy-input-color(m.get-color-config($legacy-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-input-theme/custom-full-theme",
+      "mixin": "legacy-input-theme",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-input-theme($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-input-theme/custom-dark-theme",
+      "mixin": "legacy-input-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$legacy-dark",
+      "call": ".sass-argument-probe { @include m.legacy-input-theme($legacy-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-input-typography/custom-full-theme",
+      "mixin": "legacy-input-typography",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-input-typography($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-input-typography/raw-typography-config",
+      "mixin": "legacy-input-typography",
+      "variant": "raw-typography-config",
+      "argument": "$legacy",
+      "call": ".sass-argument-probe { @include m.legacy-input-typography($legacy); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-list-color/custom-full-theme",
+      "mixin": "legacy-list-color",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-list-color($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-list-color/raw-color-config",
+      "mixin": "legacy-list-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($legacy-light)",
+      "call": ".sass-argument-probe { @include m.legacy-list-color(m.get-color-config($legacy-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-list-theme/custom-full-theme",
+      "mixin": "legacy-list-theme",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-list-theme($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-list-theme/custom-dark-theme",
+      "mixin": "legacy-list-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$legacy-dark",
+      "call": ".sass-argument-probe { @include m.legacy-list-theme($legacy-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-list-typography/custom-full-theme",
+      "mixin": "legacy-list-typography",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-list-typography($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-list-typography/raw-typography-config",
+      "mixin": "legacy-list-typography",
+      "variant": "raw-typography-config",
+      "argument": "$legacy",
+      "call": ".sass-argument-probe { @include m.legacy-list-typography($legacy); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-menu-color/custom-full-theme",
+      "mixin": "legacy-menu-color",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-menu-color($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-menu-color/raw-color-config",
+      "mixin": "legacy-menu-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($legacy-light)",
+      "call": ".sass-argument-probe { @include m.legacy-menu-color(m.get-color-config($legacy-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-menu-theme/custom-full-theme",
+      "mixin": "legacy-menu-theme",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-menu-theme($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-menu-theme/custom-dark-theme",
+      "mixin": "legacy-menu-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$legacy-dark",
+      "call": ".sass-argument-probe { @include m.legacy-menu-theme($legacy-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-menu-typography/custom-full-theme",
+      "mixin": "legacy-menu-typography",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-menu-typography($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-menu-typography/raw-typography-config",
+      "mixin": "legacy-menu-typography",
+      "variant": "raw-typography-config",
+      "argument": "$legacy",
+      "call": ".sass-argument-probe { @include m.legacy-menu-typography($legacy); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-optgroup-color/custom-full-theme",
+      "mixin": "legacy-optgroup-color",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-optgroup-color($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-optgroup-color/raw-color-config",
+      "mixin": "legacy-optgroup-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($legacy-light)",
+      "call": ".sass-argument-probe { @include m.legacy-optgroup-color(m.get-color-config($legacy-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-optgroup-theme/custom-full-theme",
+      "mixin": "legacy-optgroup-theme",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-optgroup-theme($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-optgroup-theme/custom-dark-theme",
+      "mixin": "legacy-optgroup-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$legacy-dark",
+      "call": ".sass-argument-probe { @include m.legacy-optgroup-theme($legacy-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-optgroup-typography/custom-full-theme",
+      "mixin": "legacy-optgroup-typography",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-optgroup-typography($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-optgroup-typography/raw-typography-config",
+      "mixin": "legacy-optgroup-typography",
+      "variant": "raw-typography-config",
+      "argument": "$legacy",
+      "call": ".sass-argument-probe { @include m.legacy-optgroup-typography($legacy); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-option-color/custom-full-theme",
+      "mixin": "legacy-option-color",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-option-color($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-option-color/raw-color-config",
+      "mixin": "legacy-option-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($legacy-light)",
+      "call": ".sass-argument-probe { @include m.legacy-option-color(m.get-color-config($legacy-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-option-theme/custom-full-theme",
+      "mixin": "legacy-option-theme",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-option-theme($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-option-theme/custom-dark-theme",
+      "mixin": "legacy-option-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$legacy-dark",
+      "call": ".sass-argument-probe { @include m.legacy-option-theme($legacy-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-option-typography/custom-full-theme",
+      "mixin": "legacy-option-typography",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-option-typography($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-option-typography/raw-typography-config",
+      "mixin": "legacy-option-typography",
+      "variant": "raw-typography-config",
+      "argument": "$legacy",
+      "call": ".sass-argument-probe { @include m.legacy-option-typography($legacy); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-paginator-color/custom-full-theme",
+      "mixin": "legacy-paginator-color",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-paginator-color($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-paginator-color/raw-color-config",
+      "mixin": "legacy-paginator-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($legacy-light)",
+      "call": ".sass-argument-probe { @include m.legacy-paginator-color(m.get-color-config($legacy-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-paginator-theme/custom-full-theme",
+      "mixin": "legacy-paginator-theme",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-paginator-theme($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-paginator-theme/custom-dark-theme",
+      "mixin": "legacy-paginator-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$legacy-dark",
+      "call": ".sass-argument-probe { @include m.legacy-paginator-theme($legacy-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-paginator-typography/custom-full-theme",
+      "mixin": "legacy-paginator-typography",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-paginator-typography($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-paginator-typography/raw-typography-config",
+      "mixin": "legacy-paginator-typography",
+      "variant": "raw-typography-config",
+      "argument": "$legacy",
+      "call": ".sass-argument-probe { @include m.legacy-paginator-typography($legacy); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-progress-bar-color/custom-full-theme",
+      "mixin": "legacy-progress-bar-color",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-progress-bar-color($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-progress-bar-color/raw-color-config",
+      "mixin": "legacy-progress-bar-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($legacy-light)",
+      "call": ".sass-argument-probe { @include m.legacy-progress-bar-color(m.get-color-config($legacy-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-progress-bar-theme/custom-full-theme",
+      "mixin": "legacy-progress-bar-theme",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-progress-bar-theme($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-progress-bar-theme/custom-dark-theme",
+      "mixin": "legacy-progress-bar-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$legacy-dark",
+      "call": ".sass-argument-probe { @include m.legacy-progress-bar-theme($legacy-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-progress-bar-typography/custom-full-theme",
+      "mixin": "legacy-progress-bar-typography",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-progress-bar-typography($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-progress-bar-typography/raw-typography-config",
+      "mixin": "legacy-progress-bar-typography",
+      "variant": "raw-typography-config",
+      "argument": "$legacy",
+      "call": ".sass-argument-probe { @include m.legacy-progress-bar-typography($legacy); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-progress-spinner-color/custom-full-theme",
+      "mixin": "legacy-progress-spinner-color",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-progress-spinner-color($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-progress-spinner-color/raw-color-config",
+      "mixin": "legacy-progress-spinner-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($legacy-light)",
+      "call": ".sass-argument-probe { @include m.legacy-progress-spinner-color(m.get-color-config($legacy-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-progress-spinner-theme/custom-full-theme",
+      "mixin": "legacy-progress-spinner-theme",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-progress-spinner-theme($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-progress-spinner-theme/custom-dark-theme",
+      "mixin": "legacy-progress-spinner-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$legacy-dark",
+      "call": ".sass-argument-probe { @include m.legacy-progress-spinner-theme($legacy-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-progress-spinner-typography/custom-full-theme",
+      "mixin": "legacy-progress-spinner-typography",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-progress-spinner-typography($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-progress-spinner-typography/raw-typography-config",
+      "mixin": "legacy-progress-spinner-typography",
+      "variant": "raw-typography-config",
+      "argument": "$legacy",
+      "call": ".sass-argument-probe { @include m.legacy-progress-spinner-typography($legacy); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-radio-color/custom-full-theme",
+      "mixin": "legacy-radio-color",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-radio-color($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-radio-color/raw-color-config",
+      "mixin": "legacy-radio-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($legacy-light)",
+      "call": ".sass-argument-probe { @include m.legacy-radio-color(m.get-color-config($legacy-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-radio-theme/custom-full-theme",
+      "mixin": "legacy-radio-theme",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-radio-theme($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-radio-theme/custom-dark-theme",
+      "mixin": "legacy-radio-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$legacy-dark",
+      "call": ".sass-argument-probe { @include m.legacy-radio-theme($legacy-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-radio-typography/custom-full-theme",
+      "mixin": "legacy-radio-typography",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-radio-typography($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-radio-typography/raw-typography-config",
+      "mixin": "legacy-radio-typography",
+      "variant": "raw-typography-config",
+      "argument": "$legacy",
+      "call": ".sass-argument-probe { @include m.legacy-radio-typography($legacy); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-select-color/custom-full-theme",
+      "mixin": "legacy-select-color",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-select-color($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-select-color/raw-color-config",
+      "mixin": "legacy-select-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($legacy-light)",
+      "call": ".sass-argument-probe { @include m.legacy-select-color(m.get-color-config($legacy-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-select-theme/custom-full-theme",
+      "mixin": "legacy-select-theme",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-select-theme($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-select-theme/custom-dark-theme",
+      "mixin": "legacy-select-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$legacy-dark",
+      "call": ".sass-argument-probe { @include m.legacy-select-theme($legacy-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-select-typography/custom-full-theme",
+      "mixin": "legacy-select-typography",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-select-typography($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-select-typography/raw-typography-config",
+      "mixin": "legacy-select-typography",
+      "variant": "raw-typography-config",
+      "argument": "$legacy",
+      "call": ".sass-argument-probe { @include m.legacy-select-typography($legacy); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-slide-toggle-color/custom-full-theme",
+      "mixin": "legacy-slide-toggle-color",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-slide-toggle-color($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-slide-toggle-color/raw-color-config",
+      "mixin": "legacy-slide-toggle-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($legacy-light)",
+      "call": ".sass-argument-probe { @include m.legacy-slide-toggle-color(m.get-color-config($legacy-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-slide-toggle-theme/custom-full-theme",
+      "mixin": "legacy-slide-toggle-theme",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-slide-toggle-theme($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-slide-toggle-theme/custom-dark-theme",
+      "mixin": "legacy-slide-toggle-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$legacy-dark",
+      "call": ".sass-argument-probe { @include m.legacy-slide-toggle-theme($legacy-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-slide-toggle-typography/custom-full-theme",
+      "mixin": "legacy-slide-toggle-typography",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-slide-toggle-typography($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-slide-toggle-typography/raw-typography-config",
+      "mixin": "legacy-slide-toggle-typography",
+      "variant": "raw-typography-config",
+      "argument": "$legacy",
+      "call": ".sass-argument-probe { @include m.legacy-slide-toggle-typography($legacy); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-slider-color/custom-full-theme",
+      "mixin": "legacy-slider-color",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-slider-color($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-slider-color/raw-color-config",
+      "mixin": "legacy-slider-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($legacy-light)",
+      "call": ".sass-argument-probe { @include m.legacy-slider-color(m.get-color-config($legacy-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-slider-theme/custom-full-theme",
+      "mixin": "legacy-slider-theme",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-slider-theme($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-slider-theme/custom-dark-theme",
+      "mixin": "legacy-slider-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$legacy-dark",
+      "call": ".sass-argument-probe { @include m.legacy-slider-theme($legacy-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-slider-typography/custom-full-theme",
+      "mixin": "legacy-slider-typography",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-slider-typography($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-slider-typography/raw-typography-config",
+      "mixin": "legacy-slider-typography",
+      "variant": "raw-typography-config",
+      "argument": "$legacy",
+      "call": ".sass-argument-probe { @include m.legacy-slider-typography($legacy); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-snack-bar-color/custom-full-theme",
+      "mixin": "legacy-snack-bar-color",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-snack-bar-color($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-snack-bar-color/raw-color-config",
+      "mixin": "legacy-snack-bar-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($legacy-light)",
+      "call": ".sass-argument-probe { @include m.legacy-snack-bar-color(m.get-color-config($legacy-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-snack-bar-theme/custom-full-theme",
+      "mixin": "legacy-snack-bar-theme",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-snack-bar-theme($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-snack-bar-theme/custom-dark-theme",
+      "mixin": "legacy-snack-bar-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$legacy-dark",
+      "call": ".sass-argument-probe { @include m.legacy-snack-bar-theme($legacy-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-snack-bar-typography/custom-full-theme",
+      "mixin": "legacy-snack-bar-typography",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-snack-bar-typography($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-snack-bar-typography/raw-typography-config",
+      "mixin": "legacy-snack-bar-typography",
+      "variant": "raw-typography-config",
+      "argument": "$legacy",
+      "call": ".sass-argument-probe { @include m.legacy-snack-bar-typography($legacy); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-table-color/custom-full-theme",
+      "mixin": "legacy-table-color",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-table-color($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-table-color/raw-color-config",
+      "mixin": "legacy-table-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($legacy-light)",
+      "call": ".sass-argument-probe { @include m.legacy-table-color(m.get-color-config($legacy-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-table-theme/custom-full-theme",
+      "mixin": "legacy-table-theme",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-table-theme($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-table-theme/custom-dark-theme",
+      "mixin": "legacy-table-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$legacy-dark",
+      "call": ".sass-argument-probe { @include m.legacy-table-theme($legacy-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-table-typography/custom-full-theme",
+      "mixin": "legacy-table-typography",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-table-typography($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-table-typography/raw-typography-config",
+      "mixin": "legacy-table-typography",
+      "variant": "raw-typography-config",
+      "argument": "$legacy",
+      "call": ".sass-argument-probe { @include m.legacy-table-typography($legacy); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-tabs-color/custom-full-theme",
+      "mixin": "legacy-tabs-color",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-tabs-color($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-tabs-color/raw-color-config",
+      "mixin": "legacy-tabs-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($legacy-light)",
+      "call": ".sass-argument-probe { @include m.legacy-tabs-color(m.get-color-config($legacy-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-tabs-theme/custom-full-theme",
+      "mixin": "legacy-tabs-theme",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-tabs-theme($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-tabs-theme/custom-dark-theme",
+      "mixin": "legacy-tabs-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$legacy-dark",
+      "call": ".sass-argument-probe { @include m.legacy-tabs-theme($legacy-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-tabs-typography/custom-full-theme",
+      "mixin": "legacy-tabs-typography",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-tabs-typography($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-tabs-typography/raw-typography-config",
+      "mixin": "legacy-tabs-typography",
+      "variant": "raw-typography-config",
+      "argument": "$legacy",
+      "call": ".sass-argument-probe { @include m.legacy-tabs-typography($legacy); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-tooltip-color/custom-full-theme",
+      "mixin": "legacy-tooltip-color",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-tooltip-color($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-tooltip-color/raw-color-config",
+      "mixin": "legacy-tooltip-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($legacy-light)",
+      "call": ".sass-argument-probe { @include m.legacy-tooltip-color(m.get-color-config($legacy-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-tooltip-theme/custom-full-theme",
+      "mixin": "legacy-tooltip-theme",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-tooltip-theme($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-tooltip-theme/custom-dark-theme",
+      "mixin": "legacy-tooltip-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$legacy-dark",
+      "call": ".sass-argument-probe { @include m.legacy-tooltip-theme($legacy-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-tooltip-typography/custom-full-theme",
+      "mixin": "legacy-tooltip-typography",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-tooltip-typography($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-tooltip-typography/raw-typography-config",
+      "mixin": "legacy-tooltip-typography",
+      "variant": "raw-typography-config",
+      "argument": "$legacy",
+      "call": ".sass-argument-probe { @include m.legacy-tooltip-typography($legacy); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-typography-hierarchy/custom-full-theme",
+      "mixin": "legacy-typography-hierarchy",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.legacy-typography-hierarchy($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/legacy-typography-hierarchy/raw-typography-config",
+      "mixin": "legacy-typography-hierarchy",
+      "variant": "raw-typography-config",
+      "argument": "$legacy",
+      "call": ".sass-argument-probe { @include m.legacy-typography-hierarchy($legacy); }"
+    },
+    {
+      "case_id": "mixin-argument/list-color/custom-full-theme",
+      "mixin": "list-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.list-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/list-color/raw-color-config",
+      "mixin": "list-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.list-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/list-density/custom-full-theme",
+      "mixin": "list-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.list-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/list-density/raw-density-config",
+      "mixin": "list-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.list-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/list-theme/custom-full-theme",
+      "mixin": "list-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.list-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/list-theme/custom-dark-theme",
+      "mixin": "list-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.list-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/list-typography/custom-full-theme",
+      "mixin": "list-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.list-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/list-typography/raw-typography-config",
+      "mixin": "list-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.list-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/menu-color/custom-full-theme",
+      "mixin": "menu-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.menu-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/menu-color/raw-color-config",
+      "mixin": "menu-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.menu-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/menu-density/custom-full-theme",
+      "mixin": "menu-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.menu-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/menu-density/raw-density-config",
+      "mixin": "menu-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.menu-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/menu-theme/custom-full-theme",
+      "mixin": "menu-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.menu-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/menu-theme/custom-dark-theme",
+      "mixin": "menu-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.menu-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/menu-typography/custom-full-theme",
+      "mixin": "menu-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.menu-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/menu-typography/raw-typography-config",
+      "mixin": "menu-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.menu-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/optgroup-color/custom-full-theme",
+      "mixin": "optgroup-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.optgroup-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/optgroup-color/raw-color-config",
+      "mixin": "optgroup-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.optgroup-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/optgroup-density/custom-full-theme",
+      "mixin": "optgroup-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.optgroup-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/optgroup-density/raw-density-config",
+      "mixin": "optgroup-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.optgroup-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/optgroup-theme/custom-full-theme",
+      "mixin": "optgroup-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.optgroup-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/optgroup-theme/custom-dark-theme",
+      "mixin": "optgroup-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.optgroup-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/optgroup-typography/custom-full-theme",
+      "mixin": "optgroup-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.optgroup-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/optgroup-typography/raw-typography-config",
+      "mixin": "optgroup-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.optgroup-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/option-color/custom-full-theme",
+      "mixin": "option-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.option-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/option-color/raw-color-config",
+      "mixin": "option-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.option-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/option-density/custom-full-theme",
+      "mixin": "option-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.option-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/option-density/raw-density-config",
+      "mixin": "option-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.option-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/option-theme/custom-full-theme",
+      "mixin": "option-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.option-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/option-theme/custom-dark-theme",
+      "mixin": "option-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.option-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/option-typography/custom-full-theme",
+      "mixin": "option-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.option-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/option-typography/raw-typography-config",
+      "mixin": "option-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.option-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/paginator-color/custom-full-theme",
+      "mixin": "paginator-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.paginator-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/paginator-color/raw-color-config",
+      "mixin": "paginator-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.paginator-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/paginator-density/custom-full-theme",
+      "mixin": "paginator-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.paginator-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/paginator-density/raw-density-config",
+      "mixin": "paginator-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.paginator-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/paginator-theme/custom-full-theme",
+      "mixin": "paginator-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.paginator-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/paginator-theme/custom-dark-theme",
+      "mixin": "paginator-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.paginator-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/paginator-typography/custom-full-theme",
+      "mixin": "paginator-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.paginator-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/paginator-typography/raw-typography-config",
+      "mixin": "paginator-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.paginator-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/private-all-legacy-component-densities/custom-full-theme",
+      "mixin": "private-all-legacy-component-densities",
+      "variant": "custom-full-theme",
+      "argument": "$legacy-light",
+      "call": ".sass-argument-probe { @include m.private-all-legacy-component-densities($legacy-light); }"
+    },
+    {
+      "case_id": "mixin-argument/private-all-legacy-component-densities/raw-density-config",
+      "mixin": "private-all-legacy-component-densities",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.private-all-legacy-component-densities(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/private-form-field-density/custom-full-theme",
+      "mixin": "private-form-field-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.private-form-field-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/private-form-field-density/raw-density-config",
+      "mixin": "private-form-field-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.private-form-field-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/private-strong-focus-indicators-mdc-strong-focus-indicators-color/custom-full-theme",
+      "mixin": "private-strong-focus-indicators-mdc-strong-focus-indicators-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.private-strong-focus-indicators-mdc-strong-focus-indicators-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/private-strong-focus-indicators-mdc-strong-focus-indicators-color/raw-color-config",
+      "mixin": "private-strong-focus-indicators-mdc-strong-focus-indicators-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.private-strong-focus-indicators-mdc-strong-focus-indicators-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/private-strong-focus-indicators-mdc-strong-focus-indicators-theme/custom-full-theme",
+      "mixin": "private-strong-focus-indicators-mdc-strong-focus-indicators-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.private-strong-focus-indicators-mdc-strong-focus-indicators-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/private-strong-focus-indicators-mdc-strong-focus-indicators-theme/custom-dark-theme",
+      "mixin": "private-strong-focus-indicators-mdc-strong-focus-indicators-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.private-strong-focus-indicators-mdc-strong-focus-indicators-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/private-strong-focus-indicators-strong-focus-indicators-color/custom-full-theme",
+      "mixin": "private-strong-focus-indicators-strong-focus-indicators-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.private-strong-focus-indicators-strong-focus-indicators-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/private-strong-focus-indicators-strong-focus-indicators-color/raw-color-config",
+      "mixin": "private-strong-focus-indicators-strong-focus-indicators-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.private-strong-focus-indicators-strong-focus-indicators-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/private-strong-focus-indicators-strong-focus-indicators-theme/custom-full-theme",
+      "mixin": "private-strong-focus-indicators-strong-focus-indicators-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.private-strong-focus-indicators-strong-focus-indicators-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/private-strong-focus-indicators-strong-focus-indicators-theme/custom-dark-theme",
+      "mixin": "private-strong-focus-indicators-strong-focus-indicators-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.private-strong-focus-indicators-strong-focus-indicators-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/progress-bar-color/custom-full-theme",
+      "mixin": "progress-bar-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.progress-bar-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/progress-bar-color/raw-color-config",
+      "mixin": "progress-bar-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.progress-bar-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/progress-bar-density/custom-full-theme",
+      "mixin": "progress-bar-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.progress-bar-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/progress-bar-density/raw-density-config",
+      "mixin": "progress-bar-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.progress-bar-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/progress-bar-theme/custom-full-theme",
+      "mixin": "progress-bar-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.progress-bar-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/progress-bar-theme/custom-dark-theme",
+      "mixin": "progress-bar-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.progress-bar-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/progress-bar-typography/custom-full-theme",
+      "mixin": "progress-bar-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.progress-bar-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/progress-bar-typography/raw-typography-config",
+      "mixin": "progress-bar-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.progress-bar-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/progress-spinner-color/custom-full-theme",
+      "mixin": "progress-spinner-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.progress-spinner-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/progress-spinner-color/raw-color-config",
+      "mixin": "progress-spinner-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.progress-spinner-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/progress-spinner-density/custom-full-theme",
+      "mixin": "progress-spinner-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.progress-spinner-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/progress-spinner-density/raw-density-config",
+      "mixin": "progress-spinner-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.progress-spinner-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/progress-spinner-theme/custom-full-theme",
+      "mixin": "progress-spinner-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.progress-spinner-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/progress-spinner-theme/custom-dark-theme",
+      "mixin": "progress-spinner-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.progress-spinner-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/progress-spinner-typography/custom-full-theme",
+      "mixin": "progress-spinner-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.progress-spinner-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/progress-spinner-typography/raw-typography-config",
+      "mixin": "progress-spinner-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.progress-spinner-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/pseudo-checkbox-color/custom-full-theme",
+      "mixin": "pseudo-checkbox-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.pseudo-checkbox-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/pseudo-checkbox-color/raw-color-config",
+      "mixin": "pseudo-checkbox-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.pseudo-checkbox-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/pseudo-checkbox-theme/custom-full-theme",
+      "mixin": "pseudo-checkbox-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.pseudo-checkbox-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/pseudo-checkbox-theme/custom-dark-theme",
+      "mixin": "pseudo-checkbox-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.pseudo-checkbox-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/pseudo-checkbox-typography/custom-full-theme",
+      "mixin": "pseudo-checkbox-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.pseudo-checkbox-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/pseudo-checkbox-typography/raw-typography-config",
+      "mixin": "pseudo-checkbox-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.pseudo-checkbox-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/radio-color/custom-full-theme",
+      "mixin": "radio-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.radio-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/radio-color/raw-color-config",
+      "mixin": "radio-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.radio-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/radio-density/custom-full-theme",
+      "mixin": "radio-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.radio-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/radio-density/raw-density-config",
+      "mixin": "radio-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.radio-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/radio-theme/custom-full-theme",
+      "mixin": "radio-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.radio-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/radio-theme/custom-dark-theme",
+      "mixin": "radio-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.radio-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/radio-typography/custom-full-theme",
+      "mixin": "radio-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.radio-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/radio-typography/raw-typography-config",
+      "mixin": "radio-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.radio-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/ripple-color/custom-full-theme",
+      "mixin": "ripple-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.ripple-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/ripple-color/raw-color-config",
+      "mixin": "ripple-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.ripple-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/ripple-theme/custom-full-theme",
+      "mixin": "ripple-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.ripple-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/ripple-theme/custom-dark-theme",
+      "mixin": "ripple-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.ripple-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/select-color/custom-full-theme",
+      "mixin": "select-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.select-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/select-color/raw-color-config",
+      "mixin": "select-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.select-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/select-density/custom-full-theme",
+      "mixin": "select-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.select-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/select-density/raw-density-config",
+      "mixin": "select-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.select-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/select-theme/custom-full-theme",
+      "mixin": "select-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.select-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/select-theme/custom-dark-theme",
+      "mixin": "select-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.select-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/select-typography/custom-full-theme",
+      "mixin": "select-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.select-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/select-typography/raw-typography-config",
+      "mixin": "select-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.select-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/sidenav-color/custom-full-theme",
+      "mixin": "sidenav-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.sidenav-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/sidenav-color/raw-color-config",
+      "mixin": "sidenav-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.sidenav-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/sidenav-density/custom-full-theme",
+      "mixin": "sidenav-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.sidenav-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/sidenav-density/raw-density-config",
+      "mixin": "sidenav-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.sidenav-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/sidenav-theme/custom-full-theme",
+      "mixin": "sidenav-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.sidenav-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/sidenav-theme/custom-dark-theme",
+      "mixin": "sidenav-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.sidenav-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/sidenav-typography/custom-full-theme",
+      "mixin": "sidenav-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.sidenav-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/sidenav-typography/raw-typography-config",
+      "mixin": "sidenav-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.sidenav-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/slide-toggle-color/custom-full-theme",
+      "mixin": "slide-toggle-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.slide-toggle-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/slide-toggle-color/raw-color-config",
+      "mixin": "slide-toggle-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.slide-toggle-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/slide-toggle-density/custom-full-theme",
+      "mixin": "slide-toggle-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.slide-toggle-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/slide-toggle-density/raw-density-config",
+      "mixin": "slide-toggle-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.slide-toggle-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/slide-toggle-theme/custom-full-theme",
+      "mixin": "slide-toggle-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.slide-toggle-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/slide-toggle-theme/custom-dark-theme",
+      "mixin": "slide-toggle-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.slide-toggle-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/slide-toggle-typography/custom-full-theme",
+      "mixin": "slide-toggle-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.slide-toggle-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/slide-toggle-typography/raw-typography-config",
+      "mixin": "slide-toggle-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.slide-toggle-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/slider-color/custom-full-theme",
+      "mixin": "slider-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.slider-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/slider-color/raw-color-config",
+      "mixin": "slider-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.slider-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/slider-density/custom-full-theme",
+      "mixin": "slider-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.slider-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/slider-density/raw-density-config",
+      "mixin": "slider-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.slider-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/slider-theme/custom-full-theme",
+      "mixin": "slider-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.slider-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/slider-theme/custom-dark-theme",
+      "mixin": "slider-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.slider-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/slider-typography/custom-full-theme",
+      "mixin": "slider-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.slider-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/slider-typography/raw-typography-config",
+      "mixin": "slider-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.slider-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/snack-bar-color/custom-full-theme",
+      "mixin": "snack-bar-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.snack-bar-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/snack-bar-color/raw-color-config",
+      "mixin": "snack-bar-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.snack-bar-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/snack-bar-density/custom-full-theme",
+      "mixin": "snack-bar-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.snack-bar-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/snack-bar-density/raw-density-config",
+      "mixin": "snack-bar-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.snack-bar-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/snack-bar-theme/custom-full-theme",
+      "mixin": "snack-bar-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.snack-bar-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/snack-bar-theme/custom-dark-theme",
+      "mixin": "snack-bar-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.snack-bar-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/snack-bar-typography/custom-full-theme",
+      "mixin": "snack-bar-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.snack-bar-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/snack-bar-typography/raw-typography-config",
+      "mixin": "snack-bar-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.snack-bar-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/sort-color/custom-full-theme",
+      "mixin": "sort-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.sort-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/sort-color/raw-color-config",
+      "mixin": "sort-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.sort-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/sort-density/custom-full-theme",
+      "mixin": "sort-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.sort-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/sort-density/raw-density-config",
+      "mixin": "sort-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.sort-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/sort-theme/custom-full-theme",
+      "mixin": "sort-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.sort-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/sort-theme/custom-dark-theme",
+      "mixin": "sort-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.sort-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/sort-typography/custom-full-theme",
+      "mixin": "sort-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.sort-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/sort-typography/raw-typography-config",
+      "mixin": "sort-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.sort-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/stepper-color/custom-full-theme",
+      "mixin": "stepper-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.stepper-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/stepper-color/raw-color-config",
+      "mixin": "stepper-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.stepper-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/stepper-density/custom-full-theme",
+      "mixin": "stepper-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.stepper-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/stepper-density/raw-density-config",
+      "mixin": "stepper-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.stepper-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/stepper-theme/custom-full-theme",
+      "mixin": "stepper-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.stepper-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/stepper-theme/custom-dark-theme",
+      "mixin": "stepper-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.stepper-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/stepper-typography/custom-full-theme",
+      "mixin": "stepper-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.stepper-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/stepper-typography/raw-typography-config",
+      "mixin": "stepper-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.stepper-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/strong-focus-indicators-color/custom-full-theme",
+      "mixin": "strong-focus-indicators-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.strong-focus-indicators-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/strong-focus-indicators-color/raw-color-config",
+      "mixin": "strong-focus-indicators-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.strong-focus-indicators-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/strong-focus-indicators-theme/custom-full-theme",
+      "mixin": "strong-focus-indicators-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.strong-focus-indicators-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/strong-focus-indicators-theme/custom-dark-theme",
+      "mixin": "strong-focus-indicators-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.strong-focus-indicators-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/table-color/custom-full-theme",
+      "mixin": "table-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.table-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/table-color/raw-color-config",
+      "mixin": "table-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.table-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/table-density/custom-full-theme",
+      "mixin": "table-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.table-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/table-density/raw-density-config",
+      "mixin": "table-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.table-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/table-theme/custom-full-theme",
+      "mixin": "table-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.table-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/table-theme/custom-dark-theme",
+      "mixin": "table-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.table-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/table-typography/custom-full-theme",
+      "mixin": "table-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.table-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/table-typography/raw-typography-config",
+      "mixin": "table-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.table-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/tabs-color/custom-full-theme",
+      "mixin": "tabs-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.tabs-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/tabs-color/raw-color-config",
+      "mixin": "tabs-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.tabs-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/tabs-density/custom-full-theme",
+      "mixin": "tabs-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.tabs-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/tabs-density/raw-density-config",
+      "mixin": "tabs-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.tabs-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/tabs-theme/custom-full-theme",
+      "mixin": "tabs-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.tabs-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/tabs-theme/custom-dark-theme",
+      "mixin": "tabs-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.tabs-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/tabs-typography/custom-full-theme",
+      "mixin": "tabs-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.tabs-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/tabs-typography/raw-typography-config",
+      "mixin": "tabs-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.tabs-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/toolbar-color/custom-full-theme",
+      "mixin": "toolbar-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.toolbar-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/toolbar-color/raw-color-config",
+      "mixin": "toolbar-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.toolbar-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/toolbar-density/custom-full-theme",
+      "mixin": "toolbar-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.toolbar-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/toolbar-density/raw-density-config",
+      "mixin": "toolbar-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.toolbar-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/toolbar-theme/custom-full-theme",
+      "mixin": "toolbar-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.toolbar-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/toolbar-theme/custom-dark-theme",
+      "mixin": "toolbar-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.toolbar-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/toolbar-typography/custom-full-theme",
+      "mixin": "toolbar-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.toolbar-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/toolbar-typography/raw-typography-config",
+      "mixin": "toolbar-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.toolbar-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/tooltip-color/custom-full-theme",
+      "mixin": "tooltip-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.tooltip-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/tooltip-color/raw-color-config",
+      "mixin": "tooltip-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.tooltip-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/tooltip-density/custom-full-theme",
+      "mixin": "tooltip-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.tooltip-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/tooltip-density/raw-density-config",
+      "mixin": "tooltip-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.tooltip-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/tooltip-theme/custom-full-theme",
+      "mixin": "tooltip-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.tooltip-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/tooltip-theme/custom-dark-theme",
+      "mixin": "tooltip-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.tooltip-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/tooltip-typography/custom-full-theme",
+      "mixin": "tooltip-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.tooltip-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/tooltip-typography/raw-typography-config",
+      "mixin": "tooltip-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.tooltip-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/tree-color/custom-full-theme",
+      "mixin": "tree-color",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.tree-color($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/tree-color/raw-color-config",
+      "mixin": "tree-color",
+      "variant": "raw-color-config",
+      "argument": "m.get-color-config($modern-light)",
+      "call": ".sass-argument-probe { @include m.tree-color(m.get-color-config($modern-light)); }"
+    },
+    {
+      "case_id": "mixin-argument/tree-density/custom-full-theme",
+      "mixin": "tree-density",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.tree-density($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/tree-density/raw-density-config",
+      "mixin": "tree-density",
+      "variant": "raw-density-config",
+      "argument": "-2",
+      "call": ".sass-argument-probe { @include m.tree-density(-2); }"
+    },
+    {
+      "case_id": "mixin-argument/tree-theme/custom-full-theme",
+      "mixin": "tree-theme",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.tree-theme($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/tree-theme/custom-dark-theme",
+      "mixin": "tree-theme",
+      "variant": "custom-dark-theme",
+      "argument": "$modern-dark",
+      "call": ".sass-argument-probe { @include m.tree-theme($modern-dark); }"
+    },
+    {
+      "case_id": "mixin-argument/tree-typography/custom-full-theme",
+      "mixin": "tree-typography",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.tree-typography($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/tree-typography/raw-typography-config",
+      "mixin": "tree-typography",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.tree-typography($modern); }"
+    },
+    {
+      "case_id": "mixin-argument/typography-hierarchy/custom-full-theme",
+      "mixin": "typography-hierarchy",
+      "variant": "custom-full-theme",
+      "argument": "$modern-light",
+      "call": ".sass-argument-probe { @include m.typography-hierarchy($modern-light); }"
+    },
+    {
+      "case_id": "mixin-argument/typography-hierarchy/raw-typography-config",
+      "mixin": "typography-hierarchy",
+      "variant": "raw-typography-config",
+      "argument": "$modern",
+      "call": ".sass-argument-probe { @include m.typography-hierarchy($modern); }"
+    }
+  ]
+}
