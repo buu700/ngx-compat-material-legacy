@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "role": "C02 individual owned-style repair findings; not approval of exceptions or G11",
+  "recorded_at_utc": "2026-10-06T17:17:44.855045+00:00",
+  "decisions": [
+    {
+      "decision_id": "upstream-29870-select-disabled-placeholder",
+      "upstream": {
+        "sha": "306e437d213f3ace7b3ee294ef1dd82f5e8e2fab",
+        "url": "https://github.com/angular/components/commit/306e437d213f3ace7b3ee294ef1dd82f5e8e2fab",
+        "subject": "fix(material/select): match disabled placeholder color with label (#29870)",
+        "files": [
+          {
+            "path": "src/material/select/select.scss",
+            "patch": "@@ -41,6 +41,13 @@ $scale: 0.75 !default;\n     tokens-mat-select.$prefix, tokens-mat-select.get-token-slots()) {\n     @include token-utils.create-token-slot(color, disabled-trigger-text-color);\n   }\n+\n+  .mat-mdc-select-placeholder {\n+    @include token-utils.use-tokens(\n+      tokens-mat-select.$prefix, tokens-mat-select.get-token-slots()) {\n+      @include token-utils.create-token-slot(color, disabled-trigger-text-color);\n+    }\n+  }\n }\n \n .mat-mdc-select-trigger {"
+          }
+        ]
+      },
+      "affected_lines": [
+        "main",
+        "21.x"
+      ],
+      "classification": "modern-peer-fix-with-unapproved-owned-transplant",
+      "owned_resolution": "Restore untouched Material 16.2.14 stylesheet semantics; only historical helper module relocation differs.",
+      "owned_source": "projects/ngx-material-legacy/legacy-select/_select-theme.scss",
+      "owned_source_sha256": "e9180b3c4147955567b531defd61f6746b39286bef827339699e411060bc9ec1",
+      "original_reference": "reference/material-16.2.14/owned-style-source-provenance.json",
+      "reason": "The original hunk changes modern mat-mdc select/snack-bar selectors and token slots. It does not touch the removed legacy controls. The previous already-adapted ledger conclusion transferred that modern styling into frozen owned Sass without independent legacy-contract evidence.",
+      "owner_authority_required": false,
+      "authority_scope": "Technical repair to the already-agreed Material 16.2.14 owned contract; no deviation or residual risk is accepted.",
+      "status": "repair-awaiting-actions-css-and-targeted-rendered-review",
+      "peer_fix_status": "Installed-floor modern behavior still needs individual delegation proof on both lines.",
+      "coverage_preserved": true,
+      "g11_claim": "not-passed"
+    },
+    {
+      "decision_id": "upstream-27511-snack-bar-action",
+      "upstream": {
+        "sha": "d0cf8bfe8bc476145984e0f8f3ab7d18eea36f1a",
+        "url": "https://github.com/angular/components/commit/d0cf8bfe8bc476145984e0f8f3ab7d18eea36f1a",
+        "subject": "fix(material/snack-bar): prevent override of snack bar action button color (#27511)",
+        "files": [
+          {
+            "path": "src/material/snack-bar/snack-bar-container.scss",
+            "patch": "@@ -105,14 +105,16 @@ $_side-padding: 8px;\n // The `mat-mdc-button` and `:not(:disabled)` here are redundant, but we need them to increase\n // the specificity over the button styles that may bleed in from the rest of the app.\n .mat-mdc-snack-bar-container .mat-mdc-button.mat-mdc-snack-bar-action:not(:disabled) {\n-  // MDC's `action-label-text-color` should be able to do this, but the button theme has a\n-  // higher specificity so it ends up overriding it. Define our own variable that we can\n-  // use to control the color instead.\n-  @include token-utils.use-tokens(\n-    tokens-mat-snack-bar.$prefix,\n-    tokens-mat-snack-bar.get-token-slots()\n-  ) {\n-    @include token-utils.create-token-slot(color, button-color);\n+  &.mat-unthemed {\n+    // MDC's `action-label-text-color` should be able to do this, but the button theme has a\n+    // higher specificity so it ends up overriding it. Define our own variable that we can\n+    // use to control the color instead.\n+    @include token-utils.use-tokens(\n+      tokens-mat-snack-bar.$prefix,\n+      tokens-mat-snack-bar.get-token-slots()\n+    ) {\n+      @include token-utils.create-token-slot(color, button-color);\n+    }\n   }\n \n   // Darken the ripples in the button so they're visible against the dark background."
+          }
+        ]
+      },
+      "affected_lines": [
+        "main",
+        "21.x"
+      ],
+      "classification": "modern-peer-fix-with-unapproved-owned-transplant",
+      "owned_resolution": "Restore untouched Material 16.2.14 stylesheet semantics; only historical helper module relocation differs.",
+      "owned_source": "projects/ngx-material-legacy/legacy-snack-bar/_snack-bar-theme.scss",
+      "owned_source_sha256": "fe3d16c42f28230628478c600dde9f3acedc0cb96a34301f501d6cfa8fb15cc7",
+      "original_reference": "reference/material-16.2.14/owned-style-source-provenance.json",
+      "reason": "The original hunk changes modern mat-mdc select/snack-bar selectors and token slots. It does not touch the removed legacy controls. The previous already-adapted ledger conclusion transferred that modern styling into frozen owned Sass without independent legacy-contract evidence.",
+      "owner_authority_required": false,
+      "authority_scope": "Technical repair to the already-agreed Material 16.2.14 owned contract; no deviation or residual risk is accepted.",
+      "status": "repair-awaiting-actions-css-and-targeted-rendered-review",
+      "peer_fix_status": "Installed-floor modern behavior still needs individual delegation proof on both lines.",
+      "coverage_preserved": true,
+      "g11_claim": "not-passed"
+    }
+  ]
+}
