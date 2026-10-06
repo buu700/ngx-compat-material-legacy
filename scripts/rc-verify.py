@@ -656,6 +656,12 @@ _LINE_COORDINATOR_LIMITATIONS = {
         "Main consumer-floors groups stay null on this branch. A 21.x run does not copy main proofs.",
         "This report is the acceptance input. It does not add a G12 claim field.",
     ],
+    "companion-computed-styles": [
+        "Coordinator report for the line being verified. Each rostered 21.x case has exactly one assertion file written by this run.",
+        "Each assertion compares the candidate rendered computed value with the computed value from the installed current @angular/material peer oracle recorded for this run. Historical v16 output is not the oracle.",
+        "Main companion-computed-styles groups stay null. A 21.x run does not copy them and does not call expected_cases for main.",
+        "This report is the acceptance input. It does not add a G06, G07 or G08 claim field.",
+    ],
     "m3-coexistence": [
         "Coordinator report for the line being verified. Each rostered 21.x case has an assertion file written by this run.",
         "Contamination fixtures are rejected and are not rostered. The report keeps the executed scope ids only.",
@@ -779,8 +785,126 @@ def _bridge_token_assertion_ok(body: dict, invocation: str) -> bool:
     return True
 
 
+_COMPUTED_DIMENSIONS = ("base", "color", "typography", "density")
+
+def _is_sha256(value) -> bool:
+    return isinstance(value, str) and _SHA256_HEX.fullmatch(value) is not None
+
+def _library_artifact_sha256() -> str | None:
+    for item in ACTIVE_RUN.manifest.get("artifacts", []):
+        if isinstance(item, dict) and item.get("id") == "library":
+            digest = item.get("sha256")
+            return digest if isinstance(digest, str) and digest else None
+    return None
+
+def _computed_rendered_case_ok(body: dict, case_id: str, component: str, dimension: str) -> bool:
+    element, prop = body.get("element"), body.get("property")
+    if not all(isinstance(v, str) and v for v in (element, prop)):
+        return False
+    if case_id != f"{component}/{dimension}/{element}/{prop}":
+        return False
+    token = body.get("token")
+    prefixes = (f"--mat-{component}-", *_COMPUTED_FOREIGN_TOKEN_PREFIXES.get((component, dimension), ()))
+    if not (isinstance(token, str) and token.startswith(prefixes)):
+        return False
+    keyword = body.get("peer_declared_keyword")
+    if keyword is not None and keyword not in _CSS_WIDE_KEYWORDS:
+        return False
+    scenarios = body.get("scenarios")
+    if not isinstance(scenarios, list) or not scenarios:
+        return False
+    seen = set()
+    for scenario in scenarios:
+        if not isinstance(scenario, dict) or scenario.get("match") is not True:
+            return False
+        name = scenario.get("scenario")
+        if not isinstance(name, str) or not name or name in seen:
+            return False
+        seen.add(name)
+        oracle = scenario.get("oracle")
+        if not (isinstance(oracle, str) and oracle.strip() and scenario.get("candidate") == oracle):
+            return False
+        # A token the peer declares with a CSS-wide keyword has no computed value of its own.
+        if keyword is None and not (isinstance(scenario.get("oracle_token"), str) and scenario["oracle_token"].strip()):
+            return False
+    negative = body.get("negative")
+    if not isinstance(negative, dict):
+        return False
+    if negative.get("sentinel_consumed") is not True or negative.get("mismatch_detected") is not True:
+        return False
+    injected, observed = negative.get("injected"), negative.get("observed")
+    if not (isinstance(injected, str) and injected and isinstance(observed, str) and observed):
+        return False
+    return observed != negative.get("oracle")
+
+def _computed_style_assertion_ok(body: dict, invocation: str) -> bool:
+    """A companion computed-style assertion from this run's rendered peer oracle.
+
+    Common: this run and invocation, the run's frozen @angular/material peer
+    version and package.json digest, the run's library tarball, and the peer
+    ``<companion>/_m2-<companion>.scss`` source. A rendered dimension case
+    needs candidate == oracle (non-empty, peer token defined on the consuming
+    element) in every scenario and a consumed wrong-but-nonempty negative. A
+    not-applicable case needs the live peer dimension mixin to emit nothing.
+    A peer-oracle case needs peer-only Sass and a sensitivity witness per
+    applicable dimension.
+    """
+    case_id = body.get("case_id")
+    component = body.get("companion")
+    if not (isinstance(case_id, str) and case_id and isinstance(component, str) and component):
+        return False
+    if body.get("check_id") != "companion-computed-styles" or body.get("line") != "21.x":
+        return False
+    if body.get("run_id") != ACTIVE_RUN.manifest.get("run_id") or body.get("invocation_id") != invocation:
+        return False
+    if body.get("peer_package") != "@angular/material":
+        return False
+    peer_version = _current_peer_version("@angular/material")
+    if peer_version is None or body.get("peer_version") != peer_version:
+        return False
+    if not _is_sha256(body.get("peer_package_json_sha256")):
+        return False
+    library = _library_artifact_sha256()
+    if library is None or body.get("tarball_sha256") != library:
+        return False
+    source = body.get("peer_source_file")
+    match = _PEER_SOURCE_FILE.fullmatch(source) if isinstance(source, str) else None
+    if match is None or match.group(1) != component or not _is_sha256(body.get("peer_source_sha256")):
+        return False
+    if not (_is_sha256(body.get("oracle_css_sha256")) and _is_sha256(body.get("candidate_css_sha256"))):
+        return False
+    group = body.get("group")
+    if group == "independent-peer-oracle":
+        if case_id != f"{component}/peer-oracle":
+            return False
+        isolation = body.get("oracle_isolation")
+        if not isinstance(isolation, dict) or isolation.get("peer_only") is not True:
+            return False
+        if isolation.get("legacy_package_loaded") is not False:
+            return False
+        applicable = body.get("applicable_dimensions")
+        sensitivity = body.get("sensitivity")
+        if not isinstance(applicable, list) or not applicable or not isinstance(sensitivity, dict):
+            return False
+        if set(sensitivity) != set(applicable):
+            return False
+        return all(isinstance(v, dict) and v.get("ok") is True for v in sensitivity.values())
+    if group != "thirteen-companion-dimensions":
+        return False
+    dimension = body.get("dimension")
+    if dimension not in _COMPUTED_DIMENSIONS:
+        return False
+    if body.get("not_applicable") is True:
+        if case_id != f"{component}/{dimension}/not-applicable":
+            return False
+        if body.get("peer_mixin") != f"mat.{component}-{dimension}":
+            return False
+        return body.get("peer_emitted_tokens") == []
+    return _computed_rendered_case_ok(body, case_id, component, dimension)
+
 _ASSERTION_BODY_CHECKS = {
     "companion-bridge-tokens": _bridge_token_assertion_ok,
+    "companion-computed-styles": _computed_style_assertion_ok,
 }
 
 
@@ -1253,16 +1377,20 @@ def main() -> int:
     results["companion-bridge-tokens"] = "pass" if code == 0 else "fail"
     implemented_ran.append("companion-bridge-tokens")
 
-    # companion-computed-styles: Chromium rendered CSS-var slice (all 13 companions); not G07.
+    # companion-computed-styles: Chromium rendered computed properties of the
+    # thirteen companions vs the in-page current-peer M2 oracle; not a G07 claim.
+    # Complete only on 21.x when every rostered case has a passing peer-oracle
+    # assertion from this run; null rosters, a failed child or main stay a slice.
     code = run_node("scripts/check-companion-computed-styles.mjs", ["--run", str(run_path)])
-    write_check_report(
+    write_line_coordinator_report(
         out_dir,
         run_id,
         line,
         "companion-computed-styles",
         exit_code=code,
         limitations=[
-            "Rendered all 13 companion CSS custom-property rows on main/Chromium/zoneful only.",
+            "Rendered current-peer components in Chromium; candidate bridges vs the in-page peer M2 oracle on consuming computed properties.",
+            "Complete only on 21.x when every rostered case has a passing assertion from this run. Main stays a slice.",
             "Does not claim RC-05-A02 / G06-G08.",
         ],
     )
