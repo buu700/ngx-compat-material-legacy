@@ -22,7 +22,7 @@ import {
   ViewEncapsulation,
   Injectable,
   NgModule,
-  createNgModuleRef,
+  createNgModule,
 } from '@angular/core';
 import {By} from '@angular/platform-browser';
 import {LEGACY_ENABLED_ANIMATIONS, LEGACY_NOOP_ANIMATIONS} from '../internal/testing/owned-animation-modules';
@@ -2231,7 +2231,7 @@ class ModuleBoundDialogParentComponent {
   constructor(private _injector: Injector, private _dialog: MatLegacyDialog) {}
 
   openDialog(): void {
-    const ngModuleRef = createNgModuleRef(
+    const ngModuleRef = createNgModule(
       ModuleBoundDialogModule,
       /* parentInjector */ this._injector,
     );
