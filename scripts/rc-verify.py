@@ -1493,21 +1493,6 @@ def main() -> int:
     # FRESH-03 producers. Nonzero means the admission gap is still open.
     # A structural ledger pass is not security clearance and is not copied forward.
     code = run_node(
-        "scripts/check-upstream-audit-disposition.mjs",
-        ["--admission", "--line", line, "--report", str(out_dir / "upstream-audit-structural.json")],
-    )
-    write_check_report(
-        out_dir, run_id, line, "upstream-audit-disposition", exit_code=code,
-        limitations=[
-            "Structural seed coverage is not disposition admission or security clearance.",
-            "Sensitive, inherited, and material behavior rows still lack individual proof; the symbol seed is open.",
-            "This check does not query advisories. g11_claim stays not-passed.",
-        ],
-    )
-    results["upstream-audit-disposition"] = "pass" if code == 0 else "fail"
-    implemented_ran.append("upstream-audit-disposition")
-
-    code = run_node(
         "scripts/check-source-policy.py",
         ["--root", "projects/ngx-material-legacy", "--tarball", str(tarball),
          "--report", str(out_dir / "source-policy-observation.json")],
@@ -1560,6 +1545,21 @@ def main() -> int:
     )
     results["m3-coexistence"] = "pass" if code == 0 else "fail"
     implemented_ran.append("m3-coexistence")
+
+    code = run_node(
+        "scripts/check-upstream-audit-disposition.mjs",
+        ["--admission", "--line", line, "--report", str(out_dir / "upstream-audit-structural.json")],
+    )
+    write_check_report(
+        out_dir, run_id, line, "upstream-audit-disposition", exit_code=code,
+        limitations=[
+            "Structural seed coverage is not disposition admission or security clearance.",
+            "Sensitive, inherited, and material behavior rows still lack individual proof; the symbol seed is open.",
+            "Current advisory admission consumes this run’s complete, source-bound dependency producer; g11_claim stays not-passed.",
+        ],
+    )
+    results["upstream-audit-disposition"] = "pass" if code == 0 else "fail"
+    implemented_ran.append("upstream-audit-disposition")
 
     # consumer-floors: library engines/peers, the migrate CLI runtime, and --line isolation.
     code = run_node(
