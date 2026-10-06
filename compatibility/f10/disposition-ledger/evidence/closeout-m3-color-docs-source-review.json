@@ -1,0 +1,302 @@
+{
+  "schema_version": 1,
+  "reviewer": "Codex primary implementer",
+  "recorded_at_utc": "2026-10-06T23:12:17.864647+00:00",
+  "method": "Complete original diffs read for every exact member. Library added/removed TS lines verified comment-only; runtime example/dev-app removals explicitly enumerated and outside both source/package closures.",
+  "scope": "Seven exact current M3 color-documentation patches, not other M3/runtime/peer decisions",
+  "packaging": {
+    "path": "projects/ngx-material-legacy/ng-package.json",
+    "sha256": "692f6b0fc780306368c4f05078f01210e4f2dab1b5536c1984d7a721d669ea33",
+    "closure": "Owned entry and secondary barrels plus enumerated Sass/schematic assets; no upstream src/components-examples or src/dev-app asset inputs"
+  },
+  "g11_claim": "not-passed",
+  "limitations": [
+    "No functional inherited-delegation, contrast, accessibility, lifecycle, complete M2/M3 coexistence or packed-artifact acceptance proof is inferred from this comment/example review.",
+    "Full A10 maintained docs review remains required."
+  ],
+  "reviews": [
+    {
+      "sha": "701c4fda774e0736c47f61e89cfab5218f62eb59",
+      "diff": "diff --git a/src/material/list/list-option.ts b/src/material/list/list-option.ts\nindex 4e39d2e9b..8c4c7049f 100644\n--- a/src/material/list/list-option.ts\n+++ b/src/material/list/list-option.ts\n@@ -129,7 +129,13 @@ export class MatListOption extends MatListItemBase implements ListOption, OnInit\n     this.togglePosition = value;\n   }\n \n-  /** Theme color of the list option. This sets the color of the checkbox/radio. */\n+  /**\n+   * Theme color of the list option. This sets the color of the checkbox/radio.\n+   * This API is supported in M2 themes only, it has no effect in M3 themes.\n+   *\n+   * For information on applying color variants in M3, see\n+   * https://material.angular.io/guide/theming#using-component-color-variants.\n+   */\n   @Input()\n   get color(): ThemePalette {\n     return this._color || this._selectionList.color;\n",
+      "diff_sha256": "5d668a54601a107fbdc7598d4eb8ffcc29a3e1a299bfd6fddc44193ee36dfcec",
+      "files": [
+        "src/material/list/list-option.ts"
+      ],
+      "actual_changed_path_count": 1,
+      "review_depth": "bounded-documentation-source-review",
+      "decision": "One list-option source path changes only the color JSDoc to describe current M3 color variants. The getter and selection-list color fallback are untouched. Legacy list retains M2 palette color support; no modern M3 API or styling is adopted.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "material_source_changed_lines": [
+        "/** Theme color of the list option. This sets the color of the checkbox/radio. */",
+        "/**",
+        "* Theme color of the list option. This sets the color of the checkbox/radio.",
+        "* This API is supported in M2 themes only, it has no effect in M3 themes.",
+        "*",
+        "* For information on applying color variants in M3, see",
+        "* https://material.angular.io/guide/theming#using-component-color-variants.",
+        "*/"
+      ],
+      "material_runtime_change_in_patch": false,
+      "runtime_change_in_patch": false,
+      "unshipped_runtime_paths": []
+    },
+    {
+      "sha": "e254b2f953c94a72a7c6cce696b4e1d214248e6f",
+      "diff": "diff --git a/src/components-examples/material/progress-bar/progress-bar-configurable/progress-bar-configurable-example.html b/src/components-examples/material/progress-bar/progress-bar-configurable/progress-bar-configurable-example.html\nindex 100f7afff..4f5fd3a22 100644\n--- a/src/components-examples/material/progress-bar/progress-bar-configurable/progress-bar-configurable-example.html\n+++ b/src/components-examples/material/progress-bar/progress-bar-configurable/progress-bar-configurable-example.html\n@@ -2,21 +2,6 @@\n   <mat-card-content>\n     <h2 class=\"example-h2\">Progress bar configuration</h2>\n \n-    <section class=\"example-section\">\n-      <label class=\"example-margin\">Color:</label>\n-      <mat-radio-group [(ngModel)]=\"color\">\n-        <mat-radio-button class=\"example-margin\" value=\"primary\">\n-          Primary\n-        </mat-radio-button>\n-        <mat-radio-button class=\"example-margin\" value=\"accent\">\n-          Accent\n-        </mat-radio-button>\n-        <mat-radio-button class=\"example-margin\" value=\"warn\">\n-          Warn\n-        </mat-radio-button>\n-      </mat-radio-group>\n-    </section>\n-\n     <section class=\"example-section\">\n       <label class=\"example-margin\">Mode:</label>\n       <mat-radio-group [(ngModel)]=\"mode\">\n@@ -61,7 +46,6 @@\n     <section class=\"example-section\">\n       <mat-progress-bar\n           class=\"example-margin\"\n-          [color]=\"color\"\n           [mode]=\"mode\"\n           [value]=\"value\"\n           [bufferValue]=\"bufferValue\">\ndiff --git a/src/components-examples/material/progress-bar/progress-bar-configurable/progress-bar-configurable-example.ts b/src/components-examples/material/progress-bar/progress-bar-configurable/progress-bar-configurable-example.ts\nindex 6b4f2bb84..14d40de9c 100644\n--- a/src/components-examples/material/progress-bar/progress-bar-configurable/progress-bar-configurable-example.ts\n+++ b/src/components-examples/material/progress-bar/progress-bar-configurable/progress-bar-configurable-example.ts\n@@ -1,5 +1,4 @@\n import {Component} from '@angular/core';\n-import {ThemePalette} from '@angular/material/core';\n import {ProgressBarMode, MatProgressBarModule} from '@angular/material/progress-bar';\n import {MatSliderModule} from '@angular/material/slider';\n import {FormsModule} from '@angular/forms';\n@@ -17,7 +16,6 @@ import {MatCardModule} from '@angular/material/card';\n   imports: [MatCardModule, MatRadioModule, FormsModule, MatSliderModule, MatProgressBarModule],\n })\n export class ProgressBarConfigurableExample {\n-  color: ThemePalette = 'primary';\n   mode: ProgressBarMode = 'determinate';\n   value = 50;\n   bufferValue = 75;\ndiff --git a/src/material/progress-bar/progress-bar.md b/src/material/progress-bar/progress-bar.md\nindex b9d708c70..855051a30 100644\n--- a/src/material/progress-bar/progress-bar.md\n+++ b/src/material/progress-bar/progress-bar.md\n@@ -4,7 +4,7 @@\n The progress-bar supports four modes: determinate, indeterminate, buffer and query.\n \n #### Determinate\n-Operations where the percentage of the operation complete is known should use the \n+Operations where the percentage of the operation complete is known should use the\n determinate indicator.\n \n <!-- example(progress-bar-determinate) -->\n@@ -12,7 +12,7 @@ determinate indicator.\n This is the default mode and the progress is represented by the `value` property.\n \n #### Indeterminate\n-Operations where the user is asked to wait while something finishes and it\u2019s \n+Operations where the user is asked to wait while something finishes and it\u2019s\n not necessary to indicate how long it will take should use the indeterminate indicator.\n \n <!-- example(progress-bar-indeterminate) -->\n@@ -24,7 +24,7 @@ Use the `buffer` mode of the progress-bar to indicate some activity or loading f\n \n <!-- example(progress-bar-buffer) -->\n \n-In \"buffer\" mode, `value` determines the progress of the primary bar while the `bufferValue` is \n+In \"buffer\" mode, `value` determines the progress of the primary bar while the `bufferValue` is\n used to show the additional buffering progress.\n \n #### Query\n@@ -33,14 +33,10 @@ Use the `query` mode of the progress-bar to indicate pre-loading before the actu\n \n <!-- example(progress-bar-query) -->\n \n-In \"query\" mode, the progress-bar renders as an inverted \"indeterminate\" bar. Once the response \n+In \"query\" mode, the progress-bar renders as an inverted \"indeterminate\" bar. Once the response\n progress is available, the `mode` should be changed to determinate to convey the progress. In\n this mode the `value` property is ignored.\n \n-### Theming\n-The color of a progress-bar can be changed by using the `color` property. By default, progress-bars\n-use the theme's primary color. This can be changed to `'accent'` or `'warn'`.  \n-\n ### Accessibility\n \n `MatProgressBar` implements the ARIA `role=\"progressbar\"` pattern. By default, the progress bar\ndiff --git a/src/material/progress-bar/progress-bar.ts b/src/material/progress-bar/progress-bar.ts\nindex 56bd5708f..8a4788b43 100644\n--- a/src/material/progress-bar/progress-bar.ts\n+++ b/src/material/progress-bar/progress-bar.ts\n@@ -35,7 +35,13 @@ export interface ProgressAnimationEnd {\n \n /** Default `mat-progress-bar` options that can be overridden. */\n export interface MatProgressBarDefaultOptions {\n-  /** Default color of the progress bar. */\n+  /**\n+   * Default theme color of the progress bar. This API is supported in M2 themes only,\n+   * it has no effect in M3 themes.\n+   *\n+   * For information on applying color variants in M3, see\n+   * https://material.angular.io/guide/theming#using-component-color-variants.\n+   */\n   color?: ThemePalette;\n \n   /** Default mode of the progress bar. */\n@@ -128,7 +134,13 @@ export class MatProgressBar implements AfterViewInit, OnDestroy {\n   _isNoopAnimation = false;\n \n   // TODO: should be typed as `ThemePalette` but internal apps pass in arbitrary strings.\n-  /** Theme palette color of the progress bar. */\n+  /**\n+   * Theme color of the progress bar. This API is supported in M2 themes only, it\n+   * has no effect in M3 themes.\n+   *\n+   * For information on applying color variants in M3, see\n+   * https://material.angular.io/guide/theming#using-component-color-variants.\n+   */\n   @Input()\n   get color() {\n     return this._color || this._defaultColor;\n",
+      "diff_sha256": "24ce7f814d08455d9b13c99618eb0a41443109b0c3aa4a88e3178ac6a0314885",
+      "files": [
+        "src/components-examples/material/progress-bar/progress-bar-configurable/progress-bar-configurable-example.html",
+        "src/components-examples/material/progress-bar/progress-bar-configurable/progress-bar-configurable-example.ts",
+        "src/material/progress-bar/progress-bar.md",
+        "src/material/progress-bar/progress-bar.ts"
+      ],
+      "actual_changed_path_count": 4,
+      "review_depth": "bounded-documentation-source-review",
+      "decision": "All four paths reviewed: source changes only default/input color comments; markdown removes M2 theming guidance; the upstream configurable example removes its color selector, property and binding. Both example paths are outside add-on packaging. Legacy progress-bar color/defaults and its owned theme contract remain retained; no runtime progress/state/security fix is part of this patch.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "material_source_changed_lines": [
+        "/** Default color of the progress bar. */",
+        "/**",
+        "* Default theme color of the progress bar. This API is supported in M2 themes only,",
+        "* it has no effect in M3 themes.",
+        "*",
+        "* For information on applying color variants in M3, see",
+        "* https://material.angular.io/guide/theming#using-component-color-variants.",
+        "*/",
+        "/** Theme palette color of the progress bar. */",
+        "/**",
+        "* Theme color of the progress bar. This API is supported in M2 themes only, it",
+        "* has no effect in M3 themes.",
+        "*",
+        "* For information on applying color variants in M3, see",
+        "* https://material.angular.io/guide/theming#using-component-color-variants.",
+        "*/"
+      ],
+      "material_runtime_change_in_patch": false,
+      "runtime_change_in_patch": true,
+      "unshipped_runtime_paths": [
+        "src/components-examples/material/progress-bar/progress-bar-configurable/progress-bar-configurable-example.html",
+        "src/components-examples/material/progress-bar/progress-bar-configurable/progress-bar-configurable-example.ts"
+      ]
+    },
+    {
+      "sha": "0f8e887f9b8824c0b5eab154ebce7c1e7f29c3cc",
+      "diff": "diff --git a/src/components-examples/material/progress-spinner/progress-spinner-configurable/progress-spinner-configurable-example.html b/src/components-examples/material/progress-spinner/progress-spinner-configurable/progress-spinner-configurable-example.html\nindex 27c971277..e8dd1590a 100644\n--- a/src/components-examples/material/progress-spinner/progress-spinner-configurable/progress-spinner-configurable-example.html\n+++ b/src/components-examples/material/progress-spinner/progress-spinner-configurable/progress-spinner-configurable-example.html\n@@ -2,21 +2,6 @@\n   <mat-card-content>\n     <h2 class=\"example-h2\">Progress spinner configuration</h2>\n \n-    <section class=\"example-section\">\n-      <label class=\"example-margin\">Color:</label>\n-      <mat-radio-group [(ngModel)]=\"color\">\n-        <mat-radio-button class=\"example-margin\" value=\"primary\">\n-          Primary\n-        </mat-radio-button>\n-        <mat-radio-button class=\"example-margin\" value=\"accent\">\n-          Accent\n-        </mat-radio-button>\n-        <mat-radio-button class=\"example-margin\" value=\"warn\">\n-          Warn\n-        </mat-radio-button>\n-      </mat-radio-group>\n-    </section>\n-\n     <section class=\"example-section\">\n       <label class=\"example-margin\">Mode:</label>\n       <mat-radio-group [(ngModel)]=\"mode\">\n@@ -46,7 +31,6 @@\n \n     <mat-progress-spinner\n         class=\"example-margin\"\n-        [color]=\"color\"\n         [mode]=\"mode\"\n         [value]=\"value\">\n     </mat-progress-spinner>\ndiff --git a/src/components-examples/material/progress-spinner/progress-spinner-configurable/progress-spinner-configurable-example.ts b/src/components-examples/material/progress-spinner/progress-spinner-configurable/progress-spinner-configurable-example.ts\nindex acb167e87..cd2e33983 100644\n--- a/src/components-examples/material/progress-spinner/progress-spinner-configurable/progress-spinner-configurable-example.ts\n+++ b/src/components-examples/material/progress-spinner/progress-spinner-configurable/progress-spinner-configurable-example.ts\n@@ -1,5 +1,4 @@\n import {Component} from '@angular/core';\n-import {ThemePalette} from '@angular/material/core';\n import {ProgressSpinnerMode, MatProgressSpinnerModule} from '@angular/material/progress-spinner';\n import {MatSliderModule} from '@angular/material/slider';\n import {FormsModule} from '@angular/forms';\n@@ -17,7 +16,6 @@ import {MatCardModule} from '@angular/material/card';\n   imports: [MatCardModule, MatRadioModule, FormsModule, MatSliderModule, MatProgressSpinnerModule],\n })\n export class ProgressSpinnerConfigurableExample {\n-  color: ThemePalette = 'primary';\n   mode: ProgressSpinnerMode = 'determinate';\n   value = 50;\n }\ndiff --git a/src/material/progress-spinner/progress-spinner.md b/src/material/progress-spinner/progress-spinner.md\nindex f1064af12..5b4d41110 100644\n--- a/src/material/progress-spinner/progress-spinner.md\n+++ b/src/material/progress-spinner/progress-spinner.md\n@@ -17,11 +17,6 @@ which can be a whole number between 0 and 100.\n \n In \"indeterminate\" mode, the `value` property is ignored.\n \n-\n-### Theming\n-The color of a progress-spinner can be changed by using the `color` property. By default,\n-progress-spinners use the theme's primary color. This can be changed to `'accent'` or `'warn'`.\n-\n ### Accessibility\n \n `MatLegacyProgressSpinner` implements the ARIA `role=\"progressbar\"` pattern. By default, the spinner\ndiff --git a/src/material/progress-spinner/progress-spinner.ts b/src/material/progress-spinner/progress-spinner.ts\nindex 2c89a4bb4..d6e425267 100644\n--- a/src/material/progress-spinner/progress-spinner.ts\n+++ b/src/material/progress-spinner/progress-spinner.ts\n@@ -27,7 +27,13 @@ export type ProgressSpinnerMode = 'determinate' | 'indeterminate';\n \n /** Default `mat-progress-spinner` options that can be overridden. */\n export interface MatProgressSpinnerDefaultOptions {\n-  /** Default color of the spinner. */\n+  /**\n+   * Default theme color of the progress spinner. This API is supported in M2 themes only, it\n+   * has no effect in M3 themes.\n+   *\n+   * For information on applying color variants in M3, see\n+   * https://material.angular.io/guide/theming#using-component-color-variants.\n+   */\n   color?: ThemePalette;\n   /** Diameter of the spinner. */\n   diameter?: number;\n@@ -95,7 +101,13 @@ export class MatProgressSpinner {\n   _noopAnimations: boolean;\n \n   // TODO: should be typed as `ThemePalette` but internal apps pass in arbitrary strings.\n-  /** Theme palette color of the progress spinner. */\n+  /**\n+   * Theme color of the progress spinner. This API is supported in M2 themes only, it\n+   * has no effect in M3 themes.\n+   *\n+   * For information on applying color variants in M3, see\n+   * https://material.angular.io/guide/theming#using-component-color-variants.\n+   */\n   @Input()\n   get color() {\n     return this._color || this._defaultColor;\n",
+      "diff_sha256": "8b5b61666afbe7ecd005467f8989b1e3b715058559b45c2fdb9636b1e0b89fcf",
+      "files": [
+        "src/components-examples/material/progress-spinner/progress-spinner-configurable/progress-spinner-configurable-example.html",
+        "src/components-examples/material/progress-spinner/progress-spinner-configurable/progress-spinner-configurable-example.ts",
+        "src/material/progress-spinner/progress-spinner.md",
+        "src/material/progress-spinner/progress-spinner.ts"
+      ],
+      "actual_changed_path_count": 4,
+      "review_depth": "bounded-documentation-source-review",
+      "decision": "All four paths reviewed: source adds M3-only documentation caveats; overview removes M2 palette instructions; unshipped configurable example removes color controls and property/binding. Spinner diameter/mode/value and color implementation are unchanged by this patch. Retain legacy M2 theming; SVG/security/forced-colors reviews remain separate.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "material_source_changed_lines": [
+        "/** Default color of the spinner. */",
+        "/**",
+        "* Default theme color of the progress spinner. This API is supported in M2 themes only, it",
+        "* has no effect in M3 themes.",
+        "*",
+        "* For information on applying color variants in M3, see",
+        "* https://material.angular.io/guide/theming#using-component-color-variants.",
+        "*/",
+        "/** Theme palette color of the progress spinner. */",
+        "/**",
+        "* Theme color of the progress spinner. This API is supported in M2 themes only, it",
+        "* has no effect in M3 themes.",
+        "*",
+        "* For information on applying color variants in M3, see",
+        "* https://material.angular.io/guide/theming#using-component-color-variants.",
+        "*/"
+      ],
+      "material_runtime_change_in_patch": false,
+      "runtime_change_in_patch": true,
+      "unshipped_runtime_paths": [
+        "src/components-examples/material/progress-spinner/progress-spinner-configurable/progress-spinner-configurable-example.html",
+        "src/components-examples/material/progress-spinner/progress-spinner-configurable/progress-spinner-configurable-example.ts"
+      ]
+    },
+    {
+      "sha": "0cd258fb6b1cbaf12191ab198ce99a6b4126d832",
+      "diff": "diff --git a/src/material/slider/slider.ts b/src/material/slider/slider.ts\nindex f11be294f..ad9f252fc 100644\n--- a/src/material/slider/slider.ts\n+++ b/src/material/slider/slider.ts\n@@ -136,7 +136,13 @@ export class MatSlider implements AfterViewInit, OnDestroy, _MatSlider {\n   }\n   private _min: number = 0;\n \n-  /** Palette color of the slider. */\n+  /**\n+   * Theme color of the slider. This API is supported in M2 themes only, it\n+   * has no effect in M3 themes.\n+   *\n+   * For information on applying color variants in M3, see\n+   * https://material.angular.io/guide/theming#using-component-color-variants.\n+   */\n   @Input()\n   color: ThemePalette;\n \n",
+      "diff_sha256": "4243337ffebd3fb2aba872f0b096e5611f425f0d85142553c5e31ab17f1ca102",
+      "files": [
+        "src/material/slider/slider.ts"
+      ],
+      "actual_changed_path_count": 1,
+      "review_depth": "bounded-documentation-source-review",
+      "decision": "One modern slider source path expands only the color JSDoc. Input name/type and code remain unchanged; it supplies no justification for changing the frozen single-thumb legacy slider or copying modern M3 variant APIs.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "material_source_changed_lines": [
+        "/** Palette color of the slider. */",
+        "/**",
+        "* Theme color of the slider. This API is supported in M2 themes only, it",
+        "* has no effect in M3 themes.",
+        "*",
+        "* For information on applying color variants in M3, see",
+        "* https://material.angular.io/guide/theming#using-component-color-variants.",
+        "*/"
+      ],
+      "material_runtime_change_in_patch": false,
+      "runtime_change_in_patch": false,
+      "unshipped_runtime_paths": []
+    },
+    {
+      "sha": "caeb3e8c4c81c383260bbc0156a1c3deb38005ef",
+      "diff": "diff --git a/src/components-examples/material/slide-toggle/slide-toggle-configurable/slide-toggle-configurable-example.html b/src/components-examples/material/slide-toggle/slide-toggle-configurable/slide-toggle-configurable-example.html\nindex b7f41c009..50bb04515 100644\n--- a/src/components-examples/material/slide-toggle/slide-toggle-configurable/slide-toggle-configurable-example.html\n+++ b/src/components-examples/material/slide-toggle/slide-toggle-configurable/slide-toggle-configurable-example.html\n@@ -1,21 +1,6 @@\n <mat-card>\n   <mat-card-content>\n-    <h2 class=\"example-h2\">Slider configuration</h2>\n-\n-    <section class=\"example-section\">\n-      <label class=\"example-margin\">Color:</label>\n-      <mat-radio-group [(ngModel)]=\"color\">\n-        <mat-radio-button class=\"example-margin\" value=\"primary\">\n-          Primary\n-        </mat-radio-button>\n-        <mat-radio-button class=\"example-margin\" value=\"accent\">\n-          Accent\n-        </mat-radio-button>\n-        <mat-radio-button class=\"example-margin\" value=\"warn\">\n-          Warn\n-        </mat-radio-button>\n-      </mat-radio-group>\n-    </section>\n+    <h2 class=\"example-h2\">Slide toggle configuration</h2>\n \n     <section class=\"example-section\">\n       <mat-checkbox class=\"example-margin\" [(ngModel)]=\"checked\">Checked</mat-checkbox>\n@@ -34,7 +19,6 @@\n     <section class=\"example-section\">\n       <mat-slide-toggle\n           class=\"example-margin\"\n-          [color]=\"color\"\n           [checked]=\"checked\"\n           [disabled]=\"disabled\">\n         Slide me!\ndiff --git a/src/components-examples/material/slide-toggle/slide-toggle-configurable/slide-toggle-configurable-example.ts b/src/components-examples/material/slide-toggle/slide-toggle-configurable/slide-toggle-configurable-example.ts\nindex 9302b71a5..eb2a6c003 100644\n--- a/src/components-examples/material/slide-toggle/slide-toggle-configurable/slide-toggle-configurable-example.ts\n+++ b/src/components-examples/material/slide-toggle/slide-toggle-configurable/slide-toggle-configurable-example.ts\n@@ -1,5 +1,4 @@\n import {Component} from '@angular/core';\n-import {ThemePalette} from '@angular/material/core';\n import {MatSlideToggleModule} from '@angular/material/slide-toggle';\n import {MatCheckboxModule} from '@angular/material/checkbox';\n import {FormsModule} from '@angular/forms';\n@@ -17,7 +16,6 @@ import {MatCardModule} from '@angular/material/card';\n   imports: [MatCardModule, MatRadioModule, FormsModule, MatCheckboxModule, MatSlideToggleModule],\n })\n export class SlideToggleConfigurableExample {\n-  color: ThemePalette = 'accent';\n   checked = false;\n   disabled = false;\n }\ndiff --git a/src/material/slide-toggle/slide-toggle-config.ts b/src/material/slide-toggle/slide-toggle-config.ts\nindex 8dfe1eaaf..4b1936e83 100644\n--- a/src/material/slide-toggle/slide-toggle-config.ts\n+++ b/src/material/slide-toggle/slide-toggle-config.ts\n@@ -13,7 +13,13 @@ export interface MatSlideToggleDefaultOptions {\n   /** Whether toggle action triggers value changes in slide toggle. */\n   disableToggleValue?: boolean;\n \n-  /** Default color for slide toggles. */\n+  /**\n+   * Default theme color of the slide toggle. This API is supported in M2 themes only,\n+   * it has no effect in M3 themes.\n+   *\n+   * For information on applying color variants in M3, see\n+   * https://material.angular.io/guide/theming#using-component-color-variants.\n+   */\n   color?: ThemePalette;\n \n   /** Whether to hide the icon inside the slide toggle. */\ndiff --git a/src/material/slide-toggle/slide-toggle.md b/src/material/slide-toggle/slide-toggle.md\nindex 5fa88962d..9b14aaf46 100644\n--- a/src/material/slide-toggle/slide-toggle.md\n+++ b/src/material/slide-toggle/slide-toggle.md\n@@ -17,10 +17,6 @@ specify an appropriate label.\n `<mat-slide-toggle>` is compatible with `@angular/forms` and supports both `FormsModule`\n and `ReactiveFormsModule`.\n \n-### Theming\n-The color of a `<mat-slide-toggle>` can be changed by using the `color` property. By default,\n-slide-toggles use the theme's accent color. This can be changed to `'primary'` or `'warn'`.\n-\n ### Accessibility\n \n `MatSlideToggle` uses an internal `<button role=\"switch\">` to provide an accessible experience. This\n",
+      "diff_sha256": "26cc9dc962236e9ab1166d260dcdb753437fcd32f6498b0cb507e520c01bce38",
+      "files": [
+        "src/components-examples/material/slide-toggle/slide-toggle-configurable/slide-toggle-configurable-example.html",
+        "src/components-examples/material/slide-toggle/slide-toggle-configurable/slide-toggle-configurable-example.ts",
+        "src/material/slide-toggle/slide-toggle-config.ts",
+        "src/material/slide-toggle/slide-toggle.md"
+      ],
+      "actual_changed_path_count": 4,
+      "review_depth": "bounded-documentation-source-review",
+      "decision": "All four paths reviewed: default-options source changes a comment only; overview removes M2 color instructions; unshipped example corrects its heading and removes color radio controls/binding/property. No toggle/CVA/value/state implementation changes. Legacy M2 color/default options are retained; modern switch accessibility is not inherited as an audit conclusion.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "material_source_changed_lines": [
+        "/** Default color for slide toggles. */",
+        "/**",
+        "* Default theme color of the slide toggle. This API is supported in M2 themes only,",
+        "* it has no effect in M3 themes.",
+        "*",
+        "* For information on applying color variants in M3, see",
+        "* https://material.angular.io/guide/theming#using-component-color-variants.",
+        "*/"
+      ],
+      "material_runtime_change_in_patch": false,
+      "runtime_change_in_patch": true,
+      "unshipped_runtime_paths": [
+        "src/components-examples/material/slide-toggle/slide-toggle-configurable/slide-toggle-configurable-example.html",
+        "src/components-examples/material/slide-toggle/slide-toggle-configurable/slide-toggle-configurable-example.ts"
+      ]
+    },
+    {
+      "sha": "f7a7289a8b06bdc0dc291a7e3725ff0d4a8c9bd1",
+      "diff": "diff --git a/src/components-examples/material/tabs/index.ts b/src/components-examples/material/tabs/index.ts\nindex 81390209a..5e64e11dc 100644\n--- a/src/components-examples/material/tabs/index.ts\n+++ b/src/components-examples/material/tabs/index.ts\n@@ -10,7 +10,6 @@ export {TabGroupHeaderBelowExample} from './tab-group-header-below/tab-group-hea\n export {TabGroupLazyLoadedExample} from './tab-group-lazy-loaded/tab-group-lazy-loaded-example';\n export {TabGroupPreserveContentExample} from './tab-group-preserve-content/tab-group-preserve-content-example';\n export {TabGroupStretchedExample} from './tab-group-stretched/tab-group-stretched-example';\n-export {TabGroupThemeExample} from './tab-group-theme/tab-group-theme-example';\n export {TabNavBarBasicExample} from './tab-nav-bar-basic/tab-nav-bar-basic-example';\n export {TabGroupPaginatedExample} from './tab-group-paginated/tab-group-paginated-example';\n export {TabGroupInvertedExample} from './tab-group-inverted/tab-group-inverted-example';\ndiff --git a/src/components-examples/material/tabs/tab-group-theme/tab-group-theme-example.css b/src/components-examples/material/tabs/tab-group-theme/tab-group-theme-example.css\ndeleted file mode 100644\nindex f54020caf..000000000\n--- a/src/components-examples/material/tabs/tab-group-theme/tab-group-theme-example.css\n+++ /dev/null\n@@ -1,4 +0,0 @@\n-.example-button-toggle-label {\n-  display: inline-block;\n-  margin: 16px;\n-}\ndiff --git a/src/components-examples/material/tabs/tab-group-theme/tab-group-theme-example.html b/src/components-examples/material/tabs/tab-group-theme/tab-group-theme-example.html\ndeleted file mode 100644\nindex 651c8ae08..000000000\n--- a/src/components-examples/material/tabs/tab-group-theme/tab-group-theme-example.html\n+++ /dev/null\n@@ -1,27 +0,0 @@\n-<div>\n-  <mat-button-toggle-group #colorToggle=\"matButtonToggleGroup\"\n-                           value=\"primary\"\n-                           aria-label=\"Change color\">\n-    <mat-button-toggle value=\"primary\">Primary</mat-button-toggle>\n-    <mat-button-toggle value=\"accent\">Accent</mat-button-toggle>\n-    <mat-button-toggle value=\"warn\">Warn</mat-button-toggle>\n-  </mat-button-toggle-group>\n-  <span class=\"example-button-toggle-label\">Color</span>\n-</div>\n-\n-<div>\n-  <mat-button-toggle-group #backgroundColorToggle=\"matButtonToggleGroup\"\n-                           value=\"primary\"\n-                           aria-label=\"Change color\">\n-    <mat-button-toggle value=\"primary\">Primary</mat-button-toggle>\n-    <mat-button-toggle value=\"accent\">Accent</mat-button-toggle>\n-    <mat-button-toggle value=\"warn\">Warn</mat-button-toggle>\n-  </mat-button-toggle-group>\n-  <span class=\"example-button-toggle-label\">Background Color</span>\n-</div>\n-\n-<mat-tab-group [color]=\"colorToggle.value\" [backgroundColor]=\"backgroundColorToggle.value\">\n-  <mat-tab label=\"First\">Content 1</mat-tab>\n-  <mat-tab label=\"Second\">Content 2</mat-tab>\n-  <mat-tab label=\"Third\">Content 3</mat-tab>\n-</mat-tab-group>\ndiff --git a/src/components-examples/material/tabs/tab-group-theme/tab-group-theme-example.ts b/src/components-examples/material/tabs/tab-group-theme/tab-group-theme-example.ts\ndeleted file mode 100644\nindex 2aae41a46..000000000\n--- a/src/components-examples/material/tabs/tab-group-theme/tab-group-theme-example.ts\n+++ /dev/null\n@@ -1,15 +0,0 @@\n-import {Component} from '@angular/core';\n-import {MatTabsModule} from '@angular/material/tabs';\n-import {MatButtonToggleModule} from '@angular/material/button-toggle';\n-\n-/**\n- * @title Customizing the theme options on the tab group\n- */\n-@Component({\n-  selector: 'tab-group-theme-example',\n-  templateUrl: 'tab-group-theme-example.html',\n-  styleUrl: 'tab-group-theme-example.css',\n-  standalone: true,\n-  imports: [MatButtonToggleModule, MatTabsModule],\n-})\n-export class TabGroupThemeExample {}\ndiff --git a/src/components-examples/material/tabs/tab-nav-bar-basic/tab-nav-bar-basic-example.html b/src/components-examples/material/tabs/tab-nav-bar-basic/tab-nav-bar-basic-example.html\nindex b3f3d959c..c6ed16b9e 100644\n--- a/src/components-examples/material/tabs/tab-nav-bar-basic/tab-nav-bar-basic-example.html\n+++ b/src/components-examples/material/tabs/tab-nav-bar-basic/tab-nav-bar-basic-example.html\n@@ -1,5 +1,5 @@\n <!-- #docregion mat-tab-nav -->\n-<nav mat-tab-nav-bar [backgroundColor]=\"background\" [tabPanel]=\"tabPanel\">\n+<nav mat-tab-nav-bar [tabPanel]=\"tabPanel\">\n   @for (link of links; track link) {\n     <a mat-tab-link\n       (click)=\"activeLink = link\"\n@@ -10,9 +10,6 @@\n <mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>\n <!-- #enddocregion mat-tab-nav -->\n \n-<button mat-raised-button class=\"example-action-button\" (click)=\"toggleBackground()\">\n-  Toggle background\n-</button>\n <button mat-raised-button class=\"example-action-button\" (click)=\"addLink()\">\n   Add link\n </button>\ndiff --git a/src/components-examples/material/tabs/tab-nav-bar-basic/tab-nav-bar-basic-example.ts b/src/components-examples/material/tabs/tab-nav-bar-basic/tab-nav-bar-basic-example.ts\nindex 84a3467c1..cd7cc3359 100644\n--- a/src/components-examples/material/tabs/tab-nav-bar-basic/tab-nav-bar-basic-example.ts\n+++ b/src/components-examples/material/tabs/tab-nav-bar-basic/tab-nav-bar-basic-example.ts\n@@ -1,5 +1,4 @@\n import {Component} from '@angular/core';\n-import {ThemePalette} from '@angular/material/core';\n import {MatButtonModule} from '@angular/material/button';\n import {MatTabsModule} from '@angular/material/tabs';\n \n@@ -16,11 +15,6 @@ import {MatTabsModule} from '@angular/material/tabs';\n export class TabNavBarBasicExample {\n   links = ['First', 'Second', 'Third'];\n   activeLink = this.links[0];\n-  background: ThemePalette = undefined;\n-\n-  toggleBackground() {\n-    this.background = this.background ? undefined : 'primary';\n-  }\n \n   addLink() {\n     this.links.push(`Link ${this.links.length + 1}`);\ndiff --git a/src/dev-app/tabs/tabs-demo.html b/src/dev-app/tabs/tabs-demo.html\nindex 5d77820d1..20aed4baf 100644\n--- a/src/dev-app/tabs/tabs-demo.html\n+++ b/src/dev-app/tabs/tabs-demo.html\n@@ -16,8 +16,6 @@\n <tab-group-lazy-loaded-example></tab-group-lazy-loaded-example>\n <h3>Tab group stretched</h3>\n <tab-group-stretched-example></tab-group-stretched-example>\n-<h3>Tab group theming</h3>\n-<tab-group-theme-example></tab-group-theme-example>\n <h3>Tab navigation bar basic</h3>\n <tab-nav-bar-basic-example></tab-nav-bar-basic-example>\n <h3>Paginated Tabs</h3>\ndiff --git a/src/dev-app/tabs/tabs-demo.ts b/src/dev-app/tabs/tabs-demo.ts\nindex c66314293..889509b1f 100644\n--- a/src/dev-app/tabs/tabs-demo.ts\n+++ b/src/dev-app/tabs/tabs-demo.ts\n@@ -22,7 +22,6 @@ import {\n   TabGroupPaginatedExample,\n   TabGroupPreserveContentExample,\n   TabGroupStretchedExample,\n-  TabGroupThemeExample,\n   TabNavBarBasicExample,\n } from '@angular/components-examples/material/tabs';\n import {ChangeDetectionStrategy, Component} from '@angular/core';\n@@ -37,7 +36,6 @@ import {MatTabsModule} from '@angular/material/tabs';\n     TabGroupInvertedExample,\n     TabGroupPaginatedExample,\n     TabNavBarBasicExample,\n-    TabGroupThemeExample,\n     TabGroupStretchedExample,\n     TabGroupPreserveContentExample,\n     TabGroupLazyLoadedExample,\ndiff --git a/src/material/tabs/tab-group.ts b/src/material/tabs/tab-group.ts\nindex 1f2f5fa0a..d4c004956 100644\n--- a/src/material/tabs/tab-group.ts\n+++ b/src/material/tabs/tab-group.ts\n@@ -120,7 +120,13 @@ export class MatTabGroup implements AfterContentInit, AfterContentChecked, OnDes\n   /** Subscription to changes in the tab labels. */\n   private _tabLabelSubscription = Subscription.EMPTY;\n \n-  /** Theme color of the tab group. */\n+  /**\n+   * Theme color of the tab group. This API is supported in M2 themes only, it\n+   * has no effect in M3 themes.\n+   *\n+   * For information on applying color variants in M3, see\n+   * https://material.angular.io/guide/theming#using-component-color-variants.\n+   */\n   @Input()\n   color: ThemePalette;\n \n@@ -204,7 +210,12 @@ export class MatTabGroup implements AfterContentInit, AfterContentChecked, OnDes\n   preserveContent: boolean = false;\n \n   /**\n-   * Background color of the tab group.\n+   * Theme color of the background of the tab group. This API is supported in M2 themes only, it\n+   * has no effect in M3 themes.\n+   *\n+   * For information on applying color variants in M3, see\n+   * https://material.angular.io/guide/theming#using-component-color-variants.\n+   *\n    * @deprecated The background color should be customized through Sass theming APIs.\n    * @breaking-change 20.0.0 Remove this input\n    */\ndiff --git a/src/material/tabs/tab-nav-bar/tab-nav-bar.ts b/src/material/tabs/tab-nav-bar/tab-nav-bar.ts\nindex 614b41a66..fe2d2c0b8 100644\n--- a/src/material/tabs/tab-nav-bar/tab-nav-bar.ts\n+++ b/src/material/tabs/tab-nav-bar/tab-nav-bar.ts\n@@ -112,7 +112,13 @@ export class MatTabNav\n   /** Query list of all tab links of the tab navigation. */\n   @ContentChildren(forwardRef(() => MatTabLink), {descendants: true}) _items: QueryList<MatTabLink>;\n \n-  /** Background color of the tab nav. */\n+  /**\n+   * Theme color of the background of the tab nav. This API is supported in M2 themes only, it\n+   * has no effect in M3 themes.\n+   *\n+   * For information on applying color variants in M3, see\n+   * https://material.angular.io/guide/theming#using-component-color-variants.\n+   */\n   @Input()\n   get backgroundColor(): ThemePalette {\n     return this._backgroundColor;\n",
+      "diff_sha256": "9ab3e613edd2f0eda4ee1075b223911672b9f9b1767e71564aa8408676eb6549",
+      "files": [
+        "src/components-examples/material/tabs/index.ts",
+        "src/components-examples/material/tabs/tab-group-theme/tab-group-theme-example.css",
+        "src/components-examples/material/tabs/tab-group-theme/tab-group-theme-example.html",
+        "src/components-examples/material/tabs/tab-group-theme/tab-group-theme-example.ts",
+        "src/components-examples/material/tabs/tab-nav-bar-basic/tab-nav-bar-basic-example.html",
+        "src/components-examples/material/tabs/tab-nav-bar-basic/tab-nav-bar-basic-example.ts",
+        "src/dev-app/tabs/tabs-demo.html",
+        "src/dev-app/tabs/tabs-demo.ts",
+        "src/material/tabs/tab-group.ts",
+        "src/material/tabs/tab-nav-bar/tab-nav-bar.ts"
+      ],
+      "actual_changed_path_count": 10,
+      "review_depth": "bounded-documentation-source-review",
+      "decision": "Every actual path reviewed, including deleted TS/HTML/CSS theme example, example barrel, navigation example, dev-app imports/template, tab-group and tab-nav sources. Runtime edits are confined to unshipped examples/dev-app. Library sources add color/background documentation only; the existing backgroundColor deprecation is context, not a new declaration change. Legacy color/background behavior is retained and no deletion is applied to owned controls.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "material_source_changed_lines": [
+        "/** Theme color of the tab group. */",
+        "/**",
+        "* Theme color of the tab group. This API is supported in M2 themes only, it",
+        "* has no effect in M3 themes.",
+        "*",
+        "* For information on applying color variants in M3, see",
+        "* https://material.angular.io/guide/theming#using-component-color-variants.",
+        "*/",
+        "* Background color of the tab group.",
+        "* Theme color of the background of the tab group. This API is supported in M2 themes only, it",
+        "* has no effect in M3 themes.",
+        "*",
+        "* For information on applying color variants in M3, see",
+        "* https://material.angular.io/guide/theming#using-component-color-variants.",
+        "*",
+        "/** Background color of the tab nav. */",
+        "/**",
+        "* Theme color of the background of the tab nav. This API is supported in M2 themes only, it",
+        "* has no effect in M3 themes.",
+        "*",
+        "* For information on applying color variants in M3, see",
+        "* https://material.angular.io/guide/theming#using-component-color-variants.",
+        "*/"
+      ],
+      "material_runtime_change_in_patch": false,
+      "runtime_change_in_patch": true,
+      "unshipped_runtime_paths": [
+        "src/components-examples/material/tabs/index.ts",
+        "src/components-examples/material/tabs/tab-group-theme/tab-group-theme-example.css",
+        "src/components-examples/material/tabs/tab-group-theme/tab-group-theme-example.html",
+        "src/components-examples/material/tabs/tab-group-theme/tab-group-theme-example.ts",
+        "src/components-examples/material/tabs/tab-nav-bar-basic/tab-nav-bar-basic-example.html",
+        "src/components-examples/material/tabs/tab-nav-bar-basic/tab-nav-bar-basic-example.ts",
+        "src/dev-app/tabs/tabs-demo.html",
+        "src/dev-app/tabs/tabs-demo.ts"
+      ]
+    },
+    {
+      "sha": "91557c1ae91245aa4887dfcc8d96fc64bdf25ad9",
+      "diff": "diff --git a/src/material/radio/radio.md b/src/material/radio/radio.md\nindex c63eb2ee3..aacf13031 100644\n--- a/src/material/radio/radio.md\n+++ b/src/material/radio/radio.md\n@@ -28,16 +28,6 @@ Individual radio-buttons inside of a radio-group will inherit the `name` of the\n `<mat-radio-group>` is compatible with `@angular/forms` and supports both `FormsModule`\n and `ReactiveFormsModule`.\n \n-### Default Color Configuration\n-The default color for radio buttons can be configured globally using the `MAT_RADIO_DEFAULT_OPTIONS` provider\n-\n-```\n-providers: [{\n-    provide: MAT_RADIO_DEFAULT_OPTIONS,\n-    useValue: { color: 'accent' },\n-}]\n-```\n-\n ### Accessibility\n \n `MatRadioButton` uses an internal `<input type=\"radio\">` to provide an accessible experience.\n@@ -56,7 +46,7 @@ should not use the `attr.` prefix when binding these properties, as demonstrated\n ```\n \n Prefer placing all radio buttons inside of a `<mat-radio-group>` rather than creating standalone\n-radio buttons because groups are easier to use exclusively with a keyboard. \n+radio buttons because groups are easier to use exclusively with a keyboard.\n \n You should provide an accessible label for all `<mat-radio-group>` elements via `aria-label` or\n-`aria-labelledby`. \n+`aria-labelledby`.\ndiff --git a/src/material/radio/radio.ts b/src/material/radio/radio.ts\nindex 7108df397..7a178900b 100644\n--- a/src/material/radio/radio.ts\n+++ b/src/material/radio/radio.ts\n@@ -74,6 +74,13 @@ export const MAT_RADIO_GROUP_CONTROL_VALUE_ACCESSOR: any = {\n export const MAT_RADIO_GROUP = new InjectionToken<MatRadioGroup>('MatRadioGroup');\n \n export interface MatRadioDefaultOptions {\n+  /**\n+   * Theme color of the radio button. This API is supported in M2 themes only, it\n+   * has no effect in M3 themes.\n+   *\n+   * For information on applying color variants in M3, see\n+   * https://material.angular.io/guide/theming#using-component-color-variants.\n+   */\n   color: ThemePalette;\n }\n \n@@ -481,11 +488,17 @@ export class MatRadioButton implements OnInit, AfterViewInit, DoCheck, OnDestroy\n     this._required = value;\n   }\n \n-  /** Theme color of the radio button. */\n+  /**\n+   * Theme color of the radio button. This API is supported in M2 themes only, it\n+   * has no effect in M3 themes.\n+   *\n+   * For information on applying color variants in M3, see\n+   * https://material.angular.io/guide/theming#using-component-color-variants.\n+   */\n   @Input()\n   get color(): ThemePalette {\n-    // As per Material design specifications the selection control radio should use the accent color\n-    // palette by default. https://material.io/guidelines/components/selection-controls.html\n+    // As per M2 design specifications the selection control radio should use the accent color\n+    // palette by default. https://m2.material.io/components/radio-buttons#specs\n     return (\n       this._color ||\n       (this.radioGroup && this.radioGroup.color) ||\ndiff --git a/tools/public_api_guard/material/radio.md b/tools/public_api_guard/material/radio.md\nindex aa72a44de..f7083a615 100644\n--- a/tools/public_api_guard/material/radio.md\n+++ b/tools/public_api_guard/material/radio.md\n@@ -109,7 +109,6 @@ export class MatRadioChange {\n \n // @public (undocumented)\n export interface MatRadioDefaultOptions {\n-    // (undocumented)\n     color: ThemePalette;\n }\n \n",
+      "diff_sha256": "cf890829561b8d756e8e215d4ae009c1ee01054767c2e6453a505b93e3c98730",
+      "files": [
+        "src/material/radio/radio.md",
+        "src/material/radio/radio.ts",
+        "tools/public_api_guard/material/radio.md"
+      ],
+      "actual_changed_path_count": 3,
+      "review_depth": "bounded-documentation-source-review",
+      "decision": "All three paths reviewed: radio source changes only JSDoc and an M2 specification-link comment; radio overview removes default-color prose, and the public API guard drops an undocumented-comment marker. Token/default-options/color getter/types are untouched. Preserve legacy default-color guidance and distinct token behavior; keyboard/accessibility/state reviews remain separate.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "material_source_changed_lines": [
+        "/**",
+        "* Theme color of the radio button. This API is supported in M2 themes only, it",
+        "* has no effect in M3 themes.",
+        "*",
+        "* For information on applying color variants in M3, see",
+        "* https://material.angular.io/guide/theming#using-component-color-variants.",
+        "*/",
+        "/** Theme color of the radio button. */",
+        "/**",
+        "* Theme color of the radio button. This API is supported in M2 themes only, it",
+        "* has no effect in M3 themes.",
+        "*",
+        "* For information on applying color variants in M3, see",
+        "* https://material.angular.io/guide/theming#using-component-color-variants.",
+        "*/",
+        "// As per Material design specifications the selection control radio should use the accent color",
+        "// palette by default. https://material.io/guidelines/components/selection-controls.html",
+        "// As per M2 design specifications the selection control radio should use the accent color",
+        "// palette by default. https://m2.material.io/components/radio-buttons#specs"
+      ],
+      "material_runtime_change_in_patch": false,
+      "runtime_change_in_patch": false,
+      "unshipped_runtime_paths": []
+    }
+  ]
+}
