@@ -35,7 +35,7 @@ import {spawnSync} from 'node:child_process';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
-const version = '22.0.0-rc.0';
+const version = '21.0.0-rc.0';
 const distDir = join(root, 'migration/dist');
 const pkgDir = join(distDir, 'package');
 const recordPath = join(root, 'compatibility/migrate-legacy-cli-artifact.json');
