@@ -151,7 +151,7 @@ class FullSealerTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         self.f = CompleteFixture(self.root)
         (self.root / 'scripts').mkdir()
-        for name in ('rc_acceptance.py', 'rc-verify.py', 'archive_run_closure.py', 'seal-draft-run.mjs'):
+        for name in ('rc_acceptance.py', 'rc-verify.py', 'archive_run_closure.py', 'consumer_floor_admission.py', 'm3_rendered_admission.py', 'seal-draft-run.mjs'):
             shutil.copy2(ROOT / 'scripts' / name, self.root / 'scripts' / name)
         write_json(self.root / 'projects/ngx-material-legacy/package.json', {'version': '22.0.0-rc.0'})
         git = initialize_git(self.root)
@@ -306,7 +306,7 @@ class CoordinatorEntryTests(WriterFixture):
 
     def setUp(self):
         super().setUp()
-        for name in ('rc-verify.py', 'rc_acceptance.py', 'archive_run_closure.py'):
+        for name in ('rc-verify.py', 'rc_acceptance.py', 'archive_run_closure.py', 'consumer_floor_admission.py', 'm3_rendered_admission.py'):
             shutil.copy2(ROOT / 'scripts' / name, self.root / 'scripts' / name)
         shutil.copy2(ROOT / 'compatibility/rc/matrices/full-verify.json',
                      self.root / 'compatibility/rc/matrices/full-verify.json')
