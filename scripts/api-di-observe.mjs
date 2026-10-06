@@ -68,6 +68,25 @@ export function expectedFactoryDi(shape) {
   ];
 }
 
+// Historical constructors name the original token; the finite public export map
+// exposes its independently owned legacy identity. Never match these by description.
+const ownedTokenExports = {
+  'legacy-form-field': {
+    MAT_FORM_FIELD: 'MAT_LEGACY_FORM_FIELD', MAT_ERROR: 'MAT_LEGACY_ERROR',
+    MAT_PREFIX: 'MAT_LEGACY_PREFIX', MAT_SUFFIX: 'MAT_LEGACY_SUFFIX',
+  },
+  'legacy-progress-bar': {
+    MAT_PROGRESS_BAR_LOCATION: 'MAT_LEGACY_PROGRESS_BAR_LOCATION',
+    MAT_PROGRESS_BAR_DEFAULT_OPTIONS: 'MAT_LEGACY_PROGRESS_BAR_DEFAULT_OPTIONS',
+  },
+};
+
+export function ownedTokenIdentity(family, param, loaded, observedToken) {
+  const exported = ownedTokenExports[family]?.[param.ident];
+  if (!exported) return null;
+  return Object.hasOwn(loaded, exported) && loaded[exported] === observedToken;
+}
+
 export async function observeRuntimeDi(packageRoot, symbols, differences = []) {
   const {Injector, runInInjectionContext} = await import('@angular/core');
   await import('@angular/compiler');
@@ -109,8 +128,9 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = []) {
       for (let index = 0; index < expected.length; index += 1) {
         const param = expected[index];
         const got = observed[index];
-        let same = got.label === param.imported || got.label === param.ident || (got.token && got.token.name === param.imported);
-        if (!same && param.spec && !param.spec.startsWith('.')) {
+        const ownedIdentity = ownedTokenIdentity(symbol.family, param, loaded, got.token);
+        let same = ownedIdentity ?? (got.label === param.imported || got.label === param.ident || (got.token && got.token.name === param.imported));
+        if (ownedIdentity === null && !same && param.spec && !param.spec.startsWith('.')) {
           try {
             const imported = await import(param.spec);
             same = imported[param.imported] === got.token;
@@ -118,7 +138,7 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = []) {
             same = false;
           }
         }
-        if (!same && param.ident) same = loaded[param.ident] === got.token;
+        if (ownedIdentity === null && !same && param.ident) same = loaded[param.ident] === got.token;
         if (!same) problems.push(`token ${symbol.symbol_id}[${index}] expected ${param.ident} observed ${got.label}`);
         if (Boolean(param.optional) !== Boolean(got.optional)) {
           problems.push(`optional ${symbol.symbol_id}[${index}] expected ${Boolean(param.optional)} observed ${Boolean(got.optional)}`);
