@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "sha": "b423c0e0b754b1f1d118d17e022981c357c3aa68",
+  "status": "repair-awaiting-full-di-actions-review",
+  "g11_claim": "not-passed",
+  "original": "reference/material-16.2.14/datetime/source-provenance.json",
+  "findings": [
+    {
+      "id": "peer-native-date-constructor-removal",
+      "repair": "Owned untouched historical constructor and methods, with local legacy provider modules under the stable DateAdapter token.",
+      "actions": "main36205bee38 packed strict declarations, constructor/subclass/calendar behavior, provider locale/formats and engine-free consumer pass."
+    },
+    {
+      "id": "typescript-optional-conflated-with-di-optional",
+      "original_source": "NativeDateAdapter declares @Optional() on matDateLocale, but no @Optional() on _platform?:Platform. Original16 API metadata records the second dependency as null metadata, not optional:true.",
+      "repair": "Infer DI optionality only from constructor Optional decorators; retain TypeScript argument optionality separately in signatures. Remove the prior NativeDateAdapter duplicate-locale DI exception instead of changing its expected historical contract.",
+      "removed_exception": {
+        "symbol_id": "legacy-core/primary/LegacyNativeDateAdapter",
+        "classification": "intentional-legacy-difference",
+        "historical": "MAT_DATE_LOCALE?|Platform?",
+        "owned": "MAT_DATE_LOCALE?|MAT_DATE_LOCALE?",
+        "rationale": "The executed factory dependency list differs from the 16.2.14 constructor parameter list. Angular 22 host dependencies and owned constructor edits are pinned here; a different executed list fails. This is not a d.ts spelling check."
+      }
+    }
+  ],
+  "limitations": [
+    "Packed main execution does not prove21.x or every consumer floor.",
+    "Complete constructor/provider and unaffected factory review remains required; exact newly exposed DI mismatches remain failures."
+  ]
+}
