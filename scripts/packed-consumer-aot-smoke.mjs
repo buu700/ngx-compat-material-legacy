@@ -473,6 +473,7 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
     'packed-consumer/harness/chip-input-backspace-release': parsed.chipBackspaceRelease === true,
     'packed-consumer/harness/chip-repeated-removal-and-separator': parsed.chipRepeatedEvents === true,
     'packed-consumer/harness/form-field-error-live-region': parsed.errorLiveRegion === true,
+    'packed-consumer/harness/form-field-token-isolation': parsed.formFieldTokenIsolation === true,
   };
   const owned = declarationKeys(keys)
     .filter(key => key.endsWith('/testing'))
@@ -887,7 +888,8 @@ import {provideNoopAnimations} from '@angular/platform-browser/animations';
 import {OverlayContainer} from '@angular/cdk/overlay';
 import {MatLegacyButtonModule} from '@ngx-compat/material-legacy/legacy-button';
 import {MatLegacyButtonHarness} from '@ngx-compat/material-legacy/legacy-button/testing';
-import {MatLegacyError, MatLegacyFormFieldModule} from '@ngx-compat/material-legacy/legacy-form-field';
+import {MatLegacyError, MatLegacyFormField, MatLegacyPrefix, MatLegacySuffix, MatLegacyFormFieldModule, MAT_LEGACY_FORM_FIELD, MAT_LEGACY_ERROR, MAT_LEGACY_PREFIX, MAT_LEGACY_SUFFIX} from '@ngx-compat/material-legacy/legacy-form-field';
+import {MAT_FORM_FIELD, MAT_ERROR, MAT_PREFIX, MAT_SUFFIX} from '@angular/material/form-field';
 import {MatLegacySelectModule} from '@ngx-compat/material-legacy/legacy-select';
 import {MatLegacySelectHarness} from '@ngx-compat/material-legacy/legacy-select/testing';
 import {MatLegacyDialog, MatLegacyDialogModule} from '@ngx-compat/material-legacy/legacy-dialog';
@@ -942,7 +944,9 @@ class SmokeDialogContent {}
     <mat-error id="error-live-default">Default error</mat-error>
     <mat-error id="error-live-explicit" aria-live="assertive">Explicit error</mat-error>
     <mat-error id="error-live-empty" aria-live="">Empty attribute error</mat-error>
-    <mat-form-field>
+    <mat-form-field id="token-field">
+      <span matPrefix id="token-prefix">Prefix</span>
+      <span matSuffix id="token-suffix">Suffix</span>
       <mat-label>Choice</mat-label>
       <mat-select>
         <mat-option value="a">A</mat-option>
@@ -1108,6 +1112,18 @@ async function main() {
     &&liveExplicit.getAttribute('aria-live')==='assertive'
     &&[liveDefault,liveExplicit,liveEmpty].every(el=>el.getAttribute('aria-atomic')==='true')
     &&manualError.getAttribute('aria-live')==='polite'&&explicitManualError.getAttribute('aria-live')==='assertive';
+  const byId=(id:string)=>fixture.debugElement.query(element=>element.nativeElement?.id===id);
+  const fieldNode=byId('token-field'),prefixNode=byId('token-prefix'),suffixNode=byId('token-suffix');
+  const field=fieldNode.injector.get(MatLegacyFormField);
+  const formFieldTokenIsolation=new Set<unknown>([MAT_LEGACY_FORM_FIELD,MAT_LEGACY_ERROR,MAT_LEGACY_PREFIX,MAT_LEGACY_SUFFIX,MAT_FORM_FIELD,MAT_ERROR,MAT_PREFIX,MAT_SUFFIX]).size===8
+    &&Object.is(fieldNode.injector.get(MAT_LEGACY_FORM_FIELD),field)&&fieldNode.injector.get(MAT_FORM_FIELD,null)===null
+    &&byId('error-live-default').injector.get(MAT_LEGACY_ERROR)===byId('error-live-default').injector.get(MatLegacyError)
+    &&byId('error-live-default').injector.get(MAT_ERROR,null)===null
+    &&prefixNode.injector.get(MAT_LEGACY_PREFIX)===prefixNode.injector.get(MatLegacyPrefix)
+    &&prefixNode.injector.get(MAT_PREFIX,null)===null
+    &&suffixNode.injector.get(MAT_LEGACY_SUFFIX)===suffixNode.injector.get(MatLegacySuffix)
+    &&suffixNode.injector.get(MAT_SUFFIX,null)===null
+    &&field._prefixChildren.length===1&&field._suffixChildren.length===1;
   const out = {
     ok:
       text === 'Go' &&
@@ -1121,7 +1137,7 @@ async function main() {
       selectOpened === true &&
       selectClosed === true &&
       tabCount === 2 &&
-      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion,
+      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation,
     buttonText: text,
     selectIsOpen: isOpen,
     dialogText,
@@ -1141,6 +1157,7 @@ async function main() {
     chipBackspaceRelease,
     chipRepeatedEvents,
     errorLiveRegion,
+    formFieldTokenIsolation,
     chipEventCounts:{removals:fixture.componentInstance.repeatRemovals,separators:fixture.componentInstance.repeatEnds},
     harnesses: [
       'MatLegacyButtonHarness',

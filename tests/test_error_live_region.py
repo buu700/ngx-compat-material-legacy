@@ -11,7 +11,7 @@ class ErrorLiveRegionTests(unittest.TestCase):
         original=(ROOT/'reference/material-16.2.14/error-helper-sources/legacy-error.ts').read_text()
         self.assertEqual(hashlib.sha256(original.encode()).hexdigest(),'fde8ceb3fdd9ce24122f56c6838b68da382c41774c6b2808a1860341f46d50e0')
         owned=(ROOT/'projects/ngx-material-legacy/legacy-form-field/error.ts').read_text()
-        restored=owned.replace(' * Copyright (c) 2026 Ryan Lester.\n','').replace('@Directive({\n  standalone: false,','@Directive({')
+        restored=owned.replace(' * Copyright (c) 2026 Ryan Lester.\n','').replace('@Directive({\n  standalone: false,','@Directive({').replace("import {MAT_LEGACY_ERROR as MAT_ERROR} from './owned-tokens';","import {MAT_ERROR} from '@angular/material/form-field';")
         self.assertEqual(restored,original)
         self.assertIn("'aria-atomic': 'true'",owned)
         body=re.search(r"constructor\(@Attribute\('aria-live'\) ariaLive: string, elementRef: ElementRef\) \{(.*)\n  \}\n\}",owned,re.S)[1]
