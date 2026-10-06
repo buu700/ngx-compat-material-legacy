@@ -8,9 +8,11 @@
  * MatLegacyButtonHarness.
  *
  * Usage:
- *   node scripts/packed-consumer-aot-smoke.mjs [--tarball path] [--skip-harness]
+ *   node scripts/packed-consumer-aot-smoke.mjs --tarball path [--skip-harness]
+ *   node scripts/packed-consumer-aot-smoke.mjs --run <run.json> [--skip-harness]
  * Evidence:
- *   compatibility/pack-proof/aot-harness-smoke.json
+ *   --run writes reports/packed-consumer-detail.json under that run directory.
+ *   Standalone (no --run) may still write compatibility/pack-proof/aot-harness-smoke.json.
  */
 import {
   cpSync,
@@ -19,16 +21,17 @@ import {
   mkdtempSync,
   readFileSync,
   rmSync,
+  statSync,
   writeFileSync,
 } from 'node:fs';
 import {createHash} from 'node:crypto';
 import {tmpdir} from 'node:os';
-import {dirname, join, relative, resolve} from 'node:path';
+import {dirname, isAbsolute, join, relative, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {spawnSync} from 'node:child_process';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const outPath = join(root, 'compatibility/pack-proof/aot-harness-smoke.json');
+const trackedReceipt = join(root, 'compatibility/pack-proof/aot-harness-smoke.json');
 const defaultTarball = join(
   root,
   'compatibility/pack-proof-21/ngx-compat-material-legacy-21.0.0-rc.0.tgz',
@@ -36,12 +39,34 @@ const defaultTarball = join(
 
 const args = process.argv.slice(2);
 const skipHarness = args.includes('--skip-harness');
-const tarballArgIdx = args.indexOf('--tarball');
-const tarball =
-  tarballArgIdx >= 0 ? resolve(args[tarballArgIdx + 1]) : defaultTarball;
+let tarball = null;
+let runManifestPath = null;
+
+for (let i = 0; i < args.length; i += 1) {
+  const arg = args[i];
+  if (arg === '--skip-harness') continue;
+  if (arg === '--tarball' || arg === '--run') {
+    const value = args[i + 1];
+    if (!value || value.startsWith('-')) {
+      console.error(`${arg} requires a path`);
+      process.exit(2);
+    }
+    if (arg === '--tarball') tarball = resolve(value);
+    else runManifestPath = resolve(value);
+    i += 1;
+    continue;
+  }
+  console.error(`Unknown argument: ${arg}`);
+  process.exit(2);
+}
 
 function sha256File(path) {
   return createHash('sha256').update(readFileSync(path)).digest('hex');
+}
+
+function insideDir(dir, target) {
+  const rel = relative(resolve(dir), resolve(target));
+  return rel === '' || (!rel.startsWith('..') && !isAbsolute(rel));
 }
 
 function run(cmd, cmdlineArgs, opts = {}) {
@@ -52,16 +77,110 @@ function run(cmd, cmdlineArgs, opts = {}) {
   return res;
 }
 
+let draftRun = null;
+if (runManifestPath) {
+  if (!existsSync(runManifestPath)) {
+    console.error(`Missing run manifest: ${runManifestPath}`);
+    process.exit(2);
+  }
+  const draft = JSON.parse(readFileSync(runManifestPath, 'utf8'));
+  if (draft.schema_version !== 1 || draft.template === true || draft.stage !== 'draft') {
+    console.error('run manifest must be an unsealed schema_version 1 draft');
+    process.exit(2);
+  }
+  if (draft.purpose === 'release') {
+    console.error('packed-consumer does not accept a release manifest');
+    process.exit(2);
+  }
+  const artifact = (draft.artifacts || []).find(item => item && item.id === 'library');
+  if (!artifact || typeof artifact.path !== 'string' || typeof artifact.sha256 !== 'string') {
+    console.error('draft run has no library artifact');
+    process.exit(2);
+  }
+  const runDir = dirname(runManifestPath);
+  if (isAbsolute(artifact.path) || artifact.path.split(/[\\/]/).includes('..')) {
+    console.error('draft library path must stay inside the run directory');
+    process.exit(2);
+  }
+  const fromRun = resolve(runDir, artifact.path);
+  if (!insideDir(runDir, fromRun)) {
+    console.error('draft library path must stay inside the run directory');
+    process.exit(2);
+  }
+  if (tarball && resolve(tarball) !== fromRun) {
+    console.error('--tarball does not match the draft library artifact');
+    process.exit(2);
+  }
+  tarball = fromRun;
+  if (!existsSync(tarball)) {
+    console.error(`Draft library artifact is missing: ${tarball}`);
+    process.exit(2);
+  }
+  const digest = sha256File(tarball);
+  const bytes = statSync(tarball).size;
+  draftRun = {run_id: draft.run_id, runDir, artifact, digest, bytes, line: draft.source?.line ?? null};
+  if (digest !== artifact.sha256 || bytes !== artifact.bytes) {
+    console.error('Tarball bytes do not match the draft library artifact. Not repacking.');
+    mkdirSync(join(runDir, 'reports'), {recursive: true});
+    writeFileSync(
+      join(runDir, 'reports/packed-consumer.json'),
+      JSON.stringify(
+        {
+          schema_version: 1,
+          template: false,
+          run_id: draft.run_id,
+          check_id: 'packed-consumer',
+          line: draft.source?.line ?? null,
+          subject_kind: 'artifact',
+          subject_ids: ['library'],
+          command: process.argv.slice(1),
+          exit_code: 1,
+          result: 'fail',
+          expected_case_ids: ['rehash'],
+          executed_case_ids: ['rehash'],
+          passed: 0,
+          failed: 1,
+          skipped: 0,
+          skip_reasons: [],
+          outputs: [],
+          limitations: ['Identified draft library bytes did not match the manifest. Not rebuild.'],
+        },
+        null,
+        2,
+      ) + '\n',
+    );
+    process.exit(1);
+  }
+} else if (!tarball) {
+  tarball = defaultTarball;
+}
+
 if (!existsSync(tarball)) {
   console.error(`Missing tarball: ${tarball}. Build/pack first.`);
   process.exit(2);
+}
+
+const detailPath = draftRun
+  ? join(draftRun.runDir, 'reports/packed-consumer-detail.json')
+  : trackedReceipt;
+if (draftRun) {
+  mkdirSync(dirname(detailPath), {recursive: true});
+  if (resolve(detailPath) === resolve(trackedReceipt)) {
+    console.error('packed-consumer detail must not overwrite the tracked pack-proof file');
+    process.exit(2);
+  }
 }
 
 const consumer = mkdtempSync(join(tmpdir(), 'ngx-compat-aot-harness_'));
 const result = {
   schema_version: 1,
   captured_at: new Date().toISOString(),
-  tarball: {path: relative(root, tarball), sha256: sha256File(tarball)},
+  run_id: draftRun ? draftRun.run_id : null,
+  check_id: draftRun ? 'packed-consumer' : null,
+  tarball: {
+    path: draftRun ? draftRun.artifact.path : relative(root, tarball),
+    sha256: sha256File(tarball),
+  },
   consumer_dir: consumer,
   aot: {status: 'pending'},
   harness: {status: skipHarness ? 'skipped' : 'pending'},
@@ -519,18 +638,18 @@ main().catch(err => {
   result.status = 'fail';
   result.errors.push(String(err && err.message ? err.message : err));
 } finally {
-  writeFileSync(outPath, JSON.stringify(result, null, 2) + '\n');
+  writeFileSync(detailPath, JSON.stringify(result, null, 2) + '\n');
   // Keep consumer on failure for debugging; remove on success to save disk.
   if (result.status === 'ok') {
     try {
       rmSync(consumer, {recursive: true, force: true});
       result.consumer_dir = '(removed after success)';
-      writeFileSync(outPath, JSON.stringify(result, null, 2) + '\n');
+      writeFileSync(detailPath, JSON.stringify(result, null, 2) + '\n');
     } catch {
       /* ignore */
     }
   }
 }
 
-console.log(JSON.stringify({status: result.status, errors: result.errors, outPath}, null, 2));
+console.log(JSON.stringify({status: result.status, errors: result.errors, outPath: detailPath}, null, 2));
 process.exit(result.status === 'ok' ? 0 : 1);

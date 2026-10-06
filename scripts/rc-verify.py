@@ -164,7 +164,10 @@ def verifier_lock(root):
 def classify_input(path):
     """Role of a fingerprinted path. Reports stay excluded; this does not ignore locks or checkers."""
     name = path.replace('\\', '/')
-    if name.startswith('compatibility/rc/reports/') or name == 'compatibility/pack-proof/motion-lifecycle-smoke.json':
+    if name.startswith('compatibility/rc/reports/') or name in {
+            'compatibility/pack-proof/motion-lifecycle-smoke.json',
+            'compatibility/pack-proof/aot-harness-smoke.json',
+    }:
         return 'derived-diagnostic'
     if name in {'pnpm-lock.yaml', 'toolchain-lock.json', 'chainman.lock', '.npm-version', '.node-version'}:
         return 'lock'
