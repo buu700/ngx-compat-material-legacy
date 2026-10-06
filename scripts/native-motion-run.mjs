@@ -23,7 +23,8 @@ const DRIVERS = {chromium: withChromium, firefox: withFirefox, webkit: withWebKi
 
 function exactVersion(spec, fallback) {
   const text = String(spec || '').trim();
-  if (/^\d+\.\d+\.\d+$/.test(text)) return text;
+  const match = text.match(/\d+\.\d+\.\d+/);
+  if (match) return match[0];
   return fallback;
 }
 
@@ -35,13 +36,13 @@ function readPackedPackage(tarball) {
 
 export function versionsFor(pkg) {
   const peers = pkg.peerDependencies || {};
-  const core = exactVersion(peers['@angular/core'], '22.1.7');
+  const core = exactVersion(peers['@angular/core'], '21.2.23');
   return {
     core,
-    cdk: exactVersion(peers['@angular/cdk'], '22.1.7'),
-    material: exactVersion(peers['@angular/material'], '22.1.7'),
+    cdk: exactVersion(peers['@angular/cdk'], '21.2.14'),
+    material: exactVersion(peers['@angular/material'], '21.2.14'),
     rxjs: exactVersion(peers.rxjs, '7.8.2'),
-    typescript: '6.0.3',
+    typescript: '5.9.2',
     zone: '0.16.3',
     tslib: '2.8.1',
     sass: '1.104.1',

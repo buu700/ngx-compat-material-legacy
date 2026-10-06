@@ -1088,7 +1088,7 @@ export function bindingProblems(context) {
   if (!context || context.library_sha256 !== context.artifact_sha256 || context.library_bytes !== context.artifact_bytes) {
     problems.push('unbound artifact');
   }
-  if (context && context.line !== 'main') problems.push('finite roster is main-only');
+  if (context && context.line !== '21.x') problems.push('finite roster is 21.x-only');
   return problems;
 }
 

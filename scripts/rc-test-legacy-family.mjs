@@ -171,8 +171,8 @@ function coordinatorRequest() {
 }
 
 function writeAcceptance(request, derived, results, library) {
-  if (request.line !== 'main') {
-    console.error('historical-legacy-artifact: finite roster is derived for main only');
+  if (request.line !== '21.x') {
+    console.error('historical-legacy-artifact: finite roster is derived for 21.x only');
     return false;
   }
   const executed = Array.isArray(results.specs) ? results.specs : [];

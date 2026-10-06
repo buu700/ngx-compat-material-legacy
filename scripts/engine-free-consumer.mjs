@@ -585,8 +585,8 @@ export class EngineFreeCheckboxModule {}
     }
     process.exit(1);
   }
-  if (coordinator && line !== 'main') {
-    console.error('engine-free acceptance roster is reviewed for main only');
+  if (coordinator && line !== '21.x') {
+    console.error('engine-free acceptance roster is reviewed for 21.x only');
     process.exit(1);
   }
   console.log(JSON.stringify({ok: true, unresolved: state.unresolved, tarball_sha256: digest, cases: cases.length}, null, 2));
