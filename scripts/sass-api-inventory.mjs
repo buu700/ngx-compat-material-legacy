@@ -473,3 +473,14 @@ export function apiDriftNegative(oracle, candidate, candidateCss) {
 
 const entry = process.argv[1] ? pathToFileURL(resolve(process.argv[1])).href : '';
 if (import.meta.url === entry) main(process.argv.slice(2));
+
+/** Complete finite Sass results; a digest-matched pending decision is a failure. */
+export function sassResultsComplete(results,expectedIds) {
+  if (!Array.isArray(results) || !Array.isArray(expectedIds) || !expectedIds.length || results.length !== expectedIds.length) return false;
+  const expected = new Set(expectedIds), seen = new Set();
+  if (expected.size !== expectedIds.length) return false;
+  return results.every(item => {
+    if (!item || item.result !== 'pass' || ['pending-decision','unexplained-failure'].includes(item.status) || !expected.has(item.case_id) || seen.has(item.case_id)) return false;
+    seen.add(item.case_id);return true;
+  });
+}
