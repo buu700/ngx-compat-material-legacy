@@ -99,12 +99,20 @@ export class MatLegacyDialogContainer extends _MatDialogContainerBase implements
   private _animationTimer: ReturnType<typeof setTimeout> | null = null;
   private _hostElement = this._elementRef.nativeElement;
 
+  /**
+   * Animation phase string kept for historical specs that asserted the
+   * engine trigger state. Mapped onto CSS enter/exit lifecycle.
+   * @docs-private
+   */
+  _state: 'void' | 'enter' | 'exit' = 'void';
+
   protected override _contentAttached(): void {
     super._contentAttached();
     this._startOpenAnimation();
   }
 
   private _startOpenAnimation(): void {
+    this._state = 'enter';
     this._animationStateChanged.emit({
       state: 'opening',
       totalTime: this._enterAnimationDuration,
@@ -125,6 +133,7 @@ export class MatLegacyDialogContainer extends _MatDialogContainerBase implements
 
   /** Starts the dialog exit animation. */
   _startExitAnimation(): void {
+    this._state = 'exit';
     this._animationStateChanged.emit({
       state: 'closing',
       totalTime: this._exitAnimationDuration,

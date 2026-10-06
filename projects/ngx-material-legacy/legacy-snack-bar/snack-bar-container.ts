@@ -11,7 +11,7 @@
 
 import {ChangeDetectionStrategy, Component, ViewEncapsulation} from '@angular/core';
 import {_MatSnackBarContainerBase} from './internal/snack-bar-container-base';
-import {legacyAnimationsDisabled} from '@ngx-compat/material-legacy/legacy-core';
+import {legacyAnimationsDisabled, legacyHostMotionEvent} from '@ngx-compat/material-legacy/legacy-core';
 
 const ENTER_MS = 150;
 const EXIT_MS = 75;
@@ -38,7 +38,7 @@ const EXIT_MS = 75;
     '[class.mat-snack-bar-container-enter]': "_animationsEnabled && _animationState === 'visible'",
     '[class.mat-snack-bar-container-exit]': "_animationsEnabled && _animationState === 'hidden'",
     '[class.mat-snack-bar-container-animations-enabled]': '_animationsEnabled',
-    '(animationend)': 'onAnimationEnd($event.animationName)',
+    '(animationend)': 'onAnimationEnd($event)',
   },
 })
 export class MatLegacySnackBarContainer extends _MatSnackBarContainerBase {
@@ -63,10 +63,16 @@ export class MatLegacySnackBarContainer extends _MatSnackBarContainerBase {
 
   protected override _afterExitMotionStarted(): void {
     if (!this._animationsEnabled) {
-      // Do not wait for NgZone.onMicrotaskEmpty. A zoneless consumer never
-      // emits it, so the snack bar would stay attached.
-      this._onExit.next();
-      this._onExit.complete();
+      // Keep the container in the DOM for the current turn so callers can see
+      // the mat-exit attribute, then finish on a microtask. queueMicrotask
+      // runs under fakeAsync flush and in a zoneless app, unlike
+      // NgZone.onMicrotaskEmpty.
+      queueMicrotask(() => {
+        if (!this._onExit.closed) {
+          this._onExit.next();
+          this._onExit.complete();
+        }
+      });
       return;
     }
     if (this._exitFallback !== null) {
@@ -78,8 +84,18 @@ export class MatLegacySnackBarContainer extends _MatSnackBarContainerBase {
   }
 
   override onAnimationEnd(
-    event: string | {fromState?: string; toState?: string; animationName?: string},
+    event: string | Event | {fromState?: string; toState?: string; animationName?: string},
   ) {
+    if (typeof event !== 'string' && event instanceof Event) {
+      if (!legacyHostMotionEvent(event)) {
+        return;
+      }
+      const animationName = (event as AnimationEvent).animationName;
+      if (animationName) {
+        this.onAnimationEnd(animationName);
+      }
+      return;
+    }
     if (typeof event === 'string') {
       if (event === 'mat-legacy-snack-bar-enter' && this._enterFallback !== null) {
         clearTimeout(this._enterFallback);
