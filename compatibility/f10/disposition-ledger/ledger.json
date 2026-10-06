@@ -731,7 +731,7 @@
         "upstream_file": "src/material/autocomplete/autocomplete-trigger.ts",
         "candidate_member": {
           "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
-          "sha256": "015222d0b5f4f104047e3d5f3d8174a8a01ccf71abe5340f82050de00a739964"
+          "sha256": "d7baf2c194dbd4c90be215d7c258f92f8c7fffe5b6649ce4d27ac46393c8eac8"
         },
         "added_lines": [
           {
@@ -751,9 +751,9 @@
         "recorded_by": "Grok, FIN-02-C02; Codex validates in FIN-02-C05",
         "recomputed_by": "scripts/record-candidate-line-proofs.py",
         "coordinate_relocation": {
-          "source_parent": "02cb35cfa",
-          "source_after": "0096fbeb7",
-          "method": "Exact matching line blocks only; changed lines are refused, prior text and conclusions retained",
+          "source_parent": "31a6b252d",
+          "change": "Local ownership of original missing-panel helper; unchanged matching source lines relocated only",
+          "method": "Exact line-block mapping; changed lines refused",
           "prior_proof": {
             "diff_sha256": "98754a36c31e10ac256779888887af07bcddae1411ba569d1417f4a8b64babd5",
             "review_depth": "individual-compatibility",
@@ -765,25 +765,61 @@
             "upstream_file": "src/material/autocomplete/autocomplete-trigger.ts",
             "candidate_member": {
               "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
-              "sha256": "c61178b73599a69247a20dcd3ec2bb62337a46801c70e47a71049cca2911167f"
+              "sha256": "015222d0b5f4f104047e3d5f3d8174a8a01ccf71abe5340f82050de00a739964"
             },
             "added_lines": [
               {
                 "upstream_added": "if (!this.autocomplete || !this.autocomplete.requireSelection) {",
                 "candidate_lines": [
-                  480
+                  481
                 ]
               },
               {
                 "upstream_added": "this._onChange(value);",
                 "candidate_lines": [
-                  481
+                  482
                 ]
               }
             ],
             "read_note": "already-present",
             "recorded_by": "Grok, FIN-02-C02; Codex validates in FIN-02-C05",
-            "recomputed_by": "scripts/record-candidate-line-proofs.py"
+            "recomputed_by": "scripts/record-candidate-line-proofs.py",
+            "coordinate_relocation": {
+              "source_parent": "02cb35cfa",
+              "source_after": "0096fbeb7",
+              "method": "Exact matching line blocks only; changed lines are refused, prior text and conclusions retained",
+              "prior_proof": {
+                "diff_sha256": "98754a36c31e10ac256779888887af07bcddae1411ba569d1417f4a8b64babd5",
+                "review_depth": "individual-compatibility",
+                "affected_branches": [
+                  "main"
+                ],
+                "decision": "Upstream wraps this._onChange(value) in _handleInput with `if (!this.autocomplete || !this.autocomplete.requireSelection)` so typing does not write the CVA when requireSelection is set. The owned legacy trigger base has the same guard and the same explanatory comment in its _handleInput, so the fix was already present. No candidate change was needed. The upstream example and demo edits are not shipped.",
+                "proof_kind": "candidate-source-line-match",
+                "upstream_file": "src/material/autocomplete/autocomplete-trigger.ts",
+                "candidate_member": {
+                  "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+                  "sha256": "c61178b73599a69247a20dcd3ec2bb62337a46801c70e47a71049cca2911167f"
+                },
+                "added_lines": [
+                  {
+                    "upstream_added": "if (!this.autocomplete || !this.autocomplete.requireSelection) {",
+                    "candidate_lines": [
+                      480
+                    ]
+                  },
+                  {
+                    "upstream_added": "this._onChange(value);",
+                    "candidate_lines": [
+                      481
+                    ]
+                  }
+                ],
+                "read_note": "already-present",
+                "recorded_by": "Grok, FIN-02-C02; Codex validates in FIN-02-C05",
+                "recomputed_by": "scripts/record-candidate-line-proofs.py"
+              }
+            }
           }
         }
       }

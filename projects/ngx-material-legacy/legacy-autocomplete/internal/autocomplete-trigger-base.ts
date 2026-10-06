@@ -60,9 +60,9 @@ import {
   MatAutocompleteDefaultOptions,
   MAT_AUTOCOMPLETE_DEFAULT_OPTIONS,
   MAT_AUTOCOMPLETE_SCROLL_STRATEGY,
-  getMatAutocompleteMissingPanelError,
 } from '@angular/material/autocomplete';
 import {_MatAutocompleteBase} from './autocomplete-base';
+import {getMatAutocompleteMissingPanelError} from '../owned-errors';
 
 /** @docs-private */
 export function MAT_AUTOCOMPLETE_SCROLL_STRATEGY_FACTORY(overlay: Overlay): () => ScrollStrategy {
