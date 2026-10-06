@@ -409,7 +409,7 @@ class CoordinatorTests(unittest.TestCase):
     def test_sass_seal_pending_api_cases_keep_the_report_incomplete(self):
         row, ids = self._real_line_ids("sass-seal")
         api = row["acceptance"]["cases_by_line"]["main"]["sass-api-and-values"]
-        self.assertEqual(len(api), 651 + 57 + 494)
+        self.assertEqual(len(api), 651 + 57 + 498)
         self.assertEqual(row["acceptance"]["cases_by_line"]["main"]["isolation-negatives"],
                          ["archived-import", "mutated-golden", "hidden-resolution", "api-drift"])
         decisions = acceptance.read_json(ROOT / "compatibility/rc/sass-pending-decisions.json")

@@ -17,8 +17,8 @@ import assert from 'node:assert/strict';
 import {mixinArgumentCatalog,mixinArgumentCaseIds,measureMixinArgument,mixinArgumentResultsMatch,runMixinArgumentContracts} from './scripts/sass-mixin-arguments.mjs';
 import {mkdtempSync,mkdirSync,writeFileSync,rmSync} from 'node:fs';
 import {join} from 'node:path';import {tmpdir} from 'node:os';import {pathToFileURL} from 'node:url';
-const catalog=mixinArgumentCatalog();assert.equal(mixinArgumentCaseIds().length,494);
-assert.equal(new Set(catalog.cases.map(p=>p.mixin)).size,247);
+const catalog=mixinArgumentCatalog();assert.equal(mixinArgumentCaseIds().length,498);
+assert.equal(new Set(catalog.cases.map(p=>p.mixin)).size,249);
 const dir=mkdtempSync(join(tmpdir(),'mixin-argument-fence-'));
 try {
  const original=join(dir,'original'),candidate=join(dir,'candidate');mkdirSync(original);mkdirSync(candidate);
@@ -26,7 +26,7 @@ try {
  let calls=0;
  const sass={compileString(program,options){calls++;assert.match(program,/define-palette\(m.\$indigo-palette, 700/);assert.equal(options.style,'expanded');const location=program.includes(pathToFileURL(referenceEntry).href)?referenceEntry:entry;return {css:program.slice(program.indexOf('.sass-argument-probe')),loadedUrls:[pathToFileURL(location)]};}};
  const result=runMixinArgumentContracts({sass,entry,loadPaths:[],allowedRoots:[candidate],line:'main',referenceEntry,referenceRoot:original,identity:{synthetic:true}});
- assert.equal(result.ok,true);assert.equal(calls,988);assert.equal(result.results.every(p=>p.mutation_rejected),true);
+ assert.equal(result.ok,true);assert.equal(calls,996);assert.equal(result.results.every(p=>p.mutation_rejected),true);
  const observed=result.results[0];assert.equal(mixinArgumentResultsMatch(observed.expected,observed.actual),true);
  assert.equal(mixinArgumentResultsMatch(observed.expected,{...observed.actual,css:'wrong'}),false);
  assert.equal(mixinArgumentResultsMatch(observed.expected,observed.mutation),false);
