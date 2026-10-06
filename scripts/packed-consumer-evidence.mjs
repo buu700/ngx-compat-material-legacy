@@ -31,6 +31,8 @@ export const HARNESS_CASE_IDS = [
   'packed-consumer/harness/native-date-provider',
   'packed-consumer/harness/chip-tabindex-attribute',
   'packed-consumer/harness/radio-tabindex-attribute',
+  'packed-consumer/harness/chip-input-backspace-release',
+  'packed-consumer/harness/chip-repeated-removal-and-separator',
   'packed-consumer/harness/owned-resolution',
   'packed-consumer/harness/peer-harness-separate-scope',
 ];

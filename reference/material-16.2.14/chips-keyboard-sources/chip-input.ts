@@ -56,7 +56,6 @@ let nextUniqueId = 0;
  * @breaking-change 17.0.0
  */
 @Directive({
-  standalone: false,
   selector: 'input[matChipInputFor]',
   exportAs: 'matChipInput, matChipInputFor',
   host: {

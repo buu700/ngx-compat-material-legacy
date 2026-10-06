@@ -470,6 +470,8 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
     'packed-consumer/harness/native-date-provider': parsed.nativeDateProvider === true,
     'packed-consumer/harness/chip-tabindex-attribute': parsed.chipTabIndex === 6,
     'packed-consumer/harness/radio-tabindex-attribute': parsed.radioTabIndex === 8,
+    'packed-consumer/harness/chip-input-backspace-release': parsed.chipBackspaceRelease === true,
+    'packed-consumer/harness/chip-repeated-removal-and-separator': parsed.chipRepeatedEvents === true,
   };
   const owned = declarationKeys(keys)
     .filter(key => key.endsWith('/testing'))
@@ -930,6 +932,11 @@ class SmokeDialogContent {}
   template: \`
     <button mat-button id="h">Go</button>
     <mat-chip id="attribute-chip" tabindex="6">Attribute chip</mat-chip>
+    <mat-chip-list #repeatChipList>
+      <mat-chip id="repeat-first">First chip</mat-chip>
+      <mat-chip id="repeat-last" (removed)="repeatRemovals=repeatRemovals+1">Last chip</mat-chip>
+      <input id="repeat-input" [matChipInputFor]="repeatChipList" [matChipInputSeparatorKeyCodes]="[188]" (matChipInputTokenEnd)="repeatEnds=repeatEnds+1">
+    </mat-chip-list>
     <mat-radio-button id="attribute-radio" tabindex="8">Attribute radio</mat-radio-button>
     <mat-form-field>
       <mat-label>Choice</mat-label>
@@ -950,6 +957,8 @@ class SmokeDialogContent {}
   \`,
 })
 class HarnessHost {
+  repeatRemovals=0;
+  repeatEnds=0;
   private readonly _dialog = inject(MatLegacyDialog);
   private readonly _snack = inject(MatLegacySnackBar);
 
@@ -1058,6 +1067,30 @@ async function main() {
   await sleep(30);
   const selected = await (await tabGroup.getSelectedTab()).getLabel();
 
+  // Actual DOM events exercise the original keyup guard and repeated-event contract.
+  const repeatInput=fixture.nativeElement.querySelector('#repeat-input') as HTMLInputElement;
+  const repeatLast=fixture.nativeElement.querySelector('#repeat-last') as HTMLElement;
+  const keyboard=(element:HTMLElement,type:string,keyCode:number,repeat=false)=>{
+    const event=new KeyboardEvent(type,{bubbles:true,cancelable:true,repeat});
+    Object.defineProperty(event,'keyCode',{value:keyCode});
+    element.dispatchEvent(event);fixture.detectChanges();return event;
+  };
+  repeatInput.focus();fixture.detectChanges();
+  repeatInput.value='changed';keyboard(repeatInput,'keydown',65);
+  repeatInput.value='';repeatInput.dispatchEvent(new Event('input',{bubbles:true}));fixture.detectChanges();
+  keyboard(repeatInput,'keydown',8,false);keyboard(repeatInput,'keydown',8,true);
+  const heldDidNotFocus=document.activeElement===repeatInput;
+  keyboard(repeatInput,'keyup',8);
+  const releaseDidNotFocus=document.activeElement===repeatInput;
+  keyboard(repeatInput,'keydown',8,false);
+  const chipBackspaceRelease=heldDidNotFocus&&releaseDidNotFocus&&document.activeElement===repeatLast;
+  const firstRemoval=keyboard(repeatLast,'keydown',8,false);
+  const repeatedRemoval=keyboard(repeatLast,'keydown',8,true);
+  repeatInput.focus();repeatInput.value='separator value';
+  const firstSeparator=keyboard(repeatInput,'keydown',188,false);
+  const repeatedSeparator=keyboard(repeatInput,'keydown',188,true);
+  const chipRepeatedEvents=fixture.componentInstance.repeatRemovals===2&&fixture.componentInstance.repeatEnds===2
+    &&firstRemoval.defaultPrevented&&repeatedRemoval.defaultPrevented&&firstSeparator.defaultPrevented&&repeatedSeparator.defaultPrevented;
   const chipTabIndex = (fixture.nativeElement.querySelector('#attribute-chip') as HTMLElement).tabIndex;
   const radioTabIndex = (fixture.nativeElement.querySelector('#attribute-radio input') as HTMLInputElement).tabIndex;
   const out = {
@@ -1073,7 +1106,7 @@ async function main() {
       selectOpened === true &&
       selectClosed === true &&
       tabCount === 2 &&
-      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8,
+      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents,
     buttonText: text,
     selectIsOpen: isOpen,
     dialogText,
@@ -1090,6 +1123,9 @@ async function main() {
     nativeDateProvider,
     chipTabIndex,
     radioTabIndex,
+    chipBackspaceRelease,
+    chipRepeatedEvents,
+    chipEventCounts:{removals:fixture.componentInstance.repeatRemovals,separators:fixture.componentInstance.repeatEnds},
     harnesses: [
       'MatLegacyButtonHarness',
       'MatLegacySelectHarness',
