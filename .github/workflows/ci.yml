@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.ref }}-${{ github.sha }}
   cancel-in-progress: true
 
 permissions:
@@ -38,6 +38,11 @@ jobs:
 
       - name: verify-lite
         run: just verify-lite
+
+      - name: Closeout handoff integrity
+        run: |
+          python3 -B compatibility/handoff/codex-closeout/tools/validate_handoff.py
+          python3 -B -m unittest discover -s compatibility/handoff/codex-closeout/tools -p 'test_*.py'
 
       - name: Motion lifecycle smoke
         run: just chainman run motion-smoke

@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Actual audit or closeout finding",
+  "description": "Field guide for real execution records. Presence/schema validity is not evidence or authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_commit": {
+      "type": "string",
+      "minLength": 1
+    },
+    "line": {
+      "enum": [
+        "main",
+        "21.x",
+        "both"
+      ]
+    },
+    "paths": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "gates": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "severity": {
+      "enum": [
+        "critical",
+        "high",
+        "medium",
+        "low",
+        "informational"
+      ]
+    },
+    "expected": {
+      "type": "string",
+      "minLength": 1
+    },
+    "observed": {
+      "type": "string",
+      "minLength": 1
+    },
+    "impact": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reproduction_or_evidence": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "root_cause": {
+      "type": "string",
+      "minLength": 1
+    },
+    "repair_or_decision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "required_authority": {
+      "type": "string",
+      "minLength": 1
+    },
+    "retest": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "reviewer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "final_source": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": [
+        "open",
+        "fixed-unverified",
+        "verified-fixed",
+        "nonblocking-disposition",
+        "owner-blocked"
+      ]
+    }
+  },
+  "required": [
+    "id",
+    "title",
+    "source_commit",
+    "line",
+    "paths",
+    "gates",
+    "severity",
+    "expected",
+    "observed",
+    "impact",
+    "reproduction_or_evidence",
+    "root_cause",
+    "repair_or_decision",
+    "required_authority",
+    "retest",
+    "reviewer",
+    "final_source",
+    "status"
+  ]
+}

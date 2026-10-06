@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Actual compatibility or risk decision",
+  "description": "Field guide for real execution records. Presence/schema validity is not evidence or authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "kind": {
+      "enum": [
+        "contract-interpretation",
+        "compatibility-deviation",
+        "security-risk",
+        "minimum-age",
+        "publication",
+        "cyph-admission"
+      ]
+    },
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "lines": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "original_inputs": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "candidate_inputs": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "rationale": {
+      "type": "string",
+      "minLength": 1
+    },
+    "alternatives": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "regressions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "technical_reviewer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "owner_authority_required": {
+      "type": "boolean"
+    },
+    "original_authority_reference": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "scope_and_limits": {
+      "type": "string",
+      "minLength": 1
+    },
+    "expires_or_revokes": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": [
+        "proposed",
+        "pending-authority",
+        "denied",
+        "technically-resolved-within-contract",
+        "authorized-and-validated"
+      ]
+    }
+  },
+  "required": [
+    "id",
+    "kind",
+    "cases",
+    "lines",
+    "original_inputs",
+    "candidate_inputs",
+    "rationale",
+    "alternatives",
+    "regressions",
+    "technical_reviewer",
+    "owner_authority_required",
+    "original_authority_reference",
+    "scope_and_limits",
+    "expires_or_revokes",
+    "status"
+  ]
+}

@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "One actual audited scope record",
+  "description": "Field guide for real execution records. Presence/schema validity is not evidence or authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "scope_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "audit_domain": {
+      "enum": [
+        "A01",
+        "A02",
+        "A03",
+        "A04",
+        "A05",
+        "A06",
+        "A07",
+        "A08",
+        "A09",
+        "A10"
+      ]
+    },
+    "paths": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "line": {
+      "enum": [
+        "main",
+        "21.x",
+        "shared-content"
+      ]
+    },
+    "source_commit": {
+      "type": "string",
+      "minLength": 1
+    },
+    "content_identities": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "origin": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reference_identity": {
+      "type": "string",
+      "minLength": 1
+    },
+    "review_method": {
+      "enum": [
+        "contextual-semantic",
+        "authenticated-inheritance",
+        "generator-and-output",
+        "exact-homogeneous-batch"
+      ]
+    },
+    "reviewer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "review_independence": {
+      "enum": [
+        "separate-context",
+        "separate-reviewer",
+        "same-agent-explicit"
+      ]
+    },
+    "rationale": {
+      "type": "string",
+      "minLength": 1
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "tests_and_evidence": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "remaining_scope": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "state": {
+      "enum": [
+        "unreviewed",
+        "in_progress",
+        "reviewed",
+        "blocked"
+      ]
+    }
+  },
+  "required": [
+    "scope_id",
+    "audit_domain",
+    "paths",
+    "line",
+    "source_commit",
+    "content_identities",
+    "origin",
+    "reference_identity",
+    "review_method",
+    "reviewer",
+    "review_independence",
+    "rationale",
+    "findings",
+    "tests_and_evidence",
+    "remaining_scope",
+    "state"
+  ]
+}
