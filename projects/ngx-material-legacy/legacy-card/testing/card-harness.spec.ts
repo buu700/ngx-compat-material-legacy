@@ -1,5 +1,5 @@
 import {MatLegacyCardModule} from '@ngx-compat/material-legacy/legacy-card';
-import {runHarnessTests} from '@angular/material/card/testing/shared.spec';
+import {runHarnessTests} from '../../../../testing/legacy-runner/shims/harness/card/shared.spec.ts';
 import {MatLegacyCardHarness, MatLegacyCardSection} from './card-harness';
 
 describe('Non-MDC-based MatCardHarness', () => {

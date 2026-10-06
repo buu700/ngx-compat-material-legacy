@@ -1,5 +1,5 @@
 import {MatLegacyOptionModule} from '@ngx-compat/material-legacy/legacy-core';
-import {runHarnessTests} from '@angular/material/core/testing/optgroup-shared.spec';
+import {runHarnessTests} from '../../../../testing/legacy-runner/shims/harness/core/optgroup-shared.spec.ts';
 import {MatLegacyOptgroupHarness} from './optgroup-harness';
 
 describe('Non-MDC-based MatOptgroupHarness', () => {

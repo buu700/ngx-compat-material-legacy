@@ -1,5 +1,5 @@
 import {MatLegacyButtonModule} from '@ngx-compat/material-legacy/legacy-button';
-import {runHarnessTests} from '@angular/material/button/testing/shared.spec';
+import {runHarnessTests} from '../../../../testing/legacy-runner/shims/button-shared.spec.ts';
 import {MatLegacyButtonHarness} from './button-harness';
 
 describe('Non-MDC-based MatLegacyButtonHarness', () => {

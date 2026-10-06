@@ -13,7 +13,7 @@ import {MatLegacySelectModule} from '@ngx-compat/material-legacy/legacy-select';
 import {MatLegacySelectHarness} from '@ngx-compat/material-legacy/legacy-select/testing';
 
 import {MatLegacyFormFieldHarness} from './form-field-harness';
-import {runHarnessTests} from '@angular/material/form-field/testing/shared.spec';
+import {runHarnessTests} from '../../../../testing/legacy-runner/shims/harness/form-field/shared.spec.ts';
 
 describe('Non-MDC-based MatFormFieldHarness', () => {
   runHarnessTests(
