@@ -78,3 +78,15 @@ class PeerAnnotationTests(unittest.TestCase):
                 (authored/'use.ts').write_text("import {Absent} from '@angular/material/dialog';")
                 result,case=self.observe(authored,peers);self.assertEqual(case['result'],'fail')
                 self.assertEqual(result['annotation_unresolved_exports'][0]['name'],'Absent')
+
+    def test_public_cross_package_reexport_follows_actual_declaration(self):
+        authored,peers=self.fixture();directory=peers/'material'
+        (directory/'index.d.ts').write_text("export {OLD_MOTION as ForwardedMotion} from '@angular/core';\n")
+        (authored/'use.ts').write_text("import {ForwardedMotion} from '@angular/material/dialog';")
+        result,case=self.observe(authored,peers);self.assertEqual(case['result'],'fail')
+        self.assertEqual(result['annotation_deprecated_hits'][0]['declaration_package'],'@angular/core')
+        self.assertEqual(result['annotation_deprecated_hits'][0]['declaration_name'],'OLD_MOTION')
+        (directory/'index.d.ts').write_text("export {ForwardedMotion} from '@angular/cdk';\n")
+        (peers/'cdk/index.d.ts').write_text("export {ForwardedMotion} from '@angular/material/dialog';\n")
+        result,case=self.observe(authored,peers);self.assertEqual(case['result'],'fail')
+        self.assertEqual(result['annotation_unresolved_exports'][0]['name'],'ForwardedMotion')
