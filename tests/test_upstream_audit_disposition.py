@@ -350,5 +350,34 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
                     self.assertIn("".join(text.split()), "".join(lines[number - 1].split()), (entry["sha"], number))
 
 
+    def test_execution_observation_covers_every_inherited_row_and_matches_groups(self) -> None:
+        observation = json.loads((ROOT / "compatibility/f10/audit-join/delegated-execution.json").read_text())
+        self.assertEqual(observation["line"], "main")
+        self.assertEqual(observation["g11_claim"], "not-passed")
+        self.assertGreater(observation["environment"]["run"]["executed"], 2000)
+        rows = {row["sha"]: row for row in observation["rows"]}
+        ledger = json.loads(LEDGER.read_text())["entries"]
+        inherited = {e["sha"] for e in ledger if e["final_disposition"] == "inherited" and not e.get("individual_proof")}
+        self.assertEqual(inherited, set(rows))
+        statuses = {"all-added-lines-present-and-executed", "some-added-lines-executed", "present-not-executed",
+                    "added-lines-not-found-in-installed-source", "delegated-module-not-in-candidate-bundle",
+                    "no-script-delegated-source", "no-significant-added-lines"}
+        for sha, row in rows.items():
+            self.assertIn(row["status"], statuses)
+            self.assertLessEqual(row["executed"], row["found_in_installed_source"])
+            self.assertLessEqual(row["found_in_installed_source"], row["added_lines"])
+            if row["status"] == "all-added-lines-present-and-executed":
+                self.assertEqual(row["executed"], row["added_lines"], sha)
+                for file in row["files"]:
+                    if file["added_lines"]:
+                        self.assertRegex(file["installed_member"]["sha256"], r"^[0-9a-f]{64}$")
+        queue = json.loads(QUEUE.read_text())
+        for group in queue["groups"]:
+            for sha in group["members"]:
+                self.assertEqual(rows[sha]["status"], group["execution_status"], sha)
+        # An observation is evidence for review, never an individual proof.
+        self.assertFalse(any((e.get("individual_proof") or {}).get("reachable_behavior") for e in ledger))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -267,6 +267,16 @@ class Context:
                     self.notes[item["sha"]] = {"source": rel, **item}
         log = git(upstream, "log", "--format=%s", "16.2.14").decode(errors="replace")
         self.prs_16 = set(PR_NUMBER.findall(log))
+        execution = ROOT / "compatibility/f10/audit-join/delegated-execution.json"
+        self.execution = {}
+        if execution.is_file():
+            for item in json.loads(execution.read_text())["rows"]:
+                members = sorted({(f["installed_member"]["path"], f["installed_member"]["sha256"]) for f in item["files"] if f.get("installed_member")})
+                self.execution[item["sha"]] = {
+                    "source": "compatibility/f10/audit-join/delegated-execution.json", "line": "main", "status": item["status"],
+                    "added_lines": item["added_lines"], "found_in_installed_source": item["found_in_installed_source"],
+                    "executed": item["executed"], "installed_members": [{"path": path, "sha256": digest} for path, digest in members],
+                }
         self.specs = defaultdict(list)
         for spec in sorted(PACKAGE.rglob("*.spec.ts")):
             if "node_modules" in spec.parts:
@@ -363,6 +373,13 @@ def review_note(row: dict, category: str, priority: int, ctx: Context) -> dict:
             proposal = (f"The delegated change has no significant added lines (comments, removals or trivial lines only) and touches no owned source; "
                         f"read note {note['disposition']}. Proposed: no runtime behavior for the candidate to carry; record that individually.")
             alternatives = ["A removal can still change behavior; confirm nothing the candidate calls was removed."]
+        elif final in INHERITED and ctx.execution.get(sha, {}).get("status") == "all-added-lines-present-and-executed":
+            kind = "unavailable-evidence"
+            observed = ctx.execution[sha]
+            proposal = (f"Inherited on main: all {observed['added_lines']} significant delegated added lines are in the installed 22.1.7 source "
+                        f"({', '.join(m['path'] for m in observed['installed_members'])}) and their enclosing functions executed in the candidate's legacy spec run. "
+                        "21.x is not observed, and the a11y semantics still need an individual read.")
+            alternatives = ["Owned code may shadow the delegated member; if so, the fix needs an owned port instead."]
         elif final in INHERITED and all(info["delegated_added_lines"] and info["delegated_added_lines_present_in_installed_floor"] == info["delegated_added_lines"] for info in row["lines"].values()):
             kind = "unavailable-evidence"
             proposal = f"Inherited from the installed floors (all added delegated lines found on both lines: {line_counts}). The executed delegation is still missing."
@@ -391,6 +408,12 @@ def review_note(row: dict, category: str, priority: int, ctx: Context) -> dict:
             kind = "unavailable-evidence"
             proposal = f"No candidate file is cited by the read note ({note['source']}); the claim '{final}' cannot be checked mechanically."
             alternatives = ["Locate the owned counterpart and cite its lines.", "Record that the change has no owned counterpart and reclassify."]
+    elif category == "question-added-lines-absent-on-a-line" and ctx.execution.get(sha, {}).get("status") == "all-added-lines-present-and-executed":
+        kind = "unavailable-evidence"
+        proposal = (f"The compiled-text check missed lines ({line_counts}), but on main all {ctx.execution[sha]['added_lines']} added lines are in the installed "
+                    "22.1.7 original source, and their enclosing functions executed in the candidate's legacy spec run. The miss is a compilation artifact. "
+                    "Proposed: inherited on main. 21.x is not observed.")
+        alternatives = ["If 21.x lacks the fix (ancestry " + str(row["lines"]["21.x"]["sha_is_ancestor_of_floor_tag"]) + "), the row is not inherited there."]
     elif category == "question-added-lines-absent-on-a-line":
         kind = "ambiguity"
         proposal = f"Inherited, but delegated added lines per line are {line_counts}; ancestry " + ", ".join(f"{line}={info['sha_is_ancestor_of_floor_tag']}" for line, info in row["lines"].items()) + ". Compiled output may differ from source, so absence is a question."
@@ -423,6 +446,7 @@ def review_note(row: dict, category: str, priority: int, ctx: Context) -> dict:
         "candidate_references": refs,
         "contradictions": contradictions,
         **({"reviewer_observation": OBSERVATIONS[sha]} if sha in OBSERVATIONS else {}),
+        **({"executed_delegation_observation": ctx.execution[sha]} if sha in ctx.execution else {}),
         "proposed_conclusion": proposal,
         "alternatives": alternatives,
         "regression_impact": {"candidate_specs": tests, "count": len(tests)},
@@ -434,6 +458,28 @@ GROUP_REASONING = {
     "consistent-added-lines-present-both-lines": "Every member is inherited from this delegated module set, and all of its significant delegated added lines are present in both installed floors.",
     "partial-added-lines-present": "Every member is inherited from this delegated module set, and some but not all of its significant delegated added lines are present on each line (none is absent on a whole line).",
     "question-no-significant-added-lines": "Every member is inherited from this delegated module set, and its delegated change has no significant added lines to look for (removals, renames or trivial lines only).",
+}
+
+
+EXECUTION_REASONING = {
+    "all-added-lines-present-and-executed": "On main, every significant delegated added line is in the installed 22.1.7 source and its enclosing function executed during the candidate's legacy spec run.",
+    "some-added-lines-executed": "On main, some significant delegated added lines are in the installed 22.1.7 source and executed during the candidate's legacy spec run; others were not found or did not execute.",
+    "present-not-executed": "On main, the added lines are in the installed 22.1.7 source, but no enclosing function executed during the candidate's legacy spec run.",
+    "added-lines-not-found-in-installed-source": "On main, none of the significant added lines is found verbatim in the installed 22.1.7 original source (refactored or superseded since).",
+    "delegated-module-not-in-candidate-bundle": "On main, the delegated TypeScript module is not part of the candidate's legacy spec bundle at all.",
+    "no-script-delegated-source": "The delegated change touches only styles, build or other non-TypeScript files, so script execution cannot observe it.",
+    "no-significant-added-lines": "The delegated TypeScript change has no significant added lines to observe.",
+    "not-observed": "No execution observation exists for this row.",
+}
+EXECUTION_PROPOSAL = {
+    "all-added-lines-present-and-executed": "Inherited on main (installed member hash and executed lines are in delegated-execution.json). 21.x still needs the same observation on its floor.",
+    "some-added-lines-executed": "Probably inherited. Codex decides whether the unexecuted or missing lines are part of the fix; 21.x needs its own observation.",
+    "present-not-executed": "The fix is present in the floor but the candidate's specs do not reach it. Add a spec that exercises the delegated member, or accept presence without execution as a documented limitation.",
+    "added-lines-not-found-in-installed-source": "Find the superseding form in the installed source and cite it, or treat the row as not inherited on that line.",
+    "delegated-module-not-in-candidate-bundle": "The candidate's specs never load this module. Show that the candidate reaches it at runtime, or reclassify the row as not reached.",
+    "no-script-delegated-source": "Needs a rendered or compiled style observation (for example sass-seal or computed-style evidence) instead of script coverage.",
+    "no-significant-added-lines": "Confirm that the removal or rename does not affect anything the candidate calls, then record that individually.",
+    "not-observed": "Inherited. Add one executed-delegation observation per delegated member, plus the installed member hash for each line.",
 }
 
 
@@ -471,15 +517,16 @@ def write_queue(rows: list[dict], report: dict, ctx: Context) -> dict:
                 and "inherited-without-installed-member-and-executed-delegation" in row["defects"]:
             items.append(review_note(row, c["status"], 4, ctx))
         elif "inherited-without-installed-member-and-executed-delegation" in row["defects"]:
-            groups[(c["status"], ", ".join(c["delegated_modules"]))].append(row["sha"])
+            observed = ctx.execution.get(row["sha"], {}).get("status", "not-observed")
+            groups[(c["status"], observed, ", ".join(c["delegated_modules"]))].append(row["sha"])
     group_items = [{
         "priority": 5, "category": "inherited-delegation", "question_kind": "unavailable-evidence",
-        "mechanical_status": status, "delegated_modules": modules, "members": sorted(members), "member_count": len(members),
-        "identical_reasoning": GROUP_REASONING[status] + " Each lacks only installed_member and an executed delegation (per-row counts in join.json).",
-        "proposed_conclusion": "Inherited. Add one executed-delegation observation per delegated member, plus the installed member hash for each line.",
+        "mechanical_status": status, "execution_status": observed, "delegated_modules": modules, "members": sorted(members), "member_count": len(members),
+        "identical_reasoning": GROUP_REASONING[status] + " " + EXECUTION_REASONING[observed] + " Per-row counts are in join.json and delegated-execution.json.",
+        "proposed_conclusion": EXECUTION_PROPOSAL[observed],
         "regression_impact": {"candidate_specs": sorted({t for sha in members for t in ctx.regression_tests(next(r for r in rows if r["sha"] == sha))})},
         "decision_requested": "Accept the executed-delegation evidence when it is supplied. A member whose observation fails leaves the group.",
-    } for (status, modules), members in sorted(groups.items())]
+    } for (status, observed, modules), members in sorted(groups.items())]
     for group in group_items:
         group["regression_impact"]["count"] = len(group["regression_impact"]["candidate_specs"])
     items.sort(key=lambda item: (item["priority"], {"contradiction": 0, "authority": 0, "ambiguity": 1, "unavailable-evidence": 2}[item["question_kind"]], item["sha"]))
