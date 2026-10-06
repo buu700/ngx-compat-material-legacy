@@ -12,6 +12,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -27,7 +28,7 @@ if str(Path(__file__).resolve().parent) not in sys.path:
 from rc_acceptance import (
     CHECK_CONTRACT, EvidenceError, binding_for, evaluate_run, read_json,
     validate_matrix, checked_file, sha256_file as evidence_sha256,
-    assertion_directory, prepack_binding_for,
+    assertion_directory, expected_cases, prepack_binding_for,
 )
 from archive_run_closure import ClosureError, write_closure
 
@@ -60,6 +61,7 @@ SCRIPT_CHECKS = {
     "scripts/build-migrate-legacy-cli.mjs": "migration-packaged",
     "scripts/migration-cli-isolation.mjs": "migration-packaged",
     "scripts/rc-test-legacy-family.mjs": "historical-legacy-artifact",
+    "scripts/check-release-metadata.mjs": "release-metadata",
 }
 
 
@@ -595,6 +597,255 @@ def write_check_report(
     report_path.write_text(json.dumps(payload, indent=2) + "\n")
 
 
+
+_MIGRATION_RESERVED_NAMES = {
+    "run.json", "execution-record.json", "pack-execution.json", "pack-meta.json", "full-verify.json",
+}
+
+
+def _reserved_evidence(run_dir: Path) -> set[tuple[str, int]]:
+    found: set[tuple[str, int]] = set()
+    for name in _MIGRATION_RESERVED_NAMES:
+        path = run_dir / name
+        if path.is_file() and not path.is_symlink():
+            found.add((evidence_sha256(path), path.stat().st_size))
+    return found
+
+
+_LINE_COORDINATOR_LIMITATIONS = {
+    "release-metadata": [
+        "Coordinator report for the line being verified. Each rostered 21.x case has an assertion file written by this run.",
+        "instructions-provenance rosters only provenance fields that were compared. No instruction file was compared.",
+        "Main release-metadata groups stay null on this branch. A 21.x run does not copy main proofs.",
+        "This report is the acceptance input. It does not add a G01 or G13 claim field.",
+    ],
+    "companion-bridge-tokens": [
+        "Coordinator report for the line being verified. Each rostered 21.x token has an assertion file written by this run.",
+        "Each assertion compares the compiled public bridge custom property with the installed current @angular/material peer's own M2 theme output compiled in the same invocation. Historical v16 output is not the oracle.",
+        "Compiled CSS custom properties only. No rendered computed styles; companion-computed-styles stays a separate check.",
+        "Main companion-bridge-tokens groups stay null on this branch. A 21.x run does not copy main proofs.",
+        "This report is the acceptance input. It does not add a G06, G07 or G08 claim field.",
+    ],
+}
+
+
+def _contract_artifacts(row: dict) -> dict | None:
+    subjects = row["acceptance"]["subject_ids"]
+    if not isinstance(subjects, list) or not subjects:
+        return None
+    wanted = [aid for aid in subjects if aid != "source"]
+    by_id: dict = {}
+    for item in ACTIVE_RUN.manifest.get("artifacts", []):
+        aid = item.get("id")
+        if aid not in wanted:
+            continue
+        if aid in by_id:
+            return None
+        digest = item.get("sha256")
+        size = item.get("bytes")
+        if not isinstance(digest, str) or type(size) is not int or size <= 0:
+            return None
+        by_id[aid] = {"sha256": digest, "bytes": size}
+    if set(by_id) != set(wanted):
+        return None
+    return {aid: by_id[aid] for aid in wanted}
+
+
+def _roster_assertion_records(run_dir: Path, check_id: str, invocation: str, expected: list[str]) -> dict | None:
+    prefix = assertion_directory(check_id, invocation)
+    directory = run_dir / prefix
+    if not directory.is_dir() or directory.is_symlink():
+        return None
+    reserved = _reserved_evidence(run_dir)
+    allowed = set(expected)
+    found: dict = {}
+    for path in sorted(directory.iterdir()):
+        if not path.is_file() or path.is_symlink() or path.stat().st_nlink != 1:
+            continue
+        if path.name in _MIGRATION_RESERVED_NAMES or path.suffix != ".json":
+            continue
+        if path.name.endswith((".sha256", ".sha512", ".sha1")):
+            continue
+        identity = (evidence_sha256(path), path.stat().st_size)
+        if identity in reserved:
+            continue
+        try:
+            body = read_json(path)
+        except EvidenceError:
+            continue
+        case_id = body.get("case_id")
+        if body.get("result") != "pass" or body.get("kind") != "assertion":
+            continue
+        if not isinstance(case_id, str) or case_id not in allowed or case_id in found:
+            if isinstance(case_id, str) and case_id in found:
+                return None
+            continue
+        body_check = _ASSERTION_BODY_CHECKS.get(check_id)
+        if body_check is not None and not body_check(body, invocation):
+            continue
+        relative = path.relative_to(run_dir).as_posix()
+        if not relative.startswith(prefix + "/"):
+            continue
+        found[case_id] = {"path": relative, "sha256": identity[0], "bytes": identity[1]}
+    if set(found) != allowed:
+        return None
+    return found
+
+
+_PEER_SOURCE_FILE = re.compile(r"^([a-z0-9-]+)/_m2-\1\.scss$")
+
+
+def _current_peer_version(package: str) -> str | None:
+    for item in (ACTIVE_RUN.manifest.get("oracles") or {}).get("current_peer") or []:
+        if isinstance(item, dict) and item.get("id") == package:
+            version = item.get("version")
+            return version if isinstance(version, str) and version else None
+    return None
+
+
+def _bridge_token_assertion_ok(body: dict, invocation: str) -> bool:
+    case_id = body.get("case_id")
+    component = body.get("component")
+    key = body.get("allowed_key")
+    if not all(isinstance(v, str) and v for v in (case_id, component, key)):
+        return False
+    if body.get("token") != case_id or case_id != f"--mat-{component}-{key}":
+        return False
+    if body.get("run_id") != ACTIVE_RUN.manifest.get("run_id") or body.get("invocation_id") != invocation:
+        return False
+    if body.get("peer_package") != "@angular/material":
+        return False
+    peer_version = _current_peer_version("@angular/material")
+    if peer_version is None or body.get("peer_version") != peer_version:
+        return False
+    source = body.get("peer_source_file")
+    match = _PEER_SOURCE_FILE.fullmatch(source) if isinstance(source, str) else None
+    if match is None or match.group(1) != component:
+        return False
+    if not (isinstance(body.get("peer_source_sha256"), str) and re.fullmatch(r"[0-9a-f]{64}", body["peer_source_sha256"])):
+        return False
+    expected, candidate = body.get("expected_peer"), body.get("candidate")
+    if not (isinstance(expected, str) and expected and candidate == expected):
+        return False
+    scenarios = body.get("scenarios")
+    if not isinstance(scenarios, list) or not scenarios:
+        return False
+    for scenario in scenarios:
+        checks = scenario.get("selector_checks") if isinstance(scenario, dict) else None
+        if scenario.get("match") is not True or not isinstance(checks, list) or not checks:
+            return False
+        for check in checks:
+            if not isinstance(check, dict) or check.get("match") is not True:
+                return False
+            value = check.get("expected_peer")
+            if not (isinstance(value, str) and value and check.get("candidate") == value):
+                return False
+    return True
+
+
+_ASSERTION_BODY_CHECKS = {
+    "companion-bridge-tokens": _bridge_token_assertion_ok,
+}
+
+
+def _complete_line_report(run_dir: Path, run_id: str, check_id: str) -> dict | None:
+    """Coverage complete for the run's source line when that line's roster is resolved."""
+    if ACTIVE_RUN is None or check_id not in _LINE_COORDINATOR_LIMITATIONS:
+        return None
+    line = ACTIVE_RUN.manifest.get("source", {}).get("line")
+    if line not in ("main", "21.x"):
+        return None
+    matrix = read_json(MATRIX_PATH)
+    row = validate_matrix(matrix)[check_id]
+    groups = row["acceptance"]["cases_by_line"].get(line)
+    if not isinstance(groups, dict) or any(ids is None for ids in groups.values()):
+        return None
+    expected = expected_cases(row, line)
+    invocation = ACTIVE_RUN.invocation(check_id)
+    records = _roster_assertion_records(run_dir, check_id, invocation, expected)
+    artifacts = _contract_artifacts(row)
+    if records is None or artifacts is None:
+        return None
+    outputs = []
+    seen: set[str] = set()
+    case_results = []
+    for case_id in expected:
+        record = records[case_id]
+        if record["path"] not in seen:
+            outputs.append(record)
+            seen.add(record["path"])
+        case_results.append({
+            "case_id": case_id,
+            "result": "pass",
+            "kind": "assertion",
+            "output_paths": [record["path"]],
+        })
+    spec = row["acceptance"]
+    return {
+        "schema_version": 1,
+        "template": False,
+        "run_id": run_id,
+        "check_id": check_id,
+        "line": line,
+        "invocation_id": invocation,
+        "binding": ACTIVE_RUN.binding,
+        "coverage": "complete",
+        "result": "pass",
+        "exit_code": 0,
+        "subject_kind": spec["subject_kind"],
+        "subject_ids": list(spec["subject_ids"]),
+        "artifacts": artifacts,
+        "expected_case_ids": expected,
+        "discovered_case_ids": list(expected),
+        "executed_case_ids": list(expected),
+        "passed_case_ids": list(expected),
+        "failed_case_ids": [],
+        "skipped_case_ids": [],
+        "unresolved_case_ids": [],
+        "exceptions": [],
+        "passed": len(expected),
+        "failed": 0,
+        "skipped": 0,
+        "outputs": outputs,
+        "case_results": case_results,
+        "command": ["rc-verify.py", check_id],
+        "limitations": list(_LINE_COORDINATOR_LIMITATIONS[check_id]),
+    }
+
+
+def write_line_coordinator_report(
+    run_dir: Path,
+    run_id: str,
+    line: str,
+    check_id: str,
+    *,
+    exit_code: int,
+    limitations: list[str] | None = None,
+) -> None:
+    """Complete when this run's line has a resolved roster and every assertion passes."""
+    if check_id not in _LINE_COORDINATOR_LIMITATIONS:
+        raise EvidenceError(f"no line coordinator report for {check_id}")
+    report_path = run_dir / "reports" / f"{check_id}.json"
+    complete = _complete_line_report(run_dir, run_id, check_id) if exit_code == 0 else None
+    if complete is None:
+        write_check_report(
+            run_dir, run_id, line, check_id,
+            exit_code=exit_code, limitations=limitations,
+        )
+        return
+    reports = report_path.parent
+    reports.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(json.dumps(complete, indent=2) + "\n")
+    before = report_path.read_bytes()
+    write_check_report(
+        run_dir, run_id, line, check_id,
+        exit_code=exit_code, limitations=limitations,
+    )
+    if report_path.read_bytes() != before:
+        raise EvidenceError(f"write_check_report overwrote a complete {check_id} report")
+
+
+
 def main() -> int:
     global ACTIVE_RUN
     ACTIVE_RUN = None
@@ -765,17 +1016,18 @@ def main() -> int:
     results["sass-seal"] = "pass" if code == 0 else "fail"
     implemented_ran.append("sass-seal")
 
-    # companion-bridge-tokens: compiled per-companion override token receipts (not G07).
+    # companion-bridge-tokens: compiled bridge tokens vs the in-run current-peer M2 oracle (not G07).
     code = run_node("scripts/check-companion-bridges.mjs", [])
-    write_check_report(
+    write_line_coordinator_report(
         out_dir,
         run_id,
         line,
         "companion-bridge-tokens",
         exit_code=code,
         limitations=[
-            "Compiled token inventory only; no rendered computed styles.",
-            "Does not claim G06-G08.",
+            "Inventories compiled --mat-* override tokens per companion against owned allowed lists.",
+            "Complete only when every rostered 21.x token has a passing peer-oracle assertion from this run.",
+            "Does not claim G06–G08 / RC-05-A02.",
         ],
     )
     results["companion-bridge-tokens"] = "pass" if code == 0 else "fail"
@@ -929,6 +1181,26 @@ def main() -> int:
     )
     results["dependency-eligibility"] = "pass" if code == 0 else "fail"
     implemented_ran.append("dependency-eligibility")
+
+    # release-metadata: declared name/version/license/provenance for this line.
+    code = run_node(
+        "scripts/check-release-metadata.mjs",
+        ["--out", str(out_dir / "release-metadata-workspace.json")],
+    )
+    write_line_coordinator_report(
+        out_dir,
+        run_id,
+        line,
+        "release-metadata",
+        exit_code=code,
+        limitations=[
+            "Compares declared library and migrate-cli name, version, and license fields, plus the existing provenance file.",
+            "Main release-metadata groups stay null on this branch. A 21.x run does not copy main proofs.",
+            "Does not mark release-metadata approved. Does not claim G01 or G13.",
+        ],
+    )
+    results["release-metadata"] = "pass" if code == 0 else "fail"
+    implemented_ran.append("release-metadata")
 
     missing: list[str] = []
     failed: list[str] = []

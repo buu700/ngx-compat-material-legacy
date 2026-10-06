@@ -12,8 +12,8 @@
  * Does not rewrite the library version. Does not roster a provenance field that
  * does not match. Does not add an instruction case id. Does not claim G01 or G13.
  * Does not mark release-metadata approved. Main groups are not filled.
- * Coverage stays a slice: this is not a coverage-complete coordinator report,
- * so the matrix implemented flag stays false.
+ * The workspace diagnostic stays a slice. The coordinator assembles coverage
+ * complete from assertion files when the 21.x roster passes.
  */
 import {createHash} from 'node:crypto';
 import {existsSync, lstatSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
@@ -528,7 +528,7 @@ function main(argv) {
       'A provenance field that does not match is not rostered.',
       'No instruction file was compared. No instruction case id was added.',
       'Main release-metadata groups are left untouched.',
-      'Coverage is a slice. This file is not a coverage-complete 21.x coordinator report. implemented stays false.',
+      'This workspace diagnostic stays a slice. The coordinator assembles coverage-complete from assertion files.',
       'Does not mark release-metadata approved. Does not claim G01 or G13.',
     ],
   };
