@@ -828,6 +828,13 @@ _LINE_COORDINATOR_LIMITATIONS = {
         "21.x companion-bridge-tokens groups stay null. A main run does not copy them and does not call expected_cases for 21.x.",
         "This report is the acceptance input. It does not add a G06, G07 or G08 claim field.",
     ],
+    "sass-seal": [
+        "Coordinator report for the line being verified. Each rostered main case needs a passing assertion file written by this run against the run library tarball.",
+        "sass-api-and-values is the predeclared Material 16.2.14 Sass inventory in compatibility/rc/oracles/material-16.2.14-sass-api.json: variable values, function and mixin signatures, invoked mixin CSS digests and aggregate membership/order.",
+        "Cases matching a recorded pending decision in compatibility/rc/sass-pending-decisions.json write no assertion. Pending decisions are owner-visible blockers, so the report stays an incomplete slice until each is decided and resolved.",
+        "21.x sass-seal groups stay null. A main run does not copy them and does not call expected_cases for 21.x.",
+        "This report is the acceptance input. It does not add a G06 or G08 claim field.",
+    ],
     "companion-computed-styles": [
         "Coordinator report for the line being verified. Each rostered main case has exactly one assertion file written by this run.",
         "Each assertion compares the candidate rendered computed value with the computed value from the installed current @angular/material peer oracle recorded for this run. Historical v16 output is not the oracle.",
@@ -1190,7 +1197,33 @@ def _m3_assertion_ok(body: dict, invocation: str) -> bool:
     return True
 
 
+SASS_API_ORACLE = ROOT / "compatibility/rc/oracles/material-16.2.14-sass-api.json"
+_SASS_API_PREFIXES = ("variable/", "function/", "mixin/", "mixin-css/", "aggregate/")
+
+
+def _sass_seal_assertion_ok(body: dict, invocation: str) -> bool:
+    """sass-api-and-values assertions must bind this run, invocation, library and oracle.
+
+    Ordered-CSS and isolation-negative ids carry no API prefix and keep their
+    existing assertion bodies.
+    """
+    case_id = body.get("case_id")
+    if not isinstance(case_id, str) or not case_id.startswith(_SASS_API_PREFIXES):
+        return True
+    if body.get("group") != "sass-api-and-values" or body.get("check_id") != "sass-seal" or body.get("line") != "main":
+        return False
+    if body.get("run_id") != ACTIVE_RUN.manifest.get("run_id") or body.get("invocation_id") != invocation:
+        return False
+    library = [a for a in ACTIVE_RUN.manifest.get("artifacts", []) if a.get("id") == "library"]
+    if len(library) != 1 or body.get("tarball_sha256") != library[0].get("sha256"):
+        return False
+    if not SASS_API_ORACLE.is_file() or body.get("oracle_sha256") != evidence_sha256(SASS_API_ORACLE):
+        return False
+    return True
+
+
 _ASSERTION_BODY_CHECKS = {
+    "sass-seal": _sass_seal_assertion_ok,
     "companion-bridge-tokens": _bridge_token_assertion_ok,
     "companion-computed-styles": _computed_style_assertion_ok,
     "m3-coexistence": _m3_assertion_ok,
@@ -1481,18 +1514,20 @@ def main() -> int:
     results["migration-packaged"] = "pass" if code == 0 else "fail"
     implemented_ran.append("migration-packaged")
 
-    # sass-seal: peer-aware packed Sass isolation + sealed values + archived negative.
+    # sass-seal: packed Sass API inventory, ordered CSS and isolation negatives.
+    # Recorded pending decisions write no assertion, so the coordinator report
+    # stays an incomplete slice while any decision is open.
     code = run_node("scripts/sass-seal.mjs", ["--run", str(run_path)])
-    write_check_report(
+    write_line_coordinator_report(
         out_dir,
         run_id,
         line,
         "sass-seal",
         exit_code=code,
         limitations=[
-            "Peer-aware packed facade compile, three sealed value fixtures, archived @material import negative, mutated sealed-CSS negative, and the finite exact ordered-CSS fixtures.",
-            "Does not execute sass-api-and-values, unresolved strict CSS diffs, DOM, or 21.x. Does not mark sass-seal accepted.",
-            "Does not close companion bridge computed styles or G06-G08.",
+            "Peer-aware packed facade compile, three sealed value fixtures, the 16.2.14 Sass API inventory (values, signatures, invoked mixin CSS digests, aggregate membership), 31 ordered-CSS fixtures, and archived-import, mutated-golden, hidden-resolution and api-drift negatives.",
+            "Cases covered by a recorded pending decision in compatibility/rc/sass-pending-decisions.json have no assertion and keep coverage incomplete. Pending decisions are not passes and are not exceptions.",
+            "Does not execute DOM or 21.x. Does not mark sass-seal accepted. Does not close companion bridge computed styles or G06-G08.",
         ],
     )
     results["sass-seal"] = "pass" if code == 0 else "fail"

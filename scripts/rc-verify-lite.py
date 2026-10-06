@@ -88,6 +88,8 @@ CHECKS = (
     ["node", "--check", "scripts/sass-seal.mjs"],
     ["node", "--check", "scripts/sass-ordered-css.mjs"],
     ["node", "--check", "scripts/sass-seal-regressions.mjs"],
+    ["node", "--check", "scripts/sass-api-inventory.mjs"],
+    ["node", "scripts/sass-api-regressions.mjs"],
     ["node", "--check", "scripts/run-browser-matrix-slice.mjs"],
     ["node", "--check", "scripts/browser-required-cells.mjs"],
     ["node", "--check", "scripts/browser-matrix-roster.mjs"],

@@ -1,0 +1,57 @@
+--- 16.2.14/mixin-css/badge-theme
++++ candidate/mixin-css/badge-theme
+@@ -29,7 +29,8 @@
+ }
+-.cdk-high-contrast-active .sass-api-probe .mat-badge-content {
+-  outline: solid 1px;
+-  border-radius: 0;
+-}
+-
++@media (forced-colors: active) {
++  .sass-api-probe .mat-badge-content {
++    outline: solid 1px;
++    border-radius: 0;
++  }
++}
+ .sass-api-probe .mat-badge-disabled .mat-badge-content {
+@@ -193 +194,40 @@
+ }
++
++.sass-api-probe {
++  --mat-badge-container-shape: 50%;
++  --mat-badge-container-size: unset;
++  --mat-badge-small-size-container-size: unset;
++  --mat-badge-large-size-container-size: unset;
++  --mat-badge-legacy-container-size: 22px;
++  --mat-badge-legacy-small-size-container-size: 16px;
++  --mat-badge-legacy-large-size-container-size: 28px;
++  --mat-badge-container-offset: -11px 0;
++  --mat-badge-small-size-container-offset: -8px 0;
++  --mat-badge-large-size-container-offset: -14px 0;
++  --mat-badge-container-overlap-offset: -11px;
++  --mat-badge-small-size-container-overlap-offset: -8px;
++  --mat-badge-large-size-container-overlap-offset: -14px;
++  --mat-badge-container-padding: 0;
++  --mat-badge-small-size-container-padding: 0;
++  --mat-badge-large-size-container-padding: 0;
++  --mat-badge-background-color: #3f51b5;
++  --mat-badge-text-color: white;
++  --mat-badge-disabled-state-background-color: color-mix(in srgb, rgba(0, 0, 0, 0.87) 12%, transparent);
++  --mat-badge-disabled-state-text-color: color-mix(in srgb, rgba(0, 0, 0, 0.87) 38%, transparent);
++  --mat-badge-text-font: Roboto, sans-serif;
++  --mat-badge-line-height: 22px;
++  --mat-badge-text-size: 12px;
++  --mat-badge-text-weight: 600;
++  --mat-badge-small-size-text-size: 9px;
++  --mat-badge-small-size-line-height: 16px;
++  --mat-badge-large-size-text-size: 24px;
++  --mat-badge-large-size-line-height: 28px;
++}
++.sass-api-probe .mat-badge-accent {
++  --mat-badge-background-color: #ff4081;
++  --mat-badge-text-color: white;
++}
++.sass-api-probe .mat-badge-warn {
++  --mat-badge-background-color: #f44336;
++  --mat-badge-text-color: white;
++}

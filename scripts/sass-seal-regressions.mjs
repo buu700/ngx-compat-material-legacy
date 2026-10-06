@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 /**
  * Ordered-CSS and isolation-negative roster regressions for sass-seal.
- * Ordered-CSS ids are existing strict fixture ids. Isolation negatives are only
- * the archived import and mutated golden cases the seal runner executes.
- * sass-api-and-values and every 21.x group stay null.
+ * Ordered-CSS ids are every non-debug fixture id. Isolation negatives are the
+ * archived import, mutated golden, hidden resolution and API drift cases the
+ * seal runner executes. sass-api-and-values is the predeclared oracle roster
+ * (see sass-api-regressions.mjs). Every 21.x group stays null.
  * A mutated candidate must not match the sealed reference.
  */
 import assert from 'node:assert/strict';
@@ -24,24 +25,30 @@ import {
 } from './sass-ordered-css.mjs';
 import {
   ISOLATION_NEGATIVE_IDS,
+  apiDriftAssertion,
+  foreignLoads,
+  runHiddenResolutionNegative,
   archivedImportAssertion,
   mutatedGoldenAssertion,
   runArchivedImportNegative,
   runMutatedGoldenNegative,
   writeIsolationNegativeAssertions,
 } from './sass-seal.mjs';
+import {apiCaseIds, apiDriftNegative} from './sass-api-inventory.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const matrix = JSON.parse(readFileSync(join(root, 'compatibility/rc/matrices/full-verify.json'), 'utf8'));
 const row = matrix.checks.find(item => item.check_id === 'sass-seal');
 assert.deepEqual(row.acceptance.cases_by_line.main['ordered-css-dom'], [...ORDERED_CSS_FIXTURE_IDS]);
-assert.equal(row.acceptance.cases_by_line.main['sass-api-and-values'], null);
+const apiOracle = JSON.parse(readFileSync(join(root, 'compatibility/rc/oracles/material-16.2.14-sass-api.json'), 'utf8'));
+assert.deepEqual(row.acceptance.cases_by_line.main['sass-api-and-values'], apiCaseIds(apiOracle));
 assert.deepEqual(row.acceptance.cases_by_line.main['isolation-negatives'], [...ISOLATION_NEGATIVE_IDS]);
-assert.deepEqual([...ISOLATION_NEGATIVE_IDS], ['archived-import', 'mutated-golden']);
-for (const id of ['hidden-resolution', '05-custom-map-nested', 'owned-legacy-button', 'owned-legacy-select', 'owned-legacy-snack-bar']) {
-  assert.equal(ISOLATION_NEGATIVE_IDS.includes(id), false, id);
-  assert.equal(ORDERED_CSS_FIXTURE_IDS.includes(id), false, id);
+assert.deepEqual([...ISOLATION_NEGATIVE_IDS], ['archived-import', 'mutated-golden', 'hidden-resolution', 'api-drift']);
+for (const id of ['05-custom-map-nested', 'owned-legacy-button', 'owned-legacy-select', 'owned-legacy-snack-bar']) {
+  assert.equal(ORDERED_CSS_FIXTURE_IDS.includes(id), true, id);
 }
+assert.equal(UNRESOLVED_STRICT_CSS.length, 0);
+assert.equal(BRIDGE_REVIEW_FIXTURES.length, 0);
 for (const group of Object.keys(row.acceptance.cases_by_line['21.x'])) {
   assert.equal(row.acceptance.cases_by_line['21.x'][group], null, group);
 }
@@ -102,10 +109,30 @@ try {
   assert.equal(mutatedGolden.mismatched_file, 'owned-legacy-card.css');
   assert.equal(mutatedGoldenAssertion({compareStatus: 0, cardStatus: 'exact', othersExact: true}).result, 'fail');
 
+  const allowedRoot = join(scratch, 'allowed');
+  mkdirSync(allowedRoot);
+  const hidden = runHiddenResolutionNegative([emptyLoadPath], [allowedRoot, emptyLoadPath]);
+  assert.equal(hidden.case_id, 'hidden-resolution');
+  assert.equal(hidden.refused, true);
+  assert.equal(hidden.flagged_foreign > 0, true);
+  assert.equal(hidden.result, 'pass');
+  assert.deepEqual(foreignLoads([`file://${join(allowedRoot, 'x.scss')}`, 'data:,x'], [allowedRoot]), []);
+  assert.equal(foreignLoads([`file://${join(scratch, 'elsewhere.scss')}`], [allowedRoot]).length, 1);
+
+  const css = {};
+  for (const [name, entry] of Object.entries(apiOracle.members.mixins)) {
+    if (entry.invocation?.invocable) css[name] = {css: '', sha256: entry.invocation.css_sha256};
+  }
+  const drift = apiDriftAssertion(apiDriftNegative(apiOracle, structuredClone(apiOracle.members), css));
+  assert.equal(drift.result, 'pass');
+  assert.equal(apiDriftAssertion({detected: false, mutated: ['variable/x'], newly_failed: []}).result, 'fail');
+  assert.equal(apiDriftAssertion(null).result, 'fail');
+
   const negativeDir = join(scratch, 'isolation-assertions');
   mkdirSync(negativeDir, {recursive: true});
-  const negativeWritten = writeIsolationNegativeAssertions(negativeDir, [archived, mutatedGolden]);
-  assert.deepEqual(negativeWritten.map(item => item.name), ['archived-import.json', 'mutated-golden.json']);
+  assert.throws(() => writeIsolationNegativeAssertions(negativeDir, [archived, mutatedGolden]));
+  const negativeWritten = writeIsolationNegativeAssertions(negativeDir, [archived, mutatedGolden, hidden, drift]);
+  assert.deepEqual(negativeWritten.map(item => item.name), ['archived-import.json', 'mutated-golden.json', 'hidden-resolution.json', 'api-drift.json']);
   const archivedFile = JSON.parse(readFileSync(join(negativeDir, 'archived-import.json'), 'utf8'));
   const mutatedFile = JSON.parse(readFileSync(join(negativeDir, 'mutated-golden.json'), 'utf8'));
   assert.equal(archivedFile.kind, 'assertion');

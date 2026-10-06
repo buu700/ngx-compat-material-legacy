@@ -2,10 +2,15 @@
 /**
  * Finite ordered-CSS cases sass-seal actually compiles and compares.
  *
- * Ids are strict fixtures from fixtures/sass/manifest.json. Empty debug CSS
- * and the four strict fixtures that differ from the sealed reference are not
- * in this set: they are not approved exceptions and are not executed here.
- * Bridge-review fixtures and DOM are not in this set. 21.x is not in this set.
+ * Ids are every strict non-debug fixture from fixtures/sass/manifest.json,
+ * including the four whose candidate CSS differs from the sealed reference
+ * (05-custom-map-nested, owned-legacy-button/-select/-snack-bar). Those stay
+ * failing against the unmodified sealed CSS; a matching pending decision in
+ * compatibility/rc/sass-pending-decisions.json explains them but never passes
+ * them. The four bridge-review fixtures (core, legacy-core, aggregate and
+ * companions, core-theme) are rostered against their sealed CSS the same way.
+ * Empty debug CSS (its values are sealed separately) and DOM are not in this
+ * set. 21.x is not in this set.
  */
 import {spawnSync} from 'node:child_process';
 import {copyFileSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
@@ -38,15 +43,18 @@ export const ORDERED_CSS_FIXTURE_IDS = Object.freeze([
   '04-constructors-and-typography',
   '07-with-configuration',
   '11-cyph-deep-purple-800',
-]);
-
-/** Strict fixtures whose sealed CSS is not exact. Not rostered and not rewritten. */
-export const UNRESOLVED_STRICT_CSS = Object.freeze([
   '05-custom-map-nested',
   'owned-legacy-button',
   'owned-legacy-select',
   'owned-legacy-snack-bar',
+  '02-core',
+  '03-legacy-core',
+  '06-aggregate-and-companions',
+  '08-core-theme',
 ]);
+
+/** Strict fixtures left out of the roster. Empty: every strict fixture is rostered. */
+export const UNRESOLVED_STRICT_CSS = Object.freeze([]);
 
 /** Debug fixtures. Their CSS is empty; the value seal is separate and not this roster. */
 export const EMPTY_DEBUG_CSS = Object.freeze([
@@ -55,12 +63,8 @@ export const EMPTY_DEBUG_CSS = Object.freeze([
   '12-cyph-palette-debug',
 ]);
 
-export const BRIDGE_REVIEW_FIXTURES = Object.freeze([
-  '02-core',
-  '03-legacy-core',
-  '06-aggregate-and-companions',
-  '08-core-theme',
-]);
+/** Bridge-review fixtures left out of the roster. Empty: all four are rostered. */
+export const BRIDGE_REVIEW_FIXTURES = Object.freeze([]);
 
 export function orderedCssCaseId(fixtureId) {
   if (!ORDERED_CSS_FIXTURE_IDS.includes(fixtureId)) {
@@ -82,8 +86,8 @@ export function rosterProblems(manifest = loadManifest()) {
   for (const id of ORDERED_CSS_FIXTURE_IDS) {
     const item = cases.get(id);
     if (!item) problems.push(`missing fixture: ${id}`);
-    else if (item.comparison !== 'strict' || item.capture_debug) {
-      problems.push(`fixture is not a strict non-debug case: ${id}`);
+    else if (!['strict', 'bridge-review'].includes(item.comparison) || item.capture_debug) {
+      problems.push(`fixture is not a strict or bridge-review non-debug case: ${id}`);
     }
     const css = join(root, 'reference/material-16.2.14/sass-css', `${id}.css`);
     try {
@@ -96,6 +100,11 @@ export function rosterProblems(manifest = loadManifest()) {
   for (const id of [...UNRESOLVED_STRICT_CSS, ...EMPTY_DEBUG_CSS, ...BRIDGE_REVIEW_FIXTURES]) {
     if (ORDERED_CSS_FIXTURE_IDS.includes(id)) problems.push(`excluded fixture is rostered: ${id}`);
     if (!cases.has(id)) problems.push(`excluded fixture is not in the manifest: ${id}`);
+  }
+  // The roster is every non-debug fixture of the manifest: nothing is chosen by outcome.
+  const declared = (manifest.cases || []).filter(item => !item.capture_debug).map(item => item.id).sort();
+  if (JSON.stringify(declared) !== JSON.stringify([...ORDERED_CSS_FIXTURE_IDS].sort())) {
+    problems.push('ordered CSS roster is not exactly the non-debug fixtures of the manifest');
   }
   return problems;
 }
@@ -187,6 +196,7 @@ export function runOrderedCss(environment) {
     '--module', '@ngx-compat/material-legacy',
     '--output', candidate,
     '--fixtures', fixtures,
+    '--include-bridge',
   ], {cwd: root, encoding: 'utf8'});
   const compared = compareOrderedCss(reference, candidate, reportPath);
   const results = compared.report ? orderedCssResults(compared.report) : ORDERED_CSS_FIXTURE_IDS.map(id => ({

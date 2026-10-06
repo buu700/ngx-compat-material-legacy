@@ -363,6 +363,67 @@ class CoordinatorTests(unittest.TestCase):
         )
         self.assertEqual(acceptance.read_json(path)["coverage"], "complete")
 
+    def _sass_seal_bodies(self, ids, *, tarball=None):
+        invocation = self.run.invocation("sass-seal")
+        library = next(item for item in self.f.run["artifacts"] if item["id"] == "library")
+        oracle_sha = verify.evidence_sha256(verify.SASS_API_ORACLE)
+        bodies = {}
+        for case_id in ids:
+            body = {"case_id": case_id, "result": "pass", "kind": "assertion"}
+            if case_id.startswith(verify._SASS_API_PREFIXES):
+                body.update({
+                    "group": "sass-api-and-values", "check_id": "sass-seal", "line": "main",
+                    "run_id": self.f.run["run_id"], "invocation_id": invocation,
+                    "tarball_sha256": tarball or library["sha256"], "oracle_sha256": oracle_sha,
+                })
+            bodies[case_id] = body
+        return invocation, bodies
+
+    def _write_sass_seal(self, bodies, invocation):
+        directory = self.f.run_dir / acceptance.assertion_directory("sass-seal", invocation)
+        directory.mkdir(parents=True, exist_ok=True)
+        for case_id, body in bodies.items():
+            write_json(directory / f"{case_id.replace('/', '__')}.json", body)
+        path = self.f.run_dir / "reports/sass-seal.json"
+        if path.exists():
+            path.unlink()
+        verify.write_line_coordinator_report(
+            self.f.run_dir, self.f.run["run_id"], "main", "sass-seal", exit_code=0,
+        )
+        return acceptance.read_json(path)
+
+    def test_sass_seal_pending_api_cases_keep_the_report_incomplete(self):
+        row, ids = self._real_line_ids("sass-seal")
+        api = row["acceptance"]["cases_by_line"]["main"]["sass-api-and-values"]
+        self.assertEqual(len(api), 651)
+        self.assertEqual(row["acceptance"]["cases_by_line"]["main"]["isolation-negatives"],
+                         ["archived-import", "mutated-golden", "hidden-resolution", "api-drift"])
+        decisions = acceptance.read_json(ROOT / "compatibility/rc/sass-pending-decisions.json")
+        pending = {item["case_id"] for d in decisions["decisions"] for item in d["cases"]}
+        self.assertTrue(pending <= set(ids))
+        invocation, bodies = self._sass_seal_bodies(ids)
+        report = self._write_sass_seal({k: v for k, v in bodies.items() if k not in pending}, invocation)
+        self.assertEqual(report["coverage"], "slice")
+
+    def test_sass_seal_api_assertions_must_bind_the_run_library(self):
+        _, ids = self._real_line_ids("sass-seal")
+        invocation, bodies = self._sass_seal_bodies(ids, tarball="0" * 64)
+        self.assertFalse(verify._sass_seal_assertion_ok(bodies["variable/indigo-palette"], invocation))
+        self.assertTrue(verify._sass_seal_assertion_ok(bodies["owned-legacy-card"], invocation))
+        self.assertEqual(self._write_sass_seal(bodies, invocation)["coverage"], "slice")
+        _, good = self._sass_seal_bodies(ids)
+        stale = dict(good["mixin-css/core"], oracle_sha256="f" * 64)
+        self.assertFalse(verify._sass_seal_assertion_ok(stale, invocation))
+        other = dict(good["mixin/core"], invocation_id="other")
+        self.assertFalse(verify._sass_seal_assertion_ok(other, invocation))
+
+    def test_sass_seal_complete_only_with_every_rostered_assertion(self):
+        _, ids = self._real_line_ids("sass-seal")
+        invocation, bodies = self._sass_seal_bodies(ids)
+        for body in bodies.values():
+            self.assertTrue(verify._sass_seal_assertion_ok(body, invocation), body["case_id"])
+        self.assertEqual(self._write_sass_seal(bodies, invocation)["coverage"], "complete")
+
     def _real_line_ids(self, check_id):
         matrix = acceptance.read_json(verify.MATRIX_PATH)
         row = next(item for item in matrix["checks"] if item["check_id"] == check_id)
