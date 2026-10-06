@@ -3,7 +3,7 @@ import {
   MatLegacySnackBarConfig,
   MatLegacySnackBarModule,
 } from '@ngx-compat/material-legacy/legacy-snack-bar';
-import {runHarnessTests} from '@angular/material/snack-bar/testing/shared.spec';
+import {runHarnessTests} from '../../../../testing/legacy-runner/shims/harness/snack-bar/shared.spec.ts';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {HarnessLoader} from '@angular/cdk/testing';
 import {LEGACY_NOOP_ANIMATIONS} from '../../internal/testing/owned-animation-modules';

@@ -1,5 +1,5 @@
 import {MatLegacyTooltipModule} from '@ngx-compat/material-legacy/legacy-tooltip';
-import {runHarnessTests} from '@angular/material/tooltip/testing/shared.spec';
+import {runHarnessTests} from '../../../../testing/legacy-runner/shims/harness/tooltip/shared.spec.ts';
 import {MatLegacyTooltipHarness} from './tooltip-harness';
 
 describe('Non-MDC-based MatTooltipHarness', () => {
