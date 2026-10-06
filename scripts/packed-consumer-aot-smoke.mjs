@@ -342,7 +342,6 @@ export class ModernStrictModule {}
       rootDir: 'src',
       outDir,
       types: [],
-      ignoreDeprecations: '6.0',
     },
     files: [file],
     angularCompilerOptions: {compilationMode: 'full', strictTemplates: true},
@@ -732,7 +731,6 @@ platformBrowserDynamic().bootstrapModule(AotSmokeModule).catch(err => console.er
           declaration: false,
           importHelpers: true,
           useDefineForClassFields: false,
-          ignoreDeprecations: '6.0',
         },
         files: ['src/app.module.ts', 'src/main.ts'],
         angularCompilerOptions: {
