@@ -220,55 +220,285 @@ def question_for(row: dict) -> str:
     return "; ".join(parts)
 
 
-DECISION = {
-    "sensitive": "Confirm or replace the current disposition with an individual a11y/security/lifecycle review; supply individual_proof (diff read, owned file or installed member, affected lines).",
-    "conflict-owned-source-touched": "The row is non-applicable but the commit touches owned legacy source that exists in the candidate. Decide whether the change applies to the owned copy.",
-    "behavior": "Owned-behavior disposition without individual proof. Confirm the owned line carries (or deliberately omits) the change and record individual_proof.",
-    "question-added-lines-absent-on-a-line": "Inherited, but the delegated added lines were not found in one line's installed floor. Confirm the fix is present there (cherry-pick, refactor or compiled form) or change the disposition for that line.",
-    "question-no-delegated-source": "Inherited, but the commit touches no delegated peer source. Confirm what is inherited or reclassify.",
-    "inherited-delegation": "Inherited with mechanical support. Missing evidence is the executed delegation: a test or observation that the candidate reaches the named installed member on each line.",
+def proof_defects(entry: dict, sensitive: str | None) -> list[str]:
+    """Same individual-proof gaps the checker counts, per row."""
+    disposition = entry.get("final_disposition")
+    proof = entry.get("individual_proof") if isinstance(entry.get("individual_proof"), dict) else None
+    out = []
+    if sensitive and not proof:
+        out.append(f"sensitive-{sensitive}-without-individual-proof")
+    if disposition in INHERITED and not (proof and proof.get("installed_member") and proof.get("reachable_behavior")):
+        out.append("inherited-without-installed-member-and-executed-delegation")
+    if disposition in BEHAVIOR and not proof:
+        out.append("behavior-without-individual-proof")
+    return out
+
+
+RETAINED_NOTES = {"not-applied", "owned-retained", "not-owned", "retained-legacy-differs"}
+NOTE_PATH = re.compile(r"[\w./-]+\.(?:ts|scss|html|css)")
+PR_NUMBER = re.compile(r"\(#(\d+)\)")
+
+
+class Context:
+    """Lookups shared by every review note."""
+
+    def __init__(self, upstream: Path, ledger: dict):
+        self.upstream = upstream
+        self.entries = {entry["sha"]: entry for entry in ledger["entries"]}
+        self.notes = {}
+        for rel in sorted(BATCH_REPORTS):
+            for item in json.loads((ROOT / rel).read_text()).get("reviews") or []:
+                if isinstance(item, dict) and item.get("sha"):
+                    self.notes[item["sha"]] = {"source": rel, **item}
+        log = git(upstream, "log", "--format=%s", "16.2.14").decode(errors="replace")
+        self.prs_16 = set(PR_NUMBER.findall(log))
+        self.specs = defaultdict(list)
+        for spec in sorted(PACKAGE.rglob("*.spec.ts")):
+            if "node_modules" in spec.parts:
+                continue
+            rel = spec.relative_to(ROOT).as_posix()
+            for module in set(re.findall(r"from\s+['\"](@angular/(?:cdk|material)/[a-z0-9-]+)", spec.read_text(errors="replace"))):
+                self.specs[module].append(rel)
+            legacy = spec.relative_to(PACKAGE).parts[0]
+            self.specs[f"owned:{legacy}"].append(rel)
+
+    def read_note(self, sha: str) -> dict:
+        entry = self.entries.get(sha, {})
+        note = self.notes.get(sha)
+        if note:
+            return {"source": note["source"], "disposition": note.get("disposition"), "text": note.get("evidence") or ""}
+        return {"source": "ledger", "disposition": entry.get("read_note_disposition"), "text": entry.get("reason") or ""}
+
+    def candidate_refs(self, text: str, row: dict) -> dict:
+        refs = []
+        for cited in sorted(set(NOTE_PATH.findall(text))):
+            for base in (PACKAGE, ROOT):
+                path = base / cited
+                if path.is_file() and "node_modules" not in path.parts:
+                    refs.append(path)
+                    break
+        if not refs:
+            return {"paths": [], "upstream_added_lines_found": None}
+        patch = git(self.upstream, "show", "--format=", "--no-renames", row["sha"]).decode(errors="replace")
+        wanted = {f["path"] for f in row["files"] if f["kind"] in ("delegated-peer", "owned-legacy")}
+        added = added_lines(patch, wanted)
+        body = "\n".join(path.read_text(errors="replace") for path in refs)
+        squashed = re.sub(r"\s+", "", body)
+        found = sum(1 for line in added if line in body or re.sub(r"\s+", "", line) in squashed)
+        return {"paths": [{"path": path.relative_to(ROOT).as_posix(), "sha256": sha256_bytes(path.read_bytes())} for path in refs],
+                "upstream_added_lines_found": f"{found}/{len(added)}"}
+
+    def regression_tests(self, row: dict) -> list[str]:
+        c = row["mechanical_consistency"]
+        tests = set()
+        for module in c["delegated_modules"]:
+            tests.update(self.specs.get(module, []))
+            legacy = f"owned:legacy-{module.split('/')[-1]}"
+            tests.update(self.specs.get(legacy, []))
+        for path in c["owned_paths"]:
+            match = re.match(r"^src/material/(legacy-[a-z-]+)/", path)
+            if match:
+                tests.update(self.specs.get(f"owned:{match.group(1)}", []))
+        return sorted(tests)
+
+
+def review_note(row: dict, category: str, priority: int, ctx: Context) -> dict:
+    """One prepared review question: identity, evidence, proposal, alternatives, impact, decision."""
+    sha, final = row["sha"], row["final_disposition"]
+    c = row["mechanical_consistency"]
+    note = ctx.read_note(sha)
+    refs = ctx.candidate_refs(note["text"], row) if note["text"] else {"paths": [], "upstream_added_lines_found": None}
+    pr = PR_NUMBER.search(row["subject"] or "")
+    in_16 = bool(pr and pr.group(1) in ctx.prs_16)
+    contradictions = []
+    if final in BEHAVIOR and note["disposition"] in RETAINED_NOTES:
+        contradictions.append(f"final_disposition {final} but the read note says {note['disposition']}")
+    if final in INHERITED and note["disposition"] == "owned-retained":
+        contradictions.append("final_disposition inherited but the read note says owned-retained")
+    if c["status"] == "conflict-owned-source-touched":
+        contradictions.append(f"final_disposition {final} but the commit touches owned source {', '.join(c['owned_paths'])}")
+    kinds = sorted({f["kind"] for f in row["files"]})
+    runtime_paths = [f["path"] for f in row["files"] if f["kind"] in ("delegated-peer", "owned-legacy")]
+    tests = ctx.regression_tests(row)
+    line_counts = {line: f"{info['delegated_added_lines_present_in_installed_floor']}/{info['delegated_added_lines']}" for line, info in row["lines"].items()}
+
+    if contradictions:
+        kind = "contradiction"
+        if final in BEHAVIOR and note["disposition"] in RETAINED_NOTES:
+            proposal = (f"The read note ({note['source']}) says the candidate does not carry this change ({note['disposition']}). "
+                        f"If that holds, {final} overstates it: record a deviation (keep the 16.2.14 behavior) under a non-adopting disposition.")
+            alternatives = [f"Port the upstream change into {', '.join(p['path'] for p in refs['paths']) or 'the owned counterpart'} and keep {final}.",
+                            f"Keep {final} if the read note is wrong, citing the candidate lines that implement it (cited-file line match {refs['upstream_added_lines_found']})."]
+        else:
+            proposal = f"Re-read the diff against the owned source; the disposition {final} conflicts with the mechanical facts."
+            alternatives = [f"Keep {final} with an individual proof that the owned copy is unaffected.", "Change the disposition and add a regression."]
+    elif category.startswith("sensitive"):
+        if not runtime_paths:
+            kind = "ambiguity"
+            proposal = f"The classifier flagged {row['sensitive_class']}, but the commit only touches {', '.join(kinds)} paths. Proposed: not runtime-relevant; confirm with an individual read."
+            alternatives = ["Keep it sensitive if a docs/test change documents a behavior the candidate must follow."]
+        elif not c["owned_paths"] and all(info["delegated_added_lines"] == 0 for info in row["lines"].values()):
+            kind = "ambiguity"
+            proposal = (f"The delegated change has no significant added lines (comments, removals or trivial lines only) and touches no owned source; "
+                        f"read note {note['disposition']}. Proposed: no runtime behavior for the candidate to carry; record that individually.")
+            alternatives = ["A removal can still change behavior; confirm nothing the candidate calls was removed."]
+        elif final in INHERITED and all(info["delegated_added_lines"] and info["delegated_added_lines_present_in_installed_floor"] == info["delegated_added_lines"] for info in row["lines"].values()):
+            kind = "unavailable-evidence"
+            proposal = f"Inherited from the installed floors (all added delegated lines found on both lines: {line_counts}). The executed delegation is still missing."
+            alternatives = ["Owned code may shadow the delegated member; if so, the fix needs an owned port instead."]
+        else:
+            kind = "ambiguity"
+            proposal = f"No mechanical conclusion. Delegated added-line presence per line {line_counts}; read note {note['disposition']}."
+            alternatives = [f"Keep {final} with individual proof.", "Reclassify after reading the hunk against the candidate."]
+    elif category == "behavior":
+        found = refs["upstream_added_lines_found"]
+        if refs["paths"] and found and found.split("/")[0] == found.split("/")[1] and found != "0/0":
+            kind = "ambiguity"
+            proposal = f"All {found} significant upstream added lines are present in the cited candidate file(s); the read note says {note['disposition']}. Proposed: fix present, record an individual proof after checking context."
+            alternatives = ["The lines may match generically (for example a common statement) without the surrounding change; then treat as not present."]
+        elif refs["paths"]:
+            kind = "ambiguity"
+            proposal = f"The cited candidate file(s) contain {found} of the significant upstream added lines; the read note says {note['disposition']}. The fix may be adapted in different form or absent."
+            alternatives = ["Present in adapted form: cite the candidate lines.", "Absent: port it or record a deviation."]
+        else:
+            kind = "unavailable-evidence"
+            proposal = f"No candidate file is cited by the read note ({note['source']}); the claim '{final}' cannot be checked mechanically."
+            alternatives = ["Locate the owned counterpart and cite its lines.", "Record that the change has no owned counterpart and reclassify."]
+    elif category == "question-added-lines-absent-on-a-line":
+        kind = "ambiguity"
+        proposal = f"Inherited, but delegated added lines per line are {line_counts}; ancestry " + ", ".join(f"{line}={info['sha_is_ancestor_of_floor_tag']}" for line, info in row["lines"].items()) + ". Compiled output may differ from source, so absence is a question."
+        alternatives = ["Find the compiled form in the installed floor and cite it.", "If the fix is missing on a line, the row is not inherited there."]
+    else:
+        kind = "ambiguity"
+        proposal = f"Inherited, but the commit touches only {', '.join(kinds)} paths and no delegated peer source."
+        alternatives = ["Reclassify as irrelevant if nothing ships.", "Name the delegated member if something is inherited."]
+
+    decision = {
+        "contradiction": f"Resolve the conflict for {sha[:12]}: {contradictions[0] if contradictions else ''}.",
+        "ambiguity": f"Decide whether {sha[:12]} is {final} on main and 21.x, using the facts above.",
+        "unavailable-evidence": f"Supply or waive the missing evidence for {sha[:12]} ({'executed delegation' if final in INHERITED else 'candidate reference'}).",
+    }[kind]
+    return {
+        "sha": sha,
+        "priority": priority,
+        "category": category,
+        "question_kind": kind,
+        "subject": row["subject"],
+        "source_identity": {"upstream_commit": f"https://github.com/angular/components/commit/{sha}", "diff_sha256": row["diff_sha256"],
+                            "pr_in_16_2_14_history": in_16, "files": [f"{f['path']} ({f['kind']})" for f in row["files"]]},
+        "scope": {line: {"floor": info["floor_tag"], "ancestor_of_floor": info["sha_is_ancestor_of_floor_tag"],
+                         "delegated_added_lines_found": line_counts[line]} for line, info in row["lines"].items()},
+        "current_disposition": final,
+        "evidence_report": row["evidence_report"],
+        "defects": row["defects"],
+        "facts": question_for(row),
+        "read_note": note,
+        "candidate_references": refs,
+        "contradictions": contradictions,
+        "proposed_conclusion": proposal,
+        "alternatives": alternatives,
+        "regression_impact": {"candidate_specs": tests, "count": len(tests)},
+        "decision_requested": decision,
+    }
+
+
+GROUP_REASONING = {
+    "consistent-added-lines-present-both-lines": "Every member is inherited from this delegated module set, and all of its significant delegated added lines are present in both installed floors.",
+    "partial-added-lines-present": "Every member is inherited from this delegated module set, and some but not all of its significant delegated added lines are present on each line (none is absent on a whole line).",
+    "question-no-significant-added-lines": "Every member is inherited from this delegated module set, and its delegated change has no significant added lines to look for (removals, renames or trivial lines only).",
 }
 
 
-def write_queue(rows: list[dict], report: dict) -> dict:
+AUTHORITY_ITEMS = [
+    {
+        "id": "authority/braces-3.0.3", "priority": 1, "category": "exception-authority", "question_kind": "authority",
+        "record": "compatibility/rc/dependency-dispositions/braces-3.0.3.json",
+        "facts_note": "compatibility/f10/audit-join/braces-exception-facts.md",
+        "proposed_conclusion": "Keep the exception until 2026-11-04, or until a patched braces release appears if that is sooner, if the owner's group-chat grant is confirmed. Correct the record's path text, which omits the direct karma -> braces edge.",
+        "alternatives": ["Treat the grant as unverified and block the release.", "Narrow the claimed scope to the two observed lock edges."],
+        "decision_requested": "Confirm the original grant, and decide whether the omitted karma -> braces edge is within its scope.",
+    },
+    {
+        "id": "authority/source-map-js-1.2.2-minimum-age", "priority": 1, "category": "exception-authority", "question_kind": "authority",
+        "record": "chainman/minimum-age-exceptions.toml",
+        "facts_note": "chainman/minimum-age-exceptions.toml (granted 2026-10-06T03:43-04:00 for GHSA-68fv-2mgg-jv7q; expires 2026-10-07T14:08:09Z)",
+        "proposed_conclusion": "Temporary and exact. Remove the pnpm minimumReleaseAgeExclude entry and the record after it expires; dependency-eligibility fails until then.",
+        "alternatives": ["Revert to source-map-js 1.2.1 if the grant is not accepted."],
+        "decision_requested": "Confirm the owner grant and schedule removing the exclude after 2026-10-07 10:08 ET.",
+    },
+]
+
+
+def write_queue(rows: list[dict], report: dict, ctx: Context) -> dict:
     items, groups = [], defaultdict(list)
     for row in rows:
         c = row["mechanical_consistency"]
-        base = {
-            "sha": row["sha"], "subject": row["subject"], "current_disposition": row["final_disposition"],
-            "diff_sha256": row["diff_sha256"], "evidence_report": row["evidence_report"], "defects": row["defects"],
-            "facts": question_for(row),
-        }
         if row["sensitive_class"] and any(d.startswith("sensitive-") for d in row["defects"]):
-            items.append({**base, "priority": 1, "category": f"sensitive-{row['sensitive_class']}", "decision_requested": DECISION["sensitive"]})
+            items.append(review_note(row, f"sensitive-{row['sensitive_class']}", 1, ctx))
         elif c["status"] == "conflict-owned-source-touched":
-            items.append({**base, "priority": 2, "category": c["status"], "decision_requested": DECISION[c["status"]]})
+            items.append(review_note(row, c["status"], 2, ctx))
         elif "behavior-without-individual-proof" in row["defects"]:
-            items.append({**base, "priority": 3, "category": "behavior", "decision_requested": DECISION["behavior"]})
-        elif row["final_disposition"] == "inherited" and c["status"] in ("question-added-lines-absent-on-a-line", "question-no-delegated-source"):
-            items.append({**base, "priority": 4, "category": c["status"], "decision_requested": DECISION[c["status"]]})
+            items.append(review_note(row, "behavior", 3, ctx))
+        elif row["final_disposition"] == "inherited" and c["status"] in ("question-added-lines-absent-on-a-line", "question-no-delegated-source") \
+                and "inherited-without-installed-member-and-executed-delegation" in row["defects"]:
+            items.append(review_note(row, c["status"], 4, ctx))
         elif "inherited-without-installed-member-and-executed-delegation" in row["defects"]:
-            groups[", ".join(c["delegated_modules"]) or "none"].append(row["sha"])
+            groups[(c["status"], ", ".join(c["delegated_modules"]))].append(row["sha"])
     group_items = [{
-        "priority": 5, "category": "inherited-delegation", "delegated_modules": key, "members": sorted(members),
-        "member_count": len(members), "decision_requested": DECISION["inherited-delegation"],
-        "identical_reasoning": "Every member is inherited from the same delegated module set, its delegated added lines are at least partly present in both installed floors (per-row counts in join.json), and each lacks only installed_member and an executed delegation.",
-    } for key, members in sorted(groups.items())]
+        "priority": 5, "category": "inherited-delegation", "question_kind": "unavailable-evidence",
+        "mechanical_status": status, "delegated_modules": modules, "members": sorted(members), "member_count": len(members),
+        "identical_reasoning": GROUP_REASONING[status] + " Each lacks only installed_member and an executed delegation (per-row counts in join.json).",
+        "proposed_conclusion": "Inherited. Add one executed-delegation observation per delegated member, plus the installed member hash for each line.",
+        "regression_impact": {"candidate_specs": sorted({t for sha in members for t in ctx.regression_tests(next(r for r in rows if r["sha"] == sha))})},
+        "decision_requested": "Accept the executed-delegation evidence when it is supplied. A member whose observation fails leaves the group.",
+    } for (status, modules), members in sorted(groups.items())]
+    for group in group_items:
+        group["regression_impact"]["count"] = len(group["regression_impact"]["candidate_specs"])
+    items.sort(key=lambda item: (item["priority"], {"contradiction": 0, "authority": 0, "ambiguity": 1, "unavailable-evidence": 2}[item["question_kind"]], item["sha"]))
     queue = {
-        "schema_version": 1,
-        "role": "FIN-02 finite prioritized review queue (prepared evidence; no decisions)",
+        "schema_version": 2,
+        "role": "FIN-02 finite prioritized review queue (prepared evidence; proposals are not decisions)",
         "g11_claim": "not-passed",
         "join": "compatibility/f10/audit-join/join.json",
-        "priorities": {"1": "sensitive a11y/security/lifecycle, individual", "2": "non-applicable row touching owned source, individual",
-                        "3": "owned behavior without individual proof, individual", "4": "inherited with a mechanical contradiction, individual",
-                        "5": "inherited awaiting executed-delegation evidence, grouped by delegated module with explicit membership"},
-        "counts": {"individual_items": len(items), "groups": len(group_items), "grouped_members": sum(g["member_count"] for g in group_items),
-                   "by_priority": dict(Counter(str(item["priority"]) for item in items + group_items))},
-        "items": sorted(items, key=lambda item: (item["priority"], item["sha"])),
+        "priorities": {"1": "sensitive a11y/security/lifecycle rows and exception authority, individual",
+                       "2": "non-applicable row touching owned source, individual",
+                       "3": "owned behavior without individual proof, individual",
+                       "4": "inherited with a mechanical question, individual",
+                       "5": "inherited awaiting executed-delegation evidence, grouped by mechanical status and delegated module set with explicit membership"},
+        "question_kinds": ["contradiction", "authority", "ambiguity", "unavailable-evidence"],
+        "counts": {"individual_items": len(items), "authority_items": len(AUTHORITY_ITEMS), "groups": len(group_items),
+                   "grouped_members": sum(g["member_count"] for g in group_items),
+                   "by_priority": dict(sorted(Counter(str(item["priority"]) for item in items + group_items + AUTHORITY_ITEMS).items())),
+                   "by_question_kind": dict(sorted(Counter(item["question_kind"] for item in items + AUTHORITY_ITEMS).items()))},
+        "authority": AUTHORITY_ITEMS,
+        "items": items,
         "groups": group_items,
     }
     QUEUE.write_text(json.dumps(queue, indent=1) + "\n")
     return queue["counts"]
+
+
+def queue_only(args) -> int:
+    """Re-derive per-row proof gaps from the current ledger and rewrite the queue; diff/floor facts are reused."""
+    report = json.loads(args.out.read_text())
+    ledger = json.loads(LEDGER.read_text())
+    entries = {entry["sha"]: entry for entry in ledger["entries"]}
+    defects = defaultdict(list)
+    for row in report["rows"]:
+        kept = [d for d in row["defects"] if d in EVIDENCE_DEFECTS or d in ("no-ledger-row", "evidence-file-missing")]
+        entry = entries.get(row["sha"], {})
+        row["evidence_report"] = entry.get("evidence_report")
+        row["defects"] = [d for d in kept if d not in EVIDENCE_DEFECTS] + proof_defects(entry, row["sensitive_class"])
+        for defect in row["defects"]:
+            defects[defect].append(row["sha"])
+    report["defects"] = {key: sorted(value) for key, value in sorted(defects.items())}
+    report["summary"]["rows_with_any_defect"] = sum(1 for row in report["rows"] if row["defects"])
+    report["summary"]["defect_counts"] = {key: len(value) for key, value in sorted(defects.items())}
+    report["inputs"]["compatibility/f10/disposition-ledger/ledger.json"] = sha256_bytes(LEDGER.read_bytes())
+    report["review_queue"] = write_queue(report["rows"], report, Context(args.upstream, ledger))
+    args.out.write_text(json.dumps(report, separators=(",", ":")) + "\n")
+    print(json.dumps({"summary": report["summary"], "review_queue": report["review_queue"]}, indent=2))
+    return 0
 
 
 def main() -> int:
@@ -277,7 +507,10 @@ def main() -> int:
     parser.add_argument("--peer", action="append", default=[], help="line=dir containing cdk/ and material/")
     parser.add_argument("--write-evidence", action="store_true")
     parser.add_argument("--out", type=Path, default=OUT)
+    parser.add_argument("--queue-only", action="store_true", help="refresh proof defects and the review queue from an existing join")
     args = parser.parse_args()
+    if args.queue_only:
+        return queue_only(args)
     peers_dirs = dict(item.split("=", 1) for item in args.peer)
     if set(peers_dirs) != set(LINE_FLOORS):
         raise SystemExit("--peer main=... and --peer 21.x=... are required")
@@ -354,13 +587,7 @@ def main() -> int:
             row_defects.append("batch-report-does-not-contain-sha")
         elif evidence not in BATCH_REPORTS and not (ROOT / evidence).is_file():
             row_defects.append("evidence-file-missing")
-        proof = entry.get("individual_proof") if isinstance(entry.get("individual_proof"), dict) else None
-        if sensitive and not proof:
-            row_defects.append(f"sensitive-{sensitive}-without-individual-proof")
-        if disposition in INHERITED and not (proof and proof.get("installed_member") and proof.get("reachable_behavior")):
-            row_defects.append("inherited-without-installed-member-and-executed-delegation")
-        if disposition in BEHAVIOR and not proof:
-            row_defects.append("behavior-without-individual-proof")
+        row_defects.extend(proof_defects(entry, sensitive))
         for defect in row_defects:
             defects[defect].append(sha)
         rows.append({
@@ -463,7 +690,7 @@ def main() -> int:
     }
     if args.write_evidence:
         report["evidence_written"] = write_evidence(rows, ledger, report)
-        report["review_queue"] = write_queue(rows, report)
+        report["review_queue"] = write_queue(rows, report, Context(args.upstream, json.loads(LEDGER.read_text())))
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(report, separators=(",", ":")) + "\n")
     print(json.dumps(summary, indent=2))

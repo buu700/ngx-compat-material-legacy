@@ -307,12 +307,39 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
         self.assertEqual(sensitive, {item["sha"] for item in queue["items"] if item["priority"] == 1})
         inherited = {row["sha"] for row in join["rows"] if "inherited-without-installed-member-and-executed-delegation" in row["defects"]}
         self.assertTrue(inherited <= set(placed))
+        rows = {row["sha"]: row for row in join["rows"]}
         for item in queue["items"]:
-            self.assertTrue(item["facts"].strip())
-            self.assertTrue(item["decision_requested"].strip())
+            self.assertIn(item["question_kind"], queue["question_kinds"])
+            self.assertEqual(item["source_identity"]["diff_sha256"], rows[item["sha"]]["diff_sha256"])
+            for key in ("facts", "proposed_conclusion", "decision_requested"):
+                self.assertTrue(item[key].strip(), (item["sha"], key))
+            self.assertTrue(item["alternatives"])
+            self.assertEqual(item["question_kind"] == "contradiction", bool(item["contradictions"]))
         for group in queue["groups"]:
             self.assertEqual(group["member_count"], len(group["members"]))
             self.assertTrue(group["members"])
+            for sha in group["members"]:
+                # Identical reasoning only holds if every member has the group's mechanical status and modules.
+                status = rows[sha]["mechanical_consistency"]
+                self.assertEqual(status["status"], group["mechanical_status"], sha)
+                self.assertEqual(", ".join(status["delegated_modules"]), group["delegated_modules"], sha)
+        self.assertEqual({item["question_kind"] for item in queue["authority"]}, {"authority"})
+        self.assertTrue((ROOT / "compatibility/f10/audit-join/braces-exception-facts.md").is_file())
+
+    def test_recorded_candidate_line_proofs_still_match_the_candidate(self) -> None:
+        proofs = [e for e in json.loads(LEDGER.read_text())["entries"]
+                  if (e.get("individual_proof") or {}).get("proof_kind") == "candidate-source-line-match"]
+        self.assertGreater(len(proofs), 0)
+        for entry in proofs:
+            proof = entry["individual_proof"]
+            self.assertEqual(proof["affected_branches"], ["main"])
+            self.assertGreaterEqual(len(proof["decision"]), 40)
+            lines = (ROOT / proof["candidate_member"]["path"]).read_text().split("\n")
+            for item in proof["added_lines"]:
+                self.assertTrue(item["candidate_lines"], (entry["sha"], item))
+                for number in item["candidate_lines"]:
+                    squashed = "".join(item["upstream_added"].split())
+                    self.assertIn(squashed, "".join(lines[number - 1].split()), (entry["sha"], number))
 
 
 if __name__ == "__main__":

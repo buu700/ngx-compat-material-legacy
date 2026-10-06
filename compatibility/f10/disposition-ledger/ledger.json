@@ -323,7 +323,38 @@
       "batch_id": "security-already-present-2026-10-01-b",
       "recorded_at_utc": "2026-10-01T16:30:02Z",
       "g11_claim": "not-passed",
-      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "individual_proof": {
+        "diff_sha256": "98754a36c31e10ac256779888887af07bcddae1411ba569d1417f4a8b64babd5",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Upstream wraps this._onChange(value) in _handleInput with `if (!this.autocomplete || !this.autocomplete.requireSelection)` so typing does not write the CVA when requireSelection is set. The owned legacy trigger base has the same guard and the same explanatory comment in its _handleInput, so the fix was already present. No candidate change was needed. The upstream example and demo edits are not shipped.",
+        "proof_kind": "candidate-source-line-match",
+        "upstream_file": "src/material/autocomplete/autocomplete-trigger.ts",
+        "candidate_member": {
+          "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+          "sha256": "c61178b73599a69247a20dcd3ec2bb62337a46801c70e47a71049cca2911167f"
+        },
+        "added_lines": [
+          {
+            "upstream_added": "if (!this.autocomplete || !this.autocomplete.requireSelection) {",
+            "candidate_lines": [
+              480
+            ]
+          },
+          {
+            "upstream_added": "this._onChange(value);",
+            "candidate_lines": [
+              481
+            ]
+          }
+        ],
+        "read_note": "already-present",
+        "recorded_by": "Grok, FIN-02-C02; Codex validates in FIN-02-C05",
+        "recomputed_by": "scripts/record-candidate-line-proofs.py"
+      }
     },
     {
       "sha": "642d886ef117721a34c98055391c9055fde29607",
@@ -407,7 +438,51 @@
       "batch_id": "security-already-present-2026-10-01-b",
       "recorded_at_utc": "2026-10-01T16:30:02Z",
       "g11_claim": "not-passed",
-      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "individual_proof": {
+        "diff_sha256": "bc7f365f37be09c0a09618b21be4b4dedd46f83cbc06f53e485a11f5f7ebcbf2",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Upstream makes the nav-bar link _handleKeydown react to ENTER as well as SPACE when a tab panel is set, still preventing default for a disabled link and only preventing default on SPACE before clicking. The owned legacy link base _handleKeydown has exactly that branch structure, so the fix was already present in the candidate.",
+        "proof_kind": "candidate-source-line-match",
+        "upstream_file": "src/material/tabs/tab-nav-bar/tab-nav-bar.ts",
+        "candidate_member": {
+          "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+          "sha256": "345331d2018fd3146e0fa09e87705a0709f777a65767d25bd11e6325276e7617"
+        },
+        "added_lines": [
+          {
+            "upstream_added": "if (event.keyCode === SPACE || event.keyCode === ENTER) {",
+            "candidate_lines": [
+              257
+            ]
+          },
+          {
+            "upstream_added": "if (this.disabled) {",
+            "candidate_lines": [
+              258
+            ]
+          },
+          {
+            "upstream_added": "event.preventDefault();",
+            "candidate_lines": [
+              259,
+              264
+            ]
+          },
+          {
+            "upstream_added": "this.elementRef.nativeElement.click();",
+            "candidate_lines": [
+              267
+            ]
+          }
+        ],
+        "read_note": "already-present",
+        "recorded_by": "Grok, FIN-02-C02; Codex validates in FIN-02-C05",
+        "recomputed_by": "scripts/record-candidate-line-proofs.py"
+      }
     },
     {
       "sha": "f6c5ea4c5d41a25ea4500999250d8e5f60fd2c20",
@@ -1746,7 +1821,32 @@
       "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
       "recorded_at_utc": "2026-10-01T16:46:41Z",
       "g11_claim": "not-passed",
-      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "individual_proof": {
+        "diff_sha256": "b443861e8eabbfa6c7613fc26349a89e59d2b364493d426461957beb247b691a",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Upstream binds the connected overlay (detach) output to close() so the select panel closes when the overlay detaches (for example on scroll strategy close). The owned legacy select template binds (detach)=\"close()\" on its cdk-connected-overlay, so the fix was already present in the candidate.",
+        "proof_kind": "candidate-source-line-match",
+        "upstream_file": "src/material/select/select.html",
+        "candidate_member": {
+          "path": "projects/ngx-material-legacy/legacy-select/select.html",
+          "sha256": "c54309b92719e6e9bf2e0b77decb82f4347b78a9565a4e22ba7f49f81353e5cf"
+        },
+        "added_lines": [
+          {
+            "upstream_added": "(detach)=\"close()\"",
+            "candidate_lines": [
+              41
+            ]
+          }
+        ],
+        "read_note": "already-present",
+        "recorded_by": "Grok, FIN-02-C02; Codex validates in FIN-02-C05",
+        "recomputed_by": "scripts/record-candidate-line-proofs.py"
+      }
     },
     {
       "sha": "40d0ab4fc73f059cb5496c4c035d4dcebc08b8b0",
