@@ -130,7 +130,7 @@ function collectFiles(target) {
   throw new Error(`Not a file or directory: ${target}`);
 }
 
-function processFile(absPath, apply, rewriteOptions) {
+function processFile(absPath, rewriteOptions) {
   const content = readFileSync(absPath, 'utf8');
   const indented = /\.sass$/i.test(absPath);
   const kind = indented ? 'sass' : SCSS_RE.test(absPath) ? 'scss' : 'ts';
@@ -150,11 +150,6 @@ function processFile(absPath, apply, rewriteOptions) {
     original: content,
     applied: false,
   };
-
-  if (apply && record.content != null) {
-    writeFileSync(absPath, record.content, 'utf8');
-    record.applied = true;
-  }
 
   return record;
 }
@@ -204,7 +199,7 @@ function main(argv) {
   for (const file of files) {
     let record;
     try {
-      record = processFile(file, false, rewriteOptions);
+      record = processFile(file, rewriteOptions);
     } catch (err) {
       record = {
         path: file,

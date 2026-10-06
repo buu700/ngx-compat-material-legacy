@@ -6,6 +6,7 @@
  */
 'use strict';
 
+const {spawnSync} = require('child_process');
 const {
   existsSync,
   readdirSync,
@@ -98,11 +99,12 @@ function collectFiles(target) {
 
 function processFile(absPath, apply, rewriteOptions) {
   const content = readFileSync(absPath, 'utf8');
-  const kind = SCSS_RE.test(absPath) ? 'scss' : 'ts';
+  const indented = /\.sass$/i.test(absPath);
+  const kind = indented ? 'sass' : SCSS_RE.test(absPath) ? 'scss' : 'ts';
   const result =
-    kind === 'scss'
-      ? rewriteSassModuleSource(content, rewriteOptions)
-      : rewriteLegacyTypescriptImports(content, rewriteOptions);
+    kind === 'ts'
+      ? rewriteLegacyTypescriptImports(content, rewriteOptions)
+      : rewriteSassModuleSource(content, indented ? Object.assign({}, rewriteOptions, {syntax: 'indented'}) : rewriteOptions);
 
   const record = {
     path: absPath,
@@ -111,16 +113,31 @@ function processFile(absPath, apply, rewriteOptions) {
     changed: Boolean(result.changed),
     diagnostics: result.diagnostics || [],
     acknowledgements: result.acknowledgements || [],
+    content: result.ok && result.changed ? result.content : null,
+    original: content,
     applied: false,
   };
+  return record;
+}
 
-  if (result.ok && result.changed && result.content != null) {
-    if (apply) {
-      writeFileSync(absPath, result.content, 'utf8');
-      record.applied = true;
+function concurrentEdits(records) {
+  const conflicts = [];
+  for (const record of records) {
+    if (record.content == null || typeof record.original !== 'string') continue;
+    let current;
+    try {
+      current = readFileSync(record.path, 'utf8');
+    } catch (err) {
+      record.diagnostics = (record.diagnostics || []).concat(['concurrent-edit: ' + (err.message || err)]);
+      conflicts.push(record);
+      continue;
+    }
+    if (current !== record.original) {
+      record.diagnostics = (record.diagnostics || []).concat(['concurrent-edit: file changed after it was read']);
+      conflicts.push(record);
     }
   }
-  return record;
+  return conflicts;
 }
 
 function main(argv) {
@@ -167,7 +184,7 @@ function main(argv) {
   for (const file of files) {
     let record;
     try {
-      record = processFile(file, apply, rewriteOptions);
+      record = processFile(file, false, rewriteOptions);
     } catch (err) {
       record = {
         path: file,
@@ -188,6 +205,32 @@ function main(argv) {
     }
   }
 
+  let concurrentEdit = false;
+  if (apply && blocking === 0) {
+    const hook = process.env.MIGRATE_LEGACY_BEFORE_WRITE;
+    if (hook) {
+      const injected = spawnSync(hook, {shell: true, encoding: 'utf8'});
+      if (injected.status !== 0) {
+        console.error(injected.stderr || injected.stdout || 'before-write hook failed');
+        process.exit(1);
+      }
+    }
+    const conflicts = concurrentEdits(records);
+    if (conflicts.length) {
+      concurrentEdit = true;
+      blocking += conflicts.length;
+      for (const record of conflicts) record.ok = false;
+    } else {
+      for (const record of records) {
+        if (record.content != null) {
+          writeFileSync(record.path, record.content, 'utf8');
+          record.applied = true;
+          applied += 1;
+        }
+      }
+    }
+  }
+
   const summary = {
     target,
     mode: apply ? 'apply' : 'dry-run',
@@ -195,6 +238,7 @@ function main(argv) {
     safe_edits: safeEdits,
     applied,
     blocking,
+    concurrent_edit: concurrentEdit,
     acknowledgements: allAcks,
     options: rewriteOptions,
     distribution: 'bundled-cli',
