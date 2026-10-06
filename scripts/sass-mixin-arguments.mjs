@@ -12,7 +12,8 @@ export function mixinArgumentCatalog() {
   const oracle=JSON.parse(readFileSync(join(root,'compatibility/rc/oracles/material-16.2.14-sass-api.json')));
   const names=Object.entries(oracle.members.mixins).filter(([,entry])=>{
     const required=entry.params.filter(p=>p.default===null);
-    return required.length>0 && required.every(p=>THEME_PARAMS.includes(p.name));
+    return required.length>0 ? required.every(p=>THEME_PARAMS.includes(p.name))
+      : entry.params.length===1 && THEME_PARAMS.includes(entry.params[0].name);
   }).map(([name])=>name).sort();
   const expected=[];
   for(const name of names) {
@@ -26,7 +27,7 @@ export function mixinArgumentCatalog() {
     for(const [mode,value] of [['custom-full-theme','$'+model+'-light'],[variant,argument]])
       expected.push({case_id:'mixin-argument/'+name+'/'+mode,mixin:name,variant:mode,argument:value,call:'.sass-argument-probe { @include m.'+name+'('+value+'); }'});
   }
-  if(catalog.schema_version!==1 || names.length!==247 || typeof catalog.setup!=='string'
+  if(catalog.schema_version!==1 || names.length!==249 || typeof catalog.setup!=='string'
     || JSON.stringify(catalog.cases)!==JSON.stringify(expected)) throw new Error('configurable mixin argument roster is incomplete or changed');
   return {...catalog,sha256:sha(raw)};
 }
@@ -65,5 +66,5 @@ export function runMixinArgumentContracts({sass,entry,loadPaths,allowedRoots,imp
     return {...probe,line,expected,actual,error:error??null,identity:provenance,mutation,mutation_rejected,
       result:!error && mixinArgumentResultsMatch(expected,actual) && mutation_rejected?'pass':'fail'};
   });
-  return {results,identity:provenance,ok:results.length===494 && results.every(r=>r.result==='pass')};
+  return {results,identity:provenance,ok:results.length===498 && results.every(r=>r.result==='pass')};
 }
