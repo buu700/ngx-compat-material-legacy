@@ -1,0 +1,393 @@
+--- 16.2.14/mixin-css/all-legacy-component-themes
++++ candidate/mixin-css/all-legacy-component-themes
+@@ -305,2 +305,8 @@
+   text-transform: var(--mdc-typography-button-text-transform, none);
++}
++.sass-api-probe .mat-datepicker-content .mat-mdc-button,
++.sass-api-probe .mat-datepicker-content .mat-mdc-raised-button,
++.sass-api-probe .mat-datepicker-content .mat-mdc-unelevated-button,
++.sass-api-probe .mat-datepicker-content .mat-mdc-outlined-button {
++  line-height: inherit;
+ }
+@@ -861,2 +867,5 @@
+ }
++.sass-api-probe .mat-select-disabled .mat-select-placeholder {
++  color: rgba(0, 0, 0, 0.38);
++}
+ .sass-api-probe .mat-select-arrow {
+@@ -1584,3 +1593,3 @@
+ }
+-.sass-api-probe .mat-simple-snackbar-action {
++.sass-api-probe .mat-simple-snackbar-action .mat-button:not(.mat-primary):not(.mat-accent):not(.mat-warn) {
+   color: #ff4081;
+@@ -1655,7 +1664,8 @@
+ }
+-.cdk-high-contrast-active .sass-api-probe .mat-badge-content {
+-  outline: solid 1px;
+-  border-radius: 0;
+-}
+-
++@media (forced-colors: active) {
++  .sass-api-probe .mat-badge-content {
++    outline: solid 1px;
++    border-radius: 0;
++  }
++}
+ .sass-api-probe .mat-badge-disabled .mat-badge-content {
+@@ -1821,2 +1831,40 @@
+ .sass-api-probe {
++  --mat-badge-container-shape: 50%;
++  --mat-badge-container-size: unset;
++  --mat-badge-small-size-container-size: unset;
++  --mat-badge-large-size-container-size: unset;
++  --mat-badge-legacy-container-size: 22px;
++  --mat-badge-legacy-small-size-container-size: 16px;
++  --mat-badge-legacy-large-size-container-size: 28px;
++  --mat-badge-container-offset: -11px 0;
++  --mat-badge-small-size-container-offset: -8px 0;
++  --mat-badge-large-size-container-offset: -14px 0;
++  --mat-badge-container-overlap-offset: -11px;
++  --mat-badge-small-size-container-overlap-offset: -8px;
++  --mat-badge-large-size-container-overlap-offset: -14px;
++  --mat-badge-container-padding: 0;
++  --mat-badge-small-size-container-padding: 0;
++  --mat-badge-large-size-container-padding: 0;
++  --mat-badge-background-color: #3f51b5;
++  --mat-badge-text-color: white;
++  --mat-badge-disabled-state-background-color: color-mix(in srgb, rgba(0, 0, 0, 0.87) 12%, transparent);
++  --mat-badge-disabled-state-text-color: color-mix(in srgb, rgba(0, 0, 0, 0.87) 38%, transparent);
++  --mat-badge-text-font: Roboto, sans-serif;
++  --mat-badge-line-height: 22px;
++  --mat-badge-text-size: 12px;
++  --mat-badge-text-weight: 600;
++  --mat-badge-small-size-text-size: 9px;
++  --mat-badge-small-size-line-height: 16px;
++  --mat-badge-large-size-text-size: 24px;
++  --mat-badge-large-size-line-height: 28px;
++}
++.sass-api-probe .mat-badge-accent {
++  --mat-badge-background-color: #ff4081;
++  --mat-badge-text-color: white;
++}
++.sass-api-probe .mat-badge-warn {
++  --mat-badge-background-color: #f44336;
++  --mat-badge-text-color: white;
++}
++.sass-api-probe {
+   --mat-bottom-sheet-container-text-color: rgba(0, 0, 0, 0.87);
+@@ -1833,2 +1881,12 @@
+ 
++.sass-api-probe {
++  --mat-bottom-sheet-container-shape: 4px;
++  --mat-bottom-sheet-container-text-color: rgba(0, 0, 0, 0.87);
++  --mat-bottom-sheet-container-background-color: white;
++  --mat-bottom-sheet-container-text-font: Roboto, sans-serif;
++  --mat-bottom-sheet-container-text-line-height: 20px;
++  --mat-bottom-sheet-container-text-size: 14px;
++  --mat-bottom-sheet-container-text-tracking: 0.0178571429em;
++  --mat-bottom-sheet-container-text-weight: 400;
++}
+ .sass-api-probe {
+@@ -1862,2 +1920,38 @@
+ 
++.sass-api-probe {
++  --mat-button-toggle-focus-state-layer-opacity: 0.12;
++  --mat-button-toggle-hover-state-layer-opacity: 0.04;
++  --mat-button-toggle-legacy-focus-state-layer-opacity: 1;
++  --mat-button-toggle-legacy-height: 36px;
++  --mat-button-toggle-legacy-shape: 2px;
++  --mat-button-toggle-shape: 4px;
++  --mat-button-toggle-background-color: white;
++  --mat-button-toggle-disabled-selected-state-background-color: color-mix(in srgb, rgba(0, 0, 0, 0.87) 12%, transparent);
++  --mat-button-toggle-disabled-selected-state-text-color: color-mix(in srgb, rgba(0, 0, 0, 0.87) 38%, transparent);
++  --mat-button-toggle-disabled-state-background-color: white;
++  --mat-button-toggle-disabled-state-text-color: color-mix(in srgb, rgba(0, 0, 0, 0.87) 38%, transparent);
++  --mat-button-toggle-divider-color: rgba(0, 0, 0, 0.12);
++  --mat-button-toggle-selected-state-background-color: color-mix(in srgb, rgba(0, 0, 0, 0.87) 12%, transparent);
++  --mat-button-toggle-selected-state-text-color: rgba(0, 0, 0, 0.87);
++  --mat-button-toggle-state-layer-color: rgba(0, 0, 0, 0.87);
++  --mat-button-toggle-text-color: rgba(0, 0, 0, 0.87);
++  --mat-button-toggle-legacy-disabled-selected-state-background-color: color-mix(in srgb, rgba(0, 0, 0, 0.87) 12%, transparent);
++  --mat-button-toggle-legacy-disabled-state-background-color: white;
++  --mat-button-toggle-legacy-disabled-state-text-color: color-mix(in srgb, rgba(0, 0, 0, 0.87) 38%, transparent);
++  --mat-button-toggle-legacy-selected-state-background-color: color-mix(in srgb, rgba(0, 0, 0, 0.87) 12%, transparent);
++  --mat-button-toggle-legacy-selected-state-text-color: rgba(0, 0, 0, 0.87);
++  --mat-button-toggle-legacy-state-layer-color: color-mix(in srgb, rgba(0, 0, 0, 0.87) 12%, transparent);
++  --mat-button-toggle-legacy-text-color: rgba(0, 0, 0, 0.87);
++  --mat-button-toggle-label-text-font: Roboto, sans-serif;
++  --mat-button-toggle-label-text-line-height: 24px;
++  --mat-button-toggle-label-text-size: 16px;
++  --mat-button-toggle-label-text-tracking: 0.03125em;
++  --mat-button-toggle-label-text-weight: 400;
++  --mat-button-toggle-legacy-label-text-font: Roboto, sans-serif;
++  --mat-button-toggle-legacy-label-text-line-height: 24px;
++  --mat-button-toggle-legacy-label-text-size: 16px;
++  --mat-button-toggle-legacy-label-text-tracking: 0.03125em;
++  --mat-button-toggle-legacy-label-text-weight: 400;
++  --mat-button-toggle-height: 48px;
++}
+ .sass-api-probe {
+@@ -1944,2 +2038,113 @@
+ .sass-api-probe {
++  --mat-datepicker-calendar-container-shape: 4px;
++  --mat-datepicker-calendar-container-touch-shape: 4px;
++  --mat-datepicker-calendar-container-elevation-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
++  --mat-datepicker-calendar-container-touch-elevation-shadow: 0px 11px 15px -7px rgba(0, 0, 0, 0.2), 0px 24px 38px 3px rgba(0, 0, 0, 0.14), 0px 9px 46px 8px rgba(0, 0, 0, 0.12);
++  --mat-datepicker-calendar-date-in-range-state-background-color: color-mix(in srgb, #3f51b5 20%, transparent);
++  --mat-datepicker-calendar-date-in-comparison-range-state-background-color: color-mix(in srgb, #ff4081 20%, transparent);
++  --mat-datepicker-calendar-date-in-overlap-range-state-background-color: #a8dab5;
++  --mat-datepicker-calendar-date-in-overlap-range-selected-state-background-color: rgb(27.2643896268%, 64.1081593928%, 36.843769766%);
++  --mat-datepicker-calendar-date-selected-state-text-color: white;
++  --mat-datepicker-calendar-date-selected-state-background-color: #3f51b5;
++  --mat-datepicker-calendar-date-selected-disabled-state-background-color: color-mix(in srgb, #3f51b5 38%, transparent);
++  --mat-datepicker-calendar-date-today-selected-state-outline-color: white;
++  --mat-datepicker-calendar-date-focus-state-background-color: color-mix(in srgb, #3f51b5 12%, transparent);
++  --mat-datepicker-calendar-date-hover-state-background-color: color-mix(in srgb, #3f51b5 4%, transparent);
++  --mat-datepicker-toggle-active-state-icon-color: #3f51b5;
++  --mat-datepicker-toggle-icon-color: rgba(0, 0, 0, 0.54);
++  --mat-datepicker-calendar-body-label-text-color: rgba(0, 0, 0, 0.54);
++  --mat-datepicker-calendar-period-button-text-color: rgba(0, 0, 0, 0.87);
++  --mat-datepicker-calendar-period-button-icon-color: rgba(0, 0, 0, 0.54);
++  --mat-datepicker-calendar-navigation-button-icon-color: rgba(0, 0, 0, 0.54);
++  --mat-datepicker-calendar-header-divider-color: rgba(0, 0, 0, 0.12);
++  --mat-datepicker-calendar-header-text-color: rgba(0, 0, 0, 0.54);
++  --mat-datepicker-calendar-date-today-outline-color: rgba(0, 0, 0, 0.54);
++  --mat-datepicker-calendar-date-today-disabled-state-outline-color: color-mix(in srgb, rgba(0, 0, 0, 0.87) 38%, transparent);
++  --mat-datepicker-calendar-date-text-color: rgba(0, 0, 0, 0.87);
++  --mat-datepicker-calendar-date-outline-color: transparent;
++  --mat-datepicker-calendar-date-disabled-state-text-color: color-mix(in srgb, rgba(0, 0, 0, 0.87) 38%, transparent);
++  --mat-datepicker-calendar-date-preview-state-outline-color: rgba(0, 0, 0, 0.54);
++  --mat-datepicker-range-input-separator-color: rgba(0, 0, 0, 0.87);
++  --mat-datepicker-range-input-disabled-state-separator-color: color-mix(in srgb, rgba(0, 0, 0, 0.87) 38%, transparent);
++  --mat-datepicker-range-input-disabled-state-text-color: color-mix(in srgb, rgba(0, 0, 0, 0.87) 38%, transparent);
++  --mat-datepicker-calendar-container-background-color: white;
++  --mat-datepicker-calendar-container-text-color: rgba(0, 0, 0, 0.87);
++  --mat-datepicker-calendar-text-font: Roboto, sans-serif;
++  --mat-datepicker-calendar-text-size: 13px;
++  --mat-datepicker-calendar-body-label-text-size: 14px;
++  --mat-datepicker-calendar-body-label-text-weight: 500;
++  --mat-datepicker-calendar-period-button-text-size: 14px;
++  --mat-datepicker-calendar-period-button-text-weight: 500;
++  --mat-datepicker-calendar-header-text-size: 11px;
++  --mat-datepicker-calendar-header-text-weight: 400;
++}
++.sass-api-probe .mat-datepicker-content.mat-accent, .sass-api-probe .mat-datepicker-toggle-active.mat-accent {
++  --mat-datepicker-calendar-date-in-range-state-background-color: color-mix(in srgb, #ff4081 20%, transparent);
++  --mat-datepicker-calendar-date-in-comparison-range-state-background-color: color-mix(in srgb, #ff4081 20%, transparent);
++  --mat-datepicker-calendar-date-in-overlap-range-state-background-color: #a8dab5;
++  --mat-datepicker-calendar-date-in-overlap-range-selected-state-background-color: rgb(27.2643896268%, 64.1081593928%, 36.843769766%);
++  --mat-datepicker-calendar-date-selected-state-text-color: white;
++  --mat-datepicker-calendar-date-selected-state-background-color: #ff4081;
++  --mat-datepicker-calendar-date-selected-disabled-state-background-color: color-mix(in srgb, #ff4081 38%, transparent);
++  --mat-datepicker-calendar-date-today-selected-state-outline-color: white;
++  --mat-datepicker-calendar-date-focus-state-background-color: color-mix(in srgb, #ff4081 12%, transparent);
++  --mat-datepicker-calendar-date-hover-state-background-color: color-mix(in srgb, #ff4081 4%, transparent);
++  --mat-datepicker-toggle-active-state-icon-color: #ff4081;
++  --mat-datepicker-toggle-icon-color: rgba(0, 0, 0, 0.54);
++  --mat-datepicker-calendar-body-label-text-color: rgba(0, 0, 0, 0.54);
++  --mat-datepicker-calendar-period-button-text-color: rgba(0, 0, 0, 0.87);
++  --mat-datepicker-calendar-period-button-icon-color: rgba(0, 0, 0, 0.54);
++  --mat-datepicker-calendar-navigation-button-icon-color: rgba(0, 0, 0, 0.54);
++  --mat-datepicker-calendar-header-divider-color: rgba(0, 0, 0, 0.12);
++  --mat-datepicker-calendar-header-text-color: rgba(0, 0, 0, 0.54);
++  --mat-datepicker-calendar-date-today-outline-color: rgba(0, 0, 0, 0.54);
++  --mat-datepicker-calendar-date-today-disabled-state-outline-color: color-mix(in srgb, rgba(0, 0, 0, 0.87) 38%, transparent);
++  --mat-datepicker-calendar-date-text-color: rgba(0, 0, 0, 0.87);
++  --mat-datepicker-calendar-date-outline-color: transparent;
++  --mat-datepicker-calendar-date-disabled-state-text-color: color-mix(in srgb, rgba(0, 0, 0, 0.87) 38%, transparent);
++  --mat-datepicker-calendar-date-preview-state-outline-color: rgba(0, 0, 0, 0.54);
++  --mat-datepicker-range-input-separator-color: rgba(0, 0, 0, 0.87);
++  --mat-datepicker-range-input-disabled-state-separator-color: color-mix(in srgb, rgba(0, 0, 0, 0.87) 38%, transparent);
++  --mat-datepicker-range-input-disabled-state-text-color: color-mix(in srgb, rgba(0, 0, 0, 0.87) 38%, transparent);
++  --mat-datepicker-calendar-container-background-color: white;
++  --mat-datepicker-calendar-container-text-color: rgba(0, 0, 0, 0.87);
++}
++.sass-api-probe .mat-datepicker-content.mat-warn, .sass-api-probe .mat-datepicker-toggle-active.mat-warn {
++  --mat-datepicker-calendar-date-in-range-state-background-color: color-mix(in srgb, #f44336 20%, transparent);
++  --mat-datepicker-calendar-date-in-comparison-range-state-background-color: color-mix(in srgb, #ff4081 20%, transparent);
++  --mat-datepicker-calendar-date-in-overlap-range-state-background-color: #a8dab5;
++  --mat-datepicker-calendar-date-in-overlap-range-selected-state-background-color: rgb(27.2643896268%, 64.1081593928%, 36.843769766%);
++  --mat-datepicker-calendar-date-selected-state-text-color: white;
++  --mat-datepicker-calendar-date-selected-state-background-color: #f44336;
++  --mat-datepicker-calendar-date-selected-disabled-state-background-color: color-mix(in srgb, #f44336 38%, transparent);
++  --mat-datepicker-calendar-date-today-selected-state-outline-color: white;
++  --mat-datepicker-calendar-date-focus-state-background-color: color-mix(in srgb, #f44336 12%, transparent);
++  --mat-datepicker-calendar-date-hover-state-background-color: color-mix(in srgb, #f44336 4%, transparent);
++  --mat-datepicker-toggle-active-state-icon-color: #f44336;
++  --mat-datepicker-toggle-icon-color: rgba(0, 0, 0, 0.54);
++  --mat-datepicker-calendar-body-label-text-color: rgba(0, 0, 0, 0.54);
++  --mat-datepicker-calendar-period-button-text-color: rgba(0, 0, 0, 0.87);
++  --mat-datepicker-calendar-period-button-icon-color: rgba(0, 0, 0, 0.54);
++  --mat-datepicker-calendar-navigation-button-icon-color: rgba(0, 0, 0, 0.54);
++  --mat-datepicker-calendar-header-divider-color: rgba(0, 0, 0, 0.12);
++  --mat-datepicker-calendar-header-text-color: rgba(0, 0, 0, 0.54);
++  --mat-datepicker-calendar-date-today-outline-color: rgba(0, 0, 0, 0.54);
++  --mat-datepicker-calendar-date-today-disabled-state-outline-color: color-mix(in srgb, rgba(0, 0, 0, 0.87) 38%, transparent);
++  --mat-datepicker-calendar-date-text-color: rgba(0, 0, 0, 0.87);
++  --mat-datepicker-calendar-date-outline-color: transparent;
++  --mat-datepicker-calendar-date-disabled-state-text-color: color-mix(in srgb, rgba(0, 0, 0, 0.87) 38%, transparent);
++  --mat-datepicker-calendar-date-preview-state-outline-color: rgba(0, 0, 0, 0.54);
++  --mat-datepicker-range-input-separator-color: rgba(0, 0, 0, 0.87);
++  --mat-datepicker-range-input-disabled-state-separator-color: color-mix(in srgb, rgba(0, 0, 0, 0.87) 38%, transparent);
++  --mat-datepicker-range-input-disabled-state-text-color: color-mix(in srgb, rgba(0, 0, 0, 0.87) 38%, transparent);
++  --mat-datepicker-calendar-container-background-color: white;
++  --mat-datepicker-calendar-container-text-color: rgba(0, 0, 0, 0.87);
++}
++.sass-api-probe .mat-calendar-controls {
++  --mat-icon-button-touch-target-display: none;
++}
++.sass-api-probe .mat-calendar-controls .mat-mdc-icon-button.mat-mdc-button-base {
++  --mat-icon-button-state-layer-size: 40px;
++}
++.sass-api-probe {
+   --mat-divider-color: rgba(0, 0, 0, 0.12);
+@@ -1947,2 +2152,6 @@
+ 
++.sass-api-probe {
++  --mat-divider-width: 1px;
++  --mat-divider-color: rgba(0, 0, 0, 0.12);
++}
+ .sass-api-probe {
+@@ -1978,2 +2187,27 @@
+ .sass-api-probe {
++  --mat-expansion-container-shape: 4px;
++  --mat-expansion-legacy-header-indicator-display: inline-block;
++  --mat-expansion-header-indicator-display: none;
++  --mat-expansion-container-elevation-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
++  --mat-expansion-container-background-color: white;
++  --mat-expansion-container-text-color: rgba(0, 0, 0, 0.87);
++  --mat-expansion-actions-divider-color: rgba(0, 0, 0, 0.12);
++  --mat-expansion-header-hover-state-layer-color: color-mix(in srgb, rgba(0, 0, 0, 0.87) 4%, transparent);
++  --mat-expansion-header-focus-state-layer-color: color-mix(in srgb, rgba(0, 0, 0, 0.87) 12%, transparent);
++  --mat-expansion-header-disabled-state-text-color: color-mix(in srgb, rgba(0, 0, 0, 0.87) 38%, transparent);
++  --mat-expansion-header-text-color: rgba(0, 0, 0, 0.87);
++  --mat-expansion-header-description-color: rgba(0, 0, 0, 0.54);
++  --mat-expansion-header-indicator-color: rgba(0, 0, 0, 0.54);
++  --mat-expansion-header-text-font: Roboto, sans-serif;
++  --mat-expansion-header-text-size: 14px;
++  --mat-expansion-header-text-weight: 500;
++  --mat-expansion-header-text-line-height: inherit;
++  --mat-expansion-header-text-tracking: inherit;
++  --mat-expansion-container-text-font: Roboto, sans-serif;
++  --mat-expansion-container-text-line-height: 20px;
++  --mat-expansion-container-text-size: 14px;
++  --mat-expansion-container-text-tracking: 0.0178571429em;
++  --mat-expansion-container-text-weight: 400;
++  --mat-expansion-header-collapsed-state-height: 48px;
++  --mat-expansion-header-expanded-state-height: 64px;
+   --mat-grid-list-tile-header-primary-text-size: 14px;
+@@ -1982,8 +2216,4 @@
+   --mat-grid-list-tile-footer-secondary-text-size: 12px;
+-}
+-
+-.sass-api-probe {
+   --mat-icon-color: inherit;
+ }
+-
+ .sass-api-probe .mat-icon.mat-primary {
+@@ -2006,2 +2236,13 @@
+ 
++.sass-api-probe {
++  --mat-sidenav-container-shape: 0;
++  --mat-sidenav-container-width: auto;
++  --mat-sidenav-container-elevation-shadow: 0px 8px 10px -5px rgba(0, 0, 0, 0.2), 0px 16px 24px 2px rgba(0, 0, 0, 0.14), 0px 6px 30px 5px rgba(0, 0, 0, 0.12);
++  --mat-sidenav-container-divider-color: rgba(0, 0, 0, 0.12);
++  --mat-sidenav-container-background-color: white;
++  --mat-sidenav-container-text-color: rgba(0, 0, 0, 0.87);
++  --mat-sidenav-content-background-color: #fafafa;
++  --mat-sidenav-content-text-color: rgba(0, 0, 0, 0.87);
++  --mat-sidenav-scrim-color: rgba(0, 0, 0, 0.6);
++}
+ .sass-api-probe {
+@@ -2059,4 +2300,55 @@
+ 
++.sass-api-probe {
++  --mat-stepper-header-focus-state-layer-shape: 4px;
++  --mat-stepper-header-hover-state-layer-shape: 4px;
++  --mat-stepper-header-icon-foreground-color: white;
++  --mat-stepper-header-selected-state-icon-background-color: #3f51b5;
++  --mat-stepper-header-selected-state-icon-foreground-color: white;
++  --mat-stepper-header-done-state-icon-background-color: #3f51b5;
++  --mat-stepper-header-done-state-icon-foreground-color: white;
++  --mat-stepper-header-edit-state-icon-background-color: #3f51b5;
++  --mat-stepper-header-edit-state-icon-foreground-color: white;
++  --mat-stepper-container-color: white;
++  --mat-stepper-line-color: rgba(0, 0, 0, 0.12);
++  --mat-stepper-header-hover-state-layer-color: color-mix(in srgb, rgba(0, 0, 0, 0.87) 4%, transparent);
++  --mat-stepper-header-focus-state-layer-color: color-mix(in srgb, rgba(0, 0, 0, 0.87) 12%, transparent);
++  --mat-stepper-header-label-text-color: rgba(0, 0, 0, 0.54);
++  --mat-stepper-header-optional-label-text-color: rgba(0, 0, 0, 0.54);
++  --mat-stepper-header-selected-state-label-text-color: rgba(0, 0, 0, 0.87);
++  --mat-stepper-header-error-state-label-text-color: #f44336;
++  --mat-stepper-header-icon-background-color: rgba(0, 0, 0, 0.54);
++  --mat-stepper-header-error-state-icon-foreground-color: #f44336;
++  --mat-stepper-header-error-state-icon-background-color: transparent;
++  --mat-stepper-container-text-font: Roboto, sans-serif;
++  --mat-stepper-header-label-text-font: Roboto, sans-serif;
++  --mat-stepper-header-label-text-size: 14px;
++  --mat-stepper-header-label-text-weight: 400;
++  --mat-stepper-header-error-state-label-text-size: 16px;
++  --mat-stepper-header-selected-state-label-text-size: 16px;
++  --mat-stepper-header-selected-state-label-text-weight: 400;
++  --mat-stepper-header-height: 72px;
++}
++.sass-api-probe .mat-step-header.mat-accent {
++  --mat-stepper-header-icon-foreground-color: white;
++  --mat-stepper-header-selected-state-icon-background-color: #ff4081;
++  --mat-stepper-header-selected-state-icon-foreground-color: white;
++  --mat-stepper-header-done-state-icon-background-color: #ff4081;
++  --mat-stepper-header-done-state-icon-foreground-color: white;
++  --mat-stepper-header-edit-state-icon-background-color: #ff4081;
++  --mat-stepper-header-edit-state-icon-foreground-color: white;
++}
++.sass-api-probe .mat-step-header.mat-warn {
++  --mat-stepper-header-icon-foreground-color: white;
++  --mat-stepper-header-selected-state-icon-background-color: #f44336;
++  --mat-stepper-header-selected-state-icon-foreground-color: white;
++  --mat-stepper-header-done-state-icon-background-color: #f44336;
++  --mat-stepper-header-done-state-icon-foreground-color: white;
++  --mat-stepper-header-edit-state-icon-background-color: #f44336;
++  --mat-stepper-header-edit-state-icon-foreground-color: white;
++}
+ .sass-api-probe .mat-sort-header-arrow {
+   color: rgb(46%, 46%, 46%);
++}
++.sass-api-probe {
++  --mat-sort-arrow-color: rgba(0, 0, 0, 0.87);
+ }
+@@ -2092,2 +2384,25 @@
+ 
++.sass-api-probe {
++  --mat-toolbar-container-background-color: white;
++  --mat-toolbar-container-text-color: rgba(0, 0, 0, 0.87);
++  --mat-toolbar-title-text-font: Roboto, sans-serif;
++  --mat-toolbar-title-text-line-height: 32px;
++  --mat-toolbar-title-text-size: 20px;
++  --mat-toolbar-title-text-tracking: 0.0125em;
++  --mat-toolbar-title-text-weight: 500;
++  --mat-toolbar-standard-height: 64px;
++  --mat-toolbar-mobile-height: 56px;
++}
++.sass-api-probe .mat-toolbar.mat-primary {
++  --mat-toolbar-container-background-color: #3f51b5;
++  --mat-toolbar-container-text-color: white;
++}
++.sass-api-probe .mat-toolbar.mat-accent {
++  --mat-toolbar-container-background-color: #ff4081;
++  --mat-toolbar-container-text-color: white;
++}
++.sass-api-probe .mat-toolbar.mat-warn {
++  --mat-toolbar-container-background-color: #f44336;
++  --mat-toolbar-container-text-color: white;
++}
+ .sass-api-probe .mat-tree {
+@@ -2110 +2425,9 @@
+ }
++.sass-api-probe {
++  --mat-tree-container-background-color: white;
++  --mat-tree-node-text-color: rgba(0, 0, 0, 0.87);
++  --mat-tree-node-text-font: Roboto, sans-serif;
++  --mat-tree-node-text-size: 14px;
++  --mat-tree-node-text-weight: 400;
++  --mat-tree-node-min-height: 48px;
++}
