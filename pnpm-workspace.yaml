@@ -16,7 +16,16 @@ minimumReleaseAgeIgnoreMissingTime: false
 minimumReleaseAgeExcludePrune: true
 
 # Add only exact version-specific exceptions, with comments explaining the urgent fix.
-minimumReleaseAgeExclude: []
+minimumReleaseAgeExclude:
+  # Urgent OSV remediations for transitive lock packages (FIN-07 B).
+  # http-cache-semantics@4.3.0: GHSA-ch52-4w7c-c8xp (max-stale cross-user cache).
+  # source-map-js@1.2.2: GHSA-68fv-2mgg-jv7q (event-loop DoS via indexed sections).
+  - http-cache-semantics@4.3.0
+  - source-map-js@1.2.2
 allowBuilds:
   '@parcel/watcher': true
   esbuild: true
+
+overrides:
+  http-cache-semantics: 4.3.0
+  source-map-js: 1.2.2
