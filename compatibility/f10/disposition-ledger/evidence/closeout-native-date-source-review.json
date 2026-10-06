@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "sha": "b423c0e0b754b1f1d118d17e022981c357c3aa68",
+  "line": "21.x",
+  "final_disposition": "do-not-adopt",
+  "decision": "Do not adopt this constructor-breaking upstream change into the legacy export. The whole patch removes Platform from NativeDateAdapter and forces inject(MAT_DATE_LOCALE); its second hunk narrows the public declaration and factory. The add-on now owns the untouched Material16 helper under LegacyNativeDateAdapter, preserves locale:string plus Platform? and the original two-token factory, and owns its provider modules. It no longer delegates this helper to the current peer. Both exact release-line packed consumers passed constructor/subclass/calendar and provider/locale tests, and API observations show no NativeDateAdapter discrepancy. This is historical-contract preservation, not a claimed vulnerability fix; unrelated DI failures and global G11 remain open.",
+  "review_depth": "individual-compatibility",
+  "diff_sha256": "0fc17a9693eca8bb91cf85b9e1bd5129acf63ccc8a761482a7e8e2ba5d9dd31d",
+  "patch_file": "compatibility/f10/disposition-ledger/evidence/patches/b423c0e0b754b1f1d118d17e022981c357c3aa68.patch",
+  "patch_paths": [
+    "src/material/core/datetime/native-date-adapter.ts",
+    "tools/public_api_guard/material/core.md"
+  ],
+  "owned_source": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/datetime/native-date-adapter.ts",
+      "sha256": "b69f5c2bbc12deb6ff4c420252733f51742616e016b2a6193de066cf4eecade5",
+      "bytes": 8524
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/datetime/native-date-module.ts",
+      "sha256": "ea7b50c1618c5631f6dddb395461a144fb2d9448d2e1cb05222664ade19b23c1",
+      "bytes": 871
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+      "sha256": "c54bd7d94179da6fc7e6340e37445351357e4618fde30070f026d5bd13547801",
+      "bytes": 3399
+    },
+    {
+      "path": "reference/material-16.2.14/datetime/native-date-adapter.ts",
+      "sha256": "9764348262387bc4d76f3c1724620074288167e8d2b13ebd5e109bab23f8e797",
+      "bytes": 8475
+    },
+    {
+      "path": "reference/material-16.2.14/factory-metadata.json",
+      "sha256": "1b124aab1f570e111647f8142cdea8066ae9db673efc405a6999c178709602b6",
+      "bytes": 220609
+    },
+    {
+      "path": "scripts/packed-consumer-aot-smoke.mjs",
+      "sha256": "cc03b5411ababa6b2cdb9aa2df00d9c127e7cf1f78b05a5c36e99f0a35d2c13a",
+      "bytes": 49476
+    }
+  ],
+  "original_tag": "16.2.14",
+  "original_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+  "execution": {
+    "source_commit": "9b016947bbf8a8cf05ad16ab32782330788df282",
+    "run": 37515479277,
+    "job": 112447179667,
+    "library_sha256": "08bc08f1ff28cf697f0c59cc154400920c2eee6cd8ae977c70062722ca3a2ac5"
+  },
+  "executed_cases": [
+    "packed-consumer/harness/native-date-constructor",
+    "packed-consumer/harness/native-date-provider"
+  ],
+  "packed_roster_passed": 65,
+  "evidence_transport": "Reviewed authenticated Actions job logs; artifact archive was not downloaded or independently rehashed.",
+  "scope": "Two original factory tokens and historical constructor/provider semantics; this is not complete API/DI or runtime-floor certification.",
+  "independent_review": "Required at C05/A02/A07, not yet performed",
+  "g11_claim": "not-passed",
+  "recorded_at_utc": "2026-10-06T19:51:14.065922+00:00"
+}

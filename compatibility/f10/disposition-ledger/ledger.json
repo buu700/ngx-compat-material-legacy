@@ -4,8 +4,8 @@
   "g11_claim": "not-passed",
   "seed_rows": 1697,
   "ledger_rows": 1697,
-  "closed_dispositions": 15,
-  "open_or_deferred": 1682,
+  "closed_dispositions": 16,
+  "open_or_deferred": 1681,
   "entries": [
     {
       "sha": "b13c6aa194cf560a304213961ae28725f8d0a4e2",
@@ -861,18 +861,22 @@
       "bucket": "security-deep",
       "subject": "fix(material/datepicker): deprecate constructor injection in NativeDateAdapter (#26144)",
       "files": [
-        "src/material/core/datetime/native-date-adapter.ts"
+        "projects/ngx-material-legacy/legacy-core/internal/datetime/native-date-adapter.ts",
+        "projects/ngx-material-legacy/legacy-core/internal/datetime/native-date-module.ts",
+        "projects/ngx-material-legacy/legacy-core/public-api.ts",
+        "reference/material-16.2.14/datetime/native-date-adapter.ts",
+        "reference/material-16.2.14/factory-metadata.json",
+        "scripts/packed-consumer-aot-smoke.mjs"
       ],
-      "final_disposition": "needs-individual-review",
-      "reason": "Constructor/declaration change applies to the exact NativeDateAdapter currently re-exported as LegacyNativeDateAdapter. The original16 constructor accepts matDateLocale:string and optional Platform; installed main22.1.7 types declare constructor(), with inject(MAT_DATE_LOCALE) inside runtime. Previous not-owned/irrelevant rationale ignored the public alias. Constructor/subclass compatibility requires repair or a substantiated allowed contract decision; no identity proof is claimed.",
+      "final_disposition": "do-not-adopt",
+      "reason": "Do not adopt this constructor-breaking upstream change into the legacy export. The whole patch removes Platform from NativeDateAdapter and forces inject(MAT_DATE_LOCALE); its second hunk narrows the public declaration and factory. The add-on now owns the untouched Material16 helper under LegacyNativeDateAdapter, preserves locale:string plus Platform? and the original two-token factory, and owns its provider modules. It no longer delegates this helper to the current peer. Both exact release-line packed consumers passed constructor/subclass/calendar and provider/locale tests, and API observations show no NativeDateAdapter discrepancy. This is historical-contract preservation, not a claimed vulnerability fix; unrelated DI failures and global G11 remain open.",
       "read_note_disposition": "unreviewed-on-21.x",
       "affected_branches": [
-        "main",
         "21.x"
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-security-source-review.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-native-date-source-review.json",
       "prior_dispositions": [
         {
           "sha": "b423c0e0b754b1f1d118d17e022981c357c3aa68",
@@ -890,10 +894,45 @@
           "g11_claim": "not-passed",
           "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
           "evidence_report": null
+        },
+        {
+          "sha": "b423c0e0b754b1f1d118d17e022981c357c3aa68",
+          "bucket": "security-deep",
+          "subject": "fix(material/datepicker): deprecate constructor injection in NativeDateAdapter (#26144)",
+          "files": [
+            "src/material/core/datetime/native-date-adapter.ts"
+          ],
+          "final_disposition": "needs-individual-review",
+          "reason": "Constructor/declaration change applies to the exact NativeDateAdapter currently re-exported as LegacyNativeDateAdapter. The original16 constructor accepts matDateLocale:string and optional Platform; installed main22.1.7 types declare constructor(), with inject(MAT_DATE_LOCALE) inside runtime. Previous not-owned/irrelevant rationale ignored the public alias. Constructor/subclass compatibility requires repair or a substantiated allowed contract decision; no identity proof is claimed.",
+          "read_note_disposition": "unreviewed-on-21.x",
+          "affected_branches": [
+            "main",
+            "21.x"
+          ],
+          "g11_claim": "not-passed",
+          "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+          "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-security-source-review.json",
+          "batch_id": "closeout-six-security-source-reads",
+          "recorded_at_utc": "2026-10-06T18:23:24.711579+00:00"
         }
       ],
-      "batch_id": "closeout-six-security-source-reads",
-      "recorded_at_utc": "2026-10-06T18:23:24.711579+00:00"
+      "batch_id": "closeout-native-constructor-individual",
+      "recorded_at_utc": "2026-10-06T19:51:14.065922+00:00",
+      "individual_proof": {
+        "diff_sha256": "0fc17a9693eca8bb91cf85b9e1bd5129acf63ccc8a761482a7e8e2ba5d9dd31d",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "21.x"
+        ],
+        "decision": "Do not adopt this constructor-breaking upstream change into the legacy export. The whole patch removes Platform from NativeDateAdapter and forces inject(MAT_DATE_LOCALE); its second hunk narrows the public declaration and factory. The add-on now owns the untouched Material16 helper under LegacyNativeDateAdapter, preserves locale:string plus Platform? and the original two-token factory, and owns its provider modules. It no longer delegates this helper to the current peer. Both exact release-line packed consumers passed constructor/subclass/calendar and provider/locale tests, and API observations show no NativeDateAdapter discrepancy. This is historical-contract preservation, not a claimed vulnerability fix; unrelated DI failures and global G11 remain open.",
+        "proof_kind": "source-and-executed-packed-constructor-provider",
+        "execution": {
+          "source_commit": "9b016947bbf8a8cf05ad16ab32782330788df282",
+          "run": 37515479277,
+          "job": 112447179667,
+          "library_sha256": "08bc08f1ff28cf697f0c59cc154400920c2eee6cd8ae977c70062722ca3a2ac5"
+        }
+      }
     },
     {
       "sha": "373a0cbf9531ea9ae0c9eb0e9cbf70f049f863b7",
