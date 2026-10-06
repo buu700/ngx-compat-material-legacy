@@ -28,7 +28,60 @@ $calendar-weekday-table-font-size: 11px !default;
     map.merge($calendar-tokens, $range-tokens));
 }
 
+@mixin _m2-color($config-or-theme) {
+  $config: theming.get-color-config($config-or-theme);
+
+  @include sass-utils.current-selector-or-root() {
+    @include token-utils.create-token-values(tokens-mat-datepicker.$prefix,
+      tokens-mat-datepicker.get-color-tokens($config));
+  }
+
+  .mat-datepicker-content {
+    &.mat-accent {
+      @include _calendar-color($config, accent);
+    }
+
+    &.mat-warn {
+      @include _calendar-color($config, warn);
+    }
+  }
+
+  .mat-datepicker-toggle-active {
+    &.mat-accent {
+      $accent-tokens:
+        tokens-mat-datepicker.private-get-toggle-color-palette-color-tokens($config, accent);
+      @include token-utils.create-token-values(tokens-mat-datepicker.$prefix, $accent-tokens);
+    }
+
+    &.mat-warn {
+      $warn-tokens:
+        tokens-mat-datepicker.private-get-toggle-color-palette-color-tokens($config, warn);
+      @include token-utils.create-token-values(tokens-mat-datepicker.$prefix, $warn-tokens);
+    }
+  }
+}
+
+@mixin _m2-typography($config-or-theme) {
+  $config: typography.private-typography-to-2014-config(
+      theming.get-typography-config($config-or-theme));
+
+  @include sass-utils.current-selector-or-root() {
+    @include token-utils.create-token-values(tokens-mat-datepicker.$prefix,
+      tokens-mat-datepicker.get-typography-tokens($config));
+  }
+}
+
+@mixin _m2-density($config-or-theme) {
+  // Calendar previous/next buttons stay at density -2 regardless of the theme density.
+  .mat-calendar-controls {
+    @include icon-button-theme.density(-2);
+  }
+}
+
 @mixin color($config-or-theme) {
+  // 16.2.14 color rules, then the companion bridge. The bridge carries the
+  // current peer's token values, so it stays a separate insertion.
+  @include _m2-color($config-or-theme);
   @include bridges.datepicker((
     color: theming.get-color-config($config-or-theme),
     typography: null,
@@ -38,6 +91,9 @@ $calendar-weekday-table-font-size: 11px !default;
 
 
 @mixin typography($config-or-theme) {
+  // 16.2.14 typography rules, then the companion bridge. The bridge carries the
+  // current peer's token values, so it stays a separate insertion.
+  @include _m2-typography($config-or-theme);
   @include bridges.datepicker((
     color: null,
     typography: theming.get-typography-config($config-or-theme),
@@ -63,23 +119,33 @@ $calendar-weekday-table-font-size: 11px !default;
 }
 
 @mixin density($config-or-theme) {
+  // 16.2.14 density rules, then the companion bridge.
+  @include _m2-density($config-or-theme);
   @include bridges.datepicker((
     color: null,
     typography: null,
     density: theming.get-density-config($config-or-theme)
   ));
-
-  // Calendar previous/next buttons stay at density -2 regardless of the theme density.
-  .mat-calendar-controls {
-    @include icon-button-theme.density(-2);
-  }
 }
 
 
 @mixin theme($theme-or-color-config) {
   $theme: theming.private-legacy-get-theme($theme-or-color-config);
   @include theming.private-check-duplicate-theme-styles($theme, 'mat-datepicker') {
+    $color: theming.get-color-config($theme);
+    $density: theming.get-density-config($theme);
+    $typography: theming.get-typography-config($theme);
+
+    @if $color != null {
+      @include _m2-color($color);
+    }
+    @if $density != null {
+      @include _m2-density($density);
+    }
+    @if $typography != null {
+      @include _m2-typography($typography);
+    }
+    // Companion bridge stays. Its rules follow the 16.2.14 rules.
     @include bridges.datepicker($theme);
   }
 }
-

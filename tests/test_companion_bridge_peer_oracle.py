@@ -106,7 +106,7 @@ console.log(JSON.stringify({
 
     def test_roster_is_exactly_the_asserted_tokens(self):
         self.assertEqual(self.out["ids"], roster())
-        self.assertEqual(len(self.out["ids"]), 161)
+        self.assertEqual(len(self.out["ids"]), 196)
 
     def test_every_rostered_token_equals_the_current_peer(self):
         self.assertEqual(self.out["failed"], [])
@@ -116,7 +116,7 @@ console.log(JSON.stringify({
         self.assertEqual(self.out["identity"]["version"], package["devDependencies"]["@angular/material"])
 
     def test_one_assertion_per_case_records_peer_version_and_source(self):
-        self.assertEqual(self.out["files"], 161)
+        self.assertEqual(self.out["files"], 196)
         sample = self.out["sample"]
         self.assertEqual(sample["kind"], "assertion")
         self.assertEqual(sample["result"], "pass")

@@ -34,7 +34,7 @@ class Group1RosterTests(unittest.TestCase):
             cwd=ROOT, text=True,
         ))
         self.assertEqual(row["acceptance"]["cases_by_line"]["21.x"]["compiled-override-tokens"], derived)
-        self.assertEqual(len(derived), 161)
+        self.assertEqual(len(derived), 196)
         self.assertIsNone(row["acceptance"]["cases_by_line"]["main"]["compiled-override-tokens"])
 
     def test_release_metadata_is_implemented_with_21x_roster(self):
