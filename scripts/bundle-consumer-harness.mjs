@@ -5,7 +5,7 @@ import {createHash} from 'node:crypto';
 import {dirname, isAbsolute, join, relative} from 'node:path';
 import {fileURLToPath} from 'node:url';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const require = createRequire(join(root, 'package.json'));
+const bundlerVersion = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).devDependencies.esbuild;
 export function isolatedHarnessInputs(consumer, metadata, resolvePath = realpathSync) {
   const base = resolvePath(consumer);
   const inputs = Object.keys(metadata?.inputs ?? {});
@@ -18,7 +18,11 @@ export function isolatedHarnessInputs(consumer, metadata, resolvePath = realpath
   });
 }
 export function bundleConsumerHarness(consumer) {
-  const esbuild = require('esbuild');
+  const consumerRequire = createRequire(join(consumer, 'package.json'));
+  const bundlerPath = consumerRequire.resolve('esbuild');
+  isolatedHarnessInputs(consumer, {inputs: {[bundlerPath]: {}}});
+  const esbuild = consumerRequire('esbuild');
+  if (esbuild.version !== bundlerVersion) throw new Error('consumer harness bundler does not match the pinned workspace tool');
   const output = join(consumer, 'out-tsc/harness-runtime.cjs');
   const built = esbuild.buildSync({absWorkingDir: consumer, entryPoints: ['out-tsc/harness-runtime.js'],
     bundle: true, platform: 'node', format: 'cjs', target: 'es2022', keepNames: true,
