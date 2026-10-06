@@ -184,6 +184,8 @@ export abstract class MatLegacyListHarnessBase<
     if (filters.divider !== false) {
       query.push(MatDividerHarness.with(filters.divider));
     }
-    return this.locatorForAll(...query)();
+    return this.locatorForAll(...query)() as Promise<
+      (C | MatLegacySubheaderHarness | MatDividerHarness)[]
+    >;
   }
 }

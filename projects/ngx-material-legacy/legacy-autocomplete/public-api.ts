@@ -17,6 +17,7 @@ export {
   _MatAutocompleteBase as _MatLegacyAutocompleteBase,
   MatAutocompleteSelectedEvent as MatLegacyAutocompleteSelectedEvent,
   MatAutocompleteActivatedEvent as MatLegacyAutocompleteActivatedEvent,
+  MAT_AUTOCOMPLETE_DEFAULT_OPTIONS_FACTORY as MAT_LEGACY_AUTOCOMPLETE_DEFAULT_OPTIONS_FACTORY,
 } from './internal/autocomplete-base';
 export {_MatAutocompleteTriggerBase as _MatLegacyAutocompleteTriggerBase} from './internal/autocomplete-trigger-base';
 export {_MatAutocompleteOriginBase as _MatLegacyAutocompleteOriginBase} from './internal/autocomplete-origin-base';
