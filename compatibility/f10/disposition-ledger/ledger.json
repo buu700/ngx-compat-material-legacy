@@ -4,8 +4,8 @@
   "g11_claim": "not-passed",
   "seed_rows": 1697,
   "ledger_rows": 1697,
-  "closed_dispositions": 1695,
-  "open_or_deferred": 2,
+  "closed_dispositions": 1689,
+  "open_or_deferred": 8,
   "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
   "batch_id": "unread-seed-content-review-2026-10-02",
   "entries": [
@@ -327,145 +327,265 @@
       "sha": "b423c0e0b754b1f1d118d17e022981c357c3aa68",
       "bucket": "security-deep",
       "subject": "fix(material/datepicker): deprecate constructor injection in NativeDateAdapter (#26144)",
-      "final_disposition": "irrelevant",
-      "reason": "NativeDateAdapter lives in @angular/material/core. This package only re-exports LegacyNativeDateAdapter from the peer and does not implement the adapter.",
+      "final_disposition": "needs-individual-review",
+      "reason": "Constructor/declaration change applies to the exact NativeDateAdapter currently re-exported as LegacyNativeDateAdapter. The original16 constructor accepts matDateLocale:string and optional Platform; installed main22.1.7 types declare constructor(), with inject(MAT_DATE_LOCALE) inside runtime. Previous not-owned/irrelevant rationale ignored the public alias. Constructor/subclass compatibility requires repair or a substantiated allowed contract decision; no identity proof is claimed.",
       "read_note_disposition": "not-owned",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/b423c0e0b754b1f1d118d17e022981c357c3aa68.json",
-      "source_check": "projects/ngx-material-legacy/legacy-core/public-api.ts re-exports NativeDateAdapter as LegacyNativeDateAdapter",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-security-source-review.json",
       "files": [],
-      "batch_id": "security-already-present-2026-10-01-b",
-      "recorded_at_utc": "2026-10-01T16:30:02Z",
+      "batch_id": "closeout-six-security-source-reads",
+      "recorded_at_utc": "2026-10-06T18:23:24.711579+00:00",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-      "individual_proof": {
-        "diff_sha256": "0fc17a9693eca8bb91cf85b9e1bd5129acf63ccc8a761482a7e8e2ba5d9dd31d",
-        "review_depth": "individual-deep",
-        "affected_branches": [
-          "main"
-        ],
-        "decision": "Read upstream patch b423c0e0b754b1f1d118d17e022981c357c3aa68 (fix(material/datepicker): deprecate constructor injection in NativeDateAdapter (#26144)). It touches 2 paths: src/material/core/datetime/native-date-adapter.ts, tools/public_api_guard/material/core.md. No path is under src/material/legacy- or projects/ngx-material-legacy. Final disposition stays irrelevant. This is a per-commit read of that patch, not a batch close and not security clearance.",
-        "proof_kind": "diff-read"
-      }
+      "prior_dispositions": [
+        {
+          "sha": "b423c0e0b754b1f1d118d17e022981c357c3aa68",
+          "bucket": "security-deep",
+          "subject": "fix(material/datepicker): deprecate constructor injection in NativeDateAdapter (#26144)",
+          "final_disposition": "irrelevant",
+          "reason": "NativeDateAdapter lives in @angular/material/core. This package only re-exports LegacyNativeDateAdapter from the peer and does not implement the adapter.",
+          "read_note_disposition": "not-owned",
+          "evidence_report": "compatibility/f10/disposition-ledger/evidence/b423c0e0b754b1f1d118d17e022981c357c3aa68.json",
+          "source_check": "projects/ngx-material-legacy/legacy-core/public-api.ts re-exports NativeDateAdapter as LegacyNativeDateAdapter",
+          "files": [],
+          "batch_id": "security-already-present-2026-10-01-b",
+          "recorded_at_utc": "2026-10-01T16:30:02Z",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+          "individual_proof": {
+            "diff_sha256": "0fc17a9693eca8bb91cf85b9e1bd5129acf63ccc8a761482a7e8e2ba5d9dd31d",
+            "review_depth": "individual-deep",
+            "affected_branches": [
+              "main"
+            ],
+            "decision": "Read upstream patch b423c0e0b754b1f1d118d17e022981c357c3aa68 (fix(material/datepicker): deprecate constructor injection in NativeDateAdapter (#26144)). It touches 2 paths: src/material/core/datetime/native-date-adapter.ts, tools/public_api_guard/material/core.md. No path is under src/material/legacy- or projects/ngx-material-legacy. Final disposition stays irrelevant. This is a per-commit read of that patch, not a batch close and not security clearance.",
+            "proof_kind": "diff-read"
+          }
+        }
+      ],
+      "affected_branches": [
+        "main",
+        "21.x"
+      ]
     },
     {
       "sha": "cf3506adf1af1556d705dbb651e7e96a7141b81d",
       "bucket": "security-deep",
       "subject": "fix(material/progress-bar): avoid CSP issues for apps not using buffer mode (#28946)",
-      "final_disposition": "irrelevant",
-      "reason": "Owned legacy progress-bar template uses an inline SVG pattern for the buffer track and does not render mdc-linear-progress__buffer-dots.",
+      "final_disposition": "needs-individual-review",
+      "reason": "The hunk removes modern MDC buffer dots outside buffer mode to avoid CSP problems. Owned legacy markup instead has inline SVG pattern/rect, not modern buffer-dots, but the exported historical ordinary companion progress-bar Sass remains reachable and emits data:image/svg+xml. Review the current companion/runtime combination and CSP behavior individually; modern-template path alone cannot clear the entire reachable style contract.",
       "read_note_disposition": "unaffected",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/cf3506adf1af1556d705dbb651e7e96a7141b81d.json",
-      "source_check": "legacy-progress-bar/progress-bar.html SVG pattern; no buffer-dots class",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-security-source-review.json",
       "files": [],
-      "batch_id": "security-already-present-2026-10-01-b",
-      "recorded_at_utc": "2026-10-01T16:30:02Z",
+      "batch_id": "closeout-six-security-source-reads",
+      "recorded_at_utc": "2026-10-06T18:23:24.711579+00:00",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-      "individual_proof": {
-        "diff_sha256": "d578212ff38ab504578e5a1a2544191f514fa76ef20343df73f140bf4bf324a9",
-        "review_depth": "individual-deep",
-        "affected_branches": [
-          "main"
-        ],
-        "decision": "Read upstream patch cf3506adf1af1556d705dbb651e7e96a7141b81d (fix(material/progress-bar): avoid CSP issues for apps not using buffer mode (#28946)). It touches 1 paths: src/material/progress-bar/progress-bar.html. No path is under src/material/legacy- or projects/ngx-material-legacy. Final disposition stays irrelevant. This is a per-commit read of that patch, not a batch close and not security clearance.",
-        "proof_kind": "diff-read"
-      }
+      "prior_dispositions": [
+        {
+          "sha": "cf3506adf1af1556d705dbb651e7e96a7141b81d",
+          "bucket": "security-deep",
+          "subject": "fix(material/progress-bar): avoid CSP issues for apps not using buffer mode (#28946)",
+          "final_disposition": "irrelevant",
+          "reason": "Owned legacy progress-bar template uses an inline SVG pattern for the buffer track and does not render mdc-linear-progress__buffer-dots.",
+          "read_note_disposition": "unaffected",
+          "evidence_report": "compatibility/f10/disposition-ledger/evidence/cf3506adf1af1556d705dbb651e7e96a7141b81d.json",
+          "source_check": "legacy-progress-bar/progress-bar.html SVG pattern; no buffer-dots class",
+          "files": [],
+          "batch_id": "security-already-present-2026-10-01-b",
+          "recorded_at_utc": "2026-10-01T16:30:02Z",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+          "individual_proof": {
+            "diff_sha256": "d578212ff38ab504578e5a1a2544191f514fa76ef20343df73f140bf4bf324a9",
+            "review_depth": "individual-deep",
+            "affected_branches": [
+              "main"
+            ],
+            "decision": "Read upstream patch cf3506adf1af1556d705dbb651e7e96a7141b81d (fix(material/progress-bar): avoid CSP issues for apps not using buffer mode (#28946)). It touches 1 paths: src/material/progress-bar/progress-bar.html. No path is under src/material/legacy- or projects/ngx-material-legacy. Final disposition stays irrelevant. This is a per-commit read of that patch, not a batch close and not security clearance.",
+            "proof_kind": "diff-read"
+          }
+        }
+      ],
+      "affected_branches": [
+        "main",
+        "21.x"
+      ]
     },
     {
       "sha": "878700d10ab042b6a62c6f86f4fcc24d5a0ae685",
       "bucket": "security-deep",
       "subject": "fix(material/progress-bar): avoid CSP issues due to buffer dots (#31818)",
-      "final_disposition": "irrelevant",
-      "reason": "Owned progress-bar styles have no data-URI mask. The CSP buffer-dots change targets MDC styles this package does not ship on the progress-bar path.",
+      "final_disposition": "needs-individual-review",
+      "reason": "The modern progress-bar Sass changes a data-SVG mask to a radial-gradient. The facade exports an independently owned historical ordinary progress-bar companion theme, whose reachable vendored linear-progress Sass still constructs data-SVG. The owned legacy inline-SVG control is a distinct path. Resolve the companion emitted-CSS/CSP contract separately without rewriting the legacy reference CSS or hiding its mismatch.",
       "read_note_disposition": "unaffected",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/878700d10ab042b6a62c6f86f4fcc24d5a0ae685.json",
-      "source_check": "no data: URI under legacy-progress-bar/*.scss",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-security-source-review.json",
       "files": [],
-      "batch_id": "security-already-present-2026-10-01-b",
-      "recorded_at_utc": "2026-10-01T16:30:02Z",
+      "batch_id": "closeout-six-security-source-reads",
+      "recorded_at_utc": "2026-10-06T18:23:24.711579+00:00",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-      "individual_proof": {
-        "diff_sha256": "3e3e53e25a5632cda150fa83309dc2f1ff90f9f7b55429f843bf9e3d49790069",
-        "review_depth": "individual-deep",
-        "affected_branches": [
-          "main"
-        ],
-        "decision": "Read upstream patch 878700d10ab042b6a62c6f86f4fcc24d5a0ae685 (fix(material/progress-bar): avoid CSP issues due to buffer dots (#31818)). It touches 1 paths: src/material/progress-bar/progress-bar.scss. No path is under src/material/legacy- or projects/ngx-material-legacy. Final disposition stays irrelevant. This is a per-commit read of that patch, not a batch close and not security clearance.",
-        "proof_kind": "diff-read"
-      }
+      "prior_dispositions": [
+        {
+          "sha": "878700d10ab042b6a62c6f86f4fcc24d5a0ae685",
+          "bucket": "security-deep",
+          "subject": "fix(material/progress-bar): avoid CSP issues due to buffer dots (#31818)",
+          "final_disposition": "irrelevant",
+          "reason": "Owned progress-bar styles have no data-URI mask. The CSP buffer-dots change targets MDC styles this package does not ship on the progress-bar path.",
+          "read_note_disposition": "unaffected",
+          "evidence_report": "compatibility/f10/disposition-ledger/evidence/878700d10ab042b6a62c6f86f4fcc24d5a0ae685.json",
+          "source_check": "no data: URI under legacy-progress-bar/*.scss",
+          "files": [],
+          "batch_id": "security-already-present-2026-10-01-b",
+          "recorded_at_utc": "2026-10-01T16:30:02Z",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+          "individual_proof": {
+            "diff_sha256": "3e3e53e25a5632cda150fa83309dc2f1ff90f9f7b55429f843bf9e3d49790069",
+            "review_depth": "individual-deep",
+            "affected_branches": [
+              "main"
+            ],
+            "decision": "Read upstream patch 878700d10ab042b6a62c6f86f4fcc24d5a0ae685 (fix(material/progress-bar): avoid CSP issues due to buffer dots (#31818)). It touches 1 paths: src/material/progress-bar/progress-bar.scss. No path is under src/material/legacy- or projects/ngx-material-legacy. Final disposition stays irrelevant. This is a per-commit read of that patch, not a batch close and not security clearance.",
+            "proof_kind": "diff-read"
+          }
+        }
+      ],
+      "affected_branches": [
+        "main",
+        "21.x"
+      ]
     },
     {
       "sha": "622152de761b629a426b744ec2ff3e4e79d18889",
       "bucket": "security-deep",
       "subject": "perf(material/tooltip): Defer injection of injectables not needed until tooltip is shown. (#30440)",
-      "final_disposition": "irrelevant",
-      "reason": "Deferred Overlay/ScrollDispatcher/ViewContainerRef/DOCUMENT injection is a performance change, not a security-sink change for this package.",
+      "final_disposition": "needs-individual-review",
+      "reason": "The hunk changes current MatTooltip private injections to lazy Injector lookups. Owned MatLegacyTooltip and local _MatTooltipBase retain historical constructor DI, so the optimization is not inherited through current MatTooltip. No fork of current MatTooltip is needed; preserving the old constructor behavior still needs explicit constructor/provider/lifecycle proof and current public injected-service review. Do not claim security clearance from the bootstrap bucket.",
       "read_note_disposition": "not-security",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/622152de761b629a426b744ec2ff3e4e79d18889.json",
-      "source_check": "security-deep note classification retained after review",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-security-source-review.json",
       "files": [],
-      "batch_id": "security-already-present-2026-10-01-b",
-      "recorded_at_utc": "2026-10-01T16:30:02Z",
+      "batch_id": "closeout-six-security-source-reads",
+      "recorded_at_utc": "2026-10-06T18:23:24.711579+00:00",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-      "individual_proof": {
-        "diff_sha256": "f1918f702d5d58a47f521e0493b3f12298545ee7caed4842091178d7f5325d30",
-        "review_depth": "individual-deep",
-        "affected_branches": [
-          "main"
-        ],
-        "decision": "Read upstream patch 622152de761b629a426b744ec2ff3e4e79d18889 (perf(material/tooltip): Defer injection of injectables not needed until tooltip is shown. (#30440)). It touches 1 paths: src/material/tooltip/tooltip.ts. No path is under src/material/legacy- or projects/ngx-material-legacy. Final disposition stays irrelevant. This is a per-commit read of that patch, not a batch close and not security clearance.",
-        "proof_kind": "diff-read"
-      }
+      "prior_dispositions": [
+        {
+          "sha": "622152de761b629a426b744ec2ff3e4e79d18889",
+          "bucket": "security-deep",
+          "subject": "perf(material/tooltip): Defer injection of injectables not needed until tooltip is shown. (#30440)",
+          "final_disposition": "irrelevant",
+          "reason": "Deferred Overlay/ScrollDispatcher/ViewContainerRef/DOCUMENT injection is a performance change, not a security-sink change for this package.",
+          "read_note_disposition": "not-security",
+          "evidence_report": "compatibility/f10/disposition-ledger/evidence/622152de761b629a426b744ec2ff3e4e79d18889.json",
+          "source_check": "security-deep note classification retained after review",
+          "files": [],
+          "batch_id": "security-already-present-2026-10-01-b",
+          "recorded_at_utc": "2026-10-01T16:30:02Z",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+          "individual_proof": {
+            "diff_sha256": "f1918f702d5d58a47f521e0493b3f12298545ee7caed4842091178d7f5325d30",
+            "review_depth": "individual-deep",
+            "affected_branches": [
+              "main"
+            ],
+            "decision": "Read upstream patch 622152de761b629a426b744ec2ff3e4e79d18889 (perf(material/tooltip): Defer injection of injectables not needed until tooltip is shown. (#30440)). It touches 1 paths: src/material/tooltip/tooltip.ts. No path is under src/material/legacy- or projects/ngx-material-legacy. Final disposition stays irrelevant. This is a per-commit read of that patch, not a batch close and not security clearance.",
+            "proof_kind": "diff-read"
+          }
+        }
+      ],
+      "affected_branches": [
+        "main",
+        "21.x"
+      ]
     },
     {
       "sha": "1d42431b2fe745602727eda03338c80c8897850a",
       "bucket": "security-deep",
       "subject": "refactor: move trusted types logic into CDK (#32387)",
-      "final_disposition": "irrelevant",
-      "reason": "trustedHTMLFromString / icon-registry trusted-types move is not owned here; package has no cdk/private trusted-types helper.",
+      "final_disposition": "needs-individual-review",
+      "reason": "The hunk relocates trusted-types logic from current Material icon to @angular/cdk/private, including a bypass createHTML policy. The add-on has no authored import of this helper and owns no icon component. Current-peer MatIconRegistry may transitively use it internally, which differs from an authored dependency. Need complete authored-use and reachable input/sink review before closing; never import @angular/cdk/private to follow this relocation.",
       "read_note_disposition": "not-owned",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/1d42431b2fe745602727eda03338c80c8897850a.json",
-      "source_check": "no trustedHTMLFromString or @angular/cdk/private import in projects/ngx-material-legacy",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-security-source-review.json",
       "files": [],
-      "batch_id": "security-already-present-2026-10-01-b",
-      "recorded_at_utc": "2026-10-01T16:30:02Z",
+      "batch_id": "closeout-six-security-source-reads",
+      "recorded_at_utc": "2026-10-06T18:23:24.711579+00:00",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-      "individual_proof": {
-        "diff_sha256": "884270b4402971f05d5094dbc633da1bd844c7fa220addff4e090dfb0fa2e21b",
-        "review_depth": "individual-deep",
-        "affected_branches": [
-          "main"
-        ],
-        "decision": "Read upstream patch 1d42431b2fe745602727eda03338c80c8897850a (refactor: move trusted types logic into CDK (#32387)). It touches 5 paths: goldens/cdk/private/index.api.md, src/cdk/private/public-api.ts, src/cdk/private/trusted-types.ts, src/material/icon/BUILD.bazel, src/material/icon/icon-registry.ts. No path is under src/material/legacy- or projects/ngx-material-legacy. Final disposition stays irrelevant. This is a per-commit read of that patch, not a batch close and not security clearance.",
-        "proof_kind": "diff-read"
-      }
+      "prior_dispositions": [
+        {
+          "sha": "1d42431b2fe745602727eda03338c80c8897850a",
+          "bucket": "security-deep",
+          "subject": "refactor: move trusted types logic into CDK (#32387)",
+          "final_disposition": "irrelevant",
+          "reason": "trustedHTMLFromString / icon-registry trusted-types move is not owned here; package has no cdk/private trusted-types helper.",
+          "read_note_disposition": "not-owned",
+          "evidence_report": "compatibility/f10/disposition-ledger/evidence/1d42431b2fe745602727eda03338c80c8897850a.json",
+          "source_check": "no trustedHTMLFromString or @angular/cdk/private import in projects/ngx-material-legacy",
+          "files": [],
+          "batch_id": "security-already-present-2026-10-01-b",
+          "recorded_at_utc": "2026-10-01T16:30:02Z",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+          "individual_proof": {
+            "diff_sha256": "884270b4402971f05d5094dbc633da1bd844c7fa220addff4e090dfb0fa2e21b",
+            "review_depth": "individual-deep",
+            "affected_branches": [
+              "main"
+            ],
+            "decision": "Read upstream patch 1d42431b2fe745602727eda03338c80c8897850a (refactor: move trusted types logic into CDK (#32387)). It touches 5 paths: goldens/cdk/private/index.api.md, src/cdk/private/public-api.ts, src/cdk/private/trusted-types.ts, src/material/icon/BUILD.bazel, src/material/icon/icon-registry.ts. No path is under src/material/legacy- or projects/ngx-material-legacy. Final disposition stays irrelevant. This is a per-commit read of that patch, not a batch close and not security clearance.",
+            "proof_kind": "diff-read"
+          }
+        }
+      ],
+      "affected_branches": [
+        "main",
+        "21.x"
+      ]
     },
     {
       "sha": "231f94f5557bb58afc0070585688b3014d541eb2",
       "bucket": "security-deep",
       "subject": "fix(cdk/layout): avoid CSS injection attacks in media matcher",
-      "final_disposition": "irrelevant",
-      "reason": "Owned MediaMatcher call site passes the constant (prefers-reduced-motion) query with no braces. This disposition does not claim the installed CDK peer contains the strip fix.",
+      "final_disposition": "needs-individual-review",
+      "reason": "Actual security fix strips braces from media-query strings before style-sheet insertRule in CDK MediaMatcher. The add-on authored direct MediaMatcher call is a fixed (prefers-reduced-motion) query; tooltip also delegates through public BreakpointObserver. Installed main22.1.7 peer source contains the brace stripping. This is useful main-floor source evidence, but actual21.x-floor implementation and exercised delegation remain required; no generic ancestry or cross-line clearance.",
       "read_note_disposition": "call-site-unaffected",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/231f94f5557bb58afc0070585688b3014d541eb2.json",
-      "source_check": "legacy-core/internal/legacy-animations.ts matchMedia('(prefers-reduced-motion)')",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-security-source-review.json",
       "files": [],
-      "batch_id": "security-already-present-2026-10-01-b",
-      "recorded_at_utc": "2026-10-01T16:30:02Z",
+      "batch_id": "closeout-six-security-source-reads",
+      "recorded_at_utc": "2026-10-06T18:23:24.711579+00:00",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-      "individual_proof": {
-        "diff_sha256": "a89ab37d4dd3819592854002413e12b1840bb047195528455ea90cea8cbcdc44",
-        "review_depth": "individual-deep",
-        "affected_branches": [
-          "main"
-        ],
-        "decision": "Read upstream patch 231f94f5557bb58afc0070585688b3014d541eb2 (fix(cdk/layout): avoid CSS injection attacks in media matcher). It touches 1 paths: src/cdk/layout/media-matcher.ts. No path is under src/material/legacy- or projects/ngx-material-legacy. Final disposition stays irrelevant. This is a per-commit read of that patch, not a batch close and not security clearance.",
-        "proof_kind": "diff-read"
-      }
+      "prior_dispositions": [
+        {
+          "sha": "231f94f5557bb58afc0070585688b3014d541eb2",
+          "bucket": "security-deep",
+          "subject": "fix(cdk/layout): avoid CSS injection attacks in media matcher",
+          "final_disposition": "irrelevant",
+          "reason": "Owned MediaMatcher call site passes the constant (prefers-reduced-motion) query with no braces. This disposition does not claim the installed CDK peer contains the strip fix.",
+          "read_note_disposition": "call-site-unaffected",
+          "evidence_report": "compatibility/f10/disposition-ledger/evidence/231f94f5557bb58afc0070585688b3014d541eb2.json",
+          "source_check": "legacy-core/internal/legacy-animations.ts matchMedia('(prefers-reduced-motion)')",
+          "files": [],
+          "batch_id": "security-already-present-2026-10-01-b",
+          "recorded_at_utc": "2026-10-01T16:30:02Z",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+          "individual_proof": {
+            "diff_sha256": "a89ab37d4dd3819592854002413e12b1840bb047195528455ea90cea8cbcdc44",
+            "review_depth": "individual-deep",
+            "affected_branches": [
+              "main"
+            ],
+            "decision": "Read upstream patch 231f94f5557bb58afc0070585688b3014d541eb2 (fix(cdk/layout): avoid CSS injection attacks in media matcher). It touches 1 paths: src/cdk/layout/media-matcher.ts. No path is under src/material/legacy- or projects/ngx-material-legacy. Final disposition stays irrelevant. This is a per-commit read of that patch, not a batch close and not security clearance.",
+            "proof_kind": "diff-read"
+          }
+        }
+      ],
+      "affected_branches": [
+        "main",
+        "21.x"
+      ]
     },
     {
       "sha": "77ffdf98ba71c11d908b29e02b516dddf487ae0b",
