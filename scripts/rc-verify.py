@@ -787,6 +787,9 @@ def _bridge_token_assertion_ok(body: dict, invocation: str) -> bool:
 
 _COMPUTED_DIMENSIONS = ("base", "color", "typography", "density")
 
+_SHA256_HEX = re.compile(r"^[0-9a-f]{64}$")
+
+
 def _is_sha256(value) -> bool:
     return isinstance(value, str) and _SHA256_HEX.fullmatch(value) is not None
 
