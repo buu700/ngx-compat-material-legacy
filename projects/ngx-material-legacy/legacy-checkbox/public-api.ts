@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -20,11 +21,6 @@ export {
    */
   MatCheckboxClickAction as MatLegacyCheckboxClickAction,
 
-  /**
-   * @deprecated Use `TransitionCheckState` from `@angular/material/checkbox` instead.
-   * @breaking-change 17.0.0
-   */
-  TransitionCheckState as LegacyTransitionCheckState,
 
   /**
    * @deprecated Use `MatCheckboxDefaultOptions` from `@angular/material/checkbox` instead.
@@ -48,3 +44,11 @@ export {
 export {MAT_CHECKBOX_DEFAULT_OPTIONS_FACTORY as MAT_LEGACY_CHECKBOX_DEFAULT_OPTIONS_FACTORY} from './internal/checkbox-base';
 export {_MatCheckboxBase as _MatLegacyCheckboxBase} from './internal/checkbox-base';
 export {MatCommonModule} from './internal/common-module';
+
+export {
+  /**
+   * @deprecated Use `TransitionCheckState` from `@angular/material/checkbox` instead.
+   * @breaking-change 17.0.0
+   */
+  TransitionCheckState as LegacyTransitionCheckState,
+} from './owned-transition-state';

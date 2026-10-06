@@ -1,0 +1,33 @@
+    _getAnimationClassForCheckStateTransition(oldState, newState) {
+        // Don't transition if animations are disabled.
+        if (this._animationMode === 'NoopAnimations') {
+            return '';
+        }
+        switch (oldState) {
+            case 0 /* TransitionCheckState.Init */:
+                // Handle edge case where user interacts with checkbox that does not have [(ngModel)] or
+                // [checked] bound to it.
+                if (newState === 1 /* TransitionCheckState.Checked */) {
+                    return this._animationClasses.uncheckedToChecked;
+                }
+                else if (newState == 3 /* TransitionCheckState.Indeterminate */) {
+                    return this._checked
+                        ? this._animationClasses.checkedToIndeterminate
+                        : this._animationClasses.uncheckedToIndeterminate;
+                }
+                break;
+            case 2 /* TransitionCheckState.Unchecked */:
+                return newState === 1 /* TransitionCheckState.Checked */
+                    ? this._animationClasses.uncheckedToChecked
+                    : this._animationClasses.uncheckedToIndeterminate;
+            case 1 /* TransitionCheckState.Checked */:
+                return newState === 2 /* TransitionCheckState.Unchecked */
+                    ? this._animationClasses.checkedToUnchecked
+                    : this._animationClasses.checkedToIndeterminate;
+            case 3 /* TransitionCheckState.Indeterminate */:
+                return newState === 1 /* TransitionCheckState.Checked */
+                    ? this._animationClasses.indeterminateToChecked
+                    : this._animationClasses.indeterminateToUnchecked;
+        }
+        return '';
+    }
