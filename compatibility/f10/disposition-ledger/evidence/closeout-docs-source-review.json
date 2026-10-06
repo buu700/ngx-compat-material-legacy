@@ -2,8 +2,8 @@
   "schema_version": 1,
   "reviewer": "Codex primary implementer",
   "method": "Read every complete original hunk for each listed SHA; enumerate all changed paths; distinguish current API documentation from historical owned controls. Shared identical upstream content reviewed once with both branch ownership contexts.",
-  "recorded_at_utc": "2026-10-06T20:10:33.448419+00:00",
-  "scope": "18 explicitly listed upstream documentation/dev-application SHAs, reviewed in complete original hunks; not all62 bootstrap candidates",
+  "recorded_at_utc": "2026-10-06T20:54:27.909995+00:00",
+  "scope": "24 explicitly listed upstream docs/build/demo SHAs; complete original hunks and both-line ownership, not all62 candidates",
   "source_repository": "https://github.com/angular/components",
   "scope_input_sha256": "400e89f53e41975dd5056158c60bdac2e4a2c9dcabaee1204eda782492f5f456",
   "g11_claim": "not-passed",
@@ -331,6 +331,144 @@
       "final_disposition": "not-applicable",
       "runtime_change_in_patch": true,
       "unshipped_paths_verified_on_both_lines": true
+    },
+    {
+      "sha": "b4d01dc5cf1015cfbe4cb382e36e96ced96012e5",
+      "subject": "docs(material/toolbar): minor doc fixes (#29227)",
+      "files": [
+        "src/components-examples/material/toolbar/index.ts",
+        "src/components-examples/material/toolbar/toolbar-multirow/toolbar-multirow-example.html",
+        "src/components-examples/material/toolbar/toolbar-overview/toolbar-overview-example.html",
+        "src/components-examples/material/toolbar/toolbar-simple/toolbar-simple-example.html",
+        "src/components-examples/material/toolbar/toolbar-simple/toolbar-simple-example.ts",
+        "src/dev-app/toolbar/toolbar-demo.html",
+        "src/dev-app/toolbar/toolbar-demo.ts",
+        "src/material/toolbar/toolbar.md"
+      ],
+      "diff": "diff --git a/src/components-examples/material/toolbar/index.ts b/src/components-examples/material/toolbar/index.ts\nindex 2718cddbb..e9f17b3c6 100644\n--- a/src/components-examples/material/toolbar/index.ts\n+++ b/src/components-examples/material/toolbar/index.ts\n@@ -1,4 +1,5 @@\n export {ToolbarBasicExample} from './toolbar-basic/toolbar-basic-example';\n export {ToolbarMultirowExample} from './toolbar-multirow/toolbar-multirow-example';\n+export {ToolbarSimpleExample} from './toolbar-simple/toolbar-simple-example';\n export {ToolbarOverviewExample} from './toolbar-overview/toolbar-overview-example';\n export {ToolbarHarnessExample} from './toolbar-harness/toolbar-harness-example';\ndiff --git a/src/components-examples/material/toolbar/toolbar-multirow/toolbar-multirow-example.html b/src/components-examples/material/toolbar/toolbar-multirow/toolbar-multirow-example.html\nindex 54076637d..8b3e8288e 100644\n--- a/src/components-examples/material/toolbar/toolbar-multirow/toolbar-multirow-example.html\n+++ b/src/components-examples/material/toolbar/toolbar-multirow/toolbar-multirow-example.html\n@@ -1,4 +1,4 @@\n-<mat-toolbar color=\"primary\">\n+<mat-toolbar>\n <!-- #docregion toolbar-row -->\n   <mat-toolbar-row>\n     <span>Custom Toolbar</span>\ndiff --git a/src/components-examples/material/toolbar/toolbar-overview/toolbar-overview-example.html b/src/components-examples/material/toolbar/toolbar-overview/toolbar-overview-example.html\nindex 69fb3047d..5499e0bd1 100644\n--- a/src/components-examples/material/toolbar/toolbar-overview/toolbar-overview-example.html\n+++ b/src/components-examples/material/toolbar/toolbar-overview/toolbar-overview-example.html\n@@ -1,62 +1,13 @@\n-<p>\n-  <!-- #docregion toolbar-simple -->\n-  <mat-toolbar>\n-    <span>My Application</span>\n-  </mat-toolbar>\n-  <!-- #enddocregion toolbar-simple -->\n-</p>\n-\n-<p>\n-  <mat-toolbar>\n-    <button mat-icon-button class=\"example-icon\" aria-label=\"Example icon-button with menu icon\">\n-      <mat-icon>menu</mat-icon>\n-    </button>\n-    <span>My App</span>\n-    <span class=\"example-spacer\"></span>\n-    <button mat-icon-button class=\"example-icon favorite-icon\" aria-label=\"Example icon-button with heart icon\">\n-      <mat-icon>favorite</mat-icon>\n-    </button>\n-    <button mat-icon-button class=\"example-icon\" aria-label=\"Example icon-button with share icon\">\n-      <mat-icon>share</mat-icon>\n-    </button>\n-  </mat-toolbar>\n-</p>\n-\n-<p>\n-  <mat-toolbar color=\"primary\">\n-    <button mat-icon-button class=\"example-icon\" aria-label=\"Example icon-button with menu icon\">\n-      <mat-icon>menu</mat-icon>\n-    </button>\n-    <span>My App</span>\n-    <span class=\"example-spacer\"></span>\n-    <button mat-icon-button class=\"example-icon favorite-icon\" aria-label=\"Example icon-button with heart icon\">\n-      <mat-icon>favorite</mat-icon>\n-    </button>\n-    <button mat-icon-button class=\"example-icon\" aria-label=\"Example icon-button with share icon\">\n-      <mat-icon>share</mat-icon>\n-    </button>\n-  </mat-toolbar>\n-</p>\n-\n-<p>\n-  <mat-toolbar color=\"primary\">\n-    <mat-toolbar-row>\n-      <span>My App</span>\n-      <span class=\"example-spacer\"></span>\n-      <button mat-icon-button class=\"example-icon\" aria-label=\"Example icon-button with menu icon\">\n-        <mat-icon>menu</mat-icon>\n-      </button>\n-    </mat-toolbar-row>\n-\n-    <mat-toolbar-row>\n-      <span>Second Line</span>\n-      <span class=\"example-spacer\"></span>\n-      <button mat-icon-button class=\"example-icon favorite-icon\" aria-label=\"Example icon-button with heart icon\">\n-        <mat-icon>favorite</mat-icon>\n-      </button>\n-      <button mat-icon-button class=\"example-icon\" aria-label=\"Example icon-button with share icon\">\n-        <mat-icon>share</mat-icon>\n-      </button>\n-    </mat-toolbar-row>\n-  </mat-toolbar>\n-</p>\n+<mat-toolbar>\n+  <button mat-icon-button class=\"example-icon\" aria-label=\"Example icon-button with menu icon\">\n+    <mat-icon>menu</mat-icon>\n+  </button>\n+  <span>My App</span>\n+  <span class=\"example-spacer\"></span>\n+  <button mat-icon-button class=\"example-icon favorite-icon\" aria-label=\"Example icon-button with heart icon\">\n+    <mat-icon>favorite</mat-icon>\n+  </button>\n+  <button mat-icon-button class=\"example-icon\" aria-label=\"Example icon-button with share icon\">\n+    <mat-icon>share</mat-icon>\n+  </button>\n+</mat-toolbar>\ndiff --git a/src/components-examples/material/toolbar/toolbar-simple/toolbar-simple-example.html b/src/components-examples/material/toolbar/toolbar-simple/toolbar-simple-example.html\nnew file mode 100644\nindex 000000000..c1ecc747d\n--- /dev/null\n+++ b/src/components-examples/material/toolbar/toolbar-simple/toolbar-simple-example.html\n@@ -0,0 +1,3 @@\n+<mat-toolbar>\n+  <span>My Application</span>\n+</mat-toolbar>\ndiff --git a/src/components-examples/material/toolbar/toolbar-simple/toolbar-simple-example.ts b/src/components-examples/material/toolbar/toolbar-simple/toolbar-simple-example.ts\nnew file mode 100644\nindex 000000000..b4ab8ab1b\n--- /dev/null\n+++ b/src/components-examples/material/toolbar/toolbar-simple/toolbar-simple-example.ts\n@@ -0,0 +1,13 @@\n+import {Component} from '@angular/core';\n+import {MatToolbarModule} from '@angular/material/toolbar';\n+\n+/**\n+ * @title Toolbar with just text\n+ */\n+@Component({\n+  selector: 'toolbar-simple-example',\n+  templateUrl: 'toolbar-simple-example.html',\n+  standalone: true,\n+  imports: [MatToolbarModule],\n+})\n+export class ToolbarSimpleExample {}\ndiff --git a/src/dev-app/toolbar/toolbar-demo.html b/src/dev-app/toolbar/toolbar-demo.html\nindex a41b9a7e4..e665bd38f 100644\n--- a/src/dev-app/toolbar/toolbar-demo.html\n+++ b/src/dev-app/toolbar/toolbar-demo.html\n@@ -1,4 +1,8 @@\n <div class=\"demo-toolbar\">\n+  <p>\n+    <toolbar-simple-example></toolbar-simple-example>\n+  </p>\n+\n   <p>\n     <toolbar-overview-example></toolbar-overview-example>\n   </p>\ndiff --git a/src/dev-app/toolbar/toolbar-demo.ts b/src/dev-app/toolbar/toolbar-demo.ts\nindex 7ecc87e50..cf4654420 100644\n--- a/src/dev-app/toolbar/toolbar-demo.ts\n+++ b/src/dev-app/toolbar/toolbar-demo.ts\n@@ -12,6 +12,7 @@ import {\n   ToolbarMultirowExample,\n   ToolbarOverviewExample,\n } from '@angular/components-examples/material/toolbar';\n+import {ToolbarSimpleExample} from '@angular/components-examples/material/toolbar/toolbar-simple/toolbar-simple-example';\n import {ChangeDetectionStrategy, Component} from '@angular/core';\n import {MatButtonModule} from '@angular/material/button';\n import {MatIconModule} from '@angular/material/icon';\n@@ -29,6 +30,7 @@ import {MatToolbarModule} from '@angular/material/toolbar';\n     ToolbarBasicExample,\n     ToolbarMultirowExample,\n     ToolbarOverviewExample,\n+    ToolbarSimpleExample,\n     ToolbarHarnessExample,\n   ],\n   changeDetection: ChangeDetectionStrategy.OnPush,\ndiff --git a/src/material/toolbar/toolbar.md b/src/material/toolbar/toolbar.md\nindex 6f32b5c3e..f82ea1b2a 100644\n--- a/src/material/toolbar/toolbar.md\n+++ b/src/material/toolbar/toolbar.md\n@@ -4,24 +4,21 @@\n \n ### Single row\n \n-In the most situations, a toolbar will be placed at the top of your application and will only \n+In the simplest case, a toolbar may be placed at the top of your application and \n have a single row that includes the title of your application.\n \n-<!-- example({\"example\":\"toolbar-overview\",\n-              \"file\":\"toolbar-overview-example.html\", \n-              \"region\":\"toolbar-simple\"}) -->\n+<!-- example(toolbar-simple) -->\n \n ### Multiple rows\n \n-The Material Design specifications describe that toolbars can also have multiple rows. Creating\n-toolbars with multiple rows in Angular Material can be done by placing `<mat-toolbar-row>` elements\n-inside of a `<mat-toolbar>`.\n+The Material Design spec used to describe toolbars with multiple rows. This can \n+be done by placing `<mat-toolbar-row>` elements inside a `<mat-toolbar>`.\n \n <!-- example({\"example\":\"toolbar-multirow\",\n               \"file\":\"toolbar-multirow-example.html\", \n               \"region\":\"toolbar-row\"}) -->\n \n-**Note**: Placing content outside of a `<mat-toolbar-row>` when multiple rows are specified is not\n+**Note**: Placing content outside a `<mat-toolbar-row>` when multiple rows are specified is not\n supported.\n \n ### Positioning toolbar content\n@@ -39,11 +36,6 @@ easily accomplished with `display: flex`:\n               \"file\":\"toolbar-multirow-example.css\", \n               \"region\":\"toolbar-position-content-style\"}) -->\n \n-### Theming\n-The color of a `<mat-toolbar>` can be changed by using the `color` property. By default, toolbars\n-use a neutral background color based on the current theme (light or dark). This can be changed to \n-`'primary'`, `'accent'`, or `'warn'`.  \n-\n ### Accessibility\n By default, the toolbar assumes that it will be used in a purely decorative fashion and thus sets\n no roles, ARIA attributes, or keyboard shortcuts. This is equivalent to having a sequence of `<div>`\n",
+      "diff_sha256": "4c690b346186f0fc4fb553643c44fe578fb49c592a4dd3f17443d1a5253b54c7",
+      "review_depth": "individual-compatibility",
+      "decision": "Read all8 changed paths rather than the seed toolbar-only count1. Extracts a simple toolbar demo, removes duplicate/color variants from overview and multirow demos, updates example exports/dev-app imports, and removes obsolete upstream toolbar color prose. No toolbar implementation changes. All8 source paths are absent from both add-on and ng-packagr entry/assets. Toolbar is a current companion, so this demo refresh does not authorize dropping the historical M2 toolbar companion bridge or altering owned controls.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": true,
+      "unshipped_paths_verified_on_both_lines": true,
+      "actual_changed_path_count": 8
+    },
+    {
+      "sha": "f4cb9f1526225cc6534742d3fa4f0b2bd5fedbde",
+      "subject": "docs(material/progress-spinner): remove legacy prefix (#29701)",
+      "files": [
+        "src/material/progress-spinner/progress-spinner.md"
+      ],
+      "diff": "diff --git a/src/material/progress-spinner/progress-spinner.md b/src/material/progress-spinner/progress-spinner.md\nindex 5b4d41110..0ca04cd24 100644\n--- a/src/material/progress-spinner/progress-spinner.md\n+++ b/src/material/progress-spinner/progress-spinner.md\n@@ -19,7 +19,7 @@ In \"indeterminate\" mode, the `value` property is ignored.\n \n ### Accessibility\n \n-`MatLegacyProgressSpinner` implements the ARIA `role=\"progressbar\"` pattern. By default, the spinner\n+`MatProgressSpinner` implements the ARIA `role=\"progressbar\"` pattern. By default, the spinner\n sets `aria-valuemin` to `0` and `aria-valuemax` to `100`. Avoid changing these values, as this may\n cause incompatibility with some assistive technology.\n \n",
+      "diff_sha256": "564289e21e8929145ce188ea6a5baad050d49a5a196de34d088db0d28156ba30",
+      "review_depth": "individual-compatibility",
+      "decision": "Only replaces MatLegacyProgressSpinner with MatProgressSpinner in current upstream accessibility prose. It changes no role, min/max, template or implementation. Both upstream markdown paths are unshipped by the add-on; retain the frozen distinct MatLegacyProgressSpinner export and its existing progressbar contract. This documentation rename is no authorization for a legacy token/API rename.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": false,
+      "unshipped_paths_verified_on_both_lines": true,
+      "actual_changed_path_count": 1
+    },
+    {
+      "sha": "0425bc72fcc11c933f8a5072d7afb46231d2eccc",
+      "subject": "docs: Update ARIA Tabs design pattern link in documentation (#32245)",
+      "files": [
+        "src/material/tabs/tabs.md"
+      ],
+      "diff": "diff --git a/src/material/tabs/tabs.md b/src/material/tabs/tabs.md\nindex ff098e32d..958da95ed 100644\n--- a/src/material/tabs/tabs.md\n+++ b/src/material/tabs/tabs.md\n@@ -96,7 +96,7 @@ off-screen tabs in the DOM, you can set the `preserveContent` input to `true`.\n \n ### Accessibility\n `MatTabGroup` and `MatTabNavBar` both implement the\n-[ARIA Tabs design pattern](https://www.w3.org/TR/wai-aria-practices-1.1/#tabpanel). Both components\n+[ARIA Tabs design pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/). Both components\n compose `tablist`, `tab`, and `tabpanel` elements with handling for keyboard inputs and focus\n management.\n \n",
+      "diff_sha256": "a01c10808dd951b7c1b0989c6eb17fe8f901b6f0a8bc40abc11cad471e51869c",
+      "review_depth": "individual-compatibility",
+      "decision": "Full one-line hunk changes only the ARIA Tabs design-pattern hyperlink to the current APG tabs path. Tab roles, keyboard and focus prose remain byte-identical, and no component code changes. The upstream tabs markdown is absent from both add-on package closures. Historical tablist/tab/tabpanel and interaction obligations remain; no runtime a11y clearance is inferred from fixing this link.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": false,
+      "unshipped_paths_verified_on_both_lines": true,
+      "actual_changed_path_count": 1
+    },
+    {
+      "sha": "bd17fb3652d66a28ca2b1e84c4cc67aecff9cab2",
+      "subject": "docs(material/menu): add docs for context menu",
+      "files": [
+        "src/components-examples/material/menu/context-menu/context-menu-example.css",
+        "src/components-examples/material/menu/context-menu/context-menu-example.html",
+        "src/components-examples/material/menu/context-menu/context-menu-example.ts",
+        "src/components-examples/material/menu/index.ts",
+        "src/material/menu/menu.md"
+      ],
+      "diff": "diff --git a/src/components-examples/material/menu/context-menu/context-menu-example.css b/src/components-examples/material/menu/context-menu/context-menu-example.css\nnew file mode 100644\nindex 000000000..58e649479\n--- /dev/null\n+++ b/src/components-examples/material/menu/context-menu/context-menu-example.css\n@@ -0,0 +1,12 @@\n+.example-context-menu-area {\n+  display: flex;\n+  align-items: center;\n+  justify-content: center;\n+  width: 100%;\n+  height: 300px;\n+  max-width: 300px;\n+  border: dashed 1px;\n+  text-align: center;\n+  padding: 30px;\n+  box-sizing: border-box;\n+}\ndiff --git a/src/components-examples/material/menu/context-menu/context-menu-example.html b/src/components-examples/material/menu/context-menu/context-menu-example.html\nnew file mode 100644\nindex 000000000..a491af0f7\n--- /dev/null\n+++ b/src/components-examples/material/menu/context-menu/context-menu-example.html\n@@ -0,0 +1,22 @@\n+<div class=\"example-context-menu-area\" [matContextMenuTriggerFor]=\"contextMenu\">\n+  Right click here to trigger a context menu\n+</div>\n+\n+<mat-menu #contextMenu>\n+  <button mat-menu-item>\n+    <mat-icon>content_cut</mat-icon>\n+    Cut\n+  </button>\n+  <button mat-menu-item>\n+    <mat-icon>content_copy</mat-icon>\n+    Copy\n+  </button>\n+  <button mat-menu-item>\n+    <mat-icon>content_paste</mat-icon>\n+    Paste\n+  </button>\n+  <button mat-menu-item>\n+    <mat-icon>print</mat-icon>\n+    Print\n+  </button>\n+</mat-menu>\ndiff --git a/src/components-examples/material/menu/context-menu/context-menu-example.ts b/src/components-examples/material/menu/context-menu/context-menu-example.ts\nnew file mode 100644\nindex 000000000..ac59a7633\n--- /dev/null\n+++ b/src/components-examples/material/menu/context-menu/context-menu-example.ts\n@@ -0,0 +1,14 @@\n+import {Component} from '@angular/core';\n+import {MatMenuModule} from '@angular/material/menu';\n+import {MatIconModule} from '@angular/material/icon';\n+\n+/**\n+ * @title Context menu\n+ */\n+@Component({\n+  selector: 'context-menu-example',\n+  templateUrl: 'context-menu-example.html',\n+  styleUrl: './context-menu-example.css',\n+  imports: [MatMenuModule, MatIconModule],\n+})\n+export class ContextMenuExample {}\ndiff --git a/src/components-examples/material/menu/index.ts b/src/components-examples/material/menu/index.ts\nindex f44f9d603..8f78a3618 100644\n--- a/src/components-examples/material/menu/index.ts\n+++ b/src/components-examples/material/menu/index.ts\n@@ -3,3 +3,4 @@ export {MenuOverviewExample} from './menu-overview/menu-overview-example';\n export {MenuPositionExample} from './menu-position/menu-position-example';\n export {MenuNestedExample} from './menu-nested/menu-nested-example';\n export {MenuHarnessExample} from './menu-harness/menu-harness-example';\n+export {ContextMenuExample} from './context-menu/context-menu-example';\ndiff --git a/src/material/menu/menu.md b/src/material/menu/menu.md\nindex a9eb998ef..c0f5f1117 100644\n--- a/src/material/menu/menu.md\n+++ b/src/material/menu/menu.md\n@@ -49,6 +49,16 @@ that should trigger the sub-menu:\n               \"file\": \"menu-nested-example.html\",\n               \"region\": \"sub-menu\"}) -->\n \n+### Context menu\n+A context menu is a menu that is triggered by right-clicking in a specific area, rather than\n+clicking on a trigger element. It is re-positioned if the user right-clicks somewhere else in the\n+area and will be closed if the user clicks away.\n+\n+You can set up a `mat-menu` as a context menu by adding the `matContextMenuTriggerFor` directive\n+to your container and binding it to a menu instance.\n+\n+<!-- example(context-menu) -->\n+\n ### Lazy rendering\n By default, the menu content will be initialized even when the panel is closed. To defer\n initialization until the menu is open, the content can be provided as an `ng-template`\n",
+      "diff_sha256": "2ca48a7f1204b3e4fb8931a62cf0830b19e26893f0a58db371dcbab3e257c236",
+      "review_depth": "individual-compatibility",
+      "decision": "Read all5 changed paths, not the seed menu-markdown-only count1. Adds a modern matContextMenuTriggerFor demo template/style/component, its example export, and explanatory prose. The patch changes no menu-trigger implementation; none of these demo/docs paths is in either add-on entry/assets. Historical legacy menu does not advertise a modern context-menu API mirror. Do not port these demo features or infer right-click behavior for owned MatLegacyMenuTrigger.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": true,
+      "unshipped_paths_verified_on_both_lines": true,
+      "actual_changed_path_count": 5
+    },
+    {
+      "sha": "15e9a57a10d1d5bd2295bb62026b4621999c9e20",
+      "subject": "build: some overrides not showing up in docs site (#31397)",
+      "files": [
+        "src/material/button/BUILD.bazel"
+      ],
+      "diff": "diff --git a/src/material/button/BUILD.bazel b/src/material/button/BUILD.bazel\nindex 036bf223f..4487e6d32 100644\n--- a/src/material/button/BUILD.bazel\n+++ b/src/material/button/BUILD.bazel\n@@ -194,7 +194,11 @@ markdown_to_html(\n \n extract_tokens(\n     name = \"tokens\",\n-    srcs = [\":theme\"],\n+    srcs = [\n+        \":fab_theme\",\n+        \":icon_button_theme\",\n+        \":theme\",\n+    ],\n )\n \n filegroup(\n",
+      "diff_sha256": "8343f7fabbc550d71ad33417e95acc5094832f1b993a835b52ec2761c90fdcc9",
+      "review_depth": "individual-compatibility",
+      "decision": "Full hunk only adds fab_theme and icon_button_theme inputs to the upstream Bazel extract_tokens rule so docs-site overrides appear. No Sass definitions, runtime button or token API change is present. Both add-on lines build with ng-packagr and a finite owned Sass facade, and contain no such BUILD.bazel target. This docs extractor dependency is outside their source/package closure; current companion bridge semantics are a separate C02 obligation.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": false,
+      "unshipped_paths_verified_on_both_lines": true,
+      "actual_changed_path_count": 1
+    },
+    {
+      "sha": "1dc6b44a38321471417822023bd4cc784e7849d6",
+      "subject": "docs(material/dialog): clarify that default options replace rather than merge (#32819)",
+      "files": [
+        "src/cdk/dialog/dialog.md",
+        "src/material/dialog/dialog.md"
+      ],
+      "diff": "diff --git a/src/cdk/dialog/dialog.md b/src/cdk/dialog/dialog.md\nindex cfdd2bedb..a32458966 100644\n--- a/src/cdk/dialog/dialog.md\n+++ b/src/cdk/dialog/dialog.md\n@@ -129,6 +129,18 @@ bootstrapApplication(MyApp, {\n });\n ```\n \n+> **Note:** The value provided for `DEFAULT_DIALOG_CONFIG` **replaces** the built-in defaults\n+> entirely rather than merging with them. For example, providing `{disableClose: true}` means that\n+> all other defaults (such as `hasBackdrop`) will be `undefined`. If you only want to override\n+> specific properties, spread the defaults first:\n+>\n+> ```ts\n+> {provide: DEFAULT_DIALOG_CONFIG, useValue: {...new DialogConfig(), disableClose: true}}\n+> ```\n+>\n+> When you call `dialog.open()` with a config, that config is merged on top of these defaults, so\n+> per-dialog options always take precedence.\n+\n ### Sharing data with the Dialog component.\n You can use the `data` option to pass information to the dialog component.\n \ndiff --git a/src/material/dialog/dialog.md b/src/material/dialog/dialog.md\nindex 43a4cde25..1424d81c9 100644\n--- a/src/material/dialog/dialog.md\n+++ b/src/material/dialog/dialog.md\n@@ -53,6 +53,18 @@ bootstrapApplication(MyApp, {\n });\n ```\n \n+> **Note:** The value provided for `MAT_DIALOG_DEFAULT_OPTIONS` **replaces** the built-in defaults\n+> entirely rather than merging with them. For example, providing `{disableClose: true}` means that\n+> all other defaults (such as `hasBackdrop`) will be `undefined`. If you only want to override\n+> specific properties, spread the defaults first:\n+>\n+> ```ts\n+> {provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: {...new MatDialogConfig(), disableClose: true}}\n+> ```\n+>\n+> When you call `dialog.open()` with a config, that config is merged on top of these defaults, so\n+> per-dialog options always take precedence.\n+\n ### Sharing data with the Dialog component.\n If you want to share data with your dialog, you can use the `data`\n option to pass information to the dialog component.\n",
+      "diff_sha256": "0f313ee9a6169d313213d5f0c23ce0c3c167dc5c8d6e497e04ea67d9a1d0f3c6",
+      "review_depth": "individual-compatibility",
+      "decision": "Read both CDK/material dialog markdown paths, not seed count1. Adds default-config replacement/explicit spread guidance and per-open precedence prose only. Both markdown paths are outside add-on packaging. The authentic16 dialog FESM and both owned internal dialog-base sources use defaults OR new config, then spread per-open config, matching the explanation. MAT_LEGACY_DIALOG_DEFAULT_OPTIONS remains a distinct owned token; importing modern MAT_DIALOG_DEFAULT_OPTIONS or copying a modern API is not warranted. Constructor/lifecycle/current-CDK delegation review remains separate and unclosed.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": false,
+      "unshipped_paths_verified_on_both_lines": true,
+      "actual_changed_path_count": 2,
+      "owned_source_checks": {
+        "main": {
+          "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "sha256": "4e7cd25ae98c06810601ae0ea79f09a616a437fa54a696de45ce82f594460b62",
+          "expression": "config = {...(this._defaultOptions || new this.dialogConfigClass()), ...config};"
+        },
+        "21.x": {
+          "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "sha256": "4e7cd25ae98c06810601ae0ea79f09a616a437fa54a696de45ce82f594460b62",
+          "expression": "config = {...(this._defaultOptions || new this.dialogConfigClass()), ...config};"
+        }
+      }
     }
   ]
 }
