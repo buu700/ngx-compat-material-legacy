@@ -13,6 +13,9 @@ ROOT = Path(__file__).resolve().parents[1]
 CHECKER = ROOT / "scripts" / "check-upstream-audit-disposition.mjs"
 SEED = ROOT / "compatibility" / "f10" / "upstream-sha-risk-bootstrap.json"
 LEDGER = ROOT / "compatibility" / "f10" / "disposition-ledger" / "ledger.json"
+MECHANICAL = ROOT / "compatibility" / "f10" / "disposition-ledger" / "evidence" / "mechanical"
+JOIN = ROOT / "compatibility" / "f10" / "audit-join" / "join.json"
+QUEUE = ROOT / "compatibility" / "f10" / "audit-join" / "review-queue.json"
 
 
 def run_checker(
@@ -63,7 +66,8 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
             self.assertEqual(summary["security_clearance"], "not-passed")
             self.assertGreater(summary["insufficient_inherited"], 0)
             self.assertGreater(summary["insufficient_sensitive"], 0)
-            self.assertGreater(summary["missing_evidence"], 0)
+            self.assertEqual(summary["missing_evidence"], 0)
+            self.assertEqual(summary["circular_evidence"], 0)
             self.assertGreater(summary["symbol_uses_open"], 0)
             report_body = json.loads(report.read_text())
             self.assertEqual(report_body["result"], "pass")
@@ -187,7 +191,7 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
 
 
     def test_individual_proof_is_accepted_and_ancestry_is_not(self) -> None:
-        sha = "a" * 40
+        sha = sorted(MECHANICAL.glob("*.json"))[0].stem
         with tempfile.TemporaryDirectory() as tmp:
             directory = Path(tmp)
             seed = directory / "seed.json"
@@ -197,7 +201,7 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
                 "status": "closed",
                 "symbol_uses": [{"disposition": "closed", "status": "reviewed"}],
             }))
-            evidence = "compatibility/rc/reports/docs-build-one-diff.json"
+            evidence = f"compatibility/f10/disposition-ledger/evidence/mechanical/{sha}.json"
             common = {
                 "sha": sha,
                 "bucket": "behavior-semantic",
@@ -251,6 +255,64 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
             self.assertGreaterEqual(ancestry_summary["insufficient_inherited"], 1)
             self.assertEqual(ancestry_summary["disposition_admission"], "incomplete")
             self.assertEqual(ancestry_summary["security_clearance"], "not-passed")
+
+
+    def test_evidence_must_speak_about_the_row(self) -> None:
+        ledger = json.loads(LEDGER.read_text())
+        entries = ledger["entries"]
+        mechanical = [e for e in entries if (e.get("evidence_report") or "").startswith("compatibility/f10/disposition-ledger/evidence/mechanical/")]
+        batch = json.loads((ROOT / "compatibility/rc/reports/needs-triage-one-diff.json").read_text())
+        listed = {item["sha"] for item in batch["reviews"]}
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            for label, change in (
+                ("other-sha-record", lambda e: {**e, "evidence_report": mechanical[1]["evidence_report"]}),
+                ("batch-without-sha", lambda e: {**e, "evidence_report": "compatibility/rc/reports/needs-triage-one-diff.json"}),
+                ("empty-batch", lambda e: {**e, "evidence_report": "compatibility/rc/reports/test-only-one-diff.json"}),
+                ("circular", lambda e: {**e, "evidence_report": "compatibility/rc/reports/upstream-audit-disposition.json"}),
+            ):
+                with self.subTest(label=label):
+                    target = next(e for e in mechanical if e["sha"] not in listed)
+                    mutated = json.loads(json.dumps(ledger))
+                    mutated["entries"] = [change(e) if e["sha"] == target["sha"] else e for e in mutated["entries"]]
+                    path = directory / f"{label}.json"
+                    path.write_text(json.dumps(mutated))
+                    summary = json.loads(run_checker(SEED, path, directory / f"{label}-report.json").stdout)
+                    self.assertEqual(summary["missing_evidence"] + summary["circular_evidence"], 1, label)
+
+    def test_mechanical_evidence_and_join_are_per_sha_and_change_no_disposition(self) -> None:
+        ledger = {e["sha"]: e for e in json.loads(LEDGER.read_text())["entries"]}
+        join = json.loads(JOIN.read_text())
+        rows = {row["sha"]: row for row in join["rows"]}
+        self.assertEqual(set(rows), set(ledger))
+        files = sorted(MECHANICAL.glob("*.json"))
+        self.assertGreater(len(files), 0)
+        for path in files:
+            body = json.loads(path.read_text())
+            entry = ledger[path.stem]
+            self.assertEqual(body["sha"], path.stem)
+            self.assertEqual(body["final_disposition"], entry["final_disposition"])
+            self.assertFalse(body["final_disposition_changed"])
+            self.assertTrue(body["not_individual_proof"])
+            self.assertEqual(body["diff_sha256"], rows[path.stem]["diff_sha256"])
+            self.assertEqual(entry["evidence_report"], path.relative_to(ROOT).as_posix())
+            self.assertNotIn("individual_proof", body)
+
+    def test_review_queue_is_finite_disjoint_and_covers_sensitive_rows(self) -> None:
+        queue = json.loads(QUEUE.read_text())
+        join = json.loads(JOIN.read_text())
+        placed = [item["sha"] for item in queue["items"]] + [sha for group in queue["groups"] for sha in group["members"]]
+        self.assertEqual(len(placed), len(set(placed)))
+        sensitive = {row["sha"] for row in join["rows"] if any(d.startswith("sensitive-") for d in row["defects"])}
+        self.assertEqual(sensitive, {item["sha"] for item in queue["items"] if item["priority"] == 1})
+        inherited = {row["sha"] for row in join["rows"] if "inherited-without-installed-member-and-executed-delegation" in row["defects"]}
+        self.assertTrue(inherited <= set(placed))
+        for item in queue["items"]:
+            self.assertTrue(item["facts"].strip())
+            self.assertTrue(item["decision_requested"].strip())
+        for group in queue["groups"]:
+            self.assertEqual(group["member_count"], len(group["members"]))
+            self.assertTrue(group["members"])
 
 
 if __name__ == "__main__":

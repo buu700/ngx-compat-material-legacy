@@ -94,6 +94,19 @@ function sensitiveClass(entry) {
   return null;
 }
 
+const evidenceCache = new Map();
+function evidenceJson(file) {
+  if (!evidenceCache.has(file)) {
+    let body = null;
+    try { body = JSON.parse(readFileSync(file, 'utf8')); } catch { body = null; }
+    evidenceCache.set(file, body);
+  }
+  return evidenceCache.get(file);
+}
+
+// A pointer is evidence only if the file actually speaks about this SHA: a
+// batch report must list it among its reviews, and a per-SHA JSON record must
+// carry the same sha. A file that merely exists is not evidence for the row.
 function evidenceClass(entry) {
   const rel = entry.evidence_report;
   if (typeof rel !== 'string' || !rel.trim()) return 'missing';
@@ -101,6 +114,17 @@ function evidenceClass(entry) {
   if (rel === 'compatibility/rc/reports/upstream-audit-disposition.json') return 'circular';
   const file = join(root, rel);
   if (!existsSync(file) || !lstatSync(file).isFile()) return 'missing-file';
+  const named = rel.split('/').pop().match(/\b[0-9a-f]{40}\b/);
+  if (named && named[0] !== entry.sha) return 'other-sha';
+  if (rel.endsWith('.json')) {
+    const body = evidenceJson(file);
+    if (!body || typeof body !== 'object') return 'unreadable';
+    if (Array.isArray(body.reviews)) {
+      return body.reviews.some(item => item && item.sha === entry.sha) ? 'file' : 'not-in-report';
+    }
+    if (typeof body.sha === 'string' && body.sha !== entry.sha) return 'other-sha';
+    if (rel.startsWith('compatibility/f10/disposition-ledger/evidence/') && body.sha !== entry.sha) return 'other-sha';
+  }
   return 'file';
 }
 
