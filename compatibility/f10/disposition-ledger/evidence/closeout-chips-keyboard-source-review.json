@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "reviewer": "Codex primary implementer",
-  "status": "repair-awaiting-actions",
+  "status": "individually-reviewed-original-restoration-qualified",
   "g11_claim": "not-passed",
   "original_provenance": "reference/material-16.2.14/chips-keyboard-sources/provenance.json",
   "reviews": [
@@ -22,9 +22,28 @@
         "21.x"
       ],
       "proposal": "do-not-adopt",
-      "status": "repair-awaiting-artifact-bound-actions",
-      "reason": "The complete hunks change modern MDC MatChip/MatChipInput/MatChipGrid behavior and tests. The original legacy input owns a keyup-driven focus guard, exposes _keyup and AfterContentInit behavior, and emits repeated separator/removal requests. Previously transplanting the modern repeat predicate into owned legacy sources removed that historical state machine and replaced a genuine original test. Restore original16; installed modern peer remains separate. No residual risk or historical-contract deviation is accepted.",
-      "g11_claim": "not-passed"
+      "status": "individually-reviewed-do-not-adopt",
+      "reason": "The complete hunks change modern MDC MatChip/MatChipInput/MatChipGrid behavior and tests. The original legacy input owns a keyup-driven focus guard, exposes _keyup and AfterContentInit behavior, and emits repeated separator/removal requests. Previously transplanting the modern repeat predicate into owned legacy sources removed that historical state machine and replaced a genuine original test. Restore original16; installed modern peer remains separate. No residual risk or historical-contract deviation is accepted. Branch-native Actions now confirm both exact repair commits pass all67 packed consumer cases, including actual release/repress focus and repeated separator/removal probes, and2152 historical tests. Decline the modern behavior changes for the owned legacy controls; retain the distinct historical state machine and assertions. This decision does not clear unrelated API, audit, dependency or release failures.",
+      "g11_claim": "not-passed",
+      "final_disposition": "do-not-adopt",
+      "execution": {
+        "main": {
+          "source_commit": "e155084685004f19ed010a468754d690f438642b",
+          "run": 37533826194,
+          "job": 112509599897,
+          "library_sha256": "fd0269c00b547c848fb049836357b9e4f1735b1ad27093cc9a6cbf8f36d9af90"
+        },
+        "21.x": {
+          "source_commit": "ed4180c98c307c38e87c47eb93ad1c43b53d87c2",
+          "run": 37533828978,
+          "job": 112509608870,
+          "library_sha256": "386aa373fcf7e0384a86d641c82e19e30c87a4044c17952b36f5c015e9acf589"
+        }
+      },
+      "executed_cases": [
+        "packed-consumer/harness/chip-input-backspace-release",
+        "packed-consumer/harness/chip-repeated-removal-and-separator"
+      ]
     },
     {
       "sha": "5153a5cd4bdd69649f07ba6596cad56bfd9eb2b1",
@@ -40,14 +59,57 @@
         "21.x"
       ],
       "proposal": "do-not-adopt",
-      "status": "repair-awaiting-artifact-bound-actions",
-      "reason": "The complete hunks change modern MDC MatChip/MatChipInput/MatChipGrid behavior and tests. The original legacy input owns a keyup-driven focus guard, exposes _keyup and AfterContentInit behavior, and emits repeated separator/removal requests. Previously transplanting the modern repeat predicate into owned legacy sources removed that historical state machine and replaced a genuine original test. Restore original16; installed modern peer remains separate. No residual risk or historical-contract deviation is accepted.",
-      "g11_claim": "not-passed"
+      "status": "individually-reviewed-do-not-adopt",
+      "reason": "The complete hunks change modern MDC MatChip/MatChipInput/MatChipGrid behavior and tests. The original legacy input owns a keyup-driven focus guard, exposes _keyup and AfterContentInit behavior, and emits repeated separator/removal requests. Previously transplanting the modern repeat predicate into owned legacy sources removed that historical state machine and replaced a genuine original test. Restore original16; installed modern peer remains separate. No residual risk or historical-contract deviation is accepted. Branch-native Actions now confirm both exact repair commits pass all67 packed consumer cases, including actual release/repress focus and repeated separator/removal probes, and2152 historical tests. Decline the modern behavior changes for the owned legacy controls; retain the distinct historical state machine and assertions. This decision does not clear unrelated API, audit, dependency or release failures.",
+      "g11_claim": "not-passed",
+      "final_disposition": "do-not-adopt",
+      "execution": {
+        "main": {
+          "source_commit": "e155084685004f19ed010a468754d690f438642b",
+          "run": 37533826194,
+          "job": 112509599897,
+          "library_sha256": "fd0269c00b547c848fb049836357b9e4f1735b1ad27093cc9a6cbf8f36d9af90"
+        },
+        "21.x": {
+          "source_commit": "ed4180c98c307c38e87c47eb93ad1c43b53d87c2",
+          "run": 37533828978,
+          "job": 112509608870,
+          "library_sha256": "386aa373fcf7e0384a86d641c82e19e30c87a4044c17952b36f5c015e9acf589"
+        }
+      },
+      "executed_cases": [
+        "packed-consumer/harness/chip-input-backspace-release",
+        "packed-consumer/harness/chip-repeated-removal-and-separator"
+      ]
     }
   ],
   "limitations": [
-    "Pure method tests do not prove actual DOM focus or current peer delegation.",
-    "A replaced original test is restored;2152 registry case population remains unchanged.",
-    "Real packed67 consumer cases and historical family tests require branch-native Actions; no G01/G11 claim."
-  ]
+    "Only the two explicitly listed whole upstream patches and historical keyboard contracts are decided here; other chip/a11y changes remain separate.",
+    "Actions qualified the exact repair commits; later source changes require fresh qualification.",
+    "Original test assertions restored; the2152 population alone does not prove all historical assertions remain intact.",
+    "No G01/G02/G11/full release pass. Authenticated logs reviewed; artifact archive not independently downloaded and rehashed."
+  ],
+  "recorded_at_utc": "2026-10-06T21:51:20.261147+00:00",
+  "executions": {
+    "main": {
+      "source_commit": "e155084685004f19ed010a468754d690f438642b",
+      "run": 37533826194,
+      "job": 112509599897,
+      "library_sha256": "fd0269c00b547c848fb049836357b9e4f1735b1ad27093cc9a6cbf8f36d9af90"
+    },
+    "21.x": {
+      "source_commit": "ed4180c98c307c38e87c47eb93ad1c43b53d87c2",
+      "run": 37533828978,
+      "job": 112509608870,
+      "library_sha256": "386aa373fcf7e0384a86d641c82e19e30c87a4044c17952b36f5c015e9acf589"
+    }
+  },
+  "executed_cases": [
+    "packed-consumer/harness/chip-input-backspace-release",
+    "packed-consumer/harness/chip-repeated-removal-and-separator"
+  ],
+  "packed_roster_passed": 67,
+  "historical_tests_passed": 2152,
+  "evidence_transport": "Authenticated workflow logs reviewed. The coordinator rehashes artifact bytes and binds actual assertions; no independent archive download/rehash or final release seal is claimed.",
+  "independent_review": "Pending C05/fresh full audit"
 }
