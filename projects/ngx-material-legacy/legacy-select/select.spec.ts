@@ -52,12 +52,12 @@ import {
   FormBuilder,
 } from '@angular/forms';
 import {ErrorStateMatcher} from '@angular/material/core';
-import {MatLegacyOption, MatLegacyOptionSelectionChange} from '@angular/material/legacy-core';
+import {MatLegacyOption, MatLegacyOptionSelectionChange} from '@ngx-compat/material-legacy/legacy-core';
 import {
   LegacyFloatLabelType,
   MatLegacyFormFieldModule,
   MAT_LEGACY_FORM_FIELD_DEFAULT_OPTIONS,
-} from '@angular/material/legacy-form-field';
+} from '@ngx-compat/material-legacy/legacy-form-field';
 import {By} from '@angular/platform-browser';
 import {LEGACY_NOOP_ANIMATIONS} from '../internal/testing/owned-animation-modules';
 import {LiveAnnouncer} from '@angular/cdk/a11y';

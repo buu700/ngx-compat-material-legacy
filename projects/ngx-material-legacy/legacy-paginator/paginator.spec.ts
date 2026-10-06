@@ -3,7 +3,7 @@ import {Component, Provider, Type, ViewChild} from '@angular/core';
 import {LEGACY_NOOP_ANIMATIONS} from '../internal/testing/owned-animation-modules';
 import {dispatchMouseEvent} from '../internal/testing/owned-test-events';
 import {ThemePalette} from '@angular/material/core';
-import {MatLegacySelect} from '@angular/material/legacy-select';
+import {MatLegacySelect} from '@ngx-compat/material-legacy/legacy-select';
 import {By} from '@angular/platform-browser';
 import {MatLegacyPaginator, MatLegacyPaginatorIntl, MatLegacyPaginatorModule} from './index';
 import {MAT_LEGACY_PAGINATOR_DEFAULT_OPTIONS, MatLegacyPaginatorDefaultOptions} from './paginator';

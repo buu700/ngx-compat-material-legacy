@@ -1,4 +1,4 @@
-import {MatLegacyRadioModule} from '@angular/material/legacy-radio';
+import {MatLegacyRadioModule} from '@ngx-compat/material-legacy/legacy-radio';
 import {runHarnessTests} from '@angular/material/radio/testing/shared.spec';
 import {MatLegacyRadioButtonHarness, MatLegacyRadioGroupHarness} from './radio-harness';
 

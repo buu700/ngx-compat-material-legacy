@@ -48,7 +48,7 @@ import {
   MAT_LEGACY_DIALOG_DEFAULT_OPTIONS,
 } from './index';
 import {Subject} from 'rxjs';
-import {MatLegacyDialogRef, MatLegacyDialogState} from '@angular/material/legacy-dialog';
+import {MatLegacyDialogRef, MatLegacyDialogState} from '@ngx-compat/material-legacy/legacy-dialog';
 
 describe('MatDialog', () => {
   let dialog: MatLegacyDialog;

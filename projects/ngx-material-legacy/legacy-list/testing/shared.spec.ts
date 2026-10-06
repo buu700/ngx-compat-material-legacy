@@ -9,7 +9,7 @@ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
 import {Component, Type} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {MatDividerHarness} from '@angular/material/divider/testing';
-import {MatLegacyListModule} from '@angular/material/legacy-list';
+import {MatLegacyListModule} from '@ngx-compat/material-legacy/legacy-list';
 import {MatLegacyActionListHarness, MatLegacyActionListItemHarness} from './action-list-harness';
 import {MatLegacyListHarness, MatLegacyListItemHarness} from './list-harness';
 import {MatLegacyListHarnessBase} from './list-harness-base';

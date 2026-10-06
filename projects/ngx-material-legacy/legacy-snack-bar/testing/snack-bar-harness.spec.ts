@@ -2,7 +2,7 @@ import {
   MatLegacySnackBar,
   MatLegacySnackBarConfig,
   MatLegacySnackBarModule,
-} from '@angular/material/legacy-snack-bar';
+} from '@ngx-compat/material-legacy/legacy-snack-bar';
 import {runHarnessTests} from '@angular/material/snack-bar/testing/shared.spec';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {HarnessLoader} from '@angular/cdk/testing';

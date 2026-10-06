@@ -21,7 +21,7 @@ import {
   LegacySimpleSnackBar,
 } from './index';
 import {Platform} from '@angular/cdk/platform';
-import {MAT_LEGACY_SNACK_BAR_DEFAULT_OPTIONS} from '@angular/material/legacy-snack-bar';
+import {MAT_LEGACY_SNACK_BAR_DEFAULT_OPTIONS} from '@ngx-compat/material-legacy/legacy-snack-bar';
 
 describe('MatSnackBar', () => {
   let snackBar: MatLegacySnackBar;

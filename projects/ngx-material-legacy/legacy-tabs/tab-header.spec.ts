@@ -24,7 +24,7 @@ import {By} from '@angular/platform-browser';
 import {MatLegacyInkBar} from './ink-bar';
 import {MatLegacyTabHeader} from './tab-header';
 import {ObserversModule, MutationObserverFactory} from '@angular/cdk/observers';
-import {MatLegacyTabLabelWrapper} from '@angular/material/legacy-tabs';
+import {MatLegacyTabLabelWrapper} from '@ngx-compat/material-legacy/legacy-tabs';
 
 describe('MatTabHeader', () => {
   let fixture: ComponentFixture<SimpleTabHeaderApp>;

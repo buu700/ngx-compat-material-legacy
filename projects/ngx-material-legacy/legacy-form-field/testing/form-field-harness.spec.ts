@@ -1,16 +1,16 @@
 import {MatLegacyErrorHarness} from './error-harness';
-import {MatLegacyAutocompleteModule} from '@angular/material/legacy-autocomplete';
+import {MatLegacyAutocompleteModule} from '@ngx-compat/material-legacy/legacy-autocomplete';
 import {MatNativeDateModule} from '@angular/material/core';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import {
   MatDatepickerInputHarness,
   MatDateRangeInputHarness,
 } from '@angular/material/datepicker/testing';
-import {MatLegacyFormFieldModule} from '@angular/material/legacy-form-field';
-import {MatLegacyInputModule} from '@angular/material/legacy-input';
-import {MatLegacyInputHarness} from '@angular/material/legacy-input/testing';
-import {MatLegacySelectModule} from '@angular/material/legacy-select';
-import {MatLegacySelectHarness} from '@angular/material/legacy-select/testing';
+import {MatLegacyFormFieldModule} from '@ngx-compat/material-legacy/legacy-form-field';
+import {MatLegacyInputModule} from '@ngx-compat/material-legacy/legacy-input';
+import {MatLegacyInputHarness} from '@ngx-compat/material-legacy/legacy-input/testing';
+import {MatLegacySelectModule} from '@ngx-compat/material-legacy/legacy-select';
+import {MatLegacySelectHarness} from '@ngx-compat/material-legacy/legacy-select/testing';
 
 import {MatLegacyFormFieldHarness} from './form-field-harness';
 import {runHarnessTests} from '@angular/material/form-field/testing/shared.spec';

@@ -1,5 +1,5 @@
 import {MatDividerHarness} from '@angular/material/divider/testing';
-import {MatLegacyListModule} from '@angular/material/legacy-list';
+import {MatLegacyListModule} from '@ngx-compat/material-legacy/legacy-list';
 import {MatLegacyActionListHarness} from './action-list-harness';
 import {MatLegacyListHarness} from './list-harness';
 import {MatLegacyNavListHarness} from './nav-list-harness';

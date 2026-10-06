@@ -1,4 +1,4 @@
-import {MatLegacyMenuModule} from '@angular/material/legacy-menu';
+import {MatLegacyMenuModule} from '@ngx-compat/material-legacy/legacy-menu';
 import {runHarnessTests} from '@angular/material/menu/testing/shared.spec';
 import {MatLegacyMenuHarness} from './menu-harness';
 

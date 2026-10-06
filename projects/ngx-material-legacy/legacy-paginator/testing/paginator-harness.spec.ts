@@ -1,4 +1,4 @@
-import {MatLegacyPaginatorModule} from '@angular/material/legacy-paginator';
+import {MatLegacyPaginatorModule} from '@ngx-compat/material-legacy/legacy-paginator';
 import {runHarnessTests} from '@angular/material/paginator/testing/shared.spec';
 import {MatLegacyPaginatorHarness} from './paginator-harness';
 

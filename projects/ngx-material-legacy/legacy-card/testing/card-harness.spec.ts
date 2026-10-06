@@ -1,4 +1,4 @@
-import {MatLegacyCardModule} from '@angular/material/legacy-card';
+import {MatLegacyCardModule} from '@ngx-compat/material-legacy/legacy-card';
 import {runHarnessTests} from '@angular/material/card/testing/shared.spec';
 import {MatLegacyCardHarness, MatLegacyCardSection} from './card-harness';
 
