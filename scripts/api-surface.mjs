@@ -94,7 +94,12 @@ export function propertyTypeText(node, sourceFile) {
         element.name.text === local
           && (element.propertyName || element.name).text === 'AsyncFactoryFn'));
   if (!imported) return raw;
-  return `() => Promise<${node.typeArguments[0].getText(sourceFile)}>`;
+  const argument = node.typeArguments[0];
+  // A leading pipe is permitted union formatting, not an additional type member.
+  const text = ts.isUnionTypeNode(argument)
+    ? argument.types.map(type => type.getText(sourceFile)).join(' | ')
+    : argument.getText(sourceFile);
+  return `() => Promise<${text}>`;
 }
 
 function optionalType(type, optional) {

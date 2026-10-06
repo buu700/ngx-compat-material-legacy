@@ -179,6 +179,8 @@ function observe(importLine,type) {
 }
 const imported="import {AsyncFactoryFn as Locator} from '@angular/cdk/testing';";
 assert.equal(observe(imported,'Locator<TestElement | null>'),observe('', '() => Promise<TestElement | null>'));
+assert.equal(observe(imported,'Locator<| (ComponentHarness & { getValueText(): Promise<string> }) | null>'),observe('', '() => Promise<(ComponentHarness & { getValueText(): Promise<string> }) | null>'));
+assert.notEqual(observe(imported,'Locator<| TestElement | null | undefined>'),observe('', '() => Promise<TestElement | null>'));
 assert.notEqual(observe(imported,'Locator<TestElement | null>'),observe('', '() => Promise<TestElement>'));
 assert.notEqual(observe(imported,'Locator<TestElement>'),observe('', '(id: string) => Promise<TestElement>'));
 assert.notEqual(observe(imported,'Locator<TestElement>'),observe('', '() => Promise<string>'));
