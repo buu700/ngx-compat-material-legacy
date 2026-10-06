@@ -31,7 +31,7 @@ function fail(code, message) {
   process.exit(code);
 }
 
-let tarball = join(root, 'artifacts/main/draft/ngx-compat-material-legacy-22.0.0-rc.0.tgz');
+let tarball = join(root, 'artifacts/main/draft/ngx-compat-material-legacy-21.0.0-rc.0.tgz');
 for (let i = 2; i < process.argv.length; i += 1) {
   const arg = process.argv[i];
   if (arg === '--tarball') {

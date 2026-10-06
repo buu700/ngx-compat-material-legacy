@@ -217,7 +217,7 @@ function interruptProblem(suffix, obs) {
 
 export function assertCase(caseId, obs) {
   const parts = String(caseId || '').split('/');
-  if (parts.length < 6 || parts[0] !== 'native-motion' || parts[1] !== 'main') return ['unknown case'];
+  if (parts.length < 6 || parts[0] !== 'native-motion' || parts[1] !== '21.x') return ['unknown case'];
   const group = parts[4];
   const suffix = parts.slice(5).join('/');
   if (group === 'enabled-disabled-reduced') {

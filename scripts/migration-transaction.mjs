@@ -22,7 +22,7 @@ import {dirname, join, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const tarballRelative = 'migration/dist/ngx-compat-material-legacy-migrate-cli-22.0.0-rc.0.tgz';
+const tarballRelative = 'migration/dist/ngx-compat-material-legacy-migrate-cli-21.0.0-rc.0.tgz';
 const tarball = join(root, tarballRelative);
 const reportPath = join(root, 'compatibility/rc/reports/migration-transaction.json');
 const safeSource = "import {MatLegacyButtonModule} from '@angular/material/legacy-button';\n";

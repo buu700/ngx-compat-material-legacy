@@ -86,7 +86,6 @@ function compile(consumer, env, files, outDir) {
     compilerOptions: {
       target: 'ES2022', module: 'ES2022', moduleResolution: 'bundler', experimentalDecorators: true,
       strict: true, skipLibCheck: true, lib: ['ES2022', 'DOM'], rootDir: 'src', outDir, types: [],
-      ignoreDeprecations: '6.0',
     },
     files,
     angularCompilerOptions: {compilationMode: 'full', strictTemplates: true},
@@ -265,9 +264,9 @@ async function runBrowser(consumer) {
           await readReady(driver.evaluate, driver.sleep);
           rawByMode[mode] = await driver.evaluate('window.__cspResult || null');
         }
-        observations[`csp-ssr/main/chromium/nonce-and-negative/${surface}/correct-nonce`] = nonceObservation(surface, rawByMode.correct, unsafe(NONCE_POLICY));
-        observations[`csp-ssr/main/chromium/nonce-and-negative/${surface}/missing-nonce`] = nonceObservation(surface, rawByMode.missing, unsafe(NONCE_POLICY));
-        observations[`csp-ssr/main/chromium/nonce-and-negative/${surface}/wrong-nonce`] = nonceObservation(surface, rawByMode.wrong, unsafe(NONCE_POLICY));
+        observations[`csp-ssr/21.x/chromium/nonce-and-negative/${surface}/correct-nonce`] = nonceObservation(surface, rawByMode.correct, unsafe(NONCE_POLICY));
+        observations[`csp-ssr/21.x/chromium/nonce-and-negative/${surface}/missing-nonce`] = nonceObservation(surface, rawByMode.missing, unsafe(NONCE_POLICY));
+        observations[`csp-ssr/21.x/chromium/nonce-and-negative/${surface}/wrong-nonce`] = nonceObservation(surface, rawByMode.wrong, unsafe(NONCE_POLICY));
       }
       await driver.send('Page.navigate', {url: `${origin}/inline.html`});
       for (let i = 0; i < 30 && !(await driver.evaluate('window.__appBooted === 1 || (window.__cspViolations || []).length > 0')); i += 1) await driver.sleep(50);
@@ -281,9 +280,9 @@ async function runBrowser(consumer) {
       const inlineObs = JSON.parse(inline);
       const driverValue = await driver.evaluate('1+1===2');
       const policyBase = {engine: 'chromium', unsafeInline: unsafe(NONCE_POLICY), hydration: false};
-      observations['csp-ssr/main/chromium/nonce-and-negative/policy/unapproved-inline-script'] = {...policyBase, ...inlineObs};
-      observations['csp-ssr/main/chromium/nonce-and-negative/policy/unapproved-inline-style'] = {...policyBase, ...inlineObs};
-      observations['csp-ssr/main/chromium/nonce-and-negative/policy/driver-not-application-script'] = {
+      observations['csp-ssr/21.x/chromium/nonce-and-negative/policy/unapproved-inline-script'] = {...policyBase, ...inlineObs};
+      observations['csp-ssr/21.x/chromium/nonce-and-negative/policy/unapproved-inline-style'] = {...policyBase, ...inlineObs};
+      observations['csp-ssr/21.x/chromium/nonce-and-negative/policy/driver-not-application-script'] = {
         ...policyBase, driverEvaluated: driverValue === true, inlineScriptRan: inlineObs.inlineScriptRan, scriptSrcViolations: inlineObs.scriptSrcViolations,
       };
       await driver.send('Page.navigate', {url: `${origin}/hash.html`});
@@ -292,7 +291,7 @@ async function runBrowser(consumer) {
         hashStyleApplied: getComputedStyle(document.body).backgroundColor === 'rgb(4, 5, 6)',
         styleSrcViolations: (window.__cspViolations || []).filter(item => item.startsWith('style-src')).length
       })`));
-      observations['csp-ssr/main/chromium/nonce-and-negative/policy/style-hash-match'] = {
+      observations['csp-ssr/21.x/chromium/nonce-and-negative/policy/style-hash-match'] = {
         engine: 'chromium', unsafeInline: unsafe(HASH_POLICY), hydration: false, ...hashOk,
       };
       await driver.send('Page.navigate', {url: `${origin}/hash-bad.html`});
@@ -301,7 +300,7 @@ async function runBrowser(consumer) {
         hashStyleApplied: getComputedStyle(document.body).backgroundColor === 'rgb(7, 8, 9)',
         styleSrcViolations: (window.__cspViolations || []).filter(item => item.startsWith('style-src')).length
       })`));
-      observations['csp-ssr/main/chromium/nonce-and-negative/policy/style-hash-mismatch'] = {
+      observations['csp-ssr/21.x/chromium/nonce-and-negative/policy/style-hash-mismatch'] = {
         engine: 'chromium', unsafeInline: unsafe(HASH_POLICY), hydration: false, ...hashBad,
       };
     });
@@ -625,11 +624,11 @@ async function runServers(consumer, env) {
   const observations = {};
   const jobs = [];
   for (const entry of PUBLIC_ENTRIES) {
-    jobs.push([`csp-ssr/main/server/dom-free-server-and-leaks/import/${entry}`, join(consumer, 'server-dist', `import-${entry}.js`)]);
-    jobs.push([`csp-ssr/main/server/dom-free-server-and-leaks/testing/${entry}`, join(consumer, 'server-dist', `testing-${entry}.js`)]);
+    jobs.push([`csp-ssr/21.x/server/dom-free-server-and-leaks/import/${entry}`, join(consumer, 'server-dist', `import-${entry}.js`)]);
+    jobs.push([`csp-ssr/21.x/server/dom-free-server-and-leaks/testing/${entry}`, join(consumer, 'server-dist', `testing-${entry}.js`)]);
   }
   for (const family of RENDER_FAMILIES) {
-    jobs.push([`csp-ssr/main/server/dom-free-server-and-leaks/render/${family}`, join(consumer, 'server-dist', `render-${family}.js`)]);
+    jobs.push([`csp-ssr/21.x/server/dom-free-server-and-leaks/render/${family}`, join(consumer, 'server-dist', `render-${family}.js`)]);
   }
   for (const [id, bundle] of jobs) {
     const result = await runProcess(preload, bundle, env);

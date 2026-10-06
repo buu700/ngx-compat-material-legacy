@@ -342,7 +342,7 @@ export function artifactNegativeObservations() {
     mkdirSync(packageDir);
     writeFileSync(packageDir + '/package.json', JSON.stringify({
       name: '@ngx-compat/material-legacy',
-      version: '22.0.0-rc.0',
+      version: '21.0.0-rc.0',
     }));
     const wrongTar = join(wrongDir, 'library.tgz');
     const packed = spawnSync('tar', ['-czf', wrongTar, '-C', wrongDir, 'package'], {encoding: 'utf8'});

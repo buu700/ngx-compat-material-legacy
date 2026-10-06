@@ -34,7 +34,7 @@ import {fileURLToPath} from 'node:url';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const catalogPath = join(root, 'fixtures/migration/cases.json');
 const matrixPath = join(root, 'compatibility/rc/matrices/full-verify.json');
-const cliTarballRelative = 'migration/dist/ngx-compat-material-legacy-migrate-cli-22.0.0-rc.0.tgz';
+const cliTarballRelative = 'migration/dist/ngx-compat-material-legacy-migrate-cli-21.0.0-rc.0.tgz';
 const cliTarball = join(root, cliTarballRelative);
 const distPackage = join(root, 'dist/ngx-material-legacy');
 const ngJs = join(root, 'node_modules/@angular/cli/bin/ng.js');

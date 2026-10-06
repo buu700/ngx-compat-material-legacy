@@ -21,9 +21,9 @@ const roster = deriveMainRoster();
 expect('no safari id', roster.ids.every(id => !id.includes('safari')));
 expect('no hydration id', roster.ids.every(id => !id.includes('hydration')));
 expect('chromium only for nonce', roster.groups['nonce-and-negative'].every(id => id.split('/')[2] === 'chromium'));
-expect('server group has every public entry', PUBLIC_ENTRIES.every(entry => roster.ids.includes(`csp-ssr/main/server/dom-free-server-and-leaks/import/${entry}`)));
-expect('server group has every testing entry', PUBLIC_ENTRIES.every(entry => roster.ids.includes(`csp-ssr/main/server/dom-free-server-and-leaks/testing/${entry}`)));
-expect('render families', RENDER_FAMILIES.every(family => roster.ids.includes(`csp-ssr/main/server/dom-free-server-and-leaks/render/${family}`)));
+expect('server group has every public entry', PUBLIC_ENTRIES.every(entry => roster.ids.includes(`csp-ssr/21.x/server/dom-free-server-and-leaks/import/${entry}`)));
+expect('server group has every testing entry', PUBLIC_ENTRIES.every(entry => roster.ids.includes(`csp-ssr/21.x/server/dom-free-server-and-leaks/testing/${entry}`)));
+expect('render families', RENDER_FAMILIES.every(family => roster.ids.includes(`csp-ssr/21.x/server/dom-free-server-and-leaks/render/${family}`)));
 expect('hydration unclaimed', roster.notApplicable.some(item => item.claim === 'hydration'));
 expect('safari not applicable', roster.notApplicable.some(item => item.engine === 'safari'));
 

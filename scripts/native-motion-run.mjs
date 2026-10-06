@@ -104,7 +104,6 @@ export function nativeMotionConsumerSpec(versions, zoneless) {
         rootDir: 'src',
         outDir: 'out',
         types: [],
-        ignoreDeprecations: '6.0',
       },
       files: ['src/main.ts'],
       angularCompilerOptions: {compilationMode: 'full', strictTemplates: true},

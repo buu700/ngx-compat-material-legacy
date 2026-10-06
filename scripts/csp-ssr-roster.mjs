@@ -179,7 +179,7 @@ function serverProblem(kind, family, obs) {
 
 export function assertCase(caseId, obs) {
   const parts = String(caseId || '').split('/');
-  if (parts[0] !== 'csp-ssr' || parts[1] !== 'main') return ['unknown case'];
+  if (parts[0] !== 'csp-ssr' || parts[1] !== '21.x') return ['unknown case'];
   if (parts[2] === 'chromium' && parts[3] === 'nonce-and-negative') {
     if (parts[4] === 'policy') {
       const problem = policyProblem(parts[5], obs);
