@@ -15,9 +15,10 @@
  * old-workspace-cli, transaction-negatives, or frontend-parity.
  * Every main migration group stays null. Does not claim G04 or G05.
  *
- *   node scripts/check-packaged-schematic.mjs --out <report.json> [--library-tarball <library.tgz>]
+ *   node scripts/check-packaged-schematic.mjs --out <report.json> --run <run.json>
  */
-import {spawnSync} from 'node:child_process';
+import {resolveMigrationRun} from './migration-run-inputs.mjs';
+import {coordinatorRequest} from './packed-consumer-evidence.mjs';
 import {
   existsSync,
   lstatSync,
@@ -35,7 +36,8 @@ import {
   extractTarball,
   flagsFor,
   installAndNgGenerate,
-  packLibrary,
+  parseFrontendArgs,
+  schematicIdentities,
   readNodeVersion,
   rewriteCases,
   sha256,
@@ -53,64 +55,10 @@ function fail(message) {
   process.exit(1);
 }
 
-function parseArgs(argv) {
-  let out = defaultReport;
-  let libraryTarball = null;
-  for (let i = 0; i < argv.length; i += 1) {
-    const arg = argv[i];
-    if (arg === '--out' || arg === '--library-tarball') {
-      const value = argv[i + 1];
-      if (!value || value.startsWith('-')) fail(`${arg} requires a path`);
-      if (arg === '--out') out = resolve(value);
-      else libraryTarball = resolve(value);
-      i += 1;
-      continue;
-    }
-    fail(`Unknown argument: ${arg}`);
-  }
-  return {out, libraryTarball};
-}
-
 export function assertionOutputDir() {
-  const names = ['RC_CHECK_ID', 'RC_RUN_ID', 'RC_INVOCATION_ID', 'RC_EVIDENCE_BINDING', 'RC_ASSERTION_OUTPUT_DIR'];
-  const present = names.filter(name => process.env[name]);
-  if (present.length === 0) return null;
-  if (present.length !== names.length || process.env.RC_CHECK_ID !== 'migration-packaged') {
-    fail('packaged-schematic: incomplete coordinator environment');
-  }
-  let binding;
-  try {
-    binding = JSON.parse(process.env.RC_EVIDENCE_BINDING);
-  } catch {
-    fail('packaged-schematic: RC_EVIDENCE_BINDING is not JSON');
-  }
-  if (!binding || typeof binding !== 'object' || Array.isArray(binding)) {
-    fail('packaged-schematic: binding is not an object');
-  }
-  if (binding.source_line === 'main') return null;
-  if (binding.source_line !== '21.x') fail('packaged-schematic: binding source line is not 21.x');
-  const outputDir = process.env.RC_ASSERTION_OUTPUT_DIR;
-  let stat;
-  try {
-    stat = lstatSync(outputDir);
-  } catch {
-    fail('packaged-schematic: assertion output directory is missing');
-  }
-  if (!stat.isDirectory() || stat.isSymbolicLink()) {
-    fail('packaged-schematic: assertion output directory is not a real directory');
-  }
-  const invocation = process.env.RC_INVOCATION_ID;
-  if (!outputDir.endsWith(join('evidence', 'migration-packaged', invocation))) {
-    fail('packaged-schematic: assertion directory is not check-owned');
-  }
-  return outputDir;
-}
-
-function matrixGroups() {
-  const matrix = JSON.parse(readFileSync(matrixPath, 'utf8'));
-  const row = matrix.checks.find(item => item.check_id === 'migration-packaged');
-  if (!row) throw new Error('migration-packaged matrix row is missing');
-  return row.acceptance.cases_by_line;
+  const request=coordinatorRequest('migration-packaged');
+  if(request?.error)throw new Error(request.error);
+  return request?.outputDir ?? null;
 }
 
 export function writeAssertions(outputDir, report) {
@@ -168,6 +116,9 @@ export function writeAssertions(outputDir, report) {
       kind: 'assertion',
       line: '21.x',
       group: 'packaged-schematic',
+      check_id:'migration-packaged',exit_code:0,run_id:report.run_id,invocation_id:report.invocation_id,binding:report.binding,
+      artifacts:report.artifacts,schematic_support_files:report.schematic_support_files,
+      before:change.before,after:change.after,expected_after:change.expected_after,
       path: change.path,
       before_sha256: change.before_sha256,
       after_sha256: change.after_sha256,
@@ -197,7 +148,8 @@ export function writeAssertions(outputDir, report) {
   return written;
 }
 
-export function executePackagedSchematic(libraryTarball) {
+export function executePackagedSchematic(runPath) {
+  const input=resolveMigrationRun(runPath);
   if (!existsSync(ngJs)) throw new Error('Angular CLI ng.js is missing');
   const catalog = JSON.parse(readFileSync(catalogPath, 'utf8'));
   const cases = rewriteCases(catalog);
@@ -211,9 +163,10 @@ export function executePackagedSchematic(libraryTarball) {
     throw new Error('refusing to build the disposable fixture inside the repository');
   }
   try {
-    const librarySource = libraryTarball || packLibrary(join(work, 'pack'));
+    const librarySource=input.artifacts.library.absolute;
     const libraryBytes = readFileSync(librarySource);
     const libraryPackage = extractTarball(librarySource, join(work, 'library-package'));
+    const schematicSupport=schematicIdentities(libraryPackage);
     const schematicPackage = JSON.parse(readFileSync(join(libraryPackage, 'schematics/package.json'), 'utf8'));
     if (schematicPackage.type !== 'commonjs') {
       throw new Error('packed schematics/package.json must set type commonjs');
@@ -276,11 +229,15 @@ export function executePackagedSchematic(libraryTarball) {
       '--defaults',
     ];
 
+    for(const a of Object.values(input.artifacts)){const bytes=readFileSync(a.absolute);if(bytes.length!==a.bytes||sha256(bytes)!==a.sha256)throw new Error('run artifact changed during schematic execution');}
     return {
       schema_version: 1,
       role: 'packaged schematic ng generate expected_after',
       check_id: 'migration-packaged',
       group: 'packaged-schematic',
+      run_id:input.run.run_id,invocation_id:input.request?.invocation ?? null,binding:input.request?.binding ?? null,
+      artifacts:Object.fromEntries(Object.entries(input.artifacts).map(([id,a])=>[id,{sha256:a.sha256,bytes:a.bytes}])),
+      schematic_support_files:schematicSupport,
       line: '21.x',
       coverage: 'slice',
       result: mismatches.length === 0 ? 'pass' : 'fail',
@@ -294,7 +251,7 @@ export function executePackagedSchematic(libraryTarball) {
       expectation: 'expected_after',
       node_binary: angularNode,
       node_version: nodeVersion,
-      library_tarball: libraryTarball ? libraryTarball : 'dist/ngx-material-legacy (npm pack)',
+      library_tarball: input.artifacts.library.path,
       library_tarball_sha256: sha256(libraryBytes),
       library_tarball_bytes: libraryBytes.length,
       acknowledgement_flags: flags,
@@ -334,10 +291,10 @@ export function executePackagedSchematic(libraryTarball) {
 }
 
 function main(argv) {
-  const {out, libraryTarball} = parseArgs(argv);
+  const {out,runPath}=parseFrontendArgs(argv,{defaultOutput:defaultReport});
   let report;
   try {
-    report = executePackagedSchematic(libraryTarball);
+    report = executePackagedSchematic(runPath);
   } catch (error) {
     fail(error instanceof Error ? error.message : String(error));
   }

@@ -6,6 +6,7 @@ import {tmpdir} from 'node:os';
 import {dirname, isAbsolute, join, relative, resolve, sep} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {floorConfigurations} from './consumer-floor-roster.mjs';
+import {extractMigrationCli} from './migration-run-inputs.mjs';
 import {coordinatorRequest, lineForPackageVersion} from './packed-consumer-evidence.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -82,15 +83,9 @@ async function runtime(version) {
   return value;
 }
 function inspectCliArchive() {
-  const members = child('tar', ['-tzf', cli.path]).stdout.trim().split('\n');
-  if (!members.length || members.some(name => name.startsWith('/') || name.split('/').includes('..') || !name.startsWith('package/'))) throw new Error('CLI archive path escape');
-  const directory = join(owned, 'cli'); mkdirSync(directory);
-  child('tar', ['--no-same-owner', '--no-same-permissions', '-xzf', cli.path, '-C', directory]);
-  const packageRoot = join(directory, 'package');
-  const manifest = JSON.parse(readFileSync(confinedPath(packageRoot, 'package.json'), 'utf8'));
-  if (manifest.name !== '@ngx-compat/material-legacy-migrate-cli' || lineForPackageVersion(manifest.version) !== line) throw new Error('wrong CLI artifact line');
-  return confinedPath(packageRoot, 'bin/migrate-legacy.js');
+  return extractMigrationCli({line,artifacts:{'migrate-cli':{absolute:cli.path}}},join(owned,'cli')).bin;
 }
+
 const results = [];
 try {
   const cliBin = inspectCliArchive();
