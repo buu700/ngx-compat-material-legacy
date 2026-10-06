@@ -31,6 +31,7 @@ from rc_acceptance import (
     assertion_directory, expected_cases, prepack_binding_for,
 )
 from archive_run_closure import ClosureError, write_closure
+from consumer_floor_admission import floor_assertion_ok, floor_support_records
 
 ROOT = Path(__file__).resolve().parents[1]
 MATRIX_PATH = ROOT / "compatibility/rc/matrices/full-verify.json"
@@ -66,7 +67,8 @@ SCRIPT_CHECKS = {
     "scripts/check-packaged-schematic.mjs": "migration-packaged",
     "scripts/rc-test-legacy-family.mjs": "historical-legacy-artifact",
     "scripts/check-release-metadata.mjs": "release-metadata",
-    "scripts/check-consumer-floors.mjs": "consumer-floors",    "scripts/check-m3-inclusion-order.mjs": "m3-coexistence",
+    "scripts/check-consumer-floors.mjs": "consumer-floors",
+    "scripts/run-consumer-floor-configurations.mjs": "consumer-floors",    "scripts/check-m3-inclusion-order.mjs": "m3-coexistence",
 }
 
 
@@ -650,11 +652,10 @@ _LINE_COORDINATOR_LIMITATIONS = {
         "Main companion-bridge-tokens groups stay null on this branch. A 21.x run does not copy main proofs.",
         "This report is the acceptance input. It does not add a G06, G07 or G08 claim field.",
     ],    "consumer-floors": [
-        "Coordinator report for the line being verified. Each rostered 21.x case has an assertion file written by this run.",
-        "cli-runtime executes the migrate CLI on the current Node and rejects 17.0.0 by the CLI engines range. The current runtime is not recorded as a Node 18 floor run.",
-        "line-isolation maps this checkout library version to 21.x and rejects --line main. It is not a main checkout run.",
-        "Main consumer-floors groups stay null on this branch. A 21.x run does not copy main proofs.",
-        "This report is the acceptance input. It does not add a G12 claim field.",
+        "Complete coverage requires diagnostics plus every source-policy runtime case on the actual pinned Node executable.",
+        "Each floor uses the run's packed artifacts in an isolated consumer with exact peers, strict declarations, AOT and real harness probes.",
+        "CLI floors execute the extracted packed CLI, including Node 18, dry-run, apply and idempotence.",
+        "Only this run's source line is admitted; the other line's roster is policy, not evidence.",
     ],
     "companion-computed-styles": [
         "Coordinator report for the line being verified. Each rostered 21.x case has exactly one assertion file written by this run.",
@@ -909,7 +910,12 @@ def _computed_style_assertion_ok(body: dict, invocation: str) -> bool:
         return body.get("peer_emitted_tokens") == []
     return _computed_rendered_case_ok(body, case_id, component, dimension)
 
+def _consumer_floor_assertion_ok(body: dict, invocation: str) -> bool:
+    return floor_assertion_ok(ROOT, ACTIVE_RUN, body, invocation)
+
+
 _ASSERTION_BODY_CHECKS = {
+    "consumer-floors": _consumer_floor_assertion_ok,
     "companion-bridge-tokens": _bridge_token_assertion_ok,
     "companion-computed-styles": _computed_style_assertion_ok,
 }
@@ -941,6 +947,12 @@ def _complete_line_report(run_dir: Path, run_id: str, check_id: str) -> dict | N
         if record["path"] not in seen:
             outputs.append(record)
             seen.add(record["path"])
+        if check_id == "consumer-floors":
+            body = read_json(run_dir / record["path"])
+            for support in floor_support_records(body):
+                if support["path"] not in seen:
+                    outputs.append(support)
+                    seen.add(support["path"])
         case_results.append({
             "case_id": case_id,
             "result": "pass",
@@ -1561,25 +1573,16 @@ def main() -> int:
     results["upstream-audit-disposition"] = "pass" if code == 0 else "fail"
     implemented_ran.append("upstream-audit-disposition")
 
-    # consumer-floors: library engines/peers, the migrate CLI runtime, and --line isolation.
-    code = run_node(
+    # Diagnostic ranges and actual artifact-bound runtime configurations share one invocation.
+    diagnostic_code = run_node(
         "scripts/check-consumer-floors.mjs",
         ["--out", str(out_dir / "consumer-floors-workspace.json")],
     )
+    runtime_code = run_node("scripts/run-consumer-floor-configurations.mjs", ["--run", str(out_dir / "run.json")])
+    code = diagnostic_code or runtime_code
     write_line_coordinator_report(
-        out_dir,
-        run_id,
-        line,
-        "consumer-floors",
-        exit_code=code,
-        limitations=[
-            "Compares advertised library engines.node and peerDependencies to lock/installed versions.",
-            "Library Node floor uses toolchain-lock.json / .node-version, not process.version.",
-            "cli-runtime executes the migrate CLI on the current Node and rejects 17.0.0 by the CLI engines range. The current runtime is not recorded as a Node 18 floor run.",
-            "line-isolation maps this checkout library version to 21.x and rejects --line main. It is not a main checkout run.",
-            "Main consumer-floors groups stay null on this branch. A 21.x run does not copy main proofs.",
-            "Does not mark consumer-floors accepted. Does not claim G12.",
-        ],
+        out_dir, run_id, line, "consumer-floors", exit_code=code,
+        limitations=["Only this source line's reviewed configurations are executed against this run's artifacts."],
     )
     results["consumer-floors"] = "pass" if code == 0 else "fail"
     implemented_ran.append("consumer-floors")

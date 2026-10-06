@@ -34,7 +34,7 @@ CHECK_CONTRACT = {
     "m3-coexistence": (("G07",), "artifact", ("library",), ("inclusion-order", "nested-lazy-overlay", "shared-style-boundary")),
     "native-motion": (("G04", "G10"), "artifact", ("library",), ("enabled-disabled-reduced", "interruption-destruction", "exactly-once-notification")),
     "csp-ssr": (("G04", "G10"), "artifact", ("library",), ("nonce-and-negative", "dom-free-server-and-leaks")),
-    "consumer-floors": (("G12",), "artifact", ("library", "migrate-cli"), ("public-engines-peers", "cli-runtime", "line-isolation")),
+    "consumer-floors": (("G12",), "artifact", ("library", "migrate-cli"), ("public-engines-peers", "cli-runtime", "line-isolation", "library-runtime", "cli-runtime-floors")),
     "dependency-eligibility": (("G08", "G11", "G13"), "source", ("source",), ("locks-tools-maturity", "vendor-provenance-license")),
     "release-metadata": (("G01", "G13"), "artifact", ("library", "migrate-cli"), ("package-metadata-license", "instructions-provenance")),
 }

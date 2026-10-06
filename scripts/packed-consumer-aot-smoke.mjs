@@ -30,6 +30,7 @@ import {tmpdir} from 'node:os';
 import {dirname, isAbsolute, join, relative, resolve, sep} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {spawnSync} from 'node:child_process';
+import {floorConfigurations} from './consumer-floor-roster.mjs';
 import {
   allConsumerCaseIds,
   coordinatorRequest,
@@ -57,18 +58,22 @@ const args = process.argv.slice(2);
 const skipHarness = args.includes('--skip-harness');
 let tarball = null;
 let runManifestPath = null;
+let floorCaseId = null;
+let floorOutput = null;
 
 for (let i = 0; i < args.length; i += 1) {
   const arg = args[i];
   if (arg === '--skip-harness') continue;
-  if (arg === '--tarball' || arg === '--run') {
+  if (arg === '--tarball' || arg === '--run' || arg === '--floor-case' || arg === '--floor-out') {
     const value = args[i + 1];
     if (!value || value.startsWith('-')) {
       console.error(`${arg} requires a path`);
       process.exit(2);
     }
     if (arg === '--tarball') tarball = resolve(value);
-    else runManifestPath = resolve(value);
+    else if (arg === '--run') runManifestPath = resolve(value);
+    else if (arg === '--floor-case') floorCaseId = value;
+    else floorOutput = resolve(value);
     i += 1;
     continue;
   }
@@ -94,6 +99,12 @@ function insideDir(dir, target) {
 }
 
 function run(cmd, cmdlineArgs, opts = {}) {
+  if (floorCaseId && cmd === 'npm') {
+    const npmCli = process.env.NGX_FLOOR_NPM_CLI;
+    if (!npmCli || !isAbsolute(npmCli) || !npmCli.endsWith('/npm-cli.js')) throw new Error('qualified floor npm CLI required');
+    cmd = process.execPath;
+    cmdlineArgs = [npmCli, ...cmdlineArgs];
+  }
   const res = spawnSync(cmd, cmdlineArgs, {
     encoding: 'utf8',
     ...opts,
@@ -585,6 +596,28 @@ if (!existsSync(tarball)) {
   process.exit(2);
 }
 
+if (Boolean(floorCaseId) !== Boolean(floorOutput) || (floorCaseId && (skipHarness || runManifestPath))) {
+  console.error('Floor mode requires --floor-case and --floor-out with --tarball, full harness execution, and its own report.');
+  process.exit(2);
+}
+const sourceManifest = JSON.parse(readFileSync(libraryManifestPath(), 'utf8'));
+const sourceLine = lineForPackageVersion(sourceManifest.version);
+let floorConfiguration = null;
+if (floorCaseId) {
+  const floorPlan = JSON.parse(readFileSync(join(root, 'compatibility/rc/consumer-floor-plan.json'), 'utf8'));
+  floorConfiguration = floorConfigurations(floorPlan, sourceLine, sourceManifest)
+    .find(item => item.case_id === floorCaseId && item.group === 'library-runtime');
+  const identity = readPackedIdentity(tarball);
+  if (!floorConfiguration || process.versions.node !== floorConfiguration.node
+      || identity.name !== sourceManifest.name || lineForPackageVersion(identity.version) !== sourceLine
+      || existsSync(floorOutput)) {
+    console.error('Unknown floor case, wrong actual runtime/artifact line, or stale output.');
+    process.exit(2);
+  }
+}
+function libraryManifestPath() { return join(root, 'projects/ngx-material-legacy/package.json'); }
+const compilerDeprecationVersion = Number((floorConfiguration?.typescript
+  ?? JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).devDependencies.typescript).split('.')[0]) >= 6 ? '6.0' : '5.0';
 const consumer = mkdtempSync(join(tmpdir(), 'ngx-compat-aot-harness_'));
 const rootReal = realpathSync(root);
 const consumerReal = realpathSync(consumer);
@@ -592,9 +625,9 @@ if (isInside(rootReal, consumerReal)) {
   console.error(`Consumer directory is inside the repository: ${consumerReal}`);
   process.exit(1);
 }
-const detailPath = draftRun
+const detailPath = floorOutput ?? (draftRun
   ? join(draftRun.runDir, 'reports/packed-consumer-detail.json')
-  : outPath;
+  : outPath);
 const result = {
   schema_version: 1,
   captured_at: new Date().toISOString(),
@@ -602,6 +635,8 @@ const result = {
   check_id: draftRun ? 'packed-consumer' : null,
   tarball: {path: tarball, sha256: sha256File(tarball)},
   consumer_dir: consumer,
+  floor_configuration: floorConfiguration,
+  node_runtime: {version: process.version, exec_path: process.execPath},
   aot: {status: 'pending'},
   harness: {status: skipHarness ? 'skipped' : 'pending'},
   errors: [],
@@ -637,6 +672,14 @@ try {
       jsdom: '26.1.0',
     },
   };
+  if (floorConfiguration) {
+    for (const name of Object.keys(pkg.dependencies)) {
+      if (name.startsWith('@angular/')) pkg.dependencies[name] = name === '@angular/cdk'
+        ? floorConfiguration.cdk : name === '@angular/material' ? floorConfiguration.material : floorConfiguration.framework;
+    }
+    pkg.dependencies.rxjs = floorConfiguration.rxjs;
+    pkg.dependencies.typescript = floorConfiguration.typescript;
+  }
   writeFileSync(join(consumer, 'package.json'), JSON.stringify(pkg, null, 2));
   writeFileSync(join(consumer, '.npmrc'), 'install-links=true\nfund=false\naudit=false\n');
 
@@ -652,6 +695,19 @@ try {
   }
   if (sha256File(join(root, 'pnpm-lock.yaml')) !== repoLockBefore) {
     throw new Error('Consumer install changed the repository pnpm-lock.yaml');
+  }
+  if (floorConfiguration) {
+    result.installed_floor_versions = {};
+    for (const [name, wanted] of Object.entries(pkg.dependencies)) {
+      if (!name.startsWith('@angular/') && !['rxjs', 'typescript'].includes(name)) continue;
+      const actual = JSON.parse(readFileSync(join(consumer, 'node_modules', ...name.split('/'), 'package.json'), 'utf8')).version;
+      result.installed_floor_versions[name] = actual;
+      if (actual !== wanted) throw new Error(`Installed floor ${name}@${actual} differs from ${wanted}`);
+    }
+    const bytes = readFileSync(join(consumer, 'package-lock.json'));
+    const receipt = `${floorOutput}.package-lock.json`;
+    writeFileSync(receipt, bytes);
+    result.consumer_lock = {path: receipt, bytes: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex')};
   }
   result.isolation = assertIsolatedInstall(consumer, consumerReal, rootReal);
   result.peer = compilePeerHarness(consumer, rootReal);
@@ -1087,7 +1143,7 @@ main().catch(err => {
   result.status = 'fail';
   result.errors.push(String(err && err.message ? err.message : err));
 } finally {
-  if (draftRun) mkdirSync(dirname(detailPath), {recursive: true});
+  if (draftRun || floorOutput) mkdirSync(dirname(detailPath), {recursive: true});
   writeFileSync(detailPath, JSON.stringify(result, null, 2) + '\n');
   // Keep consumer on failure for debugging; remove on success to save disk.
   if (result.status === 'ok') {
