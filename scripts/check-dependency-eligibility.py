@@ -802,6 +802,8 @@ def evaluate(root: Path, now: datetime, *, lookup_performed: bool, lookup: dict 
         "; ".join(pin_errors[:4]) if pin_errors else "this run direct-pin rows are present"
     ) if live is not None else ("; ".join(stored_assessment["errors"][:4]) or "stored direct-pin record is internally consistent")
     http_known = live is not None and live.get("http_status") == 200 and live.get("result") == "queried" and not live.get("truncated")
+    cutoff = parse_time((live or {}).get("cutoff"))
+    cutoff_known = cutoff is not None and cutoff <= now and (now - cutoff).total_seconds() <= MAX_AGE_SECONDS
     age_unknown = (live or {}).get("age_unknown") or []
     age_young = (live or {}).get("age_young") or []
     age_excepted = (live or {}).get("age_excepted") or []
@@ -820,7 +822,7 @@ def evaluate(root: Path, now: datetime, *, lookup_performed: bool, lookup: dict 
             f"this run lookup is {lookup_result}; http_status={(live or {}).get('http_status')}; stored http_status={stored.get('http_status')} is not this run",
         ),
         "dependency-eligibility/locks-tools-maturity/cutoff-not-stale": (
-            http_known and not pin_errors,
+            http_known and cutoff_known and not pin_errors,
             f"this run lookup is {lookup_result}; cutoff={(live or {}).get('cutoff')}",
         ),
         "dependency-eligibility/locks-tools-maturity/lock-transitive-coverage": (
@@ -880,6 +882,7 @@ def evaluate(root: Path, now: datetime, *, lookup_performed: bool, lookup: dict 
     return {
         "cases": cases,
         "lookup": lookup_result,
+        "lookup_cutoff": (live or {}).get("cutoff"),
         "stored_result": stored_assessment["result"],
         "stored_errors": stored_assessment["errors"],
         "lock_packages": len(packages),
@@ -896,7 +899,7 @@ def evaluate(root: Path, now: datetime, *, lookup_performed: bool, lookup: dict 
     }
 
 
-def coordinator_request() -> dict | None:
+def coordinator_request(root: Path = ROOT) -> dict | None:
     names = ["RC_CHECK_ID", "RC_RUN_ID", "RC_INVOCATION_ID", "RC_EVIDENCE_BINDING", "RC_ASSERTION_OUTPUT_DIR"]
     present = [name for name in names if os.environ.get(name)]
     if not present:
@@ -911,6 +914,10 @@ def coordinator_request() -> dict | None:
     binding = json.loads(os.environ["RC_EVIDENCE_BINDING"])
     if binding.get("run_id") != os.environ["RC_RUN_ID"]:
         raise SystemExit("dependency-eligibility: binding run_id does not match RC_RUN_ID")
+    version = json.loads((root / "projects/ngx-material-legacy/package.json").read_text())["version"]
+    source_line = {"22": "main", "21": "21.x"}.get(version.split(".")[0])
+    if source_line is None or binding.get("source_line") != source_line:
+        raise SystemExit("dependency-eligibility: binding line does not match this checkout")
     output = Path(os.environ["RC_ASSERTION_OUTPUT_DIR"])
     if not output.is_dir() or output.is_symlink():
         raise SystemExit("dependency-eligibility: assertion output directory is not a real directory")
@@ -936,6 +943,9 @@ def write_acceptance(request: dict, observation: dict) -> bool:
         "run_id": request["run_id"],
         "invocation_id": request["invocation"],
         "lookup": observation["lookup"],
+        "lookup_cutoff": observation.get("lookup_cutoff"),
+        "line": request["line"],
+        "binding": request["binding"],
         "stored_result": observation["stored_result"],
         "lock_packages": observation["lock_packages"],
         "uncovered_lock_packages": observation["uncovered_lock_packages"],
@@ -1011,6 +1021,7 @@ def main() -> int:
     now = parse_time(args.now) if args.now else datetime.now(timezone.utc)
     if now is None:
         raise SystemExit("dependency-eligibility: --now is not a timestamp")
+    request = coordinator_request(args.root)
     live_lookup = perform_lookup(args.root, now) if args.lookup else None
     observation = evaluate(args.root, now, lookup_performed=args.lookup, lookup=live_lookup)
     failed = [item["case_id"] for item in observation["cases"] if item["result"] != "pass"]
@@ -1028,7 +1039,6 @@ def main() -> int:
         args.report.parent.mkdir(parents=True, exist_ok=True)
         args.report.write_text(json.dumps(observation, indent=2) + "\n")
     print(json.dumps(summary, indent=2))
-    request = coordinator_request()
     if request is not None:
         return 0 if write_acceptance(request, observation) else 1
     return 0 if not failed else 1

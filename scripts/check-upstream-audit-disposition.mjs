@@ -15,6 +15,7 @@ import {createHash} from 'node:crypto';
 import {existsSync, lstatSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
 import {dirname, join, relative, resolve} from 'node:path';
 import {fileURLToPath, pathToFileURL} from 'node:url';
+import {validateCurrentAdvisories} from './upstream-advisory-admission.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -284,6 +285,9 @@ function coordinatorRequest() {
   }
   if (!binding || typeof binding !== 'object' || Array.isArray(binding)) return {error: 'binding is not an object'};
   if (binding.run_id !== process.env.RC_RUN_ID) return {error: 'binding run_id does not match RC_RUN_ID'};
+  const major = JSON.parse(readFileSync(join(root, 'projects/ngx-material-legacy/package.json'), 'utf8')).version.split('.')[0];
+  const sourceLine = major === '22' ? 'main' : major === '21' ? '21.x' : null;
+  if (!sourceLine || binding.source_line !== sourceLine || (line && line !== sourceLine)) return {error: 'binding line does not match this checkout'};
   const outputDir = process.env.RC_ASSERTION_OUTPUT_DIR;
   if (!outputDir || !existsSync(outputDir)) return {error: 'assertion output directory is missing'};
   const stat = lstatSync(outputDir);
@@ -293,15 +297,23 @@ function coordinatorRequest() {
   return {binding, invocation, runId: process.env.RC_RUN_ID, outputDir, runDir: resolve(outputDir, '..', '..', '..'), line: binding.source_line};
 }
 
+const request = coordinatorRequest();
+if (request && request.error) fail(2, `upstream-audit-disposition: refusing acceptance report: ${request.error}`);
+const dependencyGroups = request ? JSON.parse(readFileSync(join(root, 'compatibility/rc/matrices/full-verify.json'), 'utf8'))
+  .checks.find(check => check.check_id === 'dependency-eligibility').acceptance.cases_by_line[request.line] : null;
+const advisory = request ? validateCurrentAdvisories({runDir: request.runDir, binding: request.binding,
+  expectedCaseIds: dependencyGroups && Object.values(dependencyGroups).every(Array.isArray)
+    ? Object.values(dependencyGroups).flat() : null}) : {ok: false, detail: 'No run-bound current dependency lookup supplied.'};
+
 const CASE_RESULTS = [
   ['upstream-shas', 'upstream-audit/upstream-shas/unique-membership', missing.length === 0 && conflicts.length === 0 && outside.length === 0 && unresolved.length === 0],
   ['upstream-shas', 'upstream-audit/upstream-shas/allowed-vocabulary', unknown.length === 0 && !forgedClearance],
   ['upstream-shas', 'upstream-audit/upstream-shas/sensitive-individual-proof', insufficientSensitive.length === 0],
   ['upstream-shas', 'upstream-audit/upstream-shas/independent-evidence', missingEvidence.length === 0 && circularEvidence.length === 0],
-  ['authored-symbols', 'upstream-audit/authored-symbols/seed-not-closed', symbolUsesOpen === 0 && symbolStatus === 'closed'],
+  ['authored-symbols', 'upstream-audit/authored-symbols/complete-use-dispositions', symbolUsesOpen === 0 && symbolStatus === 'closed'],
   ['installed-peer-fixes', 'upstream-audit/installed-peer-fixes/content-not-ancestry', insufficientInherited.length === 0],
   ['installed-peer-fixes', 'upstream-audit/installed-peer-fixes/branch-applicability', missingBranch.length === 0 && insufficientBehavior.length === 0],
-  ['current-advisories', 'upstream-audit/current-advisories/not-satisfied-by-ledger', false], // this process does not query advisories
+  ['current-advisories', 'upstream-audit/current-advisories/bound-current-lookup', advisory.ok],
 ];
 
 function writeAcceptance(request) {
@@ -309,7 +321,7 @@ function writeAcceptance(request) {
     case_id: caseId,
     group,
     result: passed ? 'pass' : 'fail',
-    detail: passed ? 'observed' : 'not individually sufficient for admission',
+    detail: group === 'current-advisories' ? advisory.detail : passed ? 'observed' : 'not individually sufficient for admission',
   }));
   const failed = cases.filter(item => item.result !== 'pass').map(item => item.case_id);
   const assertion = {
@@ -322,6 +334,9 @@ function writeAcceptance(request) {
     security_clearance: 'not-passed',
     g11_claim: 'not-passed',
     counts: summary,
+    line: request.line,
+    binding: request.binding,
+    current_advisories: advisory,
     note: 'Structural row equality is recorded separately from security clearance. Failed cases are the admission gap.',
     cases,
   };
@@ -373,7 +388,7 @@ function writeAcceptance(request) {
     limitations: [
       `structural_inventory=${summary.structural_inventory}; disposition_admission=${summary.disposition_admission}; security_clearance=not-passed`,
       `insufficient_sensitive=${insufficientSensitive.length}; insufficient_inherited=${insufficientInherited.length}; insufficient_behavior=${insufficientBehavior.length}; missing_evidence=${missingEvidence.length}; circular_evidence=${circularEvidence.length}; symbol_uses_open=${symbolUsesOpen}`,
-      'Ledger equality does not query current advisories and does not admit this check.',
+      'Ledger equality does not admit this check. Current advisories require this run’s complete, hashed dependency observations.',
     ],
   };
   const reportsDir = join(request.runDir, 'reports');
@@ -386,8 +401,6 @@ mkdirSync(dirname(reportPath), {recursive: true});
 writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`);
 console.log(JSON.stringify(summary, null, 2));
 
-const request = coordinatorRequest();
-if (request && request.error) fail(2, `upstream-audit-disposition: refusing acceptance report: ${request.error}`);
 if (request) {
   const accepted = writeAcceptance(request);
   if (!accepted || !dispositionOk) {

@@ -41,7 +41,10 @@ class Fresh03AdmissionTests(unittest.TestCase):
         ):
             self.assertTrue(rows[check_id]["implemented"])
             self.assertEqual(rows[check_id]["acceptance"]["cases_by_line"]["main"], cases)
-            self.assertTrue(all(value is None for value in rows[check_id]["acceptance"]["cases_by_line"]["21.x"].values()))
+            if check_id == "source-policy":
+                self.assertTrue(all(value is None for value in rows[check_id]["acceptance"]["cases_by_line"]["21.x"].values()))
+            else:
+                self.assertEqual(rows[check_id]["acceptance"]["cases_by_line"]["21.x"], cases)
         self.assertEqual(len(audit_ids), sum(len(v) for v in audit_groups.values()))
 
     def test_stored_query_mutations_stay_unknown_or_blocked(self) -> None:
