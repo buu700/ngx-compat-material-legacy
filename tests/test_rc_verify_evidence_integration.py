@@ -43,7 +43,7 @@ class CoordinatorTests(unittest.TestCase):
         for id in ['owned-legacy-select','owned-legacy-snack-bar','owned-legacy-button','05-custom-map-nested']:
             for relative in [f'fixtures/sass/{id}.scss',f'reference/material-16.2.14/sass-css/{id}.css']:
                 target=self.root/relative;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes((ROOT/relative).read_bytes())
-        for relative in ['fixtures/migration/cases.json','reference/material-16.2.14/PROVENANCE.json','toolchain-lock.json']:
+        for relative in ['fixtures/migration/cases.json','fixtures/sass/function-contracts.json','reference/material-16.2.14/PROVENANCE.json','reference/material-16.2.14/environment-package-lock.json','toolchain-lock.json']:
             write_json(self.root / relative, acceptance.read_json(ROOT / relative))
         write_json(self.root / "compatibility/rc/matrices/full-verify.json", acceptance.read_json(ROOT / "compatibility/rc/matrices/full-verify.json"))
         write_json(self.root / "compatibility/rc/consumer-floor-plan.json", acceptance.read_json(ROOT / "compatibility/rc/consumer-floor-plan.json"))
@@ -372,6 +372,9 @@ class CoordinatorTests(unittest.TestCase):
             if case_id.startswith('owned-style/'):
                 from owned_style_fixture import style_receipt
                 body=style_receipt(ROOT,self.run,case_id,invocation)
+            elif case_id.startswith('function-value/'):
+                from sass_function_fixture import function_receipt
+                body=function_receipt(ROOT,self.run,case_id,invocation)
             elif case_id.startswith(verify._SASS_API_PREFIXES):
                 body.update({
                     "group": "sass-api-and-values", "check_id": "sass-seal", "line": "main",
@@ -397,7 +400,7 @@ class CoordinatorTests(unittest.TestCase):
     def test_sass_seal_pending_api_cases_keep_the_report_incomplete(self):
         row, ids = self._real_line_ids("sass-seal")
         api = row["acceptance"]["cases_by_line"]["main"]["sass-api-and-values"]
-        self.assertEqual(len(api), 651)
+        self.assertEqual(len(api), 651 + 57)
         self.assertEqual(row["acceptance"]["cases_by_line"]["main"]["isolation-negatives"],
                          ["archived-import", "mutated-golden", "hidden-resolution", "api-drift"])
         decisions = acceptance.read_json(ROOT / "compatibility/rc/sass-pending-decisions.json")

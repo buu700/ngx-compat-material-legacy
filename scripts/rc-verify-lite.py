@@ -89,6 +89,7 @@ CHECKS = (
     ["node", "--check", "scripts/compare-legacy-aggregate.mjs"],
     ["node", "--check", "scripts/compile-packed-sass.mjs"],
     ["node", "--check", "scripts/sass-seal.mjs"],
+    ["node", "--check", "scripts/sass-function-contracts.mjs"],
     ["node", "--check", "scripts/sass-owned-rendered.mjs"],
     ["node", "--check", "scripts/sass-ordered-css.mjs"],
     ["node", "--check", "scripts/sass-seal-regressions.mjs"],

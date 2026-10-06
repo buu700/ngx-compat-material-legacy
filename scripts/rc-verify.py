@@ -34,6 +34,7 @@ from archive_run_closure import ClosureError, write_closure
 from owned_rendered_admission import owned_rendered_ok
 from migration_workspace_admission import old_workspace_assertion_ok
 from migration_transaction_admission import transaction_assertion_ok
+from sass_function_admission import function_assertion_ok
 from m3_rendered_admission import complete_rendered_checks
 from consumer_floor_admission import floor_assertion_ok, floor_support_records
 
@@ -1217,6 +1218,8 @@ def _sass_seal_assertion_ok(body: dict, invocation: str) -> bool:
     Ordered-CSS and isolation-negative ids carry no API prefix and keep their
     existing assertion bodies.
     """
+    if str(body.get('case_id', '')).startswith('function-value/'):
+        return function_assertion_ok(ROOT, ACTIVE_RUN, body, invocation)
     if str(body.get('case_id', '')).startswith('owned-style/'):
         return owned_rendered_ok(ROOT, ACTIVE_RUN, body, invocation)
     case_id = body.get("case_id")
