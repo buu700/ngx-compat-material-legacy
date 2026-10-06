@@ -471,6 +471,7 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
     'packed-consumer/harness/radio-tabindex-attribute': parsed.radioTabIndex === 8,
     'packed-consumer/harness/chip-input-backspace-release': parsed.chipBackspaceRelease === true,
     'packed-consumer/harness/chip-repeated-removal-and-separator': parsed.chipRepeatedEvents === true,
+    'packed-consumer/harness/form-field-error-live-region': parsed.errorLiveRegion === true,
   };
   const owned = declarationKeys(keys)
     .filter(key => key.endsWith('/testing'))
@@ -883,7 +884,7 @@ Object.defineProperty(globalThis, 'navigator', {
 
 import 'zone.js';
 import '@angular/compiler';
-import {Component, inject} from '@angular/core';
+import {Component, ElementRef, inject} from '@angular/core';
 import {
   BrowserDynamicTestingModule,
   platformBrowserDynamicTesting,
@@ -894,7 +895,7 @@ import {provideNoopAnimations} from '@angular/platform-browser/animations';
 import {OverlayContainer} from '@angular/cdk/overlay';
 import {MatLegacyButtonModule} from '@ngx-compat/material-legacy/legacy-button';
 import {MatLegacyButtonHarness} from '@ngx-compat/material-legacy/legacy-button/testing';
-import {MatLegacyFormFieldModule} from '@ngx-compat/material-legacy/legacy-form-field';
+import {MatLegacyError, MatLegacyFormFieldModule} from '@ngx-compat/material-legacy/legacy-form-field';
 import {MatLegacySelectModule} from '@ngx-compat/material-legacy/legacy-select';
 import {MatLegacySelectHarness} from '@ngx-compat/material-legacy/legacy-select/testing';
 import {MatLegacyDialog, MatLegacyDialogModule} from '@ngx-compat/material-legacy/legacy-dialog';
@@ -946,6 +947,9 @@ class SmokeDialogContent {}
       <input id="repeat-input" [matChipInputFor]="repeatChipList" [matChipInputSeparatorKeyCodes]="[188]" (matChipInputTokenEnd)="repeatEnds=repeatEnds+1">
     </mat-chip-list>
     <mat-radio-button id="attribute-radio" tabindex="8">Attribute radio</mat-radio-button>
+    <mat-error id="error-live-default">Default error</mat-error>
+    <mat-error id="error-live-explicit" aria-live="assertive">Explicit error</mat-error>
+    <mat-error id="error-live-empty" aria-live="">Empty attribute error</mat-error>
     <mat-form-field>
       <mat-label>Choice</mat-label>
       <mat-select>
@@ -1101,6 +1105,17 @@ async function main() {
     &&firstRemoval.defaultPrevented&&repeatedRemoval.defaultPrevented&&firstSeparator.defaultPrevented&&repeatedSeparator.defaultPrevented;
   const chipTabIndex = (fixture.nativeElement.querySelector('#attribute-chip') as HTMLElement).tabIndex;
   const radioTabIndex = (fixture.nativeElement.querySelector('#attribute-radio input') as HTMLInputElement).tabIndex;
+  const liveDefault=fixture.nativeElement.querySelector('#error-live-default') as HTMLElement;
+  const liveExplicit=fixture.nativeElement.querySelector('#error-live-explicit') as HTMLElement;
+  const liveEmpty=fixture.nativeElement.querySelector('#error-live-empty') as HTMLElement;
+  const manualError=document.createElement('div');
+  new MatLegacyError('',new ElementRef(manualError));
+  const explicitManualError=document.createElement('div');explicitManualError.setAttribute('aria-live','assertive');
+  new MatLegacyError('assertive',new ElementRef(explicitManualError));
+  const errorLiveRegion=liveDefault.getAttribute('aria-live')==='polite'&&liveEmpty.getAttribute('aria-live')==='polite'
+    &&liveExplicit.getAttribute('aria-live')==='assertive'
+    &&[liveDefault,liveExplicit,liveEmpty].every(el=>el.getAttribute('aria-atomic')==='true')
+    &&manualError.getAttribute('aria-live')==='polite'&&explicitManualError.getAttribute('aria-live')==='assertive';
   const out = {
     ok:
       text === 'Go' &&
@@ -1114,7 +1129,7 @@ async function main() {
       selectOpened === true &&
       selectClosed === true &&
       tabCount === 2 &&
-      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents,
+      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion,
     buttonText: text,
     selectIsOpen: isOpen,
     dialogText,
@@ -1133,6 +1148,7 @@ async function main() {
     radioTabIndex,
     chipBackspaceRelease,
     chipRepeatedEvents,
+    errorLiveRegion,
     chipEventCounts:{removals:fixture.componentInstance.repeatRemovals,separators:fixture.componentInstance.repeatEnds},
     harnesses: [
       'MatLegacyButtonHarness',
