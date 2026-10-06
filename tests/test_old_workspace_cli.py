@@ -21,7 +21,7 @@ class OldWorkspaceCliTests(unittest.TestCase):
         version='22.0.0-rc.0' if line=='main' else '21.0.0-rc.0'
         with tempfile.TemporaryDirectory() as tmp:
             directory=Path(tmp);archive=directory/'cli.tgz'
-            files={'package/package.json':json.dumps({'name':'@ngx-compat/material-legacy-migrate-cli','version':version,'engines':{'node':'>=18.0.0'}}),'package/bin/migrate-legacy.js':'// synthetic CLI\n','package/lib/ts-rewrite.js':'// synthetic transform\n','package/lib/sass-rewrite.js':'// synthetic transform\n','package/LICENSE':'MIT synthetic fixture'}
+            files={'package/package.json':json.dumps({'name':'@ngx-compat/material-legacy-migrate-cli','version':version,'engines':{'node':'>=18.0.0'}}),'package/bin/migrate-legacy.js':'// synthetic CLI\n','package/lib/ts-rewrite.js':'// synthetic transform\n','package/lib/sass-rewrite.js':'// synthetic transform\n','package/lib/transaction-write.js':'// synthetic transaction writer\n','package/LICENSE':'MIT synthetic fixture'}
             def pack(link=False):
                 with tarfile.open(archive,'w:gz') as t:
                     for name,data in files.items():
@@ -36,7 +36,8 @@ class OldWorkspaceCliTests(unittest.TestCase):
                 code="import {resolveMigrationRun,extractMigrationCli} from './scripts/migration-run-inputs.mjs';const x=resolveMigrationRun(process.argv[1]);const c=extractMigrationCli(x,process.argv[2]);console.log(JSON.stringify(c.identities));"
                 env={k:v for k,v in os.environ.items() if not k.startswith('RC_')}
                 return subprocess.run(['node','--input-type=module','-e',code,str(directory/'run.json'),str(directory/output)],cwd=ROOT,env=env,capture_output=True,text=True)
-            pack();data=manifest();result=execute(data,'one');self.assertEqual(result.returncode,0,result.stderr);self.assertEqual(len(json.loads(result.stdout)),5)
+            pack();data=manifest();result=execute(data,'one');self.assertEqual(result.returncode,0,result.stderr);self.assertEqual(len(json.loads(result.stdout)),6)
             bad=json.loads(json.dumps(data));bad['source']['line']='21.x' if line=='main' else 'main';self.assertNotEqual(execute(bad,'two').returncode,0)
             archive.write_bytes(archive.read_bytes()+b'tamper');self.assertNotEqual(execute(data,'three').returncode,0)
             pack(link=True);self.assertNotEqual(execute(manifest(),'four').returncode,0)
+            files.pop('package/lib/transaction-write.js');pack();self.assertNotEqual(execute(manifest(),'missing-helper').returncode,0)
