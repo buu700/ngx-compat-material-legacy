@@ -27,13 +27,11 @@ import {
 } from '@angular/core';
 import {CanColor, mixinColor} from './internal/common-behaviors';
 import {
-  MatProgressBarDefaultOptions,
-  MAT_PROGRESS_BAR_DEFAULT_OPTIONS,
   ProgressAnimationEnd,
   ProgressBarMode,
-  MAT_PROGRESS_BAR_LOCATION,
-  MatProgressBarLocation,
 } from '@angular/material/progress-bar';
+import {MAT_PROGRESS_BAR_LOCATION, MatProgressBarLocation} from './internal/progress-bar-location';
+import {MAT_PROGRESS_BAR_DEFAULT_OPTIONS, MatProgressBarDefaultOptions} from './internal/progress-bar-defaults';
 import {fromEvent, Observable, Subscription} from 'rxjs';
 import {filter} from 'rxjs/operators';
 

@@ -474,6 +474,7 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
     'packed-consumer/harness/chip-repeated-removal-and-separator': parsed.chipRepeatedEvents === true,
     'packed-consumer/harness/form-field-error-live-region': parsed.errorLiveRegion === true,
     'packed-consumer/harness/form-field-token-isolation': parsed.formFieldTokenIsolation === true,
+    'packed-consumer/harness/progress-bar-location-and-defaults': parsed.progressLocationAndDefaults === true,
   };
   const owned = declarationKeys(keys)
     .filter(key => key.endsWith('/testing'))
@@ -901,6 +902,8 @@ import {MatLegacySnackBarHarness} from '@ngx-compat/material-legacy/legacy-snack
 import {MatLegacyTooltipModule} from '@ngx-compat/material-legacy/legacy-tooltip';
 import {MatLegacyTooltipHarness} from '@ngx-compat/material-legacy/legacy-tooltip/testing';
 import {MatLegacyTabsModule} from '@ngx-compat/material-legacy/legacy-tabs';
+import {MatLegacyProgressBar, MatLegacyProgressBarModule, MAT_LEGACY_PROGRESS_BAR_LOCATION, MAT_LEGACY_PROGRESS_BAR_LOCATION_FACTORY, MAT_LEGACY_PROGRESS_BAR_DEFAULT_OPTIONS} from '@ngx-compat/material-legacy/legacy-progress-bar';
+import {MAT_PROGRESS_BAR_DEFAULT_OPTIONS} from '@angular/material/progress-bar';
 import {MatLegacyChipsModule} from '@ngx-compat/material-legacy/legacy-chips';
 import {MatLegacyRadioModule} from '@ngx-compat/material-legacy/legacy-radio';
 import {MatLegacyTabGroupHarness} from '@ngx-compat/material-legacy/legacy-tabs/testing';
@@ -931,6 +934,11 @@ class SmokeDialogContent {}
     MatLegacyTabsModule,
     MatLegacyChipsModule,
     MatLegacyRadioModule,
+    MatLegacyProgressBarModule,
+  ],
+  providers: [
+    {provide: MAT_LEGACY_PROGRESS_BAR_LOCATION, useValue: {getPathname:()=>'/legacy-location(path)?query=1#ignored'}},
+    {provide: MAT_LEGACY_PROGRESS_BAR_DEFAULT_OPTIONS, useValue: {color:'warn',mode:'query'}},
   ],
   template: \`
     <button mat-button id="h">Go</button>
@@ -940,6 +948,7 @@ class SmokeDialogContent {}
       <mat-chip id="repeat-last" (removed)="repeatRemovals=repeatRemovals+1">Last chip</mat-chip>
       <input id="repeat-input" [matChipInputFor]="repeatChipList" [matChipInputSeparatorKeyCodes]="[188]" (matChipInputTokenEnd)="repeatEnds=repeatEnds+1">
     </mat-chip-list>
+    <mat-progress-bar id="location-progress" [value]="45" aria-label="Location progress"></mat-progress-bar>
     <mat-radio-button id="attribute-radio" tabindex="8">Attribute radio</mat-radio-button>
     <mat-error id="error-live-default">Default error</mat-error>
     <mat-error id="error-live-explicit" aria-live="assertive">Explicit error</mat-error>
@@ -1124,6 +1133,24 @@ async function main() {
     &&suffixNode.injector.get(MAT_LEGACY_SUFFIX)===suffixNode.injector.get(MatLegacySuffix)
     &&suffixNode.injector.get(MAT_SUFFIX,null)===null
     &&field._prefixChildren.length===1&&field._suffixChildren.length===1;
+  const barNode=byId('location-progress'),bar=barNode.injector.get(MatLegacyProgressBar);
+  const pattern=barNode.nativeElement.querySelector('pattern') as SVGPatternElement;
+  const rectangle=barNode.nativeElement.querySelector('rect') as SVGRectElement;
+  const rootLocation=TestBed.inject(MAT_LEGACY_PROGRESS_BAR_LOCATION);
+  const factoryLocation=TestBed.runInInjectionContext(()=>MAT_LEGACY_PROGRESS_BAR_LOCATION_FACTORY());
+  const originalUrl=document.location.href;
+  let dynamicLocation=false;
+  try {
+    win.history.replaceState(null,'','/factory-probe(path)?q=1#ignored');
+    dynamicLocation=rootLocation.getPathname()==='/factory-probe(path)?q=1'&&factoryLocation.getPathname()==='/factory-probe(path)?q=1';
+    win.history.replaceState(null,'','/second-path?changed=2');
+    dynamicLocation=dynamicLocation&&rootLocation.getPathname()==='/second-path?changed=2'&&factoryLocation.getPathname()==='/second-path?changed=2';
+  }finally {win.history.replaceState(null,'',originalUrl);}
+  const progressLocationAndDefaults=dynamicLocation&&pattern!==null&&rectangle!==null
+    &&barNode.injector.get(MAT_LEGACY_PROGRESS_BAR_LOCATION)!==rootLocation
+    &&MAT_LEGACY_PROGRESS_BAR_DEFAULT_OPTIONS!==MAT_PROGRESS_BAR_DEFAULT_OPTIONS
+    &&bar.color==='warn'&&bar.mode==='query'
+    &&rectangle.getAttribute('fill')==="url('/legacy-location(path)?query=1#"+pattern.id+"')";
   const out = {
     ok:
       text === 'Go' &&
@@ -1137,7 +1164,7 @@ async function main() {
       selectOpened === true &&
       selectClosed === true &&
       tabCount === 2 &&
-      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation,
+      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults,
     buttonText: text,
     selectIsOpen: isOpen,
     dialogText,
@@ -1158,6 +1185,7 @@ async function main() {
     chipRepeatedEvents,
     errorLiveRegion,
     formFieldTokenIsolation,
+    progressLocationAndDefaults,
     chipEventCounts:{removals:fixture.componentInstance.repeatRemovals,separators:fixture.componentInstance.repeatEnds},
     harnesses: [
       'MatLegacyButtonHarness',
