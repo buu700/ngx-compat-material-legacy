@@ -608,7 +608,8 @@ async function main() {
         line:ownedRendered.line,tarball_sha256:tarballSha,source_kind:'packed',
         reference_kind:item.context==='typography'?'untouched-material-16.2.14-compiled-css':ownedRendered.reference_kind,
         ...(item.context==='typography'?{custom_typography_theme:ownedRendered.custom_typography_theme}:{}),identities:ownedRendered.identities,
-        versions:ownedRendered.versions,browser:ownedRendered.browser,strict_templates:true,skip_lib_check:false};
+        versions:ownedRendered.versions,browser:ownedRendered.browser,strict_templates:true,skip_lib_check:false,
+        settlement:Object.fromEntries(['reference','candidate','negative'].map(mode=>[mode,ownedRendered.settlement[mode][item.context]]))};
       writeFileSync(join(outputDir,apiAssertionFileName(item.case_id)),JSON.stringify(body,null,2)+'\n');
     }
     return outputDir;
