@@ -13,7 +13,7 @@ import hashlib
 import json
 import os
 import re
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -271,6 +271,234 @@ def _vuln_rows(packages: list[tuple[str, str]], results: list) -> tuple[dict, li
     return rows, unresolved
 
 
+
+AGE_EXCEPTIONS_PATH = "chainman/minimum-age-exceptions.toml"
+_EXACT_EXCLUDE = re.compile(r"^((?:@[a-z0-9][a-z0-9._-]*/)?[a-z0-9][a-z0-9._-]*)@(\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?)$")
+_AGE_EXCEPTION_FIELDS = ("package", "version", "published_at", "expires_at", "advisory",
+                         "granted_by", "granted_on", "granted_at", "authority", "reason")
+
+
+def pnpm_age_excludes(text: str) -> list[str] | None:
+    """Top-level minimumReleaseAgeExclude entries from pnpm-workspace.yaml.
+
+    Only the inline ``[]`` form and a block list of scalars are accepted; any
+    other shape returns None and blocks the check.
+    """
+    lines = text.splitlines()
+    starts = [i for i, line in enumerate(lines) if re.match(r"^minimumReleaseAgeExclude:", line)]
+    if len(starts) != 1:
+        return None
+    head = lines[starts[0]].split(":", 1)[1].split("#", 1)[0].strip()
+    if head == "[]":
+        return []
+    if head:
+        return None
+    entries = []
+    for line in lines[starts[0] + 1:]:
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        if not line.startswith(" "):
+            break
+        match = re.match(r"^-\s+(['\"]?)([^'\"#]+)\1\s*(?:#.*)?$", stripped)
+        if not match:
+            return None
+        entries.append(match.group(2).strip())
+    return entries
+
+
+def load_age_exceptions(root: Path) -> tuple[list[dict], str | None]:
+    path = root / AGE_EXCEPTIONS_PATH
+    if not path.is_file():
+        return [], None
+    import tomllib
+    try:
+        data = tomllib.loads(path.read_text())
+    except (tomllib.TOMLDecodeError, UnicodeDecodeError) as exc:
+        return [], f"{AGE_EXCEPTIONS_PATH} is not valid TOML: {exc}"
+    if data.get("schema") != 1 or data.get("policy_minimum_age_minutes") != MAX_AGE_SECONDS // 60:
+        return [], f"{AGE_EXCEPTIONS_PATH} schema or policy minimum age is wrong"
+    records = data.get("exception") or []
+    if not isinstance(records, list) or not all(isinstance(item, dict) for item in records):
+        return [], f"{AGE_EXCEPTIONS_PATH} exception entries are malformed"
+    return records, None
+
+
+def assess_age_exceptions(records: list[dict], excludes: list[str] | None, now: datetime,
+                          publish_time, load_error: str | None = None) -> dict:
+    """Owner-granted minimum-age exceptions for exact package@version entries.
+
+    An exception is active only while it is unexpired, matches exactly one
+    pnpm exclude entry, cites a grantor, grant time, authority and advisory, and
+    expires no later than the registry publish time plus the seven-day window.
+    Every exclude entry needs such a record; anything else is a problem that
+    blocks the check. An active exception only defers the age finding for that
+    exact version. It does not clear advisories and it is not a blanket pass.
+    """
+    problems: list[str] = []
+    active: dict[str, dict] = {}
+    expired: list[str] = []
+    if load_error:
+        problems.append(load_error)
+    if excludes is None:
+        problems.append("pnpm-workspace.yaml minimumReleaseAgeExclude is missing, duplicated or not a plain list")
+        excludes = []
+    by_key: dict[str, list[dict]] = {}
+    for record in records:
+        by_key.setdefault(f"{record.get('package')}@{record.get('version')}", []).append(record)
+    for entry in excludes:
+        if not _EXACT_EXCLUDE.match(entry):
+            problems.append(f"minimumReleaseAgeExclude entry {entry!r} is not one exact package@version")
+        elif len(by_key.get(entry, [])) != 1:
+            problems.append(f"minimumReleaseAgeExclude entry {entry} has no single owner grant record in {AGE_EXCEPTIONS_PATH}")
+    for key, items in by_key.items():
+        record = items[0]
+        if len(items) != 1:
+            problems.append(f"{key}: duplicate exception records")
+            continue
+        missing = [field for field in _AGE_EXCEPTION_FIELDS if not isinstance(record.get(field), str) or not record[field].strip()]
+        if missing:
+            problems.append(f"{key}: exception record is missing {', '.join(missing)}")
+            continue
+        if not _EXACT_EXCLUDE.match(key):
+            problems.append(f"{key}: exception is not one exact package@version")
+            continue
+        advisory = record["advisory"]
+        if not re.fullmatch(r"(GHSA(-[23456789cfghjmpqrvwx]{4}){3}|CVE-\d{4}-\d{4,})", advisory) or advisory not in record["reason"]:
+            problems.append(f"{key}: exception does not cite one advisory in its reason")
+            continue
+        if len(record["authority"].strip()) < 40:
+            problems.append(f"{key}: exception authority is not a recorded owner grant")
+            continue
+        published_at = parse_time(record["published_at"])
+        expires_at = parse_time(record["expires_at"])
+        granted_at = parse_time(record["granted_at"])
+        if published_at is None or expires_at is None or granted_at is None:
+            problems.append(f"{key}: exception timestamps are not parseable")
+            continue
+        # granted_on is the calendar day in the grant's own recorded offset.
+        if record["granted_at"].strip()[:10] != record["granted_on"]:
+            problems.append(f"{key}: granted_on does not match granted_at")
+            continue
+        registry, error = publish_time(record["package"], record["version"])
+        if registry is None:
+            problems.append(f"{key}: registry publish time unknown ({error}); the exception cannot be bounded")
+            continue
+        if abs((registry - published_at).total_seconds()) > 1:
+            problems.append(f"{key}: recorded published_at {published_at.isoformat()} differs from the registry {registry.isoformat()}")
+            continue
+        natural = registry + timedelta(seconds=MAX_AGE_SECONDS)
+        if expires_at > natural:
+            problems.append(f"{key}: expires_at {expires_at.isoformat()} outlasts the natural window end {natural.isoformat()}")
+            continue
+        if granted_at > now:
+            problems.append(f"{key}: grant time is in the future")
+            continue
+        if now >= expires_at:
+            expired.append(key)
+            if key in excludes:
+                problems.append(f"{key}: exception expired at {expires_at.isoformat()} but is still in minimumReleaseAgeExclude; remove it")
+            continue
+        if key not in excludes:
+            problems.append(f"{key}: exception record is not configured in pnpm-workspace.yaml minimumReleaseAgeExclude")
+            continue
+        active[key] = {
+            "package": record["package"],
+            "version": record["version"],
+            "advisory": advisory,
+            "granted_by": record["granted_by"],
+            "granted_on": record["granted_on"],
+            "granted_at": record["granted_at"],
+            "expires_at": expires_at.isoformat(),
+            "published_at": registry.isoformat(),
+            "authority": record["authority"],
+            "file": AGE_EXCEPTIONS_PATH,
+            "citation": (
+                f"{key} minimum-age exception granted by {record['granted_by']} on {record['granted_on']} "
+                f"for {advisory}; expires {expires_at.isoformat()} ({AGE_EXCEPTIONS_PATH})"
+            ),
+        }
+    return {"active": active, "expired": expired, "problems": problems}
+
+
+
+def _version_key(value: str) -> tuple | None:
+    """Release ordering for plain x.y.z[-pre] npm versions. Anything else is unknown."""
+    import re
+
+    match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?", value or "")
+    if not match:
+        return None
+    major, minor, patch, pre = match.groups()
+    # A prerelease sorts before its release.
+    return (int(major), int(minor), int(patch), 0 if pre else 1, pre or "")
+
+def fixed_versions(vuln: dict, name: str, version: str) -> list[str]:
+    """OSV ``fixed`` events of SEMVER ranges for name whose range covers version."""
+    current = _version_key(version)
+    if current is None or not isinstance(vuln, dict):
+        return []
+    found = set()
+    for affected in vuln.get("affected") or []:
+        package = (affected or {}).get("package") or {}
+        if package.get("ecosystem") != "npm" or package.get("name") != name:
+            continue
+        for item in affected.get("ranges") or []:
+            if (item or {}).get("type") != "SEMVER":
+                continue
+            introduced = None
+            for event in item.get("events") or []:
+                if "introduced" in event:
+                    introduced = _version_key("0.0.0" if event["introduced"] == "0" else event["introduced"])
+                elif "fixed" in event:
+                    fixed = _version_key(event["fixed"])
+                    if introduced is not None and fixed is not None and introduced <= current < fixed:
+                        found.add(event["fixed"])
+                    introduced = None
+    return sorted(found, key=_version_key)
+
+def remediation_note(key: str, advisory: str, fixes: list[str], published: datetime | None, now: datetime,
+                     error: str = "") -> dict:
+    """Observed remediation state of one unresolved finding. Never a disposition."""
+    note = {"package": key, "advisory": advisory, "fixed_version": fixes[0] if fixes else None}
+    if not fixes:
+        note.update(state="no-fixed-release", detail=f"{key} {advisory}: OSV records no fixed release for this version")
+        return note
+    if published is None:
+        note.update(state="fixed-release-age-unknown",
+                    detail=f"{key} {advisory}: fixed in {fixes[0]}, publish time unknown ({error or 'missing'})")
+        return note
+    eligible_at = published + timedelta(seconds=MAX_AGE_SECONDS)
+    note.update(published=published.isoformat(), eligible_at=eligible_at.isoformat())
+    if published > now or now < eligible_at:
+        note.update(state="fixed-release-under-maturity", detail=(
+            f"{key} {advisory}: fixed in {fixes[0]} published {published.isoformat()}, "
+            f"under the seven-day minimumReleaseAge until {eligible_at.isoformat()}"))
+    else:
+        note.update(state="fixed-release-eligible", detail=(
+            f"{key} {advisory}: fixed in {fixes[0]} published {published.isoformat()}, "
+            "past the seven-day minimumReleaseAge; the lock still pins the vulnerable version"))
+    return note
+
+def _remediation_notes(unresolved: list[str], rows: dict, now: datetime) -> list[dict]:
+    notes = []
+    for key in unresolved:
+        row = rows.get(key) or {}
+        name, version = row.get("name"), row.get("version")
+        for item in row.get("vulns") or []:
+            advisory = item.get("id") if isinstance(item, dict) else None
+            if not (isinstance(name, str) and isinstance(version, str) and isinstance(advisory, str)):
+                continue
+            status, body, error = _http_json(f"https://api.osv.dev/v1/vulns/{advisory}", timeout=45)
+            if status != 200 or not isinstance(body, dict):
+                notes.append({"package": key, "advisory": advisory, "fixed_version": None, "state": "advisory-unknown",
+                              "detail": f"{key} {advisory}: advisory detail unknown ({error or f'http_status={status}'})"})
+                continue
+            fixes = fixed_versions(body, name, version)
+            published, age_error = _npm_publish_time(name, fixes[0]) if fixes else (None, "")
+            notes.append(remediation_note(key, advisory, fixes, published, now, age_error))
+    return notes
+
 def load_finding_dispositions(root: Path) -> dict[str, list[dict]]:
     """Reviewed per-finding records. A missing file leaves the finding unresolved."""
     directory = root / "compatibility/rc/dependency-dispositions"
@@ -443,6 +671,13 @@ def perform_lookup(root: Path, now: datetime) -> dict:
                 elif (now - published).total_seconds() < MAX_AGE_SECONDS:
                     age_young.append(key)
 
+    records, load_error = load_age_exceptions(root)
+    excludes = pnpm_age_excludes((root / "pnpm-workspace.yaml").read_text())
+    exceptions = assess_age_exceptions(records, excludes, now, _npm_publish_time, load_error)
+    # Only an exact, live, cited grant defers an age finding, and only for its own version.
+    age_excepted = [exceptions["active"][key] for key in age_young if key in exceptions["active"]]
+    age_young = [key for key in age_young if key not in exceptions["active"]]
+
     tool_detail = []
     tool_ok = status == 200 and not truncated
     repo = toolchain.get("repository") or {}
@@ -486,6 +721,7 @@ def perform_lookup(root: Path, now: datetime) -> dict:
     blocked = classified["blocked"]
     http_known = status == 200 and not truncated and not error and bool(rows or not queried)
     result = "queried" if http_known else "unknown"
+    remediation = _remediation_notes(unresolved, rows, now) if http_known else []
     return {
         "http_status": status,
         "result": result,
@@ -497,6 +733,9 @@ def perform_lookup(root: Path, now: datetime) -> dict:
         "uncovered": uncovered,
         "age_unknown": age_unknown,
         "age_young": age_young,
+        "age_excepted": age_excepted,
+        "age_exception_problems": exceptions["problems"],
+        "age_exceptions_expired": exceptions["expired"],
         "toolchain_ok": tool_ok and http_known,
         "toolchain_detail": "; ".join(tool_detail) or error or "toolchain was not queried",
         "toolchain": toolchain_report,
@@ -509,6 +748,7 @@ def perform_lookup(root: Path, now: datetime) -> dict:
         "blocked_findings": blocked,
         "excepted_findings": classified["excepted"],
         "finding_dispositions": classified["classified"],
+        "remediation": remediation,
         "lock_packages": len(packages),
         "security_clearance": "not-passed",
     }
@@ -537,6 +777,7 @@ def evaluate(root: Path, now: datetime, *, lookup_performed: bool, lookup: dict 
             "uncovered": [f"{name}@{version}" for name, version in packages],
             "age_unknown": ["not queried"],
             "age_young": [],
+            "age_excepted": [],
             "toolchain_ok": False,
             "toolchain_detail": "toolchain age was not queried",
             "vendor_ok": False,
@@ -562,6 +803,8 @@ def evaluate(root: Path, now: datetime, *, lookup_performed: bool, lookup: dict 
     http_known = live is not None and live.get("http_status") == 200 and live.get("result") == "queried" and not live.get("truncated")
     age_unknown = (live or {}).get("age_unknown") or []
     age_young = (live or {}).get("age_young") or []
+    age_excepted = (live or {}).get("age_excepted") or []
+    age_problems = (live or {}).get("age_exception_problems") or []
     live_uncovered = (live or {}).get("uncovered")
     if live is None:
         live_uncovered = uncovered
@@ -580,13 +823,20 @@ def evaluate(root: Path, now: datetime, *, lookup_performed: bool, lookup: dict 
             f"this run lookup is {lookup_result}; cutoff={(live or {}).get('cutoff')}",
         ),
         "dependency-eligibility/locks-tools-maturity/lock-transitive-coverage": (
-            http_known and not live_uncovered and not age_unknown and not age_young,
+            http_known and not live_uncovered and not age_unknown and not age_young and not age_problems,
             (
                 f"lock_packages={len(packages)} absent={len(live_uncovered or [])} "
-                f"age_unknown={len(age_unknown)} age_young={len(age_young)}"
+                f"age_unknown={len(age_unknown)} age_young={len(age_young)} {age_young[:6]}"
+                + "".join(f"; {problem}" for problem in age_problems[:6])
+                + "".join(f"; excepted {item['citation']}" for item in age_excepted)
                 if live is not None else
                 f"lock_packages={len(packages)} absent_from_stored_query={len(uncovered)}; this run did not query"
             ),
+            (
+                f"observed; age_excepted={len(age_excepted)}: "
+                + "; ".join(item["citation"] for item in age_excepted)
+                + ". The exception only defers the minimum-age finding for that exact version; advisories are still queried."
+            ) if age_excepted else None,
         ),
         "dependency-eligibility/locks-tools-maturity/toolchain-age-known": (
             bool(live and live.get("toolchain_ok")),
@@ -594,7 +844,10 @@ def evaluate(root: Path, now: datetime, *, lookup_performed: bool, lookup: dict 
         ),
         "dependency-eligibility/locks-tools-maturity/unresolved-findings-block": (
             http_known and not unresolved and not live_uncovered,
-            "unresolved or blocked findings: " + ", ".join(unresolved[:8]) if unresolved else (
+            "unresolved or blocked findings: " + ", ".join(unresolved[:8]) + "".join(
+                f"; {note['detail']}" for note in ((live or {}).get("remediation") or [])[:8]
+                if isinstance(note, dict) and isinstance(note.get("detail"), str)
+            ) if unresolved else (
                 "findings stay unknown until the lock, toolchain, and vendor set are queried"
                 if live is None or not http_known else "queried set has no unresolved finding; this is not security clearance"
             ),
@@ -615,12 +868,13 @@ def evaluate(root: Path, now: datetime, *, lookup_performed: bool, lookup: dict 
     cases = []
     for group, ids in MAIN_CASES.items():
         for case_id in ids:
-            passed, detail = observations[case_id]
+            passed, detail, *rest = observations[case_id]
+            pass_detail = rest[0] if rest and rest[0] else "observed"
             cases.append({
                 "case_id": case_id,
                 "group": group,
                 "result": "pass" if passed else "fail",
-                "detail": "observed" if passed else detail,
+                "detail": pass_detail if passed else detail,
             })
     return {
         "cases": cases,
@@ -633,6 +887,8 @@ def evaluate(root: Path, now: datetime, *, lookup_performed: bool, lookup: dict 
         "lookup_http_status": None if live is None else live.get("http_status"),
         "age_unknown": len(age_unknown),
         "age_young": len(age_young),
+        "age_excepted": age_excepted,
+        "age_exception_problems": age_problems,
         "unresolved_findings": len(unresolved),
         "vendor": {key: vendor[key] for key in ("files", "hash_mismatches", "missing_files", "license_missing", "origin", "git_head", "license")},
         "security_clearance": "not-passed",
@@ -687,6 +943,8 @@ def write_acceptance(request: dict, observation: dict) -> bool:
         "vendor_hash_mismatches": observation["vendor"]["hash_mismatches"],
         "security_clearance": "not-passed",
         "note": "Stored query success is not this run's network result and is not security clearance.",
+        "age_exceptions": observation.get("age_excepted") or [],
+        "age_exception_problems": observation.get("age_exception_problems") or [],
         "cases": cases,
     }
     payload = (json.dumps(assertion, indent=2) + "\n").encode()
@@ -730,6 +988,7 @@ def write_acceptance(request: dict, observation: dict) -> bool:
             f"lookup={observation['lookup']}; stored_result={observation['stored_result']}; uncovered_lock_packages={observation['uncovered_lock_packages']}",
             "Vendor hash equality is not an advisory clearance.",
             "A temporary exception defers one exact unpatched finding until its expiry. It is not a fix, not security clearance, and not a G11 claim.",
+            "A minimum-age exception in chainman/minimum-age-exceptions.toml defers the seven-day age finding for one exact package@version until its expiry, citing the owner grant. It is not security clearance and not a G11 claim.",
             "Does not claim G08, G11, or G13.",
         ],
     }
