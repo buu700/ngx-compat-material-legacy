@@ -31,4 +31,15 @@ class CanonicalAuditScopeTests(unittest.TestCase):
             self.assertEqual(ledger['closed_dispositions'],len(final));self.assertEqual(ledger['open_or_deferred'],1697-len(final))
             for entry in final:
                 evidence=json.loads((ROOT/entry['evidence_report']).read_text())
-                self.assertTrue(any(r['sha']==entry['sha'] and r['decision']==entry['reason'] for r in evidence['reviews']))
+                if 'reviews' in evidence:
+                    self.assertTrue(any(r['sha']==entry['sha'] and r['decision']==entry['reason'] for r in evidence['reviews']))
+                else:
+                    # An individual compatibility review has one SHA subject,
+                    # not a documentation batch with a reviews array.
+                    self.assertEqual(evidence['sha'],entry['sha'])
+                    self.assertEqual(evidence['decision'],entry['reason'])
+                    self.assertEqual(evidence['line'],line)
+                    self.assertEqual(evidence['review_depth'],'individual-compatibility')
+                    self.assertEqual(evidence['diff_sha256'],entry['individual_proof']['diff_sha256'])
+                    self.assertEqual(evidence['final_disposition'],entry['final_disposition'])
+                    self.assertEqual(evidence['g11_claim'],'not-passed')
