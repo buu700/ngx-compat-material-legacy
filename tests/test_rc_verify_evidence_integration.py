@@ -39,6 +39,8 @@ class CoordinatorTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         self.f = CompleteFixture(self.root)
+        for relative in ['fixtures/migration/cases.json','reference/material-16.2.14/PROVENANCE.json','toolchain-lock.json']:
+            write_json(self.root / relative, acceptance.read_json(ROOT / relative))
         write_json(self.root / "compatibility/rc/matrices/full-verify.json", acceptance.read_json(ROOT / "compatibility/rc/matrices/full-verify.json"))
         write_json(self.root / "compatibility/rc/consumer-floor-plan.json", acceptance.read_json(ROOT / "compatibility/rc/consumer-floor-plan.json"))
         self.run = verify.RunEvidence(self.f.run, self.f.run_dir, self.f.matrix_sha)
@@ -150,6 +152,11 @@ class CoordinatorTests(unittest.TestCase):
         directory = self.f.run_dir / acceptance.assertion_directory("migration-packaged", invocation)
         directory.mkdir(parents=True, exist_ok=True)
         for case_id in ids:
+            from migration_workspace_fixture import workspace_receipt
+            from migration_workspace_admission import old_workspace_ids
+            if case_id in old_workspace_ids(ROOT) or case_id == 'old-workspace/upgraded-consumer':
+                write_json(directory / f"{case_id.replace('/', '__')}.json", workspace_receipt(ROOT, self.run, case_id, invocation))
+                continue
             write_json(directory / f"{case_id.replace('/', '__')}.json", {
                 "case_id": case_id,
                 "result": "pass",
