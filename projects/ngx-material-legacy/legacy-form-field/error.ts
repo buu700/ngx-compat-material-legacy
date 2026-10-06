@@ -8,7 +8,7 @@
  */
 
 import {Attribute, Directive, ElementRef, Input} from '@angular/core';
-import {MAT_ERROR} from '@angular/material/form-field';
+import {MAT_LEGACY_ERROR as MAT_ERROR} from './owned-tokens';
 
 let nextUniqueId = 0;
 

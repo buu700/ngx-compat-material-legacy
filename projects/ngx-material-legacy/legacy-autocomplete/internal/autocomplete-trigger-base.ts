@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -51,7 +52,7 @@ import {
   _getLegacyOptionScrollPosition as _getOptionScrollPosition,
   _MatLegacyOptionBase as _MatOptionBase,
 } from '@ngx-compat/material-legacy/legacy-core';
-import {MAT_FORM_FIELD, MatFormField} from '@angular/material/form-field';
+import {MAT_LEGACY_FORM_FIELD as MAT_FORM_FIELD, MatLegacyFormField as MatFormField} from '@ngx-compat/material-legacy/legacy-form-field';
 import {defer, fromEvent, merge, Observable, of as observableOf, Subject, Subscription} from 'rxjs';
 import {delay, filter, map, switchMap, take, tap, startWith} from 'rxjs/operators';
 import {_MatAutocompleteOriginBase} from './autocomplete-origin-base';

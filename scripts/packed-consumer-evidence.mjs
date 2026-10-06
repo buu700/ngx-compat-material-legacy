@@ -34,6 +34,7 @@ export const HARNESS_CASE_IDS = [
   'packed-consumer/harness/chip-input-backspace-release',
   'packed-consumer/harness/chip-repeated-removal-and-separator',
   'packed-consumer/harness/form-field-error-live-region',
+  'packed-consumer/harness/form-field-token-isolation',
   'packed-consumer/harness/owned-resolution',
   'packed-consumer/harness/peer-harness-separate-scope',
 ];

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -42,13 +43,13 @@ import {Platform} from '@angular/cdk/platform';
 import {getShadowRoot} from './owned-shadow-dom';
 import {AbstractControlDirective, ValidatorFn} from '@angular/forms';
 import {ANIMATION_MODULE_TYPE} from '@angular/core';
+import {MatFormFieldControl} from '@angular/material/form-field';
 import {
-  MatFormFieldControl,
-  MAT_ERROR,
-  MAT_FORM_FIELD,
-  MAT_PREFIX,
-  MAT_SUFFIX,
-} from '@angular/material/form-field';
+  MAT_LEGACY_ERROR as MAT_ERROR,
+  MAT_LEGACY_FORM_FIELD as MAT_FORM_FIELD,
+  MAT_LEGACY_PREFIX as MAT_PREFIX,
+  MAT_LEGACY_SUFFIX as MAT_SUFFIX,
+} from './owned-tokens';
 import {getMatFormFieldDuplicatedHintError, getMatFormFieldMissingControlError, getMatFormFieldPlaceholderConflictError} from './owned-errors';
 import {
   legacyAnimationsDisabled,

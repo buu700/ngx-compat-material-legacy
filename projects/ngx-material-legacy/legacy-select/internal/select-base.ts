@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -95,7 +96,8 @@ import {
   _countGroupLabelsBeforeLegacyOption as _countGroupLabelsBeforeOption,
   _getLegacyOptionScrollPosition as _getOptionScrollPosition,
 } from '@ngx-compat/material-legacy/legacy-core';
-import {MatFormField, MatFormFieldControl, MAT_FORM_FIELD} from '@angular/material/form-field';
+import {MatFormFieldControl} from '@angular/material/form-field';
+import {MAT_LEGACY_FORM_FIELD as MAT_FORM_FIELD, MatLegacyFormField as MatFormField} from '@ngx-compat/material-legacy/legacy-form-field';
 import {defer, merge, Observable, Subject} from 'rxjs';
 import {
   distinctUntilChanged,
