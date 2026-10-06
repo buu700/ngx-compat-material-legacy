@@ -4,8 +4,8 @@
   "g11_claim": "not-passed",
   "seed_rows": 1697,
   "ledger_rows": 1697,
-  "closed_dispositions": 1690,
-  "open_or_deferred": 7,
+  "closed_dispositions": 1689,
+  "open_or_deferred": 8,
   "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
   "batch_id": "unread-seed-content-review-2026-10-02",
   "entries": [
@@ -787,16 +787,20 @@
       "sha": "7a2191906339aab259e59fb8cea05273538f4ebf",
       "bucket": "behavior-semantic",
       "subject": "docs(material/autocomplete): fix autocomplete typo (#27662)",
-      "final_disposition": "already-adapted",
-      "reason": "legacy-autocomplete/internal/autocomplete-base.ts already spells autocomplete correctly on requireSelection comments/API.",
+      "final_disposition": "not-applicable",
+      "reason": "Changes only autocomplete requirement prose spelling. The owned requireSelection extension is present and requires its separate behavior/contract review; this one-word comment correction supplies no evidence for adopting or validating that extension.",
       "read_note_disposition": "already-present",
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
-      "source_check": "no autcomplete misspelling under legacy-autocomplete/internal",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-comment-typos-source-review.json",
+      "source_check": {
+        "diff_sha256": "1c39f4005ed1ff80d1cd21d1485e6dca988fa73e79f805b3274008642858ac25",
+        "patch_path": "compatibility/f10/disposition-ledger/evidence/closeout-comment-typos-source-review.json",
+        "review_membership": "7a2191906339aab259e59fb8cea05273538f4ebf"
+      },
       "files": [
         "src/material/autocomplete/autocomplete.ts"
       ],
-      "batch_id": "security-already-present-2026-10-01-b",
-      "recorded_at_utc": "2026-10-01T16:30:02Z",
+      "batch_id": "closeout-comment-typos-source-review",
+      "recorded_at_utc": "2026-10-06T22:56:18.309591+00:00",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
       "individual_proof": {
@@ -823,7 +827,56 @@
         "read_note": "already-present",
         "recorded_by": "Grok, FIN-02-C02; Codex validates in FIN-02-C05",
         "recomputed_by": "scripts/record-candidate-line-proofs.py"
-      }
+      },
+      "prior_dispositions": [
+        {
+          "sha": "7a2191906339aab259e59fb8cea05273538f4ebf",
+          "bucket": "behavior-semantic",
+          "subject": "docs(material/autocomplete): fix autocomplete typo (#27662)",
+          "final_disposition": "already-adapted",
+          "reason": "legacy-autocomplete/internal/autocomplete-base.ts already spells autocomplete correctly on requireSelection comments/API.",
+          "read_note_disposition": "already-present",
+          "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+          "source_check": "no autcomplete misspelling under legacy-autocomplete/internal",
+          "files": [
+            "src/material/autocomplete/autocomplete.ts"
+          ],
+          "batch_id": "security-already-present-2026-10-01-b",
+          "recorded_at_utc": "2026-10-01T16:30:02Z",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+          "individual_proof": {
+            "diff_sha256": "1c39f4005ed1ff80d1cd21d1485e6dca988fa73e79f805b3274008642858ac25",
+            "review_depth": "individual-compatibility",
+            "affected_branches": [
+              "main"
+            ],
+            "decision": "Upstream only fixes the spelling autcomplete -> autocomplete in the requireSelection doc comment. The owned legacy autocomplete base already carries the corrected comment text on its requireSelection input, so there is nothing to adapt. The commit has no runtime effect.",
+            "proof_kind": "candidate-source-line-match",
+            "upstream_file": "src/material/autocomplete/autocomplete.ts",
+            "candidate_member": {
+              "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-base.ts",
+              "sha256": "56339de165b620907ce17ba9085ba8cfed7ed1e4ca77d1876158f5f4da6ba1ee"
+            },
+            "added_lines": [
+              {
+                "upstream_added": "autocomplete. If the user moves away from the autocomplete without selecting an option from",
+                "candidate_lines": [
+                  170
+                ]
+              }
+            ],
+            "read_note": "already-present",
+            "recorded_by": "Grok, FIN-02-C02; Codex validates in FIN-02-C05",
+            "recomputed_by": "scripts/record-candidate-line-proofs.py"
+          }
+        }
+      ],
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "review_depth": "bounded-documentation-source-review"
     },
     {
       "sha": "db06fa8d8939d793f598bc3dbedc96a5a71c0db0",
@@ -4620,17 +4673,45 @@
       "sha": "20083416967308916d2b3f81bf95606b45dbdb0b",
       "bucket": "behavior-semantic",
       "subject": "docs(dialog): fix typo (#30419)",
-      "final_disposition": "irrelevant",
-      "reason": "The patch corrects a comment on the dialog harness getText method. This package does not define that method. That comment was not changed.",
+      "final_disposition": "not-applicable",
+      "reason": "Changes Gets te to Gets the in the modern dialog harness comment only. The owned dialog harness base already says Gets the dialog's full text content. Its host text() call and the upstream text() call are unchanged by this patch; no close/focus lifecycle proof is claimed.",
       "read_note_disposition": "not-owned",
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-comment-typos-source-review.json",
       "files": [
         "src/material/dialog/testing/dialog-harness.ts"
       ],
-      "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
-      "recorded_at_utc": "2026-10-01T16:46:41Z",
+      "batch_id": "closeout-comment-typos-source-review",
+      "recorded_at_utc": "2026-10-06T22:56:18.309591+00:00",
       "g11_claim": "not-passed",
-      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "prior_dispositions": [
+        {
+          "sha": "20083416967308916d2b3f81bf95606b45dbdb0b",
+          "bucket": "behavior-semantic",
+          "subject": "docs(dialog): fix typo (#30419)",
+          "final_disposition": "irrelevant",
+          "reason": "The patch corrects a comment on the dialog harness getText method. This package does not define that method. That comment was not changed.",
+          "read_note_disposition": "not-owned",
+          "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+          "files": [
+            "src/material/dialog/testing/dialog-harness.ts"
+          ],
+          "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
+          "recorded_at_utc": "2026-10-01T16:46:41Z",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+        }
+      ],
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "review_depth": "bounded-documentation-source-review",
+      "source_check": {
+        "diff_sha256": "972432ce3ec567be270f67f493caa3da2a6dde0fca6bbbda3aef440c9d8f117b",
+        "patch_path": "compatibility/f10/disposition-ledger/evidence/closeout-comment-typos-source-review.json",
+        "review_membership": "20083416967308916d2b3f81bf95606b45dbdb0b"
+      }
     },
     {
       "sha": "7ef405c4e6014c1724788c3561eaff3701e654d1",
@@ -4968,13 +5049,13 @@
       "sha": "09433fb436bc1b6b426f388b9cac740df01e8391",
       "bucket": "behavior-semantic",
       "subject": "docs: omit repetitions (#27746)",
-      "final_disposition": "inherited",
-      "reason": "The patch only changes a comment on InteractivityChecker, from whether is is focusable to whether it is focusable. This package does not define that class. No source was changed. Inherited via installed peer @angular/cdk@22.1.7 (advertised floor ^22.1.7); upstream SHA is an ancestor of v22.1.7.",
+      "final_disposition": "not-applicable",
+      "reason": "Corrects is is to it is solely in the public InteractivityChecker class description. Focusability logic is unchanged and CDK remains peer-owned; no accessibility clearance is inferred.",
       "read_note_disposition": "not-owned",
       "files": [
         "src/cdk/a11y/interactivity-checker/interactivity-checker.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/09433fb436bc1b6b426f388b9cac740df01e8391.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-comment-typos-source-review.json",
       "peer_floor": {
         "package": "@angular/cdk",
         "advertised_range": "^22.1.7",
@@ -4988,10 +5069,51 @@
           "a11y"
         ]
       },
-      "batch_id": "cdk-inherited-not-owned-retain-2026-10-01-d",
-      "recorded_at_utc": "2026-10-01T16:49:17Z",
+      "batch_id": "closeout-comment-typos-source-review",
+      "recorded_at_utc": "2026-10-06T22:56:18.309591+00:00",
       "g11_claim": "not-passed",
-      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "prior_dispositions": [
+        {
+          "sha": "09433fb436bc1b6b426f388b9cac740df01e8391",
+          "bucket": "behavior-semantic",
+          "subject": "docs: omit repetitions (#27746)",
+          "final_disposition": "inherited",
+          "reason": "The patch only changes a comment on InteractivityChecker, from whether is is focusable to whether it is focusable. This package does not define that class. No source was changed. Inherited via installed peer @angular/cdk@22.1.7 (advertised floor ^22.1.7); upstream SHA is an ancestor of v22.1.7.",
+          "read_note_disposition": "not-owned",
+          "files": [
+            "src/cdk/a11y/interactivity-checker/interactivity-checker.ts"
+          ],
+          "evidence_report": "compatibility/f10/disposition-ledger/evidence/09433fb436bc1b6b426f388b9cac740df01e8391.json",
+          "peer_floor": {
+            "package": "@angular/cdk",
+            "advertised_range": "^22.1.7",
+            "installed_version": "22.1.7",
+            "contains_fix_tag": "v22.1.7",
+            "sha_is_ancestor_of_tag": true,
+            "cdk_modules": [
+              "a11y"
+            ],
+            "owned_import_intersection": [
+              "a11y"
+            ]
+          },
+          "batch_id": "cdk-inherited-not-owned-retain-2026-10-01-d",
+          "recorded_at_utc": "2026-10-01T16:49:17Z",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+        }
+      ],
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "review_depth": "bounded-documentation-source-review",
+      "source_check": {
+        "diff_sha256": "0fb8a2411bddcc46859732090ed3258815b047f61ff238fe73502bcad9cb5f71",
+        "patch_path": "compatibility/f10/disposition-ledger/evidence/closeout-comment-typos-source-review.json",
+        "review_membership": "09433fb436bc1b6b426f388b9cac740df01e8391"
+      }
     },
     {
       "sha": "d2253b9768e3d6c6e4bf2a1890dc43d6a8fff3d5",
@@ -9001,8 +9123,8 @@
       "sha": "0a2448d9334a24b12594f426fbf10e2a2714f17b",
       "bucket": "behavior-semantic",
       "subject": "docs: fix typo in css file (#27757)",
-      "final_disposition": "irrelevant",
-      "reason": "The patch renames the typography map key font-famiy to font-family. This package has no m2-inspection or versioning file. styles/core/typography/_typography.scss line 327 still uses font-famiy in the 2014-to-2018 map. That key was not renamed. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+      "final_disposition": "needs-individual-review",
+      "reason": "The full original hunk changes executable typography map keys, not just comments. Both owned consolidated typography sources retain font-famiy, and absence of upstream filenames does not establish irrelevance. Exact original-map behavior and downstream custom font inheritance must be reviewed before a do-not-adopt/adaptation decision.",
       "read_note_disposition": "not-applied",
       "files": [
         "src/material/core/theming/_m2-inspection.scss",
@@ -9011,9 +9133,33 @@
       "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
       "source_check": "Owned package has no m2-inspection/versioning file touched by the typo rename.",
       "batch_id": "owned-retain-not-applied-2026-10-01-e",
-      "recorded_at_utc": "2026-10-01T16:53:08Z",
+      "recorded_at_utc": "2026-10-06T22:56:18.309591+00:00",
       "g11_claim": "not-passed",
-      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "prior_dispositions": [
+        {
+          "sha": "0a2448d9334a24b12594f426fbf10e2a2714f17b",
+          "bucket": "behavior-semantic",
+          "subject": "docs: fix typo in css file (#27757)",
+          "final_disposition": "irrelevant",
+          "reason": "The patch renames the typography map key font-famiy to font-family. This package has no m2-inspection or versioning file. styles/core/typography/_typography.scss line 327 still uses font-famiy in the 2014-to-2018 map. That key was not renamed. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+          "read_note_disposition": "not-applied",
+          "files": [
+            "src/material/core/theming/_m2-inspection.scss",
+            "src/material/core/typography/_versioning.scss"
+          ],
+          "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+          "source_check": "Owned package has no m2-inspection/versioning file touched by the typo rename.",
+          "batch_id": "owned-retain-not-applied-2026-10-01-e",
+          "recorded_at_utc": "2026-10-01T16:53:08Z",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+        }
+      ],
+      "affected_branches": [
+        "main",
+        "21.x"
+      ]
     },
     {
       "sha": "7be5dde24e46ca889b31b307c2eda6d6f0faab56",
@@ -10895,18 +11041,46 @@
       "sha": "45e660f836d174d2c080307446871e8718f1c0a3",
       "bucket": "behavior-semantic",
       "subject": "docs(material/button-toggle): fix typo in documentation (#29955)",
-      "final_disposition": "irrelevant",
-      "reason": "The patch corrects a comment typo on hideSingleSelectionIndicator. The owned button toggle has no such option. That comment was not changed. Upstream change is irrelevant to this package: the touched files/APIs are absent from the owned legacy tree.",
+      "final_disposition": "not-applicable",
+      "reason": "Corrects Whetehr in the modern button-toggle option description only. The hideSingleSelectionIndicator property and its type are unchanged; no API is added to the legacy add-on.",
       "read_note_disposition": "not-applied",
       "files": [
         "src/material/button-toggle/button-toggle.ts"
       ],
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
-      "source_check": "Owned surface lacks the documented option/comment target; docs-only upstream delta.",
-      "batch_id": "owned-retain-not-applied-2026-10-01-f",
-      "recorded_at_utc": "2026-10-01T16:57:12Z",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-comment-typos-source-review.json",
+      "source_check": {
+        "diff_sha256": "f040bd128c05628c68d5025351bac0111dfa7d70415a483084952650908674e0",
+        "patch_path": "compatibility/f10/disposition-ledger/evidence/closeout-comment-typos-source-review.json",
+        "review_membership": "45e660f836d174d2c080307446871e8718f1c0a3"
+      },
+      "batch_id": "closeout-comment-typos-source-review",
+      "recorded_at_utc": "2026-10-06T22:56:18.309591+00:00",
       "g11_claim": "not-passed",
-      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "prior_dispositions": [
+        {
+          "sha": "45e660f836d174d2c080307446871e8718f1c0a3",
+          "bucket": "behavior-semantic",
+          "subject": "docs(material/button-toggle): fix typo in documentation (#29955)",
+          "final_disposition": "irrelevant",
+          "reason": "The patch corrects a comment typo on hideSingleSelectionIndicator. The owned button toggle has no such option. That comment was not changed. Upstream change is irrelevant to this package: the touched files/APIs are absent from the owned legacy tree.",
+          "read_note_disposition": "not-applied",
+          "files": [
+            "src/material/button-toggle/button-toggle.ts"
+          ],
+          "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+          "source_check": "Owned surface lacks the documented option/comment target; docs-only upstream delta.",
+          "batch_id": "owned-retain-not-applied-2026-10-01-f",
+          "recorded_at_utc": "2026-10-01T16:57:12Z",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+        }
+      ],
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "review_depth": "bounded-documentation-source-review"
     },
     {
       "sha": "fe631c5e1a4934f82a95fee7a9426a3d6205a8fd",
@@ -18116,52 +18290,139 @@
       "sha": "a080fcba2fa9a3997bc1ece122ba79b1afa1de45",
       "bucket": "needs-triage",
       "subject": "docs: omit repetitions (#27753)",
-      "final_disposition": "already-present",
-      "reason": "Inspected upstream patch content (sha256=b85c257b3236070aa25fa4a2d8b55c3dae09bcc7007bc08def8f32b8505c1198, bytes=1698). Paths: src/material/form-field/_form-field-sizing.scss, src/material/schematics/ng-generate/mdc-migration/rules/ts-migration/runtime-migration.ts. The schematic path is not shipped. The form-field sizing comment typo is already absent in owned projects/ngx-material-legacy/styles/form-field/_form-field-sizing.scss (reads \"a consistent\"). Already present / not-owned mix; no product adaptation required.",
+      "final_disposition": "not-applicable",
+      "reason": "Removes repeated a in two comments: modern form-field Sass sizing and upstream MDC runtime migration. All variables and migration conditions are untouched. The legacy form-field also retains the harmless prose typo, which has no selector/value effect; this is not authorization to import upstream MDC migration.",
       "read_note_disposition": "already-present",
       "files": [
         "src/material/form-field/_form-field-sizing.scss",
         "src/material/schematics/ng-generate/mdc-migration/rules/ts-migration/runtime-migration.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/a080fcba2fa9a3997bc1ece122ba79b1afa1de45.json",
-      "batch_id": "test-only-residual-needs-triage-docs-2026-10-01",
-      "recorded_at_utc": "2026-10-01T19:02:59Z",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-comment-typos-source-review.json",
+      "batch_id": "closeout-comment-typos-source-review",
+      "recorded_at_utc": "2026-10-06T22:56:18.309591+00:00",
       "g11_claim": "not-passed",
-      "patch_sha256": "b85c257b3236070aa25fa4a2d8b55c3dae09bcc7007bc08def8f32b8505c1198"
+      "patch_sha256": "b85c257b3236070aa25fa4a2d8b55c3dae09bcc7007bc08def8f32b8505c1198",
+      "prior_dispositions": [
+        {
+          "sha": "a080fcba2fa9a3997bc1ece122ba79b1afa1de45",
+          "bucket": "needs-triage",
+          "subject": "docs: omit repetitions (#27753)",
+          "final_disposition": "already-present",
+          "reason": "Inspected upstream patch content (sha256=b85c257b3236070aa25fa4a2d8b55c3dae09bcc7007bc08def8f32b8505c1198, bytes=1698). Paths: src/material/form-field/_form-field-sizing.scss, src/material/schematics/ng-generate/mdc-migration/rules/ts-migration/runtime-migration.ts. The schematic path is not shipped. The form-field sizing comment typo is already absent in owned projects/ngx-material-legacy/styles/form-field/_form-field-sizing.scss (reads \"a consistent\"). Already present / not-owned mix; no product adaptation required.",
+          "read_note_disposition": "already-present",
+          "files": [
+            "src/material/form-field/_form-field-sizing.scss",
+            "src/material/schematics/ng-generate/mdc-migration/rules/ts-migration/runtime-migration.ts"
+          ],
+          "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/a080fcba2fa9a3997bc1ece122ba79b1afa1de45.json",
+          "batch_id": "test-only-residual-needs-triage-docs-2026-10-01",
+          "recorded_at_utc": "2026-10-01T19:02:59Z",
+          "g11_claim": "not-passed",
+          "patch_sha256": "b85c257b3236070aa25fa4a2d8b55c3dae09bcc7007bc08def8f32b8505c1198"
+        }
+      ],
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "review_depth": "bounded-documentation-source-review",
+      "source_check": {
+        "diff_sha256": "b85c257b3236070aa25fa4a2d8b55c3dae09bcc7007bc08def8f32b8505c1198",
+        "patch_path": "compatibility/f10/disposition-ledger/evidence/closeout-comment-typos-source-review.json",
+        "review_membership": "a080fcba2fa9a3997bc1ece122ba79b1afa1de45"
+      }
     },
     {
       "sha": "1dc30e8eacae1f318b53a9d22a462571b9de8ddb",
       "bucket": "needs-triage",
       "subject": "docs: remove duplicate words (#27712)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=ad2ca6a7edfc519c5f8e64a9fd3511cf8a93d4ec3b3b7a27d9d014b5cb7643da, bytes=1941). Changed paths: src/material/datepicker/month-view.ts, src/material/datepicker/multi-year-view.ts, src/material/datepicker/year-view.ts. Comment-only typo edits in current Material datepicker view classes. This package does not ship those TypeScript sources; companion datepicker coverage is Sass bridge/theme only. Irrelevant to retained legacy product behavior.",
+      "final_disposition": "not-applicable",
+      "reason": "Removes duplicated in from comments in all three month/year/multi-year datepicker views. Those runtime views are current peers; no code, types, selectors or template lines change.",
       "read_note_disposition": "not-owned",
       "files": [
         "src/material/datepicker/month-view.ts",
         "src/material/datepicker/multi-year-view.ts",
         "src/material/datepicker/year-view.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/1dc30e8eacae1f318b53a9d22a462571b9de8ddb.json",
-      "batch_id": "test-only-residual-needs-triage-docs-2026-10-01",
-      "recorded_at_utc": "2026-10-01T19:02:59Z",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-comment-typos-source-review.json",
+      "batch_id": "closeout-comment-typos-source-review",
+      "recorded_at_utc": "2026-10-06T22:56:18.309591+00:00",
       "g11_claim": "not-passed",
-      "patch_sha256": "ad2ca6a7edfc519c5f8e64a9fd3511cf8a93d4ec3b3b7a27d9d014b5cb7643da"
+      "patch_sha256": "ad2ca6a7edfc519c5f8e64a9fd3511cf8a93d4ec3b3b7a27d9d014b5cb7643da",
+      "prior_dispositions": [
+        {
+          "sha": "1dc30e8eacae1f318b53a9d22a462571b9de8ddb",
+          "bucket": "needs-triage",
+          "subject": "docs: remove duplicate words (#27712)",
+          "final_disposition": "irrelevant",
+          "reason": "Inspected upstream patch content (sha256=ad2ca6a7edfc519c5f8e64a9fd3511cf8a93d4ec3b3b7a27d9d014b5cb7643da, bytes=1941). Changed paths: src/material/datepicker/month-view.ts, src/material/datepicker/multi-year-view.ts, src/material/datepicker/year-view.ts. Comment-only typo edits in current Material datepicker view classes. This package does not ship those TypeScript sources; companion datepicker coverage is Sass bridge/theme only. Irrelevant to retained legacy product behavior.",
+          "read_note_disposition": "not-owned",
+          "files": [
+            "src/material/datepicker/month-view.ts",
+            "src/material/datepicker/multi-year-view.ts",
+            "src/material/datepicker/year-view.ts"
+          ],
+          "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/1dc30e8eacae1f318b53a9d22a462571b9de8ddb.json",
+          "batch_id": "test-only-residual-needs-triage-docs-2026-10-01",
+          "recorded_at_utc": "2026-10-01T19:02:59Z",
+          "g11_claim": "not-passed",
+          "patch_sha256": "ad2ca6a7edfc519c5f8e64a9fd3511cf8a93d4ec3b3b7a27d9d014b5cb7643da"
+        }
+      ],
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "review_depth": "bounded-documentation-source-review",
+      "source_check": {
+        "diff_sha256": "ad2ca6a7edfc519c5f8e64a9fd3511cf8a93d4ec3b3b7a27d9d014b5cb7643da",
+        "patch_path": "compatibility/f10/disposition-ledger/evidence/closeout-comment-typos-source-review.json",
+        "review_membership": "1dc30e8eacae1f318b53a9d22a462571b9de8ddb"
+      }
     },
     {
       "sha": "91b2937d3470aaa503722c4bf329ea81aa7012f5",
       "bucket": "needs-triage",
       "subject": "docs: remove duplicate word (#27743)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=f5dbe323aba85d911c8227c57130ab6272bda2594948daf78a2468c3afcde797, bytes=876). Changed paths: src/material/button-toggle/button-toggle.ts. Comment-only typo edit in current Material button-toggle.ts. This package does not ship that TypeScript source; companion button-toggle coverage is Sass bridge/theme only. Irrelevant to retained legacy product behavior.",
+      "final_disposition": "not-applicable",
+      "reason": "Removes a duplicate As in a button-toggle initialization comment. The entire patch leaves assignments, initialization ordering and inputs unchanged; ordinary button-toggle is peer-owned.",
       "read_note_disposition": "not-owned",
       "files": [
         "src/material/button-toggle/button-toggle.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/91b2937d3470aaa503722c4bf329ea81aa7012f5.json",
-      "batch_id": "test-only-residual-needs-triage-docs-2026-10-01",
-      "recorded_at_utc": "2026-10-01T19:02:59Z",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-comment-typos-source-review.json",
+      "batch_id": "closeout-comment-typos-source-review",
+      "recorded_at_utc": "2026-10-06T22:56:18.309591+00:00",
       "g11_claim": "not-passed",
-      "patch_sha256": "f5dbe323aba85d911c8227c57130ab6272bda2594948daf78a2468c3afcde797"
+      "patch_sha256": "f5dbe323aba85d911c8227c57130ab6272bda2594948daf78a2468c3afcde797",
+      "prior_dispositions": [
+        {
+          "sha": "91b2937d3470aaa503722c4bf329ea81aa7012f5",
+          "bucket": "needs-triage",
+          "subject": "docs: remove duplicate word (#27743)",
+          "final_disposition": "irrelevant",
+          "reason": "Inspected upstream patch content (sha256=f5dbe323aba85d911c8227c57130ab6272bda2594948daf78a2468c3afcde797, bytes=876). Changed paths: src/material/button-toggle/button-toggle.ts. Comment-only typo edit in current Material button-toggle.ts. This package does not ship that TypeScript source; companion button-toggle coverage is Sass bridge/theme only. Irrelevant to retained legacy product behavior.",
+          "read_note_disposition": "not-owned",
+          "files": [
+            "src/material/button-toggle/button-toggle.ts"
+          ],
+          "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/91b2937d3470aaa503722c4bf329ea81aa7012f5.json",
+          "batch_id": "test-only-residual-needs-triage-docs-2026-10-01",
+          "recorded_at_utc": "2026-10-01T19:02:59Z",
+          "g11_claim": "not-passed",
+          "patch_sha256": "f5dbe323aba85d911c8227c57130ab6272bda2594948daf78a2468c3afcde797"
+        }
+      ],
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "review_depth": "bounded-documentation-source-review",
+      "source_check": {
+        "diff_sha256": "f5dbe323aba85d911c8227c57130ab6272bda2594948daf78a2468c3afcde797",
+        "patch_path": "compatibility/f10/disposition-ledger/evidence/closeout-comment-typos-source-review.json",
+        "review_membership": "91b2937d3470aaa503722c4bf329ea81aa7012f5"
+      }
     },
     {
       "sha": "b83c6c1effc53f97a981cc95c7b4e53174290d45",
@@ -35212,13 +35473,41 @@
         "src/material/sidenav/drawer.ts"
       ],
       "diff_sha256": "b6542312e8381368275db364fdf778ca6b0f19ce3bbc843203fd9f687d632701",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/d5925b6de503a9055cb70ad4680b21a9fedeb0b5.json",
-      "batch_id": "unread-seed-content-review-2026-10-02",
-      "recorded_at_utc": "2026-10-02T18:49:16Z",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-comment-typos-source-review.json",
+      "batch_id": "closeout-comment-typos-source-review",
+      "recorded_at_utc": "2026-10-06T22:56:18.309591+00:00",
       "g11_claim": "not-passed",
       "final_disposition": "not-applicable",
       "read_note_disposition": "not-owned",
-      "reason": "The diff in src/material/sidenav/drawer.ts changes `docs(material/sidenav): fix typo in drawer comment (#32702)`. The changed paths are absent from projects/ngx-material-legacy, and no legacy source imports that entry point. Docs, examples, dev-app, goldens, and tooling-only hunks do not change the shipped legacy contract."
+      "reason": "Corrects importatnt in a modern drawer animation comment. The condition and _setIsAnimating timing remain byte-identical in the full hunk; sidenav/drawer runtime is peer-owned and this review makes no animation behavior claim.",
+      "prior_dispositions": [
+        {
+          "sha": "d5925b6de503a9055cb70ad4680b21a9fedeb0b5",
+          "bucket": "behavior-semantic",
+          "subject": "docs(material/sidenav): fix typo in drawer comment (#32702)",
+          "files": [
+            "src/material/sidenav/drawer.ts"
+          ],
+          "diff_sha256": "b6542312e8381368275db364fdf778ca6b0f19ce3bbc843203fd9f687d632701",
+          "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/d5925b6de503a9055cb70ad4680b21a9fedeb0b5.json",
+          "batch_id": "unread-seed-content-review-2026-10-02",
+          "recorded_at_utc": "2026-10-02T18:49:16Z",
+          "g11_claim": "not-passed",
+          "final_disposition": "not-applicable",
+          "read_note_disposition": "not-owned",
+          "reason": "The diff in src/material/sidenav/drawer.ts changes `docs(material/sidenav): fix typo in drawer comment (#32702)`. The changed paths are absent from projects/ngx-material-legacy, and no legacy source imports that entry point. Docs, examples, dev-app, goldens, and tooling-only hunks do not change the shipped legacy contract."
+        }
+      ],
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "review_depth": "bounded-documentation-source-review",
+      "source_check": {
+        "diff_sha256": "b59f53001c001360eb15e0b247db4c03356ab1f56e20d59fad98af80a93165db",
+        "patch_path": "compatibility/f10/disposition-ledger/evidence/closeout-comment-typos-source-review.json",
+        "review_membership": "d5925b6de503a9055cb70ad4680b21a9fedeb0b5"
+      }
     },
     {
       "sha": "a3f2ec8a94aadf459797114d31ba487741b37d35",

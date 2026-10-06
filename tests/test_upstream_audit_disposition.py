@@ -55,7 +55,7 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
             summary = json.loads(result.stdout)
             self.assertFalse(summary["ok"])
             # The two chip patches now have qualified individual do-not-adopt decisions.
-            self.assertEqual(summary["unresolved"], 7)
+            self.assertEqual(summary["unresolved"], 8)
             self.assertEqual(summary["seed_rows"], 1697)
             self.assertEqual(summary["ledger_rows"], 1697)
             self.assertEqual(summary["missing"], 0)
@@ -186,7 +186,7 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
             self.assertEqual(summary["structural_inventory"], "fail")
             self.assertEqual(summary["disposition_admission"], "incomplete")
             self.assertGreaterEqual(summary["insufficient_inherited"], 1)
-            self.assertIn("unresolved=7", result.stderr)
+            self.assertIn("unresolved=8", result.stderr)
             self.assertEqual(summary["security_clearance"], "not-passed")
             # The ledger object above is only used to prove the file still parses.
             self.assertEqual(ledger["g11_claim"], "not-passed")
@@ -293,6 +293,17 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
             body = json.loads(path.read_text())
             entry = ledger[path.stem]
             self.assertEqual(body["sha"], path.stem)
+            evidence_path = path.relative_to(ROOT).as_posix()
+            if entry["evidence_report"] != evidence_path:
+                # Retain immutable earlier observations; a later semantic review supersedes them.
+                prior = entry.get("prior_dispositions", [])
+                self.assertTrue(any(row.get("evidence_report") == evidence_path
+                                    and row.get("final_disposition") == body["final_disposition"] for row in prior))
+                report = json.loads((ROOT / entry["evidence_report"]).read_text())
+                review = next(row for row in report["reviews"] if row["sha"] == path.stem)
+                self.assertEqual(review["final_disposition"], entry["final_disposition"])
+                self.assertTrue(review["diff"])
+                continue
             self.assertEqual(body["final_disposition"], entry["final_disposition"])
             self.assertFalse(body["final_disposition_changed"])
             self.assertTrue(body["not_individual_proof"])
@@ -366,7 +377,16 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
         rows = {row["sha"]: row for row in observation["rows"]}
         ledger = json.loads(LEDGER.read_text())["entries"]
         inherited = {e["sha"] for e in ledger if e["final_disposition"] == "inherited" and not e.get("individual_proof")}
-        self.assertEqual(inherited, set(rows))
+        self.assertTrue(inherited.issubset(rows))
+        for sha in set(rows) - inherited:
+            entry = next(row for row in ledger if row["sha"] == sha)
+            self.assertTrue(any(row.get("final_disposition") == "inherited"
+                                for row in entry.get("prior_dispositions", [])))
+            self.assertEqual(entry["final_disposition"], "not-applicable")
+            report = json.loads((ROOT / entry["evidence_report"]).read_text())
+            review = next(row for row in report["reviews"] if row["sha"] == sha)
+            self.assertFalse(review["runtime_change_in_patch"])
+            self.assertTrue(all(line.startswith(("*", "//", "/**")) for line in review["changed_lines"]))
         statuses = {"all-added-lines-present-and-executed", "some-added-lines-executed", "present-not-executed",
                     "added-lines-not-found-in-installed-source", "delegated-module-not-in-candidate-bundle",
                     "no-script-delegated-source", "no-significant-added-lines"}
