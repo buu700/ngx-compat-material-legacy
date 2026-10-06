@@ -461,6 +461,8 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
     'packed-consumer/harness/legacy-snack-bar': typeof parsed.snackText === 'string' && parsed.snackText.includes('Snack message'),
     'packed-consumer/harness/legacy-tooltip': parsed.tipVisible === true && typeof parsed.tipText === 'string' && parsed.tipText.includes('Tip text'),
     'packed-consumer/harness/legacy-tabs': parsed.tabCount === 2 && parsed.selectedTab === 'Two',
+    'packed-consumer/harness/native-date-constructor': parsed.nativeDateConstructor === true,
+    'packed-consumer/harness/native-date-provider': parsed.nativeDateProvider === true,
   };
   const owned = declarationKeys(keys)
     .filter(key => key.endsWith('/testing'))
@@ -894,6 +896,7 @@ import {MatLegacyTooltipModule} from '@ngx-compat/material-legacy/legacy-tooltip
 import {MatLegacyTooltipHarness} from '@ngx-compat/material-legacy/legacy-tooltip/testing';
 import {MatLegacyTabsModule} from '@ngx-compat/material-legacy/legacy-tabs';
 import {MatLegacyTabGroupHarness} from '@ngx-compat/material-legacy/legacy-tabs/testing';
+import {LegacyNativeDateAdapter, LegacyNativeDateModule, MatLegacyNativeDateModule, LegacyDateAdapter, MAT_LEGACY_DATE_LOCALE, MAT_LEGACY_DATE_FORMATS, MAT_LEGACY_NATIVE_DATE_FORMATS} from '@ngx-compat/material-legacy/legacy-core';
 
 getTestBed().initTestEnvironment(
   BrowserDynamicTestingModule,
@@ -957,10 +960,28 @@ function sleep(ms: number) {
 }
 
 async function main() {
+  // These constructors run outside an injection context, as in the untouched v16 API.
+  class ConsumerDateAdapter extends LegacyNativeDateAdapter {
+    constructor(locale: string) { super(locale); }
+  }
+  const direct = new LegacyNativeDateAdapter('en-US', undefined);
+  const subclass = new ConsumerDateAdapter('en-GB');
+  const smallYear = direct.createDate(7, 1, 28);
+  const nativeDateConstructor = direct.getYear(smallYear) === 7 &&
+    direct.getMonth(smallYear) === 1 && direct.getDate(smallYear) === 28 &&
+    direct.getFirstDayOfWeek() === 0 && subclass.getYear(subclass.createDate(2024, 1, 29)) === 2024 &&
+    direct.getMonth(direct.addCalendarMonths(direct.createDate(2023, 0, 31), 1)) === 1 &&
+    direct.getDate(direct.addCalendarMonths(direct.createDate(2023, 0, 31), 1)) === 28 &&
+    direct.isValid(direct.invalid()) === false && direct.deserialize('2024-02-29')?.getFullYear() === 2024;
   TestBed.configureTestingModule({
-    imports: [HarnessHost, SmokeDialogContent],
-    providers: [provideNoopAnimations()],
+    imports: [HarnessHost, SmokeDialogContent, LegacyNativeDateModule, MatLegacyNativeDateModule],
+    providers: [provideNoopAnimations(), {provide: MAT_LEGACY_DATE_LOCALE, useValue: 'en-GB'}],
   });
+  const provided = TestBed.inject(LegacyDateAdapter);
+  const nativeDateProvider = provided instanceof LegacyNativeDateAdapter &&
+    provided !== direct && provided.getYear(provided.createDate(2024, 1, 29)) === 2024 &&
+    TestBed.inject(MAT_LEGACY_DATE_FORMATS) === MAT_LEGACY_NATIVE_DATE_FORMATS &&
+    provided.format(provided.createDate(2024, 0, 2), {year:'numeric', month:'2-digit', day:'2-digit'}) === '02/01/2024';
   const fixture = TestBed.createComponent(HarnessHost);
   fixture.detectChanges();
   const loader = TestbedHarnessEnvironment.loader(fixture);
@@ -1043,7 +1064,7 @@ async function main() {
       selectOpened === true &&
       selectClosed === true &&
       tabCount === 2 &&
-      selected === 'Two',
+      selected === 'Two' && nativeDateConstructor && nativeDateProvider,
     buttonText: text,
     selectIsOpen: isOpen,
     dialogText,
@@ -1056,6 +1077,8 @@ async function main() {
     selectClosed,
     tabCount,
     selectedTab: selected,
+    nativeDateConstructor,
+    nativeDateProvider,
     harnesses: [
       'MatLegacyButtonHarness',
       'MatLegacySelectHarness',

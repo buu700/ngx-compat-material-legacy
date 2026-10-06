@@ -61,16 +61,16 @@ export type {
   LegacyRippleAnimationConfig,
 } from './ripple';
 
+export {LegacyNativeDateAdapter} from './internal/datetime/native-date-adapter';
+export {LegacyNativeDateModule, MatLegacyNativeDateModule} from './internal/datetime/native-date-module';
+
 // --- Conditional public re-exports (identity preserved) ---
 export {
   VERSION as LEGACY_VERSION,
   MAT_DATE_LOCALE as MAT_LEGACY_DATE_LOCALE,
   DateAdapter as LegacyDateAdapter,
   MAT_DATE_FORMATS as MAT_LEGACY_DATE_FORMATS,
-  NativeDateAdapter as LegacyNativeDateAdapter,
   MAT_NATIVE_DATE_FORMATS as MAT_LEGACY_NATIVE_DATE_FORMATS,
-  NativeDateModule as LegacyNativeDateModule,
-  MatNativeDateModule as MatLegacyNativeDateModule,
   ShowOnDirtyErrorStateMatcher as LegacyShowOnDirtyErrorStateMatcher,
   ErrorStateMatcher as LegacyErrorStateMatcher,
   MatLine as MatLegacyLine,
