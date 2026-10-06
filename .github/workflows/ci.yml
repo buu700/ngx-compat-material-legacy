@@ -86,19 +86,77 @@ jobs:
   packed-consumer-aot:
     name: Packed-consumer AOT and harness
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 90
     steps:
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-
-      - name: Setup Node from .node-version
-        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
         with:
-          node-version-file: .node-version
-          package-manager-cache: false
+          fetch-depth: 0
+
+      - name: Install pinned Nix
+        uses: DeterminateSystems/nix-installer-action@3138316df39ed29be04236d7ffc686fa525866aa # v23
+
+      - name: Install pinned just 1.46.0
+        run: |
+          set -euo pipefail
+          curl -fsSL -o /tmp/just.tar.gz https://github.com/casey/just/releases/download/1.46.0/just-1.46.0-x86_64-unknown-linux-musl.tar.gz
+          echo "79966e6e353f535ee7d1c6221641bcc8e3381c55b0d0a6dc6e54b34f9db36eaa  /tmp/just.tar.gz" | sha256sum -c
+          tar -xzf /tmp/just.tar.gz -C /tmp just
+          sudo mv /tmp/just /usr/local/bin/just
+          just --version
+
+      - name: Set up JavaScript toolchain
+        run: just chainman setup javascript
+
+      - name: Pack a fresh entry run
+        id: pack
+        run: |
+          set -euo pipefail
+          # Unique non-draft identity per FIRST-SESSION / FRESH-ARTIFACT.
+          # Do not reuse a fixed draft directory (pack-draft cleans a reused dir).
+          RUN="artifacts/21.x/entry-${GITHUB_SHA}"
+          test ! -e "$RUN"
+          just chainman run pack-draft -- --line 21.x --out "$RUN"
+          META="$RUN/pack-meta.json"
+          test -f "$META"
+          test -f "$RUN/run.json"
+          python3 -c "import json; m=json.load(open('$META')); assert m.get('tarball') and m.get('sha256'); print(m.get('source_sha'), m['sha256'][:12], m['tarball'])"
+          echo "run_dir=$RUN" >> "$GITHUB_OUTPUT"
+
+      - name: Require the packed export map
+        run: |
+          set -euo pipefail
+          RUN="${{ steps.pack.outputs.run_dir }}"
+          tarball=$(python3 -c "import json; print(json.load(open('${RUN}/pack-meta.json'))['tarball'])")
+          just chainman exec -- node scripts/check-packed-exports.mjs --tarball "${RUN}/${tarball}"
 
       - name: Packed-consumer AOT + harness smoke
-        run: node scripts/packed-consumer-aot-smoke.mjs --tarball compatibility/pack-proof-21/ngx-compat-material-legacy-21.0.0-rc.0.tgz
+        run: |
+          set -euo pipefail
+          RUN="${{ steps.pack.outputs.run_dir }}"
+          just chainman run packed-consumer -- --run "${RUN}/run.json"
+
+      - name: Engine-free required consumer against tip pack
+        run: |
+          set -euo pipefail
+          RUN="${{ steps.pack.outputs.run_dir }}"
+          tarball=$(python3 -c "import json; print(json.load(open('${RUN}/pack-meta.json'))['tarball'])")
+          just chainman exec -- node scripts/engine-free-consumer.mjs --tarball "${RUN}/${tarball}"
+
+      - name: Migration packaged CLI verify and isolation
+        run: |
+          set -euo pipefail
+          just chainman exec -- node scripts/build-migrate-legacy-cli.mjs --verify
+          just chainman exec -- node scripts/migration-cli-isolation.mjs
+
+      - name: Upload entry run directory
+        if: always() && steps.pack.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: entry-${{ github.sha }}
+          path: ${{ steps.pack.outputs.run_dir }}
+          if-no-files-found: error
+          retention-days: 14
 
 
   full-acceptance:
