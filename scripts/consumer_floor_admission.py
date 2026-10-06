@@ -69,6 +69,22 @@ def floor_assertion_ok(root: Path, active, body: dict, invocation: str) -> bool:
                 return False
             if detail['tarball']['sha256'] != artifacts['library'] or detail['status'] != 'ok' or detail.get('errors') != []:
                 return False
+            bundle = detail['harness']['bundle']
+            if bundle.get('module_loader') != 'bundled-consumer-node-cjs' or bundle.get('input_paths_confined') is not True or not bundle.get('inputs'):
+                return False
+            if bundle.get('preserve_explicit_imports') is not True or bundle.get('format') != 'cjs' or bundle.get('platform') != 'node' or not HEX.fullmatch(bundle['bundle_sha256']):
+                return False
+            tool = json.loads((root / 'package.json').read_text())['devDependencies']['esbuild']
+            if bundle.get('tool_version') != tool:
+                return False
+            paths = [item['path'] for item in bundle['inputs']]
+            if len(paths) != len(set(paths)) or any(path.startswith('/') or '\\' in path or any(part in ('', '.', '..') for part in path.split('/')) for path in paths):
+                return False
+            if any(not HEX.fullmatch(item['sha256']) for item in bundle['inputs']):
+                return False
+            if not all(any(path.startswith(prefix) for path in paths) for prefix in ('out-tsc/', 'node_modules/rxjs/', 'node_modules/@ngx-compat/material-legacy/')):
+                return False
+
             if any(detail[k]['status'] != 'ok' for k in ('aot','harness')):
                 return False
             cases = detail['acceptanceCases']

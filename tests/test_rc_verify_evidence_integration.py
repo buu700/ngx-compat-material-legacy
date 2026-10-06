@@ -39,6 +39,7 @@ class CoordinatorTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         self.f = CompleteFixture(self.root)
+        write_json(self.root / "package.json", acceptance.read_json(ROOT / "package.json"))
         for id in ['owned-legacy-select','owned-legacy-snack-bar','owned-legacy-button','05-custom-map-nested']:
             for relative in [f'fixtures/sass/{id}.scss',f'reference/material-16.2.14/sass-css/{id}.css']:
                 target=self.root/relative;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes((ROOT/relative).read_bytes())

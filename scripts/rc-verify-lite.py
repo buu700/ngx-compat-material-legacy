@@ -65,6 +65,7 @@ CHECKS = (
     ["node", "--check", "scripts/check-pack-library.mjs"],
     ["node", "scripts/pack-library-regressions.mjs"],
     ["node", "--check", "scripts/packed-consumer-evidence.mjs"],
+    ["node", "--check", "scripts/bundle-consumer-harness.mjs"],
     ["node", "scripts/packed-consumer-regressions.mjs"],
     ["node", "--check", "scripts/engine-free-consumer-evidence.mjs"],
     ["node", "scripts/engine-free-consumer-regressions.mjs"],

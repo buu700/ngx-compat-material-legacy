@@ -31,6 +31,7 @@ import {dirname, isAbsolute, join, relative, resolve, sep} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {spawnSync} from 'node:child_process';
 import {floorConfigurations} from './consumer-floor-roster.mjs';
+import {bundleConsumerHarness} from './bundle-consumer-harness.mjs';
 import {
   allConsumerCaseIds,
   coordinatorRequest,
@@ -1091,7 +1092,8 @@ main().catch(err => {
       };
       result.errors.push('Harness compile failed');
     } else {
-      const harness = run(process.execPath, ['out-tsc/harness-runtime.js'], {
+      const bundle = bundleConsumerHarness(consumer);
+      const harness = run(process.execPath, [bundle.output], {
         cwd: consumer,
         timeout: 120000,
         env: isolatedEnv(),
@@ -1105,6 +1107,7 @@ main().catch(err => {
       }
       result.harness = {
         status: harness.status === 0 && parsed?.ok ? 'ok' : 'fail',
+        bundle: bundle.receipt,
         exit_code: harness.status,
         result: parsed,
         stderr_tail: (harness.stderr || '').slice(-2000),
