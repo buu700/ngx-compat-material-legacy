@@ -12,7 +12,6 @@ import {BACKSPACE, DELETE, SPACE} from '@angular/cdk/keycodes';
 import {Platform} from '@angular/cdk/platform';
 import {DOCUMENT} from '@angular/common';
 import {
-  ANIMATION_MODULE_TYPE,
   Attribute,
   ChangeDetectorRef,
   ContentChild,
@@ -27,13 +26,21 @@ import {
   Optional,
   Output,
 } from '@angular/core';
-import {MAT_RIPPLE_GLOBAL_OPTIONS, RippleGlobalOptions} from '@angular/material/core';
 import {
-  LegacyRippleConfig as RippleConfig,
-  LegacyRippleRenderer as RippleRenderer,
-  LegacyRippleTarget as RippleTarget,
-} from '@ngx-compat/material-legacy/legacy-core';
-import {CanColor, CanDisable, CanDisableRipple, HasTabIndex, mixinColor, mixinDisableRipple, mixinTabIndex} from './internal/common-behaviors';
+  CanColor,
+  CanDisable,
+  CanDisableRipple,
+  HasTabIndex,
+  MAT_RIPPLE_GLOBAL_OPTIONS,
+  mixinColor,
+  mixinDisableRipple,
+  mixinTabIndex,
+  RippleConfig,
+  RippleGlobalOptions,
+  RippleRenderer,
+  RippleTarget,
+} from '@angular/material/core';
+import {ANIMATION_MODULE_TYPE} from '@angular/platform-browser/animations';
 import {Subject} from 'rxjs';
 import {take} from 'rxjs/operators';
 
@@ -108,7 +115,6 @@ const _MatChipMixinBase = mixinTabIndex(mixinColor(mixinDisableRipple(MatChipBas
  * @breaking-change 17.0.0
  */
 @Directive({
-  standalone: false,
   selector: 'mat-chip-avatar, [matChipAvatar]',
   host: {'class': 'mat-chip-avatar'},
   providers: [{provide: MAT_LEGACY_CHIP_AVATAR, useExisting: MatLegacyChipAvatar}],
@@ -122,7 +128,6 @@ export class MatLegacyChipAvatar {}
  * @breaking-change 17.0.0
  */
 @Directive({
-  standalone: false,
   selector: 'mat-chip-trailing-icon, [matChipTrailingIcon]',
   host: {'class': 'mat-chip-trailing-icon'},
   providers: [{provide: MAT_LEGACY_CHIP_TRAILING_ICON, useExisting: MatLegacyChipTrailingIcon}],
@@ -135,7 +140,6 @@ export class MatLegacyChipTrailingIcon {}
  * @breaking-change 17.0.0
  */
 @Directive({
-  standalone: false,
   selector: `mat-basic-chip, [mat-basic-chip], mat-chip, [mat-chip]`,
   inputs: ['color', 'disableRipple', 'tabIndex'],
   exportAs: 'matChip',
@@ -457,7 +461,7 @@ export class MatLegacyChip
   _blur(): void {
     // When animations are enabled, Angular may end up removing the chip from the DOM a little
     // earlier than usual, causing it to be blurred and throwing off the logic in the chip list
-    // that moves focus to the next item. To work around the issue, we defer marking the chip
+    // that moves focus not the next item. To work around the issue, we defer marking the chip
     // as not focused until the next time the zone stabilizes.
     this._ngZone.onStable.pipe(take(1)).subscribe(() => {
       this._ngZone.run(() => {
@@ -493,7 +497,6 @@ export class MatLegacyChip
  * @breaking-change 17.0.0
  */
 @Directive({
-  standalone: false,
   selector: '[matChipRemove]',
   host: {
     'class': 'mat-chip-remove mat-chip-trailing-icon',

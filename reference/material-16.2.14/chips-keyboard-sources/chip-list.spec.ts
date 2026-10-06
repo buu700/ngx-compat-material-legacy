@@ -1,3 +1,4 @@
+import {animate, style, transition, trigger} from '@angular/animations';
 import {FocusKeyManager} from '@angular/cdk/a11y';
 import {Direction, Directionality} from '@angular/cdk/bidi';
 import {
@@ -44,7 +45,7 @@ import {
 } from '@angular/forms';
 import {MatLegacyFormFieldModule} from '@angular/material/legacy-form-field';
 import {By} from '@angular/platform-browser';
-import {LEGACY_ENABLED_ANIMATIONS, LEGACY_NOOP_ANIMATIONS} from '../internal/testing/owned-animation-modules';
+import {BrowserAnimationsModule, NoopAnimationsModule} from '@angular/platform-browser/animations';
 import {Subject} from 'rxjs';
 import {MatLegacyInputModule} from '../legacy-input/index';
 import {MatLegacyChip} from './chip';
@@ -320,7 +321,7 @@ describe('MatChipList', () => {
           fakeAsync(() => {
             fixture.destroy();
             TestBed.resetTestingModule();
-            fixture = createComponent(StandardChipListWithAnimations, [], LEGACY_ENABLED_ANIMATIONS);
+            fixture = createComponent(StandardChipListWithAnimations, [], BrowserAnimationsModule);
             fixture.detectChanges();
 
             chipListDebugElement = fixture.debugElement.query(By.directive(MatLegacyChipList))!;
@@ -1465,12 +1466,11 @@ describe('MatChipList', () => {
       });
     }));
 
-    it('should be in a parent element with an aria-live attribute to announce the error', () => {
+    it('should set the proper aria-live attribute on the error messages', () => {
       errorTestComponent.formControl.markAsTouched();
       fixture.detectChanges();
 
-      const error = containerEl.querySelector('mat-error')!;
-      expect(error.closest('[aria-live]')!.getAttribute('aria-live')).toBe('polite');
+      expect(containerEl.querySelector('mat-error')!.getAttribute('aria-live')).toBe('polite');
     });
 
     it('sets the aria-describedby to reference errors when in error state', () => {
@@ -1523,7 +1523,9 @@ describe('MatChipList', () => {
   function createComponent<T>(
     component: Type<T>,
     providers: Provider[] = [],
-    animations: Provider = LEGACY_NOOP_ANIMATIONS,
+    animationsModule:
+      | Type<NoopAnimationsModule>
+      | Type<BrowserAnimationsModule> = NoopAnimationsModule,
   ): ComponentFixture<T> {
     TestBed.configureTestingModule({
       imports: [
@@ -1532,9 +1534,10 @@ describe('MatChipList', () => {
         MatLegacyChipsModule,
         MatLegacyFormFieldModule,
         MatLegacyInputModule,
+        animationsModule,
       ],
       declarations: [component],
-      providers: [animations, {provide: NgZone, useFactory: () => (zone = new MockNgZone())}, ...providers],
+      providers: [{provide: NgZone, useFactory: () => (zone = new MockNgZone())}, ...providers],
     }).compileComponents();
 
     return TestBed.createComponent<T>(component);
@@ -1811,7 +1814,13 @@ class ChipListWithFormErrorMessages {
     <mat-chip-list>
       <mat-chip *ngFor="let i of numbers" (removed)="remove(i)">{{i}}</mat-chip>
     </mat-chip-list>`,
-  // Engine-free removal is synchronous. This fixture does not declare an animation trigger.
+  animations: [
+    // For the case we're testing this animation doesn't
+    // have to be used anywhere, it just has to be defined.
+    trigger('dummyAnimation', [
+      transition(':leave', [style({opacity: 0}), animate('500ms', style({opacity: 1}))]),
+    ]),
+  ],
 })
 class StandardChipListWithAnimations {
   numbers = [0, 1, 2, 3, 4];
