@@ -180,7 +180,7 @@ const manifest = {
       sha256: sha256File(tarball),
     },
     ...(() => {
-      const cliRel = 'migration/dist/ngx-compat-material-legacy-migrate-cli-22.0.0-rc.0.tgz';
+      const cliRel = 'migration/dist/ngx-compat-material-legacy-migrate-cli-21.0.0-rc.0.tgz';
       const cliPath = join(root, cliRel);
       if (!existsSync(cliPath)) return [];
       // All artifact paths in run.json are relative to this run, including

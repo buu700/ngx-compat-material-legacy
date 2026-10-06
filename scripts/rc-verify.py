@@ -912,19 +912,19 @@ def _migration_assertion_records(run_dir: Path, invocation: str, expected: list[
     return found
 
 def _complete_migration_report(run_dir: Path, run_id: str) -> dict | None:
-    """Coverage complete only for main, and only from the matrix roster.
+    """Coverage complete only for 21.x, and only from the matrix roster.
 
-    A main run calls expected_cases for main. Null 21.x groups are not filled
+    A 21.x run calls expected_cases for 21.x. Null main groups are not filled
     and are not passed to expected_cases.
     """
     if ACTIVE_RUN is None:
         return None
     matrix = read_json(MATRIX_PATH)
     row = validate_matrix(matrix)["migration-packaged"]
-    groups = row["acceptance"]["cases_by_line"].get("main")
+    groups = row["acceptance"]["cases_by_line"].get("21.x")
     if not isinstance(groups, dict) or any(ids is None for ids in groups.values()):
         return None
-    expected = expected_cases(row, "main")
+    expected = expected_cases(row, "21.x")
     invocation = ACTIVE_RUN.invocation("migration-packaged")
     records = _migration_assertion_records(run_dir, invocation, expected)
     artifacts = _migration_contract_artifacts(row)
@@ -950,7 +950,7 @@ def _complete_migration_report(run_dir: Path, run_id: str) -> dict | None:
         "template": False,
         "run_id": run_id,
         "check_id": "migration-packaged",
-        "line": "main",
+        "line": "21.x",
         "invocation_id": invocation,
         "binding": ACTIVE_RUN.binding,
         "coverage": "complete",
@@ -974,8 +974,8 @@ def _complete_migration_report(run_dir: Path, run_id: str) -> dict | None:
         "case_results": case_results,
         "command": ["rc-verify.py", "migration-packaged"],
         "limitations": [
-            "Coordinator report for the line being verified. Each rostered main case has an assertion file written by this run.",
-            "21.x migration groups stay null. A main run does not copy them and does not call expected_cases for 21.x.",
+            "Coordinator report for the line being verified. Each rostered 21.x case has an assertion file written by this run.",
+            "Main migration groups stay null. A 21.x run does not copy them and does not call expected_cases for main.",
             "This report is the acceptance input. It does not add a G04 or G05 claim field.",
         ],
     }
@@ -991,12 +991,12 @@ def write_migration_packaged_report(
     """Write one migration-packaged report.
 
     Coverage is complete only when this main run's child exit is zero and every
-    rostered main case has a passing assertion file in the check-owned
+    rostered 21.x case has a passing assertion file in the check-owned
     invocation directory. Any other outcome stays the incomplete slice.
     write_check_report must not replace a complete report.
     """
     report_path = run_dir / "reports" / "migration-packaged.json"
-    complete = _complete_migration_report(run_dir, run_id) if exit_code == 0 and line == "main" else None
+    complete = _complete_migration_report(run_dir, run_id) if exit_code == 0 and line == "21.x" else None
     if complete is None:
         write_check_report(
             run_dir, run_id, line, "migration-packaged",

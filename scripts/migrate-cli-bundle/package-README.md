@@ -13,12 +13,12 @@ historical TypeScript `@angular/material/legacy-*` module specifiers to
 sha256sum ngx-material-legacy-migrate-cli-*.tgz
 
 mkdir -p /tmp/migrate-cli
-tar -xzf ngx-compat-material-legacy-migrate-cli-22.0.0-rc.0.tgz -C /tmp/migrate-cli
+tar -xzf ngx-compat-material-legacy-migrate-cli-21.0.0-rc.0.tgz -C /tmp/migrate-cli
 node /tmp/migrate-cli/package/bin/migrate-legacy.js /path/to/old-workspace          # dry-run
 node /tmp/migrate-cli/package/bin/migrate-legacy.js /path/to/old-workspace --apply
 ```
 
-Optional: `npm install ./ngx-compat-material-legacy-migrate-cli-22.0.0-rc.0.tgz`
+Optional: `npm install ./ngx-compat-material-legacy-migrate-cli-21.0.0-rc.0.tgz`
 then use the `ngx-material-legacy-migrate` bin.
 
 Do **not** use `npx @ngx-compat/material-legacy` for peer-light pre-upgrade —

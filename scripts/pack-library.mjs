@@ -12,7 +12,7 @@
  * --line and npm pack --json only name the run. They do not change the toolchain.
  */
 import {spawnSync} from 'node:child_process';
-import {cpSync, existsSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
+import {cpSync, existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {dirname, join, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -70,6 +70,25 @@ run('pnpm', [
 if (!existsSync(join(dist, 'package.json'))) {
   console.error('Pack failed: missing dist package.json');
   process.exit(1);
+}
+
+// ng-packagr 21 writes dist/.npmignore with **/package.json, which drops the
+// schematics commonjs marker from npm pack. Keep that nested manifest.
+const schematicsPkgSrc = join(root, 'projects/ngx-material-legacy/schematics/package.json');
+const schematicsPkgDest = join(dist, 'schematics/package.json');
+if (!existsSync(schematicsPkgSrc)) {
+  console.error('Pack failed: missing projects/ngx-material-legacy/schematics/package.json');
+  process.exit(1);
+}
+mkdirSync(join(dist, 'schematics'), {recursive: true});
+cpSync(schematicsPkgSrc, schematicsPkgDest);
+// Drop ng-packagr's dist/.npmignore (**/package.json). npm does not honor a
+// later !schematics/package.json un-ignore for that pattern, and schematics
+// must ship type:commonjs so the migrate-legacy factory loads under the
+// package root type:module.
+const npmignore = join(dist, '.npmignore');
+if (existsSync(npmignore)) {
+  unlinkSync(npmignore);
 }
 
 const pkg = JSON.parse(readFileSync(join(dist, 'package.json'), 'utf8'));
