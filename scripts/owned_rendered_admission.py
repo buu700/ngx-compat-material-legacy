@@ -26,6 +26,10 @@ def owned_rendered_ok(root,active,body,invocation):
         peer={p['id']:p['version'] for p in active.manifest['oracles']['current_peer']}
         versions=body['versions']
         if versions['material']!=peer['@angular/material'] or versions['cdk']!=peer['@angular/cdk'] or versions['core']!=peer['@angular/core']:return False
+        settled=body['settlement']
+        if set(settled)!={'reference','candidate','negative'}:return False
+        for frame in settled.values():
+            if frame.get('fonts_status')!='loaded' or type(frame.get('active_animations')) is not int or frame['active_animations']!=0 or type(frame.get('stable_frames')) is not int or frame['stable_frames']!=2 or type(frame.get('observed_animations')) is not int or frame['observed_animations']<0:return False
         fixtures=['owned-legacy-select','owned-legacy-snack-bar','owned-legacy-button','05-custom-map-nested']
         if set(body['identities'])!=set(fixtures):return False
         for id in fixtures:

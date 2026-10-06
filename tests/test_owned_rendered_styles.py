@@ -41,8 +41,10 @@ for(const id of Object.keys(negative)){const inert=structuredClone(negative);ine
             for case in owned_schema():
                 body=style_receipt(ROOT,active,case,'one')
                 self.assertTrue(owned_rendered_ok(ROOT,active,body,'one'),case)
-                for field,value in [('source_kind','workspace'),('line','foreign'),('tarball_sha256','a'*64),('binding',{}),('properties',[]),('found',False),('mutation_detected',False),('skip_lib_check',True)]:
+                for field,value in [('source_kind','workspace'),('line','foreign'),('tarball_sha256','a'*64),('binding',{}),('properties',[]),('found',False),('mutation_detected',False),('skip_lib_check',True),('settlement',{})]:
                     bad=copy.deepcopy(body);bad[field]=value;self.assertFalse(owned_rendered_ok(ROOT,active,bad,'one'),(case,field))
+                for field,value in [('fonts_status','loading'),('active_animations',1),('stable_frames',1),('observed_animations',-1)]:
+                    bad=copy.deepcopy(body);bad['settlement']['reference'][field]=value;self.assertFalse(owned_rendered_ok(ROOT,active,bad,'one'))
                 bad=copy.deepcopy(body);bad['properties'][0]['candidate']='wrong-value';self.assertFalse(owned_rendered_ok(ROOT,active,bad,'one'))
                 bad=copy.deepcopy(body);bad['identities']['owned-legacy-select']['reference_sha256']='f'*64;self.assertFalse(owned_rendered_ok(ROOT,active,bad,'one'))
                 bad=copy.deepcopy(body);bad['mutation']['observed']=bad['mutation']['reference'];self.assertFalse(owned_rendered_ok(ROOT,active,bad,'one'))
@@ -59,3 +61,25 @@ for(const id of Object.keys(negative)){const inert=structuredClone(negative);ine
                         for prop in bad['properties']:
                             if prop['property']=='rect-height':prop.update(reference=value,candidate=value)
                         self.assertFalse(owned_rendered_ok(ROOT,active,bad,'one'))
+
+    def test_actual_animation_and_font_wait_cannot_fake_settlement(self):
+        code=r"""
+import assert from 'node:assert/strict';
+import {settleOwnedStyleFrame} from './scripts/sass-owned-rendered.mjs';
+const evaluate=async program=>await eval(program);
+globalThis.requestAnimationFrame=callback=>setTimeout(callback,1);
+let animation={playState:'running',pending:false};let finish;let scheduled=false;
+animation.finished=new Promise(resolve=>{finish=resolve;});
+globalThis.document={fonts:{status:'loaded',ready:Promise.resolve()},getAnimations:()=>{if(!scheduled){scheduled=true;setTimeout(()=>{animation.playState='finished';finish();},12);}return [animation];}};
+let result=await settleOwnedStyleFrame(evaluate,1000);
+assert.equal(result.active_animations,0);assert.equal(result.stable_frames,2);assert.equal(result.observed_animations,1);
+document.fonts.status='loading';document.fonts.ready=new Promise(resolve=>setTimeout(()=>{document.fonts.status='loaded';resolve();},12));
+result=await settleOwnedStyleFrame(evaluate,1000);assert.equal(result.fonts_status,'loaded');
+animation={playState:'paused',pending:false,finished:new Promise(()=>{})};
+await assert.rejects(settleOwnedStyleFrame(evaluate,20),/did not settle/);
+animation={playState:'running',pending:false};
+animation.finished=new Promise((resolve,reject)=>setTimeout(()=>{animation.playState='idle';reject(new Error('cancelled'));},5));animation.finished.catch(()=>{});
+result=await settleOwnedStyleFrame(evaluate,1000);assert.equal(result.active_animations,0);
+"""
+        result=subprocess.run(['node','--input-type=module','-e',code],cwd=ROOT,capture_output=True,text=True)
+        self.assertEqual(result.returncode,0,result.stdout+result.stderr)
