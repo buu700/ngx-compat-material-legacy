@@ -31,6 +31,7 @@ from rc_acceptance import (
     assertion_directory, expected_cases, prepack_binding_for,
 )
 from archive_run_closure import ClosureError, write_closure
+from migration_workspace_admission import old_workspace_assertion_ok
 from m3_rendered_admission import complete_rendered_checks
 from consumer_floor_admission import floor_assertion_ok, floor_support_records
 
@@ -1145,6 +1146,8 @@ def _migration_assertion_records(run_dir: Path, invocation: str, expected: list[
             if isinstance(case_id, str) and case_id in found:
                 return None
             continue
+        if not old_workspace_assertion_ok(ROOT, ACTIVE_RUN, body, invocation):
+            continue
         relative = path.relative_to(run_dir).as_posix()
         if not relative.startswith(prefix + "/"):
             continue
@@ -1429,7 +1432,7 @@ def main() -> int:
     code_iso = run_node("scripts/migration-cli-isolation.mjs", [])
     code_workspace = run_node(
         "scripts/check-old-workspace-cli.mjs",
-        ["--out", str(out_dir / "old-workspace-cli.json")],
+        ["--run", str(run_path), "--out", str(out_dir / "old-workspace-cli.json")],
     )
     code_tx = run_node(
         "scripts/migration-transaction.mjs",
@@ -1451,7 +1454,7 @@ def main() -> int:
         exit_code=code,
         limitations=[
             "Checks the committed migrate-legacy CLI tarball identity and isolation. That tarball is not old-workspace-cli acceptance.",
-            "old-workspace-cli runs node on migration/dist/package/bin/migrate-legacy.js in a temp workspace installed from the sealed Material 16.2.14 environment.",
+            "old-workspace-cli runs the exact run CLI on the authenticated Material 16.2.14 environment, then upgrades that workspace and strictly compiles/renders the migrated application.",
             "transaction-negatives runs node on package/bin/migrate-legacy.js extracted from that tarball. It does not import a transform function and does not run the schematic runner.",
             "Rostered transaction cases are blocked-file-writes-nothing, dry-apply-parity, second-apply-noop, concurrent-edit-rejected, and before-write-hook-refuses. The before-write refusal is MIGRATE_LEGACY_BEFORE_WRITE, not a production fault.",
             "An uncaught write error is not rostered when an earlier file remains rewritten.",

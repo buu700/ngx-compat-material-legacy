@@ -1225,5 +1225,5 @@ main().catch(err => {
   }
 }
 
-console.log(JSON.stringify({status: result.status, errors: result.errors, outPath: detailPath}, null, 2));
+console.log(JSON.stringify({status: result.status, errors: result.errors, harness_diagnostics: result.harness?.status === 'fail' ? {stderr: result.harness.stderr_tail, stdout: result.harness.stdout_tail, result: result.harness.result} : null, outPath: detailPath}, null, 2));
 process.exit(result.status === 'ok' ? 0 : 1);

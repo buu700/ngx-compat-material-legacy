@@ -1,17 +1,11 @@
 #!/usr/bin/env node
-/**
- * Run migration/dist/package/bin/migrate-legacy.js against a disposable
- * Material 16.2.14 workspace. The workspace is a temp directory whose
- * package.json and lock are the sealed reference environment, plus fixture
- * sources the CLI scans. The committed CLI tarball is not the subject.
- *
- * Rosters only fixture cases the CLI actually rewrites. Does not claim G04
- * or G05. Leaves packaged-schematic, transaction-negatives, frontend-parity,
- * and every main migration group null.
- *
- *   node scripts/check-old-workspace-cli.mjs --out <report.json>
+/** Migrate with the run CLI before upgrading the sealed historical workspace.
+ * The resulting application is strictly compiled and interacted with in Chromium.
+ * Execution evidence is admitted only through a bound --run invocation.
  */
 import {createHash} from 'node:crypto';
+import {resolveMigrationRun, extractMigrationCli} from './migration-run-inputs.mjs';
+import {OLD_APPLICATION, OLD_STYLES, proveMigratedConsumer} from './migrated-consumer-proof.mjs';
 import {spawnSync} from 'node:child_process';
 import {
   copyFileSync,
@@ -32,12 +26,6 @@ const catalogPath = join(root, 'fixtures/migration/cases.json');
 const packageJsonPath = join(root, 'reference/material-16.2.14/environment-package.json');
 const packageLockPath = join(root, 'reference/material-16.2.14/environment-package-lock.json');
 const provenancePath = join(root, 'reference/material-16.2.14/PROVENANCE.json');
-const cliBinPath = join(root, 'migration/dist/package/bin/migrate-legacy.js');
-const cliLibPaths = [
-  join(root, 'migration/dist/package/lib/ts-rewrite.js'),
-  join(root, 'migration/dist/package/lib/sass-rewrite.js'),
-];
-const cliPathRelative = 'migration/dist/package/bin/migrate-legacy.js';
 
 const OPTION_FLAGS = [
   ['acknowledgeCompanionBridges', '--acknowledge-companion-bridges'],
@@ -118,11 +106,9 @@ function assertInside(parent, child) {
   }
 }
 
-export function executeOldWorkspaceCli() {
-  if (!existsSync(cliBinPath)) throw new Error('migrate CLI bin is missing');
-  for (const lib of cliLibPaths) {
-    if (!existsSync(lib)) throw new Error(`migrate CLI support file is missing: ${lib}`);
-  }
+export async function executeOldWorkspaceCli(runPath) {
+  if (!runPath) throw new Error('--run is required; workspace CLI fallback is forbidden');
+  const input = resolveMigrationRun(runPath);
   const catalog = loadCatalog();
   const cases = rewriteCases(catalog);
   const flags = flagsFor(cases);
@@ -140,17 +126,19 @@ export function executeOldWorkspaceCli() {
     throw new Error('sealed lock does not pin @angular/material 16.2.14');
   }
 
-  const cli = fileIdentity(cliBinPath, cliPathRelative);
-  const support = cliLibPaths.map(path => fileIdentity(
-    path,
-    relative(root, path).split('\\').join('/'),
-  ));
+  for (const [path, key] of [[packageJsonPath, 'package_json_sha256'], [packageLockPath, 'package_lock_sha256']]) {
+    if (sha256(readFileSync(path)) !== provenance.isolated_environment[key]) throw new Error('historical environment identity mismatch');
+  }
   const work = mkdtempSync(join(tmpdir(), 'ngx-old-workspace-cli-'));
   const repoResolved = resolve(root);
   if (resolve(work).startsWith(repoResolved)) {
     throw new Error('refusing to build the disposable workspace inside the repository');
   }
   try {
+    const staged = extractMigrationCli(input, join(work, 'cli-artifact'));
+    const cliBinPath = staged.bin;
+    const cli = staged.identities.find(item => item.path === 'package/bin/migrate-legacy.js');
+    const support = staged.identities.filter(item => item.path !== cli.path);
     copyFileSync(packageJsonPath, join(work, 'package.json'));
     copyFileSync(packageLockPath, join(work, 'package-lock.json'));
     const packageBefore = readFileSync(join(work, 'package.json'));
@@ -184,7 +172,18 @@ export function executeOldWorkspaceCli() {
       written.push({item, rel, abs, before: item.before});
     }
 
+    const applicationPath = join(work, 'application.ts');
+    const stylesPath = join(work, 'application.scss');
+    writeFileSync(applicationPath, OLD_APPLICATION);
+    writeFileSync(stylesPath, OLD_STYLES);
     const args = [cliBinPath, work, '--apply', '--json', ...flags];
+    const dryChild = spawnSync(process.execPath, [cliBinPath, work, '--json', ...flags], {cwd: work, encoding: 'utf8'});
+    const dry = JSON.parse(dryChild.stdout);
+    if (dryChild.status !== 0 || dry.mode !== 'dry-run' || dry.blocking !== 0 || dry.safe_edits !== written.length + 2
+      || written.some(file => readFileSync(file.abs, 'utf8') !== file.before)
+      || readFileSync(applicationPath, 'utf8') !== OLD_APPLICATION || readFileSync(stylesPath, 'utf8') !== OLD_STYLES) {
+      throw new Error('historical workspace dry-run changed bytes or omitted migrations');
+    }
     const child = spawnSync(process.execPath, args, {cwd: work, encoding: 'utf8'});
     let summary = null;
     try {
@@ -198,7 +197,7 @@ export function executeOldWorkspaceCli() {
     if (summary.mode !== 'apply' || summary.distribution !== 'bundled-cli') {
       throw new Error('migrate CLI did not apply as the bundled CLI');
     }
-    if (summary.files_scanned !== written.length || summary.applied !== written.length || summary.blocking !== 0) {
+    if (summary.files_scanned !== written.length + 2 || summary.applied !== written.length + 2 || summary.blocking !== 0) {
       throw new Error(`migrate CLI did not rewrite every selected file: ${child.stdout}`);
     }
     if (readFileSync(join(work, 'package.json')).equals(packageBefore) !== true) {
@@ -231,19 +230,38 @@ export function executeOldWorkspaceCli() {
       });
     }
 
+    const application = readFileSync(applicationPath, 'utf8');
+    const styles = readFileSync(stylesPath, 'utf8');
+    if (application !== OLD_APPLICATION.replaceAll('@angular/material/legacy-', '@ngx-compat/material-legacy/legacy-')
+        || styles !== OLD_STYLES.replaceAll("'@angular/material'", "'@ngx-compat/material-legacy'")) {
+      throw new Error('application migration changed more than module sources');
+    }
+    const repeated = spawnSync(process.execPath, [cliBinPath, work, '--apply', '--json', ...flags], {cwd: work, encoding: 'utf8'});
+    const again = JSON.parse(repeated.stdout);
+    if (repeated.status !== 0 || again.applied !== 0 || again.blocking !== 0
+        || readFileSync(applicationPath, 'utf8') !== application || readFileSync(stylesPath, 'utf8') !== styles) throw new Error('old-workspace migration was not idempotent');
+    const upgraded = await proveMigratedConsumer(work, application, styles, input);
+    for (const artifact of Object.values(input.artifacts)) if (sha256(readFileSync(artifact.absolute)) !== artifact.sha256) throw new Error('run artifact changed during migration');
     return {
       schema_version: 1,
       role: 'packaged migrate CLI on a disposable Material 16.2.14 workspace',
       check_id: 'migration-packaged',
       group: 'old-workspace-cli',
       coverage: 'slice',
-      line: '21.x',
+      line: input.line,
       g04_claim: 'not-passed',
       g05_claim: 'not-passed',
-      tarball_used: false,
+      tarball_used: true,
+      run_id: input.run.run_id,
+      invocation_id: input.request?.invocation ?? null,
+      binding: input.request?.binding ?? null,
+      artifacts: Object.fromEntries(Object.entries(input.artifacts).map(([id, a]) => [id, a.sha256])),
+      upgraded_consumer: upgraded,
+      dry_run: dry,
+      second_apply: again,
       cli,
       cli_support: support,
-      command: [process.execPath, cliPathRelative, '<temp-workspace>', '--apply', '--json', ...flags],
+      command: [process.execPath, cli.path, '<temp-workspace>', '--apply', '--json', ...flags],
       command_argv: [process.execPath, ...args],
       node: process.version,
       workspace: {
@@ -270,14 +288,9 @@ export function executeOldWorkspaceCli() {
       },
       discovered_fixture_count: catalog.cases.length,
       not_rostered: catalog.cases.filter(item => !cases.some(selected => selected.id === item.id)).map(item => item.id),
-      case_ids: changes.map(item => item.case_id),
+      case_ids: [...changes.map(item => item.case_id), "old-workspace/upgraded-consumer"],
       changes,
-      cases_by_line_main: {
-        'old-workspace-cli': null,
-        'packaged-schematic': null,
-        'transaction-negatives': null,
-        'frontend-parity': null,
-      },
+      other_line_executed: false,
       other_groups: {
         'packaged-schematic': null,
         'transaction-negatives': null,
@@ -285,11 +298,11 @@ export function executeOldWorkspaceCli() {
       },
       result: 'pass',
       limitations: [
-        'Runs node on migration/dist/package/bin/migrate-legacy.js. The committed CLI tarball is not the acceptance subject.',
+        'Executes the exact run CLI tarball and support files, dry-run/apply/idempotence, then upgrades the authenticated historical workspace and strictly builds/renders its migrated application.',
         'The temp workspace is npm ci of the sealed Material 16.2.14 reference environment plus fixture sources. It is not an in-memory schematic host.',
         'Only fixture cases the CLI applied are rostered. Refused and unchanged fixtures are not passing cases.',
         'packaged-schematic, transaction-negatives, and frontend-parity were not executed.',
-        'Every main migration group stays null. Does not claim G04 or G05.',
+        'Every 21.x migration group stays null. Does not claim G04 or G05.',
       ],
     };
   } finally {
@@ -298,118 +311,54 @@ export function executeOldWorkspaceCli() {
 }
 
 export function assertionOutputDir() {
-  const names = ['RC_CHECK_ID', 'RC_RUN_ID', 'RC_INVOCATION_ID', 'RC_EVIDENCE_BINDING', 'RC_ASSERTION_OUTPUT_DIR'];
-  const present = names.filter(name => process.env[name]);
-  if (present.length === 0) return null;
-  if (present.length !== names.length || process.env.RC_CHECK_ID !== 'migration-packaged') {
-    fail(2, 'old-workspace-cli: incomplete coordinator environment');
-  }
-  let binding;
-  try {
-    binding = JSON.parse(process.env.RC_EVIDENCE_BINDING);
-  } catch {
-    fail(2, 'old-workspace-cli: RC_EVIDENCE_BINDING is not JSON');
-  }
-  if (!binding || typeof binding !== 'object' || Array.isArray(binding)) {
-    fail(2, 'old-workspace-cli: binding is not an object');
-  }
-  if (binding.source_line === 'main') return null;
-  if (binding.source_line !== '21.x') fail(2, 'old-workspace-cli: binding source line is not 21.x');
-  const outputDir = process.env.RC_ASSERTION_OUTPUT_DIR;
-  let stat;
-  try {
-    stat = lstatSync(outputDir);
-  } catch {
-    fail(2, 'old-workspace-cli: assertion output directory is missing');
-  }
-  if (!stat.isDirectory() || stat.isSymbolicLink()) {
-    fail(2, 'old-workspace-cli: assertion output directory is not a real directory');
-  }
-  const invocation = process.env.RC_INVOCATION_ID;
-  if (!outputDir.endsWith(join('evidence', 'migration-packaged', invocation))) {
-    fail(2, 'old-workspace-cli: assertion directory is not check-owned');
-  }
-  return outputDir;
+  const runDir = process.env.RC_ASSERTION_OUTPUT_DIR;
+  return runDir || null;
 }
 
 export function writeAssertions(outputDir, report) {
-  if (report.result !== 'pass' || report.tarball_used !== false) {
-    throw new Error('refusing to emit an old-workspace-cli assertion without a real CLI apply');
+  if (report.result !== 'pass' || report.tarball_used !== true || report.upgraded_consumer?.result !== 'pass'
+      || !report.run_id || !report.invocation_id || !report.binding || report.line !== report.binding.source_line) {
+    throw new Error('refusing migration assertions without run-bound CLI and upgraded consumer execution');
   }
-  if (report.g04_claim !== 'not-passed' || report.g05_claim !== 'not-passed') {
-    throw new Error('refusing to claim G04 or G05');
-  }
-  if (report.cli?.path !== cliPathRelative || report.workspace?.material_version !== '16.2.14') {
-    throw new Error('refusing to emit an assertion for a different CLI or Material package');
-  }
-  if (!report.workspace.material_manifest_matches_provenance || report.workspace.legacy_button_entry !== true) {
-    throw new Error('refusing to emit an assertion without the sealed Material 16.2.14 install');
-  }
-  for (const [group, ids] of Object.entries(report.other_groups)) {
-    if (ids !== null) throw new Error(`refusing to roster ${group}`);
-  }
-  for (const ids of Object.values(report.cases_by_line_main)) {
-    if (ids !== null) throw new Error('refusing to copy a 21.x result onto main');
-  }
+  const bodies = report.changes.map(change => ({...change, group:'old-workspace-cli'}));
+  bodies.push({case_id:'old-workspace/upgraded-consumer',group:'old-workspace-cli'});
   const written = [];
-  for (const change of report.changes) {
-    if (change.changed !== true || change.applied !== true || change.before === change.after) {
-      throw new Error(`refusing to emit ${change.case_id} without a real rewrite`);
-    }
-    const body = {
-      case_id: change.case_id,
-      result: 'pass',
-      kind: 'assertion',
-      line: '21.x',
-      group: 'old-workspace-cli',
-      path: change.path,
-      before_sha256: change.before_sha256,
-      after_sha256: change.after_sha256,
-      cli_path: report.cli.path,
-      cli_sha256: report.cli.sha256,
-      cli_bytes: report.cli.bytes,
-      tarball_used: false,
-      material_version: report.workspace.material_version,
-      material_manifest_sha256: report.workspace.material_manifest_sha256,
-      command: report.command,
-      g04_claim: 'not-passed',
-      g05_claim: 'not-passed',
-      not_executed: {
-        'packaged-schematic': null,
-        'transaction-negatives': null,
-        'frontend-parity': null,
-        'main': null,
-      },
-    };
-    const name = `${change.case_id.replaceAll('/', '__')}.json`;
-    writeFileSync(join(outputDir, name), `${JSON.stringify(body, null, 2)}\n`);
-    written.push(name);
+  for (const fields of bodies) {
+    const body = {...fields, check_id:'migration-packaged',kind:'assertion',result:'pass',line:report.line,
+      run_id:report.run_id,invocation_id:report.invocation_id,binding:report.binding,artifacts:report.artifacts,
+      tarball_used:true,cli:report.cli,cli_support:report.cli_support,material_version:report.workspace.material_version,
+      material_manifest_sha256:report.workspace.material_manifest_sha256,upgraded_consumer:report.upgraded_consumer,
+      command:report.command,exit_code:0};
+    const name = `${fields.case_id.replaceAll('/', '__')}.json`;
+    writeFileSync(join(outputDir,name),JSON.stringify(body,null,2)+'\n');written.push(name);
   }
   return written;
 }
 
 function parseArgs(argv) {
   let out = null;
+  let run = null;
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
-    if (arg === '--out') {
+    if (arg === '--out' || arg === '--run') {
       const value = argv[i + 1];
       if (!value || value.startsWith('-')) fail(2, '--out requires a path');
-      out = resolve(value);
+      if (arg === '--out') out = resolve(value); else run = resolve(value);
       i += 1;
       continue;
     }
     fail(2, `Unknown argument: ${arg}`);
   }
   if (!out) fail(2, '--out requires a path');
-  return out;
+  if (!run) fail(2, '--run requires a path; no workspace fallback');
+  return {out, run};
 }
 
-function main(argv) {
-  const out = parseArgs(argv);
+async function main(argv) {
+  const {out, run} = parseArgs(argv);
   let report;
   try {
-    report = executeOldWorkspaceCli();
+    report = await executeOldWorkspaceCli(run);
   } catch (error) {
     fail(1, error instanceof Error ? error.message : String(error));
   }
@@ -433,7 +382,7 @@ function main(argv) {
     material_manifest_sha256: report.workspace.material_manifest_sha256,
     cli_path: report.cli.path,
     cli_sha256: report.cli.sha256,
-    tarball_used: false,
+    tarball_used: true,
     assertion_files,
     g04_claim: report.g04_claim,
     g05_claim: report.g05_claim,
@@ -442,5 +391,5 @@ function main(argv) {
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  process.exit(main(process.argv.slice(2)));
+  main(process.argv.slice(2)).then(code => process.exit(code), error => fail(1,error.message));
 }

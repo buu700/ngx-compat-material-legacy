@@ -574,12 +574,12 @@ function compileCandidate(sass, nodeModules, installed, identity) {
   return {css: compiled.css, sha256: sha256(compiled.css), loaded_files: loaded.length};
 }
 
-export async function buildLab(consumer, env, versions, source = labSource()) {
+export async function buildLab(consumer, env, versions, source = labSource(), {strictDeclarations = false} = {}) {
   mkdirSync(join(consumer, 'src'), {recursive: true});
   writeFileSync(join(consumer, 'src/main.ts'), source);
   const compilerOptions = {
     target: 'ES2022', module: 'ES2022', moduleResolution: 'bundler', experimentalDecorators: true,
-    strict: true, skipLibCheck: true, lib: ['ES2022', 'DOM'], rootDir: 'src', outDir: 'out', types: [],
+    strict: true, skipLibCheck: !strictDeclarations, lib: ['ES2022', 'DOM'], rootDir: 'src', outDir: 'out', types: [],
   };
   if (Number(versions.typescript.split('.')[0]) >= 6) compilerOptions.ignoreDeprecations = '6.0';
   writeFileSync(join(consumer, 'tsconfig.json'), JSON.stringify({
