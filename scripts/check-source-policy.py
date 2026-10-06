@@ -116,6 +116,89 @@ def annotated_names(directory: Path, marker: str) -> tuple[set[str], int]:
     return names, files
 
 
+def declaration_export(directory: Path, module: str, name: str):
+    """Resolve the exported declaration, keeping same-name internal types separate.
+
+    Follow finite named and star re-exports in declaration files. An unavailable,
+    ambiguous or unsupported export stays unknown rather than becoming clean.
+    """
+    package = '/'.join(module.split('/')[:2])
+    subpath = '.' + module[len(package):]
+    def types_target(value):
+        if isinstance(value, dict):
+            if isinstance(value.get('types'), str):
+                return value['types']
+            for condition in ('import', 'default'):
+                target = types_target(value.get(condition))
+                if target:
+                    return target
+        return None
+    try:
+        manifest = json.loads((directory / 'package.json').read_text())
+        target = types_target(manifest.get('exports', {}).get(subpath))
+        if not target and subpath == '.':
+            target = manifest.get('types') or manifest.get('typings')
+        if not target:
+            return None
+    except (OSError, ValueError):
+        return None
+    fence = directory.resolve()
+    def relative_file(parent, target):
+        path = (parent / target).resolve()
+        if fence not in path.parents or not target.startswith('.'):
+            return None
+        if path.suffix in ('.js', '.mjs'):
+            path = path.with_suffix('.d.ts')
+        return path if path.is_file() else None
+    entry = relative_file(directory, target)
+    named = re.compile(r'\b(export|import)\s+(?:type\s+)?\{([^}]*)\}\s*(?:from\s*[\'\"]([^\'\"]+)[\'\"])?\s*;')
+    declaration = re.compile(r'\b(?:export\s+)?(?:declare\s+)?(?:abstract\s+)?(?:class|interface|type|enum|function|const|let|var)\s+([A-Za-z_$][\w$]*)\b')
+    def resolve(path, symbol, trail):
+        if path is None or (path, symbol) in trail:
+            return set()
+        trail = trail | {(path, symbol)}
+        source = path.read_text(errors='replace')
+        code = _scanner.strip_comments(source)
+        imports = {}
+        exports = []
+        for kind, block, origin in named.findall(code):
+            for part in block.split(','):
+                pair = re.fullmatch(r'(?:type\s+)?([\w$]+)(?:\s+as\s+([\w$]+))?', part.strip())
+                if not pair:
+                    continue
+                original, alias = pair.groups()
+                if kind == 'import':
+                    imports[alias or original] = (origin, original)
+                elif (alias or original) == symbol:
+                    exports.append((origin, original))
+        results = set()
+        if re.search(r'\bexport\s+(?:declare\s+)?(?:abstract\s+)?(?:class|interface|type|enum|function|const|let|var)\s+' + re.escape(symbol) + r'\b', code):
+            results.add((path, symbol))
+        for origin, original in exports:
+            if origin:
+                results |= resolve(relative_file(path.parent, origin), original, trail)
+            elif original in imports:
+                origin, imported = imports[original]
+                results |= resolve(relative_file(path.parent, origin), imported, trail)
+            elif original in declaration.findall(code):
+                results.add((path, original))
+        for origin in re.findall(r'\bexport\s+\*\s+from\s*[\'\"]([^\'\"]+)[\'\"]', code):
+            results |= resolve(relative_file(path.parent, origin), symbol, trail)
+        return results
+    resolved = resolve(entry, name, set())
+    return next(iter(resolved)) if len(resolved) == 1 else None
+
+
+def declaration_markers(path: Path, name: str) -> set[str]:
+    attached = re.compile(
+        r'/\*\*((?:(?!\*/).)*)\*/\s*'
+        r'(?:export\s+)?(?:declare\s+)?(?:abstract\s+)?'
+        r'(?:class|interface|type|enum|function|const|let|var)\s+' + re.escape(name) + r'\b', re.S)
+    return {marker for comment in attached.findall(path.read_text(errors='replace'))
+            for marker in ('@docs-private', '@deprecated')
+            if re.search(re.escape(marker) + r'(?![\w-])', comment)}
+
+
 def imported_angular_references(root: Path) -> list[dict]:
     """Qualify authored named/namespace references by their Angular package."""
     named = re.compile(
@@ -188,6 +271,7 @@ def evaluate(authored: Path, policy: dict, tarball: Path | None, annotations: Pa
     private_hits = []
     deprecated_hits = []
     missing_packages = []
+    unresolved_exports = []
     if annotations is not None and annotations.is_dir():
         uses = imported_angular_references(authored)
         # Follow each installed Angular package independently, rather than allowing
@@ -197,22 +281,33 @@ def evaluate(authored: Path, policy: dict, tarball: Path | None, annotations: Pa
         deprecated_hits = []
         missing_packages = []
         private_count = deprecated_count = 0
-        for package, directory in package_roots.items():
-            private_names, private_files = annotated_names(directory, "@docs-private")
-            deprecated_names, deprecated_files = annotated_names(directory, "@deprecated")
-            compared_files += private_files + deprecated_files
-            private_count += len(private_names)
-            deprecated_count += len(deprecated_names)
-            package_uses = [use for use in uses if use['package'] == package]
-            if package_uses and private_files == 0:
-                missing_packages.append(package)
-            private_hits.extend(use for use in package_uses if use['name'] in private_names)
-            deprecated_hits.extend(use for use in package_uses if use['name'] in deprecated_names)
-        missing_packages.extend(sorted({use['package'] for use in uses} - set(package_roots)))
+        unresolved_exports = []
+        observed_files = set()
+        for use in uses:
+            directory = package_roots.get(use['package'])
+            if directory is None:
+                missing_packages.append(use['package'])
+                continue
+            resolved = declaration_export(directory, use['module'], use['name'])
+            if resolved is None:
+                unresolved_exports.append(use)
+                continue
+            path, name = resolved
+            observed_files.add(path)
+            markers = declaration_markers(path, name)
+            detail = dict(use, declaration=str(path.relative_to(directory.resolve())), declaration_name=name)
+            if '@docs-private' in markers:
+                private_hits.append(detail)
+            if '@deprecated' in markers:
+                deprecated_hits.append(detail)
+        compared_files = len(observed_files)
+        private_count, deprecated_count = len(private_hits), len(deprecated_hits)
         if compared_files == 0:
             annotation_detail = "annotation directory contained no declaration files"
         elif missing_packages:
             annotation_detail = f"imported peer declarations unavailable: {sorted(set(missing_packages))}"
+        elif unresolved_exports:
+            annotation_detail = f"imported peer exports unresolved: {unresolved_exports[:8]}"
         elif private_hits or deprecated_hits:
             annotation_detail = (
                 f"docs-private={private_hits[:8]} deprecated={deprecated_hits[:8]} "
@@ -295,6 +390,7 @@ def evaluate(authored: Path, policy: dict, tarball: Path | None, annotations: Pa
         "annotation_private_hits": private_hits,
         "annotation_deprecated_hits": deprecated_hits,
         "annotation_missing_packages": sorted(set(missing_packages)),
+        "annotation_unresolved_exports": unresolved_exports,
     }
 
 
@@ -344,6 +440,7 @@ def write_acceptance(request: dict, observation: dict) -> bool:
         "annotation_private_hits": observation["annotation_private_hits"],
         "annotation_deprecated_hits": observation["annotation_deprecated_hits"],
         "annotation_missing_packages": observation["annotation_missing_packages"],
+        "annotation_unresolved_exports": observation["annotation_unresolved_exports"],
         "note": "Packed bytes are identified by digest. Outer subject remains source. Annotation comparison is unknown when declarations are absent.",
         "violations": observation["authored_violations"][:40],
         "cases": cases,

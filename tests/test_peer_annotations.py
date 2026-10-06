@@ -1,4 +1,5 @@
 """Reject real bundled-declaration and namespace annotation bypasses."""
+import json
 import importlib.util
 from pathlib import Path
 import tempfile
@@ -11,7 +12,9 @@ class PeerAnnotationTests(unittest.TestCase):
     def fixture(self):
         temp=tempfile.TemporaryDirectory();self.addCleanup(temp.cleanup);root=Path(temp.name)
         authored=root/'src';authored.mkdir();peers=root/'node_modules/@angular';peers.mkdir(parents=True)
-        for package in ('core','cdk','material'):(peers/package).mkdir()
+        for package in ('core','cdk','material'):
+            (peers/package).mkdir()
+            (peers/package/'package.json').write_text(json.dumps({'exports':{'.':{'types':'./index.d.ts'},'./dialog':{'types':'./index.d.ts'}}}))
         (peers/'core/index.d.ts').write_text('/** @deprecated use stable motion */\ndeclare const OLD_MOTION: unknown;\nexport { OLD_MOTION };\n')
         (peers/'cdk/index.d.ts').write_text('/**\n * Internal container.\n * @docs-private\n */\ndeclare class InternalContainer {}\nexport { InternalContainer };\n')
         (peers/'material/index.d.ts').write_text('declare class InternalContainer {}\nexport { InternalContainer };\n')
@@ -52,3 +55,26 @@ class PeerAnnotationTests(unittest.TestCase):
         file.write_text('declare class WithMembers {\n/** @deprecated */\noldMember(): void;\n}\ndeclare class Good {}\n/** @docs-private-ish not the marker */\ndeclare class AlsoGood {}\n/**\n * @docs-private\n'+''.join(' * Padding line\n' for _ in range(20))+' */\ndeclare class ActualPrivate {}\nexport { Good, AlsoGood, ActualPrivate };\n')
         names,files=POLICY.annotated_names(peers/'material','@deprecated');self.assertEqual(names,set());self.assertEqual(files,1)
         names,_=POLICY.annotated_names(peers/'material','@docs-private');self.assertEqual(names,{'ActualPrivate'})
+
+    def test_same_name_internal_interface_does_not_classify_public_export(self):
+        authored,peers=self.fixture();directory=peers/'material'
+        (directory/'package.json').write_text(json.dumps({'exports':{'./form-field':{'types':'./index.d.ts'}}}))
+        (directory/'index.d.ts').write_text("export { Control as PublicControl } from './public.js';\nimport './internal.js';\n")
+        (directory/'public.d.ts').write_text('/** Public contract. */\ndeclare abstract class Control {}\nexport {Control};\n')
+        (directory/'internal.d.ts').write_text('/** @docs-private */\ninterface Control {}\n')
+        (authored/'use.ts').write_text("import { PublicControl } from '@angular/material/form-field';\n")
+        result,case=self.observe(authored,peers);self.assertEqual(case['result'],'pass')
+        self.assertEqual(result['annotation_private_hits'],[])
+        (directory/'public.d.ts').write_text('/** @docs-private */\ndeclare abstract class Control {}\nexport {Control};\n')
+        result,case=self.observe(authored,peers);self.assertEqual(case['result'],'fail')
+        self.assertEqual(result['annotation_private_hits'][0]['declaration'],'public.d.ts')
+
+    def test_missing_or_ambiguous_export_is_unknown(self):
+        for content in ("export {Absent};", "export * from './a.js';\nexport * from './b.js';"):
+            with self.subTest(content=content):
+                authored,peers=self.fixture();directory=peers/'material'
+                (directory/'index.d.ts').write_text(content)
+                for name in ('a','b'):(directory/(name+'.d.ts')).write_text('export declare class Absent {}')
+                (authored/'use.ts').write_text("import {Absent} from '@angular/material/dialog';")
+                result,case=self.observe(authored,peers);self.assertEqual(case['result'],'fail')
+                self.assertEqual(result['annotation_unresolved_exports'][0]['name'],'Absent')
