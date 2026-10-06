@@ -23,7 +23,7 @@ class SassApiInventoryTests(unittest.TestCase):
             [d["id"] for d in decisions["decisions"]],
             ["companion-bridge-appended", "cdk-forced-colors-and-overlay",
              "upstream-29870-select-disabled-placeholder", "upstream-27511-snack-bar-action",
-             "button-line-height-inherit", "aggregates-composite", "invocation-arguments"],
+             "button-line-height-inherit", "aggregates-composite"],
         )
         for decision in decisions["decisions"]:
             self.assertEqual(decision["state"], "pending")

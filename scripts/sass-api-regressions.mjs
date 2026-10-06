@@ -14,6 +14,7 @@ import {fileURLToPath} from 'node:url';
 import {
   THEME_PARAMS,
   apiCaseIds,
+  argumentCases,
   apiDriftNegative,
   classifyPending,
   compareInventory,
@@ -61,14 +62,32 @@ assert.equal(params.params[0].default, null);
 assert.equal(params.params[1].default, '(a: 1, b: 2)');
 assert.equal(params.rest, 'args');
 
-// Invocation plans come only from the authentic signature.
+// Invocation plans come only from the authentic signature, or for non-theme
+// required parameters from a cited 16.2.14 argument case.
+const argumentFile = readFileSync(join(root, 'compatibility/rc/oracles/material-16.2.14-sass-argument-cases.json'));
+assert.equal(createHash('sha256').update(argumentFile).digest('hex'), oracle.provenance.argument_cases_sha256);
+const cases = argumentCases();
+const needArguments = [];
 for (const [name, entry] of Object.entries(oracle.members.mixins)) {
   const plan = invocationPlan(name, entry);
   const required = (entry.params || []).filter(p => p.default === null).map(p => p.name);
-  assert.equal(plan.invocable, required.every(p => THEME_PARAMS.includes(p)), name);
+  const themeOnly = required.every(p => THEME_PARAMS.includes(p));
+  if (!themeOnly) needArguments.push(name);
+  assert.equal(plan.invocable, themeOnly || Object.hasOwn(cases, name), name);
   assert.equal(entry.invocation.invocable, plan.invocable, name);
+  if (!themeOnly && plan.invocable) {
+    assert.deepEqual(entry.invocation.argument_source, cases[name].sources, name);
+    assert.match(cases[name].call, new RegExp(`@include m\\.${name}\\(`), name);
+  }
+}
+// Argument cases exist only for mixins whose signature needs them; each cites a 16.2.14 source.
+assert.deepEqual(Object.keys(cases).sort(), needArguments.filter(name => Object.hasOwn(cases, name)).sort());
+for (const [name, entry] of Object.entries(cases)) {
+  assert.equal(entry.sources.length > 0, true, name);
+  for (const source of entry.sources) assert.match(source, /16\.2\.14/, `${name}: ${source}`);
 }
 assert.equal(invocationPlan('x', {params: [{name: 'color', default: null}]}).invocable, false);
+assert.equal(invocationPlan('x', {params: [{name: 'color', default: null}]}, {x: {call: '@include m.x(red);', sources: []}}).invocable, false);
 
 // Exact self-comparison passes every predeclared case.
 const css = {};

@@ -244,6 +244,7 @@ function main(argv) {
   for (const [name, entry] of Object.entries(members.mixins)) {
     const plan = invocationPlan(name, entry);
     entry.invocation = {invocable: plan.invocable, reason: plan.reason};
+    if (plan.argument_source) entry.invocation.argument_source = plan.argument_source;
     if (!plan.invocable) continue;
     const compiled = compileInvocation(sass, '@angular/material', [reference], plan.call);
     if (compiled.error) throw new Error(`reference invocation of ${name} failed: ${compiled.error}`);
@@ -263,6 +264,7 @@ function main(argv) {
       index_sha256: sha256(readFileSync(join(materialRoot, '_index.scss'))),
       sass_version: JSON.parse(readFileSync(join(reference, 'sass/package.json'), 'utf8')).version,
       generator: 'scripts/sass-api-inventory.mjs --reference',
+      argument_cases_sha256: existsSync(ARGUMENT_CASES_PATH) ? sha256(readFileSync(ARGUMENT_CASES_PATH)) : null,
     },
     counts: Object.fromEntries(Object.entries(members).map(([key, value]) => [key, Object.keys(value).length])),
     standard_theme: standardThemeSource(),
@@ -294,12 +296,30 @@ export function standardThemeSource() {
 ));`;
 }
 
-/** Invocation plan for a mixin entry: {invocable, reason, call}. */
-export function invocationPlan(name, entry) {
+export const ARGUMENT_CASES_PATH = join(root, 'compatibility/rc/oracles/material-16.2.14-sass-argument-cases.json');
+let argumentCasesCache = null;
+
+/** Authentic 16.2.14 argument cases, transcribed from cited callers, docs and tests. */
+export function argumentCases() {
+  if (argumentCasesCache === null) {
+    argumentCasesCache = existsSync(ARGUMENT_CASES_PATH)
+      ? JSON.parse(readFileSync(ARGUMENT_CASES_PATH, 'utf8')).mixins || {}
+      : {};
+  }
+  return argumentCasesCache;
+}
+
+/** Invocation plan for a mixin entry: {invocable, reason, call, argument_source}. */
+export function invocationPlan(name, entry, cases = argumentCases()) {
   if (!entry || !Array.isArray(entry.params)) return {invocable: false, reason: 'signature unknown', call: null};
   const required = entry.params.filter(param => param.default === null).map(param => param.name);
   const unknown = required.filter(param => !THEME_PARAMS.includes(param));
   if (unknown.length) {
+    const authentic = Object.prototype.hasOwnProperty.call(cases, name) ? cases[name] : null;
+    if (authentic && typeof authentic.call === 'string' && Array.isArray(authentic.sources) && authentic.sources.length) {
+      // Top level exactly as the cited caller wrote it; identical on both sides.
+      return {invocable: true, reason: null, call: authentic.call, argument_source: authentic.sources};
+    }
     return {invocable: false, reason: `required parameters without a predeclared argument: ${unknown.map(p => `$${p}`).join(', ')}`, call: null};
   }
   const args = required.map(() => '$__theme').join(', ');

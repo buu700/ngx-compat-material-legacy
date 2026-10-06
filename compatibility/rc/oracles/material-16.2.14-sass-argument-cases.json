@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "role": "authentic argument cases for 16.2.14 mixins whose required parameters are not a theme/config",
+  "rules": "Each call is transcribed from a 16.2.14 caller, doc example or test at the cited location. mat./local module names become the public m.* forward; a local $config/$theme derived from the caller's theme argument becomes the same derivation from the predeclared standard $__theme. Calls compile at the top level exactly as written (no probe wrapper), on both sides.",
+  "experimental_reference": {
+    "package": "@angular/material-experimental",
+    "version": "16.2.14",
+    "integrity": "sha512-vlRONqDNBUFHj4EUKXtlXA3/Rm2UZFMj2N00QsKMGJ05ixrtvMsgszqzHPPOaAk8uLNKifWl28pd5snnmLsSMA==",
+    "used_for": "the $tokens literal only"
+  },
+  "upstream_tag": {
+    "repo": "angular/components",
+    "tag": "16.2.14",
+    "commit": "df60e73"
+  },
+  "mixins": {
+    "datepicker-date-range-colors": {
+      "call": "@include m.datepicker-date-range-colors(\n  hotpink, teal, yellow, purple);\n.demo-custom-range {\n  @include m.datepicker-date-range-colors(\n    hotpink, teal, yellow, purple);\n}",
+      "sources": [
+        "angular/components@16.2.14 (df60e73) src/material/datepicker/datepicker.md:237",
+        "angular/components@16.2.14 (df60e73) src/dev-app/datepicker/datepicker-demo.scss:12"
+      ]
+    },
+    "elevation": {
+      "call": ".my-class-with-default-shadow {\n  @include m.elevation(2);\n}\n.my-class-with-custom-shadow {\n  @include m.elevation(2, #e91e63, 0.8);\n}\n.my-class {\n  @include m.elevation-transition();\n  @include m.elevation(2);\n  &:active {\n    @include m.elevation(8);\n  }\n}",
+      "sources": [
+        "angular/components@16.2.14 (df60e73) guides/elevation.md:36-44",
+        "angular/components@16.2.14 (df60e73) guides/elevation.md:61-69"
+      ]
+    },
+    "overridable-elevation": {
+      "call": ".mat-expansion-panel {\n  @include m.overridable-elevation(2);\n}",
+      "sources": [
+        "angular/components@16.2.14 (df60e73) src/material/expansion/expansion-panel.scss:11"
+      ]
+    },
+    "font-shorthand": {
+      "call": "$config: m.private-typography-to-2018-config(m.get-typography-config($__theme));\n.mat-h5,\n.mat-typography .mat-h5,\n.mat-typography h5 {\n  @include m.font-shorthand(\n    calc(#{m.font-size($config, body-2)} * 0.83),\n    m.font-weight($config, body-2),\n    m.line-height($config, body-2),\n    m.font-family($config, body-2)\n  );\n  margin: 0 0 12px;\n}",
+      "sources": [
+        "angular/components@16.2.14 (df60e73) src/material/core/typography/_typography.scss:351,395-405 (typography-hierarchy with the default '.mat-typography' selector)"
+      ]
+    },
+    "private-apply-card-theme-from-tokens": {
+      "call": "html {\n  @include m.private-apply-card-theme-from-tokens(((mdc, checkbox): (disabled-selected-checkmark-color: #fffbfe, selected-focus-state-layer-opacity: 0.12, selected-hover-state-layer-opacity: 0.08, selected-pressed-state-layer-opacity: 0.12, unselected-focus-state-layer-opacity: 0.12, unselected-hover-state-layer-opacity: 0.08, unselected-pressed-state-layer-opacity: 0.12, disabled-selected-icon-color: #1c1b1f, disabled-unselected-icon-color: #1c1b1f, selected-checkmark-color: #fff, selected-focus-icon-color: #6750a4, selected-hover-icon-color: #6750a4, selected-icon-color: #6750a4, selected-pressed-icon-color: #6750a4, unselected-focus-icon-color: #1c1b1f, unselected-hover-icon-color: #1c1b1f, unselected-icon-color: #49454f, unselected-pressed-icon-color: #1c1b1f, selected-focus-state-layer-color: #6750a4, selected-hover-state-layer-color: #6750a4, selected-pressed-state-layer-color: #1c1b1f, unselected-focus-state-layer-color: #1c1b1f, unselected-hover-state-layer-color: #1c1b1f, unselected-pressed-state-layer-color: #6750a4, state-layer-size: 40px), (mdc, elevated-card): (container-shape: 12px, container-color: #fffbfe, container-elevation: 1, container-shadow-color: #000), (mdc, outlined-card): (container-shape: 12px, outline-width: 1px, container-color: #fffbfe, outline-color: #cac4d0, container-elevation: 0, container-shadow-color: #000), (mat, card): (title-text-font: Roboto, title-text-line-height: 1.75rem, title-text-size: 1.375rem, title-text-tracking: 0rem, title-text-weight: 400, subtitle-text-font: Roboto, subtitle-text-line-height: 1.5rem, subtitle-text-size: 1rem, subtitle-text-tracking: 0.009rem, subtitle-text-weight: 500, subtitle-text-color: #1c1b1f)));\n}",
+      "sources": [
+        "angular/components@16.2.14 (df60e73) src/dev-app/theme-token-api.scss:37-43",
+        "angular/components@16.2.14 (df60e73) src/material-experimental/theming/_theming.scss:15-23"
+      ],
+      "argument_provenance": "The $tokens literal is meta.inspect(map.deep-merge(get-m3-tokens(), customizations of card())) from @angular/material-experimental@16.2.14 (the dev-app caller path). It round-trips through meta.inspect unchanged, and compiling this literal call gives byte-identical CSS to matx.theme(matx.token-defaults(matx.get-m3-tokens()), matx.card()) against the 16.2.14 reference."
+    },
+    "private-apply-checkbox-theme-from-tokens": {
+      "call": "html {\n  @include m.private-apply-checkbox-theme-from-tokens(((mdc, checkbox): (disabled-selected-checkmark-color: #fffbfe, selected-focus-state-layer-opacity: 0.12, selected-hover-state-layer-opacity: 0.08, selected-pressed-state-layer-opacity: 0.12, unselected-focus-state-layer-opacity: 0.12, unselected-hover-state-layer-opacity: 0.08, unselected-pressed-state-layer-opacity: 0.12, disabled-selected-icon-color: #1c1b1f, disabled-unselected-icon-color: #1c1b1f, selected-checkmark-color: #fff, selected-focus-icon-color: #6750a4, selected-hover-icon-color: #6750a4, selected-icon-color: #6750a4, selected-pressed-icon-color: #6750a4, unselected-focus-icon-color: #1c1b1f, unselected-hover-icon-color: #1c1b1f, unselected-icon-color: #49454f, unselected-pressed-icon-color: #1c1b1f, selected-focus-state-layer-color: #6750a4, selected-hover-state-layer-color: #6750a4, selected-pressed-state-layer-color: #1c1b1f, unselected-focus-state-layer-color: #1c1b1f, unselected-hover-state-layer-color: #1c1b1f, unselected-pressed-state-layer-color: #6750a4, state-layer-size: 40px), (mdc, elevated-card): (container-shape: 12px, container-color: #fffbfe, container-elevation: 1, container-shadow-color: #000), (mdc, outlined-card): (container-shape: 12px, outline-width: 1px, container-color: #fffbfe, outline-color: #cac4d0, container-elevation: 0, container-shadow-color: #000), (mat, card): (title-text-font: Roboto, title-text-line-height: 1.75rem, title-text-size: 1.375rem, title-text-tracking: 0rem, title-text-weight: 400, subtitle-text-font: Roboto, subtitle-text-line-height: 1.5rem, subtitle-text-size: 1rem, subtitle-text-tracking: 0.009rem, subtitle-text-weight: 500, subtitle-text-color: #1c1b1f)));\n}",
+      "sources": [
+        "angular/components@16.2.14 (df60e73) src/dev-app/theme-token-api.scss:37-43",
+        "angular/components@16.2.14 (df60e73) src/material-experimental/theming/_theming.scss:15-26"
+      ],
+      "argument_provenance": "As for private-apply-card-theme-from-tokens with checkbox(); byte-identical to matx.theme(matx.token-defaults(matx.get-m3-tokens()), matx.checkbox()) against the 16.2.14 reference."
+    },
+    "private-check-duplicate-theme-styles": {
+      "call": "$theme: m.private-legacy-get-theme($__theme);\n@include m.private-check-duplicate-theme-styles($theme, 'mat-card') {\n  $color: m.get-color-config($theme);\n  $density: m.get-density-config($theme);\n  $typography: m.get-typography-config($theme);\n  @if $color != null {\n    @include m.card-color($color);\n  }\n  @if $density != null {\n    @include m.card-density($density);\n  }\n  @if $typography != null {\n    @include m.card-typography($typography);\n  }\n}",
+      "sources": [
+        "@angular/material@16.2.14 card/_card-theme.scss:62-79 (local color/density/typography replaced by their public card-* forwards in _index.scss:96)"
+      ]
+    },
+    "private-clip-path": {
+      "call": ".mat-mdc-form-field .mdc-notched-outline__notch {\n  margin-left: -1px;\n  @include m.private-clip-path(inset(-9em -999em -9em 1px));\n  [dir='rtl'] & {\n    margin-left: 0;\n    margin-right: -1px;\n    @include m.private-clip-path(inset(-9em 1px -9em -999em));\n  }\n}",
+      "sources": [
+        "angular/components@16.2.14 (df60e73) src/material/form-field/form-field.scss:197-206"
+      ]
+    },
+    "private-color-adjust": {
+      "call": ".mat-mdc-checkbox .mdc-checkbox__background {\n  @include m.private-color-adjust(exact);\n}",
+      "sources": [
+        "angular/components@16.2.14 (df60e73) src/material/checkbox/checkbox.scss:159-162"
+      ]
+    },
+    "private-if-touch-targets-unsupported": {
+      "call": "@include m.private-if-touch-targets-unsupported(m.get-density-config($__theme)) {\n  .mat-mdc-radio-touch-target {\n    display: none;\n  }\n}\n@include m.private-if-touch-targets-unsupported(-2) {\n  .mat-mdc-radio-touch-target {\n    display: none;\n  }\n}",
+      "sources": [
+        "@angular/material@16.2.14 radio/_radio-theme.scss:66-70",
+        "angular/components@16.2.14 (df60e73) guides/theming.md:408 (documented density -2)"
+      ]
+    },
+    "private-menu-common-item-submenu-trigger": {
+      "call": ".mat-menu-item-submenu-trigger {\n  @include m.private-menu-common-item-submenu-trigger(m.$private-menu-common-side-padding);\n}",
+      "sources": [
+        "angular/components@16.2.14 (df60e73) src/material/legacy-menu/menu.scss:80-82"
+      ]
+    },
+    "private-menu-common-item-submenu-icon": {
+      "call": ".mat-menu-submenu-icon {\n  @include m.private-menu-common-item-submenu-icon(m.$private-menu-common-side-padding);\n}",
+      "sources": [
+        "angular/components@16.2.14 (df60e73) src/material/legacy-menu/menu.scss:84-86"
+      ]
+    },
+    "private-strong-focus-indicators-customize-focus-indicators": {
+      "call": "@include m.private-strong-focus-indicators-customize-focus-indicators((border-color: black, display: block), 'mat');\n@include m.private-strong-focus-indicators-customize-focus-indicators((border-color: black, display: block), 'mat-mdc');\n.mat-focus-indicator {\n  @include m.private-strong-focus-indicators-customize-focus-indicators((display: block), 'mat');\n}",
+      "sources": [
+        "@angular/material@16.2.14 core/focus-indicators/_private.scss:89-100 and 103-113 (default config merged with ())",
+        "@angular/material@16.2.14 core/focus-indicators/_private.scss:50 (display: block, 'mat')"
+      ]
+    },
+    "private-strong-focus-indicators-structural-styling": {
+      "call": "@include m.private-strong-focus-indicators-structural-styling('mat');\n@include m.private-strong-focus-indicators-structural-styling('mat-mdc');",
+      "sources": [
+        "@angular/material@16.2.14 core/_core.scss:14-15"
+      ]
+    },
+    "private-theme-elevation": {
+      "call": ".mat-edit-pane {\n  @include m.private-theme-elevation(2, m.get-color-config($__theme));\n}",
+      "sources": [
+        "angular/components@16.2.14 (df60e73) src/material-experimental/popover-edit/_popover-edit-theme.scss:10,84"
+      ]
+    },
+    "private-user-select": {
+      "call": ".mat-column-resize-overlay-thumb {\n  @include m.private-user-select(none);\n}",
+      "sources": [
+        "angular/components@16.2.14 (df60e73) src/material-experimental/column-resize/_column-resize-theme.scss:114"
+      ]
+    },
+    "private-using-mdc-theme": {
+      "call": "@include m.private-using-mdc-theme(m.get-color-config($__theme)) {}",
+      "sources": [
+        "@angular/material@16.2.14 input/_input-theme.scss:5-8"
+      ]
+    },
+    "private-using-mdc-typography": {
+      "call": "@include m.private-using-mdc-typography(m.private-typography-to-2018-config(m.get-typography-config($__theme))) {}",
+      "sources": [
+        "@angular/material@16.2.14 input/_input-theme.scss:10-14"
+      ]
+    },
+    "typography-level": {
+      "call": "$my-typography: m.define-typography-config();\n.some-class-name {\n  @include m.typography-level($my-typography, 'body-1');\n}\n[mat-edit-title] {\n  @include m.typography-level(m.private-typography-to-2014-config(m.get-typography-config($__theme)), title);\n}",
+      "sources": [
+        "angular/components@16.2.14 (df60e73) guides/typography.md:246-252",
+        "angular/components@16.2.14 (df60e73) src/material-experimental/popover-edit/_popover-edit-theme.scss:150-155"
+      ]
+    }
+  }
+}
