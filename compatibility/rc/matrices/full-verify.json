@@ -5264,7 +5264,7 @@
     {
       "check_id": "m3-coexistence",
       "required": true,
-      "implemented": false,
+      "implemented": true,
       "acceptance": {
         "gates": [
           "G07"
@@ -5280,9 +5280,20 @@
             "shared-style-boundary": null
           },
           "21.x": {
-            "inclusion-order": null,
-            "nested-lazy-overlay": null,
-            "shared-style-boundary": null
+            "inclusion-order": [
+              "current-only",
+              "legacy-only",
+              "current-then-legacy",
+              "legacy-then-current"
+            ],
+            "nested-lazy-overlay": [
+              "nested-theme-scope",
+              "lazy-body-overlay"
+            ],
+            "shared-style-boundary": [
+              "current-shared-scope",
+              "legacy-shared-scope"
+            ]
           }
         }
       }
@@ -5712,7 +5723,7 @@
     {
       "check_id": "consumer-floors",
       "required": true,
-      "implemented": false,
+      "implemented": true,
       "acceptance": {
         "gates": [
           "G12"
@@ -5729,9 +5740,24 @@
             "line-isolation": null
           },
           "21.x": {
-            "public-engines-peers": null,
-            "cli-runtime": null,
-            "line-isolation": null
+            "public-engines-peers": [
+              "engines-node",
+              "peer-@angular/core",
+              "peer-@angular/common",
+              "peer-@angular/forms",
+              "peer-@angular/platform-browser",
+              "peer-@angular/cdk",
+              "peer-@angular/material",
+              "peer-rxjs"
+            ],
+            "cli-runtime": [
+              "current-runtime-satisfies",
+              "below-floor-rejected"
+            ],
+            "line-isolation": [
+              "checkout-21-maps-to-21x",
+              "requested-main-rejected"
+            ]
           }
         }
       }

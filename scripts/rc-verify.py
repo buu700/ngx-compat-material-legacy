@@ -62,6 +62,7 @@ SCRIPT_CHECKS = {
     "scripts/migration-cli-isolation.mjs": "migration-packaged",
     "scripts/rc-test-legacy-family.mjs": "historical-legacy-artifact",
     "scripts/check-release-metadata.mjs": "release-metadata",
+    "scripts/check-consumer-floors.mjs": "consumer-floors",    "scripts/check-m3-inclusion-order.mjs": "m3-coexistence",
 }
 
 
@@ -194,6 +195,25 @@ def _file_record(path, role):
         return {'sha256': None, 'role': role, 'payload': b'directory', 'missing': False}
     payload = str(path.stat().st_mode).encode() + b'\0' + path.read_bytes()
     return {'sha256': hashlib.sha256(payload).hexdigest(), 'role': role, 'payload': payload, 'missing': False}
+
+
+
+def source_line_for_library_version(version):
+    """Map an advertised library version to the checkout line this verifier accepts.
+
+    Major 21 is the 21.x line. Major 22 is main. Any other major is not a
+    supported checkout line. A synthetic version string is not a checkout.
+    """
+    major = version.split('.', 1)[0] if isinstance(version, str) else ''
+    if major not in ('21', '22'):
+        raise EvidenceError('cannot determine the supported source line from library version')
+    return '21.x' if major == '21' else 'main'
+
+
+def require_line_matches_checkout(requested_line, checkout_line):
+    """Reject --line when it disagrees with the checkout library version's line."""
+    if checkout_line != requested_line:
+        fail('--line does not match this checkout library version')
 
 
 def observe_inputs(root):
@@ -625,6 +645,18 @@ _LINE_COORDINATOR_LIMITATIONS = {
         "Compiled CSS custom properties only. No rendered computed styles; companion-computed-styles stays a separate check.",
         "Main companion-bridge-tokens groups stay null on this branch. A 21.x run does not copy main proofs.",
         "This report is the acceptance input. It does not add a G06, G07 or G08 claim field.",
+    ],    "consumer-floors": [
+        "Coordinator report for the line being verified. Each rostered 21.x case has an assertion file written by this run.",
+        "cli-runtime executes the migrate CLI on the current Node and rejects 17.0.0 by the CLI engines range. The current runtime is not recorded as a Node 18 floor run.",
+        "line-isolation maps this checkout library version to 21.x and rejects --line main. It is not a main checkout run.",
+        "Main consumer-floors groups stay null on this branch. A 21.x run does not copy main proofs.",
+        "This report is the acceptance input. It does not add a G12 claim field.",
+    ],
+    "m3-coexistence": [
+        "Coordinator report for the line being verified. Each rostered 21.x case has an assertion file written by this run.",
+        "Contamination fixtures are rejected and are not rostered. The report keeps the executed scope ids only.",
+        "Main m3 groups stay null on this branch. A 21.x run does not copy main proofs.",
+        "This report is the acceptance input. It does not add a G07 claim field.",
     ],
 }
 
@@ -1181,6 +1213,53 @@ def main() -> int:
     )
     results["dependency-eligibility"] = "pass" if code == 0 else "fail"
     implemented_ran.append("dependency-eligibility")
+
+
+
+    # m3-coexistence: fresh 21.x workspace compile of inclusion order plus the
+    # nested/lazy/overlay and shared-style cases.
+    code = run_node(
+        "scripts/check-m3-inclusion-order.mjs",
+        ["--out", str(out_dir / "m3-inclusion-order-workspace.json")],
+    )
+    write_line_coordinator_report(
+        out_dir,
+        run_id,
+        line,
+        "m3-coexistence",
+        exit_code=code,
+        limitations=[
+            "21.x workspace compiles the four inclusion orders, nested-theme-scope, lazy-body-overlay, and separate current/legacy shared-style scopes.",
+            "Contamination fixtures are rejected and are not rostered.",
+            "Main m3 groups stay null on this branch. A 21.x run does not copy main proofs.",
+            "Does not mark m3-coexistence accepted. Does not claim G07.",
+        ],
+    )
+    results["m3-coexistence"] = "pass" if code == 0 else "fail"
+    implemented_ran.append("m3-coexistence")
+
+    # consumer-floors: library engines/peers, the migrate CLI runtime, and --line isolation.
+    code = run_node(
+        "scripts/check-consumer-floors.mjs",
+        ["--out", str(out_dir / "consumer-floors-workspace.json")],
+    )
+    write_line_coordinator_report(
+        out_dir,
+        run_id,
+        line,
+        "consumer-floors",
+        exit_code=code,
+        limitations=[
+            "Compares advertised library engines.node and peerDependencies to lock/installed versions.",
+            "Library Node floor uses toolchain-lock.json / .node-version, not process.version.",
+            "cli-runtime executes the migrate CLI on the current Node and rejects 17.0.0 by the CLI engines range. The current runtime is not recorded as a Node 18 floor run.",
+            "line-isolation maps this checkout library version to 21.x and rejects --line main. It is not a main checkout run.",
+            "Main consumer-floors groups stay null on this branch. A 21.x run does not copy main proofs.",
+            "Does not mark consumer-floors accepted. Does not claim G12.",
+        ],
+    )
+    results["consumer-floors"] = "pass" if code == 0 else "fail"
+    implemented_ran.append("consumer-floors")
 
     # release-metadata: declared name/version/license/provenance for this line.
     code = run_node(
