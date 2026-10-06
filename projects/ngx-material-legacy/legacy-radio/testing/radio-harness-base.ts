@@ -10,7 +10,6 @@
 
 import {coerceBooleanProperty} from '@angular/cdk/coercion';
 import {
-  AsyncFactoryFn,
   BaseHarnessFilters,
   ComponentHarness,
   ComponentHarnessConstructor,
@@ -164,8 +163,8 @@ export abstract class _MatRadioGroupHarnessBase<
 }
 
 export abstract class _MatRadioButtonHarnessBase extends ComponentHarness {
-  protected abstract _textLabel: AsyncFactoryFn<TestElement>;
-  protected abstract _clickLabel: AsyncFactoryFn<TestElement>;
+  protected abstract _textLabel: () => Promise<TestElement>;
+  protected abstract _clickLabel: () => Promise<TestElement>;
   private _input = this.locatorFor('input');
 
   /** Whether the radio-button is checked. */

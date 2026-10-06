@@ -9,7 +9,6 @@
  */
 
 import {
-  AsyncFactoryFn,
   ComponentHarness,
   TestElement,
 } from '@angular/cdk/testing';
@@ -17,7 +16,7 @@ import {coerceBooleanProperty} from '@angular/cdk/coercion';
 
 export abstract class _MatSlideToggleHarnessBase extends ComponentHarness {
   private _label = this.locatorFor('label');
-  protected abstract _nativeElement: AsyncFactoryFn<TestElement>;
+  protected abstract _nativeElement: () => Promise<TestElement>;
 
   /** Toggle the checked state of the slide-toggle. */
   abstract toggle(): Promise<void>;
