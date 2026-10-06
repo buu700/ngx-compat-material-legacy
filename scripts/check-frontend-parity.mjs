@@ -183,6 +183,13 @@ export function installAndNgGenerate({schematicDir, libraryPackage, angularNode,
   return {ngArgv,ngStatus:ng.status,packageName};
 }
 
+export function matrixGroups() {
+  const matrix = JSON.parse(readFileSync(matrixPath, 'utf8'));
+  const row = matrix.checks.find(item => item.check_id === 'migration-packaged');
+  if (!row) throw new Error('migration-packaged matrix row is missing');
+  return row.acceptance.cases_by_line;
+}
+
 export function assertionOutputDir() {
   const request=coordinatorRequest('migration-packaged');
   if(request?.error)throw new Error(request.error);
@@ -222,6 +229,8 @@ export function writeAssertions(outputDir, report) {
       }
     }
   }
+  const expected = groups['21.x']?.['frontend-parity'];
+  if (!Array.isArray(expected) || expected.join('\n') !== report.case_ids.join('\n')) throw new Error('frontend-parity report does not match its complete own-line roster');
   const written = [];
   const roster = new Set(report.case_ids);
   if (report.disagreements.length !== 0 && roster.size !== 0) {
