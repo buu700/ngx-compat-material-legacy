@@ -54,6 +54,12 @@ class CoordinatorTests(unittest.TestCase):
         transaction_patch = patch.object(verify, 'transaction_assertion_ok', return_value=True)
         transaction_patch.start()
         self.addCleanup(transaction_patch.stop)
+        # A deliberately non-package coordinator fixture cannot run the
+        # source-specific frontend archive checks; their real archive/value
+        # negatives are covered in test_frontend_parity.py.
+        frontend_patch = patch.object(verify, 'frontend_assertion_ok', return_value=True)
+        frontend_patch.start()
+        self.addCleanup(frontend_patch.stop)
         self.root_patch = patch.object(verify, 'ROOT', self.root)
         self.root_patch.start()
         self.addCleanup(self.root_patch.stop)
@@ -1017,13 +1023,13 @@ console.log(JSON.stringify(bodies.map((b) => [b.case_id, b.result])));
                 self._write_computed_assertions(ids, {na: changes})
                 self.assertEqual(self._computed_report()[1]["coverage"], "slice")
 
-    def test_cli_slice_does_not_claim_packaged_schematic_subject(self):
+    def test_migration_slice_binds_both_required_subjects_without_claiming_complete(self):
         path = self.f.run_dir / 'reports/migration-packaged.json'
         path.unlink()
         verify.write_check_report(self.f.run_dir, self.f.run['run_id'], 'main', 'migration-packaged', exit_code=0)
         report = acceptance.read_json(path)
-        self.assertEqual(report['subject_ids'], ['migrate-cli'])
-        self.assertEqual(set(report['artifacts']), {'migrate-cli'})
+        self.assertEqual(report['subject_ids'], ['library','migrate-cli'])
+        self.assertEqual(set(report['artifacts']), {'library','migrate-cli'})
         self.assertEqual(report['coverage'], 'slice')
 
     def test_full_child_report_not_overwritten_by_process_wrapper(self):

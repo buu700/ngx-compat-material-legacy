@@ -1,150 +1,53 @@
-#!/usr/bin/env python3
-"""Packaged CLI and ng generate rewrite the same fixture bytes."""
-from __future__ import annotations
-
+"""Frontend binding negatives remain cheap; Actions executes real ng generate."""
+import copy
+import hashlib
+import io
 import json
-import os
-import subprocess
-import tempfile
-import unittest
 from pathlib import Path
-
-ROOT = Path(__file__).resolve().parents[1]
-MATRIX = ROOT / "compatibility/rc/matrices/full-verify.json"
-CATALOG = ROOT / "fixtures/migration/cases.json"
-
-
-def expected_ids() -> list[str]:
-    catalog = json.loads(CATALOG.read_text())
-    ids = []
-    for case in catalog["cases"]:
-        expected = case.get("expected_after")
-        if isinstance(expected, str) and expected != case.get("before") and case.get("expect_ok") is not False:
-            ids.append(f"frontend-parity/{case['id']}")
-    return ids
-
+import subprocess
+import sys
+import tarfile
+import tempfile
+from types import SimpleNamespace
+import unittest
+ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'scripts'))
+from migration_frontend_admission import frontend_assertion_ok,SCHEMATIC_FILES,CLI_FILES
+from migration_workspace_admission import old_workspace_ids
+from migration_frontend_fixture import frontend_receipt
 
 class FrontendParityTests(unittest.TestCase):
-    def test_21x_binding_does_not_receive_assertions(self):
-        script = r"""
-import {assertionOutputDir} from './scripts/check-frontend-parity.mjs';
-console.log(JSON.stringify(assertionOutputDir()));
-"""
-        env = os.environ.copy()
-        env.update({
-            "RC_CHECK_ID": "migration-packaged",
-            "RC_RUN_ID": "not-a-21x-run",
-            "RC_INVOCATION_ID": "frontendparity21",
-            "RC_EVIDENCE_BINDING": json.dumps({"source_line": "21.x"}),
-            "RC_ASSERTION_OUTPUT_DIR": "/tmp/does-not-matter",
-        })
-        result = subprocess.run(
-            ["node", "--input-type=module", "-e", script],
-            cwd=ROOT,
-            text=True,
-            capture_output=True,
-            check=False,
-            env=env,
-        )
-        self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
-        self.assertEqual(result.stdout.strip(), "null")
-
-    @unittest.skipUnless((ROOT / 'node_modules/@angular/cli/bin/ng.js').is_file(), 'Angular CLI is not installed; full verify runs ng generate')
-    def test_packaged_frontends_match(self):
-        source = (ROOT / "scripts/check-frontend-parity.mjs").read_text()
-        self.assertNotIn("SchematicTestRunner", source)
-        self.assertNotIn("rewriteLegacyTypescriptImports", source)
-        self.assertNotIn("rewriteSassModuleSource", source)
-        self.assertNotIn("migration-schematic-runner.mjs", source)
-        ids = expected_ids()
+    def test_required_run_and_no_repack_or_alternate_runtime(self):
+        code=r'''
+import assert from 'node:assert/strict';
+import {parseFrontendArgs,ensureAngularNode} from './scripts/check-frontend-parity.mjs';
+import {readFileSync} from 'node:fs';
+for(const args of [[],['--out','/tmp/no-run'],['--library-tarball','/tmp/fallback'],['--run','x','--run','y']])assert.throws(()=>parseFrontendArgs(args));
+const tools=JSON.parse(readFileSync('toolchain-lock.json'));
+if(process.versions.node!==tools.repository.node)assert.throws(()=>ensureAngularNode(),/pinned private Node/);
+else assert.equal(ensureAngularNode(),process.execPath);
+'''
+        result=subprocess.run(['node','--input-type=module','-e',code],cwd=ROOT,text=True,capture_output=True);self.assertEqual(result.returncode,0,result.stderr)
+        for script in ['check-frontend-parity.mjs','check-packaged-schematic.mjs']:
+            result=subprocess.run(['node','scripts/'+script,'--out','/tmp/not-written-frontends.json'],cwd=ROOT,text=True,capture_output=True)
+            self.assertNotEqual(result.returncode,0);self.assertIn('--run requires a path',result.stderr)
+    def test_real_archive_identities_and_fixed_fixture_values_admit_only_own_bound_routes(self):
         with tempfile.TemporaryDirectory() as tmp:
-            tmp_path = Path(tmp)
-            out = tmp_path / "frontend-parity.json"
-            invocation = "frontendparity"
-            assertion_dir = tmp_path / "evidence" / "migration-packaged" / invocation
-            assertion_dir.mkdir(parents=True)
-            env = os.environ.copy()
-            env.update({
-                "RC_CHECK_ID": "migration-packaged",
-                "RC_RUN_ID": "frontend-parity",
-                "RC_INVOCATION_ID": invocation,
-                "RC_EVIDENCE_BINDING": json.dumps({"source_line": "main"}),
-                "RC_ASSERTION_OUTPUT_DIR": str(assertion_dir),
-            })
-            result = subprocess.run(
-                ["node", "scripts/check-frontend-parity.mjs", "--out", str(out)],
-                cwd=ROOT,
-                text=True,
-                capture_output=True,
-                check=False,
-                env=env,
-            )
-            self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
-            report = json.loads(out.read_text())
-            assertions = {
-                path.stem: json.loads(path.read_text())
-                for path in assertion_dir.iterdir()
-            }
-        self.assertEqual(report["case_ids"], ids)
-        self.assertEqual(report["disagreements"], [])
-        self.assertTrue(report["same_fixture"])
-        self.assertFalse(report["transform_import"])
-        self.assertFalse(report["schematic_test_runner"])
-        self.assertEqual(report["schematic_host"], "ng-generate")
-        self.assertEqual(report["schematic_collection"], "@ngx-compat/material-legacy:migrate-legacy")
-        self.assertEqual(report["cli_bin"], "package/bin/migrate-legacy.js")
-        self.assertEqual(report["coverage"], "slice")
-        self.assertEqual(report["g04_claim"], "not-passed")
-        self.assertEqual(report["g05_claim"], "not-passed")
-        self.assertIsNone(report["not_rostered"]["packaged-schematic"])
-        for group, group_ids in report["cases_by_line_21x"].items():
-            self.assertIsNone(group_ids, group)
-        self.assertIn("--apply", report["commands"]["cli"])
-        self.assertIn("package/bin/migrate-legacy.js", report["commands"]["cli"])
-        self.assertIn("generate", report["commands"]["schematic"])
-        self.assertIn("@ngx-compat/material-legacy:migrate-legacy", report["commands"]["schematic"])
-        self.assertNotIn("approved", report)
-        self.assertEqual(sorted(assertions), sorted(case_id.replace("/", "__") for case_id in ids))
-        for case_id in ids:
-            body = assertions[case_id.replace("/", "__")]
-            self.assertEqual(body["case_id"], case_id)
-            self.assertEqual(body["result"], "pass")
-            self.assertEqual(body["kind"], "assertion")
-            self.assertEqual(body["line"], "main")
-            self.assertEqual(body["group"], "frontend-parity")
-            self.assertTrue(body["outputs_match"])
-            self.assertTrue(body["rewritten"])
-            self.assertEqual(body["cli_after_sha256"], body["schematic_after_sha256"])
-            self.assertEqual(body["after_sha256"], body["cli_after_sha256"])
-            self.assertFalse(body["schematic_test_runner"])
-            self.assertEqual(body["schematic_host"], "ng-generate")
-            self.assertFalse(body["transform_import"])
-            self.assertEqual(body["g04_claim"], "not-passed")
-            self.assertEqual(body["g05_claim"], "not-passed")
-            self.assertNotIn("approved", body)
-            self.assertIsNone(body["not_rostered"]["packaged-schematic"])
-            self.assertIsNone(body["not_rostered"]["21.x"])
-
-        matrix = json.loads(MATRIX.read_text())
-        row = next(item for item in matrix["checks"] if item["check_id"] == "migration-packaged")
-        main = row["acceptance"]["cases_by_line"]["main"]
-        self.assertEqual(main["frontend-parity"], ids)
-        packaged = [item.replace("frontend-parity/", "packaged-schematic/", 1) for item in ids]
-        self.assertEqual(main["packaged-schematic"], packaged)
-        self.assertFalse(set(main["packaged-schematic"]) & set(ids))
-        self.assertFalse(set(main["packaged-schematic"]) & set(main["old-workspace-cli"]))
-        self.assertFalse(set(main["packaged-schematic"]) & set(main["transaction-negatives"]))
-        self.assertEqual(main["old-workspace-cli"][0], "legacy-named-alias")
-        self.assertEqual(main["transaction-negatives"][0], "blocked-file-writes-nothing")
-        for group, group_ids in row["acceptance"]["cases_by_line"]["21.x"].items():
-            self.assertIsNone(group_ids, group)
-        verify = (ROOT / "scripts/rc-verify.py").read_text()
-        self.assertIn("scripts/check-frontend-parity.mjs", verify)
-        self.assertIn("Does not mark migration-packaged accepted", verify)
-        self.assertIn("packaged-schematic compares ng generate output with expected_after", verify)
-        self.assertNotIn("packaged-schematic stays null", verify)
-        self.assertNotIn("migration-schematic-runner.mjs", verify)
-
-
-if __name__ == "__main__":
-    unittest.main()
+            directory=Path(tmp);artifacts=[]
+            for id,names in [('library',SCHEMATIC_FILES),('migrate-cli',CLI_FILES)]:
+                archive=directory/(id+'.tgz')
+                with tarfile.open(archive,'w:gz') as t:
+                    for name in names:
+                        data=('synthetic support file '+name).encode();info=tarfile.TarInfo(name);info.size=len(data);t.addfile(info,io.BytesIO(data))
+                artifacts.append(dict(id=id,path=archive.name,bytes=archive.stat().st_size,sha256=hashlib.sha256(archive.read_bytes()).hexdigest()))
+            for line in ['main','21.x']:
+                active=SimpleNamespace(binding={'source_line':line},manifest={'run_id':'synthetic','artifacts':artifacts},run_dir=directory)
+                for group in ['frontend-parity','packaged-schematic']:
+                    for fixture in old_workspace_ids(ROOT):
+                        body=frontend_receipt(ROOT,active,group+'/'+fixture,'synthetic-invocation')
+                        self.assertTrue(frontend_assertion_ok(ROOT,active,body,'synthetic-invocation'),body['case_id'])
+                        for key,value in [('line','foreign'),('binding',{}),('artifacts',{}),('schematic_support_files',[]),('after','wrong-but-nonempty'),('node_version','99.0.0')]:
+                            bad=copy.deepcopy(body);bad[key]=value
+                            self.assertFalse(frontend_assertion_ok(ROOT,active,bad,'synthetic-invocation'),(body['case_id'],key))
+                body=frontend_receipt(ROOT,active,'frontend-parity/'+next(iter(old_workspace_ids(ROOT))),'synthetic-invocation');body['cli_support_files']=[]
+                self.assertFalse(frontend_assertion_ok(ROOT,active,body,'synthetic-invocation'))
+if __name__=='__main__':unittest.main()

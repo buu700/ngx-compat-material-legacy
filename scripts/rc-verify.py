@@ -34,6 +34,7 @@ from archive_run_closure import ClosureError, write_closure
 from owned_rendered_admission import owned_rendered_ok
 from migration_workspace_admission import old_workspace_assertion_ok
 from migration_transaction_admission import transaction_assertion_ok
+from migration_frontend_admission import frontend_assertion_ok
 from sass_function_admission import function_assertion_ok
 from m3_rendered_admission import complete_rendered_checks
 from consumer_floor_admission import floor_assertion_ok, floor_support_records
@@ -106,12 +107,6 @@ class RunEvidence:
 
     def subject(self, check_id):
         _, kind, ids, _ = CHECK_CONTRACT[check_id]
-        if check_id == 'migration-packaged':
-            # frontend-parity and packaged-schematic both run ng generate of the
-            # packed library. coverage stays slice and every 21.x migration group
-            # stays unresolved, so this slice still does not claim the library as
-            # an acceptance subject and does not claim G04 or G05.
-            ids = ('migrate-cli',)
         artifacts = {
             item['id']: {'sha256': item['sha256'], 'bytes': item['bytes']}
             for item in self.manifest.get('artifacts', []) if item['id'] in ids
@@ -694,7 +689,7 @@ def _migration_assertion_records(run_dir: Path, invocation: str, expected: list[
             if isinstance(case_id, str) and case_id in found:
                 return None
             continue
-        if not old_workspace_assertion_ok(ROOT, ACTIVE_RUN, body, invocation) or not transaction_assertion_ok(ROOT, ACTIVE_RUN, body, invocation):
+        if not old_workspace_assertion_ok(ROOT, ACTIVE_RUN, body, invocation) or not transaction_assertion_ok(ROOT, ACTIVE_RUN, body, invocation) or not frontend_assertion_ok(ROOT, ACTIVE_RUN, body, invocation):
             continue
         relative = path.relative_to(run_dir).as_posix()
         if not relative.startswith(prefix + "/"):
@@ -1515,11 +1510,11 @@ def main() -> int:
     )
     code_parity = run_node(
         "scripts/check-frontend-parity.mjs",
-        ["--library-tarball", str(tarball), "--out", str(out_dir / "frontend-parity.json")],
+        ["--run", str(run_path), "--out", str(out_dir / "frontend-parity.json")],
     )
     code_schematic = run_node(
         "scripts/check-packaged-schematic.mjs",
-        ["--library-tarball", str(tarball), "--out", str(out_dir / "packaged-schematic.json")],
+        ["--run", str(run_path), "--out", str(out_dir / "packaged-schematic.json")],
     )
     code = 0 if code_verify == 0 and code_iso == 0 and code_workspace == 0 and code_tx == 0 and code_parity == 0 and code_schematic == 0 else (code_verify or code_iso or code_workspace or code_tx or code_parity or code_schematic or 1)
     write_migration_packaged_report(

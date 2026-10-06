@@ -1,3 +1,4 @@
+import {extractPackageArchive} from './safe-package-extract.mjs';
 /**
  * Resolve a draft --run manifest to a rehashed library tarball and extract it.
  *
@@ -118,19 +119,10 @@ export function resolveLibraryFromRun(runManifestPath, {tarball: tarballOverride
  * (the directory that contains package.json).
  */
 export function extractLibraryPackage(tarball, {parentDir = null} = {}) {
-  const base = parentDir
-    ? join(parentDir, 'extracted')
-    : join(tmpdir(), 'ngx-legacy-artifact-');
-  if (parentDir) {
-    mkdirSync(parentDir, {recursive: true});
-    rmSync(base, {recursive: true, force: true});
-    mkdirSync(base, {recursive: true});
-  }
-  const extractRoot = parentDir ? base : mkdtempSync(base);
-  const tar = spawnSync('tar', ['-xzf', tarball, '-C', extractRoot], {encoding: 'utf8'});
-  if (tar.status !== 0) {
-    fail(1, `Failed to extract library tarball: ${tar.stderr || tar.stdout || 'tar error'}`);
-  }
+  const base=parentDir ? resolve(parentDir) : tmpdir();
+  mkdirSync(base,{recursive:true});
+  const extractRoot=mkdtempSync(join(base,'ngx-legacy-artifact-'));
+  extractPackageArchive(tarball,extractRoot);
   const packageRoot = join(extractRoot, 'package');
   if (!existsSync(join(packageRoot, 'package.json'))) {
     fail(1, `Extracted tarball is missing package/package.json under ${extractRoot}`);

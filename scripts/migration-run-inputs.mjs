@@ -1,6 +1,6 @@
 /** Exact run artifacts for the old-workspace migration; no dist fallback. */
 import {createHash} from 'node:crypto';
-import {spawnSync} from 'node:child_process';
+import {extractPackageArchive} from './safe-package-extract.mjs';
 import {lstatSync, readFileSync} from 'node:fs';
 import {dirname, isAbsolute, join, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -34,20 +34,7 @@ export function resolveMigrationRun(runPath) {
   return {run, runDir, line, request, artifacts};
 }
 export function extractMigrationCli(input, destination) {
-  // Validate all members before extraction; no symlink/hardlink/device paths are allowed.
-  const python = `import sys,tarfile,pathlib
-with tarfile.open(sys.argv[1]) as t:
- members=t.getmembers(); seen=set(); total=0
- if not members or len(members)>1000: raise ValueError('CLI member count')
- for m in members:
-  p=pathlib.PurePosixPath(m.name)
-  if p.is_absolute() or '..' in p.parts or not p.parts or p.parts[0]!='package' or m.name in seen or not (m.isdir() or m.isfile()): raise ValueError('unsafe CLI member')
-  seen.add(m.name); total+=m.size
-  if total>10*1024*1024: raise ValueError('CLI size')
- t.extractall(sys.argv[2],filter='data')
-`;
-  const extracted = spawnSync('python3', ['-c', python, input.artifacts['migrate-cli'].absolute, destination], {encoding: 'utf8', timeout: 30000});
-  if (extracted.status !== 0) throw new Error(`CLI extraction refused: ${extracted.stderr}`);
+  extractPackageArchive(input.artifacts['migrate-cli'].absolute,destination,{maxFiles:1000,maxBytes:10*1024*1024});
   const packageRoot = join(destination, 'package');
   const manifest = JSON.parse(readFileSync(join(packageRoot, 'package.json'), 'utf8'));
   if (manifest.name !== '@ngx-compat/material-legacy-migrate-cli' || lineForPackageVersion(manifest.version) !== input.line

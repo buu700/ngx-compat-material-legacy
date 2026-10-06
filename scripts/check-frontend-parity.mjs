@@ -3,7 +3,7 @@
  * Frontend parity for migration-packaged on main.
  *
  * Runs two frontends on copies of one temp fixture:
- *   1. package/bin/migrate-legacy.js extracted from the committed CLI tarball
+ *   1. package/bin/migrate-legacy.js extracted from the exact run CLI tarball
  *   2. ng generate of migrate-legacy from the packed library tarball, installed
  *      into a real Angular workspace
  *
@@ -13,9 +13,12 @@
  * packaged-schematic is not rostered. Every 21.x migration group stays null.
  * Does not claim G04 or G05.
  *
- *   node scripts/check-frontend-parity.mjs --out <report.json> [--library-tarball <library.tgz>]
+ *   node scripts/check-frontend-parity.mjs --out <report.json> --run <run.json>
  */
 import {createHash} from 'node:crypto';
+import {resolveMigrationRun,extractMigrationCli} from './migration-run-inputs.mjs';
+import {extractPackageArchive} from './safe-package-extract.mjs';
+import {coordinatorRequest} from './packed-consumer-evidence.mjs';
 import {spawnSync} from 'node:child_process';
 import {
   cpSync,
@@ -27,16 +30,13 @@ import {
   rmSync,
   writeFileSync,
 } from 'node:fs';
-import {homedir, tmpdir} from 'node:os';
+import {tmpdir} from 'node:os';
 import {dirname, join, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const catalogPath = join(root, 'fixtures/migration/cases.json');
 const matrixPath = join(root, 'compatibility/rc/matrices/full-verify.json');
-const cliTarballRelative = 'migration/dist/ngx-compat-material-legacy-migrate-cli-22.0.0-rc.0.tgz';
-const cliTarball = join(root, cliTarballRelative);
-const distPackage = join(root, 'dist/ngx-material-legacy');
 const ngJs = join(root, 'node_modules/@angular/cli/bin/ng.js');
 const defaultReport = join(root, 'compatibility/rc/reports/migration-frontend-parity.json');
 
@@ -95,77 +95,24 @@ export function readNodeVersion(bin) {
 }
 
 export function ensureAngularNode() {
-  const version = readNodeVersion(process.execPath);
-  if (version && nodeVersionSupported(version)) return process.execPath;
-  const candidates = [
-    join(homedir(), 'node22', 'bin', 'node'),
-    join(tmpdir(), 'ngx-compat-node-v22.22.3', 'bin', 'node'),
-  ];
-  for (const candidate of candidates) {
-    if (!existsSync(candidate)) continue;
-    const found = readNodeVersion(candidate);
-    if (found && nodeVersionSupported(found)) return candidate;
-  }
-  const dest = join(tmpdir(), 'ngx-compat-node-v22.22.3');
-  const archive = join(tmpdir(), 'node-v22.22.3-linux-x64.tar.gz');
-  if (process.platform !== 'linux' || process.arch !== 'x64') {
-    throw new Error(`Angular CLI needs Node ^22.22.3 || ^24.15.0 || >=26 and no such binary is available on ${process.platform}-${process.arch}`);
-  }
-  if (!existsSync(archive)) {
-    const curl = spawnSync('curl', ['-fsSL', '-o', archive, 'https://nodejs.org/dist/v22.22.3/node-v22.22.3-linux-x64.tar.gz'], {encoding: 'utf8'});
-    if (curl.status !== 0) {
-      throw new Error(curl.stderr || 'failed to download Node 22.22.3 for ng generate');
-    }
-  }
-  mkdirSync(dest, {recursive: true});
-  const extracted = spawnSync('tar', ['-xzf', archive, '-C', dest, '--strip-components=1'], {encoding: 'utf8'});
-  if (extracted.status !== 0) throw new Error(extracted.stderr || 'failed to extract Node 22.22.3');
-  const cached = join(dest, 'bin', 'node');
-  const found = readNodeVersion(cached);
-  if (!found || !nodeVersionSupported(found)) throw new Error('extracted Node does not satisfy the Angular CLI');
-  return cached;
+  const tools=JSON.parse(readFileSync(join(root,'toolchain-lock.json'),'utf8'));
+  if (process.versions.node!==tools.repository.node) throw new Error('migration frontends require the pinned private Node runtime; no alternate download or cache fallback');
+  return process.execPath;
 }
 
-function parseArgs(argv) {
-  let out = defaultReport;
-  let libraryTarball = null;
-  for (let i = 0; i < argv.length; i += 1) {
-    const arg = argv[i];
-    if (arg === '--out' || arg === '--library-tarball') {
-      const value = argv[i + 1];
-      if (!value || value.startsWith('-')) fail(`${arg} requires a path`);
-      if (arg === '--out') out = resolve(value);
-      else libraryTarball = resolve(value);
-      i += 1;
-      continue;
-    }
-    fail(`Unknown argument: ${arg}`);
+export function parseFrontendArgs(argv,{defaultOutput=defaultReport}={}) {
+  let out=defaultOutput,runPath=null;
+  const seen=new Set();
+  for(let i=0;i<argv.length;i+=2){
+    const flag=argv[i],value=argv[i+1];
+    if(!['--run','--out'].includes(flag)||!value||value.startsWith('-')||seen.has(flag)) throw new Error('expected one --run and optional --out');
+    seen.add(flag);if(flag==='--run')runPath=resolve(value);else out=resolve(value);
   }
-  return {out, libraryTarball};
+  if(!runPath)throw new Error('--run requires a path; no workspace repack or committed CLI fallback');
+  if(existsSync(out))throw new Error('refusing to overwrite frontend report');
+  return {out,runPath};
 }
-
-export function packLibrary(destination) {
-  if (!existsSync(join(distPackage, 'package.json'))) {
-    throw new Error('dist/ngx-material-legacy is missing; pass --library-tarball');
-  }
-  mkdirSync(destination, {recursive: true});
-  const packed = spawnSync('npm', ['pack', distPackage, '--json', '--pack-destination', destination], {
-    cwd: root,
-    encoding: 'utf8',
-  });
-  if (packed.status !== 0) throw new Error(packed.stderr || packed.stdout || 'npm pack failed');
-  const parsed = JSON.parse(packed.stdout);
-  const entry = Array.isArray(parsed) ? parsed[0] : parsed;
-  if (!entry || typeof entry.filename !== 'string') throw new Error('npm pack did not name a tarball');
-  return join(destination, entry.filename);
-}
-
-export function extractTarball(tarball, destination) {
-  mkdirSync(destination, {recursive: true});
-  const extracted = spawnSync('tar', ['-xzf', tarball, '-C', destination], {encoding: 'utf8'});
-  if (extracted.status !== 0) throw new Error(extracted.stderr || `tar extract failed: ${tarball}`);
-  return join(destination, 'package');
-}
+export function extractTarball(tarball,destination){return extractPackageArchive(tarball,destination);}
 
 export function writeFixture(dir, cases) {
   mkdirSync(join(dir, 'src'), {recursive: true});
@@ -189,6 +136,12 @@ function snapshot(files) {
 }
 
 
+export function schematicIdentities(packageRoot) {
+  return ['package.json','schematics/package.json','schematics/collection.json','schematics/migrate-legacy/schema.json','schematics/migrate-legacy/index.js','schematics/migrate-legacy/ts-rewrite.js','schematics/migrate-legacy/sass-rewrite.js'].map(path=>{
+    const bytes=readFileSync(join(packageRoot,path));return {path:'package/'+path,sha256:sha256(bytes),bytes:bytes.length};
+  });
+}
+
 export function installAndNgGenerate({schematicDir, libraryPackage, angularNode, flags, packageName = 'frontend-parity-fixture'}) {
   const installed = join(schematicDir, 'node_modules/@ngx-compat/material-legacy');
   mkdirSync(dirname(installed), {recursive: true});
@@ -204,6 +157,7 @@ export function installAndNgGenerate({schematicDir, libraryPackage, angularNode,
   writeFileSync(join(schematicDir, 'package.json'), packageJson);
   writeFileSync(join(schematicDir, 'angular.json'), angularJson);
   const installedCollection = readFileSync(join(installed, 'schematics/collection.json'));
+  const installedSupport=schematicIdentities(installed);
   const ngArgv = [
     angularNode,
     ngJs,
@@ -225,49 +179,14 @@ export function installAndNgGenerate({schematicDir, libraryPackage, angularNode,
   if (!readFileSync(join(installed, 'schematics/collection.json')).equals(installedCollection)) {
     throw new Error('ng generate changed the installed collection');
   }
-  return {ngArgv, ngStatus: ng.status, packageName};
+  if(JSON.stringify(schematicIdentities(installed))!==JSON.stringify(installedSupport))throw new Error('ng generate changed packed schematic support files');
+  return {ngArgv,ngStatus:ng.status,packageName};
 }
 
 export function assertionOutputDir() {
-  const names = ['RC_CHECK_ID', 'RC_RUN_ID', 'RC_INVOCATION_ID', 'RC_EVIDENCE_BINDING', 'RC_ASSERTION_OUTPUT_DIR'];
-  const present = names.filter(name => process.env[name]);
-  if (present.length === 0) return null;
-  if (present.length !== names.length || process.env.RC_CHECK_ID !== 'migration-packaged') {
-    fail('frontend-parity: incomplete coordinator environment');
-  }
-  let binding;
-  try {
-    binding = JSON.parse(process.env.RC_EVIDENCE_BINDING);
-  } catch {
-    fail('frontend-parity: RC_EVIDENCE_BINDING is not JSON');
-  }
-  if (!binding || typeof binding !== 'object' || Array.isArray(binding)) {
-    fail('frontend-parity: binding is not an object');
-  }
-  if (binding.source_line === '21.x') return null;
-  if (binding.source_line !== 'main') fail('frontend-parity: binding source line is not main');
-  const outputDir = process.env.RC_ASSERTION_OUTPUT_DIR;
-  let stat;
-  try {
-    stat = lstatSync(outputDir);
-  } catch {
-    fail('frontend-parity: assertion output directory is missing');
-  }
-  if (!stat.isDirectory() || stat.isSymbolicLink()) {
-    fail('frontend-parity: assertion output directory is not a real directory');
-  }
-  const invocation = process.env.RC_INVOCATION_ID;
-  if (!outputDir.endsWith(join('evidence', 'migration-packaged', invocation))) {
-    fail('frontend-parity: assertion directory is not check-owned');
-  }
-  return outputDir;
-}
-
-function matrixGroups() {
-  const matrix = JSON.parse(readFileSync(matrixPath, 'utf8'));
-  const row = matrix.checks.find(item => item.check_id === 'migration-packaged');
-  if (!row) throw new Error('migration-packaged matrix row is missing');
-  return row.acceptance.cases_by_line;
+  const request=coordinatorRequest('migration-packaged');
+  if(request?.error)throw new Error(request.error);
+  return request?.outputDir ?? null;
 }
 
 export function writeAssertions(outputDir, report) {
@@ -323,6 +242,10 @@ export function writeAssertions(outputDir, report) {
       kind: 'assertion',
       line: 'main',
       group: 'frontend-parity',
+      check_id:'migration-packaged',exit_code:0,run_id:report.run_id,invocation_id:report.invocation_id,binding:report.binding,
+      artifacts:report.artifacts,cli_support_files:report.cli_support_files,schematic_support_files:report.schematic_support_files,
+      before:change.before,after:change.after,node_version:report.node_version,
+      node_binary:report.node_binary,
       path: change.path,
       before_sha256: change.before_sha256,
       after_sha256: change.after_sha256,
@@ -355,7 +278,8 @@ export function writeAssertions(outputDir, report) {
   return written;
 }
 
-export function executeFrontendParity(libraryTarball) {
+export function executeFrontendParity(runPath) {
+  const input=resolveMigrationRun(runPath);
   if (!existsSync(ngJs)) throw new Error('Angular CLI ng.js is missing');
   const catalog = JSON.parse(readFileSync(catalogPath, 'utf8'));
   const cases = rewriteCases(catalog);
@@ -367,12 +291,13 @@ export function executeFrontendParity(libraryTarball) {
     throw new Error('refusing to build the disposable fixture inside the repository');
   }
   try {
-    const cliPackage = extractTarball(cliTarball, join(work, 'cli-package'));
-    const cliBin = join(cliPackage, 'bin/migrate-legacy.js');
+    const staged=extractMigrationCli(input,join(work,'cli-package'));
+    const cliBin=staged.bin;
     const cliBytes = readFileSync(cliBin);
-    const librarySource = libraryTarball || packLibrary(join(work, 'pack'));
+    const librarySource=input.artifacts.library.absolute;
     const libraryBytes = readFileSync(librarySource);
     const libraryPackage = extractTarball(librarySource, join(work, 'library-package'));
+    const schematicSupport=schematicIdentities(libraryPackage);
     const schematicPackage = JSON.parse(readFileSync(join(libraryPackage, 'schematics/package.json'), 'utf8'));
     if (schematicPackage.type !== 'commonjs') {
       throw new Error('packed schematics/package.json must set type commonjs');
@@ -466,11 +391,15 @@ export function executeFrontendParity(libraryTarball) {
       schematic_cwd: '<angular-workspace-copy>',
     };
 
+    for(const a of Object.values(input.artifacts)){const bytes=readFileSync(a.absolute);if(bytes.length!==a.bytes||sha256(bytes)!==a.sha256)throw new Error('run artifact changed during frontend execution');}
     return {
       schema_version: 1,
       role: 'packaged CLI and packaged schematic frontend parity',
       check_id: 'migration-packaged',
       group: 'frontend-parity',
+      run_id:input.run.run_id,invocation_id:input.request?.invocation ?? null,binding:input.request?.binding ?? null,
+      artifacts:Object.fromEntries(Object.entries(input.artifacts).map(([id,a])=>[id,{sha256:a.sha256,bytes:a.bytes}])),
+      cli_support_files:staged.identities,schematic_support_files:schematicSupport,
       line: 'main',
       coverage: 'slice',
       result: 'pass',
@@ -483,10 +412,11 @@ export function executeFrontendParity(libraryTarball) {
       cli_bin: 'package/bin/migrate-legacy.js',
       cli_sha256: sha256(cliBytes),
       cli_bytes: cliBytes.length,
-      cli_tarball: cliTarballRelative,
-      library_tarball: libraryTarball ? libraryTarball : 'dist/ngx-material-legacy (npm pack)',
+      cli_tarball: input.artifacts['migrate-cli'].path,
+      library_tarball: input.artifacts.library.path,
       library_tarball_sha256: sha256(libraryBytes),
       library_tarball_bytes: libraryBytes.length,
+      node_binary:angularNode,node_version:readNodeVersion(angularNode),
       same_fixture: true,
       fixture_copies: ['cli-copy', 'schematic-copy'],
       acknowledgement_flags: flags,
@@ -513,7 +443,7 @@ export function executeFrontendParity(libraryTarball) {
         'frontend-parity': null,
       },
       limitations: [
-        'Compares package/bin/migrate-legacy.js from the committed CLI tarball with ng generate of the collection installed from the packed library tarball.',
+        'Compares package/bin/migrate-legacy.js from the exact run CLI tarball with ng generate of the collection installed from the packed library tarball.',
         'Both frontends receive copies of one temp fixture. The copies are byte-identical before either frontend runs. Applying on one tree would hide the second frontend.',
         'An in-memory schematic host is not used. packaged-schematic is not rostered.',
         'Case ids are prefixed with frontend-parity/ because the matrix rejects a case id that already appears in old-workspace-cli.',
@@ -527,10 +457,10 @@ export function executeFrontendParity(libraryTarball) {
 }
 
 function main(argv) {
-  const {out, libraryTarball} = parseArgs(argv);
+  const {out,runPath}=parseFrontendArgs(argv);
   let report;
   try {
-    report = executeFrontendParity(libraryTarball);
+    report = executeFrontendParity(runPath);
   } catch (error) {
     fail(error instanceof Error ? error.message : String(error));
   }
