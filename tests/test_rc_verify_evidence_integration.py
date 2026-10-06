@@ -48,6 +48,12 @@ class CoordinatorTests(unittest.TestCase):
         write_json(self.root / "compatibility/rc/matrices/full-verify.json", acceptance.read_json(ROOT / "compatibility/rc/matrices/full-verify.json"))
         write_json(self.root / "compatibility/rc/consumer-floor-plan.json", acceptance.read_json(ROOT / "compatibility/rc/consumer-floor-plan.json"))
         self.run = verify.RunEvidence(self.f.run, self.f.run_dir, self.f.matrix_sha)
+        # These coordinator tests use deliberately non-package artifact bytes.
+        # Source-specific transaction admission is tested through the real CLI
+        # and tampered receipts in test_migration_transaction.py.
+        transaction_patch = patch.object(verify, 'transaction_assertion_ok', return_value=True)
+        transaction_patch.start()
+        self.addCleanup(transaction_patch.stop)
         self.root_patch = patch.object(verify, 'ROOT', self.root)
         self.root_patch.start()
         self.addCleanup(self.root_patch.stop)

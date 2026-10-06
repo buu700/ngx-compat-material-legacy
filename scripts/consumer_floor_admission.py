@@ -101,7 +101,7 @@ def floor_assertion_ok(root: Path, active, body: dict, invocation: str) -> bool:
         else:
             cli = body['cli']
             files = cli['support_files']
-            if set(files) != {'bin/migrate-legacy.js','lib/ts-rewrite.js','lib/sass-rewrite.js','package.json'} or not all(HEX.fullmatch(v) for v in files.values()):
+            if set(files) != {'bin/migrate-legacy.js','lib/ts-rewrite.js','lib/sass-rewrite.js','lib/transaction-write.js','package.json'} or not all(HEX.fullmatch(v) for v in files.values()):
                 return False
             if cli['cli_bin_sha256'] != files['bin/migrate-legacy.js']:
                 return False

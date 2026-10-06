@@ -33,6 +33,7 @@ from rc_acceptance import (
 from archive_run_closure import ClosureError, write_closure
 from owned_rendered_admission import owned_rendered_ok
 from migration_workspace_admission import old_workspace_assertion_ok
+from migration_transaction_admission import transaction_assertion_ok
 from m3_rendered_admission import complete_rendered_checks
 from consumer_floor_admission import floor_assertion_ok, floor_support_records
 
@@ -692,7 +693,7 @@ def _migration_assertion_records(run_dir: Path, invocation: str, expected: list[
             if isinstance(case_id, str) and case_id in found:
                 return None
             continue
-        if not old_workspace_assertion_ok(ROOT, ACTIVE_RUN, body, invocation):
+        if not old_workspace_assertion_ok(ROOT, ACTIVE_RUN, body, invocation) or not transaction_assertion_ok(ROOT, ACTIVE_RUN, body, invocation):
             continue
         relative = path.relative_to(run_dir).as_posix()
         if not relative.startswith(prefix + "/"):
@@ -1494,11 +1495,10 @@ def main() -> int:
     results["engine-free-consumer"] = "pass" if code == 0 else "fail"
     implemented_ran.append("engine-free-consumer")
 
-    # migration-packaged: CLI artifact verify, isolation, and the four main
-    # groups. When every rostered case for the line being verified has an
-    # assertion file from this run, write one coordinator report. A failed
-    # child stays an incomplete slice and the process exits non-zero. 21.x
-    # groups stay null. The report is the acceptance input; this comment does
+    # migration-packaged: exact artifact verification plus this line
+    # old-workspace/transaction/frontend groups. A failed child or missing
+    # source-rostered assertion keeps the report incomplete. Foreign line
+    # groups remain separate. The report is the acceptance input; this comment does
     # not accept the check and does not add a G04 or G05 claim field.
     code_verify = run_node("scripts/build-migrate-legacy-cli.mjs", ["--verify"])
     code_iso = run_node("scripts/migration-cli-isolation.mjs", [])
@@ -1508,7 +1508,7 @@ def main() -> int:
     )
     code_tx = run_node(
         "scripts/migration-transaction.mjs",
-        ["--out", str(out_dir / "migration-transaction.json")],
+        ["--run", str(run_path), "--out", str(out_dir / "migration-transaction.json")],
     )
     code_parity = run_node(
         "scripts/check-frontend-parity.mjs",
@@ -1528,10 +1528,10 @@ def main() -> int:
             "Checks the committed migrate-legacy CLI tarball identity and isolation. That tarball is not old-workspace-cli acceptance.",
             "old-workspace-cli runs the exact run CLI on the authenticated Material 16.2.14 environment, then upgrades that workspace and strictly compiles/renders the migrated application.",
             "transaction-negatives runs node on package/bin/migrate-legacy.js extracted from that tarball. It does not import a transform function and does not run the schematic runner.",
-            "Rostered transaction cases are blocked-file-writes-nothing, dry-apply-parity, second-apply-noop, concurrent-edit-rejected, and before-write-hook-refuses. The before-write refusal is MIGRATE_LEGACY_BEFORE_WRITE, not a production fault.",
-            "An uncaught write error is not rostered when an earlier file remains rewritten.",
+            "Ten artifact-bound transaction cases include real mid-replacement EIO recovery, preservation of concurrent edits and retained backups after rollback failure; injected errors and before-write hooks are identified separately.",
+            "Recoverable file application is not crash-atomic and does not exclude noncooperating writers between validation and rename.",
             "frontend-parity runs the extracted CLI bin and ng generate of the packed library collection on two copies of one temp fixture. It does not use an in-memory schematic host. That comparison stays a CLI byte match.",
-            "packaged-schematic compares ng generate output with expected_after. It reuses the ng generate frontend from scripts/check-frontend-parity.mjs and does not define the roster as bytes matched the CLI. Every 21.x migration group stays null. coverage stays slice. Does not mark migration-packaged accepted. Does not claim G04 or G05.",
+            "packaged-schematic compares ng generate output with expected_after. It reuses the ng generate frontend from scripts/check-frontend-parity.mjs and does not define the roster as bytes matched the CLI. Foreign-line groups remain separate. Missing assertions keep coverage slice. Does not mark migration-packaged accepted. Does not claim G04 or G05.",
         ],
     )
     results["migration-packaged"] = "pass" if code == 0 else "fail"

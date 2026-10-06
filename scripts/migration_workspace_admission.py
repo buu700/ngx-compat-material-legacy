@@ -19,7 +19,7 @@ def old_workspace_assertion_ok(root,active,body,invocation):
         provenance=json.loads((root/'reference/material-16.2.14/PROVENANCE.json').read_text())
         if body['material_manifest_sha256']!=provenance['isolated_environment']['material_manifest_sha256']:return False
         identities=[body['cli'],*body['cli_support']]
-        if {i['path'] for i in identities}!={'package/package.json','package/bin/migrate-legacy.js','package/lib/ts-rewrite.js','package/lib/sass-rewrite.js','package/LICENSE'} or len(identities)!=5:return False
+        if {i['path'] for i in identities}!={'package/package.json','package/bin/migrate-legacy.js','package/lib/ts-rewrite.js','package/lib/sass-rewrite.js','package/lib/transaction-write.js','package/LICENSE'} or len(identities)!=6:return False
         if any(not re.fullmatch(r'[0-9a-f]{64}',i['sha256']) or type(i['bytes']) is not int or i['bytes']<1 for i in identities):return False
         upgraded=body['upgraded_consumer']
         if any(upgraded.get(k)!=v for k,v in dict(result='pass',line=line,library_sha256=artifacts['library'],cli_sha256=artifacts['migrate-cli'],strict_templates=True,skip_lib_check=False).items()):return False

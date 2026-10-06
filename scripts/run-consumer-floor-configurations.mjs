@@ -133,7 +133,7 @@ try {
         if (applied.applied !== 1 || applied.blocking !== 0 || !after.includes('@ngx-compat/material-legacy/legacy-button')) throw new Error('CLI did not apply migration');
         const second = runCli(['--apply']);
         if (second.applied !== 0 || readFileSync(target, 'utf8') !== after) throw new Error('CLI is not idempotent');
-        observation.cli = {support_files: Object.fromEntries(['bin/migrate-legacy.js', 'lib/ts-rewrite.js', 'lib/sass-rewrite.js', 'package.json'].map(path => [path, hash(readFileSync(confinedPath(resolve(cliBin, '../..'), path)))])), dry_run: dry, apply: applied, second_apply: second, cli_bin_sha256: hash(readFileSync(cliBin))};
+        observation.cli = {support_files: Object.fromEntries(['bin/migrate-legacy.js', 'lib/ts-rewrite.js', 'lib/sass-rewrite.js', 'lib/transaction-write.js', 'package.json'].map(path => [path, hash(readFileSync(confinedPath(resolve(cliBin, '../..'), path)))])), dry_run: dry, apply: applied, second_apply: second, cli_bin_sha256: hash(readFileSync(cliBin))};
         observation.command = [node.executable, cliBin, '<owned-fixture>', '--json', '--apply'];
       }
       if (hash(readFileSync(library.path)) !== library.sha256 || hash(readFileSync(cli.path)) !== cli.sha256) throw new Error('artifact changed during floor execution');
