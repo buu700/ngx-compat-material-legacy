@@ -50,12 +50,19 @@ def sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+def git_command(upstream: Path, *args: str) -> list[str]:
+    # Older Git versions do not honor GIT_NO_LAZY_FETCH. Keep this source-only
+    # collector from fetching missing objects or maintaining a shared cache.
+    return ["git", "-c", "remote.origin.promisor=false", "-c", "extensions.partialClone=",
+            "-c", "gc.auto=0", f"--git-dir={upstream}", *args]
+
+
 def git(upstream: Path, *args: str) -> bytes:
-    return subprocess.run(["git", f"--git-dir={upstream}", *args], check=True, capture_output=True).stdout
+    return subprocess.run(git_command(upstream, *args), check=True, capture_output=True).stdout
 
 
 def git_ok(upstream: Path, *args: str) -> bool:
-    return subprocess.run(["git", f"--git-dir={upstream}", *args], capture_output=True).returncode == 0
+    return subprocess.run(git_command(upstream, *args), capture_output=True).returncode == 0
 
 
 def sensitive_class(entry: dict) -> str | None:
@@ -72,11 +79,36 @@ def sensitive_class(entry: dict) -> str | None:
 
 def path_owner(path: str) -> dict:
     """Who owns an upstream path in the candidate."""
+    # Sass is independently owned even when its historical source lived under
+    # an ordinary Material family. The public assets live in styles/, while
+    # component-side theme copies can exist without being the facade target.
+    m = re.match(r"^src/material/([^/]+)/(.+\.scss)$", path)
+    if m:
+        family, suffix = m.groups()
+        candidates = [PACKAGE / "styles" / family / suffix, PACKAGE / family / suffix]
+        existing = [candidate for candidate in candidates if candidate.is_file()]
+        if existing:
+            return {"kind": "owned-legacy", "owned_kind": "historical-sass",
+                    "candidate_path": existing[0].relative_to(ROOT).as_posix(),
+                    "candidate_exists": True,
+                    "source_candidates": [p.relative_to(ROOT).as_posix() for p in existing],
+                    "reachability_proof": "required; path ownership alone is not execution"}
     m = re.match(r"^src/material/(legacy-[a-z-]+)/(.+)$", path)
     if m:
         candidate = PACKAGE / m.group(1) / m.group(2)
         return {"kind": "owned-legacy", "candidate_path": candidate.relative_to(ROOT).as_posix(),
                 "candidate_exists": candidate.is_file()}
+    m = re.match(r"^src/material/core/(.+\.ts)$", path)
+    if m and not path.endswith('.spec.ts'):
+        suffix = m.group(1)
+        candidates = [PACKAGE / "legacy-core/internal" / suffix, PACKAGE / "legacy-core" / suffix]
+        existing = [candidate for candidate in candidates if candidate.is_file()]
+        if existing:
+            return {"kind": "owned-legacy", "owned_kind": "historical-core-helper",
+                    "candidate_path": existing[0].relative_to(ROOT).as_posix(),
+                    "candidate_exists": True,
+                    "source_candidates": [p.relative_to(ROOT).as_posix() for p in existing],
+                    "reachability_proof": "required; matching source paths do not prove delegation"}
     if re.search(r"(^|/)(testing/)|\.spec\.ts$|/testing\b|e2e|harness", path):
         kind = "test"
     elif path.endswith(".md") or path.startswith(("guides/", "docs/")):
@@ -150,7 +182,9 @@ def consistency(row: dict) -> dict:
     if disposition in NONAPPLICABLE:
         status = "conflict-owned-source-touched" if owned else "consistent-no-owned-source"
     elif disposition == "inherited":
-        if not delegated:
+        if owned:
+            status = "question-owned-source-shadows-delegation"
+        elif not delegated:
             status = "question-no-delegated-source"
         else:
             counts = {line: (info["delegated_added_lines_present_in_installed_floor"], info["delegated_added_lines"]) for line, info in row["lines"].items()}
@@ -661,7 +695,7 @@ def main() -> int:
     entries = {entry["sha"]: entry for entry in ledger["entries"]}
     batch_shas = {}
     for rel in BATCH_REPORTS:
-        report = json.loads((ROOT / rel).read_text())
+        report = json.loads((ROOT / rel).read_text()) if (ROOT / rel).is_file() else {}
         batch_shas[rel] = {item.get("sha") for item in report.get("reviews") or [] if isinstance(item, dict)}
 
     rows = []
@@ -678,7 +712,7 @@ def main() -> int:
             owner = path_owner(path)
             item = {"path": path, "added": added, "removed": removed, **owner}
             if owner["kind"] == "owned-legacy":
-                original = subprocess.run(["git", f"--git-dir={args.upstream}", "show", f"{base_commit}:{path}"], capture_output=True)
+                original = subprocess.run(git_command(args.upstream, "show", f"{base_commit}:{path}"), capture_output=True)
                 item["original_16_2_14_sha256"] = sha256_bytes(original.stdout) if original.returncode == 0 else None
                 candidate = ROOT / owner["candidate_path"]
                 item["candidate_sha256"] = sha256_bytes(candidate.read_bytes()) if candidate.is_file() else None
