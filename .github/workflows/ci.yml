@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.ref }}-${{ github.sha }}
   cancel-in-progress: true
 
 permissions:
@@ -36,6 +36,11 @@ jobs:
           node --version
           npm --version
           pnpm --version
+
+      - name: Closeout handoff integrity
+        run: |
+          python3 -B compatibility/handoff/codex-closeout/tools/validate_handoff.py
+          python3 -B -m unittest discover -s compatibility/handoff/codex-closeout/tools -p 'test_*.py'
 
       - name: Helper unit tests
         run: python3 -m unittest discover -s tests -v
