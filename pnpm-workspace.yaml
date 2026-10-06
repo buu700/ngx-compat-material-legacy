@@ -17,6 +17,11 @@ minimumReleaseAgeExcludePrune: true
 
 # Add only exact version-specific exceptions, with comments explaining the urgent fix.
 minimumReleaseAgeExclude:
+  # Security pin for GHSA-ch52-4w7c-c8xp. Published 2026-10-04T02:56:05Z; seven-day
+  # maturity 2026-10-11T02:56:05Z. No owner age-exception grant yet — do not roster
+  # dependency-eligibility while this exclude lacks chainman/minimum-age-exceptions.toml.
+  # Remove this entry once 4.3.0 is mature (or after an owner grant is recorded).
+  - 'http-cache-semantics@4.3.0'
   # TEMPORARY. Owner grant 2026-10-06 (Ryan Lester) for GHSA-68fv-2mgg-jv7q:
   # 1.2.2 is the only fixed release. Expires 2026-10-07T14:08:09Z (10:08 ET), when
   # it passes the seven-day window on its own; remove this entry then.
@@ -27,7 +32,5 @@ allowBuilds:
   esbuild: true
 
 overrides:
-  # Security pins (FIN-07). http-cache-semantics@4.3.0 remains inside the
-  # seven-day window (published 2026-10-04); no owner age exception for it.
   http-cache-semantics: 4.3.0
   source-map-js: 1.2.2
