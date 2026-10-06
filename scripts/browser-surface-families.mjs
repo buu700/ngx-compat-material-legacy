@@ -170,7 +170,6 @@ writeFileSync(join(consumer, 'tsconfig.json'), JSON.stringify({
     rootDir: 'src',
     outDir: 'out',
     types: [],
-    ignoreDeprecations: '6.0',
   },
   files: ['src/main.ts'],
   angularCompilerOptions: {compilationMode: 'full', strictTemplates: true},
