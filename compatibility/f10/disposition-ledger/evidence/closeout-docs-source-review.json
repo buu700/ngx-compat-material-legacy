@@ -2,15 +2,16 @@
   "schema_version": 1,
   "reviewer": "Codex primary implementer",
   "method": "Read every complete original hunk for each listed SHA; enumerate all changed paths; distinguish current API documentation from historical owned controls. Shared identical upstream content reviewed once with both branch ownership contexts.",
-  "recorded_at_utc": "2026-10-06T18:19:43.542048+00:00",
-  "scope": "15 explicitly listed documentation-only SHAs; not all62 bootstrap batch candidates",
+  "recorded_at_utc": "2026-10-06T20:10:33.448419+00:00",
+  "scope": "18 explicitly listed upstream documentation/dev-application SHAs, reviewed in complete original hunks; not all62 bootstrap candidates",
   "source_repository": "https://github.com/angular/components",
   "scope_input_sha256": "400e89f53e41975dd5056158c60bdac2e4a2c9dcabaee1204eda782492f5f456",
   "g11_claim": "not-passed",
   "limitations": [
     "No runtime behavior or installed-peer delegation proof is claimed by this documentation-only review.",
     "Other SHAs, accessibility guidance and authored uses remain independently accountable.",
-    "Maintained documentation applicability and obsolete upstream links require A10 review."
+    "Maintained documentation applicability and obsolete upstream links require A10 review.",
+    "The icon Symbols SHA changes an upstream dev-app at runtime; all three paths were individually checked outside both add-on source/package closures. Accessibility-guidance SHA47819c4 remains outside this batch."
   ],
   "reviews": [
     {
@@ -274,6 +275,62 @@
       ],
       "final_disposition": "not-applicable",
       "runtime_change_in_patch": false
+    },
+    {
+      "sha": "bae953999407fd385b1d571e04350bf0f28abf05",
+      "subject": "docs: mat-error can only rendered if the input has touched and is invalid state (#27752)",
+      "files": [
+        "src/material/input/input.md"
+      ],
+      "diff": "diff --git a/src/material/input/input.md b/src/material/input/input.md\nindex 4529bbe92..bde6aa86e 100644\n--- a/src/material/input/input.md\n+++ b/src/material/input/input.md\n@@ -50,7 +50,7 @@ element. In some cases that `<mat-form-field>` may use the placeholder as the la\n The `<mat-form-field>` allows you to\n [associate error messages](https://material.angular.io/components/form-field/overview#error-messages)\n with your `matNativeControl`. By default, these error messages are shown when the control is invalid and\n-either the user has interacted with (touched) the element or the parent form has been submitted. If\n+the user has interacted with (touched) the element or the parent form has been submitted. If\n you wish to override this behavior (e.g. to show the error as soon as the invalid control is dirty\n or when a parent form group is invalid), you can use the `errorStateMatcher` property of the\n `matNativeControl`. The property takes an instance of an `ErrorStateMatcher` object. An `ErrorStateMatcher`\n",
+      "diff_sha256": "6c2fcc633556cd35bd07e59f1c4c14c3dc708fcc3352bbf3c28d6dfebbe25931",
+      "review_depth": "bounded-documentation-source-review",
+      "decision": "Changes one unshipped input documentation sentence from either-the-user wording to the actual invalid AND (touched OR submitted) description. No directive, ErrorStateMatcher or owned legacy input code is changed. That upstream markdown is absent from both add-on checkouts and the ng-packagr asset/entry closure; no library patch is warranted.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": false,
+      "unshipped_paths_verified_on_both_lines": true
+    },
+    {
+      "sha": "7369dfadcf38d05d4f93a8fa8308ed7ccb55f2a9",
+      "subject": "docs(material/slider): Page Up/Down increase value but not by 10 steps (#27854)",
+      "files": [
+        "src/material/slider/slider.md"
+      ],
+      "diff": "diff --git a/src/material/slider/slider.md b/src/material/slider/slider.md\nindex d00a6595f..240d44b0c 100644\n--- a/src/material/slider/slider.md\n+++ b/src/material/slider/slider.md\n@@ -68,8 +68,8 @@ The slider has the following keyboard bindings:\n | Up arrow    | Increment the slider value by one step.                                            |\n | Left arrow  | Decrement the slider value by one step (increments in RTL).                        |\n | Down arrow  | Decrement the slider value by one step.                                            |\n-| Page up     | Increment the slider value by 10 steps.                                            |\n-| Page down   | Decrement the slider value by 10 steps.                                            |\n+| Page up     | Increment the slider value by 10% (of the max value).                              |\n+| Page down   | Decrement the slider value by 10% (of the max value).                              |\n | End         | Set the value to the maximum possible.                                             |\n | Home        | Set the value to the minimum possible.                                             |\n \n",
+      "diff_sha256": "863f861ce00f6f4b01dee3bf59e18f5ea9b89f8193b5ecea8c48964deb87c39d",
+      "review_depth": "bounded-documentation-source-review",
+      "decision": "Only the modern slider documentation table is changed, from ten steps to ten percent Page Up/Down movement. The upstream markdown is absent from the add-on and its package closure. No slider implementation changes in this SHA, and the modern-slider documentation does not authorize changing historical MatLegacySlider keyboard increments.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": false,
+      "unshipped_paths_verified_on_both_lines": true
+    },
+    {
+      "sha": "0cf81f358481655ca37c36763c42ddaa423dec55",
+      "subject": "docs(material/icon): add guidance for Material Symbols (#28436)",
+      "files": [
+        "src/dev-app/dev-app/dev-app-layout.ts",
+        "src/dev-app/index.html",
+        "src/material/icon/icon.md"
+      ],
+      "diff": "diff --git a/src/dev-app/dev-app/dev-app-layout.ts b/src/dev-app/dev-app/dev-app-layout.ts\nindex 1ee83b9c4..43d1548b2 100644\n--- a/src/dev-app/dev-app/dev-app-layout.ts\n+++ b/src/dev-app/dev-app/dev-app-layout.ts\n@@ -13,7 +13,7 @@ import {MatSidenavModule} from '@angular/material/sidenav';\n import {MatListModule} from '@angular/material/list';\n import {MatButtonModule} from '@angular/material/button';\n import {RouterModule} from '@angular/router';\n-import {MatIconModule} from '@angular/material/icon';\n+import {MatIconModule, MatIconRegistry} from '@angular/material/icon';\n import {MatToolbarModule} from '@angular/material/toolbar';\n import {MatTooltipModule} from '@angular/material/tooltip';\n import {DevAppDirectionality} from './dev-app-directionality';\n@@ -110,12 +110,14 @@ export class DevAppLayout {\n     @Inject(Directionality) private _dir: DevAppDirectionality,\n     private _changeDetectorRef: ChangeDetectorRef,\n     @Inject(DOCUMENT) private _document: Document,\n+    private _iconRegistry: MatIconRegistry,\n   ) {\n     this.toggleTheme(this.state.darkTheme);\n     this.toggleStrongFocus(this.state.strongFocusEnabled);\n     this.toggleDensity(Math.max(this._densityScales.indexOf(this.state.density), 0));\n     this.toggleRippleDisabled(this.state.rippleDisabled);\n     this.toggleDirection(this.state.direction);\n+    this.toggleM3(this.state.m3Enabled);\n   }\n \n   toggleTheme(value = !this.state.darkTheme) {\n@@ -168,9 +170,13 @@ export class DevAppLayout {\n       (document.getElementById('theme-styles') as HTMLLinkElement).href = value\n         ? 'theme-m3.css'\n         : 'theme.css';\n-      this.state.m3Enabled = value;\n-      setAppState(this.state);\n     }\n+\n+    this._iconRegistry.setDefaultFontSetClass(\n+      value ? 'material-symbols-outlined' : 'material-icons',\n+    );\n+    this.state.m3Enabled = value;\n+    setAppState(this.state);\n   }\n \n   getDensityClass() {\ndiff --git a/src/dev-app/index.html b/src/dev-app/index.html\nindex e89639e68..6a80726fd 100644\n--- a/src/dev-app/index.html\n+++ b/src/dev-app/index.html\n@@ -9,6 +9,7 @@\n   <link rel=\"icon\" type=\"image/x-icon\" href=\"favicon.ico\">\n   <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\">\n   <link href=\"https://fonts.googleapis.com/icon?family=Material+Icons\" rel=\"stylesheet\">\n+  <link href=\"https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined\" rel=\"stylesheet\">\n   <link href=\"https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap\" rel=\"stylesheet\">\n \n   <!-- FontAwesome for mat-icon demo. -->\ndiff --git a/src/material/icon/icon.md b/src/material/icon/icon.md\nindex 77cd171ca..9ac9a4662 100644\n--- a/src/material/icon/icon.md\n+++ b/src/material/icon/icon.md\n@@ -19,9 +19,12 @@ component.\n By default, `<mat-icon>` expects the\n [Material icons font](https://google.github.io/material-design-icons/#icon-font-for-the-web).\n (You will still need to include the HTML to load the font and its CSS, as described in the link).\n-You can specify a different font by setting the `fontSet` input to either the CSS class to apply to\n-use the desired font, or to an alias previously registered with\n-`MatIconRegistry.registerFontClassAlias`.\n+\n+You can specify a different font, such as Material's latest icons, \n+[Material Symbols](https://fonts.google.com/icons), by setting the `fontSet` input to either the \n+CSS class to apply to use the desired font, or to an alias previously registered with\n+`MatIconRegistry.registerFontClassAlias`. Alternatively you can set the default for all\n+your application's icons using `MatIconRegistry.setDefaultFontSetClass`.\n \n ### Font icons with CSS\n \n",
+      "diff_sha256": "5a4e7f384b713a52c25abd983acaafd038aa8c07f4b49bed95428a269d95215c",
+      "review_depth": "individual-compatibility",
+      "decision": "Read all three changed paths, including the two dev-app files omitted by the seed material-path count. The upstream dev application injects the already-public MatIconRegistry and toggles its font-set class with its own M3 switch; its HTML loads the Symbols font, and icon markdown explains the existing public font-set API. None of those paths exists in either add-on checkout or its ng-packagr entry/assets. No MatIconRegistry implementation, owned control or public API is changed; do not transplant unrelated upstream demo bootstrap/network/font choices into the add-on.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": true,
+      "unshipped_paths_verified_on_both_lines": true
     }
   ]
 }
