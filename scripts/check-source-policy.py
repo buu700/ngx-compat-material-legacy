@@ -242,11 +242,11 @@ def evaluate(authored: Path, policy: dict, tarball: Path | None, annotations: Pa
             "deep private or src module",
         ),
         "source-policy/authored-boundary/no-docs-private-symbol": (
-            not rule_hits(authored_scan, "forbidden-symbol"),
+            not rule_hits(authored_scan, "forbidden-symbol") and not private_hits,
             "forbidden imported symbol",
         ),
         "source-policy/authored-boundary/no-deprecated-symbol": (
-            not rule_hits(authored_scan, "forbidden-deprecated-symbol"),
+            not rule_hits(authored_scan, "forbidden-deprecated-symbol") and not deprecated_hits,
             "deprecated upstream symbol",
         ),
         "source-policy/authored-boundary/inheritance-of-upstream": (
