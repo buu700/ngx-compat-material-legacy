@@ -9,15 +9,14 @@
  */
 
 import {
-  AsyncFactoryFn,
   ComponentHarness,
   TestElement,
 } from '@angular/cdk/testing';
 import {coerceBooleanProperty} from '@angular/cdk/coercion';
 
 export abstract class _MatCheckboxHarnessBase extends ComponentHarness {
-  protected abstract _input: AsyncFactoryFn<TestElement>;
-  protected abstract _label: AsyncFactoryFn<TestElement>;
+  protected abstract _input: () => Promise<TestElement>;
+  protected abstract _label: () => Promise<TestElement>;
 
   async isChecked(): Promise<boolean> {
     const checked = (await this._input()).getProperty<boolean>('checked');

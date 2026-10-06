@@ -9,26 +9,25 @@
  */
 
 import {
-  AsyncFactoryFn,
   ComponentHarness,
   TestElement,
 } from '@angular/cdk/testing';
 import {coerceNumberProperty} from '@angular/cdk/coercion';
 
 export abstract class _MatPaginatorHarnessBase extends ComponentHarness {
-  protected abstract _nextButton: AsyncFactoryFn<TestElement>;
-  protected abstract _previousButton: AsyncFactoryFn<TestElement>;
-  protected abstract _firstPageButton: AsyncFactoryFn<TestElement | null>;
-  protected abstract _lastPageButton: AsyncFactoryFn<TestElement | null>;
-  protected abstract _select: AsyncFactoryFn<
+  protected abstract _nextButton: () => Promise<TestElement>;
+  protected abstract _previousButton: () => Promise<TestElement>;
+  protected abstract _firstPageButton: () => Promise<TestElement | null>;
+  protected abstract _lastPageButton: () => Promise<TestElement | null>;
+  protected abstract _select: () => Promise<
     | (ComponentHarness & {
         getValueText(): Promise<string>;
         clickOptions(...filters: unknown[]): Promise<void>;
       })
     | null
   >;
-  protected abstract _pageSizeFallback: AsyncFactoryFn<TestElement>;
-  protected abstract _rangeLabel: AsyncFactoryFn<TestElement>;
+  protected abstract _pageSizeFallback: () => Promise<TestElement>;
+  protected abstract _rangeLabel: () => Promise<TestElement>;
 
   /** Goes to the next page in the paginator. */
   async goToNextPage(): Promise<void> {

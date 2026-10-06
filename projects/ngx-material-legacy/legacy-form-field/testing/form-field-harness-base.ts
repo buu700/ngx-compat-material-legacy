@@ -9,7 +9,6 @@
  */
 
 import {
-  AsyncFactoryFn,
   ComponentHarness,
   ComponentHarnessConstructor,
   HarnessPredicate,
@@ -30,14 +29,14 @@ export abstract class _MatFormFieldHarnessBase<
     with: (options?: ErrorHarnessFilters) => HarnessPredicate<ErrorBase>;
   },
 > extends ComponentHarness {
-  protected abstract _prefixContainer: AsyncFactoryFn<TestElement | null>;
-  protected abstract _suffixContainer: AsyncFactoryFn<TestElement | null>;
-  protected abstract _label: AsyncFactoryFn<TestElement | null>;
-  protected abstract _hints: AsyncFactoryFn<TestElement[]>;
-  protected abstract _inputControl: AsyncFactoryFn<ControlHarness | null>;
-  protected abstract _selectControl: AsyncFactoryFn<ControlHarness | null>;
-  protected abstract _datepickerInputControl: AsyncFactoryFn<ControlHarness | null>;
-  protected abstract _dateRangeInputControl: AsyncFactoryFn<ControlHarness | null>;
+  protected abstract _prefixContainer: () => Promise<TestElement | null>;
+  protected abstract _suffixContainer: () => Promise<TestElement | null>;
+  protected abstract _label: () => Promise<TestElement | null>;
+  protected abstract _hints: () => Promise<TestElement[]>;
+  protected abstract _inputControl: () => Promise<ControlHarness | null>;
+  protected abstract _selectControl: () => Promise<ControlHarness | null>;
+  protected abstract _datepickerInputControl: () => Promise<ControlHarness | null>;
+  protected abstract _dateRangeInputControl: () => Promise<ControlHarness | null>;
   protected abstract _errorHarness: ErrorType;
 
   abstract getAppearance(): Promise<string>;

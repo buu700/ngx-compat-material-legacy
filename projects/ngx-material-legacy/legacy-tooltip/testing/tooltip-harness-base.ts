@@ -8,10 +8,10 @@
  * Owned Material-16 harness base(s) removed from Angular Material 22.
  */
 
-import {AsyncFactoryFn, ComponentHarness, TestElement} from '@angular/cdk/testing';
+import {ComponentHarness, TestElement} from '@angular/cdk/testing';
 
 export abstract class _MatTooltipHarnessBase extends ComponentHarness {
-  protected abstract _optionalPanel: AsyncFactoryFn<TestElement | null>;
+  protected abstract _optionalPanel: () => Promise<TestElement | null>;
   protected abstract _hiddenClass: string;
   protected abstract _disabledClass: string;
   protected abstract _showAnimationName: string;
