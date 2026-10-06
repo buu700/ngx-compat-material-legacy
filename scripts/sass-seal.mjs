@@ -28,7 +28,7 @@
  */
 import {createHash} from 'node:crypto';
 import {runFunctionContracts} from './sass-function-contracts.mjs';
-import {runMixinArgumentContracts} from './sass-mixin-arguments.mjs';
+import {runMixinArgumentContracts,firstMixinCssDifference} from './sass-mixin-arguments.mjs';
 import {ownedStyleCaseIds, renderOwnedStyles} from './sass-owned-rendered.mjs';
 import {coordinatorRequest} from './packed-consumer-evidence.mjs';
 import {spawnSync} from 'node:child_process';
@@ -702,6 +702,7 @@ async function main() {
     sass_mixin_argument_cases: functions.mixin_arguments?.results.length ?? 0,
     sass_mixin_argument_passed: functions.mixin_arguments?.results.filter(r=>r.result==='pass').length ?? 0,
     sass_mixin_argument_failures: functions.mixin_arguments?.results.filter(r=>r.result!=='pass').map(r=>({case_id:r.case_id,error:r.error,expected_sha256:r.expected?.css_sha256??null,actual_sha256:r.actual?.css_sha256??null})) ?? [],
+    sass_mixin_argument_difference_previews: functions.mixin_arguments?.results.filter(r=>r.result!=='pass').slice(0,40).map(r=>({case_id:r.case_id,difference:firstMixinCssDifference(r.expected,r.actual)})) ?? [],
     sass_function_cases: functions.results.length,
     sass_function_passed: functions.results.filter(r=>r.result==='pass').length,
     sass_function_error: functions.error ?? null,
