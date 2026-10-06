@@ -99,7 +99,7 @@ console.log(JSON.stringify(compareContracts(ref, packed)));
 
 
 class ApiSignatureTests(unittest.TestCase):
-    def test_owned_form_field_tokens_compare_original_identifier_to_public_alias(self):
+    def test_owned_tokens_compare_original_identifier_to_public_alias(self):
         script = r"""
 import assert from 'node:assert/strict';
 import {compareSignatures} from './scripts/api-surface.mjs';
@@ -108,6 +108,8 @@ for (const [name,type,description] of [
  ['MAT_ERROR','MatError','MatError'],
  ['MAT_PREFIX','MatPrefix','MatPrefix'],
  ['MAT_SUFFIX','MatSuffix','MatSuffix'],
+ ['MAT_PROGRESS_BAR_DEFAULT_OPTIONS','MatProgressBarDefaultOptions','MAT_PROGRESS_BAR_DEFAULT_OPTIONS'],
+ ['MAT_PROGRESS_BAR_LOCATION','MatProgressBarLocation','mat-progress-bar-location'],
 ]) {
  const alias=name.replace('MAT_','MAT_LEGACY_');
  const symbol={symbol_id:`legacy-form-field/primary/${alias}`,shape:{kind:'token',signatures:[`token ${name} '${description}'`]}};
