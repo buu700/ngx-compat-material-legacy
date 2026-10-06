@@ -57,6 +57,7 @@ import {
 } from './sass-ordered-css.mjs';
 import {
   apiCaseIds,
+  sassResultsComplete,
   apiDriftNegative,
   classifyPending,
   compareInventory,
@@ -535,10 +536,11 @@ async function main() {
   const pending = [...apiResults, ...orderedClassified].filter(item => item.status === 'pending-decision');
   const unexplained = [...apiResults, ...orderedClassified].filter(item => item.status === 'unexplained-failure');
   const apiPassed = apiResults.filter(item => item.result === 'pass');
-  // Exit nonzero on anything unexplained. Pending cases keep the check incomplete
-  // because they write no passing assertion; they are never passes.
+  // Every required API/ordered case must pass. Pending decisions are not
+  // acceptance and must also make the child exit nonzero.
   const ok = functions.ok && ownedRenderedOk && compiled && !compileError && isolationOk && valuesOk && materialRequested && unexplained.length === 0
-    && orderedCss.compile_status === 0;
+    && orderedCss.compile_status === 0 && sassResultsComplete(apiResults,apiIds)
+    && sassResultsComplete(orderedClassified,ORDERED_CSS_FIXTURE_IDS);
 
 
   function writeOrderedCssAssertionFiles(results, isolationResults) {
@@ -707,6 +709,9 @@ async function main() {
     if (!negativeRejected) reasons.push('archived @material negative did not refuse');
     if (mutatedNegative.result !== 'pass') reasons.push(`mutated golden negative did not detect a compare-css mismatch (status=${mutatedNegative.compare_status})`);
     if (!valuesOk) reasons.push('sealed value fixtures did not match');
+    if (!functions.ok) reasons.push('function semantic probes failed');
+    if (pending.length) reasons.push(`pending decisions are not accepted: ${pending.length} cases`);
+    if (!sassResultsComplete(apiResults,apiIds) || !sassResultsComplete(orderedClassified,ORDERED_CSS_FIXTURE_IDS)) reasons.push('required Sass case coverage is not complete');
     if (unexplained.length) reasons.push(`unexplained failures: ${unexplained.slice(0, 8).map(item => item.case_id).join(', ')}`);
     if (orderedCss.compile_status !== 0) reasons.push('ordered CSS fixtures did not compile');
     for (const item of isolation) if (item.result !== 'pass') reasons.push(`isolation negative ${item.case_id} failed`);

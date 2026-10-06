@@ -14,6 +14,7 @@ import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {
   THEME_PARAMS,
+  sassResultsComplete,
   apiCaseIds,
   argumentCases,
   apiDriftNegative,
@@ -153,3 +154,15 @@ const notInvoked = exact.filter(item => item.result !== 'pass');
 assert.equal(classifyPending(notInvoked, decisions).every(item => item.status === 'pending-decision'), true);
 
 console.log(`sass-api regressions passed (${ids.length} api cases, ${pendingApi.length} pending, ${decisions.decisions.length} decisions)`);
+
+// Passing program compilation cannot relabel pending/omitted/duplicate cases.
+const full = ids.map(case_id=>({case_id,result:'pass'}));
+assert.equal(sassResultsComplete(full,ids),true);
+assert.equal(sassResultsComplete(full.slice(1),ids),false);
+assert.equal(sassResultsComplete([full[0],...full.slice(0,-1)],ids),false);
+assert.equal(sassResultsComplete(full,[...ids.slice(1),ids[1]]),false);
+for(const status of ['pending-decision','unexplained-failure']) {
+ const bad=structuredClone(full);bad[0].status=status;
+ assert.equal(sassResultsComplete(bad,ids),false);
+ bad[0].result='fail';assert.equal(sassResultsComplete(bad,ids),false);
+}
