@@ -60,6 +60,10 @@ SCRIPT_CHECKS = {
     "scripts/csp-ssr-acceptance.mjs": "csp-ssr",
     "scripts/build-migrate-legacy-cli.mjs": "migration-packaged",
     "scripts/migration-cli-isolation.mjs": "migration-packaged",
+    "scripts/check-old-workspace-cli.mjs": "migration-packaged",
+    "scripts/migration-transaction.mjs": "migration-packaged",
+    "scripts/check-frontend-parity.mjs": "migration-packaged",
+    "scripts/check-packaged-schematic.mjs": "migration-packaged",
     "scripts/rc-test-legacy-family.mjs": "historical-legacy-artifact",
     "scripts/check-release-metadata.mjs": "release-metadata",
     "scripts/check-consumer-floors.mjs": "consumer-floors",    "scripts/check-m3-inclusion-order.mjs": "m3-coexistence",
@@ -845,6 +849,171 @@ def _complete_line_report(run_dir: Path, run_id: str, check_id: str) -> dict | N
     }
 
 
+
+def _migration_contract_artifacts(row: dict) -> dict | None:
+    wanted = row["acceptance"]["subject_ids"]
+    if wanted != ["library", "migrate-cli"]:
+        return None
+    by_id: dict = {}
+    for item in ACTIVE_RUN.manifest.get("artifacts", []):
+        aid = item.get("id")
+        if aid not in wanted:
+            continue
+        if aid in by_id:
+            return None
+        digest = item.get("sha256")
+        size = item.get("bytes")
+        if not isinstance(digest, str) or type(size) is not int or size <= 0:
+            return None
+        by_id[aid] = {"sha256": digest, "bytes": size}
+    if set(by_id) != set(wanted):
+        return None
+    return {aid: by_id[aid] for aid in wanted}
+
+def _migration_assertion_records(run_dir: Path, invocation: str, expected: list[str]) -> dict | None:
+    """Map rostered case ids to assertion files this run wrote.
+
+    Copies of the manifest or other control files are not assertion evidence.
+    """
+    prefix = assertion_directory("migration-packaged", invocation)
+    directory = run_dir / prefix
+    if not directory.is_dir() or directory.is_symlink():
+        return None
+    reserved = _reserved_evidence(run_dir)
+    allowed = set(expected)
+    found: dict = {}
+    for path in sorted(directory.iterdir()):
+        if not path.is_file() or path.is_symlink() or path.stat().st_nlink != 1:
+            continue
+        if path.name in _MIGRATION_RESERVED_NAMES or path.suffix != ".json":
+            continue
+        if path.name.endswith((".sha256", ".sha512", ".sha1")):
+            continue
+        identity = (evidence_sha256(path), path.stat().st_size)
+        if identity in reserved:
+            continue
+        try:
+            body = read_json(path)
+        except EvidenceError:
+            continue
+        case_id = body.get("case_id")
+        if body.get("result") != "pass" or body.get("kind") != "assertion":
+            continue
+        if not isinstance(case_id, str) or case_id not in allowed or case_id in found:
+            if isinstance(case_id, str) and case_id in found:
+                return None
+            continue
+        relative = path.relative_to(run_dir).as_posix()
+        if not relative.startswith(prefix + "/"):
+            continue
+        found[case_id] = {"path": relative, "sha256": identity[0], "bytes": identity[1]}
+    if set(found) != allowed:
+        return None
+    return found
+
+def _complete_migration_report(run_dir: Path, run_id: str) -> dict | None:
+    """Coverage complete only for main, and only from the matrix roster.
+
+    A main run calls expected_cases for main. Null 21.x groups are not filled
+    and are not passed to expected_cases.
+    """
+    if ACTIVE_RUN is None:
+        return None
+    matrix = read_json(MATRIX_PATH)
+    row = validate_matrix(matrix)["migration-packaged"]
+    groups = row["acceptance"]["cases_by_line"].get("main")
+    if not isinstance(groups, dict) or any(ids is None for ids in groups.values()):
+        return None
+    expected = expected_cases(row, "main")
+    invocation = ACTIVE_RUN.invocation("migration-packaged")
+    records = _migration_assertion_records(run_dir, invocation, expected)
+    artifacts = _migration_contract_artifacts(row)
+    if records is None or artifacts is None:
+        return None
+    outputs = []
+    seen: set[str] = set()
+    case_results = []
+    for case_id in expected:
+        record = records[case_id]
+        if record["path"] not in seen:
+            outputs.append(record)
+            seen.add(record["path"])
+        case_results.append({
+            "case_id": case_id,
+            "result": "pass",
+            "kind": "assertion",
+            "output_paths": [record["path"]],
+        })
+    spec = row["acceptance"]
+    return {
+        "schema_version": 1,
+        "template": False,
+        "run_id": run_id,
+        "check_id": "migration-packaged",
+        "line": "main",
+        "invocation_id": invocation,
+        "binding": ACTIVE_RUN.binding,
+        "coverage": "complete",
+        "result": "pass",
+        "exit_code": 0,
+        "subject_kind": spec["subject_kind"],
+        "subject_ids": list(spec["subject_ids"]),
+        "artifacts": artifacts,
+        "expected_case_ids": expected,
+        "discovered_case_ids": list(expected),
+        "executed_case_ids": list(expected),
+        "passed_case_ids": list(expected),
+        "failed_case_ids": [],
+        "skipped_case_ids": [],
+        "unresolved_case_ids": [],
+        "exceptions": [],
+        "passed": len(expected),
+        "failed": 0,
+        "skipped": 0,
+        "outputs": outputs,
+        "case_results": case_results,
+        "command": ["rc-verify.py", "migration-packaged"],
+        "limitations": [
+            "Coordinator report for the line being verified. Each rostered main case has an assertion file written by this run.",
+            "21.x migration groups stay null. A main run does not copy them and does not call expected_cases for 21.x.",
+            "This report is the acceptance input. It does not add a G04 or G05 claim field.",
+        ],
+    }
+
+def write_migration_packaged_report(
+    run_dir: Path,
+    run_id: str,
+    line: str,
+    *,
+    exit_code: int,
+    limitations: list[str] | None = None,
+) -> None:
+    """Write one migration-packaged report.
+
+    Coverage is complete only when this main run's child exit is zero and every
+    rostered main case has a passing assertion file in the check-owned
+    invocation directory. Any other outcome stays the incomplete slice.
+    write_check_report must not replace a complete report.
+    """
+    report_path = run_dir / "reports" / "migration-packaged.json"
+    complete = _complete_migration_report(run_dir, run_id) if exit_code == 0 and line == "main" else None
+    if complete is None:
+        write_check_report(
+            run_dir, run_id, line, "migration-packaged",
+            exit_code=exit_code, limitations=limitations,
+        )
+        return
+    reports = report_path.parent
+    reports.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(json.dumps(complete, indent=2) + "\n")
+    before = report_path.read_bytes()
+    write_check_report(
+        run_dir, run_id, line, "migration-packaged",
+        exit_code=exit_code, limitations=limitations,
+    )
+    if report_path.read_bytes() != before:
+        raise EvidenceError("write_check_report overwrote a complete migration-packaged report")
+
 def write_line_coordinator_report(
     run_dir: Path,
     run_id: str,
@@ -1013,20 +1182,39 @@ def main() -> int:
     results["engine-free-consumer"] = "pass" if code == 0 else "fail"
     implemented_ran.append("engine-free-consumer")
 
-    # migration-packaged: committed peer-light CLI artifact verify + isolation.
+    # migration-packaged: CLI artifact verify, isolation, and the four 21.x groups.
     code_verify = run_node("scripts/build-migrate-legacy-cli.mjs", ["--verify"])
     code_iso = run_node("scripts/migration-cli-isolation.mjs", [])
-    code = 0 if code_verify == 0 and code_iso == 0 else (code_verify or code_iso or 1)
-    write_check_report(
+    code_workspace = run_node(
+        "scripts/check-old-workspace-cli.mjs",
+        ["--out", str(out_dir / "old-workspace-cli.json")],
+    )
+    code_tx = run_node(
+        "scripts/migration-transaction.mjs",
+        ["--out", str(out_dir / "migration-transaction.json")],
+    )
+    code_parity = run_node(
+        "scripts/check-frontend-parity.mjs",
+        ["--library-tarball", str(tarball), "--out", str(out_dir / "frontend-parity.json")],
+    )
+    code_schematic = run_node(
+        "scripts/check-packaged-schematic.mjs",
+        ["--library-tarball", str(tarball), "--out", str(out_dir / "packaged-schematic.json")],
+    )
+    code = 0 if code_verify == 0 and code_iso == 0 and code_workspace == 0 and code_tx == 0 and code_parity == 0 and code_schematic == 0 else (code_verify or code_iso or code_workspace or code_tx or code_parity or code_schematic or 1)
+    write_migration_packaged_report(
         out_dir,
         run_id,
         line,
-        "migration-packaged",
         exit_code=code,
         limitations=[
-            "Checks the committed migrate-legacy CLI tarball identity and isolation.",
-            "CLI identity is the committed migration/dist tarball; draft run.json records it as migrate-cli when present.",
-            "Schematic runner / old-workspace migration fixtures remain separate.",
+            "Checks the committed migrate-legacy CLI tarball identity and isolation. That tarball is not old-workspace-cli acceptance.",
+            "old-workspace-cli runs node on migration/dist/package/bin/migrate-legacy.js in a temp workspace installed from the sealed Material 16.2.14 environment.",
+            "transaction-negatives runs node on package/bin/migrate-legacy.js extracted from that tarball. It does not import a transform function and does not run the schematic runner.",
+            "Rostered transaction cases are blocked-file-writes-nothing, dry-apply-parity, second-apply-noop, concurrent-edit-rejected, and before-write-hook-refuses. The before-write refusal is MIGRATE_LEGACY_BEFORE_WRITE, not a production fault.",
+            "An uncaught write error is not rostered when an earlier file remains rewritten.",
+            "frontend-parity runs the extracted CLI bin and ng generate of the packed library collection on two copies of one temp fixture. It does not use an in-memory schematic host. That comparison stays a CLI byte match.",
+            "packaged-schematic compares ng generate output with expected_after. It reuses the ng generate frontend from scripts/check-frontend-parity.mjs. Main migration groups stay null. Does not claim G04 or G05.",
         ],
     )
     results["migration-packaged"] = "pass" if code == 0 else "fail"
