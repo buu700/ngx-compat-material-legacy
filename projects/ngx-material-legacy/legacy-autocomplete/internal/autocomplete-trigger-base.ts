@@ -29,7 +29,8 @@ import {
 } from '@angular/core';
 import {DOCUMENT} from '@angular/common';
 import {Directionality} from '@angular/cdk/bidi';
-import {BooleanInput, coerceBooleanProperty} from '@angular/cdk/coercion';
+import {coerceBooleanProperty} from '@angular/cdk/coercion';
+type BooleanInput = string | boolean | null | undefined;
 import {DOWN_ARROW, ENTER, ESCAPE, TAB, UP_ARROW, hasModifierKey} from '@angular/cdk/keycodes';
 import {focusedElementPierceShadowDom} from './owned-shadow-dom';
 import {legacyGetEventTarget} from '@ngx-compat/material-legacy/legacy-core';

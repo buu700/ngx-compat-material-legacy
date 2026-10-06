@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -46,7 +47,8 @@ const ENTER_ANIMATION = 'mat-legacy-menu-enter';
 const EXIT_ANIMATION = 'mat-legacy-menu-exit';
 import {FocusKeyManager, FocusOrigin} from '@angular/cdk/a11y';
 import {Direction} from '@angular/cdk/bidi';
-import {BooleanInput, coerceBooleanProperty} from '@angular/cdk/coercion';
+import {coerceBooleanProperty} from '@angular/cdk/coercion';
+type BooleanInput = string | boolean | null | undefined;
 import {
   ESCAPE,
   LEFT_ARROW,

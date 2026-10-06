@@ -1,12 +1,14 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
 
-import {coerceNumberProperty, NumberInput} from '@angular/cdk/coercion';
+import {coerceNumberProperty} from '@angular/cdk/coercion';
+type NumberInput = string | number | null | undefined;
 import {Platform} from '@angular/cdk/platform';
 import {legacyGetShadowRoot} from '@ngx-compat/material-legacy/legacy-core';
 import {ViewportRuler} from '@angular/cdk/scrolling';

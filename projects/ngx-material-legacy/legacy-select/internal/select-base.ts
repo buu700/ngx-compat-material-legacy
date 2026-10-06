@@ -14,12 +14,9 @@ import {
   removeAriaReferencedId,
 } from '@angular/cdk/a11y';
 import {Directionality} from '@angular/cdk/bidi';
-import {
-  BooleanInput,
-  coerceBooleanProperty,
-  coerceNumberProperty,
-  NumberInput,
-} from '@angular/cdk/coercion';
+import {coerceBooleanProperty, coerceNumberProperty} from '@angular/cdk/coercion';
+type BooleanInput = string | boolean | null | undefined;
+type NumberInput = string | number | null | undefined;
 import {SelectionModel} from '@angular/cdk/collections';
 import {
   A,

@@ -8,7 +8,8 @@
  */
 
 import {Directionality} from '@angular/cdk/bidi';
-import {BooleanInput, coerceBooleanProperty} from '@angular/cdk/coercion';
+import {coerceBooleanProperty} from '@angular/cdk/coercion';
+type BooleanInput = string | boolean | null | undefined;
 import {
   AfterContentChecked,
   AfterContentInit,

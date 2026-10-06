@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -29,12 +30,9 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import {MAT_TAB_GROUP, _MatTabBase} from './tab-base';
-import {
-  BooleanInput,
-  coerceBooleanProperty,
-  coerceNumberProperty,
-  NumberInput,
-} from '@angular/cdk/coercion';
+import {coerceBooleanProperty, coerceNumberProperty} from '@angular/cdk/coercion';
+type BooleanInput = string | boolean | null | undefined;
+type NumberInput = string | number | null | undefined;
 import {ThemePalette} from '@angular/material/core';
 import {CanColor, CanDisableRipple, mixinColor, mixinDisableRipple} from './common-behaviors';
 import {merge, Subscription} from 'rxjs';

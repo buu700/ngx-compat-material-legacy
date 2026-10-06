@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -30,7 +31,8 @@ export interface LegacyAutocompleteAnimationEvent {
 }
 
 import {ActiveDescendantKeyManager} from '@angular/cdk/a11y';
-import {BooleanInput, coerceBooleanProperty, coerceStringArray} from '@angular/cdk/coercion';
+import {coerceBooleanProperty, coerceStringArray} from '@angular/cdk/coercion';
+type BooleanInput = string | boolean | null | undefined;
 import {Platform} from '@angular/cdk/platform';
 import {Subscription} from 'rxjs';
 import {
