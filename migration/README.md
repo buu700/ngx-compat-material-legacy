@@ -55,7 +55,7 @@ Old Angular-16 workspaces may not install current Angular peers. Prefer the
 
 | Field | Value |
 | --- | --- |
-| Tarball | `migration/dist/ngx-compat-material-legacy-migrate-cli-22.0.0-rc.0.tgz` |
+| Tarball | `migration/dist/ngx-compat-material-legacy-migrate-cli-21.0.0-rc.0.tgz` |
 | Hash record | `compatibility/migrate-legacy-cli-artifact.json` |
 | Node engines | `>=18.0.0` |
 | Angular peers | **none** |
@@ -64,10 +64,10 @@ Old Angular-16 workspaces may not install current Angular peers. Prefer the
 
 ```bash
 # Review published sha256 in compatibility/migrate-legacy-cli-artifact.json first
-sha256sum migration/dist/ngx-compat-material-legacy-migrate-cli-22.0.0-rc.0.tgz
+sha256sum migration/dist/ngx-compat-material-legacy-migrate-cli-21.0.0-rc.0.tgz
 
 mkdir -p /tmp/migrate-cli
-tar -xzf migration/dist/ngx-compat-material-legacy-migrate-cli-22.0.0-rc.0.tgz -C /tmp/migrate-cli
+tar -xzf migration/dist/ngx-compat-material-legacy-migrate-cli-21.0.0-rc.0.tgz -C /tmp/migrate-cli
 node /tmp/migrate-cli/package/bin/migrate-legacy.js /path/to/old-workspace
 node /tmp/migrate-cli/package/bin/migrate-legacy.js /path/to/old-workspace --apply
 ```
