@@ -15,7 +15,7 @@ import {_MatDialogHarnessBase} from './dialog-harness-base';
  * @deprecated Use `enum` from `@angular/material/dialog/testing` instead.
  * @breaking-change 17.0.0
  */
-export const enum MatLegacyDialogSection {
+export enum MatLegacyDialogSection {
   TITLE = '.mat-dialog-title',
   CONTENT = '.mat-dialog-content',
   ACTIONS = '.mat-dialog-actions',
