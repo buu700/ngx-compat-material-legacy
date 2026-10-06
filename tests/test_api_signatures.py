@@ -165,6 +165,30 @@ assert.equal(observe('@Optional() service?: Service')[1].optional,true);
         self.assertEqual(report["method_status"], "mismatch")
         self.assertTrue(any("focus(FocusOrigin)" in method or "focus(" in method for method in report["missing_methods"]))
 
+    @unittest.skipUnless(typescript_resolves(), "typescript is not installed")
+    def test_async_factory_alias_requires_exact_cdk_import_and_keeps_type_argument(self):
+        script = r"""
+import assert from 'node:assert/strict';
+import {createRequire} from 'node:module';
+import {propertyTypeText,normalizeType} from './scripts/api-surface.mjs';
+const ts=createRequire(process.cwd()+'/package.json')('typescript');
+function observe(importLine,type) {
+ const source=ts.createSourceFile('fixture.ts',`${importLine} class Fixture {protected locator: ${type};}`,ts.ScriptTarget.Latest,true);
+ const declaration=source.statements.find(ts.isClassDeclaration).members[0];
+ return normalizeType(propertyTypeText(declaration.type,source));
+}
+const imported="import {AsyncFactoryFn as Locator} from '@angular/cdk/testing';";
+assert.equal(observe(imported,'Locator<TestElement | null>'),observe('', '() => Promise<TestElement | null>'));
+assert.notEqual(observe(imported,'Locator<TestElement | null>'),observe('', '() => Promise<TestElement>'));
+assert.notEqual(observe(imported,'Locator<TestElement>'),observe('', '(id: string) => Promise<TestElement>'));
+assert.notEqual(observe(imported,'Locator<TestElement>'),observe('', '() => Promise<string>'));
+assert.equal(observe("import {AsyncFactoryFn as Locator} from 'other';",'Locator<TestElement>'),'Locator<TestElement>');
+assert.equal(observe('type AsyncFactoryFn<T> = T;','AsyncFactoryFn<TestElement>'),'AsyncFactoryFn<TestElement>');
+assert.equal(observe(imported,'Locator<TestElement, string>'),'Locator<TestElement,string>');
+"""
+        result=subprocess.run(['node','--input-type=module','-e',script],cwd=ROOT,capture_output=True,text=True)
+        self.assertEqual(result.returncode,0,result.stderr or result.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()
