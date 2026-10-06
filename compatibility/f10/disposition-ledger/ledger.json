@@ -4,8 +4,8 @@
   "g11_claim": "not-passed",
   "seed_rows": 1697,
   "ledger_rows": 1697,
-  "closed_dispositions": 1689,
-  "open_or_deferred": 8,
+  "closed_dispositions": 1690,
+  "open_or_deferred": 7,
   "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
   "batch_id": "unread-seed-content-review-2026-10-02",
   "entries": [
@@ -327,13 +327,20 @@
       "sha": "b423c0e0b754b1f1d118d17e022981c357c3aa68",
       "bucket": "security-deep",
       "subject": "fix(material/datepicker): deprecate constructor injection in NativeDateAdapter (#26144)",
-      "final_disposition": "needs-individual-review",
-      "reason": "Constructor/declaration change applies to the exact NativeDateAdapter currently re-exported as LegacyNativeDateAdapter. The original16 constructor accepts matDateLocale:string and optional Platform; installed main22.1.7 types declare constructor(), with inject(MAT_DATE_LOCALE) inside runtime. Previous not-owned/irrelevant rationale ignored the public alias. Constructor/subclass compatibility requires repair or a substantiated allowed contract decision; no identity proof is claimed.",
+      "final_disposition": "do-not-adopt",
+      "reason": "Do not adopt this constructor-breaking upstream change into the legacy export. The whole patch removes Platform from NativeDateAdapter and forces inject(MAT_DATE_LOCALE); its second hunk narrows the public declaration and factory. The add-on now owns the untouched Material16 helper under LegacyNativeDateAdapter, preserves locale:string plus Platform? and the original two-token factory, and owns its provider modules. It no longer delegates this helper to the current peer. Both exact release-line packed consumers passed constructor/subclass/calendar and provider/locale tests, and API observations show no NativeDateAdapter discrepancy. This is historical-contract preservation, not a claimed vulnerability fix; unrelated DI failures and global G11 remain open.",
       "read_note_disposition": "not-owned",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-security-source-review.json",
-      "files": [],
-      "batch_id": "closeout-six-security-source-reads",
-      "recorded_at_utc": "2026-10-06T18:23:24.711579+00:00",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-native-date-source-review.json",
+      "files": [
+        "projects/ngx-material-legacy/legacy-core/internal/datetime/native-date-adapter.ts",
+        "projects/ngx-material-legacy/legacy-core/internal/datetime/native-date-module.ts",
+        "projects/ngx-material-legacy/legacy-core/public-api.ts",
+        "reference/material-16.2.14/datetime/native-date-adapter.ts",
+        "reference/material-16.2.14/factory-metadata.json",
+        "scripts/packed-consumer-aot-smoke.mjs"
+      ],
+      "batch_id": "closeout-native-constructor-individual",
+      "recorded_at_utc": "2026-10-06T19:51:14.065922+00:00",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
       "prior_dispositions": [
@@ -360,12 +367,44 @@
             "decision": "Read upstream patch b423c0e0b754b1f1d118d17e022981c357c3aa68 (fix(material/datepicker): deprecate constructor injection in NativeDateAdapter (#26144)). It touches 2 paths: src/material/core/datetime/native-date-adapter.ts, tools/public_api_guard/material/core.md. No path is under src/material/legacy- or projects/ngx-material-legacy. Final disposition stays irrelevant. This is a per-commit read of that patch, not a batch close and not security clearance.",
             "proof_kind": "diff-read"
           }
+        },
+        {
+          "sha": "b423c0e0b754b1f1d118d17e022981c357c3aa68",
+          "bucket": "security-deep",
+          "subject": "fix(material/datepicker): deprecate constructor injection in NativeDateAdapter (#26144)",
+          "final_disposition": "needs-individual-review",
+          "reason": "Constructor/declaration change applies to the exact NativeDateAdapter currently re-exported as LegacyNativeDateAdapter. The original16 constructor accepts matDateLocale:string and optional Platform; installed main22.1.7 types declare constructor(), with inject(MAT_DATE_LOCALE) inside runtime. Previous not-owned/irrelevant rationale ignored the public alias. Constructor/subclass compatibility requires repair or a substantiated allowed contract decision; no identity proof is claimed.",
+          "read_note_disposition": "not-owned",
+          "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-security-source-review.json",
+          "files": [],
+          "batch_id": "closeout-six-security-source-reads",
+          "recorded_at_utc": "2026-10-06T18:23:24.711579+00:00",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+          "affected_branches": [
+            "main",
+            "21.x"
+          ]
         }
       ],
       "affected_branches": [
-        "main",
-        "21.x"
-      ]
+        "main"
+      ],
+      "individual_proof": {
+        "diff_sha256": "0fc17a9693eca8bb91cf85b9e1bd5129acf63ccc8a761482a7e8e2ba5d9dd31d",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Do not adopt this constructor-breaking upstream change into the legacy export. The whole patch removes Platform from NativeDateAdapter and forces inject(MAT_DATE_LOCALE); its second hunk narrows the public declaration and factory. The add-on now owns the untouched Material16 helper under LegacyNativeDateAdapter, preserves locale:string plus Platform? and the original two-token factory, and owns its provider modules. It no longer delegates this helper to the current peer. Both exact release-line packed consumers passed constructor/subclass/calendar and provider/locale tests, and API observations show no NativeDateAdapter discrepancy. This is historical-contract preservation, not a claimed vulnerability fix; unrelated DI failures and global G11 remain open.",
+        "proof_kind": "source-and-executed-packed-constructor-provider",
+        "execution": {
+          "source_commit": "bbe6c01a18ab1696b764c35218ae7d36a7f293ce",
+          "run": 37515463713,
+          "job": 112447132714,
+          "library_sha256": "898a7547350f0b99d94a9e8338963d346abca6ff11e27936a3ae76812beaa530"
+        }
+      }
     },
     {
       "sha": "cf3506adf1af1556d705dbb651e7e96a7141b81d",
