@@ -6,7 +6,7 @@ from migration_workspace_admission import old_workspace_ids
 def workspace_receipt(root, active, case, invocation):
     line=active.binding['source_line'];plan=json.loads((root/'compatibility/rc/consumer-floor-plan.json').read_text());row=plan['lines'][line]
     artifacts={a['id']:a['sha256'] for a in active.manifest['artifacts'] if a['id'] in ('library','migrate-cli')}
-    files=['package/package.json','package/bin/migrate-legacy.js','package/lib/ts-rewrite.js','package/lib/sass-rewrite.js','package/LICENSE']
+    files=['package/package.json','package/bin/migrate-legacy.js','package/lib/ts-rewrite.js','package/lib/sass-rewrite.js','package/lib/transaction-write.js','package/LICENSE']
     identities=[{'path':p,'sha256':'c'*64,'bytes':100} for p in files]
     cli=identities.pop(1)
     upgraded=dict(result='pass',line=line,versions=dict(core=row['framework'],cdk=row['cdk'],material=row['material'],rxjs=plan['current_configuration']['rxjs'],typescript=plan['current_configuration']['typescript_by_line'][line],zone='0.16.3' if line=='main' else '0.15.1',tslib='2.8.1'),node='v'+json.loads((root/'toolchain-lock.json').read_text())['repository']['node'],strict_templates=True,skip_lib_check=False,library_sha256=artifacts['library'],cli_sha256=artifacts['migrate-cli'],**{k:'f'*64 for k in ('application_sha256','styles_sha256','css_sha256','lock_sha256')},browser={'browser':'Synthetic Chrome','result':'pass','before':{'ready':True,'error':None,'invalid':True,'button':'Migrated'},'after':{'value':'yes','valid':True,'panelOpen':False}})

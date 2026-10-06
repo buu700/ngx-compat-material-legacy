@@ -33,6 +33,7 @@ from rc_acceptance import (
 from archive_run_closure import ClosureError, write_closure
 from owned_rendered_admission import owned_rendered_ok
 from migration_workspace_admission import old_workspace_assertion_ok
+from migration_transaction_admission import transaction_assertion_ok
 from m3_rendered_admission import complete_rendered_checks
 from consumer_floor_admission import floor_assertion_ok, floor_support_records
 
@@ -1154,7 +1155,7 @@ def _migration_assertion_records(run_dir: Path, invocation: str, expected: list[
             if isinstance(case_id, str) and case_id in found:
                 return None
             continue
-        if not old_workspace_assertion_ok(ROOT, ACTIVE_RUN, body, invocation):
+        if not old_workspace_assertion_ok(ROOT, ACTIVE_RUN, body, invocation) or not transaction_assertion_ok(ROOT, ACTIVE_RUN, body, invocation):
             continue
         relative = path.relative_to(run_dir).as_posix()
         if not relative.startswith(prefix + "/"):
@@ -1444,7 +1445,7 @@ def main() -> int:
     )
     code_tx = run_node(
         "scripts/migration-transaction.mjs",
-        ["--out", str(out_dir / "migration-transaction.json")],
+        ["--run", str(run_path), "--out", str(out_dir / "migration-transaction.json")],
     )
     code_parity = run_node(
         "scripts/check-frontend-parity.mjs",
@@ -1464,8 +1465,8 @@ def main() -> int:
             "Checks the committed migrate-legacy CLI tarball identity and isolation. That tarball is not old-workspace-cli acceptance.",
             "old-workspace-cli runs the exact run CLI on the authenticated Material 16.2.14 environment, then upgrades that workspace and strictly compiles/renders the migrated application.",
             "transaction-negatives runs node on package/bin/migrate-legacy.js extracted from that tarball. It does not import a transform function and does not run the schematic runner.",
-            "Rostered transaction cases are blocked-file-writes-nothing, dry-apply-parity, second-apply-noop, concurrent-edit-rejected, and before-write-hook-refuses. The before-write refusal is MIGRATE_LEGACY_BEFORE_WRITE, not a production fault.",
-            "An uncaught write error is not rostered when an earlier file remains rewritten.",
+            "Ten artifact-bound transaction cases include real mid-replacement EIO recovery, preservation of concurrent edits and retained backups after rollback failure; injected errors and before-write hooks are identified separately.",
+            "Recoverable file application is not crash-atomic and does not exclude noncooperating writers between validation and rename.",
             "frontend-parity runs the extracted CLI bin and ng generate of the packed library collection on two copies of one temp fixture. It does not use an in-memory schematic host. That comparison stays a CLI byte match.",
             "packaged-schematic compares ng generate output with expected_after. It reuses the ng generate frontend from scripts/check-frontend-parity.mjs. Main migration groups stay null. Does not claim G04 or G05.",
         ],

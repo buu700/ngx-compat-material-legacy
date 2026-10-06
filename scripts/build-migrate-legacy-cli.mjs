@@ -136,6 +136,7 @@ function copyEngine(targetDir) {
   for (const name of ['sass-rewrite.js', 'ts-rewrite.js']) {
     cpSync(join(engineDir, name), join(targetDir, 'lib', name));
   }
+  cpSync(join(here, 'migrate-cli-bundle/transaction-write.js'), join(targetDir, 'lib/transaction-write.js'));
 }
 
 function assemblePackage(targetDir) {

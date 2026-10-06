@@ -52,7 +52,7 @@ with tarfile.open(sys.argv[1]) as t:
   const manifest = JSON.parse(readFileSync(join(packageRoot, 'package.json'), 'utf8'));
   if (manifest.name !== '@ngx-compat/material-legacy-migrate-cli' || lineForPackageVersion(manifest.version) !== input.line
     || manifest.dependencies || manifest.peerDependencies || manifest.optionalDependencies) throw new Error('wrong CLI line or non-peer-light manifest');
-  const files = ['package.json', 'bin/migrate-legacy.js', 'lib/ts-rewrite.js', 'lib/sass-rewrite.js', 'LICENSE'];
+  const files = ['package.json', 'bin/migrate-legacy.js', 'lib/ts-rewrite.js', 'lib/sass-rewrite.js', 'lib/transaction-write.js', 'LICENSE'];
   const identities = files.map(path => {
     const bytes = readFileSync(join(packageRoot, path));
     return {path: `package/${path}`, bytes: bytes.length, sha256: digest(bytes)};

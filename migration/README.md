@@ -98,3 +98,7 @@ disable Material animations should prefer the public
 `{animationsDisabled: true}`) rather than deleting legacy animation recipes.
 See `compatibility/motion-overlay-trio.md`. No engine-bound trigger removals in
 this wave.
+
+Apply stages all edits before replacing source files. A replacement error restores completed replacements when their bytes and file identities still match this invocation. If recovery encounters a newer edit or cannot restore a file, the CLI exits nonzero and `--json` reports `transaction.recovery_files`, including retained backups and original SHA256 hashes. Inspect those files before restoring a backup manually. Do not retry an unresolved recovery blindly.
+
+This provides recoverable application after ordinary I/O errors; it is not crash-atomic storage and cannot exclude a noncooperating writer between a check and file replacement. Read-only files, symlink targets and multiply-linked files are refused.

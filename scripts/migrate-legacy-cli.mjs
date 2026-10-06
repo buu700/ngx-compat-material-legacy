@@ -30,7 +30,6 @@ import {
   readdirSync,
   readFileSync,
   statSync,
-  writeFileSync,
 } from 'node:fs';
 import {dirname, join, relative, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -43,6 +42,7 @@ const engineDir = join(
   'projects/ngx-material-legacy/schematics/migrate-legacy',
 );
 
+const {applyFileTransaction} = require(join(here, 'migrate-cli-bundle/transaction-write.js'));
 const {rewriteSassModuleSource} = require(join(engineDir, 'sass-rewrite.js'));
 const {rewriteLegacyTypescriptImports} = require(join(engineDir, 'ts-rewrite.js'));
 
@@ -227,6 +227,7 @@ function main(argv) {
   }
 
   let concurrentEdit = false;
+  let transaction = null;
   if (apply && blocking === 0) {
     const hook = process.env.MIGRATE_LEGACY_BEFORE_WRITE;
     if (hook) {
@@ -257,12 +258,13 @@ function main(argv) {
       blocking += conflicts.length;
       for (const record of conflicts) record.ok = false;
     } else {
-      for (const record of records) {
-        if (record.content != null) {
-          writeFileSync(record.path, record.content, 'utf8');
-          record.applied = true;
-          applied += 1;
-        }
+      transaction = applyFileTransaction(records);
+      applied = transaction.applied;
+      if (transaction.status !== 'committed') {
+        blocking += 1;
+        concurrentEdit = /concurrent-edit/.test(transaction.error || '') || transaction.recovery_files.some(item => /concurrent-edit/.test(item.error));
+        const failed = records.find(record => record.path === transaction.failed_path);
+        if (failed) {failed.ok = false;failed.diagnostics.push('io-error: ' + transaction.error);}
       }
     }
   }
@@ -275,6 +277,7 @@ function main(argv) {
     applied,
     blocking,
     concurrent_edit: concurrentEdit,
+    transaction,
     acknowledgements: allAcks,
     options: rewriteOptions,
     engine: {
@@ -309,6 +312,12 @@ function main(argv) {
       console.log(`  ${tag}  ${r.path}`);
       for (const d of r.diagnostics) {
         console.log(`         ${d}`);
+      }
+    }
+    if (transaction && transaction.status !== 'committed') {
+      console.error('File transaction ' + transaction.status + ': ' + transaction.error);
+      for (const recovery of transaction.recovery_files) {
+        console.error('Manual recovery: ' + JSON.stringify(recovery));
       }
     }
     if (!apply && safeEdits) {

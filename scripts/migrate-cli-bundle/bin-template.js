@@ -12,9 +12,9 @@ const {
   readdirSync,
   readFileSync,
   statSync,
-  writeFileSync,
 } = require('fs');
 const {join, relative, resolve} = require('path');
+const {applyFileTransaction} = require('../lib/transaction-write.js');
 const {rewriteSassModuleSource} = require('../lib/sass-rewrite.js');
 const {rewriteLegacyTypescriptImports} = require('../lib/ts-rewrite.js');
 
@@ -97,7 +97,7 @@ function collectFiles(target) {
   throw new Error('Not a file or directory: ' + target);
 }
 
-function processFile(absPath, apply, rewriteOptions) {
+function processFile(absPath, rewriteOptions) {
   const content = readFileSync(absPath, 'utf8');
   const indented = /\.sass$/i.test(absPath);
   const kind = indented ? 'sass' : SCSS_RE.test(absPath) ? 'scss' : 'ts';
@@ -184,7 +184,7 @@ function main(argv) {
   for (const file of files) {
     let record;
     try {
-      record = processFile(file, false, rewriteOptions);
+      record = processFile(file, rewriteOptions);
     } catch (err) {
       record = {
         path: file,
@@ -206,6 +206,7 @@ function main(argv) {
   }
 
   let concurrentEdit = false;
+  let transaction = null;
   if (apply && blocking === 0) {
     const hook = process.env.MIGRATE_LEGACY_BEFORE_WRITE;
     if (hook) {
@@ -221,12 +222,13 @@ function main(argv) {
       blocking += conflicts.length;
       for (const record of conflicts) record.ok = false;
     } else {
-      for (const record of records) {
-        if (record.content != null) {
-          writeFileSync(record.path, record.content, 'utf8');
-          record.applied = true;
-          applied += 1;
-        }
+      transaction = applyFileTransaction(records);
+      applied = transaction.applied;
+      if (transaction.status !== 'committed') {
+        blocking += 1;
+        concurrentEdit = /concurrent-edit/.test(transaction.error || '') || transaction.recovery_files.some(item => /concurrent-edit/.test(item.error));
+        const failed = records.find(record => record.path === transaction.failed_path);
+        if (failed) {failed.ok = false;failed.diagnostics.push('io-error: ' + transaction.error);}
       }
     }
   }
@@ -239,6 +241,7 @@ function main(argv) {
     applied,
     blocking,
     concurrent_edit: concurrentEdit,
+    transaction,
     acknowledgements: allAcks,
     options: rewriteOptions,
     distribution: 'bundled-cli',
@@ -276,6 +279,12 @@ function main(argv) {
       console.log('  ' + tag + '  ' + r.path);
       for (const d of r.diagnostics) {
         console.log('         ' + d);
+      }
+    }
+    if (transaction && transaction.status !== 'committed') {
+      console.error('File transaction ' + transaction.status + ': ' + transaction.error);
+      for (const recovery of transaction.recovery_files) {
+        console.error('Manual recovery: ' + JSON.stringify(recovery));
       }
     }
     if (!apply && safeEdits) {

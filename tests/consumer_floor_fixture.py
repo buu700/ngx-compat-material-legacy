@@ -22,6 +22,6 @@ def write_floor_receipt(root, active, case, invocation):
         detail=dict(status='ok', errors=[],floor_configuration=config,node_runtime={'version':runtime['version'],'exec_path':runtime['executable']},installed_floor_versions=versions,tarball={'sha256':body['artifacts']['library']},aot={'status':'ok'},harness={'status':'ok','bundle':{'module_loader':'bundled-consumer-node-cjs','preserve_explicit_imports':True,'input_paths_confined':True,'tool_version':json.loads((root/'package.json').read_text())['devDependencies']['esbuild'],'format':'cjs','platform':'node','inputs':[{'path':p,'sha256':'f'*64} for p in ['out-tsc/harness-runtime.js','node_modules/rxjs/index.js','node_modules/@ngx-compat/material-legacy/fesm2022/testing.mjs']],'bundle_sha256':'a'*64}},acceptanceCases=[{'case_id':case_id,'result':'pass'} for case_id in floor_probe_ids(root)],isolation={'declaration_program_ok':True,'declaration_check':'skipLibCheck:false'},consumer_lock=body['consumer_lock'])
         body['consumer_detail']=record(case.replace('/','__')+'.detail.json',detail)
     else:
-        files={k:'c'*64 for k in ('bin/migrate-legacy.js','lib/ts-rewrite.js','lib/sass-rewrite.js','package.json')}
+        files={k:'c'*64 for k in ('bin/migrate-legacy.js','lib/ts-rewrite.js','lib/sass-rewrite.js','lib/transaction-write.js','package.json')}
         body['cli']=dict(support_files=files,cli_bin_sha256=files['bin/migrate-legacy.js'],dry_run={'mode':'dry-run','safe_edits':1,'blocking':0},apply={'applied':1,'blocking':0},second_apply={'applied':0,'blocking':0})
     return body
