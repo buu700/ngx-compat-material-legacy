@@ -20,7 +20,7 @@ export function floorConfigurations(plan, line, manifest) {
     node, rxjs, typescript: row.typescript_minimum, ...row,
   })));
   configurations.push({group: 'library-runtime', case_id: 'library/current-supported-configuration',
-    ...row, ...plan.current_configuration});
+    ...row, ...plan.current_configuration, typescript: plan.current_configuration.typescript_by_line[line]});
   for (const node of plan.cli_node_versions) configurations.push({group: 'cli-runtime-floors', case_id: `cli/node-${node}`, node});
   for (const configuration of configurations) {
     const pin = plan.node_sources[configuration.node];

@@ -31,6 +31,7 @@ from rc_acceptance import (
     assertion_directory, expected_cases, prepack_binding_for,
 )
 from archive_run_closure import ClosureError, write_closure
+from consumer_floor_admission import floor_assertion_ok, floor_support_records
 
 ROOT = Path(__file__).resolve().parents[1]
 MATRIX_PATH = ROOT / "compatibility/rc/matrices/full-verify.json"
@@ -67,6 +68,7 @@ SCRIPT_CHECKS = {
     "scripts/rc-test-legacy-family.mjs": "historical-legacy-artifact",
     "scripts/check-m3-inclusion-order.mjs": "m3-coexistence",
     "scripts/check-consumer-floors.mjs": "consumer-floors",
+    "scripts/run-consumer-floor-configurations.mjs": "consumer-floors",
     "scripts/check-release-metadata.mjs": "release-metadata",
 }
 
@@ -809,11 +811,10 @@ _LINE_COORDINATOR_LIMITATIONS = {
         "This report is the acceptance input. It does not add a G07 claim field.",
     ],
     "consumer-floors": [
-        "Coordinator report for the line being verified. Each rostered main case has an assertion file written by this run.",
-        "cli-runtime executes the migrate CLI on the current Node and rejects 17.0.0 by the CLI engines range. The current runtime is not recorded as a Node 18 floor run.",
-        "line-isolation maps this checkout library version to main and rejects --line 21.x. It is not a 21.x checkout run.",
-        "21.x consumer-floors groups stay null. A main run does not copy them and does not call expected_cases for 21.x.",
-        "This report is the acceptance input. It does not add a G12 claim field.",
+        "Complete coverage requires diagnostics plus every source-policy runtime case on the actual pinned Node executable.",
+        "Each floor uses the run's packed artifacts in an isolated consumer with exact peers, strict declarations, AOT and real harness probes.",
+        "CLI floors execute the extracted packed CLI, including Node 18, dry-run, apply and idempotence.",
+        "Only this run's source line is admitted; the other line's roster is policy, not evidence.",
     ],
     "release-metadata": [
         "Coordinator report for the line being verified. Each rostered main case has an assertion file written by this run.",
@@ -1222,7 +1223,12 @@ def _sass_seal_assertion_ok(body: dict, invocation: str) -> bool:
     return True
 
 
+def _consumer_floor_assertion_ok(body: dict, invocation: str) -> bool:
+    return floor_assertion_ok(ROOT, ACTIVE_RUN, body, invocation)
+
+
 _ASSERTION_BODY_CHECKS = {
+    "consumer-floors": _consumer_floor_assertion_ok,
     "sass-seal": _sass_seal_assertion_ok,
     "companion-bridge-tokens": _bridge_token_assertion_ok,
     "companion-computed-styles": _computed_style_assertion_ok,
@@ -1240,13 +1246,14 @@ def _complete_line_report(run_dir: Path, run_id: str, check_id: str) -> dict | N
         return None
     matrix = read_json(MATRIX_PATH)
     row = validate_matrix(matrix)[check_id]
-    groups = row["acceptance"]["cases_by_line"].get("main")
+    line = ACTIVE_RUN.binding.get("source_line") if check_id == "consumer-floors" else "main"
+    groups = row["acceptance"]["cases_by_line"].get(line)
     if not isinstance(groups, dict) or any(ids is None for ids in groups.values()):
         return None
     other = row["acceptance"]["cases_by_line"].get("21.x")
-    if not isinstance(other, dict) or any(ids is not None for ids in other.values()):
+    if not isinstance(other, dict) or (check_id != "consumer-floors" and any(ids is not None for ids in other.values())):
         return None
-    expected = expected_cases(row, "main")
+    expected = expected_cases(row, line)
     invocation = ACTIVE_RUN.invocation(check_id)
     records = _roster_assertion_records(run_dir, check_id, invocation, expected)
     artifacts = _contract_artifacts(row)
@@ -1260,6 +1267,12 @@ def _complete_line_report(run_dir: Path, run_id: str, check_id: str) -> dict | N
         if record["path"] not in seen:
             outputs.append(record)
             seen.add(record["path"])
+        if check_id == "consumer-floors":
+            body = read_json(run_dir / record["path"])
+            for support in floor_support_records(body):
+                if support["path"] not in seen:
+                    outputs.append(support)
+                    seen.add(support["path"])
         case_results.append({
             "case_id": case_id,
             "result": "pass",
@@ -1272,7 +1285,7 @@ def _complete_line_report(run_dir: Path, run_id: str, check_id: str) -> dict | N
         "template": False,
         "run_id": run_id,
         "check_id": check_id,
-        "line": "main",
+        "line": line,
         "invocation_id": invocation,
         "binding": ACTIVE_RUN.binding,
         "coverage": "complete",
@@ -1728,28 +1741,16 @@ def main() -> int:
     results["upstream-audit-disposition"] = "pass" if code == 0 else "fail"
     implemented_ran.append("upstream-audit-disposition")
 
-    # consumer-floors: library engines/peers, the migrate CLI runtime, and --line isolation.
-    # When every rostered main case has an assertion file from this run, write one
-    # coordinator report. A failed child or a 21.x line stays an incomplete slice.
-    # The current runtime is not recorded as a Node 18 floor run. The report does
-    # not add a G12 claim field.
-    code = run_node(
+    # Diagnostic ranges and actual artifact-bound runtime configurations share one invocation.
+    diagnostic_code = run_node(
         "scripts/check-consumer-floors.mjs",
         ["--out", str(out_dir / "consumer-floors-workspace.json")],
     )
+    runtime_code = run_node("scripts/run-consumer-floor-configurations.mjs", ["--run", str(out_dir / "run.json")])
+    code = diagnostic_code or runtime_code
     write_line_coordinator_report(
-        out_dir,
-        run_id,
-        line,
-        "consumer-floors",
-        exit_code=code,
-        limitations=[
-            "Compares advertised library engines.node and peerDependencies to lock/installed versions.",
-            "Library Node floor uses toolchain-lock.json / .node-version, not process.version.",
-            "cli-runtime executes the migrate CLI on the current Node and rejects 17.0.0 by the CLI engines range. The current runtime is not recorded as a Node 18 floor run.",
-            "line-isolation maps this checkout library version to main and rejects --line 21.x. It is not a 21.x checkout run.",
-            "21.x consumer-floors groups stay null. A 21.x line stays an incomplete slice. Does not mark consumer-floors accepted. Does not claim G12.",
-        ],
+        out_dir, run_id, line, "consumer-floors", exit_code=code,
+        limitations=["Only this source line's reviewed configurations are executed against this run's artifacts."],
     )
     results["consumer-floors"] = "pass" if code == 0 else "fail"
     implemented_ran.append("consumer-floors")

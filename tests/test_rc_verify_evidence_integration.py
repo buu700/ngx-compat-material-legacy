@@ -39,6 +39,8 @@ class CoordinatorTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         self.f = CompleteFixture(self.root)
+        write_json(self.root / "compatibility/rc/matrices/full-verify.json", acceptance.read_json(ROOT / "compatibility/rc/matrices/full-verify.json"))
+        write_json(self.root / "compatibility/rc/consumer-floor-plan.json", acceptance.read_json(ROOT / "compatibility/rc/consumer-floor-plan.json"))
         self.run = verify.RunEvidence(self.f.run, self.f.run_dir, self.f.matrix_sha)
         self.root_patch = patch.object(verify, 'ROOT', self.root)
         self.root_patch.start()
@@ -439,6 +441,10 @@ class CoordinatorTests(unittest.TestCase):
                 write_json(directory / f"{case_id}.json", self._m3_body(case_id, invocation))
             return directory
         for case_id in ids:
+            if check_id == "consumer-floors" and case_id.startswith(("library/", "cli/")):
+                from consumer_floor_fixture import write_floor_receipt
+                write_json(directory / f"{case_id.replace('/', '__')}.json", write_floor_receipt(ROOT, verify.ACTIVE_RUN, case_id, invocation))
+                continue
             write_json(directory / f"{case_id.replace('/', '__')}.json", {
                 "case_id": case_id,
                 "result": "pass",
@@ -454,7 +460,10 @@ class CoordinatorTests(unittest.TestCase):
                 row, ids = self._real_line_ids(check_id)
                 self.assertTrue(row["implemented"])
                 for group, group_ids in row["acceptance"]["cases_by_line"]["21.x"].items():
-                    self.assertIsNone(group_ids, group)
+                    if check_id == "consumer-floors" and group in ("library-runtime", "cli-runtime-floors"):
+                        self.assertTrue(group_ids)
+                    else:
+                        self.assertIsNone(group_ids, group)
                 self._write_line_assertions(check_id, ids)
                 path = self.f.run_dir / f"reports/{check_id}.json"
                 path.unlink()
@@ -500,7 +509,7 @@ class CoordinatorTests(unittest.TestCase):
                 if check_id == "consumer-floors":
                     self.assertIn("current-runtime-satisfies", ids)
                     self.assertIn("below-floor-rejected", ids)
-                    self.assertTrue(any("not recorded as a Node 18 floor run" in item for item in report["limitations"]))
+                    self.assertTrue(any("including Node 18" in item for item in report["limitations"]))
                 if check_id == "release-metadata":
                     self.assertTrue(any("No instruction file was compared" in item for item in report["limitations"]))
                     self.assertEqual(

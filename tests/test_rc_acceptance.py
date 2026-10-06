@@ -239,7 +239,10 @@ class AcceptanceTests(unittest.TestCase):
             real_row = next(item for item in real["checks"] if item["check_id"] == cid)
             self.assertTrue(real_row["implemented"])
             for group, group_ids in real_row["acceptance"]["cases_by_line"]["21.x"].items():
-                self.assertIsNone(group_ids, group)
+                if cid == "consumer-floors" and group in ("library-runtime", "cli-runtime-floors"):
+                    self.assertTrue(group_ids)
+                else:
+                    self.assertIsNone(group_ids, group)
             ids = acceptance.expected_cases(real_row, "main")
             self.assertTrue(ids)
             if cid == "m3-coexistence":

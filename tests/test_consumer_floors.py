@@ -171,7 +171,10 @@ console.log(JSON.stringify({
         self.assertIn("--line does not match this checkout library version", rejected["verifier_message"])
         self.assertFalse(executed["line"]["copied_21x_manifest"])
         for group, ids in row["acceptance"]["cases_by_line"]["21.x"].items():
-            self.assertIsNone(ids, group)
+            if group in ("library-runtime", "cli-runtime-floors"):
+                self.assertTrue(ids, group)
+            else:
+                self.assertIsNone(ids, group)
 
     def test_synthetic_version_is_not_a_21x_run(self):
         import importlib.util
@@ -197,7 +200,10 @@ console.log(JSON.stringify({
         self.assertNotIn("99.0.0", row["acceptance"]["cases_by_line"]["main"]["line-isolation"])
         self.assertNotIn("21.0.0", row["acceptance"]["cases_by_line"]["main"]["line-isolation"])
         for group, ids in row["acceptance"]["cases_by_line"]["21.x"].items():
-            self.assertIsNone(ids, group)
+            if group in ("library-runtime", "cli-runtime-floors"):
+                self.assertTrue(ids, group)
+            else:
+                self.assertIsNone(ids, group)
 
     @unittest.skipUnless(
         workspace_packages_ready(),
