@@ -163,8 +163,11 @@ function bind(companion, dimension, element, property, token, locate, extra = {}
 // ---------------------------------------------------------------- datepicker (popup overlays + in-tree)
 {
   const t = m('datepicker');
-  const pop = (panel, sub) => ({css: `.${panel} ${sub}`, overlay: true});
-  const day = (panel, which, sub, extra = {}) => ({css: `.${panel} .mat-calendar`, day: which, sub, overlay: true, ...extra});
+  // panelClass lands on the popup's <mat-calendar>, inside .mat-datepicker-content.
+  const popCss = (panel, sub) => (sub === '.mat-datepicker-content' ? `.mat-datepicker-content:has(.mat-calendar.${panel})`
+    : sub === '.mat-calendar' ? `.mat-calendar.${panel}` : `.mat-calendar.${panel} ${sub}`);
+  const pop = (panel, sub) => ({css: popCss(panel, sub), overlay: true});
+  const day = (panel, which, sub, extra = {}) => ({css: `.mat-calendar.${panel}`, day: which, sub, overlay: true, ...extra});
   const cal = (id, which, sub, extra = {}) => ({css: `#${id}`, day: which, sub, ...extra});
   const content = '.mat-calendar-body-cell-content';
   bind('datepicker', 'color', 'popup', 'background-color', t('calendar-container-background-color'), pop('ccs-dp-primary', '.mat-datepicker-content'));
@@ -176,7 +179,8 @@ function bind(companion, dimension, element, property, token, locate, extra = {}
   for (const [variant, panel] of [['', 'ccs-dp-primary'], ['-accent', 'ccs-dp-accent'], ['-warn', 'ccs-dp-warn']]) {
     bind('datepicker', 'color', `popup${variant}-selected-today`, 'background-color', t('calendar-date-selected-state-background-color'), day(panel, 'today', content));
     bind('datepicker', 'color', `popup${variant}-selected-today`, 'color', t('calendar-date-selected-state-text-color'), day(panel, 'today', content));
-    bind('datepicker', 'color', `popup${variant}-selected-today`, 'box-shadow', t('calendar-date-today-selected-state-outline-color'), day(panel, 'today', content));
+    // The token is a color inside `box-shadow: inset 0 0 0 1px <token>`: a color sentinel.
+    bind('datepicker', 'color', `popup${variant}-selected-today`, 'box-shadow', t('calendar-date-today-selected-state-outline-color'), day(panel, 'today', content), {sentinel_kind: 'color'});
   }
   bind('datepicker', 'color', 'popup-date', 'color', t('calendar-date-text-color'), day('ccs-dp-primary', 'plain', content));
   bind('datepicker', 'color', 'popup-date', 'border-top-color', t('calendar-date-outline-color'), day('ccs-dp-primary', 'plain', content));
@@ -374,8 +378,8 @@ const SENTINEL_KIND = {
   'letter-spacing': 'tracking', 'font-weight': 'weight', 'font-family': 'family', opacity: 'opacity', display: 'display',
 };
 
-export function sentinelKind(property) {
-  const kind = SENTINEL_KIND[property];
+export function sentinelKind(property, override = null) {
+  const kind = override || SENTINEL_KIND[property];
   if (!kind) throw new Error(`no sentinel kind for ${property}`);
   return kind;
 }
@@ -388,7 +392,7 @@ export function sentinelKind(property) {
 export function sentinelTable(bindings = BINDINGS) {
   const tokens = new Map();
   for (const binding of bindings) {
-    const kind = sentinelKind(binding.property);
+    const kind = sentinelKind(binding.property, binding.sentinel_kind);
     const known = tokens.get(binding.token);
     if (known && known.kind !== kind) throw new Error(`${binding.token}: conflicting sentinel kinds ${known.kind}/${kind}`);
     if (!known) tokens.set(binding.token, {kind});
@@ -451,11 +455,16 @@ export function candidateScss(moduleUrl = '@ngx-compat/material-legacy') {
   return `@use '${moduleUrl}' as legacy with ($theme-ignore-duplication-warnings: true);\n${themeSass('legacy', {m2Prefix: ''})}\n${rules.join('\n')}\n`;
 }
 
-/** Wrong-but-nonempty token values on every candidate scope (negative read only). */
-export function sentinelCss(table, scenario = NEGATIVE_SCENARIO) {
+/**
+ * Wrong-but-nonempty value for one token on the candidate scope (negative read
+ * only). Tokens are injected one at a time so that another token's sentinel
+ * (padding, min-width, ...) cannot mask or reshape the consuming property.
+ */
+export function sentinelCss(table, token, scenario = NEGATIVE_SCENARIO) {
+  const s = table[token];
+  if (!s) throw new Error(`no sentinel for ${token}`);
   const theme = SCENARIOS[scenario].outer;
-  const decls = Object.entries(table).map(([token, s]) => `${token}: ${s.value} !important;`).join(' ');
-  return `.ccs-candidate-${theme}, .ccs-candidate-${theme} * { ${decls} }\n`;
+  return `.ccs-candidate-${theme}, .ccs-candidate-${theme} * { ${token}: ${s.value} !important; }\n`;
 }
 
 export function parseDeclarations(css) {
@@ -514,7 +523,7 @@ export function peerDimensionTokens(sass, nodeModules, identity = peerIdentity(n
     out[companion] = {
       peer_source_file: existsSync(file) ? rel : null,
       peer_source_sha256: existsSync(file) ? sha256(readFileSync(file)) : null,
-      dimensions: Object.fromEntries(DIMENSIONS.map((d) => [d, {tokens: new Set(), by_theme: {}}])),
+      dimensions: Object.fromEntries(DIMENSIONS.map((d) => [d, {tokens: new Set(), by_theme: {}, declared: {}}])),
     };
   }
   for (const name of Object.keys(THEMES)) {
@@ -527,18 +536,26 @@ export function peerDimensionTokens(sass, nodeModules, identity = peerIdentity(n
     const body = `@use '@angular/material' as mat;\n${themeSass('mat', {m2Prefix: 'm2-'})}\n${blocks.join('\n')}\n`;
     const {css} = compilePeerOnly(sass, nodeModules, body, `ccs-dimensions-${name}.scss`, identity);
     const per = {};
+    const values = {};
     for (const block of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
       const owner = block[1].match(/\.ccs-p-([a-z-]+?)--([a-z]+)/);
       if (!owner) continue;
       const key = `${owner[1]}\u0000${owner[2]}`;
-      for (const decl of block[2].matchAll(/(--mat-[a-z0-9-]+)\s*:/g)) (per[key] ||= new Set()).add(decl[1]);
+      for (const decl of block[2].matchAll(/(--mat-[a-z0-9-]+)\s*:\s*([^;]*);?/g)) {
+        (per[key] ||= new Set()).add(decl[1]);
+        // Declared values are recorded for the root scope only, not variant descendants.
+        if (block[1].trim() === owner[0]) ((values[key] ||= {})[decl[1]] ||= new Set()).add(decl[2].trim());
+      }
     }
     for (const companion of COMPANIONS) {
       for (const dimension of DIMENSIONS) {
         const found = [...(per[`${companion}\u0000${dimension}`] || [])].sort();
         const slot = out[companion].dimensions[dimension];
         slot.by_theme[name] = found;
-        for (const token of found) slot.tokens.add(token);
+        for (const token of found) {
+          slot.tokens.add(token);
+          for (const value of values[`${companion}\u0000${dimension}`]?.[token] || []) (slot.declared[token] ||= new Set()).add(value);
+        }
       }
     }
   }
@@ -546,6 +563,28 @@ export function peerDimensionTokens(sass, nodeModules, identity = peerIdentity(n
     for (const dimension of DIMENSIONS) {
       const slot = out[companion].dimensions[dimension];
       slot.tokens = [...slot.tokens].sort();
+      slot.declared = Object.fromEntries(Object.entries(slot.declared).map(([token, set]) => [token, [...set].sort()]));
+    }
+  }
+  return out;
+}
+
+/** CSS-wide keywords: a custom property declared with one has no computed token value of its own. */
+export const CSS_WIDE_KEYWORDS = ['inherit', 'initial', 'unset', 'revert', 'revert-layer'];
+
+/**
+ * Tokens the peer's own dimension mixins declare with a CSS-wide keyword in
+ * every theme (for example badge `container-size: unset`, icon `color: inherit`).
+ * getComputedStyle reports no value for such a token; the consuming property
+ * still has to match the oracle and still has to consume an injected value.
+ */
+export function peerKeywordTokens(dimensionTokens) {
+  const out = {};
+  for (const info of Object.values(dimensionTokens || {})) {
+    for (const slot of Object.values(info.dimensions || {})) {
+      for (const [token, values] of Object.entries(slot.declared || {})) {
+        if (values.length === 1 && CSS_WIDE_KEYWORDS.includes(values[0])) out[token] = values[0];
+      }
     }
   }
   return out;
@@ -608,8 +647,9 @@ const nonEmpty = (v) => typeof v === 'string' && v.trim() !== '';
  * scope, the consuming property shows that wrong value and no longer equals
  * the oracle.
  */
-export function assessCase(binding, obs, sentinel) {
+export function assessCase(binding, obs, sentinel, {peerKeyword = null} = {}) {
   const reasons = [];
+  const keyword = CSS_WIDE_KEYWORDS.includes(peerKeyword) ? peerKeyword : null;
   const scenarios = [];
   for (const scenario of binding.scenarios) {
     const o = obs?.oracle?.[scenario];
@@ -624,7 +664,7 @@ export function assessCase(binding, obs, sentinel) {
     };
     if (!o?.found) reasons.push(`${scenario}: oracle consuming element not rendered`);
     else if (!c?.found) reasons.push(`${scenario}: candidate consuming element not rendered`);
-    else if (!nonEmpty(o.token_value)) reasons.push(`${scenario}: peer oracle does not define ${binding.token} on the consuming element`);
+    else if (!nonEmpty(o.token_value) && !keyword) reasons.push(`${scenario}: peer oracle does not define ${binding.token} on the consuming element`);
     else if (!nonEmpty(o.value)) reasons.push(`${scenario}: oracle computed ${binding.property} is empty`);
     else if (o.value !== c.value) reasons.push(`${scenario}: candidate ${binding.property} ${JSON.stringify(c.value)} != peer ${JSON.stringify(o.value)}`);
     else row.match = true;
@@ -649,6 +689,7 @@ export function assessCase(binding, obs, sentinel) {
     case_id: binding.id,
     result: reasons.length ? 'fail' : 'pass',
     reasons,
+    peer_declared_keyword: keyword,
     scenarios,
     negative,
   };
@@ -673,7 +714,7 @@ export function assessOracle(companion, caseResults, {identity, isolation, appli
     const pair = SENSITIVITY[dimension];
     const mine = caseResults.filter((r) => r.dimension === dimension);
     if (!pair) {
-      const defined = mine.length > 0 && mine.every((r) => r.scenarios.every((s) => nonEmpty(s.oracle_token)));
+      const defined = mine.length > 0 && mine.every((r) => r.scenarios.every((s) => nonEmpty(s.oracle_token) || CSS_WIDE_KEYWORDS.includes(r.peer_declared_keyword)));
       sensitivity[dimension] = {kind: 'peer-token-defined', ok: defined};
       if (!defined) reasons.push(`${dimension}: peer oracle tokens not defined on every consuming element`);
       continue;

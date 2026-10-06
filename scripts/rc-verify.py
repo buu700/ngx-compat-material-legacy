@@ -970,6 +970,7 @@ def _bridge_token_assertion_ok(body: dict, invocation: str) -> bool:
 _SHA256_HEX = re.compile(r"^[0-9a-f]{64}$")
 _COMPUTED_GROUPS = ("thirteen-companion-dimensions", "independent-peer-oracle")
 _COMPUTED_DIMENSIONS = ("base", "color", "typography", "density")
+_CSS_WIDE_KEYWORDS = ("inherit", "initial", "unset", "revert", "revert-layer")
 
 
 def _is_sha256(value) -> bool:
@@ -993,6 +994,9 @@ def _computed_rendered_case_ok(body: dict, case_id: str, component: str, dimensi
     token = body.get("token")
     if not (isinstance(token, str) and token.startswith(f"--mat-{component}-")):
         return False
+    keyword = body.get("peer_declared_keyword")
+    if keyword is not None and keyword not in _CSS_WIDE_KEYWORDS:
+        return False
     scenarios = body.get("scenarios")
     if not isinstance(scenarios, list) or not scenarios:
         return False
@@ -1007,7 +1011,8 @@ def _computed_rendered_case_ok(body: dict, case_id: str, component: str, dimensi
         oracle = scenario.get("oracle")
         if not (isinstance(oracle, str) and oracle.strip() and scenario.get("candidate") == oracle):
             return False
-        if not (isinstance(scenario.get("oracle_token"), str) and scenario["oracle_token"].strip()):
+        # A token the peer declares with a CSS-wide keyword has no computed value of its own.
+        if keyword is None and not (isinstance(scenario.get("oracle_token"), str) and scenario["oracle_token"].strip()):
             return False
     negative = body.get("negative")
     if not isinstance(negative, dict):

@@ -61,15 +61,25 @@ if (mode === 'no-oracle') delete obs.oracle[first];
 if (mode === 'empty') { obs.oracle[first] = {found: true, value: '', token_value: 'x'}; obs.candidate[first] = obs.oracle[first]; }
 if (mode === 'negative-ignored') obs.negative = {found: true, value: input.value};
 if (mode === 'negative-missing') delete obs.negative;
-out(cases.assessCase(binding, obs, mode === 'no-sentinel' ? undefined : sentinel));
+out(cases.assessCase(binding, obs, mode === 'no-sentinel' ? undefined : sentinel, {peerKeyword: input.keyword || null}));
 """
 
 
 class AssessCaseTests(unittest.TestCase):
     ID = "toolbar/color/toolbar/background-color"
 
-    def assess(self, mode):
-        return node(ASSESS, {"id": self.ID, "mode": mode, "value": "rgb(245, 245, 245)", "wrong": "rgb(33, 33, 33)"})
+    def assess(self, mode, keyword=None):
+        return node(ASSESS, {"id": self.ID, "mode": mode, "value": "rgb(245, 245, 245)", "wrong": "rgb(33, 33, 33)",
+                             "keyword": keyword})
+
+    def test_css_wide_keyword_token_needs_no_computed_token_value_only(self):
+        result = self.assess("no-oracle-token", keyword="inherit")
+        self.assertEqual(result["result"], "pass", result["reasons"])
+        self.assertEqual(result["peer_declared_keyword"], "inherit")
+        self.assertEqual(self.assess("no-oracle-token", keyword="rgb(0, 0, 0)")["result"], "fail")
+        # A keyword token still has to match and still has to consume the injected value.
+        self.assertEqual(self.assess("wrong", keyword="inherit")["result"], "fail")
+        self.assertEqual(self.assess("negative-ignored", keyword="inherit")["result"], "fail")
 
     def test_equal_consumed_value_with_consumed_negative_passes(self):
         result = self.assess("pass")
@@ -128,6 +138,22 @@ out({
   anonymous: cases.assessOracle('toolbar', rows.moving, {identity: null, isolation: {peer_only: true}, applicable: ['color']}),
 });
 """
+
+
+class SentinelInjectionTests(unittest.TestCase):
+    def test_one_token_per_injection_and_color_sentinel_for_outline_color(self):
+        out = node("""
+const table = cases.sentinelTable();
+const css = cases.sentinelCss(table, '--mat-badge-container-shape');
+const outline = cases.BINDINGS.find((b) => b.id === 'datepicker/color/popup-selected-today/box-shadow');
+const kw = cases.peerKeywordTokens({badge: {dimensions: {base: {declared: {
+  '--mat-badge-container-size': ['unset'], '--mat-badge-container-shape': ['50%'], '--mat-badge-x': ['unset', '1px']}}}}});
+out({css, outline: table[outline.token].kind, kw});
+""")
+        self.assertEqual(out["css"].count("--mat-"), 1)
+        self.assertIn("--mat-badge-container-shape", out["css"])
+        self.assertEqual(out["outline"], "color")
+        self.assertEqual(out["kw"], {"--mat-badge-container-size": "unset"})
 
 
 class OracleTests(unittest.TestCase):

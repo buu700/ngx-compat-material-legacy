@@ -19,9 +19,11 @@
  * and a nested dark-inside-light theme (datepicker popups and the bottom
  * sheet are real body overlays themed through the overlay container), and
  * requires candidate == oracle. A negative read injects a distinct
- * wrong-but-nonempty value for every token on the candidate scope; each case
- * then requires the consuming property to show that value and no longer
- * match the oracle.
+ * wrong-but-nonempty value for one token at a time on the candidate scope;
+ * each case then requires the consuming property to show that value and no
+ * longer match the oracle. A button renders before any calendar, as in a
+ * typical app, and headless Chromium is started with hover-capable input so
+ * the peer's (hover: hover) state rules apply.
  *
  * The roster comes from companion-computed-cases.mjs: reviewed bindings
  * filtered by the peer's own per-dimension M2 mixins. A rostered case that is
@@ -44,7 +46,7 @@ import {
   BINDINGS, CHECK_ID, COMPANIONS, DEFAULT_SCENARIOS, DIMENSIONS, GROUP_DIMENSIONS, GROUP_ORACLE,
   NEGATIVE_SCENARIO, PEER_PACKAGE, SCENARIOS,
   assessCase, assessNotApplicable, assessOracle, candidateScss, caseFileName, compilePeerOnly,
-  deriveRoster, oracleScss, peerDimensionTokens, peerIdentity, sentinelCss, sentinelTable,
+  deriveRoster, oracleScss, peerDimensionTokens, peerIdentity, peerKeywordTokens, sentinelCss, sentinelTable,
 } from './companion-computed-cases.mjs';
 
 export {COMPANIONS, DIMENSIONS};
@@ -92,8 +94,9 @@ export function compareRoster(derived, groups) {
 export function assessAll({roster, observations, sentinels, dimensionTokens, identity, isolation}) {
   const results = [];
   const byCompanion = {};
+  const keywords = peerKeywordTokens(dimensionTokens);
   for (const binding of roster.rostered) {
-    const result = assessCase(binding, observations[binding.id], sentinels[binding.token]);
+    const result = assessCase(binding, observations[binding.id], sentinels[binding.token], {peerKeyword: keywords[binding.token] || null});
     result.companion = binding.companion;
     result.dimension = binding.dimension;
     result.element = binding.element;
@@ -237,6 +240,7 @@ import {BrowserModule} from '@angular/platform-browser';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {MatBadgeModule} from '@angular/material/badge';
 import {MatBottomSheet, MatBottomSheetModule} from '@angular/material/bottom-sheet';
+import {MatButtonModule} from '@angular/material/button';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MATERIAL_ANIMATIONS, MatNativeDateModule} from '@angular/material/core';
 import {
@@ -275,6 +279,9 @@ export class SheetContent {}
   selector: 'lab-root',
   providers: [{provide: MAT_DATE_RANGE_SELECTION_STRATEGY, useClass: DefaultMatCalendarRangeStrategy}],
   template: \`
+  <!-- A button rendered before any calendar, as in a typical app, so MatButton
+       styles precede the calendar's and the calendar's own button rules apply. -->
+  <button matButton type="button" id="ccs-early-button">Early</button>
   <div id="ccs-root" class="ccs-root">
    <div id="ccs-inner" class="ccs-inner">
     <section class="ccs-badges">
@@ -491,7 +498,7 @@ export class LabRoot implements AfterViewInit {
 
 @NgModule({
   imports: [
-    BrowserModule, MatBadgeModule, MatBottomSheetModule, MatButtonToggleModule, MatDatepickerModule,
+    BrowserModule, MatBadgeModule, MatBottomSheetModule, MatButtonModule, MatButtonToggleModule, MatDatepickerModule,
     MatDividerModule, MatExpansionModule, MatFormFieldModule, MatGridListModule, MatIconModule,
     MatInputModule, MatNativeDateModule, MatSidenavModule, MatSortModule, MatStepperModule,
     MatToolbarModule, MatTreeModule,
@@ -723,6 +730,8 @@ async function withChromium(distDir, run) {
   const chrome = spawn(chromeBin, [
     '--headless=new', `--remote-debugging-port=${debugPort}`, `--user-data-dir=${chromeDir}`,
     '--no-sandbox', '--disable-gpu', '--window-size=1280,1000', '--force-device-scale-factor=1',
+    // Headless reports (hover: none); the peer gates hover styles on (hover: hover).
+    '--blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4',
     `http://127.0.0.1:${port}/`,
   ], {stdio: ['ignore', 'ignore', 'pipe']});
   let chromeLog = '';
@@ -780,7 +789,7 @@ async function withChromium(distDir, run) {
 }
 
 /** Drive the page: prepare states, then oracle/candidate reads per scenario and one negative read. */
-async function observe({send, evaluate}, bindings) {
+async function observe({send, evaluate}, bindings, sentinels) {
   for (let i = 0; i < 200; i += 1) {
     if (await evaluate('window.__ccsReady === true || !!document.getElementById("bootstrap-error")')) break;
     await sleep(100);
@@ -838,21 +847,32 @@ async function observe({send, evaluate}, bindings) {
   await frame();
   const unthemed = await evaluate(`window.__ccs.read(${JSON.stringify(unthemedIds)})`);
   for (const id of unthemedIds) observations[id].unthemed = unthemed[id];
-  const negativeIds = bindings.filter((b) => b.scenarios.includes(NEGATIVE_SCENARIO)).map((b) => b.id);
-  const narrowNegative = bindings.filter((b) => !b.scenarios.includes(NEGATIVE_SCENARIO));
+  // Negative: one token at a time, the candidate light scope gets a wrong value.
+  // Bindings observed only in narrow scenarios get theirs at the narrow viewport.
   applied.negative = await evaluate(`(() => { document.getElementById('ccs-sentinel').media = 'all'; return window.__ccs.apply('candidate', ${JSON.stringify(SCENARIOS[NEGATIVE_SCENARIO])}); })()`);
-  await frame();
-  const negative = await evaluate(`window.__ccs.read(${JSON.stringify(negativeIds)})`);
-  for (const id of negativeIds) observations[id].negative = negative[id];
-  // Bindings observed only in narrow scenarios get their negative at the narrow viewport, light theme.
-  if (narrowNegative.length) {
-    await setViewport('narrow');
-    await frame();
-    const narrow = await evaluate(`window.__ccs.read(${JSON.stringify(narrowNegative.map((b) => b.id))})`);
-    for (const b of narrowNegative) observations[b.id].negative = narrow[b.id];
-    await setViewport('wide');
+  const byToken = new Map();
+  for (const b of bindings) {
+    const group = byToken.get(b.token) || {wide: [], narrow: []};
+    (b.scenarios.includes(NEGATIVE_SCENARIO) ? group.wide : group.narrow).push(b.id);
+    byToken.set(b.token, group);
   }
-  await evaluate(`document.getElementById('ccs-sentinel').media = 'not all'`);
+  const injected = [];
+  for (const viewportName of ['wide', 'narrow']) {
+    const work = [...byToken].filter(([, group]) => group[viewportName].length);
+    if (!work.length) continue;
+    await setViewport(viewportName);
+    for (const [token, group] of work) {
+      const ids = group[viewportName];
+      await evaluate(`document.getElementById('ccs-sentinel').textContent = ${JSON.stringify(sentinelCss(sentinels, token))}`);
+      await frame();
+      const negative = await evaluate(`window.__ccs.read(${JSON.stringify(ids)})`);
+      for (const id of ids) observations[id].negative = {...negative[id], isolated_token: token};
+      injected.push(token);
+    }
+  }
+  await setViewport('wide');
+  applied.negative_tokens = injected.length;
+  await evaluate(`(() => { const el = document.getElementById('ccs-sentinel'); el.media = 'not all'; el.textContent = ''; })()`);
   return {observations, applied, environment};
 }
 
@@ -892,9 +912,8 @@ async function renderLine({tarball, line, runId, expectPeerVersion, matrixGroups
   await buildLab(consumer, env, versions);
   const dist = join(consumer, 'dist');
   writeFileSync(join(dist, 'theme.css'), `${oracle.css}\n${candidate.css}\n`);
-  writeFileSync(join(dist, 'index.html'), INDEX_HTML.replace('<style id="ccs-sentinel" media="not all"></style>',
-    `<style id="ccs-sentinel" media="not all">${sentinelCss(sentinels)}</style>`));
-  const rendered = await withChromium(dist, async (cdp) => ({browser: cdp.browser, ...(await observe(cdp, roster.rostered))}));
+  writeFileSync(join(dist, 'index.html'), INDEX_HTML);
+  const rendered = await withChromium(dist, async (cdp) => ({browser: cdp.browser, ...(await observe(cdp, roster.rostered, sentinels))}));
   const assessed = assessAll({roster, observations: rendered.observations, sentinels, dimensionTokens, identity, isolation});
   const failed = [...assessed.dimensionCases, ...assessed.oracleCases].filter((r) => r.result !== 'pass');
   return {
@@ -1007,7 +1026,8 @@ async function main() {
       'Oracle: the consumer-installed current @angular/material peer, M2-themed by its own m2-define-*-theme and <companion>-theme mixins, compiled from the peer only, rendered in the same page and DOM as the candidate.',
       'Candidate: legacy.all-current-companion-bridges from the packed library. 16.2.14 rules that per-companion legacy theme mixins also emit are not part of this candidate.',
       'Scenarios: light, dark, density -2, alternate typography (Georgia), RTL, nested dark-in-light; toolbar mobile height at a 480px viewport. Popups and the bottom sheet are real CDK body overlays themed through the overlay container.',
-      'Each case needs candidate == oracle on the consuming computed property in every scenario and a failing comparison when a wrong-but-nonempty token is injected on the candidate scope.',
+      'Each case needs candidate == oracle on the consuming computed property in every scenario and a failing comparison when a wrong-but-nonempty value of its token alone is injected on the candidate scope.',
+      'A token the peer M2 mixin declares with a CSS-wide keyword (badge container sizes unset, icon color and expansion header line-height/tracking inherit) has no computed token value; its consuming property must still match and consume the injected value.',
       'This report is a slice. The rc-verify coordinator report built from the assertion files is the acceptance input. No G06/G07/G08 claim.',
     ],
   };

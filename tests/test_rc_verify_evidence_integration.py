@@ -787,6 +787,15 @@ console.log(JSON.stringify(bodies.map((b) => [b.case_id, b.result])));
             with self.subTest(changes=changes):
                 self._write_computed_assertions(ids, {case_id: changes})
                 self.assertEqual(self._computed_report()[1]["coverage"], "slice")
+        keyword_light = {**light, "oracle_token": ""}
+        for changes, coverage in (
+            ({"peer_declared_keyword": "unset", "scenarios": [keyword_light]}, "complete"),
+            ({"peer_declared_keyword": "bogus", "scenarios": [keyword_light]}, "slice"),
+            ({"peer_declared_keyword": None, "scenarios": [keyword_light]}, "slice"),
+        ):
+            with self.subTest(keyword=changes["peer_declared_keyword"]):
+                self._write_computed_assertions(ids, {case_id: changes})
+                self.assertEqual(self._computed_report()[1]["coverage"], coverage)
         na = "badge/density/not-applicable"
         for changes in ({"peer_emitted_tokens": ["--mat-badge-x"]}, {"peer_emitted_tokens": None},
                         {"peer_mixin": "mat.badge-theme"}, {"peer_source_sha256": None}):
