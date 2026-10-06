@@ -35,6 +35,7 @@ def owned_rendered_ok(root,active,body,invocation):
         if any(not isinstance(p['reference'],str) or not p['reference'] or p['candidate']!=p['reference'] for p in props):return False
         mutation=body['mutation']
         if mutation['found'] is not True or any(not isinstance(mutation[k],str) or not mutation[k] for k in ('reference','observed')) or mutation['reference']==mutation['observed']:return False
-        if body['case_id']=='owned-style/light/disabled-placeholder' and mutation['reference']!=props[0]['reference']:return False
+        mutation_property='line-height' if any(p['property']=='line-height' for p in props) else props[0]['property']
+        if mutation.get('property')!=mutation_property or mutation['reference']!=next(p['reference'] for p in props if p['property']==mutation_property):return False
         return True
     except (KeyError,ValueError,TypeError,OSError,subprocess.TimeoutExpired):return False
