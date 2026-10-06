@@ -803,7 +803,7 @@ def write_migration_packaged_report(
 
 _LINE_COORDINATOR_LIMITATIONS = {
     "m3-coexistence": [
-        "Coordinator report for the line being verified. Each rostered main case has an assertion file written by this run.",
+        "Coordinator report for the line being verified. Each rostered main case has a packed rendered assertion file written by this run against the run library tarball.",
         "Contamination fixtures are rejected and are not rostered. The report keeps the executed scope ids only.",
         "21.x m3 groups stay null. A main run does not copy them and does not call expected_cases for 21.x.",
         "This report is the acceptance input. It does not add a G07 claim field.",
@@ -971,6 +971,9 @@ _SHA256_HEX = re.compile(r"^[0-9a-f]{64}$")
 _COMPUTED_GROUPS = ("thirteen-companion-dimensions", "independent-peer-oracle")
 _COMPUTED_DIMENSIONS = ("base", "color", "typography", "density")
 _CSS_WIDE_KEYWORDS = ("inherit", "initial", "unset", "revert", "revert-layer")
+# The peer datepicker density mixin restyles its calendar controls through
+# icon-button tokens, so those cases consume a token the companion does not own.
+_COMPUTED_FOREIGN_TOKEN_PREFIXES = {("datepicker", "density"): ("--mat-icon-button-",)}
 
 
 def _is_sha256(value) -> bool:
@@ -992,7 +995,8 @@ def _computed_rendered_case_ok(body: dict, case_id: str, component: str, dimensi
     if case_id != f"{component}/{dimension}/{element}/{prop}":
         return False
     token = body.get("token")
-    if not (isinstance(token, str) and token.startswith(f"--mat-{component}-")):
+    prefixes = (f"--mat-{component}-", *_COMPUTED_FOREIGN_TOKEN_PREFIXES.get((component, dimension), ()))
+    if not (isinstance(token, str) and token.startswith(prefixes)):
         return False
     keyword = body.get("peer_declared_keyword")
     if keyword is not None and keyword not in _CSS_WIDE_KEYWORDS:
@@ -1091,9 +1095,105 @@ def _computed_style_assertion_ok(body: dict, invocation: str) -> bool:
     return _computed_rendered_case_ok(body, case_id, component, dimension)
 
 
+_M3_CASE_GROUPS = {
+    "current-only": "inclusion-order",
+    "legacy-only": "inclusion-order",
+    "current-then-legacy": "inclusion-order",
+    "legacy-then-current": "inclusion-order",
+    "nested-theme-scope": "nested-lazy-overlay",
+    "lazy-body-overlay": "nested-lazy-overlay",
+    "current-shared-scope": "shared-style-boundary",
+    "legacy-shared-scope": "shared-style-boundary",
+}
+
+
+def _m3_order_facts_ok(case_id: str, facts: dict) -> bool:
+    m3, m2 = facts.get("m3_present"), facts.get("m2_present")
+    if case_id == "current-only":
+        return m3 is True and m2 is False
+    if case_id == "legacy-only":
+        return m2 is True and m3 is False
+    i3, i2 = facts.get("m3_index"), facts.get("m2_index")
+    if not (m3 is True and m2 is True and isinstance(i3, int) and isinstance(i2, int)):
+        return False
+    return i3 < i2 if case_id == "current-then-legacy" else i2 < i3
+
+
+def _m3_rendered_check_ok(check) -> bool:
+    if not isinstance(check, dict) or check.get("found") is not True or check.get("ok") is not True:
+        return False
+    if not all(isinstance(check.get(k), str) and check.get(k) for k in ("label", "probe", "observed", "reference")):
+        return False
+    props = check.get("properties")
+    if not isinstance(props, list) or not props:
+        return False
+    for prop in props:
+        if not isinstance(prop, dict) or not isinstance(prop.get("property"), str) or not prop.get("property"):
+            return False
+        if not all(isinstance(prop.get(k), str) and prop.get(k) for k in ("observed", "reference")):
+            return False
+    if check.get("expect") == "equal":
+        return all(prop["observed"] == prop["reference"] for prop in props)
+    if check.get("expect") == "differ":
+        return any(prop["observed"] != prop["reference"] for prop in props)
+    return False
+
+
+def _m3_assertion_ok(body: dict, invocation: str) -> bool:
+    """An m3-coexistence assertion from this run's packed library.
+
+    It must name this run and invocation and the run's library tarball, carry
+    a passing packed compile of its case, and a passing Chromium render of a
+    fresh consumer install against the run's frozen @angular/material peer:
+    every rendered check found its probes and holds on non-empty computed
+    values. current-shared-scope also needs its contamination fixture
+    detected and unrostered. A workspace compile is not accepted.
+    """
+    case_id = body.get("case_id")
+    group = _M3_CASE_GROUPS.get(case_id) if isinstance(case_id, str) else None
+    if group is None or body.get("group") != group:
+        return False
+    if body.get("check_id") != "m3-coexistence" or body.get("line") != "main":
+        return False
+    if body.get("result") != "pass" or body.get("kind") != "assertion" or body.get("source_kind") != "packed":
+        return False
+    if body.get("run_id") != ACTIVE_RUN.manifest.get("run_id") or body.get("invocation_id") != invocation:
+        return False
+    library = _library_artifact_sha256()
+    if library is None or body.get("tarball_sha256") != library:
+        return False
+    peer_version = _current_peer_version("@angular/material")
+    if peer_version is None or body.get("peer_version") != peer_version:
+        return False
+    facts = body.get("packed_compile")
+    if not isinstance(facts, dict) or not facts:
+        return False
+    if group == "inclusion-order" and not _m3_order_facts_ok(case_id, facts):
+        return False
+    rendered = body.get("rendered")
+    if not isinstance(rendered, dict) or rendered.get("result") != "pass":
+        return False
+    if not (isinstance(rendered.get("browser"), str) and rendered.get("browser")):
+        return False
+    versions = rendered.get("versions")
+    if not isinstance(versions, dict) or versions.get("material") != peer_version:
+        return False
+    checks = rendered.get("checks")
+    if not isinstance(checks, list) or not checks or not all(_m3_rendered_check_ok(c) for c in checks):
+        return False
+    if not any(c.get("expect") == "equal" for c in checks):
+        return False
+    if case_id == "current-shared-scope":
+        negative = rendered.get("contamination_negative")
+        if not isinstance(negative, dict) or negative.get("detected") is not True or negative.get("rostered") is not False:
+            return False
+    return True
+
+
 _ASSERTION_BODY_CHECKS = {
     "companion-bridge-tokens": _bridge_token_assertion_ok,
     "companion-computed-styles": _computed_style_assertion_ok,
+    "m3-coexistence": _m3_assertion_ok,
 }
 
 
@@ -1435,14 +1535,15 @@ def main() -> int:
     results["companion-computed-styles"] = "pass" if code == 0 else "fail"
     implemented_ran.append("companion-computed-styles")
 
-    # m3-coexistence: fresh main workspace compile of inclusion order plus the
-    # nested/lazy/overlay and shared-style cases. When every rostered main case
-    # has an assertion file from this run, write one coordinator report. A
-    # failed child or a 21.x line stays an incomplete slice. Contamination
-    # negatives stay unrostered. The report does not add a G07 claim field.
+    # m3-coexistence: packed compile plus a Chromium render of a fresh consumer
+    # install of the run library for the inclusion orders, nested/lazy/overlay
+    # and shared-style cases; the workspace compile stays in the child report.
+    # When every rostered main case has a packed rendered assertion from this
+    # run, write one coordinator report. A failed child or a 21.x line stays an
+    # incomplete slice. Contamination negatives stay unrostered. No G07 claim.
     code = run_node(
         "scripts/check-m3-inclusion-order.mjs",
-        ["--out", str(out_dir / "m3-inclusion-order-workspace.json")],
+        ["--run", str(run_path), "--out", str(out_dir / "m3-inclusion-order-workspace.json")],
     )
     write_line_coordinator_report(
         out_dir,
@@ -1451,8 +1552,8 @@ def main() -> int:
         "m3-coexistence",
         exit_code=code,
         limitations=[
-            "Main workspace compiles the four inclusion orders, nested-theme-scope, lazy-body-overlay, and separate current/legacy shared-style scopes.",
-            "Contamination fixtures are rejected and are not rostered.",
+            "Run library tarball: packed compile and Chromium-rendered computed styles of a fresh consumer install for the four inclusion orders, nested-theme-scope, lazy-body-overlay, and separate current/legacy shared-style scopes.",
+            "The main workspace compile also runs and stays in the child report. Contamination fixtures are rejected or detected and are not rostered.",
             "21.x m3 groups stay null. A 21.x line stays an incomplete slice. Does not mark m3-coexistence accepted. Does not claim G07.",
         ],
     )

@@ -179,13 +179,13 @@ function exactVersion(spec, fallback) {
   return match ? match[1] : fallback;
 }
 
-function readPackedPackage(tarball) {
+export function readPackedPackage(tarball) {
   const result = spawnSync('tar', ['-xOzf', tarball, 'package/package.json'], {encoding: 'utf8'});
   if (result.status !== 0) throw new Error((result.stderr || 'unable to read packed package.json').slice(-500));
   return JSON.parse(result.stdout);
 }
 
-function versionsFor(pkg) {
+export function versionsFor(pkg) {
   const peers = pkg.peerDependencies || {};
   const core = exactVersion(peers['@angular/core'], '22.1.7');
   const major = Number(core.split('.')[0]);
@@ -520,7 +520,7 @@ platformBrowserDynamic().bootstrapModule(LabModule).catch(err => {
 
 function sleep(ms) { return new Promise((resolveSleep) => setTimeout(resolveSleep, ms)); }
 
-function installConsumer(tarball, versions) {
+export function installConsumer(tarball, versions) {
   const consumer = mkdtempSync(join(tmpdir(), 'ngx-compat-companion-computed-'));
   const installTarball = join(consumer, 'library.tgz');
   writeFileSync(installTarball, readFileSync(tarball));
@@ -574,9 +574,9 @@ function compileCandidate(sass, nodeModules, installed, identity) {
   return {css: compiled.css, sha256: sha256(compiled.css), loaded_files: loaded.length};
 }
 
-async function buildLab(consumer, env, versions) {
+export async function buildLab(consumer, env, versions, source = labSource()) {
   mkdirSync(join(consumer, 'src'), {recursive: true});
-  writeFileSync(join(consumer, 'src/main.ts'), labSource());
+  writeFileSync(join(consumer, 'src/main.ts'), source);
   const compilerOptions = {
     target: 'ES2022', module: 'ES2022', moduleResolution: 'bundler', experimentalDecorators: true,
     strict: true, skipLibCheck: true, lib: ['ES2022', 'DOM'], rootDir: 'src', outDir: 'out', types: [],
@@ -710,7 +710,7 @@ const INDEX_HTML = `<!doctype html><html><head>
 </head><body><lab-root></lab-root><script src="/app.js"></script></body></html>
 `;
 
-async function withChromium(distDir, run) {
+export async function withChromium(distDir, run, {debugPort: portOverride = null} = {}) {
   const server = createServer((req, res) => {
     const file = req.url === '/' ? 'index.html' : req.url.split('?')[0].replace(/^\//, '');
     try {
@@ -725,7 +725,7 @@ async function withChromium(distDir, run) {
   await new Promise((resolveListen) => server.listen(0, '127.0.0.1', resolveListen));
   const {port} = server.address();
   const chromeBin = resolveChromeBin();
-  const debugPort = Number(process.env.COMPANION_CDP_PORT || 9334);
+  const debugPort = Number(portOverride || process.env.COMPANION_CDP_PORT || 9334);
   const chromeDir = mkdtempSync(join(tmpdir(), 'ngx-compat-chrome-companion-'));
   const chrome = spawn(chromeBin, [
     '--headless=new', `--remote-debugging-port=${debugPort}`, `--user-data-dir=${chromeDir}`,

@@ -5,6 +5,7 @@
  *
  *   node scripts/check-m3-inclusion-order.mjs
  *   node scripts/check-m3-inclusion-order.mjs --tarball <main.tgz> --tarball-21x <21.tgz> --material-21x <node_modules>
+ *   node scripts/check-m3-inclusion-order.mjs --run <run.json>
  *
  * Workspace mode uses this checkout and its installed @angular/material.
  * A tarball is extracted and compiled against the material root for that line.
@@ -12,6 +13,10 @@
  * nested-theme-scope, lazy-body-overlay, and the two shared-style scopes.
  * 21.x m3 groups stay unexecuted. implemented stays false.
  * A coordinator invocation on main writes one assertion file per executed case.
+ * With --run, the case assertions come from the run's packed library only: a
+ * packed compile of every case plus a Chromium render of a fresh consumer
+ * install (scripts/m3-rendered-coexistence.mjs). A case passes only when both
+ * pass. The workspace compile still runs and stays in the report.
  * Deliberate contamination fixtures must fail and are not rostered.
  */
 import {createHash} from 'node:crypto';
@@ -33,7 +38,7 @@ function fail(code, message) {
 }
 
 function parseArgs(argv) {
-  const args = {tarball: null, tarball21: null, material21: null, out: defaultReport};
+  const args = {tarball: null, tarball21: null, material21: null, run: null, out: defaultReport};
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     const next = () => {
@@ -46,9 +51,11 @@ function parseArgs(argv) {
     else if (arg === '--tarball-21x') args.tarball21 = next();
     else if (arg === '--material-21x') args.material21 = next();
     else if (arg === '--out') args.out = next();
+    else if (arg === '--run') args.run = next();
     else fail(2, `Unknown argument: ${arg}`);
   }
   if (args.tarball21 && !args.material21) fail(2, '--tarball-21x requires --material-21x');
+  if (args.run && args.tarball) fail(2, '--run and --tarball are exclusive');
   return args;
 }
 
@@ -91,7 +98,7 @@ function compileCss(source, loadPaths, urlName) {
   return result.css;
 }
 
-function themePrelude() {
+export function themePrelude() {
   return `
 @use '@ngx-compat/material-legacy' as legacy with ($theme-ignore-duplication-warnings: true);
 @use '@angular/material' as mat;
@@ -109,7 +116,7 @@ $m3: mat.define-theme((
 `;
 }
 
-function themeSource(order) {
+export function themeSource(order) {
   const current = '@include mat.all-component-themes($m3);';
   const legacy = '@include legacy.all-legacy-component-themes($m2);';
   const body = order === 'current-only' ? current
@@ -119,7 +126,7 @@ function themeSource(order) {
   return `${themePrelude()}\n.order { ${body} }\n`;
 }
 
-function nestedThemeSource() {
+export function nestedThemeSource() {
   return `${themePrelude()}
 .app-nested {
   @include mat.all-component-themes($m3);
@@ -138,7 +145,7 @@ function lazyInitialSource() {
 `;
 }
 
-function lazyOverlaySource() {
+export function lazyOverlaySource() {
   return `${themePrelude()}
 body .cdk-overlay-container .lazy-m3-overlay {
   @include mat.all-component-themes($m3);
@@ -149,7 +156,7 @@ body .cdk-overlay-container .lazy-m2-overlay {
 `;
 }
 
-function currentSharedSource() {
+export function currentSharedSource() {
   return `${themePrelude()}
 .current-shared-scope {
   @include mat.ripple();
@@ -159,7 +166,7 @@ function currentSharedSource() {
 `;
 }
 
-function legacySharedSource() {
+export function legacySharedSource() {
   return `${themePrelude()}
 .legacy-shared-scope {
   @include legacy.ripple();
@@ -181,7 +188,7 @@ function groupedControlSource() {
 `;
 }
 
-function unscopedLegacyCoreSource() {
+export function unscopedLegacyCoreSource() {
   return `
 @use '@ngx-compat/material-legacy' as legacy;
 @include legacy.legacy-core();
@@ -684,6 +691,65 @@ export function writeExtensionAssertions(outputDir, line) {
   return written;
 }
 
+export const M3_CASE_GROUPS = Object.freeze({
+  ...Object.fromEntries(INCLUSION_ORDER_IDS.map(id => [id, 'inclusion-order'])),
+  ...Object.fromEntries(NESTED_LAZY_OVERLAY_IDS.map(id => [id, 'nested-lazy-overlay'])),
+  ...Object.fromEntries(SHARED_STYLE_BOUNDARY_IDS.map(id => [id, 'shared-style-boundary'])),
+});
+
+const EXTENSION_FACT_KEYS = {
+  'nested-theme-scope': 'nested_theme_scope',
+  'lazy-body-overlay': 'lazy_body_overlay',
+  'current-shared-scope': 'current_shared_scope',
+  'legacy-shared-scope': 'legacy_shared_scope',
+};
+
+/** Packed compile facts for one case, or null when that compile did not pass. */
+export function packedCompileFacts(id, line) {
+  if (!line || line.source_kind !== 'packed' || !Array.isArray(line.errors) || line.errors.length) return null;
+  if (M3_CASE_GROUPS[id] === 'inclusion-order') {
+    return orderPassed(id, line.orders?.[id]) ? line.orders[id] : null;
+  }
+  if (!extensionReady(line)) return null;
+  return line.extensions[EXTENSION_FACT_KEYS[id]] ?? null;
+}
+
+/** Pure: one rendered-and-compiled assertion body per passing case. */
+export function packedRenderedBodies(line, rendered, {runId, invocationId}) {
+  const bodies = {};
+  for (const [id, group] of Object.entries(M3_CASE_GROUPS)) {
+    const facts = packedCompileFacts(id, line);
+    const result = rendered?.results?.[id];
+    if (!facts || result?.result !== 'pass' || result.group !== group) continue;
+    if (group === 'shared-style-boundary' && id === 'current-shared-scope' && result.contamination_negative?.detected !== true) continue;
+    bodies[id] = {
+      check_id: 'm3-coexistence',
+      case_id: id,
+      group,
+      result: 'pass',
+      kind: 'assertion',
+      line: 'main',
+      source_kind: 'packed',
+      run_id: runId,
+      invocation_id: invocationId,
+      tarball_sha256: line.tarball_sha256,
+      material_version: line.material_version,
+      peer_version: rendered.versions?.material ?? null,
+      packed_compile: facts,
+      rendered: {
+        browser: rendered.browser,
+        versions: rendered.versions,
+        result: result.result,
+        checks: result.checks,
+        ...(result.contamination_negative ? {contamination_negative: result.contamination_negative} : {}),
+      },
+      g07_claim: 'not-passed',
+      not_executed: {'21.x': null},
+    };
+  }
+  return bodies;
+}
+
 function assertionOutputDir() {
   const names = ['RC_CHECK_ID', 'RC_RUN_ID', 'RC_INVOCATION_ID', 'RC_EVIDENCE_BINDING', 'RC_ASSERTION_OUTPUT_DIR'];
   const present = names.filter(name => process.env[name]);
@@ -722,8 +788,13 @@ function assertionOutputDir() {
   return outputDir;
 }
 
-function main(argv) {
+async function main(argv) {
   const args = parseArgs(argv);
+  let library = null;
+  if (args.run) {
+    const {resolveLibraryFromRun} = await import('./resolve-run-library.mjs');
+    library = resolveLibraryFromRun(args.run);
+  }
   const workspaceModules = [
     join(root, 'node_modules'),
     join(root, 'node_modules/.pnpm/node_modules'),
@@ -747,6 +818,31 @@ function main(argv) {
     line.extensions = compileWorkspaceExtensions(loadPaths);
     line.errors = [...line.errors, ...line.extensions.errors];
     lines.push(line);
+  }
+  let rendered = null;
+  if (library) {
+    const packedPaths = [stagePackage(library.tarball), ...workspaceModules];
+    const packed = compileLine({line: 'main', loadPaths: packedPaths, sourceKind: 'packed', tarball: library.tarball});
+    packed.extensions = compileWorkspaceExtensions(packedPaths);
+    packed.errors = [...packed.errors, ...packed.extensions.errors];
+    lines.push(packed);
+    try {
+      const {renderM3Coexistence} = await import('./m3-rendered-coexistence.mjs');
+      rendered = await renderM3Coexistence({tarball: library.tarball, debugPort: Number(process.env.M3_CDP_PORT || 9336)});
+    } catch (error) {
+      rendered = {error: error instanceof Error ? error.message : String(error), results: {}};
+    }
+    const renderErrors = rendered.error ? [`rendered: ${rendered.error}`]
+      : Object.values(rendered.results).filter(r => r.result !== 'pass').map(r => `rendered ${r.case_id}: ${r.reasons.join('; ')}`);
+    packed.rendered = {
+      browser: rendered.browser ?? null,
+      versions: rendered.versions ?? null,
+      compiled_bytes: rendered.compiled_bytes ?? null,
+      applied: rendered.applied ?? null,
+      results: Object.fromEntries(Object.entries(rendered.results).map(([id, r]) => [id, {result: r.result, reasons: r.reasons}])),
+      error: rendered.error ?? null,
+    };
+    packed.errors = [...packed.errors, ...renderErrors];
   }
   if (args.tarball21) {
     lines.push(compileLine({
@@ -784,6 +880,10 @@ function main(argv) {
       'lazy-body-overlay compiles a second stylesheet after the initial theme and confines markers to body .cdk-overlay-container scopes.',
       'current-shared-scope and legacy-shared-scope are separate compilations. Shared ripple, focus, and pseudo-checkbox selectors must stay in the compilation that emitted them.',
       'Contamination fixtures are rejected and are not rostered.',
+      ...(library ? [
+        'With --run, case assertions come from the run library tarball: packed compile of every case plus a Chromium render of a fresh consumer install, both of which must pass.',
+        'Rendered checks compare computed styles of current and legacy button, checkbox, slide-toggle, pseudo-checkbox, ripple and focus-indicator probes across inclusion orders, nested scopes, lazy body overlays and shared-style scopes. A root-level legacy shared-style fixture must visibly restyle the current scope and is not rostered.',
+      ] : []),
       '21.x m3 groups stay null. implemented stays false. Does not mark m3-coexistence accepted. Does not claim G07.',
     ] : [
       'Both include orders compile and the theme markers follow that order.',
@@ -798,7 +898,16 @@ function main(argv) {
   if (outputDir) {
     const mainLine = lines.find(line => line.line === 'main' && line.source_kind === 'workspace');
     if (!mainLine) fail(2, 'm3-coexistence: main workspace compile did not run');
-    if (errors.length === 0) {
+    if (library) {
+      const packed = lines.find(line => line.line === 'main' && line.source_kind === 'packed');
+      const bodies = packedRenderedBodies(packed, rendered, {runId: process.env.RC_RUN_ID, invocationId: process.env.RC_INVOCATION_ID});
+      assertion_files = [];
+      for (const [id, body] of Object.entries(bodies)) {
+        const name = `${id}.json`;
+        writeFileSync(join(outputDir, name), `${JSON.stringify(body, null, 2)}\n`);
+        assertion_files.push(name);
+      }
+    } else if (errors.length === 0) {
       try {
         assertion_files = [
           ...writeInclusionOrderAssertions(outputDir, mainLine),
@@ -819,6 +928,7 @@ function main(argv) {
       current_then_legacy: line.orders['current-then-legacy'].m3_index < line.orders['current-then-legacy'].m2_index,
       legacy_then_current: line.orders['legacy-then-current'].m2_index < line.orders['legacy-then-current'].m3_index,
       extended: Boolean(line.extensions) && line.extensions.errors.length === 0,
+      rendered: line.rendered ? Object.fromEntries(Object.entries(line.rendered.results).map(([id, r]) => [id, r.result])) : undefined,
     })),
     contamination_rejected: workspaceMain ? {
       'nested-lazy-overlay': workspaceMain.extensions.contamination_negatives['nested-lazy-overlay'].rejected,
@@ -830,5 +940,8 @@ function main(argv) {
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  process.exit(main(process.argv.slice(2)));
+  main(process.argv.slice(2)).then(code => process.exit(code), error => {
+    console.error(error);
+    process.exit(1);
+  });
 }

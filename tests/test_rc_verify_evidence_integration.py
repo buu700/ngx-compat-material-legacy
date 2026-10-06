@@ -242,6 +242,127 @@ class CoordinatorTests(unittest.TestCase):
         self.assertEqual(report["coverage"], "slice")
         self.assertEqual(report["line"], "21.x")
 
+    _M3_GROUPS = {
+        "current-only": "inclusion-order", "legacy-only": "inclusion-order",
+        "current-then-legacy": "inclusion-order", "legacy-then-current": "inclusion-order",
+        "nested-theme-scope": "nested-lazy-overlay", "lazy-body-overlay": "nested-lazy-overlay",
+        "current-shared-scope": "shared-style-boundary", "legacy-shared-scope": "shared-style-boundary",
+    }
+    _M3_ORDER_FACTS = {
+        "current-only": (True, False, 10, -1),
+        "legacy-only": (False, True, -1, 10),
+        "current-then-legacy": (True, True, 10, 20),
+        "legacy-then-current": (True, True, 20, 10),
+    }
+
+    def _m3_body(self, case_id, invocation, **changes):
+        library = next(item for item in self.f.run["artifacts"] if item["id"] == "library")
+        group = self._M3_GROUPS[case_id]
+        if group == "inclusion-order":
+            m3, m2, i3, i2 = self._M3_ORDER_FACTS[case_id]
+            facts = {"bytes": 100, "m3_present": m3, "m2_present": m2, "m3_index": i3, "m2_index": i2}
+        else:
+            facts = {"selectors": 3}
+        themed, plain = "rgb(0, 92, 187)", "rgba(0, 0, 0, 0)"
+        checks = [
+            {"label": "themed", "probe": "cur-button", "expect": "differ", "observed": "a/order",
+             "reference": "none/order", "found": True, "ok": True,
+             "properties": [{"property": "background-color", "observed": themed, "reference": plain}]},
+            {"label": "unchanged", "probe": "cur-button", "expect": "equal", "observed": "b/order",
+             "reference": "a/order", "found": True, "ok": True,
+             "properties": [{"property": "background-color", "observed": themed, "reference": themed}]},
+        ]
+        rendered = {"browser": "Chrome/154", "versions": {"material": "22.1.7"}, "result": "pass", "checks": checks}
+        if case_id == "current-shared-scope":
+            rendered["contamination_negative"] = {"fixture": "root legacy shared styles", "detected": True,
+                                                  "rostered": False, "checks": []}
+        body = {
+            "check_id": "m3-coexistence", "case_id": case_id, "group": group, "result": "pass",
+            "kind": "assertion", "line": "main", "source_kind": "packed",
+            "run_id": self.f.run["run_id"], "invocation_id": invocation,
+            "tarball_sha256": library["sha256"], "material_version": "22.1.7", "peer_version": "22.1.7",
+            "packed_compile": facts, "rendered": rendered,
+            "g07_claim": "not-passed", "not_executed": {"21.x": None},
+        }
+        body.update(changes)
+        return body
+
+    def test_m3_wrong_but_nonempty_or_unpacked_assertion_stays_slice(self):
+        _, ids = self._real_line_ids("m3-coexistence")
+        self.assertEqual(sorted(ids), sorted(self._M3_GROUPS))
+
+        def rendered_with(case_id, **changes):
+            body = self._m3_body(case_id, "x")["rendered"]
+            body = json.loads(json.dumps(body))
+            for key, value in changes.items():
+                if key == "equal_observed":
+                    body["checks"][1]["properties"][0]["observed"] = value
+                elif key == "differ_observed":
+                    body["checks"][0]["properties"][0]["observed"] = value
+                else:
+                    body[key] = value
+            return body
+
+        library = next(item for item in self.f.run["artifacts"] if item["id"] == "library")
+        bad = {
+            "workspace compile": ("current-only", {"source_kind": "workspace"}),
+            "foreign tarball": ("legacy-only", {"tarball_sha256": "ef" * 32}),
+            "missing tarball": ("legacy-only", {"tarball_sha256": None}),
+            "wrong peer": ("nested-theme-scope", {"peer_version": "22.0.0"}),
+            "wrong-but-nonempty equal": ("lazy-body-overlay", {"rendered": rendered_with("lazy-body-overlay", equal_observed="rgb(1, 2, 3)")}),
+            "unthemed differ": ("current-then-legacy", {"rendered": rendered_with("current-then-legacy", differ_observed="rgba(0, 0, 0, 0)")}),
+            "empty observed": ("legacy-then-current", {"rendered": rendered_with("legacy-then-current", equal_observed="")}),
+            "no checks": ("legacy-shared-scope", {"rendered": rendered_with("legacy-shared-scope", checks=[])}),
+            "failed render": ("legacy-shared-scope", {"rendered": rendered_with("legacy-shared-scope", result="fail")}),
+            "undetected negative": ("current-shared-scope", {"rendered": rendered_with(
+                "current-shared-scope", contamination_negative={"detected": False, "rostered": False})}),
+            "crossed order facts": ("current-then-legacy", {"packed_compile": {
+                "m3_present": True, "m2_present": True, "m3_index": 30, "m2_index": 20}}),
+            "wrong group": ("nested-theme-scope", {"group": "inclusion-order"}),
+            "other run": ("current-only", {"run_id": "another-run"}),
+        }
+        self.assertTrue(library["sha256"])
+        for label, (case_id, changes) in bad.items():
+            with self.subTest(label=label):
+                directory = self._write_line_assertions("m3-coexistence", ids)
+                write_json(directory / f"{case_id}.json",
+                           self._m3_body(case_id, self.run.invocation("m3-coexistence"), **changes))
+                path = self.f.run_dir / "reports/m3-coexistence.json"
+                if path.exists():
+                    path.unlink()
+                verify.write_line_coordinator_report(
+                    self.f.run_dir, self.f.run["run_id"], "main", "m3-coexistence", exit_code=0,
+                )
+                self.assertEqual(acceptance.read_json(path)["coverage"], "slice")
+        directory = self._write_line_assertions("m3-coexistence", ids)
+        path = self.f.run_dir / "reports/m3-coexistence.json"
+        path.unlink()
+        verify.write_line_coordinator_report(
+            self.f.run_dir, self.f.run["run_id"], "main", "m3-coexistence", exit_code=0,
+        )
+        self.assertEqual(acceptance.read_json(path)["coverage"], "complete")
+
+    def test_m3_producer_bodies_satisfy_the_coordinator(self):
+        from test_m3_rendered_coexistence import render
+        _, ids = self._real_line_ids("m3-coexistence")
+        self._bridge_peer()
+        invocation = self.run.invocation("m3-coexistence")
+        library = next(item for item in self.f.run["artifacts"] if item["id"] == "library")
+        bodies = render(bodies={"tarball": library["sha256"], "run_id": self.f.run["run_id"],
+                                "invocation": invocation})["bodies"]
+        self.assertEqual(sorted(bodies), sorted(ids))
+        directory = self.f.run_dir / acceptance.assertion_directory("m3-coexistence", invocation)
+        directory.mkdir(parents=True, exist_ok=True)
+        for case_id, body in bodies.items():
+            self.assertTrue(verify._m3_assertion_ok(body, invocation), case_id)
+            write_json(directory / f"{case_id}.json", body)
+        path = self.f.run_dir / "reports/m3-coexistence.json"
+        path.unlink()
+        verify.write_line_coordinator_report(
+            self.f.run_dir, self.f.run["run_id"], "main", "m3-coexistence", exit_code=0,
+        )
+        self.assertEqual(acceptance.read_json(path)["coverage"], "complete")
+
     def _real_line_ids(self, check_id):
         matrix = acceptance.read_json(verify.MATRIX_PATH)
         row = next(item for item in matrix["checks"] if item["check_id"] == check_id)
@@ -251,6 +372,11 @@ class CoordinatorTests(unittest.TestCase):
         invocation = self.run.invocation(check_id)
         directory = self.f.run_dir / acceptance.assertion_directory(check_id, invocation)
         directory.mkdir(parents=True, exist_ok=True)
+        if check_id == "m3-coexistence":
+            self._bridge_peer()
+            for case_id in ids:
+                write_json(directory / f"{case_id}.json", self._m3_body(case_id, invocation))
+            return directory
         for case_id in ids:
             write_json(directory / f"{case_id.replace('/', '__')}.json", {
                 "case_id": case_id,
@@ -682,6 +808,21 @@ console.log(JSON.stringify(bodies.map((b) => [b.case_id, b.result])));
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(sorted(json.loads(result.stdout)), sorted([case_id, "pass"] for case_id in ids))
         self.assertEqual(self._computed_report()[1]["coverage"], "complete")
+
+    def test_computed_token_owner_allows_only_the_datepicker_density_icon_button(self):
+        self._computed_matrix()
+        invocation = self.run.invocation("companion-computed-styles")
+        allowed = self._computed_body("datepicker/density/popup-next-button-touch-target/display", invocation,
+                                      token="--mat-icon-button-touch-target-display")
+        self.assertTrue(verify._computed_style_assertion_ok(allowed, invocation))
+        for case_id, token in (
+            ("datepicker/color/popup-next-button-touch-target/display", "--mat-icon-button-touch-target-display"),
+            ("badge/color/badge/background-color", "--mat-icon-button-touch-target-display"),
+            ("datepicker/density/popup-next-button-touch-target/display", "--mat-badge-background-color"),
+        ):
+            with self.subTest(case_id=case_id, token=token):
+                body = self._computed_body(case_id, invocation, token=token)
+                self.assertFalse(verify._computed_style_assertion_ok(body, invocation))
 
     def test_null_computed_styles_roster_stays_slice(self):
         self._computed_matrix()
