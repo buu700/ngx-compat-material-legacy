@@ -116,12 +116,13 @@ def annotated_names(directory: Path, marker: str) -> tuple[set[str], int]:
     return names, files
 
 
-def declaration_export(directory: Path, module: str, name: str):
+def declaration_export(directory: Path, module: str, name: str, cache=None):
     """Resolve the exported declaration, keeping same-name internal types separate.
 
     Follow finite named and star re-exports in declaration files. An unavailable,
     ambiguous or unsupported export stays unknown rather than becoming clean.
     """
+    cache = {} if cache is None else cache
     package = '/'.join(module.split('/')[:2])
     subpath = '.' + module[len(package):]
     def types_target(value):
@@ -134,7 +135,10 @@ def declaration_export(directory: Path, module: str, name: str):
                     return target
         return None
     try:
-        manifest = json.loads((directory / 'package.json').read_text())
+        manifest_key = ('manifest', directory)
+        if manifest_key not in cache:
+            cache[manifest_key] = json.loads((directory / 'package.json').read_text())
+        manifest = cache[manifest_key]
         target = types_target(manifest.get('exports', {}).get(subpath))
         if not target and subpath == '.':
             target = manifest.get('types') or manifest.get('typings')
@@ -157,11 +161,16 @@ def declaration_export(directory: Path, module: str, name: str):
         if path is None or (path, symbol) in trail:
             return set()
         trail = trail | {(path, symbol)}
-        source = path.read_text(errors='replace')
-        code = _scanner.strip_comments(source)
+        parsed_key = ('parsed', path)
+        if parsed_key not in cache:
+            code = _scanner.strip_comments(path.read_text(errors='replace'))
+            direct = re.findall(r'\bexport\s+(?:declare\s+)?(?:abstract\s+)?(?:class|interface|type|enum|function|const|let|var)\s+([\w$]+)\b', code)
+            stars = re.findall(r'\bexport\s+\*\s+from\s*[\'\"]([^\'\"]+)[\'\"]', code)
+            cache[parsed_key] = (named.findall(code), set(declaration.findall(code)), set(direct), stars)
+        blocks, declarations, direct, stars = cache[parsed_key]
         imports = {}
         exports = []
-        for kind, block, origin in named.findall(code):
+        for kind, block, origin in blocks:
             for part in block.split(','):
                 pair = re.fullmatch(r'(?:type\s+)?([\w$]+)(?:\s+as\s+([\w$]+))?', part.strip())
                 if not pair:
@@ -172,7 +181,7 @@ def declaration_export(directory: Path, module: str, name: str):
                 elif (alias or original) == symbol:
                     exports.append((origin, original))
         results = set()
-        if re.search(r'\bexport\s+(?:declare\s+)?(?:abstract\s+)?(?:class|interface|type|enum|function|const|let|var)\s+' + re.escape(symbol) + r'\b', code):
+        if symbol in direct:
             results.add((path, symbol))
         for origin, original in exports:
             if origin:
@@ -180,9 +189,9 @@ def declaration_export(directory: Path, module: str, name: str):
             elif original in imports:
                 origin, imported = imports[original]
                 results |= resolve(relative_file(path.parent, origin), imported, trail)
-            elif original in declaration.findall(code):
+            elif original in declarations:
                 results.add((path, original))
-        for origin in re.findall(r'\bexport\s+\*\s+from\s*[\'\"]([^\'\"]+)[\'\"]', code):
+        for origin in stars:
             results |= resolve(relative_file(path.parent, origin), symbol, trail)
         return results
     resolved = resolve(entry, name, set())
@@ -283,18 +292,26 @@ def evaluate(authored: Path, policy: dict, tarball: Path | None, annotations: Pa
         private_count = deprecated_count = 0
         unresolved_exports = []
         observed_files = set()
+        declaration_cache = {}
+        export_cache = {}
+        marker_cache = {}
         for use in uses:
             directory = package_roots.get(use['package'])
             if directory is None:
                 missing_packages.append(use['package'])
                 continue
-            resolved = declaration_export(directory, use['module'], use['name'])
+            key = (directory, use['module'], use['name'])
+            if key not in export_cache:
+                export_cache[key] = declaration_export(directory, use['module'], use['name'], declaration_cache)
+            resolved = export_cache[key]
             if resolved is None:
                 unresolved_exports.append(use)
                 continue
             path, name = resolved
             observed_files.add(path)
-            markers = declaration_markers(path, name)
+            if resolved not in marker_cache:
+                marker_cache[resolved] = declaration_markers(path, name)
+            markers = marker_cache[resolved]
             detail = dict(use, declaration=str(path.relative_to(directory.resolve())), declaration_name=name)
             if '@docs-private' in markers:
                 private_hits.append(detail)
