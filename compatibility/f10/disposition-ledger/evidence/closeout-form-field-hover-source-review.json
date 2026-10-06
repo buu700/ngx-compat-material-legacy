@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "reviewer": "Codex primary implementer",
+  "recorded_at_utc": "2026-10-06T23:48:52.659657+00:00",
+  "reviews": [
+    {
+      "sha": "cf456a2d43837497367662e7de22f1b2bcbf4f00",
+      "diff": "diff --git a/src/material/form-field/_form-field-focus-overlay.scss b/src/material/form-field/_form-field-focus-overlay.scss\nindex ade624aaf..9dfd64cc7 100644\n--- a/src/material/form-field/_form-field-focus-overlay.scss\n+++ b/src/material/form-field/_form-field-focus-overlay.scss\n@@ -19,7 +19,7 @@\n       tokens-mat-form-field.$prefix, tokens-mat-form-field.get-token-slots()) {\n       @include token-utils.create-token-slot(background-color, state-layer-color);\n \n-      .mat-mdc-form-field:hover & {\n+      .mat-mdc-text-field-wrapper:hover & {\n         @include token-utils.create-token-slot(opacity, hover-state-layer-opacity);\n       }\n \n",
+      "diff_sha256": "e2ca404fabad6af81c12ef841957e5d3a05a9439627b3302751baccde7ec9d69",
+      "files": [
+        "src/material/form-field/_form-field-focus-overlay.scss"
+      ],
+      "review_depth": "individual-compatibility",
+      "decision": "Main claimed already-adapted but its actual owned helper retains the tagged parent-hover selector.21 copied the modern wrapper-hover selector and differs in four complete custom field mixin outputs. The original helper is now restored on21 with only two approved vendor module relocations; no binding/value/selector golden or exception is changed. Read the entire upstream modern patch; its source structure and token-slot implementation differ from the owned16 helper. Required fresh CSS/current-peer scope review remains open rather than treating source presence or an issue number as adaptation proof.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "needs-individual-review",
+      "original": {
+        "member": "package/form-field/_form-field-focus-overlay.scss",
+        "sha256": "29be39f281b7079368ae00750de8dbe8a7693ef7bfc640960562dd8805f4110a",
+        "reference_path": "reference/material-16.2.14/error-helper-sources/form-field-focus-overlay.scss"
+      },
+      "owned": {
+        "path": "projects/ngx-material-legacy/styles/form-field/_form-field-focus-overlay.scss",
+        "before_sha256": "f6bd446f5e7931d0349f6b59a11b3c63a4974ef0d4de10a56412936fb796be9e",
+        "after_sha256": "f6bd446f5e7931d0349f6b59a11b3c63a4974ef0d4de10a56412936fb796be9e",
+        "original_body_unchanged": true,
+        "allowed_module_relocations": {
+          "@material/ripple/functions": "../vendor/mdc/ripple/functions",
+          "@material/textfield": "../vendor/mdc/textfield"
+        }
+      },
+      "qualification": "Main helper already has the original body.21 restored, awaiting actual color/theme custom argument cases and further scoped current-peer hover review. No full Sass/G11 acceptance.",
+      "g11_claim": "not-passed"
+    }
+  ],
+  "g11_claim": "not-passed"
+}
