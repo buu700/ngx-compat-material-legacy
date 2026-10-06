@@ -23,8 +23,9 @@ const DRIVERS = {chromium: withChromium, firefox: withFirefox, webkit: withWebKi
 
 function exactVersion(spec, fallback) {
   const text = String(spec || '').trim();
-  const match = text.match(/\d+\.\d+\.\d+/);
-  if (match) return match[0];
+  const matches = text.match(/\d+\.\d+\.\d+/g) || [];
+  if (matches.length === 1) return matches[0];
+  if (matches.length > 1) return fallback;
   return fallback;
 }
 
@@ -43,7 +44,7 @@ export function versionsFor(pkg) {
     material: exactVersion(peers['@angular/material'], '21.2.14'),
     rxjs: exactVersion(peers.rxjs, '7.8.2'),
     typescript: '5.9.2',
-    zone: '0.16.3',
+    zone: '0.15.1',
     tslib: '2.8.1',
     sass: '1.104.1',
   };

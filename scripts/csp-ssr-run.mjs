@@ -62,7 +62,7 @@ function packageJson() {
       rxjs: '7.8.2',
       tslib: '2.8.1',
       typescript: '5.9.2',
-      'zone.js': '0.16.3',
+      'zone.js': '0.15.1',
     },
   }, null, 2);
 }
