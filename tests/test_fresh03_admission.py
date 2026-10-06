@@ -207,6 +207,90 @@ class Fresh03AdmissionTests(unittest.TestCase):
 
 
 
+class MinimumAgeExceptionTests(unittest.TestCase):
+    PUBLISHED = datetime(2026, 9, 30, 14, 8, 9, 382000, tzinfo=timezone.utc)
+    NOW = datetime(2026, 10, 6, 12, 0, tzinfo=timezone.utc)
+
+    def record(self, **changes):
+        base = {
+            "package": "source-map-js", "version": "1.2.2",
+            "published_at": "2026-09-30T14:08:09.382Z", "expires_at": "2026-10-07T14:08:09.382Z",
+            "advisory": "GHSA-68fv-2mgg-jv7q", "granted_by": "Ryan Lester",
+            "granted_on": "2026-10-06", "granted_at": "2026-10-06T03:43:00-04:00",
+            "authority": "Ryan Lester granted this temporary minimum-age exception in the project group chat.",
+            "reason": "GHSA-68fv-2mgg-jv7q is fixed only in 1.2.2, which is inside the seven-day window.",
+        }
+        base.update(changes)
+        return base
+
+    def assess(self, records, excludes, now=None):
+        return ELIGIBILITY.assess_age_exceptions(
+            records, excludes, now or self.NOW, lambda name, version: (self.PUBLISHED, ""))
+
+    def test_committed_grant_is_exact_cited_and_live(self):
+        records, error = ELIGIBILITY.load_age_exceptions(ROOT)
+        excludes = ELIGIBILITY.pnpm_age_excludes((ROOT / "pnpm-workspace.yaml").read_text())
+        self.assertIsNone(error)
+        self.assertEqual(excludes, ["source-map-js@1.2.2"])
+        result = self.assess(records, excludes)
+        self.assertEqual(result["problems"], [])
+        active = result["active"]["source-map-js@1.2.2"]
+        self.assertEqual(active["granted_by"], "Ryan Lester")
+        self.assertIn("GHSA-68fv-2mgg-jv7q", active["citation"])
+        self.assertIn("chainman/minimum-age-exceptions.toml", active["citation"])
+        self.assertIn("chainman/minimum-age-exceptions.toml", (ROOT / "chainman.toml").read_text())
+        self.assertIn("source-map-js@1.2.2:", (ROOT / "pnpm-lock.yaml").read_text())
+        self.assertNotIn("source-map-js@1.2.1", (ROOT / "pnpm-lock.yaml").read_text())
+
+    def test_expired_grant_still_configured_blocks(self):
+        result = self.assess([self.record()], ["source-map-js@1.2.2"], datetime(2026, 10, 7, 14, 8, 10, tzinfo=timezone.utc))
+        self.assertEqual(result["active"], {})
+        self.assertTrue(any("expired" in problem and "remove it" in problem for problem in result["problems"]))
+
+    def test_expiry_cannot_outlast_the_natural_window(self):
+        result = self.assess([self.record(expires_at="2026-10-08T00:00:00Z")], ["source-map-js@1.2.2"])
+        self.assertEqual(result["active"], {})
+        self.assertTrue(any("outlasts" in problem for problem in result["problems"]))
+
+    def test_blanket_or_unrecorded_excludes_block(self):
+        for entry in ("source-map-js", "source-map-js@*", "@types/*", "source-map-js@^1.2.2", "other@1.0.0"):
+            with self.subTest(entry=entry):
+                result = self.assess([self.record()], ["source-map-js@1.2.2", entry])
+                self.assertTrue(result["problems"], entry)
+
+    def test_grant_must_cite_owner_and_advisory(self):
+        for changes in ({"granted_by": ""}, {"authority": "ok"}, {"advisory": "none"},
+                        {"reason": "no advisory named"}, {"granted_on": "2026-10-05"}):
+            with self.subTest(changes=changes):
+                result = self.assess([self.record(**changes)], ["source-map-js@1.2.2"])
+                self.assertEqual(result["active"], {})
+                self.assertTrue(result["problems"])
+
+    def test_record_without_exclude_or_wrong_publish_time_is_not_active(self):
+        self.assertTrue(self.assess([self.record()], [])["problems"])
+        result = self.assess([self.record(published_at="2026-09-29T00:00:00Z")], ["source-map-js@1.2.2"])
+        self.assertEqual(result["active"], {})
+        self.assertTrue(any("differs from the registry" in problem for problem in result["problems"]))
+
+    def test_exclude_parser_rejects_other_shapes(self):
+        self.assertEqual(ELIGIBILITY.pnpm_age_excludes("minimumReleaseAgeExclude: []\n"), [])
+        self.assertIsNone(ELIGIBILITY.pnpm_age_excludes("minimumReleaseAgeExclude: [a]\n"))
+        self.assertIsNone(ELIGIBILITY.pnpm_age_excludes("a: 1\n"))
+        self.assertEqual(ELIGIBILITY.pnpm_age_excludes(
+            "minimumReleaseAgeExclude:\n  # note\n  - 'x@1.0.0'\nallowBuilds:\n  y: true\n"), ["x@1.0.0"])
+
+    def test_active_exception_defers_only_its_age_finding(self):
+        observation = ELIGIBILITY.evaluate(ROOT, self.NOW, lookup_performed=True, lookup={
+            "result": "queried", "http_status": 200, "rows": {}, "uncovered": [], "age_unknown": [],
+            "age_young": ["other@1.0.0"], "age_excepted": [{"citation": "source-map-js@1.2.2 grant"}],
+            "age_exception_problems": [], "toolchain_ok": True, "unresolved": [],
+        })
+        case = next(c for c in observation["cases"] if c["case_id"].endswith("lock-transitive-coverage"))
+        self.assertEqual(case["result"], "fail")
+        self.assertIn("other@1.0.0", case["detail"])
+        self.assertIn("source-map-js@1.2.2 grant", case["detail"])
+
+
 class RemediationObservationTests(unittest.TestCase):
     VULN = {"affected": [
         {"package": {"ecosystem": "npm", "name": "source-map-js"},
