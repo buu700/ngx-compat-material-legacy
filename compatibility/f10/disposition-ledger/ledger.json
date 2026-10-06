@@ -402,7 +402,32 @@
       "batch_id": "security-already-present-2026-10-01-b",
       "recorded_at_utc": "2026-10-01T16:30:02Z",
       "g11_claim": "not-passed",
-      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "individual_proof": {
+        "diff_sha256": "1c39f4005ed1ff80d1cd21d1485e6dca988fa73e79f805b3274008642858ac25",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Upstream only fixes the spelling autcomplete -> autocomplete in the requireSelection doc comment. The owned legacy autocomplete base already carries the corrected comment text on its requireSelection input, so there is nothing to adapt. The commit has no runtime effect.",
+        "proof_kind": "candidate-source-line-match",
+        "upstream_file": "src/material/autocomplete/autocomplete.ts",
+        "candidate_member": {
+          "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-base.ts",
+          "sha256": "56339de165b620907ce17ba9085ba8cfed7ed1e4ca77d1876158f5f4da6ba1ee"
+        },
+        "added_lines": [
+          {
+            "upstream_added": "autocomplete. If the user moves away from the autocomplete without selecting an option from",
+            "candidate_lines": [
+              170
+            ]
+          }
+        ],
+        "read_note": "already-present",
+        "recorded_by": "Grok, FIN-02-C02; Codex validates in FIN-02-C05",
+        "recomputed_by": "scripts/record-candidate-line-proofs.py"
+      }
     },
     {
       "sha": "db06fa8d8939d793f598bc3dbedc96a5a71c0db0",
@@ -1753,7 +1778,36 @@
       "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
       "recorded_at_utc": "2026-10-01T16:46:41Z",
       "g11_claim": "not-passed",
-      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "individual_proof": {
+        "diff_sha256": "040d162a30fac34d6298da796b61bc31b5049051e98d8f75666fe5cc47259813",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Upstream makes _exitAndDetach detach the overlay immediately when the panel element does not exist yet (`this._animationsDisabled || !this.panel`) instead of waiting for an exit animation on a missing element. The owned legacy select base _exitAndDetach has the same early branch (`!animationsEnabled || !this.panel`): it clears _overlayAttached, emits the void done state and returns, which detaches the connected overlay without touching the panel.",
+        "proof_kind": "candidate-source-equivalent",
+        "upstream_file": "src/material/select/select.ts",
+        "candidate_member": {
+          "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+          "sha256": "f445ce2492896a7beffbd94b7acd4955305525f75af76ae97ed1ef03e87aac95"
+        },
+        "added_lines": [],
+        "equivalent_candidate_lines": [
+          {
+            "candidate_snippet": "if (!animationsEnabled || !this.panel) {",
+            "candidate_lines": [
+              725
+            ]
+          }
+        ],
+        "replaced_upstream_lines": [
+          "if (this._animationsDisabled || !this.panel) {"
+        ],
+        "read_note": "already-present",
+        "recorded_by": "Grok, FIN-02-C02; Codex validates in FIN-02-C05",
+        "recomputed_by": "scripts/record-candidate-line-proofs.py"
+      }
     },
     {
       "sha": "24c25672b4eeb8d5599243bd50dec9fe4125de9b",
@@ -1787,7 +1841,43 @@
       "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
       "recorded_at_utc": "2026-10-01T16:46:41Z",
       "g11_claim": "not-passed",
-      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "individual_proof": {
+        "diff_sha256": "18b8d7b47b2f26e04cf1d50df6cc26d773af0cb8760c9f1015487e4af356cd90",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Upstream stops reading ViewContainerRef from the injector at attach time and passes a field-injected ViewContainerRef to the tooltip ComponentPortal. The owned legacy tooltip base receives ViewContainerRef as a constructor parameter (stored as _viewContainerRef) and builds the portal with `new ComponentPortal(this._tooltipComponent, this._viewContainerRef)`, so the portal already uses the directive's own view container. Only the injection style differs.",
+        "proof_kind": "candidate-source-equivalent",
+        "upstream_file": "src/material/tooltip/tooltip.ts",
+        "candidate_member": {
+          "path": "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
+          "sha256": "db6dda61947d7718b24170c963e781ed2aaf71fc00e4ba5b7ef8a7a20f4cc2e6"
+        },
+        "added_lines": [
+          {
+            "upstream_added": "this._portal || new ComponentPortal(this._tooltipComponent, this._viewContainerRef);",
+            "candidate_lines": [
+              375
+            ]
+          }
+        ],
+        "equivalent_candidate_lines": [
+          {
+            "candidate_snippet": "private _viewContainerRef: ViewContainerRef,",
+            "candidate_lines": [
+              284
+            ]
+          }
+        ],
+        "replaced_upstream_lines": [
+          "private _viewContainerRef = inject(ViewContainerRef);"
+        ],
+        "read_note": "already-present",
+        "recorded_by": "Grok, FIN-02-C02; Codex validates in FIN-02-C05",
+        "recomputed_by": "scripts/record-candidate-line-proofs.py"
+      }
     },
     {
       "sha": "cda5c8e686b0c4394b382db08c2d0b4b793ac7d6",
@@ -1863,7 +1953,39 @@
       "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
       "recorded_at_utc": "2026-10-01T16:46:41Z",
       "g11_claim": "not-passed",
-      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "individual_proof": {
+        "diff_sha256": "9c9207f9c8a8f416a3e92b0fffd2b0f6ce1e86bdd10a868241f505d91d49e6fd",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Upstream renames the M2 snack-bar token prefix (mat, snackbar) to (mat, snack-bar) and drops the (mat, snackbar) density entry, so no --mat-snackbar-* names remain. The owned token file styles/core/tokens/m2/mat/_snack-bar.scss already declares $prefix: (mat, snack-bar), and no owned source anywhere uses (mat, snackbar) or mat-snackbar. The separate (mdc, snackbar) 16.2.14 MDC token set is a different prefix that this commit does not touch.",
+        "proof_kind": "candidate-source-line-match",
+        "upstream_file": "src/material/core/tokens/m2/mdc/_snack-bar.scss",
+        "candidate_member": {
+          "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_snack-bar.scss",
+          "sha256": "16a8ffe092202483c5387822617c9789ee0aaf6b26a01ffb2ea168fa4c203d58"
+        },
+        "added_lines": [
+          {
+            "upstream_added": "$prefix: (mat, snack-bar);",
+            "candidate_lines": [
+              7
+            ]
+          }
+        ],
+        "absent_in_package": {
+          "needles": [
+            "(mat, snackbar)",
+            "mat-snackbar"
+          ],
+          "hits": []
+        },
+        "read_note": "already-present",
+        "recorded_by": "Grok, FIN-02-C02; Codex validates in FIN-02-C05",
+        "recomputed_by": "scripts/record-candidate-line-proofs.py"
+      }
     },
     {
       "sha": "b13c6aa194cf560a304213961ae28725f8d0a4e2",

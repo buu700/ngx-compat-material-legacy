@@ -234,6 +234,21 @@ def proof_defects(entry: dict, sensitive: str | None) -> list[str]:
     return out
 
 
+# Rows Grok read individually without being able to finish them; the observation is part of the question.
+OBSERVATIONS = {
+    "86a96c9290e3896485c6b6c0d039873652f543df": (
+        "The read note says owned close detaches lazy content after the void animation. "
+        "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts close actually detaches the overlay and the lazy content "
+        "immediately in both branches ('Detach immediately; do not bind semantic close to the exit animation'). Upstream waits for "
+        "the exit animation when the trigger owns the menu. The lazy-content leak is fixed, but the timing is a deliberate deviation "
+        "that the note misdescribes."),
+    "db06fa8d8939d793f598bc3dbedc96a5a71c0db0": (
+        "The candidate has no _captureValueOnAttach. It records _valueOnAttach in _attachOverlay(valueOnAttach) whenever the overlay "
+        "attaches (also with no options), using _valueOnLastKeydown, and compares requireSelection against it. Upstream additionally "
+        "re-captures when the panel becomes open after options arrive; the candidate's options-change branch only emits opened. "
+        "Whether that later re-capture matters for the no-options case is the open question."),
+}
+
 RETAINED_NOTES = {"not-applied", "owned-retained", "not-owned", "retained-legacy-differs"}
 NOTE_PATH = re.compile(r"[\w./-]+\.(?:ts|scss|html|css)")
 PR_NUMBER = re.compile(r"\(#(\d+)\)")
@@ -269,7 +284,7 @@ class Context:
             return {"source": note["source"], "disposition": note.get("disposition"), "text": note.get("evidence") or ""}
         return {"source": "ledger", "disposition": entry.get("read_note_disposition"), "text": entry.get("reason") or ""}
 
-    def candidate_refs(self, text: str, row: dict) -> dict:
+    def candidate_refs(self, text: str, row: dict, claims_present: bool = False) -> dict:
         refs = []
         for cited in sorted(set(NOTE_PATH.findall(text))):
             for base in (PACKAGE, ROOT):
@@ -285,8 +300,14 @@ class Context:
         body = "\n".join(path.read_text(errors="replace") for path in refs)
         squashed = re.sub(r"\s+", "", body)
         found = sum(1 for line in added if line in body or re.sub(r"\s+", "", line) in squashed)
+        # Identifiers the read note names (camelCase or _private) that the cited files do not contain.
+        # Only meaningful when the note claims the candidate already has the change.
+        prose = NOTE_PATH.sub(" ", text) if claims_present else ""
+        named = sorted({token for token in re.findall(r"\b_?[a-z]+[A-Z]\w*\b|\b_[a-z]\w+\b", prose)})
+        missing = [token for token in named if not re.search(rf"\b{re.escape(token)}\b", body)]
         return {"paths": [{"path": path.relative_to(ROOT).as_posix(), "sha256": sha256_bytes(path.read_bytes())} for path in refs],
-                "upstream_added_lines_found": f"{found}/{len(added)}"}
+                "upstream_added_lines_found": f"{found}/{len(added)}",
+                "read_note_identifiers_not_in_cited_files": missing}
 
     def regression_tests(self, row: dict) -> list[str]:
         c = row["mechanical_consistency"]
@@ -307,7 +328,7 @@ def review_note(row: dict, category: str, priority: int, ctx: Context) -> dict:
     sha, final = row["sha"], row["final_disposition"]
     c = row["mechanical_consistency"]
     note = ctx.read_note(sha)
-    refs = ctx.candidate_refs(note["text"], row) if note["text"] else {"paths": [], "upstream_added_lines_found": None}
+    refs = ctx.candidate_refs(note["text"], row, note["disposition"] == "already-present") if note["text"] else {"paths": [], "upstream_added_lines_found": None}
     pr = PR_NUMBER.search(row["subject"] or "")
     in_16 = bool(pr and pr.group(1) in ctx.prs_16)
     contradictions = []
@@ -352,7 +373,13 @@ def review_note(row: dict, category: str, priority: int, ctx: Context) -> dict:
             alternatives = [f"Keep {final} with individual proof.", "Reclassify after reading the hunk against the candidate."]
     elif category == "behavior":
         found = refs["upstream_added_lines_found"]
-        if refs["paths"] and found and found.split("/")[0] == found.split("/")[1] and found != "0/0":
+        unseen = refs.get("read_note_identifiers_not_in_cited_files") or []
+        if unseen:
+            kind = "ambiguity"
+            proposal = (f"The read note names {', '.join(unseen)}, which the cited candidate file(s) do not contain "
+                        f"(upstream added-line match {found}). The note may describe upstream code rather than the candidate; re-read before relying on it.")
+            alternatives = ["The candidate implements the behavior under other names: cite those lines.", "The behavior is absent: port it or record a deviation."]
+        elif refs["paths"] and found and found.split("/")[0] == found.split("/")[1] and found != "0/0":
             kind = "ambiguity"
             proposal = f"All {found} significant upstream added lines are present in the cited candidate file(s); the read note says {note['disposition']}. Proposed: fix present, record an individual proof after checking context."
             alternatives = ["The lines may match generically (for example a common statement) without the surrounding change; then treat as not present."]
@@ -395,6 +422,7 @@ def review_note(row: dict, category: str, priority: int, ctx: Context) -> dict:
         "read_note": note,
         "candidate_references": refs,
         "contradictions": contradictions,
+        **({"reviewer_observation": OBSERVATIONS[sha]} if sha in OBSERVATIONS else {}),
         "proposed_conclusion": proposal,
         "alternatives": alternatives,
         "regression_impact": {"candidate_specs": tests, "count": len(tests)},

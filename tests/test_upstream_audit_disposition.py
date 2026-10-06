@@ -328,18 +328,26 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
 
     def test_recorded_candidate_line_proofs_still_match_the_candidate(self) -> None:
         proofs = [e for e in json.loads(LEDGER.read_text())["entries"]
-                  if (e.get("individual_proof") or {}).get("proof_kind") == "candidate-source-line-match"]
+                  if (e.get("individual_proof") or {}).get("proof_kind") in ("candidate-source-line-match", "candidate-source-equivalent")]
         self.assertGreater(len(proofs), 0)
         for entry in proofs:
             proof = entry["individual_proof"]
             self.assertEqual(proof["affected_branches"], ["main"])
             self.assertGreaterEqual(len(proof["decision"]), 40)
             lines = (ROOT / proof["candidate_member"]["path"]).read_text().split("\n")
-            for item in proof["added_lines"]:
-                self.assertTrue(item["candidate_lines"], (entry["sha"], item))
-                for number in item["candidate_lines"]:
-                    squashed = "".join(item["upstream_added"].split())
-                    self.assertIn(squashed, "".join(lines[number - 1].split()), (entry["sha"], number))
+            checks = [(item["upstream_added"], item["candidate_lines"]) for item in proof["added_lines"]]
+            checks += [(item["candidate_snippet"], item["candidate_lines"]) for item in proof.get("equivalent_candidate_lines", [])]
+            if proof["proof_kind"] == "candidate-source-equivalent":
+                self.assertTrue(proof["equivalent_candidate_lines"], entry["sha"])
+            self.assertTrue(checks, entry["sha"])
+            for needle in proof.get("absent_in_package", {}).get("needles", []):
+                for path in (ROOT / "projects/ngx-material-legacy").rglob("*"):
+                    if path.is_file() and "node_modules" not in path.parts and path.suffix in {".ts", ".scss", ".html", ".css"}:
+                        self.assertNotIn(needle, path.read_text(errors="replace"), (entry["sha"], path))
+            for text, numbers in checks:
+                self.assertTrue(numbers, (entry["sha"], text))
+                for number in numbers:
+                    self.assertIn("".join(text.split()), "".join(lines[number - 1].split()), (entry["sha"], number))
 
 
 if __name__ == "__main__":

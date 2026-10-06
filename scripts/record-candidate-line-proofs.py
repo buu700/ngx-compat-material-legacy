@@ -26,7 +26,10 @@ _spec = importlib.util.spec_from_file_location("audit_join", ROOT / "scripts/bui
 join = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(join)
 
-# sha -> (upstream delegated file, candidate member, individual decision text)
+# sha -> (upstream delegated file, candidate member, individual decision text[, options])
+# options.comments: also compare comment lines (for comment-only commits).
+# options.equivalent: candidate snippets that implement the change in a different form; each
+# must be present, and upstream lines that are absent are listed as replaced_upstream_lines.
 PROOFS = {
     "77ffdf98ba71c11d908b29e02b516dddf487ae0b": (
         "src/material/autocomplete/autocomplete-trigger.ts",
@@ -53,6 +56,44 @@ PROOFS = {
         "template binds (detach)=\"close()\" on its cdk-connected-overlay, so the fix was already "
         "present in the candidate.",
     ),
+    "68b267dd59f3addf92a3b9f8ce9e8baa479df7f4": (
+        "src/material/tooltip/tooltip.ts",
+        f"{PACKAGE}/legacy-tooltip/internal/tooltip-base.ts",
+        "Upstream stops reading ViewContainerRef from the injector at attach time and passes a "
+        "field-injected ViewContainerRef to the tooltip ComponentPortal. The owned legacy tooltip base "
+        "receives ViewContainerRef as a constructor parameter (stored as _viewContainerRef) and builds the "
+        "portal with `new ComponentPortal(this._tooltipComponent, this._viewContainerRef)`, so the "
+        "portal already uses the directive's own view container. Only the injection style differs.",
+        {"equivalent": ["private _viewContainerRef: ViewContainerRef,"]},
+    ),
+    "86ad5150110522873dae2801fd3c2957502949e7": (
+        "src/material/select/select.ts",
+        f"{PACKAGE}/legacy-select/internal/select-base.ts",
+        "Upstream makes _exitAndDetach detach the overlay immediately when the panel element does not "
+        "exist yet (`this._animationsDisabled || !this.panel`) instead of waiting for an exit animation "
+        "on a missing element. The owned legacy select base _exitAndDetach has the same early branch "
+        "(`!animationsEnabled || !this.panel`): it clears _overlayAttached, emits the void done state "
+        "and returns, which detaches the connected overlay without touching the panel.",
+        {"equivalent": ["if (!animationsEnabled || !this.panel) {"]},
+    ),
+    "7a2191906339aab259e59fb8cea05273538f4ebf": (
+        "src/material/autocomplete/autocomplete.ts",
+        f"{PACKAGE}/legacy-autocomplete/internal/autocomplete-base.ts",
+        "Upstream only fixes the spelling autcomplete -> autocomplete in the requireSelection doc "
+        "comment. The owned legacy autocomplete base already carries the corrected comment text on its "
+        "requireSelection input, so there is nothing to adapt. The commit has no runtime effect.",
+        {"comments": True},
+    ),
+    "40d0ab4fc73f059cb5496c4c035d4dcebc08b8b0": (
+        "src/material/core/tokens/m2/mdc/_snack-bar.scss",
+        f"{PACKAGE}/styles/core/tokens/m2/mat/_snack-bar.scss",
+        "Upstream renames the M2 snack-bar token prefix (mat, snackbar) to (mat, snack-bar) and drops "
+        "the (mat, snackbar) density entry, so no --mat-snackbar-* names remain. The owned token file "
+        "styles/core/tokens/m2/mat/_snack-bar.scss already declares $prefix: (mat, snack-bar), and no "
+        "owned source anywhere uses (mat, snackbar) or mat-snackbar. The separate (mdc, snackbar) "
+        "16.2.14 MDC token set is a different prefix that this commit does not touch.",
+        {"absent_in_package": ["(mat, snackbar)", "mat-snackbar"]},
+    ),
 }
 
 
@@ -62,22 +103,48 @@ def upstream_patch(upstream: Path, sha: str) -> bytes:
 
 
 def facts(upstream: Path, sha: str) -> dict:
-    upstream_file, member, _ = PROOFS[sha]
-    raw = git_show = upstream_patch(upstream, sha)
-    added = join.added_lines(git_show.decode("utf-8", "replace"), {upstream_file})
-    text = (ROOT / member).read_text()
-    rows = text.split("\n")
-    located = []
-    for line in added:
-        hits = [n + 1 for n, row in enumerate(rows) if row.strip() == line or re.sub(r"\s+", "", line) in re.sub(r"\s+", "", row)]
-        located.append({"upstream_added": line, "candidate_lines": hits})
-    return {
+    upstream_file, member, _decision, *rest = PROOFS[sha]
+    options = rest[0] if rest else {}
+    raw = upstream_patch(upstream, sha)
+    patch = raw.decode("utf-8", "replace")
+    if options.get("comments"):
+        added = [row[1:].strip().lstrip("* ").strip() for row in patch.split("\n")
+                 if row.startswith("+") and not row.startswith("+++") and len(row[1:].strip()) >= 16]
+    else:
+        added = join.added_lines(patch, {upstream_file})
+    rows = (ROOT / member).read_text().split("\n")
+
+    def locate(line: str) -> list[int]:
+        squashed = re.sub(r"\s+", "", line)
+        return [n + 1 for n, row in enumerate(rows) if row.strip() == line or squashed in re.sub(r"\s+", "", row)]
+
+    located = [{"upstream_added": line, "candidate_lines": locate(line)} for line in added]
+    present = [item for item in located if item["candidate_lines"]]
+    equivalent = [{"candidate_snippet": snippet, "candidate_lines": locate(snippet)} for snippet in options.get("equivalent", [])]
+    if equivalent:
+        ok = all(item["candidate_lines"] for item in equivalent)
+    else:
+        ok = bool(located) and len(present) == len(located)
+    result = {
         "diff_sha256": hashlib.sha256(raw).hexdigest(),
         "upstream_file": upstream_file,
         "candidate_member": {"path": member, "sha256": hashlib.sha256((ROOT / member).read_bytes()).hexdigest()},
-        "added_lines": located,
-        "all_present": bool(located) and all(item["candidate_lines"] for item in located),
+        "added_lines": present if equivalent else located,
+        "all_present": ok,
     }
+    absent = options.get("absent_in_package", [])
+    if absent:
+        hits = []
+        for path in sorted((ROOT / PACKAGE).rglob("*")):
+            if path.is_file() and "node_modules" not in path.parts and path.suffix in {".ts", ".scss", ".html", ".css"}:
+                text = path.read_text(errors="replace")
+                hits += [f"{path.relative_to(ROOT).as_posix()}: {needle}" for needle in absent if needle in text]
+        result["absent_in_package"] = {"needles": absent, "hits": hits}
+        result["all_present"] = result["all_present"] and not hits
+    if equivalent:
+        result["equivalent_candidate_lines"] = equivalent
+        result["replaced_upstream_lines"] = [item["upstream_added"] for item in located if not item["candidate_lines"]]
+    return result
 
 
 def main() -> int:
@@ -88,7 +155,7 @@ def main() -> int:
     ledger = json.loads(LEDGER.read_text())
     by_sha = {entry["sha"]: entry for entry in ledger["entries"]}
     problems = []
-    for sha, (_, _, decision) in PROOFS.items():
+    for sha, (_, _, decision, *_rest) in PROOFS.items():
         observed = facts(args.upstream, sha)
         if not observed["all_present"]:
             problems.append(f"{sha}: upstream added lines no longer all present in {observed['candidate_member']['path']}")
@@ -98,10 +165,11 @@ def main() -> int:
             "review_depth": "individual-compatibility",
             "affected_branches": ["main"],
             "decision": decision,
-            "proof_kind": "candidate-source-line-match",
+            "proof_kind": "candidate-source-equivalent" if "equivalent_candidate_lines" in observed else "candidate-source-line-match",
             "upstream_file": observed["upstream_file"],
             "candidate_member": observed["candidate_member"],
             "added_lines": observed["added_lines"],
+            **({key: observed[key] for key in ("equivalent_candidate_lines", "replaced_upstream_lines", "absent_in_package") if key in observed}),
             "read_note": by_sha[sha].get("read_note_disposition"),
             "recorded_by": "Grok, FIN-02-C02; Codex validates in FIN-02-C05",
             "recomputed_by": "scripts/record-candidate-line-proofs.py",
