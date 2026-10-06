@@ -99,6 +99,27 @@ console.log(JSON.stringify(compareContracts(ref, packed)));
 
 
 class ApiSignatureTests(unittest.TestCase):
+    def test_owned_form_field_tokens_compare_original_identifier_to_public_alias(self):
+        script = r"""
+import assert from 'node:assert/strict';
+import {compareSignatures} from './scripts/api-surface.mjs';
+for (const [name,type,description] of [
+ ['MAT_FORM_FIELD','MatFormField','MatFormField'],
+ ['MAT_ERROR','MatError','MatError'],
+ ['MAT_PREFIX','MatPrefix','MatPrefix'],
+ ['MAT_SUFFIX','MatSuffix','MatSuffix'],
+]) {
+ const alias=name.replace('MAT_','MAT_LEGACY_');
+ const symbol={symbol_id:`legacy-form-field/primary/${alias}`,shape:{kind:'token',signatures:[`token ${name} '${description}'`]}};
+ const packed={kind:'const',signatures:[`const ${alias}:InjectionToken<${type}>`]};
+ assert.deepEqual(compareSignatures(symbol,packed,[]).blocking,[]);
+ const unrelated={...packed,signatures:[`const OTHER_TOKEN:InjectionToken<${type}>`]};
+ assert.ok(compareSignatures(symbol,unrelated,[]).blocking.length);
+}
+"""
+        result=subprocess.run(['node','--input-type=module','-e',script],cwd=ROOT,capture_output=True,text=True)
+        self.assertEqual(result.returncode,0,result.stderr or result.stdout)
+
     def test_compare_contracts_reads_parameter_types(self):
         matched = self.compare_objects("match")
         self.assertEqual(matched["di_status"], "match")

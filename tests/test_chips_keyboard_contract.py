@@ -23,7 +23,16 @@ class ChipsKeyboardContractTests(unittest.TestCase):
         provenance=json.loads((REFERENCE/'provenance.json').read_text());self.assertEqual(provenance['commit'],'df60e733c60e572ba538f6ad0ceff3e63e527b53')
         for name,pin in PINS.items():self.assertEqual(hashlib.sha256((REFERENCE/name).read_bytes()).hexdigest(),pin)
         source=ROOT/'projects/ngx-material-legacy/legacy-chips'
-        self.assertEqual((source/'chip-input.ts').read_text(),(REFERENCE/'chip-input.ts').read_text().replace('@Directive({','@Directive({\n  standalone: false,',1))
+        candidate=(source/'chip-input.ts').read_text()
+        # Reverse only the pinned ownership relocation and mandatory owner notice.
+        # The original reference stays untouched; all remaining source bytes must match.
+        local_type="import {coerceBooleanProperty} from '@angular/cdk/coercion';\ntype BooleanInput = string | boolean | null | undefined;"
+        self.assertEqual(candidate.count(local_type),1)
+        candidate=candidate.replace(local_type,"import {BooleanInput, coerceBooleanProperty} from '@angular/cdk/coercion';",1)
+        notice=' * Copyright (c) 2026 Ryan Lester.\n'
+        self.assertEqual(candidate.count(notice),1)
+        candidate=candidate.replace(notice,'',1)
+        self.assertEqual(candidate,(REFERENCE/'chip-input.ts').read_text().replace('@Directive({','@Directive({\n  standalone: false,',1))
         self.assertEqual(body((source/'chip.ts').read_text(),'_handleKeydown'),body((REFERENCE/'chip.ts').read_text(),'_handleKeydown'))
         needle="        it(\n          'should not focus the last chip when pressing BACKSPACE after changing input, '"
         end="        it('should focus last chip after pressing BACKSPACE after creating a chip'"
