@@ -36,7 +36,12 @@
 $badge-allowed: (
   background-color, text-color, disabled-state-background-color, disabled-state-text-color,
   text-font, text-size, text-weight, line-height, small-size-text-size, large-size-text-size,
-  small-size-line-height, large-size-line-height
+  small-size-line-height, large-size-line-height,
+  container-shape, container-size, small-size-container-size, large-size-container-size,
+  legacy-container-size, legacy-small-size-container-size, legacy-large-size-container-size,
+  container-offset, small-size-container-offset, large-size-container-offset,
+  container-overlap-offset, small-size-container-overlap-offset, large-size-container-overlap-offset,
+  container-padding, small-size-container-padding, large-size-container-padding
 );
 $bottom-sheet-allowed: (
   container-text-color, container-background-color, container-text-font,
@@ -48,7 +53,14 @@ $button-toggle-allowed: (
   disabled-selected-state-text-color, disabled-state-background-color,
   disabled-state-text-color, divider-color, selected-state-background-color,
   selected-state-text-color, state-layer-color, text-color, height,
-  label-text-font, focus-state-layer-opacity, hover-state-layer-opacity, shape
+  label-text-font, focus-state-layer-opacity, hover-state-layer-opacity, shape,
+  label-text-line-height, label-text-size, label-text-tracking, label-text-weight,
+  legacy-focus-state-layer-opacity, legacy-height, legacy-shape,
+  legacy-disabled-selected-state-background-color, legacy-disabled-state-background-color,
+  legacy-disabled-state-text-color, legacy-selected-state-background-color,
+  legacy-selected-state-text-color, legacy-state-layer-color, legacy-text-color,
+  legacy-label-text-font, legacy-label-text-line-height, legacy-label-text-size,
+  legacy-label-text-tracking, legacy-label-text-weight
 );
 $datepicker-allowed: (
   calendar-container-elevation-shadow, calendar-container-shape,
@@ -172,9 +184,28 @@ $_variants: (accent: secondary, warn: error);
 
 @function _badge-tokens($system) {
   $default-size: 22px;
+  $small-size: $default-size - 6px;
+  $large-size: $default-size + 6px;
   $base-size: 12px;
   @return (
-    base: (),
+    base: (
+      container-shape: 50%,
+      container-size: unset,
+      small-size-container-size: unset,
+      large-size-container-size: unset,
+      legacy-container-size: $default-size,
+      legacy-small-size-container-size: $small-size,
+      legacy-large-size-container-size: $large-size,
+      container-offset: $default-size * -0.5 0,
+      small-size-container-offset: $small-size * -0.5 0,
+      large-size-container-offset: $large-size * -0.5 0,
+      container-overlap-offset: $default-size * -0.5,
+      small-size-container-overlap-offset: $small-size * -0.5,
+      large-size-container-overlap-offset: $large-size * -0.5,
+      container-padding: 0,
+      small-size-container-padding: 0,
+      large-size-container-padding: 0,
+    ),
     color: map.merge(_badge-palette-tokens($system), (
       disabled-state-background-color:
           m2-system.color-with-opacity(map.get($system, on-surface), 12%),
@@ -221,6 +252,9 @@ $_variants: (accent: secondary, warn: error);
     base: (
       focus-state-layer-opacity: map.get($system, focus-state-layer-opacity),
       hover-state-layer-opacity: map.get($system, hover-state-layer-opacity),
+      legacy-focus-state-layer-opacity: 1,
+      legacy-height: 36px,
+      legacy-shape: 2px,
       shape: 4px,
     ),
     color: (
@@ -234,6 +268,13 @@ $_variants: (accent: secondary, warn: error);
       selected-state-text-color: $on-surface,
       state-layer-color: $on-surface,
       text-color: $on-surface,
+      legacy-disabled-selected-state-background-color: m2-system.color-with-opacity($on-surface, 12%),
+      legacy-disabled-state-background-color: map.get($system, surface),
+      legacy-disabled-state-text-color: m2-system.color-with-opacity($on-surface, 38%),
+      legacy-selected-state-background-color: m2-system.color-with-opacity($on-surface, 12%),
+      legacy-selected-state-text-color: $on-surface,
+      legacy-state-layer-color: m2-system.color-with-opacity($on-surface, 12%),
+      legacy-text-color: $on-surface,
     ),
     typography: (
       label-text-font: map.get($system, body-large-font),
@@ -241,6 +282,11 @@ $_variants: (accent: secondary, warn: error);
       label-text-size: map.get($system, body-large-size),
       label-text-tracking: map.get($system, body-large-tracking),
       label-text-weight: map.get($system, body-large-weight),
+      legacy-label-text-font: map.get($system, body-large-font),
+      legacy-label-text-line-height: map.get($system, body-large-line-height),
+      legacy-label-text-size: map.get($system, body-large-size),
+      legacy-label-text-tracking: map.get($system, body-large-tracking),
+      legacy-label-text-weight: map.get($system, body-large-weight),
     ),
     density: (
       height: map.get((0: 48px, -1: 44px, -2: 40px, -3: 36px, -4: 24px), $scale),
@@ -554,6 +600,17 @@ $_variants: (accent: secondary, warn: error);
           @include mat.datepicker-overrides(
             _variant(datepicker, $theme, $datepicker-allowed, $palette-fn, $variant));
         }
+      }
+    }
+  }
+  @if theming.get-density-config($theme) != null {
+    // The peer's M2 datepicker density keeps the calendar previous/next icon
+    // buttons at density -2 whatever the theme density: touch target hidden,
+    // 40px state layer. Same selectors, through the public icon-button overrides.
+    .mat-calendar-controls {
+      @include mat.icon-button-overrides((touch-target-display: none));
+      .mat-mdc-icon-button.mat-mdc-button-base {
+        @include mat.icon-button-overrides((state-layer-size: 40px));
       }
     }
   }

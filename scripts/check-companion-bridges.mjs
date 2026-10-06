@@ -123,6 +123,8 @@ function extractComponentVars(css, component) {
   const re = new RegExp(`${prefix.replace(/-/g, '\\-')}([a-z0-9-]+)\\s*:`, 'g');
   let match;
   while ((match = re.exec(css))) {
+    // --mat-icon-button-* is icon-button's, not the icon companion's.
+    if (component === 'icon' && match[1].startsWith('button-')) continue;
     found.add(match[1]);
   }
   return [...found].sort();

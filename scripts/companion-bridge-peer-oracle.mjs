@@ -223,13 +223,22 @@ export function compareTokens({caseIds, peer, candidate, sources}) {
   return cases;
 }
 
-/** Root-level candidate tokens that are not in any allowed list. */
+/**
+ * Token prefixes of other current peer components that share a companion's
+ * prefix. `--mat-icon-button-*` belongs to icon-button, not the icon
+ * companion; the peer's M2 datepicker density mixin sets two of them on the
+ * calendar controls, and the datepicker bridge does the same.
+ */
+export const FOREIGN_TOKEN_PREFIXES = ['--mat-icon-button-'];
+
+/** Candidate tokens of a companion that are not in any allowed list. */
 export function unexpectedCandidateTokens(candidate, caseIds) {
   const allowed = new Set(caseIds);
   const out = new Set();
   for (const parsed of Object.values(candidate)) {
     for (const decls of Object.values(parsed)) {
       for (const token of Object.keys(decls)) {
+        if (FOREIGN_TOKEN_PREFIXES.some((prefix) => token.startsWith(prefix))) continue;
         if (COMPANIONS.some((c) => token.startsWith(`--mat-${c}-`)) && !allowed.has(token)) out.add(token);
       }
     }

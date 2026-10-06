@@ -332,8 +332,8 @@ class AcceptanceTests(unittest.TestCase):
         for group, group_ids in real_row["acceptance"]["cases_by_line"]["21.x"].items():
             self.assertIsNone(group_ids, group)
         ids = acceptance.expected_cases(real_row, "main")
-        self.assertEqual(len(ids), 161)
-        self.assertEqual(len(set(ids)), 161)
+        self.assertEqual(len(ids), 196)
+        self.assertEqual(len(set(ids)), 196)
         row = next(item for item in self.f.matrix["checks"] if item["check_id"] == cid)
         row["acceptance"]["cases_by_line"]["main"] = real_row["acceptance"]["cases_by_line"]["main"]
         row["acceptance"]["cases_by_line"]["21.x"] = {group: None for group in row["acceptance"]["cases_by_line"]["21.x"]}

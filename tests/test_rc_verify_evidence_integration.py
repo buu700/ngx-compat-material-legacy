@@ -444,7 +444,7 @@ class CoordinatorTests(unittest.TestCase):
         row, ids = self._real_line_ids("companion-bridge-tokens")
         self.assertTrue(row["implemented"])
         self.assertEqual(list(row["acceptance"]["cases_by_line"]["main"]), ["compiled-override-tokens"])
-        self.assertEqual(len(ids), 161)
+        self.assertEqual(len(ids), 196)
         self.assertTrue(all(case_id.startswith("--mat-") for case_id in ids))
         for group, group_ids in row["acceptance"]["cases_by_line"]["21.x"].items():
             self.assertIsNone(group_ids, group)
@@ -456,8 +456,8 @@ class CoordinatorTests(unittest.TestCase):
         self.assertEqual(report["subject_ids"], ["source"])
         self.assertEqual(report["artifacts"], {})
         self.assertEqual(report["expected_case_ids"], ids)
-        self.assertEqual(report["passed"], 161)
-        self.assertEqual(len(report["outputs"]), 161)
+        self.assertEqual(report["passed"], 196)
+        self.assertEqual(len(report["outputs"]), 196)
         for name in ("approved", "g06_claim", "g07_claim", "g08_claim", "g06_g07_g08_claim"):
             self.assertNotIn(name, report)
         before = path.read_bytes()
