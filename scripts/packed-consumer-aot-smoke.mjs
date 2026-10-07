@@ -1280,6 +1280,7 @@ async function main() {
   // This standalone Node fixture has no runner-local Jasmine/Jest variables.
   const runner=globalThis as typeof globalThis & {__karma__?:unknown;jasmine?:unknown;jest?:unknown;Mocha?:unknown};
   const checksEnabled=isDevMode()&&!Boolean(runner.__karma__||runner.jasmine||runner.jest||runner.Mocha);
+  const checkboxProbeInjector=byId('attribute-checkbox').injector;
   const environmentProto=Object.getPrototypeOf(TestBed.inject(EnvironmentInjector));
   const environmentGet=environmentProto.get;
   const nodeRequests:Array<{token:unknown,optional:boolean}>=[];
@@ -1292,7 +1293,7 @@ async function main() {
     try{return environmentGet.call(this,token,notFound,flags);}finally{nodeGetDepth--;}
   };
   try {
-    checkboxProbeInstance=byId('attribute-checkbox').injector.get(CHECKBOX_NODE_FACTORY_PROBE);
+    checkboxProbeInstance=checkboxProbeInjector.get(CHECKBOX_NODE_FACTORY_PROBE);
     const expected=[FocusMonitor,NgZone,ANIMATION_MODULE_TYPE,MAT_LEGACY_CHECKBOX_DEFAULT_OPTIONS];
     checkboxNodeFactoryContext=checkboxProbeInstance instanceof MatLegacyCheckbox&&checkboxProbeInstance.tabIndex===7
       &&nodeRequests.length===expected.length&&nodeRequests.every((request,index)=>
@@ -1302,7 +1303,7 @@ async function main() {
   const checkboxNodeFactoryObservation={
     attribute:checkboxProbeInstance?.tabIndex??null,
     returned:checkboxProbeInstance instanceof MatLegacyCheckbox,
-    root_requests:nodeRequests.map(request=>({token:String(request.token),optional:request.optional})),
+    root_requests:nodeRequests.map(request=>({token:typeof request.token==='function'?request.token.name:String(request.token),optional:request.optional})),
     token_objects_and_optional_flags_match:checkboxNodeFactoryContext,
     error:checkboxNodeFactoryError,
   };
