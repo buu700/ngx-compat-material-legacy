@@ -1,0 +1,23 @@
+commit cf456a2d43837497367662e7de22f1b2bcbf4f00
+Author:     Kristiyan Kostadinov <crisbeto@users.noreply.github.com>
+AuthorDate: Mon Aug 21 08:56:44 2023 -0700
+Commit:     GitHub <noreply@github.com>
+CommitDate: Mon Aug 21 08:56:44 2023 -0700
+
+    fix(material/form-field): don't toggle hover state over subscript (#27683)
+    
+    Fixes that the form field was showing its hover state when hovering over the hint/error area. This looked off, because while these elements are connected to the form field, they aren't part of the main container.
+
+diff --git a/src/material/form-field/_form-field-focus-overlay.scss b/src/material/form-field/_form-field-focus-overlay.scss
+index ade624aaf..9dfd64cc7 100644
+--- a/src/material/form-field/_form-field-focus-overlay.scss
++++ b/src/material/form-field/_form-field-focus-overlay.scss
+@@ -19,7 +19,7 @@
+       tokens-mat-form-field.$prefix, tokens-mat-form-field.get-token-slots()) {
+       @include token-utils.create-token-slot(background-color, state-layer-color);
+ 
+-      .mat-mdc-form-field:hover & {
++      .mat-mdc-text-field-wrapper:hover & {
+         @include token-utils.create-token-slot(opacity, hover-state-layer-opacity);
+       }
+ 

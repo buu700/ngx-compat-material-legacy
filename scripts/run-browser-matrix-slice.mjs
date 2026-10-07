@@ -397,6 +397,11 @@ for (const scenario of scenarios) {
       scenario:scenario.id,observation:detail.progress_csp,
     }));
   }
+  if (detail?.peer_form_hover) {
+    console.log('peer form-field hover diagnostic (no acceptance credit): '+JSON.stringify({
+      scenario:scenario.id,observation:detail.peer_form_hover,
+    }));
+  }
   const ok = result.status === 0 && detail && scenario.require(detail);
   const entry = {
     scenario: scenario.id,

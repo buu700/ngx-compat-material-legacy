@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-07T05:00:40.938424+00:00",
+  "reviewer": "Codex primary implementer",
+  "sha": "cf456a2d43837497367662e7de22f1b2bcbf4f00",
+  "patch": "compatibility/f10/disposition-ledger/evidence/patches/cf456a2d43837497367662e7de22f1b2bcbf4f00-whole-form-hover.patch",
+  "patch_sha256": "22f1e908b36bb2758a3c331dbdbbb5d028bc04244deb2831439fc646170323e1",
+  "changed_paths": [
+    "src/material/form-field/_form-field-focus-overlay.scss"
+  ],
+  "owned_source": "projects/ngx-material-legacy/styles/form-field/_form-field-focus-overlay.scss",
+  "owned_source_sha256": "f6bd446f5e7931d0349f6b59a11b3c63a4974ef0d4de10a56412936fb796be9e",
+  "finding": "The actual exported ordinary form-field color mixin invokes this owned helper. Its whole-host hover selector remains reachable; the fact that the original patch targets an ordinary component does not exclude retained exported CSS. Both exact minimum peer compiled styles use wrapper-only hover. Native computed-style behavior with packed exported Sass remains pending; no selector or production behavior changed.",
+  "minimum_peer_source": [
+    {
+      "version": "21.2.14",
+      "archive_sha256": "2f8c0fce7967b8a91a07bc3a184cf5da6023eac3828d15fa23b6c338b340e23c",
+      "member": "package/fesm2022/_form-field-chunk.mjs",
+      "member_sha256": "1981af655b978abbf4deab909488ced158784242564d5f3709bf6d3de285bc39",
+      "hover_rules": [
+        "\\n.mat-mdc-text-field-wrapper:hover .mat-mdc-form-field-focus-overlay {\\n  opacity: var(--mat-form-field-hover-state-layer-opacity, var(--mat-sys-hover-state-layer-opacity));\\n}",
+        "\\n.mat-mdc-text-field-wrapper:hover .mat-mdc-form-field-focus-overlay {\\n  opacity: var(--mat-form-field-hover-state-layer-opacity, var(--mat-sys-hover-state-layer-opacity));\\n}"
+      ]
+    },
+    {
+      "version": "22.1.7",
+      "archive_sha256": "06115b963b565428d8d5f79cc1cdd07a3f0d5a58dbaebf9955639f38b35ac43d",
+      "member": "package/fesm2022/_form-field-chunk.mjs",
+      "member_sha256": "8796ccc010d8fa1862a78c3a799af465b989fecf19a90fb0a8859079a4777d85",
+      "hover_rules": [
+        "\\n.mat-mdc-text-field-wrapper:hover .mat-mdc-form-field-focus-overlay {\\n  opacity: var(--mat-form-field-hover-state-layer-opacity, var(--mat-sys-hover-state-layer-opacity));\\n}",
+        "\\n.mat-mdc-text-field-wrapper:hover .mat-mdc-form-field-focus-overlay {\\n  opacity: var(--mat-form-field-hover-state-layer-opacity, var(--mat-sys-hover-state-layer-opacity));\\n}"
+      ]
+    }
+  ],
+  "probe": {
+    "producer": "scripts/browser-surface-families.mjs",
+    "observation": "peer_form_hover",
+    "status": "pending native Actions",
+    "scope": "Actual public current MatFormField/MatInput in separate scope, packed ordinary form-field theme, real CDP pointer moves over wrapper and subscript bounding rectangles, actual hover media/host/wrapper/focus and computed overlay opacity. No dispatched synthetic hover event or source-string-only claim.",
+    "acceptance_credit": false
+  },
+  "limitations": [
+    "Default fill field only; no all-theme/appearance/accessibility or G11 qualification.",
+    "Native browser observation must precede defect/terminal disposition.",
+    "Original CSS, frozen oracle, public names, maps and selectors unchanged."
+  ],
+  "g11_claim": "not-passed"
+}
