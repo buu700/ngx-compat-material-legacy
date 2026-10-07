@@ -1038,6 +1038,7 @@ class SmokeDialogContent {}
   \`,
 })
 class HarnessHost {
+  @ViewChild(MatLegacyTextColumn,{static:true}) originalTextColumn!:MatLegacyTextColumn<any>;
   @ViewChild('constructorGridColumn',{read:MatLegacyColumnDef,static:true}) gridColumn!:MatLegacyColumnDef;
   @ViewChild('manualCellTemplate',{read:MatLegacyCellDef,static:true}) cellDefinition!:MatLegacyCellDef;
   @ViewChild('manualHeaderTemplate',{read:MatLegacyHeaderCellDef,static:true}) headerDefinition!:MatLegacyHeaderCellDef;
@@ -1181,8 +1182,7 @@ async function main() {
     &&cellConstructorObservation.every(row=>Object.entries(row).every(([name,value])=>name==='name'||value===true));
   const textTableNode=fixture.debugElement.query(node=>node.nativeElement?.id==='constructor-text-table');
   const textTable=textTableNode.injector.get(MatLegacyTable);
-  const textColumnNode=fixture.debugElement.query(node=>node.nativeElement?.matches?.('#constructor-text-table mat-text-column'));
-  const nodeTextColumn=textColumnNode.injector.get(MatLegacyTextColumn);
+  const nodeTextColumn=fixture.componentInstance.originalTextColumn;
   const manualTextColumn=new MatLegacyTextColumn(textTable,ORIGINAL_TEXT_OPTIONS);
   const manualTextFields=manualTextColumn as any;
   const textColumnObservation={
