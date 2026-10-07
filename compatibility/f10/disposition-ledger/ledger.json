@@ -4,8 +4,8 @@
   "g11_claim": "not-passed",
   "seed_rows": 1697,
   "ledger_rows": 1697,
-  "closed_dispositions": 63,
-  "open_or_deferred": 1634,
+  "closed_dispositions": 64,
+  "open_or_deferred": 1633,
   "entries": [
     {
       "sha": "b13c6aa194cf560a304213961ae28725f8d0a4e2",
@@ -33393,16 +33393,16 @@
         "src/material/icon/icon-registry.ts",
         "src/material/icon/trusted-types.ts"
       ],
-      "final_disposition": "needs-individual-review",
-      "reason": "The hunk relocates trusted-types logic from current Material icon to @angular/cdk/private, including a bypass createHTML policy. The add-on has no authored import of this helper and owns no icon component. Current-peer MatIconRegistry may transitively use it internally, which differs from an authored dependency. Need complete authored-use and reachable input/sink review before closing; never import @angular/cdk/private to follow this relocation.",
-      "read_note_disposition": "unreviewed-on-21.x",
+      "final_disposition": "do-not-adopt",
+      "reason": "The complete seven-path upstream patch relocates the private Trusted Types helper, adjusts its type exports/comments and registry import/build edges, and leaves its runtime policy/promotion body byte-identical. The owned add-on has no direct registry or private-TT references and must not copy/import this private helper or fork the ordinary icon registry. Both authenticated minimum peer sources contain the relocated helper and the same literal HTML/resource-URL sanitizer boundaries and innerHTML sink. Public peer registry literal sanitization, independent clones and real MatIcon projection inside a packed legacy button pass on each line; actual Chromium TT enforcement with the allowed Angular policy list and raw-literal/disallowed-policy negatives is required by the passing zoneful/zoneless browser coordinator predicates. Do not adopt this private import relocation into owned code. This decision does not claim that TT promotion sanitizes downloaded SVG, that arbitrary resource trust is safe, or that the later22 policy-creation catch/fallback is certified. Those broader trust/network/CSP behaviors remain separate security/audit obligations; no general security or G11 pass is asserted.",
+      "read_note_disposition": "private-relocation-reviewed-no-owned-transplant",
       "affected_branches": [
         "main",
         "21.x"
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-security-source-review.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-trusted-types-relocation-decision.json",
       "prior_dispositions": [
         {
           "sha": "1d42431b2fe745602727eda03338c80c8897850a",
@@ -33422,10 +33422,43 @@
           "g11_claim": "not-passed",
           "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
           "evidence_report": null
+        },
+        {
+          "sha": "1d42431b2fe745602727eda03338c80c8897850a",
+          "bucket": "security-deep",
+          "subject": "refactor: move trusted types logic into CDK (#32387)",
+          "files": [
+            "src/material/icon/BUILD.bazel",
+            "src/material/icon/icon-registry.ts",
+            "src/material/icon/trusted-types.ts"
+          ],
+          "final_disposition": "needs-individual-review",
+          "reason": "The hunk relocates trusted-types logic from current Material icon to @angular/cdk/private, including a bypass createHTML policy. The add-on has no authored import of this helper and owns no icon component. Current-peer MatIconRegistry may transitively use it internally, which differs from an authored dependency. Need complete authored-use and reachable input/sink review before closing; never import @angular/cdk/private to follow this relocation.",
+          "read_note_disposition": "unreviewed-on-21.x",
+          "affected_branches": [
+            "main",
+            "21.x"
+          ],
+          "g11_claim": "not-passed",
+          "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+          "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-security-source-review.json",
+          "batch_id": "closeout-six-security-source-reads",
+          "recorded_at_utc": "2026-10-06T18:23:24.711579+00:00"
         }
       ],
       "batch_id": "closeout-six-security-source-reads",
-      "recorded_at_utc": "2026-10-06T18:23:24.711579+00:00"
+      "recorded_at_utc": "2026-10-07T03:29:45.807908+00:00",
+      "review_depth": "individual-escalated",
+      "individual_proof": {
+        "diff_sha256": "98d6c76532b51fadb09c6ff6a126e31085370fa0e70ba1b08070d1ae4c679e86",
+        "review_depth": "individual-escalated",
+        "affected_branches": [
+          "main",
+          "21.x"
+        ],
+        "decision": "The complete seven-path upstream patch relocates the private Trusted Types helper, adjusts its type exports/comments and registry import/build edges, and leaves its runtime policy/promotion body byte-identical. The owned add-on has no direct registry or private-TT references and must not copy/import this private helper or fork the ordinary icon registry. Both authenticated minimum peer sources contain the relocated helper and the same literal HTML/resource-URL sanitizer boundaries and innerHTML sink. Public peer registry literal sanitization, independent clones and real MatIcon projection inside a packed legacy button pass on each line; actual Chromium TT enforcement with the allowed Angular policy list and raw-literal/disallowed-policy negatives is required by the passing zoneful/zoneless browser coordinator predicates. Do not adopt this private import relocation into owned code. This decision does not claim that TT promotion sanitizes downloaded SVG, that arbitrary resource trust is safe, or that the later22 policy-creation catch/fallback is certified. Those broader trust/network/CSP behaviors remain separate security/audit obligations; no general security or G11 pass is asserted.",
+        "proof_kind": "whole-sha-source-and-native-public-peer-probe"
+      }
     },
     {
       "sha": "21cc21ea3b280c3f82a19f5ec1b679eb1eee1358",
