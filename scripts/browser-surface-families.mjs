@@ -459,6 +459,8 @@ console.log(JSON.stringify({
   bundle_has_zone: bundleHasZone,
   zone_global: zoneGlobal,
   families,
+  peer_icon_tt: peerIconTt,
+  error,
   credited_cell_ids: report.credited_cell_ids,
 }, null, 2));
 process.exit(ok ? 0 : 1);
