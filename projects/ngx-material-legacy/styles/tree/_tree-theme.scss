@@ -12,12 +12,14 @@
   $foreground: map.get($config, foreground);
 
   .mat-tree {
-    background: theming.get-color-from-palette($background, 'card');
+    background: var(--mat-tree-container-background-color,
+      #{theming.get-color-from-palette($background, 'card')});
   }
 
   .mat-tree-node,
   .mat-nested-tree-node {
-    color: theming.get-color-from-palette($foreground, text);
+    color: var(--mat-tree-node-text-color,
+      #{theming.get-color-from-palette($foreground, text)});
   }
 }
 
@@ -30,8 +32,10 @@
 
   .mat-tree-node,
   .mat-nested-tree-node {
-    font-weight: typography-utils.font-weight($config, body-1);
-    font-size: typography-utils.font-size($config, body-1);
+    font-weight: var(--mat-tree-node-text-weight,
+      #{typography-utils.font-weight($config, body-1)});
+    font-size: var(--mat-tree-node-text-size,
+      #{typography-utils.font-size($config, body-1)});
   }
 }
 
@@ -42,7 +46,7 @@
 
   @include compatibility.private-density-legacy-compatibility() {
     .mat-tree-node {
-      min-height: $height;
+      min-height: var(--mat-tree-node-min-height, #{$height});
     }
   }
 }
