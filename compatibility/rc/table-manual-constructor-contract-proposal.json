@@ -16,8 +16,10 @@
       "strategy_selection": "this._viewRepeater = this.recycleRows || this._virtualScrollEnabled() ? new _RecycleViewRepeaterStrategy() : new _DisposeViewRepeaterStrategy();",
       "state_declarations": [
         "protected _viewRepeater: _ViewRepeater<T, RenderRow<T>, RowContext<T>>;",
-        "private readonly _viewportRuler;"
-      ]
+        "private readonly _viewportRuler;",
+        "private _stickyStyler;"
+      ],
+      "coalesced_scheduler_references_in_table_module": 0
     },
     {
       "line": "21.x",
@@ -30,11 +32,13 @@
       "strategy_selection": "this._viewRepeater = this.recycleRows || this._virtualScrollEnabled() ? new _RecycleViewRepeaterStrategy() : new _DisposeViewRepeaterStrategy();",
       "state_declarations": [
         "protected _viewRepeater: _ViewRepeater<T, RenderRow<T>, RowContext<T>>;",
-        "private readonly _viewportRuler;"
-      ]
+        "private readonly _viewportRuler;",
+        "private _stickyStyler;"
+      ],
+      "coalesced_scheduler_references_in_table_module": 0
     }
   ],
-  "constraint": "Current minimum CdkTable exposes a protected _viewRepeater field and chooses its default strategies at ngAfterContentInit; custom-strategy preservation through a protected lifecycle adapter needs proof and is not ruled out. The full original twelve-argument constructor also supplies ViewportRuler and a coalesced style scheduler. Current parents obtain their own ViewportRuler through injection and declare viewport/scheduler state private. A signature-only adapter that ignores those supplied objects would conceal lost behavior. Direct current-private token/member use or a CDK fork violates supplied implementation rules. No complete stable-public-only adapter has been established.",
+  "constraint": "Current minimum CdkTable exposes a protected _viewRepeater field and chooses its default strategies at ngAfterContentInit; custom-strategy preservation through a protected lifecycle adapter needs proof and is not ruled out. The full original twelve-argument constructor also supplies ViewportRuler and a coalesced style scheduler. Current parents obtain their own ViewportRuler through injection and declare viewport and sticky-styler state private. The original coalesced scheduler parameter is absent from the current table module. A signature-only adapter that ignores those supplied objects would conceal lost behavior. Direct current-private token/member use or a CDK fork violates supplied implementation rules. No complete stable-public-only adapter has been established.",
   "proposed_owner_choice": "Either explicitly exclude this original manual-construction path from the published compatibility contract, or retain it and keep release readiness blocked until a compliant implementation exists.",
   "remaining_supported_scope_under_proposal": "Automatic Angular-created legacy tables, public data/render APIs, original boolean input behavior and public recycleRows behavior retain their separate native evidence; no exemption covers other API, DI, source-policy or full audit failures.",
   "approval": "Not granted. No constructor waiver, exception, golden, release baseline or support statement changed.",
