@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "sha": "306e437d213f3ace7b3ee294ef1dd82f5e8e2fab",
+  "line": "main",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "decision": "The entire one-file hunk assigns the modern disabled placeholder the existing disabled-trigger-text-color token inside mat-mdc-select-disabled. It does not edit the original legacy .mat-select color contract or the exported theme constructors. Keep the original16 legacy disabled placeholder/value/arrow and custom-map behavior; do not transplant the modern token-slot selector into the owned legacy Sass. Both exact peer npm floors already contain the modern disabled-placeholder structural rule, while the retained historical ordinary select-theme emits color tokens rather than that structural rule. Actual original16-versus-packed default/custom disabled placeholder, disabled value and invalid-arrow style probes pass. Modern select is outside the thirteen bridged companions; no current-component fork or claim that its full interaction/style contract was exercised is made.",
+  "diff_sha256": "57d55f6c66ece9e528f32fc87e09c23fdce736da221d50c27647323f6a93a82f",
+  "patch_file": "compatibility/f10/disposition-ledger/evidence/patches/306e437d213f3ace7b3ee294ef1dd82f5e8e2fab.patch",
+  "patch_paths": [
+    "src/material/select/select.scss"
+  ],
+  "owned_sources": [
+    {
+      "path": "projects/ngx-material-legacy/styles/legacy-select/_select-theme.scss",
+      "sha256": "42f5d0d0aa21b2034cee66aa1b022ffd7b6d7f17ad7f636bc2490cd4ccbdccc8",
+      "bytes": 3365
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/select/_select-theme.scss",
+      "sha256": "37438dfdc7e738a041c3c24ec0f552846c97d2e2d3ceb28eebd34f0f9f612214",
+      "bytes": 2958
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.scss",
+      "sha256": "5520987e9617a872afb76cf5692dfb87f278f7303fba456b8d77101d353fb537",
+      "bytes": 5823
+    }
+  ],
+  "installed_peer_source": {
+    "21.x": {
+      "version": "21.2.14",
+      "archive_sha256": "2f8c0fce7967b8a91a07bc3a184cf5da6023eac3828d15fa23b6c338b340e23c",
+      "integrity": "sha512-fMQca8VRtei93JRRG9qQ+u08DCb0nga59Esoakq5yx3+A1NfdpFeUS1tBns56U04o8KAaIAwZK3NBqXz8ZKNqg==",
+      "member": "package/fesm2022/select.mjs",
+      "member_sha256": "232446055bcef61e7427e3ed9a0e7f2c25916bdb16fd2ffa59297491767305cf",
+      "structural_rule": ".mat-mdc-select-disabled .mat-mdc-select-placeholder",
+      "excerpt": ".mat-mdc-select-disabled .mat-mdc-select-placeholder {\\n  color: var(--mat-select-disabled-trigger-text-color, color-mix(in srgb, var(--mat-sys-on-surface) 38%, transparent));\\n}\\n\\n.mat-mdc-select-trigger {\\n  display: inline-flex;\\n  align-items: center;\\n  cursor: pointer;\\n  position: relative;\\n  box-sizing: border-box;\\n  width: 100%;\\n}\\n.mat-mdc-select-disabled .mat-mdc-select-trigger {\\n "
+    },
+    "main": {
+      "version": "22.1.7",
+      "archive_sha256": "06115b963b565428d8d5f79cc1cdd07a3f0d5a58dbaebf9955639f38b35ac43d",
+      "integrity": "sha512-mpe0lL6eDlN5AuXY7CP29SfKey7nVuHp4YhQijaq9orRFwsP3fSGrMU9BJjIRDOLWc8Zg9v/oa85E1CjNebXGg==",
+      "member": "package/fesm2022/select.mjs",
+      "member_sha256": "ff5933e67ecdc489b88dbd5307278993b2bb8441aa2a45c0c2436e8d557f1669",
+      "structural_rule": ".mat-mdc-select-disabled .mat-mdc-select-placeholder",
+      "excerpt": ".mat-mdc-select-disabled .mat-mdc-select-placeholder {\\n  color: var(--mat-select-disabled-trigger-text-color, color-mix(in srgb, var(--mat-sys-on-surface) 38%, transparent));\\n}\\n\\n.mat-mdc-select-trigger {\\n  display: inline-flex;\\n  align-items: center;\\n  cursor: pointer;\\n  position: relative;\\n  box-sizing: border-box;\\n  width: 100%;\\n}\\n.mat-mdc-select-disabled .mat-mdc-select-trigger {\\n "
+    }
+  },
+  "execution": {
+    "source_commit": "555de911f191946fc03b6bbe4984e3b5f1e2fa8d",
+    "run": 37556908642,
+    "job": 112585132733
+  },
+  "executed_scope": "24 originalCSS-vs-packed rendered probes, 398/498 complete configurable CSS matches with no owned legacy select/snack failure, and2152 historical cases on each source. Other100 configurable mismatches remain failed.",
+  "evidence_transport": "Authenticated Actions logs and independently authenticated exact npm peer source archives. Actions evidence archives not independently downloaded/rehashed.",
+  "independent_review": "Required at C05/A audit; not yet performed",
+  "g11_claim": "not-passed",
+  "recorded_at_utc": "2026-10-07T02:01:48.226728+00:00"
+}

@@ -4,8 +4,8 @@
   "g11_claim": "not-passed",
   "seed_rows": 1697,
   "ledger_rows": 1697,
-  "closed_dispositions": 1689,
-  "open_or_deferred": 8,
+  "closed_dispositions": 1691,
+  "open_or_deferred": 6,
   "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
   "batch_id": "unread-seed-content-review-2026-10-02",
   "entries": [
@@ -15560,15 +15560,15 @@
       "sha": "d0cf8bfe8bc476145984e0f8f3ab7d18eea36f1a",
       "bucket": "behavior-semantic",
       "subject": "fix(material/snack-bar): prevent override of snack bar action button color (#27511)",
-      "final_disposition": "needs-individual-review",
-      "reason": "C02 source/hunk review rejects the unapproved modern-to-legacy Sass transplant. Owned styling is restored to the untouched v16 contract; modern peer delegation remains pending individual installed-floor and rendered proof.",
+      "final_disposition": "do-not-adopt",
+      "reason": "The entire one-file hunk scopes the modern mat-mdc snack action button-color token to mat-unthemed, preventing that structural modern rule from overriding explicitly themed current buttons. It does not edit a legacy theme mixin. Keep the original16 legacy action/primary/accent/warn behavior; do not transplant this modern structural selector into the owned legacy Sass. Both exact peer npm floors already contain the modern structural selector; their component internals are not copied. The retained historical ordinary snack-bar-theme emits theme token values and does not embed this structural container rule. The actual original16-versus-packed style probes pass default and custom snack-container, action, and explicit primary action properties. This is a do-not-adopt decision for the add-on, not a claim to have executed or certified every current modern snack-bar interaction.",
       "read_note_disposition": "owned-retained",
       "files": [
         "src/material/snack-bar/snack-bar-container.scss"
       ],
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
-      "batch_id": "product-adapt-residual-2026-10-01-l",
-      "recorded_at_utc": "2026-10-06T17:17:44.893269+00:00",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-snack-bar-style-decision.json",
+      "batch_id": "closeout-snack-bar-individual-style-decision",
+      "recorded_at_utc": "2026-10-07T02:01:48.226728+00:00",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
       "category": "snack-bar-action-color",
@@ -15592,9 +15592,42 @@
           "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
           "category": "snack-bar-action-color",
           "product_adaptation": true
+        },
+        {
+          "sha": "d0cf8bfe8bc476145984e0f8f3ab7d18eea36f1a",
+          "bucket": "behavior-semantic",
+          "subject": "fix(material/snack-bar): prevent override of snack bar action button color (#27511)",
+          "final_disposition": "needs-individual-review",
+          "reason": "C02 source/hunk review rejects the unapproved modern-to-legacy Sass transplant. Owned styling is restored to the untouched v16 contract; modern peer delegation remains pending individual installed-floor and rendered proof.",
+          "read_note_disposition": "owned-retained",
+          "files": [
+            "src/material/snack-bar/snack-bar-container.scss"
+          ],
+          "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+          "batch_id": "product-adapt-residual-2026-10-01-l",
+          "recorded_at_utc": "2026-10-06T17:17:44.893269+00:00",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+          "category": "snack-bar-action-color",
+          "product_adaptation": false,
+          "closeout_review": "compatibility/rc/sass-closeout-reviews.json"
         }
       ],
-      "closeout_review": "compatibility/rc/sass-closeout-reviews.json"
+      "closeout_review": "compatibility/rc/sass-closeout-reviews.json",
+      "individual_proof": {
+        "review_depth": "individual-compatibility",
+        "diff_sha256": "54a23a310fdb6c13ccca73846eb6c7e0e7798324bd308678e018e6a0152d02ba",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The entire one-file hunk scopes the modern mat-mdc snack action button-color token to mat-unthemed, preventing that structural modern rule from overriding explicitly themed current buttons. It does not edit a legacy theme mixin. Keep the original16 legacy action/primary/accent/warn behavior; do not transplant this modern structural selector into the owned legacy Sass. Both exact peer npm floors already contain the modern structural selector; their component internals are not copied. The retained historical ordinary snack-bar-theme emits theme token values and does not embed this structural container rule. The actual original16-versus-packed style probes pass default and custom snack-container, action, and explicit primary action properties. This is a do-not-adopt decision for the add-on, not a claim to have executed or certified every current modern snack-bar interaction.",
+        "proof_kind": "whole-hunk-peer-structure-and-original-rendered-style",
+        "execution": {
+          "source_commit": "555de911f191946fc03b6bbe4984e3b5f1e2fa8d",
+          "run": 37556908642,
+          "job": 112585132733
+        }
+      }
     },
     {
       "sha": "42f6a4ac45b115784a155c886dff28b100d9604b",
@@ -15640,15 +15673,15 @@
       "sha": "306e437d213f3ace7b3ee294ef1dd82f5e8e2fab",
       "bucket": "behavior-semantic",
       "subject": "fix(material/select): match disabled placeholder color with label (#29870)",
-      "final_disposition": "needs-individual-review",
-      "reason": "C02 source/hunk review rejects the unapproved modern-to-legacy Sass transplant. Owned styling is restored to the untouched v16 contract; modern peer delegation remains pending individual installed-floor and rendered proof.",
+      "final_disposition": "do-not-adopt",
+      "reason": "The entire one-file hunk assigns the modern disabled placeholder the existing disabled-trigger-text-color token inside mat-mdc-select-disabled. It does not edit the original legacy .mat-select color contract or the exported theme constructors. Keep the original16 legacy disabled placeholder/value/arrow and custom-map behavior; do not transplant the modern token-slot selector into the owned legacy Sass. Both exact peer npm floors already contain the modern disabled-placeholder structural rule, while the retained historical ordinary select-theme emits color tokens rather than that structural rule. Actual original16-versus-packed default/custom disabled placeholder, disabled value and invalid-arrow style probes pass. Modern select is outside the thirteen bridged companions; no current-component fork or claim that its full interaction/style contract was exercised is made.",
       "read_note_disposition": "owned-retained",
       "files": [
         "src/material/select/select.scss"
       ],
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
-      "batch_id": "product-adapt-residual-2026-10-01-l",
-      "recorded_at_utc": "2026-10-06T17:17:44.893311+00:00",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-select-style-decision.json",
+      "batch_id": "closeout-select-individual-style-decision",
+      "recorded_at_utc": "2026-10-07T02:01:48.226728+00:00",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
       "category": "select-disabled-placeholder",
@@ -15672,9 +15705,42 @@
           "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
           "category": "select-disabled-placeholder",
           "product_adaptation": true
+        },
+        {
+          "sha": "306e437d213f3ace7b3ee294ef1dd82f5e8e2fab",
+          "bucket": "behavior-semantic",
+          "subject": "fix(material/select): match disabled placeholder color with label (#29870)",
+          "final_disposition": "needs-individual-review",
+          "reason": "C02 source/hunk review rejects the unapproved modern-to-legacy Sass transplant. Owned styling is restored to the untouched v16 contract; modern peer delegation remains pending individual installed-floor and rendered proof.",
+          "read_note_disposition": "owned-retained",
+          "files": [
+            "src/material/select/select.scss"
+          ],
+          "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+          "batch_id": "product-adapt-residual-2026-10-01-l",
+          "recorded_at_utc": "2026-10-06T17:17:44.893311+00:00",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+          "category": "select-disabled-placeholder",
+          "product_adaptation": false,
+          "closeout_review": "compatibility/rc/sass-closeout-reviews.json"
         }
       ],
-      "closeout_review": "compatibility/rc/sass-closeout-reviews.json"
+      "closeout_review": "compatibility/rc/sass-closeout-reviews.json",
+      "individual_proof": {
+        "review_depth": "individual-compatibility",
+        "diff_sha256": "57d55f6c66ece9e528f32fc87e09c23fdce736da221d50c27647323f6a93a82f",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The entire one-file hunk assigns the modern disabled placeholder the existing disabled-trigger-text-color token inside mat-mdc-select-disabled. It does not edit the original legacy .mat-select color contract or the exported theme constructors. Keep the original16 legacy disabled placeholder/value/arrow and custom-map behavior; do not transplant the modern token-slot selector into the owned legacy Sass. Both exact peer npm floors already contain the modern disabled-placeholder structural rule, while the retained historical ordinary select-theme emits color tokens rather than that structural rule. Actual original16-versus-packed default/custom disabled placeholder, disabled value and invalid-arrow style probes pass. Modern select is outside the thirteen bridged companions; no current-component fork or claim that its full interaction/style contract was exercised is made.",
+        "proof_kind": "whole-hunk-peer-structure-and-original-rendered-style",
+        "execution": {
+          "source_commit": "555de911f191946fc03b6bbe4984e3b5f1e2fa8d",
+          "run": 37556908642,
+          "job": 112585132733
+        }
+      }
     },
     {
       "sha": "7c9c898faac8daac1bbb20a0807168a74360760d",

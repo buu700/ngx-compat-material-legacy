@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "sha": "d0cf8bfe8bc476145984e0f8f3ab7d18eea36f1a",
+  "line": "main",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "decision": "The entire one-file hunk scopes the modern mat-mdc snack action button-color token to mat-unthemed, preventing that structural modern rule from overriding explicitly themed current buttons. It does not edit a legacy theme mixin. Keep the original16 legacy action/primary/accent/warn behavior; do not transplant this modern structural selector into the owned legacy Sass. Both exact peer npm floors already contain the modern structural selector; their component internals are not copied. The retained historical ordinary snack-bar-theme emits theme token values and does not embed this structural container rule. The actual original16-versus-packed style probes pass default and custom snack-container, action, and explicit primary action properties. This is a do-not-adopt decision for the add-on, not a claim to have executed or certified every current modern snack-bar interaction.",
+  "diff_sha256": "54a23a310fdb6c13ccca73846eb6c7e0e7798324bd308678e018e6a0152d02ba",
+  "patch_file": "compatibility/f10/disposition-ledger/evidence/patches/d0cf8bfe8bc476145984e0f8f3ab7d18eea36f1a.patch",
+  "patch_paths": [
+    "src/material/snack-bar/snack-bar-container.scss"
+  ],
+  "owned_sources": [
+    {
+      "path": "projects/ngx-material-legacy/styles/legacy-snack-bar/_snack-bar-theme.scss",
+      "sha256": "b9a6613433a84b02035c6252dd226d31cc74eb71c5dcb68ce76e012579a848bf",
+      "bytes": 2506
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/snack-bar/_snack-bar-theme.scss",
+      "sha256": "29ca545098f2b8eb81fbf7f311b5dac5fda4986f641d39ac23ca01eb7a547906",
+      "bytes": 1536
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.scss",
+      "sha256": "96fd654f49a0520eea553c133033e730bf02059b30df4a9e12339ade42c19bd5",
+      "bytes": 1500
+    }
+  ],
+  "installed_peer_source": {
+    "21.x": {
+      "version": "21.2.14",
+      "archive_sha256": "2f8c0fce7967b8a91a07bc3a184cf5da6023eac3828d15fa23b6c338b340e23c",
+      "integrity": "sha512-fMQca8VRtei93JRRG9qQ+u08DCb0nga59Esoakq5yx3+A1NfdpFeUS1tBns56U04o8KAaIAwZK3NBqXz8ZKNqg==",
+      "member": "package/fesm2022/snack-bar.mjs",
+      "member_sha256": "2c5d78a32e101a37d3f99592409e436f45fe99a964fd349038be8223a931ee60",
+      "structural_rule": ".mat-mdc-snack-bar-container .mat-mdc-button.mat-mdc-snack-bar-action:not(:disabled).mat-unthemed",
+      "excerpt": ".mat-mdc-snack-bar-container .mat-mdc-button.mat-mdc-snack-bar-action:not(:disabled).mat-unthemed {\\n  color: var(--mat-snack-bar-button-color, var(--mat-sys-inverse-primary));\\n}\\n.mat-mdc-snack-bar-container .mat-mdc-button.mat-mdc-snack-bar-action:not(:disabled) {\\n  --mat-button-text-state-layer-color: currentColor;\\n  --mat-button-text-ripple-color: currentColor;\\n}\\n.mat-mdc-snack-bar-contai"
+    },
+    "main": {
+      "version": "22.1.7",
+      "archive_sha256": "06115b963b565428d8d5f79cc1cdd07a3f0d5a58dbaebf9955639f38b35ac43d",
+      "integrity": "sha512-mpe0lL6eDlN5AuXY7CP29SfKey7nVuHp4YhQijaq9orRFwsP3fSGrMU9BJjIRDOLWc8Zg9v/oa85E1CjNebXGg==",
+      "member": "package/fesm2022/snack-bar.mjs",
+      "member_sha256": "a3aef232509cc44e971b41be1bc017ba543374b323d16bce90a5162fc568922b",
+      "structural_rule": ".mat-mdc-snack-bar-container .mat-mdc-button.mat-mdc-snack-bar-action:not(:disabled).mat-unthemed",
+      "excerpt": ".mat-mdc-snack-bar-container .mat-mdc-button.mat-mdc-snack-bar-action:not(:disabled).mat-unthemed {\\n  color: var(--mat-snack-bar-button-color, var(--mat-sys-inverse-primary));\\n}\\n.mat-mdc-snack-bar-container .mat-mdc-button.mat-mdc-snack-bar-action:not(:disabled) {\\n  --mat-button-text-state-layer-color: currentColor;\\n  --mat-button-text-ripple-color: currentColor;\\n}\\n.mat-mdc-snack-bar-contai"
+    }
+  },
+  "execution": {
+    "source_commit": "555de911f191946fc03b6bbe4984e3b5f1e2fa8d",
+    "run": 37556908642,
+    "job": 112585132733
+  },
+  "executed_scope": "24 originalCSS-vs-packed rendered probes, 398/498 complete configurable CSS matches with no owned legacy select/snack failure, and2152 historical cases on each source. Other100 configurable mismatches remain failed.",
+  "evidence_transport": "Authenticated Actions logs and independently authenticated exact npm peer source archives. Actions evidence archives not independently downloaded/rehashed.",
+  "independent_review": "Required at C05/A audit; not yet performed",
+  "g11_claim": "not-passed",
+  "recorded_at_utc": "2026-10-07T02:01:48.226728+00:00"
+}
