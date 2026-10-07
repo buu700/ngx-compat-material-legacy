@@ -1159,6 +1159,9 @@ async function main() {
   // Simulate platform-computed colors, but use the unchanged actual CDK
   // detector/module and its public BreakpointObserver event/teardown boundary.
   const oldComputedStyle=globalThis.getComputedStyle;
+  const documentWindow=document.defaultView;
+  if(!documentWindow)throw Error('contrast fixture requires a document window');
+  const oldWindowComputedStyle=documentWindow.getComputedStyle;
   const oldBodyClass=document.body.className;
   const contrastChanges=new Subject<BreakpointState>();
   let computedBackground='rgb(255, 255, 255)';
@@ -1176,13 +1179,14 @@ async function main() {
   let environmentClosed=false;
   try {
     globalThis.getComputedStyle=(element,pseudo)=>{
-      const style=oldComputedStyle(element,pseudo);
+      const style=oldWindowComputedStyle.call(documentWindow,element,pseudo);
       if((element as HTMLElement).style?.backgroundColor.replace(/\\s/g,'')==='rgb(1,2,3)') {
         contrastProbeReads++;
         return new Proxy(style,{get:(target,key)=>key==='backgroundColor'?computedBackground:Reflect.get(target,key,target)});
       }
       return style;
     };
+    documentWindow.getComputedStyle=globalThis.getComputedStyle;
     commonRef=createNgModule(MatLegacyCommonModule,environment);
     const classes=document.body.classList;
     const black=classes.contains('cdk-high-contrast-active')&&classes.contains('cdk-high-contrast-black-on-white')&&!classes.contains('cdk-high-contrast-white-on-black');
@@ -1201,7 +1205,8 @@ async function main() {
   } finally {
     if(commonRef)commonRef.destroy();
     if(!environmentClosed)environment.destroy();
-    contrastChanges.complete();globalThis.getComputedStyle=oldComputedStyle;
+    contrastChanges.complete();documentWindow.getComputedStyle=oldWindowComputedStyle;
+    globalThis.getComputedStyle=oldComputedStyle;
     document.body.className=oldBodyClass;
   }
   const sanityWarnings: string[]=[];
@@ -1256,6 +1261,7 @@ async function main() {
     formFieldTokenIsolation,
     progressLocationAndDefaults,
     commonModuleBehavior,
+    commonModuleDiagnostics:{contrastLifecycle,contrastProbeReads,sanityWarnings,checksEnabled,sanityDefault:TestBed.inject(MATERIAL_LEGACY_SANITY_CHECKS),sanityToken:String(MATERIAL_LEGACY_SANITY_CHECKS)},
     chipEventCounts:{removals:fixture.componentInstance.repeatRemovals,separators:fixture.componentInstance.repeatEnds},
     harnesses: [
       'MatLegacyButtonHarness',
