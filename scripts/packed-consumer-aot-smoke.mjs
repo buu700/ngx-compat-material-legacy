@@ -483,6 +483,7 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
     'packed-consumer/harness/peer-icon-literal-sanitization': parsed.peerIconLiteralSanitization === true,
     'packed-consumer/harness/checkbox-node-factory-context': parsed.checkboxNodeFactoryContext === true,
     'packed-consumer/harness/peer-stepper-abstract-control': parsed.peerStepperAbstractControl === true,
+    'packed-consumer/harness/tooltip-original-eager-dependencies': parsed.tooltipOriginalEagerDependencies === true,
   };
   const owned = declarationKeys(keys)
     .filter(key => key.endsWith('/testing'))
@@ -886,7 +887,7 @@ Object.defineProperty(globalThis, 'navigator', {
 
 import 'zone.js';
 import '@angular/compiler';
-import {Component, ElementRef, EventEmitter, InjectionToken, ANIMATION_MODULE_TYPE, NgZone, inject, isDevMode, createEnvironmentInjector, createNgModule, EnvironmentInjector} from '@angular/core';
+import {Component, ElementRef, ViewContainerRef, EventEmitter, InjectionToken, ANIMATION_MODULE_TYPE, NgZone, inject, isDevMode, createEnvironmentInjector, createNgModule, EnvironmentInjector} from '@angular/core';
 import {Subject} from 'rxjs';
 import {FormControl, Validators} from '@angular/forms';
 import {MatStepperModule, MatStepper} from '@angular/material/stepper';
@@ -899,7 +900,8 @@ import {
 import {getTestBed, TestBed} from '@angular/core/testing';
 import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
 import {provideNoopAnimations} from '@angular/platform-browser/animations';
-import {OverlayContainer} from '@angular/cdk/overlay';
+import {Overlay, OverlayContainer} from '@angular/cdk/overlay';
+import {ScrollDispatcher} from '@angular/cdk/scrolling';
 import {MatLegacyButtonModule} from '@ngx-compat/material-legacy/legacy-button';
 import {MatLegacyButtonHarness} from '@ngx-compat/material-legacy/legacy-button/testing';
 import {MatLegacyError, MatLegacyFormField, MatLegacyPrefix, MatLegacySuffix, MatLegacyFormFieldModule, MAT_LEGACY_FORM_FIELD, MAT_LEGACY_ERROR, MAT_LEGACY_PREFIX, MAT_LEGACY_SUFFIX} from '@ngx-compat/material-legacy/legacy-form-field';
@@ -912,7 +914,7 @@ import {MatLegacyMenuModule} from '@ngx-compat/material-legacy/legacy-menu';
 import {MatLegacyMenuHarness} from '@ngx-compat/material-legacy/legacy-menu/testing';
 import {MatLegacySnackBar, MatLegacySnackBarModule} from '@ngx-compat/material-legacy/legacy-snack-bar';
 import {MatLegacySnackBarHarness} from '@ngx-compat/material-legacy/legacy-snack-bar/testing';
-import {MatLegacyTooltipModule} from '@ngx-compat/material-legacy/legacy-tooltip';
+import {MatLegacyTooltip, MatLegacyTooltipModule, MAT_LEGACY_TOOLTIP_SCROLL_STRATEGY} from '@ngx-compat/material-legacy/legacy-tooltip';
 import {MatLegacyTooltipHarness} from '@ngx-compat/material-legacy/legacy-tooltip/testing';
 import {MatLegacyTabsModule, MatLegacyTabLink} from '@ngx-compat/material-legacy/legacy-tabs';
 import {MatLegacyCheckbox, MatLegacyCheckboxModule, MAT_LEGACY_CHECKBOX_DEFAULT_OPTIONS} from '@ngx-compat/material-legacy/legacy-checkbox';
@@ -999,6 +1001,7 @@ class SmokeDialogContent {}
     </mat-menu>
     <button mat-button id="snack-open">Snack</button>
     <button mat-button matTooltip="Tip text" id="tip">Hover</button>
+    <span id="tooltip-eager" matTooltip="" [matTooltipDisabled]="true">Disabled empty tooltip</span>
     <mat-tab-group id="tabs">
       <mat-tab label="One">Tab one</mat-tab>
       <mat-tab label="Two">Tab two</mat-tab>
@@ -1085,6 +1088,21 @@ async function main() {
   const secondIcon=await iconSvg();
   const fixture = TestBed.createComponent(HarnessHost);
   fixture.detectChanges();
+  const eagerNode=fixture.debugElement.query(element=>element.nativeElement?.id==='tooltip-eager');
+  const eagerTooltip=eagerNode.injector.get(MatLegacyTooltip);
+  // These are owned original16 fields, not current private peer imports. Check
+  // real object identity before any show(), including an empty disabled trigger.
+  const eagerFields=eagerTooltip as any;
+  const tooltipEagerObservation={
+    disabled_empty:eagerTooltip.disabled&&eagerTooltip.message==='',
+    no_overlay_created:eagerFields._overlayRef==null&&eagerFields._tooltipInstance==null&&eagerFields._portal==null,
+    overlay_identity:eagerFields._overlay===eagerNode.injector.get(Overlay),
+    scroll_dispatcher_identity:eagerFields._scrollDispatcher===eagerNode.injector.get(ScrollDispatcher),
+    view_container_identity:eagerFields._viewContainerRef===eagerNode.injector.get(ViewContainerRef),
+    strategy_identity:eagerFields._scrollStrategy===eagerNode.injector.get(MAT_LEGACY_TOOLTIP_SCROLL_STRATEGY),
+    document_identity:eagerFields._document===win.document,
+  };
+  const tooltipOriginalEagerDependencies=Object.values(tooltipEagerObservation).every(value=>value===true);
   const loader = TestbedHarnessEnvironment.loader(fixture);
   const rootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
 
@@ -1373,7 +1391,7 @@ async function main() {
       selectOpened === true &&
       selectClosed === true &&
       tabCount === 2 &&
-      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl,
+      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies,
     buttonText: text,
     selectIsOpen: isOpen,
     dialogText,
@@ -1400,6 +1418,7 @@ async function main() {
     checkboxNodeFactoryContext,
     checkboxNodeFactoryObservation,
     peerStepperAbstractControl, peerStepperObservation,
+    tooltipOriginalEagerDependencies, tooltipEagerObservation,
     checkboxAttribute, slideToggleAttribute, sliderAttribute, tabLinkAttribute,
     commonModuleDiagnostics:{contrastLifecycle,contrastProbeReads,sanityWarnings,checksEnabled,sanityDefault:TestBed.inject(MATERIAL_LEGACY_SANITY_CHECKS),sanityToken:String(MATERIAL_LEGACY_SANITY_CHECKS)},
     chipEventCounts:{removals:fixture.componentInstance.repeatRemovals,separators:fixture.componentInstance.repeatEnds},
