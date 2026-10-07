@@ -24,7 +24,7 @@ class OriginalFactoryContractTests(unittest.TestCase):
     def test_factory_observer_keeps_invalid_throw_and_empty_return_distinct(self):
         code=r'''
 import assert from 'node:assert/strict';
-import {runFactory} from './scripts/api-di-observe.mjs';
+import {runFactory,factoryExecutionProblems} from './scripts/api-di-observe.mjs';
 import {originalFactoryContract} from './scripts/api-surface.mjs';
 class FakeInjector {static create(){return new FakeInjector();}get(){return null;}}
 const context=(injector,fn)=>fn();
@@ -33,6 +33,24 @@ const invalid=runFactory(()=>{throw new Error('This constructor was not compatib
 assert.equal(validEmpty.outcome,'returned');assert.equal(validEmpty.error,null);
 assert.equal(invalid.outcome,'threw');assert.match(invalid.error,/not compatible/);
 assert.deepEqual(invalid.requests,[]);assert.deepEqual(validEmpty.requests,[]);
+assert.deepEqual(factoryExecutionProblems('dependencies',validEmpty),[]);
+assert.deepEqual(factoryExecutionProblems('invalid',invalid),[]);
+assert.equal(factoryExecutionProblems('dependencies',invalid).length,1);
+assert.equal(factoryExecutionProblems('invalid',validEmpty).length,1);
+const token=function RequiredProvider(){};
+class MissingInjector {static create(){return new MissingInjector();}get(){throw new Error('No provider');}}
+const originalGet=MissingInjector.prototype.get;
+const stubbed=runFactory(()=>MissingInjector.create().get(token),MissingInjector,context);
+assert.equal(stubbed.outcome,'returned');assert.equal(stubbed.requests.length,1);
+assert.equal(stubbed.requests[0].token,token);assert.equal(stubbed.requests[0].unresolved,true);
+assert.match(stubbed.requests[0].resolution_error,/No provider/);
+assert.equal(MissingInjector.prototype.get,originalGet);
+assert.match(factoryExecutionProblems('dependencies',stubbed)[0],/unresolved provider stubs/);
+const afterRequest=runFactory(()=>{MissingInjector.create().get(token);throw new Error('No node context');},MissingInjector,context);
+assert.equal(afterRequest.requests.length,1); // Matching count cannot prove return.
+assert.equal(factoryExecutionProblems('dependencies',afterRequest).length,2);
+assert.equal(MissingInjector.prototype.get,originalGet);
+
 assert.equal(originalFactoryContract('/untouched/src/material/dialog/dialog.ts','_MatDialogBase').deps_kind,'invalid');
 assert.equal(originalFactoryContract('/untouched/src/material/core/datetime/native-date-adapter.ts','NativeDateAdapter').deps_kind,'dependencies');
 assert.equal(originalFactoryContract('/unrelated/candidate/dialog.ts','_MatDialogBase'),null);

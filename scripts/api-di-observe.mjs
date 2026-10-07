@@ -34,10 +34,13 @@ export function runFactory(factory, Injector, runInInjectionContext) {
   const original = proto.get;
   proto.get = function patched(token, notFound, flags) {
     const optional = typeof flags === 'number' ? (flags & 8) === 8 : Boolean(flags && flags.optional);
-    requests.push({token, label: labelOf(token), optional});
+    const request = {token, label: labelOf(token), optional};
+    requests.push(request);
     try {
       return original.call(this, token, notFound, flags);
-    } catch {
+    } catch (caught) {
+      request.unresolved = true;
+      request.resolution_error = String(caught?.message || caught);
       return {stub: labelOf(token)};
     }
   };
@@ -52,6 +55,20 @@ export function runFactory(factory, Injector, runInInjectionContext) {
     proto.get = original;
   }
   return {requests, outcome, error};
+}
+
+/** Execution evidence cannot be replaced by a matching request-name/count list. */
+export function factoryExecutionProblems(originalKind, factory) {
+  if (originalKind === 'invalid') {
+    return factory.outcome === 'threw'
+      && /constructor was not compatible with Dependency Injection/.test(factory.error || '')
+      ? [] : ['did not preserve the original non-injectable factory contract'];
+  }
+  const problems=[];
+  if (factory.outcome !== 'returned') problems.push('factory execution incomplete: '+(factory.error || factory.outcome));
+  const unresolved=factory.requests.filter(request=>request.unresolved);
+  if (unresolved.length) problems.push('factory execution used unresolved provider stubs: '+unresolved.map(request=>request.label).join(', '));
+  return problems;
 }
 
 export function expectedFactoryDi(shape, context = {}) {
@@ -191,8 +208,8 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = []) {
     const invalidReference = symbol.shape.originalFactory?.deps_kind === 'invalid';
     const runtime_context = {devMode: isDevMode()};
     const expected = invalidReference ? [] : expectedFactoryDi(symbol.shape, runtime_context);
-    if (invalidReference && !(factory.outcome === 'threw' && /constructor was not compatible with Dependency Injection/.test(factory.error || ''))) {
-      problems.push(`factory ${symbol.symbol_id} did not preserve the original non-injectable factory contract`);
+    for (const issue of factoryExecutionProblems(symbol.shape.originalFactory?.deps_kind, factory)) {
+      problems.push(`factory ${symbol.symbol_id} ${issue}`);
     }
     if (observed.length !== expected.length) {
       problems.push(`token count ${symbol.symbol_id} expected ${expected.length} observed ${observed.length} [${observed.map(item => item.label).join(', ')}]`);
@@ -210,7 +227,7 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = []) {
         }
       }
     }
-    results.push({symbol, problems, runtime_context, factory_outcome:factory.outcome, factory_error:factory.error, original_factory_kind:symbol.shape.originalFactory?.deps_kind ?? null, original_inherited_factory:symbol.shape.originalFactory?.inherited_factory?.name ?? null, constructor_attributes:(symbol.shape.diParams || []).filter(param=>param.attribute).map(param=>param.attribute), observed: observed.map(item => `${item.label}${item.optional ? '?' : ''}`)});
+    results.push({symbol, problems, runtime_context, factory_unresolved_provider_labels:observed.filter(request=>request.unresolved).map(request=>request.label), factory_outcome:factory.outcome, factory_error:factory.error, original_factory_kind:symbol.shape.originalFactory?.deps_kind ?? null, original_inherited_factory:symbol.shape.originalFactory?.inherited_factory?.name ?? null, constructor_attributes:(symbol.shape.diParams || []).filter(param=>param.attribute).map(param=>param.attribute), observed: observed.map(item => `${item.label}${item.optional ? '?' : ''}`)});
   }
   return results;
 }
