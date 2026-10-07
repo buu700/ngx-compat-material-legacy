@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "role": "Restore original legacy common constructor, sanity options/checks and local test-environment helper. Public A11yModule imports initialize high contrast and own media-change/teardown behavior. No private CDK method or detector fork.",
+  "originals": {
+    "common-module.ts": "da6fe5b41447947454278e7475c393be01103c39344de22734dc9b88707b2dd9",
+    "test-environment.ts": "75501456f24a37964640dbfbd0f6da3127553eda8aa020791e9c807f7c93fbd3",
+    "high-contrast-mode-detector.ts": "b0387313cce44d1c3cd599dcb80ecd86771600ddd2eb2b4db68f995de5e39f71",
+    "common-module-compiled.txt": "2f2f43d0d09dfe93e49f70c6c93406e432e6b0977c8a0fe73cbefffe19b8692a"
+  },
+  "original_material_archive_sha256": "de41309d20b1d98a7fd6d028a7de42853ea2d453a329c7a8815aaf73ea7f365b",
+  "original_cdk_archive_sha256": "a499ba0fee46784441b92587e43b17ec72d9bd383f78ea14954eaa62c781bad7",
+  "owned": {
+    "path": "projects/ngx-material-legacy/legacy-core/internal/common-module.ts",
+    "before_sha256": "a36d4381d828eccbf40815dcac053048a054b3fa6ce90f6fb41b58b04183c8ee",
+    "after_sha256": "8f8d7dbcf89c151f6bb953f8a0e803b2d64cdb07fbcedfa460415c7f5c22afe6"
+  },
+  "sanity_types": {
+    "original": "boolean | {doctype:boolean,theme:boolean,version:boolean}",
+    "token_description": "mat-sanity-checks",
+    "default": true,
+    "before_sha256": "e422d177218ae7117389643ea592b40d96146228bda604879f2d30127fcbf170",
+    "after_sha256": "8756b0495ab4f02518887dff55ab844ff433a267c5e899a9b6abfe005863e9d7"
+  },
+  "allowed_changes": [
+    "Original check functions and _checkIsEnabled body retained unchanged; test-environment helper owned byte-for-byte apart from Ryan notice.",
+    "isDevMode replaces the same global Angular dev-mode condition through the stable public API.",
+    "Current public Material VERSION and CDK VERSION are compared; LEGACY_VERSION already promises the current peer Material identity, not add-on package16 vs currentCDK mismatch.",
+    "The public A11yModule is imported without re-exporting its directives. Its authenticated21 initializer calls the same detector initialization as original16 common-module; the original16 detector also resets classes on media changes. No detector/lifecycle algorithm or CSS projection is forked."
+  ],
+  "minimum_public_cdk_proof": {
+    "version": "21.2.14",
+    "archive_sha256": "b54868a0f7aefa471203a0fe419370e156cdf0218db9b625aca3ae6e8de25c63",
+    "member": "package/types/a11y.d.ts",
+    "member_sha256": "c7cb507235c6a481ec46b581092a0855986e1c817b798221e7da56eb2e25ce16",
+    "enum_declaration": "declare enum HighContrastMode {\n    NONE = 0,\n    BLACK_ON_WHITE = 1,\n    WHITE_ON_BLACK = 2\n}",
+    "detector_declaration": "declare class HighContrastModeDetector implements OnDestroy {\n    private _platform;\n    /**\n     * Figuring out the high contrast mode and adding the body classes can cause\n     * some expensive layouts. This flag is used to ensure that we only do it once.\n     */\n    private _hasCheckedHighContrastMode;\n    private _document;\n    private _breakpointSubscription;\n    constructor(...args: unknown[]);\n    /** Gets the current high-contrast-mode for the page. */\n    getHighContrastMode(): HighContrastMode;\n    ngOnDestroy(): void;\n    /** Applies CSS classes indicating high-contrast mode to document body (browser-only). */\n    _applyBodyHighContrastModeCssClasses(): void;\n    static \u0275fac: i0.\u0275\u0275FactoryDeclaration<HighContrastModeDetector, never>;\n    static \u0275prov: i0.\u0275\u0275InjectableDeclaration<HighContrastModeDetector>;\n}",
+    "public_exports": [
+      "export { AriaDescriber, CDK_DESCRIBEDBY_HOST_ATTRIBUTE, CDK_DESCRIBEDBY_ID_PREFIX, ConfigurableFocusTrap, ConfigurableFocusTrapFactory, EventListenerFocusTrapInertStrategy, FOCUS_TRAP_INERT_STRATEGY, FocusTrap, HighContrastMode, HighContrastModeDetector, INPUT_MODALITY_DETECTOR_DEFAULT_OPTIONS, INPUT_MODALITY_DETECTOR_OPTIONS, InputModalityDetector, InteractivityChecker, MESSAGES_CONTAINER_ID, NOOP_TREE_KEY_MANAGER_FACTORY_PROVIDER, NoopTreeKeyManager, TREE_KEY_MANAGER, TreeKeyManager, TreeKeyManagerFactory, TreeKeyManagerItem, TreeKeyManagerOptions, TreeKeyManagerStrategy, _IdGenerator, addAriaReferencedId, getAriaReferenceIds, isFakeMousedownFromScreenReader, isFakeTouchstartFromScreenReader, removeAriaReferencedId };"
+    ],
+    "a11y_module_runtime_member": "package/fesm2022/_a11y-module-chunk.mjs",
+    "a11y_module_runtime_member_sha256": "5cba710056d2fd8198a5cdefb19579d2c0dd7daab363867913b65d34913b2a29",
+    "a11y_module_initialization_excerpt": "class A11yModule {\n  constructor() {\n    inject(HighContrastModeDetector)._applyBodyHighContrastModeCssClasses();\n  }\n"
+  },
+  "removed_waivers": [
+    {
+      "file": "compatibility/rc/api/signature-differences.json",
+      "record": {
+        "symbol_id": "legacy-core/primary/LegacyGranularSanityChecks",
+        "classification": "intentional-legacy-difference",
+        "historical_signature": "public prop doctype:boolean",
+        "owned_signature": "public prop doctype:boolean?",
+        "rationale": "Owned declaration text differs from the 16.2.14 signature. Only this exact pair is accepted; it is not a match."
+      }
+    },
+    {
+      "file": "compatibility/rc/api/signature-differences.json",
+      "record": {
+        "symbol_id": "legacy-core/primary/LegacyGranularSanityChecks",
+        "classification": "intentional-legacy-difference",
+        "historical_signature": "public prop theme:boolean",
+        "owned_signature": "public prop theme:boolean?",
+        "rationale": "Owned declaration text differs from the 16.2.14 signature. Only this exact pair is accepted; it is not a match."
+      }
+    },
+    {
+      "file": "compatibility/rc/api/signature-differences.json",
+      "record": {
+        "symbol_id": "legacy-core/primary/LegacyGranularSanityChecks",
+        "classification": "intentional-legacy-difference",
+        "historical_signature": "public prop version:boolean",
+        "owned_signature": "public prop version:boolean?",
+        "rationale": "Owned declaration text differs from the 16.2.14 signature. Only this exact pair is accepted; it is not a match."
+      }
+    },
+    {
+      "file": "compatibility/rc/api/signature-differences.json",
+      "record": {
+        "symbol_id": "legacy-core/primary/MatLegacyCommonModule",
+        "classification": "intentional-legacy-difference",
+        "historical_signature": "public constructor(HighContrastModeDetector,SanityChecks,Document)",
+        "owned_signature": null,
+        "rationale": "Constructor parameters differ from 16.2.14, including peer APIs removed from the current runtime such as ComponentFactoryResolver. Only this exact pair is accepted."
+      }
+    },
+    {
+      "file": "compatibility/rc/api/di-differences.json",
+      "record": {
+        "symbol_id": "legacy-core/primary/MATERIAL_LEGACY_SANITY_CHECKS",
+        "classification": "intentional-legacy-difference",
+        "historical": "token 'mat-sanity-checks'",
+        "owned": "InjectionToken mat-legacy-sanity-checks",
+        "rationale": "The owned InjectionToken description differs from the 16.2.14 string. Runtime identity was executed. Only this exact description pair is accepted."
+      }
+    },
+    {
+      "file": "compatibility/rc/api/di-differences.json",
+      "record": {
+        "symbol_id": "legacy-core/primary/MatLegacyCommonModule",
+        "classification": "intentional-legacy-difference",
+        "historical": "HighContrastModeDetector|MATERIAL_SANITY_CHECKS?|DOCUMENT",
+        "owned": "",
+        "rationale": "The executed factory dependency list differs from the 16.2.14 constructor parameter list. Angular 22 host dependencies and owned constructor edits are pinned here; a different executed list fails. This is not a d.ts spelling check."
+      }
+    }
+  ],
+  "limits": [
+    "Packed71 must exercise real public module initialization, original mode classes, media-change callbacks and destroy behavior, with the peer detector unchanged. Actual browser forced-colors style qualification remains separate.",
+    "No original oracle/golden or runtime risk exception is changed, and no G01-G13/audit pass follows from source diagnostics."
+  ],
+  "packed_case": "packed-consumer/harness/common-module-sanity-and-contrast",
+  "packed_assertions": "Real public A11yModule/HighContrastModeDetector initialization via isolated public injector/module APIs; public BreakpointObserver event fixture and simulated native computed colors exercise black/white/NONE transitions and teardown. Owned original sanity token/default, constructor and granular doctype checks remain independently asserted.",
+  "original_implicit_di": {
+    "member": "package/fesm2022/core.mjs",
+    "member_sha256": "38b761eb8e9b43297942f6e1412469437bc3ee0291342a766b001f715061d175",
+    "factory_parameters": 3,
+    "additional_dev_mode_request": {
+      "token": "Platform",
+      "optional": true
+    },
+    "compiled_original_call": "const platform = inject(Platform, { optional: true });",
+    "runtime_context": "devMode true/default -> total4, devMode false -> total3. Original factory-metadata oracle remains untouched. Original compiled constructor is executed in a source-model diagnostic; not claimed as an Angular16 environment execution."
+  }
+}

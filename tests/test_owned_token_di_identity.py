@@ -9,10 +9,11 @@ class OwnedTokenIdentityTests(unittest.TestCase):
 import assert from 'node:assert/strict';
 import {ownedTokenIdentity} from './scripts/api-di-observe.mjs';
 for (const [family,names] of [
+ ['legacy-core',['MATERIAL_SANITY_CHECKS']],
  ['legacy-form-field',['MAT_FORM_FIELD','MAT_ERROR','MAT_PREFIX','MAT_SUFFIX']],
  ['legacy-progress-bar',['MAT_PROGRESS_BAR_LOCATION','MAT_PROGRESS_BAR_DEFAULT_OPTIONS']],
 ]) for (const name of names) {
- const alias=name.replace('MAT_','MAT_LEGACY_');
+ const alias=name==='MATERIAL_SANITY_CHECKS'?'MATERIAL_LEGACY_SANITY_CHECKS':name.replace('MAT_','MAT_LEGACY_');
  const token={toString:()=>`InjectionToken ${name}`};
  const twin={toString:()=>`InjectionToken ${name}`};
  const exports={[alias]:token};

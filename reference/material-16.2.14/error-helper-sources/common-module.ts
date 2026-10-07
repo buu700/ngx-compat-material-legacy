@@ -1,25 +1,42 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
- * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
 
-import {A11yModule, HighContrastModeDetector} from '@angular/cdk/a11y';
+import {HighContrastModeDetector} from '@angular/cdk/a11y';
 import {BidiModule} from '@angular/cdk/bidi';
-import {inject, Inject, isDevMode, NgModule, Optional} from '@angular/core';
+import {inject, Inject, InjectionToken, NgModule, Optional} from '@angular/core';
 import {VERSION as CDK_VERSION} from '@angular/cdk';
 import {DOCUMENT} from '@angular/common';
-import {Platform} from '@angular/cdk/platform';
-import {VERSION} from '@angular/material/core';
-import {
-  MATERIAL_LEGACY_SANITY_CHECKS as MATERIAL_SANITY_CHECKS,
-  LegacySanityChecks as SanityChecks,
-  LegacyGranularSanityChecks as GranularSanityChecks,
-} from './sanity-checks';
-import {_isTestEnvironment} from './test-environment';
+import {Platform, _isTestEnvironment} from '@angular/cdk/platform';
+import {VERSION} from '../version';
+
+/** @docs-private */
+export function MATERIAL_SANITY_CHECKS_FACTORY(): SanityChecks {
+  return true;
+}
+
+/** Injection token that configures whether the Material sanity checks are enabled. */
+export const MATERIAL_SANITY_CHECKS = new InjectionToken<SanityChecks>('mat-sanity-checks', {
+  providedIn: 'root',
+  factory: MATERIAL_SANITY_CHECKS_FACTORY,
+});
+
+/**
+ * Possible sanity checks that can be enabled. If set to
+ * true/false, all checks will be enabled/disabled.
+ */
+export type SanityChecks = boolean | GranularSanityChecks;
+
+/** Object that can be used to configure the sanity checks granularly. */
+export interface GranularSanityChecks {
+  doctype: boolean;
+  theme: boolean;
+  version: boolean;
+}
 
 /**
  * Module that captures anything that should be loaded and/or run for *all* Angular Material
@@ -28,7 +45,7 @@ import {_isTestEnvironment} from './test-environment';
  * This module should be imported to each top-level component module (e.g., MatTabsModule).
  */
 @NgModule({
-  imports: [BidiModule, A11yModule],
+  imports: [BidiModule],
   exports: [BidiModule],
 })
 export class MatCommonModule {
@@ -40,15 +57,14 @@ export class MatCommonModule {
     @Optional() @Inject(MATERIAL_SANITY_CHECKS) private _sanityChecks: SanityChecks,
     @Inject(DOCUMENT) private _document: Document,
   ) {
-    // The public A11yModule import initializes high contrast and observes mode
-    // changes. Keep the historical constructor token without importing or
-    // copying the detector's private body-class/lifecycle implementation.
-    void highContrastModeDetector;
+    // While A11yModule also does this, we repeat it here to avoid importing A11yModule
+    // in MatCommonModule.
+    highContrastModeDetector._applyBodyHighContrastModeCssClasses();
 
     if (!this._hasDoneGlobalChecks) {
       this._hasDoneGlobalChecks = true;
 
-      if (isDevMode()) {
+      if (typeof ngDevMode === 'undefined' || ngDevMode) {
         // Inject in here so the reference to `Platform` can be removed in production mode.
         const platform = inject(Platform, {optional: true});
 
