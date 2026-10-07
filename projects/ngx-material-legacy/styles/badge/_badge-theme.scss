@@ -134,6 +134,12 @@ $_emit-fallback-vars: true;
       @include token-utils.create-token-slot(font-weight, text-weight, $_emit-fallback-vars);
     }
 
+    // Preserve the historical class contract alongside current forced colors.
+    @at-root .cdk-high-contrast-active #{&} {
+      outline: solid 1px;
+      border-radius: 0;
+    }
+
     @include cdk.high-contrast(active) {
       outline: solid 1px;
       border-radius: 0;
