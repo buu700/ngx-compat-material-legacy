@@ -129,10 +129,43 @@ function evidenceClass(entry) {
   return 'file';
 }
 
+function regularRepoMember(rel) {
+  if (typeof rel !== 'string' || rel.includes('\\')) return null;
+  const parts = rel.split('/');
+  if (parts.some(part => !part || part === '.' || part === '..')) return null;
+  let file = root;
+  try {
+    for (const part of parts) {
+      file = join(file, part);
+      if (lstatSync(file).isSymbolicLink()) return null;
+    }
+    return lstatSync(file).isFile() ? file : null;
+  } catch { return null; }
+}
+
+function individualPatchBound(entry, proof) {
+  if (!regularRepoMember(entry.evidence_report)) return false;
+  if (evidenceClass(entry) !== 'file' || !entry.evidence_report.endsWith('.json')) return false;
+  const body = evidenceJson(join(root, entry.evidence_report));
+  const review = Array.isArray(body?.reviews)
+    ? body.reviews.find(item => item?.sha === entry.sha) : body;
+  if (!review || review.sha !== entry.sha || review.diff_sha256 !== proof.diff_sha256) return false;
+  let bytes;
+  if (typeof review.diff === 'string' && review.diff.startsWith('diff --git ')) {
+    bytes = Buffer.from(review.diff, 'utf8');
+  } else {
+    const file = regularRepoMember(review.patch_file);
+    if (!file) return false;
+    bytes = readFileSync(file);
+    if (!bytes.toString('utf8').includes('diff --git ')) return false;
+  }
+  return createHash('sha256').update(bytes).digest('hex') === proof.diff_sha256;
+}
+
 function individualProofOk(entry) {
   const proof = entry.individual_proof;
   if (!proof || typeof proof !== 'object' || Array.isArray(proof)) return false;
-  if (!HEX64.test(proof.diff_sha256 || '')) return false;
+  if (!HEX64.test(proof.diff_sha256 || '') || !individualPatchBound(entry, proof)) return false;
   if (!REVIEW_DEPTHS.has(proof.review_depth)) return false;
   if (!Array.isArray(proof.affected_branches) || proof.affected_branches.length === 0) return false;
   if (!proof.affected_branches.every(branch => branch === 'main' || branch === '21.x')) return false;
