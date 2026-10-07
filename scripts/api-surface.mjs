@@ -570,6 +570,7 @@ function shapeFromFound(found, refRoot) {
     const flat = flattenClass(found, refRoot, new Set());
     flat.comparison = 'signature';
     flat.di = classIsInjectable(node);
+    flat.runtimeName = ts.isClassDeclaration(node) ? (node.name?.text ?? null) : null;
     flat.token = false;
     flat.ownSignatures = own.signatures;
     flat.ownProtected = own.requiredProtected;
