@@ -23,6 +23,9 @@ import {MAT_TAB_LABEL, MatTabLabel as MatNonLegacyTabLabel} from '@angular/mater
   providers: [{provide: MAT_TAB_LABEL, useExisting: MatLegacyTabLabel}],
 })
 export class MatLegacyTabLabel extends MatNonLegacyTabLabel {
+  /** Original public nearest-tab identity, initialized on the returned parent. */
+  declare _closestTab: any;
+
   // @ts-expect-error TS2377: derived constructor deliberately returns its object.
   constructor(templateRef: TemplateRef<any>, viewContainerRef: ViewContainerRef,
       @Optional() @Inject(MatLegacyTab) closestTab: any) {
