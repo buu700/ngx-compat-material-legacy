@@ -1,0 +1,580 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "role": "Bounded stable peer API maintenance, not a consumer Sass migration. Remove only the unused planned-removal argument; namespace/helper names, selectors, contents and maps unchanged.",
+  "calls": 52,
+  "files": 30,
+  "peer21": {
+    "version": "21.2.14",
+    "archive_sha256": "b54868a0f7aefa471203a0fe419370e156cdf0218db9b625aca3ae6e8de25c63",
+    "member": "package/a11y/_index.scss",
+    "member_sha256": "534372c8fe2542a439818bf5dddc76264e3cbe1dfb0cf3188a39b8a14fa1d159"
+  },
+  "peer22_diagnostic": {
+    "version": "22.1.7",
+    "member_sha256": "534372c8fe2542a439818bf5dddc76264e3cbe1dfb0cf3188a39b8a14fa1d159"
+  },
+  "identical_public_mixin_declaration": "/// Applies styles for users in high contrast mode.\n///\n/// @param {String} target Type of high contrast setting to target. Can be `active` or `none`.\n///   Defaults to `active`.\n/// @param {String} encapsulation No longer used and will be removed.\n@mixin high-contrast($target: active, $encapsulation: null) {\n  // Historically we used to support `black-on-white` and `white-on-black` so we\n  // allow them here anyway. They'll be coerced to `active` below.\n  @if ($target != 'active' and $target != 'none' and $target != 'black-on-white' and\n    $target != 'white-on-black') {\n    @error 'Unknown cdk-high-contrast value \"#{$target}\" provided. ' +\n           'Allowed values are \"active\" and \"none\"';\n  }\n\n  $query-value: active;\n\n  @if ($target == none) {\n    $query-value: none;\n  }\n\n  @media (forced-colors: #{$query-value}) {\n    @content;\n  }\n}\n",
+  "reason": "The body never reads encapsulation; active/off and active/default execute identical public forced-colors content at both advertised peer lines. This removes dependence on a parameter explicitly marked planned removal without changing any helper name or generated selector.",
+  "records": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/menu.scss",
+      "before_sha256": "80bc38ebd93f7b4b6a7e3f75d1dd2379e2b4085df38ffe5e5a48c06ed68b5df3",
+      "after_sha256": "ebf00fab85fe193b6ae964b3d3582d671aa473a3a5bdb9f683aec63f93e4a3f4",
+      "edits": [
+        {
+          "before_offset": 1795,
+          "after_offset": 1795,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        },
+        {
+          "before_offset": 2680,
+          "after_offset": 2675,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        }
+      ],
+      "all_other_source_bytes_preserved": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.scss",
+      "before_sha256": "f764ac22080de844a500034ea1153d21f4390ecfa359151af3fcf65013ebf026",
+      "after_sha256": "96fd654f49a0520eea553c133033e730bf02059b30df4a9e12339ade42c19bd5",
+      "edits": [
+        {
+          "before_offset": 466,
+          "after_offset": 466,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        }
+      ],
+      "all_other_source_bytes_preserved": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-card/card.scss",
+      "before_sha256": "6c5fc816e9134c49f81b272b1e25b4cdb2639fafb15a62cfb1fa456453388bce",
+      "after_sha256": "1ce7d2e83d42d690543b92c0a4f18af09b141a820d998cdeff335f67d2df051f",
+      "edits": [
+        {
+          "before_offset": 827,
+          "after_offset": 827,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        }
+      ],
+      "all_other_source_bytes_preserved": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-radio/radio.scss",
+      "before_sha256": "5f055872941c70776bfb1f7b189f3d0765ab0e7b60b4dfd37cd5d1d5bbdea612",
+      "after_sha256": "ee7421d24701d685adffa406f82841333ee17d4618d24d0a99176195551d130d",
+      "edits": [
+        {
+          "before_offset": 2780,
+          "after_offset": 2780,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        },
+        {
+          "before_offset": 5912,
+          "after_offset": 5907,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        }
+      ],
+      "all_other_source_bytes_preserved": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-paginator/paginator.scss",
+      "before_sha256": "3a99e635bf78dc96d695a8af2a7c7533dcc052f20a6674ffea5e962937fb9b0b",
+      "after_sha256": "3af5b61f711f276eac7fe0b9a251d1c78bb8fed77787f7ab22794deaa1fd3f9a",
+      "edits": [
+        {
+          "before_offset": 1590,
+          "after_offset": 1590,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        },
+        {
+          "before_offset": 1663,
+          "after_offset": 1658,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        }
+      ],
+      "all_other_source_bytes_preserved": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-slider/slider.scss",
+      "before_sha256": "ef073999faaf7caf5e3d0e8a9b7c0d2ac3b4e7e39a2e049407632c3aeb6f6490",
+      "after_sha256": "0fd2c57264430c0c982708797dbba0e452ac76057736abd447b89279b0a6d1c3",
+      "edits": [
+        {
+          "before_offset": 4265,
+          "after_offset": 4265,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        },
+        {
+          "before_offset": 7289,
+          "after_offset": 7284,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        },
+        {
+          "before_offset": 8120,
+          "after_offset": 8110,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        },
+        {
+          "before_offset": 9029,
+          "after_offset": 9014,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        }
+      ],
+      "all_other_source_bytes_preserved": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.scss",
+      "before_sha256": "b657aaba0d295cb874c0fe24a4735c6b523422ef6df3a160d4992ab99cf1a22e",
+      "after_sha256": "5520987e9617a872afb76cf5692dfb87f278f7303fba456b8d77101d353fb537",
+      "edits": [
+        {
+          "before_offset": 3409,
+          "after_offset": 3409,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        }
+      ],
+      "all_other_source_bytes_preserved": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.scss",
+      "before_sha256": "992e7d5efd82176dad3fb68b8ac052091c4261bacab83aaa6b8c32ecd16e0f38",
+      "after_sha256": "21c4cfddf29b447d648142b9b3b917340a3ade323850af82525d9dbb8630cdac",
+      "edits": [
+        {
+          "before_offset": 7990,
+          "after_offset": 7990,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        },
+        {
+          "before_offset": 9793,
+          "after_offset": 9788,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        },
+        {
+          "before_offset": 10787,
+          "after_offset": 10777,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        }
+      ],
+      "all_other_source_bytes_preserved": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-button/button.scss",
+      "before_sha256": "c3b46e5bda81602f2adb8a00002356a58137e90b67e65a7467ffecbfb4f0d1f2",
+      "after_sha256": "e9a9451d1ef93b0ab9997b9df3e3e4c3d5f906a71abb1b1a55d1c45916ed5d18",
+      "edits": [
+        {
+          "before_offset": 6473,
+          "after_offset": 6473,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        }
+      ],
+      "all_other_source_bytes_preserved": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/chips.scss",
+      "before_sha256": "d57ff1327f0976c6a86444750b74a81916129087721a90f6960d24af2ebfb81b",
+      "after_sha256": "5d26a2afd3a6157417173138027813dc9c6075d73d92cc44d6a86ec1b745d8da",
+      "edits": [
+        {
+          "before_offset": 2921,
+          "after_offset": 2921,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        },
+        {
+          "before_offset": 3299,
+          "after_offset": 3294,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        }
+      ],
+      "all_other_source_bytes_preserved": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-dialog/dialog.scss",
+      "before_sha256": "2dbec7a913d120b881a2ff7f1ca1671703a8e7f59bc409d9df38e28d9f4ba0d2",
+      "after_sha256": "6b8e777777f4b78e0a0aa68b11007f644359fa97e2bf505f5aa0c4cb25d082f9",
+      "edits": [
+        {
+          "before_offset": 597,
+          "after_offset": 597,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        }
+      ],
+      "all_other_source_bytes_preserved": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-slide-toggle/slide-toggle.scss",
+      "before_sha256": "5d749194867b86c50d35ad01bbad2115e55be08a5e8ed19552140702a0080ac2",
+      "after_sha256": "6a1ba12dd4e9405c3f53c069b9eab5f6bb4d34069c7f74ab383485fbd5f37a8b",
+      "edits": [
+        {
+          "before_offset": 6423,
+          "after_offset": 6423,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        }
+      ],
+      "all_other_source_bytes_preserved": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/form-field.scss",
+      "before_sha256": "e1d7766c75712cf0a89bd5204f33cbffacb363b8d25f91f040f896f80ab7e675",
+      "after_sha256": "9a546e6286af3937bc742cc0005262d979da5c686696b21d3a803a983d0305d9",
+      "edits": [
+        {
+          "before_offset": 1890,
+          "after_offset": 1890,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        },
+        {
+          "before_offset": 3649,
+          "after_offset": 3644,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        }
+      ],
+      "all_other_source_bytes_preserved": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/form-field-input.scss",
+      "before_sha256": "3573ff9d8781a6af5667cd47a2ac2c9aef4e4aad618bf7f91d429678a4a7ef52",
+      "after_sha256": "f19340f6dc6a7a23224e4408a026c9977e0013bba633c734f52c870bed977fb6",
+      "edits": [
+        {
+          "before_offset": 4782,
+          "after_offset": 4782,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        }
+      ],
+      "all_other_source_bytes_preserved": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/form-field-legacy.scss",
+      "before_sha256": "28fac264a9a2d122d96bcdb46d81e79d59353dc64c10d385b8f803cc2ac73a0f",
+      "after_sha256": "18d806fcb829c56c4667e78477e4dbd9dd4da1a9d2b6f2dcab1063df843157d7",
+      "edits": [
+        {
+          "before_offset": 876,
+          "after_offset": 876,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        },
+        {
+          "before_offset": 1298,
+          "after_offset": 1293,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        },
+        {
+          "before_offset": 1525,
+          "after_offset": 1515,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        }
+      ],
+      "all_other_source_bytes_preserved": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/form-field-outline.scss",
+      "before_sha256": "ac1e830d8e786fda52bd8c7e3673e8ccd94877ff24c386376f36c4b8eaff4f90",
+      "after_sha256": "5fa99663272c685c593cf3a786fad8d8c738c1a0d3b53b21ff074e08807a1c8c",
+      "edits": [
+        {
+          "before_offset": 3541,
+          "after_offset": 3541,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        },
+        {
+          "before_offset": 4026,
+          "after_offset": 4021,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        }
+      ],
+      "all_other_source_bytes_preserved": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/form-field-fill.scss",
+      "before_sha256": "a0a705d699de86fb271f2c4b7f8f3fc166eaee8f34add5c0ec253aed7641c17f",
+      "after_sha256": "9706330904bcbc1f34515b178cf2fb633ab04a08f9f2a43173001f9e19338cf7",
+      "edits": [
+        {
+          "before_offset": 1319,
+          "after_offset": 1319,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        },
+        {
+          "before_offset": 1453,
+          "after_offset": 1448,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        },
+        {
+          "before_offset": 1580,
+          "after_offset": 1570,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        },
+        {
+          "before_offset": 1922,
+          "after_offset": 1907,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        }
+      ],
+      "all_other_source_bytes_preserved": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/form-field-standard.scss",
+      "before_sha256": "6a59b3d87a295fee3f0006d44bf6b71866535953fe4a7a608cf5389e5a66a9b5",
+      "after_sha256": "6b2bd91773220fdaafc0e279208ddf9da29da9bebf0bc92778f37d7f4609168a",
+      "edits": [
+        {
+          "before_offset": 734,
+          "after_offset": 734,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        },
+        {
+          "before_offset": 969,
+          "after_offset": 964,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        },
+        {
+          "before_offset": 1196,
+          "after_offset": 1186,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        }
+      ],
+      "all_other_source_bytes_preserved": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-bar/progress-bar.scss",
+      "before_sha256": "917c782531862714d88ef4e93005b05c697fbc1e1d0769481055aef27cccef22",
+      "after_sha256": "e5eac20b958559090d7f5866d52fded97be8703ab72c39451039dacaab12af2e",
+      "edits": [
+        {
+          "before_offset": 1031,
+          "after_offset": 1031,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        },
+        {
+          "before_offset": 1383,
+          "after_offset": 1378,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        },
+        {
+          "before_offset": 1886,
+          "after_offset": 1876,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        }
+      ],
+      "all_other_source_bytes_preserved": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.scss",
+      "before_sha256": "84d58433690ca45f1251bb897b706e2b7dbc9cde6c53b0cb0d1d11a53ee5a444",
+      "after_sha256": "e31e15d575d131f4ca34370b02f34091ce737ce5d08a2f1ae9bf420694de7f62",
+      "edits": [
+        {
+          "before_offset": 621,
+          "after_offset": 621,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        }
+      ],
+      "all_other_source_bytes_preserved": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.scss",
+      "before_sha256": "c29ae8f61be47e42802ee2219f87e9d6c80e1ed35b06dd38df2b4ab72f2a0db9",
+      "after_sha256": "68e8461002312b99822da585597d85f37ed3d5b719695e49467987825b7e2839",
+      "edits": [
+        {
+          "before_offset": 1060,
+          "after_offset": 1060,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        }
+      ],
+      "all_other_source_bytes_preserved": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.scss",
+      "before_sha256": "5d559eb75bd8277cd9790a2df355f2081f6eadc7cf84f75f2354e50fb9faffcc",
+      "after_sha256": "749662548e8724b6e49e21a1284df3e463caf6086c659bd0094cff2adb39f92a",
+      "edits": [
+        {
+          "before_offset": 477,
+          "after_offset": 477,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        }
+      ],
+      "all_other_source_bytes_preserved": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/_tabs-common.scss",
+      "before_sha256": "a194262fb432f6519469634b9dbb81ccc252312d237c5e5082c934ed3685df26",
+      "after_sha256": "f8c567d82879d41db35ed7dcd7deb7e266c316c4aa6f754f277b3ef0d0ee3fe0",
+      "edits": [
+        {
+          "before_offset": 866,
+          "after_offset": 866,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        },
+        {
+          "before_offset": 1078,
+          "after_offset": 1073,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        },
+        {
+          "before_offset": 1645,
+          "after_offset": 1635,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        }
+      ],
+      "all_other_source_bytes_preserved": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/list.scss",
+      "before_sha256": "43c11606ee4374e88969efbcbcbc82d2bdbab155bc8bc26c3af042aba16473c4",
+      "after_sha256": "76c0fb305c28e326e41b57a9a5b48c6880dc423b7c0a91a2e32c64fc7d8938ff",
+      "edits": [
+        {
+          "before_offset": 7531,
+          "after_offset": 7531,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        }
+      ],
+      "all_other_source_bytes_preserved": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/badge/_badge-theme.scss",
+      "before_sha256": "9a933f89822142be95f00594c05ec93a0ba479b92983d5329d4ea9b2f3764936",
+      "after_sha256": "9f1d278f8931c37a25fd91ff2fdef696db060338215551a58ef5c2e1d13729c8",
+      "edits": [
+        {
+          "before_offset": 3796,
+          "after_offset": 3796,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        }
+      ],
+      "all_other_source_bytes_preserved": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/core/ripple/_ripple.scss",
+      "before_sha256": "1fa16981074f7de88d6636665231b99f285876ebcdef3e0251ed1bebe78b3d64",
+      "after_sha256": "a0f108b709c87d14823b0f30d870fcd1e8dc77b891da80ec91d7ffc761167a11",
+      "edits": [
+        {
+          "before_offset": 1492,
+          "after_offset": 1492,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        }
+      ],
+      "all_other_source_bytes_preserved": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/core/style/_menu-common.scss",
+      "before_sha256": "afe406f8797c8d3154b16b2ec2681fd90c3604761013b6e92631d852bf658f5e",
+      "after_sha256": "9bbacb26ca84ca30ed708a2473316b5c5ca947af5dbe3326d6343c6955419e51",
+      "edits": [
+        {
+          "before_offset": 1892,
+          "after_offset": 1892,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        }
+      ],
+      "all_other_source_bytes_preserved": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/core/focus-indicators/_private.scss",
+      "before_sha256": "a8d9045dc9725c5867e82b82fc13d6a5ec92799627a63a1552786fdf2c9416e4",
+      "after_sha256": "43f873d9bb89016fdd17c96e2446b28495d96ec25b65a8103d0303f36c77cccd",
+      "edits": [
+        {
+          "before_offset": 1439,
+          "after_offset": 1439,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        }
+      ],
+      "all_other_source_bytes_preserved": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/core/option/option.scss",
+      "before_sha256": "525d3e12c62795cdfa492ddd0b0344220b94568c5d874452033df4a94822e23f",
+      "after_sha256": "259cc7d9194cf2d2a7620f533e51c5859e54a88e26afa5229f5d0341b6bffd58",
+      "edits": [
+        {
+          "before_offset": 6328,
+          "after_offset": 6328,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        }
+      ],
+      "all_other_source_bytes_preserved": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/option/option.scss",
+      "before_sha256": "f00c9089efa755c52d0319965a3f7018da4e374e3214199d0205eb658cd4d369",
+      "after_sha256": "eee08968f40e26b222d9bf8755cbd1fb2aad21acee0f72afd5c1bb577c28ca2d",
+      "edits": [
+        {
+          "before_offset": 910,
+          "after_offset": 910,
+          "original": "cdk.high-contrast(active, off)",
+          "replacement": "cdk.high-contrast(active)"
+        }
+      ],
+      "all_other_source_bytes_preserved": true
+    }
+  ],
+  "remaining_compatibility_calls": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.scss",
+      "call": "cdk.high-contrast(black-on-white, off)"
+    }
+  ],
+  "qualification": "Exact public source identity and reverse-source proof only; fresh pinned Sass/browser/artifact qualification still required. No mismatch/golden/waiver changed."
+}
