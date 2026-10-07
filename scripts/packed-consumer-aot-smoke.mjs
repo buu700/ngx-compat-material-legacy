@@ -491,6 +491,7 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
     'packed-consumer/harness/no-data-row-original-constructor': parsed.noDataRowOriginalConstructor === true,
     'packed-consumer/harness/constructor-borrowed-provider-lifecycle': parsed.constructorBorrowedProviderLifecycle === true,
     'packed-consumer/harness/table-original-sticky-coercion-dirty-state': parsed.tableOriginalStickyBehavior === true,
+    'packed-consumer/harness/table-original-boolean-input-rendering': parsed.tableOriginalBooleanInputs === true,
   };
   const owned = declarationKeys(keys)
     .filter(key => key.endsWith('/testing'))
@@ -1030,6 +1031,7 @@ class SmokeDialogContent {}
       </ng-container>
       <mat-header-row *matHeaderRowDef="['constructor-probe']"></mat-header-row>
       <mat-row *matRowDef="let row; columns:['constructor-probe']"></mat-row>
+      <mat-row *matRowDef="let row; columns:['constructor-probe']; when: constructorGridWhen"></mat-row>
       <mat-footer-row *matFooterRowDef="['constructor-probe']"></mat-footer-row>
       <ng-template #manualNoDataTemplate matNoDataRow><div>Empty grid probe</div></ng-template>
     </mat-table>
@@ -1046,6 +1048,7 @@ class SmokeDialogContent {}
 })
 class HarnessHost {
   constructorGridData=[{value:'Grid value'}];
+  constructorGridWhen=()=>true;
   @ViewChild(MatLegacyHeaderRowDef,{static:true}) originalStickyHeader!:MatLegacyHeaderRowDef;
   @ViewChild(MatLegacyFooterRowDef,{static:true}) originalStickyFooter!:MatLegacyFooterRowDef;
   @ViewChild('manualNoDataTemplate',{read:MatLegacyNoDataRow,static:true}) originalNoDataRow!:MatLegacyNoDataRow;
@@ -1195,6 +1198,23 @@ async function main() {
   }
   const tableOriginalStickyBehavior=stickyObservations.length===4
     &&stickyObservations.every(row=>row.present&&row.sequence.length===8&&row.sequence.every(Boolean));
+  const booleanTableNode=fixture.debugElement.query(element=>element.nativeElement?.id==='constructor-grid');
+  const booleanTable=booleanTableNode.injector.get(MatLegacyTable);
+  const tableBooleanObservations=[];
+  for(const [input,expected] of [['false',false],['',true],[null,false],['true',true],[undefined,false]] as const){
+    booleanTable.multiTemplateDataRows=input;booleanTable.fixedLayout=input;
+    fixture.changeDetectorRef.markForCheck();fixture.detectChanges();
+    tableBooleanObservations.push({
+      coerced_multi:booleanTable.multiTemplateDataRows===expected,
+      coerced_fixed:booleanTable.fixedLayout===expected,
+      rendered_rows:booleanTableNode.nativeElement.querySelectorAll('mat-row').length===(expected?2:1),
+      fixed_class:booleanTableNode.nativeElement.classList.contains('mat-table-fixed-layout')===expected,
+    });
+  }
+  booleanTable.multiTemplateDataRows=false;booleanTable.fixedLayout=false;
+  fixture.changeDetectorRef.markForCheck();fixture.detectChanges();
+  const tableOriginalBooleanInputs=tableBooleanObservations.length===5
+    &&tableBooleanObservations.every(row=>Object.values(row).every(value=>value===true));
   const cellConstructorObservation=[];
   const column=fixture.componentInstance.gridColumn;
   for(const [Owned,Peer,selector,role] of [
@@ -1605,7 +1625,7 @@ async function main() {
       selectOpened === true &&
       selectClosed === true &&
       tabCount === 2 &&
-      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor && tabContentOriginalConstructor && noDataRowOriginalConstructor && constructorBorrowedProviderLifecycle && tableOriginalStickyBehavior,
+      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor && tabContentOriginalConstructor && noDataRowOriginalConstructor && constructorBorrowedProviderLifecycle && tableOriginalStickyBehavior && tableOriginalBooleanInputs,
     buttonText: text,
     selectIsOpen: isOpen,
     dialogText,
@@ -1640,6 +1660,7 @@ async function main() {
     noDataRowOriginalConstructor, noDataRowObservation,
     constructorBorrowedProviderLifecycle, borrowedTableDestroyed, borrowedOptionsDestroyed,
     tableOriginalStickyBehavior, stickyObservations,
+    tableOriginalBooleanInputs, tableBooleanObservations,
     checkboxAttribute, slideToggleAttribute, sliderAttribute, tabLinkAttribute,
     commonModuleDiagnostics:{contrastLifecycle,contrastProbeReads,sanityWarnings,checksEnabled,sanityDefault:TestBed.inject(MATERIAL_LEGACY_SANITY_CHECKS),sanityToken:String(MATERIAL_LEGACY_SANITY_CHECKS)},
     chipEventCounts:{removals:fixture.componentInstance.repeatRemovals,separators:fixture.componentInstance.repeatEnds},

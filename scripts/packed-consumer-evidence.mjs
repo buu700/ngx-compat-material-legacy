@@ -52,6 +52,7 @@ export const HARNESS_CASE_IDS = [
   'packed-consumer/harness/no-data-row-original-constructor',
   'packed-consumer/harness/constructor-borrowed-provider-lifecycle',
   'packed-consumer/harness/table-original-sticky-coercion-dirty-state',
+  'packed-consumer/harness/table-original-boolean-input-rendering',
   'packed-consumer/harness/owned-resolution',
   'packed-consumer/harness/peer-harness-separate-scope',
 ];
