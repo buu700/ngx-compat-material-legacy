@@ -99,8 +99,48 @@ export function ownedTokenIdentity(family, param, loaded, observedToken) {
   return Object.hasOwn(loaded, exported) && loaded[exported] === observedToken;
 }
 
+// Alias identities come from the original barrels/source before loading the
+// candidate. Do not infer an owned alias from a candidate's spelling or label.
+export function originalRuntimeAliases(symbols, family) {
+  const aliases = Object.create(null);
+  for (const symbol of symbols) {
+    if (symbol.family !== family) continue;
+    const original = symbol.shape?.tokenName || symbol.shape?.runtimeName;
+    if (!original) continue;
+    (aliases[original] ||= []).push(symbol.name);
+  }
+  return Object.fromEntries(Object.entries(aliases).map(([name,exports])=>[name,[...new Set(exports)]]));
+}
+
+export async function runtimeTokenIdentity(family, param, loaded, aliases, observedToken, importModule = spec => import(spec)) {
+  const finite = ownedTokenIdentity(family, param, loaded, observedToken);
+  if (finite !== null) return finite;
+  const originalAliases = name => Object.hasOwn(aliases, name) && Array.isArray(aliases[name]) ? aliases[name] : [];
+  const exported = [...new Set([...originalAliases(param.ident),...originalAliases(param.imported)])];
+  if (exported.length) {
+    // Original aliases of one class/token must still resolve to one object.
+    if (exported.some(name=>!Object.hasOwn(loaded,name) || loaded[name] == null)) return false;
+    const originals = new Set(exported.map(name=>loaded[name]));
+    return originals.size === 1 && originals.has(observedToken);
+  }
+  if (param.spec && !param.spec.startsWith('.')) {
+    try {
+      const module = await importModule(param.spec);
+      return Boolean(param.imported && Object.hasOwn(module,param.imported)
+        && module[param.imported] != null && module[param.imported] === observedToken);
+    } catch { return false; }
+  }
+  const keys=[...new Set([param.ident,param.imported].filter(Boolean))];
+  const objects=keys.filter(name=>Object.hasOwn(loaded,name)&&loaded[name]!=null).map(name=>loaded[name]);
+  return objects.length > 0 && objects.every(value=>value === observedToken);
+}
+
+export function injectionTokenMatches(value, InjectionToken, expectedDescription) {
+  return value instanceof InjectionToken && String(value) === `InjectionToken ${expectedDescription}`;
+}
+
 export async function observeRuntimeDi(packageRoot, symbols, differences = []) {
-  const {Injector, runInInjectionContext, isDevMode} = await import('@angular/core');
+  const {Injector, InjectionToken, runInInjectionContext, isDevMode} = await import('@angular/core');
   await import('@angular/compiler');
   const results = [];
   for (const symbol of symbols) {
@@ -115,10 +155,10 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = []) {
     const value = loaded[symbol.name];
     if (symbol.shape.token) {
       const text = String(value);
-      if (!text.startsWith('InjectionToken')) problems.push(`not an InjectionToken ${symbol.symbol_id}`);
+      if (!(value instanceof InjectionToken)) problems.push(`not an InjectionToken ${symbol.symbol_id}`);
       const description = symbol.shape.tokenDescription || '';
       const expected = description.replace(/^['"]|['"]$/g, '');
-      if (expected && !text.includes(expected)) problems.push(`token description ${text} != ${expected}`);
+      if (expected && !injectionTokenMatches(value, InjectionToken, expected)) problems.push(`token identity/description ${text} != InjectionToken ${expected}`);
       results.push({symbol, problems, observed: [text]});
       continue;
     }
@@ -141,17 +181,10 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = []) {
       for (let index = 0; index < expected.length; index += 1) {
         const param = expected[index];
         const got = observed[index];
-        const ownedIdentity = ownedTokenIdentity(symbol.family, param, loaded, got.token);
-        let same = ownedIdentity ?? (got.label === param.imported || got.label === param.ident || (got.token && got.token.name === param.imported));
-        if (ownedIdentity === null && !same && param.spec && !param.spec.startsWith('.')) {
-          try {
-            const imported = await import(param.spec);
-            same = imported[param.imported] === got.token;
-          } catch {
-            same = false;
-          }
-        }
-        if (ownedIdentity === null && !same && param.ident) same = loaded[param.ident] === got.token;
+        const primary = symbol.kind === 'primary' ? loaded : await loadRuntimeModule(packageRoot, symbol.family, 'primary');
+        const exports = {...(primary || {}),...loaded};
+        const same = await runtimeTokenIdentity(symbol.family, param, exports,
+          originalRuntimeAliases(symbols, symbol.family), got.token);
         if (!same) problems.push(`token ${symbol.symbol_id}[${index}] expected ${param.ident} observed ${got.label}`);
         if (Boolean(param.optional) !== Boolean(got.optional)) {
           problems.push(`optional ${symbol.symbol_id}[${index}] expected ${Boolean(param.optional)} observed ${Boolean(got.optional)}`);
