@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "reviewer": "Codex primary implementer",
+  "recorded_at_utc": "2026-10-07T00:12:50.185266+00:00",
+  "method": "Every complete original hunk and every changed markdown path read. Mobile accessibility and zone guidance individually reasoned; the other three decisions also have exact per-SHA reasoning. No executable/source changes occur in any member.",
+  "scope": "Five exact guide SHAs; no broad docs-prefix or sensitive-behavior exclusion",
+  "packaging": {
+    "path": "projects/ngx-material-legacy/ng-package.json",
+    "sha256": "692f6b0fc780306368c4f05078f01210e4f2dab1b5536c1984d7a721d669ea33",
+    "closure": "Owned secondary entries/Sass/schematic assets; no upstream src/material or src/cdk markdown copied as assets"
+  },
+  "g11_claim": "not-passed",
+  "limitations": [
+    "These source-only documentation decisions do not accept mobile screen-reader, FocusMonitor zone/lifecycle, tooltip ARIA, table sort delegation or icon security behavior.",
+    "Maintained guidance and public peer authored-use contracts still require A10/A03 review. All seed SHAs and uses remain in their original denominators."
+  ],
+  "reviews": [
+    {
+      "sha": "82cfd49142a78cdd6b0688f69319677a222ef0f9",
+      "diff": "diff --git a/src/material/tooltip/tooltip.md b/src/material/tooltip/tooltip.md\nindex 079bd174d..d76c3f8e7 100644\n--- a/src/material/tooltip/tooltip.md\n+++ b/src/material/tooltip/tooltip.md\n@@ -5,11 +5,11 @@ over or longpresses an element.\n \n ### Positioning\n \n-The tooltip will be displayed below the element but this can be configured using the\n+The tooltip will be displayed below the element by default, but this can be configured using the\n `matTooltipPosition` input.\n-The tooltip can be displayed above, below, left, or right of the element. By default the position\n-will be below. If the tooltip should switch left/right positions in an RTL layout direction, then\n-the positions `before` and `after` should be used instead of `left` and `right`, respectively.\n+The tooltip can be displayed above, below, left, or right of the element. If the tooltip should \n+switch left/right positions in an RTL layout direction, then the input values `before` and `after` \n+should be used instead of `left` and `right`, respectively.\n \n | Position  | Description                                                                          |\n |-----------|--------------------------------------------------------------------------------------|\n@@ -38,7 +38,7 @@ it will display the same as if this setting was turned off.\n By default, the tooltip will be immediately shown when the user's mouse hovers over the tooltip's\n trigger element and immediately hides when the user's mouse leaves.\n \n-On mobile, the tooltip is displayed when the user longpresses the element and hides after a\n+On mobile, the tooltip displays when the user longpresses the element and hides after a\n delay of 1500ms.\n \n #### Show and hide delays\n@@ -58,7 +58,7 @@ your options using the `MAT_TOOLTIP_DEFAULT_OPTIONS` injection token.\n \n <!-- example(tooltip-modified-defaults) -->\n \n-#### Manually calling show() and hide()\n+#### Manually showing and hiding the tooltip\n \n To manually cause the tooltip to show or hide, you can call the `show` and `hide` directive methods,\n which both accept a number in milliseconds to delay before applying the display change.\n@@ -74,7 +74,7 @@ shown.\n \n `MatTooltip` adds an `aria-describedby` description that provides a reference\n to a visually hidden element containing the tooltip's message. This provides screen-readers\n-the information needed to read out the tooltip's contents when the end-user focuses on\n+the information needed to read out the tooltip's contents when the user focuses on\n tooltip's trigger. The element referenced by `aria-describedby` is not the tooltip itself,\n but instead an invisible copy of the tooltip content that is always present in the DOM.\n \n",
+      "diff_sha256": "b960a9a034a38e188a6bf35af2d77eb2eeaab6ab7534d5c28e6b287af31cc5a2",
+      "files": [
+        "src/material/tooltip/tooltip.md"
+      ],
+      "actual_changed_path_count": 1,
+      "review_depth": "bounded-documentation-source-review",
+      "decision": "All one-file hunks read: tooltip overview rephrases below-default positioning, logical before/after RTL values, mobile longpress wording, manual show/hide heading and aria-describedby prose. No timing, position, ARIA or runtime source changes are in this SHA. The upstream markdown is absent from both owned source and packaged assets. Its retained behavioral statements do not authorize a tooltip behavior change or close the separate owned token/accessibility review.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": false,
+      "individual_sensitive_guidance_review": false
+    },
+    {
+      "sha": "ae839775c21cb37355075ef4624913a1fd8391a9",
+      "diff": "diff --git a/src/material/table/table.md b/src/material/table/table.md\nindex 778e32cb8..a32288438 100644\n--- a/src/material/table/table.md\n+++ b/src/material/table/table.md\n@@ -200,6 +200,8 @@ Note that if the data properties do not match the column names, or if a more com\n accessor is required, then a custom `sortingDataAccessor` function can be set to override the\n default data accessor on the `MatTableDataSource`.\n \n+When updating the data soure asynchronously avoid doing so by recreating the entire `MatTableDataSource` as this could break sorting. Rather update it through the `MatTableDataSource.data` property.\n+\n If you are not using the `MatTableDataSource`, but instead implementing custom logic to sort your\n data, listen to the sort's `(matSortChange)` event and re-order your data according to the sort state.\n If you are providing a data array directly to the table, don't forget to call `renderRows()` on the\n",
+      "diff_sha256": "46b76056b6fb864e7934a4f18c942afa539d32930f7ca7fed63225e494fb8c95",
+      "files": [
+        "src/material/table/table.md"
+      ],
+      "actual_changed_path_count": 1,
+      "review_depth": "bounded-documentation-source-review",
+      "decision": "The only two added markdown lines recommend assigning MatTableDataSource.data instead of recreating a source when async data arrives, preserving an existing sort attachment. No data-source implementation/API or table source is changed. The upstream overview is absent from the add-on package; current public MatTableDataSource delegation and sort behavior remain separately accountable. No new ordinary table/data-source fork or runtime adaptation is required by this documentation patch.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": false,
+      "individual_sensitive_guidance_review": false
+    },
+    {
+      "sha": "cd2e4d4e8c571402a909d62c58779f973737e34a",
+      "diff": "diff --git a/src/material/datepicker/datepicker.md b/src/material/datepicker/datepicker.md\nindex e00ab5073..4031c9402 100644\n--- a/src/material/datepicker/datepicker.md\n+++ b/src/material/datepicker/datepicker.md\n@@ -566,6 +566,10 @@ datepicker pop-up. However, ChromeOS intercepts this key combination at the OS l\n browser only receives a `PageDown` key event. Because of this behavior, you should always include an\n additional means of opening the pop-up, such as `MatDatepickerToggle`.\n \n+`MatDatepickerToggle` must be included along with `MatDatepicker` for optimal mobile a11y \n+compatibility. Mobile screen reader users currently do not have a way to trigger the datepicker\n+dialog without the icon button present.\n+\n #### Keyboard interaction\n \n The datepicker supports the following keyboard shortcuts:\n",
+      "diff_sha256": "4eb4d5f90b657b18f1dcf928ff0a9102d5b9de870a22cee8fe4f26e1a30f2b19",
+      "files": [
+        "src/material/datepicker/datepicker.md"
+      ],
+      "actual_changed_path_count": 1,
+      "review_depth": "bounded-documentation-source-review",
+      "decision": "Individually reviewed accessibility guidance: only datepicker.md gains four lines recommending a MatDatepickerToggle because mobile screen readers need a reachable button to open the dialog. No datepicker, focus, keyboard or screen-reader implementation changes occur in the SHA. Datepicker is a current companion, not an owned legacy control, and this upstream markdown is not maintained or packed. The guidance remains an A10 accessibility-documentation lead; no mobile-screen-reader or companion behavior pass is inferred.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": false,
+      "individual_sensitive_guidance_review": true
+    },
+    {
+      "sha": "dfbdec0bf7702913b4ef42c9d721a7dc0521552f",
+      "diff": "diff --git a/src/cdk/a11y/a11y.md b/src/cdk/a11y/a11y.md\nindex 82c1df7c4..ac989804d 100644\n--- a/src/cdk/a11y/a11y.md\n+++ b/src/cdk/a11y/a11y.md\n@@ -170,13 +170,6 @@ to the element when focused. It will add `.cdk-focused` if the element is focuse\n add `.cdk-${origin}-focused` (with `${origin}` being `mouse`, `keyboard`, `touch`, or `program`) to\n indicate how the element was focused.\n \n-Note: currently the `FocusMonitor` emits on the observable _outside_ of the Angular zone. Therefore,\n-if you `markForCheck` in the subscription you must put yourself back in the Angular zone.\n-\n-```ts\n-focusMonitor.monitor(el).subscribe(origin => this.ngZone.run(() => /* ... */ ));\n-```\n-\n Any element that is monitored by calling `monitor` should eventually be unmonitored by calling\n `stopMonitoring` with the same element.\n \n",
+      "diff_sha256": "4c9fcde113e5cfe91446a76e6bcfa94e6c95771be04d7c7478e9194d472423c8",
+      "files": [
+        "src/cdk/a11y/a11y.md"
+      ],
+      "actual_changed_path_count": 1,
+      "review_depth": "bounded-documentation-source-review",
+      "decision": "Individually reviewed zone guidance: the sole CDK markdown hunk deletes the outside-Angular-zone note and ngZone.run subscription snippet. No FocusMonitor implementation/API is changed in this SHA and no CDK overview is copied or packaged. Removing legacy callback zone guards or assuming emission timing is not authorized; both-line public FocusMonitor caller/lifecycle/zone contracts remain an authored-use obligation. The removed note is an A10 lead, not inherited runtime fix evidence.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": false,
+      "individual_sensitive_guidance_review": true
+    },
+    {
+      "sha": "1ef3463838ead9066e74762ece5e27d8d83bbdec",
+      "diff": "diff --git a/src/cdk/listbox/listbox.md b/src/cdk/listbox/listbox.md\nindex 021b24a90..0be6b63f8 100644\n--- a/src/cdk/listbox/listbox.md\n+++ b/src/cdk/listbox/listbox.md\n@@ -44,7 +44,7 @@ In addition to CSS classes, these directives add aria attributes that can be tar\n \n ### Getting started\n \n-Import the `CdkListboxModule` into the `NgModule` in which you want to create a listbox. You can\n+Import `CdkListbox` and `CdkOption` in the component where you want to create a listbox. You can\n then apply listbox directives to build your custom listbox. A typical listbox consists of the\n following directives:\n \ndiff --git a/src/cdk/menu/menu.md b/src/cdk/menu/menu.md\nindex 440614930..f2c387ab4 100644\n--- a/src/cdk/menu/menu.md\n+++ b/src/cdk/menu/menu.md\n@@ -41,8 +41,8 @@ The available CSS classes are listed below, by directive.\n \n ### Getting started\n \n-Import the `CdkMenuModule` into the `NgModule` in which you want to create menus. You can then apply\n-menu directives to build your custom menu. A typical menu consists of the following directives:\n+Import `CdkMenu`, `CdkMenuItem`, and `CdkMenuTrigger` in the component where you want to create\n+menus. You can then apply menu directives to build your custom menu. A typical menu consists of the following directives:\n \n - `cdkMenuTriggerFor` - links a trigger element to an `ng-template` containing the menu to be opened\n - `cdkMenu` - creates the menu content opened by the trigger\ndiff --git a/src/material/autocomplete/autocomplete.md b/src/material/autocomplete/autocomplete.md\nindex 12306f3f9..8cda8f887 100644\n--- a/src/material/autocomplete/autocomplete.md\n+++ b/src/material/autocomplete/autocomplete.md\n@@ -16,7 +16,7 @@ track the value of the input.\n \n > Note: It is possible to use template-driven forms instead, if you prefer. We use reactive forms\n in this example because it makes subscribing to changes in the input's value easy. For this\n-example, be sure to import `ReactiveFormsModule` from `@angular/forms` into your `NgModule`.\n+example, be sure to import `ReactiveFormsModule` from `@angular/forms` in your component.\n If you are unfamiliar with using reactive forms, you can read more about the subject in the\n [Angular documentation](https://angular.dev/guide/forms/reactive-forms).\n \ndiff --git a/src/material/icon/icon.md b/src/material/icon/icon.md\nindex 4063a860a..87df32232 100644\n--- a/src/material/icon/icon.md\n+++ b/src/material/icon/icon.md\n@@ -52,8 +52,8 @@ In order to guard against XSS vulnerabilities, any SVG URLs and HTML strings pas\n `MatIconRegistry` must be marked as trusted by using Angular's `DomSanitizer` service.\n \n `MatIconRegistry` fetches all remote SVG icons via Angular's `HttpClient` service. If you haven't\n-included [`HttpClientModule` from the `@angular/common/http` package](https://angular.dev/guide/http)\n-in your `NgModule` imports, you will get an error at runtime.\n+included [`provideHttpClient()`](https://angular.dev/guide/http) in your app config, you will get\n+an error at runtime.\n \n Note that `HttpClient` fetches SVG icons registered with a URL via `XmlHttpRequest`, subject to the\n [Same-origin policy](https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy). This\n",
+      "diff_sha256": "cb1e64ed1881318907b9f5f47a3f93ca898deae379075bf6e56a00736f3d6506",
+      "files": [
+        "src/cdk/listbox/listbox.md",
+        "src/cdk/menu/menu.md",
+        "src/material/autocomplete/autocomplete.md",
+        "src/material/icon/icon.md"
+      ],
+      "actual_changed_path_count": 4,
+      "review_depth": "bounded-documentation-source-review",
+      "decision": "All four markdown paths read: CDK listbox/menu prose replaces NgModule imports with component imports, Material autocomplete says ReactiveFormsModule in a component, and icon prose recommends provideHttpClient. No implementation or packaged add-on docs change. Legacy declarations remain in their modules and consumers may import those modules from standalone components; no standalone conversion or new ordinary CDK/listbox/menu/icon fork is introduced. The icon trust/XSS paragraph is unchanged context, not a sanitizer fix or security clearance.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": false,
+      "individual_sensitive_guidance_review": false
+    }
+  ]
+}
