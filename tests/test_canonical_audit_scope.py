@@ -38,8 +38,14 @@ class CanonicalAuditScopeTests(unittest.TestCase):
                     # not a documentation batch with a reviews array.
                     self.assertEqual(evidence['sha'],entry['sha'])
                     self.assertEqual(evidence['decision'],entry['reason'])
-                    self.assertEqual(evidence['line'],line)
-                    self.assertEqual(evidence['review_depth'],'individual-compatibility')
+                    if 'line' in evidence:
+                        self.assertEqual(evidence['line'],line)
+                    else:
+                        self.assertIn(line,evidence['affected_branches'])
+                        self.assertEqual(set(evidence['affected_branches']),set(entry['individual_proof']['affected_branches']))
+                        self.assertEqual(evidence['peers'][line]['version'],floor['material'])
+                    self.assertIn(evidence['review_depth'],{'individual-compatibility','individual-escalated'})
+                    self.assertEqual(evidence['review_depth'],entry['individual_proof']['review_depth'])
                     self.assertEqual(evidence['diff_sha256'],entry['individual_proof']['diff_sha256'])
                     self.assertEqual(evidence['final_disposition'],entry['final_disposition'])
                     self.assertEqual(evidence['g11_claim'],'not-passed')
