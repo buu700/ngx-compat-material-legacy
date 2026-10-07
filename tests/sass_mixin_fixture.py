@@ -64,7 +64,15 @@ def mixin_receipt(root,active,case,invocation):
         from sass_datepicker_controls_admission import DATEPICKER_CONTROLS_CASES, _CATALOG as controls_catalog
         from sass_aggregate_density_admission import AGGREGATE_DENSITY_CASES
         from sass_aggregate_typography_admission import AGGREGATE_TYPOGRAPHY_CASES
-        if case in AGGREGATE_TYPOGRAPHY_CASES:
+        from sass_aggregate_color_theme_admission import AGGREGATE_COLOR_THEME_CASES
+        if case in AGGREGATE_COLOR_THEME_CASES:
+            fixture=json.loads((Path(__file__).parent/'sass_aggregate_color_theme_fixture.json').read_bytes())
+            line=body['line'];original=fixture['originals'][case];actual=fixture['candidate_inputs'][case+'-'+line]
+            for role,value in [('expected',original),('actual',actual)]:body[role].update(css=value,css_sha256=hashlib.sha256(value.encode()).hexdigest(),css_bytes=len(value.encode()))
+            body['current_companion']=dict(classification='conforming-current-companion',contract='historical-color-theme-aggregate-with-qualified-members',peer=copy.deepcopy(fixture['peers'][AGGREGATE_COLOR_THEME_CASES[case]['peer_profile']+'-'+line]))
+            body['comparison']='current-companion-contract'
+            wrong=actual+'\n.wrong-nonempty-mixin { color: red; }\n';body['mutation']=dict(css=wrong,css_sha256=hashlib.sha256(wrong.encode()).hexdigest(),css_bytes=len(wrong.encode()))
+        elif case in AGGREGATE_TYPOGRAPHY_CASES:
             fixture=json.loads((Path(__file__).parent/'sass_aggregate_typography_fixture.json').read_bytes())
             line=body['line'];original=fixture['originals'][case];actual=fixture['candidate_inputs'][case+'-'+line]
             for role,value in [('expected',original),('actual',actual)]:body[role].update(css=value,css_sha256=hashlib.sha256(value.encode()).hexdigest(),css_bytes=len(value.encode()))
