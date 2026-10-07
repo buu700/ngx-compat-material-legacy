@@ -35,6 +35,52 @@ let cdkFactoryReference;
 const CDK_FACTORY_REFERENCE = 'reference/material-16.2.14/cdk-factory-metadata.json';
 const CDK_FACTORY_REFERENCE_SHA256 = '86a98330dda8255dfd6666363aecc2b08ea0730cd39f8f31af998dd0987d4a72';
 const INHERITED_TABLE_FACTORIES = Object.freeze({MatLegacyHeaderRowDef:'CdkHeaderRowDef',MatLegacyFooterRowDef:'CdkFooterRowDef',MatLegacyRowDef:'CdkRowDef'});
+const INHERITED_CONSTRUCTOR_REFERENCE = 'reference/material-16.2.14/cdk-inherited-constructors/table.d.ts';
+const INHERITED_CONSTRUCTOR_SHA256 = '94789cae5567000d4f23d9634ce006670e3fca4c5db427ce129026da62002c2d';
+export function originalInheritedConstructor(file, name) {
+  if (!file.split('\\').join('/').includes('/material/legacy-table/')) return null;
+  const parent = INHERITED_TABLE_FACTORIES[name];
+  if (!parent) return null;
+  const bytes = readFileSync(join(root, INHERITED_CONSTRUCTOR_REFERENCE));
+  if (createHash('sha256').update(bytes).digest('hex') !== INHERITED_CONSTRUCTOR_SHA256)
+    throw new Error('untouched16 inherited constructor declaration identity mismatch');
+  const source = ts.createSourceFile(INHERITED_CONSTRUCTOR_REFERENCE, bytes.toString('utf8'), ts.ScriptTarget.Latest, true);
+  const shape = packedShape(source, parent);
+  const signatures = shape?.ownSignatures?.filter(sig => sig.includes(' constructor('));
+  if (signatures?.length !== 1) throw new Error('missing original inherited constructor');
+  return {parent, signatures, source_sha256: INHERITED_CONSTRUCTOR_SHA256};
+}
+
+export function packedInheritedConstructor(sourceFile, name, loadPeer = (spec, file) => {
+  const resolved = ts.resolveModuleName(spec, file,
+    {moduleResolution: ts.ModuleResolutionKind.Bundler, module: ts.ModuleKind.ESNext}, ts.sys).resolvedModule;
+  if (!resolved) return null;
+  const text = readFileSync(resolved.resolvedFileName, 'utf8');
+  return ts.createSourceFile(resolved.resolvedFileName, text, ts.ScriptTarget.Latest, true);
+}) {
+  const expectedParent = INHERITED_TABLE_FACTORIES[name];
+  if (!expectedParent) return null;
+  const node = indexFile(sourceFile).get(name);
+  if (!node || !ts.isClassDeclaration(node)) return {parent: expectedParent, signatures: ['unresolved inherited constructor']};
+  const own = declaredMembers(node, sourceFile);
+  if (own.requiredConstructor) return null;
+  const bindings = importBindings(sourceFile);
+  for (const clause of node.heritageClauses || []) {
+    if (clause.token !== ts.SyntaxKind.ExtendsKeyword) continue;
+    for (const typeNode of clause.types || []) {
+      const ident = heritageIdentifier(typeNode);
+      const binding = ident && bindings.get(ident.local);
+      if (binding?.spec !== '@angular/cdk/table' || binding.imported !== expectedParent) continue;
+      const source = loadPeer(binding.spec, sourceFile.fileName);
+      const shape = source && packedShape(source, binding.imported);
+      if (!shape || shape.kind !== 'class') continue;
+      const signatures = shape.signatures.filter(sig => sig.includes(' constructor('));
+      return {parent: expectedParent, signatures: signatures.length ? signatures : ['public constructor()']};
+    }
+  }
+  return {parent: expectedParent, signatures: ['unresolved inherited constructor']};
+}
+
 export function originalFactoryContract(file, name) {
   const family = file.split('\\').join('/').match(/\/material\/([^/]+)\//)?.[1];
   if (!family) return null;
@@ -578,6 +624,11 @@ function shapeFromFound(found, refRoot) {
     flat.heritage = heritageNames(node, found.sourceFile);
     flat.diParams = diParamsOf(node, found.sourceFile);
     flat.originalFactory = originalFactoryContract(found.file, node.name?.text);
+    flat.inheritedConstructor = originalInheritedConstructor(found.file, node.name?.text);
+    if (flat.inheritedConstructor && !own.requiredConstructor) {
+      flat.requiredConstructor = true;
+      flat.signatures = unique([...flat.signatures, ...flat.inheritedConstructor.signatures]);
+    }
     if (found.reexport) flat.reexport = found.reexport;
     return flat;
   }
@@ -862,6 +913,8 @@ export function packedShape(sourceFile, name) {
     flat.ownProtected = own.requiredProtected;
     flat.ownConstructor = own.requiredConstructor;
     flat.heritage = heritageNames(node, sourceFile);
+    flat.inheritedConstructor = packedInheritedConstructor(sourceFile, node.name?.text);
+    if (flat.inheritedConstructor) flat.signatures = unique([...flat.signatures, ...flat.inheritedConstructor.signatures]);
     return flat;
   }
   if (ts.isTypeAliasDeclaration(node)) {
@@ -1056,6 +1109,8 @@ export function compareSignatures(symbol, packed, differences) {
   }
   const ownHist = [...(historical.ownSignatures || historical.signatures || [])];
   const ownPacked = [...(packed.ownSignatures || packed.signatures || [])];
+  if (historical.inheritedConstructor && !historical.ownConstructor) ownHist.push(...historical.inheritedConstructor.signatures);
+  if (packed.inheritedConstructor && !packed.ownConstructor) ownPacked.push(...packed.inheritedConstructor.signatures);
   const heritageHist = `heritage ${(historical.heritage || []).join(',')}`;
   const heritagePacked = `heritage ${(packed.heritage || []).join(',')}`;
   let historicalSigs = ownHist;
@@ -1236,7 +1291,7 @@ export function readDts(packageRoot) {
   for (const name of readdirSync(typesDir)) {
     if (!name.endsWith('.d.ts') || name.endsWith('.d.ts.map')) continue;
     const text = readFileSync(join(typesDir, name), 'utf8');
-    files.set(name, ts.createSourceFile(name, text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS));
+    files.set(name, ts.createSourceFile(join(typesDir, name), text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS));
   }
   return files;
 }
