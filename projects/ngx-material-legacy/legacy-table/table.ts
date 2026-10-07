@@ -34,7 +34,8 @@ type BooleanInput = string | boolean | null | undefined;
 })
 export class MatLegacyRecycleRows {
   /**
-   * @deprecated Recycle rows is a no-op under current CDK; retained for selector compatibility.
+   * Current CDK selects recycling through the inherited public recycleRows input.
+   * This marker directive retains the historical selector without private providers.
    * @breaking-change 17.0.0
    */
 }
