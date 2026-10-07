@@ -1,0 +1,144 @@
+diff --git a/src/cdk/table/cell.ts b/src/cdk/table/cell.ts
+index 4aabe6e48..0a213c584 100644
+--- a/src/cdk/table/cell.ts
++++ b/src/cdk/table/cell.ts
+@@ -6,7 +6,6 @@
+  * found in the LICENSE file at https://angular.io/license
+  */
+ 
+-import {BooleanInput, coerceBooleanProperty} from '@angular/cdk/coercion';
+ import {
+   ContentChild,
+   Directive,
+@@ -15,6 +14,7 @@ import {
+   Input,
+   Optional,
+   TemplateRef,
++  booleanAttribute,
+ } from '@angular/core';
+ import {CanStick, CanStickCtor, mixinHasStickyInput} from './can-stick';
+ import {CDK_TABLE} from './tokens';
+@@ -82,14 +82,15 @@ export class CdkColumnDef extends _CdkColumnDefBase implements CanStick {
+    * that it mimics the `CanStick` mixin such that `_hasStickyChanged` is set to true if the value
+    * has been changed.
+    */
+-  @Input('stickyEnd')
++  @Input({transform: booleanAttribute})
+   get stickyEnd(): boolean {
+     return this._stickyEnd;
+   }
+-  set stickyEnd(v: BooleanInput) {
+-    const prevValue = this._stickyEnd;
+-    this._stickyEnd = coerceBooleanProperty(v);
+-    this._hasStickyChanged = prevValue !== this._stickyEnd;
++  set stickyEnd(value: boolean) {
++    if (value !== this._stickyEnd) {
++      this._stickyEnd = value;
++      this._hasStickyChanged = true;
++    }
+   }
+   _stickyEnd: boolean = false;
+ 
+diff --git a/src/cdk/table/table.ts b/src/cdk/table/table.ts
+index 0fd73a714..6d17b6f6c 100644
+--- a/src/cdk/table/table.ts
++++ b/src/cdk/table/table.ts
+@@ -7,7 +7,6 @@
+  */
+ 
+ import {Direction, Directionality} from '@angular/cdk/bidi';
+-import {BooleanInput, coerceBooleanProperty} from '@angular/cdk/coercion';
+ import {
+   CollectionViewer,
+   DataSource,
+@@ -52,6 +51,7 @@ import {
+   ViewChild,
+   ViewContainerRef,
+   ViewEncapsulation,
++  booleanAttribute,
+ } from '@angular/core';
+ import {
+   BehaviorSubject,
+@@ -432,12 +432,12 @@ export class CdkTable<T> implements AfterContentChecked, CollectionViewer, OnDes
+    * dataobject will render the first row that evaluates its when predicate to true, in the order
+    * defined in the table, or otherwise the default row which does not have a when predicate.
+    */
+-  @Input()
++  @Input({transform: booleanAttribute})
+   get multiTemplateDataRows(): boolean {
+     return this._multiTemplateDataRows;
+   }
+-  set multiTemplateDataRows(v: BooleanInput) {
+-    this._multiTemplateDataRows = coerceBooleanProperty(v);
++  set multiTemplateDataRows(value: boolean) {
++    this._multiTemplateDataRows = value;
+ 
+     // In Ivy if this value is set via a static attribute (e.g. <table multiTemplateDataRows>),
+     // this setter will be invoked before the row outlet has been defined hence the null check.
+@@ -452,12 +452,12 @@ export class CdkTable<T> implements AfterContentChecked, CollectionViewer, OnDes
+    * Whether to use a fixed table layout. Enabling this option will enforce consistent column widths
+    * and optimize rendering sticky styles for native tables. No-op for flex tables.
+    */
+-  @Input()
++  @Input({transform: booleanAttribute})
+   get fixedLayout(): boolean {
+     return this._fixedLayout;
+   }
+-  set fixedLayout(v: BooleanInput) {
+-    this._fixedLayout = coerceBooleanProperty(v);
++  set fixedLayout(value: boolean) {
++    this._fixedLayout = value;
+ 
+     // Toggling `fixedLayout` may change column widths. Sticky column styles should be recalculated.
+     this._forceRecalculateCellWidths = true;
+diff --git a/tools/public_api_guard/cdk/table.md b/tools/public_api_guard/cdk/table.md
+index 29d6de0ce..b6d8d6c68 100644
+--- a/tools/public_api_guard/cdk/table.md
++++ b/tools/public_api_guard/cdk/table.md
+@@ -6,7 +6,6 @@
+ 
+ import { AfterContentChecked } from '@angular/core';
+ import { BehaviorSubject } from 'rxjs';
+-import { BooleanInput } from '@angular/cdk/coercion';
+ import { ChangeDetectorRef } from '@angular/core';
+ import { CollectionViewer } from '@angular/cdk/collections';
+ import { DataSource } from '@angular/cdk/collections';
+@@ -149,9 +148,11 @@ export class CdkColumnDef extends _CdkColumnDefBase implements CanStick {
+     set name(name: string);
+     // (undocumented)
+     protected _name: string;
++    // (undocumented)
++    static ngAcceptInputType_stickyEnd: unknown;
+     protected _setNameInput(value: string): void;
+     get stickyEnd(): boolean;
+-    set stickyEnd(v: BooleanInput);
++    set stickyEnd(value: boolean);
+     // (undocumented)
+     _stickyEnd: boolean;
+     // (undocumented)
+@@ -314,7 +315,7 @@ export class CdkTable<T> implements AfterContentChecked, CollectionViewer, OnDes
+     // (undocumented)
+     protected readonly _elementRef: ElementRef;
+     get fixedLayout(): boolean;
+-    set fixedLayout(v: BooleanInput);
++    set fixedLayout(value: boolean);
+     // (undocumented)
+     _footerRowOutlet: FooterRowOutlet;
+     _getRenderedRows(rowOutlet: RowOutlet): HTMLElement[];
+@@ -323,11 +324,15 @@ export class CdkTable<T> implements AfterContentChecked, CollectionViewer, OnDes
+     _headerRowOutlet: HeaderRowOutlet;
+     protected _isNativeHtmlTable: boolean;
+     get multiTemplateDataRows(): boolean;
+-    set multiTemplateDataRows(v: BooleanInput);
++    set multiTemplateDataRows(value: boolean);
+     // (undocumented)
+     _multiTemplateDataRows: boolean;
+     protected needsPositionStickyOnElement: boolean;
+     // (undocumented)
++    static ngAcceptInputType_fixedLayout: unknown;
++    // (undocumented)
++    static ngAcceptInputType_multiTemplateDataRows: unknown;
++    // (undocumented)
+     ngAfterContentChecked(): void;
+     // (undocumented)
+     ngOnDestroy(): void;

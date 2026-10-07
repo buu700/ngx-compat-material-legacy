@@ -21850,8 +21850,8 @@
       "sha": "dd04fe910c4587f11cd37b1d0b216e4a56cac2e3",
       "bucket": "needs-triage",
       "subject": "refactor(cdk/table): switch to input transforms",
-      "final_disposition": "inherited",
-      "reason": "Inspected upstream patch content (sha256=f8afee9dc0580e3103aaf8ee84161f026523be24b21bbbd22be6bc82dab87460, bytes=5521). Changed paths: src/cdk/table/cell.ts, src/cdk/table/table.ts, tools/public_api_guard/cdk/table.md. switches CDK peer directives to booleanAttribute/numberAttribute input transforms. This package consumes @angular/cdk as a peer and does not redefine those CDK directive inputs. Fail-closed: not deferred=pass; g11_claim remains not-passed Installed peer @angular/cdk@22.1.7 (ancestor of v22.1.7 e950f29dcfbda93c13bff0d1a632465364488249). Delegation: @angular/cdk/table imported by projects/ngx-material-legacy/legacy-table/table.ts.",
+      "final_disposition": "already-adapted",
+      "reason": "Reviewed all three original patch paths and hunk contexts. Minimum peer CDK setters remove imperative BooleanInput coercion and retain a prior sticky dirty flag on repeated equal writes. Owned wrappers now coerce through stable public parent setters and reset sticky state before each write. Native packed88 cases on both lines check original sticky transitions and actual one/two data-row rendering with the fixed-layout class. Angular input transforms and parent render/cache/sticky side effects remain. This patch is already adapted within its setter/input scope; separate original constructors, removed public mixin members, all1736 authored uses and full G11 remain unresolved.",
       "batch_id": "needs-triage-experimental-m3-mixin-build-test-2026-10-01",
       "files": [
         "src/cdk/table/cell.ts",
@@ -21859,7 +21859,7 @@
         "tools/public_api_guard/cdk/table.md"
       ],
       "patch_sha256": "f8afee9dc0580e3103aaf8ee84161f026523be24b21bbbd22be6bc82dab87460",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/dd04fe910c4587f11cd37b1d0b216e4a56cac2e3.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-table-input-transforms-individual-review.json",
       "read_note_disposition": "inherited",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
@@ -21869,7 +21869,37 @@
         "installed": "22.1.7",
         "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
         "delegation": "@angular/cdk/table imported by projects/ngx-material-legacy/legacy-table/table.ts"
-      }
+      },
+      "superseded_closeout_source_judgments": [
+        {
+          "final_disposition": "inherited",
+          "reason": "Inspected upstream patch content (sha256=f8afee9dc0580e3103aaf8ee84161f026523be24b21bbbd22be6bc82dab87460, bytes=5521). Changed paths: src/cdk/table/cell.ts, src/cdk/table/table.ts, tools/public_api_guard/cdk/table.md. switches CDK peer directives to booleanAttribute/numberAttribute input transforms. This package consumes @angular/cdk as a peer and does not redefine those CDK directive inputs. Fail-closed: not deferred=pass; g11_claim remains not-passed Installed peer @angular/cdk@22.1.7 (ancestor of v22.1.7 e950f29dcfbda93c13bff0d1a632465364488249). Delegation: @angular/cdk/table imported by projects/ngx-material-legacy/legacy-table/table.ts.",
+          "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/dd04fe910c4587f11cd37b1d0b216e4a56cac2e3.json",
+          "individual_proof": null
+        }
+      ],
+      "individual_proof": {
+        "diff_sha256": "f8afee9dc0580e3103aaf8ee84161f026523be24b21bbbd22be6bc82dab87460",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main",
+          "21.x"
+        ],
+        "decision": "Reviewed all three original patch paths and hunk contexts. Minimum peer CDK setters remove imperative BooleanInput coercion and retain a prior sticky dirty flag on repeated equal writes. Owned wrappers now coerce through stable public parent setters and reset sticky state before each write. Native packed88 cases on both lines check original sticky transitions and actual one/two data-row rendering with the fixed-layout class. Angular input transforms and parent render/cache/sticky side effects remain. This patch is already adapted within its setter/input scope; separate original constructors, removed public mixin members, all1736 authored uses and full G11 remain unresolved.",
+        "proof_kind": "whole-input-transform-hunk-and-original-native-behavior",
+        "installed_member": {
+          "path": "package/fesm2022/table.mjs",
+          "sha256": "2bdeb437714a07914ccb8d2f749fd75d72b63da1ab4cc0c069f64e714c2a6ad4"
+        },
+        "reachable_behavior": {
+          "kind": "executed-delegation",
+          "id": "native88/main37592379486/job112696716946;21.x37592382230/job112696725471"
+        }
+      },
+      "affected_branches": [
+        "main",
+        "21.x"
+      ]
     },
     {
       "sha": "6d4051797150721b35858786ce41c53b98870718",
