@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "role": "Source review of an unresolved legacy tab-label ownership/constructor conflict. Proposed TemplatePortal implementation was withdrawn before commit; no runtime changes or token ownership are claimed.",
+  "originals": {
+    "tab-label.ts": "644521cab3af17c5dd99f63937556b90ca34b259b1e76f9bc9efeaf0067415c0",
+    "legacy-tab-label.ts": "12f3a625c1883fcf189a326d3200e8c1ab43ab4ef9d17c033e6877da43db003c",
+    "portal-directives.ts": "c8a1dc75b41cea08c49de38981ba7ec98b91831c074efa0d26f60f2c64b078bd"
+  },
+  "original_material_archive_sha256": "de41309d20b1d98a7fd6d028a7de42853ea2d453a329c7a8815aaf73ea7f365b",
+  "historical_constructor": "templateRef, viewContainerRef, optional MAT_TAB; super(templateRef, viewContainerRef)",
+  "shared_public_base": "TemplatePortal exposes the original inherited portal behavior directly; CdkPortal16 adds only its own directive factory/metadata and the same two-argument super call, not another portal algorithm. Current MatTabLabel and CdkPortal use inject-based constructors absent in the original legacy constructor contract.",
+  "minimum_peer_proof": {
+    "version": "21.2.14",
+    "archive_sha256": "b54868a0f7aefa471203a0fe419370e156cdf0218db9b625aca3ae6e8de25c63",
+    "registry_integrity": "sha512-806REq/CLf37nEhmmd8Q+ILN8z/RVG2vk2n8YZ/4TdHpcBCi5ux4AxLbpMmduLwGPOzPagJ6ggRzE5fnX0rmcQ==",
+    "member": "package/types/_portal-directives-chunk.d.ts",
+    "member_sha256": "8bf59f01d49417cba2bb4b8eba6ba9a03f33976950bc369865070d17be684cb7",
+    "contract": "Public nondeprecated TemplatePortal(templateRef,viewContainerRef,context?,injector?); original two arguments remain supported. Angular21 is qualified only through Actions at this floor, not by installing the read-only package.",
+    "public_entry_member": "package/types/portal.d.ts",
+    "public_entry_sha256": "17f59b700249a0ee761c3ac50d34415c7118eba48e26b8928e87d530fc4a4a64",
+    "public_exports": [
+      "export { CdkPortal, CdkPortalOutlet, CdkPortalOutletAttachedRef, ComponentType, Portal, PortalModule, PortalOutlet } from './_portal-directives-chunk.js';",
+      "export { BasePortalOutlet, ComponentPortal, DomPortal, DomPortalOutlet, TemplatePortal };"
+    ],
+    "original_declaration_excerpt": "/**\n * A `TemplatePortal` is a portal that represents some embedded template (TemplateRef).\n */\ndeclare class TemplatePortal<C = any> extends Portal<EmbeddedViewRef<C>> {\n    /** The embedded template that will be used to instantiate an embedded View in the host. */\n    templateRef: TemplateRef<C>;\n    /** Reference to the ViewContainer into which the template will be stamped out. */\n    viewContainerRef: ViewContainerRef;\n    /** Contextual data to be passed in to the embedded view. */\n    context?: C | undefined;\n    /** The injector to use for the embedded view. */\n    injector?: Injector | undefined;\n    constructor(\n    /** The embedded template that will be used to instantiate an embedded View in the host. */\n    templateRef: TemplateRef<C>, \n    /** Reference to the ViewContainer into which the template will be stamped out. */\n    viewContainerRef: ViewContainerRef, \n    /** Contextual data to be passed in to the embedded view. */\n    context?: C | undefined, \n    /** The injector to use for the embedded view. */\n    injector?: Injector | undefined);\n    get origin(): ElementRef;\n    /**\n     * Attach the portal to the provided `PortalOutlet`.\n     * When a context is provided it will override the `context` property of the `TemplatePortal`\n     * instance.\n     */\n    attach(host: PortalOutlet, context?: C | undefined): EmbeddedViewRef<C>;\n    detach(): void;\n}\n"
+  },
+  "query_body": "Existing parent queries still use the peer label and private MAT_TAB token; changing the provider token alone leaves MatTabLabel._closestTab null and breaks the original nearest-tab guard.",
+  "qualification": "Open engineering finding; not a token, API, lifecycle, G11 or complete-audit pass. No runtime source or acceptance matrix changed.",
+  "proposed_source_changes_not_applied": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/tab-label.ts",
+      "before_sha256": "dfd5c4b529291faf6417af4165291bdfbe6a8b4206d415f283186935365acb1c",
+      "after_sha256": "fb186a216859742c6decbadbfa31d0af371003bf397b5c59dfecf72c02ad8df1"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/tab.ts",
+      "before_sha256": "bb929139d36c518a9571295e7418502e9cbbc8fd4129a6820238a9c752eb25b2",
+      "after_sha256": "0b87a28c59f4d1af6e2ff2f91f13fa8eb0f60dd6ebda54d01fa5701d5202a174"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-base.ts",
+      "before_sha256": "af9653b5f85b6365c5fe2c435b2a4ee880c0b9317829fb23d8cb69ded3defc35",
+      "after_sha256": "ef9d3e1a2bc4c311326ef8dff486de4995444e362a1aa5543f32927462cb7172"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/public-api.ts",
+      "before_sha256": "d31441397232fa570af1e24ea89b48875f9ed4cdd2ed0982ba19d65e9ba2a5d1",
+      "after_sha256": "5796cdfaceba4d147de2e279cc7b95e57d8a8ded2e82a2c130e3cb61d730efcc"
+    }
+  ],
+  "proposed_heritage_waiver_removal_not_applied": [
+    {
+      "symbol_id": "legacy-tabs/primary/MatLegacyTabLabel",
+      "classification": "intentional-legacy-difference",
+      "historical_signature": "heritage MatNonLegacyTabLabel",
+      "owned_signature": "heritage MatTabLabel",
+      "rationale": "The owned class extends a different base than the 16.2.14 declaration. Only this exact extends pair is accepted."
+    }
+  ],
+  "rejected_alternative": "Extending public TemplatePortal with the original three-argument constructor restores manual construction and portal methods, but removes instanceof current MatTabLabel/CdkPortal. No frozen inheritance identity change is authorized by restoring a declaration waiver or matching flattened signatures.",
+  "current_peer_diagnostic": "Read-only current CDK22.1.7 CdkPortal constructor() injects TemplateRef/ViewContainerRef. CDK21.2.14 declaration constructor(...args:unknown[]) is a compatibility constructor, not proof original explicit arguments still control the instance. Required stable public surface and minimum behavior constraints remain unresolved.",
+  "proposed_packed_case_not_added": "Three real label directives (two outer, one nested) have three distinct nearest tabs, attached TemplatePortal instances, own token providers and matching parent.templateLabel; modern label token absent. Existing harness selection still finds two outer tabs and selects Two."
+}
