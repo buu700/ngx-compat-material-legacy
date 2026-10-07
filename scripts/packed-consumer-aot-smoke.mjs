@@ -481,6 +481,7 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
     'packed-consumer/harness/slider-tabindex-attribute': parsed.sliderAttribute === true,
     'packed-consumer/harness/tab-link-tabindex-attribute': parsed.tabLinkAttribute === true,
     'packed-consumer/harness/peer-icon-literal-sanitization': parsed.peerIconLiteralSanitization === true,
+    'packed-consumer/harness/checkbox-node-factory-context': parsed.checkboxNodeFactoryContext === true,
   };
   const owned = declarationKeys(keys)
     .filter(key => key.endsWith('/testing'))
@@ -884,10 +885,10 @@ Object.defineProperty(globalThis, 'navigator', {
 
 import 'zone.js';
 import '@angular/compiler';
-import {Component, ElementRef, inject, isDevMode, createEnvironmentInjector, createNgModule, EnvironmentInjector} from '@angular/core';
+import {Component, ElementRef, InjectionToken, ANIMATION_MODULE_TYPE, NgZone, inject, isDevMode, createEnvironmentInjector, createNgModule, EnvironmentInjector} from '@angular/core';
 import {Subject} from 'rxjs';
 import {BreakpointObserver, BreakpointState} from '@angular/cdk/layout';
-import {HighContrastMode, HighContrastModeDetector} from '@angular/cdk/a11y';
+import {FocusMonitor, HighContrastMode, HighContrastModeDetector} from '@angular/cdk/a11y';
 import {
   BrowserDynamicTestingModule,
   platformBrowserDynamicTesting,
@@ -911,7 +912,7 @@ import {MatLegacySnackBarHarness} from '@ngx-compat/material-legacy/legacy-snack
 import {MatLegacyTooltipModule} from '@ngx-compat/material-legacy/legacy-tooltip';
 import {MatLegacyTooltipHarness} from '@ngx-compat/material-legacy/legacy-tooltip/testing';
 import {MatLegacyTabsModule, MatLegacyTabLink} from '@ngx-compat/material-legacy/legacy-tabs';
-import {MatLegacyCheckbox, MatLegacyCheckboxModule} from '@ngx-compat/material-legacy/legacy-checkbox';
+import {MatLegacyCheckbox, MatLegacyCheckboxModule, MAT_LEGACY_CHECKBOX_DEFAULT_OPTIONS} from '@ngx-compat/material-legacy/legacy-checkbox';
 import {MatLegacySlideToggle, MatLegacySlideToggleModule} from '@ngx-compat/material-legacy/legacy-slide-toggle';
 import {MatLegacySlider, MatLegacySliderModule} from '@ngx-compat/material-legacy/legacy-slider';
 import {MatLegacyProgressBar, MatLegacyProgressBarModule, MAT_LEGACY_PROGRESS_BAR_LOCATION, MAT_LEGACY_PROGRESS_BAR_LOCATION_FACTORY, MAT_LEGACY_PROGRESS_BAR_DEFAULT_OPTIONS} from '@ngx-compat/material-legacy/legacy-progress-bar';
@@ -1015,6 +1016,9 @@ function sleep(ms: number) {
   return new Promise<void>(r => setTimeout(r, ms));
 }
 
+const checkboxArtifactFactory=(MatLegacyCheckbox as unknown as {ɵfac:()=>MatLegacyCheckbox}).ɵfac;
+const CHECKBOX_NODE_FACTORY_PROBE=new InjectionToken<MatLegacyCheckbox>('closeout-checkbox-node-factory-probe');
+
 async function main() {
   // These constructors run outside an injection context, as in the untouched v16 API.
   class ConsumerDateAdapter extends LegacyNativeDateAdapter {
@@ -1029,6 +1033,11 @@ async function main() {
     direct.getMonth(direct.addCalendarMonths(direct.createDate(2023, 0, 31), 1)) === 1 &&
     direct.getDate(direct.addCalendarMonths(direct.createDate(2023, 0, 31), 1)) === 28 &&
     direct.isValid(direct.invalid()) === false && direct.deserialize('2024-02-29')?.getFullYear() === 2024;
+  // A public node provider executes the untouched artifact factory inside a
+  // real node context. No Angular private context helper or token is imported.
+  TestBed.overrideComponent(MatLegacyCheckbox,{add:{providers:[{
+    provide:CHECKBOX_NODE_FACTORY_PROBE,useFactory:()=>checkboxArtifactFactory(),
+  }]}});
   TestBed.configureTestingModule({
     imports: [HarnessHost, SmokeDialogContent, LegacyNativeDateModule, MatLegacyNativeDateModule],
     providers: [provideNoopAnimations(), {provide: MAT_LEGACY_DATE_LOCALE, useValue: 'en-GB'}],
@@ -1263,6 +1272,34 @@ async function main() {
   // This standalone Node fixture has no runner-local Jasmine/Jest variables.
   const runner=globalThis as typeof globalThis & {__karma__?:unknown;jasmine?:unknown;jest?:unknown;Mocha?:unknown};
   const checksEnabled=isDevMode()&&!Boolean(runner.__karma__||runner.jasmine||runner.jest||runner.Mocha);
+  const environmentProto=Object.getPrototypeOf(TestBed.inject(EnvironmentInjector));
+  const environmentGet=environmentProto.get;
+  const nodeRequests:Array<{token:unknown,optional:boolean}>=[];
+  let nodeGetDepth=0,checkboxNodeFactoryContext=false;
+  let checkboxNodeFactoryError:string|null=null;
+  let checkboxProbeInstance:MatLegacyCheckbox|undefined;
+  environmentProto.get=function(token:unknown,notFound:unknown,flags:unknown){
+    if(nodeGetDepth===0)nodeRequests.push({token,optional:typeof flags==='number'?(flags&8)===8:Boolean(flags&&typeof flags==='object'&&'optional' in flags&&flags.optional)});
+    nodeGetDepth++;
+    try{return environmentGet.call(this,token,notFound,flags);}finally{nodeGetDepth--;}
+  };
+  try {
+    checkboxProbeInstance=byId('attribute-checkbox').injector.get(CHECKBOX_NODE_FACTORY_PROBE);
+    const expected=[FocusMonitor,NgZone,ANIMATION_MODULE_TYPE,MAT_LEGACY_CHECKBOX_DEFAULT_OPTIONS];
+    checkboxNodeFactoryContext=checkboxProbeInstance instanceof MatLegacyCheckbox&&checkboxProbeInstance.tabIndex===7
+      &&nodeRequests.length===expected.length&&nodeRequests.every((request,index)=>
+        request.token===expected[index]&&request.optional===(index>=2));
+  } catch(error){checkboxNodeFactoryError=String(error);}
+  finally {environmentProto.get=environmentGet;}
+  const checkboxNodeFactoryObservation={
+    attribute:checkboxProbeInstance?.tabIndex??null,
+    returned:checkboxProbeInstance instanceof MatLegacyCheckbox,
+    root_requests:nodeRequests.map(request=>({token:String(request.token),optional:request.optional})),
+    token_objects_and_optional_flags_match:checkboxNodeFactoryContext,
+    error:checkboxNodeFactoryError,
+  };
+  checkboxProbeInstance?.ngOnDestroy();
+
   const commonModuleBehavior=TestBed.inject(MATERIAL_LEGACY_SANITY_CHECKS)===true
     &&String(MATERIAL_LEGACY_SANITY_CHECKS)==='InjectionToken mat-sanity-checks'
     &&contrastLifecycle
@@ -1281,7 +1318,7 @@ async function main() {
       selectOpened === true &&
       selectClosed === true &&
       tabCount === 2 &&
-      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization,
+      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext,
     buttonText: text,
     selectIsOpen: isOpen,
     dialogText,
@@ -1305,6 +1342,8 @@ async function main() {
     progressLocationAndDefaults,
     commonModuleBehavior,
     peerIconLiteralSanitization,
+    checkboxNodeFactoryContext,
+    checkboxNodeFactoryObservation,
     checkboxAttribute, slideToggleAttribute, sliderAttribute, tabLinkAttribute,
     commonModuleDiagnostics:{contrastLifecycle,contrastProbeReads,sanityWarnings,checksEnabled,sanityDefault:TestBed.inject(MATERIAL_LEGACY_SANITY_CHECKS),sanityToken:String(MATERIAL_LEGACY_SANITY_CHECKS)},
     chipEventCounts:{removals:fixture.componentInstance.repeatRemovals,separators:fixture.componentInstance.repeatEnds},
