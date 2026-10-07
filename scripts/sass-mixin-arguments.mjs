@@ -8,6 +8,7 @@ import {measureSortPeer,sortCompanionResultsMatch,SORT_COMPANION_CASES} from './
 import {measureTreePeer,treeCompanionResultsMatch,TREE_COMPANION_CASES} from './sass-tree-companion-contract.mjs';
 import {measureCompanionAdditionPeer,companionAdditionResultsMatch,COMPANION_ADDITION_CASES} from './sass-companion-addition-contract.mjs';
 import {measureProgressColorPeer,progressColorAliasResultsMatch,PROGRESS_COLOR_ALIAS_CASES} from './sass-progress-color-alias-contract.mjs';
+import {measureBadgeShapePeer,badgeShapeResultsMatch,BADGE_SHAPE_CASES} from './sass-badge-shape-contract.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 export const MIXIN_ARGUMENT_CATALOG='fixtures/sass/mixin-argument-contracts.json';
@@ -85,6 +86,9 @@ export function runMixinArgumentContracts({sass,entry,loadPaths,allowedRoots,imp
       } else if (Object.hasOwn(PROGRESS_COLOR_ALIAS_CASES,probe.case_id)) {
         const peer=measureProgressColorPeer({sass,materialRoot:allowedRoots[1],cdkRoot:allowedRoots[2],caseId:probe.case_id,line});
         current_peer_alias={classification:'conforming-current-infrastructure',contract:'historical-progress-css-with-public-color-aliases',peer};
+      } else if (Object.hasOwn(BADGE_SHAPE_CASES,probe.case_id)) {
+        const peer=measureBadgeShapePeer({sass,materialRoot:allowedRoots[1],cdkRoot:allowedRoots[2],caseId:probe.case_id,line});
+        current_companion={classification:'conforming-current-companion',contract:'historical-badge-shape-with-current-tokens',peer};
       }
     }catch(caught){error=String(caught.message || caught);}
     const wrongCss=(actual?.css || '')+'\n.wrong-nonempty-mixin { color: red; }\n';
@@ -97,6 +101,8 @@ export function runMixinArgumentContracts({sass,entry,loadPaths,allowedRoots,imp
       ? companionAdditionResultsMatch(probe.case_id,expected,value,current_companion?.peer)
       : Object.hasOwn(PROGRESS_COLOR_ALIAS_CASES,probe.case_id)
       ? progressColorAliasResultsMatch(probe.case_id,expected,value,current_peer_alias?.peer)
+      : Object.hasOwn(BADGE_SHAPE_CASES,probe.case_id)
+      ? badgeShapeResultsMatch(probe.case_id,expected,value,current_companion?.peer)
       : mixinArgumentResultsMatch(expected,value);
     const mutation_rejected=Boolean(expected && actual && !conforms(mutation));
     const exact=mixinArgumentResultsMatch(expected,actual);

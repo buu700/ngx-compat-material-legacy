@@ -566,8 +566,23 @@ $_variants: (accent: secondary, warn: error);
 }
 
 @mixin badge($theme) {
-  @include mat.badge-overrides(_collect(
-    badge, $theme, $badge-allowed, meta.get-function('_badge-tokens')));
+  // Keep the public peer's variant rules before its typography/density block.
+  $groups: _badge-tokens(m2-system.get-system($theme));
+  $root: _qualify(badge, map.get($groups, base), $badge-allowed);
+  $tail: ();
+  @if theming.get-typography-config($theme) != null {
+    $tail: map.merge($tail, _qualify(badge, map.get($groups, typography), $badge-allowed));
+  }
+  @if theming.get-density-config($theme) != null {
+    $tail: map.merge($tail, _qualify(badge, map.get($groups, density), $badge-allowed));
+  }
+  @if theming.get-color-config($theme) != null {
+    $root: map.merge($root, _qualify(badge, map.get($groups, color), $badge-allowed));
+  } @else {
+    $root: map.merge($root, $tail);
+    $tail: ();
+  }
+  @include mat.badge-overrides($root);
   @if theming.get-color-config($theme) != null {
     @each $name, $variant in $_variants {
       .mat-badge-#{$name} {
@@ -576,6 +591,7 @@ $_variants: (accent: secondary, warn: error);
       }
     }
   }
+  @include mat.badge-overrides($tail);
 }
 
 @mixin bottom-sheet($theme) {
