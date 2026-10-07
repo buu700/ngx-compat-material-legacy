@@ -337,7 +337,7 @@ const families = {
   list: {present: false, disabled_class: false},
   slider: {present: false, disabled_class: false, value_reflected: false},
   radio: {present: false, disabled_class: false},
-  checkbox: {present: false, disabled_class: false},
+  checkbox: {present: false, disabled_class: false, contrast_modes: false, contrast_negative: false, contrast_observations: []},
   'slide-toggle': {present: false, disabled_class: false},
 };
 let error = null;
@@ -397,6 +397,22 @@ try {
     '!!document.querySelector("mat-checkbox#checkbox-disabled.mat-checkbox-disabled")',
   );
 
+  // Exercise actual browser forced-color palettes and public A11yModule mode classes.
+  // Toggle through none because changing the palette alone does not change the
+  // detector's public forced-colors media query.
+  for (const [scheme,mode,expected] of [['light','black-on-white','rgb(0, 0, 0)'],['dark','white-on-black','rgb(255, 255, 255)']]) {
+    await send('Emulation.setEmulatedMedia',{features:[{name:'forced-colors',value:'none'},{name:'prefers-color-scheme',value:scheme}]});
+    if (!await waitFor('!document.body.classList.contains("cdk-high-contrast-active")')) throw new Error('checkbox contrast mode did not clear');
+    await send('Emulation.setEmulatedMedia',{features:[{name:'forced-colors',value:'active'},{name:'prefers-color-scheme',value:scheme}]});
+    const detected=await waitFor(`document.body.classList.contains("cdk-high-contrast-${mode}")`);
+    const stroke=await evaluate('getComputedStyle(document.querySelector("#checkbox-default .mat-checkbox-checkmark-path")).stroke');
+    families.checkbox.contrast_observations.push({scheme,mode,detected,stroke,expected});
+  }
+  families.checkbox.contrast_modes=families.checkbox.contrast_observations.every(item=>item.detected&&item.stroke===item.expected);
+  const wrongStroke=await evaluate(`(()=>{const path=document.querySelector('#checkbox-default .mat-checkbox-checkmark-path');const saved=path.getAttribute('style');try{path.style.setProperty('stroke','rgb(1, 2, 3)','important');return getComputedStyle(path).stroke;}finally{if(saved===null)path.removeAttribute('style');else path.setAttribute('style',saved);}})()`);
+  families.checkbox.contrast_negative=wrongStroke==='rgb(1, 2, 3)'&&wrongStroke!==families.checkbox.contrast_observations[1].expected;
+  await send('Emulation.setEmulatedMedia',{features:[]});
+
   // Slide-toggle default + disabled state cell (legacy uses mat-disabled host class).
   families['slide-toggle'].present = await waitFor('!!document.querySelector("mat-slide-toggle#toggle-default")');
   families['slide-toggle'].disabled_class = await waitFor(
@@ -437,7 +453,7 @@ const ok =
   && families.list.present && families.list.disabled_class
   && families.slider.present && families.slider.disabled_class && families.slider.value_reflected
   && families.radio.present && families.radio.disabled_class
-  && families.checkbox.present && families.checkbox.disabled_class
+  && families.checkbox.present && families.checkbox.disabled_class && families.checkbox.contrast_modes && families.checkbox.contrast_negative
   && families['slide-toggle'].present && families['slide-toggle'].disabled_class;
 
 const report = {
@@ -465,7 +481,7 @@ const report = {
     'List credit is item presence + disabled class on disabled mat-list-item; selection-list/nav-list not exercised.',
     'Slider credit is presence + thumb label value + disabled class; drag/keyboard range motion not exercised.',
     'Radio credit is button presence + disabled class on group-disabled mat-radio-button; keyboard/focus/invalid not exercised.',
-    'Checkbox credit is presence + disabled class; indeterminate/checked/focus/invalid not exercised.',
+    'Checkbox credit includes actual forced-color light/dark palettes, detector body classes and black/white checkmark strokes with a wrong-stroke negative; indeterminate/checked/focus/invalid not exercised.',
     'Slide-toggle credit is presence + mat-disabled host class; focus/invalid/checked interaction not exercised.',
     'Success is not copied to unexecuted cells.',
     'Does not claim G10.',

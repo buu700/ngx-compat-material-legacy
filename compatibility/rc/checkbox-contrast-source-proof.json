@@ -1,0 +1,30 @@
+{
+  "status": "implemented-browser-qualification-pending",
+  "scope": "One legacy checkbox checkmark selector, unchanged original black-on-white meaning. No CDK helper fork or consumer map change. No CSS golden changed.",
+  "originals": {
+    "reference/material-16.2.14/checkbox-contrast/cdk-a11y-index.scss": {
+      "sha256": "dd7e20cc3b362ed0140de0b277b8d192720cb72c4e480337910a499a0f5bfed5",
+      "archive_member": "package/a11y/_index.scss",
+      "archive_sha256": "a499ba0fee46784441b92587e43b17ec72d9bd383f78ea14954eaa62c781bad7"
+    },
+    "reference/material-16.2.14/checkbox-contrast/checkbox-theme.scss": {
+      "sha256": "f50e3f7ec838c204e1ef92c4ceed4b6b4f4aae38602fc3a69b58e5e5c796d3f1",
+      "archive_member": "package/legacy-checkbox/_checkbox-theme.scss",
+      "archive_sha256": "de41309d20b1d98a7fd6d028a7de42853ea2d453a329c7a8815aaf73ea7f365b"
+    },
+    "reference/material-16.2.14/checkbox-contrast/checkbox.html": {
+      "sha256": "a4033cb7b0c3cf908c6ca1d47fe6af6563a65d7d8e24d6bcccf05dfd1e653829",
+      "tag_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+      "member": "src/material/legacy-checkbox/checkbox.html"
+    },
+    "reference/material-16.2.14/checkbox-contrast/checkbox.scss": {
+      "sha256": "e27cfb000644622cf0d42ce350fe99824e82f70a0aa3fede676a17dc25fbbccd",
+      "tag_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+      "member": "src/material/legacy-checkbox/checkbox.scss"
+    }
+  },
+  "original_expansion": ".cdk-high-contrast-black-on-white .mat-checkbox-checkmark-path { stroke: #000 !important; }",
+  "current_regression": "Both21/22 high-contrast coerce black-on-white to active, making black stroke apply also in white-on-black. Restoring original selector removes compatibility target and preserves namespace bindings.",
+  "browser_test": "Both zoneful and zoneless packed control-family probes require public A11yModule body mode detection under actual Chromium forced-color light/dark palettes; strokes black/white, wrong nonempty stroke mutation detected. Other control cells retained.",
+  "limits": "Pinned browser execution pending; no full cross-browser/style/motion gate inferred."
+}
