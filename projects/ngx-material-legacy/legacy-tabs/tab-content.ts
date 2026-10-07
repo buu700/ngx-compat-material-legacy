@@ -1,12 +1,14 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
 
-import {Directive} from '@angular/core';
+import {Directive, TemplateRef} from '@angular/core';
+import {constructWithPublicDependencies} from '../legacy-core/internal/public-constructor-context';
 import {MAT_TAB_CONTENT, MatTabContent as MatNonLegacyTabContent} from '@angular/material/tabs';
 
 /**
@@ -19,4 +21,11 @@ import {MAT_TAB_CONTENT, MatTabContent as MatNonLegacyTabContent} from '@angular
   selector: '[matTabContent]',
   providers: [{provide: MAT_TAB_CONTENT, useExisting: MatLegacyTabContent}],
 })
-export class MatLegacyTabContent extends MatNonLegacyTabContent {}
+export class MatLegacyTabContent extends MatNonLegacyTabContent {
+  // @ts-expect-error TS2377: valid derived object return preserves manual arguments.
+  constructor(template: TemplateRef<any>) {
+    return constructWithPublicDependencies(MatNonLegacyTabContent, new.target, [
+      {provide: TemplateRef, useValue: template},
+    ]);
+  }
+}

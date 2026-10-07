@@ -48,6 +48,7 @@ export const HARNESS_CASE_IDS = [
   'packed-consumer/harness/cell-definition-original-constructors',
   'packed-consumer/harness/cell-original-constructors-and-grid-roles',
   'packed-consumer/harness/text-column-original-constructor-options',
+  'packed-consumer/harness/tab-content-original-constructor',
   'packed-consumer/harness/owned-resolution',
   'packed-consumer/harness/peer-harness-separate-scope',
 ];

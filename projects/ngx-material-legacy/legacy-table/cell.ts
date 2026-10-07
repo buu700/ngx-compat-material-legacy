@@ -8,7 +8,7 @@
  */
 
 import {Directive, ElementRef, Input, TemplateRef} from '@angular/core';
-import {constructLegacyCell} from './internal/construct-legacy-cell';
+import {constructWithPublicDependencies} from '../legacy-core/internal/public-constructor-context';
 import {
   CdkCell,
   CdkCellDef,
@@ -35,7 +35,7 @@ export class MatLegacyCellDef extends CdkCellDef {
   // super() even though that would discard the original manual argument here.
   // @ts-expect-error TS2377: derived constructor deliberately returns its object.
   constructor(template: TemplateRef<any>) {
-    return constructLegacyCell(CdkCellDef, new.target, [{provide: TemplateRef, useValue: template}]);
+    return constructWithPublicDependencies(CdkCellDef, new.target, [{provide: TemplateRef, useValue: template}]);
   }
 }
 
@@ -55,7 +55,7 @@ export class MatLegacyHeaderCellDef extends CdkHeaderCellDef {
   // super() even though that would discard the original manual argument here.
   // @ts-expect-error TS2377: derived constructor deliberately returns its object.
   constructor(template: TemplateRef<any>) {
-    return constructLegacyCell(CdkHeaderCellDef, new.target, [{provide: TemplateRef, useValue: template}]);
+    return constructWithPublicDependencies(CdkHeaderCellDef, new.target, [{provide: TemplateRef, useValue: template}]);
   }
 }
 
@@ -75,7 +75,7 @@ export class MatLegacyFooterCellDef extends CdkFooterCellDef {
   // super() even though that would discard the original manual argument here.
   // @ts-expect-error TS2377: derived constructor deliberately returns its object.
   constructor(template: TemplateRef<any>) {
-    return constructLegacyCell(CdkFooterCellDef, new.target, [{provide: TemplateRef, useValue: template}]);
+    return constructWithPublicDependencies(CdkFooterCellDef, new.target, [{provide: TemplateRef, useValue: template}]);
   }
 }
 
@@ -132,7 +132,7 @@ export class MatLegacyColumnDef extends CdkColumnDef {
 export class MatLegacyHeaderCell extends CdkHeaderCell {
   // @ts-expect-error TS2377: valid derived object return preserves manual arguments.
   constructor(columnDef: CdkColumnDef, elementRef: ElementRef) {
-    return constructLegacyCell(CdkHeaderCell, new.target, [
+    return constructWithPublicDependencies(CdkHeaderCell, new.target, [
       {provide: CdkColumnDef, useValue: columnDef},
       {provide: ElementRef, useValue: elementRef},
     ]);
@@ -155,7 +155,7 @@ export class MatLegacyHeaderCell extends CdkHeaderCell {
 export class MatLegacyFooterCell extends CdkFooterCell {
   // @ts-expect-error TS2377: valid derived object return preserves manual arguments.
   constructor(columnDef: CdkColumnDef, elementRef: ElementRef) {
-    return constructLegacyCell(CdkFooterCell, new.target, [
+    return constructWithPublicDependencies(CdkFooterCell, new.target, [
       {provide: CdkColumnDef, useValue: columnDef},
       {provide: ElementRef, useValue: elementRef},
     ]);
@@ -178,7 +178,7 @@ export class MatLegacyFooterCell extends CdkFooterCell {
 export class MatLegacyCell extends CdkCell {
   // @ts-expect-error TS2377: valid derived object return preserves manual arguments.
   constructor(columnDef: CdkColumnDef, elementRef: ElementRef) {
-    return constructLegacyCell(CdkCell, new.target, [
+    return constructWithPublicDependencies(CdkCell, new.target, [
       {provide: CdkColumnDef, useValue: columnDef},
       {provide: ElementRef, useValue: elementRef},
     ]);

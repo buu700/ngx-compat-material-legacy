@@ -8,7 +8,7 @@
  */
 
 import {CdkTable, CdkTextColumn, TEXT_COLUMN_OPTIONS, type TextColumnOptions} from '@angular/cdk/table';
-import {constructLegacyCell} from './internal/construct-legacy-cell';
+import {constructWithPublicDependencies} from '../legacy-core/internal/public-constructor-context';
 import {ChangeDetectionStrategy, Component, Inject, Optional, ViewEncapsulation} from '@angular/core';
 
 /**
@@ -52,7 +52,7 @@ import {ChangeDetectionStrategy, Component, Inject, Optional, ViewEncapsulation}
 export class MatLegacyTextColumn<T> extends CdkTextColumn<T> {
   // @ts-expect-error TS2377: valid derived object return preserves manual arguments.
   constructor(@Optional() table: CdkTable<T>, @Optional() @Inject(TEXT_COLUMN_OPTIONS) options: TextColumnOptions<T>) {
-    return constructLegacyCell(CdkTextColumn<T>, new.target, [
+    return constructWithPublicDependencies(CdkTextColumn<T>, new.target, [
       {provide: CdkTable, useValue: table},
       {provide: TEXT_COLUMN_OPTIONS, useValue: options},
     ]);

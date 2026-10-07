@@ -487,6 +487,7 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
     'packed-consumer/harness/cell-definition-original-constructors': parsed.cellDefinitionOriginalConstructors === true,
     'packed-consumer/harness/cell-original-constructors-and-grid-roles': parsed.cellOriginalConstructors === true,
     'packed-consumer/harness/text-column-original-constructor-options': parsed.textColumnOriginalConstructor === true,
+    'packed-consumer/harness/tab-content-original-constructor': parsed.tabContentOriginalConstructor === true,
   };
   const owned = declarationKeys(keys)
     .filter(key => key.endsWith('/testing'))
@@ -894,6 +895,7 @@ import {Component, ElementRef, TemplateRef, ViewChild, Injector, ViewContainerRe
 import {Subject} from 'rxjs';
 import {FormControl, Validators} from '@angular/forms';
 import {MatStepperModule, MatStepper} from '@angular/material/stepper';
+import {MatTabContent} from '@angular/material/tabs';
 import {BreakpointObserver, BreakpointState} from '@angular/cdk/layout';
 import {AriaDescriber, FocusMonitor, HighContrastMode, HighContrastModeDetector} from '@angular/cdk/a11y';
 import {
@@ -923,7 +925,7 @@ import {MatLegacySnackBar, MatLegacySnackBarModule} from '@ngx-compat/material-l
 import {MatLegacySnackBarHarness} from '@ngx-compat/material-legacy/legacy-snack-bar/testing';
 import {MatLegacyTooltip, MatLegacyTooltipModule, MAT_LEGACY_TOOLTIP_SCROLL_STRATEGY, MAT_LEGACY_TOOLTIP_DEFAULT_OPTIONS} from '@ngx-compat/material-legacy/legacy-tooltip';
 import {MatLegacyTooltipHarness} from '@ngx-compat/material-legacy/legacy-tooltip/testing';
-import {MatLegacyTabsModule, MatLegacyTabLink} from '@ngx-compat/material-legacy/legacy-tabs';
+import {MatLegacyTabsModule, MatLegacyTabLink, MatLegacyTabContent} from '@ngx-compat/material-legacy/legacy-tabs';
 import {MatLegacyCheckbox, MatLegacyCheckboxModule, MAT_LEGACY_CHECKBOX_DEFAULT_OPTIONS} from '@ngx-compat/material-legacy/legacy-checkbox';
 import {MatLegacySlideToggle, MatLegacySlideToggleModule} from '@ngx-compat/material-legacy/legacy-slide-toggle';
 import {MatLegacySlider, MatLegacySliderModule} from '@ngx-compat/material-legacy/legacy-slider';
@@ -1027,6 +1029,7 @@ class SmokeDialogContent {}
       <mat-row *matRowDef="let row; columns:['constructor-probe']"></mat-row>
       <mat-footer-row *matFooterRowDef="['constructor-probe']"></mat-footer-row>
     </mat-table>
+    <ng-template #manualTabTemplate matTabContent>Tab lazy probe</ng-template>
     <ng-template #manualCellTemplate matCellDef>Data probe</ng-template>
     <ng-template #manualHeaderTemplate matHeaderCellDef>Header probe</ng-template>
     <ng-template #manualFooterTemplate matFooterCellDef>Footer probe</ng-template>
@@ -1038,6 +1041,8 @@ class SmokeDialogContent {}
   \`,
 })
 class HarnessHost {
+  @ViewChild('manualTabTemplate',{read:MatLegacyTabContent,static:true}) originalTabContent!:MatLegacyTabContent;
+  @ViewChild('manualTabTemplate',{read:TemplateRef,static:true}) originalTabTemplate!:TemplateRef<any>;
   @ViewChild(MatLegacyTextColumn,{static:true}) originalTextColumn!:MatLegacyTextColumn<any>;
   @ViewChild('constructorGridColumn',{read:MatLegacyColumnDef,static:true}) gridColumn!:MatLegacyColumnDef;
   @ViewChild('manualCellTemplate',{read:MatLegacyCellDef,static:true}) cellDefinition!:MatLegacyCellDef;
@@ -1201,6 +1206,21 @@ async function main() {
     options_unmutated:Object.isFrozen(ORIGINAL_TEXT_OPTIONS)&&Object.keys(ORIGINAL_TEXT_OPTIONS).length===2,
   };
   const textColumnOriginalConstructor=Object.values(textColumnObservation).every(value=>value===true);
+  const suppliedTabTemplate=fixture.componentInstance.originalTabTemplate;
+  const nodeTabContent=fixture.componentInstance.originalTabContent;
+  const manualTabContent=new MatLegacyTabContent(suppliedTabTemplate);
+  const tabView=manualTabContent.template.createEmbeddedView({});tabView.detectChanges();
+  const tabContentObservation={manual_argument_identity:manualTabContent.template===suppliedTabTemplate,
+    manual_owned_identity:manualTabContent instanceof MatLegacyTabContent,
+    manual_peer_identity:manualTabContent instanceof MatTabContent,
+    prototype_identity:Object.getPrototypeOf(manualTabContent)===MatLegacyTabContent.prototype,
+    parent_constructor_identity:Object.getPrototypeOf(MatLegacyTabContent)===MatTabContent,
+    node_owned_identity:nodeTabContent instanceof MatLegacyTabContent,
+    node_peer_identity:nodeTabContent instanceof MatTabContent,
+    node_template_anchor:nodeTabContent.template.elementRef.nativeElement===suppliedTabTemplate.elementRef.nativeElement,
+    embedded_view_text:tabView.rootNodes.map(node=>node.textContent||'').join('').trim()==='Tab lazy probe'};
+  tabView.destroy();
+  const tabContentOriginalConstructor=Object.values(tabContentObservation).every(value=>value===true);
   const eagerNode=fixture.debugElement.query(element=>element.nativeElement?.id==='tooltip-eager');
   const eagerTooltip=eagerNode.injector.get(MatLegacyTooltip);
   // These are owned original16 fields, not current private peer imports. Check
@@ -1519,7 +1539,7 @@ async function main() {
       selectOpened === true &&
       selectClosed === true &&
       tabCount === 2 &&
-      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor,
+      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor && tabContentOriginalConstructor,
     buttonText: text,
     selectIsOpen: isOpen,
     dialogText,
@@ -1550,6 +1570,7 @@ async function main() {
     cellDefinitionOriginalConstructors, cellDefinitionObservation,
     cellOriginalConstructors, cellConstructorObservation,
     textColumnOriginalConstructor, textColumnObservation,
+    tabContentOriginalConstructor, tabContentObservation,
     checkboxAttribute, slideToggleAttribute, sliderAttribute, tabLinkAttribute,
     commonModuleDiagnostics:{contrastLifecycle,contrastProbeReads,sanityWarnings,checksEnabled,sanityDefault:TestBed.inject(MATERIAL_LEGACY_SANITY_CHECKS),sanityToken:String(MATERIAL_LEGACY_SANITY_CHECKS)},
     chipEventCounts:{removals:fixture.componentInstance.repeatRemovals,separators:fixture.componentInstance.repeatEnds},
