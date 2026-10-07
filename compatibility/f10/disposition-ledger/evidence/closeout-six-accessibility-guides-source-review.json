@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "reviewer": "Codex primary implementer",
+  "recorded_at_utc": "2026-10-07T02:31:13.512507+00:00",
+  "method": "Every complete original patch read, all actual changed paths enumerated independently of filtered seed paths, and each accessibility/consumer-guidance implication reasoned individually. Both line-owned package assets and maintained documentation searched.",
+  "scope": "Six exact guide SHAs only; no general markdown-prefix or accessibility exclusion.",
+  "packaging": {
+    "path": "projects/ngx-material-legacy/ng-package.json",
+    "sha256": "692f6b0fc780306368c4f05078f01210e4f2dab1b5536c1984d7a721d669ea33",
+    "closure": "Entry source, owned Sass and schematics only; no src/material or src/cdk overview markdown assets."
+  },
+  "reviews": [
+    {
+      "sha": "ed03088c672efa2d92ab06bdd96a6b60f380a447",
+      "subject": "fix(material/slider): update documentation (#30029)",
+      "files": [
+        "src/material/slider/slider.md"
+      ],
+      "diff": "diff --git a/src/material/slider/slider.md b/src/material/slider/slider.md\nindex 5d0919d3b..c8e358b8e 100644\n--- a/src/material/slider/slider.md\n+++ b/src/material/slider/slider.md\n@@ -77,3 +77,8 @@ The slider has the following keyboard bindings:\n \n `MatSlider` uses an internal `<input type=\"range\">` to provide an accessible experience. The input\n receives focus and it can be labelled using `aria-label` or `aria-labelledby`.\n+\n+Make sure the colors of the active and inactive track of the `MatSlider` meet \n+at least a 3:1 contrast ratio with the background. This can be achieved through \n+changing the active or inactive track colors or showing tick marks on the\n+track that have at least a 3:1 color contrast ratio with the background.\n\\ No newline at end of file\n",
+      "diff_sha256": "c8f50657bd18ffd9e089b6c68a31e371f888851d7395aeec27e5607f294fa0ac",
+      "actual_changed_path_count": 1,
+      "review_depth": "individual-compatibility",
+      "decision": "The only changed path is slider.md, adding active/inactive track contrast and tick-mark guidance. It describes the current input-range slider, while this package owns the historical single-thumb control. No slider styles, values, events or accessibility implementation change in this SHA. Do not transplant modern slider instructions into the frozen legacy API. Contrast documentation remains an A10 review lead, not proof of rendered contrast.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": false,
+      "individual_sensitive_guidance_review": true
+    },
+    {
+      "sha": "d84a4c3b26dd2bdb14e6403eadc2cae8cca2fcec",
+      "subject": "docs: updates buttons with icons a11y recommendations (#30400)",
+      "files": [
+        "src/material/button/button.md"
+      ],
+      "diff": "diff --git a/src/material/button/button.md b/src/material/button/button.md\nindex 6b51d9963..4ed6d42af 100644\n--- a/src/material/button/button.md\n+++ b/src/material/button/button.md\n@@ -68,7 +68,7 @@ with any assistive technology your application supports.\n Buttons or links containing only icons (such as `mat-fab`, `mat-mini-fab`, and `mat-icon-button`)\n should be given a meaningful label via `aria-label` or `aria-labelledby`. [See the documentation\n for `MatIcon`](https://material.angular.io/components/icon) for more\n-information on using icons in buttons.\n+information on using icons in buttons. Additionally, to be fully accessible the icon should have a minimum touch-target of 48x48 to ensure that the icon is easily clickable particularly on mobile devices and small screens.\n \n #### Toggle buttons\n [See the documentation for `MatButtonToggle`](https://material.angular.io/components/button-toggle)\n",
+      "diff_sha256": "77f003412e74021bce23095140acee0c2c2721b8dbf01e5e42949af07a87e1e9",
+      "actual_changed_path_count": 1,
+      "review_depth": "individual-compatibility",
+      "decision": "Individually reviewed accessibility guidance: one button.md sentence recommends a 48x48 touch target for icon-only buttons. The patch changes no button CSS, geometry, focus or runtime behavior. The upstream overview is absent from the maintained package and asset closure. Keep original legacy geometry; this documentation exclusion does not excuse touch-target/accessibility review or authorize a geometry change.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": false,
+      "individual_sensitive_guidance_review": true
+    },
+    {
+      "sha": "d7fc5601405f83e5418121382b7647d4dcc7793c",
+      "subject": "fix(docs): add example for adding icon in meta section using matListI\u2026 (#30068)",
+      "files": [
+        "src/material/list/list.md"
+      ],
+      "diff": "diff --git a/src/material/list/list.md b/src/material/list/list.md\nindex c1c86b453..e6a7ed85d 100644\n--- a/src/material/list/list.md\n+++ b/src/material/list/list.md\n@@ -158,6 +158,28 @@ To add an icon to your list item, use the `matListItemIcon` attribute.\n </mat-list>\n ```\n \n+### Lists with meta section icons\n+\n+To add a meta icon to your list item, use the `matListItemMeta` directive. This allows you to display an icon or any other content in the meta section of the list item.\n+\n+\n+```html\n+<mat-list>\n+  @for (message of messages; track message) {\n+    <mat-list-item>\n+      <div matListItemMeta>\n+        <mat-icon>folder</mat-icon>\n+      </div>\n+      <h3 matListItemTitle>{{message.from}}</h3>\n+      <p matListItemLine>\n+        <span>{{message.subject}}</span>\n+        <span class=\"demo-2\"> -- {{message.content}}</span>\n+      </p>\n+    </mat-list-item>\n+  }\n+</mat-list>\n+```\n+\n ### Lists with avatars\n \n To include an avatar image, add an image tag with an `matListItemAvatar` attribute.\n",
+      "diff_sha256": "a90b6e655fe5fece6874660124850ad181d6d67999f4e0bb031458a3e6d39bd7",
+      "actual_changed_path_count": 1,
+      "review_depth": "individual-compatibility",
+      "decision": "The sole list.md hunk adds a modern matListItemMeta example with title/line directives and @for syntax. It changes no component/directive implementation. Those modern meta/title directives are not the historical owned list API, and the upstream overview is neither maintained nor packaged here. No modern list API mirror or ordinary component fork should be introduced for this example.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": false,
+      "individual_sensitive_guidance_review": true
+    },
+    {
+      "sha": "47819c4f2efa9d932a2dde7642bf8f8b1732e659",
+      "subject": "docs(material/chips): remove instructions to announce deletion (#28253)",
+      "files": [
+        "src/material/chips/chips.md"
+      ],
+      "diff": "diff --git a/src/material/chips/chips.md b/src/material/chips/chips.md\nindex f803ff291..8b3fd2815 100644\n--- a/src/material/chips/chips.md\n+++ b/src/material/chips/chips.md\n@@ -191,6 +191,4 @@ When using MatChipListbox, never nest other interactive controls inside of the `\n \n By default, `MatChipListbox` displays a checkmark to identify selected items. While you can hide the checkmark indicator for single-selection via `hideSingleSelectionIndicator`, this makes the component less accessible by making it harder or impossible for users to visually identify selected items.\n \n-When using `MatChipRemove`, you should always communicate removals for assistive technology. One way to accomplish this is by sending a message with `LiveAnnouncer`. Otherwise, removing a chip may only be communicated visually.\n-\n When a chip is editable, provide instructions to assistive technology how to edit the chip using a keyboard. One way to accomplish this is adding an `aria-description` attribute with instructions to press enter to edit the chip.\n",
+      "diff_sha256": "e2d670850daaacfddf87cb4014f16e1c4839b89a201946c10c30948961d3d1ec",
+      "actual_changed_path_count": 1,
+      "review_depth": "individual-compatibility",
+      "decision": "Individually reviewed assistive-technology guidance: the sole chips.md hunk removes a recommendation that modern MatChipRemove consumers always announce deletion through LiveAnnouncer. It removes no runtime call or live region in any source; the commit message must not be mistaken for an executable deletion. The owned historical chip list differs from modern listbox/grid semantics. Do not change legacy removal events or ARIA based on this prose-only patch. Original removal behavior, announcements and maintained migration guidance remain separate A04/A10 obligations.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": false,
+      "individual_sensitive_guidance_review": true
+    },
+    {
+      "sha": "204b289588106d90c991f26a50c23c80c68d4fc3",
+      "subject": "fix(material/list): update documentation (#30883)",
+      "files": [
+        "src/material/list/list.md"
+      ],
+      "diff": "diff --git a/src/material/list/list.md b/src/material/list/list.md\nindex febcd776e..a6ca84936 100644\n--- a/src/material/list/list.md\n+++ b/src/material/list/list.md\n@@ -241,6 +241,35 @@ anchors, including buttons and checkboxes.\n Always provide an accessible label for the `<mat-nav-list>` element via `aria-label` or\n `aria-labelledby`.\n \n+To provide the best screen reader experience for a list, wrap each anchor element with a `<li>` or `<div role=\"listitem\">` element and wrap all of the anchor elements with a `<ul>` element or `<div role=\"list\">` element.\n+\n+```html\n+<mat-nav-list aria-label=\"Select a folder\">\n+  <ul>\n+    @for (link of list; track link) {\n+    <li>\n+      <a mat-list-item href=\"...\" [activated]=\"link.isActive\">{{ link }}</a>\n+    </li>\n+    }\n+  </ul>\n+</mat-nav-list>\n+```\n+\n+#### Action\n+\n+To provide the best screen reader experience for a list, wrap each button element with a `<li>` or `<div role=\"listitem\">` element and add `role=\"list\"` to `<mat-action-list>`.\n+\n+```html\n+<mat-action-list role=\"list\" aria-label=\"Post actions\">\n+  <li>\n+    <button mat-list-item (click)=\"save()\">Save</button>\n+  </li>\n+  <li>\n+    <button mat-list-item (click)=\"undo()\">Undo</button>\n+  </li>\n+</mat-action-list>\n+```\n+\n #### Selection\n \n You should use `MatSelectionList` and `MatListOption` for lists that allow the user to select one\n",
+      "diff_sha256": "4cb275f4a5db15f1cdaaffd0332419be5dc6717a5179a183dbccb057ddaf78d5",
+      "actual_changed_path_count": 1,
+      "review_depth": "individual-compatibility",
+      "decision": "Individually reviewed accessibility guidance: list.md adds consumer-authored ul/li or role=list/listitem wrappers around navigation anchors and action buttons. No owned list DOM, keyboard, selection or screen-reader implementation changes occur. The upstream markdown is not in this package closure. Do not insert wrappers or change frozen selectors to adopt the documentation patch; maintained examples and screen-reader behavior remain separate audit obligations.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": false,
+      "individual_sensitive_guidance_review": true
+    },
+    {
+      "sha": "1f13d60126bcde7af29438bae38a4da91a30e352",
+      "subject": "docs(material/form-field): update form-field prefix suffix a11y docs (#33680)",
+      "files": [
+        "src/material/form-field/form-field.md"
+      ],
+      "diff": "diff --git a/src/material/form-field/form-field.md b/src/material/form-field/form-field.md\nindex bdcf41bcd..b89d1dbac 100644\n--- a/src/material/form-field/form-field.md\n+++ b/src/material/form-field/form-field.md\n@@ -144,6 +144,18 @@ adds these elements' IDs to the control's `aria-describedby` attribute. Addition\n applies `aria-live=\"polite\"` by default such that assistive technology will announce errors when\n they appear.\n \n+When using static text prefixes or suffixes (such as currency symbols like `$` or unit suffixes like\n+`.00` or `kg`), screen readers may not announce them as part of the input value, and some mobile screen\n+readers, especially on Android/TalkBack, may expose them as separate focus stops. This can lead to\n+redundant announcements or unexpected focus behavior when navigating the field.\n+\n+If the prefix or suffix provides important context, add an `aria-label` to the input or include the full\n+meaning in `aria-describedby` so the accessible name/description matches the visible content. For example,\n+if the prefix is `$` and the suffix is `.00` to indicate dollars with no cents, an appropriate `aria-label`\n+could be `aria-label=\"Amount in dollars with 0 cents\"`. When the static text is purely decorative and the\n+input already conveys the full context, add `aria-hidden=\"true\"` to the static `matTextPrefix` or\n+`matTextSuffix` elements so they are skipped during swipe navigation and do not create redundant focus stops.\n+\n ### Troubleshooting\n \n #### Error: A hint was already declared for align=\"...\"\n",
+      "diff_sha256": "c48be8d2d0f265da8e7a153989e6e49e43882d44728cb91ddbc882ed4056094c",
+      "actual_changed_path_count": 1,
+      "review_depth": "individual-compatibility",
+      "decision": "Individually reviewed accessibility guidance: form-field.md adds advice for static modern matTextPrefix/matTextSuffix context, Android/TalkBack focus stops, input accessible names/descriptions and decorative aria-hidden. This is prose only, with no field/prefix/suffix or ARIA implementation edits. Legacy matPrefix/matSuffix remain distinct public directives; no selector rename, automatic aria-hidden or live-region change follows. Upstream prose is absent from the maintained package; consumer guidance and actual accessibility still require A10/A04 review.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "runtime_change_in_patch": false,
+      "individual_sensitive_guidance_review": true
+    }
+  ],
+  "limitations": [
+    "No runtime accessibility, screen-reader, keyboard, contrast or geometry pass is claimed.",
+    "A10 maintained consumer guidance and A04 behavior remain open. All 1697 SHAs and 1736 authored uses remain accountable.",
+    "Other seed rows may enumerate a filtered path set; full original patches, rather than those sets alone, determine review scope."
+  ],
+  "g11_claim": "not-passed"
+}
