@@ -13,11 +13,26 @@
 }
 
 @mixin color($config-or-theme) {
-  @include bridges.icon((
-    color: theming.get-color-config($config-or-theme),
-    typography: null,
-    density: null
-  ));
+  $config: theming.get-color-config($config-or-theme);
+
+  @include sass-utils.current-selector-or-root() {
+    @include token-utils.create-token-values(tokens-mat-icon.$prefix,
+      tokens-mat-icon.get-color-tokens($config));
+  }
+
+  .mat-icon {
+    &.mat-primary {
+      @include _palette-colors($config, primary);
+    }
+
+    &.mat-accent {
+      @include _palette-colors($config, accent);
+    }
+
+    &.mat-warn {
+      @include _palette-colors($config, warn);
+    }
+  }
 }
 
 
@@ -42,7 +57,19 @@
 @mixin theme($theme-or-color-config) {
   $theme: theming.private-legacy-get-theme($theme-or-color-config);
   @include theming.private-check-duplicate-theme-styles($theme, 'mat-icon') {
-    @include bridges.icon($theme);
+    $color: theming.get-color-config($theme);
+    $density: theming.get-density-config($theme);
+    $typography: theming.get-typography-config($theme);
+
+    @if $color != null {
+      @include color($color);
+    }
+    @if $density != null {
+      @include density($density);
+    }
+    @if $typography != null {
+      @include typography($typography);
+    }
   }
 }
 
