@@ -30,6 +30,7 @@ import {emitMixinMismatchArchive} from './sass-mismatch-diagnostic.mjs';
 import {runFunctionContracts} from './sass-function-contracts.mjs';
 import {runMixinArgumentContracts,firstMixinCssDifference} from './sass-mixin-arguments.mjs';
 import {runOwnedAggregateContracts} from './sass-owned-aggregates.mjs';
+import {DEFAULT_CORE_CDK_CASES,DEFAULT_CORE_CDK_CONTRACT,measureDefaultCoreCdkPeer,defaultCoreCdkMeasurementOk} from './sass-default-core-cdk-contract.mjs';
 import {ownedStyleCaseIds, renderOwnedStyles} from './sass-owned-rendered.mjs';
 import {coordinatorRequest} from './packed-consumer-evidence.mjs';
 import {spawnSync} from 'node:child_process';
@@ -66,6 +67,7 @@ import {
   compileInvocation,
   inventoryModule,
   invocationPlan,
+  standardThemeSource,
 } from './sass-api-inventory.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -325,10 +327,11 @@ function sha256Text(text) {
 }
 
 /** Candidate inventory and planned invocations through the seal importer and load-URL audit. */
-export function runSassApi({oracle, entryFile, loadPaths, packageRoot, allowedRoots, importer = makeImporter()}) {
+export function runSassApi({oracle, entryFile, loadPaths, packageRoot, allowedRoots, line = 'main', importer = makeImporter()}) {
   const moduleUrl = pathToFileURL(entryFile).href;
   const members = inventoryModule({sass, moduleUrl, loadPaths, packageRoot, importers: [importer]});
   const css = {};
+  let coreCdkPeer;
   for (const [name, entry] of Object.entries(oracle.members.mixins)) {
     // The plan comes from the authentic signature, never from the candidate.
     const plan = invocationPlan(name, entry);
@@ -339,17 +342,33 @@ export function runSassApi({oracle, entryFile, loadPaths, packageRoot, allowedRo
       continue;
     }
     const foreign = foreignLoads(compiled.loaded, allowedRoots);
-    css[name] = foreign.length
-      ? {error: `loaded outside the packed package and peers: ${foreign[0]}`}
-      : {css: compiled.css, sha256: sha256Text(compiled.css)};
+    if(foreign.length){css[name]={error:`loaded outside the packed package and peers: ${foreign[0]}`};continue;}
+    css[name]={css:compiled.css,sha256:sha256Text(compiled.css)};
+    const caseId=`mixin-css/${name}`;
+    if(Object.hasOwn(DEFAULT_CORE_CDK_CASES,caseId)){
+      try{
+        if(plan.call!==DEFAULT_CORE_CDK_CASES[caseId].call)throw Error('default core invocation changed');
+        const bases=allowedRoots.map(p=>realpathSync(p));
+        const sources=compiled.loaded.map(url=>{
+          const path=realpathSync(fileURLToPath(url)),index=bases.findIndex(base=>path===base||path.startsWith(base+'/'));
+          if(index<0)throw Error('default core loaded a foreign source');
+          const bytes=readFileSync(path);return {root:index,path:relative(bases[index],path).replaceAll('\\','/'),sha256:sha256Text(bytes),bytes:bytes.length};
+        }).sort((a,b)=>a.root-b.root||a.path.localeCompare(b.path));
+        const program="@use '__entry__' as m;\n"+standardThemeSource()+'\n'+plan.call+'\n';
+        const actual_measurement={line,css:compiled.css,css_sha256:sha256Text(compiled.css),css_bytes:Buffer.byteLength(compiled.css),program_sha256:sha256Text(program),sass_version:sass.info,sources};
+        if(!defaultCoreCdkMeasurementOk(caseId,actual_measurement,line))throw Error('default core measurement incomplete');
+        coreCdkPeer??=measureDefaultCoreCdkPeer({sass,materialRoot:bases[1],cdkRoot:bases[2],line});
+        css[name]={...css[name],actual_measurement,current_infrastructure:{classification:'conforming-current-infrastructure',contract:DEFAULT_CORE_CDK_CONTRACT,peer:coreCdkPeer}};
+      }catch(error){css[name]={error:String(error.message||error)};}
+    }
   }
   return {members, css};
 }
 
-export function apiAssertionBody(result, {oracleSha256, tarballSha256, runId, invocationId}) {
+export function apiAssertionBody(result, {oracleSha256, tarballSha256, runId, invocationId, binding}) {
   const body = {
     case_id: result.case_id,
-    result: 'pass',
+    result: result.result,
     kind: 'assertion',
     group: 'sass-api-and-values',
     check_id: 'sass-seal',
@@ -360,9 +379,10 @@ export function apiAssertionBody(result, {oracleSha256, tarballSha256, runId, in
     oracle: 'compatibility/rc/oracles/material-16.2.14-sass-api.json',
     oracle_sha256: oracleSha256,
   };
-  for (const key of ['expected', 'actual', 'expected_params', 'actual_params', 'expected_sha256', 'actual_sha256', 'expected_bytes', 'actual_bytes']) {
+  for (const key of ['expected', 'actual', 'expected_params', 'actual_params', 'expected_sha256', 'actual_sha256', 'expected_bytes', 'actual_bytes','current_infrastructure','actual_measurement','comparison']) {
     if (result[key] !== undefined) body[key] = result[key];
   }
+  if(result.current_infrastructure){body.binding=binding;body.exit_code=0;}
   return body;
 }
 
@@ -579,7 +599,7 @@ async function main() {
     writeOrderedCssAssertions(outputDir, results);
     writeIsolationNegativeAssertions(outputDir, isolationResults);
     const identity = {
-      oracleSha256: sha256Text(oracleText), tarballSha256: tarballSha, runId, invocationId: invocation,
+      oracleSha256: sha256Text(oracleText), tarballSha256: tarballSha, runId, invocationId: invocation, binding,
     };
     for (const item of functions.results) {
       if (item.result !== 'pass' || !functions.mutation_rejected) continue;

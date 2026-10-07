@@ -133,7 +133,8 @@ def owned_aggregate_receipt(root,active,case,invocation):
     """Synthetic validator input, not an original or candidate Sass observation."""
     raw=(root/'fixtures/sass/owned-aggregate-contracts.json').read_bytes();catalog=json.loads(raw)
     probe=next(p for p in catalog['cases'] if p['case_id']==case)
-    body=mixin_receipt(root,active,'mixin-argument/all-component-themes/custom-full-theme',invocation)
+    # Owned-only synthetic receipts must not inherit current companion CSS.
+    body=mixin_receipt(root,active,'mixin-argument/legacy-card-theme/custom-full-theme',invocation)
     for key in ('mixin','argument'):body.pop(key)
     body.update(probe)
     body['identity'].update(catalog='fixtures/sass/owned-aggregate-contracts.json',catalog_sha256=hashlib.sha256(raw).hexdigest())

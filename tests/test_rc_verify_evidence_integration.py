@@ -389,6 +389,10 @@ class CoordinatorTests(unittest.TestCase):
             elif case_id.startswith('function-value/'):
                 from sass_function_fixture import function_receipt
                 body=function_receipt(ROOT,self.run,case_id,invocation)
+            elif case_id in verify.DEFAULT_CORE_CDK_CASES:
+                from sass_default_core_cdk_fixture import default_core_receipt
+                body=default_core_receipt(self.run,case_id,invocation)
+                if tarball is not None:body['tarball_sha256']=tarball
             elif case_id.startswith(verify._SASS_API_PREFIXES):
                 body.update({
                     "group": "sass-api-and-values", "check_id": "sass-seal", "line": "main",
