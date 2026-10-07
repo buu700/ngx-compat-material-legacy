@@ -33,6 +33,7 @@ import {runMixinArgumentContracts,firstMixinCssDifference} from './sass-mixin-ar
 import {runOwnedAggregateContracts} from './sass-owned-aggregates.mjs';
 import {DEFAULT_CORE_CDK_CASES,DEFAULT_CORE_CDK_CONTRACT,measureDefaultCoreCdkPeer,defaultCoreCdkMeasurementOk} from './sass-default-core-cdk-contract.mjs';
 import {DEFAULT_COMPANION_CASES,DEFAULT_COMPANION_CONTRACT,measureDefaultCompanionPeer,defaultCompanionMeasurementOk} from './sass-default-companion-contract.mjs';
+import {DEFAULT_MAPPED_COMPANION_CASES,DEFAULT_MAPPED_COMPANION_CONTRACT,measureDefaultMappedCompanionPeer,defaultMappedCompanionMeasurementOk} from './sass-default-mapped-companion-contract.mjs';
 import {ownedStyleCaseIds, renderOwnedStyles} from './sass-owned-rendered.mjs';
 import {coordinatorRequest} from './packed-consumer-evidence.mjs';
 import {spawnSync} from 'node:child_process';
@@ -346,14 +347,14 @@ export function runSassApiCss({oracle, entryFile, loadPaths, allowedRoots, line 
     if(foreign.length){css[name]={error:`loaded outside the packed package and peers: ${foreign[0]}`};continue;}
     css[name]={css:compiled.css,sha256:sha256Text(compiled.css)};
     const caseId=`mixin-css/${name}`;
-    const defaultEntry=DEFAULT_CORE_CDK_CASES[caseId]||DEFAULT_COMPANION_CASES[caseId];
+    const defaultEntry=DEFAULT_CORE_CDK_CASES[caseId]||DEFAULT_COMPANION_CASES[caseId]||DEFAULT_MAPPED_COMPANION_CASES[caseId];
     if(defaultEntry){
       try{
         if(plan.call!==defaultEntry.call)throw Error('default invocation changed');
         const bases=allowedRoots.map(p=>realpathSync(p));
         const sources=compiled.loaded.map(url=>{
           const path=realpathSync(fileURLToPath(url)),index=bases.findIndex(base=>path===base||path.startsWith(base+'/'));
-          if(index<0)throw Error('default core loaded a foreign source');
+          if(index<0)throw Error('default Sass loaded a foreign source');
           const bytes=readFileSync(path);return {root:index,path:relative(bases[index],path).replaceAll('\\','/'),sha256:sha256Text(bytes),bytes:bytes.length};
         }).sort((a,b)=>a.root-b.root||a.path.localeCompare(b.path));
         const program="@use '__entry__' as m;\n"+standardThemeSource()+'\n'+plan.call+'\n';
@@ -362,6 +363,10 @@ export function runSassApiCss({oracle, entryFile, loadPaths, allowedRoots, line 
           if(!defaultCoreCdkMeasurementOk(caseId,actual_measurement,line))throw Error('default core measurement incomplete');
           coreCdkPeer??=measureDefaultCoreCdkPeer({sass,materialRoot:bases[1],cdkRoot:bases[2],line});
           css[name]={...css[name],actual_measurement,current_infrastructure:{classification:'conforming-current-infrastructure',contract:DEFAULT_CORE_CDK_CONTRACT,peer:coreCdkPeer}};
+        }else if(Object.hasOwn(DEFAULT_MAPPED_COMPANION_CASES,caseId)){
+          if(!defaultMappedCompanionMeasurementOk(caseId,actual_measurement,line))throw Error('default mapped companion measurement incomplete');
+          const peer=measureDefaultMappedCompanionPeer({sass,materialRoot:bases[1],cdkRoot:bases[2],line,caseId});
+          css[name]={...css[name],actual_measurement,current_companion:{classification:'conforming-current-companion',contract:DEFAULT_MAPPED_COMPANION_CONTRACT,peer}};
         }else{
           if(!defaultCompanionMeasurementOk(caseId,actual_measurement,line))throw Error('default companion measurement incomplete');
           const peer=measureDefaultCompanionPeer({sass,materialRoot:bases[1],cdkRoot:bases[2],line,caseId});

@@ -24,6 +24,7 @@ import {fileURLToPath, pathToFileURL} from 'node:url';
 
 import {DEFAULT_CORE_CDK_CASES,defaultCoreCdkResultsMatch,defaultCoreCdkMeasurementOk,DEFAULT_CORE_CDK_CONTRACT} from './sass-default-core-cdk-contract.mjs';
 import {DEFAULT_COMPANION_CASES,DEFAULT_COMPANION_CONTRACT,defaultCompanionMeasurementOk,defaultCompanionResultsMatch} from './sass-default-companion-contract.mjs';
+import {DEFAULT_MAPPED_COMPANION_CASES,DEFAULT_MAPPED_COMPANION_CONTRACT,defaultMappedCompanionMeasurementOk,defaultMappedCompanionResultsMatch} from './sass-default-mapped-companion-contract.mjs';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const SILENCE = ['import', 'if-function', 'global-builtin', 'color-functions', 'mixed-decls', 'slash-div'];
 const QUIET = {warn() {}, debug() {}};
@@ -406,20 +407,23 @@ export function compareInventory(oracle, candidate, candidateCss) {
     const failure = !got ? 'candidate invocation missing'
       : got.error ? `candidate invocation failed: ${got.error}`
         : Object.hasOwn(got,'current_companion')&&Object.hasOwn(got,'current_infrastructure') ? 'conflicting default contracts'
-        : got.current_infrastructure
+        : Object.hasOwn(got,'current_infrastructure')
           ? (!Object.hasOwn(DEFAULT_CORE_CDK_CASES,`mixin-css/${name}`)
             || !defaultCoreCdkMeasurementOk(`mixin-css/${name}`,got.actual_measurement,got.actual_measurement?.line)
             || !defaultCoreCdkResultsMatch(`mixin-css/${name}`,got,got.current_infrastructure) ? 'finite current CDK contract differs' : null)
-          : got.current_companion
-            ? (!Object.hasOwn(DEFAULT_COMPANION_CASES,`mixin-css/${name}`)
+          : Object.hasOwn(got,'current_companion')
+            ? Object.hasOwn(DEFAULT_MAPPED_COMPANION_CASES,`mixin-css/${name}`)
+              ? (!defaultMappedCompanionMeasurementOk(`mixin-css/${name}`,got.actual_measurement,got.actual_measurement?.line)
+                || !defaultMappedCompanionResultsMatch(`mixin-css/${name}`,got,got.current_companion) ? 'finite default mapped companion contract differs' : null)
+              : (!Object.hasOwn(DEFAULT_COMPANION_CASES,`mixin-css/${name}`)
               || !defaultCompanionMeasurementOk(`mixin-css/${name}`,got.actual_measurement,got.actual_measurement?.line)
               || !defaultCompanionResultsMatch(`mixin-css/${name}`,got,got.current_companion) ? 'finite default companion contract differs' : null)
             : got.sha256 !== invocation.css_sha256 ? 'compiled CSS differs' : null;
     push(`mixin-css/${name}`, failure, {
       invocable: true, expected_sha256: invocation.css_sha256, expected_bytes: invocation.css_bytes,
       actual_sha256: got?.sha256 ?? null, actual_bytes: got?.css === undefined ? null : Buffer.byteLength(got.css),
-      ...(got?.current_infrastructure?{current_infrastructure:got.current_infrastructure,actual_measurement:got.actual_measurement,comparison:DEFAULT_CORE_CDK_CONTRACT}:{}),
-      ...(got?.current_companion?{current_companion:got.current_companion,actual_measurement:got.actual_measurement,comparison:DEFAULT_COMPANION_CONTRACT}:{}),
+      ...(got&&Object.hasOwn(got,'current_infrastructure')?{current_infrastructure:got.current_infrastructure,actual_measurement:got.actual_measurement,comparison:DEFAULT_CORE_CDK_CONTRACT}:{}),
+      ...(got&&Object.hasOwn(got,'current_companion')?{current_companion:got.current_companion,actual_measurement:got.actual_measurement,comparison:Object.hasOwn(DEFAULT_MAPPED_COMPANION_CASES,`mixin-css/${name}`)?DEFAULT_MAPPED_COMPANION_CONTRACT:DEFAULT_COMPANION_CONTRACT}:{}),
     });
   }
   for (const name of Object.keys(om.mixins).sort()) {
