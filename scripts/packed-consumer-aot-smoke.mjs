@@ -481,6 +481,7 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
     'packed-consumer/harness/tab-link-tabindex-attribute': parsed.tabLinkAttribute === true,
     'packed-consumer/harness/peer-icon-literal-sanitization': parsed.peerIconLiteralSanitization === true,
     'packed-consumer/harness/checkbox-node-factory-context': parsed.checkboxNodeFactoryContext === true,
+    'packed-consumer/harness/peer-stepper-abstract-control': parsed.peerStepperAbstractControl === true,
   };
   const owned = declarationKeys(keys)
     .filter(key => key.endsWith('/testing'))
@@ -895,6 +896,8 @@ import 'zone.js';
 import '@angular/compiler';
 import {Component, ElementRef, InjectionToken, ANIMATION_MODULE_TYPE, NgZone, inject, isDevMode, createEnvironmentInjector, createNgModule, EnvironmentInjector} from '@angular/core';
 import {Subject} from 'rxjs';
+import {FormControl, Validators} from '@angular/forms';
+import {MatStepperModule, MatStepper} from '@angular/material/stepper';
 import {BreakpointObserver, BreakpointState} from '@angular/cdk/layout';
 import {FocusMonitor, HighContrastMode, HighContrastModeDetector} from '@angular/cdk/a11y';
 import {
@@ -958,6 +961,7 @@ class SmokeDialogContent {}
     MatLegacyChipsModule,
     MatLegacyRadioModule,
     MatIconModule,
+    MatStepperModule,
     MatLegacyProgressBarModule,
     MatLegacyCheckboxModule,
     MatLegacySlideToggleModule,
@@ -970,6 +974,10 @@ class SmokeDialogContent {}
   template: \`
     <button mat-button id="h">Go</button>
     <button mat-button id="trusted-icon-button"><mat-icon svgIcon="closeout-trusted"></mat-icon>Icon</button>
+    <mat-stepper id="peer-stepper" linear>
+      <mat-step [stepControl]="stepControl"><ng-template matStepLabel>First</ng-template>First step</mat-step>
+      <mat-step><ng-template matStepLabel>Second</ng-template>Second step</mat-step>
+    </mat-stepper>
     <mat-chip id="attribute-chip" tabindex="6">Attribute chip</mat-chip>
     <mat-checkbox id="attribute-checkbox" tabindex="7">Attribute checkbox</mat-checkbox>
     <mat-slide-toggle id="attribute-toggle" tabindex="9">Attribute toggle</mat-slide-toggle>
@@ -1006,6 +1014,7 @@ class SmokeDialogContent {}
   \`,
 })
 class HarnessHost {
+  stepControl = new FormControl('', Validators.required);
   repeatRemovals=0;
   repeatEnds=0;
   private readonly _dialog = inject(MatLegacyDialog);
@@ -1182,6 +1191,25 @@ async function main() {
     &&secondIcon.querySelector('path')?.getAttribute('d')==='M0 0h8v8H0z'
     &&fixture.nativeElement.querySelector('#trusted-icon-button mat-icon svg path')?.getAttribute('d')==='M0 0h8v8H0z';
   const byId=(id:string)=>fixture.debugElement.query(element=>element.nativeElement?.id===id);
+  const stepper=byId('peer-stepper').injector.get(MatStepper);
+  const firstStep=stepper.steps.get(0)!;
+  const stepControl=fixture.componentInstance.stepControl;
+  const stepSelections:number[]=[];
+  const stepSelectionSubscription=stepper.selectionChange.subscribe(event=>stepSelections.push(event.selectedIndex));
+  stepper.selectedIndex=1;
+  const invalidBlocked=stepper.selectedIndex===0&&firstStep.interacted&&firstStep.hasError&&!firstStep.completed;
+  stepControl.setValue('valid');stepControl.markAsPending();
+  stepper.selectedIndex=1;
+  const pendingBlocked=stepper.selectedIndex===0&&stepControl.pending;
+  stepControl.updateValueAndValidity();stepper.selectedIndex=1;
+  const validAdvanced=stepper.selectedIndex===1&&firstStep.completed&&!firstStep.hasError;
+  stepper.reset();
+  const resetRestored=stepper.selectedIndex===0&&stepControl.value===null&&stepControl.invalid
+    &&stepControl.pristine&&stepControl.untouched&&!firstStep.interacted&&!firstStep.completed&&!firstStep.hasError;
+  stepSelectionSubscription.unsubscribe();
+  const peerStepperObservation={invalidBlocked,pendingBlocked,validAdvanced,resetRestored,selections:stepSelections};
+  const peerStepperAbstractControl=invalidBlocked&&pendingBlocked&&validAdvanced&&resetRestored
+    &&JSON.stringify(stepSelections)===JSON.stringify([1,0]);
   const checkboxAttribute=byId('attribute-checkbox').injector.get(MatLegacyCheckbox).tabIndex===7
     &&(fixture.nativeElement.querySelector('#attribute-checkbox input') as HTMLInputElement).tabIndex===7;
   const slideToggleAttribute=byId('attribute-toggle').injector.get(MatLegacySlideToggle).tabIndex===9
@@ -1332,7 +1360,7 @@ async function main() {
       selectOpened === true &&
       selectClosed === true &&
       tabCount === 2 &&
-      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext,
+      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl,
     buttonText: text,
     selectIsOpen: isOpen,
     dialogText,
@@ -1358,6 +1386,7 @@ async function main() {
     peerIconLiteralSanitization,
     checkboxNodeFactoryContext,
     checkboxNodeFactoryObservation,
+    peerStepperAbstractControl, peerStepperObservation,
     checkboxAttribute, slideToggleAttribute, sliderAttribute, tabLinkAttribute,
     commonModuleDiagnostics:{contrastLifecycle,contrastProbeReads,sanityWarnings,checksEnabled,sanityDefault:TestBed.inject(MATERIAL_LEGACY_SANITY_CHECKS),sanityToken:String(MATERIAL_LEGACY_SANITY_CHECKS)},
     chipEventCounts:{removals:fixture.componentInstance.repeatRemovals,separators:fixture.componentInstance.repeatEnds},
