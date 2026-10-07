@@ -1,3 +1,4 @@
+import {announcedChromeEndpoint, debuggerMatchesChild} from './chromium-debug-endpoint.mjs';
 /**
  * Packed CSP page on Chromium plus one server process per public import,
  * testing import, and render family. Hydration is not claimed. The WebKit
@@ -168,7 +169,8 @@ function startServer(consumer) {
 
 async function withChromium(origin, visit) {
   const bin = chromeBin();
-  let port = Number(process.env.CSP_SSR_CDP_PORT || '0');
+  const requestedPort = Number(process.env.CSP_SSR_CDP_PORT || '0');
+  let port = requestedPort;
   if (!Number.isInteger(port) || port < 0 || port > 65535) throw new Error('invalid CSP_SSR_CDP_PORT');
   const userData = mkdtempSync(join(tmpdir(), 'ngx-csp-chrome-'));
   const chrome = spawn(bin, [
@@ -181,17 +183,13 @@ async function withChromium(origin, visit) {
   let version = null;
   for (let i = 0; i < 80 && !version; i += 1) {
     try {
-      if (!port) {
-        const activePort = join(userData, 'DevToolsActivePort');
-        const selected = Number(readFileSync(activePort, 'utf8').split('\n')[0]);
-        if (!Number.isInteger(selected) || selected < 1 || selected > 65535) throw new Error('invalid owned debugging port');
-        port = selected;
-      }
+      // Sandboxed Chromium may keep its profile file in a private /tmp.
+      // Read the unique endpoint from this child's captured stderr instead.
+      const endpoint=announcedChromeEndpoint(log,requestedPort);
+      if (!endpoint) { await sleep(250); continue; }
+      port=endpoint.port;
       const observed = await (await fetch(`http://127.0.0.1:${port}/json/version`)).json();
-      // A fixed port may belong to another process. Connect only after this
-      // child announces the same unique browser debugger endpoint on stderr.
-      if (typeof observed.webSocketDebuggerUrl === 'string' &&
-          log.includes('DevTools listening on '+observed.webSocketDebuggerUrl)) version = observed;
+      if (debuggerMatchesChild(observed,endpoint)) version=observed;
       else await sleep(250);
     } catch { await sleep(250); }
   }
