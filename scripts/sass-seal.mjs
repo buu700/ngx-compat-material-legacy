@@ -31,6 +31,7 @@ import {runFunctionContracts} from './sass-function-contracts.mjs';
 import {runMixinArgumentContracts,firstMixinCssDifference} from './sass-mixin-arguments.mjs';
 import {runOwnedAggregateContracts} from './sass-owned-aggregates.mjs';
 import {DEFAULT_CORE_CDK_CASES,DEFAULT_CORE_CDK_CONTRACT,measureDefaultCoreCdkPeer,defaultCoreCdkMeasurementOk} from './sass-default-core-cdk-contract.mjs';
+import {DEFAULT_COMPANION_CASES,DEFAULT_COMPANION_CONTRACT,measureDefaultCompanionPeer,defaultCompanionMeasurementOk} from './sass-default-companion-contract.mjs';
 import {ownedStyleCaseIds, renderOwnedStyles} from './sass-owned-rendered.mjs';
 import {coordinatorRequest} from './packed-consumer-evidence.mjs';
 import {spawnSync} from 'node:child_process';
@@ -326,10 +327,9 @@ function sha256Text(text) {
   return createHash('sha256').update(text).digest('hex');
 }
 
-/** Candidate inventory and planned invocations through the seal importer and load-URL audit. */
-export function runSassApi({oracle, entryFile, loadPaths, packageRoot, allowedRoots, line = 'main', importer = makeImporter()}) {
+/** Planned CSS measurements only; this grants no variable/signature inventory coverage. */
+export function runSassApiCss({oracle, entryFile, loadPaths, allowedRoots, line = 'main', importer = makeImporter()}) {
   const moduleUrl = pathToFileURL(entryFile).href;
-  const members = inventoryModule({sass, moduleUrl, loadPaths, packageRoot, importers: [importer]});
   const css = {};
   let coreCdkPeer;
   for (const [name, entry] of Object.entries(oracle.members.mixins)) {
@@ -345,9 +345,10 @@ export function runSassApi({oracle, entryFile, loadPaths, packageRoot, allowedRo
     if(foreign.length){css[name]={error:`loaded outside the packed package and peers: ${foreign[0]}`};continue;}
     css[name]={css:compiled.css,sha256:sha256Text(compiled.css)};
     const caseId=`mixin-css/${name}`;
-    if(Object.hasOwn(DEFAULT_CORE_CDK_CASES,caseId)){
+    const defaultEntry=DEFAULT_CORE_CDK_CASES[caseId]||DEFAULT_COMPANION_CASES[caseId];
+    if(defaultEntry){
       try{
-        if(plan.call!==DEFAULT_CORE_CDK_CASES[caseId].call)throw Error('default core invocation changed');
+        if(plan.call!==defaultEntry.call)throw Error('default invocation changed');
         const bases=allowedRoots.map(p=>realpathSync(p));
         const sources=compiled.loaded.map(url=>{
           const path=realpathSync(fileURLToPath(url)),index=bases.findIndex(base=>path===base||path.startsWith(base+'/'));
@@ -356,13 +357,26 @@ export function runSassApi({oracle, entryFile, loadPaths, packageRoot, allowedRo
         }).sort((a,b)=>a.root-b.root||a.path.localeCompare(b.path));
         const program="@use '__entry__' as m;\n"+standardThemeSource()+'\n'+plan.call+'\n';
         const actual_measurement={line,css:compiled.css,css_sha256:sha256Text(compiled.css),css_bytes:Buffer.byteLength(compiled.css),program_sha256:sha256Text(program),sass_version:sass.info,sources};
-        if(!defaultCoreCdkMeasurementOk(caseId,actual_measurement,line))throw Error('default core measurement incomplete');
-        coreCdkPeer??=measureDefaultCoreCdkPeer({sass,materialRoot:bases[1],cdkRoot:bases[2],line});
-        css[name]={...css[name],actual_measurement,current_infrastructure:{classification:'conforming-current-infrastructure',contract:DEFAULT_CORE_CDK_CONTRACT,peer:coreCdkPeer}};
+        if(Object.hasOwn(DEFAULT_CORE_CDK_CASES,caseId)){
+          if(!defaultCoreCdkMeasurementOk(caseId,actual_measurement,line))throw Error('default core measurement incomplete');
+          coreCdkPeer??=measureDefaultCoreCdkPeer({sass,materialRoot:bases[1],cdkRoot:bases[2],line});
+          css[name]={...css[name],actual_measurement,current_infrastructure:{classification:'conforming-current-infrastructure',contract:DEFAULT_CORE_CDK_CONTRACT,peer:coreCdkPeer}};
+        }else{
+          if(!defaultCompanionMeasurementOk(caseId,actual_measurement,line))throw Error('default companion measurement incomplete');
+          const peer=measureDefaultCompanionPeer({sass,materialRoot:bases[1],cdkRoot:bases[2],line,caseId});
+          css[name]={...css[name],actual_measurement,current_companion:{classification:'conforming-current-companion',contract:DEFAULT_COMPANION_CONTRACT,peer}};
+        }
       }catch(error){css[name]={error:String(error.message||error)};}
     }
   }
-  return {members, css};
+  return css;
+}
+
+/** Full production inventory plus every planned invocation,with the same importer. */
+export function runSassApi(options){
+  const importer=options.importer===undefined?makeImporter():options.importer;
+  const members=inventoryModule({sass,moduleUrl:pathToFileURL(options.entryFile).href,loadPaths:options.loadPaths,packageRoot:options.packageRoot,importers:[importer]});
+  return {members,css:runSassApiCss({...options,importer})};
 }
 
 export function apiAssertionBody(result, {oracleSha256, tarballSha256, runId, invocationId, binding}) {
@@ -379,10 +393,10 @@ export function apiAssertionBody(result, {oracleSha256, tarballSha256, runId, in
     oracle: 'compatibility/rc/oracles/material-16.2.14-sass-api.json',
     oracle_sha256: oracleSha256,
   };
-  for (const key of ['expected', 'actual', 'expected_params', 'actual_params', 'expected_sha256', 'actual_sha256', 'expected_bytes', 'actual_bytes','current_infrastructure','actual_measurement','comparison']) {
+  for (const key of ['expected', 'actual', 'expected_params', 'actual_params', 'expected_sha256', 'actual_sha256', 'expected_bytes', 'actual_bytes','current_infrastructure','current_companion','actual_measurement','comparison']) {
     if (result[key] !== undefined) body[key] = result[key];
   }
-  if(result.current_infrastructure){body.binding=binding;body.exit_code=0;}
+  if(result.current_infrastructure||result.current_companion){body.binding=binding;body.exit_code=0;}
   return body;
 }
 
