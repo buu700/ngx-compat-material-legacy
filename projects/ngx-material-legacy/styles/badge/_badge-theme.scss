@@ -28,9 +28,20 @@ $_emit-fallback-vars: true;
   // This mixin isn't used in the context of a theme so we can disable the ampersand check.
   // stylelint-disable material/no-ampersand-beyond-selector-start
   .mat-badge-content {
-    width: $size;
-    height: $size;
-    line-height: $size;
+    // Preserve the historical fallback while letting the current public peer
+    // consume its size and typography overrides through the same selectors.
+    $size-token: legacy-container-size;
+    $line-height-token: line-height;
+    @if $font-size-token == small-size-text-size {
+      $size-token: legacy-small-size-container-size;
+      $line-height-token: small-size-line-height;
+    } @else if $font-size-token == large-size-text-size {
+      $size-token: legacy-large-size-container-size;
+      $line-height-token: large-size-line-height;
+    }
+    width: var(--mat-badge-#{$size-token}, #{$size});
+    height: var(--mat-badge-#{$size-token}, #{$size});
+    line-height: var(--mat-badge-#{$line-height-token}, #{$size});
 
     @if ($font-size-token) {
       @include token-utils.use-tokens(tokens-mat-badge.$prefix,
@@ -107,7 +118,7 @@ $_emit-fallback-vars: true;
     position: absolute;
     text-align: center;
     display: inline-block;
-    border-radius: 50%;
+    border-radius: var(--mat-badge-container-shape, 50%);
     transition: transform 200ms ease-in-out;
     transform: scale(0.6);
     overflow: hidden;
