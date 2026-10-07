@@ -1,3 +1,4 @@
+import {captureMutationObserverCallbacks} from '../../../testing/legacy-runner/mutation-observer';
 import {Direction} from '@angular/cdk/bidi';
 import {END, ENTER, HOME, LEFT_ARROW, RIGHT_ARROW, SPACE} from '@angular/cdk/keycodes';
 import {PortalModule} from '@angular/cdk/portal';
@@ -23,7 +24,7 @@ import {MatRippleModule} from '@angular/material/core';
 import {By} from '@angular/platform-browser';
 import {MatLegacyInkBar} from './ink-bar';
 import {MatLegacyTabHeader} from './tab-header';
-import {ObserversModule, MutationObserverFactory} from '@angular/cdk/observers';
+import {ObserversModule} from '@angular/cdk/observers';
 import {MatLegacyTabLabelWrapper} from '@ngx-compat/material-legacy/legacy-tabs';
 
 describe('MatTabHeader', () => {
@@ -676,15 +677,7 @@ describe('MatTabHeader', () => {
 
     it('should update the pagination state if the content of the labels changes', () => {
       const mutationCallbacks: Function[] = [];
-      TestBed.overrideProvider(MutationObserverFactory, {
-        useValue: {
-          // Stub out the MutationObserver since the native one is async.
-          create: function (callback: Function) {
-            mutationCallbacks.push(callback);
-            return {observe: () => {}, disconnect: () => {}};
-          },
-        },
-      });
+      captureMutationObserverCallbacks(mutationCallbacks);
 
       fixture = TestBed.createComponent(SimpleTabHeaderApp);
       fixture.detectChanges();

@@ -1,4 +1,4 @@
-import {MutationObserverFactory} from '@angular/cdk/observers';
+import {captureMutationObserverCallbacks} from '../../../testing/legacy-runner/mutation-observer';
 import {dispatchFakeEvent} from '../../cdk/testing/private';
 import {Component, DebugElement} from '@angular/core';
 import {
@@ -30,6 +30,7 @@ describe('MatSlideToggle without forms', () => {
 
   beforeEach(fakeAsync(() => {
     mutationObserverCallbacks = [];
+    captureMutationObserverCallbacks(mutationObserverCallbacks);
 
     TestBed.configureTestingModule({
       imports: [MatLegacySlideToggleModule],
@@ -40,17 +41,6 @@ describe('MatSlideToggle without forms', () => {
         SlideToggleProjectedLabel,
         TextBindingComponent,
         SlideToggleWithStaticAriaAttributes,
-      ],
-      providers: [
-        {
-          provide: MutationObserverFactory,
-          useValue: {
-            create: (callback: Function) => {
-              mutationObserverCallbacks.push(callback);
-              return {observe: () => {}, disconnect: () => {}};
-            },
-          },
-        },
       ],
     });
 
