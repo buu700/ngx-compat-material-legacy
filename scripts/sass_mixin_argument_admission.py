@@ -2,6 +2,7 @@
 import hashlib
 import json
 import re
+from sass_sort_companion_admission import SORT_CASES, sort_companion_results_match
 
 def mixin_argument_measurements_ok(root,body,*,owned=False):
     try:
@@ -54,7 +55,9 @@ def mixin_argument_assertion_ok(root,active,body,invocation):
         library=[a for a in active.manifest['artifacts'] if a['id']=='library']
         if len(library)!=1 or body['tarball_sha256']!=library[0]['sha256'] or not mixin_argument_measurements_ok(root,body,owned=owned):return False
         original=body['expected']['css'];actual=body['actual']['css']
-        if original!=actual:return False
+        if body['case_id'] in SORT_CASES:
+            if not sort_companion_results_match(body):return False
+        elif original!=actual or 'current_companion' in body or body.get('comparison','historical-exact')!='historical-exact':return False
         wrong=actual+'\n.wrong-nonempty-mixin { color: red; }\n'
         return wrong!=original and body['mutation']==dict(css=wrong,css_sha256=hashlib.sha256(wrong.encode()).hexdigest(),css_bytes=len(wrong.encode()))
     except (KeyError,TypeError,ValueError,OSError):return False
