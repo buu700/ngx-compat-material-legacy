@@ -7,6 +7,7 @@ from sass_tree_companion_admission import TREE_CASES, tree_companion_results_mat
 from sass_companion_addition_admission import COMPANION_ADDITION_CASES, companion_addition_results_match
 from sass_progress_color_alias_admission import PROGRESS_COLOR_ALIAS_CASES, progress_color_alias_results_match
 from sass_badge_shape_admission import BADGE_SHAPE_CASES, badge_shape_results_match
+from sass_datepicker_controls_admission import DATEPICKER_CONTROLS_CASES, datepicker_controls_results_match
 
 def mixin_argument_measurements_ok(root,body,*,owned=False):
     try:
@@ -70,6 +71,8 @@ def mixin_argument_assertion_ok(root,active,body,invocation):
             if not progress_color_alias_results_match(body):return False
         elif body['case_id'] in BADGE_SHAPE_CASES:
             if not badge_shape_results_match(body):return False
+        elif body['case_id'] in DATEPICKER_CONTROLS_CASES:
+            if not datepicker_controls_results_match(body):return False
         elif original!=actual or 'current_companion' in body or body.get('comparison','historical-exact')!='historical-exact':return False
         wrong=actual+'\n.wrong-nonempty-mixin { color: red; }\n'
         return wrong!=original and body['mutation']==dict(css=wrong,css_sha256=hashlib.sha256(wrong.encode()).hexdigest(),css_bytes=len(wrong.encode()))

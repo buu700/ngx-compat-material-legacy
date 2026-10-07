@@ -605,8 +605,20 @@ $_variants: (accent: secondary, warn: error);
 }
 
 @mixin datepicker($theme) {
-  @include mat.datepicker-overrides(_collect(
-    datepicker, $theme, $datepicker-allowed, meta.get-function('_datepicker-tokens')));
+  // Preserve the public peer's color-variant and typography emission order.
+  $groups: _datepicker-tokens(m2-system.get-system($theme));
+  $root: _qualify(datepicker, map.get($groups, base), $datepicker-allowed);
+  $tail: ();
+  @if theming.get-typography-config($theme) != null {
+    $tail: map.merge($tail, _qualify(datepicker, map.get($groups, typography), $datepicker-allowed));
+  }
+  @if theming.get-color-config($theme) != null {
+    $root: map.merge($root, _qualify(datepicker, map.get($groups, color), $datepicker-allowed));
+  } @else {
+    $root: map.merge($root, $tail);
+    $tail: ();
+  }
+  @include mat.datepicker-overrides($root);
   @if theming.get-color-config($theme) != null {
     $palette-fn: meta.get-function('_datepicker-palette-tokens');
     // Same selector shape and token set as the peer's M2 datepicker color mixin.
@@ -619,6 +631,7 @@ $_variants: (accent: secondary, warn: error);
       }
     }
   }
+  @include mat.datepicker-overrides($tail);
   @if theming.get-density-config($theme) != null {
     // The peer's M2 datepicker density keeps the calendar previous/next icon
     // buttons at density -2 whatever the theme density: touch target hidden,
