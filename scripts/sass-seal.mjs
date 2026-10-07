@@ -27,6 +27,7 @@
  * Does not claim G06–G08.
  */
 import {createHash} from 'node:crypto';
+import {emitMixinMismatchArchive} from './sass-mismatch-diagnostic.mjs';
 import {runFunctionContracts} from './sass-function-contracts.mjs';
 import {runMixinArgumentContracts,firstMixinCssDifference} from './sass-mixin-arguments.mjs';
 import {runOwnedAggregateContracts} from './sass-owned-aggregates.mjs';
@@ -692,6 +693,9 @@ async function main() {
   mkdirSync(dirname(reportPath), {recursive: true});
   writeFileSync(reportPath, JSON.stringify(report, null, 2) + '\n');
   const assertionDir = writeOrderedCssAssertionFiles(orderedCss.results, isolation);
+  if (Array.isArray(functions.mixin_arguments?.results))
+    emitMixinMismatchArchive(functions.mixin_arguments.results,'21.x',tarballSha);
+
   console.log(JSON.stringify({
     ok,
     compiled,
