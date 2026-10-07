@@ -102,7 +102,7 @@ export function parseCustomProperties(css, wrapper) {
   return out;
 }
 
-function themeSass(ns, scenario, {m2Prefix}) {
+export function themeSass(ns, scenario, {m2Prefix}) {
   const pal = (spec) => {
     const [name, ...hues] = spec;
     const args = [`${ns}.$${m2Prefix}${name}-palette`, ...hues].join(', ');

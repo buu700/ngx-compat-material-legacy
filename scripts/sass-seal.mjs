@@ -702,6 +702,8 @@ async function main() {
     owned_aggregate_failures: functions.mixin_arguments?.owned_aggregates?.results.filter(row=>row.result!=='pass').map(row=>({case_id:row.case_id,error:row.error,difference:firstMixinCssDifference(row.expected,row.actual)})) ?? [],
     sass_mixin_argument_cases: functions.mixin_arguments?.results.length ?? 0,
     sass_mixin_argument_passed: functions.mixin_arguments?.results.filter(r=>r.result==='pass').length ?? 0,
+    sass_mixin_argument_historical_exact: functions.mixin_arguments?.results.filter(r=>r.result==='pass'&&r.comparison==='historical-exact').length ?? 0,
+    sass_mixin_argument_current_companion: functions.mixin_arguments?.results.filter(r=>r.result==='pass'&&r.comparison==='current-companion-contract').length ?? 0,
     sass_mixin_argument_failures: functions.mixin_arguments?.results.filter(r=>r.result!=='pass').map(r=>({case_id:r.case_id,error:r.error,expected_sha256:r.expected?.css_sha256??null,actual_sha256:r.actual?.css_sha256??null})) ?? [],
     sass_mixin_argument_difference_previews: functions.mixin_arguments?.results.filter(r=>r.result!=='pass').slice(0,40).map(r=>({case_id:r.case_id,difference:firstMixinCssDifference(r.expected,r.actual)})) ?? [],
     sass_function_cases: functions.results.length,

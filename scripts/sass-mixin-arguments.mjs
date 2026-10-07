@@ -4,6 +4,7 @@ import {readFileSync,realpathSync} from 'node:fs';
 import {dirname,isAbsolute,join,relative,resolve} from 'node:path';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 import {SILENCE,THEME_PARAMS} from './sass-api-inventory.mjs';
+import {measureSortPeer,sortCompanionResultsMatch,SORT_COMPANION_CASES} from './sass-sort-companion-contract.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 export const MIXIN_ARGUMENT_CATALOG='fixtures/sass/mixin-argument-contracts.json';
@@ -65,16 +66,25 @@ export function runMixinArgumentContracts({sass,entry,loadPaths,allowedRoots,imp
   const catalog=mixinArgumentCatalog();
   const provenance={...identity,catalog:MIXIN_ARGUMENT_CATALOG,catalog_sha256:catalog.sha256};
   const results=catalog.cases.map(probe=>{
-    let expected,actual,error;
+    let expected,actual,error,current_companion;
     try {
       expected=measureMixinArgument(sass,referenceEntry,[referenceRoot],catalog,probe,[referenceRoot]);
       actual=measureMixinArgument(sass,entry,loadPaths,catalog,probe,allowedRoots,importers);
+      if (Object.hasOwn(SORT_COMPANION_CASES,probe.case_id)) {
+        const peer=measureSortPeer({sass,materialRoot:allowedRoots[1],cdkRoot:allowedRoots[2],caseId:probe.case_id,line});
+        current_companion={classification:'conforming-current-companion',contract:'current-sort-color-with-original-fallback',peer};
+      }
     }catch(caught){error=String(caught.message || caught);}
     const wrongCss=(actual?.css || '')+'\n.wrong-nonempty-mixin { color: red; }\n';
     const mutation={css:wrongCss,css_sha256:sha(wrongCss),css_bytes:Buffer.byteLength(wrongCss)};
-    const mutation_rejected=Boolean(expected && actual && !mixinArgumentResultsMatch(expected,mutation));
+    const conforms=value=>Object.hasOwn(SORT_COMPANION_CASES,probe.case_id)
+      ? sortCompanionResultsMatch(probe.case_id,expected,value,current_companion?.peer)
+      : mixinArgumentResultsMatch(expected,value);
+    const mutation_rejected=Boolean(expected && actual && !conforms(mutation));
+    const exact=mixinArgumentResultsMatch(expected,actual);
     return {...probe,line,expected,actual,error:error??null,identity:provenance,mutation,mutation_rejected,
-      result:!error && mixinArgumentResultsMatch(expected,actual) && mutation_rejected?'pass':'fail'};
+      ...(current_companion?{current_companion}:{}),comparison:current_companion?'current-companion-contract':exact?'historical-exact':'historical-mismatch',
+      result:!error && conforms(actual) && mutation_rejected?'pass':'fail'};
   });
   return {results,identity:provenance,ok:results.length===498 && results.every(r=>r.result==='pass')};
 }
