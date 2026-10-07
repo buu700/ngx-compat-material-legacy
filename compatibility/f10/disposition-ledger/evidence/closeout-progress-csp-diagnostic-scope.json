@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-07T04:53:31.083202+00:00",
+  "reviewer": "Codex primary implementer",
+  "reviews": [
+    {
+      "sha": "cf3506adf1af1556d705dbb651e7e96a7141b81d",
+      "patch": "compatibility/f10/disposition-ledger/evidence/patches/cf3506adf1af1556d705dbb651e7e96a7141b81d-whole-progress-csp.patch",
+      "sha256": "ac40f67f91d66f4db48b1010cec6b139dd12c8159ec0560112e9fd45c6581422",
+      "reviewed_changed_paths": [
+        "src/material/progress-bar/progress-bar.html"
+      ]
+    },
+    {
+      "sha": "878700d10ab042b6a62c6f86f4fcc24d5a0ae685",
+      "patch": "compatibility/f10/disposition-ledger/evidence/patches/878700d10ab042b6a62c6f86f4fcc24d5a0ae685-whole-progress-csp.patch",
+      "sha256": "3957e7bb1013644d76abf27b409c7ad0b1532a3308c7f9173f3acf53cd7a1e5d",
+      "reviewed_changed_paths": [
+        "src/material/progress-bar/progress-bar.scss"
+      ]
+    }
+  ],
+  "owned_source_sha256": {
+    "projects/ngx-material-legacy/styles/progress-bar/_progress-bar-theme.scss": "bdd416333ed093e0d67e3465d0a2f73aad6cf1af77cf0094710e68c95890f93e",
+    "projects/ngx-material-legacy/styles/vendor/mdc/linear-progress/_linear-progress-theme.scss": "8f0f8ceb75f565514e11e4579cdfe3a4378255ee4c1b736af589d180156cf802",
+    "projects/ngx-material-legacy/styles/vendor/mdc/dom/_dom.scss": "316b7d43f65b4e053e0eda8cadefd01e597b69ba5749c8c95e9378951ed0f7b7",
+    "projects/ngx-material-legacy/legacy-progress-bar/progress-bar.html": "00f81e3d99f77d0157c006d81f251a6325b26773885dd76c355720a0bf89ff8a"
+  },
+  "source_findings": [
+    "First original hunk removes current MDC buffer-dot elements outside buffer mode; second replaces its SVG data-URI mask with a radial gradient. Neither original patch targets the owned legacy inline SVG template.",
+    "The exported independently owned ordinary progress-bar theme calls vendored linear-progress buffer-color. Its data-SVG background-image is inside dom.ie11-support, whose exact media condition is all and (-ms-high-contrast: none), (-ms-high-contrast: active). Source presence alone therefore does not establish an applied current-browser data-URI style or a CSP violation.",
+    "No production theme, vendor source, golden, selector or namespace changed. Actual current companion and legacy buffer CSP interactions remain to be measured separately on each line."
+  ],
+  "native_probe": {
+    "producer": "scripts/browser-surface-families.mjs",
+    "observation": "progress_csp",
+    "status": "pending Actions",
+    "scope": "Current public MatProgressBar in separate component/module scope, determinate/buffer/query/indeterminate plus owned legacy buffer. Packed exported progress-bar and legacy-progress-bar Sass is actually compiled and loaded. Served img-src none; intentionally blocked fixed data SVG confirms native enforcement. Records computed buffer-dot background/mask, actual IE media match, legacy inline SVG and positive image violations.",
+    "acceptance_credit": false,
+    "limitations": [
+      "Not enabled motion, all browsers, arbitrary theme inputs, complete CSP or security clearance.",
+      "No terminal audit disposition until actual native observations and branch-specific source/behavior review."
+    ]
+  },
+  "g11_claim": "not-passed"
+}

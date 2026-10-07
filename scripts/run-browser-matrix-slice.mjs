@@ -392,6 +392,11 @@ for (const scenario of scenarios) {
       scenario:scenario.id,observation:detail.peer_media_matcher,
     }));
   }
+  if (detail?.progress_csp) {
+    console.log('progress-bar CSP diagnostic (no acceptance credit): '+JSON.stringify({
+      scenario:scenario.id,observation:detail.progress_csp,
+    }));
+  }
   const ok = result.status === 0 && detail && scenario.require(detail);
   const entry = {
     scenario: scenario.id,

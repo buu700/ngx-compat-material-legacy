@@ -29,7 +29,7 @@ import {createServer} from 'node:http';
 import {existsSync, mkdtempSync, mkdirSync, readFileSync, realpathSync, writeFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {dirname, join, relative, resolve} from 'node:path';
-import {fileURLToPath} from 'node:url';
+import {fileURLToPath, pathToFileURL} from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 let reportPath = join(root, 'compatibility/rc/reports/browser-surface-families.json');
@@ -108,18 +108,46 @@ if (install.status !== 0) fail(1, (install.stderr || install.stdout || 'npm inst
 const installed = realpathSync(join(consumer, 'node_modules/@ngx-compat/material-legacy'));
 if (relative(realpathSync(consumer), installed).startsWith('..')) fail(1, `Library resolved outside the consumer: ${installed}`);
 
+// Compile the exported ordinary and legacy progress-bar themes from the packed
+// consumer. The historical IE-only data URI stays intact for this diagnostic.
+const progressSass = createRequire(join(root, 'package.json'))('sass');
+const progressCss = progressSass.compileString(`
+@use '@ngx-compat/material-legacy' as legacy;
+$primary: legacy.define-palette(legacy.$indigo-palette);
+$accent: legacy.define-palette(legacy.$pink-palette, A200, A100, A400);
+$theme: legacy.define-light-theme((color: (primary: $primary, accent: $accent)));
+@include legacy.progress-bar-theme($theme);
+@include legacy.legacy-progress-bar-theme($theme);
+`, {loadPaths:[join(consumer,'node_modules')],url:pathToFileURL(join(consumer,'progress-csp.scss')),
+  silenceDeprecations:['if-function','global-builtin','color-functions','import']}).css;
+
 mkdirSync(join(consumer, 'src'), {recursive: true});
 writeFileSync(join(consumer, 'src/main.ts'), `${zoneless ? '' : `import 'zone.js';
 `}import {Component, NgModule, inject${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';
 import {BrowserModule, DomSanitizer} from '@angular/platform-browser';
 import {MatIconModule, MatIconRegistry} from '@angular/material/icon';
 import {MediaMatcher} from '@angular/cdk/layout';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {MATERIAL_ANIMATIONS} from '@angular/material/core';
 import {MatLegacyButtonModule} from '@ngx-compat/material-legacy/legacy-button';
 import {MatLegacyCardModule} from '@ngx-compat/material-legacy/legacy-card';
 import {MatLegacyProgressBarModule} from '@ngx-compat/material-legacy/legacy-progress-bar';
 import {MatLegacyProgressSpinnerModule} from '@ngx-compat/material-legacy/legacy-progress-spinner';
+
+@Component({
+  standalone: false,
+  selector: 'peer-progress-csp',
+  template: \`
+    <mat-progress-bar id="peer-progress-determinate" mode="determinate" [value]="40"></mat-progress-bar>
+    <mat-progress-bar id="peer-progress-buffer" mode="buffer" [value]="40" [bufferValue]="65"></mat-progress-bar>
+    <mat-progress-bar id="peer-progress-query" mode="query"></mat-progress-bar>
+    <mat-progress-bar id="peer-progress-indeterminate" mode="indeterminate"></mat-progress-bar>
+  \`,
+})
+export class PeerProgressCsp {}
+@NgModule({imports:[MatProgressBarModule],declarations:[PeerProgressCsp],exports:[PeerProgressCsp]})
+export class PeerProgressCspModule {}
 
 @Component({
   standalone: false,
@@ -136,6 +164,8 @@ import {MatLegacyProgressSpinnerModule} from '@ngx-compat/material-legacy/legacy
     </mat-card>
 
     <mat-progress-bar id="progress-bar-default" mode="determinate" [value]="40"></mat-progress-bar>
+    <mat-progress-bar id="legacy-progress-buffer" mode="buffer" [value]="40" [bufferValue]="65"></mat-progress-bar>
+    <peer-progress-csp></peer-progress-csp>
     <mat-progress-spinner id="progress-spinner-default" mode="determinate" [value]="55" diameter="48"></mat-progress-spinner>
   \`,
 })
@@ -151,6 +181,7 @@ export class LabRoot {
   imports: [
     BrowserModule,
     MatIconModule,
+    PeerProgressCspModule,
     MatLegacyButtonModule,
     MatLegacyCardModule,
     MatLegacyProgressBarModule,
@@ -230,15 +261,17 @@ if (bundleDeclares || bundleCompilerImport || (zoneless && bundleHasZone)) {
   fail(1, `bundle partial=${bundleDeclares} compiler=${bundleCompilerImport} zone=${bundleHasZone}`);
 }
 writeFileSync(join(consumer, 'dist/index.html'),
-  `<!doctype html><html><body><lab-root></lab-root><script src="/app.js"></script></body></html>\n`);
+  `<!doctype html><html><head><link rel="stylesheet" href="/progress.css"></head><body><lab-root></lab-root><script src="/app.js"></script></body></html>\n`);
+
+writeFileSync(join(consumer,'dist/progress.css'),progressCss);
 
 const server = createServer((req, res) => {
   const file = req.url === '/' ? 'index.html' : req.url.split('?')[0].replace(/^\//, '');
   try {
     const body = readFileSync(join(consumer, 'dist', file));
     res.writeHead(200, {
-      'content-type': file.endsWith('.js') ? 'text/javascript' : 'text/html',
-      'content-security-policy': PEER_ICON_TT_CSP,
+      'content-type': file.endsWith('.js') ? 'text/javascript' : file.endsWith('.css') ? 'text/css' : 'text/html',
+      'content-security-policy': PEER_ICON_TT_CSP + "; img-src 'none'",
     });
     res.end(body);
   } catch {
@@ -327,12 +360,13 @@ let diagnostic = null;
 let zoneGlobal = null;
 let peerIconTt = null;
 let peerMediaMatcher = null;
+let progressCsp = null;
 
 try {
   await send('Runtime.enable');
   await send('Page.enable');
   await send('Page.addScriptToEvaluateOnNewDocument', {
-    source: 'window.__errors=[];window.__ttViolations=[];window.addEventListener("error",e=>window.__errors.push(String(e.message)));window.addEventListener("securitypolicyviolation",e=>window.__ttViolations.push(e.violatedDirective));',
+    source: 'window.__errors=[];window.__ttViolations=[];window.__cspDetails=[];window.addEventListener("error",e=>window.__errors.push(String(e.message)));window.addEventListener("securitypolicyviolation",e=>{window.__ttViolations.push(e.violatedDirective);window.__cspDetails.push({directive:e.violatedDirective,blocked:e.blockedURI});});',
   });
   await send('Page.reload', {ignoreCache: true});
   await waitFor('!!document.getElementById("button-default") || !!document.getElementById("bootstrap-error")');
@@ -358,6 +392,27 @@ try {
       && negativeViolations.includes('require-trusted-types-for') && negativeViolations.includes('trusted-types'),
     observed_negative_directives: negativeViolations,
   });
+
+  progressCsp = await evaluate(`(() => {
+    const modes={};
+    for(const mode of ['determinate','buffer','query','indeterminate']){
+      const host=document.getElementById('peer-progress-'+mode);
+      const dots=host?.querySelector('.mdc-linear-progress__buffer-dots');
+      const style=dots?getComputedStyle(dots):null;
+      modes[mode]={present:!!host,dots_present:!!dots,background_image:style?.backgroundImage??null,
+        mask_image:style?.maskImage??null,background_color:style?.backgroundColor??null};
+    }
+    return {modes,ie11_media_matches:matchMedia('all and (-ms-high-contrast: none), (-ms-high-contrast: active)').matches,
+      legacy_buffer_inline_svg:!!document.querySelector('#legacy-progress-buffer svg pattern circle'),
+      positive_violations:(window.__cspDetails||[]).filter(row=>row.directive==='img-src')};
+  })()`);
+  // One intentionally blocked data image confirms this actual browser enforces
+  // img-src 'none'; keep its violation separate from the positive observations.
+  await evaluate(`(() => {const image=new Image();image.src='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg"/%3E';})()`);
+  await sleep(100);
+  progressCsp.negative_data_image_blocked = await evaluate(`(window.__cspDetails||[]).some(row=>row.directive==='img-src'&&row.blocked==='data')`);
+  progressCsp.compiled_css_sha256 = createHash('sha256').update(progressCss).digest('hex');
+  progressCsp.historical_data_uri_retained = progressCss.includes('data:image/svg+xml');
 
   // Security diagnostic only: a fixed CSS custom-property marker, no URL or
   // script payload. This tests the public peer path; it earns no matrix credit
@@ -468,6 +523,7 @@ const report = {
   families,
   peer_icon_tt: peerIconTt,
   peer_media_matcher: peerMediaMatcher,
+  progress_csp: progressCsp,
   credited_cell_ids: ok ? cells : [],
   matrix_updated: false,
   error,
@@ -485,6 +541,7 @@ const report = {
     'Success is not copied to unexecuted cells.',
     'Peer icon TT probe uses actual Chromium require-trusted-types-for enforcement and an allowed Angular policy list; this is not a full script/style/network CSP matrix or arbitrary SVG trust audit.',
     'Public MediaMatcher unsafe-query diagnostic uses one fixed reversible CSS marker; it earns no acceptance/matrix credit and does not establish an owned input path or security clearance.',
+    'Progress CSP diagnostic covers four current modes and legacy buffer with the actual packed exported themes, img-src none and a blocked data-image negative; it earns no acceptance/matrix credit or complete CSP/motion qualification.',
     'Does not claim G10.',
   ],
 };
@@ -499,6 +556,7 @@ console.log(JSON.stringify({
   families,
   peer_icon_tt: peerIconTt,
   peer_media_matcher: peerMediaMatcher,
+  progress_csp: progressCsp,
   error,
   credited_cell_ids: report.credited_cell_ids,
 }, null, 2));
