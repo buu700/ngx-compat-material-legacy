@@ -1,17 +1,53 @@
+// Copyright Google LLC All Rights Reserved.
+// Copyright (c) 2026 Ryan Lester.
+// Use of this source code is governed by the MIT license in LICENSE.
+
 @use '../bridges/companion-overrides' as bridges;
 @use 'sass:color';
 @use 'sass:map';
 @use 'sass:meta';
 @use '../core/theming/theming';
 
+@mixin _m2-color($config-or-theme) {
+  $config: theming.get-color-config($config-or-theme);
+  $background: map.get($config, background);
+  $foreground: map.get($config, foreground);
+
+  .mat-sort-header-arrow {
+    $table-background: theming.get-color-from-palette($background, 'card');
+    $text-color: theming.get-color-from-palette($foreground, secondary-text);
+
+    // Because the arrow is made up of multiple elements that are stacked on top of each other,
+    // we can't use the semi-transparent color from the theme directly. If the value is a color
+    // *type*, we convert it into a solid color by taking the opacity from the rgba value and
+    // using the value to determine the percentage of the background to put into foreground
+    // when mixing the colors together. Otherwise, if it resolves to something different
+    // (e.g. it resolves to a CSS variable), we use the color directly.
+    @if (meta.type-of($table-background) == color and meta.type-of($text-color) == color) {
+      $text-opacity: color.opacity($text-color);
+      color: var(--mat-sort-arrow-color,
+        #{color.mix($table-background, rgba($text-color, 1), (1 - $text-opacity) * 100%)});
+    }
+    @else {
+      color: var(--mat-sort-arrow-color, #{$text-color});
+    }
+  }
+}
+
+@mixin _m2-typography($config-or-theme) {}
+
+@mixin _m2-density($config-or-theme) {}
+
 @mixin color($config-or-theme) {
+  // 16.2.14 color rules, then the companion bridge. The bridge re-emits
+  // historical declarations, so it stays a separate insertion.
+  @include _m2-color($config-or-theme);
   @include bridges.sort((
     color: theming.get-color-config($config-or-theme),
     typography: null,
     density: null
   ));
 }
-
 
 @mixin typography($config-or-theme) {
   @include bridges.sort((
@@ -21,7 +57,6 @@
   ));
 }
 
-
 @mixin density($config-or-theme) {
   @include bridges.sort((
     color: null,
@@ -30,11 +65,23 @@
   ));
 }
 
-
 @mixin theme($theme-or-color-config) {
   $theme: theming.private-legacy-get-theme($theme-or-color-config);
   @include theming.private-check-duplicate-theme-styles($theme, 'mat-sort') {
+    $color: theming.get-color-config($theme);
+    $density: theming.get-density-config($theme);
+    $typography: theming.get-typography-config($theme);
+
+    @if $color != null {
+      @include _m2-color($color);
+    }
+    @if $density != null {
+      @include _m2-density($density);
+    }
+    @if $typography != null {
+      @include _m2-typography($typography);
+    }
+    // Companion bridge stays. Its rules follow the 16.2.14 rules.
     @include bridges.sort($theme);
   }
 }
-

@@ -1,17 +1,36 @@
+// Copyright Google LLC All Rights Reserved.
+// Copyright (c) 2026 Ryan Lester.
+// Use of this source code is governed by the MIT license in LICENSE.
+
 @use '../bridges/companion-overrides' as bridges;
 @use '../core/style/sass-utils';
 @use '../core/theming/theming';
 @use '../core/tokens/token-utils';
 @use '../core/tokens/m2/mat/divider' as tokens-mat-divider;
 
+@mixin _m2-color($config-or-theme) {
+  $config: theming.get-color-config($config-or-theme);
+
+  @include sass-utils.current-selector-or-root() {
+    @include token-utils.create-token-values(tokens-mat-divider.$prefix,
+            tokens-mat-divider.get-color-tokens($config));
+  }
+}
+
+@mixin _m2-typography($config-or-theme) {}
+
+@mixin _m2-density($config-or-theme) {}
+
 @mixin color($config-or-theme) {
+  // 16.2.14 color rules, then the companion bridge. The bridge re-emits
+  // historical declarations, so it stays a separate insertion.
+  @include _m2-color($config-or-theme);
   @include bridges.divider((
     color: theming.get-color-config($config-or-theme),
     typography: null,
     density: null
   ));
 }
-
 
 @mixin typography($config-or-theme) {
   @include bridges.divider((
@@ -21,7 +40,6 @@
   ));
 }
 
-
 @mixin density($config-or-theme) {
   @include bridges.divider((
     color: null,
@@ -30,11 +48,23 @@
   ));
 }
 
-
 @mixin theme($theme-or-color-config) {
   $theme: theming.private-legacy-get-theme($theme-or-color-config);
   @include theming.private-check-duplicate-theme-styles($theme, 'mat-divider') {
+    $color: theming.get-color-config($theme);
+    $density: theming.get-density-config($theme);
+    $typography: theming.get-typography-config($theme);
+
+    @if $color != null {
+      @include _m2-color($color);
+    }
+    @if $density != null {
+      @include _m2-density($density);
+    }
+    @if $typography != null {
+      @include _m2-typography($typography);
+    }
+    // Companion bridge stays. Its rules follow the 16.2.14 rules.
     @include bridges.divider($theme);
   }
 }
-
