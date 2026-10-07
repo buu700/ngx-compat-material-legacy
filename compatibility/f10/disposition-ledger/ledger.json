@@ -4,8 +4,8 @@
   "g11_claim": "not-passed",
   "seed_rows": 1697,
   "ledger_rows": 1697,
-  "closed_dispositions": 1691,
-  "open_or_deferred": 6,
+  "closed_dispositions": 1692,
+  "open_or_deferred": 5,
   "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
   "batch_id": "unread-seed-content-review-2026-10-02",
   "entries": [
@@ -39907,13 +39907,13 @@
         "src/material/stepper/stepper.md"
       ],
       "diff_sha256": "c5d9d8d2bcde4f898da6f9d336da21b3699c8c0cdbedbac12bd389a181c8f0a0",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-stepper-and-demo-source-review.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-stepper-classic-control-decision.json",
       "batch_id": "closeout-stepper-and-demo-source-review",
-      "recorded_at_utc": "2026-10-07T03:41:21.974067+00:00",
+      "recorded_at_utc": "2026-10-07T04:09:38.641544+00:00",
       "g11_claim": "not-passed",
-      "final_disposition": "needs-individual-review",
+      "final_disposition": "do-not-adopt",
       "read_note_disposition": "whole-patch-unshipped-guidance-and-demo-review",
-      "reason": "Complete seven-path patch read: contrary to the filtered markdown seed, this includes production CdkStep/CdkStepper and public declaration changes. StepControl widens AbstractControl to Field, and valid/invalid/pending/reset operations branch on callable field values; linear navigation and completed/error behavior are affected. Authentic pinned CDK21.2.14 declares AbstractControl, while22.1.7 declares the union. The add-on owns stepper Sass but delegates ordinary stepper behavior. No modern API mirror or younger21.x peer is authorized. Reopen main prior irrelevant disposition: public AbstractControl navigation/completion/error/reset compatibility on both minimum peers still needs individual behavior evidence before terminal disposition. Signal-form support absent at21 minimum is not itself a legacy regression.",
+      "reason": "The complete original seven-path production/API/demo patch is reviewed individually. Its callable Field branch adds modern signal-form support; this does not authorize copying a CDK stepper or a modern legacy API mirror, and that branch is absent at21.2.14 minimum. The noncallable AbstractControl valid/invalid/pending/reset logic retains the original16 contract: invalid/pending controls block linear navigation, valid controls complete/advance, and reset clears interaction/error/completion and form state while selecting zero. Those expectations were read from untouched CDK16.2.14, not generated from the candidate. A real public MatStepper with FormControl in the packed legacy consumer executes all four transitions and selection events[1,0] on both exact minimum CDK/Material peers; both78-case packed-consumer checks pass. Do not adopt the modern Field API or fork the ordinary stepper into the add-on. This is a bounded disposition of this patch and its classic-control path, not full stepper accessibility/motion/signal-form support, all consumer floors or G11 qualification.",
       "prior_dispositions": [
         {
           "sha": "0e34c64d0cc96cd3cc8f19dea06f58a0ad4d8b59",
@@ -39936,6 +39936,71 @@
           "final_disposition": "not-applicable",
           "read_note_disposition": "not-owned",
           "reason": "The diff in src/cdk/stepper/stepper.ts changes `export type StepControl = AbstractControl | Field<unknown>;`. The changed paths are absent from projects/ngx-material-legacy, and no legacy source imports that entry point. Docs, examples, dev-app, goldens, and tooling-only hunks do not change the shipped legacy contract."
+        },
+        {
+          "sha": "0e34c64d0cc96cd3cc8f19dea06f58a0ad4d8b59",
+          "bucket": "behavior-semantic",
+          "subject": "fix(cdk/stepper): allow signal form to be assigned as stepControl (#33562)",
+          "files": [
+            "goldens/cdk/stepper/index.api.md",
+            "src/cdk/stepper/stepper.ts",
+            "src/components-examples/material/stepper/index.ts",
+            "src/components-examples/material/stepper/stepper-signal-forms/stepper-signal-forms-example.css",
+            "src/components-examples/material/stepper/stepper-signal-forms/stepper-signal-forms-example.html",
+            "src/components-examples/material/stepper/stepper-signal-forms/stepper-signal-forms-example.ts",
+            "src/material/stepper/stepper.md"
+          ],
+          "diff_sha256": "c5d9d8d2bcde4f898da6f9d336da21b3699c8c0cdbedbac12bd389a181c8f0a0",
+          "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-stepper-and-demo-source-review.json",
+          "batch_id": "closeout-stepper-and-demo-source-review",
+          "recorded_at_utc": "2026-10-07T03:41:21.974067+00:00",
+          "g11_claim": "not-passed",
+          "final_disposition": "needs-individual-review",
+          "read_note_disposition": "whole-patch-unshipped-guidance-and-demo-review",
+          "reason": "Complete seven-path patch read: contrary to the filtered markdown seed, this includes production CdkStep/CdkStepper and public declaration changes. StepControl widens AbstractControl to Field, and valid/invalid/pending/reset operations branch on callable field values; linear navigation and completed/error behavior are affected. Authentic pinned CDK21.2.14 declares AbstractControl, while22.1.7 declares the union. The add-on owns stepper Sass but delegates ordinary stepper behavior. No modern API mirror or younger21.x peer is authorized. Reopen main prior irrelevant disposition: public AbstractControl navigation/completion/error/reset compatibility on both minimum peers still needs individual behavior evidence before terminal disposition. Signal-form support absent at21 minimum is not itself a legacy regression.",
+          "prior_dispositions": [
+            {
+              "sha": "0e34c64d0cc96cd3cc8f19dea06f58a0ad4d8b59",
+              "bucket": "behavior-semantic",
+              "subject": "fix(cdk/stepper): allow signal form to be assigned as stepControl (#33562)",
+              "files": [
+                "goldens/cdk/stepper/index.api.md",
+                "src/cdk/stepper/stepper.ts",
+                "src/components-examples/material/stepper/index.ts",
+                "src/components-examples/material/stepper/stepper-signal-forms/stepper-signal-forms-example.css",
+                "src/components-examples/material/stepper/stepper-signal-forms/stepper-signal-forms-example.html",
+                "src/components-examples/material/stepper/stepper-signal-forms/stepper-signal-forms-example.ts",
+                "src/material/stepper/stepper.md"
+              ],
+              "diff_sha256": "c5d9d8d2bcde4f898da6f9d336da21b3699c8c0cdbedbac12bd389a181c8f0a0",
+              "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/0e34c64d0cc96cd3cc8f19dea06f58a0ad4d8b59.json",
+              "batch_id": "unread-seed-content-review-2026-10-02",
+              "recorded_at_utc": "2026-10-02T18:49:16Z",
+              "g11_claim": "not-passed",
+              "final_disposition": "not-applicable",
+              "read_note_disposition": "not-owned",
+              "reason": "The diff in src/cdk/stepper/stepper.ts changes `export type StepControl = AbstractControl | Field<unknown>;`. The changed paths are absent from projects/ngx-material-legacy, and no legacy source imports that entry point. Docs, examples, dev-app, goldens, and tooling-only hunks do not change the shipped legacy contract."
+            }
+          ],
+          "review_depth": "individual-escalated",
+          "affected_branches": [
+            "main",
+            "21.x"
+          ],
+          "source_check": {
+            "diff_sha256": "948bd43bb6c3648a33ab065403a44bc2825f9c5af86630837e25792db2f834fe",
+            "patch_path": "compatibility/f10/disposition-ledger/evidence/closeout-stepper-and-demo-source-review.json",
+            "review_membership": "0e34c64d0cc96cd3cc8f19dea06f58a0ad4d8b59"
+          },
+          "individual_proof": {
+            "diff_sha256": "948bd43bb6c3648a33ab065403a44bc2825f9c5af86630837e25792db2f834fe",
+            "review_depth": "individual-escalated",
+            "affected_branches": [
+              "main",
+              "21.x"
+            ],
+            "decision": "Complete seven-path patch read: contrary to the filtered markdown seed, this includes production CdkStep/CdkStepper and public declaration changes. StepControl widens AbstractControl to Field, and valid/invalid/pending/reset operations branch on callable field values; linear navigation and completed/error behavior are affected. Authentic pinned CDK21.2.14 declares AbstractControl, while22.1.7 declares the union. The add-on owns stepper Sass but delegates ordinary stepper behavior. No modern API mirror or younger21.x peer is authorized. Reopen main prior irrelevant disposition: public AbstractControl navigation/completion/error/reset compatibility on both minimum peers still needs individual behavior evidence before terminal disposition. Signal-form support absent at21 minimum is not itself a legacy regression."
+          }
         }
       ],
       "review_depth": "individual-escalated",
@@ -39945,7 +40010,7 @@
       ],
       "source_check": {
         "diff_sha256": "948bd43bb6c3648a33ab065403a44bc2825f9c5af86630837e25792db2f834fe",
-        "patch_path": "compatibility/f10/disposition-ledger/evidence/closeout-stepper-and-demo-source-review.json",
+        "patch_path": "compatibility/f10/disposition-ledger/evidence/closeout-stepper-classic-control-decision.json",
         "review_membership": "0e34c64d0cc96cd3cc8f19dea06f58a0ad4d8b59"
       },
       "individual_proof": {
@@ -39955,7 +40020,12 @@
           "main",
           "21.x"
         ],
-        "decision": "Complete seven-path patch read: contrary to the filtered markdown seed, this includes production CdkStep/CdkStepper and public declaration changes. StepControl widens AbstractControl to Field, and valid/invalid/pending/reset operations branch on callable field values; linear navigation and completed/error behavior are affected. Authentic pinned CDK21.2.14 declares AbstractControl, while22.1.7 declares the union. The add-on owns stepper Sass but delegates ordinary stepper behavior. No modern API mirror or younger21.x peer is authorized. Reopen main prior irrelevant disposition: public AbstractControl navigation/completion/error/reset compatibility on both minimum peers still needs individual behavior evidence before terminal disposition. Signal-form support absent at21 minimum is not itself a legacy regression."
+        "decision": "The complete original seven-path production/API/demo patch is reviewed individually. Its callable Field branch adds modern signal-form support; this does not authorize copying a CDK stepper or a modern legacy API mirror, and that branch is absent at21.2.14 minimum. The noncallable AbstractControl valid/invalid/pending/reset logic retains the original16 contract: invalid/pending controls block linear navigation, valid controls complete/advance, and reset clears interaction/error/completion and form state while selecting zero. Those expectations were read from untouched CDK16.2.14, not generated from the candidate. A real public MatStepper with FormControl in the packed legacy consumer executes all four transitions and selection events[1,0] on both exact minimum CDK/Material peers; both78-case packed-consumer checks pass. Do not adopt the modern Field API or fork the ordinary stepper into the add-on. This is a bounded disposition of this patch and its classic-control path, not full stepper accessibility/motion/signal-form support, all consumer floors or G11 qualification.",
+        "proof_kind": "whole-patch-source-and-executed-public-classic-control",
+        "reachable_behavior": {
+          "kind": "executed-delegation",
+          "id": "packed-consumer/harness/peer-stepper-abstract-control"
+        }
       }
     },
     {

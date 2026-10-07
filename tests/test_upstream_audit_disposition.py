@@ -55,7 +55,7 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
             summary = json.loads(result.stdout)
             self.assertFalse(summary["ok"])
             # The two chip patches now have qualified individual do-not-adopt decisions.
-            self.assertEqual(summary["unresolved"], 6)
+            self.assertEqual(summary["unresolved"], 5)
             self.assertEqual(summary["seed_rows"], 1697)
             self.assertEqual(summary["ledger_rows"], 1697)
             self.assertEqual(summary["missing"], 0)
@@ -186,7 +186,7 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
             self.assertEqual(summary["structural_inventory"], "fail")
             self.assertEqual(summary["disposition_admission"], "incomplete")
             self.assertGreaterEqual(summary["insufficient_inherited"], 1)
-            self.assertIn("unresolved=6", result.stderr)
+            self.assertIn("unresolved=5", result.stderr)
             self.assertEqual(summary["security_clearance"], "not-passed")
             # The ledger object above is only used to prove the file still parses.
             self.assertEqual(ledger["g11_claim"], "not-passed")
@@ -396,8 +396,11 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
         for group in queue["groups"]:
             for sha in group["members"]:
                 self.assertEqual(rows[sha]["status"], group["execution_status"], sha)
-        # An observation is evidence for review, never an individual proof.
-        self.assertFalse(any((e.get("individual_proof") or {}).get("reachable_behavior") for e in ledger))
+        # This mechanical observation cannot create individual proofs for its
+        # member rows. Separate fresh reviews outside this roster can execute
+        # behavior probes and record their own immutable source/artifact scope.
+        self.assertFalse(any((e.get("individual_proof") or {}).get("reachable_behavior")
+                             for e in ledger if e["sha"] in rows))
 
 
 if __name__ == "__main__":
