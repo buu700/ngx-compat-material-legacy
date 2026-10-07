@@ -5,7 +5,7 @@
 import {readFileSync} from 'node:fs';
 import {dirname, join} from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {deriveReleaseIds, familiesFromInventory, loadMainReleaseRoster, observationProblems} from './browser-matrix-roster.mjs';
+import {deriveReleaseIds, familiesFromInventory, loadReleaseRoster, observationProblems} from './browser-matrix-roster.mjs';
 import {candidateInstallSpec, candidateQualificationDefects, fixtureQualificationDefects} from './browser-required-cells.mjs';
 import {qualifyRelease} from './browser-matrix-acceptance.mjs';
 
@@ -15,23 +15,23 @@ function expect(name, condition) {
   if (!condition) failures.push(name);
 }
 
-const roster = loadMainReleaseRoster();
+const roster = loadReleaseRoster('21.x');
 expect('family count', roster.families.length === 22);
 expect('912 cells', roster.ids.length === 912);
 expect('304 chromium', roster.perEngine.chromium === 304);
 expect('304 firefox', roster.perEngine.firefox === 304);
 expect('304 webkit', roster.perEngine.webkit === 304);
-expect('no 21.x', roster.ids.every(id => id.split('/')[1] === 'main'));
+expect('only21.x', roster.ids.every(id => id.split('/')[1] === '21.x'));
 expect('no safari id', roster.ids.every(id => !id.includes('safari')));
-expect('stable', JSON.stringify(deriveReleaseIds(roster.families, 'main')) === JSON.stringify(roster.ids));
+expect('stable', JSON.stringify(deriveReleaseIds(roster.families, '21.x')) === JSON.stringify(roster.ids));
 
 const inventory = JSON.parse(readFileSync(join(root, 'testing/legacy-runner/historical-inventory.json'), 'utf8'));
 expect('inventory families', JSON.stringify(familiesFromInventory(inventory)) === JSON.stringify(roster.families));
 
 const matrix = JSON.parse(readFileSync(join(root, 'compatibility/rc/matrices/full-verify.json'), 'utf8'));
 const row = matrix.checks.find(item => item.check_id === 'browser-matrix');
-expect('matrix main roster', JSON.stringify(row.acceptance.cases_by_line.main['release-engine-runtime-state-matrix']) === JSON.stringify(roster.ids));
-expect('21.x null', row.acceptance.cases_by_line['21.x']['release-engine-runtime-state-matrix'] === null);
+expect('matrix21.x roster', JSON.stringify(row.acceptance.cases_by_line['21.x']['release-engine-runtime-state-matrix']) === JSON.stringify(roster.ids));
+expect('main null on21.x branch', row.acceptance.cases_by_line.main['release-engine-runtime-state-matrix'] === null);
 
 const goodEngines = {
   chromium: {launched: true, product: 'Chrome/128.0.0.0'},
@@ -48,6 +48,11 @@ const good = observationProblems({
   boundSha: 'abc',
 });
 expect('clean observation', good.problems.length === 0);
+const foreignLine=observationProblems({requiredIds:roster.ids,
+  outcomes:roster.ids.map(id=>({id:id.replace('/21.x/','/main/'),ok:true,evidence:'foreign line'})),
+  engines:goodEngines,sourceClean:true,artifactSha:'abc',boundSha:'abc'});
+expect('foreign-line rows do not discharge this roster',foreignLine.skipped.length===roster.ids.length);
+
 
 const missing = observationProblems({
   requiredIds: roster.ids,

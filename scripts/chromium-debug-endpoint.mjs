@@ -20,3 +20,17 @@ export function debuggerMatchesChild(observed, endpoint) {
       && Number(url.port)===endpoint.port && url.pathname===endpoint.path;
   } catch { return false; }
 }
+
+/** Firefox announces its ephemeral BiDi listener on the child's output. */
+export function announcedFirefoxEndpoint(log,requestedPort=0) {
+  const matches=[...String(log).matchAll(/WebDriver BiDi listening on (ws:\/\/[^\s]+)/g)];
+  if(!matches.length)return null;
+  try {
+    const url=new URL(matches.at(-1)[1]),port=Number(url.port);
+    if(url.protocol!=='ws:' || !['127.0.0.1','localhost','[::1]'].includes(url.hostname)
+      || !Number.isInteger(port) || port<1 || port>65535 || url.pathname!=='/'
+      || url.search || url.hash || url.username || url.password
+      || (requestedPort && port!==requestedPort))return null;
+    return {port,url:url.origin+'/session'};
+  }catch{return null;}
+}

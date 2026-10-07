@@ -25,3 +25,20 @@ assert.equal(debuggerMatchesChild({webSocketDebuggerUrl:'ws://[::1]:43125/devtoo
 """
         result=subprocess.run(['node','--input-type=module','-e',code],cwd=ROOT,capture_output=True,text=True)
         self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+
+    def test_firefox_listener_comes_from_the_child_and_matches_requested_port(self):
+        code=r"""
+import assert from 'node:assert/strict';
+import {announcedFirefoxEndpoint} from './scripts/chromium-debug-endpoint.mjs';
+const text='noise\nWebDriver BiDi listening on ws://127.0.0.1:43125\n';
+assert.deepEqual(announcedFirefoxEndpoint(text),{port:43125,url:'ws://127.0.0.1:43125/session'});
+assert.deepEqual(announcedFirefoxEndpoint(text,43125),{port:43125,url:'ws://127.0.0.1:43125/session'});
+assert.equal(announcedFirefoxEndpoint(text,43126),null);
+for(const address of ['ws://example.com:43125','ws://127.0.0.1:0','ws://127.0.0.1:43125/foreign','ws://user:pass@127.0.0.1:43125','ws://127.0.0.1:43125/?foreign','ws://127.0.0.1:43125/#foreign','http://127.0.0.1:43125'])
+ assert.equal(announcedFirefoxEndpoint('WebDriver BiDi listening on '+address),null);
+assert.equal(announcedFirefoxEndpoint(''),null);
+assert.equal(announcedFirefoxEndpoint('unrelated ws://127.0.0.1:43125'),null);
+assert.deepEqual(announcedFirefoxEndpoint('WebDriver BiDi listening on ws://[::1]:43125'),{port:43125,url:'ws://[::1]:43125/session'});
+"""
+        result=subprocess.run(['node','--input-type=module','-e',code],cwd=ROOT,capture_output=True,text=True)
+        self.assertEqual(result.returncode,0,result.stdout+result.stderr)

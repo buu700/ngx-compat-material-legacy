@@ -12,6 +12,7 @@
  *   node scripts/browser-control-families.mjs --tarball <path> --zoneless
  */
 import {createHash} from 'node:crypto';
+import {announcedChromeEndpoint,debuggerMatchesChild} from './chromium-debug-endpoint.mjs';
 import {spawnSync as __spawnSyncForWs} from 'node:child_process';
 if (typeof globalThis.WebSocket !== 'function') {
   // Local Node 20 shells need the experimental flag; CI/Chainman Node 22+ has WebSocket.
@@ -266,11 +267,12 @@ await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
 const {port} = server.address();
 const pageUrl = `http://127.0.0.1:${port}/`;
 const chromeDir = mkdtempSync(join(tmpdir(), 'ngx-compat-chrome-control-'));
-const debugPort = Number(process.env.CDP_PORT || '9336');
+const requestedDebugPort = Number(process.env.CDP_PORT || '0');
+let debugPort = 0;
 const chrome = spawn(chromeBin, [
 
   '--headless=new',
-  '--remote-debugging-port=' + String(debugPort),
+  '--remote-debugging-port=' + String(requestedDebugPort),
   '--user-data-dir=' + chromeDir,
   '--no-sandbox',
   '--disable-gpu',
@@ -288,8 +290,11 @@ async function jsonGet(url) {
 let version = null;
 for (let i = 0; i < 50; i += 1) {
   try {
-    version = await jsonGet(`http://127.0.0.1:${debugPort}/json/version`);
-    break;
+    const endpoint=announcedChromeEndpoint(chromeLog,requestedDebugPort);
+    if(!endpoint){await sleep(100);continue;}
+    const observed=await jsonGet(`http://127.0.0.1:${endpoint.port}/json/version`);
+    if(!debuggerMatchesChild(observed,endpoint))throw Error('debugger does not belong to the browser child');
+    version=observed;debugPort=endpoint.port;break;
   } catch {
     await sleep(100);
   }

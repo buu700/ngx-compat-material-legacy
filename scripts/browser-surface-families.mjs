@@ -12,6 +12,8 @@
  *   node scripts/browser-surface-families.mjs --tarball <path> --zoneless
  */
 import {createHash} from 'node:crypto';
+import {announcedChromeEndpoint,debuggerMatchesChild} from './chromium-debug-endpoint.mjs';
+import {observeLegacyCoreHighContrast,legacyCoreHighContrastOkay} from './legacy-core-high-contrast-contract.mjs';
 import {PEER_ICON_TT_CSP, peerIconTtOkay} from './peer-icon-tt-admission.mjs';
 import {spawnSync as __spawnSyncForWs} from 'node:child_process';
 if (typeof globalThis.WebSocket !== 'function') {
@@ -125,6 +127,11 @@ const progressCss = progressSass.compileString(`
 $primary: legacy.define-palette(legacy.$indigo-palette);
 $accent: legacy.define-palette(legacy.$pink-palette, A200, A100, A400);
 $theme: legacy.define-light-theme((color: (primary: $primary, accent: $accent)));
+@include legacy.core();
+.mat-menu-submenu-icon { @include legacy.private-menu-common-item-submenu-icon(legacy.$private-menu-common-side-padding); }
+#core-contrast-ripple { width:48px; height:48px; }
+#core-contrast-menu { color:rgb(1,2,3); forced-color-adjust:none; }
+#core-contrast-canvas { color:CanvasText; }
 @include legacy.progress-bar-theme($theme);
 @include legacy.legacy-progress-bar-theme($theme);
 @include legacy.form-field-theme($theme);
@@ -133,10 +140,12 @@ $theme: legacy.define-light-theme((color: (primary: $primary, accent: $accent)))
 
 mkdirSync(join(consumer, 'src'), {recursive: true});
 writeFileSync(join(consumer, 'src/main.ts'), `${zoneless ? '' : `import 'zone.js';
-`}import {Component, NgModule, inject${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';
+`}import {Component, NgModule, NgZone, inject${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';
 import {BrowserModule, DomSanitizer} from '@angular/platform-browser';
 import {MatIconModule, MatIconRegistry} from '@angular/material/icon';
 import {MediaMatcher} from '@angular/cdk/layout';
+import {Platform} from '@angular/cdk/platform';
+import {LegacyRippleRenderer,LegacyRippleRef,LegacyRippleState} from '@ngx-compat/material-legacy/legacy-core';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
@@ -171,6 +180,10 @@ export class PeerProgressCspModule {}
     <button id="button-disabled" mat-button type="button" disabled>Disabled</button>
     <button id="button-focus" mat-raised-button type="button">Focus me</button>
 
+    <div id="core-contrast-ripple" class="mat-ripple"></div>
+    <button id="core-contrast-focus" class="mat-focus-indicator" type="button">Core focus</button>
+    <svg id="core-contrast-menu" class="mat-menu-submenu-icon" viewBox="0 0 5 10"><path d="M0 0l5 5-5 5z"/></svg>
+    <span id="core-contrast-canvas">Canvas text</span>
     <mat-card id="card-default">
       <mat-card-title>Title</mat-card-title>
       <mat-card-content>Content</mat-card-content>
@@ -184,6 +197,37 @@ export class PeerProgressCspModule {}
 })
 export class LabRoot {
   constructor() {
+    const ngZone=inject(NgZone),platform=inject(Platform);
+    const refs: LegacyRippleRef[]=[];
+    let fallback: LegacyRippleRef | null=null;
+    const launch=() => {
+      const host=document.getElementById('core-contrast-ripple');
+      if(!host)throw Error('core contrast ripple host missing');
+      const renderer=new LegacyRippleRenderer({rippleDisabled:false,rippleConfig:{}},ngZone,host,platform);
+      const ref=renderer.fadeInRipple(0,0,{centered:true,radius:12,persistent:true,animation:{enterDuration:60,exitDuration:60}});
+      refs.push(ref);return ref;
+    };
+    const snapshot=(ref:LegacyRippleRef) => ({state:LegacyRippleState[ref.state],connected:ref.element.isConnected});
+    (window as any).__closeoutCoreContrast={
+      exercise:() => {
+        const ref=launch(),steps=[snapshot(ref)];
+        const focus=document.getElementById('core-contrast-focus');
+        const menu=document.getElementById('core-contrast-menu');
+        const canvas=document.getElementById('core-contrast-canvas');
+        const styles={found:!!focus&&!!menu&&!!canvas,ripple_display:getComputedStyle(ref.element).display,
+          focus_display:focus?getComputedStyle(focus,'::before').display:null,
+          submenu_fill:menu?getComputedStyle(menu).fill:null,canvas_color:canvas?getComputedStyle(canvas).color:null};
+        // Exercise the real renderer's public event completion and fade-out
+        // paths in every style mode; this does not claim elapsed animation timing.
+        ref.element.dispatchEvent(new Event('transitionend'));steps.push(snapshot(ref));
+        ref.fadeOut();steps.push(snapshot(ref));
+        ref.element.dispatchEvent(new Event('transitionend'));steps.push(snapshot(ref));
+        return {...styles,lifecycle:steps.map(s=>s.state),connected:steps.map(s=>s.connected)};
+      },
+      startFallback:() => {fallback=launch();return {initial_state:LegacyRippleState[fallback.state],initial_connected:fallback.element.isConnected};},
+      readFallback:() => ({final_state:fallback?LegacyRippleState[fallback.state]:null,final_connected:fallback?.element.isConnected??null}),
+      cleanup:() => {for(const ref of refs){ref.fadeOut();ref.element.dispatchEvent(new Event('transitioncancel'));}}
+    };
     (window as any).__closeoutMediaMatcher=inject(MediaMatcher);
     inject(MatIconRegistry).addSvgIconLiteral('closeout-native-tt',inject(DomSanitizer).bypassSecurityTrustHtml(
       '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8"><path d="M0 0h8v8H0z"/></svg>'));
@@ -296,11 +340,12 @@ await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
 const {port} = server.address();
 const pageUrl = `http://127.0.0.1:${port}/`;
 const chromeDir = mkdtempSync(join(tmpdir(), 'ngx-compat-chrome-surface-'));
-const debugPort = Number(process.env.CDP_PORT || '9336');
+const requestedDebugPort = Number(process.env.CDP_PORT || '0');
+let debugPort = 0;
 const chrome = spawn(chromeBin, [
 
   '--headless=new',
-  '--remote-debugging-port=' + String(debugPort),
+  '--remote-debugging-port=' + String(requestedDebugPort),
   '--user-data-dir=' + chromeDir,
   '--no-sandbox',
   '--disable-gpu',
@@ -318,8 +363,11 @@ async function jsonGet(url) {
 let version = null;
 for (let i = 0; i < 50; i += 1) {
   try {
-    version = await jsonGet(`http://127.0.0.1:${debugPort}/json/version`);
-    break;
+    const endpoint=announcedChromeEndpoint(chromeLog,requestedDebugPort);
+    if(!endpoint){await sleep(100);continue;}
+    const observed=await jsonGet(`http://127.0.0.1:${endpoint.port}/json/version`);
+    if(!debuggerMatchesChild(observed,endpoint))throw Error('debugger does not belong to the surface child');
+    version=observed;debugPort=endpoint.port;break;
   } catch {
     await sleep(100);
   }
@@ -375,6 +423,7 @@ let peerIconTt = null;
 let peerMediaMatcher = null;
 let progressCsp = null;
 let peerFormHover = null;
+let coreHighContrast = null;
 
 try {
   await send('Runtime.enable');
@@ -485,6 +534,8 @@ try {
       cleanup_marker:getComputedStyle(document.documentElement).getPropertyValue(marker).trim(),error};
   })()`);
 
+  coreHighContrast=await observeLegacyCoreHighContrast({send,evaluate,waitFor});
+
   // Button default + disabled + focused state cells.
   families.button.present = await waitFor('!!document.querySelector("button#button-default.mat-button, button#button-default[mat-button]")');
   families.button.disabled_class = await waitFor(
@@ -543,6 +594,7 @@ const ok =
   !error
   && zoneOk
   && peerIconTtOkay(peerIconTt)
+  && legacyCoreHighContrastOkay(coreHighContrast)
   && families.button.present && families.button.disabled_class && families.button.focused
   && families.card.present
   && families['progress-bar'].present && families['progress-bar'].value_reflected
@@ -563,6 +615,7 @@ const report = {
   peer_media_matcher: peerMediaMatcher,
   progress_csp: progressCsp,
   peer_form_hover: peerFormHover,
+  core_high_contrast: coreHighContrast,
   credited_cell_ids: ok ? cells : [],
   matrix_updated: false,
   error,
@@ -573,7 +626,7 @@ const report = {
       : 'Only Chromium main-line zoneful button/card/progress-bar/progress-spinner default+disabled/focused cells.',
     'Firefox/WebKit, CSP, motion, invalid/RTL/density/dark, and other states stay not-executed.',
     'MATERIAL_ANIMATIONS.animationsDisabled=true for deterministic layout; not enabled-motion proof.',
-    'Button credit is presence + mat-button-disabled class + focus on raised button; ripple/variants/keyboard not exercised.',
+    'Button credit is presence + mat-button-disabled class + focus on raised button; variants/keyboard not exercised. Supplemental owned-core ripple event states and high-contrast fallback run separately and earn no matrix credit or elapsed enabled-motion timing proof.',
     'Card credit is host+title presence; actions/images/subtitle/footer not exercised.',
     'Progress-bar credit is host presence + aria-valuenow for determinate mode; buffer/query/indeterminate motion not exercised.',
     'Progress-spinner credit is host presence + aria-valuenow for determinate mode; indeterminate SVG animation not exercised.',
@@ -598,6 +651,7 @@ console.log(JSON.stringify({
   peer_media_matcher: peerMediaMatcher,
   progress_csp: progressCsp,
   peer_form_hover: peerFormHover,
+  core_high_contrast: coreHighContrast,
   error,
   credited_cell_ids: report.credited_cell_ids,
 }, null, 2));
