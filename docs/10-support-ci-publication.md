@@ -28,8 +28,8 @@ The private root's exact Node engine must **not** leak into published library me
 
 | Package line | Node range | TypeScript build line | Angular-compatible RxJS range |
 |---|---|---|---|
-| 22.x | `^22.22.3 || ^24.15.0 || ^26.0.0` | `>=6.0 <6.1` | `^6.5.3 || ^7.4.0` |
-| 21.x | `^20.19.0 || ^22.12.0 || ^24.0.0` | `>=5.9 <6.0` | `^6.5.3 || ^7.4.0` |
+| 22.x | `^22.22.3 || ^24.15.0 || ^26.0.0` | `>=6.0 <6.1` | `^6.5.3 || ^7.5.5` |
+| 21.x | `^20.19.0 || ^22.12.0 || ^24.0.0` | `>=5.9 <6.0` | `^6.5.3 || ^7.5.5` |
 
 Resolve exact security-patched Angular/framework/CLI/compiler/Material/CDK, TypeScript, RxJS, Sass and build-tool versions into each branch's lockfile. The table is not a tested peer matrix: validate the selected releases' actual manifests. **Research-head references are not release pins**: record the source reviewed separately from the aged published package set, and verify every delegated API against that set and its advertised minimum. See `docs/07-upstream-security-release.md`. Material/CDK may publish at different times from framework. Do not claim every later minor uses an unchanged TypeScript range merely from a docs row.
 

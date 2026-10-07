@@ -61,9 +61,12 @@ console.log(JSON.stringify(Object.fromEntries(
                 "node_box": ["18.20.0", "^20.19.0 || ^22.12.0 || ^24.0.0"],
                 "angular_ok": ["21.2.23", "^21.2.23"],
                 "angular_low": ["21.0.0", "^21.2.23"],
-                "rxjs_ok": ["7.8.2", "^6.5.3 || ^7.4.0"],
-                "rxjs_old": ["6.5.3", "^6.5.3 || ^7.4.0"],
-                "rxjs_bad": ["6.4.0", "^6.5.3 || ^7.4.0"],
+                "rxjs_ok": ["7.8.2", "^6.5.3 || ^7.5.5"],
+                "rxjs_old": ["6.5.3", "^6.5.3 || ^7.5.5"],
+                "rxjs_bad": ["6.4.0", "^6.5.3 || ^7.5.5"],
+                "rxjs_prior_floor": ["7.4.0", "^6.5.3 || ^7.5.5"],
+                "rxjs_below_floor": ["7.5.4", "^6.5.3 || ^7.5.5"],
+                "rxjs_floor": ["7.5.5", "^6.5.3 || ^7.5.5"],
             },
         )
         self.assertTrue(report["node_ok"])
@@ -73,6 +76,9 @@ console.log(JSON.stringify(Object.fromEntries(
         self.assertTrue(report["rxjs_ok"])
         self.assertTrue(report["rxjs_old"])
         self.assertFalse(report["rxjs_bad"])
+        self.assertFalse(report["rxjs_prior_floor"])
+        self.assertFalse(report["rxjs_below_floor"])
+        self.assertTrue(report["rxjs_floor"])
 
     def test_evaluate_requires_real_range_match(self):
         report = node_eval(
