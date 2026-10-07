@@ -33,8 +33,8 @@ expect('page reads the nonce token', page.includes('CSP_NONCE'));
 
 const matrix = JSON.parse(readFileSync(join(root, 'compatibility/rc/matrices/full-verify.json'), 'utf8'));
 const row = matrix.checks.find(item => item.check_id === 'csp-ssr');
-expect('matrix main roster', JSON.stringify(row.acceptance.cases_by_line.main) === JSON.stringify(roster.groups));
-expect('21.x null', Object.values(row.acceptance.cases_by_line['21.x']).every(value => value === null));
+expect('matrix21 roster', JSON.stringify(row.acceptance.cases_by_line['21.x']) === JSON.stringify(roster.groups));
+expect('opposite main line stays null', Object.values(row.acceptance.cases_by_line.main).every(value => value === null));
 expect('implemented', row.implemented === true);
 
 const goodOutcomes = roster.ids.map(id => ({id, ok: true, observation: samplePass(id), evidence: 'observed'}));

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Coordinator path for csp-ssr. Derives the main roster before Chromium or
+ * Coordinator path for csp-ssr. Derives the21.x roster before Chromium or
  * the server processes start. Chromium is the CSP engine. WebKitGTK is not
  * Safari and is not launched here. Hydration is unclaimed. Does not claim
  * G04 or G10.
@@ -85,7 +85,7 @@ export async function runAcceptance({runPath}) {
     if (request.binding.source_tree !== tree) identity.push('source tree mismatch');
     if (request.line !== '21.x') identity.push('line is not 21.x');
   }
-  if (matrixMismatch) identity.push('matrix roster is not the derived main csp-ssr roster');
+  if (matrixMismatch) identity.push('matrix roster is not the derived21.x csp-ssr roster');
   if (launchError) identity.push(launchError);
   const problems = [...identity, ...observed.problems.filter(item => !identity.includes(item))];
   const accepted = problems.length === 0 && observed.skipped.length === 0 && chromiumLaunched;
@@ -151,7 +151,7 @@ export async function runAcceptance({runPath}) {
       'CSP evidence is Chromium only. WebKitGTK is not Safari and was not launched for this check.',
       'Hydration is unclaimed.',
       'Does not claim G04 or G10.',
-      '21.x was not executed.',
+      'Main was not executed by this21.x invocation.',
     ] : problems.slice(0, 30),
   };
   if (!accepted) {
