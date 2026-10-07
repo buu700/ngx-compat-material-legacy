@@ -140,6 +140,37 @@ assert.equal(read(pair,'MISSING'),null);
         result=subprocess.run(['node','--input-type=module','-e',script],cwd=ROOT,capture_output=True,text=True)
         self.assertEqual(result.returncode,0,result.stderr or result.stdout)
 
+    @unittest.skipUnless(typescript_resolves(), "typescript is not installed")
+    def test_six_original_variable_declarations_and_wrong_types(self):
+        script=r"""
+import assert from 'node:assert/strict';
+import {originalVariableDeclaration,compareSignatures} from './scripts/api-surface.mjs';
+for (const [family,name] of [
+ ['paginator','MAT_PAGINATOR_INTL_PROVIDER'],
+ ['select','MAT_SELECT_SCROLL_STRATEGY_PROVIDER'],
+ ['slide-toggle','MAT_SLIDE_TOGGLE_REQUIRED_VALIDATOR'],
+ ['tabs','MAT_TAB_GROUP'],
+ ['tabs','_MAT_INK_BAR_POSITIONER'],
+ ['tooltip','MAT_TOOLTIP_SCROLL_STRATEGY_FACTORY_PROVIDER'],
+]) {
+ const original=originalVariableDeclaration(`/original/src/material/${family}/source.ts`,name);
+ assert.equal(original.kind,'const');
+ assert.equal(original.signatures.length,1);
+ assert.ok(!original.signatures[0].endsWith(':*'));
+ const alias=name.replace('MAT_','MAT_LEGACY_');
+ const owned={...original,signatures:original.signatures.map(s=>s.replace(name,alias))};
+ const symbol={symbol_id:`legacy-${family}/primary/${alias}`,shape:original};
+ assert.deepEqual(compareSignatures(symbol,owned,[]).blocking,[]);
+ for (const wrong of [`const ${alias}:boolean`,`const ${alias}:InjectionToken<string>`]) {
+  assert.ok(compareSignatures(symbol,{...owned,signatures:[wrong]},[]).blocking.length);
+ }
+}
+assert.equal(originalVariableDeclaration('/original/src/material/tabs/source.ts','UNRELATED'),null);
+assert.equal(originalVariableDeclaration('/candidate/src/legacy-tabs/source.ts','MAT_TAB_GROUP'),null);
+"""
+        result=subprocess.run(['node','--input-type=module','-e',script],cwd=ROOT,capture_output=True,text=True)
+        self.assertEqual(result.returncode,0,result.stderr or result.stdout)
+
     def test_compare_contracts_reads_parameter_types(self):
         matched = self.compare_objects("match")
         self.assertEqual(matched["di_status"], "match")
