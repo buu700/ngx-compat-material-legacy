@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "reviewer": "Codex primary implementer",
+  "recorded_at_utc": "2026-10-07T05:31:47.183109+00:00",
+  "reviews": [
+    {
+      "sha": "622152de761b629a426b744ec2ff3e4e79d18889",
+      "subject": "perf(material/tooltip): Defer injection of injectables not needed until tooltip is shown. (#30440)",
+      "files": [
+        "src/material/tooltip/tooltip.ts"
+      ],
+      "patch_file": "compatibility/f10/disposition-ledger/evidence/patches/622152de761b629a426b744ec2ff3e4e79d18889-whole-tooltip-lazy-di.patch",
+      "diff_sha256": "88aed569f1ec66477351d0df2b277afbfc0a0d6dfd2584d2c61893dd62060b05",
+      "review_depth": "individual-escalated",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "do-not-adopt",
+      "decision": "Read the complete one-path modern tooltip performance patch individually. It defers Overlay, ScrollDispatcher, ViewContainerRef, scroll strategy and DOCUMENT; AriaDescriber/FocusMonitor remain eager. The legacy directive instead extends the independently owned original base, and its12-argument constructor/super body exactly matches untouched16.2.14. Both authentic minimum peers have since evolved again: ViewContainerRef/DOCUMENT are eager, ScrollDispatcher/scroll strategy stay lazy, and Overlay service creation is replaced by current helper functions. Tag ancestry does not establish identical implementation. Preserve the original legacy constructor and supplied dependency identities; do not transplant the modern injection strategy or mirror its helper API. On both minimum peers the actual packed legacy empty/disabled trigger already holds original service/strategy/document identities and a real node container without creating overlay/portal, and manual construction outside injection context honors all12 supplied objects. All79 packed cases including existing tooltip show/hide pass. This bounded do-not-adopt decision does not qualify every tooltip motion/lifecycle/public-peer dependency, all floors, remaining inherited/private contracts or G11.",
+      "runtime_change_in_patch": true,
+      "owned_runtime_change_in_patch": false,
+      "case_id": "packed-consumer/harness/tooltip-original-eager-dependencies",
+      "original_constructor": {
+        "commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+        "path": "src/material/legacy-tooltip/tooltip.ts",
+        "retained_bytes": "compatibility/f10/disposition-ledger/evidence/patches/material-16.2.14-untouched-legacy-tooltip.ts",
+        "source_sha256": "f0878a31a521ddd424bd79f316494115505f2d64734560dc939c0ccb3ffc3582",
+        "constructor_sha256": "d5e1136a9d8eb0eb4ad686d4eca2e30fa47d8d829ecc237b3842c56365bf470b"
+      }
+    }
+  ],
+  "minimum_peer_source": [
+    {
+      "version": "21.2.14",
+      "archive_sha256": "2f8c0fce7967b8a91a07bc3a184cf5da6023eac3828d15fa23b6c338b340e23c",
+      "member": "package/fesm2022/_tooltip-chunk.mjs",
+      "member_sha256": "df3cbb5bd321356ed2ddf1951ff54d9367fd2141b0f941169f43d3564300dd8c",
+      "lazy_lookups": [
+        {
+          "term": ".get(ViewContainerRef)",
+          "present": false,
+          "context": null
+        },
+        {
+          "term": ".get(ScrollDispatcher)",
+          "present": true,
+          "context": "tach();\n    }\n    const scrollableAncestors = this._injector.get(ScrollDispatcher).getAncestorScrollContainers(this._elementRef);\n    const panelClass ="
+        },
+        {
+          "term": ".get(Overlay)",
+          "present": false,
+          "context": null
+        },
+        {
+          "term": ".get(MAT_TOOLTIP_SCROLL_STRATEGY)",
+          "present": true,
+          "context": "nelClass] : panelClass,\n      scrollStrategy: this._injector.get(MAT_TOOLTIP_SCROLL_STRATEGY)(),\n      disableAnimations: this._animationsDisabled,\n      eventPred"
+        },
+        {
+          "term": ".get(DOCUMENT)",
+          "present": false,
+          "context": null
+        }
+      ]
+    },
+    {
+      "version": "22.1.7",
+      "archive_sha256": "06115b963b565428d8d5f79cc1cdd07a3f0d5a58dbaebf9955639f38b35ac43d",
+      "member": "package/fesm2022/_tooltip-chunk.mjs",
+      "member_sha256": "1a5490c23d4c6673b5d365e942dd3f74e2a3ab3a3c77d6434f20469c80f600e8",
+      "lazy_lookups": [
+        {
+          "term": ".get(ViewContainerRef)",
+          "present": false,
+          "context": null
+        },
+        {
+          "term": ".get(ScrollDispatcher)",
+          "present": true,
+          "context": "tach();\n    }\n    const scrollableAncestors = this._injector.get(ScrollDispatcher).getAncestorScrollContainers(this._elementRef);\n    const panelClass ="
+        },
+        {
+          "term": ".get(Overlay)",
+          "present": false,
+          "context": null
+        },
+        {
+          "term": ".get(MAT_TOOLTIP_SCROLL_STRATEGY)",
+          "present": true,
+          "context": "nelClass] : panelClass,\n      scrollStrategy: this._injector.get(MAT_TOOLTIP_SCROLL_STRATEGY)(),\n      disableAnimations: this._animationsDisabled,\n      eventPred"
+        },
+        {
+          "term": ".get(DOCUMENT)",
+          "present": false,
+          "context": null
+        }
+      ]
+    }
+  ],
+  "current_peer_followup": "Actual21.2.14/22.1.7 compiled class fields include inject(ViewContainerRef) and inject(DOCUMENT); ComponentPortal uses the stored container. ScrollDispatcher/scroll strategy are retrieved in create-overlay; current public overlay helper functions replace the original service calls. Missing literal .get(ViewContainerRef)/.get(Overlay)/.get(DOCUMENT) must not be called evidence that those original patch semantics remain unchanged.",
+  "executions": {
+    "main": {
+      "commit": "8b8fd6530a6bf54554c3bb94a473cf6265b73e5b",
+      "run": 37575127285,
+      "job": 112642194275,
+      "artifact_sha256": "050faf79d6ec29c239cb4898689faf5be388fab03ab03144f7cabff9565e919f",
+      "overall_job": "failure in subsequent API checks; packed consumer79 status ok/errors[]"
+    },
+    "21.x": {
+      "commit": "7eef906439534aad646ff87bbba1e320c05019a0",
+      "run": 37575134803,
+      "job": 112642218986,
+      "artifact_sha256": "09e13c57b223a0b03339431630bd94b535c52d3753ca0280bc27e7e8238b34f0",
+      "overall_job": "success; packed consumer79 status ok/errors[]"
+    }
+  },
+  "qualification": "Authenticated Actions logs record derived79 mandatory cases/status ok/errors[] at these exact sources and input artifact digests. Per-case detail archives not independently downloaded/rehashed. Current table-constructor production repair is a newer subject and needs fresh80-case/full reruns.",
+  "g11_claim": "not-passed"
+}
