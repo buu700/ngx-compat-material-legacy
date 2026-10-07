@@ -493,6 +493,7 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
     'packed-consumer/harness/table-original-boolean-input-rendering': parsed.tableOriginalBooleanInputs === true,
     'packed-consumer/harness/table-recycle-row-view-identity': parsed.tableRecycleRowIdentity === true,
     'packed-consumer/harness/table-definition-original-constructors': parsed.tableDefinitionOriginalConstructors === true,
+    'packed-consumer/harness/tab-label-original-constructor-and-nearest-tab': parsed.tabLabelOriginalConstructor === true,
   };
   const owned = declarationKeys(keys)
     .filter(key => key.endsWith('/testing'))
@@ -909,7 +910,8 @@ import {Component, ElementRef, TemplateRef, ViewChild, Injector, ViewContainerRe
 import {Subject} from 'rxjs';
 import {FormControl, Validators} from '@angular/forms';
 import {MatStepperModule, MatStepper} from '@angular/material/stepper';
-import {MatTabContent} from '@angular/material/tabs';
+import {MatTabContent,MatTabLabel} from '@angular/material/tabs';
+import {CdkPortal} from '@angular/cdk/portal';
 import {BreakpointObserver, BreakpointState} from '@angular/cdk/layout';
 import {AriaDescriber, FocusMonitor, HighContrastMode, HighContrastModeDetector} from '@angular/cdk/a11y';
 import {
@@ -939,7 +941,7 @@ import {MatLegacySnackBar, MatLegacySnackBarModule} from '@ngx-compat/material-l
 import {MatLegacySnackBarHarness} from '@ngx-compat/material-legacy/legacy-snack-bar/testing';
 import {MatLegacyTooltip, MatLegacyTooltipModule, MAT_LEGACY_TOOLTIP_SCROLL_STRATEGY, MAT_LEGACY_TOOLTIP_DEFAULT_OPTIONS} from '@ngx-compat/material-legacy/legacy-tooltip';
 import {MatLegacyTooltipHarness} from '@ngx-compat/material-legacy/legacy-tooltip/testing';
-import {MatLegacyTabsModule, MatLegacyTabLink, MatLegacyTabContent} from '@ngx-compat/material-legacy/legacy-tabs';
+import {MatLegacyTabsModule, MatLegacyTabLink, MatLegacyTabContent, MatLegacyTabLabel, MatLegacyTab} from '@ngx-compat/material-legacy/legacy-tabs';
 import {MatLegacyCheckbox, MatLegacyCheckboxModule, MAT_LEGACY_CHECKBOX_DEFAULT_OPTIONS} from '@ngx-compat/material-legacy/legacy-checkbox';
 import {MatLegacySlideToggle, MatLegacySlideToggleModule} from '@ngx-compat/material-legacy/legacy-slide-toggle';
 import {MatLegacySlider, MatLegacySliderModule} from '@ngx-compat/material-legacy/legacy-slider';
@@ -1059,7 +1061,7 @@ class SmokeDialogContent {}
     <ng-template #manualFooterTemplate matFooterCellDef>Footer probe</ng-template>
     <span id="tooltip-eager" matTooltip="" [matTooltipDisabled]="true">Disabled empty tooltip</span>
     <mat-tab-group id="tabs">
-      <mat-tab label="One">Tab one</mat-tab>
+      <mat-tab label="One"><ng-template #manualTabLabel mat-tab-label>One</ng-template>Tab one</mat-tab>
       <mat-tab label="Two">Tab two</mat-tab>
     </mat-tab-group>
   \`,
@@ -1076,6 +1078,11 @@ class HarnessHost {
   @ViewChild('manualNoDataTemplate',{read:TemplateRef,static:true}) originalNoDataTemplate!:TemplateRef<any>;
   @ViewChild('manualTabTemplate',{read:MatLegacyTabContent,static:true}) originalTabContent!:MatLegacyTabContent;
   @ViewChild('manualTabTemplate',{read:TemplateRef,static:true}) originalTabTemplate!:TemplateRef<any>;
+  @ViewChild('manualTabLabel',{read:MatLegacyTabLabel,static:true}) originalTabLabel!:MatLegacyTabLabel;
+  @ViewChild('manualTabLabel',{read:TemplateRef,static:true}) originalTabLabelTemplate!:TemplateRef<any>;
+  @ViewChild('manualTabLabel',{read:ViewContainerRef,static:true}) originalTabLabelContainer!:ViewContainerRef;
+  @ViewChild(MatLegacyTab,{static:true}) originalLabelTab!:MatLegacyTab;
+
   @ViewChild(MatLegacyTextColumn,{static:true}) originalTextColumn!:MatLegacyTextColumn<any>;
   @ViewChild('constructorGridColumn',{read:MatLegacyColumnDef,static:true}) gridColumn!:MatLegacyColumnDef;
   @ViewChild('manualCellTemplate',{read:MatLegacyCellDef,static:true}) cellDefinition!:MatLegacyCellDef;
@@ -1355,6 +1362,23 @@ async function main() {
   const nodeNoDataRow=fixture.componentInstance.originalNoDataRow;
   const manualNoDataRow=new MatLegacyNoDataRow(suppliedNoDataTemplate);
   const noDataView=manualNoDataRow.templateRef.createEmbeddedView({});noDataView.detectChanges();
+  const labelHost=fixture.componentInstance;
+  const suppliedClosestTab={originalMarker:true};
+  const manualLabel=new MatLegacyTabLabel(labelHost.originalTabLabelTemplate,
+    labelHost.originalTabLabelContainer,suppliedClosestTab);
+  const labelView=manualLabel.templateRef.createEmbeddedView({});labelView.detectChanges();
+  const tabLabelObservation={
+    manual_template:manualLabel.templateRef===labelHost.originalTabLabelTemplate,
+    manual_container:manualLabel.viewContainerRef===labelHost.originalTabLabelContainer,
+    manual_closest:manualLabel._closestTab===suppliedClosestTab,
+    manual_parent:manualLabel instanceof MatLegacyTabLabel&&manualLabel instanceof MatTabLabel&&manualLabel instanceof CdkPortal,
+    node_parent:labelHost.originalTabLabel instanceof MatTabLabel&&labelHost.originalTabLabel instanceof CdkPortal,
+    node_closest:labelHost.originalTabLabel._closestTab===labelHost.originalLabelTab,
+    node_label:labelHost.originalLabelTab.templateLabel===labelHost.originalTabLabel,
+    embedded_label:labelView.rootNodes.map(node=>node.textContent||'').join('').trim()==='One',
+  };
+  labelView.destroy();
+  const tabLabelOriginalConstructor=Object.values(tabLabelObservation).every(value=>value===true);
   const noDataRowObservation={manual_argument_identity:manualNoDataRow.templateRef===suppliedNoDataTemplate,
     manual_owned_identity:manualNoDataRow instanceof MatLegacyNoDataRow,
     manual_peer_identity:manualNoDataRow instanceof CdkNoDataRow,
@@ -1692,7 +1716,7 @@ async function main() {
       selectOpened === true &&
       selectClosed === true &&
       tabCount === 2 &&
-      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor && tabContentOriginalConstructor && noDataRowOriginalConstructor && constructorBorrowedProviderLifecycle && tableOriginalStickyBehavior && tableOriginalBooleanInputs && tableRecycleRowIdentity && tableDefinitionOriginalConstructors,
+      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor && tabContentOriginalConstructor && noDataRowOriginalConstructor && constructorBorrowedProviderLifecycle && tableOriginalStickyBehavior && tableOriginalBooleanInputs && tableRecycleRowIdentity && tableDefinitionOriginalConstructors && tabLabelOriginalConstructor,
     buttonText: text,
     selectIsOpen: isOpen,
     dialogText,
@@ -1730,6 +1754,7 @@ async function main() {
     tableOriginalBooleanInputs, tableBooleanObservations,
     tableRecycleRowIdentity, recycleObservations,
     tableDefinitionOriginalConstructors, definitionConstructorObservations, definitionCallerDestroyed,
+    tabLabelOriginalConstructor, tabLabelObservation,
     checkboxAttribute, slideToggleAttribute, sliderAttribute, tabLinkAttribute,
     commonModuleDiagnostics:{contrastLifecycle,contrastProbeReads,sanityWarnings,checksEnabled,sanityDefault:TestBed.inject(MATERIAL_LEGACY_SANITY_CHECKS),sanityToken:String(MATERIAL_LEGACY_SANITY_CHECKS)},
     chipEventCounts:{removals:fixture.componentInstance.repeatRemovals,separators:fixture.componentInstance.repeatEnds},

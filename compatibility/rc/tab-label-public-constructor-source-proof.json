@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "scope": "MatLegacyTabLabel original TemplateRef/ViewContainerRef/closestTab constructor",
+  "minimum_peer_declarations": "Both21.2.14 and22.1.7 MatTabLabel extends CdkPortal and publicly declares _closestTab:any without docs-private/deprecation annotation. CdkPortal consumes TemplateRef and ViewContainerRef.",
+  "implementation": "Borrow template/container in bounded context, construct actual MatTabLabel parent and assign original supplied closest tab to its public field. No private MAT_TAB import or private token-name fallback. Angular lookup uses owned public MatLegacyTab class. No owned instance-field initializer.",
+  "prototype_contract": "Retains MatTabLabel, CdkPortal and TemplatePortal identities through actual public parent; the earlier proposal to replace the parent with TemplatePortal is unnecessary and withdrawn, subject to native proof.",
+  "di_scope": "The nominal token change from private MAT_TAB to public owned MatLegacyTab remains visible and unwaived in API completeness. Default nearest-tab behavior is tested; custom private-token overrides are not claimed equivalent.",
+  "required_native_case": "packed-consumer/harness/tab-label-original-constructor-and-nearest-tab",
+  "native_status": "Pending native90 Actions",
+  "remaining_original_constructors": [
+    "MatLegacyMenuItem",
+    "MatLegacyTable"
+  ],
+  "full_G03_G11": "not passed"
+}
