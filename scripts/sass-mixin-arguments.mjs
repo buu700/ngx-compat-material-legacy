@@ -5,6 +5,7 @@ import {dirname,isAbsolute,join,relative,resolve} from 'node:path';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 import {SILENCE,THEME_PARAMS} from './sass-api-inventory.mjs';
 import {measureSortPeer,sortCompanionResultsMatch,SORT_COMPANION_CASES} from './sass-sort-companion-contract.mjs';
+import {measureTreePeer,treeCompanionResultsMatch,TREE_COMPANION_CASES} from './sass-tree-companion-contract.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 export const MIXIN_ARGUMENT_CATALOG='fixtures/sass/mixin-argument-contracts.json';
@@ -73,12 +74,17 @@ export function runMixinArgumentContracts({sass,entry,loadPaths,allowedRoots,imp
       if (Object.hasOwn(SORT_COMPANION_CASES,probe.case_id)) {
         const peer=measureSortPeer({sass,materialRoot:allowedRoots[1],cdkRoot:allowedRoots[2],caseId:probe.case_id,line});
         current_companion={classification:'conforming-current-companion',contract:'current-sort-color-with-original-fallback',peer};
+      } else if (Object.hasOwn(TREE_COMPANION_CASES,probe.case_id)) {
+        const peer=measureTreePeer({sass,materialRoot:allowedRoots[1],cdkRoot:allowedRoots[2],caseId:probe.case_id,line});
+        current_companion={classification:'conforming-current-companion',contract:'current-tree-dimensions-with-original-fallbacks',peer};
       }
     }catch(caught){error=String(caught.message || caught);}
     const wrongCss=(actual?.css || '')+'\n.wrong-nonempty-mixin { color: red; }\n';
     const mutation={css:wrongCss,css_sha256:sha(wrongCss),css_bytes:Buffer.byteLength(wrongCss)};
     const conforms=value=>Object.hasOwn(SORT_COMPANION_CASES,probe.case_id)
       ? sortCompanionResultsMatch(probe.case_id,expected,value,current_companion?.peer)
+      : Object.hasOwn(TREE_COMPANION_CASES,probe.case_id)
+      ? treeCompanionResultsMatch(probe.case_id,expected,value,current_companion?.peer)
       : mixinArgumentResultsMatch(expected,value);
     const mutation_rejected=Boolean(expected && actual && !conforms(mutation));
     const exact=mixinArgumentResultsMatch(expected,actual);
