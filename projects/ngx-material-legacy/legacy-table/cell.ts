@@ -1,12 +1,13 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
 
-import {Directive, Input} from '@angular/core';
+import {Directive, Input, Injector, TemplateRef, runInInjectionContext} from '@angular/core';
 import {
   CdkCell,
   CdkCellDef,
@@ -16,6 +17,16 @@ import {
   CdkHeaderCell,
   CdkHeaderCellDef,
 } from '@angular/cdk/table';
+
+/** Construct the public parent with exactly the original supplied template. */
+function constructCellDefinition<T>(parent: new () => T, target: Function, template: TemplateRef<any>): T {
+  const context = Injector.create({providers: [{provide: TemplateRef, useValue: template}]});
+  try {
+    return runInInjectionContext(context, () => Reflect.construct(parent, [], target));
+  } finally {
+    context.destroy();
+  }
+}
 
 /**
  * Cell definition for the mat-table.
@@ -28,7 +39,14 @@ import {
   selector: '[matCellDef]',
   providers: [{provide: CdkCellDef, useExisting: MatLegacyCellDef}],
 })
-export class MatLegacyCellDef extends CdkCellDef {}
+export class MatLegacyCellDef extends CdkCellDef {
+  // Returning the constructed object is valid ECMAScript. TS requires a lexical
+  // super() even though that would discard the original manual argument here.
+  // @ts-expect-error TS2377: derived constructor deliberately returns its object.
+  constructor(template: TemplateRef<any>) {
+    return constructCellDefinition(CdkCellDef, new.target, template);
+  }
+}
 
 /**
  * Header cell definition for the mat-table.
@@ -41,7 +59,14 @@ export class MatLegacyCellDef extends CdkCellDef {}
   selector: '[matHeaderCellDef]',
   providers: [{provide: CdkHeaderCellDef, useExisting: MatLegacyHeaderCellDef}],
 })
-export class MatLegacyHeaderCellDef extends CdkHeaderCellDef {}
+export class MatLegacyHeaderCellDef extends CdkHeaderCellDef {
+  // Returning the constructed object is valid ECMAScript. TS requires a lexical
+  // super() even though that would discard the original manual argument here.
+  // @ts-expect-error TS2377: derived constructor deliberately returns its object.
+  constructor(template: TemplateRef<any>) {
+    return constructCellDefinition(CdkHeaderCellDef, new.target, template);
+  }
+}
 
 /**
  * Footer cell definition for the mat-table.
@@ -54,7 +79,14 @@ export class MatLegacyHeaderCellDef extends CdkHeaderCellDef {}
   selector: '[matFooterCellDef]',
   providers: [{provide: CdkFooterCellDef, useExisting: MatLegacyFooterCellDef}],
 })
-export class MatLegacyFooterCellDef extends CdkFooterCellDef {}
+export class MatLegacyFooterCellDef extends CdkFooterCellDef {
+  // Returning the constructed object is valid ECMAScript. TS requires a lexical
+  // super() even though that would discard the original manual argument here.
+  // @ts-expect-error TS2377: derived constructor deliberately returns its object.
+  constructor(template: TemplateRef<any>) {
+    return constructCellDefinition(CdkFooterCellDef, new.target, template);
+  }
+}
 
 /**
  * Column definition for the mat-table.
