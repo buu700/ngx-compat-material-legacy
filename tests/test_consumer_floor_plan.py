@@ -16,6 +16,8 @@ const plan = JSON.parse(readFileSync('compatibility/rc/consumer-floor-plan.json'
 const manifest = JSON.parse(readFileSync('projects/ngx-material-legacy/package.json', 'utf8'));
 const line = manifest.version.startsWith('22.') ? 'main' : '21.x';
 const configurations = floorConfigurations(plan, line, manifest);
+const lock=readFileSync('pnpm-lock.yaml','utf8'),importer=lock.split('  projects/ngx-material-legacy:\n')[1]?.split('\npackages:')[0];
+assert.ok(importer?.includes('      rxjs:\n        specifier: '+manifest.peerDependencies.rxjs+'\n        version: '+plan.current_configuration.rxjs));
 assert.equal(configurations.filter(c => c.group === 'library-runtime').length, 7);
 assert.equal(configurations.filter(c => c.group === 'cli-runtime-floors').length, 3);
 assert.ok(configurations.some(c => c.node === '18.0.0' && c.group === 'cli-runtime-floors'));
