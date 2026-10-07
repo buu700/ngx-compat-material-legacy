@@ -15,7 +15,7 @@ import {createHash} from 'node:crypto';
 import {existsSync, lstatSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
 import {dirname, join, relative, resolve} from 'node:path';
 import {fileURLToPath, pathToFileURL} from 'node:url';
-import {authoredUseInventory} from './authored-use-inventory.mjs';
+import {authoredUseInventory, authoredUseReviewEvidence} from './authored-use-inventory.mjs';
 import {validateCurrentAdvisories} from './upstream-advisory-admission.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -235,10 +235,13 @@ const authoredReference = JSON.parse(authoredReferenceBytes);
 let symbolUsesOpen = null;
 let symbolStatus = 'missing';
 let symbolInventory = authoredUseInventory(authoredReference.symbol_uses, null);
+let symbolReviewEvidence = {reviewed:0,insufficient:0,insufficient_uses:[]};
+const reviewLine = line || (JSON.parse(readFileSync(join(root,'package.json'),'utf8')).devDependencies['@angular/core'].startsWith('21.') ? '21.x' : 'main');
 if (existsSync(symbolsPath)) {
   const symbols = JSON.parse(readFileSync(symbolsPath, 'utf8'));
   symbolStatus = symbols.status || 'missing';
   symbolInventory = authoredUseInventory(authoredReference.symbol_uses, symbols);
+  symbolReviewEvidence = authoredUseReviewEvidence(symbols,reviewLine,rel=>{const file=regularRepoMember(rel);return file?readFileSync(file):null;},bytes=>createHash('sha256').update(bytes).digest('hex'));
   symbolUsesOpen = symbolInventory.open + symbolInventory.missing + symbolInventory.duplicates
     + symbolInventory.outside + symbolInventory.invalid;
 } 
@@ -249,7 +252,7 @@ const structuralOk = missing.length === 0 && unresolved.length === 0 && conflict
 const dispositionOk = structuralOk && missingEvidence.length === 0 && circularEvidence.length === 0
   && insufficientSensitive.length === 0 && insufficientInherited.length === 0
   && insufficientBehavior.length === 0 && missingBranch.length === 0
-  && symbolInventory.complete && symbolUsesOpen === 0 && symbolStatus === 'closed';
+  && symbolInventory.complete && symbolUsesOpen === 0 && symbolStatus === 'closed' && symbolReviewEvidence.insufficient === 0;
 
 const summary = {
   ok: structuralOk,
@@ -272,6 +275,7 @@ const summary = {
   insufficient_behavior: insufficientBehavior.length,
   missing_branch_applicability: missingBranch.length,
   authored_use_inventory: symbolInventory,
+  authored_use_review_evidence: {reviewed:symbolReviewEvidence.reviewed,insufficient:symbolReviewEvidence.insufficient,insufficient_use_sample:symbolReviewEvidence.insufficient_uses.slice(0,20)},
   symbol_uses_open: symbolUsesOpen,
   symbol_status: symbolStatus,
   forged_clearance: forgedClearance,
@@ -296,6 +300,7 @@ const report = {
   insufficient_behavior: insufficientBehavior.length,
   missing_branch_applicability: missingBranch.length,
   authored_use_inventory: symbolInventory,
+  authored_use_review_evidence: symbolReviewEvidence,
   symbol_uses_open: symbolUsesOpen,
   symbol_status: symbolStatus,
   ledger_sha256: createHash('sha256').update(readFileSync(ledgerPath)).digest('hex'),
@@ -308,7 +313,7 @@ const report = {
     'Structural inventory equality is not security clearance and is not cell closure.',
     'Sensitive rows and inherited or other material behavior decisions need individual proof. Tag ancestry or an import path is not that proof.',
     'A ledger string cannot set security clearance. g11_claim stays not-passed.',
-    'Authored-use inventory equality and closed labels are structural facts; individual source/API/behavior judgments still require the complete G11 audit.',
+    'Authored-use closed labels require exact per-use source/line/import review and independently hashed evidence. These bindings do not replace complete semantic G11 review of each conclusion.',
     'Does not claim G11.',
   ],
 };
@@ -354,7 +359,7 @@ const CASE_RESULTS = [
   ['upstream-shas', 'upstream-audit/upstream-shas/allowed-vocabulary', unknown.length === 0 && !forgedClearance],
   ['upstream-shas', 'upstream-audit/upstream-shas/sensitive-individual-proof', insufficientSensitive.length === 0],
   ['upstream-shas', 'upstream-audit/upstream-shas/independent-evidence', missingEvidence.length === 0 && circularEvidence.length === 0],
-  ['authored-symbols', 'upstream-audit/authored-symbols/complete-use-dispositions', symbolInventory.complete && symbolUsesOpen === 0 && symbolStatus === 'closed'],
+  ['authored-symbols', 'upstream-audit/authored-symbols/complete-use-dispositions', symbolInventory.complete && symbolUsesOpen === 0 && symbolStatus === 'closed' && symbolReviewEvidence.insufficient === 0],
   ['installed-peer-fixes', 'upstream-audit/installed-peer-fixes/content-not-ancestry', insufficientInherited.length === 0],
   ['installed-peer-fixes', 'upstream-audit/installed-peer-fixes/branch-applicability', missingBranch.length === 0 && insufficientBehavior.length === 0],
   ['current-advisories', 'upstream-audit/current-advisories/bound-current-lookup', advisory.ok],

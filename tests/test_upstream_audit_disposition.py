@@ -250,8 +250,11 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
                 admission=True, line="main", symbols=symbols,
             )
             admitted_summary = json.loads(admitted_result.stdout)
-            self.assertEqual(admitted_result.returncode, 0, admitted_result.stderr)
-            self.assertEqual(admitted_summary["disposition_admission"], "pass")
+            self.assertNotEqual(admitted_result.returncode, 0, admitted_result.stderr)
+            self.assertEqual(admitted_summary["disposition_admission"], "incomplete")
+            self.assertEqual(admitted_summary["authored_use_review_evidence"]["insufficient"], 1736)
+            self.assertEqual(admitted_summary["insufficient_sensitive"], 0)
+            self.assertEqual(admitted_summary["missing_evidence"], 0)
             self.assertEqual(admitted_summary["security_clearance"], "not-passed")
             self.assertEqual(admitted_summary["g11_claim"], "not-passed")
             self.assertEqual(admitted_summary["insufficient_inherited"], 0)
