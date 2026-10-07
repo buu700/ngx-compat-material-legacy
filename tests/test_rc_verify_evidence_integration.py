@@ -812,6 +812,7 @@ class CoordinatorTests(unittest.TestCase):
                              "observed": "rgb(1, 2, 3)", "oracle": value,
                              "sentinel_consumed": True, "mismatch_detected": True},
             })
+            body["bridge_negative"] = dict(body["negative"])
         body.update(changes)
         return body
 
@@ -866,7 +867,7 @@ for (const b of rostered) {
     const v = `rgb(${i + 10}, 9, 9)`;
     return [s, {found: true, value: v, token_value: v}];
   }));
-  observations[b.id] = {oracle: per, candidate: per, bridge: per, negative: {found: true, value: sentinels[b.token].marker}};
+  observations[b.id] = {oracle: per, candidate: per, bridge: per, bridge_negative: {found: true, value: sentinels[b.token].marker}, negative: {found: true, value: sentinels[b.token].marker}};
 }
 const dimensionTokens = {};
 for (const c of cases.COMPANIONS) {
@@ -1008,6 +1009,8 @@ console.log(JSON.stringify(bodies.map((b) => [b.case_id, b.result])));
             {"scenarios": good["scenarios"][:-1]},
             {"scenarios": [{**row, "bridge": "wrong"} for row in good["scenarios"]]},
             {"locate": {"css": "#wrong"}},
+            {"bridge_negative": None},
+            {"bridge_negative": {**good["bridge_negative"], "sentinel_consumed": False}},
             {"scenarios": [light, light]},
             {"negative": {**good["negative"], "sentinel_consumed": False}},
             {"negative": {**good["negative"], "mismatch_detected": False}},

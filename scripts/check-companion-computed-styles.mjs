@@ -819,7 +819,7 @@ async function observe({send, evaluate}, bindings, sentinels) {
   }
   const byScenario = {};
   for (const binding of bindings) for (const scenario of binding.scenarios) (byScenario[scenario] ||= []).push(binding.id);
-  const observations = Object.fromEntries(bindings.map((b) => [b.id, {oracle: {}, candidate: {}, bridge: {}, negative: null, unthemed: null}]));
+  const observations = Object.fromEntries(bindings.map((b) => [b.id, {oracle: {}, candidate: {}, bridge: {}, bridge_negative: null, negative: null, unthemed: null}]));
   const applied = {};
   const frame = () => evaluate('new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(() => r(true))))');
   let viewport = 'wide';
@@ -849,7 +849,6 @@ async function observe({send, evaluate}, bindings, sentinels) {
   for (const id of unthemedIds) observations[id].unthemed = unthemed[id];
   // Negative: one token at a time, the candidate light scope gets a wrong value.
   // Bindings observed only in narrow scenarios get theirs at the narrow viewport.
-  applied.negative = await evaluate(`(() => { document.getElementById('ccs-sentinel').media = 'all'; return window.__ccs.apply('candidate', ${JSON.stringify(SCENARIOS[NEGATIVE_SCENARIO])}); })()`);
   const byToken = new Map();
   for (const b of bindings) {
     const group = byToken.get(b.token) || {wide: [], narrow: []};
@@ -857,17 +856,20 @@ async function observe({send, evaluate}, bindings, sentinels) {
     byToken.set(b.token, group);
   }
   const injected = [];
-  for (const viewportName of ['wide', 'narrow']) {
-    const work = [...byToken].filter(([, group]) => group[viewportName].length);
-    if (!work.length) continue;
-    await setViewport(viewportName);
-    for (const [token, group] of work) {
-      const ids = group[viewportName];
-      await evaluate(`document.getElementById('ccs-sentinel').textContent = ${JSON.stringify(sentinelCss(sentinels, token))}`);
-      await frame();
-      const negative = await evaluate(`window.__ccs.read(${JSON.stringify(ids)})`);
-      for (const id of ids) observations[id].negative = {...negative[id], isolated_token: token};
-      injected.push(token);
+  for (const mode of ['candidate', 'bridge']) {
+    applied[`${mode}:negative`] = await evaluate(`(() => { document.getElementById('ccs-sentinel').media = 'all'; return window.__ccs.apply(${JSON.stringify(mode)}, ${JSON.stringify(SCENARIOS[NEGATIVE_SCENARIO])}); })()`);
+    for (const viewportName of ['wide', 'narrow']) {
+      const work = [...byToken].filter(([, group]) => group[viewportName].length);
+      if (!work.length) continue;
+      await setViewport(viewportName);
+      for (const [token, group] of work) {
+        const ids = group[viewportName];
+        await evaluate(`document.getElementById('ccs-sentinel').textContent = ${JSON.stringify(sentinelCss(sentinels, token, NEGATIVE_SCENARIO, mode))}`);
+        await frame();
+        const negative = await evaluate(`window.__ccs.read(${JSON.stringify(ids)})`);
+        for (const id of ids) observations[id][mode === 'candidate' ? 'negative' : 'bridge_negative'] = {...negative[id], isolated_token: token};
+        injected.push(token);
+      }
     }
   }
   await setViewport('wide');

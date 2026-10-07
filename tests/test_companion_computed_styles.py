@@ -47,7 +47,7 @@ ASSESS = """
 const binding = cases.BINDINGS.find((b) => b.id === input.id);
 const sentinel = cases.sentinelTable([binding])[binding.token];
 const good = (v) => ({found: true, value: v, token_value: v});
-const obs = {oracle: {}, candidate: {}, bridge: {}, negative: {found: true, value: sentinel.marker}};
+const obs = {oracle: {}, candidate: {}, bridge: {}, bridge_negative: {found: true, value: sentinel.marker}, negative: {found: true, value: sentinel.marker}};
 for (const s of binding.scenarios) {
   obs.oracle[s] = good(input.value);
   obs.candidate[s] = good(input.value);
@@ -279,7 +279,7 @@ for (const b of roster.rostered) {
   const o = {found: true, value: 'rgb(9, 9, 9)', token_value: 'rgb(9, 9, 9)'};
   const d = {found: true, value: 'rgb(8, 8, 8)', token_value: 'rgb(8, 8, 8)'};
   const per = Object.fromEntries(b.scenarios.map((s) => [s, s === 'light' ? o : d]));
-  observations[b.id] = {oracle: per, candidate: per, bridge: per, negative: {found: true, value: sentinels[b.token].marker}};
+  observations[b.id] = {oracle: per, candidate: per, bridge: per, bridge_negative: {found: true, value: sentinels[b.token].marker}, negative: {found: true, value: sentinels[b.token].marker}};
 }
 const tokens = {toolbar: {peer_source_file: 'toolbar/_m2-toolbar.scss', peer_source_sha256: 'ab'.repeat(32),
   dimensions: Object.fromEntries(cases.DIMENSIONS.map((d) => [d, {tokens: []}]))}};

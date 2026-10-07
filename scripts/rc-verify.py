@@ -1052,15 +1052,18 @@ def _computed_rendered_case_ok(body: dict, case_id: str, component: str, dimensi
         # A token the peer declares with a CSS-wide keyword has no computed value of its own.
         if keyword is None and not (isinstance(scenario.get("oracle_token"), str) and scenario["oracle_token"].strip()):
             return False
-    negative = body.get("negative")
-    if not isinstance(negative, dict) or negative.get("scenario") != binding["negative_scenario"]:
-        return False
-    if negative.get("sentinel_consumed") is not True or negative.get("mismatch_detected") is not True:
-        return False
-    injected, observed = negative.get("injected"), negative.get("observed")
-    if not (isinstance(injected, str) and injected and isinstance(observed, str) and observed):
-        return False
-    return observed != negative.get("oracle")
+    for key in ("negative", "bridge_negative"):
+        negative = body.get(key)
+        if not isinstance(negative, dict) or negative.get("scenario") != binding["negative_scenario"]:
+            return False
+        if negative.get("sentinel_consumed") is not True or negative.get("mismatch_detected") is not True:
+            return False
+        injected, observed = negative.get("injected"), negative.get("observed")
+        if not (isinstance(injected, str) and injected and isinstance(observed, str) and observed):
+            return False
+        if observed == negative.get("oracle"):
+            return False
+    return True
 
 
 def _computed_style_assertion_ok(body: dict, invocation: str) -> bool:
