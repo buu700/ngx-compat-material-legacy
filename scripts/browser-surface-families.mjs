@@ -42,10 +42,19 @@ function fail(code, message) {
 
 let tarball = null;
 let zoneless = false;
+let explicitReport = false;
 for (let i = 2; i < process.argv.length; i += 1) {
   if (process.argv[i] === '--zoneless') {
     zoneless = true;
-    reportPath = join(root, 'compatibility/rc/reports/browser-surface-families-zoneless.json');
+    if (!explicitReport) reportPath = join(root, 'compatibility/rc/reports/browser-surface-families-zoneless.json');
+    continue;
+  }
+  if (process.argv[i] === '--out') {
+    const value = process.argv[i + 1];
+    if (!value || value.startsWith('-')) fail(2, '--out requires a path');
+    reportPath = resolve(value);
+    explicitReport = true;
+    i += 1;
     continue;
   }
   if (process.argv[i] === '--tarball') {

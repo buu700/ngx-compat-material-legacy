@@ -133,6 +133,34 @@ export function qualifyRelease({expectedIds, outcomes, defects}) {
   };
 }
 
+/** Separate zoneful diagnostic; never writes or credits release assertions. */
+function runCloseoutDiagnostic(request, library, launch) {
+  if (!request || request.error || !library || !launch.chrome) return null;
+  const out = join(request.runDir, 'reports', 'closeout-browser-diagnostics.json');
+  if (existsSync(out)) {
+    console.log('closeout browser diagnostic: not run; output already exists');
+    return {status:'not-run',error:'fresh diagnostic output required',acceptance_credit:false};
+  }
+  const child = spawnSync(process.execPath, [join(root,'scripts/browser-surface-families.mjs'),
+    '--tarball',library.tarball,'--out',out], {
+    cwd:root,encoding:'utf8',timeout:300000,
+    env:{...process.env,CHROME_BIN:launch.chrome,NODE_OPTIONS:'',NODE_PATH:''},
+  });
+  let detail=null;
+  if (existsSync(out)) {
+    try { detail=JSON.parse(readFileSync(out,'utf8')); } catch { /* Report unreadable stays unexecuted. */ }
+  }
+  const bound=detail?.tarball_sha256===library.digest;
+  const observation={status:child.status===0&&bound?'executed':'failed',exit_code:child.status,
+    artifact_bound:bound,acceptance_credit:false,report:relative(request.runDir,out),
+    ...(child.status!==0||!bound?{stderr_tail:(child.stderr||child.error?.message||'').slice(-1000)}:{})};
+  console.log('closeout browser diagnostic (no acceptance credit): '+JSON.stringify(observation));
+  if (bound) for (const key of ['peer_media_matcher','progress_csp','peer_form_hover']) {
+    console.log('closeout '+key+' diagnostic (no acceptance credit): '+JSON.stringify(detail[key]??null));
+  }
+  return observation;
+}
+
 export async function runAcceptance({tarball, runPath}) {
   const request = coordinatorRequest();
   const roster = loadMainReleaseRoster();
@@ -168,6 +196,7 @@ export async function runAcceptance({tarball, runPath}) {
       launchError = error instanceof Error ? error.message : String(error);
     }
   }
+  const closeoutDiagnostic=runCloseoutDiagnostic(request,library,launch);
   const observed = observationProblems({
     requiredIds: roster.ids,
     outcomes,
@@ -206,6 +235,7 @@ export async function runAcceptance({tarball, runPath}) {
   writeDetail({
     schema_version: 1,
     role: 'diagnostic browser-matrix detail; acceptance is the coordinator report',
+    closeout_diagnostic:closeoutDiagnostic,
     check_id: 'browser-matrix',
     result: accepted ? 'pass' : 'fail',
     g10_claim: 'not-passed',
