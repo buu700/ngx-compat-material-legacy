@@ -193,7 +193,9 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
 
 
     def test_individual_proof_is_accepted_and_ancestry_is_not(self) -> None:
-        sha = sorted(MECHANICAL.glob("*.json"))[0].stem
+        sha = "1f13d60126bcde7af29438bae38a4da91a30e352"
+        evidence = "compatibility/f10/disposition-ledger/evidence/closeout-six-accessibility-guides-source-review.json"
+        reviewed = next(row for row in json.loads((ROOT / evidence).read_text())["reviews"] if row["sha"] == sha)
         with tempfile.TemporaryDirectory() as tmp:
             directory = Path(tmp)
             seed = directory / "seed.json"
@@ -203,30 +205,21 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
                 "status": "closed",
                 "symbol_uses": [{"disposition": "closed", "status": "reviewed"}],
             }))
-            evidence = f"compatibility/f10/disposition-ledger/evidence/mechanical/{sha}.json"
             common = {
                 "sha": sha,
                 "bucket": "behavior-semantic",
                 "subject": "fix(cdk/a11y): sample",
-                "files": ["src/cdk/a11y/live-announcer.ts"],
+                "files": reviewed["files"],
                 "evidence_report": evidence,
                 "reason": "synthetic row",
                 "batch_id": "synthetic",
                 "g11_claim": "not-passed",
             }
-            proof = {
-                "diff_sha256": "b" * 64,
-                "review_depth": "individual-deep",
-                "affected_branches": ["main"],
-                "decision": "Installed member bytes and an executed delegation were compared for this commit.",
-                "proof_kind": "installed-content",
-                "installed_member": {"sha256": "c" * 64},
-                "reachable_behavior": {"kind": "executed-delegation", "id": "synthetic/a11y/live-announcer"},
-            }
+            proof = {key: reviewed[key] for key in ("diff_sha256", "review_depth", "affected_branches", "decision")}
             admitted = directory / "admitted.json"
             admitted.write_text(json.dumps({
                 "g11_claim": "not-passed",
-                "entries": [{**common, "final_disposition": "inherited", "individual_proof": proof}],
+                "entries": [{**common, "final_disposition": "not-applicable", "individual_proof": proof}],
             }))
             admitted_result = run_checker(
                 seed, admitted, directory / "admitted-report.json",
