@@ -245,6 +245,8 @@ const scenarios = [
       && report.families?.radio?.disabled_class
       && report.families?.checkbox?.present
       && report.families?.checkbox?.disabled_class
+      && report.families?.checkbox?.contrast_modes === true
+      && report.families?.checkbox?.contrast_negative === true
       && report.families?.['slide-toggle']?.present
       && report.families?.['slide-toggle']?.disabled_class
       && !report.error,
@@ -284,6 +286,8 @@ const scenarios = [
       && report.families?.radio?.disabled_class
       && report.families?.checkbox?.present
       && report.families?.checkbox?.disabled_class
+      && report.families?.checkbox?.contrast_modes === true
+      && report.families?.checkbox?.contrast_negative === true
       && report.families?.['slide-toggle']?.present
       && report.families?.['slide-toggle']?.disabled_class
       && !report.error,
