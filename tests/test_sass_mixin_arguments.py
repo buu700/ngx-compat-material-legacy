@@ -37,7 +37,8 @@ try {
  const controlsCases=Object.keys((await import('./scripts/sass-datepicker-controls-contract.mjs')).DATEPICKER_CONTROLS_CASES);
  const aggregateDensityCases=Object.keys((await import('./scripts/sass-aggregate-density-contract.mjs')).AGGREGATE_DENSITY_CASES);
  const aggregateTypographyCases=Object.keys((await import('./scripts/sass-aggregate-typography-contract.mjs')).AGGREGATE_TYPOGRAPHY_CASES);
- assert.deepEqual(result.results.filter(p=>p.result!=='pass').map(p=>p.case_id).sort(),[...sortCases,...treeCases,...additionCases,...aliasCases,...shapeCases,...controlsCases,...aggregateDensityCases,...aggregateTypographyCases].sort());
+ const aggregateColorThemeCases=Object.keys((await import('./scripts/sass-aggregate-color-theme-contract.mjs')).AGGREGATE_COLOR_THEME_CASES);
+ assert.deepEqual(result.results.filter(p=>p.result!=='pass').map(p=>p.case_id).sort(),[...sortCases,...treeCases,...additionCases,...aliasCases,...shapeCases,...controlsCases,...aggregateDensityCases,...aggregateTypographyCases,...aggregateColorThemeCases].sort());
  const observed=result.results[0];assert.equal(mixinArgumentResultsMatch(observed.expected,observed.actual),true);
  assert.equal(mixinArgumentResultsMatch(observed.expected,{...observed.actual,css:'wrong'}),false);
  assert.equal(mixinArgumentResultsMatch(observed.expected,observed.mutation),false);
