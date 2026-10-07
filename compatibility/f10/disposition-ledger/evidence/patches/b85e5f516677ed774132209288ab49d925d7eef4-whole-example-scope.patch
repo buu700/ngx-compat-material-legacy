@@ -1,0 +1,540 @@
+diff --git a/src/cdk/table/table.md b/src/cdk/table/table.md
+index 62d105ad6..db12c29f9 100644
+--- a/src/cdk/table/table.md
++++ b/src/cdk/table/table.md
+@@ -19,7 +19,7 @@ top of the CDK data-table.
+ The first step to writing the data-table template is to define the columns.
+ A column definition is specified via an `<ng-container>` with the `cdkColumnDef` directive, giving
+ the column a name. Each column definition can contain a header-cell template
+-(`cdkHeaderCellDef`), data-cell template (`cdkCellDef`), and footer-cell 
++(`cdkHeaderCellDef`), data-cell template (`cdkCellDef`), and footer-cell
+ template (`cdkFooterCellDef`).
+ 
+ ```html
+@@ -120,9 +120,9 @@ cells that are displayed in the column `name` will be given the class `cdk-colum
+ columns to be given styles that will match across the header and rows.
+ 
+ Since columns can be given any string for its name, its possible that it cannot be directly applied
+-to the CSS class (e.g. `*nameColumn!`). In these cases, the special characters will be replaced by 
++to the CSS class (e.g. `*nameColumn!`). In these cases, the special characters will be replaced by
+ the `-` character. For example, cells container in a column named `*nameColumn!` will be given
+-the class `cdk-column--nameColumn-`.    
++the class `cdk-column--nameColumn-`.
+ 
+ #### Connecting the table to a data source
+ 
+@@ -158,15 +158,23 @@ table how to uniquely identify rows to track how the data changes with each upda
+ ```
+ 
+ ##### `recycleRows`
+-By default, `CdkTable` creates and destroys an internal Angular view for each row. This allows rows 
+-to participate in animations and to toggle between different row templates with `cdkRowDefWhen`. If 
+-you don't need these features, you can instruct the table to cache and recycle rows by specifying 
++By default, `CdkTable` creates and destroys an internal Angular view for each row. This allows rows
++to participate in animations and to toggle between different row templates with `cdkRowDefWhen`. If
++you don't need these features, you can instruct the table to cache and recycle rows by specifying
+ `recycleRows`.
+ 
+ ```html
+ <table cdk-table [dataSource]="dataSource" recycleRows>
+ ```
+ 
++### Virtual scrolling
++
++If you're showing a large amount of data in your table, you can use virtual scrolling to ensure a
++smooth experience for the user. To enable virtual scrolling, you have to wrap the CDK table in a
++`cdk-virtual-scroll-viewport` element and add some CSS to make it scrollable.
++
++<!-- example(cdk-table-virtual-scroll) -->
++
+ ### Alternate HTML to using native table
+ 
+ The CDK table does not require that you use a native HTML table. If you want to have full control
+@@ -174,7 +182,7 @@ over the style of the table, it may be easier to follow an alternative template
+ not use the native table element tags.
+ 
+ This alternative approach replaces the native table element tags with the CDK table directive
+-selectors. For example, `<table cdk-table>` becomes `<cdk-table>`; `<tr cdk-row`> becomes 
++selectors. For example, `<table cdk-table>` becomes `<cdk-table>`; `<tr cdk-row`> becomes
+ `<cdk-row>`. The following shows a previous example using this alternative template:
+ 
+ ```html
+diff --git a/src/components-examples/cdk/table/BUILD.bazel b/src/components-examples/cdk/table/BUILD.bazel
+index c4adba90c..bd4c87dae 100644
+--- a/src/components-examples/cdk/table/BUILD.bazel
++++ b/src/components-examples/cdk/table/BUILD.bazel
+@@ -12,8 +12,8 @@ ng_project(
+     deps = [
+         "//:node_modules/@angular/core",
+         "//:node_modules/rxjs",
+-        "//src/cdk/table",
+         "//src/cdk/scrolling",
++        "//src/cdk/table",
+     ],
+ )
+ 
+diff --git a/src/components-examples/cdk/table/cdk-table-virtual-scroll/cdk-table-virtual-scroll-example.css b/src/components-examples/cdk/table/cdk-table-virtual-scroll/cdk-table-virtual-scroll-example.css
+new file mode 100644
+index 000000000..148a534b9
+--- /dev/null
++++ b/src/components-examples/cdk/table/cdk-table-virtual-scroll/cdk-table-virtual-scroll-example.css
+@@ -0,0 +1,16 @@
++/* Make the container scrollable */
++.example-container {
++  height: 600px;
++  overflow: auto;
++}
++
++.example-container table {
++  width: 100%;
++}
++
++.example-container td,
++.example-container th {
++  height: 48px;
++  padding: 0;
++  text-align: left;
++}
+diff --git a/src/components-examples/cdk/table/cdk-virtual-table/cdk-virtual-table-example.html b/src/components-examples/cdk/table/cdk-table-virtual-scroll/cdk-table-virtual-scroll-example.html
+similarity index 83%
+rename from src/components-examples/cdk/table/cdk-virtual-table/cdk-virtual-table-example.html
+rename to src/components-examples/cdk/table/cdk-table-virtual-scroll/cdk-table-virtual-scroll-example.html
+index 4f338dabe..ae33d6fa9 100644
+--- a/src/components-examples/cdk/table/cdk-virtual-table/cdk-virtual-table-example.html
++++ b/src/components-examples/cdk/table/cdk-table-virtual-scroll/cdk-table-virtual-scroll-example.html
+@@ -1,5 +1,8 @@
++<p>Showing {{dataSource.length}} rows</p>
++
++<!-- Enable virtual scrolling -->
+ <cdk-virtual-scroll-viewport class="example-container" [itemSize]="48" [maxBufferPx]="1200" [minBufferPx]="400">
+-  <table class="example-virtual-table" cdk-table [dataSource]="dataSource" [trackBy]="trackBy">
++  <table cdk-table [dataSource]="dataSource" [trackBy]="trackBy">
+     <!-- Position Column -->
+     <ng-container cdkColumnDef="position">
+       <th cdk-header-cell *cdkHeaderCellDef> No. </th>
+@@ -28,8 +31,7 @@
+       <th cdk-footer-cell *cdkFooterCellDef> Symbol </th>
+     </ng-container>
+ 
+-    <tr cdk-header-row *cdkHeaderRowDef="displayedColumns; sticky: true;"></tr>
++    <tr cdk-header-row *cdkHeaderRowDef="displayedColumns"></tr>
+     <tr cdk-row *cdkRowDef="let row; columns: displayedColumns;"></tr>
+-    <tr cdk-footer-row *cdkFooterRowDef="displayedColumns; sticky: true;"></tr>
+   </table>
+ </cdk-virtual-scroll-viewport>
+diff --git a/src/components-examples/cdk/table/cdk-virtual-flex-table/cdk-virtual-flex-table-example.ts b/src/components-examples/cdk/table/cdk-table-virtual-scroll/cdk-table-virtual-scroll-example.ts
+similarity index 73%
+rename from src/components-examples/cdk/table/cdk-virtual-flex-table/cdk-virtual-flex-table-example.ts
+rename to src/components-examples/cdk/table/cdk-table-virtual-scroll/cdk-table-virtual-scroll-example.ts
+index 15a48a534..401a266f2 100644
+--- a/src/components-examples/cdk/table/cdk-virtual-flex-table/cdk-virtual-flex-table-example.ts
++++ b/src/components-examples/cdk/table/cdk-table-virtual-scroll/cdk-table-virtual-scroll-example.ts
+@@ -1,6 +1,6 @@
+ import {Component} from '@angular/core';
+ import {CdkTableModule} from '@angular/cdk/table';
+-import {CdkFixedSizeVirtualScroll, CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
++import {ScrollingModule} from '@angular/cdk/scrolling';
+ 
+ export interface PeriodicElement {
+   name: string;
+@@ -23,22 +23,22 @@ const ELEMENT_DATA: PeriodicElement[] = [
+ ];
+ 
+ const EXPANDED_ELEMENT_DATA: PeriodicElement[] = [];
+-for (let x = 0; x < 100; x++) {
++for (let x = 0; x < 250; x++) {
+   for (const entry of ELEMENT_DATA) {
+     EXPANDED_ELEMENT_DATA.push({...entry, position: entry.position + 10 * x});
+   }
+ }
+ 
+ /**
+- * @title Example of a flex table with virtual scroll enabled.
++ * @title Example of a CDK table with virtual scroll enabled.
+  */
+ @Component({
+-  selector: 'cdk-virtual-flex-table-example',
+-  styleUrls: ['cdk-virtual-flex-table-example.css'],
+-  templateUrl: 'cdk-virtual-flex-table-example.html',
+-  imports: [CdkTableModule, CdkVirtualScrollViewport, CdkFixedSizeVirtualScroll],
++  selector: 'cdk-table-virtual-scroll-example',
++  styleUrls: ['cdk-table-virtual-scroll-example.css'],
++  templateUrl: 'cdk-table-virtual-scroll-example.html',
++  imports: [CdkTableModule, ScrollingModule],
+ })
+-export class CdkVirtualFlexTableExample {
++export class CdkTableVirtualScrollExample {
+   displayedColumns: string[] = ['position', 'name', 'weight', 'symbol'];
+   dataSource = EXPANDED_ELEMENT_DATA;
+   trackBy = (index: number, el: PeriodicElement) => el.position;
+diff --git a/src/components-examples/cdk/table/cdk-virtual-flex-table/cdk-virtual-flex-table-example.css b/src/components-examples/cdk/table/cdk-virtual-flex-table/cdk-virtual-flex-table-example.css
+deleted file mode 100644
+index c7dfc5ddc..000000000
+--- a/src/components-examples/cdk/table/cdk-virtual-flex-table/cdk-virtual-flex-table-example.css
++++ /dev/null
+@@ -1,39 +0,0 @@
+-.example-container {
+-  height: 600px;
+-  overflow: auto;
+-}
+-
+-.example-virtual-table {
+-  width: 100%;
+-}
+-
+-.example-virtual-table .cdk-header-cell,
+-.example-virtual-table .cdk-footer-cell {
+-  align-items: center;
+-  background: #3f51b5;
+-  color: white;
+-  display: flex;
+-  font-weight: bold;
+-  justify-content: center;
+-}
+-
+-.example-virtual-table .cdk-cell,
+-.example-virtual-table .cdk-footer-cell,
+-.example-virtual-table .cdk-header-cell {
+-  height: 48px;
+-}
+-
+-/**
+- * Add basic flex styling so that the cells evenly space themselves in the row.
+- */
+-.example-virtual-table cdk-row,
+-.example-virtual-table cdk-header-row,
+-.example-virtual-table cdk-footer-row {
+-  display: flex;
+-}
+-
+-.example-virtual-table cdk-cell,
+-.example-virtual-table cdk-header-cell,
+-.example-virtual-table cdk-footer-cell {
+-  flex: 1;
+-}
+diff --git a/src/components-examples/cdk/table/cdk-virtual-flex-table/cdk-virtual-flex-table-example.html b/src/components-examples/cdk/table/cdk-virtual-flex-table/cdk-virtual-flex-table-example.html
+deleted file mode 100644
+index 983fe382c..000000000
+--- a/src/components-examples/cdk/table/cdk-virtual-flex-table/cdk-virtual-flex-table-example.html
++++ /dev/null
+@@ -1,35 +0,0 @@
+-<cdk-virtual-scroll-viewport class="example-container" [itemSize]="48" [maxBufferPx]="1200" [minBufferPx]="400">
+-  <cdk-table class="example-virtual-table" [dataSource]="dataSource" [trackBy]="trackBy">
+-    <!-- Position Column -->
+-    <ng-container cdkColumnDef="position">
+-      <cdk-header-cell *cdkHeaderCellDef> No. </cdk-header-cell>
+-      <cdk-cell *cdkCellDef="let element"> {{element.position}} </cdk-cell>
+-      <cdk-footer-cell *cdkFooterCellDef> No. </cdk-footer-cell>
+-    </ng-container>
+-
+-    <!-- Name Column -->
+-    <ng-container cdkColumnDef="name">
+-      <cdk-header-cell *cdkHeaderCellDef> Name </cdk-header-cell>
+-      <cdk-cell *cdkCellDef="let element"> {{element.name}} </cdk-cell>
+-      <cdk-footer-cell *cdkFooterCellDef> Name </cdk-footer-cell>
+-    </ng-container>
+-
+-    <!-- Weight Column -->
+-    <ng-container cdkColumnDef="weight">
+-      <cdk-header-cell *cdkHeaderCellDef> Weight </cdk-header-cell>
+-      <cdk-cell *cdkCellDef="let element"> {{element.weight}} </cdk-cell>
+-      <cdk-footer-cell *cdkFooterCellDef> Weight </cdk-footer-cell>
+-    </ng-container>
+-
+-    <!-- Symbol Column -->
+-    <ng-container cdkColumnDef="symbol">
+-      <cdk-header-cell *cdkHeaderCellDef> Symbol </cdk-header-cell>
+-      <cdk-cell *cdkCellDef="let element"> {{element.symbol}} </cdk-cell>
+-      <cdk-footer-cell *cdkFooterCellDef> Symbol </cdk-footer-cell>
+-    </ng-container>
+-
+-    <cdk-header-row *cdkHeaderRowDef="displayedColumns; sticky: true;"></cdk-header-row>
+-    <cdk-row *cdkRowDef="let row; columns: displayedColumns;"></cdk-row>
+-    <cdk-footer-row *cdkFooterRowDef="displayedColumns; sticky: true;"></cdk-footer-row>
+-  </cdk-table>
+-</cdk-virtual-scroll-viewport>
+diff --git a/src/components-examples/cdk/table/cdk-virtual-table/cdk-virtual-table-example.css b/src/components-examples/cdk/table/cdk-virtual-table/cdk-virtual-table-example.css
+deleted file mode 100644
+index c5e394c0b..000000000
+--- a/src/components-examples/cdk/table/cdk-virtual-table/cdk-virtual-table-example.css
++++ /dev/null
+@@ -1,29 +0,0 @@
+-.example-container {
+-  height: 600px;
+-  overflow: auto;
+-}
+-
+-.example-virtual-table {
+-  width: 100%;
+-}
+-
+-.example-virtual-table td,
+-.example-virtual-table th {
+-  height: 48px;
+-  padding: 0;
+-}
+-
+-.example-virtual-table th.cdk-header-cell,
+-.example-virtual-table .cdk-footer-row th {
+-  background: #3f51b5;
+-  color: white;
+-}
+-
+-.example-virtual-table th.mat-column-position,
+-.example-virtual-table td.mat-column-position {
+-  padding-left: 8px;
+-}
+-
+-.example-virtual-table .cdk-cell.cdk-table-sticky {
+-  background: #f0f0f0;
+-}
+diff --git a/src/components-examples/cdk/table/index.ts b/src/components-examples/cdk/table/index.ts
+index e1fe7d02a..d97ca1aa7 100644
+--- a/src/components-examples/cdk/table/index.ts
++++ b/src/components-examples/cdk/table/index.ts
+@@ -2,5 +2,4 @@ export {CdkTableFlexBasicExample} from './cdk-table-flex-basic/cdk-table-flex-ba
+ export {CdkTableBasicExample} from './cdk-table-basic/cdk-table-basic-example';
+ export {CdkTableFixedLayoutExample} from './cdk-table-fixed-layout/cdk-table-fixed-layout-example';
+ export {CdkTableRecycleRowsExample} from './cdk-table-recycle-rows/cdk-table-recycle-rows-example';
+-export {CdkVirtualFlexTableExample} from './cdk-virtual-flex-table/cdk-virtual-flex-table-example';
+-export {CdkVirtualTableExample} from './cdk-virtual-table/cdk-virtual-table-example';
++export {CdkTableVirtualScrollExample} from './cdk-table-virtual-scroll/cdk-table-virtual-scroll-example';
+diff --git a/src/components-examples/material/table/index.ts b/src/components-examples/material/table/index.ts
+index ef7a2c516..b9842617e 100644
+--- a/src/components-examples/material/table/index.ts
++++ b/src/components-examples/material/table/index.ts
+@@ -30,3 +30,4 @@ export {TableDynamicArrayDataExample} from './table-dynamic-array-data/table-dyn
+ export {TableDynamicObservableDataExample} from './table-dynamic-observable-data/table-dynamic-observable-data-example';
+ export {TableGeneratedColumnsExample} from './table-generated-columns/table-generated-columns-example';
+ export {TableFlexLargeRowExample} from './table-flex-large-row/table-flex-large-row-example';
++export {TableVirtualScrollExample} from './table-virtual-scroll/table-virtual-scroll-example';
+diff --git a/src/components-examples/material/table/table-virtual-scroll/table-virtual-scroll-example.css b/src/components-examples/material/table/table-virtual-scroll/table-virtual-scroll-example.css
+new file mode 100644
+index 000000000..c92ab5df4
+--- /dev/null
++++ b/src/components-examples/material/table/table-virtual-scroll/table-virtual-scroll-example.css
+@@ -0,0 +1,9 @@
++/* Make the container scrollable */
++.example-container {
++  height: 600px;
++  overflow: auto;
++}
++
++.example-container table {
++  width: 100%;
++}
+diff --git a/src/components-examples/material/table/table-virtual-scroll/table-virtual-scroll-example.html b/src/components-examples/material/table/table-virtual-scroll/table-virtual-scroll-example.html
+new file mode 100644
+index 000000000..166ddc5f6
+--- /dev/null
++++ b/src/components-examples/material/table/table-virtual-scroll/table-virtual-scroll-example.html
+@@ -0,0 +1,37 @@
++<p>Showing {{dataSource.length}} rows</p>
++
++<!-- Enable virtual scrolling -->
++<cdk-virtual-scroll-viewport class="example-container" [itemSize]="52" [maxBufferPx]="1200" [minBufferPx]="400">
++  <table mat-table [dataSource]="dataSource" [trackBy]="trackBy">
++    <!-- Position Column -->
++    <ng-container matColumnDef="position">
++      <th mat-header-cell *matHeaderCellDef> No. </th>
++      <td mat-cell *matCellDef="let element"> {{element.position}} </td>
++      <th mat-footer-cell *matFooterCellDef> No. </th>
++    </ng-container>
++
++    <!-- Name Column -->
++    <ng-container matColumnDef="name">
++      <th mat-header-cell *matHeaderCellDef> Name </th>
++      <td mat-cell *matCellDef="let element"> {{element.name}} </td>
++      <th mat-footer-cell *matFooterCellDef> Name </th>
++    </ng-container>
++
++    <!-- Weight Column -->
++    <ng-container matColumnDef="weight">
++      <th mat-header-cell *matHeaderCellDef> Weight </th>
++      <td mat-cell *matCellDef="let element"> {{element.weight}} </td>
++      <th mat-footer-cell *matFooterCellDef> Weight </th>
++    </ng-container>
++
++    <!-- Symbol Column -->
++    <ng-container matColumnDef="symbol">
++      <th mat-header-cell *matHeaderCellDef> Symbol </th>
++      <td mat-cell *matCellDef="let element"> {{element.symbol}} </td>
++      <th mat-footer-cell *matFooterCellDef> Symbol </th>
++    </ng-container>
++
++    <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
++    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
++  </table>
++</cdk-virtual-scroll-viewport>
+diff --git a/src/components-examples/cdk/table/cdk-virtual-table/cdk-virtual-table-example.ts b/src/components-examples/material/table/table-virtual-scroll/table-virtual-scroll-example.ts
+similarity index 65%
+rename from src/components-examples/cdk/table/cdk-virtual-table/cdk-virtual-table-example.ts
+rename to src/components-examples/material/table/table-virtual-scroll/table-virtual-scroll-example.ts
+index c96aed9c4..2da07b078 100644
+--- a/src/components-examples/cdk/table/cdk-virtual-table/cdk-virtual-table-example.ts
++++ b/src/components-examples/material/table/table-virtual-scroll/table-virtual-scroll-example.ts
+@@ -1,6 +1,6 @@
+-import {CdkFixedSizeVirtualScroll, CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
+-import {CdkTableModule} from '@angular/cdk/table';
+-import {ChangeDetectionStrategy, Component} from '@angular/core';
++import {Component} from '@angular/core';
++import {MatTableModule} from '@angular/material/table';
++import {ScrollingModule} from '@angular/cdk/scrolling';
+ 
+ export interface PeriodicElement {
+   name: string;
+@@ -23,23 +23,22 @@ const ELEMENT_DATA: PeriodicElement[] = [
+ ];
+ 
+ const EXPANDED_ELEMENT_DATA: PeriodicElement[] = [];
+-for (let x = 0; x < 100; x++) {
++for (let x = 0; x < 250; x++) {
+   for (const entry of ELEMENT_DATA) {
+     EXPANDED_ELEMENT_DATA.push({...entry, position: entry.position + 10 * x});
+   }
+ }
+ 
+ /**
+- * @title Example of a native table with virtual scroll enabled.
++ * @title Example of a Material table with virtual scroll enabled.
+  */
+ @Component({
+-  selector: 'cdk-virtual-table-example',
+-  styleUrls: ['cdk-virtual-table-example.css'],
+-  templateUrl: 'cdk-virtual-table-example.html',
+-  changeDetection: ChangeDetectionStrategy.OnPush,
+-  imports: [CdkTableModule, CdkVirtualScrollViewport, CdkFixedSizeVirtualScroll],
++  selector: 'table-virtual-scroll-example',
++  styleUrls: ['table-virtual-scroll-example.css'],
++  templateUrl: 'table-virtual-scroll-example.html',
++  imports: [MatTableModule, ScrollingModule],
+ })
+-export class CdkVirtualTableExample {
++export class TableVirtualScrollExample {
+   displayedColumns: string[] = ['position', 'name', 'weight', 'symbol'];
+   dataSource = EXPANDED_ELEMENT_DATA;
+   trackBy = (index: number, el: PeriodicElement) => el.position;
+diff --git a/src/dev-app/table/table-demo.html b/src/dev-app/table/table-demo.html
+index 85c9537bd..e4cafbb90 100644
+--- a/src/dev-app/table/table-demo.html
++++ b/src/dev-app/table/table-demo.html
+@@ -1,15 +1,18 @@
+-<h3>Cdk table basic</h3>
++<h3>CDK table basic</h3>
+ <cdk-table-basic-example></cdk-table-basic-example>
+ 
+-<h3>Cdk table with recycled rows</h3>
++<h3>CDK table with recycled rows</h3>
+ <cdk-table-recycle-rows-example></cdk-table-recycle-rows-example>
+ 
+-<h3>Cdk table basic with fixed column widths</h3>
++<h3>CDK table basic with fixed column widths</h3>
+ <cdk-table-fixed-layout-example></cdk-table-fixed-layout-example>
+ 
+-<h3>Cdk table basic flex</h3>
++<h3>CDK table basic flex</h3>
+ <cdk-table-flex-basic-example></cdk-table-flex-basic-example>
+ 
++<h3>CDK table with virtual scrolling</h3>
++<cdk-table-virtual-scroll-example></cdk-table-virtual-scroll-example>
++
+ <h3>Table basic</h3>
+ <table-basic-example></table-basic-example>
+ 
+@@ -49,6 +52,9 @@
+ <h3>Table with pagination</h3>
+ <table-pagination-example></table-pagination-example>
+ 
++<h3>Table with virtual scrolling</h3>
++<table-virtual-scroll-example></table-virtual-scroll-example>
++
+ <h3>Table with selection</h3>
+ <table-selection-example></table-selection-example>
+ 
+@@ -84,9 +90,3 @@
+ 
+ <h3>Table wrapped re-orderable columns</h3>
+ <table-reorderable-example></table-reorderable-example>
+-
+-<h3>Cdk virtual table</h3>
+-<cdk-virtual-table-example></cdk-virtual-table-example>
+-
+-<h3>Cdk virtual flex table</h3>
+-<cdk-virtual-flex-table-example></cdk-virtual-flex-table-example>
+diff --git a/src/dev-app/table/table-demo.ts b/src/dev-app/table/table-demo.ts
+index 3561a4449..8aad80b0c 100644
+--- a/src/dev-app/table/table-demo.ts
++++ b/src/dev-app/table/table-demo.ts
+@@ -6,13 +6,13 @@
+  * found in the LICENSE file at https://angular.dev/license
+  */
+ 
++import {ChangeDetectionStrategy, Component} from '@angular/core';
+ import {
+   CdkTableBasicExample,
+   CdkTableFixedLayoutExample,
+   CdkTableFlexBasicExample,
+   CdkTableRecycleRowsExample,
+-  CdkVirtualFlexTableExample,
+-  CdkVirtualTableExample,
++  CdkTableVirtualScrollExample,
+ } from '@angular/components-examples/cdk/table';
+ import {
+   TableBasicExample,
+@@ -39,9 +39,9 @@ import {
+   TableStickyHeaderExample,
+   TableTextColumnAdvancedExample,
+   TableTextColumnExample,
++  TableVirtualScrollExample,
+   TableWrappedExample,
+ } from '@angular/components-examples/material/table';
+-import {ChangeDetectionStrategy, Component} from '@angular/core';
+ 
+ @Component({
+   templateUrl: './table-demo.html',
+@@ -50,6 +50,7 @@ import {ChangeDetectionStrategy, Component} from '@angular/core';
+     CdkTableBasicExample,
+     CdkTableFixedLayoutExample,
+     CdkTableRecycleRowsExample,
++    CdkTableVirtualScrollExample,
+     TableFlexBasicExample,
+     TableBasicExample,
+     TableDynamicColumnsExample,
+@@ -61,6 +62,7 @@ import {ChangeDetectionStrategy, Component} from '@angular/core';
+     TableMultipleRowTemplateExample,
+     TableOverviewExample,
+     TablePaginationExample,
++    TableVirtualScrollExample,
+     TableRowContextExample,
+     TableSelectionExample,
+     TableSortingExample,
+@@ -75,8 +77,6 @@ import {ChangeDetectionStrategy, Component} from '@angular/core';
+     TableReorderableExample,
+     TableRecycleRowsExample,
+     TableFlexLargeRowExample,
+-    CdkVirtualFlexTableExample,
+-    CdkVirtualTableExample,
+   ],
+   changeDetection: ChangeDetectionStrategy.OnPush,
+ })
+diff --git a/src/material/table/table.md b/src/material/table/table.md
+index c578e5625..84370e2d4 100644
+--- a/src/material/table/table.md
++++ b/src/material/table/table.md
+@@ -175,6 +175,16 @@ and its interface is not tied to any one specific implementation.
+ 
+ <!-- example(table-pagination) -->
+ 
++#### Virtual scrolling
++
++An alternative approach to showing a large amount of data inside a Material table is to use
++virtual scrolling which will only render the the visible rows in the DOM as the user is scrolling.
++
++To enable virtual scrolling you have to wrap the Material table in a `<cdk-virtual-scroll-viewport>`
++element and add CSS to make the viewport scrollable.
++
++<!-- example(table-virtual-scroll) -->
++
+ #### Sorting
+ 
+ To add sorting behavior to the table, add the `matSort` directive to the table and add
