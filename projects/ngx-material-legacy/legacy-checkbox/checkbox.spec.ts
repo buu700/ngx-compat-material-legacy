@@ -1,10 +1,10 @@
+import {captureMutationObserverCallbacks} from '../../../testing/legacy-runner/mutation-observer';
 import {ComponentFixture, fakeAsync, TestBed, flush, flushMicrotasks} from '@angular/core/testing';
 import {FormControl, FormsModule, NgModel, ReactiveFormsModule} from '@angular/forms';
 import {Component, DebugElement, ViewChild, Type, ChangeDetectionStrategy} from '@angular/core';
 import {By} from '@angular/platform-browser';
 import {dispatchFakeEvent} from '../../cdk/testing/private';
 import {MatLegacyCheckbox, MatLegacyCheckboxChange, MatLegacyCheckboxModule} from './index';
-import {MutationObserverFactory} from '@angular/cdk/observers';
 import {ThemePalette} from '@angular/material/core';
 import {MatCheckboxDefaultOptions, MAT_CHECKBOX_DEFAULT_OPTIONS} from '@angular/material/checkbox';
 
@@ -1153,28 +1153,12 @@ describe('MatLegacyCheckbox', () => {
       fixture.destroy();
 
       const mutationCallbacks: Function[] = [];
+      captureMutationObserverCallbacks(mutationCallbacks);
 
       TestBed.resetTestingModule()
         .configureTestingModule({
           imports: [MatLegacyCheckboxModule, FormsModule, ReactiveFormsModule],
           declarations: [CheckboxWithoutLabel],
-          providers: [
-            {
-              provide: MutationObserverFactory,
-              useValue: {
-                // Stub out the factory that creates mutation observers for the underlying directive
-                // to allows us to flush out the callbacks asynchronously.
-                create: (callback: Function) => {
-                  mutationCallbacks.push(callback);
-
-                  return {
-                    observe: () => {},
-                    disconnect: () => {},
-                  };
-                },
-              },
-            },
-          ],
         })
         .compileComponents();
 
@@ -1217,20 +1201,9 @@ describe('MatLegacyCheckbox', () => {
   describe('label margin', () => {
     it('should properly update margin if label content is projected', () => {
       const mutationCallbacks: Function[] = [];
+      captureMutationObserverCallbacks(mutationCallbacks);
 
-      TestBed.configureTestingModule({
-        providers: [
-          {
-            provide: MutationObserverFactory,
-            useValue: {
-              create: (callback: Function) => {
-                mutationCallbacks.push(callback);
-                return {observe: () => {}, disconnect: () => {}};
-              },
-            },
-          },
-        ],
-      });
+      TestBed.configureTestingModule({});
 
       fixture = createComponent(CheckboxWithProjectedLabel, [TextBindingComponent]);
       fixture.detectChanges();
