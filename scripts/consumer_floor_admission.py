@@ -68,6 +68,8 @@ def floor_assertion_ok(root: Path, active, body: dict, invocation: str) -> bool:
             versions.update(rxjs=config['rxjs'], typescript=config['typescript'])
             if body['installed_versions'] != versions or detail['installed_floor_versions'] != versions:
                 return False
+            if detail.get('experimental_peer') is True or detail.get('advertised_floor_acceptance_credit') is False:
+                return False
             if detail['floor_configuration'] != config or detail['node_runtime'] != {'version':runtime['version'], 'exec_path':runtime['executable']}:
                 return False
             if detail['tarball']['sha256'] != artifacts['library'] or detail['status'] != 'ok' or detail.get('errors') != []:

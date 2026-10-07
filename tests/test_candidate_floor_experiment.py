@@ -1,5 +1,6 @@
 """Candidate peer experiments cannot replace advertised-floor acceptance."""
 import copy
+import hashlib
 import json
 from pathlib import Path
 import subprocess
@@ -13,7 +14,7 @@ from consumer_floor_admission import floor_assertion_ok,reviewed_configurations
 from consumer_floor_fixture import write_floor_receipt
 
 class CandidateFloorExperimentTests(unittest.TestCase):
-    def test_candidate_is_separate_and_published_roster_is_unchanged(self):
+    def test_authorized_floor_replaces_the_experiment_without_reusing_its_credit(self):
         code=r'''
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -22,12 +23,15 @@ const plan=JSON.parse(readFileSync('compatibility/rc/consumer-floor-plan.json'))
 const manifest=JSON.parse(readFileSync('projects/ngx-material-legacy/package.json'));
 const line=manifest.version.startsWith('22.')?'main':'21.x';
 const declared=floorConfigurations(plan,line,manifest), candidate=candidateFloorConfigurations(plan,line,manifest);
-assert.equal(declared.length,10);assert.equal(candidate.length,3);
-assert.equal(manifest.peerDependencies.rxjs,'^6.5.3 || ^7.4.0');
-assert.ok(declared.filter(c=>c.case_id.includes('/rxjs-7.4.0/')).length===3);
-assert.deepEqual(candidate.map(c=>c.node),plan.lines[line].library_node_minima);
-for(const config of candidate){assert.equal(config.rxjs,'7.5.5');assert.equal(config.rxjs_integrity,RXJS_CANDIDATE.integrity);assert.equal(config.acceptance_credit,false);assert.equal(config.group,'candidate-peer-experiment');assert.ok(config.case_id.startsWith('experiment/'));assert.ok(!declared.some(c=>c.case_id===config.case_id));}
-const mutated=structuredClone(manifest);mutated.peerDependencies.rxjs='^6.5.3 || ^7.5.5';
+assert.equal(declared.length,10);assert.equal(candidate.length,0);
+assert.equal(manifest.peerDependencies.rxjs,'^6.5.3 || ^7.5.5');
+assert.ok(declared.filter(c=>c.case_id.includes('/rxjs-7.5.5/')).length===3);
+assert.ok(!declared.some(c=>c.rxjs==='7.4.0'));
+const archivedPlan=structuredClone(plan),archivedManifest=structuredClone(manifest);archivedPlan.rxjs_minima=['6.5.3','7.4.0'];archivedManifest.peerDependencies.rxjs='^6.5.3 || ^7.4.0';
+const historical=candidateFloorConfigurations(archivedPlan,line,archivedManifest);assert.equal(historical.length,3);
+assert.deepEqual(historical.map(c=>c.node),plan.lines[line].library_node_minima);
+for(const config of historical){assert.equal(config.rxjs,'7.5.5');assert.equal(config.rxjs_integrity,RXJS_CANDIDATE.integrity);assert.equal(config.acceptance_credit,false);assert.equal(config.group,'candidate-peer-experiment');assert.ok(config.case_id.startsWith('experiment/'));assert.ok(!declared.some(c=>c.case_id===config.case_id));}
+const mutated=structuredClone(manifest);mutated.peerDependencies.rxjs='^6.5.3 || ^7.4.0';
 assert.throws(()=>candidateFloorConfigurations(plan,line,mutated),/advertised RxJS ranges changed/);
 '''
         result=subprocess.run(['node','--input-type=module','-e',code],cwd=ROOT,capture_output=True,text=True)
@@ -38,9 +42,12 @@ assert.throws(()=>candidateFloorConfigurations(plan,line,mutated),/advertised Rx
         for line in ('main','21.x'):
             with tempfile.TemporaryDirectory() as tmp:
                 active=SimpleNamespace(run_dir=Path(tmp),binding={'source_line':line},manifest={'run_id':'synthetic','artifacts':[{'id':'library','sha256':'d'*64},{'id':'migrate-cli','sha256':'e'*64}]})
-                case=next(k for k,c in reviewed_configurations(plan,line).items() if c.get('rxjs')=='7.4.0')
+                case=next(k for k,c in reviewed_configurations(plan,line).items() if c.get('rxjs')=='7.5.5')
                 receipt=write_floor_receipt(ROOT,active,case,'one');self.assertTrue(floor_assertion_ok(ROOT,active,receipt,'one'))
                 candidate=copy.deepcopy(receipt);candidate['kind']='candidate-peer-experiment';candidate['group']='candidate-peer-experiment';candidate['case_id']='experiment/'+case;candidate['configuration']['rxjs']='7.5.5';candidate['acceptance_credit']=False
                 self.assertFalse(floor_assertion_ok(ROOT,active,candidate,'one'))
                 candidate.update(kind='assertion',group='library-runtime',case_id=case,acceptance_credit=True)
+                # Retained experiment provenance in its bound detail survives relabelling.
+                path=active.run_dir/candidate['consumer_detail']['path'];detail=json.loads(path.read_bytes());detail.update(experimental_peer=True,advertised_floor_acceptance_credit=False)
+                raw=(json.dumps(detail,indent=2)+'\n').encode();path.write_bytes(raw);candidate['consumer_detail'].update(sha256=hashlib.sha256(raw).hexdigest(),bytes=len(raw))
                 self.assertFalse(floor_assertion_ok(ROOT,active,candidate,'one'))
