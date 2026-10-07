@@ -169,8 +169,8 @@ function startServer(consumer) {
 
 async function withChromium(origin, visit) {
   const bin = chromeBin();
-  const port = Number(process.env.CSP_SSR_CDP_PORT || '9341');
-  spawnSync('bash', ['-lc', `fuser -k ${port}/tcp >/dev/null 2>&1 || true`], {timeout: 5000});
+  let port = Number(process.env.CSP_SSR_CDP_PORT || '0');
+  if (!Number.isInteger(port) || port < 0 || port > 65535) throw new Error('invalid CSP_SSR_CDP_PORT');
   const userData = mkdtempSync(join(tmpdir(), 'ngx-csp-chrome-'));
   const chrome = spawn(bin, [
     '--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${userData}`,
@@ -181,7 +181,20 @@ async function withChromium(origin, visit) {
   const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
   let version = null;
   for (let i = 0; i < 80 && !version; i += 1) {
-    try { version = await (await fetch(`http://127.0.0.1:${port}/json/version`)).json(); } catch { await sleep(250); }
+    try {
+      if (!port) {
+        const activePort = join(userData, 'DevToolsActivePort');
+        const selected = Number(readFileSync(activePort, 'utf8').split('\n')[0]);
+        if (!Number.isInteger(selected) || selected < 1 || selected > 65535) throw new Error('invalid owned debugging port');
+        port = selected;
+      }
+      const observed = await (await fetch(`http://127.0.0.1:${port}/json/version`)).json();
+      // A fixed port may belong to another process. Connect only after this
+      // child announces the same unique browser debugger endpoint on stderr.
+      if (typeof observed.webSocketDebuggerUrl === 'string' &&
+          log.includes('DevTools listening on '+observed.webSocketDebuggerUrl)) version = observed;
+      else await sleep(250);
+    } catch { await sleep(250); }
   }
   if (!version) {
     chrome.kill();
