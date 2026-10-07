@@ -10,6 +10,7 @@ import {createHash} from 'node:crypto';
 import {dirname, join, relative, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {resolveLibraryFromRun} from './resolve-run-library.mjs';
+import {legacyCoreHighContrastOkay} from './legacy-core-high-contrast-contract.mjs';
 import {loadMainReleaseRoster, observationProblems} from './browser-matrix-roster.mjs';
 import {executeIds, fixtureQualificationDefects, fixtureQualificationDefectsFromTarball} from './browser-required-cells.mjs';
 
@@ -153,9 +154,10 @@ function runCloseoutDiagnostic(request, library, launch) {
   const bound=detail?.tarball_sha256===library.digest;
   const observation={status:child.status===0&&bound?'executed':'failed',exit_code:child.status,
     artifact_bound:bound,acceptance_credit:false,report:relative(request.runDir,out),
+    core_high_contrast_passed:bound&&legacyCoreHighContrastOkay(detail?.core_high_contrast),
     ...(child.status!==0||!bound?{stderr_tail:(child.stderr||child.error?.message||'').slice(-1000)}:{})};
   console.log('closeout browser diagnostic (no acceptance credit): '+JSON.stringify(observation));
-  if (bound) for (const key of ['peer_media_matcher','progress_csp','peer_form_hover']) {
+  if (bound) for (const key of ['peer_media_matcher','progress_csp','peer_form_hover','core_high_contrast']) {
     console.log('closeout '+key+' diagnostic (no acceptance credit): '+JSON.stringify(detail[key]??null));
   }
   return observation;
@@ -197,6 +199,7 @@ export async function runAcceptance({tarball, runPath}) {
     }
   }
   const closeoutDiagnostic=runCloseoutDiagnostic(request,library,launch);
+  if(!closeoutDiagnostic?.core_high_contrast_passed)qualificationDefects.push('legacy core high contrast/ripple native guard missing or failed');
   const observed = observationProblems({
     requiredIds: roster.ids,
     outcomes,

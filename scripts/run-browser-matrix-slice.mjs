@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import {peerIconTtOkay} from './peer-icon-tt-admission.mjs';
+import {legacyCoreHighContrastOkay} from './legacy-core-high-contrast-contract.mjs';
 /**
  * Execute a real Chromium browser slice against a packed artifact and credit
  * only the declared matrix cells that actually ran.
@@ -316,6 +317,7 @@ const scenarios = [
       && report.families?.['progress-spinner']?.present
       && report.families?.['progress-spinner']?.value_reflected
       && peerIconTtOkay(report.peer_icon_tt)
+      && legacyCoreHighContrastOkay(report.core_high_contrast)
       && !report.error,
   },
   {
@@ -345,6 +347,7 @@ const scenarios = [
       && report.families?.['progress-spinner']?.present
       && report.families?.['progress-spinner']?.value_reflected
       && peerIconTtOkay(report.peer_icon_tt)
+      && legacyCoreHighContrastOkay(report.core_high_contrast)
       && !report.error,
   },
 ];
@@ -358,29 +361,13 @@ const nodeArgs = typeof globalThis.WebSocket === 'function'
   ? []
   : ['--experimental-websocket'];
 
-function freeCdpPort(port) {
-  spawnSync('bash', ['-lc', `fuser -k ${port}/tcp >/dev/null 2>&1 || true; sleep 0.2; fuser -k ${port}/tcp >/dev/null 2>&1 || true`], {
-    encoding: 'utf8',
-    timeout: 8000,
-  });
-}
-
 for (const scenario of scenarios) {
-  const cdpPort = scenario.script.includes('surface-families')
-    ? 9336
-    : scenario.script.includes('control-families')
-      ? 9336
-      : scenario.script.includes('form-families')
-        ? 9335
-        : scenario.script.includes('overlay')
-          ? 9334
-          : 9333;
-  freeCdpPort(cdpPort);
-  process.env.CDP_PORT = String(cdpPort);
+  // Every browser child owns an OS-assigned debugger port. Never kill a
+  // process by port number while other work may be running.
   const result = spawnSync(
     process.execPath,
     [...nodeArgs, join(root, scenario.script), '--tarball', tarball, ...scenario.args],
-    {cwd: root, encoding: 'utf8', timeout: 300000, env: {...process.env, NODE_PATH: '', NODE_OPTIONS: ''}},
+    {cwd: root, encoding: 'utf8', timeout: 300000, env: {...process.env, CDP_PORT:'0', NODE_PATH: '', NODE_OPTIONS: ''}},
   );
   const detailPath = join(root, scenario.detail);
   let detail = null;

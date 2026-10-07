@@ -11,6 +11,7 @@
  * for them. Pass --ssr to also run scripts/ssr-dialog.mjs for the main tarball.
  */
 import {createHash} from 'node:crypto';
+import {announcedChromeEndpoint,debuggerMatchesChild,announcedFirefoxEndpoint} from './chromium-debug-endpoint.mjs';
 import {spawn, spawnSync} from 'node:child_process';
 import {createRequire} from 'node:module';
 import {createServer} from 'node:http';
@@ -38,7 +39,6 @@ const reportPath = join(root, 'compatibility/rc/reports/browser-matrix-required.
 const probePath = join(root, 'scripts/browser-required-probe.js');
 const webkitScript = join(root, 'scripts/browser-webkit-session.py');
 const CSP_NONCE = 'rc07csp';
-const CDP_PORTS = {chromium: 9333, firefox: 9334};
 
 function firefoxBin() {
   if (process.env.FIREFOX_BIN && existsSync(process.env.FIREFOX_BIN)) return process.env.FIREFOX_BIN;
@@ -646,11 +646,11 @@ function chromeBin() {
 export async function withChromium(origin, fn, options = {}) {
   const bin = chromeBin();
   const userDir = allocateLauncherDir('chrome-');
-  const port = options.port || CDP_PORTS.chromium;
-  spawnSync('bash', ['-lc', `fuser -k ${port}/tcp >/dev/null 2>&1 || true`], {timeout: 5000});
+  const requestedPort=options.port??0;
+  let port=0;
   const chrome = spawn(bin, [
     '--headless=new',
-    `--remote-debugging-port=${port}`,
+    `--remote-debugging-port=${requestedPort}`,
     `--user-data-dir=${userDir}`,
     '--no-sandbox',
     '--disable-gpu',
@@ -662,8 +662,14 @@ export async function withChromium(origin, fn, options = {}) {
     let version = null;
     for (let i = 0; i < 80; i += 1) {
       try {
-        const response = await fetch(`http://127.0.0.1:${port}/json/version`);
-        if (response.ok) { version = await response.json(); break; }
+        const endpoint=announcedChromeEndpoint(log,requestedPort);
+        if(!endpoint){await sleep(100);continue;}
+        const response = await fetch(`http://127.0.0.1:${endpoint.port}/json/version`);
+        if(response.ok){
+          const observed=await response.json();
+          if(!debuggerMatchesChild(observed,endpoint))throw Error('debugger does not belong to Chromium child');
+          version=observed;port=endpoint.port;break;
+        }
       } catch { /* retry */ }
       await sleep(250);
     }
@@ -736,12 +742,12 @@ export async function withFirefox(origin, fn, options = {}) {
   if (options.reduced) {
     writeFileSync(join(profile, 'user.js'), 'user_pref("ui.prefersReducedMotion", 1);\n');
   }
-  const port = options.port || CDP_PORTS.firefox;
-  spawnSync('bash', ['-lc', `fuser -k ${port}/tcp >/dev/null 2>&1 || true`], {timeout: 5000});
+  const requestedPort=options.port??0;
+  let port=0;
   const firefox = spawn(bin, [
     '--headless',
     '--profile', profile,
-    `--remote-debugging-port=${port}`,
+    `--remote-debugging-port=${requestedPort}`,
     '--remote-allow-hosts=127.0.0.1',
     'about:blank',
   ], {stdio: ['ignore', 'pipe', 'pipe']});
@@ -750,13 +756,15 @@ export async function withFirefox(origin, fn, options = {}) {
   firefox.stderr.on('data', chunk => { log += chunk; });
   try {
     const started = Date.now();
-    while (!log.includes('WebDriver BiDi listening')) {
+    while (!announcedFirefoxEndpoint(log,requestedPort)) {
+      if(firefox.exitCode!==null)throw Error(log.slice(-500)||'Firefox child exited before BiDi readiness');
       if (Date.now() - started > 20000) throw new Error(log.slice(-500) || 'Firefox BiDi did not listen');
       await sleep(100);
     }
-    const match = log.match(/ws:\/\/127\.0\.0\.1:\d+/);
-    if (!match) throw new Error(log.slice(-400));
-    const socket = new WebSocket(`${match[0]}/session`);
+    const endpoint=announcedFirefoxEndpoint(log,requestedPort);
+    if(!endpoint||firefox.exitCode!==null)throw Error(log.slice(-400)||'Firefox child did not announce its listener');
+    port=endpoint.port;
+    const socket = new WebSocket(endpoint.url);
     await new Promise((resolveOpen, rejectOpen) => {
       socket.addEventListener('open', resolveOpen);
       socket.addEventListener('error', () => rejectOpen(new Error('firefox socket error')));

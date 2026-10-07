@@ -48,6 +48,11 @@ const good = observationProblems({
   boundSha: 'abc',
 });
 expect('clean observation', good.problems.length === 0);
+const foreignLine=observationProblems({requiredIds:roster.ids,
+  outcomes:roster.ids.map(id=>({id:id.replace('/main/','/21.x/'),ok:true,evidence:'foreign line'})),
+  engines:goodEngines,sourceClean:true,artifactSha:'abc',boundSha:'abc'});
+expect('foreign-line rows do not discharge this roster',foreignLine.skipped.length===roster.ids.length);
+
 
 const missing = observationProblems({
   requiredIds: roster.ids,
