@@ -27,11 +27,11 @@ try {
  const sass={compileString(program,options){calls++;assert.match(program,/define-palette\(m.\$indigo-palette, 700/);assert.equal(options.style,'expanded');const location=program.includes(pathToFileURL(referenceEntry).href)?referenceEntry:entry;return {css:program.slice(program.indexOf('.sass-argument-probe')),loadedUrls:[pathToFileURL(location)]};}};
  const result=runMixinArgumentContracts({sass,entry,loadPaths:[],allowedRoots:[candidate],line:'main',referenceEntry,referenceRoot:original,identity:{synthetic:true}});
  // An invented equal CSS string cannot discharge the current-sort contract.
- // Four sort cases need their genuine original CSS and independent peer probe.
+ // Sort/tree cases need genuine original CSS and independent peer probes.
  assert.equal(result.ok,false);assert.equal(calls,996);assert.equal(result.results.every(p=>p.mutation_rejected),true);
- assert.deepEqual(result.results.filter(p=>p.result!=='pass').map(p=>p.case_id).sort(),[
-  'mixin-argument/sort-color/custom-full-theme','mixin-argument/sort-color/raw-color-config',
-  'mixin-argument/sort-theme/custom-dark-theme','mixin-argument/sort-theme/custom-full-theme']);
+ const sortCases=Object.keys((await import('./scripts/sass-sort-companion-contract.mjs')).SORT_COMPANION_CASES);
+ const treeCases=Object.keys((await import('./scripts/sass-tree-companion-contract.mjs')).TREE_COMPANION_CASES);
+ assert.deepEqual(result.results.filter(p=>p.result!=='pass').map(p=>p.case_id).sort(),[...sortCases,...treeCases].sort());
  const observed=result.results[0];assert.equal(mixinArgumentResultsMatch(observed.expected,observed.actual),true);
  assert.equal(mixinArgumentResultsMatch(observed.expected,{...observed.actual,css:'wrong'}),false);
  assert.equal(mixinArgumentResultsMatch(observed.expected,observed.mutation),false);
