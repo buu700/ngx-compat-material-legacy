@@ -8,8 +8,12 @@
  */
 import {Injector, runInInjectionContext} from '@angular/core';
 
-/** Construct the public parent with exactly the original supplied dependencies. */
-export function constructLegacyCell<T>(parent: new () => T, target: Function, providers: {provide: unknown; useValue: unknown}[]): T {
+/**
+ * Construct the public parent with exactly the original supplied dependencies.
+ * Only use for owned subclasses with no emitted instance fields/parameter
+ * properties: returning this object skips their own instance initializers.
+ */
+export function constructWithPublicDependencies<T>(parent: new () => T, target: Function, providers: {provide: unknown; useValue: unknown}[]): T {
   const context = Injector.create({providers});
   try {
     return runInInjectionContext(context, () => Reflect.construct(parent, [], target));
