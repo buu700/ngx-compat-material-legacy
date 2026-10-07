@@ -32,6 +32,17 @@ class DefaultMappedCompanionContractTests(unittest.TestCase):
                         self.assertIn('var(--mat-tree-node-min-height, 48px)',css)
                         changes.append(css.replace('var(--mat-tree-node-min-height, 48px)','var(--mat-tree-node-min-height, 40px)',1))
                     if e['dimension'] in ['theme','color']:changes.append(css.replace('var(--mat-tree-container-background-color, white)','var(--mat-tree-container-background-color, black)',1))
+                elif e['family']=='badge':
+                    self.assertIn('.cdk-high-contrast-active .sass-api-probe .mat-badge-content',css)
+                    self.assertIn('@media (forced-colors: active)',css)
+                    self.assertIn('var(--mat-badge-container-shape, 50%)',css)
+                    self.assertIn('var(--mat-badge-legacy-container-size, 22px)',css)
+                    changes.extend([css.replace('.cdk-high-contrast-active','.lost-accessibility',1),css.replace('var(--mat-badge-container-shape, 50%)','var(--mat-badge-container-shape, 0)',1),css.replace('var(--mat-badge-legacy-container-size, 22px)','var(--mat-badge-legacy-container-size, 19px)',1),css.replace('transform: scale(0.6);','transform: scale(1);',1)])
+                elif e['family']=='datepicker':
+                    self.assertIn('--mdc-icon-button-state-layer-size: 40px;',css)
+                    self.assertIn('padding: 8px;',css)
+                    self.assertIn('display: var(--mat-icon-button-touch-target-display, none);',css)
+                    changes.extend([css.replace('--mdc-icon-button-state-layer-size: 40px;','--mdc-icon-button-state-layer-size: 41px;',1),css.replace('padding: 8px;','padding: 9px;',1),css.replace('display: var(--mat-icon-button-touch-target-display, none);','display: var(--mat-icon-button-touch-target-display, block);',1)])
                 else:
                     import re
                     # Stripping only the six aliases reconstructs the untouched reference.
@@ -53,6 +64,8 @@ class DefaultMappedCompanionContractTests(unittest.TestCase):
                     wrong=copy.deepcopy(body);wrong['current_companion']['peer'][key]=value;self.assertFalse(default_mapped_companion_assertion_ok(wrong),key)
                 wrong=copy.deepcopy(body);wrong['current_companion']['peer']['sources'][0]['sha256']='0'*64;self.assertFalse(default_mapped_companion_assertion_ok(wrong))
                 wrong=copy.deepcopy(body);wrong['actual_measurement']['sources']=[s for s in wrong['actual_measurement']['sources'] if s['path']!='styles/bridges/_m2-system.scss'];self.assertFalse(default_mapped_companion_assertion_ok(wrong))
+                if case=='mixin-css/badge-theme':
+                    wrong=copy.deepcopy(body);wrong['actual_measurement']['sources']=[s for s in wrong['actual_measurement']['sources'] if s['path']!='styles/core/style/_high-contrast.scss'];self.assertFalse(default_mapped_companion_assertion_ok(wrong))
                 wrong=copy.deepcopy(body);p=wrong['current_companion']['peer'];p['css']+='\n.unrelated {color:red}';p['css_sha256']=hashlib.sha256(p['css'].encode()).hexdigest();p['css_bytes']=len(p['css'].encode());self.assertFalse(default_mapped_companion_assertion_ok(wrong))
                 wrong=copy.deepcopy(body);wrong['current_infrastructure']=None;self.assertFalse(default_mapped_companion_assertion_ok(wrong))
                 for key,value in [('binding',{}),('run_id','foreign'),('invocation_id','foreign'),('tarball_sha256','0'*64),('oracle_sha256','0'*64),('result','fail'),('exit_code',1)]:

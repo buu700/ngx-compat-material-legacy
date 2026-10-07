@@ -1,13 +1,14 @@
-/** Eight finite default mappings retain every owned rule and historical fallback. */
+/** Eleven finite default mappings retain every owned rule and historical fallback. */
 import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {measureM2PeerProgram,peerMeasurementMatches} from './sass-current-companion-peer.mjs';
+import {ORIGINAL_CALENDAR_DENSITY,CURRENT_CALENDAR_FALLBACKS} from './sass-datepicker-controls-contract.mjs';
 
 const sha=b=>createHash('sha256').update(b).digest('hex');
 const catalog=JSON.parse(readFileSync(new URL('../fixtures/sass/default-mapped-companion-contracts.json',import.meta.url)));
 const raw=readFileSync(new URL('../compatibility/rc/oracles/material-16.2.14-sass-api.json',import.meta.url)),oracle=JSON.parse(raw);
-const scopes={sort:['color','theme'],tree:['color','typography','density','theme'],'progress-bar':['color','theme']};
+const scopes={sort:['color','theme'],tree:['color','typography','density','theme'],'progress-bar':['color','theme'],badge:['theme'],datepicker:['density','theme']};
 const ids=Object.entries(scopes).flatMap(([family,ds])=>ds.map(d=>'mixin-css/'+family+'-'+d));
 const peerSetup=oracle.standard_theme.replaceAll('m.define-','peer.m2-define-').replaceAll('m.$','peer.$m2-');
 const peerSourceSets=Object.fromEntries(Object.entries(catalog.peer_inputs).map(([line,input])=>[line,new Set(input.sources.map(s=>JSON.stringify([s.root,s.path,s.sha256,s.bytes])))]));
@@ -18,10 +19,13 @@ export const DEFAULT_MAPPED_COMPANION_CASES=Object.freeze(catalog.cases);
 export const DEFAULT_MAPPED_COMPANION_CONTRACT='historical-default-css-with-public-companion-mapping';
 export function defaultMappedCompanionPeerProgram(id){
   const e=DEFAULT_MAPPED_COMPANION_CASES[id];if(!e)return null;
+  const badge=e.family==='badge',datepicker=e.family==='datepicker';
   const dimensions=e.dimension==='theme'?['color','typography','density']:[e.dimension];
-  const includes=e.family==='tree'?['base',...dimensions].map(d=>`@include peer.tree-${d}($__theme);`).join(' ')
+  const includes=badge?'@include peer.badge-base($__theme); @include peer.badge-color($__theme); @include peer.badge-typography($__theme); @include peer.badge-density($__theme); .mat-badge-content { @include cdk.high-contrast(active) { outline: solid 1px; border-radius: 0; } }'
+    :datepicker?`@include peer.datepicker-base($__theme); ${e.dimension==='theme'?'@include peer.datepicker-color($__theme); @include peer.datepicker-typography($__theme); ':''}.mat-calendar-controls { @include peer.icon-button-overrides((touch-target-display: none)); .mat-mdc-icon-button.mat-mdc-button-base { @include peer.icon-button-overrides((state-layer-size: 40px)); } }`
+    :e.family==='tree'?['base',...dimensions].map(d=>`@include peer.tree-${d}($__theme);`).join(' ')
     :`@include peer.${e.family}-${e.family==='progress-bar'?'color':e.dimension}($__theme);`;
-  return "@use '@angular/material' as peer;\n"+peerSetup+'\n.sass-api-probe { '+includes+' }\n';
+  return "@use '@angular/material' as peer;\n"+(badge?"@use '@angular/cdk' as cdk;\n":'')+peerSetup+'\n.sass-api-probe { '+includes+' }\n';
 }
 for(const [id,e] of Object.entries(DEFAULT_MAPPED_COMPANION_CASES)){
   const name=id.slice(10),inv=oracle.members.mixins[name].invocation;
@@ -31,6 +35,7 @@ for(const [id,e] of Object.entries(DEFAULT_MAPPED_COMPANION_CASES)){
     ||e.original_sha256!==inv.css_sha256||e.original_bytes!==inv.css_bytes||sha(e.original_css)!==inv.css_sha256
     ||Buffer.byteLength(e.original_css)!==e.original_bytes
     ||Object.values(e.peers).some(p=>p.program_sha256!==sha(defaultMappedCompanionPeerProgram(id))))throw Error('finite default mapped companion reference changed');
+  if(['badge','datepicker'].includes(e.family)&&Object.values(e.peers).some(p=>typeof p.css!=='string'||sha(p.css)!==p.css_sha256||Buffer.byteLength(p.css)!==p.css_bytes))throw Error('default variant public peer output changed');
 }
 
 export function measureDefaultMappedCompanionPeer(options){
@@ -39,8 +44,9 @@ export function measureDefaultMappedCompanionPeer(options){
   return {...peer,cdk_version:JSON.parse(raw).version,cdk_package_json_sha256:sha(raw)};
 }
 
-export function defaultMappedCompanionPeerExpectedCss(id){
+export function defaultMappedCompanionPeerExpectedCss(id,line){
   const e=DEFAULT_MAPPED_COMPANION_CASES[id];if(!e)return null;
+  if(['badge','datepicker'].includes(e.family))return e.peers[line]?.css??null;
   if(e.family==='sort')return '.sass-api-probe {\n  --mat-sort-arrow-color: rgba(0, 0, 0, 0.87);\n}';
   if(e.family==='tree'){
     const groups={color:[['container-background-color','white'],['node-text-color','rgba(0, 0, 0, 0.87)']],
@@ -56,7 +62,7 @@ export function defaultMappedCompanionExpectedCss(id,peer){
   const e=DEFAULT_MAPPED_COMPANION_CASES[id],floor=e?.peers[peer?.line],inputs=catalog.peer_inputs[peer?.line];
   if(!floor||!inputs||!peerMeasurementMatches(peer,defaultMappedCompanionPeerProgram(id),{})
     ||peer.program_sha256!==floor.program_sha256||peer.css_sha256!==floor.css_sha256||peer.css_bytes!==floor.css_bytes
-    ||peer.css!==defaultMappedCompanionPeerExpectedCss(id)||peer.cdk_version!==peer.peer_version
+    ||peer.css!==defaultMappedCompanionPeerExpectedCss(id,peer.line)||peer.cdk_version!==peer.peer_version
     ||peer.cdk_version!==inputs.cdk_version||peer.cdk_package_json_sha256!==inputs.cdk_package_json_sha256
     ||peer.sources.length!==inputs.sources.length||peer.sources.some(s=>!peerSourceSets[peer.line].has(JSON.stringify([s.root,s.path,s.sha256,s.bytes]))))return null;
   if(e.family==='sort'){
@@ -70,12 +76,33 @@ export function defaultMappedCompanionExpectedCss(id,peer){
       (_,property,value)=>{count++;return `  ${property}: var(--mat-tree-${tokens[property]}, ${value});`;});
     return count==={color:2,typography:2,density:1,theme:5}[e.dimension]?css+'\n'+peer.css:null;
   }
+  if(e.family==='badge')return defaultBadgeCss(e.original_css,peer.css);
+  if(e.family==='datepicker'){
+    const original=ORIGINAL_CALENDAR_DENSITY.replaceAll('.sass-argument-probe','.sass-api-probe');
+    const fallbacks=CURRENT_CALENDAR_FALLBACKS.replaceAll('.sass-argument-probe','.sass-api-probe');
+    return e.original_css.split(original).length===2?e.original_css.replace(original,original+'\n'+fallbacks)
+      +(e.dimension==='theme'?'\n\n':'\n')+peer.css:null;
+  }
   // Insert only three independently verified color aliases; leave motion, media,
   // images, selectors, original variables and every remaining byte untouched.
   let count=0;
   const css=e.original_css.replace(/(\.sass-api-probe \.mat-mdc-progress-bar(?:\.mat-(?:accent|warn))? \{\n  --mdc-linear-progress-active-indicator-color: ([^;\n]+);\n  --mdc-linear-progress-track-color: ([^;\n]+);)\n\}/g,
     (_,prefix,active,track)=>{count++;return `${prefix}\n  --mat-progress-bar-active-indicator-color: ${active};\n  --mat-progress-bar-track-color: ${track};\n}`;});
   return count===3?css:null;
+}
+
+const BADGE_FORCED='@media (forced-colors: active) {\n  .sass-api-probe .mat-badge-content {\n    outline: solid 1px;\n    border-radius: 0;\n  }\n}';
+const BADGE_ORIGINAL_CLASS='.cdk-high-contrast-active .sass-api-probe .mat-badge-content {\n  outline: solid 1px;\n  border-radius: 0;\n}';
+function defaultBadgeCss(original,peer){
+  if(!peer.endsWith('\n'+BADGE_FORCED)||original.split('  border-radius: 50%;').length!==2)return null;
+  let css=original.replace('  border-radius: 50%;','  border-radius: var(--mat-badge-container-shape, 50%);');
+  for(const [size,value,geometry,height] of [['small','16','legacy-small-size-container-size','small-size-line-height'],['medium','22','legacy-container-size','line-height'],['large','28','legacy-large-size-container-size','large-size-line-height']]){
+    const from=`.sass-api-probe .mat-badge-${size} .mat-badge-content {\n  width: ${value}px;\n  height: ${value}px;\n  line-height: ${value}px;`;
+    if(css.split(from).length!==2)return null;
+    css=css.replace(from,`.sass-api-probe .mat-badge-${size} .mat-badge-content {\n  width: var(--mat-badge-${geometry}, ${value}px);\n  height: var(--mat-badge-${geometry}, ${value}px);\n  line-height: var(--mat-badge-${height}, ${value}px);`);
+  }
+  if(css.split(BADGE_ORIGINAL_CLASS+'\n\n').length!==2)return null;
+  return css.replace(BADGE_ORIGINAL_CLASS+'\n\n',BADGE_ORIGINAL_CLASS+'\n\n'+BADGE_FORCED+'\n')+'\n\n'+peer.slice(0,-(BADGE_FORCED.length+1));
 }
 
 export function defaultMappedCompanionMeasurementOk(id,m,line){
@@ -88,6 +115,7 @@ export function defaultMappedCompanionMeasurementOk(id,m,line){
     ||new Set(ss.map(s=>`${s.root}/${s.path}`)).size!==ss.length)return false;
   const required=['_index.scss','styles/bridges/_companion-overrides.scss','styles/bridges/_m2-system.scss','styles/core/theming/_theming.scss',`styles/${e.family}/_${e.family}-theme.scss`];
   if(e.family==='progress-bar')required.push('styles/legacy-progress-bar/_progress-bar-theme.scss');
+  if(e.family==='badge')required.push('styles/core/style/_high-contrast.scss');
   return required.every(path=>ss.some(s=>s.root===0&&s.path===path));
 }
 export function defaultMappedCompanionResultsMatch(id,actual,contract){
