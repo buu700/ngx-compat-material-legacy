@@ -894,7 +894,7 @@ Object.defineProperty(globalThis, 'navigator', {
 
 import 'zone.js';
 import '@angular/compiler';
-import {Component, ElementRef, InjectionToken, ANIMATION_MODULE_TYPE, NgZone, inject, isDevMode, createEnvironmentInjector, createNgModule, EnvironmentInjector} from '@angular/core';
+import {Component, ElementRef, EventEmitter, InjectionToken, ANIMATION_MODULE_TYPE, NgZone, inject, isDevMode, createEnvironmentInjector, createNgModule, EnvironmentInjector} from '@angular/core';
 import {Subject} from 'rxjs';
 import {FormControl, Validators} from '@angular/forms';
 import {MatStepperModule, MatStepper} from '@angular/material/stepper';
@@ -1036,6 +1036,8 @@ function sleep(ms: number) {
 const checkboxArtifactFactory=(MatLegacyCheckbox as unknown as {ɵfac:()=>MatLegacyCheckbox}).ɵfac;
 const CHECKBOX_NODE_FACTORY_PROBE=new InjectionToken<MatLegacyCheckbox>('closeout-checkbox-node-factory-probe');
 let observingCheckboxArtifactFactory=false;
+let observingPublicEmitterBaseline=false;
+const CHECKBOX_EMITTER_BASELINE=new InjectionToken<EventEmitter<unknown>[]>('closeout-public-emitter-baseline');
 
 async function main() {
   // These constructors run outside an injection context, as in the untouched v16 API.
@@ -1058,6 +1060,14 @@ async function main() {
       observingCheckboxArtifactFactory=true;
       try{return checkboxArtifactFactory();}
       finally{observingCheckboxArtifactFactory=false;}
+    },
+  },{
+    provide:CHECKBOX_EMITTER_BASELINE,useFactory:()=>{
+      // The untouched v16 checkbox has exactly two EventEmitter fields.
+      // Measure current public emitter construction without a private token import.
+      observingPublicEmitterBaseline=true;
+      try{return [new EventEmitter<unknown>(),new EventEmitter<unknown>()];}
+      finally{observingPublicEmitterBaseline=false;}
     },
   }]}});
   TestBed.configureTestingModule({
@@ -1317,26 +1327,37 @@ async function main() {
   const environmentProto=Object.getPrototypeOf(TestBed.inject(EnvironmentInjector));
   const environmentGet=environmentProto.get;
   const nodeRequests:Array<{token:unknown,optional:boolean}>=[];
+  const emitterRequests:Array<{token:unknown,optional:boolean}>=[];
   let nodeGetDepth=0,checkboxNodeFactoryContext=false;
   let checkboxNodeFactoryError:string|null=null;
   let checkboxProbeInstance:MatLegacyCheckbox|undefined;
   environmentProto.get=function(token:unknown,notFound:unknown,flags:unknown){
-    if(observingCheckboxArtifactFactory&&nodeGetDepth===0)nodeRequests.push({token,optional:typeof flags==='number'?(flags&8)===8:Boolean(flags&&typeof flags==='object'&&'optional' in flags&&flags.optional)});
+    const request={token,optional:typeof flags==='number'?(flags&8)===8:Boolean(flags&&typeof flags==='object'&&'optional' in flags&&flags.optional)};
+    if(nodeGetDepth===0){
+      if(observingCheckboxArtifactFactory)nodeRequests.push(request);
+      if(observingPublicEmitterBaseline)emitterRequests.push(request);
+    }
     nodeGetDepth++;
     try{return environmentGet.call(this,token,notFound,flags);}finally{nodeGetDepth--;}
   };
   try {
     checkboxProbeInstance=checkboxProbeInjector.get(CHECKBOX_NODE_FACTORY_PROBE);
+    const emitterBaseline=checkboxProbeInjector.get(CHECKBOX_EMITTER_BASELINE);
     const expected=[FocusMonitor,NgZone,ANIMATION_MODULE_TYPE,MAT_LEGACY_CHECKBOX_DEFAULT_OPTIONS];
+    const directRequests=nodeRequests.slice(0,expected.length),bodyRequests=nodeRequests.slice(expected.length);
     checkboxNodeFactoryContext=checkboxProbeInstance instanceof MatLegacyCheckbox&&checkboxProbeInstance.tabIndex===7
-      &&nodeRequests.length===expected.length&&nodeRequests.every((request,index)=>
-        request.token===expected[index]&&request.optional===(index>=2));
+      &&emitterBaseline.length===2&&emitterBaseline.every(emitter=>emitter instanceof EventEmitter)
+      &&directRequests.length===expected.length&&directRequests.every((request,index)=>
+        request.token===expected[index]&&request.optional===(index>=2))
+      &&bodyRequests.length===emitterRequests.length&&bodyRequests.every((request,index)=>
+        request.token===emitterRequests[index].token&&request.optional===emitterRequests[index].optional);
   } catch(error){checkboxNodeFactoryError=String(error);}
   finally {environmentProto.get=environmentGet;}
   const checkboxNodeFactoryObservation={
     attribute:checkboxProbeInstance?.tabIndex??null,
     returned:checkboxProbeInstance instanceof MatLegacyCheckbox,
     root_requests:nodeRequests.map(request=>({token:typeof request.token==='function'?request.token.name:String(request.token),optional:request.optional})),
+    public_emitter_baseline_requests:emitterRequests.map(request=>({token:typeof request.token==='function'?request.token.name:String(request.token),optional:request.optional})),
     token_objects_and_optional_flags_match:checkboxNodeFactoryContext,
     error:checkboxNodeFactoryError,
   };
