@@ -1028,7 +1028,7 @@ async function main() {
       'Oracle: the consumer-installed current @angular/material peer, M2-themed by its own m2-define-*-theme and <companion>-theme mixins, compiled from the peer only, rendered in the same page and DOM as the candidate.',
       'Candidate: legacy.all-current-companion-bridges from the packed library. 16.2.14 rules that per-companion legacy theme mixins also emit are not part of this candidate.',
       'Scenarios: light, dark, density -2, alternate typography (Georgia), RTL, nested dark-in-light, plus complete custom2018/legacy light/dark palettes and typography and custom nested dark-in-light; toolbar mobile height also uses all four rich themes at a 480px viewport. Popups and the bottom sheet are real CDK body overlays themed through the overlay container.',
-      'Each case needs candidate == oracle on the consuming computed property in every scenario and a failing comparison when a wrong-but-nonempty value of its token alone is injected on the candidate scope.',
+      'Each case needs complete public-theme candidate and bridge aggregate == oracle on the consuming computed property in every required scenario; each route must consume an isolated wrong-but-nonempty token and fail its normal comparison.',
       'A token the peer M2 mixin declares with a CSS-wide keyword (badge container sizes unset, icon color and expansion header line-height/tracking inherit) has no computed token value; its consuming property must still match and consume the injected value.',
       'This report is a slice. The rc-verify coordinator report built from the assertion files is the acceptance input. No G06/G07/G08 claim.',
     ],
@@ -1039,7 +1039,9 @@ async function main() {
     ok,
     assertions_written: assertionsWritten,
     lines: lines.map((l) => ({line: l.line, result: l.result, peer: l.peer?.version, roster: l.roster,
-      failed: (l.failed_case_ids || []).length, errors: (l.errors || []).map((e) => String(e).slice(0, 400))})),
+      failed: (l.failed_case_ids || []).length,
+      failures: (l.failures || []).map(({case_id, reasons}) => ({case_id, reasons})),
+      errors: (l.errors || []).map((e) => String(e).slice(0, 400))})),
     report: relative(root, args.out),
   }, null, 2));
   if (!ok) process.exit(1);
