@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-07T05:04:29.391812+00:00",
+  "reviewer": "Codex primary implementer",
+  "sha": "622152de761b629a426b744ec2ff3e4e79d18889",
+  "patch": "compatibility/f10/disposition-ledger/evidence/patches/622152de761b629a426b744ec2ff3e4e79d18889-whole-tooltip-lazy-di.patch",
+  "patch_sha256": "88aed569f1ec66477351d0df2b277afbfc0a0d6dfd2584d2c61893dd62060b05",
+  "changed_paths": [
+    "src/material/tooltip/tooltip.ts"
+  ],
+  "original": {
+    "commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+    "path": "src/material/legacy-tooltip/tooltip.ts",
+    "retained_bytes": "compatibility/f10/disposition-ledger/evidence/patches/material-16.2.14-untouched-legacy-tooltip.ts",
+    "source_sha256": "f0878a31a521ddd424bd79f316494115505f2d64734560dc939c0ccb3ffc3582",
+    "constructor_sha256": "d5e1136a9d8eb0eb4ad686d4eca2e30fa47d8d829ecc237b3842c56365bf470b"
+  },
+  "ownership": "Owned MatLegacyTooltip extends its local internal/tooltip-base.ts, not a current private MatTooltip parent. Its original12-argument constructor and super body exactly equal the untouched tagged original. This corrects any interpretation that it currently inherits the changed modern MatTooltip injection body. Other shared token, CDK, lifecycle and motion audits remain independent.",
+  "patch_semantics": "The one production hunk defers Overlay, ScrollDispatcher, ViewContainerRef, MAT_TOOLTIP_SCROLL_STRATEGY and DOCUMENT until use. AriaDescriber and FocusMonitor remain eager. Do not describe the patch as deferring those two dependencies. Source identity and frozen constructor spelling alone do not establish actual current-node provider identity.",
+  "probe": {
+    "case_id": "packed-consumer/harness/tooltip-original-eager-dependencies",
+    "required_packed_cases": 79,
+    "status": "pending Actions",
+    "scope": "Actual packed legacy directive, disabled empty trigger, before show: original five dependency slots hold the exact objects resolved from the real node/public providers, while overlay/tooltip instance/portal have not been created. Original source determines the expectation; no current private token or implementation import.",
+    "negative_condition": "Any missing or same-name different dependency object fails the exact-identity comparisons; any premature overlay or active/nonempty trigger fails. Existing visible-tooltip harness show/hide assertions retained."
+  },
+  "disposition": "pending actual native artifact observation and remaining branch-specific source review",
+  "g11_claim": "not-passed"
+}
