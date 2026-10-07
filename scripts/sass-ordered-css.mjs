@@ -9,13 +9,16 @@
  * compatibility/rc/sass-pending-decisions.json explains them but never passes
  * them. The four bridge-review fixtures (core, legacy-core, aggregate and
  * companions, core-theme) are rostered against their sealed CSS the same way.
- * Empty debug CSS (its values are sealed separately) and DOM are not in this
- * set. 21.x is not in this set.
+ * The two root core fixtures have a finite current public CDK contract,
+ * preserving complete historical owned CSS. Raw reference differences stay
+ * visible. Both supported lines execute this roster; empty debug CSS and DOM
+ * are separate checks.
  */
 import {spawnSync} from 'node:child_process';
 import {copyFileSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
 import {dirname, join} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {ORDERED_CORE_CASES,ORDERED_CORE_CONTRACT,orderedCoreResultMatches} from './sass-ordered-core-contract.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -147,11 +150,21 @@ export function compareOrderedCss(referenceDir, candidateDir, reportPath) {
   return {status: run.status, stdout: run.stdout, stderr: run.stderr, report};
 }
 
-export function orderedCssResults(report) {
+export function orderedCssResults(report, compiledReport = null) {
   const files = new Map((report?.files || []).map(item => [item.file, item]));
   return ORDERED_CSS_FIXTURE_IDS.map(id => {
-    const row = files.get(`${id}.css`);
+    const rows=(report?.files||[]).filter(item=>item.file===`${id}.css`);
+    const row=rows.length===1?files.get(`${id}.css`):null;
     const exact = row?.status === 'exact';
+    if(Object.hasOwn(ORDERED_CORE_CASES,id)&&compiledReport!==null){
+      const records=(compiledReport?.fixtures||[]).filter(item=>item.id===id);
+      const record=records.length===1?records[0]:null;
+      const conforming=orderedCoreResultMatches(id,row,record),entry=ORDERED_CORE_CASES[id];
+      return {case_id:id,result:conforming?'pass':'fail',kind:'assertion',status:conforming?'conforming-current-infrastructure':row?.status??'missing',
+        raw_status:row?.status??'missing',baseline_sha256:row?.baseline_sha256??null,candidate_sha256:row?.candidate_sha256??null,
+        fixture:entry.fixture,fixture_sha256:record?.fixture_sha256??null,reference:entry.reference,reference_sha256:entry.reference_sha256,
+        comparison:ORDERED_CORE_CONTRACT,actual_measurement:record?.actual_measurement??null,current_infrastructure:record?.current_infrastructure??null};
+    }
     return {
       case_id: orderedCssCaseId(id),
       result: exact ? 'pass' : 'fail',
@@ -163,17 +176,19 @@ export function orderedCssResults(report) {
   });
 }
 
-export function writeOrderedCssAssertions(outputDir, results) {
+export function writeOrderedCssAssertions(outputDir, results, identity = null) {
   const outputs = [];
   for (const item of results) {
     const body = Buffer.from(`${JSON.stringify({
+      ...item,
+      ...(identity?{check_id:'sass-seal',group:'ordered-css-dom',line:identity.binding.source_line,run_id:identity.runId,invocation_id:identity.invocationId,binding:identity.binding,tarball_sha256:identity.tarballSha256,exit_code:item.result==='pass'?0:1}:{}),
       case_id: item.case_id,
       result: item.result,
       kind: 'assertion',
       status: item.status,
       baseline_sha256: item.baseline_sha256,
       candidate_sha256: item.candidate_sha256,
-      note: 'Exact ordered CSS against the sealed Material 16.2.14 reference. Not a DOM result and not a 21.x case.',
+      note: item.comparison===ORDERED_CORE_CONTRACT?'Complete historical owned core CSS with independently measured public CDK contributions;raw golden difference retained.':'Exact ordered CSS against the sealed Material16.2.14 reference. Rendering is checked separately.',
     }, null, 2)}\n`);
     const name = `${item.case_id}.json`;
     writeFileSync(join(outputDir, name), body);
@@ -182,7 +197,17 @@ export function writeOrderedCssAssertions(outputDir, results) {
   return outputs;
 }
 
-export function runOrderedCss(environment) {
+/** Whole execution fails for unknown/duplicate rows or any child failure. */
+export function orderedCssCompletion(compileStatus,compared,results){
+  const rows=compared.report?.files||[],expected=ORDERED_CSS_FIXTURE_IDS.map(id=>`${id}.css`).sort();
+  const completeReport=JSON.stringify(rows.map(row=>row.file).sort())===JSON.stringify(expected);
+  const ok=compileStatus===0&&[0,1].includes(compared.status)&&completeReport&&results.length===ORDERED_CSS_FIXTURE_IDS.length
+    &&results.every(item=>item.result==='pass');
+  const exact=compileStatus===0&&compared.status===0&&completeReport&&rows.every(row=>row.status==='exact');
+  return {ok,exact};
+}
+
+export function runOrderedCss(environment, {line = 'main'} = {}) {
   const work = join(environment, 'ordered-css');
   const fixtures = join(work, 'fixtures');
   const reference = join(work, 'reference');
@@ -197,9 +222,12 @@ export function runOrderedCss(environment) {
     '--output', candidate,
     '--fixtures', fixtures,
     '--include-bridge',
+    '--line',line,
   ], {cwd: root, encoding: 'utf8'});
   const compared = compareOrderedCss(reference, candidate, reportPath);
-  const results = compared.report ? orderedCssResults(compared.report) : ORDERED_CSS_FIXTURE_IDS.map(id => ({
+  let compiledReport;
+  try{compiledReport=JSON.parse(readFileSync(join(candidate,'compile-report.json'),'utf8'));}catch{compiledReport={fixtures:[]};}
+  const results = compared.report ? orderedCssResults(compared.report,compiledReport) : ORDERED_CSS_FIXTURE_IDS.map(id => ({
     case_id: id,
     result: 'fail',
     kind: 'assertion',
@@ -207,10 +235,10 @@ export function runOrderedCss(environment) {
     baseline_sha256: null,
     candidate_sha256: null,
   }));
-  const ok = compiled.status === 0 && compared.status === 0 && results.length === ORDERED_CSS_FIXTURE_IDS.length
-    && results.every(item => item.result === 'pass');
+  const {ok,exact}=orderedCssCompletion(compiled.status,compared,results);
   return {
     ok,
+    exact,
     results,
     compile_status: compiled.status,
     compare_status: compared.status,

@@ -8,18 +8,19 @@ import path from 'node:path';
 import {createRequire} from 'node:module';
 import {fileURLToPath, pathToFileURL} from 'node:url';
 import crypto from 'node:crypto';
+import {ORDERED_CORE_CASES,ORDERED_CORE_CONTRACT,measureOrderedCore,measureOrderedCorePeer} from './sass-ordered-core-contract.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
 if (args.includes('--help')) {
-  console.log('Usage: node scripts/run-sass-fixtures.mjs --environment DIR --module @angular/material|@ngx-compat/material-legacy --output NEW_DIR [--fixtures DIR] [--include-bridge]');
+  console.log('Usage: node scripts/run-sass-fixtures.mjs --environment DIR --module @angular/material|@ngx-compat/material-legacy --output NEW_DIR [--fixtures DIR] [--include-bridge] [--line main|21.x]');
   process.exit(0);
 }
 const options = {};
 for (let i = 0; i < args.length; i++) {
   const key = args[i];
   if (key === '--include-bridge') { options[key] = true; continue; }
-  if (!['--environment','--module','--output','--fixtures'].includes(key) || !args[i+1] || args[i+1].startsWith('--')) {
+  if (!['--environment','--module','--output','--fixtures','--line'].includes(key) || !args[i+1] || args[i+1].startsWith('--')) {
     throw new Error(`Unknown/missing argument: ${key}`);
   }
   options[key] = args[++i];
@@ -32,6 +33,8 @@ const env = path.resolve(options['--environment']);
 const output = path.resolve(options['--output']);
 const fixtureDir = path.resolve(options['--fixtures'] || path.join(root,'fixtures/sass'));
 const targetModule = options['--module'];
+const line=options['--line']||'main';
+if(!['main','21.x'].includes(line))throw new Error('Unexpected source line.');
 if (!['@angular/material','@ngx-compat/material-legacy'].includes(targetModule)) throw new Error('Unexpected module target.');
 if (fs.existsSync(output)) throw new Error('Output directory must be new; reference evidence is never overwritten.');
 if (!fs.existsSync(path.join(env,'package.json'))) throw new Error('Environment must contain a package.json and installed pinned dependencies.');
@@ -42,6 +45,7 @@ const manifest = JSON.parse(fs.readFileSync(path.join(fixtureDir,'manifest.json'
 const selected = manifest.cases.filter(c => c.comparison === 'strict' || options['--include-bridge']);
 if (!selected.length) throw new Error('No fixtures selected.');
 const reports = []; const hashes = {}; let failures = 0;
+let orderedCorePeer;
 fs.mkdirSync(output, {recursive: true});
 for (const c of selected) {
   if (path.basename(c.file) !== c.file || !c.file.endsWith('.scss')) throw new Error('Fixture filenames must be local SCSS files.');
@@ -61,6 +65,12 @@ for (const c of selected) {
     });
     fs.writeFileSync(path.join(output,c.id+'.css'), result.css);
     Object.assign(record,{status:'compiled',css_sha256:hash(result.css),warnings:warningMessages});
+    if(targetModule==='@ngx-compat/material-legacy'&&Object.hasOwn(ORDERED_CORE_CASES,c.id)){
+      const roots=['@ngx-compat/material-legacy','@angular/material','@angular/cdk'].map(pkg=>path.join(env,'node_modules',...pkg.split('/')));
+      const actual_measurement=measureOrderedCore({id:c.id,source,fixtureFile:sourceFile,result,roots,sass,line});
+      orderedCorePeer??=measureOrderedCorePeer({sass,materialRoot:roots[1],cdkRoot:roots[2],line});
+      Object.assign(record,{actual_measurement,current_infrastructure:{classification:'conforming-current-infrastructure',contract:ORDERED_CORE_CONTRACT,peer:orderedCorePeer}});
+    }
   } catch (error) {
     failures++;
     Object.assign(record,{status:'compile-failed',error:String(error),warnings:warningMessages});
