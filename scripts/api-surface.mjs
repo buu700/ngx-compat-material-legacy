@@ -57,6 +57,27 @@ export function originalFactoryContract(file, name) {
   return contract;
 }
 
+const VARIABLE_DECLARATION_MANIFEST = 'reference/material-16.2.14/variable-declarations.json';
+const VARIABLE_DECLARATION_MANIFEST_SHA256 = '464abc4b29f144ed17ac3de148982b9746db138bcbfb1da13155f841e6b74d7c';
+let variableDeclarationManifest;
+export function originalVariableDeclaration(file, name) {
+  const family = file.split('\\').join('/').match(/\/material\/([^/]+)\//)?.[1];
+  if (!family) return null;
+  if (!variableDeclarationManifest) {
+    const bytes = readFileSync(join(root, VARIABLE_DECLARATION_MANIFEST));
+    if (createHash('sha256').update(bytes).digest('hex') !== VARIABLE_DECLARATION_MANIFEST_SHA256) throw new Error('original variable declaration manifest identity mismatch');
+    variableDeclarationManifest = JSON.parse(bytes);
+  }
+  const reference = variableDeclarationManifest.declarations[family + '/' + name];
+  if (!reference) return null;
+  const bytes = readFileSync(join(root, reference.path));
+  if (createHash('sha256').update(bytes).digest('hex') !== reference.sha256) throw new Error('original variable declaration member identity mismatch');
+  const source = ts.createSourceFile(reference.path, bytes.toString('utf8'), ts.ScriptTarget.Latest, true);
+  const shape = packedShape(source, name);
+  if (!shape || shape.kind !== 'const' || shape.signatures.some(signature => signature.endsWith(':*'))) throw new Error('original variable declaration unavailable');
+  return shape;
+}
+
 export const NEGATIVE_IDS = {
   missingMember: 'api-completeness/export-contract/negatives/missing-member',
   forgedSource: 'api-completeness/export-contract/negatives/forged-source-identity',
@@ -592,9 +613,10 @@ function shapeFromFound(found, refRoot) {
     if (token && decl.initializer.arguments && decl.initializer.arguments[0]) {
       description = normalizeType(decl.initializer.arguments[0].getText(found.sourceFile));
     }
+    const originalDeclaration = decl && originalVariableDeclaration(found.file, decl.name.text);
     return {
       kind: token ? 'token' : 'const',
-      signatures: token
+      signatures: originalDeclaration ? originalDeclaration.signatures : token
         ? [`token ${decl.name.text} ${description}`]
         : [`const ${decl.name.text}:${type}`],
       requiredProtected: [],
@@ -945,6 +967,12 @@ const TYPE_RENAMES = [
   ['MAT_SUFFIX', 'MAT_LEGACY_SUFFIX'],
   ['MAT_PROGRESS_BAR_DEFAULT_OPTIONS', 'MAT_LEGACY_PROGRESS_BAR_DEFAULT_OPTIONS'],
   ['MAT_PROGRESS_BAR_LOCATION', 'MAT_LEGACY_PROGRESS_BAR_LOCATION'],
+  ['MAT_PAGINATOR_INTL_PROVIDER', 'MAT_LEGACY_PAGINATOR_INTL_PROVIDER'],
+  ['MAT_SELECT_SCROLL_STRATEGY_PROVIDER', 'MAT_LEGACY_SELECT_SCROLL_STRATEGY_PROVIDER'],
+  ['MAT_SLIDE_TOGGLE_REQUIRED_VALIDATOR', 'MAT_LEGACY_SLIDE_TOGGLE_REQUIRED_VALIDATOR'],
+  ['MAT_TAB_GROUP', 'MAT_LEGACY_TAB_GROUP'],
+  ['_MAT_INK_BAR_POSITIONER', '_MAT_LEGACY_INK_BAR_POSITIONER'],
+  ['MAT_TOOLTIP_SCROLL_STRATEGY_FACTORY_PROVIDER', 'MAT_LEGACY_TOOLTIP_SCROLL_STRATEGY_FACTORY_PROVIDER'],
   ['MAT_OPTGROUP', 'MAT_LEGACY_OPTGROUP'],
   ['MAT_OPTION_PARENT_COMPONENT', 'MAT_LEGACY_OPTION_PARENT_COMPONENT'],
 ];
@@ -979,7 +1007,9 @@ function findLoose(sig, packedLeft) {
     }
   }
   const loose = looseValue(sig);
-  if (loose === applyRenames(sig) && !sig.startsWith('token ') && !sig.endsWith(':*')) return null;
+  // A typed original declaration must retain its generic/type contract. Only
+  // source-inferred tokens or genuinely untyped source values need elaboration.
+  if (!sig.startsWith('token ') && !sig.endsWith(':*')) return null;
   const hits = [...packedLeft].filter(candidate => looseValue(candidate) === loose || applyRenames(candidate) === loose || looseValue(candidate) === applyRenames(sig));
   if (hits.length !== 1) return null;
   return {candidate: hits[0], kind: sig.startsWith('token ') || hits[0].startsWith('token ') || sig.endsWith(':*') || hits[0].endsWith(':*') ? 'elaboration' : 'rename'};
