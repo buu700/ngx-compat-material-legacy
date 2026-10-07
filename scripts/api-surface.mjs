@@ -796,8 +796,9 @@ function flattenPacked(node, index, sourceFile, seen) {
   };
 }
 
-function packedShape(sourceFile, name) {
+export function packedShape(sourceFile, name) {
   const index = indexFile(sourceFile);
+  let declarationName = name;
   let node = index.get(name);
   if (!node) {
     for (const statement of sourceFile.statements) {
@@ -810,6 +811,7 @@ function packedShape(sourceFile, name) {
           const local = index.get(imported);
           if (local) {
             node = local;
+            declarationName = imported;
             break;
           }
         }
@@ -864,7 +866,7 @@ function packedShape(sourceFile, name) {
     };
   }
   if (ts.isVariableStatement(node)) {
-    const decl = node.declarationList.declarations.find(item => identText(item.name) === name);
+    const decl = node.declarationList.declarations.find(item => identText(item.name) === declarationName);
     const type = decl && decl.type ? normalizeType(decl.type.getText(sourceFile)) : '*';
     return {
       kind: 'const',
