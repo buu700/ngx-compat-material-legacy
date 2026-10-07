@@ -135,9 +135,11 @@ $_emit-fallback-vars: true;
     }
 
     // Preserve the historical class contract alongside current forced colors.
-    @at-root .cdk-high-contrast-active #{&} {
-      outline: solid 1px;
-      border-radius: 0;
+    @at-root {
+      .cdk-high-contrast-active & {
+        outline: solid 1px;
+        border-radius: 0;
+      }
     }
 
     @include cdk.high-contrast(active) {

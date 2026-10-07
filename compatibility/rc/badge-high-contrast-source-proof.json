@@ -140,7 +140,7 @@
     "unexecuted": "Native browser emulation and new styles at final packed/canonical subjects."
   },
   "existing_goldens_changed": false,
-  "badge_theme_conformance": "Still pending; complete structural/size/override CSS and configured-variable behavior must be reviewed before disposition.",
+  "badge_theme_conformance": "Two finite source-composition cases now documented in badge-shape-contract-review.json; new native guard still unexecuted. No final packed or gate admission.",
   "implementation_files": [
     {
       "path": "projects/ngx-material-legacy/styles/badge/_badge-theme.scss",
@@ -158,5 +158,43 @@
       "path": "tests/test_badge_high_contrast_contract.py",
       "sha256": "f7d17f30a156fe9fe390139d1a0738c387c8f1f9647b0e0dbc9234219e377a75"
     }
-  ]
+  ],
+  "public_configuration_scope": "Authenticated16 root forwards only badge-theme/color/typography/density,no badge variables. Direct internal module variables are not newly promised by this facade.",
+  "selector_list_correction": {
+    "tag": "16.2.14",
+    "commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+    "path": "src/cdk/a11y/_index.scss",
+    "sha256": "dd7e20cc3b362ed0140de0b277b8d192720cb72c4e480337910a499a0f5bfed5",
+    "bytes": 3793,
+    "reason": "Original helper explicitly guards every comma-separated selector. Restored local rule now uses Sass nested ampersand inside at-root,avoiding an unguarded second selector.",
+    "cases": [
+      {
+        "line": "21.x",
+        "case_id": "mixin-argument/badge-theme/custom-full-theme",
+        "original_sha256": "6a8659df976b1936caad8dd6a9c99d7ac7d4fca5555b17d2b08481e81ced859b",
+        "actual_sha256": "645c0084554867b0e16b90d3dfccc34ce18923e5e6442751c28e49d86f7ba65a",
+        "original_rule_sha256": "65abfa496d70cdf46949086bae8d20040716d5932021198ca470155f0aebace8",
+        "modern_rule_sha256": "932f47b74bfc2d6ec4e4dc4c0294cea450525758a1f9b31845bfc5de80c9b6c8",
+        "program_sha256": "5c42d8bf2345b8d0574f560b8fb0f81b4bb57c9cbe262f2680e1288a5f348f4e",
+        "original_rule_preserved": true,
+        "forced_colors_preserved": true,
+        "selector_list_guarded": true,
+        "selector_list_rule_sha256": "512dbb879a42d5a962524e7fdeaf07f7f4b86d34812697de1a56e13d62f45947"
+      },
+      {
+        "line": "21.x",
+        "case_id": "mixin-argument/badge-theme/custom-dark-theme",
+        "original_sha256": "565eb2e43c472b3501312ff3d8bc8e5f54e29fd094f164696f7720f618ba4090",
+        "actual_sha256": "e20740f16ddedb10cf14587b30bc5abdfb73bbdcaff08de98bfdf6a728971d0b",
+        "original_rule_sha256": "65abfa496d70cdf46949086bae8d20040716d5932021198ca470155f0aebace8",
+        "modern_rule_sha256": "932f47b74bfc2d6ec4e4dc4c0294cea450525758a1f9b31845bfc5de80c9b6c8",
+        "program_sha256": "c004a3ff10127fac4a1aafaa2c2c8ec65f114efd1f885940ed02756acb1a723a",
+        "original_rule_preserved": true,
+        "forced_colors_preserved": true,
+        "selector_list_guarded": true,
+        "selector_list_rule_sha256": "512dbb879a42d5a962524e7fdeaf07f7f4b86d34812697de1a56e13d62f45947"
+      }
+    ]
+  },
+  "latest_product_source_sha256": "007415c60e7b5b251053da0590eb5996d780788ecbe7c589c6d08934e5b3a275"
 }
