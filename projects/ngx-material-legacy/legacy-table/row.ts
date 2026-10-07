@@ -18,7 +18,7 @@ import {
   CdkNoDataRow,
 } from '@angular/cdk/table';
 import {ChangeDetectionStrategy, Component, Directive, TemplateRef, ViewEncapsulation} from '@angular/core';
-import {constructWithPublicDependencies} from '../legacy-core/internal/public-constructor-context';
+import {constructWithPublicDependencies} from './internal/public-constructor-context';
 
 /**
  * Header row definition for the mat-table.

@@ -8,7 +8,7 @@
  */
 
 import {CdkTable, CdkTextColumn, TEXT_COLUMN_OPTIONS, type TextColumnOptions} from '@angular/cdk/table';
-import {constructWithPublicDependencies} from '../legacy-core/internal/public-constructor-context';
+import {constructWithPublicDependencies} from './internal/public-constructor-context';
 import {ChangeDetectionStrategy, Component, Inject, Optional, ViewEncapsulation} from '@angular/core';
 
 /**

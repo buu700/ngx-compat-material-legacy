@@ -8,7 +8,7 @@
  */
 
 import {Directive, TemplateRef} from '@angular/core';
-import {constructWithPublicDependencies} from '../legacy-core/internal/public-constructor-context';
+import {constructWithPublicDependencies} from './internal/public-constructor-context';
 import {MAT_TAB_CONTENT, MatTabContent as MatNonLegacyTabContent} from '@angular/material/tabs';
 
 /**

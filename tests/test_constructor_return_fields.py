@@ -5,6 +5,16 @@ ROOT=Path(__file__).resolve().parents[1]
 def typescript_available():
     return subprocess.run(['node','-e',"require('typescript')"],cwd=ROOT,capture_output=True).returncode==0
 class ConstructorReturnFields(unittest.TestCase):
+    def test_entry_local_copies_match_the_single_owned_source(self):
+        project=ROOT/'projects/ngx-material-legacy'
+        canonical=(project/'internal/public-constructor-context.ts').read_bytes()
+        for family in ['legacy-table','legacy-tabs']:
+            self.assertEqual((project/family/'internal/public-constructor-context.ts').read_bytes(),canonical)
+        for rel in ['legacy-table/cell.ts','legacy-table/text-column.ts','legacy-table/row.ts','legacy-tabs/tab-content.ts']:
+            source=(project/rel).read_text()
+            self.assertIn("from './internal/public-constructor-context'",source)
+            self.assertNotIn("../legacy-core/internal/public-constructor-context",source)
+
     @unittest.skipUnless(typescript_available(),'typescript is not installed')
     def test_all_actual_adapter_classes_and_emitted_field_negatives(self):
         code=r"""
