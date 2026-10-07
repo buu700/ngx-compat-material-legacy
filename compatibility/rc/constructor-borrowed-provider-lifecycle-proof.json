@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "finding": "Injector.create useValue objects are registered for ngOnDestroy when hydrated. Destroying the temporary context incorrectly destroys supplied caller dependencies (notably CdkTable).",
+  "repair": "Use a bounded public Injector subclass backed by exact token-object Map and public Injector.NULL fallback. runInInjectionContext restores the prior context, including throws. No resource-owning injector is created and borrowed objects are never destroyed. Real public parent/prototype identities remain.",
+  "canonical_source": "projects/ngx-material-legacy/internal/public-constructor-context.ts",
+  "canonical_source_sha256": "5fc78b1916b5a189a64e5ab68a810b1304a742c6f084a327cd1f3bbdcf4c27dd",
+  "copies": [
+    "legacy-table/internal/public-constructor-context.ts",
+    "legacy-tabs/internal/public-constructor-context.ts"
+  ],
+  "local_diagnostic": "Real Angular22.1.7 public runtime with readonly TS6.0.3 transpilation: borrowed object identity/optional missing/real parent identity/caller destruction negative/required missing/throw restoration pass. This is not pinned21/main full qualification.",
+  "test": "tests/test_constructor_dependency_lifecycle.py",
+  "native_required_case": "packed-consumer/harness/constructor-borrowed-provider-lifecycle",
+  "required_packed_cases": 85,
+  "native_status": "pending Actions on both lines",
+  "scope": "Only nine bounded adapter classes whose reviewed peer constructors request the supplied dependency objects and optional missing tokens. Not a general hierarchical injector or a CDK fork. G02/full API/DI remains incomplete."
+}
