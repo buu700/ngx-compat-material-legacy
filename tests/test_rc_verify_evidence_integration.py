@@ -800,16 +800,17 @@ class CoordinatorTests(unittest.TestCase):
                 "peer_mixin": f"mat.{companion}-{parts[1]}", "peer_emitted_tokens": [],
             })
         else:
-            light, dark = "rgb(255, 64, 129)", "rgb(66, 66, 66)"
+            binding = verify._computed_binding_roster()[case_id]
+            value = "rgb(255, 64, 129)"
             body.update({
-                "group": "thirteen-companion-dimensions", "dimension": parts[1],
-                "element": parts[2], "property": parts[3], "token": f"--mat-{companion}-background-color",
-                "scenarios": [
-                    {"scenario": "light", "oracle": light, "candidate": light, "oracle_token": light, "match": True},
-                    {"scenario": "dark", "oracle": dark, "candidate": dark, "oracle_token": dark, "match": True},
-                ],
-                "negative": {"scenario": "light", "injected": "rgb(1, 2, 3)", "observed": "rgb(1, 2, 3)",
-                             "oracle": light, "sentinel_consumed": True, "mismatch_detected": True},
+                "group": "thirteen-companion-dimensions",
+                **{key: binding[key] for key in ("dimension", "element", "property", "token", "locate")},
+                "scenarios": [{"scenario": name, "oracle": value, "candidate": value, "bridge": value,
+                               "oracle_token": value, "candidate_token": value, "bridge_token": value,
+                               "match": True} for name in binding["scenarios"]],
+                "negative": {"scenario": binding["negative_scenario"], "injected": "rgb(1, 2, 3)",
+                             "observed": "rgb(1, 2, 3)", "oracle": value,
+                             "sentinel_consumed": True, "mismatch_detected": True},
             })
         body.update(changes)
         return body
@@ -865,7 +866,7 @@ for (const b of rostered) {
     const v = `rgb(${i + 10}, 9, 9)`;
     return [s, {found: true, value: v, token_value: v}];
   }));
-  observations[b.id] = {oracle: per, candidate: per, negative: {found: true, value: sentinels[b.token].marker}};
+  observations[b.id] = {oracle: per, candidate: per, bridge: per, negative: {found: true, value: sentinels[b.token].marker}};
 }
 const dimensionTokens = {};
 for (const c of cases.COMPANIONS) {
@@ -908,7 +909,9 @@ console.log(JSON.stringify(bodies.map((b) => [b.case_id, b.result])));
             ("datepicker/density/popup-next-button-touch-target/display", "--mat-badge-background-color"),
         ):
             with self.subTest(case_id=case_id, token=token):
-                body = self._computed_body(case_id, invocation, token=token)
+                body = self._computed_body("datepicker/density/popup-next-button-touch-target/display", invocation, token=token)
+                parts = case_id.split("/")
+                body.update(case_id=case_id, companion=parts[0], dimension=parts[1], element=parts[2], property=parts[3])
                 self.assertFalse(verify._computed_style_assertion_ok(body, invocation))
 
     def test_null_computed_styles_roster_stays_slice(self):
@@ -1002,6 +1005,9 @@ console.log(JSON.stringify(bodies.map((b) => [b.case_id, b.result])));
             {"scenarios": [{**light, "oracle": "", "candidate": ""}]},
             {"scenarios": [{**light, "oracle_token": ""}]},
             {"scenarios": []},
+            {"scenarios": good["scenarios"][:-1]},
+            {"scenarios": [{**row, "bridge": "wrong"} for row in good["scenarios"]]},
+            {"locate": {"css": "#wrong"}},
             {"scenarios": [light, light]},
             {"negative": {**good["negative"], "sentinel_consumed": False}},
             {"negative": {**good["negative"], "mismatch_detected": False}},
@@ -1015,11 +1021,11 @@ console.log(JSON.stringify(bodies.map((b) => [b.case_id, b.result])));
             with self.subTest(changes=changes):
                 self._write_computed_assertions(ids, {case_id: changes})
                 self.assertEqual(self._computed_report()[1]["coverage"], "slice")
-        keyword_light = {**light, "oracle_token": ""}
+        keyword_scenarios = [{**row, "oracle_token": ""} for row in good["scenarios"]]
         for changes, coverage in (
-            ({"peer_declared_keyword": "unset", "scenarios": [keyword_light]}, "complete"),
-            ({"peer_declared_keyword": "bogus", "scenarios": [keyword_light]}, "slice"),
-            ({"peer_declared_keyword": None, "scenarios": [keyword_light]}, "slice"),
+            ({"peer_declared_keyword": "unset", "scenarios": keyword_scenarios}, "complete"),
+            ({"peer_declared_keyword": "bogus", "scenarios": keyword_scenarios}, "slice"),
+            ({"peer_declared_keyword": None, "scenarios": keyword_scenarios}, "slice"),
         ):
             with self.subTest(keyword=changes["peer_declared_keyword"]):
                 self._write_computed_assertions(ids, {case_id: changes})

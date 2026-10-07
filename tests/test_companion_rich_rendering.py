@@ -24,17 +24,24 @@ for(const id of cases.RICH_THEME_IDS){
 }
 const candidate=cases.candidateScss(),oracle=cases.oracleScss();
 for(const source of [candidate,oracle])assert.ok(source.includes('19px, 27px, 600')&&source.includes('Closeout Font')&&source.includes('0.03em'));
+for(const family of cases.COMPANIONS) assert.ok(candidate.includes(`@include legacy.${family}-theme(`));
+assert.ok(candidate.includes('.ccs-bridge-light')&&candidate.includes('legacy.all-current-companion-bridges'));
 assert.ok(candidate.includes('legacy.define-typography-level'));
 assert.ok(!candidate.includes('m2-define-typography-level'));
 assert.ok(oracle.includes('mat.m2-define-typography-level'));
 const binding=cases.BINDINGS.find(b=>b.scenarios.includes(cases.RICH_THEME_IDS[0]));
 const sentinel=cases.sentinelTable([binding])[binding.token];
 const observed={found:true,value:'rgb(1, 2, 3)',token_value:'rgb(1, 2, 3)'};
-const obs={oracle:Object.fromEntries(binding.scenarios.map(id=>[id,observed])),candidate:Object.fromEntries(binding.scenarios.map(id=>[id,observed])),negative:{found:true,value:sentinel.marker,token_value:sentinel.value}};
+const obs={oracle:Object.fromEntries(binding.scenarios.map(id=>[id,observed])),candidate:Object.fromEntries(binding.scenarios.map(id=>[id,observed])),bridge:Object.fromEntries(binding.scenarios.map(id=>[id,observed])),negative:{found:true,value:sentinel.marker,token_value:sentinel.value}};
 assert.equal(cases.assessCase(binding,obs,sentinel).result,'pass');
 obs.candidate[cases.RICH_THEME_IDS[0]]={...observed,value:'rgb(7, 8, 9)'};
 assert.equal(cases.assessCase(binding,obs,sentinel).result,'fail');
 delete obs.candidate[cases.RICH_THEME_IDS[0]];
+assert.equal(cases.assessCase(binding,obs,sentinel).result,'fail');
+obs.candidate[cases.RICH_THEME_IDS[0]]=observed;
+obs.bridge[cases.RICH_THEME_IDS[0]]={...observed,value:'rgb(7, 8, 9)'};
+assert.equal(cases.assessCase(binding,obs,sentinel).result,'fail');
+delete obs.bridge[cases.RICH_THEME_IDS[0]];
 assert.equal(cases.assessCase(binding,obs,sentinel).result,'fail');
 out(true);
 """)
