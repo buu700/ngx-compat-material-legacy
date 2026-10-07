@@ -489,6 +489,7 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
     'packed-consumer/harness/text-column-original-constructor-options': parsed.textColumnOriginalConstructor === true,
     'packed-consumer/harness/tab-content-original-constructor': parsed.tabContentOriginalConstructor === true,
     'packed-consumer/harness/no-data-row-original-constructor': parsed.noDataRowOriginalConstructor === true,
+    'packed-consumer/harness/constructor-borrowed-provider-lifecycle': parsed.constructorBorrowedProviderLifecycle === true,
   };
   const owned = declarationKeys(keys)
     .filter(key => key.endsWith('/testing'))
@@ -1211,6 +1212,14 @@ async function main() {
     options_unmutated:Object.isFrozen(ORIGINAL_TEXT_OPTIONS)&&Object.keys(ORIGINAL_TEXT_OPTIONS).length===2,
   };
   const textColumnOriginalConstructor=Object.values(textColumnObservation).every(value=>value===true);
+  let borrowedTableDestroyed=0,borrowedOptionsDestroyed=0;
+  const borrowedTable={ngOnDestroy:()=>borrowedTableDestroyed++} as unknown as CdkTable<any>;
+  const borrowedOptions={...ORIGINAL_TEXT_OPTIONS,ngOnDestroy:()=>borrowedOptionsDestroyed++};
+  const borrowedColumn=new MatLegacyTextColumn(borrowedTable,borrowedOptions);
+  const constructorBorrowedProviderLifecycle=(borrowedColumn as any)._table===borrowedTable
+    &&(borrowedColumn as any)._options===borrowedOptions
+    &&borrowedTableDestroyed===0&&borrowedOptionsDestroyed===0;
+
   const suppliedTabTemplate=fixture.componentInstance.originalTabTemplate;
   const nodeTabContent=fixture.componentInstance.originalTabContent;
   const manualTabContent=new MatLegacyTabContent(suppliedTabTemplate);
@@ -1567,7 +1576,7 @@ async function main() {
       selectOpened === true &&
       selectClosed === true &&
       tabCount === 2 &&
-      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor && tabContentOriginalConstructor && noDataRowOriginalConstructor,
+      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor && tabContentOriginalConstructor && noDataRowOriginalConstructor && constructorBorrowedProviderLifecycle,
     buttonText: text,
     selectIsOpen: isOpen,
     dialogText,
@@ -1600,6 +1609,7 @@ async function main() {
     textColumnOriginalConstructor, textColumnObservation,
     tabContentOriginalConstructor, tabContentObservation,
     noDataRowOriginalConstructor, noDataRowObservation,
+    constructorBorrowedProviderLifecycle, borrowedTableDestroyed, borrowedOptionsDestroyed,
     checkboxAttribute, slideToggleAttribute, sliderAttribute, tabLinkAttribute,
     commonModuleDiagnostics:{contrastLifecycle,contrastProbeReads,sanityWarnings,checksEnabled,sanityDefault:TestBed.inject(MATERIAL_LEGACY_SANITY_CHECKS),sanityToken:String(MATERIAL_LEGACY_SANITY_CHECKS)},
     chipEventCounts:{removals:fixture.componentInstance.repeatRemovals,separators:fixture.componentInstance.repeatEnds},
