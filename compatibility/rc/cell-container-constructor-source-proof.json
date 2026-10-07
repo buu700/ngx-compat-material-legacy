@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-07T05:44:27.569536+00:00",
+  "scope": [
+    "MatLegacyHeaderCell",
+    "MatLegacyCell",
+    "MatLegacyFooterCell"
+  ],
+  "authentic_original_and_minimum_bodies": {
+    "original16": {
+      "archive_sha256": "a499ba0fee46784441b92587e43b17ec72d9bd383f78ea14954eaa62c781bad7",
+      "member": "package/fesm2022/table.mjs",
+      "member_sha256": "5970be112e4a2e41c48316120a1695fef3be7ca0c91507ff1d2dec1e724e508e",
+      "constructor_bodies": {
+        "CdkCell": "class CdkCell extends BaseCdkCell {\n    constructor(columnDef, elementRef) {\n        super(columnDef, elementRef);\n        if (columnDef._table?._elementRef.nativeElement.nodeType === 1) {\n            const tableRole = columnDef._table._elementRef.nativeElement.getAttribute('role');\n            const role = tableRole === 'grid' || tableRole === 'treegrid' ? 'gridcell' : 'cell';\n            elementRef.nativeElement.setAttribute('role', role);\n        }\n    }\n",
+        "CdkHeaderCell": "class CdkHeaderCell extends BaseCdkCell {\n    constructor(columnDef, elementRef) {\n        super(columnDef, elementRef);\n    }\n",
+        "CdkFooterCell": "class CdkFooterCell extends BaseCdkCell {\n    constructor(columnDef, elementRef) {\n        super(columnDef, elementRef);\n        if (columnDef._table?._elementRef.nativeElement.nodeType === 1) {\n            const tableRole = columnDef._table._elementRef.nativeElement.getAttribute('role');\n            const role = tableRole === 'grid' || tableRole === 'treegrid' ? 'gridcell' : 'cell';\n            elementRef.nativeElement.setAttribute('role', role);\n        }\n    }\n"
+      },
+      "current_role_helper": null
+    },
+    "21.x": {
+      "archive_sha256": "b54868a0f7aefa471203a0fe419370e156cdf0218db9b625aca3ae6e8de25c63",
+      "member": "package/fesm2022/table.mjs",
+      "member_sha256": "ea8d99a22482768bab22e19aba83b2a1498be6be340e46991965f539036b6c11",
+      "constructor_bodies": {
+        "CdkCell": "class CdkCell extends BaseCdkCell {\n  constructor() {\n    const columnDef = inject(CdkColumnDef);\n    const elementRef = inject(ElementRef);\n    super(columnDef, elementRef);\n    const role = columnDef._table?._getCellRole();\n    if (role) {\n      elementRef.nativeElement.setAttribute('role', role);\n    }\n  }\n",
+        "CdkHeaderCell": "class CdkHeaderCell extends BaseCdkCell {\n  constructor() {\n    super(inject(CdkColumnDef), inject(ElementRef));\n  }\n",
+        "CdkFooterCell": "class CdkFooterCell extends BaseCdkCell {\n  constructor() {\n    const columnDef = inject(CdkColumnDef);\n    const elementRef = inject(ElementRef);\n    super(columnDef, elementRef);\n    const role = columnDef._table?._getCellRole();\n    if (role) {\n      elementRef.nativeElement.setAttribute('role', role);\n    }\n  }\n"
+      },
+      "current_role_helper": "  _getCellRole() {\n    if (this._cellRoleInternal === undefined) {\n      const tableRole = this._elementRef.nativeElement.getAttribute('role');\n      return tableRole === 'grid' || tableRole === 'treegrid' ? 'gridcell' : 'cell';\n    }\n    return this._cellRoleInternal;\n  }"
+    },
+    "main": {
+      "archive_sha256": "225d82389797aefbbb2684461576ef950465546a9d28326483e0b816c8a5a558",
+      "member": "package/fesm2022/table.mjs",
+      "member_sha256": "2bdeb437714a07914ccb8d2f749fd75d72b63da1ab4cc0c069f64e714c2a6ad4",
+      "constructor_bodies": {
+        "CdkCell": "class CdkCell extends BaseCdkCell {\n  constructor() {\n    const columnDef = inject(CdkColumnDef);\n    const elementRef = inject(ElementRef);\n    super(columnDef, elementRef);\n    const role = columnDef._table?._getCellRole();\n    if (role) {\n      elementRef.nativeElement.setAttribute('role', role);\n    }\n  }\n",
+        "CdkHeaderCell": "class CdkHeaderCell extends BaseCdkCell {\n  constructor() {\n    super(inject(CdkColumnDef), inject(ElementRef));\n  }\n",
+        "CdkFooterCell": "class CdkFooterCell extends BaseCdkCell {\n  constructor() {\n    const columnDef = inject(CdkColumnDef);\n    const elementRef = inject(ElementRef);\n    super(columnDef, elementRef);\n    const role = columnDef._table?._getCellRole();\n    if (role) {\n      elementRef.nativeElement.setAttribute('role', role);\n    }\n  }\n"
+      },
+      "current_role_helper": "  _getCellRole() {\n    if (this._cellRoleInternal === undefined) {\n      const tableRole = this._elementRef.nativeElement.getAttribute('role');\n      return tableRole === 'grid' || tableRole === 'treegrid' ? 'gridcell' : 'cell';\n    }\n    return this._cellRoleInternal;\n  }"
+    }
+  },
+  "implementation": "Restore original (CdkColumnDef, ElementRef) constructors through the same public Angular/standard Reflect adapter, preserving supplied objects, actual current public CDK parents/prototypes and existing selectors/host classes/roles. No CDK implementation or private token/member is imported/copied.",
+  "original_expectations": "Original BaseCdkCell adds column CSS classes to the supplied element. Header constructor assigns no DOM role itself; original data/footer constructors read actual table role and set gridcell for grid/treegrid, cell otherwise. Both current minimum helpers compute the same default real-table role; modern internal override behavior is not adopted or claimed by this scoped test.",
+  "native_case": "packed-consumer/harness/cell-original-constructors-and-grid-roles",
+  "required_packed_cases": 81,
+  "native_status": "pending Actions",
+  "scope_limit": "Actual manual supplied element/classes/parent/prototype identity and real rendered grid header/data/footer role/owned identity checked. Fresh full untouched historical table/family suite still required; no whole table/API/G02 clearance. Other inherited constructor/provider/private scopes remain open.",
+  "typescript_note": "Same narrow documented TS2377 suppression for valid derived object return; constructor type/argument expectations and all native predicates remain required.",
+  "g02_claim": "not-passed"
+}

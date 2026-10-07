@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import {Directive, Input, Injector, TemplateRef, runInInjectionContext} from '@angular/core';
+import {Directive, ElementRef, Input, Injector, TemplateRef, runInInjectionContext} from '@angular/core';
 import {
   CdkCell,
   CdkCellDef,
@@ -18,9 +18,9 @@ import {
   CdkHeaderCellDef,
 } from '@angular/cdk/table';
 
-/** Construct the public parent with exactly the original supplied template. */
-function constructCellDefinition<T>(parent: new () => T, target: Function, template: TemplateRef<any>): T {
-  const context = Injector.create({providers: [{provide: TemplateRef, useValue: template}]});
+/** Construct the public parent with exactly the original supplied dependencies. */
+function constructLegacyCell<T>(parent: new () => T, target: Function, providers: {provide: unknown; useValue: unknown}[]): T {
+  const context = Injector.create({providers});
   try {
     return runInInjectionContext(context, () => Reflect.construct(parent, [], target));
   } finally {
@@ -44,7 +44,7 @@ export class MatLegacyCellDef extends CdkCellDef {
   // super() even though that would discard the original manual argument here.
   // @ts-expect-error TS2377: derived constructor deliberately returns its object.
   constructor(template: TemplateRef<any>) {
-    return constructCellDefinition(CdkCellDef, new.target, template);
+    return constructLegacyCell(CdkCellDef, new.target, [{provide: TemplateRef, useValue: template}]);
   }
 }
 
@@ -64,7 +64,7 @@ export class MatLegacyHeaderCellDef extends CdkHeaderCellDef {
   // super() even though that would discard the original manual argument here.
   // @ts-expect-error TS2377: derived constructor deliberately returns its object.
   constructor(template: TemplateRef<any>) {
-    return constructCellDefinition(CdkHeaderCellDef, new.target, template);
+    return constructLegacyCell(CdkHeaderCellDef, new.target, [{provide: TemplateRef, useValue: template}]);
   }
 }
 
@@ -84,7 +84,7 @@ export class MatLegacyFooterCellDef extends CdkFooterCellDef {
   // super() even though that would discard the original manual argument here.
   // @ts-expect-error TS2377: derived constructor deliberately returns its object.
   constructor(template: TemplateRef<any>) {
-    return constructCellDefinition(CdkFooterCellDef, new.target, template);
+    return constructLegacyCell(CdkFooterCellDef, new.target, [{provide: TemplateRef, useValue: template}]);
   }
 }
 
@@ -138,7 +138,15 @@ export class MatLegacyColumnDef extends CdkColumnDef {
     'role': 'columnheader',
   },
 })
-export class MatLegacyHeaderCell extends CdkHeaderCell {}
+export class MatLegacyHeaderCell extends CdkHeaderCell {
+  // @ts-expect-error TS2377: valid derived object return preserves manual arguments.
+  constructor(columnDef: CdkColumnDef, elementRef: ElementRef) {
+    return constructLegacyCell(CdkHeaderCell, new.target, [
+      {provide: CdkColumnDef, useValue: columnDef},
+      {provide: ElementRef, useValue: elementRef},
+    ]);
+  }
+}
 
 /**
  * Footer cell template container that adds the right classes and role.
@@ -153,7 +161,15 @@ export class MatLegacyHeaderCell extends CdkHeaderCell {}
     'role': 'gridcell',
   },
 })
-export class MatLegacyFooterCell extends CdkFooterCell {}
+export class MatLegacyFooterCell extends CdkFooterCell {
+  // @ts-expect-error TS2377: valid derived object return preserves manual arguments.
+  constructor(columnDef: CdkColumnDef, elementRef: ElementRef) {
+    return constructLegacyCell(CdkFooterCell, new.target, [
+      {provide: CdkColumnDef, useValue: columnDef},
+      {provide: ElementRef, useValue: elementRef},
+    ]);
+  }
+}
 
 /**
  * Cell template container that adds the right classes and role.
@@ -168,4 +184,12 @@ export class MatLegacyFooterCell extends CdkFooterCell {}
     'role': 'gridcell',
   },
 })
-export class MatLegacyCell extends CdkCell {}
+export class MatLegacyCell extends CdkCell {
+  // @ts-expect-error TS2377: valid derived object return preserves manual arguments.
+  constructor(columnDef: CdkColumnDef, elementRef: ElementRef) {
+    return constructLegacyCell(CdkCell, new.target, [
+      {provide: CdkColumnDef, useValue: columnDef},
+      {provide: ElementRef, useValue: elementRef},
+    ]);
+  }
+}

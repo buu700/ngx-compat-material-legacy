@@ -485,6 +485,7 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
     'packed-consumer/harness/peer-stepper-abstract-control': parsed.peerStepperAbstractControl === true,
     'packed-consumer/harness/tooltip-original-eager-dependencies': parsed.tooltipOriginalEagerDependencies === true,
     'packed-consumer/harness/cell-definition-original-constructors': parsed.cellDefinitionOriginalConstructors === true,
+    'packed-consumer/harness/cell-original-constructors-and-grid-roles': parsed.cellOriginalConstructors === true,
   };
   const owned = declarationKeys(keys)
     .filter(key => key.endsWith('/testing'))
@@ -903,8 +904,8 @@ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
 import {provideNoopAnimations} from '@angular/platform-browser/animations';
 import {Overlay, OverlayContainer} from '@angular/cdk/overlay';
 import {ScrollDispatcher} from '@angular/cdk/scrolling';
-import {CdkCellDef,CdkHeaderCellDef,CdkFooterCellDef} from '@angular/cdk/table';
-import {MatLegacyTableModule,MatLegacyCellDef,MatLegacyHeaderCellDef,MatLegacyFooterCellDef} from '@ngx-compat/material-legacy/legacy-table';
+import {CdkCellDef,CdkHeaderCellDef,CdkFooterCellDef,CdkCell,CdkHeaderCell,CdkFooterCell} from '@angular/cdk/table';
+import {MatLegacyTableModule,MatLegacyCellDef,MatLegacyHeaderCellDef,MatLegacyFooterCellDef,MatLegacyColumnDef,MatLegacyCell,MatLegacyHeaderCell,MatLegacyFooterCell} from '@ngx-compat/material-legacy/legacy-table';
 import {Platform} from '@angular/cdk/platform';
 import {Directionality} from '@angular/cdk/bidi';
 import {MatLegacyButtonModule} from '@ngx-compat/material-legacy/legacy-button';
@@ -1009,6 +1010,16 @@ class SmokeDialogContent {}
     </mat-menu>
     <button mat-button id="snack-open">Snack</button>
     <button mat-button matTooltip="Tip text" id="tip">Hover</button>
+    <mat-table id="constructor-grid" role="grid" [dataSource]="[{value:'Grid value'}]">
+      <ng-container matColumnDef="constructor-probe">
+        <mat-header-cell *matHeaderCellDef>Grid header</mat-header-cell>
+        <mat-cell *matCellDef="let row">{{row.value}}</mat-cell>
+        <mat-footer-cell *matFooterCellDef>Grid footer</mat-footer-cell>
+      </ng-container>
+      <mat-header-row *matHeaderRowDef="['constructor-probe']"></mat-header-row>
+      <mat-row *matRowDef="let row; columns:['constructor-probe']"></mat-row>
+      <mat-footer-row *matFooterRowDef="['constructor-probe']"></mat-footer-row>
+    </mat-table>
     <ng-template #manualCellTemplate matCellDef>Data probe</ng-template>
     <ng-template #manualHeaderTemplate matHeaderCellDef>Header probe</ng-template>
     <ng-template #manualFooterTemplate matFooterCellDef>Footer probe</ng-template>
@@ -1020,9 +1031,10 @@ class SmokeDialogContent {}
   \`,
 })
 class HarnessHost {
-  @ViewChild(MatLegacyCellDef,{static:true}) cellDefinition!:MatLegacyCellDef;
-  @ViewChild(MatLegacyHeaderCellDef,{static:true}) headerDefinition!:MatLegacyHeaderCellDef;
-  @ViewChild(MatLegacyFooterCellDef,{static:true}) footerDefinition!:MatLegacyFooterCellDef;
+  @ViewChild(MatLegacyColumnDef,{static:true}) gridColumn!:MatLegacyColumnDef;
+  @ViewChild('manualCellTemplate',{read:MatLegacyCellDef,static:true}) cellDefinition!:MatLegacyCellDef;
+  @ViewChild('manualHeaderTemplate',{read:MatLegacyHeaderCellDef,static:true}) headerDefinition!:MatLegacyHeaderCellDef;
+  @ViewChild('manualFooterTemplate',{read:MatLegacyFooterCellDef,static:true}) footerDefinition!:MatLegacyFooterCellDef;
   @ViewChild('manualCellTemplate',{read:TemplateRef,static:true}) cellTemplate!:TemplateRef<any>;
   @ViewChild('manualHeaderTemplate',{read:TemplateRef,static:true}) headerTemplate!:TemplateRef<any>;
   @ViewChild('manualFooterTemplate',{read:TemplateRef,static:true}) footerTemplate!:TemplateRef<any>;
@@ -1135,6 +1147,31 @@ async function main() {
   }
   const cellDefinitionOriginalConstructors=cellDefinitionObservation.length===3
     &&cellDefinitionObservation.every(row=>Object.entries(row).every(([name,value])=>name==='name'||value===true));
+  const cellConstructorObservation=[];
+  const column=fixture.componentInstance.gridColumn;
+  for(const [Owned,Peer,selector,role] of [
+    [MatLegacyHeaderCell,CdkHeaderCell,'mat-header-cell','columnheader'],
+    [MatLegacyCell,CdkCell,'mat-cell','gridcell'],
+    [MatLegacyFooterCell,CdkFooterCell,'mat-footer-cell','gridcell'],
+  ] as const){
+    const element=win.document.createElement('div');element.classList.add('manual-kept');
+    const suppliedElement=new ElementRef<HTMLElement>(element);
+    const manual=new Owned(column,suppliedElement);
+    const node=fixture.debugElement.query(item=>item.nativeElement?.matches?.('#constructor-grid '+selector));
+    cellConstructorObservation.push({name:Owned.name,
+      owned_identity:manual instanceof Owned,peer_identity:manual instanceof Peer,
+      prototype_identity:Object.getPrototypeOf(manual)===Owned.prototype,
+      parent_constructor_identity:Object.getPrototypeOf(Owned)===Peer,
+      supplied_element_classes:element.classList.contains('manual-kept')
+        &&element.classList.contains('cdk-column-constructor-probe')&&element.classList.contains('mat-column-constructor-probe'),
+      manual_grid_role:selector==='mat-header-cell'?element.getAttribute('role')===null:element.getAttribute('role')==='gridcell',
+      node_owned_identity:node?.injector.get(Owned) instanceof Owned,
+      node_peer_identity:node?.injector.get(Owned) instanceof Peer,
+      node_grid_role:node?.nativeElement.getAttribute('role')===role,
+      node_provider_element:!!node?.nativeElement.classList.contains('mat-column-constructor-probe')});
+  }
+  const cellOriginalConstructors=cellConstructorObservation.length===3
+    &&cellConstructorObservation.every(row=>Object.entries(row).every(([name,value])=>name==='name'||value===true));
   const eagerNode=fixture.debugElement.query(element=>element.nativeElement?.id==='tooltip-eager');
   const eagerTooltip=eagerNode.injector.get(MatLegacyTooltip);
   // These are owned original16 fields, not current private peer imports. Check
@@ -1453,7 +1490,7 @@ async function main() {
       selectOpened === true &&
       selectClosed === true &&
       tabCount === 2 &&
-      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors,
+      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors,
     buttonText: text,
     selectIsOpen: isOpen,
     dialogText,
@@ -1482,6 +1519,7 @@ async function main() {
     peerStepperAbstractControl, peerStepperObservation,
     tooltipOriginalEagerDependencies, tooltipEagerObservation,
     cellDefinitionOriginalConstructors, cellDefinitionObservation,
+    cellOriginalConstructors, cellConstructorObservation,
     checkboxAttribute, slideToggleAttribute, sliderAttribute, tabLinkAttribute,
     commonModuleDiagnostics:{contrastLifecycle,contrastProbeReads,sanityWarnings,checksEnabled,sanityDefault:TestBed.inject(MATERIAL_LEGACY_SANITY_CHECKS),sanityToken:String(MATERIAL_LEGACY_SANITY_CHECKS)},
     chipEventCounts:{removals:fixture.componentInstance.repeatRemovals,separators:fixture.componentInstance.repeatEnds},
