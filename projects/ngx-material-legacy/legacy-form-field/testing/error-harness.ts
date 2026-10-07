@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -15,8 +16,6 @@ import {ErrorHarnessFilters} from '@angular/material/form-field/testing';
 
 /**
  * Harness for interacting with a legacy `mat-error` in tests.
- * @deprecated Use `MatErrorHarness` from `@angular/material/form-field/testing` instead.
- * @breaking-change 17.0.0
  */
 export class MatLegacyErrorHarness extends ComponentHarness {
   static hostSelector = '.mat-error';

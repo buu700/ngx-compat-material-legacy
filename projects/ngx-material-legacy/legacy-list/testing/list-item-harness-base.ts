@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -28,8 +29,6 @@ const avatarSelector = '.mat-list-avatar';
  * @param harnessType A constructor for a list item harness.
  * @param options An instance of `BaseListItemHarnessFilters` to apply.
  * @return A `HarnessPredicate` for the given harness type with the given options applied.
- * @deprecated Use `getListItemPredicate` from `@angular/material/list/testing` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export function getListItemPredicate<H extends MatLegacyListItemHarnessBase>(
   harnessType: ComponentHarnessConstructor<H>,
@@ -44,8 +43,6 @@ export function getListItemPredicate<H extends MatLegacyListItemHarnessBase>(
 
 /**
  * Harness for interacting with a list subheader.
- * @deprecated Use `MatSubheaderHarness` from `@angular/material/list/testing` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export class MatLegacySubheaderHarness extends ComponentHarness {
   static hostSelector = '.mat-subheader';
@@ -68,8 +65,6 @@ export class MatLegacySubheaderHarness extends ComponentHarness {
 
 /**
  * Selectors for the various list item sections that may contain user content.
- * @deprecated Use `enum` from `@angular/material/list/testing` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export enum MatLegacyListItemSection {
   CONTENT = '.mat-list-item-content',
@@ -79,8 +74,6 @@ export enum MatLegacyListItemSection {
 /**
  * Shared behavior among the harnesses for the various `MatListItem` flavors.
  * @docs-private
- * @deprecated Use `class` from `@angular/material/list/testing` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export abstract class MatLegacyListItemHarnessBase extends ContentContainerComponentHarness<MatLegacyListItemSection> {
   private _lines = this.locatorForAll('.mat-line');

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -13,10 +14,7 @@ export {LegacySimpleSnackBar, LegacyTextOnlySnackBar} from './simple-snack-bar';
 // Historical AnimationTriggerMetadata recipes moved to
 // native CSS motion (historical `/animations` recipe secondary removed in F04).
 export {
-  /**
-   * @deprecated Use `MatSnackBarRef` from `@angular/material/snack-bar` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
-   * @breaking-change 17.0.0
-   */
+
   MatSnackBarRef as MatLegacySnackBarRef,
   MatSnackBarDismiss as MatLegacySnackBarDismiss,
 } from './internal/snack-bar-ref';
@@ -28,28 +26,16 @@ export {
   _MatSnackBarContainerBase as _MatLegacySnackBarContainerBase,
 } from './internal/snack-bar-container-base';
 export {
-  /**
-   * @deprecated Use `MAT_SNACK_BAR_DATA` from `@angular/material/snack-bar` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
-   * @breaking-change 17.0.0
-   */
+
   MAT_SNACK_BAR_DATA as MAT_LEGACY_SNACK_BAR_DATA,
 
-  /**
-   * @deprecated Use `MatSnackBarHorizontalPosition` from `@angular/material/snack-bar` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
-   * @breaking-change 17.0.0
-   */
+
   MatSnackBarHorizontalPosition as MatLegacySnackBarHorizontalPosition,
 
-  /**
-   * @deprecated Use `MatSnackBarVerticalPosition` from `@angular/material/snack-bar` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
-   * @breaking-change 17.0.0
-   */
+
   MatSnackBarVerticalPosition as MatLegacySnackBarVerticalPosition,
 
-  /**
-   * @deprecated Use `MAT_SNACK_BAR_DEFAULT_OPTIONS` from `@angular/material/snack-bar` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
-   * @breaking-change 17.0.0
-   */
+
   MAT_SNACK_BAR_DEFAULT_OPTIONS as MAT_LEGACY_SNACK_BAR_DEFAULT_OPTIONS,
 
 } from '@angular/material/snack-bar';

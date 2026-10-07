@@ -15,23 +15,14 @@ export {
 export {MatLegacyCheckboxModule} from './checkbox-module';
 
 export {
-  /**
-   * @deprecated Use `MatCheckboxClickAction` from `@angular/material/checkbox` instead.
-   * @breaking-change 17.0.0
-   */
+
   MatCheckboxClickAction as MatLegacyCheckboxClickAction,
 
 
-  /**
-   * @deprecated Use `MatCheckboxDefaultOptions` from `@angular/material/checkbox` instead.
-   * @breaking-change 17.0.0
-   */
+
   MatCheckboxDefaultOptions as MatLegacyCheckboxDefaultOptions,
 
-  /**
-   * @deprecated Use `MAT_CHECKBOX_DEFAULT_OPTIONS` from `@angular/material/checkbox` instead.
-   * @breaking-change 17.0.0
-   */
+
   MAT_CHECKBOX_DEFAULT_OPTIONS as MAT_LEGACY_CHECKBOX_DEFAULT_OPTIONS,
 } from '@angular/material/checkbox';
 
@@ -46,9 +37,6 @@ export {_MatCheckboxBase as _MatLegacyCheckboxBase} from './internal/checkbox-ba
 export {MatCommonModule} from './internal/common-module';
 
 export {
-  /**
-   * @deprecated Use `TransitionCheckState` from `@angular/material/checkbox` instead.
-   * @breaking-change 17.0.0
-   */
+
   TransitionCheckState as LegacyTransitionCheckState,
 } from './owned-transition-state';

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -43,28 +44,16 @@ export {
   _MatDialogContainerBase as _MatLegacyDialogContainerBase,
 } from './internal/dialog-container-base';
 export {
-  /**
-   * @deprecated Use `AutoFocusTarget` from `@angular/material/dialog` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
-   * @breaking-change 17.0.0
-   */
+
   AutoFocusTarget as LegacyAutoFocusTarget,
 
-  /**
-   * @deprecated Use `DialogRole` from `@angular/material/dialog` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
-   * @breaking-change 17.0.0
-   */
+
   DialogRole as LegacyDialogRole,
 
-  /**
-   * @deprecated Use `DialogPosition` from `@angular/material/dialog` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
-   * @breaking-change 17.0.0
-   */
+
   DialogPosition as LegacyDialogPosition,
 
-  /**
-   * @deprecated Use `MatDialogState` from `@angular/material/dialog` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
-   * @breaking-change 17.0.0
-   */
+
   MatDialogState as MatLegacyDialogState,
 } from '@angular/material/dialog';
 export {MatCommonModule} from './internal/common-module';

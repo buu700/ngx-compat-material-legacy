@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -21,8 +22,6 @@ import {MatLegacySnackBarModule} from './snack-bar-module';
 
 /**
  * Service to dispatch Material Design snack bar messages.
- * @deprecated Use `MatSnackBar` from `@angular/material/snack-bar` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Injectable({providedIn: MatLegacySnackBarModule})
 export class MatLegacySnackBar extends _MatSnackBarBase {

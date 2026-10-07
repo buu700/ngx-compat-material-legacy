@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -24,15 +25,11 @@ import {MatLegacyDialogConfig} from './dialog-config';
 
 /**
  * Injection token that can be used to access the data that was passed in to a dialog.
- * @deprecated Use `MAT_DIALOG_DATA` from `@angular/material/dialog` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export const MAT_LEGACY_DIALOG_DATA = new InjectionToken<any>('MatDialogData');
 
 /**
  * Injection token that can be used to specify default dialog options.
- * @deprecated Use `MAT_DIALOG_DEFAULT_OPTIONS` from `@angular/material/dialog` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export const MAT_LEGACY_DIALOG_DEFAULT_OPTIONS = new InjectionToken<MatLegacyDialogConfig>(
   'mat-dialog-default-options',
@@ -40,8 +37,6 @@ export const MAT_LEGACY_DIALOG_DEFAULT_OPTIONS = new InjectionToken<MatLegacyDia
 
 /**
  * Injection token that determines the scroll handling while the dialog is open.
- * @deprecated Use `MAT_DIALOG_SCROLL_STRATEGY` from `@angular/material/dialog` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export const MAT_LEGACY_DIALOG_SCROLL_STRATEGY = new InjectionToken<() => ScrollStrategy>(
   'mat-dialog-scroll-strategy',
@@ -49,8 +44,6 @@ export const MAT_LEGACY_DIALOG_SCROLL_STRATEGY = new InjectionToken<() => Scroll
 
 /**
  * @docs-private
- * @deprecated Use `MAT_DIALOG_SCROLL_STRATEGY_PROVIDER_FACTORY` from `@angular/material/dialog` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export function MAT_LEGACY_DIALOG_SCROLL_STRATEGY_PROVIDER_FACTORY(
   overlay: Overlay,
@@ -60,8 +53,6 @@ export function MAT_LEGACY_DIALOG_SCROLL_STRATEGY_PROVIDER_FACTORY(
 
 /**
  * @docs-private
- * @deprecated Use `MAT_DIALOG_SCROLL_STRATEGY_PROVIDER` from `@angular/material/dialog` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export const MAT_LEGACY_DIALOG_SCROLL_STRATEGY_PROVIDER = {
   provide: MAT_LEGACY_DIALOG_SCROLL_STRATEGY,
@@ -71,8 +62,6 @@ export const MAT_LEGACY_DIALOG_SCROLL_STRATEGY_PROVIDER = {
 
 /**
  * Service to open Material Design modal dialogs.
- * @deprecated Use `MatDialog` from `@angular/material/dialog` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Injectable()
 export class MatLegacyDialog extends _MatDialogBase<MatLegacyDialogContainer> {

@@ -12,8 +12,6 @@ import {MAT_LEGACY_PREFIX as MAT_PREFIX} from './owned-tokens';
 
 /**
  * Prefix to be placed in front of the form field.
- * @deprecated Use `MatPrefix` from `@angular/material/form-field` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Directive({
   standalone: false,

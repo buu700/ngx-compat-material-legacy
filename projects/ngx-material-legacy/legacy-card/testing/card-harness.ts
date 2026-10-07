@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -11,8 +12,6 @@ import {LegacyCardHarnessFilters} from './card-harness-filters';
 
 /**
  * Selectors for different sections of the mat-card that can container user content.
- * @deprecated Use `MatCardSection` from `@angular/material/card/testing` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export enum MatLegacyCardSection {
   HEADER = '.mat-card-header',
@@ -23,8 +22,6 @@ export enum MatLegacyCardSection {
 
 /**
  * Harness for interacting with a standard mat-card in tests.
- * @deprecated Use `MatCardHarness` from `@angular/material/card/testing` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export class MatLegacyCardHarness extends ContentContainerComponentHarness<MatLegacyCardSection> {
   /** The selector for the host element of a `MatCard` instance. */

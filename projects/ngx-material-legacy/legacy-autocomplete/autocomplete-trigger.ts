@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -12,8 +13,6 @@ import {_MatAutocompleteTriggerBase} from './internal/autocomplete-trigger-base'
 /**
  * Provider that allows the autocomplete to register as a ControlValueAccessor.
  * @docs-private
- * @deprecated Use `MAT_AUTOCOMPLETE_VALUE_ACCESSOR` from `@angular/material/autocomplete` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export const MAT_LEGACY_AUTOCOMPLETE_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
@@ -21,10 +20,7 @@ export const MAT_LEGACY_AUTOCOMPLETE_VALUE_ACCESSOR: any = {
   multi: true,
 };
 
-/**
- * @deprecated Use `MatAutocompleteTrigger` from `@angular/material/autocomplete` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
- */
+
 @Directive({
   standalone: false,
   selector: `input[matAutocomplete], textarea[matAutocomplete]`,

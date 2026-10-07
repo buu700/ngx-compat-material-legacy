@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -17,10 +18,7 @@ import {LegacySimpleSnackBar} from './simple-snack-bar';
 import {MatLegacySnackBarContainer} from './snack-bar-container';
 import {MAT_SNACK_BAR_DEFAULT_OPTIONS_FACTORY} from './internal/snack-bar-base';
 
-/**
- * @deprecated Use `MatSnackBarModule` from `@angular/material/snack-bar` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
- */
+
 @NgModule({
   imports: [OverlayModule, PortalModule, CommonModule, MatLegacyButtonModule, MatCommonModule],
   exports: [MatLegacySnackBarContainer, MatCommonModule],

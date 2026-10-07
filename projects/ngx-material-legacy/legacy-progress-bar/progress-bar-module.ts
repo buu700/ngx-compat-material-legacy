@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -11,10 +12,7 @@ import {CommonModule} from '@angular/common';
 import {MatCommonModule} from './internal/common-module';
 import {MatLegacyProgressBar} from './progress-bar';
 
-/**
- * @deprecated Use `MatProgressBarModule` from `@angular/material/progress-bar` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
- */
+
 @NgModule({
   imports: [CommonModule, MatCommonModule],
   exports: [MatLegacyProgressBar, MatCommonModule],

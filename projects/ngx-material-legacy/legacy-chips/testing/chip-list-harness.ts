@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -17,8 +18,6 @@ import {
 
 /**
  * Base class for chip list harnesses.
- * @deprecated Use `class` from `@angular/material/chips/testing` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export abstract class _MatChipListHarnessBase extends ComponentHarness {
   /** Gets whether the chip list is disabled. */
@@ -50,8 +49,6 @@ export abstract class _MatChipListHarnessBase extends ComponentHarness {
 
 /**
  * Harness for interacting with a standard chip list in tests.
- * @deprecated Use `MatChipListHarness` from `@angular/material/chips/testing` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export class MatLegacyChipListHarness extends _MatChipListHarnessBase {
   /** The selector for the host element of a `MatChipList` instance. */

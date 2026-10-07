@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -14,10 +15,7 @@ import {MatCommonModule} from '../internal/common-module';
 import {MatLegacyOption} from './option';
 import {MatLegacyOptgroup} from './optgroup';
 
-/**
- * @deprecated Use `MatOptionModule` from `@angular/material/core` instead.
- * @breaking-change 17.0.0
- */
+
 @NgModule({
   imports: [MatRippleModule, CommonModule, MatCommonModule, MatPseudoCheckboxModule],
   exports: [MatLegacyOption, MatLegacyOptgroup],

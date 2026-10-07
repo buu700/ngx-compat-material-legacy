@@ -41,8 +41,6 @@ import {take} from 'rxjs/operators';
 
 /**
  * Represents an event fired on an individual `mat-chip`.
- * @deprecated Use `MatChipEvent` from `@angular/material/chips` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export interface MatLegacyChipEvent {
   /** The chip the event was fired on. */
@@ -51,8 +49,6 @@ export interface MatLegacyChipEvent {
 
 /**
  * Event object emitted by MatChip when selected or deselected.
- * @deprecated Use `MatChipSelectionChange` from `@angular/material/chips` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export class MatLegacyChipSelectionChange {
   constructor(
@@ -69,8 +65,6 @@ export class MatLegacyChipSelectionChange {
  * Injection token that can be used to reference instances of `MatChipRemove`. It serves as
  * alternative token to the actual `MatChipRemove` class which could cause unnecessary
  * retention of the class and its directive metadata.
- * @deprecated Use `MAT_CHIP_REMOVE` from `@angular/material/chips` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export const MAT_LEGACY_CHIP_REMOVE = new InjectionToken<MatLegacyChipRemove>('MatChipRemove');
 
@@ -78,8 +72,6 @@ export const MAT_LEGACY_CHIP_REMOVE = new InjectionToken<MatLegacyChipRemove>('M
  * Injection token that can be used to reference instances of `MatChipAvatar`. It serves as
  * alternative token to the actual `MatChipAvatar` class which could cause unnecessary
  * retention of the class and its directive metadata.
- * @deprecated Use `MAT_CHIP_AVATAR` from `@angular/material/chips` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export const MAT_LEGACY_CHIP_AVATAR = new InjectionToken<MatLegacyChipAvatar>('MatChipAvatar');
 
@@ -87,8 +79,6 @@ export const MAT_LEGACY_CHIP_AVATAR = new InjectionToken<MatLegacyChipAvatar>('M
  * Injection token that can be used to reference instances of `MatChipTrailingIcon`. It serves as
  * alternative token to the actual `MatChipTrailingIcon` class which could cause unnecessary
  * retention of the class and its directive metadata.
- * @deprecated Use `MAT_CHIP_TRAILING_ICON` from `@angular/material/chips` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export const MAT_LEGACY_CHIP_TRAILING_ICON = new InjectionToken<MatLegacyChipTrailingIcon>(
   'MatChipTrailingIcon',
@@ -106,8 +96,6 @@ const _MatChipMixinBase = mixinTabIndex(mixinColor(mixinDisableRipple(MatChipBas
 /**
  * Dummy directive to add CSS class to chip avatar.
  * @docs-private
- * @deprecated Use `MatChipAvatar` from `@angular/material/chips` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Directive({
   standalone: false,
@@ -120,8 +108,6 @@ export class MatLegacyChipAvatar {}
 /**
  * Dummy directive to add CSS class to chip trailing icon.
  * @docs-private
- * @deprecated Use `MatChipTrailingIcon` from `@angular/material/chips` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Directive({
   standalone: false,
@@ -133,8 +119,6 @@ export class MatLegacyChipTrailingIcon {}
 
 /**
  * Material Design styled chip directive. Used inside the MatChipList component.
- * @deprecated Use `MatChip` from `@angular/material/chips` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Directive({
   standalone: false,
@@ -491,8 +475,6 @@ export class MatLegacyChip
  * You *may* use a custom icon, but you may need to override the `mat-chip-remove` positioning
  * styles to properly center the icon within the chip.
  *
- * @deprecated Use `MatChipRemove` from `@angular/material/chips` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Directive({
   standalone: false,

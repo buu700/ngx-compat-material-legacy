@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -12,8 +13,6 @@ import {MatLegacyTabHarness} from './tab-harness';
 
 /**
  * Harness for interacting with a standard mat-tab-group in tests.
- * @deprecated Use `MatTabGroupHarness` from `@angular/material/tabs/testing` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export class MatLegacyTabGroupHarness extends ComponentHarness {
   /** The selector for the host element of a `MatTabGroup` instance. */

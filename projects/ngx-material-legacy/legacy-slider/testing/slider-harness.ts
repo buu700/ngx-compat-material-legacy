@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -12,8 +13,6 @@ import {LegacySliderHarnessFilters} from './slider-harness-filters';
 
 /**
  * Harness for interacting with a standard mat-slider in tests.
- * @deprecated Use `MatSliderHarness` from `@angular/material/slider/testing` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export class MatLegacySliderHarness extends ComponentHarness {
   /** The selector for the host element of a `MatSlider` instance. */

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -25,8 +26,6 @@ let dialogElementUid = 0;
 
 /**
  * Button that will close the current dialog.
- * @deprecated Use `MatDialogClose` from `@angular/material/dialog` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Directive({
   standalone: false,
@@ -97,8 +96,6 @@ export class MatLegacyDialogClose implements OnInit, OnChanges {
 
 /**
  * Title of a dialog element. Stays fixed to the top of the dialog when scrolling.
- * @deprecated Use `MatDialogTitle` from `@angular/material/dialog` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Directive({
   standalone: false,
@@ -149,8 +146,6 @@ export class MatLegacyDialogTitle implements OnInit, OnDestroy {
 
 /**
  * Scrollable content container of a dialog.
- * @deprecated Use `MatDialogContent` from `@angular/material/dialog` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Directive({
   standalone: false,
@@ -162,8 +157,6 @@ export class MatLegacyDialogContent {}
 /**
  * Container for the bottom action buttons in a dialog.
  * Stays fixed to the bottom when scrolling.
- * @deprecated Use `MatDialogActions` from `@angular/material/dialog` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Directive({
   standalone: false,

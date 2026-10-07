@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -18,8 +19,6 @@ import {_MatSelectHarnessBase} from './select-harness-base';
 
 /**
  * Harness for interacting with a standard mat-select in tests.
- * @deprecated Use `MatSelectHarness` from `@angular/material/select/testing` instead.
- * @breaking-change 17.0.0
  */
 export class MatLegacySelectHarness extends _MatSelectHarnessBase<
   typeof MatLegacyOptionHarness,

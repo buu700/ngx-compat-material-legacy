@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -16,10 +17,7 @@ import {
 import {MatTabLabel, MAT_TAB_LABEL, MAT_TAB_CONTENT, MAT_TAB} from '@angular/material/tabs';
 import {_MatTabBase} from './internal/tab-base';
 
-/**
- * @deprecated Use `MatTab` from `@angular/material/tabs` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
- */
+
 @Component({
   standalone: false,
   selector: 'mat-tab',

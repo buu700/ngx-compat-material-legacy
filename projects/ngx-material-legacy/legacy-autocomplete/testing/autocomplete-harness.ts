@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -18,8 +19,6 @@ import {LegacyAutocompleteHarnessFilters} from './autocomplete-harness-filters';
 
 /**
  * Harness for interacting with a standard mat-autocomplete in tests.
- * @deprecated Use `MatAutocompleteHarness` from `@angular/material/autocomplete/testing` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export class MatLegacyAutocompleteHarness extends _MatAutocompleteHarnessBase<
   typeof MatLegacyOptionHarness,

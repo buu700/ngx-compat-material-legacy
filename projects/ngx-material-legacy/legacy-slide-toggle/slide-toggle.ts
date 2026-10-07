@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -29,8 +30,6 @@ import {_MatSlideToggleBase} from './internal/slide-toggle-base';
 
 /**
  * @docs-private
- * @deprecated Use `MAT_SLIDE_TOGGLE_VALUE_ACCESSOR` from `@angular/material/slide-toggle` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export const MAT_LEGACY_SLIDE_TOGGLE_VALUE_ACCESSOR = {
   provide: NG_VALUE_ACCESSOR,
@@ -40,8 +39,6 @@ export const MAT_LEGACY_SLIDE_TOGGLE_VALUE_ACCESSOR = {
 
 /**
  * Change event object emitted by a slide toggle.
- * @deprecated Use `MatSlideToggleChange` from `@angular/material/slide-toggle` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export class MatLegacySlideToggleChange {
   constructor(
@@ -54,8 +51,6 @@ export class MatLegacySlideToggleChange {
 
 /**
  * Represents a slidable "switch" toggle that can be moved between on and off.
- * @deprecated Use `MatSlideToggle` from `@angular/material/slide-toggle` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Component({
   standalone: false,

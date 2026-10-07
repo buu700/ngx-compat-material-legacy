@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -25,8 +26,6 @@ import {_MatDialogContainerBase} from './internal/dialog-container-base';
 
 /**
  * Reference to a dialog opened via the MatDialog service.
- * @deprecated Use `MatDialogRef` from `@angular/material/dialog` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export class MatLegacyDialogRef<T, R = any> {
   /** The instance of component opened into the dialog. */

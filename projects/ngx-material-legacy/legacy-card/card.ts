@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -20,8 +21,6 @@ import {
 /**
  * Content of a card, needed as it's used as a selector in the API.
  * @docs-private
- * @deprecated Use `MatCardContent` from `@angular/material/card` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Directive({
   standalone: false,
@@ -33,8 +32,6 @@ export class MatLegacyCardContent {}
 /**
  * Title of a card, needed as it's used as a selector in the API.
  * @docs-private
- * @deprecated Use `MatCardTitle` from `@angular/material/card` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Directive({
   standalone: false,
@@ -48,8 +45,6 @@ export class MatLegacyCardTitle {}
 /**
  * Sub-title of a card, needed as it's used as a selector in the API.
  * @docs-private
- * @deprecated Use `MatCardSubtitle` from `@angular/material/card` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Directive({
   standalone: false,
@@ -63,8 +58,6 @@ export class MatLegacyCardSubtitle {}
 /**
  * Action section of a card, needed as it's used as a selector in the API.
  * @docs-private
- * @deprecated Use `MatCardActions` from `@angular/material/card` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Directive({
   standalone: false,
@@ -83,8 +76,6 @@ export class MatLegacyCardActions {
 /**
  * Footer of a card, needed as it's used as a selector in the API.
  * @docs-private
- * @deprecated Use `MatCardFooter` from `@angular/material/card` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Directive({
   standalone: false,
@@ -96,8 +87,6 @@ export class MatLegacyCardFooter {}
 /**
  * Image used in a card, needed to add the mat- CSS styling.
  * @docs-private
- * @deprecated Use `MatCardImage` from `@angular/material/card` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Directive({
   standalone: false,
@@ -109,8 +98,6 @@ export class MatLegacyCardImage {}
 /**
  * Image used in a card, needed to add the mat- CSS styling.
  * @docs-private
- * @deprecated Use `MatCardSmImage` from `@angular/material/card` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Directive({
   standalone: false,
@@ -122,8 +109,6 @@ export class MatLegacyCardSmImage {}
 /**
  * Image used in a card, needed to add the mat- CSS styling.
  * @docs-private
- * @deprecated Use `MatCardMdImage` from `@angular/material/card` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Directive({
   standalone: false,
@@ -135,8 +120,6 @@ export class MatLegacyCardMdImage {}
 /**
  * Image used in a card, needed to add the mat- CSS styling.
  * @docs-private
- * @deprecated Use `MatCardLgImage` from `@angular/material/card` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Directive({
   standalone: false,
@@ -148,8 +131,6 @@ export class MatLegacyCardLgImage {}
 /**
  * Large image used in a card, needed to add the mat- CSS styling.
  * @docs-private
- * @deprecated Use `MatCardXlImage` from `@angular/material/card` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Directive({
   standalone: false,
@@ -161,8 +142,6 @@ export class MatLegacyCardXlImage {}
 /**
  * Avatar image used in a card, needed to add the mat- CSS styling.
  * @docs-private
- * @deprecated Use `MatCardAvatar` from `@angular/material/card` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Directive({
   standalone: false,
@@ -182,8 +161,6 @@ export class MatLegacyCardAvatar {}
  * - mat-card-actions
  * - mat-card-footer
  *
- * @deprecated Use `MatCard` from `@angular/material/card` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Component({
   standalone: false,
@@ -207,8 +184,6 @@ export class MatLegacyCard {
  * Component intended to be used within the `<mat-card>` component. It adds styles for a
  * preset header section (i.e. a title, subtitle, and avatar layout).
  * @docs-private
- * @deprecated Use `MatCardHeader` from `@angular/material/card` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Component({
   standalone: false,
@@ -224,8 +199,6 @@ export class MatLegacyCardHeader {}
  * Component intended to be used within the `<mat-card>` component. It adds styles for a preset
  * layout that groups an image with a title section.
  * @docs-private
- * @deprecated Use `MatCardTitleGroup` from `@angular/material/card` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Component({
   standalone: false,

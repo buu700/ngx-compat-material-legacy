@@ -20,8 +20,6 @@ import {ChangeDetectionStrategy, Component, Inject, Optional, ViewEncapsulation}
  * the `dataAccessor` input. Change the text justification to the start or end using the `justify`
  * input.
  *
- * @deprecated Use `MatTextColumn` from `@angular/material/table` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Component({
   standalone: false,

@@ -23,10 +23,7 @@ export {MatLegacySuffix} from './suffix';
 export {MatLegacyLabel} from './label';
 
 export {
-  /**
-   * @deprecated Use `MatFormFieldControl` from `@angular/material/form-field` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
-   * @breaking-change 17.0.0
-   */
+
   MatFormFieldControl as MatLegacyFormFieldControl,
 } from '@angular/material/form-field';
 export {MAT_LEGACY_FORM_FIELD, MAT_LEGACY_SUFFIX, MAT_LEGACY_ERROR, MAT_LEGACY_PREFIX} from './owned-tokens';
@@ -36,19 +33,10 @@ export {MAT_LEGACY_FORM_FIELD, MAT_LEGACY_SUFFIX, MAT_LEGACY_ERROR, MAT_LEGACY_P
 export {MatCommonModule} from './internal/common-module';
 
 export {
-  /**
-   * @deprecated Use `getMatFormFieldDuplicatedHintError` from `@angular/material/form-field` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
-   * @breaking-change 17.0.0
-   */
+
   getMatFormFieldDuplicatedHintError as getMatLegacyFormFieldDuplicatedHintError,
-  /**
-   * @deprecated Use `getMatFormFieldMissingControlError` from `@angular/material/form-field` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
-   * @breaking-change 17.0.0
-   */
+
   getMatFormFieldMissingControlError as getMatLegacyFormFieldMissingControlError,
-  /**
-   * @deprecated Use `getMatFormFieldPlaceholderConflictError` from `@angular/material/form-field` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
-   * @breaking-change 17.0.0
-   */
+
   getMatFormFieldPlaceholderConflictError as getMatLegacyFormFieldPlaceholderConflictError,
 } from './owned-errors';

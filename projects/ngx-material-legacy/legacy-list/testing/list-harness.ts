@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -13,8 +14,6 @@ import {getListItemPredicate, MatLegacyListItemHarnessBase} from './list-item-ha
 
 /**
  * Harness for interacting with a standard mat-list in tests.
- * @deprecated Use `MatListHarness` from `@angular/material/list/testing` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export class MatLegacyListHarness extends MatLegacyListHarnessBase<
   typeof MatLegacyListItemHarness,
@@ -39,8 +38,6 @@ export class MatLegacyListHarness extends MatLegacyListHarnessBase<
 
 /**
  * Harness for interacting with a list item.
- * @deprecated Use `MatListItemHarness` from `@angular/material/list/testing` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export class MatLegacyListItemHarness extends MatLegacyListItemHarnessBase {
   /** The selector for the host element of a `MatListItem` instance. */

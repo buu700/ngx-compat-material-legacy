@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -12,8 +13,6 @@ import {_MatDialogHarnessBase} from './dialog-harness-base';
 
 /**
  * Selectors for different sections of the mat-dialog that can contain user content.
- * @deprecated Use `enum` from `@angular/material/dialog/testing` instead.
- * @breaking-change 17.0.0
  */
 export enum MatLegacyDialogSection {
   TITLE = '.mat-dialog-title',
@@ -23,8 +22,6 @@ export enum MatLegacyDialogSection {
 
 /**
  * Harness for interacting with a standard `MatDialog` in tests.
- * @deprecated Use `MatDialogHarness` from `@angular/material/dialog/testing` instead.
- * @breaking-change 17.0.0
  */
 export class MatLegacyDialogHarness extends _MatDialogHarnessBase {
   static hostSelector = '.mat-dialog-container';
