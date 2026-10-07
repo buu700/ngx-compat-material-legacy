@@ -12,6 +12,7 @@
  *   node scripts/browser-surface-families.mjs --tarball <path> --zoneless
  */
 import {createHash} from 'node:crypto';
+import {PEER_ICON_TT_CSP, peerIconTtOkay} from './peer-icon-tt-admission.mjs';
 import {spawnSync as __spawnSyncForWs} from 'node:child_process';
 if (typeof globalThis.WebSocket !== 'function') {
   // Local Node 20 shells need the experimental flag; CI/Chainman Node 22+ has WebSocket.
@@ -109,8 +110,9 @@ if (relative(realpathSync(consumer), installed).startsWith('..')) fail(1, `Libra
 
 mkdirSync(join(consumer, 'src'), {recursive: true});
 writeFileSync(join(consumer, 'src/main.ts'), `${zoneless ? '' : `import 'zone.js';
-`}import {Component, NgModule${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';
-import {BrowserModule} from '@angular/platform-browser';
+`}import {Component, NgModule, inject${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';
+import {BrowserModule, DomSanitizer} from '@angular/platform-browser';
+import {MatIconModule, MatIconRegistry} from '@angular/material/icon';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {MATERIAL_ANIMATIONS} from '@angular/material/core';
 import {MatLegacyButtonModule} from '@ngx-compat/material-legacy/legacy-button';
@@ -122,6 +124,7 @@ import {MatLegacyProgressSpinnerModule} from '@ngx-compat/material-legacy/legacy
   standalone: false,
   selector: 'lab-root',
   template: \`
+    <button mat-button id="peer-icon-button"><mat-icon svgIcon="closeout-native-tt"></mat-icon>Icon</button>
     <button id="button-default" mat-button type="button">Default</button>
     <button id="button-disabled" mat-button type="button" disabled>Disabled</button>
     <button id="button-focus" mat-raised-button type="button">Focus me</button>
@@ -135,11 +138,17 @@ import {MatLegacyProgressSpinnerModule} from '@ngx-compat/material-legacy/legacy
     <mat-progress-spinner id="progress-spinner-default" mode="determinate" [value]="55" diameter="48"></mat-progress-spinner>
   \`,
 })
-export class LabRoot {}
+export class LabRoot {
+  constructor() {
+    inject(MatIconRegistry).addSvgIconLiteral('closeout-native-tt',inject(DomSanitizer).bypassSecurityTrustHtml(
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8"><path d="M0 0h8v8H0z"/></svg>'));
+  }
+}
 
 @NgModule({
   imports: [
     BrowserModule,
+    MatIconModule,
     MatLegacyButtonModule,
     MatLegacyCardModule,
     MatLegacyProgressBarModule,
@@ -225,7 +234,10 @@ const server = createServer((req, res) => {
   const file = req.url === '/' ? 'index.html' : req.url.split('?')[0].replace(/^\//, '');
   try {
     const body = readFileSync(join(consumer, 'dist', file));
-    res.writeHead(200, {'content-type': file.endsWith('.js') ? 'text/javascript' : 'text/html'});
+    res.writeHead(200, {
+      'content-type': file.endsWith('.js') ? 'text/javascript' : 'text/html',
+      'content-security-policy': PEER_ICON_TT_CSP,
+    });
     res.end(body);
   } catch {
     res.writeHead(404);
@@ -311,17 +323,38 @@ const families = {
 let error = null;
 let diagnostic = null;
 let zoneGlobal = null;
+let peerIconTt = null;
 
 try {
   await send('Runtime.enable');
   await send('Page.enable');
   await send('Page.addScriptToEvaluateOnNewDocument', {
-    source: 'window.__errors=[];window.addEventListener("error",e=>window.__errors.push(String(e.message)));',
+    source: 'window.__errors=[];window.__ttViolations=[];window.addEventListener("error",e=>window.__errors.push(String(e.message)));window.addEventListener("securitypolicyviolation",e=>window.__ttViolations.push(e.violatedDirective));',
   });
   await send('Page.reload', {ignoreCache: true});
   await waitFor('!!document.getElementById("button-default") || !!document.getElementById("bootstrap-error")');
   diagnostic = await evaluate('({errors: window.__errors || [], text: document.body.innerText, html: document.body.innerHTML.slice(0, 800)})');
   if (await evaluate('!!document.getElementById("bootstrap-error")')) throw new Error('bootstrap failed');
+
+  const iconRendered = await waitFor(`document.querySelector('#peer-icon-button mat-icon svg path')?.getAttribute('d') === 'M0 0h8v8H0z'`);
+  await sleep(100);
+  const initialViolations = await evaluate('window.__ttViolations || []');
+  peerIconTt = await evaluate(`(() => {
+    const available = typeof trustedTypes !== 'undefined';
+    let rawLiteralRejected = false, disallowedPolicyRejected = false;
+    try { document.createElement('div').innerHTML = '<svg></svg>'; } catch { rawLiteralRejected = true; }
+    try { trustedTypes.createPolicy('closeout-disallowed', {createHTML: x => x}); } catch { disallowedPolicyRejected = true; }
+    return {available, raw_literal_rejected: rawLiteralRejected, disallowed_policy_rejected: disallowedPolicyRejected};
+  })()`);
+  await sleep(100);
+  const negativeViolations = await evaluate('window.__ttViolations || []');
+  Object.assign(peerIconTt, {
+    svg_rendered: iconRendered,
+    positive_without_violations: Array.isArray(initialViolations) && initialViolations.length === 0,
+    negative_directives_observed: Array.isArray(negativeViolations)
+      && negativeViolations.includes('require-trusted-types-for') && negativeViolations.includes('trusted-types'),
+    observed_negative_directives: negativeViolations,
+  });
 
   // Button default + disabled + focused state cells.
   families.button.present = await waitFor('!!document.querySelector("button#button-default.mat-button, button#button-default[mat-button]")');
@@ -380,6 +413,7 @@ const zoneOk = zoneless
 const ok =
   !error
   && zoneOk
+  && peerIconTtOkay(peerIconTt)
   && families.button.present && families.button.disabled_class && families.button.focused
   && families.card.present
   && families['progress-bar'].present && families['progress-bar'].value_reflected
@@ -396,6 +430,7 @@ const report = {
   bundle_has_zone: bundleHasZone,
   zone_global: zoneGlobal,
   families,
+  peer_icon_tt: peerIconTt,
   credited_cell_ids: ok ? cells : [],
   matrix_updated: false,
   error,
@@ -411,6 +446,7 @@ const report = {
     'Progress-bar credit is host presence + aria-valuenow for determinate mode; buffer/query/indeterminate motion not exercised.',
     'Progress-spinner credit is host presence + aria-valuenow for determinate mode; indeterminate SVG animation not exercised.',
     'Success is not copied to unexecuted cells.',
+    'Peer icon TT probe uses actual Chromium require-trusted-types-for enforcement and an allowed Angular policy list; this is not a full script/style/network CSP matrix or arbitrary SVG trust audit.',
     'Does not claim G10.',
   ],
 };
