@@ -122,6 +122,24 @@ for (const [name,type,description] of [
         result=subprocess.run(['node','--input-type=module','-e',script],cwd=ROOT,capture_output=True,text=True)
         self.assertEqual(result.returncode,0,result.stderr or result.stdout)
 
+    @unittest.skipUnless(typescript_resolves(), "typescript is not installed")
+    def test_packed_variable_alias_keeps_actual_declared_type(self):
+        script=r"""
+import assert from 'node:assert/strict';
+import {createRequire} from 'node:module';
+import {packedShape} from './scripts/api-surface.mjs';
+const ts=createRequire(process.cwd()+'/package.json')('typescript');
+function read(text,name) {return packedShape(ts.createSourceFile('fixture.d.ts',text,ts.ScriptTarget.Latest,true),name);}
+const text="import {InjectionToken} from '@angular/core'; declare const MAT_PROGRESS_BAR_LOCATION: InjectionToken<MatProgressBarLocation>; export {MAT_PROGRESS_BAR_LOCATION as MAT_LEGACY_PROGRESS_BAR_LOCATION};";
+assert.deepEqual(read(text,'MAT_LEGACY_PROGRESS_BAR_LOCATION').signatures,['const MAT_LEGACY_PROGRESS_BAR_LOCATION:InjectionToken<MatProgressBarLocation>']);
+const pair="declare const FIRST: string, SECOND: number; export {SECOND as PUBLIC_SECOND};";
+assert.deepEqual(read(pair,'PUBLIC_SECOND').signatures,['const PUBLIC_SECOND:number']);
+assert.notDeepEqual(read(pair.replace('SECOND: number','SECOND: boolean'),'PUBLIC_SECOND').signatures,read(pair,'PUBLIC_SECOND').signatures);
+assert.equal(read(pair,'MISSING'),null);
+"""
+        result=subprocess.run(['node','--input-type=module','-e',script],cwd=ROOT,capture_output=True,text=True)
+        self.assertEqual(result.returncode,0,result.stderr or result.stdout)
+
     def test_compare_contracts_reads_parameter_types(self):
         matched = self.compare_objects("match")
         self.assertEqual(matched["di_status"], "match")
