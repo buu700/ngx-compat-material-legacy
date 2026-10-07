@@ -76,6 +76,17 @@ for(const [name,parent,parameters,signature] of [
  const wrong=packedInheritedConstructor(candidate,name,()=>sf(`export declare class ${parent}<T> {constructor(...args: unknown[]);}`));
  assert.notDeepEqual(wrong.signatures,original.signatures);
 }
+{
+ const name='MatLegacyTable';
+ const original=originalInheritedConstructor('/original/src/material/legacy-table/table.ts',name);
+ assert.equal(original.parent,'CdkTable');assert.equal(original.signatures.length,1);
+ assert.ok(original.signatures[0].startsWith('public constructor(IterableDiffers,ChangeDetectorRef,ElementRef,string,Directionality,any,Platform,'));
+ assert.ok(original.signatures[0].includes('_ViewRepeater<T,RenderRow<T>,RowContext<T>>'));
+ assert.ok(original.signatures[0].endsWith('StickyPositioningListener,NgZone?)'));
+ const candidate=sf(`import {CdkTable} from '@angular/cdk/table'; export declare class ${name}<T> extends CdkTable<T> {}`);
+ assert.deepEqual(packedInheritedConstructor(candidate,name,()=>sf('export declare class CdkTable<T> {}')).signatures,['public constructor()']);
+ assert.notDeepEqual(packedInheritedConstructor(candidate,name,()=>sf('export declare class CdkTable<T> {constructor(...args: unknown[]);}')).signatures,original.signatures);
+}
 for(const [family,name,parent,spec,count,parameters] of [
  ['legacy-menu','MatLegacyMenuItem','MatMenuItem','@angular/material/menu',2,'elementRef: ElementRef<HTMLElement>, document: any, focusMonitor: FocusMonitor, parentMenu: MatMenuPanel<MatMenuItem> | undefined, changeDetectorRef: ChangeDetectorRef'],
  ['legacy-tabs','MatLegacyTabLabel','MatTabLabel','@angular/material/tabs',1,'templateRef: TemplateRef<any>, viewContainerRef: ViewContainerRef, closestTab: any'],
