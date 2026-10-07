@@ -479,6 +479,7 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
     'packed-consumer/harness/slide-toggle-tabindex-attribute': parsed.slideToggleAttribute === true,
     'packed-consumer/harness/slider-tabindex-attribute': parsed.sliderAttribute === true,
     'packed-consumer/harness/tab-link-tabindex-attribute': parsed.tabLinkAttribute === true,
+    'packed-consumer/harness/peer-icon-literal-sanitization': parsed.peerIconLiteralSanitization === true,
   };
   const owned = declarationKeys(keys)
     .filter(key => key.endsWith('/testing'))
@@ -925,6 +926,8 @@ import {MatLegacyProgressBar, MatLegacyProgressBarModule, MAT_LEGACY_PROGRESS_BA
 import {MAT_PROGRESS_BAR_DEFAULT_OPTIONS} from '@angular/material/progress-bar';
 import {MatLegacyChipsModule} from '@ngx-compat/material-legacy/legacy-chips';
 import {MatLegacyRadioModule} from '@ngx-compat/material-legacy/legacy-radio';
+import {MatIconModule, MatIconRegistry} from '@angular/material/icon';
+import {DomSanitizer} from '@angular/platform-browser';
 import {MatLegacyTabGroupHarness} from '@ngx-compat/material-legacy/legacy-tabs/testing';
 import {MatLegacyCommonModule, MATERIAL_LEGACY_SANITY_CHECKS, LegacyNativeDateAdapter, LegacyNativeDateModule, MatLegacyNativeDateModule, LegacyDateAdapter, MAT_LEGACY_DATE_LOCALE, MAT_LEGACY_DATE_FORMATS, MAT_LEGACY_NATIVE_DATE_FORMATS} from '@ngx-compat/material-legacy/legacy-core';
 
@@ -953,6 +956,7 @@ class SmokeDialogContent {}
     MatLegacyTabsModule,
     MatLegacyChipsModule,
     MatLegacyRadioModule,
+    MatIconModule,
     MatLegacyProgressBarModule,
     MatLegacyCheckboxModule,
     MatLegacySlideToggleModule,
@@ -964,6 +968,7 @@ class SmokeDialogContent {}
   ],
   template: \`
     <button mat-button id="h">Go</button>
+    <button mat-button id="trusted-icon-button"><mat-icon svgIcon="closeout-trusted"></mat-icon>Icon</button>
     <mat-chip id="attribute-chip" tabindex="6">Attribute chip</mat-chip>
     <mat-checkbox id="attribute-checkbox" tabindex="7">Attribute checkbox</mat-checkbox>
     <mat-slide-toggle id="attribute-toggle" tabindex="9">Attribute toggle</mat-slide-toggle>
@@ -1041,6 +1046,18 @@ async function main() {
     provided !== direct && provided.getYear(provided.createDate(2024, 1, 29)) === 2024 &&
     TestBed.inject(MAT_LEGACY_DATE_FORMATS) === MAT_LEGACY_NATIVE_DATE_FORMATS &&
     provided.format(provided.createDate(2024, 0, 2), {year:'numeric', month:'2-digit', day:'2-digit'}) === '02/01/2024';
+  // Fixed, independently authored safe SVG fixture. Exercise the peer's public
+  // registry/sanitizer path without importing or copying its private TT helper.
+  const iconRegistry=TestBed.inject(MatIconRegistry), sanitizer=TestBed.inject(DomSanitizer);
+  iconRegistry.addSvgIconLiteral('closeout-trusted',sanitizer.bypassSecurityTrustHtml(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8"><path id="closeout-path" d="M0 0h8v8H0z"/></svg>'));
+  let rawIconRejected=false;
+  try { iconRegistry.addSvgIconLiteral('closeout-untrusted','<script>void 0</script>' as never); }
+  catch { rawIconRejected=true; }
+  const iconSvg=()=>new Promise<SVGElement>((resolve,reject)=>
+    iconRegistry.getNamedSvgIcon('closeout-trusted').subscribe({next:resolve,error:reject}));
+  const firstIcon=await iconSvg();firstIcon.querySelector('path')!.setAttribute('d','M1 1');
+  const secondIcon=await iconSvg();
   const fixture = TestBed.createComponent(HarnessHost);
   fixture.detectChanges();
   const loader = TestbedHarnessEnvironment.loader(fixture);
@@ -1147,6 +1164,9 @@ async function main() {
     &&liveExplicit.getAttribute('aria-live')==='assertive'
     &&[liveDefault,liveExplicit,liveEmpty].every(el=>el.getAttribute('aria-atomic')==='true')
     &&manualError.getAttribute('aria-live')==='polite'&&explicitManualError.getAttribute('aria-live')==='assertive';
+  const peerIconLiteralSanitization=rawIconRejected&&firstIcon!==secondIcon
+    &&secondIcon.querySelector('path')?.getAttribute('d')==='M0 0h8v8H0z'
+    &&fixture.nativeElement.querySelector('#trusted-icon-button mat-icon svg path')?.getAttribute('d')==='M0 0h8v8H0z';
   const byId=(id:string)=>fixture.debugElement.query(element=>element.nativeElement?.id===id);
   const checkboxAttribute=byId('attribute-checkbox').injector.get(MatLegacyCheckbox).tabIndex===7
     &&(fixture.nativeElement.querySelector('#attribute-checkbox input') as HTMLInputElement).tabIndex===7;
@@ -1269,7 +1289,7 @@ async function main() {
       selectOpened === true &&
       selectClosed === true &&
       tabCount === 2 &&
-      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute,
+      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization,
     buttonText: text,
     selectIsOpen: isOpen,
     dialogText,
@@ -1292,6 +1312,7 @@ async function main() {
     formFieldTokenIsolation,
     progressLocationAndDefaults,
     commonModuleBehavior,
+    peerIconLiteralSanitization,
     checkboxAttribute, slideToggleAttribute, sliderAttribute, tabLinkAttribute,
     commonModuleDiagnostics:{contrastLifecycle,contrastProbeReads,sanityWarnings,checksEnabled,sanityDefault:TestBed.inject(MATERIAL_LEGACY_SANITY_CHECKS),sanityToken:String(MATERIAL_LEGACY_SANITY_CHECKS)},
     chipEventCounts:{removals:fixture.componentInstance.repeatRemovals,separators:fixture.componentInstance.repeatEnds},
