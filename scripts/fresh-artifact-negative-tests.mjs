@@ -207,9 +207,16 @@ const failedPack = spawnSync(process.execPath, ['scripts/pack-draft-run.mjs', '-
   encoding: 'utf8',
   env: {...process.env, RC_PACK_DRAFT_FAIL: '1'},
 });
-expect('broken pack exits 1', failedPack.status === 1, failedPack.stderr);
-expect('broken pack removes the old tarball', !existsSync(join(oldDir, 'previous.tgz')));
-expect('broken pack does not write a new manifest', !existsSync(join(oldDir, 'run.json')));
+expect('old pack directory is refused before packing', failedPack.status === 2, failedPack.stderr);
+expect('refused reuse preserves the old tarball', readFileSync(join(oldDir, 'previous.tgz'), 'utf8') === 'old-tarball');
+expect('refused reuse preserves the old manifest', readFileSync(join(oldDir, 'run.json'), 'utf8') === '{"stage":"draft"}\n');
+const freshFailureDir = join(scratch, 'fresh-failed-pack');
+const freshFailedPack = spawnSync(process.execPath, ['scripts/pack-draft-run.mjs', '--line', 'main', '--out', freshFailureDir], {
+  cwd: root, encoding: 'utf8', env: {...process.env, RC_PACK_DRAFT_FAIL: '1'},
+});
+expect('fresh injected pack failure exits 1', freshFailedPack.status === 1, freshFailedPack.stderr);
+expect('fresh failed pack has no tarball', !existsSync(join(freshFailureDir, 'previous.tgz')));
+expect('fresh failed pack has no manifest', !existsSync(join(freshFailureDir, 'run.json')));
 
 const motion = run(['scripts/motion-lifecycle-smoke.mjs', '--self-check']);
 expect('motion self-check passes', motion.status === 0, motion.stderr);
