@@ -4,6 +4,7 @@ import json
 import re
 from sass_sort_companion_admission import SORT_CASES, sort_companion_results_match
 from sass_tree_companion_admission import TREE_CASES, tree_companion_results_match
+from sass_companion_addition_admission import COMPANION_ADDITION_CASES, companion_addition_results_match
 
 def mixin_argument_measurements_ok(root,body,*,owned=False):
     try:
@@ -60,6 +61,8 @@ def mixin_argument_assertion_ok(root,active,body,invocation):
             if not sort_companion_results_match(body):return False
         elif body['case_id'] in TREE_CASES:
             if not tree_companion_results_match(body):return False
+        elif body['case_id'] in COMPANION_ADDITION_CASES:
+            if not companion_addition_results_match(body):return False
         elif original!=actual or 'current_companion' in body or body.get('comparison','historical-exact')!='historical-exact':return False
         wrong=actual+'\n.wrong-nonempty-mixin { color: red; }\n'
         return wrong!=original and body['mutation']==dict(css=wrong,css_sha256=hashlib.sha256(wrong.encode()).hexdigest(),css_bytes=len(wrong.encode()))

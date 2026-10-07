@@ -6,6 +6,7 @@ import {fileURLToPath,pathToFileURL} from 'node:url';
 import {SILENCE,THEME_PARAMS} from './sass-api-inventory.mjs';
 import {measureSortPeer,sortCompanionResultsMatch,SORT_COMPANION_CASES} from './sass-sort-companion-contract.mjs';
 import {measureTreePeer,treeCompanionResultsMatch,TREE_COMPANION_CASES} from './sass-tree-companion-contract.mjs';
+import {measureCompanionAdditionPeer,companionAdditionResultsMatch,COMPANION_ADDITION_CASES} from './sass-companion-addition-contract.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 export const MIXIN_ARGUMENT_CATALOG='fixtures/sass/mixin-argument-contracts.json';
@@ -77,6 +78,9 @@ export function runMixinArgumentContracts({sass,entry,loadPaths,allowedRoots,imp
       } else if (Object.hasOwn(TREE_COMPANION_CASES,probe.case_id)) {
         const peer=measureTreePeer({sass,materialRoot:allowedRoots[1],cdkRoot:allowedRoots[2],caseId:probe.case_id,line});
         current_companion={classification:'conforming-current-companion',contract:'current-tree-dimensions-with-original-fallbacks',peer};
+      } else if (Object.hasOwn(COMPANION_ADDITION_CASES,probe.case_id)) {
+        const peer=measureCompanionAdditionPeer({sass,materialRoot:allowedRoots[1],cdkRoot:allowedRoots[2],caseId:probe.case_id,line});
+        current_companion={classification:'conforming-current-companion',contract:'original-css-with-current-companion-addition',peer};
       }
     }catch(caught){error=String(caught.message || caught);}
     const wrongCss=(actual?.css || '')+'\n.wrong-nonempty-mixin { color: red; }\n';
@@ -85,6 +89,8 @@ export function runMixinArgumentContracts({sass,entry,loadPaths,allowedRoots,imp
       ? sortCompanionResultsMatch(probe.case_id,expected,value,current_companion?.peer)
       : Object.hasOwn(TREE_COMPANION_CASES,probe.case_id)
       ? treeCompanionResultsMatch(probe.case_id,expected,value,current_companion?.peer)
+      : Object.hasOwn(COMPANION_ADDITION_CASES,probe.case_id)
+      ? companionAdditionResultsMatch(probe.case_id,expected,value,current_companion?.peer)
       : mixinArgumentResultsMatch(expected,value);
     const mutation_rejected=Boolean(expected && actual && !conforms(mutation));
     const exact=mixinArgumentResultsMatch(expected,actual);
