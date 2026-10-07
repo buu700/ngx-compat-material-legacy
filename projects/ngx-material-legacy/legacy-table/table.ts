@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -15,7 +16,11 @@ import {
   NoDataRowOutlet,
   FooterRowOutlet,
 } from '@angular/cdk/table';
+import {coerceBooleanProperty} from '@angular/cdk/coercion';
+
 import {ChangeDetectionStrategy, Component, Directive, ViewEncapsulation} from '@angular/core';
+
+type BooleanInput = string | boolean | null | undefined;
 
 /**
  * Enables the recycle view repeater strategy, which reduces rendering latency. Not compatible with
@@ -86,6 +91,17 @@ export class MatLegacyRecycleRows {
   changeDetection: ChangeDetectionStrategy.Default,
 })
 export class MatLegacyTable<T> extends CdkTable<T> {
+  /** Preserve original coercion for direct writes as well as template inputs. */
+  override get fixedLayout(): boolean { return super.fixedLayout; }
+  override set fixedLayout(value: BooleanInput) {
+    super.fixedLayout = coerceBooleanProperty(value);
+  }
+
+  override get multiTemplateDataRows(): boolean { return super.multiTemplateDataRows; }
+  override set multiTemplateDataRows(value: BooleanInput) {
+    super.multiTemplateDataRows = coerceBooleanProperty(value);
+  }
+
   /** Overrides the sticky CSS class set by the `CdkTable`. */
   protected override stickyCssClass = 'mat-table-sticky';
 
