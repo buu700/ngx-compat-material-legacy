@@ -264,10 +264,6 @@ $_variants: (accent: secondary, warn: error);
       disabled-state-background-color: map.get($system, surface),
       disabled-state-text-color: m2-system.color-with-opacity($on-surface, 38%),
       divider-color: map.get($system, outline),
-      selected-state-background-color: m2-system.color-with-opacity($on-surface, 12%),
-      selected-state-text-color: $on-surface,
-      state-layer-color: $on-surface,
-      text-color: $on-surface,
       legacy-disabled-selected-state-background-color: m2-system.color-with-opacity($on-surface, 12%),
       legacy-disabled-state-background-color: map.get($system, surface),
       legacy-disabled-state-text-color: m2-system.color-with-opacity($on-surface, 38%),
@@ -275,6 +271,10 @@ $_variants: (accent: secondary, warn: error);
       legacy-selected-state-text-color: $on-surface,
       legacy-state-layer-color: m2-system.color-with-opacity($on-surface, 12%),
       legacy-text-color: $on-surface,
+      selected-state-background-color: m2-system.color-with-opacity($on-surface, 12%),
+      selected-state-text-color: $on-surface,
+      state-layer-color: $on-surface,
+      text-color: $on-surface,
     ),
     typography: (
       label-text-font: map.get($system, body-large-font),
@@ -379,11 +379,11 @@ $_variants: (accent: secondary, warn: error);
   @return (
     base: (
       container-shape: 4px,
+      container-elevation-shadow: m2-system.box-shadow(2),
       legacy-header-indicator-display: inline-block,
       header-indicator-display: none,
     ),
     color: (
-      container-elevation-shadow: m2-system.box-shadow(2),
       container-background-color: map.get($system, surface),
       container-text-color: $on-surface,
       actions-divider-color: map.get($system, outline),
@@ -447,10 +447,10 @@ $_variants: (accent: secondary, warn: error);
   @return (
     base: (
       container-shape: 0,
+      container-elevation-shadow: m2-system.box-shadow(16),
       container-width: auto,
     ),
     color: (
-      container-elevation-shadow: m2-system.box-shadow(16),
       container-divider-color: map.get($system, outline),
       container-background-color: map.get($system, surface),
       container-text-color: map.get($system, on-surface),
@@ -654,8 +654,24 @@ $_variants: (accent: secondary, warn: error);
 }
 
 @mixin stepper($theme) {
-  @include mat.stepper-overrides(_collect(
-    stepper, $theme, $stepper-allowed, meta.get-function('_stepper-tokens')));
+  // Keep public peer emission order, including variant rules between color
+  // and typography/density. Historical rules emitted by the caller stay intact.
+  $groups: _stepper-tokens(m2-system.get-system($theme));
+  $root: _qualify(stepper, map.get($groups, base), $stepper-allowed);
+  $tail: ();
+  @if theming.get-typography-config($theme) != null {
+    $tail: map.merge($tail, _qualify(stepper, map.get($groups, typography), $stepper-allowed));
+  }
+  @if theming.get-density-config($theme) != null {
+    $tail: map.merge($tail, _qualify(stepper, map.get($groups, density), $stepper-allowed));
+  }
+  @if theming.get-color-config($theme) != null {
+    $root: map.merge($root, _qualify(stepper, map.get($groups, color), $stepper-allowed));
+  } @else {
+    $root: map.merge($root, $tail);
+    $tail: ();
+  }
+  @include mat.stepper-overrides($root);
   @if theming.get-color-config($theme) != null {
     @each $name, $variant in $_variants {
       .mat-step-header.mat-#{$name} {
@@ -665,6 +681,7 @@ $_variants: (accent: secondary, warn: error);
       }
     }
   }
+  @include mat.stepper-overrides($tail);
 }
 
 @mixin sort($theme) {

@@ -4,6 +4,7 @@ import hashlib
 import json
 import functools
 import subprocess
+from pathlib import Path
 from sass_function_fixture import function_receipt
 
 @functools.lru_cache(maxsize=None)
@@ -56,4 +57,17 @@ def mixin_receipt(root,active,case,invocation):
             dict(root=0,path='tree/_tree-theme.scss',sha256='645c90053453a65e4519c2396a1710f881866a3a589a241108490d86577ec2a2',bytes=1977)]))
         body['comparison']='current-companion-contract'
         wrong=actual+'\n.wrong-nonempty-mixin { color: red; }\n';body['mutation']=dict(css=wrong,css_sha256=hashlib.sha256(wrong.encode()).hexdigest(),css_bytes=len(wrong.encode()))
+    else:
+        from sass_companion_addition_admission import COMPANION_ADDITION_CASES, _CATALOG
+        if case in COMPANION_ADDITION_CASES:
+            entry=COMPANION_ADDITION_CASES[case];line=body['line'];floor=entry['peers'][line]
+            fixture=json.loads((Path(__file__).parent/'sass_companion_addition_fixture.json').read_bytes())
+            original=fixture['originals'][entry['original_sha256']]
+            recorded=fixture['peers'][floor['program_sha256']+'-'+line]
+            peer_css=recorded['css'];actual=(original+'\n\n' if original else '')+peer_css
+            for role,value in [('expected',original),('actual',actual)]:body[role].update(css=value,css_sha256=hashlib.sha256(value.encode()).hexdigest(),css_bytes=len(value.encode()))
+            version,manifest=('22.1.7','5d33c35b56f9834d36a3be0ce4dc37892e689bceb1727de0cf223f10ab8f28af') if line=='main' else ('21.2.14','26af34e77987b55564689c8eb7b5352db661d6a737fdec2160417ae42114f355')
+            body['current_companion']=dict(classification='conforming-current-companion',contract='original-css-with-current-companion-addition',peer=dict(line=line,peer_version=version,peer_package_json_sha256=manifest,program=recorded['program'],program_sha256=floor['program_sha256'],css=peer_css,css_sha256=floor['css_sha256'],css_bytes=len(peer_css.encode()),sources=[dict(root=0,path=p,sha256=digest,bytes=size) for p,(digest,size) in _CATALOG['sources'][line][entry['family']].items()]))
+            body['comparison']='current-companion-contract'
+            wrong=actual+'\n.wrong-nonempty-mixin { color: red; }\n';body['mutation']=dict(css=wrong,css_sha256=hashlib.sha256(wrong.encode()).hexdigest(),css_bytes=len(wrong.encode()))
     return body

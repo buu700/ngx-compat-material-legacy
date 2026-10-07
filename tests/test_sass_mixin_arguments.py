@@ -31,7 +31,8 @@ try {
  assert.equal(result.ok,false);assert.equal(calls,996);assert.equal(result.results.every(p=>p.mutation_rejected),true);
  const sortCases=Object.keys((await import('./scripts/sass-sort-companion-contract.mjs')).SORT_COMPANION_CASES);
  const treeCases=Object.keys((await import('./scripts/sass-tree-companion-contract.mjs')).TREE_COMPANION_CASES);
- assert.deepEqual(result.results.filter(p=>p.result!=='pass').map(p=>p.case_id).sort(),[...sortCases,...treeCases].sort());
+ const additionCases=Object.keys((await import('./scripts/sass-companion-addition-contract.mjs')).COMPANION_ADDITION_CASES);
+ assert.deepEqual(result.results.filter(p=>p.result!=='pass').map(p=>p.case_id).sort(),[...sortCases,...treeCases,...additionCases].sort());
  const observed=result.results[0];assert.equal(mixinArgumentResultsMatch(observed.expected,observed.actual),true);
  assert.equal(mixinArgumentResultsMatch(observed.expected,{...observed.actual,css:'wrong'}),false);
  assert.equal(mixinArgumentResultsMatch(observed.expected,observed.mutation),false);
