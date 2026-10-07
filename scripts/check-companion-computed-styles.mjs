@@ -42,6 +42,7 @@ import {tmpdir} from 'node:os';
 import {dirname, join, relative, resolve, sep} from 'node:path';
 import {fileURLToPath, pathToFileURL} from 'node:url';
 import {parseLegacyArgs, resolveLibraryFromRun, sha256File} from './resolve-run-library.mjs';
+import {assessBadgeHighContrast,observeBadgeHighContrast} from './badge-high-contrast-contract.mjs';
 import {
   BINDINGS, CHECK_ID, COMPANIONS, DEFAULT_SCENARIOS, DIMENSIONS, GROUP_DIMENSIONS, GROUP_ORACLE,
   NEGATIVE_SCENARIO, PEER_PACKAGE, SCENARIOS,
@@ -875,7 +876,8 @@ async function observe({send, evaluate}, bindings, sentinels) {
   await setViewport('wide');
   applied.negative_tokens = injected.length;
   await evaluate(`(() => { const el = document.getElementById('ccs-sentinel'); el.media = 'not all'; el.textContent = ''; })()`);
-  return {observations, applied, environment};
+  const badgeHighContrast=await observeBadgeHighContrast({send,evaluate},SCENARIOS.light);
+  return {observations, applied, environment,badgeHighContrast};
 }
 
 function frozenPeerVersion(runPath) {
@@ -917,12 +919,13 @@ async function renderLine({tarball, line, runId, expectPeerVersion, matrixGroups
   writeFileSync(join(dist, 'index.html'), INDEX_HTML);
   const rendered = await withChromium(dist, async (cdp) => ({browser: cdp.browser, ...(await observe(cdp, roster.rostered, sentinels))}));
   const assessed = assessAll({roster, observations: rendered.observations, sentinels, dimensionTokens, identity, isolation});
-  const failed = [...assessed.dimensionCases, ...assessed.oracleCases].filter((r) => r.result !== 'pass');
+  const badgeHighContrast=assessBadgeHighContrast(rendered.badgeHighContrast);
+  const failed = [...assessed.dimensionCases, ...assessed.oracleCases,...badgeHighContrast].filter((r) => r.result !== 'pass');
   return {
     line, runId, errors, identity, versions, roster, assessed, failed, isolation,
     browser: rendered.browser, environment: rendered.environment, applied: rendered.applied,
     tarballSha256: sha256File(tarball), oracleCssSha256: oracle.sha256, candidateCssSha256: candidate.sha256,
-    dimensionTokens, sentinels,
+    dimensionTokens, sentinels,badgeHighContrast,
   };
 }
 
@@ -1007,6 +1010,7 @@ async function main() {
       failures: item.failed.slice(0, 400).map((r) => ({case_id: r.case_id, reasons: r.reasons})),
       cases: item.assessed.dimensionCases,
       oracle_cases: item.assessed.oracleCases,
+      badge_high_contrast: item.badgeHighContrast,
       errors: item.errors,
     });
   }
