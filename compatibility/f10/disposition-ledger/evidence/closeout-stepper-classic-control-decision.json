@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "reviewer": "Codex primary implementer",
+  "recorded_at_utc": "2026-10-07T04:09:38.641544+00:00",
+  "reviews": [
+    {
+      "sha": "0e34c64d0cc96cd3cc8f19dea06f58a0ad4d8b59",
+      "subject": "fix(cdk/stepper): allow signal form to be assigned as stepControl (#33562)",
+      "files": [
+        "goldens/cdk/stepper/index.api.md",
+        "src/cdk/stepper/stepper.ts",
+        "src/components-examples/material/stepper/index.ts",
+        "src/components-examples/material/stepper/stepper-signal-forms/stepper-signal-forms-example.css",
+        "src/components-examples/material/stepper/stepper-signal-forms/stepper-signal-forms-example.html",
+        "src/components-examples/material/stepper/stepper-signal-forms/stepper-signal-forms-example.ts",
+        "src/material/stepper/stepper.md"
+      ],
+      "seed_filtered_files": [
+        "src/material/stepper/stepper.md"
+      ],
+      "diff": "diff --git a/goldens/cdk/stepper/index.api.md b/goldens/cdk/stepper/index.api.md\nindex d45cc6768..2136b8b11 100644\n--- a/goldens/cdk/stepper/index.api.md\n+++ b/goldens/cdk/stepper/index.api.md\n@@ -9,6 +9,7 @@ import { AfterContentInit } from '@angular/core';\n import { AfterViewInit } from '@angular/core';\n import { ElementRef } from '@angular/core';\n import { EventEmitter } from '@angular/core';\n+import { Field } from '@angular/forms/signals';\n import { FormGroupDirective } from '@angular/forms';\n import * as i0 from '@angular/core';\n import { InjectionToken } from '@angular/core';\n@@ -63,7 +64,7 @@ export class CdkStep implements OnChanges {\n     _showError(): boolean;\n     get state(): StepState;\n     set state(value: StepState);\n-    stepControl: AbstractControl;\n+    stepControl: StepControl;\n     stepLabel: CdkStepLabel;\n     // (undocumented)\n     _stepper: CdkStepper;\n@@ -181,6 +182,9 @@ export const STEP_STATE: {\n // @public\n export type StepContentPositionState = 'previous' | 'current' | 'next';\n \n+// @public\n+export type StepControl = AbstractControl | Field<unknown>;\n+\n // @public\n export const STEPPER_GLOBAL_OPTIONS: InjectionToken<StepperOptions>;\n \ndiff --git a/src/cdk/stepper/stepper.ts b/src/cdk/stepper/stepper.ts\nindex da55ca2f6..da7b6563d 100644\n--- a/src/cdk/stepper/stepper.ts\n+++ b/src/cdk/stepper/stepper.ts\n@@ -40,6 +40,7 @@ import {\n   type NgForm,\n   type FormGroupDirective,\n } from '@angular/forms';\n+import type {Field} from '@angular/forms/signals';\n import {_getFocusedElementPierceShadowDom} from '../platform';\n import {Observable, of as observableOf, Subject} from 'rxjs';\n import {startWith, takeUntil} from 'rxjs/operators';\n@@ -56,6 +57,9 @@ export type StepContentPositionState = 'previous' | 'current' | 'next';\n /** Possible orientation of a stepper. */\n export type StepperOrientation = 'horizontal' | 'vertical';\n \n+/** Possible controls that can be assigned to a step. */\n+export type StepControl = AbstractControl | Field<unknown>;\n+\n /** Change event emitted on selection changes. */\n export class StepperSelectionEvent {\n   /** Index of the step now selected. */\n@@ -132,7 +136,7 @@ export class CdkStep implements OnChanges {\n   @ViewChild(TemplateRef, {static: true}) content!: TemplateRef<any>;\n \n   /** The top level abstract control of the step. */\n-  @Input() stepControl!: AbstractControl;\n+  @Input() stepControl!: StepControl;\n \n   /** Whether user has attempted to move away from the step. */\n   get interacted(): boolean {\n@@ -195,7 +199,7 @@ export class CdkStep implements OnChanges {\n       return override;\n     }\n \n-    return interacted && (!this.stepControl || this.stepControl.valid);\n+    return interacted && (!this.stepControl || isValid(this.stepControl));\n   }\n   set completed(value: boolean) {\n     this._completedOverride.set(value);\n@@ -253,7 +257,7 @@ export class CdkStep implements OnChanges {\n   private _customError = signal<boolean | null>(null);\n \n   private _getDefaultError() {\n-    return this.interacted && !!this.stepControl?.invalid;\n+    return this.interacted && !!this.stepControl && isInvalid(this.stepControl);\n   }\n \n   constructor() {\n@@ -284,7 +288,7 @@ export class CdkStep implements OnChanges {\n       // want the form to be back to its initial state (see #29781). Submitted state is on the\n       // individual directives, rather than the control, so we need to reset them ourselves.\n       this._childForms?.forEach(form => form.resetForm?.());\n-      this.stepControl.reset();\n+      reset(this.stepControl);\n     }\n   }\n \n@@ -593,7 +597,7 @@ export class CdkStepper implements AfterContentInit, AfterViewInit, OnDestroy {\n         .some(step => {\n           const control = step.stepControl;\n           const isIncomplete = control\n-            ? control.invalid || control.pending || !step.interacted\n+            ? isInvalid(control) || isPending(control) || !step.interacted\n             : !step.completed;\n           return isIncomplete && !step.optional && !step._completedOverride();\n         });\n@@ -618,3 +622,29 @@ export class CdkStepper implements AfterContentInit, AfterViewInit, OnDestroy {\n     return index > -1 && (!this.steps || index < this.steps.length);\n   }\n }\n+\n+function isField(value: StepControl): value is Field<unknown> {\n+  return typeof value === 'function';\n+}\n+\n+function isValid(control: StepControl): boolean {\n+  return isField(control) ? control().valid() : control.valid;\n+}\n+\n+function isInvalid(control: StepControl): boolean {\n+  // Note: it's a bit redundant to have both `isValid` and `isInvalid`. We need both, because\n+  // some internal apps mock out `invalid` specifically so `!valid` won't hit the mock.\n+  return isField(control) ? control().invalid() : control.invalid;\n+}\n+\n+function isPending(control: StepControl): boolean {\n+  return isField(control) ? control().pending() : control.pending;\n+}\n+\n+function reset(control: StepControl): void {\n+  if (isField(control)) {\n+    control().reset();\n+  } else {\n+    control.reset();\n+  }\n+}\ndiff --git a/src/components-examples/material/stepper/index.ts b/src/components-examples/material/stepper/index.ts\nindex a53ab5c7d..db761af89 100644\n--- a/src/components-examples/material/stepper/index.ts\n+++ b/src/components-examples/material/stepper/index.ts\n@@ -11,3 +11,4 @@ export {StepperLazyContentExample} from './stepper-lazy-content/stepper-lazy-con\n export {StepperResponsiveExample} from './stepper-responsive/stepper-responsive-example';\n export {StepperHeaderPositionExample} from './stepper-header-position/stepper-header-position-example';\n export {StepperAnimationsExample} from './stepper-animations/stepper-animations-example';\n+export {StepperSignalFormsExample} from './stepper-signal-forms/stepper-signal-forms-example';\ndiff --git a/src/components-examples/material/stepper/stepper-signal-forms/stepper-signal-forms-example.css b/src/components-examples/material/stepper/stepper-signal-forms/stepper-signal-forms-example.css\nnew file mode 100644\nindex 000000000..054169cec\n--- /dev/null\n+++ b/src/components-examples/material/stepper/stepper-signal-forms/stepper-signal-forms-example.css\n@@ -0,0 +1,7 @@\n+.mat-stepper-horizontal {\n+  margin-top: 8px;\n+}\n+\n+.mat-mdc-form-field {\n+  margin-top: 16px;\n+}\ndiff --git a/src/components-examples/material/stepper/stepper-signal-forms/stepper-signal-forms-example.html b/src/components-examples/material/stepper/stepper-signal-forms/stepper-signal-forms-example.html\nnew file mode 100644\nindex 000000000..0376d7160\n--- /dev/null\n+++ b/src/components-examples/material/stepper/stepper-signal-forms/stepper-signal-forms-example.html\n@@ -0,0 +1,38 @@\n+<button matButton=\"elevated\" (click)=\"isLinear.set(!isLinear())\">\n+  {{!isLinear ? 'Enable linear mode' : 'Disable linear mode'}}\n+</button>\n+\n+<mat-stepper [linear]=\"isLinear()\" #stepper>\n+  <mat-step [stepControl]=\"nameFormGroup\">\n+    <form (submit)=\"$event.preventDefault()\">\n+      <ng-template matStepLabel>Fill out your name</ng-template>\n+      <mat-form-field>\n+        <mat-label>Name</mat-label>\n+        <input matInput placeholder=\"Last name, First name\" [formField]=\"nameFormGroup.name\">\n+      </mat-form-field>\n+      <div>\n+        <button matButton matStepperNext>Next</button>\n+      </div>\n+    </form>\n+  </mat-step>\n+  <mat-step [stepControl]=\"adddressFormGroup\" label=\"Fill out your address\">\n+    <form (submit)=\"$event.preventDefault()\">\n+      <mat-form-field>\n+        <mat-label>Address</mat-label>\n+        <input matInput [formField]=\"adddressFormGroup.address\" placeholder=\"Ex. 1 Main St, New York, NY\">\n+      </mat-form-field>\n+      <div>\n+        <button matButton matStepperPrevious>Back</button>\n+        <button matButton matStepperNext>Next</button>\n+      </div>\n+    </form>\n+  </mat-step>\n+  <mat-step>\n+    <ng-template matStepLabel>Done</ng-template>\n+    <p>You are now done.</p>\n+    <div>\n+      <button matButton matStepperPrevious>Back</button>\n+      <button matButton (click)=\"stepper.reset()\">Reset</button>\n+    </div>\n+  </mat-step>\n+</mat-stepper>\ndiff --git a/src/components-examples/material/stepper/stepper-signal-forms/stepper-signal-forms-example.ts b/src/components-examples/material/stepper/stepper-signal-forms/stepper-signal-forms-example.ts\nnew file mode 100644\nindex 000000000..4c35812b9\n--- /dev/null\n+++ b/src/components-examples/material/stepper/stepper-signal-forms/stepper-signal-forms-example.ts\n@@ -0,0 +1,27 @@\n+import {Component, signal} from '@angular/core';\n+import {form, required, FormField} from '@angular/forms/signals';\n+import {MatButtonModule} from '@angular/material/button';\n+import {MatFormFieldModule} from '@angular/material/form-field';\n+import {MatInputModule} from '@angular/material/input';\n+import {MatStepperModule} from '@angular/material/stepper';\n+\n+/**\n+ * @title Stepper using signal forms\n+ */\n+@Component({\n+  selector: 'stepper-signal-forms-example',\n+  templateUrl: 'stepper-signal-forms-example.html',\n+  styleUrl: 'stepper-signal-forms-example.css',\n+  imports: [FormField, MatButtonModule, MatFormFieldModule, MatInputModule, MatStepperModule],\n+})\n+export class StepperSignalFormsExample {\n+  readonly nameFormGroup = form(signal({name: ''}), tree => {\n+    required(tree.name);\n+  });\n+\n+  readonly adddressFormGroup = form(signal({address: ''}), tree => {\n+    required(tree.address);\n+  });\n+\n+  readonly isLinear = signal(false);\n+}\ndiff --git a/src/material/stepper/stepper.md b/src/material/stepper/stepper.md\nindex e264ae642..f012d4520 100644\n--- a/src/material/stepper/stepper.md\n+++ b/src/material/stepper/stepper.md\n@@ -101,6 +101,12 @@ are completed.\n   </mat-step>\n </mat-stepper>\n ```\n+\n+#### Using Signal Forms\n+The stepper also supports passing in a Signal Forms field as the `stepControl`:\n+\n+<!-- example(stepper-signal-forms) -->\n+\n ### Types of steps\n \n #### Optional step\n",
+      "diff_sha256": "948bd43bb6c3648a33ab065403a44bc2825f9c5af86630837e25792db2f834fe",
+      "actual_changed_path_count": 7,
+      "review_depth": "individual-escalated",
+      "decision": "The complete original seven-path production/API/demo patch is reviewed individually. Its callable Field branch adds modern signal-form support; this does not authorize copying a CDK stepper or a modern legacy API mirror, and that branch is absent at21.2.14 minimum. The noncallable AbstractControl valid/invalid/pending/reset logic retains the original16 contract: invalid/pending controls block linear navigation, valid controls complete/advance, and reset clears interaction/error/completion and form state while selecting zero. Those expectations were read from untouched CDK16.2.14, not generated from the candidate. A real public MatStepper with FormControl in the packed legacy consumer executes all four transitions and selection events[1,0] on both exact minimum CDK/Material peers; both78-case packed-consumer checks pass. Do not adopt the modern Field API or fork the ordinary stepper into the add-on. This is a bounded disposition of this patch and its classic-control path, not full stepper accessibility/motion/signal-form support, all consumer floors or G11 qualification.",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "final_disposition": "do-not-adopt",
+      "runtime_change_in_patch": true,
+      "owned_runtime_change_in_patch": false,
+      "minimum_peer_declarations": {
+        "main": {
+          "version": "22.1.7",
+          "archive_sha256": "225d82389797aefbbb2684461576ef950465546a9d28326483e0b816c8a5a558",
+          "member": "package/types/stepper.d.ts",
+          "member_sha256": "2d83414e0bc619a882f7bc4d4802355f674cdcb1bd0133a98082fe3765540ec9",
+          "stepControl": "AbstractControl | Field<unknown>"
+        },
+        "21.x": {
+          "version": "21.2.14",
+          "archive_sha256": "b54868a0f7aefa471203a0fe419370e156cdf0218db9b625aca3ae6e8de25c63",
+          "member": "package/types/stepper.d.ts",
+          "member_sha256": "ad98e54615496c078ea51431f3574b89a29b2fda04ff2480d920813aac7c519e",
+          "stepControl": "AbstractControl"
+        }
+      },
+      "behavior_qualification": "Bounded classic AbstractControl transitions pass on both minimum component peers; standalone packed consumer78 passes both lines. Broader gates incomplete.",
+      "case_id": "packed-consumer/harness/peer-stepper-abstract-control"
+    }
+  ],
+  "original_reference": {
+    "package": "@angular/cdk",
+    "version": "16.2.14",
+    "archive_sha256": "a499ba0fee46784441b92587e43b17ec72d9bd383f78ea14954eaa62c781bad7",
+    "member": "package/fesm2022/stepper.mjs",
+    "member_sha256": "7b02b88e12aa0c583b0916b5b4abdd82ab91196cc1ce3647dd3724dfced86fcf",
+    "reviewed_methods": [
+      "CdkStep.completed",
+      "CdkStep._getDefaultCompleted",
+      "CdkStep._getDefaultError",
+      "CdkStep.reset",
+      "CdkStepper.selectedIndex setter",
+      "CdkStepper._anyControlsInvalidOrPending",
+      "CdkStepper.reset"
+    ]
+  },
+  "executions": {
+    "main": {
+      "source_commit": "94328734183c8196860621e8c7f15d4b64aa3c15",
+      "run": 37568577713,
+      "job": 112621855289,
+      "tarball_sha256": "050faf79d6ec29c239cb4898689faf5be388fab03ab03144f7cabff9565e919f",
+      "framework": "22.1.7",
+      "cdk": "22.1.7",
+      "material": "22.1.7",
+      "typescript": "6.0.3",
+      "packed_consumer_status": "ok",
+      "errors": [],
+      "cases": 78,
+      "overall_job": "failure in later API checks:3 signatures/8 DI",
+      "producer_sha256": "b91b05e99c054122cd6117fbc034c579336b47aa69db4de751637ebe53e62e49"
+    },
+    "21.x": {
+      "source_commit": "0e0fc720aa4c36a3eebf56257147bc5aa9fd4c0c",
+      "run": 37568606450,
+      "job": 112621943411,
+      "tarball_sha256": "09e13c57b223a0b03339431630bd94b535c52d3753ca0280bc27e7e8238b34f0",
+      "framework": "21.2.23",
+      "cdk": "21.2.14",
+      "material": "21.2.14",
+      "typescript": "5.9.2",
+      "packed_consumer_status": "ok",
+      "errors": [],
+      "cases": 78,
+      "overall_job": "success",
+      "producer_sha256": "459a181ca1b3e16e1e44f202f855a2d3e942105903fa0ba606aaaca92bc1c35b"
+    }
+  },
+  "prior_observations": {
+    "main": {
+      "source_commit": "9f525a35a",
+      "job": 112620438617
+    },
+    "21.x": {
+      "source_commit": "b3cd5c48c",
+      "job": 112620468967
+    },
+    "observations": {
+      "invalidBlocked": true,
+      "pendingBlocked": true,
+      "validAdvanced": true,
+      "resetRestored": true,
+      "selections": [
+        1,
+        0
+      ]
+    },
+    "overall_packed_consumer": "failed checkbox at these earlier checkpoints; no whole-job pass claimed"
+  },
+  "qualification": "Authenticated Actions logs of artifact-bound packed-consumer78 with rehashed input digests. Detailed uploaded archives not independently transferred/rehashed; fresh finalization still required. Not all runtime floors or all stepper behaviors.",
+  "g11_claim": "not-passed"
+}
