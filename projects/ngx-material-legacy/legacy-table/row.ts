@@ -142,12 +142,15 @@ export class MatLegacyRow extends CdkRow {}
 export class MatLegacyNoDataRow extends CdkNoDataRow {
   // Type-only declaration: initialization is explicit on the returned object.
   declare _contentClassNames: string[];
+  /** Historical16 public member, retained alongside the current CDK field. */
+  declare _contentClassName: string;
 
   // @ts-expect-error TS2377: valid derived object return preserves manual arguments.
   constructor(templateRef: TemplateRef<any>) {
     const row = constructWithPublicDependencies(CdkNoDataRow, new.target, [
       {provide: TemplateRef, useValue: templateRef},
     ]) as MatLegacyNoDataRow;
+    row._contentClassName = 'mat-no-data-row';
     row._contentClassNames = ['mat-no-data-row'];
     return row;
   }
