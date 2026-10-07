@@ -43,6 +43,26 @@ for(const [name,parent] of [['MatLegacyHeaderRowDef','CdkHeaderRowDef'],['MatLeg
  }
  assert.equal(originalInheritedConstructor('/other/table.ts',name),null);
 }
+for(const [name,parent,parameters,signature] of [
+ ['MatLegacyCellDef','CdkCellDef','template: TemplateRef<any>','public constructor(TemplateRef<any>)'],
+ ['MatLegacyHeaderCellDef','CdkHeaderCellDef','template: TemplateRef<any>','public constructor(TemplateRef<any>)'],
+ ['MatLegacyFooterCellDef','CdkFooterCellDef','template: TemplateRef<any>','public constructor(TemplateRef<any>)'],
+ ['MatLegacyHeaderCell','CdkHeaderCell','columnDef: CdkColumnDef, elementRef: ElementRef','public constructor(CdkColumnDef,ElementRef)'],
+ ['MatLegacyFooterCell','CdkFooterCell','columnDef: CdkColumnDef, elementRef: ElementRef','public constructor(CdkColumnDef,ElementRef)'],
+ ['MatLegacyCell','CdkCell','columnDef: CdkColumnDef, elementRef: ElementRef','public constructor(CdkColumnDef,ElementRef)'],
+ ['MatLegacyTextColumn','CdkTextColumn','table: CdkTable<T>, options: TextColumnOptions<T>','public constructor(CdkTable<T>,TextColumnOptions<T>)'],
+]) {
+ const original=originalInheritedConstructor('/original/src/material/legacy-table/cell.ts',name);
+ assert.deepEqual(original.signatures,[signature]);
+ const candidate=sf(`import {${parent}} from '@angular/cdk/table'; export declare class ${name}<T> extends ${parent}<T> {}`);
+ const matching=packedInheritedConstructor(candidate,name,()=>sf(`export declare class ${parent}<T> {constructor(${parameters});}`));
+ assert.deepEqual(matching.signatures,original.signatures);
+ const missing=packedInheritedConstructor(candidate,name,()=>sf(`export declare class ${parent}<T> {}`));
+ assert.deepEqual(missing.signatures,['public constructor()']);
+ assert.notDeepEqual(missing.signatures,original.signatures);
+ const wrong=packedInheritedConstructor(candidate,name,()=>sf(`export declare class ${parent}<T> {constructor(...args: unknown[]);}`));
+ assert.notDeepEqual(wrong.signatures,original.signatures);
+}
 assert.equal(originalInheritedConstructor('/original/src/material/legacy-table/row.ts','Unknown'),null);
 '''
         result=subprocess.run(['node','--input-type=module','-e',code],cwd=ROOT,capture_output=True,text=True)
