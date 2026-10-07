@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "sha": "231f94f5557bb58afc0070585688b3014d541eb2",
+  "status": "security-review pending",
+  "owned_source_sha256": {
+    "projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts": "88812bc9ead98f1fc04fc0d58f38750ac515d8c93b1ad8fc694e6d1a2ea64f1a",
+    "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts": "5cc0825493fb756df3298b2e87309c40ea5acb66761a3a2ca40784499737940c",
+    "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts": "5bc94d546786b828e6224db74d6e4ec3475b0d67d1e3fa62b34e497fb4d5f584",
+    "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts": "c84e6f6a5b137b6287c7268d88550888b337d1ac26b56784922af46872ff7051",
+    "projects/ngx-material-legacy/legacy-core/internal/common-module.ts": "8f8d7dbcf89c151f6bb953f8a0e803b2d64cdb07fbcedfa460415c7f5c22afe6"
+  },
+  "authentic_peers": [
+    {
+      "version": "21.2.14",
+      "archive_sha256": "b54868a0f7aefa471203a0fe419370e156cdf0218db9b625aca3ae6e8de25c63",
+      "members": {
+        "package/fesm2022/layout.mjs": "7eefe5dc622093ef51a80d72f12a1600867e584fee1dbd9835a3c05411474baf",
+        "package/fesm2022/_breakpoints-observer-chunk.mjs": "68b5fe349d7bbc533d63e49fe17a05a2b49518eca42a21e00b5658cbbd1453de",
+        "package/fesm2022/_a11y-module-chunk.mjs": "5cba710056d2fd8198a5cdefb19579d2c0dd7daab363867913b65d34913b2a29"
+      }
+    },
+    {
+      "version": "22.1.7",
+      "archive_sha256": "225d82389797aefbbb2684461576ef950465546a9d28326483e0b816c8a5a558",
+      "members": {
+        "package/fesm2022/layout.mjs": "2ee894e12f9c4bedfea46aff56f317bb3d4f874e76a95b6b98e304b89866d6f6",
+        "package/fesm2022/_breakpoints-observer-chunk.mjs": "39fc38921aa1f28533becd5027dbcec5192b642121452b8352d94aee9813d9f2",
+        "package/fesm2022/_a11y-module-chunk.mjs": "fdac8c799d3adab5f92370a80c37eaa1f11dad9861142b6564aa32b67f2481a4"
+      }
+    }
+  ],
+  "reviewed_source_flows": [
+    "Animation helper: literal (prefers-reduced-motion) -> public MediaMatcher.",
+    "Autocomplete, tooltip, snack-bar: public Breakpoints.HandsetLandscape/Handset/HandsetPortrait -> public BreakpointObserver.",
+    "Common-module public high-contrast service: literal (forced-colors: active) -> public BreakpointObserver.",
+    "Peer Breakpoints values are fixed width/orientation strings. observe splits/coerces, registers and passes queries to MediaMatcher.21 inserts raw braces;22 removes them."
+  ],
+  "native_receipt": "compatibility/f10/disposition-ledger/evidence/closeout-browser-native-diagnostic-receipts.json",
+  "triage": "21.x peer CSS injection reproduced. Reviewed owned callers do not accept consumer strings for queries; no add-on untrusted-input path established. No complete security clearance, accepted risk exception or terminal disposition. No CDK fork, floor change or sanitizer copy.",
+  "limitations": [
+    "Scoped source triage, not complete dependency security review.",
+    "Peer-floor policy and complete audit remain pending.",
+    "Zoneful Chromium reversible marker only; not all platforms or payloads."
+  ],
+  "g11_claim": "not-passed"
+}
