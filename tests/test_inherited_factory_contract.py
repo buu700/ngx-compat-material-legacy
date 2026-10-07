@@ -25,6 +25,27 @@ class InheritedFactoryContractTests(unittest.TestCase):
         self.assertTrue(all(row['historical']=='' for row in withdrawn))
         self.assertFalse(any(row['symbol_id'] in ids for row in active))
 
+    def test_name_tuple_and_rationale_cannot_waive_factory_problems(self):
+        active=json.loads((ROOT/'compatibility/rc/api/di-differences.json').read_text())['differences']
+        self.assertEqual(active,[])
+        withdrawn=json.loads((ROOT/'compatibility/rc/api/withdrawn-unproven-di-waivers.json').read_text())['removed_rows']
+        self.assertEqual(len(withdrawn),50)
+        self.assertEqual(len({row['symbol_id'] for row in withdrawn}),50)
+        code=r"""
+import assert from 'node:assert/strict';
+import {settleDi} from './scripts/api-completeness.mjs';
+const symbol={symbol_id:'fixture/primary/Example',shape:{diParams:[{ident:'Token',optional:false}]}};
+const record={symbol_id:symbol.symbol_id,historical:'Token',owned:'Token',classification:'intentional-legacy-difference',rationale:'Pinned current dependencies'};
+for(const problem of ['token identity mismatch','optional flag mismatch','factory threw','incomplete observation context','token count mismatch']){
+ const row=settleDi({symbol,observed:['Token'],problems:[problem]},[record]);
+ assert.equal(row.result,'fail');assert.equal(row.status,'mismatch');
+ assert.deepEqual(row.problems,[problem]);assert.equal(row.proposed_difference,record.rationale);
+}
+assert.equal(settleDi({symbol,observed:['Token'],problems:[]},[record]).result,'pass');
+"""
+        result=subprocess.run(['node','--input-type=module','-e',code],cwd=ROOT,capture_output=True,text=True)
+        self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+
     def test_inherited_expectation_and_artifact_module_cache(self):
         code=r'''
 import assert from 'node:assert/strict';
