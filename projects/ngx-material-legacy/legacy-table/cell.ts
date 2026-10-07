@@ -7,7 +7,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import {Directive, ElementRef, Input, Injector, TemplateRef, runInInjectionContext} from '@angular/core';
+import {Directive, ElementRef, Input, TemplateRef} from '@angular/core';
+import {constructLegacyCell} from './internal/construct-legacy-cell';
 import {
   CdkCell,
   CdkCellDef,
@@ -17,16 +18,6 @@ import {
   CdkHeaderCell,
   CdkHeaderCellDef,
 } from '@angular/cdk/table';
-
-/** Construct the public parent with exactly the original supplied dependencies. */
-function constructLegacyCell<T>(parent: new () => T, target: Function, providers: {provide: unknown; useValue: unknown}[]): T {
-  const context = Injector.create({providers});
-  try {
-    return runInInjectionContext(context, () => Reflect.construct(parent, [], target));
-  } finally {
-    context.destroy();
-  }
-}
 
 /**
  * Cell definition for the mat-table.

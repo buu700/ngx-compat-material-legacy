@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-07T05:53:19.196702+00:00",
+  "scope": "MatLegacyTextColumn",
+  "original_and_minimum_sources": {
+    "original16": {
+      "archive_sha256": "a499ba0fee46784441b92587e43b17ec72d9bd383f78ea14954eaa62c781bad7",
+      "member": "package/fesm2022/table.mjs",
+      "member_sha256": "5970be112e4a2e41c48316120a1695fef3be7ca0c91507ff1d2dec1e724e508e",
+      "constructor": "class CdkTextColumn {\n    /** Column name that should be used to reference this column. */\n    get name() {\n        return this._name;\n    }\n    set name(name) {\n        this._name = name;\n        // With Ivy, inputs can be initialized before static query results are\n        // available. In that case, we defer the synchronization until \"ngOnInit\" fires.\n        this._syncColumnDefName();\n    }\n    constructor(\n    // `CdkTextColumn` is always requiring a table, but we just assert it manually\n    // for better error reporting.\n    // tslint:disable-next-line: lightweight-tokens\n    _table, _options) {\n        this._table = _table;\n        this._options = _options;\n        /** Alignment of the cell values. */\n        this.justify = 'start';\n        this._options = _options || {};\n    }\n",
+      "options_token_declaration": "StickySize[];\n}\n\n/** Injection token that can be used to specify the text column options. */\nexport declare const TEXT_COLUMN_OPTIONS: InjectionToken<TextColumnOptions<any>>;\n\n/** Configurable options"
+    },
+    "21.x": {
+      "archive_sha256": "b54868a0f7aefa471203a0fe419370e156cdf0218db9b625aca3ae6e8de25c63",
+      "member": "package/fesm2022/table.mjs",
+      "member_sha256": "ea8d99a22482768bab22e19aba83b2a1498be6be340e46991965f539036b6c11",
+      "constructor": "class CdkTextColumn {\n  _table = inject(CdkTable, {\n    optional: true\n  });\n  _options = inject(TEXT_COLUMN_OPTIONS, {\n    optional: true\n  });\n  get name() {\n    return this._name;\n  }\n  set name(name) {\n    this._name = name;\n    this._syncColumnDefName();\n  }\n  _name;\n  headerText;\n  dataAccessor;\n  justify = 'start';\n  columnDef;\n  cell;\n  headerCell;\n  constructor() {\n    this._options = this._options || {};\n  }\n",
+      "options_token_declaration": "e: string) => string;\n}\n/** Injection token that can be used to specify the text column options. */\ndeclare const TEXT_COLUMN_OPTIONS: InjectionToken<TextColumnOptions<any>>;\n\nexport { BaseCdkCell, Ba"
+    },
+    "main": {
+      "archive_sha256": "225d82389797aefbbb2684461576ef950465546a9d28326483e0b816c8a5a558",
+      "member": "package/fesm2022/table.mjs",
+      "member_sha256": "2bdeb437714a07914ccb8d2f749fd75d72b63da1ab4cc0c069f64e714c2a6ad4",
+      "constructor": "class CdkTextColumn {\n  _table = inject(CdkTable, {\n    optional: true\n  });\n  _options = inject(TEXT_COLUMN_OPTIONS, {\n    optional: true\n  });\n  get name() {\n    return this._name;\n  }\n  set name(name) {\n    this._name = name;\n    this._syncColumnDefName();\n  }\n  _name;\n  headerText;\n  dataAccessor;\n  justify = 'start';\n  columnDef;\n  cell;\n  headerCell;\n  constructor() {\n    this._options = this._options || {};\n  }\n",
+      "options_token_declaration": "e: string) => string;\n}\n/** Injection token that can be used to specify the text column options. */\ndeclare const TEXT_COLUMN_OPTIONS: InjectionToken<TextColumnOptions<any>>;\n\nexport { BaseCdkCell, Ba"
+    }
+  },
+  "implementation": "Original (CdkTable<T>, TextColumnOptions<T>) constructor restored. Both optional dependency flags retained. The same locally owned public-injection/standard Reflect adapter supplies those exact objects to the real current public parent; no copied CDK implementation or private import. Helper stays internal and is not exported by public-api.ts.",
+  "typecheck_note": "Narrow TS2377 suppression for valid derived object return. Adapter is limited to classes without own initialized instance fields; such fields would otherwise be skipped and must not be introduced without changing the construction strategy.",
+  "native_case": "packed-consumer/harness/text-column-original-constructor-options",
+  "required_packed_cases": 82,
+  "native_status": "pending Actions",
+  "expectations": "Untouched original constructor retains table/options, defaults justify=start, and reads custom header transform/data accessor at initialization. Test manual table/options/prototype identity and actual native-table header/data cells with frozen custom options; original selectors/maps/goldens unchanged.",
+  "limitations": "No complete table/CDK/private/provider/lifecycle or G02 claim. Fresh82-case/full untouched historical suite required.",
+  "g02_claim": "not-passed"
+}
