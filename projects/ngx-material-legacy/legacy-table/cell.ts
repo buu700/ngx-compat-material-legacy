@@ -102,7 +102,7 @@ export class MatLegacyColumnDef extends CdkColumnDef {
   constructor(@Optional() @Inject(CdkTable) table?: any) {
     const definition = constructWithPublicDependencies(CdkColumnDef, new.target, []);
     definition._table = table;
-    return definition;
+    return definition as MatLegacyColumnDef;
   }
 
   override get sticky(): boolean { return super.sticky; }
