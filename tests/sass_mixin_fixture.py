@@ -59,7 +59,19 @@ def mixin_receipt(root,active,case,invocation):
         wrong=actual+'\n.wrong-nonempty-mixin { color: red; }\n';body['mutation']=dict(css=wrong,css_sha256=hashlib.sha256(wrong.encode()).hexdigest(),css_bytes=len(wrong.encode()))
     else:
         from sass_companion_addition_admission import COMPANION_ADDITION_CASES, _CATALOG
-        if case in COMPANION_ADDITION_CASES:
+        from sass_progress_color_alias_admission import PROGRESS_COLOR_ALIAS_CASES, _SOURCES
+        if case in PROGRESS_COLOR_ALIAS_CASES:
+            # Receipt-shape fixture, never a source/compiler observation.
+            fixture=json.loads((Path(__file__).parent/'sass_progress_color_alias_fixture.json').read_bytes())
+            original=fixture['original'];peer_css=fixture['peer_css'];program=fixture['programs'][case];line=body['line']
+            import re
+            actual=re.sub(r'(  --mdc-linear-progress-active-indicator-color: ([^;\n]+);\n  --mdc-linear-progress-track-color: ([^;\n]+);)',lambda m:m[1]+'\n  --mat-progress-bar-active-indicator-color: '+m[2]+';\n  --mat-progress-bar-track-color: '+m[3]+';',original)
+            for role,value in [('expected',original),('actual',actual)]:body[role].update(css=value,css_sha256=hashlib.sha256(value.encode()).hexdigest(),css_bytes=len(value.encode()))
+            version,manifest=('22.1.7','5d33c35b56f9834d36a3be0ce4dc37892e689bceb1727de0cf223f10ab8f28af') if line=='main' else ('21.2.14','26af34e77987b55564689c8eb7b5352db661d6a737fdec2160417ae42114f355')
+            body['current_peer_alias']=dict(classification='conforming-current-infrastructure',contract='historical-progress-css-with-public-color-aliases',peer=dict(line=line,peer_version=version,peer_package_json_sha256=manifest,program=program,program_sha256=hashlib.sha256(program.encode()).hexdigest(),css=peer_css,css_sha256=hashlib.sha256(peer_css.encode()).hexdigest(),css_bytes=len(peer_css.encode()),sources=[dict(root=0,path=p,sha256=digest,bytes=size) for p,(digest,size) in _SOURCES.items()]))
+            body['comparison']='current-peer-color-alias-contract'
+            wrong=actual+'\n.wrong-nonempty-mixin { color: red; }\n';body['mutation']=dict(css=wrong,css_sha256=hashlib.sha256(wrong.encode()).hexdigest(),css_bytes=len(wrong.encode()))
+        elif case in COMPANION_ADDITION_CASES:
             entry=COMPANION_ADDITION_CASES[case];line=body['line'];floor=entry['peers'][line]
             fixture=json.loads((Path(__file__).parent/'sass_companion_addition_fixture.json').read_bytes())
             original=fixture['originals'][entry['original_sha256']]
