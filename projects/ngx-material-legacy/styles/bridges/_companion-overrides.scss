@@ -690,8 +690,23 @@ $_variants: (accent: secondary, warn: error);
 }
 
 @mixin toolbar($theme) {
-  @include mat.toolbar-overrides(_collect(
-    toolbar, $theme, $toolbar-allowed, meta.get-function('_toolbar-tokens')));
+  // Public peer color variants precede the typography/density root block.
+  $groups: _toolbar-tokens(m2-system.get-system($theme));
+  $root: _qualify(toolbar, map.get($groups, base), $toolbar-allowed);
+  $tail: ();
+  @if theming.get-typography-config($theme) != null {
+    $tail: map.merge($tail, _qualify(toolbar, map.get($groups, typography), $toolbar-allowed));
+  }
+  @if theming.get-density-config($theme) != null {
+    $tail: map.merge($tail, _qualify(toolbar, map.get($groups, density), $toolbar-allowed));
+  }
+  @if theming.get-color-config($theme) != null {
+    $root: map.merge($root, _qualify(toolbar, map.get($groups, color), $toolbar-allowed));
+  } @else {
+    $root: map.merge($root, $tail);
+    $tail: ();
+  }
+  @include mat.toolbar-overrides($root);
   $color: theming.get-color-config($theme);
   @if $color != null {
     .mat-toolbar {
@@ -706,6 +721,7 @@ $_variants: (accent: secondary, warn: error);
       }
     }
   }
+  @include mat.toolbar-overrides($tail);
 }
 
 @mixin tree($theme) {
