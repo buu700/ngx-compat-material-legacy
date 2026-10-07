@@ -34,7 +34,12 @@ let factoryReference;
 let cdkFactoryReference;
 const CDK_FACTORY_REFERENCE = 'reference/material-16.2.14/cdk-factory-metadata.json';
 const CDK_FACTORY_REFERENCE_SHA256 = '86a98330dda8255dfd6666363aecc2b08ea0730cd39f8f31af998dd0987d4a72';
-const INHERITED_TABLE_FACTORIES = Object.freeze({MatLegacyHeaderRowDef:'CdkHeaderRowDef',MatLegacyFooterRowDef:'CdkFooterRowDef',MatLegacyRowDef:'CdkRowDef'});
+const INHERITED_TABLE_FACTORIES = Object.freeze({
+  MatLegacyHeaderRowDef:'CdkHeaderRowDef', MatLegacyFooterRowDef:'CdkFooterRowDef', MatLegacyRowDef:'CdkRowDef',
+  MatLegacyCellDef:'CdkCellDef', MatLegacyHeaderCellDef:'CdkHeaderCellDef', MatLegacyFooterCellDef:'CdkFooterCellDef',
+  MatLegacyHeaderCell:'CdkHeaderCell', MatLegacyFooterCell:'CdkFooterCell', MatLegacyCell:'CdkCell',
+  MatLegacyTextColumn:'CdkTextColumn',
+});
 const INHERITED_CONSTRUCTOR_REFERENCE = 'reference/material-16.2.14/cdk-inherited-constructors/table.d.ts';
 const INHERITED_CONSTRUCTOR_SHA256 = '94789cae5567000d4f23d9634ce006670e3fca4c5db427ce129026da62002c2d';
 export function originalInheritedConstructor(file, name) {
