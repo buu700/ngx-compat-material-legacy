@@ -1,7 +1,10 @@
+// Copyright Google LLC All Rights Reserved. MIT license; see LICENSE.
+// Copyright (c) 2026 Ryan Lester.
 @use '../core/theming/theming';
 @use '../core/tokens/m2/mdc/linear-progress' as tokens-mdc-linear-progress;
 @use '../vendor/mdc/linear-progress/linear-progress-theme' as mdc-linear-progress-theme;
 @use 'sass:map';
+@use '@angular/material' as mat;
 
 @mixin _palette-styles($config, $palette-name) {
   $palette-config: map.merge($config, (primary: map.get($config, $palette-name)));
@@ -20,6 +23,8 @@
   ));
 
   @include mdc-linear-progress-theme.theme($color-tokens);
+  // Current public peers consume mat-prefixed slots for the same M2 colors.
+  @include mat.progress-bar-overrides($color-tokens);
 }
 
 @mixin color($config-or-theme) {
