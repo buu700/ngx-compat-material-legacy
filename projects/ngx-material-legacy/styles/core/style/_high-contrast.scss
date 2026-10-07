@@ -1,0 +1,28 @@
+// The MIT License
+// Copyright (c) 2023 Google LLC.
+// Copyright (c) 2026 Ryan Lester.
+// See the package LICENSE for the full terms.
+@use '@angular/cdk';
+
+// The finite historical class contract used by owned legacy styles. Current
+// forced colors are emitted through the public CDK mixin without its obsolete
+// encapsulation argument. Capture the caller before nesting so comma-separated
+// selector contexts receive the class on every branch, including root calls.
+@mixin active() {
+  @at-root {
+    $selector-context: #{&};
+    .cdk-high-contrast-active {
+      @if $selector-context == '' {
+        @content;
+      } @else {
+        #{$selector-context} {
+          @content;
+        }
+      }
+    }
+  }
+
+  @include cdk.high-contrast(active) {
+    @content;
+  }
+}
