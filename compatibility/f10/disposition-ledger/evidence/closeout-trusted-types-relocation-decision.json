@@ -66,7 +66,8 @@
     "The specific upstream change relocates the policy helper and rewires registry import/build/API exposure; it does not add sanitizer validation to the helper.",
     "Both exact peer registries sanitize literal input with SecurityContext.HTML and configured URLs with SecurityContext.RESOURCE_URL. Downloaded SVG text is promoted before the innerHTML sink; resource trust is not sanitization of downloaded contents.",
     "The TT policy createHTML callback returns its input. Do not treat TT promotion as XSS sanitization or a trust grant for arbitrary network SVG.",
-    "The 21.2.14 TT policy creation propagates an exception; 22.1.7 catches/logs that exception and falls back. The reviewed relocation alone does not certify that later fallback change."
+    "The 21.2.14 TT policy creation propagates an exception; 22.1.7 catches/logs that exception and falls back. The reviewed relocation alone does not certify that later fallback change.",
+    "The archived no-renames patch has six diff headers; prior seven-path wording was a counting error. All six paths remain in patch_paths and the unchanged byte-bound patch."
   ],
   "probe_scope": "Actual public registry/sanitizer plus peer MatIcon rendered inside packed legacy button in the packed-consumer DOM harness: fixed trusted SVG, raw-script rejection, independent clones. This is the TT-unavailable fallback route, not browser require-trusted-types-for enforcement, allowed-policy rejection or network SVG qualification.",
   "limitations": [
@@ -75,7 +76,7 @@
     "Fresh C05/A audit and remaining sensitive/inherited/authored-use obligations are still required."
   ],
   "g11_claim": "not-passed",
-  "decision": "The complete seven-path upstream patch relocates the private Trusted Types helper, adjusts its type exports/comments and registry import/build edges, and leaves its runtime policy/promotion body byte-identical. The owned add-on has no direct registry or private-TT references and must not copy/import this private helper or fork the ordinary icon registry. Both authenticated minimum peer sources contain the relocated helper and the same literal HTML/resource-URL sanitizer boundaries and innerHTML sink. Public peer registry literal sanitization, independent clones and real MatIcon projection inside a packed legacy button pass on each line; actual Chromium TT enforcement with the allowed Angular policy list and raw-literal/disallowed-policy negatives is required by the passing zoneful/zoneless browser coordinator predicates. Do not adopt this private import relocation into owned code. This decision does not claim that TT promotion sanitizes downloaded SVG, that arbitrary resource trust is safe, or that the later22 policy-creation catch/fallback is certified. Those broader trust/network/CSP behaviors remain separate security/audit obligations; no general security or G11 pass is asserted.",
+  "decision": "The complete six-path upstream patch relocates the private Trusted Types helper, adjusts its type exports/comments and registry import/build edges, and leaves its runtime policy/promotion body byte-identical. The owned add-on has no direct registry or private-TT references and must not copy/import this private helper or fork the ordinary icon registry. Both authenticated minimum peer sources contain the relocated helper and the same literal HTML/resource-URL sanitizer boundaries and innerHTML sink. Public peer registry literal sanitization, independent clones and real MatIcon projection inside a packed legacy button pass on each line; actual Chromium TT enforcement with the allowed Angular policy list and raw-literal/disallowed-policy negatives is required by the passing zoneful/zoneless browser coordinator predicates. Do not adopt this private import relocation into owned code. This decision does not claim that TT promotion sanitizes downloaded SVG, that arbitrary resource trust is safe, or that the later22 policy-creation catch/fallback is certified. Those broader trust/network/CSP behaviors remain separate security/audit obligations; no general security or G11 pass is asserted.",
   "runtime_policy_relocation": {
     "before": "src/material/icon/trusted-types.ts at parent of reviewed SHA",
     "after": "src/cdk/private/trusted-types.ts at reviewed SHA",
@@ -97,5 +98,9 @@
     }
   },
   "qualification": "Authenticated Actions log observations: packed-consumer/consumer-floor passes and browser-matrix coordinator pass with both mandatory native-TT predicates in the reviewed source. Detailed evidence archives have not been independently transferred/rehashed; not a full G10 or G11 certification.",
-  "prior_evidence": "compatibility/f10/disposition-ledger/evidence/closeout-trusted-types-relocation-followup.json"
+  "prior_evidence": "compatibility/f10/disposition-ledger/evidence/closeout-trusted-types-relocation-followup.json",
+  "affected_branches": [
+    "main",
+    "21.x"
+  ]
 }
