@@ -484,7 +484,7 @@ if (isMain) {
   }
 }
 
-function settleDi(row, records) {
+export function settleDi(row, records) {
   const historical = row.symbol.shape.token
     ? `token ${row.symbol.shape.tokenDescription || ''}`
     : row.symbol.shape.originalFactory?.deps_kind === 'invalid' ? 'original-non-injectable-factory'
@@ -501,8 +501,11 @@ function settleDi(row, records) {
     && item.owned === owned
     && item.classification === 'intentional-legacy-difference'
     && item.rationale);
-  if (record) return {...row, result: 'pass', status: 'intentional-legacy-difference', historical, owned, rationale: record.rationale};
-  return {...row, result: 'fail', status: 'mismatch', historical, owned};
+  // A tuple of token names and a rationale cannot discharge an actual identity,
+  // flag, count or factory-execution problem. Preserve proposed differences for
+  // review, while genuine observations remain failed until independently proved.
+  return {...row, result: 'fail', status: 'mismatch', historical, owned,
+    ...(record ? {proposed_difference: record.rationale} : {})};
 }
 
 function gitValue(args) {
