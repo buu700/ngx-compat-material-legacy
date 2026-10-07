@@ -113,6 +113,7 @@ writeFileSync(join(consumer, 'src/main.ts'), `${zoneless ? '' : `import 'zone.js
 `}import {Component, NgModule, inject${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';
 import {BrowserModule, DomSanitizer} from '@angular/platform-browser';
 import {MatIconModule, MatIconRegistry} from '@angular/material/icon';
+import {MediaMatcher} from '@angular/cdk/layout';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {MATERIAL_ANIMATIONS} from '@angular/material/core';
 import {MatLegacyButtonModule} from '@ngx-compat/material-legacy/legacy-button';
@@ -140,6 +141,7 @@ import {MatLegacyProgressSpinnerModule} from '@ngx-compat/material-legacy/legacy
 })
 export class LabRoot {
   constructor() {
+    (window as any).__closeoutMediaMatcher=inject(MediaMatcher);
     inject(MatIconRegistry).addSvgIconLiteral('closeout-native-tt',inject(DomSanitizer).bypassSecurityTrustHtml(
       '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8"><path d="M0 0h8v8H0z"/></svg>'));
   }
@@ -324,6 +326,7 @@ let error = null;
 let diagnostic = null;
 let zoneGlobal = null;
 let peerIconTt = null;
+let peerMediaMatcher = null;
 
 try {
   await send('Runtime.enable');
@@ -355,6 +358,39 @@ try {
       && negativeViolations.includes('require-trusted-types-for') && negativeViolations.includes('trusted-types'),
     observed_negative_directives: negativeViolations,
   });
+
+  // Security diagnostic only: a fixed CSS custom-property marker, no URL or
+  // script payload. This tests the public peer path; it earns no matrix credit
+  // and does not establish an owned untrusted-input flow or security clearance.
+  peerMediaMatcher = await evaluate(`(() => {
+    const matcher=window.__closeoutMediaMatcher;
+    const marker='--closeout-peer-query-css-probe';
+    const query='(min-width: 0px) {html {'+marker+': 1} /*';
+    const attemptedRules=[];
+    const originalInsert=CSSStyleSheet.prototype.insertRule;
+    const before=getComputedStyle(document.documentElement).getPropertyValue(marker).trim();
+    let validQuery=null,unsafeQuery=null,error=null,removedRules=0;
+    try {
+      validQuery=matcher.matchMedia('(min-width: 0px)').matches;
+      CSSStyleSheet.prototype.insertRule=function(...args){
+        attemptedRules.push(String(args[0]).slice(0,300));
+        return originalInsert.apply(this,args);
+      };
+      unsafeQuery=matcher.matchMedia(query).matches;
+    } catch(caught){error=String(caught);}
+    finally{CSSStyleSheet.prototype.insertRule=originalInsert;}
+    const after=getComputedStyle(document.documentElement).getPropertyValue(marker).trim();
+    for(const style of document.querySelectorAll('style')){
+      const sheet=style.sheet;if(!sheet)continue;
+      for(let index=sheet.cssRules.length-1;index>=0;index--){
+        if(sheet.cssRules[index].cssText.includes(marker)){sheet.deleteRule(index);removedRules++;}
+      }
+    }
+    return {available:!!matcher,valid_query_matches:validQuery,unsafe_query_matches:unsafeQuery,
+      before_marker:before,after_marker:after,unsafe_query_css_injected:before===''&&after==='1',
+      attempted_rules:attemptedRules,removed_probe_rules:removedRules,
+      cleanup_marker:getComputedStyle(document.documentElement).getPropertyValue(marker).trim(),error};
+  })()`);
 
   // Button default + disabled + focused state cells.
   families.button.present = await waitFor('!!document.querySelector("button#button-default.mat-button, button#button-default[mat-button]")');
@@ -431,6 +467,7 @@ const report = {
   zone_global: zoneGlobal,
   families,
   peer_icon_tt: peerIconTt,
+  peer_media_matcher: peerMediaMatcher,
   credited_cell_ids: ok ? cells : [],
   matrix_updated: false,
   error,
@@ -447,6 +484,7 @@ const report = {
     'Progress-spinner credit is host presence + aria-valuenow for determinate mode; indeterminate SVG animation not exercised.',
     'Success is not copied to unexecuted cells.',
     'Peer icon TT probe uses actual Chromium require-trusted-types-for enforcement and an allowed Angular policy list; this is not a full script/style/network CSP matrix or arbitrary SVG trust audit.',
+    'Public MediaMatcher unsafe-query diagnostic uses one fixed reversible CSS marker; it earns no acceptance/matrix credit and does not establish an owned input path or security clearance.',
     'Does not claim G10.',
   ],
 };
@@ -460,6 +498,7 @@ console.log(JSON.stringify({
   zone_global: zoneGlobal,
   families,
   peer_icon_tt: peerIconTt,
+  peer_media_matcher: peerMediaMatcher,
   error,
   credited_cell_ids: report.credited_cell_ids,
 }, null, 2));

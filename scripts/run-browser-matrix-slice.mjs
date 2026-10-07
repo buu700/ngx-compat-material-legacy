@@ -387,6 +387,11 @@ for (const scenario of scenarios) {
   if (existsSync(detailPath)) {
     detail = JSON.parse(readFileSync(detailPath, 'utf8'));
   }
+  if (detail?.peer_media_matcher) {
+    console.log('peer MediaMatcher security diagnostic (no acceptance credit): '+JSON.stringify({
+      scenario:scenario.id,observation:detail.peer_media_matcher,
+    }));
+  }
   const ok = result.status === 0 && detail && scenario.require(detail);
   const entry = {
     scenario: scenario.id,
