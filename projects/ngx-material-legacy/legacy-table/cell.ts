@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import {Directive, ElementRef, Input, TemplateRef} from '@angular/core';
+import {Directive, ElementRef, Inject, Input, Optional, TemplateRef} from '@angular/core';
 import {coerceBooleanProperty} from '@angular/cdk/coercion';
 type BooleanInput = string | boolean | null | undefined;
 import {constructWithPublicDependencies} from './internal/public-constructor-context';
@@ -15,6 +15,7 @@ import {
   CdkCell,
   CdkCellDef,
   CdkColumnDef,
+  CdkTable,
   CdkFooterCell,
   CdkFooterCellDef,
   CdkHeaderCell,
@@ -97,6 +98,13 @@ export class MatLegacyFooterCellDef extends CdkFooterCellDef {
   ],
 })
 export class MatLegacyColumnDef extends CdkColumnDef {
+  // @ts-expect-error TS2377: derived constructor deliberately returns its object.
+  constructor(@Optional() @Inject(CdkTable) table?: any) {
+    const definition = constructWithPublicDependencies(CdkColumnDef, new.target, []);
+    definition._table = table;
+    return definition;
+  }
+
   override get sticky(): boolean { return super.sticky; }
   override set sticky(value: boolean) {
     this.resetStickyChanged();

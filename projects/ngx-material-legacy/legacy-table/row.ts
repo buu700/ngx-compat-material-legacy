@@ -15,9 +15,10 @@ import {
   CdkHeaderRowDef,
   CdkRow,
   CdkRowDef,
+  CdkTable,
   CdkNoDataRow,
 } from '@angular/cdk/table';
-import {ChangeDetectionStrategy, Component, Directive, TemplateRef, ViewEncapsulation} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Directive, Inject, IterableDiffers, Optional, TemplateRef, ViewEncapsulation} from '@angular/core';
 import {constructWithPublicDependencies} from './internal/public-constructor-context';
 import {coerceBooleanProperty} from '@angular/cdk/coercion';
 
@@ -34,6 +35,17 @@ import {coerceBooleanProperty} from '@angular/cdk/coercion';
   inputs: ['columns: matHeaderRowDef', 'sticky: matHeaderRowDefSticky'],
 })
 export class MatLegacyHeaderRowDef extends CdkHeaderRowDef {
+  // @ts-expect-error TS2377: derived constructor deliberately returns its object.
+  constructor(template: TemplateRef<any>, differs: IterableDiffers,
+      @Optional() @Inject(CdkTable) table?: any) {
+    const definition = constructWithPublicDependencies(CdkHeaderRowDef, new.target, [
+      {provide: TemplateRef, useValue: template},
+      {provide: IterableDiffers, useValue: differs},
+    ]);
+    definition._table = table;
+    return definition;
+  }
+
   override get sticky(): boolean { return super.sticky; }
   override set sticky(value: boolean) {
     this.resetStickyChanged();
@@ -54,6 +66,17 @@ export class MatLegacyHeaderRowDef extends CdkHeaderRowDef {
   inputs: ['columns: matFooterRowDef', 'sticky: matFooterRowDefSticky'],
 })
 export class MatLegacyFooterRowDef extends CdkFooterRowDef {
+  // @ts-expect-error TS2377: derived constructor deliberately returns its object.
+  constructor(template: TemplateRef<any>, differs: IterableDiffers,
+      @Optional() @Inject(CdkTable) table?: any) {
+    const definition = constructWithPublicDependencies(CdkFooterRowDef, new.target, [
+      {provide: TemplateRef, useValue: template},
+      {provide: IterableDiffers, useValue: differs},
+    ]);
+    definition._table = table;
+    return definition;
+  }
+
   override get sticky(): boolean { return super.sticky; }
   override set sticky(value: boolean) {
     this.resetStickyChanged();
@@ -74,7 +97,19 @@ export class MatLegacyFooterRowDef extends CdkFooterRowDef {
   providers: [{provide: CdkRowDef, useExisting: MatLegacyRowDef}],
   inputs: ['columns: matRowDefColumns', 'when: matRowDefWhen'],
 })
-export class MatLegacyRowDef<T> extends CdkRowDef<T> {}
+export class MatLegacyRowDef<T> extends CdkRowDef<T> {
+  // @ts-expect-error TS2377: derived constructor deliberately returns its object.
+  constructor(template: TemplateRef<any>, differs: IterableDiffers,
+      @Optional() @Inject(CdkTable) table?: any) {
+    const definition = constructWithPublicDependencies(CdkRowDef, new.target, [
+      {provide: TemplateRef, useValue: template},
+      {provide: IterableDiffers, useValue: differs},
+    ]);
+    definition._table = table;
+    return definition as MatLegacyRowDef<T>;
+  }
+
+}
 
 /**
  * Header template container that contains the cell outlet. Adds the right class and role.
