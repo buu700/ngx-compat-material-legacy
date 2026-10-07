@@ -389,6 +389,10 @@ class CoordinatorTests(unittest.TestCase):
             elif case_id.startswith('function-value/'):
                 from sass_function_fixture import function_receipt
                 body=function_receipt(ROOT,self.run,case_id,invocation)
+            elif case_id in verify.DEFAULT_MAPPED_COMPANION_CASES:
+                from sass_default_mapped_companion_fixture import default_mapped_companion_receipt
+                body=default_mapped_companion_receipt(self.run,case_id,invocation)
+                if tarball is not None:body['tarball_sha256']=tarball
             elif case_id in verify.DEFAULT_COMPANION_CASES:
                 from sass_default_companion_fixture import default_companion_receipt
                 body=default_companion_receipt(self.run,case_id,invocation)
