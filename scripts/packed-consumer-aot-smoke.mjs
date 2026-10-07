@@ -493,6 +493,7 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
     'packed-consumer/harness/table-original-sticky-coercion-dirty-state': parsed.tableOriginalStickyBehavior === true,
     'packed-consumer/harness/table-original-boolean-input-rendering': parsed.tableOriginalBooleanInputs === true,
     'packed-consumer/harness/table-recycle-row-view-identity': parsed.tableRecycleRowIdentity === true,
+    'packed-consumer/harness/table-definition-original-constructors': parsed.tableDefinitionOriginalConstructors === true,
   };
   const owned = declarationKeys(keys)
     .filter(key => key.endsWith('/testing'))
@@ -896,7 +897,7 @@ Object.defineProperty(globalThis, 'navigator', {
 
 import 'zone.js';
 import '@angular/compiler';
-import {Component, ElementRef, TemplateRef, ViewChild, Injector, ViewContainerRef, EventEmitter, InjectionToken, ANIMATION_MODULE_TYPE, NgZone, inject, isDevMode, createEnvironmentInjector, createNgModule, EnvironmentInjector} from '@angular/core';
+import {Component, ElementRef, TemplateRef, ViewChild, Injector, ViewContainerRef, EventEmitter, InjectionToken, ANIMATION_MODULE_TYPE, NgZone, inject, isDevMode, createEnvironmentInjector, createNgModule, EnvironmentInjector, IterableDiffers, SimpleChange} from '@angular/core';
 import {Subject} from 'rxjs';
 import {FormControl, Validators} from '@angular/forms';
 import {MatStepperModule, MatStepper} from '@angular/material/stepper';
@@ -912,8 +913,8 @@ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
 import {provideNoopAnimations} from '@angular/platform-browser/animations';
 import {Overlay, OverlayContainer} from '@angular/cdk/overlay';
 import {ScrollDispatcher} from '@angular/cdk/scrolling';
-import {CdkCellDef,CdkHeaderCellDef,CdkFooterCellDef,CdkCell,CdkHeaderCell,CdkFooterCell,CdkTextColumn,TEXT_COLUMN_OPTIONS,CdkNoDataRow,type CdkTable} from '@angular/cdk/table';
-import {MatLegacyTableModule,MatLegacyCellDef,MatLegacyHeaderCellDef,MatLegacyFooterCellDef,MatLegacyColumnDef,MatLegacyCell,MatLegacyHeaderCell,MatLegacyFooterCell,MatLegacyTable,MatLegacyTextColumn,MatLegacyNoDataRow,MatLegacyHeaderRowDef,MatLegacyFooterRowDef} from '@ngx-compat/material-legacy/legacy-table';
+import {CdkCellDef,CdkHeaderCellDef,CdkFooterCellDef,CdkCell,CdkHeaderCell,CdkFooterCell,CdkTextColumn,TEXT_COLUMN_OPTIONS,CdkNoDataRow,CdkTable,CdkColumnDef,CdkHeaderRowDef,CdkFooterRowDef,CdkRowDef} from '@angular/cdk/table';
+import {MatLegacyTableModule,MatLegacyCellDef,MatLegacyHeaderCellDef,MatLegacyFooterCellDef,MatLegacyColumnDef,MatLegacyCell,MatLegacyHeaderCell,MatLegacyFooterCell,MatLegacyTable,MatLegacyTextColumn,MatLegacyNoDataRow,MatLegacyHeaderRowDef,MatLegacyFooterRowDef,MatLegacyRowDef} from '@ngx-compat/material-legacy/legacy-table';
 import {Platform} from '@angular/cdk/platform';
 import {Directionality} from '@angular/cdk/bidi';
 import {MatLegacyButtonModule} from '@ngx-compat/material-legacy/legacy-button';
@@ -1058,6 +1059,7 @@ class SmokeDialogContent {}
 class HarnessHost {
   constructorGridData=[{value:'Grid value'}];
   constructorGridWhen=()=>true;
+  @ViewChild(MatLegacyRowDef,{static:true}) originalRowDefinition!:MatLegacyRowDef<any>;
   recycleProbeData=[{value:'initial recycle'}];
   disposeProbeData=[{value:'initial dispose'}];
   @ViewChild(MatLegacyHeaderRowDef,{static:true}) originalStickyHeader!:MatLegacyHeaderRowDef;
@@ -1269,6 +1271,36 @@ async function main() {
     &&cellConstructorObservation.every(row=>Object.entries(row).every(([name,value])=>name==='name'||value===true));
   const textTableNode=fixture.debugElement.query(node=>node.nativeElement?.id==='constructor-text-table');
   const textTable=textTableNode.injector.get(MatLegacyTable);
+  const suppliedDiffers=TestBed.inject(IterableDiffers);
+  let definitionCallerDestroyed=0;
+  const suppliedTable={originalMarker:true,ngOnDestroy(){definitionCallerDestroyed++;}};
+  const manualColumn=new MatLegacyColumnDef(suppliedTable);
+  manualColumn.name='Original column';
+  const definitionConstructorObservations=[{name:'MatLegacyColumnDef',
+    manual_table:manualColumn._table===suppliedTable,
+    manual_identity:manualColumn instanceof MatLegacyColumnDef&&manualColumn instanceof CdkColumnDef,
+    original_name:manualColumn.name==='Original column'&&manualColumn.cssClassFriendlyName==='Original-column',
+    node_table:fixture.componentInstance.gridColumn._table===booleanTable}];
+  for(const [Owned,Peer,nodeDefinition,expectedTable] of [
+    [MatLegacyHeaderRowDef,CdkHeaderRowDef,fixture.componentInstance.originalStickyHeader,textTable],
+    [MatLegacyFooterRowDef,CdkFooterRowDef,fixture.componentInstance.originalStickyFooter,booleanTable],
+    [MatLegacyRowDef,CdkRowDef,fixture.componentInstance.originalRowDefinition,textTable],
+  ] as const){
+    const manual=new Owned(nodeDefinition.template,suppliedDiffers,suppliedTable);
+    manual.columns=['a','b'];manual.ngOnChanges({columns:new SimpleChange(undefined,manual.columns,true)});
+    manual.getColumnsDiff();manual.columns=['b','c'];
+    const changes=manual.getColumnsDiff(),added=[],removed=[];
+    changes?.forEachAddedItem(item=>added.push(item.item));
+    changes?.forEachRemovedItem(item=>removed.push(item.item));
+    definitionConstructorObservations.push({name:Owned.name,
+      manual_table:manual._table===suppliedTable,
+      manual_identity:manual instanceof Owned&&manual instanceof Peer,
+      original_name:manual.template===nodeDefinition.template&&added.join(',')==='c'&&removed.join(',')==='a',
+      node_table:nodeDefinition._table===expectedTable});
+  }
+  const tableDefinitionOriginalConstructors=definitionConstructorObservations.length===4
+    &&definitionCallerDestroyed===0
+    &&definitionConstructorObservations.every(row=>Object.entries(row).every(([key,value])=>key==='name'||value===true));
   const nodeTextColumn=fixture.componentInstance.originalTextColumn;
   const manualTextColumn=new MatLegacyTextColumn(textTable,ORIGINAL_TEXT_OPTIONS);
   const manualTextFields=manualTextColumn as any;
@@ -1652,7 +1684,7 @@ async function main() {
       selectOpened === true &&
       selectClosed === true &&
       tabCount === 2 &&
-      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor && tabContentOriginalConstructor && noDataRowOriginalConstructor && constructorBorrowedProviderLifecycle && tableOriginalStickyBehavior && tableOriginalBooleanInputs && tableRecycleRowIdentity,
+      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor && tabContentOriginalConstructor && noDataRowOriginalConstructor && constructorBorrowedProviderLifecycle && tableOriginalStickyBehavior && tableOriginalBooleanInputs && tableRecycleRowIdentity && tableDefinitionOriginalConstructors,
     buttonText: text,
     selectIsOpen: isOpen,
     dialogText,
@@ -1689,6 +1721,7 @@ async function main() {
     tableOriginalStickyBehavior, stickyObservations,
     tableOriginalBooleanInputs, tableBooleanObservations,
     tableRecycleRowIdentity, recycleObservations,
+    tableDefinitionOriginalConstructors, definitionConstructorObservations, definitionCallerDestroyed,
     checkboxAttribute, slideToggleAttribute, sliderAttribute, tabLinkAttribute,
     commonModuleDiagnostics:{contrastLifecycle,contrastProbeReads,sanityWarnings,checksEnabled,sanityDefault:TestBed.inject(MATERIAL_LEGACY_SANITY_CHECKS),sanityToken:String(MATERIAL_LEGACY_SANITY_CHECKS)},
     chipEventCounts:{removals:fixture.componentInstance.repeatRemovals,separators:fixture.componentInstance.repeatEnds},
