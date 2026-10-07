@@ -1,0 +1,4000 @@
+From 364d4783d643bf83c28cc15fceabdb3ff52aeb4f Mon Sep 17 00:00:00 2001
+From: Kristiyan Kostadinov <crisbeto@abv.bg>
+Date: Mon, 6 Nov 2023 11:00:15 +0100
+Subject: [PATCH] test(multiple): switch tests to new control flow
+
+Switches all of our tests to use the new control flow in order to validate that it works as expected.
+---
+ .../popover-edit/popover-edit.spec.ts         |  58 +--
+ .../selection/selection.spec.ts               |  60 ++--
+ .../table-scroll-container.spec.ts            |  16 +-
+ src/cdk/a11y/focus-trap/focus-trap.spec.ts    |  22 +-
+ src/cdk/drag-drop/directives/drag.spec.ts     | 329 ++++++++++--------
+ src/cdk/drag-drop/drag-drop.md                |  14 +-
+ src/cdk/listbox/listbox.spec.ts               |  12 +-
+ src/cdk/menu/pointer-focus-tracker.spec.ts    |   4 +-
+ src/cdk/portal/portal.spec.ts                 |  14 +-
+ .../scrolling/virtual-scroll-viewport.spec.ts |   4 +-
+ src/cdk/table/table.spec.ts                   |  48 +--
+ .../testing/tests/test-main-component.html    |   4 +-
+ src/cdk/testing/tests/test-sub-component.ts   |   4 +-
+ src/cdk/tree/tree.spec.ts                     |   8 +-
+ src/google-maps/README.md                     |   6 +-
+ .../map-directions-renderer/README.md         |   5 +-
+ src/google-maps/map-info-window/README.md     |  10 +-
+ .../map-marker-clusterer/README.md            |   5 +-
+ .../map-marker-clusterer.spec.ts              |  12 +-
+ src/google-maps/map-marker/README.md          |   6 +-
+ src/material/autocomplete/autocomplete.md     |   4 +-
+ .../autocomplete/autocomplete.spec.ts         | 119 ++++---
+ .../testing/autocomplete-harness.spec.ts      |  16 +-
+ .../button-toggle/button-toggle.spec.ts       |  32 +-
+ src/material/chips/chip-grid.spec.ts          |  24 +-
+ src/material/chips/chip-listbox.spec.ts       |  43 ++-
+ src/material/chips/chip-option.spec.ts        |  24 +-
+ src/material/chips/chip-row.spec.ts           |  28 +-
+ src/material/chips/chip-set.spec.ts           |  16 +-
+ src/material/chips/chip.spec.ts               |  18 +-
+ src/material/chips/chips.md                   |  19 +-
+ .../testing/chip-listbox-harness.spec.ts      |   8 +-
+ src/material/core/ripple/ripple.spec.ts       |   8 +-
+ .../datepicker/datepicker-actions.spec.ts     |  10 +-
+ src/material/dialog/dialog.spec.ts            |  31 +-
+ src/material/divider/divider.md               |  28 +-
+ src/material/expansion/accordion.spec.ts      |  10 +-
+ src/material/expansion/expansion.spec.ts      |  13 +-
+ src/material/form-field/form-field.md         |   2 +-
+ src/material/grid-list/grid-list.spec.ts      |  20 +-
+ .../testing/grid-list-harness.spec.ts         |   4 +-
+ src/material/icon/icon.spec.ts                |   2 +-
+ src/material/input/input.spec.ts              |  12 +-
+ src/material/list/list.md                     | 106 +++---
+ src/material/list/list.spec.ts                |  84 +++--
+ src/material/list/selection-list.spec.ts      |  44 ++-
+ src/material/menu/menu.spec.ts                |  44 +--
+ .../progress-spinner/progress-spinner.spec.ts |   8 +-
+ src/material/radio/radio.spec.ts              |  33 +-
+ .../radio/testing/radio-harness.spec.ts       |  42 +--
+ src/material/select/select.md                 |  17 +-
+ src/material/select/select.spec.ts            | 207 ++++++-----
+ .../select/testing/select-harness.spec.ts     |  24 +-
+ src/material/sidenav/drawer.spec.ts           |  16 +-
+ src/material/sidenav/sidenav.spec.ts          |   8 +-
+ src/material/snack-bar/snack-bar.spec.ts      |   2 +-
+ .../sort/testing/sort-harness.spec.ts         |  16 +-
+ src/material/stepper/stepper.spec.ts          |  56 +--
+ src/material/tabs/tab-group.spec.ts           |  34 +-
+ src/material/tabs/tab-header.spec.ts          |   9 +-
+ .../tabs/tab-nav-bar/tab-nav-bar.spec.ts      |  27 +-
+ src/material/toolbar/toolbar.spec.ts          |   8 +-
+ src/material/tooltip/tooltip.spec.ts          |  31 +-
+ src/material/tree/tree.spec.ts                |  16 +-
+ src/youtube-player/youtube-player.spec.ts     |  24 +-
+ 65 files changed, 1159 insertions(+), 829 deletions(-)
+
+diff --git a/src/cdk-experimental/popover-edit/popover-edit.spec.ts b/src/cdk-experimental/popover-edit/popover-edit.spec.ts
+index 950c572cc538..7a7b0bd1a605 100644
+--- a/src/cdk-experimental/popover-edit/popover-edit.spec.ts
++++ b/src/cdk-experimental/popover-edit/popover-edit.spec.ts
+@@ -194,18 +194,20 @@ abstract class BaseTestComponent {
+       ${WEIGHT_EDIT_TEMPLATE}
+     </ng-template>
+ 
+-    <tr *ngFor="let element of elements">
+-      <td> just a cell </td>
+-
+-      <td ${POPOVER_EDIT_DIRECTIVE_NAME}
+-          [cdkPopoverEditContext]="element">
+-        ${CELL_TEMPLATE}
+-      </td>
+-
+-      <td ${POPOVER_EDIT_DIRECTIVE_WEIGHT}>
+-        {{element.weight}}
+-      </td>
+-    </tr>
++    @for (element of elements; track element) {
++      <tr>
++        <td> just a cell </td>
++
++        <td ${POPOVER_EDIT_DIRECTIVE_NAME}
++            [cdkPopoverEditContext]="element">
++          ${CELL_TEMPLATE}
++        </td>
++
++        <td ${POPOVER_EDIT_DIRECTIVE_WEIGHT}>
++          {{element.weight}}
++        </td>
++      </tr>
++    }
+   </table>
+   `,
+ })
+@@ -220,25 +222,27 @@ class VanillaTableOutOfCell extends BaseTestComponent {
+ @Component({
+   template: `
+   <table #table editable [dir]="direction">
+-    <tr *ngFor="let element of elements">
+-      <td> just a cell </td>
++    @for (element of elements; track element) {
++      <tr>
++        <td> just a cell </td>
+ 
+-      <td ${POPOVER_EDIT_DIRECTIVE_NAME}>
+-        ${CELL_TEMPLATE}
++        <td ${POPOVER_EDIT_DIRECTIVE_NAME}>
++          ${CELL_TEMPLATE}
+ 
+-        <ng-template #nameEdit>
+-          ${NAME_EDIT_TEMPLATE}
+-        </ng-template>
+-      </td>
++          <ng-template #nameEdit>
++            ${NAME_EDIT_TEMPLATE}
++          </ng-template>
++        </td>
+ 
+-      <td ${POPOVER_EDIT_DIRECTIVE_WEIGHT}>
+-        {{element.weight}}
++        <td ${POPOVER_EDIT_DIRECTIVE_WEIGHT}>
++          {{element.weight}}
+ 
+-        <ng-template #weightEdit>
+-          ${WEIGHT_EDIT_TEMPLATE}
+-        </ng-template>
+-      </td>
+-    </tr>
++          <ng-template #weightEdit>
++            ${WEIGHT_EDIT_TEMPLATE}
++          </ng-template>
++        </td>
++      </tr>
++    }
+   </table>
+   `,
+ })
+diff --git a/src/cdk-experimental/selection/selection.spec.ts b/src/cdk-experimental/selection/selection.spec.ts
+index 0a15f2bd45d1..757ee64cd85e 100644
+--- a/src/cdk-experimental/selection/selection.spec.ts
++++ b/src/cdk-experimental/selection/selection.spec.ts
+@@ -442,15 +442,17 @@ describe('cdkSelectionColumn with multiple = false', () => {
+       <button cdkSelectAll #toggleAll="cdkSelectAll" (click)="toggleAll.toggle($event)">
+         {{selectAllState(toggleAll.indeterminate | async, toggleAll.checked | async)}}
+       </button>
+-      <li *ngFor="let item of data; index as i">
+-        <button cdkSelectionToggle #toggle="cdkSelectionToggle"
+-            [cdkSelectionToggleValue]="item"
+-            [cdkSelectionToggleIndex]="i"
+-            (click)="toggle.toggle()">
+-          {{(toggle.checked | async) ? 'checked' : 'unchecked'}}
+-        </button>
+-        {{item}}
+-      </li>
++      @for (item of data; track item; let i = $index) {
++        <li>
++          <button cdkSelectionToggle #toggle="cdkSelectionToggle"
++              [cdkSelectionToggleValue]="item"
++              [cdkSelectionToggleIndex]="i"
++              (click)="toggle.toggle()">
++            {{(toggle.checked | async) ? 'checked' : 'unchecked'}}
++          </button>
++          {{item}}
++        </li>
++      }
+     </ul>`,
+ })
+ class ListWithMultiSelection {
+@@ -460,7 +462,10 @@ class ListWithMultiSelection {
+ 
+   selectionChange?: SelectionChange<string>;
+ 
+-  constructor(private readonly _elementRef: ElementRef, private readonly _cdr: ChangeDetectorRef) {}
++  constructor(
++    private readonly _elementRef: ElementRef,
++    private readonly _cdr: ChangeDetectorRef,
++  ) {}
+ 
+   selectAllState(indeterminateState: boolean | null, checkedState: boolean | null): string {
+     if (indeterminateState) {
+@@ -502,15 +507,17 @@ class ListWithMultiSelection {
+   template: `
+     <ul cdkSelection [dataSource]="data" [cdkSelectionMultiple]="false"
+         (cdkSelectionChange)="selectionChange = $event" >
+-      <li *ngFor="let item of data; index as i">
+-        <button cdkSelectionToggle #toggle="cdkSelectionToggle"
+-            [cdkSelectionToggleValue]="item"
+-            [cdkSelectionToggleIndex]="i"
+-            (click)="toggle.toggle()">
+-          {{(toggle.checked | async) ? 'checked' : 'unchecked'}}
+-        </button>
+-        {{item}}
+-      </li>
++      @for (item of data; track item; let i = $index) {
++        <li>
++          <button cdkSelectionToggle #toggle="cdkSelectionToggle"
++              [cdkSelectionToggleValue]="item"
++              [cdkSelectionToggleIndex]="i"
++              (click)="toggle.toggle()">
++            {{(toggle.checked | async) ? 'checked' : 'unchecked'}}
++          </button>
++          {{item}}
++        </li>
++      }
+     </ul>`,
+ })
+ class ListWithSingleSelection {
+@@ -530,7 +537,10 @@ class ListWithSingleSelection {
+     this._cdr.detectChanges();
+   }
+ 
+-  constructor(private readonly _elementRef: ElementRef, private readonly _cdr: ChangeDetectorRef) {}
++  constructor(
++    private readonly _elementRef: ElementRef,
++    private readonly _cdr: ChangeDetectorRef,
++  ) {}
+ 
+   getSelectionToggle(index: number) {
+     return this._elementRef.nativeElement.querySelectorAll('[cdkselectiontoggle]')[index];
+@@ -585,7 +595,10 @@ class MultiSelectTableWithSelectionColumn {
+     this._cdr.detectChanges();
+   }
+ 
+-  constructor(readonly elementRef: ElementRef, private readonly _cdr: ChangeDetectorRef) {}
++  constructor(
++    readonly elementRef: ElementRef,
++    private readonly _cdr: ChangeDetectorRef,
++  ) {}
+ 
+   getSelectAll(): HTMLInputElement {
+     return this.elementRef.nativeElement.querySelector('input[cdkselectall]');
+@@ -632,7 +645,10 @@ class SingleSelectTableWithSelectionColumn {
+     this._cdr.detectChanges();
+   }
+ 
+-  constructor(readonly elementRef: ElementRef, private readonly _cdr: ChangeDetectorRef) {}
++  constructor(
++    readonly elementRef: ElementRef,
++    private readonly _cdr: ChangeDetectorRef,
++  ) {}
+ 
+   getSelectionToggle(index: number): HTMLInputElement {
+     return this.elementRef.nativeElement.querySelectorAll('input[cdkselectiontoggle]')[index];
+diff --git a/src/cdk-experimental/table-scroll-container/table-scroll-container.spec.ts b/src/cdk-experimental/table-scroll-container/table-scroll-container.spec.ts
+index 1c152347c069..4fffaff7cfc9 100644
+--- a/src/cdk-experimental/table-scroll-container/table-scroll-container.spec.ts
++++ b/src/cdk-experimental/table-scroll-container/table-scroll-container.spec.ts
+@@ -247,13 +247,15 @@ class FakeDataSource extends DataSource<TestData> {
+   template: `
+     <div cdkTableScrollContainer>
+     <table cdk-table [dataSource]="dataSource">
+-      <ng-container [cdkColumnDef]="column" *ngFor="let column of columns"
+-                    [sticky]="isStuck(stickyStartColumns, column)"
+-                    [stickyEnd]="isStuck(stickyEndColumns, column)">
+-        <th cdk-header-cell *cdkHeaderCellDef> Header {{column}} </th>
+-        <td cdk-cell *cdkCellDef="let row"> {{column}} </td>
+-        <td cdk-footer-cell *cdkFooterCellDef> Footer {{column}} </td>
+-      </ng-container>
++      @for (column of columns; track column) {
++        <ng-container [cdkColumnDef]="column"
++                      [sticky]="isStuck(stickyStartColumns, column)"
++                      [stickyEnd]="isStuck(stickyEndColumns, column)">
++          <th cdk-header-cell *cdkHeaderCellDef> Header {{column}} </th>
++          <td cdk-cell *cdkCellDef="let row"> {{column}} </td>
++          <td cdk-footer-cell *cdkFooterCellDef> Footer {{column}} </td>
++        </ng-container>
++      }
+ 
+       <tr cdk-header-row *cdkHeaderRowDef="columns; sticky: isStuck(stickyHeaders, 'header-1')">
+       </tr>
+diff --git a/src/cdk/a11y/focus-trap/focus-trap.spec.ts b/src/cdk/a11y/focus-trap/focus-trap.spec.ts
+index 7c8bbfe0b76d..6038356b930a 100644
+--- a/src/cdk/a11y/focus-trap/focus-trap.spec.ts
++++ b/src/cdk/a11y/focus-trap/focus-trap.spec.ts
+@@ -339,10 +339,12 @@ class SimpleFocusTrap {
+ 
+ const AUTO_FOCUS_TEMPLATE = `
+   <button type="button">Toggle</button>
+-  <div *ngIf="showTrappedRegion" cdkTrapFocus [cdkTrapFocusAutoCapture]="autoCaptureEnabled">
+-    <input id="auto-capture-target">
+-    <button>SAVE</button>
+-  </div>
++  @if (showTrappedRegion) {
++    <div cdkTrapFocus [cdkTrapFocusAutoCapture]="autoCaptureEnabled">
++      <input id="auto-capture-target">
++      <button>SAVE</button>
++    </div>
++  }
+ `;
+ 
+ @Component({template: AUTO_FOCUS_TEMPLATE})
+@@ -360,11 +362,13 @@ class FocusTrapWithAutoCaptureInShadowDom extends FocusTrapWithAutoCapture {}
+ 
+ @Component({
+   template: `
+-    <div *ngIf="renderFocusTrap" [cdkTrapFocus]="_isFocusTrapEnabled">
+-      <input>
+-      <button>SAVE</button>
+-    </div>
+-    `,
++    @if (renderFocusTrap) {
++      <div [cdkTrapFocus]="_isFocusTrapEnabled">
++        <input>
++        <button>SAVE</button>
++      </div>
++    }
++  `,
+ })
+ class FocusTrapWithBindings {
+   @ViewChild(CdkTrapFocus) focusTrapDirective: CdkTrapFocus;
+diff --git a/src/cdk/drag-drop/directives/drag.spec.ts b/src/cdk/drag-drop/directives/drag.spec.ts
+index 8c5ca6a3d05b..3398aed91e2e 100644
+--- a/src/cdk/drag-drop/directives/drag.spec.ts
++++ b/src/cdk/drag-drop/directives/drag.spec.ts
+@@ -6,7 +6,7 @@ import {
+   dispatchMouseEvent,
+   dispatchTouchEvent,
+   dispatchFakeEvent,
+-} from '../../testing/private';
++} from '@angular/cdk/testing/private';
+ import {
+   AfterViewInit,
+   ChangeDetectionStrategy,
+@@ -6725,10 +6725,11 @@ class StandaloneDraggableWithPreDisabledHandle {
+   template: `
+     <div #dragElement cdkDrag
+       style="width: 100px; height: 100px; background: red; position: relative">
+-      <div
+-        #handleElement
+-        *ngIf="showHandle"
+-        cdkDragHandle style="width: 10px; height: 10px; background: green;"></div>
++      @if (showHandle) {
++        <div
++          #handleElement
++          cdkDragHandle style="width: 10px; height: 10px; background: green;"></div>
++      }
+     </div>
+   `,
+ })
+@@ -6806,6 +6807,7 @@ class StandaloneDraggableWithMultipleHandles {
+   @ViewChildren(CdkDragHandle) handles: QueryList<CdkDragHandle>;
+ }
+ 
++// TODO(crisbeto): figure out why switch `*ngFor` with `@for` here causes a test failure.
+ const DROP_ZONE_FIXTURE_TEMPLATE = `
+   <div
+     cdkDropList
+@@ -6945,7 +6947,7 @@ class DraggableInScrollableParentContainer extends DraggableInDropZone implement
+ }
+ 
+ @Component({
+-  // Note that we need the blank `ngSwitch` below to hit the code path that we're testing.
++  // Note that we need the blank `@if` below to hit the code path that we're testing.
+   template: `
+     <div
+       cdkDropList
+@@ -6955,16 +6957,17 @@ class DraggableInScrollableParentContainer extends DraggableInDropZone implement
+       [cdkDropListData]="items"
+       (cdkDropListSorted)="sortedSpy($event)"
+       (cdkDropListDropped)="droppedSpy($event)">
+-        <ng-container [ngSwitch]="true">
+-          <div
+-            *ngFor="let item of items"
+-            cdkDrag
+-            [cdkDragData]="item"
+-            [cdkDragBoundary]="boundarySelector"
+-            [style.height.px]="item.height"
+-            [style.margin-bottom.px]="item.margin"
+-            style="width: 100%; background: red;">{{item.value}}</div>
+-        </ng-container>
++        @if (true) {
++          @for (item of items; track item) {
++            <div
++              cdkDrag
++              [cdkDragData]="item"
++              [cdkDragBoundary]="boundarySelector"
++              [style.height.px]="item.height"
++              [style.margin-bottom.px]="item.margin"
++              style="width: 100%; background: red;">{{item.value}}</div>
++          }
++        }
+     </div>
+   `,
+ })
+@@ -6993,12 +6996,13 @@ const HORIZONTAL_FIXTURE_TEMPLATE = `
+     cdkDropListOrientation="horizontal"
+     [cdkDropListData]="items"
+     (cdkDropListDropped)="droppedSpy($event)">
+-    <div
+-      *ngFor="let item of items"
+-      [style.width.px]="item.width"
+-      [style.margin-right.px]="item.margin"
+-      [cdkDragBoundary]="boundarySelector"
+-      cdkDrag>{{item.value}}</div>
++    @for (item of items; track item) {
++      <div
++        [style.width.px]="item.width"
++        [style.margin-right.px]="item.margin"
++        [cdkDragBoundary]="boundarySelector"
++        cdkDrag>{{item.value}}</div>
++    }
+   </div>
+ `;
+ 
+@@ -7058,26 +7062,29 @@ class DraggableInScrollableHorizontalDropZone extends DraggableInHorizontalDropZ
+   }
+ }
+ 
++// TODO(crisbeto): `*ngIf` here can be removed after updating to a version of Angular that includes
++// https://github.com/angular/angular/pull/52515
+ @Component({
+   template: `
+     <div cdkDropList style="width: 100px; background: pink;">
+-      <div
+-        *ngFor="let item of items"
+-        cdkDrag
+-        [cdkDragConstrainPosition]="constrainPosition"
+-        [cdkDragBoundary]="boundarySelector"
+-        [cdkDragPreviewClass]="previewClass"
+-        style="width: 100%; height: ${ITEM_HEIGHT}px; background: red;">
+-          {{item}}
+-
+-          <ng-container *ngIf="renderCustomPreview">
+-            <ng-template cdkDragPreview [matchSize]="matchPreviewSize">
+-              <div
+-                class="custom-preview"
+-                style="width: 50px; height: 50px; background: purple;">Custom preview</div>
+-            </ng-template>
+-          </ng-container>
+-      </div>
++      @for (item of items; track item) {
++        <div
++          cdkDrag
++          [cdkDragConstrainPosition]="constrainPosition"
++          [cdkDragBoundary]="boundarySelector"
++          [cdkDragPreviewClass]="previewClass"
++          style="width: 100%; height: ${ITEM_HEIGHT}px; background: red;">
++            {{item}}
++
++            <ng-container *ngIf="renderCustomPreview">
++              <ng-template cdkDragPreview [matchSize]="matchPreviewSize">
++                <div
++                  class="custom-preview"
++                  style="width: 50px; height: 50px; background: purple;">Custom preview</div>
++              </ng-template>
++            </ng-container>
++        </div>
++      }
+     </div>
+   `,
+ })
+@@ -7095,15 +7102,16 @@ class DraggableInDropZoneWithCustomPreview {
+ @Component({
+   template: `
+     <div cdkDropList style="width: 100px; background: pink;">
+-      <div
+-        *ngFor="let item of items"
+-        cdkDrag
+-        [cdkDragConstrainPosition]="constrainPosition"
+-        [cdkDragBoundary]="boundarySelector"
+-        style="width: 100%; height: ${ITEM_HEIGHT}px; background: red;">
+-          {{item}}
+-          <ng-template cdkDragPreview>Hello {{item}}</ng-template>
+-      </div>
++      @for (item of items; track item) {
++        <div
++          cdkDrag
++          [cdkDragConstrainPosition]="constrainPosition"
++          [cdkDragBoundary]="boundarySelector"
++          style="width: 100%; height: ${ITEM_HEIGHT}px; background: red;">
++            {{item}}
++            <ng-template cdkDragPreview>Hello {{item}}</ng-template>
++        </div>
++      }
+     </div>
+   `,
+ })
+@@ -7116,16 +7124,15 @@ class DraggableInDropZoneWithCustomTextOnlyPreview {
+ @Component({
+   template: `
+     <div cdkDropList style="width: 100px; background: pink;">
+-      <div
+-        *ngFor="let item of items"
+-        cdkDrag
+-        style="width: 100%; height: ${ITEM_HEIGHT}px; background: red;">
++      @for (item of items; track item) {
++        <div cdkDrag style="width: 100%; height: ${ITEM_HEIGHT}px; background: red;">
+           {{item}}
+           <ng-template cdkDragPreview>
+             <span>Hello</span>
+             <span>{{item}}</span>
+           </ng-template>
+-      </div>
++        </div>
++      }
+     </div>
+   `,
+ })
+@@ -7141,16 +7148,17 @@ class DraggableInDropZoneWithCustomMultiNodePreview {
+       cdkDropList
+       (cdkDropListDropped)="droppedSpy($event)"
+       style="width: 100px; background: pink;">
+-      <div *ngFor="let item of items" cdkDrag
+-        style="width: 100%; height: ${ITEM_HEIGHT}px; background: red;">
++      @for (item of items; track item) {
++        <div cdkDrag style="width: 100%; height: ${ITEM_HEIGHT}px; background: red;">
+           {{item}}
+-          <ng-container *ngIf="renderPlaceholder">
++          @if (renderPlaceholder) {
+             <div
+               class="custom-placeholder"
+               [ngClass]="extraPlaceholderClass"
+               *cdkDragPlaceholder>Custom placeholder</div>
+-          </ng-container>
+-      </div>
++          }
++        </div>
++      }
+     </div>
+   `,
+   styles: [
+@@ -7172,11 +7180,12 @@ class DraggableInDropZoneWithCustomPlaceholder {
+ @Component({
+   template: `
+     <div cdkDropList style="width: 100px; background: pink;">
+-      <div *ngFor="let item of items" cdkDrag
+-        style="width: 100%; height: ${ITEM_HEIGHT}px; background: red;">
++      @for (item of items; track item) {
++        <div cdkDrag style="width: 100%; height: ${ITEM_HEIGHT}px; background: red;">
+           {{item}}
+           <ng-template cdkDragPlaceholder>Hello {{item}}</ng-template>
+-      </div>
++        </div>
++      }
+     </div>
+   `,
+ })
+@@ -7188,14 +7197,15 @@ class DraggableInDropZoneWithCustomTextOnlyPlaceholder {
+ @Component({
+   template: `
+     <div cdkDropList style="width: 100px; background: pink;">
+-      <div *ngFor="let item of items" cdkDrag
+-        style="width: 100%; height: ${ITEM_HEIGHT}px; background: red;">
++      @for (item of items; track item) {
++        <div cdkDrag style="width: 100%; height: ${ITEM_HEIGHT}px; background: red;">
+           {{item}}
+           <ng-template cdkDragPlaceholder>
+             <span>Hello</span>
+             <span>{{item}}</span>
+           </ng-template>
+-      </div>
++        </div>
++      }
+     </div>
+   `,
+ })
+@@ -7229,11 +7239,12 @@ const CONNECTED_DROP_ZONES_TEMPLATE = `
+     [cdkDropListConnectedTo]="[doneZone]"
+     (cdkDropListDropped)="droppedSpy($event)"
+     (cdkDropListEntered)="enteredSpy($event)">
+-    <div
+-      [cdkDragData]="item"
+-      (cdkDragEntered)="itemEnteredSpy($event)"
+-      *ngFor="let item of todo"
+-      cdkDrag>{{item}}</div>
++    @for (item of todo; track item) {
++      <div
++        [cdkDragData]="item"
++        (cdkDragEntered)="itemEnteredSpy($event)"
++        cdkDrag>{{item}}</div>
++    }
+   </div>
+ 
+   <div
+@@ -7243,11 +7254,12 @@ const CONNECTED_DROP_ZONES_TEMPLATE = `
+     [cdkDropListConnectedTo]="[todoZone]"
+     (cdkDropListDropped)="droppedSpy($event)"
+     (cdkDropListEntered)="enteredSpy($event)">
+-    <div
+-      [cdkDragData]="item"
+-      (cdkDragEntered)="itemEnteredSpy($event)"
+-      *ngFor="let item of done"
+-      cdkDrag>{{item}}</div>
++    @for (item of done; track item) {
++      <div
++        [cdkDragData]="item"
++        (cdkDragEntered)="itemEnteredSpy($event)"
++        cdkDrag>{{item}}</div>
++    }
+   </div>
+ 
+   <div
+@@ -7256,11 +7268,12 @@ const CONNECTED_DROP_ZONES_TEMPLATE = `
+     [cdkDropListData]="extra"
+     (cdkDropListDropped)="droppedSpy($event)"
+     (cdkDropListEntered)="enteredSpy($event)">
+-    <div
+-      [cdkDragData]="item"
+-      (cdkDragEntered)="itemEnteredSpy($event)"
+-      *ngFor="let item of extra"
+-      cdkDrag>{{item}}</div>
++    @for (item of extra; track item) {
++      <div
++        [cdkDragData]="item"
++        (cdkDragEntered)="itemEnteredSpy($event)"
++        cdkDrag>{{item}}</div>
++    }
+   </div>
+ `;
+ 
+@@ -7295,7 +7308,7 @@ class ConnectedDropZones implements AfterViewInit {
+ @Component({
+   encapsulation: ViewEncapsulation.ShadowDom,
+   styles: CONNECTED_DROP_ZONES_STYLES,
+-  template: `<div *ngIf="true">${CONNECTED_DROP_ZONES_TEMPLATE}</div>`,
++  template: `@if (true) {${CONNECTED_DROP_ZONES_TEMPLATE}}`,
+ })
+ class ConnectedDropZonesInsideShadowRootWithNgIf extends ConnectedDropZones {}
+ 
+@@ -7323,14 +7336,18 @@ class ConnectedDropZonesInsideShadowRootWithNgIf extends ConnectedDropZones {}
+         cdkDropList
+         [cdkDropListData]="todo"
+         (cdkDropListDropped)="droppedSpy($event)">
+-        <div [cdkDragData]="item" *ngFor="let item of todo" cdkDrag>{{item}}</div>
++        @for (item of todo; track item) {
++  <div [cdkDragData]="item" cdkDrag>{{item}}</div>
++}
+       </div>
+ 
+       <div
+         cdkDropList
+         [cdkDropListData]="done"
+         (cdkDropListDropped)="droppedSpy($event)">
+-        <div [cdkDragData]="item" *ngFor="let item of done" cdkDrag>{{item}}</div>
++        @for (item of done; track item) {
++          <div [cdkDragData]="item" cdkDrag>{{item}}</div>
++        }
+       </div>
+     </div>
+   `,
+@@ -7445,10 +7462,12 @@ class DropListOnNgContainer {}
+   changeDetection: ChangeDetectionStrategy.OnPush,
+   template: `
+     <div cdkDropList style="width: 100px; background: pink;">
+-      <div *ngFor="let item of items"
+-        cdkDrag
+-        [style.height.px]="item.height"
+-        style="width: 100%; background: red;">{{item.value}}</div>
++      @for (item of items; track item) {
++        <div
++          cdkDrag
++          [style.height.px]="item.height"
++          style="width: 100%; background: red;">{{item.value}}</div>
++      }
+     </div>
+   `,
+ })
+@@ -7503,16 +7522,17 @@ class ConnectedWrappedDropZones {
+       [cdkDropListData]="items"
+       (cdkDropListSorted)="sortedSpy($event)"
+       (cdkDropListDropped)="droppedSpy($event)">
+-      <div
+-        *ngFor="let item of items"
+-        cdkDrag
+-        [cdkDragData]="item"
+-        [style.height.px]="item.height"
+-        [style.margin-bottom.px]="item.margin"
+-        style="width: 100%; background: red;">
+-          {{item.value}}
+-          <canvas width="100px" height="100px"></canvas>
+-        </div>
++      @for (item of items; track item) {
++        <div
++          cdkDrag
++          [cdkDragData]="item"
++          [style.height.px]="item.height"
++          [style.margin-bottom.px]="item.margin"
++          style="width: 100%; background: red;">
++            {{item.value}}
++            <canvas width="100px" height="100px"></canvas>
++          </div>
++        }
+     </div>
+   `,
+ })
+@@ -7546,16 +7566,17 @@ class DraggableWithCanvasInDropZone extends DraggableInDropZone implements After
+       [cdkDropListData]="items"
+       (cdkDropListSorted)="sortedSpy($event)"
+       (cdkDropListDropped)="droppedSpy($event)">
+-      <div
+-        *ngFor="let item of items"
+-        cdkDrag
+-        [cdkDragData]="item"
+-        [style.height.px]="item.height"
+-        [style.margin-bottom.px]="item.margin"
+-        style="width: 100%; background: red;">
+-          {{item.value}}
+-          <canvas width="0" height="0"></canvas>
+-        </div>
++      @for (item of items; track item) {
++        <div
++          cdkDrag
++          [cdkDragData]="item"
++          [style.height.px]="item.height"
++          [style.margin-bottom.px]="item.margin"
++          style="width: 100%; background: red;">
++            {{item.value}}
++            <canvas width="0" height="0"></canvas>
++          </div>
++        }
+     </div>
+   `,
+ })
+@@ -7576,7 +7597,9 @@ class PassthroughComponent {}
+   selector: 'wrapped-drop-container',
+   template: `
+     <div cdkDropList [cdkDropListData]="items">
+-      <div *ngFor="let item of items" cdkDrag>{{item}}</div>
++      @for (item of items; track item) {
++        <div cdkDrag>{{item}}</div>
++      }
+     </div>
+   `,
+   changeDetection: ChangeDetectionStrategy.OnPush,
+@@ -7695,10 +7718,11 @@ class NestedDragsThroughTemplate {
+   template: `
+     <div cdkDropList class="drop-list" #outerList>
+       <div cdkDropList class="drop-list" #innerList>
+-        <div
+-          *ngFor="let item of items"
+-          cdkDrag
+-          style="width: 100%; background: red; height: ${ITEM_HEIGHT}px;">{{item}}</div>
++        @for (item of items; track item) {
++          <div
++            cdkDrag
++            style="width: 100%; background: red; height: ${ITEM_HEIGHT}px;">{{item}}</div>
++        }
+       </div>
+     </div>
+   `,
+@@ -7743,13 +7767,14 @@ class PlainStandaloneDropList {
+   ],
+   template: `
+     <div class="list" cdkDropList cdkDropListOrientation="horizontal">
+-      <div *ngFor="let item of items" class="item" cdkDrag>
+-        {{item}}
+-
+-        <ng-template cdkDragPreview [matchSize]="true">
+-          <div class="item">{{item}}</div>
+-        </ng-template>
+-      </div>
++      @for (item of items; track item) {
++        <div class="item" cdkDrag>
++          {{item}}
++          <ng-template cdkDragPreview [matchSize]="true">
++            <div class="item">{{item}}</div>
++          </ng-template>
++        </div>
++      }
+     </div>
+   `,
+ })
+@@ -7768,11 +7793,12 @@ class DraggableInHorizontalFlexDropZoneWithMatchSizePreview {
+       [cdkDropListConnectedTo]="[doneZone]"
+       (cdkDropListDropped)="droppedSpy($event)"
+       (cdkDropListEntered)="enteredSpy($event)">
+-      <div
+-        [cdkDragData]="item"
+-        (cdkDragEntered)="itemEnteredSpy($event)"
+-        *ngFor="let item of todo"
+-        cdkDrag>{{item}}</div>
++      @for (item of todo; track item) {
++        <div
++          [cdkDragData]="item"
++          (cdkDragEntered)="itemEnteredSpy($event)"
++          cdkDrag>{{item}}</div>
++      }
+     </div>
+ 
+     <div
+@@ -7785,11 +7811,12 @@ class DraggableInHorizontalFlexDropZoneWithMatchSizePreview {
+ 
+       <div>Hello there</div>
+       <div>
+-        <div
+-          [cdkDragData]="item"
+-          (cdkDragEntered)="itemEnteredSpy($event)"
+-          *ngFor="let item of done"
+-          cdkDrag>{{item}}</div>
++        @for (item of done; track item) {
++          <div
++            [cdkDragData]="item"
++            (cdkDragEntered)="itemEnteredSpy($event)"
++            cdkDrag>{{item}}</div>
++        }
+       </div>
+     </div>
+   `,
+@@ -7824,21 +7851,22 @@ class DraggableWithAlternateRootAndSelfHandle {
+       [cdkDropListData]="items"
+       (cdkDropListSorted)="sortedSpy($event)"
+       (cdkDropListDropped)="droppedSpy($event)">
+-      <div
+-        *ngFor="let item of items"
+-        cdkDrag
+-        [cdkDragData]="item"
+-        [style.height.px]="item.height"
+-        [style.margin-bottom.px]="item.margin"
+-        style="width: 100%; background: red;">
+-          {{item.value}}
+-          <input [value]="inputValue"/>
+-          <textarea [value]="inputValue"></textarea>
+-          <select [value]="inputValue">
+-            <option value="goodbye">Goodbye</option>
+-            <option value="hello">Hello</option>
+-          </select>
+-        </div>
++      @for (item of items; track item) {
++        <div
++          cdkDrag
++          [cdkDragData]="item"
++          [style.height.px]="item.height"
++          [style.margin-bottom.px]="item.margin"
++          style="width: 100%; background: red;">
++            {{item.value}}
++            <input [value]="inputValue"/>
++            <textarea [value]="inputValue"></textarea>
++            <select [value]="inputValue">
++              <option value="goodbye">Goodbye</option>
++              <option value="hello">Hello</option>
++            </select>
++          </div>
++      }
+     </div>
+   `,
+ })
+@@ -7852,13 +7880,14 @@ class DraggableWithInputsInDropZone extends DraggableInDropZone {
+       cdkDropList
+       class="drop-list scroll-container"
+       [cdkDropListData]="items">
+-      <div
+-        *ngFor="let item of items"
+-        cdkDrag
+-        [cdkDragData]="item">
+-          {{item.id}}
+-          <input type="radio" name="radio" [checked]="item.checked"/>
+-        </div>
++      @for (item of items; track item) {
++        <div
++          cdkDrag
++          [cdkDragData]="item">
++            {{item.id}}
++            <input type="radio" name="radio" [checked]="item.checked"/>
++          </div>
++      }
+     </div>
+   `,
+ })
+diff --git a/src/cdk/drag-drop/drag-drop.md b/src/cdk/drag-drop/drag-drop.md
+index 0c955660e0e1..bb8438e525d9 100644
+--- a/src/cdk/drag-drop/drag-drop.md
++++ b/src/cdk/drag-drop/drag-drop.md
+@@ -46,7 +46,9 @@ will be connected to all other lists automatically.
+ ```html
+ <div cdkDropListGroup>
+   <!-- All lists in here will be connected. -->
+-  <div cdkDropList *ngFor="let list of lists"></div>
++  @for (list of lists; track list) {
++    <div cdkDropList></div>
++  }
+ </div>
+ ```
+ 
+@@ -58,9 +60,13 @@ or `cdkDropListData`, respectively. Events fired from both directives include th
+ you to easily identify the origin of the drag or drop interaction.
+ 
+ ```html
+-<div cdkDropList [cdkDropListData]="list" *ngFor="let list of lists" (cdkDropListDropped)="drop($event)">
+-  <div cdkDrag [cdkDragData]="item" *ngFor="let item of list"></div>
+-</div>
++@for (list of lists; track list) {
++  <div cdkDropList [cdkDropListData]="list" (cdkDropListDropped)="drop($event)">
++    @for (item of list; track item) {
++      <div cdkDrag [cdkDragData]="item"></div>
++    }
++  </div>
++}
+ ```
+ 
+ ### Styling
+diff --git a/src/cdk/listbox/listbox.spec.ts b/src/cdk/listbox/listbox.spec.ts
+index 3a75f90bdb2d..a7a2c9837ce1 100644
+--- a/src/cdk/listbox/listbox.spec.ts
++++ b/src/cdk/listbox/listbox.spec.ts
+@@ -1004,7 +1004,9 @@ class ListboxWithFormControl {
+ @Component({
+   template: `
+     <div cdkListbox [formControl]="formControl">
+-      <div *ngFor="let option of options" [cdkOption]="option">{{option}}</div>
++      @for (option of options; track option) {
++        <div [cdkOption]="option">{{option}}</div>
++      }
+     </div>
+   `,
+ })
+@@ -1016,7 +1018,9 @@ class ListboxWithPreselectedFormControl {
+ @Component({
+   template: `
+     <div cdkListbox [formControl]="formControl">
+-      <div *ngFor="let option of options" [cdkOption]="option">{{option}}</div>
++      @for (option of options; track option) {
++        <div [cdkOption]="option">{{option}}</div>
++      }
+     </div>
+   `,
+ })
+@@ -1071,7 +1075,9 @@ class ListboxWithMultipleBoundValues {
+ @Component({
+   template: `
+     <div cdkListbox [cdkListboxCompareWith]="fruitCompare">
+-      <div *ngFor="let fruit of fruits" [cdkOption]="fruit">{{fruit.name}}</div>
++      @for (fruit of fruits; track fruit) {
++        <div [cdkOption]="fruit">{{fruit.name}}</div>
++      }
+     </div>
+   `,
+ })
+diff --git a/src/cdk/menu/pointer-focus-tracker.spec.ts b/src/cdk/menu/pointer-focus-tracker.spec.ts
+index 0e8c2ca43467..afa8f7ddc3e2 100644
+--- a/src/cdk/menu/pointer-focus-tracker.spec.ts
++++ b/src/cdk/menu/pointer-focus-tracker.spec.ts
+@@ -108,7 +108,9 @@ class MockWrapper implements FocusableElement {
+     <div>
+       <wrapper>First</wrapper>
+       <wrapper>Second</wrapper>
+-      <wrapper *ngIf="showThird">Third</wrapper>
++      @if (showThird) {
++        <wrapper>Third</wrapper>
++      }
+     </div>
+   `,
+ })
+diff --git a/src/cdk/portal/portal.spec.ts b/src/cdk/portal/portal.spec.ts
+index 2ac61c3cd067..df20e496453c 100644
+--- a/src/cdk/portal/portal.spec.ts
++++ b/src/cdk/portal/portal.spec.ts
+@@ -779,7 +779,10 @@ class ArbitraryViewContainerRefComponent {
+   @ViewChild('template') template: TemplateRef<any>;
+   @ViewChild(SaveParentNodeOnInit) saveParentNodeOnInit: SaveParentNodeOnInit;
+ 
+-  constructor(public viewContainerRef: ViewContainerRef, public injector: Injector) {}
++  constructor(
++    public viewContainerRef: ViewContainerRef,
++    public injector: Injector,
++  ) {}
+ }
+ 
+ /** Test-bed component that contains a portal outlet and a couple of template portals. */
+@@ -799,7 +802,9 @@ class ArbitraryViewContainerRefComponent {
+ 
+   <ng-template cdk-portal>
+     <ul>
+-      <li *ngFor="let fruitName of fruits"> {{fruitName}} </li>
++      @for (fruitName of fruits; track fruitName) {
++        <li> {{fruitName}} </li>
++      }
+     </ul>
+   </ng-template>
+ 
+@@ -825,7 +830,10 @@ class PortalTestApp {
+   fruits = ['Apple', 'Pineapple', 'Durian'];
+   attachedSpy = jasmine.createSpy('attached spy');
+ 
+-  constructor(public viewContainerRef: ViewContainerRef, public injector: Injector) {}
++  constructor(
++    public viewContainerRef: ViewContainerRef,
++    public injector: Injector,
++  ) {}
+ 
+   get cakePortal() {
+     return this.portals.first;
+diff --git a/src/cdk/scrolling/virtual-scroll-viewport.spec.ts b/src/cdk/scrolling/virtual-scroll-viewport.spec.ts
+index c61ec400f7d9..0b623dd0e36f 100644
+--- a/src/cdk/scrolling/virtual-scroll-viewport.spec.ts
++++ b/src/cdk/scrolling/virtual-scroll-viewport.spec.ts
+@@ -1419,9 +1419,9 @@ class VirtualScrollWithItemInjectingViewContainer {
+ @Component({
+   template: `
+     <cdk-virtual-scroll-viewport [itemSize]="itemSize">
+-      <ng-container *ngIf="renderVirtualFor">
++      @if (renderVirtualFor) {
+         <div class="item" *cdkVirtualFor="let item of items; trackBy: trackBy">{{item}}</div>
+-      </ng-container>
++      }
+     </cdk-virtual-scroll-viewport>
+   `,
+   styles: [
+diff --git a/src/cdk/table/table.spec.ts b/src/cdk/table/table.spec.ts
+index 798e41234f4f..1ac2f5cb3dce 100644
+--- a/src/cdk/table/table.spec.ts
++++ b/src/cdk/table/table.spec.ts
+@@ -2419,13 +2419,15 @@ class StickyPositioningListenerTest implements StickyPositioningListener {
+ @Component({
+   template: `
+     <cdk-table [dataSource]="dataSource" [dir]="dir">
+-      <ng-container [cdkColumnDef]="column" *ngFor="let column of columns"
+-                    [sticky]="isStuck(stickyStartColumns, column)"
+-                    [stickyEnd]="isStuck(stickyEndColumns, column)">
+-        <cdk-header-cell *cdkHeaderCellDef> Header {{column}} </cdk-header-cell>
+-        <cdk-cell *cdkCellDef>{{column}}</cdk-cell>
+-        <cdk-footer-cell *cdkFooterCellDef> Footer {{column}} </cdk-footer-cell>
+-      </ng-container>
++      @for (column of columns; track column) {
++        <ng-container [cdkColumnDef]="column"
++                      [sticky]="isStuck(stickyStartColumns, column)"
++                      [stickyEnd]="isStuck(stickyEndColumns, column)">
++          <cdk-header-cell *cdkHeaderCellDef> Header {{column}} </cdk-header-cell>
++          <cdk-cell *cdkCellDef>{{column}}</cdk-cell>
++          <cdk-footer-cell *cdkFooterCellDef> Footer {{column}} </cdk-footer-cell>
++        </ng-container>
++      }
+ 
+       <cdk-header-row *cdkHeaderRowDef="columns; sticky: isStuck(stickyHeaders, 'header-1')">
+       </cdk-header-row>
+@@ -2477,13 +2479,15 @@ class StickyFlexLayoutCdkTableApp extends StickyPositioningListenerTest {
+ @Component({
+   template: `
+     <table cdk-table [dataSource]="dataSource">
+-      <ng-container [cdkColumnDef]="column" *ngFor="let column of columns"
+-                    [sticky]="isStuck(stickyStartColumns, column)"
+-                    [stickyEnd]="isStuck(stickyEndColumns, column)">
+-        <th cdk-header-cell *cdkHeaderCellDef> Header {{column}} </th>
+-        <td cdk-cell *cdkCellDef="let row"> {{column}} </td>
+-        <td cdk-footer-cell *cdkFooterCellDef> Footer {{column}} </td>
+-      </ng-container>
++      @for (column of columns; track column) {
++        <ng-container [cdkColumnDef]="column"
++                      [sticky]="isStuck(stickyStartColumns, column)"
++                      [stickyEnd]="isStuck(stickyEndColumns, column)">
++          <th cdk-header-cell *cdkHeaderCellDef> Header {{column}} </th>
++          <td cdk-cell *cdkCellDef="let row"> {{column}} </td>
++          <td cdk-footer-cell *cdkFooterCellDef> Footer {{column}} </td>
++        </ng-container>
++      }
+ 
+       <tr cdk-header-row *cdkHeaderRowDef="columns; sticky: isStuck(stickyHeaders, 'header-1')">
+       </tr>
+@@ -2532,10 +2536,12 @@ class StickyNativeLayoutCdkTableApp extends StickyPositioningListenerTest {
+ @Component({
+   template: `
+     <cdk-table [dataSource]="dataSource">
+-      <ng-container [cdkColumnDef]="column" *ngFor="let column of dynamicColumns">
+-        <cdk-header-cell *cdkHeaderCellDef> {{column}} </cdk-header-cell>
+-        <cdk-cell *cdkCellDef="let row"> {{column}} </cdk-cell>
+-      </ng-container>
++      @for (column of dynamicColumns; track column) {
++        <ng-container [cdkColumnDef]="column">
++          <cdk-header-cell *cdkHeaderCellDef> {{column}} </cdk-header-cell>
++          <cdk-cell *cdkCellDef="let row"> {{column}} </cdk-cell>
++        </ng-container>
++      }
+ 
+       <cdk-header-row *cdkHeaderRowDef="dynamicColumns"></cdk-header-row>
+       <cdk-row *cdkRowDef="let row; columns: dynamicColumns;"></cdk-row>
+@@ -3007,15 +3013,15 @@ class NativeHtmlTableWithColgroupAndCol {
+ }
+ 
+ @Component({
+-  // Note that we need the `ngSwitch` below in order to surface the issue we're testing for.
++  // Note that we need the `@if` below in order to surface the issue we're testing for.
+   template: `
+     <cdk-table [dataSource]="dataSource">
+-      <ng-container [ngSwitch]="true">
++      @if (true) {
+         <ng-container cdkColumnDef="column_a">
+           <cdk-header-cell *cdkHeaderCellDef> Column A</cdk-header-cell>
+           <cdk-cell *cdkCellDef="let row"> {{row.a}}</cdk-cell>
+         </ng-container>
+-      </ng-container>
++      }
+ 
+       <cdk-header-row *cdkHeaderRowDef="['column_a']"></cdk-header-row>
+       <cdk-row *cdkRowDef="let row; columns: ['column_a']"></cdk-row>
+diff --git a/src/cdk/testing/tests/test-main-component.html b/src/cdk/testing/tests/test-main-component.html
+index 8ec6080aa042..263f6d235b5c 100644
+--- a/src/cdk/testing/tests/test-main-component.html
++++ b/src/cdk/testing/tests/test-main-component.html
+@@ -74,7 +74,9 @@ <h1 style="height: 100px; width: 200px;">Main Component</h1>
+   </button>
+   <span id="task-state-result" #taskStateResult></span>
+ </div>
+-<test-shadow-boundary *ngIf="_shadowDomSupported"></test-shadow-boundary>
++@if (_shadowDomSupported) {
++  <test-shadow-boundary></test-shadow-boundary>
++}
+ 
+ 
+ <div
+diff --git a/src/cdk/testing/tests/test-sub-component.ts b/src/cdk/testing/tests/test-sub-component.ts
+index 545efeba0f7f..0eb519f75bdc 100644
+--- a/src/cdk/testing/tests/test-sub-component.ts
++++ b/src/cdk/testing/tests/test-sub-component.ts
+@@ -13,7 +13,9 @@ import {ChangeDetectionStrategy, Component, Input, ViewEncapsulation} from '@ang
+   template: `
+       <h2>List of {{title}}</h2>
+       <ul>
+-        <li *ngFor="let item of items">{{item}}</li>
++        @for (item of items; track item) {
++          <li>{{item}}</li>
++        }
+       </ul>`,
+   encapsulation: ViewEncapsulation.None,
+   changeDetection: ChangeDetectionStrategy.OnPush,
+diff --git a/src/cdk/tree/tree.spec.ts b/src/cdk/tree/tree.spec.ts
+index fa6cff0a4075..c2c9e6abe55f 100644
+--- a/src/cdk/tree/tree.spec.ts
++++ b/src/cdk/tree/tree.spec.ts
+@@ -1383,13 +1383,13 @@ class SimpleCdkTreeApp {
+ @Component({
+   template: `
+     <cdk-tree [dataSource]="dataSource" [treeControl]="treeControl">
+-      <ng-container [ngSwitch]="true">
++      @if (true) {
+         <cdk-tree-node *cdkTreeNodeDef="let node" class="customNodeClass"
+                       cdkTreeNodePadding [cdkTreeNodePaddingIndent]="indent"
+                       cdkTreeNodeToggle>
+                       {{node.pizzaTopping}} - {{node.pizzaCheese}} + {{node.pizzaBase}}
+         </cdk-tree-node>
+-      </ng-container>
++      }
+     </cdk-tree>
+   `,
+ })
+@@ -1500,9 +1500,11 @@ class CdkTreeAppWithToggle {
+       <cdk-nested-tree-node *cdkTreeNodeDef="let node" class="customNodeClass"
+                             cdkTreeNodeToggle [cdkTreeNodeToggleRecursive]="toggleRecursively">
+                      {{node.pizzaTopping}} - {{node.pizzaCheese}} + {{node.pizzaBase}}
+-        <div *ngIf="treeControl.isExpanded(node)">
++        @if (treeControl.isExpanded(node)) {
++<div>
+           <ng-template cdkTreeNodeOutlet></ng-template>
+         </div>
++}
+       </cdk-nested-tree-node>
+     </cdk-tree>
+   `,
+diff --git a/src/google-maps/README.md b/src/google-maps/README.md
+index 8cc09375b663..acea33991e30 100644
+--- a/src/google-maps/README.md
++++ b/src/google-maps/README.md
+@@ -59,7 +59,7 @@ export class GoogleMapsDemoComponent {
+   apiLoaded: Observable<boolean>;
+ 
+   constructor(httpClient: HttpClient) {
+-    // If you're using the `<map-heatmap-layer>` directive, you also have to include the `visualization` library 
++    // If you're using the `<map-heatmap-layer>` directive, you also have to include the `visualization` library
+     // when loading the Google Maps API. To do so, you can add `&libraries=visualization` to the script URL:
+     // https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=visualization
+ 
+@@ -75,9 +75,9 @@ export class GoogleMapsDemoComponent {
+ ```html
+ <!-- google-maps-demo.component.html -->
+ 
+-<div *ngIf="apiLoaded | async">
++@if (apiLoaded | async) {
+   <google-map></google-map>
+-</div>
++}
+ ```
+ 
+ ## Components
+diff --git a/src/google-maps/map-directions-renderer/README.md b/src/google-maps/map-directions-renderer/README.md
+index d40c54678c31..f0e705d4dd51 100644
+--- a/src/google-maps/map-directions-renderer/README.md
++++ b/src/google-maps/map-directions-renderer/README.md
+@@ -51,7 +51,8 @@ export class GoogleMapDemo {
+             width="750px"
+             [center]="center"
+             [zoom]="zoom">
+-  <map-directions-renderer *ngIf="(directionsResults$ | async) as directionsResults"
+-                           [directions]="directionsResults"></map-directions-renderer>
++  @if (directionsResults$ | async; as directionsResults) {
++    <map-directions-renderer [directions]="directionsResults"></map-directions-renderer>
++  }
+ </google-map>
+ ```
+diff --git a/src/google-maps/map-info-window/README.md b/src/google-maps/map-info-window/README.md
+index 4b60ab0ebfdb..046553258ab2 100644
+--- a/src/google-maps/map-info-window/README.md
++++ b/src/google-maps/map-info-window/README.md
+@@ -39,10 +39,12 @@ export class GoogleMapDemo {
+             [center]="center"
+             [zoom]="zoom"
+             (mapClick)="addMarker($event)">
+-  <map-marker #marker="mapMarker"
+-              *ngFor="let markerPosition of markerPositions"
+-              [position]="markerPosition"
+-              (mapClick)="openInfoWindow(marker)"></map-marker>
++
++  @for (position of markerPositions; track position) {
++    <map-marker #marker="mapMarker"
++                [position]="position"
++                (mapClick)="openInfoWindow(marker)"></map-marker>
++  }
+   <map-info-window>Info Window content</map-info-window>
+ </google-map>
+ ```
+diff --git a/src/google-maps/map-marker-clusterer/README.md b/src/google-maps/map-marker-clusterer/README.md
+index 4b73cc8d6a77..1ca18feb31b4 100644
+--- a/src/google-maps/map-marker-clusterer/README.md
++++ b/src/google-maps/map-marker-clusterer/README.md
+@@ -43,8 +43,9 @@ export class GoogleMapDemo {
+             [zoom]="zoom"
+             (mapClick)="addMarker($event)">
+   <map-marker-clusterer [imagePath]="markerClustererImagePath">
+-    <map-marker *ngFor="let markerPosition of markerPositions"
+-                [position]="markerPosition"></map-marker>
++    @for (position of markerPositions; track position) {
++      <map-marker [position]="position"></map-marker>
++    }
+   </map-marker-clusterer>
+ </google-map>
+ ```
+diff --git a/src/google-maps/map-marker-clusterer/map-marker-clusterer.spec.ts b/src/google-maps/map-marker-clusterer/map-marker-clusterer.spec.ts
+index c4a5e475ee91..ed08e42e22b6 100644
+--- a/src/google-maps/map-marker-clusterer/map-marker-clusterer.spec.ts
++++ b/src/google-maps/map-marker-clusterer/map-marker-clusterer.spec.ts
+@@ -325,9 +325,15 @@ describe('MapMarkerClusterer', () => {
+                                      [options]="options"
+                                      (clusteringbegin)="onClusteringBegin()"
+                                      (clusterClick)="onClusterClick()">
+-                 <map-marker *ngIf="state === 'state1'"></map-marker>
+-                 <map-marker *ngIf="state === 'state1' || state === 'state2'"></map-marker>
+-                 <map-marker *ngIf="state === 'state2'"></map-marker>
++                 @if (state === 'state1') {
++                  <map-marker></map-marker>
++                }
++                 @if (state === 'state1' || state === 'state2') {
++                  <map-marker></map-marker>
++                }
++                 @if (state === 'state2') {
++                  <map-marker></map-marker>
++                }
+                </map-marker-clusterer>
+              </google-map>`,
+ })
+diff --git a/src/google-maps/map-marker/README.md b/src/google-maps/map-marker/README.md
+index 2089aebd9f2d..2360943b2940 100644
+--- a/src/google-maps/map-marker/README.md
++++ b/src/google-maps/map-marker/README.md
+@@ -32,8 +32,8 @@ export class GoogleMapDemo {
+             [center]="center"
+             [zoom]="zoom"
+             (mapClick)="addMarker($event)">
+-  <map-marker *ngFor="let markerPosition of markerPositions"
+-              [position]="markerPosition"
+-              [options]="markerOptions"></map-marker>
++  @for (position of markerPositions; track position) {
++    <map-marker [position]="position" [options]="markerOptions"></map-marker>
++  }
+ </google-map>
+ ```
+diff --git a/src/material/autocomplete/autocomplete.md b/src/material/autocomplete/autocomplete.md
+index 48fdcd9070e4..6bb167e3b029 100644
+--- a/src/material/autocomplete/autocomplete.md
++++ b/src/material/autocomplete/autocomplete.md
+@@ -111,7 +111,9 @@ autocomplete is attached to using the `matAutocompleteOrigin` directive together
+ </div>
+ 
+ <mat-autocomplete #auto="matAutocomplete">
+-  <mat-option *ngFor="let option of options" [value]="option">{{option}}</mat-option>
++  @for (option of options; track option) {
++    <mat-option [value]="option">{{option}}</mat-option>
++  }
+ </mat-autocomplete>
+ ```
+ 
+diff --git a/src/material/autocomplete/autocomplete.spec.ts b/src/material/autocomplete/autocomplete.spec.ts
+index 801d808702bd..4723e194cac9 100644
+--- a/src/material/autocomplete/autocomplete.spec.ts
++++ b/src/material/autocomplete/autocomplete.spec.ts
+@@ -3758,7 +3758,9 @@ describe('MDC-based MatAutocomplete', () => {
+ 
+ const SIMPLE_AUTOCOMPLETE_TEMPLATE = `
+   <mat-form-field [floatLabel]="floatLabel" [style.width.px]="width" [color]="theme">
+-    <mat-label *ngIf="hasLabel">State</mat-label>
++    @if (hasLabel) {
++      <mat-label>State</mat-label>
++    }
+     <input
+       matInput
+       placeholder="State"
+@@ -3777,13 +3779,14 @@ const SIMPLE_AUTOCOMPLETE_TEMPLATE = `
+     [aria-labelledby]="ariaLabelledby"
+     (opened)="openedSpy()"
+     (closed)="closedSpy()">
+-    <mat-option
+-      *ngFor="let state of filteredStates"
+-      [value]="state"
+-      [style.height.px]="state.height"
+-      [disabled]="state.disabled">
+-      <span>{{ state.code }}: {{ state.name }}</span>
+-    </mat-option>
++    @for (state of filteredStates; track state) {
++      <mat-option
++        [value]="state"
++        [style.height.px]="state.height"
++        [disabled]="state.disabled">
++        <span>{{ state.code }}: {{ state.name }}</span>
++      </mat-option>
++    }
+   </mat-autocomplete>
+ `;
+ 
+@@ -3848,14 +3851,18 @@ class SimpleAutocompleteShadowDom extends SimpleAutocomplete {}
+ 
+ @Component({
+   template: `
+-    <mat-form-field *ngIf="isVisible">
++    @if (isVisible) {
++<mat-form-field>
+       <input matInput placeholder="Choose" [matAutocomplete]="auto" [formControl]="optionCtrl">
+     </mat-form-field>
++}
+ 
+     <mat-autocomplete #auto="matAutocomplete">
+-      <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
++      @for (option of filteredOptions | async; track option) {
++  <mat-option [value]="option">
+          {{option}}
+       </mat-option>
++}
+     </mat-autocomplete>
+   `,
+ })
+@@ -3888,9 +3895,11 @@ class NgIfAutocomplete {
+     </mat-form-field>
+ 
+     <mat-autocomplete #auto="matAutocomplete">
+-      <mat-option *ngFor="let state of filteredStates" [value]="state">
+-        <span> {{ state }}  </span>
+-      </mat-option>
++      @for (state of filteredStates; track state) {
++        <mat-option [value]="state">
++          <span> {{ state }}  </span>
++        </mat-option>
++      }
+     </mat-autocomplete>
+   `,
+ })
+@@ -3915,9 +3924,11 @@ class AutocompleteWithoutForms {
+     </mat-form-field>
+ 
+     <mat-autocomplete #auto="matAutocomplete">
+-      <mat-option *ngFor="let state of filteredStates" [value]="state">
+-        <span>{{ state }}</span>
+-      </mat-option>
++      @for (state of filteredStates; track state) {
++        <mat-option [value]="state">
++          <span>{{ state }}</span>
++        </mat-option>
++      }
+     </mat-autocomplete>
+   `,
+ })
+@@ -3944,9 +3955,11 @@ class AutocompleteWithNgModel {
+     </mat-form-field>
+ 
+     <mat-autocomplete #auto="matAutocomplete">
+-      <mat-option *ngFor="let number of numbers" [value]="number">
+-        <span>{{ number }}</span>
+-      </mat-option>
++      @for (number of numbers; track number) {
++        <mat-option [value]="number">
++          <span>{{ number }}</span>
++        </mat-option>
++      }
+     </mat-autocomplete>
+   `,
+ })
+@@ -3963,7 +3976,9 @@ class AutocompleteWithNumbers {
+     </mat-form-field>
+ 
+     <mat-autocomplete #auto="matAutocomplete">
+-      <mat-option *ngFor="let option of options" [value]="option">{{ option }}</mat-option>
++      @for (option of options; track option) {
++        <mat-option [value]="option">{{ option }}</mat-option>
++      }
+     </mat-autocomplete>
+   `,
+ })
+@@ -3983,9 +3998,9 @@ class AutocompleteWithOnPushDelay implements OnInit {
+     <input placeholder="Choose" [matAutocomplete]="auto" [formControl]="optionCtrl">
+ 
+     <mat-autocomplete #auto="matAutocomplete">
+-      <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+-         {{option}}
+-      </mat-option>
++      @for (option of filteredOptions | async; track option) {
++        <mat-option [value]="option">{{option}}</mat-option>
++      }
+     </mat-autocomplete>
+   `,
+ })
+@@ -4024,11 +4039,15 @@ class AutocompleteWithoutPanel {
+     </mat-form-field>
+ 
+     <mat-autocomplete #auto="matAutocomplete">
+-      <mat-optgroup *ngFor="let group of stateGroups" [label]="group.label">
+-        <mat-option *ngFor="let state of group.states" [value]="state">
+-          <span>{{ state }}</span>
+-        </mat-option>
+-      </mat-optgroup>
++      @for (group of stateGroups; track group) {
++        <mat-optgroup [label]="group.label">
++          @for (state of group.states; track state) {
++            <mat-option [value]="state">
++              <span>{{ state }}</span>
++            </mat-option>
++          }
++        </mat-optgroup>
++      }
+     </mat-autocomplete>
+   `,
+ })
+@@ -4058,13 +4077,17 @@ class AutocompleteWithGroups {
+     </mat-form-field>
+ 
+     <mat-autocomplete #auto="matAutocomplete">
+-      <ng-container [ngSwitch]="true">
+-        <mat-optgroup *ngFor="let group of stateGroups" [label]="group.label">
+-          <mat-option *ngFor="let state of group.states" [value]="state">
+-            <span>{{ state }}</span>
+-          </mat-option>
+-        </mat-optgroup>
+-      </ng-container>
++      @if (true) {
++        @for (group of stateGroups; track group) {
++          <mat-optgroup [label]="group.label">
++            @for (state of group.states; track state) {
++              <mat-option [value]="state">
++                <span>{{ state }}</span>
++              </mat-option>
++            }
++          </mat-optgroup>
++        }
++      }
+     </mat-autocomplete>
+   `,
+ })
+@@ -4077,9 +4100,11 @@ class AutocompleteWithIndirectGroups extends AutocompleteWithGroups {}
+     </mat-form-field>
+ 
+     <mat-autocomplete #auto="matAutocomplete" (optionSelected)="optionSelected($event)">
+-      <mat-option *ngFor="let state of states" [value]="state">
+-        <span>{{ state }}</span>
+-      </mat-option>
++      @for (state of states; track state) {
++        <mat-option [value]="state">
++          <span>{{ state }}</span>
++        </mat-option>
++      }
+     </mat-autocomplete>
+   `,
+ })
+@@ -4109,7 +4134,9 @@ class PlainAutocompleteInputWithFormControl {
+     </mat-form-field>
+ 
+     <mat-autocomplete #auto="matAutocomplete">
+-      <mat-option *ngFor="let value of values" [value]="value">{{value}}</mat-option>
++      @for (value of values; track value) {
++        <mat-option [value]="value">{{value}}</mat-option>
++      }
+     </mat-autocomplete>
+   `,
+ })
+@@ -4139,7 +4166,9 @@ class AutocompleteWithNumberInputAndNgModel {
+     </div>
+ 
+     <mat-autocomplete #auto="matAutocomplete">
+-      <mat-option *ngFor="let value of values" [value]="value">{{value}}</mat-option>
++      @for (value of values; track value) {
++        <mat-option [value]="value">{{value}}</mat-option>
++      }
+     </mat-autocomplete>
+   `,
+ })
+@@ -4173,7 +4202,9 @@ class InputWithoutAutocompleteAndDisabled {}
+     </mat-form-field>
+ 
+     <mat-autocomplete #auto="matAutocomplete" (optionActivated)="optionActivated($event)">
+-      <mat-option *ngFor="let state of states" [value]="state">{{ state }}</mat-option>
++      @for (state of states; track state) {
++        <mat-option [value]="state">{{ state }}</mat-option>
++      }
+     </mat-autocomplete>
+   `,
+ })
+@@ -4198,9 +4229,9 @@ class AutocompleteWithActivatedEvent {
+           <input matInput [matAutocomplete]="reactiveAuto" [formControl]="formControl">
+         </mat-form-field>
+         <mat-autocomplete #reactiveAuto="matAutocomplete">
+-          <mat-option *ngFor="let food of foods; let index = index" [value]="food">
+-            {{food.viewValue}}
+-          </mat-option>
++          @for (food of foods; track food; let index = $index) {
++            <mat-option [value]="food">{{food.viewValue}}</mat-option>
++          }
+         </mat-autocomplete>
+       </div>
+     </ng-template>
+diff --git a/src/material/autocomplete/testing/autocomplete-harness.spec.ts b/src/material/autocomplete/testing/autocomplete-harness.spec.ts
+index 0c4350e3f371..2948d774bfb8 100644
+--- a/src/material/autocomplete/testing/autocomplete-harness.spec.ts
++++ b/src/material/autocomplete/testing/autocomplete-harness.spec.ts
+@@ -156,15 +156,19 @@ describe('MatAutocompleteHarness', () => {
+ @Component({
+   template: `
+     <mat-autocomplete #autocomplete="matAutocomplete">
+-      <mat-option *ngFor="let state of states" [value]="state.code">{{ state.name }}</mat-option>
++      @for (state of states; track state) {
++        <mat-option [value]="state.code">{{ state.name }}</mat-option>
++      }
+     </mat-autocomplete>
+ 
+     <mat-autocomplete #groupedAutocomplete="matAutocomplete">
+-      <mat-optgroup *ngFor="let group of stateGroups" [label]="group.name">
+-        <mat-option
+-          *ngFor="let state of group.states"
+-          [value]="state.code">{{ state.name }}</mat-option>
+-      </mat-optgroup>
++      @for (group of stateGroups; track group) {
++        <mat-optgroup [label]="group.name">
++          @for (state of group.states; track state) {
++            <mat-option [value]="state.code">{{ state.name }}</mat-option>
++          }
++        </mat-optgroup>
++      }
+     </mat-autocomplete>
+ 
+     <input id="plain" [matAutocomplete]="autocomplete">
+diff --git a/src/material/button-toggle/button-toggle.spec.ts b/src/material/button-toggle/button-toggle.spec.ts
+index 9b38f86d4669..4217167225bb 100644
+--- a/src/material/button-toggle/button-toggle.spec.ts
++++ b/src/material/button-toggle/button-toggle.spec.ts
+@@ -962,7 +962,9 @@ describe('MatButtonToggle without forms', () => {
+   <mat-button-toggle-group [disabled]="isGroupDisabled"
+                            [vertical]="isVertical"
+                            [(value)]="groupValue">
+-    <mat-button-toggle value="test1" *ngIf="renderFirstToggle">Test1</mat-button-toggle>
++    @if (renderFirstToggle) {
++      <mat-button-toggle value="test1">Test1</mat-button-toggle>
++    }
+     <mat-button-toggle value="test2">Test2</mat-button-toggle>
+     <mat-button-toggle value="test3">Test3</mat-button-toggle>
+   </mat-button-toggle-group>
+@@ -981,12 +983,12 @@ class ButtonTogglesInsideButtonToggleGroup {
+     [name]="groupName"
+     [(ngModel)]="modelValue"
+     (change)="lastEvent = $event">
+-    <mat-button-toggle *ngFor="let option of options"
+-      [value]="option.value"
+-      [disableRipple]="disableRipple"
+-      [name]="option.name">
+-      {{option.label}}
+-    </mat-button-toggle>
++    @for (option of options; track option) {
++      <mat-button-toggle
++        [value]="option.value"
++        [disableRipple]="disableRipple"
++        [name]="option.name">{{option.label}}</mat-button-toggle>
++    }
+   </mat-button-toggle-group>
+   `,
+ })
+@@ -1064,14 +1066,14 @@ class ButtonToggleGroupWithFormControl {
+ }
+ 
+ @Component({
+-  // We need the `ngSwitch` so that there's a directive between the group and the toggles.
++  // We need the `@if` so that there's a container between the group and the toggles.
+   template: `
+     <mat-button-toggle-group [formControl]="control">
+-      <ng-container [ngSwitch]="true">
++      @if (true) {
+         <mat-button-toggle value="red">Value Red</mat-button-toggle>
+         <mat-button-toggle value="green">Value Green</mat-button-toggle>
+         <mat-button-toggle value="blue">Value Blue</mat-button-toggle>
+-      </ng-container>
++      }
+     </mat-button-toggle-group>
+   `,
+ })
+@@ -1094,9 +1096,9 @@ class ButtonToggleWithAriaLabelledby {}
+ @Component({
+   template: `
+     <mat-button-toggle-group [(value)]="value">
+-      <mat-button-toggle *ngFor="let toggle of possibleValues" [value]="toggle">
+-        {{toggle}}
+-      </mat-button-toggle>
++      @for (toggle of possibleValues; track toggle) {
++        <mat-button-toggle [value]="toggle">{{toggle}}</mat-button-toggle>
++      }
+     </mat-button-toggle-group>
+   `,
+ })
+@@ -1141,7 +1143,9 @@ class ButtonToggleWithStaticAriaAttributes {}
+ @Component({
+   template: `
+   <mat-button-toggle-group [formControl]="control">
+-    <mat-button-toggle *ngFor="let value of values" [value]="value">{{value}}</mat-button-toggle>
++    @for (value of values; track value) {
++      <mat-button-toggle [value]="value">{{value}}</mat-button-toggle>
++    }
+   </mat-button-toggle-group>
+   `,
+ })
+diff --git a/src/material/chips/chip-grid.spec.ts b/src/material/chips/chip-grid.spec.ts
+index 946f017e8122..77790253d94c 100644
+--- a/src/material/chips/chip-grid.spec.ts
++++ b/src/material/chips/chip-grid.spec.ts
+@@ -1033,10 +1033,12 @@ describe('MDC-based MatChipGrid', () => {
+ @Component({
+   template: `
+     <mat-chip-grid [tabIndex]="tabIndex" [role]="role" #chipGrid>
+-      <mat-chip-row *ngFor="let i of chips"
++      @for (i of chips; track i) {
++  <mat-chip-row
+                     [editable]="editable">
+         {{name}} {{i + 1}}
+       </mat-chip-row>
++}
+     </mat-chip-grid>
+     <input name="test" [matChipInputFor]="chipGrid"/>`,
+ })
+@@ -1053,7 +1055,9 @@ class StandardChipGrid {
+     <mat-form-field>
+       <mat-label>Add a chip</mat-label>
+       <mat-chip-grid #chipGrid>
+-        <mat-chip-row *ngFor="let chip of chips" (removed)="remove(chip)">{{chip}}</mat-chip-row>
++        @for (chip of chips; track chip) {
++  <mat-chip-row (removed)="remove(chip)">{{chip}}</mat-chip-row>
++}
+       </mat-chip-grid>
+       <input name="test" [matChipInputFor]="chipGrid"/>
+     </mat-form-field>
+@@ -1076,9 +1080,11 @@ class FormFieldChipGrid {
+     <mat-form-field>
+       <mat-label>New food...</mat-label>
+       <mat-chip-grid #chipGrid placeholder="Food" [formControl]="control">
+-        <mat-chip-row *ngFor="let food of foods" [value]="food.value" (removed)="remove(food)">
++        @for (food of foods; track food) {
++  <mat-chip-row [value]="food.value" (removed)="remove(food)">
+           {{ food.viewValue }}
+         </mat-chip-row>
++}
+       </mat-chip-grid>
+       <input
+           [matChipInputFor]="chipGrid"
+@@ -1136,9 +1142,11 @@ class InputChipGrid {
+ <form #form="ngForm" novalidate>
+   <mat-form-field>
+     <mat-chip-grid #chipGrid [formControl]="formControl">
+-      <mat-chip-row *ngFor="let food of foods" [value]="food.value">
++      @for (food of foods; track food) {
++  <mat-chip-row [value]="food.value">
+       {{food.viewValue}}
+       </mat-chip-row>
++}
+     </mat-chip-grid>
+     <input name="test" [matChipInputFor]="chipGrid"/>
+     <mat-hint>Please select a chip, or type to add a new chip</mat-hint>
+@@ -1162,7 +1170,9 @@ class ChipGridWithFormErrorMessages {
+ @Component({
+   template: `
+     <mat-chip-grid #chipGrid>
+-      <mat-chip-row *ngFor="let i of numbers" (removed)="remove(i)">{{i}}</mat-chip-row>
++      @for (i of numbers; track i) {
++  <mat-chip-row (removed)="remove(i)">{{i}}</mat-chip-row>
++}
+       <input name="test" [matChipInputFor]="chipGrid"/>
+     </mat-chip-grid>`,
+   animations: [
+@@ -1189,10 +1199,12 @@ class StandardChipGridWithAnimations {
+   template: `
+     <mat-form-field>
+       <mat-chip-grid #chipGrid>
+-        <mat-chip-row [value]="i" (removed)="removeChip($event)" *ngFor="let i of chips">
++        @for (i of chips; track i) {
++  <mat-chip-row [value]="i" (removed)="removeChip($event)">
+           Chip {{i + 1}}
+           <span matChipRemove>Remove</span>
+         </mat-chip-row>
++}
+       </mat-chip-grid>
+       <input name="test" [matChipInputFor]="chipGrid"/>
+     </mat-form-field>
+diff --git a/src/material/chips/chip-listbox.spec.ts b/src/material/chips/chip-listbox.spec.ts
+index ac964fa2cbda..cd4024edef6a 100644
+--- a/src/material/chips/chip-listbox.spec.ts
++++ b/src/material/chips/chip-listbox.spec.ts
+@@ -870,10 +870,11 @@ describe('MDC-based MatChipListbox', () => {
+ @Component({
+   template: `
+     <mat-chip-listbox [tabIndex]="tabIndex" [selectable]="selectable" [role]="role">
+-      <mat-chip-option *ngFor="let i of chips" (select)="chipSelect(i)"
+-        (deselect)="chipDeselect(i)">
+-        {{name}} {{i + 1}}
+-      </mat-chip-option>
++      @for (i of chips; track i) {
++        <mat-chip-option (select)="chipSelect(i)" (deselect)="chipDeselect(i)">
++          {{name}} {{i + 1}}
++        </mat-chip-option>
++      }
+     </mat-chip-listbox>`,
+ })
+ class StandardChipListbox {
+@@ -890,9 +891,11 @@ class StandardChipListbox {
+   template: `
+       <mat-chip-listbox [formControl]="control" [required]="isRequired"
+         [tabIndex]="tabIndexOverride" [selectable]="selectable">
+-        <mat-chip-option *ngFor="let food of foods" [value]="food.value" [disabled]="food.disabled">
+-          {{ food.viewValue }}
+-        </mat-chip-option>
++        @for (food of foods; track food) {
++          <mat-chip-option [value]="food.value" [disabled]="food.disabled">
++            {{ food.viewValue }}
++          </mat-chip-option>
++        }
+       </mat-chip-listbox>
+   `,
+ })
+@@ -921,9 +924,11 @@ class BasicChipListbox {
+       <mat-chip-listbox [multiple]="true" [formControl]="control"
+         [required]="isRequired"
+         [tabIndex]="tabIndexOverride" [selectable]="selectable">
+-        <mat-chip-option *ngFor="let food of foods" [value]="food.value" [disabled]="food.disabled">
+-          {{ food.viewValue }}
+-        </mat-chip-option>
++        @for (food of foods; track food) {
++          <mat-chip-option [value]="food.value" [disabled]="food.disabled">
++            {{ food.viewValue }}
++          </mat-chip-option>
++        }
+       </mat-chip-listbox>
+   `,
+ })
+@@ -950,9 +955,9 @@ class MultiSelectionChipListbox {
+ @Component({
+   template: `
+       <mat-chip-listbox [formControl]="control">
+-        <mat-chip-option *ngFor="let food of foods" [value]="food.value">
+-          {{ food.viewValue }}
+-        </mat-chip-option>
++        @for (food of foods; track food) {
++          <mat-chip-option [value]="food.value">{{ food.viewValue }}</mat-chip-option>
++        }
+       </mat-chip-listbox>
+   `,
+ })
+@@ -968,9 +973,11 @@ class FalsyValueChipListbox {
+ @Component({
+   template: `
+     <mat-chip-listbox>
+-        <mat-chip-option *ngFor="let food of foods" [value]="food.value" [selected]="food.selected">
++      @for (food of foods; track food) {
++        <mat-chip-option [value]="food.value" [selected]="food.selected">
+             {{ food.viewValue }}
+         </mat-chip-option>
++      }
+     </mat-chip-listbox>
+   `,
+ })
+@@ -987,9 +994,11 @@ class SelectedChipListbox {
+   template: `
+       <mat-chip-listbox [formControl]="control" [required]="isRequired"
+         [tabIndex]="tabIndexOverride" [selectable]="selectable">
+-        <mat-chip-option *ngFor="let food of foods" [value]="food.value" [disabled]="food.disabled">
+-          {{ food.viewValue }}
+-        </mat-chip-option>
++        @for (food of foods; track food) {
++          <mat-chip-option [value]="food.value" [disabled]="food.disabled">
++            {{ food.viewValue }}
++          </mat-chip-option>
++        }
+       </mat-chip-listbox>
+   `,
+ })
+diff --git a/src/material/chips/chip-option.spec.ts b/src/material/chips/chip-option.spec.ts
+index 1897d290ac0f..cc74d3011c32 100644
+--- a/src/material/chips/chip-option.spec.ts
++++ b/src/material/chips/chip-option.spec.ts
+@@ -398,16 +398,20 @@ describe('MDC-based Option Chips', () => {
+ @Component({
+   template: `
+     <mat-chip-listbox>
+-      <div *ngIf="shouldShow">
+-        <mat-chip-option [selectable]="selectable"
+-                 [color]="color" [selected]="selected" [disabled]="disabled"
+-                 (destroyed)="chipDestroy($event)"
+-                 (selectionChange)="chipSelectionChange($event)"
+-                 [aria-label]="ariaLabel" [aria-description]="ariaDescription">
+-          <span class="avatar" matChipAvatar *ngIf="avatarLabel">{{avatarLabel}}</span>
+-          {{name}}
+-        </mat-chip-option>
+-      </div>
++      @if (shouldShow) {
++        <div>
++          <mat-chip-option [selectable]="selectable"
++                  [color]="color" [selected]="selected" [disabled]="disabled"
++                  (destroyed)="chipDestroy($event)"
++                  (selectionChange)="chipSelectionChange($event)"
++                  [aria-label]="ariaLabel" [aria-description]="ariaDescription">
++            @if (avatarLabel) {
++              <span class="avatar" matChipAvatar>{{avatarLabel}}</span>
++            }
++            {{name}}
++          </mat-chip-option>
++        </div>
++      }
+     </mat-chip-listbox>`,
+ })
+ class SingleChip {
+diff --git a/src/material/chips/chip-row.spec.ts b/src/material/chips/chip-row.spec.ts
+index c6c44ee47d5e..695fa085a836 100644
+--- a/src/material/chips/chip-row.spec.ts
++++ b/src/material/chips/chip-row.spec.ts
+@@ -384,18 +384,22 @@ describe('MDC-based Row Chips', () => {
+ @Component({
+   template: `
+     <mat-chip-grid #chipGrid>
+-      <div *ngIf="shouldShow">
+-        <mat-chip-row [removable]="removable"
+-                 [color]="color" [disabled]="disabled" [editable]="editable"
+-                 (destroyed)="chipDestroy($event)"
+-                 (removed)="chipRemove($event)" (edited)="chipEdit($event)"
+-                 [aria-label]="ariaLabel" [aria-description]="ariaDescription">
+-          {{name}}
+-          <button matChipRemove>x</button>
+-          <span *ngIf="useCustomEditInput" class="projected-edit-input" matChipEditInput></span>
+-        </mat-chip-row>
+-        <input matInput [matChipInputFor]="chipGrid" #chipInput>
+-      </div>
++      @if (shouldShow) {
++        <div>
++          <mat-chip-row [removable]="removable"
++                  [color]="color" [disabled]="disabled" [editable]="editable"
++                  (destroyed)="chipDestroy($event)"
++                  (removed)="chipRemove($event)" (edited)="chipEdit($event)"
++                  [aria-label]="ariaLabel" [aria-description]="ariaDescription">
++            {{name}}
++            <button matChipRemove>x</button>
++            @if (useCustomEditInput) {
++              <span class="projected-edit-input" matChipEditInput></span>
++            }
++          </mat-chip-row>
++          <input matInput [matChipInputFor]="chipGrid" #chipInput>
++        </div>
++      }
+     </mat-chip-grid>`,
+ })
+ class SingleChip {
+diff --git a/src/material/chips/chip-set.spec.ts b/src/material/chips/chip-set.spec.ts
+index a5e6363d034b..89c4fdb2fd7c 100644
+--- a/src/material/chips/chip-set.spec.ts
++++ b/src/material/chips/chip-set.spec.ts
+@@ -109,9 +109,9 @@ describe('MDC-based MatChipSet', () => {
+ @Component({
+   template: `
+       <mat-chip-set>
+-        <mat-chip *ngFor="let i of chips">
+-          {{name}} {{i + 1}}
+-        </mat-chip>
++        @for (i of chips; track i) {
++          <mat-chip>{{name}} {{i + 1}}</mat-chip>
++        }
+       </mat-chip-set>
+   `,
+ })
+@@ -123,11 +123,11 @@ class BasicChipSet {
+ @Component({
+   template: `
+     <mat-chip-set>
+-      <ng-container [ngSwitch]="true">
+-        <mat-chip *ngFor="let i of chips">
+-          {{name}} {{i + 1}}
+-        </mat-chip>
+-      </ng-container>
++      @if (true) {
++        @for (i of chips; track i) {
++          <mat-chip>{{name}} {{i + 1}}</mat-chip>
++        }
++      }
+     </mat-chip-set>
+   `,
+ })
+diff --git a/src/material/chips/chip.spec.ts b/src/material/chips/chip.spec.ts
+index a5f828a20e61..cb15b4935eb6 100644
+--- a/src/material/chips/chip.spec.ts
++++ b/src/material/chips/chip.spec.ts
+@@ -185,14 +185,16 @@ describe('MDC-based MatChip', () => {
+ @Component({
+   template: `
+     <mat-chip-set>
+-      <div *ngIf="shouldShow">
+-        <mat-chip [removable]="removable"
+-                 [color]="color" [disabled]="disabled"
+-                 (destroyed)="chipDestroy($event)"
+-                 (removed)="chipRemove($event)" [value]="value" [disableRipple]="rippleDisabled">
+-          {{name}}
+-        </mat-chip>
+-      </div>
++      @if (shouldShow) {
++        <div>
++          <mat-chip [removable]="removable"
++                  [color]="color" [disabled]="disabled"
++                  (destroyed)="chipDestroy($event)"
++                  (removed)="chipRemove($event)" [value]="value" [disableRipple]="rippleDisabled">
++            {{name}}
++          </mat-chip>
++        </div>
++      }
+     </mat-chip-set>`,
+ })
+ class SingleChip {
+diff --git a/src/material/chips/chips.md b/src/material/chips/chips.md
+index 8a95c6cb4fbc..f803ff2910ae 100644
+--- a/src/material/chips/chips.md
++++ b/src/material/chips/chips.md
+@@ -94,7 +94,7 @@ See the [accessibility](#accessibility) section for best practices on implementi
+ 
+ ### Orientation
+ 
+-By default, chips are displayed horizontally. To stack chips vertically, apply the `mat-mdc-chip-set-stacked` class to `<mat-chip-set>`, `<mat-chip-listbox>` or `<mat-chip-grid>`. 
++By default, chips are displayed horizontally. To stack chips vertically, apply the `mat-mdc-chip-set-stacked` class to `<mat-chip-set>`, `<mat-chip-listbox>` or `<mat-chip-grid>`.
+ 
+ <!-- example(chips-stacked) -->
+ 
+@@ -141,14 +141,15 @@ The chips components support 3 user interaction patterns, each with its own cont
+ ```html
+ <mat-form-field>
+   <mat-chip-grid #myChipGrid [(ngModel)]="mySelection"
+-  aria-label="enter sandwich fillings">
+-    <mat-chip-row *ngFor="let filling of fillings"
+-                 (removed)="remove(filling)">
+-      {{filling.name}}
+-      <button matChipRemove>
+-        <mat-icon>cancel</mat-icon>
+-      </button>
+-    </mat-chip-row>
++    aria-label="enter sandwich fillings">
++    @for (filling of fillings; track filling) {
++      <mat-chip-row (removed)="remove(filling)">
++        {{filling.name}}
++        <button matChipRemove>
++          <mat-icon>cancel</mat-icon>
++        </button>
++      </mat-chip-row>
++    }
+     <input [matChipInputFor]="myChipGrid"
+            [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+            (matChipInputTokenEnd)="add($event)" />
+diff --git a/src/material/chips/testing/chip-listbox-harness.spec.ts b/src/material/chips/testing/chip-listbox-harness.spec.ts
+index 1843d50a08c8..d513a7c03c42 100644
+--- a/src/material/chips/testing/chip-listbox-harness.spec.ts
++++ b/src/material/chips/testing/chip-listbox-harness.spec.ts
+@@ -112,9 +112,11 @@ describe('MatChipListboxHarness', () => {
+ @Component({
+   template: `
+     <mat-chip-listbox [multiple]="isMultiple" [disabled]="disabled" [required]="required">
+-      <mat-chip-option *ngFor="let option of options" [selected]="option.selected">
+-        {{option.text}}
+-      </mat-chip-option>
++      @for (option of options; track option) {
++        <mat-chip-option [selected]="option.selected">
++          {{option.text}}
++        </mat-chip-option>
++      }
+     </mat-chip-listbox>
+   `,
+ })
+diff --git a/src/material/core/ripple/ripple.spec.ts b/src/material/core/ripple/ripple.spec.ts
+index a38158cc68b4..cc3ef2a61d99 100644
+--- a/src/material/core/ripple/ripple.spec.ts
++++ b/src/material/core/ripple/ripple.spec.ts
+@@ -874,7 +874,7 @@ class RippleContainerWithInputBindings {
+ class RippleContainerWithoutBindings {}
+ 
+ @Component({
+-  template: `<div id="container" matRipple *ngIf="!isDestroyed"></div>`,
++  template: `@if (!isDestroyed) {<div id="container" matRipple></div>}`,
+ })
+ class RippleContainerWithNgIf {
+   @ViewChild(MatRipple) ripple: MatRipple;
+@@ -897,9 +897,9 @@ class RippleCssTransitionDurationZero {}
+ 
+ @Component({
+   template: `
+-    <div *ngIf="show" (click)="show = false" matRipple>
+-      Click to remove this element.
+-    </div>
++    @if (show) {
++      <div (click)="show = false" matRipple>Click to remove this element.</div>
++    }
+   `,
+ })
+ class RippleWithDomRemovalOnClick {
+diff --git a/src/material/datepicker/datepicker-actions.spec.ts b/src/material/datepicker/datepicker-actions.spec.ts
+index e4fd8fb34104..6a004e161330 100644
+--- a/src/material/datepicker/datepicker-actions.spec.ts
++++ b/src/material/datepicker/datepicker-actions.spec.ts
+@@ -292,10 +292,12 @@ describe('MatDatepickerActions', () => {
+           [formControl]="control"
+           (dateChange)="onDateChange()">
+       <mat-datepicker #picker [touchUi]="touchUi" [startAt]="startAt">
+-        <mat-datepicker-actions *ngIf="renderActions">
+-          <button mat-button class="cancel" matDatepickerCancel>Cancel</button>
+-          <button mat-raised-button class="apply" matDatepickerApply>Apply</button>
+-        </mat-datepicker-actions>
++        @if (renderActions) {
++          <mat-datepicker-actions>
++            <button mat-button class="cancel" matDatepickerCancel>Cancel</button>
++            <button mat-raised-button class="apply" matDatepickerApply>Apply</button>
++          </mat-datepicker-actions>
++        }
+       </mat-datepicker>
+     </mat-form-field>
+   `,
+diff --git a/src/material/dialog/dialog.spec.ts b/src/material/dialog/dialog.spec.ts
+index a43f9dc70940..e8be88bc3231 100644
+--- a/src/material/dialog/dialog.spec.ts
++++ b/src/material/dialog/dialog.spec.ts
+@@ -2121,7 +2121,7 @@ class ComponentWithOnPushViewContainer {
+ 
+ @Component({
+   selector: 'arbitrary-component',
+-  template: `<dir-with-view-container *ngIf="showChildView"></dir-with-view-container>`,
++  template: `@if (showChildView) {<dir-with-view-container></dir-with-view-container>}`,
+ })
+ class ComponentWithChildViewContainer {
+   showChildView = true;
+@@ -2162,9 +2162,15 @@ class PizzaMsg {
+ 
+ @Component({
+   template: `
+-    <h1 mat-dialog-title *ngIf="shouldShowTitle('first')">This is the first title</h1>
+-    <h1 mat-dialog-title *ngIf="shouldShowTitle('second')">This is the second title</h1>
+-    <h1 mat-dialog-title *ngIf="shouldShowTitle('third')">This is the third title</h1>
++    @if (shouldShowTitle('first')) {
++      <h1 mat-dialog-title>This is the first title</h1>
++    }
++    @if (shouldShowTitle('second')) {
++      <h1 mat-dialog-title>This is the second title</h1>
++    }
++    @if (shouldShowTitle('third')) {
++      <h1 mat-dialog-title>This is the third title</h1>
++    }
+     <mat-dialog-content>Lorem ipsum dolor sit amet.</mat-dialog-content>
+     <mat-dialog-actions align="end">
+       <button mat-dialog-close>Close</button>
+@@ -2189,9 +2195,15 @@ class ContentElementDialog {
+ @Component({
+   template: `
+     <ng-template>
+-      <h1 mat-dialog-title *ngIf="shouldShowTitle('first')">This is the first title</h1>
+-      <h1 mat-dialog-title *ngIf="shouldShowTitle('second')">This is the second title</h1>
+-      <h1 mat-dialog-title *ngIf="shouldShowTitle('third')">This is the third title</h1>
++      @if (shouldShowTitle('first')) {
++        <h1 mat-dialog-title>This is the first title</h1>
++      }
++      @if (shouldShowTitle('second')) {
++        <h1 mat-dialog-title>This is the second title</h1>
++      }
++      @if (shouldShowTitle('third')) {
++        <h1 mat-dialog-title>This is the third title</h1>
++      }
+       <mat-dialog-content>Lorem ipsum dolor sit amet.</mat-dialog-content>
+       <mat-dialog-actions align="end">
+         <button mat-dialog-close>Close</button>
+@@ -2238,7 +2250,10 @@ class ShadowDomComponent {}
+ 
+ @Component({template: ''})
+ class ModuleBoundDialogParentComponent {
+-  constructor(private _injector: Injector, private _dialog: MatDialog) {}
++  constructor(
++    private _injector: Injector,
++    private _dialog: MatDialog,
++  ) {}
+ 
+   openDialog(): void {
+     const ngModuleRef = createNgModuleRef(
+diff --git a/src/material/divider/divider.md b/src/material/divider/divider.md
+index 960ef674945d..6e0094184c3b 100644
+--- a/src/material/divider/divider.md
++++ b/src/material/divider/divider.md
+@@ -38,19 +38,25 @@ in a list, because it will overlap with the section divider.
+ ```html
+ <mat-list>
+    <h3 mat-subheader>Folders</h3>
+-   <mat-list-item *ngFor="let folder of folders; last as last">
+-      <mat-icon mat-list-icon>folder</mat-icon>
+-      <h4 mat-line>{{folder.name}}</h4>
+-      <p mat-line class="demo-2"> {{folder.updated}} </p>
+-      <mat-divider [inset]="true" *ngIf="!last"></mat-divider>
+-   </mat-list-item>
++   @for (folder of folders; track folder) {
++      <mat-list-item>
++         <mat-icon mat-list-icon>folder</mat-icon>
++         <h4 mat-line>{{folder.name}}</h4>
++         <p mat-line class="demo-2">{{folder.updated}}</p>
++         @if (!$last) {
++            <mat-divider [inset]="true"></mat-divider>
++         }
++      </mat-list-item>
++   }
+    <mat-divider></mat-divider>
+    <h3 mat-subheader>Notes</h3>
+-   <mat-list-item *ngFor="let note of notes">
+-      <mat-icon mat-list-icon>note</mat-icon>
+-      <h4 mat-line>{{note.name}}</h4>
+-      <p mat-line class="demo-2"> {{note.updated}} </p>
+-   </mat-list-item>
++   @for (note of notes; track node) {
++      <mat-list-item>
++         <mat-icon mat-list-icon>note</mat-icon>
++         <h4 mat-line>{{note.name}}</h4>
++         <p mat-line class="demo-2"> {{note.updated}} </p>
++      </mat-list-item>
++   }
+ </mat-list>
+ ```
+ 
+diff --git a/src/material/expansion/accordion.spec.ts b/src/material/expansion/accordion.spec.ts
+index 45d441c6f469..e0de275e23ce 100644
+--- a/src/material/expansion/accordion.spec.ts
++++ b/src/material/expansion/accordion.spec.ts
+@@ -303,10 +303,12 @@ describe('MatAccordion', () => {
+ @Component({
+   template: `
+   <mat-accordion [multi]="multi">
+-    <mat-expansion-panel *ngFor="let i of [0, 1, 2, 3]">
+-      <mat-expansion-panel-header>Summary {{i}}</mat-expansion-panel-header>
+-      <p>Content</p>
+-    </mat-expansion-panel>
++    @for (i of [0, 1, 2, 3]; track i) {
++      <mat-expansion-panel>
++        <mat-expansion-panel-header>Summary {{i}}</mat-expansion-panel-header>
++        <p>Content</p>
++      </mat-expansion-panel>
++    }
+   </mat-accordion>`,
+ })
+ class SetOfItems {
+diff --git a/src/material/expansion/expansion.spec.ts b/src/material/expansion/expansion.spec.ts
+index ae3fbc004a2c..f79a19e1e965 100644
+--- a/src/material/expansion/expansion.spec.ts
++++ b/src/material/expansion/expansion.spec.ts
+@@ -582,11 +582,14 @@ class PanelWithContent {
+ 
+ @Component({
+   template: `
+-  <div *ngIf="expansionShown">
+-    <mat-expansion-panel>
+-      <mat-expansion-panel-header>Panel Title</mat-expansion-panel-header>
+-    </mat-expansion-panel>
+-  </div>`,
++    @if (expansionShown) {
++      <div>
++        <mat-expansion-panel>
++          <mat-expansion-panel-header>Panel Title</mat-expansion-panel-header>
++        </mat-expansion-panel>
++      </div>
++    }
++  `,
+ })
+ class PanelWithContentInNgIf {
+   expansionShown = true;
+diff --git a/src/material/form-field/form-field.md b/src/material/form-field/form-field.md
+index 5ccf3129b13b..a393f128eb24 100644
+--- a/src/material/form-field/form-field.md
++++ b/src/material/form-field/form-field.md
+@@ -86,7 +86,7 @@ has interacted with the element or the parent form has been submitted. Since the
+ same space as the hints, the hints are hidden when the errors are shown.
+ 
+ If a form field can have more than one error state, it is up to the consumer to toggle which
+-messages should be displayed. This can be done with CSS, `ngIf` or `ngSwitch`. Multiple error
++messages should be displayed. This can be done with CSS, `@if` or `@switch`. Multiple error
+ messages can be shown at the same time if desired, but the `<mat-form-field>` only reserves enough
+ space to display one error message at a time. Ensuring that enough space is available to display
+ multiple errors is up to the user.
+diff --git a/src/material/grid-list/grid-list.spec.ts b/src/material/grid-list/grid-list.spec.ts
+index f6519917c11f..ceca04053d5b 100644
+--- a/src/material/grid-list/grid-list.spec.ts
++++ b/src/material/grid-list/grid-list.spec.ts
+@@ -676,10 +676,12 @@ class GridListWithRowspanBinding {
+   template: `
+     <div style="width:400px">
+       <mat-grid-list cols="4" rowHeight="100px">
+-        <mat-grid-tile *ngFor="let tile of tiles" [colspan]="tile.cols" [rowspan]="tile.rows"
+-                      [style.background]="tile.color">
+-          {{tile.text}}
+-        </mat-grid-tile>
++        @for (tile of tiles; track tile) {
++          <mat-grid-tile [colspan]="tile.cols" [rowspan]="tile.rows"
++                        [style.background]="tile.color">
++            {{tile.text}}
++          </mat-grid-tile>
++        }
+       </mat-grid-list>
+     </div>`,
+ })
+@@ -744,10 +746,10 @@ class GridListWithFooterContainingTwoLines {}
+     <mat-grid-list cols="1">
+       <mat-grid-tile>
+         <mat-grid-tile-footer>
+-          <ng-container [ngSwitch]="true">
++          @if (true) {
+             <h3 mat-line>First line</h3>
+             <span mat-line>Second line</span>
+-          </ng-container>
++          }
+         </mat-grid-tile-footer>
+       </mat-grid-tile>
+     </mat-grid-list>`,
+@@ -779,13 +781,13 @@ class GridListWithEmptyDirectionality {}
+ class GridListWithRtl {}
+ 
+ @Component({
+-  // Note the blank `ngSwitch` which we need in order to hit the bug that we're testing.
++  // Note the blank `@if` which we need in order to hit the bug that we're testing.
+   template: `
+     <div style="width:200px">
+       <mat-grid-list cols="1">
+-        <ng-container [ngSwitch]="true">
++        @if (true) {
+           <mat-grid-tile></mat-grid-tile>
+-        </ng-container>
++        }
+       </mat-grid-list>
+     </div>
+   `,
+diff --git a/src/material/grid-list/testing/grid-list-harness.spec.ts b/src/material/grid-list/testing/grid-list-harness.spec.ts
+index 2faf72ab5986..2431235d850e 100644
+--- a/src/material/grid-list/testing/grid-list-harness.spec.ts
++++ b/src/material/grid-list/testing/grid-list-harness.spec.ts
+@@ -151,7 +151,9 @@ describe('MatGridListHarness', () => {
+     <mat-grid-list [cols]="columns">
+       <mat-grid-tile>
+         <mat-grid-tile-header>{{firstTileText}}</mat-grid-tile-header>
+-        <mat-grid-tile-footer *ngIf="showFooter">Footer</mat-grid-tile-footer>
++        @if (showFooter) {
++          <mat-grid-tile-footer>Footer</mat-grid-tile-footer>
++        }
+       </mat-grid-tile>
+       <mat-grid-tile>
+         <mat-grid-tile-header>Two</mat-grid-tile-header>
+diff --git a/src/material/icon/icon.spec.ts b/src/material/icon/icon.spec.ts
+index 3d7e8f18d2c3..2a02df303cf9 100644
+--- a/src/material/icon/icon.spec.ts
++++ b/src/material/icon/icon.spec.ts
+@@ -1420,7 +1420,7 @@ class IconFromSvgName {
+ @Component({template: '<mat-icon aria-hidden="false">face</mat-icon>'})
+ class IconWithAriaHiddenFalse {}
+ 
+-@Component({template: `<mat-icon [svgIcon]="iconName" *ngIf="showIcon">{{iconName}}</mat-icon>`})
++@Component({template: `@if (showIcon) {<mat-icon [svgIcon]="iconName">{{iconName}}</mat-icon>}`})
+ class IconWithBindingAndNgIf {
+   iconName = 'fluffy';
+   showIcon = true;
+diff --git a/src/material/input/input.spec.ts b/src/material/input/input.spec.ts
+index 0f805aae8033..fef22dd52f7c 100644
+--- a/src/material/input/input.spec.ts
++++ b/src/material/input/input.spec.ts
+@@ -1629,7 +1629,9 @@ class MatInputHintLabelTestController {
+   template: `
+     <mat-form-field [hintLabel]="label">
+       <input matInput [formControl]="formControl" [aria-describedby]="userDescribedByValue">
+-      <mat-error *ngIf="showError">Some error</mat-error>
++      @if (showError) {
++        <mat-error>Some error</mat-error>
++      }
+     </mat-form-field>`,
+ })
+ class MatInputWithSubscriptAndAriaDescribedBy {
+@@ -1782,7 +1784,9 @@ class MatInputMissingMatInputTestController {}
+       <mat-form-field>
+         <input matInput [formControl]="formControl">
+         <mat-hint>Please type something</mat-hint>
+-        <mat-error *ngIf="renderError">This field is required</mat-error>
++        @if (renderError) {
++          <mat-error>This field is required</mat-error>
++        }
+       </mat-form-field>
+     </form>
+   `,
+@@ -1855,7 +1859,9 @@ class MatInputWithPrefixAndSuffix {}
+ @Component({
+   template: `
+     <mat-form-field>
+-      <input matInput *ngIf="renderInput">
++      @if (renderInput) {
++        <input matInput>
++      }
+     </mat-form-field>
+   `,
+ })
+diff --git a/src/material/list/list.md b/src/material/list/list.md
+index 9360406bc586..c1c86b453b30 100644
+--- a/src/material/list/list.md
++++ b/src/material/list/list.md
+@@ -62,7 +62,9 @@ Simple navigation lists can use the `mat-list-item` attribute on anchor tag elem
+ 
+ ```html
+ <mat-nav-list>
+-  <a mat-list-item href="..." *ngFor="let link of links" [activated]="link.isActive">{{ link }}</a>
++  @for (link of list; track link) {
++    <a mat-list-item href="..." [activated]="link.isActive">{{ link }}</a>
++  }
+ </mat-nav-list>
+ ```
+ 
+@@ -71,12 +73,14 @@ element in an `<mat-list-item>`.
+ 
+ ```html
+ <mat-nav-list>
+-  <mat-list-item *ngFor="let link of links" [activated]="link.isActive">
+-     <a matListItemTitle href="...">{{ link }}</a>
+-     <button mat-icon-button (click)="showInfo(link)" matListItemMeta>
+-        <mat-icon>info</mat-icon>
+-     </button>
+-  </mat-list-item>
++  @for (link of links; track link) {
++    <mat-list-item [activated]="link.isActive">
++       <a matListItemTitle href="...">{{ link }}</a>
++       <button mat-icon-button (click)="showInfo(link)" matListItemMeta>
++          <mat-icon>info</mat-icon>
++       </button>
++    </mat-list-item>
++  }
+ </mat-nav-list>
+ ```
+ 
+@@ -111,22 +115,26 @@ attribute. Whichever heading tag is appropriate for your DOM hierarchy should be
+ ```html
+ <!-- two line list -->
+ <mat-list>
+-  <mat-list-item *ngFor="let message of messages">
+-    <h3 matListItemTitle>{{message.from}}</h3>
+-    <p matListItemLine>
+-      <span>{{message.subject}}</span>
+-      <span class="demo-2"> -- {{message.content}}</span>
+-    </p>
+-  </mat-list-item>
++  @for (message of messages; track message) {
++    <mat-list-item>
++      <h3 matListItemTitle>{{message.from}}</h3>
++      <p matListItemLine>
++        <span>{{message.subject}}</span>
++        <span class="demo-2"> -- {{message.content}}</span>
++      </p>
++    </mat-list-item>
++  }
+ </mat-list>
+ 
+ <!-- three line list -->
+ <mat-list>
+-  <mat-list-item *ngFor="let message of messages">
+-    <h3 matListItemTitle>{{message.from}}</h3>
+-    <p matListItemLine>{{message.subject}}</p>
+-    <p matListItemLine class="demo-2">{{message.content}}</p>
+-  </mat-list-item>
++  @for (message of messages; track message) {
++    <mat-list-item>
++      <h3 matListItemTitle>{{message.from}}</h3>
++      <p matListItemLine>{{message.subject}}</p>
++      <p matListItemLine class="demo-2">{{message.content}}</p>
++    </mat-list-item>
++  }
+ </mat-list>
+ ```
+ 
+@@ -137,14 +145,16 @@ To add an icon to your list item, use the `matListItemIcon` attribute.
+ 
+ ```html
+ <mat-list>
+-  <mat-list-item *ngFor="let message of messages">
+-    <mat-icon matListItemIcon>folder</mat-icon>
+-    <h3 matListItemTitle>{{message.from}}</h3>
+-    <p matListItemLine>
+-      <span>{{message.subject}}</span>
+-      <span class="demo-2"> -- {{message.content}}</span>
+-    </p>
+-  </mat-list-item>
++  @for (message of messages; track message) {
++    <mat-list-item>
++      <mat-icon matListItemIcon>folder</mat-icon>
++      <h3 matListItemTitle>{{message.from}}</h3>
++      <p matListItemLine>
++        <span>{{message.subject}}</span>
++        <span class="demo-2"> -- {{message.content}}</span>
++      </p>
++    </mat-list-item>
++  }
+ </mat-list>
+ ```
+ 
+@@ -154,14 +164,16 @@ To include an avatar image, add an image tag with an `matListItemAvatar` attribu
+ 
+ ```html
+ <mat-list>
+-  <mat-list-item *ngFor="let message of messages">
+-    <img matListItemAvatar src="..." alt="...">
+-    <h3 matListItemTitle>{{message.from}}</h3>
+-    <p matListItemLine>
+-      <span>{{message.subject}}</span>
+-      <span class="demo-2"> -- {{message.content}}</span>
+-    </p>
+-  </mat-list-item>
++  @for (message of messages; track message) {
++    <mat-list-item>
++      <img matListItemAvatar src="..." alt="...">
++      <h3 matListItemTitle>{{message.from}}</h3>
++      <p matListItemLine>
++        <span>{{message.subject}}</span>
++        <span class="demo-2"> -- {{message.content}}</span>
++      </p>
++    </mat-list-item>
++  }
+ </mat-list>
+ ```
+ 
+@@ -173,18 +185,22 @@ To add a divider, use `<mat-divider>`.
+ ```html
+ <mat-list>
+    <h3 matSubheader>Folders</h3>
+-   <mat-list-item *ngFor="let folder of folders">
+-      <mat-icon matListIcon>folder</mat-icon>
+-      <h4 matListItemTitle>{{folder.name}}</h4>
+-      <p matListItemLine class="demo-2"> {{folder.updated}} </p>
+-   </mat-list-item>
++   @for (folder of folders; track folder) {
++     <mat-list-item>
++        <mat-icon matListIcon>folder</mat-icon>
++        <h4 matListItemTitle>{{folder.name}}</h4>
++        <p matListItemLine class="demo-2"> {{folder.updated}} </p>
++     </mat-list-item>
++   }
+    <mat-divider></mat-divider>
+    <h3 matSubheader>Notes</h3>
+-   <mat-list-item *ngFor="let note of notes">
+-      <mat-icon matListIcon>note</mat-icon>
+-      <h4 matListItemTitle>{{note.name}}</h4>
+-      <p matListItemLine class="demo-2"> {{note.updated}} </p>
+-   </mat-list-item>
++   @for (note of notes; track note) {
++     <mat-list-item>
++        <mat-icon matListIcon>note</mat-icon>
++        <h4 matListItemTitle>{{note.name}}</h4>
++        <p matListItemLine class="demo-2"> {{note.updated}} </p>
++     </mat-list-item>
++   }
+ </mat-list>
+ ```
+ 
+diff --git a/src/material/list/list.spec.ts b/src/material/list/list.spec.ts
+index 5b97fc9f1460..53214f0a75d5 100644
+--- a/src/material/list/list.spec.ts
++++ b/src/material/list/list.spec.ts
+@@ -449,10 +449,12 @@ class NavListWithOneAnchorItem extends BaseTestList {
+ @Component({
+   template: `
+   <mat-nav-list [disableRipple]="disableListRipple">
+-    <a *ngFor="let item of items; let index = index" mat-list-item [disableRipple]="disableItemRipple"
+-      [activated]="index === activatedIndex">
+-      {{item.name}}
+-    </a>
++    @for (item of items; track item; let index = $index) {
++      <a mat-list-item [disableRipple]="disableItemRipple"
++        [activated]="index === activatedIndex">
++        {{item.name}}
++      </a>
++    }
+   </mat-nav-list>`,
+ })
+ class NavListWithActivatedItem extends BaseTestList {
+@@ -493,9 +495,9 @@ class ActionListWithType extends BaseTestList {
+ @Component({
+   template: `
+   <mat-action-list [disabled]="disableList">
+-    <button mat-list-item *ngFor="let item of items">
+-      {{item.name}}
+-    </button>
++    @for (item of items; track item) {
++      <button mat-list-item>{{item.name}}</button>
++    }
+   </mat-action-list>`,
+ })
+ class ActionListWithDisabledList extends BaseTestList {
+@@ -528,11 +530,13 @@ class ListWithOneItem extends BaseTestList {}
+ @Component({
+   template: `
+   <mat-list>
+-    <mat-list-item *ngFor="let item of items">
+-      <img src="">
+-      <h3 matListItemTitle>{{item.name}}</h3>
+-      <p matListItemLine>{{item.description}}</p>
+-    </mat-list-item>
++    @for (item of items; track item) {
++      <mat-list-item>
++        <img src="">
++        <h3 matListItemTitle>{{item.name}}</h3>
++        <p matListItemLine>{{item.description}}</p>
++      </mat-list-item>
++    }
+   </mat-list>`,
+ })
+ class ListWithTwoLineItem extends BaseTestList {}
+@@ -540,11 +544,13 @@ class ListWithTwoLineItem extends BaseTestList {}
+ @Component({
+   template: `
+   <mat-list>
+-    <mat-list-item *ngFor="let item of items">
+-      <h3 matListItemTitle>{{item.name}}</h3>
+-      <p matListItemLine>{{item.description}}</p>
+-      <p matListItemLine>Some other text</p>
+-    </mat-list-item>
++    @for (item of items; track item) {
++      <mat-list-item>
++        <h3 matListItemTitle>{{item.name}}</h3>
++        <p matListItemLine>{{item.description}}</p>
++        <p matListItemLine>Some other text</p>
++      </mat-list-item>
++    }
+   </mat-list>`,
+ })
+ class ListWithThreeLineItem extends BaseTestList {}
+@@ -552,12 +558,14 @@ class ListWithThreeLineItem extends BaseTestList {}
+ @Component({
+   template: `
+   <mat-list>
+-    <mat-list-item *ngFor="let item of items">
+-      <h3 matListItemTitle>Line 1</h3>
+-      <p matListItemLine>Line 2</p>
+-      <p matListItemLine>Line 3</p>
+-      <p matListItemLine>Line 4</p>
+-    </mat-list-item>
++    @for (item of items; track item) {
++      <mat-list-item>
++        <h3 matListItemTitle>Line 1</h3>
++        <p matListItemLine>Line 2</p>
++        <p matListItemLine>Line 3</p>
++        <p matListItemLine>Line 4</p>
++      </mat-list-item>
++    }
+   </mat-list>`,
+ })
+ class ListWithManyLines extends BaseTestList {}
+@@ -579,10 +587,12 @@ class ListWithAvatar extends BaseTestList {}
+ @Component({
+   template: `
+   <mat-list>
+-    <mat-list-item class="test-class" *ngFor="let item of items">
+-      <h3 matListItemTitle>{{item.name}}</h3>
+-      <p matListItemLine>{{item.description}}</p>
+-    </mat-list-item>
++    @for (item of items; track item) {
++      <mat-list-item class="test-class">
++        <h3 matListItemTitle>{{item.name}}</h3>
++        <p matListItemLine>{{item.description}}</p>
++      </mat-list-item>
++    }
+   </mat-list>`,
+ })
+ class ListWithItemWithCssClass extends BaseTestList {}
+@@ -590,11 +600,15 @@ class ListWithItemWithCssClass extends BaseTestList {}
+ @Component({
+   template: `
+   <mat-list>
+-    <mat-list-item *ngFor="let item of items">
+-      <h3 matListItemTitle>{{item.name}}</h3>
+-      <p matListItemLine>{{item.description}}</p>
+-      <p matListItemLine *ngIf="showThirdLine">Some other text</p>
+-    </mat-list-item>
++    @for (item of items; track item) {
++      <mat-list-item>
++        <h3 matListItemTitle>{{item.name}}</h3>
++        <p matListItemLine>{{item.description}}</p>
++        @if (showThirdLine) {
++          <p matListItemLine>Some other text</p>
++        }
++      </mat-list-item>
++    }
+   </mat-list>`,
+ })
+ class ListWithDynamicNumberOfLines extends BaseTestList {}
+@@ -602,9 +616,9 @@ class ListWithDynamicNumberOfLines extends BaseTestList {}
+ @Component({
+   template: `
+   <mat-list>
+-    <mat-list-item *ngFor="let item of items">
+-      {{item.name}}
+-    </mat-list-item>
++    @for (item of items; track item) {
++      <mat-list-item>{{item.name}}</mat-list-item>
++    }
+   </mat-list>`,
+ })
+ class ListWithMultipleItems extends BaseTestList {}
+diff --git a/src/material/list/selection-list.spec.ts b/src/material/list/selection-list.spec.ts
+index c908b52a24f6..51ec5b0413d0 100644
+--- a/src/material/list/selection-list.spec.ts
++++ b/src/material/list/selection-list.spec.ts
+@@ -1725,9 +1725,11 @@ describe('MDC-based MatSelectionList with forms', () => {
+     <mat-list-option togglePosition="before" value="archive">
+       Archive
+     </mat-list-option>
+-    <mat-list-option togglePosition="before" value="drafts" *ngIf="showLastOption">
+-      Drafts
+-    </mat-list-option>
++    @if (showLastOption) {
++      <mat-list-option togglePosition="before" value="drafts">
++        Drafts
++      </mat-list-option>
++    }
+   </mat-selection-list>`,
+ })
+ class SelectionListWithListOptions {
+@@ -1837,7 +1839,9 @@ class SelectionListWithOnlyOneOption {}
+       [(ngModel)]="selectedOptions"
+       (ngModelChange)="modelChangeSpy()"
+       [multiple]="multiple">
+-      <mat-list-option *ngFor="let option of options" [value]="option">{{option}}</mat-list-option>
++      @for (option of options; track option) {
++        <mat-list-option [value]="option">{{option}}</mat-list-option>
++      }
+     </mat-selection-list>`,
+ })
+ class SelectionListWithModel {
+@@ -1849,12 +1853,16 @@ class SelectionListWithModel {
+ 
+ @Component({
+   template: `
+-    <mat-selection-list [formControl]="formControl" *ngIf="renderList">
+-      <mat-list-option value="opt1">Option 1</mat-list-option>
+-      <mat-list-option value="opt2">Option 2</mat-list-option>
+-      <mat-list-option value="opt3">Option 3</mat-list-option>
+-      <mat-list-option value="opt4" *ngIf="renderExtraOption">Option 4</mat-list-option>
+-    </mat-selection-list>
++    @if (renderList) {
++      <mat-selection-list [formControl]="formControl">
++        <mat-list-option value="opt1">Option 1</mat-list-option>
++        <mat-list-option value="opt2">Option 2</mat-list-option>
++        <mat-list-option value="opt3">Option 3</mat-list-option>
++        @if (renderExtraOption) {
++          <mat-list-option value="opt4">Option 4</mat-list-option>
++        }
++      </mat-selection-list>
++    }
+   `,
+ })
+ class SelectionListWithFormControl {
+@@ -1889,7 +1897,9 @@ class SelectionListWithPreselectedOptionAndModel {
+   changeDetection: ChangeDetectionStrategy.OnPush,
+   template: `
+     <mat-selection-list [formControl]="formControl">
+-      <mat-list-option *ngFor="let opt of opts" [value]="opt">{{opt}}</mat-list-option>
++      @for (opt of opts; track opt) {
++        <mat-list-option [value]="opt">{{opt}}</mat-list-option>
++      }
+     </mat-selection-list>
+   `,
+ })
+@@ -1901,9 +1911,9 @@ class SelectionListWithPreselectedFormControlOnPush {
+ @Component({
+   template: `
+     <mat-selection-list [(ngModel)]="selectedOptions" [compareWith]="compareWith">
+-      <mat-list-option *ngFor="let option of options" [value]="option">
+-        {{option.label}}
+-      </mat-list-option>
++      @for (option of options; track option) {
++        <mat-list-option [value]="option">{{option.label}}</mat-list-option>
++      }
+     </mat-selection-list>`,
+ })
+ class SelectionListWithCustomComparator {
+@@ -1946,13 +1956,13 @@ class SelectionListWithIcon {
+ }
+ 
+ @Component({
+-  // Note the blank `ngSwitch` which we need in order to hit the bug that we're testing.
++  // Note the blank `@if` which we need in order to hit the bug that we're testing.
+   template: `
+     <mat-selection-list>
+-      <ng-container [ngSwitch]="true">
++      @if (true) {
+         <mat-list-option [value]="1">One</mat-list-option>
+         <mat-list-option [value]="2">Two</mat-list-option>
+-      </ng-container>
++      }
+     </mat-selection-list>`,
+ })
+ class SelectionListWithIndirectChildOptions {
+diff --git a/src/material/menu/menu.spec.ts b/src/material/menu/menu.spec.ts
+index 8af757362780..5722baf4819b 100644
+--- a/src/material/menu/menu.spec.ts
++++ b/src/material/menu/menu.spec.ts
+@@ -2780,7 +2780,9 @@ const SIMPLE_MENU_TEMPLATE = `
+     <button mat-menu-item>
+       <span>Item with text inside span</span>
+     </button>
+-    <button *ngFor="let item of extraItems" mat-menu-item> {{item}} </button>
++    @for (item of extraItems; track item) {
++      <button mat-menu-item> {{item}} </button>
++    }
+   </mat-menu>
+ `;
+ 
+@@ -2889,11 +2891,12 @@ class CustomMenu {
+         [matMenuTriggerFor]="levelOne"
+         #levelOneTrigger="matMenuTrigger">One</button>
+       <button mat-menu-item>Two</button>
+-      <button mat-menu-item
+-        *ngIf="showLazy"
+-        id="lazy-trigger"
+-        [matMenuTriggerFor]="lazy"
+-        #lazyTrigger="matMenuTrigger">Three</button>
++      @if (showLazy) {
++        <button mat-menu-item
++          id="lazy-trigger"
++          [matMenuTriggerFor]="lazy"
++          #lazyTrigger="matMenuTrigger">Three</button>
++      }
+     </mat-menu>
+ 
+     <mat-menu #levelOne="matMenu" (closed)="levelOneCloseCallback($event)">
+@@ -2962,11 +2965,12 @@ class NestedMenuCustomElevation {
+   template: `
+     <button [matMenuTriggerFor]="root" #rootTriggerEl>Toggle menu</button>
+     <mat-menu #root="matMenu">
+-      <button
+-        mat-menu-item
+-        class="level-one-trigger"
+-        *ngFor="let item of items"
+-        [matMenuTriggerFor]="levelOne">{{item}}</button>
++      @for (item of items; track item) {
++        <button
++          mat-menu-item
++          class="level-one-trigger"
++          [matMenuTriggerFor]="levelOne">{{item}}</button>
++      }
+     </mat-menu>
+ 
+     <mat-menu #levelOne="matMenu">
+@@ -3083,10 +3087,9 @@ class MenuWithCheckboxItems {
+   template: `
+     <button [matMenuTriggerFor]="menu">Toggle menu</button>
+     <mat-menu #menu="matMenu">
+-      <button
+-        *ngFor="let item of items"
+-        [disabled]="item.disabled"
+-        mat-menu-item>{{item.label}}</button>
++      @for (item of items; track item) {
++        <button [disabled]="item.disabled"mat-menu-item>{{item.label}}</button>
++      }
+     </mat-menu>
+   `,
+ })
+@@ -3105,10 +3108,9 @@ class SimpleMenuWithRepeater {
+     <button [matMenuTriggerFor]="menu">Toggle menu</button>
+     <mat-menu #menu="matMenu">
+       <ng-template matMenuContent>
+-        <button
+-          *ngFor="let item of items"
+-          [disabled]="item.disabled"
+-          mat-menu-item>{{item.label}}</button>
++        @for (item of items; track item) {
++          <button [disabled]="item.disabled" mat-menu-item>{{item.label}}</button>
++        }
+       </ng-template>
+     </mat-menu>
+   `,
+@@ -3173,7 +3175,9 @@ class StaticAriaDescribedbyMenu {}
+   template: `
+     <button [matMenuTriggerFor]="menu" #triggerEl>Toggle menu</button>
+     <mat-menu #menu="matMenu">
+-      <button *ngFor="let item of items" mat-menu-item>{{item}}</button>
++      @for (item of items; track item) {
++        <button mat-menu-item>{{item}}</button>
++      }
+     </mat-menu>
+   `,
+ })
+diff --git a/src/material/progress-spinner/progress-spinner.spec.ts b/src/material/progress-spinner/progress-spinner.spec.ts
+index c17934f8c29b..6b93ca5d7f5f 100644
+--- a/src/material/progress-spinner/progress-spinner.spec.ts
++++ b/src/material/progress-spinner/progress-spinner.spec.ts
+@@ -462,9 +462,11 @@ class IndeterminateSpinnerInShadowDom {
+ 
+ @Component({
+   template: `
+-    <div *ngIf="true">
+-      <mat-progress-spinner mode="indeterminate" [diameter]="diameter"></mat-progress-spinner>
+-    </div>
++    @if (true) {
++      <div>
++        <mat-progress-spinner mode="indeterminate" [diameter]="diameter"></mat-progress-spinner>
++      </div>
++    }
+   `,
+   encapsulation: ViewEncapsulation.ShadowDom,
+ })
+diff --git a/src/material/radio/radio.spec.ts b/src/material/radio/radio.spec.ts
+index a67d74a0a7b4..02b8d1e9ba41 100644
+--- a/src/material/radio/radio.spec.ts
++++ b/src/material/radio/radio.spec.ts
+@@ -1007,10 +1007,12 @@ describe('MatRadioDefaultOverrides', () => {
+                   [required]="isGroupRequired"
+                   [value]="groupValue"
+                   name="test-name">
+-    <mat-radio-button value="fire" [disableRipple]="disableRipple" [disabled]="isFirstDisabled"
+-                     [color]="color" *ngIf="isFirstShown">
+-      Charmander
+-    </mat-radio-button>
++    @if (isFirstShown) {
++      <mat-radio-button value="fire" [disableRipple]="disableRipple" [disabled]="isFirstDisabled"
++                      [color]="color">
++        Charmander
++      </mat-radio-button>
++    }
+     <mat-radio-button value="water" [disableRipple]="disableRipple" [color]="color">
+       Squirtle
+     </mat-radio-button>
+@@ -1073,9 +1075,9 @@ class StandaloneRadioButtons {
+ @Component({
+   template: `
+   <mat-radio-group [name]="groupName" [(ngModel)]="modelValue" (change)="lastEvent = $event">
+-    <mat-radio-button *ngFor="let option of options" [value]="option.value">
+-      {{option.label}}
+-    </mat-radio-button>
++    @for (option of options; track option) {
++      <mat-radio-button [value]="option.value">{{option.label}}</mat-radio-button>
++    }
+   </mat-radio-group>
+   `,
+ })
+@@ -1125,9 +1127,11 @@ class FocusableRadioButton {
+ @Component({
+   template: `
+   <mat-radio-group name="group" [(ngModel)]="modelValue">
+-    <transcluding-wrapper *ngFor="let option of options">
+-      <mat-radio-button [value]="option.value">{{option.label}}</mat-radio-button>
+-    </transcluding-wrapper>
++    @for (option of options; track option) {
++      <transcluding-wrapper>
++        <mat-radio-button [value]="option.value">{{option.label}}</mat-radio-button>
++      </transcluding-wrapper>
++    }
+   </mat-radio-group>
+   `,
+ })
+@@ -1176,15 +1180,16 @@ class RadioButtonWithPredefinedAriaAttributes {}
+   // Note that this is somewhat of a contrived template, but it is required to
+   // reproduce the issue. It was taken for a specific user report at #25831.
+   template: `
+-    <ng-container *ngIf="true">
++    @if (true) {
+       <mat-radio-group [formControl]="controls.predecessor">
+         <mat-radio-button value="predecessor"></mat-radio-button>
+       </mat-radio-group>
+-    </ng-container>
+-
++    }
+     <mat-radio-group [formControl]="controls.target" #preselectedGroup>
+       <mat-radio-button value="a"></mat-radio-button>
+-      <mat-radio-button *ngIf="true" value="b" #preselectedRadio></mat-radio-button>
++        @if (true) {
++          <mat-radio-button value="b" #preselectedRadio></mat-radio-button>
++        }
+     </mat-radio-group>
+   `,
+ })
+diff --git a/src/material/radio/testing/radio-harness.spec.ts b/src/material/radio/testing/radio-harness.spec.ts
+index fc933aa27787..ad19f356e1e2 100644
+--- a/src/material/radio/testing/radio-harness.spec.ts
++++ b/src/material/radio/testing/radio-harness.spec.ts
+@@ -185,18 +185,16 @@ describe('radio harness', () => {
+     });
+ 
+     it('should get label text', async () => {
+-      const [firstRadio, secondRadio, thirdRadio] = await loader.getAllHarnesses(
+-        MatRadioButtonHarness,
+-      );
++      const [firstRadio, secondRadio, thirdRadio] =
++        await loader.getAllHarnesses(MatRadioButtonHarness);
+       expect(await firstRadio.getLabelText()).toBe('Option #1');
+       expect(await secondRadio.getLabelText()).toBe('Option #2');
+       expect(await thirdRadio.getLabelText()).toBe('Option #3');
+     });
+ 
+     it('should get value', async () => {
+-      const [firstRadio, secondRadio, thirdRadio] = await loader.getAllHarnesses(
+-        MatRadioButtonHarness,
+-      );
++      const [firstRadio, secondRadio, thirdRadio] =
++        await loader.getAllHarnesses(MatRadioButtonHarness);
+       expect(await firstRadio.getValue()).toBe('opt1');
+       expect(await secondRadio.getValue()).toBe('opt2');
+       expect(await thirdRadio.getValue()).toBe('opt3');
+@@ -264,23 +262,25 @@ describe('radio harness', () => {
+ 
+ @Component({
+   template: `
+-    <mat-radio-button *ngFor="let value of values, let i = index"
+-                      [name]="value === 'opt3' ? 'group2' : 'group1'"
+-                      [disabled]="disableAll"
+-                      [checked]="value === 'opt2'"
+-                      [id]="value"
+-                      [required]="value === 'opt2'"
+-                      [value]="value">
+-      Option #{{i + 1}}
+-    </mat-radio-button>
++    @for (value of values; track value) {
++      <mat-radio-button
++        [name]="value === 'opt3' ? 'group2' : 'group1'"
++        [disabled]="disableAll"
++        [checked]="value === 'opt2'"
++        [id]="value"
++        [required]="value === 'opt2'"
++        [value]="value">
++        Option #{{$index + 1}}
++      </mat-radio-button>
++    }
+ 
+     <mat-radio-group id="my-group-1" name="my-group-1-name">
+-      <mat-radio-button *ngFor="let value of values"
+-                        [checked]="value === 'opt2'"
+-                        [value]="value"
+-                        [id]="value + '-group-one'">
+-        {{value}}
+-      </mat-radio-button>
++      @for (value of values; track value) {
++        <mat-radio-button
++          [checked]="value === 'opt2'"
++          [value]="value"
++          [id]="value + '-group-one'">{{value}}</mat-radio-button>
++      }
+     </mat-radio-group>
+ 
+ 
+diff --git a/src/material/select/select.md b/src/material/select/select.md
+index a26aab612e28..6169c15faec9 100644
+--- a/src/material/select/select.md
++++ b/src/material/select/select.md
+@@ -176,15 +176,18 @@ items.
+ 
+ This error is thrown if you attempt to bind the `multiple` property on `<mat-select>` to a dynamic
+ value. (e.g. `[multiple]="isMultiple"` where the value of `isMultiple` changes over the course of
+-the component's lifetime). If you need to change this dynamically, use `ngIf` or `ngSwitch` instead:
++the component's lifetime). If you need to change this dynamically, use `@if` or `@switch` instead:
+ 
+ ```html
+-<mat-select *ngIf="isMultiple" multiple>
+-  ...
+-</mat-select>
+-<mat-select *ngIf="!isMultiple">
+-  ...
+-</mat-select>
++@if (isMultiple) {
++  <mat-select multiple>
++    ...
++  </mat-select>
++} @else {
++  <mat-select>
++    ...
++  </mat-select>
++}
+ ```
+ 
+ #### Error: Value must be an array in multiple-selection mode
+diff --git a/src/material/select/select.spec.ts b/src/material/select/select.spec.ts
+index 87fe1e9ae4d8..27f32fc633f8 100644
+--- a/src/material/select/select.spec.ts
++++ b/src/material/select/select.spec.ts
+@@ -4575,18 +4575,24 @@ describe('MDC-based MatSelect', () => {
+   template: `
+     <div [style.height.px]="heightAbove"></div>
+     <mat-form-field>
+-      <mat-label *ngIf="hasLabel">Select a food</mat-label>
++      @if (hasLabel) {
++        <mat-label>Select a food</mat-label>
++      }
+       <mat-select placeholder="Food" [formControl]="control" [required]="isRequired"
+         [tabIndex]="tabIndexOverride" [aria-describedby]="ariaDescribedBy"
+         [aria-label]="ariaLabel" [aria-labelledby]="ariaLabelledby"
+         [panelClass]="panelClass" [disableRipple]="disableRipple"
+         [typeaheadDebounceInterval]="typeaheadDebounceInterval"
+         [panelWidth]="panelWidth">
+-        <mat-option *ngFor="let food of foods" [value]="food.value" [disabled]="food.disabled">
+-          {{ capitalize ? food.viewValue.toUpperCase() : food.viewValue }}
+-        </mat-option>
++        @for (food of foods; track food) {
++          <mat-option [value]="food.value" [disabled]="food.disabled">
++            {{ capitalize ? food.viewValue.toUpperCase() : food.viewValue }}
++          </mat-option>
++        }
+       </mat-select>
+-      <mat-hint *ngIf="hint">{{ hint }}</mat-hint>
++      @if (hint) {
++        <mat-hint>{{ hint }}</mat-hint>
++      }
+     </mat-form-field>
+     <div [style.height.px]="heightBelow"></div>
+   `,
+@@ -4627,9 +4633,9 @@ class BasicSelect {
+   template: `
+     <mat-form-field>
+       <mat-select placeholder="Food" ngModel [disabled]="isDisabled">
+-        <mat-option *ngFor="let food of foods"
+-                    [value]="food.value">{{ food.viewValue }}
+-        </mat-option>
++        @for (food of foods; track food) {
++          <mat-option [value]="food.value">{{ food.viewValue }}</mat-option>
++        }
+       </mat-select>
+     </mat-form-field>
+   `,
+@@ -4668,15 +4674,17 @@ class ManySelects {}
+ @Component({
+   selector: 'ng-if-select',
+   template: `
+-    <div *ngIf="isShowing">
+-      <mat-form-field>
+-        <mat-select placeholder="Food I want to eat right now" [formControl]="control">
+-          <mat-option *ngFor="let food of foods" [value]="food.value">
+-            {{ food.viewValue }}
+-          </mat-option>
+-        </mat-select>
+-      </mat-form-field>
+-    </div>
++    @if (isShowing) {
++      <div>
++        <mat-form-field>
++          <mat-select placeholder="Food I want to eat right now" [formControl]="control">
++            @for (food of foods; track food) {
++              <mat-option [value]="food.value">{{ food.viewValue }}</mat-option>
++            }
++          </mat-select>
++        </mat-form-field>
++      </div>
++    }
+   `,
+ })
+ class NgIfSelect {
+@@ -4696,7 +4704,9 @@ class NgIfSelect {
+   template: `
+     <mat-form-field>
+       <mat-select (selectionChange)="changeListener($event)">
+-        <mat-option *ngFor="let food of foods" [value]="food">{{ food }}</mat-option>
++        @for (food of foods; track food) {
++          <mat-option [value]="food">{{ food }}</mat-option>
++        }
+       </mat-select>
+     </mat-form-field>
+   `,
+@@ -4721,9 +4731,9 @@ class SelectWithChangeEvent {
+   template: `
+     <mat-form-field>
+       <mat-select placeholder="Food I want to eat right now" [formControl]="control">
+-        <mat-option *ngFor="let food of foods" [value]="food.value">
+-          {{ food.viewValue }}
+-        </mat-option>
++        @for (food of foods; track food) {
++          <mat-option [value]="food.value">{{ food.viewValue }}</mat-option>
++        }
+       </mat-select>
+     </mat-form-field>
+   `,
+@@ -4808,9 +4818,9 @@ class ThrowsErrorOnInit implements OnInit {
+   template: `
+     <mat-form-field>
+       <mat-select placeholder="Food" [formControl]="control">
+-        <mat-option *ngFor="let food of foods" [value]="food.value">
+-          {{ food.viewValue }}
+-        </mat-option>
++        @for (food of foods; track food) {
++          <mat-option [value]="food.value">{{ food.viewValue }}</mat-option>
++        }
+       </mat-select>
+     </mat-form-field>
+   `,
+@@ -4830,9 +4840,9 @@ class BasicSelectOnPush {
+   template: `
+     <mat-form-field>
+       <mat-select placeholder="Food" [formControl]="control">
+-        <mat-option *ngFor="let food of foods" [value]="food.value">
+-          {{ food.viewValue }}
+-        </mat-option>
++        @for (food of foods; track food) {
++          <mat-option [value]="food.value">{{ food.viewValue }}</mat-option>
++        }
+       </mat-select>
+     </mat-form-field>
+   `,
+@@ -4853,9 +4863,9 @@ class BasicSelectOnPushPreselected {
+     <mat-form-field [floatLabel]="floatLabel">
+       <mat-label>Select a food</mat-label>
+       <mat-select [placeholder]="placeholder" [formControl]="control">
+-        <mat-option *ngFor="let food of foods" [value]="food.value">
+-          {{ food.viewValue }}
+-        </mat-option>
++        @for (food of foods; track food) {
++          <mat-option [value]="food.value">{{ food.viewValue }}</mat-option>
++        }
+       </mat-select>
+     </mat-form-field>
+     `,
+@@ -4879,9 +4889,9 @@ class FloatLabelSelect {
+     <mat-form-field>
+       <mat-select multiple placeholder="Food" [formControl]="control"
+         [sortComparator]="sortComparator">
+-        <mat-option *ngFor="let food of foods"
+-                    [value]="food.value">{{ food.viewValue }}
+-        </mat-option>
++        @for (food of foods; track food) {
++          <mat-option [value]="food.value">{{ food.viewValue }}</mat-option>
++        }
+       </mat-select>
+     </mat-form-field>
+   `,
+@@ -4916,7 +4926,9 @@ class SelectWithPlainTabindex {}
+     <mat-form-field>
+       <mat-select #select="matSelect"></mat-select>
+     </mat-form-field>
+-    <div *ngIf="select.selected"></div>
++    @if (select.selected) {
++      <div></div>
++    }
+   `,
+ })
+ class SelectEarlyAccessSibling {}
+@@ -4969,9 +4981,9 @@ class BasicSelectWithTheming {
+     <mat-form-field>
+       <mat-label>Select a food</mat-label>
+       <mat-select [formControl]="control">
+-        <mat-option *ngFor="let food of foods" [value]="food.value">
+-          {{ food.viewValue }}
+-        </mat-option>
++        @for (food of foods; track food) {
++          <mat-option [value]="food.value">{{ food.viewValue }}</mat-option>
++        }
+         <mat-option>None</mat-option>
+       </mat-select>
+     </mat-form-field>
+@@ -4995,9 +5007,9 @@ class ResetValuesSelect {
+   template: `
+     <mat-form-field>
+       <mat-select [formControl]="control">
+-        <mat-option *ngFor="let food of foods"
+-                    [value]="food.value">{{ food.viewValue }}
+-        </mat-option>
++        @for (food of foods; track food) {
++          <mat-option [value]="food.value">{{ food.viewValue }}</mat-option>
++        }
+       </mat-select>
+     </mat-form-field>
+   `,
+@@ -5016,12 +5028,13 @@ class FalsyValueSelect {
+   template: `
+     <mat-form-field>
+       <mat-select placeholder="Pokemon" [formControl]="control">
+-        <mat-optgroup *ngFor="let group of pokemonTypes" [label]="group.name"
+-          [disabled]="group.disabled">
+-          <mat-option *ngFor="let pokemon of group.pokemon" [value]="pokemon.value">
+-            {{ pokemon.viewValue }}
+-          </mat-option>
+-        </mat-optgroup>
++        @for (group of pokemonTypes; track group) {
++          <mat-optgroup [label]="group.name" [disabled]="group.disabled">
++            @for (pokemon of group.pokemon; track pokemon) {
++              <mat-option [value]="pokemon.value">{{ pokemon.viewValue }}</mat-option>
++            }
++          </mat-optgroup>
++        }
+         <mat-option value="mime-11">Mr. Mime</mat-option>
+       </mat-select>
+     </mat-form-field>
+@@ -5073,11 +5086,13 @@ class SelectWithGroups {
+   template: `
+     <mat-form-field>
+       <mat-select placeholder="Pokemon" [formControl]="control">
+-        <mat-optgroup *ngFor="let group of pokemonTypes" [label]="group.name">
+-          <ng-container *ngFor="let pokemon of group.pokemon">
+-            <mat-option [value]="pokemon.value">{{ pokemon.viewValue }}</mat-option>
+-          </ng-container>
+-        </mat-optgroup>
++        @for (group of pokemonTypes; track group) {
++          <mat-optgroup [label]="group.name">
++            @for (pokemon of group.pokemon; track pokemon) {
++              <mat-option [value]="pokemon.value">{{ pokemon.viewValue }}</mat-option>
++            }
++          </mat-optgroup>
++        }
+       </mat-select>
+     </mat-form-field>
+   `,
+@@ -5111,9 +5126,9 @@ class InvalidSelectInForm {
+       <mat-form-field>
+         <mat-label>Food</mat-label>
+         <mat-select formControlName="food">
+-          <mat-option *ngFor="let option of options" [value]="option.value">
+-            {{option.viewValue}}
+-          </mat-option>
++          @for (option of options; track option) {
++            <mat-option [value]="option.value">{{option.viewValue}}</mat-option>
++          }
+         </mat-select>
+ 
+         <mat-error>This field is required</mat-error>
+@@ -5138,9 +5153,9 @@ class SelectInsideFormGroup {
+   template: `
+     <mat-form-field>
+       <mat-select placeholder="Food" [(value)]="selectedFood">
+-        <mat-option *ngFor="let food of foods" [value]="food.value">
+-          {{ food.viewValue }}
+-        </mat-option>
++        @for (food of foods; track food) {
++          <mat-option [value]="food.value">{{ food.viewValue }}</mat-option>
++        }
+       </mat-select>
+     </mat-form-field>
+   `,
+@@ -5160,9 +5175,9 @@ class BasicSelectWithoutForms {
+   template: `
+     <mat-form-field>
+       <mat-select placeholder="Food" [(value)]="selectedFood">
+-        <mat-option *ngFor="let food of foods" [value]="food.value">
+-          {{ food.viewValue }}
+-        </mat-option>
++        @for (food of foods; track food) {
++          <mat-option [value]="food.value">{{ food.viewValue }}</mat-option>
++        }
+       </mat-select>
+     </mat-form-field>
+   `,
+@@ -5181,9 +5196,9 @@ class BasicSelectWithoutFormsPreselected {
+   template: `
+     <mat-form-field>
+       <mat-select placeholder="Food" [(value)]="selectedFoods" multiple>
+-        <mat-option *ngFor="let food of foods" [value]="food.value">
+-          {{ food.viewValue }}
+-        </mat-option>
++        @for (food of foods; track food) {
++          <mat-option [value]="food.value">{{ food.viewValue }}</mat-option>
++        }
+       </mat-select>
+     </mat-form-field>
+   `,
+@@ -5207,9 +5222,9 @@ class BasicSelectWithoutFormsMultiple {
+         <mat-select-trigger>
+           {{ select.selected?.viewValue.split('').reverse().join('') }}
+         </mat-select-trigger>
+-        <mat-option *ngFor="let food of foods" [value]="food.value">
+-          {{ food.viewValue }}
+-        </mat-option>
++        @for (food of foods; track food) {
++          <mat-option [value]="food.value">{{ food.viewValue }}</mat-option>
++        }
+       </mat-select>
+     </mat-form-field>
+   `,
+@@ -5228,7 +5243,9 @@ class SelectWithCustomTrigger {
+     <mat-form-field>
+       <mat-select [ngModel]="selectedFood" (ngModelChange)="setFoodByCopy($event)"
+                  [compareWith]="comparator">
+-        <mat-option *ngFor="let food of foods" [value]="food">{{ food.viewValue }}</mat-option>
++        @for (food of foods; track food) {
++          <mat-option [value]="food">{{ food.viewValue }}</mat-option>
++        }
+       </mat-select>
+     </mat-form-field>
+   `,
+@@ -5273,9 +5290,9 @@ class NgModelCompareWithSelect {
+ @Component({
+   template: `
+     <mat-select placeholder="Food" [formControl]="control" [errorStateMatcher]="errorStateMatcher">
+-      <mat-option *ngFor="let food of foods" [value]="food.value">
+-        {{ food.viewValue }}
+-      </mat-option>
++      @for (food of foods; track food) {
++        <mat-option [value]="food.value">{{ food.viewValue }}</mat-option>
++      }
+     </mat-select>
+   `,
+ })
+@@ -5293,9 +5310,9 @@ class CustomErrorBehaviorSelect {
+   template: `
+     <mat-form-field>
+       <mat-select placeholder="Food" [(ngModel)]="selectedFoods">
+-        <mat-option *ngFor="let food of foods"
+-                    [value]="food.value">{{ food.viewValue }}
+-        </mat-option>
++        @for (food of foods; track food) {
++          <mat-option [value]="food.value">{{ food.viewValue }}</mat-option>
++        }
+       </mat-select>
+     </mat-form-field>
+   `,
+@@ -5318,9 +5335,9 @@ class SingleSelectWithPreselectedArrayValues {
+   template: `
+     <mat-form-field>
+       <mat-select placeholder="Food" [formControl]="control" disableOptionCentering>
+-        <mat-option *ngFor="let food of foods" [value]="food.value">
+-          {{ food.viewValue }}
+-        </mat-option>
++        @for (food of foods; track food) {
++          <mat-option [value]="food.value">{{ food.viewValue }}</mat-option>
++        }
+       </mat-select>
+     </mat-form-field>
+   `,
+@@ -5361,9 +5378,11 @@ class SelectWithFormFieldLabel {
+   template: `
+     <mat-form-field appearance="fill">
+       <mat-label>Select something</mat-label>
+-      <mat-select *ngIf="showSelect">
+-        <mat-option value="1">One</mat-option>
+-      </mat-select>
++      @if (showSelect) {
++        <mat-select>
++          <mat-option value="1">One</mat-option>
++        </mat-select>
++      }
+     </mat-form-field>
+   `,
+ })
+@@ -5375,7 +5394,9 @@ class SelectWithNgIfAndLabel {
+   template: `
+     <mat-form-field>
+       <mat-select multiple [ngModel]="value">
+-        <mat-option *ngFor="let item of items" [value]="item">{{item}}</mat-option>
++        @for (item of items; track item) {
++          <mat-option [value]="item">{{item}}</mat-option>
++        }
+       </mat-select>
+     </mat-form-field>
+   `,
+@@ -5416,13 +5437,13 @@ class SelectWithResetOptionAndFormControl {
+   selector: 'select-with-placeholder-in-ngcontainer-with-ngIf',
+   template: `
+     <mat-form-field>
+-      <ng-container *ngIf="true">
++      @if (true) {
+         <mat-select placeholder="Product Area">
+           <mat-option value="a">A</mat-option>
+           <mat-option value="b">B</mat-option>
+           <mat-option value="c">C</mat-option>
+         </mat-select>
+-      </ng-container>
++      }
+     </mat-form-field>
+   `,
+ })
+@@ -5458,17 +5479,23 @@ class SelectInsideDynamicFormGroup {
+   template: `
+     <div [style.height.px]="heightAbove"></div>
+     <mat-form-field>
+-      <mat-label *ngIf="hasLabel">Select a food</mat-label>
++      @if (hasLabel) {
++        <mat-label>Select a food</mat-label>
++      }
+       <mat-select placeholder="Food" [formControl]="control" [required]="isRequired"
+         [tabIndex]="tabIndexOverride" [aria-describedby]="ariaDescribedBy"
+         [aria-label]="ariaLabel" [aria-labelledby]="ariaLabelledby"
+         [panelClass]="panelClass" [disableRipple]="disableRipple"
+         [typeaheadDebounceInterval]="typeaheadDebounceInterval">
+-        <mat-option *ngFor="let food of foods" [value]="food.value" [disabled]="food.disabled">
+-          {{ food.viewValue }}
+-        </mat-option>
++        @for (food of foods; track food) {
++          <mat-option [value]="food.value" [disabled]="food.disabled">
++            {{ food.viewValue }}
++          </mat-option>
++        }
+       </mat-select>
+-      <mat-hint *ngIf="hint">{{ hint }}</mat-hint>
++      @if (hint) {
++        <mat-hint>{{ hint }}</mat-hint>
++      }
+     </mat-form-field>
+     <div [style.height.px]="heightBelow"></div>
+   `,
+@@ -5512,9 +5539,9 @@ class BasicSelectWithFirstAndLastOptionDisabled {
+         <mat-form-field>
+           <mat-label>Select a food</mat-label>
+           <mat-select placeholder="Food" ngModel>
+-            <mat-option *ngFor="let food of foods"
+-                        [value]="food.value">{{ food.viewValue }}
+-            </mat-option>
++            @for (food of foods; track food) {
++              <mat-option [value]="food.value">{{ food.viewValue }}</mat-option>
++            }
+           </mat-select>
+         </mat-form-field>
+       </div>
+diff --git a/src/material/select/testing/select-harness.spec.ts b/src/material/select/testing/select-harness.spec.ts
+index 454da02187e4..c2bb067a24d4 100644
+--- a/src/material/select/testing/select-harness.spec.ts
++++ b/src/material/select/testing/select-harness.spec.ts
+@@ -270,26 +270,34 @@ describe('MatSelectHarness', () => {
+   template: `
+     <mat-form-field>
+       <mat-select [disabled]="isDisabled" [required]="isRequired" id="single-selection">
+-        <mat-option *ngFor="let state of states" [value]="state.code">{{ state.name }}</mat-option>
++        @for (state of states; track state) {
++          <mat-option [value]="state.code">{{ state.name }}</mat-option>
++        }
+       </mat-select>
+     </mat-form-field>
+     <mat-form-field>
+       <mat-select multiple id="multiple-selection">
+-        <mat-option *ngFor="let state of states" [value]="state.code">{{ state.name }}</mat-option>
++        @for (state of states; track state) {
++  <mat-option [value]="state.code">{{ state.name }}</mat-option>
++}
+       </mat-select>
+     </mat-form-field>
+     <mat-form-field>
+       <mat-select id="grouped">
+-        <mat-optgroup *ngFor="let group of stateGroups" [label]="group.name">
+-          <mat-option
+-            *ngFor="let state of group.states"
+-            [value]="state.code">{{ state.name }}</mat-option>
+-        </mat-optgroup>
++        @for (group of stateGroups; track group) {
++          <mat-optgroup [label]="group.name">
++            @for (state of group.states; track state) {
++              <mat-option [value]="state.code">{{ state.name }}</mat-option>
++            }
++          </mat-optgroup>
++        }
+       </mat-select>
+     </mat-form-field>
+     <mat-form-field>
+       <mat-select [formControl]="formControl" id="with-form-control">
+-        <mat-option *ngFor="let state of states" [value]="state.code">{{ state.name }}</mat-option>
++        @for (state of states; track state) {
++          <mat-option [value]="state.code">{{ state.name }}</mat-option>
++        }
+       </mat-select>
+     </mat-form-field>
+   `,
+diff --git a/src/material/sidenav/drawer.spec.ts b/src/material/sidenav/drawer.spec.ts
+index 3758567e0f39..480d8ac16531 100644
+--- a/src/material/sidenav/drawer.spec.ts
++++ b/src/material/sidenav/drawer.spec.ts
+@@ -1284,7 +1284,9 @@ class DrawerWithoutFocusableElements {}
+ @Component({
+   template: `
+     <mat-drawer-container>
+-      <mat-drawer *ngIf="showDrawer" #drawer mode="side">Drawer</mat-drawer>
++      @if (showDrawer) {
++        <mat-drawer #drawer mode="side">Drawer</mat-drawer>
++      }
+     </mat-drawer-container>
+   `,
+ })
+@@ -1296,7 +1298,9 @@ class DrawerDelayed {
+ @Component({
+   template: `
+     <mat-drawer-container [dir]="direction">
+-      <mat-drawer *ngIf="renderDrawer" [mode]="mode" style="width:100px"></mat-drawer>
++      @if (renderDrawer) {
++        <mat-drawer [mode]="mode" style="width:100px"></mat-drawer>
++      }
+     </mat-drawer-container>`,
+ })
+ class DrawerContainerStateChangesTestApp {
+@@ -1336,13 +1340,13 @@ class DrawerContainerWithContent {
+ }
+ 
+ @Component({
+-  // Note that we need the `ng-container` with the `ngSwitch` so that
+-  // there's a directive between the container and the drawer.
++  // Note that we need the `@if` so that there's an embedded
++  // view between the container and the drawer.
+   template: `
+     <mat-drawer-container #container>
+-      <ng-container [ngSwitch]="true">
++      @if (true) {
+         <mat-drawer #drawer>Drawer</mat-drawer>
+-      </ng-container>
++      }
+     </mat-drawer-container>`,
+ })
+ class IndirectDescendantDrawer {
+diff --git a/src/material/sidenav/sidenav.spec.ts b/src/material/sidenav/sidenav.spec.ts
+index d1d5604178c7..ba0b49b5c34e 100644
+--- a/src/material/sidenav/sidenav.spec.ts
++++ b/src/material/sidenav/sidenav.spec.ts
+@@ -105,13 +105,13 @@ class SidenavWithFixedPosition {
+ }
+ 
+ @Component({
+-  // Note that we need the `ng-container` with the `ngSwitch` so that
+-  // there's a directive between the container and the sidenav.
++  // Note that we need the `@if` so that there's an embedded
++  // view between the container and the sidenav.
+   template: `
+     <mat-sidenav-container #container>
+-      <ng-container [ngSwitch]="true">
++      @if (true) {
+         <mat-sidenav #sidenav>Sidenav.</mat-sidenav>
+-      </ng-container>
++      }
+       <mat-sidenav-content>Some content.</mat-sidenav-content>
+     </mat-sidenav-container>`,
+ })
+diff --git a/src/material/snack-bar/snack-bar.spec.ts b/src/material/snack-bar/snack-bar.spec.ts
+index b04988967c32..53fe0e94b9a6 100644
+--- a/src/material/snack-bar/snack-bar.spec.ts
++++ b/src/material/snack-bar/snack-bar.spec.ts
+@@ -1091,7 +1091,7 @@ class DirectiveWithViewContainer {
+ 
+ @Component({
+   selector: 'arbitrary-component',
+-  template: `<dir-with-view-container *ngIf="childComponentExists"></dir-with-view-container>`,
++  template: `@if (childComponentExists) {<dir-with-view-container></dir-with-view-container>}`,
+ })
+ class ComponentWithChildViewContainer {
+   @ViewChild(DirectiveWithViewContainer) childWithViewContainer: DirectiveWithViewContainer;
+diff --git a/src/material/sort/testing/sort-harness.spec.ts b/src/material/sort/testing/sort-harness.spec.ts
+index ee34924a2e26..017765e65758 100644
+--- a/src/material/sort/testing/sort-harness.spec.ts
++++ b/src/material/sort/testing/sort-harness.spec.ts
+@@ -127,13 +127,15 @@ describe('MatSortHarness', () => {
+         <th mat-sort-header="protein">Protein</th>
+       </tr>
+ 
+-      <tr *ngFor="let dessert of sortedData">
+-        <td>{{dessert.name}}</td>
+-        <td>{{dessert.calories}}</td>
+-        <td>{{dessert.fat}}</td>
+-        <td>{{dessert.carbs}}</td>
+-        <td>{{dessert.protein}}</td>
+-      </tr>
++      @for (dessert of sortedData; track dessert) {
++        <tr>
++          <td>{{dessert.name}}</td>
++          <td>{{dessert.calories}}</td>
++          <td>{{dessert.fat}}</td>
++          <td>{{dessert.carbs}}</td>
++          <td>{{dessert.protein}}</td>
++        </tr>
++      }
+     </table>
+   `,
+ })
+diff --git a/src/material/stepper/stepper.spec.ts b/src/material/stepper/stepper.spec.ts
+index ac8fcefb6a69..5e33dc892298 100644
+--- a/src/material/stepper/stepper.spec.ts
++++ b/src/material/stepper/stepper.spec.ts
+@@ -1894,14 +1894,16 @@ class SimpleMatHorizontalStepperApp {
+           <button mat-button matStepperNext>Next</button>
+         </div>
+       </mat-step>
+-      <mat-step *ngIf="showStepTwo" [color]="secondStepTheme">
+-        <ng-template matStepLabel>Step 2</ng-template>
+-        Content 2
+-        <div>
+-          <button mat-button matStepperPrevious>Back</button>
+-          <button mat-button matStepperNext>Next</button>
+-        </div>
+-      </mat-step>
++      @if (showStepTwo) {
++        <mat-step [color]="secondStepTheme">
++          <ng-template matStepLabel>Step 2</ng-template>
++          Content 2
++          <div>
++            <button mat-button matStepperPrevious>Back</button>
++            <button mat-button matStepperNext>Next</button>
++          </div>
++        </mat-step>
++      }
+       <mat-step [label]="inputLabel">
+         Content 3
+         <div>
+@@ -1988,10 +1990,9 @@ class SimplePreselectedMatHorizontalStepperApp {
+ @Component({
+   template: `
+     <mat-stepper linear>
+-      <mat-step
+-        *ngFor="let step of steps"
+-        [label]="step.label"
+-        [completed]="step.completed"></mat-step>
++      @for (step of steps; track step) {
++        <mat-step [label]="step.label" [completed]="step.completed"></mat-step>
++      }
+     </mat-stepper>
+   `,
+ })
+@@ -2006,11 +2007,12 @@ class SimpleStepperWithoutStepControl {
+ @Component({
+   template: `
+     <mat-stepper linear>
+-      <mat-step
+-        *ngFor="let step of steps"
+-        [label]="step.label"
+-        [stepControl]="step.control"
+-        [completed]="step.completed"></mat-step>
++      @for (step of steps; track step) {
++        <mat-step
++          [label]="step.label"
++          [stepControl]="step.control"
++          [completed]="step.completed"></mat-step>
++      }
+     </mat-stepper>
+   `,
+ })
+@@ -2058,13 +2060,13 @@ class IconOverridesStepper {
+ @Component({
+   template: `
+     <mat-stepper>
+-      <ng-container [ngSwitch]="true">
++      @if (true) {
+         <ng-template matStepperIcon="edit">Custom edit</ng-template>
+         <ng-template matStepperIcon="done">Custom done</ng-template>
+         <ng-template matStepperIcon="number" let-index="index">
+           {{getRomanNumeral(index + 1)}}
+         </ng-template>
+-      </ng-container>
++      }
+ 
+       <mat-step>Content 1</mat-step>
+       <mat-step>Content 2</mat-step>
+@@ -2103,11 +2105,11 @@ class StepperWithAriaInputs {
+ @Component({
+   template: `
+     <mat-stepper orientation="vertical">
+-      <ng-container [ngSwitch]="true">
++      @if (true) {
+         <mat-step label="Step 1">Content 1</mat-step>
+         <mat-step label="Step 2">Content 2</mat-step>
+         <mat-step label="Step 3">Content 3</mat-step>
+-      </ng-container>
++      }
+     </mat-stepper>
+   `,
+ })
+@@ -2120,9 +2122,11 @@ class StepperWithIndirectDescendantSteps {}
+         <ng-template matStepLabel>Step 1</ng-template>
+       </mat-step>
+ 
+-      <mat-step *ngIf="showStep2">
+-        <ng-template matStepLabel>Step 2</ng-template>
+-      </mat-step>
++      @if (showStep2) {
++        <mat-step>
++          <ng-template matStepLabel>Step 2</ng-template>
++        </mat-step>
++      }
+     </mat-stepper>
+   `,
+ })
+@@ -2187,7 +2191,9 @@ class StepperWithLazyContent {
+   template: `
+     <mat-stepper>
+       <mat-step label="Step 1">Content 1</mat-step>
+-      <mat-step label="Step 2" *ngIf="renderSecondStep">Content 2</mat-step>
++      @if (renderSecondStep) {
++        <mat-step label="Step 2">Content 2</mat-step>
++      }
+       <mat-step label="Step 3">Content 3</mat-step>
+     </mat-stepper>
+   `,
+diff --git a/src/material/tabs/tab-group.spec.ts b/src/material/tabs/tab-group.spec.ts
+index 31b468ec456a..a392c10ded1f 100644
+--- a/src/material/tabs/tab-group.spec.ts
++++ b/src/material/tabs/tab-group.spec.ts
+@@ -1158,10 +1158,12 @@ class SimpleTabsTestApp {
+         (focusChange)="handleFocus($event)"
+         (selectedTabChange)="handleSelection($event)"
+         [disablePagination]="disablePagination">
+-      <mat-tab *ngFor="let tab of tabs">
+-        <ng-template mat-tab-label>{{tab.label}}</ng-template>
+-        {{tab.content}}
+-      </mat-tab>
++      @for (tab of tabs; track tab) {
++        <mat-tab>
++          <ng-template mat-tab-label>{{tab.label}}</ng-template>
++          {{tab.content}}
++        </mat-tab>
++      }
+     </mat-tab-group>
+   `,
+ })
+@@ -1186,9 +1188,9 @@ class SimpleDynamicTabsTestApp {
+ @Component({
+   template: `
+     <mat-tab-group class="tab-group" [(selectedIndex)]="selectedIndex">
+-      <mat-tab *ngFor="let tab of tabs" label="{{tab.label}}">
+-        {{tab.content}}
+-      </mat-tab>
++      @for (tab of tabs; track tab) {
++        <mat-tab label="{{tab.label}}">{{tab.content}}</mat-tab>
++      }
+     </mat-tab-group>
+   `,
+ })
+@@ -1234,10 +1236,12 @@ class DisabledTabsTestApp {
+ @Component({
+   template: `
+     <mat-tab-group class="tab-group">
+-      <mat-tab *ngFor="let tab of tabs | async">
+-        <ng-template mat-tab-label>{{ tab.label }}</ng-template>
+-        {{ tab.content }}
+-      </mat-tab>
++      @for (tab of tabs | async; track tab) {
++        <mat-tab>
++          <ng-template mat-tab-label>{{ tab.label }}</ng-template>
++          {{ tab.content }}
++        </mat-tab>
++      }
+    </mat-tab-group>
+   `,
+ })
+@@ -1327,7 +1331,9 @@ class TabGroupWithAriaInputs {
+       <mat-tab label="Vegetables"> Broccoli, spinach </mat-tab>
+     </mat-tab-group>
+ 
+-    <div *ngIf="pizza.isActive">pizza is active</div>
++    @if (pizza.isActive) {
++      <div>pizza is active</div>
++    }
+   `,
+ })
+ class TabGroupWithIsActiveBinding {}
+@@ -1345,10 +1351,10 @@ class TabsWithCustomAnimationDuration {}
+ @Component({
+   template: `
+     <mat-tab-group>
+-      <ng-container [ngSwitch]="true">
++      @if (true) {
+         <mat-tab label="One">Tab one content</mat-tab>
+         <mat-tab label="Two">Tab two content</mat-tab>
+-      </ng-container>
++      }
+     </mat-tab-group>
+   `,
+ })
+diff --git a/src/material/tabs/tab-header.spec.ts b/src/material/tabs/tab-header.spec.ts
+index fda6f442ab51..920cb195f12b 100644
+--- a/src/material/tabs/tab-header.spec.ts
++++ b/src/material/tabs/tab-header.spec.ts
+@@ -723,12 +723,11 @@ interface Tab {
+                (indexFocused)="focusedIndex = $event"
+                (selectFocusedIndex)="selectedIndex = $event"
+                [disablePagination]="disablePagination">
+-      <div matTabLabelWrapper class="label-content" style="min-width: 30px; width: 30px"
+-           *ngFor="let tab of tabs; let i = index"
++      @for (tab of tabs; track tab; let i = $index) {
++        <div matTabLabelWrapper class="label-content" style="min-width: 30px; width: 30px"
+            [disabled]="!!tab.disabled"
+-           (click)="selectedIndex = i">
+-         {{tab.label}}
+-      </div>
++           (click)="selectedIndex = i">{{tab.label}}</div>
++      }
+     </mat-tab-header>
+   </div>
+   `,
+diff --git a/src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts b/src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts
+index df4c41485d37..e1a749f65ad2 100644
+--- a/src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts
++++ b/src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts
+@@ -526,14 +526,13 @@ describe('MatTabNavBar with enabled animations', () => {
+          [disableRipple]="disableRippleOnBar"
+          [fitInkBarToContent]="fitInkBarToContent"
+          [tabPanel]="tabPanel">
+-      <a mat-tab-link
+-         *ngFor="let tab of tabs; let index = index"
+-         [active]="activeIndex === index"
+-         [disabled]="disabled"
+-         (click)="activeIndex = index"
+-         [disableRipple]="disableRippleOnLink">
+-        Tab link {{label}}
+-      </a>
++      @for (tab of tabs; track tab; let index = $index) {
++        <a mat-tab-link
++          [active]="activeIndex === index"
++          [disabled]="disabled"
++          (click)="activeIndex = index"
++          [disableRipple]="disableRippleOnLink">Tab link {{label}}</a>
++      }
+     </nav>
+     <mat-tab-nav-panel #tabPanel id="tab-panel">Tab panel</mat-tab-nav-panel>
+   `,
+@@ -555,7 +554,9 @@ class SimpleTabNavBarTestApp {
+ @Component({
+   template: `
+     <nav mat-tab-nav-bar [tabPanel]="tabPanel">
+-      <a mat-tab-link *ngIf="!isDestroyed">Link</a>
++      @if (!isDestroyed) {
++        <a mat-tab-link>Link</a>
++      }
+     </nav>
+     <mat-tab-nav-panel #tabPanel>Tab panel</mat-tab-nav-panel>
+   `,
+@@ -567,7 +568,9 @@ class TabLinkWithNgIf {
+ @Component({
+   template: `
+     <nav mat-tab-nav-bar [tabPanel]="tabPanel">
+-      <a mat-tab-link *ngFor="let tab of tabs" [active]="false">Tab link {{label}}</a>
++      @for (tab of tabs; track tab) {
++        <a mat-tab-link [active]="false">Tab link {{label}}</a>
++      }
+     </nav>
+     <mat-tab-nav-panel #tabPanel>Tab panel</mat-tab-nav-panel>
+   `,
+@@ -579,7 +582,9 @@ class TabBarWithInactiveTabsOnInit {
+ @Component({
+   template: `
+     <nav [animationDuration]="500" mat-tab-nav-bar [tabPanel]="tabPanel">
+-    <a mat-tab-link *ngFor="let link of links">{{link}}</a>
++    @for (link of links; track link) {
++      <a mat-tab-link>{{link}}</a>
++    }
+   </nav>
+   <mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>,
+   `,
+diff --git a/src/material/toolbar/toolbar.spec.ts b/src/material/toolbar/toolbar.spec.ts
+index 524ff148a570..2989dd7fc838 100644
+--- a/src/material/toolbar/toolbar.spec.ts
++++ b/src/material/toolbar/toolbar.spec.ts
+@@ -128,7 +128,9 @@ class ToolbarMultipleRows {}
+   template: `
+     <mat-toolbar>
+       First Row
+-      <mat-toolbar-row *ngIf="showToolbarRow">Second Row</mat-toolbar-row>
++      @if (showToolbarRow) {
++        <mat-toolbar-row>Second Row</mat-toolbar-row>
++      }
+     </mat-toolbar>
+   `,
+ })
+@@ -140,10 +142,10 @@ class ToolbarMixedRowModes {
+   // The ng-container is there so we have a node with a directive between the toolbar and the rows.
+   template: `
+     <mat-toolbar>
+-      <ng-container [ngSwitch]="true">
++      @if (true) {
+         <mat-toolbar-row>First Row</mat-toolbar-row>
+         <mat-toolbar-row>Second Row</mat-toolbar-row>
+-      </ng-container>
++      }
+     </mat-toolbar>
+   `,
+ })
+diff --git a/src/material/tooltip/tooltip.spec.ts b/src/material/tooltip/tooltip.spec.ts
+index 12f86924974f..393e841614c9 100644
+--- a/src/material/tooltip/tooltip.spec.ts
++++ b/src/material/tooltip/tooltip.spec.ts
+@@ -1533,14 +1533,13 @@ describe('MDC-based MatTooltip', () => {
+ @Component({
+   selector: 'app',
+   template: `
+-    <button #button
+-            *ngIf="showButton"
+-            [matTooltip]="message"
+-            [matTooltipPosition]="position"
+-            [matTooltipClass]="{'custom-one': showTooltipClass, 'custom-two': showTooltipClass }"
+-            [matTooltipTouchGestures]="touchGestures">
+-      Button
+-    </button>`,
++    @if (showButton) {
++      <button #button
++        [matTooltip]="message"
++        [matTooltipPosition]="position"
++        [matTooltipClass]="{'custom-one': showTooltipClass, 'custom-two': showTooltipClass }"
++        [matTooltipTouchGestures]="touchGestures">Button</button>
++    }`,
+ })
+ class BasicTooltipDemo {
+   position: string = 'below';
+@@ -1557,11 +1556,11 @@ class BasicTooltipDemo {
+   template: `
+     <div cdkScrollable style="padding: 100px; margin: 300px;
+                                height: 200px; width: 200px; overflow: auto;">
+-      <button *ngIf="showButton" style="margin-bottom: 600px"
++      @if (showButton) {
++        <button style="margin-bottom: 600px"
+               [matTooltip]="message"
+-              [matTooltipPosition]="position">
+-        Button
+-      </button>
++              [matTooltipPosition]="position">Button</button>
++      }
+     </div>`,
+ })
+ class ScrollableTooltipDemo {
+@@ -1599,10 +1598,10 @@ class OnPushTooltipDemo {
+ @Component({
+   selector: 'app',
+   template: `
+-    <button *ngFor="let tooltip of tooltips"
+-            [matTooltip]="tooltip">
+-      Button {{tooltip}}
+-    </button>`,
++    @for (tooltip of tooltips; track tooltip) {
++      <button [matTooltip]="tooltip">Button {{tooltip}}</button>
++    }
++  `,
+ })
+ class DynamicTooltipsDemo {
+   tooltips: string[] = [];
+diff --git a/src/material/tree/tree.spec.ts b/src/material/tree/tree.spec.ts
+index 76774f7584de..7091498106cc 100644
+--- a/src/material/tree/tree.spec.ts
++++ b/src/material/tree/tree.spec.ts
+@@ -937,9 +937,11 @@ class NestedMatTreeApp {
+        <mat-nested-tree-node *matTreeNodeDef="let node; when: isSpecial"
+                              matTreeNodeToggle>
+                      >>> {{node.pizzaTopping}} - {{node.pizzaCheese}} + {{node.pizzaBase}}
+-         <div *ngIf="treeControl.isExpanded(node)">
+-            <ng-template matTreeNodeOutlet></ng-template>
+-         </div>
++         @if (treeControl.isExpanded(node)) {
++            <div>
++              <ng-template matTreeNodeOutlet></ng-template>
++            </div>
++         }
+       </mat-nested-tree-node>
+     </mat-tree>
+   `,
+@@ -1012,9 +1014,11 @@ class MatTreeAppWithToggle {
+       <mat-nested-tree-node *matTreeNodeDef="let node" class="customNodeClass"
+                             matTreeNodeToggle [matTreeNodeToggleRecursive]="toggleRecursively">
+                      {{node.pizzaTopping}} - {{node.pizzaCheese}} + {{node.pizzaBase}}
+-        <div *ngIf="treeControl.isExpanded(node)">
+-          <ng-template matTreeNodeOutlet></ng-template>
+-        </div>
++        @if (treeControl.isExpanded(node)) {
++          <div>
++            <ng-template matTreeNodeOutlet></ng-template>
++          </div>
++        }
+       </mat-nested-tree-node>
+     </mat-tree>
+   `,
+diff --git a/src/youtube-player/youtube-player.spec.ts b/src/youtube-player/youtube-player.spec.ts
+index ec3e45d9818c..777be4fb2e20 100644
+--- a/src/youtube-player/youtube-player.spec.ts
++++ b/src/youtube-player/youtube-player.spec.ts
+@@ -554,17 +554,19 @@ describe('YoutubePlayer', () => {
+ @Component({
+   selector: 'test-app',
+   template: `
+-    <youtube-player #player [videoId]="videoId" *ngIf="visible" [width]="width" [height]="height"
+-      [startSeconds]="startSeconds" [endSeconds]="endSeconds" [suggestedQuality]="suggestedQuality"
+-      [playerVars]="playerVars"
+-      [disableCookies]="disableCookies"
+-      (ready)="onReady($event)"
+-      (stateChange)="onStateChange($event)"
+-      (playbackQualityChange)="onPlaybackQualityChange($event)"
+-      (playbackRateChange)="onPlaybackRateChange($event)"
+-      (error)="onError($event)"
+-      (apiChange)="onApiChange($event)">
+-    </youtube-player>
++    @if (visible) {
++      <youtube-player #player [videoId]="videoId" [width]="width" [height]="height"
++        [startSeconds]="startSeconds" [endSeconds]="endSeconds" [suggestedQuality]="suggestedQuality"
++        [playerVars]="playerVars"
++        [disableCookies]="disableCookies"
++        (ready)="onReady($event)"
++        (stateChange)="onStateChange($event)"
++        (playbackQualityChange)="onPlaybackQualityChange($event)"
++        (playbackRateChange)="onPlaybackRateChange($event)"
++        (error)="onError($event)"
++        (apiChange)="onApiChange($event)">
++      </youtube-player>
++    }
+   `,
+ })
+ class TestApp {
