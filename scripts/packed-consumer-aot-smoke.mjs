@@ -488,6 +488,7 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
     'packed-consumer/harness/cell-original-constructors-and-grid-roles': parsed.cellOriginalConstructors === true,
     'packed-consumer/harness/text-column-original-constructor-options': parsed.textColumnOriginalConstructor === true,
     'packed-consumer/harness/tab-content-original-constructor': parsed.tabContentOriginalConstructor === true,
+    'packed-consumer/harness/no-data-row-original-constructor': parsed.noDataRowOriginalConstructor === true,
   };
   const owned = declarationKeys(keys)
     .filter(key => key.endsWith('/testing'))
@@ -907,8 +908,8 @@ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
 import {provideNoopAnimations} from '@angular/platform-browser/animations';
 import {Overlay, OverlayContainer} from '@angular/cdk/overlay';
 import {ScrollDispatcher} from '@angular/cdk/scrolling';
-import {CdkCellDef,CdkHeaderCellDef,CdkFooterCellDef,CdkCell,CdkHeaderCell,CdkFooterCell,CdkTextColumn,TEXT_COLUMN_OPTIONS} from '@angular/cdk/table';
-import {MatLegacyTableModule,MatLegacyCellDef,MatLegacyHeaderCellDef,MatLegacyFooterCellDef,MatLegacyColumnDef,MatLegacyCell,MatLegacyHeaderCell,MatLegacyFooterCell,MatLegacyTable,MatLegacyTextColumn} from '@ngx-compat/material-legacy/legacy-table';
+import {CdkCellDef,CdkHeaderCellDef,CdkFooterCellDef,CdkCell,CdkHeaderCell,CdkFooterCell,CdkTextColumn,TEXT_COLUMN_OPTIONS,CdkNoDataRow} from '@angular/cdk/table';
+import {MatLegacyTableModule,MatLegacyCellDef,MatLegacyHeaderCellDef,MatLegacyFooterCellDef,MatLegacyColumnDef,MatLegacyCell,MatLegacyHeaderCell,MatLegacyFooterCell,MatLegacyTable,MatLegacyTextColumn,MatLegacyNoDataRow} from '@ngx-compat/material-legacy/legacy-table';
 import {Platform} from '@angular/cdk/platform';
 import {Directionality} from '@angular/cdk/bidi';
 import {MatLegacyButtonModule} from '@ngx-compat/material-legacy/legacy-button';
@@ -1019,7 +1020,7 @@ class SmokeDialogContent {}
       <tr mat-header-row *matHeaderRowDef="['value']"></tr>
       <tr mat-row *matRowDef="let row; columns:['value']"></tr>
     </table>
-    <mat-table id="constructor-grid" role="grid" [dataSource]="[{value:'Grid value'}]">
+    <mat-table id="constructor-grid" role="grid" [dataSource]="constructorGridData">
       <ng-container #constructorGridColumn matColumnDef="constructor-probe">
         <mat-header-cell *matHeaderCellDef>Grid header</mat-header-cell>
         <mat-cell *matCellDef="let row">{{row.value}}</mat-cell>
@@ -1028,6 +1029,7 @@ class SmokeDialogContent {}
       <mat-header-row *matHeaderRowDef="['constructor-probe']"></mat-header-row>
       <mat-row *matRowDef="let row; columns:['constructor-probe']"></mat-row>
       <mat-footer-row *matFooterRowDef="['constructor-probe']"></mat-footer-row>
+      <ng-template #manualNoDataTemplate matNoDataRow><div>Empty grid probe</div></ng-template>
     </mat-table>
     <ng-template #manualTabTemplate matTabContent>Tab lazy probe</ng-template>
     <ng-template #manualCellTemplate matCellDef>Data probe</ng-template>
@@ -1041,6 +1043,9 @@ class SmokeDialogContent {}
   \`,
 })
 class HarnessHost {
+  constructorGridData=[{value:'Grid value'}];
+  @ViewChild('manualNoDataTemplate',{read:MatLegacyNoDataRow,static:true}) originalNoDataRow!:MatLegacyNoDataRow;
+  @ViewChild('manualNoDataTemplate',{read:TemplateRef,static:true}) originalNoDataTemplate!:TemplateRef<any>;
   @ViewChild('manualTabTemplate',{read:MatLegacyTabContent,static:true}) originalTabContent!:MatLegacyTabContent;
   @ViewChild('manualTabTemplate',{read:TemplateRef,static:true}) originalTabTemplate!:TemplateRef<any>;
   @ViewChild(MatLegacyTextColumn,{static:true}) originalTextColumn!:MatLegacyTextColumn<any>;
@@ -1221,6 +1226,24 @@ async function main() {
     embedded_view_text:tabView.rootNodes.map(node=>node.textContent||'').join('').trim()==='Tab lazy probe'};
   tabView.destroy();
   const tabContentOriginalConstructor=Object.values(tabContentObservation).every(value=>value===true);
+  const suppliedNoDataTemplate=fixture.componentInstance.originalNoDataTemplate;
+  const nodeNoDataRow=fixture.componentInstance.originalNoDataRow;
+  const manualNoDataRow=new MatLegacyNoDataRow(suppliedNoDataTemplate);
+  const noDataView=manualNoDataRow.templateRef.createEmbeddedView({});noDataView.detectChanges();
+  const noDataRowObservation={manual_argument_identity:manualNoDataRow.templateRef===suppliedNoDataTemplate,
+    manual_owned_identity:manualNoDataRow instanceof MatLegacyNoDataRow,
+    manual_peer_identity:manualNoDataRow instanceof CdkNoDataRow,
+    prototype_identity:Object.getPrototypeOf(manualNoDataRow)===MatLegacyNoDataRow.prototype,
+    parent_constructor_identity:Object.getPrototypeOf(MatLegacyNoDataRow)===CdkNoDataRow,
+    explicit_legacy_initialization:JSON.stringify(manualNoDataRow._contentClassNames)===JSON.stringify(['mat-no-data-row']),
+    node_template_anchor:nodeNoDataRow.templateRef.elementRef.nativeElement===suppliedNoDataTemplate.elementRef.nativeElement,
+    embedded_view_text:noDataView.rootNodes.map(node=>node.textContent||'').join('').trim()==='Empty grid probe',
+    rendered_legacy_row:false};
+  noDataView.destroy();
+  fixture.componentInstance.constructorGridData=[];fixture.detectChanges();
+  await sleep(20);fixture.detectChanges();
+  noDataRowObservation.rendered_legacy_row=fixture.nativeElement.querySelector('#constructor-grid .mat-no-data-row')?.textContent.trim()==='Empty grid probe';
+  const noDataRowOriginalConstructor=Object.values(noDataRowObservation).every(value=>value===true);
   const eagerNode=fixture.debugElement.query(element=>element.nativeElement?.id==='tooltip-eager');
   const eagerTooltip=eagerNode.injector.get(MatLegacyTooltip);
   // These are owned original16 fields, not current private peer imports. Check
@@ -1539,7 +1562,7 @@ async function main() {
       selectOpened === true &&
       selectClosed === true &&
       tabCount === 2 &&
-      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor && tabContentOriginalConstructor,
+      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor && tabContentOriginalConstructor && noDataRowOriginalConstructor,
     buttonText: text,
     selectIsOpen: isOpen,
     dialogText,
@@ -1571,6 +1594,7 @@ async function main() {
     cellOriginalConstructors, cellConstructorObservation,
     textColumnOriginalConstructor, textColumnObservation,
     tabContentOriginalConstructor, tabContentObservation,
+    noDataRowOriginalConstructor, noDataRowObservation,
     checkboxAttribute, slideToggleAttribute, sliderAttribute, tabLinkAttribute,
     commonModuleDiagnostics:{contrastLifecycle,contrastProbeReads,sanityWarnings,checksEnabled,sanityDefault:TestBed.inject(MATERIAL_LEGACY_SANITY_CHECKS),sanityToken:String(MATERIAL_LEGACY_SANITY_CHECKS)},
     chipEventCounts:{removals:fixture.componentInstance.repeatRemovals,separators:fixture.componentInstance.repeatEnds},
