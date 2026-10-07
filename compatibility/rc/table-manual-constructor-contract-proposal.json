@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "status": "owner-decision-required",
+  "scope": "Original public imperative/manual MatLegacyTable construction with the twelve-argument CdkTable16 constructor, including supplied custom view-repeater strategy",
+  "original_reference": "reference/material-16.2.14/cdk-inherited-constructors/table.d.ts",
+  "original_reference_sha256": "94789cae5567000d4f23d9634ce006670e3fca4c5db427ce129026da62002c2d",
+  "minimum_source_observations": [
+    {
+      "line": "main",
+      "minimum_peer": "cdk-22.1.7.tgz",
+      "archive_sha256": "225d82389797aefbbb2684461576ef950465546a9d28326483e0b816c8a5a558",
+      "implementation_member": "package/fesm2022/table.mjs",
+      "implementation_sha256": "2bdeb437714a07914ccb8d2f749fd75d72b63da1ab4cc0c069f64e714c2a6ad4",
+      "declaration_member": "package/types/table.d.ts",
+      "declaration_sha256": "f1981ed3da13cccefbc8ad12a197d27fdbbe1d1712de3a00007224518fb841b5",
+      "strategy_selection": "this._viewRepeater = this.recycleRows || this._virtualScrollEnabled() ? new _RecycleViewRepeaterStrategy() : new _DisposeViewRepeaterStrategy();",
+      "view_repeater_is_private": false
+    },
+    {
+      "line": "21.x",
+      "minimum_peer": "cdk-21.2.14.tgz",
+      "archive_sha256": "b54868a0f7aefa471203a0fe419370e156cdf0218db9b625aca3ae6e8de25c63",
+      "implementation_member": "package/fesm2022/table.mjs",
+      "implementation_sha256": "ea8d99a22482768bab22e19aba83b2a1498be6be340e46991965f539036b6c11",
+      "declaration_member": "package/types/table.d.ts",
+      "declaration_sha256": "87da6f6b6bc01549d46dbd5333921b58b4ad160b1f209047f6c79dc510cb1d12",
+      "strategy_selection": "this._viewRepeater = this.recycleRows || this._virtualScrollEnabled() ? new _RecycleViewRepeaterStrategy() : new _DisposeViewRepeaterStrategy();",
+      "view_repeater_is_private": false
+    }
+  ],
+  "constraint": "Current minimum CDK selects its own two strategies at ngAfterContentInit. There is no stable public strategy assignment/injection API equivalent to the original supplied strategy. A signature-only adapter that ignores supplied arguments would conceal lost behavior. Importing or assigning current private strategy state, or forking CDK table, violates supplied implementation rules.",
+  "proposed_owner_choice": "Either explicitly exclude this original manual-construction path from the published compatibility contract, or retain it and keep release readiness blocked until a compliant implementation exists.",
+  "remaining_supported_scope_under_proposal": "Automatic Angular-created legacy tables, public data/render APIs, original boolean input behavior and public recycleRows behavior retain their separate native evidence; no exemption covers other API, DI, source-policy or full audit failures.",
+  "approval": "Not granted. No constructor waiver, exception, golden, release baseline or support statement changed.",
+  "native_evidence": "table-boolean-input-source-proof.json, table-recycle-row-source-proof.json and native90 constructor/identity cases concern distinct supported paths and do not prove the removed custom strategy contract.",
+  "g11_claim": "not-passed"
+}
