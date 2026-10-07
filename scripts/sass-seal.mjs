@@ -33,6 +33,7 @@ import {runOwnedAggregateContracts} from './sass-owned-aggregates.mjs';
 import {DEFAULT_CORE_CDK_CASES,DEFAULT_CORE_CDK_CONTRACT,measureDefaultCoreCdkPeer,defaultCoreCdkMeasurementOk} from './sass-default-core-cdk-contract.mjs';
 import {DEFAULT_COMPANION_CASES,DEFAULT_COMPANION_CONTRACT,measureDefaultCompanionPeer,defaultCompanionMeasurementOk} from './sass-default-companion-contract.mjs';
 import {DEFAULT_MAPPED_COMPANION_CASES,DEFAULT_MAPPED_COMPANION_CONTRACT,measureDefaultMappedCompanionPeer,defaultMappedCompanionMeasurementOk} from './sass-default-mapped-companion-contract.mjs';
+import {DEFAULT_AGGREGATE_CASES,DEFAULT_AGGREGATE_CONTRACT,measureDefaultAggregatePeer,defaultAggregateMeasurementOk} from './sass-default-aggregate-contract.mjs';
 import {ownedStyleCaseIds, renderOwnedStyles} from './sass-owned-rendered.mjs';
 import {coordinatorRequest} from './packed-consumer-evidence.mjs';
 import {spawnSync} from 'node:child_process';
@@ -333,6 +334,7 @@ export function runSassApiCss({oracle, entryFile, loadPaths, allowedRoots, line 
   const moduleUrl = pathToFileURL(entryFile).href;
   const css = {};
   let coreCdkPeer;
+  const aggregatePeers=new Map();
   for (const [name, entry] of Object.entries(oracle.members.mixins)) {
     // The plan comes from the authentic signature, never from the candidate.
     const plan = invocationPlan(name, entry);
@@ -346,7 +348,7 @@ export function runSassApiCss({oracle, entryFile, loadPaths, allowedRoots, line 
     if(foreign.length){css[name]={error:`loaded outside the packed package and peers: ${foreign[0]}`};continue;}
     css[name]={css:compiled.css,sha256:sha256Text(compiled.css)};
     const caseId=`mixin-css/${name}`;
-    const defaultEntry=DEFAULT_CORE_CDK_CASES[caseId]||DEFAULT_COMPANION_CASES[caseId]||DEFAULT_MAPPED_COMPANION_CASES[caseId];
+    const defaultEntry=DEFAULT_CORE_CDK_CASES[caseId]||DEFAULT_COMPANION_CASES[caseId]||DEFAULT_MAPPED_COMPANION_CASES[caseId]||DEFAULT_AGGREGATE_CASES[caseId];
     if(defaultEntry){
       try{
         if(plan.call!==defaultEntry.call)throw Error('default invocation changed');
@@ -362,6 +364,11 @@ export function runSassApiCss({oracle, entryFile, loadPaths, allowedRoots, line 
           if(!defaultCoreCdkMeasurementOk(caseId,actual_measurement,line))throw Error('default core measurement incomplete');
           coreCdkPeer??=measureDefaultCoreCdkPeer({sass,materialRoot:bases[1],cdkRoot:bases[2],line});
           css[name]={...css[name],actual_measurement,current_infrastructure:{classification:'conforming-current-infrastructure',contract:DEFAULT_CORE_CDK_CONTRACT,peer:coreCdkPeer}};
+        }else if(Object.hasOwn(DEFAULT_AGGREGATE_CASES,caseId)){
+          if(!defaultAggregateMeasurementOk(caseId,actual_measurement,line))throw Error('default aggregate measurement incomplete');
+          if(!aggregatePeers.has(defaultEntry.profile))aggregatePeers.set(defaultEntry.profile,measureDefaultAggregatePeer({sass,materialRoot:bases[1],cdkRoot:bases[2],line,caseId}));
+          const peer=aggregatePeers.get(defaultEntry.profile);
+          css[name]={...css[name],actual_measurement,current_companion:{classification:'conforming-current-companion',contract:DEFAULT_AGGREGATE_CONTRACT,peer}};
         }else if(Object.hasOwn(DEFAULT_MAPPED_COMPANION_CASES,caseId)){
           if(!defaultMappedCompanionMeasurementOk(caseId,actual_measurement,line))throw Error('default mapped companion measurement incomplete');
           const peer=measureDefaultMappedCompanionPeer({sass,materialRoot:bases[1],cdkRoot:bases[2],line,caseId});
