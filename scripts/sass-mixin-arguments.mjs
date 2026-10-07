@@ -11,6 +11,7 @@ import {measureProgressColorPeer,progressColorAliasResultsMatch,PROGRESS_COLOR_A
 import {measureBadgeShapePeer,badgeShapeResultsMatch,BADGE_SHAPE_CASES} from './sass-badge-shape-contract.mjs';
 import {measureDatepickerControlsPeer,datepickerControlsResultsMatch,DATEPICKER_CONTROLS_CASES} from './sass-datepicker-controls-contract.mjs';
 import {measureAggregateDensityPeers,aggregateDensityResultsMatch,AGGREGATE_DENSITY_CASES} from './sass-aggregate-density-contract.mjs';
+import {measureAggregateTypographyPeer,aggregateTypographyResultsMatch,AGGREGATE_TYPOGRAPHY_CASES} from './sass-aggregate-typography-contract.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 export const MIXIN_ARGUMENT_CATALOG='fixtures/sass/mixin-argument-contracts.json';
@@ -91,6 +92,9 @@ export function runMixinArgumentContracts({sass,entry,loadPaths,allowedRoots,imp
       } else if (Object.hasOwn(BADGE_SHAPE_CASES,probe.case_id)) {
         const peer=measureBadgeShapePeer({sass,materialRoot:allowedRoots[1],cdkRoot:allowedRoots[2],caseId:probe.case_id,line});
         current_companion={classification:'conforming-current-companion',contract:'historical-badge-shape-with-current-tokens',peer};
+      } else if (Object.hasOwn(AGGREGATE_TYPOGRAPHY_CASES,probe.case_id)) {
+        const peer=measureAggregateTypographyPeer({sass,materialRoot:allowedRoots[1],cdkRoot:allowedRoots[2],caseId:probe.case_id,line});
+        current_companion={classification:'conforming-current-companion',contract:'historical-typography-aggregate-with-qualified-members',peer};
       } else if (Object.hasOwn(AGGREGATE_DENSITY_CASES,probe.case_id)) {
         const peers=measureAggregateDensityPeers({sass,materialRoot:allowedRoots[1],cdkRoot:allowedRoots[2],caseId:probe.case_id,line});
         current_companion={classification:'conforming-current-companion',contract:'historical-density-aggregate-with-qualified-tail',peers};
@@ -111,6 +115,8 @@ export function runMixinArgumentContracts({sass,entry,loadPaths,allowedRoots,imp
       ? progressColorAliasResultsMatch(probe.case_id,expected,value,current_peer_alias?.peer)
       : Object.hasOwn(BADGE_SHAPE_CASES,probe.case_id)
       ? badgeShapeResultsMatch(probe.case_id,expected,value,current_companion?.peer)
+      : Object.hasOwn(AGGREGATE_TYPOGRAPHY_CASES,probe.case_id)
+      ? aggregateTypographyResultsMatch(probe.case_id,expected,value,current_companion?.peer)
       : Object.hasOwn(AGGREGATE_DENSITY_CASES,probe.case_id)
       ? aggregateDensityResultsMatch(probe.case_id,expected,value,current_companion?.peers)
       : Object.hasOwn(DATEPICKER_CONTROLS_CASES,probe.case_id)
