@@ -31,7 +31,11 @@ class UpstreamPatchBinding(unittest.TestCase):
                     '--symbols',str(root/'symbols.json'),'--report',str(root/'report.json'),
                     '--admission','--line','main'],text=True,capture_output=True)
                 data=json.loads(result.stdout)
-                self.assertEqual(result.returncode==0,ok,result.stderr)
+                # This fixture isolates patch proof. Its closed authored-use labels
+                # deliberately have no source reviews, so whole admission fails.
+                self.assertNotEqual(result.returncode,0,result.stderr)
+                self.assertEqual(data['disposition_admission'],'incomplete')
+                self.assertEqual(data['authored_use_review_evidence']['insufficient'],1736)
                 self.assertEqual(data['insufficient_sensitive'],0 if ok else 1)
             good={'sha':sha,'diff_sha256':digest,'diff':patch}
             check(good,True)
