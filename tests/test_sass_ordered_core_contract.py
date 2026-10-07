@@ -72,6 +72,7 @@ try{
         code=r'''
 import assert from 'node:assert/strict';import {mkdtempSync,readFileSync,writeFileSync,cpSync,mkdirSync,rmSync} from 'node:fs';import {join} from 'node:path';import {tmpdir} from 'node:os';import {createHash} from 'node:crypto';
 import {ORDERED_CORE_CASES,ORDERED_CORE_CONTRACT,orderedCoreExpectedCss,orderedCoreMeasurementOk,orderedCoreResultMatches} from './scripts/sass-ordered-core-contract.mjs';
+import {ORDERED_AGGREGATE_CASES,ORDERED_AGGREGATE_CONTRACT} from './scripts/sass-ordered-aggregate-contract.mjs';
 import {ORDERED_CSS_FIXTURE_IDS,writeReferenceCss,compareOrderedCss,orderedCssResults,writeOrderedCssAssertions,orderedCssCompletion} from './scripts/sass-ordered-css.mjs';
 const f=JSON.parse(readFileSync('tests/sass_ordered_core_fixture.json')),source=JSON.parse(readFileSync('tests/'+f.source_fixture)),sha=s=>createHash('sha256').update(s).digest('hex');
 for(const line of ['main','21.x']){
@@ -83,9 +84,13 @@ for(const line of ['main','21.x']){
    assert.ok(orderedCoreMeasurementOk(id,m,line));assert.equal(orderedCoreExpectedCss(id,f.peers[line]),m.css);writeFileSync(join(candidate,id+'.css'),m.css);
    return {id,status:'compiled',module:'@ngx-compat/material-legacy',fixture_sha256:e.fixture_sha256,css_sha256:m.css_sha256,actual_measurement:m,current_infrastructure:{classification:'conforming-current-infrastructure',contract:ORDERED_CORE_CONTRACT,peer:f.peers[line]}};
   });
-  const raw=compareOrderedCss(ref,candidate,join(scratch,'raw.json'));assert.equal(raw.status,1);assert.equal(raw.report.exact_count,ORDERED_CSS_FIXTURE_IDS.length-2);
+  const af=JSON.parse(readFileSync('tests/sass_ordered_aggregate_fixture.json')),ac=JSON.parse(readFileSync('fixtures/sass/ordered-aggregate-contracts.json')),aid=Object.keys(ORDERED_AGGREGATE_CASES)[0],am={...af.measurements[line],sources:source.source_sets[line]},peers={};
+  for(const group of ['core','light','dark','panel']){const p=af.peers[group+'-'+line];peers[group]={...p,...(group==='core'?{}:{sources:ac.peer_inputs[line].sources})};}
+  records.push({id:aid,status:'compiled',module:'@ngx-compat/material-legacy',fixture_sha256:ORDERED_AGGREGATE_CASES[aid].fixture_sha256,css_sha256:am.css_sha256,actual_measurement:am,current_companion:{classification:'conforming-current-companion',contract:ORDERED_AGGREGATE_CONTRACT,peers}});writeFileSync(join(candidate,aid+'.css'),am.css);
+  const finiteIds=[...Object.keys(ORDERED_CORE_CASES),aid];
+  const raw=compareOrderedCss(ref,candidate,join(scratch,'raw.json'));assert.equal(raw.status,1);assert.equal(raw.report.exact_count,ORDERED_CSS_FIXTURE_IDS.length-3);
   const compiled={fixtures:records},results=orderedCssResults(raw.report,compiled);assert.equal(results.length,ORDERED_CSS_FIXTURE_IDS.length);assert.ok(results.every(r=>r.result==='pass'));
-  assert.deepEqual(results.filter(r=>r.raw_status==='blocked').map(r=>r.case_id),Object.keys(ORDERED_CORE_CASES));
+  assert.deepEqual(results.filter(r=>r.raw_status==='blocked').map(r=>r.case_id),finiteIds);
   assert.deepEqual(orderedCssCompletion(0,raw,results),{ok:true,exact:false});
   assert.equal(orderedCssCompletion(1,raw,results).ok,false);assert.equal(orderedCssCompletion(0,{...raw,status:2},results).ok,false);
   const foreign=structuredClone(raw);foreign.report.files.push({file:'foreign.css',status:'exact'});assert.equal(orderedCssCompletion(0,foreign,results).ok,false);
@@ -102,7 +107,7 @@ for(const line of ['main','21.x']){
   }
   writeFileSync(join(candidate,'owned-legacy-card.css'),readFileSync(join(candidate,'owned-legacy-card.css'),'utf8')+'\n.unrelated { color:red; }');
   const ordinary=compareOrderedCss(ref,candidate,join(scratch,'ordinary.json'));assert.deepEqual(orderedCssResults(ordinary.report,compiled).filter(r=>r.result!=='pass').map(r=>r.case_id),['owned-legacy-card']);
-  assert.deepEqual(orderedCssResults(raw.report,{fixtures:[]}).filter(r=>r.result!=='pass').map(r=>r.case_id),Object.keys(ORDERED_CORE_CASES));
+  assert.deepEqual(orderedCssResults(raw.report,{fixtures:[]}).filter(r=>r.result!=='pass').map(r=>r.case_id),finiteIds);
  }finally{rmSync(scratch,{recursive:true,force:true});}
 }
 '''
