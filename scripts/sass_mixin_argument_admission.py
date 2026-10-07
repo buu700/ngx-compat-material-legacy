@@ -3,9 +3,13 @@ import hashlib
 import json
 import re
 
-def mixin_argument_measurements_ok(root,body):
+def mixin_argument_measurements_ok(root,body,*,owned=False):
     try:
-        path='fixtures/sass/mixin-argument-contracts.json';raw=(root/path).read_bytes();catalog=json.loads(raw)
+        path='fixtures/sass/owned-aggregate-contracts.json' if owned else 'fixtures/sass/mixin-argument-contracts.json';raw=(root/path).read_bytes();catalog=json.loads(raw)
+        if owned:
+            if hashlib.sha256(raw).hexdigest()!='b83f5ee9e898004e2fce2ae49719dbed923dd2b5eabf06f3f463a8ad33f24c7a':return False
+            membership=catalog['original_membership']
+            if hashlib.sha256((root/membership['path']).read_bytes()).hexdigest()!=membership['sha256']:return False
         probes=[p for p in catalog['cases'] if p['case_id']==body['case_id']]
         if len(probes)!=1:return False
         probe=probes[0]
@@ -26,7 +30,8 @@ def mixin_argument_measurements_ok(root,body):
         for role in ('expected','actual'):
             measured=body[role];css=measured['css']
             if not isinstance(css,str) or measured['css_sha256']!=hashlib.sha256(css.encode()).hexdigest() or type(measured['css_bytes']) is not int or measured['css_bytes']!=len(css.encode()):return False
-            if measured['program_sha256']!=program_sha:return False
+            role_program="@use '__entry__' as m;\n"+catalog['setup']+'\n'+(probe['reference_call'] if owned and role=='expected' else probe['call'])+'\n'
+            if measured['program_sha256']!=hashlib.sha256(role_program.encode()).hexdigest():return False
             sources=measured['sources']
             if not sources or any(type(s['root']) is not int or s['root'] not in (0,1,2) or not s['path'] or s['path'].startswith('/') or '\\' in s['path'] or '..' in s['path'].split('/') or not re.fullmatch('[0-9a-f]{64}',s['sha256']) or type(s['bytes']) is not int or s['bytes']<1 for s in sources):return False
             if len({(s['root'],s['path']) for s in sources})!=len(sources):return False
@@ -38,7 +43,8 @@ def mixin_argument_measurements_ok(root,body):
     except (KeyError,TypeError,ValueError,OSError):return False
 
 def mixin_argument_assertion_ok(root,active,body,invocation):
-    if not str(body.get('case_id','')).startswith('mixin-argument/'):
+    owned=str(body.get('case_id','')).startswith('owned-aggregate/')
+    if not owned and not str(body.get('case_id','')).startswith('mixin-argument/'):
         return True
     try:
         envelope=dict(kind='assertion',check_id='sass-seal',group='sass-api-and-values',result='pass',exit_code=0,
@@ -46,7 +52,7 @@ def mixin_argument_assertion_ok(root,active,body,invocation):
             mutation_rejected=True,error=None)
         if any(body.get(k)!=v or type(body.get(k))!=type(v) for k,v in envelope.items()):return False
         library=[a for a in active.manifest['artifacts'] if a['id']=='library']
-        if len(library)!=1 or body['tarball_sha256']!=library[0]['sha256'] or not mixin_argument_measurements_ok(root,body):return False
+        if len(library)!=1 or body['tarball_sha256']!=library[0]['sha256'] or not mixin_argument_measurements_ok(root,body,owned=owned):return False
         original=body['expected']['css'];actual=body['actual']['css']
         if original!=actual:return False
         wrong=actual+'\n.wrong-nonempty-mixin { color: red; }\n'
