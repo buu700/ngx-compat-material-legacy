@@ -35,7 +35,8 @@ try {
  const aliasCases=Object.keys((await import('./scripts/sass-progress-color-alias-contract.mjs')).PROGRESS_COLOR_ALIAS_CASES);
  const shapeCases=Object.keys((await import('./scripts/sass-badge-shape-contract.mjs')).BADGE_SHAPE_CASES);
  const controlsCases=Object.keys((await import('./scripts/sass-datepicker-controls-contract.mjs')).DATEPICKER_CONTROLS_CASES);
- assert.deepEqual(result.results.filter(p=>p.result!=='pass').map(p=>p.case_id).sort(),[...sortCases,...treeCases,...additionCases,...aliasCases,...shapeCases,...controlsCases].sort());
+ const aggregateDensityCases=Object.keys((await import('./scripts/sass-aggregate-density-contract.mjs')).AGGREGATE_DENSITY_CASES);
+ assert.deepEqual(result.results.filter(p=>p.result!=='pass').map(p=>p.case_id).sort(),[...sortCases,...treeCases,...additionCases,...aliasCases,...shapeCases,...controlsCases,...aggregateDensityCases].sort());
  const observed=result.results[0];assert.equal(mixinArgumentResultsMatch(observed.expected,observed.actual),true);
  assert.equal(mixinArgumentResultsMatch(observed.expected,{...observed.actual,css:'wrong'}),false);
  assert.equal(mixinArgumentResultsMatch(observed.expected,observed.mutation),false);
