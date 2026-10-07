@@ -41,6 +41,7 @@ export const HARNESS_CASE_IDS = [
   'packed-consumer/harness/slide-toggle-tabindex-attribute',
   'packed-consumer/harness/slider-tabindex-attribute',
   'packed-consumer/harness/tab-link-tabindex-attribute',
+  'packed-consumer/harness/peer-icon-literal-sanitization',
   'packed-consumer/harness/owned-resolution',
   'packed-consumer/harness/peer-harness-separate-scope',
 ];

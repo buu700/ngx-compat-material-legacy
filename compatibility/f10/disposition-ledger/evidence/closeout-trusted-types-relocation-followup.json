@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "sha": "1d42431b2fe745602727eda03338c80c8897850a",
+  "review_depth": "individual-escalated",
+  "status": "pending-branch-native-behavior-proof",
+  "final_disposition": "needs-individual-review",
+  "recorded_at_utc": "2026-10-07T02:44:15.465788+00:00",
+  "method": "Whole original no-renames patch read; exact public peer registry input/sanitizer/promotion/sink methods and private TT helper read from authenticated pinned npm archives. No installed helper imported into owned code.",
+  "patch_file": "compatibility/f10/disposition-ledger/evidence/patches/1d42431b2fe745602727eda03338c80c8897850a.patch",
+  "diff_sha256": "98d6c76532b51fadb09c6ff6a126e31085370fa0e70ba1b08070d1ae4c679e86",
+  "patch_paths": [
+    "goldens/cdk/private/index.api.md",
+    "src/cdk/private/public-api.ts",
+    "src/cdk/private/trusted-types.ts",
+    "src/material/icon/BUILD.bazel",
+    "src/material/icon/icon-registry.ts",
+    "src/material/icon/trusted-types.ts"
+  ],
+  "peers": {
+    "main": {
+      "version": "22.1.7",
+      "material_archive_sha256": "06115b963b565428d8d5f79cc1cdd07a3f0d5a58dbaebf9955639f38b35ac43d",
+      "cdk_archive_sha256": "225d82389797aefbbb2684461576ef950465546a9d28326483e0b816c8a5a558",
+      "registry": {
+        "member": "package/fesm2022/_icon-registry-chunk.mjs",
+        "sha256": "5bcfa347ed97ec834e84ffcd7b87187af8d9a136dd7cdafe10d3555bac78e2c5",
+        "methods": {
+          "addSvgIconLiteralInNamespace(": "  addSvgIconLiteralInNamespace(namespace, iconName, literal, options) {\n    const cleanLiteral = this._sanitizer.sanitize(SecurityContext.HTML, literal);\n    if (!cleanLiteral) {\n      throw getMatIconFailedToSanitizeLiteralError(literal);\n    }\n    const trustedLiteral = trustedHTMLFromString(cleanLiteral);\n    return this._addSvgIconConfig(namespace, iconName, new SvgIconConfig('', trustedLiteral, options));\n  }",
+          "_fetchIcon(": "  _fetchIcon(iconConfig) {\n    const {\n      url: safeUrl,\n      options\n    } = iconConfig;\n    const withCredentials = options?.withCredentials ?? false;\n    if (!this._httpClient) {\n      throw getMatIconNoHttpProviderError();\n    }\n    if (safeUrl == null) {\n      throw Error(`Cannot fetch icon from URL \"${safeUrl}\".`);\n    }\n    const url = this._sanitizer.sanitize(SecurityContext.RESOURCE_URL, safeUrl);\n    if (!url) {\n      throw getMatIconFailedToSanitizeUrlError(safeUrl);\n    }\n    const inProgressFetch = this._inProgressUrlFetches.get(url);\n    if (inProgressFetch) {\n      return inProgressFetch;\n    }\n    const req = this._httpClient.get(url, {\n      responseType: 'text',\n      withCredentials\n    }).pipe(map(svg => {\n      return trustedHTMLFromString(svg);\n    }), finalize(() => this._inProgressUrlFetches.delete(url)), share());\n    this._inProgressUrlFetches.set(url, req);\n    return req;\n  }",
+          "_svgElementFromConfig(": "  _svgElementFromConfig(config) {\n    if (!config.svgElement) {\n      const svg = this._svgElementFromString(config.svgText);\n      this._setSvgAttributes(svg, config.options);\n      config.svgElement = svg;\n    }\n    return config.svgElement;\n  }",
+          "_svgElementFromString(": "  _svgElementFromString(str) {\n    const div = this._document.createElement('DIV');\n    div.innerHTML = str;\n    const svg = div.querySelector('svg');\n    if (!svg) {\n      throw Error('<svg> tag not found');\n    }\n    return svg;\n  }"
+        }
+      },
+      "tt_internal": {
+        "member": "package/fesm2022/private.mjs",
+        "sha256": "883d5bfe20c4e8fb29a47cffc33257bfdf83d13468440b6e794c4f080819c85b",
+        "policy_helper": "let policy;\nfunction getPolicy() {\n  if (policy === undefined) {\n    policy = null;\n    if (typeof window !== 'undefined') {\n      const ttWindow = window;\n      if (ttWindow.trustedTypes !== undefined) {\n        try {\n          policy = ttWindow.trustedTypes.createPolicy('angular#components', {\n            createHTML: s => s\n          });\n        } catch (error) {\n          console.error(error);\n        }\n      }\n    }\n  }\n  return policy;\n}\nfunction trustedHTMLFromString(html) {\n  return getPolicy()?.createHTML(html) || html;\n}\n",
+        "policy_helper_sha256": "8c298417a9eb2cf2d734a269acc871c6c3a478fc5183a8afea0c17a19b71e10c"
+      }
+    },
+    "21.x": {
+      "version": "21.2.14",
+      "material_archive_sha256": "2f8c0fce7967b8a91a07bc3a184cf5da6023eac3828d15fa23b6c338b340e23c",
+      "cdk_archive_sha256": "b54868a0f7aefa471203a0fe419370e156cdf0218db9b625aca3ae6e8de25c63",
+      "registry": {
+        "member": "package/fesm2022/_icon-registry-chunk.mjs",
+        "sha256": "9e9e275486f72746b864cc8def1f2fb9f0643a728c7d2501acf528493fdd5b3c",
+        "methods": {
+          "addSvgIconLiteralInNamespace(": "  addSvgIconLiteralInNamespace(namespace, iconName, literal, options) {\n    const cleanLiteral = this._sanitizer.sanitize(SecurityContext.HTML, literal);\n    if (!cleanLiteral) {\n      throw getMatIconFailedToSanitizeLiteralError(literal);\n    }\n    const trustedLiteral = trustedHTMLFromString(cleanLiteral);\n    return this._addSvgIconConfig(namespace, iconName, new SvgIconConfig('', trustedLiteral, options));\n  }",
+          "_fetchIcon(": "  _fetchIcon(iconConfig) {\n    const {\n      url: safeUrl,\n      options\n    } = iconConfig;\n    const withCredentials = options?.withCredentials ?? false;\n    if (!this._httpClient) {\n      throw getMatIconNoHttpProviderError();\n    }\n    if (safeUrl == null) {\n      throw Error(`Cannot fetch icon from URL \"${safeUrl}\".`);\n    }\n    const url = this._sanitizer.sanitize(SecurityContext.RESOURCE_URL, safeUrl);\n    if (!url) {\n      throw getMatIconFailedToSanitizeUrlError(safeUrl);\n    }\n    const inProgressFetch = this._inProgressUrlFetches.get(url);\n    if (inProgressFetch) {\n      return inProgressFetch;\n    }\n    const req = this._httpClient.get(url, {\n      responseType: 'text',\n      withCredentials\n    }).pipe(map(svg => {\n      return trustedHTMLFromString(svg);\n    }), finalize(() => this._inProgressUrlFetches.delete(url)), share());\n    this._inProgressUrlFetches.set(url, req);\n    return req;\n  }",
+          "_svgElementFromConfig(": "  _svgElementFromConfig(config) {\n    if (!config.svgElement) {\n      const svg = this._svgElementFromString(config.svgText);\n      this._setSvgAttributes(svg, config.options);\n      config.svgElement = svg;\n    }\n    return config.svgElement;\n  }",
+          "_svgElementFromString(": "  _svgElementFromString(str) {\n    const div = this._document.createElement('DIV');\n    div.innerHTML = str;\n    const svg = div.querySelector('svg');\n    if (!svg) {\n      throw Error('<svg> tag not found');\n    }\n    return svg;\n  }"
+        }
+      },
+      "tt_internal": {
+        "member": "package/fesm2022/private.mjs",
+        "sha256": "07ab34acdf1f19f7efda77014f1ff1da32712809d54101fb641770f9b967031a",
+        "policy_helper": "let policy;\nfunction getPolicy() {\n  if (policy === undefined) {\n    policy = null;\n    if (typeof window !== 'undefined') {\n      const ttWindow = window;\n      if (ttWindow.trustedTypes !== undefined) {\n        policy = ttWindow.trustedTypes.createPolicy('angular#components', {\n          createHTML: s => s\n        });\n      }\n    }\n  }\n  return policy;\n}\nfunction trustedHTMLFromString(html) {\n  return getPolicy()?.createHTML(html) || html;\n}\n",
+        "policy_helper_sha256": "e6f695b0f8474284fa24ebc3d53574b283287fd30eaa48327e35dfff1247c552"
+      }
+    }
+  },
+  "owned_direct_registry_or_private_tt_references": [],
+  "owned_production_ts_files_scanned": 398,
+  "source_observations": [
+    "The specific upstream change relocates the policy helper and rewires registry import/build/API exposure; it does not add sanitizer validation to the helper.",
+    "Both exact peer registries sanitize literal input with SecurityContext.HTML and configured URLs with SecurityContext.RESOURCE_URL. Downloaded SVG text is promoted before the innerHTML sink; resource trust is not sanitization of downloaded contents.",
+    "The TT policy createHTML callback returns its input. Do not treat TT promotion as XSS sanitization or a trust grant for arbitrary network SVG.",
+    "The 21.2.14 TT policy creation propagates an exception; 22.1.7 catches/logs that exception and falls back. The reviewed relocation alone does not certify that later fallback change."
+  ],
+  "pending_behavior_probe": "packed-consumer/harness/peer-icon-literal-sanitization",
+  "probe_scope": "Actual public registry/sanitizer plus peer MatIcon rendered inside packed legacy button in the packed-consumer DOM harness: fixed trusted SVG, raw-script rejection, independent clones. This is the TT-unavailable fallback route, not browser require-trusted-types-for enforcement, allowed-policy rejection or network SVG qualification.",
+  "limitations": [
+    "New probe awaits Actions on both lines; no native result is claimed.",
+    "No private/helper or ordinary icon/registry fork is permitted or proposed.",
+    "No general security clearance, advisory clearance or G11 pass is claimed. Individual final disposition and native TT-policy/CSP behavior remain pending."
+  ],
+  "g11_claim": "not-passed"
+}

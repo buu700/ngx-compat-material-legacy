@@ -1,20 +1,5 @@
-From 1d42431b2fe745602727eda03338c80c8897850a Mon Sep 17 00:00:00 2001
-From: Kristiyan Kostadinov <crisbeto@users.noreply.github.com>
-Date: Fri, 21 Nov 2025 06:55:42 +0100
-Subject: [PATCH] refactor: move trusted types logic into CDK (#32387)
-
-Moves the logic around trusted types into the CDK so it can be reused.
----
- goldens/cdk/private/index.api.md              |  9 ++++++++
- src/cdk/private/public-api.ts                 |  1 +
- .../icon => cdk/private}/trusted-types.ts     | 23 ++++++++-----------
- src/material/icon/BUILD.bazel                 |  2 +-
- src/material/icon/icon-registry.ts            |  2 +-
- 5 files changed, 22 insertions(+), 15 deletions(-)
- rename src/{material/icon => cdk/private}/trusted-types.ts (75%)
-
 diff --git a/goldens/cdk/private/index.api.md b/goldens/cdk/private/index.api.md
-index 5ef9ad638b5c..dbe48ac4374c 100644
+index 5ef9ad638..dbe48ac43 100644
 --- a/goldens/cdk/private/index.api.md
 +++ b/goldens/cdk/private/index.api.md
 @@ -16,6 +16,15 @@ export class _CdkPrivateStyleLoader {
@@ -34,7 +19,7 @@ index 5ef9ad638b5c..dbe48ac4374c 100644
  export class _VisuallyHiddenLoader {
      // (undocumented)
 diff --git a/src/cdk/private/public-api.ts b/src/cdk/private/public-api.ts
-index daa7b818d389..195f75b68f0c 100644
+index daa7b818d..195f75b68 100644
 --- a/src/cdk/private/public-api.ts
 +++ b/src/cdk/private/public-api.ts
 @@ -8,3 +8,4 @@
@@ -42,63 +27,83 @@ index daa7b818d389..195f75b68f0c 100644
  export * from './style-loader';
  export * from './visually-hidden/visually-hidden';
 +export {TrustedHTML, trustedHTMLFromString} from './trusted-types';
-diff --git a/src/material/icon/trusted-types.ts b/src/cdk/private/trusted-types.ts
-similarity index 75%
-rename from src/material/icon/trusted-types.ts
-rename to src/cdk/private/trusted-types.ts
-index 01f75fa2640b..febe9fa717f6 100644
---- a/src/material/icon/trusted-types.ts
+diff --git a/src/cdk/private/trusted-types.ts b/src/cdk/private/trusted-types.ts
+new file mode 100644
+index 000000000..febe9fa71
+--- /dev/null
 +++ b/src/cdk/private/trusted-types.ts
-@@ -6,21 +6,17 @@
-  * found in the LICENSE file at https://angular.dev/license
-  */
- 
--/**
-- * @fileoverview
-- * A module to facilitate use of a Trusted Types policy internally within
-- * Angular Material. It lazily constructs the Trusted Types policy, providing
-- * helper utilities for promoting strings to Trusted Types. When Trusted Types
-- * are not available, strings are used as a fallback.
-- * @security All use of this module is security-sensitive and should go through
-- * security review.
-- */
+@@ -0,0 +1,69 @@
++/**
++ * @license
++ * Copyright Google LLC All Rights Reserved.
++ *
++ * Use of this source code is governed by an MIT-style license that can be
++ * found in the LICENSE file at https://angular.dev/license
++ */
++
 +// A module to facilitate use of a Trusted Types policy internally within
 +// Angular Material. It lazily constructs the Trusted Types policy, providing
 +// helper utilities for promoting strings to Trusted Types. When Trusted Types
 +// are not available, strings are used as a fallback.
 +// All use of this module is security-sensitive and should go through security review.
- 
--export declare interface TrustedHTML {
++
 +export interface TrustedHTML {
-   __brand__: 'TrustedHTML';
- }
- 
--export declare interface TrustedTypePolicyFactory {
++  __brand__: 'TrustedHTML';
++}
++
 +interface TrustedTypePolicyFactory {
-   createPolicy(
-     policyName: string,
-     policyOptions: {
-@@ -29,7 +25,7 @@ export declare interface TrustedTypePolicyFactory {
-   ): TrustedTypePolicy;
- }
- 
--export declare interface TrustedTypePolicy {
++  createPolicy(
++    policyName: string,
++    policyOptions: {
++      createHTML?: (input: string) => string;
++    },
++  ): TrustedTypePolicy;
++}
++
 +interface TrustedTypePolicy {
-   createHTML(input: string): TrustedHTML;
- }
- 
-@@ -61,7 +57,8 @@ function getPolicy(): TrustedTypePolicy | null {
- /**
-  * Unsafely promote a string to a TrustedHTML, falling back to strings when
-  * Trusted Types are not available.
-- * @security This is a security-sensitive function; any use of this function
++  createHTML(input: string): TrustedHTML;
++}
++
++/**
++ * The Trusted Types policy, or null if Trusted Types are not
++ * enabled/supported, or undefined if the policy has not been created yet.
++ */
++let policy: TrustedTypePolicy | null | undefined;
++
++/**
++ * Returns the Trusted Types policy, or null if Trusted Types are not
++ * enabled/supported. The first call to this function will create the policy.
++ */
++function getPolicy(): TrustedTypePolicy | null {
++  if (policy === undefined) {
++    policy = null;
++    if (typeof window !== 'undefined') {
++      const ttWindow = window as unknown as {trustedTypes?: TrustedTypePolicyFactory};
++      if (ttWindow.trustedTypes !== undefined) {
++        policy = ttWindow.trustedTypes.createPolicy('angular#components', {
++          createHTML: (s: string) => s,
++        });
++      }
++    }
++  }
++  return policy;
++}
++
++/**
++ * Unsafely promote a string to a TrustedHTML, falling back to strings when
++ * Trusted Types are not available.
 + *
 + * Important!!! This is a security-sensitive function; any use of this function
-  * must go through security review. In particular, it must be assured that the
-  * provided string will never cause an XSS vulnerability if used in a context
-  * that will be interpreted as HTML by a browser, e.g. when assigning to
++ * must go through security review. In particular, it must be assured that the
++ * provided string will never cause an XSS vulnerability if used in a context
++ * that will be interpreted as HTML by a browser, e.g. when assigning to
++ * element.innerHTML.
++ */
++export function trustedHTMLFromString(html: string): TrustedHTML {
++  return getPolicy()?.createHTML(html) || (html as unknown as TrustedHTML);
++}
 diff --git a/src/material/icon/BUILD.bazel b/src/material/icon/BUILD.bazel
-index bf4df42d2a6e..200496244769 100644
+index bf4df42d2..200496244 100644
 --- a/src/material/icon/BUILD.bazel
 +++ b/src/material/icon/BUILD.bazel
 @@ -68,7 +68,6 @@ ng_project(
@@ -118,7 +123,7 @@ index bf4df42d2a6e..200496244769 100644
      ],
  )
 diff --git a/src/material/icon/icon-registry.ts b/src/material/icon/icon-registry.ts
-index 2555b6342ddb..3d69ff4a7062 100644
+index 2555b6342..3d69ff4a7 100644
 --- a/src/material/icon/icon-registry.ts
 +++ b/src/material/icon/icon-registry.ts
 @@ -6,6 +6,7 @@
@@ -137,3 +142,81 @@ index 2555b6342ddb..3d69ff4a7062 100644
  
  /**
   * Returns an exception to be thrown in the case when attempting to
+diff --git a/src/material/icon/trusted-types.ts b/src/material/icon/trusted-types.ts
+deleted file mode 100644
+index 01f75fa26..000000000
+--- a/src/material/icon/trusted-types.ts
++++ /dev/null
+@@ -1,72 +0,0 @@
+-/**
+- * @license
+- * Copyright Google LLC All Rights Reserved.
+- *
+- * Use of this source code is governed by an MIT-style license that can be
+- * found in the LICENSE file at https://angular.dev/license
+- */
+-
+-/**
+- * @fileoverview
+- * A module to facilitate use of a Trusted Types policy internally within
+- * Angular Material. It lazily constructs the Trusted Types policy, providing
+- * helper utilities for promoting strings to Trusted Types. When Trusted Types
+- * are not available, strings are used as a fallback.
+- * @security All use of this module is security-sensitive and should go through
+- * security review.
+- */
+-
+-export declare interface TrustedHTML {
+-  __brand__: 'TrustedHTML';
+-}
+-
+-export declare interface TrustedTypePolicyFactory {
+-  createPolicy(
+-    policyName: string,
+-    policyOptions: {
+-      createHTML?: (input: string) => string;
+-    },
+-  ): TrustedTypePolicy;
+-}
+-
+-export declare interface TrustedTypePolicy {
+-  createHTML(input: string): TrustedHTML;
+-}
+-
+-/**
+- * The Trusted Types policy, or null if Trusted Types are not
+- * enabled/supported, or undefined if the policy has not been created yet.
+- */
+-let policy: TrustedTypePolicy | null | undefined;
+-
+-/**
+- * Returns the Trusted Types policy, or null if Trusted Types are not
+- * enabled/supported. The first call to this function will create the policy.
+- */
+-function getPolicy(): TrustedTypePolicy | null {
+-  if (policy === undefined) {
+-    policy = null;
+-    if (typeof window !== 'undefined') {
+-      const ttWindow = window as unknown as {trustedTypes?: TrustedTypePolicyFactory};
+-      if (ttWindow.trustedTypes !== undefined) {
+-        policy = ttWindow.trustedTypes.createPolicy('angular#components', {
+-          createHTML: (s: string) => s,
+-        });
+-      }
+-    }
+-  }
+-  return policy;
+-}
+-
+-/**
+- * Unsafely promote a string to a TrustedHTML, falling back to strings when
+- * Trusted Types are not available.
+- * @security This is a security-sensitive function; any use of this function
+- * must go through security review. In particular, it must be assured that the
+- * provided string will never cause an XSS vulnerability if used in a context
+- * that will be interpreted as HTML by a browser, e.g. when assigning to
+- * element.innerHTML.
+- */
+-export function trustedHTMLFromString(html: string): TrustedHTML {
+-  return getPolicy()?.createHTML(html) || (html as unknown as TrustedHTML);
+-}
