@@ -1,0 +1,53 @@
+{
+  "sha": "dd04fe910c4587f11cd37b1d0b216e4a56cac2e3",
+  "kind": "individual-original-input-transform-review",
+  "patch_file": "compatibility/f10/disposition-ledger/evidence/patches/dd04fe910c4587f11cd37b1d0b216e4a56cac2e3-whole-input-transforms.patch",
+  "diff_sha256": "f8afee9dc0580e3103aaf8ee84161f026523be24b21bbbd22be6bc82dab87460",
+  "review_depth": "individual-compatibility",
+  "affected_branches": [
+    "main",
+    "21.x"
+  ],
+  "decision": "Reviewed all three original patch paths and hunk contexts. Minimum peer CDK setters remove imperative BooleanInput coercion and retain a prior sticky dirty flag on repeated equal writes. Owned wrappers now coerce through stable public parent setters and reset sticky state before each write. Native packed88 cases on both lines check original sticky transitions and actual one/two data-row rendering with the fixed-layout class. Angular input transforms and parent render/cache/sticky side effects remain. This patch is already adapted within its setter/input scope; separate original constructors, removed public mixin members, all1736 authored uses and full G11 remain unresolved.",
+  "final_disposition": "already-adapted",
+  "g11_claim": "not-passed",
+  "peers": {
+    "main": {
+      "version": "22.1.7",
+      "table_member_sha256": "2bdeb437714a07914ccb8d2f749fd75d72b63da1ab4cc0c069f64e714c2a6ad4"
+    },
+    "21.x": {
+      "version": "21.2.14",
+      "table_member_sha256": "ea8d99a22482768bab22e19aba83b2a1498be6be340e46991965f539036b6c11"
+    }
+  },
+  "path_reviews": {
+    "src/cdk/table/cell.ts": "stickyEnd transform and raw setter remove coercion and change repeated-write dirty semantics. Owned stickyEnd parent wrapper restores both.",
+    "src/cdk/table/table.ts": "fixedLayout/multiTemplateDataRows transforms and raw setters narrow direct writes. Owned wrappers restore primitive BooleanInput coercion retaining parent side effects.",
+    "tools/public_api_guard/cdk/table.md": "BooleanInput to boolean writes and new static Angular input-acceptance fields. Owned historical setters retain BooleanInput; added peer Angular statics are not original exports."
+  },
+  "native_receipts": {
+    "main": {
+      "commit": "b6145f553",
+      "run": 37592379486,
+      "job": 112696716946,
+      "packed_cases": 88,
+      "status": "ok/errors-empty; later unrelated API incompleteness"
+    },
+    "21.x": {
+      "commit": "99cf57e06",
+      "run": 37592382230,
+      "job": 112696725471,
+      "packed_cases": 88,
+      "status": "job success"
+    }
+  },
+  "transport": "Authenticated Actions logs; artifact archive not independently transferred or rehashed.",
+  "representation_note": "This whole Git diff digest matches the previous ledger rationale (5521 bytes). Mechanical evidence uses a different diff representation; its file and digest remain untouched.",
+  "separate_unresolved_scope": [
+    "original constructors",
+    "f260aa04c919d2906604fa7b66a3852e4d19a5ff removed public CanStick._hasStickyChanged and mixin inheritance",
+    "all1736 authored uses",
+    "full G11/Sass/source-policy/security/floors"
+  ]
+}
