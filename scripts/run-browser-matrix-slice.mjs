@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import {peerIconTtOkay} from './peer-icon-tt-admission.mjs';
 /**
  * Execute a real Chromium browser slice against a packed artifact and credit
  * only the declared matrix cells that actually ran.
@@ -314,6 +315,7 @@ const scenarios = [
       && report.families?.['progress-bar']?.value_reflected
       && report.families?.['progress-spinner']?.present
       && report.families?.['progress-spinner']?.value_reflected
+      && peerIconTtOkay(report.peer_icon_tt)
       && !report.error,
   },
   {
@@ -342,6 +344,7 @@ const scenarios = [
       && report.families?.['progress-bar']?.value_reflected
       && report.families?.['progress-spinner']?.present
       && report.families?.['progress-spinner']?.value_reflected
+      && peerIconTtOkay(report.peer_icon_tt)
       && !report.error,
   },
 ];
