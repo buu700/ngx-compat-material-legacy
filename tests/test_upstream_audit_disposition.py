@@ -54,8 +54,8 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0, combined)
             summary = json.loads(result.stdout)
             self.assertFalse(summary["ok"])
-            # Qualified bounded source/runtime decisions leave four original pending subjects.
-            self.assertEqual(summary["unresolved"], 4)
+            # Qualified bounded source/runtime decisions leave three original pending subjects on main.
+            self.assertEqual(summary["unresolved"], 3)
             self.assertEqual(summary["seed_rows"], 1697)
             self.assertEqual(summary["ledger_rows"], 1697)
             self.assertEqual(summary["missing"], 0)
@@ -186,11 +186,35 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
             self.assertEqual(summary["structural_inventory"], "fail")
             self.assertEqual(summary["disposition_admission"], "incomplete")
             self.assertGreaterEqual(summary["insufficient_inherited"], 1)
-            self.assertIn("unresolved=4", result.stderr)
+            self.assertIn("unresolved=3", result.stderr)
             self.assertEqual(summary["security_clearance"], "not-passed")
             # The ledger object above is only used to prove the file still parses.
             self.assertEqual(ledger["g11_claim"], "not-passed")
 
+
+    def test_media_matcher_main_proof_cannot_admit_21_or_missing_evidence(self) -> None:
+        sha = "231f94f5557bb58afc0070585688b3014d541eb2"
+        entry = next(row for row in json.loads(LEDGER.read_text())["entries"] if row["sha"] == sha)
+        self.assertEqual(entry["final_disposition"], "inherited")
+        self.assertEqual(entry["individual_proof"]["affected_branches"], ["main"])
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            seed = directory / "seed.json"
+            seed.write_text(json.dumps({"commits": [{"sha": sha}]}))
+            symbols = directory / "symbols.json"
+            symbols.write_text(json.dumps({"status": "closed", "symbol_uses": [{"disposition": "closed", "status": "reviewed"}]}))
+            for label, line, remove_proof, expected in [("main", "main", False, 0), ("wrong-line", "21.x", False, 1), ("missing-proof", "main", True, 1)]:
+                candidate = json.loads(json.dumps(entry))
+                if remove_proof:
+                    candidate.pop("individual_proof")
+                ledger = directory / (label + ".json")
+                ledger.write_text(json.dumps({"g11_claim": "not-passed", "entries": [candidate]}))
+                result = run_checker(seed, ledger, directory / (label + "-report.json"), admission=True, line=line, symbols=symbols)
+                summary = json.loads(result.stdout)
+                self.assertEqual(summary["insufficient_inherited"], expected, label)
+                self.assertEqual(summary["insufficient_sensitive"], expected, label)
+                if expected:
+                    self.assertNotEqual(result.returncode, 0, label)
 
     def test_individual_proof_is_accepted_and_ancestry_is_not(self) -> None:
         sha = "1f13d60126bcde7af29438bae38a4da91a30e352"
