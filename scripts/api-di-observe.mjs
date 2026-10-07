@@ -54,7 +54,18 @@ export function runFactory(factory, Injector, runInInjectionContext) {
   return {requests, outcome, error};
 }
 
-export function expectedFactoryDi(shape) {
+export function expectedFactoryDi(shape, context = {}) {
+  const original = shape.originalFactory;
+  if (original?.family === 'core' && original.name === 'MatCommonModule') {
+    // Untouched core.mjs also injects Platform inside the dev-mode constructor
+    // body. Factory declaration deps describe its three parameters, not that
+    // fourth contextual request. This adds an authentic requirement, no waiver.
+    if (original.source_sha256 !== '38b761eb8e9b43297942f6e1412469437bc3ee0291342a766b001f715061d175'
+        || original.deps_kind !== 'dependencies') throw new Error('unrecognized authentic common-module body');
+    if (typeof context.devMode !== 'boolean') throw new Error('missing common-module dev-mode context');
+    const direct = (shape.diParams || []).filter(param => !param.attribute);
+    return context.devMode ? [...direct, {ident:'Platform',imported:'Platform',spec:'@angular/cdk/platform',optional:true}] : direct;
+  }
   const inherited = shape.originalFactory?.inherited_factory;
   if (!inherited) return (shape.diParams || []).filter(param => !param.attribute);
   // These are the three authenticated original CDK table constructors, not
@@ -71,6 +82,7 @@ export function expectedFactoryDi(shape) {
 // Historical constructors name the original token; the finite public export map
 // exposes its independently owned legacy identity. Never match these by description.
 const ownedTokenExports = {
+  'legacy-core': {MATERIAL_SANITY_CHECKS: 'MATERIAL_LEGACY_SANITY_CHECKS'},
   'legacy-form-field': {
     MAT_FORM_FIELD: 'MAT_LEGACY_FORM_FIELD', MAT_ERROR: 'MAT_LEGACY_ERROR',
     MAT_PREFIX: 'MAT_LEGACY_PREFIX', MAT_SUFFIX: 'MAT_LEGACY_SUFFIX',
@@ -88,7 +100,7 @@ export function ownedTokenIdentity(family, param, loaded, observedToken) {
 }
 
 export async function observeRuntimeDi(packageRoot, symbols, differences = []) {
-  const {Injector, runInInjectionContext} = await import('@angular/core');
+  const {Injector, runInInjectionContext, isDevMode} = await import('@angular/core');
   await import('@angular/compiler');
   const results = [];
   for (const symbol of symbols) {
@@ -118,7 +130,8 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = []) {
     const factory = runFactory(value.ɵfac, Injector, runInInjectionContext);
     const observed = factory.requests;
     const invalidReference = symbol.shape.originalFactory?.deps_kind === 'invalid';
-    const expected = invalidReference ? [] : expectedFactoryDi(symbol.shape);
+    const runtime_context = {devMode: isDevMode()};
+    const expected = invalidReference ? [] : expectedFactoryDi(symbol.shape, runtime_context);
     if (invalidReference && !(factory.outcome === 'threw' && /constructor was not compatible with Dependency Injection/.test(factory.error || ''))) {
       problems.push(`factory ${symbol.symbol_id} did not preserve the original non-injectable factory contract`);
     }
@@ -145,7 +158,7 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = []) {
         }
       }
     }
-    results.push({symbol, problems, factory_outcome:factory.outcome, factory_error:factory.error, original_factory_kind:symbol.shape.originalFactory?.deps_kind ?? null, original_inherited_factory:symbol.shape.originalFactory?.inherited_factory?.name ?? null, constructor_attributes:(symbol.shape.diParams || []).filter(param=>param.attribute).map(param=>param.attribute), observed: observed.map(item => `${item.label}${item.optional ? '?' : ''}`)});
+    results.push({symbol, problems, runtime_context, factory_outcome:factory.outcome, factory_error:factory.error, original_factory_kind:symbol.shape.originalFactory?.deps_kind ?? null, original_inherited_factory:symbol.shape.originalFactory?.inherited_factory?.name ?? null, constructor_attributes:(symbol.shape.diParams || []).filter(param=>param.attribute).map(param=>param.attribute), observed: observed.map(item => `${item.label}${item.optional ? '?' : ''}`)});
   }
   return results;
 }

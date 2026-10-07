@@ -1,0 +1,40 @@
+class MatCommonModule {
+    constructor(highContrastModeDetector, _sanityChecks, _document) {
+        this._sanityChecks = _sanityChecks;
+        this._document = _document;
+        /** Whether we've done the global sanity checks (e.g. a theme is loaded, there is a doctype). */
+        this._hasDoneGlobalChecks = false;
+        // While A11yModule also does this, we repeat it here to avoid importing A11yModule
+        // in MatCommonModule.
+        highContrastModeDetector._applyBodyHighContrastModeCssClasses();
+        if (!this._hasDoneGlobalChecks) {
+            this._hasDoneGlobalChecks = true;
+            if (typeof ngDevMode === 'undefined' || ngDevMode) {
+                // Inject in here so the reference to `Platform` can be removed in production mode.
+                const platform = inject(Platform, { optional: true });
+                if (this._checkIsEnabled('doctype')) {
+                    _checkDoctypeIsDefined(this._document);
+                }
+                if (this._checkIsEnabled('theme')) {
+                    _checkThemeIsPresent(this._document, !!platform?.isBrowser);
+                }
+                if (this._checkIsEnabled('version')) {
+                    _checkCdkVersionMatch();
+                }
+            }
+        }
+    }
+    /** Gets whether a specific sanity check is enabled. */
+    _checkIsEnabled(name) {
+        if (_isTestEnvironment()) {
+            return false;
+        }
+        if (typeof this._sanityChecks === 'boolean') {
+            return this._sanityChecks;
+        }
+        return !!this._sanityChecks[name];
+    }
+    static { this.ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "16.1.1", ngImport: i0, type: MatCommonModule, deps: [{ token: i1.HighContrastModeDetector }, { token: MATERIAL_SANITY_CHECKS, optional: true }, { token: DOCUMENT }], target: i0.ɵɵFactoryTarget.NgModule }); }
+    static { this.ɵmod = i0.ɵɵngDeclareNgModule({ minVersion: "14.0.0", version: "16.1.1", ngImport: i0, type: MatCommonModule, imports: [BidiModule], exports: [BidiModule] }); }
+    static { this.ɵinj = i0.ɵɵngDeclareInjector({ minVersion: "12.0.0", version: "16.1.1", ngImport: i0, type: MatCommonModule, imports: [BidiModule, BidiModule] }); }
+}

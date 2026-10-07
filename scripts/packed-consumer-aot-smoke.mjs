@@ -475,6 +475,7 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
     'packed-consumer/harness/form-field-error-live-region': parsed.errorLiveRegion === true,
     'packed-consumer/harness/form-field-token-isolation': parsed.formFieldTokenIsolation === true,
     'packed-consumer/harness/progress-bar-location-and-defaults': parsed.progressLocationAndDefaults === true,
+    'packed-consumer/harness/common-module-sanity-and-contrast': parsed.commonModuleBehavior === true,
   };
   const owned = declarationKeys(keys)
     .filter(key => key.endsWith('/testing'))
@@ -878,7 +879,10 @@ Object.defineProperty(globalThis, 'navigator', {
 
 import 'zone.js';
 import '@angular/compiler';
-import {Component, ElementRef, inject} from '@angular/core';
+import {Component, ElementRef, inject, isDevMode, createEnvironmentInjector, createNgModule, EnvironmentInjector} from '@angular/core';
+import {Subject} from 'rxjs';
+import {BreakpointObserver, BreakpointState} from '@angular/cdk/layout';
+import {HighContrastMode, HighContrastModeDetector} from '@angular/cdk/a11y';
 import {
   BrowserDynamicTestingModule,
   platformBrowserDynamicTesting,
@@ -907,7 +911,7 @@ import {MAT_PROGRESS_BAR_DEFAULT_OPTIONS} from '@angular/material/progress-bar';
 import {MatLegacyChipsModule} from '@ngx-compat/material-legacy/legacy-chips';
 import {MatLegacyRadioModule} from '@ngx-compat/material-legacy/legacy-radio';
 import {MatLegacyTabGroupHarness} from '@ngx-compat/material-legacy/legacy-tabs/testing';
-import {LegacyNativeDateAdapter, LegacyNativeDateModule, MatLegacyNativeDateModule, LegacyDateAdapter, MAT_LEGACY_DATE_LOCALE, MAT_LEGACY_DATE_FORMATS, MAT_LEGACY_NATIVE_DATE_FORMATS} from '@ngx-compat/material-legacy/legacy-core';
+import {MatLegacyCommonModule, MATERIAL_LEGACY_SANITY_CHECKS, LegacyNativeDateAdapter, LegacyNativeDateModule, MatLegacyNativeDateModule, LegacyDateAdapter, MAT_LEGACY_DATE_LOCALE, MAT_LEGACY_DATE_FORMATS, MAT_LEGACY_NATIVE_DATE_FORMATS} from '@ngx-compat/material-legacy/legacy-core';
 
 getTestBed().initTestEnvironment(
   BrowserDynamicTestingModule,
@@ -1151,6 +1155,71 @@ async function main() {
     &&MAT_LEGACY_PROGRESS_BAR_DEFAULT_OPTIONS!==MAT_PROGRESS_BAR_DEFAULT_OPTIONS
     &&bar.color==='warn'&&bar.mode==='query'
     &&rectangle.getAttribute('fill')==="url('/legacy-location(path)?query=1#"+pattern.id+"')";
+  // Real public constructor calls exercise the owned common module, not a dummy.
+  // Simulate platform-computed colors, but use the unchanged actual CDK
+  // detector/module and its public BreakpointObserver event/teardown boundary.
+  const oldComputedStyle=globalThis.getComputedStyle;
+  const oldBodyClass=document.body.className;
+  const contrastChanges=new Subject<BreakpointState>();
+  let computedBackground='rgb(255, 255, 255)';
+  let contrastProbeReads=0;
+  let contrastLifecycle=false;
+  const environment=createEnvironmentInjector([
+    HighContrastModeDetector,
+    {provide:MATERIAL_LEGACY_SANITY_CHECKS,useValue:false},
+    {provide:BreakpointObserver,useValue:{observe:(query:string|string[])=>{
+      if(query!=='(forced-colors: active)')throw Error('unexpected contrast media query');
+      return contrastChanges.asObservable();
+    }}},
+  ],TestBed.inject(EnvironmentInjector));
+  let commonRef:{destroy():void}|undefined;
+  let environmentClosed=false;
+  try {
+    globalThis.getComputedStyle=(element,pseudo)=>{
+      const style=oldComputedStyle(element,pseudo);
+      if((element as HTMLElement).style?.backgroundColor.replace(/\\s/g,'')==='rgb(1,2,3)') {
+        contrastProbeReads++;
+        return new Proxy(style,{get:(target,key)=>key==='backgroundColor'?computedBackground:Reflect.get(target,key,target)});
+      }
+      return style;
+    };
+    commonRef=createNgModule(MatLegacyCommonModule,environment);
+    const classes=document.body.classList;
+    const black=classes.contains('cdk-high-contrast-active')&&classes.contains('cdk-high-contrast-black-on-white')&&!classes.contains('cdk-high-contrast-white-on-black');
+    computedBackground='rgb(0, 0, 0)';
+    contrastChanges.next({matches:true,breakpoints:{'(forced-colors: active)':true}});
+    const white=classes.contains('cdk-high-contrast-active')&&classes.contains('cdk-high-contrast-white-on-black')&&!classes.contains('cdk-high-contrast-black-on-white');
+    computedBackground='rgb(1, 2, 3)';
+    contrastChanges.next({matches:false,breakpoints:{'(forced-colors: active)':false}});
+    const none=!classes.contains('cdk-high-contrast-active')&&!classes.contains('cdk-high-contrast-black-on-white')&&!classes.contains('cdk-high-contrast-white-on-black');
+    commonRef.destroy();commonRef=undefined;environmentClosed=true;environment.destroy();
+    const readsBeforeDestroyedEmission=contrastProbeReads;
+    computedBackground='rgb(255, 255, 255)';
+    contrastChanges.next({matches:true,breakpoints:{'(forced-colors: active)':true}});
+    contrastLifecycle=black&&white&&none&&contrastProbeReads===readsBeforeDestroyedEmission
+      &&!classes.contains('cdk-high-contrast-active');
+  } finally {
+    if(commonRef)commonRef.destroy();
+    if(!environmentClosed)environment.destroy();
+    contrastChanges.complete();globalThis.getComputedStyle=oldComputedStyle;
+    document.body.className=oldBodyClass;
+  }
+  const sanityWarnings: string[]=[];
+  const originalWarn=console.warn;
+  try {
+    console.warn=(message:unknown)=>{sanityWarnings.push(String(message));};
+    const doc={doctype:null,body:null} as unknown as Document;
+    const detector={getHighContrastMode:()=>HighContrastMode.NONE} as unknown as HighContrastModeDetector;
+    TestBed.runInInjectionContext(()=>new MatLegacyCommonModule(detector,{doctype:true,theme:false,version:false},doc));
+  } finally {console.warn=originalWarn;}
+  // This standalone Node fixture has no runner-local Jasmine/Jest variables.
+  const runner=globalThis as typeof globalThis & {__karma__?:unknown;jasmine?:unknown;jest?:unknown;Mocha?:unknown};
+  const checksEnabled=isDevMode()&&!Boolean(runner.__karma__||runner.jasmine||runner.jest||runner.Mocha);
+  const commonModuleBehavior=TestBed.inject(MATERIAL_LEGACY_SANITY_CHECKS)===true
+    &&String(MATERIAL_LEGACY_SANITY_CHECKS)==='InjectionToken mat-sanity-checks'
+    &&contrastLifecycle
+    &&sanityWarnings.length===(checksEnabled?1:0)
+    &&(!checksEnabled||sanityWarnings[0].includes('Current document does not have a doctype.'));
   const out = {
     ok:
       text === 'Go' &&
@@ -1164,7 +1233,7 @@ async function main() {
       selectOpened === true &&
       selectClosed === true &&
       tabCount === 2 &&
-      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults,
+      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior,
     buttonText: text,
     selectIsOpen: isOpen,
     dialogText,
@@ -1186,6 +1255,7 @@ async function main() {
     errorLiveRegion,
     formFieldTokenIsolation,
     progressLocationAndDefaults,
+    commonModuleBehavior,
     chipEventCounts:{removals:fixture.componentInstance.repeatRemovals,separators:fixture.componentInstance.repeatEnds},
     harnesses: [
       'MatLegacyButtonHarness',
