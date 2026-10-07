@@ -8,6 +8,8 @@
  */
 
 import {Directive, ElementRef, Input, TemplateRef} from '@angular/core';
+import {coerceBooleanProperty} from '@angular/cdk/coercion';
+type BooleanInput = string | boolean | null | undefined;
 import {constructWithPublicDependencies} from './internal/public-constructor-context';
 import {
   CdkCell,
@@ -95,6 +97,18 @@ export class MatLegacyFooterCellDef extends CdkFooterCellDef {
   ],
 })
 export class MatLegacyColumnDef extends CdkColumnDef {
+  override get sticky(): boolean { return super.sticky; }
+  override set sticky(value: boolean) {
+    this.resetStickyChanged();
+    super.sticky = coerceBooleanProperty(value);
+  }
+
+  override get stickyEnd(): boolean { return super.stickyEnd; }
+  override set stickyEnd(value: BooleanInput) {
+    this.resetStickyChanged();
+    super.stickyEnd = coerceBooleanProperty(value);
+  }
+
   /** Unique name for this column. */
   @Input('matColumnDef')
   override get name(): string {

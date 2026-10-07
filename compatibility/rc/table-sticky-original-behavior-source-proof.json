@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "scope": [
+    "MatLegacyColumnDef.sticky",
+    "MatLegacyColumnDef.stickyEnd",
+    "MatLegacyHeaderRowDef.sticky",
+    "MatLegacyFooterRowDef.sticky"
+  ],
+  "authentic_sources": [
+    {
+      "version": "16.2.14",
+      "archive_sha256": "a499ba0fee46784441b92587e43b17ec72d9bd383f78ea14954eaa62c781bad7",
+      "member": "package/fesm2022/table.mjs",
+      "member_sha256": "5970be112e4a2e41c48316120a1695fef3be7ca0c91507ff1d2dec1e724e508e",
+      "reviewed_sticky_body": "function mixinHasStickyInput(base) {\n    return class extends base {\n        /** Whether sticky positioning should be applied. */\n        get sticky() {\n            return this._sticky;\n        }\n        set sticky(v) {\n            const prevValue = this._sticky;\n            this._sticky = coerceBooleanProperty(v);\n            this._hasStickyChanged = prevValue !== this._sticky;\n        }\n        /** Whether the sticky value has changed since this was last called. */\n        hasStickyChanged() {\n            const hasStickyChanged = this._hasStickyChanged;\n            this._hasStickyChanged = false;\n            return hasStickyChanged;\n        }\n        /** Resets the dirty check for cases where the sticky state has been used without checking. */\n        resetStickyChanged() {\n            this._hasStickyChanged = false;\n        }\n        constructor(...args) {\n            super(...args);\n            this._sticky = false;\n            /** Whether the sticky input has changed since it was last checked. */\n            this._hasStickyChanged = false;\n        }\n    };\n}\n\nset stickyEnd(v) {\n        const prevValue = this._stickyEnd;\n        this._stickyEnd = coerceBooleanProperty(v);\n        this._hasStickyChanged = prevValue !== this._stickyEnd;\n    }"
+    },
+    {
+      "version": "21.2.14",
+      "archive_sha256": "b54868a0f7aefa471203a0fe419370e156cdf0218db9b625aca3ae6e8de25c63",
+      "member": "package/fesm2022/table.mjs",
+      "member_sha256": "ea8d99a22482768bab22e19aba83b2a1498be6be340e46991965f539036b6c11",
+      "reviewed_sticky_body": "class CdkColumnDef {\n  _table = inject(CDK_TABLE, {\n    optional: true\n  });\n  _hasStickyChanged = false;\n  get name() {\n    return this._name;\n  }\n  set name(name) {\n    this._setNameInput(name);\n  }\n  _name;\n  get sticky() {\n    return this._sticky;\n  }\n  set sticky(value) {\n    if (value !== this._sticky) {\n      this._sticky = value;\n      this._hasStickyChanged = true;\n    }\n  }\n  _sticky = false;\n  get stickyEnd() {\n    return this._stickyEnd;\n  }\n  set stickyEnd(value) {\n    if (value !== this._stickyEnd) {\n      this._stickyEnd = value;\n      this._hasStickyChanged = true;\n    }\n  }\n  _stickyEnd = false;\n"
+    },
+    {
+      "version": "22.1.7",
+      "archive_sha256": "225d82389797aefbbb2684461576ef950465546a9d28326483e0b816c8a5a558",
+      "member": "package/fesm2022/table.mjs",
+      "member_sha256": "2bdeb437714a07914ccb8d2f749fd75d72b63da1ab4cc0c069f64e714c2a6ad4",
+      "reviewed_sticky_body": "class CdkColumnDef {\n  _table = inject(CDK_TABLE, {\n    optional: true\n  });\n  _hasStickyChanged = false;\n  get name() {\n    return this._name;\n  }\n  set name(name) {\n    this._setNameInput(name);\n  }\n  _name;\n  get sticky() {\n    return this._sticky;\n  }\n  set sticky(value) {\n    if (value !== this._sticky) {\n      this._sticky = value;\n      this._hasStickyChanged = true;\n    }\n  }\n  _sticky = false;\n  get stickyEnd() {\n    return this._stickyEnd;\n  }\n  set stickyEnd(value) {\n    if (value !== this._stickyEnd) {\n      this._stickyEnd = value;\n      this._hasStickyChanged = true;\n    }\n  }\n  _stickyEnd = false;\n"
+    }
+  ],
+  "original_behavior": "Each write coerces using coerceBooleanProperty and sets dirty to comparison of previous and next coerced value. Repeated same-value write clears dirty. hasStickyChanged reads and clears dirty.",
+  "peer_difference": "Current21/22 setters receive boolean values, do not coerce imperative strings, and only set dirty when raw value changes; equal writes retain an earlier dirty flag.",
+  "repair": "Before each public parent setter, call public resetStickyChanged and pass the public coerceBooleanProperty result. Read through public parent getters. Actual parent class/prototype remains; no private flag access, private token import, CDK mixin/algorithm copy, selector or CSS change.",
+  "required_native_case": "packed-consumer/harness/table-original-sticky-coercion-dirty-state",
+  "required_packed_cases": 86,
+  "native_status": "pending Actions",
+  "expected_sequence": "Eight authenticated original BooleanInput transitions across four setters, with read/dirty flag and repeated-read checks (32 transitions). Uses actual Angular-created definitions; restores false state after the test.",
+  "declaration_scope": "sticky read/write remains boolean as original mixed HasStickyInput contract; stickyEnd retains original BooleanInput primitive union locally. Original constructors and remaining source/API/DI blockers are not waived.",
+  "qualification": "Source reviewed on untouched16 and both authenticated minimum peers. JS parser and three constructor diagnostic tests pass locally under readonly22/TS6.0.3. No local pinned/native86 claim."
+}

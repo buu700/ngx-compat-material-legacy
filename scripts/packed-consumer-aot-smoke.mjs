@@ -490,6 +490,7 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
     'packed-consumer/harness/tab-content-original-constructor': parsed.tabContentOriginalConstructor === true,
     'packed-consumer/harness/no-data-row-original-constructor': parsed.noDataRowOriginalConstructor === true,
     'packed-consumer/harness/constructor-borrowed-provider-lifecycle': parsed.constructorBorrowedProviderLifecycle === true,
+    'packed-consumer/harness/table-original-sticky-coercion-dirty-state': parsed.tableOriginalStickyBehavior === true,
   };
   const owned = declarationKeys(keys)
     .filter(key => key.endsWith('/testing'))
@@ -910,7 +911,7 @@ import {provideNoopAnimations} from '@angular/platform-browser/animations';
 import {Overlay, OverlayContainer} from '@angular/cdk/overlay';
 import {ScrollDispatcher} from '@angular/cdk/scrolling';
 import {CdkCellDef,CdkHeaderCellDef,CdkFooterCellDef,CdkCell,CdkHeaderCell,CdkFooterCell,CdkTextColumn,TEXT_COLUMN_OPTIONS,CdkNoDataRow,type CdkTable} from '@angular/cdk/table';
-import {MatLegacyTableModule,MatLegacyCellDef,MatLegacyHeaderCellDef,MatLegacyFooterCellDef,MatLegacyColumnDef,MatLegacyCell,MatLegacyHeaderCell,MatLegacyFooterCell,MatLegacyTable,MatLegacyTextColumn,MatLegacyNoDataRow} from '@ngx-compat/material-legacy/legacy-table';
+import {MatLegacyTableModule,MatLegacyCellDef,MatLegacyHeaderCellDef,MatLegacyFooterCellDef,MatLegacyColumnDef,MatLegacyCell,MatLegacyHeaderCell,MatLegacyFooterCell,MatLegacyTable,MatLegacyTextColumn,MatLegacyNoDataRow,MatLegacyHeaderRowDef,MatLegacyFooterRowDef} from '@ngx-compat/material-legacy/legacy-table';
 import {Platform} from '@angular/cdk/platform';
 import {Directionality} from '@angular/cdk/bidi';
 import {MatLegacyButtonModule} from '@ngx-compat/material-legacy/legacy-button';
@@ -1045,6 +1046,8 @@ class SmokeDialogContent {}
 })
 class HarnessHost {
   constructorGridData=[{value:'Grid value'}];
+  @ViewChild(MatLegacyHeaderRowDef,{static:true}) originalStickyHeader!:MatLegacyHeaderRowDef;
+  @ViewChild(MatLegacyFooterRowDef,{static:true}) originalStickyFooter!:MatLegacyFooterRowDef;
   @ViewChild('manualNoDataTemplate',{read:MatLegacyNoDataRow,static:true}) originalNoDataRow!:MatLegacyNoDataRow;
   @ViewChild('manualNoDataTemplate',{read:TemplateRef,static:true}) originalNoDataTemplate!:TemplateRef<any>;
   @ViewChild('manualTabTemplate',{read:MatLegacyTabContent,static:true}) originalTabContent!:MatLegacyTabContent;
@@ -1166,6 +1169,32 @@ async function main() {
   }
   const cellDefinitionOriginalConstructors=cellDefinitionObservation.length===3
     &&cellDefinitionObservation.every(row=>Object.entries(row).every(([name,value])=>name==='name'||value===true));
+
+  const stickyObservations=[];
+  // Original16 coercion and last-write dirty semantics, not current expectations.
+  for(const [target,property] of [
+    [fixture.componentInstance.gridColumn,'sticky'],
+    [fixture.componentInstance.gridColumn,'stickyEnd'],
+    [fixture.componentInstance.originalStickyHeader,'sticky'],
+    [fixture.componentInstance.originalStickyFooter,'sticky'],
+  ] as const){
+    const row={property,present:!!target,sequence:[] as boolean[]};
+    if(target){
+      const writable=target as any;writable[property]=false;target.resetStickyChanged();
+      for(const [input,value,changed] of [
+        ['false',false,false],['',true,true],['',true,false],[null,false,true],
+        [undefined,false,false],['true',true,true],[true,true,false],[false,false,true],
+      ] as const){
+        writable[property]=input;
+        row.sequence.push(writable[property]===value&&target.hasStickyChanged()===changed
+          &&target.hasStickyChanged()===false);
+      }
+      writable[property]=false;target.resetStickyChanged();
+    }
+    stickyObservations.push(row);
+  }
+  const tableOriginalStickyBehavior=stickyObservations.length===4
+    &&stickyObservations.every(row=>row.present&&row.sequence.length===8&&row.sequence.every(Boolean));
   const cellConstructorObservation=[];
   const column=fixture.componentInstance.gridColumn;
   for(const [Owned,Peer,selector,role] of [
@@ -1576,7 +1605,7 @@ async function main() {
       selectOpened === true &&
       selectClosed === true &&
       tabCount === 2 &&
-      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor && tabContentOriginalConstructor && noDataRowOriginalConstructor && constructorBorrowedProviderLifecycle,
+      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor && tabContentOriginalConstructor && noDataRowOriginalConstructor && constructorBorrowedProviderLifecycle && tableOriginalStickyBehavior,
     buttonText: text,
     selectIsOpen: isOpen,
     dialogText,
@@ -1610,6 +1639,7 @@ async function main() {
     tabContentOriginalConstructor, tabContentObservation,
     noDataRowOriginalConstructor, noDataRowObservation,
     constructorBorrowedProviderLifecycle, borrowedTableDestroyed, borrowedOptionsDestroyed,
+    tableOriginalStickyBehavior, stickyObservations,
     checkboxAttribute, slideToggleAttribute, sliderAttribute, tabLinkAttribute,
     commonModuleDiagnostics:{contrastLifecycle,contrastProbeReads,sanityWarnings,checksEnabled,sanityDefault:TestBed.inject(MATERIAL_LEGACY_SANITY_CHECKS),sanityToken:String(MATERIAL_LEGACY_SANITY_CHECKS)},
     chipEventCounts:{removals:fixture.componentInstance.repeatRemovals,separators:fixture.componentInstance.repeatEnds},
