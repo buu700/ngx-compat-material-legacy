@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-07T05:25:59.537071+00:00",
+  "scope": [
+    "MatLegacyCellDef",
+    "MatLegacyHeaderCellDef",
+    "MatLegacyFooterCellDef"
+  ],
+  "authentic_reference_and_minimum_peer_bodies": {
+    "original16": {
+      "version": "16.2.14",
+      "archive_sha256": "a499ba0fee46784441b92587e43b17ec72d9bd383f78ea14954eaa62c781bad7",
+      "member": "package/fesm2022/table.mjs",
+      "member_sha256": "5970be112e4a2e41c48316120a1695fef3be7ca0c91507ff1d2dec1e724e508e",
+      "constructor_bodies": {
+        "CdkCellDef": "class CdkCellDef {\n    constructor(/** @docs-private */ template) {\n        this.template = template;\n    }\n",
+        "CdkHeaderCellDef": "class CdkHeaderCellDef {\n    constructor(/** @docs-private */ template) {\n        this.template = template;\n    }\n",
+        "CdkFooterCellDef": "class CdkFooterCellDef {\n    constructor(/** @docs-private */ template) {\n        this.template = template;\n    }\n"
+      }
+    },
+    "21.x": {
+      "version": "21.2.14",
+      "archive_sha256": "b54868a0f7aefa471203a0fe419370e156cdf0218db9b625aca3ae6e8de25c63",
+      "member": "package/fesm2022/table.mjs",
+      "member_sha256": "ea8d99a22482768bab22e19aba83b2a1498be6be340e46991965f539036b6c11",
+      "constructor_bodies": {
+        "CdkCellDef": "class CdkCellDef {\n  template = inject(TemplateRef);\n  constructor() {}\n",
+        "CdkHeaderCellDef": "class CdkHeaderCellDef {\n  template = inject(TemplateRef);\n  constructor() {}\n",
+        "CdkFooterCellDef": "class CdkFooterCellDef {\n  template = inject(TemplateRef);\n  constructor() {}\n"
+      }
+    },
+    "main": {
+      "version": "22.1.7",
+      "archive_sha256": "225d82389797aefbbb2684461576ef950465546a9d28326483e0b816c8a5a558",
+      "member": "package/fesm2022/table.mjs",
+      "member_sha256": "2bdeb437714a07914ccb8d2f749fd75d72b63da1ab4cc0c069f64e714c2a6ad4",
+      "constructor_bodies": {
+        "CdkCellDef": "class CdkCellDef {\n  template = inject(TemplateRef);\n",
+        "CdkHeaderCellDef": "class CdkHeaderCellDef {\n  template = inject(TemplateRef);\n",
+        "CdkFooterCellDef": "class CdkFooterCellDef {\n  template = inject(TemplateRef);\n"
+      }
+    }
+  },
+  "implementation": "Restore each original TemplateRef<any> constructor. Public Injector.create/runInInjectionContext supplies exactly that caller object to the real public CDK parent; standard Reflect.construct uses the legacy new.target to preserve its actual prototype and public parent constructor identity. Temporary injector is destroyed in finally. No CDK implementation, token or class is copied, replaced or shadowed.",
+  "typescript_limitation": "Derived constructor returns its correctly constructed object before super(), valid ECMAScript. TypeScript TS2377 insists on lexical super even for this legal return. Each exact constructor has a narrow ts-expect-error; no d.ts declaration, argument/type check, factory diagnostic or native assertion is waived. A proposed callback-super version was rejected by the readonly TS semantic diagnostic and never committed.",
+  "required_native_case": "packed-consumer/harness/cell-definition-original-constructors",
+  "required_packed_cases": 80,
+  "native_status": "pending Actions",
+  "expected_behavior_from_original": "Untouched CDK16 parent constructor stores the supplied template. Test actual manual argument identity, owned/current peer instanceof and prototype/parent constructor identities, real Angular node template anchors/current CDK useExisting alias, and embedded-view text for all three definitions. These expectations do not come from candidate snapshots.",
+  "remaining_scope": "Other ten inherited constructor guards, complete DI execution/provider/context proof, whole table behavior and G02 remain incomplete. Root-only factory collection may observe the extra bounded internal template lookup; no waiver is granted. Fresh full historical artifact and80-case native consumer required.",
+  "g02_claim": "not-passed"
+}

@@ -484,6 +484,7 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
     'packed-consumer/harness/checkbox-node-factory-context': parsed.checkboxNodeFactoryContext === true,
     'packed-consumer/harness/peer-stepper-abstract-control': parsed.peerStepperAbstractControl === true,
     'packed-consumer/harness/tooltip-original-eager-dependencies': parsed.tooltipOriginalEagerDependencies === true,
+    'packed-consumer/harness/cell-definition-original-constructors': parsed.cellDefinitionOriginalConstructors === true,
   };
   const owned = declarationKeys(keys)
     .filter(key => key.endsWith('/testing'))
@@ -887,7 +888,7 @@ Object.defineProperty(globalThis, 'navigator', {
 
 import 'zone.js';
 import '@angular/compiler';
-import {Component, ElementRef, ViewContainerRef, EventEmitter, InjectionToken, ANIMATION_MODULE_TYPE, NgZone, inject, isDevMode, createEnvironmentInjector, createNgModule, EnvironmentInjector} from '@angular/core';
+import {Component, ElementRef, TemplateRef, ViewChild, Injector, ViewContainerRef, EventEmitter, InjectionToken, ANIMATION_MODULE_TYPE, NgZone, inject, isDevMode, createEnvironmentInjector, createNgModule, EnvironmentInjector} from '@angular/core';
 import {Subject} from 'rxjs';
 import {FormControl, Validators} from '@angular/forms';
 import {MatStepperModule, MatStepper} from '@angular/material/stepper';
@@ -902,6 +903,8 @@ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
 import {provideNoopAnimations} from '@angular/platform-browser/animations';
 import {Overlay, OverlayContainer} from '@angular/cdk/overlay';
 import {ScrollDispatcher} from '@angular/cdk/scrolling';
+import {CdkCellDef,CdkHeaderCellDef,CdkFooterCellDef} from '@angular/cdk/table';
+import {MatLegacyTableModule,MatLegacyCellDef,MatLegacyHeaderCellDef,MatLegacyFooterCellDef} from '@ngx-compat/material-legacy/legacy-table';
 import {Platform} from '@angular/cdk/platform';
 import {Directionality} from '@angular/cdk/bidi';
 import {MatLegacyButtonModule} from '@ngx-compat/material-legacy/legacy-button';
@@ -936,6 +939,8 @@ getTestBed().initTestEnvironment(
   platformBrowserDynamicTesting(),
 );
 
+const CELL_DEF_NODE_INJECTOR=new InjectionToken<Injector>('closeout-cell-def-node-injector');
+
 @Component({
   standalone: true,
   imports: [MatLegacyDialogModule],
@@ -953,6 +958,7 @@ class SmokeDialogContent {}
     MatLegacyMenuModule,
     MatLegacySnackBarModule,
     MatLegacyTooltipModule,
+    MatLegacyTableModule,
     MatLegacyTabsModule,
     MatLegacyChipsModule,
     MatLegacyRadioModule,
@@ -1003,6 +1009,9 @@ class SmokeDialogContent {}
     </mat-menu>
     <button mat-button id="snack-open">Snack</button>
     <button mat-button matTooltip="Tip text" id="tip">Hover</button>
+    <ng-template #manualCellTemplate matCellDef>Data probe</ng-template>
+    <ng-template #manualHeaderTemplate matHeaderCellDef>Header probe</ng-template>
+    <ng-template #manualFooterTemplate matFooterCellDef>Footer probe</ng-template>
     <span id="tooltip-eager" matTooltip="" [matTooltipDisabled]="true">Disabled empty tooltip</span>
     <mat-tab-group id="tabs">
       <mat-tab label="One">Tab one</mat-tab>
@@ -1011,6 +1020,15 @@ class SmokeDialogContent {}
   \`,
 })
 class HarnessHost {
+  @ViewChild(MatLegacyCellDef,{static:true}) cellDefinition!:MatLegacyCellDef;
+  @ViewChild(MatLegacyHeaderCellDef,{static:true}) headerDefinition!:MatLegacyHeaderCellDef;
+  @ViewChild(MatLegacyFooterCellDef,{static:true}) footerDefinition!:MatLegacyFooterCellDef;
+  @ViewChild('manualCellTemplate',{read:TemplateRef,static:true}) cellTemplate!:TemplateRef<any>;
+  @ViewChild('manualHeaderTemplate',{read:TemplateRef,static:true}) headerTemplate!:TemplateRef<any>;
+  @ViewChild('manualFooterTemplate',{read:TemplateRef,static:true}) footerTemplate!:TemplateRef<any>;
+  @ViewChild('manualCellTemplate',{read:CELL_DEF_NODE_INJECTOR,static:true}) cellInjector!:Injector;
+  @ViewChild('manualHeaderTemplate',{read:CELL_DEF_NODE_INJECTOR,static:true}) headerInjector!:Injector;
+  @ViewChild('manualFooterTemplate',{read:CELL_DEF_NODE_INJECTOR,static:true}) footerInjector!:Injector;
   stepControl = new FormControl('', Validators.required);
   repeatRemovals=0;
   repeatEnds=0;
@@ -1067,6 +1085,11 @@ async function main() {
       finally{observingPublicEmitterBaseline=false;}
     },
   }]}});
+  for(const definition of [MatLegacyCellDef,MatLegacyHeaderCellDef,MatLegacyFooterCellDef]){
+    TestBed.overrideDirective(definition,{add:{providers:[{
+      provide:CELL_DEF_NODE_INJECTOR,useFactory:()=>inject(Injector),
+    }]}});
+  }
   TestBed.configureTestingModule({
     imports: [HarnessHost, SmokeDialogContent, LegacyNativeDateModule, MatLegacyNativeDateModule],
     providers: [provideNoopAnimations(), {provide: MAT_LEGACY_DATE_LOCALE, useValue: 'en-GB'}],
@@ -1090,6 +1113,28 @@ async function main() {
   const secondIcon=await iconSvg();
   const fixture = TestBed.createComponent(HarnessHost);
   fixture.detectChanges();
+  const cellDefinitionObservation=[];
+  const definitions=[
+    [MatLegacyCellDef,CdkCellDef,fixture.componentInstance.cellDefinition,fixture.componentInstance.cellTemplate,fixture.componentInstance.cellInjector,'Data probe'],
+    [MatLegacyHeaderCellDef,CdkHeaderCellDef,fixture.componentInstance.headerDefinition,fixture.componentInstance.headerTemplate,fixture.componentInstance.headerInjector,'Header probe'],
+    [MatLegacyFooterCellDef,CdkFooterCellDef,fixture.componentInstance.footerDefinition,fixture.componentInstance.footerTemplate,fixture.componentInstance.footerInjector,'Footer probe'],
+  ] as const;
+  for(const [Owned,Peer,nodeDefinition,template,nodeInjector,text] of definitions){
+    const manual=new Owned(template);
+    const view=manual.template.createEmbeddedView({});view.detectChanges();
+    cellDefinitionObservation.push({name:Owned.name,
+      manual_argument_identity:manual.template===template,
+      manual_owned_identity:manual instanceof Owned,manual_peer_identity:manual instanceof Peer,
+      manual_prototype:Object.getPrototypeOf(manual)===Owned.prototype,
+      parent_constructor_identity:Object.getPrototypeOf(Owned)===Peer,
+      node_owned_identity:nodeDefinition instanceof Owned,node_peer_identity:nodeDefinition instanceof Peer,
+      node_template_anchor:nodeDefinition.template.elementRef.nativeElement===template.elementRef.nativeElement,
+      node_provider_alias:nodeInjector.get(Peer)===nodeDefinition,
+      embedded_view_text:view.rootNodes.map(node=>node.textContent||'').join('').trim()===text});
+    view.destroy();
+  }
+  const cellDefinitionOriginalConstructors=cellDefinitionObservation.length===3
+    &&cellDefinitionObservation.every(row=>Object.entries(row).every(([name,value])=>name==='name'||value===true));
   const eagerNode=fixture.debugElement.query(element=>element.nativeElement?.id==='tooltip-eager');
   const eagerTooltip=eagerNode.injector.get(MatLegacyTooltip);
   // These are owned original16 fields, not current private peer imports. Check
@@ -1408,7 +1453,7 @@ async function main() {
       selectOpened === true &&
       selectClosed === true &&
       tabCount === 2 &&
-      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies,
+      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors,
     buttonText: text,
     selectIsOpen: isOpen,
     dialogText,
@@ -1436,6 +1481,7 @@ async function main() {
     checkboxNodeFactoryObservation,
     peerStepperAbstractControl, peerStepperObservation,
     tooltipOriginalEagerDependencies, tooltipEagerObservation,
+    cellDefinitionOriginalConstructors, cellDefinitionObservation,
     checkboxAttribute, slideToggleAttribute, sliderAttribute, tabLinkAttribute,
     commonModuleDiagnostics:{contrastLifecycle,contrastProbeReads,sanityWarnings,checksEnabled,sanityDefault:TestBed.inject(MATERIAL_LEGACY_SANITY_CHECKS),sanityToken:String(MATERIAL_LEGACY_SANITY_CHECKS)},
     chipEventCounts:{removals:fixture.componentInstance.repeatRemovals,separators:fixture.componentInstance.repeatEnds},

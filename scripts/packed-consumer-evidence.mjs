@@ -45,6 +45,7 @@ export const HARNESS_CASE_IDS = [
   'packed-consumer/harness/checkbox-node-factory-context',
   'packed-consumer/harness/peer-stepper-abstract-control',
   'packed-consumer/harness/tooltip-original-eager-dependencies',
+  'packed-consumer/harness/cell-definition-original-constructors',
   'packed-consumer/harness/owned-resolution',
   'packed-consumer/harness/peer-harness-separate-scope',
 ];
