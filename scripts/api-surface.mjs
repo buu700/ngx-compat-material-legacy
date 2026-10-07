@@ -42,18 +42,33 @@ const INHERITED_TABLE_FACTORIES = Object.freeze({
 });
 const INHERITED_CONSTRUCTOR_REFERENCE = 'reference/material-16.2.14/cdk-inherited-constructors/table.d.ts';
 const INHERITED_CONSTRUCTOR_SHA256 = '94789cae5567000d4f23d9634ce006670e3fca4c5db427ce129026da62002c2d';
+const INHERITED_PEER_CONSTRUCTORS = Object.freeze({
+  ...Object.fromEntries(Object.entries(INHERITED_TABLE_FACTORIES).map(([name,parent])=>[name,{
+    family:'legacy-table',parent,spec:'@angular/cdk/table',reference:INHERITED_CONSTRUCTOR_REFERENCE,
+    sha256:INHERITED_CONSTRUCTOR_SHA256,count:1,
+  }])),
+  MatLegacyMenuItem:{family:'legacy-menu',parent:'MatMenuItem',spec:'@angular/material/menu',
+    reference:'reference/material-16.2.14/material-inherited-constructors/menu.d.ts',
+    sha256:'f1c4c4a656aec1dafc93dbcc92507418b1a80abefd3a64fa85938ec8f9332b0a',count:2},
+  MatLegacyTabLabel:{family:'legacy-tabs',parent:'MatTabLabel',spec:'@angular/material/tabs',
+    reference:'reference/material-16.2.14/material-inherited-constructors/tabs.d.ts',
+    sha256:'30bc71d7fdfc6d01c54cc157e50298025351db6969cb49f042a4f0a252da1ca8',count:1},
+  MatLegacyTabContent:{family:'legacy-tabs',parent:'MatTabContent',spec:'@angular/material/tabs',
+    reference:'reference/material-16.2.14/material-inherited-constructors/tabs.d.ts',
+    sha256:'30bc71d7fdfc6d01c54cc157e50298025351db6969cb49f042a4f0a252da1ca8',count:1},
+});
 export function originalInheritedConstructor(file, name) {
-  if (!file.split('\\').join('/').includes('/material/legacy-table/')) return null;
-  const parent = INHERITED_TABLE_FACTORIES[name];
-  if (!parent) return null;
-  const bytes = readFileSync(join(root, INHERITED_CONSTRUCTOR_REFERENCE));
-  if (createHash('sha256').update(bytes).digest('hex') !== INHERITED_CONSTRUCTOR_SHA256)
+  const config=INHERITED_PEER_CONSTRUCTORS[name];
+  if (!config || !file.split('\\').join('/').includes(`/material/${config.family}/`)) return null;
+  const parent=config.parent;
+  const bytes = readFileSync(join(root, config.reference));
+  if (createHash('sha256').update(bytes).digest('hex') !== config.sha256)
     throw new Error('untouched16 inherited constructor declaration identity mismatch');
-  const source = ts.createSourceFile(INHERITED_CONSTRUCTOR_REFERENCE, bytes.toString('utf8'), ts.ScriptTarget.Latest, true);
+  const source = ts.createSourceFile(config.reference, bytes.toString('utf8'), ts.ScriptTarget.Latest, true);
   const shape = packedShape(source, parent);
   const signatures = shape?.ownSignatures?.filter(sig => sig.includes(' constructor('));
-  if (signatures?.length !== 1) throw new Error('missing original inherited constructor');
-  return {parent, signatures, source_sha256: INHERITED_CONSTRUCTOR_SHA256};
+  if (signatures?.length !== config.count) throw new Error('missing original inherited constructor');
+  return {parent, signatures, source_sha256: config.sha256};
 }
 
 export function packedInheritedConstructor(sourceFile, name, loadPeer = (spec, file) => {
@@ -63,7 +78,8 @@ export function packedInheritedConstructor(sourceFile, name, loadPeer = (spec, f
   const text = readFileSync(resolved.resolvedFileName, 'utf8');
   return ts.createSourceFile(resolved.resolvedFileName, text, ts.ScriptTarget.Latest, true);
 }) {
-  const expectedParent = INHERITED_TABLE_FACTORIES[name];
+  const config=INHERITED_PEER_CONSTRUCTORS[name];
+  const expectedParent = config?.parent;
   if (!expectedParent) return null;
   const node = indexFile(sourceFile).get(name);
   if (!node || !ts.isClassDeclaration(node)) return {parent: expectedParent, signatures: ['unresolved inherited constructor']};
@@ -75,7 +91,7 @@ export function packedInheritedConstructor(sourceFile, name, loadPeer = (spec, f
     for (const typeNode of clause.types || []) {
       const ident = heritageIdentifier(typeNode);
       const binding = ident && bindings.get(ident.local);
-      if (binding?.spec !== '@angular/cdk/table' || binding.imported !== expectedParent) continue;
+      if (binding?.spec !== config.spec || binding.imported !== expectedParent) continue;
       const source = loadPeer(binding.spec, sourceFile.fileName);
       const shape = source && packedShape(source, binding.imported);
       if (!shape || shape.kind !== 'class') continue;
@@ -103,6 +119,13 @@ export function originalFactoryContract(file, name) {
     }
     const inherited = cdkFactoryReference.factories['table/'+INHERITED_TABLE_FACTORIES[name]];
     if (!inherited || inherited.deps_kind !== 'dependencies') throw new Error('original table inheritance factory contract unavailable');
+    return {...contract,inherited_factory:inherited};
+  }
+  const inheritedPeer=INHERITED_PEER_CONSTRUCTORS[name];
+  if (inheritedPeer && family===inheritedPeer.family && inheritedPeer.spec.startsWith('@angular/material/') && contract?.deps_kind==='inherited') {
+    const parentFamily=inheritedPeer.spec.slice('@angular/material/'.length);
+    const inherited=factoryReference.factories[parentFamily+'/'+inheritedPeer.parent];
+    if (!inherited || inherited.deps_kind!=='dependencies') throw new Error('original Material inheritance factory contract unavailable');
     return {...contract,inherited_factory:inherited};
   }
   return contract;

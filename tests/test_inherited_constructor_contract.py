@@ -13,6 +13,17 @@ class InheritedConstructorContracts(unittest.TestCase):
         self.assertEqual(provenance['archive_sha256'],factory['tarball_sha256'])
         self.assertEqual(provenance['scope'],['CdkHeaderRowDef','CdkFooterRowDef','CdkRowDef'])
 
+    def test_untouched_material_constructor_members(self):
+        folder=ROOT/'reference/material-16.2.14/material-inherited-constructors'
+        provenance=json.loads((folder/'provenance.json').read_text())
+        factory=json.loads((ROOT/'reference/material-16.2.14/factory-metadata.json').read_text())
+        self.assertEqual(provenance['archive_sha256'],factory['tarball_sha256'])
+        self.assertEqual([r['scope'] for r in provenance['members']],[['MatMenuItem'],['MatTabLabel','MatTabContent']])
+        for record in provenance['members']:
+            data=(folder/(record['archive_member'].split('/')[1]+'.d.ts')).read_bytes()
+            self.assertEqual(len(data),record['bytes'])
+            self.assertEqual(hashlib.sha256(data).hexdigest(),record['member_sha256'])
+
     @unittest.skipUnless(typescript_available(),'typescript is not installed')
     def test_authenticated_signature_same_base_changes_and_shadow_rejection(self):
         code=r'''
@@ -62,6 +73,24 @@ for(const [name,parent,parameters,signature] of [
  assert.notDeepEqual(missing.signatures,original.signatures);
  const wrong=packedInheritedConstructor(candidate,name,()=>sf(`export declare class ${parent}<T> {constructor(...args: unknown[]);}`));
  assert.notDeepEqual(wrong.signatures,original.signatures);
+}
+for(const [family,name,parent,spec,count,parameters] of [
+ ['legacy-menu','MatLegacyMenuItem','MatMenuItem','@angular/material/menu',2,'elementRef: ElementRef<HTMLElement>, document: any, focusMonitor: FocusMonitor, parentMenu: MatMenuPanel<MatMenuItem> | undefined, changeDetectorRef: ChangeDetectorRef'],
+ ['legacy-tabs','MatLegacyTabLabel','MatTabLabel','@angular/material/tabs',1,'templateRef: TemplateRef<any>, viewContainerRef: ViewContainerRef, closestTab: any'],
+ ['legacy-tabs','MatLegacyTabContent','MatTabContent','@angular/material/tabs',1,'template: TemplateRef<any>'],
+]) {
+ const original=originalInheritedConstructor(`/original/src/material/${family}/fixture.ts`,name);
+ assert.equal(original.parent,parent);assert.equal(original.signatures.length,count);
+ const candidate=sf(`import {${parent} as PeerBase} from '${spec}'; export declare class ${name} extends PeerBase {}`);
+ const declaration=`export declare class ${parent} {constructor(${parameters});${count===2?'constructor(elementRef: ElementRef<HTMLElement>, document?: any, focusMonitor?: FocusMonitor, parentMenu?: MatMenuPanel<MatMenuItem>, changeDetectorRef?: ChangeDetectorRef);':''}}`;
+ const matching=packedInheritedConstructor(candidate,name,(requested)=>{assert.equal(requested,spec);return sf(declaration);});
+ assert.deepEqual(matching.signatures,original.signatures);
+ const missing=packedInheritedConstructor(candidate,name,()=>sf(`export declare class ${parent} {}`));
+ assert.deepEqual(missing.signatures,['public constructor()']);
+ assert.notDeepEqual(missing.signatures,original.signatures);
+ const shadow=sf(`import {${parent}} from './shadow'; export declare class ${name} extends ${parent} {}`);
+ assert.deepEqual(packedInheritedConstructor(shadow,name,()=>{throw Error('shadow public parent');}).signatures,['unresolved inherited constructor']);
+ assert.equal(originalInheritedConstructor('/original/src/material/legacy-table/fixture.ts',name),null);
 }
 assert.equal(originalInheritedConstructor('/original/src/material/legacy-table/row.ts','Unknown'),null);
 '''
