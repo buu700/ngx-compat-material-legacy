@@ -892,7 +892,7 @@ import {Subject} from 'rxjs';
 import {FormControl, Validators} from '@angular/forms';
 import {MatStepperModule, MatStepper} from '@angular/material/stepper';
 import {BreakpointObserver, BreakpointState} from '@angular/cdk/layout';
-import {FocusMonitor, HighContrastMode, HighContrastModeDetector} from '@angular/cdk/a11y';
+import {AriaDescriber, FocusMonitor, HighContrastMode, HighContrastModeDetector} from '@angular/cdk/a11y';
 import {
   BrowserDynamicTestingModule,
   platformBrowserDynamicTesting,
@@ -902,6 +902,8 @@ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
 import {provideNoopAnimations} from '@angular/platform-browser/animations';
 import {Overlay, OverlayContainer} from '@angular/cdk/overlay';
 import {ScrollDispatcher} from '@angular/cdk/scrolling';
+import {Platform} from '@angular/cdk/platform';
+import {Directionality} from '@angular/cdk/bidi';
 import {MatLegacyButtonModule} from '@ngx-compat/material-legacy/legacy-button';
 import {MatLegacyButtonHarness} from '@ngx-compat/material-legacy/legacy-button/testing';
 import {MatLegacyError, MatLegacyFormField, MatLegacyPrefix, MatLegacySuffix, MatLegacyFormFieldModule, MAT_LEGACY_FORM_FIELD, MAT_LEGACY_ERROR, MAT_LEGACY_PREFIX, MAT_LEGACY_SUFFIX} from '@ngx-compat/material-legacy/legacy-form-field';
@@ -914,7 +916,7 @@ import {MatLegacyMenuModule} from '@ngx-compat/material-legacy/legacy-menu';
 import {MatLegacyMenuHarness} from '@ngx-compat/material-legacy/legacy-menu/testing';
 import {MatLegacySnackBar, MatLegacySnackBarModule} from '@ngx-compat/material-legacy/legacy-snack-bar';
 import {MatLegacySnackBarHarness} from '@ngx-compat/material-legacy/legacy-snack-bar/testing';
-import {MatLegacyTooltip, MatLegacyTooltipModule, MAT_LEGACY_TOOLTIP_SCROLL_STRATEGY} from '@ngx-compat/material-legacy/legacy-tooltip';
+import {MatLegacyTooltip, MatLegacyTooltipModule, MAT_LEGACY_TOOLTIP_SCROLL_STRATEGY, MAT_LEGACY_TOOLTIP_DEFAULT_OPTIONS} from '@ngx-compat/material-legacy/legacy-tooltip';
 import {MatLegacyTooltipHarness} from '@ngx-compat/material-legacy/legacy-tooltip/testing';
 import {MatLegacyTabsModule, MatLegacyTabLink} from '@ngx-compat/material-legacy/legacy-tabs';
 import {MatLegacyCheckbox, MatLegacyCheckboxModule, MAT_LEGACY_CHECKBOX_DEFAULT_OPTIONS} from '@ngx-compat/material-legacy/legacy-checkbox';
@@ -1093,12 +1095,27 @@ async function main() {
   // These are owned original16 fields, not current private peer imports. Check
   // real object identity before any show(), including an empty disabled trigger.
   const eagerFields=eagerTooltip as any;
+  const manualArguments=[eagerNode.injector.get(Overlay),new ElementRef(win.document.createElement('span')),
+    eagerNode.injector.get(ScrollDispatcher),eagerNode.injector.get(ViewContainerRef),eagerNode.injector.get(NgZone),
+    eagerNode.injector.get(Platform),eagerNode.injector.get(AriaDescriber),eagerNode.injector.get(FocusMonitor),
+    eagerNode.injector.get(MAT_LEGACY_TOOLTIP_SCROLL_STRATEGY),eagerNode.injector.get(Directionality),
+    eagerNode.injector.get(MAT_LEGACY_TOOLTIP_DEFAULT_OPTIONS,null)!,win.document] as const;
+  // Calling the historical public constructor outside an Angular injection
+  // context must honor its supplied values, not silently inject replacements.
+  const manualTooltip=new MatLegacyTooltip(...manualArguments);
+  const manualFields=manualTooltip as any;
+  const manualSlots=['_overlay','_elementRef','_scrollDispatcher','_viewContainerRef','_ngZone','_platform',
+    '_ariaDescriber','_focusMonitor','_scrollStrategy','_dir','_defaultOptions','_document'];
+  const manualConstructorIdentity=manualSlots.every((name,index)=>manualFields[name]===manualArguments[index]);
+  manualTooltip.ngOnDestroy();
   const tooltipEagerObservation={
     disabled_empty:eagerTooltip.disabled&&eagerTooltip.message==='',
     no_overlay_created:eagerFields._overlayRef==null&&eagerFields._tooltipInstance==null&&eagerFields._portal==null,
     overlay_identity:eagerFields._overlay===eagerNode.injector.get(Overlay),
     scroll_dispatcher_identity:eagerFields._scrollDispatcher===eagerNode.injector.get(ScrollDispatcher),
-    view_container_identity:eagerFields._viewContainerRef===eagerNode.injector.get(ViewContainerRef),
+    view_container_node:eagerFields._viewContainerRef instanceof ViewContainerRef
+      &&eagerFields._viewContainerRef.element.nativeElement===eagerNode.nativeElement,
+    manual_constructor_identity:manualConstructorIdentity,
     strategy_identity:eagerFields._scrollStrategy===eagerNode.injector.get(MAT_LEGACY_TOOLTIP_SCROLL_STRATEGY),
     document_identity:eagerFields._document===win.document,
   };
