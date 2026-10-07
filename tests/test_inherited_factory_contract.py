@@ -86,6 +86,19 @@ for(const [family,name,deps] of [
  const bad=structuredClone(original);bad.inherited_factory.declaration=bad.inherited_factory.declaration.replace('token: i0.TemplateRef','token: BrokenToken').replace('token: DOCUMENT','token: BrokenToken');
  assert.throws(()=>expectedFactoryDi({originalFactory:bad}),/unrecognized/);
 }
+{
+ const original=originalFactoryContract('/untouched/src/material/legacy-table/table.ts','MatLegacyTable');
+ assert.equal(original.inherited_factory.name,'CdkTable');
+ assert.deepEqual(original.inherited_factory.attributes,['role']);
+ const deps=expectedFactoryDi({diParams:[],originalFactory:original});
+ assert.deepEqual(deps.map(p=>[p.ident,p.optional]),[
+  ['IterableDiffers',false],['ChangeDetectorRef',false],['ElementRef',false],['Directionality',true],
+  ['DOCUMENT',false],['Platform',false],['_VIEW_REPEATER_STRATEGY',false],
+  ['_COALESCED_STYLE_SCHEDULER',false],['ViewportRuler',false],['STICKY_POSITIONING_LISTENER',true],['NgZone',true]]);
+ assert.equal(deps[9].skipSelf,true);
+ const bad=structuredClone(original);bad.inherited_factory.declaration=bad.inherited_factory.declaration.replace("token: 'role'","token: 'changed-role'");
+ assert.throws(()=>expectedFactoryDi({originalFactory:bad}),/unrecognized/);
+}
 const temp=mkdtempSync(join(tmpdir(),'different-artifact-modules-'));
 try {
  const a=join(temp,'a'),b=join(temp,'b');

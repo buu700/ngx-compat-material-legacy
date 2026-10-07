@@ -35,6 +35,7 @@ let cdkFactoryReference;
 const CDK_FACTORY_REFERENCE = 'reference/material-16.2.14/cdk-factory-metadata.json';
 const CDK_FACTORY_REFERENCE_SHA256 = '86a98330dda8255dfd6666363aecc2b08ea0730cd39f8f31af998dd0987d4a72';
 const INHERITED_TABLE_FACTORIES = Object.freeze({
+  MatLegacyTable:'CdkTable',
   MatLegacyHeaderRowDef:'CdkHeaderRowDef', MatLegacyFooterRowDef:'CdkFooterRowDef', MatLegacyRowDef:'CdkRowDef',
   MatLegacyCellDef:'CdkCellDef', MatLegacyHeaderCellDef:'CdkHeaderCellDef', MatLegacyFooterCellDef:'CdkFooterCellDef',
   MatLegacyHeaderCell:'CdkHeaderCell', MatLegacyFooterCell:'CdkFooterCell', MatLegacyCell:'CdkCell',

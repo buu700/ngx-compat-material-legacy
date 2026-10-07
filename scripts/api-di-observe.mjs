@@ -91,6 +91,15 @@ export function expectedFactoryDi(shape, context = {}) {
   const core=(ident,optional=false)=>({ident,imported:ident,spec:'@angular/core',optional});
   const peer=(ident,spec,optional=false)=>({ident,imported:ident,spec,optional});
   const records=[
+    {family:'table',names:['CdkTable'],
+      declaration: "deps: [{ token: i0.IterableDiffers }, { token: i0.ChangeDetectorRef }, { token: i0.ElementRef }, { token: 'role', attribute: true }, { token: i1.Directionality, optional: true }, { token: DOCUMENT }, { token: i2.Platform }, { token: _VIEW_REPEATER_STRATEGY }, { token: _COALESCED_STYLE_SCHEDULER }, { token: i3.ViewportRuler }, { token: STICKY_POSITIONING_LISTENER, optional: true, skipSelf: true }, { token: i0.NgZone, optional: true }]",
+      // The role attribute belongs to node construction, not token injection.
+      // Private historical dependencies remain strict unresolved identities.
+      params:[core('IterableDiffers'),core('ChangeDetectorRef'),core('ElementRef'),
+        peer('Directionality','@angular/cdk/bidi',true),core('DOCUMENT'),
+        peer('Platform','@angular/cdk/platform'),peer('_VIEW_REPEATER_STRATEGY','@angular/cdk/collections'),
+        peer('_COALESCED_STYLE_SCHEDULER','@angular/cdk/table'),peer('ViewportRuler','@angular/cdk/scrolling'),
+        {...peer('STICKY_POSITIONING_LISTENER','@angular/cdk/table',true),skipSelf:true},core('NgZone',true)]},
     {family:'table',names:['CdkHeaderRowDef','CdkFooterRowDef','CdkRowDef'],
       declaration:'deps: [{ token: i0.TemplateRef }, { token: i0.IterableDiffers }, { token: CDK_TABLE, optional: true }]',
       params:[core('TemplateRef'),core('IterableDiffers'),peer('CDK_TABLE','@angular/cdk/table',true)]},
@@ -231,7 +240,7 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = []) {
         }
       }
     }
-    results.push({symbol, problems, runtime_context, factory_unresolved_provider_labels:observed.filter(request=>request.unresolved).map(request=>request.label), factory_outcome:factory.outcome, factory_error:factory.error, original_factory_kind:symbol.shape.originalFactory?.deps_kind ?? null, original_inherited_factory:symbol.shape.originalFactory?.inherited_factory?.name ?? null, constructor_attributes:(symbol.shape.diParams || []).filter(param=>param.attribute).map(param=>param.attribute), observed: observed.map(item => `${item.label}${item.optional ? '?' : ''}`)});
+    results.push({symbol, problems, runtime_context, factory_unresolved_provider_labels:observed.filter(request=>request.unresolved).map(request=>request.label), factory_outcome:factory.outcome, factory_error:factory.error, original_factory_kind:symbol.shape.originalFactory?.deps_kind ?? null, original_inherited_factory:symbol.shape.originalFactory?.inherited_factory?.name ?? null, constructor_attributes:[...new Set([...(symbol.shape.originalFactory?.inherited_factory?.attributes || []),...(symbol.shape.diParams || []).filter(param=>param.attribute).map(param=>param.attribute)])], observed: observed.map(item => `${item.label}${item.optional ? '?' : ''}`)});
   }
   return results;
 }
