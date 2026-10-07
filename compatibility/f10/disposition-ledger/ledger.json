@@ -4,8 +4,8 @@
   "g11_claim": "not-passed",
   "seed_rows": 1697,
   "ledger_rows": 1697,
-  "closed_dispositions": 1692,
-  "open_or_deferred": 5,
+  "closed_dispositions": 1691,
+  "open_or_deferred": 6,
   "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
   "batch_id": "unread-seed-content-review-2026-10-02",
   "entries": [
@@ -1324,18 +1324,65 @@
       "sha": "205f5ec737886e95e02bf2e19603b1d03b6ed44c",
       "bucket": "docs-build-batch-candidate",
       "subject": "docs(material/button-toggle): Update docs and examples (#29256)",
-      "final_disposition": "irrelevant",
-      "reason": "The patch refreshes button-toggle examples, including hide-selection-indicator checkboxes, and button-toggle.md. Those files are not in this package.",
-      "read_note_disposition": "not-owned",
+      "final_disposition": "not-applicable",
+      "reason": "Complete eleven-path patch read: upstream button-toggle demo build dependency, four OnPush examples, removal of the exclusive example/export, and selection-mode demo signals/checkboxes for hiding current selection indicators plus overview wording. No component, provider, public declaration or theme implementation change occurs. Existing modern selection indicator APIs are demo inputs, not a requested legacy API mirror. All affected example/build/overview assets are absent from both maintained package closures. No accessibility, forms or selection behavior qualification is inferred from those demos.",
+      "read_note_disposition": "whole-patch-unshipped-guidance-and-demo-review",
       "files": [
-        "src/components-examples/material/button-toggle",
+        "src/components-examples/material/button-toggle/BUILD.bazel",
+        "src/components-examples/material/button-toggle/button-toggle-appearance/button-toggle-appearance-example.ts",
+        "src/components-examples/material/button-toggle/button-toggle-exclusive/button-toggle-exclusive-example.css",
+        "src/components-examples/material/button-toggle/button-toggle-exclusive/button-toggle-exclusive-example.html",
+        "src/components-examples/material/button-toggle/button-toggle-exclusive/button-toggle-exclusive-example.ts",
+        "src/components-examples/material/button-toggle/button-toggle-forms/button-toggle-forms-example.ts",
+        "src/components-examples/material/button-toggle/button-toggle-harness/button-toggle-harness-example.ts",
+        "src/components-examples/material/button-toggle/button-toggle-mode/button-toggle-mode-example.html",
+        "src/components-examples/material/button-toggle/button-toggle-mode/button-toggle-mode-example.ts",
+        "src/components-examples/material/button-toggle/index.ts",
         "src/material/button-toggle/button-toggle.md"
       ],
-      "evidence_report": "compatibility/rc/reports/docs-build-one-diff.json",
-      "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
-      "recorded_at_utc": "2026-10-01T16:46:41Z",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-stepper-and-demo-source-review.json",
+      "batch_id": "closeout-stepper-and-demo-source-review",
+      "recorded_at_utc": "2026-10-07T03:41:21.974067+00:00",
       "g11_claim": "not-passed",
-      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "prior_dispositions": [
+        {
+          "sha": "205f5ec737886e95e02bf2e19603b1d03b6ed44c",
+          "bucket": "docs-build-batch-candidate",
+          "subject": "docs(material/button-toggle): Update docs and examples (#29256)",
+          "final_disposition": "irrelevant",
+          "reason": "The patch refreshes button-toggle examples, including hide-selection-indicator checkboxes, and button-toggle.md. Those files are not in this package.",
+          "read_note_disposition": "not-owned",
+          "files": [
+            "src/components-examples/material/button-toggle",
+            "src/material/button-toggle/button-toggle.md"
+          ],
+          "evidence_report": "compatibility/rc/reports/docs-build-one-diff.json",
+          "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
+          "recorded_at_utc": "2026-10-01T16:46:41Z",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+        }
+      ],
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "source_check": {
+        "diff_sha256": "b0fa9fb315c476158cc6025cd45110fa7396fe4b33e775b4b00af866a16e8eac",
+        "patch_path": "compatibility/f10/disposition-ledger/evidence/closeout-stepper-and-demo-source-review.json",
+        "review_membership": "205f5ec737886e95e02bf2e19603b1d03b6ed44c"
+      },
+      "individual_proof": {
+        "diff_sha256": "b0fa9fb315c476158cc6025cd45110fa7396fe4b33e775b4b00af866a16e8eac",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main",
+          "21.x"
+        ],
+        "decision": "Complete eleven-path patch read: upstream button-toggle demo build dependency, four OnPush examples, removal of the exclusive example/export, and selection-mode demo signals/checkboxes for hiding current selection indicators plus overview wording. No component, provider, public declaration or theme implementation change occurs. Existing modern selection indicator APIs are demo inputs, not a requested legacy API mirror. All affected example/build/overview assets are absent from both maintained package closures. No accessibility, forms or selection behavior qualification is inferred from those demos."
+      }
     },
     {
       "sha": "82cfd49142a78cdd6b0688f69319677a222ef0f9",
@@ -2516,19 +2563,71 @@
       "sha": "3b8f7f3ec4564c1567059ff590f31e1c49480031",
       "bucket": "docs-build-batch-candidate",
       "subject": "docs: move some drag&drop examples into separate packages (#32620)",
-      "final_disposition": "irrelevant",
-      "reason": "The patch moves drag-and-drop examples into separate packages and says automatic scrolling needs cdkScrollable. Those files are not in this package.",
-      "read_note_disposition": "not-owned",
+      "final_disposition": "not-applicable",
+      "reason": "Complete sixteen-path patch read, including renames: upstream drag-drop table/tabs examples move into Material example packages, class/selector/template/export/build registrations change, table row surface becomes a current system token, reorderable headers gain a move cursor, and overview links move. Unchanged moved HTML/CSS has no hidden implementation edits in the full patch. No CDK drag-drop, legacy table/tabs implementation or API change occurs. The unshipped examples do not qualify original row/selection/focus behavior or authorize copying current system styling into owned legacy controls.",
+      "read_note_disposition": "whole-patch-unshipped-guidance-and-demo-review",
       "files": [
-        "src/components-examples/cdk/drag-drop",
-        "src/components-examples/material/table",
-        "src/cdk/drag-drop/drag-drop.md"
+        "src/cdk/drag-drop/drag-drop.md",
+        "src/components-examples/cdk/drag-drop/index.ts",
+        "src/components-examples/material/table/index.ts",
+        "src/components-examples/material/table/table-drag-drop/table-drag-drop-example.css",
+        "src/components-examples/material/table/table-drag-drop/table-drag-drop-example.html",
+        "src/components-examples/material/table/table-drag-drop/table-drag-drop-example.ts",
+        "src/components-examples/material/table/table-reorderable/table-reorderable-example.css",
+        "src/components-examples/material/tabs/BUILD.bazel",
+        "src/components-examples/material/tabs/index.ts",
+        "src/components-examples/material/tabs/tab-group-drag-drop/tab-group-drag-drop-example.css",
+        "src/components-examples/material/tabs/tab-group-drag-drop/tab-group-drag-drop-example.html",
+        "src/components-examples/material/tabs/tab-group-drag-drop/tab-group-drag-drop-example.ts",
+        "src/dev-app/table/table-demo.html",
+        "src/dev-app/table/table-demo.ts",
+        "src/material/table/table.md",
+        "src/material/tabs/tabs.md"
       ],
-      "evidence_report": "compatibility/rc/reports/docs-build-one-diff.json",
-      "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
-      "recorded_at_utc": "2026-10-01T16:46:41Z",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-stepper-and-demo-source-review.json",
+      "batch_id": "closeout-stepper-and-demo-source-review",
+      "recorded_at_utc": "2026-10-07T03:41:21.974067+00:00",
       "g11_claim": "not-passed",
-      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "prior_dispositions": [
+        {
+          "sha": "3b8f7f3ec4564c1567059ff590f31e1c49480031",
+          "bucket": "docs-build-batch-candidate",
+          "subject": "docs: move some drag&drop examples into separate packages (#32620)",
+          "final_disposition": "irrelevant",
+          "reason": "The patch moves drag-and-drop examples into separate packages and says automatic scrolling needs cdkScrollable. Those files are not in this package.",
+          "read_note_disposition": "not-owned",
+          "files": [
+            "src/components-examples/cdk/drag-drop",
+            "src/components-examples/material/table",
+            "src/cdk/drag-drop/drag-drop.md"
+          ],
+          "evidence_report": "compatibility/rc/reports/docs-build-one-diff.json",
+          "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
+          "recorded_at_utc": "2026-10-01T16:46:41Z",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+        }
+      ],
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "source_check": {
+        "diff_sha256": "8e397bf3c453266364f5c54427aa3746da6454407f74f90dc71ac573a90948ef",
+        "patch_path": "compatibility/f10/disposition-ledger/evidence/closeout-stepper-and-demo-source-review.json",
+        "review_membership": "3b8f7f3ec4564c1567059ff590f31e1c49480031"
+      },
+      "individual_proof": {
+        "diff_sha256": "8e397bf3c453266364f5c54427aa3746da6454407f74f90dc71ac573a90948ef",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main",
+          "21.x"
+        ],
+        "decision": "Complete sixteen-path patch read, including renames: upstream drag-drop table/tabs examples move into Material example packages, class/selector/template/export/build registrations change, table row surface becomes a current system token, reorderable headers gain a move cursor, and overview links move. Unchanged moved HTML/CSS has no hidden implementation edits in the full patch. No CDK drag-drop, legacy table/tabs implementation or API change occurs. The unshipped examples do not qualify original row/selection/focus behavior or authorize copying current system styling into owned legacy controls."
+      }
     },
     {
       "sha": "d67ac1f67efab6460f7a9544cb423aac5d6cd325",
@@ -39487,13 +39586,56 @@
         "src/material/stepper/stepper.md"
       ],
       "diff_sha256": "c5d9d8d2bcde4f898da6f9d336da21b3699c8c0cdbedbac12bd389a181c8f0a0",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/0e34c64d0cc96cd3cc8f19dea06f58a0ad4d8b59.json",
-      "batch_id": "unread-seed-content-review-2026-10-02",
-      "recorded_at_utc": "2026-10-02T18:49:16Z",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-stepper-and-demo-source-review.json",
+      "batch_id": "closeout-stepper-and-demo-source-review",
+      "recorded_at_utc": "2026-10-07T03:41:21.974067+00:00",
       "g11_claim": "not-passed",
-      "final_disposition": "not-applicable",
-      "read_note_disposition": "not-owned",
-      "reason": "The diff in src/cdk/stepper/stepper.ts changes `export type StepControl = AbstractControl | Field<unknown>;`. The changed paths are absent from projects/ngx-material-legacy, and no legacy source imports that entry point. Docs, examples, dev-app, goldens, and tooling-only hunks do not change the shipped legacy contract."
+      "final_disposition": "needs-individual-review",
+      "read_note_disposition": "whole-patch-unshipped-guidance-and-demo-review",
+      "reason": "Complete seven-path patch read: contrary to the filtered markdown seed, this includes production CdkStep/CdkStepper and public declaration changes. StepControl widens AbstractControl to Field, and valid/invalid/pending/reset operations branch on callable field values; linear navigation and completed/error behavior are affected. Authentic pinned CDK21.2.14 declares AbstractControl, while22.1.7 declares the union. The add-on owns stepper Sass but delegates ordinary stepper behavior. No modern API mirror or younger21.x peer is authorized. Reopen main prior irrelevant disposition: public AbstractControl navigation/completion/error/reset compatibility on both minimum peers still needs individual behavior evidence before terminal disposition. Signal-form support absent at21 minimum is not itself a legacy regression.",
+      "prior_dispositions": [
+        {
+          "sha": "0e34c64d0cc96cd3cc8f19dea06f58a0ad4d8b59",
+          "bucket": "behavior-semantic",
+          "subject": "fix(cdk/stepper): allow signal form to be assigned as stepControl (#33562)",
+          "files": [
+            "goldens/cdk/stepper/index.api.md",
+            "src/cdk/stepper/stepper.ts",
+            "src/components-examples/material/stepper/index.ts",
+            "src/components-examples/material/stepper/stepper-signal-forms/stepper-signal-forms-example.css",
+            "src/components-examples/material/stepper/stepper-signal-forms/stepper-signal-forms-example.html",
+            "src/components-examples/material/stepper/stepper-signal-forms/stepper-signal-forms-example.ts",
+            "src/material/stepper/stepper.md"
+          ],
+          "diff_sha256": "c5d9d8d2bcde4f898da6f9d336da21b3699c8c0cdbedbac12bd389a181c8f0a0",
+          "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/0e34c64d0cc96cd3cc8f19dea06f58a0ad4d8b59.json",
+          "batch_id": "unread-seed-content-review-2026-10-02",
+          "recorded_at_utc": "2026-10-02T18:49:16Z",
+          "g11_claim": "not-passed",
+          "final_disposition": "not-applicable",
+          "read_note_disposition": "not-owned",
+          "reason": "The diff in src/cdk/stepper/stepper.ts changes `export type StepControl = AbstractControl | Field<unknown>;`. The changed paths are absent from projects/ngx-material-legacy, and no legacy source imports that entry point. Docs, examples, dev-app, goldens, and tooling-only hunks do not change the shipped legacy contract."
+        }
+      ],
+      "review_depth": "individual-escalated",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "source_check": {
+        "diff_sha256": "948bd43bb6c3648a33ab065403a44bc2825f9c5af86630837e25792db2f834fe",
+        "patch_path": "compatibility/f10/disposition-ledger/evidence/closeout-stepper-and-demo-source-review.json",
+        "review_membership": "0e34c64d0cc96cd3cc8f19dea06f58a0ad4d8b59"
+      },
+      "individual_proof": {
+        "diff_sha256": "948bd43bb6c3648a33ab065403a44bc2825f9c5af86630837e25792db2f834fe",
+        "review_depth": "individual-escalated",
+        "affected_branches": [
+          "main",
+          "21.x"
+        ],
+        "decision": "Complete seven-path patch read: contrary to the filtered markdown seed, this includes production CdkStep/CdkStepper and public declaration changes. StepControl widens AbstractControl to Field, and valid/invalid/pending/reset operations branch on callable field values; linear navigation and completed/error behavior are affected. Authentic pinned CDK21.2.14 declares AbstractControl, while22.1.7 declares the union. The add-on owns stepper Sass but delegates ordinary stepper behavior. No modern API mirror or younger21.x peer is authorized. Reopen main prior irrelevant disposition: public AbstractControl navigation/completion/error/reset compatibility on both minimum peers still needs individual behavior evidence before terminal disposition. Signal-form support absent at21 minimum is not itself a legacy regression."
+      }
     },
     {
       "sha": "d61a26d1942bc77c0f1d6c195f46961bfe995c59",
