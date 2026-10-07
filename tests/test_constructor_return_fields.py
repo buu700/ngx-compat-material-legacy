@@ -10,7 +10,7 @@ class ConstructorReturnFields(unittest.TestCase):
         canonical=(project/'internal/public-constructor-context.ts').read_bytes()
         for family in ['legacy-table','legacy-tabs']:
             self.assertEqual((project/family/'internal/public-constructor-context.ts').read_bytes(),canonical)
-        for rel in ['legacy-table/cell.ts','legacy-table/text-column.ts','legacy-table/row.ts','legacy-tabs/tab-content.ts']:
+        for rel in ['legacy-table/cell.ts','legacy-table/text-column.ts','legacy-table/row.ts','legacy-tabs/tab-content.ts','legacy-tabs/tab-label.ts']:
             source=(project/rel).read_text()
             self.assertIn("from './internal/public-constructor-context'",source)
             self.assertNotIn("../legacy-core/internal/public-constructor-context",source)
@@ -25,8 +25,8 @@ const ts=createRequire(import.meta.url)('typescript');
 function fields(clazz){return clazz.members.filter(member=>
  ts.isPropertyDeclaration(member)&&!(ts.getCombinedModifierFlags(member)&(ts.ModifierFlags.Static|ts.ModifierFlags.Ambient))
  ||ts.isConstructorDeclaration(member)&&member.parameters.some(p=>ts.getCombinedModifierFlags(p)&ts.ModifierFlags.ParameterPropertyModifier));}
-const expected=new Set(['MatLegacyCellDef','MatLegacyHeaderCellDef','MatLegacyFooterCellDef','MatLegacyCell','MatLegacyHeaderCell','MatLegacyFooterCell','MatLegacyTextColumn','MatLegacyTabContent','MatLegacyNoDataRow','MatLegacyColumnDef','MatLegacyHeaderRowDef','MatLegacyFooterRowDef','MatLegacyRowDef']);
-for(const file of ['legacy-table/cell.ts','legacy-table/text-column.ts','legacy-tabs/tab-content.ts','legacy-table/row.ts']){
+const expected=new Set(['MatLegacyCellDef','MatLegacyHeaderCellDef','MatLegacyFooterCellDef','MatLegacyCell','MatLegacyHeaderCell','MatLegacyFooterCell','MatLegacyTextColumn','MatLegacyTabContent','MatLegacyNoDataRow','MatLegacyColumnDef','MatLegacyHeaderRowDef','MatLegacyFooterRowDef','MatLegacyRowDef','MatLegacyTabLabel']);
+for(const file of ['legacy-table/cell.ts','legacy-table/text-column.ts','legacy-tabs/tab-content.ts','legacy-table/row.ts','legacy-tabs/tab-label.ts']){
  const source=ts.createSourceFile(file,readFileSync('projects/ngx-material-legacy/'+file,'utf8'),ts.ScriptTarget.Latest,true);
  for(const clazz of source.statements.filter(ts.isClassDeclaration)){
   if(!clazz.name||!expected.has(clazz.name.text))continue;

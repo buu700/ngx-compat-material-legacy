@@ -55,6 +55,7 @@ export const HARNESS_CASE_IDS = [
   'packed-consumer/harness/table-original-boolean-input-rendering',
   'packed-consumer/harness/table-recycle-row-view-identity',
   'packed-consumer/harness/table-definition-original-constructors',
+  'packed-consumer/harness/tab-label-original-constructor-and-nearest-tab',
   'packed-consumer/harness/owned-resolution',
   'packed-consumer/harness/peer-harness-separate-scope',
 ];
