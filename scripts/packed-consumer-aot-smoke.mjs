@@ -1240,7 +1240,10 @@ async function main() {
     embedded_view_text:noDataView.rootNodes.map(node=>node.textContent||'').join('').trim()==='Empty grid probe',
     rendered_legacy_row:false};
   noDataView.destroy();
-  fixture.componentInstance.constructorGridData=[];fixture.detectChanges();
+  fixture.componentInstance.constructorGridData=[];
+  // The public fixture API must dirty the host before checking changed bindings
+  // on both supported Angular lines (including a zoneless TestBed default).
+  fixture.changeDetectorRef.markForCheck();fixture.detectChanges();
   await sleep(20);fixture.detectChanges();
   noDataRowObservation.rendered_legacy_row=fixture.nativeElement.querySelector('#constructor-grid .mat-no-data-row')?.textContent.trim()==='Empty grid probe';
   const noDataRowOriginalConstructor=Object.values(noDataRowObservation).every(value=>value===true);
