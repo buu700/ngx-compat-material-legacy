@@ -19,6 +19,9 @@ import {createHash} from 'node:crypto';
 import {existsSync, readFileSync, realpathSync} from 'node:fs';
 import path from 'node:path';
 import {pathToFileURL} from 'node:url';
+import {SCENARIOS as TOKEN_SCENARIOS} from './companion-bridge-peer-oracle.mjs';
+const RICH_THEMES = TOKEN_SCENARIOS.filter(theme => theme.customTypography);
+export const RICH_THEME_IDS = RICH_THEMES.map(theme => theme.id);
 
 export const CHECK_ID = 'companion-computed-styles';
 export const PEER_PACKAGE = '@angular/material';
@@ -41,6 +44,7 @@ export const THEMES = {
   dark: {type: 'dark', typography: 'legacy', density: 0},
   dense: {type: 'light', typography: 'legacy', density: -2},
   type: {type: 'light', typography: 'alternate', density: 0},
+  ...Object.fromEntries(RICH_THEMES.map(theme => [theme.id, theme])),
 };
 export const PALETTES = {
   primary: ['indigo'],
@@ -63,8 +67,16 @@ export const SCENARIOS = {
   nested: {outer: 'light', inner: 'dark', overlay: 'dark', dir: 'ltr', viewport: 'wide'},
   'narrow-light': {outer: 'light', inner: 'light', overlay: 'light', dir: 'ltr', viewport: 'narrow'},
   'narrow-dense': {outer: 'dense', inner: 'dense', overlay: 'dense', dir: 'ltr', viewport: 'narrow'},
+  ...Object.fromEntries(RICH_THEME_IDS.flatMap(id => [
+    [id, {outer:id,inner:id,overlay:id,dir:'ltr',viewport:'wide'}],
+    ['narrow-'+id, {outer:id,inner:id,overlay:id,dir:'ltr',viewport:'narrow'}],
+  ])),
+  ...Object.fromEntries(['2018','legacy'].map(typography => {
+    const light=`closeout-custom-${typography}-light`,dark=`closeout-custom-${typography}-dark`;
+    return ['nested-custom-'+typography,{outer:light,inner:dark,overlay:dark,dir:'ltr',viewport:'wide'}];
+  })),
 };
-export const DEFAULT_SCENARIOS = ['light', 'dark', 'dense', 'typography', 'rtl', 'nested'];
+export const DEFAULT_SCENARIOS = ['light', 'dark', 'dense', 'typography', 'rtl', 'nested', ...RICH_THEME_IDS, 'nested-custom-2018', 'nested-custom-legacy'];
 export const NEGATIVE_SCENARIO = 'light';
 
 /** Which scenario pair must move the oracle for a dimension (oracle sensitivity). */
@@ -363,7 +375,7 @@ export function oracleCaseId(companion) {
 export const BINDINGS = Object.freeze(BINDINGS_RAW.map((binding) => Object.freeze({
   ...binding,
   id: caseId(binding),
-  scenarios: binding.scenarios || DEFAULT_SCENARIOS,
+  scenarios: binding.scenarios ? [...binding.scenarios, ...RICH_THEME_IDS.map(id=>'narrow-'+id)] : DEFAULT_SCENARIOS,
   negative_scenario: (binding.scenarios || DEFAULT_SCENARIOS).includes(NEGATIVE_SCENARIO)
     ? NEGATIVE_SCENARIO : (binding.scenarios || DEFAULT_SCENARIOS)[0],
 })));
@@ -436,7 +448,16 @@ export function themeSass(ns, {m2Prefix}) {
     `$ccs-type-alternate: ${ns}.${m2Prefix}define-typography-config($font-family: '${ALTERNATE_FONT_FAMILY}');`,
   ];
   for (const [name, theme] of Object.entries(THEMES)) {
-    lines.push(`$ccs-theme-${name}: ${ns}.${m2Prefix}define-${theme.type}-theme((color: $ccs-color, typography: $ccs-type-${theme.typography}, density: ${theme.density}));`);
+    let color='$ccs-color',typography=`$ccs-type-${theme.typography}`;
+    if (theme.customTypography) {
+      color=`$ccs-color-${name}`;typography=`$ccs-type-${name}`;
+      const level=`$ccs-level-${name}`;
+      lines.push(`${color}: (primary: ${pal(theme.primary)}, accent: ${pal(theme.accent)}, warn: ${pal(theme.warn)});`);
+      lines.push(`${level}: ${ns}.${m2Prefix}define-typography-level(19px, 27px, 600, 'Closeout Font', 0.03em);`);
+      const constructor=theme.typography==='legacy'?'define-legacy-typography-config':'define-typography-config';
+      lines.push(`${typography}: ${ns}.${m2Prefix}${constructor}($font-family: '${theme.fontFamily}', $body-1: ${level}, $button: ${level});`);
+    }
+    lines.push(`$ccs-theme-${name}: ${ns}.${m2Prefix}define-${theme.type}-theme((color: ${color}, typography: ${typography}, density: ${theme.density}));`);
   }
   return lines.join('\n');
 }
