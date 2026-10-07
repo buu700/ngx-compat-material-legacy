@@ -32,6 +32,29 @@ for(const name of ['MatLegacyHeaderRowDef','MatLegacyFooterRowDef','MatLegacyRow
  const bad=structuredClone(original);bad.inherited_factory.declaration=bad.inherited_factory.declaration.replace('token: CDK_TABLE','token: BrokenToken');
  assert.throws(()=>expectedFactoryDi({originalFactory:bad}),/unrecognized/);
 }
+for(const [name,deps] of [
+ ['MatLegacyCellDef',[['TemplateRef',false]]],['MatLegacyHeaderCellDef',[['TemplateRef',false]]],['MatLegacyFooterCellDef',[['TemplateRef',false]]],
+ ['MatLegacyCell',[['CdkColumnDef',false],['ElementRef',false]]],['MatLegacyHeaderCell',[['CdkColumnDef',false],['ElementRef',false]]],['MatLegacyFooterCell',[['CdkColumnDef',false],['ElementRef',false]]],
+ ['MatLegacyTextColumn',[['CdkTable',true],['TEXT_COLUMN_OPTIONS',true]]],
+]) {
+ const original=originalFactoryContract('/untouched/src/material/legacy-table/cell.ts',name);
+ assert.equal(original.deps_kind,'inherited');
+ assert.deepEqual(expectedFactoryDi({diParams:[],originalFactory:original}).map(p=>[p.ident,p.optional]),deps);
+ const bad=structuredClone(original);bad.inherited_factory.declaration=bad.inherited_factory.declaration.replace('token: i0.TemplateRef','token: BrokenToken').replace('token: CdkColumnDef','token: BrokenToken').replace('token: CdkTable','token: BrokenToken');
+ assert.throws(()=>expectedFactoryDi({originalFactory:bad}),/unrecognized/);
+}
+for(const [family,name,deps] of [
+ ['legacy-menu','MatLegacyMenuItem',[['ElementRef',false],['DOCUMENT',false],['FocusMonitor',false],['MAT_MENU_PANEL',true],['ChangeDetectorRef',false]]],
+ ['legacy-tabs','MatLegacyTabLabel',[['TemplateRef',false],['ViewContainerRef',false],['MAT_TAB',true]]],
+ ['legacy-tabs','MatLegacyTabContent',[['TemplateRef',false]]],
+]) {
+ const original=originalFactoryContract(`/untouched/src/material/${family}/fixture.ts`,name);
+ assert.equal(original.deps_kind,'inherited');
+ const expected=expectedFactoryDi({diParams:[],originalFactory:original});
+ assert.deepEqual(expected.map(p=>[p.ident,p.optional]),deps);
+ const bad=structuredClone(original);bad.inherited_factory.declaration=bad.inherited_factory.declaration.replace('token: i0.TemplateRef','token: BrokenToken').replace('token: DOCUMENT','token: BrokenToken');
+ assert.throws(()=>expectedFactoryDi({originalFactory:bad}),/unrecognized/);
+}
 const temp=mkdtempSync(join(tmpdir(),'different-artifact-modules-'));
 try {
  const a=join(temp,'a'),b=join(temp,'b');

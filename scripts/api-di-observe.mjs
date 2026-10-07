@@ -68,15 +68,34 @@ export function expectedFactoryDi(shape, context = {}) {
   }
   const inherited = shape.originalFactory?.inherited_factory;
   if (!inherited) return (shape.diParams || []).filter(param => !param.attribute);
-  // These are the three authenticated original CDK table constructors, not
-  // guessed zero-dependency Material factories whose deps:null delegates upward.
-  const expected = 'deps: [{ token: i0.TemplateRef }, { token: i0.IterableDiffers }, { token: CDK_TABLE, optional: true }]';
-  if (inherited.family !== 'table' || !['CdkHeaderRowDef','CdkFooterRowDef','CdkRowDef'].includes(inherited.name) || !inherited.declaration.includes(expected)) throw new Error('unrecognized authentic table DI declaration');
-  return [
-    {ident:'TemplateRef',imported:'TemplateRef',spec:'@angular/core',optional:false},
-    {ident:'IterableDiffers',imported:'IterableDiffers',spec:'@angular/core',optional:false},
-    {ident:'CDK_TABLE',imported:'CDK_TABLE',spec:'@angular/cdk/table',optional:true},
+  // Finite original parent declarations. Each dependency list must match the
+  // authenticated16 factory bytes before it can become an expectation.
+  const core=(ident,optional=false)=>({ident,imported:ident,spec:'@angular/core',optional});
+  const peer=(ident,spec,optional=false)=>({ident,imported:ident,spec,optional});
+  const records=[
+    {family:'table',names:['CdkHeaderRowDef','CdkFooterRowDef','CdkRowDef'],
+      declaration:'deps: [{ token: i0.TemplateRef }, { token: i0.IterableDiffers }, { token: CDK_TABLE, optional: true }]',
+      params:[core('TemplateRef'),core('IterableDiffers'),peer('CDK_TABLE','@angular/cdk/table',true)]},
+    {family:'table',names:['CdkCellDef','CdkHeaderCellDef','CdkFooterCellDef'],
+      declaration:'deps: [{ token: i0.TemplateRef }]',params:[core('TemplateRef')]},
+    {family:'table',names:['CdkCell','CdkHeaderCell','CdkFooterCell'],
+      declaration:'deps: [{ token: CdkColumnDef }, { token: i0.ElementRef }]',
+      params:[peer('CdkColumnDef','@angular/cdk/table'),core('ElementRef')]},
+    {family:'table',names:['CdkTextColumn'],
+      declaration:'deps: [{ token: CdkTable, optional: true }, { token: TEXT_COLUMN_OPTIONS, optional: true }]',
+      params:[peer('CdkTable','@angular/cdk/table',true),peer('TEXT_COLUMN_OPTIONS','@angular/cdk/table',true)]},
+    {family:'menu',names:['MatMenuItem'],
+      declaration:'deps: [{ token: i0.ElementRef }, { token: DOCUMENT }, { token: i1.FocusMonitor }, { token: MAT_MENU_PANEL, optional: true }, { token: i0.ChangeDetectorRef }]',
+      params:[core('ElementRef'),core('DOCUMENT'),peer('FocusMonitor','@angular/cdk/a11y'),peer('MAT_MENU_PANEL','@angular/material/menu',true),core('ChangeDetectorRef')]},
+    {family:'tabs',names:['MatTabLabel'],
+      declaration:'deps: [{ token: i0.TemplateRef }, { token: i0.ViewContainerRef }, { token: MAT_TAB, optional: true }]',
+      params:[core('TemplateRef'),core('ViewContainerRef'),peer('MAT_TAB','@angular/material/tabs',true)]},
+    {family:'tabs',names:['MatTabContent'],
+      declaration:'deps: [{ token: i0.TemplateRef }]',params:[core('TemplateRef')]},
   ];
+  const record=records.find(record=>record.family===inherited.family&&record.names.includes(inherited.name));
+  if (!record || !inherited.declaration.includes(record.declaration)) throw new Error('unrecognized authentic inherited DI declaration');
+  return record.params;
 }
 
 // Historical constructors name the original token; the finite public export map
