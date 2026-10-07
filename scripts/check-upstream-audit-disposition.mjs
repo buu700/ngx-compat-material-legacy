@@ -453,12 +453,12 @@ console.log(JSON.stringify(summary, null, 2));
 if (request) {
   const accepted = writeAcceptance(request);
   if (!accepted || !dispositionOk) {
-    fail(1, `upstream-audit-disposition admission incomplete: sensitive=${insufficientSensitive.length} inherited=${insufficientInherited.length} behavior=${insufficientBehavior.length} missing_evidence=${missingEvidence.length} circular=${circularEvidence.length} symbols_open=${symbolUsesOpen}`);
+    fail(1, `upstream-audit-disposition admission incomplete: sensitive=${insufficientSensitive.length} inherited=${insufficientInherited.length} behavior=${insufficientBehavior.length} missing_evidence=${missingEvidence.length} circular=${circularEvidence.length} symbols_open=${symbolUsesOpen} authored_reviews_missing=${symbolReviewEvidence.insufficient}`);
   }
 }
 if (!structuralOk) {
   fail(1, `upstream-audit-disposition incomplete: missing=${missing.length} unresolved=${unresolved.length} conflicting=${conflicts.length} outside=${outside.length} security_docs_only=${securityDocsOnly.length} unknown=${unknown.length}`);
 }
 if (admission && !dispositionOk) {
-  fail(1, `upstream-audit-disposition admission incomplete: sensitive=${insufficientSensitive.length} inherited=${insufficientInherited.length} behavior=${insufficientBehavior.length} missing_evidence=${missingEvidence.length} circular=${circularEvidence.length} symbols_open=${symbolUsesOpen} branch=${missingBranch.length}`);
+  fail(1, `upstream-audit-disposition admission incomplete: sensitive=${insufficientSensitive.length} inherited=${insufficientInherited.length} behavior=${insufficientBehavior.length} missing_evidence=${missingEvidence.length} circular=${circularEvidence.length} symbols_open=${symbolUsesOpen} authored_reviews_missing=${symbolReviewEvidence.insufficient} branch=${missingBranch.length}`);
 }
