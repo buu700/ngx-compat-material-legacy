@@ -492,6 +492,7 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
     'packed-consumer/harness/constructor-borrowed-provider-lifecycle': parsed.constructorBorrowedProviderLifecycle === true,
     'packed-consumer/harness/table-original-sticky-coercion-dirty-state': parsed.tableOriginalStickyBehavior === true,
     'packed-consumer/harness/table-original-boolean-input-rendering': parsed.tableOriginalBooleanInputs === true,
+    'packed-consumer/harness/table-recycle-row-view-identity': parsed.tableRecycleRowIdentity === true,
   };
   const owned = declarationKeys(keys)
     .filter(key => key.endsWith('/testing'))
@@ -1035,6 +1036,14 @@ class SmokeDialogContent {}
       <mat-footer-row *matFooterRowDef="['constructor-probe']"></mat-footer-row>
       <ng-template #manualNoDataTemplate matNoDataRow><div>Empty grid probe</div></ng-template>
     </mat-table>
+    <mat-table id="recycle-view-probe" recycleRows [dataSource]="recycleProbeData">
+      <ng-container matColumnDef="value"><mat-cell *matCellDef="let row">{{row.value}}</mat-cell></ng-container>
+      <mat-row *matRowDef="let row; columns:['value']"></mat-row>
+    </mat-table>
+    <mat-table id="dispose-view-probe" [dataSource]="disposeProbeData">
+      <ng-container matColumnDef="value"><mat-cell *matCellDef="let row">{{row.value}}</mat-cell></ng-container>
+      <mat-row *matRowDef="let row; columns:['value']"></mat-row>
+    </mat-table>
     <ng-template #manualTabTemplate matTabContent>Tab lazy probe</ng-template>
     <ng-template #manualCellTemplate matCellDef>Data probe</ng-template>
     <ng-template #manualHeaderTemplate matHeaderCellDef>Header probe</ng-template>
@@ -1049,6 +1058,8 @@ class SmokeDialogContent {}
 class HarnessHost {
   constructorGridData=[{value:'Grid value'}];
   constructorGridWhen=()=>true;
+  recycleProbeData=[{value:'initial recycle'}];
+  disposeProbeData=[{value:'initial dispose'}];
   @ViewChild(MatLegacyHeaderRowDef,{static:true}) originalStickyHeader!:MatLegacyHeaderRowDef;
   @ViewChild(MatLegacyFooterRowDef,{static:true}) originalStickyFooter!:MatLegacyFooterRowDef;
   @ViewChild('manualNoDataTemplate',{read:MatLegacyNoDataRow,static:true}) originalNoDataRow!:MatLegacyNoDataRow;
@@ -1215,6 +1226,22 @@ async function main() {
   fixture.changeDetectorRef.markForCheck();fixture.detectChanges();
   const tableOriginalBooleanInputs=tableBooleanObservations.length===5
     &&tableBooleanObservations.every(row=>Object.values(row).every(value=>value===true));
+  const recycleObservations=[];
+  for(const [id,recycles] of [['recycle-view-probe',true],['dispose-view-probe',false]] as const){
+    const node=fixture.debugElement.query(element=>element.nativeElement?.id===id);
+    const table=node.injector.get(MatLegacyTable);
+    const before=node.nativeElement.querySelector('mat-row');
+    table.dataSource=[];fixture.changeDetectorRef.markForCheck();fixture.detectChanges();
+    const removed=node.nativeElement.querySelectorAll('mat-row').length===0;
+    table.dataSource=[{value:'Replacement value'}];
+    fixture.changeDetectorRef.markForCheck();fixture.detectChanges();
+    const after=node.nativeElement.querySelector('mat-row');
+    recycleObservations.push({id,enabled:table.recycleRows===recycles,removed,
+      identity:!!before&&!!after&&(before===after)===recycles,
+      new_text:after?.textContent.trim()==='Replacement value'});
+  }
+  const tableRecycleRowIdentity=recycleObservations.length===2
+    &&recycleObservations.every(row=>Object.entries(row).every(([key,value])=>key==='id'||value===true));
   const cellConstructorObservation=[];
   const column=fixture.componentInstance.gridColumn;
   for(const [Owned,Peer,selector,role] of [
@@ -1625,7 +1652,7 @@ async function main() {
       selectOpened === true &&
       selectClosed === true &&
       tabCount === 2 &&
-      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor && tabContentOriginalConstructor && noDataRowOriginalConstructor && constructorBorrowedProviderLifecycle && tableOriginalStickyBehavior && tableOriginalBooleanInputs,
+      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor && tabContentOriginalConstructor && noDataRowOriginalConstructor && constructorBorrowedProviderLifecycle && tableOriginalStickyBehavior && tableOriginalBooleanInputs && tableRecycleRowIdentity,
     buttonText: text,
     selectIsOpen: isOpen,
     dialogText,
@@ -1661,6 +1688,7 @@ async function main() {
     constructorBorrowedProviderLifecycle, borrowedTableDestroyed, borrowedOptionsDestroyed,
     tableOriginalStickyBehavior, stickyObservations,
     tableOriginalBooleanInputs, tableBooleanObservations,
+    tableRecycleRowIdentity, recycleObservations,
     checkboxAttribute, slideToggleAttribute, sliderAttribute, tabLinkAttribute,
     commonModuleDiagnostics:{contrastLifecycle,contrastProbeReads,sanityWarnings,checksEnabled,sanityDefault:TestBed.inject(MATERIAL_LEGACY_SANITY_CHECKS),sanityToken:String(MATERIAL_LEGACY_SANITY_CHECKS)},
     chipEventCounts:{removals:fixture.componentInstance.repeatRemovals,separators:fixture.componentInstance.repeatEnds},
