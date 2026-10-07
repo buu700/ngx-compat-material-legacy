@@ -481,11 +481,12 @@ export function candidateScss(moduleUrl = '@ngx-compat/material-legacy') {
  * only). Tokens are injected one at a time so that another token's sentinel
  * (padding, min-width, ...) cannot mask or reshape the consuming property.
  */
-export function sentinelCss(table, token, scenario = NEGATIVE_SCENARIO) {
+export function sentinelCss(table, token, scenario = NEGATIVE_SCENARIO, mode = 'candidate') {
+  if (!['candidate', 'bridge'].includes(mode)) throw new Error(`invalid sentinel mode ${mode}`);
   const s = table[token];
   if (!s) throw new Error(`no sentinel for ${token}`);
   const theme = SCENARIOS[scenario].outer;
-  return `.ccs-candidate-${theme}, .ccs-candidate-${theme} * { ${token}: ${s.value} !important; }\n`;
+  return `.ccs-${mode}-${theme}, .ccs-${mode}-${theme} * { ${token}: ${s.value} !important; }\n`;
 }
 
 export function parseDeclarations(css) {
@@ -663,9 +664,9 @@ export function deriveRoster(dimensionTokens, bindings = BINDINGS) {
 const nonEmpty = (v) => typeof v === 'string' && v.trim() !== '';
 
 /**
- * One dimension case. `obs` = {oracle: {scenario: o}, candidate: {scenario: o},
- * negative: o} where o = {found, value, token_value}. Passes only when, in every
- * scenario, both elements exist, the peer oracle defines the token on the
+ * One dimension case. `obs` = {oracle: {scenario: o}, candidate: {scenario: o}, bridge: {scenario: o},
+ * negative: o, bridge_negative: o} where o = {found, value, token_value}. Passes only when, in every
+ * scenario, all three elements exist, the peer oracle defines the token on the
  * consuming element, and the candidate's computed property equals the
  * oracle's; and, with a wrong-but-nonempty token injected on the candidate
  * scope, the consuming property shows that wrong value and no longer equals
@@ -714,6 +715,17 @@ export function assessCase(binding, obs, sentinel, {peerKeyword = null} = {}) {
   else if (!n?.found) reasons.push('negative: candidate consuming element not rendered');
   else if (!negative.sentinel_consumed) reasons.push(`negative: ${binding.property} ${JSON.stringify(n.value)} does not consume injected ${binding.token}=${sentinel.value}`);
   else if (!negative.mismatch_detected) reasons.push('negative: wrong token did not change the comparison');
+  const bn = obs?.bridge_negative;
+  const bridgeNegative = {
+    scenario: negativeScenario,
+    injected: sentinel?.value ?? null,
+    observed: bn?.value ?? null,
+    oracle: oracleNegative,
+    sentinel_consumed: Boolean(bn?.found && sentinelSeen(bn.value, sentinel)),
+    mismatch_detected: Boolean(bn?.found && nonEmpty(bn.value) && bn.value !== oracleNegative),
+  };
+  if (!bridgeNegative.sentinel_consumed || !bridgeNegative.mismatch_detected)
+    reasons.push('bridge negative: wrong token not consumed or comparison unchanged');
   return {
     case_id: binding.id,
     result: reasons.length ? 'fail' : 'pass',
@@ -721,6 +733,7 @@ export function assessCase(binding, obs, sentinel, {peerKeyword = null} = {}) {
     peer_declared_keyword: keyword,
     scenarios,
     negative,
+    bridge_negative: bridgeNegative,
   };
 }
 

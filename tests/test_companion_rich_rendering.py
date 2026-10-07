@@ -32,7 +32,7 @@ assert.ok(oracle.includes('mat.m2-define-typography-level'));
 const binding=cases.BINDINGS.find(b=>b.scenarios.includes(cases.RICH_THEME_IDS[0]));
 const sentinel=cases.sentinelTable([binding])[binding.token];
 const observed={found:true,value:'rgb(1, 2, 3)',token_value:'rgb(1, 2, 3)'};
-const obs={oracle:Object.fromEntries(binding.scenarios.map(id=>[id,observed])),candidate:Object.fromEntries(binding.scenarios.map(id=>[id,observed])),bridge:Object.fromEntries(binding.scenarios.map(id=>[id,observed])),negative:{found:true,value:sentinel.marker,token_value:sentinel.value}};
+const obs={oracle:Object.fromEntries(binding.scenarios.map(id=>[id,observed])),candidate:Object.fromEntries(binding.scenarios.map(id=>[id,observed])),bridge:Object.fromEntries(binding.scenarios.map(id=>[id,observed])),bridge_negative:{found:true,value:sentinel.marker,token_value:sentinel.value},negative:{found:true,value:sentinel.marker,token_value:sentinel.value}};
 assert.equal(cases.assessCase(binding,obs,sentinel).result,'pass');
 obs.candidate[cases.RICH_THEME_IDS[0]]={...observed,value:'rgb(7, 8, 9)'};
 assert.equal(cases.assessCase(binding,obs,sentinel).result,'fail');
@@ -43,6 +43,13 @@ obs.bridge[cases.RICH_THEME_IDS[0]]={...observed,value:'rgb(7, 8, 9)'};
 assert.equal(cases.assessCase(binding,obs,sentinel).result,'fail');
 delete obs.bridge[cases.RICH_THEME_IDS[0]];
 assert.equal(cases.assessCase(binding,obs,sentinel).result,'fail');
+obs.bridge[cases.RICH_THEME_IDS[0]]=observed;
+obs.bridge_negative={found:true,value:observed.value};
+assert.equal(cases.assessCase(binding,obs,sentinel).result,'fail');
+delete obs.bridge_negative;
+assert.equal(cases.assessCase(binding,obs,sentinel).result,'fail');
+assert.ok(cases.sentinelCss(cases.sentinelTable([binding]),binding.token,'light','bridge').includes('.ccs-bridge-light'));
+assert.throws(()=>cases.sentinelCss({},binding.token,'light','oracle'),/invalid sentinel mode/);
 out(true);
 """)
         self.assertTrue(result)
