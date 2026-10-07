@@ -19,6 +19,7 @@ import {
 } from '@angular/cdk/table';
 import {ChangeDetectionStrategy, Component, Directive, TemplateRef, ViewEncapsulation} from '@angular/core';
 import {constructWithPublicDependencies} from './internal/public-constructor-context';
+import {coerceBooleanProperty} from '@angular/cdk/coercion';
 
 /**
  * Header row definition for the mat-table.
@@ -32,7 +33,13 @@ import {constructWithPublicDependencies} from './internal/public-constructor-con
   providers: [{provide: CdkHeaderRowDef, useExisting: MatLegacyHeaderRowDef}],
   inputs: ['columns: matHeaderRowDef', 'sticky: matHeaderRowDefSticky'],
 })
-export class MatLegacyHeaderRowDef extends CdkHeaderRowDef {}
+export class MatLegacyHeaderRowDef extends CdkHeaderRowDef {
+  override get sticky(): boolean { return super.sticky; }
+  override set sticky(value: boolean) {
+    this.resetStickyChanged();
+    super.sticky = coerceBooleanProperty(value);
+  }
+}
 
 /**
  * Footer row definition for the mat-table.
@@ -46,7 +53,13 @@ export class MatLegacyHeaderRowDef extends CdkHeaderRowDef {}
   providers: [{provide: CdkFooterRowDef, useExisting: MatLegacyFooterRowDef}],
   inputs: ['columns: matFooterRowDef', 'sticky: matFooterRowDefSticky'],
 })
-export class MatLegacyFooterRowDef extends CdkFooterRowDef {}
+export class MatLegacyFooterRowDef extends CdkFooterRowDef {
+  override get sticky(): boolean { return super.sticky; }
+  override set sticky(value: boolean) {
+    this.resetStickyChanged();
+    super.sticky = coerceBooleanProperty(value);
+  }
+}
 
 /**
  * Data row definition for the mat-table.
