@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -16,7 +17,8 @@ import {
   CdkRowDef,
   CdkNoDataRow,
 } from '@angular/cdk/table';
-import {ChangeDetectionStrategy, Component, Directive, ViewEncapsulation} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Directive, TemplateRef, ViewEncapsulation} from '@angular/core';
+import {constructWithPublicDependencies} from '../legacy-core/internal/public-constructor-context';
 
 /**
  * Header row definition for the mat-table.
@@ -138,5 +140,15 @@ export class MatLegacyRow extends CdkRow {}
   providers: [{provide: CdkNoDataRow, useExisting: MatLegacyNoDataRow}],
 })
 export class MatLegacyNoDataRow extends CdkNoDataRow {
-  override _contentClassNames = ['mat-no-data-row'];
+  // Type-only declaration: initialization is explicit on the returned object.
+  declare _contentClassNames: string[];
+
+  // @ts-expect-error TS2377: valid derived object return preserves manual arguments.
+  constructor(templateRef: TemplateRef<any>) {
+    const row = constructWithPublicDependencies(CdkNoDataRow, new.target, [
+      {provide: TemplateRef, useValue: templateRef},
+    ]) as MatLegacyNoDataRow;
+    row._contentClassNames = ['mat-no-data-row'];
+    return row;
+  }
 }

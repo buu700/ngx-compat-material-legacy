@@ -62,6 +62,8 @@ for(const [name,parent,parameters,signature] of [
  ['MatLegacyFooterCell','CdkFooterCell','columnDef: CdkColumnDef, elementRef: ElementRef','public constructor(CdkColumnDef,ElementRef)'],
  ['MatLegacyCell','CdkCell','columnDef: CdkColumnDef, elementRef: ElementRef','public constructor(CdkColumnDef,ElementRef)'],
  ['MatLegacyTextColumn','CdkTextColumn','table: CdkTable<T>, options: TextColumnOptions<T>','public constructor(CdkTable<T>,TextColumnOptions<T>)'],
+ ['MatLegacyColumnDef','CdkColumnDef','table?: any','public constructor(any?)'],
+ ['MatLegacyNoDataRow','CdkNoDataRow','templateRef: TemplateRef<any>','public constructor(TemplateRef<any>)'],
 ]) {
  const original=originalInheritedConstructor('/original/src/material/legacy-table/cell.ts',name);
  assert.deepEqual(original.signatures,[signature]);

@@ -39,6 +39,7 @@ const INHERITED_TABLE_FACTORIES = Object.freeze({
   MatLegacyCellDef:'CdkCellDef', MatLegacyHeaderCellDef:'CdkHeaderCellDef', MatLegacyFooterCellDef:'CdkFooterCellDef',
   MatLegacyHeaderCell:'CdkHeaderCell', MatLegacyFooterCell:'CdkFooterCell', MatLegacyCell:'CdkCell',
   MatLegacyTextColumn:'CdkTextColumn',
+  MatLegacyColumnDef:'CdkColumnDef',MatLegacyNoDataRow:'CdkNoDataRow',
 });
 const INHERITED_CONSTRUCTOR_REFERENCE = 'reference/material-16.2.14/cdk-inherited-constructors/table.d.ts';
 const INHERITED_CONSTRUCTOR_SHA256 = '94789cae5567000d4f23d9634ce006670e3fca4c5db427ce129026da62002c2d';
