@@ -20,7 +20,7 @@ def css_replace(result,css):
     result.update(css=css,css_sha256=hashlib.sha256(css.encode()).hexdigest(),css_bytes=len(css.encode()))
 
 class CompanionAdditionAdmission(unittest.TestCase):
-    def test_all48_both_lines_and_rehashed_css_mutations(self):
+    def test_all62_both_lines_and_rehashed_css_mutations(self):
         for line in ['main','21.x']:
             run=active(line)
             for case in COMPANION_ADDITION_CASES:
@@ -49,7 +49,7 @@ class CompanionAdditionAdmission(unittest.TestCase):
             self.assertFalse(mixin_argument_assertion_ok(ROOT,run,wrong,'one'),key)
         wrong=copy.deepcopy(body);peer=wrong['current_companion']['peer'];css_replace(peer,peer['css'].replace('4px','8px'))
         self.assertFalse(mixin_argument_assertion_ok(ROOT,run,wrong,'one'))
-        for case in ['mixin-argument/badge-color/custom-full-theme','mixin-argument/all-legacy-component-themes/custom-full-theme']:
+        for case in ['mixin-argument/badge-theme/custom-full-theme','mixin-argument/datepicker-density/custom-full-theme','mixin-argument/all-legacy-component-themes/custom-full-theme']:
             wrong=mixin_receipt(ROOT,run,case,'one');wrong['current_companion']=copy.deepcopy(body['current_companion']);wrong['comparison']='current-companion-contract'
             self.assertFalse(mixin_argument_assertion_ok(ROOT,run,wrong,'one'))
 

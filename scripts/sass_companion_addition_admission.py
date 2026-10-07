@@ -6,8 +6,9 @@ from sass_current_companion_admission import peer_measurement_ok
 
 _CATALOG=json.loads((Path(__file__).resolve().parents[1]/'fixtures/sass/companion-addition-contracts.json').read_bytes())
 _FAMILIES=['bottom-sheet','button-toggle','divider','expansion','sidenav','stepper']
-_IDS={f'mixin-argument/{family}-{dimension}/{variant}' for family in _FAMILIES
-      for dimension in ['color','typography','density','theme']
+_SCOPES={**dict.fromkeys(_FAMILIES,['color','typography','density','theme']),'badge':['color','typography','density'],'datepicker':['color','typography'],'toolbar':['color','theme']}
+_IDS={f'mixin-argument/{family}-{dimension}/{variant}' for family,dimensions in _SCOPES.items()
+      for dimension in dimensions
       for variant in ['custom-full-theme','custom-dark-theme' if dimension=='theme' else f'raw-{dimension}-config']}
 if _CATALOG['schema_version']!=1 or set(_CATALOG['cases'])!=_IDS:
     raise ValueError('finite companion addition roster changed')
@@ -22,7 +23,7 @@ def companion_addition_expected_css(body):
         original=body['expected'];peer=contract['peer'];line=body['line'];floor=entry['peers'][line]
         if original['css_sha256']!=entry['original_sha256'] or hashlib.sha256(original['css'].encode()).hexdigest()!=entry['original_sha256'] or original['css_bytes']!=len(original['css'].encode()):return None
         if not peer_measurement_ok(peer,line,floor['program_sha256'],_CATALOG['sources'][line][entry['family']]) or peer['css_sha256']!=floor['css_sha256']:return None
-        return (original['css']+'\n\n' if original['css'] else '')+peer['css']
+        return (original['css']+entry['separator'] if original['css'] else '')+peer['css']
     except (KeyError,TypeError,ValueError,AttributeError):return None
 
 def companion_addition_results_match(body):

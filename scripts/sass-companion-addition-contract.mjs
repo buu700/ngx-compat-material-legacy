@@ -6,8 +6,8 @@ import {measureM2PeerProgram,peerMeasurementMatches} from './sass-current-compan
 
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 const catalog=JSON.parse(readFileSync(new URL('../fixtures/sass/companion-addition-contracts.json',import.meta.url)));
-const families=['bottom-sheet','button-toggle','divider','expansion','sidenav','stepper'];
-const ids=families.flatMap(family=>['color','typography','density','theme'].flatMap(d=>[
+const scopes={...Object.fromEntries(['bottom-sheet','button-toggle','divider','expansion','sidenav','stepper'].map(f=>[f,['color','typography','density','theme']])),badge:['color','typography','density'],datepicker:['color','typography'],toolbar:['color','theme']};
+const ids=Object.entries(scopes).flatMap(([family,dimensions])=>dimensions.flatMap(d=>[
   `mixin-argument/${family}-${d}/custom-full-theme`,
   `mixin-argument/${family}-${d}/${d==='theme'?'custom-dark-theme':`raw-${d}-config`}`,
 ]));
@@ -33,7 +33,7 @@ export function companionAdditionExpectedCss(caseId,original,peer){
       || sha(original.css)!==entry.original_sha256 || original.css_bytes!==Buffer.byteLength(original.css)
       || !peerMeasurementMatches(peer,companionAdditionPeerProgram(caseId),catalog.sources[peer.line][entry.family])
       || peer.program_sha256!==floor.program_sha256 || peer.css_sha256!==floor.css_sha256)return null;
-  return (original.css?original.css+'\n\n':'')+peer.css;
+  return (original.css?original.css+entry.separator:'')+peer.css;
 }
 export function companionAdditionResultsMatch(caseId,original,actual,peer){
   const expected=companionAdditionExpectedCss(caseId,original,peer);

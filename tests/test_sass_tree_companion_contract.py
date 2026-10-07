@@ -84,7 +84,7 @@ class TreeCompanionAdmission(unittest.TestCase):
             wrong['current_companion']['peer']['sources'][0][key] = value
             self.assertFalse(mixin_argument_assertion_ok(ROOT, run, wrong, 'one'), key)
         for case in ['mixin-argument/all-legacy-component-themes/custom-full-theme',
-                     'mixin-argument/badge-color/custom-full-theme']:
+                     'mixin-argument/badge-theme/custom-full-theme']:
             wrong = mixin_receipt(ROOT, run, case, 'one')
             wrong['current_companion'] = copy.deepcopy(body['current_companion'])
             wrong['comparison'] = 'current-companion-contract'
