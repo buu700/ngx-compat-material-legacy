@@ -450,7 +450,17 @@ if (isMain) {
     recorded_differences: summary.recorded.length + diSettled.filter(item => item.status === 'intentional-legacy-difference').length,
     export_failures: exportFails.slice(0, 20),
     signature_failures: signatureFails.slice(0, 20).map(item => item.symbol.symbol_id),
-    di_failures: diFails.slice(0, 20).map(item => ({symbol_id: item.symbol.symbol_id, problems: item.problems})),
+    di_failures: diFails.slice(0, 20).map(item => ({
+      symbol_id: item.symbol.symbol_id,
+      problems: item.problems,
+      observation_context: 'environment-injector factory invocation; no component node attribute context',
+      factory_outcome: item.factory_outcome ?? null,
+      factory_error: item.factory_error ?? null,
+      constructor_attributes: item.constructor_attributes || [],
+      observed: item.observed,
+      original_factory_kind: item.original_factory_kind ?? null,
+      original_inherited_factory: item.original_inherited_factory ?? null,
+    })),
   };
   mkdirSync(dirname(reportPath), {recursive: true});
   writeFileSync(reportPath, `${JSON.stringify(detail, null, 2)}\n`);
