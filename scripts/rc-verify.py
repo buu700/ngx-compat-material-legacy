@@ -1015,7 +1015,7 @@ def _consumer_floor_assertion_ok(body: dict, invocation: str) -> bool:
 
 
 def _sass_seal_assertion_ok(body: dict, invocation: str) -> bool:
-    if str(body.get('case_id', '')).startswith('mixin-argument/'):
+    if str(body.get('case_id', '')).startswith(('mixin-argument/', 'owned-aggregate/')):
         return mixin_argument_assertion_ok(ROOT, ACTIVE_RUN, body, invocation)
     if str(body.get('case_id', '')).startswith('function-value/'):
         return function_assertion_ok(ROOT, ACTIVE_RUN, body, invocation)

@@ -37,13 +37,14 @@ import {
 import {apiCaseIds, apiDriftNegative} from './sass-api-inventory.mjs';
 import {functionCaseIds} from './sass-function-contracts.mjs';
 import {mixinArgumentCaseIds} from './sass-mixin-arguments.mjs';
+import {ownedAggregateCaseIds} from './sass-owned-aggregates.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const matrix = JSON.parse(readFileSync(join(root, 'compatibility/rc/matrices/full-verify.json'), 'utf8'));
 const row = matrix.checks.find(item => item.check_id === 'sass-seal');
 assert.deepEqual(row.acceptance.cases_by_line['21.x']['ordered-css-dom'], [...ORDERED_CSS_FIXTURE_IDS]);
 const apiOracle = JSON.parse(readFileSync(join(root, 'compatibility/rc/oracles/material-16.2.14-sass-api.json'), 'utf8'));
-assert.deepEqual(row.acceptance.cases_by_line['21.x']['sass-api-and-values'], [...apiCaseIds(apiOracle),...functionCaseIds(),...mixinArgumentCaseIds()]);
+assert.deepEqual(row.acceptance.cases_by_line['21.x']['sass-api-and-values'], [...apiCaseIds(apiOracle),...functionCaseIds(),...mixinArgumentCaseIds(),...ownedAggregateCaseIds()]);
 assert.deepEqual(row.acceptance.cases_by_line['21.x']['isolation-negatives'], [...ISOLATION_NEGATIVE_IDS]);
 assert.deepEqual([...ISOLATION_NEGATIVE_IDS], ['archived-import', 'mutated-golden', 'hidden-resolution', 'api-drift']);
 for (const id of ['05-custom-map-nested', 'owned-legacy-button', 'owned-legacy-select', 'owned-legacy-snack-bar']) {
