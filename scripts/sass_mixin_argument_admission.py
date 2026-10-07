@@ -9,6 +9,7 @@ from sass_progress_color_alias_admission import PROGRESS_COLOR_ALIAS_CASES, prog
 from sass_badge_shape_admission import BADGE_SHAPE_CASES, badge_shape_results_match
 from sass_datepicker_controls_admission import DATEPICKER_CONTROLS_CASES, datepicker_controls_results_match
 from sass_aggregate_density_admission import AGGREGATE_DENSITY_CASES, aggregate_density_results_match
+from sass_aggregate_typography_admission import AGGREGATE_TYPOGRAPHY_CASES, aggregate_typography_results_match
 
 def mixin_argument_measurements_ok(root,body,*,owned=False):
     try:
@@ -72,6 +73,8 @@ def mixin_argument_assertion_ok(root,active,body,invocation):
             if not progress_color_alias_results_match(body):return False
         elif body['case_id'] in BADGE_SHAPE_CASES:
             if not badge_shape_results_match(body):return False
+        elif body['case_id'] in AGGREGATE_TYPOGRAPHY_CASES:
+            if not aggregate_typography_results_match(body):return False
         elif body['case_id'] in AGGREGATE_DENSITY_CASES:
             if not aggregate_density_results_match(body):return False
         elif body['case_id'] in DATEPICKER_CONTROLS_CASES:
