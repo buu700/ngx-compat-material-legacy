@@ -71,3 +71,14 @@ the grant came from.
 
 Whether the grant is authentic, whether the dual-edge path is still in scope,
 and G11 readiness are all decisions for Codex (FIN-02-C05).
+
+## Codex authority admission update (2026-10-07 UTC)
+
+The live disposition is now `pending-owner-authority`. The entire earlier
+`temporary-exception` claim remains under `prior_unverified_record`; its original
+message has not been retrieved or authenticated. The live record enumerates both
+karma dependency edges. The checker leaves the actual advisory unresolved even
+within the claimed grant period. This does not revoke a verified human grant or
+clear the advisory: it prevents the repository claim from being treated as one.
+The existing 2026-11-04 expiry is unchanged. Reproduction, triage and full
+dependency/security review remain outstanding.

@@ -174,20 +174,21 @@ class Fresh03AdmissionTests(unittest.TestCase):
         self.assertEqual(classified["excepted"], [])
         self.assertEqual(classified["unresolved"], [])
 
-    def test_recorded_braces_exception_is_temporary(self) -> None:
+    def test_unverified_braces_claim_stays_unresolved(self) -> None:
         from datetime import datetime, timezone
         rows = {"braces@3.0.3": {"name": "braces", "version": "3.0.3", "vulns": [{"id": "GHSA-vfj7-8cjw-p6xm"}]}}
         dispositions = ELIGIBILITY.load_finding_dispositions(ROOT)
         record = dispositions["braces@3.0.3"][0]
-        self.assertEqual(record["classification"], "temporary-exception")
+        self.assertEqual(record["classification"], "pending-owner-authority")
+        self.assertEqual(record["prior_unverified_record"]["classification"], "temporary-exception")
         self.assertIsNone(record["fixed_version"])
         self.assertEqual(record["registry_latest"], "3.0.3")
         self.assertEqual(record["expires_on"], "2026-11-04")
         during = datetime(2026, 10, 4, tzinfo=timezone.utc)
         classified = ELIGIBILITY.classify_live_findings(rows, ["braces@3.0.3"], dispositions, during)
-        self.assertEqual(classified["excepted"], ["braces@3.0.3"])
+        self.assertEqual(classified["excepted"], [])
         self.assertEqual(classified["blocked"], [])
-        self.assertEqual(classified["unresolved"], [])
+        self.assertEqual(classified["unresolved"], ["braces@3.0.3"])
         after = datetime(2026, 11, 5, tzinfo=timezone.utc)
         expired = ELIGIBILITY.classify_live_findings(rows, ["braces@3.0.3"], dispositions, after)
         self.assertEqual(expired["excepted"], [])
@@ -223,6 +224,7 @@ class MinimumAgeExceptionTests(unittest.TestCase):
     def record(self, **changes):
         base = {
             "package": "source-map-js", "version": "1.2.2",
+            "classification": "temporary-exception",
             "published_at": "2026-09-30T14:08:09.382Z", "expires_at": "2026-10-07T14:08:09.382Z",
             "advisory": "GHSA-68fv-2mgg-jv7q", "granted_by": "Ryan Lester",
             "granted_on": "2026-10-06", "granted_at": "2026-10-06T03:43:00-04:00",
@@ -236,20 +238,32 @@ class MinimumAgeExceptionTests(unittest.TestCase):
         return ELIGIBILITY.assess_age_exceptions(
             records, excludes, now or self.NOW, lambda name, version: (self.PUBLISHED, ""))
 
-    def test_committed_grant_is_exact_cited_and_live(self):
+    def test_committed_age_claim_requires_original_authority(self):
         records, error = ELIGIBILITY.load_age_exceptions(ROOT)
         excludes = ELIGIBILITY.pnpm_age_excludes((ROOT / "pnpm-workspace.yaml").read_text())
         self.assertIsNone(error)
         self.assertEqual(excludes, ["source-map-js@1.2.2"])
         result = self.assess(records, excludes)
-        self.assertEqual(result["problems"], [])
-        active = result["active"]["source-map-js@1.2.2"]
-        self.assertEqual(active["granted_by"], "Ryan Lester")
-        self.assertIn("GHSA-68fv-2mgg-jv7q", active["citation"])
-        self.assertIn("chainman/minimum-age-exceptions.toml", active["citation"])
+        self.assertEqual(result["active"], {})
+        self.assertTrue(any("owner authority pending" in problem for problem in result["problems"]))
+        self.assertEqual(records[0]["classification"], "pending-owner-authority")
+        self.assertEqual(records[0]["granted_by"], "Ryan Lester")
+        # This fixture exercises date/scope mechanics only; it is not human authority.
+        fixture=self.assess([self.record()], excludes)
+        self.assertEqual(fixture["problems"], [])
+        self.assertIn("source-map-js@1.2.2", fixture["active"])
         self.assertIn("chainman/minimum-age-exceptions.toml", (ROOT / "chainman.toml").read_text())
         self.assertIn("source-map-js@1.2.2:", (ROOT / "pnpm-lock.yaml").read_text())
         self.assertNotIn("source-map-js@1.2.1", (ROOT / "pnpm-lock.yaml").read_text())
+
+    def test_missing_or_pending_classification_cannot_admit_age_grant(self):
+        for classification in (None, "pending-owner-authority"):
+            result=self.assess([self.record(classification=classification)], ["source-map-js@1.2.2"])
+            self.assertEqual(result["active"], {})
+            self.assertTrue(any("owner authority pending" in problem for problem in result["problems"]))
+        records,_=ELIGIBILITY.load_age_exceptions(ROOT)
+        expired=self.assess(records,["source-map-js@1.2.2"],datetime(2026,10,7,14,8,10,tzinfo=timezone.utc))
+        self.assertTrue(any("expired" in problem and "remove it" in problem for problem in expired["problems"]))
 
     def test_expired_grant_still_configured_blocks(self):
         result = self.assess([self.record()], ["source-map-js@1.2.2"], datetime(2026, 10, 7, 14, 8, 10, tzinfo=timezone.utc))
