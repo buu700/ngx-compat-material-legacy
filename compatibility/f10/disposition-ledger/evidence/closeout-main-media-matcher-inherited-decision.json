@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "sha": "231f94f5557bb58afc0070585688b3014d541eb2",
+  "recorded_at_utc": "2026-10-07T07:42:41.341965+00:00",
+  "reviewer": "Codex primary implementer; fresh complete audit must challenge this decision",
+  "affected_branches": [
+    "main"
+  ],
+  "review_depth": "individual-compatibility",
+  "final_disposition": "inherited",
+  "diff_sha256": "a89ab37d4dd3819592854002413e12b1840bb047195528455ea90cea8cbcdc44",
+  "patch_file": "compatibility/f10/disposition-ledger/evidence/patches/231f94f5557bb58afc0070585688b3014d541eb2.patch",
+  "decision": "Main inherits this exact CSS-query fix from its advertised minimum CDK22.1.7: the actual insertion string strips every literal brace with the same expression as the full original hunk. Reviewed owned direct and BreakpointObserver/high-contrast callers use fixed queries. Actual public MediaMatcher in packed zoneful Chromium confirms a valid query works, the malformed query has no marker effect and its insertion attempt has braces removed. No owned sanitizer, private API or CDK fork is introduced. This is a bounded disposition of this SHA on main, not a full security clearance;21.x21.2.14 retains raw insertion and reproduced injection, so its security review remains open.",
+  "peers": {
+    "main": {
+      "version": "22.1.7",
+      "cdk_version": "22.1.7",
+      "archive_sha256": "225d82389797aefbbb2684461576ef950465546a9d28326483e0b816c8a5a558",
+      "installed_member": {
+        "path": "package/fesm2022/_breakpoints-observer-chunk.mjs",
+        "sha256": "39fc38921aa1f28533becd5027dbcec5192b642121452b8352d94aee9813d9f2"
+      }
+    }
+  },
+  "source_review": "Complete original one-function hunk and enclosing CSSStyleSheet insertion/caching/catch context reviewed. Authentic minimum implementation has identical brace sanitization. MediaMatcher only invokes the CSS workaround on Blink/WebKit. No adoption conclusion based on ancestry or a newer research tag.",
+  "owned_caller_triage": "compatibility/f10/disposition-ledger/evidence/closeout-media-matcher-caller-triage.json",
+  "native_receipt": "compatibility/f10/disposition-ledger/evidence/closeout-browser-native-diagnostic-receipts.json",
+  "native_execution": {
+    "commit": "081b1e940",
+    "run": 37575386672,
+    "job": 112643003696,
+    "subject": "Run-local hashed packed artifact, public MediaMatcher, zoneful Chromium",
+    "valid_query_matches": true,
+    "unsafe_query_css_injected": false,
+    "before_marker": "",
+    "after_marker": "",
+    "cleanup_marker": "",
+    "attempted_rule": "@media (min-width: 0px) html --closeout-peer-query-css-probe: 1 /* {body{ }}"
+  },
+  "supersedes": "Earlier irrelevant/no-owned-path rationale omitted actual public peer reachability. Original archive and earlier per-SHA evidence are preserved.",
+  "limitations": [
+    "No native WebKit/Firefox payload test or general payload/CSP/security certification.",
+    "No21.x clearance or accepted residual-risk exception.",
+    "Authenticated logs reviewed; uploaded artifact archive not independently transferred/rehashed.",
+    "1697 SHA/1736 authored-use overall audit remains incomplete."
+  ],
+  "g11_claim": "not-passed"
+}

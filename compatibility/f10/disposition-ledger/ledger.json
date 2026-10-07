@@ -4,8 +4,8 @@
   "g11_claim": "not-passed",
   "seed_rows": 1697,
   "ledger_rows": 1697,
-  "closed_dispositions": 1693,
-  "open_or_deferred": 4,
+  "closed_dispositions": 1694,
+  "open_or_deferred": 3,
   "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
   "batch_id": "unread-seed-content-review-2026-10-02",
   "entries": [
@@ -764,10 +764,10 @@
       "sha": "231f94f5557bb58afc0070585688b3014d541eb2",
       "bucket": "security-deep",
       "subject": "fix(cdk/layout): avoid CSS injection attacks in media matcher",
-      "final_disposition": "needs-individual-review",
-      "reason": "Actual security fix strips braces from media-query strings before style-sheet insertRule in CDK MediaMatcher. The add-on authored direct MediaMatcher call is a fixed (prefers-reduced-motion) query; tooltip also delegates through public BreakpointObserver. Installed main22.1.7 peer source contains the brace stripping. This is useful main-floor source evidence, but actual21.x-floor implementation and exercised delegation remain required; no generic ancestry or cross-line clearance.",
-      "read_note_disposition": "call-site-unaffected",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-security-source-review.json",
+      "final_disposition": "inherited",
+      "reason": "Main inherits this exact CSS-query fix from its advertised minimum CDK22.1.7: the actual insertion string strips every literal brace with the same expression as the full original hunk. Reviewed owned direct and BreakpointObserver/high-contrast callers use fixed queries. Actual public MediaMatcher in packed zoneful Chromium confirms a valid query works, the malformed query has no marker effect and its insertion attempt has braces removed. No owned sanitizer, private API or CDK fork is introduced. This is a bounded disposition of this SHA on main, not a full security clearance;21.x21.2.14 retains raw insertion and reproduced injection, so its security review remains open.",
+      "read_note_disposition": "individual minimum-peer inherited fix on main only",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-main-media-matcher-inherited-decision.json",
       "files": [],
       "batch_id": "closeout-six-security-source-reads",
       "recorded_at_utc": "2026-10-06T18:23:24.711579+00:00",
@@ -802,7 +802,24 @@
       "affected_branches": [
         "main",
         "21.x"
-      ]
+      ],
+      "individual_proof": {
+        "diff_sha256": "a89ab37d4dd3819592854002413e12b1840bb047195528455ea90cea8cbcdc44",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Main inherits this exact CSS-query fix from its advertised minimum CDK22.1.7: the actual insertion string strips every literal brace with the same expression as the full original hunk. Reviewed owned direct and BreakpointObserver/high-contrast callers use fixed queries. Actual public MediaMatcher in packed zoneful Chromium confirms a valid query works, the malformed query has no marker effect and its insertion attempt has braces removed. No owned sanitizer, private API or CDK fork is introduced. This is a bounded disposition of this SHA on main, not a full security clearance;21.x21.2.14 retains raw insertion and reproduced injection, so its security review remains open.",
+        "proof_kind": "whole-hunk-minimum-peer-and-public-browser-review",
+        "installed_member": {
+          "path": "package/fesm2022/_breakpoints-observer-chunk.mjs",
+          "sha256": "39fc38921aa1f28533becd5027dbcec5192b642121452b8352d94aee9813d9f2"
+        },
+        "reachable_behavior": {
+          "kind": "executed-delegation",
+          "id": "peer-media-matcher/native-main/run37575386672/job112643003696"
+        }
+      }
     },
     {
       "sha": "77ffdf98ba71c11d908b29e02b516dddf487ae0b",
