@@ -23,12 +23,17 @@
     }
   },
   "implementation": "Restore original TemplateRef<any> constructor using the same public Angular/standard Reflect adapter. Keep the real public MatTabContent parent and existing MAT_TAB_CONTENT provider. No private tab-parent token, copied ordinary component or class shadow is introduced.",
-  "helper": "projects/ngx-material-legacy/legacy-core/internal/public-constructor-context.ts",
+  "helper": "projects/ngx-material-legacy/internal/public-constructor-context.ts",
   "guard": "tests/test_constructor_return_fields.py rejects emitted own fields and parameter properties on all eight adapter classes; native JavaScript negative shows why they would otherwise be skipped. Core helper is not publicly reexported.",
   "native_case": "packed-consumer/harness/tab-content-original-constructor",
   "required_packed_cases": 83,
   "native_status": "pending Actions",
   "original_expectations": "Untouched MatTabContent constructor stores the supplied template. Actual manual argument identity, owned/current parent instance/prototype/constructor identity, real Angular template anchor and embedded-view text are mandatory.",
   "remaining": "Tab-label/menu-item/private tab/table tokens and complete DI/source/API audits remain unresolved. Native83-case/current full artifact qualification required; no G02 pass.",
-  "g02_claim": "not-passed"
+  "g02_claim": "not-passed",
+  "entry_local_copies": [
+    "projects/ngx-material-legacy/legacy-table/internal/public-constructor-context.ts",
+    "projects/ngx-material-legacy/legacy-tabs/internal/public-constructor-context.ts"
+  ],
+  "packaging_followup": "Direct relative import across secondary-entry rootDir failed native pack at b6eead33b/7980597d7. Same owned bytes now copied into each entry internal folder, with byte/import coherence regression. Core/public exports are not broadened. Fresh native pack required."
 }

@@ -8,7 +8,7 @@
  */
 
 import {Directive, ElementRef, Input, TemplateRef} from '@angular/core';
-import {constructWithPublicDependencies} from '../legacy-core/internal/public-constructor-context';
+import {constructWithPublicDependencies} from './internal/public-constructor-context';
 import {
   CdkCell,
   CdkCellDef,
