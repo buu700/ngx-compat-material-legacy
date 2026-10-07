@@ -22,6 +22,9 @@ import {MAT_TAB_CONTENT, MatTabContent as MatNonLegacyTabContent} from '@angular
   providers: [{provide: MAT_TAB_CONTENT, useExisting: MatLegacyTabContent}],
 })
 export class MatLegacyTabContent extends MatNonLegacyTabContent {
+  /** Original16 public member, initialized by the real public parent. */
+  declare template: TemplateRef<any>;
+
   // @ts-expect-error TS2377: valid derived object return preserves manual arguments.
   constructor(template: TemplateRef<any>) {
     return constructWithPublicDependencies(MatNonLegacyTabContent, new.target, [
