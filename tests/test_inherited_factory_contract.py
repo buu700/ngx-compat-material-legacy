@@ -16,6 +16,15 @@ class InheritedFactoryContractTests(unittest.TestCase):
         self.assertEqual(data['tarball_sha256'],'a499ba0fee46784441b92587e43b17ec72d9bd383f78ea14954eaa62c781bad7')
         self.assertEqual(len(data['factories']),135)
 
+    def test_inherited_empty_key_waivers_are_withdrawn(self):
+        active=json.loads((ROOT/'compatibility/rc/api/di-differences.json').read_text())['differences']
+        withdrawn=json.loads((ROOT/'compatibility/rc/api/withdrawn-inherited-di-waivers.json').read_text())['removed_rows']
+        self.assertEqual(len(withdrawn),13)
+        ids={row['symbol_id'] for row in withdrawn}
+        self.assertEqual(len(ids),13)
+        self.assertTrue(all(row['historical']=='' for row in withdrawn))
+        self.assertFalse(any(row['symbol_id'] in ids for row in active))
+
     def test_inherited_expectation_and_artifact_module_cache(self):
         code=r'''
 import assert from 'node:assert/strict';
