@@ -118,6 +118,7 @@ $accent: legacy.define-palette(legacy.$pink-palette, A200, A100, A400);
 $theme: legacy.define-light-theme((color: (primary: $primary, accent: $accent)));
 @include legacy.progress-bar-theme($theme);
 @include legacy.legacy-progress-bar-theme($theme);
+@include legacy.form-field-theme($theme);
 `, {loadPaths:[join(consumer,'node_modules')],url:pathToFileURL(join(consumer,'progress-csp.scss')),
   silenceDeprecations:['if-function','global-builtin','color-functions','import']}).css;
 
@@ -128,6 +129,8 @@ import {BrowserModule, DomSanitizer} from '@angular/platform-browser';
 import {MatIconModule, MatIconRegistry} from '@angular/material/icon';
 import {MediaMatcher} from '@angular/cdk/layout';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {MATERIAL_ANIMATIONS} from '@angular/material/core';
 import {MatLegacyButtonModule} from '@ngx-compat/material-legacy/legacy-button';
@@ -139,6 +142,7 @@ import {MatLegacyProgressSpinnerModule} from '@ngx-compat/material-legacy/legacy
   standalone: false,
   selector: 'peer-progress-csp',
   template: \`
+    <mat-form-field id="peer-form-hover" appearance="fill"><mat-label>Peer field</mat-label><input matInput><mat-hint>Peer hint area</mat-hint></mat-form-field>
     <mat-progress-bar id="peer-progress-determinate" mode="determinate" [value]="40"></mat-progress-bar>
     <mat-progress-bar id="peer-progress-buffer" mode="buffer" [value]="40" [bufferValue]="65"></mat-progress-bar>
     <mat-progress-bar id="peer-progress-query" mode="query"></mat-progress-bar>
@@ -146,7 +150,7 @@ import {MatLegacyProgressSpinnerModule} from '@ngx-compat/material-legacy/legacy
   \`,
 })
 export class PeerProgressCsp {}
-@NgModule({imports:[MatProgressBarModule],declarations:[PeerProgressCsp],exports:[PeerProgressCsp]})
+@NgModule({imports:[MatProgressBarModule,MatFormFieldModule,MatInputModule],declarations:[PeerProgressCsp],exports:[PeerProgressCsp]})
 export class PeerProgressCspModule {}
 
 @Component({
@@ -361,6 +365,7 @@ let zoneGlobal = null;
 let peerIconTt = null;
 let peerMediaMatcher = null;
 let progressCsp = null;
+let peerFormHover = null;
 
 try {
   await send('Runtime.enable');
@@ -413,6 +418,30 @@ try {
   progressCsp.negative_data_image_blocked = await evaluate(`(window.__cspDetails||[]).some(row=>row.directive==='img-src'&&row.blocked==='data')`);
   progressCsp.compiled_css_sha256 = createHash('sha256').update(progressCss).digest('hex');
   progressCsp.historical_data_uri_retained = progressCss.includes('data:image/svg+xml');
+
+  // Actual pointer hover on the current companion, with the packed historical
+  // form-field theme loaded. A changed selector is not inferred from ancestry.
+  await send('Emulation.setEmulatedMedia',{features:[{name:'hover',value:'hover'}]});
+  const hoverOpacity = () => evaluate(`(() => {
+    const host=document.getElementById('peer-form-hover');
+    const overlay=host?.querySelector('.mat-mdc-form-field-focus-overlay');
+    return {present:!!host,overlay_present:!!overlay,host_hovered:!!host?.matches(':hover'),
+      wrapper_hovered:!!host?.querySelector('.mat-mdc-text-field-wrapper')?.matches(':hover'),
+      focused:!!host?.classList.contains('mat-focused'),opacity:overlay?getComputedStyle(overlay).opacity:null};
+  })()`);
+  await send('Input.dispatchMouseEvent',{type:'mouseMoved',x:0,y:0});
+  await sleep(200);
+  peerFormHover={baseline:await hoverOpacity(),hover_media:await evaluate('matchMedia("(hover: hover)").matches')};
+  for(const [name,selector] of [['wrapper','.mat-mdc-text-field-wrapper'],['hint','.mat-mdc-form-field-subscript-wrapper']]){
+    const point=await evaluate(`(() => {const rect=document.querySelector('#peer-form-hover '+${JSON.stringify(selector)})?.getBoundingClientRect();return rect&&{x:rect.x+rect.width/2,y:rect.y+rect.height/2,width:rect.width,height:rect.height};})()`);
+    if(point&&point.width>0&&point.height>0){
+      await send('Input.dispatchMouseEvent',{type:'mouseMoved',x:point.x,y:point.y});
+      await sleep(200);
+      peerFormHover[name]={point,...await hoverOpacity()};
+    }else peerFormHover[name]={point,error:'No measurable hover target'};
+  }
+  await send('Input.dispatchMouseEvent',{type:'mouseMoved',x:0,y:0});
+  peerFormHover.compiled_theme_css_sha256=createHash('sha256').update(progressCss).digest('hex');
 
   // Security diagnostic only: a fixed CSS custom-property marker, no URL or
   // script payload. This tests the public peer path; it earns no matrix credit
@@ -524,6 +553,7 @@ const report = {
   peer_icon_tt: peerIconTt,
   peer_media_matcher: peerMediaMatcher,
   progress_csp: progressCsp,
+  peer_form_hover: peerFormHover,
   credited_cell_ids: ok ? cells : [],
   matrix_updated: false,
   error,
@@ -542,6 +572,7 @@ const report = {
     'Peer icon TT probe uses actual Chromium require-trusted-types-for enforcement and an allowed Angular policy list; this is not a full script/style/network CSP matrix or arbitrary SVG trust audit.',
     'Public MediaMatcher unsafe-query diagnostic uses one fixed reversible CSS marker; it earns no acceptance/matrix credit and does not establish an owned input path or security clearance.',
     'Progress CSP diagnostic covers four current modes and legacy buffer with the actual packed exported themes, img-src none and a blocked data-image negative; it earns no acceptance/matrix credit or complete CSP/motion qualification.',
+    'Current form-field hover diagnostic uses actual pointer moves over wrapper and hint with packed exported Sass; no selector changed, no acceptance/matrix credit and no general interaction or style qualification.',
     'Does not claim G10.',
   ],
 };
@@ -557,6 +588,7 @@ console.log(JSON.stringify({
   peer_icon_tt: peerIconTt,
   peer_media_matcher: peerMediaMatcher,
   progress_csp: progressCsp,
+  peer_form_hover: peerFormHover,
   error,
   credited_cell_ids: report.credited_cell_ids,
 }, null, 2));
