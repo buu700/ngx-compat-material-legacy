@@ -2441,18 +2441,75 @@
       "sha": "f6e8a02091a9fc7e02f8c3d723afeee4ef732e48",
       "bucket": "docs-build-batch-candidate",
       "subject": "docs: switch datepicker examples to Luxon (#32008)",
-      "final_disposition": "irrelevant",
-      "reason": "The patch switches upstream datepicker examples to the Luxon adapter and adds Luxon Bazel deps. Those examples are not in this package.",
-      "read_note_disposition": "not-owned",
+      "final_disposition": "do-not-adopt",
+      "reason": "Complete twenty-one-path scope reviewed: every nonlock hunk read; full StackBlitz lock documents parsed and all149 changed package records retained for structured dependency-scope review, plus all upstream pnpm importer hunks read. Datepicker demos switch Moment to Luxon providers/date values/format strings, remove locale side-effect imports, and month/year selection constructs a new immutable DateTime rather than mutating the existing date. Docs/build/example manifests and path mappings move optional adapter edges. The StackBlitz graph independently refreshes Angular20/CLI/TypeScript/tool transitive dependencies, not only Luxon. No owned LegacyNativeDateAdapter, legacy format map, package peer or lock change is authorized. docs package/StackBlitz assets/components-examples are absent from both maintained closures. The retained root pkg-externals.bzl exists, but its moment locale entries are archival Bazel externals, outside the active pinned ng-packagr pack-library path; keep them unchanged. Do not adopt this demo/provider/tool graph refresh. No execution, installer, vulnerability or arbitrary optional-adapter qualification is claimed.",
+      "read_note_disposition": "whole-patch-example-and-tool-graph-source-scope-review",
       "files": [
-        "src/components-examples/material/datepicker",
-        "BUILD.bazel"
+        "docs/BUILD.bazel",
+        "docs/angular.json",
+        "docs/defs.bzl",
+        "docs/package.json",
+        "docs/scenes/BUILD.bazel",
+        "docs/src/assets/stackblitz/package-lock.json",
+        "docs/src/assets/stackblitz/package.json",
+        "pkg-externals.bzl",
+        "pnpm-lock.yaml",
+        "src/components-examples/BUILD.bazel",
+        "src/components-examples/material/datepicker/BUILD.bazel",
+        "src/components-examples/material/datepicker/datepicker-formats/datepicker-formats-example.ts",
+        "src/components-examples/material/datepicker/datepicker-locale/datepicker-locale-example.ts",
+        "src/components-examples/material/datepicker/datepicker-luxon/datepicker-luxon-example.html",
+        "src/components-examples/material/datepicker/datepicker-luxon/datepicker-luxon-example.ts",
+        "src/components-examples/material/datepicker/datepicker-moment/datepicker-moment-example.ts",
+        "src/components-examples/material/datepicker/datepicker-views-selection/datepicker-views-selection-example.ts",
+        "src/components-examples/material/datepicker/index.ts",
+        "src/components-examples/package.json",
+        "src/components-examples/tsconfig.json",
+        "src/material/datepicker/datepicker.md"
       ],
-      "evidence_report": "compatibility/rc/reports/docs-build-one-diff.json",
-      "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
-      "recorded_at_utc": "2026-10-01T16:46:41Z",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-virtual-table-and-luxon-demos-source-review.json",
+      "batch_id": "closeout-virtual-table-and-luxon-demos-source-review",
+      "recorded_at_utc": "2026-10-07T03:53:38.848058+00:00",
       "g11_claim": "not-passed",
-      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "prior_dispositions": [
+        {
+          "sha": "f6e8a02091a9fc7e02f8c3d723afeee4ef732e48",
+          "bucket": "docs-build-batch-candidate",
+          "subject": "docs: switch datepicker examples to Luxon (#32008)",
+          "final_disposition": "irrelevant",
+          "reason": "The patch switches upstream datepicker examples to the Luxon adapter and adds Luxon Bazel deps. Those examples are not in this package.",
+          "read_note_disposition": "not-owned",
+          "files": [
+            "src/components-examples/material/datepicker",
+            "BUILD.bazel"
+          ],
+          "evidence_report": "compatibility/rc/reports/docs-build-one-diff.json",
+          "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
+          "recorded_at_utc": "2026-10-01T16:46:41Z",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+        }
+      ],
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "source_check": {
+        "diff_sha256": "73cf54cb79c21e11c73d081febbbef2ad1481034de2b961abe602df87122ed4c",
+        "patch_path": "compatibility/f10/disposition-ledger/evidence/closeout-virtual-table-and-luxon-demos-source-review.json",
+        "review_membership": "f6e8a02091a9fc7e02f8c3d723afeee4ef732e48"
+      },
+      "individual_proof": {
+        "diff_sha256": "73cf54cb79c21e11c73d081febbbef2ad1481034de2b961abe602df87122ed4c",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main",
+          "21.x"
+        ],
+        "decision": "Complete twenty-one-path scope reviewed: every nonlock hunk read; full StackBlitz lock documents parsed and all149 changed package records retained for structured dependency-scope review, plus all upstream pnpm importer hunks read. Datepicker demos switch Moment to Luxon providers/date values/format strings, remove locale side-effect imports, and month/year selection constructs a new immutable DateTime rather than mutating the existing date. Docs/build/example manifests and path mappings move optional adapter edges. The StackBlitz graph independently refreshes Angular20/CLI/TypeScript/tool transitive dependencies, not only Luxon. No owned LegacyNativeDateAdapter, legacy format map, package peer or lock change is authorized. docs package/StackBlitz assets/components-examples are absent from both maintained closures. The retained root pkg-externals.bzl exists, but its moment locale entries are archival Bazel externals, outside the active pinned ng-packagr pack-library path; keep them unchanged. Do not adopt this demo/provider/tool graph refresh. No execution, installer, vulnerability or arbitrary optional-adapter qualification is claimed."
+      }
     },
     {
       "sha": "dfbdec0bf7702913b4ef42c9d721a7dc0521552f",
@@ -2686,18 +2743,70 @@
       "sha": "b85e5f516677ed774132209288ab49d925d7eef4",
       "bucket": "docs-build-batch-candidate",
       "subject": "docs: add virtual scrolling examples",
-      "final_disposition": "irrelevant",
-      "reason": "The patch adds virtual-scroll table examples and documents escaped column class names. Those files are not in this package.",
-      "read_note_disposition": "not-owned",
+      "final_disposition": "not-applicable",
+      "reason": "Complete sixteen-path patch read, including renamed and deleted examples. Upstream CDK/Material table demos switch to ScrollingModule, use48/52px fixed item sizes, expand data to2500 entries, simplify/remove CDK sticky footer/header markup, add Material sticky header, alter styling/OnPush and register overview/dev-app examples. No table/virtual-scroll/CDK implementation or owned legacy table source is changed. The current demo52px row geometry is not the original legacy row contract and must not be copied. All affected examples/build/overview paths are unshipped; their presence does not qualify virtualization, row recycling, sticky layout, identity, focus or inherited constructors. Record only this bounded unshipped-example source exclusion.",
+      "read_note_disposition": "whole-patch-example-and-tool-graph-source-scope-review",
       "files": [
-        "src/components-examples/cdk/table",
-        "src/cdk/table/table.md"
+        "src/cdk/table/table.md",
+        "src/components-examples/cdk/table/BUILD.bazel",
+        "src/components-examples/cdk/table/cdk-table-virtual-scroll/cdk-table-virtual-scroll-example.css",
+        "src/components-examples/cdk/table/cdk-table-virtual-scroll/cdk-table-virtual-scroll-example.html",
+        "src/components-examples/cdk/table/cdk-table-virtual-scroll/cdk-table-virtual-scroll-example.ts",
+        "src/components-examples/cdk/table/cdk-virtual-flex-table/cdk-virtual-flex-table-example.css",
+        "src/components-examples/cdk/table/cdk-virtual-flex-table/cdk-virtual-flex-table-example.html",
+        "src/components-examples/cdk/table/cdk-virtual-table/cdk-virtual-table-example.css",
+        "src/components-examples/cdk/table/index.ts",
+        "src/components-examples/material/table/index.ts",
+        "src/components-examples/material/table/table-virtual-scroll/table-virtual-scroll-example.css",
+        "src/components-examples/material/table/table-virtual-scroll/table-virtual-scroll-example.html",
+        "src/components-examples/material/table/table-virtual-scroll/table-virtual-scroll-example.ts",
+        "src/dev-app/table/table-demo.html",
+        "src/dev-app/table/table-demo.ts",
+        "src/material/table/table.md"
       ],
-      "evidence_report": "compatibility/rc/reports/docs-build-one-diff.json",
-      "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
-      "recorded_at_utc": "2026-10-01T16:46:41Z",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-virtual-table-and-luxon-demos-source-review.json",
+      "batch_id": "closeout-virtual-table-and-luxon-demos-source-review",
+      "recorded_at_utc": "2026-10-07T03:53:38.848058+00:00",
       "g11_claim": "not-passed",
-      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "prior_dispositions": [
+        {
+          "sha": "b85e5f516677ed774132209288ab49d925d7eef4",
+          "bucket": "docs-build-batch-candidate",
+          "subject": "docs: add virtual scrolling examples",
+          "final_disposition": "irrelevant",
+          "reason": "The patch adds virtual-scroll table examples and documents escaped column class names. Those files are not in this package.",
+          "read_note_disposition": "not-owned",
+          "files": [
+            "src/components-examples/cdk/table",
+            "src/cdk/table/table.md"
+          ],
+          "evidence_report": "compatibility/rc/reports/docs-build-one-diff.json",
+          "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
+          "recorded_at_utc": "2026-10-01T16:46:41Z",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+        }
+      ],
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "source_check": {
+        "diff_sha256": "098e0c67f603529264bc8117118ebfda4b93c442aa66284a13e1ce6f608f88e6",
+        "patch_path": "compatibility/f10/disposition-ledger/evidence/closeout-virtual-table-and-luxon-demos-source-review.json",
+        "review_membership": "b85e5f516677ed774132209288ab49d925d7eef4"
+      },
+      "individual_proof": {
+        "diff_sha256": "098e0c67f603529264bc8117118ebfda4b93c442aa66284a13e1ce6f608f88e6",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main",
+          "21.x"
+        ],
+        "decision": "Complete sixteen-path patch read, including renamed and deleted examples. Upstream CDK/Material table demos switch to ScrollingModule, use48/52px fixed item sizes, expand data to2500 entries, simplify/remove CDK sticky footer/header markup, add Material sticky header, alter styling/OnPush and register overview/dev-app examples. No table/virtual-scroll/CDK implementation or owned legacy table source is changed. The current demo52px row geometry is not the original legacy row contract and must not be copied. All affected examples/build/overview paths are unshipped; their presence does not qualify virtualization, row recycling, sticky layout, identity, focus or inherited constructors. Record only this bounded unshipped-example source exclusion."
+      }
     },
     {
       "sha": "3b8f7f3ec4564c1567059ff590f31e1c49480031",
