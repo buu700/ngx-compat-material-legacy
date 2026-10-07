@@ -1018,6 +1018,7 @@ function sleep(ms: number) {
 
 const checkboxArtifactFactory=(MatLegacyCheckbox as unknown as {ɵfac:()=>MatLegacyCheckbox}).ɵfac;
 const CHECKBOX_NODE_FACTORY_PROBE=new InjectionToken<MatLegacyCheckbox>('closeout-checkbox-node-factory-probe');
+let observingCheckboxArtifactFactory=false;
 
 async function main() {
   // These constructors run outside an injection context, as in the untouched v16 API.
@@ -1036,7 +1037,11 @@ async function main() {
   // A public node provider executes the untouched artifact factory inside a
   // real node context. No Angular private context helper or token is imported.
   TestBed.overrideComponent(MatLegacyCheckbox,{add:{providers:[{
-    provide:CHECKBOX_NODE_FACTORY_PROBE,useFactory:()=>checkboxArtifactFactory(),
+    provide:CHECKBOX_NODE_FACTORY_PROBE,useFactory:()=>{
+      observingCheckboxArtifactFactory=true;
+      try{return checkboxArtifactFactory();}
+      finally{observingCheckboxArtifactFactory=false;}
+    },
   }]}});
   TestBed.configureTestingModule({
     imports: [HarnessHost, SmokeDialogContent, LegacyNativeDateModule, MatLegacyNativeDateModule],
@@ -1280,7 +1285,7 @@ async function main() {
   let checkboxNodeFactoryError:string|null=null;
   let checkboxProbeInstance:MatLegacyCheckbox|undefined;
   environmentProto.get=function(token:unknown,notFound:unknown,flags:unknown){
-    if(nodeGetDepth===0)nodeRequests.push({token,optional:typeof flags==='number'?(flags&8)===8:Boolean(flags&&typeof flags==='object'&&'optional' in flags&&flags.optional)});
+    if(observingCheckboxArtifactFactory&&nodeGetDepth===0)nodeRequests.push({token,optional:typeof flags==='number'?(flags&8)===8:Boolean(flags&&typeof flags==='object'&&'optional' in flags&&flags.optional)});
     nodeGetDepth++;
     try{return environmentGet.call(this,token,notFound,flags);}finally{nodeGetDepth--;}
   };
