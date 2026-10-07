@@ -14,7 +14,10 @@
       "declaration_member": "package/types/table.d.ts",
       "declaration_sha256": "f1981ed3da13cccefbc8ad12a197d27fdbbe1d1712de3a00007224518fb841b5",
       "strategy_selection": "this._viewRepeater = this.recycleRows || this._virtualScrollEnabled() ? new _RecycleViewRepeaterStrategy() : new _DisposeViewRepeaterStrategy();",
-      "view_repeater_is_private": false
+      "state_declarations": [
+        "protected _viewRepeater: _ViewRepeater<T, RenderRow<T>, RowContext<T>>;",
+        "private readonly _viewportRuler;"
+      ]
     },
     {
       "line": "21.x",
@@ -25,13 +28,17 @@
       "declaration_member": "package/types/table.d.ts",
       "declaration_sha256": "87da6f6b6bc01549d46dbd5333921b58b4ad160b1f209047f6c79dc510cb1d12",
       "strategy_selection": "this._viewRepeater = this.recycleRows || this._virtualScrollEnabled() ? new _RecycleViewRepeaterStrategy() : new _DisposeViewRepeaterStrategy();",
-      "view_repeater_is_private": false
+      "state_declarations": [
+        "protected _viewRepeater: _ViewRepeater<T, RenderRow<T>, RowContext<T>>;",
+        "private readonly _viewportRuler;"
+      ]
     }
   ],
-  "constraint": "Current minimum CDK selects its own two strategies at ngAfterContentInit. There is no stable public strategy assignment/injection API equivalent to the original supplied strategy. A signature-only adapter that ignores supplied arguments would conceal lost behavior. Importing or assigning current private strategy state, or forking CDK table, violates supplied implementation rules.",
+  "constraint": "Current minimum CdkTable exposes a protected _viewRepeater field and chooses its default strategies at ngAfterContentInit; custom-strategy preservation through a protected lifecycle adapter needs proof and is not ruled out. The full original twelve-argument constructor also supplies ViewportRuler and a coalesced style scheduler. Current parents obtain their own ViewportRuler through injection and declare viewport/scheduler state private. A signature-only adapter that ignores those supplied objects would conceal lost behavior. Direct current-private token/member use or a CDK fork violates supplied implementation rules. No complete stable-public-only adapter has been established.",
   "proposed_owner_choice": "Either explicitly exclude this original manual-construction path from the published compatibility contract, or retain it and keep release readiness blocked until a compliant implementation exists.",
   "remaining_supported_scope_under_proposal": "Automatic Angular-created legacy tables, public data/render APIs, original boolean input behavior and public recycleRows behavior retain their separate native evidence; no exemption covers other API, DI, source-policy or full audit failures.",
   "approval": "Not granted. No constructor waiver, exception, golden, release baseline or support statement changed.",
   "native_evidence": "table-boolean-input-source-proof.json, table-recycle-row-source-proof.json and native90 constructor/identity cases concern distinct supported paths and do not prove the removed custom strategy contract.",
-  "g11_claim": "not-passed"
+  "g11_claim": "not-passed",
+  "correction": "The earlier rationale incorrectly described _viewRepeater as private/no public assignment route. Both authenticated minimum declarations actually mark it protected. The pending choice concerns the whole original manual construction path; no exclusion or approval is inferred from the corrected rationale."
 }
