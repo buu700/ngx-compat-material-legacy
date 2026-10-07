@@ -399,6 +399,11 @@ def assess_age_exceptions(records: list[dict], excludes: list[str] | None, now: 
             if key in excludes:
                 problems.append(f"{key}: exception expired at {expires_at.isoformat()} but is still in minimumReleaseAgeExclude; remove it")
             continue
+        # Repository claims with missing original authority are actual pending
+        # decisions, not grants. Expired records above still demand exclusion removal.
+        if record.get("classification") != "temporary-exception":
+            problems.append(f"{key}: owner authority pending; original grant has not been authenticated")
+            continue
         if key not in excludes:
             problems.append(f"{key}: exception record is not configured in pnpm-workspace.yaml minimumReleaseAgeExclude")
             continue
