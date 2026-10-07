@@ -5,7 +5,17 @@ from pathlib import Path
 import unittest
 ROOT=Path(__file__).resolve().parents[1]
 PINS={'compatibility/f10/upstream-sha-risk-bootstrap.json':'400e89f53e41975dd5056158c60bdac2e4a2c9dcabaee1204eda782492f5f456','compatibility/f10/authored-dependency-inventory-seed.json':'3e059e3d9ba423b9f666fcf3ec960945cb43555750eb5fa3025a503d3cd8795b','compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json':'6ddec0dcf4fd1c03b648d89d37f3c6e62c6f256d248c38e0e1c8221802e1cdd6'}
+TERMINAL_DISPOSITIONS={'irrelevant','not-applicable','inherited','already-adapted','do-not-adopt','adapt','already-present'}
+def terminal_entries(entries):
+    return [entry for entry in entries if entry.get('final_disposition') in TERMINAL_DISPOSITIONS]
 class CanonicalAuditScopeTests(unittest.TestCase):
+    def test_pending_security_review_is_never_terminal(self):
+        pending=[{'final_disposition':state} for state in ['open','needs-individual-review','security-review','unknown',None]]
+        self.assertEqual(terminal_entries(pending),[])
+        for state in TERMINAL_DISPOSITIONS:
+            row={'final_disposition':state}
+            self.assertEqual(terminal_entries([*pending,row]),[row])
+
     def test_exact_frozen_inputs_and_population(self):
         scope=json.loads((ROOT/'compatibility/f10/canonical-audit-scope.json').read_text())
         self.assertFalse(scope['selects_release_baseline'])
@@ -27,7 +37,7 @@ class CanonicalAuditScopeTests(unittest.TestCase):
         self.assertEqual(manifest['peerDependencies']['@angular/cdk'],'^'+floor['cdk'])
         self.assertEqual(manifest['peerDependencies']['@angular/core'],'^'+floor['framework'])
         if line=='21.x':
-            final=[e for e in ledger['entries'] if e['final_disposition']!='needs-individual-review']
+            final=terminal_entries(ledger['entries'])
             self.assertEqual(ledger['closed_dispositions'],len(final));self.assertEqual(ledger['open_or_deferred'],1697-len(final))
             for entry in final:
                 evidence=json.loads((ROOT/entry['evidence_report']).read_text())
