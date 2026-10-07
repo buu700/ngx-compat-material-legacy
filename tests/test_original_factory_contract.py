@@ -34,6 +34,7 @@ assert.equal(validEmpty.outcome,'returned');assert.equal(validEmpty.error,null);
 assert.equal(invalid.outcome,'threw');assert.match(invalid.error,/not compatible/);
 assert.deepEqual(invalid.requests,[]);assert.deepEqual(validEmpty.requests,[]);
 assert.deepEqual(factoryExecutionProblems('dependencies',validEmpty),[]);
+for(const kind of [undefined,null,'unknown'])assert.match(factoryExecutionProblems(kind,validEmpty)[0],/original factory contract missing/);
 assert.deepEqual(factoryExecutionProblems('invalid',invalid),[]);
 assert.equal(factoryExecutionProblems('dependencies',invalid).length,1);
 assert.equal(factoryExecutionProblems('invalid',validEmpty).length,1);

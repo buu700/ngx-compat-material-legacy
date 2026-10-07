@@ -4,8 +4,8 @@
   "g11_claim": "not-passed",
   "seed_rows": 1697,
   "ledger_rows": 1697,
-  "closed_dispositions": 1692,
-  "open_or_deferred": 5,
+  "closed_dispositions": 1693,
+  "open_or_deferred": 4,
   "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
   "batch_id": "unread-seed-content-review-2026-10-02",
   "entries": [
@@ -609,13 +609,13 @@
       "sha": "622152de761b629a426b744ec2ff3e4e79d18889",
       "bucket": "security-deep",
       "subject": "perf(material/tooltip): Defer injection of injectables not needed until tooltip is shown. (#30440)",
-      "final_disposition": "needs-individual-review",
-      "reason": "The hunk changes current MatTooltip private injections to lazy Injector lookups. Owned MatLegacyTooltip and local _MatTooltipBase retain historical constructor DI, so the optimization is not inherited through current MatTooltip. No fork of current MatTooltip is needed; preserving the old constructor behavior still needs explicit constructor/provider/lifecycle proof and current public injected-service review. Do not claim security clearance from the bootstrap bucket.",
+      "final_disposition": "do-not-adopt",
+      "reason": "Read the complete one-path modern tooltip performance patch individually. It defers Overlay, ScrollDispatcher, ViewContainerRef, scroll strategy and DOCUMENT; AriaDescriber/FocusMonitor remain eager. The legacy directive instead extends the independently owned original base, and its12-argument constructor/super body exactly matches untouched16.2.14. Both authentic minimum peers have since evolved again: ViewContainerRef/DOCUMENT are eager, ScrollDispatcher/scroll strategy stay lazy, and Overlay service creation is replaced by current helper functions. Tag ancestry does not establish identical implementation. Preserve the original legacy constructor and supplied dependency identities; do not transplant the modern injection strategy or mirror its helper API. On both minimum peers the actual packed legacy empty/disabled trigger already holds original service/strategy/document identities and a real node container without creating overlay/portal, and manual construction outside injection context honors all12 supplied objects. All79 packed cases including existing tooltip show/hide pass. This bounded do-not-adopt decision does not qualify every tooltip motion/lifecycle/public-peer dependency, all floors, remaining inherited/private contracts or G11.",
       "read_note_disposition": "not-security",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-security-source-review.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-tooltip-original-constructor-decision.json",
       "files": [],
       "batch_id": "closeout-six-security-source-reads",
-      "recorded_at_utc": "2026-10-06T18:23:24.711579+00:00",
+      "recorded_at_utc": "2026-10-07T05:31:46.905043+00:00",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
       "prior_dispositions": [
@@ -642,12 +642,50 @@
             "decision": "Read upstream patch 622152de761b629a426b744ec2ff3e4e79d18889 (perf(material/tooltip): Defer injection of injectables not needed until tooltip is shown. (#30440)). It touches 1 paths: src/material/tooltip/tooltip.ts. No path is under src/material/legacy- or projects/ngx-material-legacy. Final disposition stays irrelevant. This is a per-commit read of that patch, not a batch close and not security clearance.",
             "proof_kind": "diff-read"
           }
+        },
+        {
+          "sha": "622152de761b629a426b744ec2ff3e4e79d18889",
+          "bucket": "security-deep",
+          "subject": "perf(material/tooltip): Defer injection of injectables not needed until tooltip is shown. (#30440)",
+          "final_disposition": "needs-individual-review",
+          "reason": "The hunk changes current MatTooltip private injections to lazy Injector lookups. Owned MatLegacyTooltip and local _MatTooltipBase retain historical constructor DI, so the optimization is not inherited through current MatTooltip. No fork of current MatTooltip is needed; preserving the old constructor behavior still needs explicit constructor/provider/lifecycle proof and current public injected-service review. Do not claim security clearance from the bootstrap bucket.",
+          "read_note_disposition": "not-security",
+          "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-security-source-review.json",
+          "files": [],
+          "batch_id": "closeout-six-security-source-reads",
+          "recorded_at_utc": "2026-10-06T18:23:24.711579+00:00",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+          "affected_branches": [
+            "main",
+            "21.x"
+          ]
         }
       ],
       "affected_branches": [
         "main",
         "21.x"
-      ]
+      ],
+      "review_depth": "individual-escalated",
+      "source_check": {
+        "diff_sha256": "88aed569f1ec66477351d0df2b277afbfc0a0d6dfd2584d2c61893dd62060b05",
+        "patch_path": "compatibility/f10/disposition-ledger/evidence/closeout-tooltip-original-constructor-decision.json",
+        "review_membership": "622152de761b629a426b744ec2ff3e4e79d18889"
+      },
+      "individual_proof": {
+        "diff_sha256": "88aed569f1ec66477351d0df2b277afbfc0a0d6dfd2584d2c61893dd62060b05",
+        "review_depth": "individual-escalated",
+        "affected_branches": [
+          "main",
+          "21.x"
+        ],
+        "decision": "Read the complete one-path modern tooltip performance patch individually. It defers Overlay, ScrollDispatcher, ViewContainerRef, scroll strategy and DOCUMENT; AriaDescriber/FocusMonitor remain eager. The legacy directive instead extends the independently owned original base, and its12-argument constructor/super body exactly matches untouched16.2.14. Both authentic minimum peers have since evolved again: ViewContainerRef/DOCUMENT are eager, ScrollDispatcher/scroll strategy stay lazy, and Overlay service creation is replaced by current helper functions. Tag ancestry does not establish identical implementation. Preserve the original legacy constructor and supplied dependency identities; do not transplant the modern injection strategy or mirror its helper API. On both minimum peers the actual packed legacy empty/disabled trigger already holds original service/strategy/document identities and a real node container without creating overlay/portal, and manual construction outside injection context honors all12 supplied objects. All79 packed cases including existing tooltip show/hide pass. This bounded do-not-adopt decision does not qualify every tooltip motion/lifecycle/public-peer dependency, all floors, remaining inherited/private contracts or G11.",
+        "proof_kind": "whole-patch-source-and-original-manual-and-node-constructor",
+        "reachable_behavior": {
+          "kind": "executed-delegation",
+          "id": "packed-consumer/harness/tooltip-original-eager-dependencies"
+        }
+      }
     },
     {
       "sha": "1d42431b2fe745602727eda03338c80c8897850a",

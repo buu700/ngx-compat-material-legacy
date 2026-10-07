@@ -59,6 +59,7 @@ export function runFactory(factory, Injector, runInInjectionContext) {
 
 /** Execution evidence cannot be replaced by a matching request-name/count list. */
 export function factoryExecutionProblems(originalKind, factory) {
+  if (!['dependencies','inherited','invalid'].includes(originalKind)) return ['authenticated original factory contract missing'];
   if (originalKind === 'invalid') {
     return factory.outcome === 'threw'
       && /constructor was not compatible with Dependency Injection/.test(factory.error || '')
