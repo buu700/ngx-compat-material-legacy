@@ -9,6 +9,7 @@ import {createRequire} from 'node:module';
 import {fileURLToPath, pathToFileURL} from 'node:url';
 import crypto from 'node:crypto';
 import {ORDERED_CORE_CASES,ORDERED_CORE_CONTRACT,measureOrderedCore,measureOrderedCorePeer} from './sass-ordered-core-contract.mjs';
+import {ORDERED_AGGREGATE_CASES,ORDERED_AGGREGATE_CONTRACT,measureOrderedAggregate,measureOrderedAggregatePeers} from './sass-ordered-aggregate-contract.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -45,7 +46,7 @@ const manifest = JSON.parse(fs.readFileSync(path.join(fixtureDir,'manifest.json'
 const selected = manifest.cases.filter(c => c.comparison === 'strict' || options['--include-bridge']);
 if (!selected.length) throw new Error('No fixtures selected.');
 const reports = []; const hashes = {}; let failures = 0;
-let orderedCorePeer;
+let orderedCorePeer,orderedAggregatePeers;
 fs.mkdirSync(output, {recursive: true});
 for (const c of selected) {
   if (path.basename(c.file) !== c.file || !c.file.endsWith('.scss')) throw new Error('Fixture filenames must be local SCSS files.');
@@ -70,6 +71,12 @@ for (const c of selected) {
       const actual_measurement=measureOrderedCore({id:c.id,source,fixtureFile:sourceFile,result,roots,sass,line});
       orderedCorePeer??=measureOrderedCorePeer({sass,materialRoot:roots[1],cdkRoot:roots[2],line});
       Object.assign(record,{actual_measurement,current_infrastructure:{classification:'conforming-current-infrastructure',contract:ORDERED_CORE_CONTRACT,peer:orderedCorePeer}});
+    }
+    if(targetModule==='@ngx-compat/material-legacy'&&Object.hasOwn(ORDERED_AGGREGATE_CASES,c.id)){
+      const roots=['@ngx-compat/material-legacy','@angular/material','@angular/cdk'].map(pkg=>path.join(env,'node_modules',...pkg.split('/')));
+      const actual_measurement=measureOrderedAggregate({source,fixtureFile:sourceFile,result,roots,sass,line});
+      orderedAggregatePeers??=measureOrderedAggregatePeers({sass,materialRoot:roots[1],cdkRoot:roots[2],line});
+      Object.assign(record,{actual_measurement,current_companion:{classification:'conforming-current-companion',contract:ORDERED_AGGREGATE_CONTRACT,peers:orderedAggregatePeers}});
     }
   } catch (error) {
     failures++;

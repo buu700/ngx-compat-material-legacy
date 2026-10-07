@@ -11,7 +11,8 @@
  * companions, core-theme) are rostered against their sealed CSS the same way.
  * The two root core fixtures have a finite current public CDK contract,
  * preserving complete historical owned CSS. Raw reference differences stay
- * visible. Both supported lines execute this roster; empty debug CSS and DOM
+ * visible. The aggregate fixture has a separate sequence-sensitive whole-CSS
+ * contract. Both supported lines execute this roster; empty debug CSS and DOM
  * are separate checks.
  */
 import {spawnSync} from 'node:child_process';
@@ -19,6 +20,7 @@ import {copyFileSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
 import {dirname, join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {ORDERED_CORE_CASES,ORDERED_CORE_CONTRACT,orderedCoreResultMatches} from './sass-ordered-core-contract.mjs';
+import {ORDERED_AGGREGATE_CASES,ORDERED_AGGREGATE_CONTRACT,orderedAggregateResultMatches} from './sass-ordered-aggregate-contract.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -156,6 +158,14 @@ export function orderedCssResults(report, compiledReport = null) {
     const rows=(report?.files||[]).filter(item=>item.file===`${id}.css`);
     const row=rows.length===1?files.get(`${id}.css`):null;
     const exact = row?.status === 'exact';
+    if(Object.hasOwn(ORDERED_AGGREGATE_CASES,id)&&compiledReport!==null){
+      const records=(compiledReport?.fixtures||[]).filter(item=>item.id===id),record=records.length===1?records[0]:null;
+      const conforming=orderedAggregateResultMatches(row,record),entry=ORDERED_AGGREGATE_CASES[id];
+      return {case_id:id,result:conforming?'pass':'fail',kind:'assertion',status:conforming?'conforming-current-companion':row?.status??'missing',
+        raw_status:row?.status??'missing',baseline_sha256:row?.baseline_sha256??null,candidate_sha256:row?.candidate_sha256??null,
+        fixture:entry.fixture,fixture_sha256:record?.fixture_sha256??null,reference:entry.reference,reference_sha256:entry.reference_sha256,
+        comparison:ORDERED_AGGREGATE_CONTRACT,actual_measurement:record?.actual_measurement??null,current_companion:record?.current_companion??null};
+    }
     if(Object.hasOwn(ORDERED_CORE_CASES,id)&&compiledReport!==null){
       const records=(compiledReport?.fixtures||[]).filter(item=>item.id===id);
       const record=records.length===1?records[0]:null;
@@ -188,7 +198,7 @@ export function writeOrderedCssAssertions(outputDir, results, identity = null) {
       status: item.status,
       baseline_sha256: item.baseline_sha256,
       candidate_sha256: item.candidate_sha256,
-      note: item.comparison===ORDERED_CORE_CONTRACT?'Complete historical owned core CSS with independently measured public CDK contributions;raw golden difference retained.':'Exact ordered CSS against the sealed Material16.2.14 reference. Rendering is checked separately.',
+      note: item.comparison===ORDERED_AGGREGATE_CONTRACT?'Complete historical aggregate sequence with independently measured public contributions;raw golden difference retained.':item.comparison===ORDERED_CORE_CONTRACT?'Complete historical owned core CSS with independently measured public CDK contributions;raw golden difference retained.':'Exact ordered CSS against the sealed Material16.2.14 reference. Rendering is checked separately.',
     }, null, 2)}\n`);
     const name = `${item.case_id}.json`;
     writeFileSync(join(outputDir, name), body);

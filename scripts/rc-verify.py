@@ -40,6 +40,7 @@ from sass_function_admission import function_assertion_ok
 from sass_mixin_argument_admission import mixin_argument_assertion_ok
 from sass_default_core_cdk_admission import DEFAULT_CORE_CDK_CASES, default_core_cdk_envelope_ok
 from sass_ordered_core_admission import ORDERED_CORE_CASES, ordered_core_envelope_ok
+from sass_ordered_aggregate_admission import ORDERED_AGGREGATE_CASES, ordered_aggregate_envelope_ok
 from sass_default_companion_admission import DEFAULT_COMPANION_CASES, default_companion_envelope_ok
 from sass_default_mapped_companion_admission import DEFAULT_MAPPED_COMPANION_CASES, default_mapped_companion_envelope_ok
 from sass_default_aggregate_admission import DEFAULT_AGGREGATE_CASES, default_aggregate_envelope_ok
@@ -1241,7 +1242,7 @@ _SASS_API_PREFIXES = ("variable/", "function/", "mixin/", "mixin-css/", "aggrega
 def _sass_seal_assertion_ok(body: dict, invocation: str) -> bool:
     """sass-api-and-values assertions must bind this run, invocation, library and oracle.
 
-    Root ordered-core ids require their finite whole-CSS artifact contract.
+    Root core and aggregate ids require their finite whole-CSS artifact contracts.
     Other ordered-CSS and isolation-negative ids keep their existing bodies.
     """
     if str(body.get('case_id', '')).startswith(('mixin-argument/', 'owned-aggregate/')):
@@ -1258,6 +1259,8 @@ def _sass_seal_assertion_ok(body: dict, invocation: str) -> bool:
         return default_companion_envelope_ok(ACTIVE_RUN,body,invocation)
     if body.get('case_id') in ORDERED_CORE_CASES:
         return 'current_companion' not in body and ordered_core_envelope_ok(ACTIVE_RUN,body,invocation)
+    if body.get('case_id') in ORDERED_AGGREGATE_CASES:
+        return ordered_aggregate_envelope_ok(ACTIVE_RUN,body,invocation)
     if body.get('case_id') in DEFAULT_CORE_CDK_CASES:
         return 'current_companion' not in body and default_core_cdk_envelope_ok(ACTIVE_RUN,body,invocation)
     if 'current_infrastructure' in body or 'current_companion' in body:return False

@@ -405,6 +405,10 @@ class CoordinatorTests(unittest.TestCase):
                 from sass_ordered_core_fixture import ordered_core_receipt
                 body=ordered_core_receipt(self.run,case_id,invocation)
                 if tarball is not None:body['tarball_sha256']=tarball
+            elif case_id in verify.ORDERED_AGGREGATE_CASES:
+                from sass_ordered_aggregate_fixture import ordered_aggregate_receipt
+                body=ordered_aggregate_receipt(self.run,case_id,invocation)
+                if tarball is not None:body['tarball_sha256']=tarball
             elif case_id in verify.DEFAULT_CORE_CDK_CASES:
                 from sass_default_core_cdk_fixture import default_core_receipt
                 body=default_core_receipt(self.run,case_id,invocation)
