@@ -22,6 +22,7 @@ import {createRequire} from 'node:module';
 import {dirname, join, relative, resolve, isAbsolute} from 'node:path';
 import {fileURLToPath, pathToFileURL} from 'node:url';
 
+import {DEFAULT_CORE_CDK_CASES,defaultCoreCdkResultsMatch,defaultCoreCdkMeasurementOk,DEFAULT_CORE_CDK_CONTRACT} from './sass-default-core-cdk-contract.mjs';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const SILENCE = ['import', 'if-function', 'global-builtin', 'color-functions', 'mixed-decls', 'slash-div'];
 const QUIET = {warn() {}, debug() {}};
@@ -403,10 +404,15 @@ export function compareInventory(oracle, candidate, candidateCss) {
     const got = candidateCss?.[name];
     const failure = !got ? 'candidate invocation missing'
       : got.error ? `candidate invocation failed: ${got.error}`
-        : got.sha256 !== invocation.css_sha256 ? 'compiled CSS differs' : null;
+        : got.current_infrastructure
+          ? (!Object.hasOwn(DEFAULT_CORE_CDK_CASES,`mixin-css/${name}`)
+            || !defaultCoreCdkMeasurementOk(`mixin-css/${name}`,got.actual_measurement,got.actual_measurement?.line)
+            || !defaultCoreCdkResultsMatch(`mixin-css/${name}`,got,got.current_infrastructure) ? 'finite current CDK contract differs' : null)
+          : got.sha256 !== invocation.css_sha256 ? 'compiled CSS differs' : null;
     push(`mixin-css/${name}`, failure, {
       invocable: true, expected_sha256: invocation.css_sha256, expected_bytes: invocation.css_bytes,
       actual_sha256: got?.sha256 ?? null, actual_bytes: got?.css === undefined ? null : Buffer.byteLength(got.css),
+      ...(got?.current_infrastructure?{current_infrastructure:got.current_infrastructure,actual_measurement:got.actual_measurement,comparison:DEFAULT_CORE_CDK_CONTRACT}:{}),
     });
   }
   for (const name of Object.keys(om.mixins).sort()) {
