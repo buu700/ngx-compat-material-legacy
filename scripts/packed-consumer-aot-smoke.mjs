@@ -485,6 +485,7 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
     'packed-consumer/harness/tooltip-original-eager-dependencies': parsed.tooltipOriginalEagerDependencies === true,
     'packed-consumer/harness/cell-definition-original-constructors': parsed.cellDefinitionOriginalConstructors === true,
     'packed-consumer/harness/cell-original-constructors-and-grid-roles': parsed.cellOriginalConstructors === true,
+    'packed-consumer/harness/text-column-original-constructor-options': parsed.textColumnOriginalConstructor === true,
   };
   const owned = declarationKeys(keys)
     .filter(key => key.endsWith('/testing'))
@@ -912,8 +913,8 @@ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
 import {provideNoopAnimations} from '@angular/platform-browser/animations';
 import {Overlay, OverlayContainer} from '@angular/cdk/overlay';
 import {ScrollDispatcher} from '@angular/cdk/scrolling';
-import {CdkCellDef,CdkHeaderCellDef,CdkFooterCellDef,CdkCell,CdkHeaderCell,CdkFooterCell} from '@angular/cdk/table';
-import {MatLegacyTableModule,MatLegacyCellDef,MatLegacyHeaderCellDef,MatLegacyFooterCellDef,MatLegacyColumnDef,MatLegacyCell,MatLegacyHeaderCell,MatLegacyFooterCell} from '@ngx-compat/material-legacy/legacy-table';
+import {CdkCellDef,CdkHeaderCellDef,CdkFooterCellDef,CdkCell,CdkHeaderCell,CdkFooterCell,CdkTextColumn,TEXT_COLUMN_OPTIONS} from '@angular/cdk/table';
+import {MatLegacyTableModule,MatLegacyCellDef,MatLegacyHeaderCellDef,MatLegacyFooterCellDef,MatLegacyColumnDef,MatLegacyCell,MatLegacyHeaderCell,MatLegacyFooterCell,MatLegacyTable,MatLegacyTextColumn} from '@ngx-compat/material-legacy/legacy-table';
 import {Platform} from '@angular/cdk/platform';
 import {Directionality} from '@angular/cdk/bidi';
 import {MatLegacyButtonModule} from '@ngx-compat/material-legacy/legacy-button';
@@ -949,6 +950,7 @@ getTestBed().initTestEnvironment(
 );
 
 const CELL_DEF_NODE_INJECTOR=new InjectionToken<Injector>('closeout-cell-def-node-injector');
+const ORIGINAL_TEXT_OPTIONS=Object.freeze({defaultHeaderTextTransform:(name:string)=>'Header '+name,defaultDataAccessor:(data:any,name:string)=>'Cell '+data[name]});
 
 @Component({
   standalone: true,
@@ -1018,8 +1020,13 @@ class SmokeDialogContent {}
     </mat-menu>
     <button mat-button id="snack-open">Snack</button>
     <button mat-button matTooltip="Tip text" id="tip">Hover</button>
+    <table mat-table id="constructor-text-table" [dataSource]="[{value:'value'}]">
+      <mat-text-column name="value"></mat-text-column>
+      <tr mat-header-row *matHeaderRowDef="['value']"></tr>
+      <tr mat-row *matRowDef="let row; columns:['value']"></tr>
+    </table>
     <mat-table id="constructor-grid" role="grid" [dataSource]="[{value:'Grid value'}]">
-      <ng-container matColumnDef="constructor-probe">
+      <ng-container #constructorGridColumn matColumnDef="constructor-probe">
         <mat-header-cell *matHeaderCellDef>Grid header</mat-header-cell>
         <mat-cell *matCellDef="let row">{{row.value}}</mat-cell>
         <mat-footer-cell *matFooterCellDef>Grid footer</mat-footer-cell>
@@ -1039,7 +1046,7 @@ class SmokeDialogContent {}
   \`,
 })
 class HarnessHost {
-  @ViewChild(MatLegacyColumnDef,{static:true}) gridColumn!:MatLegacyColumnDef;
+  @ViewChild('constructorGridColumn',{read:MatLegacyColumnDef,static:true}) gridColumn!:MatLegacyColumnDef;
   @ViewChild('manualCellTemplate',{read:MatLegacyCellDef,static:true}) cellDefinition!:MatLegacyCellDef;
   @ViewChild('manualHeaderTemplate',{read:MatLegacyHeaderCellDef,static:true}) headerDefinition!:MatLegacyHeaderCellDef;
   @ViewChild('manualFooterTemplate',{read:MatLegacyFooterCellDef,static:true}) footerDefinition!:MatLegacyFooterCellDef;
@@ -1112,7 +1119,7 @@ async function main() {
   }
   TestBed.configureTestingModule({
     imports: [HarnessHost, SmokeDialogContent, LegacyNativeDateModule, MatLegacyNativeDateModule],
-    providers: [provideNoopAnimations(), {provide: MAT_LEGACY_DATE_LOCALE, useValue: 'en-GB'}],
+    providers: [provideNoopAnimations(), {provide: MAT_LEGACY_DATE_LOCALE, useValue: 'en-GB'}, {provide:TEXT_COLUMN_OPTIONS,useValue:ORIGINAL_TEXT_OPTIONS}],
   });
   const provided = TestBed.inject(LegacyDateAdapter);
   const nativeDateProvider = provided instanceof LegacyNativeDateAdapter &&
@@ -1180,6 +1187,28 @@ async function main() {
   }
   const cellOriginalConstructors=cellConstructorObservation.length===3
     &&cellConstructorObservation.every(row=>Object.entries(row).every(([name,value])=>name==='name'||value===true));
+  const textTableNode=fixture.debugElement.query(node=>node.nativeElement?.id==='constructor-text-table');
+  const textTable=textTableNode.injector.get(MatLegacyTable);
+  const textColumnNode=fixture.debugElement.query(node=>node.nativeElement?.matches?.('#constructor-text-table mat-text-column'));
+  const nodeTextColumn=textColumnNode.injector.get(MatLegacyTextColumn);
+  const manualTextColumn=new MatLegacyTextColumn(textTable,ORIGINAL_TEXT_OPTIONS);
+  const manualTextFields=manualTextColumn as any;
+  const textColumnObservation={
+    manual_owned_identity:manualTextColumn instanceof MatLegacyTextColumn,
+    manual_peer_identity:manualTextColumn instanceof CdkTextColumn,
+    parent_constructor_identity:Object.getPrototypeOf(MatLegacyTextColumn)===CdkTextColumn,
+    manual_table_identity:manualTextFields._table===textTable,
+    manual_options_identity:manualTextFields._options===ORIGINAL_TEXT_OPTIONS,
+    default_justify:manualTextColumn.justify==='start',
+    node_table_identity:(nodeTextColumn as any)._table===textTable,
+    node_options_identity:(nodeTextColumn as any)._options===ORIGINAL_TEXT_OPTIONS,
+    custom_header:nodeTextColumn.headerText==='Header value',
+    custom_accessor:nodeTextColumn.dataAccessor({value:'value'},'value')==='Cell value',
+    rendered_header:fixture.nativeElement.querySelector('#constructor-text-table th')?.textContent.trim()==='Header value',
+    rendered_cell:fixture.nativeElement.querySelector('#constructor-text-table td')?.textContent.trim()==='Cell value',
+    options_unmutated:Object.isFrozen(ORIGINAL_TEXT_OPTIONS)&&Object.keys(ORIGINAL_TEXT_OPTIONS).length===2,
+  };
+  const textColumnOriginalConstructor=Object.values(textColumnObservation).every(value=>value===true);
   const eagerNode=fixture.debugElement.query(element=>element.nativeElement?.id==='tooltip-eager');
   const eagerTooltip=eagerNode.injector.get(MatLegacyTooltip);
   // These are owned original16 fields, not current private peer imports. Check
@@ -1498,7 +1527,7 @@ async function main() {
       selectOpened === true &&
       selectClosed === true &&
       tabCount === 2 &&
-      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors,
+      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor,
     buttonText: text,
     selectIsOpen: isOpen,
     dialogText,
@@ -1528,6 +1557,7 @@ async function main() {
     tooltipOriginalEagerDependencies, tooltipEagerObservation,
     cellDefinitionOriginalConstructors, cellDefinitionObservation,
     cellOriginalConstructors, cellConstructorObservation,
+    textColumnOriginalConstructor, textColumnObservation,
     checkboxAttribute, slideToggleAttribute, sliderAttribute, tabLinkAttribute,
     commonModuleDiagnostics:{contrastLifecycle,contrastProbeReads,sanityWarnings,checksEnabled,sanityDefault:TestBed.inject(MATERIAL_LEGACY_SANITY_CHECKS),sanityToken:String(MATERIAL_LEGACY_SANITY_CHECKS)},
     chipEventCounts:{removals:fixture.componentInstance.repeatRemovals,separators:fixture.componentInstance.repeatEnds},

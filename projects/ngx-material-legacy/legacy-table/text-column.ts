@@ -1,13 +1,15 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
 
-import {CdkTextColumn} from '@angular/cdk/table';
-import {ChangeDetectionStrategy, Component, ViewEncapsulation} from '@angular/core';
+import {CdkTable, CdkTextColumn, TEXT_COLUMN_OPTIONS, type TextColumnOptions} from '@angular/cdk/table';
+import {constructLegacyCell} from './internal/construct-legacy-cell';
+import {ChangeDetectionStrategy, Component, Inject, Optional, ViewEncapsulation} from '@angular/core';
 
 /**
  * Column that simply shows text content for the header and row cells. Assumes that the table
@@ -47,4 +49,12 @@ import {ChangeDetectionStrategy, Component, ViewEncapsulation} from '@angular/co
   // tslint:disable-next-line:validate-decorators
   changeDetection: ChangeDetectionStrategy.Default,
 })
-export class MatLegacyTextColumn<T> extends CdkTextColumn<T> {}
+export class MatLegacyTextColumn<T> extends CdkTextColumn<T> {
+  // @ts-expect-error TS2377: valid derived object return preserves manual arguments.
+  constructor(@Optional() table: CdkTable<T>, @Optional() @Inject(TEXT_COLUMN_OPTIONS) options: TextColumnOptions<T>) {
+    return constructLegacyCell(CdkTextColumn<T>, new.target, [
+      {provide: CdkTable, useValue: table},
+      {provide: TEXT_COLUMN_OPTIONS, useValue: options},
+    ]);
+  }
+}
