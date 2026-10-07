@@ -140,7 +140,7 @@ export function assertionBodies({dimensionCases, oracleCases}, ctx) {
     peer_version: ctx.identity.version,
     peer_package_json_sha256: ctx.identity.package_json_sha256,
     oracle: 'current peer components themed by the peer M2 theme (mat.m2-define-*-theme + mat.<companion>-theme), compiled from the consumer peer only, rendered in the same Chromium page and DOM as the candidate',
-    candidate: 'packed library legacy.all-current-companion-bridges for the same theme inputs',
+    candidate: 'packed library public companion theme mixins and separate legacy.all-current-companion-bridges for the same theme inputs',
     oracle_css_sha256: ctx.oracleCssSha256,
     candidate_css_sha256: ctx.candidateCssSha256,
     tarball_sha256: ctx.tarballSha256,
@@ -638,7 +638,7 @@ function pageHelpers(bindings) {
   }
   function setClass(el, cls) {
     if (!el) return;
-    for (const name of [...el.classList]) if (name.startsWith('ccs-oracle-') || name.startsWith('ccs-candidate-')) el.classList.remove(name);
+    for (const name of [...el.classList]) if (name.startsWith('ccs-oracle-') || name.startsWith('ccs-candidate-') || name.startsWith('ccs-bridge-')) el.classList.remove(name);
     if (cls) el.classList.add(cls);
   }
   window.__ccs = {
@@ -819,7 +819,7 @@ async function observe({send, evaluate}, bindings, sentinels) {
   }
   const byScenario = {};
   for (const binding of bindings) for (const scenario of binding.scenarios) (byScenario[scenario] ||= []).push(binding.id);
-  const observations = Object.fromEntries(bindings.map((b) => [b.id, {oracle: {}, candidate: {}, negative: null, unthemed: null}]));
+  const observations = Object.fromEntries(bindings.map((b) => [b.id, {oracle: {}, candidate: {}, bridge: {}, negative: null, unthemed: null}]));
   const applied = {};
   const frame = () => evaluate('new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(() => r(true))))');
   let viewport = 'wide';
@@ -834,7 +834,7 @@ async function observe({send, evaluate}, bindings, sentinels) {
     const spec = SCENARIOS[scenario];
     if (!spec) throw new Error(`unknown scenario ${scenario}`);
     await setViewport(spec.viewport);
-    for (const mode of ['oracle', 'candidate']) {
+    for (const mode of ['oracle', 'candidate', 'bridge']) {
       applied[`${mode}:${scenario}`] = await evaluate(`window.__ccs.apply(${JSON.stringify(mode)}, ${JSON.stringify(spec)})`);
       await frame();
       const values = await evaluate(`window.__ccs.read(${JSON.stringify(ids)})`);

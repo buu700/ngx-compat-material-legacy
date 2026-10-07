@@ -21,6 +21,7 @@ import tempfile
 import shutil
 import uuid
 from contextlib import contextmanager
+from functools import lru_cache
 
 # Script and unittest/importlib execution both resolve this local helper.
 if str(Path(__file__).resolve().parent) not in sys.path:
@@ -808,7 +809,26 @@ def _library_artifact_sha256() -> str | None:
             return digest if isinstance(digest, str) and digest else None
     return None
 
+@lru_cache(maxsize=1)
+def _computed_binding_roster() -> dict:
+    """Canonical consuming elements and required contexts, independent of report input."""
+    module = Path(__file__).resolve().with_name("companion-computed-cases.mjs").as_uri()
+    result = subprocess.run(
+        ["node", "--input-type=module", "-e",
+         f"import {{BINDINGS}} from {json.dumps(module)}; console.log(JSON.stringify(BINDINGS));"],
+        capture_output=True, text=True, check=True,
+    )
+    return {binding["id"]: binding for binding in json.loads(result.stdout)}
+
+
 def _computed_rendered_case_ok(body: dict, case_id: str, component: str, dimension: str) -> bool:
+    try:
+        binding = _computed_binding_roster().get(case_id)
+    except (OSError, ValueError, subprocess.SubprocessError):
+        return False
+    if binding is None or any(body.get(key) != binding.get(key) for key in
+                              ("companion", "dimension", "element", "property", "token", "locate")):
+        return False
     element, prop = body.get("element"), body.get("property")
     if not all(isinstance(v, str) and v for v in (element, prop)):
         return False
@@ -824,6 +844,8 @@ def _computed_rendered_case_ok(body: dict, case_id: str, component: str, dimensi
     scenarios = body.get("scenarios")
     if not isinstance(scenarios, list) or not scenarios:
         return False
+    if [row.get("scenario") if isinstance(row, dict) else None for row in scenarios] != binding["scenarios"]:
+        return False
     seen = set()
     for scenario in scenarios:
         if not isinstance(scenario, dict) or scenario.get("match") is not True:
@@ -833,13 +855,13 @@ def _computed_rendered_case_ok(body: dict, case_id: str, component: str, dimensi
             return False
         seen.add(name)
         oracle = scenario.get("oracle")
-        if not (isinstance(oracle, str) and oracle.strip() and scenario.get("candidate") == oracle):
+        if not (isinstance(oracle, str) and oracle.strip() and scenario.get("candidate") == oracle and scenario.get("bridge") == oracle):
             return False
         # A token the peer declares with a CSS-wide keyword has no computed value of its own.
         if keyword is None and not (isinstance(scenario.get("oracle_token"), str) and scenario["oracle_token"].strip()):
             return False
     negative = body.get("negative")
-    if not isinstance(negative, dict):
+    if not isinstance(negative, dict) or negative.get("scenario") != binding["negative_scenario"]:
         return False
     if negative.get("sentinel_consumed") is not True or negative.get("mismatch_detected") is not True:
         return False

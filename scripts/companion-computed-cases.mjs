@@ -469,10 +469,10 @@ export function oracleScss() {
   return `@use '@angular/material' as mat;\n${themeSass('mat', {m2Prefix: 'm2-'})}\n${rules.join('\n')}\n`;
 }
 
-/** Candidate stylesheet: the public legacy bridge aggregate for the same theme inputs. */
+/** Candidate stylesheet: named public themes and the separate bridge aggregate. */
 export function candidateScss(moduleUrl = '@ngx-compat/material-legacy') {
   const rules = Object.keys(THEMES).map((name) =>
-    `.ccs-candidate-${name} { @include legacy.all-current-companion-bridges($ccs-theme-${name}); }`);
+    `.ccs-candidate-${name} { ${COMPANIONS.map((c) => `@include legacy.${c}-theme($ccs-theme-${name});`).join(' ')} }\n.ccs-bridge-${name} { @include legacy.all-current-companion-bridges($ccs-theme-${name}); }`);
   return `@use '${moduleUrl}' as legacy with ($theme-ignore-duplication-warnings: true);\n${themeSass('legacy', {m2Prefix: ''})}\n${rules.join('\n')}\n`;
 }
 
@@ -678,19 +678,24 @@ export function assessCase(binding, obs, sentinel, {peerKeyword = null} = {}) {
   for (const scenario of binding.scenarios) {
     const o = obs?.oracle?.[scenario];
     const c = obs?.candidate?.[scenario];
+    const b = obs?.bridge?.[scenario];
     const row = {
       scenario,
       oracle: o?.value ?? null,
       candidate: c?.value ?? null,
+      bridge: b?.value ?? null,
+      bridge_token: b?.token_value ?? null,
       oracle_token: o?.token_value ?? null,
       candidate_token: c?.token_value ?? null,
       match: false,
     };
     if (!o?.found) reasons.push(`${scenario}: oracle consuming element not rendered`);
     else if (!c?.found) reasons.push(`${scenario}: candidate consuming element not rendered`);
+    else if (!b?.found) reasons.push(`${scenario}: bridge consuming element not rendered`);
     else if (!nonEmpty(o.token_value) && !keyword) reasons.push(`${scenario}: peer oracle does not define ${binding.token} on the consuming element`);
     else if (!nonEmpty(o.value)) reasons.push(`${scenario}: oracle computed ${binding.property} is empty`);
     else if (o.value !== c.value) reasons.push(`${scenario}: candidate ${binding.property} ${JSON.stringify(c.value)} != peer ${JSON.stringify(o.value)}`);
+    else if (o.value !== b.value) reasons.push(`${scenario}: bridge ${binding.property} ${JSON.stringify(b.value)} != peer ${JSON.stringify(o.value)}`);
     else row.match = true;
     scenarios.push(row);
   }
