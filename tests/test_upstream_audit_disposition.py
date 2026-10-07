@@ -202,7 +202,7 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
             seed = directory / "seed.json"
             seed.write_text(json.dumps({"commits": [{"sha": sha}]}))
             symbols = directory / "symbols.json"
-            symbols.write_text(json.dumps({"status": "closed", "symbol_uses": [{"disposition": "closed", "status": "reviewed"}]}))
+            symbols.write_text(json.dumps({"status": "closed", "symbol_uses": [{**row, "disposition": "closed", "status": "reviewed"} for row in json.loads((ROOT / "compatibility/f10/authored-dependency-inventory-seed.json").read_text())["symbol_uses"]]}))
             for label, line, remove_proof, expected in [("main", "main", False, 0), ("wrong-line", "21.x", False, 1), ("missing-proof", "main", True, 1)]:
                 candidate = json.loads(json.dumps(entry))
                 if remove_proof:
@@ -227,7 +227,7 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
             symbols = directory / "symbols.json"
             symbols.write_text(json.dumps({
                 "status": "closed",
-                "symbol_uses": [{"disposition": "closed", "status": "reviewed"}],
+                "symbol_uses": [{**row, "disposition": "closed", "status": "reviewed"} for row in json.loads((ROOT / "compatibility/f10/authored-dependency-inventory-seed.json").read_text())["symbol_uses"]],
             }))
             common = {
                 "sha": sha,
@@ -255,6 +255,16 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
             self.assertEqual(admitted_summary["security_clearance"], "not-passed")
             self.assertEqual(admitted_summary["g11_claim"], "not-passed")
             self.assertEqual(admitted_summary["insufficient_inherited"], 0)
+
+            complete_symbols = json.loads(symbols.read_text())
+            for label, uses in [('empty', []), ('missing', complete_symbols['symbol_uses'][1:]), ('duplicate', complete_symbols['symbol_uses'] + [complete_symbols['symbol_uses'][0]])]:
+                broken_symbols = directory / (label + '-symbols.json')
+                broken_symbols.write_text(json.dumps({'status':'closed','symbol_uses':uses}))
+                broken = run_checker(seed, admitted, directory / (label + '-roster-report.json'), admission=True, line='main', symbols=broken_symbols)
+                summary = json.loads(broken.stdout)
+                self.assertNotEqual(broken.returncode, 0, label)
+                self.assertFalse(summary['authored_use_inventory']['complete'], label)
+                self.assertEqual(summary['disposition_admission'], 'incomplete', label)
 
             ancestry = directory / "ancestry.json"
             ancestry.write_text(json.dumps({
@@ -299,6 +309,22 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
                     summary = json.loads(run_checker(SEED, path, directory / f"{label}-report.json").stdout)
                     self.assertEqual(summary["missing_evidence"] + summary["circular_evidence"], 1, label)
 
+    def assert_table_transform_superseding_review(self, entry):
+        import hashlib
+        self.assertEqual(entry['sha'], 'dd04fe910c4587f11cd37b1d0b216e4a56cac2e3')
+        self.assertEqual(entry['final_disposition'], 'already-adapted')
+        report = json.loads((ROOT / entry['evidence_report']).read_text())
+        self.assertEqual(report['sha'], entry['sha'])
+        self.assertEqual(report['decision'], entry['reason'])
+        self.assertEqual(set(report['affected_branches']), {'main','21.x'})
+        self.assertEqual(report['diff_sha256'], 'f8afee9dc0580e3103aaf8ee84161f026523be24b21bbbd22be6bc82dab87460')
+        self.assertEqual(hashlib.sha256((ROOT / report['patch_file']).read_bytes()).hexdigest(), report['diff_sha256'])
+        self.assertEqual(set(report['path_reviews']), {'src/cdk/table/cell.ts','src/cdk/table/table.ts','tools/public_api_guard/cdk/table.md'})
+        self.assertEqual(report['g11_claim'], 'not-passed')
+        for line in ['main','21.x']:
+            self.assertEqual(report['native_receipts'][line]['packed_cases'], 88)
+        self.assertEqual(entry['individual_proof']['diff_sha256'], report['diff_sha256'])
+
     def test_mechanical_evidence_and_join_are_per_sha_and_change_no_disposition(self) -> None:
         ledger = {e["sha"]: e for e in json.loads(LEDGER.read_text())["entries"]}
         join = json.loads(JOIN.read_text())
@@ -313,6 +339,11 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
             evidence_path = path.relative_to(ROOT).as_posix()
             if entry["evidence_report"] != evidence_path:
                 # Retain immutable earlier observations; a later semantic review supersedes them.
+                if entry['sha'] == 'dd04fe910c4587f11cd37b1d0b216e4a56cac2e3':
+                    prior = entry['superseded_closeout_source_judgments']
+                    self.assertTrue(any(row.get('evidence_report') == evidence_path and row.get('final_disposition') == body['final_disposition'] for row in prior))
+                    self.assert_table_transform_superseding_review(entry)
+                    continue
                 prior = entry.get("prior_dispositions", [])
                 self.assertTrue(any(row.get("evidence_report") == evidence_path
                                     and row.get("final_disposition") == body["final_disposition"] for row in prior))
@@ -397,6 +428,10 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
         self.assertTrue(inherited.issubset(rows))
         for sha in set(rows) - inherited:
             entry = next(row for row in ledger if row["sha"] == sha)
+            if entry['sha'] == 'dd04fe910c4587f11cd37b1d0b216e4a56cac2e3':
+                self.assertTrue(any(row.get('final_disposition') == 'inherited' for row in entry['superseded_closeout_source_judgments']))
+                self.assert_table_transform_superseding_review(entry)
+                continue
             self.assertTrue(any(row.get("final_disposition") == "inherited"
                                 for row in entry.get("prior_dispositions", [])))
             self.assertEqual(entry["final_disposition"], "not-applicable")
@@ -423,8 +458,10 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
         # This mechanical observation cannot create individual proofs for its
         # member rows. Separate fresh reviews outside this roster can execute
         # behavior probes and record their own immutable source/artifact scope.
-        self.assertFalse(any((e.get("individual_proof") or {}).get("reachable_behavior")
-                             for e in ledger if e["sha"] in rows))
+        independent = [e for e in ledger if e['sha'] in rows and (e.get('individual_proof') or {}).get('reachable_behavior')]
+        self.assertEqual({e['sha'] for e in independent}, {'dd04fe910c4587f11cd37b1d0b216e4a56cac2e3'})
+        for entry in independent:
+            self.assert_table_transform_superseding_review(entry)
 
 
 if __name__ == "__main__":

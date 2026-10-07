@@ -7,7 +7,7 @@ class UpstreamPatchBinding(unittest.TestCase):
     def test_inline_archived_and_negative_patch_subjects(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);(root/'scripts').mkdir();(root/'evidence').mkdir()
-            for name in ('check-upstream-audit-disposition.mjs','upstream-advisory-admission.mjs'):
+            for name in ('check-upstream-audit-disposition.mjs','upstream-advisory-admission.mjs','authored-use-inventory.mjs'):
                 shutil.copyfile(ROOT/'scripts'/name,root/'scripts'/name)
             sha='1'*40
             patch='diff --git a/doc.md b/doc.md\n--- a/doc.md\n+++ b/doc.md\n@@ -1 +1 @@\n-old\n+new\n'
@@ -19,7 +19,10 @@ class UpstreamPatchBinding(unittest.TestCase):
                  'evidence_report':'evidence/review.json','individual_proof':proof}
             def write(name,body):(root/name).write_text(json.dumps(body))
             write('seed.json',{'commits':[{'sha':sha}]})
-            write('symbols.json',{'status':'closed','symbol_uses':[]})
+            reference=ROOT/'compatibility/f10/authored-dependency-inventory-seed.json'
+            (root/'compatibility/f10').mkdir(parents=True)
+            shutil.copyfile(reference,root/'compatibility/f10/authored-dependency-inventory-seed.json')
+            write('symbols.json',{'status':'closed','symbol_uses':[{**row,'disposition':'closed','status':'reviewed'} for row in json.loads(reference.read_text())['symbol_uses']]})
             write('ledger.json',{'g11_claim':'not-passed','entries':[row]})
             def check(body,ok):
                 write('evidence/review.json',body)
