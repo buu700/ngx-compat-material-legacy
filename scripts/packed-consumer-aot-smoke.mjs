@@ -1236,6 +1236,8 @@ async function main() {
     prototype_identity:Object.getPrototypeOf(manualNoDataRow)===MatLegacyNoDataRow.prototype,
     parent_constructor_identity:Object.getPrototypeOf(MatLegacyNoDataRow)===CdkNoDataRow,
     explicit_legacy_initialization:JSON.stringify(manualNoDataRow._contentClassNames)===JSON.stringify(['mat-no-data-row']),
+    historical_member:manualNoDataRow._contentClassName==='mat-no-data-row'
+      &&nodeNoDataRow._contentClassName==='mat-no-data-row',
     node_template_anchor:nodeNoDataRow.templateRef.elementRef.nativeElement===suppliedNoDataTemplate.elementRef.nativeElement,
     embedded_view_text:noDataView.rootNodes.map(node=>node.textContent||'').join('').trim()==='Empty grid probe',
     rendered_legacy_row:false};
