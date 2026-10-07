@@ -9,6 +9,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 MATRIX = ROOT / "compatibility/rc/matrices/full-verify.json"
+SCENARIO_IDS = ["contract", "alternate", "closeout-custom-2018-light", "closeout-custom-2018-dark", "closeout-custom-legacy-light", "closeout-custom-legacy-dark"]
 HAS_PEER = (ROOT / "node_modules/@angular/material/_index.scss").is_file() and (ROOT / "node_modules/sass").exists()
 
 
@@ -38,12 +39,42 @@ console.log(JSON.stringify(compareTokens(input)));
     def compare(self, peer, candidate, sources=None):
         token = "--mat-toolbar-container-background-color"
         sources = {token: {"file": "toolbar/_m2-toolbar.scss", "sha256": "a" * 64}} if sources is None else sources
-        return node_json(self.SCRIPT, {"caseIds": [token], "peer": {"contract": peer},
-                                       "candidate": {"contract": candidate}, "sources": sources})[0]
+        return node_json(self.SCRIPT, {"caseIds": [token], "peer": {name: peer for name in SCENARIO_IDS},
+                                       "candidate": {name: candidate for name in SCENARIO_IDS}, "sources": sources})[0]
 
     def test_equal_value_passes(self):
         decls = {":root": {"--mat-toolbar-container-background-color": "white"}}
         self.assertEqual(self.compare(decls, decls)["result"], "pass")
+
+    def test_every_required_scenario_and_rich_custom_override_is_measured(self):
+        token="--mat-toolbar-container-background-color"
+        decls={":root":{token:"white"}}
+        peer={name:decls for name in SCENARIO_IDS}
+        sources={token:{"file":"toolbar/_m2-toolbar.scss","sha256":"a"*64}}
+        complete={"caseIds":[token],"peer":peer,"candidate":peer,"sources":sources}
+        self.assertEqual(node_json(self.SCRIPT,complete)[0]["result"],"pass")
+        for name in SCENARIO_IDS:
+            missing={key:value for key,value in peer.items() if key!=name}
+            for side in ("peer","candidate"):
+                report=node_json(self.SCRIPT,{**complete,side:missing})[0]
+                self.assertEqual(report["result"],"fail",(side,name))
+                self.assertEqual([row["id"] for row in report["scenarios"]],SCENARIO_IDS)
+        self.assertEqual(node_json(self.SCRIPT,{**complete,"peer":{},"candidate":{}})[0]["result"],"fail")
+        extra={**peer,"unreviewed":{" :root":{token:"white"}}}
+        self.assertEqual(node_json(self.SCRIPT,{**complete,"candidate":extra})[0]["result"],"fail")
+        wrong={**peer,SCENARIO_IDS[-1]:{":root":{token:"whitesmoke"}}}
+        self.assertEqual(node_json(self.SCRIPT,{**complete,"candidate":wrong})[0]["result"],"fail")
+        scenarios=node_json("""
+import {SCENARIOS} from './scripts/companion-bridge-peer-oracle.mjs';
+console.log(JSON.stringify(SCENARIOS));
+""",None)
+        self.assertEqual([row["id"] for row in scenarios],SCENARIO_IDS)
+        for row in scenarios[2:]:
+            self.assertEqual(row["primary"],["indigo","700","200","900","300"])
+            self.assertEqual(row["warn"],["red","900"])
+            self.assertEqual(row["density"],"-2")
+            self.assertTrue(row["customTypography"])
+            self.assertEqual(row["fontFamily"],"Legacy Family" if row["typography"]=="legacy" else "Custom Family")
 
     def test_wrong_but_nonempty_value_fails(self):
         case = self.compare({":root": {"--mat-toolbar-container-background-color": "white"}},
@@ -139,6 +170,7 @@ console.log(JSON.stringify({
         component = sample["component"]
         self.assertEqual(sample["peer_source_file"], f"{component}/_m2-{component}.scss")
         self.assertEqual(sample["candidate"], sample["expected_peer"])
+        self.assertEqual([row["id"] for row in sample["scenarios"]],SCENARIO_IDS)
 
     def test_deliberately_wrong_token_fails_only_its_case(self):
         self.assertEqual(self.out["wrongFailed"], ["--mat-toolbar-container-background-color"])

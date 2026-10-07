@@ -49,6 +49,19 @@ export const SCENARIOS = [
     typography: '2018',
     density: '-2',
   },
+  // Same non-default hues and complete typography overrides as the immutable
+  // Material16 configurable-mixin probes, through independent peer constructors.
+  ...['2018', 'legacy'].flatMap(typography => ['light', 'dark'].map(type => ({
+    id: `closeout-custom-${typography}-${type}`,
+    type,
+    primary: ['indigo', '700', '200', '900', '300'],
+    accent: ['pink', 'A200', 'A100', 'A400'],
+    warn: ['red', '900'],
+    typography,
+    fontFamily: typography === 'legacy' ? 'Legacy Family' : 'Custom Family',
+    customTypography: true,
+    density: '-2',
+  }))),
 ];
 
 const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex');
@@ -95,14 +108,20 @@ function themeSass(ns, scenario, {m2Prefix}) {
     const args = [`${ns}.$${m2Prefix}${name}-palette`, ...hues].join(', ');
     return `${ns}.${m2Prefix}define-palette(${args})`;
   };
+  const level = scenario.customTypography
+    ? `$closeout-level: ${ns}.${m2Prefix}define-typography-level(19px, 27px, 600, 'Closeout Font', 0.03em);\n`
+    : '';
+  const typeArgs = scenario.customTypography
+    ? `$font-family: '${scenario.fontFamily}', $body-1: $closeout-level, $button: $closeout-level`
+    : '';
   const typography = scenario.typography === 'legacy'
-    ? `${ns}.${m2Prefix}define-legacy-typography-config()`
-    : `${ns}.${m2Prefix}define-typography-config()`;
+    ? `${ns}.${m2Prefix}define-legacy-typography-config(${typeArgs})`
+    : `${ns}.${m2Prefix}define-typography-config(${typeArgs})`;
   return `
 $primary: ${pal(scenario.primary)};
 $accent: ${pal(scenario.accent)};
 $warn: ${pal(scenario.warn)};
-$theme: ${ns}.${m2Prefix}define-${scenario.type}-theme((
+${level}$theme: ${ns}.${m2Prefix}define-${scenario.type}-theme((
   color: (primary: $primary, accent: $accent, warn: $warn),
   typography: ${typography},
   density: ${scenario.density}
@@ -187,11 +206,15 @@ export function peerSourceFor(materialRoot, component, key) {
  */
 export function compareTokens({caseIds, peer, candidate, sources}) {
   const cases = [];
+  const requiredScenarios = SCENARIOS.map(scenario => scenario.id);
+  const complete = [peer, candidate].every(measurements =>
+    Object.keys(measurements).length === requiredScenarios.length
+      && requiredScenarios.every(id => Object.hasOwn(measurements, id)));
   for (const token of caseIds) {
     const scenarios = [];
-    let ok = Boolean(sources[token]);
-    for (const scenarioId of Object.keys(peer)) {
-      const p = peer[scenarioId];
+    let ok = Boolean(sources[token]) && complete;
+    for (const scenarioId of requiredScenarios) {
+      const p = peer[scenarioId] || {};
       const c = candidate[scenarioId] || {};
       const selectors = new Set();
       for (const [sel, decls] of Object.entries(p)) if (token in decls) selectors.add(sel);
