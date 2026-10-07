@@ -75,6 +75,15 @@ $calendar-weekday-table-font-size: 11px !default;
   // Calendar previous/next buttons stay at density -2 regardless of the theme density.
   .mat-calendar-controls {
     @include icon-button-theme.density(-2);
+    // The historical density declarations share selectors with current public
+    // icon buttons. Keep their fallback geometry without masking peer overrides.
+    .mat-mdc-icon-button.mat-mdc-button-base {
+      width: var(--mat-icon-button-state-layer-size, var(--mdc-icon-button-state-layer-size));
+      height: var(--mat-icon-button-state-layer-size, var(--mdc-icon-button-state-layer-size));
+      .mat-mdc-button-touch-target {
+        display: var(--mat-icon-button-touch-target-display, none);
+      }
+    }
   }
 }
 
