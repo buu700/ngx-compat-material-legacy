@@ -549,7 +549,7 @@ async function main() {
   }
 
   const orderedCss = runOrderedCss(consumer);
-  const orderedCssOk = orderedCss.ok;
+  const orderedCssExact = orderedCss.exact;
   const orderedClassified = classifyPending(orderedCss.results.map(item => ({
     ...item, expected_sha256: item.baseline_sha256, actual_sha256: item.candidate_sha256,
   })), decisions);
@@ -566,7 +566,7 @@ async function main() {
   // Every required API/ordered case must pass. Pending decisions are not
   // acceptance and must also make the child exit nonzero.
   const ok = functions.ok && functions.mixin_arguments?.ok === true && functions.mixin_arguments?.owned_aggregates?.ok === true && ownedRenderedOk && compiled && !compileError && isolationOk && valuesOk && materialRequested && unexplained.length === 0
-    && orderedCss.compile_status === 0 && sassResultsComplete(apiResults,apiIds)
+    && orderedCss.ok && sassResultsComplete(apiResults,apiIds)
     && sassResultsComplete(orderedClassified,ORDERED_CSS_FIXTURE_IDS);
 
 
@@ -605,7 +605,7 @@ async function main() {
     if (!outputDir.endsWith(join('evidence', 'sass-seal', invocation))) {
       fail(2, 'sass-seal: assertion directory is not check-owned');
     }
-    writeOrderedCssAssertions(outputDir, results);
+    writeOrderedCssAssertions(outputDir, results,{runId,invocationId:invocation,binding,tarballSha256:tarballSha});
     writeIsolationNegativeAssertions(outputDir, isolationResults);
     const identity = {
       oracleSha256: sha256Text(oracleText), tarballSha256: tarballSha, runId, invocationId: invocation, binding,
@@ -668,7 +668,8 @@ async function main() {
     result: ok ? 'pass' : 'fail',
     ordered_css_case_ids: ORDERED_CSS_FIXTURE_IDS,
     ordered_css_results: orderedCss.results,
-    ordered_css_exact: orderedCssOk,
+    ordered_css_exact: orderedCssExact,
+    ordered_css_conforming: orderedCss.ok,
     owned_rendered_ok: ownedRenderedOk,
     owned_rendered_cases: Object.fromEntries(Object.values(ownedRendered.results || {}).map(r => [r.case_id,r.result])),
     owned_rendered_error: ownedRendered.error ?? null,
@@ -702,6 +703,7 @@ async function main() {
     },
     limitations: [
       'Seals packed facade compile, three sealed value fixtures, the authentic 16.2.14 Sass API inventory (variables, signatures, invoked mixin CSS, aggregate membership/order) and every non-debug ordered-CSS fixture under exact public peers.',
+      'Two root core fixtures preserve whole historical owned CSS around independently measured public CDK contributions;raw golden differences stay visible and do not exempt other cases.',
       'Expected sets are predeclared from the frozen oracle and the fixture manifest. Sealed CSS was not rewritten. A failing case matching a pending decision digest pair is reported pending and writes no assertion; it is not a pass.',
       'Executes four main isolation negatives: archived @material/button rejection, a mutated sealed CSS copy, a hidden load-path resolution, and API drift.',
       'Empty debug CSS is covered by the value seal. Ten real owned-control DOM probes compare tagged CSS under default/custom-map, disabled/invalid, action-color and inherited typography contexts.',
@@ -720,7 +722,8 @@ async function main() {
     ok,
     compiled,
     sealed_values_match: valuesOk,
-    ordered_css_exact: orderedCssOk,
+    ordered_css_exact: orderedCssExact,
+    ordered_css_conforming: orderedCss.ok,
     owned_rendered_ok: ownedRenderedOk,
     owned_rendered_cases: Object.fromEntries(Object.values(ownedRendered.results || {}).map(r => [r.case_id,r.result])),
     owned_rendered_error: ownedRendered.error ?? null,

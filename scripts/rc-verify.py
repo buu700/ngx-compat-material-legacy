@@ -39,6 +39,7 @@ from migration_frontend_admission import frontend_assertion_ok
 from sass_function_admission import function_assertion_ok
 from sass_mixin_argument_admission import mixin_argument_assertion_ok
 from sass_default_core_cdk_admission import DEFAULT_CORE_CDK_CASES, default_core_cdk_envelope_ok
+from sass_ordered_core_admission import ORDERED_CORE_CASES, ordered_core_envelope_ok
 from m3_rendered_admission import complete_rendered_checks
 from consumer_floor_admission import floor_assertion_ok, floor_support_records
 
@@ -1048,6 +1049,8 @@ def _sass_seal_assertion_ok(body: dict, invocation: str) -> bool:
         return function_assertion_ok(ROOT, ACTIVE_RUN, body, invocation)
     if str(body.get('case_id', '')).startswith('owned-style/'):
         return owned_rendered_ok(ROOT, ACTIVE_RUN, body, invocation)
+    if body.get('case_id') in ORDERED_CORE_CASES:
+        return ordered_core_envelope_ok(ACTIVE_RUN,body,invocation)
     if body.get('case_id') in DEFAULT_CORE_CDK_CASES:
         return default_core_cdk_envelope_ok(ACTIVE_RUN,body,invocation)
     if 'current_infrastructure' in body:return False
