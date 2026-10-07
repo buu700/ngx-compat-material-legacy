@@ -37,6 +37,10 @@ export const HARNESS_CASE_IDS = [
   'packed-consumer/harness/form-field-token-isolation',
   'packed-consumer/harness/progress-bar-location-and-defaults',
   'packed-consumer/harness/common-module-sanity-and-contrast',
+  'packed-consumer/harness/checkbox-tabindex-attribute',
+  'packed-consumer/harness/slide-toggle-tabindex-attribute',
+  'packed-consumer/harness/slider-tabindex-attribute',
+  'packed-consumer/harness/tab-link-tabindex-attribute',
   'packed-consumer/harness/owned-resolution',
   'packed-consumer/harness/peer-harness-separate-scope',
 ];

@@ -476,6 +476,10 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
     'packed-consumer/harness/form-field-token-isolation': parsed.formFieldTokenIsolation === true,
     'packed-consumer/harness/progress-bar-location-and-defaults': parsed.progressLocationAndDefaults === true,
     'packed-consumer/harness/common-module-sanity-and-contrast': parsed.commonModuleBehavior === true,
+    'packed-consumer/harness/checkbox-tabindex-attribute': parsed.checkboxAttribute === true,
+    'packed-consumer/harness/slide-toggle-tabindex-attribute': parsed.slideToggleAttribute === true,
+    'packed-consumer/harness/slider-tabindex-attribute': parsed.sliderAttribute === true,
+    'packed-consumer/harness/tab-link-tabindex-attribute': parsed.tabLinkAttribute === true,
   };
   const owned = declarationKeys(keys)
     .filter(key => key.endsWith('/testing'))
@@ -905,7 +909,10 @@ import {MatLegacySnackBar, MatLegacySnackBarModule} from '@ngx-compat/material-l
 import {MatLegacySnackBarHarness} from '@ngx-compat/material-legacy/legacy-snack-bar/testing';
 import {MatLegacyTooltipModule} from '@ngx-compat/material-legacy/legacy-tooltip';
 import {MatLegacyTooltipHarness} from '@ngx-compat/material-legacy/legacy-tooltip/testing';
-import {MatLegacyTabsModule} from '@ngx-compat/material-legacy/legacy-tabs';
+import {MatLegacyTabsModule, MatLegacyTabLink} from '@ngx-compat/material-legacy/legacy-tabs';
+import {MatLegacyCheckbox, MatLegacyCheckboxModule} from '@ngx-compat/material-legacy/legacy-checkbox';
+import {MatLegacySlideToggle, MatLegacySlideToggleModule} from '@ngx-compat/material-legacy/legacy-slide-toggle';
+import {MatLegacySlider, MatLegacySliderModule} from '@ngx-compat/material-legacy/legacy-slider';
 import {MatLegacyProgressBar, MatLegacyProgressBarModule, MAT_LEGACY_PROGRESS_BAR_LOCATION, MAT_LEGACY_PROGRESS_BAR_LOCATION_FACTORY, MAT_LEGACY_PROGRESS_BAR_DEFAULT_OPTIONS} from '@ngx-compat/material-legacy/legacy-progress-bar';
 import {MAT_PROGRESS_BAR_DEFAULT_OPTIONS} from '@angular/material/progress-bar';
 import {MatLegacyChipsModule} from '@ngx-compat/material-legacy/legacy-chips';
@@ -939,6 +946,9 @@ class SmokeDialogContent {}
     MatLegacyChipsModule,
     MatLegacyRadioModule,
     MatLegacyProgressBarModule,
+    MatLegacyCheckboxModule,
+    MatLegacySlideToggleModule,
+    MatLegacySliderModule,
   ],
   providers: [
     {provide: MAT_LEGACY_PROGRESS_BAR_LOCATION, useValue: {getPathname:()=>'/legacy-location(path)?query=1#ignored'}},
@@ -947,6 +957,10 @@ class SmokeDialogContent {}
   template: \`
     <button mat-button id="h">Go</button>
     <mat-chip id="attribute-chip" tabindex="6">Attribute chip</mat-chip>
+    <mat-checkbox id="attribute-checkbox" tabindex="7">Attribute checkbox</mat-checkbox>
+    <mat-slide-toggle id="attribute-toggle" tabindex="9">Attribute toggle</mat-slide-toggle>
+    <mat-slider id="attribute-slider" tabindex="11"></mat-slider>
+    <nav mat-tab-nav-bar><a mat-tab-link id="attribute-tab-link" tabindex="13">Attribute link</a></nav>
     <mat-chip-list #repeatChipList>
       <mat-chip id="repeat-first">First chip</mat-chip>
       <mat-chip id="repeat-last" (removed)="repeatRemovals=repeatRemovals+1">Last chip</mat-chip>
@@ -1126,6 +1140,15 @@ async function main() {
     &&[liveDefault,liveExplicit,liveEmpty].every(el=>el.getAttribute('aria-atomic')==='true')
     &&manualError.getAttribute('aria-live')==='polite'&&explicitManualError.getAttribute('aria-live')==='assertive';
   const byId=(id:string)=>fixture.debugElement.query(element=>element.nativeElement?.id===id);
+  const checkboxAttribute=byId('attribute-checkbox').injector.get(MatLegacyCheckbox).tabIndex===7
+    &&(fixture.nativeElement.querySelector('#attribute-checkbox input') as HTMLInputElement).tabIndex===7;
+  const slideToggleAttribute=byId('attribute-toggle').injector.get(MatLegacySlideToggle).tabIndex===9
+    &&(fixture.nativeElement.querySelector('#attribute-toggle input') as HTMLInputElement).tabIndex===9;
+  const sliderAttribute=byId('attribute-slider').injector.get(MatLegacySlider).tabIndex===11
+    &&(fixture.nativeElement.querySelector('#attribute-slider') as HTMLElement).tabIndex===11;
+  const tabLinkAttribute=byId('attribute-tab-link').injector.get(MatLegacyTabLink).tabIndex===13
+    &&(fixture.nativeElement.querySelector('#attribute-tab-link') as HTMLElement).tabIndex===13;
+
   const fieldNode=byId('token-field'),prefixNode=byId('token-prefix'),suffixNode=byId('token-suffix');
   const field=fieldNode.injector.get(MatLegacyFormField);
   const formFieldTokenIsolation=new Set<unknown>([MAT_LEGACY_FORM_FIELD,MAT_LEGACY_ERROR,MAT_LEGACY_PREFIX,MAT_LEGACY_SUFFIX,MAT_FORM_FIELD,MAT_ERROR,MAT_PREFIX,MAT_SUFFIX]).size===8
@@ -1238,7 +1261,7 @@ async function main() {
       selectOpened === true &&
       selectClosed === true &&
       tabCount === 2 &&
-      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior,
+      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute,
     buttonText: text,
     selectIsOpen: isOpen,
     dialogText,
@@ -1261,6 +1284,7 @@ async function main() {
     formFieldTokenIsolation,
     progressLocationAndDefaults,
     commonModuleBehavior,
+    checkboxAttribute, slideToggleAttribute, sliderAttribute, tabLinkAttribute,
     commonModuleDiagnostics:{contrastLifecycle,contrastProbeReads,sanityWarnings,checksEnabled,sanityDefault:TestBed.inject(MATERIAL_LEGACY_SANITY_CHECKS),sanityToken:String(MATERIAL_LEGACY_SANITY_CHECKS)},
     chipEventCounts:{removals:fixture.componentInstance.repeatRemovals,separators:fixture.componentInstance.repeatEnds},
     harnesses: [
