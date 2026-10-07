@@ -62,7 +62,15 @@ def mixin_receipt(root,active,case,invocation):
         from sass_progress_color_alias_admission import PROGRESS_COLOR_ALIAS_CASES, _SOURCES
         from sass_badge_shape_admission import BADGE_SHAPE_CASES, _CATALOG as badge_catalog
         from sass_datepicker_controls_admission import DATEPICKER_CONTROLS_CASES, _CATALOG as controls_catalog
-        if case in DATEPICKER_CONTROLS_CASES:
+        from sass_aggregate_density_admission import AGGREGATE_DENSITY_CASES
+        if case in AGGREGATE_DENSITY_CASES:
+            fixture=json.loads((Path(__file__).parent/'sass_aggregate_density_fixture.json').read_bytes())
+            line=body['line'];original=fixture['originals'][case];actual=fixture['candidate_inputs'][case+'-'+line]
+            for role,value in [('expected',original),('actual',actual)]:body[role].update(css=value,css_sha256=hashlib.sha256(value.encode()).hexdigest(),css_bytes=len(value.encode()))
+            body['current_companion']=dict(classification='conforming-current-companion',contract='historical-density-aggregate-with-qualified-tail',peers=copy.deepcopy(fixture['peers'][line]))
+            body['comparison']='current-companion-contract'
+            wrong=actual+'\n.wrong-nonempty-mixin { color: red; }\n';body['mutation']=dict(css=wrong,css_sha256=hashlib.sha256(wrong.encode()).hexdigest(),css_bytes=len(wrong.encode()))
+        elif case in DATEPICKER_CONTROLS_CASES:
             fixture=json.loads((Path(__file__).parent/'sass_datepicker_controls_fixture.json').read_bytes())
             original=fixture['originals'][case];actual=fixture['candidate_inputs'][case];line=body['line'];peer=fixture['peers'][case+'-'+line];entry=DATEPICKER_CONTROLS_CASES[case]['peers'][line]
             for role,value in [('expected',original),('actual',actual)]:body[role].update(css=value,css_sha256=hashlib.sha256(value.encode()).hexdigest(),css_bytes=len(value.encode()))
