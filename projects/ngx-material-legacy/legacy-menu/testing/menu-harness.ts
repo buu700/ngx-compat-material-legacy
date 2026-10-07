@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -15,8 +16,6 @@ import {_MatMenuHarnessBase, _MatMenuItemHarnessBase} from './menu-harness-base'
 
 /**
  * Harness for interacting with a standard mat-menu in tests.
- * @deprecated Use `MatMenuHarness` from `@angular/material/menu/testing` instead.
- * @breaking-change 17.0.0
  */
 export class MatLegacyMenuHarness extends _MatMenuHarnessBase<
   typeof MatLegacyMenuItemHarness,
@@ -37,8 +36,6 @@ export class MatLegacyMenuHarness extends _MatMenuHarnessBase<
 
 /**
  * Harness for interacting with a standard mat-menu-item in tests.
- * @deprecated Use `MatMenuItemHarness` from `@angular/material/menu/testing` instead.
- * @breaking-change 17.0.0
  */
 export class MatLegacyMenuItemHarness extends _MatMenuItemHarnessBase<
   typeof MatLegacyMenuHarness,

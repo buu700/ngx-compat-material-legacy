@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -40,8 +41,6 @@ import {_MatTooltipBase, _TooltipComponentBase} from './internal/tooltip-base';
  *
  * https://material.io/design/components/tooltips.html
  *
- * @deprecated Use `MatTooltip` from `@angular/material/tooltip` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Directive({
   standalone: false,
@@ -89,8 +88,6 @@ export class MatLegacyTooltip extends _MatTooltipBase<LegacyTooltipComponent> {
 /**
  * Internal component that wraps the tooltip's content.
  * @docs-private
- * @deprecated Use `TooltipComponent` from `@angular/material/tooltip` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Component({
   standalone: false,

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -31,8 +32,6 @@ import {
 /**
  * The portal host directive for the contents of the tab.
  * @docs-private
- * @deprecated Use `MatTabBodyPortal` from `@angular/material/tabs` instead.
- * @breaking-change 17.0.0
  */
 @Directive({
   standalone: false,
@@ -76,8 +75,6 @@ export class MatLegacyTabBodyPortal extends CdkPortalOutlet {
 /**
  * Wrapper for the contents of a tab.
  * @docs-private
- * @deprecated Use `MatTabBody` from `@angular/material/tabs` instead.
- * @breaking-change 17.0.0
  */
 @Component({
   standalone: false,

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -20,8 +21,6 @@ import {_MAT_INK_BAR_POSITIONER, _MatInkBarPositioner} from './internal/ink-bar-
 /**
  * The ink-bar is used to display and animate the line underneath the current active tab label.
  * @docs-private
- * @deprecated Use `MatInkBar` from `@angular/material/tabs` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Directive({
   standalone: false,

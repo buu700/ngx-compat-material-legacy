@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -40,29 +41,21 @@ import {take, takeUntil} from 'rxjs/operators';
 
 /**
  * The max height of the select's overlay panel.
- * @deprecated Use `SELECT_PANEL_MAX_HEIGHT` from `@angular/material/select` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export const SELECT_PANEL_MAX_HEIGHT = 256;
 
 /**
  * The panel's padding on the x-axis.
- * @deprecated Use `SELECT_PANEL_PADDING_X` from `@angular/material/select` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export const SELECT_PANEL_PADDING_X = 16;
 
 /**
  * The panel's x axis padding if it is indented (e.g. there is an option group).
- * @deprecated Use `SELECT_PANEL_INDENT_PADDING_X` from `@angular/material/select` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export const SELECT_PANEL_INDENT_PADDING_X = SELECT_PANEL_PADDING_X * 2;
 
 /**
  * The height of the select items in `em` units.
- * @deprecated Use `SELECT_ITEM_HEIGHT_EM` from `@angular/material/select` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export const SELECT_ITEM_HEIGHT_EM = 3;
 
@@ -76,23 +69,17 @@ export const SELECT_ITEM_HEIGHT_EM = 3;
  * The padding is multiplied by 1.5 because the checkbox's margin is half the padding.
  * The checkbox width is 16px.
  *
- * @deprecated Use `SELECT_MULTIPLE_PANEL_PADDING_X` from `@angular/material/select` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export const SELECT_MULTIPLE_PANEL_PADDING_X = SELECT_PANEL_PADDING_X * 1.5 + 16;
 
 /**
  * The select panel will only "fit" inside the viewport if it is positioned at
  * this value or more away from the viewport boundary.
- * @deprecated Use `SELECT_PANEL_VIEWPORT_PADDING` from `@angular/material/select` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export const SELECT_PANEL_VIEWPORT_PADDING = 8;
 
 /**
  * Change event object that is emitted when the select value has changed.
- * @deprecated Use `MatSelectChange` from `@angular/material/select` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export class MatLegacySelectChange {
   constructor(
@@ -103,16 +90,11 @@ export class MatLegacySelectChange {
   ) {}
 }
 
-/**
- * @deprecated Use `MatSelectConfig` from `@angular/material/select` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
- */
+
 export type MatLegacySelectConfig = Omit<MatSelectConfig, 'panelWidth'>;
 
 /**
  * Allows the user to customize the trigger that is displayed when the select has a value.
- * @deprecated Use `MatSelectTrigger` from `@angular/material/select` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Directive({
   standalone: false,
@@ -121,10 +103,7 @@ export type MatLegacySelectConfig = Omit<MatSelectConfig, 'panelWidth'>;
 })
 export class MatLegacySelectTrigger {}
 
-/**
- * @deprecated Use `MatSelect` from `@angular/material/select` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
- */
+
 @Component({
   standalone: false,
   selector: 'mat-select',

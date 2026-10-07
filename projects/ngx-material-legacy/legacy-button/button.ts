@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -61,8 +62,6 @@ const _MatButtonBase = mixinColor(
 
 /**
  * Material design button.
- * @deprecated Use `MatButton` from `@angular/material/button` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Component({
   selector: `button[mat-button], button[mat-raised-button], button[mat-icon-button],
@@ -156,8 +155,6 @@ export class MatLegacyButton
 
 /**
  * Material design anchor button.
- * @deprecated Use `MatAnchor` from `@angular/material/button` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Component({
   selector: `a[mat-button], a[mat-raised-button], a[mat-icon-button], a[mat-fab],

@@ -87,8 +87,6 @@ const INDETERMINATE_ANIMATION_TEMPLATE = `
 
 /**
  * `<mat-progress-spinner>` component.
- * @deprecated Use `MatProgressSpinner` from `@angular/material/progress-spinner` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Component({
   standalone: false,

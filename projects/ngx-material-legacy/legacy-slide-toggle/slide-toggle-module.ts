@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -13,10 +14,7 @@ import {MatCommonModule} from './internal/common-module';
 import {MatLegacySlideToggle} from './slide-toggle';
 import {_MatSlideToggleRequiredValidatorModule} from './internal/slide-toggle-required-validator';
 
-/**
- * @deprecated Use `MatSlideToggleModule` from `@angular/material/slide-toggle` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
- */
+
 @NgModule({
   imports: [
     _MatSlideToggleRequiredValidatorModule,

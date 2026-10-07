@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -12,8 +13,6 @@ import {_MatCheckboxHarnessBase} from './checkbox-harness-base';
 
 /**
  * Harness for interacting with a standard mat-checkbox in tests.
- * @deprecated Use `MatCheckboxHarness` from `@angular/material/checkbox/testing` instead.
- * @breaking-change 17.0.0
  */
 export class MatLegacyCheckboxHarness extends _MatCheckboxHarnessBase {
   static hostSelector = '.mat-checkbox';

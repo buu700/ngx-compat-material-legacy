@@ -28,30 +28,18 @@ export {
 } from './internal/autocomplete-trigger-base';
 export {
 
-  /**
-   * @deprecated Use `MAT_AUTOCOMPLETE_DEFAULT_OPTIONS` from `@angular/material/autocomplete` instead.
-   * @breaking-change 17.0.0
-   */
+
   MAT_AUTOCOMPLETE_DEFAULT_OPTIONS as MAT_LEGACY_AUTOCOMPLETE_DEFAULT_OPTIONS,
 
-  /**
-   * @deprecated Use `MAT_AUTOCOMPLETE_SCROLL_STRATEGY` from `@angular/material/autocomplete` instead.
-   * @breaking-change 17.0.0
-   */
+
   MAT_AUTOCOMPLETE_SCROLL_STRATEGY as MAT_LEGACY_AUTOCOMPLETE_SCROLL_STRATEGY,
 
-  /**
-   * @deprecated Use `MatAutocompleteDefaultOptions` from `@angular/material/autocomplete` instead.
-   * @breaking-change 17.0.0
-   */
+
   MatAutocompleteDefaultOptions as MatLegacyAutocompleteDefaultOptions,
 } from '@angular/material/autocomplete';
 export {MatCommonModule} from './internal/common-module';
 
 export {
-  /**
-   * @deprecated Use `getMatAutocompleteMissingPanelError` from `@angular/material/autocomplete` instead.
-   * @breaking-change 17.0.0
-   */
+
   getMatAutocompleteMissingPanelError as getMatLegacyAutocompleteMissingPanelError,
 } from './owned-errors';

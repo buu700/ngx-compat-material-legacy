@@ -25,8 +25,6 @@ import {
 /**
  * Cell definition for the mat-table.
  * Captures the template of a column's data row cell as well as cell-specific properties.
- * @deprecated Use `MatCellDef` from `@angular/material/table` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Directive({
   standalone: false,
@@ -45,8 +43,6 @@ export class MatLegacyCellDef extends CdkCellDef {
 /**
  * Header cell definition for the mat-table.
  * Captures the template of a column's header cell and as well as cell-specific properties.
- * @deprecated Use `MatHeaderCellDef` from `@angular/material/table` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Directive({
   standalone: false,
@@ -65,8 +61,6 @@ export class MatLegacyHeaderCellDef extends CdkHeaderCellDef {
 /**
  * Footer cell definition for the mat-table.
  * Captures the template of a column's footer cell and as well as cell-specific properties.
- * @deprecated Use `MatFooterCellDef` from `@angular/material/table` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Directive({
   standalone: false,
@@ -85,8 +79,6 @@ export class MatLegacyFooterCellDef extends CdkFooterCellDef {
 /**
  * Column definition for the mat-table.
  * Defines a set of cells available for a table column.
- * @deprecated Use `MatColumnDef` from `@angular/material/table` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Directive({
   standalone: false,
@@ -140,8 +132,6 @@ export class MatLegacyColumnDef extends CdkColumnDef {
 
 /**
  * Header cell template container that adds the right classes and role.
- * @deprecated Use `MatHeaderCell` from `@angular/material/table` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Directive({
   standalone: false,
@@ -163,8 +153,6 @@ export class MatLegacyHeaderCell extends CdkHeaderCell {
 
 /**
  * Footer cell template container that adds the right classes and role.
- * @deprecated Use `MatFooterCell` from `@angular/material/table` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Directive({
   standalone: false,
@@ -186,8 +174,6 @@ export class MatLegacyFooterCell extends CdkFooterCell {
 
 /**
  * Cell template container that adds the right classes and role.
- * @deprecated Use `MatCell` from `@angular/material/table` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Directive({
   standalone: false,

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -13,8 +14,6 @@ import {_MatSlideToggleHarnessBase} from './slide-toggle-harness-base';
 
 /**
  * Harness for interacting with a standard mat-slide-toggle in tests.
- * @deprecated Use `MatSlideToggleHarness` from `@angular/material/slide-toggle/testing` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export class MatLegacySlideToggleHarness extends _MatSlideToggleHarnessBase {
   private _inputContainer = this.locatorFor('.mat-slide-toggle-bar');

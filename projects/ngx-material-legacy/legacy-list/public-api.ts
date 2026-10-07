@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -24,16 +25,10 @@ export {
 } from './selection-list';
 
 export {
-  /**
-   * @deprecated Use `MAT_LIST` from `@angular/material/list` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
-   * @breaking-change 17.0.0
-   */
+
   MAT_LIST as MAT_LEGACY_LIST,
 
-  /**
-   * @deprecated Use `MAT_NAV_LIST` from `@angular/material/list` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
-   * @breaking-change 17.0.0
-   */
+
   MAT_NAV_LIST as MAT_LEGACY_NAV_LIST,
 } from '@angular/material/list';
 export {MatCommonModule} from './internal/common-module';

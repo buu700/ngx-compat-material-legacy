@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -10,8 +11,6 @@ import {BaseHarnessFilters} from '@angular/cdk/testing';
 
 /**
  * A set of criteria that can be used to filter a list of `MatSelectHarness` instances.
- * @deprecated Use `SelectHarnessFilters` from `@angular/material/select/testing` instead.
- * @breaking-change 17.0.0
  */
 export interface LegacySelectHarnessFilters extends BaseHarnessFilters {
   /** Only find instances which match the given disabled state. */

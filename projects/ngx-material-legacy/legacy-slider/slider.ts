@@ -69,8 +69,6 @@ const MIN_VALUE_ACTIVE_THUMB_GAP = 10;
  * Provider Expression that allows mat-slider to register as a ControlValueAccessor.
  * This allows it to support [(ngModel)] and [formControl].
  * @docs-private
- * @deprecated Use `MAT_SLIDER_VALUE_ACCESSOR` from `@angular/material/slider` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export const MAT_LEGACY_SLIDER_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
@@ -80,8 +78,6 @@ export const MAT_LEGACY_SLIDER_VALUE_ACCESSOR: any = {
 
 /**
  * A simple change event emitted by the MatSlider component.
- * @deprecated Use `MatSliderChange` from `@angular/material/slider` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export class MatLegacySliderChange {
   /** The MatSlider that changed. */
@@ -107,8 +103,6 @@ const _MatSliderBase = mixinTabIndex(
 /**
  * Allows users to select from a range of values by moving the slider thumb. It is similar in
  * behavior to the native `<input type="range">` element.
- * @deprecated Use `MatSlider` from `@angular/material/slider` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Component({
   standalone: false,

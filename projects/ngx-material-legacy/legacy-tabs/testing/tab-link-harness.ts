@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -11,8 +12,6 @@ import {LegacyTabLinkHarnessFilters} from './tab-harness-filters';
 
 /**
  * Harness for interacting with a standard Angular Material tab link in tests.
- * @deprecated Use `MatTabLinkHarness` from `@angular/material/tabs/testing` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 export class MatLegacyTabLinkHarness extends ComponentHarness {
   /** The selector for the host element of a `MatTabLink` instance. */

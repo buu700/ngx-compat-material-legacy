@@ -41,10 +41,7 @@ const _MatListBase = mixinDisabled(mixinDisableRipple(class {}));
 /** @docs-private */
 const _MatListItemMixinBase = mixinDisableRipple(class {});
 
-/**
- * @deprecated Use `MatNavList` from `@angular/material/list` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
- */
+
 @Component({
   standalone: false,
   selector: 'mat-nav-list',
@@ -76,10 +73,7 @@ export class MatLegacyNavList
   }
 }
 
-/**
- * @deprecated Use `MatList` from `@angular/material/list` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
- */
+
 @Component({
   standalone: false,
   selector: 'mat-list, mat-action-list',
@@ -136,8 +130,6 @@ export class MatLegacyList
 /**
  * Directive whose purpose is to add the mat- CSS styling to this selector.
  * @docs-private
- * @deprecated Use `MatListAvatarCssMatStyler` from `@angular/material/list` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Directive({
   standalone: false,
@@ -149,8 +141,6 @@ export class MatLegacyListAvatarCssMatStyler {}
 /**
  * Directive whose purpose is to add the mat- CSS styling to this selector.
  * @docs-private
- * @deprecated Use `MatListIconCssMatStyler` from `@angular/material/list` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Directive({
   standalone: false,
@@ -162,8 +152,6 @@ export class MatLegacyListIconCssMatStyler {}
 /**
  * Directive whose purpose is to add the mat- CSS styling to this selector.
  * @docs-private
- * @deprecated Use `MatListSubheaderCssMatStyler` from `@angular/material/list` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Directive({
   standalone: false,
@@ -174,8 +162,6 @@ export class MatLegacyListSubheaderCssMatStyler {}
 
 /**
  * An item within a Material Design list.
- * @deprecated Use `MatListItem` from `@angular/material/list` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.
- * @breaking-change 17.0.0
  */
 @Component({
   standalone: false,

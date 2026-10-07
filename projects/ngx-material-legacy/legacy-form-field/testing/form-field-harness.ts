@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -19,8 +20,6 @@ import {_MatFormFieldHarnessBase} from './form-field-harness-base';
 
 /**
  * Possible harnesses of controls which can be bound to a form-field.
- * @deprecated Use `FormFieldControlHarness` from `@angular/material/form-field/testing` instead.
- * @breaking-change 17.0.0
  */
 export type LegacyFormFieldControlHarness =
   | MatLegacyInputHarness
@@ -30,8 +29,6 @@ export type LegacyFormFieldControlHarness =
 
 /**
  * Harness for interacting with a standard Material form-field's in tests.
- * @deprecated Use `MatFormFieldHarness` from `@angular/material/form-field/testing` instead.
- * @breaking-change 17.0.0
  */
 export class MatLegacyFormFieldHarness extends _MatFormFieldHarnessBase<
   LegacyFormFieldControlHarness,

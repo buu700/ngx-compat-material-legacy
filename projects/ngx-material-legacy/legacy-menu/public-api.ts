@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -22,52 +23,28 @@ export {
   MENU_PANEL_TOP_PADDING as LEGACY_MENU_PANEL_TOP_PADDING,
 } from './internal/menu-trigger-base';
 export {
-  /**
-   * @deprecated Use `MAT_MENU_DEFAULT_OPTIONS` from `@angular/material/menu` instead.
-   * @breaking-change 17.0.0
-   */
+
   MAT_MENU_DEFAULT_OPTIONS as MAT_LEGACY_MENU_DEFAULT_OPTIONS,
 
-  /**
-   * @deprecated Use `MAT_MENU_PANEL` from `@angular/material/menu` instead.
-   * @breaking-change 17.0.0
-   */
+
   MAT_MENU_PANEL as MAT_LEGACY_MENU_PANEL,
 
-  /**
-   * @deprecated Use `MAT_MENU_SCROLL_STRATEGY` from `@angular/material/menu` instead.
-   * @breaking-change 17.0.0
-   */
+
   MAT_MENU_SCROLL_STRATEGY as MAT_LEGACY_MENU_SCROLL_STRATEGY,
 
-  /**
-   * @deprecated Use `MatMenuDefaultOptions` from `@angular/material/menu` instead.
-   * @breaking-change 17.0.0
-   */
+
   MatMenuDefaultOptions as MatLegacyMenuDefaultOptions,
 
-  /**
-   * @deprecated Use `MatMenuPanel` from `@angular/material/menu` instead.
-   * @breaking-change 17.0.0
-   */
+
   MatMenuPanel as MatLegacyMenuPanel,
 
-  /**
-   * @deprecated Use `MenuPositionX` from `@angular/material/menu` instead.
-   * @breaking-change 17.0.0
-   */
+
   MenuPositionX as LegacyMenuPositionX,
 
-  /**
-   * @deprecated Use `MenuPositionY` from `@angular/material/menu` instead.
-   * @breaking-change 17.0.0
-   */
+
   MenuPositionY as LegacyMenuPositionY,
 
-  /**
-   * @deprecated Use `MAT_MENU_CONTENT` from `@angular/material/menu` instead.
-   * @breaking-change 17.0.0
-   */
+
   MAT_MENU_CONTENT as MAT_LEGACY_MENU_CONTENT,
 } from '@angular/material/menu';
 export {MatCommonModule} from './internal/common-module';
