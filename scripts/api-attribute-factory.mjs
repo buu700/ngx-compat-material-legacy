@@ -97,7 +97,7 @@ export function executeAttributeFactory(Type,core,contract,node,runFactory,attri
   constructorEvidence.push({index:parameter.index,attribute:null,input_verified:true,
    scope_challenge:parameter.token===core.ChangeDetectorRef?'pending-public-view-destruction':null});
  }
- return {...factory,value:captured.value,requests:[...requests,...partition.requests],constructorEvidence,detectors,
+ return {...factory,value:captured.value,capturedInputs:captured.inputs,requests:[...requests,...partition.requests],constructorEvidence,detectors,
   peerConstructorPartition:partition.observation,
   compilerObservation:{...contract.compiler,runtime_inheritance_verified:true}};
 }
@@ -114,9 +114,9 @@ export function challengeAttributeDetectorScopes(factory,fixture){
 }
 
 /** Serialized execution evidence is required by settlement, as well as producer success. */
-export function attributeConstructorObservationProblems(row){
+export function attributeConstructorObservationProblems(row,{force=false}={}){
  const parameters=row.symbol.shape.originalFactoryContext?.factory_parameters||row.symbol.shape.diParams||[];
- if(!parameters.some(p=>p.attribute))return [];
+ if(!force&&!parameters.some(p=>p.attribute))return [];
  const evidence=row.factory_constructor_evidence,compiler=row.factory_compiler_observation;
  if(!Array.isArray(evidence)||evidence.length!==parameters.length||!compiler
   ||!Array.isArray(compiler.parameters)||compiler.parameters.length!==parameters.length)
