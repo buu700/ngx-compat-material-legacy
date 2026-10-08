@@ -8,7 +8,6 @@
  */
 
 import {
-  CDK_TABLE,
   CdkTable,
   STICKY_POSITIONING_LISTENER,
 } from '@angular/cdk/table';
@@ -51,20 +50,20 @@ export class MatLegacyRecycleRows {
 
     @if (_isNativeHtmlTable) {
       <thead role="rowgroup">
-        <ng-container headerRowOutlet></ng-container>
+        <ng-container legacyTableOutlet="header"></ng-container>
       </thead>
       <tbody role="rowgroup">
-        <ng-container rowOutlet></ng-container>
-        <ng-container noDataRowOutlet></ng-container>
+        <ng-container legacyTableOutlet="data"></ng-container>
+        <ng-container legacyTableOutlet="empty"></ng-container>
       </tbody>
       <tfoot role="rowgroup">
-        <ng-container footerRowOutlet></ng-container>
+        <ng-container legacyTableOutlet="footer"></ng-container>
       </tfoot>
     } @else {
-      <ng-container headerRowOutlet></ng-container>
-      <ng-container rowOutlet></ng-container>
-      <ng-container noDataRowOutlet></ng-container>
-      <ng-container footerRowOutlet></ng-container>
+      <ng-container legacyTableOutlet="header"></ng-container>
+      <ng-container legacyTableOutlet="data"></ng-container>
+      <ng-container legacyTableOutlet="empty"></ng-container>
+      <ng-container legacyTableOutlet="footer"></ng-container>
     }
   `,
   styleUrls: ['table.scss'],
@@ -75,7 +74,6 @@ export class MatLegacyRecycleRows {
   },
   providers: [
     {provide: CdkTable, useExisting: MatLegacyTable},
-    {provide: CDK_TABLE, useExisting: MatLegacyTable},
     {provide: STICKY_POSITIONING_LISTENER, useValue: null},
   ],
   encapsulation: ViewEncapsulation.None,

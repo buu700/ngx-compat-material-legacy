@@ -492,7 +492,7 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
     'packed-consumer/harness/table-original-sticky-coercion-dirty-state': parsed.tableOriginalStickyBehavior === true,
     'packed-consumer/harness/table-original-boolean-input-rendering': parsed.tableOriginalBooleanInputs === true,
     'packed-consumer/harness/table-recycle-row-view-identity': parsed.tableRecycleRowIdentity === true,
-    'packed-consumer/harness/table-definition-original-constructors': parsed.tableDefinitionOriginalConstructors === true,
+    'packed-consumer/harness/table-definition-original-constructors': parsed.tableDefinitionOriginalConstructors === true && parsed.tableOutletAndDefinitionOwnership === true,
     'packed-consumer/harness/tab-label-original-constructor-and-nearest-tab': parsed.tabLabelOriginalConstructor === true,
   };
   const owned = declarationKeys(keys)
@@ -915,8 +915,8 @@ import {provideNoopAnimations} from '@angular/platform-browser/animations';
 import {Overlay, OverlayContainer} from '@angular/cdk/overlay';
 import {ScrollDispatcher} from '@angular/cdk/scrolling';
 import {By} from '@angular/platform-browser';
-import {CdkCellDef,CdkHeaderCellDef,CdkFooterCellDef,CdkCell,CdkHeaderCell,CdkFooterCell,CdkTextColumn,TEXT_COLUMN_OPTIONS,CdkNoDataRow,CdkTable,CdkColumnDef,CdkHeaderRowDef,CdkFooterRowDef,CdkRowDef} from '@angular/cdk/table';
-import {MatLegacyTableModule,MatLegacyCellDef,MatLegacyHeaderCellDef,MatLegacyFooterCellDef,MatLegacyColumnDef,MatLegacyCell,MatLegacyHeaderCell,MatLegacyFooterCell,MatLegacyTable,MatLegacyTextColumn,MatLegacyNoDataRow,MatLegacyHeaderRowDef,MatLegacyFooterRowDef,MatLegacyRowDef} from '@ngx-compat/material-legacy/legacy-table';
+import {CdkTableModule,CdkCellDef,CdkHeaderCellDef,CdkFooterCellDef,CdkCell,CdkHeaderCell,CdkFooterCell,CdkTextColumn,TEXT_COLUMN_OPTIONS,CdkNoDataRow,CdkTable,CdkColumnDef,CdkHeaderRowDef,CdkFooterRowDef,CdkRowDef} from '@angular/cdk/table';
+import {_LegacyTableDefinitionOwner,MatLegacyTableModule,MatLegacyCellDef,MatLegacyHeaderCellDef,MatLegacyFooterCellDef,MatLegacyColumnDef,MatLegacyCell,MatLegacyHeaderCell,MatLegacyFooterCell,MatLegacyTable,MatLegacyTextColumn,MatLegacyNoDataRow,MatLegacyHeaderRowDef,MatLegacyFooterRowDef,MatLegacyRowDef} from '@ngx-compat/material-legacy/legacy-table';
 import {Platform} from '@angular/cdk/platform';
 import {Directionality} from '@angular/cdk/bidi';
 import {MatLegacyButtonModule} from '@ngx-compat/material-legacy/legacy-button';
@@ -973,6 +973,7 @@ class SmokeDialogContent {}
     MatLegacySnackBarModule,
     MatLegacyTooltipModule,
     MatLegacyTableModule,
+    CdkTableModule,
     MatLegacyTabsModule,
     MatLegacyChipsModule,
     MatLegacyRadioModule,
@@ -1050,6 +1051,21 @@ class SmokeDialogContent {}
       <ng-container matColumnDef="value"><mat-cell *matCellDef="let row">{{row.value}}</mat-cell></ng-container>
       <mat-row *matRowDef="let row; columns:['value']"></mat-row>
     </mat-table>
+    <table mat-table id="raw-owned-table" [dataSource]="[{value:'Outer'}]">
+      <ng-container cdkColumnDef="value">
+        <th mat-header-cell *cdkHeaderCellDef>Header</th>
+        <td mat-cell *cdkCellDef="let row">{{row.value}}
+          <table cdk-table id="raw-peer-table" [dataSource]="[{value:'Inner'}]">
+            <ng-container cdkColumnDef="value"><td cdk-cell *cdkCellDef="let inner">{{inner.value}}</td></ng-container>
+            <tr cdk-row *cdkRowDef="let inner; columns:['value']"></tr>
+          </table>
+        </td>
+        <td mat-footer-cell *cdkFooterCellDef>Footer</td>
+      </ng-container>
+      <tr mat-header-row *cdkHeaderRowDef="['value']"></tr>
+      <tr mat-row *cdkRowDef="let row; columns:['value']"></tr>
+      <tr mat-footer-row *cdkFooterRowDef="['value']"></tr>
+    </table>
     <ng-template #manualTabTemplate matTabContent>Tab lazy probe</ng-template>
     <ng-template #manualCellTemplate matCellDef>Data probe</ng-template>
     <ng-template #manualHeaderTemplate matHeaderCellDef>Header probe</ng-template>
@@ -1311,6 +1327,20 @@ async function main() {
   const tableDefinitionOriginalConstructors=definitionConstructorObservations.length===4
     &&definitionCallerDestroyed===0
     &&definitionConstructorObservations.every(row=>Object.entries(row).every(([key,value])=>key==='name'||value===true));
+  const rawOwners=fixture.debugElement.queryAll(By.directive(_LegacyTableDefinitionOwner));
+  const rawOwnershipObservation=rawOwners.map(node=>{
+    const nearest=node.injector.get(CdkTable);
+    const definitions=[node.injector.get(CdkColumnDef,null),node.injector.get(CdkHeaderRowDef,null),
+      node.injector.get(CdkFooterRowDef,null),node.injector.get(CdkRowDef,null)].filter(Boolean);
+    return definitions.length===1&&definitions[0]!._table===nearest;
+  });
+  const rawTable=fixture.nativeElement.querySelector('#raw-owned-table');
+  const rawPeerTable=rawTable?.querySelector('#raw-peer-table');
+  const tableOutletAndDefinitionOwnership=rawOwnershipObservation.length===6&&rawOwnershipObservation.every(Boolean)
+    &&rawTable?.querySelector('tbody > tr > td')?.firstChild?.textContent.trim()==='Outer'
+    &&rawTable?.querySelector('thead > tr > th')?.textContent.trim()==='Header'
+    &&rawTable?.querySelector('tfoot > tr > td')?.textContent.trim()==='Footer'
+    &&rawPeerTable?.querySelector('tbody > tr > td')?.textContent.trim()==='Inner';
   const nodeTextColumn=fixture.componentInstance.originalTextColumn;
   const manualTextColumn=new MatLegacyTextColumn(textTable,ORIGINAL_TEXT_OPTIONS);
   const manualTextFields=manualTextColumn as any;
@@ -1731,7 +1761,7 @@ async function main() {
       selectOpened === true &&
       selectClosed === true &&
       tabCount === 2 &&
-      selected === 'Two' && viewportShared && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor && tabContentOriginalConstructor && noDataRowOriginalConstructor && constructorBorrowedProviderLifecycle && tableOriginalStickyBehavior && tableOriginalBooleanInputs && tableRecycleRowIdentity && tableDefinitionOriginalConstructors && tabLabelOriginalConstructor,
+      selected === 'Two' && viewportShared && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor && tabContentOriginalConstructor && noDataRowOriginalConstructor && constructorBorrowedProviderLifecycle && tableOriginalStickyBehavior && tableOriginalBooleanInputs && tableRecycleRowIdentity && tableDefinitionOriginalConstructors && tableOutletAndDefinitionOwnership && tabLabelOriginalConstructor,
     buttonText: text,
     selectIsOpen: isOpen,
     dialogText,
@@ -1771,6 +1801,7 @@ async function main() {
     tableOriginalBooleanInputs, tableBooleanObservations,
     tableRecycleRowIdentity, recycleObservations,
     tableDefinitionOriginalConstructors, definitionConstructorObservations, definitionCallerDestroyed,
+    tableOutletAndDefinitionOwnership, rawOwnershipObservation,
     tabLabelOriginalConstructor, tabLabelObservation,
     checkboxAttribute, slideToggleAttribute, sliderAttribute, tabLinkAttribute,
     commonModuleDiagnostics:{contrastLifecycle,contrastProbeReads,sanityWarnings,checksEnabled,sanityDefault:TestBed.inject(MATERIAL_LEGACY_SANITY_CHECKS),sanityToken:String(MATERIAL_LEGACY_SANITY_CHECKS)},

@@ -1,4 +1,6 @@
 import {DataSource} from '@angular/cdk/collections';
+import {CdkColumnDef, CdkFooterRowDef, CdkHeaderRowDef, CdkRowDef, CdkTable, CdkTableModule} from '@angular/cdk/table';
+import {By} from '@angular/platform-browser';
 import {Component, OnInit, ViewChild, AfterViewInit} from '@angular/core';
 import {
   waitForAsync,
@@ -15,12 +17,14 @@ import {MatSort, MatSortHeader, MatSortModule} from '../sort/index';
 import {MatLegacyTableModule} from './index';
 import {MatLegacyTable} from './table';
 import {MatLegacyTableDataSource} from './table-data-source';
+import {_LegacyTableDefinitionOwner} from './internal/table-outlet';
 
 describe('MatTable', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
         MatLegacyTableModule,
+        CdkTableModule,
         MatLegacyPaginatorModule,
         MatSortModule
         ],
@@ -33,9 +37,53 @@ describe('MatTable', () => {
         MatTableWithPaginatorApp,
         StickyTableApp,
         TableWithNgContainerRow,
-        NestedHtmlTableApp
+        NestedHtmlTableApp,
+        RawNestedLegacyTablesApp,
+        RawNestedCurrentTableApp,
       ], providers: [LEGACY_NOOP_ANIMATIONS]}).compileComponents();
   }));
+
+  it('binds four owned outlets without changing native table row groups', () => {
+    const fixture = TestBed.createComponent(NativeHtmlTableApp);
+    fixture.detectChanges();
+    const node = fixture.debugElement.query(By.directive(MatLegacyTable));
+    const table = node.injector.get(MatLegacyTable);
+    expect(node.injector.get(CdkTable)).toBe(table);
+    const outlets = [table._headerRowOutlet, table._rowOutlet, table._footerRowOutlet, table._noDataRowOutlet];
+    expect(outlets.length).toBe(4);
+    expect(new Set(outlets).size).toBe(4);
+    for (const outlet of outlets) {
+      expect(outlet.viewContainer.element.nativeElement)
+        .toBe(outlet.elementRef.nativeElement);
+      expect(outlet.elementRef.nativeElement.nodeType).toBe(Node.COMMENT_NODE);
+    }
+    expect(Array.from<HTMLElement>(node.nativeElement.children).map(child => child.tagName))
+      .toEqual(['THEAD', 'TBODY', 'TFOOT']);
+    expect(node.nativeElement.querySelectorAll('tbody > tr').length).toBe(4);
+  });
+
+  for (const [label, host] of [['legacy', () => RawNestedLegacyTablesApp],
+    ['current CDK', () => RawNestedCurrentTableApp]] as const) {
+    it('keeps raw CDK definitions in their nearest nested ' + label + ' table', () => {
+      const fixture = TestBed.createComponent(host());
+      fixture.detectChanges();
+      const outer = fixture.nativeElement.querySelector('#raw-outer');
+      const inner = outer.querySelector('#raw-inner');
+      expect(outer.querySelector('tbody > tr > td')?.firstChild?.textContent.trim()).toBe('Outer');
+      expect(inner.querySelector('tbody > tr > td')?.textContent.trim()).toBe('Inner');
+      expect(outer.querySelector('thead > tr > th')?.textContent.trim()).toBe('Header');
+      expect(outer.querySelector('tfoot > tr > td')?.textContent.trim()).toBe('Footer');
+      const owners = fixture.debugElement.queryAll(By.directive(_LegacyTableDefinitionOwner));
+      expect(owners.length).toBe(6);
+      for (const owner of owners) {
+        const nearest = owner.injector.get(CdkTable);
+        const definitions = [owner.injector.get(CdkColumnDef, null), owner.injector.get(CdkHeaderRowDef, null),
+          owner.injector.get(CdkFooterRowDef, null), owner.injector.get(CdkRowDef, null)].filter(Boolean);
+        expect(definitions.length).toBe(1);
+        expect(definitions[0]!._table).toBe(nearest);
+      }
+    });
+  }
 
   describe('with basic data source', () => {
     it('should be able to create a table with the right content and without when row', () => {
@@ -1109,3 +1157,37 @@ export function expectTableToMatchContent(tableElement: Element, expected: any[]
     fail(missedExpectations.join('\n'));
   }
 }
+
+@Component({standalone: false, template: `
+    <table mat-table id="raw-outer" [dataSource]="[{value:'Outer'}]">
+      <ng-container cdkColumnDef="value">
+        <th mat-header-cell *cdkHeaderCellDef>Header</th>
+        <td mat-cell *cdkCellDef="let row">{{row.value}} <table mat-table id="raw-inner" [dataSource]="[{value:'Inner'}]">
+          <ng-container cdkColumnDef="value"><td mat-cell *cdkCellDef="let row">{{row.value}}</td></ng-container>
+          <tr mat-row *cdkRowDef="let row; columns:['value']"></tr>
+        </table></td>
+        <td mat-footer-cell *cdkFooterCellDef>Footer</td>
+      </ng-container>
+      <tr mat-header-row *cdkHeaderRowDef="['value']"></tr>
+      <tr mat-row *cdkRowDef="let row; columns:['value']"></tr>
+      <tr mat-footer-row *cdkFooterRowDef="['value']"></tr>
+    </table>
+  `})
+class RawNestedLegacyTablesApp {}
+
+@Component({standalone: false, template: `
+    <table mat-table id="raw-outer" [dataSource]="[{value:'Outer'}]">
+      <ng-container cdkColumnDef="value">
+        <th mat-header-cell *cdkHeaderCellDef>Header</th>
+        <td mat-cell *cdkCellDef="let row">{{row.value}} <table cdk-table id="raw-inner" [dataSource]="[{value:'Inner'}]">
+          <ng-container cdkColumnDef="value"><td cdk-cell *cdkCellDef="let row">{{row.value}}</td></ng-container>
+          <tr cdk-row *cdkRowDef="let row; columns:['value']"></tr>
+        </table></td>
+        <td mat-footer-cell *cdkFooterCellDef>Footer</td>
+      </ng-container>
+      <tr mat-header-row *cdkHeaderRowDef="['value']"></tr>
+      <tr mat-row *cdkRowDef="let row; columns:['value']"></tr>
+      <tr mat-footer-row *cdkFooterRowDef="['value']"></tr>
+    </table>
+  `})
+class RawNestedCurrentTableApp {}
