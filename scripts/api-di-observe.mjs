@@ -6,6 +6,7 @@ import {observeMenuItemFactory} from './api-menu-item-factory.mjs';
 import {TABLE_SYMBOL, approvedTableContract} from './table-construction-contract.mjs';
 import {observeTableFactory} from './api-table-factory.mjs';
 import {originalContextDi} from './api-original-factory-contexts.mjs';
+import {createPublicFactoryContext} from './api-public-node-context.mjs';
 
 // verify-lite imports the checker before node_modules exists. Load Angular
 // only when a packed factory is actually executed.
@@ -51,6 +52,47 @@ export function runFactory(factory, Injector, runInInjectionContext, options = {
   catch(caught){outcome='threw';error=String(caught?.message||caught);}
   finally{if(!borrowed)base.destroy?.();}
   return {requests,outcome,error,value,context:borrowed?'caller-supplied public injector context':'empty-injector diagnostic; not node/application qualification'};
+}
+
+/** Original module ownership selects caller providers before the owned factory executes. */
+function isOriginalModule(symbol){
+  const factory=symbol.shape?.originalFactory;
+  return Boolean(factory&&(factory.declaration.includes('.ɵɵFactoryTarget.NgModule')
+    ||factory.declaration_kind==='published-jit-decorators'&&/\bNgModule\(/.test(factory.declaration)));
+}
+
+export async function observePublicNodeFactory(value,core,packageRoot,symbol,symbols,importModule){
+  let fixture,factory;
+  let nodeKind=null;
+  const modules=[],behaviorProblems=[];
+  try{
+    for(const owner of symbols.filter(s=>s.family===symbol.family&&isOriginalModule(s)
+      &&(s.kind==='primary'||s.kind===symbol.kind))){
+      const loaded=await loadRuntimeModule(packageRoot,owner.family,owner.kind);
+      if(typeof loaded?.[owner.name]!=='function')throw Error('missing caller module '+owner.symbol_id);
+      modules.push({symbol_id:owner.symbol_id,value:loaded[owner.name]});
+    }
+    fixture=await createPublicFactoryContext(core,importModule,
+      {providers:modules.length?[core.importProvidersFrom(...modules.map(m=>m.value))]:[]});
+    const parameters=symbol.shape.originalFactoryContext?.factory_parameters||symbol.shape.diParams||[];
+    const usesTemplate=parameters.some(p=>p.spec==='@angular/core'&&p.imported==='TemplateRef');
+    nodeKind=usesTemplate?'template':'element';
+    factory=runFactory(value.ɵfac,core.Injector,core.runInInjectionContext,
+      {injector:(usesTemplate?fixture.template:fixture.element).injector});
+    factory.context=fixture.context;
+    if(factory.outcome==='returned'&&typeof factory.value?.ngOnDestroy==='function'){
+      try{factory.value.ngOnDestroy();}catch(error){behaviorProblems.push('owned instance teardown: '+String(error?.message||error));}
+    }
+    if(fixture.component.hostView.destroyed)behaviorProblems.push('owned factory destroyed the borrowed fixture view');
+    if(fixture.element.destroyed||fixture.template.destroyed)behaviorProblems.push('owned factory destroyed borrowed Angular node probes');
+    if(fixture.environment.destroyed)behaviorProblems.push('owned factory destroyed the caller environment');
+  }catch(error){
+    factory={requests:[],outcome:'threw',error:String(error?.message||error),value:undefined,
+      context:'public node/application context setup failed; no qualification'};
+  }finally{
+    try{fixture?.close();}catch(error){behaviorProblems.push('caller fixture cleanup: '+String(error?.message||error));}
+  }
+  return {...factory,behaviorProblems,callerModules:modules.map(m=>m.symbol_id),nodeKind};
 }
 
 /** Execution evidence cannot be replaced by a matching request-name/count list. */
@@ -204,7 +246,8 @@ export function injectionTokenMatches(value, InjectionToken, expectedDescription
 }
 
 export async function observeRuntimeDi(packageRoot, symbols, differences = [], importModule = spec => import(spec)) {
-  const {Injector, InjectionToken, runInInjectionContext, isDevMode} = await importModule('@angular/core');
+  const core=await importModule('@angular/core');
+  const {Injector, InjectionToken, runInInjectionContext, isDevMode}=core;
   await importModule('@angular/compiler');
   const results = [];
   for (const symbol of symbols) {
@@ -232,19 +275,21 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = [], i
       continue;
     }
     const construction = approvedMenuItemContract(symbol) || approvedTableContract(symbol);
+    const originalKind = symbol.shape.originalFactoryContext?.effective_factory_kind || symbol.shape.originalFactory?.deps_kind;
     const factory = construction ? symbol.symbol_id === TABLE_SYMBOL
       ? await observeTableFactory(value, loaded, importModule) : await observeMenuItemFactory(value, loaded, importModule)
-      : runFactory(value.ɵfac, Injector, runInInjectionContext);
+      : originalKind==='invalid' ? runFactory(value.ɵfac,Injector,runInInjectionContext)
+      : await observePublicNodeFactory(value,core,packageRoot,symbol,symbols,importModule);
     const observed = factory.requests;
     const publicNodeRequests=[];
-    const originalKind = symbol.shape.originalFactoryContext?.effective_factory_kind || symbol.shape.originalFactory?.deps_kind;
+    const runtimeRequests=[];
     const invalidReference = originalKind === 'invalid';
     const runtime_context = {devMode: isDevMode()};
     if (!construction && !invalidReference && factory.outcome==='returned' && !(factory.value instanceof value))
       problems.push(`factory ${symbol.symbol_id} did not return the owned class instance`);
     const expected = invalidReference ? [] : construction?.runtime_requests
       || expectedFactoryDi(symbol.shape, runtime_context);
-    if (construction) problems.push(...factory.behaviorProblems.map(problem => `factory ${symbol.symbol_id} ${problem}`));
+    if (factory.behaviorProblems) problems.push(...factory.behaviorProblems.map(problem => `factory ${symbol.symbol_id} ${problem}`));
     for (const issue of factoryExecutionProblems(originalKind, factory)) {
       problems.push(`factory ${symbol.symbol_id} ${issue}`);
     }
@@ -261,6 +306,9 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = [], i
         const ownedViewport = ownedViewportIdentity(symbol.family, param, coreExports || {}, got.token);
         const same = ownedViewport !== null ? ownedViewport : await runtimeTokenIdentity(symbol.family, param, exports,
           originalRuntimeAliases(symbols, symbol.family), got.token, importModule);
+        runtimeRequests.push({expected_ident:param.ident,expected_spec:param.spec,identity_matched:same,
+          expected_optional:Boolean(param.optional),expected_self:Boolean(param.self),
+          expected_skipSelf:Boolean(param.skipSelf),expected_host:Boolean(param.host)});
         if (symbol.symbol_id===TABLE_SYMBOL) publicNodeRequests.push({ident:param.ident,spec:param.spec,
           observed_label:got.label+(got.optional?'?':''),identity_matched:same,
           optional:Boolean(got.optional),self:Boolean(got.self),skipSelf:Boolean(got.skipSelf),host:Boolean(got.host)});
@@ -272,7 +320,7 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = [], i
         }
       }
     }
-    results.push({symbol, problems, runtime_context, factory_unresolved_provider_labels:observed.filter(request=>request.unresolved).map(request=>request.label), factory_outcome:factory.outcome, factory_error:factory.error, original_factory_kind:symbol.shape.originalFactory?.deps_kind ?? null, original_inherited_factory:symbol.shape.originalFactory?.inherited_factory?.name ?? null, effective_original_factory_kind:originalKind ?? null, factory_context:factory.context, factory_returned_owned_instance:factory.outcome==='returned' && (construction ? factory.behaviorProblems.length===0 : factory.value instanceof value), constructor_attributes:[...new Set(symbol.shape.originalFactoryContext ? symbol.shape.originalFactoryContext.factory_parameters?.filter(param=>param.attribute).map(param=>param.attribute) || [] : [...(symbol.shape.originalFactory?.inherited_factory?.attributes || []),...(symbol.shape.diParams || []).filter(param=>param.attribute).map(param=>param.attribute)])], observed: observed.map(item => `${item.label}${item.optional ? '?' : ''}`),
+    results.push({symbol, problems, runtime_context, factory_unresolved_provider_labels:observed.filter(request=>request.unresolved).map(request=>request.label), factory_outcome:factory.outcome, factory_error:factory.error, original_factory_kind:symbol.shape.originalFactory?.deps_kind ?? null, original_inherited_factory:symbol.shape.originalFactory?.inherited_factory?.name ?? null, effective_original_factory_kind:originalKind ?? null, factory_context:factory.context, factory_context_modules:factory.callerModules || [], factory_node_kind:factory.nodeKind || null, runtime_requests:observed.map((request,index)=>({...runtimeRequests[index],observed_label:request.label,optional:Boolean(request.optional),self:Boolean(request.self),skipSelf:Boolean(request.skipSelf),host:Boolean(request.host),unresolved:Boolean(request.unresolved)})), factory_returned_owned_instance:factory.outcome==='returned' && (construction ? factory.behaviorProblems.length===0 : factory.value instanceof value), constructor_attributes:[...new Set(symbol.shape.originalFactoryContext ? symbol.shape.originalFactoryContext.factory_parameters?.filter(param=>param.attribute).map(param=>param.attribute) || [] : [...(symbol.shape.originalFactory?.inherited_factory?.attributes || []),...(symbol.shape.diParams || []).filter(param=>param.attribute).map(param=>param.attribute)])], observed: observed.map(item => `${item.label}${item.optional ? '?' : ''}`),
       ...(construction ? {approved_construction: {profile_id: construction.profile_id,
         contract_sha256: construction.contract_sha256, context: factory.context,
         behavior_problems: factory.behaviorProblems, counts: factory.counts,
