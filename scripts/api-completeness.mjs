@@ -32,7 +32,7 @@ import {originalCompilerFactoryContext} from './api-original-factory-contexts.mj
 import {observeRuntimeDi, expectedFactoryDi} from './api-di-observe.mjs';
 import {attributeConstructorObservationProblems} from './api-attribute-factory.mjs';
 import {publicConstructorPartitionProblems} from './api-public-constructor-internals.mjs';
-import {SELECT_MOTION_SYMBOL,ownedSelectMotionProblems} from './api-owned-motion-context.mjs';
+import {ownedMotionProfile,ownedSelectMotionProblems} from './api-owned-motion-context.mjs';
 import {MENU_ITEM_SYMBOL, approvedMenuItemContract} from './menu-item-construction-contract.mjs';
 import {TABLE_SYMBOL, approvedTableContract, tableConstructionObservationComplete} from './table-construction-contract.mjs';
 
@@ -499,8 +499,8 @@ if (isMain) {
 }
 
 export function settleDi(row, records) {
-  if(row.symbol.symbol_id===SELECT_MOTION_SYMBOL)
-    row={...row,problems:[...row.problems,...ownedSelectMotionProblems(row.factory_owned_motion_context)]};
+  if(ownedMotionProfile(row.symbol.symbol_id))
+    row={...row,problems:[...row.problems,...ownedSelectMotionProblems(row.factory_owned_motion_context,row.symbol.symbol_id)]};
   if(['legacy-tabs/primary/MatLegacyTabLink','legacy-tabs/primary/_MatLegacyTabLinkBase'].includes(row.symbol.symbol_id)){
     const parent=row.factory_parent_construction;
     const original=originalFactoryContract('/original/src/material/legacy-tabs/tab-nav-bar/tab-nav-bar.ts','MatLegacyTabNav');

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -14,6 +15,10 @@ import {
   Input,
   ViewEncapsulation,
   booleanAttribute,
+  ANIMATION_MODULE_TYPE,
+  Inject,
+  Optional,
+  assertInInjectionContext,
 } from '@angular/core';
 import {legacyAnimationsDisabled} from '../internal/legacy-animations';
 
@@ -54,6 +59,21 @@ export class MatLegacyPseudoCheckbox {
    */
   @Input() appearance: 'minimal' | 'full' = 'full';
 
-  /** Resolved through public MATERIAL_ANIMATIONS / reduced-motion policy (F04). */
-  protected _animationsDisabled = legacyAnimationsDisabled();
+  private _diAnimationsDisabled = false;
+
+  constructor(@Optional() @Inject(ANIMATION_MODULE_TYPE) public _animationMode?: string) {
+    // Historical callers can construct this decorative control outside Angular.
+    let inContext = true;
+    try {
+      assertInInjectionContext(MatLegacyPseudoCheckbox);
+    } catch {
+      inContext = false;
+    }
+    this._diAnimationsDisabled = inContext ? legacyAnimationsDisabled() : false;
+  }
+
+  /** Keep the original mutable animation mode and the owned motion policy. */
+  protected get _animationsDisabled(): boolean {
+    return this._diAnimationsDisabled || this._animationMode === 'NoopAnimations';
+  }
 }
