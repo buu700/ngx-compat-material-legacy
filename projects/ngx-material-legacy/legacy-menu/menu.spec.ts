@@ -62,6 +62,15 @@ import type {MatLegacyMenuPanel as MatMenuPanel} from './index';
 const MENU_PANEL_TOP_PADDING = 8;
 
 describe('MatMenu', () => {
+  it('uses standard pressed-button masks in its mouse fixtures', () => {
+    for (const [button, buttons] of [[0, 1], [1, 4], [2, 2], [3, 8], [4, 16]]) {
+      const event = createMouseEvent('mousedown', 50, 100, undefined, undefined, button);
+      expect(event.button).toBe(button);
+      expect(event.buttons).toBe(buttons);
+      expect(event.detail).toBe(1);
+    }
+  });
+
   let overlayContainerElement: HTMLElement;
   let focusMonitor: FocusMonitor;
   let viewportRuler: ViewportRuler;
