@@ -4,6 +4,7 @@ import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {measureM2PeerProgram,peerMeasurementMatches} from './sass-current-companion-peer.mjs';
 import {ORIGINAL_CALENDAR_DENSITY,CURRENT_CALENDAR_FALLBACKS} from './sass-datepicker-controls-contract.mjs';
+import {FORM_FIELD_STATE_AGGREGATE_CASES,insertFormFieldStateInAggregate} from './sass-form-field-state-contract.mjs';
 const sha=b=>createHash('sha256').update(b).digest('hex');
 const catalog=JSON.parse(readFileSync(new URL('../fixtures/sass/default-aggregate-contracts.json',import.meta.url)));
 const raw=readFileSync(new URL('../compatibility/rc/oracles/material-16.2.14-sass-api.json',import.meta.url)),oracle=JSON.parse(raw);
@@ -115,7 +116,8 @@ export function defaultAggregateExpectedCss(id,peer){
   if(!floor||!inputs||!peerMeasurementMatches(peer,defaultAggregatePeerProgram(id),{})||peer.program_sha256!==floor.program_sha256||peer.css_sha256!==floor.css_sha256||peer.css_bytes!==floor.css_bytes
     ||peer.cdk_version!==peer.peer_version||peer.cdk_version!==inputs.cdk_version||peer.cdk_package_json_sha256!==inputs.cdk_package_json_sha256||peer.sources.length!==inputs.sources.length||peer.sources.some(s=>!sourceSets[peer.line].has(JSON.stringify([s.root,s.path,s.sha256,s.bytes]))))return null;
   const p=members(peer.css,profile.public_families);if(!p)return null;const o=Object.fromEntries(Object.entries(profile.originals).map(([f,m])=>[f,m.css]));
-  return profile.dimension==='density'?densityModel(e.original_css,o,p):profile.dimension==='typography'?typographyModel(e.original_css,o,p):colorThemeModel(e.original_css,o,p,e);
+  const css=profile.dimension==='density'?densityModel(e.original_css,o,p):profile.dimension==='typography'?typographyModel(e.original_css,o,p):colorThemeModel(e.original_css,o,p,e);
+  return Object.hasOwn(FORM_FIELD_STATE_AGGREGATE_CASES,id)?insertFormFieldStateInAggregate(id,css,peer):css;
 }
 export function defaultAggregateMeasurementOk(id,m,line){
   const e=DEFAULT_AGGREGATE_CASES[id];if(!e||!Object.hasOwn(catalog.peer_inputs,line)||m?.line!==line||m.program_sha256!==e.program_sha256||typeof m.css!=='string'||m.css_sha256!==sha(m.css)||m.css_bytes!==Buffer.byteLength(m.css)||typeof m.sass_version!=='string'||!m.sass_version.startsWith('dart-sass\t1.104.1\t'))return false;

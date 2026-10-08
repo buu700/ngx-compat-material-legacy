@@ -43,6 +43,13 @@ class AggregateColorThemeContractTests(unittest.TestCase):
                 if not legacy:replacements.extend([('@keyframes mdc-linear-progress-buffering','@keyframes changed-progress-buffering'),('data:image/svg+xml','data:image/changed-svg'),('--mat-progress-bar-active-indicator-color','--wrong-progress-active-color')])
                 if theme:replacements.extend([('var(--mat-icon-button-touch-target-display, none)','var(--mat-icon-button-touch-target-display, block)'),('var(--mat-icon-button-state-layer-size, var(--mdc-icon-button-state-layer-size))','var(--mat-icon-button-state-layer-size, 99px)'),('var(--mat-tree-node-min-height, 40px)','var(--mat-tree-node-min-height, 99px)'),('font-family: '+('Legacy Family' if legacy else 'Custom Family'),'font-family: Changed Family'),('padding: 8px','padding: 9px')])
                 changes=[css+'\n.extra { color: red; }']
+                if not legacy:
+                    import re
+                    for token in ['state-layer-color','hover-state-layer-opacity','focus-state-layer-opacity']:
+                        changes.append(re.sub(r'(--mat-form-field-'+token+r':) [^;]+;',r'\1 initial;',css))
+                    block=re.search(r'(?m)^\.sass-argument-probe \{\n  --mat-form-field-state-layer-color:[^{}]+\n\}',css);self.assertIsNotNone(block)
+                    changes.extend([css[:block.start()]+css[block.end():],css[:block.start()]+css[block.end():]+'\n'+block[0]])
+                else:self.assertNotIn('--mat-form-field-hover-state-layer-opacity:',css)
                 for old,new in replacements:
                     self.assertIn(old,css,(case,old));changes.append(css.replace(old,new,1))
                 for changed in changes:

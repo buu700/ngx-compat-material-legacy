@@ -135,3 +135,30 @@ def form_field_state_default_envelope_ok(active, body, invocation):
         return len(library) == 1 and body['tarball_sha256'] == library[0]['sha256'] and form_field_state_default_assertion_ok(body)
     except (KeyError, TypeError, ValueError, AttributeError):
         return False
+
+
+FORM_FIELD_STATE_AGGREGATE_CASES = {
+    'mixin-css/all-component-colors': 'mixin-css/form-field-color',
+    'mixin-css/all-component-themes': 'mixin-css/form-field-theme',
+    'mixin-argument/all-component-colors/custom-full-theme': 'mixin-argument/form-field-color/custom-full-theme',
+    'mixin-argument/all-component-colors/raw-color-config': 'mixin-argument/form-field-color/raw-color-config',
+    'mixin-argument/all-component-themes/custom-full-theme': 'mixin-argument/form-field-theme/custom-full-theme',
+    'mixin-argument/all-component-themes/custom-dark-theme': 'mixin-argument/form-field-theme/custom-dark-theme',
+}
+
+
+def insert_form_field_state_in_aggregate(case, css, peer):
+    """Change only one whole original color prefix in an authenticated aggregate model."""
+    try:
+        e = _CATALOG['cases'][FORM_FIELD_STATE_AGGREGATE_CASES[case]]
+        floor = e['peers'][peer['line']]
+        paths = ['_index.scss', 'form-field/_form-field-theme.scss', 'form-field/_m3-form-field.scss', 'core/tokens/_token-utils.scss']
+        required = {s['path']: (s['sha256'], s['bytes']) for s in _CATALOG['peer_inputs'][peer['line']] if s['root'] == 0 and s['path'] in paths}
+        if (len(required) != len(paths) or not isinstance(css, str) or css.count(e['color']['css']) != 1
+                or not peer_measurement_ok(peer, peer['line'], _sha(peer['program']), required)):
+            return None
+        at = css.index(e['color']['css']) + len(e['color']['css'])
+        suffix = css[at:]
+        return css[:at] + e['separator'] + floor['css'] + ('\n' if suffix else '') + suffix
+    except (KeyError, TypeError, ValueError, AttributeError):
+        return None

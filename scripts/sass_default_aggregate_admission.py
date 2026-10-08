@@ -2,6 +2,7 @@
 import hashlib,json,re
 from pathlib import Path
 from sass_current_companion_admission import peer_measurement_ok
+from sass_form_field_state_admission import FORM_FIELD_STATE_AGGREGATE_CASES, insert_form_field_state_in_aggregate
 ROOT=Path(__file__).resolve().parents[1]
 _CATALOG=json.loads((ROOT/'fixtures/sass/default-aggregate-contracts.json').read_bytes())
 _RAW=(ROOT/'compatibility/rc/oracles/material-16.2.14-sass-api.json').read_bytes();_ORACLE=json.loads(_RAW)
@@ -148,7 +149,8 @@ def default_aggregate_expected_css(case,peer,line):
         p=_members(peer['css'],profile['public_families'])
         if p is None:return None
         css=e['original_css']
-        return density(css,profile,p) if profile['dimension']=='density' else typography(css,profile,p) if profile['dimension']=='typography' else color_theme(css,profile,p,e['name'])
+        modeled = density(css,profile,p) if profile['dimension']=='density' else typography(css,profile,p) if profile['dimension']=='typography' else color_theme(css,profile,p,e['name'])
+        return insert_form_field_state_in_aggregate(case,modeled,peer) if case in FORM_FIELD_STATE_AGGREGATE_CASES else modeled
     except (KeyError,TypeError,ValueError,AttributeError):return None
 
 def default_aggregate_assertion_ok(body):
