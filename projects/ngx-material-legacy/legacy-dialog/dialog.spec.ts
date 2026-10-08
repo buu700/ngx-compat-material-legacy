@@ -34,6 +34,8 @@ import {supportsShadowDom} from '../internal/owned-shadow-dom';
 import {MatLegacyDialogContainer} from './dialog-container';
 import {_MatDialogContainerBase} from './internal/dialog-container-base';
 import {MatDialogConfig} from '@angular/material/dialog';
+import {ComponentPortal} from '@angular/cdk/portal';
+import {LEGACY_ANIMATIONS_TEST_OVERRIDE} from '../legacy-core/internal/legacy-animations';
 import {OverlayContainer, ScrollStrategy, Overlay, OverlayRef} from '@angular/cdk/overlay';
 import {ScrollDispatcher} from '@angular/cdk/scrolling';
 import {A, ESCAPE} from '@angular/cdk/keycodes';
@@ -2399,3 +2401,80 @@ describe('Owned legacy dialog initial focus', () => {
     expect(heading.hasAttribute('tabindex')).toBe(false);
   }));
 });
+
+
+@Component({standalone: false, template: '<button>Motion content</button>'})
+class LegacyMotionContent {}
+
+for (const mode of ['enabled', 'di-disabled'] as const) {
+  describe(`Owned legacy dialog motion (${mode})`, () => {
+    beforeEach(() => TestBed.configureTestingModule({
+      imports: [MatLegacyDialogModule],
+      declarations: [LegacyMotionContent],
+      providers: [
+        {provide: MatDialogConfig, useFactory: () => {
+          const config = new MatDialogConfig();
+          config.restoreFocus = false;
+          return config;
+        }},
+        {provide: OverlayRef, useValue: {backdropClick: () => new Subject<MouseEvent>()}},
+        {provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: mode},
+      ],
+    }));
+
+    it('should cancel queued open work on actual fixture destruction', fakeAsync(() => {
+      const fixture = TestBed.createComponent(MatLegacyDialogContainer);
+      fixture.detectChanges();
+      const states: string[] = [];
+      fixture.componentInstance._animationStateChanged.subscribe(event => states.push(event.state));
+      fixture.componentInstance.attachComponentPortal(new ComponentPortal(LegacyMotionContent));
+      expect(states).toEqual(['opening']);
+      fixture.destroy();
+      flush();
+      expect(states).toEqual(['opening']);
+      expect(document.querySelectorAll('.cdk-focus-trap-anchor').length).toBe(0);
+    }));
+
+    it('should preserve a close requested synchronously by an opening observer', fakeAsync(() => {
+      const fixture = TestBed.createComponent(MatLegacyDialogContainer);
+      fixture.detectChanges();
+      const states: string[] = [];
+      fixture.componentInstance._animationStateChanged.subscribe(event => {
+        states.push(event.state);
+        if (event.state === 'opening') {
+          fixture.componentInstance._startExitAnimation();
+        }
+      });
+      fixture.componentInstance.attachComponentPortal(new ComponentPortal(LegacyMotionContent));
+      flush();
+      expect(states).toEqual(['opening', 'closing', 'closed']);
+      expect(fixture.nativeElement.classList.contains('mat-legacy-dialog-container-open')).toBe(false);
+      expect(fixture.nativeElement.classList.contains('mat-legacy-dialog-container-opening')).toBe(false);
+      fixture.destroy();
+    }));
+
+    if (mode === 'enabled') {
+      it('should settle a zero-duration open visibly even before an animation frame', fakeAsync(() => {
+        const config = new MatDialogConfig();
+        config.enterAnimationDuration = 0;
+        config.exitAnimationDuration = 0;
+        config.restoreFocus = false;
+        TestBed.overrideProvider(MatDialogConfig, {useValue: config});
+        const fixture = TestBed.createComponent(MatLegacyDialogContainer);
+        fixture.detectChanges();
+        const states: string[] = [];
+        fixture.componentInstance._animationStateChanged.subscribe(event => states.push(event.state));
+        fixture.componentInstance.attachComponentPortal(new ComponentPortal(LegacyMotionContent));
+        tick(0);
+        fixture.detectChanges();
+        expect(states).toEqual(['opening', 'opened']);
+        expect(fixture.nativeElement.classList.contains('mat-legacy-dialog-container-open')).toBe(true);
+        expect(fixture.nativeElement.classList.contains('mat-legacy-dialog-container-opening')).toBe(false);
+        expect(getComputedStyle(fixture.nativeElement).opacity).toBe('1');
+        fixture.destroy();
+        flush();
+        expect(states).toEqual(['opening', 'opened']);
+      }));
+    }
+  });
+}

@@ -31,7 +31,7 @@ const basePath = folder + 'dialog-container-base.ts', focusPath = folder + 'dial
 const originalBase = readFileSync(resolve(root, basePath), 'utf8');
 const originalFocus = readFileSync(resolve(root, focusPath), 'utf8');
 
-export async function load(baseSource = originalBase, focusSource = originalFocus) {
+export async function load(baseSource = originalBase, focusSource = originalFocus, moduleUrlOnly = false) {
   function emit(raw) {
     let js = ts.transpileModule(raw, {compilerOptions: {
       target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext, experimentalDecorators: true,
@@ -41,7 +41,9 @@ export async function load(baseSource = originalBase, focusSource = originalFocu
   }
   const focusUrl = 'data:text/javascript;base64,' + Buffer.from(emit(focusSource)).toString('base64');
   const base = emit(baseSource).replaceAll("'./dialog-initial-focus'", JSON.stringify(focusUrl));
-  const loaded = await import('data:text/javascript;base64,' + Buffer.from(base).toString('base64'));
+  const baseUrl = 'data:text/javascript;base64,' + Buffer.from(base).toString('base64');
+  if (moduleUrlOnly) return baseUrl;
+  const loaded = await import(baseUrl);
   return loaded._MatDialogContainerBase;
 }
 
@@ -116,6 +118,7 @@ export function fixture(Base, autoFocus = 'first-tabbable', isBrowser = true, mo
       {provide: core.NgZone, useValue: {runOutsideAngular() {throw Error('ambient zone used');}}},
       {provide: FocusMonitor, useValue: {focusVia() {throw Error('ambient monitor used');}}},
     ] : []),
+    ...(mode.providers || []),
   ]});
   const args = [new core.ElementRef(host), factory, mode.noDocument ? null : document,
     config, checker, zone, overlay, ...(mode.noMonitor ? [] : [monitor])];

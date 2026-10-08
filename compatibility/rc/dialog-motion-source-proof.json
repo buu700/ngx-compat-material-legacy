@@ -1,0 +1,732 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "recorded_at_utc": "2026-10-08T04:14:30Z",
+  "role": "Owned leaf motion implementation/source proof;no whole API/native/SSR/AOT/packed/floor/security clearance",
+  "problem": "Pending noop opening callbacks can emit opened after closing/destruction;enabled opening frames can mutate a destroyed/closing host. Focus restoration failure can leave the old animation timer live. A synchronous opening observer can schedule closing before stale opening work then replaces it. Zero-duration completion before the first frame can leave the host hidden or later re-add its opening class.",
+  "repair": "Own and cancel pending frame/timer handles. Bind each asynchronous callback to its phase revision and guard destruction. Cancel before focus restoration. Recheck phase after synchronous lifecycle observers. Settle a completed open with its existing visible class and cancel the pending frame. Repeated exit requests are inert.",
+  "source_diagnostic": {
+    "schema_version": 1,
+    "role": "Owned dialog motion state/cancellation source diagnostic;not native/AOT/packed/minimum qualification",
+    "node": "v22.23.3",
+    "compiler": "6.0.3",
+    "runtime_peer": "22.1.7",
+    "sources": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-dialog/dialog-container.ts",
+        "sha256": "e582982a52c2effafeb50d7b20da0c0e3cd081fb1d2c852b1063392b0110628a",
+        "bytes": 9028
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts",
+        "sha256": "88812bc9ead98f1fc04fc0d58f38750ac515d8c93b1ad8fc694e6d1a2ea64f1a",
+        "bytes": 3114
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-dialog/dialog-animation-params.ts",
+        "sha256": "8c0160584629786ab3f7babb1060d526952238c58455989c7b6ced6ef59a619f",
+        "bytes": 775
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+        "sha256": "4a216814bba5b8906f91e4d64869e6e3292e18287db4b15e32f2b8cd89e9669c",
+        "bytes": 9590
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-initial-focus.ts",
+        "sha256": "826678416164bcf3fdc92d5d1692ba0f6d8d7922c303476e50b0e915f3ea142d",
+        "bytes": 3155
+      },
+      {
+        "path": "tests/dialog_initial_focus_runtime_probe.mjs",
+        "sha256": "442580fcc28ac4f08d0c1d1c7ac983a60d3664d7caaa9a3b684f9e7d9ab9996f",
+        "bytes": 19133
+      },
+      {
+        "path": "tests/dialog_motion_runtime_probe.mjs",
+        "sha256": "696ce8098fbcc39de009783024eab542c632f0e65ff29b12d896b9c23a858ad8",
+        "bytes": 17390
+      }
+    ],
+    "cases": [
+      {
+        "id": "enabled-open-close-order-duration-and-css-state",
+        "result": "pass"
+      },
+      {
+        "id": "di-disabled-keeps-deferred-single-open-and-close",
+        "result": "pass"
+      },
+      {
+        "id": "reduced-motion-keeps-deferred-single-open-and-close",
+        "result": "pass"
+      },
+      {
+        "id": "noop-close-before-open-never-emits-opened",
+        "result": "pass"
+      },
+      {
+        "id": "noop-destroy-before-open-leaves-no-event-or-dom-work",
+        "result": "pass"
+      },
+      {
+        "id": "noop-destroy-before-close-never-emits-closed",
+        "result": "pass"
+      },
+      {
+        "id": "noop-old-phase-cannot-complete-reopened-phase-early",
+        "result": "pass"
+      },
+      {
+        "id": "enabled-destroy-cancels-timer-and-frame",
+        "result": "pass"
+      },
+      {
+        "id": "uncancellable-old-frame-cannot-reopen-closing-dialog",
+        "result": "pass"
+      },
+      {
+        "id": "close-during-opening-observer-keeps-only-exit-work",
+        "result": "pass"
+      },
+      {
+        "id": "destroy-during-opening-observer-schedules-nothing",
+        "result": "pass"
+      },
+      {
+        "id": "parent-restoration-failure-cannot-leak-animation-work",
+        "result": "pass"
+      },
+      {
+        "id": "zero-duration-before-first-frame-settles-visible-without-opening-class",
+        "result": "pass"
+      },
+      {
+        "id": "repeated-exit-request-does-not-duplicate-events-or-jobs",
+        "result": "pass"
+      },
+      {
+        "id": "missing-raf-preserves-immediate-class-and-duration-completion",
+        "result": "pass"
+      },
+      {
+        "id": "phase-request-after-destruction-is-inert",
+        "result": "pass"
+      }
+    ],
+    "mutations": [
+      {
+        "id": "destroy-cancellation-removed",
+        "rejected_by": "enabled-destroy-cancels-timer-and-frame"
+      },
+      {
+        "id": "callback-phase-guard-removed",
+        "rejected_by": "uncancellable-old-frame-cannot-reopen-closing-dialog"
+      },
+      {
+        "id": "noop-phase-identity-removed",
+        "rejected_by": "noop-old-phase-cannot-complete-reopened-phase-early"
+      },
+      {
+        "id": "settled-visible-class-removed",
+        "rejected_by": "zero-duration-before-first-frame-settles-visible-without-opening-class"
+      },
+      {
+        "id": "reentrant-event-check-removed",
+        "rejected_by": "close-during-opening-observer-keeps-only-exit-work"
+      }
+    ],
+    "limits": [
+      "Actual owned leaf/base/focus helper/defaults and motion flag code execute;only the flag override provider is selected for these controlled states.",
+      "Deterministic timer/frame fixtures and synthetic class/style DOM are not native rendered transitions,SSR engine qualification or real browser scheduling.",
+      "Source fixture mostly disables browser focus to isolate motion;the separate focus/restoration source tests and native keyboard/focus/style suites remain required.",
+      "Read-only installed22.1.7/hostNode22.23.3/TS6.0.3 does not qualify actual21 minimum,canonical toolchain,AOT,packed artifacts or consumer floors."
+    ],
+    "pre_fix_source_observation": {
+      "commit": "dc24c26a65d03c92279c913ce0044ca66165abd2",
+      "path": "projects/ngx-material-legacy/legacy-dialog/dialog-container.ts",
+      "sha256": "732dfd67a85649e3003196ccaeff1ffc3c7efb388e97fc0c71b9dd2f50f7f0d9",
+      "cases": [
+        {
+          "id": "enabled-open-close-order-duration-and-css-state",
+          "result": "pass"
+        },
+        {
+          "id": "di-disabled-keeps-deferred-single-open-and-close",
+          "result": "pass"
+        },
+        {
+          "id": "reduced-motion-keeps-deferred-single-open-and-close",
+          "result": "pass"
+        },
+        {
+          "id": "noop-close-before-open-never-emits-opened",
+          "result": "fail",
+          "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    'opening',\n    'closing',\n+   'opened',\n    'closed'\n  ]\n"
+        },
+        {
+          "id": "noop-destroy-before-open-leaves-no-event-or-dom-work",
+          "result": "fail",
+          "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    'opening',\n+   'opened'\n  ]\n"
+        },
+        {
+          "id": "noop-destroy-before-close-never-emits-closed",
+          "result": "fail",
+          "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    'closing',\n+   'closed'\n  ]\n"
+        },
+        {
+          "id": "noop-old-phase-cannot-complete-reopened-phase-early",
+          "result": "fail",
+          "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n+   'closed',\n    'between-phases',\n    'closed'\n  ]\n"
+        },
+        {
+          "id": "enabled-destroy-cancels-timer-and-frame",
+          "result": "fail",
+          "error": "Expected values to be strictly equal:\n\n1 !== 0\n"
+        },
+        {
+          "id": "uncancellable-old-frame-cannot-reopen-closing-dialog",
+          "result": "fail",
+          "error": "Expected values to be strictly equal:\n\ntrue !== false\n"
+        },
+        {
+          "id": "close-during-opening-observer-keeps-only-exit-work",
+          "result": "fail",
+          "error": "Expected values to be strictly equal:\n\n150 !== 75\n"
+        },
+        {
+          "id": "destroy-during-opening-observer-schedules-nothing",
+          "result": "fail",
+          "error": "Expected values to be strictly equal:\n\n1 !== 0\n"
+        },
+        {
+          "id": "parent-restoration-failure-cannot-leak-animation-work",
+          "result": "fail",
+          "error": "Expected values to be strictly equal:\n\n1 !== 0\n"
+        },
+        {
+          "id": "zero-duration-before-first-frame-settles-visible-without-opening-class",
+          "result": "fail",
+          "error": "Expected values to be strictly equal:\n\nfalse !== true\n"
+        },
+        {
+          "id": "repeated-exit-request-does-not-duplicate-events-or-jobs",
+          "result": "fail",
+          "error": "Expected values to be strictly equal:\n\n2 !== 1\n"
+        },
+        {
+          "id": "missing-raf-preserves-immediate-class-and-duration-completion",
+          "result": "pass"
+        },
+        {
+          "id": "phase-request-after-destruction-is-inert",
+          "result": "fail",
+          "error": "Expected values to be strictly equal:\n\n2 !== 0\n"
+        }
+      ],
+      "role": "Actual prior owned leaf with unchanged base/flag/default modules;synthetic diagnostic,not native reproduction"
+    }
+  },
+  "strict_source_types_and_api": {
+    "role": "Owned leaf/base/focus/defaults/flag source type diagnostic;only the exact owned legacy-core flag export is mapped,not whole legacy-core package/AOT/packed/minimum qualification",
+    "node": "v22.23.3",
+    "compiler": "6.0.3",
+    "peer": "read-only installed22.1.7",
+    "options": {
+      "noEmit": true,
+      "strict": true,
+      "noImplicitOverride": true,
+      "skipLibCheck": true,
+      "target": 9,
+      "module": 99,
+      "moduleResolution": 100,
+      "experimentalDecorators": true
+    },
+    "diagnostics": [],
+    "public_protected_source_api_unchanged": true,
+    "source_api": {
+      "kind": "class",
+      "typeParams": "type-params",
+      "signatures": [
+        "protected method _contentAttached():void",
+        "public method _startExitAnimation():void",
+        "public method ngOnDestroy():void",
+        "public prop _state:'void'|'enter'|'exit'",
+        "public readonly prop _animationsEnabled:*"
+      ],
+      "requiredProtected": [
+        "protected method _contentAttached():void"
+      ],
+      "requiredConstructor": false,
+      "comparison": "signature",
+      "ownSignatures": [
+        "public readonly prop _animationsEnabled:*",
+        "public prop _state:'void'|'enter'|'exit'",
+        "protected method _contentAttached():void",
+        "public method _startExitAnimation():void",
+        "public method ngOnDestroy():void"
+      ],
+      "ownProtected": [
+        "protected method _contentAttached():void"
+      ],
+      "ownConstructor": false,
+      "heritage": [
+        "_MatDialogContainerBase"
+      ],
+      "inheritedConstructor": null
+    }
+  },
+  "targeted_style_review": {
+    "unchanged_sources": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-dialog/dialog.scss",
+        "sha256": "6b8e777777f4b78e0a0aa68b11007f644359fa97e2bf505f5aa0c4cb25d082f9",
+        "bytes": 2562,
+        "unchanged_from_pre_fix": true
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-dialog/dialog-container.html",
+        "sha256": "89aeb28616459a7393902fcbeca143e3ca101baeaafa59054aebc512a5022256",
+        "bytes": 44,
+        "unchanged_from_pre_fix": true
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-dialog/dialog-animation-params.ts",
+        "sha256": "8c0160584629786ab3f7babb1060d526952238c58455989c7b6ced6ef59a619f",
+        "bytes": 775,
+        "unchanged_from_pre_fix": true
+      }
+    ],
+    "preserved": "Existing class names,style-variable names,150ms/75ms defaults,CSS duration parsing/recipes,selectors and goldens unchanged. Normal enabled start/frame/finish classes and duration order are asserted. Noop and reduced-motion still complete on a microtask with0 totalTime. Closed state removes existing transient classes;normal dialog ownership still removes the view.",
+    "zero_duration": "Only the race where the completion timer beats its first frame changes:completion sets the existing open class and cancels opening frame work,so the settled host stays visible. Prepared native test sets both durations0 and checks rendered opacity.",
+    "native_review_status": "Five native state/destruction/style regressions prepared,not run."
+  },
+  "focused_regressions_each_line": {
+    "passed": 13,
+    "skipped": 0,
+    "scope": "New motion source probe plus existing focus,public constructor/portal/restoration,authentic inherited API/DI,authored-use evidence and canonical population tests."
+  },
+  "main_host_motion_event_script": {
+    "applicable": false,
+    "passed": false,
+    "change": "Remove the two dialog string-presence checks;actual owned source state/cancellation tests now cover those behaviors. Existing other-family host-event tests unchanged."
+  },
+  "native_regressions": {
+    "spec": "projects/ngx-material-legacy/legacy-dialog/dialog.spec.ts",
+    "new": 5,
+    "executed": false,
+    "names": [
+      "should cancel queued open work on actual fixture destruction (enabled and di-disabled)",
+      "should preserve a close requested synchronously by an opening observer (enabled and di-disabled)",
+      "should settle a zero-duration open visibly even before an animation frame (enabled)"
+    ]
+  },
+  "previous_public_container_proof": {
+    "path": "compatibility/rc/dialog-public-container-source-proof.json",
+    "scope": "The actual base/focus/service code is unchanged. Its candidate native-spec/tooling and untouched-leaf observations remain historical after this motion edit;do not reattribute old bytes."
+  },
+  "type_evidence_refresh": {
+    "path": "compatibility/rc/dialog-motion-lifecycle-type-refresh.json",
+    "scope": "One existing OnDestroy type-use source cap refreshed after the leaf edit. Full positive96use/38file type/default/erasure diagnostic reran;prior mutations retain historical subjects. No new use/status closure."
+  },
+  "current_source_caps": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-dialog/dialog-container.ts",
+      "sha256": "e582982a52c2effafeb50d7b20da0c0e3cd081fb1d2c852b1063392b0110628a",
+      "bytes": 9028
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-dialog/dialog.spec.ts",
+      "sha256": "d908806e5f68ade01d783f246a98aa9b9683ba2eef945f6a6fb3b49ff13612bb",
+      "bytes": 84409
+    },
+    {
+      "path": "tests/dialog_initial_focus_runtime_probe.mjs",
+      "sha256": "442580fcc28ac4f08d0c1d1c7ac983a60d3664d7caaa9a3b684f9e7d9ab9996f",
+      "bytes": 19133
+    },
+    {
+      "path": "tests/dialog_motion_runtime_probe.mjs",
+      "sha256": "696ce8098fbcc39de009783024eab542c632f0e65ff29b12d896b9c23a858ad8",
+      "bytes": 17390
+    },
+    {
+      "path": "tests/test_dialog_motion_runtime.py",
+      "sha256": "c95f96dc9f0104b979e0ba4fd95b97971eebe1bb3964f0c63cba46109688c79e",
+      "bytes": 851
+    },
+    {
+      "path": "compatibility/rc/dialog-motion-lifecycle-type-refresh.json",
+      "sha256": "918e5600810f197af34af318c9f223eb3c00fe24b92279e613b1779987549bd0",
+      "bytes": 18192
+    }
+  ],
+  "authored_use_population": {
+    "frozen": 1736,
+    "reviewed": 138,
+    "open": 1598,
+    "new_closures": 0
+  },
+  "upstream_sha_scope": {
+    "frozen": 1697,
+    "new_closures": 0
+  },
+  "private_surface": "Fresh source-policy diagnostic still15 private hits,missing sparse framework declaration packages and no scanned artifact. The owned leaf adds no upstream import/private dependency;the whole gate remains failed.",
+  "still_open": [
+    "Four dialog API judgments from the public-parent repair.",
+    "Original leaf/manual/inherited constructor scope still requires complete authentic API review;the restored8-argument base does not claim every dialog class constructor qualified.",
+    "Actual21 minimum/native/rendered scheduling/SSR/AOT/packed/canonical/floor qualification.",
+    "DialogRef observable/subscription teardown review,including afterOpened stream ownership when opening is canceled.",
+    "Remaining15 private import findings,MenuItem5/Table12 constructor contracts and full1697SHA/1736authored-use scope;C05/A01-A10/R01-R03."
+  ],
+  "scope_limits": [
+    "Actual owned leaf/base/focus helper/defaults and motion flag code execute;only the flag override provider is selected for these controlled states.",
+    "Deterministic timer/frame fixtures and synthetic class/style DOM are not native rendered transitions,SSR engine qualification or real browser scheduling.",
+    "Source fixture mostly disables browser focus to isolate motion;the separate focus/restoration source tests and native keyboard/focus/style suites remain required.",
+    "Read-only installed22.1.7/hostNode22.23.3/TS6.0.3 does not qualify actual21 minimum,canonical toolchain,AOT,packed artifacts or consumer floors.",
+    "No CSS/golden/exception change,new Actions,push,credential change,publish or full G01-G13 claim."
+  ],
+  "g11_claim": "not-passed",
+  "source_policy_observation": {
+    "cases": [
+      {
+        "case_id": "source-policy/authored-boundary/no-animations-module",
+        "group": "authored-boundary",
+        "result": "pass",
+        "detail": "observed"
+      },
+      {
+        "case_id": "source-policy/authored-boundary/no-private-namespace-member",
+        "group": "authored-boundary",
+        "result": "pass",
+        "detail": "observed"
+      },
+      {
+        "case_id": "source-policy/authored-boundary/no-deep-internal",
+        "group": "authored-boundary",
+        "result": "pass",
+        "detail": "observed"
+      },
+      {
+        "case_id": "source-policy/authored-boundary/no-docs-private-symbol",
+        "group": "authored-boundary",
+        "result": "fail",
+        "detail": "forbidden imported symbol"
+      },
+      {
+        "case_id": "source-policy/authored-boundary/no-deprecated-symbol",
+        "group": "authored-boundary",
+        "result": "pass",
+        "detail": "observed"
+      },
+      {
+        "case_id": "source-policy/authored-boundary/inheritance-of-upstream",
+        "group": "authored-boundary",
+        "result": "pass",
+        "detail": "observed"
+      },
+      {
+        "case_id": "source-policy/authored-boundary/sass-public-boundary",
+        "group": "authored-boundary",
+        "result": "pass",
+        "detail": "observed"
+      },
+      {
+        "case_id": "source-policy/authored-boundary/installed-annotation-comparison",
+        "group": "authored-boundary",
+        "result": "fail",
+        "detail": "imported peer declarations unavailable: ['@angular/common', '@angular/core', '@angular/forms', '@angular/platform-browser']"
+      },
+      {
+        "case_id": "source-policy/packed-boundary/scanned-artifact-digest",
+        "group": "packed-boundary",
+        "result": "fail",
+        "detail": "packed tarball was not scanned"
+      },
+      {
+        "case_id": "source-policy/packed-boundary/js-and-declarations",
+        "group": "packed-boundary",
+        "result": "fail",
+        "detail": "packed tarball was not scanned"
+      },
+      {
+        "case_id": "source-policy/packed-boundary/sass-transitive-closure",
+        "group": "packed-boundary",
+        "result": "fail",
+        "detail": "packed tarball was not scanned"
+      }
+    ],
+    "authored_violations": [],
+    "authored_violation_count": 0,
+    "packed_violation_count": null,
+    "tarball_sha256": null,
+    "annotation_files": 75,
+    "annotation_detail": "imported peer declarations unavailable: ['@angular/common', '@angular/core', '@angular/forms', '@angular/platform-browser']",
+    "annotation_private_hits": [
+      {
+        "name": "MAT_MENU_PANEL",
+        "module": "@angular/material/menu",
+        "package": "@angular/material",
+        "path": "legacy-menu/menu.ts",
+        "access": "named",
+        "declaration_package": "@angular/material",
+        "declaration": "types/menu.d.ts",
+        "declaration_name": "MAT_MENU_PANEL"
+      },
+      {
+        "name": "MAT_MENU_PANEL",
+        "module": "@angular/material/menu",
+        "package": "@angular/material",
+        "path": "legacy-menu/public-api.ts",
+        "access": "named",
+        "declaration_package": "@angular/material",
+        "declaration": "types/menu.d.ts",
+        "declaration_name": "MAT_MENU_PANEL"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-menu/menu.spec.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "CDK_TABLE",
+        "module": "@angular/cdk/table",
+        "package": "@angular/cdk",
+        "path": "legacy-table/table.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/table.d.ts",
+        "declaration_name": "CDK_TABLE"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-select/select.spec.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-progress-spinner/progress-spinner.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-tabs/tab-header.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-tabs/tab-header.spec.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "MAT_MENU_PANEL",
+        "module": "@angular/material/menu",
+        "package": "@angular/material",
+        "path": "legacy-menu/internal/menu-trigger-base.ts",
+        "access": "named",
+        "declaration_package": "@angular/material",
+        "declaration": "types/menu.d.ts",
+        "declaration_name": "MAT_MENU_PANEL"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-select/internal/select-base.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-tabs/internal/tab-nav-bar-base.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-tabs/internal/paginated-tab-header.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-tabs/internal/tab-header-base.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-tabs/tab-nav-bar/tab-nav-bar.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      }
+    ],
+    "annotation_deprecated_hits": [],
+    "annotation_missing_packages": [
+      "@angular/common",
+      "@angular/core",
+      "@angular/forms",
+      "@angular/platform-browser"
+    ],
+    "annotation_unresolved_exports": [
+      {
+        "name": "createKeyboardEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-menu/menu.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "createMouseEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-menu/menu.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "dispatchEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-menu/menu.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "dispatchFakeEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-menu/menu.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "dispatchKeyboardEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-menu/menu.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "dispatchMouseEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-menu/menu.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "MockNgZone",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-menu/menu.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "patchElementFocus",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-menu/menu.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "createKeyboardEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-select/select.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "dispatchEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-select/select.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "dispatchFakeEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-select/select.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "dispatchKeyboardEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-select/select.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "wrappedErrorMessage",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-select/select.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "createMouseEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-button/button.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "dispatchEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-button/button.spec.ts",
+        "access": "named"
+      }
+    ]
+  }
+}
