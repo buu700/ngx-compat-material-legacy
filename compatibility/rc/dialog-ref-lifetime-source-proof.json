@@ -1,0 +1,1135 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "recorded_at_utc": "2026-10-08T05:21:25.422408+00:00",
+  "role": "Owned dialog ref lifetime/closure implementation proof;not complete API/native/AOT/minimum/packed/canonical/floor/security qualification",
+  "repair": "First close owns the result and focus origin;repeat/reentrant calls are inert. Canceled opening completes without emitting opened. Ref-owned animation/input/detachment subscriptions and fallback are released before public CDK disposal. beforeClosed emits once despite synchronous observer reentry. Preserve component availability during public afterClosed dispatch and clear it in finally,including a throwing peer. Interrupted exit that emits no closing event still has bounded cleanup while its original error propagates.",
+  "fallback_contract": {
+    "normal": "Original emitted totalTime+100ms;clear when the ref finishes.",
+    "interrupted_exit": "When owned exit returns/throws without a closing event,notify beforeClosed once,detach backdrop if stillclosing and schedule0+100ms. State guards prevent arming after reentrant completion.",
+    "stale_callback": "A captured old timer cannot finish/close twice."
+  },
+  "pre_fix_reproduction": {
+    "prior_commit": "b7be79e5189d7104e5a4db2f15c1ca0739dcaac1",
+    "prior_ref_sha256": "b4a2d126f5abb574a796fedc124c0fdaad7a2872d4b33794ee3e75f7d33acbd7",
+    "cases": 20,
+    "failed": 18,
+    "diagnostic": {
+      "schema_version": 1,
+      "role": "Actual owned ref/leaf and real public CDK DialogRef source diagnostic;finite overlay,not native/packed/minimum qualification",
+      "node": "v22.23.3",
+      "compiler": "6.0.3",
+      "runtime_peer": "22.1.7",
+      "sources": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-dialog/dialog-ref.ts",
+          "sha256": "b4a2d126f5abb574a796fedc124c0fdaad7a2872d4b33794ee3e75f7d33acbd7",
+          "bytes": 6719
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-dialog/dialog-container.ts",
+          "sha256": "5f24aba5838a8b87fd116496ad0dc240228bc484d83417082ffd4fc1c483b2d4",
+          "bytes": 10353
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "sha256": "4a216814bba5b8906f91e4d64869e6e3292e18287db4b15e32f2b8cd89e9669c",
+          "bytes": 9590
+        },
+        {
+          "path": "tests/dialog_ref_runtime_probe.mjs",
+          "sha256": "ddfeb2b5f10100f501280b02eff25fd6a1f6d9285a956fc318a994c50b5b2412",
+          "bytes": 20558
+        },
+        {
+          "path": "tests/dialog_motion_runtime_probe.mjs",
+          "sha256": "8077f3210bdcd62d73b5e16e7b6b03886d1511f6e0c0bb03975e27bb9ba87d9e",
+          "bytes": 18298
+        },
+        {
+          "path": "tests/dialog_initial_focus_runtime_probe.mjs",
+          "sha256": "a5222a43a7a82206832879b1dc244d77588b94bb406e9ee55caf1d663a51224b",
+          "bytes": 19467
+        }
+      ],
+      "source_override": "/tmp/closeout-dialog-ref-before-main.ts",
+      "authenticated_public_peer_protocol_sources": [
+        {
+          "path": "compatibility/rc/dialog-public-container-peer-sources/cdk-21.2.14-_overlay-module-chunk.mjs",
+          "sha256": "16d7e3baa590f2ed9c355b7cc3e87882ee517716cba3a7ea6a95eb0c88231627",
+          "bytes": 92570
+        },
+        {
+          "path": "compatibility/rc/dialog-public-container-peer-sources/cdk-21.2.14-dialog.mjs",
+          "sha256": "74f639c81356a04f11e7fcc94668a17da882737a1104cba769f137a57931839c",
+          "bytes": 24088
+        },
+        {
+          "path": "compatibility/rc/dialog-public-container-peer-sources/cdk-22.1.7-_overlay-module-chunk.mjs",
+          "sha256": "19811e7834a48d0a7358b5489487d8c025e51d0efe2f14c7881a0d91be736c8b",
+          "bytes": 91804
+        },
+        {
+          "path": "compatibility/rc/dialog-public-container-peer-sources/cdk-22.1.7-dialog.mjs",
+          "sha256": "715d0f484af26b104b4d043243a9de7cc945d0a34b3175e291ad0f56b08f2c29",
+          "bytes": 23982
+        }
+      ],
+      "untouched_reference": {
+        "path": "reference/material-16.2.14/dialog-focus-sources/material-dialog-ref.ts",
+        "sha256": "381c4255f6329e44e015949bf14da4cb2e51985b4ae9a5e5e25716ff6c5ea336",
+        "bytes": 8239
+      },
+      "original_shape": {
+        "kind": "class",
+        "typeParams": "type-params <T,R=any>",
+        "signatures": [
+          "public constructor(DialogRef<R,T>,MatDialogConfig,_MatDialogContainerBase)",
+          "public method addPanelClass(string|string[]):this",
+          "public method afterClosed():Observable<R|undefined>",
+          "public method afterOpened():Observable<void>",
+          "public method backdropClick():Observable<MouseEvent>",
+          "public method beforeClosed():Observable<R|undefined>",
+          "public method close(R?):void",
+          "public method getState():MatDialogState",
+          "public method keydownEvents():Observable<KeyboardEvent>",
+          "public method removePanelClass(string|string[]):this",
+          "public method updatePosition(DialogPosition?):this",
+          "public method updateSize(string?,string?):this",
+          "public prop _containerInstance:_MatDialogContainerBase",
+          "public prop componentInstance:T",
+          "public prop disableClose:boolean|undefined",
+          "public prop id:string",
+          "public readonly prop componentRef:ComponentRef<T>|null"
+        ],
+        "requiredProtected": [],
+        "requiredConstructor": true,
+        "comparison": "signature",
+        "ownSignatures": [
+          "public prop componentInstance:T",
+          "public readonly prop componentRef:ComponentRef<T>|null",
+          "public prop disableClose:boolean|undefined",
+          "public prop id:string",
+          "public constructor(DialogRef<R,T>,MatDialogConfig,_MatDialogContainerBase)",
+          "public prop _containerInstance:_MatDialogContainerBase",
+          "public method close(R?):void",
+          "public method afterOpened():Observable<void>",
+          "public method afterClosed():Observable<R|undefined>",
+          "public method beforeClosed():Observable<R|undefined>",
+          "public method backdropClick():Observable<MouseEvent>",
+          "public method keydownEvents():Observable<KeyboardEvent>",
+          "public method updatePosition(DialogPosition?):this",
+          "public method updateSize(string?,string?):this",
+          "public method addPanelClass(string|string[]):this",
+          "public method removePanelClass(string|string[]):this",
+          "public method getState():MatDialogState"
+        ],
+        "ownProtected": [],
+        "ownConstructor": true,
+        "heritage": [],
+        "inheritedConstructor": null
+      },
+      "candidate_shape": {
+        "kind": "class",
+        "typeParams": "type-params <T,R=any>",
+        "signatures": [
+          "public constructor(DialogRef<R,T>,MatDialogConfig,_MatDialogContainerBase)",
+          "public method addPanelClass(string|string[]):this",
+          "public method afterClosed():Observable<R|undefined>",
+          "public method afterOpened():Observable<void>",
+          "public method backdropClick():Observable<MouseEvent>",
+          "public method beforeClosed():Observable<R|undefined>",
+          "public method close(R?):void",
+          "public method getState():MatDialogState",
+          "public method keydownEvents():Observable<KeyboardEvent>",
+          "public method removePanelClass(string|string[]):this",
+          "public method updatePosition(DialogPosition?):this",
+          "public method updateSize(string?,string?):this",
+          "public prop _containerInstance:_MatDialogContainerBase",
+          "public prop componentInstance:T",
+          "public prop disableClose:boolean|undefined",
+          "public prop id:string",
+          "public readonly prop componentRef:ComponentRef<T>|null"
+        ],
+        "requiredProtected": [],
+        "requiredConstructor": true,
+        "comparison": "signature",
+        "ownSignatures": [
+          "public prop componentInstance:T",
+          "public readonly prop componentRef:ComponentRef<T>|null",
+          "public prop disableClose:boolean|undefined",
+          "public prop id:string",
+          "public constructor(DialogRef<R,T>,MatDialogConfig,_MatDialogContainerBase)",
+          "public prop _containerInstance:_MatDialogContainerBase",
+          "public method close(R?):void",
+          "public method afterOpened():Observable<void>",
+          "public method afterClosed():Observable<R|undefined>",
+          "public method beforeClosed():Observable<R|undefined>",
+          "public method backdropClick():Observable<MouseEvent>",
+          "public method keydownEvents():Observable<KeyboardEvent>",
+          "public method updatePosition(DialogPosition?):this",
+          "public method updateSize(string?,string?):this",
+          "public method addPanelClass(string|string[]):this",
+          "public method removePanelClass(string|string[]):this",
+          "public method getState():MatDialogState"
+        ],
+        "ownProtected": [],
+        "ownConstructor": true,
+        "heritage": [],
+        "inheritedConstructor": null
+      },
+      "cases": [
+        {
+          "id": "canceled-opening-completes-without-opened:enabled",
+          "result": "fail",
+          "error": "Expected values to be strictly equal:\n\n0 !== 1\n"
+        },
+        {
+          "id": "first-close-result-survives-repeat-and-beforeClosed-reentry:enabled",
+          "result": "fail",
+          "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n+   'repeat'\n-   'first'\n  ]\n"
+        },
+        {
+          "id": "normal-close-retains-result-focus-origin-and-component-event-order:enabled",
+          "result": "fail",
+          "error": "Expected values to be strictly equal:\n\n2 !== 1\n"
+        },
+        {
+          "id": "canceled-opening-completes-without-opened:di-disabled",
+          "result": "fail",
+          "error": "Expected values to be strictly equal:\n\n0 !== 1\n"
+        },
+        {
+          "id": "first-close-result-survives-repeat-and-beforeClosed-reentry:di-disabled",
+          "result": "fail",
+          "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n+   'repeat'\n-   'first'\n  ]\n"
+        },
+        {
+          "id": "normal-close-retains-result-focus-origin-and-component-event-order:di-disabled",
+          "result": "fail",
+          "error": "Expected values to be strictly equal:\n\n2 !== 1\n"
+        },
+        {
+          "id": "beforeClosed-overlay-detach-cannot-arm-a-late-fallback",
+          "result": "fail",
+          "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    'detached',\n+   'detached'\n  ]\n"
+        },
+        {
+          "id": "detachBackdrop-reentry-cannot-arm-a-late-fallback",
+          "result": "fail",
+          "error": "Expected values to be strictly equal:\n\n2 !== 1\n"
+        },
+        {
+          "id": "external-detach-finishes-notifications-and-releases-container-listeners",
+          "result": "fail",
+          "error": "Expected values to be strictly equal:\n\n0 !== 1\n"
+        },
+        {
+          "id": "fallback-remains-when-parent-view-is-destroyed-during-exit",
+          "result": "fail",
+          "error": "Expected values to be strictly equal:\n\n2 !== 1\n"
+        },
+        {
+          "id": "captured-stale-fallback-cannot-close-a-finished-ref-again",
+          "result": "fail",
+          "error": "Expected values to be strictly equal:\n\n3 !== 1\n"
+        },
+        {
+          "id": "input-subscriptions-do-not-handle-events-after-close",
+          "result": "fail",
+          "error": "Expected values to be strictly equal:\n\n2 !== 1\n"
+        },
+        {
+          "id": "afterOpened-completion-observer-can-detach-before-exit-is-scheduled",
+          "result": "fail",
+          "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ []\n- [\n-   'completion'\n- ]\n"
+        },
+        {
+          "id": "later-interaction-cannot-replace-the-first-close-focus-origin",
+          "result": "fail",
+          "error": "Expected values to be strictly equal:\n\n2 !== 1\n"
+        },
+        {
+          "id": "throwing-peer-close-still-releases-owned-subscriptions-and-fallback",
+          "result": "fail",
+          "error": "Expected values to be strictly equal:\n+ actual - expected\n\n+ {\n+   alive: true\n+ }\n- null\n"
+        },
+        {
+          "id": "successful-opening-replay-and-borrowed-container-stream-remain-intact",
+          "result": "pass"
+        },
+        {
+          "id": "disabled-close-modified-escape-and-nonescape-keep-the-dialog-open",
+          "result": "pass"
+        },
+        {
+          "id": "close-after-view-destruction-retains-a-bounded-fallback",
+          "result": "fail",
+          "error": "Expected values to be strictly equal:\n\n0 !== 1\n"
+        },
+        {
+          "id": "detector-destruction-before-closing-event-still-finishes-the-ref",
+          "result": "fail",
+          "error": "Expected values to be strictly equal:\n\n0 !== 1\n"
+        },
+        {
+          "id": "throwing-detector-preserves-the-error-and-the-close-fallback",
+          "result": "fail",
+          "error": "Expected values to be strictly equal:\n\n0 !== 1\n"
+        }
+      ],
+      "mutations": [],
+      "limits": [
+        "Installed public CDK22.1.7 DialogRef and actual owned ref/leaf/base/focus code execute;OverlayRef is a finite fixture matching authenticated disposal ordering.",
+        "DOM,rendering,services and clocks are synthetic fixtures;root Overlay/native factory/real reduced-motion/SSR/actual21/minimum/AOT/canonical/packed/floor checks are not executed.",
+        "Subject observer counts are test-only lifetime observations,not product dependencies on RxJS internals."
+      ]
+    },
+    "interpretation": "Previous actual owned ref code executes under current unchanged owned leaf/base/focus and authenticated public22.1.7 protocol fixture. This is not an execution of the untouched16 animation engine."
+  },
+  "source_runtime_diagnostic": {
+    "schema_version": 1,
+    "role": "Actual owned ref/leaf and real public CDK DialogRef source diagnostic;finite overlay,not native/packed/minimum qualification",
+    "node": "v22.23.3",
+    "compiler": "6.0.3",
+    "runtime_peer": "22.1.7",
+    "sources": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-dialog/dialog-ref.ts",
+        "sha256": "93cf4e88a9971a01b2572c0491142351c4598a4b325760733111266b4a10a071",
+        "bytes": 9280
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-dialog/dialog-container.ts",
+        "sha256": "5f24aba5838a8b87fd116496ad0dc240228bc484d83417082ffd4fc1c483b2d4",
+        "bytes": 10353
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+        "sha256": "4a216814bba5b8906f91e4d64869e6e3292e18287db4b15e32f2b8cd89e9669c",
+        "bytes": 9590
+      },
+      {
+        "path": "tests/dialog_ref_runtime_probe.mjs",
+        "sha256": "ddfeb2b5f10100f501280b02eff25fd6a1f6d9285a956fc318a994c50b5b2412",
+        "bytes": 20558
+      },
+      {
+        "path": "tests/dialog_motion_runtime_probe.mjs",
+        "sha256": "8077f3210bdcd62d73b5e16e7b6b03886d1511f6e0c0bb03975e27bb9ba87d9e",
+        "bytes": 18298
+      },
+      {
+        "path": "tests/dialog_initial_focus_runtime_probe.mjs",
+        "sha256": "a5222a43a7a82206832879b1dc244d77588b94bb406e9ee55caf1d663a51224b",
+        "bytes": 19467
+      }
+    ],
+    "source_override": null,
+    "authenticated_public_peer_protocol_sources": [
+      {
+        "path": "compatibility/rc/dialog-public-container-peer-sources/cdk-21.2.14-_overlay-module-chunk.mjs",
+        "sha256": "16d7e3baa590f2ed9c355b7cc3e87882ee517716cba3a7ea6a95eb0c88231627",
+        "bytes": 92570
+      },
+      {
+        "path": "compatibility/rc/dialog-public-container-peer-sources/cdk-21.2.14-dialog.mjs",
+        "sha256": "74f639c81356a04f11e7fcc94668a17da882737a1104cba769f137a57931839c",
+        "bytes": 24088
+      },
+      {
+        "path": "compatibility/rc/dialog-public-container-peer-sources/cdk-22.1.7-_overlay-module-chunk.mjs",
+        "sha256": "19811e7834a48d0a7358b5489487d8c025e51d0efe2f14c7881a0d91be736c8b",
+        "bytes": 91804
+      },
+      {
+        "path": "compatibility/rc/dialog-public-container-peer-sources/cdk-22.1.7-dialog.mjs",
+        "sha256": "715d0f484af26b104b4d043243a9de7cc945d0a34b3175e291ad0f56b08f2c29",
+        "bytes": 23982
+      }
+    ],
+    "untouched_reference": {
+      "path": "reference/material-16.2.14/dialog-focus-sources/material-dialog-ref.ts",
+      "sha256": "381c4255f6329e44e015949bf14da4cb2e51985b4ae9a5e5e25716ff6c5ea336",
+      "bytes": 8239
+    },
+    "original_shape": {
+      "kind": "class",
+      "typeParams": "type-params <T,R=any>",
+      "signatures": [
+        "public constructor(DialogRef<R,T>,MatDialogConfig,_MatDialogContainerBase)",
+        "public method addPanelClass(string|string[]):this",
+        "public method afterClosed():Observable<R|undefined>",
+        "public method afterOpened():Observable<void>",
+        "public method backdropClick():Observable<MouseEvent>",
+        "public method beforeClosed():Observable<R|undefined>",
+        "public method close(R?):void",
+        "public method getState():MatDialogState",
+        "public method keydownEvents():Observable<KeyboardEvent>",
+        "public method removePanelClass(string|string[]):this",
+        "public method updatePosition(DialogPosition?):this",
+        "public method updateSize(string?,string?):this",
+        "public prop _containerInstance:_MatDialogContainerBase",
+        "public prop componentInstance:T",
+        "public prop disableClose:boolean|undefined",
+        "public prop id:string",
+        "public readonly prop componentRef:ComponentRef<T>|null"
+      ],
+      "requiredProtected": [],
+      "requiredConstructor": true,
+      "comparison": "signature",
+      "ownSignatures": [
+        "public prop componentInstance:T",
+        "public readonly prop componentRef:ComponentRef<T>|null",
+        "public prop disableClose:boolean|undefined",
+        "public prop id:string",
+        "public constructor(DialogRef<R,T>,MatDialogConfig,_MatDialogContainerBase)",
+        "public prop _containerInstance:_MatDialogContainerBase",
+        "public method close(R?):void",
+        "public method afterOpened():Observable<void>",
+        "public method afterClosed():Observable<R|undefined>",
+        "public method beforeClosed():Observable<R|undefined>",
+        "public method backdropClick():Observable<MouseEvent>",
+        "public method keydownEvents():Observable<KeyboardEvent>",
+        "public method updatePosition(DialogPosition?):this",
+        "public method updateSize(string?,string?):this",
+        "public method addPanelClass(string|string[]):this",
+        "public method removePanelClass(string|string[]):this",
+        "public method getState():MatDialogState"
+      ],
+      "ownProtected": [],
+      "ownConstructor": true,
+      "heritage": [],
+      "inheritedConstructor": null
+    },
+    "candidate_shape": {
+      "kind": "class",
+      "typeParams": "type-params <T,R=any>",
+      "signatures": [
+        "public constructor(DialogRef<R,T>,MatDialogConfig,_MatDialogContainerBase)",
+        "public method addPanelClass(string|string[]):this",
+        "public method afterClosed():Observable<R|undefined>",
+        "public method afterOpened():Observable<void>",
+        "public method backdropClick():Observable<MouseEvent>",
+        "public method beforeClosed():Observable<R|undefined>",
+        "public method close(R?):void",
+        "public method getState():MatDialogState",
+        "public method keydownEvents():Observable<KeyboardEvent>",
+        "public method removePanelClass(string|string[]):this",
+        "public method updatePosition(DialogPosition?):this",
+        "public method updateSize(string?,string?):this",
+        "public prop _containerInstance:_MatDialogContainerBase",
+        "public prop componentInstance:T",
+        "public prop disableClose:boolean|undefined",
+        "public prop id:string",
+        "public readonly prop componentRef:ComponentRef<T>|null"
+      ],
+      "requiredProtected": [],
+      "requiredConstructor": true,
+      "comparison": "signature",
+      "ownSignatures": [
+        "public prop componentInstance:T",
+        "public readonly prop componentRef:ComponentRef<T>|null",
+        "public prop disableClose:boolean|undefined",
+        "public prop id:string",
+        "public constructor(DialogRef<R,T>,MatDialogConfig,_MatDialogContainerBase)",
+        "public prop _containerInstance:_MatDialogContainerBase",
+        "public method close(R?):void",
+        "public method afterOpened():Observable<void>",
+        "public method afterClosed():Observable<R|undefined>",
+        "public method beforeClosed():Observable<R|undefined>",
+        "public method backdropClick():Observable<MouseEvent>",
+        "public method keydownEvents():Observable<KeyboardEvent>",
+        "public method updatePosition(DialogPosition?):this",
+        "public method updateSize(string?,string?):this",
+        "public method addPanelClass(string|string[]):this",
+        "public method removePanelClass(string|string[]):this",
+        "public method getState():MatDialogState"
+      ],
+      "ownProtected": [],
+      "ownConstructor": true,
+      "heritage": [],
+      "inheritedConstructor": null
+    },
+    "cases": [
+      {
+        "id": "canceled-opening-completes-without-opened:enabled",
+        "result": "pass"
+      },
+      {
+        "id": "first-close-result-survives-repeat-and-beforeClosed-reentry:enabled",
+        "result": "pass"
+      },
+      {
+        "id": "normal-close-retains-result-focus-origin-and-component-event-order:enabled",
+        "result": "pass"
+      },
+      {
+        "id": "canceled-opening-completes-without-opened:di-disabled",
+        "result": "pass"
+      },
+      {
+        "id": "first-close-result-survives-repeat-and-beforeClosed-reentry:di-disabled",
+        "result": "pass"
+      },
+      {
+        "id": "normal-close-retains-result-focus-origin-and-component-event-order:di-disabled",
+        "result": "pass"
+      },
+      {
+        "id": "beforeClosed-overlay-detach-cannot-arm-a-late-fallback",
+        "result": "pass"
+      },
+      {
+        "id": "detachBackdrop-reentry-cannot-arm-a-late-fallback",
+        "result": "pass"
+      },
+      {
+        "id": "external-detach-finishes-notifications-and-releases-container-listeners",
+        "result": "pass"
+      },
+      {
+        "id": "fallback-remains-when-parent-view-is-destroyed-during-exit",
+        "result": "pass"
+      },
+      {
+        "id": "captured-stale-fallback-cannot-close-a-finished-ref-again",
+        "result": "pass"
+      },
+      {
+        "id": "input-subscriptions-do-not-handle-events-after-close",
+        "result": "pass"
+      },
+      {
+        "id": "afterOpened-completion-observer-can-detach-before-exit-is-scheduled",
+        "result": "pass"
+      },
+      {
+        "id": "later-interaction-cannot-replace-the-first-close-focus-origin",
+        "result": "pass"
+      },
+      {
+        "id": "throwing-peer-close-still-releases-owned-subscriptions-and-fallback",
+        "result": "pass"
+      },
+      {
+        "id": "successful-opening-replay-and-borrowed-container-stream-remain-intact",
+        "result": "pass"
+      },
+      {
+        "id": "disabled-close-modified-escape-and-nonescape-keep-the-dialog-open",
+        "result": "pass"
+      },
+      {
+        "id": "close-after-view-destruction-retains-a-bounded-fallback",
+        "result": "pass"
+      },
+      {
+        "id": "detector-destruction-before-closing-event-still-finishes-the-ref",
+        "result": "pass"
+      },
+      {
+        "id": "throwing-detector-preserves-the-error-and-the-close-fallback",
+        "result": "pass"
+      }
+    ],
+    "mutations": [
+      {
+        "id": "repeated-close-guard-removed",
+        "rejected_by": "first-close-result-survives-repeat-and-beforeClosed-reentry:enabled"
+      },
+      {
+        "id": "canceled-opening-never-completes",
+        "rejected_by": "canceled-opening-completes-without-opened:enabled"
+      },
+      {
+        "id": "owned-subscriptions-not-released",
+        "rejected_by": "external-detach-finishes-notifications-and-releases-container-listeners"
+      },
+      {
+        "id": "beforeClosed-reentrancy-guard-removed",
+        "rejected_by": "beforeClosed-overlay-detach-cannot-arm-a-late-fallback"
+      },
+      {
+        "id": "fallback-not-cleared",
+        "rejected_by": "captured-stale-fallback-cannot-close-a-finished-ref-again"
+      },
+      {
+        "id": "fallback-phase-check-removed",
+        "rejected_by": "detachBackdrop-reentry-cannot-arm-a-late-fallback"
+      },
+      {
+        "id": "finish-once-guard-removed",
+        "rejected_by": "captured-stale-fallback-cannot-close-a-finished-ref-again"
+      },
+      {
+        "id": "first-interaction-origin-guard-removed",
+        "rejected_by": "later-interaction-cannot-replace-the-first-close-focus-origin"
+      },
+      {
+        "id": "interrupted-exit-fallback-removed",
+        "rejected_by": "detector-destruction-before-closing-event-still-finishes-the-ref"
+      }
+    ],
+    "limits": [
+      "Installed public CDK22.1.7 DialogRef and actual owned ref/leaf/base/focus code execute;OverlayRef is a finite fixture matching authenticated disposal ordering.",
+      "DOM,rendering,services and clocks are synthetic fixtures;root Overlay/native factory/real reduced-motion/SSR/actual21/minimum/AOT/canonical/packed/floor checks are not executed.",
+      "Subject observer counts are test-only lifetime observations,not product dependencies on RxJS internals."
+    ]
+  },
+  "strict_source_types": {
+    "role": "Owned ref/base/focus source types;not native/AOT/packed/minimum qualification",
+    "node": "v22.23.3",
+    "compiler": "6.0.3",
+    "peer": "read-only installed22.1.7",
+    "options": {
+      "noEmit": true,
+      "strict": true,
+      "strictPropertyInitialization": false,
+      "noImplicitOverride": true,
+      "skipLibCheck": true,
+      "target": 9,
+      "module": 99,
+      "moduleResolution": 100,
+      "experimentalDecorators": true
+    },
+    "sources": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-initial-focus.ts",
+        "sha256": "826678416164bcf3fdc92d5d1692ba0f6d8d7922c303476e50b0e915f3ea142d"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+        "sha256": "4a216814bba5b8906f91e4d64869e6e3292e18287db4b15e32f2b8cd89e9669c"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-dialog/dialog-ref.ts",
+        "sha256": "93cf4e88a9971a01b2572c0491142351c4598a4b325760733111266b4a10a071"
+      }
+    ],
+    "diagnostics": [],
+    "public_protected_constructor_api_unchanged": true,
+    "original_reference_shape_exact": true,
+    "before": {
+      "kind": "class",
+      "typeParams": "type-params <T,R=any>",
+      "signatures": [
+        "public constructor(DialogRef<R,T>,MatDialogConfig,_MatDialogContainerBase)",
+        "public method addPanelClass(string|string[]):this",
+        "public method afterClosed():Observable<R|undefined>",
+        "public method afterOpened():Observable<void>",
+        "public method backdropClick():Observable<MouseEvent>",
+        "public method beforeClosed():Observable<R|undefined>",
+        "public method close(R?):void",
+        "public method getState():MatDialogState",
+        "public method keydownEvents():Observable<KeyboardEvent>",
+        "public method removePanelClass(string|string[]):this",
+        "public method updatePosition(DialogPosition?):this",
+        "public method updateSize(string?,string?):this",
+        "public prop _containerInstance:_MatDialogContainerBase",
+        "public prop componentInstance:T",
+        "public prop disableClose:boolean|undefined",
+        "public prop id:string",
+        "public readonly prop componentRef:ComponentRef<T>|null"
+      ],
+      "requiredProtected": [],
+      "requiredConstructor": true,
+      "comparison": "signature",
+      "ownSignatures": [
+        "public prop componentInstance:T",
+        "public readonly prop componentRef:ComponentRef<T>|null",
+        "public prop disableClose:boolean|undefined",
+        "public prop id:string",
+        "public constructor(DialogRef<R,T>,MatDialogConfig,_MatDialogContainerBase)",
+        "public prop _containerInstance:_MatDialogContainerBase",
+        "public method close(R?):void",
+        "public method afterOpened():Observable<void>",
+        "public method afterClosed():Observable<R|undefined>",
+        "public method beforeClosed():Observable<R|undefined>",
+        "public method backdropClick():Observable<MouseEvent>",
+        "public method keydownEvents():Observable<KeyboardEvent>",
+        "public method updatePosition(DialogPosition?):this",
+        "public method updateSize(string?,string?):this",
+        "public method addPanelClass(string|string[]):this",
+        "public method removePanelClass(string|string[]):this",
+        "public method getState():MatDialogState"
+      ],
+      "ownProtected": [],
+      "ownConstructor": true,
+      "heritage": [],
+      "inheritedConstructor": null
+    },
+    "after": {
+      "kind": "class",
+      "typeParams": "type-params <T,R=any>",
+      "signatures": [
+        "public constructor(DialogRef<R,T>,MatDialogConfig,_MatDialogContainerBase)",
+        "public method addPanelClass(string|string[]):this",
+        "public method afterClosed():Observable<R|undefined>",
+        "public method afterOpened():Observable<void>",
+        "public method backdropClick():Observable<MouseEvent>",
+        "public method beforeClosed():Observable<R|undefined>",
+        "public method close(R?):void",
+        "public method getState():MatDialogState",
+        "public method keydownEvents():Observable<KeyboardEvent>",
+        "public method removePanelClass(string|string[]):this",
+        "public method updatePosition(DialogPosition?):this",
+        "public method updateSize(string?,string?):this",
+        "public prop _containerInstance:_MatDialogContainerBase",
+        "public prop componentInstance:T",
+        "public prop disableClose:boolean|undefined",
+        "public prop id:string",
+        "public readonly prop componentRef:ComponentRef<T>|null"
+      ],
+      "requiredProtected": [],
+      "requiredConstructor": true,
+      "comparison": "signature",
+      "ownSignatures": [
+        "public prop componentInstance:T",
+        "public readonly prop componentRef:ComponentRef<T>|null",
+        "public prop disableClose:boolean|undefined",
+        "public prop id:string",
+        "public constructor(DialogRef<R,T>,MatDialogConfig,_MatDialogContainerBase)",
+        "public prop _containerInstance:_MatDialogContainerBase",
+        "public method close(R?):void",
+        "public method afterOpened():Observable<void>",
+        "public method afterClosed():Observable<R|undefined>",
+        "public method beforeClosed():Observable<R|undefined>",
+        "public method backdropClick():Observable<MouseEvent>",
+        "public method keydownEvents():Observable<KeyboardEvent>",
+        "public method updatePosition(DialogPosition?):this",
+        "public method updateSize(string?,string?):this",
+        "public method addPanelClass(string|string[]):this",
+        "public method removePanelClass(string|string[]):this",
+        "public method getState():MatDialogState"
+      ],
+      "ownProtected": [],
+      "ownConstructor": true,
+      "heritage": [],
+      "inheritedConstructor": null
+    }
+  },
+  "peer_protocol_provenance": [
+    {
+      "line": "main",
+      "package": "@angular/cdk",
+      "version": "22.1.7",
+      "archive_sha256": "225d82389797aefbbb2684461576ef950465546a9d28326483e0b816c8a5a558",
+      "integrity": "sha512-TN4pPExBZ6ZbxWnfVb77M/0cL83eRY3qpHv/R9Y1KhkNXlxdocd0My7wiueWBBimYacSpBnfHrIRNmHgX7Pc4Q==",
+      "sri_rehashed": true,
+      "members": [
+        {
+          "path": "compatibility/rc/dialog-public-container-peer-sources/cdk-22.1.7-_overlay-module-chunk.mjs",
+          "member": "package/fesm2022/_overlay-module-chunk.mjs",
+          "sha256": "19811e7834a48d0a7358b5489487d8c025e51d0efe2f14c7881a0d91be736c8b",
+          "bytes": 91804
+        },
+        {
+          "path": "compatibility/rc/dialog-public-container-peer-sources/cdk-22.1.7-dialog.mjs",
+          "member": "package/fesm2022/dialog.mjs",
+          "sha256": "715d0f484af26b104b4d043243a9de7cc945d0a34b3175e291ad0f56b08f2c29",
+          "bytes": 23982
+        }
+      ]
+    },
+    {
+      "line": "21.x",
+      "package": "@angular/cdk",
+      "version": "21.2.14",
+      "archive_sha256": "b54868a0f7aefa471203a0fe419370e156cdf0218db9b625aca3ae6e8de25c63",
+      "integrity": "sha512-806REq/CLf37nEhmmd8Q+ILN8z/RVG2vk2n8YZ/4TdHpcBCi5ux4AxLbpMmduLwGPOzPagJ6ggRzE5fnX0rmcQ==",
+      "sri_rehashed": true,
+      "members": [
+        {
+          "path": "compatibility/rc/dialog-public-container-peer-sources/cdk-21.2.14-_overlay-module-chunk.mjs",
+          "member": "package/fesm2022/_overlay-module-chunk.mjs",
+          "sha256": "16d7e3baa590f2ed9c355b7cc3e87882ee517716cba3a7ea6a95eb0c88231627",
+          "bytes": 92570
+        },
+        {
+          "path": "compatibility/rc/dialog-public-container-peer-sources/cdk-21.2.14-dialog.mjs",
+          "member": "package/fesm2022/dialog.mjs",
+          "sha256": "74f639c81356a04f11e7fcc94668a17da882737a1104cba769f137a57931839c",
+          "bytes": 24088
+        }
+      ]
+    }
+  ],
+  "native_regressions": {
+    "spec": {
+      "path": "projects/ngx-material-legacy/legacy-dialog/dialog.spec.ts",
+      "sha256": "66639b27dba4420bc7ec63fcdc9ccaf5cd04f30b4ab15fad5022adde0adb0bba"
+    },
+    "new": 10,
+    "executed": false,
+    "syntax_only": {
+      "role": "Native spec syntax/transpile diagnostic only;no native type/factory/browser/AOT execution",
+      "source": {
+        "path": "projects/ngx-material-legacy/legacy-dialog/dialog.spec.ts",
+        "sha256": "66639b27dba4420bc7ec63fcdc9ccaf5cd04f30b4ab15fad5022adde0adb0bba"
+      },
+      "diagnostics": []
+    },
+    "modes": [
+      "enabled",
+      "di-disabled"
+    ],
+    "per_mode": [
+      "Canceled opening completes without stale opened.",
+      "First result/reentrant closure;one actual publicCDK close;component available inside afterClosed.",
+      "beforeClosed detaches actual root Overlay.",
+      "afterOpened completion detaches before exit scheduling.",
+      "Public owned container destroy before close;actual overlay released by bounded fallback."
+    ]
+  },
+  "focused_tests_each_line": {
+    "shared_python_tests_passed": 14,
+    "skipped": 0,
+    "commands": [
+      "NODE_PATH=<read-only-runtime>/node_modules python3 -m unittest discover -s tests -p 'test_dialog*.py'",
+      "NODE_PATH=<read-only-runtime>/node_modules python3 -m unittest discover -s tests -p 'test_api_signatures.py'"
+    ],
+    "breakdown": "6 owned-dialog source/API wrappers+8 API helper unit tests. Actual source dialog cases total94 (20ref,13leaf constructor,16motion,19focus,26publicbase),32mutants (9ref+23prior).",
+    "runtime_scope": "Both branch candidates use read-only installed22.1.7/hostNode22.23.3/TS6.0.3 fixtures;actual21 minimum and native/packed qualification unexecuted."
+  },
+  "api_contract": "Complete untouched16.2.14 ref class source authenticates exact public/protected constructor/API shape;the candidate matches. Four base container API judgments remain open. No exception broadened.",
+  "targeted_style_behavior_review": {
+    "unchanged": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-dialog/dialog.scss",
+        "sha256": "6b8e777777f4b78e0a0aa68b11007f644359fa97e2bf505f5aa0c4cb25d082f9",
+        "bytes": 2562,
+        "unchanged_from_prior_commit": true
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-dialog/dialog-container.html",
+        "sha256": "89aeb28616459a7393902fcbeca143e3ca101baeaafa59054aebc512a5022256",
+        "bytes": 44,
+        "unchanged_from_prior_commit": true
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-dialog/dialog-animation-params.ts",
+        "sha256": "8c0160584629786ab3f7babb1060d526952238c58455989c7b6ced6ef59a619f",
+        "bytes": 775,
+        "unchanged_from_prior_commit": true
+      },
+      {
+        "path": "compatibility/rc/api/signature-differences.json",
+        "sha256": "e06fb7d14056aa44dad9f5c838c838f4f44f43d20bd855fb93d2f8b7fbc8b7f9",
+        "bytes": 47333,
+        "unchanged_from_prior_commit": true
+      }
+    ],
+    "normal_events": "Opening succeeds once;existing replay behavior retained. beforeClosed(CLOSING,result)->afterClosed(CLOSED,result);component remains available in afterClosed. Owned ref never completes the borrowed container animation emitter.",
+    "motion": "No selector/class/duration/default/CSS/golden change. Exit interrupts canceled opening;source94 dialog cases still pass. Native timing/style/floor gates remain required."
+  },
+  "source_policy_diagnostic": {
+    "cases": [
+      {
+        "case_id": "source-policy/authored-boundary/no-animations-module",
+        "group": "authored-boundary",
+        "result": "pass",
+        "detail": "observed"
+      },
+      {
+        "case_id": "source-policy/authored-boundary/no-private-namespace-member",
+        "group": "authored-boundary",
+        "result": "pass",
+        "detail": "observed"
+      },
+      {
+        "case_id": "source-policy/authored-boundary/no-deep-internal",
+        "group": "authored-boundary",
+        "result": "pass",
+        "detail": "observed"
+      },
+      {
+        "case_id": "source-policy/authored-boundary/no-docs-private-symbol",
+        "group": "authored-boundary",
+        "result": "fail",
+        "detail": "forbidden imported symbol"
+      },
+      {
+        "case_id": "source-policy/authored-boundary/no-deprecated-symbol",
+        "group": "authored-boundary",
+        "result": "pass",
+        "detail": "observed"
+      },
+      {
+        "case_id": "source-policy/authored-boundary/inheritance-of-upstream",
+        "group": "authored-boundary",
+        "result": "pass",
+        "detail": "observed"
+      },
+      {
+        "case_id": "source-policy/authored-boundary/sass-public-boundary",
+        "group": "authored-boundary",
+        "result": "pass",
+        "detail": "observed"
+      },
+      {
+        "case_id": "source-policy/authored-boundary/installed-annotation-comparison",
+        "group": "authored-boundary",
+        "result": "fail",
+        "detail": "imported peer declarations unavailable: ['@angular/common', '@angular/core', '@angular/forms', '@angular/platform-browser']"
+      },
+      {
+        "case_id": "source-policy/packed-boundary/scanned-artifact-digest",
+        "group": "packed-boundary",
+        "result": "fail",
+        "detail": "packed tarball was not scanned"
+      },
+      {
+        "case_id": "source-policy/packed-boundary/js-and-declarations",
+        "group": "packed-boundary",
+        "result": "fail",
+        "detail": "packed tarball was not scanned"
+      },
+      {
+        "case_id": "source-policy/packed-boundary/sass-transitive-closure",
+        "group": "packed-boundary",
+        "result": "fail",
+        "detail": "packed tarball was not scanned"
+      }
+    ],
+    "authored_violations": [],
+    "authored_violation_count": 0,
+    "packed_violation_count": null,
+    "tarball_sha256": null,
+    "annotation_files": 75,
+    "annotation_detail": "imported peer declarations unavailable: ['@angular/common', '@angular/core', '@angular/forms', '@angular/platform-browser']",
+    "annotation_private_hits": [
+      {
+        "name": "MAT_MENU_PANEL",
+        "module": "@angular/material/menu",
+        "package": "@angular/material",
+        "path": "legacy-menu/menu.ts",
+        "access": "named",
+        "declaration_package": "@angular/material",
+        "declaration": "types/menu.d.ts",
+        "declaration_name": "MAT_MENU_PANEL"
+      },
+      {
+        "name": "MAT_MENU_PANEL",
+        "module": "@angular/material/menu",
+        "package": "@angular/material",
+        "path": "legacy-menu/public-api.ts",
+        "access": "named",
+        "declaration_package": "@angular/material",
+        "declaration": "types/menu.d.ts",
+        "declaration_name": "MAT_MENU_PANEL"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-menu/menu.spec.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "CDK_TABLE",
+        "module": "@angular/cdk/table",
+        "package": "@angular/cdk",
+        "path": "legacy-table/table.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/table.d.ts",
+        "declaration_name": "CDK_TABLE"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-select/select.spec.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-progress-spinner/progress-spinner.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-tabs/tab-header.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-tabs/tab-header.spec.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "MAT_MENU_PANEL",
+        "module": "@angular/material/menu",
+        "package": "@angular/material",
+        "path": "legacy-menu/internal/menu-trigger-base.ts",
+        "access": "named",
+        "declaration_package": "@angular/material",
+        "declaration": "types/menu.d.ts",
+        "declaration_name": "MAT_MENU_PANEL"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-select/internal/select-base.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-tabs/internal/tab-nav-bar-base.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-tabs/internal/paginated-tab-header.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-tabs/internal/tab-header-base.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-tabs/tab-nav-bar/tab-nav-bar.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      }
+    ],
+    "annotation_deprecated_hits": [],
+    "annotation_missing_packages": [
+      "@angular/common",
+      "@angular/core",
+      "@angular/forms",
+      "@angular/platform-browser"
+    ],
+    "annotation_unresolved_exports": []
+  },
+  "frozen_authored_use_binding": {
+    "role": "Frozen inventory and existing source-review admission binding only;not complete semantic audit",
+    "seed_sha256": "3e059e3d9ba423b9f666fcf3ec960945cb43555750eb5fa3025a503d3cd8795b",
+    "inventory": {
+      "complete": true,
+      "expected": 1736,
+      "observed": 1736,
+      "missing": 0,
+      "duplicates": 0,
+      "outside": 0,
+      "invalid": 0,
+      "open": 1598
+    },
+    "evidence": {
+      "reviewed": 138,
+      "insufficient": 0,
+      "insufficient_uses": []
+    }
+  },
+  "frozen_scope": {
+    "upstream_shas": 1697,
+    "authored_uses": 1736,
+    "reviewed": 138,
+    "open": 1598,
+    "new_closures": 0
+  },
+  "current_source_caps": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-dialog/dialog-ref.ts",
+      "sha256": "93cf4e88a9971a01b2572c0491142351c4598a4b325760733111266b4a10a071",
+      "bytes": 9280
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-dialog/dialog.spec.ts",
+      "sha256": "66639b27dba4420bc7ec63fcdc9ccaf5cd04f30b4ab15fad5022adde0adb0bba",
+      "bytes": 92925
+    },
+    {
+      "path": "tests/dialog_ref_runtime_probe.mjs",
+      "sha256": "ddfeb2b5f10100f501280b02eff25fd6a1f6d9285a956fc318a994c50b5b2412",
+      "bytes": 20558
+    },
+    {
+      "path": "tests/test_dialog_ref_runtime.py",
+      "sha256": "f547c018a90a7928dfc10b367680531d0733c27f93c73588c063b48f075ee4a4",
+      "bytes": 844
+    },
+    {
+      "path": "reference/material-16.2.14/dialog-focus-sources/material-dialog-ref.ts",
+      "sha256": "381c4255f6329e44e015949bf14da4cb2e51985b4ae9a5e5e25716ff6c5ea336",
+      "bytes": 8239
+    },
+    {
+      "path": "reference/material-16.2.14/dialog-focus-sources/provenance.json",
+      "sha256": "216549f15c18cb2b5a17b52f16b51226b12900f5b03262c845ee355962d9b414",
+      "bytes": 2560
+    }
+  ],
+  "limits": [
+    "Installed public CDK22.1.7 DialogRef and actual owned ref/leaf/base/focus code execute;OverlayRef is a finite fixture matching authenticated disposal ordering.",
+    "DOM,rendering,services and clocks are synthetic fixtures;root Overlay/native factory/real reduced-motion/SSR/actual21/minimum/AOT/canonical/packed/floor checks are not executed.",
+    "Subject observer counts are test-only lifetime observations,not product dependencies on RxJS internals.",
+    "The new Subscription import uses the public RxJS subscription owner;fullRx6.5.3/Rx7.5.5 consumer floor qualification remains required.",
+    "Strict source compiler uses skipLibCheck:true and the repository strictPropertyInitialization:false;borrowed22 declarations do not qualify21.",
+    "Prior artifacts/receipts remain bound to their captured sources and are not reattributed to this repair.",
+    "No pushes,Actions,credential changes,publish,new SHA/use closure or G01-G13 claim."
+  ],
+  "remaining": [
+    "Four base protected/current-interoperability API judgments.",
+    "OriginalMenuItem5/Table12 and15 private imports;form-field hover/media/security and wider engineering.",
+    "Every1697 SHA/1736use plusC05/A01-A10/R01-R03;native/min21/AOT/packed/floor/canonical gates."
+  ],
+  "g11_claim": "not-passed"
+}

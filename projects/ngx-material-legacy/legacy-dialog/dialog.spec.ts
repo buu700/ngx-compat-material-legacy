@@ -1,4 +1,5 @@
 import {FocusMonitor, FocusOrigin, FocusTrapFactory, InteractivityChecker} from '@angular/cdk/a11y';
+import {DialogRef as CdkDialogRef} from '@angular/cdk/dialog';
 import {
   ComponentFixture,
   fakeAsync,
@@ -2471,6 +2472,112 @@ describe('Owned legacy dialog initial focus', () => {
 
 @Component({standalone: false, template: '<button>Motion content</button>'})
 class LegacyMotionContent {}
+
+for (const mode of ['enabled', 'di-disabled'] as const) {
+  describe(`Owned legacy dialog ref teardown (${mode})`, () => {
+    beforeEach(() => TestBed.configureTestingModule({
+      imports: [MatLegacyDialogModule],
+      declarations: [LegacyMotionContent],
+      providers: [{provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: mode}],
+    }));
+
+    it('should complete canceled opening without a stale opened notification', fakeAsync(() => {
+      const dialog = TestBed.inject(MatLegacyDialog);
+      const ref = dialog.open(LegacyMotionContent);
+      const opened = jasmine.createSpy('opened');
+      const completed = jasmine.createSpy('opening completed');
+      const results: unknown[] = [];
+      ref.afterOpened().subscribe({next: opened, complete: completed});
+      ref.afterClosed().subscribe(result => results.push(result));
+      ref.close('canceled');
+      flush();
+      expect(opened).not.toHaveBeenCalled();
+      expect(completed).toHaveBeenCalledTimes(1);
+      expect(results).toEqual(['canceled']);
+      expect(ref.getState()).toBe(MatLegacyDialogState.CLOSED);
+      expect(TestBed.inject(OverlayContainer).getContainerElement().childElementCount).toBe(0);
+    }));
+
+    it('should retain the first result through repeated and reentrant close', fakeAsync(() => {
+      const close = spyOn(CdkDialogRef.prototype, 'close').and.callThrough();
+      const ref = TestBed.inject(MatLegacyDialog).open(LegacyMotionContent);
+      const before: unknown[] = [];
+      const after: unknown[] = [];
+      let instanceInAfterClosed: unknown;
+      ref.beforeClosed().subscribe(result => {
+        before.push(result);
+        ref.close('reentrant');
+      });
+      ref.afterClosed().subscribe(result => {
+        after.push(result);
+        instanceInAfterClosed = ref.componentInstance;
+      });
+      ref.close('first');
+      ref.close('repeat');
+      flush();
+      expect(before).toEqual(['first']);
+      expect(after).toEqual(['first']);
+      expect(close).toHaveBeenCalledTimes(1);
+      expect(instanceInAfterClosed).toBeTruthy();
+      expect(ref.componentInstance).toBeNull();
+    }));
+
+    it('should finish once when beforeClosed detaches the actual overlay', fakeAsync(() => {
+      const close = spyOn(CdkDialogRef.prototype, 'close').and.callThrough();
+      const create = spyOn(TestBed.inject(Overlay), 'create').and.callThrough();
+      const ref = TestBed.inject(MatLegacyDialog).open(LegacyMotionContent);
+      const overlay = create.calls.mostRecent().returnValue;
+      const before = jasmine.createSpy('beforeClosed');
+      const after = jasmine.createSpy('afterClosed');
+      ref.beforeClosed().subscribe(result => {
+        before(result);
+        overlay.detach();
+      });
+      ref.afterClosed().subscribe(after);
+      ref.close('detached');
+      flush();
+      expect(before).toHaveBeenCalledOnceWith('detached');
+      expect(after).toHaveBeenCalledOnceWith('detached');
+      expect(close).toHaveBeenCalledTimes(1);
+      expect(ref.getState()).toBe(MatLegacyDialogState.CLOSED);
+      expect(TestBed.inject(OverlayContainer).getContainerElement().childElementCount).toBe(0);
+    }));
+
+    it('should allow opening completion to detach without scheduling an exit', fakeAsync(() => {
+      const create = spyOn(TestBed.inject(Overlay), 'create').and.callThrough();
+      const ref = TestBed.inject(MatLegacyDialog).open(LegacyMotionContent);
+      const overlay = create.calls.mostRecent().returnValue;
+      const exit = spyOn(ref._containerInstance, '_startExitAnimation').and.callThrough();
+      const after = jasmine.createSpy('afterClosed');
+      ref.afterOpened().subscribe({complete: () => overlay.detach()});
+      ref.afterClosed().subscribe(after);
+      ref.close('completion');
+      flush();
+      expect(exit).not.toHaveBeenCalled();
+      expect(after).toHaveBeenCalledOnceWith('completion');
+      expect(ref.componentInstance).toBeNull();
+      expect(TestBed.inject(OverlayContainer).getContainerElement().childElementCount).toBe(0);
+    }));
+
+    it('should release a ref whose owned container was destroyed before close', fakeAsync(() => {
+      const close = spyOn(CdkDialogRef.prototype, 'close').and.callThrough();
+      const ref = TestBed.inject(MatLegacyDialog).open(LegacyMotionContent);
+      const before = jasmine.createSpy('beforeClosed');
+      const after = jasmine.createSpy('afterClosed');
+      ref.beforeClosed().subscribe(before);
+      ref.afterClosed().subscribe(after);
+      ref._containerInstance.ngOnDestroy();
+      ref.close('destroyed');
+      tick(100);
+      flush();
+      expect(before).toHaveBeenCalledOnceWith('destroyed');
+      expect(after).toHaveBeenCalledOnceWith('destroyed');
+      expect(close).toHaveBeenCalledTimes(1);
+      expect(ref.componentInstance).toBeNull();
+      expect(TestBed.inject(OverlayContainer).getContainerElement().childElementCount).toBe(0);
+    }));
+  });
+}
 
 for (const mode of ['enabled', 'di-disabled'] as const) {
   describe(`Owned legacy dialog motion (${mode})`, () => {
