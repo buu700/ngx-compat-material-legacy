@@ -15,10 +15,12 @@ import {CommonModule} from '@angular/common';
 import {Observable} from 'rxjs';
 import {
   MatLegacyTab,
+  MatLegacyTabLabel,
   MatLegacyTabGroup,
   MatLegacyTabHeader,
   MatLegacyTabsModule,
   MAT_LEGACY_TABS_CONFIG,
+  MAT_LEGACY_TAB,
 } from './index';
 import {MatLegacyTabHeaderPosition} from '@ngx-compat/material-legacy/legacy-tabs';
 
@@ -766,6 +768,31 @@ describe('MatTabGroup', () => {
   });
 
   describe('special cases', () => {
+    it('should resolve the exported legacy tab token to the nearest tab', () => {
+      const fixture = TestBed.createComponent(SimpleTabsTestApp);
+      fixture.detectChanges();
+      const tabs = fixture.debugElement.queryAll(By.directive(MatLegacyTab));
+      const labels = fixture.debugElement.queryAll(By.directive(MatLegacyTabLabel));
+      expect(tabs.length).toBe(3);
+      expect(labels.length).toBe(3);
+      tabs.forEach((tab, index) => {
+        expect(tab.injector.get(MAT_LEGACY_TAB)).toBe(tab.componentInstance);
+        expect(labels[index].componentInstance._closestTab).toBe(tab.componentInstance);
+      });
+    });
+
+    it('should honor an explicit legacy tab token override for labels', () => {
+      const suppliedTab = {marker: 'custom nearest tab'};
+      TestBed.overrideComponent(MatLegacyTab, {
+        set: {providers: [{provide: MAT_LEGACY_TAB, useValue: suppliedTab}]},
+      });
+      const fixture = TestBed.createComponent(SimpleTabsTestApp);
+      fixture.detectChanges();
+      const labels = fixture.debugElement.queryAll(By.directive(MatLegacyTabLabel));
+      expect(labels.length).toBe(3);
+      labels.forEach(label => expect(label.componentInstance._closestTab).toBe(suppliedTab));
+    });
+
     it('should not throw an error when binding isActive to the view', fakeAsync(() => {
       const fixture = TestBed.createComponent(TabGroupWithIsActiveBinding);
 

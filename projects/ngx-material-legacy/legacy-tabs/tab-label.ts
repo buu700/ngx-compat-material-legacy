@@ -8,7 +8,7 @@
  */
 
 import {Directive, Inject, Optional, TemplateRef, ViewContainerRef} from '@angular/core';
-import {MatLegacyTab} from './tab';
+import {MAT_TAB} from './internal/tab-token';
 import {constructWithPublicDependencies} from './internal/public-constructor-context';
 import {MAT_TAB_LABEL, MatTabLabel as MatNonLegacyTabLabel} from '@angular/material/tabs';
 
@@ -25,8 +25,9 @@ export class MatLegacyTabLabel extends MatNonLegacyTabLabel {
   declare _closestTab: any;
 
   // @ts-expect-error TS2377: derived constructor deliberately returns its object.
-  constructor(templateRef: TemplateRef<any>, viewContainerRef: ViewContainerRef,
-      @Optional() @Inject(MatLegacyTab) closestTab: any) {
+  constructor(@Inject(TemplateRef) templateRef: TemplateRef<any>,
+      @Inject(ViewContainerRef) viewContainerRef: ViewContainerRef,
+      @Optional() @Inject(MAT_TAB) closestTab: any) {
     const label = constructWithPublicDependencies(MatNonLegacyTabLabel, new.target, [
       {provide: TemplateRef, useValue: templateRef},
       {provide: ViewContainerRef, useValue: viewContainerRef},

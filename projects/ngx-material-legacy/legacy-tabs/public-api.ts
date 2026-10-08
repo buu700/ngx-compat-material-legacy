@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -40,7 +41,6 @@ export {
 } from './internal/tab-nav-bar-base';
 export {MatPaginatedTabHeader as MatLegacyPaginatedTabHeader} from './internal/paginated-tab-header';
 export {
-  MAT_TAB as MAT_LEGACY_TAB,
   MAT_TAB_LABEL as MAT_LEGACY_TAB_LABEL,
   MAT_TAB_CONTENT as MAT_LEGACY_TAB_CONTENT,
   MAT_TABS_CONFIG as MAT_LEGACY_TABS_CONFIG,
@@ -53,3 +53,4 @@ export {
   _MAT_INK_BAR_POSITIONER_FACTORY as _MAT_LEGACY_INK_BAR_POSITIONER_FACTORY,
 } from './internal/ink-bar-shared';
 export {MatCommonModule} from './internal/common-module';
+export {MAT_TAB as MAT_LEGACY_TAB} from './internal/tab-token';

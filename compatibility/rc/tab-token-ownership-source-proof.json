@@ -1,0 +1,391 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-08T00:51:55.443376+00:00",
+  "scope": "C03/C04 bounded replacement of the private MAT_TAB bridge with one owned legacy token",
+  "reviewer": "Codex primary implementer",
+  "original": {
+    "commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+    "sources": [
+      {
+        "path": "src/material/tabs/tab-label.ts",
+        "sha256": "644521cab3af17c5dd99f63937556b90ca34b259b1e76f9bc9efeaf0067415c0",
+        "bytes": 1292,
+        "source": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\n\nimport {\n  Directive,\n  Inject,\n  InjectionToken,\n  Optional,\n  TemplateRef,\n  ViewContainerRef,\n} from '@angular/core';\nimport {CdkPortal} from '@angular/cdk/portal';\n\n/**\n * Injection token that can be used to reference instances of `MatTabLabel`. It serves as\n * alternative token to the actual `MatTabLabel` class which could cause unnecessary\n * retention of the class and its directive metadata.\n */\nexport const MAT_TAB_LABEL = new InjectionToken<MatTabLabel>('MatTabLabel');\n\n/**\n * Used to provide a tab label to a tab without causing a circular dependency.\n * @docs-private\n */\nexport const MAT_TAB = new InjectionToken<any>('MAT_TAB');\n\n/** Used to flag tab labels for use with the portal directive */\n@Directive({\n  selector: '[mat-tab-label], [matTabLabel]',\n  providers: [{provide: MAT_TAB_LABEL, useExisting: MatTabLabel}],\n})\nexport class MatTabLabel extends CdkPortal {\n  constructor(\n    templateRef: TemplateRef<any>,\n    viewContainerRef: ViewContainerRef,\n    @Inject(MAT_TAB) @Optional() public _closestTab: any,\n  ) {\n    super(templateRef, viewContainerRef);\n  }\n}\n"
+      },
+      {
+        "path": "src/material/legacy-tabs/tab.ts",
+        "sha256": "0fc0c91e7916d16fd6fe6a82356b6c5f8890e34958483e960f784412978e0970",
+        "bytes": 1753,
+        "source": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\n\nimport {\n  ChangeDetectionStrategy,\n  Component,\n  ContentChild,\n  TemplateRef,\n  ViewEncapsulation,\n} from '@angular/core';\nimport {\n  _MatTabBase,\n  MAT_TAB,\n  MatTabLabel,\n  MAT_TAB_LABEL,\n  MAT_TAB_CONTENT,\n} from '@angular/material/tabs';\n\n/**\n * @deprecated Use `MatTab` from `@angular/material/tabs` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.\n * @breaking-change 17.0.0\n */\n@Component({\n  selector: 'mat-tab',\n  templateUrl: 'tab.html',\n  inputs: ['disabled'],\n  // tslint:disable-next-line:validate-decorators\n  changeDetection: ChangeDetectionStrategy.Default,\n  encapsulation: ViewEncapsulation.None,\n  exportAs: 'matTab',\n  providers: [{provide: MAT_TAB, useExisting: MatLegacyTab}],\n  host: {\n    // This binding is used to ensure that the component ID doesn't clash with the `MatTab`.\n    '[attr.mat-id-collision]': 'null',\n  },\n})\nexport class MatLegacyTab extends _MatTabBase {\n  /** Content for the tab label given by `<ng-template mat-tab-label>`. */\n  @ContentChild(MAT_TAB_LABEL)\n  get templateLabel(): MatTabLabel {\n    return this._templateLabel;\n  }\n  set templateLabel(value: MatTabLabel) {\n    this._setTemplateLabelInput(value);\n  }\n\n  /**\n   * Template provided in the tab content that will be used if present, used to enable lazy-loading\n   */\n  @ContentChild(MAT_TAB_CONTENT, {read: TemplateRef, static: true})\n  // We need an initializer here to avoid a TS error. The value will be set in `ngAfterViewInit`.\n  override _explicitContent: TemplateRef<any> = undefined!;\n}\n"
+      },
+      {
+        "path": "src/material/legacy-tabs/public-api.ts",
+        "sha256": "f6a4dd305258afa9706c958c06f6260baec6258731f2fa9dba91667faa43b62c",
+        "bytes": 6159,
+        "source": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\n\nexport {MatLegacyTabsModule} from './tabs-module';\nexport {MatLegacyTabGroup} from './tab-group';\nexport {MatLegacyInkBar} from './ink-bar';\nexport {MatLegacyTabBody, MatLegacyTabBodyPortal} from './tab-body';\nexport {MatLegacyTabHeader} from './tab-header';\nexport {MatLegacyTab} from './tab';\nexport {MatLegacyTabNav, MatLegacyTabLink, MatLegacyTabNavPanel} from './tab-nav-bar/index';\nexport {MatLegacyTabLabel} from './tab-label';\nexport {MatLegacyTabLabelWrapper} from './tab-label-wrapper';\nexport {MatLegacyTabContent} from './tab-content';\nexport {\n  /**\n   * @deprecated Use `_MatTabNavBase` from `@angular/material/tabs` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.\n   * @breaking-change 17.0.0\n   */\n  _MatTabNavBase as _MatLegacyTabNavBase,\n\n  /**\n   * @deprecated Use `_MatTabLinkBase` from `@angular/material/tabs` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.\n   * @breaking-change 17.0.0\n   */\n  _MatTabLinkBase as _MatLegacyTabLinkBase,\n\n  /**\n   * @deprecated Use `MatTabsConfig` from `@angular/material/tabs` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.\n   * @breaking-change 17.0.0\n   */\n  MatTabsConfig as MatLegacyTabsConfig,\n\n  /**\n   * @deprecated Use `MAT_TABS_CONFIG` from `@angular/material/tabs` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.\n   * @breaking-change 17.0.0\n   */\n  MAT_TABS_CONFIG as MAT_LEGACY_TABS_CONFIG,\n\n  /**\n   * @deprecated Use `_MatTabBase` from `@angular/material/tabs` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.\n   * @breaking-change 17.0.0\n   */\n  _MatTabBase as _MatLegacyTabBase,\n\n  /**\n   * @deprecated Use `MAT_TAB` from `@angular/material/tabs` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.\n   * @breaking-change 17.0.0\n   */\n  MAT_TAB as MAT_LEGACY_TAB,\n\n  /**\n   * @deprecated Use `ScrollDirection` from `@angular/material/tabs` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.\n   * @breaking-change 17.0.0\n   */\n  ScrollDirection as LegacyScrollDirection,\n\n  /**\n   * @deprecated Use `MAT_TAB_GROUP` from `@angular/material/tabs` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.\n   * @breaking-change 17.0.0\n   */\n  MAT_TAB_GROUP as MAT_LEGACY_TAB_GROUP,\n\n  /**\n   * @deprecated Use `_MatTabBodyBase` from `@angular/material/tabs` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.\n   * @breaking-change 17.0.0\n   */\n  _MatTabBodyBase as _MatLegacyTabBodyBase,\n\n  /**\n   * @deprecated Use `MatTabBodyPositionState` from `@angular/material/tabs` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.\n   * @breaking-change 17.0.0\n   */\n  MatTabBodyPositionState as MatLegacyTabBodyPositionState,\n\n  /**\n   * @deprecated Use `matTabsAnimations` from `@angular/material/tabs` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.\n   * @breaking-change 17.0.0\n   */\n  matTabsAnimations as matLegacyTabsAnimations,\n\n  /**\n   * @deprecated Use `MAT_TAB_CONTENT` from `@angular/material/tabs` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.\n   * @breaking-change 17.0.0\n   */\n  MAT_TAB_CONTENT as MAT_LEGACY_TAB_CONTENT,\n\n  /**\n   * @deprecated Use `MatTabBodyOriginState` from `@angular/material/tabs` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.\n   * @breaking-change 17.0.0\n   */\n  MatTabBodyOriginState as MatLegacyTabBodyOriginState,\n\n  /**\n   * @deprecated Use `_MatInkBarPositioner` from `@angular/material/tabs` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.\n   * @breaking-change 17.0.0\n   */\n  _MatInkBarPositioner as _MatLegacyInkBarPositioner,\n\n  /**\n   * @deprecated Use `_MAT_INK_BAR_POSITIONER` from `@angular/material/tabs` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.\n   * @breaking-change 17.0.0\n   */\n  _MAT_INK_BAR_POSITIONER as _MAT_LEGACY_INK_BAR_POSITIONER,\n\n  /**\n   * @deprecated Use `_MAT_INK_BAR_POSITIONER_FACTORY` from `@angular/material/tabs` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.\n   * @breaking-change 17.0.0\n   */\n  _MAT_INK_BAR_POSITIONER_FACTORY as _MAT_LEGACY_INK_BAR_POSITIONER_FACTORY,\n\n  /**\n   * @deprecated Use `MatTabChangeEvent` from `@angular/material/tabs` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.\n   * @breaking-change 17.0.0\n   */\n  MatTabChangeEvent as MatLegacyTabChangeEvent,\n\n  /**\n   * @deprecated Use `_MatTabGroupBase` from `@angular/material/tabs` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.\n   * @breaking-change 17.0.0\n   */\n  _MatTabGroupBase as _MatLegacyTabGroupBase,\n\n  /**\n   * @deprecated Use `MatTabHeaderPosition` from `@angular/material/tabs` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.\n   * @breaking-change 17.0.0\n   */\n  MatTabHeaderPosition as MatLegacyTabHeaderPosition,\n\n  /**\n   * @deprecated Use `_MatTabHeaderBase` from `@angular/material/tabs` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.\n   * @breaking-change 17.0.0\n   */\n  _MatTabHeaderBase as _MatLegacyTabHeaderBase,\n\n  /**\n   * @deprecated Use `MatPaginatedTabHeader` from `@angular/material/tabs` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.\n   * @breaking-change 17.0.0\n   */\n  MatPaginatedTabHeader as MatLegacyPaginatedTabHeader,\n} from '@angular/material/tabs';\n"
+      }
+    ],
+    "constructor_reference": "reference/material-16.2.14/material-inherited-constructors/tabs.d.ts",
+    "constructor_reference_sha256": "30bc71d7fdfc6d01c54cc157e50298025351db6969cb49f042a4f0a252da1ca8"
+  },
+  "minimum_peers": [
+    {
+      "line": "main",
+      "package": "@angular/material",
+      "version": "22.1.7",
+      "integrity": "sha512-mpe0lL6eDlN5AuXY7CP29SfKey7nVuHp4YhQijaq9orRFwsP3fSGrMU9BJjIRDOLWc8Zg9v/oa85E1CjNebXGg==",
+      "archive_sha256": "06115b963b565428d8d5f79cc1cdd07a3f0d5a58dbaebf9955639f38b35ac43d",
+      "source_files": 184,
+      "archive_rehashed": true,
+      "members": [
+        {
+          "member": "package/types/tabs.d.ts",
+          "sha256": "f9e3d4a03f04f9453a41ef7faaf823e856d5287db74bde6ebf37be037f486f32",
+          "bytes": 43886,
+          "token_and_label_context": "nToken<MatTabLabel>;\n/**\n * Used to provide a tab label to a tab without causing a circular dependency.\n * @docs-private\n */\ndeclare const MAT_TAB: InjectionToken<any>;\n/** Used to flag tab labels for use with the portal directive */\ndeclare class MatTabLabel extends CdkPortal {\n    _closestTab: any;\n    static \u0275fac: i0.\u0275\u0275FactoryDeclaration<MatTabLabel, never>;\n    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatTabLabel, \"[mat-tab-label], [matTabLabel]\", never, {}, {}, never, never, t"
+        },
+        {
+          "member": "package/fesm2022/tabs.mjs",
+          "sha256": "bd6314ac06a0eed5cf0fe3a8e4c5cf69526df9541df5e40dc01a406af257fb09",
+          "bytes": 134401,
+          "token_and_label_context": "g: MatTabContent\n      }]\n    }]\n  }]\n});\n\nconst MAT_TAB_LABEL = new InjectionToken('MatTabLabel');\nconst MAT_TAB = new InjectionToken('MAT_TAB');\nclass MatTabLabel extends CdkPortal {\n  _closestTab = inject(MAT_TAB, {\n    optional: true\n  });\n  static \u0275fac = i0.\u0275\u0275ngDeclareFactory({\n    minVersio"
+        }
+      ]
+    },
+    {
+      "line": "21.x",
+      "package": "@angular/material",
+      "version": "21.2.14",
+      "integrity": "sha512-fMQca8VRtei93JRRG9qQ+u08DCb0nga59Esoakq5yx3+A1NfdpFeUS1tBns56U04o8KAaIAwZK3NBqXz8ZKNqg==",
+      "archive_sha256": "2f8c0fce7967b8a91a07bc3a184cf5da6023eac3828d15fa23b6c338b340e23c",
+      "source_files": 183,
+      "archive_rehashed": true,
+      "members": [
+        {
+          "member": "package/types/tabs.d.ts",
+          "sha256": "d63d56688e24118bb38d0f224248c59f0330a60df3fe457a068a9842eb9616fd",
+          "bytes": 43670,
+          "token_and_label_context": "nToken<MatTabLabel>;\n/**\n * Used to provide a tab label to a tab without causing a circular dependency.\n * @docs-private\n */\ndeclare const MAT_TAB: InjectionToken<any>;\n/** Used to flag tab labels for use with the portal directive */\ndeclare class MatTabLabel extends CdkPortal {\n    _closestTab: any;\n    static \u0275fac: i0.\u0275\u0275FactoryDeclaration<MatTabLabel, never>;\n    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatTabLabel, \"[mat-tab-label], [matTabLabel]\", never, {}, {}, never, never, t"
+        },
+        {
+          "member": "package/fesm2022/tabs.mjs",
+          "sha256": "5a798a54a86a966501288531be98f12338b28463543324c2b16e9756b64b418d",
+          "bytes": 134073,
+          "token_and_label_context": "  }]\n  }],\n  ctorParameters: () => []\n});\n\nconst MAT_TAB_LABEL = new InjectionToken('MatTabLabel');\nconst MAT_TAB = new InjectionToken('MAT_TAB');\nclass MatTabLabel extends CdkPortal {\n  _closestTab = inject(MAT_TAB, {\n    optional: true\n  });\n  static \u0275fac = i0.\u0275\u0275ngDeclareFactory({\n    minVersio"
+        }
+      ]
+    }
+  ],
+  "decision": "Own the finite MAT_TAB InjectionToken definition with the original description. The exported MAT_LEGACY_TAB, legacy tab provider and optional label constructor all reference exactly that object. Restore custom-token overrides lost by the prior class-based adapter. Keep actual public MatTabLabel/CdkPortal/TemplatePortal parent identities, supplied template/container/closest-tab objects and nesting guard. Do not import current private MAT_TAB in production or substitute label descriptions for identities. Sharing a historical token with Material16 does not authorize the current private dependency. This independently owned bridge follows the required legacy ownership contract;there is no new component/CDK fork or compatibility waiver.",
+  "prior_proof": {
+    "path": "compatibility/rc/tab-label-public-constructor-source-proof.json",
+    "sha256": "1aba82ae3683fa2c736b5bdb35fadd02f61699c6552bf2d15eee1a6dca666e72",
+    "role": "Preserved old class-injection adaptation and90-case Actions evidence. Its prior token-change limitation is superseded by this implementation;its native runs do not qualify this source."
+  },
+  "source_factory_runtime": {
+    "main": {
+      "role": "Actual owned source label JIT factory,public Angular injector and exact token/portal objects",
+      "node": "v22.23.3",
+      "compiler": "6.0.3",
+      "sources": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-token.ts",
+          "sha256": "8b4148fb7e16dbe43712b0de95e078c1b2aad5e60b27621141d3ff2b6682d90b",
+          "bytes": 424
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/internal/public-constructor-context.ts",
+          "sha256": "5fc78b1916b5a189a64e5ab68a810b1304a742c6f084a327cd1f3bbdcf4c27dd",
+          "bytes": 1371
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/tab-label.ts",
+          "sha256": "5ff08854377bb33070d69ee6fb4f7a346d37bebf4aefb6f0fd7a48f6a98621ff",
+          "bytes": 1493
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/tab.ts",
+          "sha256": "d6c880f2c5e9c1ee5218f688e4cb73e6df76cf09687a06af1c3c2a379912c2a6",
+          "bytes": 1701
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/public-api.ts",
+          "sha256": "c858153f373aa44ddb7e238b63702cb0119b3bae4be57dfd73afd85378dc6203",
+          "bytes": 2559
+        }
+      ],
+      "dependencies": {
+        "@angular/core": {
+          "version": "22.1.7",
+          "manifest_sha256": "fd7e79e557a78aa4ac6617a6056dbb461b07286ee5915bceec9af9e07742acbf"
+        },
+        "@angular/compiler": {
+          "version": "22.1.7",
+          "manifest_sha256": "f80d2d7613d473e1eb91c54b05f4976ab269a67e960f270c6c4f14dc3e438bbb"
+        },
+        "@angular/cdk": {
+          "version": "22.1.7",
+          "manifest_sha256": "ec60a5803a214c9b9d8bcdc2de0b0c294ecdd420d680d0e95e686f7aa4d46933"
+        },
+        "@angular/material": {
+          "version": "22.1.7",
+          "manifest_sha256": "5d33c35b56f9834d36a3be0ce4dc37892e689bceb1727de0cf223f10ab8f28af"
+        },
+        "typescript": {
+          "version": "6.0.3",
+          "manifest_sha256": "9332e97c30d3e53ed54910b89207ed657fb444066484df6e5b6965bf130865e9"
+        }
+      },
+      "cases": [
+        {
+          "id": "owned-token-is-distinct",
+          "result": "pass"
+        },
+        {
+          "id": "factory-preserves-supplied-token-and-portal-objects",
+          "result": "pass"
+        },
+        {
+          "id": "missing-legacy-token-is-optional",
+          "result": "pass"
+        },
+        {
+          "id": "same-description-token-does-not-resolve",
+          "result": "pass"
+        },
+        {
+          "id": "current-peer-token-does-not-resolve-as-legacy",
+          "result": "pass"
+        },
+        {
+          "id": "manual-constructor-preserves-arguments",
+          "result": "pass"
+        }
+      ],
+      "mutations": [
+        {
+          "id": "wrong-constructor-token",
+          "source_sha256": "705e66d95bb5621dfaae0ebcf5d50a9eb5db4d6ae196f40eecf57f12dd16d36b",
+          "rejected_by": [
+            "factory-preserves-supplied-token-and-portal-objects",
+            "missing-legacy-token-is-optional",
+            "same-description-token-does-not-resolve",
+            "current-peer-token-does-not-resolve-as-legacy"
+          ]
+        },
+        {
+          "id": "missing-closest-assignment",
+          "source_sha256": "8d5b0e234f38c7b7cfcccdeaec5e24fbe175dcb1e17487feb902d7db83c578b4",
+          "rejected_by": [
+            "factory-preserves-supplied-token-and-portal-objects",
+            "manual-constructor-preserves-arguments"
+          ]
+        },
+        {
+          "id": "required-legacy-token",
+          "source_sha256": "edad38f87053a4ea38c821408aa26c3340ceb680d8b14a857d2424e3f180cd62",
+          "rejected_by": [
+            "missing-legacy-token-is-optional",
+            "same-description-token-does-not-resolve",
+            "current-peer-token-does-not-resolve-as-legacy"
+          ]
+        }
+      ],
+      "limitations": [
+        "No strict external declarations,AOT,node-view or rendered nearest-tab execution",
+        "Host22.1.7 runtime;not minimum21/Node/RxJS or packed qualification",
+        "Default node provider and override/nesting native regressions remain required"
+      ]
+    },
+    "21.x": {
+      "role": "Actual owned source label JIT factory,public Angular injector and exact token/portal objects",
+      "node": "v22.23.3",
+      "compiler": "6.0.3",
+      "sources": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-token.ts",
+          "sha256": "8b4148fb7e16dbe43712b0de95e078c1b2aad5e60b27621141d3ff2b6682d90b",
+          "bytes": 424
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/internal/public-constructor-context.ts",
+          "sha256": "5fc78b1916b5a189a64e5ab68a810b1304a742c6f084a327cd1f3bbdcf4c27dd",
+          "bytes": 1371
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/tab-label.ts",
+          "sha256": "5ff08854377bb33070d69ee6fb4f7a346d37bebf4aefb6f0fd7a48f6a98621ff",
+          "bytes": 1493
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/tab.ts",
+          "sha256": "d6c880f2c5e9c1ee5218f688e4cb73e6df76cf09687a06af1c3c2a379912c2a6",
+          "bytes": 1701
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/public-api.ts",
+          "sha256": "c858153f373aa44ddb7e238b63702cb0119b3bae4be57dfd73afd85378dc6203",
+          "bytes": 2559
+        }
+      ],
+      "dependencies": {
+        "@angular/core": {
+          "version": "22.1.7",
+          "manifest_sha256": "fd7e79e557a78aa4ac6617a6056dbb461b07286ee5915bceec9af9e07742acbf"
+        },
+        "@angular/compiler": {
+          "version": "22.1.7",
+          "manifest_sha256": "f80d2d7613d473e1eb91c54b05f4976ab269a67e960f270c6c4f14dc3e438bbb"
+        },
+        "@angular/cdk": {
+          "version": "22.1.7",
+          "manifest_sha256": "ec60a5803a214c9b9d8bcdc2de0b0c294ecdd420d680d0e95e686f7aa4d46933"
+        },
+        "@angular/material": {
+          "version": "22.1.7",
+          "manifest_sha256": "5d33c35b56f9834d36a3be0ce4dc37892e689bceb1727de0cf223f10ab8f28af"
+        },
+        "typescript": {
+          "version": "6.0.3",
+          "manifest_sha256": "9332e97c30d3e53ed54910b89207ed657fb444066484df6e5b6965bf130865e9"
+        }
+      },
+      "cases": [
+        {
+          "id": "owned-token-is-distinct",
+          "result": "pass"
+        },
+        {
+          "id": "factory-preserves-supplied-token-and-portal-objects",
+          "result": "pass"
+        },
+        {
+          "id": "missing-legacy-token-is-optional",
+          "result": "pass"
+        },
+        {
+          "id": "same-description-token-does-not-resolve",
+          "result": "pass"
+        },
+        {
+          "id": "current-peer-token-does-not-resolve-as-legacy",
+          "result": "pass"
+        },
+        {
+          "id": "manual-constructor-preserves-arguments",
+          "result": "pass"
+        }
+      ],
+      "mutations": [
+        {
+          "id": "wrong-constructor-token",
+          "source_sha256": "705e66d95bb5621dfaae0ebcf5d50a9eb5db4d6ae196f40eecf57f12dd16d36b",
+          "rejected_by": [
+            "factory-preserves-supplied-token-and-portal-objects",
+            "missing-legacy-token-is-optional",
+            "same-description-token-does-not-resolve",
+            "current-peer-token-does-not-resolve-as-legacy"
+          ]
+        },
+        {
+          "id": "missing-closest-assignment",
+          "source_sha256": "8d5b0e234f38c7b7cfcccdeaec5e24fbe175dcb1e17487feb902d7db83c578b4",
+          "rejected_by": [
+            "factory-preserves-supplied-token-and-portal-objects",
+            "manual-constructor-preserves-arguments"
+          ]
+        },
+        {
+          "id": "required-legacy-token",
+          "source_sha256": "edad38f87053a4ea38c821408aa26c3340ceb680d8b14a857d2424e3f180cd62",
+          "rejected_by": [
+            "missing-legacy-token-is-optional",
+            "same-description-token-does-not-resolve",
+            "current-peer-token-does-not-resolve-as-legacy"
+          ]
+        }
+      ],
+      "limitations": [
+        "No strict external declarations,AOT,node-view or rendered nearest-tab execution",
+        "Host22.1.7 runtime;not minimum21/Node/RxJS or packed qualification",
+        "Default node provider and override/nesting native regressions remain required"
+      ]
+    }
+  },
+  "focused_tests": {
+    "main": {
+      "passed": 8,
+      "skipped": 0
+    },
+    "21.x": {
+      "passed": 8,
+      "skipped": 0
+    },
+    "command": "NODE_PATH=<readonly existing runtime> PYTHONPATH=tests python3 -m unittest test_tab_token_runtime test_constructor_return_fields test_constructor_dependency_lifecycle test_owned_token_di_identity test_inherited_constructor_contract"
+  },
+  "native_pending": {
+    "historical_cases": [
+      "should resolve the exported legacy tab token to the nearest tab",
+      "should honor an explicit legacy tab token override for labels",
+      "should not pick up mat-tab-label from a child tab"
+    ],
+    "packed_case": "packed-consumer/harness/tab-label-original-constructor-and-nearest-tab",
+    "packed_change": "Existing90-case producer now requires the node provider to resolve the actual exported MAT_LEGACY_TAB to the actual queried legacy tab. No accepted roster or oracle narrowed.",
+    "status": "Prepared,not executed on this source;final artifact-bound Actions required"
+  },
+  "source_policy_diagnostic": {
+    "main": {
+      "annotation_private_hits": 29,
+      "remaining_names": [
+        "CDK_TABLE",
+        "CdkDialogContainer",
+        "DataRowOutlet",
+        "FooterRowOutlet",
+        "HeaderRowOutlet",
+        "MAT_MENU_PANEL",
+        "MatMenuPanel",
+        "NoDataRowOutlet",
+        "ViewportRuler"
+      ],
+      "authored_violation_count": 0,
+      "annotation_missing_packages": [
+        "@angular/common",
+        "@angular/core",
+        "@angular/forms",
+        "@angular/platform-browser"
+      ],
+      "packed": null,
+      "full_pass": false
+    },
+    "21.x": {
+      "annotation_private_hits": 29,
+      "remaining_names": [
+        "CDK_TABLE",
+        "CdkDialogContainer",
+        "DataRowOutlet",
+        "FooterRowOutlet",
+        "HeaderRowOutlet",
+        "MAT_MENU_PANEL",
+        "MatMenuPanel",
+        "NoDataRowOutlet",
+        "ViewportRuler"
+      ],
+      "authored_violation_count": 0,
+      "annotation_missing_packages": [
+        "@angular/common",
+        "@angular/core",
+        "@angular/forms",
+        "@angular/platform-browser"
+      ],
+      "packed": null,
+      "full_pass": false
+    }
+  },
+  "limits": [
+    "Actual source JIT injector probes use hostNode22.23.3/TS6.0.3/Angular22.1.7;21 source execution has no21 minimum/floor credit.",
+    "No strict declaration/AOT/node-view/default-provider/nested rendering or fresh packed/native qualification.",
+    "29 current minimum docs-private hits remain;framework declaration packages and artifact absent from this diagnostic. Whole source-policy remains failed.",
+    "All1697SHA and1736authored-use obligations remain. This source repair does not close a ledger row or assert G03/G11/readiness."
+  ],
+  "g11_claim": "not-passed"
+}
