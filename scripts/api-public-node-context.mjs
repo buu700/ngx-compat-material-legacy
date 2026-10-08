@@ -8,6 +8,7 @@
  */
 /** Public Angular nodes and root services; synthetic rendering is not browser qualification. */
 const definitions=new WeakMap();
+let fixtureId=0;
 
 function node(name,document){
  const attributes=new Map(),classes=new Set(),styles=new Map(),listeners=new Map();
@@ -56,10 +57,12 @@ function renderer(core,document){
  };
 }
 
-function fixtureDefinitions(core){
- if(definitions.has(core))return definitions.get(core);
+function fixtureDefinitions(core,{nodeFactory,attributes={}}={}){
+ const cacheable=!nodeFactory&&Object.keys(attributes).length===0;
+ if(cacheable&&definitions.has(core))return definitions.get(core);
  const scopeToken=new core.InjectionToken('API fixture node scope');
  const parentValue={scope:'parent'},childValue={scope:'child'};
+ const executionToken=nodeFactory?new core.InjectionToken('API fixture node-local factory execution'):null;
  class Parent{}
  core.Directive({selector:'[apiFactoryParent]',standalone:true,
   providers:[{provide:scopeToken,useValue:parentValue}]})(Parent);
@@ -69,10 +72,12 @@ function fixtureDefinitions(core){
   element=core.inject(core.ElementRef);
   detector=core.inject(core.ChangeDetectorRef);
   container=core.inject(core.ViewContainerRef);
+  execution=nodeFactory?core.inject(executionToken):null;
   ngOnDestroy(){this.destroyed=true;}
  }
  core.Directive({selector:'[apiFactoryElement]',standalone:true,
-  providers:[{provide:scopeToken,useValue:childValue}]})(ElementProbe);
+  providers:[{provide:scopeToken,useValue:childValue},...(nodeFactory?[{provide:executionToken,
+   useFactory:()=>nodeFactory({injector:core.inject(core.Injector),element:core.inject(core.ElementRef)})}]:[])]})(ElementProbe);
  class TemplateProbe {
   destroyed=false;
   injector=core.inject(core.Injector);
@@ -86,9 +91,13 @@ function fixtureDefinitions(core){
  class Host{}
  core.ViewChild(ElementProbe)(Host.prototype,'element');
  core.ViewChild(TemplateProbe)(Host.prototype,'template');
- core.Component({selector:'api-factory-host',standalone:true,imports:[Parent,ElementProbe,TemplateProbe],
-  template:'<section apiFactoryParent><div apiFactoryElement></div><ng-template apiFactoryTemplate></ng-template></section>'})(Host);
- const result={Host,scopeToken,parentValue,childValue};definitions.set(core,result);return result;
+ const literalAttributes=Object.entries(attributes).map(([name,value])=>{
+  if(!/^[a-z][a-z0-9-]*$/.test(name)||typeof value!=='string')throw Error('invalid fixture literal attribute');
+  return ' '+name+'="'+value.replaceAll('&','&amp;').replaceAll('"','&quot;').replaceAll('<','&lt;').replaceAll('>','&gt;')+'"';
+ }).join('');
+ core.Component({selector:'api-factory-host-'+fixtureId++,standalone:true,imports:[Parent,ElementProbe,TemplateProbe],
+  template:'<section apiFactoryParent><div apiFactoryElement'+literalAttributes+'></div><ng-template apiFactoryTemplate></ng-template></section>'})(Host);
+ const result={Host,scopeToken,parentValue,childValue};if(cacheable)definitions.set(core,result);return result;
 }
 
 /**
@@ -96,7 +105,7 @@ function fixtureDefinitions(core){
  * TemplateRef. Providers are caller-supplied public module/configuration values;
  * missing services propagate. There is no private token discovery or fallback.
  */
-export async function createPublicFactoryContext(core,importModule,{providers=[]}={}){
+export async function createPublicFactoryContext(core,importModule,{providers=[],nodeFactory,attributes={}}={}){
  const {BrowserModule}=await importModule('@angular/platform-browser');
  const document={activeElement:null,defaultView:null,doctype:{},
   createElement(name){return node(name,document);},
@@ -104,7 +113,7 @@ export async function createPublicFactoryContext(core,importModule,{providers=[]
   querySelector(){return null;},querySelectorAll(){return [];}};
  document.head=node('head',document);document.body=node('body',document);document.documentElement=node('html',document);
  document.documentElement.appendChild(document.head);document.documentElement.appendChild(document.body);
- const fixtureRenderer=renderer(core,document),defs=fixtureDefinitions(core);
+ const fixtureRenderer=renderer(core,document),defs=fixtureDefinitions(core,{nodeFactory,attributes});
  let parent,environment,component,closed=false;
  const close=()=>{
   if(closed)return;closed=true;
