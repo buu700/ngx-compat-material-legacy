@@ -14,6 +14,7 @@ import {dirname,resolve,join} from 'node:path';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 import {tmpdir} from 'node:os';
 import {createHash} from 'node:crypto';
+import {spawnSync} from 'node:child_process';
 import {deriveSurface} from '../scripts/api-surface.mjs';
 import {observeRuntimeDi,loadRuntimeModule,runtimeTokenIdentity,runFactory} from '../scripts/api-di-observe.mjs';
 import {partitionOwnedSelectMotion} from '../scripts/api-owned-motion-context.mjs';
@@ -88,9 +89,93 @@ try{
  const symbols=surface.symbols.map(symbol=>({...symbol,di_id:ids.has(symbol.symbol_id)?symbol.di_id:null}));
  assert.equal(symbols.filter(symbol=>symbol.di_id).length,ids.size,'Original selection incomplete');
  const rows=(await observeRuntimeDi(runtime,symbols,[],load)).map(row=>settleDi(row,[]));
- const configurationCases=[];
+ const configurationCases=[],coldRippleContexts=[];
  if(families.includes('legacy-core')){
   const owned=await loadRuntimeModule(runtime,'legacy-core','primary'),Type=owned.MatLegacyPseudoCheckbox;
+  const ripple=rows.find(row=>row.symbol.symbol_id==='legacy-core/primary/MatLegacyRipple');
+  if(ripple?.result==='pass')for(const [id,change]of [
+   ['missing-ripple-control',r=>r.approved_construction.parent_comparison=[]],
+   ['wrong-ripple-public-parent',r=>r.approved_construction.parent_comparison[0].shared_public_identity=false],
+   ['wrong-ripple-object-identity',r=>r.approved_construction.parent_comparison[0].token_objects_equal=false],
+   ['wrong-ripple-options',r=>r.approved_construction.parent_comparison[0].options_equal=false],
+   ['missing-ripple-motion-context',r=>r.approved_construction.parent_comparison.pop()],
+   ['wrong-ripple-motion-state',r=>r.approved_construction.parent_comparison[2].motion_disabled=false],
+   ['wrong-ripple-color-inputs',r=>r.approved_construction.parent_comparison[0].public_color_inputs_verified=false],
+   ['wrong-ripple-configuration',r=>r.approved_construction.parent_comparison[0].configuration_equal=false],
+   ['lost-ripple-inputs',r=>r.approved_construction.parent_comparison[0].public_inputs_verified=false],
+   ['lost-ripple-trigger',r=>r.approved_construction.parent_comparison[0].public_trigger_verified=false],
+   ['ripple-borrowed-view-destroyed',r=>r.approved_construction.parent_comparison[0].borrowed_alive=false],
+   ['missing-ripple-teardown',r=>r.approved_construction.counts.teardown=0],
+   ['missing-ripple-subclass',r=>r.approved_construction.counts.subclass=0],
+   ['ripple-unverified-actual-token',r=>r.runtime_requests[0].identity_matched=false],
+   ['ripple-wrong-actual-token-option',r=>r.runtime_requests[0].host=true],
+   ['ripple-missing-priming-request',r=>r.approved_construction.parent_comparison[0].priming_requests.pop()],
+   ['ripple-wrong-priming-identity',r=>r.approved_construction.parent_comparison[0].priming_requests[0].identity_matched=false],
+   ['ripple-wrong-priming-token',r=>r.approved_construction.parent_comparison[0].priming_requests[0].ident='unrecognized'],
+   ['ripple-wrong-priming-option',r=>r.approved_construction.parent_comparison[0].priming_requests[0].optional=true],
+   ['ripple-wrong-cache-scope',r=>r.approved_construction.parent_comparison[0].media_measurement_requested=!r.approved_construction.parent_comparison[0].media_measurement_requested],
+   ['ripple-wrong-context-request-count',r=>r.approved_construction.parent_comparison[1].request_count=99],
+  ]){
+   const mutant=structuredClone(ripple);mutant.problems=[];change(mutant);
+   assert.equal(settleDi(mutant,[]).result,'fail',id+' admitted');configurationCases.push({id,result:'rejected'});
+  }
+  const peer=await load('@angular/material/core');
+  for(const reduced of [false,true]){
+   const script=`
+import assert from 'node:assert/strict';import {createRequire} from 'node:module';import {pathToFileURL} from 'node:url';
+import {createPublicFactoryContext} from ${JSON.stringify(pathToFileURL(join(root,'scripts/api-public-node-context.mjs')).href)};
+import {runFactory} from ${JSON.stringify(pathToFileURL(join(root,'scripts/api-di-observe.mjs')).href)};
+const require=createRequire(${JSON.stringify(join(peerRoot,'package.json'))}),load=s=>import(pathToFileURL(require.resolve(s)).href);
+await load('@angular/compiler');const core=await load('@angular/core'),peer=await load('@angular/material/core');
+const {MediaMatcher}=await load('@angular/cdk/layout'),{Platform}=await load('@angular/cdk/platform');
+const owned=await import(${JSON.stringify(pathToFileURL(join(runtime,'fesm2022/ngx-compat-material-legacy-legacy-core.mjs')).href)});
+let queries=0;const reduced=${reduced};
+const context=await createPublicFactoryContext(core,load,{providers:[{provide:MediaMatcher,useValue:{matchMedia(query){assert.equal(query,'(prefers-reduced-motion)');queries++;return {matches:reduced};}}}]});
+try{
+ const cold=runFactory(owned.MatLegacyRipple.ɵfac,core.Injector,core.runInInjectionContext,{injector:context.element.injector});
+ const warm=runFactory(()=>new peer.MatRipple(),core.Injector,core.runInInjectionContext,{injector:context.element.injector});
+ assert.equal(owned.MatLegacyRipple,peer.MatRipple);assert.equal(cold.outcome,'returned',cold.error);assert.equal(warm.outcome,'returned',warm.error);
+ const tokens=[core.ElementRef,peer.MATERIAL_ANIMATIONS,core.ANIMATION_MODULE_TYPE,MediaMatcher,core.NgZone,Platform,peer.MAT_RIPPLE_GLOBAL_OPTIONS,core.Injector];
+ const options=token=>[peer.MATERIAL_ANIMATIONS,core.ANIMATION_MODULE_TYPE,peer.MAT_RIPPLE_GLOBAL_OPTIONS].includes(token);
+ for(const [value,expected]of [[cold,tokens],[warm,tokens.filter(t=>t!==MediaMatcher)]]){
+  assert.equal(value.requests.length,expected.length);value.requests.forEach((r,index)=>{assert.equal(r.token,expected[index]);assert.equal(r.optional,options(r.token));assert.equal(Boolean(r.self||r.skipSelf||r.host||r.unresolved),false);});
+  assert.equal(value.value.rippleConfig.animation.enterDuration===0&&value.value.rippleConfig.animation.exitDuration===0,reduced);
+  value.value.ngOnDestroy();
+ }
+ assert.equal(queries,1);assert.equal(context.component.hostView.destroyed,false);assert.equal(context.environment.destroyed,false);
+ console.log(JSON.stringify({id:reduced?'fresh-realm-reduced-motion':'fresh-realm-enabled',result:'pass',cold_requests:cold.requests.length,warm_requests:warm.requests.length,query: '(prefers-reduced-motion)',queries,token_objects_and_options_verified:true,motion_disabled:reduced,borrowed_alive:true}));
+}finally{context.close();}
+`;
+   const child=spawnSync(process.execPath,['--input-type=module','-'],{input:script,encoding:'utf8',timeout:20000});
+   assert.equal(child.status,0,child.stderr||child.stdout);
+   const evidence=JSON.parse(child.stdout.trim());coldRippleContexts.push(evidence);
+   configurationCases.push({id:evidence.id,result:'pass'});
+  }
+  class RippleHost {color=null;unbounded=true;}
+  core.Input()(RippleHost.prototype,'color');core.Input()(RippleHost.prototype,'unbounded');
+  core.ViewChild(owned.MatLegacyRipple)(RippleHost.prototype,'owned');
+  core.ViewChild(peer.MatRipple)(RippleHost.prototype,'parent');
+  core.Component({standalone:true,imports:[owned.MatLegacyRippleModule],
+   template:'<div matRipple [matRippleColor]="color" [matRippleUnbounded]="unbounded"></div>'})(RippleHost);
+  const rippleContext=await createPublicFactoryContext(core,load);
+  let rippleComponent;
+  try{
+   const host=rippleContext.document.createElement('section');
+   rippleComponent=core.createComponent(RippleHost,{hostElement:host,environmentInjector:rippleContext.environment});
+   rippleComponent.changeDetectorRef.detectChanges();
+   assert.ok(rippleComponent.instance.owned instanceof owned.MatLegacyRipple);
+   assert.ok(rippleComponent.instance.parent===rippleComponent.instance.owned);
+   const element=host.children[0];assert.ok(element.classList.contains('mat-ripple'));assert.ok(element.classList.contains('mat-ripple-unbounded'));
+   assert.equal(rippleComponent.instance.owned.color,null);
+   for(const color of [undefined,'','red']){
+    rippleComponent.setInput('color',color);rippleComponent.changeDetectorRef.detectChanges();
+    assert.equal(rippleComponent.instance.owned.color,color);
+   }
+   rippleComponent.setInput('unbounded',false);rippleComponent.changeDetectorRef.detectChanges();assert.equal(element.classList.contains('mat-ripple-unbounded'),false);
+   rippleComponent.destroy();rippleComponent=null;
+   assert.equal(rippleContext.component.hostView.destroyed,false);assert.equal(rippleContext.environment.destroyed,false);
+   configurationCases.push({id:'actual-owned-ripple-module-inherited-host-inputs-public-parent-query-and-lifetime',result:'pass'});
+  }finally{rippleComponent?.destroy();rippleContext.close();}
   for(const [mode,disabled]of [[undefined,false],['BrowserAnimations',false],['NoopAnimations',true]]){
    const manual=new Type(mode);assert.equal(manual._animationMode,mode);assert.equal(manual._animationsDisabled,disabled);
    manual._animationMode=mode==='NoopAnimations'?'BrowserAnimations':'NoopAnimations';
@@ -206,6 +291,7 @@ try{
  const caps=[...new Set([...files.map(file=>file.fileName),...resources])].sort().map(file=>({path:file.startsWith(root+'/')?file.slice(root.length+1):file,sha256:sha(readFileSync(file))}));
  const result={schema_version:1,role:'Unchanged owned source partial compilation and family constructor API observation; not canonical packed/style/native/floor qualification',
   family,families,node:process.version,typescript:ts.version,runtime_peer:core.VERSION.full,rows,configuration_cases:configurationCases,
+  cold_ripple_contexts:coldRippleContexts,
   selection:allClasses?'all authenticated original primary factory classes in the exact family':'finite historical attribute constructor selection',
   source_files:files.length,resource_files:resources.size,source_caps:caps,virtual_typecheck_files:virtualFiles.length,
   styles:'Original SCSS resources are read unchanged by the Angular compiler. No Sass transform/rendered/style compatibility is claimed.',

@@ -1,6 +1,7 @@
 @use 'sass:map';
 @use 'sass:meta';
 @use '../theming/theming';
+@use '../style/sass-utils';
 
 // Colors for the ripple elements.
 @mixin color($config-or-theme) {
@@ -18,6 +19,17 @@
     @else {
       background-color: $foreground-base;
       opacity: $color-opacity;
+    }
+  }
+
+  // Public ripple infrastructure can inject its structural styles after the
+  // theme. Bind its public color token to this independently owned M2 model.
+  @include sass-utils.current-selector-or-root() {
+    @if (meta.type-of($foreground-base) == color) {
+      --mat-ripple-color: #{rgba($foreground-base, $color-opacity)};
+    }
+    @else {
+      --mat-ripple-color: #{$foreground-base};
     }
   }
 }

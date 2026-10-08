@@ -14,6 +14,7 @@
 import {createHash} from 'node:crypto';
 import {announcedChromeEndpoint,debuggerMatchesChild} from './chromium-debug-endpoint.mjs';
 import {observeLegacyCoreHighContrast,legacyCoreHighContrastOkay} from './legacy-core-high-contrast-contract.mjs';
+import {observeRippleColorBinding,rippleColorBindingOkay} from './ripple-color-binding-observation.mjs';
 import {PEER_ICON_TT_CSP, peerIconTtOkay} from './peer-icon-tt-admission.mjs';
 import {formFieldStateTokensOkay} from './form-field-state-style-observation.mjs';
 import {spawnSync as __spawnSyncForWs} from 'node:child_process';
@@ -124,11 +125,19 @@ if (relative(realpathSync(consumer), installed).startsWith('..')) fail(1, `Libra
 // consumer. The historical IE-only data URI stays intact for this diagnostic.
 const progressSass = createRequire(join(root, 'package.json'))('sass');
 const progressCss = progressSass.compileString(`
+@use 'sass:map';
 @use '@ngx-compat/material-legacy' as legacy;
 $primary: legacy.define-palette(legacy.$indigo-palette);
 $accent: legacy.define-palette(legacy.$pink-palette, A200, A100, A400);
 $theme: legacy.define-light-theme((color: (primary: $primary, accent: $accent)));
 @include legacy.core();
+@include legacy.ripple-theme($theme);
+#ripple-color-root, .ripple-color-scope {width:48px;height:48px;}
+#ripple-color-modern {--mat-ripple-color:rgba(210,80,60,.3);}
+$ripple-custom: map.set(legacy.get-color-config($theme), foreground, base, #4f7082);
+$ripple-variable: map.set(legacy.get-color-config($theme), foreground, base, var(--custom-foreground));
+#ripple-color-custom { @include legacy.ripple-color($ripple-custom); }
+#ripple-color-variable { --custom-foreground:rgb(70,30,90); @include legacy.ripple-color($ripple-variable); }
 .mat-menu-submenu-icon { @include legacy.private-menu-common-item-submenu-icon(legacy.$private-menu-common-side-padding); }
 #core-contrast-ripple { width:48px; height:48px; }
 #core-contrast-menu { color:rgb(1,2,3); forced-color-adjust:none; }
@@ -137,6 +146,7 @@ $theme: legacy.define-light-theme((color: (primary: $primary, accent: $accent)))
 @include legacy.legacy-progress-bar-theme($theme);
 @include legacy.form-field-theme($theme);
 $dark-theme: legacy.define-dark-theme((color: (primary: $primary, accent: $accent)));
+#ripple-color-dark { @include legacy.ripple-color($dark-theme); }
 // A zero-specificity theme scope lets the peer's equally specific structural
 // wrapper rule consume the token; the historical host rule still covers hints.
 :where(#peer-form-hover-dark-theme) { @include legacy.form-field-color($dark-theme); }
@@ -145,17 +155,17 @@ $dark-theme: legacy.define-dark-theme((color: (primary: $primary, accent: $accen
 
 mkdirSync(join(consumer, 'src'), {recursive: true});
 writeFileSync(join(consumer, 'src/main.ts'), `${zoneless ? '' : `import 'zone.js';
-`}import {Component, NgModule, NgZone, inject${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';
+`}import {Component, NgModule, NgZone, ViewChild, inject${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';
 import {BrowserModule, DomSanitizer} from '@angular/platform-browser';
 import {MatIconModule, MatIconRegistry} from '@angular/material/icon';
 import {MediaMatcher} from '@angular/cdk/layout';
 import {Platform} from '@angular/cdk/platform';
-import {LegacyRippleRenderer,LegacyRippleRef,LegacyRippleState} from '@ngx-compat/material-legacy/legacy-core';
+import {MatLegacyRipple,MatLegacyRippleModule,LegacyRippleRenderer,LegacyRippleRef,LegacyRippleState} from '@ngx-compat/material-legacy/legacy-core';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
-import {MATERIAL_ANIMATIONS} from '@angular/material/core';
+import {MATERIAL_ANIMATIONS,MatRipple,MatRippleModule} from '@angular/material/core';
 import {MatLegacyButtonModule} from '@ngx-compat/material-legacy/legacy-button';
 import {MatLegacyCardModule} from '@ngx-compat/material-legacy/legacy-card';
 import {MatLegacyProgressBarModule} from '@ngx-compat/material-legacy/legacy-progress-bar';
@@ -187,6 +197,11 @@ export class PeerProgressCspModule {}
     <button id="button-focus" mat-raised-button type="button">Focus me</button>
 
     <div id="core-contrast-ripple" class="mat-ripple"></div>
+    <div id="ripple-color-root" matRipple #rippleRoot="matRipple"></div>
+    <div id="ripple-color-dark" class="ripple-color-scope"><div matRipple #rippleDark="matRipple"></div></div>
+    <div id="ripple-color-custom" class="ripple-color-scope"><div matRipple #rippleCustom="matRipple"></div></div>
+    <div id="ripple-color-variable" class="ripple-color-scope"><div matRipple #rippleVariable="matRipple"></div></div>
+    <div id="ripple-color-modern" class="ripple-color-scope"><div matRipple #rippleModern="matRipple"></div></div>
     <button id="core-contrast-focus" class="mat-focus-indicator" type="button">Core focus</button>
     <svg id="core-contrast-menu" class="mat-menu-submenu-icon" viewBox="0 0 5 10"><path d="M0 0l5 5-5 5z"/></svg>
     <span id="core-contrast-canvas">Canvas text</span>
@@ -202,6 +217,11 @@ export class PeerProgressCspModule {}
   \`,
 })
 export class LabRoot {
+  @ViewChild('rippleRoot') rippleRoot!:MatLegacyRipple;
+  @ViewChild('rippleDark') rippleDark!:MatLegacyRipple;
+  @ViewChild('rippleCustom') rippleCustom!:MatLegacyRipple;
+  @ViewChild('rippleVariable') rippleVariable!:MatLegacyRipple;
+  @ViewChild('rippleModern') rippleModern!:MatRipple;
   constructor() {
     const ngZone=inject(NgZone),platform=inject(Platform);
     const refs: LegacyRippleRef[]=[];
@@ -234,6 +254,22 @@ export class LabRoot {
       readFallback:() => ({final_state:fallback?LegacyRippleState[fallback.state]:null,final_connected:fallback?.element.isConnected??null}),
       cleanup:() => {for(const ref of refs){ref.fadeOut();ref.element.dispatchEvent(new Event('transitioncancel'));}}
     };
+    (window as any).__closeoutRippleColor={
+      sharedPublicIdentity:MatLegacyRipple===MatRipple&&MatLegacyRippleModule===MatRippleModule,
+      exercise:(explicit:boolean) => [
+        ['root',this.rippleRoot],['dark',this.rippleDark],['custom',this.rippleCustom],
+        ['variable',this.rippleVariable],['modern',this.rippleModern]
+      ].map(([id,value]) => {
+        const ripple=value as MatRipple;
+        const ref=ripple.launch({persistent:true,centered:true,radius:12,
+          animation:{enterDuration:0,exitDuration:0},...(explicit?{color:'rgb(5,6,7)'}:{})});
+        const style=getComputedStyle(ref.element);
+        const row={id,shared_public_instance:ripple instanceof MatRipple,connected:ref.element.isConnected,
+          background:style.backgroundColor,opacity:style.opacity,position:style.position,radius:style.borderRadius};
+        ref.fadeOut();return {...row,removed:!ref.element.isConnected};
+      }),
+      remainingElements:() => document.querySelectorAll('[id^="ripple-color-"] .mat-ripple-element').length
+    };
     (window as any).__closeoutMediaMatcher=inject(MediaMatcher);
     inject(MatIconRegistry).addSvgIconLiteral('closeout-native-tt',inject(DomSanitizer).bypassSecurityTrustHtml(
       '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8"><path d="M0 0h8v8H0z"/></svg>'));
@@ -244,6 +280,7 @@ export class LabRoot {
   imports: [
     BrowserModule,
     MatIconModule,
+    MatLegacyRippleModule,
     PeerProgressCspModule,
     MatLegacyButtonModule,
     MatLegacyCardModule,
@@ -430,6 +467,7 @@ let peerMediaMatcher = null;
 let progressCsp = null;
 let peerFormHover = null;
 let coreHighContrast = null;
+let rippleColorBinding = null;
 
 try {
   await send('Runtime.enable');
@@ -582,6 +620,8 @@ try {
   })()`);
 
   coreHighContrast=await observeLegacyCoreHighContrast({send,evaluate,waitFor});
+  rippleColorBinding=await observeRippleColorBinding({evaluate});
+  rippleColorBinding.compiled_theme_css_sha256=createHash('sha256').update(progressCss).digest('hex');
 
   // Button default + disabled + focused state cells.
   families.button.present = await waitFor('!!document.querySelector("button#button-default.mat-button, button#button-default[mat-button]")');
@@ -643,6 +683,7 @@ const ok =
   && peerIconTtOkay(peerIconTt)
   && formFieldStateTokensOkay(peerFormHover?.state_token_scenarios)
   && legacyCoreHighContrastOkay(coreHighContrast)
+  && rippleColorBindingOkay(rippleColorBinding)
   && families.button.present && families.button.disabled_class && families.button.focused
   && families.card.present
   && families['progress-bar'].present && families['progress-bar'].value_reflected
@@ -664,6 +705,7 @@ const report = {
   progress_csp: progressCsp,
   peer_form_hover: peerFormHover,
   core_high_contrast: coreHighContrast,
+  ripple_color_binding: rippleColorBinding,
   credited_cell_ids: ok ? cells : [],
   matrix_updated: false,
   error,
@@ -683,6 +725,7 @@ const report = {
     'Public MediaMatcher unsafe-query diagnostic uses one fixed reversible CSS marker; it earns no acceptance/matrix credit and does not establish an owned input path or security clearance.',
     'Progress CSP diagnostic covers four current modes and legacy buffer with the actual packed exported themes, img-src none and a blocked data-image negative; it earns no acceptance/matrix credit or complete CSP/motion qualification.',
     'Current form-field state check requires light/dark baseline, wrapper/hint hover, focus, token consumption negative and restoration with packed exported Sass. Historical selectors are retained; no additional matrix cells, full Sass or general style qualification are credited.',
+    'Ripple color guard consumes packed root/scoped/light/dark/custom/CSS-variable Sass through shared public MatRipple, challenges late public styles and token consumption, and preserves explicit colors and a separate modern color scope. This earns no full Sass/peer-floor/motion/matrix credit.',
     'Does not claim G10.',
   ],
 };
@@ -700,6 +743,7 @@ console.log(JSON.stringify({
   progress_csp: progressCsp,
   peer_form_hover: peerFormHover,
   core_high_contrast: coreHighContrast,
+  ripple_color_binding: rippleColorBinding,
   error,
   credited_cell_ids: report.credited_cell_ids,
 }, null, 2));

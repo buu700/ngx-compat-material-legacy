@@ -5,6 +5,8 @@ import {approvedMenuItemContract} from './menu-item-construction-contract.mjs';
 import {observeMenuItemFactory} from './api-menu-item-factory.mjs';
 import {TABLE_SYMBOL, approvedTableContract} from './table-construction-contract.mjs';
 import {observeTableFactory} from './api-table-factory.mjs';
+import {RIPPLE_SYMBOL,approvedRippleContract} from './ripple-construction-contract.mjs';
+import {observeRippleFactory} from './api-ripple-factory.mjs';
 import {originalContextDi} from './api-original-factory-contexts.mjs';
 import {createPublicFactoryContext} from './api-public-node-context.mjs';
 import {attributeFactoryContract,executeAttributeFactory,challengeAttributeDetectorScopes} from './api-attribute-factory.mjs';
@@ -360,10 +362,11 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = [], i
       results.push({symbol, problems, observed: []});
       continue;
     }
-    const construction = approvedMenuItemContract(symbol) || approvedTableContract(symbol);
+    const construction = approvedMenuItemContract(symbol) || approvedTableContract(symbol) || approvedRippleContract(symbol);
     const originalKind = symbol.shape.originalFactoryContext?.effective_factory_kind || symbol.shape.originalFactory?.deps_kind;
     const factory = construction ? symbol.symbol_id === TABLE_SYMBOL
-      ? await observeTableFactory(value, loaded, importModule) : await observeMenuItemFactory(value, loaded, importModule)
+      ? await observeTableFactory(value, loaded, importModule) : symbol.symbol_id===RIPPLE_SYMBOL
+      ? await observeRippleFactory(value,loaded,importModule,runFactory) : await observeMenuItemFactory(value, loaded, importModule)
       : originalKind==='invalid' ? runFactory(value.ɵfac,Injector,runInInjectionContext)
       : await observePublicNodeFactory(value,core,packageRoot,symbol,symbols,importModule);
     const observed = factory.requests;
@@ -412,7 +415,7 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = [], i
         behavior_problems: factory.behaviorProblems, counts: factory.counts,
         ...(factory.parentComparison ? {parent_comparison:factory.parentComparison} : {}),
         ...(symbol.symbol_id===TABLE_SYMBOL ? {public_node_requests:publicNodeRequests} : {}),
-        root_requests: factory.rootRequests.map(request => ({optional: request.optional, unresolved: request.unresolved}))}} : {})});
+        root_requests: (factory.rootRequests||[]).map(request => ({optional: request.optional, unresolved: request.unresolved}))}} : {})});
   }
   return results;
 }

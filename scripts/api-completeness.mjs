@@ -35,6 +35,8 @@ import {publicConstructorPartitionProblems} from './api-public-constructor-inter
 import {ownedMotionProfile,ownedSelectMotionProblems} from './api-owned-motion-context.mjs';
 import {MENU_ITEM_SYMBOL, approvedMenuItemContract} from './menu-item-construction-contract.mjs';
 import {TABLE_SYMBOL, approvedTableContract, tableConstructionObservationComplete} from './table-construction-contract.mjs';
+import {RIPPLE_SYMBOL,approvedRippleContract} from './ripple-construction-contract.mjs';
+import {rippleFactoryObservationProblems} from './api-ripple-factory.mjs';
 
 // verify-lite imports this module before node_modules exists. Load the parser
 // on first use so compareContracts can be unit-tested without typescript.
@@ -499,6 +501,13 @@ if (isMain) {
 }
 
 export function settleDi(row, records) {
+  if(row.symbol.symbol_id===RIPPLE_SYMBOL){
+    const contract=approvedRippleContract(row.symbol),problems=[...row.problems,...rippleFactoryObservationProblems(row,contract)];
+    return {...row,problems,result:problems.length?'fail':'pass',status:problems.length?'mismatch':'intentional-legacy-difference',
+      historical:expectedFactoryDi(row.symbol.shape,row.runtime_context||{}).map(p=>p.ident+(p.optional?'?':'')).join('|'),
+      owned:row.observed.join('|'),rationale:'Exact maintainer-delegated construction change with actual owned factory/public-parent controls. Original five dependencies stay authenticated. Native/packed/minimum and full Sass/API qualification remain separate.'};
+  }
+
   if(ownedMotionProfile(row.symbol.symbol_id))
     row={...row,problems:[...row.problems,...ownedSelectMotionProblems(row.factory_owned_motion_context,row.symbol.symbol_id)]};
   if(['legacy-tabs/primary/MatLegacyTabLink','legacy-tabs/primary/_MatLegacyTabLinkBase'].includes(row.symbol.symbol_id)){
