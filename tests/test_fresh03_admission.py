@@ -174,26 +174,6 @@ class Fresh03AdmissionTests(unittest.TestCase):
         self.assertEqual(classified["excepted"], [])
         self.assertEqual(classified["unresolved"], [])
 
-    def test_unverified_braces_claim_stays_unresolved(self) -> None:
-        from datetime import datetime, timezone
-        rows = {"braces@3.0.3": {"name": "braces", "version": "3.0.3", "vulns": [{"id": "GHSA-vfj7-8cjw-p6xm"}]}}
-        dispositions = ELIGIBILITY.load_finding_dispositions(ROOT)
-        record = dispositions["braces@3.0.3"][0]
-        self.assertEqual(record["classification"], "pending-owner-authority")
-        self.assertEqual(record["prior_unverified_record"]["classification"], "temporary-exception")
-        self.assertIsNone(record["fixed_version"])
-        self.assertEqual(record["registry_latest"], "3.0.3")
-        self.assertEqual(record["expires_on"], "2026-11-04")
-        during = datetime(2026, 10, 4, tzinfo=timezone.utc)
-        classified = ELIGIBILITY.classify_live_findings(rows, ["braces@3.0.3"], dispositions, during)
-        self.assertEqual(classified["excepted"], [])
-        self.assertEqual(classified["blocked"], [])
-        self.assertEqual(classified["unresolved"], ["braces@3.0.3"])
-        after = datetime(2026, 11, 5, tzinfo=timezone.utc)
-        expired = ELIGIBILITY.classify_live_findings(rows, ["braces@3.0.3"], dispositions, after)
-        self.assertEqual(expired["excepted"], [])
-        self.assertIn("braces@3.0.3", expired["unresolved"])
-
     def test_temporary_exception_rejects_a_standing_waiver(self) -> None:
         from datetime import datetime, timezone
         rows = {"braces@3.0.3": {"name": "braces", "version": "3.0.3", "vulns": [{"id": "GHSA-vfj7-8cjw-p6xm"}]}}

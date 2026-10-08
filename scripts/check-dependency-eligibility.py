@@ -275,6 +275,8 @@ def _version_key(value: str) -> tuple | None:
     """Release ordering for plain x.y.z[-pre] npm versions. Anything else is unknown."""
     import re
 
+    if not isinstance(value, str):
+        return None
     match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?", value or "")
     if not match:
         return None
@@ -366,8 +368,61 @@ def load_finding_dispositions(root: Path) -> dict[str, list[dict]]:
             continue
         key = f"{data.get('package')}@{data.get('version')}"
         data["_file"] = path.name
+        if data.get('scope_rule') == 'karma-braces-3.0.3-two-paths':
+            data['_dependency_scope_ok'] = karma_braces_scope_ok(root, data)
         found.setdefault(key, []).append(data)
     return found
+
+
+def karma_braces_scope_ok(root: Path, record: dict) -> bool:
+    """The owner's exact two Karma paths must remain the only locked paths."""
+    try:
+        expected = [['devDependency karma@6.4.4', 'braces@3.0.3'],
+                    ['devDependency karma@6.4.4', 'chokidar@3.6.0', 'braces@3.0.3']]
+        manifest = json.loads((root/'package.json').read_text())
+        if (record.get('package') != 'braces' or record.get('version') != '3.0.3'
+            or record.get('dependency_paths') != expected or manifest.get('devDependencies', {}).get('karma') != '6.4.4'
+            or 'karma' in manifest.get('dependencies', {})):return False
+        text = (root/'pnpm-lock.yaml').read_text();blocks=[]
+        # pnpm12 locks include separate package-manager and workspace documents.
+        documents=[doc for doc in re.split(r'(?m)^---[ \t]*$',text) if doc.strip()]
+        for doc in documents:
+            pieces=re.split(r'(?m)^snapshots:[ \t]*$',doc)
+            if len(pieces) != 2:return False
+            blocks.extend(re.findall(r'(?ms)^  ([^\n]+):(?: \{\})?\n(.*?)(?=^  \S|\Z)', pieces[1]))
+        braces_in=set();chokidar_in=set();karma_edges=set()
+        for label, body in blocks:
+            parent=label.strip("'\"").split('(', 1)[0]
+            for key, value in re.findall(r'(?m)^      ([^:\n]+): ([^\n]+)$', body):
+                key=key.strip("'\"");value=value.strip("'\"").split('(', 1)[0]
+                if key in ('braces','chokidar') and _version_key(value) is None:return False
+                if key == 'braces' and value == '3.0.3':braces_in.add(parent)
+                elif value == 'braces@3.0.3':return False  # An aliased path is outside this grant.
+                if key == 'chokidar' and value == '3.6.0':chokidar_in.add(parent)
+                if parent == 'karma@6.4.4' and key in ('braces', 'chokidar'):karma_edges.add((key,value))
+        return braces_in == {'karma@6.4.4','chokidar@3.6.0'} and chokidar_in == {'karma@6.4.4'} and karma_edges == {('braces','3.0.3'),('chokidar','3.6.0')}
+    except (OSError,KeyError,TypeError,ValueError):return False
+
+
+def refresh_exception_patch_status(rows: dict, dispositions: dict, now: datetime, lookup=None) -> None:
+    """A no-patch grant needs a fresh full advisory; unknown detail cannot defer it."""
+    lookup = lookup or _http_json
+    for key, records in dispositions.items():
+        row=rows.get(key) or {};name=row.get('name');version=row.get('version')
+        active=[r for r in records if r.get('patch_check_required') is True and _temporary_exception_applies(r,r.get('advisory_id'),now)]
+        for item in row.get('vulns') or []:
+            advisory=item.get('id') if isinstance(item,dict) else None
+            if not any(r.get('advisory_id') == advisory for r in active):continue
+            item.update(patch_lookup_result='unknown',available_fixed_versions=None)
+            status,body,error=lookup(f'https://api.osv.dev/v1/vulns/{advisory}',timeout=45)
+            if status != 200 or error or not isinstance(body,dict) or body.get('id') != advisory:continue
+            try:
+                affected=[a for a in body.get('affected') or [] if isinstance(a,dict) and a.get('package',{}).get('ecosystem') == 'npm' and a.get('package',{}).get('name') == name]
+                ranges=[r for a in affected for r in a.get('ranges') or [] if isinstance(r,dict) and r.get('type') == 'SEMVER']
+                if not ranges or any(not isinstance(r.get('events'),list) or not r['events'] or any(not isinstance(e,dict) or ('fixed' in e and _version_key(e['fixed']) is None) for e in r['events']) for r in ranges):continue
+                fixes=fixed_versions(body,name,version)
+            except (TypeError,ValueError,AttributeError):continue
+            item.update(patch_lookup_result='queried',available_fixed_versions=fixes)
 
 
 def _record_shape(record: dict, advisory_id: str) -> bool:
@@ -406,6 +461,8 @@ def _temporary_exception_applies(record: dict, advisory_id: str, now: datetime) 
     if not _record_shape(record, advisory_id):
         return False
     if record.get("fixed_version") is not None:
+        return False
+    if record.get('scope_rule') and record.get('_dependency_scope_ok') is not True:
         return False
     authority = record.get("authority")
     granted_by = record.get("granted_by")
@@ -447,7 +504,11 @@ def classify_live_findings(rows: dict, unresolved: list[str], dispositions: dict
         ids = [item.get("id") for item in vulns or [] if isinstance(item, dict) and isinstance(item.get("id"), str)]
         records = dispositions.get(key, [])
         reviewed = [record for record in records if any(_disposition_matches(record, advisory) for advisory in ids)]
-        temporary = [record for record in records if any(_temporary_exception_applies(record, advisory, now) for advisory in ids)]
+        temporary = [record for record in records if any(
+            _temporary_exception_applies(record, item.get('id'), now)
+            and (record.get('patch_check_required') is not True or
+                 (item.get('patch_lookup_result') == 'queried' and item.get('available_fixed_versions') == []))
+            for item in vulns or [] if isinstance(item, dict))]
         matched_ids = {record.get("advisory_id") for record in reviewed}
         excepted_ids = {record.get("advisory_id") for record in temporary}
         if not ids or any(advisory not in matched_ids | excepted_ids for advisory in ids):
@@ -723,7 +784,9 @@ def perform_lookup(root: Path, now: datetime) -> dict:
     if vendor_unknown:
         vendor_queried = False
 
-    classified = classify_live_findings(rows, unresolved, load_finding_dispositions(root), now)
+    dispositions = load_finding_dispositions(root)
+    refresh_exception_patch_status(rows, dispositions, now)
+    classified = classify_live_findings(rows, unresolved, dispositions, now)
     unresolved = classified["unresolved"]
     blocked = classified["blocked"]
     http_known = status == 200 and not truncated and not error and bool(rows or not queried)
