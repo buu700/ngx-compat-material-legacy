@@ -9,13 +9,7 @@
 
 import {NgModule} from '@angular/core';
 import {MatLegacyRecycleRows, MatLegacyTable} from './table';
-import {
-  CdkTableModule,
-  HeaderRowOutlet,
-  DataRowOutlet,
-  NoDataRowOutlet,
-  FooterRowOutlet,
-} from '@angular/cdk/table';
+import {CdkTableModule} from '@angular/cdk/table';
 import {
   MatLegacyCell,
   MatLegacyCellDef,
@@ -67,7 +61,7 @@ const EXPORTED_DECLARATIONS = [
 
 
 @NgModule({
-  imports: [CdkTableModule, MatCommonModule, HeaderRowOutlet, DataRowOutlet, NoDataRowOutlet, FooterRowOutlet],
+  imports: [CdkTableModule, MatCommonModule],
   exports: [MatCommonModule, EXPORTED_DECLARATIONS],
   declarations: EXPORTED_DECLARATIONS,
 })

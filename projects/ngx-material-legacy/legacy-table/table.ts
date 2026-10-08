@@ -11,10 +11,6 @@ import {
   CDK_TABLE,
   CdkTable,
   STICKY_POSITIONING_LISTENER,
-  HeaderRowOutlet,
-  DataRowOutlet,
-  NoDataRowOutlet,
-  FooterRowOutlet,
 } from '@angular/cdk/table';
 import {coerceBooleanProperty} from '@angular/cdk/coercion';
 
