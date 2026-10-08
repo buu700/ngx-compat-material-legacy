@@ -30,7 +30,7 @@ import {coerceBooleanProperty, coerceNumberProperty} from '@angular/cdk/coercion
 type BooleanInput = string | boolean | null | undefined;
 type NumberInput = string | number | null | undefined;
 import {ownedHeaderResize} from './owned-header-resize';
-import {ViewportRuler} from '@angular/cdk/scrolling';
+import {_LegacyViewport as ViewportRuler} from '@ngx-compat/material-legacy/legacy-core';
 import {FocusKeyManager, FocusableOption} from '@angular/cdk/a11y';
 import {ENTER, SPACE, hasModifierKey} from '@angular/cdk/keycodes';
 import {

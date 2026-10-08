@@ -151,6 +151,15 @@ export function ownedTokenIdentity(family, param, loaded, observedToken) {
   return Object.hasOwn(loaded, exported) && loaded[exported] === observedToken;
 }
 
+/** Only these legacy consumers replace the original private viewport helper. */
+export function ownedViewportIdentity(family, param, coreExports, observedToken) {
+  if (!['legacy-autocomplete','legacy-progress-spinner','legacy-select','legacy-tabs'].includes(family)
+      || param.ident !== 'ViewportRuler' || param.imported !== 'ViewportRuler'
+      || param.spec !== '@angular/cdk/scrolling') return null;
+  return Object.hasOwn(coreExports, '_LegacyViewport') && typeof coreExports._LegacyViewport === 'function'
+    && coreExports._LegacyViewport === observedToken;
+}
+
 // Alias identities come from the original barrels/source before loading the
 // candidate. Do not infer an owned alias from a candidate's spelling or label.
 export function originalRuntimeAliases(symbols, family) {
@@ -239,7 +248,10 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = [], i
         const got = observed[index];
         const primary = symbol.kind === 'primary' ? loaded : await loadRuntimeModule(packageRoot, symbol.family, 'primary');
         const exports = {...(primary || {}),...loaded};
-        const same = await runtimeTokenIdentity(symbol.family, param, exports,
+        const coreExports = param.ident === 'ViewportRuler'
+          ? await loadRuntimeModule(packageRoot, 'legacy-core', 'primary') : null;
+        const ownedViewport = ownedViewportIdentity(symbol.family, param, coreExports || {}, got.token);
+        const same = ownedViewport !== null ? ownedViewport : await runtimeTokenIdentity(symbol.family, param, exports,
           originalRuntimeAliases(symbols, symbol.family), got.token, importModule);
         if (!same) problems.push(`token ${symbol.symbol_id}[${index}] expected ${param.ident} observed ${got.label}`);
         if (Boolean(param.optional) !== Boolean(got.optional)) {

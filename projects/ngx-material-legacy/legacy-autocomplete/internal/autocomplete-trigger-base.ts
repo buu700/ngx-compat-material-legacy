@@ -35,7 +35,7 @@ import {DOWN_ARROW, ENTER, ESCAPE, TAB, UP_ARROW, hasModifierKey} from '@angular
 import {focusedElementPierceShadowDom} from './owned-shadow-dom';
 import {legacyGetEventTarget} from '@ngx-compat/material-legacy/legacy-core';
 import {TemplatePortal} from '@angular/cdk/portal';
-import {ViewportRuler} from '@angular/cdk/scrolling';
+import {_LegacyViewport as ViewportRuler} from '@ngx-compat/material-legacy/legacy-core';
 import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
 import {
   FlexibleConnectedPositionStrategy,

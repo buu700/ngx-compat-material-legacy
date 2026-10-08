@@ -8,7 +8,7 @@
  */
 
 import {Directionality} from '@angular/cdk/bidi';
-import {ViewportRuler} from '@angular/cdk/scrolling';
+import {_LegacyViewport as ViewportRuler} from '@ngx-compat/material-legacy/legacy-core';
 import {
   ANIMATION_MODULE_TYPE,
   ChangeDetectionStrategy,

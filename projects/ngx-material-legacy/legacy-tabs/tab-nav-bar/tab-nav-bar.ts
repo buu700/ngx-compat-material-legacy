@@ -9,7 +9,7 @@
 import {FocusMonitor} from '@angular/cdk/a11y';
 import {Directionality} from '@angular/cdk/bidi';
 import {Platform} from '@angular/cdk/platform';
-import {ViewportRuler} from '@angular/cdk/scrolling';
+import {_LegacyViewport as ViewportRuler} from '@ngx-compat/material-legacy/legacy-core';
 import {
   ANIMATION_MODULE_TYPE,
   Attribute,

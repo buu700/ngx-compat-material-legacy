@@ -35,7 +35,7 @@ import {
   Overlay,
   ScrollStrategy,
 } from '@angular/cdk/overlay';
-import {ViewportRuler} from '@angular/cdk/scrolling';
+import {_LegacyViewport as ViewportRuler} from '@ngx-compat/material-legacy/legacy-core';
 import {MAT_SELECT_CONFIG} from '@angular/material/select';
 import {
   AfterContentInit,

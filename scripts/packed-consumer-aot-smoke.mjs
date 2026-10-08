@@ -460,12 +460,12 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
   const parsed = result.harness && result.harness.result ? result.harness.result : {};
   const harnessMap = {
     'packed-consumer/harness/legacy-button': parsed.buttonText === 'Go',
-    'packed-consumer/harness/legacy-select': parsed.selectOpened === true && parsed.selectClosed === true,
+    'packed-consumer/harness/legacy-select': parsed.selectOpened === true && parsed.selectClosed === true && parsed.viewportShared === true,
     'packed-consumer/harness/legacy-dialog': typeof parsed.dialogText === 'string' && parsed.dialogText.includes('Hello dialog') && parsed.dialogsAfterClose === 0,
     'packed-consumer/harness/legacy-menu': parsed.menuOpen === true && parsed.menuItemConstruction === true,
     'packed-consumer/harness/legacy-snack-bar': typeof parsed.snackText === 'string' && parsed.snackText.includes('Snack message'),
     'packed-consumer/harness/legacy-tooltip': parsed.tipVisible === true && typeof parsed.tipText === 'string' && parsed.tipText.includes('Tip text'),
-    'packed-consumer/harness/legacy-tabs': parsed.tabCount === 2 && parsed.selectedTab === 'Two',
+    'packed-consumer/harness/legacy-tabs': parsed.tabCount === 2 && parsed.selectedTab === 'Two' && parsed.viewportShared === true,
     'packed-consumer/harness/native-date-constructor': parsed.nativeDateConstructor === true,
     'packed-consumer/harness/native-date-provider': parsed.nativeDateProvider === true,
     'packed-consumer/harness/chip-tabindex-attribute': parsed.chipTabIndex === 6,
@@ -903,6 +903,7 @@ import {Subject} from 'rxjs';
 import {FormControl, Validators} from '@angular/forms';
 import {MatStepperModule, MatStepper} from '@angular/material/stepper';
 import {MatTabContent,MatTabLabel} from '@angular/material/tabs';
+import {_LegacyViewport} from '@ngx-compat/material-legacy/legacy-core';
 import {CdkPortal} from '@angular/cdk/portal';
 import {BreakpointObserver, BreakpointState} from '@angular/cdk/layout';
 import {AriaDescriber, FocusMonitor, HighContrastMode, HighContrastModeDetector} from '@angular/cdk/a11y';
@@ -1545,6 +1546,12 @@ async function main() {
   const peerIconLiteralSanitization=rawIconRejected&&firstIcon!==secondIcon
     &&secondIcon.querySelector('path')?.getAttribute('d')==='M0 0h8v8H0z'
     &&fixture.nativeElement.querySelector('#trusted-icon-button mat-icon svg path')?.getAttribute('d')==='M0 0h8v8H0z';
+  const ownedViewport=TestBed.inject(_LegacyViewport);
+  const viewportNodes=fixture.debugElement.queryAll(By.css('mat-select, mat-tab-header'));
+  const viewportShared=viewportNodes.length>=2
+    && viewportNodes.every(node=>node.injector.get(_LegacyViewport)===ownedViewport)
+    && ownedViewport.getViewportSize().width===window.innerWidth
+    && ownedViewport.getViewportSize().height===window.innerHeight;
   const byId=(id:string)=>fixture.debugElement.query(element=>element.nativeElement?.id===id);
   const stepper=byId('peer-stepper').injector.get(MatStepper);
   const firstStep=stepper.steps.get(0)!;
@@ -1726,13 +1733,14 @@ async function main() {
       selectOpened === true &&
       selectClosed === true &&
       tabCount === 2 &&
-      selected === 'Two' && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor && tabContentOriginalConstructor && noDataRowOriginalConstructor && constructorBorrowedProviderLifecycle && tableOriginalStickyBehavior && tableOriginalBooleanInputs && tableRecycleRowIdentity && tableDefinitionOriginalConstructors && tabLabelOriginalConstructor,
+      selected === 'Two' && viewportShared && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor && tabContentOriginalConstructor && noDataRowOriginalConstructor && constructorBorrowedProviderLifecycle && tableOriginalStickyBehavior && tableOriginalBooleanInputs && tableRecycleRowIdentity && tableDefinitionOriginalConstructors && tabLabelOriginalConstructor,
     buttonText: text,
     selectIsOpen: isOpen,
     dialogText,
     dialogsAfterClose: dialogsAfter.length,
     menuOpen,
     menuItemConstruction,
+    viewportShared,
     snackText,
     tipVisible,
     tipText,
