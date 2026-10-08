@@ -12,15 +12,37 @@
  * native CSS motion (historical `/animations` recipe secondary removed in F04).
  */
 
+import {FocusMonitor, FocusTrapFactory, InteractivityChecker} from '@angular/cdk/a11y';
+import {OverlayRef} from '@angular/cdk/overlay';
 import {
+  assertInInjectionContext,
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  DOCUMENT,
+  ElementRef,
+  Inject,
+  NgZone,
+  Optional,
   Component,
   OnDestroy,
   ViewEncapsulation,
 } from '@angular/core';
 import {_MatDialogContainerBase} from './internal/dialog-container-base';
+import {MatLegacyDialogConfig} from './dialog-config';
 import {defaultParams} from './dialog-animation-params';
 import {legacyAnimationsDisabled} from '@ngx-compat/material-legacy/legacy-core';
+
+/** Preserve manual construction; the owned policy still governs Angular views. */
+function dialogAnimationsDisabled(): boolean {
+  try {
+    assertInInjectionContext(dialogAnimationsDisabled);
+  } catch {
+    // The original constructor could be called outside Angular. It had no
+    // injected motion-mode argument, so manual construction starts enabled.
+    return false;
+  }
+  return legacyAnimationsDisabled();
+}
 
 const OPEN_CLASS = 'mat-legacy-dialog-container-open';
 const OPENING_CLASS = 'mat-legacy-dialog-container-opening';
@@ -79,7 +101,7 @@ function parseCssTime(value: string | number | undefined | null): number | null 
   },
 })
 export class MatLegacyDialogContainer extends _MatDialogContainerBase implements OnDestroy {
-  private readonly _legacyAnimationsDisabled = legacyAnimationsDisabled();
+  private readonly _legacyAnimationsDisabled = dialogAnimationsDisabled();
 
   /** Whether CSS transitions should run (MATERIAL_ANIMATIONS / reduced-motion / Noop). */
   readonly _animationsEnabled = !this._legacyAnimationsDisabled;
@@ -107,7 +129,22 @@ export class MatLegacyDialogContainer extends _MatDialogContainerBase implements
    * engine trigger state. Mapped onto CSS enter/exit lifecycle.
    * @docs-private
    */
-  _state: 'void' | 'enter' | 'exit' = 'void';
+  _state: 'void' | 'enter' | 'exit' = 'enter';
+
+  constructor(
+    elementRef: ElementRef,
+    focusTrapFactory: FocusTrapFactory,
+    @Optional() @Inject(DOCUMENT) document: any,
+    dialogConfig: MatLegacyDialogConfig,
+    checker: InteractivityChecker,
+    ngZone: NgZone,
+    overlayRef: OverlayRef,
+    private _changeDetectorRef: ChangeDetectorRef,
+    focusMonitor?: FocusMonitor,
+  ) {
+    super(elementRef, focusTrapFactory, document, dialogConfig, checker, ngZone,
+      overlayRef, focusMonitor);
+  }
 
   protected override _contentAttached(): void {
     super._contentAttached();
@@ -153,6 +190,10 @@ export class MatLegacyDialogContainer extends _MatDialogContainerBase implements
     this._animationCompleted = false;
     this._state = 'exit';
     const revision = this._animationRevision;
+    this._changeDetectorRef.markForCheck();
+    if (this._animationDestroyed || revision !== this._animationRevision) {
+      return;
+    }
     this._animationStateChanged.emit({
       state: 'closing',
       totalTime: this._exitAnimationDuration,
