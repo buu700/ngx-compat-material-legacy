@@ -1,5 +1,14 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
-import {Component, DebugElement} from '@angular/core';
+import {ANIMATION_MODULE_TYPE, Component, DebugElement} from '@angular/core';
+import {MatLegacyPseudoCheckbox, LEGACY_ANIMATIONS_TEST_OVERRIDE, MATERIAL_ANIMATIONS} from '@ngx-compat/material-legacy/legacy-core';
 import {By} from '@angular/platform-browser';
 import {
   dispatchFakeEvent,
@@ -257,3 +266,54 @@ class BasicOption {
   `,
 })
 class InsideGroup {}
+
+
+describe('owned pseudo-checkbox construction and motion', () => {
+  it('preserves the historical optional constructor outside Angular', () => {
+    expect(new MatLegacyPseudoCheckbox()._animationMode).toBeUndefined();
+    expect(new MatLegacyPseudoCheckbox('NoopAnimations')._animationMode).toBe('NoopAnimations');
+  });
+
+  it('keeps historical host classes, mutable mode and independent view lifetimes', () => {
+    TestBed.configureTestingModule({imports: [MatLegacyPseudoCheckbox], providers: [
+      {provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations'},
+      {provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: 'enabled'},
+    ]});
+    const first = TestBed.createComponent(MatLegacyPseudoCheckbox);
+    const second = TestBed.createComponent(MatLegacyPseudoCheckbox);
+    const element = first.nativeElement as HTMLElement;
+    first.componentRef.setInput('state', 'checked');
+    first.componentRef.setInput('disabled', true);
+    first.detectChanges();
+    expect(first.componentInstance._animationMode).toBe('NoopAnimations');
+    expect(element.classList.contains('mat-pseudo-checkbox')).toBe(true);
+    expect(element.classList.contains('mat-pseudo-checkbox-checked')).toBe(true);
+    expect(element.classList.contains('mat-pseudo-checkbox-disabled')).toBe(true);
+    expect(element.classList.contains('_mat-animation-noopable')).toBe(true);
+    first.componentInstance._animationMode = 'BrowserAnimations';
+    first.componentRef.setInput('state', 'indeterminate');
+    first.componentRef.setInput('disabled', false);
+    first.componentRef.setInput('appearance', 'minimal');
+    first.detectChanges();
+    expect(element.classList.contains('_mat-animation-noopable')).toBe(false);
+    expect(element.classList.contains('mat-pseudo-checkbox-checked')).toBe(false);
+    expect(element.classList.contains('mat-pseudo-checkbox-disabled')).toBe(false);
+    expect(element.classList.contains('mat-pseudo-checkbox-indeterminate')).toBe(true);
+    expect(element.classList.contains('mat-pseudo-checkbox-minimal')).toBe(true);
+    first.destroy();
+    expect(second.componentRef.hostView.destroyed).toBe(false);
+    second.detectChanges();
+    second.destroy();
+  });
+
+  it('retains the existing public Material motion-disable policy', () => {
+    TestBed.configureTestingModule({imports: [MatLegacyPseudoCheckbox], providers: [
+      {provide: ANIMATION_MODULE_TYPE, useValue: 'BrowserAnimations'},
+      {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
+    ]});
+    const fixture = TestBed.createComponent(MatLegacyPseudoCheckbox);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.classList.contains('_mat-animation-noopable')).toBe(true);
+    fixture.destroy();
+  });
+});

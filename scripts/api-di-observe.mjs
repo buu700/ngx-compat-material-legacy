@@ -9,7 +9,7 @@ import {originalContextDi} from './api-original-factory-contexts.mjs';
 import {createPublicFactoryContext} from './api-public-node-context.mjs';
 import {attributeFactoryContract,executeAttributeFactory,challengeAttributeDetectorScopes} from './api-attribute-factory.mjs';
 import {partitionPublicConstructorRequests} from './api-public-constructor-internals.mjs';
-import {SELECT_MOTION_SYMBOL,partitionOwnedSelectMotion} from './api-owned-motion-context.mjs';
+import {ownedMotionProfile,partitionOwnedSelectMotion} from './api-owned-motion-context.mjs';
 
 // verify-lite imports the checker before node_modules exists. Load Angular
 // only when a packed factory is actually executed.
@@ -127,13 +127,13 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
         factory.requests=partition.requests;factory.peerConstructorPartition=partition.observation;
       }
     }
-    if(symbol.symbol_id===SELECT_MOTION_SYMBOL&&factory.outcome==='returned'){
+    if(ownedMotionProfile(symbol.symbol_id)&&factory.outcome==='returned'){
       const owned=await loadRuntimeModule(packageRoot,'legacy-core','primary');
       const partition=partitionOwnedSelectMotion(factory.requests,core,owned,
         await importModule('@angular/cdk/layout'),await importModule('@angular/material/core'),value,
         {core:resolve(packageRoot,'fesm2022/ngx-compat-material-legacy-legacy-core.mjs'),
-         caller:resolve(packageRoot,'fesm2022/ngx-compat-material-legacy-legacy-select.mjs')},
-        runFactory,fixture.element.injector,factory.value);
+         caller:resolve(packageRoot,'fesm2022',`ngx-compat-material-legacy-${ownedMotionProfile(symbol.symbol_id).family}.mjs`)},
+        runFactory,fixture.element.injector,factory.value,symbol.symbol_id);
       factory.requests=partition.requests;factory.ownedMotionContext=partition.observation;
     }
     factory.context=fixture.context;
@@ -285,6 +285,11 @@ export function originalRuntimeAliases(symbols, family) {
 }
 
 export async function runtimeTokenIdentity(family, param, loaded, aliases, observedToken, importModule = spec => import(spec), packageRoot = null) {
+  if(param.ident==='ANIMATION_MODULE_TYPE'&&param.imported==='ANIMATION_MODULE_TYPE'
+    &&param.spec==='@angular/platform-browser/animations'){
+    const core=await importModule('@angular/core');
+    return core.ANIMATION_MODULE_TYPE!=null&&core.ANIMATION_MODULE_TYPE===observedToken;
+  }
   if(family==='legacy-select'&&param.ident==='MAT_FORM_FIELD'&&param.imported==='MAT_FORM_FIELD'
     &&param.spec==='@angular/material/form-field'){
     if(!packageRoot)return false;

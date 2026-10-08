@@ -34,9 +34,15 @@ const selected={
 };
 const family=arg('--family');
 const families=family==='legacy-controls'?['legacy-checkbox','legacy-radio','legacy-slide-toggle','legacy-slider']:[family];
-if(families.some(name=>!Object.hasOwn(selected,name))){console.error('An exact supported --family is required.');process.exit(2);}
 const peerRoot=resolve(process.env.CLOSEOUT_DIAGNOSTIC_PEER_ROOT||root);
 const originalRoot=resolve(arg('--reference-root')||join(peerRoot,'artifacts/local/ref-material-16.2.14/src/material'));
+const surface=deriveSurface(originalRoot),allClasses=process.argv.includes('--all-family-classes');
+const ids=new Set(allClasses?surface.symbols.filter(symbol=>families.includes(symbol.family)&&symbol.kind==='primary'
+ &&symbol.di_id&&!symbol.shape.token).map(symbol=>symbol.symbol_id)
+ :families.flatMap(name=>(selected[name]||[]).map(symbol=>name+'/primary/'+symbol)));
+if(!ids.size||families.some(name=>allClasses?!surface.symbols.some(symbol=>symbol.family===name):!Object.hasOwn(selected,name))){
+ console.error('An exact supported --family with a nonempty original class selection is required.');process.exit(2);
+}
 const ts=require('typescript'),esbuild=require('esbuild'),url=spec=>pathToFileURL(require.resolve(spec)).href;
 const load=spec=>import(url(spec));
 const cli=await load('@angular/compiler-cli');
@@ -79,11 +85,44 @@ try{
  }
  await load('@angular/compiler');const core=await load('@angular/core');
  if(arg('--source-out'))writeFileSync(arg('--source-out'),readFileSync(join(runtime,'fesm2022',`ngx-compat-material-legacy-${family}.mjs`)));
- const surface=deriveSurface(originalRoot),ids=new Set(families.flatMap(name=>selected[name].map(symbol=>name+'/primary/'+symbol)));
  const symbols=surface.symbols.map(symbol=>({...symbol,di_id:ids.has(symbol.symbol_id)?symbol.di_id:null}));
  assert.equal(symbols.filter(symbol=>symbol.di_id).length,ids.size,'Original selection incomplete');
  const rows=(await observeRuntimeDi(runtime,symbols,[],load)).map(row=>settleDi(row,[]));
  const configurationCases=[];
+ if(families.includes('legacy-core')){
+  const owned=await loadRuntimeModule(runtime,'legacy-core','primary'),Type=owned.MatLegacyPseudoCheckbox;
+  for(const [mode,disabled]of [[undefined,false],['BrowserAnimations',false],['NoopAnimations',true]]){
+   const manual=new Type(mode);assert.equal(manual._animationMode,mode);assert.equal(manual._animationsDisabled,disabled);
+   manual._animationMode=mode==='NoopAnimations'?'BrowserAnimations':'NoopAnimations';
+   assert.equal(manual._animationsDisabled,!disabled);
+   configurationCases.push({id:'pseudo-manual-constructor-and-mutable-mode/'+(mode??'absent'),result:'pass'});
+  }
+  for(const mode of ['BrowserAnimations','NoopAnimations']){
+   const context=await createPublicFactoryContext(core,load,{providers:[{provide:core.ANIMATION_MODULE_TYPE,useValue:mode}]});
+   try{
+    const observed=runFactory(Type.ɵfac,core.Injector,core.runInInjectionContext,{injector:context.element.injector});
+    assert.equal(observed.outcome,'returned',observed.error);assert.ok(observed.value instanceof Type);
+    assert.equal(observed.value._animationMode,mode);assert.equal(observed.value._animationsDisabled,mode==='NoopAnimations');
+    configurationCases.push({id:'pseudo-actual-factory-injected-mode/'+mode,result:'pass'});
+    const element=context.document.createElement('mat-pseudo-checkbox');context.document.body.appendChild(element);
+    const component=core.createComponent(Type,{hostElement:element,environmentInjector:context.environment});
+    try{
+     component.setInput('state','checked');component.setInput('disabled',true);component.changeDetectorRef.detectChanges();
+     assert.ok(element.classList.contains('mat-pseudo-checkbox'));
+     assert.ok(element.classList.contains('mat-pseudo-checkbox-checked'));
+     assert.ok(element.classList.contains('mat-pseudo-checkbox-disabled'));
+     assert.equal(element.classList.contains('_mat-animation-noopable'),mode==='NoopAnimations');
+     component.setInput('state','indeterminate');component.setInput('disabled',false);component.setInput('appearance','minimal');component.changeDetectorRef.detectChanges();
+     assert.ok(element.classList.contains('mat-pseudo-checkbox-indeterminate'));
+     assert.ok(element.classList.contains('mat-pseudo-checkbox-minimal'));
+     assert.equal(element.classList.contains('mat-pseudo-checkbox-checked'),false);
+     assert.equal(element.classList.contains('mat-pseudo-checkbox-disabled'),false);
+     configurationCases.push({id:'pseudo-actual-component-host-state-and-owned-view-lifecycle/'+mode,result:'pass'});
+    }finally{component.destroy();}
+    assert.equal(context.component.hostView.destroyed,false);assert.equal(context.environment.destroyed,false);
+   }finally{context.close();}
+  }
+ }
  for(const row of rows.filter(row=>['legacy-tabs/primary/MatLegacyTabLink','legacy-tabs/primary/_MatLegacyTabLinkBase'].includes(row.symbol.symbol_id))){
   if(row.result!=='pass')continue;
   for(const [id,change]of [
@@ -167,6 +206,7 @@ try{
  const caps=[...new Set([...files.map(file=>file.fileName),...resources])].sort().map(file=>({path:file.startsWith(root+'/')?file.slice(root.length+1):file,sha256:sha(readFileSync(file))}));
  const result={schema_version:1,role:'Unchanged owned source partial compilation and family constructor API observation; not canonical packed/style/native/floor qualification',
   family,families,node:process.version,typescript:ts.version,runtime_peer:core.VERSION.full,rows,configuration_cases:configurationCases,
+  selection:allClasses?'all authenticated original primary factory classes in the exact family':'finite historical attribute constructor selection',
   source_files:files.length,resource_files:resources.size,source_caps:caps,virtual_typecheck_files:virtualFiles.length,
   styles:'Original SCSS resources are read unchanged by the Angular compiler. No Sass transform/rendered/style compatibility is claimed.',
   product_source_or_resource_rewrites:false,actual21_execution:false,packed_execution:false,native_browser_execution:false,g02_claim:'not-passed'};

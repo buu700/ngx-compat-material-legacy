@@ -13,6 +13,12 @@ import {fileURLToPath} from 'node:url';
 
 const require=createRequire(import.meta.url),flags=['optional','self','skipSelf','host'];
 export const SELECT_MOTION_SYMBOL='legacy-select/primary/MatLegacySelect';
+export const PSEUDO_MOTION_SYMBOL='legacy-core/primary/MatLegacyPseudoCheckbox';
+const ownedMotionProfiles=Object.freeze({
+ [SELECT_MOTION_SYMBOL]:Object.freeze({family:'legacy-select',property:'_animationsEnabled',enabled:true}),
+ [PSEUDO_MOTION_SYMBOL]:Object.freeze({family:'legacy-core',property:'_animationsDisabled',enabled:false}),
+});
+export const ownedMotionProfile=symbolId=>Object.hasOwn(ownedMotionProfiles,symbolId)?ownedMotionProfiles[symbolId]:null;
 const sha=text=>createHash('sha256').update(text).digest('hex');
 const matrix=[
  {id:'override-enabled',override:'enabled',state:'enabled',count:1},
@@ -77,7 +83,9 @@ function serialized(requests,expected){
 }
 
 /** Additional owned motion behavior is proved separately from the immutable original constructor DI. */
-export function partitionOwnedSelectMotion(requests,core,owned,layout,material,Type,files,runFactory,injector,value){
+export function partitionOwnedSelectMotion(requests,core,owned,layout,material,Type,files,runFactory,injector,value,symbolId=SELECT_MOTION_SYMBOL){
+ const profile=ownedMotionProfile(symbolId);
+ if(!profile)throw Error('unknown owned motion caller');
  const stateScope=sourceScope(files.core,owned.getLegacyAnimationsState);
  const disabledScope=sourceScope(files.core,owned.legacyAnimationsDisabled);
  const callerScope=sourceScope(files.caller,Type,{classConstructor:true});
@@ -98,7 +106,8 @@ export function partitionOwnedSelectMotion(requests,core,owned,layout,material,T
   ||control.requests.some(request=>!helperOrigin(request,stateScope)))throw Error('owned motion independent control incomplete');
  assertRequests(control.requests,expected.slice(0,control.requests.length));
  assertRequests(classified,expected.slice(0,control.requests.length));
- if(!classified.length||value._animationsEnabled!==(control.value==='enabled'))throw Error('owned select motion state differs from control');
+ const componentState=value[profile.property],expectedState=profile.enabled?control.value==='enabled':control.value!=='enabled';
+ if(!classified.length||componentState!==expectedState)throw Error('owned component motion state differs from control');
  const cases=[];
  for(const cell of matrix){
   const queries=[],parent=core.Injector.create({providers:[]});
@@ -124,18 +133,18 @@ export function partitionOwnedSelectMotion(requests,core,owned,layout,material,T
     disabled_queries:[...queries],requests:serialized(observed.requests,expected),disabled_requests:serialized(disabled.requests,expected)});
   }finally{child.destroy();parent.destroy();}
  }
- return {requests:retained,observation:{symbol_id:SELECT_MOTION_SYMBOL,
+ return {requests:retained,observation:{symbol_id:symbolId,
   role:'Owned helper source/caller, independent same-node control and finite state matrix; original constructor expectations unchanged',
   total_requests:requests.length,retained_requests:retained.length,classified_requests:classified.length,
   sources:{state:stateScope.proof,disabled:disabledScope.proof,caller:callerScope.proof},
   caller:helperOrigin(classified[0],stateScope,disabledScope,callerScope),
-  state:control.value,component_enabled:value._animationsEnabled,verified:true,
+  state:control.value,component_enabled:profile.enabled?componentState:!componentState,verified:true,
   requests:serialized(classified,expected),control_requests:serialized(control.requests,expected),cases}};
 }
 
-export function ownedSelectMotionProblems(observation){
+export function ownedSelectMotionProblems(observation,symbolId=SELECT_MOTION_SYMBOL){
  const x=observation,problems=[];
- if(!x||x.symbol_id!==SELECT_MOTION_SYMBOL||x.verified!==true
+ if(!ownedMotionProfile(symbolId)||!x||x.symbol_id!==symbolId||x.verified!==true
   ||!Number.isInteger(x.total_requests)||!Number.isInteger(x.retained_requests)||!Number.isInteger(x.classified_requests)
   ||x.retained_requests<0||x.classified_requests<1||x.retained_requests+x.classified_requests!==x.total_requests
   ||!['enabled','di-disabled','reduced-motion'].includes(x.state)||x.component_enabled!==(x.state==='enabled')

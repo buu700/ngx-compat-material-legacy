@@ -4,6 +4,19 @@ from pathlib import Path
 import unittest
 ROOT=Path(__file__).resolve().parents[1]
 class OwnedTokenIdentityTests(unittest.TestCase):
+    def test_historical_animation_mode_uses_supported_core_object(self):
+        script=r"""
+import assert from 'node:assert/strict';import {runtimeTokenIdentity} from './scripts/api-di-observe.mjs';
+const ANIMATION_MODULE_TYPE={},twin={},imports=[];
+const load=async spec=>{imports.push(spec);assert.equal(spec,'@angular/core');return {ANIMATION_MODULE_TYPE};};
+const original={ident:'ANIMATION_MODULE_TYPE',imported:'ANIMATION_MODULE_TYPE',spec:'@angular/platform-browser/animations'};
+assert.equal(await runtimeTokenIdentity('legacy-core',original,{}, {},ANIMATION_MODULE_TYPE,load),true);
+assert.equal(await runtimeTokenIdentity('legacy-core',original,{}, {},twin,load),false);
+assert.deepEqual(imports,['@angular/core','@angular/core']);
+"""
+        result=subprocess.run(['node','--input-type=module','-e',script],cwd=ROOT,text=True,capture_output=True)
+        self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+
     def test_historical_document_uses_supported_core_object_without_common_import(self):
         script=r"""
 import assert from 'node:assert/strict';import{runtimeTokenIdentity}from'./scripts/api-di-observe.mjs';
