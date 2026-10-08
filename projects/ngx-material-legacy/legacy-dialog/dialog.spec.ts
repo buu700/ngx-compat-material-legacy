@@ -1,5 +1,5 @@
 import {FocusMonitor, FocusOrigin, FocusTrapFactory, InteractivityChecker} from '@angular/cdk/a11y';
-import {DialogRef as CdkDialogRef} from '@angular/cdk/dialog';
+import {Dialog as CdkDialog, DialogRef as CdkDialogRef} from '@angular/cdk/dialog';
 import {
   ComponentFixture,
   fakeAsync,
@@ -34,6 +34,7 @@ import {Directionality} from '@angular/cdk/bidi';
 import {supportsShadowDom} from '../internal/owned-shadow-dom';
 import {MatLegacyDialogContainer} from './dialog-container';
 import {_MatDialogContainerBase} from './internal/dialog-container-base';
+import {legacyDialogFocusNotifications} from './internal/dialog-container-state';
 import {MatDialogConfig} from '@angular/material/dialog';
 import {MatLegacyDialogConfig} from './dialog-config';
 import {ComponentPortal} from '@angular/cdk/portal';
@@ -1316,10 +1317,14 @@ describe('MatDialog', () => {
     }));
 
     it('should retain exactly the container trap anchors after initial focus selection', fakeAsync(() => {
-      const ref = dialog.open(PizzaMsg, {viewContainerRef: testViewContainerRef});
-      viewContainerFixture.detectChanges();
+      let ref: MatLegacyDialogRef<PizzaMsg>;
       let notifications = 0;
-      ref._containerInstance._focusTrapped.subscribe(() => notifications++);
+      TestBed.inject(NgZone).run(() => {
+        Promise.resolve().then(() => {});
+        ref = dialog.open(PizzaMsg, {viewContainerRef: testViewContainerRef});
+        viewContainerFixture.detectChanges();
+        legacyDialogFocusNotifications(ref._containerInstance).subscribe(() => notifications++);
+      });
       flushMicrotasks();
 
       const container = overlayContainerElement.querySelector('mat-dialog-container')!;
@@ -2432,8 +2437,11 @@ describe('Owned legacy dialog initial focus', () => {
     fixture.detectChanges();
     const button = fixture.nativeElement.querySelector('button') as HTMLButtonElement;
     const focus = spyOn(button, 'focus').and.callThrough();
-    fixture.componentInstance.requestInitialFocus();
-    expect(focus).not.toHaveBeenCalled();
+    TestBed.inject(NgZone).run(() => {
+      Promise.resolve().then(() => {});
+      fixture.componentInstance.requestInitialFocus();
+      expect(focus).not.toHaveBeenCalled();
+    });
     flushMicrotasks();
     expect(document.activeElement).toBe(button);
     expect(focus).toHaveBeenCalledTimes(1);
@@ -2447,12 +2455,32 @@ describe('Owned legacy dialog initial focus', () => {
     fixture.detectChanges();
     const focus = spyOn(fixture.nativeElement.querySelector('button'), 'focus');
     let completed = 0;
-    fixture.componentInstance._focusTrapped.subscribe({complete: () => completed++});
-    fixture.componentInstance.requestInitialFocus();
-    fixture.destroy();
+    legacyDialogFocusNotifications(fixture.componentInstance).subscribe({complete: () => completed++});
+    TestBed.inject(NgZone).run(() => {
+      Promise.resolve().then(() => {});
+      fixture.componentInstance.requestInitialFocus();
+      fixture.destroy();
+    });
     flushMicrotasks();
     expect(focus).not.toHaveBeenCalled();
     expect(completed).toBe(1);
+  }));
+
+  it('should focus a selector synchronously while the supplied zone is unstable', fakeAsync(() => {
+    const fixture = TestBed.createComponent(LegacyInitialFocusProbe);
+    fixture.detectChanges();
+    fixture.componentInstance._config.autoFocus = 'first-heading';
+    const heading = fixture.nativeElement.querySelector('h2') as HTMLElement;
+    const focused = spyOn(heading, 'focus').and.callThrough();
+    TestBed.inject(NgZone).run(() => {
+      Promise.resolve().then(() => {});
+      fixture.componentInstance.requestInitialFocus();
+      expect(focused).toHaveBeenCalledTimes(1);
+      expect(document.activeElement).toBe(heading);
+    });
+    fixture.destroy();
+    flushMicrotasks();
+    expect(heading.hasAttribute('tabindex')).toBe(false);
   }));
 
   it('should remove a temporary heading tabindex when the container is destroyed', fakeAsync(() => {
@@ -2524,9 +2552,8 @@ for (const mode of ['enabled', 'di-disabled'] as const) {
 
     it('should finish once when beforeClosed detaches the actual overlay', fakeAsync(() => {
       const close = spyOn(CdkDialogRef.prototype, 'close').and.callThrough();
-      const create = spyOn(TestBed.inject(Overlay), 'create').and.callThrough();
       const ref = TestBed.inject(MatLegacyDialog).open(LegacyMotionContent);
-      const overlay = create.calls.mostRecent().returnValue;
+      const overlay = TestBed.inject(CdkDialog).getDialogById(ref.id)!.overlayRef;
       const before = jasmine.createSpy('beforeClosed');
       const after = jasmine.createSpy('afterClosed');
       ref.beforeClosed().subscribe(result => {
@@ -2544,9 +2571,8 @@ for (const mode of ['enabled', 'di-disabled'] as const) {
     }));
 
     it('should allow opening completion to detach without scheduling an exit', fakeAsync(() => {
-      const create = spyOn(TestBed.inject(Overlay), 'create').and.callThrough();
       const ref = TestBed.inject(MatLegacyDialog).open(LegacyMotionContent);
-      const overlay = create.calls.mostRecent().returnValue;
+      const overlay = TestBed.inject(CdkDialog).getDialogById(ref.id)!.overlayRef;
       const exit = spyOn(ref._containerInstance, '_startExitAnimation').and.callThrough();
       const after = jasmine.createSpy('afterClosed');
       ref.afterOpened().subscribe({complete: () => overlay.detach()});

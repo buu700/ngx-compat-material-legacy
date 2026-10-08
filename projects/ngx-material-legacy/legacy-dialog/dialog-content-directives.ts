@@ -20,6 +20,7 @@ import {
 import {MatLegacyDialog} from './dialog';
 import {MatLegacyDialogRef} from './dialog-ref';
 import {_closeDialogVia} from './dialog-ref';
+import {addLegacyDialogTitle, removeLegacyDialogTitle} from './internal/dialog-container-state';
 
 /** Counter used to generate unique IDs for dialog elements. */
 let dialogElementUid = 0;
@@ -126,7 +127,10 @@ export class MatLegacyDialogTitle implements OnInit, OnDestroy {
     if (this._dialogRef) {
       Promise.resolve().then(() => {
         // Use markForCheck-aware helpers so titles work under OnPush view containers.
-        this._dialogRef._containerInstance?._addAriaLabelledBy?.(this.id);
+        const container = this._dialogRef._containerInstance;
+        if (container) {
+          addLegacyDialogTitle(container, this.id);
+        }
       });
     }
   }
@@ -138,7 +142,7 @@ export class MatLegacyDialogTitle implements OnInit, OnDestroy {
 
     if (instance) {
       Promise.resolve().then(() => {
-        instance._removeAriaLabelledBy?.(this.id);
+        removeLegacyDialogTitle(instance, this.id);
       });
     }
   }

@@ -20,6 +20,8 @@ export interface LegacyDialogInitialFocusContext {
   renderer: Pick<Renderer2, 'listen'>;
   ngZone: NgZone;
   isBrowser: boolean;
+  isDestroyed: () => boolean;
+  onFocusSettled: () => void;
 }
 
 /** Resolve the active element through open shadow roots without private CDK helpers. */
@@ -43,6 +45,7 @@ export function legacyDialogContainsFocus(element: HTMLElement): boolean {
 export function focusLegacyDialogInitially(context: LegacyDialogInitialFocusContext,
     options?: FocusOptions): (() => void) | null {
   if (!context.isBrowser) {
+    context.onFocusSettled();
     return null;
   }
   const {element, config, factory, checker, renderer, ngZone} = context;
@@ -52,20 +55,32 @@ export function focusLegacyDialogInitially(context: LegacyDialogInitialFocusCont
       if (!legacyDialogContainsFocus(element)) {
         element.focus(options);
       }
+      context.onFocusSettled();
       return null;
     case true:
     case 'first-tabbable': {
       // This temporary selector uses the public initial-element algorithm.
       // Defer anchors: the enclosing container already owns the real tab trap.
       const selection = factory.create(element, true);
+      let focused: boolean;
       try {
-        if (!selection.focusInitialElement(options)) {
-          element.focus(options);
-        }
+        focused = selection.focusInitialElement(options);
       } finally {
         selection.destroy();
       }
-      return null;
+      if (focused) {
+        context.onFocusSettled();
+        return null;
+      }
+      // The original focusInitialElementWhenReady promise deferred only its fallback.
+      let canceled = false;
+      Promise.resolve().then(() => {
+        if (!canceled && !context.isDestroyed()) {
+          element.focus(options);
+          context.onFocusSettled();
+        }
+      });
+      return () => { canceled = true; };
     }
   }
   const selector = config.autoFocus === 'first-heading'
@@ -94,5 +109,6 @@ export function focusLegacyDialogInitially(context: LegacyDialogInitialFocusCont
     }
     target.focus(options);
   }
+  context.onFocusSettled();
   return cleanup;
 }
