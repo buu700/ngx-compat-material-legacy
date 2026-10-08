@@ -36,7 +36,6 @@ export {
   MatMenuDefaultOptions as MatLegacyMenuDefaultOptions,
 
 
-  MatMenuPanel as MatLegacyMenuPanel,
 
 
   MenuPositionX as LegacyMenuPositionX,
@@ -48,3 +47,4 @@ export {
   MAT_MENU_CONTENT as MAT_LEGACY_MENU_CONTENT,
 } from '@angular/material/menu';
 export {MatCommonModule} from './internal/common-module';
+export type {MatMenuPanel as MatLegacyMenuPanel} from './internal/menu-panel';

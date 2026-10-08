@@ -1,0 +1,315 @@
+{
+  "schema_version": 1,
+  "scope": "C04 exact historical type-only custom menu panel contract ownership",
+  "reviewer": "Codex primary implementer",
+  "recorded_at_utc": "2026-10-08T01:04:14.064953+00:00",
+  "original": {
+    "version": "16.2.14",
+    "repository_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+    "repository_path": "src/material/menu/menu-panel.ts",
+    "source_sha256": "48ae888c7a12b733a45989cf0195bd42298203da9768e5354c31759004883b43",
+    "source_bytes": 1617,
+    "scope": "Complete untouched source;only its interface declaration is copied into owned module. Private token is not copied or changed in this work.",
+    "retained_source": "reference/material-16.2.14/interface-sources/menu-panel.ts"
+  },
+  "minimum_peers": [
+    {
+      "line": "main",
+      "package": "@angular/material",
+      "version": "22.1.7",
+      "integrity": "sha512-mpe0lL6eDlN5AuXY7CP29SfKey7nVuHp4YhQijaq9orRFwsP3fSGrMU9BJjIRDOLWc8Zg9v/oa85E1CjNebXGg==",
+      "archive_sha256": "06115b963b565428d8d5f79cc1cdd07a3f0d5a58dbaebf9955639f38b35ac43d",
+      "source_files": 184,
+      "archive_rehashed": true,
+      "declaration_member": "package/types/menu.d.ts",
+      "declaration_sha256": "42055c30ec251b3a272b68958fd7b877b347ed964f8f7e4236b1e5deaaf4fa1b",
+      "declaration_bytes": 24680,
+      "role": "Exact current private-interface annotation/source dependencies. Presence/public export does not license continued private MatMenuPanel import."
+    },
+    {
+      "line": "21.x",
+      "package": "@angular/material",
+      "version": "21.2.14",
+      "integrity": "sha512-fMQca8VRtei93JRRG9qQ+u08DCb0nga59Esoakq5yx3+A1NfdpFeUS1tBns56U04o8KAaIAwZK3NBqXz8ZKNqg==",
+      "archive_sha256": "2f8c0fce7967b8a91a07bc3a184cf5da6023eac3828d15fa23b6c338b340e23c",
+      "source_files": 183,
+      "archive_rehashed": true,
+      "declaration_member": "package/types/menu.d.ts",
+      "declaration_sha256": "7789c2ffbc33fe9e0c656a6808a4e325c6a9c3f597c5348738c877d39a04a6a1",
+      "declaration_bytes": 24741,
+      "role": "Exact current private-interface annotation/source dependencies. Presence/public export does not license continued private MatMenuPanel import."
+    }
+  ],
+  "decision": "Own exactly the complete untouched16 MatMenuPanel<T=any> interface declaration and retain its public MatLegacyMenuPanel alias. Required/optional/readonly flags,generic item types,close event domain,focus/position methods,recursive parent shape and deprecated owned add/remove callbacks remain unchanged. Resolve its external types only through stable public upstream exports. Menu and trigger import the owned type;the historical custom-panel test uses the published alias. Remove the unused current private MAT_MENU_PANEL import from owned menu-base. Runtime token/provider routing,owned menu/trigger implementations,selectors,motion,peer versions and oracles are unchanged. No component/CDK fork or compatibility exception is introduced.",
+  "branches": {
+    "main": {
+      "source_head_before": "60d5dd2014b921cbb325ec281b66b14c858154a1",
+      "sources": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-panel.ts",
+          "before_sha256": null,
+          "after_sha256": "4212186406b92fc485c050ffae7a8fd7b1f8e7af855bfd0133b018435834018a",
+          "after_bytes": 1443
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+          "before_sha256": "f230ad54f6ce76fe71b08592907bcf256f3baa71051bc09a0320c61a85b83e6a",
+          "after_sha256": "c0830fca23f02ec1bbd5377010f1af735341c7049458b4915e70e4d7ebd35b72",
+          "after_bytes": 20507
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+          "before_sha256": "9061a662e8fa8aa86d85a8b4fda73e0b0e61d3ec409da6f9072452dd6b31b741",
+          "after_sha256": "d052a61711194bffb9492d64471f21107441e3d60c28618d13acaf99274c90b0",
+          "after_bytes": 22226
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/public-api.ts",
+          "before_sha256": "28b0778a515f0ce19c5c06b3e59d2e348fc4c0d7548ace530dd8479c4ade6048",
+          "after_sha256": "81b5a694b163913919795064ea67581f03a939c71abe18307f576def7bb3f75f",
+          "after_bytes": 1709
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+          "before_sha256": "5fd2155c22f0a89b31ff73a42b1e243298eee6679b9ad576263f060d07b27d16",
+          "after_sha256": "12cc61852d0f8e15c245182862a71ff73de9c4379707a8cafed2d4240f64476b",
+          "after_bytes": 110249
+        }
+      ],
+      "strict_test_command": "NODE_PATH=<readonly22.1.7 runtime> python3 -m unittest discover -s tests -p test_menu_panel_contract.py",
+      "unit_tests": {
+        "passed": 2,
+        "skipped": 0
+      },
+      "strict_consumer": {
+        "positive": 1,
+        "negatives": 5,
+        "expected_diagnostics": {
+          "position": 2322,
+          "readonly": 2540,
+          "origin": 2345,
+          "generic": 2345,
+          "required": 2740
+        },
+        "runtime": "HostNode22.23.3/TypeScript6.0.3,Angular/Material/CDK22.1.7;not minimum21/strict packed/floor qualification"
+      },
+      "runtime_code_comparison": "Both actual menu-base/menu-trigger-base TypeScript emit modules match their previous emitted modules exactly after ignoring retained license comments. The new interface emits only its MIT Google/Ryan notice and an empty module. No token,runtime value or behavior added.",
+      "source_policy": {
+        "private_hits_before": 29,
+        "private_hits_after": 24,
+        "removed_hits": [
+          {
+            "name": "MatMenuPanel",
+            "module": "@angular/material/menu",
+            "package": "@angular/material",
+            "path": "legacy-menu/public-api.ts",
+            "access": "named",
+            "declaration_package": "@angular/material",
+            "declaration": "types/menu.d.ts",
+            "declaration_name": "MatMenuPanel"
+          },
+          {
+            "name": "MatMenuPanel",
+            "module": "@angular/material/menu",
+            "package": "@angular/material",
+            "path": "legacy-menu/menu.spec.ts",
+            "access": "named",
+            "declaration_package": "@angular/material",
+            "declaration": "types/menu.d.ts",
+            "declaration_name": "MatMenuPanel"
+          },
+          {
+            "name": "MatMenuPanel",
+            "module": "@angular/material/menu",
+            "package": "@angular/material",
+            "path": "legacy-menu/internal/menu-trigger-base.ts",
+            "access": "named",
+            "declaration_package": "@angular/material",
+            "declaration": "types/menu.d.ts",
+            "declaration_name": "MatMenuPanel"
+          },
+          {
+            "name": "MAT_MENU_PANEL",
+            "module": "@angular/material/menu",
+            "package": "@angular/material",
+            "path": "legacy-menu/internal/menu-base.ts",
+            "access": "named",
+            "declaration_package": "@angular/material",
+            "declaration": "types/menu.d.ts",
+            "declaration_name": "MAT_MENU_PANEL"
+          },
+          {
+            "name": "MatMenuPanel",
+            "module": "@angular/material/menu",
+            "package": "@angular/material",
+            "path": "legacy-menu/internal/menu-base.ts",
+            "access": "named",
+            "declaration_package": "@angular/material",
+            "declaration": "types/menu.d.ts",
+            "declaration_name": "MatMenuPanel"
+          }
+        ],
+        "remaining_names": [
+          "CDK_TABLE",
+          "CdkDialogContainer",
+          "DataRowOutlet",
+          "FooterRowOutlet",
+          "HeaderRowOutlet",
+          "MAT_MENU_PANEL",
+          "NoDataRowOutlet",
+          "ViewportRuler"
+        ],
+        "authored_syntax_violations": 0,
+        "framework_declarations_missing": [
+          "@angular/common",
+          "@angular/core",
+          "@angular/forms",
+          "@angular/platform-browser"
+        ],
+        "packed_digest": null,
+        "full_pass": false
+      }
+    },
+    "21.x": {
+      "source_head_before": "8b237eff8f161325cc1110c2331792151267c002",
+      "sources": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-panel.ts",
+          "before_sha256": null,
+          "after_sha256": "4212186406b92fc485c050ffae7a8fd7b1f8e7af855bfd0133b018435834018a",
+          "after_bytes": 1443
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+          "before_sha256": "f230ad54f6ce76fe71b08592907bcf256f3baa71051bc09a0320c61a85b83e6a",
+          "after_sha256": "c0830fca23f02ec1bbd5377010f1af735341c7049458b4915e70e4d7ebd35b72",
+          "after_bytes": 20507
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+          "before_sha256": "9061a662e8fa8aa86d85a8b4fda73e0b0e61d3ec409da6f9072452dd6b31b741",
+          "after_sha256": "d052a61711194bffb9492d64471f21107441e3d60c28618d13acaf99274c90b0",
+          "after_bytes": 22226
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/public-api.ts",
+          "before_sha256": "28b0778a515f0ce19c5c06b3e59d2e348fc4c0d7548ace530dd8479c4ade6048",
+          "after_sha256": "81b5a694b163913919795064ea67581f03a939c71abe18307f576def7bb3f75f",
+          "after_bytes": 1709
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+          "before_sha256": "3e91900c5b3d0c4506cfb65924092d2b5b0d737db01c87bc16f0e7fc33531e60",
+          "after_sha256": "c4db1fc32378c139e000fb92cacb64e08e616e2e23242bc71cb8e5f5e49a76c0",
+          "after_bytes": 110240
+        }
+      ],
+      "strict_test_command": "NODE_PATH=<readonly22.1.7 runtime> python3 -m unittest discover -s tests -p test_menu_panel_contract.py",
+      "unit_tests": {
+        "passed": 2,
+        "skipped": 0
+      },
+      "strict_consumer": {
+        "positive": 1,
+        "negatives": 5,
+        "expected_diagnostics": {
+          "position": 2322,
+          "readonly": 2540,
+          "origin": 2345,
+          "generic": 2345,
+          "required": 2740
+        },
+        "runtime": "HostNode22.23.3/TypeScript6.0.3,Angular/Material/CDK22.1.7;not minimum21/strict packed/floor qualification"
+      },
+      "runtime_code_comparison": "Both actual menu-base/menu-trigger-base TypeScript emit modules match their previous emitted modules exactly after ignoring retained license comments. The new interface emits only its MIT Google/Ryan notice and an empty module. No token,runtime value or behavior added.",
+      "source_policy": {
+        "private_hits_before": 29,
+        "private_hits_after": 24,
+        "removed_hits": [
+          {
+            "name": "MatMenuPanel",
+            "module": "@angular/material/menu",
+            "package": "@angular/material",
+            "path": "legacy-menu/public-api.ts",
+            "access": "named",
+            "declaration_package": "@angular/material",
+            "declaration": "types/menu.d.ts",
+            "declaration_name": "MatMenuPanel"
+          },
+          {
+            "name": "MatMenuPanel",
+            "module": "@angular/material/menu",
+            "package": "@angular/material",
+            "path": "legacy-menu/menu.spec.ts",
+            "access": "named",
+            "declaration_package": "@angular/material",
+            "declaration": "types/menu.d.ts",
+            "declaration_name": "MatMenuPanel"
+          },
+          {
+            "name": "MatMenuPanel",
+            "module": "@angular/material/menu",
+            "package": "@angular/material",
+            "path": "legacy-menu/internal/menu-trigger-base.ts",
+            "access": "named",
+            "declaration_package": "@angular/material",
+            "declaration": "types/menu.d.ts",
+            "declaration_name": "MatMenuPanel"
+          },
+          {
+            "name": "MAT_MENU_PANEL",
+            "module": "@angular/material/menu",
+            "package": "@angular/material",
+            "path": "legacy-menu/internal/menu-base.ts",
+            "access": "named",
+            "declaration_package": "@angular/material",
+            "declaration": "types/menu.d.ts",
+            "declaration_name": "MAT_MENU_PANEL"
+          },
+          {
+            "name": "MatMenuPanel",
+            "module": "@angular/material/menu",
+            "package": "@angular/material",
+            "path": "legacy-menu/internal/menu-base.ts",
+            "access": "named",
+            "declaration_package": "@angular/material",
+            "declaration": "types/menu.d.ts",
+            "declaration_name": "MatMenuPanel"
+          }
+        ],
+        "remaining_names": [
+          "CDK_TABLE",
+          "CdkDialogContainer",
+          "DataRowOutlet",
+          "FooterRowOutlet",
+          "HeaderRowOutlet",
+          "MAT_MENU_PANEL",
+          "NoDataRowOutlet",
+          "ViewportRuler"
+        ],
+        "authored_syntax_violations": 0,
+        "framework_declarations_missing": [
+          "@angular/common",
+          "@angular/core",
+          "@angular/forms",
+          "@angular/platform-browser"
+        ],
+        "packed_digest": null,
+        "full_pass": false
+      }
+    }
+  },
+  "checks": {
+    "full_original_declaration": "All bytes from export interface through end-of-file preserved exactly on both lines;complete original source retained/authenticated separately.",
+    "type_checks": "One real strict consumer and five independently failing violations per line use actual declarations;all expected diagnostics exact.",
+    "emit": "Both runtime implementations byte-identical after license-comment erasure;owned interface has no runtime value.",
+    "final_provenance_guard": "Final literal authenticated original digest assertion passes separately on both lines."
+  },
+  "limits": [
+    "No strict packed/AOT/minimum21/runtime-floor or new native acceptance. Cached runtime is22.1.7 for both source type diagnostics.",
+    "24 private-surface hits remain per line,including necessary MAT_MENU_PANEL runtime bridge. Original menu-item/table manual constructors remain unresolved.",
+    "Framework declaration packages and packed artifact absent from these policy diagnostics;whole source-policy stays failed.",
+    "No SHA/authored-use ledger label closed by this type repair. All1697SHA/1736use and audit obligations remain."
+  ],
+  "g11_claim": "not-passed"
+}

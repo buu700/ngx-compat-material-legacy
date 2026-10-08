@@ -1,0 +1,48 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+
+import type {EventEmitter, TemplateRef} from '@angular/core';
+import type {Direction} from '@angular/cdk/bidi';
+import type {FocusOrigin} from '@angular/cdk/a11y';
+import type {MatMenuContent, MenuPositionX, MenuPositionY} from '@angular/material/menu';
+
+/**
+ * Interface for a custom menu panel that can be used with `matMenuTriggerFor`.
+ * @docs-private
+ */
+export interface MatMenuPanel<T = any> {
+  xPosition: MenuPositionX;
+  yPosition: MenuPositionY;
+  overlapTrigger: boolean;
+  templateRef: TemplateRef<any>;
+  readonly close: EventEmitter<void | 'click' | 'keydown' | 'tab'>;
+  parentMenu?: MatMenuPanel | undefined;
+  direction?: Direction;
+  focusFirstItem: (origin?: FocusOrigin) => void;
+  resetActiveItem: () => void;
+  setPositionClasses?: (x: MenuPositionX, y: MenuPositionY) => void;
+  setElevation?(depth: number): void;
+  lazyContent?: MatMenuContent;
+  backdropClass?: string;
+  overlayPanelClass?: string | string[];
+  hasBackdrop?: boolean;
+  readonly panelId?: string;
+
+  /**
+   * @deprecated To be removed.
+   * @breaking-change 8.0.0
+   */
+  addItem?: (item: T) => void;
+
+  /**
+   * @deprecated To be removed.
+   * @breaking-change 8.0.0
+   */
+  removeItem?: (item: T) => void;
+}

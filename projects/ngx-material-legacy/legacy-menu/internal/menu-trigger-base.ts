@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -30,7 +31,6 @@ import {
   MAT_MENU_PANEL,
   MAT_MENU_SCROLL_STRATEGY,
   MatMenuItem,
-  MatMenuPanel,
   MenuCloseReason,
   MenuPositionX,
   MenuPositionY,
@@ -57,6 +57,7 @@ import {asapScheduler, merge, Observable, of as observableOf, Subscription} from
 import {delay, filter, takeUntil} from 'rxjs/operators';
 import {_MatMenuBase} from './menu-base';
 import {_MatMenuContentBase} from './menu-content-base';
+import type {MatMenuPanel} from './menu-panel';
 import {throwMatMenuRecursiveError} from './menu-errors';
 
 /** @docs-private */
