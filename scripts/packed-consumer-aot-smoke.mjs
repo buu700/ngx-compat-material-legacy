@@ -462,7 +462,7 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
     'packed-consumer/harness/legacy-button': parsed.buttonText === 'Go',
     'packed-consumer/harness/legacy-select': parsed.selectOpened === true && parsed.selectClosed === true,
     'packed-consumer/harness/legacy-dialog': typeof parsed.dialogText === 'string' && parsed.dialogText.includes('Hello dialog') && parsed.dialogsAfterClose === 0,
-    'packed-consumer/harness/legacy-menu': parsed.menuOpen === true,
+    'packed-consumer/harness/legacy-menu': parsed.menuOpen === true && parsed.menuItemConstruction === true,
     'packed-consumer/harness/legacy-snack-bar': typeof parsed.snackText === 'string' && parsed.snackText.includes('Snack message'),
     'packed-consumer/harness/legacy-tooltip': parsed.tipVisible === true && typeof parsed.tipText === 'string' && parsed.tipText.includes('Tip text'),
     'packed-consumer/harness/legacy-tabs': parsed.tabCount === 2 && parsed.selectedTab === 'Two',
@@ -928,7 +928,8 @@ import {MatLegacySelectModule} from '@ngx-compat/material-legacy/legacy-select';
 import {MatLegacySelectHarness} from '@ngx-compat/material-legacy/legacy-select/testing';
 import {MatLegacyDialog, MatLegacyDialogModule} from '@ngx-compat/material-legacy/legacy-dialog';
 import {MatLegacyDialogHarness} from '@ngx-compat/material-legacy/legacy-dialog/testing';
-import {MatLegacyMenuModule} from '@ngx-compat/material-legacy/legacy-menu';
+import {MatLegacyMenuModule,MatLegacyMenuItem,MAT_LEGACY_MENU_PANEL} from '@ngx-compat/material-legacy/legacy-menu';
+import {MatMenuItem} from '@angular/material/menu';
 import {MatLegacyMenuHarness} from '@ngx-compat/material-legacy/legacy-menu/testing';
 import {MatLegacySnackBar, MatLegacySnackBarModule} from '@ngx-compat/material-legacy/legacy-snack-bar';
 import {MatLegacySnackBarHarness} from '@ngx-compat/material-legacy/legacy-snack-bar/testing';
@@ -1020,6 +1021,8 @@ class SmokeDialogContent {}
     <button mat-button [matMenuTriggerFor]="menu" id="menu-trigger">Menu</button>
     <mat-menu #menu="matMenu">
       <button mat-menu-item id="menu-item">Item</button>
+      <button mat-menu-item disabled id="menu-disabled">Disabled</button>
+      <button mat-menu-item disableRipple id="menu-no-ripple">No ripple</button>
     </mat-menu>
     <button mat-button id="snack-open">Snack</button>
     <button mat-button matTooltip="Tip text" id="tip">Hover</button>
@@ -1457,6 +1460,19 @@ async function main() {
   fixture.detectChanges();
   await sleep(20);
   const menuOpen = await menu.isOpen();
+  const menuNodes=fixture.debugElement.queryAll(By.directive(MatLegacyMenuItem));
+  const normalMenuNode=menuNodes.find(node=>node.nativeElement.id==='menu-item');
+  const disabledMenuNode=menuNodes.find(node=>node.nativeElement.id==='menu-disabled');
+  const noRippleMenuNode=menuNodes.find(node=>node.nativeElement.id==='menu-no-ripple');
+  const normalMenuItem=normalMenuNode?.injector.get(MatLegacyMenuItem);
+  let menuOutsideDiRejected=false;
+  try {new MatLegacyMenuItem();} catch(error) {menuOutsideDiRejected=/NG0203|injection context/.test(String(error));}
+  const menuItemConstruction=!!normalMenuItem && normalMenuItem instanceof MatMenuItem
+    && normalMenuNode!.injector.get(MatMenuItem)===normalMenuItem
+    && normalMenuNode!.injector.get(MAT_LEGACY_MENU_PANEL)===normalMenuItem._parentMenu
+    && normalMenuItem.disabled===false && normalMenuItem.disableRipple===false
+    && disabledMenuNode?.injector.get(MatLegacyMenuItem).disabled===true
+    && noRippleMenuNode?.injector.get(MatLegacyMenuItem).disableRipple===true && menuOutsideDiRejected;
   await menu.close();
   fixture.detectChanges();
   await sleep(20);
@@ -1703,7 +1719,7 @@ async function main() {
       isOpen === false &&
       dialogText.includes('Hello dialog') &&
       dialogsAfter.length === 0 &&
-      menuOpen === true &&
+      menuOpen === true && menuItemConstruction &&
       snackText.includes('Snack message') &&
       tipVisible === true &&
       tipText.includes('Tip text') &&
@@ -1716,6 +1732,7 @@ async function main() {
     dialogText,
     dialogsAfterClose: dialogsAfter.length,
     menuOpen,
+    menuItemConstruction,
     snackText,
     tipVisible,
     tipText,

@@ -11,6 +11,7 @@ import {createHash} from 'node:crypto';
 import {dirname, join, resolve} from 'node:path';
 import {createRequire} from 'node:module';
 import {fileURLToPath} from 'node:url';
+import {MENU_ITEM_SYMBOL, approvedMenuItemSignatureRecord} from './menu-item-construction-contract.mjs';
 
 const require = createRequire(import.meta.url);
 let typescriptModule;
@@ -1011,6 +1012,20 @@ export function packedShape(sourceFile, name) {
     flat.ownProtected = own.requiredProtected;
     flat.ownConstructor = own.requiredConstructor;
     flat.heritage = heritageNames(node, sourceFile);
+    if (node.name?.text === 'MatLegacyMenuItem') {
+      const bases = (node.heritageClauses || []).filter(clause => clause.token === ts.SyntaxKind.ExtendsKeyword)
+        .flatMap(clause => [...clause.types]);
+      const expression = bases.length === 1 ? bases[0].expression : null;
+      const binding = expression && ts.isIdentifier(expression) ? importBindings(sourceFile).get(expression.text) : null;
+      const namespace = expression && ts.isPropertyAccessExpression(expression)
+        && ts.isIdentifier(expression.expression) && expression.name.text === 'MatMenuItem'
+        && sourceFile.statements.some(statement => ts.isImportDeclaration(statement)
+          && statement.moduleSpecifier.text === '@angular/material/menu'
+          && statement.importClause?.namedBindings && ts.isNamespaceImport(statement.importClause.namedBindings)
+          && statement.importClause.namedBindings.name.text === expression.expression.text);
+      flat.publicMenuItemParent = Boolean((binding?.spec === '@angular/material/menu'
+        && binding.imported === 'MatMenuItem' && !index.has(expression.text)) || namespace);
+    }
     if (flat.heritage.includes('BasePortalOutlet')) {
       const portalBinding = importBindings(sourceFile).get('BasePortalOutlet');
       flat.publicPortalParent = portalBinding?.spec === '@angular/cdk/portal'
@@ -1273,7 +1288,8 @@ export function compareSignatures(symbol, packed, differences) {
       && item.historical_signature === sig
       && item.classification === 'intentional-legacy-difference'
       && item.rationale
-      && (item.owned_signature == null || packedLeft.has(item.owned_signature)));
+      && (item.owned_signature == null || packedLeft.has(item.owned_signature))
+      && constructionDifferenceAllowed(symbol, packed, item));
     if (record) {
       if (record.owned_signature != null) {
         packedLeft.delete(record.owned_signature);
@@ -1301,7 +1317,8 @@ export function compareSignatures(symbol, packed, differences) {
     }
     const record = (differences || []).find(item => item.symbol_id === symbol.symbol_id
       && item.historical_signature == null && item.owned_signature === extra
-      && item.classification === 'intentional-legacy-difference' && item.rationale);
+      && item.classification === 'intentional-legacy-difference' && item.rationale
+      && constructionDifferenceAllowed(symbol, packed, item));
     if (record) {
       rows.push(differenceRow(record));
       reported.add(extra);
@@ -1327,7 +1344,16 @@ function differenceRow(record) {
     historical: record.historical_signature,
     owned: record.owned_signature,
     rationale: record.rationale,
+    ...(record.construction_contract ? {construction_contract: record.construction_contract} : {}),
   };
+}
+
+function constructionDifferenceAllowed(symbol, packed, record) {
+  const constructor = [record.historical_signature, record.owned_signature]
+    .some(signature => signature?.includes(' constructor('));
+  if (symbol.symbol_id === MENU_ITEM_SYMBOL && constructor)
+    return approvedMenuItemSignatureRecord(symbol, packed, record);
+  return !record.construction_contract;
 }
 
 function matchRecord(differences, symbolId, historical, owned) {
