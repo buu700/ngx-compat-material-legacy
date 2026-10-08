@@ -53,7 +53,7 @@ function hasFlag(name) {
 const seedPath = arg('--seed', join(root, 'compatibility/f10/upstream-sha-risk-bootstrap.json'));
 const ledgerPath = arg('--ledger', join(root, 'compatibility/f10/disposition-ledger/ledger.json'));
 const reportPath = arg('--report', join(root, 'compatibility/rc/reports/upstream-audit-disposition.json'));
-const symbolsPath = arg('--symbols', join(root, 'compatibility/f10/authored-dependency-inventory-seed.json'));
+const symbolsPath = arg('--symbols', join(root, 'compatibility/f10/authored-dependency-dispositions.json'));
 const patchesDir = arg('--patches', '');
 const line = arg('--line', '');
 const admission = hasFlag('--admission');
@@ -234,11 +234,14 @@ if (createHash('sha256').update(authoredReferenceBytes).digest('hex') !== '3e059
 const authoredReference = JSON.parse(authoredReferenceBytes);
 let symbolUsesOpen = null;
 let symbolStatus = 'missing';
+let symbolDispositionsSha256 = null;
 let symbolInventory = authoredUseInventory(authoredReference.symbol_uses, null);
 let symbolReviewEvidence = {reviewed:0,insufficient:0,insufficient_uses:[]};
 const reviewLine = line || (JSON.parse(readFileSync(join(root,'package.json'),'utf8')).devDependencies['@angular/core'].startsWith('21.') ? '21.x' : 'main');
 if (existsSync(symbolsPath)) {
-  const symbols = JSON.parse(readFileSync(symbolsPath, 'utf8'));
+  const symbolBytes = readFileSync(symbolsPath);
+  symbolDispositionsSha256 = createHash('sha256').update(symbolBytes).digest('hex');
+  const symbols = JSON.parse(symbolBytes.toString('utf8'));
   symbolStatus = symbols.status || 'missing';
   symbolInventory = authoredUseInventory(authoredReference.symbol_uses, symbols);
   symbolReviewEvidence = authoredUseReviewEvidence(symbols,reviewLine,rel=>{const file=regularRepoMember(rel);return file?readFileSync(file):null;},bytes=>createHash('sha256').update(bytes).digest('hex'));
@@ -278,6 +281,7 @@ const summary = {
   authored_use_review_evidence: {reviewed:symbolReviewEvidence.reviewed,insufficient:symbolReviewEvidence.insufficient,insufficient_use_sample:symbolReviewEvidence.insufficient_uses.slice(0,20)},
   symbol_uses_open: symbolUsesOpen,
   symbol_status: symbolStatus,
+  symbol_dispositions_sha256: symbolDispositionsSha256,
   forged_clearance: forgedClearance,
 };
 
@@ -303,6 +307,7 @@ const report = {
   authored_use_review_evidence: symbolReviewEvidence,
   symbol_uses_open: symbolUsesOpen,
   symbol_status: symbolStatus,
+  symbol_dispositions_sha256: symbolDispositionsSha256,
   ledger_sha256: createHash('sha256').update(readFileSync(ledgerPath)).digest('hex'),
   result: structuralOk ? 'pass' : 'fail',
   structural_inventory: summary.structural_inventory,
