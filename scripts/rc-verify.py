@@ -44,6 +44,7 @@ from sass_ordered_aggregate_admission import ORDERED_AGGREGATE_CASES, ordered_ag
 from sass_default_companion_admission import DEFAULT_COMPANION_CASES, default_companion_envelope_ok
 from sass_default_mapped_companion_admission import DEFAULT_MAPPED_COMPANION_CASES, default_mapped_companion_envelope_ok
 from sass_default_aggregate_admission import DEFAULT_AGGREGATE_CASES, default_aggregate_envelope_ok
+from sass_form_field_state_admission import FORM_FIELD_STATE_DEFAULT_CASES, form_field_state_default_envelope_ok
 from m3_rendered_admission import complete_rendered_checks
 from consumer_floor_admission import floor_assertion_ok, floor_support_records
 
@@ -1053,6 +1054,8 @@ def _sass_seal_assertion_ok(body: dict, invocation: str) -> bool:
         return function_assertion_ok(ROOT, ACTIVE_RUN, body, invocation)
     if str(body.get('case_id', '')).startswith('owned-style/'):
         return owned_rendered_ok(ROOT, ACTIVE_RUN, body, invocation)
+    if body.get('case_id') in FORM_FIELD_STATE_DEFAULT_CASES:
+        return form_field_state_default_envelope_ok(ACTIVE_RUN,body,invocation)
     if body.get('case_id') in DEFAULT_AGGREGATE_CASES:
         return default_aggregate_envelope_ok(ACTIVE_RUN,body,invocation)
     if body.get('case_id') in DEFAULT_MAPPED_COMPANION_CASES:

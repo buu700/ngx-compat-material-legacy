@@ -13,6 +13,7 @@ import {measureDatepickerControlsPeer,datepickerControlsResultsMatch,DATEPICKER_
 import {measureAggregateDensityPeers,aggregateDensityResultsMatch,AGGREGATE_DENSITY_CASES} from './sass-aggregate-density-contract.mjs';
 import {measureAggregateTypographyPeer,aggregateTypographyResultsMatch,AGGREGATE_TYPOGRAPHY_CASES} from './sass-aggregate-typography-contract.mjs';
 import {measureAggregateColorThemePeer,aggregateColorThemeResultsMatch,AGGREGATE_COLOR_THEME_CASES} from './sass-aggregate-color-theme-contract.mjs';
+import {FORM_FIELD_STATE_ARGUMENT_CASES,FORM_FIELD_STATE_CONTRACT,measureFormFieldStatePeer,formFieldStateArgumentResultsMatch} from './sass-form-field-state-contract.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 export const MIXIN_ARGUMENT_CATALOG='fixtures/sass/mixin-argument-contracts.json';
@@ -78,7 +79,10 @@ export function runMixinArgumentContracts({sass,entry,loadPaths,allowedRoots,imp
     try {
       expected=measureMixinArgument(sass,referenceEntry,[referenceRoot],catalog,probe,[referenceRoot]);
       actual=measureMixinArgument(sass,entry,loadPaths,catalog,probe,allowedRoots,importers);
-      if (Object.hasOwn(SORT_COMPANION_CASES,probe.case_id)) {
+      if (Object.hasOwn(FORM_FIELD_STATE_ARGUMENT_CASES,probe.case_id)) {
+        const peer=measureFormFieldStatePeer({sass,materialRoot:allowedRoots[1],cdkRoot:allowedRoots[2],caseId:probe.case_id,line});
+        current_companion={classification:'conforming-current-companion',contract:FORM_FIELD_STATE_CONTRACT,peer};
+      } else if (Object.hasOwn(SORT_COMPANION_CASES,probe.case_id)) {
         const peer=measureSortPeer({sass,materialRoot:allowedRoots[1],cdkRoot:allowedRoots[2],caseId:probe.case_id,line});
         current_companion={classification:'conforming-current-companion',contract:'current-sort-color-with-original-fallback',peer};
       } else if (Object.hasOwn(TREE_COMPANION_CASES,probe.case_id)) {
@@ -109,7 +113,9 @@ export function runMixinArgumentContracts({sass,entry,loadPaths,allowedRoots,imp
     }catch(caught){error=String(caught.message || caught);}
     const wrongCss=(actual?.css || '')+'\n.wrong-nonempty-mixin { color: red; }\n';
     const mutation={css:wrongCss,css_sha256:sha(wrongCss),css_bytes:Buffer.byteLength(wrongCss)};
-    const conforms=value=>Object.hasOwn(SORT_COMPANION_CASES,probe.case_id)
+    const conforms=value=>Object.hasOwn(FORM_FIELD_STATE_ARGUMENT_CASES,probe.case_id)
+      ? formFieldStateArgumentResultsMatch(probe.case_id,expected,value,current_companion?.peer)
+      : Object.hasOwn(SORT_COMPANION_CASES,probe.case_id)
       ? sortCompanionResultsMatch(probe.case_id,expected,value,current_companion?.peer)
       : Object.hasOwn(TREE_COMPANION_CASES,probe.case_id)
       ? treeCompanionResultsMatch(probe.case_id,expected,value,current_companion?.peer)

@@ -1,0 +1,575 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "recorded_at_utc": "2026-10-08T13:25:55.074241+00:00",
+  "role": "Separate finite default/configurable Sass admission for the historical form-field state-token repair",
+  "source_base_commit": "c4607d021d8f04ab5f0c56626a40497cf2781060",
+  "library_change_subject": "4968960e86de796a87221691387a12041f37baf1",
+  "decision": "Only two existing default color/theme cases and four existing configurable color/theme cases receive this independently owned state-token model. Preserve complete tagged16 CSS and insert only the independently compiled current public three-token rule after the original color prefix. Keep the exact Sass-generated boundary newlines. Do not match by token presence, strip/normalize candidate CSS, accept extra rules or apply this model to legacy-form-field exports.",
+  "source_authentication": {
+    "lock_sha256": "ad2f9d62bf04758f87650cae408f805e667236f992cd6d8e481c5577c939d130",
+    "packages": [
+      {
+        "package": "@angular/cdk",
+        "version": "16.2.14",
+        "resolved": "https://registry.npmjs.org/@angular/cdk/-/cdk-16.2.14.tgz",
+        "integrity": "sha512-n6PrGdiVeSTEmM/HEiwIyg6YQUUymZrb5afaNLGFRM5YL0Y8OBqd+XhCjb0OfD/AfgCUtedVEPwNqrfW8KzgGw==",
+        "archive_sha256": "a499ba0fee46784441b92587e43b17ec72d9bd383f78ea14954eaa62c781bad7",
+        "archive_bytes": 2037314,
+        "loaded_members": 4
+      },
+      {
+        "package": "@angular/material",
+        "version": "16.2.14",
+        "resolved": "https://registry.npmjs.org/@angular/material/-/material-16.2.14.tgz",
+        "integrity": "sha512-zQIxUb23elPfiIvddqkIDYqQhAHa9ZwMblfbv+ug8bxr4D0Dw360jIarxCgMjAcLj7Ccl3GBqZMUnVeM6cjthw==",
+        "archive_sha256": "de41309d20b1d98a7fd6d028a7de42853ea2d453a329c7a8815aaf73ea7f365b",
+        "archive_bytes": 4790549,
+        "loaded_members": 163
+      },
+      {
+        "package": "@material/animation",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/animation/-/animation-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-leRf+BcZTfC/iSigLXnYgcHAGvFVQveoJT5+2PIRdyPI/bIG7hhciRgacHRsCKC0sGya81dDblLgdkjSUemYLw==",
+        "archive_sha256": "62db859d4cef58234cbace1786368223569f5745c2533a7b4c4de22d04b27e7d",
+        "archive_bytes": 11969,
+        "loaded_members": 3
+      },
+      {
+        "package": "@material/base",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/base/-/base-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-Fc3vGuOf+duGo22HTRP6dHdc+MUe0VqQfWOuKrn/wXKD62m0QQR2TqJd3rRhCumH557T5QUyheW943M3E+IGfg==",
+        "archive_sha256": "c218c84086456ccf51e0366178df88ad1ab4e0ac85a706b832e542fe7d1fcb21",
+        "archive_bytes": 92934,
+        "loaded_members": 1
+      },
+      {
+        "package": "@material/button",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/button/-/button-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-3AQgwrPZCTWHDJvwgKq7Cj+BurQ4wTjDdGL+FEnIGUAjJDskwi1yzx5tW2Wf/NxIi7IoPFyOY3UB41jwMiOrnw==",
+        "archive_sha256": "30811eae818c229fff8f4e2504e888aaf333577ebd17b6587092257b48c16be2",
+        "archive_bytes": 192606,
+        "loaded_members": 13
+      },
+      {
+        "package": "@material/card",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/card/-/card-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-nPlhiWvbLmooTnBmV5gmzB0eLWSgLKsSRBYAbIBmO76Okgz1y+fQNLag+lpm/TDaHVsn5fmQJH8e0zIg0rYsQA==",
+        "archive_sha256": "7399a8b5ce550c782bbcdc7825f31672e8e0f683c1c403be82089be0e6d49f69",
+        "archive_bytes": 71587,
+        "loaded_members": 5
+      },
+      {
+        "package": "@material/checkbox",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/checkbox/-/checkbox-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-4tpNnO1L0IppoMF3oeQn8F17t2n0WHB0D7mdJK9rhrujen/fLbekkIC82APB3fdGtLGg3qeNqDqPsJm1YnmrwA==",
+        "archive_sha256": "f39fff5933f68c832c4fe85d70182ca642bb8f56242299c5b77af48a4d0f0004",
+        "archive_bytes": 267259,
+        "loaded_members": 2
+      },
+      {
+        "package": "@material/chips",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/chips/-/chips-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-fqHKvE5bSWK0bXVkf57MWxZtytGqYBZvvHIOs4JI9HPHEhaJy4CpSw562BEtbm3yFxxALoQknvPW2KYzvADnmA==",
+        "archive_sha256": "fee4bf32c70ec1b519af5c4df1d0ae1da36cfeb1b5d49aacd29bc7d41b3b8006",
+        "archive_bytes": 311810,
+        "loaded_members": 1
+      },
+      {
+        "package": "@material/circular-progress",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/circular-progress/-/circular-progress-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-Lxe8BGAxQwCQqrLhrYrIP0Uok10h7aYS3RBXP41ph+5GmwJd5zdyE2t93qm2dyThvU6qKuXw9726Dtq/N+wvZQ==",
+        "archive_sha256": "f3dd9c3cf815e7e7989afacc8dc5458a4f3952a878377a3c98c2a1235009da84",
+        "archive_bytes": 104171,
+        "loaded_members": 1
+      },
+      {
+        "package": "@material/density",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/density/-/density-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-Zt3u07fXrBWLW06Tl5fgvjicxNQMkFdawLyNTzZ5TvbXfVkErILLePwwGaw8LNcvzqJP6ABLA8jiR+sKNoJQCg==",
+        "archive_sha256": "2570821fefb0f235e21131627c81e7e1786e519c42835ddd5c65705bdbacdc1d",
+        "archive_bytes": 4322,
+        "loaded_members": 4
+      },
+      {
+        "package": "@material/dialog",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/dialog/-/dialog-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-o+9a/fmwJ9+gY3Z/uhj/PMVJDq7it1NTWKJn2GwAKdB+fDkT4hb9qEdcxMPyvJJ5ups+XiKZo03+tZrD+38c1w==",
+        "archive_sha256": "c1c903aa0633e8f7ebf7dedd2381f88e6a371c2e6467aa0fb9f71f12a89e6bf6",
+        "archive_bytes": 767885,
+        "loaded_members": 1
+      },
+      {
+        "package": "@material/dom",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/dom/-/dom-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-ly78R7aoCJtundSUu0UROU+5pQD5Piae0Y1MkN6bs0724azeazX1KeXFeaf06JOXnlr5/41ol+fSUPowjoqnOg==",
+        "archive_sha256": "38319c39df19022dd85473dde7d815ee7a45d2bddd1b3fe6e7613b0319d99244",
+        "archive_bytes": 23284,
+        "loaded_members": 2
+      },
+      {
+        "package": "@material/elevation",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/elevation/-/elevation-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-Ro+Pk8jFuap+T0B0shA3xI1hs2b89dNQ2EIPCNjNMp87emHKAzJfhKb7EZGIwv3+gFLlVaLyIVkb94I89KLsyg==",
+        "archive_sha256": "85d9da95a96378d367dbcda0812393e393555db64376f43f1b62536fbc27e5ff",
+        "archive_bytes": 13609,
+        "loaded_members": 3
+      },
+      {
+        "package": "@material/fab",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/fab/-/fab-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-dvU0KWMRglwJEQwmQtFAmJcAjzg9VFF6Aqj78bJYu/DAIGFJ1VTTTSgoXM/XCm1YyQEZ7kZRvxBO37CH54rSDg==",
+        "archive_sha256": "8eeef2d5e19cfca36396441c6f19345bd05dc08904bf0a5502d0a9ffcc41039f",
+        "archive_bytes": 105347,
+        "loaded_members": 4
+      },
+      {
+        "package": "@material/feature-targeting",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/feature-targeting/-/feature-targeting-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-wkDjVcoVEYYaJvun28IXdln/foLgPD7n9ZC9TY76GErGCwTq+HWpU6wBAAk+ePmpRFDayw4vI4wBlaWGxLtysQ==",
+        "archive_sha256": "4c59766a5b222f640c60437dd5f294e217e7ef2e19de20b016ee926d82bb3860",
+        "archive_bytes": 4267,
+        "loaded_members": 2
+      },
+      {
+        "package": "@material/floating-label",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/floating-label/-/floating-label-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-bUWPtXzZITOD/2mkvLkEPO1ngDWmb74y0Kgbz6llHLOQBtycyJIpuoQJ1q2Ez0NM/tFLwPphhAgRqmL3YQ/Kzw==",
+        "archive_sha256": "c42ce9d539a4f514896a8a893b7c883da970a5fd46b431267b31f82e0c98ff91",
+        "archive_bytes": 111257,
+        "loaded_members": 4
+      },
+      {
+        "package": "@material/focus-ring",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/focus-ring/-/focus-ring-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-cZHThVose3GvAlJzpJoBI1iqL6d1/Jj9hXrR+r8Mwtb1hBIUEG3hxfsRd4vGREuzROPlf0OgNf/V+YHoSwgR5w==",
+        "archive_sha256": "3fc36c44d048621c7dc4e450bb8cfaec7f434efddf21c2a18150ab1b925c9328",
+        "archive_bytes": 2374,
+        "loaded_members": 1
+      },
+      {
+        "package": "@material/form-field",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/form-field/-/form-field-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-+JFXy5X44Gue1CbZZAQ6YejnI203lebYwL0i6k0ylDpWHEOdD5xkF2PyHR28r9/65Ebcbwbff6q7kI1SGoT7MA==",
+        "archive_sha256": "69d205a1869b38e351b780ff65a9602fd9e3e02713a8d20035b6bfe56c7263b6",
+        "archive_bytes": 92302,
+        "loaded_members": 5
+      },
+      {
+        "package": "@material/icon-button",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/icon-button/-/icon-button-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-1a0MHgyIwOs4RzxrVljsqSizGYFlM1zY2AZaLDsgT4G3kzsplTx8HZQ022GpUCjAygW+WLvg4z1qAhQHvsbqlw==",
+        "archive_sha256": "da098796881c16ab589926bbaa7e4bbc7b5d3b286d3a9e758b49c7118f10d8a6",
+        "archive_bytes": 144412,
+        "loaded_members": 1
+      },
+      {
+        "package": "@material/line-ripple",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/line-ripple/-/line-ripple-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-8S30WXEuUdgDdBulzUDlPXD6qMzwCX9SxYb5mGDYLwl199cpSGdXHtGgEcCjokvnpLhdZhcT1Dsxeo1g2Evh5Q==",
+        "archive_sha256": "a0995c24d92183f0a97772a91ab96d075b7f4989251bcd1f036e8350c3c621eb",
+        "archive_bytes": 89861,
+        "loaded_members": 4
+      },
+      {
+        "package": "@material/linear-progress",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/linear-progress/-/linear-progress-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-6EJpjrz6aoH2/gXLg9iMe0yF2C42hpQyZoHpmcgTLKeci85ktDvJIjwup8tnk8ULQyFiGiIrhXw2v2RSsiFjvQ==",
+        "archive_sha256": "08f2fe7107ea52de0650d4e01318bc69f577ffa4b6b928b4fad3d13a070ff7d6",
+        "archive_bytes": 121831,
+        "loaded_members": 1
+      },
+      {
+        "package": "@material/list",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/list/-/list-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-TQ1ppqiCMQj/P7bGD4edbIIv4goczZUoiUAaPq/feb1dflvrFMzYqJ7tQRRCyBL8nRhJoI2x99tk8Q2RXvlGUQ==",
+        "archive_sha256": "25eff837a57be8ae562ca32e4850476e974cb65055795f576168f8aea0fafa0f",
+        "archive_bytes": 362577,
+        "loaded_members": 4
+      },
+      {
+        "package": "@material/notched-outline",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/notched-outline/-/notched-outline-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-WuurMg44xexkvLTBTnsO0A+qnzFjpcPdvgWBGstBepYozsvSF9zJGdb1x7Zv1MmqbpYh/Ohnuxtb/Y3jOh6irg==",
+        "archive_sha256": "28682564780aa770f5e6fea088c33cefc954ae8a5971b46b5b78e8b884a1ce3b",
+        "archive_bytes": 101115,
+        "loaded_members": 4
+      },
+      {
+        "package": "@material/radio",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/radio/-/radio-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-ehzOK+U1IxQN+OQjgD2lsnf1t7t7RAwQzeO6Czkiuid29ookYbQynWuLWk7NW8H8ohl7lnmfqTP1xSNkkL/F0g==",
+        "archive_sha256": "76b3fcfdbed0f376947d0844d7d8788d65a6458475f900cd1c43f5d9bcec2e9d",
+        "archive_bytes": 227557,
+        "loaded_members": 2
+      },
+      {
+        "package": "@material/ripple",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/ripple/-/ripple-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-JfLW+g3GMVDv4cruQ19+HUxpKVdWCldFlIPw1UYezz2h3WTNDy05S3uP2zUdXzZ01C3dkBFviv4nqZ0GCT16MA==",
+        "archive_sha256": "ab25c5ee2839c0c93e17741cee295dc09d6d519e191644209a6b170c452b401d",
+        "archive_bytes": 144352,
+        "loaded_members": 3
+      },
+      {
+        "package": "@material/rtl",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/rtl/-/rtl-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-SkKLNLFp5QtG7/JEFg9R92qq4MzTcZ5As6sWbH7rRg6ahTHoJEuqE+pOb9Vrtbj84k5gtX+vCYPvCILtSlr2uw==",
+        "archive_sha256": "4e2f9ba560fed164a9c39a77863a0a7a54584ed741296251b1188b6b850c2e1c",
+        "archive_bytes": 5681,
+        "loaded_members": 1
+      },
+      {
+        "package": "@material/shape",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/shape/-/shape-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-Dsvr771ZKC46ODzoixLdGwlLEQLfxfLrtnRojXABoZf5G3o9KtJU+J+5Ld5aa960OAsCzzANuaub4iR88b1guA==",
+        "archive_sha256": "a6ffddc7bc2bc57da53b84a70ba7ce9c072ad499323c57e1d7e0f0379ec95477",
+        "archive_bytes": 7194,
+        "loaded_members": 3
+      },
+      {
+        "package": "@material/slider",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/slider/-/slider-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-3AEu+7PwW4DSNLndue47dh2u7ga4hDJRYmuu7wnJCIWJBnLCkp6C92kNc4Rj5iQY2ftJio5aj1gqryluh5tlYg==",
+        "archive_sha256": "5e403eae5ead96dd20c87723a5c2be608e0ed27c39eda2ccf00a64cf247def5e",
+        "archive_bytes": 255431,
+        "loaded_members": 1
+      },
+      {
+        "package": "@material/snackbar",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/snackbar/-/snackbar-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-TwwQSYxfGK6mc03/rdDamycND6o+1p61WNd7ElZv1F1CLxB4ihRjbCoH7Qo+oVDaP8CTpjeclka+24RLhQq0mA==",
+        "archive_sha256": "e3a2ebc0eaa5bda423360ecf21f4b583bbf46a5288ce59249721cc6e053428d1",
+        "archive_bytes": 158028,
+        "loaded_members": 1
+      },
+      {
+        "package": "@material/switch",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/switch/-/switch-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-OjUjtT0kRz1ASAsOS+dNzwMwvsjmqy5edK57692qmrP6bL4GblFfBDoiNJ6t0AN4OaKcmL5Hy/xNrTdOZW7Qqw==",
+        "archive_sha256": "6690a0c1b2bd7a00e91cba6742e425a3fb2980f54a5662edeb07a8f9a2b235ae",
+        "archive_bytes": 223924,
+        "loaded_members": 2
+      },
+      {
+        "package": "@material/tab",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/tab/-/tab-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-s/L9otAwn/pZwVQZBRQJmPqYeNbjoEbzbjMpDQf/VBG/6dJ+aP03ilIBEkqo8NVnCoChqcdtVCoDNRtbU+yp6w==",
+        "archive_sha256": "b2a94a4b3d60b6e2230e759e80ba7200d05a1cffa14d371a3b15ea9e144480cd",
+        "archive_bytes": 164065,
+        "loaded_members": 1
+      },
+      {
+        "package": "@material/tab-indicator",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/tab-indicator/-/tab-indicator-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-despCJYi1GrDDq7F2hvLQkObHnSLZPPDxnOzU16zJ6FNYvIdszgfzn2HgAZ6pl5hLOexQ8cla6cAqjTDuaJBhQ==",
+        "archive_sha256": "585627aecf54d706f7faae67d66c20651ced53acd9480ce3433fc7a50f393750",
+        "archive_bytes": 94514,
+        "loaded_members": 1
+      },
+      {
+        "package": "@material/textfield",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/textfield/-/textfield-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-R3qRex9kCaZIAK8DuxPnVC42R0OaW7AB7fsFknDKeTeVQvRcbnV8E+iWSdqTiGdsi6QQHifX8idUrXw+O45zPw==",
+        "archive_sha256": "24fca6bffd08f506e4dbc8984b41571c0ee619d3b559eb902925b807df8d6de5",
+        "archive_bytes": 314535,
+        "loaded_members": 11
+      },
+      {
+        "package": "@material/theme",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/theme/-/theme-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-CpUwXGE0dbhxQ45Hu9r9wbJtO/MAlv5ER4tBHA9tp/K+SU+lDgurBE2touFMg5INmdfVNtdumxb0nPPLaNQcUg==",
+        "archive_sha256": "4b9be2bcf9a1e712957c834b0af55513e9190727675af59aa6d6ce21da5ef23f",
+        "archive_bytes": 45935,
+        "loaded_members": 16
+      },
+      {
+        "package": "@material/tokens",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/tokens/-/tokens-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-nbEuGj05txWz6ZMUanpM47SaAD7soyjKILR+XwDell9Zg3bGhsnexCNXPEz2fD+YgomS+jM5XmIcaJJHg/H93Q==",
+        "archive_sha256": "66e3fc2431e8264f75524954f679f1d05da88e8d279e792648caf1d32dc58933",
+        "archive_bytes": 36913,
+        "loaded_members": 1
+      },
+      {
+        "package": "@material/tooltip",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/tooltip/-/tooltip-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-UzuXp0b9NuWuYLYpPguxrjbJnCmT/Cco8CkjI/6JajxaeA3o2XEBbQfRMTq8PTafuBjCHTc0b0mQY7rtxUp1Gg==",
+        "archive_sha256": "9b450e12536e48d352724cbeb8bcc9754340db5bde1ed3985fe44635e17a316d",
+        "archive_bytes": 324463,
+        "loaded_members": 2
+      },
+      {
+        "package": "@material/touch-target",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/touch-target/-/touch-target-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-AqYh9fjt+tv4ZE0C6MeYHblS2H+XwLbDl2mtyrK0DOEnCVQk5/l5ImKDfhrUdFWHvS4a5nBM4AA+sa7KaroLoA==",
+        "archive_sha256": "a4af1d261c7de815afc890960879e2345c3bd7ff5f40e321b0edbbed60c24581",
+        "archive_bytes": 4363,
+        "loaded_members": 3
+      },
+      {
+        "package": "@material/typography",
+        "version": "15.0.0-canary.bc9ae6c9c.0",
+        "resolved": "https://registry.npmjs.org/@material/typography/-/typography-15.0.0-canary.bc9ae6c9c.0.tgz",
+        "integrity": "sha512-CKsG1zyv34AKPNyZC8olER2OdPII64iR2SzQjpqh1UUvmIFiMPk23LvQ1OnC5aCB14pOXzmVgvJt31r9eNdZ6Q==",
+        "archive_sha256": "c479f7e475542ac89f6e336b3d10980b4f65299212190436048ba6d238e772ea",
+        "archive_bytes": 22262,
+        "loaded_members": 5
+      }
+    ],
+    "compiler_loaded_members": 286,
+    "all_loaded_bytes_reauthenticated": true
+  },
+  "original_default_oracle": {
+    "path": "compatibility/rc/oracles/material-16.2.14-sass-api.json",
+    "sha256": "76908825fdbb55fc188f0add372d371f473cd7874cbf575894247231ab854e2d",
+    "unchanged": true
+  },
+  "argument_roster": {
+    "path": "fixtures/sass/mixin-argument-contracts.json",
+    "sha256": "c1d1151a8c1fa02cea0c6fac5618bbefe11dd018bbfff1d30f5c3f35f8fc8770",
+    "cases": 498,
+    "unchanged": true
+  },
+  "default_roster_cases": 651,
+  "source_comparisons": {
+    "mixin-css/form-field-color": {
+      "kind": "default",
+      "name": "form-field-color",
+      "original_css_sha256": "2c41673cfba6a049a7c0b8c5682e2636fc4ad31db40550a5f5ddabfb6ed6332e",
+      "original_css_bytes": 5410,
+      "color_prefix_sha256": "2c41673cfba6a049a7c0b8c5682e2636fc4ad31db40550a5f5ddabfb6ed6332e",
+      "peer_css_sha256": "b800bb9697083f2879969daa4b0f5a269954f3a39fc9872b0a4a1494a6ac526d",
+      "values": {
+        "ink": "rgba(0, 0, 0, 0.87)",
+        "hover": "0.04",
+        "focus": "0.12"
+      },
+      "complete_source_css_comparison": "pass"
+    },
+    "mixin-css/form-field-theme": {
+      "kind": "default",
+      "name": "form-field-theme",
+      "original_css_sha256": "3d64da3316cd279650182a4fe69f74f49a74c9bf8722121a2e1c8b1fca8b7338",
+      "original_css_bytes": 7450,
+      "color_prefix_sha256": "2c41673cfba6a049a7c0b8c5682e2636fc4ad31db40550a5f5ddabfb6ed6332e",
+      "peer_css_sha256": "b800bb9697083f2879969daa4b0f5a269954f3a39fc9872b0a4a1494a6ac526d",
+      "values": {
+        "ink": "rgba(0, 0, 0, 0.87)",
+        "hover": "0.04",
+        "focus": "0.12"
+      },
+      "complete_source_css_comparison": "pass"
+    },
+    "mixin-argument/form-field-color/custom-full-theme": {
+      "kind": "argument",
+      "name": "form-field-color",
+      "original_css_sha256": "ebb8968290eff7725433f1c8ef509f383750ddde4906bb3191c2b7dc7fdfdbe8",
+      "original_css_bytes": 5490,
+      "color_prefix_sha256": "ebb8968290eff7725433f1c8ef509f383750ddde4906bb3191c2b7dc7fdfdbe8",
+      "peer_css_sha256": "fb51bc74d540b39984772da761efcf393a8c620d8c54544333abd7d8c15df2d5",
+      "values": {
+        "ink": "rgba(0, 0, 0, 0.87)",
+        "hover": "0.04",
+        "focus": "0.12"
+      },
+      "complete_source_css_comparison": "pass"
+    },
+    "mixin-argument/form-field-color/raw-color-config": {
+      "kind": "argument",
+      "name": "form-field-color",
+      "original_css_sha256": "ebb8968290eff7725433f1c8ef509f383750ddde4906bb3191c2b7dc7fdfdbe8",
+      "original_css_bytes": 5490,
+      "color_prefix_sha256": "ebb8968290eff7725433f1c8ef509f383750ddde4906bb3191c2b7dc7fdfdbe8",
+      "peer_css_sha256": "fb51bc74d540b39984772da761efcf393a8c620d8c54544333abd7d8c15df2d5",
+      "values": {
+        "ink": "rgba(0, 0, 0, 0.87)",
+        "hover": "0.04",
+        "focus": "0.12"
+      },
+      "complete_source_css_comparison": "pass"
+    },
+    "mixin-argument/form-field-theme/custom-full-theme": {
+      "kind": "argument",
+      "name": "form-field-theme",
+      "original_css_sha256": "ce36956565fea83a1998c18e68122900cd52fc30c365be3e88929f4791830fc7",
+      "original_css_bytes": 7662,
+      "color_prefix_sha256": "ebb8968290eff7725433f1c8ef509f383750ddde4906bb3191c2b7dc7fdfdbe8",
+      "peer_css_sha256": "fb51bc74d540b39984772da761efcf393a8c620d8c54544333abd7d8c15df2d5",
+      "values": {
+        "ink": "rgba(0, 0, 0, 0.87)",
+        "hover": "0.04",
+        "focus": "0.12"
+      },
+      "complete_source_css_comparison": "pass"
+    },
+    "mixin-argument/form-field-theme/custom-dark-theme": {
+      "kind": "argument",
+      "name": "form-field-theme",
+      "original_css_sha256": "60b29871e014119bdda5a35b2703ebc633f362f29f229518bf414239f8c04fb6",
+      "original_css_bytes": 8131,
+      "color_prefix_sha256": "a9b0266ebe9a9d1b173154d21b8ac74efeb49049361950f8f93bd3c4d6dbda9f",
+      "peer_css_sha256": "0d026fad3131b34aa579e979d00cc396cd8fbb7c19a623d16e0d272b3fe97b68",
+      "values": {
+        "ink": "rgba(255, 255, 255, 0.87)",
+        "hover": "0.08",
+        "focus": "0.24"
+      },
+      "complete_source_css_comparison": "pass"
+    }
+  },
+  "minimum_peer_sass_sources": {
+    "main": "22.1.7",
+    "21.x": "21.2.14",
+    "authentication": "Complete Material/CDK archive SRI and member bytes checked in form-field-state-token-bridge-source-proof.json. New peer measurements include exact branch manifest/program/CSS and compiler-loaded source capsules."
+  },
+  "tests": {
+    "new_form_field_contract": {
+      "tests": 4,
+      "passed": 4,
+      "skipped": 0
+    },
+    "shared_sass_regressions": {
+      "tests": 14,
+      "passed": 14,
+      "skipped": 0
+    },
+    "coordinator_regressions": {
+      "tests": 11,
+      "passed": 11,
+      "skipped": 0
+    },
+    "syntax_whitespace": "pass",
+    "scope": "Source/measurement/model and synthetic report admission tests, not product gate qualification."
+  },
+  "producer_and_admission": "Both canonical Sass producers stamp the finite contract. JavaScript inventory comparison and Python coordinator intake require complete exact output, authentic floor peer measurements and run/invocation/library bindings. Generic configurable roster fixtures now use the source-captured finite records for these four cases; no synthetic equal CSS can pass them.",
+  "aggregate_impact": {
+    "affected_default_cases": [
+      "mixin-css/all-component-colors",
+      "mixin-css/all-component-themes"
+    ],
+    "affected_argument_cases": [
+      "mixin-argument/all-component-colors/custom-full-theme",
+      "mixin-argument/all-component-colors/raw-color-config",
+      "mixin-argument/all-component-themes/custom-full-theme",
+      "mixin-argument/all-component-themes/custom-dark-theme"
+    ],
+    "evidence": "Both modern default aggregate immutable CSS bodies contain exactly one whole tagged form-field color prefix; legacy aggregate bodies contain none. Ordered06 fixture calls only all-legacy-component-themes and expansion-theme, so this repair does not change that fixture.",
+    "finite_aggregate_model_update": "pending; no aggregate exception added"
+  },
+  "limitations": [
+    "Six source-only comparisons per line used actual branch library Sass and exact minimum-peer Sass sources under hostNode22/Sass1.104.1. They are not Angular21 runtime or packed/native/consumer-floor qualification.",
+    "The two modern default and four modern configurable aggregate outputs still need their exact state-token insertion integrated and measured.",
+    "Full651/default,498/configurable,ordered/aggregate, browser,artifact and independent audit remain incomplete.",
+    "Upstream hover SHA still needs native cascade review; no G11/security clearance."
+  ],
+  "implementation_files": [
+    {
+      "path": "fixtures/sass/form-field-state-contracts.json",
+      "sha256": "fbcbc66f0ad162037488a405319b4ab3c02a40e3201a28dfb591b70f22494009",
+      "bytes": 234538
+    },
+    {
+      "path": "tests/form_field_state_contract_fixture.json",
+      "sha256": "fca91b153d94f1961e071215f593fe5248831445190fff265ae4a4df94ef8219",
+      "bytes": 287682
+    },
+    {
+      "path": "scripts/sass-form-field-state-contract.mjs",
+      "sha256": "dc7025131d558f87de259a8d28b863e66aabae0ab12a28e075df5a9e8a9138f0",
+      "bytes": 8260
+    },
+    {
+      "path": "scripts/sass_form_field_state_admission.py",
+      "sha256": "eea08f3ad8f78dd74b4c41d68bb9783a2f97664ae8ff11481cceff82eaa8baa4",
+      "bytes": 9254
+    },
+    {
+      "path": "tests/sass_form_field_state_fixture.py",
+      "sha256": "500bf3a6fe5aef56f1f5dacd8ac3f62572f9b0923afe7f5bc6ce70651fc01a5c",
+      "bytes": 3216
+    },
+    {
+      "path": "tests/test_sass_form_field_state_contract.py",
+      "sha256": "e41919211eaafbe2d95cfad949c7f564718d33412248befe60af5d756c5073e6",
+      "bytes": 9931
+    },
+    {
+      "path": "scripts/sass-api-inventory.mjs",
+      "sha256": "406c59c6e6c264f5b50be4e565ca853168b2bacc3cd502a85814be4b195dee10",
+      "bytes": 26295
+    },
+    {
+      "path": "scripts/sass-seal.mjs",
+      "sha256": "ce0d996ca46e75d769402c3240f7d2665ecfe2addd425e52af0d18aeabe7d783",
+      "bytes": 41636
+    },
+    {
+      "path": "scripts/sass-mixin-arguments.mjs",
+      "sha256": "2fdf5e3df70b677827d10d7ac6e0aa4630c24d5746d949305b78e14cad317bf6",
+      "bytes": 12769
+    },
+    {
+      "path": "scripts/sass_mixin_argument_admission.py",
+      "sha256": "8f99a9eb66710981c6e4d5a6c3416428a825eca614585e03bf5fb41a00fd6fa5",
+      "bytes": 7369
+    },
+    {
+      "path": "scripts/rc-verify.py",
+      "sha256": "15f8fd36e6ac63cd2e2cd58ff8f116938f9a779bb74477c1549f50ed9e555c6e",
+      "bytes": 86894
+    },
+    {
+      "path": "tests/sass_mixin_fixture.py",
+      "sha256": "bf0fa3a54ab9e8e2d15548d1145fe7e7dbaf04e87b82bf53f73b83bef31102bc",
+      "bytes": 17057
+    },
+    {
+      "path": "tests/test_sass_mixin_arguments.py",
+      "sha256": "bd1c034046bad5a46458344d186438e056d79cc5ff03ddc0a7fdbefc891e9eaf",
+      "bytes": 6887
+    }
+  ],
+  "goldens_changed": false,
+  "existing_exceptions_broadened": false,
+  "legacy_component_html_css_scss_changed": false,
+  "full_sass_gate": "not-passed",
+  "g11_claim": "not-passed",
+  "push_actions_publish": "not performed",
+  "unknown_case_guard": "Unknown and JavaScript prototype property names cannot select a finite form-field profile."
+}
