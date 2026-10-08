@@ -47,6 +47,20 @@ for(const change of [
  s=>s+'\nOwned.ɵfac=()=>({});',
  s=>s+'\nObject.setPrototypeOf(Child,Missing);',
 ]){const mutant=change(inherited);assert.notEqual(mutant,inherited);assert.throws(()=>compilerConstructorContract(mutant,'Child',{resolveInherited:true}));}
+const bundled=String.raw`import * as i0 from '@angular/core';
+var PublicOwned=class _Owned {static \u0275fac=i0.\u0275\u0275ngDeclareFactory({type:_Owned,deps:[{token:'role',attribute:true},{token:i0.ElementRef}],target:i0.\u0275\u0275FactoryTarget.Directive});};
+i0.\u0275\u0275ngDeclareClassMetadata({type:PublicOwned,ctorParameters:()=>[{type:undefined,decorators:[{type:i0.Attribute,args:['role']}]},{type:i0.ElementRef}]});
+var PublicChild=class _Child extends PublicOwned {static \u0275fac=i0.\u0275\u0275ngDeclareFactory({type:_Child,deps:null,target:i0.\u0275\u0275FactoryTarget.Directive});};
+i0.\u0275\u0275ngDeclareClassMetadata({type:PublicChild});`;
+const bundledResult=compilerConstructorContract(bundled,'_Child',{resolveInherited:true});
+assert.deepEqual(bundledResult.inheritance,['_Child','_Owned']);assert.equal(bundledResult.parameters[1].token_expression,'@angular/core#ElementRef');
+for(const change of [
+ s=>s+'\nPublicOwned.ɵfac=()=>({});',
+ s=>s.replace('type:PublicOwned,ctorParameters','type:Foreign,ctorParameters'),
+ s=>s.replace('type:_Owned,deps','type:Foreign,deps'),
+ s=>s+'\nvar shadow=class i0 {};',
+ s=>s+'\nclass _Child {}',
+]){const mutant=change(bundled);assert.notEqual(mutant,bundled);assert.throws(()=>compilerConstructorContract(mutant,'_Child',{resolveInherited:true}));}
 """
         result=subprocess.run(['node','--input-type=module','-e',code],cwd=ROOT,capture_output=True,text=True)
         self.assertEqual(result.returncode,0,(result.stdout+result.stderr)[-6000:])
