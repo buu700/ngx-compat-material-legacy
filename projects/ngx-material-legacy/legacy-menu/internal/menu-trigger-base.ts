@@ -28,7 +28,6 @@ import {
 } from '@angular/cdk/overlay';
 import {TemplatePortal} from '@angular/cdk/portal';
 import {
-  MAT_MENU_PANEL,
   MAT_MENU_SCROLL_STRATEGY,
   MatMenuItem,
   MenuCloseReason,
@@ -58,6 +57,7 @@ import {delay, filter, takeUntil} from 'rxjs/operators';
 import {_MatMenuBase} from './menu-base';
 import {_MatMenuContentBase} from './menu-content-base';
 import type {MatMenuPanel} from './menu-panel';
+import {MAT_MENU_PANEL} from './menu-panel-token';
 import {throwMatMenuRecursiveError} from './menu-errors';
 
 /** @docs-private */

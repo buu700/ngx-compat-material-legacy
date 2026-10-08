@@ -18,10 +18,10 @@ import {
 } from '@angular/core';
 import {
   MAT_MENU_DEFAULT_OPTIONS,
-  MAT_MENU_PANEL,
   MatMenuDefaultOptions,
 } from '@angular/material/menu';
 import {_MatMenuBase} from './internal/menu-base';
+import {MAT_MENU_PANEL} from './internal/menu-panel-token';
 
 /**
  * @docs-public MatMenu

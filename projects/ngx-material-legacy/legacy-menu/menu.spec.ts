@@ -47,8 +47,15 @@ import {
   MenuPositionX,
   MenuPositionY,
   MAT_MENU_SCROLL_STRATEGY,
+  MatMenuItem,
 } from '@angular/material/menu';
-import {MatLegacyMenu, MatLegacyMenuItem, MatLegacyMenuModule, MatLegacyMenuTrigger} from './index';
+import {
+  MAT_LEGACY_MENU_PANEL,
+  MatLegacyMenu,
+  MatLegacyMenuItem,
+  MatLegacyMenuModule,
+  MatLegacyMenuTrigger,
+} from './index';
 import type {MatLegacyMenuPanel as MatMenuPanel} from './index';
 
 const MENU_PANEL_TOP_PADDING = 8;
@@ -76,6 +83,39 @@ describe('MatMenu', () => {
     window.scroll(0, 0);
     return fixture;
   }
+
+  it('should preserve the public item provider while using the owned legacy panel', fakeAsync(() => {
+    const fixture = createComponent(SimpleMenu, [], [FakeIcon]);
+    fixture.detectChanges();
+    fixture.componentInstance.trigger.openMenu();
+    fixture.detectChanges();
+    tick(500);
+
+    const item = fixture.debugElement.query(By.directive(MatLegacyMenuItem))!;
+    const legacyItem = item.injector.get(MatLegacyMenuItem);
+    expect(legacyItem instanceof MatMenuItem).toBe(true);
+    expect(item.injector.get(MatMenuItem)).toBe(legacyItem);
+    expect(item.injector.get(MAT_LEGACY_MENU_PANEL)).toBe(fixture.componentInstance.menu);
+    expect(legacyItem._parentMenu).toBe(fixture.componentInstance.menu);
+  }));
+
+  it('should inherit boolean input transforms for bare legacy item attributes', fakeAsync(() => {
+    const fixture = createComponent(SimpleMenu, [], [FakeIcon]);
+    fixture.detectChanges();
+    fixture.componentInstance.trigger.openMenu();
+    fixture.detectChanges();
+    tick(500);
+
+    const items = fixture.debugElement.queryAll(By.directive(MatLegacyMenuItem));
+    expect(items[0].injector.get(MatLegacyMenuItem).disabled).toBe(false);
+    expect(items[0].injector.get(MatLegacyMenuItem).disableRipple).toBe(false);
+    expect(items[1].injector.get(MatLegacyMenuItem).disabled).toBe(true);
+    expect(items[2].injector.get(MatLegacyMenuItem).disableRipple).toBe(true);
+  }));
+
+  it('should require an Angular injection context for direct item construction', () => {
+    expect(() => new MatLegacyMenuItem()).toThrowError(/NG0203|injection context/);
+  });
 
   it('should aria-controls the menu panel', fakeAsync(() => {
     const fixture = createComponent(SimpleMenu, [], [FakeIcon]);
