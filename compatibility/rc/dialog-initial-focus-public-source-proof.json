@@ -1,0 +1,784 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "recorded_at_utc": "2026-10-08T02:56:57.409266+00:00",
+  "role": "Finite owned legacy initial-focus/private-field repair; source evidence, not complete dialog qualification",
+  "implementation": "Replace the cast into current CDK private focus/destroy/selector fields with an owned initial-focus helper using the public FocusTrapFactory.create(element,true), FocusTrap.focusInitialElement/destroy, InteractivityChecker and Renderer2. The enclosing container retains the real tab trap; temporary selector traps create no anchors. Preserve microtask focus, original global open-shadow active-element resolution, defaults/heading/custom selectors, FocusOptions and notification order. Own the destroyed guard and notification subject; its assigned public stream retains the inherited Observable-only type. Remove temporary forced-tabindex listeners on blur/mousedown, recapture and destroy, including finally cleanup when the parent destroy path throws.",
+  "reference": {
+    "schema_version": 1,
+    "tag": "16.2.14",
+    "commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+    "cdk_archive_sha256": "a499ba0fee46784441b92587e43b17ec72d9bd383f78ea14954eaa62c781bad7",
+    "cdk_integrity": "sha512-n6PrGdiVeSTEmM/HEiwIyg6YQUUymZrb5afaNLGFRM5YL0Y8OBqd+XhCjb0OfD/AfgCUtedVEPwNqrfW8KzgGw==",
+    "archive_sri_rehashed": true,
+    "members": [
+      {
+        "path": "reference/material-16.2.14/dialog-focus-sources/material-dialog-container.ts",
+        "tag_path": "src/material/dialog/dialog-container.ts",
+        "sha256": "91ecfd4630a3aac273b04c9090887364a358be2c44f0588551e36545fe004dc1",
+        "bytes": 12242
+      },
+      {
+        "path": "reference/material-16.2.14/dialog-focus-sources/cdk-dialog-container.ts",
+        "tag_path": "src/cdk/dialog/dialog-container.ts",
+        "sha256": "571d6c3017e773229880a6da96b6e5c322c462b20e2c9784c85a291a96d12545",
+        "bytes": 11999
+      },
+      {
+        "path": "reference/material-16.2.14/dialog-focus-sources/focus-trap.ts",
+        "tag_path": "src/cdk/a11y/focus-trap/focus-trap.ts",
+        "sha256": "8ad7f0fb6b7814ac981a51b48dd6ad39c8035b9f638d58041ea409a6fe76c8f5",
+        "bytes": 15443
+      },
+      {
+        "path": "reference/material-16.2.14/dialog-focus-sources/shadow-dom.ts",
+        "tag_path": "src/cdk/platform/features/shadow-dom.ts",
+        "sha256": "921df8a9671e5c66043bf45a86fb7544c1d3ca000f0eb5cb0263f70479a43f2c",
+        "bytes": 2163
+      },
+      {
+        "path": "reference/material-16.2.14/dialog-focus-sources/cdk-dialog.d.ts",
+        "archive_member": "package/dialog/index.d.ts",
+        "sha256": "bfbf53c3fd8e9535005853fb23249b9d2bb6f79df89c30eef9bf873a3a9c0950",
+        "bytes": 20110
+      }
+    ],
+    "role": "Complete untouched reference members;not candidate-generated expectations or shipped CDK fork"
+  },
+  "minimum_public_cdk_subjects": [
+    {
+      "line": "main",
+      "package": "@angular/cdk",
+      "version": "22.1.7",
+      "archive_sha256": "225d82389797aefbbb2684461576ef950465546a9d28326483e0b816c8a5a558",
+      "integrity": "sha512-TN4pPExBZ6ZbxWnfVb77M/0cL83eRY3qpHv/R9Y1KhkNXlxdocd0My7wiueWBBimYacSpBnfHrIRNmHgX7Pc4Q==",
+      "sri_rehashed": true,
+      "members": [
+        {
+          "path": "compatibility/rc/dialog-focus-peer-sources/cdk-22.1.7-a11y.d.ts",
+          "member": "package/types/a11y.d.ts",
+          "sha256": "d3c1b9be3d42573c4ef2bea969a3749c41bd26f86f89d8a921cdc5ce3ae73be6",
+          "bytes": 22225
+        },
+        {
+          "path": "compatibility/rc/dialog-focus-peer-sources/cdk-22.1.7-_a11y-module-chunk.d.ts",
+          "member": "package/types/_a11y-module-chunk.d.ts",
+          "sha256": "a0727db98298971c25c5de5796bce82cb139fb339343fdf23df6b14aecbdcd0b",
+          "bytes": 13740
+        },
+        {
+          "path": "compatibility/rc/dialog-focus-peer-sources/cdk-22.1.7-_platform-chunk.d.ts",
+          "member": "package/types/_platform-chunk.d.ts",
+          "sha256": "243c0912f4380940ca17b8f62779a431d9c59dd428682e3630c12d6d88e209b5",
+          "bytes": 1083
+        },
+        {
+          "path": "compatibility/rc/dialog-focus-peer-sources/cdk-22.1.7-_a11y-module-chunk.mjs",
+          "member": "package/fesm2022/_a11y-module-chunk.mjs",
+          "sha256": "fdac8c799d3adab5f92370a80c37eaa1f11dad9861142b6564aa32b67f2481a4",
+          "bytes": 26367
+        }
+      ],
+      "public_declarations": {
+        "FocusTrapFactory": {
+          "module": "@angular/cdk/a11y",
+          "declaration": "types/_a11y-module-chunk.d.ts",
+          "public_export": true,
+          "private_or_deprecated_markers": []
+        },
+        "FocusTrap": {
+          "module": "@angular/cdk/a11y",
+          "declaration": "types/_a11y-module-chunk.d.ts",
+          "public_export": true,
+          "private_or_deprecated_markers": []
+        },
+        "InteractivityChecker": {
+          "module": "@angular/cdk/a11y",
+          "declaration": "types/_a11y-module-chunk.d.ts",
+          "public_export": true,
+          "private_or_deprecated_markers": []
+        },
+        "Platform": {
+          "module": "@angular/cdk/platform",
+          "declaration": "types/_platform-chunk.d.ts",
+          "public_export": true,
+          "private_or_deprecated_markers": []
+        }
+      }
+    },
+    {
+      "line": "21.x",
+      "package": "@angular/cdk",
+      "version": "21.2.14",
+      "archive_sha256": "b54868a0f7aefa471203a0fe419370e156cdf0218db9b625aca3ae6e8de25c63",
+      "integrity": "sha512-806REq/CLf37nEhmmd8Q+ILN8z/RVG2vk2n8YZ/4TdHpcBCi5ux4AxLbpMmduLwGPOzPagJ6ggRzE5fnX0rmcQ==",
+      "sri_rehashed": true,
+      "members": [
+        {
+          "path": "compatibility/rc/dialog-focus-peer-sources/cdk-21.2.14-a11y.d.ts",
+          "member": "package/types/a11y.d.ts",
+          "sha256": "c7cb507235c6a481ec46b581092a0855986e1c817b798221e7da56eb2e25ce16",
+          "bytes": 23372
+        },
+        {
+          "path": "compatibility/rc/dialog-focus-peer-sources/cdk-21.2.14-_a11y-module-chunk.d.ts",
+          "member": "package/types/_a11y-module-chunk.d.ts",
+          "sha256": "f3d9fbabc0d75cb1bb95e2424f1b2724fb7fcf63655b10f742d2e752ebf4b21c",
+          "bytes": 14029
+        },
+        {
+          "path": "compatibility/rc/dialog-focus-peer-sources/cdk-21.2.14-_platform-chunk.d.ts",
+          "member": "package/types/_platform-chunk.d.ts",
+          "sha256": "91d9de4d3888ec1767f406307b333103aeb33469f81a8f8743ece26549f8f856",
+          "bytes": 1171
+        },
+        {
+          "path": "compatibility/rc/dialog-focus-peer-sources/cdk-21.2.14-_a11y-module-chunk.mjs",
+          "member": "package/fesm2022/_a11y-module-chunk.mjs",
+          "sha256": "5cba710056d2fd8198a5cdefb19579d2c0dd7daab363867913b65d34913b2a29",
+          "bytes": 26578
+        }
+      ],
+      "public_declarations": {
+        "FocusTrapFactory": {
+          "module": "@angular/cdk/a11y",
+          "declaration": "types/_a11y-module-chunk.d.ts",
+          "public_export": true,
+          "private_or_deprecated_markers": []
+        },
+        "FocusTrap": {
+          "module": "@angular/cdk/a11y",
+          "declaration": "types/_a11y-module-chunk.d.ts",
+          "public_export": true,
+          "private_or_deprecated_markers": []
+        },
+        "InteractivityChecker": {
+          "module": "@angular/cdk/a11y",
+          "declaration": "types/_a11y-module-chunk.d.ts",
+          "public_export": true,
+          "private_or_deprecated_markers": []
+        },
+        "Platform": {
+          "module": "@angular/cdk/platform",
+          "declaration": "types/_platform-chunk.d.ts",
+          "public_export": true,
+          "private_or_deprecated_markers": []
+        }
+      }
+    }
+  ],
+  "minimum_public_core_annotations": [
+    {
+      "line": "main",
+      "version": "22.1.7",
+      "symbols": {
+        "inject": {
+          "declaration": "types/core.d.ts",
+          "public_export": true,
+          "private_or_deprecated_markers": []
+        },
+        "Renderer2": {
+          "declaration": "types/_debug_node-chunk.d.ts",
+          "public_export": true,
+          "private_or_deprecated_markers": []
+        },
+        "NgZone": {
+          "declaration": "types/_debug_node-chunk.d.ts",
+          "public_export": true,
+          "private_or_deprecated_markers": []
+        },
+        "Component": {
+          "declaration": "types/_debug_node-chunk.d.ts",
+          "public_export": true,
+          "private_or_deprecated_markers": []
+        },
+        "EventEmitter": {
+          "declaration": "types/_debug_node-chunk.d.ts",
+          "public_export": true,
+          "private_or_deprecated_markers": []
+        }
+      }
+    },
+    {
+      "line": "21.x",
+      "version": "21.2.23",
+      "symbols": {
+        "inject": {
+          "declaration": "types/core.d.ts",
+          "public_export": true,
+          "private_or_deprecated_markers": []
+        },
+        "Renderer2": {
+          "declaration": "types/_discovery-chunk.d.ts",
+          "public_export": true,
+          "private_or_deprecated_markers": []
+        },
+        "NgZone": {
+          "declaration": "types/_discovery-chunk.d.ts",
+          "public_export": true,
+          "private_or_deprecated_markers": []
+        },
+        "Component": {
+          "declaration": "types/_discovery-chunk.d.ts",
+          "public_export": true,
+          "private_or_deprecated_markers": []
+        },
+        "EventEmitter": {
+          "declaration": "types/_discovery-chunk.d.ts",
+          "public_export": true,
+          "private_or_deprecated_markers": []
+        }
+      }
+    }
+  ],
+  "runtime_diagnostic": {
+    "schema_version": 1,
+    "role": "Owned focus/source lifecycle diagnostic; not native/AOT/packed/minimum qualification",
+    "node": "v22.23.3",
+    "compiler": "6.0.3",
+    "runtime_peer": {
+      "framework": "22.1.7",
+      "cdk_package": "22.1.7"
+    },
+    "sources": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+        "sha256": "e8d2718ba607616c6086e4818d87827124a13d15056aa0c8f05978645acb7f97",
+        "bytes": 3717
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-initial-focus.ts",
+        "sha256": "9cbc3bd334bf51fe1156749f461100c0614a590e69faee3390558152663ac814",
+        "bytes": 2972
+      }
+    ],
+    "cases": [
+      {
+        "id": "microtask-focus-and-notification-order",
+        "result": "pass"
+      },
+      {
+        "id": "explicit-initial-marker-prioritized",
+        "result": "pass"
+      },
+      {
+        "id": "empty-tabbable-content-falls-back-to-container",
+        "result": "pass"
+      },
+      {
+        "id": "dialog-mode-preserves-already-contained-focus",
+        "result": "pass"
+      },
+      {
+        "id": "false-mode-captures-container-from-outside",
+        "result": "pass"
+      },
+      {
+        "id": "open-shadow-active-element-is-contained",
+        "result": "pass"
+      },
+      {
+        "id": "empty-shadow-root-preserves-original-active-element-resolution",
+        "result": "pass"
+      },
+      {
+        "id": "self-referencing-shadow-active-element-stops",
+        "result": "pass"
+      },
+      {
+        "id": "heading-temporary-tabindex-restored-on-blur",
+        "result": "pass"
+      },
+      {
+        "id": "selector-temporary-tabindex-restored-on-mousedown",
+        "result": "pass"
+      },
+      {
+        "id": "focusable-selector-keeps-existing-tabindex",
+        "result": "pass"
+      },
+      {
+        "id": "destroy-cleans-selector-listeners-and-temporary-tabindex",
+        "result": "pass"
+      },
+      {
+        "id": "recapture-cleans-previous-selector-listeners",
+        "result": "pass"
+      },
+      {
+        "id": "parent-destroy-failure-still-cleans-owned-selector-state",
+        "result": "pass"
+      },
+      {
+        "id": "missing-selector-does-not-invent-focus",
+        "result": "pass"
+      },
+      {
+        "id": "destroy-before-microtask-cancels-focus-and-completes",
+        "result": "pass"
+      },
+      {
+        "id": "focus-request-after-destroy-is-inert",
+        "result": "pass"
+      },
+      {
+        "id": "ssr-does-not-access-dom-or-create-selection",
+        "result": "pass"
+      },
+      {
+        "id": "delayed-focus-waits-for-owned-open-completion",
+        "result": "pass"
+      }
+    ],
+    "mutations": [
+      {
+        "id": "destroy-guard-removed",
+        "rejected_by": "destroy-before-microtask-cancels-focus-and-completes"
+      },
+      {
+        "id": "anchors-enabled",
+        "rejected_by": "microtask-focus-and-notification-order"
+      },
+      {
+        "id": "selection-destroy-removed",
+        "rejected_by": "microtask-focus-and-notification-order"
+      },
+      {
+        "id": "forced-tabindex-cleanup-removed",
+        "rejected_by": "heading-temporary-tabindex-restored-on-blur"
+      }
+    ],
+    "limits": [
+      "Actual owned two-module code and current public FocusTrap execute under synthetic DOM and borrowed service fixtures.",
+      "Public FocusTrapFactory.create protocol is supplied by a fixture that constructs the real public FocusTrap; actual factory/root service setup is not executed.",
+      "Actual21 minimum peer, native focus/keyboard/rendered CSS, strict AOT, canonical toolchain and packed/runtime-floor qualification are not executed.",
+      "Remaining private CdkDialogContainer inheritance and other dialog contracts are not cleared."
+    ]
+  },
+  "strict_source_type_diagnostic": {
+    "compiler": "6.0.3",
+    "node": "v22.23.3",
+    "diagnostics": 0,
+    "options": {
+      "strict": true,
+      "noImplicitOverride": true,
+      "skipLibCheck": true
+    },
+    "owned_modules": 2,
+    "peer_subject": "read-only installed22.1.7;not21 minimum,AOT,packed or canonical qualification",
+    "before": {
+      "kind": "class",
+      "typeParams": "type-params",
+      "signatures": [
+        "protected method _captureInitialFocus():void",
+        "protected method _openAnimationDone(number):*",
+        "protected method _trapFocus(FocusOptions?):void",
+        "public constructor()",
+        "public method _startExitAnimation():void",
+        "public prop _animationStateChanged:*"
+      ],
+      "requiredProtected": [
+        "protected method _captureInitialFocus():void",
+        "protected method _openAnimationDone(number):*",
+        "protected method _trapFocus(FocusOptions?):void"
+      ],
+      "requiredConstructor": true,
+      "comparison": "signature",
+      "ownSignatures": [
+        "public prop _animationStateChanged:*",
+        "public constructor()",
+        "public method _startExitAnimation():void",
+        "protected method _trapFocus(FocusOptions?):void",
+        "protected method _captureInitialFocus():void",
+        "protected method _openAnimationDone(number):*"
+      ],
+      "ownProtected": [
+        "protected method _trapFocus(FocusOptions?):void",
+        "protected method _captureInitialFocus():void",
+        "protected method _openAnimationDone(number):*"
+      ],
+      "ownConstructor": true,
+      "heritage": [
+        "CdkDialogContainer"
+      ],
+      "inheritedConstructor": null
+    },
+    "after": {
+      "kind": "class",
+      "typeParams": "type-params",
+      "signatures": [
+        "protected method _captureInitialFocus():void",
+        "protected method _openAnimationDone(number):*",
+        "protected method _trapFocus(FocusOptions?):void",
+        "public constructor()",
+        "public method _startExitAnimation():void",
+        "public method ngOnDestroy():void",
+        "public prop _animationStateChanged:*"
+      ],
+      "requiredProtected": [
+        "protected method _captureInitialFocus():void",
+        "protected method _openAnimationDone(number):*",
+        "protected method _trapFocus(FocusOptions?):void"
+      ],
+      "requiredConstructor": true,
+      "comparison": "signature",
+      "ownSignatures": [
+        "public prop _animationStateChanged:*",
+        "public constructor()",
+        "public method _startExitAnimation():void",
+        "protected method _trapFocus(FocusOptions?):void",
+        "public method ngOnDestroy():void",
+        "protected method _captureInitialFocus():void",
+        "protected method _openAnimationDone(number):*"
+      ],
+      "ownProtected": [
+        "protected method _trapFocus(FocusOptions?):void",
+        "protected method _captureInitialFocus():void",
+        "protected method _openAnimationDone(number):*"
+      ],
+      "ownConstructor": true,
+      "heritage": [
+        "CdkDialogContainer"
+      ],
+      "inheritedConstructor": null
+    }
+  },
+  "scope_limits": [
+    "Actual owned two-module code and current public FocusTrap execute under synthetic DOM and borrowed service fixtures.",
+    "Public FocusTrapFactory.create protocol is supplied by a fixture that constructs the real public FocusTrap; actual factory/root service setup is not executed.",
+    "Actual21 minimum peer, native focus/keyboard/rendered CSS, strict AOT, canonical toolchain and packed/runtime-floor qualification are not executed.",
+    "Remaining private CdkDialogContainer inheritance and other dialog contracts are not cleared.",
+    "Strict source compilation used read-only22.1.7 declarations with skipLibCheck:true; identical owned source bytes on21 do not establish its actual minimum compiler/runtime qualification.",
+    "No public class/provider identity, focus restoration, full motion, constructor or G02/G03/G10/G11 pass is inferred."
+  ],
+  "inherited_api_repair": {
+    "scope": "Only the actual original _MatDialogContainerBase inherited CdkDialogContainer.ngOnDestroy():void contract. Original whole Material class and CDK declaration identities are pinned; actual deriveSurface attaches the method contract. An exact candidate override is an existing member, not an API exception.",
+    "reference": "reference/material-16.2.14/dialog-focus-sources/cdk-dialog.d.ts",
+    "reference_sha256": "bfbf53c3fd8e9535005853fb23249b9d2bb6f79df89c30eef9bf873a3a9c0950",
+    "material_reference_sha256": "91ecfd4630a3aac273b04c9090887364a358be2c44f0588551e36545fe004dc1",
+    "actual_unit_pass_each_line": true,
+    "rejected_shapes_and_identity_changes": 9,
+    "scope_limit": "Does not establish other inherited members, original manual constructor arguments, existing exception authority or whole API completeness.",
+    "signature_differences_unchanged": true,
+    "signature_differences_sha256": "e06fb7d14056aa44dad9f5c838c838f4f44f43d20bd855fb93d2f8b7fbc8b7f9"
+  },
+  "targeted_style_review": {
+    "untouched_sources": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-dialog/dialog.scss",
+        "sha256": "6b8e777777f4b78e0a0aa68b11007f644359fa97e2bf505f5aa0c4cb25d082f9",
+        "unchanged_from_pre_repair_commit": true
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-dialog/dialog-container.html",
+        "sha256": "89aeb28616459a7393902fcbeca143e3ca101baeaafa59054aebc512a5022256",
+        "unchanged_from_pre_repair_commit": true
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-dialog/dialog-animation-params.ts",
+        "sha256": "8c0160584629786ab3f7babb1060d526952238c58455989c7b6ced6ef59a619f",
+        "unchanged_from_pre_repair_commit": true
+      }
+    ],
+    "selectors": "Heading selector and temporary tabindex=-1 behavior follow untouched16 source. No stylesheet, container template, native motion recipe, duration/state, provider, selector or CSS golden changed. Deferred public selector trap allocates no anchors; destruction cleans only its own selection/listeners.",
+    "source_assertions": "Real public FocusTrap under the synthetic DOM, no anchor creation; wrong defer flag and missing destroy/attribute cleanup mutants rejected.",
+    "native_rendered_status": "Not executed; four explicit native regressions below remain required."
+  },
+  "native_regressions": {
+    "spec": "projects/ngx-material-legacy/legacy-dialog/dialog.spec.ts",
+    "added": 4,
+    "executed": false,
+    "names": [
+      "should retain exactly the container trap anchors after initial focus selection",
+      "should use the public initial-focus marker without creating trap anchors",
+      "should cancel queued initial focus when the container is destroyed",
+      "should remove a temporary heading tabindex when the container is destroyed"
+    ]
+  },
+  "current_source_caps": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-dialog/dialog.spec.ts",
+      "sha256": "10d77137a52cb3c140fc6039135c939b80c19311015d958f3afbdf7feaf7af8c",
+      "bytes": 77443
+    },
+    {
+      "path": "scripts/api-surface.mjs",
+      "sha256": "e6c86f39739c58bc5863b8fe1bb59c642880de42e78cde4faede698f3f759fc0",
+      "bytes": 63352
+    },
+    {
+      "path": "tests/dialog_initial_focus_runtime_probe.mjs",
+      "sha256": "a8e804104414b084eb1fa470786e97caa26dc2b31abdf5a26e09b3c2274cfb93",
+      "bytes": 17046
+    },
+    {
+      "path": "tests/test_dialog_initial_focus_runtime.py",
+      "sha256": "32f756563b14269ad54d2f9eb268ecbb7b18dcb93d2b4f4c487aee8affd7c2ec",
+      "bytes": 871
+    },
+    {
+      "path": "tests/test_dialog_inherited_destroy_contract.py",
+      "sha256": "febd500fa8a416b2fea1db96855e554bdd0b4d53633e151afb56e29d65745aca",
+      "bytes": 4139
+    }
+  ],
+  "focused_tests_each_line": {
+    "passed": 11,
+    "skipped": 0
+  },
+  "source_policy_observation": {
+    "cases": [
+      {
+        "case_id": "source-policy/authored-boundary/no-animations-module",
+        "group": "authored-boundary",
+        "result": "pass",
+        "detail": "observed"
+      },
+      {
+        "case_id": "source-policy/authored-boundary/no-private-namespace-member",
+        "group": "authored-boundary",
+        "result": "pass",
+        "detail": "observed"
+      },
+      {
+        "case_id": "source-policy/authored-boundary/no-deep-internal",
+        "group": "authored-boundary",
+        "result": "pass",
+        "detail": "observed"
+      },
+      {
+        "case_id": "source-policy/authored-boundary/no-docs-private-symbol",
+        "group": "authored-boundary",
+        "result": "fail",
+        "detail": "forbidden imported symbol"
+      },
+      {
+        "case_id": "source-policy/authored-boundary/no-deprecated-symbol",
+        "group": "authored-boundary",
+        "result": "pass",
+        "detail": "observed"
+      },
+      {
+        "case_id": "source-policy/authored-boundary/inheritance-of-upstream",
+        "group": "authored-boundary",
+        "result": "pass",
+        "detail": "observed"
+      },
+      {
+        "case_id": "source-policy/authored-boundary/sass-public-boundary",
+        "group": "authored-boundary",
+        "result": "pass",
+        "detail": "observed"
+      },
+      {
+        "case_id": "source-policy/authored-boundary/installed-annotation-comparison",
+        "group": "authored-boundary",
+        "result": "fail",
+        "detail": "imported peer declarations unavailable: ['@angular/common', '@angular/core', '@angular/forms', '@angular/platform-browser']"
+      },
+      {
+        "case_id": "source-policy/packed-boundary/scanned-artifact-digest",
+        "group": "packed-boundary",
+        "result": "fail",
+        "detail": "packed tarball was not scanned"
+      },
+      {
+        "case_id": "source-policy/packed-boundary/js-and-declarations",
+        "group": "packed-boundary",
+        "result": "fail",
+        "detail": "packed tarball was not scanned"
+      },
+      {
+        "case_id": "source-policy/packed-boundary/sass-transitive-closure",
+        "group": "packed-boundary",
+        "result": "fail",
+        "detail": "packed tarball was not scanned"
+      }
+    ],
+    "authored_violations": [],
+    "authored_violation_count": 0,
+    "packed_violation_count": null,
+    "tarball_sha256": null,
+    "annotation_files": 75,
+    "annotation_detail": "imported peer declarations unavailable: ['@angular/common', '@angular/core', '@angular/forms', '@angular/platform-browser']",
+    "annotation_private_hits": [
+      {
+        "name": "MAT_MENU_PANEL",
+        "module": "@angular/material/menu",
+        "package": "@angular/material",
+        "path": "legacy-menu/menu.ts",
+        "access": "named",
+        "declaration_package": "@angular/material",
+        "declaration": "types/menu.d.ts",
+        "declaration_name": "MAT_MENU_PANEL"
+      },
+      {
+        "name": "MAT_MENU_PANEL",
+        "module": "@angular/material/menu",
+        "package": "@angular/material",
+        "path": "legacy-menu/public-api.ts",
+        "access": "named",
+        "declaration_package": "@angular/material",
+        "declaration": "types/menu.d.ts",
+        "declaration_name": "MAT_MENU_PANEL"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-menu/menu.spec.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "CDK_TABLE",
+        "module": "@angular/cdk/table",
+        "package": "@angular/cdk",
+        "path": "legacy-table/table.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/table.d.ts",
+        "declaration_name": "CDK_TABLE"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-select/select.spec.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-progress-spinner/progress-spinner.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-tabs/tab-header.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-tabs/tab-header.spec.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "MAT_MENU_PANEL",
+        "module": "@angular/material/menu",
+        "package": "@angular/material",
+        "path": "legacy-menu/internal/menu-trigger-base.ts",
+        "access": "named",
+        "declaration_package": "@angular/material",
+        "declaration": "types/menu.d.ts",
+        "declaration_name": "MAT_MENU_PANEL"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-select/internal/select-base.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "CdkDialogContainer",
+        "module": "@angular/cdk/dialog",
+        "package": "@angular/cdk",
+        "path": "legacy-dialog/internal/dialog-container-base.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/dialog.d.ts",
+        "declaration_name": "CdkDialogContainer"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-tabs/internal/tab-nav-bar-base.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-tabs/internal/paginated-tab-header.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-tabs/internal/tab-header-base.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-tabs/tab-nav-bar/tab-nav-bar.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      }
+    ],
+    "annotation_deprecated_hits": [],
+    "annotation_missing_packages": [
+      "@angular/common",
+      "@angular/core",
+      "@angular/forms",
+      "@angular/platform-browser"
+    ],
+    "annotation_unresolved_exports": []
+  },
+  "remaining_private_hits_each_line": 16,
+  "authored_use_population": {
+    "frozen": 1736,
+    "reviewed": 138,
+    "open": 1598,
+    "changed_by_this_repair": false
+  },
+  "upstream_sha_review": "No SHA closure inferred; entire1697 scope retained.",
+  "g11_claim": "not-passed"
+}
