@@ -271,278 +271,6 @@ def _vuln_rows(packages: list[tuple[str, str]], results: list) -> tuple[dict, li
     return rows, unresolved
 
 
-def _version_key(value: str) -> tuple | None:
-    """Release ordering for plain x.y.z[-pre] npm versions. Anything else is unknown."""
-    import re
-
-    if not isinstance(value, str):
-        return None
-    match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?", value or "")
-    if not match:
-        return None
-    major, minor, patch, pre = match.groups()
-    # A prerelease sorts before its release.
-    return (int(major), int(minor), int(patch), 0 if pre else 1, pre or "")
-
-
-def fixed_versions(vuln: dict, name: str, version: str) -> list[str]:
-    """OSV ``fixed`` events of SEMVER ranges for name whose range covers version."""
-    current = _version_key(version)
-    if current is None or not isinstance(vuln, dict):
-        return []
-    found = set()
-    for affected in vuln.get("affected") or []:
-        package = (affected or {}).get("package") or {}
-        if package.get("ecosystem") != "npm" or package.get("name") != name:
-            continue
-        for item in affected.get("ranges") or []:
-            if (item or {}).get("type") != "SEMVER":
-                continue
-            introduced = None
-            for event in item.get("events") or []:
-                if "introduced" in event:
-                    introduced = _version_key("0.0.0" if event["introduced"] == "0" else event["introduced"])
-                elif "fixed" in event:
-                    fixed = _version_key(event["fixed"])
-                    if introduced is not None and fixed is not None and introduced <= current < fixed:
-                        found.add(event["fixed"])
-                    introduced = None
-    return sorted(found, key=_version_key)
-
-
-def remediation_note(key: str, advisory: str, fixes: list[str], published: datetime | None, now: datetime,
-                     error: str = "") -> dict:
-    """Observed remediation state of one unresolved finding. Never a disposition."""
-    note = {"package": key, "advisory": advisory, "fixed_version": fixes[0] if fixes else None}
-    if not fixes:
-        note.update(state="no-fixed-release", detail=f"{key} {advisory}: OSV records no fixed release for this version")
-        return note
-    if published is None:
-        note.update(state="fixed-release-age-unknown",
-                    detail=f"{key} {advisory}: fixed in {fixes[0]}, publish time unknown ({error or 'missing'})")
-        return note
-    eligible_at = published + timedelta(seconds=MAX_AGE_SECONDS)
-    note.update(published=published.isoformat(), eligible_at=eligible_at.isoformat())
-    if published > now or now < eligible_at:
-        note.update(state="fixed-release-under-maturity", detail=(
-            f"{key} {advisory}: fixed in {fixes[0]} published {published.isoformat()}, "
-            f"under the seven-day minimumReleaseAge until {eligible_at.isoformat()}"))
-    else:
-        note.update(state="fixed-release-eligible", detail=(
-            f"{key} {advisory}: fixed in {fixes[0]} published {published.isoformat()}, "
-            "past the seven-day minimumReleaseAge; the lock still pins the vulnerable version"))
-    return note
-
-
-def _remediation_notes(unresolved: list[str], rows: dict, now: datetime) -> list[dict]:
-    notes = []
-    for key in unresolved:
-        row = rows.get(key) or {}
-        name, version = row.get("name"), row.get("version")
-        for item in row.get("vulns") or []:
-            advisory = item.get("id") if isinstance(item, dict) else None
-            if not (isinstance(name, str) and isinstance(version, str) and isinstance(advisory, str)):
-                continue
-            status, body, error = _http_json(f"https://api.osv.dev/v1/vulns/{advisory}", timeout=45)
-            if status != 200 or not isinstance(body, dict):
-                notes.append({"package": key, "advisory": advisory, "fixed_version": None, "state": "advisory-unknown",
-                              "detail": f"{key} {advisory}: advisory detail unknown ({error or f'http_status={status}'})"})
-                continue
-            fixes = fixed_versions(body, name, version)
-            published, age_error = _npm_publish_time(name, fixes[0]) if fixes else (None, "")
-            notes.append(remediation_note(key, advisory, fixes, published, now, age_error))
-    return notes
-
-
-def load_finding_dispositions(root: Path) -> dict[str, list[dict]]:
-    """Reviewed per-finding records. A missing file leaves the finding unresolved."""
-    directory = root / "compatibility/rc/dependency-dispositions"
-    found: dict[str, list[dict]] = {}
-    if not directory.is_dir() or directory.is_symlink():
-        return found
-    for path in sorted(directory.glob("*.json")):
-        if not path.is_file() or path.is_symlink():
-            continue
-        data = json.loads(path.read_text())
-        if not isinstance(data, dict):
-            continue
-        key = f"{data.get('package')}@{data.get('version')}"
-        data["_file"] = path.name
-        if data.get('scope_rule') == 'karma-braces-3.0.3-two-paths':
-            data['_dependency_scope_ok'] = karma_braces_scope_ok(root, data)
-        found.setdefault(key, []).append(data)
-    return found
-
-
-def karma_braces_scope_ok(root: Path, record: dict) -> bool:
-    """The owner's exact two Karma paths must remain the only locked paths."""
-    try:
-        expected = [['devDependency karma@6.4.4', 'braces@3.0.3'],
-                    ['devDependency karma@6.4.4', 'chokidar@3.6.0', 'braces@3.0.3']]
-        manifest = json.loads((root/'package.json').read_text())
-        if (record.get('package') != 'braces' or record.get('version') != '3.0.3'
-            or record.get('dependency_paths') != expected or manifest.get('devDependencies', {}).get('karma') != '6.4.4'
-            or 'karma' in manifest.get('dependencies', {})):return False
-        text = (root/'pnpm-lock.yaml').read_text();blocks=[]
-        # pnpm12 locks include separate package-manager and workspace documents.
-        documents=[doc for doc in re.split(r'(?m)^---[ \t]*$',text) if doc.strip()]
-        for doc in documents:
-            pieces=re.split(r'(?m)^snapshots:[ \t]*$',doc)
-            if len(pieces) != 2:return False
-            blocks.extend(re.findall(r'(?ms)^  ([^\n]+):(?: \{\})?\n(.*?)(?=^  \S|\Z)', pieces[1]))
-        braces_in=set();chokidar_in=set();karma_edges=set()
-        for label, body in blocks:
-            parent=label.strip("'\"").split('(', 1)[0]
-            for key, value in re.findall(r'(?m)^      ([^:\n]+): ([^\n]+)$', body):
-                key=key.strip("'\"");value=value.strip("'\"").split('(', 1)[0]
-                if key in ('braces','chokidar') and _version_key(value) is None:return False
-                if key == 'braces' and value == '3.0.3':braces_in.add(parent)
-                elif value == 'braces@3.0.3':return False  # An aliased path is outside this grant.
-                if key == 'chokidar' and value == '3.6.0':chokidar_in.add(parent)
-                if parent == 'karma@6.4.4' and key in ('braces', 'chokidar'):karma_edges.add((key,value))
-        return braces_in == {'karma@6.4.4','chokidar@3.6.0'} and chokidar_in == {'karma@6.4.4'} and karma_edges == {('braces','3.0.3'),('chokidar','3.6.0')}
-    except (OSError,KeyError,TypeError,ValueError):return False
-
-
-def refresh_exception_patch_status(rows: dict, dispositions: dict, now: datetime, lookup=None) -> None:
-    """A no-patch grant needs a fresh full advisory; unknown detail cannot defer it."""
-    lookup = lookup or _http_json
-    for key, records in dispositions.items():
-        row=rows.get(key) or {};name=row.get('name');version=row.get('version')
-        active=[r for r in records if r.get('patch_check_required') is True and _temporary_exception_applies(r,r.get('advisory_id'),now)]
-        for item in row.get('vulns') or []:
-            advisory=item.get('id') if isinstance(item,dict) else None
-            if not any(r.get('advisory_id') == advisory for r in active):continue
-            item.update(patch_lookup_result='unknown',available_fixed_versions=None)
-            status,body,error=lookup(f'https://api.osv.dev/v1/vulns/{advisory}',timeout=45)
-            if status != 200 or error or not isinstance(body,dict) or body.get('id') != advisory:continue
-            try:
-                affected=[a for a in body.get('affected') or [] if isinstance(a,dict) and a.get('package',{}).get('ecosystem') == 'npm' and a.get('package',{}).get('name') == name]
-                ranges=[r for a in affected for r in a.get('ranges') or [] if isinstance(r,dict) and r.get('type') == 'SEMVER']
-                if not ranges or any(not isinstance(r.get('events'),list) or not r['events'] or any(not isinstance(e,dict) or ('fixed' in e and _version_key(e['fixed']) is None) for e in r['events']) for r in ranges):continue
-                fixes=fixed_versions(body,name,version)
-            except (TypeError,ValueError,AttributeError):continue
-            item.update(patch_lookup_result='queried',available_fixed_versions=fixes)
-
-
-def _record_shape(record: dict, advisory_id: str) -> bool:
-    if record.get("advisory_id") != advisory_id:
-        return False
-    path = record.get("dependency_path")
-    reason = record.get("reason")
-    if not isinstance(path, list) or not path or not all(isinstance(item, str) and item for item in path):
-        return False
-    if not isinstance(reason, str) or len(reason.strip()) < 40:
-        return False
-    if "fixed_version" not in record:
-        return False
-    return True
-
-
-def _disposition_matches(record: dict, advisory_id: str) -> bool:
-    if record.get("classification") not in {"blocked", "not-applicable"}:
-        return False
-    return _record_shape(record, advisory_id)
-
-
-def _parse_day(value: object):
-    if not isinstance(value, str) or not value:
-        return None
-    try:
-        return datetime.fromisoformat(value).date()
-    except ValueError:
-        return None
-
-
-def _temporary_exception_applies(record: dict, advisory_id: str, now: datetime) -> bool:
-    """A dated owner exception can defer one exact finding. It is not a fix."""
-    if record.get("classification") != "temporary-exception":
-        return False
-    if not _record_shape(record, advisory_id):
-        return False
-    if record.get("fixed_version") is not None:
-        return False
-    if record.get('scope_rule') and record.get('_dependency_scope_ok') is not True:
-        return False
-    authority = record.get("authority")
-    granted_by = record.get("granted_by")
-    if not isinstance(authority, str) or len(authority.strip()) < 40:
-        return False
-    if not isinstance(granted_by, str) or not granted_by.strip():
-        return False
-    granted_on = _parse_day(record.get("granted_on"))
-    expires_on = _parse_day(record.get("expires_on"))
-    if granted_on is None or expires_on is None:
-        return False
-    today = now.date()
-    if granted_on > today or today > expires_on:
-        return False
-    if (expires_on - granted_on).days > 90:
-        return False
-    return True
-
-
-def classify_live_findings(rows: dict, unresolved: list[str], dispositions: dict[str, list[dict]], now: datetime | None = None) -> dict:
-    """A reviewed blocked record stays blocking. Unknown findings stay unresolved.
-
-    A temporary exception removes one exact advisory only while it is unexpired,
-    names a grantor, and records no patched release. It does not clear the
-    finding and it is not security clearance.
-    """
-    now = now or datetime.now(timezone.utc)
-    still = []
-    blocked = []
-    excepted = []
-    classified = []
-    seen = set()
-    for key in unresolved:
-        if key in seen:
-            continue
-        seen.add(key)
-        row = rows.get(key) or {}
-        vulns = row.get("vulns") if isinstance(row, dict) else None
-        ids = [item.get("id") for item in vulns or [] if isinstance(item, dict) and isinstance(item.get("id"), str)]
-        records = dispositions.get(key, [])
-        reviewed = [record for record in records if any(_disposition_matches(record, advisory) for advisory in ids)]
-        temporary = [record for record in records if any(
-            _temporary_exception_applies(record, item.get('id'), now)
-            and (record.get('patch_check_required') is not True or
-                 (item.get('patch_lookup_result') == 'queried' and item.get('available_fixed_versions') == []))
-            for item in vulns or [] if isinstance(item, dict))]
-        matched_ids = {record.get("advisory_id") for record in reviewed}
-        excepted_ids = {record.get("advisory_id") for record in temporary}
-        if not ids or any(advisory not in matched_ids | excepted_ids for advisory in ids):
-            still.append(key)
-            continue
-        if any(record.get("classification") == "blocked" for record in reviewed):
-            blocked.append(key)
-            classified.append({
-                "package": key,
-                "classification": "blocked",
-                "advisories": ids,
-                "file": reviewed[0].get("_file"),
-                "dependency_path": reviewed[0].get("dependency_path"),
-                "fixed_version": reviewed[0].get("fixed_version"),
-            })
-            continue
-        if temporary and all(advisory in excepted_ids for advisory in ids):
-            excepted.append(key)
-            classified.append({
-                "package": key,
-                "classification": "temporary-exception",
-                "advisories": ids,
-                "file": temporary[0].get("_file"),
-                "dependency_path": temporary[0].get("dependency_path"),
-                "fixed_version": None,
-                "expires_on": temporary[0].get("expires_on"),
-                "granted_by": temporary[0].get("granted_by"),
-            })
-            continue
-        # not-applicable, or a temporary record that has expired or lacks a
-        # grant, does not clear a finding that is still in the lock.
-        still.append(key)
-    return {"unresolved": still, "blocked": blocked, "excepted": excepted, "classified": classified}
-
 
 AGE_EXCEPTIONS_PATH = "chainman/minimum-age-exceptions.toml"
 _EXACT_EXCLUDE = re.compile(r"^((?:@[a-z0-9][a-z0-9._-]*/)?[a-z0-9][a-z0-9._-]*)@(\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?)$")
@@ -698,6 +426,275 @@ def assess_age_exceptions(records: list[dict], excludes: list[str] | None, now: 
     return {"active": active, "expired": expired, "problems": problems}
 
 
+
+def _version_key(value: str) -> tuple | None:
+    """Release ordering for plain x.y.z[-pre] npm versions. Anything else is unknown."""
+    import re
+
+    if not isinstance(value, str):
+        return None
+    match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?", value or "")
+    if not match:
+        return None
+    major, minor, patch, pre = match.groups()
+    # A prerelease sorts before its release.
+    return (int(major), int(minor), int(patch), 0 if pre else 1, pre or "")
+
+def fixed_versions(vuln: dict, name: str, version: str) -> list[str]:
+    """OSV ``fixed`` events of SEMVER ranges for name whose range covers version."""
+    current = _version_key(version)
+    if current is None or not isinstance(vuln, dict):
+        return []
+    found = set()
+    for affected in vuln.get("affected") or []:
+        package = (affected or {}).get("package") or {}
+        if package.get("ecosystem") != "npm" or package.get("name") != name:
+            continue
+        for item in affected.get("ranges") or []:
+            if (item or {}).get("type") != "SEMVER":
+                continue
+            introduced = None
+            for event in item.get("events") or []:
+                if "introduced" in event:
+                    introduced = _version_key("0.0.0" if event["introduced"] == "0" else event["introduced"])
+                elif "fixed" in event:
+                    fixed = _version_key(event["fixed"])
+                    if introduced is not None and fixed is not None and introduced <= current < fixed:
+                        found.add(event["fixed"])
+                    introduced = None
+    return sorted(found, key=_version_key)
+
+def remediation_note(key: str, advisory: str, fixes: list[str], published: datetime | None, now: datetime,
+                     error: str = "") -> dict:
+    """Observed remediation state of one unresolved finding. Never a disposition."""
+    note = {"package": key, "advisory": advisory, "fixed_version": fixes[0] if fixes else None}
+    if not fixes:
+        note.update(state="no-fixed-release", detail=f"{key} {advisory}: OSV records no fixed release for this version")
+        return note
+    if published is None:
+        note.update(state="fixed-release-age-unknown",
+                    detail=f"{key} {advisory}: fixed in {fixes[0]}, publish time unknown ({error or 'missing'})")
+        return note
+    eligible_at = published + timedelta(seconds=MAX_AGE_SECONDS)
+    note.update(published=published.isoformat(), eligible_at=eligible_at.isoformat())
+    if published > now or now < eligible_at:
+        note.update(state="fixed-release-under-maturity", detail=(
+            f"{key} {advisory}: fixed in {fixes[0]} published {published.isoformat()}, "
+            f"under the seven-day minimumReleaseAge until {eligible_at.isoformat()}"))
+    else:
+        note.update(state="fixed-release-eligible", detail=(
+            f"{key} {advisory}: fixed in {fixes[0]} published {published.isoformat()}, "
+            "past the seven-day minimumReleaseAge; the lock still pins the vulnerable version"))
+    return note
+
+def _remediation_notes(unresolved: list[str], rows: dict, now: datetime) -> list[dict]:
+    notes = []
+    for key in unresolved:
+        row = rows.get(key) or {}
+        name, version = row.get("name"), row.get("version")
+        for item in row.get("vulns") or []:
+            advisory = item.get("id") if isinstance(item, dict) else None
+            if not (isinstance(name, str) and isinstance(version, str) and isinstance(advisory, str)):
+                continue
+            status, body, error = _http_json(f"https://api.osv.dev/v1/vulns/{advisory}", timeout=45)
+            if status != 200 or not isinstance(body, dict):
+                notes.append({"package": key, "advisory": advisory, "fixed_version": None, "state": "advisory-unknown",
+                              "detail": f"{key} {advisory}: advisory detail unknown ({error or f'http_status={status}'})"})
+                continue
+            fixes = fixed_versions(body, name, version)
+            published, age_error = _npm_publish_time(name, fixes[0]) if fixes else (None, "")
+            notes.append(remediation_note(key, advisory, fixes, published, now, age_error))
+    return notes
+
+def load_finding_dispositions(root: Path) -> dict[str, list[dict]]:
+    """Reviewed per-finding records. A missing file leaves the finding unresolved."""
+    directory = root / "compatibility/rc/dependency-dispositions"
+    found: dict[str, list[dict]] = {}
+    if not directory.is_dir() or directory.is_symlink():
+        return found
+    for path in sorted(directory.glob("*.json")):
+        if not path.is_file() or path.is_symlink():
+            continue
+        data = json.loads(path.read_text())
+        if not isinstance(data, dict):
+            continue
+        key = f"{data.get('package')}@{data.get('version')}"
+        data["_file"] = path.name
+        if data.get('scope_rule') == 'karma-braces-3.0.3-two-paths':
+            data['_dependency_scope_ok'] = karma_braces_scope_ok(root, data)
+        found.setdefault(key, []).append(data)
+    return found
+
+
+def karma_braces_scope_ok(root: Path, record: dict) -> bool:
+    """The owner's exact two Karma paths must remain the only locked paths."""
+    try:
+        expected = [['devDependency karma@6.4.4', 'braces@3.0.3'],
+                    ['devDependency karma@6.4.4', 'chokidar@3.6.0', 'braces@3.0.3']]
+        manifest = json.loads((root/'package.json').read_text())
+        if (record.get('package') != 'braces' or record.get('version') != '3.0.3'
+            or record.get('dependency_paths') != expected or manifest.get('devDependencies', {}).get('karma') != '6.4.4'
+            or 'karma' in manifest.get('dependencies', {})):return False
+        text = (root/'pnpm-lock.yaml').read_text();blocks=[]
+        # pnpm12 locks include separate package-manager and workspace documents.
+        documents=[doc for doc in re.split(r'(?m)^---[ \t]*$',text) if doc.strip()]
+        for doc in documents:
+            pieces=re.split(r'(?m)^snapshots:[ \t]*$',doc)
+            if len(pieces) != 2:return False
+            blocks.extend(re.findall(r'(?ms)^  ([^\n]+):(?: \{\})?\n(.*?)(?=^  \S|\Z)', pieces[1]))
+        braces_in=set();chokidar_in=set();karma_edges=set()
+        for label, body in blocks:
+            parent=label.strip("'\"").split('(', 1)[0]
+            for key, value in re.findall(r'(?m)^      ([^:\n]+): ([^\n]+)$', body):
+                key=key.strip("'\"");value=value.strip("'\"").split('(', 1)[0]
+                if key in ('braces','chokidar') and _version_key(value) is None:return False
+                if key == 'braces' and value == '3.0.3':braces_in.add(parent)
+                elif value == 'braces@3.0.3':return False  # An aliased path is outside this grant.
+                if key == 'chokidar' and value == '3.6.0':chokidar_in.add(parent)
+                if parent == 'karma@6.4.4' and key in ('braces', 'chokidar'):karma_edges.add((key,value))
+        return braces_in == {'karma@6.4.4','chokidar@3.6.0'} and chokidar_in == {'karma@6.4.4'} and karma_edges == {('braces','3.0.3'),('chokidar','3.6.0')}
+    except (OSError,KeyError,TypeError,ValueError):return False
+
+def refresh_exception_patch_status(rows: dict, dispositions: dict, now: datetime, lookup=None) -> None:
+    """A no-patch grant needs a fresh full advisory; unknown detail cannot defer it."""
+    lookup = lookup or _http_json
+    for key, records in dispositions.items():
+        row=rows.get(key) or {};name=row.get('name');version=row.get('version')
+        active=[r for r in records if r.get('patch_check_required') is True and _temporary_exception_applies(r,r.get('advisory_id'),now)]
+        for item in row.get('vulns') or []:
+            advisory=item.get('id') if isinstance(item,dict) else None
+            if not any(r.get('advisory_id') == advisory for r in active):continue
+            item.update(patch_lookup_result='unknown',available_fixed_versions=None)
+            status,body,error=lookup(f'https://api.osv.dev/v1/vulns/{advisory}',timeout=45)
+            if status != 200 or error or not isinstance(body,dict) or body.get('id') != advisory:continue
+            try:
+                affected=[a for a in body.get('affected') or [] if isinstance(a,dict) and a.get('package',{}).get('ecosystem') == 'npm' and a.get('package',{}).get('name') == name]
+                ranges=[r for a in affected for r in a.get('ranges') or [] if isinstance(r,dict) and r.get('type') == 'SEMVER']
+                if not ranges or any(not isinstance(r.get('events'),list) or not r['events'] or any(not isinstance(e,dict) or ('fixed' in e and _version_key(e['fixed']) is None) for e in r['events']) for r in ranges):continue
+                fixes=fixed_versions(body,name,version)
+            except (TypeError,ValueError,AttributeError):continue
+            item.update(patch_lookup_result='queried',available_fixed_versions=fixes)
+
+
+def _record_shape(record: dict, advisory_id: str) -> bool:
+    if record.get("advisory_id") != advisory_id:
+        return False
+    path = record.get("dependency_path")
+    reason = record.get("reason")
+    if not isinstance(path, list) or not path or not all(isinstance(item, str) and item for item in path):
+        return False
+    if not isinstance(reason, str) or len(reason.strip()) < 40:
+        return False
+    if "fixed_version" not in record:
+        return False
+    return True
+
+
+def _disposition_matches(record: dict, advisory_id: str) -> bool:
+    if record.get("classification") not in {"blocked", "not-applicable"}:
+        return False
+    return _record_shape(record, advisory_id)
+
+
+def _parse_day(value: object):
+    if not isinstance(value, str) or not value:
+        return None
+    try:
+        return datetime.fromisoformat(value).date()
+    except ValueError:
+        return None
+
+
+def _temporary_exception_applies(record: dict, advisory_id: str, now: datetime) -> bool:
+    """A dated owner exception can defer one exact finding. It is not a fix."""
+    if record.get("classification") != "temporary-exception":
+        return False
+    if not _record_shape(record, advisory_id):
+        return False
+    if record.get("fixed_version") is not None:
+        return False
+    if record.get('scope_rule') and record.get('_dependency_scope_ok') is not True:
+        return False
+    authority = record.get("authority")
+    granted_by = record.get("granted_by")
+    if not isinstance(authority, str) or len(authority.strip()) < 40:
+        return False
+    if not isinstance(granted_by, str) or not granted_by.strip():
+        return False
+    granted_on = _parse_day(record.get("granted_on"))
+    expires_on = _parse_day(record.get("expires_on"))
+    if granted_on is None or expires_on is None:
+        return False
+    today = now.date()
+    if granted_on > today or today > expires_on:
+        return False
+    if (expires_on - granted_on).days > 90:
+        return False
+    return True
+
+
+def classify_live_findings(rows: dict, unresolved: list[str], dispositions: dict[str, list[dict]], now: datetime | None = None) -> dict:
+    """A reviewed blocked record stays blocking. Unknown findings stay unresolved.
+
+    A temporary exception removes one exact advisory only while it is unexpired,
+    names a grantor, and records no patched release. It does not clear the
+    finding and it is not security clearance.
+    """
+    now = now or datetime.now(timezone.utc)
+    still = []
+    blocked = []
+    excepted = []
+    classified = []
+    seen = set()
+    for key in unresolved:
+        if key in seen:
+            continue
+        seen.add(key)
+        row = rows.get(key) or {}
+        vulns = row.get("vulns") if isinstance(row, dict) else None
+        ids = [item.get("id") for item in vulns or [] if isinstance(item, dict) and isinstance(item.get("id"), str)]
+        records = dispositions.get(key, [])
+        reviewed = [record for record in records if any(_disposition_matches(record, advisory) for advisory in ids)]
+        temporary = [record for record in records if any(
+            _temporary_exception_applies(record, item.get('id'), now)
+            and (record.get('patch_check_required') is not True or
+                 (item.get('patch_lookup_result') == 'queried' and item.get('available_fixed_versions') == []))
+            for item in vulns or [] if isinstance(item, dict))]
+        matched_ids = {record.get("advisory_id") for record in reviewed}
+        excepted_ids = {record.get("advisory_id") for record in temporary}
+        if not ids or any(advisory not in matched_ids | excepted_ids for advisory in ids):
+            still.append(key)
+            continue
+        if any(record.get("classification") == "blocked" for record in reviewed):
+            blocked.append(key)
+            classified.append({
+                "package": key,
+                "classification": "blocked",
+                "advisories": ids,
+                "file": reviewed[0].get("_file"),
+                "dependency_path": reviewed[0].get("dependency_path"),
+                "fixed_version": reviewed[0].get("fixed_version"),
+            })
+            continue
+        if temporary and all(advisory in excepted_ids for advisory in ids):
+            excepted.append(key)
+            classified.append({
+                "package": key,
+                "classification": "temporary-exception",
+                "advisories": ids,
+                "file": temporary[0].get("_file"),
+                "dependency_path": temporary[0].get("dependency_path"),
+                "fixed_version": None,
+                "expires_on": temporary[0].get("expires_on"),
+                "granted_by": temporary[0].get("granted_by"),
+            })
+            continue
+        # not-applicable, or a temporary record that has expired or lacks a
+        # grant, does not clear a finding that is still in the lock.
+        still.append(key)
+    return {"unresolved": still, "blocked": blocked, "excepted": excepted, "classified": classified}
+
+
 def perform_lookup(root: Path, now: datetime) -> dict:
     """Live advisory, registry-age, and vendor lookup. Failure stays unknown."""
     packages = lock_packages((root / "pnpm-lock.yaml").read_text())
@@ -825,7 +822,7 @@ def perform_lookup(root: Path, now: datetime) -> dict:
 
 
 def evaluate(root: Path, now: datetime, *, lookup_performed: bool, lookup: dict | None = None) -> dict:
-    peers = json.loads((root / "compatibility/peers-22.proposed.json").read_text())
+    peers = json.loads((root / "compatibility/peers-21.proposed.json").read_text())
     stored_path = root / "compatibility/rc/reports/pinned-dependency-advisories.json"
     stored = json.loads(stored_path.read_text()) if stored_path.is_file() else {}
     stored_assessment = assess_stored_query(stored, peers, now) if stored else {
@@ -847,6 +844,7 @@ def evaluate(root: Path, now: datetime, *, lookup_performed: bool, lookup: dict 
             "uncovered": [f"{name}@{version}" for name, version in packages],
             "age_unknown": ["not queried"],
             "age_young": [],
+            "age_excepted": [],
             "toolchain_ok": False,
             "toolchain_detail": "toolchain age was not queried",
             "vendor_ok": False,
