@@ -33,6 +33,20 @@ for(const change of [
 assert.throws(()=>compilerConstructorContract(source,'Missing'));
 const foreign=source.replaceAll("from '@angular/core'","from 'foreign/core'");assert.throws(()=>compilerConstructorContract(foreign,'Owned'));
 const ambiguous=source.replace('{type:Owned,deps:','{type:Owned,type:Owned,deps:');assert.throws(()=>compilerConstructorContract(ambiguous,'Owned'));
+const inherited=source+`\nclass Child extends Owned {static ɵfac=i0.ɵɵngDeclareFactory({type:Child,deps:null,target:i0.ɵɵFactoryTarget.Directive});}
+i0.ɵɵngDeclareClassMetadata({type:Child});`;
+assert.throws(()=>compilerConstructorContract(inherited,'Child'));
+const child=compilerConstructorContract(inherited,'Child',{resolveInherited:true});
+assert.deepEqual(child.inheritance,['Child','Owned']);assert.equal(child.parameter_class_name,'Owned');assert.equal(child.parameters.length,2);
+for(const change of [
+ s=>s.replace('extends Owned','extends Missing'),
+ s=>s.replace('extends Owned','extends choose()'),
+ s=>s.replace('extends Owned','extends Child'),
+ s=>s.replace('class Child extends Owned {','class Child extends Owned {constructor(...values){super(...values);}'),
+ s=>s.replace('ClassMetadata({type:Child})','ClassMetadata({type:Child,ctorParameters:()=>[]})'),
+ s=>s+'\nOwned.ɵfac=()=>({});',
+ s=>s+'\nObject.setPrototypeOf(Child,Missing);',
+]){const mutant=change(inherited);assert.notEqual(mutant,inherited);assert.throws(()=>compilerConstructorContract(mutant,'Child',{resolveInherited:true}));}
 """
         result=subprocess.run(['node','--input-type=module','-e',code],cwd=ROOT,capture_output=True,text=True)
         self.assertEqual(result.returncode,0,(result.stdout+result.stderr)[-6000:])

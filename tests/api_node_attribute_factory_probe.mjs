@@ -24,7 +24,9 @@ try{
  const detectorFile='detector-fixture.ts';
  writeFileSync(join(temp,'src',detectorFile),`import {Directive,Attribute,ElementRef,ChangeDetectorRef} from '@angular/core';
  @Directive({selector:'[attributeDetectorFixture]',standalone:true})
- export class AttributeDetectorFixture {constructor(@Attribute('role') role:string,element:ElementRef,detector:ChangeDetectorRef){}}`);
+ export class AttributeDetectorFixture {constructor(@Attribute('role') role:string,element:ElementRef,detector:ChangeDetectorRef){}}
+ @Directive({selector:'[inheritedAttributeDetectorFixture]',standalone:true})
+ export class InheritedAttributeDetectorFixture extends AttributeDetectorFixture {}`);
  const options={target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ES2022,moduleResolution:ts.ModuleResolutionKind.Bundler,
   experimentalDecorators:true,skipLibCheck:true,strict:true,rootDir:join(temp,'src'),outDir:join(temp,'out'),
   paths:{'@angular/core':[resolve(dirname(req.resolve('@angular/core')),'../types/core.d.ts')],'@angular/material/form-field':[resolve(dirname(req.resolve('@angular/material/form-field')),'../types/form-field.d.ts')]},compilationMode:'partial'};
@@ -86,6 +88,8 @@ try{
   ['settlement-wrong-attribute-name',r=>r.factory_constructor_evidence[0].attribute='role'],
   ['settlement-wrong-attribute-value',r=>r.factory_constructor_evidence[0].value='assertive'],
   ['settlement-wrong-compiler-flag',r=>r.factory_compiler_observation.parameters[1].skipSelf=true],
+  ['settlement-unverified-runtime-inheritance',r=>r.factory_compiler_observation.runtime_inheritance_verified=false],
+  ['settlement-wrong-inheritance-chain',r=>r.factory_compiler_observation.inheritance=['Missing']],
  ]){
   const row=JSON.parse(JSON.stringify(admitted));row.problems=[];change(row);
   assert.equal(settleDi(row,[]).result,'fail',id+' admitted');cases.push({id,result:'rejected'});
@@ -106,7 +110,7 @@ try{
  const {attributeFactoryContract,executeAttributeFactory,challengeAttributeDetectorScopes}=
   await import(pathToFileURL(join(root,'scripts/api-attribute-factory.mjs')).href);
  const {runFactory}=await import(pathToFileURL(join(root,'scripts/api-di-observe.mjs')).href);
- const {AttributeDetectorFixture}=await import(pathToFileURL(join(temp,'out/detector-fixture.js')).href);
+ const {AttributeDetectorFixture,InheritedAttributeDetectorFixture}=await import(pathToFileURL(join(temp,'out/detector-fixture.js')).href);
  const detectorParameters=[{attribute:'role'},{ident:'ElementRef'},{ident:'ChangeDetectorRef'}];
  const detectorContract=await attributeFactoryContract(AttributeDetectorFixture,c,detectorSource,detectorParameters,
   (p,token)=>token===c[p.ident]);
@@ -119,6 +123,23 @@ try{
   assert.equal(execution.constructorEvidence[2].scope_challenge,'public-view-destruction-verified');
   cases.push({id:'compiled-helper-detector-actual-public-view-scope',result:'pass'});
  }finally{detectorFixture.close();}
+ const inheritedContract=await attributeFactoryContract(InheritedAttributeDetectorFixture,c,detectorSource,detectorParameters,
+  (p,token)=>token===c[p.ident]);
+ assert.deepEqual(inheritedContract.compiler.inheritance,['InheritedAttributeDetectorFixture','AttributeDetectorFixture']);
+ const inheritedFixture=await createPublicFactoryContext(c,s=>import(url(s)),{nodeFactory:node=>
+  executeAttributeFactory(InheritedAttributeDetectorFixture,c,inheritedContract,node,runFactory)});
+ try{
+  const execution=inheritedFixture.element.execution;assert.equal(execution.outcome,'returned');
+  assert.ok(execution.value instanceof InheritedAttributeDetectorFixture);
+  challengeAttributeDetectorScopes(execution,inheritedFixture);
+  cases.push({id:'actual-compiled-inherited-attribute-factory-and-detector-scope',result:'pass'});
+ }finally{inheritedFixture.close();}
+ Object.defineProperty(InheritedAttributeDetectorFixture,'ctorParameters',{value:()=>AttributeDetectorFixture.ctorParameters(),configurable:true});
+ try{
+  await assert.rejects(attributeFactoryContract(InheritedAttributeDetectorFixture,c,detectorSource,detectorParameters,
+   (p,token)=>token===c[p.ident]),/unexpected own constructor metadata/);
+  cases.push({id:'inherited-runtime-own-metadata-insertion-rejected',result:'rejected'});
+ }finally{delete InheritedAttributeDetectorFixture.ctorParameters;}
  const foreign=await createPublicFactoryContext(c,s=>import(url(s)));
  const actualFactory=AttributeDetectorFixture.ɵfac;
  try{
@@ -147,6 +168,7 @@ try{
  }
  const result={schema_version:1,role:'Unchanged emitted error factory full API producer and strict attribute constructor observations; not complete nine-class or packed/native/minimum qualification',node:process.version,typescript:ts.version,runtime_peer:c.VERSION.full,cases,
  api_constructor_evidence:admitted.factory_constructor_evidence,api_runtime_requests:admitted.runtime_requests,
+ inherited_fixture_compiler_contract:inheritedContract.compiler,
  compiler_observation_contract:compilerContract,
  original_directive_unchanged_except_owned_token_standalone_copyright_and_retired_migration_notices:true,actual_attribute_and_elementref_metadata_identity:true,handcrafted_dependency_metadata:false,current_private_imports:false,library_typescript_templates_styles_changed:false,g02_claim:'not-passed'};
  if(process.argv.includes('--out'))writeFileSync(process.argv[process.argv.indexOf('--out')+1],JSON.stringify(result,null,2)+'\n');
