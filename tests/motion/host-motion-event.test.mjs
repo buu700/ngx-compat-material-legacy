@@ -40,8 +40,6 @@ assert.ok(menu.includes('legacyNextMotionCompletion'));
 const tabs = source('projects/ngx-material-legacy/legacy-tabs/internal/tab-body-base.ts');
 assert.ok(tabs.includes('event.target !== this._contentElement?.nativeElement'));
 
-const dialog = source('projects/ngx-material-legacy/legacy-dialog/dialog-container.ts');
-assert.ok(dialog.includes('clearTimeout(this._animationTimer)'));
-assert.ok(dialog.includes('Promise.resolve().then(() => this._finishDialogOpen())'));
+// Dialog timing/cancellation runs as actual owned source in dialog_motion_runtime_probe.mjs.
 
 console.log('host motion event tests passed');

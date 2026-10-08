@@ -96,6 +96,10 @@ export class MatLegacyDialogContainer extends _MatDialogContainerBase implements
     : 0;
 
   private _animationTimer: ReturnType<typeof setTimeout> | null = null;
+  private _animationFrame: number | null = null;
+  private _animationRevision = 0;
+  private _animationDestroyed = false;
+  private _animationCompleted = false;
   private _hostElement = this._elementRef.nativeElement;
 
   /**
@@ -111,11 +115,21 @@ export class MatLegacyDialogContainer extends _MatDialogContainerBase implements
   }
 
   private _startOpenAnimation(): void {
+    if (this._animationDestroyed) {
+      return;
+    }
+    this._cancelAnimationWork();
+    this._animationCompleted = false;
     this._state = 'enter';
+    const revision = this._animationRevision;
     this._animationStateChanged.emit({
       state: 'opening',
       totalTime: this._enterAnimationDuration,
     });
+    // A synchronous opening observer can close or destroy the container.
+    if (this._animationDestroyed || revision !== this._animationRevision) {
+      return;
+    }
 
     if (this._animationsEnabled) {
       this._hostElement.style.setProperty(ENTER_DURATION_VAR, `${this._enterAnimationDuration}ms`);
@@ -126,17 +140,26 @@ export class MatLegacyDialogContainer extends _MatDialogContainerBase implements
       this._waitForAnimationToComplete(this._enterAnimationDuration, this._finishDialogOpen);
     } else {
       this._hostElement.classList.add(OPEN_CLASS, NOOP_CLASS);
-      Promise.resolve().then(() => this._finishDialogOpen());
+      Promise.resolve().then(() => this._finishDialogOpen(revision));
     }
   }
 
   /** Starts the dialog exit animation. */
   _startExitAnimation(): void {
+    if (this._animationDestroyed || this._state === 'exit') {
+      return;
+    }
+    this._cancelAnimationWork();
+    this._animationCompleted = false;
     this._state = 'exit';
+    const revision = this._animationRevision;
     this._animationStateChanged.emit({
       state: 'closing',
       totalTime: this._exitAnimationDuration,
     });
+    if (this._animationDestroyed || revision !== this._animationRevision) {
+      return;
+    }
     this._hostElement.classList.remove(OPEN_CLASS);
 
     if (this._animationsEnabled) {
@@ -146,16 +169,28 @@ export class MatLegacyDialogContainer extends _MatDialogContainerBase implements
       });
       this._waitForAnimationToComplete(this._exitAnimationDuration, this._finishDialogClose);
     } else {
-      Promise.resolve().then(() => this._finishDialogClose());
+      Promise.resolve().then(() => this._finishDialogClose(revision));
     }
   }
 
-  private _finishDialogOpen = (): void => {
+  private _finishDialogOpen = (revision = this._animationRevision): void => {
+    if (revision !== this._animationRevision || this._animationDestroyed || this._state !== 'enter' || this._animationCompleted) {
+      return;
+    }
+    this._animationCompleted = true;
+    this._cancelAnimationWork();
+    // A zero-duration timer can finish before the first animation frame.
+    this._hostElement.classList.add(OPEN_CLASS);
     this._clearAnimationClasses();
     this._openAnimationDone(this._enterAnimationDuration);
   };
 
-  private _finishDialogClose = (): void => {
+  private _finishDialogClose = (revision = this._animationRevision): void => {
+    if (revision !== this._animationRevision || this._animationDestroyed || this._state !== 'exit' || this._animationCompleted) {
+      return;
+    }
+    this._animationCompleted = true;
+    this._cancelAnimationWork();
     this._clearAnimationClasses();
     this._animationStateChanged.emit({
       state: 'closed',
@@ -171,23 +206,49 @@ export class MatLegacyDialogContainer extends _MatDialogContainerBase implements
     if (this._animationTimer !== null) {
       clearTimeout(this._animationTimer);
     }
-    this._animationTimer = setTimeout(callback, duration);
+    const revision = this._animationRevision;
+    this._animationTimer = setTimeout(() => {
+      if (!this._animationDestroyed && revision === this._animationRevision) {
+        this._animationTimer = null;
+        callback();
+      }
+    }, duration);
   }
 
   private _requestAnimationFrame(callback: () => void): void {
+    const revision = this._animationRevision;
     this._ngZone.runOutsideAngular(() => {
       if (typeof requestAnimationFrame === 'function') {
-        requestAnimationFrame(callback);
-      } else {
+        this._animationFrame = requestAnimationFrame(() => {
+          if (!this._animationDestroyed && revision === this._animationRevision) {
+            this._animationFrame = null;
+            callback();
+          }
+        });
+      } else if (!this._animationDestroyed && revision === this._animationRevision) {
         callback();
       }
     });
   }
 
-  override ngOnDestroy(): void {
-    super.ngOnDestroy();
+  private _cancelAnimationWork(): void {
+    this._animationRevision++;
     if (this._animationTimer !== null) {
       clearTimeout(this._animationTimer);
+      this._animationTimer = null;
     }
+    if (this._animationFrame !== null) {
+      if (typeof cancelAnimationFrame === 'function') {
+        cancelAnimationFrame(this._animationFrame);
+      }
+      this._animationFrame = null;
+    }
+  }
+
+  override ngOnDestroy(): void {
+    this._animationDestroyed = true;
+    // Cancel before focus restoration, which may throw in consumer code.
+    this._cancelAnimationWork();
+    super.ngOnDestroy();
   }
 }
