@@ -122,7 +122,7 @@ export function createMouseEvent(
     button,
     // detail 0 is treated as a screen-reader mousedown and does not start ripples or mouse focus.
     detail: 1,
-    buttons: button === 0 ? 1 : 1 << button,
+    buttons: button === 1 ? 4 : button === 2 ? 2 : 1 << button,
   });
   if (offsetX != null) {
     defineReadonly(event, 'offsetX', offsetX);

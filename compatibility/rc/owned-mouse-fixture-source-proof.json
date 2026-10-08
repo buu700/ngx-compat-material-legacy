@@ -1,0 +1,214 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "recorded_at_utc": "2026-10-08T11:58:16.508559+00:00",
+  "role": "Correct nonprimary mouse test-fixture masks, not a published product/legacy golden change",
+  "sources": [
+    {
+      "path": "projects/ngx-material-legacy/internal/testing/owned-test-events.ts",
+      "sha256": "7c5798340b031d79a5ebe8c94ba266bb137e0babc24f6126d54aced47367f212",
+      "before_sha256": "44bb9b8380b50d6a658f013b37bdbfe7c701e4b5837bdd26ea85f9bc7f956ba8"
+    },
+    {
+      "path": "testing/legacy-runner/shims/event-objects.ts",
+      "sha256": "077a61a7e10532fea833e2e3c2959ad9843192cc23f2b6a711eec6ead2b04d98",
+      "before_sha256": "35f2fcaf088c28d41c0421544018eb0b61f0af11aebf3ae9dcb0b36b8c0014aa"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+      "sha256": "6bf0b3a87276b025d95d4692b05bc0cd31ce2af04f8028aab3f38f82fae5ba3b",
+      "before_sha256": "686b76ab228cbe69abd1c966e3dcc071916b4b654b85dc508095e8ecca76ded0"
+    },
+    {
+      "path": "tests/owned_mouse_fixture_probe.mjs",
+      "sha256": "42fa033d26a73e633368f5aaeda42be6bfb6564997ede517a4cdc163e181f20b",
+      "before_sha256": null
+    },
+    {
+      "path": "tests/test_owned_mouse_fixtures.py",
+      "sha256": "040228bc8332bdac0b26bdaf94f0a2bb6c1b0ea4fc43a2ab1feb150ab697b280",
+      "before_sha256": null
+    }
+  ],
+  "primary_standard": {
+    "url": "https://www.w3.org/TR/pointerevents4/#dom-mouseevent-buttons",
+    "mapping": {
+      "button0": 1,
+      "button1": 4,
+      "button2": 2,
+      "button3": 8,
+      "button4": 16
+    },
+    "observation": "W3C button enum uses1 for auxiliary/middle and2 for secondary/right; buttons mask uses4 and2 respectively. Other successive masks begin8.",
+    "verbatim_quote": false
+  },
+  "change": "Owned helpers and historical runner adapter previously swapped middle/right bit masks. Correct only those masks, preserve primary/back/forward, detail1, coordinates, modifiers, flags and dispatch/cancellation. RestoreGoogle MIT/Ryan2026 notice on derived adapter. MouseEvent-specific constructor options are modeled in the local probe; native event base behavior is real.",
+  "runtime": {
+    "receipt_sha256": "a036c9b9fb981b5ad1cd0f40b3857f73b63036cd5c836868fe2c78549010f33d",
+    "observations": {
+      "node": "v22.23.3",
+      "compiler": "6.0.3",
+      "standard": "https://www.w3.org/TR/pointerevents4/#dom-mouseevent-buttons",
+      "expected_pressed_masks": [
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          2
+        ],
+        [
+          3,
+          8
+        ],
+        [
+          4,
+          16
+        ]
+      ],
+      "receipts": [
+        {
+          "path": "projects/ngx-material-legacy/internal/testing/owned-test-events.ts",
+          "sha256": "7c5798340b031d79a5ebe8c94ba266bb137e0babc24f6126d54aced47367f212",
+          "observations": [
+            {
+              "button": 0,
+              "buttons": 1,
+              "primary": true,
+              "detail": 1,
+              "coordinates_and_modifiers": true,
+              "dispatch_and_cancel": true
+            },
+            {
+              "button": 1,
+              "buttons": 4,
+              "primary": false,
+              "detail": 1,
+              "coordinates_and_modifiers": true,
+              "dispatch_and_cancel": true
+            },
+            {
+              "button": 2,
+              "buttons": 2,
+              "primary": false,
+              "detail": 1,
+              "coordinates_and_modifiers": true,
+              "dispatch_and_cancel": true
+            },
+            {
+              "button": 3,
+              "buttons": 8,
+              "primary": false,
+              "detail": 1,
+              "coordinates_and_modifiers": true,
+              "dispatch_and_cancel": true
+            },
+            {
+              "button": 4,
+              "buttons": 16,
+              "primary": false,
+              "detail": 1,
+              "coordinates_and_modifiers": true,
+              "dispatch_and_cancel": true
+            }
+          ],
+          "mutants": [
+            {
+              "id": "swapped-middle-and-right",
+              "rejected": true
+            },
+            {
+              "id": "all-primary",
+              "rejected": true
+            },
+            {
+              "id": "all-released",
+              "rejected": true
+            }
+          ]
+        },
+        {
+          "path": "testing/legacy-runner/shims/event-objects.ts",
+          "sha256": "077a61a7e10532fea833e2e3c2959ad9843192cc23f2b6a711eec6ead2b04d98",
+          "observations": [
+            {
+              "button": 0,
+              "buttons": 1,
+              "primary": true,
+              "detail": 1,
+              "coordinates_and_modifiers": true,
+              "dispatch_and_cancel": true
+            },
+            {
+              "button": 1,
+              "buttons": 4,
+              "primary": false,
+              "detail": 1,
+              "coordinates_and_modifiers": true,
+              "dispatch_and_cancel": true
+            },
+            {
+              "button": 2,
+              "buttons": 2,
+              "primary": false,
+              "detail": 1,
+              "coordinates_and_modifiers": true,
+              "dispatch_and_cancel": true
+            },
+            {
+              "button": 3,
+              "buttons": 8,
+              "primary": false,
+              "detail": 1,
+              "coordinates_and_modifiers": true,
+              "dispatch_and_cancel": true
+            },
+            {
+              "button": 4,
+              "buttons": 16,
+              "primary": false,
+              "detail": 1,
+              "coordinates_and_modifiers": true,
+              "dispatch_and_cancel": true
+            }
+          ],
+          "mutants": [
+            {
+              "id": "swapped-middle-and-right",
+              "rejected": true
+            },
+            {
+              "id": "all-primary",
+              "rejected": true
+            },
+            {
+              "id": "all-released",
+              "rejected": true
+            }
+          ]
+        }
+      ],
+      "limits": [
+        "Real native Event/EventTarget flags, dispatch and cancellation; MouseEvent-specific properties are modeled from constructor options.",
+        "One real-browser property test prepared in each existing historical menu spec. No native/AOT/packed/actual21 qualification.",
+        "Only middle/right masks change; original historical reference constant1 remains untouched and is not relabeled standards-compliant."
+      ]
+    }
+  },
+  "native_prepared": {
+    "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+    "cases": 1,
+    "executed": false,
+    "scope": "Five real native MouseEvent.button/buttons/detail values before any menu behavior; original assertions unchanged."
+  },
+  "historical_reference": "Untouched16 original helper used buttons1 for everybutton; that reference is not edited or relabeled standards-correct. This changes test-only event input fidelity, not historical expectations.",
+  "qualification": "Ten synthetic option/native EventTarget cases and six rejected mutations per line. No actual21/native browser/AOT/packed/floor or whole G11 credit. Full historical suite must rerun against final candidate.",
+  "constructor_owner_decision": "Still pending; no table product constructor or API exception changed.",
+  "new_frozen_use_or_sha_closures": 0,
+  "g11_claim": "not-passed"
+}

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -48,7 +49,7 @@ export function createMouseEvent(
     metaKey: modifiers.meta,
     button: button,
     // Match the pressed button bit so right/middle clicks are not reported as primary.
-    buttons: button === 0 ? 1 : 1 << button,
+    buttons: button === 1 ? 4 : button === 2 ? 2 : 1 << button,
   });
 
   // The `MouseEvent` constructor doesn't allow us to pass these properties into the constructor.
