@@ -135,3 +135,29 @@ for(const line of ['main','21.x']){
 """
         result = subprocess.run(['node', '--input-type=module', '-e', code], cwd=ROOT, capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
+
+    def test_aggregate_insertion_requires_one_whole_original_prefix_and_exact_public_sources(self):
+        code = r"""
+import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';
+import {FORM_FIELD_STATE_AGGREGATE_CASES,insertFormFieldStateInAggregate} from './scripts/sass-form-field-state-contract.mjs';
+const c=JSON.parse(readFileSync('fixtures/sass/form-field-state-contracts.json')),d=JSON.parse(readFileSync('tests/sass_default_aggregate_fixture.json')),dc=JSON.parse(readFileSync('fixtures/sass/default-aggregate-contracts.json')),a=JSON.parse(readFileSync('tests/sass_aggregate_color_theme_fixture.json')),ac=JSON.parse(readFileSync('fixtures/sass/aggregate-color-theme-contracts.json'));
+assert.equal(Object.keys(FORM_FIELD_STATE_AGGREGATE_CASES).length,6);
+for(const line of ['main','21.x'])for(const [id,field]of Object.entries(FORM_FIELD_STATE_AGGREGATE_CASES)){
+ const e=c.cases[field],isDefault=id.startsWith('mixin-css/');
+ const css=isDefault?d.measurements[id+'-'+line].css:a.candidate_inputs[id+'-'+line];
+ const stored=isDefault?d.peers[dc.cases[id].profile+'-'+line]:a.peers[ac.cases[id].peer_profile+'-'+line];
+ const peer=isDefault?{...stored,sources:dc.peer_inputs[line].sources}:stored;
+ const addition='\n'+e.peers[line].css+'\n';assert.equal(css.split(addition).length,2);
+ const base=css.replace(addition,'');assert.equal(insertFormFieldStateInAggregate(id,base,peer),css);
+ for(const wrong of [base.replace(e.color.css,''),base+e.color.css,base.replace('--mdc-filled-text-field-caret-color:','--foreign-token:')])
+  assert.equal(insertFormFieldStateInAggregate(id,wrong,peer),null);
+ const missing=structuredClone(peer);missing.sources=missing.sources.filter(s=>s.path!=='form-field/_form-field-theme.scss');
+ assert.equal(insertFormFieldStateInAggregate(id,base,missing),null);
+ const changed=structuredClone(peer);changed.sources.find(s=>s.path==='form-field/_m3-form-field.scss').sha256='0'.repeat(64);
+ assert.equal(insertFormFieldStateInAggregate(id,base,changed),null);
+ for(const unknown of ['__proto__','constructor','unknown',id.replace('all-component','all-legacy-component')])
+  assert.equal(insertFormFieldStateInAggregate(unknown,base,peer),null);
+}
+"""
+        result = subprocess.run(['node', '--input-type=module', '-e', code], cwd=ROOT, capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr or result.stdout)

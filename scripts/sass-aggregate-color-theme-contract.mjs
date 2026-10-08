@@ -4,6 +4,7 @@ import {readFileSync} from 'node:fs';
 import {SCENARIOS,themeSass,COMPANIONS} from './companion-bridge-peer-oracle.mjs';
 import {measureM2PeerProgram,peerMeasurementMatches} from './sass-current-companion-peer.mjs';
 import {ORIGINAL_CALENDAR_DENSITY,CURRENT_CALENDAR_FALLBACKS} from './sass-datepicker-controls-contract.mjs';
+import {FORM_FIELD_STATE_AGGREGATE_CASES,insertFormFieldStateInAggregate} from './sass-form-field-state-contract.mjs';
 const sha=s=>createHash('sha256').update(s).digest('hex');
 const catalog=JSON.parse(readFileSync(new URL('../fixtures/sass/aggregate-color-theme-contracts.json',import.meta.url)));
 const names=['all-component-colors','all-component-themes','all-legacy-component-colors','all-legacy-component-themes'];
@@ -97,7 +98,8 @@ export function aggregateColorThemeExpectedCss(caseId,original,peer){
   const tree=o.tree.replace(/^  (background|color|font-weight|font-size|min-height): ([^;\n]+);$/gm,(_,k,v)=>`  ${k}: var(--mat-tree-${tokens[k]}, ${v});`)+'\n'+p.tree;
   // Preserve the entire owned prefix and historical icon CSS. Only the
   // enumerated companion additions and expansion/grid parent boundary compose.
-  return prefix+[badgeCss,added('bottom-sheet'),added('button-toggle'),datepicker,added('divider'),o.expansion+'\n\n'+expansion,o.icon,added('sidenav'),added('stepper'),sort,added('toolbar'),tree].join('\n');
+  const css=prefix+[badgeCss,added('bottom-sheet'),added('button-toggle'),datepicker,added('divider'),o.expansion+'\n\n'+expansion,o.icon,added('sidenav'),added('stepper'),sort,added('toolbar'),tree].join('\n');
+  return Object.hasOwn(FORM_FIELD_STATE_AGGREGATE_CASES,caseId)?insertFormFieldStateInAggregate(caseId,css,peer):css;
 }
 export function aggregateColorThemeResultsMatch(caseId,original,actual,peer){
   const expected=aggregateColorThemeExpectedCss(caseId,original,peer);

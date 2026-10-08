@@ -34,6 +34,12 @@ class DefaultAggregateContractTests(unittest.TestCase):
                     self.assertIn('.cdk-high-contrast-active',css)
                     changes.extend([css.replace('.cdk-high-contrast-active','.lost-accessibility',1),css.replace('transform: scale(0.6);','transform: scale(1);',1)])
                     if e['profile']=='themes':changes.append(css.replace('padding: 8px;','padding: 9px;',1))
+                    if case in ['mixin-css/all-component-colors','mixin-css/all-component-themes']:
+                        for token in ['state-layer-color','hover-state-layer-opacity','focus-state-layer-opacity']:
+                            changes.append(re.sub(r'(--mat-form-field-'+token+r':) [^;]+;',r'\1 initial;',css))
+                        block=re.search(r'(?m)^\.sass-api-probe \{\n  --mat-form-field-state-layer-color:[^{}]+\n\}',css);self.assertIsNotNone(block)
+                        changes.extend([css[:block.start()]+css[block.end():],css[:block.start()]+css[block.end():]+'\n'+block[0]])
+                    else:self.assertNotIn('--mat-form-field-hover-state-layer-opacity:',css)
                 else:
                     self.assertIn('var(--mat-tree-node-min-height, 48px)',css)
                     changes.append(css.replace('var(--mat-tree-node-min-height, 48px)','var(--mat-tree-node-min-height, 40px)',1))
@@ -79,7 +85,7 @@ const f=JSON.parse(readFileSync('tests/sass_default_aggregate_fixture.json')),c=
 for(const line of ['main','21.x']){
  const css=Object.fromEntries(Object.entries(o.members.mixins).filter(([,e])=>e.invocation.invocable).map(([n,e])=>[n,{css:'',sha256:e.invocation.css_sha256}]));
  for(const [id,e] of Object.entries(DEFAULT_AGGREGATE_CASES)){
-  const saved=f.measurements[id+'-'+line],m={...saved,sources:source.source_sets[saved.source_set]},stored=f.peers[e.profile+'-'+line],peer={...stored,sources:c.peer_inputs[line].sources},contract={classification:'conforming-current-companion',contract:DEFAULT_AGGREGATE_CONTRACT,peer};
+  const saved=f.measurements[id+'-'+line],selected=saved.source_fixture?JSON.parse(readFileSync('tests/'+saved.source_fixture)):source,m={...saved,sources:selected.source_sets[saved.source_set]},stored=f.peers[e.profile+'-'+line],peer={...stored,sources:c.peer_inputs[line].sources},contract={classification:'conforming-current-companion',contract:DEFAULT_AGGREGATE_CONTRACT,peer};
   const got={css:m.css,sha256:m.css_sha256,actual_measurement:m,current_companion:contract};css[id.slice(10)]=got;
   assert.equal(defaultAggregateExpectedCss(id,peer),m.css);assert.ok(defaultAggregateMeasurementOk(id,m,line));assert.ok(defaultAggregateResultsMatch(id,got,contract));
   const changed=structuredClone(got);changed.css+='\n.unrelated {color:red}';changed.sha256=sha(changed.css);changed.actual_measurement.css=changed.css;changed.actual_measurement.css_sha256=changed.sha256;changed.actual_measurement.css_bytes=Buffer.byteLength(changed.css);assert.equal(defaultAggregateResultsMatch(id,changed,contract),false);

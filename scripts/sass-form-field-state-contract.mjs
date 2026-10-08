@@ -105,3 +105,32 @@ export function formFieldStateDefaultResultsMatch(id, actual, contract) {
   const expected = formFieldStateExpectedCss(id, e.original, contract.peer);
   return expected !== null && actual.css === expected && actual.actual_measurement.css === expected && actual.sha256 === sha(expected);
 }
+
+// Only modern aggregate names call the changed ordinary form-field mixin.
+// The complete historical color prefix must occur once in the existing whole
+// aggregate model. No candidate CSS is searched, stripped or normalized.
+export const FORM_FIELD_STATE_AGGREGATE_CASES = Object.freeze({
+  'mixin-css/all-component-colors': 'mixin-css/form-field-color',
+  'mixin-css/all-component-themes': 'mixin-css/form-field-theme',
+  'mixin-argument/all-component-colors/custom-full-theme': 'mixin-argument/form-field-color/custom-full-theme',
+  'mixin-argument/all-component-colors/raw-color-config': 'mixin-argument/form-field-color/raw-color-config',
+  'mixin-argument/all-component-themes/custom-full-theme': 'mixin-argument/form-field-theme/custom-full-theme',
+  'mixin-argument/all-component-themes/custom-dark-theme': 'mixin-argument/form-field-theme/custom-dark-theme',
+});
+export function insertFormFieldStateInAggregate(id, css, peer) {
+  if (!Object.hasOwn(FORM_FIELD_STATE_AGGREGATE_CASES, id) || typeof css !== 'string'
+      || !Object.hasOwn(catalog.peer_inputs, peer?.line)) return null;
+  const e = catalog.cases[FORM_FIELD_STATE_AGGREGATE_CASES[id]], floor = e.peers[peer.line];
+  // The caller already authenticates its complete aggregate peer program and
+  // contribution. Additionally require the exact public state API's sources,
+  // which are loaded by that same floor's public Material barrel.
+  const paths = ['_index.scss', 'form-field/_form-field-theme.scss', 'form-field/_m3-form-field.scss', 'core/tokens/_token-utils.scss'];
+  const required = Object.fromEntries(paths.map(path => {
+    const s = catalog.peer_inputs[peer.line].find(s => s.root === 0 && s.path === path);
+    if (!s) throw Error('authenticated form-field state source missing');
+    return [path, [s.sha256, s.bytes]];
+  }));
+  if (!peerMeasurementMatches(peer, peer.program, required) || css.split(e.color.css).length !== 2) return null;
+  const at = css.indexOf(e.color.css) + e.color.css.length, suffix = css.slice(at);
+  return css.slice(0, at) + e.separator + floor.css + (suffix ? '\n' : '') + suffix;
+}

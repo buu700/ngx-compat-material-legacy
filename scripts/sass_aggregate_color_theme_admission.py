@@ -5,6 +5,7 @@ import re
 from pathlib import Path
 from sass_current_companion_admission import peer_measurement_ok
 from sass_datepicker_controls_admission import ORIGINAL_CALENDAR_DENSITY, CURRENT_CALENDAR_FALLBACKS
+from sass_form_field_state_admission import FORM_FIELD_STATE_AGGREGATE_CASES, insert_form_field_state_in_aggregate
 _ROOT=Path(__file__).resolve().parents[1]
 _CATALOG=json.loads((_ROOT/'fixtures/sass/aggregate-color-theme-contracts.json').read_bytes())
 AGGREGATE_COLOR_THEME_CASES=_CATALOG['cases']
@@ -77,7 +78,8 @@ def aggregate_color_theme_expected_css(body):
         tokens={'background':'container-background-color','color':'node-text-color','font-weight':'node-text-weight','font-size':'node-text-size','min-height':'node-min-height'}
         tree=re.sub(r'^  (background|color|font-weight|font-size|min-height): ([^;\n]+);$',lambda m:'  '+m[1]+': var(--mat-tree-'+tokens[m[1]]+', '+m[2]+');',o['tree'],flags=re.M)+'\n'+p['tree']
         # Whole owned prefix, original icon rules and motion remain exact.
-        return prefix+'\n'.join([badge,added('bottom-sheet'),added('button-toggle'),datepicker,added('divider'),o['expansion']+'\n\n'+expansion,o['icon'],added('sidenav'),added('stepper'),sort,added('toolbar'),tree])
+        css = prefix+'\n'.join([badge,added('bottom-sheet'),added('button-toggle'),datepicker,added('divider'),o['expansion']+'\n\n'+expansion,o['icon'],added('sidenav'),added('stepper'),sort,added('toolbar'),tree])
+        return insert_form_field_state_in_aggregate(body['case_id'],css,peer) if body['case_id'] in FORM_FIELD_STATE_AGGREGATE_CASES else css
     except (KeyError,TypeError,ValueError,AttributeError):return None
 
 def aggregate_color_theme_results_match(body):
