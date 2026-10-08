@@ -32,9 +32,14 @@ function emit(raw) {
 const data = raw => 'data:text/javascript;base64,' + Buffer.from(raw).toString('base64');
 const flagsUrl = data(emit(readFileSync(resolve(root, flagPath), 'utf8')));
 const flags = await import(flagsUrl);
+export const motionOverrideToken = flags.LEGACY_ANIMATIONS_TEST_OVERRIDE;
 const paramsUrl = data(emit(readFileSync(resolve(root, paramsPath), 'utf8')));
+export async function loadConfig() {
+  const raw = readFileSync(resolve(root, 'projects/ngx-material-legacy/legacy-dialog/dialog-config.ts'), 'utf8');
+  return (await import(data(emit(raw).replaceAll("'./dialog-animation-params'", JSON.stringify(paramsUrl))))).MatLegacyDialogConfig;
+}
 const baseUrl = await loadBase(undefined, undefined, true);
-async function load(raw = original) {
+export async function load(raw = original) {
   const js = emit(raw).replaceAll("'./internal/dialog-container-base'", JSON.stringify(baseUrl))
     .replaceAll("'./dialog-animation-params'", JSON.stringify(paramsUrl))
     .replaceAll("'@ngx-compat/material-legacy/legacy-core'", JSON.stringify(flagsUrl));
@@ -62,10 +67,15 @@ function clock(options = {}) {
     }},
   };
 }
-function make(Leaf, mode = 'enabled', options = {}) {
+export function make(Leaf, mode = 'enabled', options = {}) {
   const c = clock(options);
-  const f = fixture(Leaf, 'dialog', !!options.browser, {config: {delayFocusTrap: true, ...options.config},
-    providers: [{provide: flags.LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: mode}]});
+  let f;
+  try { f = fixture(Leaf, 'dialog', !!options.browser, {manual: !!options.manual, noMonitor: !!options.noMonitor,
+    config: {delayFocusTrap: true, ...options.config}, configFactory: options.configFactory,
+    providers: [{provide: flags.LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: mode}, ...(options.providers || [])],
+    mapArguments: (args, injector) => options.beforeConstructor ? args
+      : [...args.slice(0, 7), options.changeDetector || injector.get(core.ChangeDetectorRef), ...args.slice(7)]});
+  } catch (error) {c.restore();throw error;}
   const classes = new Set(), styles = new Map(), writes = [], events = [];
   f.host.classList = {add(...names) {names.forEach(name => classes.add(name));writes.push(['add', ...names]);},
     remove(...names) {names.forEach(name => classes.delete(name));writes.push(['remove', ...names]);}};
@@ -80,14 +90,15 @@ function make(Leaf, mode = 'enabled', options = {}) {
 const open = 'mat-legacy-dialog-container-open', opening = 'mat-legacy-dialog-container-opening';
 const closing = 'mat-legacy-dialog-container-closing';
 const phases = f => f.events.map(e => e.state);
-async function observations(Leaf) {
+async function observations(Leaf, beforeConstructor = false) {
+  const create = (mode, options = {}) => make(Leaf, mode, {...options, beforeConstructor});
   const cases = [];
   async function check(id, run) {
     try {await run();cases.push({id, result: 'pass'});}
     catch(error) {cases.push({id, result: 'fail', error: error.message.slice(0, 450)});}
   }
   await check('enabled-open-close-order-duration-and-css-state', async () => {
-    const f = make(Leaf);
+    const f = create();
     try {f.instance._startOpenAnimation();assert.deepEqual(phases(f), ['opening']);
       assert.equal(f.c.timers.size, 1);assert.equal(f.c.frames.size, 1);assert.equal(f.classes.has(open), false);
       f.c.frame();assert.equal(f.classes.has(opening), true);assert.equal(f.classes.has(open), true);
@@ -104,7 +115,7 @@ async function observations(Leaf) {
   });
   for(const mode of ['di-disabled', 'reduced-motion']) {
     await check(mode + '-keeps-deferred-single-open-and-close', async () => {
-      const f = make(Leaf, mode);
+      const f = create(mode);
       try {f.instance._startOpenAnimation();assert.deepEqual(phases(f), ['opening']);
         assert.equal(f.c.timers.size, 0);assert.equal(f.c.frames.size, 0);
         await Promise.resolve();assert.deepEqual(phases(f), ['opening', 'opened']);
@@ -115,25 +126,25 @@ async function observations(Leaf) {
     });
   }
   await check('noop-close-before-open-never-emits-opened', async () => {
-    const f = make(Leaf, 'di-disabled');
+    const f = create('di-disabled');
     try {f.instance._startOpenAnimation();f.instance._startExitAnimation();await Promise.resolve();
       assert.deepEqual(phases(f), ['opening', 'closing', 'closed']);assert.equal(f.notifications(), 0);
     } finally {f.close();}
   });
   await check('noop-destroy-before-open-leaves-no-event-or-dom-work', async () => {
-    const f = make(Leaf, 'di-disabled');f.instance._startOpenAnimation();const writes = f.writes.length;
+    const f = create('di-disabled');f.instance._startOpenAnimation();const writes = f.writes.length;
     try {f.destroy();await Promise.resolve();assert.deepEqual(phases(f), ['opening']);
       assert.equal(f.writes.length, writes);assert.equal(f.notifications(), 0);assert.equal(f.completed(), 1);
     } finally {f.close();}
   });
   await check('noop-destroy-before-close-never-emits-closed', async () => {
-    const f = make(Leaf, 'di-disabled');
+    const f = create('di-disabled');
     try {f.instance._startExitAnimation();f.destroy();await Promise.resolve();
       assert.deepEqual(phases(f), ['closing']);assert.equal(f.completed(), 1);
     } finally {f.close();}
   });
   await check('noop-old-phase-cannot-complete-reopened-phase-early', async () => {
-    const f = make(Leaf, 'di-disabled'), order = [];
+    const f = create('di-disabled'), order = [];
     f.instance._animationStateChanged.subscribe(e => {if(e.state === 'closed') order.push('closed');});
     try {f.instance._startOpenAnimation();f.instance._startExitAnimation();
       Promise.resolve().then(() => order.push('between-phases'));
@@ -142,7 +153,7 @@ async function observations(Leaf) {
     } finally {f.close();}
   });
   await check('enabled-destroy-cancels-timer-and-frame', async () => {
-    const f = make(Leaf);f.instance._startOpenAnimation();const frame = [...f.c.frames.values()][0];
+    const f = create();f.instance._startOpenAnimation();const frame = [...f.c.frames.values()][0];
     const timer = [...f.c.timers.values()][0].callback, writes = f.writes.length;
     try {f.destroy();assert.equal(f.c.frames.size, 0);assert.equal(f.c.timers.size, 0);
       frame();timer();await Promise.resolve();assert.deepEqual(phases(f), ['opening']);
@@ -150,7 +161,7 @@ async function observations(Leaf) {
     } finally {f.close();}
   });
   await check('uncancellable-old-frame-cannot-reopen-closing-dialog', async () => {
-    const f = make(Leaf, 'enabled', {noCancel: true});
+    const f = create('enabled', {noCancel: true});
     try {f.instance._startOpenAnimation();const old = [...f.c.frames.values()][0];
       f.instance._startExitAnimation();old();assert.equal(f.classes.has(open), false);
       assert.equal(f.classes.has(opening), false);f.c.timer();await Promise.resolve();
@@ -159,7 +170,7 @@ async function observations(Leaf) {
     } finally {f.close();}
   });
   await check('close-during-opening-observer-keeps-only-exit-work', async () => {
-    const f = make(Leaf);
+    const f = create();
     f.instance._animationStateChanged.subscribe(e => {if(e.state === 'opening') f.instance._startExitAnimation();});
     try {f.instance._startOpenAnimation();assert.equal(f.c.timers.size, 1);
       assert.equal([...f.c.timers.values()][0].duration, 75);assert.equal(f.c.frames.size, 1);
@@ -168,7 +179,7 @@ async function observations(Leaf) {
     } finally {f.close();}
   });
   await check('destroy-during-opening-observer-schedules-nothing', async () => {
-    const f = make(Leaf);
+    const f = create();
     f.instance._animationStateChanged.subscribe(e => {if(e.state === 'opening') f.destroy();});
     try {f.instance._startOpenAnimation();await Promise.resolve();
       assert.equal(f.c.timers.size, 0);assert.equal(f.c.frames.size, 0);assert.equal(f.writes.length, 0);
@@ -176,21 +187,21 @@ async function observations(Leaf) {
     } finally {f.close();}
   });
   await check('parent-restoration-failure-cannot-leak-animation-work', async () => {
-    const f = make(Leaf, 'enabled', {browser: true});f.instance._startOpenAnimation();
+    const f = create('enabled', {browser: true});f.instance._startOpenAnimation();
     f.config.restoreFocus = '.bad';f.document.querySelector = () => {throw Error('restore failed');};
     try {assert.throws(() => f.destroy(), /restore failed/);
       assert.equal(f.c.timers.size, 0);assert.equal(f.c.frames.size, 0);assert.equal(f.completed(), 1);
     } finally {f.close();}
   });
   await check('zero-duration-before-first-frame-settles-visible-without-opening-class', async () => {
-    const f = make(Leaf, 'enabled', {config: {enterAnimationDuration: '0ms'}});
+    const f = create('enabled', {config: {enterAnimationDuration: '0ms'}});
     try {f.instance._startOpenAnimation();f.c.timer();await Promise.resolve();
       assert.equal(f.classes.has(open), true);assert.equal(f.classes.has(opening), false);
       assert.equal(f.c.frames.size, 0);assert.deepEqual(phases(f), ['opening', 'opened']);
     } finally {f.close();}
   });
   await check('repeated-exit-request-does-not-duplicate-events-or-jobs', async () => {
-    const f = make(Leaf);
+    const f = create();
     try {f.instance._startExitAnimation();f.instance._startExitAnimation();
       assert.equal(f.c.timers.size, 1);assert.equal(f.c.frames.size, 1);f.c.frame();f.c.timer();
       f.instance._startExitAnimation();assert.deepEqual(phases(f), ['closing', 'closed']);
@@ -198,7 +209,7 @@ async function observations(Leaf) {
     } finally {f.close();}
   });
   await check('missing-raf-preserves-immediate-class-and-duration-completion', async () => {
-    const f = make(Leaf, 'enabled', {noFrame: true, config: {enterAnimationDuration: '0.2s', exitAnimationDuration: '25ms'}});
+    const f = create('enabled', {noFrame: true, config: {enterAnimationDuration: '0.2s', exitAnimationDuration: '25ms'}});
     try {f.instance._startOpenAnimation();assert.equal(f.classes.has(open), true);
       assert.equal(f.c.frames.size, 0);f.c.timer();f.instance._startExitAnimation();
       assert.equal(f.classes.has(closing), true);f.c.timer();
@@ -206,13 +217,14 @@ async function observations(Leaf) {
     } finally {f.close();}
   });
   await check('phase-request-after-destruction-is-inert', async () => {
-    const f = make(Leaf);f.destroy();
+    const f = create();f.destroy();
     try {f.instance._startOpenAnimation();f.instance._startExitAnimation();await Promise.resolve();
       assert.equal(f.events.length, 0);assert.equal(f.writes.length, 0);assert.equal(f.c.timers.size, 0);
     } finally {f.close();}
   });
   return cases;
 }
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
 const cases = await observations(await load());
 assert.ok(cases.every(c => c.result === 'pass'), JSON.stringify(cases.filter(c => c.result !== 'pass')));
 const mutations = [];
@@ -243,7 +255,7 @@ if(args.length) {
   if(args.length === 4) {
     assert.equal(args[2], '--before');assert.match(args[3], /^[0-9a-f]{40}$/);
     const before = execFileSync('git', ['show', args[3] + ':' + leafPath], {cwd: root, encoding: 'utf8'});
-    const actual = await observations(await load(before));
+    const actual = await observations(await load(before), true);
     for(const id of ['noop-close-before-open-never-emits-opened', 'noop-destroy-before-open-leaves-no-event-or-dom-work',
       'enabled-destroy-cancels-timer-and-frame', 'parent-restoration-failure-cannot-leak-animation-work'])
       assert.equal(actual.find(c => c.id === id).result, 'fail', 'pre-fix source must demonstrate ' + id);
@@ -253,3 +265,5 @@ if(args.length) {
   assert.equal(existsSync(args[1]), false);writeFileSync(args[1], JSON.stringify(report, null, 2) + '\n');
 }
 console.log(JSON.stringify({cases: cases.length, mutants_rejected: mutations.length,node: report.node,compiler: report.compiler,runtime_peer: report.runtime_peer}));
+
+}

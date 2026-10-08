@@ -34,6 +34,7 @@ import {supportsShadowDom} from '../internal/owned-shadow-dom';
 import {MatLegacyDialogContainer} from './dialog-container';
 import {_MatDialogContainerBase} from './internal/dialog-container-base';
 import {MatDialogConfig} from '@angular/material/dialog';
+import {MatLegacyDialogConfig} from './dialog-config';
 import {ComponentPortal} from '@angular/cdk/portal';
 import {LEGACY_ANIMATIONS_TEST_OVERRIDE} from '../legacy-core/internal/legacy-animations';
 import {OverlayContainer, ScrollStrategy, Overlay, OverlayRef} from '@angular/cdk/overlay';
@@ -2360,6 +2361,71 @@ describe('Owned legacy dialog initial focus', () => {
     }
   }));
 
+  it('should retain the legacy leaf change-detector and monitor argument order outside DI', fakeAsync(() => {
+    const view = TestBed.createComponent(LegacyInitialFocusProbe);
+    view.detectChanges();
+    const marked = spyOn(view.changeDetectorRef, 'markForCheck').and.callThrough();
+    const target = document.createElement('button');
+    const host = document.createElement('div');
+    host.tabIndex = -1;
+    document.body.append(target, host);
+    const config = new MatLegacyDialogConfig();
+    config.restoreFocus = target;
+    const overlay = TestBed.inject(Overlay).create();
+    const monitor = TestBed.inject(FocusMonitor);
+    const focused = spyOn(monitor, 'focusVia').and.callThrough();
+    const container = new MatLegacyDialogContainer(new ElementRef(host),
+      TestBed.inject(FocusTrapFactory), document, config, TestBed.inject(InteractivityChecker),
+      TestBed.inject(NgZone), overlay, view.changeDetectorRef, monitor);
+    try {
+      expect(container._config).toBe(config);
+      expect(container._state).toBe('enter');
+      expect(container._animationsEnabled).toBe(true);
+      container._startExitAnimation();
+      expect(marked).toHaveBeenCalledTimes(1);
+      flush();
+      host.focus();
+      container._closeInteractionType = 'keyboard';
+      container.ngOnDestroy();
+      expect(focused).toHaveBeenCalledWith(target, 'keyboard');
+      expect(document.activeElement).toBe(target);
+    } finally {
+      container.ngOnDestroy();
+      overlay.dispose();
+      target.remove();
+      host.remove();
+      view.destroy();
+    }
+  }));
+
+  it('should permit the legacy leaf eighth detector argument without a ninth monitor', fakeAsync(() => {
+    const view = TestBed.createComponent(LegacyInitialFocusProbe);
+    view.detectChanges();
+    const target = document.createElement('button');
+    const host = document.createElement('div');
+    host.tabIndex = -1;
+    document.body.append(target, host);
+    const config = new MatLegacyDialogConfig();
+    config.restoreFocus = target;
+    const overlay = TestBed.inject(Overlay).create();
+    const container = new MatLegacyDialogContainer(new ElementRef(host),
+      TestBed.inject(FocusTrapFactory), document, config, TestBed.inject(InteractivityChecker),
+      TestBed.inject(NgZone), overlay, view.changeDetectorRef);
+    const focused = spyOn(target, 'focus').and.callThrough();
+    try {
+      host.focus();
+      container.ngOnDestroy();
+      expect(focused).toHaveBeenCalledTimes(1);
+      expect(document.activeElement).toBe(target);
+    } finally {
+      container.ngOnDestroy();
+      overlay.dispose();
+      target.remove();
+      host.remove();
+      view.destroy();
+    }
+  }));
+
   it('should use the public initial-focus marker without creating trap anchors', fakeAsync(() => {
     const fixture = TestBed.createComponent(LegacyInitialFocusProbe);
     fixture.detectChanges();
@@ -2412,15 +2478,28 @@ for (const mode of ['enabled', 'di-disabled'] as const) {
       imports: [MatLegacyDialogModule],
       declarations: [LegacyMotionContent],
       providers: [
-        {provide: MatDialogConfig, useFactory: () => {
-          const config = new MatDialogConfig();
+        {provide: MatLegacyDialogConfig, useFactory: () => {
+          const config = new MatLegacyDialogConfig();
           config.restoreFocus = false;
           return config;
         }},
+        {provide: MatDialogConfig, useExisting: MatLegacyDialogConfig},
         {provide: OverlayRef, useValue: {backdropClick: () => new Subject<MouseEvent>()}},
         {provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: mode},
       ],
     }));
+
+    it('should instantiate the original leaf constructor with the scoped legacy config token', () => {
+      const fixture = TestBed.createComponent(MatLegacyDialogContainer);
+      fixture.detectChanges();
+      expect(fixture.componentInstance._config).toBe(TestBed.inject(MatLegacyDialogConfig));
+      expect(fixture.componentInstance._config).toBe(TestBed.inject(MatDialogConfig));
+      expect(fixture.componentInstance._config.ariaModal).toBe(true);
+      expect(fixture.componentInstance._config.maxWidth).toBe('80vw');
+      expect(fixture.componentInstance._state).toBe('enter');
+      expect(fixture.componentInstance._animationsEnabled).toBe(mode === 'enabled');
+      fixture.destroy();
+    });
 
     it('should cancel queued open work on actual fixture destruction', fakeAsync(() => {
       const fixture = TestBed.createComponent(MatLegacyDialogContainer);
@@ -2455,11 +2534,11 @@ for (const mode of ['enabled', 'di-disabled'] as const) {
 
     if (mode === 'enabled') {
       it('should settle a zero-duration open visibly even before an animation frame', fakeAsync(() => {
-        const config = new MatDialogConfig();
-        config.enterAnimationDuration = 0;
-        config.exitAnimationDuration = 0;
+        const config = new MatLegacyDialogConfig();
+        config.enterAnimationDuration = '0ms';
+        config.exitAnimationDuration = '0ms';
         config.restoreFocus = false;
-        TestBed.overrideProvider(MatDialogConfig, {useValue: config});
+        TestBed.overrideProvider(MatLegacyDialogConfig, {useValue: config});
         const fixture = TestBed.createComponent(MatLegacyDialogContainer);
         fixture.detectChanges();
         const states: string[] = [];

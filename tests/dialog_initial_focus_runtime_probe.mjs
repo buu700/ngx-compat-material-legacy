@@ -80,7 +80,8 @@ export function fixture(Base, autoFocus = 'first-tabbable', isBrowser = true, mo
   host.children = [first, second, heading];
   const checker = {isFocusable: node => node.focusable, isTabbable: node => node.tabbable};
   const zone = {runOutsideAngular: callback => callback()};
-  const config = {autoFocus, restoreFocus: false, ...mode.config};
+  const config = Object.assign(mode.configFactory ? mode.configFactory() : {},
+    {autoFocus, restoreFocus: false, ...mode.config});
   const backdrop = new Subject();
   const overlay = {backdropClick: () => backdrop, keydownEvents: () => new Subject(),
     outsidePointerEvents: () => new Subject(), detachments: () => new Subject(),
@@ -120,10 +121,18 @@ export function fixture(Base, autoFocus = 'first-tabbable', isBrowser = true, mo
     ] : []),
     ...(mode.providers || []),
   ]});
-  const args = [new core.ElementRef(host), factory, mode.noDocument ? null : document,
+  const baseArgs = [new core.ElementRef(host), factory, mode.noDocument ? null : document,
     config, checker, zone, overlay, ...(mode.noMonitor ? [] : [monitor])];
-  const instance = mode.manual ? new Base(...args)
-    : core.runInInjectionContext(injector, () => new Base(...args));
+  const args = mode.mapArguments ? mode.mapArguments(baseArgs, injector) : baseArgs;
+  let instance;
+  try {
+    instance = mode.manual ? new Base(...args)
+      : core.runInInjectionContext(injector, () => new Base(...args));
+  } catch (error) {
+    injector.destroy();
+    if (hadDocument) globalThis.document = priorDocument; else delete globalThis.document;
+    throw error;
+  }
   if (owner) owner.containerInstance = instance;
   let notifications = 0, completed = 0;
   instance._focusTrapped.subscribe({next() { notifications++; log.push({kind: 'notification'}); },
