@@ -37,6 +37,8 @@ Legacy Angular Animations is not part of the target runtime. Component behavior 
 
 ## Compatibility and contribution
 
+MatLegacyMenuItem and MatLegacyTable use zero-argument construction through Angular node DI. Their old manual dependency arguments are unsupported and reject at compile time and runtime. In particular, the original table constructor's supplied repeater, viewport and style scheduler are retired; use the supported Angular table inputs and providers. Table data-source and row/column definition constructors are separate APIs. This construction change requires no consumer template or stylesheet edits.
+
 Support only version combinations published in the tested matrix once that matrix exists. Build success alone is not visual parity. Contributions require preserved tests, provenance and explicit API/CSS exception review. No guaranteed response time or enterprise support is implied. See `CONTRIBUTING.md`, `SECURITY.md`, and `AGENTS.md`.
 
 ## Origin and license
