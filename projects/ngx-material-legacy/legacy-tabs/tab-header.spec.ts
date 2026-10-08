@@ -17,6 +17,7 @@ import {
   ComponentFixture,
   discardPeriodicTasks,
   fakeAsync,
+  flushMicrotasks,
   TestBed,
   tick,
 } from '@angular/core/testing';
@@ -45,6 +46,75 @@ describe('MatTabHeader', () => {
 
     TestBed.compileComponents();
   }));
+
+  describe('header lifetime', () => {
+    it('does not realign a queued direction change after destruction', fakeAsync(() => {
+      fixture = TestBed.createComponent(SimpleTabHeaderApp);
+      fixture.detectChanges();
+      const header = fixture.componentInstance.tabHeader;
+      const update = spyOn(header, 'updatePagination').and.callThrough();
+      const align = spyOn(header._inkBar, 'alignToElement').and.callThrough();
+
+      fixture.componentInstance.dir = 'rtl';
+      fixture.detectChanges();
+      fixture.destroy();
+      update.calls.reset();
+      align.calls.reset();
+      flushMicrotasks();
+
+      expect(update).not.toHaveBeenCalled();
+      expect(align).not.toHaveBeenCalled();
+    }));
+
+    it('does not focus a label when an indexFocused observer destroys the fixture', () => {
+      fixture = TestBed.createComponent(SimpleTabHeaderApp);
+      fixture.detectChanges();
+      const header = fixture.componentInstance.tabHeader;
+      const focus = spyOn(header._items.get(1)!, 'focus').and.callThrough();
+      const subscription = header.indexFocused.subscribe(() => fixture.destroy());
+
+      header.focusIndex = 1;
+
+      expect(focus).not.toHaveBeenCalled();
+      subscription.unsubscribe();
+    });
+
+    it('does not reset container scroll when a native label focus destroys the fixture', () => {
+      fixture = TestBed.createComponent(SimpleTabHeaderApp);
+      fixture.detectChanges();
+      const header = fixture.componentInstance.tabHeader;
+      const label = header._items.get(1)!.elementRef.nativeElement;
+      const scroll = spyOnProperty(header._tabListContainer.nativeElement, 'scrollLeft', 'set')
+        .and.callThrough();
+      let destroyed = false;
+      label.tabIndex = 0;
+      label.addEventListener('focus', () => {
+        destroyed = true;
+        fixture.destroy();
+      }, {once: true});
+
+      header.focusIndex = 1;
+
+      expect(destroyed).toBe(true);
+      expect(scroll).not.toHaveBeenCalled();
+    });
+
+    it('cancels paginator work and ignores later presses after destruction', fakeAsync(() => {
+      fixture = TestBed.createComponent(SimpleTabHeaderApp);
+      fixture.componentInstance.addTabsForScrolling();
+      fixture.detectChanges();
+      const header = fixture.componentInstance.tabHeader;
+      const scroll = spyOn(header, '_scrollHeader').and.callThrough();
+
+      header._handlePaginatorPress('after');
+      fixture.destroy();
+      header._handlePaginatorPress('after');
+      tick(850);
+
+      expect(scroll).not.toHaveBeenCalled();
+      discardPeriodicTasks();
+    }));
+  });
 
   describe('focusing', () => {
     let tabListContainer: HTMLElement;
