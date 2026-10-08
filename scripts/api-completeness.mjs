@@ -28,6 +28,7 @@ import {
   bindingProblems,
 } from './api-surface.mjs';
 import {observeRuntimeDi, expectedFactoryDi} from './api-di-observe.mjs';
+import {MENU_ITEM_SYMBOL, approvedMenuItemContract} from './menu-item-construction-contract.mjs';
 
 // verify-lite imports this module before node_modules exists. Load the parser
 // on first use so compareContracts can be unit-tested without typescript.
@@ -493,6 +494,22 @@ export function settleDi(row, records) {
         : (row.symbol.shape.diParams || []).filter(param=>!param.attribute))
         .map(param => `${param.ident}${param.optional ? '?' : ''}`).join('|');
   const owned = row.observed.join('|');
+  if (row.symbol.symbol_id === MENU_ITEM_SYMBOL) {
+    const contract = approvedMenuItemContract(row.symbol);
+    const observation = row.approved_construction;
+    const complete = observation?.profile_id === contract.profile_id
+      && observation.contract_sha256 === contract.contract_sha256
+      && row.factory_outcome === 'returned'
+      && row.observed.length === contract.runtime_requests.length
+      && Array.isArray(observation.behavior_problems) && observation.behavior_problems.length === 0
+      && observation.root_requests?.length === 1 && observation.root_requests[0].unresolved === false
+      && observation.root_requests[0].optional === false
+      && observation.counts?.borrowedDestroyed === 0 && observation.counts.styles > 0;
+    if (!complete) return {...row, result: 'fail', status: 'mismatch', historical, owned,
+      problems: [...row.problems, 'authorized menu construction observation incomplete']};
+    if (!row.problems.length) return {...row, result: 'pass', status: 'intentional-legacy-difference', historical, owned,
+      rationale: 'Owner accepted Angular DI construction while preserving the genuine public parent and Material16 markup/styles. Original five-dependency/manual constructor evidence is retained. This exact executed public/owned context is checked by object identity, flags, real root resolution and lifetime behavior.'};
+  }
   if (!row.problems.length) {
     return {...row, result: 'pass', status: 'match', historical, owned};
   }

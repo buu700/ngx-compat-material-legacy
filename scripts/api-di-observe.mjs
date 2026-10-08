@@ -1,6 +1,8 @@
 import {existsSync} from 'node:fs';
 import {pathToFileURL} from 'node:url';
 import {join,resolve} from 'node:path';
+import {approvedMenuItemContract} from './menu-item-construction-contract.mjs';
+import {observeMenuItemFactory} from './api-menu-item-factory.mjs';
 
 // verify-lite imports the checker before node_modules exists. Load Angular
 // only when a packed factory is actually executed.
@@ -131,6 +133,7 @@ export function expectedFactoryDi(shape, context = {}) {
 // Historical constructors name the original token; the finite public export map
 // exposes its independently owned legacy identity. Never match these by description.
 const ownedTokenExports = {
+  'legacy-menu': {MAT_MENU_PANEL: 'MAT_LEGACY_MENU_PANEL'},
   'legacy-core': {MATERIAL_SANITY_CHECKS: 'MATERIAL_LEGACY_SANITY_CHECKS'},
   'legacy-form-field': {
     MAT_FORM_FIELD: 'MAT_LEGACY_FORM_FIELD', MAT_ERROR: 'MAT_LEGACY_ERROR',
@@ -188,9 +191,9 @@ export function injectionTokenMatches(value, InjectionToken, expectedDescription
   return value instanceof InjectionToken && String(value) === `InjectionToken ${expectedDescription}`;
 }
 
-export async function observeRuntimeDi(packageRoot, symbols, differences = []) {
-  const {Injector, InjectionToken, runInInjectionContext, isDevMode} = await import('@angular/core');
-  await import('@angular/compiler');
+export async function observeRuntimeDi(packageRoot, symbols, differences = [], importModule = spec => import(spec)) {
+  const {Injector, InjectionToken, runInInjectionContext, isDevMode} = await importModule('@angular/core');
+  await importModule('@angular/compiler');
   const results = [];
   for (const symbol of symbols) {
     if (!symbol.di_id) continue;
@@ -216,11 +219,15 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = []) {
       results.push({symbol, problems, observed: []});
       continue;
     }
-    const factory = runFactory(value.ɵfac, Injector, runInInjectionContext);
+    const construction = approvedMenuItemContract(symbol);
+    const factory = construction ? await observeMenuItemFactory(value, loaded, importModule)
+      : runFactory(value.ɵfac, Injector, runInInjectionContext);
     const observed = factory.requests;
     const invalidReference = symbol.shape.originalFactory?.deps_kind === 'invalid';
     const runtime_context = {devMode: isDevMode()};
-    const expected = invalidReference ? [] : expectedFactoryDi(symbol.shape, runtime_context);
+    const expected = invalidReference ? [] : construction?.runtime_requests
+      || expectedFactoryDi(symbol.shape, runtime_context);
+    if (construction) problems.push(...factory.behaviorProblems.map(problem => `factory ${symbol.symbol_id} ${problem}`));
     for (const issue of factoryExecutionProblems(symbol.shape.originalFactory?.deps_kind, factory)) {
       problems.push(`factory ${symbol.symbol_id} ${issue}`);
     }
@@ -233,14 +240,18 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = []) {
         const primary = symbol.kind === 'primary' ? loaded : await loadRuntimeModule(packageRoot, symbol.family, 'primary');
         const exports = {...(primary || {}),...loaded};
         const same = await runtimeTokenIdentity(symbol.family, param, exports,
-          originalRuntimeAliases(symbols, symbol.family), got.token);
+          originalRuntimeAliases(symbols, symbol.family), got.token, importModule);
         if (!same) problems.push(`token ${symbol.symbol_id}[${index}] expected ${param.ident} observed ${got.label}`);
         if (Boolean(param.optional) !== Boolean(got.optional)) {
           problems.push(`optional ${symbol.symbol_id}[${index}] expected ${Boolean(param.optional)} observed ${Boolean(got.optional)}`);
         }
       }
     }
-    results.push({symbol, problems, runtime_context, factory_unresolved_provider_labels:observed.filter(request=>request.unresolved).map(request=>request.label), factory_outcome:factory.outcome, factory_error:factory.error, original_factory_kind:symbol.shape.originalFactory?.deps_kind ?? null, original_inherited_factory:symbol.shape.originalFactory?.inherited_factory?.name ?? null, constructor_attributes:[...new Set([...(symbol.shape.originalFactory?.inherited_factory?.attributes || []),...(symbol.shape.diParams || []).filter(param=>param.attribute).map(param=>param.attribute)])], observed: observed.map(item => `${item.label}${item.optional ? '?' : ''}`)});
+    results.push({symbol, problems, runtime_context, factory_unresolved_provider_labels:observed.filter(request=>request.unresolved).map(request=>request.label), factory_outcome:factory.outcome, factory_error:factory.error, original_factory_kind:symbol.shape.originalFactory?.deps_kind ?? null, original_inherited_factory:symbol.shape.originalFactory?.inherited_factory?.name ?? null, constructor_attributes:[...new Set([...(symbol.shape.originalFactory?.inherited_factory?.attributes || []),...(symbol.shape.diParams || []).filter(param=>param.attribute).map(param=>param.attribute)])], observed: observed.map(item => `${item.label}${item.optional ? '?' : ''}`),
+      ...(construction ? {approved_construction: {profile_id: construction.profile_id,
+        contract_sha256: construction.contract_sha256, context: factory.context,
+        behavior_problems: factory.behaviorProblems, counts: factory.counts,
+        root_requests: factory.rootRequests.map(request => ({optional: request.optional, unresolved: request.unresolved}))}} : {})});
   }
   return results;
 }
