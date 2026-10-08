@@ -13,6 +13,7 @@ import {createRequire} from 'node:module';
 import {fileURLToPath} from 'node:url';
 import {MENU_ITEM_SYMBOL, approvedMenuItemSignatureRecord} from './menu-item-construction-contract.mjs';
 import {TABLE_SYMBOL, approvedTableSignatureRecord} from './table-construction-contract.mjs';
+import {RIPPLE_SYMBOL,rippleReexportSignatureProblems} from './ripple-construction-contract.mjs';
 import {originalCompilerFactoryContext, originalPublishedJitFactory} from './api-original-factory-contexts.mjs';
 
 const require = createRequire(import.meta.url);
@@ -994,6 +995,49 @@ function flattenPacked(node, index, sourceFile, seen) {
   };
 }
 
+/** Follow only the public root's named declaration binding, read-only; no private symbol import. */
+function publicReexportConstructor(spec,name,containing){
+ const options={moduleResolution:ts.ModuleResolutionKind.Bundler,module:ts.ModuleKind.ESNext};
+ const first=ts.resolveModuleName(spec,containing,options,ts.sys).resolvedModule;
+ if(!first)return null;
+ const sources=[],seen=new Set();
+ let peerVersion=null,peerDirectory=dirname(first.resolvedFileName);
+ while(peerDirectory!==dirname(peerDirectory)){
+  const path=join(peerDirectory,'package.json');
+  if(existsSync(path)){
+   const bytes=readFileSync(path),pkg=JSON.parse(bytes);
+   if(pkg.name!=='@angular/material')return null;
+   peerVersion=pkg.version;sources.push({path,sha256:createHash('sha256').update(bytes).digest('hex')});break;
+  }
+  peerDirectory=dirname(peerDirectory);
+ }
+ if(!peerVersion)return null;
+ function follow(file,wanted){
+  const key=file+'#'+wanted;if(seen.has(key))return null;seen.add(key);
+  const bytes=readFileSync(file),source=ts.createSourceFile(file,bytes.toString(),ts.ScriptTarget.Latest,true);
+  if(source.parseDiagnostics.length)return null;
+  sources.push({path:file,sha256:createHash('sha256').update(bytes).digest('hex')});
+  const declaration=source.statements.find(node=>ts.isClassDeclaration(node)&&node.name?.text===wanted);
+  if(declaration)return {public_spec:spec,public_peer_version:peerVersion,declaration_name:declaration.name.text,
+    constructors:declaredMembers(declaration,source).signatures.filter(sig=>sig.includes(' constructor(')),
+    shape:packedShape(source,wanted),sources};
+  for(const statement of source.statements){
+   if(!ts.isExportDeclaration(statement)||!statement.exportClause||!ts.isNamedExports(statement.exportClause))continue;
+   for(const element of statement.exportClause.elements){
+    if(element.name.text!==wanted)continue;
+    const imported=element.propertyName?.text||element.name.text;
+    const binding=importBindings(source).get(imported),nextSpec=statement.moduleSpecifier?.text||binding?.spec;
+    const nextName=statement.moduleSpecifier?imported:binding?.imported;
+    if(!nextSpec?.startsWith('.')||!nextName)return null;
+    const next=ts.resolveModuleName(nextSpec,file,options,ts.sys).resolvedModule;
+    return next?follow(next.resolvedFileName,nextName):null;
+   }
+  }
+  return null;
+ }
+ return follow(first.resolvedFileName,name);
+}
+
 export function packedShape(sourceFile, name) {
   const index = indexFile(sourceFile);
   let declarationName = name;
@@ -1016,7 +1060,7 @@ export function packedShape(sourceFile, name) {
         const spec = statement.moduleSpecifier
           ? statement.moduleSpecifier.text
           : importSpecFor(sourceFile, imported);
-        return {
+        const detail = {
           kind: 'reexport',
           signatures: [`reexport ${imported} from ${spec}`],
           requiredProtected: [],
@@ -1024,6 +1068,9 @@ export function packedShape(sourceFile, name) {
           comparison: 'signature',
           reexport: {spec, imported},
         };
+        if(name==='MatLegacyRipple'&&spec==='@angular/material/core'&&imported==='MatRipple')
+          detail.public_constructor_observation=publicReexportConstructor(spec,imported,sourceFile.fileName);
+        return detail;
       }
       if (node) break;
     }
@@ -1257,6 +1304,20 @@ export function compareSignatures(symbol, packed, differences) {
       && packed.reexport.imported === historical.reexport.imported
       && packed.reexport.spec === historical.reexport.spec;
     if (same) {
+      if(symbol.symbol_id===RIPPLE_SYMBOL){
+        const problems=rippleReexportSignatureProblems(symbol,packed);
+        const proof=packed.public_constructor_observation;
+        const replaceCtor=signatures=>[...(signatures||[]).filter(sig=>!sig.includes(' constructor(')),proof?.constructors?.[0]];
+        const actual=problems.length?null:compareSignatures({...symbol,symbol_id:'ripple-public-remaining-members',shape:{...historical,
+          reexport:null,ownSignatures:replaceCtor(historical.ownSignatures),signatures:replaceCtor(historical.signatures)}},proof.shape,[]);
+        const blocking=[...problems,...(actual?.blocking||[])];
+        return {comparison:'signature',blocking,rows:problems.length?[]:[...(actual?.rows||[]),{
+          status:'intentional-legacy-difference',historical:historical.ownSignatures.find(sig=>sig.includes(' constructor(')),
+          owned:packed.public_constructor_observation.constructors[0],
+          rationale:'Maintainer delegates conservative TypeScript changes subject to unchanged required consumer styles and Cyph sanity. Shared public ripple identity is retained; actual public zero-argument declaration is read rather than inferred from a matching re-export label.'}],
+          reported_signatures:problems.length?[]:actual.reported_signatures,
+          required_protected:historical.requiredProtected||[],required_constructor:true};
+      }
       const sig = `reexport ${historical.reexport.imported} from ${historical.reexport.spec}`;
       return {
         comparison: 'signature',
