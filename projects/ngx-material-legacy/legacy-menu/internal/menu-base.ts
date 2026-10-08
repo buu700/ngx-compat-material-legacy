@@ -63,16 +63,15 @@ import {startWith, switchMap, take} from 'rxjs/operators';
 import {
   MAT_MENU_CONTENT,
   MAT_MENU_DEFAULT_OPTIONS,
-  MAT_MENU_PANEL,
   MatMenuDefaultOptions,
   MatMenuItem,
-  MatMenuPanel,
   MenuCloseReason,
   MenuPositionX,
   MenuPositionY,
 } from '@angular/material/menu';
 import {throwMatMenuInvalidPositionX, throwMatMenuInvalidPositionY} from './menu-errors';
 import {_MatMenuContentBase} from './menu-content-base';
+import type {MatMenuPanel} from './menu-panel';
 
 let menuPanelUid = 0;
 

@@ -44,12 +44,12 @@ import {LEGACY_NOOP_ANIMATIONS} from '../internal/testing/owned-animation-module
 import {Subject} from 'rxjs';
 import {
   MAT_MENU_DEFAULT_OPTIONS,
-  MatMenuPanel,
   MenuPositionX,
   MenuPositionY,
   MAT_MENU_SCROLL_STRATEGY,
 } from '@angular/material/menu';
 import {MatLegacyMenu, MatLegacyMenuItem, MatLegacyMenuModule, MatLegacyMenuTrigger} from './index';
+import type {MatLegacyMenuPanel as MatMenuPanel} from './index';
 
 const MENU_PANEL_TOP_PADDING = 8;
 
