@@ -7,10 +7,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /** Capture actual compiler-factory constructor inputs without changing its code or Angular hooks. */
-export function captureFactoryConstructorInputs(Type,factory=Type.ɵfac){
+export function captureFactoryConstructorInputs(Type,factory=Type.ɵfac,{beforeConstructor}={}){
  let inputs,calls=0;
  class Receiver extends Type {
-  constructor(...values){super(...values);inputs=values;calls++;}
+  constructor(...values){beforeConstructor?.(values);super(...values);inputs=values;calls++;}
  }
  const value=factory(Receiver);
  if(calls!==1||!(value instanceof Receiver))throw Error('factory did not preserve its constructor-type override; input evidence unavailable');
