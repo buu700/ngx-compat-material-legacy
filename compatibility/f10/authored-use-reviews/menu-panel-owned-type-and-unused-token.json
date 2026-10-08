@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "status": "reviewed",
+  "recorded_at_utc": "2026-10-08T01:09:01.422682+00:00",
+  "criteria": {
+    "population": "Exact three frozen file/module/symbol identities;no denominator edits or batch-by-name closure.",
+    "removed-use": "Complete original occurrence is unused;no current reference;whole executable emit unchanged.",
+    "owned-replacement": "Complete untouched-tag type declaration owned exactly;all type flags retained;strict consumer/negative evidence and unchanged complete runtime emit.",
+    "limits": "Source/erasure decision only;current native/floor/packed,other private runtime uses,new imports and all other authored uses remain separate obligations."
+  },
+  "reviews": [
+    {
+      "file": "legacy-menu/internal/menu-base.ts",
+      "module": "@angular/material/menu",
+      "symbol": "MAT_MENU_PANEL",
+      "conclusion": "removed-use",
+      "reviewer": "Codex primary implementer",
+      "decision": "The frozen use was an unused named private-token import in the owned menu-base. It has no remaining identifier or import in this complete current source, and the full menu-base emitted JavaScript is identical to its preceding source after retained license comments are ignored. No provider,caller,constructor or runtime token is changed. Close only this unused occurrence;the menu/trigger runtime MAT_MENU_PANEL bridge remains separately open.",
+      "candidate_source_sha256": "c0830fca23f02ec1bbd5377010f1af735341c7049458b4915e70e4d7ebd35b72",
+      "independent_evidence": [
+        {
+          "path": "reference/material-16.2.14/interface-sources/menu-panel.ts",
+          "sha256": "48ae888c7a12b733a45989cf0195bd42298203da9768e5354c31759004883b43"
+        },
+        {
+          "path": "reference/material-16.2.14/interface-sources/menu-panel-provenance.json",
+          "sha256": "d519c85982880fe8a7109cde451392638b377163ee21e5d9ed4b09d6aa598f33"
+        },
+        {
+          "path": "compatibility/rc/menu-panel-type-ownership-source-proof.json",
+          "sha256": "9404a80e1c0c4c6779dd6f4424fdd99ffeea615c921fd851154c151646b86627"
+        }
+      ]
+    },
+    {
+      "file": "legacy-menu/internal/menu-base.ts",
+      "module": "@angular/material/menu",
+      "symbol": "MatMenuPanel",
+      "conclusion": "owned-replacement",
+      "reviewer": "Codex primary implementer",
+      "decision": "This frozen occurrence now resolves exclusively through the owned type-only MatMenuPanel import. The entire independently authenticated Material16 interface declaration,including every required/optional/readonly member,generic callback,recursive parent and event/focus domain,is preserved byte for byte. A real strict consumer and five negative contracts pass;the entire current menu/trigger runtime emit is unchanged. No runtime peer/interface/token call remains for this use. Its public type dependencies and new module remain visible to current policy/audit;this decision grants no minimum21,AOT/packed,consumer-floor or other runtime-use clearance.",
+      "candidate_source_sha256": "c0830fca23f02ec1bbd5377010f1af735341c7049458b4915e70e4d7ebd35b72",
+      "independent_evidence": [
+        {
+          "path": "reference/material-16.2.14/interface-sources/menu-panel.ts",
+          "sha256": "48ae888c7a12b733a45989cf0195bd42298203da9768e5354c31759004883b43"
+        },
+        {
+          "path": "reference/material-16.2.14/interface-sources/menu-panel-provenance.json",
+          "sha256": "d519c85982880fe8a7109cde451392638b377163ee21e5d9ed4b09d6aa598f33"
+        },
+        {
+          "path": "compatibility/rc/menu-panel-type-ownership-source-proof.json",
+          "sha256": "9404a80e1c0c4c6779dd6f4424fdd99ffeea615c921fd851154c151646b86627"
+        }
+      ]
+    },
+    {
+      "file": "legacy-menu/internal/menu-trigger-base.ts",
+      "module": "@angular/material/menu",
+      "symbol": "MatMenuPanel",
+      "conclusion": "owned-replacement",
+      "reviewer": "Codex primary implementer",
+      "decision": "This frozen occurrence now resolves exclusively through the owned type-only MatMenuPanel import. The entire independently authenticated Material16 interface declaration,including every required/optional/readonly member,generic callback,recursive parent and event/focus domain,is preserved byte for byte. A real strict consumer and five negative contracts pass;the entire current menu/trigger runtime emit is unchanged. No runtime peer/interface/token call remains for this use. Its public type dependencies and new module remain visible to current policy/audit;this decision grants no minimum21,AOT/packed,consumer-floor or other runtime-use clearance.",
+      "candidate_source_sha256": "d052a61711194bffb9492d64471f21107441e3d60c28618d13acaf99274c90b0",
+      "independent_evidence": [
+        {
+          "path": "reference/material-16.2.14/interface-sources/menu-panel.ts",
+          "sha256": "48ae888c7a12b733a45989cf0195bd42298203da9768e5354c31759004883b43"
+        },
+        {
+          "path": "reference/material-16.2.14/interface-sources/menu-panel-provenance.json",
+          "sha256": "d519c85982880fe8a7109cde451392638b377163ee21e5d9ed4b09d6aa598f33"
+        },
+        {
+          "path": "compatibility/rc/menu-panel-type-ownership-source-proof.json",
+          "sha256": "9404a80e1c0c4c6779dd6f4424fdd99ffeea615c921fd851154c151646b86627"
+        }
+      ]
+    }
+  ],
+  "g11_claim": "not-passed"
+}
