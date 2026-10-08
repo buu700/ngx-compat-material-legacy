@@ -13,10 +13,19 @@ const flags=['optional','self','skipSelf','host'];
 
 /** Candidate compiler observations must agree with original expectations and actual token objects. */
 export async function attributeFactoryContract(Type,core,source,originalParameters,matchToken){
- const compiler=compilerConstructorContract(source,Type.name);
- if(!Object.hasOwn(Type,'ctorParameters')||typeof Type.ctorParameters!=='function')
+ const compiler=compilerConstructorContract(source,Type.name,{resolveInherited:true});
+ let parameterType=Type;
+ for(const [index,name]of compiler.inheritance.entries()){
+  if(typeof parameterType!=='function'||parameterType.name!==name)
+   throw Error('actual runtime constructor inheritance differs');
+  if(index<compiler.inheritance.length-1){
+   if(Object.hasOwn(parameterType,'ctorParameters'))throw Error('inherited class has unexpected own constructor metadata');
+   parameterType=Object.getPrototypeOf(parameterType);
+  }
+ }
+ if(!Object.hasOwn(parameterType,'ctorParameters')||typeof parameterType.ctorParameters!=='function')
   throw Error('explicit owned constructor reflection metadata required');
- const metadata=Type.ctorParameters();
+ const metadata=parameterType.ctorParameters();
  if(!Array.isArray(metadata)||metadata.length!==originalParameters.length||compiler.parameters.length!==metadata.length)
   throw Error('original/compiler/runtime constructor parameter counts differ');
  const parameters=[];
@@ -87,7 +96,7 @@ export function executeAttributeFactory(Type,core,contract,node,runFactory,attri
    scope_challenge:parameter.token===core.ChangeDetectorRef?'pending-public-view-destruction':null});
  }
  return {...factory,value:captured.value,requests:[...requests,...factory.requests],constructorEvidence,detectors,
-  compilerObservation:contract.compiler};
+  compilerObservation:{...contract.compiler,runtime_inheritance_verified:true}};
 }
 
 /** Only after checking that the owned instance left borrowed nodes alive. */
@@ -109,6 +118,12 @@ export function attributeConstructorObservationProblems(row){
  if(!Array.isArray(evidence)||evidence.length!==parameters.length||!compiler
   ||!Array.isArray(compiler.parameters)||compiler.parameters.length!==parameters.length)
   return ['attribute constructor execution/correlation evidence incomplete'];
+ if(compiler.runtime_inheritance_verified!==true||!Array.isArray(compiler.inheritance)||!compiler.inheritance.length
+  ||compiler.inheritance.some(name=>typeof name!=='string'||!name)
+  ||new Set(compiler.inheritance).size!==compiler.inheritance.length
+  ||compiler.inheritance[0]!==compiler.class_name
+  ||compiler.inheritance.at(-1)!==compiler.parameter_class_name)
+  return ['attribute constructor inheritance evidence incomplete'];
  const problems=[];
  for(let index=0;index<parameters.length;index++){
   const original=parameters[index],observed=evidence[index],declared=compiler.parameters[index];

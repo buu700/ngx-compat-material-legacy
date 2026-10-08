@@ -14,10 +14,11 @@ const require=createRequire(import.meta.url);
  * retained constructor reflection metadata. This is not a historical oracle or
  * runtime qualification. Unknown/multiple/manual factory writes are rejected.
  */
-export function compilerConstructorContract(source,name){
+export function compilerConstructorContract(source,name,{resolveInherited=false,ancestors=[]}={}){
+ if(ancestors.includes(name))throw Error('compiler factory inheritance cycle');
  const ts=require('typescript'),file=ts.createSourceFile('owned.mjs',source,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);
  if(file.parseDiagnostics.length)throw Error('owned compiler source does not parse');
- const coreNamespaces=new Set(),imports=new Map(),factories=[],metadata=[],writes=[];
+ const coreNamespaces=new Set(),imports=new Map(),factories=[],metadata=[],writes=[],classes=[];
  for(const statement of file.statements){
   if(!ts.isImportDeclaration(statement))continue;
   const bindings=statement.importClause?.namedBindings,spec=statement.moduleSpecifier.text;
@@ -41,6 +42,7 @@ export function compilerConstructorContract(source,name){
  const isCoreCall=(node,method)=>ts.isCallExpression(node)&&ts.isPropertyAccessExpression(node.expression)
   &&ts.isIdentifier(node.expression.expression)&&coreNamespaces.has(node.expression.expression.text)&&node.expression.name.text===method;
  const visit=node=>{
+  if(ts.isClassDeclaration(node)&&node.name?.text===name)classes.push(node);
   if((ts.isVariableDeclaration(node)||ts.isParameter(node)||ts.isFunctionDeclaration(node)||ts.isClassDeclaration(node))
    &&node.name&&ts.isIdentifier(node.name)&&imports.has(node.name.text))throw Error('imported compiler identity is shadowed');
   if(ts.isBinaryExpression(node)&&ts.isElementAccessExpression(node.left)&&owner(node.left.expression)===name
@@ -55,6 +57,8 @@ export function compilerConstructorContract(source,name){
   }
   if(ts.isCallExpression(node)&&ts.isPropertyAccessExpression(node.expression)&&node.expression.name.text==='defineProperty'
    &&owner(node.arguments[0])===name&&node.arguments[1]?.text==='ɵfac')writes.push(node);
+  if(ts.isCallExpression(node)&&ts.isPropertyAccessExpression(node.expression)&&node.expression.name.text==='setPrototypeOf'
+   &&owner(node.arguments[0])===name)throw Error('manual owned constructor inheritance mutation unsupported');
   if(isCoreCall(node,'ɵɵngDeclareClassMetadata')){const row=fields(node.arguments[0]);if(row.get('type')&&text(row.get('type'))===name)metadata.push(row);}
   ts.forEachChild(node,visit);
  };visit(file);
@@ -62,6 +66,15 @@ export function compilerConstructorContract(source,name){
  const factory=factories[0],classMetadata=metadata[0];
  if(!factory.get('type')||text(factory.get('type'))!==name)throw Error('factory type does not match owned class');
  const deps=factory.get('deps'),ctor=classMetadata.get('ctorParameters');
+ if(resolveInherited&&deps?.kind===ts.SyntaxKind.NullKeyword){
+  if(ctor||classes.length!==1||classes[0].members.some(ts.isConstructorDeclaration))
+   throw Error('inherited compiler factory has ambiguous/explicit own constructor');
+  const heritage=classes[0].heritageClauses?.filter(h=>h.token===ts.SyntaxKind.ExtendsKeyword);
+  const parent=heritage?.length===1&&heritage[0].types.length===1?heritage[0].types[0].expression:null;
+  if(!parent||!ts.isIdentifier(parent))throw Error('explicit owned parent class required for inherited factory');
+  const inherited=compilerConstructorContract(source,parent.text,{resolveInherited:true,ancestors:[...ancestors,name]});
+  return {...inherited,class_name:name,inheritance:[name,...inherited.inheritance]};
+ }
  if(!deps||!ts.isArrayLiteralExpression(deps)||!ctor||!ts.isArrowFunction(ctor)||!ts.isArrayLiteralExpression(ctor.body))throw Error('explicit constructor arrays required; inherited/invalid/unavailable cases remain unresolved');
  if(deps.elements.length!==ctor.body.elements.length)throw Error('factory and constructor metadata counts differ');
  const expression=node=>{
@@ -110,5 +123,6 @@ export function compilerConstructorContract(source,name){
   for(const key of Object.keys(flags))if(boolean(dep,key)!==flags[key])throw Error('factory/metadata '+key+' differs');
   result.push({index,token_expression:observed,attribute,...flags});
  }
- return {class_name:name,parameters:result,role:'actual compiler observation correlation; runtime/historical identity proof still required'};
+ return {class_name:name,parameter_class_name:name,inheritance:[name],parameters:result,
+  role:'actual compiler observation correlation; runtime/historical identity proof still required'};
 }
