@@ -13,7 +13,7 @@ import {
 } from '@angular/cdk/table';
 import {coerceBooleanProperty} from '@angular/cdk/coercion';
 
-import {ChangeDetectionStrategy, Component, Directive, ViewEncapsulation} from '@angular/core';
+import {assertInInjectionContext, ChangeDetectionStrategy, Component, Directive, ViewEncapsulation} from '@angular/core';
 
 type BooleanInput = string | boolean | null | undefined;
 
@@ -82,6 +82,13 @@ export class MatLegacyRecycleRows {
   changeDetection: ChangeDetectionStrategy.Default,
 })
 export class MatLegacyTable<T> extends CdkTable<T> {
+  /** Construct through Angular node DI; manual dependency arguments are unsupported. */
+  constructor() {
+    if (arguments.length) throw new Error('MatLegacyTable manual dependency arguments are not supported.');
+    assertInInjectionContext(MatLegacyTable);
+    super();
+  }
+
   /** Preserve original coercion for direct writes as well as template inputs. */
   override get fixedLayout(): boolean { return super.fixedLayout; }
   override set fixedLayout(value: BooleanInput) {

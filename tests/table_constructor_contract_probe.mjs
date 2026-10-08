@@ -6,7 +6,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/** Historical manual construction versus actual public parent; proposed DI policy separate. */
+/** Historical manual construction versus actual public parent and adopted Angular DI policy. */
 import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
 import {createHash} from 'node:crypto';
@@ -109,7 +109,7 @@ check('manual-role-and-optional-zone-contract',()=>{
 });
 assert.equal(historical.filter(c=>c.result!=='pass').length,0,JSON.stringify(historical));
 const f=manualFixture();let outsideError;
-try{new MatLegacyTable(...f.args);}catch(e){outsideError=String(e.message);}assert.match(outsideError,/NG0203|injection context/);
+try{new peer.CdkTable(...f.args);}catch(e){outsideError=String(e.message);}assert.match(outsideError,/NG0203|injection context/);
 const document={},environment=core.createEnvironmentInjector([core.importProvidersFrom(BrowserModule),core.provideZonelessChangeDetection(),
   {provide:core.DOCUMENT,useValue:document},{provide:core.PLATFORM_ID,useValue:'server'},{provide:Platform,useValue:{isBrowser:false}}],core.Injector.NULL);
 const currentRef=new core.ElementRef({nodeName:'MAT-TABLE',setAttribute(){},getAttribute(){return 'grid';}}),detector={markForCheck(){}};
@@ -119,19 +119,10 @@ class NodeContext extends core.Injector{get(token,notFoundValue,options){
   return environment.get(token,notFoundValue,options);
 }}
 let current,proposed;
-const constructor=`  constructor() {
-    if (arguments.length) throw new Error('MatLegacyTable manual dependency arguments are not supported.');
-    assertInInjectionContext(MatLegacyTable);
-    super();
-  }
-`;
-const proposedSource=source.replace('ChangeDetectionStrategy, Component, Directive, ViewEncapsulation','assertInInjectionContext, ChangeDetectionStrategy, Component, Directive, ViewEncapsulation')
-  .replace('export class MatLegacyTable<T> extends CdkTable<T> {','export class MatLegacyTable<T> extends CdkTable<T> {\n'+constructor);
-assert.notEqual(proposedSource,source);
-const Proposed=(await import(data(emit(proposedSource)))).MatLegacyTable;
+const Proposed=MatLegacyTable;
 const policy=[];
 try{
-  const context=new NodeContext();current=core.runInInjectionContext(context,()=>new MatLegacyTable(...f.args));
+  const context=new NodeContext();current=core.runInInjectionContext(context,()=>new peer.CdkTable(...f.args));
   assert.equal(current._elementRef,currentRef);assert.notEqual(current._elementRef,f.args[2]);current.ngOnInit();current.ngAfterContentInit();
   assert.notEqual(current._viewRepeater,f.args[7]);assert.notEqual(current._viewportRuler,f.args[9]);assert.equal(f.calls.viewport,0);
   assert.equal(current._coalescedStyleScheduler,undefined);assert.equal(f.calls.scheduled,0);
@@ -140,6 +131,15 @@ try{
   proposed=core.runInInjectionContext(context,()=>new Proposed());assert.ok(proposed instanceof peer.CdkTable);assert.ok(proposed instanceof Proposed);
   assert.equal(proposed._elementRef,currentRef);assert.equal(proposed.stickyCssClass,'mat-table-sticky');assert.equal(proposed.needsPositionStickyOnElement,false);policy.push('genuine public parent/node and legacy sticky settings retained');
   proposed.ngOnInit();proposed.ngAfterContentInit();policy.push('real public parent initialization and default strategy execute');
+  const made=core.runInInjectionContext(context,()=>Proposed.ɵfac());
+  assert.ok(made instanceof Proposed);assert.ok(made instanceof peer.CdkTable);assert.equal(made._elementRef,currentRef);
+  made.ngOnInit();made.ngAfterContentInit();made.ngOnDestroy();policy.push('actual owned Angular JIT factory executes with zero dependency arguments');
+  class ConsumerTable extends Proposed {marker='consumer';}
+  const child=core.runInInjectionContext(context,()=>new ConsumerTable());
+  assert.ok(child instanceof ConsumerTable);assert.ok(child instanceof Proposed);assert.ok(child instanceof peer.CdkTable);assert.equal(child.marker,'consumer');
+  child.ngOnInit();child.ngAfterContentInit();child.ngOnDestroy();policy.push('public parent/subclass initialization retained');
+  for(const args of [[{}],f.args])assert.throws(()=>core.runInInjectionContext(context,()=>Reflect.construct(Proposed,args)),/manual dependency arguments are not supported/);
+  policy.push('single and twelve manual arguments explicitly reject');
 }finally{current?.ngOnDestroy();proposed?.ngOnDestroy();environment.destroy();f.close();}
 const actualPeerPath=req.resolve('@angular/cdk/table'),actualPeerHash=sha(readFileSync(actualPeerPath));
 const subjects=JSON.parse(readFileSync(resolve(root,'compatibility/rc/table-public-module-import-source-proof.json'),'utf8')).subjects;
@@ -148,9 +148,9 @@ const result={node:process.version,compiler:ts.version,source:{path,sha256:sha(B
   decorator_removal:'Only Angular class/member/parameter decorators removed for manual source execution; original constructor bodies, parameters, class fields and called methods preserved.',
   actual_peer:{version:subject.version,sha256:actualPeerHash},historical_contract_cases:historical,
   current_contract_gaps:{outside_di_error:outsideError,inside_di_extra_arguments:'Ignored by current zero-argument parent: original supplied element, custom repeater, viewport and coalescer are not honored.',original_contract_pass:false},
-  proposed_policy:{status:'unapproved proposal only',source:proposedSource,source_sha256:sha(Buffer.from(proposedSource)),passed_cases:policy,changes_rendered_template_or_styles:false},
+  adopted_policy:{status:'maintainer-delegated conservative TypeScript decision; source implemented',source_sha256:sha(Buffer.from(source)),passed_cases:policy,changes_rendered_template_or_styles:false},
   limits:['Actual untouched tagged classes execute with synthetic manual dependencies; style callback/diff work is observed, not native DOM rendering.',
     'Actual public current parent executes under borrowed22.1.7 public node/root context. No actual21/native/AOT/packed/floor qualification.',
-    'Proposed DI policy is isolated source text, not applied to the library or admitted as an original-contract pass.']};
+    'Actual maintained source executes; original manual/customization contract is deliberately retired, not an original-contract pass. Exact API/factory admission and all native/AOT/packed/floor gates remain pending.']};
 const argv=process.argv.slice(2),at=argv.indexOf('--report');if(at>=0)writeFileSync(argv[at+1],JSON.stringify(result,null,2)+'\n');
-console.log(JSON.stringify({historical_passed:historical.length,current_original_contract_pass:false,proposed_policy_cases:policy.length,proposal_applied:false}));
+console.log(JSON.stringify({historical_passed:historical.length,current_original_contract_pass:false,adopted_policy_cases:policy.length,product_source_constructor_applied:true}));

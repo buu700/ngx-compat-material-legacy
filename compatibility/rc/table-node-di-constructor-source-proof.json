@@ -1,0 +1,208 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "recorded_at_utc": "2026-10-08T14:49:14.214275+00:00",
+  "role": "Delegated conservative Angular-DI table constructor source implementation; original behavior retirement explicit",
+  "before_commit": "87a5d9fcf11c7bef5177570a3aadcc45d0a6da60",
+  "decision": {
+    "path": "compatibility/rc/table-construction-consumer-decision.json",
+    "sha256": "0c186843d753bcc4ac63a090c914bbd7af1473c44537889bdf65096a7ad75486"
+  },
+  "sources": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+      "sha256": "62bb8a2a990076572df97788e57b3d3c2d68fe52ac6d96e064f207f10eb54d4d"
+    },
+    {
+      "path": "tests/table_constructor_contract_probe.mjs",
+      "sha256": "09fb74983acca6c12697d26a613ff6a7811ea278b24818f3d85576531b212628"
+    },
+    {
+      "path": "tests/table_constructor_type_probe.mjs",
+      "sha256": "56aa19123af26da4caa569475b20e9f85c7c39021c446e892db70210c9454859"
+    },
+    {
+      "path": "tests/test_table_constructor_policy.py",
+      "sha256": "cfd027075253a125d6f53e82eb888826dd8afe0420a941e75fe5a3bc654a1e24"
+    }
+  ],
+  "runtime_receipt_sha256": "f4030ffd6dc3283a4b371e659fde9d2d582844fc5d138d209b44342e6b32b496",
+  "runtime_observations": {
+    "node": "v22.23.3",
+    "compiler": "6.0.3",
+    "source": {
+      "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+      "sha256": "62bb8a2a990076572df97788e57b3d3c2d68fe52ac6d96e064f207f10eb54d4d"
+    },
+    "originals": [
+      {
+        "path": "reference/material-16.2.14/table-outlet-sources/cdk-table.ts",
+        "tag_source": "src/cdk/table/table.ts",
+        "sha256": "a192133a11a131d340c3acfab9461f5b0f19f1c0c1788edfeb42dedd81aabafd",
+        "bytes": 51217,
+        "git_blob": "0fd73a71401648e524fee8763403a6ec52fbb3f5"
+      },
+      {
+        "path": "reference/material-16.2.14/table-outlet-sources/legacy-table.ts",
+        "tag_source": "src/material/legacy-table/table.ts",
+        "sha256": "de77a136b68213f97954d8696cc3bb5364f55be3fa295e59cc92211911a12bf3",
+        "bytes": 2809,
+        "git_blob": "fa8bcb04a3d58400b2143c09ee1051db411ea6d7"
+      },
+      {
+        "path": "reference/material-16.2.14/table-constructor-sources/sticky-styler.ts",
+        "tag_source": "src/cdk/table/sticky-styler.ts",
+        "sha256": "c4ee6bb44a39d60d26698bb936ff19869a59202525bb78e810e2f83c580e20d2",
+        "bytes": 15932,
+        "git_blob": "b58f0c6d6a06e3f8fa6293c4562227fd200a500b"
+      },
+      {
+        "path": "reference/material-16.2.14/table-constructor-sources/data-source.ts",
+        "tag_source": "src/cdk/collections/data-source.ts",
+        "sha256": "e2321d4d27a3cc43d45a1a90d5b71f5992b34a9c30f82e20d5aea3f407e7e0c5",
+        "bytes": 1782,
+        "git_blob": "97636823f741aff66b73f1fcea98854e66ffc603"
+      }
+    ],
+    "decorator_removal": "Only Angular class/member/parameter decorators removed for manual source execution; original constructor bodies, parameters, class fields and called methods preserved.",
+    "actual_peer": {
+      "version": "22.1.7",
+      "sha256": "2bdeb437714a07914ccb8d2f749fd75d72b63da1ab4cc0c069f64e714c2a6ad4"
+    },
+    "historical_contract_cases": [
+      {
+        "id": "twelve-argument-manual-construction-outside-di-retains-eleven-supplied-objects",
+        "result": "pass"
+      },
+      {
+        "id": "caller-viewport-drives-invalidation-and-unsubscribes-without-destruction",
+        "result": "pass"
+      },
+      {
+        "id": "caller-repeater-actually-receives-render-diff",
+        "result": "pass"
+      },
+      {
+        "id": "caller-coalescer-defers-and-flushes-real-tagged-style-work",
+        "result": "pass"
+      },
+      {
+        "id": "manual-role-and-optional-zone-contract",
+        "result": "pass"
+      }
+    ],
+    "current_contract_gaps": {
+      "outside_di_error": "NG0203: The `IterableDiffers` token injection failed. `inject()` function must be called from an injection context such as a constructor, a factory function, a field initializer, or a function used with `runInInjectionContext`. Find more at https://v22.angular.dev/errors/NG0203",
+      "inside_di_extra_arguments": "Ignored by current zero-argument parent: original supplied element, custom repeater, viewport and coalescer are not honored.",
+      "original_contract_pass": false
+    },
+    "adopted_policy": {
+      "status": "maintainer-delegated conservative TypeScript decision; source implemented",
+      "source_sha256": "62bb8a2a990076572df97788e57b3d3c2d68fe52ac6d96e064f207f10eb54d4d",
+      "passed_cases": [
+        "outside-DI explicitly rejects",
+        "old manual arguments explicitly reject before dependencies are ignored",
+        "genuine public parent/node and legacy sticky settings retained",
+        "real public parent initialization and default strategy execute",
+        "actual owned Angular JIT factory executes with zero dependency arguments",
+        "public parent/subclass initialization retained",
+        "single and twelve manual arguments explicitly reject"
+      ],
+      "changes_rendered_template_or_styles": false
+    },
+    "limits": [
+      "Actual untouched tagged classes execute with synthetic manual dependencies; style callback/diff work is observed, not native DOM rendering.",
+      "Actual public current parent executes under borrowed22.1.7 public node/root context. No actual21/native/AOT/packed/floor qualification.",
+      "Actual maintained source executes; original manual/customization contract is deliberately retired, not an original-contract pass. Exact API/factory admission and all native/AOT/packed/floor gates remain pending."
+    ]
+  },
+  "strict_receipt_sha256": "7a7e5f471acc742982e1542c28f29b293a2f0ebd30c1989559ef969f8322be01",
+  "strict_observations": {
+    "node": "v22.23.3",
+    "compiler": "6.0.3",
+    "annotations": "/tmp/closeout-full-minimum-peer-annotations-20261008/main/@angular",
+    "loaded_packages": [
+      {
+        "package": "@angular/cdk",
+        "version": "22.1.7",
+        "manifest_sha256": "ec60a5803a214c9b9d8bcdc2de0b0c294ecdd420d680d0e95e686f7aa4d46933"
+      },
+      {
+        "package": "@angular/core",
+        "version": "22.1.7",
+        "manifest_sha256": "fd7e79e557a78aa4ac6617a6056dbb461b07286ee5915bceec9af9e07742acbf"
+      }
+    ],
+    "positive": [],
+    "negative": [
+      {
+        "code": 2554,
+        "message": "Expected 0 arguments, but got 12."
+      }
+    ],
+    "fixture": "import {MatLegacyTable} from '/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/projects/ngx-material-legacy/legacy-table/table.ts';\nimport {CdkTable} from '@angular/cdk/table';\nconst table=new MatLegacyTable<string>(); const publicParent:CdkTable<string>=table;\ntable.fixedLayout='true'; table.multiTemplateDataRows='false'; table.recycleRows=true;\ntable.dataSource=['row']; table.renderRows();\nclass ConsumerTable extends MatLegacyTable<string> {marker='consumer';}\nconst child=new ConsumerTable(); const legacyParent:MatLegacyTable<string>=child;",
+    "options": {
+      "strict": true,
+      "noImplicitOverride": true,
+      "strictPropertyInitialization": false,
+      "noEmit": true,
+      "skipLibCheck": true,
+      "types": [],
+      "target": 9,
+      "module": 99,
+      "moduleResolution": 100,
+      "experimentalDecorators": true,
+      "allowImportingTsExtensions": true
+    },
+    "source_sha256": "62bb8a2a990076572df97788e57b3d3c2d68fe52ac6d96e064f207f10eb54d4d",
+    "limits": [
+      "Authenticated minimum peer declarations, borrowed host Node22/TypeScript6 and external dependency types.",
+      "No actual21 compiler/runtime, native/AOT/packed artifact or advertised floor execution."
+    ]
+  },
+  "styles_and_html": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/_table-legacy-index.scss",
+      "sha256": "eb6fb4789f3bc652cccb73a989b09fc54aa6799742658ba147fcf2e9b54bd8eb"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/_table-theme.import.scss",
+      "sha256": "cad851af3ec90604d9010eeb817624289e79762706ee95a8206671a88c25449b"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/_table-theme.scss",
+      "sha256": "aedf3dd8efef2e070a12d1feb78b4cd9559a496a0a536b70f64d859cf0113160"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table.scss",
+      "sha256": "b44bf2db4265779e8f39ce8f2a1a61d8d527da2343655ba32af4b84bf7061b76"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/table/_table-flex-styles.scss",
+      "sha256": "959938ccf97e710edbd3b604cc707a4f0d58f6d9226a0cef07c808373a9caf4d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/table/_table-theme.scss",
+      "sha256": "0a8515d8dba4512748151f6c8bb047d706df6fb1af98c6f407f5f87683c83690"
+    }
+  ],
+  "inline_template_bytes_unchanged": true,
+  "focused_outlet_regressions": {
+    "tests": 2,
+    "skipped": 0,
+    "result": "pass"
+  },
+  "current_policy_source_cases": 7,
+  "historical_cases": 5,
+  "qualification": "Borrowed actual Angular22/CDK22 JIT node/root source execution plus own-line authentic minimum peer declaration checks under host TS6. No native/AOT/packed/actualAngular21/compiler/floor execution. Exact API/factory profile still needs implementation.",
+  "original_manual_contract_equivalence": false,
+  "api_factory_exception_added": false,
+  "g11_claim": "not-passed",
+  "additional_dependency_use": {
+    "module": "@angular/core",
+    "symbol": "assertInInjectionContext",
+    "file": "legacy-table/table.ts",
+    "disposition": "open",
+    "scope": "One current-source addition; frozen1736-use seed remains unchanged. Named declaration policy passed at both line minima; complete semantic/behavior/native/packed audit remains pending."
+  }
+}
