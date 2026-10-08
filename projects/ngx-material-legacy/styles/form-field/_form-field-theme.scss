@@ -14,6 +14,8 @@
 @use './form-field-focus-overlay';
 @use './form-field-native-select';
 @use './mdc-text-field-theme-variable-refresh';
+@use '../bridges/form-field-state-overrides';
+@use '../vendor/mdc/textfield' as mdc-textfield;
 
 @mixin color($config-or-theme) {
   $config: theming.get-color-config($config-or-theme);
@@ -70,6 +72,8 @@
           }
         }
       }
+
+      @include form-field-state-overrides.color(mdc-textfield.$ink-color);
     }
   }
 }

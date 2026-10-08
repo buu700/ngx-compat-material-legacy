@@ -15,6 +15,7 @@ import {createHash} from 'node:crypto';
 import {announcedChromeEndpoint,debuggerMatchesChild} from './chromium-debug-endpoint.mjs';
 import {observeLegacyCoreHighContrast,legacyCoreHighContrastOkay} from './legacy-core-high-contrast-contract.mjs';
 import {PEER_ICON_TT_CSP, peerIconTtOkay} from './peer-icon-tt-admission.mjs';
+import {formFieldStateTokensOkay} from './form-field-state-style-observation.mjs';
 import {spawnSync as __spawnSyncForWs} from 'node:child_process';
 if (typeof globalThis.WebSocket !== 'function') {
   // Local Node 20 shells need the experimental flag; CI/Chainman Node 22+ has WebSocket.
@@ -135,6 +136,10 @@ $theme: legacy.define-light-theme((color: (primary: $primary, accent: $accent)))
 @include legacy.progress-bar-theme($theme);
 @include legacy.legacy-progress-bar-theme($theme);
 @include legacy.form-field-theme($theme);
+$dark-theme: legacy.define-dark-theme((color: (primary: $primary, accent: $accent)));
+// A zero-specificity theme scope lets the peer's equally specific structural
+// wrapper rule consume the token; the historical host rule still covers hints.
+:where(#peer-form-hover-dark-theme) { @include legacy.form-field-color($dark-theme); }
 `, {loadPaths:[join(consumer,'node_modules')],url:pathToFileURL(join(consumer,'progress-csp.scss')),
   silenceDeprecations:['if-function','global-builtin','color-functions','import']}).css;
 
@@ -161,6 +166,7 @@ import {MatLegacyProgressSpinnerModule} from '@ngx-compat/material-legacy/legacy
   selector: 'peer-progress-csp',
   template: \`
     <mat-form-field id="peer-form-hover" appearance="fill"><mat-label>Peer field</mat-label><input matInput><mat-hint>Peer hint area</mat-hint></mat-form-field>
+    <div id="peer-form-hover-dark-theme"><mat-form-field id="peer-form-hover-dark" appearance="fill"><mat-label>Dark peer field</mat-label><input matInput><mat-hint>Dark peer hint area</mat-hint></mat-form-field></div>
     <mat-progress-bar id="peer-progress-determinate" mode="determinate" [value]="40"></mat-progress-bar>
     <mat-progress-bar id="peer-progress-buffer" mode="buffer" [value]="40" [bufferValue]="65"></mat-progress-bar>
     <mat-progress-bar id="peer-progress-query" mode="query"></mat-progress-bar>
@@ -480,12 +486,16 @@ try {
   // Actual pointer hover on the current companion, with the packed historical
   // form-field theme loaded. A changed selector is not inferred from ancestry.
   await send('Emulation.setEmulatedMedia',{features:[{name:'hover',value:'hover'}]});
-  const hoverOpacity = () => evaluate(`(() => {
-    const host=document.getElementById('peer-form-hover');
+  const hoverOpacity = (id = 'peer-form-hover') => evaluate(`(() => {
+    const host=document.getElementById(${JSON.stringify(id)});
     const overlay=host?.querySelector('.mat-mdc-form-field-focus-overlay');
+    const style=overlay?getComputedStyle(overlay):null;
+    const token=name=>style?.getPropertyValue('--mat-form-field-'+name).trim()??null;
     return {present:!!host,overlay_present:!!overlay,host_hovered:!!host?.matches(':hover'),
       wrapper_hovered:!!host?.querySelector('.mat-mdc-text-field-wrapper')?.matches(':hover'),
-      focused:!!host?.classList.contains('mat-focused'),opacity:overlay?getComputedStyle(overlay).opacity:null};
+      focused:!!host?.classList.contains('mat-focused'),opacity:style?.opacity??null,
+      background_color:style?.backgroundColor??null,state_layer_color:token('state-layer-color'),
+      hover_token:token('hover-state-layer-opacity'),focus_token:token('focus-state-layer-opacity')};
   })()`);
   await send('Input.dispatchMouseEvent',{type:'mouseMoved',x:0,y:0});
   await sleep(200);
@@ -500,6 +510,43 @@ try {
   }
   await send('Input.dispatchMouseEvent',{type:'mouseMoved',x:0,y:0});
   peerFormHover.compiled_theme_css_sha256=createHash('sha256').update(progressCss).digest('hex');
+
+  // The finite source repair must be consumed by the actual public peer. Keep
+  // the authentic historical host-hover behavior over the hint area, test both
+  // ink tones, and prove that changing a token changes the computed opacity.
+  peerFormHover.state_token_scenarios=[];
+  for(const id of ['peer-form-hover','peer-form-hover-dark']){
+    await send('Input.dispatchMouseEvent',{type:'mouseMoved',x:0,y:0});
+    await sleep(200);
+    const row={id,baseline:await hoverOpacity(id)};
+    let wrapperPoint;
+    for(const [name,selector] of [['wrapper','.mat-mdc-text-field-wrapper'],['hint','.mat-mdc-form-field-subscript-wrapper']]){
+      const point=await evaluate(`(() => {const rect=document.querySelector('#'+${JSON.stringify(id)}+' '+${JSON.stringify(selector)})?.getBoundingClientRect();return rect&&{x:rect.x+rect.width/2,y:rect.y+rect.height/2,width:rect.width,height:rect.height};})()`);
+      if(point&&point.width>0&&point.height>0){
+        await send('Input.dispatchMouseEvent',{type:'mouseMoved',x:point.x,y:point.y});
+        await sleep(200);
+        row[name]={point,...await hoverOpacity(id)};
+        if(name==='wrapper')wrapperPoint=point;
+      }else row[name]={point,error:'No measurable state target'};
+    }
+    await send('Input.dispatchMouseEvent',{type:'mouseMoved',x:0,y:0});
+    await evaluate(`document.querySelector('#'+${JSON.stringify(id)}+' input').focus()`);
+    await sleep(200);
+    row.focus=await hoverOpacity(id);
+    await evaluate(`document.querySelector('#'+${JSON.stringify(id)}+' input').blur()`);
+    if(wrapperPoint){
+      await send('Input.dispatchMouseEvent',{type:'mouseMoved',x:wrapperPoint.x,y:wrapperPoint.y});
+      await evaluate(`document.getElementById(${JSON.stringify(id)}).style.setProperty('--mat-form-field-hover-state-layer-opacity','0.73')`);
+      await sleep(200);
+      row.negative=await hoverOpacity(id);
+      await evaluate(`document.getElementById(${JSON.stringify(id)}).style.removeProperty('--mat-form-field-hover-state-layer-opacity')`);
+      await sleep(200);
+      row.restored=await hoverOpacity(id);
+    }
+    peerFormHover.state_token_scenarios.push(row);
+  }
+  peerFormHover.state_tokens_okay=formFieldStateTokensOkay(peerFormHover.state_token_scenarios);
+  await send('Input.dispatchMouseEvent',{type:'mouseMoved',x:0,y:0});
 
   // Security diagnostic only: a fixed CSS custom-property marker, no URL or
   // script payload. This tests the public peer path; it earns no matrix credit
@@ -594,6 +641,7 @@ const ok =
   !error
   && zoneOk
   && peerIconTtOkay(peerIconTt)
+  && formFieldStateTokensOkay(peerFormHover?.state_token_scenarios)
   && legacyCoreHighContrastOkay(coreHighContrast)
   && families.button.present && families.button.disabled_class && families.button.focused
   && families.card.present
@@ -634,7 +682,7 @@ const report = {
     'Peer icon TT probe uses actual Chromium require-trusted-types-for enforcement and an allowed Angular policy list; this is not a full script/style/network CSP matrix or arbitrary SVG trust audit.',
     'Public MediaMatcher unsafe-query diagnostic uses one fixed reversible CSS marker; it earns no acceptance/matrix credit and does not establish an owned input path or security clearance.',
     'Progress CSP diagnostic covers four current modes and legacy buffer with the actual packed exported themes, img-src none and a blocked data-image negative; it earns no acceptance/matrix credit or complete CSP/motion qualification.',
-    'Current form-field hover diagnostic uses actual pointer moves over wrapper and hint with packed exported Sass; no selector changed, no acceptance/matrix credit and no general interaction or style qualification.',
+    'Current form-field state check requires light/dark baseline, wrapper/hint hover, focus, token consumption negative and restoration with packed exported Sass. Historical selectors are retained; no additional matrix cells, full Sass or general style qualification are credited.',
     'Does not claim G10.',
   ],
 };
