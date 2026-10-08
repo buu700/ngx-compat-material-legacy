@@ -461,6 +461,9 @@ if (isMain) {
       ...(item.approved_construction ? {approved_construction:item.approved_construction} : {}),
       factory_outcome: item.factory_outcome ?? null,
       factory_error: item.factory_error ?? null,
+      caller_modules: item.factory_context_modules || [],
+      node_kind: item.factory_node_kind || null,
+      runtime_requests: item.runtime_requests || [],
       constructor_attributes: item.constructor_attributes || [],
       observed: item.observed,
       original_factory_kind: item.original_factory_kind ?? null,
@@ -613,7 +616,12 @@ function writeAcceptance(request, surface, groups, declared, diSettled, summary,
     });
     if (item.symbol.di_id) {
       const di = diSettled.find(row => row.symbol.symbol_id === item.symbol.symbol_id);
-      cases.push({case_id: item.symbol.di_id, result: di ? di.result : 'fail', detail: di ? di.problems : ['missing di observation'], status: di && di.status});
+      cases.push({case_id: item.symbol.di_id, result: di ? di.result : 'fail', detail: di ? di.problems : ['missing di observation'], status: di && di.status,
+        execution:di?{context:di.factory_context||null,outcome:di.factory_outcome||null,error:di.factory_error||null,
+          returned_owned_instance:di.factory_returned_owned_instance??null,node_kind:di.factory_node_kind||null,
+          caller_modules:di.factory_context_modules||[],requests:di.runtime_requests||[],
+          historical:di.historical,owned:di.owned,constructor_attributes:di.constructor_attributes||[],
+          ...(di.approved_construction?{approved_construction:di.approved_construction}:{})}:null});
     }
   }
   cases.push(...negatives.map(item => ({case_id: item.case_id, result: item.result, detail: item.problems})));
