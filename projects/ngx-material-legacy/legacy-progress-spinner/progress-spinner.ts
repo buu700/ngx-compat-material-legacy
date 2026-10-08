@@ -11,7 +11,7 @@ import {coerceNumberProperty} from '@angular/cdk/coercion';
 type NumberInput = string | number | null | undefined;
 import {Platform} from '@angular/cdk/platform';
 import {legacyGetShadowRoot} from '@ngx-compat/material-legacy/legacy-core';
-import {ViewportRuler} from '@angular/cdk/scrolling';
+import {_LegacyViewport as ViewportRuler} from '@ngx-compat/material-legacy/legacy-core';
 import {DOCUMENT} from '@angular/common';
 import {
   ANIMATION_MODULE_TYPE,

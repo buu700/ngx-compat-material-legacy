@@ -1,0 +1,927 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "role": "Independently owned legacy viewport native primitives;source/structural/helper evidence only",
+  "implementation": "One shared legacy-core private helper owns resize/orientation events,20ms cache invalidation and historical client-rect/scroll geometry using public Angular/Platform/RxJS and native browser APIs. State is outside the instance in a WeakMap so supplied old/current private ruler objects remain structurally accepted. No current private ruler import/cast/call-through,CDK package fork,current-modern API mirror or styles changed.",
+  "runtime_diagnostic": {
+    "schema_version": 1,
+    "role": "Owned legacy viewport native primitives vs independent untouched tagged execution; source/synthetic window/clock only",
+    "node": "v22.23.3",
+    "compiler": "6.0.3",
+    "source": {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.ts",
+      "sha256": "522d8dfc0362b7ed01b6dc9155a10d7f36f67aef4152249f56db1f631ad935b0"
+    },
+    "untouched_reference": {
+      "path": "reference/material-16.2.14/viewport-sources/viewport-ruler.ts",
+      "sha256": "2cd3078732370fd98fad1fdf1c443acbaab5b5986fbf3cadd7ff546d51c3ed76"
+    },
+    "original": [
+      {
+        "id": "one-owner-two-native-listeners-outside-zone",
+        "result": "pass",
+        "value": {
+          "registrations": [
+            {
+              "name": "resize",
+              "outside": true
+            },
+            {
+              "name": "orientationchange",
+              "outside": true
+            }
+          ],
+          "removals": [
+            "resize",
+            "orientationchange"
+          ]
+        }
+      },
+      {
+        "id": "size-copies-cache-and-default-twenty-ms-invalidation",
+        "result": "pass",
+        "value": {
+          "size": {
+            "width": 820,
+            "height": 480
+          },
+          "reads": 2
+        }
+      },
+      {
+        "id": "default-change-audits-latest-event-and-cache-is-invalidated-first",
+        "result": "pass",
+        "value": [
+          [
+            "orientationchange",
+            900
+          ]
+        ]
+      },
+      {
+        "id": "nonpositive-0-shares-synchronous-subject",
+        "result": "pass",
+        "value": [
+          "resize"
+        ]
+      },
+      {
+        "id": "nonpositive--1-shares-synchronous-subject",
+        "result": "pass",
+        "value": [
+          "resize"
+        ]
+      },
+      {
+        "id": "one-fifty-ms-control-stream-keeps-last-event",
+        "result": "pass",
+        "value": [
+          "orientationchange"
+        ]
+      },
+      {
+        "id": "pinch-zoom-client-rect-precedes-scroll-properties",
+        "result": "pass",
+        "value": {
+          "top": 41.25,
+          "left": 52.5,
+          "bottom": 521.25,
+          "right": 692.5,
+          "height": 480,
+          "width": 640
+        }
+      },
+      {
+        "id": "body-window-element-zero-scroll-fallback-order",
+        "result": "pass",
+        "value": [
+          {
+            "top": 7,
+            "left": 11
+          },
+          {
+            "top": 13,
+            "left": 17
+          },
+          {
+            "top": 23,
+            "left": 29
+          },
+          {
+            "top": 0,
+            "left": 0
+          }
+        ]
+      },
+      {
+        "id": "document-default-view-and-global-window-fallback",
+        "result": "pass",
+        "value": {
+          "top": 41.25,
+          "left": 52.5,
+          "bottom": 521.25,
+          "right": 692.5,
+          "height": 480,
+          "width": 640
+        }
+      },
+      {
+        "id": "nonbrowser-geometry-has-no-listeners-or-scroll-reads",
+        "result": "pass",
+        "value": {
+          "rect": {
+            "top": 0,
+            "left": 0,
+            "bottom": 0,
+            "right": 0,
+            "height": 0,
+            "width": 0
+          },
+          "registrations": []
+        }
+      },
+      {
+        "id": "destroy-removes-events-completes-own-stream-without-destroying-borrowed-values",
+        "result": "pass",
+        "value": {
+          "got": [
+            "resize"
+          ],
+          "complete": 1,
+          "removals": [
+            "resize",
+            "orientationchange"
+          ]
+        }
+      },
+      {
+        "id": "pending-audit-completion-remains-peer-operator-behavior",
+        "result": "pass",
+        "value": [
+          "resize",
+          "complete"
+        ]
+      },
+      {
+        "id": "unsubscribed-control-stream-does-not-complete-root-stream",
+        "result": "pass",
+        "value": [
+          "resize",
+          "orientationchange"
+        ]
+      }
+    ],
+    "candidate": [
+      {
+        "id": "one-owner-two-native-listeners-outside-zone",
+        "result": "pass",
+        "value": {
+          "registrations": [
+            {
+              "name": "resize",
+              "outside": true
+            },
+            {
+              "name": "orientationchange",
+              "outside": true
+            }
+          ],
+          "removals": [
+            "resize",
+            "orientationchange"
+          ]
+        }
+      },
+      {
+        "id": "size-copies-cache-and-default-twenty-ms-invalidation",
+        "result": "pass",
+        "value": {
+          "size": {
+            "width": 820,
+            "height": 480
+          },
+          "reads": 2
+        }
+      },
+      {
+        "id": "default-change-audits-latest-event-and-cache-is-invalidated-first",
+        "result": "pass",
+        "value": [
+          [
+            "orientationchange",
+            900
+          ]
+        ]
+      },
+      {
+        "id": "nonpositive-0-shares-synchronous-subject",
+        "result": "pass",
+        "value": [
+          "resize"
+        ]
+      },
+      {
+        "id": "nonpositive--1-shares-synchronous-subject",
+        "result": "pass",
+        "value": [
+          "resize"
+        ]
+      },
+      {
+        "id": "one-fifty-ms-control-stream-keeps-last-event",
+        "result": "pass",
+        "value": [
+          "orientationchange"
+        ]
+      },
+      {
+        "id": "pinch-zoom-client-rect-precedes-scroll-properties",
+        "result": "pass",
+        "value": {
+          "top": 41.25,
+          "left": 52.5,
+          "bottom": 521.25,
+          "right": 692.5,
+          "height": 480,
+          "width": 640
+        }
+      },
+      {
+        "id": "body-window-element-zero-scroll-fallback-order",
+        "result": "pass",
+        "value": [
+          {
+            "top": 7,
+            "left": 11
+          },
+          {
+            "top": 13,
+            "left": 17
+          },
+          {
+            "top": 23,
+            "left": 29
+          },
+          {
+            "top": 0,
+            "left": 0
+          }
+        ]
+      },
+      {
+        "id": "document-default-view-and-global-window-fallback",
+        "result": "pass",
+        "value": {
+          "top": 41.25,
+          "left": 52.5,
+          "bottom": 521.25,
+          "right": 692.5,
+          "height": 480,
+          "width": 640
+        }
+      },
+      {
+        "id": "nonbrowser-geometry-has-no-listeners-or-scroll-reads",
+        "result": "pass",
+        "value": {
+          "rect": {
+            "top": 0,
+            "left": 0,
+            "bottom": 0,
+            "right": 0,
+            "height": 0,
+            "width": 0
+          },
+          "registrations": []
+        }
+      },
+      {
+        "id": "destroy-removes-events-completes-own-stream-without-destroying-borrowed-values",
+        "result": "pass",
+        "value": {
+          "got": [
+            "resize"
+          ],
+          "complete": 1,
+          "removals": [
+            "resize",
+            "orientationchange"
+          ]
+        }
+      },
+      {
+        "id": "pending-audit-completion-remains-peer-operator-behavior",
+        "result": "pass",
+        "value": [
+          "resize",
+          "complete"
+        ]
+      },
+      {
+        "id": "unsubscribed-control-stream-does-not-complete-root-stream",
+        "result": "pass",
+        "value": [
+          "resize",
+          "orientationchange"
+        ]
+      }
+    ],
+    "mutations": [
+      {
+        "id": "default-delay-one",
+        "rejected": true,
+        "failed_cases": [
+          "size-copies-cache-and-default-twenty-ms-invalidation",
+          "default-change-audits-latest-event-and-cache-is-invalidated-first"
+        ]
+      },
+      {
+        "id": "no-orientation-listener",
+        "rejected": true,
+        "failed_cases": [
+          "one-owner-two-native-listeners-outside-zone",
+          "default-change-audits-latest-event-and-cache-is-invalidated-first",
+          "one-fifty-ms-control-stream-keeps-last-event",
+          "unsubscribed-control-stream-does-not-complete-root-stream"
+        ]
+      },
+      {
+        "id": "cache-invalidates-immediately",
+        "rejected": true,
+        "failed_cases": [
+          "size-copies-cache-and-default-twenty-ms-invalidation"
+        ]
+      },
+      {
+        "id": "cache-exposed-to-callers",
+        "rejected": true,
+        "failed_cases": [
+          "size-copies-cache-and-default-twenty-ms-invalidation"
+        ]
+      },
+      {
+        "id": "window-scroll-before-client-rect",
+        "rejected": true,
+        "failed_cases": [
+          "pinch-zoom-client-rect-precedes-scroll-properties",
+          "body-window-element-zero-scroll-fallback-order",
+          "document-default-view-and-global-window-fallback"
+        ]
+      },
+      {
+        "id": "no-listener-removal",
+        "rejected": true,
+        "failed_cases": [
+          "one-owner-two-native-listeners-outside-zone",
+          "destroy-removes-events-completes-own-stream-without-destroying-borrowed-values"
+        ]
+      },
+      {
+        "id": "no-root-completion",
+        "rejected": true,
+        "failed_cases": [
+          "destroy-removes-events-completes-own-stream-without-destroying-borrowed-values",
+          "pending-audit-completion-remains-peer-operator-behavior"
+        ]
+      }
+    ],
+    "limits": [
+      "Reference bytes remain untouched; only its DOCUMENT import resolves to the current public Core token for manual constructor execution.",
+      "Both classes execute against the same borrowed installed RxJS/Angular22 runtime with synthetic windows/geometry/clock.",
+      "Cache/event/scroll observations come from tagged code, not candidate expectations or current private ruler execution.",
+      "No native Angular zoneful/zoneless/root-singleton/AOT/packed/actual21/minimum/floor qualification."
+    ]
+  },
+  "strict_structural_diagnostic": {
+    "role": "Owned actual helper strict source plus original16/min21/min22 full instance declaration compatibility; private peer declarations are data only",
+    "node": "v22.23.3",
+    "compiler": "6.0.3",
+    "options": {
+      "strict": true,
+      "noImplicitOverride": true,
+      "strictPropertyInitialization": false,
+      "noEmit": true,
+      "skipLibCheck": true,
+      "types": [],
+      "target": 9,
+      "module": 99,
+      "moduleResolution": 100,
+      "experimentalDecorators": true,
+      "allowImportingTsExtensions": true
+    },
+    "source": {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.ts",
+      "sha256": "522d8dfc0362b7ed01b6dc9155a10d7f36f67aef4152249f56db1f631ad935b0"
+    },
+    "captured_instances": [
+      {
+        "line": "original",
+        "source_sha256": "92e1d9625262f6782ce9aed7e4e0974bae780515b277ed5030965b473a3ae701",
+        "members": [
+          "private _platform;",
+          "private _viewportSize;",
+          "private readonly _change;",
+          "private _changeListener;",
+          "protected _document: Document;",
+          "constructor(_platform: Platform, ngZone: NgZone, document: any);",
+          "ngOnDestroy(): void;",
+          "getViewportSize(): Readonly<{\n        width: number;\n        height: number;\n    }>;",
+          "getViewportRect(): {\n        top: number;\n        left: number;\n        bottom: number;\n        right: number;\n        height: number;\n        width: number;\n    };",
+          "getViewportScrollPosition(): ViewportScrollPosition;",
+          "change(throttleTime?: number): Observable<Event>;",
+          "private _getWindow;",
+          "private _updateViewportSize;"
+        ]
+      },
+      {
+        "line": "main",
+        "source_sha256": "0752df6c36c6a809b8a33f9c1d6e99fbf88fbff3db68f54a2c93d7dbf4c8422a",
+        "members": [
+          "private _platform;",
+          "private _listeners;",
+          "private _viewportSize;",
+          "private readonly _change;",
+          "protected _document: Document;",
+          "constructor();",
+          "ngOnDestroy(): void;",
+          "getViewportSize(): Readonly<{\n        width: number;\n        height: number;\n    }>;",
+          "getViewportRect(): {\n        top: number;\n        left: number;\n        bottom: number;\n        right: number;\n        height: number;\n        width: number;\n    };",
+          "getViewportScrollPosition(): ViewportScrollPosition;",
+          "change(throttleTime?: number): Observable<Event>;",
+          "private _getWindow;",
+          "private _updateViewportSize;"
+        ]
+      },
+      {
+        "line": "21.x",
+        "source_sha256": "3c1a2af7d34c2d2cd6760d8d4b574fa4ecc40bab8c6e10bc0e804287259ed340",
+        "members": [
+          "private _platform;",
+          "private _listeners;",
+          "private _viewportSize;",
+          "private readonly _change;",
+          "protected _document: Document;",
+          "constructor(...args: unknown[]);",
+          "ngOnDestroy(): void;",
+          "getViewportSize(): Readonly<{\n        width: number;\n        height: number;\n    }>;",
+          "getViewportRect(): {\n        top: number;\n        left: number;\n        bottom: number;\n        right: number;\n        height: number;\n        width: number;\n    };",
+          "getViewportScrollPosition(): ViewportScrollPosition;",
+          "change(throttleTime?: number): Observable<Event>;",
+          "private _getWindow;",
+          "private _updateViewportSize;"
+        ]
+      }
+    ],
+    "positive_fixture": "import{_LegacyViewport}from '/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.ts';\nimport{Platform}from '@angular/cdk/platform';\nimport{NgZone,OnDestroy}from '@angular/core';\nimport{Observable}from 'rxjs';\ndeclare namespace Subject0{ export interface ViewportScrollPosition {top: number;\nleft: number;}export class ViewportRuler implements OnDestroy {private _platform;\nprivate _viewportSize;\nprivate readonly _change;\nprivate _changeListener;\nprotected _document: Document;\nconstructor(_platform: Platform, ngZone: NgZone, document: any);\nngOnDestroy(): void;\ngetViewportSize(): Readonly<{\n        width: number;\n        height: number;\n    }>;\ngetViewportRect(): {\n        top: number;\n        left: number;\n        bottom: number;\n        right: number;\n        height: number;\n        width: number;\n    };\ngetViewportScrollPosition(): ViewportScrollPosition;\nchange(throttleTime?: number): Observable<Event>;\nprivate _getWindow;\nprivate _updateViewportSize;}}\ndeclare const supplied0:Subject0.ViewportRuler;const accepted0:_LegacyViewport=supplied0;\ndeclare namespace Subject1{ export interface ViewportScrollPosition {top: number;\nleft: number;}export class ViewportRuler implements OnDestroy {private _platform;\nprivate _listeners;\nprivate _viewportSize;\nprivate readonly _change;\nprotected _document: Document;\nconstructor();\nngOnDestroy(): void;\ngetViewportSize(): Readonly<{\n        width: number;\n        height: number;\n    }>;\ngetViewportRect(): {\n        top: number;\n        left: number;\n        bottom: number;\n        right: number;\n        height: number;\n        width: number;\n    };\ngetViewportScrollPosition(): ViewportScrollPosition;\nchange(throttleTime?: number): Observable<Event>;\nprivate _getWindow;\nprivate _updateViewportSize;}}\ndeclare const supplied1:Subject1.ViewportRuler;const accepted1:_LegacyViewport=supplied1;\ndeclare namespace Subject2{ export interface ViewportScrollPosition {top: number;\nleft: number;}export class ViewportRuler implements OnDestroy {private _platform;\nprivate _listeners;\nprivate _viewportSize;\nprivate readonly _change;\nprotected _document: Document;\nconstructor(...args: unknown[]);\nngOnDestroy(): void;\ngetViewportSize(): Readonly<{\n        width: number;\n        height: number;\n    }>;\ngetViewportRect(): {\n        top: number;\n        left: number;\n        bottom: number;\n        right: number;\n        height: number;\n        width: number;\n    };\ngetViewportScrollPosition(): ViewportScrollPosition;\nchange(throttleTime?: number): Observable<Event>;\nprivate _getWindow;\nprivate _updateViewportSize;}}\ndeclare const supplied2:Subject2.ViewportRuler;const accepted2:_LegacyViewport=supplied2;\ndeclare const platform:Platform,zone:NgZone,document:Document;new _LegacyViewport(platform,zone,document);\ndeclare const owned:_LegacyViewport;owned.change();owned.change(150);const size:Readonly<{width:number;height:number}>=owned.getViewportSize();const rect:{top:number;left:number;bottom:number;right:number;width:number;height:number}=owned.getViewportRect();",
+    "positive_diagnostics": [],
+    "negative_fixture": "import{_LegacyViewport}from '/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.ts';\nimport{Platform}from '@angular/cdk/platform';\nimport{NgZone,OnDestroy}from '@angular/core';\nimport{Observable}from 'rxjs';\ndeclare namespace Subject0{ export interface ViewportScrollPosition {top: number;\nleft: number;}export class ViewportRuler implements OnDestroy {private _platform;\nprivate _viewportSize;\nprivate readonly _change;\nprivate _changeListener;\nprotected _document: Document;\nconstructor(_platform: Platform, ngZone: NgZone, document: any);\nngOnDestroy(): void;\ngetViewportSize(): Readonly<{\n        width: number;\n        height: number;\n    }>;\ngetViewportRect(): {\n        top: number;\n        left: number;\n        bottom: number;\n        right: number;\n        height: number;\n        width: number;\n    };\ngetViewportScrollPosition(): ViewportScrollPosition;\nchange(throttleTime?: number): Observable<Event>;\nprivate _getWindow;\nprivate _updateViewportSize;}}\ndeclare const supplied0:Subject0.ViewportRuler;const accepted0:_LegacyViewport=supplied0;\ndeclare namespace Subject1{ export interface ViewportScrollPosition {top: number;\nleft: number;}export class ViewportRuler implements OnDestroy {private _platform;\nprivate _listeners;\nprivate _viewportSize;\nprivate readonly _change;\nprotected _document: Document;\nconstructor();\nngOnDestroy(): void;\ngetViewportSize(): Readonly<{\n        width: number;\n        height: number;\n    }>;\ngetViewportRect(): {\n        top: number;\n        left: number;\n        bottom: number;\n        right: number;\n        height: number;\n        width: number;\n    };\ngetViewportScrollPosition(): ViewportScrollPosition;\nchange(throttleTime?: number): Observable<Event>;\nprivate _getWindow;\nprivate _updateViewportSize;}}\ndeclare const supplied1:Subject1.ViewportRuler;const accepted1:_LegacyViewport=supplied1;\ndeclare namespace Subject2{ export interface ViewportScrollPosition {top: number;\nleft: number;}export class ViewportRuler implements OnDestroy {private _platform;\nprivate _listeners;\nprivate _viewportSize;\nprivate readonly _change;\nprotected _document: Document;\nconstructor(...args: unknown[]);\nngOnDestroy(): void;\ngetViewportSize(): Readonly<{\n        width: number;\n        height: number;\n    }>;\ngetViewportRect(): {\n        top: number;\n        left: number;\n        bottom: number;\n        right: number;\n        height: number;\n        width: number;\n    };\ngetViewportScrollPosition(): ViewportScrollPosition;\nchange(throttleTime?: number): Observable<Event>;\nprivate _getWindow;\nprivate _updateViewportSize;}}\ndeclare const supplied2:Subject2.ViewportRuler;const accepted2:_LegacyViewport=supplied2;\ndeclare const platform:Platform,zone:NgZone,document:Document;new _LegacyViewport(platform,zone,document);\ndeclare const owned:_LegacyViewport;owned.change();owned.change(150);const size:Readonly<{width:number;height:number}>=owned.getViewportSize();const rect:{top:number;left:number;bottom:number;right:number;width:number;height:number}=owned.getViewportRect();\nowned.change(\"slow\");owned.getViewportSize().width=7;owned.getViewportScrollPosition().top=\"bad\";",
+    "expected_negative_diagnostics": [
+      {
+        "path": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/__legacy_viewport_structural_diagnostic__.ts",
+        "code": 2345,
+        "message": "Argument of type 'string' is not assignable to parameter of type 'number'."
+      },
+      {
+        "path": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/__legacy_viewport_structural_diagnostic__.ts",
+        "code": 2540,
+        "message": "Cannot assign to 'width' because it is a read-only property."
+      },
+      {
+        "path": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/__legacy_viewport_structural_diagnostic__.ts",
+        "code": 2322,
+        "message": "Type 'string' is not assignable to type 'number'."
+      }
+    ],
+    "limits": [
+      "Actualhelper+read-only22public peers compile; original/min21/min22 private ruler declarations are preserved extracted data models for one-way supplied-object assignment.",
+      "No source current-private import,private cast or nominal brand requirement on the owned class.",
+      "No actual21 compiler/runtime,AOT/packed/root-singleton/native/floor qualification."
+    ]
+  },
+  "current_source_caps": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "sha256": "c662cc8151b995985e50cc55b34847baee6a193e2801adbfed287dd244b4dbe9"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+      "sha256": "6a3f48147d777f9147d72cb2ed2fcf3a887819093a3886549188706c57acbd1d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+      "sha256": "888178ac7a4890ffea1ed758b9c6b2e2bff256966b1daee998feaf5c7d52830b"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.ts",
+      "sha256": "85936bc7161a1dcbbc377fbf19c3de46b09f13a32adaa3d503d7dc09204c736c"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+      "sha256": "66f26ca1f7739bd9ce60082d41e60c0bea499f802b2c6c8691adc6706f09a5c3"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+      "sha256": "b783e5e8c2974a0e0954c65e6236bcd3a73f818e2cf02743b1579a5fa16faacd"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/internal/paginated-tab-header.ts",
+      "sha256": "bb52d37aa838e645e3915e6200452b0e5c97beb7707e0d07681283f88026835b"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-header-base.ts",
+      "sha256": "811a56500b5e34ac58af62f4a1d951b455186f5962d023a543089f571e331178"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+      "sha256": "fe45e7e30365d2ecb4644bdf4e9ff8fd4e4c8a163e2b2b4d44b76a528112a93a"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/tab-header.spec.ts",
+      "sha256": "cb9a251cdfd08314f195c5d3bbc90f6e20f904741aef9cb6bd0e158a6c61604b"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/tab-header.ts",
+      "sha256": "ee759299efa9db6cb261d13d58aa2f1754a3e256ccc835bc2dab30d18c529ad9"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.ts",
+      "sha256": "a59c7401b11fb342c194ec204fe961ed514ce05215e21682b873ca484c728941"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.ts",
+      "sha256": "522d8dfc0362b7ed01b6dc9155a10d7f36f67aef4152249f56db1f631ad935b0"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.spec.ts",
+      "sha256": "ed279c80cd52c3be99deeed14628870c0f7e3e00b5ab1e18079107a80148f1ca"
+    },
+    {
+      "path": "scripts/api-di-observe.mjs",
+      "sha256": "e64085d0b8dacb72c0311d8d0f27704485ad415c1ea5e089041cb8fa82586dca"
+    },
+    {
+      "path": "scripts/packed-consumer-aot-smoke.mjs",
+      "sha256": "27065aff905b237edab768ef630eb49f3455666163508eb4d19f6cc33c8bf8b6"
+    },
+    {
+      "path": "tests/legacy_viewport_runtime_probe.mjs",
+      "sha256": "3417035d1246490d2abb50a64416678151c4daa150bc2076d703d4c0fa724ba1"
+    },
+    {
+      "path": "tests/legacy_viewport_type_probe.mjs",
+      "sha256": "4b52433aa594cbabac6e854195a215505ae3628944eaa397659b3cdcce6e1547"
+    },
+    {
+      "path": "tests/tab_header_lifetime_probe.mjs",
+      "sha256": "c7d9e7f9c012e2bbf0fce0513b5f8c9800a2903c4458908b831d59d9fd68745d"
+    }
+  ],
+  "shared_identity": "All8production and3native-test imports use _LegacyViewport fromone legacy-core entry;exact family/oldparameter\u2192sharedcoreclass token checker rejects missing/twin identities and leaves table untouched. Actualpacked/root identity remains pending.",
+  "native_prepared": {
+    "count": 3,
+    "executed": 0,
+    "syntax_diagnostics": 0,
+    "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.spec.ts"
+  },
+  "packed_recipe": {
+    "existing_cases": [
+      "packed-consumer/harness/legacy-select",
+      "packed-consumer/harness/legacy-tabs"
+    ],
+    "requires_shared_viewport_and_browser_dimensions": true,
+    "script_and_embedded_ts_syntax_diagnostics": 0,
+    "executed": false,
+    "case_roster_changed": false
+  },
+  "tab_lifetime_after_rewire": {
+    "source_cases": 21,
+    "mutants": 10,
+    "passed": true,
+    "receipt_sha256": "2d8e7d24125e2324fc501901346b2f9fa29c3e930011d2dbc24bdf64f4d4b513"
+  },
+  "focused_tests_each_line": 12,
+  "skipped": 0,
+  "styles_templates_unchanged": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/option/optgroup.html",
+      "sha256": "5dce84152c4e6abf4141c8505be4d8950cea5725cad06e1da673fdd73718fa8b"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/option/optgroup.scss",
+      "sha256": "51b2f5942568b75c45c70ec08e56196a902b72b2e40abc990be933002bcc60d0"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/option/option.html",
+      "sha256": "5ffcf936ce83a2313b753c2697cad5906762f0ac9cc4e8065fe19ce1aa428712"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/option/option.scss",
+      "sha256": "eee08968f40e26b222d9bf8755cbd1fb2aad21acee0f72afd5c1bb577c28ca2d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/pseudo-checkbox/pseudo-checkbox.scss",
+      "sha256": "e4a71ac5e55819a1f23585ae8d756b3d745dbb5c52d1d36b27186589aed7316d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/_autocomplete-legacy-index.scss",
+      "sha256": "e33c466f01d4c3f1c80c2e458a3b6571f1795b885d606ced3f573171d94d72ae"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/_autocomplete-theme.import.scss",
+      "sha256": "c5f119d3c96ffd9438fbbd568a46c8b93a1d74a16345c71287d07aae993d719d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/_autocomplete-theme.scss",
+      "sha256": "545babfde84c743acb7082d45efdb15628ce1f7f190ceaac323ccf8100fc9dce"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.html",
+      "sha256": "8fae4afdffea376599d694a16698ee1a9502097cc9819ec2766a4a5d55b418ae"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.scss",
+      "sha256": "68e8461002312b99822da585597d85f37ed3d5b719695e49467987825b7e2839"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/_menu-legacy-index.scss",
+      "sha256": "6447d1d8e93c28802d23745a2d8db38bcab7d0dc8c40d8bbed38cee807cec283"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/_menu-theme.import.scss",
+      "sha256": "886e313ca0219ce2dced1349f0cd32588038417ac01bef11070be7072d639b68"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/_menu-theme.scss",
+      "sha256": "f99c0b7612cd47f7329f3de712253e696bd3dc52d4449e2f4e1e50e744b0c72c"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/menu-item.html",
+      "sha256": "8a76150cd8b906ce81bd3480f7f5daf12b5067f6af8fe6e59cbb0b59b01aa930"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/menu.html",
+      "sha256": "c0de05010295b38649dec59fa3c54b9aa6dc4c88f20d18ea78053e0f7e102a47"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/menu.scss",
+      "sha256": "ebf00fab85fe193b6ae964b3d3582d671aa473a3a5bdb9f683aec63f93e4a3f4"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-spinner/_progress-spinner-legacy-index.scss",
+      "sha256": "8058870744a1125c15bcd16407dca47ea6820680d7b09e0f4c90546c08fbb631"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-spinner/_progress-spinner-theme.import.scss",
+      "sha256": "8183c208ff863bee99f1f091cf497331ce06069f3873aecc2deeef355899a9e4"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-spinner/_progress-spinner-theme.scss",
+      "sha256": "d9231b07757932090ffdf79886cf83ba2f48ada11cf9eb84afbe210eddf4bf2b"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.html",
+      "sha256": "eb9068351eadefb859233dcc1c1bf3a58dc17231b88f5892604ebd5ed6180a69"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.scss",
+      "sha256": "e31e15d575d131f4ca34370b02f34091ce737ce5d08a2f1ae9bf420694de7f62"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/_select-legacy-index.scss",
+      "sha256": "36ac3efb781316d69c56b6642ac9027f924cd1ca531f08077f2291f73aa60417"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/_select-theme.import.scss",
+      "sha256": "bfb10a3aba361b46c56c81537e2facfed02b81810c2027e329db1c16ba3c0862"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/_select-theme.scss",
+      "sha256": "e9180b3c4147955567b531defd61f6746b39286bef827339699e411060bc9ec1"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.html",
+      "sha256": "c54309b92719e6e9bf2e0b77decb82f4347b78a9565a4e22ba7f49f81353e5cf"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.scss",
+      "sha256": "5520987e9617a872afb76cf5692dfb87f278f7303fba456b8d77101d353fb537"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/_tabs-common.import.scss",
+      "sha256": "dd91e776ddce46e48de48e3367bb438a61e988e47eec2c0cecf6d94004960a6e"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/_tabs-common.scss",
+      "sha256": "f8c567d82879d41db35ed7dcd7deb7e266c316c4aa6f754f277b3ef0d0ee3fe0"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/_tabs-legacy-index.scss",
+      "sha256": "ecb9245325bc94f2a2eec850e0c3ad19bad9e0b2e65ed4f14d5fdff5588d2deb"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/_tabs-theme.import.scss",
+      "sha256": "4efc8dda0f61439144a31b36df275f3a23e4ad9084831f1ca2bbc5a1de801f5b"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/_tabs-theme.scss",
+      "sha256": "6b8d7d37d58ba3c209a753ec7475caa08d655dfc5536e5fead45ca4d63547e17"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/tab-body.html",
+      "sha256": "fb4e59b10d5d2f72cf8aa00688a67ad21a415928e588957d9e5ae0b00782aa53"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/tab-body.scss",
+      "sha256": "7fedca13e121d806da356e39836d1abb3353c62a3a54745790c9cdaa50e07d5a"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/tab-group.html",
+      "sha256": "1ce6acdffe51366ad6f439f81a4ecfd3e2d2b79630042cd5ef1ec8dcf23003f4"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/tab-group.scss",
+      "sha256": "9180de5daa33abf6bdff2cd8954ae9fa17f7b2864931171383d7f2338b8bed76"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/tab-header.html",
+      "sha256": "1eda7aad7121d4976fff2969d04c260908761928a71db5dd6b9fa3ac8d73f1eb"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/tab-header.scss",
+      "sha256": "329f30618de44509eb667ee28bdb9aea24ab94fb25a047b7b118f040f901fce5"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.html",
+      "sha256": "cb26524b6e85c23e709b834d971ec62db27d28600fd1592454a9b4e632d388da"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.scss",
+      "sha256": "222d57e2e1491b2608cb607a293eeef79b772ec076c5f9dbf192175fafc68b0b"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/tab.html",
+      "sha256": "8a9d1fbe1786771149203bc66b44db8350c20ffbade5b3311e17a7d24c9c30cf"
+    }
+  ],
+  "sparse_annotation_policy": {
+    "private_hits": [
+      {
+        "name": "CDK_TABLE",
+        "module": "@angular/cdk/table",
+        "package": "@angular/cdk",
+        "path": "legacy-table/table.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/table.d.ts",
+        "declaration_name": "CDK_TABLE"
+      }
+    ],
+    "before": 12,
+    "after": 1,
+    "missing_packages": [
+      "@angular/common",
+      "@angular/core",
+      "@angular/forms",
+      "@angular/platform-browser"
+    ],
+    "unresolved_exports": [
+      {
+        "name": "createKeyboardEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-menu/menu.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "createMouseEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-menu/menu.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "dispatchEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-menu/menu.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "dispatchFakeEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-menu/menu.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "dispatchKeyboardEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-menu/menu.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "dispatchMouseEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-menu/menu.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "MockNgZone",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-menu/menu.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "patchElementFocus",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-menu/menu.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "createKeyboardEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-select/select.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "dispatchEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-select/select.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "dispatchFakeEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-select/select.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "dispatchKeyboardEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-select/select.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "wrappedErrorMessage",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-select/select.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "createMouseEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-button/button.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "dispatchEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-button/button.spec.ts",
+        "access": "named"
+      }
+    ],
+    "tarball_scanned": false,
+    "whole_gate": "failed",
+    "security_clearance": "not-passed",
+    "receipt_sha256": "057d1ac3a00cf15fd5461ecff60dfdd4556b9674cb5f0854de571ad3986d3a68"
+  },
+  "authored_use_scope": {
+    "frozen_count": 1736,
+    "reviewed": 150,
+    "open": 1586,
+    "insufficient_bindings": 0,
+    "existing_type_caps_renewed": 34,
+    "viewport_use_closure": 0,
+    "new_helper_source_contract": "Captured separately outside unchanged frozen8-use viewport selection."
+  },
+  "cyph_read_only_source_scan": {
+    "rg_query": "ViewportRuler|_viewportRuler under shared/js/cyph",
+    "visible_hits": 0,
+    "build_executed": false,
+    "consumer_edited": false
+  },
+  "remaining": [
+    "CDK_TABLE/private table constructor12 boundary",
+    "Actual21/compiler/native/AOT/packed/root-singleton/zoneful/zoneless/Rx6/minimum/floor qualification",
+    "Full source-policy/framework annotation/packed closure and all1697SHA/1736use review",
+    "C05 fresh independent A01-A10,R01-R03,G01-G13,Sass/consumer/dependency/security qualification"
+  ],
+  "limits": [
+    "Original/current-minimum private declarations are immutable data for one-way supplied-instance compatibility;they are not product imports or runtime dependencies.",
+    "Owned helper and tagged source execute under borrowed22/RxJS with syntheticwindows/clock; actual21 and real native events remain unexecuted.",
+    "Private geometry calls found in the actualselect source are preserved;the prior handoff description of event-only/unusedselect was inaccurate and superseded.",
+    "No blanket API type rename/constructor waiver or golden/exception broadening hides failures. One finite owned private-core export-name entry supports crossfamily identity;packed acceptance stillrequired.",
+    "No push/Actions/package installation/credentials/globalGit/publish/consumer changes."
+  ]
+}

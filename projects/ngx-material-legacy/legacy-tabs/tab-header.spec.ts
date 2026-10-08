@@ -2,7 +2,8 @@ import {captureMutationObserverCallbacks} from '../../../testing/legacy-runner/m
 import {Direction} from '@angular/cdk/bidi';
 import {END, ENTER, HOME, LEFT_ARROW, RIGHT_ARROW, SPACE} from '@angular/cdk/keycodes';
 import {PortalModule} from '@angular/cdk/portal';
-import {ScrollingModule, ViewportRuler} from '@angular/cdk/scrolling';
+import {ScrollingModule} from '@angular/cdk/scrolling';
+import {_LegacyViewport as ViewportRuler} from '@ngx-compat/material-legacy/legacy-core';
 import {
   dispatchFakeEvent,
   dispatchKeyboardEvent,

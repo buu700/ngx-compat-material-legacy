@@ -13,7 +13,8 @@ import {
   ESCAPE,
 } from '@angular/cdk/keycodes';
 import {OverlayContainer} from '@angular/cdk/overlay';
-import {ScrollDispatcher, ViewportRuler} from '@angular/cdk/scrolling';
+import {ScrollDispatcher} from '@angular/cdk/scrolling';
+import {_LegacyViewport as ViewportRuler} from '@ngx-compat/material-legacy/legacy-core';
 import {
   createKeyboardEvent,
   dispatchEvent,

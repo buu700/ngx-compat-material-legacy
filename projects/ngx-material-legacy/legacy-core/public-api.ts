@@ -44,6 +44,7 @@ export {legacySetLines} from './internal/line/line';
 export {MAT_LEGACY_DATE_LOCALE_FACTORY} from './internal/datetime/date-locale';
 export {legacyGetEventTarget, legacyGetShadowRoot, legacySupportsShadowDom} from './internal/dom/shadow-dom';
 export {legacyIsNumberValue} from './internal/coercion/number-property';
+export {_LegacyViewport} from './internal/legacy-viewport';
 export {
   MatLegacyPseudoCheckbox,
   MatLegacyPseudoCheckboxModule,

@@ -38,7 +38,7 @@ import {
 import {CanDisable, CanDisableRipple, HasTabIndex, mixinDisabled, mixinDisableRipple, mixinTabIndex} from './common-behaviors';
 import {FocusableOption, FocusMonitor} from '@angular/cdk/a11y';
 import {Directionality} from '@angular/cdk/bidi';
-import {ViewportRuler} from '@angular/cdk/scrolling';
+import {_LegacyViewport as ViewportRuler} from '@ngx-compat/material-legacy/legacy-core';
 import {Platform} from '@angular/cdk/platform';
 import {MatInkBar, MatInkBarItem, mixinInkBarItem} from './ink-bar-shared';
 import {coerceBooleanProperty} from '@angular/cdk/coercion';

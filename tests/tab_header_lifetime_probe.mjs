@@ -29,8 +29,11 @@ const emit = text => ts.transpileModule(text, {compilerOptions: {target: ts.Scri
   module: ts.ModuleKind.ESNext, experimentalDecorators: true}}).outputText
   .replace(/(['"])(@angular\/[^'"]+|rxjs(?:\/operators)?)\1/g, (_, quote, name) => JSON.stringify(url(name)));
 const helperUrl = data(emit(helper));
+const viewportPath = 'projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.ts';
+const viewportUrl = data(emit(readFileSync(resolve(root, viewportPath), 'utf8')));
 async function load(text = source) {
-  return (await import(data(emit(text).replaceAll("'./owned-header-resize'", JSON.stringify(helperUrl)))))
+  return (await import(data(emit(text).replaceAll("'./owned-header-resize'", JSON.stringify(helperUrl))
+    .replaceAll("'@ngx-compat/material-legacy/legacy-core'", JSON.stringify(viewportUrl)))))
     .MatPaginatedTabHeader;
 }
 function clock() {
