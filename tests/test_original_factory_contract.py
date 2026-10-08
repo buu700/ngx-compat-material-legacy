@@ -27,7 +27,7 @@ import assert from 'node:assert/strict';
 import {runFactory,factoryExecutionProblems} from './scripts/api-di-observe.mjs';
 import {originalFactoryContract} from './scripts/api-surface.mjs';
 class FakeInjector {static create(){return new FakeInjector();}get(){return null;}}
-const context=(injector,fn)=>fn();
+let activeInjector;const context=(injector,fn)=>{activeInjector=injector;return fn();};
 const validEmpty=runFactory(()=>({}),FakeInjector,context);
 const invalid=runFactory(()=>{throw new Error('This constructor was not compatible with Dependency Injection.');},FakeInjector,context);
 assert.equal(validEmpty.outcome,'returned');assert.equal(validEmpty.error,null);
@@ -41,13 +41,13 @@ assert.equal(factoryExecutionProblems('invalid',validEmpty).length,1);
 const token=function RequiredProvider(){};
 class MissingInjector {static create(){return new MissingInjector();}get(){throw new Error('No provider');}}
 const originalGet=MissingInjector.prototype.get;
-const stubbed=runFactory(()=>MissingInjector.create().get(token),MissingInjector,context);
-assert.equal(stubbed.outcome,'returned');assert.equal(stubbed.requests.length,1);
+const stubbed=runFactory(()=>activeInjector.get(token),MissingInjector,context);
+assert.equal(stubbed.outcome,'threw');assert.equal(stubbed.requests.length,1);
 assert.equal(stubbed.requests[0].token,token);assert.equal(stubbed.requests[0].unresolved,true);
 assert.match(stubbed.requests[0].resolution_error,/No provider/);
 assert.equal(MissingInjector.prototype.get,originalGet);
-assert.match(factoryExecutionProblems('dependencies',stubbed)[0],/unresolved provider stubs/);
-const afterRequest=runFactory(()=>{MissingInjector.create().get(token);throw new Error('No node context');},MissingInjector,context);
+assert.ok(factoryExecutionProblems('dependencies',stubbed).some(p=>/could not resolve providers/.test(p)));
+const afterRequest=runFactory(()=>{try{activeInjector.get(token);}catch{}throw new Error('No node context');},MissingInjector,context);
 assert.equal(afterRequest.requests.length,1); // Matching count cannot prove return.
 assert.equal(factoryExecutionProblems('dependencies',afterRequest).length,2);
 assert.equal(MissingInjector.prototype.get,originalGet);

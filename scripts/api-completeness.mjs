@@ -452,16 +452,19 @@ if (isMain) {
     recorded_differences: summary.recorded.length + diSettled.filter(item => item.status === 'intentional-legacy-difference').length,
     export_failures: exportFails.slice(0, 20),
     signature_failures: signatureFails.slice(0, 20).map(item => item.symbol.symbol_id),
+    di_failure_count: diFails.length,
+    di_failure_symbols: diFails.map(item => item.symbol.symbol_id),
     di_failures: diFails.slice(0, 20).map(item => ({
       symbol_id: item.symbol.symbol_id,
       problems: item.problems,
-      observation_context: item.approved_construction?.context || 'environment-injector factory invocation; no component node attribute context',
+      observation_context: item.approved_construction?.context || item.factory_context || 'factory context unavailable',
       ...(item.approved_construction ? {approved_construction:item.approved_construction} : {}),
       factory_outcome: item.factory_outcome ?? null,
       factory_error: item.factory_error ?? null,
       constructor_attributes: item.constructor_attributes || [],
       observed: item.observed,
       original_factory_kind: item.original_factory_kind ?? null,
+      effective_original_factory_kind: item.effective_original_factory_kind ?? null,
       original_inherited_factory: item.original_inherited_factory ?? null,
     })),
   };
@@ -490,8 +493,8 @@ if (isMain) {
 export function settleDi(row, records) {
   const historical = row.symbol.shape.token
     ? `token ${row.symbol.shape.tokenDescription || ''}`
-    : row.symbol.shape.originalFactory?.deps_kind === 'invalid' ? 'original-non-injectable-factory'
-    : (row.symbol.shape.originalFactory?.inherited_factory
+    : (row.symbol.shape.originalFactoryContext?.effective_factory_kind || row.symbol.shape.originalFactory?.deps_kind) === 'invalid' ? 'original-non-injectable-factory'
+    : (row.symbol.shape.originalFactoryContext || row.symbol.shape.originalFactory?.inherited_factory
         ? expectedFactoryDi(row.symbol.shape,row.runtime_context || {})
         : (row.symbol.shape.diParams || []).filter(param=>!param.attribute))
         .map(param => `${param.ident}${param.optional ? '?' : ''}`).join('|');

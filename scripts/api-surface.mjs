@@ -13,6 +13,7 @@ import {createRequire} from 'node:module';
 import {fileURLToPath} from 'node:url';
 import {MENU_ITEM_SYMBOL, approvedMenuItemSignatureRecord} from './menu-item-construction-contract.mjs';
 import {TABLE_SYMBOL, approvedTableSignatureRecord} from './table-construction-contract.mjs';
+import {originalCompilerFactoryContext, originalPublishedJitFactory} from './api-original-factory-contexts.mjs';
 
 const require = createRequire(import.meta.url);
 let typescriptModule;
@@ -187,7 +188,7 @@ export function originalFactoryContract(file, name) {
     if (createHash('sha256').update(bytes).digest('hex') !== FACTORY_REFERENCE_SHA256) throw new Error('untouched16 factory metadata identity mismatch');
     factoryReference = JSON.parse(bytes);
   }
-  const contract = factoryReference.factories[family+'/'+name] || null;
+  const contract = factoryReference.factories[family+'/'+name] || originalPublishedJitFactory(file,name) || null;
   if (family === 'legacy-table' && INHERITED_TABLE_FACTORIES[name] && contract?.deps_kind === 'inherited') {
     if (!cdkFactoryReference) {
       const bytes = readFileSync(join(root, CDK_FACTORY_REFERENCE));
@@ -741,6 +742,7 @@ function shapeFromFound(found, refRoot) {
     if (inheritedDialogContract) flat.inheritedDialogContract = inheritedDialogContract;
     flat.diParams = diParamsOf(node, found.sourceFile);
     flat.originalFactory = originalFactoryContract(found.file, node.name?.text);
+    flat.originalFactoryContext = originalCompilerFactoryContext(flat.originalFactory);
     flat.inheritedConstructor = originalInheritedConstructor(found.file, node.name?.text);
     if (flat.inheritedConstructor && !own.requiredConstructor) {
       flat.requiredConstructor = true;

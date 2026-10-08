@@ -18,6 +18,7 @@ import {packedShape, originalFactoryContract, originalInheritedConstructor, comp
 import {approvedMenuItemContract, MENU_ITEM_CONTRACT_PATH} from '../scripts/menu-item-construction-contract.mjs';
 import {observeRuntimeDi, expectedFactoryDi} from '../scripts/api-di-observe.mjs';
 import {settleDi} from '../scripts/api-completeness.mjs';
+import {originalCompilerFactoryContext} from '../scripts/api-original-factory-contexts.mjs';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..'), req = createRequire(import.meta.url);
 const ts = req('typescript'), url = spec => pathToFileURL(req.resolve(spec)).href;
 const importModule = spec => import(url(spec));
@@ -33,6 +34,7 @@ const symbol = {symbol_id: 'legacy-menu/primary/MatLegacyMenuItem', family: 'leg
   name: 'MatLegacyMenuItem', di_id: 'menu-item-fixture', shape: {...old,
     inheritedConstructor: inherited, originalFactory: originalFactoryContract(originalPath, 'MatLegacyMenuItem'),
     signatures: [...old.ownSignatures, ...inherited.signatures]}};
+symbol.shape.originalFactoryContext=originalCompilerFactoryContext(symbol.shape.originalFactory);
 const contract = approvedMenuItemContract(symbol), differences = loadDifferences();
 assert.equal(expectedFactoryDi(symbol.shape).length, 5, 'original expectation must not be replaced');
 assert.equal(contract.runtime_requests.length, 6);

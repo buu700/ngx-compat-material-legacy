@@ -5,6 +5,7 @@ import {approvedMenuItemContract} from './menu-item-construction-contract.mjs';
 import {observeMenuItemFactory} from './api-menu-item-factory.mjs';
 import {TABLE_SYMBOL, approvedTableContract} from './table-construction-contract.mjs';
 import {observeTableFactory} from './api-table-factory.mjs';
+import {originalContextDi} from './api-original-factory-contexts.mjs';
 
 // verify-lite imports the checker before node_modules exists. Load Angular
 // only when a packed factory is actually executed.
@@ -31,34 +32,25 @@ export async function loadRuntimeModule(packageRoot, family, kind) {
   return loaded;
 }
 
-export function runFactory(factory, Injector, runInInjectionContext) {
-  const requests = [];
-  const injector = Injector.create({providers: []});
-  const proto = Object.getPrototypeOf(injector);
-  const original = proto.get;
-  proto.get = function patched(token, notFound, flags) {
-    const optional = typeof flags === 'number' ? (flags & 8) === 8 : Boolean(flags && flags.optional);
-    const request = {token, label: labelOf(token), optional};
-    requests.push(request);
-    try {
-      return original.call(this, token, notFound, flags);
-    } catch (caught) {
-      request.unresolved = true;
-      request.resolution_error = String(caught?.message || caught);
-      return {stub: labelOf(token)};
+export function runFactory(factory, Injector, runInInjectionContext, options = {}) {
+  const requests=[];
+  const borrowed=Boolean(options.injector);
+  const base=options.injector || Injector.create({providers:[]});
+  const tracing=new class extends Injector {
+    get(token,notFound,flags){
+      const decoded=typeof flags==='number'
+        ?{optional:!!(flags&8),self:!!(flags&2),skipSelf:!!(flags&4),host:!!(flags&1)}
+        :{optional:!!flags?.optional,self:!!flags?.self,skipSelf:!!flags?.skipSelf,host:!!flags?.host};
+      const request={token,label:labelOf(token),...decoded};requests.push(request);
+      try{return base.get(token,notFound,flags);}
+      catch(caught){request.unresolved=true;request.resolution_error=String(caught?.message||caught);throw caught;}
     }
   };
-  let outcome = 'returned';
-  let error = null;
-  try {
-    runInInjectionContext(injector, () => factory());
-  } catch (caught) {
-    outcome = 'threw';
-    error = String(caught?.message || caught);
-  } finally {
-    proto.get = original;
-  }
-  return {requests, outcome, error};
+  let outcome='returned',error=null,value;
+  try{value=runInInjectionContext(tracing,()=>factory());}
+  catch(caught){outcome='threw';error=String(caught?.message||caught);}
+  finally{if(!borrowed)base.destroy?.();}
+  return {requests,outcome,error,value,context:borrowed?'caller-supplied public injector context':'empty-injector diagnostic; not node/application qualification'};
 }
 
 /** Execution evidence cannot be replaced by a matching request-name/count list. */
@@ -72,11 +64,13 @@ export function factoryExecutionProblems(originalKind, factory) {
   const problems=[];
   if (factory.outcome !== 'returned') problems.push('factory execution incomplete: '+(factory.error || factory.outcome));
   const unresolved=factory.requests.filter(request=>request.unresolved);
-  if (unresolved.length) problems.push('factory execution used unresolved provider stubs: '+unresolved.map(request=>request.label).join(', '));
+  if (unresolved.length) problems.push('factory execution could not resolve providers: '+unresolved.map(request=>request.label).join(', '));
   return problems;
 }
 
 export function expectedFactoryDi(shape, context = {}) {
+  const completeOriginal=originalContextDi(shape,context);
+  if (completeOriginal) return completeOriginal;
   const original = shape.originalFactory;
   if (original?.family === 'core' && original.name === 'MatCommonModule') {
     // Untouched core.mjs also injects Platform inside the dev-mode constructor
@@ -176,6 +170,13 @@ export function originalRuntimeAliases(symbols, family) {
 }
 
 export async function runtimeTokenIdentity(family, param, loaded, aliases, observedToken, importModule = spec => import(spec)) {
+  if (param.spec==='@angular/common' && param.imported==='DOCUMENT' && param.ident==='DOCUMENT') {
+    // The original archive names Common's DOCUMENT. Both maintained minimum
+    // peers expose its supported identity from Core; never load the deprecated
+    // current Common re-export to resolve historical constructor metadata.
+    const core=await importModule('@angular/core');
+    return core.DOCUMENT!=null && core.DOCUMENT===observedToken;
+  }
   const finite = ownedTokenIdentity(family, param, loaded, observedToken);
   if (finite !== null) return finite;
   const originalAliases = name => Object.hasOwn(aliases, name) && Array.isArray(aliases[name]) ? aliases[name] : [];
@@ -236,12 +237,15 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = [], i
       : runFactory(value.ɵfac, Injector, runInInjectionContext);
     const observed = factory.requests;
     const publicNodeRequests=[];
-    const invalidReference = symbol.shape.originalFactory?.deps_kind === 'invalid';
+    const originalKind = symbol.shape.originalFactoryContext?.effective_factory_kind || symbol.shape.originalFactory?.deps_kind;
+    const invalidReference = originalKind === 'invalid';
     const runtime_context = {devMode: isDevMode()};
+    if (!construction && !invalidReference && factory.outcome==='returned' && !(factory.value instanceof value))
+      problems.push(`factory ${symbol.symbol_id} did not return the owned class instance`);
     const expected = invalidReference ? [] : construction?.runtime_requests
       || expectedFactoryDi(symbol.shape, runtime_context);
     if (construction) problems.push(...factory.behaviorProblems.map(problem => `factory ${symbol.symbol_id} ${problem}`));
-    for (const issue of factoryExecutionProblems(symbol.shape.originalFactory?.deps_kind, factory)) {
+    for (const issue of factoryExecutionProblems(originalKind, factory)) {
       problems.push(`factory ${symbol.symbol_id} ${issue}`);
     }
     if (observed.length !== expected.length) {
@@ -261,16 +265,14 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = [], i
           observed_label:got.label+(got.optional?'?':''),identity_matched:same,
           optional:Boolean(got.optional),self:Boolean(got.self),skipSelf:Boolean(got.skipSelf),host:Boolean(got.host)});
         if (!same) problems.push(`token ${symbol.symbol_id}[${index}] expected ${param.ident} observed ${got.label}`);
-        if (symbol.symbol_id===TABLE_SYMBOL) {
-          for (const flag of ['self','skipSelf','host']) if (Boolean(param[flag])!==Boolean(got[flag]))
-            problems.push(`injection flag ${symbol.symbol_id}[${index}] ${flag} differs`);
-        }
+        for (const flag of ['self','skipSelf','host']) if (Boolean(param[flag])!==Boolean(got[flag]))
+          problems.push(`injection flag ${symbol.symbol_id}[${index}] ${flag} differs`);
         if (Boolean(param.optional) !== Boolean(got.optional)) {
           problems.push(`optional ${symbol.symbol_id}[${index}] expected ${Boolean(param.optional)} observed ${Boolean(got.optional)}`);
         }
       }
     }
-    results.push({symbol, problems, runtime_context, factory_unresolved_provider_labels:observed.filter(request=>request.unresolved).map(request=>request.label), factory_outcome:factory.outcome, factory_error:factory.error, original_factory_kind:symbol.shape.originalFactory?.deps_kind ?? null, original_inherited_factory:symbol.shape.originalFactory?.inherited_factory?.name ?? null, constructor_attributes:[...new Set([...(symbol.shape.originalFactory?.inherited_factory?.attributes || []),...(symbol.shape.diParams || []).filter(param=>param.attribute).map(param=>param.attribute)])], observed: observed.map(item => `${item.label}${item.optional ? '?' : ''}`),
+    results.push({symbol, problems, runtime_context, factory_unresolved_provider_labels:observed.filter(request=>request.unresolved).map(request=>request.label), factory_outcome:factory.outcome, factory_error:factory.error, original_factory_kind:symbol.shape.originalFactory?.deps_kind ?? null, original_inherited_factory:symbol.shape.originalFactory?.inherited_factory?.name ?? null, effective_original_factory_kind:originalKind ?? null, factory_context:factory.context, factory_returned_owned_instance:factory.outcome==='returned' && (construction ? factory.behaviorProblems.length===0 : factory.value instanceof value), constructor_attributes:[...new Set(symbol.shape.originalFactoryContext ? symbol.shape.originalFactoryContext.factory_parameters?.filter(param=>param.attribute).map(param=>param.attribute) || [] : [...(symbol.shape.originalFactory?.inherited_factory?.attributes || []),...(symbol.shape.diParams || []).filter(param=>param.attribute).map(param=>param.attribute)])], observed: observed.map(item => `${item.label}${item.optional ? '?' : ''}`),
       ...(construction ? {approved_construction: {profile_id: construction.profile_id,
         contract_sha256: construction.contract_sha256, context: factory.context,
         behavior_problems: factory.behaviorProblems, counts: factory.counts,
