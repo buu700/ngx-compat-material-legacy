@@ -1,4 +1,4 @@
-import {existsSync} from 'node:fs';
+import {existsSync,readFileSync} from 'node:fs';
 import {pathToFileURL} from 'node:url';
 import {join,resolve} from 'node:path';
 import {approvedMenuItemContract} from './menu-item-construction-contract.mjs';
@@ -7,6 +7,7 @@ import {TABLE_SYMBOL, approvedTableContract} from './table-construction-contract
 import {observeTableFactory} from './api-table-factory.mjs';
 import {originalContextDi} from './api-original-factory-contexts.mjs';
 import {createPublicFactoryContext} from './api-public-node-context.mjs';
+import {attributeFactoryContract,executeAttributeFactory,challengeAttributeDetectorScopes} from './api-attribute-factory.mjs';
 
 // verify-lite imports the checker before node_modules exists. Load Angular
 // only when a packed factory is actually executed.
@@ -42,7 +43,7 @@ export function runFactory(factory, Injector, runInInjectionContext, options = {
       const decoded=typeof flags==='number'
         ?{optional:!!(flags&8),self:!!(flags&2),skipSelf:!!(flags&4),host:!!(flags&1)}
         :{optional:!!flags?.optional,self:!!flags?.self,skipSelf:!!flags?.skipSelf,host:!!flags?.host};
-      const request={token,label:labelOf(token),...decoded};requests.push(request);
+      const request={token,label:labelOf(token),...decoded};options.onRequest?.(request);requests.push(request);
       try{return base.get(token,notFound,flags);}
       catch(caught){request.unresolved=true;request.resolution_error=String(caught?.message||caught);throw caught;}
     }
@@ -72,12 +73,31 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
       if(typeof loaded?.[owner.name]!=='function')throw Error('missing caller module '+owner.symbol_id);
       modules.push({symbol_id:owner.symbol_id,value:loaded[owner.name]});
     }
-    fixture=await createPublicFactoryContext(core,importModule,
-      {providers:modules.length?[core.importProvidersFrom(...modules.map(m=>m.value))]:[]});
     const parameters=symbol.shape.originalFactoryContext?.factory_parameters||symbol.shape.diParams||[];
+    // Reauthenticate the original context before using its constructor parameters.
+    expectedFactoryDi(symbol.shape,{devMode:core.isDevMode()});
+    const attributes=parameters.filter(p=>p.attribute);
     const usesTemplate=parameters.some(p=>p.spec==='@angular/core'&&p.imported==='TemplateRef');
     nodeKind=usesTemplate?'template':'element';
-    factory=runFactory(value.ɵfac,core.Injector,core.runInInjectionContext,
+    let attributeContract;
+    if(attributes.length){
+      if(usesTemplate)throw Error('attribute/template combination remains unsupported');
+      const primary=await loadRuntimeModule(packageRoot,symbol.family,'primary');
+      const loaded=await loadRuntimeModule(packageRoot,symbol.family,symbol.kind);
+      const exports={...(primary||{}),...loaded};
+      const source=readFileSync(resolve(packageRoot,'fesm2022',symbol.kind==='primary'
+        ?`ngx-compat-material-legacy-${symbol.family}.mjs`:`ngx-compat-material-legacy-${symbol.family}-testing.mjs`),'utf8');
+      attributeContract=await attributeFactoryContract(value,core,source,parameters,async(param,token)=>{
+        const owned=param.ident==='ViewportRuler'?await loadRuntimeModule(packageRoot,'legacy-core','primary'):null;
+        const viewport=ownedViewportIdentity(symbol.family,param,owned||{},token);
+        return viewport!==null?viewport:runtimeTokenIdentity(symbol.family,param,exports,
+          originalRuntimeAliases(symbols,symbol.family),token,importModule);
+      });
+    }
+    fixture=await createPublicFactoryContext(core,importModule,
+      {providers:modules.length?[core.importProvidersFrom(...modules.map(m=>m.value))]:[],
+       ...(attributeContract?{nodeFactory:node=>{factory=executeAttributeFactory(value,core,attributeContract,node,runFactory);return factory.value;}}:{})});
+    if(!attributeContract)factory=runFactory(value.ɵfac,core.Injector,core.runInInjectionContext,
       {injector:(usesTemplate?fixture.template:fixture.element).injector});
     factory.context=fixture.context;
     if(factory.outcome==='returned'&&typeof factory.value?.ngOnDestroy==='function'){
@@ -86,6 +106,8 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
     if(fixture.component.hostView.destroyed)behaviorProblems.push('owned factory destroyed the borrowed fixture view');
     if(fixture.element.destroyed||fixture.template.destroyed)behaviorProblems.push('owned factory destroyed borrowed Angular node probes');
     if(fixture.environment.destroyed)behaviorProblems.push('owned factory destroyed the caller environment');
+    if(attributeContract&&factory.outcome==='returned'&&!behaviorProblems.length)
+      challengeAttributeDetectorScopes(factory,fixture);
   }catch(error){
     factory={requests:[],outcome:'threw',error:String(error?.message||error),value:undefined,
       context:'public node/application context setup failed; no qualification'};
@@ -320,7 +342,7 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = [], i
         }
       }
     }
-    results.push({symbol, problems, runtime_context, factory_unresolved_provider_labels:observed.filter(request=>request.unresolved).map(request=>request.label), factory_outcome:factory.outcome, factory_error:factory.error, original_factory_kind:symbol.shape.originalFactory?.deps_kind ?? null, original_inherited_factory:symbol.shape.originalFactory?.inherited_factory?.name ?? null, effective_original_factory_kind:originalKind ?? null, factory_context:factory.context, factory_context_modules:factory.callerModules || [], factory_node_kind:factory.nodeKind || null, runtime_requests:observed.map((request,index)=>({...runtimeRequests[index],observed_label:request.label,optional:Boolean(request.optional),self:Boolean(request.self),skipSelf:Boolean(request.skipSelf),host:Boolean(request.host),unresolved:Boolean(request.unresolved)})), factory_returned_owned_instance:factory.outcome==='returned' && (construction ? factory.behaviorProblems.length===0 : factory.value instanceof value), constructor_attributes:[...new Set(symbol.shape.originalFactoryContext ? symbol.shape.originalFactoryContext.factory_parameters?.filter(param=>param.attribute).map(param=>param.attribute) || [] : [...(symbol.shape.originalFactory?.inherited_factory?.attributes || []),...(symbol.shape.diParams || []).filter(param=>param.attribute).map(param=>param.attribute)])], observed: observed.map(item => `${item.label}${item.optional ? '?' : ''}`),
+    results.push({symbol, problems, runtime_context, factory_unresolved_provider_labels:observed.filter(request=>request.unresolved).map(request=>request.label), factory_outcome:factory.outcome, factory_error:factory.error, original_factory_kind:symbol.shape.originalFactory?.deps_kind ?? null, original_inherited_factory:symbol.shape.originalFactory?.inherited_factory?.name ?? null, effective_original_factory_kind:originalKind ?? null, factory_context:factory.context, factory_context_modules:factory.callerModules || [], factory_node_kind:factory.nodeKind || null, factory_constructor_evidence:factory.constructorEvidence || [], factory_compiler_observation:factory.compilerObservation || null, runtime_requests:observed.map((request,index)=>({...runtimeRequests[index],observation_evidence:request.evidence || 'public Injector request trace',observed_label:request.label,optional:Boolean(request.optional),self:Boolean(request.self),skipSelf:Boolean(request.skipSelf),host:Boolean(request.host),unresolved:Boolean(request.unresolved)})), factory_returned_owned_instance:factory.outcome==='returned' && (construction ? factory.behaviorProblems.length===0 : factory.value instanceof value), constructor_attributes:[...new Set(symbol.shape.originalFactoryContext ? symbol.shape.originalFactoryContext.factory_parameters?.filter(param=>param.attribute).map(param=>param.attribute) || [] : [...(symbol.shape.originalFactory?.inherited_factory?.attributes || []),...(symbol.shape.diParams || []).filter(param=>param.attribute).map(param=>param.attribute)])], observed: observed.map(item => `${item.label}${item.optional ? '?' : ''}`),
       ...(construction ? {approved_construction: {profile_id: construction.profile_id,
         contract_sha256: construction.contract_sha256, context: factory.context,
         behavior_problems: factory.behaviorProblems, counts: factory.counts,

@@ -28,6 +28,7 @@ import {
   bindingProblems,
 } from './api-surface.mjs';
 import {observeRuntimeDi, expectedFactoryDi} from './api-di-observe.mjs';
+import {attributeConstructorObservationProblems} from './api-attribute-factory.mjs';
 import {MENU_ITEM_SYMBOL, approvedMenuItemContract} from './menu-item-construction-contract.mjs';
 import {TABLE_SYMBOL, approvedTableContract, tableConstructionObservationComplete} from './table-construction-contract.mjs';
 
@@ -494,6 +495,8 @@ if (isMain) {
 }
 
 export function settleDi(row, records) {
+  if (!approvedMenuItemContract(row.symbol) && row.symbol.symbol_id!==TABLE_SYMBOL)
+    row={...row,problems:[...row.problems,...attributeConstructorObservationProblems(row)]};
   const historical = row.symbol.shape.token
     ? `token ${row.symbol.shape.tokenDescription || ''}`
     : (row.symbol.shape.originalFactoryContext?.effective_factory_kind || row.symbol.shape.originalFactory?.deps_kind) === 'invalid' ? 'original-non-injectable-factory'
@@ -620,6 +623,7 @@ function writeAcceptance(request, surface, groups, declared, diSettled, summary,
         execution:di?{context:di.factory_context||null,outcome:di.factory_outcome||null,error:di.factory_error||null,
           returned_owned_instance:di.factory_returned_owned_instance??null,node_kind:di.factory_node_kind||null,
           caller_modules:di.factory_context_modules||[],requests:di.runtime_requests||[],
+          constructor_evidence:di.factory_constructor_evidence||[],compiler_observation:di.factory_compiler_observation||null,
           historical:di.historical,owned:di.owned,constructor_attributes:di.constructor_attributes||[],
           ...(di.approved_construction?{approved_construction:di.approved_construction}:{})}:null});
     }
