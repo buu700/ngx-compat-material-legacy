@@ -18,6 +18,7 @@ import {packedShape,originalFactoryContract,originalInheritedConstructor,origina
 import {approvedTableContract,TABLE_CONTRACT_PATH} from '../scripts/table-construction-contract.mjs';
 import {observeRuntimeDi,expectedFactoryDi} from '../scripts/api-di-observe.mjs';
 import {settleDi} from '../scripts/api-completeness.mjs';
+import {originalCompilerFactoryContext} from '../scripts/api-original-factory-contexts.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),req=createRequire(import.meta.url),ts=req('typescript');
 const read=p=>readFileSync(resolve(root,p),'utf8'),sf=(text,p='fixture.ts')=>ts.createSourceFile(p,text,ts.ScriptTarget.Latest,true);
 const sha=b=>createHash('sha256').update(b).digest('hex'),url=spec=>pathToFileURL(req.resolve(spec)).href,importModule=spec=>import(url(spec));
@@ -28,6 +29,7 @@ const constructor=originalInheritedConstructor(originalPath,name),inputs=origina
 const symbol={symbol_id:'legacy-table/primary/MatLegacyTable',family:'legacy-table',kind:'primary',name,di_id:'table-api-fixture',shape:{...old,
  inheritedConstructor:constructor,inheritedTableInputs:inputs,originalFactory:originalFactoryContract(originalPath,name),
  signatures:[...old.ownSignatures,...constructor.signatures,...inputs.signatures]}};
+symbol.shape.originalFactoryContext=originalCompilerFactoryContext(symbol.shape.originalFactory);
 const contract=approvedTableContract(symbol),differences=loadDifferences();
 assert.equal(expectedFactoryDi(symbol.shape).length,11);assert.deepEqual(symbol.shape.originalFactory.inherited_factory.attributes,['role']);
 assert.equal(contract.runtime_requests.length,7);assert.equal(inputs.signatures.length,4);
