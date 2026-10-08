@@ -18,6 +18,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const require = createRequire(import.meta.url), ts = require('typescript');
 const url = name => pathToFileURL(require.resolve(name)).href;
 const core = await import(url('@angular/core'));
+const containerState = await load(undefined,undefined,false,true);
 const {Dialog, DialogConfig} = await import(url('@angular/cdk/dialog'));
 const {MatDialogConfig} = await import(url('@angular/material/dialog'));
 const {Subject} = await import(url('rxjs'));
@@ -112,10 +113,22 @@ async function observations(Base, serviceSource = serviceRaw) {
     assert.deepEqual(f.instance._ariaLabelledByQueue, ['provided']);
     // Ambient ChangeDetectorRef belongs to the fixture; title mutations must mark it.
     const detector = f.injector.get(core.ChangeDetectorRef);detector.markForCheck = () => marks++;
-    try {f.instance._addAriaLabelledBy('first');f.instance._addAriaLabelledBy('second');
-      f.instance._removeAriaLabelledBy('missing');f.instance._removeAriaLabelledBy('first');
+    try {containerState.addLegacyDialogTitle(f.instance,'first');containerState.addLegacyDialogTitle(f.instance,'second');
+      containerState.removeLegacyDialogTitle(f.instance,'missing');containerState.removeLegacyDialogTitle(f.instance,'first');
       assert.deepEqual(f.instance._ariaLabelledByQueue, ['provided', 'second']);assert.equal(marks, 3);}
     finally {f.destroy();}
+  });
+  await check('historical-title-queue-mock-needs-no-current-container-methods',async()=>{
+    const container={_ariaLabelledByQueue:['supplied']};
+    containerState.addLegacyDialogTitle(container,'first');containerState.addLegacyDialogTitle(container,'second');
+    containerState.removeLegacyDialogTitle(container,'missing');containerState.removeLegacyDialogTitle(container,'first');
+    assert.deepEqual(container._ariaLabelledByQueue,['supplied','second']);
+  });
+  await check('destroyed-title-owner-never-mutates-or-marks-its-old-queue',async()=>{
+    const f=fixture(Base,'dialog',true,{config:{ariaLabelledBy:'supplied'}});let marks=0;
+    f.injector.get(core.ChangeDetectorRef).markForCheck=()=>marks++;f.destroy();
+    containerState.addLegacyDialogTitle(f.instance,'late');containerState.removeLegacyDialogTitle(f.instance,'supplied');
+    assert.deepEqual(f.instance._ariaLabelledByQueue,['supplied']);assert.equal(marks,0);
   });
   for(const kind of ['component', 'template', 'dom']) {
     await check(`public-generic-${kind}-portal-and-result-identity`, async () => {

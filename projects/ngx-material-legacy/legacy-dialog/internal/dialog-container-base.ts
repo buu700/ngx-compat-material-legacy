@@ -22,9 +22,12 @@ import {
   Optional, ProviderToken, Renderer2, ViewChild,
 } from '@angular/core';
 import {MatDialogConfig} from '@angular/material/dialog';
-import {Observable, Subject, Subscription} from 'rxjs';
+import {Subject, Subscription} from 'rxjs';
+import {take} from 'rxjs/operators';
 import {focusLegacyDialogInitially, legacyDialogActiveElement, legacyDialogContainsFocus}
   from './dialog-initial-focus';
+import {destroyLegacyDialogContainerState, registerLegacyDialogContainerState}
+  from './dialog-container-state';
 
 /** Optional Angular services must not prevent the original manual constructor. */
 function ambientService<T>(token: ProviderToken<T>): T | null {
@@ -61,8 +64,7 @@ export abstract class _MatDialogContainerBase extends BasePortalOutlet implement
   protected _document: Document;
 
   private readonly _legacyFocusNotifications = new Subject<void>();
-  /** Public CDK custom-container protocol; consumers cannot emit notifications. */
-  readonly _focusTrapped: Observable<void> = this._legacyFocusNotifications.asObservable();
+  private readonly _legacyFocusStableSubscriptions = new Subscription();
 
   private readonly _legacyChangeDetector = ambientService(ChangeDetectorRef);
   private readonly _legacyDialogRef = ambientService(DialogRef);
@@ -85,6 +87,8 @@ export abstract class _MatDialogContainerBase extends BasePortalOutlet implement
     private _legacyFocusMonitor?: FocusMonitor,
   ) {
     super();
+    registerLegacyDialogContainerState(
+      this, this._legacyFocusNotifications.asObservable(), this._legacyChangeDetector);
     this._document = _document;
     if (_config.ariaLabelledBy) {
       this._ariaLabelledByQueue.push(_config.ariaLabelledBy);
@@ -159,30 +163,17 @@ export abstract class _MatDialogContainerBase extends BasePortalOutlet implement
     }
   }
 
-  _addAriaLabelledBy(id: string): void {
-    this._ariaLabelledByQueue.push(id);
-    this._legacyChangeDetector?.markForCheck();
-  }
-
-  _removeAriaLabelledBy(id: string): void {
-    const index = this._ariaLabelledByQueue.indexOf(id);
-    if (index > -1) {
-      this._ariaLabelledByQueue.splice(index, 1);
-      this._legacyChangeDetector?.markForCheck();
-    }
-  }
-
-  /** Keep the legacy microtask focus timing independently of render callbacks. */
-  protected _trapFocus(options?: FocusOptions): void {
+  /** Preserve the original direct-focus and public NgZone stability timing. */
+  protected _trapFocus(): void {
     if (this._legacyFocusDestroyed) {
       return;
     }
-    Promise.resolve().then(() => {
+    const focus = () => {
       if (this._legacyFocusDestroyed) {
         return;
       }
       this._legacyFocusCleanup?.();
-      this._legacyFocusCleanup = focusLegacyDialogInitially({
+      const cleanup = focusLegacyDialogInitially({
         element: this._elementRef.nativeElement,
         config: this._config,
         factory: this._focusTrapFactory,
@@ -195,9 +186,25 @@ export abstract class _MatDialogContainerBase extends BasePortalOutlet implement
         },
         ngZone: this._ngZone,
         isBrowser: this._isBrowser(),
-      }, options);
-      this._legacyFocusNotifications.next();
-    });
+        isDestroyed: () => this._legacyFocusDestroyed,
+        onFocusSettled: () => {
+          if (!this._legacyFocusDestroyed) {
+            this._legacyFocusNotifications.next();
+          }
+        },
+      });
+      if (this._legacyFocusDestroyed) {
+        cleanup?.();
+      } else {
+        this._legacyFocusCleanup = cleanup;
+      }
+    };
+    if ((this._config.autoFocus === true || this._config.autoFocus === 'first-tabbable')
+        && !this._ngZone.isStable) {
+      this._legacyFocusStableSubscriptions.add(this._ngZone.onStable.pipe(take(1)).subscribe(focus));
+    } else {
+      focus();
+    }
   }
 
   ngOnDestroy(): void {
@@ -205,7 +212,9 @@ export abstract class _MatDialogContainerBase extends BasePortalOutlet implement
       return;
     }
     this._legacyFocusDestroyed = true;
+    destroyLegacyDialogContainerState(this);
     try {
+      this._legacyFocusStableSubscriptions.unsubscribe();
       this._restoreLegacyFocus();
     } finally {
       try {

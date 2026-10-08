@@ -68,14 +68,15 @@ try {
  const wrongParent={...candidate,publicPortalParent:false};
  for(const name of ['detach():void','dispose():void','hasAttached():boolean'])
   assert.ok(compareSignatures(symbol,wrongParent,differences).blocking.includes('public method '+name));
- // Keep newly observed differences open. Authentic inheritance is evidence,
+ // Exact original signatures are restored. Authentic inheritance is evidence,
  // not permission to add a waiver or to claim the entire API has passed.
- assert.deepEqual(current.blocking.sort(),[
-  'protected method _trapFocus():void',
-  'public method _addAriaLabelledBy(string):void',
-  'public method _removeAriaLabelledBy(string):void',
-  'public readonly prop _focusTrapped:Observable<void>',
- ].sort());
+ assert.deepEqual(current.blocking,[]);
+ for(const added of ['public method _addAriaLabelledBy(string):void','public method _removeAriaLabelledBy(string):void','public readonly prop _focusTrapped:Observable<void>']) {
+  const extra={...candidate,signatures:candidate.signatures.concat(added),ownSignatures:candidate.ownSignatures.concat(added)};
+  assert.ok(compareSignatures(symbol,extra,differences).blocking.includes(added));
+ }
+ const wrongFocus=shape(candidateRaw.replace('protected _trapFocus(): void','protected _trapFocus(options?: FocusOptions): void'));
+ assert.ok(compareSignatures(symbol,wrongFocus,differences).blocking.includes('protected method _trapFocus():void'));
  assert.ok(!current.blocking.includes('public method ngOnDestroy():void'));
  const ctor=source=>source.statements.find(n=>ts.isClassDeclaration(n)&&n.name?.text==='_MatDialogContainerBase');
  const actualSource=ts.createSourceFile('candidate.ts',candidateRaw,ts.ScriptTarget.Latest,true);

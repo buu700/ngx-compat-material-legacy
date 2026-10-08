@@ -31,16 +31,18 @@ const basePath = folder + 'dialog-container-base.ts', focusPath = folder + 'dial
 const originalBase = readFileSync(resolve(root, basePath), 'utf8');
 const originalFocus = readFileSync(resolve(root, focusPath), 'utf8');
 
-export async function load(baseSource = originalBase, focusSource = originalFocus, moduleUrlOnly = false) {
+export async function load(baseSource = originalBase, focusSource = originalFocus, moduleUrlOnly = false, stateOnly = false) {
   function emit(raw) {
     let js = ts.transpileModule(raw, {compilerOptions: {
       target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext, experimentalDecorators: true,
     }}).outputText;
-    js = js.replace(/(['"])(@angular\/[^'"]+|rxjs)\1/g, (_, quote, name) => JSON.stringify(url(name)));
+    js = js.replace(/(['"])(@angular\/[^'"]+|rxjs(?:\/operators)?)\1/g, (_, quote, name) => JSON.stringify(url(name)));
     return js;
   }
   const focusUrl = 'data:text/javascript;base64,' + Buffer.from(emit(focusSource)).toString('base64');
-  const base = emit(baseSource).replaceAll("'./dialog-initial-focus'", JSON.stringify(focusUrl));
+  const stateUrl = 'data:text/javascript;base64,' + Buffer.from(emit(readFileSync(resolve(root,folder+'dialog-container-state.ts'),'utf8'))).toString('base64');
+  if (stateOnly) return import(stateUrl);
+  const base = emit(baseSource).replaceAll("'./dialog-initial-focus'", JSON.stringify(focusUrl)).replaceAll("'./dialog-container-state'", JSON.stringify(stateUrl));
   const baseUrl = 'data:text/javascript;base64,' + Buffer.from(base).toString('base64');
   if (moduleUrlOnly) return baseUrl;
   const loaded = await import(baseUrl);
@@ -79,7 +81,8 @@ export function fixture(Base, autoFocus = 'first-tabbable', isBrowser = true, mo
   const heading = element('heading'); heading.selector = 'h1, h2, h3, h4, h5, h6, [role="heading"]';
   host.children = [first, second, heading];
   const checker = {isFocusable: node => node.focusable, isTabbable: node => node.tabbable};
-  const zone = {runOutsideAngular: callback => callback()};
+  const stable = new Subject();
+  const zone = {isStable: mode.unstableZone !== true, onStable: stable, runOutsideAngular: callback => callback()};
   const config = Object.assign(mode.configFactory ? mode.configFactory() : {},
     {autoFocus, restoreFocus: false, ...mode.config});
   const backdrop = new Subject();
@@ -138,7 +141,7 @@ export function fixture(Base, autoFocus = 'first-tabbable', isBrowser = true, mo
   instance._focusTrapped.subscribe({next() { notifications++; log.push({kind: 'notification'}); },
     complete() { completed++; }});
   return {instance, document, host, first, second, heading, log, listeners, selections,
-    element, args, factory, config, overlay, backdrop, monitor, injector, owner, notifications: () => notifications, completed: () => completed,
+    element, args, factory, config, overlay, backdrop, monitor, injector, owner, zone, stable, notifications: () => notifications, completed: () => completed,
     anchorCreations: () => anchorCreations,
     destroy() { try { instance.ngOnDestroy(); } finally { injector.destroy();
       if (hadDocument) globalThis.document = priorDocument; else delete globalThis.document; } }};
@@ -150,16 +153,55 @@ async function observations(Base) {
     try { await body(); cases.push({id, result: 'pass'}); }
     catch (error) { cases.push({id, result: 'fail', error: error.message.slice(0, 400)}); }
   }
-  await check('microtask-focus-and-notification-order', async () => {
-    const f = fixture(Base); const options = {preventScroll: true};
+  await check('stable-zone-focus-and-notification-order', async () => {
+    const f = fixture(Base);
     try {
-      f.instance._trapFocus(options); assert.equal(f.log.length, 0);
+      f.instance._trapFocus(); assert.equal(f.document.activeElement, f.first);
       await Promise.resolve(); assert.equal(f.document.activeElement, f.first);
-      assert.equal(f.log.find(e => e.kind === 'focus').options, options);
+      assert.equal(f.log.find(e => e.kind === 'focus').options, undefined);
       assert.equal(f.log.at(-1).kind, 'notification'); assert.equal(f.notifications(), 1);
       assert.equal(f.selections.size, 0); assert.equal(f.anchorCreations(), 0);
       assert.equal(f.log.find(e => e.kind === 'create-selection').deferred, true);
     } finally { f.destroy(); }
+  });
+  await check('unstable-zone-waits-on-the-supplied-public-stability-event-once',async()=>{
+    const f=fixture(Base,'first-tabbable',true,{unstableZone:true});
+    try{f.instance._trapFocus();await Promise.resolve();assert.equal(f.log.length,0);
+      assert.equal(f.stable.observers.length,1);f.zone.isStable=true;f.stable.next();
+      assert.equal(f.document.activeElement,f.first);assert.equal(f.notifications(),1);
+      assert.equal(f.stable.observers.length,0);f.stable.next();assert.equal(f.notifications(),1);
+    }finally{f.destroy();}
+  });
+  await check('destroy-unsubscribes-from-the-borrowed-unstable-zone',async()=>{
+    const f=fixture(Base,'first-tabbable',true,{unstableZone:true});
+    f.instance._trapFocus();assert.equal(f.stable.observers.length,1);f.destroy();
+    assert.equal(f.stable.observers.length,0);assert.equal(f.stable.isStopped,false);
+    f.stable.next();await Promise.resolve();assert.equal(f.log.length,0);
+  });
+  for(const mode of [false,'dialog','first-heading','button']){
+    await check('direct-and-selector-focus-is-synchronous:'+String(mode),async()=>{
+      const f=fixture(Base,mode,true,{unstableZone:true});if(mode==='button')f.second.selector='button';
+      try{f.instance._trapFocus();assert.equal(f.document.activeElement,
+        mode==='first-heading'?f.heading:mode==='button'?f.second:f.host);
+        assert.equal(f.notifications(),1);assert.equal(f.stable.observers.length,0);
+      }finally{f.destroy();}
+    });
+  }
+  await check('only-the-failed-initial-selection-fallback-is-deferred',async()=>{
+    const f=fixture(Base);f.host.children=[];
+    try{f.instance._trapFocus();assert.equal(f.document.activeElement,null);assert.equal(f.notifications(),0);
+      await Promise.resolve();assert.equal(f.document.activeElement,f.host);assert.equal(f.notifications(),1);
+    }finally{f.destroy();}
+  });
+  await check('destroy-cancels-the-deferred-empty-selection-fallback',async()=>{
+    const f=fixture(Base);f.host.children=[];f.instance._trapFocus();f.destroy();await Promise.resolve();
+    assert.equal(f.document.activeElement,null);assert.equal(f.notifications(),0);
+  });
+  await check('synchronous-focus-observer-destruction-cleans-new-selector-listeners',async()=>{
+    const f=fixture(Base,'first-heading');const focus=f.heading.focus.bind(f.heading);
+    f.heading.focus=()=>{focus();f.destroy();};
+    f.instance._trapFocus();assert.equal(f.listeners.size,0);assert.equal(f.heading.tabIndex,undefined);
+    assert.equal(f.notifications(),0);assert.equal(f.completed(),1);
   });
   await check('explicit-initial-marker-prioritized', async () => {
     const f = fixture(Base, true); f.second.initial = true;
@@ -251,8 +293,8 @@ async function observations(Base) {
       assert.equal(f.notifications(), 1); assert.equal(f.selections.size, 0); }
     finally { f.destroy(); }
   });
-  await check('destroy-before-microtask-cancels-focus-and-completes', async () => {
-    const f = fixture(Base); f.instance._trapFocus(); f.destroy(); await Promise.resolve();
+  await check('destroy-before-zone-stability-cancels-focus-and-completes', async () => {
+    const f = fixture(Base, 'first-tabbable', true, {unstableZone:true}); f.instance._trapFocus(); f.destroy(); f.stable.next(); await Promise.resolve();
     assert.equal(f.document.activeElement, null); assert.equal(f.log.length, 0);
     assert.equal(f.notifications(), 0); assert.equal(f.completed(), 1);
   });
@@ -276,7 +318,7 @@ async function observations(Base) {
       assert.equal(f.log.length, 0); assert.equal(f.notifications(), 0);
       f.instance._openAnimationDone(150);
       assert.deepEqual(animations, [{state: 'opened', totalTime: 150}]);
-      assert.equal(f.document.activeElement, null);
+      assert.equal(f.document.activeElement, f.first);
       await Promise.resolve(); assert.equal(f.document.activeElement, f.first);
       assert.equal(f.notifications(), 1); assert.equal(f.anchorCreations(), 0);
     } finally { f.destroy(); }
@@ -289,13 +331,19 @@ assert.ok(cases.every(c => c.result === 'pass'), JSON.stringify(cases.filter(c =
 const mutations = [];
 const mutants = [
   ['destroy-guard-removed', originalBase.replaceAll('if (this._legacyFocusDestroyed)', 'if (false)'), originalFocus,
-    'destroy-before-microtask-cancels-focus-and-completes'],
+    'focus-request-after-destroy-is-inert'],
   ['anchors-enabled', originalBase, originalFocus.replace('factory.create(element, true)', 'factory.create(element, false)'),
-    'microtask-focus-and-notification-order'],
+    'stable-zone-focus-and-notification-order'],
   ['selection-destroy-removed', originalBase, originalFocus.replace('selection.destroy();', '/* leaked selection */'),
-    'microtask-focus-and-notification-order'],
+    'stable-zone-focus-and-notification-order'],
   ['forced-tabindex-cleanup-removed', originalBase, originalFocus.replace("target.removeAttribute('tabindex');", '/* lost cleanup */'),
     'heading-temporary-tabindex-restored-on-blur'],
+  ['zone-subscription-not-released',originalBase.replace('this._legacyFocusStableSubscriptions.unsubscribe();','/* leaked zone subscription */'),originalFocus,
+    'destroy-unsubscribes-from-the-borrowed-unstable-zone'],
+  ['zone-stability-wait-bypassed',originalBase.replace('&& !this._ngZone.isStable','&& false'),originalFocus,
+    'unstable-zone-waits-on-the-supplied-public-stability-event-once'],
+  ['cleanup-created-during-focus-destruction-leaked',originalBase.replace('cleanup?.();','/* leaked newly created cleanup */'),originalFocus,
+    'synchronous-focus-observer-destruction-cleans-new-selector-listeners'],
 ];
 for (const [id, base, focus, failingCase] of mutants) {
   assert.ok(base !== originalBase || focus !== originalFocus);
@@ -306,7 +354,7 @@ for (const [id, base, focus, failingCase] of mutants) {
 const report = {schema_version: 1, role: 'Owned focus/source lifecycle diagnostic; not native/AOT/packed/minimum qualification',
   node: process.version, compiler: ts.version, runtime_peer: {framework: core.VERSION.full,
     cdk_package: JSON.parse(readFileSync(require.resolve('@angular/cdk/package.json'))).version},
-  sources: [basePath, focusPath].map(path => {const bytes = readFileSync(resolve(root, path));
+  sources: [basePath, focusPath, folder + 'dialog-container-state.ts', 'tests/dialog_initial_focus_runtime_probe.mjs'].map(path => {const bytes = readFileSync(resolve(root, path));
     return {path, sha256: sha(bytes), bytes: bytes.length};}), cases, mutations,
   limits: ['Actual owned two-module code and current public FocusTrap execute under synthetic DOM and borrowed service fixtures.',
     'Public FocusTrapFactory.create protocol is supplied by a fixture that constructs the real public FocusTrap; actual factory/root service setup is not executed.',
