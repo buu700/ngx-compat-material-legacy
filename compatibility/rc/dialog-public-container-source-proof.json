@@ -1,0 +1,1940 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "recorded_at_utc": "2026-10-08T03:46:57Z",
+  "role": "Bounded implementation/public primitive source proof;no complete API/native/AOT/packed/floor/security or engineering-readiness claim",
+  "previous_subject": {
+    "path": "compatibility/rc/dialog-initial-focus-public-source-proof.json",
+    "role": "Retained earlier source subject;its candidate-source/runtime receipts are historical after this edit."
+  },
+  "implementation": "Replace private CdkDialogContainer inheritance in the already owned removed Material16 base with current public BasePortalOutlet and CdkPortalOutlet generic attachment, public focus trapping and an owned legacy restoration policy. Restore all eight original constructor arguments and their optional DI flag. Preserve the actual supplied element, factory, document, config, checker, zone, overlay and optional monitor;ambient services provide only optional Angular/view protocols and are never required for manual construction.",
+  "ownership": "Own the persistent trap and manual-overlay subscription, temporary selection/listener cleanup and notification subject. Destroy only those owned resources. Public DialogRef owns its own backdrop path when its exact overlay and container match. ngOnDestroy neither disposes portal rendering nor destroys supplied services;explicit public detach/dispose delegates to the inner public outlet.",
+  "config_provider": "The actual owned dialog service provides its legacy config class, the public MatDialogConfig constructor token and public DialogConfig with the same exact legacy config object inside the custom container scope. Actual source execution rejects omission of the public alias.",
+  "untouched_reference": {
+    "schema_version": 1,
+    "tag": "16.2.14",
+    "commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+    "cdk_archive_sha256": "a499ba0fee46784441b92587e43b17ec72d9bd383f78ea14954eaa62c781bad7",
+    "cdk_integrity": "sha512-n6PrGdiVeSTEmM/HEiwIyg6YQUUymZrb5afaNLGFRM5YL0Y8OBqd+XhCjb0OfD/AfgCUtedVEPwNqrfW8KzgGw==",
+    "archive_sri_rehashed": true,
+    "members": [
+      {
+        "path": "reference/material-16.2.14/dialog-focus-sources/material-dialog-container.ts",
+        "tag_path": "src/material/dialog/dialog-container.ts",
+        "sha256": "91ecfd4630a3aac273b04c9090887364a358be2c44f0588551e36545fe004dc1",
+        "bytes": 12242
+      },
+      {
+        "path": "reference/material-16.2.14/dialog-focus-sources/cdk-dialog-container.ts",
+        "tag_path": "src/cdk/dialog/dialog-container.ts",
+        "sha256": "571d6c3017e773229880a6da96b6e5c322c462b20e2c9784c85a291a96d12545",
+        "bytes": 11999
+      },
+      {
+        "path": "reference/material-16.2.14/dialog-focus-sources/focus-trap.ts",
+        "tag_path": "src/cdk/a11y/focus-trap/focus-trap.ts",
+        "sha256": "8ad7f0fb6b7814ac981a51b48dd6ad39c8035b9f638d58041ea409a6fe76c8f5",
+        "bytes": 15443
+      },
+      {
+        "path": "reference/material-16.2.14/dialog-focus-sources/shadow-dom.ts",
+        "tag_path": "src/cdk/platform/features/shadow-dom.ts",
+        "sha256": "921df8a9671e5c66043bf45a86fb7544c1d3ca000f0eb5cb0263f70479a43f2c",
+        "bytes": 2163
+      },
+      {
+        "path": "reference/material-16.2.14/dialog-focus-sources/cdk-dialog.d.ts",
+        "archive_member": "package/dialog/index.d.ts",
+        "sha256": "bfbf53c3fd8e9535005853fb23249b9d2bb6f79df89c30eef9bf873a3a9c0950",
+        "bytes": 20110
+      },
+      {
+        "path": "reference/material-16.2.14/dialog-focus-sources/cdk-portal.d.ts",
+        "archive_member": "package/portal/index.d.ts",
+        "sha256": "7172d4edfc661bc427a1b0f16cfd0261f5255a5a96f3c5add90eca4cf5c4eb1a",
+        "bytes": 13921
+      }
+    ],
+    "role": "Complete untouched reference members;not candidate-generated expectations or shipped CDK fork"
+  },
+  "actual_minimum_peer_members": [
+    {
+      "line": "main",
+      "package": "@angular/cdk",
+      "version": "22.1.7",
+      "archive_sha256": "225d82389797aefbbb2684461576ef950465546a9d28326483e0b816c8a5a558",
+      "integrity": "sha512-TN4pPExBZ6ZbxWnfVb77M/0cL83eRY3qpHv/R9Y1KhkNXlxdocd0My7wiueWBBimYacSpBnfHrIRNmHgX7Pc4Q==",
+      "sri_rehashed": true,
+      "members": [
+        {
+          "path": "compatibility/rc/dialog-public-container-peer-sources/cdk-22.1.7-portal.d.ts",
+          "member": "package/types/portal.d.ts",
+          "sha256": "17f59b700249a0ee761c3ac50d34415c7118eba48e26b8928e87d530fc4a4a64",
+          "bytes": 2269
+        },
+        {
+          "path": "compatibility/rc/dialog-public-container-peer-sources/cdk-22.1.7-_portal-directives-chunk.d.ts",
+          "member": "package/types/_portal-directives-chunk.d.ts",
+          "sha256": "f8b81020a222fc8f1d47c7e1497595e534e4d4a98d28e46e9cfe19aeb84b9b88",
+          "bytes": 9150
+        },
+        {
+          "path": "compatibility/rc/dialog-public-container-peer-sources/cdk-22.1.7-dialog.d.ts",
+          "member": "package/types/dialog.d.ts",
+          "sha256": "8dd71a94aa0b86f248133bbc5855fea745edc5531dd616758824f9914a01e3d0",
+          "bytes": 19947
+        },
+        {
+          "path": "compatibility/rc/dialog-public-container-peer-sources/cdk-22.1.7-overlay.d.ts",
+          "member": "package/types/overlay.d.ts",
+          "sha256": "0b85f5bf55a586129ab50acaf40d6c38616f84e49f6c1b73fb0b09600596b879",
+          "bytes": 14509
+        },
+        {
+          "path": "compatibility/rc/dialog-public-container-peer-sources/cdk-22.1.7-_overlay-module-chunk.d.ts",
+          "member": "package/types/_overlay-module-chunk.d.ts",
+          "sha256": "8f6af024f02ebd819c54fa1e5568d6992f4be9cda2f17b331cd7a765f04568ae",
+          "bytes": 45138
+        },
+        {
+          "path": "compatibility/rc/dialog-public-container-peer-sources/cdk-22.1.7-dialog.mjs",
+          "member": "package/fesm2022/dialog.mjs",
+          "sha256": "715d0f484af26b104b4d043243a9de7cc945d0a34b3175e291ad0f56b08f2c29",
+          "bytes": 23982
+        },
+        {
+          "path": "compatibility/rc/dialog-public-container-peer-sources/cdk-22.1.7-portal.mjs",
+          "member": "package/fesm2022/portal.mjs",
+          "sha256": "3a6fef548d07cebf7e4f7a86ea703016e4acc5d1e897765ad6e7b528671dfa3c",
+          "bytes": 13484
+        }
+      ],
+      "role": "Complete exact minimum declaration/runtime members;read-only data, not installed peers or authored CDK fork"
+    },
+    {
+      "line": "21.x",
+      "package": "@angular/cdk",
+      "version": "21.2.14",
+      "archive_sha256": "b54868a0f7aefa471203a0fe419370e156cdf0218db9b625aca3ae6e8de25c63",
+      "integrity": "sha512-806REq/CLf37nEhmmd8Q+ILN8z/RVG2vk2n8YZ/4TdHpcBCi5ux4AxLbpMmduLwGPOzPagJ6ggRzE5fnX0rmcQ==",
+      "sri_rehashed": true,
+      "members": [
+        {
+          "path": "compatibility/rc/dialog-public-container-peer-sources/cdk-21.2.14-portal.d.ts",
+          "member": "package/types/portal.d.ts",
+          "sha256": "17f59b700249a0ee761c3ac50d34415c7118eba48e26b8928e87d530fc4a4a64",
+          "bytes": 2269
+        },
+        {
+          "path": "compatibility/rc/dialog-public-container-peer-sources/cdk-21.2.14-_portal-directives-chunk.d.ts",
+          "member": "package/types/_portal-directives-chunk.d.ts",
+          "sha256": "8bf59f01d49417cba2bb4b8eba6ba9a03f33976950bc369865070d17be684cb7",
+          "bytes": 8958
+        },
+        {
+          "path": "compatibility/rc/dialog-public-container-peer-sources/cdk-21.2.14-dialog.d.ts",
+          "member": "package/types/dialog.d.ts",
+          "sha256": "5d9ab0026ebe92d3607fecb58df3721106f8c63534f2601fc3c387c2e2245d97",
+          "bytes": 19836
+        },
+        {
+          "path": "compatibility/rc/dialog-public-container-peer-sources/cdk-21.2.14-overlay.d.ts",
+          "member": "package/types/overlay.d.ts",
+          "sha256": "e15e46ec3d671453aa3be897938cf04b0c29dbdd20480def6d57ebfae53c2499",
+          "bytes": 14625
+        },
+        {
+          "path": "compatibility/rc/dialog-public-container-peer-sources/cdk-21.2.14-_overlay-module-chunk.d.ts",
+          "member": "package/types/_overlay-module-chunk.d.ts",
+          "sha256": "7d89742d60a006d1ccf044a451c774f6baf4f54f41b61c7f309346b9ce84f6cf",
+          "bytes": 45193
+        },
+        {
+          "path": "compatibility/rc/dialog-public-container-peer-sources/cdk-21.2.14-dialog.mjs",
+          "member": "package/fesm2022/dialog.mjs",
+          "sha256": "74f639c81356a04f11e7fcc94668a17da882737a1104cba769f137a57931839c",
+          "bytes": 24088
+        },
+        {
+          "path": "compatibility/rc/dialog-public-container-peer-sources/cdk-21.2.14-portal.mjs",
+          "member": "package/fesm2022/portal.mjs",
+          "sha256": "37767877fc3b85878dca37759d0205baa672370ea7e89622bfc76df60ea0049a",
+          "bytes": 13333
+        }
+      ],
+      "role": "Complete exact minimum declaration/runtime members;read-only data, not installed peers or authored CDK fork"
+    }
+  ],
+  "actual_minimum_public_imports": [
+    {
+      "line": "main",
+      "declarations": [
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/cdk/a11y",
+          "name": "FocusMonitor",
+          "public_export": true,
+          "declaration": "types/_focus-monitor-chunk.d.ts",
+          "declaration_name": "FocusMonitor",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/cdk/a11y",
+          "name": "FocusOrigin",
+          "public_export": true,
+          "declaration": "types/_focus-monitor-chunk.d.ts",
+          "declaration_name": "FocusOrigin",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/cdk/a11y",
+          "name": "FocusTrap",
+          "public_export": true,
+          "declaration": "types/_a11y-module-chunk.d.ts",
+          "declaration_name": "FocusTrap",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/cdk/a11y",
+          "name": "FocusTrapFactory",
+          "public_export": true,
+          "declaration": "types/_a11y-module-chunk.d.ts",
+          "declaration_name": "FocusTrapFactory",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/cdk/a11y",
+          "name": "InteractivityChecker",
+          "public_export": true,
+          "declaration": "types/_a11y-module-chunk.d.ts",
+          "declaration_name": "InteractivityChecker",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/cdk/dialog",
+          "name": "DialogRef",
+          "public_export": true,
+          "declaration": "types/dialog.d.ts",
+          "declaration_name": "DialogRef",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/cdk/overlay",
+          "name": "OverlayRef",
+          "public_export": true,
+          "declaration": "types/_overlay-module-chunk.d.ts",
+          "declaration_name": "OverlayRef",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/cdk/platform",
+          "name": "Platform",
+          "public_export": true,
+          "declaration": "types/_platform-chunk.d.ts",
+          "declaration_name": "Platform",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/cdk/portal",
+          "name": "BasePortalOutlet",
+          "public_export": true,
+          "declaration": "types/_portal-directives-chunk.d.ts",
+          "declaration_name": "BasePortalOutlet",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/cdk/portal",
+          "name": "CdkPortalOutlet",
+          "public_export": true,
+          "declaration": "types/_portal-directives-chunk.d.ts",
+          "declaration_name": "CdkPortalOutlet",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/cdk/portal",
+          "name": "ComponentPortal",
+          "public_export": true,
+          "declaration": "types/_portal-directives-chunk.d.ts",
+          "declaration_name": "ComponentPortal",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/cdk/portal",
+          "name": "DomPortal",
+          "public_export": true,
+          "declaration": "types/_portal-directives-chunk.d.ts",
+          "declaration_name": "DomPortal",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/cdk/portal",
+          "name": "TemplatePortal",
+          "public_export": true,
+          "declaration": "types/_portal-directives-chunk.d.ts",
+          "declaration_name": "TemplatePortal",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/core",
+          "name": "assertInInjectionContext",
+          "public_export": true,
+          "declaration": "types/core.d.ts",
+          "declaration_name": "assertInInjectionContext",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/core",
+          "name": "ChangeDetectorRef",
+          "public_export": true,
+          "declaration": "types/_debug_node-chunk.d.ts",
+          "declaration_name": "ChangeDetectorRef",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/core",
+          "name": "Component",
+          "public_export": true,
+          "declaration": "types/_debug_node-chunk.d.ts",
+          "declaration_name": "Component",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/core",
+          "name": "ComponentRef",
+          "public_export": true,
+          "declaration": "types/_debug_node-chunk.d.ts",
+          "declaration_name": "ComponentRef",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/core",
+          "name": "DOCUMENT",
+          "public_export": true,
+          "declaration": "types/core.d.ts",
+          "declaration_name": "DOCUMENT",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/core",
+          "name": "ElementRef",
+          "public_export": true,
+          "declaration": "types/_debug_node-chunk.d.ts",
+          "declaration_name": "ElementRef",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/core",
+          "name": "EmbeddedViewRef",
+          "public_export": true,
+          "declaration": "types/_debug_node-chunk.d.ts",
+          "declaration_name": "EmbeddedViewRef",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/core",
+          "name": "EventEmitter",
+          "public_export": true,
+          "declaration": "types/_debug_node-chunk.d.ts",
+          "declaration_name": "EventEmitter",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/core",
+          "name": "Inject",
+          "public_export": true,
+          "declaration": "types/core.d.ts",
+          "declaration_name": "Inject",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/core",
+          "name": "inject",
+          "public_export": true,
+          "declaration": "types/core.d.ts",
+          "declaration_name": "inject",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/core",
+          "name": "NgZone",
+          "public_export": true,
+          "declaration": "types/_debug_node-chunk.d.ts",
+          "declaration_name": "NgZone",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/core",
+          "name": "OnDestroy",
+          "public_export": true,
+          "declaration": "types/core.d.ts",
+          "declaration_name": "OnDestroy",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/core",
+          "name": "Optional",
+          "public_export": true,
+          "declaration": "types/core.d.ts",
+          "declaration_name": "Optional",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/core",
+          "name": "ProviderToken",
+          "public_export": true,
+          "declaration": "types/_chrome_dev_tools_performance-chunk.d.ts",
+          "declaration_name": "ProviderToken",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/core",
+          "name": "Renderer2",
+          "public_export": true,
+          "declaration": "types/_debug_node-chunk.d.ts",
+          "declaration_name": "Renderer2",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/core",
+          "name": "ViewChild",
+          "public_export": true,
+          "declaration": "types/core.d.ts",
+          "declaration_name": "ViewChild",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/material/dialog",
+          "name": "MatDialogConfig",
+          "public_export": true,
+          "declaration": "types/_dialog-chunk.d.ts",
+          "declaration_name": "MatDialogConfig",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-initial-focus.ts",
+          "module": "@angular/cdk/a11y",
+          "name": "FocusTrapFactory",
+          "public_export": true,
+          "declaration": "types/_a11y-module-chunk.d.ts",
+          "declaration_name": "FocusTrapFactory",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-initial-focus.ts",
+          "module": "@angular/cdk/a11y",
+          "name": "InteractivityChecker",
+          "public_export": true,
+          "declaration": "types/_a11y-module-chunk.d.ts",
+          "declaration_name": "InteractivityChecker",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-initial-focus.ts",
+          "module": "@angular/core",
+          "name": "NgZone",
+          "public_export": true,
+          "declaration": "types/_debug_node-chunk.d.ts",
+          "declaration_name": "NgZone",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-initial-focus.ts",
+          "module": "@angular/core",
+          "name": "Renderer2",
+          "public_export": true,
+          "declaration": "types/_debug_node-chunk.d.ts",
+          "declaration_name": "Renderer2",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-initial-focus.ts",
+          "module": "@angular/material/dialog",
+          "name": "MatDialogConfig",
+          "public_export": true,
+          "declaration": "types/_dialog-chunk.d.ts",
+          "declaration_name": "MatDialogConfig",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/cdk/dialog",
+          "name": "Dialog",
+          "public_export": true,
+          "declaration": "types/dialog.d.ts",
+          "declaration_name": "Dialog",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/cdk/dialog",
+          "name": "DialogConfig",
+          "public_export": true,
+          "declaration": "types/dialog.d.ts",
+          "declaration_name": "DialogConfig",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/cdk/dialog",
+          "name": "DialogRef",
+          "public_export": true,
+          "declaration": "types/dialog.d.ts",
+          "declaration_name": "DialogRef",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/cdk/overlay",
+          "name": "ComponentType",
+          "public_export": true,
+          "declaration": "types/_portal-directives-chunk.d.ts",
+          "declaration_name": "ComponentType",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/cdk/overlay",
+          "name": "Overlay",
+          "public_export": true,
+          "declaration": "types/overlay.d.ts",
+          "declaration_name": "Overlay",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/cdk/overlay",
+          "name": "OverlayContainer",
+          "public_export": true,
+          "declaration": "types/_overlay-module-chunk.d.ts",
+          "declaration_name": "OverlayContainer",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/cdk/overlay",
+          "name": "ScrollStrategy",
+          "public_export": true,
+          "declaration": "types/_overlay-module-chunk.d.ts",
+          "declaration_name": "ScrollStrategy",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/core",
+          "name": "ComponentRef",
+          "public_export": true,
+          "declaration": "types/_debug_node-chunk.d.ts",
+          "declaration_name": "ComponentRef",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/core",
+          "name": "Injectable",
+          "public_export": true,
+          "declaration": "types/core.d.ts",
+          "declaration_name": "Injectable",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/core",
+          "name": "InjectionToken",
+          "public_export": true,
+          "declaration": "types/_chrome_dev_tools_performance-chunk.d.ts",
+          "declaration_name": "InjectionToken",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/core",
+          "name": "Injector",
+          "public_export": true,
+          "declaration": "types/_chrome_dev_tools_performance-chunk.d.ts",
+          "declaration_name": "Injector",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/core",
+          "name": "OnDestroy",
+          "public_export": true,
+          "declaration": "types/core.d.ts",
+          "declaration_name": "OnDestroy",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/core",
+          "name": "TemplateRef",
+          "public_export": true,
+          "declaration": "types/core.d.ts",
+          "declaration_name": "TemplateRef",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/core",
+          "name": "Type",
+          "public_export": true,
+          "declaration": "types/_chrome_dev_tools_performance-chunk.d.ts",
+          "declaration_name": "Type",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/material/dialog",
+          "name": "MatDialogConfig",
+          "public_export": true,
+          "declaration": "types/_dialog-chunk.d.ts",
+          "declaration_name": "MatDialogConfig",
+          "private_or_deprecated_markers": []
+        }
+      ]
+    },
+    {
+      "line": "21.x",
+      "declarations": [
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/cdk/a11y",
+          "name": "FocusMonitor",
+          "public_export": true,
+          "declaration": "types/_focus-monitor-chunk.d.ts",
+          "declaration_name": "FocusMonitor",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/cdk/a11y",
+          "name": "FocusOrigin",
+          "public_export": true,
+          "declaration": "types/_focus-monitor-chunk.d.ts",
+          "declaration_name": "FocusOrigin",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/cdk/a11y",
+          "name": "FocusTrap",
+          "public_export": true,
+          "declaration": "types/_a11y-module-chunk.d.ts",
+          "declaration_name": "FocusTrap",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/cdk/a11y",
+          "name": "FocusTrapFactory",
+          "public_export": true,
+          "declaration": "types/_a11y-module-chunk.d.ts",
+          "declaration_name": "FocusTrapFactory",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/cdk/a11y",
+          "name": "InteractivityChecker",
+          "public_export": true,
+          "declaration": "types/_a11y-module-chunk.d.ts",
+          "declaration_name": "InteractivityChecker",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/cdk/dialog",
+          "name": "DialogRef",
+          "public_export": true,
+          "declaration": "types/dialog.d.ts",
+          "declaration_name": "DialogRef",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/cdk/overlay",
+          "name": "OverlayRef",
+          "public_export": true,
+          "declaration": "types/_overlay-module-chunk.d.ts",
+          "declaration_name": "OverlayRef",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/cdk/platform",
+          "name": "Platform",
+          "public_export": true,
+          "declaration": "types/_platform-chunk.d.ts",
+          "declaration_name": "Platform",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/cdk/portal",
+          "name": "BasePortalOutlet",
+          "public_export": true,
+          "declaration": "types/_portal-directives-chunk.d.ts",
+          "declaration_name": "BasePortalOutlet",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/cdk/portal",
+          "name": "CdkPortalOutlet",
+          "public_export": true,
+          "declaration": "types/_portal-directives-chunk.d.ts",
+          "declaration_name": "CdkPortalOutlet",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/cdk/portal",
+          "name": "ComponentPortal",
+          "public_export": true,
+          "declaration": "types/_portal-directives-chunk.d.ts",
+          "declaration_name": "ComponentPortal",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/cdk/portal",
+          "name": "DomPortal",
+          "public_export": true,
+          "declaration": "types/_portal-directives-chunk.d.ts",
+          "declaration_name": "DomPortal",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/cdk/portal",
+          "name": "TemplatePortal",
+          "public_export": true,
+          "declaration": "types/_portal-directives-chunk.d.ts",
+          "declaration_name": "TemplatePortal",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/core",
+          "name": "assertInInjectionContext",
+          "public_export": true,
+          "declaration": "types/core.d.ts",
+          "declaration_name": "assertInInjectionContext",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/core",
+          "name": "ChangeDetectorRef",
+          "public_export": true,
+          "declaration": "types/_discovery-chunk.d.ts",
+          "declaration_name": "ChangeDetectorRef",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/core",
+          "name": "Component",
+          "public_export": true,
+          "declaration": "types/_discovery-chunk.d.ts",
+          "declaration_name": "Component",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/core",
+          "name": "ComponentRef",
+          "public_export": true,
+          "declaration": "types/_discovery-chunk.d.ts",
+          "declaration_name": "ComponentRef",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/core",
+          "name": "DOCUMENT",
+          "public_export": true,
+          "declaration": "types/core.d.ts",
+          "declaration_name": "DOCUMENT",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/core",
+          "name": "ElementRef",
+          "public_export": true,
+          "declaration": "types/_discovery-chunk.d.ts",
+          "declaration_name": "ElementRef",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/core",
+          "name": "EmbeddedViewRef",
+          "public_export": true,
+          "declaration": "types/_discovery-chunk.d.ts",
+          "declaration_name": "EmbeddedViewRef",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/core",
+          "name": "EventEmitter",
+          "public_export": true,
+          "declaration": "types/_discovery-chunk.d.ts",
+          "declaration_name": "EventEmitter",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/core",
+          "name": "Inject",
+          "public_export": true,
+          "declaration": "types/core.d.ts",
+          "declaration_name": "Inject",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/core",
+          "name": "inject",
+          "public_export": true,
+          "declaration": "types/core.d.ts",
+          "declaration_name": "inject",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/core",
+          "name": "NgZone",
+          "public_export": true,
+          "declaration": "types/_discovery-chunk.d.ts",
+          "declaration_name": "NgZone",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/core",
+          "name": "OnDestroy",
+          "public_export": true,
+          "declaration": "types/core.d.ts",
+          "declaration_name": "OnDestroy",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/core",
+          "name": "Optional",
+          "public_export": true,
+          "declaration": "types/core.d.ts",
+          "declaration_name": "Optional",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/core",
+          "name": "ProviderToken",
+          "public_export": true,
+          "declaration": "types/_chrome_dev_tools_performance-chunk.d.ts",
+          "declaration_name": "ProviderToken",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/core",
+          "name": "Renderer2",
+          "public_export": true,
+          "declaration": "types/_discovery-chunk.d.ts",
+          "declaration_name": "Renderer2",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/core",
+          "name": "ViewChild",
+          "public_export": true,
+          "declaration": "types/core.d.ts",
+          "declaration_name": "ViewChild",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+          "module": "@angular/material/dialog",
+          "name": "MatDialogConfig",
+          "public_export": true,
+          "declaration": "types/_dialog-chunk.d.ts",
+          "declaration_name": "MatDialogConfig",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-initial-focus.ts",
+          "module": "@angular/cdk/a11y",
+          "name": "FocusTrapFactory",
+          "public_export": true,
+          "declaration": "types/_a11y-module-chunk.d.ts",
+          "declaration_name": "FocusTrapFactory",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-initial-focus.ts",
+          "module": "@angular/cdk/a11y",
+          "name": "InteractivityChecker",
+          "public_export": true,
+          "declaration": "types/_a11y-module-chunk.d.ts",
+          "declaration_name": "InteractivityChecker",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-initial-focus.ts",
+          "module": "@angular/core",
+          "name": "NgZone",
+          "public_export": true,
+          "declaration": "types/_discovery-chunk.d.ts",
+          "declaration_name": "NgZone",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-initial-focus.ts",
+          "module": "@angular/core",
+          "name": "Renderer2",
+          "public_export": true,
+          "declaration": "types/_discovery-chunk.d.ts",
+          "declaration_name": "Renderer2",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-initial-focus.ts",
+          "module": "@angular/material/dialog",
+          "name": "MatDialogConfig",
+          "public_export": true,
+          "declaration": "types/_dialog-chunk.d.ts",
+          "declaration_name": "MatDialogConfig",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/cdk/dialog",
+          "name": "Dialog",
+          "public_export": true,
+          "declaration": "types/dialog.d.ts",
+          "declaration_name": "Dialog",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/cdk/dialog",
+          "name": "DialogConfig",
+          "public_export": true,
+          "declaration": "types/dialog.d.ts",
+          "declaration_name": "DialogConfig",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/cdk/dialog",
+          "name": "DialogRef",
+          "public_export": true,
+          "declaration": "types/dialog.d.ts",
+          "declaration_name": "DialogRef",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/cdk/overlay",
+          "name": "ComponentType",
+          "public_export": true,
+          "declaration": "types/_portal-directives-chunk.d.ts",
+          "declaration_name": "ComponentType",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/cdk/overlay",
+          "name": "Overlay",
+          "public_export": true,
+          "declaration": "types/overlay.d.ts",
+          "declaration_name": "Overlay",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/cdk/overlay",
+          "name": "OverlayContainer",
+          "public_export": true,
+          "declaration": "types/_overlay-module-chunk.d.ts",
+          "declaration_name": "OverlayContainer",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/cdk/overlay",
+          "name": "ScrollStrategy",
+          "public_export": true,
+          "declaration": "types/_overlay-module-chunk.d.ts",
+          "declaration_name": "ScrollStrategy",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/core",
+          "name": "ComponentRef",
+          "public_export": true,
+          "declaration": "types/_discovery-chunk.d.ts",
+          "declaration_name": "ComponentRef",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/core",
+          "name": "Injectable",
+          "public_export": true,
+          "declaration": "types/core.d.ts",
+          "declaration_name": "Injectable",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/core",
+          "name": "InjectionToken",
+          "public_export": true,
+          "declaration": "types/_chrome_dev_tools_performance-chunk.d.ts",
+          "declaration_name": "InjectionToken",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/core",
+          "name": "Injector",
+          "public_export": true,
+          "declaration": "types/_chrome_dev_tools_performance-chunk.d.ts",
+          "declaration_name": "Injector",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/core",
+          "name": "OnDestroy",
+          "public_export": true,
+          "declaration": "types/core.d.ts",
+          "declaration_name": "OnDestroy",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/core",
+          "name": "TemplateRef",
+          "public_export": true,
+          "declaration": "types/core.d.ts",
+          "declaration_name": "TemplateRef",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/core",
+          "name": "Type",
+          "public_export": true,
+          "declaration": "types/_chrome_dev_tools_performance-chunk.d.ts",
+          "declaration_name": "Type",
+          "private_or_deprecated_markers": []
+        },
+        {
+          "authored_path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/material/dialog",
+          "name": "MatDialogConfig",
+          "public_export": true,
+          "declaration": "types/_dialog-chunk.d.ts",
+          "declaration_name": "MatDialogConfig",
+          "private_or_deprecated_markers": []
+        }
+      ]
+    }
+  ],
+  "actual_minimum_protocol_review": [
+    {
+      "version": "21.2.14",
+      "public_portal_methods": [
+        {
+          "name": "attach",
+          "implementation_sha256": "e0f6831e4c6de54123e3991dc46ef2fc0b61d4e632fe1d192aae3a204b0aef56"
+        },
+        {
+          "name": "hasAttached",
+          "implementation_sha256": "d52bdc028723d14f3669d6985141288593cee83e34111cd11c05d3af96dd1dcb"
+        },
+        {
+          "name": "detach",
+          "implementation_sha256": "063b1b93b32460ff200584de591e4037f63f7155fe787fa0f197f49060cf1441"
+        },
+        {
+          "name": "dispose",
+          "implementation_sha256": "1f96d76bb3514c44ab58bfc14b81b6b83581b2bbeedac4134529a5047aee1468"
+        }
+      ],
+      "public_dialogref_backdrop_statement_sha256": "547fb77b82b58aa99d8ccd1132a35d564a88de05aea29d14b85151d63eeceb4b",
+      "container_set_before_content": true,
+      "focus_stream_used_for_aria_hiding": true
+    },
+    {
+      "version": "22.1.7",
+      "public_portal_methods": [
+        {
+          "name": "attach",
+          "implementation_sha256": "e0f6831e4c6de54123e3991dc46ef2fc0b61d4e632fe1d192aae3a204b0aef56"
+        },
+        {
+          "name": "hasAttached",
+          "implementation_sha256": "d52bdc028723d14f3669d6985141288593cee83e34111cd11c05d3af96dd1dcb"
+        },
+        {
+          "name": "detach",
+          "implementation_sha256": "063b1b93b32460ff200584de591e4037f63f7155fe787fa0f197f49060cf1441"
+        },
+        {
+          "name": "dispose",
+          "implementation_sha256": "1f96d76bb3514c44ab58bfc14b81b6b83581b2bbeedac4134529a5047aee1468"
+        }
+      ],
+      "public_dialogref_backdrop_statement_sha256": "547fb77b82b58aa99d8ccd1132a35d564a88de05aea29d14b85151d63eeceb4b",
+      "container_set_before_content": true,
+      "focus_stream_used_for_aria_hiding": true
+    }
+  ],
+  "source_initial_focus_diagnostic": {
+    "schema_version": 1,
+    "role": "Owned focus/source lifecycle diagnostic; not native/AOT/packed/minimum qualification",
+    "node": "v22.23.3",
+    "compiler": "6.0.3",
+    "runtime_peer": {
+      "framework": "22.1.7",
+      "cdk_package": "22.1.7"
+    },
+    "sources": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+        "sha256": "4a216814bba5b8906f91e4d64869e6e3292e18287db4b15e32f2b8cd89e9669c",
+        "bytes": 9590
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-initial-focus.ts",
+        "sha256": "826678416164bcf3fdc92d5d1692ba0f6d8d7922c303476e50b0e915f3ea142d",
+        "bytes": 3155
+      }
+    ],
+    "cases": [
+      {
+        "id": "microtask-focus-and-notification-order",
+        "result": "pass"
+      },
+      {
+        "id": "explicit-initial-marker-prioritized",
+        "result": "pass"
+      },
+      {
+        "id": "empty-tabbable-content-falls-back-to-container",
+        "result": "pass"
+      },
+      {
+        "id": "dialog-mode-preserves-already-contained-focus",
+        "result": "pass"
+      },
+      {
+        "id": "false-mode-captures-container-from-outside",
+        "result": "pass"
+      },
+      {
+        "id": "open-shadow-active-element-is-contained",
+        "result": "pass"
+      },
+      {
+        "id": "empty-shadow-root-preserves-original-active-element-resolution",
+        "result": "pass"
+      },
+      {
+        "id": "self-referencing-shadow-active-element-stops",
+        "result": "pass"
+      },
+      {
+        "id": "heading-temporary-tabindex-restored-on-blur",
+        "result": "pass"
+      },
+      {
+        "id": "selector-temporary-tabindex-restored-on-mousedown",
+        "result": "pass"
+      },
+      {
+        "id": "focusable-selector-keeps-existing-tabindex",
+        "result": "pass"
+      },
+      {
+        "id": "destroy-cleans-selector-listeners-and-temporary-tabindex",
+        "result": "pass"
+      },
+      {
+        "id": "recapture-cleans-previous-selector-listeners",
+        "result": "pass"
+      },
+      {
+        "id": "restore-failure-still-cleans-owned-selector-state",
+        "result": "pass"
+      },
+      {
+        "id": "missing-selector-does-not-invent-focus",
+        "result": "pass"
+      },
+      {
+        "id": "destroy-before-microtask-cancels-focus-and-completes",
+        "result": "pass"
+      },
+      {
+        "id": "focus-request-after-destroy-is-inert",
+        "result": "pass"
+      },
+      {
+        "id": "ssr-does-not-access-dom-or-create-selection",
+        "result": "pass"
+      },
+      {
+        "id": "delayed-focus-waits-for-owned-open-completion",
+        "result": "pass"
+      }
+    ],
+    "mutations": [
+      {
+        "id": "destroy-guard-removed",
+        "rejected_by": "destroy-before-microtask-cancels-focus-and-completes"
+      },
+      {
+        "id": "anchors-enabled",
+        "rejected_by": "microtask-focus-and-notification-order"
+      },
+      {
+        "id": "selection-destroy-removed",
+        "rejected_by": "microtask-focus-and-notification-order"
+      },
+      {
+        "id": "forced-tabindex-cleanup-removed",
+        "rejected_by": "heading-temporary-tabindex-restored-on-blur"
+      }
+    ],
+    "limits": [
+      "Actual owned two-module code and current public FocusTrap execute under synthetic DOM and borrowed service fixtures.",
+      "Public FocusTrapFactory.create protocol is supplied by a fixture that constructs the real public FocusTrap; actual factory/root service setup is not executed.",
+      "Actual21 minimum peer, native focus/keyboard/rendered CSS, strict AOT, canonical toolchain and packed/runtime-floor qualification are not executed.",
+      "Full dialog constructor, portal, native focus restoration and API qualification require their separate reviews."
+    ]
+  },
+  "source_constructor_portal_restoration_diagnostic": {
+    "schema_version": 1,
+    "role": "Owned constructor/public primitive source diagnostic; not native/AOT/packed/minimum qualification",
+    "node": "v22.23.3",
+    "compiler": "6.0.3",
+    "runtime_peer": {
+      "framework": "22.1.7",
+      "cdk_package": "22.1.7"
+    },
+    "sources": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+        "sha256": "4a216814bba5b8906f91e4d64869e6e3292e18287db4b15e32f2b8cd89e9669c",
+        "bytes": 9590
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-initial-focus.ts",
+        "sha256": "826678416164bcf3fdc92d5d1692ba0f6d8d7922c303476e50b0e915f3ea142d",
+        "bytes": 3155
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+        "sha256": "93cd62dc0e5b5ea64943632d9f4c64cfe674c178135f0fb609e9d39ec6cff8b0",
+        "bytes": 7030
+      },
+      {
+        "path": "tests/dialog_container_public_runtime_probe.mjs",
+        "sha256": "6fa075dcb1944d05978e19800aa8c3264622f797fb10eb27b6fc516d0232148b",
+        "bytes": 21377
+      }
+    ],
+    "cases": [
+      {
+        "id": "actual-owned-service-scopes-public-and-legacy-config-to-same-object",
+        "result": "pass"
+      },
+      {
+        "id": "manual-eight-arguments-outside-injection-context",
+        "result": "pass"
+      },
+      {
+        "id": "supplied-arguments-override-different-ambient-di-values",
+        "result": "pass"
+      },
+      {
+        "id": "borrowed-services-survive-container-destruction",
+        "result": "pass"
+      },
+      {
+        "id": "initial-aria-label-and-onpush-title-queue",
+        "result": "pass"
+      },
+      {
+        "id": "public-generic-component-portal-and-result-identity",
+        "result": "pass"
+      },
+      {
+        "id": "public-generic-template-portal-and-result-identity",
+        "result": "pass"
+      },
+      {
+        "id": "public-generic-dom-portal-and-result-identity",
+        "result": "pass"
+      },
+      {
+        "id": "direct-attachment-duplicate-does-not-replace-content",
+        "result": "pass"
+      },
+      {
+        "id": "failed-portal-dispatch-does-not-start-focus-or-backdrop",
+        "result": "pass"
+      },
+      {
+        "id": "detach-and-dispose-delegate-without-destroying-borrowed-services",
+        "result": "pass"
+      },
+      {
+        "id": "attachment-after-destruction-is-rejected",
+        "result": "pass"
+      },
+      {
+        "id": "manual-overlay-backdrop-recaptures-only-when-disabled",
+        "result": "pass"
+      },
+      {
+        "id": "real-public-dialogref-backdrop-recaptures-exactly-once",
+        "result": "pass"
+      },
+      {
+        "id": "different-public-dialogref-does-not-steal-supplied-overlay",
+        "result": "pass"
+      },
+      {
+        "id": "previous-focus-and-close-origin-restored-through-supplied-monitor",
+        "result": "pass"
+      },
+      {
+        "id": "omitted-eighth-monitor-uses-target-focus-without-di",
+        "result": "pass"
+      },
+      {
+        "id": "selector-target-uses-exact-supplied-document",
+        "result": "pass"
+      },
+      {
+        "id": "disabled-restoration-preserves-current-focus",
+        "result": "pass"
+      },
+      {
+        "id": "outside-consumer-focus-is-never-overridden",
+        "result": "pass"
+      },
+      {
+        "id": "open-shadow-contained-focus-allows-restoration",
+        "result": "pass"
+      },
+      {
+        "id": "restoration-failure-still-destroys-persistent-trap-and-subscription",
+        "result": "pass"
+      },
+      {
+        "id": "persistent-trap-failure-still-releases-selector-state-and-notifications",
+        "result": "pass"
+      },
+      {
+        "id": "ssr-restoration-selector-does-not-query-document",
+        "result": "pass"
+      },
+      {
+        "id": "ssr-content-does-not-create-persistent-trap",
+        "result": "pass"
+      },
+      {
+        "id": "manual-server-without-global-document-never-touches-dom",
+        "result": "pass"
+      }
+    ],
+    "mutations": [
+      {
+        "id": "constructor-config-identity-lost",
+        "rejected_by": "supplied-arguments-override-different-ambient-di-values"
+      },
+      {
+        "id": "outside-focus-guard-removed",
+        "rejected_by": "outside-consumer-focus-is-never-overridden"
+      },
+      {
+        "id": "persistent-trap-cleanup-removed",
+        "rejected_by": "restoration-failure-still-destroys-persistent-trap-and-subscription"
+      },
+      {
+        "id": "backdrop-cleanup-removed",
+        "rejected_by": "manual-overlay-backdrop-recaptures-only-when-disabled"
+      },
+      {
+        "id": "duplicate-owner-check-removed",
+        "rejected_by": "real-public-dialogref-backdrop-recaptures-exactly-once"
+      },
+      {
+        "id": "overlay-identity-check-removed",
+        "rejected_by": "different-public-dialogref-does-not-steal-supplied-overlay"
+      },
+      {
+        "id": "portal-content-initialization-removed",
+        "rejected_by": "public-generic-component-portal-and-result-identity"
+      },
+      {
+        "id": "public-config-alias-removed",
+        "rejected_by": "actual-owned-service-scopes-public-and-legacy-config-to-same-object"
+      }
+    ],
+    "limits": [
+      "Actual owned container, focus helper and service code execute with real public BasePortalOutlet, portal classes, FocusTrap and DialogRef.",
+      "Portal rendering and borrowed services use finite recording fixtures and synthetic DOM; actual CdkPortalOutlet/native view, public root service construction and browser keyboard behavior are not executed.",
+      "Source protocol proof on installed22.1.7 does not qualify actual21 minimum, canonical Node/pnpm, AOT, packed artifacts or consumer floors.",
+      "Original inherited API comparison, public class/provider identity, complete motion lifecycle and native regression qualification remain open."
+    ]
+  },
+  "strict_source_type_diagnostic": {
+    "role": "Two owned-module source types only;no native/AOT/packed/canonical/floor or actual21 minimum qualification",
+    "node": "v22.23.3",
+    "compiler": "6.0.3",
+    "peer": "22.1.7",
+    "options": {
+      "noEmit": true,
+      "strict": true,
+      "noImplicitOverride": true,
+      "skipLibCheck": true,
+      "target": 9,
+      "module": 99,
+      "moduleResolution": 100,
+      "experimentalDecorators": true
+    },
+    "diagnostics": []
+  },
+  "inherited_api_review": {
+    "reference_scope": "The full immutable Material16 class source, direct immutable CDK16 dialog declarations and common CDK16 portal ancestor declarations. The real derivation includes16 direct parent members and11 ancestor signatures. Exact own overrides of authenticated inherited members preserve existing API;no name-only exception was added.",
+    "same_common_portal_signatures_at_both_minima": true,
+    "original_constructor_signature_matches": true,
+    "constructor_di_parameters": 8,
+    "only_document_di_optional": true,
+    "focus_monitor_typescript_optional_but_di_required": true,
+    "observed_one_symbol_source_blocking": [
+      "protected method _trapFocus():void",
+      "public method _addAriaLabelledBy(string):void",
+      "public method _removeAriaLabelledBy(string):void",
+      "public readonly prop _focusTrapped:Observable<void>"
+    ],
+    "blocking_scope": "The no-argument protected contract and three current interoperability members remain explicit API judgments. Whole legacy API/packed completeness has not run or passed;the comparison does not grant an exception for them.",
+    "signature_differences_unchanged": true,
+    "signature_differences_sha256": "e06fb7d14056aa44dad9f5c838c838f4f44f43d20bd855fb93d2f8b7fbc8b7f9",
+    "unit_negative_cases": "Wrong source/declaration bytes, changed second read, changed portal bytes, wrong class/path, wrong current portal import identity, missing readonly config, wrong destroy arguments/return/visibility/name and missing inherited proof all fail."
+  },
+  "focused_tests_each_line": {
+    "passed": 12,
+    "skipped": 0,
+    "included": [
+      "dialog initial focus",
+      "public container composition",
+      "authentic inherited dialog members/constructor DI",
+      "prior inherited constructor regressions",
+      "authored-use dispositions/evidence/inventory",
+      "canonical audit scope"
+    ]
+  },
+  "targeted_style_review": {
+    "unchanged_sources": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-dialog/dialog.scss",
+        "sha256": "6b8e777777f4b78e0a0aa68b11007f644359fa97e2bf505f5aa0c4cb25d082f9",
+        "bytes": 2562,
+        "unchanged_by_this_repair": true
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-dialog/dialog-container.html",
+        "sha256": "89aeb28616459a7393902fcbeca143e3ca101baeaafa59054aebc512a5022256",
+        "bytes": 44,
+        "unchanged_by_this_repair": true
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-dialog/dialog-container.ts",
+        "sha256": "732dfd67a85649e3003196ccaeff1ffc3c7efb388e97fc0c71b9dd2f50f7f0d9",
+        "bytes": 6623,
+        "unchanged_by_this_repair": true
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-dialog/dialog-animation-params.ts",
+        "sha256": "8c0160584629786ab3f7babb1060d526952238c58455989c7b6ced6ef59a619f",
+        "bytes": 775,
+        "unchanged_by_this_repair": true
+      }
+    ],
+    "host_class": "Preserve the inherited cdk-dialog-container class in the owned base;the legacy leaf keeps mat-dialog-container,tabindex,ARIA/id/title queue and existing geometry/motion styles. Native assertion for both classes is prepared.",
+    "layout": "Existing owned dialog.scss already declares the peer container display:block,width/height100%,min/max-height:inherit. This repair needs no peer private style loader or stylesheet/selector/golden change.",
+    "motion_limit": "Leaf native CSS/timer/rAF motion is unchanged. Its queued callback cancellation/state review remains open."
+  },
+  "native_regressions": {
+    "spec": "projects/ngx-material-legacy/legacy-dialog/dialog.spec.ts",
+    "total_prepared": 6,
+    "new_this_repair": 2,
+    "executed": false,
+    "new_names": [
+      "should honor eight supplied arguments outside an Angular injection context",
+      "should restore previous focus through the supplied monitor and release its trap"
+    ],
+    "existing_adjustments": "Add required MatDialogConfig/OverlayRef providers to the previous probe and assert inherited/public host classes in the real dialog anchor regression."
+  },
+  "current_source_caps": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+      "sha256": "4a216814bba5b8906f91e4d64869e6e3292e18287db4b15e32f2b8cd89e9669c",
+      "bytes": 9590
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-initial-focus.ts",
+      "sha256": "826678416164bcf3fdc92d5d1692ba0f6d8d7922c303476e50b0e915f3ea142d",
+      "bytes": 3155
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-base.ts",
+      "sha256": "93cd62dc0e5b5ea64943632d9f4c64cfe674c178135f0fb609e9d39ec6cff8b0",
+      "bytes": 7030
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-dialog/dialog.spec.ts",
+      "sha256": "5223f54f4c5dc7b54bd67ae5b237c36f952f6d92ed8c9f1deedb12fe0f94a015",
+      "bytes": 80754
+    },
+    {
+      "path": "scripts/api-surface.mjs",
+      "sha256": "3002b3f1d462d0307a5ab9923e678e8519beccb2ec48aaaec1055950b5132b2d",
+      "bytes": 67175
+    },
+    {
+      "path": "tests/dialog_initial_focus_runtime_probe.mjs",
+      "sha256": "a31e170968161d61b072651e183e7b58939b3f95ef2aea9bfdb671e28a002225",
+      "bytes": 19015
+    },
+    {
+      "path": "tests/dialog_container_public_runtime_probe.mjs",
+      "sha256": "6fa075dcb1944d05978e19800aa8c3264622f797fb10eb27b6fc516d0232148b",
+      "bytes": 21377
+    },
+    {
+      "path": "tests/test_dialog_initial_focus_runtime.py",
+      "sha256": "32f756563b14269ad54d2f9eb268ecbb7b18dcb93d2b4f4c487aee8affd7c2ec",
+      "bytes": 871
+    },
+    {
+      "path": "tests/test_dialog_public_container_runtime.py",
+      "sha256": "e4039f181599d1179a8a59333633b43bbd54425bc3546645f2fbd5bab4a8b6e3",
+      "bytes": 887
+    },
+    {
+      "path": "tests/test_dialog_inherited_destroy_contract.py",
+      "sha256": "7e2034b2534dc147f0f8a26fe6a0cc15053d31ec720d7778de418101eafb01ca",
+      "bytes": 7205
+    },
+    {
+      "path": "compatibility/rc/dialog-lifecycle-type-refresh.json",
+      "sha256": "f30de618a9d078f87eb1983c69d45324ed889579588e87dd967578767eb4ddc3",
+      "bytes": 18207
+    }
+  ],
+  "source_policy_observation": {
+    "cases": [
+      {
+        "case_id": "source-policy/authored-boundary/no-animations-module",
+        "group": "authored-boundary",
+        "result": "pass",
+        "detail": "observed"
+      },
+      {
+        "case_id": "source-policy/authored-boundary/no-private-namespace-member",
+        "group": "authored-boundary",
+        "result": "pass",
+        "detail": "observed"
+      },
+      {
+        "case_id": "source-policy/authored-boundary/no-deep-internal",
+        "group": "authored-boundary",
+        "result": "pass",
+        "detail": "observed"
+      },
+      {
+        "case_id": "source-policy/authored-boundary/no-docs-private-symbol",
+        "group": "authored-boundary",
+        "result": "fail",
+        "detail": "forbidden imported symbol"
+      },
+      {
+        "case_id": "source-policy/authored-boundary/no-deprecated-symbol",
+        "group": "authored-boundary",
+        "result": "pass",
+        "detail": "observed"
+      },
+      {
+        "case_id": "source-policy/authored-boundary/inheritance-of-upstream",
+        "group": "authored-boundary",
+        "result": "pass",
+        "detail": "observed"
+      },
+      {
+        "case_id": "source-policy/authored-boundary/sass-public-boundary",
+        "group": "authored-boundary",
+        "result": "pass",
+        "detail": "observed"
+      },
+      {
+        "case_id": "source-policy/authored-boundary/installed-annotation-comparison",
+        "group": "authored-boundary",
+        "result": "fail",
+        "detail": "imported peer declarations unavailable: ['@angular/common', '@angular/core', '@angular/forms', '@angular/platform-browser']"
+      },
+      {
+        "case_id": "source-policy/packed-boundary/scanned-artifact-digest",
+        "group": "packed-boundary",
+        "result": "fail",
+        "detail": "packed tarball was not scanned"
+      },
+      {
+        "case_id": "source-policy/packed-boundary/js-and-declarations",
+        "group": "packed-boundary",
+        "result": "fail",
+        "detail": "packed tarball was not scanned"
+      },
+      {
+        "case_id": "source-policy/packed-boundary/sass-transitive-closure",
+        "group": "packed-boundary",
+        "result": "fail",
+        "detail": "packed tarball was not scanned"
+      }
+    ],
+    "authored_violations": [],
+    "authored_violation_count": 0,
+    "packed_violation_count": null,
+    "tarball_sha256": null,
+    "annotation_files": 75,
+    "annotation_detail": "imported peer declarations unavailable: ['@angular/common', '@angular/core', '@angular/forms', '@angular/platform-browser']",
+    "annotation_private_hits": [
+      {
+        "name": "MAT_MENU_PANEL",
+        "module": "@angular/material/menu",
+        "package": "@angular/material",
+        "path": "legacy-menu/menu.ts",
+        "access": "named",
+        "declaration_package": "@angular/material",
+        "declaration": "types/menu.d.ts",
+        "declaration_name": "MAT_MENU_PANEL"
+      },
+      {
+        "name": "MAT_MENU_PANEL",
+        "module": "@angular/material/menu",
+        "package": "@angular/material",
+        "path": "legacy-menu/public-api.ts",
+        "access": "named",
+        "declaration_package": "@angular/material",
+        "declaration": "types/menu.d.ts",
+        "declaration_name": "MAT_MENU_PANEL"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-menu/menu.spec.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "CDK_TABLE",
+        "module": "@angular/cdk/table",
+        "package": "@angular/cdk",
+        "path": "legacy-table/table.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/table.d.ts",
+        "declaration_name": "CDK_TABLE"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-select/select.spec.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-progress-spinner/progress-spinner.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-tabs/tab-header.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-tabs/tab-header.spec.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "MAT_MENU_PANEL",
+        "module": "@angular/material/menu",
+        "package": "@angular/material",
+        "path": "legacy-menu/internal/menu-trigger-base.ts",
+        "access": "named",
+        "declaration_package": "@angular/material",
+        "declaration": "types/menu.d.ts",
+        "declaration_name": "MAT_MENU_PANEL"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-select/internal/select-base.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-tabs/internal/tab-nav-bar-base.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-tabs/internal/paginated-tab-header.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-tabs/internal/tab-header-base.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      },
+      {
+        "name": "ViewportRuler",
+        "module": "@angular/cdk/scrolling",
+        "package": "@angular/cdk",
+        "path": "legacy-tabs/tab-nav-bar/tab-nav-bar.ts",
+        "access": "named",
+        "declaration_package": "@angular/cdk",
+        "declaration": "types/scrolling.d.ts",
+        "declaration_name": "ViewportRuler"
+      }
+    ],
+    "annotation_deprecated_hits": [],
+    "annotation_missing_packages": [
+      "@angular/common",
+      "@angular/core",
+      "@angular/forms",
+      "@angular/platform-browser"
+    ],
+    "annotation_unresolved_exports": [
+      {
+        "name": "createKeyboardEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-menu/menu.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "createMouseEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-menu/menu.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "dispatchEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-menu/menu.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "dispatchFakeEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-menu/menu.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "dispatchKeyboardEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-menu/menu.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "dispatchMouseEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-menu/menu.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "MockNgZone",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-menu/menu.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "patchElementFocus",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-menu/menu.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "createKeyboardEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-select/select.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "dispatchEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-select/select.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "dispatchFakeEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-select/select.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "dispatchKeyboardEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-select/select.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "wrappedErrorMessage",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-select/select.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "createMouseEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-button/button.spec.ts",
+        "access": "named"
+      },
+      {
+        "name": "dispatchEvent",
+        "module": "@angular/cdk/testing/private",
+        "package": "@angular/cdk",
+        "path": "legacy-button/button.spec.ts",
+        "access": "named"
+      }
+    ]
+  },
+  "remaining_private_hits_each_line": 15,
+  "authored_use_population": {
+    "frozen": 1736,
+    "reviewed": 138,
+    "open": 1598,
+    "new_closures": 0,
+    "stale_type_record": "One OnDestroy source review was freshly rechecked and rebound after the service edit;statuses/population unchanged."
+  },
+  "upstream_sha_review": "No SHA closure inferred;all1697 remain in scope.",
+  "scope_limits": [
+    "Actual owned container, focus helper and service code execute with real public BasePortalOutlet, portal classes, FocusTrap and DialogRef.",
+    "Portal rendering and borrowed services use finite recording fixtures and synthetic DOM; actual CdkPortalOutlet/native view, public root service construction and browser keyboard behavior are not executed.",
+    "Source protocol proof on installed22.1.7 does not qualify actual21 minimum, canonical Node/pnpm, AOT, packed artifacts or consumer floors.",
+    "Original inherited API comparison, public class/provider identity, complete motion lifecycle and native regression qualification remain open.",
+    "Strict source diagnostics use read-only installed22.1.7 declarations and skipLibCheck:true;actual21 minimum/AOT/canonical/packed/floor qualification remains unexecuted.",
+    "Minimum peer declaration/runtime members are authenticated read-only source data;no younger peer installation is authorized or inferred.",
+    "The whole source-policy gate still fails for remaining private imports,missing annotation packages and unscanned artifact.",
+    "No new Actions,push,credential change,publish or full G01-G13/C05/A01-A10/R01-R03 pass."
+  ],
+  "g11_claim": "not-passed"
+}

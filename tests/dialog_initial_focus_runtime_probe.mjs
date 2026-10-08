@@ -22,13 +22,16 @@ await import(url('@angular/compiler'));
 const core = await import(url('@angular/core'));
 const {FocusTrap, FocusTrapFactory, InteractivityChecker, FocusMonitor} = await import(url('@angular/cdk/a11y'));
 const {Platform} = await import(url('@angular/cdk/platform'));
-const {DialogConfig} = await import(url('@angular/cdk/dialog'));
+const {DialogRef} = await import(url('@angular/cdk/dialog'));
+const {MatDialogConfig} = await import(url('@angular/material/dialog'));
+const {Subject} = await import(url('rxjs'));
+const portal = await import(url('@angular/cdk/portal'));
 const folder = 'projects/ngx-material-legacy/legacy-dialog/internal/';
 const basePath = folder + 'dialog-container-base.ts', focusPath = folder + 'dialog-initial-focus.ts';
 const originalBase = readFileSync(resolve(root, basePath), 'utf8');
 const originalFocus = readFileSync(resolve(root, focusPath), 'utf8');
 
-async function load(baseSource = originalBase, focusSource = originalFocus) {
+export async function load(baseSource = originalBase, focusSource = originalFocus) {
   function emit(raw) {
     let js = ts.transpileModule(raw, {compilerOptions: {
       target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext, experimentalDecorators: true,
@@ -42,11 +45,11 @@ async function load(baseSource = originalBase, focusSource = originalFocus) {
   return loaded._MatDialogContainerBase;
 }
 
-function fixture(Base, autoFocus = 'first-tabbable', isBrowser = true) {
+export function fixture(Base, autoFocus = 'first-tabbable', isBrowser = true, mode = {}) {
   const log = [], listeners = new Map(), selections = new Set();
   let anchorCreations = 0;
   const document = {ELEMENT_NODE: 1, activeElement: null, body: {},
-    createElement(name) { anchorCreations++; return element(name); },
+    createElement(name) { anchorCreations++; return element(`anchor-${anchorCreations}`); },
     querySelector() { return null; }};
   const hadDocument = Object.hasOwn(globalThis, 'document'), priorDocument = globalThis.document;
   globalThis.document = document;
@@ -63,7 +66,9 @@ function fixture(Base, autoFocus = 'first-tabbable', isBrowser = true) {
       querySelectorAll() { return []; },
       hasAttribute(name) { return node.attributes.has(name) || name === 'cdkFocusInitial' && !!node.initial; },
       setAttribute(name, value) { node.attributes.set(name, value); },
-      classList: {add() {}}, addEventListener() {}, removeEventListener() {}, remove() {},
+      classList: {add() {}},
+      addEventListener(event, callback) {listeners.set(node.name + ':' + event, callback);},
+      removeEventListener(event) {listeners.delete(node.name + ':' + event);}, remove() {},
       removeAttribute(name) { node.attributes.delete(name); if (name === 'tabindex') delete node.tabIndex; },
     };
     return node;
@@ -73,6 +78,12 @@ function fixture(Base, autoFocus = 'first-tabbable', isBrowser = true) {
   host.children = [first, second, heading];
   const checker = {isFocusable: node => node.focusable, isTabbable: node => node.tabbable};
   const zone = {runOutsideAngular: callback => callback()};
+  const config = {autoFocus, restoreFocus: false, ...mode.config};
+  const backdrop = new Subject();
+  const overlay = {backdropClick: () => backdrop, keydownEvents: () => new Subject(),
+    outsidePointerEvents: () => new Subject(), detachments: () => new Subject(),
+    dispose() {throw Error('borrowed overlay must not be disposed');}};
+  const monitor = {focusVia(target, origin) {log.push({kind: 'monitor', target, origin}); target.focus();}};
   const factory = {create(node, deferred) {
     log.push({kind: 'create-selection', deferred});
     const trap = new FocusTrap(node, checker, zone, document, deferred, core.Injector.NULL);
@@ -84,24 +95,38 @@ function fixture(Base, autoFocus = 'first-tabbable', isBrowser = true) {
     const key = target.name + ':' + event; assert.equal(listeners.has(key), false);
     listeners.set(key, callback); return () => listeners.delete(key);
   }};
+  const owner = mode.dialogOwner ? new DialogRef(overlay, {...config, disableClose: true}) : null;
   const injector = core.Injector.create({providers: [
     {provide: core.ElementRef, useValue: new core.ElementRef(host)},
     {provide: core.DOCUMENT, useValue: document},
     {provide: FocusTrapFactory, useValue: factory},
-    {provide: DialogConfig, useValue: {autoFocus, restoreFocus: false}},
+    {provide: MatDialogConfig, useValue: config},
     {provide: InteractivityChecker, useValue: checker},
     {provide: core.NgZone, useValue: zone},
-    {provide: FocusMonitor, useValue: {}},
+    {provide: FocusMonitor, useValue: monitor},
     {provide: core.Renderer2, useValue: renderer},
     {provide: core.ChangeDetectorRef, useValue: {markForCheck() {}}},
     {provide: Platform, useValue: {isBrowser}},
+    {provide: DialogRef, useValue: owner},
+    ...(mode.ambientMismatch ? [
+      {provide: core.ElementRef, useValue: new core.ElementRef({focus() {throw Error('ambient element used');}})},
+      {provide: FocusTrapFactory, useValue: {create() {throw Error('ambient factory used');}}},
+      {provide: MatDialogConfig, useValue: {autoFocus: 'wrong-selector'}},
+      {provide: InteractivityChecker, useValue: {isFocusable() {throw Error('ambient checker used');}}},
+      {provide: core.NgZone, useValue: {runOutsideAngular() {throw Error('ambient zone used');}}},
+      {provide: FocusMonitor, useValue: {focusVia() {throw Error('ambient monitor used');}}},
+    ] : []),
   ]});
-  const instance = core.runInInjectionContext(injector, () => new Base());
+  const args = [new core.ElementRef(host), factory, mode.noDocument ? null : document,
+    config, checker, zone, overlay, ...(mode.noMonitor ? [] : [monitor])];
+  const instance = mode.manual ? new Base(...args)
+    : core.runInInjectionContext(injector, () => new Base(...args));
+  if (owner) owner.containerInstance = instance;
   let notifications = 0, completed = 0;
   instance._focusTrapped.subscribe({next() { notifications++; log.push({kind: 'notification'}); },
     complete() { completed++; }});
   return {instance, document, host, first, second, heading, log, listeners, selections,
-    element, notifications: () => notifications, completed: () => completed,
+    element, args, factory, config, overlay, backdrop, monitor, injector, owner, notifications: () => notifications, completed: () => completed,
     anchorCreations: () => anchorCreations,
     destroy() { try { instance.ngOnDestroy(); } finally { injector.destroy();
       if (hadDocument) globalThis.document = priorDocument; else delete globalThis.document; } }};
@@ -199,12 +224,12 @@ async function observations(Base) {
       assert.equal(f.listeners.size, 0); assert.equal(f.notifications(), 2);
     } finally { f.destroy(); }
   });
-  await check('parent-destroy-failure-still-cleans-owned-selector-state', async () => {
+  await check('restore-failure-still-cleans-owned-selector-state', async () => {
     const f = fixture(Base, 'first-heading');
     f.instance._trapFocus(); await Promise.resolve(); assert.equal(f.listeners.size, 2);
     f.instance._config.restoreFocus = 'restore-selector';
-    f.document.querySelector = () => { throw Error('parent restore failed'); };
-    assert.throws(() => f.destroy(), /parent restore failed/);
+    f.document.querySelector = () => { throw Error('owned restore failed'); };
+    assert.throws(() => f.destroy(), /owned restore failed/);
     assert.equal(f.heading.tabIndex, undefined); assert.equal(f.listeners.size, 0);
     assert.equal(f.completed(), 1);
   });
@@ -246,6 +271,7 @@ async function observations(Base) {
   });
   return cases;
 }
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
 const Base = await load(), cases = await observations(Base);
 assert.ok(cases.every(c => c.result === 'pass'), JSON.stringify(cases.filter(c => c.result !== 'pass')));
 const mutations = [];
@@ -273,9 +299,11 @@ const report = {schema_version: 1, role: 'Owned focus/source lifecycle diagnosti
   limits: ['Actual owned two-module code and current public FocusTrap execute under synthetic DOM and borrowed service fixtures.',
     'Public FocusTrapFactory.create protocol is supplied by a fixture that constructs the real public FocusTrap; actual factory/root service setup is not executed.',
     'Actual21 minimum peer, native focus/keyboard/rendered CSS, strict AOT, canonical toolchain and packed/runtime-floor qualification are not executed.',
-    'Remaining private CdkDialogContainer inheritance and other dialog contracts are not cleared.']};
+    'Full dialog constructor, portal, native focus restoration and API qualification require their separate reviews.']};
 const args = process.argv.slice(2);
 if (args.length) { assert.equal(args.length, 2); assert.equal(args[0], '--report');
   assert.equal(existsSync(args[1]), false); writeFileSync(args[1], JSON.stringify(report, null, 2) + '\n'); }
 console.log(JSON.stringify({cases: cases.length, mutants_rejected: mutations.length,
   node: report.node, compiler: report.compiler, runtime_peer: report.runtime_peer}));
+
+}
