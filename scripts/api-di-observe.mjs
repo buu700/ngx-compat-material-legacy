@@ -3,6 +3,8 @@ import {pathToFileURL} from 'node:url';
 import {join,resolve} from 'node:path';
 import {approvedMenuItemContract} from './menu-item-construction-contract.mjs';
 import {observeMenuItemFactory} from './api-menu-item-factory.mjs';
+import {TABLE_SYMBOL, approvedTableContract} from './table-construction-contract.mjs';
+import {observeTableFactory} from './api-table-factory.mjs';
 
 // verify-lite imports the checker before node_modules exists. Load Angular
 // only when a packed factory is actually executed.
@@ -228,10 +230,12 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = [], i
       results.push({symbol, problems, observed: []});
       continue;
     }
-    const construction = approvedMenuItemContract(symbol);
-    const factory = construction ? await observeMenuItemFactory(value, loaded, importModule)
+    const construction = approvedMenuItemContract(symbol) || approvedTableContract(symbol);
+    const factory = construction ? symbol.symbol_id === TABLE_SYMBOL
+      ? await observeTableFactory(value, loaded, importModule) : await observeMenuItemFactory(value, loaded, importModule)
       : runFactory(value.ɵfac, Injector, runInInjectionContext);
     const observed = factory.requests;
+    const publicNodeRequests=[];
     const invalidReference = symbol.shape.originalFactory?.deps_kind === 'invalid';
     const runtime_context = {devMode: isDevMode()};
     const expected = invalidReference ? [] : construction?.runtime_requests
@@ -253,7 +257,14 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = [], i
         const ownedViewport = ownedViewportIdentity(symbol.family, param, coreExports || {}, got.token);
         const same = ownedViewport !== null ? ownedViewport : await runtimeTokenIdentity(symbol.family, param, exports,
           originalRuntimeAliases(symbols, symbol.family), got.token, importModule);
+        if (symbol.symbol_id===TABLE_SYMBOL) publicNodeRequests.push({ident:param.ident,spec:param.spec,
+          observed_label:got.label+(got.optional?'?':''),identity_matched:same,
+          optional:Boolean(got.optional),self:Boolean(got.self),skipSelf:Boolean(got.skipSelf),host:Boolean(got.host)});
         if (!same) problems.push(`token ${symbol.symbol_id}[${index}] expected ${param.ident} observed ${got.label}`);
+        if (symbol.symbol_id===TABLE_SYMBOL) {
+          for (const flag of ['self','skipSelf','host']) if (Boolean(param[flag])!==Boolean(got[flag]))
+            problems.push(`injection flag ${symbol.symbol_id}[${index}] ${flag} differs`);
+        }
         if (Boolean(param.optional) !== Boolean(got.optional)) {
           problems.push(`optional ${symbol.symbol_id}[${index}] expected ${Boolean(param.optional)} observed ${Boolean(got.optional)}`);
         }
@@ -263,6 +274,8 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = [], i
       ...(construction ? {approved_construction: {profile_id: construction.profile_id,
         contract_sha256: construction.contract_sha256, context: factory.context,
         behavior_problems: factory.behaviorProblems, counts: factory.counts,
+        ...(factory.parentComparison ? {parent_comparison:factory.parentComparison} : {}),
+        ...(symbol.symbol_id===TABLE_SYMBOL ? {public_node_requests:publicNodeRequests} : {}),
         root_requests: factory.rootRequests.map(request => ({optional: request.optional, unresolved: request.unresolved}))}} : {})});
   }
   return results;

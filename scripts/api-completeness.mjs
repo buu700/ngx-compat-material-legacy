@@ -29,6 +29,7 @@ import {
 } from './api-surface.mjs';
 import {observeRuntimeDi, expectedFactoryDi} from './api-di-observe.mjs';
 import {MENU_ITEM_SYMBOL, approvedMenuItemContract} from './menu-item-construction-contract.mjs';
+import {TABLE_SYMBOL, approvedTableContract, tableConstructionObservationComplete} from './table-construction-contract.mjs';
 
 // verify-lite imports this module before node_modules exists. Load the parser
 // on first use so compareContracts can be unit-tested without typescript.
@@ -454,7 +455,8 @@ if (isMain) {
     di_failures: diFails.slice(0, 20).map(item => ({
       symbol_id: item.symbol.symbol_id,
       problems: item.problems,
-      observation_context: 'environment-injector factory invocation; no component node attribute context',
+      observation_context: item.approved_construction?.context || 'environment-injector factory invocation; no component node attribute context',
+      ...(item.approved_construction ? {approved_construction:item.approved_construction} : {}),
       factory_outcome: item.factory_outcome ?? null,
       factory_error: item.factory_error ?? null,
       constructor_attributes: item.constructor_attributes || [],
@@ -494,6 +496,14 @@ export function settleDi(row, records) {
         : (row.symbol.shape.diParams || []).filter(param=>!param.attribute))
         .map(param => `${param.ident}${param.optional ? '?' : ''}`).join('|');
   const owned = row.observed.join('|');
+  if (row.symbol.symbol_id===TABLE_SYMBOL) {
+    const contract=approvedTableContract(row.symbol);
+    if (!tableConstructionObservationComplete(row.approved_construction,contract,row))
+      return {...row,result:'fail',status:'mismatch',historical,owned,
+        problems:[...row.problems,'delegated table construction observation incomplete']};
+    if (!row.problems.length) return {...row,result:'pass',status:'intentional-legacy-difference',historical,owned,
+      rationale:'Maintainer delegated conservative TypeScript decisions subject to unchanged required consumer styles and a Cyph sanity check. Only the original table manual dependency path is retired. The actual zero-argument factory, genuine public parent, all node/root token identities/options, roles, borrowed lifetime and subclass behavior execute; original eleven dependencies and role remain authenticated evidence.'};
+  }
   if (row.symbol.symbol_id === MENU_ITEM_SYMBOL) {
     const contract = approvedMenuItemContract(row.symbol);
     const observation = row.approved_construction;

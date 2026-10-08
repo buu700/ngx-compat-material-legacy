@@ -493,6 +493,7 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
     'packed-consumer/harness/table-original-sticky-coercion-dirty-state': parsed.tableOriginalStickyBehavior === true,
     'packed-consumer/harness/table-original-boolean-input-rendering': parsed.tableOriginalBooleanInputs === true,
     'packed-consumer/harness/table-recycle-row-view-identity': parsed.tableRecycleRowIdentity === true,
+    'packed-consumer/harness/table-angular-di-construction': parsed.tableAngularDiConstruction === true,
     'packed-consumer/harness/table-definition-original-constructors': parsed.tableDefinitionOriginalConstructors === true && parsed.tableOutletAndDefinitionOwnership === true,
     'packed-consumer/harness/tab-label-original-constructor-and-nearest-tab': parsed.tabLabelOriginalConstructor === true,
   };
@@ -898,7 +899,7 @@ Object.defineProperty(globalThis, 'navigator', {
 
 import 'zone.js';
 import '@angular/compiler';
-import {Component, ElementRef, TemplateRef, ViewChild, Injector, ViewContainerRef, EventEmitter, InjectionToken, ANIMATION_MODULE_TYPE, NgZone, inject, isDevMode, createEnvironmentInjector, createNgModule, EnvironmentInjector, IterableDiffers, SimpleChange} from '@angular/core';
+import {Component, ElementRef, TemplateRef, ViewChild, Injector, ViewContainerRef, EventEmitter, InjectionToken, ANIMATION_MODULE_TYPE, NgZone, inject, isDevMode, createEnvironmentInjector, createNgModule, EnvironmentInjector, IterableDiffers, SimpleChange, runInInjectionContext} from '@angular/core';
 import {Subject} from 'rxjs';
 import {FormControl, Validators} from '@angular/forms';
 import {MatStepperModule, MatStepper} from '@angular/material/stepper';
@@ -1299,6 +1300,29 @@ async function main() {
     &&cellConstructorObservation.every(row=>Object.entries(row).every(([name,value])=>name==='name'||value===true));
   const textTableNode=fixture.debugElement.query(node=>node.nativeElement?.id==='constructor-text-table');
   const textTable=textTableNode.injector.get(MatLegacyTable);
+  const tableConstructionObservations=[];
+  for(const node of [booleanTableNode,textTableNode]){
+    const table=node.injector.get(MatLegacyTable),before=table.dataSource;
+    const rejected=[];
+    for(const args of [[node.injector.get(ElementRef)],Array(12).fill(null)]){
+      let unexpected:any;
+      try{unexpected=runInInjectionContext(node.injector,()=>Reflect.construct(MatLegacyTable,args));rejected.push(false);}
+      catch(error){rejected.push(/manual dependency arguments are not supported/.test(String(error)));}
+      finally{unexpected?.ngOnDestroy();}
+    }
+    tableConstructionObservations.push({
+      owned_instance:table instanceof MatLegacyTable,
+      real_parent:table instanceof CdkTable&&Object.getPrototypeOf(MatLegacyTable)===CdkTable,
+      node_provider:node.injector.get(CdkTable)===table,
+      manual_rejects:rejected.length===2&&rejected.every(Boolean),
+      data_source_retained:table.dataSource===before,
+      rendered_rows_retained:node.nativeElement.querySelectorAll('mat-row,tr[mat-row]').length>0,
+    });
+  }
+  let tableOutsideDiRejects=false;
+  try{new MatLegacyTable();}catch(error){tableOutsideDiRejects=/NG0203|injection context/.test(String(error));}
+  const tableAngularDiConstruction=tableOutsideDiRejects&&tableConstructionObservations.length===2
+    &&tableConstructionObservations.every(row=>Object.values(row).every(value=>value===true));
   const suppliedDiffers=TestBed.inject(IterableDiffers);
   let definitionCallerDestroyed=0;
   const suppliedTable={originalMarker:true,ngOnDestroy(){definitionCallerDestroyed++;}};
@@ -1763,7 +1787,7 @@ async function main() {
       selectOpened === true &&
       selectClosed === true &&
       tabCount === 2 &&
-      selected === 'Two' && viewportShared && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor && tabContentOriginalConstructor && noDataRowOriginalConstructor && constructorBorrowedProviderLifecycle && tableOriginalStickyBehavior && tableOriginalBooleanInputs && tableRecycleRowIdentity && tableDefinitionOriginalConstructors && tableOutletAndDefinitionOwnership && tabLabelOriginalConstructor,
+      selected === 'Two' && viewportShared && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor && tabContentOriginalConstructor && noDataRowOriginalConstructor && constructorBorrowedProviderLifecycle && tableOriginalStickyBehavior && tableOriginalBooleanInputs && tableRecycleRowIdentity && tableDefinitionOriginalConstructors && tableAngularDiConstruction && tableOutletAndDefinitionOwnership && tabLabelOriginalConstructor,
     buttonText: text,
     selectIsOpen: isOpen,
     dialogText,
@@ -1803,6 +1827,7 @@ async function main() {
     tableOriginalBooleanInputs, tableBooleanObservations,
     tableRecycleRowIdentity, recycleObservations,
     tableDefinitionOriginalConstructors, definitionConstructorObservations, definitionCallerDestroyed,
+    tableAngularDiConstruction, tableConstructionObservations, tableOutsideDiRejects,
     tableOutletAndDefinitionOwnership, rawOwnershipObservation,
     tabLabelOriginalConstructor, tabLabelObservation,
     checkboxAttribute, slideToggleAttribute, sliderAttribute, tabLinkAttribute,
