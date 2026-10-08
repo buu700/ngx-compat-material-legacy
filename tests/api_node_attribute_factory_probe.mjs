@@ -21,6 +21,10 @@ try{
  const host=cli.createCompilerHost({options});const program=cli.createProgram({rootNames:files.map(f=>join(temp,'src',f)),options,host});
  const diagnostics=cli.defaultGatherDiagnostics(program);if(diagnostics.length)throw Error(cli.formatDiagnostics(diagnostics));
  const emitted=program.emit();assert.equal(emitted.emitSkipped,false);const cases=[];
+ const {compilerConstructorContract}=await import(pathToFileURL(join(root,'scripts/api-compiler-constructor-contract.mjs')).href);
+ const compilerSource=readFileSync(join(temp,'out/legacy-form-field/error.js'),'utf8');
+ const compilerContract=compilerConstructorContract(compilerSource,'MatLegacyError');
+ assert.equal(compilerContract.parameters.length,2);assert.equal(compilerContract.parameters[0].attribute,'aria-live');
  function patch(dir){for(const item of readdirSync(dir,{withFileTypes:true})){const p=join(dir,item.name);if(item.isDirectory()){patch(p);continue;}if(item.name.endsWith('.js')){
  const s=readFileSync(p,'utf8').replace(/(['"])(@angular\/[^'"]+)\1/g,(_,q,s)=>JSON.stringify(url(s))).replace(/(['"])(\.\.?\/[^'"]+)\1/g,(_,q,s)=>JSON.stringify(s.endsWith('.js')?s:s+'.js'));writeFileSync(p,s);}}}
  patch(join(temp,'out'));writeFileSync(join(temp,'out/package.json'),'{"type":"module"}');
@@ -46,6 +50,7 @@ try{
  cases.push({id:'factory-ignoring-constructor-type-override',result:'rejected'});
  }finally{f.close();}
  const result={schema_version:1,role:'Node-local actual emitted attribute factory and captured constructor inputs; not generic API admission or packed/native/minimum qualification',node:process.version,typescript:ts.version,runtime_peer:c.VERSION.full,cases,
+ compiler_observation_contract:compilerContract,
  original_directive_unchanged_except_owned_token_standalone_copyright_and_retired_migration_notices:true,actual_attribute_and_elementref_metadata_identity:true,handcrafted_dependency_metadata:false,current_private_imports:false,library_typescript_templates_styles_changed:false,g02_claim:'not-passed'};
  if(process.argv.includes('--out'))writeFileSync(process.argv[process.argv.indexOf('--out')+1],JSON.stringify(result,null,2)+'\n');
  console.log(JSON.stringify({cases:cases.length,runtime_peer:c.VERSION.full}));
