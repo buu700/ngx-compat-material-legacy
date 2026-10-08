@@ -26,7 +26,9 @@ import {DEFAULT_CORE_CDK_CASES,defaultCoreCdkResultsMatch,defaultCoreCdkMeasurem
 import {DEFAULT_COMPANION_CASES,DEFAULT_COMPANION_CONTRACT,defaultCompanionMeasurementOk,defaultCompanionResultsMatch} from './sass-default-companion-contract.mjs';
 import {DEFAULT_MAPPED_COMPANION_CASES,DEFAULT_MAPPED_COMPANION_CONTRACT,defaultMappedCompanionMeasurementOk,defaultMappedCompanionResultsMatch} from './sass-default-mapped-companion-contract.mjs';
 import {DEFAULT_AGGREGATE_CASES,DEFAULT_AGGREGATE_CONTRACT,defaultAggregateMeasurementOk,defaultAggregateResultsMatch} from './sass-default-aggregate-contract.mjs';
+import {FORM_FIELD_STATE_DEFAULT_CASES,FORM_FIELD_STATE_CONTRACT,formFieldStateDefaultMeasurementOk,formFieldStateDefaultResultsMatch} from './sass-form-field-state-contract.mjs';
 const companionTypes=[
+  {cases:FORM_FIELD_STATE_DEFAULT_CASES,contract:FORM_FIELD_STATE_CONTRACT,measurement:formFieldStateDefaultMeasurementOk,matches:formFieldStateDefaultResultsMatch},
   {cases:DEFAULT_COMPANION_CASES,contract:DEFAULT_COMPANION_CONTRACT,measurement:defaultCompanionMeasurementOk,matches:defaultCompanionResultsMatch},
   {cases:DEFAULT_MAPPED_COMPANION_CASES,contract:DEFAULT_MAPPED_COMPANION_CONTRACT,measurement:defaultMappedCompanionMeasurementOk,matches:defaultMappedCompanionResultsMatch},
   {cases:DEFAULT_AGGREGATE_CASES,contract:DEFAULT_AGGREGATE_CONTRACT,measurement:defaultAggregateMeasurementOk,matches:defaultAggregateResultsMatch},

@@ -13,6 +13,10 @@ def _companion_programs(root):
     return json.loads(subprocess.run(['node','--input-type=module','-e',code],cwd=root,check=True,capture_output=True,text=True).stdout)
 
 def mixin_receipt(root,active,case,invocation):
+    from sass_form_field_state_admission import FORM_FIELD_STATE_ARGUMENT_CASES
+    if case in FORM_FIELD_STATE_ARGUMENT_CASES:
+        from sass_form_field_state_fixture import form_field_state_receipt
+        return form_field_state_receipt(active,case,invocation)
     raw=(root/'fixtures/sass/mixin-argument-contracts.json').read_bytes();catalog=json.loads(raw)
     probe=next(p for p in catalog['cases'] if p['case_id']==case)
     body={**copy.deepcopy(function_receipt(root,active,'function-value/define-dark-theme/1',invocation)),**probe}

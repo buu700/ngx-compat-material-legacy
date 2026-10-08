@@ -11,6 +11,7 @@ from sass_datepicker_controls_admission import DATEPICKER_CONTROLS_CASES, datepi
 from sass_aggregate_density_admission import AGGREGATE_DENSITY_CASES, aggregate_density_results_match
 from sass_aggregate_typography_admission import AGGREGATE_TYPOGRAPHY_CASES, aggregate_typography_results_match
 from sass_aggregate_color_theme_admission import AGGREGATE_COLOR_THEME_CASES, aggregate_color_theme_results_match
+from sass_form_field_state_admission import FORM_FIELD_STATE_ARGUMENT_CASES, form_field_state_argument_results_match
 
 def mixin_argument_measurements_ok(root,body,*,owned=False):
     try:
@@ -64,7 +65,9 @@ def mixin_argument_assertion_ok(root,active,body,invocation):
         if len(library)!=1 or body['tarball_sha256']!=library[0]['sha256'] or not mixin_argument_measurements_ok(root,body,owned=owned):return False
         original=body['expected']['css'];actual=body['actual']['css']
         if body['case_id'] not in PROGRESS_COLOR_ALIAS_CASES and 'current_peer_alias' in body:return False
-        if body['case_id'] in SORT_CASES:
+        if body['case_id'] in FORM_FIELD_STATE_ARGUMENT_CASES:
+            if not form_field_state_argument_results_match(body):return False
+        elif body['case_id'] in SORT_CASES:
             if not sort_companion_results_match(body):return False
         elif body['case_id'] in TREE_CASES:
             if not tree_companion_results_match(body):return False
