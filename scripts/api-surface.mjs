@@ -12,6 +12,7 @@ import {dirname, join, resolve} from 'node:path';
 import {createRequire} from 'node:module';
 import {fileURLToPath} from 'node:url';
 import {MENU_ITEM_SYMBOL, approvedMenuItemSignatureRecord} from './menu-item-construction-contract.mjs';
+import {TABLE_SYMBOL, approvedTableSignatureRecord} from './table-construction-contract.mjs';
 
 const require = createRequire(import.meta.url);
 let typescriptModule;
@@ -128,6 +129,23 @@ export function originalInheritedConstructor(file, name) {
   const signatures = shape?.ownSignatures?.filter(sig => sig.includes(' constructor('));
   if (signatures?.length !== config.count) throw new Error('missing original inherited constructor');
   return {parent, signatures, source_sha256: config.sha256};
+}
+
+/** Exact original inherited inputs now explicitly overridden to preserve direct-write coercion.
+ * This finite four-signature coverage repair does not claim the full inherited-member audit.
+ */
+export function originalInheritedTableInputs(file,name) {
+  if (name!=='MatLegacyTable' || !file.split('\\').join('/').includes('/material/legacy-table/')) return null;
+  const bytes=readFileSync(join(root,INHERITED_CONSTRUCTOR_REFERENCE));
+  if (createHash('sha256').update(bytes).digest('hex')!==INHERITED_CONSTRUCTOR_SHA256)
+    throw new Error('untouched16 inherited table input declaration identity mismatch');
+  const declaration=ts.createSourceFile(INHERITED_CONSTRUCTOR_REFERENCE,bytes.toString(),ts.ScriptTarget.Latest,true);
+  const parent=declaration.statements.find(n=>ts.isClassDeclaration(n)&&n.name?.text==='CdkTable');
+  if (!parent) throw new Error('original CdkTable declaration missing');
+  const signatures=declaredMembers(parent,declaration).signatures
+    .filter(sig=>/^public (?:get|set) (?:fixedLayout|multiTemplateDataRows)\b/.test(sig));
+  if (signatures.length!==4) throw new Error('original inherited table boolean signatures missing');
+  return {parent:'CdkTable',signatures,source_sha256:INHERITED_CONSTRUCTOR_SHA256};
 }
 
 export function packedInheritedConstructor(sourceFile, name, loadPeer = (spec, file) => {
@@ -728,6 +746,11 @@ function shapeFromFound(found, refRoot) {
       flat.requiredConstructor = true;
       flat.signatures = unique([...flat.signatures, ...flat.inheritedConstructor.signatures]);
     }
+    const inheritedTableInputs=originalInheritedTableInputs(found.file,node.name?.text);
+    if (inheritedTableInputs) {
+      flat.inheritedTableInputs=inheritedTableInputs;
+      flat.signatures=unique([...flat.signatures,...inheritedTableInputs.signatures]);
+    }
     if (found.reexport) flat.reexport = found.reexport;
     return flat;
   }
@@ -1026,6 +1049,24 @@ export function packedShape(sourceFile, name) {
       flat.publicMenuItemParent = Boolean((binding?.spec === '@angular/material/menu'
         && binding.imported === 'MatMenuItem' && !index.has(expression.text)) || namespace);
     }
+    if (node.name?.text === 'MatLegacyTable') {
+      const bases=(node.heritageClauses||[]).filter(clause=>clause.token===ts.SyntaxKind.ExtendsKeyword)
+        .flatMap(clause=>[...clause.types]);
+      const expression=bases.length===1?bases[0].expression:null;
+      const binding=expression&&ts.isIdentifier(expression)?importBindings(sourceFile).get(expression.text):null;
+      const namespace=expression&&ts.isPropertyAccessExpression(expression)
+        &&ts.isIdentifier(expression.expression)&&expression.name.text==='CdkTable'
+        &&!index.has(expression.expression.text)
+        &&sourceFile.statements.some(statement=>ts.isImportDeclaration(statement)
+          &&statement.moduleSpecifier.text==='@angular/cdk/table'
+          &&statement.importClause?.namedBindings&&ts.isNamespaceImport(statement.importClause.namedBindings)
+          &&statement.importClause.namedBindings.name.text===expression.expression.text);
+      flat.publicTableParent=Boolean(((binding?.spec==='@angular/cdk/table'
+        &&binding.imported==='CdkTable'&&!index.has(expression.text))||namespace)
+        &&node.typeParameters?.length===1&&bases[0].typeArguments?.length===1
+        &&ts.isTypeReferenceNode(bases[0].typeArguments[0])
+        &&bases[0].typeArguments[0].typeName.getText(sourceFile)===node.typeParameters[0].name.text);
+    }
     if (flat.heritage.includes('BasePortalOutlet')) {
       const portalBinding = importBindings(sourceFile).get('BasePortalOutlet');
       flat.publicPortalParent = portalBinding?.spec === '@angular/cdk/portal'
@@ -1229,6 +1270,7 @@ export function compareSignatures(symbol, packed, differences) {
   const ownPacked = [...(packed.ownSignatures || packed.signatures || [])];
   if (historical.inheritedConstructor && !historical.ownConstructor) ownHist.push(...historical.inheritedConstructor.signatures);
   if (packed.inheritedConstructor && !packed.ownConstructor) ownPacked.push(...packed.inheritedConstructor.signatures);
+  if (historical.inheritedTableInputs) ownHist.push(...historical.inheritedTableInputs.signatures);
   const heritageHist = `heritage ${(historical.heritage || []).join(',')}`;
   const heritagePacked = `heritage ${(packed.heritage || []).join(',')}`;
   let historicalSigs = ownHist;
@@ -1353,6 +1395,8 @@ function constructionDifferenceAllowed(symbol, packed, record) {
     .some(signature => signature?.includes(' constructor('));
   if (symbol.symbol_id === MENU_ITEM_SYMBOL && constructor)
     return approvedMenuItemSignatureRecord(symbol, packed, record);
+  if (symbol.symbol_id === TABLE_SYMBOL && constructor)
+    return approvedTableSignatureRecord(symbol, packed, record);
   return !record.construction_contract;
 }
 
