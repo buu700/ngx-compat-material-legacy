@@ -1,6 +1,6 @@
 import {waitForAsync, ComponentFixture, fakeAsync, TestBed, tick} from '@angular/core/testing';
 import {FormControl, FormsModule, NgModel, ReactiveFormsModule} from '@angular/forms';
-import {Component, DebugElement, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DebugElement, ViewChild} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {By} from '@angular/platform-browser';
 import {dispatchFakeEvent} from '../internal/testing/owned-test-events';
@@ -25,11 +25,42 @@ describe('MatRadio', () => {
         RadioButtonWithPredefinedAriaAttributes,
         RadiosInsidePreCheckedRadioGroup,
         PreselectedRadioWithStaticValueAndNgIf,
+        RadioTouchOnPush,
+        RadioTouchOnPushHost,
       ],
     });
 
     TestBed.compileComponents();
   }));
+
+  it('should destroy a radio before its input view has been initialized', () => {
+    const fixture = TestBed.createComponent(MatLegacyRadioButton);
+    expect(fixture.componentInstance._inputElement).toBeUndefined();
+    expect(() => fixture.destroy()).not.toThrow();
+  });
+
+  it('should safely handle a touch-target click before the input view exists', () => {
+    const fixture = TestBed.createComponent(MatLegacyRadioButton);
+    const radio = fixture.componentInstance;
+    expect(radio._inputElement).toBeUndefined();
+    expect(() => radio._onTouchTargetClick(new MouseEvent('click'))).not.toThrow();
+    expect(radio.checked).toBe(true);
+    fixture.destroy();
+  });
+
+  it('should render touch callback changes inside an OnPush ancestor', () => {
+    const fixture = TestBed.createComponent(RadioTouchOnPushHost);
+    fixture.detectChanges();
+    const child = fixture.debugElement.query(By.directive(RadioTouchOnPush))
+      .componentInstance as RadioTouchOnPush;
+    child.group.registerOnTouched(() => { child.wasTouched = true; });
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('#radio-touch-state').textContent.trim()).toBe('false');
+
+    child.group._touch();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('#radio-touch-state').textContent.trim()).toBe('true');
+  });
 
   describe('inside of a group', () => {
     let fixture: ComponentFixture<RadiosInsideRadioGroup>;
@@ -1157,3 +1188,23 @@ class PreselectedRadioWithStaticValueAndNgIf {
     target: new FormControl('b'),
   };
 }
+
+@Component({
+  standalone: false,
+  selector: 'test-radio-touch-onpush',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    <mat-radio-group><mat-radio-button value="a">Alpha</mat-radio-button></mat-radio-group>
+    <span id="radio-touch-state">{{wasTouched}}</span>
+  `,
+})
+class RadioTouchOnPush {
+  @ViewChild(MatLegacyRadioGroup) group: MatLegacyRadioGroup;
+  wasTouched = false;
+}
+
+@Component({
+  standalone: false,
+  template: '<test-radio-touch-onpush></test-radio-touch-onpush>',
+})
+class RadioTouchOnPushHost {}
