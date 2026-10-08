@@ -4,8 +4,8 @@
   "g11_claim": "not-passed",
   "seed_rows": 1697,
   "ledger_rows": 1697,
-  "closed_dispositions": 79,
-  "open_or_deferred": 1618,
+  "closed_dispositions": 81,
+  "open_or_deferred": 1616,
   "entries": [
     {
       "sha": "b13c6aa194cf560a304213961ae28725f8d0a4e2",
@@ -11759,15 +11759,54 @@
       "files": [
         "src/material/radio/radio.ts"
       ],
-      "final_disposition": "needs-individual-review",
-      "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
-      "read_note_disposition": "unreviewed-on-21.x",
+      "final_disposition": "already-adapted",
+      "reason": "The whole patch adds markForCheck after onTouched inside the existing callback guard. Untouched16 only calls onTouched;the current owned legacy group on both lines already calls the supplied ChangeDetectorRef after the callback. Its FocusMonitor blur subscription reaches this method. Actual owned class execution preserves callback-before-mark and skips marking without a callback;removing the mark is detected. Both exact current Material minima have since evolved to a callback-only modern group,so inheritance/tag ancestry is not the justification. Retain the legacy adaptation. The older read note describes the pre-adaptation state and is preserved rather than rewritten. Native OnPush rendering is separately prepared for final artifact-bound Actions;this source algorithm decision does not claim that execution.",
+      "read_note_disposition": "owned-retained",
       "affected_branches": [
+        "main",
         "21.x"
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": null
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-radio-touch-and-early-destroy-review.json",
+      "prior_dispositions": [
+        {
+          "sha": "e3abc65d7d191f2adf1c294bdb84f532d4eac05c",
+          "bucket": "behavior-semantic",
+          "subject": "fix(material/radio): mark radio-group for check on touch (#29203)",
+          "files": [
+            "src/material/radio/radio.ts"
+          ],
+          "final_disposition": "needs-individual-review",
+          "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+          "read_note_disposition": "unreviewed-on-21.x",
+          "affected_branches": [
+            "21.x"
+          ],
+          "g11_claim": "not-passed",
+          "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+          "evidence_report": null
+        }
+      ],
+      "review_depth": "individual-compatibility",
+      "recorded_at_utc": "2026-10-08T00:37:48.968965+00:00",
+      "batch_id": "closeout-radio-individual-source-runtime-review",
+      "individual_proof": {
+        "diff_sha256": "862c15e2583e7346bab407c45627409d9cbbbd74370a8d3e50441a68a6b890ef",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main",
+          "21.x"
+        ],
+        "decision": "The whole patch adds markForCheck after onTouched inside the existing callback guard. Untouched16 only calls onTouched;the current owned legacy group on both lines already calls the supplied ChangeDetectorRef after the callback. Its FocusMonitor blur subscription reaches this method. Actual owned class execution preserves callback-before-mark and skips marking without a callback;removing the mark is detected. Both exact current Material minima have since evolved to a callback-only modern group,so inheritance/tag ancestry is not the justification. Retain the legacy adaptation. The older read note describes the pre-adaptation state and is preserved rather than rewritten. Native OnPush rendering is separately prepared for final artifact-bound Actions;this source algorithm decision does not claim that execution.",
+        "proof_kind": "owned-source-and-executed-lifecycle-protocol"
+      },
+      "source_check": {
+        "path": "projects/ngx-material-legacy/legacy-radio/internal/radio-base.ts",
+        "sha256": "d88f1ee678e3b18707d7698be87f307c3c471eb6dd5b696571955444e5420f9b",
+        "executed_diagnostic": "compatibility/f10/disposition-ledger/evidence/closeout-radio-touch-and-early-destroy-review.json",
+        "native_regressions_pending": true
+      }
     },
     {
       "sha": "faf82b1e23ea6b3f7dc0efd44d323749426996a7",
@@ -14614,15 +14653,54 @@
       "files": [
         "src/material/radio/radio.ts"
       ],
-      "final_disposition": "needs-individual-review",
-      "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
-      "read_note_disposition": "unreviewed-on-21.x",
+      "final_disposition": "already-adapted",
+      "reason": "The complete two-hunk patch guards both destruction-time removal of a manually bound modern click listener and touch-target focus before the input query exists. The owned legacy and untouched16 teardown never install/remove that modern listener;their cleanup stops FocusMonitor on the host ElementRef and invokes the initialized-or-noop selection cleanup. The current owned touch-target focus already has the optional input guard on both lines. Actual class execution covers destruction before init and after init/before view,cleanup order,missing/ready/disabled touch targets. Unsafe view dereferences and dropped cleanup are rejected. Both exact current peers now use a guarded Renderer cleanup closure and retain optional touch focus,including a modern disabledInteractive branch absent from the frozen legacy feature set. Do not import that modern lifecycle or feature. The prior rationale/note was incomplete or pre-adaptation;preserve it and replace it with this whole-hunk conclusion. Native creation/destruction and OnPush integration cases remain pending final Actions.",
+      "read_note_disposition": "owned-retained",
       "affected_branches": [
+        "main",
         "21.x"
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": null
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-radio-touch-and-early-destroy-review.json",
+      "prior_dispositions": [
+        {
+          "sha": "fd47a0e60dd9ab50d9f923713ca60a7fd21ccc16",
+          "bucket": "behavior-semantic",
+          "subject": "fix(material/radio): avoid error if destroyed quickly (#29507)",
+          "files": [
+            "src/material/radio/radio.ts"
+          ],
+          "final_disposition": "needs-individual-review",
+          "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+          "read_note_disposition": "unreviewed-on-21.x",
+          "affected_branches": [
+            "21.x"
+          ],
+          "g11_claim": "not-passed",
+          "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+          "evidence_report": null
+        }
+      ],
+      "review_depth": "individual-compatibility",
+      "recorded_at_utc": "2026-10-08T00:37:48.968965+00:00",
+      "batch_id": "closeout-radio-individual-source-runtime-review",
+      "individual_proof": {
+        "diff_sha256": "a30093a30310a1c2354b237309d4e16da3adfac16482156fdc511033cfdb0c33",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main",
+          "21.x"
+        ],
+        "decision": "The complete two-hunk patch guards both destruction-time removal of a manually bound modern click listener and touch-target focus before the input query exists. The owned legacy and untouched16 teardown never install/remove that modern listener;their cleanup stops FocusMonitor on the host ElementRef and invokes the initialized-or-noop selection cleanup. The current owned touch-target focus already has the optional input guard on both lines. Actual class execution covers destruction before init and after init/before view,cleanup order,missing/ready/disabled touch targets. Unsafe view dereferences and dropped cleanup are rejected. Both exact current peers now use a guarded Renderer cleanup closure and retain optional touch focus,including a modern disabledInteractive branch absent from the frozen legacy feature set. Do not import that modern lifecycle or feature. The prior rationale/note was incomplete or pre-adaptation;preserve it and replace it with this whole-hunk conclusion. Native creation/destruction and OnPush integration cases remain pending final Actions.",
+        "proof_kind": "owned-source-and-executed-lifecycle-protocol"
+      },
+      "source_check": {
+        "path": "projects/ngx-material-legacy/legacy-radio/internal/radio-base.ts",
+        "sha256": "d88f1ee678e3b18707d7698be87f307c3c471eb6dd5b696571955444e5420f9b",
+        "executed_diagnostic": "compatibility/f10/disposition-ledger/evidence/closeout-radio-touch-and-early-destroy-review.json",
+        "native_regressions_pending": true
+      }
     },
     {
       "sha": "5892acfde36ac1c12e98f7ea95a2a02bb95eeedd",
