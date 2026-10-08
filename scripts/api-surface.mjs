@@ -30,6 +30,8 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 const DIALOG_INHERITED_DESTROY_REFERENCE = 'reference/material-16.2.14/dialog-focus-sources/cdk-dialog.d.ts';
 const DIALOG_INHERITED_DESTROY_SHA256 = 'bfbf53c3fd8e9535005853fb23249b9d2bb6f79df89c30eef9bf873a3a9c0950';
+const DIALOG_PORTAL_REFERENCE = 'reference/material-16.2.14/dialog-focus-sources/cdk-portal.d.ts';
+const DIALOG_PORTAL_SHA256 = '7172d4edfc661bc427a1b0f16cfd0261f5255a5a96f3c5add90eca4cf5c4eb1a';
 const ORIGINAL_MATERIAL_DIALOG_SHA256 = '91ecfd4630a3aac273b04c9090887364a358be2c44f0588551e36545fe004dc1';
 
 /** One previously omitted inherited lifecycle contract, derived from untouched16. */
@@ -50,6 +52,36 @@ export function originalInheritedDialogDestroy(file, name, sourceFile, readRefer
     throw new Error('missing authentic inherited dialog destroy contract');
   return {parent: 'CdkDialogContainer', signatures, reference: DIALOG_INHERITED_DESTROY_REFERENCE,
     source_sha256: DIALOG_INHERITED_DESTROY_SHA256, material_source_sha256: ORIGINAL_MATERIAL_DIALOG_SHA256};
+}
+
+/** Direct inherited dialog members omitted by the historical Material-only flattener. */
+export function originalInheritedDialogContract(file, name, sourceFile, readReference = path => readFileSync(join(root, path))) {
+  const lifecycle = originalInheritedDialogDestroy(file, name, sourceFile, readReference);
+  if (!lifecycle) return null;
+  const parentBytes = readReference(DIALOG_INHERITED_DESTROY_REFERENCE);
+  if (createHash('sha256').update(parentBytes).digest('hex') !== DIALOG_INHERITED_DESTROY_SHA256)
+    throw new Error('untouched16 inherited dialog member identity mismatch');
+  const declaration = ts.createSourceFile(DIALOG_INHERITED_DESTROY_REFERENCE,
+    parentBytes.toString('utf8'), ts.ScriptTarget.Latest, true);
+  const parent = declaration.statements.find(node => ts.isClassDeclaration(node) && node.name?.text === lifecycle.parent);
+  const original = sourceFile.statements.find(node => ts.isClassDeclaration(node) && node.name?.text === name);
+  const heritage = original?.heritageClauses?.flatMap(clause => [...clause.types])
+    .find(type => heritageIdentifier(type)?.local === lifecycle.parent);
+  const argument = heritage?.typeArguments?.[0]?.getText(sourceFile);
+  if (parent?.typeParameters?.length !== 1 || parent.typeParameters[0].name.text !== 'C'
+      || argument !== 'MatDialogConfig') throw new Error('missing authentic inherited dialog type argument');
+  const signatures = declaredMembers(parent, declaration).signatures
+    .filter(sig => !sig.includes(' constructor(')).map(sig => sig.replace(/\bC\b/g, argument));
+  const portalBytes = readReference(DIALOG_PORTAL_REFERENCE);
+  if (createHash('sha256').update(portalBytes).digest('hex') !== DIALOG_PORTAL_SHA256)
+    throw new Error('untouched16 inherited portal member identity mismatch');
+  const portalSource = ts.createSourceFile(DIALOG_PORTAL_REFERENCE, portalBytes.toString('utf8'), ts.ScriptTarget.Latest, true);
+  const portalParent = portalSource.statements.find(node => ts.isClassDeclaration(node) && node.name?.text === 'BasePortalOutlet');
+  if (!portalParent) throw new Error('missing authentic common portal ancestor');
+  return {...lifecycle, signatures, common_parent: 'BasePortalOutlet',
+    ancestor_signatures: declaredMembers(portalParent, portalSource).signatures,
+    ancestor_reference: DIALOG_PORTAL_REFERENCE, ancestor_sha256: DIALOG_PORTAL_SHA256,
+    scope: 'Direct untouched16 CDK parent members plus exact common public portal ancestor declarations.'};
 }
 
 const FACTORY_REFERENCE = 'reference/material-16.2.14/factory-metadata.json';
@@ -608,6 +640,14 @@ function flattenClass(found, refRoot, seen) {
     }
     }
   }
+  const inheritedDialog = originalInheritedDialogContract(found.file, found.node.name?.text, found.sourceFile);
+  if (inheritedDialog) {
+    for (const sig of inheritedDialog.signatures) {
+      if (ownGroups.has(groupOf(sig))) continue;
+      merged.push(sig);
+      if (sig.startsWith('protected ')) mergedProtected.push(sig);
+    }
+  }
   return {
     kind: shape.kind,
     typeParams: shape.typeParams,
@@ -678,6 +718,8 @@ function shapeFromFound(found, refRoot) {
     flat.heritage = heritageNames(node, found.sourceFile);
     const inheritedDialogDestroy = originalInheritedDialogDestroy(found.file, node.name?.text, found.sourceFile);
     if (inheritedDialogDestroy) flat.inheritedDialogDestroy = inheritedDialogDestroy;
+    const inheritedDialogContract = originalInheritedDialogContract(found.file, node.name?.text, found.sourceFile);
+    if (inheritedDialogContract) flat.inheritedDialogContract = inheritedDialogContract;
     flat.diParams = diParamsOf(node, found.sourceFile);
     flat.originalFactory = originalFactoryContract(found.file, node.name?.text);
     flat.inheritedConstructor = originalInheritedConstructor(found.file, node.name?.text);
@@ -969,6 +1011,11 @@ export function packedShape(sourceFile, name) {
     flat.ownProtected = own.requiredProtected;
     flat.ownConstructor = own.requiredConstructor;
     flat.heritage = heritageNames(node, sourceFile);
+    if (flat.heritage.includes('BasePortalOutlet')) {
+      const portalBinding = importBindings(sourceFile).get('BasePortalOutlet');
+      flat.publicPortalParent = portalBinding?.spec === '@angular/cdk/portal'
+        && portalBinding?.imported === 'BasePortalOutlet';
+    }
     flat.inheritedConstructor = packedInheritedConstructor(sourceFile, node.name?.text);
     if (flat.inheritedConstructor) flat.signatures = unique([...flat.signatures, ...flat.inheritedConstructor.signatures]);
     return flat;
@@ -1239,6 +1286,13 @@ export function compareSignatures(symbol, packed, differences) {
     rows.push({status: 'mismatch', historical: sig, owned: null});
   }
   for (const extra of [...packedLeft]) {
+    if (historical.inheritedDialogContract?.ancestor_signatures.includes(extra)
+        && packed.publicPortalParent) {
+      // An exact override still belongs to the authenticated original public
+      // ancestor. Keep the actual public import identity bound to this check.
+      reported.add(extra);
+      continue;
+    }
     if (historical.inheritedDialogDestroy?.signatures.includes(extra)) {
       // An exact override of the authenticated inherited public method is
       // already part of the original API. This is not a new signature waiver.

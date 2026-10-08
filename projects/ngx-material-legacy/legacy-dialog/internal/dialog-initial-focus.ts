@@ -11,19 +11,19 @@ import {FocusTrapFactory, InteractivityChecker} from '@angular/cdk/a11y';
 import {NgZone, Renderer2} from '@angular/core';
 import {MatDialogConfig} from '@angular/material/dialog';
 
-/** Owned initial-focus selection. The enclosing CDK container owns tab trapping. */
+/** Owned initial-focus selection. The owned container holds the persistent public focus trap. */
 export interface LegacyDialogInitialFocusContext {
   element: HTMLElement;
   config: Pick<MatDialogConfig, 'autoFocus'>;
   factory: FocusTrapFactory;
   checker: InteractivityChecker;
-  renderer: Renderer2;
+  renderer: Pick<Renderer2, 'listen'>;
   ngZone: NgZone;
   isBrowser: boolean;
 }
 
 /** Resolve the active element through open shadow roots without private CDK helpers. */
-export function legacyDialogContainsFocus(element: HTMLElement): boolean {
+export function legacyDialogActiveElement(): HTMLElement | null {
   let active = typeof document !== 'undefined' && document ? document.activeElement : null;
   while (active?.shadowRoot) {
     const next = active.shadowRoot.activeElement;
@@ -32,6 +32,11 @@ export function legacyDialogContainsFocus(element: HTMLElement): boolean {
     }
     active = next;
   }
+  return active as HTMLElement | null;
+}
+
+export function legacyDialogContainsFocus(element: HTMLElement): boolean {
+  const active = legacyDialogActiveElement();
   return element === active || !!active && element.contains(active);
 }
 

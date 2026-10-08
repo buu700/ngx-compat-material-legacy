@@ -1,4 +1,4 @@
-import {FocusMonitor, FocusOrigin} from '@angular/cdk/a11y';
+import {FocusMonitor, FocusOrigin, FocusTrapFactory, InteractivityChecker} from '@angular/cdk/a11y';
 import {
   ComponentFixture,
   fakeAsync,
@@ -12,6 +12,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   Directive,
+  ElementRef,
   Inject,
   Injector,
   TemplateRef,
@@ -32,7 +33,8 @@ import {Directionality} from '@angular/cdk/bidi';
 import {supportsShadowDom} from '../internal/owned-shadow-dom';
 import {MatLegacyDialogContainer} from './dialog-container';
 import {_MatDialogContainerBase} from './internal/dialog-container-base';
-import {OverlayContainer, ScrollStrategy, Overlay} from '@angular/cdk/overlay';
+import {MatDialogConfig} from '@angular/material/dialog';
+import {OverlayContainer, ScrollStrategy, Overlay, OverlayRef} from '@angular/cdk/overlay';
 import {ScrollDispatcher} from '@angular/cdk/scrolling';
 import {A, ESCAPE} from '@angular/cdk/keycodes';
 import {
@@ -1316,6 +1318,9 @@ describe('MatDialog', () => {
       ref._containerInstance._focusTrapped.subscribe(() => notifications++);
       flushMicrotasks();
 
+      const container = overlayContainerElement.querySelector('mat-dialog-container')!;
+      expect(container.classList.contains('cdk-dialog-container')).toBe(true);
+      expect(container.classList.contains('mat-dialog-container')).toBe(true);
       expect(overlayContainerElement.querySelectorAll('.cdk-focus-trap-anchor').length).toBe(2);
       expect(notifications).toBe(1);
       expect(document.activeElement!.tagName).toBe('INPUT');
@@ -2280,11 +2285,78 @@ class ModuleBoundDialogModule {}
 })
 class LegacyInitialFocusProbe extends _MatDialogContainerBase {
   requestInitialFocus(): void { this._trapFocus(); }
+  initializeContentFocus(): void { this._contentAttached(); }
   _startExitAnimation(): void {}
 }
 
 describe('Owned legacy dialog initial focus', () => {
-  beforeEach(() => TestBed.configureTestingModule({declarations: [LegacyInitialFocusProbe]}));
+  beforeEach(() => TestBed.configureTestingModule({
+    declarations: [LegacyInitialFocusProbe],
+    providers: [MatDialogConfig, {provide: OverlayRef, useValue: {}}],
+  }));
+
+  it('should honor eight supplied arguments outside an Angular injection context', fakeAsync(() => {
+    const host = document.createElement('div');
+    host.innerHTML = '<h2>Manual heading</h2>';
+    document.body.appendChild(host);
+    const overlay = TestBed.inject(Overlay).create();
+    const config = new MatDialogConfig();
+    config.autoFocus = 'first-heading';
+    config.restoreFocus = false;
+    const checker = TestBed.inject(InteractivityChecker);
+    const checked = spyOn(checker, 'isFocusable').and.callThrough();
+    const container = new LegacyInitialFocusProbe(new ElementRef(host),
+      TestBed.inject(FocusTrapFactory), document, config, checker, TestBed.inject(NgZone),
+      overlay, TestBed.inject(FocusMonitor));
+    try {
+      expect(container._config).toBe(config);
+      container.requestInitialFocus();
+      flushMicrotasks();
+      expect(document.activeElement).toBe(host.querySelector('h2'));
+      expect(checked).toHaveBeenCalledWith(host.querySelector('h2')!);
+      expect(host.querySelector('h2')!.getAttribute('tabindex')).toBe('-1');
+    } finally {
+      container.ngOnDestroy();
+      expect(host.querySelector('h2')!.hasAttribute('tabindex')).toBe(false);
+      overlay.dispose();
+      host.remove();
+    }
+  }));
+
+  it('should restore previous focus through the supplied monitor and release its trap', fakeAsync(() => {
+    const previous = document.createElement('button');
+    const host = document.createElement('div');
+    host.tabIndex = -1;
+    document.body.append(previous, host);
+    previous.focus();
+    const overlay = TestBed.inject(Overlay).create();
+    const disposed = spyOn(overlay, 'dispose').and.callThrough();
+    const config = new MatDialogConfig();
+    config.autoFocus = 'dialog';
+    config.restoreFocus = true;
+    const monitor = TestBed.inject(FocusMonitor);
+    const focused = spyOn(monitor, 'focusVia').and.callThrough();
+    const container = new LegacyInitialFocusProbe(new ElementRef(host),
+      TestBed.inject(FocusTrapFactory), document, config, TestBed.inject(InteractivityChecker),
+      TestBed.inject(NgZone), overlay, monitor);
+    try {
+      container.initializeContentFocus();
+      flushMicrotasks();
+      expect(document.activeElement).toBe(host);
+      expect(document.body.querySelectorAll('.cdk-focus-trap-anchor').length).toBe(2);
+      container._closeInteractionType = 'keyboard';
+      container.ngOnDestroy();
+      expect(focused).toHaveBeenCalledWith(previous, 'keyboard');
+      expect(document.activeElement).toBe(previous);
+      expect(document.body.querySelectorAll('.cdk-focus-trap-anchor').length).toBe(0);
+      expect(disposed).not.toHaveBeenCalled();
+    } finally {
+      container.ngOnDestroy();
+      overlay.dispose();
+      previous.remove();
+      host.remove();
+    }
+  }));
 
   it('should use the public initial-focus marker without creating trap anchors', fakeAsync(() => {
     const fixture = TestBed.createComponent(LegacyInitialFocusProbe);
