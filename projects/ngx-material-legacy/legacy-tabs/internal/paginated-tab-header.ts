@@ -98,6 +98,9 @@ export abstract class MatPaginatedTabHeader
   /** Emits when the component is destroyed. */
   protected readonly _destroyed = new Subject<void>();
 
+  /** Completed subjects do not cancel callbacks which were already queued. */
+  private _isDestroyed = false;
+
   /** Whether the controls for pagination should be displayed */
   _showPaginationControls = false;
 
@@ -191,6 +194,7 @@ export abstract class MatPaginatedTabHeader
   protected abstract _itemSelected(event: KeyboardEvent): void;
 
   ngAfterViewInit() {
+    if (this._isDestroyed) return;
     // We need to handle these events manually, because we want to bind passive event listeners.
     fromEvent(this._previousPaginator.nativeElement, 'touchstart', passiveEventListenerOptions)
       .pipe(takeUntil(this._destroyed))
@@ -206,6 +210,7 @@ export abstract class MatPaginatedTabHeader
   }
 
   ngAfterContentInit() {
+    if (this._isDestroyed) return;
     const dirChange = this._dir ? this._dir.change : observableOf('ltr');
     // Debounce resize events because the alignment logic is expensive.
     const resize = ownedHeaderResize(this._elementRef.nativeElement, this._ngZone).pipe(
@@ -215,8 +220,9 @@ export abstract class MatPaginatedTabHeader
     // Viewport resize retained for screenshot-test compatibility with historical layouts.
     const viewportResize = this._viewportRuler.change(150).pipe(takeUntil(this._destroyed));
     const realign = () => {
+      if (this._isDestroyed) return;
       this.updatePagination();
-      this._alignInkBarToSelectedTab();
+      if (!this._isDestroyed) this._alignInkBarToSelectedTab();
     };
 
     this._keyManager = new FocusKeyManager<MatPaginatedTabHeaderItem>(this._items)
@@ -234,7 +240,7 @@ export abstract class MatPaginatedTabHeader
     // This helps in cases where the user lands directly on a page with paginated tabs.
     // Note that we use `onStable` instead of `requestAnimationFrame`, because the latter
     // can hold up tests that are in a background tab.
-    this._ngZone.onStable.pipe(take(1)).subscribe(realign);
+    this._ngZone.onStable.pipe(take(1), takeUntil(this._destroyed)).subscribe(realign);
 
     // On dir change or resize, realign the ink bar and update the orientation of
     // the key manager if the direction has changed.
@@ -246,6 +252,7 @@ export abstract class MatPaginatedTabHeader
         // because the viewport change handler runs outside of Angular.
         this._ngZone.run(() => {
           Promise.resolve().then(() => {
+            if (this._isDestroyed) return;
             // Clamp the scroll distance, because it can change with the number of tabs.
             this._scrollDistance = Math.max(
               0,
@@ -260,9 +267,9 @@ export abstract class MatPaginatedTabHeader
     // If there is a change in the focus key manager we need to emit the `indexFocused`
     // event in order to provide a public event that notifies about focus changes. Also we realign
     // the tabs container by scrolling the new focused tab into the visible section.
-    this._keyManager.change.subscribe(newFocusIndex => {
+    this._keyManager.change.pipe(takeUntil(this._destroyed)).subscribe(newFocusIndex => {
       this.indexFocused.emit(newFocusIndex);
-      this._setTabFocus(newFocusIndex);
+      if (!this._isDestroyed) this._setTabFocus(newFocusIndex);
     });
   }
 
@@ -296,21 +303,28 @@ export abstract class MatPaginatedTabHeader
   }
 
   ngAfterContentChecked(): void {
+    if (this._isDestroyed) return;
     // If the number of tab labels have changed, check if scrolling should be enabled
     if (this._tabLabelCount != this._items.length) {
       this.updatePagination();
+      if (this._isDestroyed) return;
       this._tabLabelCount = this._items.length;
       this._changeDetectorRef.markForCheck();
+      if (this._isDestroyed) return;
     }
 
     // If the selected index has changed, scroll to the label and check if the scrolling controls
     // should be disabled.
     if (this._selectedIndexChanged) {
       this._scrollToLabel(this._selectedIndex);
+      if (this._isDestroyed) return;
       this._checkScrollingControls();
+      if (this._isDestroyed) return;
       this._alignInkBarToSelectedTab();
+      if (this._isDestroyed) return;
       this._selectedIndexChanged = false;
       this._changeDetectorRef.markForCheck();
+      if (this._isDestroyed) return;
     }
 
     // If the scroll distance has been changed (tab selected, focused, scroll controls activated),
@@ -323,16 +337,21 @@ export abstract class MatPaginatedTabHeader
   }
 
   ngOnDestroy() {
-    this._keyManager?.destroy();
+    if (this._isDestroyed) return;
+    this._isDestroyed = true;
     this._destroyed.next();
     this._destroyed.complete();
     this._stopScrolling.complete();
+    // A change observer can destroy this header during FocusKeyManager.setActiveItem.
+    // Clear its public active item before the parent resumes its focus continuation.
+    this._keyManager?.updateActiveItem(-1);
+    this._keyManager?.destroy();
   }
 
   /** Handles keyboard events on the header. */
   _handleKeydown(event: KeyboardEvent) {
     // We don't handle any key bindings with a modifier key.
-    if (hasModifierKey(event)) {
+    if (this._isDestroyed || hasModifierKey(event)) {
       return;
     }
 
@@ -357,6 +376,7 @@ export abstract class MatPaginatedTabHeader
    * Callback for when the MutationObserver detects that the content has changed.
    */
   _onContentChanges() {
+    if (this._isDestroyed) return;
     const textContent = this._elementRef.nativeElement.textContent;
 
     // We need to diff the text content of the header, because the MutationObserver callback
@@ -369,8 +389,9 @@ export abstract class MatPaginatedTabHeader
       // means that we need to bring the callback back in ourselves.
       this._ngZone.run(() => {
         this.updatePagination();
+        if (this._isDestroyed) return;
         this._alignInkBarToSelectedTab();
-        this._changeDetectorRef.markForCheck();
+        if (!this._isDestroyed) this._changeDetectorRef.markForCheck();
       });
     }
   }
@@ -383,9 +404,11 @@ export abstract class MatPaginatedTabHeader
    * page.
    */
   updatePagination() {
+    if (this._isDestroyed) return;
     this._checkPaginationEnabled();
+    if (this._isDestroyed) return;
     this._checkScrollingControls();
-    this._updateTabScrollPosition();
+    if (!this._isDestroyed) this._updateTabScrollPosition();
   }
 
   /** Tracks which element has focus; used for keyboard navigation */
@@ -395,7 +418,7 @@ export abstract class MatPaginatedTabHeader
 
   /** When the focus index is set, we must manually send focus to the correct label */
   set focusIndex(value: number) {
-    if (!this._isValidIndex(value) || this.focusIndex === value || !this._keyManager) {
+    if (this._isDestroyed || !this._isValidIndex(value) || this.focusIndex === value || !this._keyManager) {
       return;
     }
 
@@ -415,12 +438,15 @@ export abstract class MatPaginatedTabHeader
    * scrolling is enabled.
    */
   _setTabFocus(tabIndex: number) {
+    if (this._isDestroyed) return;
     if (this._showPaginationControls) {
       this._scrollToLabel(tabIndex);
+      if (this._isDestroyed) return;
     }
 
     if (this._items && this._items.length) {
       this._items.toArray()[tabIndex].focus();
+      if (this._isDestroyed) return;
 
       // Do not let the browser manage scrolling to focus the element, this will be handled
       // by using translation. In LTR, the scroll left should be 0. In RTL, the scroll width
@@ -443,7 +469,7 @@ export abstract class MatPaginatedTabHeader
 
   /** Performs the CSS transformation on the tab list that will cause the list to scroll. */
   _updateTabScrollPosition() {
-    if (this.disablePagination) {
+    if (this._isDestroyed || this.disablePagination) {
       return;
     }
 
@@ -494,6 +520,7 @@ export abstract class MatPaginatedTabHeader
 
   /** Handles click events on the pagination arrows. */
   _handlePaginatorClick(direction: ScrollDirection) {
+    if (this._isDestroyed) return;
     this._stopInterval();
     this._scrollHeader(direction);
   }
@@ -607,6 +634,7 @@ export abstract class MatPaginatedTabHeader
 
   /** Tells the ink-bar to align itself to the current label wrapper */
   _alignInkBarToSelectedTab(): void {
+    if (this._isDestroyed) return;
     const selectedItem =
       this._items && this._items.length ? this._items.toArray()[this.selectedIndex] : null;
     const selectedLabelWrapper = selectedItem ? selectedItem.elementRef.nativeElement : null;
@@ -631,7 +659,7 @@ export abstract class MatPaginatedTabHeader
   _handlePaginatorPress(direction: ScrollDirection, mouseEvent?: MouseEvent) {
     // Don't start auto scrolling for right mouse button clicks. Note that we shouldn't have to
     // null check the `button`, but we do it so we don't break tests that use fake events.
-    if (mouseEvent && mouseEvent.button != null && mouseEvent.button !== 0) {
+    if (this._isDestroyed || (mouseEvent && mouseEvent.button != null && mouseEvent.button !== 0)) {
       return;
     }
 

@@ -1,0 +1,515 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "recorded_at_utc": "2026-10-08T07:28:07.641237+00:00",
+  "worksheets": [
+    "C04",
+    "A02",
+    "A05"
+  ],
+  "role": "Owned tab-header lifetime/state repair and targeted style/source proof; not native or product acceptance",
+  "problem": "Initial zone-stable wait leaks after destroy; queued resize/direction/item realignment still reads geometry and mutates layout; indexFocused observer destruction is followed by public key-manager focus; late hooks/content/paginator work can restart after teardown.",
+  "repair": "Own destroyed state, release zone/key-manager subscriptions, guard queued and observer-reentrant work, clear the public key-manager active item before destroy, make teardown idempotent. Keep caller-owned streams alive, preserve live delay/interval/pagination/transforms.",
+  "baseline": {
+    "schema_version": 1,
+    "role": "Owned tab-header source lifecycle/state and targeted transform diagnostic only",
+    "line": "21.x",
+    "node": "v22.23.3",
+    "compiler": "6.0.3",
+    "runtime_peer": "22.1.7",
+    "sources": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/internal/paginated-tab-header.ts",
+        "sha256": "f463579ad081e2b9a8d4b7f441b313e179fce1412ef0d123f1510c5ba60c1987"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/internal/owned-header-resize.ts",
+        "sha256": "1eba9ce3f5595998227e3cd938ccae6aa1428f07d6fc7b1231666e50a9543033"
+      }
+    ],
+    "cases": [
+      {
+        "id": "live-initial-stable-realignment-remains-once",
+        "result": "pass"
+      },
+      {
+        "id": "destroy-before-stable-unsubscribes-without-late-work",
+        "result": "fail",
+        "error": "Expected values to be strictly equal:\n\n1 !== 0\n"
+      },
+      {
+        "id": "viewport-queued-realignment-is-cancelled-on-destroy",
+        "result": "fail",
+        "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n+   3,\n    2,\n-   1,\n    0,\n    0,\n+   2,\n+   10,\n-   1,\n-   4,\n    0\n  ]\n"
+      },
+      {
+        "id": "direction-queued-realignment-is-cancelled-on-destroy",
+        "result": "fail",
+        "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n+   3,\n    2,\n-   1,\n    0,\n    0,\n+   2,\n+   10,\n-   1,\n-   4,\n    0\n  ]\n"
+      },
+      {
+        "id": "items-queued-realignment-is-cancelled-on-destroy",
+        "result": "fail",
+        "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n+   3,\n    2,\n-   1,\n    0,\n    0,\n+   2,\n+   10,\n-   1,\n-   4,\n    0\n  ]\n"
+      },
+      {
+        "id": "live-viewport-realignment-remains-deferred-and-clamps",
+        "result": "pass"
+      },
+      {
+        "id": "destroy-in-index-focused-observer-prevents-own-and-public-parent-focus",
+        "result": "fail",
+        "error": "Expected values to be strictly equal:\n\n2 !== 0\n"
+      },
+      {
+        "id": "destroy-is-idempotent-and-releases-live-observers",
+        "result": "fail",
+        "error": "Expected values to be strictly equal:\n\n2 !== 1\n"
+      },
+      {
+        "id": "destroy-before-hooks-cannot-register-new-observers",
+        "result": "fail",
+        "error": "Expected values to be strictly equal:\n\n1 !== 0\n"
+      },
+      {
+        "id": "late-content-callback-does-not-reenter-zone-after-destroy",
+        "result": "fail",
+        "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n+   3,\n+   1,\n    0,\n    0,\n+   1,\n+   4,\n    0,\n-   0,\n-   0,\n-   0,\n-   0\n  ]\n"
+      },
+      {
+        "id": "destroy-releases-own-subscriptions-without-completing-borrowed-streams",
+        "result": "pass"
+      },
+      {
+        "id": "destroy-cancels-active-paginator-timer",
+        "result": "pass"
+      },
+      {
+        "id": "late-paginator-press-cannot-create-new-timer-after-destroy",
+        "result": "fail",
+        "error": "Expected values to be strictly equal:\n\n1 !== 0\n"
+      },
+      {
+        "id": "live-paginator-delay-interval-stop-and-right-button-remain",
+        "result": "pass"
+      },
+      {
+        "id": "destroy-cancels-debounced-header-resize-and-disconnects-observers",
+        "result": "pass"
+      },
+      {
+        "id": "destroy-during-pagination-mark-prevents-later-style-and-ink-work",
+        "result": "fail",
+        "error": "Expected values to be strictly equal:\n\n1 !== 0\n"
+      },
+      {
+        "id": "ltr-live-transform-rounding-and-legacy-scroll-reset",
+        "result": "pass"
+      },
+      {
+        "id": "rtl-live-transform-rounding-and-legacy-scroll-reset",
+        "result": "pass"
+      }
+    ],
+    "limits": [
+      "Actual owned class/helper and public current22 FocusKeyManager execute; geometry/events/clock are synthetic.",
+      "No native browser rendering, actual21 runtime, AOT, packed, canonical or minimum runtime/compiler qualification.",
+      "Viewport private-source boundary, table/menu constructors and every other plan requirement remain separate."
+    ]
+  },
+  "after": {
+    "schema_version": 1,
+    "role": "Owned tab-header source lifecycle/state and targeted transform diagnostic only",
+    "line": "21.x",
+    "node": "v22.23.3",
+    "compiler": "6.0.3",
+    "runtime_peer": "22.1.7",
+    "sources": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/internal/paginated-tab-header.ts",
+        "sha256": "3d837092be95e0455fd55a70d5b49168c3243d26358c902d7250b671a54781ea"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/internal/owned-header-resize.ts",
+        "sha256": "1eba9ce3f5595998227e3cd938ccae6aa1428f07d6fc7b1231666e50a9543033"
+      }
+    ],
+    "cases": [
+      {
+        "id": "live-initial-stable-realignment-remains-once",
+        "result": "pass"
+      },
+      {
+        "id": "destroy-before-stable-unsubscribes-without-late-work",
+        "result": "pass"
+      },
+      {
+        "id": "viewport-queued-realignment-is-cancelled-on-destroy",
+        "result": "pass"
+      },
+      {
+        "id": "direction-queued-realignment-is-cancelled-on-destroy",
+        "result": "pass"
+      },
+      {
+        "id": "items-queued-realignment-is-cancelled-on-destroy",
+        "result": "pass"
+      },
+      {
+        "id": "live-viewport-realignment-remains-deferred-and-clamps",
+        "result": "pass"
+      },
+      {
+        "id": "destroy-in-index-focused-observer-prevents-own-and-public-parent-focus",
+        "result": "pass"
+      },
+      {
+        "id": "destroy-during-focus-pagination-mark-prevents-label-focus",
+        "result": "pass"
+      },
+      {
+        "id": "ltr-destroy-in-label-focus-prevents-container-scroll-reset",
+        "result": "pass"
+      },
+      {
+        "id": "rtl-destroy-in-label-focus-prevents-container-scroll-reset",
+        "result": "pass"
+      },
+      {
+        "id": "destroy-is-idempotent-and-releases-live-observers",
+        "result": "pass"
+      },
+      {
+        "id": "destroy-before-hooks-cannot-register-new-observers",
+        "result": "pass"
+      },
+      {
+        "id": "late-content-callback-does-not-reenter-zone-after-destroy",
+        "result": "pass"
+      },
+      {
+        "id": "destroy-releases-own-subscriptions-without-completing-borrowed-streams",
+        "result": "pass"
+      },
+      {
+        "id": "destroy-cancels-active-paginator-timer",
+        "result": "pass"
+      },
+      {
+        "id": "late-paginator-press-cannot-create-new-timer-after-destroy",
+        "result": "pass"
+      },
+      {
+        "id": "live-paginator-delay-interval-stop-and-right-button-remain",
+        "result": "pass"
+      },
+      {
+        "id": "destroy-cancels-debounced-header-resize-and-disconnects-observers",
+        "result": "pass"
+      },
+      {
+        "id": "destroy-during-pagination-mark-prevents-later-style-and-ink-work",
+        "result": "pass"
+      },
+      {
+        "id": "ltr-live-transform-rounding-and-legacy-scroll-reset",
+        "result": "pass"
+      },
+      {
+        "id": "rtl-live-transform-rounding-and-legacy-scroll-reset",
+        "result": "pass"
+      }
+    ],
+    "limits": [
+      "Actual owned class/helper and public current22 FocusKeyManager execute; geometry/events/clock are synthetic.",
+      "No native browser rendering, actual21 runtime, AOT, packed, canonical or minimum runtime/compiler qualification.",
+      "Viewport private-source boundary, table/menu constructors and every other plan requirement remain separate."
+    ],
+    "mutations": [
+      {
+        "id": "leaked-stable-subscription",
+        "rejected_by": "destroy-before-stable-unsubscribes-without-late-work",
+        "observed_failure": "Expected values to be strictly equal:\n\n1 !== 0\n"
+      },
+      {
+        "id": "stale-promise-realignment",
+        "rejected_by": "viewport-queued-realignment-is-cancelled-on-destroy",
+        "observed_failure": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    2,\n    1,\n    0,\n    0,\n    1,\n+   6,\n-   4,\n    0,\n    0\n  ]\n"
+      },
+      {
+        "id": "public-parent-focus-continuation",
+        "rejected_by": "destroy-in-index-focused-observer-prevents-own-and-public-parent-focus",
+        "observed_failure": "Expected values to be strictly equal:\n\n1 !== 0\n"
+      },
+      {
+        "id": "repeated-destruction",
+        "rejected_by": "destroy-is-idempotent-and-releases-live-observers",
+        "observed_failure": "Expected values to be strictly equal:\n\n2 !== 1\n"
+      },
+      {
+        "id": "late-paginator-timer",
+        "rejected_by": "late-paginator-press-cannot-create-new-timer-after-destroy",
+        "observed_failure": "Expected values to be strictly equal:\n\n1 !== 0\n"
+      },
+      {
+        "id": "pagination-after-destruction-mark",
+        "rejected_by": "destroy-during-pagination-mark-prevents-later-style-and-ink-work",
+        "observed_failure": "Expected values to be strictly equal:\n\n2 !== 1\n"
+      },
+      {
+        "id": "late-content-zone-reentry",
+        "rejected_by": "late-content-callback-does-not-reenter-zone-after-destroy",
+        "observed_failure": "Expected values to be strictly equal:\n\n1 !== 0\n"
+      },
+      {
+        "id": "hooks-after-destruction",
+        "rejected_by": "destroy-before-hooks-cannot-register-new-observers",
+        "observed_failure": "Expected values to be strictly equal:\n\n1 !== 0\n"
+      },
+      {
+        "id": "focus-after-pagination-destroy",
+        "rejected_by": "destroy-during-focus-pagination-mark-prevents-label-focus",
+        "observed_failure": "Expected values to be strictly equal:\n\n1 !== 0\n"
+      },
+      {
+        "id": "container-after-label-destroy",
+        "rejected_by": "rtl-destroy-in-label-focus-prevents-container-scroll-reset",
+        "observed_failure": "Expected values to be strictly equal:\n\n1 !== 0\n"
+      }
+    ]
+  },
+  "source_contract_review": {
+    "schema_version": 1,
+    "line": "21.x",
+    "role": "Owned header signatures, DI, targeted live style source and strict source diagnostic only",
+    "node": "v22.23.3",
+    "compiler": "6.0.3",
+    "pre_source_sha256": "f463579ad081e2b9a8d4b7f441b313e179fce1412ef0d123f1510c5ba60c1987",
+    "candidate_source_sha256": "3d837092be95e0455fd55a70d5b49168c3243d26358c902d7250b671a54781ea",
+    "public_protected_signatures": [
+      "public prop _items:QueryList<MatPaginatedTabHeaderItem>",
+      "public prop _inkBar:{hide:()=>void,alignToElement:(element:HTMLElement)=>void}",
+      "public prop _tabListContainer:ElementRef<HTMLElement>",
+      "public prop _tabList:ElementRef<HTMLElement>",
+      "public prop _tabListInner:ElementRef<HTMLElement>",
+      "public prop _nextPaginator:ElementRef<HTMLElement>",
+      "public prop _previousPaginator:ElementRef<HTMLElement>",
+      "protected readonly prop _destroyed:*",
+      "public prop _showPaginationControls:*",
+      "public prop _disableScrollAfter:*",
+      "public prop _disableScrollBefore:*",
+      "public get disablePagination():boolean",
+      "public set disablePagination(BooleanInput)",
+      "public prop ariaLabel:string",
+      "public prop ariaLabelledby:string",
+      "public get selectedIndex():number",
+      "public set selectedIndex(NumberInput)",
+      "public readonly prop selectFocusedIndex:EventEmitter<number>",
+      "public readonly prop indexFocused:EventEmitter<number>",
+      "public constructor(ElementRef<HTMLElement>,ChangeDetectorRef,ViewportRuler,Directionality,NgZone,Platform,string?)",
+      "protected prop _elementRef:ElementRef<HTMLElement>",
+      "protected prop _changeDetectorRef:ChangeDetectorRef",
+      "public prop _animationMode:string?",
+      "protected method _itemSelected(KeyboardEvent):void",
+      "public method ngAfterViewInit():*",
+      "public method ngAfterContentInit():*",
+      "public method ngAfterContentChecked():void",
+      "public method ngOnDestroy():*",
+      "public method _handleKeydown(KeyboardEvent):*",
+      "public method _onContentChanges():*",
+      "public method updatePagination():*",
+      "public get focusIndex():number",
+      "public set focusIndex(number)",
+      "public method _isValidIndex(number):boolean",
+      "public method _setTabFocus(number):*",
+      "public method _getLayoutDirection():Direction",
+      "public method _updateTabScrollPosition():*",
+      "public get scrollDistance():number",
+      "public set scrollDistance(number)",
+      "public method _scrollHeader(ScrollDirection):*",
+      "public method _handlePaginatorClick(ScrollDirection):*",
+      "public method _scrollToLabel(number):*",
+      "public method _checkPaginationEnabled():*",
+      "public method _checkScrollingControls():*",
+      "public method _getMaxScrollDistance():number",
+      "public method _alignInkBarToSelectedTab():void",
+      "public method _stopInterval():*",
+      "public method _handlePaginatorPress(ScrollDirection,MouseEvent?):*"
+    ],
+    "constructor_di": [
+      {
+        "ident": "ElementRef",
+        "optional": false,
+        "attribute": null,
+        "spec": "@angular/core",
+        "imported": "ElementRef"
+      },
+      {
+        "ident": "ChangeDetectorRef",
+        "optional": false,
+        "attribute": null,
+        "spec": "@angular/core",
+        "imported": "ChangeDetectorRef"
+      },
+      {
+        "ident": "ViewportRuler",
+        "optional": false,
+        "attribute": null,
+        "spec": "@angular/cdk/scrolling",
+        "imported": "ViewportRuler"
+      },
+      {
+        "ident": "Directionality",
+        "optional": true,
+        "attribute": null,
+        "spec": "@angular/cdk/bidi",
+        "imported": "Directionality"
+      },
+      {
+        "ident": "NgZone",
+        "optional": false,
+        "attribute": null,
+        "spec": "@angular/core",
+        "imported": "NgZone"
+      },
+      {
+        "ident": "Platform",
+        "optional": false,
+        "attribute": null,
+        "spec": "@angular/cdk/platform",
+        "imported": "Platform"
+      },
+      {
+        "ident": "ANIMATION_MODULE_TYPE",
+        "optional": true,
+        "attribute": null,
+        "spec": "@angular/core",
+        "imported": "ANIMATION_MODULE_TYPE"
+      }
+    ],
+    "unchanged_algorithms": [
+      "_checkPaginationEnabled",
+      "_checkScrollingControls",
+      "_scrollHeader",
+      "_scrollToLabel",
+      "_getMaxScrollDistance",
+      "_scrollTo"
+    ],
+    "transform_review": "Only the destroyed-state early return changes _updateTabScrollPosition; remaining complete method source is byte-identical, including rounded direction sign and legacy scroll reset.",
+    "unchanged_style_template_files": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/_tabs-common.import.scss",
+        "sha256": "dd91e776ddce46e48de48e3367bb438a61e988e47eec2c0cecf6d94004960a6e"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/_tabs-common.scss",
+        "sha256": "f8c567d82879d41db35ed7dcd7deb7e266c316c4aa6f754f277b3ef0d0ee3fe0"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/_tabs-legacy-index.scss",
+        "sha256": "ecb9245325bc94f2a2eec850e0c3ad19bad9e0b2e65ed4f14d5fdff5588d2deb"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/_tabs-theme.import.scss",
+        "sha256": "4efc8dda0f61439144a31b36df275f3a23e4ad9084831f1ca2bbc5a1de801f5b"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/_tabs-theme.scss",
+        "sha256": "6b8d7d37d58ba3c209a753ec7475caa08d655dfc5536e5fead45ca4d63547e17"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/tab-body.html",
+        "sha256": "fb4e59b10d5d2f72cf8aa00688a67ad21a415928e588957d9e5ae0b00782aa53"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/tab-body.scss",
+        "sha256": "7fedca13e121d806da356e39836d1abb3353c62a3a54745790c9cdaa50e07d5a"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/tab-group.html",
+        "sha256": "1ce6acdffe51366ad6f439f81a4ecfd3e2d2b79630042cd5ef1ec8dcf23003f4"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/tab-group.scss",
+        "sha256": "9180de5daa33abf6bdff2cd8954ae9fa17f7b2864931171383d7f2338b8bed76"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/tab-header.html",
+        "sha256": "1eda7aad7121d4976fff2969d04c260908761928a71db5dd6b9fa3ac8d73f1eb"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/tab-header.scss",
+        "sha256": "329f30618de44509eb667ee28bdb9aea24ab94fb25a047b7b118f040f901fce5"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.html",
+        "sha256": "cb26524b6e85c23e709b834d971ec62db27d28600fd1592454a9b4e632d388da"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.scss",
+        "sha256": "222d57e2e1491b2608cb607a293eeef79b772ec076c5f9dbf192175fafc68b0b"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/tab.html",
+        "sha256": "8a9d1fbe1786771149203bc66b44db8350c20ffbade5b3311e17a7d24c9c30cf"
+      }
+    ],
+    "strict_source_diagnostic": {
+      "options": {
+        "strict": true,
+        "strictPropertyInitialization": false,
+        "noEmit": true,
+        "noImplicitOverride": true,
+        "skipLibCheck": true,
+        "target": 9,
+        "module": 99,
+        "moduleResolution": 100,
+        "experimentalDecorators": true,
+        "allowImportingTsExtensions": true
+      },
+      "peer": "Borrowed read-only installed22.1.7",
+      "diagnostics": [],
+      "owned_modules": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/internal/owned-header-resize.ts",
+          "sha256": "1eba9ce3f5595998227e3cd938ccae6aa1428f07d6fc7b1231666e50a9543033"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/internal/paginated-tab-header.ts",
+          "sha256": "3d837092be95e0455fd55a70d5b49168c3243d26358c902d7250b671a54781ea"
+        }
+      ]
+    },
+    "limitations": [
+      "No full CSS compilation, native rendering, AOT or packed API qualification.",
+      "Actual untouched16 style goldens/API exceptions are unchanged; existing private ViewportRuler remains separate.",
+      "Host Node22/TS6.0.3 and borrowed22 source compilation is not canonical or actual21 compiler/runtime qualification."
+    ]
+  },
+  "public_peer_subjects": {
+    "path": "compatibility/rc/tab-header-public-key-manager-subjects.json",
+    "sha256": "f9ddb7e762ebdc52dbdac079d3b66c2b3c99f7d60cd13066f8b126d25847a0d6"
+  },
+  "native_regressions": {
+    "path": "projects/ngx-material-legacy/legacy-tabs/tab-header.spec.ts",
+    "sha256": "24ec84ac2f8103b21c75fa692ebaf3e69e08c2f6cb8e6f8aea3d0e610061537e",
+    "new_cases": [
+      "does not realign a queued direction change after destruction",
+      "does not focus a label when an indexFocused observer destroys the fixture",
+      "cancels paginator work and ignores later presses after destruction",
+      "does not reset container scroll when a native label focus destroys the fixture"
+    ],
+    "syntax_diagnostics": 0,
+    "executed": 0
+  },
+  "minimum_api_review": "Authenticated public FocusKeyManager/ListKeyManager declarations and complete implementation members at21.2.14 and22.1.7. updateActiveItem(number),destroy and inherited public activeItem are nondeprecated; numeric-1 clears the active item without a change emission, preventing the parent focus continuation.",
+  "g11_claim": "not-passed",
+  "goldens_changed": false,
+  "exceptions_changed": false,
+  "qualification_limits": [
+    "Actual owned sources and read-only installed22 public primitives execute with synthetic DOM/geometry/clock. Both branch sources execute;21runtime itself was not executed.",
+    "Fresh strict source compilation covers two owned modules against borrowed22; no canonical/native/AOT/packed/actualminimum-compiler/runtime claim.",
+    "Three native regressions prepared only; required later Actions remain deferred.",
+    "Original full plan1697SHA/1736use/C05/A01-A10/R01-R03, private ViewportRuler, table/menu constructors and other obligations remain open."
+  ]
+}
