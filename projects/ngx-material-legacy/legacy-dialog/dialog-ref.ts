@@ -20,7 +20,7 @@ import {
   MatDialogConfig,
   MatDialogState,
 } from '@angular/material/dialog';
-import {Observable, ReplaySubject, merge} from 'rxjs';
+import {Observable, ReplaySubject, Subscription, merge} from 'rxjs';
 import {filter, take} from 'rxjs/operators';
 import {_MatDialogContainerBase} from './internal/dialog-container-base';
 
@@ -53,7 +53,13 @@ export class MatLegacyDialogRef<T, R = any> {
   private _result: R | undefined;
 
   /** Handle to the timeout that's running as a fallback in case the exit animation doesn't fire. */
-  private _closeFallbackTimeout: ReturnType<typeof setTimeout>;
+  private _closeFallbackTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  /** Subscriptions owned by this ref, including the pending animation phases. */
+  private readonly _subscriptions = new Subscription();
+
+  /** Prevent synchronous close observers from notifying beforeClosed twice. */
+  private _beforeClosedEmitted = false;
 
   /** Current state of the dialog. */
   private _state = MatDialogState.OPEN;
@@ -69,67 +75,100 @@ export class MatLegacyDialogRef<T, R = any> {
     this.disableClose = config.disableClose;
     this.id = _ref.id;
 
-    _containerInstance._animationStateChanged
-      .pipe(
-        filter(event => event.state === 'opened'),
-        take(1),
-      )
-      .subscribe(() => {
-        this._afterOpened.next();
+    this._subscriptions.add(
+      _containerInstance._animationStateChanged
+        .pipe(
+          filter(event => event.state === 'opened'),
+          take(1),
+        )
+        .subscribe(() => {
+          if (this._state === MatDialogState.OPEN) {
+            this._afterOpened.next();
+            this._afterOpened.complete();
+          }
+        }),
+    );
+
+    this._subscriptions.add(
+      _containerInstance._animationStateChanged
+        .pipe(
+          filter(event => event.state === 'closed'),
+          take(1),
+        )
+        .subscribe(() => this._finishDialogClose()),
+    );
+
+    this._subscriptions.add(
+      _ref.overlayRef.detachments().subscribe(() => {
+        if (this._state === MatDialogState.CLOSED) {
+          return;
+        }
+        this._state = MatDialogState.CLOSING;
         this._afterOpened.complete();
-      });
-
-    _containerInstance._animationStateChanged
-      .pipe(
-        filter(event => event.state === 'closed'),
-        take(1),
-      )
-      .subscribe(() => {
-        clearTimeout(this._closeFallbackTimeout);
+        this._notifyBeforeClosed();
         this._finishDialogClose();
-      });
+      }),
+    );
 
-    _ref.overlayRef.detachments().subscribe(() => {
-      this._beforeClosed.next(this._result);
-      this._beforeClosed.complete();
-      this._finishDialogClose();
-    });
-
-    merge(
-      this.backdropClick(),
-      this.keydownEvents().pipe(
-        filter(event => event.keyCode === ESCAPE && !this.disableClose && !hasModifierKey(event)),
-      ),
-    ).subscribe(event => {
-      if (!this.disableClose) {
-        event.preventDefault();
-        _closeDialogVia(this, event.type === 'keydown' ? 'keyboard' : 'mouse');
-      }
-    });
+    this._subscriptions.add(
+      merge(
+        this.backdropClick(),
+        this.keydownEvents().pipe(
+          filter(event => event.keyCode === ESCAPE && !this.disableClose && !hasModifierKey(event)),
+        ),
+      ).subscribe(event => {
+        if (!this.disableClose) {
+          event.preventDefault();
+          _closeDialogVia(this, event.type === 'keydown' ? 'keyboard' : 'mouse');
+        }
+      }),
+    );
   }
 
   /** Close the dialog. */
   close(dialogResult?: R): void {
+    if (this._state !== MatDialogState.OPEN) {
+      return;
+    }
     this._result = dialogResult;
-
-    this._containerInstance._animationStateChanged
-      .pipe(
-        filter(event => event.state === 'closing'),
-        take(1),
-      )
-      .subscribe(event => {
-        this._beforeClosed.next(dialogResult);
-        this._beforeClosed.complete();
-        this._ref.overlayRef.detachBackdrop();
-
-        this._closeFallbackTimeout = setTimeout(
-          () => this._finishDialogClose(),
-          event.totalTime + 100,
-        );
-      });
-
     this._state = MatDialogState.CLOSING;
-    this._containerInstance._startExitAnimation();
+    this._afterOpened.complete();
+
+    // A completion observer can detach the overlay synchronously.
+    if (this._state !== MatDialogState.CLOSING) {
+      return;
+    }
+
+    this._subscriptions.add(
+      this._containerInstance._animationStateChanged
+        .pipe(
+          filter(event => event.state === 'closing'),
+          take(1),
+        )
+        .subscribe(event => {
+          this._notifyBeforeClosed();
+          if (this._state !== MatDialogState.CLOSING) {
+            return;
+          }
+          this._ref.overlayRef.detachBackdrop();
+
+          this._scheduleCloseFallback(event.totalTime);
+        }),
+    );
+
+    try {
+      this._containerInstance._startExitAnimation();
+    } finally {
+      // A destroyed view or a throwing detector can prevent the closing event.
+      // Preserve its error while still releasing this ref after the usual margin.
+      if (this._state === MatDialogState.CLOSING && this._closeFallbackTimeout === null) {
+        this._notifyBeforeClosed();
+        if (this._state === MatDialogState.CLOSING) {
+          this._ref.overlayRef.detachBackdrop();
+        }
+        this._scheduleCloseFallback(0);
+      }
+    }
   }
 
   /** Gets an observable that is notified when the dialog is finished opening. */
@@ -200,10 +239,48 @@ export class MatLegacyDialogRef<T, R = any> {
     return this._state;
   }
 
-  private _finishDialogClose() {
+  private _notifyBeforeClosed(): void {
+    if (!this._beforeClosedEmitted) {
+      this._beforeClosedEmitted = true;
+      this._beforeClosed.next(this._result);
+      this._beforeClosed.complete();
+    }
+  }
+
+  private _scheduleCloseFallback(totalTime: number): void {
+    if (this._state !== MatDialogState.CLOSING) {
+      return;
+    }
+    if (this._closeFallbackTimeout !== null) {
+      clearTimeout(this._closeFallbackTimeout);
+    }
+    this._closeFallbackTimeout = setTimeout(() => this._finishDialogClose(), totalTime + 100);
+  }
+
+  private _finishDialogClose(): void {
+    if (this._state === MatDialogState.CLOSED) {
+      return;
+    }
+    if (!this._beforeClosedEmitted) {
+      this._state = MatDialogState.CLOSING;
+      this._notifyBeforeClosed();
+      if (this._state !== MatDialogState.CLOSING) {
+        return;
+      }
+    }
     this._state = MatDialogState.CLOSED;
-    this._ref.close(this._result, {focusOrigin: this._closeInteractionType});
-    this.componentInstance = null!;
+    if (this._closeFallbackTimeout !== null) {
+      clearTimeout(this._closeFallbackTimeout);
+      this._closeFallbackTimeout = null;
+    }
+    this._subscriptions.unsubscribe();
+    this._afterOpened.complete();
+    try {
+      this._ref.close(this._result, {focusOrigin: this._closeInteractionType});
+    } finally {
+      // Keep the instance available while the public CDK ref dispatches afterClosed.
+      this.componentInstance = null!;
+    }
   }
 }
 
@@ -216,6 +293,9 @@ export function _closeDialogVia<R>(
   interactionType: FocusOrigin,
   result?: R,
 ) {
+  if (ref.getState() !== MatDialogState.OPEN) {
+    return;
+  }
   (ref as unknown as {_closeInteractionType: FocusOrigin})._closeInteractionType = interactionType;
   return ref.close(result);
 }
