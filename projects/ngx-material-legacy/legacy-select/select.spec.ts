@@ -21,7 +21,7 @@ import {
   dispatchFakeEvent,
   dispatchKeyboardEvent,
   wrappedErrorMessage,
-} from '@angular/cdk/testing/private';
+} from '../internal/testing/owned-test-events';
 import {
   ChangeDetectionStrategy,
   Component,

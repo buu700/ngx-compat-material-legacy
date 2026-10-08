@@ -22,7 +22,7 @@ import {
   dispatchMouseEvent,
   MockNgZone,
   patchElementFocus,
-} from '@angular/cdk/testing/private';
+} from '../internal/testing/owned-test-events';
 import {
   ChangeDetectionStrategy,
   Component,

@@ -1,7 +1,12 @@
 /**
- * Owned test-event helpers. Specs must not import `@angular/cdk/testing/private`,
- * which is not a public CDK 22 export.
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
  */
+/** Owned test fixtures replace upstream private testing exports. */
 import {EventEmitter, NgZone} from '@angular/core';
 
 export interface OwnedModifierKeys {
@@ -17,7 +22,7 @@ export class MockNgZone extends NgZone {
   }
 
   override run<T>(fn: (...args: any[]) => T, applyThis?: any, applyArgs?: any[]): T {
-    return fn.apply(applyThis, applyArgs);
+    return fn.apply(applyThis, applyArgs ?? []);
   }
 
   override runOutsideAngular<T>(fn: (...args: any[]) => T): T {
@@ -218,4 +223,3 @@ export function wrappedErrorMessage(error: Error): RegExp {
   const escaped = error.message.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&');
   return new RegExp(escaped);
 }
-

@@ -3,7 +3,7 @@ import {ApplicationRef, Component, DebugElement} from '@angular/core';
 import {By} from '@angular/platform-browser';
 import {MatLegacyButtonModule, MatLegacyButton} from './index';
 import {MatRipple, ThemePalette} from '@angular/material/core';
-import {createMouseEvent, dispatchEvent} from '@angular/cdk/testing/private';
+import {createMouseEvent, dispatchEvent} from '../internal/testing/owned-test-events';
 
 describe('MatLegacyButton', () => {
   beforeEach(waitForAsync(() => {
