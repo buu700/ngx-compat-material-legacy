@@ -1,0 +1,12 @@
+--- a/projects/ngx-material-legacy/legacy-table/table.ts
++++ b/projects/ngx-material-legacy/legacy-table/table.ts
+@@ -16 +16 @@
+-import {ChangeDetectionStrategy, Component, Directive, ViewEncapsulation} from '@angular/core';
++import {assertInInjectionContext, ChangeDetectionStrategy, Component, Directive, ViewEncapsulation} from '@angular/core';
+@@ -84,0 +85,6 @@
++  constructor() {
++    if (arguments.length) throw new Error('MatLegacyTable manual dependency arguments are not supported.');
++    assertInInjectionContext(MatLegacyTable);
++    super();
++  }
++

@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "recorded_at_utc": "2026-10-08T11:30:02.833003+00:00",
+  "status": "explicit-owner-decision-pending",
+  "scope": "Only MatLegacyTable imperative twelve-argument construction and its supplied repeater/viewport/style-scheduler semantics. All other original APIs remain subject to the full plan.",
+  "recommendation": "Retain genuine public CdkTable inheritance and Angular node DI; add a zero-argument constructor that explicitly rejects old manual arguments and outside-DI construction. Retire the original twelve-argument manual/customization path only after explicit owner approval. Keep original rendered structure, CSS/SCSS, public data/render/sticky/recycle APIs and separate old definition constructors.",
+  "reason": "Actual untouched16 table/legacy/styler classes honor all eleven supplied objects, use caller viewport invalidation, consume caller render strategy and queue style changes through caller scheduler. The actual current public parent already fails outside DI and ignores old extra arguments inside DI. Current minimum declarations have private viewport and sticky-styler state; the old coalesced scheduler is absent. A complete public-only adapter has not been established.",
+  "authority_boundary": "User permits narrow conservative TypeScript API changes, but retiring supplied viewport/scheduler/repeater behavior is more than a declaration edit. PRODUCT-CONTRACT.md preserves16 public APIs and AGENTS.md says preserve behavior; a specific behavioral exception is requested. Menu approval does not automatically authorize this separate table path.",
+  "patch": {
+    "path": "compatibility/rc/proposals/table-node-di-constructor.patch",
+    "sha256": "70b3794359ee625fb0b187ee01d5f97a3a4216c91dbf5164f1c29d14cd87be83",
+    "applied": false,
+    "apply_hint": "Review only until approval; zero-context unified diff checks with git apply --unidiff-zero --check. No library change applied."
+  },
+  "source_observations": {
+    "receipt_sha256": "64163d5896414c3eb265fdbece78bcd083908ad6a73ee99849924ba5aa0f25f3",
+    "observations": {
+      "node": "v22.23.3",
+      "compiler": "6.0.3",
+      "source": {
+        "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+        "sha256": "81b7de7f34c27834c3acf1507c91cb39bc295df2bcb1d6b08fa2c1d4521a73ef"
+      },
+      "originals": [
+        {
+          "path": "reference/material-16.2.14/table-outlet-sources/cdk-table.ts",
+          "tag_source": "src/cdk/table/table.ts",
+          "sha256": "a192133a11a131d340c3acfab9461f5b0f19f1c0c1788edfeb42dedd81aabafd",
+          "bytes": 51217,
+          "git_blob": "0fd73a71401648e524fee8763403a6ec52fbb3f5"
+        },
+        {
+          "path": "reference/material-16.2.14/table-outlet-sources/legacy-table.ts",
+          "tag_source": "src/material/legacy-table/table.ts",
+          "sha256": "de77a136b68213f97954d8696cc3bb5364f55be3fa295e59cc92211911a12bf3",
+          "bytes": 2809,
+          "git_blob": "fa8bcb04a3d58400b2143c09ee1051db411ea6d7"
+        },
+        {
+          "path": "reference/material-16.2.14/table-constructor-sources/sticky-styler.ts",
+          "tag_source": "src/cdk/table/sticky-styler.ts",
+          "sha256": "c4ee6bb44a39d60d26698bb936ff19869a59202525bb78e810e2f83c580e20d2",
+          "bytes": 15932,
+          "git_blob": "b58f0c6d6a06e3f8fa6293c4562227fd200a500b"
+        },
+        {
+          "path": "reference/material-16.2.14/table-constructor-sources/data-source.ts",
+          "tag_source": "src/cdk/collections/data-source.ts",
+          "sha256": "e2321d4d27a3cc43d45a1a90d5b71f5992b34a9c30f82e20d5aea3f407e7e0c5",
+          "bytes": 1782,
+          "git_blob": "97636823f741aff66b73f1fcea98854e66ffc603"
+        }
+      ],
+      "decorator_removal": "Only Angular class/member/parameter decorators removed for manual source execution; original constructor bodies, parameters, class fields and called methods preserved.",
+      "actual_peer": {
+        "version": "22.1.7",
+        "sha256": "2bdeb437714a07914ccb8d2f749fd75d72b63da1ab4cc0c069f64e714c2a6ad4"
+      },
+      "historical_contract_cases": [
+        {
+          "id": "twelve-argument-manual-construction-outside-di-retains-eleven-supplied-objects",
+          "result": "pass"
+        },
+        {
+          "id": "caller-viewport-drives-invalidation-and-unsubscribes-without-destruction",
+          "result": "pass"
+        },
+        {
+          "id": "caller-repeater-actually-receives-render-diff",
+          "result": "pass"
+        },
+        {
+          "id": "caller-coalescer-defers-and-flushes-real-tagged-style-work",
+          "result": "pass"
+        },
+        {
+          "id": "manual-role-and-optional-zone-contract",
+          "result": "pass"
+        }
+      ],
+      "current_contract_gaps": {
+        "outside_di_error": "NG0203: The `IterableDiffers` token injection failed. `inject()` function must be called from an injection context such as a constructor, a factory function, a field initializer, or a function used with `runInInjectionContext`. Find more at https://v22.angular.dev/errors/NG0203",
+        "inside_di_extra_arguments": "Ignored by current zero-argument parent: original supplied element, custom repeater, viewport and coalescer are not honored.",
+        "original_contract_pass": false
+      },
+      "proposed_policy": {
+        "status": "unapproved proposal only",
+        "source": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\n\nimport {\n  CdkTable,\n  STICKY_POSITIONING_LISTENER,\n} from '@angular/cdk/table';\nimport {coerceBooleanProperty} from '@angular/cdk/coercion';\n\nimport {assertInInjectionContext, ChangeDetectionStrategy, Component, Directive, ViewEncapsulation} from '@angular/core';\n\ntype BooleanInput = string | boolean | null | undefined;\n\n/**\n * Enables the recycle view repeater strategy, which reduces rendering latency. Not compatible with\n * tables that animate rows.\n */\n@Directive({\n  standalone: false,\n  selector: 'mat-table[recycleRows], table[mat-table][recycleRows]',\n})\nexport class MatLegacyRecycleRows {\n  /**\n   * Current CDK selects recycling through the inherited public recycleRows input.\n   * This marker directive retains the historical selector without private providers.\n   * @breaking-change 17.0.0\n   */\n}\n\n/**\n * Wrapper for the CdkTable with Material design styles.\n */\n@Component({\n  standalone: false,\n  selector: 'mat-table, table[mat-table]',\n  exportAs: 'matTable',\n  template: `\n    <ng-content select=\"caption\"></ng-content>\n    <ng-content select=\"colgroup, col\"></ng-content>\n\n    @if (_isServer) {\n      <ng-content></ng-content>\n    }\n\n    @if (_isNativeHtmlTable) {\n      <thead role=\"rowgroup\">\n        <ng-container legacyTableOutlet=\"header\"></ng-container>\n      </thead>\n      <tbody role=\"rowgroup\">\n        <ng-container legacyTableOutlet=\"data\"></ng-container>\n        <ng-container legacyTableOutlet=\"empty\"></ng-container>\n      </tbody>\n      <tfoot role=\"rowgroup\">\n        <ng-container legacyTableOutlet=\"footer\"></ng-container>\n      </tfoot>\n    } @else {\n      <ng-container legacyTableOutlet=\"header\"></ng-container>\n      <ng-container legacyTableOutlet=\"data\"></ng-container>\n      <ng-container legacyTableOutlet=\"empty\"></ng-container>\n      <ng-container legacyTableOutlet=\"footer\"></ng-container>\n    }\n  `,\n  styleUrls: ['table.scss'],\n  host: {\n    'class': 'mat-table',\n    '[class.mat-table-fixed-layout]': 'fixedLayout',\n    'ngSkipHydration': '',\n  },\n  providers: [\n    {provide: CdkTable, useExisting: MatLegacyTable},\n    {provide: STICKY_POSITIONING_LISTENER, useValue: null},\n  ],\n  encapsulation: ViewEncapsulation.None,\n  // See note on CdkTable for explanation on why this uses the default change detection strategy.\n  // tslint:disable-next-line:validate-decorators\n  changeDetection: ChangeDetectionStrategy.Default,\n})\nexport class MatLegacyTable<T> extends CdkTable<T> {\n  constructor() {\n    if (arguments.length) throw new Error('MatLegacyTable manual dependency arguments are not supported.');\n    assertInInjectionContext(MatLegacyTable);\n    super();\n  }\n\n  /** Preserve original coercion for direct writes as well as template inputs. */\n  override get fixedLayout(): boolean { return super.fixedLayout; }\n  override set fixedLayout(value: BooleanInput) {\n    super.fixedLayout = coerceBooleanProperty(value);\n  }\n\n  override get multiTemplateDataRows(): boolean { return super.multiTemplateDataRows; }\n  override set multiTemplateDataRows(value: BooleanInput) {\n    super.multiTemplateDataRows = coerceBooleanProperty(value);\n  }\n\n  /** Overrides the sticky CSS class set by the `CdkTable`. */\n  protected override stickyCssClass = 'mat-table-sticky';\n\n  /** Overrides the need to add position: sticky on every sticky cell element in `CdkTable`. */\n  protected override needsPositionStickyOnElement = false;\n}\n",
+        "source_sha256": "a1eee7298631de1037c43024f56ef14cf8746a92e566f5e04991a673a77f8612",
+        "passed_cases": [
+          "outside-DI explicitly rejects",
+          "old manual arguments explicitly reject before dependencies are ignored",
+          "genuine public parent/node and legacy sticky settings retained",
+          "real public parent initialization and default strategy execute"
+        ],
+        "changes_rendered_template_or_styles": false
+      },
+      "limits": [
+        "Actual untouched tagged classes execute with synthetic manual dependencies; style callback/diff work is observed, not native DOM rendering.",
+        "Actual public current parent executes under borrowed22.1.7 public node/root context. No actual21/native/AOT/packed/floor qualification.",
+        "Proposed DI policy is isolated source text, not applied to the library or admitted as an original-contract pass."
+      ]
+    }
+  },
+  "proposed_strict_types": {
+    "receipt_sha256": "b03a17ab8c83696a5b93ebf0bba4e8e3f8771cbba3e31d270d75461b3520ab2c",
+    "observations": {
+      "node": "v22.23.3",
+      "compiler": "6.0.3",
+      "positive": [],
+      "negative": [
+        {
+          "code": 2554,
+          "message": "Expected 0 arguments, but got 12."
+        }
+      ],
+      "positive_fixture": "import {MatLegacyTable} from '/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/projects/ngx-material-legacy/legacy-table/table.ts';new MatLegacyTable<string>();",
+      "negative_fixture": "import {MatLegacyTable} from '/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/projects/ngx-material-legacy/legacy-table/table.ts';new MatLegacyTable<string>();\nnew MatLegacyTable<string>({}, {}, {}, \"table\", {}, {}, {}, {}, {}, {}, {}, {});",
+      "options": {
+        "strict": true,
+        "noImplicitOverride": true,
+        "strictPropertyInitialization": false,
+        "noEmit": true,
+        "skipLibCheck": true,
+        "types": [],
+        "target": 9,
+        "module": 99,
+        "moduleResolution": 100,
+        "experimentalDecorators": true,
+        "allowImportingTsExtensions": true
+      },
+      "proposal_applied": false
+    },
+    "limit": "Borrowed22.1.7/TS6.0.3 source compile; no actual21/compiler/native/AOT/packed/floor qualification"
+  },
+  "consumer_observation": {
+    "root": "~/cyph/shared/js/cyph",
+    "ts_files": 538,
+    "explicit_table_class_name_hits": [],
+    "cyph_head": "a56a0603636cac5aaabe8fe408f7429b4224f011",
+    "qualification": "Visible source text only; no Cyph edits/build, dynamically constructed tables are not excluded by this observation, and no original constructor exclusion is inferred."
+  },
+  "historical_constructor_reference": {
+    "path": "reference/material-16.2.14/cdk-inherited-constructors/table.d.ts",
+    "sha256": "94789cae5567000d4f23d9634ce006670e3fca4c5db427ce129026da62002c2d",
+    "unchanged": true
+  },
+  "product_constructor_changed": false,
+  "api_or_factory_exception_added": false,
+  "goldens_changed": false,
+  "g11_claim": "not-passed"
+}
