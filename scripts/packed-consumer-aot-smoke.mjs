@@ -915,6 +915,7 @@ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
 import {provideNoopAnimations} from '@angular/platform-browser/animations';
 import {Overlay, OverlayContainer} from '@angular/cdk/overlay';
 import {ScrollDispatcher} from '@angular/cdk/scrolling';
+import {By} from '@angular/platform-browser';
 import {CdkCellDef,CdkHeaderCellDef,CdkFooterCellDef,CdkCell,CdkHeaderCell,CdkFooterCell,CdkTextColumn,TEXT_COLUMN_OPTIONS,CdkNoDataRow,CdkTable,CdkColumnDef,CdkHeaderRowDef,CdkFooterRowDef,CdkRowDef} from '@angular/cdk/table';
 import {MatLegacyTableModule,MatLegacyCellDef,MatLegacyHeaderCellDef,MatLegacyFooterCellDef,MatLegacyColumnDef,MatLegacyCell,MatLegacyHeaderCell,MatLegacyFooterCell,MatLegacyTable,MatLegacyTextColumn,MatLegacyNoDataRow,MatLegacyHeaderRowDef,MatLegacyFooterRowDef,MatLegacyRowDef} from '@ngx-compat/material-legacy/legacy-table';
 import {Platform} from '@angular/cdk/platform';
@@ -933,7 +934,7 @@ import {MatLegacySnackBar, MatLegacySnackBarModule} from '@ngx-compat/material-l
 import {MatLegacySnackBarHarness} from '@ngx-compat/material-legacy/legacy-snack-bar/testing';
 import {MatLegacyTooltip, MatLegacyTooltipModule, MAT_LEGACY_TOOLTIP_SCROLL_STRATEGY, MAT_LEGACY_TOOLTIP_DEFAULT_OPTIONS} from '@ngx-compat/material-legacy/legacy-tooltip';
 import {MatLegacyTooltipHarness} from '@ngx-compat/material-legacy/legacy-tooltip/testing';
-import {MatLegacyTabsModule, MatLegacyTabLink, MatLegacyTabContent, MatLegacyTabLabel, MatLegacyTab} from '@ngx-compat/material-legacy/legacy-tabs';
+import {MatLegacyTabsModule, MatLegacyTabLink, MatLegacyTabContent, MatLegacyTabLabel, MatLegacyTab, MAT_LEGACY_TAB} from '@ngx-compat/material-legacy/legacy-tabs';
 import {MatLegacyCheckbox, MatLegacyCheckboxModule, MAT_LEGACY_CHECKBOX_DEFAULT_OPTIONS} from '@ngx-compat/material-legacy/legacy-checkbox';
 import {MatLegacySlideToggle, MatLegacySlideToggleModule} from '@ngx-compat/material-legacy/legacy-slide-toggle';
 import {MatLegacySlider, MatLegacySliderModule} from '@ngx-compat/material-legacy/legacy-slider';
@@ -1366,6 +1367,7 @@ async function main() {
     manual_parent:manualLabel instanceof MatLegacyTabLabel&&manualLabel instanceof MatTabLabel&&manualLabel instanceof CdkPortal,
     node_parent:labelHost.originalTabLabel instanceof MatTabLabel&&labelHost.originalTabLabel instanceof CdkPortal,
     node_closest:labelHost.originalTabLabel._closestTab===labelHost.originalLabelTab,
+    node_token:fixture.debugElement.query(By.directive(MatLegacyTab)).injector.get(MAT_LEGACY_TAB)===labelHost.originalLabelTab,
     node_label:labelHost.originalLabelTab.templateLabel===labelHost.originalTabLabel,
     embedded_label:labelView.rootNodes.map(node=>node.textContent||'').join('').trim()==='One',
   };

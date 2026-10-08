@@ -14,8 +14,9 @@ import {
   TemplateRef,
   ViewEncapsulation,
 } from '@angular/core';
-import {MatTabLabel, MAT_TAB_LABEL, MAT_TAB_CONTENT, MAT_TAB} from '@angular/material/tabs';
+import {MatTabLabel, MAT_TAB_LABEL, MAT_TAB_CONTENT} from '@angular/material/tabs';
 import {_MatTabBase} from './internal/tab-base';
+import {MAT_TAB} from './internal/tab-token';
 
 
 @Component({
