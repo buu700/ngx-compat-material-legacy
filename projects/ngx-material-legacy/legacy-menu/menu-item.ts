@@ -8,13 +8,13 @@
  */
 
 import {
-  booleanAttribute,
+  assertInInjectionContext,
   ChangeDetectionStrategy,
   Component,
-  Input,
   ViewEncapsulation,
 } from '@angular/core';
 import {MatMenuItem as BaseMatMenuItem} from '@angular/material/menu';
+import {constructLegacyMenuItem} from './internal/menu-item-context';
 
 /**
  * Single item inside of a `mat-menu`. Provides the menu item styling and accessibility treatment.
@@ -46,12 +46,16 @@ import {MatMenuItem as BaseMatMenuItem} from '@angular/material/menu';
   providers: [{provide: BaseMatMenuItem, useExisting: MatLegacyMenuItem}],
 })
 export class MatLegacyMenuItem extends BaseMatMenuItem {
-  // Re-declare with booleanAttribute so bare `disabled` / `disableRipple`
-  // attributes become true (current Material pattern). Plain inputs[] left
-  // them as empty strings and broke matRippleDisabled.
-  @Input({transform: booleanAttribute})
-  override disabled: boolean = false;
-
-  @Input({transform: booleanAttribute})
-  override disableRipple: boolean = false;
+  /** Construct through Angular DI; the current public parent supplies input transforms. */
+  // An ES derived constructor may return an object without calling super. The helper
+  // executes the genuine parent once with new.target; this class must have no fields.
+  // TypeScript currently requires a syntactic super call even for that valid ES case.
+  // @ts-expect-error TS2377: the returned genuine parent instance initializes this.
+  constructor() {
+    if (arguments.length) {
+      throw new Error('MatLegacyMenuItem requires Angular DI; manual dependency arguments are not supported.');
+    }
+    assertInInjectionContext(MatLegacyMenuItem);
+    return constructLegacyMenuItem(new.target);
+  }
 }

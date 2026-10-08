@@ -27,9 +27,6 @@ export {
   MAT_MENU_DEFAULT_OPTIONS as MAT_LEGACY_MENU_DEFAULT_OPTIONS,
 
 
-  MAT_MENU_PANEL as MAT_LEGACY_MENU_PANEL,
-
-
   MAT_MENU_SCROLL_STRATEGY as MAT_LEGACY_MENU_SCROLL_STRATEGY,
 
 
@@ -48,3 +45,4 @@ export {
 } from '@angular/material/menu';
 export {MatCommonModule} from './internal/common-module';
 export type {MatMenuPanel as MatLegacyMenuPanel} from './internal/menu-panel';
+export {MAT_MENU_PANEL as MAT_LEGACY_MENU_PANEL} from './internal/menu-panel-token';
