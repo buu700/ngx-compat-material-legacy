@@ -28,6 +28,30 @@ const ts = new Proxy({}, {
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
+const DIALOG_INHERITED_DESTROY_REFERENCE = 'reference/material-16.2.14/dialog-focus-sources/cdk-dialog.d.ts';
+const DIALOG_INHERITED_DESTROY_SHA256 = 'bfbf53c3fd8e9535005853fb23249b9d2bb6f79df89c30eef9bf873a3a9c0950';
+const ORIGINAL_MATERIAL_DIALOG_SHA256 = '91ecfd4630a3aac273b04c9090887364a358be2c44f0588551e36545fe004dc1';
+
+/** One previously omitted inherited lifecycle contract, derived from untouched16. */
+export function originalInheritedDialogDestroy(file, name, sourceFile, readReference = path => readFileSync(join(root, path))) {
+  if (name !== '_MatDialogContainerBase'
+      || !file.split('\\').join('/').endsWith('/material/dialog/dialog-container.ts')) return null;
+  if (!sourceFile || createHash('sha256').update(sourceFile.text).digest('hex') !== ORIGINAL_MATERIAL_DIALOG_SHA256)
+    throw new Error('untouched16 material dialog source identity mismatch');
+  const bytes = readReference(DIALOG_INHERITED_DESTROY_REFERENCE);
+  if (createHash('sha256').update(bytes).digest('hex') !== DIALOG_INHERITED_DESTROY_SHA256)
+    throw new Error('untouched16 inherited dialog member identity mismatch');
+  const declaration = ts.createSourceFile(DIALOG_INHERITED_DESTROY_REFERENCE,
+    bytes.toString('utf8'), ts.ScriptTarget.Latest, true);
+  const parent = declaration.statements.find(node => ts.isClassDeclaration(node) && node.name?.text === 'CdkDialogContainer');
+  const signatures = parent ? declaredMembers(parent, declaration).signatures
+    .filter(sig => sig.startsWith('public method ngOnDestroy(')) : [];
+  if (signatures.length !== 1 || signatures[0] !== 'public method ngOnDestroy():void')
+    throw new Error('missing authentic inherited dialog destroy contract');
+  return {parent: 'CdkDialogContainer', signatures, reference: DIALOG_INHERITED_DESTROY_REFERENCE,
+    source_sha256: DIALOG_INHERITED_DESTROY_SHA256, material_source_sha256: ORIGINAL_MATERIAL_DIALOG_SHA256};
+}
+
 const FACTORY_REFERENCE = 'reference/material-16.2.14/factory-metadata.json';
 const FACTORY_REFERENCE_SHA256 = '1b124aab1f570e111647f8142cdea8066ae9db673efc405a6999c178709602b6';
 let factoryReference;
@@ -652,6 +676,8 @@ function shapeFromFound(found, refRoot) {
     flat.ownProtected = own.requiredProtected;
     flat.ownConstructor = own.requiredConstructor;
     flat.heritage = heritageNames(node, found.sourceFile);
+    const inheritedDialogDestroy = originalInheritedDialogDestroy(found.file, node.name?.text, found.sourceFile);
+    if (inheritedDialogDestroy) flat.inheritedDialogDestroy = inheritedDialogDestroy;
     flat.diParams = diParamsOf(node, found.sourceFile);
     flat.originalFactory = originalFactoryContract(found.file, node.name?.text);
     flat.inheritedConstructor = originalInheritedConstructor(found.file, node.name?.text);
@@ -1213,6 +1239,12 @@ export function compareSignatures(symbol, packed, differences) {
     rows.push({status: 'mismatch', historical: sig, owned: null});
   }
   for (const extra of [...packedLeft]) {
+    if (historical.inheritedDialogDestroy?.signatures.includes(extra)) {
+      // An exact override of the authenticated inherited public method is
+      // already part of the original API. This is not a new signature waiver.
+      reported.add(extra);
+      continue;
+    }
     const record = (differences || []).find(item => item.symbol_id === symbol.symbol_id
       && item.historical_signature == null && item.owned_signature === extra
       && item.classification === 'intentional-legacy-difference' && item.rationale);

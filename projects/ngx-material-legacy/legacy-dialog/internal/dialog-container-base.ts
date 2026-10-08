@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -10,9 +11,12 @@
  */
 
 import {CdkDialogContainer} from '@angular/cdk/dialog';
-import {Component, EventEmitter} from '@angular/core';
+import {InteractivityChecker} from '@angular/cdk/a11y';
+import {Platform} from '@angular/cdk/platform';
+import {Component, EventEmitter, inject, Renderer2} from '@angular/core';
 import {MatDialogConfig} from '@angular/material/dialog';
 import {Subject} from 'rxjs';
+import {focusLegacyDialogInitially} from './dialog-initial-focus';
 
 /** Event that captures the state of dialog container animations. */
 export interface LegacyDialogAnimationEvent {
@@ -33,8 +37,18 @@ export abstract class _MatDialogContainerBase extends CdkDialogContainer<MatDial
   /** Emits when an animation state changes. */
   _animationStateChanged = new EventEmitter<LegacyDialogAnimationEvent>();
 
+  private readonly _legacyFocusNotifications = new Subject<void>();
+
+  private readonly _legacyFocusChecker = inject(InteractivityChecker);
+  private readonly _legacyFocusRenderer = inject(Renderer2);
+  private readonly _legacyFocusPlatform = inject(Platform);
+  private _legacyFocusDestroyed = false;
+  private _legacyFocusCleanup: (() => void) | null = null;
+
   constructor() {
     super();
+    // Keep the existing observable-only public type while owning notification.
+    this._focusTrapped = this._legacyFocusNotifications;
   }
 
   /** Starts the dialog exit animation. */
@@ -46,46 +60,35 @@ export abstract class _MatDialogContainerBase extends CdkDialogContainer<MatDial
    * a microtask so noop-animation opens still autofocus under those tests.
    */
   protected override _trapFocus(options?: FocusOptions): void {
-    const self = this as unknown as {
-      _isDestroyed?: boolean;
-      _elementRef: {nativeElement: HTMLElement};
-      _config: MatDialogConfig;
-      _focusTrap?: {focusInitialElement: (options?: FocusOptions) => boolean};
-      _containsFocus: () => boolean;
-      _focusDialogContainer: (options?: FocusOptions) => void;
-      _focusByCssSelector: (selector: string, options?: FocusOptions) => void;
-      _focusTrapped: Subject<void>;
-    };
-    if (self._isDestroyed) {
+    if (this._legacyFocusDestroyed) {
       return;
     }
     Promise.resolve().then(() => {
-      if (self._isDestroyed) {
+      if (this._legacyFocusDestroyed) {
         return;
       }
-      const element = self._elementRef.nativeElement;
-      switch (self._config.autoFocus) {
-        case false:
-        case 'dialog':
-          if (!self._containsFocus()) {
-            element.focus(options);
-          }
-          break;
-        case true:
-        case 'first-tabbable':
-          if (!self._focusTrap?.focusInitialElement(options)) {
-            self._focusDialogContainer(options);
-          }
-          break;
-        case 'first-heading':
-          self._focusByCssSelector('h1, h2, h3, h4, h5, h6, [role="heading"]', options);
-          break;
-        default:
-          self._focusByCssSelector(self._config.autoFocus as string, options);
-          break;
-      }
-      self._focusTrapped.next();
+      this._legacyFocusCleanup?.();
+      this._legacyFocusCleanup = focusLegacyDialogInitially({
+        element: this._elementRef.nativeElement,
+        config: this._config,
+        factory: this._focusTrapFactory,
+        checker: this._legacyFocusChecker,
+        renderer: this._legacyFocusRenderer,
+        ngZone: this._ngZone,
+        isBrowser: this._legacyFocusPlatform.isBrowser,
+      }, options);
+      this._legacyFocusNotifications.next();
     });
+  }
+
+  override ngOnDestroy(): void {
+    this._legacyFocusDestroyed = true;
+    try {
+      super.ngOnDestroy();
+    } finally {
+      this._legacyFocusCleanup?.();
+      this._legacyFocusCleanup = null;
+    }
   }
 
   protected override _captureInitialFocus(): void {

@@ -31,6 +31,7 @@ import {SpyLocation} from '@angular/common/testing';
 import {Directionality} from '@angular/cdk/bidi';
 import {supportsShadowDom} from '../internal/owned-shadow-dom';
 import {MatLegacyDialogContainer} from './dialog-container';
+import {_MatDialogContainerBase} from './internal/dialog-container-base';
 import {OverlayContainer, ScrollStrategy, Overlay} from '@angular/cdk/overlay';
 import {ScrollDispatcher} from '@angular/cdk/scrolling';
 import {A, ESCAPE} from '@angular/cdk/keycodes';
@@ -1308,6 +1309,18 @@ describe('MatDialog', () => {
       ).toBeGreaterThan(0);
     }));
 
+    it('should retain exactly the container trap anchors after initial focus selection', fakeAsync(() => {
+      const ref = dialog.open(PizzaMsg, {viewContainerRef: testViewContainerRef});
+      viewContainerFixture.detectChanges();
+      let notifications = 0;
+      ref._containerInstance._focusTrapped.subscribe(() => notifications++);
+      flushMicrotasks();
+
+      expect(overlayContainerElement.querySelectorAll('.cdk-focus-trap-anchor').length).toBe(2);
+      expect(notifications).toBe(1);
+      expect(document.activeElement!.tagName).toBe('INPUT');
+    }));
+
     it('should re-focus trigger element when dialog closes', fakeAsync(() => {
       // Create a element that has focus before the dialog is opened.
       const button = document.createElement('button');
@@ -2260,3 +2273,57 @@ class ModuleBoundDialogChildComponent {
   providers: [ModuleBoundDialogService],
 })
 class ModuleBoundDialogModule {}
+
+@Component({
+  standalone: false,
+  template: '<input><button cdkFocusInitial>Preferred</button><h2>Heading</h2>',
+})
+class LegacyInitialFocusProbe extends _MatDialogContainerBase {
+  requestInitialFocus(): void { this._trapFocus(); }
+  _startExitAnimation(): void {}
+}
+
+describe('Owned legacy dialog initial focus', () => {
+  beforeEach(() => TestBed.configureTestingModule({declarations: [LegacyInitialFocusProbe]}));
+
+  it('should use the public initial-focus marker without creating trap anchors', fakeAsync(() => {
+    const fixture = TestBed.createComponent(LegacyInitialFocusProbe);
+    fixture.detectChanges();
+    const button = fixture.nativeElement.querySelector('button') as HTMLButtonElement;
+    const focus = spyOn(button, 'focus').and.callThrough();
+    fixture.componentInstance.requestInitialFocus();
+    expect(focus).not.toHaveBeenCalled();
+    flushMicrotasks();
+    expect(document.activeElement).toBe(button);
+    expect(focus).toHaveBeenCalledTimes(1);
+    expect(fixture.nativeElement.parentElement.querySelectorAll('.cdk-focus-trap-anchor').length)
+      .toBe(0);
+    fixture.destroy();
+  }));
+
+  it('should cancel queued initial focus when the container is destroyed', fakeAsync(() => {
+    const fixture = TestBed.createComponent(LegacyInitialFocusProbe);
+    fixture.detectChanges();
+    const focus = spyOn(fixture.nativeElement.querySelector('button'), 'focus');
+    let completed = 0;
+    fixture.componentInstance._focusTrapped.subscribe({complete: () => completed++});
+    fixture.componentInstance.requestInitialFocus();
+    fixture.destroy();
+    flushMicrotasks();
+    expect(focus).not.toHaveBeenCalled();
+    expect(completed).toBe(1);
+  }));
+
+  it('should remove a temporary heading tabindex when the container is destroyed', fakeAsync(() => {
+    const fixture = TestBed.createComponent(LegacyInitialFocusProbe);
+    fixture.detectChanges();
+    fixture.componentInstance._config.autoFocus = 'first-heading';
+    const heading = fixture.nativeElement.querySelector('h2') as HTMLElement;
+    fixture.componentInstance.requestInitialFocus();
+    flushMicrotasks();
+    expect(document.activeElement).toBe(heading);
+    expect(heading.getAttribute('tabindex')).toBe('-1');
+    fixture.destroy();
+    expect(heading.hasAttribute('tabindex')).toBe(false);
+  }));
+});
