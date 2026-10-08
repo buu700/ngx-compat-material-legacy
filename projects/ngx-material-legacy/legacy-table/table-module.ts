@@ -30,6 +30,7 @@ import {
 } from './row';
 import {MatLegacyTextColumn} from './text-column';
 import {MatCommonModule} from './internal/common-module';
+import {_LegacyTableDefinitionOwner, _LegacyTableOutlet} from './internal/table-outlet';
 
 const EXPORTED_DECLARATIONS = [
   // Table
@@ -62,7 +63,7 @@ const EXPORTED_DECLARATIONS = [
 
 @NgModule({
   imports: [CdkTableModule, MatCommonModule],
-  exports: [MatCommonModule, EXPORTED_DECLARATIONS],
-  declarations: EXPORTED_DECLARATIONS,
+  exports: [MatCommonModule, EXPORTED_DECLARATIONS, _LegacyTableDefinitionOwner],
+  declarations: [EXPORTED_DECLARATIONS, _LegacyTableOutlet, _LegacyTableDefinitionOwner],
 })
 export class MatLegacyTableModule {}
