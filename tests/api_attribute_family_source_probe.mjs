@@ -15,7 +15,10 @@ import {fileURLToPath,pathToFileURL} from 'node:url';
 import {tmpdir} from 'node:os';
 import {createHash} from 'node:crypto';
 import {deriveSurface} from '../scripts/api-surface.mjs';
-import {observeRuntimeDi} from '../scripts/api-di-observe.mjs';
+import {observeRuntimeDi,loadRuntimeModule,runtimeTokenIdentity,runFactory} from '../scripts/api-di-observe.mjs';
+import {partitionOwnedSelectMotion} from '../scripts/api-owned-motion-context.mjs';
+import {createPublicFactoryContext} from '../scripts/api-public-node-context.mjs';
+import {captureFactoryConstructorInputs} from '../scripts/api-factory-constructor-inputs.mjs';
 import {settleDi} from '../scripts/api-completeness.mjs';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),require=createRequire(import.meta.url);
@@ -80,10 +83,90 @@ try{
  const symbols=surface.symbols.map(symbol=>({...symbol,di_id:ids.has(symbol.symbol_id)?symbol.di_id:null}));
  assert.equal(symbols.filter(symbol=>symbol.di_id).length,ids.size,'Original selection incomplete');
  const rows=(await observeRuntimeDi(runtime,symbols,[],load)).map(row=>settleDi(row,[]));
+ const configurationCases=[];
+ for(const row of rows.filter(row=>['legacy-tabs/primary/MatLegacyTabLink','legacy-tabs/primary/_MatLegacyTabLinkBase'].includes(row.symbol.symbol_id))){
+  if(row.result!=='pass')continue;
+  for(const [id,change]of [
+   ['missing-parent',r=>r.factory_parent_construction=null],
+   ['wrong-parent-instance',r=>r.factory_parent_construction.returned_owned_instance=false],
+   ['wrong-parent-node',r=>r.factory_parent_construction.parent_node='child element'],
+   ['unverified-parent-input',r=>r.factory_parent_construction.constructor_evidence[0].input_verified=false],
+   ['wrong-parent-injection-flag',r=>r.factory_parent_construction.compiler_observation.parameters[0].skipSelf=true],
+  ]){
+   const mutant=JSON.parse(JSON.stringify(row));mutant.problems=[];change(mutant);
+   assert.equal(settleDi(mutant,[]).result,'fail',row.symbol.symbol_id+' '+id+' admitted');
+   configurationCases.push({id:row.symbol.symbol_id+'/'+id,result:'rejected'});
+  }
+ }
+ if(families.includes('legacy-select')){
+  const owned=await loadRuntimeModule(runtime,'legacy-select','primary'),peer=await load('@angular/material/select');
+  const field=await loadRuntimeModule(runtime,'legacy-form-field','primary'),modernField=await load('@angular/material/form-field');
+  const original={ident:'MAT_FORM_FIELD',imported:'MAT_FORM_FIELD',spec:'@angular/material/form-field'};
+  assert.equal(await runtimeTokenIdentity('legacy-select',original,{}, {},field.MAT_LEGACY_FORM_FIELD,load,runtime),true);
+  for(const [id,token,packageRoot]of [
+   ['modern-form-field-token',modernField.MAT_FORM_FIELD,runtime],
+   ['description-twin-form-field-token',new core.InjectionToken('MatFormField'),runtime],
+   ['missing-owned-form-field-package',field.MAT_LEGACY_FORM_FIELD,null],
+  ]){
+   assert.equal(await runtimeTokenIdentity('legacy-select',original,{}, {},token,load,packageRoot),false);
+   configurationCases.push({id,result:'rejected'});
+  }
+  const select=rows.find(row=>row.symbol.symbol_id==='legacy-select/primary/MatLegacySelect');
+  if(select.result==='pass')for(const [id,change]of [
+   ['missing-motion-evidence',r=>r.factory_owned_motion_context=null],
+   ['missing-motion-caller-source',r=>r.factory_owned_motion_context.sources.caller.sha256=''],
+   ['wrong-component-motion-state',r=>r.factory_owned_motion_context.component_enabled=!r.factory_owned_motion_context.component_enabled],
+   ['wrong-motion-token-identity',r=>r.factory_owned_motion_context.requests[0].identity_matched=false],
+   ['wrong-motion-option',r=>r.factory_owned_motion_context.control_requests[0].self=true],
+   ['missing-motion-state-branch',r=>r.factory_owned_motion_context.cases.pop()],
+   ['wrong-motion-media-query',r=>r.factory_owned_motion_context.cases[5].queries[0]='screen'],
+   ['wrong-motion-disabled-result',r=>r.factory_owned_motion_context.cases[3].disabled=false],
+   ['missing-motion-disabled-requests',r=>r.factory_owned_motion_context.cases[3].disabled_requests=[]],
+  ]){
+   const mutant=JSON.parse(JSON.stringify(select));mutant.problems=[];change(mutant);
+   assert.equal(settleDi(mutant,[]).result,'fail',id+' admitted');
+   configurationCases.push({id,result:'rejected'});
+  }
+  assert.ok(owned.MAT_LEGACY_SELECT_SCROLL_STRATEGY!==peer.MAT_SELECT_SCROLL_STRATEGY,'Legacy strategy token still aliases modern token');
+  assert.ok(owned.MAT_LEGACY_SELECT_SCROLL_STRATEGY_PROVIDER.provide===owned.MAT_LEGACY_SELECT_SCROLL_STRATEGY,'Public strategy and module provider disagree');
+  const {Overlay}=await load('@angular/cdk/overlay');let calls=0,captured,traced;
+  const context=await createPublicFactoryContext(core,load,{providers:[core.importProvidersFrom(owned.MatLegacySelectModule),
+   {provide:owned.MAT_LEGACY_SELECT_SCROLL_STRATEGY,useFactory:overlay=>()=>{calls++;return overlay.scrollStrategies.noop();},deps:[Overlay]}],
+   nodeFactory:node=>{traced=runFactory(()=>captureFactoryConstructorInputs(owned.MatLegacySelect),core.Injector,core.runInInjectionContext,
+    {injector:node.injector,captureStack:true});assert.equal(traced.outcome,'returned',traced.error);captured=traced.value;return captured.value;}});
+  try{
+   assert.equal(calls,1,'Public custom scroll strategy was not consumed exactly once');
+   assert.ok(captured.inputs[11]===context.element.injector.get(owned.MAT_LEGACY_SELECT_SCROLL_STRATEGY),'Wrong public strategy provider value reached constructor');
+   const motion=await loadRuntimeModule(runtime,'legacy-core','primary'),layout=await load('@angular/cdk/layout'),material=await load('@angular/material/core');
+   const split=requests=>partitionOwnedSelectMotion(requests,core,motion,layout,material,owned.MatLegacySelect,
+    {core:join(runtime,'fesm2022/ngx-compat-material-legacy-legacy-core.mjs'),caller:join(runtime,'fesm2022/ngx-compat-material-legacy-legacy-select.mjs')},
+    runFactory,context.element.injector,captured.value);
+   const actual=split(traced.requests);
+   assert.equal(actual.observation.classified_requests,4);
+   for(const [id,change]of [
+    ['motion-description-twin-request',r=>r.token=new core.InjectionToken('LEGACY_ANIMATIONS_TEST_OVERRIDE')],
+    ['motion-wrong-request-option',r=>r.optional=false],
+    ['motion-unresolved-actual-request',r=>r.unresolved=true],
+    ['motion-missing-source-origin',r=>r.stack=null],
+   ]){
+    const requests=traced.requests.map(r=>({...r}));change(requests.find(r=>r.token===motion.LEGACY_ANIMATIONS_TEST_OVERRIDE));
+    assert.throws(()=>split(requests),/owned motion request/);
+    configurationCases.push({id,result:'rejected'});
+   }
+   const direct=runFactory(()=>core.inject(motion.LEGACY_ANIMATIONS_TEST_OVERRIDE,{optional:true}),core.Injector,core.runInInjectionContext,
+    {injector:context.element.injector,captureStack:true});
+   const extra=split([...traced.requests,...direct.requests]);
+   assert.equal(extra.requests.length,actual.requests.length+1);
+   assert.ok(extra.requests.at(-1)===direct.requests[0]);
+   configurationCases.push({id:'same-owned-motion-token-direct-request-remains-unclassified',result:'rejected'});
+   captured.value.ngOnDestroy();
+   configurationCases.push({id:'legacy-public-strategy-identity-and-real-overlay-custom-provider',result:'pass'});
+  }finally{context.close();}
+ }
  const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
  const caps=[...new Set([...files.map(file=>file.fileName),...resources])].sort().map(file=>({path:file.startsWith(root+'/')?file.slice(root.length+1):file,sha256:sha(readFileSync(file))}));
  const result={schema_version:1,role:'Unchanged owned source partial compilation and family constructor API observation; not canonical packed/style/native/floor qualification',
-  family,families,node:process.version,typescript:ts.version,runtime_peer:core.VERSION.full,rows,
+  family,families,node:process.version,typescript:ts.version,runtime_peer:core.VERSION.full,rows,configuration_cases:configurationCases,
   source_files:files.length,resource_files:resources.size,source_caps:caps,virtual_typecheck_files:virtualFiles.length,
   styles:'Original SCSS resources are read unchanged by the Angular compiler. No Sass transform/rendered/style compatibility is claimed.',
   product_source_or_resource_rewrites:false,actual21_execution:false,packed_execution:false,native_browser_execution:false,g02_claim:'not-passed'};

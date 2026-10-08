@@ -57,15 +57,20 @@ function renderer(core,document){
  };
 }
 
-function fixtureDefinitions(core,{nodeFactory,attributes={}}={}){
- const cacheable=!nodeFactory&&Object.keys(attributes).length===0;
+function fixtureDefinitions(core,{nodeFactory,attributes={},parentProviders=[]}={}){
+ const cacheable=!nodeFactory&&Object.keys(attributes).length===0&&parentProviders.length===0;
  if(cacheable&&definitions.has(core))return definitions.get(core);
  const scopeToken=new core.InjectionToken('API fixture node scope');
  const parentValue={scope:'parent'},childValue={scope:'child'};
  const executionToken=nodeFactory?new core.InjectionToken('API fixture node-local factory execution'):null;
- class Parent{}
+ class Parent {
+  destroyed=false;
+  injector=core.inject(core.Injector);
+  element=core.inject(core.ElementRef);
+  ngOnDestroy(){this.destroyed=true;}
+ }
  core.Directive({selector:'[apiFactoryParent]',standalone:true,
-  providers:[{provide:scopeToken,useValue:parentValue}]})(Parent);
+  providers:[{provide:scopeToken,useValue:parentValue},...parentProviders]})(Parent);
  class ElementProbe {
   destroyed=false;
   injector=core.inject(core.Injector);
@@ -89,6 +94,7 @@ function fixtureDefinitions(core,{nodeFactory,attributes={}}={}){
  }
  core.Directive({selector:'ng-template[apiFactoryTemplate]',standalone:true})(TemplateProbe);
  class Host{}
+ core.ViewChild(Parent)(Host.prototype,'parent');
  core.ViewChild(ElementProbe)(Host.prototype,'element');
  core.ViewChild(TemplateProbe)(Host.prototype,'template');
  const literalAttributes=Object.entries(attributes).map(([name,value])=>{
@@ -105,7 +111,7 @@ function fixtureDefinitions(core,{nodeFactory,attributes={}}={}){
  * TemplateRef. Providers are caller-supplied public module/configuration values;
  * missing services propagate. There is no private token discovery or fallback.
  */
-export async function createPublicFactoryContext(core,importModule,{providers=[],nodeFactory,attributes={}}={}){
+export async function createPublicFactoryContext(core,importModule,{providers=[],nodeFactory,attributes={},parentProviders=[]}={}){
  const {BrowserModule}=await importModule('@angular/platform-browser');
  const document=Object.assign(new EventTarget(),{activeElement:null,defaultView:null,doctype:{},
   createElement(name){return node(name,document);},
@@ -113,7 +119,11 @@ export async function createPublicFactoryContext(core,importModule,{providers=[]
   querySelector(){return null;},querySelectorAll(){return [];}});
  document.head=node('head',document);document.body=node('body',document);document.documentElement=node('html',document);
  document.documentElement.appendChild(document.head);document.documentElement.appendChild(document.body);
- const fixtureRenderer=renderer(core,document),defs=fixtureDefinitions(core,{nodeFactory,attributes});
+ document.getElementsByClassName=name=>{
+  const found=[];const visit=element=>{if(element.classList?.contains(name))found.push(element);for(const child of element.children||[])visit(child);};
+  visit(document.documentElement);return found;
+ };
+ const fixtureRenderer=renderer(core,document),defs=fixtureDefinitions(core,{nodeFactory,attributes,parentProviders});
  let parent,environment,component,closed=false;
  const close=()=>{
   if(closed)return;closed=true;
@@ -128,8 +138,8 @@ export async function createPublicFactoryContext(core,importModule,{providers=[]
   const host=node('api-factory-host',document);document.body.appendChild(host);
   component=core.createComponent(defs.Host,{hostElement:host,environmentInjector:environment});
   component.changeDetectorRef.detectChanges();
-  if(!component.instance.element||!component.instance.template)throw Error('public Angular node probes were not created');
-  return {environment,component,document,host,element:component.instance.element,template:component.instance.template,
+  if(!component.instance.element||!component.instance.template||!component.instance.parent)throw Error('public Angular node probes were not created');
+  return {environment,component,document,host,parentNode:component.instance.parent,element:component.instance.element,template:component.instance.template,
    scopeToken:defs.scopeToken,parentValue:defs.parentValue,childValue:defs.childValue,close,
    context:'actual Angular element/template nodes and public application providers with synthetic Renderer2/server DOM; native/browser/AOT/packed/floors separate'};
  }catch(error){close();throw error;}

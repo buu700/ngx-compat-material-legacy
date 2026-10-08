@@ -26,10 +26,13 @@ import {
   summarizeDiscrepancies,
   negativeResults,
   bindingProblems,
+  originalFactoryContract,
 } from './api-surface.mjs';
+import {originalCompilerFactoryContext} from './api-original-factory-contexts.mjs';
 import {observeRuntimeDi, expectedFactoryDi} from './api-di-observe.mjs';
 import {attributeConstructorObservationProblems} from './api-attribute-factory.mjs';
 import {publicConstructorPartitionProblems} from './api-public-constructor-internals.mjs';
+import {SELECT_MOTION_SYMBOL,ownedSelectMotionProblems} from './api-owned-motion-context.mjs';
 import {MENU_ITEM_SYMBOL, approvedMenuItemContract} from './menu-item-construction-contract.mjs';
 import {TABLE_SYMBOL, approvedTableContract, tableConstructionObservationComplete} from './table-construction-contract.mjs';
 
@@ -496,6 +499,19 @@ if (isMain) {
 }
 
 export function settleDi(row, records) {
+  if(row.symbol.symbol_id===SELECT_MOTION_SYMBOL)
+    row={...row,problems:[...row.problems,...ownedSelectMotionProblems(row.factory_owned_motion_context)]};
+  if(['legacy-tabs/primary/MatLegacyTabLink','legacy-tabs/primary/_MatLegacyTabLinkBase'].includes(row.symbol.symbol_id)){
+    const parent=row.factory_parent_construction;
+    const original=originalFactoryContract('/original/src/material/legacy-tabs/tab-nav-bar/tab-nav-bar.ts','MatLegacyTabNav');
+    const problems=!parent||parent.symbol_id!=='legacy-tabs/primary/MatLegacyTabNav'
+      ||parent.returned_owned_instance!==true||parent.parent_node!=='actual parent Angular element'
+      ?['tab-nav parent construction evidence incomplete']
+      :attributeConstructorObservationProblems({symbol:{shape:{originalFactoryContext:originalCompilerFactoryContext(original)}},
+        factory_constructor_evidence:parent.constructor_evidence,factory_compiler_observation:parent.compiler_observation,
+        factory_peer_constructor_partition:parent.public_constructor_partition},{force:true});
+    row={...row,problems:[...row.problems,...problems]};
+  }
   if (!approvedMenuItemContract(row.symbol) && row.symbol.symbol_id!==TABLE_SYMBOL)
     row={...row,problems:[...row.problems,...attributeConstructorObservationProblems(row)]};
   if(!approvedMenuItemContract(row.symbol)&&row.symbol.symbol_id!==TABLE_SYMBOL
@@ -629,6 +645,8 @@ function writeAcceptance(request, surface, groups, declared, diSettled, summary,
           caller_modules:di.factory_context_modules||[],requests:di.runtime_requests||[],
           constructor_evidence:di.factory_constructor_evidence||[],compiler_observation:di.factory_compiler_observation||null,
           peer_constructor_partition:di.factory_peer_constructor_partition||null,
+          parent_construction:di.factory_parent_construction||null,
+          owned_motion_context:di.factory_owned_motion_context||null,
           historical:di.historical,owned:di.owned,constructor_attributes:di.constructor_attributes||[],
           ...(di.approved_construction?{approved_construction:di.approved_construction}:{})}:null});
     }
