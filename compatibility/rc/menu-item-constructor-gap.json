@@ -1,0 +1,202 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "recorded_at_utc": "2026-10-08T06:36:51.706705+00:00",
+  "role": "Verified unresolved menu-item constructor gap;not an implementation,exclusion,audit pass or qualification",
+  "subject_commit": "a7a10e1d0ea1f7ac60a76b848be26c80f48c8dfd",
+  "reproduction": {
+    "schema_version": 1,
+    "role": "Unresolved original menu-item constructor reproduction;not repaired/native/AOT/packed/minimum qualification",
+    "node": "v22.23.3",
+    "compiler": "6.0.3",
+    "runtime_peer": "22.1.7",
+    "source": {
+      "path": "projects/ngx-material-legacy/legacy-menu/menu-item.ts",
+      "sha256": "d8a44976ccc760b735548a03f5109fa79d6897e7dbf08a31c6a1d2af78415b0d"
+    },
+    "untouched_reference": {
+      "path": "reference/material-16.2.14/menu-item-sources/material-menu-item.ts",
+      "sha256": "cc176409b67585676aa97714145e5fad042a8ca7626c63a87527c5ed83372bd8"
+    },
+    "original_constructor": {
+      "parent": "MatMenuItem",
+      "signatures": [
+        "public constructor(ElementRef<HTMLElement>,any,FocusMonitor,MatMenuPanel<MatMenuItem>|undefined,ChangeDetectorRef)",
+        "public constructor(ElementRef<HTMLElement>,any?,FocusMonitor?,MatMenuPanel<MatMenuItem>?,ChangeDetectorRef?)"
+      ],
+      "source_sha256": "f1c4c4a656aec1dafc93dbcc92507418b1a80abefd3a64fa85938ec8f9332b0a"
+    },
+    "original_di": [
+      {
+        "ident": "ElementRef",
+        "optional": false,
+        "attribute": null,
+        "spec": "@angular/core",
+        "imported": "ElementRef"
+      },
+      {
+        "ident": "DOCUMENT",
+        "optional": false,
+        "attribute": null,
+        "spec": "@angular/common",
+        "imported": "DOCUMENT"
+      },
+      {
+        "ident": "FocusMonitor",
+        "optional": false,
+        "attribute": null,
+        "spec": "@angular/cdk/a11y",
+        "imported": "FocusMonitor"
+      },
+      {
+        "ident": "MAT_MENU_PANEL",
+        "optional": true,
+        "attribute": null,
+        "spec": "./menu-panel",
+        "imported": "MAT_MENU_PANEL"
+      },
+      {
+        "ident": "ChangeDetectorRef",
+        "optional": false,
+        "attribute": null,
+        "spec": "@angular/core",
+        "imported": "ChangeDetectorRef"
+      }
+    ],
+    "original_leaf_factory": {
+      "family": "legacy-menu",
+      "name": "MatLegacyMenuItem",
+      "deps_kind": "inherited",
+      "declaration": "{ minVersion: \"12.0.0\", version: \"16.1.1\", ngImport: i0, type: MatLegacyMenuItem, deps: null, target: i0.\u0275\u0275FactoryTarget.Component }",
+      "attributes": [],
+      "source": "fesm2022/legacy-menu.mjs",
+      "source_sha256": "bff6f9ebcded2d29c4c604efa6c3e56d66de567b6a21f54226f0bfb6b9dd29e4",
+      "inherited_factory": {
+        "family": "menu",
+        "name": "MatMenuItem",
+        "deps_kind": "dependencies",
+        "declaration": "{ minVersion: \"12.0.0\", version: \"16.1.1\", ngImport: i0, type: MatMenuItem, deps: [{ token: i0.ElementRef }, { token: DOCUMENT }, { token: i1.FocusMonitor }, { token: MAT_MENU_PANEL, optional: true }, { token: i0.ChangeDetectorRef }], target: i0.\u0275\u0275FactoryTarget.Component }",
+        "attributes": [],
+        "source": "fesm2022/menu.mjs",
+        "source_sha256": "b959687b035871b5c718ca4ea75f293d67224cf6e25b0f1bf93f33519f3a3a6f"
+      }
+    },
+    "cases": [
+      {
+        "id": "original-five-arguments-outside-injection-context",
+        "result": "fail",
+        "error": "NG0203: The `ElementRef` token injection failed. `inject()` function must be called from an injection context such as a constructor, a factory function, a field initializer, or a function used with `runInInjectionContext`. Find more at https://v22.angular.dev/errors/NG0203"
+      },
+      {
+        "id": "original-short-form-with-only-element",
+        "result": "fail",
+        "error": "NG0203: The `ElementRef` token injection failed. `inject()` function must be called from an injection context such as a constructor, a factory function, a field initializer, or a function used with `runInInjectionContext`. Find more at https://v22.angular.dev/errors/NG0203"
+      },
+      {
+        "id": "supplied-element-overrides-different-ambient-element",
+        "result": "fail",
+        "error": "Expected \"actual\" to be reference-equal to \"expected\":\n+ actual - expected\n... Skipped lines\n\n  {\n    addEventListener: [Function: addEventListener],\n    appendChild: [Function: appendChild],\n    attributes: {},\n    childNodes: [],\n...\n    getAttribute: [Function: getAttribute],\n+   name: 'ambient-host',\n-   name: 'supplied-host',\n    nodeName: 'DIV',\n    nodeType: 1,\n    parentNode: null,\n    querySelector: [Function: querySelector],\n    querySelectorAll: [Function: querySelectorAll],\n"
+      },
+      {
+        "id": "supplied-focus-monitor-and-options-are-honored",
+        "result": "fail",
+        "error": "Expected values to be strictly equal:\n\n0 !== 2\n"
+      },
+      {
+        "id": "supplied-change-detector-marks-both-public-state-setters",
+        "result": "fail",
+        "error": "Expected values to be strictly equal:\n\n0 !== 2\n"
+      },
+      {
+        "id": "supplied-parent-is-registered-and-retained",
+        "result": "fail",
+        "error": "Expected values to be strictly equal:\n+ actual - expected\n\n+ null\n- {\n-   addItem: [Function: addItem],\n-   removeItem: [Function: removeItem]\n- }\n"
+      },
+      {
+        "id": "supplied-document-controls-has-focus",
+        "result": "fail",
+        "error": "Expected values to be strictly equal:\n\nfalse !== true\n"
+      }
+    ],
+    "root_style_operations": [
+      {
+        "kind": "create-element",
+        "document": "root",
+        "tag": "structural-styles"
+      },
+      {
+        "kind": "create-element",
+        "document": "root",
+        "tag": "style"
+      }
+    ],
+    "supplied_parent_counts": {
+      "adds": 0,
+      "removes": 0
+    },
+    "limits": [
+      "Actual owned leaf/current publicMatMenuItem executes under public platformBrowser/BrowserModule/zoneless root with synthetic DOM.",
+      "Borrowed injector only supplies public tokens and delegates framework services to public root;no private token/provider imported or mocked.",
+      "Root fixture lifetime is scoped to this process;not an approved product bootstrap/constructor adaptation.",
+      "No actual21/native/SSR/CSP/AOT/packed/canonical/floor qualification or constructor exclusion."
+    ]
+  },
+  "current_source_caps": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/menu-item.ts",
+      "sha256": "d8a44976ccc760b735548a03f5109fa79d6897e7dbf08a31c6a1d2af78415b0d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/menu.ts",
+      "sha256": "8e00863f5e127ba03011b96fb5342de2c33a2ee3d5085335bde20d1d07fe244e"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+      "sha256": "d052a61711194bffb9492d64471f21107441e3d60c28618d13acaf99274c90b0"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+      "sha256": "c0830fca23f02ec1bbd5377010f1af735341c7049458b4915e70e4d7ebd35b72"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/public-api.ts",
+      "sha256": "81b5a694b163913919795064ea67581f03a939c71abe18307f576def7bb3f75f"
+    },
+    {
+      "path": "tests/menu_item_constructor_runtime_probe.mjs",
+      "sha256": "77d3b43811410744cfb76f6d61085799e76f5f9896eb14606ddf99c858a56b4b"
+    },
+    {
+      "path": "reference/material-16.2.14/menu-item-sources/material-menu-item.ts",
+      "sha256": "cc176409b67585676aa97714145e5fad042a8ca7626c63a87527c5ed83372bd8"
+    },
+    {
+      "path": "reference/material-16.2.14/menu-item-sources/legacy-menu-item.ts",
+      "sha256": "70e16e9862f6b5c68ef4a32717c784017ab59c32cf4e7f3d2489d20985d5951c"
+    },
+    {
+      "path": "reference/material-16.2.14/menu-item-sources/provenance.json",
+      "sha256": "102e3ba55dda715b545a65c9016324bf0199af1509887027df6aa6dd4efb9eb5"
+    }
+  ],
+  "findings": [
+    "Both original full5 and original1-argument shortform throwNG0203 outsideDI.",
+    "Inside a complete public root fixture,all5 supplied dependencies are ignored in favor of different ambient dependencies/nullparent.",
+    "Current public parent initializes private structural styles through root services;the simple bounded public-token constructor context used for other repairs is insufficient.",
+    "Actual public MatMenuItem remains the inherited implementation/query-provider alias. Do not replace shared identity with matching names or private field casts."
+  ],
+  "next_requirements": [
+    "Restore both original ctor overloads/DIflags and actual suppliedobject behavior.",
+    "Keep borrowed services caller-owned,register/remove correctparentonce,focus/hover/highlight/label/disabled/ripple/key-manager and menuquery/publicprovider semantics.",
+    "Remove current privateMAT_MENU_PANEL imports with one independentlyowned legacytoken and bind actual menu/item/trigger consumers consistently.",
+    "Select bounded public-parent adaptation or finite owned historical legacy policy only after identity/behavior proof;no hidden root bootstrap,fakeprivateproviders,ordinarycurrentcomponent/CDKfork or broadenedAPIexception.",
+    "Native/SSR/CSP/actual21/minimum/AOT/packed/floor and fullAPI/DI/inventory qualification remainrequired."
+  ],
+  "unexecuted": [
+    "No constructor repair/native/packed/AOT/SSR/CSP/minimum/floor verification.",
+    "Both branch source probes use borrowed22.1.7;no actual21 runtime proof.",
+    "No new authored-use/SHA closure or G01-G13 pass."
+  ],
+  "actions": "No pushes,Actions,credentials or publication changes.",
+  "g11_claim": "not-passed"
+}
