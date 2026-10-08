@@ -107,10 +107,10 @@ function fixtureDefinitions(core,{nodeFactory,attributes={}}={}){
  */
 export async function createPublicFactoryContext(core,importModule,{providers=[],nodeFactory,attributes={}}={}){
  const {BrowserModule}=await importModule('@angular/platform-browser');
- const document={activeElement:null,defaultView:null,doctype:{},
+ const document=Object.assign(new EventTarget(),{activeElement:null,defaultView:null,doctype:{},
   createElement(name){return node(name,document);},
   createTextNode(value){return{nodeType:3,textContent:value,parentNode:null};},
-  querySelector(){return null;},querySelectorAll(){return [];}};
+  querySelector(){return null;},querySelectorAll(){return [];}});
  document.head=node('head',document);document.body=node('body',document);document.documentElement=node('html',document);
  document.documentElement.appendChild(document.head);document.documentElement.appendChild(document.body);
  const fixtureRenderer=renderer(core,document),defs=fixtureDefinitions(core,{nodeFactory,attributes});

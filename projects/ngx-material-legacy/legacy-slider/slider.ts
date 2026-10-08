@@ -751,8 +751,8 @@ export class MatLegacySlider
   };
 
   /** Use defaultView of injected document if available or fallback to global window reference */
-  private _getWindow(): Window {
-    return this._document.defaultView || window;
+  private _getWindow(): Window | undefined {
+    return this._document.defaultView || (typeof window !== 'undefined' ? window : undefined);
   }
 
   /**

@@ -19,6 +19,19 @@ export function compilerConstructorContract(source,name,{resolveInherited=false,
  const ts=require('typescript'),file=ts.createSourceFile('owned.mjs',source,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);
  if(file.parseDiagnostics.length)throw Error('owned compiler source does not parse');
  const coreNamespaces=new Set(),imports=new Map(),factories=[],metadata=[],writes=[],classes=[];
+ const classCandidates=[];
+ const collectClasses=node=>{
+  if(ts.isClassDeclaration(node)||ts.isClassExpression(node)){
+   const outer=ts.isClassExpression(node)&&ts.isVariableDeclaration(node.parent)&&node.parent.initializer===node
+    &&ts.isIdentifier(node.parent.name)?node.parent.name.text:null;
+   const aliases=[...new Set([node.name?.text,outer].filter(Boolean))];
+   if(aliases.includes(name))classCandidates.push({node,outer,aliases});
+  }
+  ts.forEachChild(node,collectClasses);
+ };collectClasses(file);
+ if(classCandidates.length!==1)throw Error('one unambiguous owned class binding required');
+ const ownedClass=classCandidates[0],runtimeName=ownedClass.node.name?.text||ownedClass.outer;
+ classes.push(ownedClass.node);
  for(const statement of file.statements){
   if(!ts.isImportDeclaration(statement))continue;
   const bindings=statement.importClause?.namedBindings,spec=statement.moduleSpecifier.text;
@@ -35,19 +48,27 @@ export function compilerConstructorContract(source,name,{resolveInherited=false,
   return entries;
  };
  const owner=node=>{
-  if(ts.isIdentifier(node))return node.text;
-  if(node.kind===ts.SyntaxKind.ThisKeyword){for(let parent=node.parent;parent;parent=parent.parent)if(ts.isClassDeclaration(parent)||ts.isClassExpression(parent))return parent.name?.text;}
+  if(!node)return null;
+  if(ts.isIdentifier(node)){
+   if(!ownedClass.aliases.includes(node.text))return node.text;
+   // A named class expression's inner binding is visible only in that class.
+   if(ownedClass.outer&&node.text!==ownedClass.outer){
+    let inside=false;for(let parent=node.parent;parent;parent=parent.parent)if(parent===ownedClass.node){inside=true;break;}
+    if(!inside)return null;
+   }
+   return name;
+  }
+  if(node.kind===ts.SyntaxKind.ThisKeyword){for(let parent=node.parent;parent;parent=parent.parent)if(ts.isClassDeclaration(parent)||ts.isClassExpression(parent))return parent===ownedClass.node?name:null;}
   return null;
  };
  const isCoreCall=(node,method)=>ts.isCallExpression(node)&&ts.isPropertyAccessExpression(node.expression)
   &&ts.isIdentifier(node.expression.expression)&&coreNamespaces.has(node.expression.expression.text)&&node.expression.name.text===method;
  const visit=node=>{
-  if(ts.isClassDeclaration(node)&&node.name?.text===name)classes.push(node);
-  if((ts.isVariableDeclaration(node)||ts.isParameter(node)||ts.isFunctionDeclaration(node)||ts.isClassDeclaration(node))
+  if((ts.isVariableDeclaration(node)||ts.isParameter(node)||ts.isFunctionDeclaration(node)||ts.isClassDeclaration(node)||ts.isClassExpression(node))
    &&node.name&&ts.isIdentifier(node.name)&&imports.has(node.name.text))throw Error('imported compiler identity is shadowed');
   if(ts.isBinaryExpression(node)&&ts.isElementAccessExpression(node.left)&&owner(node.left.expression)===name
    &&node.left.argumentExpression?.text==='ɵfac')writes.push(node);
-  if(ts.isPropertyDeclaration(node)&&node.name&&text(node.name)==='ɵfac'&&node.parent.name?.text===name
+  if(ts.isPropertyDeclaration(node)&&node.name&&node.name.text==='ɵfac'&&node.parent===ownedClass.node
    &&node.modifiers?.some(m=>m.kind===ts.SyntaxKind.StaticKeyword)){
    writes.push(node);if(node.initializer&&isCoreCall(node.initializer,'ɵɵngDeclareFactory'))factories.push(fields(node.initializer.arguments[0]));
   }
@@ -59,12 +80,12 @@ export function compilerConstructorContract(source,name,{resolveInherited=false,
    &&owner(node.arguments[0])===name&&node.arguments[1]?.text==='ɵfac')writes.push(node);
   if(ts.isCallExpression(node)&&ts.isPropertyAccessExpression(node.expression)&&node.expression.name.text==='setPrototypeOf'
    &&owner(node.arguments[0])===name)throw Error('manual owned constructor inheritance mutation unsupported');
-  if(isCoreCall(node,'ɵɵngDeclareClassMetadata')){const row=fields(node.arguments[0]);if(row.get('type')&&text(row.get('type'))===name)metadata.push(row);}
+  if(isCoreCall(node,'ɵɵngDeclareClassMetadata')){const row=fields(node.arguments[0]);if(owner(row.get('type'))===name)metadata.push(row);}
   ts.forEachChild(node,visit);
  };visit(file);
- if(writes.length!==1||factories.length!==1||metadata.length!==1)throw Error('one compiler factory and class metadata declaration required; manual/multiple writes unsupported');
+ if(writes.length!==1||factories.length!==1||metadata.length!==1)throw Error('one compiler factory and class metadata declaration required; manual/multiple writes unsupported: '+name+' writes='+writes.length+' factories='+factories.length+' metadata='+metadata.length);
  const factory=factories[0],classMetadata=metadata[0];
- if(!factory.get('type')||text(factory.get('type'))!==name)throw Error('factory type does not match owned class');
+ if(owner(factory.get('type'))!==name)throw Error('factory type does not match owned class');
  const deps=factory.get('deps'),ctor=classMetadata.get('ctorParameters');
  if(resolveInherited&&deps?.kind===ts.SyntaxKind.NullKeyword){
   if(ctor||classes.length!==1||classes[0].members.some(ts.isConstructorDeclaration))
@@ -73,7 +94,7 @@ export function compilerConstructorContract(source,name,{resolveInherited=false,
   const parent=heritage?.length===1&&heritage[0].types.length===1?heritage[0].types[0].expression:null;
   if(!parent||!ts.isIdentifier(parent))throw Error('explicit owned parent class required for inherited factory');
   const inherited=compilerConstructorContract(source,parent.text,{resolveInherited:true,ancestors:[...ancestors,name]});
-  return {...inherited,class_name:name,inheritance:[name,...inherited.inheritance]};
+  return {...inherited,class_name:runtimeName,inheritance:[runtimeName,...inherited.inheritance]};
  }
  if(!deps||!ts.isArrayLiteralExpression(deps)||!ctor||!ts.isArrowFunction(ctor)||!ts.isArrayLiteralExpression(ctor.body))throw Error('explicit constructor arrays required; inherited/invalid/unavailable cases remain unresolved');
  if(deps.elements.length!==ctor.body.elements.length)throw Error('factory and constructor metadata counts differ');
@@ -123,6 +144,6 @@ export function compilerConstructorContract(source,name,{resolveInherited=false,
   for(const key of Object.keys(flags))if(boolean(dep,key)!==flags[key])throw Error('factory/metadata '+key+' differs');
   result.push({index,token_expression:observed,attribute,...flags});
  }
- return {class_name:name,parameter_class_name:name,inheritance:[name],parameters:result,
+ return {class_name:runtimeName,parameter_class_name:runtimeName,inheritance:[runtimeName],parameters:result,
   role:'actual compiler observation correlation; runtime/historical identity proof still required'};
 }

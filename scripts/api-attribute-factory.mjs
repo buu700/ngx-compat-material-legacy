@@ -8,6 +8,7 @@
  */
 import {compilerConstructorContract} from './api-compiler-constructor-contract.mjs';
 import {captureFactoryConstructorInputs} from './api-factory-constructor-inputs.mjs';
+import {partitionPublicConstructorRequests,publicConstructorPartitionProblems} from './api-public-constructor-internals.mjs';
 
 const flags=['optional','self','skipSelf','host'];
 
@@ -60,7 +61,7 @@ export function executeAttributeFactory(Type,core,contract,node,runFactory,attri
  let entered=false;
  const factory=runFactory(()=>captureFactoryConstructorInputs(Type,Type.ɵfac,
   {beforeConstructor(){entered=true;}}),core.Injector,core.runInInjectionContext,{injector:node.injector,
-   onRequest:request=>{request.constructor_phase=entered?'body':'parameters';}});
+   captureStack:true,onRequest:request=>{request.constructor_phase=entered?'body':'parameters';}});
  if(factory.outcome!=='returned')return {...factory,constructorEvidence:[],detectors:[]};
  const captured=factory.value;
  if(captured.inputs.length!==contract.parameters.length)throw Error('actual constructor input count differs');
@@ -69,6 +70,7 @@ export function executeAttributeFactory(Type,core,contract,node,runFactory,attri
  // silently discard it or infer identity from a name/count list.
  if(factory.requests.some(request=>request.constructor_phase==='parameters'))
   throw Error('unexpected traced pre-constructor request in attribute factory');
+ const partition=partitionPublicConstructorRequests(factory.requests,core,runFactory,node.injector);
  const requests=[],constructorEvidence=[],detectors=[];
  for(const parameter of contract.parameters){
   const input=captured.inputs[parameter.index];
@@ -95,7 +97,8 @@ export function executeAttributeFactory(Type,core,contract,node,runFactory,attri
   constructorEvidence.push({index:parameter.index,attribute:null,input_verified:true,
    scope_challenge:parameter.token===core.ChangeDetectorRef?'pending-public-view-destruction':null});
  }
- return {...factory,value:captured.value,requests:[...requests,...factory.requests],constructorEvidence,detectors,
+ return {...factory,value:captured.value,requests:[...requests,...partition.requests],constructorEvidence,detectors,
+  peerConstructorPartition:partition.observation,
   compilerObservation:{...contract.compiler,runtime_inheritance_verified:true}};
 }
 
@@ -125,6 +128,7 @@ export function attributeConstructorObservationProblems(row){
   ||compiler.inheritance.at(-1)!==compiler.parameter_class_name)
   return ['attribute constructor inheritance evidence incomplete'];
  const problems=[];
+ problems.push(...publicConstructorPartitionProblems(row.factory_peer_constructor_partition));
  for(let index=0;index<parameters.length;index++){
   const original=parameters[index],observed=evidence[index],declared=compiler.parameters[index];
   if(observed.index!==index||declared.index!==index||observed.input_verified!==true
