@@ -12,6 +12,7 @@
  *   node scripts/browser-overlay-families.mjs --tarball <path> --zoneless
  */
 import {createHash} from 'node:crypto';
+import {observeTabPaginationNative,tabPaginationNativeOkay} from './tab-pagination-native-contract.mjs';
 import {announcedChromeEndpoint,debuggerMatchesChild} from './chromium-debug-endpoint.mjs';
 import {spawnSync as __spawnSyncForWs} from 'node:child_process';
 if (typeof globalThis.WebSocket !== 'function') {
@@ -145,6 +146,15 @@ import {MatLegacyTabsModule} from '@ngx-compat/material-legacy/legacy-tabs';
     <mat-tab-group id="tabs">
       <mat-tab label="One"><div id="tab-one">One body</div></mat-tab>
       <mat-tab label="Two"><div id="tab-two">Two body</div></mat-tab>
+    </mat-tab-group>
+
+    <mat-tab-group id="pagination-tabs" style="width:220px">
+      <mat-tab label="Pagination 0"><div>Page 0</div></mat-tab>
+      <mat-tab label="Pagination 1"><div>Page 1</div></mat-tab>
+      <mat-tab label="Pagination 2"><div>Page 2</div></mat-tab>
+      <mat-tab label="Pagination 3"><div>Page 3</div></mat-tab>
+      <mat-tab label="Pagination 4"><div>Page 4</div></mat-tab>
+      <mat-tab label="Pagination 5"><div>Page 5</div></mat-tab>
     </mat-tab-group>
   \`,
 })
@@ -440,6 +450,8 @@ try {
     '!!document.getElementById("tab-two") && getComputedStyle(document.getElementById("tab-two")).display !== "none"',
   );
 
+  families.tabs.pagination = await observeTabPaginationNative({send,evaluate,waitFor});
+
   zoneGlobal = await evaluate('typeof Zone === "undefined" ? "undefined" : typeof Zone');
 } catch (err) {
   error = String(err);
@@ -470,7 +482,8 @@ const ok =
   && families['snack-bar'].opened && families['snack-bar'].dismissed
   && families.tooltip.shown
   && families.autocomplete.panel_opened && families.autocomplete.typed_filter_visible && families.autocomplete.input_focused
-  && families.tabs.second_selected && families.tabs.second_body_visible;
+  && families.tabs.second_selected && families.tabs.second_body_visible
+  && tabPaginationNativeOkay(families.tabs.pagination);
 
 const report = {
   schema_version: 1,
