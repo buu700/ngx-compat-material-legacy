@@ -1,0 +1,1894 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "recorded_at_utc": "2026-10-09T14:33:58.031378+00:00",
+  "scope": "Owned menu/select lifecycle and isolated historical select CSS motion repair; no full native/Angular/packed/floor qualification.",
+  "source_head": "a00d8a0d43dd666fb3148bf9ce21e3dcdc589033",
+  "source_tree": "f3798194cae08b2380c68b39cb76db7a1f44f72d",
+  "reference_sources": [
+    {
+      "path": "reference/material-16.2.14/component-motion-sources/legacy-select/select-animations.ts",
+      "repository_path": "src/material/legacy-select/select-animations.ts",
+      "sha256": "e7a48bca09668d216f513d0d4d21dd0a13166de36a9e3d8af1aa3d7d77c57488",
+      "bytes": 2500,
+      "repository_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53"
+    },
+    {
+      "path": "reference/material-16.2.14/component-motion-sources/menu/menu-animations.ts",
+      "repository_path": "src/material/menu/menu-animations.ts",
+      "sha256": "d383bf1b1dc1408813543ea209d743526b8382e9f840bffa14e7d55f04824518",
+      "bytes": 2122,
+      "repository_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53"
+    },
+    {
+      "path": "reference/material-16.2.14/component-structural-sources/legacy-select/select.scss",
+      "repository_path": "src/material/legacy-select/select.scss",
+      "sha256": "ac7715b14385c823a1dc0a9d3c2be9128b26e4aa39b7dadec91a66e0bea0bfbd",
+      "bytes": 4941,
+      "repository_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53"
+    }
+  ],
+  "sources": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+      "sha256": "071cb5610d86c1aca401a3db581e1cc0f4a85b0857e0a1fc2a3c595635e99ba6",
+      "bytes": 21417
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+      "sha256": "2791f99c95619c86e942adee94d0f7e7d514acf2c7a4e53693e72efdcf633a34",
+      "bytes": 45801
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.scss",
+      "sha256": "7f8269121e0d449b08966ea8fcb2544e0866243851317f429cea745caa96a45f",
+      "bytes": 6064
+    },
+    {
+      "path": "tests/menu_select_motion_runtime_probe.mjs",
+      "sha256": "cc50024a318ade010215cececffa7cb06cb6ff446b0d5bbcc7762ac798c7e5b8",
+      "bytes": 21323
+    },
+    {
+      "path": "tests/select_css_motion_diagnostic.cjs",
+      "sha256": "6ef8581f476353acc8d024d4ae899dd5395f4586caad24c4e80a108bcd4fc002",
+      "bytes": 5878
+    },
+    {
+      "path": "scripts/native-motion-consumer.ts",
+      "sha256": "720c7eac48f57f9c8579b67ceb13c7efb51721140b76896d6bf3dbcc4c6f74f9",
+      "bytes": 27058
+    },
+    {
+      "path": "scripts/native-motion-roster.mjs",
+      "sha256": "ccb368500c5e5bf5da730b784a68e52a5250d7a22ae0f6b145713729cbca1a35",
+      "bytes": 14011
+    },
+    {
+      "path": "scripts/native-motion-regressions.mjs",
+      "sha256": "2b1e36b98e8b33441c01c1467ff8ccc874c8b953eb62d570f3cc1d6325e95ccd",
+      "bytes": 12060
+    }
+  ],
+  "changes": [
+    "Invalidate old menu completion microtasks/fallbacks on phase changes and destruction; emit completion after the final old-phase state write.",
+    "Guard select touched callback reentry, delayed exit/position receipts and destruction; deduplicate enter/exit completion with existing historical state names.",
+    "Restore tagged select min-width interpolation from100% to the historical single32px/multiple64px extension and original100ms25mslinear exit timing."
+  ],
+  "prototype_diagnostic": {
+    "schema_version": 1,
+    "line": "main",
+    "node": "v22.23.3",
+    "compiler": "6.0.3",
+    "source_sha256": {
+      "menu": "071cb5610d86c1aca401a3db581e1cc0f4a85b0857e0a1fc2a3c595635e99ba6",
+      "select": "2791f99c95619c86e942adee94d0f7e7d514acf2c7a4e53693e72efdcf633a34"
+    },
+    "helper_sha256": "8cf84411934f43287f6045dd146a8e42044a2d68d80587c31feeeb707b723667",
+    "families": {
+      "menu": [
+        {
+          "id": "enter-completes-once",
+          "result": "pass"
+        },
+        {
+          "id": "wrong-phase-enter-end-cannot-complete-exit",
+          "result": "pass"
+        },
+        {
+          "id": "reopen-rejects-captured-old-exit-fallback",
+          "result": "pass"
+        },
+        {
+          "id": "old-exit-cannot-complete-a-later-exit",
+          "result": "pass"
+        },
+        {
+          "id": "repeated-reset-replaces-fallback",
+          "result": "pass"
+        },
+        {
+          "id": "noop-close-before-open-completion",
+          "result": "pass"
+        },
+        {
+          "id": "noop-reopen-discards-earlier-phase-microtasks",
+          "result": "pass"
+        },
+        {
+          "id": "noop-latest-open-completes-after-between-phase-microtask",
+          "result": "pass"
+        },
+        {
+          "id": "destroy-discards-noop-microtask",
+          "result": "pass"
+        },
+        {
+          "id": "destroy-rejects-captured-fallback-and-late-events",
+          "result": "pass"
+        },
+        {
+          "id": "completion-observer-restarts-without-old-phase-clobber",
+          "result": "pass"
+        },
+        {
+          "id": "animation-start-after-completion-is-inert",
+          "result": "pass"
+        },
+        {
+          "id": "nested-and-unknown-native-events-are-inert",
+          "result": "pass"
+        }
+      ],
+      "select": [
+        {
+          "id": "enter-completes-once",
+          "result": "pass"
+        },
+        {
+          "id": "exit-fallback-detaches-once",
+          "result": "pass"
+        },
+        {
+          "id": "real-host-exit-event-cancels-fallback",
+          "result": "pass"
+        },
+        {
+          "id": "nested-exit-event-is-inert",
+          "result": "pass"
+        },
+        {
+          "id": "reopen-rejects-captured-old-exit-fallback",
+          "result": "pass"
+        },
+        {
+          "id": "old-exit-cannot-complete-a-later-exit",
+          "result": "pass"
+        },
+        {
+          "id": "destroy-cancels-fallback-and-no-late-view-work",
+          "result": "pass"
+        },
+        {
+          "id": "touched-callback-reopen-does-not-detach-new-panel",
+          "result": "pass"
+        },
+        {
+          "id": "touched-callback-reopen-leaves-no-exit-resources",
+          "result": "pass"
+        },
+        {
+          "id": "touched-callback-destroy-does-not-schedule-exit",
+          "result": "pass"
+        },
+        {
+          "id": "completion-is-last-old-phase-observable-work",
+          "result": "pass"
+        },
+        {
+          "id": "stale-position-receipt-after-close-does-no-work",
+          "result": "pass"
+        },
+        {
+          "id": "only-latest-reopened-position-receipt-settles",
+          "result": "pass"
+        },
+        {
+          "id": "destroy-before-position-receipt-cancels-work",
+          "result": "pass"
+        },
+        {
+          "id": "view-update-close-cancels-remaining-position-work",
+          "result": "pass"
+        },
+        {
+          "id": "noop-and-native-enter-completion-share-one-boundary",
+          "result": "pass"
+        },
+        {
+          "id": "multiple-enter-retains-historical-state-name",
+          "result": "pass"
+        }
+      ]
+    },
+    "scope": "Actual whole owned prototype method bodies, with constructor/decorator execution excluded. Deterministic timers, real Promise microtasks, Node EventTarget host events, borrowed RxJS7.8.2 streams, synthetic view/key/position services. No Angular constructor, public OverlayRef, browser, packed or full minimum runtime qualification.",
+    "g11_claim": "not-passed",
+    "failures": [],
+    "mutations": [
+      {
+        "family": "menu",
+        "id": "remove-request-sequence",
+        "intended_case": "old-exit-cannot-complete-a-later-exit",
+        "rejected": true
+      },
+      {
+        "family": "menu",
+        "id": "remove-current-phase",
+        "intended_case": "wrong-phase-enter-end-cannot-complete-exit",
+        "rejected": true
+      },
+      {
+        "family": "menu",
+        "id": "remove-start-destroy-guard",
+        "intended_case": "destroy-rejects-captured-fallback-and-late-events",
+        "rejected": true
+      },
+      {
+        "family": "menu",
+        "id": "remove-reset-destroy-guard",
+        "intended_case": "destroy-rejects-captured-fallback-and-late-events",
+        "rejected": true
+      },
+      {
+        "family": "menu",
+        "id": "retain-old-exit-timer",
+        "intended_case": "reopen-rejects-captured-old-exit-fallback",
+        "rejected": true
+      },
+      {
+        "family": "menu",
+        "id": "repeat-exit-timers",
+        "intended_case": "repeated-reset-replaces-fallback",
+        "rejected": true
+      },
+      {
+        "family": "menu",
+        "id": "do-not-complete-subject-on-destroy",
+        "intended_case": "destroy-discards-noop-microtask",
+        "rejected": true
+      },
+      {
+        "family": "menu",
+        "id": "late-state-write-after-notification",
+        "intended_case": "completion-observer-restarts-without-old-phase-clobber",
+        "rejected": true
+      },
+      {
+        "family": "select",
+        "id": "remove-enter-deduplication",
+        "intended_case": "enter-completes-once",
+        "rejected": true
+      },
+      {
+        "family": "select",
+        "id": "remove-exit-sequence",
+        "intended_case": "old-exit-cannot-complete-a-later-exit",
+        "rejected": true
+      },
+      {
+        "family": "select",
+        "id": "repeat-detached-exit-completion",
+        "intended_case": "exit-fallback-detaches-once",
+        "rejected": true
+      },
+      {
+        "family": "select",
+        "id": "remove-open-destroy-guard",
+        "intended_case": "destroy-cancels-fallback-and-no-late-view-work",
+        "rejected": true
+      },
+      {
+        "family": "select",
+        "id": "allow-exit-after-touched-reopen",
+        "intended_case": "touched-callback-reopen-leaves-no-exit-resources",
+        "rejected": true
+      },
+      {
+        "family": "select",
+        "id": "restore-old-position-receipt",
+        "intended_case": "stale-position-receipt-after-close-does-no-work",
+        "rejected": true
+      }
+    ]
+  },
+  "pre_repair_diagnostic": {
+    "path": "compatibility/rc/menu-select-motion-before-diagnostic.json",
+    "sha256": "f8b4b8ef84bcac060314b9544de0d8c2cf3818618a0313739e3d09553c4f33d8",
+    "bytes": 9275
+  },
+  "pre_repair_scope": "Main preceding owned method bodies:25cases/20failures. Captured stale callbacks deliberately stress cancellation; this is not proof of every failure being natively reachable. No preceding21 execution claimed.",
+  "isolated_css": {
+    "browser": "Google Chrome for Testing156.0.8078.4",
+    "browser_path": "/home/parallels/.cache/ms-playwright/chromium-1248/chrome-linux-arm64/chrome",
+    "fixture_sha256": "3fe9fe0a31fa20e18308c0e0932802c71ab97102969a9ee38415e1962bc72c11",
+    "generator": {
+      "path": "tests/select_css_motion_diagnostic.cjs",
+      "sha256": "6ef8581f476353acc8d024d4ae899dd5395f4586caad24c4e80a108bcd4fc002",
+      "bytes": 5878
+    },
+    "input_states": {
+      "void": {
+        "transform": "scaleY(0.8)",
+        "minWidth": "100%",
+        "opacity": 0
+      },
+      "showing": {
+        "opacity": 1,
+        "minWidth": "calc(100% + 32px)",
+        "transform": "scaleY(1)"
+      },
+      "showing-multiple": {
+        "opacity": 1,
+        "minWidth": "calc(100% + 64px)",
+        "transform": "scaleY(1)"
+      }
+    },
+    "input_transitions": {
+      "void => *": "120ms cubic-bezier(0, 0, 0.2, 1)",
+      "* => void": "100ms 25ms linear"
+    },
+    "contexts": [
+      {
+        "line": "main",
+        "css_sha256": "564ec27f61145493df4d5a6ad57d7c142519d70bde777312fd6a1fac419a2747"
+      },
+      {
+        "line": "21.x",
+        "css_sha256": "564ec27f61145493df4d5a6ad57d7c142519d70bde777312fd6a1fac419a2747"
+      }
+    ],
+    "loaded_source_sets": [
+      {
+        "line": "original",
+        "files": [
+          {
+            "sha256": "ac7715b14385c823a1dc0a9d3c2be9128b26e4aa39b7dadec91a66e0bea0bfbd",
+            "bytes": 4941,
+            "virtual_entry": true,
+            "path": "@angular/material/legacy-select/select.scss",
+            "authority": "reference/material-16.2.14/component-structural-sources/legacy-select/select.scss"
+          },
+          {
+            "sha256": "540b852551ebb148759e3c842bf14f2ae99b23342964ed97efd3052a5f73ac68",
+            "bytes": 425,
+            "virtual_entry": false,
+            "path": "@angular/cdk/_index.scss",
+            "archive_member": "package/_index.scss",
+            "archive_sha256": "a499ba0fee46784441b92587e43b17ec72d9bd383f78ea14954eaa62c781bad7",
+            "sri_verified": true
+          },
+          {
+            "sha256": "93c93a38a8db0ac49b90199d04eebf120d8d91fa4da498542b4b6a08228e66cc",
+            "bytes": 5420,
+            "virtual_entry": false,
+            "path": "@angular/cdk/overlay/_index.scss",
+            "archive_member": "package/overlay/_index.scss",
+            "archive_sha256": "a499ba0fee46784441b92587e43b17ec72d9bd383f78ea14954eaa62c781bad7",
+            "sri_verified": true
+          },
+          {
+            "sha256": "dd7e20cc3b362ed0140de0b277b8d192720cb72c4e480337910a499a0f5bfed5",
+            "bytes": 3793,
+            "virtual_entry": false,
+            "path": "@angular/cdk/a11y/_index.scss",
+            "archive_member": "package/a11y/_index.scss",
+            "archive_sha256": "a499ba0fee46784441b92587e43b17ec72d9bd383f78ea14954eaa62c781bad7",
+            "sri_verified": true
+          },
+          {
+            "sha256": "64d4842a1ceed3426274f88a1ee2aca33003cb7c01aa4fb6f654e145ad9752d5",
+            "bytes": 3878,
+            "virtual_entry": false,
+            "path": "@angular/cdk/text-field/_index.scss",
+            "archive_member": "package/text-field/_index.scss",
+            "archive_sha256": "a499ba0fee46784441b92587e43b17ec72d9bd383f78ea14954eaa62c781bad7",
+            "sri_verified": true
+          },
+          {
+            "sha256": "afe406f8797c8d3154b16b2ec2681fd90c3604761013b6e92631d852bf658f5e",
+            "bytes": 2350,
+            "virtual_entry": false,
+            "path": "@angular/material/core/style/_menu-common.scss",
+            "archive_member": "package/core/style/_menu-common.scss",
+            "archive_sha256": "de41309d20b1d98a7fd6d028a7de42853ea2d453a329c7a8815aaf73ea7f365b",
+            "sri_verified": true
+          },
+          {
+            "sha256": "fdb5cec6a9b7ce7183f8858824bfabccf1051208e0ff2f3b61b25a54220e0683",
+            "bytes": 1219,
+            "virtual_entry": false,
+            "path": "@angular/material/core/style/_list-common.scss",
+            "archive_member": "package/core/style/_list-common.scss",
+            "archive_sha256": "de41309d20b1d98a7fd6d028a7de42853ea2d453a329c7a8815aaf73ea7f365b",
+            "sri_verified": true
+          },
+          {
+            "sha256": "c164372140b463a1330373a0dff92779e3063b3002fe06e4ce6c5d97fecc7cfc",
+            "bytes": 178,
+            "virtual_entry": false,
+            "path": "@angular/material/core/style/_layout-common.scss",
+            "archive_member": "package/core/style/_layout-common.scss",
+            "archive_sha256": "de41309d20b1d98a7fd6d028a7de42853ea2d453a329c7a8815aaf73ea7f365b",
+            "sri_verified": true
+          },
+          {
+            "sha256": "e1d31a9d70e9b2d0d7e67800e5e01900aef9c15d61304839cf2214952180eb1d",
+            "bytes": 1700,
+            "virtual_entry": false,
+            "path": "@angular/material/core/style/_variables.scss",
+            "archive_member": "package/core/style/_variables.scss",
+            "archive_sha256": "de41309d20b1d98a7fd6d028a7de42853ea2d453a329c7a8815aaf73ea7f365b",
+            "sri_verified": true
+          },
+          {
+            "sha256": "d1a6533f5e5ae4fe4c3d1435201966fc029f0c31d408acd43c7fa0e9be2afdaf",
+            "bytes": 868,
+            "virtual_entry": false,
+            "path": "@angular/material/core/style/_vendor-prefixes.scss",
+            "archive_member": "package/core/style/_vendor-prefixes.scss",
+            "archive_sha256": "de41309d20b1d98a7fd6d028a7de42853ea2d453a329c7a8815aaf73ea7f365b",
+            "sri_verified": true
+          }
+        ]
+      },
+      {
+        "line": "main",
+        "files": [
+          {
+            "sha256": "7f8269121e0d449b08966ea8fcb2544e0866243851317f429cea745caa96a45f",
+            "bytes": 6064,
+            "virtual_entry": true,
+            "path": "projects/ngx-material-legacy/legacy-select/select.scss",
+            "authority": "candidate owned source"
+          },
+          {
+            "sha256": "0468c17876aaf5a54a48a3f47eb084c83be5ee1a0a4e01ccdbd396ad905fb4cb",
+            "bytes": 1400,
+            "virtual_entry": false,
+            "path": "projects/ngx-material-legacy/styles/core/style/_component-high-contrast.scss",
+            "authority": "candidate owned source"
+          },
+          {
+            "sha256": "540b852551ebb148759e3c842bf14f2ae99b23342964ed97efd3052a5f73ac68",
+            "bytes": 425,
+            "virtual_entry": false,
+            "path": "@angular/cdk/_index.scss",
+            "archive_member": "package/_index.scss",
+            "archive_sha256": "225d82389797aefbbb2684461576ef950465546a9d28326483e0b816c8a5a558",
+            "version": "22.1.7",
+            "sri_verified": true
+          },
+          {
+            "sha256": "58a90839492a9bb9aaba9e523d2a7e74bd66cecf2a7b023fa33944e4b7350b0e",
+            "bytes": 7306,
+            "virtual_entry": false,
+            "path": "@angular/cdk/overlay/_index.scss",
+            "archive_member": "package/overlay/_index.scss",
+            "archive_sha256": "225d82389797aefbbb2684461576ef950465546a9d28326483e0b816c8a5a558",
+            "version": "22.1.7",
+            "sri_verified": true
+          },
+          {
+            "sha256": "534372c8fe2542a439818bf5dddc76264e3cbe1dfb0cf3188a39b8a14fa1d159",
+            "bytes": 2199,
+            "virtual_entry": false,
+            "path": "@angular/cdk/a11y/_index.scss",
+            "archive_member": "package/a11y/_index.scss",
+            "archive_sha256": "225d82389797aefbbb2684461576ef950465546a9d28326483e0b816c8a5a558",
+            "version": "22.1.7",
+            "sri_verified": true
+          },
+          {
+            "sha256": "9df1f6bd200ac0d2181e93dddf155b0b12a7ab0a87c11eecce02f1a925701471",
+            "bytes": 3877,
+            "virtual_entry": false,
+            "path": "@angular/cdk/text-field/_index.scss",
+            "archive_member": "package/text-field/_index.scss",
+            "archive_sha256": "225d82389797aefbbb2684461576ef950465546a9d28326483e0b816c8a5a558",
+            "version": "22.1.7",
+            "sri_verified": true
+          },
+          {
+            "sha256": "656f7685cad1e990c4035ee1605acc005b15986a397003169d5424426de8d470",
+            "bytes": 2376,
+            "virtual_entry": false,
+            "path": "projects/ngx-material-legacy/styles/core/style/_menu-common.scss",
+            "authority": "candidate owned source"
+          },
+          {
+            "sha256": "4f0ad55bfd3c94ff7567bd602b185b81f1b99a37530264c84bd45aafa9ee73ea",
+            "bytes": 772,
+            "virtual_entry": false,
+            "path": "projects/ngx-material-legacy/styles/core/style/_high-contrast.scss",
+            "authority": "candidate owned source"
+          },
+          {
+            "sha256": "fdb5cec6a9b7ce7183f8858824bfabccf1051208e0ff2f3b61b25a54220e0683",
+            "bytes": 1219,
+            "virtual_entry": false,
+            "path": "projects/ngx-material-legacy/styles/core/style/_list-common.scss",
+            "authority": "candidate owned source"
+          },
+          {
+            "sha256": "c164372140b463a1330373a0dff92779e3063b3002fe06e4ce6c5d97fecc7cfc",
+            "bytes": 178,
+            "virtual_entry": false,
+            "path": "projects/ngx-material-legacy/styles/core/style/_layout-common.scss",
+            "authority": "candidate owned source"
+          },
+          {
+            "sha256": "e1d31a9d70e9b2d0d7e67800e5e01900aef9c15d61304839cf2214952180eb1d",
+            "bytes": 1700,
+            "virtual_entry": false,
+            "path": "projects/ngx-material-legacy/styles/core/style/_variables.scss",
+            "authority": "candidate owned source"
+          },
+          {
+            "sha256": "d1a6533f5e5ae4fe4c3d1435201966fc029f0c31d408acd43c7fa0e9be2afdaf",
+            "bytes": 868,
+            "virtual_entry": false,
+            "path": "projects/ngx-material-legacy/styles/core/style/_vendor-prefixes.scss",
+            "authority": "candidate owned source"
+          }
+        ]
+      },
+      {
+        "line": "21.x",
+        "files": [
+          {
+            "sha256": "7f8269121e0d449b08966ea8fcb2544e0866243851317f429cea745caa96a45f",
+            "bytes": 6064,
+            "virtual_entry": true,
+            "path": "projects/ngx-material-legacy/legacy-select/select.scss",
+            "authority": "candidate owned source"
+          },
+          {
+            "sha256": "0468c17876aaf5a54a48a3f47eb084c83be5ee1a0a4e01ccdbd396ad905fb4cb",
+            "bytes": 1400,
+            "virtual_entry": false,
+            "path": "projects/ngx-material-legacy/styles/core/style/_component-high-contrast.scss",
+            "authority": "candidate owned source"
+          },
+          {
+            "sha256": "540b852551ebb148759e3c842bf14f2ae99b23342964ed97efd3052a5f73ac68",
+            "bytes": 425,
+            "virtual_entry": false,
+            "path": "@angular/cdk/_index.scss",
+            "archive_member": "package/_index.scss",
+            "archive_sha256": "b54868a0f7aefa471203a0fe419370e156cdf0218db9b625aca3ae6e8de25c63",
+            "version": "21.2.14",
+            "sri_verified": true
+          },
+          {
+            "sha256": "58a90839492a9bb9aaba9e523d2a7e74bd66cecf2a7b023fa33944e4b7350b0e",
+            "bytes": 7306,
+            "virtual_entry": false,
+            "path": "@angular/cdk/overlay/_index.scss",
+            "archive_member": "package/overlay/_index.scss",
+            "archive_sha256": "b54868a0f7aefa471203a0fe419370e156cdf0218db9b625aca3ae6e8de25c63",
+            "version": "21.2.14",
+            "sri_verified": true
+          },
+          {
+            "sha256": "534372c8fe2542a439818bf5dddc76264e3cbe1dfb0cf3188a39b8a14fa1d159",
+            "bytes": 2199,
+            "virtual_entry": false,
+            "path": "@angular/cdk/a11y/_index.scss",
+            "archive_member": "package/a11y/_index.scss",
+            "archive_sha256": "b54868a0f7aefa471203a0fe419370e156cdf0218db9b625aca3ae6e8de25c63",
+            "version": "21.2.14",
+            "sri_verified": true
+          },
+          {
+            "sha256": "9df1f6bd200ac0d2181e93dddf155b0b12a7ab0a87c11eecce02f1a925701471",
+            "bytes": 3877,
+            "virtual_entry": false,
+            "path": "@angular/cdk/text-field/_index.scss",
+            "archive_member": "package/text-field/_index.scss",
+            "archive_sha256": "b54868a0f7aefa471203a0fe419370e156cdf0218db9b625aca3ae6e8de25c63",
+            "version": "21.2.14",
+            "sri_verified": true
+          },
+          {
+            "sha256": "656f7685cad1e990c4035ee1605acc005b15986a397003169d5424426de8d470",
+            "bytes": 2376,
+            "virtual_entry": false,
+            "path": "projects/ngx-material-legacy/styles/core/style/_menu-common.scss",
+            "authority": "candidate owned source"
+          },
+          {
+            "sha256": "4f0ad55bfd3c94ff7567bd602b185b81f1b99a37530264c84bd45aafa9ee73ea",
+            "bytes": 772,
+            "virtual_entry": false,
+            "path": "projects/ngx-material-legacy/styles/core/style/_high-contrast.scss",
+            "authority": "candidate owned source"
+          },
+          {
+            "sha256": "fdb5cec6a9b7ce7183f8858824bfabccf1051208e0ff2f3b61b25a54220e0683",
+            "bytes": 1219,
+            "virtual_entry": false,
+            "path": "projects/ngx-material-legacy/styles/core/style/_list-common.scss",
+            "authority": "candidate owned source"
+          },
+          {
+            "sha256": "c164372140b463a1330373a0dff92779e3063b3002fe06e4ce6c5d97fecc7cfc",
+            "bytes": 178,
+            "virtual_entry": false,
+            "path": "projects/ngx-material-legacy/styles/core/style/_layout-common.scss",
+            "authority": "candidate owned source"
+          },
+          {
+            "sha256": "e1d31a9d70e9b2d0d7e67800e5e01900aef9c15d61304839cf2214952180eb1d",
+            "bytes": 1700,
+            "virtual_entry": false,
+            "path": "projects/ngx-material-legacy/styles/core/style/_variables.scss",
+            "authority": "candidate owned source"
+          },
+          {
+            "sha256": "d1a6533f5e5ae4fe4c3d1435201966fc029f0c31d408acd43c7fa0e9be2afdaf",
+            "bytes": 868,
+            "virtual_entry": false,
+            "path": "projects/ngx-material-legacy/styles/core/style/_vendor-prefixes.scss",
+            "authority": "candidate owned source"
+          }
+        ]
+      }
+    ],
+    "archive_subjects": [
+      {
+        "package": "@angular/cdk",
+        "version": "16.2.14",
+        "resolved": "https://registry.npmjs.org/@angular/cdk/-/cdk-16.2.14.tgz",
+        "integrity": "sha512-n6PrGdiVeSTEmM/HEiwIyg6YQUUymZrb5afaNLGFRM5YL0Y8OBqd+XhCjb0OfD/AfgCUtedVEPwNqrfW8KzgGw==",
+        "archive_sha256": "a499ba0fee46784441b92587e43b17ec72d9bd383f78ea14954eaa62c781bad7",
+        "archive_bytes": 2037314,
+        "archive_path": "/tmp/closeout-original16-sass-sources-20261007/archives/@angular__cdk.tgz",
+        "sri_verified": true
+      },
+      {
+        "package": "@angular/material",
+        "version": "16.2.14",
+        "resolved": "https://registry.npmjs.org/@angular/material/-/material-16.2.14.tgz",
+        "integrity": "sha512-zQIxUb23elPfiIvddqkIDYqQhAHa9ZwMblfbv+ug8bxr4D0Dw360jIarxCgMjAcLj7Ccl3GBqZMUnVeM6cjthw==",
+        "archive_sha256": "de41309d20b1d98a7fd6d028a7de42853ea2d453a329c7a8815aaf73ea7f365b",
+        "archive_bytes": 4790549,
+        "archive_path": "/tmp/closeout-original16-sass-sources-20261007/archives/@angular__material.tgz",
+        "sri_verified": true
+      },
+      {
+        "package": "@angular/cdk",
+        "version": "22.1.7",
+        "integrity": "sha512-TN4pPExBZ6ZbxWnfVb77M/0cL83eRY3qpHv/R9Y1KhkNXlxdocd0My7wiueWBBimYacSpBnfHrIRNmHgX7Pc4Q==",
+        "archive_sha256": "225d82389797aefbbb2684461576ef950465546a9d28326483e0b816c8a5a558",
+        "archive_path": "/home/parallels/.cache/ngx-compat-material-legacy-closeout/keycode-subjects/cdk-22.1.7.tgz",
+        "sri_verified": true
+      },
+      {
+        "package": "@angular/cdk",
+        "version": "21.2.14",
+        "integrity": "sha512-806REq/CLf37nEhmmd8Q+ILN8z/RVG2vk2n8YZ/4TdHpcBCi5ux4AxLbpMmduLwGPOzPagJ6ggRzE5fnX0rmcQ==",
+        "archive_sha256": "b54868a0f7aefa471203a0fe419370e156cdf0218db9b625aca3ae6e8de25c63",
+        "archive_path": "/home/parallels/.cache/ngx-compat-material-legacy-closeout/keycode-subjects/cdk-21.2.14.tgz",
+        "sri_verified": true
+      }
+    ],
+    "observations": [
+      {
+        "line": "main",
+        "multiple": false,
+        "containerWidth": 112,
+        "original": [
+          {
+            "time": 0,
+            "width": 112,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 138.84375,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 144,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "candidate": [
+          {
+            "time": 0,
+            "width": 112,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 138.84375,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 144,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "exitTiming": {
+          "duration": 100,
+          "delay": 25,
+          "easing": "linear",
+          "original": "100ms 25ms linear"
+        }
+      },
+      {
+        "line": "main",
+        "multiple": false,
+        "containerWidth": 180,
+        "original": [
+          {
+            "time": 0,
+            "width": 180,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 206.84375,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 212,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "candidate": [
+          {
+            "time": 0,
+            "width": 180,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 206.84375,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 212,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "exitTiming": {
+          "duration": 100,
+          "delay": 25,
+          "easing": "linear",
+          "original": "100ms 25ms linear"
+        }
+      },
+      {
+        "line": "main",
+        "multiple": false,
+        "containerWidth": 400,
+        "original": [
+          {
+            "time": 0,
+            "width": 400,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 426.84375,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 432,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "candidate": [
+          {
+            "time": 0,
+            "width": 400,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 426.84375,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 432,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "exitTiming": {
+          "duration": 100,
+          "delay": 25,
+          "easing": "linear",
+          "original": "100ms 25ms linear"
+        }
+      },
+      {
+        "line": "main",
+        "multiple": true,
+        "containerWidth": 112,
+        "original": [
+          {
+            "time": 0,
+            "width": 112,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 165.703125,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 176,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "candidate": [
+          {
+            "time": 0,
+            "width": 112,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 165.703125,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 176,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "exitTiming": {
+          "duration": 100,
+          "delay": 25,
+          "easing": "linear",
+          "original": "100ms 25ms linear"
+        }
+      },
+      {
+        "line": "main",
+        "multiple": true,
+        "containerWidth": 180,
+        "original": [
+          {
+            "time": 0,
+            "width": 180,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 233.703125,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 244,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "candidate": [
+          {
+            "time": 0,
+            "width": 180,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 233.703125,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 244,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "exitTiming": {
+          "duration": 100,
+          "delay": 25,
+          "easing": "linear",
+          "original": "100ms 25ms linear"
+        }
+      },
+      {
+        "line": "main",
+        "multiple": true,
+        "containerWidth": 400,
+        "original": [
+          {
+            "time": 0,
+            "width": 400,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 453.703125,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 464,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "candidate": [
+          {
+            "time": 0,
+            "width": 400,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 453.703125,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 464,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "exitTiming": {
+          "duration": 100,
+          "delay": 25,
+          "easing": "linear",
+          "original": "100ms 25ms linear"
+        }
+      },
+      {
+        "line": "21.x",
+        "multiple": false,
+        "containerWidth": 112,
+        "original": [
+          {
+            "time": 0,
+            "width": 112,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 138.84375,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 144,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "candidate": [
+          {
+            "time": 0,
+            "width": 112,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 138.84375,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 144,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "exitTiming": {
+          "duration": 100,
+          "delay": 25,
+          "easing": "linear",
+          "original": "100ms 25ms linear"
+        }
+      },
+      {
+        "line": "21.x",
+        "multiple": false,
+        "containerWidth": 180,
+        "original": [
+          {
+            "time": 0,
+            "width": 180,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 206.84375,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 212,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "candidate": [
+          {
+            "time": 0,
+            "width": 180,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 206.84375,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 212,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "exitTiming": {
+          "duration": 100,
+          "delay": 25,
+          "easing": "linear",
+          "original": "100ms 25ms linear"
+        }
+      },
+      {
+        "line": "21.x",
+        "multiple": false,
+        "containerWidth": 400,
+        "original": [
+          {
+            "time": 0,
+            "width": 400,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 426.84375,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 432,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "candidate": [
+          {
+            "time": 0,
+            "width": 400,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 426.84375,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 432,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "exitTiming": {
+          "duration": 100,
+          "delay": 25,
+          "easing": "linear",
+          "original": "100ms 25ms linear"
+        }
+      },
+      {
+        "line": "21.x",
+        "multiple": true,
+        "containerWidth": 112,
+        "original": [
+          {
+            "time": 0,
+            "width": 112,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 165.703125,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 176,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "candidate": [
+          {
+            "time": 0,
+            "width": 112,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 165.703125,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 176,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "exitTiming": {
+          "duration": 100,
+          "delay": 25,
+          "easing": "linear",
+          "original": "100ms 25ms linear"
+        }
+      },
+      {
+        "line": "21.x",
+        "multiple": true,
+        "containerWidth": 180,
+        "original": [
+          {
+            "time": 0,
+            "width": 180,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 233.703125,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 244,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "candidate": [
+          {
+            "time": 0,
+            "width": 180,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 233.703125,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 244,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "exitTiming": {
+          "duration": 100,
+          "delay": 25,
+          "easing": "linear",
+          "original": "100ms 25ms linear"
+        }
+      },
+      {
+        "line": "21.x",
+        "multiple": true,
+        "containerWidth": 400,
+        "original": [
+          {
+            "time": 0,
+            "width": 400,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 453.703125,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 464,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "candidate": [
+          {
+            "time": 0,
+            "width": 400,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 453.703125,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 464,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "exitTiming": {
+          "duration": 100,
+          "delay": 25,
+          "easing": "linear",
+          "original": "100ms 25ms linear"
+        }
+      }
+    ],
+    "frame_comparisons": 36,
+    "exit_timing_checks": 12,
+    "before_width_diagnostic": [
+      {
+        "line": "main",
+        "multiple": false,
+        "containerWidth": 112,
+        "original": [
+          {
+            "time": 0,
+            "width": 112,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 138.84375,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 144,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "candidate": [
+          {
+            "time": 0,
+            "width": 144,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 144,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 144,
+            "height": 48,
+            "opacity": "1"
+          }
+        ]
+      },
+      {
+        "line": "main",
+        "multiple": false,
+        "containerWidth": 180,
+        "original": [
+          {
+            "time": 0,
+            "width": 180,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 206.84375,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 212,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "candidate": [
+          {
+            "time": 0,
+            "width": 212,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 212,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 212,
+            "height": 48,
+            "opacity": "1"
+          }
+        ]
+      },
+      {
+        "line": "main",
+        "multiple": false,
+        "containerWidth": 400,
+        "original": [
+          {
+            "time": 0,
+            "width": 400,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 426.84375,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 432,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "candidate": [
+          {
+            "time": 0,
+            "width": 432,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 432,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 432,
+            "height": 48,
+            "opacity": "1"
+          }
+        ]
+      },
+      {
+        "line": "main",
+        "multiple": true,
+        "containerWidth": 112,
+        "original": [
+          {
+            "time": 0,
+            "width": 112,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 165.703125,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 176,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "candidate": [
+          {
+            "time": 0,
+            "width": 176,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 176,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 176,
+            "height": 48,
+            "opacity": "1"
+          }
+        ]
+      },
+      {
+        "line": "main",
+        "multiple": true,
+        "containerWidth": 180,
+        "original": [
+          {
+            "time": 0,
+            "width": 180,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 233.703125,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 244,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "candidate": [
+          {
+            "time": 0,
+            "width": 244,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 244,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 244,
+            "height": 48,
+            "opacity": "1"
+          }
+        ]
+      },
+      {
+        "line": "main",
+        "multiple": true,
+        "containerWidth": 400,
+        "original": [
+          {
+            "time": 0,
+            "width": 400,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 453.703125,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 464,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "candidate": [
+          {
+            "time": 0,
+            "width": 464,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 464,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 464,
+            "height": 48,
+            "opacity": "1"
+          }
+        ]
+      },
+      {
+        "line": "21.x",
+        "multiple": false,
+        "containerWidth": 112,
+        "original": [
+          {
+            "time": 0,
+            "width": 112,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 138.84375,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 144,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "candidate": [
+          {
+            "time": 0,
+            "width": 144,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 144,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 144,
+            "height": 48,
+            "opacity": "1"
+          }
+        ]
+      },
+      {
+        "line": "21.x",
+        "multiple": false,
+        "containerWidth": 180,
+        "original": [
+          {
+            "time": 0,
+            "width": 180,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 206.84375,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 212,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "candidate": [
+          {
+            "time": 0,
+            "width": 212,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 212,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 212,
+            "height": 48,
+            "opacity": "1"
+          }
+        ]
+      },
+      {
+        "line": "21.x",
+        "multiple": false,
+        "containerWidth": 400,
+        "original": [
+          {
+            "time": 0,
+            "width": 400,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 426.84375,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 432,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "candidate": [
+          {
+            "time": 0,
+            "width": 432,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 432,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 432,
+            "height": 48,
+            "opacity": "1"
+          }
+        ]
+      },
+      {
+        "line": "21.x",
+        "multiple": true,
+        "containerWidth": 112,
+        "original": [
+          {
+            "time": 0,
+            "width": 112,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 165.703125,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 176,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "candidate": [
+          {
+            "time": 0,
+            "width": 176,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 176,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 176,
+            "height": 48,
+            "opacity": "1"
+          }
+        ]
+      },
+      {
+        "line": "21.x",
+        "multiple": true,
+        "containerWidth": 180,
+        "original": [
+          {
+            "time": 0,
+            "width": 180,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 233.703125,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 244,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "candidate": [
+          {
+            "time": 0,
+            "width": 244,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 244,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 244,
+            "height": 48,
+            "opacity": "1"
+          }
+        ]
+      },
+      {
+        "line": "21.x",
+        "multiple": true,
+        "containerWidth": 400,
+        "original": [
+          {
+            "time": 0,
+            "width": 400,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 453.703125,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 464,
+            "height": 48,
+            "opacity": "1"
+          }
+        ],
+        "candidate": [
+          {
+            "time": 0,
+            "width": 464,
+            "height": 38.400001525878906,
+            "opacity": "0"
+          },
+          {
+            "time": 60,
+            "width": 464,
+            "height": 46.456756591796875,
+            "opacity": "0.839245"
+          },
+          {
+            "time": 120,
+            "width": 464,
+            "height": 48,
+            "opacity": "1"
+          }
+        ]
+      }
+    ],
+    "execution": "The final fixture is byte-identical to the executed timed-main fixture. Each branch independently compiles its own style through both authenticated minimum CDK Sass contexts. This transfers isolated CSS observations only; it does not transfer Angular/branch/native qualification.",
+    "limits": "Default16px font,48px synthetic child, single/multiple,112/180/400px containers and0/60/120ms sampled frames. Native WebAnimations replay of untouched state data; no original Angular animation engine, Angular overlay positioning, custom theme/consumer or packed artifact execution."
+  },
+  "native_producer": {
+    "status": "implemented-unexecuted",
+    "case": "select/missing-end-fallback",
+    "required_observations": [
+      "touchedReopens exactly1",
+      "reopenedPanelVisible true"
+    ],
+    "receipt_validator": "Main282-case roster validator passes plus five targeted corrupt receipts;21returns explicit matrix main roster /21null. This validates receipt rejection only, no actual native pass."
+  },
+  "menu_panel_refresh": {
+    "owned_interface_sha256": "4212186406b92fc485c050ffae7a8fd7b1f8e7af855bfd0133b018435834018a",
+    "source_check": "Owned complete interface declaration remains byte-identical to untouched16; base imports the owned type only and contains no MAT_MENU_PANEL token. No constructor/decorator/provider/public method signature changed in this repair; earlier removed-use emit evidence remains historical, not current whole-runtime equivalence."
+  },
+  "cyph": {
+    "head": "a56a0603636cac5aaabe8fe408f7429b4224f011",
+    "read_only": true,
+    "clean": true,
+    "checked_files": [
+      {
+        "path": "shared/css/mixins.scss",
+        "sha256": "cc248f0e8b86175c9f6edab6e0193300ad5e13f2d37f5575b556d246584baf2b",
+        "bytes": 20656
+      },
+      {
+        "path": "shared/js/cyph/components/email-compose/email-compose.component.scss",
+        "sha256": "0f4f63c2ec19ea8c317930411a3ba39d63e95efb34fde4b8d1397f943e02cea2",
+        "bytes": 1567
+      },
+      {
+        "path": "shared/js/cyph/components/email-view/email-view.component.scss",
+        "sha256": "6f880ab02a9dc63b466e3b8d3ec9c2cc7668314ada4c90b5b1e0495852523752",
+        "bytes": 2218
+      }
+    ],
+    "decision": "Existing .mat-select-panel attachments/font/background selectors and existing mixin styling hooks remain. No public signature or template changes in this repair and no consumer CSS/SCSS edits required. No Cyph build performed."
+  },
+  "unexecuted": [
+    "actual current both-line native motion",
+    "two historical positioning failures",
+    "full source compilation/AOT",
+    "packed artifact and consumer floors",
+    "full Sass/theming/custom font matrix",
+    "fresh independent audit and upstream/SHA/security obligations"
+  ],
+  "new_dependency_closures": 0,
+  "new_SHA_closures": 0,
+  "g11_claim": "not-passed",
+  "publication": "not-authorized"
+}
