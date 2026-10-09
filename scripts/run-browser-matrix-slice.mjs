@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import {componentHighContrastOkay} from './component-high-contrast-contract.mjs';
 import {peerIconTtOkay} from './peer-icon-tt-admission.mjs';
 import {legacyCoreHighContrastOkay} from './legacy-core-high-contrast-contract.mjs';
 /**
@@ -249,6 +250,7 @@ const scenarios = [
       && report.families?.checkbox?.disabled_class
       && report.families?.checkbox?.contrast_modes === true
       && report.families?.checkbox?.contrast_negative === true
+      && componentHighContrastOkay(report.component_high_contrast)
       && report.families?.['slide-toggle']?.present
       && report.families?.['slide-toggle']?.disabled_class
       && !report.error,
@@ -290,6 +292,7 @@ const scenarios = [
       && report.families?.checkbox?.disabled_class
       && report.families?.checkbox?.contrast_modes === true
       && report.families?.checkbox?.contrast_negative === true
+      && componentHighContrastOkay(report.component_high_contrast)
       && report.families?.['slide-toggle']?.present
       && report.families?.['slide-toggle']?.disabled_class
       && !report.error,
