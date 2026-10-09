@@ -1,0 +1,29 @@
+commit 48b2680f6b41be5dc9bda7f261279cc4c9ad7d64
+Author:     Naji <54370141+naaajii@users.noreply.github.com>
+AuthorDate: Thu Oct 10 21:46:45 2024 +0500
+Commit:     GitHub <noreply@github.com>
+CommitDate: Thu Oct 10 18:46:45 2024 +0200
+
+    fix(material/form-field): account in `cols` attribute on textarea (#29836)
+    
+    previously we were setting width of 180px on our input field however this also made that textarea width stays the same if they are used with `cols` attribute, this commit ensures we dont do that if we have a textarea with `cols` attribute allowing it to grow in width as much as the attribute wants it to
+    
+    fixes #29459
+
+diff --git a/src/material/form-field/form-field.scss b/src/material/form-field/form-field.scss
+index d796ecb06..c2787b1a1 100644
+--- a/src/material/form-field/form-field.scss
++++ b/src/material/form-field/form-field.scss
+@@ -187,6 +187,12 @@ $_icon-prefix-infix-padding: 4px;
+   // Needed so that the floating label does not overlap with prefixes or suffixes.
+   position: relative;
+   box-sizing: border-box;
++
++  // We do not want to set fixed width on textarea with cols attribute as it makes different
++  // columns look same width.
++  &:has(textarea[cols]) {
++    width: auto;
++  }
+ }
+ 
+ // In the form-field theme, we add a 1px left margin to the notch to fix a rendering bug in Chrome.

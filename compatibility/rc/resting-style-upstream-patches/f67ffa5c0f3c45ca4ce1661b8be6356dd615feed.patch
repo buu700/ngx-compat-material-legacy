@@ -1,0 +1,28 @@
+commit f67ffa5c0f3c45ca4ce1661b8be6356dd615feed
+Author:     Kristiyan Kostadinov <crisbeto@users.noreply.github.com>
+AuthorDate: Tue Jun 25 19:48:12 2024 +0200
+Commit:     GitHub <noreply@github.com>
+CommitDate: Tue Jun 25 19:48:12 2024 +0200
+
+    fix(material/button): stack icons on top of touch target (#29291)
+    
+    Some time ago we started stacking the button's text on top of the ripple and touch target for accessibility reasons, but we didn't apply the same to icons.
+    
+    Fixes #28888.
+
+diff --git a/src/material/button/_button-base.scss b/src/material/button/_button-base.scss
+index 58d90e9e7..cb5de5769 100644
+--- a/src/material/button/_button-base.scss
++++ b/src/material/button/_button-base.scss
+@@ -44,8 +44,10 @@
+ 
+   // The content should appear over the state and ripple layers, otherwise they may adversely affect
+   // the accessibility of the text content.
+-  .mdc-button__label {
++  .mdc-button__label,
++  .mat-icon {
+     z-index: 1;
++    position: relative;
+   }
+ 
+   // The focus indicator should match the bounds of the entire button.

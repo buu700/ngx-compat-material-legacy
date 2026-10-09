@@ -1,0 +1,27 @@
+commit 4f518f9fffd1c85cddef9d573ae7bbda4981f7cb
+Author:     Kristiyan Kostadinov <crisbeto@abv.bg>
+AuthorDate: Mon Feb 12 11:58:37 2024 +0100
+Commit:     Kristiyan Kostadinov <crisbeto@users.noreply.github.com>
+CommitDate: Mon Feb 12 16:50:49 2024 +0100
+
+    fix(material/list): use direction-agnostic text-align
+    
+    Avoids some extra styles by using `text-align: start` instead of having to flip it manually for RTL.
+
+diff --git a/src/material/list/list.scss b/src/material/list/list.scss
+index 2500f8e5b..9291984fe 100644
+--- a/src/material/list/list.scss
++++ b/src/material/list/list.scss
+@@ -186,11 +186,7 @@ mat-action-list button {
+   font: inherit;
+   outline: inherit;
+   -webkit-tap-highlight-color: transparent;
+-  text-align: left;
+-
+-  [dir='rtl'] & {
+-    text-align: right;
+-  }
++  text-align: start;
+ 
+   &::-moz-focus-inner {
+     border: 0;

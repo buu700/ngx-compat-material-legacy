@@ -1,0 +1,56 @@
+commit d27f79357786e6d0b67d3895cb6e79135954ac11
+Author:     Kristiyan Kostadinov <crisbeto@users.noreply.github.com>
+AuthorDate: Mon May 12 22:41:05 2025 +0200
+Commit:     GitHub <noreply@github.com>
+CommitDate: Mon May 12 22:41:05 2025 +0200
+
+    fix(material/button): inherit button shape in focus indicator (#31065)
+    
+    Updates the button's focus indicator to inherit the shape of its button which looks better than the current approach.
+
+diff --git a/src/material/button/_button-base.scss b/src/material/button/_button-base.scss
+index bd452c589..33d25abf3 100644
+--- a/src/material/button/_button-base.scss
++++ b/src/material/button/_button-base.scss
+@@ -6,7 +6,7 @@
+ // color and opacity for states like hover, active, and focus. Additionally, adds styles to the
+ // ripple and state container so that they fill the button, match the border radius, and avoid
+ // pointer events.
+-@mixin mat-private-button-interactive() {
++@mixin mat-private-button-interactive($focus-indicator-inherits-shape: true) {
+   -webkit-tap-highlight-color: transparent;
+ 
+   // The ripple container should match the bounds of the entire button.
+@@ -50,10 +50,18 @@
+   // The focus indicator should match the bounds of the entire button.
+   .mat-focus-indicator {
+     @include layout-common.fill();
++
++    @if ($focus-indicator-inherits-shape) {
++      border-radius: inherit;
++    }
+   }
+ 
+   &:focus > .mat-focus-indicator::before {
+     content: '';
++
++    @if ($focus-indicator-inherits-shape) {
++      border-radius: inherit;
++    }
+   }
+ }
+ 
+diff --git a/src/material/button/fab.scss b/src/material/button/fab.scss
+index 8da19ef22..327532994 100644
+--- a/src/material/button/fab.scss
++++ b/src/material/button/fab.scss
+@@ -26,7 +26,8 @@
+     transform 270ms 0ms cubic-bezier(0, 0, 0.2, 1);
+   flex-shrink: 0; // Prevent the button from shrinking since it's always supposed to be a circle.
+ 
+-  @include button-base.mat-private-button-interactive();
++  // Due to the shape of the FAB, inheriting the shape looks off. Disable it explicitly.
++  @include button-base.mat-private-button-interactive($focus-indicator-inherits-shape: false);
+   @include style-private.private-animation-noop();
+ 
+   &::before {
