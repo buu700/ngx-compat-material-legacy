@@ -25,6 +25,7 @@ import {ownedDialogFocusObservationProblems} from '../scripts/api-owned-dialog-f
 import {MENU_CONTENT_SYMBOL,menuContentContract,menuContentObservationProblems} from '../scripts/api-menu-content-context.mjs';
 import {SIMPLE_SNACK_SYMBOL,simpleSnackObservationProblems} from '../scripts/api-simple-snack-context.mjs';
 import {DIALOG_OPENER_SYMBOL,dialogOpenerObservationProblems} from '../scripts/api-dialog-opener-context.mjs';
+import {AUTOCOMPLETE_SYMBOL,autocompleteProfile,createAutocompleteCapture,observeAutocompleteInputs,finishAutocompleteContext,autocompleteObservationProblems} from '../scripts/api-autocomplete-context.mjs';
 import {SNACK_MOTION_SYMBOL,FORM_FIELD_MOTION_SYMBOL,MENU_MOTION_SYMBOL,TOOLTIP_MOTION_SYMBOL,DIALOG_MOTION_SYMBOL,ownedMotionProfile,ownedSelectMotionProblems} from '../scripts/api-owned-motion-context.mjs';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),require=createRequire(import.meta.url);
@@ -289,6 +290,49 @@ try{
    assert.equal(Type.component,undefined,'dialog opener context did not restore original component state');assert.equal(Type.config,undefined,'dialog opener context did not restore original config state');
   }
  }
+ const autocompleteControls=[];
+ {
+  const symbol=selected.find(s=>s.symbol_id===AUTOCOMPLETE_SYMBOL),owned=await loadRuntimeModule(runtime,'legacy-autocomplete','primary'),field=await loadRuntimeModule(runtime,'legacy-form-field','primary'),input=await loadRuntimeModule(runtime,'legacy-input','primary'),layout=await load('@angular/cdk/layout');
+  const row=rows.find(r=>r.symbol.symbol_id===AUTOCOMPLETE_SYMBOL);assert.equal(row.result,'pass',row.problems.join('\n'));assert.deepEqual(autocompleteObservationProblems(row),[]);
+  autocompleteControls.push({id:'actual-public-view-breakpoint-lookup-and-window-lifetime',result:'pass',evidence:row.factory_autocomplete_context});
+  for(const cell of [
+   {id:'foreign-breakpoint-service',change:value=>{value._breakpointObserver={};},error:/breakpoint service differs/},
+   {id:'foreign-view-input',change:value=>{value._viewContainerRef={};},error:/supplied view\/input identity differs/},
+   {id:'initialization-noop',change:value=>{value.ngAfterViewInit=()=>{};},error:/window blur handler did not execute/},
+   {id:'teardown-noop',change:value=>{value.ngOnDestroy=()=>{};},error:/owned destroy hook did not execute/},
+   {id:'destroy-borrowed-breakpoint-service',change:value=>{const original=value.ngOnDestroy.bind(value);value.ngOnDestroy=()=>{original();value._breakpointObserver.ngOnDestroy();};},error:/destroyed borrowed public breakpoint service/},
+   {id:'retain-window-listener',change:value=>{const original=value.ngOnDestroy.bind(value);value.ngOnDestroy=()=>{original();value._document.defaultView.addEventListener('blur',value._windowBlurHandler);};},error:/retained window listener/},
+   {id:'unrelated-optional-request',extra:true},
+  ]){
+   const Type=owned.MatLegacyAutocompleteTrigger,constructorFactory=Receiver=>{if(cell.extra)core.inject(core.ChangeDetectorRef,{optional:true});return Type.ɵfac(class extends Receiver{constructor(...inputs){super(...inputs);cell.change?.(this);}});};
+   const execution=await observePublicNodeFactory(Type,core,runtime,symbol,symbols,load,{constructorFactory});
+   if(cell.extra){assert.equal(execution.outcome,'returned',execution.error);assert.equal(execution.requests.length,12);autocompleteControls.push({id:cell.id,result:'retained-unclassified-request',retained_requests:12});}
+   else{assert.equal(execution.outcome,'threw');assert.match(execution.error,cell.error);autocompleteControls.push({id:cell.id,result:'rejected',error:execution.error});}
+  }
+  const fixture=await createPublicFactoryContext(core,load,{providers:[core.importProvidersFrom(owned.MatLegacyAutocompleteModule)],defaultViewTarget:true,
+   parentHost:{tag:'mat-form-field',token:field.MatLegacyFormField,imports:[field.MatLegacyFormFieldModule,input.MatLegacyInputModule],elementTag:'input',elementAttributes:{matInput:''}}});
+  const state=createAutocompleteCapture(autocompleteProfile(symbol),core,owned.MatLegacyAutocompleteTrigger,owned,join(runtime,'fesm2022/ngx-compat-material-legacy-legacy-autocomplete.mjs'),layout);
+  try{
+   const capture=runFactory(()=>captureFactoryConstructorInputs(owned.MatLegacyAutocompleteTrigger,owned.MatLegacyAutocompleteTrigger.ɵfac,{beforeConstructor:state.beforeConstructor}),core.Injector,core.runInInjectionContext,{injector:fixture.element.injector});state.restore();
+   assert.equal(capture.outcome,'returned',capture.error);const value=capture.value.value,parent=fixture.parentNode.owner;
+   assert.ok(parent instanceof field.MatLegacyFormField&&parent._control instanceof input.MatLegacyInput,'actual legacy form-field/control parent was not initialized');
+   assert.ok(value._formField===parent&&fixture.parentNode.injector.get(field.MAT_LEGACY_FORM_FIELD,undefined,{self:true})===parent,'autocomplete legacy form-field token/provider identity differs');
+   assert.ok(fixture.element.injector.get(field.MAT_LEGACY_FORM_FIELD)===parent&&fixture.element.injector.get(field.MAT_LEGACY_FORM_FIELD,null,{self:true,optional:true})===null,'autocomplete legacy field parent/child scope differs');
+   const evidence=observeAutocompleteInputs(state,capture.value,fixture);value.ngOnDestroy();await finishAutocompleteContext(state,value,fixture,evidence);
+   assert.ok(!fixture.parentNode.destroyed&&!fixture.component.hostView.destroyed,'autocomplete child destroyed legacy field parent');autocompleteControls.push({id:'genuine-legacy-form-field-and-input-parent',result:'pass',legacy_parent_and_control_initialized:true,legacy_token_provider_identical:true,child_host_input_identical:true,borrowed_parent_alive_after_child_teardown:true});
+  }finally{state.close();fixture.close();}
+ }
+ const autocompleteManual=[];
+ {
+  const owned=await loadRuntimeModule(runtime,'legacy-autocomplete','primary'),Type=owned.MatLegacyAutocompleteTrigger;
+  const fixture=await createPublicFactoryContext(core,load,{providers:[core.importProvidersFrom(owned.MatLegacyAutocompleteModule)],defaultViewTarget:true});
+  try{
+   const capture=runFactory(()=>captureFactoryConstructorInputs(Type),core.Injector,core.runInInjectionContext,{injector:fixture.element.injector});
+   assert.equal(capture.outcome,'returned',capture.error);assert.equal(capture.value.constructor_calls,1);assert.equal(capture.value.inputs.length,11);
+   const manual=new Type(...capture.value.inputs),layout=await load('@angular/cdk/layout');assert.ok(manual._breakpointObserver===fixture.element.injector.get(layout.BreakpointObserver));manual.ngAfterViewInit();manual._canOpenOnNextFocus=false;fixture.document.defaultView.dispatchEvent(new Event('blur'));assert.equal(manual._canOpenOnNextFocus,true);manual.ngOnDestroy();manual._canOpenOnNextFocus=false;fixture.document.defaultView.dispatchEvent(new Event('blur'));assert.equal(manual._canOpenOnNextFocus,false);autocompleteManual.push({id:'original-eleven-argument-manual-constructor',outcome:'returned',actual_public_breakpoint_service:true,window_listener_delivery:true,window_listener_removed_on_teardown:true});
+   capture.value.value.ngOnDestroy();assert.equal(fixture.component.hostView.destroyed,false);assert.equal(fixture.environment.destroyed,false);
+  }finally{fixture.close();}
+ }
  const constructorMotionControls=[];
  const manualMotionObservations=[];
  const manualMotionLifecycle=[];
@@ -369,7 +413,7 @@ try{
  const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
  const caps=[...new Set([...files.map(file=>file.fileName),...resources])].sort().map(file=>({path:file.slice(root.length+1),sha256:sha(readFileSync(file))}));
  const result={schema_version:1,role:'All original154 factory class source observations;not canonical packed/native/browser/floor qualification',
-  node:process.version,typescript:ts.version,runtime_peer:core.VERSION.full,entries,rows,selected_symbol_ids:[...selectedIds].sort(),emitted_public_import_routes:routes,public_parent_controls:publicParentControls,required_parent_controls:requiredParentControls,caller_config_controls:callerConfigControls,snack_motion_controls:snackMotionControls,constructor_motion_controls:constructorMotionControls,manual_motion_observations:manualMotionObservations,manual_motion_lifecycle:manualMotionLifecycle,dialog_focus_controls:dialogFocusControls,menu_content_controls:menuContentControls,simple_snack_controls:simpleSnackControls,dialog_opener_controls:dialogOpenerControls,
+  node:process.version,typescript:ts.version,runtime_peer:core.VERSION.full,entries,rows,selected_symbol_ids:[...selectedIds].sort(),emitted_public_import_routes:routes,public_parent_controls:publicParentControls,required_parent_controls:requiredParentControls,caller_config_controls:callerConfigControls,snack_motion_controls:snackMotionControls,constructor_motion_controls:constructorMotionControls,manual_motion_observations:manualMotionObservations,manual_motion_lifecycle:manualMotionLifecycle,dialog_focus_controls:dialogFocusControls,menu_content_controls:menuContentControls,simple_snack_controls:simpleSnackControls,dialog_opener_controls:dialogOpenerControls,autocomplete_manual:autocompleteManual,autocomplete_controls:autocompleteControls,
   passed:rows.filter(row=>row.result==='pass').length,failed:rows.filter(row=>row.result!=='pass').length,
   source_files:files.length,resource_files:resources.size,source_caps:caps,virtual_typecheck_files:virtualFiles.length,
   styles:'SCSS/HTML resources read unchanged by Angular compiler;no Sass/rendered style qualification',

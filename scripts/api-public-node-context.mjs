@@ -126,9 +126,12 @@ function fixtureDefinitions(core,{nodeFactory,attributes={},parentProviders=[],p
  const parentTag=parentHost?.tag||'section';
  if(!/^[a-z][a-z0-9-]*$/.test(parentTag))throw Error('invalid fixture parent tag');
  const parentAttributes=serializeAttributes(parentHost?.attributes||{},/^[a-zA-Z][a-zA-Z0-9-]*$/);
+ const elementTag=parentHost?.elementTag||'div';if(!/^[a-z][a-z0-9-]*$/.test(elementTag))throw Error('invalid fixture element tag');
+ const elementAttributes=serializeAttributes(parentHost?.elementAttributes||{},/^[a-zA-Z][a-zA-Z0-9-]*$/);
+ const elementMarkup='<'+elementTag+' apiFactoryElement'+literalAttributes+elementAttributes+'>'+(['area','base','br','col','embed','hr','img','input','link','meta','param','source','track','wbr'].includes(elementTag)?'':'</'+elementTag+'>');
  core.Component({selector:'api-factory-host-'+fixtureId++,standalone:true,
   imports:[Parent,ElementProbe,TemplateProbe,...(parentHost?.imports||[])],
-  template:'<'+parentTag+' apiFactoryParent'+parentAttributes+'><div apiFactoryElement'+literalAttributes+'></div><ng-template apiFactoryTemplate></ng-template></'+parentTag+'>'})(Host);
+  template:'<'+parentTag+' apiFactoryParent'+parentAttributes+'>'+elementMarkup+'<ng-template apiFactoryTemplate></ng-template></'+parentTag+'>'})(Host);
  const result={Host,scopeToken,parentValue,childValue};if(cacheable)definitions.set(core,result);return result;
 }
 
