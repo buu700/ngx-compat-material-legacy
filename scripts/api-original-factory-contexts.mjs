@@ -48,7 +48,19 @@ export function originalContextDi(shape,runtimeContext={}){
  assert.ok(context.effective_factory_kind,'unresolved original factory ancestry');
  if(context.effective_factory_kind==='invalid')return [];
  assert.ok(Array.isArray(context.factory_parameters),'original parameters unavailable');
- const params=context.factory_parameters.filter(p=>!p.attribute).map(({index,local_name,...p})=>p);
+ const forwardRefs={
+  '@angular/material:fesm2022/legacy-list.mjs#MatLegacyListOption':'MatLegacySelectionList',
+  '@angular/material:fesm2022/legacy-tabs.mjs#MatLegacyTabBodyPortal':'MatLegacyTabBody',
+ };
+ const params=context.factory_parameters.filter(p=>!p.attribute).map(({index,local_name,...p})=>{
+  if(!p.unresolved_expression)return p;
+  const name=forwardRefs[context.parameter_factory_key];assert.ok(name,'unreviewed original parameter expression');
+  const expression='forwardRef(() => '+name+')';assert.equal(index,2);assert.deepEqual(p,{unresolved_expression:expression,optional:false});
+  assert.ok(context.compiler_factory.declaration.includes('{ token: '+expression+' }'),'original forwardRef declaration differs');
+  // Interpret the authenticated original public forwardRef expression only.
+  // Its owned class object and required flag remain strict runtime assertions.
+  return {ident:name,imported:name,spec:null,optional:false,original_reference_expression:expression};
+ });
  for(const ancestor of [...context.ancestry].reverse())for(const injection of ancestor.body_injections){
   if(injection.conditions.length){
    assert.equal(shape.originalFactory.name,'MatCommonModule','unreviewed conditional original body injection');
