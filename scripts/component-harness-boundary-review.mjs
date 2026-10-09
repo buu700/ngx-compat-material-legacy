@@ -195,6 +195,10 @@ harness.all({arbitrary: true});
 const lostNull: Promise<TestElement> = harness.optional('.owned')();
 // @ts-expect-error The all query returns an array.
 const lostArray: Promise<TestElement> = harness.all('.owned')();
+class UnsupportedAccessor extends ComponentHarness {
+  // @ts-expect-error The protected readonly data property cannot become a subclass accessor.
+  get locatorFactory(): LocatorFactory { return factory; }
+}
 `;
     const file = join(virtualRoot, 'consumer.ts'); files.set(file, code);
     const options = {target: compiler.ScriptTarget.ES2022, module: compiler.ModuleKind.ESNext,
@@ -207,7 +211,7 @@ const lostArray: Promise<TestElement> = harness.all('.owned')();
     assert.equal(diagnostics.length, 0, compiler.formatDiagnosticsWithColorAndContext(diagnostics,
       {getCanonicalFileName: name => name, getCurrentDirectory: () => virtualRoot, getNewLine: () => '\n'}));
     results.push({line: model.subject.line, compiler: compiler.version, strict: true, skip_lib_check: false,
-      positive_checks: 13, negative_checks: 6, source_sha256: hash(code), declarations: files.size - 1});
+      positive_checks: 13, negative_checks: 7, source_sha256: hash(code), declarations: files.size - 1});
   }
   return {compiler: compiler.version, compiler_source_sha256: hash(readFileSync(compilerPath)), compiler_root: compilerRoot ?? null,
     subjects: results, scope: 'Complete actual standalone testing declarations only;no Angular templates/native/packed/floor environment.'};
@@ -243,6 +247,9 @@ export async function reviewComponentHarnessBoundary({root = defaultRoot, readSo
           && ts.isClassDeclaration(parent.parent.parent) && parent.parent.token === ts.SyntaxKind.ExtendsKeyword) {
           assert.ok(!binding.isTypeOnly && !binding.parent.parent.isTypeOnly, 'runtime base imported as type only');
           assert.ok(!parent.typeArguments?.length, 'non-generic public base received type arguments');
+          const owner = parent.parent.parent;
+          assert.ok(!owner.members.some(ts.isConstructorDeclaration), 'authored base constructor needs separate review');
+          assert.ok(!owner.members.some(member => member.name?.getText(source) === 'locatorFactory'), 'authored locatorFactory redeclaration needs separate review');
           role = 'runtime-base-inheritance';
         }
         else if (ts.isExpressionWithTypeArguments(parent) && ts.isHeritageClause(parent.parent)
