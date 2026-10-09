@@ -4,7 +4,7 @@
  * Builds minimal packages and invokes the real script. Not release evidence.
  */
 import {spawnSync} from 'node:child_process';
-import {mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync, existsSync} from 'node:fs';
+import {mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync, existsSync, copyFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {dirname, join, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -16,6 +16,10 @@ import {
 } from './check-packed-exports.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+let checkerRoot = root;
+const sourceVersion = JSON.parse(readFileSync(join(root, 'projects/ngx-material-legacy/package.json'), 'utf8')).version;
+const sourceLine = sourceVersion.startsWith('21.') ? '21.x' : 'main';
+const otherLine = sourceLine === 'main' ? '21.x' : 'main';
 const failures = [];
 
 function expect(name, condition, detail = '') {
@@ -26,7 +30,7 @@ function expect(name, condition, detail = '') {
 }
 
 function git(args) {
-  const result = spawnSync('git', args, {cwd: root, encoding: 'utf8'});
+  const result = spawnSync('git', ['-c', 'gc.auto=0', '-c', 'maintenance.auto=0', ...args], {cwd: checkerRoot, encoding: 'utf8'});
   if (result.status !== 0) throw new Error(result.stderr || `git ${args.join(' ')} failed`);
   return result.stdout.trim();
 }
@@ -61,7 +65,7 @@ function writePackage(scratch, mutate) {
 
 function runChecker(tarball, env = {}) {
   return spawnSync(process.execPath, ['scripts/check-packed-exports.mjs', '--tarball', tarball], {
-    cwd: root,
+    cwd: checkerRoot,
     encoding: 'utf8',
     env: {...process.env, ...env},
   });
@@ -69,6 +73,19 @@ function runChecker(tarball, env = {}) {
 
 const base = mkdtempSync(join(tmpdir(), 'packed-exports-'));
 try {
+  // A tiny committed checker checkout keeps identity tests independent of the
+  // developer's working-tree edits. These packages never qualify a release.
+  checkerRoot = join(base, 'checker-source');
+  for (const path of ['scripts/check-packed-exports.mjs',
+    'compatibility/rc/matrices/library-exports.json', 'projects/ngx-material-legacy/package.json']) {
+    const destination = join(checkerRoot, path);
+    mkdirSync(dirname(destination), {recursive: true});
+    copyFileSync(join(root, path), destination);
+  }
+  git(['init', '--quiet']);
+  git(['add', '.']);
+  git(['-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid',
+    '-c', 'commit.gpgsign=false', 'commit', '--quiet', '-m', 'Synthetic checker fixture']);
   const intactDir = join(base, 'intact');
   const intactTar = writePackage(intactDir, null);
   const standalone = runChecker(intactTar);
@@ -123,7 +140,8 @@ try {
     run_id: 'packed-exports-regression',
     source_commit: commit,
     source_tree: tree,
-    source_line: 'main',
+    source_line: sourceLine,
+    source_clean: true,
     matrix_sha256: 'a'.repeat(64),
     input_clean: true,
   };
@@ -148,19 +166,30 @@ try {
   expect('assertion is not package.json', !readFileSync(assertionPath).equals(packageBytes));
   expect('every case passed in the assertion', assertion.cases.every(item => item.result === 'pass'));
 
-  const out21 = join(base, 'run-21x', 'evidence', 'packed-exports', invocation);
-  mkdirSync(out21, {recursive: true});
-  const binding21 = {...binding, source_line: '21.x', run_id: 'packed-exports-regression-21x'};
-  const accepted21 = runChecker(intactTar, {
-    ...coordEnv,
-    RC_RUN_ID: binding21.run_id,
-    RC_EVIDENCE_BINDING: JSON.stringify(binding21),
-    RC_ASSERTION_OUTPUT_DIR: out21,
-  });
-  expect('coordinator accepts intact package on 21.x', accepted21.status === 0, accepted21.stderr);
-  const report21 = JSON.parse(readFileSync(join(base, 'run-21x', 'reports/packed-exports.json'), 'utf8'));
-  expect('21.x coordinator report is complete', report21.coverage === 'complete' && report21.line === '21.x');
-
+  for (const [name, changed, detail] of [
+    ['foreign-line', {...binding, source_line: otherLine}, 'source line'],
+    ['unclean-binding', {...binding, source_clean: false}, 'clean'],
+    ['omitted-clean-binding', Object.fromEntries(Object.entries(binding).filter(([key]) => key !== 'source_clean')), 'clean'],
+  ]) {
+    const dir = join(base, name), out = join(dir, 'evidence', 'packed-exports', invocation);
+    mkdirSync(out, {recursive: true});
+    const rejected = runChecker(intactTar, {...coordEnv, RC_ASSERTION_OUTPUT_DIR: out,
+      RC_EVIDENCE_BINDING: JSON.stringify(changed)});
+    expect(name + ' exits2', rejected.status === 2, rejected.stderr);
+    expect(name + ' identifies source mismatch', rejected.stderr.includes(detail), rejected.stderr);
+    expect(name + ' writes no report', !existsSync(join(dir, 'reports/packed-exports.json')));
+    expect(name + ' writes no assertion', !existsSync(join(out, 'entrypoint-observations.json')));
+  }
+  const dirtyDir = join(base, 'dirty-source'), dirtyOut = join(dirtyDir, 'evidence', 'packed-exports', invocation);
+  mkdirSync(dirtyOut, {recursive: true});
+  const dirtyPath = join(checkerRoot, 'untracked-source.txt');
+  writeFileSync(dirtyPath, 'Uncommitted input\n');
+  const dirty = runChecker(intactTar, {...coordEnv, RC_ASSERTION_OUTPUT_DIR: dirtyOut});
+  expect('actual dirty source exits2', dirty.status === 2, dirty.stderr);
+  expect('actual dirty source diagnostic', dirty.stderr.includes('dirty'), dirty.stderr);
+  expect('actual dirty source writes no report', !existsSync(join(dirtyDir, 'reports/packed-exports.json')));
+  expect('actual dirty source writes no assertion', !existsSync(join(dirtyOut, 'entrypoint-observations.json')));
+  rmSync(dirtyPath);
   const rejectedDir = join(base, 'rejected-run');
   const rejectedOut = join(rejectedDir, 'evidence', 'packed-exports', invocation);
   mkdirSync(rejectedOut, {recursive: true});
