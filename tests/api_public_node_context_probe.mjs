@@ -54,6 +54,24 @@ try{
 assert.equal(fixture.component.hostView.destroyed,true);assert.equal(fixture.environment.destroyed,true);
 cases.push({id:'caller-view-and-environment-cleanup-is-idempotent',result:'pass'});
 
+class ProjectingOwner{destroyed=false;ngOnDestroy(){this.destroyed=true;}}
+core.Component({selector:'api-projecting-owner',standalone:true,template:'<article><ng-content></ng-content></article>'})(ProjectingOwner);
+const projected=await createPublicFactoryContext(core,load,{parentHost:{tag:'api-projecting-owner',imports:[ProjectingOwner],token:ProjectingOwner}});
+try{
+ assert.ok(projected.parentNode.owner instanceof ProjectingOwner);
+ assert.equal(projected.parentNode.injector.get(ProjectingOwner,undefined,{self:true}),projected.parentNode.owner);
+ assert.equal(projected.element.injector.get(ProjectingOwner),projected.parentNode.owner);
+ assert.equal(projected.element.injector.get(ProjectingOwner,null,{self:true,optional:true}),null);
+ assert.notEqual(projected.parentNode.element.nativeElement,projected.element.element.nativeElement);
+ assert.equal(projected.element.element.nativeElement.parentElement.nodeName,'ARTICLE');
+ const view=projected.element.container.createEmbeddedView(projected.template.template,{});
+ assert.equal(view.destroyed,false);view.destroy();
+ assert.equal(projected.parentNode.owner.destroyed,false);
+ cases.push({id:'actual-parent-component-projection-and-container-anchor',result:'pass'});
+}finally{projected.close();}
+assert.equal(projected.parentNode.owner.destroyed,true);
+cases.push({id:'actual-parent-destroyed-only-by-caller-cleanup',result:'pass'});
+
 const sourceFiles=['legacy-autocomplete/autocomplete-origin.ts','legacy-autocomplete/internal/autocomplete-origin-base.ts'];
 const temporary=mkdtempSync(join(tmpdir(),'api-real-source-node-'));
 try{

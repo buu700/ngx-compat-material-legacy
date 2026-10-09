@@ -13,6 +13,8 @@ import {attributeFactoryContract,executeAttributeFactory,challengeAttributeDetec
 import {partitionPublicConstructorRequests} from './api-public-constructor-internals.mjs';
 import {ownedMotionProfile,partitionOwnedSelectMotion} from './api-owned-motion-context.mjs';
 import {originalPublicParentTokenRole} from './api-public-parent-token-role.mjs';
+import {captureFactoryConstructorInputs} from './api-factory-constructor-inputs.mjs';
+import {requiredParentFactoryProfile,observeRequiredParentInputs} from './api-required-parent-context.mjs';
 
 // verify-lite imports the checker before node_modules exists. Load Angular
 // only when a packed factory is actually executed.
@@ -68,7 +70,8 @@ function isOriginalModule(symbol){
 }
 
 export async function observePublicNodeFactory(value,core,packageRoot,symbol,symbols,importModule){
-  let fixture,factory,parentExecution;
+  let fixture,factory,parentExecution,requiredParent,requiredParentType,requiredParentToken,requiredParentCapture;
+  let requiredParentDestroyed=false,parentLifetimeSubscription;
   let nodeKind=null;
   const modules=[],behaviorProblems=[];
   try{
@@ -84,6 +87,20 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
     const attributes=parameters.filter(p=>p.attribute);
     const usesTemplate=parameters.some(p=>p.spec==='@angular/core'&&p.imported==='TemplateRef');
     nodeKind=usesTemplate?'template':'element';
+    requiredParent=requiredParentFactoryProfile(symbol);
+    let parentHost;
+    if(requiredParent){
+      if(usesTemplate||attributes.length)throw Error('required parent profile has an unsupported node contract');
+      const owned=await loadRuntimeModule(packageRoot,symbol.family,'primary');
+      requiredParentType=owned?.[requiredParent.owner_export];
+      requiredParentToken=requiredParent.token_spec
+        ?(await importModule(requiredParent.token_spec))[requiredParent.token_export]:owned?.[requiredParent.token_export];
+      const ownerModule=owned?.[requiredParent.owner_module];
+      if(typeof requiredParentType!=='function'||typeof requiredParentToken!=='function'||typeof ownerModule!=='function')
+        throw Error('required parent public identities missing');
+      parentHost={tag:requiredParent.parent_tag,attributes:requiredParent.parent_attributes,
+        imports:[ownerModule],token:requiredParentToken};
+    }
     let attributeContract,parentContract,parentType,parentAlias,parentSymbol;
     if(attributes.length){
       if(usesTemplate)throw Error('attribute/template combination remains unsupported');
@@ -115,6 +132,7 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
     }
     fixture=await createPublicFactoryContext(core,importModule,
       {providers:modules.length?[core.importProvidersFrom(...modules.map(m=>m.value))]:[],
+       ...(parentHost?{parentHost}:{}),
        ...(parentContract?{parentProviders:[{provide:parentType,useFactory:()=>{
          parentExecution=executeAttributeFactory(parentType,core,parentContract,
            {injector:core.inject(core.Injector),element:core.inject(core.ElementRef)},runFactory);
@@ -122,9 +140,17 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
          return parentExecution.value;
        }},{provide:parentAlias,useExisting:parentType}]}:{}),
        ...(attributeContract?{nodeFactory:node=>{factory=executeAttributeFactory(value,core,attributeContract,node,runFactory);return factory.value;}}:{})});
+    if(requiredParent?.owner_export==='MatLegacyChip')
+      parentLifetimeSubscription=fixture.parentNode.owner.destroyed.subscribe(()=>{requiredParentDestroyed=true;});
     if(!attributeContract){
       const injector=(usesTemplate?fixture.template:fixture.element).injector;
-      factory=runFactory(value.ɵfac,core.Injector,core.runInInjectionContext,{injector,captureStack:true});
+      factory=runFactory(requiredParent?()=>captureFactoryConstructorInputs(value):value.ɵfac,
+        core.Injector,core.runInInjectionContext,{injector,captureStack:true});
+      if(requiredParent&&factory.outcome==='returned'){
+        requiredParentCapture=factory.value;factory.value=requiredParentCapture.value;
+        factory.requiredParentContext=observeRequiredParentInputs(requiredParent,requiredParentCapture,
+          fixture,requiredParentType,requiredParentToken,core);
+      }
       if(factory.outcome==='returned'){
         const partition=partitionPublicConstructorRequests(factory.requests,core,runFactory,injector);
         factory.requests=partition.requests;factory.peerConstructorPartition=partition.observation;
@@ -146,6 +172,15 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
     if(fixture.component.hostView.destroyed)behaviorProblems.push('owned factory destroyed the borrowed fixture view');
     if(fixture.element.destroyed||fixture.template.destroyed)behaviorProblems.push('owned factory destroyed borrowed Angular node probes');
     if(fixture.environment.destroyed)behaviorProblems.push('owned factory destroyed the caller environment');
+    if(requiredParent&&factory.outcome==='returned'){
+      if(requiredParentDestroyed||fixture.parentNode.destroyed||requiredParent.owner_export==='MatLegacySelectionList'
+        &&fixture.parentNode.owner._isDestroyed===true)behaviorProblems.push('owned factory destroyed the borrowed parent');
+      factory.requiredParentContext={...factory.requiredParentContext,
+        borrowed_parent_alive_after_child_teardown:!requiredParentDestroyed&&!fixture.parentNode.destroyed
+          &&!(requiredParent.owner_export==='MatLegacySelectionList'&&fixture.parentNode.owner._isDestroyed===true),
+        borrowed_nodes_alive_after_child_teardown:!fixture.component.hostView.destroyed&&!fixture.element.destroyed&&!fixture.template.destroyed,
+        borrowed_environment_alive_after_child_teardown:!fixture.environment.destroyed};
+    }
     if(parentContract&&factory.outcome==='returned'&&!behaviorProblems.length){
       if(!parentExecution||!(parentExecution.value instanceof parentType)
         ||fixture.element.injector.get(parentType)!==parentExecution.value
@@ -163,9 +198,10 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
     if(attributeContract&&factory.outcome==='returned'&&!behaviorProblems.length)
       challengeAttributeDetectorScopes(factory,fixture);
   }catch(error){
-    factory={requests:[],outcome:'threw',error:String(error?.message||error),value:undefined,
+    factory={requests:[],outcome:'threw',error:String(error?.message||error),errorStack:String(error?.stack||error),value:undefined,
       context:'public node/application context setup failed; no qualification'};
   }finally{
+    parentLifetimeSubscription?.unsubscribe();
     try{fixture?.close();}catch(error){behaviorProblems.push('caller fixture cleanup: '+String(error?.message||error));}
   }
   return {...factory,behaviorProblems,callerModules:modules.map(m=>m.symbol_id),nodeKind};
@@ -418,7 +454,7 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = [], i
         }
       }
     }
-    results.push({symbol, problems, runtime_context, factory_unresolved_provider_labels:observed.filter(request=>request.unresolved).map(request=>request.label), factory_outcome:factory.outcome, factory_error:factory.error, original_factory_kind:symbol.shape.originalFactory?.deps_kind ?? null, original_inherited_factory:symbol.shape.originalFactory?.inherited_factory?.name ?? null, effective_original_factory_kind:originalKind ?? null, factory_context:factory.context, factory_context_modules:factory.callerModules || [], factory_node_kind:factory.nodeKind || null, factory_constructor_evidence:factory.constructorEvidence || [], factory_compiler_observation:factory.compilerObservation || null, factory_peer_constructor_partition:factory.peerConstructorPartition || null, factory_parent_construction:factory.parentConstruction || null, factory_owned_motion_context:factory.ownedMotionContext || null, runtime_requests:observed.map((request,index)=>({...runtimeRequests[index],observation_evidence:request.evidence || 'public Injector request trace',observed_label:request.label,optional:Boolean(request.optional),self:Boolean(request.self),skipSelf:Boolean(request.skipSelf),host:Boolean(request.host),unresolved:Boolean(request.unresolved)})), factory_returned_owned_instance:factory.outcome==='returned' && (construction ? factory.behaviorProblems.length===0 : factory.value instanceof value), constructor_attributes:[...new Set(symbol.shape.originalFactoryContext ? symbol.shape.originalFactoryContext.factory_parameters?.filter(param=>param.attribute).map(param=>param.attribute) || [] : [...(symbol.shape.originalFactory?.inherited_factory?.attributes || []),...(symbol.shape.diParams || []).filter(param=>param.attribute).map(param=>param.attribute)])], observed: observed.map(item => `${item.label}${item.optional ? '?' : ''}`),
+    results.push({symbol, problems, runtime_context, factory_unresolved_provider_labels:observed.filter(request=>request.unresolved).map(request=>request.label), factory_outcome:factory.outcome, factory_error:factory.error, factory_error_stack:factory.errorStack||null, original_factory_kind:symbol.shape.originalFactory?.deps_kind ?? null, original_inherited_factory:symbol.shape.originalFactory?.inherited_factory?.name ?? null, effective_original_factory_kind:originalKind ?? null, factory_context:factory.context, factory_context_modules:factory.callerModules || [], factory_node_kind:factory.nodeKind || null, factory_constructor_evidence:factory.constructorEvidence || [], factory_compiler_observation:factory.compilerObservation || null, factory_peer_constructor_partition:factory.peerConstructorPartition || null, factory_parent_construction:factory.parentConstruction || null, factory_required_parent_context:factory.requiredParentContext || null, factory_owned_motion_context:factory.ownedMotionContext || null, runtime_requests:observed.map((request,index)=>({...runtimeRequests[index],observation_evidence:request.evidence || 'public Injector request trace',observed_label:request.label,optional:Boolean(request.optional),self:Boolean(request.self),skipSelf:Boolean(request.skipSelf),host:Boolean(request.host),unresolved:Boolean(request.unresolved)})), factory_returned_owned_instance:factory.outcome==='returned' && (construction ? factory.behaviorProblems.length===0 : factory.value instanceof value), constructor_attributes:[...new Set(symbol.shape.originalFactoryContext ? symbol.shape.originalFactoryContext.factory_parameters?.filter(param=>param.attribute).map(param=>param.attribute) || [] : [...(symbol.shape.originalFactory?.inherited_factory?.attributes || []),...(symbol.shape.diParams || []).filter(param=>param.attribute).map(param=>param.attribute)])], observed: observed.map(item => `${item.label}${item.optional ? '?' : ''}`),
       ...(construction ? {approved_construction: {profile_id: construction.profile_id,
         contract_sha256: construction.contract_sha256, context: factory.context,
         behavior_problems: factory.behaviorProblems, counts: factory.counts,

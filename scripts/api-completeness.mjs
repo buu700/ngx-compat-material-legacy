@@ -38,6 +38,7 @@ import {TABLE_SYMBOL, approvedTableContract, tableConstructionObservationComplet
 import {RIPPLE_SYMBOL,approvedRippleContract} from './ripple-construction-contract.mjs';
 import {rippleFactoryObservationProblems} from './api-ripple-factory.mjs';
 import {publicParentTokenRoleObservationProblems} from './api-public-parent-token-role.mjs';
+import {requiredParentContextObservationProblems} from './api-required-parent-context.mjs';
 
 // verify-lite imports this module before node_modules exists. Load the parser
 // on first use so compareContracts can be unit-tested without typescript.
@@ -472,6 +473,7 @@ if (isMain) {
       caller_modules: item.factory_context_modules || [],
       node_kind: item.factory_node_kind || null,
       runtime_requests: item.runtime_requests || [],
+      required_parent_context: item.factory_required_parent_context || null,
       constructor_attributes: item.constructor_attributes || [],
       observed: item.observed,
       original_factory_kind: item.original_factory_kind ?? null,
@@ -502,7 +504,7 @@ if (isMain) {
 }
 
 export function settleDi(row, records) {
-  row={...row,problems:[...row.problems,...publicParentTokenRoleObservationProblems(row)]};
+  row={...row,problems:[...row.problems,...publicParentTokenRoleObservationProblems(row),...requiredParentContextObservationProblems(row)]};
   if(row.symbol.symbol_id===RIPPLE_SYMBOL){
     const contract=approvedRippleContract(row.symbol),problems=[...row.problems,...rippleFactoryObservationProblems(row,contract)];
     return {...row,problems,result:problems.length?'fail':'pass',status:problems.length?'mismatch':'intentional-legacy-difference',
@@ -656,6 +658,7 @@ function writeAcceptance(request, surface, groups, declared, diSettled, summary,
           constructor_evidence:di.factory_constructor_evidence||[],compiler_observation:di.factory_compiler_observation||null,
           peer_constructor_partition:di.factory_peer_constructor_partition||null,
           parent_construction:di.factory_parent_construction||null,
+          required_parent_context:di.factory_required_parent_context||null,
           owned_motion_context:di.factory_owned_motion_context||null,
           historical:di.historical,owned:di.owned,constructor_attributes:di.constructor_attributes||[],
           ...(di.approved_construction?{approved_construction:di.approved_construction}:{})}:null});

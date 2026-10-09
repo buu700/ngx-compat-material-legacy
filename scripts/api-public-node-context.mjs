@@ -42,7 +42,14 @@ function renderer(core,document){
   createText(value){return{nodeType:3,textContent:value,parentNode:null};}
   createComment(value){return{nodeType:8,textContent:value,parentNode:null};}
   appendChild(parent,child){parent.appendChild(child);}
-  insertBefore(parent,child,next){parent.insertBefore(child,next);}
+  insertBefore(parent,child,next){
+   // Angular can request a container anchor before content projection attaches
+   // its host. The public DOM renderer accepts a null parent at that point.
+   if(parent){
+    if(next!=null&&next.parentNode!==parent)throw Error('fixture insertion reference belongs to another parent');
+    parent.insertBefore(child,next);
+   }
+  }
   removeChild(parent,child){parent.removeChild(child);}
   selectRootElement(target){if(typeof target==='string')throw Error('fixture requires an explicit host element');return target;}
   parentNode(target){return target.parentNode;}
@@ -59,8 +66,8 @@ function renderer(core,document){
  };
 }
 
-function fixtureDefinitions(core,{nodeFactory,attributes={},parentProviders=[]}={}){
- const cacheable=!nodeFactory&&Object.keys(attributes).length===0&&parentProviders.length===0;
+function fixtureDefinitions(core,{nodeFactory,attributes={},parentProviders=[],parentHost}={}){
+ const cacheable=!nodeFactory&&Object.keys(attributes).length===0&&parentProviders.length===0&&!parentHost;
  if(cacheable&&definitions.has(core))return definitions.get(core);
  const scopeToken=new core.InjectionToken('API fixture node scope');
  const parentValue={scope:'parent'},childValue={scope:'child'};
@@ -69,6 +76,7 @@ function fixtureDefinitions(core,{nodeFactory,attributes={},parentProviders=[]}=
   destroyed=false;
   injector=core.inject(core.Injector);
   element=core.inject(core.ElementRef);
+  owner=parentHost?core.inject(parentHost.token,{self:true}):null;
   ngOnDestroy(){this.destroyed=true;}
  }
  core.Directive({selector:'[apiFactoryParent]',standalone:true,
@@ -99,12 +107,17 @@ function fixtureDefinitions(core,{nodeFactory,attributes={},parentProviders=[]}=
  core.ViewChild(Parent)(Host.prototype,'parent');
  core.ViewChild(ElementProbe)(Host.prototype,'element');
  core.ViewChild(TemplateProbe)(Host.prototype,'template');
- const literalAttributes=Object.entries(attributes).map(([name,value])=>{
-  if(!/^[a-z][a-z0-9-]*$/.test(name)||typeof value!=='string')throw Error('invalid fixture literal attribute');
+ const serializeAttributes=(values,pattern)=>Object.entries(values).map(([name,value])=>{
+  if(!pattern.test(name)||typeof value!=='string')throw Error('invalid fixture literal attribute');
   return ' '+name+'="'+value.replaceAll('&','&amp;').replaceAll('"','&quot;').replaceAll('<','&lt;').replaceAll('>','&gt;')+'"';
  }).join('');
- core.Component({selector:'api-factory-host-'+fixtureId++,standalone:true,imports:[Parent,ElementProbe,TemplateProbe],
-  template:'<section apiFactoryParent><div apiFactoryElement'+literalAttributes+'></div><ng-template apiFactoryTemplate></ng-template></section>'})(Host);
+ const literalAttributes=serializeAttributes(attributes,/^[a-z][a-z0-9-]*$/);
+ const parentTag=parentHost?.tag||'section';
+ if(!/^[a-z][a-z0-9-]*$/.test(parentTag))throw Error('invalid fixture parent tag');
+ const parentAttributes=serializeAttributes(parentHost?.attributes||{},/^[a-zA-Z][a-zA-Z0-9-]*$/);
+ core.Component({selector:'api-factory-host-'+fixtureId++,standalone:true,
+  imports:[Parent,ElementProbe,TemplateProbe,...(parentHost?.imports||[])],
+  template:'<'+parentTag+' apiFactoryParent'+parentAttributes+'><div apiFactoryElement'+literalAttributes+'></div><ng-template apiFactoryTemplate></ng-template></'+parentTag+'>'})(Host);
  const result={Host,scopeToken,parentValue,childValue};if(cacheable)definitions.set(core,result);return result;
 }
 
@@ -113,7 +126,7 @@ function fixtureDefinitions(core,{nodeFactory,attributes={},parentProviders=[]}=
  * TemplateRef. Providers are caller-supplied public module/configuration values;
  * missing services propagate. There is no private token discovery or fallback.
  */
-export async function createPublicFactoryContext(core,importModule,{providers=[],nodeFactory,attributes={},parentProviders=[]}={}){
+export async function createPublicFactoryContext(core,importModule,{providers=[],nodeFactory,attributes={},parentProviders=[],parentHost}={}){
  const {BrowserModule}=await importModule('@angular/platform-browser');
  const document=Object.assign(new EventTarget(),{activeElement:null,defaultView:null,doctype:{},
   createElement(name){return node(name,document);},
@@ -125,7 +138,7 @@ export async function createPublicFactoryContext(core,importModule,{providers=[]
   const found=[];const visit=element=>{if(element.classList?.contains(name))found.push(element);for(const child of element.children||[])visit(child);};
   visit(document.documentElement);return found;
  };
- const fixtureRenderer=renderer(core,document),defs=fixtureDefinitions(core,{nodeFactory,attributes,parentProviders});
+ const fixtureRenderer=renderer(core,document),defs=fixtureDefinitions(core,{nodeFactory,attributes,parentProviders,parentHost});
  let parent,environment,component,closed=false;
  const close=()=>{
   if(closed)return;closed=true;
