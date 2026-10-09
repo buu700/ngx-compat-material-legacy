@@ -5,6 +5,7 @@ import {isAbsolute,join,relative} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {measureM2PeerProgram,peerMeasurementMatches} from './sass-current-companion-peer.mjs';
 import {measureOrderedCorePeer,orderedCoreExpectedCss} from './sass-ordered-core-contract.mjs';
+import {insertRippleColorInExpectedModel,rippleColorMeasurementOkay} from './sass-ripple-color-contract.mjs';
 const sha=b=>createHash('sha256').update(b).digest('hex'),equal=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 const catalog=JSON.parse(readFileSync(new URL('../fixtures/sass/ordered-aggregate-contracts.json',import.meta.url)));
 const id='06-aggregate-and-companions',entry=catalog.cases[id],source=catalog.fixture_source;
@@ -106,9 +107,11 @@ export function orderedAggregateExpectedCss(peers,line){
   const core=orderedCoreExpectedCss('02-core',peers.core),parts=Object.fromEntries(groups.map(g=>[g,members(g,peers[g],line)]));
   if(core===null||Object.values(parts).some(p=>p===null))return null;
   const light=themeModel('light',parts.light),dark=themeModel('dark',parts.dark);if(light===null||dark===null)return null;
-  return core+'\n'+[light,dark,catalog.parts.panel+'\n\n'+parts.panel.expansion].join('\n\n');
+  const css=core+'\n'+[light,dark,catalog.parts.panel+'\n\n'+parts.panel.expansion].join('\n\n');
+  return insertRippleColorInExpectedModel(id,css,peers.light,{aggregate:true});
 }
 export function orderedAggregateMeasurementOk(m,line){
+  if(!rippleColorMeasurementOkay(id,m,line))return false;
   if(!Object.hasOwn(catalog.peer_inputs,line)||m?.line!==line||m.program_sha256!==entry.program_sha256||typeof m.css!=='string'
     ||m.css_sha256!==sha(m.css)||m.css_bytes!==Buffer.byteLength(m.css)||typeof m.sass_version!=='string'||!m.sass_version.startsWith('dart-sass\t1.104.1\t'))return false;
   const ss=m.sources;if(!Array.isArray(ss)||!ss.length||ss.some(s=>!Number.isInteger(s.root)||![0,1,2].includes(s.root)||typeof s.path!=='string'||!s.path||s.path.startsWith('/')||s.path.includes('\\')||s.path.split('/').includes('..')||!/^[0-9a-f]{64}$/.test(s.sha256)||!Number.isInteger(s.bytes)||s.bytes<1)||new Set(ss.map(s=>`${s.root}/${s.path}`)).size!==ss.length)return false;

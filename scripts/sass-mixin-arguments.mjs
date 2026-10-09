@@ -14,6 +14,7 @@ import {measureAggregateDensityPeers,aggregateDensityResultsMatch,AGGREGATE_DENS
 import {measureAggregateTypographyPeer,aggregateTypographyResultsMatch,AGGREGATE_TYPOGRAPHY_CASES} from './sass-aggregate-typography-contract.mjs';
 import {measureAggregateColorThemePeer,aggregateColorThemeResultsMatch,AGGREGATE_COLOR_THEME_CASES} from './sass-aggregate-color-theme-contract.mjs';
 import {FORM_FIELD_STATE_ARGUMENT_CASES,FORM_FIELD_STATE_CONTRACT,measureFormFieldStatePeer,formFieldStateArgumentResultsMatch} from './sass-form-field-state-contract.mjs';
+import {RIPPLE_COLOR_ARGUMENT_CASES,RIPPLE_COLOR_BINDING_CASES,RIPPLE_COLOR_CONTRACT,measureRippleColorPeer,rippleColorArgumentResultsMatch} from './sass-ripple-color-contract.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 export const MIXIN_ARGUMENT_CATALOG='fixtures/sass/mixin-argument-contracts.json';
@@ -79,7 +80,11 @@ export function runMixinArgumentContracts({sass,entry,loadPaths,allowedRoots,imp
     try {
       expected=measureMixinArgument(sass,referenceEntry,[referenceRoot],catalog,probe,[referenceRoot]);
       actual=measureMixinArgument(sass,entry,loadPaths,catalog,probe,allowedRoots,importers);
-      if (Object.hasOwn(FORM_FIELD_STATE_ARGUMENT_CASES,probe.case_id)) {
+      if(Object.hasOwn(RIPPLE_COLOR_BINDING_CASES,probe.case_id))actual={...actual,line,sass_version:sass.info};
+      if (Object.hasOwn(RIPPLE_COLOR_ARGUMENT_CASES,probe.case_id)) {
+        const peer=measureRippleColorPeer({sass,materialRoot:allowedRoots[1],cdkRoot:allowedRoots[2],caseId:probe.case_id,line});
+        current_companion={classification:'conforming-current-companion',contract:RIPPLE_COLOR_CONTRACT,peer};
+      } else if (Object.hasOwn(FORM_FIELD_STATE_ARGUMENT_CASES,probe.case_id)) {
         const peer=measureFormFieldStatePeer({sass,materialRoot:allowedRoots[1],cdkRoot:allowedRoots[2],caseId:probe.case_id,line});
         current_companion={classification:'conforming-current-companion',contract:FORM_FIELD_STATE_CONTRACT,peer};
       } else if (Object.hasOwn(SORT_COMPANION_CASES,probe.case_id)) {
@@ -113,7 +118,9 @@ export function runMixinArgumentContracts({sass,entry,loadPaths,allowedRoots,imp
     }catch(caught){error=String(caught.message || caught);}
     const wrongCss=(actual?.css || '')+'\n.wrong-nonempty-mixin { color: red; }\n';
     const mutation={css:wrongCss,css_sha256:sha(wrongCss),css_bytes:Buffer.byteLength(wrongCss)};
-    const conforms=value=>Object.hasOwn(FORM_FIELD_STATE_ARGUMENT_CASES,probe.case_id)
+    const conforms=value=>Object.hasOwn(RIPPLE_COLOR_ARGUMENT_CASES,probe.case_id)
+      ? rippleColorArgumentResultsMatch(probe.case_id,expected,{...actual,...value},current_companion)
+      : Object.hasOwn(FORM_FIELD_STATE_ARGUMENT_CASES,probe.case_id)
       ? formFieldStateArgumentResultsMatch(probe.case_id,expected,value,current_companion?.peer)
       : Object.hasOwn(SORT_COMPANION_CASES,probe.case_id)
       ? sortCompanionResultsMatch(probe.case_id,expected,value,current_companion?.peer)
@@ -126,7 +133,7 @@ export function runMixinArgumentContracts({sass,entry,loadPaths,allowedRoots,imp
       : Object.hasOwn(BADGE_SHAPE_CASES,probe.case_id)
       ? badgeShapeResultsMatch(probe.case_id,expected,value,current_companion?.peer)
       : Object.hasOwn(AGGREGATE_COLOR_THEME_CASES,probe.case_id)
-      ? aggregateColorThemeResultsMatch(probe.case_id,expected,value,current_companion?.peer)
+      ? aggregateColorThemeResultsMatch(probe.case_id,expected,{...actual,...value},current_companion?.peer)
       : Object.hasOwn(AGGREGATE_TYPOGRAPHY_CASES,probe.case_id)
       ? aggregateTypographyResultsMatch(probe.case_id,expected,value,current_companion?.peer)
       : Object.hasOwn(AGGREGATE_DENSITY_CASES,probe.case_id)

@@ -5,6 +5,7 @@ import {join} from 'node:path';
 import {measureM2PeerProgram,peerMeasurementMatches} from './sass-current-companion-peer.mjs';
 import {ORIGINAL_CALENDAR_DENSITY,CURRENT_CALENDAR_FALLBACKS} from './sass-datepicker-controls-contract.mjs';
 import {FORM_FIELD_STATE_AGGREGATE_CASES,insertFormFieldStateInAggregate} from './sass-form-field-state-contract.mjs';
+import {RIPPLE_COLOR_BINDING_CASES,insertRippleColorInExpectedModel,rippleColorMeasurementOkay} from './sass-ripple-color-contract.mjs';
 const sha=b=>createHash('sha256').update(b).digest('hex');
 const catalog=JSON.parse(readFileSync(new URL('../fixtures/sass/default-aggregate-contracts.json',import.meta.url)));
 const raw=readFileSync(new URL('../compatibility/rc/oracles/material-16.2.14-sass-api.json',import.meta.url)),oracle=JSON.parse(raw);
@@ -117,9 +118,11 @@ export function defaultAggregateExpectedCss(id,peer){
     ||peer.cdk_version!==peer.peer_version||peer.cdk_version!==inputs.cdk_version||peer.cdk_package_json_sha256!==inputs.cdk_package_json_sha256||peer.sources.length!==inputs.sources.length||peer.sources.some(s=>!sourceSets[peer.line].has(JSON.stringify([s.root,s.path,s.sha256,s.bytes]))))return null;
   const p=members(peer.css,profile.public_families);if(!p)return null;const o=Object.fromEntries(Object.entries(profile.originals).map(([f,m])=>[f,m.css]));
   const css=profile.dimension==='density'?densityModel(e.original_css,o,p):profile.dimension==='typography'?typographyModel(e.original_css,o,p):colorThemeModel(e.original_css,o,p,e);
-  return Object.hasOwn(FORM_FIELD_STATE_AGGREGATE_CASES,id)?insertFormFieldStateInAggregate(id,css,peer):css;
+  const withState=Object.hasOwn(FORM_FIELD_STATE_AGGREGATE_CASES,id)?insertFormFieldStateInAggregate(id,css,peer):css;
+  return Object.hasOwn(RIPPLE_COLOR_BINDING_CASES,id)?insertRippleColorInExpectedModel(id,withState,peer,{aggregate:true}):withState;
 }
 export function defaultAggregateMeasurementOk(id,m,line){
+  if(Object.hasOwn(RIPPLE_COLOR_BINDING_CASES,id)&&!rippleColorMeasurementOkay(id,m,line))return false;
   const e=DEFAULT_AGGREGATE_CASES[id];if(!e||!Object.hasOwn(catalog.peer_inputs,line)||m?.line!==line||m.program_sha256!==e.program_sha256||typeof m.css!=='string'||m.css_sha256!==sha(m.css)||m.css_bytes!==Buffer.byteLength(m.css)||typeof m.sass_version!=='string'||!m.sass_version.startsWith('dart-sass\t1.104.1\t'))return false;
   const ss=m.sources;if(!Array.isArray(ss)||!ss.length||ss.some(s=>!Number.isInteger(s.root)||![0,1,2].includes(s.root)||typeof s.path!=='string'||!s.path||s.path.startsWith('/')||s.path.includes('\\')||s.path.split('/').includes('..')||!/^[0-9a-f]{64}$/.test(s.sha256)||!Number.isInteger(s.bytes)||s.bytes<1)||new Set(ss.map(s=>`${s.root}/${s.path}`)).size!==ss.length)return false;
   if(id==='mixin-css/private-all-legacy-component-densities'&&!ss.some(s=>s.root===0&&s.path===e.source_path&&s.sha256===privateMembership.sha256&&s.bytes===privateMembership.bytes))return false;

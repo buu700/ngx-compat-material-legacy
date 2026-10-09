@@ -3,6 +3,7 @@ import hashlib,json,re
 from pathlib import Path
 from sass_current_companion_admission import peer_measurement_ok
 from sass_ordered_core_admission import ordered_core_expected_css
+from sass_ripple_color_admission import insert_ripple_color_in_expected_model, ripple_color_measurement_ok
 ROOT=Path(__file__).resolve().parents[1]
 _CATALOG=json.loads((ROOT/'fixtures/sass/ordered-aggregate-contracts.json').read_bytes())
 ORDERED_AGGREGATE_CASES=_CATALOG['cases']
@@ -115,10 +116,12 @@ def ordered_aggregate_expected_css(peers,line):
         if core is None or any(p is None for p in parts.values()):return None
         light=_theme_model('light',parts['light']);dark=_theme_model('dark',parts['dark'])
         if light is None or dark is None:return None
-        return core+'\n'+'\n\n'.join([light,dark,_CATALOG['parts']['panel']+'\n\n'+parts['panel']['expansion']])
+        css=core+'\n'+'\n\n'.join([light,dark,_CATALOG['parts']['panel']+'\n\n'+parts['panel']['expansion']])
+        return insert_ripple_color_in_expected_model('06-aggregate-and-companions',css,peers['light'],aggregate=True)
     except (KeyError,TypeError,ValueError,AttributeError):return None
 
 def ordered_aggregate_assertion_ok(body):
+    if not ripple_color_measurement_ok('06-aggregate-and-companions',body.get('actual_measurement'),body.get('line')):return False
     try:
         if body['case_id']!=_CASE or 'current_infrastructure' in body:return False
         line=body['line'];m=body['actual_measurement'];c=body['current_companion'];e=_ENTRY

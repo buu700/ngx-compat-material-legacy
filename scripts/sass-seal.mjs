@@ -36,6 +36,7 @@ import {DEFAULT_COMPANION_CASES,DEFAULT_COMPANION_CONTRACT,measureDefaultCompani
 import {DEFAULT_MAPPED_COMPANION_CASES,DEFAULT_MAPPED_COMPANION_CONTRACT,measureDefaultMappedCompanionPeer,defaultMappedCompanionMeasurementOk} from './sass-default-mapped-companion-contract.mjs';
 import {DEFAULT_AGGREGATE_CASES,DEFAULT_AGGREGATE_CONTRACT,measureDefaultAggregatePeer,defaultAggregateMeasurementOk} from './sass-default-aggregate-contract.mjs';
 import {FORM_FIELD_STATE_DEFAULT_CASES,FORM_FIELD_STATE_CONTRACT,measureFormFieldStatePeer,formFieldStateDefaultMeasurementOk} from './sass-form-field-state-contract.mjs';
+import {RIPPLE_COLOR_DEFAULT_CASES,RIPPLE_COLOR_CONTRACT,measureRippleColorPeer,rippleColorMeasurementOkay} from './sass-ripple-color-contract.mjs';
 import {ownedStyleCaseIds, renderOwnedStyles} from './sass-owned-rendered.mjs';
 import {coordinatorRequest} from './packed-consumer-evidence.mjs';
 import {spawnSync} from 'node:child_process';
@@ -350,7 +351,7 @@ export function runSassApiCss({oracle, entryFile, loadPaths, allowedRoots, line 
     if(foreign.length){css[name]={error:`loaded outside the packed package and peers: ${foreign[0]}`};continue;}
     css[name]={css:compiled.css,sha256:sha256Text(compiled.css)};
     const caseId=`mixin-css/${name}`;
-    const defaultEntry=DEFAULT_CORE_CDK_CASES[caseId]||DEFAULT_COMPANION_CASES[caseId]||DEFAULT_MAPPED_COMPANION_CASES[caseId]||DEFAULT_AGGREGATE_CASES[caseId]||FORM_FIELD_STATE_DEFAULT_CASES[caseId];
+    const defaultEntry=DEFAULT_CORE_CDK_CASES[caseId]||DEFAULT_COMPANION_CASES[caseId]||DEFAULT_MAPPED_COMPANION_CASES[caseId]||DEFAULT_AGGREGATE_CASES[caseId]||FORM_FIELD_STATE_DEFAULT_CASES[caseId]||RIPPLE_COLOR_DEFAULT_CASES[caseId];
     if(defaultEntry){
       try{
         if(plan.call!==defaultEntry.call)throw Error('default invocation changed');
@@ -362,7 +363,11 @@ export function runSassApiCss({oracle, entryFile, loadPaths, allowedRoots, line 
         }).sort((a,b)=>a.root-b.root||a.path.localeCompare(b.path));
         const program="@use '__entry__' as m;\n"+standardThemeSource()+'\n'+plan.call+'\n';
         const actual_measurement={line,css:compiled.css,css_sha256:sha256Text(compiled.css),css_bytes:Buffer.byteLength(compiled.css),program_sha256:sha256Text(program),sass_version:sass.info,sources};
-        if(Object.hasOwn(FORM_FIELD_STATE_DEFAULT_CASES,caseId)){
+        if(Object.hasOwn(RIPPLE_COLOR_DEFAULT_CASES,caseId)){
+          if(!rippleColorMeasurementOkay(caseId,actual_measurement,line))throw Error('ripple color measurement incomplete');
+          const peer=measureRippleColorPeer({sass,materialRoot:bases[1],cdkRoot:bases[2],line,caseId});
+          css[name]={...css[name],actual_measurement,current_companion:{classification:'conforming-current-companion',contract:RIPPLE_COLOR_CONTRACT,peer}};
+        }else if(Object.hasOwn(FORM_FIELD_STATE_DEFAULT_CASES,caseId)){
           if(!formFieldStateDefaultMeasurementOk(caseId,actual_measurement,line))throw Error('form-field state measurement incomplete');
           const peer=measureFormFieldStatePeer({sass,materialRoot:bases[1],cdkRoot:bases[2],line,caseId});
           css[name]={...css[name],actual_measurement,current_companion:{classification:'conforming-current-companion',contract:FORM_FIELD_STATE_CONTRACT,peer}};

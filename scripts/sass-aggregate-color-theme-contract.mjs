@@ -5,6 +5,7 @@ import {SCENARIOS,themeSass,COMPANIONS} from './companion-bridge-peer-oracle.mjs
 import {measureM2PeerProgram,peerMeasurementMatches} from './sass-current-companion-peer.mjs';
 import {ORIGINAL_CALENDAR_DENSITY,CURRENT_CALENDAR_FALLBACKS} from './sass-datepicker-controls-contract.mjs';
 import {FORM_FIELD_STATE_AGGREGATE_CASES,insertFormFieldStateInAggregate} from './sass-form-field-state-contract.mjs';
+import {insertRippleColorInExpectedModel,rippleColorMeasurementOkay} from './sass-ripple-color-contract.mjs';
 const sha=s=>createHash('sha256').update(s).digest('hex');
 const catalog=JSON.parse(readFileSync(new URL('../fixtures/sass/aggregate-color-theme-contracts.json',import.meta.url)));
 const names=['all-component-colors','all-component-themes','all-legacy-component-colors','all-legacy-component-themes'];
@@ -99,9 +100,10 @@ export function aggregateColorThemeExpectedCss(caseId,original,peer){
   // Preserve the entire owned prefix and historical icon CSS. Only the
   // enumerated companion additions and expansion/grid parent boundary compose.
   const css=prefix+[badgeCss,added('bottom-sheet'),added('button-toggle'),datepicker,added('divider'),o.expansion+'\n\n'+expansion,o.icon,added('sidenav'),added('stepper'),sort,added('toolbar'),tree].join('\n');
-  return Object.hasOwn(FORM_FIELD_STATE_AGGREGATE_CASES,caseId)?insertFormFieldStateInAggregate(caseId,css,peer):css;
+  const withState=Object.hasOwn(FORM_FIELD_STATE_AGGREGATE_CASES,caseId)?insertFormFieldStateInAggregate(caseId,css,peer):css;
+  return insertRippleColorInExpectedModel(caseId,withState,peer,{aggregate:true});
 }
 export function aggregateColorThemeResultsMatch(caseId,original,actual,peer){
   const expected=aggregateColorThemeExpectedCss(caseId,original,peer);
-  return expected!==null && actual?.css===expected && actual.css_sha256===sha(actual.css) && actual.css_bytes===Buffer.byteLength(actual.css);
+  return expected!==null && rippleColorMeasurementOkay(caseId,actual,peer?.line) && actual?.css===expected && actual.css_sha256===sha(actual.css) && actual.css_bytes===Buffer.byteLength(actual.css);
 }

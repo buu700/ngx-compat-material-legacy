@@ -92,3 +92,39 @@ for case,e in _CATALOG['cases'].items():
     for line,p in e['peers'].items():
         ss=_CATALOG['peer_source_sets'][p['source_set']]
         if not peer_measurement_ok(dict(p,sources=ss),line,_sha(program),{}) or p['member_css']!=[s['scope']+' {\n  --mat-ripple-color: '+s['token']+';\n}' for s in e['slots']]:raise ValueError('public ripple override evidence changed')
+
+
+def ripple_color_original_measurement(case):
+    e=RIPPLE_COLOR_BINDING_CASES.get(case)
+    return dict(e['original'],sources=_CATALOG['original_source_sets'][e['original']['source_set']]) if e else None
+
+def ripple_color_default_assertion_ok(body):
+    try:
+        case=body['case_id'];e=RIPPLE_COLOR_DEFAULT_CASES[case];c=body['current_companion'];m=body['actual_measurement'];line=body['line']
+        if ('current_infrastructure' in body or body['comparison']!=RIPPLE_COLOR_CONTRACT or c['classification']!='conforming-current-companion' or c['contract']!=RIPPLE_COLOR_CONTRACT or c['peer']['line']!=line or body['expected_sha256']!=e['original']['css_sha256'] or type(body['expected_bytes']) is not int or body['expected_bytes']!=e['original']['css_bytes'] or body['actual_sha256']!=m['css_sha256'] or type(body['actual_bytes']) is not int or body['actual_bytes']!=m['css_bytes']):return False
+        return ripple_color_measurement_ok(case,m,line) and ripple_color_results_match(case,ripple_color_original_measurement(case),m,c['peer'])
+    except (KeyError,TypeError,ValueError,AttributeError):return False
+
+def ripple_color_argument_results_match(body):
+    try:
+        case=body['case_id'];c=body['current_companion'];line=body['line'];actual=body['actual']
+        if 'current_infrastructure' in body or (case not in RIPPLE_COLOR_ARGUMENT_CASES and case not in RIPPLE_COLOR_OWNED_CASES) or body['comparison']!='current-companion-contract' or c['classification']!='conforming-current-companion' or c['contract']!=RIPPLE_COLOR_CONTRACT or c['peer']['line']!=line:return False
+        return ripple_color_measurement_ok(case,actual,line) and ripple_color_results_match(case,body['expected'],actual,c['peer'])
+    except (KeyError,TypeError,ValueError,AttributeError):return False
+
+def ordered_ripple_color_assertion_ok(body):
+    try:
+        case=body['case_id'];e=RIPPLE_COLOR_ORDERED_CASES[case];m=body['actual_measurement'];c=body['current_companion'];line=body['line']
+        if ('current_infrastructure' in body or body['raw_status']!='blocked' or body['status']!='conforming-current-companion' or body['comparison']!=RIPPLE_COLOR_CONTRACT or c['classification']!='conforming-current-companion' or c['contract']!=RIPPLE_COLOR_CONTRACT or c['peer']['line']!=line or body['fixture']!=e['fixture'] or body['fixture_sha256']!=_sha((ROOT/e['fixture']).read_bytes()) or body['reference']!=e['reference'] or body['reference_sha256']!=e['original']['css_sha256'] or _sha((ROOT/e['reference']).read_bytes())!=e['original']['css_sha256'] or body['baseline_sha256']!=e['original']['css_sha256'] or body['candidate_sha256']!=m['css_sha256']):return False
+        return ripple_color_measurement_ok(case,m,line) and ripple_color_results_match(case,ripple_color_original_measurement(case),m,c['peer'])
+    except (KeyError,TypeError,ValueError,AttributeError):return False
+
+def ripple_color_envelope_ok(active,body,invocation,*,ordered=False):
+    try:
+        fields=dict(kind='assertion',check_id='sass-seal',group='ordered-css-dom' if ordered else 'sass-api-and-values',result='pass',exit_code=0,line=active.binding['source_line'],run_id=active.manifest['run_id'],invocation_id=invocation,binding=active.binding)
+        if not ordered:
+            fields.update(oracle='compatibility/rc/oracles/material-16.2.14-sass-api.json',oracle_sha256=next(i['sha256'] for i in _CATALOG['inputs'] if i['path']=='compatibility/rc/oracles/material-16.2.14-sass-api.json'))
+        if any(body.get(k)!=v or type(body.get(k))!=type(v) for k,v in fields.items()):return False
+        libraries=[a for a in active.manifest['artifacts'] if a['id']=='library']
+        return len(libraries)==1 and body['tarball_sha256']==libraries[0]['sha256'] and (ordered_ripple_color_assertion_ok(body) if ordered else ripple_color_default_assertion_ok(body))
+    except (KeyError,TypeError,ValueError,AttributeError):return False

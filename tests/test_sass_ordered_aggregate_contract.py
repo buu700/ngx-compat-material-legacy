@@ -84,14 +84,14 @@ for(const line of ['main','21.x']){
 
     def test_source_audit_excludes_only_the_authenticated_invocation_file(self):
         code=r'''
-import assert from 'node:assert/strict';import {mkdtempSync,mkdirSync,readFileSync,writeFileSync,rmSync} from 'node:fs';import {join,dirname} from 'node:path';import {tmpdir} from 'node:os';import {pathToFileURL} from 'node:url';
+import assert from 'node:assert/strict';import {mkdtempSync,mkdirSync,readFileSync,writeFileSync,copyFileSync,rmSync} from 'node:fs';import {join,dirname} from 'node:path';import {tmpdir} from 'node:os';import {pathToFileURL} from 'node:url';
 import {measureOrderedAggregate} from './scripts/sass-ordered-aggregate-contract.mjs';
 const f=JSON.parse(readFileSync('tests/sass_ordered_aggregate_fixture.json')),work=mkdtempSync(join(tmpdir(),'ordered-aggregate-source-audit-'));
 try{
  const roots=['owned','material','cdk'].map(n=>join(work,n));for(const p of roots)mkdirSync(p);
  const source=readFileSync('fixtures/sass/06-aggregate-and-companions.scss','utf8'),fixtureFile=join(work,'06.scss');writeFileSync(fixtureFile,source);
- const files=['_index.scss','styles/core/_core.scss','styles/core/theming/_theming.scss','styles/legacy-core/theming/_all-theme.scss','styles/bridges/_companion-overrides.scss'].map(n=>join(roots[0],n));
- for(const p of files){mkdirSync(dirname(p),{recursive:true});writeFileSync(p,'// synthetic source-audit test only\n');}
+ const paths=['_index.scss','styles/core/_core.scss','styles/core/theming/_theming.scss','styles/legacy-core/theming/_all-theme.scss','styles/bridges/_companion-overrides.scss','styles/core/ripple/_ripple-theme.scss','styles/core/theming/_palette.scss','styles/core/density/private/_compatibility.scss','styles/core/style/_sass-utils.scss'],files=paths.map(n=>join(roots[0],n));
+ for(const [i,p] of files.entries()){mkdirSync(dirname(p),{recursive:true});copyFileSync(join('projects/ngx-material-legacy',paths[i]),p);}
  const saved=f.measurements.main,result={css:saved.css,loadedUrls:[fixtureFile,...files].map(p=>pathToFileURL(p))},args={source,fixtureFile,result,roots,sass:{info:saved.sass_version},line:'main'};
  assert.equal(measureOrderedAggregate(args).sources.length,files.length);
  const foreign=join(work,'foreign.scss');writeFileSync(foreign,'// foreign source\n');
