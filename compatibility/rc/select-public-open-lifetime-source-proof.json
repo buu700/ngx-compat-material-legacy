@@ -1,0 +1,857 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "recorded_at_utc": "2026-10-09T14:41:53.076668+00:00",
+  "source_head": "8a4e65cb1088835ed8fd47e841216f9615ef2348",
+  "role": "Public derived select open/zone-stability lifetime repair, three source lines; source prototype diagnostic only.",
+  "decision": "The real public derived open calls the base _canOpen predicate before geometry work. Include destruction in that predicate, cancel the existing zone-stability subscription on destruction, and require an open panel before font writes. No constructor, public signature, template, CSS/SCSS or peer-version change.",
+  "sources": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+      "sha256": "ba6f6790553271e0296608aaad77ef9f8392a3cc2c1c01b359142010e4d9218b"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.ts",
+      "sha256": "02d57dfbf5c9c6bda4791d0a4296a8caab323e50be64deeaf95a30a1a29a760f"
+    },
+    {
+      "path": "tests/select_public_open_lifetime_probe.mjs",
+      "sha256": "0423025d9ddfcc9f41124f10ba614a4f5bcb6ab12716780d2c5915d39b3fc2ac"
+    },
+    {
+      "path": "tests/test_menu_select_motion_runtime.py",
+      "sha256": "018bd8652c2dd7d6d77ff55fbc7df67b18c369b1e12de44c2c76c6d6c89e9bd1"
+    }
+  ],
+  "pre_repair_main": {
+    "schema_version": 1,
+    "line": "main",
+    "node": "v22.23.3",
+    "compiler": "6.0.3",
+    "source_sha256": {
+      "base": "2791f99c95619c86e942adee94d0f7e7d514acf2c7a4e53693e72efdcf633a34",
+      "public": "646feed749166b69b8ca5e2e33cd83628d4f34dd89b7209b64e6b2fb2e03bdaa"
+    },
+    "cases": [
+      {
+        "id": "public-open-measures-and-sets-font-once",
+        "result": "pass"
+      },
+      {
+        "id": "public-open-after-destroy-is-inert",
+        "result": "fail",
+        "error": "Expected values to be strictly equal:\n\n1 !== 0\n"
+      },
+      {
+        "id": "destroy-before-stable-unsubscribes-font-work",
+        "result": "fail",
+        "error": "Expected values to be strictly equal:\n\n1 !== 0\n"
+      },
+      {
+        "id": "close-before-stable-does-no-closed-panel-font-work",
+        "result": "fail",
+        "error": "Expected values to be strictly equal:\n\n1 !== 0\n"
+      },
+      {
+        "id": "disabled-and-empty-open-remain-inert",
+        "result": "pass"
+      }
+    ],
+    "failures": [
+      {
+        "id": "public-open-after-destroy-is-inert",
+        "result": "fail",
+        "error": "Expected values to be strictly equal:\n\n1 !== 0\n"
+      },
+      {
+        "id": "destroy-before-stable-unsubscribes-font-work",
+        "result": "fail",
+        "error": "Expected values to be strictly equal:\n\n1 !== 0\n"
+      },
+      {
+        "id": "close-before-stable-does-no-closed-panel-font-work",
+        "result": "fail",
+        "error": "Expected values to be strictly equal:\n\n1 !== 0\n"
+      }
+    ],
+    "mutations": [],
+    "scope": "Actual complete owned base and public derived prototype bodies, without constructors/decorators, with synthetic measurement/view/zone services and real borrowed RxJS streams. No Angular/browser/packed/floor qualification.",
+    "g11_claim": "not-passed"
+  },
+  "pre_repair_scope": "Three of five actual owned base/public derived prototype cases failed on main. No pre-repair21 run claimed.",
+  "post_repair": {
+    "schema_version": 1,
+    "line": "main",
+    "node": "v22.23.3",
+    "compiler": "6.0.3",
+    "source_sha256": {
+      "base": "ba6f6790553271e0296608aaad77ef9f8392a3cc2c1c01b359142010e4d9218b",
+      "public": "02d57dfbf5c9c6bda4791d0a4296a8caab323e50be64deeaf95a30a1a29a760f"
+    },
+    "cases": [
+      {
+        "id": "public-open-measures-and-sets-font-once",
+        "result": "pass"
+      },
+      {
+        "id": "public-open-after-destroy-is-inert",
+        "result": "pass"
+      },
+      {
+        "id": "destroy-before-stable-unsubscribes-font-work",
+        "result": "pass"
+      },
+      {
+        "id": "close-before-stable-does-no-closed-panel-font-work",
+        "result": "pass"
+      },
+      {
+        "id": "disabled-and-empty-open-remain-inert",
+        "result": "pass"
+      }
+    ],
+    "failures": [],
+    "mutations": [
+      {
+        "id": "remove-open-predicate-destroy-guard",
+        "intended_case": "public-open-after-destroy-is-inert",
+        "rejected": true
+      },
+      {
+        "id": "retain-stable-subscription-after-destroy",
+        "intended_case": "destroy-before-stable-unsubscribes-font-work",
+        "rejected": true
+      },
+      {
+        "id": "font-work-on-closed-panel",
+        "intended_case": "close-before-stable-does-no-closed-panel-font-work",
+        "rejected": true
+      }
+    ],
+    "scope": "Actual complete owned base and public derived prototype bodies, without constructors/decorators, with synthetic measurement/view/zone services and real borrowed RxJS streams. No Angular/browser/packed/floor qualification.",
+    "g11_claim": "not-passed"
+  },
+  "base_motion_post_repair": {
+    "schema_version": 1,
+    "line": "main",
+    "node": "v22.23.3",
+    "compiler": "6.0.3",
+    "source_sha256": {
+      "menu": "071cb5610d86c1aca401a3db581e1cc0f4a85b0857e0a1fc2a3c595635e99ba6",
+      "select": "ba6f6790553271e0296608aaad77ef9f8392a3cc2c1c01b359142010e4d9218b"
+    },
+    "helper_sha256": "8cf84411934f43287f6045dd146a8e42044a2d68d80587c31feeeb707b723667",
+    "families": {
+      "menu": [
+        {
+          "id": "enter-completes-once",
+          "result": "pass"
+        },
+        {
+          "id": "wrong-phase-enter-end-cannot-complete-exit",
+          "result": "pass"
+        },
+        {
+          "id": "reopen-rejects-captured-old-exit-fallback",
+          "result": "pass"
+        },
+        {
+          "id": "old-exit-cannot-complete-a-later-exit",
+          "result": "pass"
+        },
+        {
+          "id": "repeated-reset-replaces-fallback",
+          "result": "pass"
+        },
+        {
+          "id": "noop-close-before-open-completion",
+          "result": "pass"
+        },
+        {
+          "id": "noop-reopen-discards-earlier-phase-microtasks",
+          "result": "pass"
+        },
+        {
+          "id": "noop-latest-open-completes-after-between-phase-microtask",
+          "result": "pass"
+        },
+        {
+          "id": "destroy-discards-noop-microtask",
+          "result": "pass"
+        },
+        {
+          "id": "destroy-rejects-captured-fallback-and-late-events",
+          "result": "pass"
+        },
+        {
+          "id": "completion-observer-restarts-without-old-phase-clobber",
+          "result": "pass"
+        },
+        {
+          "id": "animation-start-after-completion-is-inert",
+          "result": "pass"
+        },
+        {
+          "id": "nested-and-unknown-native-events-are-inert",
+          "result": "pass"
+        }
+      ],
+      "select": [
+        {
+          "id": "enter-completes-once",
+          "result": "pass"
+        },
+        {
+          "id": "exit-fallback-detaches-once",
+          "result": "pass"
+        },
+        {
+          "id": "real-host-exit-event-cancels-fallback",
+          "result": "pass"
+        },
+        {
+          "id": "nested-exit-event-is-inert",
+          "result": "pass"
+        },
+        {
+          "id": "reopen-rejects-captured-old-exit-fallback",
+          "result": "pass"
+        },
+        {
+          "id": "old-exit-cannot-complete-a-later-exit",
+          "result": "pass"
+        },
+        {
+          "id": "destroy-cancels-fallback-and-no-late-view-work",
+          "result": "pass"
+        },
+        {
+          "id": "touched-callback-reopen-does-not-detach-new-panel",
+          "result": "pass"
+        },
+        {
+          "id": "touched-callback-reopen-leaves-no-exit-resources",
+          "result": "pass"
+        },
+        {
+          "id": "touched-callback-destroy-does-not-schedule-exit",
+          "result": "pass"
+        },
+        {
+          "id": "completion-is-last-old-phase-observable-work",
+          "result": "pass"
+        },
+        {
+          "id": "stale-position-receipt-after-close-does-no-work",
+          "result": "pass"
+        },
+        {
+          "id": "only-latest-reopened-position-receipt-settles",
+          "result": "pass"
+        },
+        {
+          "id": "destroy-before-position-receipt-cancels-work",
+          "result": "pass"
+        },
+        {
+          "id": "view-update-close-cancels-remaining-position-work",
+          "result": "pass"
+        },
+        {
+          "id": "noop-and-native-enter-completion-share-one-boundary",
+          "result": "pass"
+        },
+        {
+          "id": "multiple-enter-retains-historical-state-name",
+          "result": "pass"
+        }
+      ]
+    },
+    "scope": "Actual whole owned prototype method bodies, with constructor/decorator execution excluded. Deterministic timers, real Promise microtasks, Node EventTarget host events, borrowed RxJS7.8.2 streams, synthetic view/key/position services. No Angular constructor, public OverlayRef, browser, packed or full minimum runtime qualification.",
+    "g11_claim": "not-passed",
+    "failures": [],
+    "mutations": [
+      {
+        "family": "menu",
+        "id": "remove-request-sequence",
+        "intended_case": "old-exit-cannot-complete-a-later-exit",
+        "rejected": true
+      },
+      {
+        "family": "menu",
+        "id": "remove-current-phase",
+        "intended_case": "wrong-phase-enter-end-cannot-complete-exit",
+        "rejected": true
+      },
+      {
+        "family": "menu",
+        "id": "remove-start-destroy-guard",
+        "intended_case": "destroy-rejects-captured-fallback-and-late-events",
+        "rejected": true
+      },
+      {
+        "family": "menu",
+        "id": "remove-reset-destroy-guard",
+        "intended_case": "destroy-rejects-captured-fallback-and-late-events",
+        "rejected": true
+      },
+      {
+        "family": "menu",
+        "id": "retain-old-exit-timer",
+        "intended_case": "reopen-rejects-captured-old-exit-fallback",
+        "rejected": true
+      },
+      {
+        "family": "menu",
+        "id": "repeat-exit-timers",
+        "intended_case": "repeated-reset-replaces-fallback",
+        "rejected": true
+      },
+      {
+        "family": "menu",
+        "id": "do-not-complete-subject-on-destroy",
+        "intended_case": "destroy-discards-noop-microtask",
+        "rejected": true
+      },
+      {
+        "family": "menu",
+        "id": "late-state-write-after-notification",
+        "intended_case": "completion-observer-restarts-without-old-phase-clobber",
+        "rejected": true
+      },
+      {
+        "family": "select",
+        "id": "remove-enter-deduplication",
+        "intended_case": "enter-completes-once",
+        "rejected": true
+      },
+      {
+        "family": "select",
+        "id": "remove-exit-sequence",
+        "intended_case": "old-exit-cannot-complete-a-later-exit",
+        "rejected": true
+      },
+      {
+        "family": "select",
+        "id": "repeat-detached-exit-completion",
+        "intended_case": "exit-fallback-detaches-once",
+        "rejected": true
+      },
+      {
+        "family": "select",
+        "id": "remove-open-destroy-guard",
+        "intended_case": "destroy-cancels-fallback-and-no-late-view-work",
+        "rejected": true
+      },
+      {
+        "family": "select",
+        "id": "allow-exit-after-touched-reopen",
+        "intended_case": "touched-callback-reopen-leaves-no-exit-resources",
+        "rejected": true
+      },
+      {
+        "family": "select",
+        "id": "restore-old-position-receipt",
+        "intended_case": "stale-position-receipt-after-close-does-no-work",
+        "rejected": true
+      }
+    ]
+  },
+  "dependency_refresh": {
+    "role": "Complete finite helpers were rerun; retain the23 exact changed-file cases below. Earlier complete model/type/runtime receipts remain immutable, authenticated by the previous motion dependency proof. This does not rerun wider Angular component behavior.",
+    "prior_full_diagnostic": {
+      "path": "compatibility/rc/menu-select-motion-dependency-refresh.json",
+      "sha256": "5c9170540c58ec0ab16f3e535fcdd52b5208d5fc10e10c6a3c922b472d520efe"
+    },
+    "node": "v22.23.3",
+    "compiler": "6.0.3",
+    "categories": {
+      "owned_inputs": {
+        "cases": [
+          {
+            "module": "@angular/cdk/coercion",
+            "symbol": "BooleanInput",
+            "file": "legacy-select/internal/select-base.ts",
+            "status": "inventory-seed",
+            "disposition": "open",
+            "candidate_source_sha256": "ba6f6790553271e0296608aaad77ef9f8392a3cc2c1c01b359142010e4d9218b",
+            "alias_line": 18,
+            "declaration": "type BooleanInput = string | boolean | null | undefined;",
+            "primitive_members": [
+              "boolean",
+              "null",
+              "string",
+              "undefined"
+            ],
+            "reference_lines": [
+              357,
+              368,
+              382
+            ]
+          },
+          {
+            "module": "@angular/cdk/coercion",
+            "symbol": "NumberInput",
+            "file": "legacy-select/internal/select-base.ts",
+            "status": "inventory-seed",
+            "disposition": "open",
+            "candidate_source_sha256": "ba6f6790553271e0296608aaad77ef9f8392a3cc2c1c01b359142010e4d9218b",
+            "alias_line": 19,
+            "declaration": "type NumberInput = string | number | null | undefined;",
+            "primitive_members": [
+              "null",
+              "number",
+              "string",
+              "undefined"
+            ],
+            "reference_lines": [
+              435
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+            "sha256": "ba6f6790553271e0296608aaad77ef9f8392a3cc2c1c01b359142010e4d9218b",
+            "bytes": 45827,
+            "emit_sha256": "a43a124c5853b93ba6689891896b54cd4bf32f4bee5bfec4e6002994213b3c34",
+            "emit_without_aliases_sha256": "a43a124c5853b93ba6689891896b54cd4bf32f4bee5bfec4e6002994213b3c34"
+          }
+        ]
+      },
+      "keycodes": {
+        "cases": [
+          {
+            "module": "@angular/cdk/keycodes",
+            "symbol": "A",
+            "file": "legacy-select/internal/select-base.ts",
+            "status": "inventory-seed",
+            "disposition": "open",
+            "candidate_source_sha256": "ba6f6790553271e0296608aaad77ef9f8392a3cc2c1c01b359142010e4d9218b",
+            "import_line": 21,
+            "local_name": "A",
+            "references": [
+              {
+                "line": 972,
+                "role": "keycode-comparison",
+                "expression": "keyCode === A"
+              }
+            ],
+            "observed_value": 65
+          },
+          {
+            "module": "@angular/cdk/keycodes",
+            "symbol": "DOWN_ARROW",
+            "file": "legacy-select/internal/select-base.ts",
+            "status": "inventory-seed",
+            "disposition": "open",
+            "candidate_source_sha256": "ba6f6790553271e0296608aaad77ef9f8392a3cc2c1c01b359142010e4d9218b",
+            "import_line": 21,
+            "local_name": "DOWN_ARROW",
+            "references": [
+              {
+                "line": 923,
+                "role": "keycode-comparison",
+                "expression": "keyCode === DOWN_ARROW"
+              },
+              {
+                "line": 955,
+                "role": "keycode-comparison",
+                "expression": "keyCode === DOWN_ARROW"
+              }
+            ],
+            "observed_value": 40
+          },
+          {
+            "module": "@angular/cdk/keycodes",
+            "symbol": "ENTER",
+            "file": "legacy-select/internal/select-base.ts",
+            "status": "inventory-seed",
+            "disposition": "open",
+            "candidate_source_sha256": "ba6f6790553271e0296608aaad77ef9f8392a3cc2c1c01b359142010e4d9218b",
+            "import_line": 21,
+            "local_name": "ENTER",
+            "references": [
+              {
+                "line": 927,
+                "role": "keycode-comparison",
+                "expression": "keyCode === ENTER"
+              },
+              {
+                "line": 966,
+                "role": "keycode-comparison",
+                "expression": "keyCode === ENTER"
+              }
+            ],
+            "observed_value": 13
+          },
+          {
+            "module": "@angular/cdk/keycodes",
+            "symbol": "hasModifierKey",
+            "file": "legacy-select/internal/select-base.ts",
+            "status": "inventory-seed",
+            "disposition": "open",
+            "candidate_source_sha256": "ba6f6790553271e0296608aaad77ef9f8392a3cc2c1c01b359142010e4d9218b",
+            "import_line": 21,
+            "local_name": "hasModifierKey",
+            "references": [
+              {
+                "line": 932,
+                "role": "modifier-call",
+                "expression": "hasModifierKey(event)"
+              },
+              {
+                "line": 968,
+                "role": "modifier-call",
+                "expression": "hasModifierKey(event)"
+              }
+            ],
+            "observed_value": null
+          },
+          {
+            "module": "@angular/cdk/keycodes",
+            "symbol": "LEFT_ARROW",
+            "file": "legacy-select/internal/select-base.ts",
+            "status": "inventory-seed",
+            "disposition": "open",
+            "candidate_source_sha256": "ba6f6790553271e0296608aaad77ef9f8392a3cc2c1c01b359142010e4d9218b",
+            "import_line": 21,
+            "local_name": "LEFT_ARROW",
+            "references": [
+              {
+                "line": 925,
+                "role": "keycode-comparison",
+                "expression": "keyCode === LEFT_ARROW"
+              }
+            ],
+            "observed_value": 37
+          },
+          {
+            "module": "@angular/cdk/keycodes",
+            "symbol": "RIGHT_ARROW",
+            "file": "legacy-select/internal/select-base.ts",
+            "status": "inventory-seed",
+            "disposition": "open",
+            "candidate_source_sha256": "ba6f6790553271e0296608aaad77ef9f8392a3cc2c1c01b359142010e4d9218b",
+            "import_line": 21,
+            "local_name": "RIGHT_ARROW",
+            "references": [
+              {
+                "line": 926,
+                "role": "keycode-comparison",
+                "expression": "keyCode === RIGHT_ARROW"
+              }
+            ],
+            "observed_value": 39
+          },
+          {
+            "module": "@angular/cdk/keycodes",
+            "symbol": "SPACE",
+            "file": "legacy-select/internal/select-base.ts",
+            "status": "inventory-seed",
+            "disposition": "open",
+            "candidate_source_sha256": "ba6f6790553271e0296608aaad77ef9f8392a3cc2c1c01b359142010e4d9218b",
+            "import_line": 21,
+            "local_name": "SPACE",
+            "references": [
+              {
+                "line": 927,
+                "role": "keycode-comparison",
+                "expression": "keyCode === SPACE"
+              },
+              {
+                "line": 966,
+                "role": "keycode-comparison",
+                "expression": "keyCode === SPACE"
+              }
+            ],
+            "observed_value": 32
+          },
+          {
+            "module": "@angular/cdk/keycodes",
+            "symbol": "UP_ARROW",
+            "file": "legacy-select/internal/select-base.ts",
+            "status": "inventory-seed",
+            "disposition": "open",
+            "candidate_source_sha256": "ba6f6790553271e0296608aaad77ef9f8392a3cc2c1c01b359142010e4d9218b",
+            "import_line": 21,
+            "local_name": "UP_ARROW",
+            "references": [
+              {
+                "line": 924,
+                "role": "keycode-comparison",
+                "expression": "keyCode === UP_ARROW"
+              },
+              {
+                "line": 955,
+                "role": "keycode-comparison",
+                "expression": "keyCode === UP_ARROW"
+              }
+            ],
+            "observed_value": 38
+          }
+        ],
+        "sources": []
+      },
+      "lifecycle": {
+        "cases": [
+          {
+            "module": "@angular/core",
+            "symbol": "OnInit",
+            "file": "legacy-select/select.ts",
+            "status": "inventory-seed",
+            "disposition": "open",
+            "candidate_source_sha256": "02d57dfbf5c9c6bda4791d0a4296a8caab323e50be64deeaf95a30a1a29a760f",
+            "import_line": 17,
+            "local_name": "OnInit",
+            "reference_lines": [
+              147
+            ],
+            "minimum_public_declaration": "compatibility/rc/peer-type-sources/core-22.1.7.d.ts"
+          },
+          {
+            "module": "@angular/core",
+            "symbol": "AfterContentInit",
+            "file": "legacy-select/internal/select-base.ts",
+            "status": "inventory-seed",
+            "disposition": "open",
+            "candidate_source_sha256": "ba6f6790553271e0296608aaad77ef9f8392a3cc2c1c01b359142010e4d9218b",
+            "import_line": 41,
+            "local_name": "AfterContentInit",
+            "reference_lines": [
+              211
+            ],
+            "minimum_public_declaration": "compatibility/rc/peer-type-sources/core-22.1.7.d.ts"
+          },
+          {
+            "module": "@angular/core",
+            "symbol": "DoCheck",
+            "file": "legacy-select/internal/select-base.ts",
+            "status": "inventory-seed",
+            "disposition": "open",
+            "candidate_source_sha256": "ba6f6790553271e0296608aaad77ef9f8392a3cc2c1c01b359142010e4d9218b",
+            "import_line": 49,
+            "local_name": "DoCheck",
+            "reference_lines": [
+              215
+            ],
+            "minimum_public_declaration": "compatibility/rc/peer-type-sources/core-22.1.7.d.ts"
+          },
+          {
+            "module": "@angular/core",
+            "symbol": "OnChanges",
+            "file": "legacy-select/internal/select-base.ts",
+            "status": "inventory-seed",
+            "disposition": "open",
+            "candidate_source_sha256": "ba6f6790553271e0296608aaad77ef9f8392a3cc2c1c01b359142010e4d9218b",
+            "import_line": 56,
+            "local_name": "OnChanges",
+            "reference_lines": [
+              212
+            ],
+            "minimum_public_declaration": "compatibility/rc/peer-type-sources/core-22.1.7.d.ts"
+          },
+          {
+            "module": "@angular/core",
+            "symbol": "OnDestroy",
+            "file": "legacy-select/internal/select-base.ts",
+            "status": "inventory-seed",
+            "disposition": "open",
+            "candidate_source_sha256": "ba6f6790553271e0296608aaad77ef9f8392a3cc2c1c01b359142010e4d9218b",
+            "import_line": 57,
+            "local_name": "OnDestroy",
+            "reference_lines": [
+              213
+            ],
+            "minimum_public_declaration": "compatibility/rc/peer-type-sources/core-22.1.7.d.ts"
+          },
+          {
+            "module": "@angular/core",
+            "symbol": "OnInit",
+            "file": "legacy-select/internal/select-base.ts",
+            "status": "inventory-seed",
+            "disposition": "open",
+            "candidate_source_sha256": "ba6f6790553271e0296608aaad77ef9f8392a3cc2c1c01b359142010e4d9218b",
+            "import_line": 58,
+            "local_name": "OnInit",
+            "reference_lines": [
+              214
+            ],
+            "minimum_public_declaration": "compatibility/rc/peer-type-sources/core-22.1.7.d.ts"
+          },
+          {
+            "module": "@angular/core",
+            "symbol": "SimpleChanges",
+            "file": "legacy-select/internal/select-base.ts",
+            "status": "inventory-seed",
+            "disposition": "open",
+            "candidate_source_sha256": "ba6f6790553271e0296608aaad77ef9f8392a3cc2c1c01b359142010e4d9218b",
+            "import_line": 63,
+            "local_name": "SimpleChanges",
+            "reference_lines": [
+              600
+            ],
+            "minimum_public_declaration": "compatibility/rc/peer-type-sources/core-22.1.7.d.ts"
+          }
+        ],
+        "sources": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/select.ts",
+            "sha256": "02d57dfbf5c9c6bda4791d0a4296a8caab323e50be64deeaf95a30a1a29a760f",
+            "bytes": 19928,
+            "emit_sha256": "e00f43b80c6bda33431959e65df224d8392dc27749acc8db48776ee6d8db60cf",
+            "emit_without_selected_imports_sha256": "e00f43b80c6bda33431959e65df224d8392dc27749acc8db48776ee6d8db60cf"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+            "sha256": "ba6f6790553271e0296608aaad77ef9f8392a3cc2c1c01b359142010e4d9218b",
+            "bytes": 45827,
+            "emit_sha256": "a43a124c5853b93ba6689891896b54cd4bf32f4bee5bfec4e6002994213b3c34",
+            "emit_without_selected_imports_sha256": "a43a124c5853b93ba6689891896b54cd4bf32f4bee5bfec4e6002994213b3c34"
+          }
+        ]
+      },
+      "enums": {
+        "cases": [
+          {
+            "module": "@angular/core",
+            "symbol": "ChangeDetectionStrategy",
+            "file": "legacy-select/select.ts",
+            "status": "inventory-seed",
+            "disposition": "open",
+            "candidate_source_sha256": "02d57dfbf5c9c6bda4791d0a4296a8caab323e50be64deeaf95a30a1a29a760f",
+            "local_name": "ChangeDetectionStrategy",
+            "references": [
+              {
+                "line": 115,
+                "member": "OnPush",
+                "historical_member": "OnPush",
+                "numeric_value": 0,
+                "metadata_property": "changeDetection"
+              }
+            ],
+            "unused_import_erasure": null
+          },
+          {
+            "module": "@angular/core",
+            "symbol": "ViewEncapsulation",
+            "file": "legacy-select/select.ts",
+            "status": "inventory-seed",
+            "disposition": "open",
+            "candidate_source_sha256": "02d57dfbf5c9c6bda4791d0a4296a8caab323e50be64deeaf95a30a1a29a760f",
+            "local_name": "ViewEncapsulation",
+            "references": [
+              {
+                "line": 114,
+                "member": "None",
+                "historical_member": "None",
+                "numeric_value": 2,
+                "metadata_property": "encapsulation"
+              }
+            ],
+            "unused_import_erasure": null
+          },
+          {
+            "module": "@angular/core",
+            "symbol": "ChangeDetectionStrategy",
+            "file": "legacy-select/internal/select-base.ts",
+            "status": "inventory-seed",
+            "disposition": "open",
+            "candidate_source_sha256": "ba6f6790553271e0296608aaad77ef9f8392a3cc2c1c01b359142010e4d9218b",
+            "local_name": "ChangeDetectionStrategy",
+            "references": [],
+            "unused_import_erasure": {
+              "original_emit_sha256": "a43a124c5853b93ba6689891896b54cd4bf32f4bee5bfec4e6002994213b3c34",
+              "erased_emit_sha256": "a43a124c5853b93ba6689891896b54cd4bf32f4bee5bfec4e6002994213b3c34",
+              "metadata_mode": "emitDecoratorMetadata:false"
+            }
+          },
+          {
+            "module": "@angular/core",
+            "symbol": "ViewEncapsulation",
+            "file": "legacy-select/internal/select-base.ts",
+            "status": "inventory-seed",
+            "disposition": "open",
+            "candidate_source_sha256": "ba6f6790553271e0296608aaad77ef9f8392a3cc2c1c01b359142010e4d9218b",
+            "local_name": "ViewEncapsulation",
+            "references": [],
+            "unused_import_erasure": {
+              "original_emit_sha256": "a43a124c5853b93ba6689891896b54cd4bf32f4bee5bfec4e6002994213b3c34",
+              "erased_emit_sha256": "a43a124c5853b93ba6689891896b54cd4bf32f4bee5bfec4e6002994213b3c34",
+              "metadata_mode": "emitDecoratorMetadata:false"
+            }
+          }
+        ],
+        "sources": []
+      },
+      "coercion": {
+        "cases": [
+          {
+            "module": "@angular/cdk/coercion",
+            "symbol": "coerceBooleanProperty",
+            "file": "legacy-select/internal/select-base.ts",
+            "status": "inventory-seed",
+            "disposition": "open",
+            "candidate_source_sha256": "ba6f6790553271e0296608aaad77ef9f8392a3cc2c1c01b359142010e4d9218b",
+            "import_line": 17,
+            "local_name": "coerceBooleanProperty",
+            "references": [
+              {
+                "line": 358,
+                "arguments": 1,
+                "expression": "coerceBooleanProperty(value)"
+              },
+              {
+                "line": 373,
+                "arguments": 1,
+                "expression": "coerceBooleanProperty(value)"
+              },
+              {
+                "line": 383,
+                "arguments": 1,
+                "expression": "coerceBooleanProperty(value)"
+              }
+            ]
+          },
+          {
+            "module": "@angular/cdk/coercion",
+            "symbol": "coerceNumberProperty",
+            "file": "legacy-select/internal/select-base.ts",
+            "status": "inventory-seed",
+            "disposition": "open",
+            "candidate_source_sha256": "ba6f6790553271e0296608aaad77ef9f8392a3cc2c1c01b359142010e4d9218b",
+            "import_line": 17,
+            "local_name": "coerceNumberProperty",
+            "references": [
+              {
+                "line": 436,
+                "arguments": 1,
+                "expression": "coerceNumberProperty(value)"
+              }
+            ]
+          }
+        ],
+        "sources": []
+      }
+    }
+  },
+  "cyph": {
+    "head": "a56a0603636cac5aaabe8fe408f7429b4224f011",
+    "read_only": true,
+    "previous_style_sanity": {
+      "path": "compatibility/rc/menu-select-motion-source-proof.json",
+      "sha256": "fc0ade9eac75ee7622f9f1e4b714247cf7810f50eb80b9da89d215deff0baf74"
+    },
+    "consumer_css_scss_changes_required": false,
+    "public_API_signatures_changed": false,
+    "consumer_build": "unexecuted"
+  },
+  "unexecuted": [
+    "current Angular component/DI/native browser/packed/floor qualification",
+    "two historical positioning failures",
+    "fresh independent complete audit"
+  ],
+  "new_dependency_closures": 0,
+  "new_SHA_closures": 0,
+  "g11_claim": "not-passed"
+}
