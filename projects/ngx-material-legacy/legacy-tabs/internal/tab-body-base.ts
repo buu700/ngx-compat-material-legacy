@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -10,6 +11,7 @@
  */
 
 import {
+  assertInInjectionContext,
   ChangeDetectorRef,
   Directive,
   ElementRef,
@@ -26,7 +28,18 @@ import {
 import {CdkPortalOutlet, TemplatePortal} from '@angular/cdk/portal';
 import {Direction, Directionality} from '@angular/cdk/bidi';
 import {Subject, Subscription} from 'rxjs';
+import {distinctUntilChanged} from 'rxjs/operators';
 import {legacyAnimationsDisabled} from '@ngx-compat/material-legacy/legacy-core';
+
+/** The historical three-argument constructor also works outside Angular DI. */
+function tabBodyNgZone(): NgZone | null {
+  try {
+    assertInInjectionContext(tabBodyNgZone);
+  } catch {
+    return null;
+  }
+  return inject(NgZone, {optional: true});
+}
 
 /**
  * These position states are used internally as animation states for the tab body.
@@ -56,7 +69,9 @@ export abstract class _MatTabBodyBase implements OnInit, OnDestroy {
   private _dirChangeSubscription = Subscription.EMPTY;
   private _fallbackTimer: ReturnType<typeof setTimeout> | undefined;
   private _initialized = false;
-  private readonly _ngZone = inject(NgZone, {optional: true});
+  private _destroyed = false;
+  private _pendingTransition: LegacyTabTransitionEvent | undefined;
+  private readonly _ngZone = tabBodyNgZone();
 
   /** Tab body position state. */
   _position: MatTabBodyPositionState;
@@ -111,15 +126,17 @@ export abstract class _MatTabBodyBase implements OnInit, OnDestroy {
       });
     }
 
-    this._translateTabComplete.subscribe(event => {
-      if (this._isCenterPosition(event.toState) && this._isCenterPosition(this._position)) {
-        this._onCentered.emit();
-      }
+    this._translateTabComplete
+      .pipe(distinctUntilChanged((a, b) => a.fromState === b.fromState && a.toState === b.toState))
+      .subscribe(event => {
+        if (this._isCenterPosition(event.toState) && this._isCenterPosition(this._position)) {
+          this._onCentered.emit();
+        }
 
-      if (this._isCenterPosition(event.fromState) && !this._isCenterPosition(this._position)) {
-        this._afterLeavingCenter.emit();
-      }
-    });
+        if (this._isCenterPosition(event.fromState) && !this._isCenterPosition(this._position)) {
+          this._afterLeavingCenter.emit();
+        }
+      });
   }
 
   ngOnInit() {
@@ -130,68 +147,107 @@ export abstract class _MatTabBodyBase implements OnInit, OnDestroy {
       this._previousPosition =
         this._position === 'left-origin-center' ? 'left' : 'right';
       this._setActiveClass(true);
-      this._transitionStarted(this._position);
-      this._scheduleTransitionDone(this._position);
+      this._startTransition();
     } else if (this._position === 'center') {
       this._setActiveClass(true);
-      this._onCentering.emit(this._elementRef.nativeElement.clientHeight);
+      if (!this._pendingTransition) {
+        this._startTransition();
+      }
     }
     this._initialized = true;
   }
 
   ngOnDestroy() {
+    this._destroyed = true;
+    this._pendingTransition = undefined;
     if (this._fallbackTimer !== undefined) {
       clearTimeout(this._fallbackTimer);
+      this._fallbackTimer = undefined;
     }
     this._dirChangeSubscription.unsubscribe();
     this._translateTabComplete.complete();
   }
 
   _onContentTransitionStart(event: TransitionEvent): void {
-    if (event.target !== this._contentElement?.nativeElement) {
+    if (
+      this._destroyed || !this._pendingTransition ||
+      event.target !== this._contentElement?.nativeElement
+    ) {
       return;
     }
     if (event.propertyName && event.propertyName !== 'transform') {
       return;
     }
     this._elementRef.nativeElement.classList.add('mat-tab-body-animating');
-    this._transitionStarted(this._position);
   }
 
   _onContentTransitionEnd(event: TransitionEvent): void {
-    if (event.target !== this._contentElement?.nativeElement) {
+    if (
+      this._destroyed || !this._pendingTransition ||
+      event.target !== this._contentElement?.nativeElement
+    ) {
       return;
     }
     if (event.propertyName && event.propertyName !== 'transform') {
       return;
     }
-    this._elementRef.nativeElement.classList.remove('mat-tab-body-animating');
-    this._finishTransition(this._position);
+    this._finishTransition(this._pendingTransition);
   }
 
-  private _transitionStarted(toState: string): void {
-    const isCentering = this._isCenterPosition(toState);
-    this._beforeCentering.emit(isCentering);
-    if (isCentering) {
-      this._onCentering.emit(this._elementRef.nativeElement.clientHeight);
+  private _startTransition(): void {
+    if (this._destroyed) {
+      return;
     }
-  }
-
-  private _finishTransition(toState: string): void {
     if (this._fallbackTimer !== undefined) {
       clearTimeout(this._fallbackTimer);
       this._fallbackTimer = undefined;
     }
-    const fromState = this._previousPosition || 'void';
-    this._translateTabComplete.next({fromState, toState});
+    const transition = this._pendingTransition = {
+      fromState: this._previousPosition || 'void',
+      toState: this._position,
+    };
+    // Keep the departing content visible with the existing historical selector
+    // while its transform changes; completion removes this class.
+    this._elementRef.nativeElement.classList.add('mat-tab-body-animating');
+    const isCentering = this._isCenterPosition(transition.toState);
+    this._beforeCentering.emit(isCentering);
+    if (this._pendingTransition !== transition || this._destroyed) {
+      return;
+    }
+    if (isCentering) {
+      this._onCentering.emit(this._elementRef.nativeElement.clientHeight);
+    }
+    if (this._pendingTransition === transition && !this._destroyed) {
+      this._scheduleTransitionDone(transition);
+    }
   }
 
-  private _scheduleTransitionDone(toState: string): void {
+  private _finishTransition(transition: LegacyTabTransitionEvent | undefined): void {
+    if (this._destroyed || !transition || this._pendingTransition !== transition) {
+      return;
+    }
     if (this._fallbackTimer !== undefined) {
       clearTimeout(this._fallbackTimer);
+      this._fallbackTimer = undefined;
     }
-    const delay = this._cssAnimationsDisabled() ? 0 : 100;
-    const run = () => this._finishTransition(toState);
+    this._pendingTransition = undefined;
+    this._elementRef.nativeElement.classList.remove('mat-tab-body-animating');
+    this._translateTabComplete.next(transition);
+  }
+
+  private _scheduleTransitionDone(transition: LegacyTabTransitionEvent): void {
+    // A native transitionend normally completes the phase. Allow its configured
+    // duration plus a small delivery buffer before the missing-event fallback.
+    const duration = this._animationDurationInput.trim().match(/^(\d*\.?\d+)(ms|s)$/);
+    const milliseconds = duration ? Number(duration[1]) * (duration[2] === 's' ? 1000 : 1) : 500;
+    const delay = this._cssAnimationsDisabled() ? 0 : milliseconds + 100;
+    const run = () => {
+      if (this._ngZone) {
+        this._ngZone.run(() => this._finishTransition(transition));
+      } else {
+        this._finishTransition(transition);
+      }
+    };
     if (this._ngZone) {
       this._fallbackTimer = this._ngZone.runOutsideAngular(() => setTimeout(run, delay));
     } else {
@@ -222,14 +278,16 @@ export abstract class _MatTabBodyBase implements OnInit, OnDestroy {
   }
 
   private _computePositionAnimationState(dir: Direction = this._getLayoutDirection()) {
-    this._previousPosition = this._position;
-    if (this._positionIndex < 0) {
-      this._position = dir == 'ltr' ? 'left' : 'right';
-    } else if (this._positionIndex > 0) {
-      this._position = dir == 'ltr' ? 'right' : 'left';
-    } else {
-      this._position = 'center';
+    if (this._destroyed) {
+      return;
     }
+    const position = this._positionIndex < 0 ? (dir == 'ltr' ? 'left' : 'right')
+      : this._positionIndex > 0 ? (dir == 'ltr' ? 'right' : 'left') : 'center';
+    if (position === this._position) {
+      return;
+    }
+    this._previousPosition = this._position;
+    this._position = position;
 
     if (this._isCenterPosition(this._position)) {
       this._setActiveClass(true);
@@ -237,18 +295,11 @@ export abstract class _MatTabBodyBase implements OnInit, OnDestroy {
       this._setActiveClass(false);
     }
 
-    if (this._cssAnimationsDisabled()) {
-      this._transitionStarted(this._position);
-      this._scheduleTransitionDone(this._position);
-    } else if (
-      this._initialized &&
-      (this._isCenterPosition(this._position) || this._isCenterPosition(this._previousPosition || ''))
-    ) {
-      // Attach the body when centering starts. CSS transitionstart never fires
-      // while the off-center pane is display:none, so waiting for it leaves the
-      // active tab empty.
-      this._transitionStarted(this._position);
-      this._scheduleTransitionDone(this._position);
+    if (this._cssAnimationsDisabled() || this._initialized &&
+      (this._isCenterPosition(this._position) || this._isCenterPosition(this._previousPosition || ''))) {
+      // Attach before the content can animate. An off-center pane is hidden by
+      // existing CSS, so relying on transitionstart can leave the active tab empty.
+      this._startTransition();
     }
   }
 

@@ -26,7 +26,7 @@ import {MENU_CONTENT_SYMBOL,menuContentContract,menuContentObservationProblems} 
 import {SIMPLE_SNACK_SYMBOL,simpleSnackObservationProblems} from '../scripts/api-simple-snack-context.mjs';
 import {DIALOG_OPENER_SYMBOL,dialogOpenerObservationProblems} from '../scripts/api-dialog-opener-context.mjs';
 import {AUTOCOMPLETE_SYMBOL,autocompleteProfile,createAutocompleteCapture,observeAutocompleteInputs,finishAutocompleteContext,autocompleteObservationProblems} from '../scripts/api-autocomplete-context.mjs';
-import {SNACK_MOTION_SYMBOL,FORM_FIELD_MOTION_SYMBOL,MENU_MOTION_SYMBOL,TOOLTIP_MOTION_SYMBOL,DIALOG_MOTION_SYMBOL,ownedMotionProfile,ownedSelectMotionProblems} from '../scripts/api-owned-motion-context.mjs';
+import {SNACK_MOTION_SYMBOL,FORM_FIELD_MOTION_SYMBOL,MENU_MOTION_SYMBOL,TOOLTIP_MOTION_SYMBOL,DIALOG_MOTION_SYMBOL,TAB_BODY_MOTION_SYMBOL,TAB_BODY_BASE_MOTION_SYMBOL,ownedMotionProfile,ownedSelectMotionProblems} from '../scripts/api-owned-motion-context.mjs';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),require=createRequire(import.meta.url);
 const arg=name=>process.argv.includes(name)?process.argv[process.argv.indexOf(name)+1]:null;
@@ -333,14 +333,35 @@ try{
    capture.value.value.ngOnDestroy();assert.equal(fixture.component.hostView.destroyed,false);assert.equal(fixture.environment.destroyed,false);
   }finally{fixture.close();}
  }
+ const tabBodyManual=[];
+ {
+  const owned=await loadRuntimeModule(runtime,'legacy-tabs','primary'),fixture=await createPublicFactoryContext(core,load,{providers:[core.importProvidersFrom(owned.MatLegacyTabsModule)]});
+  try{for(const name of ['MatLegacyTabBody','_MatLegacyTabBodyBase']){
+   const Type=owned[name],capture=runFactory(()=>captureFactoryConstructorInputs(Type),core.Injector,core.runInInjectionContext,{injector:fixture.element.injector});
+   assert.equal(capture.outcome,'returned',capture.error);assert.equal(capture.value.inputs.length,3);
+   const value=new Type(...capture.value.inputs);value.ngOnDestroy();tabBodyManual.push({symbol_id:'legacy-tabs/primary/'+name,outcome:'returned'});
+   capture.value.value.ngOnDestroy();assert.equal(fixture.component.hostView.destroyed,false);assert.equal(fixture.environment.destroyed,false);
+  }}finally{fixture.close();}
+ }
+ const tabBodyControls=[];
+ for(const name of ['MatLegacyTabBody','_MatLegacyTabBodyBase']){
+  const owned=await loadRuntimeModule(runtime,'legacy-tabs','primary'),Type=owned[name],symbol=selected.find(s=>s.symbol_id==='legacy-tabs/primary/'+name),row=rows.find(r=>r.symbol.symbol_id===symbol.symbol_id);
+  assert.equal(row.result,'pass',row.problems.join('\n'));tabBodyControls.push({symbol_id:symbol.symbol_id,id:'actual-original-three-inputs-and-public-optional-zone',result:'pass',evidence:row.factory_tab_body_context});
+  for(const cell of [{id:'foreign-zone-value',change:v=>{v._ngZone={};},error:/zone differs/},{id:'foreign-element-value',change:v=>{v._elementRef={};},error:/supplied element identity differs/},{id:'unrelated-optional-request',extra:true}]){
+   const constructorFactory=Receiver=>{if(cell.extra)core.inject(core.NgZone,{optional:true});return Type.ɵfac(class extends Receiver{constructor(...inputs){super(...inputs);cell.change?.(this);}});};
+   const execution=await observePublicNodeFactory(Type,core,runtime,symbol,symbols,load,{constructorFactory});
+   if(cell.extra){assert.equal(execution.outcome,'returned',execution.error);assert.equal(execution.requests.length,4);tabBodyControls.push({symbol_id:symbol.symbol_id,id:cell.id,result:'retained-unclassified-request',retained_requests:4});}
+   else{assert.equal(execution.outcome,'threw');assert.match(execution.error,cell.error);tabBodyControls.push({symbol_id:symbol.symbol_id,id:cell.id,result:'rejected',error:execution.error});}
+  }
+ }
  const constructorMotionControls=[];
  const manualMotionObservations=[];
  const manualMotionLifecycle=[];
- for(const symbolId of [FORM_FIELD_MOTION_SYMBOL,MENU_MOTION_SYMBOL,TOOLTIP_MOTION_SYMBOL,DIALOG_MOTION_SYMBOL]){
+ for(const symbolId of [FORM_FIELD_MOTION_SYMBOL,MENU_MOTION_SYMBOL,TOOLTIP_MOTION_SYMBOL,DIALOG_MOTION_SYMBOL,TAB_BODY_MOTION_SYMBOL,TAB_BODY_BASE_MOTION_SYMBOL]){
   const symbol=selected.find(s=>s.symbol_id===symbolId),profile=ownedMotionProfile(symbolId),family=await loadRuntimeModule(runtime,symbol.family,'primary'),Type=family[symbol.name];
   const row=rows.find(r=>r.symbol.symbol_id===symbolId);assert.equal(row.result,'pass',row.problems.join('\n'));
-  const module=family[symbol.family==='legacy-form-field'?'MatLegacyFormFieldModule':symbol.family==='legacy-menu'?'MatLegacyMenuModule':'MatLegacyTooltipModule'];
-  for(const mode of symbolId===DIALOG_MOTION_SYMBOL?[]:[null,'NoopAnimations']){
+  const module=family[symbol.family==='legacy-form-field'?'MatLegacyFormFieldModule':symbol.family==='legacy-menu'?'MatLegacyMenuModule':symbol.family==='legacy-tabs'?'MatLegacyTabsModule':'MatLegacyTooltipModule'];
+  for(const mode of [DIALOG_MOTION_SYMBOL,TAB_BODY_MOTION_SYMBOL,TAB_BODY_BASE_MOTION_SYMBOL].includes(symbolId)?[]:[null,'NoopAnimations']){
    const f=await createPublicFactoryContext(core,load,{providers:[core.importProvidersFrom(module),{provide:core.ANIMATION_MODULE_TYPE,useValue:mode}]});
    let manual;
    try{
@@ -391,7 +412,7 @@ try{
    constructorMotionControls.push({symbol_id:symbolId,id:cell.id,result:'pass',enabled:cell.enabled,evidence:execution.ownedMotionContext});
   }
  }
- assert.equal(constructorMotionControls.length,28);
+ assert.equal(constructorMotionControls.length,42);
  assert.equal(manualMotionObservations.length,6);
  assert.equal(manualMotionLifecycle.length,4);
  const ownedMenu=await loadRuntimeModule(runtime,'legacy-menu','primary'),peerMenu=await load('@angular/material/menu');
@@ -413,7 +434,7 @@ try{
  const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
  const caps=[...new Set([...files.map(file=>file.fileName),...resources])].sort().map(file=>({path:file.slice(root.length+1),sha256:sha(readFileSync(file))}));
  const result={schema_version:1,role:'All original154 factory class source observations;not canonical packed/native/browser/floor qualification',
-  node:process.version,typescript:ts.version,runtime_peer:core.VERSION.full,entries,rows,selected_symbol_ids:[...selectedIds].sort(),emitted_public_import_routes:routes,public_parent_controls:publicParentControls,required_parent_controls:requiredParentControls,caller_config_controls:callerConfigControls,snack_motion_controls:snackMotionControls,constructor_motion_controls:constructorMotionControls,manual_motion_observations:manualMotionObservations,manual_motion_lifecycle:manualMotionLifecycle,dialog_focus_controls:dialogFocusControls,menu_content_controls:menuContentControls,simple_snack_controls:simpleSnackControls,dialog_opener_controls:dialogOpenerControls,autocomplete_manual:autocompleteManual,autocomplete_controls:autocompleteControls,
+  node:process.version,typescript:ts.version,runtime_peer:core.VERSION.full,entries,rows,selected_symbol_ids:[...selectedIds].sort(),emitted_public_import_routes:routes,public_parent_controls:publicParentControls,required_parent_controls:requiredParentControls,caller_config_controls:callerConfigControls,snack_motion_controls:snackMotionControls,constructor_motion_controls:constructorMotionControls,manual_motion_observations:manualMotionObservations,manual_motion_lifecycle:manualMotionLifecycle,dialog_focus_controls:dialogFocusControls,menu_content_controls:menuContentControls,simple_snack_controls:simpleSnackControls,dialog_opener_controls:dialogOpenerControls,autocomplete_manual:autocompleteManual,autocomplete_controls:autocompleteControls,tab_body_manual:tabBodyManual,tab_body_controls:tabBodyControls,
   passed:rows.filter(row=>row.result==='pass').length,failed:rows.filter(row=>row.result!=='pass').length,
   source_files:files.length,resource_files:resources.size,source_caps:caps,virtual_typecheck_files:virtualFiles.length,
   styles:'SCSS/HTML resources read unchanged by Angular compiler;no Sass/rendered style qualification',

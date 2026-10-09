@@ -28,7 +28,7 @@ function node(name,document){
   getAttribute(name){return attributes.get(name)??null;},
   hasAttribute(name){return attributes.has(name);},removeAttribute(name){attributes.delete(name);if(name==='class')classes.clear();},
   classList:{add(...names){for(const n of names)classes.add(n);attributes.set('class',[...classes].join(' '));},
-   remove(...names){for(const n of names)classes.delete(n);attributes.set('class',[...classes].join(' '));},contains(name){return classes.has(name);}},
+   remove(...names){for(const n of names)classes.delete(n);attributes.set('class',[...classes].join(' '));},contains(name){return classes.has(name);},toggle(name,force){const present=force===undefined?!classes.has(name):Boolean(force);if(present)classes.add(name);else classes.delete(name);attributes.set('class',[...classes].join(' '));return present;}},
   style:{setProperty(name,value){styles.set(name,value);},removeProperty(name){styles.delete(name);}},
   querySelector(){return null;},querySelectorAll(){return [];},
   focus(){document.activeElement=this;},blur(){if(document.activeElement===this)document.activeElement=null;},

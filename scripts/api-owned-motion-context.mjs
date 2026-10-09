@@ -21,6 +21,8 @@ export const FORM_FIELD_MOTION_SYMBOL='legacy-form-field/primary/MatLegacyFormFi
 export const MENU_MOTION_SYMBOL='legacy-menu/primary/MatLegacyMenu';
 export const TOOLTIP_MOTION_SYMBOL='legacy-tooltip/primary/LegacyTooltipComponent';
 export const DIALOG_MOTION_SYMBOL='legacy-dialog/primary/MatLegacyDialogContainer';
+export const TAB_BODY_MOTION_SYMBOL='legacy-tabs/primary/MatLegacyTabBody';
+export const TAB_BODY_BASE_MOTION_SYMBOL='legacy-tabs/primary/_MatLegacyTabBodyBase';
 const ownedMotionProfiles=Object.freeze({
  [SELECT_MOTION_SYMBOL]:Object.freeze({family:'legacy-select',property:'_animationsEnabled',enabled:true}),
  [PSEUDO_MOTION_SYMBOL]:Object.freeze({family:'legacy-core',property:'_animationsDisabled',enabled:false}),
@@ -33,6 +35,8 @@ const ownedMotionProfiles=Object.freeze({
   constructorOwnerExport:'_LegacyTooltipComponentBase',constructorOwnerDepth:1,constructorAnimationIndex:2,constructorArity:3}),
  [DIALOG_MOTION_SYMBOL]:Object.freeze({family:'legacy-dialog',property:'_animationsEnabled',enabled:true,
   constructorOwnerExport:'MatLegacyDialogContainer',constructorOwnerDepth:0,wrapper:'dialogAnimationsDisabled'}),
+ [TAB_BODY_MOTION_SYMBOL]:Object.freeze({family:'legacy-tabs',property:'_legacyAnimationsDisabled',enabled:false,constructorOwnerExport:'_MatLegacyTabBodyBase',constructorOwnerDepth:1}),
+ [TAB_BODY_BASE_MOTION_SYMBOL]:Object.freeze({family:'legacy-tabs',property:'_legacyAnimationsDisabled',enabled:false,constructorOwnerExport:'_MatLegacyTabBodyBase',constructorOwnerDepth:0}),
 });
 export const ownedMotionProfile=symbolId=>Object.hasOwn(ownedMotionProfiles,symbolId)?ownedMotionProfiles[symbolId]:null;
 const sha=text=>createHash('sha256').update(text).digest('hex');

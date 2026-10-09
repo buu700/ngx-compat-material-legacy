@@ -78,6 +78,12 @@ try{
   fixture.document.body.appendChild(child);publicRenderer.removeChild(null,child);assert.equal(child.parentNode,null);publicRenderer.removeChild(null,child);
  }
  cases.push({id:'public-renderer-detached-element-text-comment-removal-is-idempotent',result:'pass'});
+ const classes=fixture.element.element.nativeElement.classList;
+ assert.equal(classes.toggle('fixture-toggle'),true);assert.ok(classes.contains('fixture-toggle'));
+ assert.equal(classes.toggle('fixture-toggle'),false);assert.equal(classes.contains('fixture-toggle'),false);
+ assert.equal(classes.toggle('fixture-toggle',true),true);assert.equal(classes.toggle('fixture-toggle',true),true);
+ assert.equal(classes.toggle('fixture-toggle',false),false);assert.equal(fixture.element.element.nativeElement.getAttribute('class').includes('fixture-toggle'),false);
+ cases.push({id:'synthetic-DOMTokenList-toggle-return-force-and-attribute-consistency',result:'pass'});
  const unknown=new core.InjectionToken('Unknown required API fixture service');
  const missing=runFactory(()=>core.inject(unknown),core.Injector,core.runInInjectionContext,{injector:fixture.element.injector});
  assert.equal(missing.outcome,'threw');assert.equal(missing.requests.length,1);assert.ok(missing.requests[0].token===unknown,'wrong unresolved token');
