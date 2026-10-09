@@ -77,8 +77,8 @@ function renderer(core,document){
  };
 }
 
-function fixtureDefinitions(core,{nodeFactory,attributes={},parentProviders=[],parentHost,additionalTemplate=''}={}){
- const cacheable=!nodeFactory&&Object.keys(attributes).length===0&&parentProviders.length===0&&!parentHost&&!additionalTemplate;
+function fixtureDefinitions(core,{nodeFactory,attributes={},parentProviders=[],parentHost,elementTag='div',additionalTemplate=''}={}){
+ const cacheable=!nodeFactory&&Object.keys(attributes).length===0&&parentProviders.length===0&&!parentHost&&elementTag==='div'&&!additionalTemplate;
  if(cacheable&&definitions.has(core))return definitions.get(core);
  const scopeToken=new core.InjectionToken('API fixture node scope');
  const parentValue={scope:'parent'},childValue={scope:'child'};
@@ -135,7 +135,7 @@ function fixtureDefinitions(core,{nodeFactory,attributes={},parentProviders=[],p
  const parentTag=parentHost?.tag||'section';
  if(!/^[a-z][a-z0-9-]*$/.test(parentTag))throw Error('invalid fixture parent tag');
  const parentAttributes=serializeAttributes(parentHost?.attributes||{},/^[a-zA-Z][a-zA-Z0-9-]*$/);
- const elementTag=parentHost?.elementTag||'div';if(!/^[a-z][a-z0-9-]*$/.test(elementTag))throw Error('invalid fixture element tag');
+ elementTag=parentHost?.elementTag||elementTag;if(!/^[a-z][a-z0-9-]*$/.test(elementTag))throw Error('invalid fixture element tag');
  const elementAttributes=serializeAttributes(parentHost?.elementAttributes||{},/^[a-zA-Z][a-zA-Z0-9-]*$/);
  const extraTemplate=(parentHost?.additionalTemplate||'')+additionalTemplate;if(typeof additionalTemplate!=='string'||parentHost?.additionalTemplate!==undefined&&typeof parentHost.additionalTemplate!=='string')throw Error('fixture additional template must be a string');
  const elementMarkup='<'+elementTag+' apiFactoryElement'+literalAttributes+elementAttributes+'>'+(['area','base','br','col','embed','hr','img','input','link','meta','param','source','track','wbr'].includes(elementTag)?'':'</'+elementTag+'>');
@@ -153,7 +153,7 @@ function fixtureDefinitions(core,{nodeFactory,attributes={},parentProviders=[],p
  * TemplateRef. Providers are caller-supplied public module/configuration values;
  * missing services propagate. There is no private token discovery or fallback.
  */
-export async function createPublicFactoryContext(core,importModule,{providers=[],nodeFactory,attributes={},parentProviders=[],parentHost,additionalTemplate='',defaultViewTarget=false}={}){
+export async function createPublicFactoryContext(core,importModule,{providers=[],nodeFactory,attributes={},parentProviders=[],parentHost,elementTag='div',additionalTemplate='',defaultViewTarget=false}={}){
  if(typeof defaultViewTarget!=='boolean')throw Error('synthetic defaultView target option must be boolean');
  const defaultView=defaultViewTarget?new EventTarget():null;
  const {BrowserModule}=await importModule('@angular/platform-browser');
@@ -172,7 +172,7 @@ export async function createPublicFactoryContext(core,importModule,{providers=[]
   const found=[];const visit=element=>{if(element.classList?.contains(name))found.push(element);for(const child of element.children||[])visit(child);};
   visit(document.documentElement);return found;
  };
- const fixtureRenderer=renderer(core,document),defs=fixtureDefinitions(core,{nodeFactory,attributes,parentProviders,parentHost,additionalTemplate});
+ const fixtureRenderer=renderer(core,document),defs=fixtureDefinitions(core,{nodeFactory,attributes,parentProviders,parentHost,elementTag,additionalTemplate});
  let parent,environment,component,closed=false;
  const close=()=>{
   if(closed)return;closed=true;
