@@ -127,6 +127,16 @@ const twice = observationProblems({
 expect('emitted twice', twice.problems.some(item => item.includes('emitted more than once')));
 
 const staleId = roster.ids.find(id => id.endsWith('/interruption-destruction/dialog/reopen-instance'));
+const selectReopenId = roster.ids.find(id => id.endsWith('/interruption-destruction/select/missing-end-fallback'));
+for (const changed of [
+  {touchedReopens: 0}, {touchedReopens: 2}, {touchedReopens: '1'},
+  {reopenedPanelVisible: false}, {reopenedPanelVisible: undefined},
+]) {
+  const rejected = observationProblems({requiredIds: roster.ids,
+    outcomes: withOne(selectReopenId, () => changed), engines: goodEngines,
+    sourceClean: true, artifactSha: 'abc', boundSha: 'abc'});
+  expect('select touched reentry rejected ' + JSON.stringify(changed), rejected.problems.some(item => item.includes('touched callback closed the reopened panel')));
+}
 const stale = observationProblems({
   requiredIds: roster.ids,
   outcomes: withOne(staleId, () => ({staleClosed: true})),

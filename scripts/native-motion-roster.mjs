@@ -201,6 +201,7 @@ function interruptProblem(suffix, obs) {
   if (suffix === 'select/missing-end-fallback') {
     if (obs.endEventDispatched !== false) return 'fallback was not isolated from an end event';
     if (obs.fallbackCompleted !== true) return 'missing fallback completion';
+    if (obs.touchedReopens !== 1 || obs.reopenedPanelVisible !== true) return 'touched callback closed the reopened panel';
     return null;
   }
   if (suffix === 'tooltip/destroy-while-shown') {
@@ -262,7 +263,7 @@ export function samplePass(caseId) {
   if (suffix === 'snack-bar/fallback-without-end-event') return {...base, endEventDispatched: false, fallbackCompleted: true, completions: 1};
   if (suffix === 'menu/duplicate-end') return {...base, duplicateDispatched: true, completions: 1};
   if (suffix === 'select/descendant-end') return {...base, descendantIgnored: true, panelRemained: true};
-  if (suffix === 'select/missing-end-fallback') return {...base, endEventDispatched: false, fallbackCompleted: true};
+  if (suffix === 'select/missing-end-fallback') return {...base, endEventDispatched: false, fallbackCompleted: true, touchedReopens: 1, reopenedPanelVisible: true};
   if (suffix === 'tooltip/destroy-while-shown') return {...base, destroyed: true, leaks: 0};
   if (suffix === 'tabs/rapid-reversal') return {...base, durationMs: MIN_ENABLED_MS.tabs, finalState: 'visible', animating: false};
   return base;

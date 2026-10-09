@@ -264,6 +264,9 @@ export abstract class _MatSelectBase<C>
   _panelExiting = false;
 
   private _exitCleanup: (() => void) | undefined;
+  private _motionSequence = 0;
+  private _motionDestroyed = false;
+  private _completedEnterAnimation = false;
 
 
   /** Comparison function to specify which option is displayed. Defaults to object equality. */
@@ -607,10 +610,17 @@ export abstract class _MatSelectBase<C>
   }
 
   ngOnDestroy() {
-    this._exitCleanup?.();
+    if (this._motionDestroyed) {
+      return;
+    }
+    this._motionDestroyed = true;
+    this._motionSequence++;
+    this._cancelExit();
+    this._panelOpen = this._overlayAttached = this._panelExiting = false;
     this._keyManager?.destroy();
     this._destroy.next();
     this._destroy.complete();
+    this._panelDoneAnimatingStream.complete();
     this.stateChanges.complete();
     this._clearFromModal();
   }
@@ -623,20 +633,26 @@ export abstract class _MatSelectBase<C>
   /** Opens the overlay panel. */
   open(): void {
     // Early return avoids measuring/toggling when open cannot proceed (e.g. focus+click flicker).
-    if (!this._canOpen()) {
+    if (this._motionDestroyed || !this._canOpen()) {
       return;
     }
 
+    const sequence = ++this._motionSequence;
+    this._completedEnterAnimation = false;
     this._applyModalPanelOwnership();
-    this._exitCleanup?.();
-    this._exitCleanup = undefined;
+    this._cancelExit();
+    if (this._motionDestroyed || sequence !== this._motionSequence) {
+      return;
+    }
     this._panelExiting = false;
 
     this._panelOpen = true;
     this._overlayAttached = true;
     this._keyManager.withHorizontalOrientation(null);
     this._highlightCorrectOption();
-    this._changeDetectorRef.markForCheck();
+    if (!this._motionDestroyed && sequence === this._motionSequence) {
+      this._changeDetectorRef.markForCheck();
+    }
   }
 
   /**
@@ -706,12 +722,18 @@ export abstract class _MatSelectBase<C>
 
   /** Closes the overlay panel and focuses the host element. */
   close(): void {
-    if (this._panelOpen) {
+    if (!this._motionDestroyed && this._panelOpen) {
+      const sequence = ++this._motionSequence;
       this._panelOpen = false;
       this._keyManager.withHorizontalOrientation(this._isRtl() ? 'rtl' : 'ltr');
       this._changeDetectorRef.markForCheck();
+      if (this._motionDestroyed || sequence !== this._motionSequence) {
+        return;
+      }
       this._onTouched();
-      this._exitAndDetach();
+      if (!this._motionDestroyed && sequence === this._motionSequence && !this._panelOpen) {
+        this._exitAndDetach();
+      }
     }
   }
 
@@ -720,30 +742,29 @@ export abstract class _MatSelectBase<C>
    * Emits panel-done stream states that historically came from Angular triggers.
    */
   protected _exitAndDetach(): void {
+    if (this._motionDestroyed || this._panelOpen) {
+      return;
+    }
+    const sequence = ++this._motionSequence;
+    this._cancelExit();
     const animationsEnabled = this._selectAnimationsEnabled();
     if (!animationsEnabled || !this.panel) {
-      this._overlayAttached = false;
-      this._panelExiting = false;
-      this._panelDoneAnimatingStream.next('void');
-      this._changeDetectorRef.markForCheck();
+      this._completePanelExit(sequence);
       return;
     }
 
-    this._exitCleanup?.();
     this._panelExiting = true;
     this._changeDetectorRef.markForCheck();
+    if (this._motionDestroyed || sequence !== this._motionSequence || this._panelOpen) {
+      return;
+    }
 
     const panelEl = this.panel.nativeElement as HTMLElement;
     const onEnd = (animationName?: string) => {
       if (animationName && animationName !== 'mat-legacy-select-exit') {
         return;
       }
-      this._exitCleanup?.();
-      this._exitCleanup = undefined;
-      this._panelExiting = false;
-      this._overlayAttached = false;
-      this._panelDoneAnimatingStream.next('void');
-      this._changeDetectorRef.markForCheck();
+      this._completePanelExit(sequence);
     };
 
     const fallback = setTimeout(() => onEnd(), 200);
@@ -758,6 +779,34 @@ export abstract class _MatSelectBase<C>
       clearTimeout(fallback);
       panelEl.removeEventListener('animationend', handler);
     };
+  }
+
+  private _cancelExit() {
+    const cleanup = this._exitCleanup;
+    this._exitCleanup = undefined;
+    cleanup?.();
+  }
+
+  private _completePanelExit(sequence: number) {
+    if (this._motionDestroyed || sequence !== this._motionSequence ||
+        this._panelOpen || !this._overlayAttached) {
+      return;
+    }
+    this._cancelExit();
+    this._panelExiting = false;
+    this._overlayAttached = false;
+    this._changeDetectorRef.markForCheck();
+    if (!this._motionDestroyed && sequence === this._motionSequence && !this._panelOpen) {
+      this._panelDoneAnimatingStream.next('void');
+    }
+  }
+
+  private _completePanelEnter(sequence: number) {
+    if (!this._motionDestroyed && sequence === this._motionSequence &&
+        this._panelOpen && this._overlayAttached && !this._panelExiting && !this._completedEnterAnimation) {
+      this._completedEnterAnimation = true;
+      this._panelDoneAnimatingStream.next(this.multiple ? 'showing-multiple' : 'showing');
+    }
   }
 
   /** Whether CSS panel motion should run (overridden by concrete select). */
@@ -775,7 +824,7 @@ export abstract class _MatSelectBase<C>
         ? animationNameOrEvent
         : (animationNameOrEvent as AnimationEvent).animationName;
     if (animationName === 'mat-legacy-select-enter' && this._panelOpen) {
-      this._panelDoneAnimatingStream.next(this.multiple ? 'showing-multiple' : 'showing');
+      this._completePanelEnter(this._motionSequence);
     } else if (animationName === 'mat-legacy-select-exit') {
       // Exit path also handled in `_exitAndDetach` listener; ignore duplicates.
     }
@@ -972,11 +1021,18 @@ export abstract class _MatSelectBase<C>
    * Callback that is invoked when the overlay panel has been attached.
    */
   _onAttached(): void {
-    this._overlayDir.positionChange.pipe(take(1)).subscribe(() => {
+    const sequence = this._motionSequence;
+    this._overlayDir.positionChange.pipe(take(1), takeUntil(this._destroy)).subscribe(() => {
+      if (this._motionDestroyed || sequence !== this._motionSequence || !this._panelOpen) {
+        return;
+      }
       this._changeDetectorRef.detectChanges();
+      if (this._motionDestroyed || sequence !== this._motionSequence || !this._panelOpen) {
+        return;
+      }
       this._positioningSettled();
       if (!this._selectAnimationsEnabled()) {
-        this._panelDoneAnimatingStream.next(this.multiple ? 'showing-multiple' : 'showing');
+        this._completePanelEnter(sequence);
       }
     });
   }

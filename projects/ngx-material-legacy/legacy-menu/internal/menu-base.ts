@@ -108,6 +108,8 @@ export class _MatMenuBase
 
   private _exitFallbackTimeout: ReturnType<typeof setTimeout> | undefined;
   private _completedAnimation: string | undefined;
+  private _motionSequence = 0;
+  private _motionDestroyed = false;
 
   /** Emits whenever an animation on the menu completes. */
   readonly _animationDone = new Subject<LegacyMenuAnimationEvent>();
@@ -347,9 +349,14 @@ export class _MatMenuBase
   }
 
   ngOnDestroy() {
-    if (this._exitFallbackTimeout !== undefined) {
-      clearTimeout(this._exitFallbackTimeout);
+    if (this._motionDestroyed) {
+      return;
     }
+    this._motionDestroyed = true;
+    this._motionSequence++;
+    this._clearExitFallback();
+    this._isAnimating = false;
+    this._animationDone.complete();
     this._keyManager?.destroy();
     this._directDescendantItems.destroy();
     this.closed.complete();
@@ -515,24 +522,34 @@ export class _MatMenuBase
 
   /** Starts the enter animation (CSS keyframes). */
   _startAnimation() {
+    if (this._motionDestroyed) {
+      return;
+    }
+    const sequence = ++this._motionSequence;
+    this._clearExitFallback();
     this._completedAnimation = undefined;
     this._panelAnimationState = 'enter';
     if (!this._animationsEnabled) {
       // Microtask so listeners subscribed after open still observe completion.
-      Promise.resolve().then(() => this._onCssAnimationDone(ENTER_ANIMATION));
+      Promise.resolve().then(() => this._completeAnimation(ENTER_ANIMATION, sequence));
     }
     this._changeDetectorRef?.markForCheck();
   }
 
   /** Resets the panel animation to its initial (exit) state. */
   _resetAnimation() {
+    if (this._motionDestroyed) {
+      return;
+    }
+    const sequence = ++this._motionSequence;
+    this._clearExitFallback();
     this._completedAnimation = undefined;
     this._panelAnimationState = 'void';
     if (!this._animationsEnabled) {
-      Promise.resolve().then(() => this._onCssAnimationDone(EXIT_ANIMATION));
+      Promise.resolve().then(() => this._completeAnimation(EXIT_ANIMATION, sequence));
     } else {
       this._exitFallbackTimeout = setTimeout(
-        () => this._onCssAnimationDone(EXIT_ANIMATION),
+        () => this._completeAnimation(EXIT_ANIMATION, sequence),
         200,
       );
     }
@@ -547,7 +564,8 @@ export class _MatMenuBase
       typeof animationNameOrEvent === 'string'
         ? animationNameOrEvent
         : (animationNameOrEvent as AnimationEvent).animationName;
-    if (animationName === ENTER_ANIMATION || animationName === EXIT_ANIMATION) {
+    if (!this._motionDestroyed && this._completedAnimation !== animationName &&
+        animationName === (this._panelAnimationState === 'enter' ? ENTER_ANIMATION : EXIT_ANIMATION)) {
       this._isAnimating = true;
       if (animationName === ENTER_ANIMATION && this._keyManager?.activeItemIndex === 0) {
         if (this._directDescendantItems?.length) {
@@ -570,8 +588,20 @@ export class _MatMenuBase
       typeof animationNameOrEvent === 'string'
         ? animationNameOrEvent
         : (animationNameOrEvent as AnimationEvent).animationName;
+    this._completeAnimation(animationName, this._motionSequence);
+  }
+
+  private _clearExitFallback() {
+    if (this._exitFallbackTimeout !== undefined) {
+      clearTimeout(this._exitFallbackTimeout);
+      this._exitFallbackTimeout = undefined;
+    }
+  }
+
+  private _completeAnimation(animationName: string, sequence: number) {
     const isExit = animationName === EXIT_ANIMATION;
-    if (!isExit && animationName !== ENTER_ANIMATION) {
+    if (this._motionDestroyed || sequence !== this._motionSequence ||
+        animationName !== (this._panelAnimationState === 'enter' ? ENTER_ANIMATION : EXIT_ANIMATION)) {
       return;
     }
     const completion = legacyNextMotionCompletion(this._completedAnimation, animationName);
@@ -579,12 +609,11 @@ export class _MatMenuBase
       return;
     }
     this._completedAnimation = completion;
-    if (isExit && this._exitFallbackTimeout !== undefined) {
-      clearTimeout(this._exitFallbackTimeout);
-      this._exitFallbackTimeout = undefined;
+    if (isExit) {
+      this._clearExitFallback();
     }
-    this._animationDone.next({toState: isExit ? 'void' : 'enter'});
     this._isAnimating = false;
+    this._animationDone.next({toState: isExit ? 'void' : 'enter'});
   }
 
   /**
