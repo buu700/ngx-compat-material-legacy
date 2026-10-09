@@ -119,7 +119,7 @@ function isSafeTarget(target) {
 }
 
 function gitValue(args) {
-  const result = spawnSync('git', args, {cwd: root, encoding: 'utf8'});
+  const result = spawnSync('git', ['-c', 'gc.auto=0', '-c', 'maintenance.auto=0', ...args], {cwd: root, encoding: 'utf8'});
   if (result.status !== 0) return null;
   return result.stdout.trim();
 }
@@ -293,6 +293,20 @@ function coordinatorRequest() {
   if (binding.source_line !== 'main' && binding.source_line !== '21.x') {
     return {error: 'binding source line is not a supported line'};
   }
+  let sourceVersion;
+  try {
+    sourceVersion = JSON.parse(readFileSync(join(root, 'projects/ngx-material-legacy/package.json'), 'utf8')).version;
+  } catch {
+    return {error: 'checkout source line cannot be read'};
+  }
+  const major = typeof sourceVersion === 'string' ? /^(21|22)\./.exec(sourceVersion)?.[1] : null;
+  if (!major) return {error: 'checkout source line is unsupported'};
+  const sourceLine = major === '21' ? '21.x' : 'main';
+  if (binding.source_line !== sourceLine) return {error: 'binding source line does not match this checkout'};
+  if (binding.source_clean !== true) return {error: 'binding source must be clean'};
+  const status = gitValue(['status', '--porcelain', '--untracked-files=normal']);
+  if (status === null) return {error: 'checkout clean source state is unknown'};
+  if (status !== '') return {error: 'checkout source is dirty'};
   const outputDir = process.env.RC_ASSERTION_OUTPUT_DIR;
   if (!outputDir || !existsSync(outputDir)) return {error: 'assertion output directory is missing'};
   let stat;
