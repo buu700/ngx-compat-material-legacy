@@ -16,6 +16,20 @@ import {createHash} from 'node:crypto';
 import {originalCompilerFactoryContext,originalContextDi} from './api-original-factory-contexts.mjs';
 const require=createRequire(import.meta.url),sha=x=>createHash('sha256').update(x).digest('hex'),flags=['optional','self','skipSelf','host'];
 export const INPUT_SYMBOL='legacy-input/primary/MatLegacyInput';
+export const INPUT_CONSTRUCTION_PROFILE='input-angular-di-construction-v1';
+export const INPUT_ORIGINAL_CONSTRUCTOR='public constructor(ElementRef<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>,Platform,NgControl,NgForm,FormGroupDirective,ErrorStateMatcher,any,AutofillMonitor,NgZone,MatFormField?)';
+export function approvedInputSignatureRecord(symbol,packed,record,read=file=>readFileSync(fileURLToPath(new URL('../'+file,import.meta.url)))){
+ if(symbol?.symbol_id!==INPUT_SYMBOL||record?.construction_contract!==INPUT_CONSTRUCTION_PROFILE)return false;
+ if(!isDeepStrictEqual(Object.keys(record).sort(),['symbol_id','classification','historical_signature','owned_signature','construction_contract','rationale'].sort()))return false;
+ inputContract(symbol);
+ const bytes=read('compatibility/rc/api/input-construction-consumer-decision.json');assert.equal(sha(bytes),'040a15b9c0b1b6c60c0350f6590b35ff225c068538dd0145a1197c1e25e0eea4','input delegated decision identity changed');
+ assert.deepEqual(symbol.shape.inheritedConstructor,{parent:'MatInput',signatures:[INPUT_ORIGINAL_CONSTRUCTOR],source_sha256:'fdd8c06ce5805b8d6ea1af278bb983f68e37b86ef1f12926d7e7614f4b4a9755'});
+ assert.equal(symbol.shape.ownConstructor,false);
+ const constructors=(packed?.ownSignatures||[]).filter(s=>s.includes(' constructor('));
+ return packed?.ownConstructor===true&&packed.inheritedConstructor===null&&packed.publicInputParent===true&&isDeepStrictEqual(constructors,['public constructor()'])
+  &&record.symbol_id===INPUT_SYMBOL&&record.classification==='intentional-legacy-difference'&&Boolean(record.rationale)
+  &&record.historical_signature===INPUT_ORIGINAL_CONSTRUCTOR&&record.owned_signature==='public constructor()';
+}
 export function inputContract(symbol){
  if(symbol?.symbol_id!==INPUT_SYMBOL)return null;
  assert.equal(symbol.family,'legacy-input');assert.equal(symbol.kind,'primary');assert.equal(symbol.name,'MatLegacyInput');
