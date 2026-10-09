@@ -17,6 +17,7 @@ import {createRequire} from 'node:module';
 import {tmpdir} from 'node:os';
 import {dirname, join, relative, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {delegatedObservationPage} from './delegated-observation-page.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -37,24 +38,7 @@ const jasmineVersion = JSON.parse(readFileSync(join(jasmineDir, 'package.json'),
 async function collect() {
   if (!existsSync(bundlePath)) throw new Error('build testing/legacy-runner first');
   const lib = join(jasmineDir, 'lib/jasmine-core');
-  const page = `<!doctype html><html><head><meta charset="utf-8">
-<link rel="stylesheet" href="/jasmine/jasmine.css">
-<script src="/jasmine/jasmine.js"></script><script src="/jasmine/jasmine-html.js"></script><script src="/jasmine/boot0.js"></script>
-<script>
-  jasmine.getEnv().configure({random: false});
-  window.__summary = {executed: 0, passed: 0, failed: 0, skipped: 0, failures: []};
-  jasmine.getEnv().addReporter({
-    specDone(r) {
-      const s = window.__summary;
-      if (r.status === 'passed') { s.executed++; s.passed++; }
-      else if (r.status === 'failed') { s.executed++; s.failed++; if (s.failures.length < 50) s.failures.push(r.fullName); }
-      else s.skipped++;
-    },
-    jasmineDone(r) { window.__summary.overall = r.overallStatus; window.__done = true; },
-  });
-</script>
-<script src="/jasmine/boot1.js"></script><script src="/out/legacy-tests.iife.js"></script>
-</head><body></body></html>`;
+  const page = delegatedObservationPage();
   const server = createServer((req, res) => {
     const url = new URL(req.url, 'http://x');
     let file = null;
