@@ -27,7 +27,10 @@
   }
 }
 
-@mixin high-contrast($target: null) {
+@mixin high-contrast($target: null, $encapsulation: null) {
+  @if $encapsulation != null and $encapsulation != off {
+    @error 'The owned legacy component boundary supports only off encapsulation.';
+  }
   @if $target != null and $target != active {
     @error 'The owned legacy component boundary supports only active high contrast.';
   }
