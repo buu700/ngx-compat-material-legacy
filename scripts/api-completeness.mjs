@@ -41,6 +41,7 @@ import {publicParentTokenRoleObservationProblems} from './api-public-parent-toke
 import {requiredParentContextObservationProblems} from './api-required-parent-context.mjs';
 import {callerConfigObservationProblems} from './api-caller-config-context.mjs';
 import {ownedDialogFocusObservationProblems} from './api-owned-dialog-focus-context.mjs';
+import {MENU_CONTENT_SYMBOL,menuContentObservationProblems} from './api-menu-content-context.mjs';
 
 // verify-lite imports this module before node_modules exists. Load the parser
 // on first use so compareContracts can be unit-tested without typescript.
@@ -507,7 +508,7 @@ if (isMain) {
 }
 
 export function settleDi(row, records) {
-  row={...row,problems:[...row.problems,...publicParentTokenRoleObservationProblems(row),...requiredParentContextObservationProblems(row),...callerConfigObservationProblems(row),...ownedDialogFocusObservationProblems(row)]};
+  row={...row,problems:[...row.problems,...publicParentTokenRoleObservationProblems(row),...requiredParentContextObservationProblems(row),...callerConfigObservationProblems(row),...ownedDialogFocusObservationProblems(row),...menuContentObservationProblems(row)]};
   if(row.symbol.symbol_id===RIPPLE_SYMBOL){
     const contract=approvedRippleContract(row.symbol),problems=[...row.problems,...rippleFactoryObservationProblems(row,contract)];
     return {...row,problems,result:problems.length?'fail':'pass',status:problems.length?'mismatch':'intentional-legacy-difference',
@@ -565,6 +566,7 @@ export function settleDi(row, records) {
       rationale: 'Owner accepted Angular DI construction while preserving the genuine public parent and Material16 markup/styles. Original five-dependency/manual constructor evidence is retained. This exact executed public/owned context is checked by object identity, flags, real root resolution and lifetime behavior.'};
   }
   if (!row.problems.length) {
+    if(row.symbol.symbol_id===MENU_CONTENT_SYMBOL)return {...row,result:'pass',status:'intentional-legacy-difference',historical,owned,rationale:'Maintainer delegated conservative TypeScript changes with unchanged required consumer styles and Cyph sanity. Only the authenticated unused resolver slot is removed; all other token objects/options remain checked. Actual public template/outlet identities, contexts, reattachment, movement, detach, owned teardown and borrowed caller view/lifetime execute. Original seven dependencies remain visible.'};
     return {...row, result: 'pass', status: 'match', historical, owned};
   }
   const record = records.find(item => item.symbol_id === row.symbol.symbol_id
@@ -664,6 +666,7 @@ function writeAcceptance(request, surface, groups, declared, diSettled, summary,
           required_parent_context:di.factory_required_parent_context||null,
           caller_config_context:di.factory_caller_config_context||null,
           owned_dialog_focus_context:di.factory_owned_dialog_focus_context||null,
+          menu_content_context:di.factory_menu_content_context||null,
           owned_motion_context:di.factory_owned_motion_context||null,
           historical:di.historical,owned:di.owned,constructor_attributes:di.constructor_attributes||[],
           ...(di.approved_construction?{approved_construction:di.approved_construction}:{})}:null});
