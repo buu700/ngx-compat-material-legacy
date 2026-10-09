@@ -13,6 +13,7 @@ import {createRequire} from 'node:module';
 import {fileURLToPath} from 'node:url';
 import {MENU_ITEM_SYMBOL, approvedMenuItemSignatureRecord} from './menu-item-construction-contract.mjs';
 import {TABLE_SYMBOL, approvedTableSignatureRecord} from './table-construction-contract.mjs';
+import {INPUT_SYMBOL,approvedInputSignatureRecord} from './api-input-context.mjs';
 import {RIPPLE_SYMBOL,rippleReexportSignatureProblems} from './ripple-construction-contract.mjs';
 import {originalCompilerFactoryContext, originalPublishedJitFactory} from './api-original-factory-contexts.mjs';
 
@@ -105,6 +106,9 @@ const INHERITED_TABLE_FACTORIES = Object.freeze({
 const INHERITED_CONSTRUCTOR_REFERENCE = 'reference/material-16.2.14/cdk-inherited-constructors/table.d.ts';
 const INHERITED_CONSTRUCTOR_SHA256 = '94789cae5567000d4f23d9634ce006670e3fca4c5db427ce129026da62002c2d';
 const INHERITED_PEER_CONSTRUCTORS = Object.freeze({
+  MatLegacyInput:{family:'legacy-input',parent:'MatInput',spec:'@angular/material/input',
+    reference:'reference/material-16.2.14/material-inherited-constructors/input.d.ts',
+    sha256:'fdd8c06ce5805b8d6ea1af278bb983f68e37b86ef1f12926d7e7614f4b4a9755',count:1},
   ...Object.fromEntries(Object.entries(INHERITED_TABLE_FACTORIES).map(([name,parent])=>[name,{
     family:'legacy-table',parent,spec:'@angular/cdk/table',reference:INHERITED_CONSTRUCTOR_REFERENCE,
     sha256:INHERITED_CONSTRUCTOR_SHA256,count:1,
@@ -148,6 +152,42 @@ export function originalInheritedTableInputs(file,name) {
     .filter(sig=>/^public (?:get|set) (?:fixedLayout|multiTemplateDataRows)\b/.test(sig));
   if (signatures.length!==4) throw new Error('original inherited table boolean signatures missing');
   return {parent:'CdkTable',signatures,source_sha256:INHERITED_CONSTRUCTOR_SHA256};
+}
+
+/** Exact historical members now explicitly redeclared by five owned children.
+ * Read untouched declarations, including the original sticky mixin type.
+ * This is coverage, not permission to discard any inherited member.
+ */
+export function originalInheritedOverrides(file,name) {
+  const config={
+    MatLegacyColumnDef:['legacy-table','CdkColumnDef','stickyEnd'],
+    MatLegacyHeaderRowDef:['legacy-table','CdkHeaderRowDef'],
+    MatLegacyFooterRowDef:['legacy-table','CdkFooterRowDef'],
+    MatLegacyTabLabel:['legacy-tabs','MatTabLabel','_closestTab'],
+    MatLegacyTabContent:['legacy-tabs','MatTabContent','template'],
+  }[name];
+  if(!config||!file.split('\\').join('/').includes('/material/'+config[0]+'/'))return null;
+  const reference=config[0]==='legacy-table'?INHERITED_CONSTRUCTOR_REFERENCE:'reference/material-16.2.14/material-inherited-constructors/tabs.d.ts';
+  const expected=config[0]==='legacy-table'?INHERITED_CONSTRUCTOR_SHA256:'30bc71d7fdfc6d01c54cc157e50298025351db6969cb49f042a4f0a252da1ca8';
+  const bytes=readFileSync(join(root,reference));if(createHash('sha256').update(bytes).digest('hex')!==expected)throw Error('untouched16 inherited override reference changed');
+  const source=ts.createSourceFile(reference,bytes.toString(),ts.ScriptTarget.Latest,true),parent=indexFile(source).get(config[1]);
+  if(!parent||!ts.isClassDeclaration(parent))throw Error('original override parent missing');
+  let signatures;
+  if(config[0]==='legacy-table'){
+    const canStick=indexFile(source).get('CanStick'),sticky=canStick?.members.find(n=>n.name?.getText(source)==='sticky');
+    const base=parent.heritageClauses?.find(c=>c.token===ts.SyntaxKind.ExtendsKeyword)?.types[0].expression.getText(source);
+    const mixin=indexFile(source).get(base);
+    if(!canStick||!sticky||!mixin||!ts.isInterfaceDeclaration(canStick)||!ts.isPropertySignature(sticky)||sticky.type.kind!==ts.SyntaxKind.BooleanKeyword
+      ||!ts.isVariableStatement(mixin)||!mixin.declarationList.declarations[0].type.getText(source).includes('CanStickCtor')
+      ||!parent.heritageClauses.some(c=>c.token===ts.SyntaxKind.ImplementsKeyword&&c.types.some(t=>t.expression.getText(source)==='CanStick')))throw Error('original sticky mixin identity missing');
+    signatures=['public get sticky():boolean','public set sticky(boolean)'];
+    if(config[2])signatures.push(...declaredMembers(parent,source).signatures.filter(sig=>/^public (?:get|set) stickyEnd\b/.test(sig)));
+    if(signatures.length!==(config[2]?4:2))throw Error('original sticky declarations missing');
+  }else{
+    signatures=declaredMembers(parent,source).signatures.filter(sig=>sig.startsWith('public prop '+config[2]+':'));
+    if(signatures.length!==1)throw Error('original tab inherited member missing');
+  }
+  return {parent:config[1],reference,source_sha256:expected,signatures};
 }
 
 export function packedInheritedConstructor(sourceFile, name, loadPeer = (spec, file) => {
@@ -711,6 +751,10 @@ function unique(values) {
   return [...new Set(values)].sort();
 }
 
+function aliasTypeText(node,sourceFile){
+  return ts.isUnionTypeNode(node)?node.types.map(type=>normalizeType(type.getText(sourceFile))).join('|'):normalizeType(node.getText(sourceFile));
+}
+
 function shapeFromFound(found, refRoot) {
   if (!found) return {kind: 'missing', signatures: [], requiredProtected: [], requiredConstructor: false, comparison: 'unresolved'};
   if (found.reexport && !found.node) {
@@ -745,6 +789,8 @@ function shapeFromFound(found, refRoot) {
     flat.originalFactory = originalFactoryContract(found.file, node.name?.text);
     flat.originalFactoryContext = originalCompilerFactoryContext(flat.originalFactory);
     flat.inheritedConstructor = originalInheritedConstructor(found.file, node.name?.text);
+    flat.inheritedOverrides=originalInheritedOverrides(found.file,node.name?.text);
+    if(flat.inheritedOverrides)flat.signatures=unique([...flat.signatures,...flat.inheritedOverrides.signatures]);
     if (flat.inheritedConstructor && !own.requiredConstructor) {
       flat.requiredConstructor = true;
       flat.signatures = unique([...flat.signatures, ...flat.inheritedConstructor.signatures]);
@@ -760,7 +806,7 @@ function shapeFromFound(found, refRoot) {
   if (ts.isTypeAliasDeclaration(node)) {
     return {
       kind: 'type',
-      signatures: [`type ${node.name.text}${typeParamText(node, found.sourceFile)}=${normalizeType(node.type.getText(found.sourceFile))}`],
+      signatures: [`type ${node.name.text}${typeParamText(node, found.sourceFile)}=${aliasTypeText(node.type,found.sourceFile)}`],
       requiredProtected: [],
       requiredConstructor: false,
       comparison: 'signature',
@@ -1098,6 +1144,16 @@ export function packedShape(sourceFile, name) {
       flat.publicMenuItemParent = Boolean((binding?.spec === '@angular/material/menu'
         && binding.imported === 'MatMenuItem' && !index.has(expression.text)) || namespace);
     }
+    if(node.name?.text==='MatLegacyInput'){
+      const bases=(node.heritageClauses||[]).filter(c=>c.token===ts.SyntaxKind.ExtendsKeyword).flatMap(c=>[...c.types]);
+      const expression=bases.length===1?bases[0].expression:null,binding=expression&&ts.isIdentifier(expression)?importBindings(sourceFile).get(expression.text):null;
+      const namespace=expression&&ts.isPropertyAccessExpression(expression)&&expression.name.text==='MatInput'
+        &&ts.isIdentifier(expression.expression)&&!index.has(expression.expression.text)
+        &&sourceFile.statements.some(n=>ts.isImportDeclaration(n)&&n.moduleSpecifier.text==='@angular/material/input'
+          &&n.importClause?.namedBindings&&ts.isNamespaceImport(n.importClause.namedBindings)
+          &&n.importClause.namedBindings.name.text===expression.expression.text);
+      flat.publicInputParent=Boolean(binding?.spec==='@angular/material/input'&&binding.imported==='MatInput'&&!index.has(expression.text)||namespace);
+    }
     if (node.name?.text === 'MatLegacyTable') {
       const bases=(node.heritageClauses||[]).filter(clause=>clause.token===ts.SyntaxKind.ExtendsKeyword)
         .flatMap(clause=>[...clause.types]);
@@ -1128,7 +1184,7 @@ export function packedShape(sourceFile, name) {
   if (ts.isTypeAliasDeclaration(node)) {
     return {
       kind: 'type',
-      signatures: [`type ${name}${typeParamText(node, sourceFile)}=${normalizeType(node.type.getText(sourceFile))}`],
+      signatures: [`type ${name}${typeParamText(node, sourceFile)}=${aliasTypeText(node.type,sourceFile)}`],
       requiredProtected: [],
       requiredConstructor: false,
       comparison: 'signature',
@@ -1334,6 +1390,7 @@ export function compareSignatures(symbol, packed, differences) {
   if (historical.inheritedConstructor && !historical.ownConstructor) ownHist.push(...historical.inheritedConstructor.signatures);
   if (packed.inheritedConstructor && !packed.ownConstructor) ownPacked.push(...packed.inheritedConstructor.signatures);
   if (historical.inheritedTableInputs) ownHist.push(...historical.inheritedTableInputs.signatures);
+  if (historical.inheritedOverrides) ownHist.push(...historical.inheritedOverrides.signatures);
   const heritageHist = `heritage ${(historical.heritage || []).join(',')}`;
   const heritagePacked = `heritage ${(packed.heritage || []).join(',')}`;
   let historicalSigs = ownHist;
@@ -1460,6 +1517,8 @@ function constructionDifferenceAllowed(symbol, packed, record) {
     return approvedMenuItemSignatureRecord(symbol, packed, record);
   if (symbol.symbol_id === TABLE_SYMBOL && constructor)
     return approvedTableSignatureRecord(symbol, packed, record);
+  if (symbol.symbol_id === INPUT_SYMBOL && constructor)
+    return approvedInputSignatureRecord(symbol,packed,record);
   return !record.construction_contract;
 }
 
