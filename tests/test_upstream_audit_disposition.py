@@ -54,8 +54,8 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0, combined)
             summary = json.loads(result.stdout)
             self.assertFalse(summary["ok"])
-            # Qualified bounded source/runtime decisions leave three original pending subjects on main.
-            self.assertEqual(summary["unresolved"], 3)
+            # Qualified bounded source/runtime decisions leave three original subjects, the reopened tab contract and three stale source proofs pending on main.
+            self.assertEqual(summary["unresolved"], 7)
             self.assertEqual(summary["seed_rows"], 1697)
             self.assertEqual(summary["ledger_rows"], 1697)
             self.assertEqual(summary["missing"], 0)
@@ -77,6 +77,17 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
             self.assertEqual(report_body["disposition_admission"], "incomplete")
             self.assertEqual(report_body["g11_claim"], "not-passed")
             self.assertEqual(report_body["security_clearance"], "not-passed")
+
+    def test_reopened_source_findings_remain_pending_and_preserve_old_proofs(self):
+        entries={e["sha"]:e for e in json.loads(LEDGER.read_text())["entries"]}
+        for sha in ['77ffdf98ba71c11d908b29e02b516dddf487ae0b','5dd614aa100e28f0815fdd83e5b68f4239ef01f9','86ad5150110522873dae2801fd3c2957502949e7']:
+            entry=entries[sha]
+            self.assertEqual(entry['final_disposition'],'needs-individual-review')
+            self.assertNotIn('individual_proof',entry)
+            evidence=json.loads((ROOT/entry['evidence_report']).read_text())
+            self.assertEqual(evidence['sha'],sha)
+            self.assertIn('individual_proof',evidence['prior_entry'])
+            self.assertEqual(evidence['g11_claim'],'not-passed')
 
     def test_removed_seed_row_conflicts_and_docs_only_security_hunk_fail(self) -> None:
         ledger = json.loads(LEDGER.read_text())
@@ -186,7 +197,7 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
             self.assertEqual(summary["structural_inventory"], "fail")
             self.assertEqual(summary["disposition_admission"], "incomplete")
             self.assertGreaterEqual(summary["insufficient_inherited"], 1)
-            self.assertIn("unresolved=3", result.stderr)
+            self.assertIn("unresolved=7", result.stderr)
             self.assertEqual(summary["security_clearance"], "not-passed")
             # The ledger object above is only used to prove the file still parses.
             self.assertEqual(ledger["g11_claim"], "not-passed")
@@ -404,7 +415,10 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
             proof = entry["individual_proof"]
             self.assertEqual(proof["affected_branches"], ["main"])
             self.assertGreaterEqual(len(proof["decision"]), 40)
-            lines = (ROOT / proof["candidate_member"]["path"]).read_text().split("\n")
+            member = ROOT / proof["candidate_member"]["path"]
+            import hashlib
+            self.assertEqual(hashlib.sha256(member.read_bytes()).hexdigest(), proof["candidate_member"]["sha256"], entry["sha"])
+            lines = member.read_text().split("\n")
             checks = [(item["upstream_added"], item["candidate_lines"]) for item in proof["added_lines"]]
             checks += [(item["candidate_snippet"], item["candidate_lines"]) for item in proof.get("equivalent_candidate_lines", [])]
             if proof["proof_kind"] == "candidate-source-equivalent":

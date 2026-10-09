@@ -43,6 +43,7 @@ LINE_FLOORS = {
 }
 INHERITED = {"inherited"}
 BEHAVIOR = {"adapt", "already-adapted", "already-present"}
+PENDING = {"open", "needs-individual-review", "security-review"}
 SKIP_ADDED = re.compile(r"^(import |export \* from|//|/\*|\*|\}|\{|\)|\]|$)")
 
 
@@ -259,6 +260,8 @@ def proof_defects(entry: dict, sensitive: str | None) -> list[str]:
     disposition = entry.get("final_disposition")
     proof = entry.get("individual_proof") if isinstance(entry.get("individual_proof"), dict) else None
     out = []
+    if disposition in PENDING:
+        out.append("unresolved-disposition")
     if sensitive and not proof:
         out.append(f"sensitive-{sensitive}-without-individual-proof")
     if disposition in INHERITED and not (proof and proof.get("installed_member") and proof.get("reachable_behavior")):
@@ -422,6 +425,11 @@ def review_note(row: dict, category: str, priority: int, ctx: Context) -> dict:
             kind = "ambiguity"
             proposal = f"No mechanical conclusion. Delegated added-line presence per line {line_counts}; read note {note['disposition']}."
             alternatives = [f"Keep {final} with individual proof.", "Reclassify after reading the hunk against the candidate."]
+    elif category == "pending-disposition":
+        kind = "unavailable-evidence"
+        proposal = f"The ledger leaves this SHA {final}; retain it as individual work until its recorded source review and outstanding qualification have an admitted decision."
+        alternatives = ["Complete the pending individual evidence and record the resulting disposition.",
+                        "Keep the precise unresolved obligation visible; source-only evidence does not close it."]
     elif category == "behavior":
         found = refs["upstream_added_lines_found"]
         unseen = refs.get("read_note_identifiers_not_in_cited_files") or []
@@ -594,6 +602,8 @@ def write_queue(rows: list[dict], report: dict, ctx: Context) -> dict:
         c = row["mechanical_consistency"]
         if row["sensitive_class"] and any(d.startswith("sensitive-") for d in row["defects"]):
             items.append(review_note(row, f"sensitive-{row['sensitive_class']}", 1, ctx))
+        elif "unresolved-disposition" in row["defects"]:
+            items.append(review_note(row, "pending-disposition", 3, ctx))
         elif c["status"] == "conflict-owned-source-touched":
             items.append(review_note(row, c["status"], 2, ctx))
         elif "behavior-without-individual-proof" in row["defects"]:
@@ -641,6 +651,17 @@ def write_queue(rows: list[dict], report: dict, ctx: Context) -> dict:
     return queue["counts"]
 
 
+def refresh_ledger_row(row: dict, entry: dict) -> None:
+    """Refresh mutable ledger facts while preserving immutable diff/floor source facts."""
+    kept = [d for d in row["defects"] if d in EVIDENCE_DEFECTS or d in ("no-ledger-row", "evidence-file-missing")]
+    row["final_disposition"] = entry.get("final_disposition")
+    row["bucket"] = entry.get("bucket")
+    row["evidence_report"] = entry.get("evidence_report")
+    row["sensitive_class"] = sensitive_class(entry) if entry else None
+    row["defects"] = [d for d in kept if d not in EVIDENCE_DEFECTS] + proof_defects(entry, row["sensitive_class"])
+    row["mechanical_consistency"] = consistency(row)
+
+
 def queue_only(args) -> int:
     """Re-derive per-row proof gaps from the current ledger and rewrite the queue; diff/floor facts are reused."""
     report = json.loads(args.out.read_text())
@@ -648,10 +669,8 @@ def queue_only(args) -> int:
     entries = {entry["sha"]: entry for entry in ledger["entries"]}
     defects = defaultdict(list)
     for row in report["rows"]:
-        kept = [d for d in row["defects"] if d in EVIDENCE_DEFECTS or d in ("no-ledger-row", "evidence-file-missing")]
         entry = entries.get(row["sha"], {})
-        row["evidence_report"] = entry.get("evidence_report")
-        row["defects"] = [d for d in kept if d not in EVIDENCE_DEFECTS] + proof_defects(entry, row["sensitive_class"])
+        refresh_ledger_row(row, entry)
         for defect in row["defects"]:
             defects[defect].append(row["sha"])
     report["defects"] = {key: sorted(value) for key, value in sorted(defects.items())}

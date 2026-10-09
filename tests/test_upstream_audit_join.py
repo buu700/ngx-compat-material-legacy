@@ -1,5 +1,8 @@
 import importlib.util
 import unittest
+import tempfile
+import json
+from unittest.mock import patch
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -81,6 +84,44 @@ class ConsistencyTests(unittest.TestCase):
         owned = {"kind": "owned-legacy", "candidate_exists": True, "path": "src/material/legacy-menu/menu.ts"}
         self.assertEqual(join.consistency(row("irrelevant", [owned]))["status"], "conflict-owned-source-touched")
         self.assertEqual(join.consistency(row("irrelevant", [self.peer]))["status"], "consistent-no-owned-source")
+
+
+class PendingRefreshTests(unittest.TestCase):
+    def test_reopened_row_survives_refresh_and_queue(self):
+        source={"kind":"delegated-peer","package":"@angular/material","module":"tabs","path":"src/material/tabs/tab-body.ts"}
+        facts={line:{"floor_tag":version,"sha_is_ancestor_of_floor_tag":True,
+                    "delegated_added_lines_present_in_installed_floor":2,"delegated_added_lines":5}
+               for line,version in [("main","v22.1.7"),("21.x","v21.2.14")]}
+        item={"sha":"0064b4218b375b30b65bf1c13530d8620f20d980","subject":"fix(material/tabs): remove IE animation workaround (#29899)",
+              "diff_sha256":"8c5c7c7e24faef142a0320faf51bd61cecd10c7e06eeeeb15ddc0f53cb654083",
+              "final_disposition":"already-adapted","bucket":"behavior-semantic","files":[source],"lines":facts,
+              "sensitive_class":None,"defects":["behavior-without-individual-proof"],"evidence_report":"old-report.json"}
+        entry={"sha":item["sha"],"subject":item["subject"],"files":[source["path"]],"bucket":"behavior-semantic",
+               "final_disposition":"needs-individual-review","evidence_report":"new-individual-source-review.json"}
+        join.refresh_ledger_row(item,entry)
+        self.assertEqual(item["final_disposition"],"needs-individual-review")
+        self.assertEqual(item["evidence_report"],entry["evidence_report"])
+        self.assertEqual(item["defects"],["unresolved-disposition"])
+        self.assertEqual(item["mechanical_consistency"]["status"],"unclassified")
+        self.assertEqual(item["lines"],facts)
+        class Context:
+            prs_16=set()
+            execution={}
+            def read_note(self,sha):return {"source":"ledger","disposition":"owned-retained-source-reviewed-native-pending","text":""}
+            def regression_tests(self,row):return []
+        with tempfile.TemporaryDirectory() as tmp,patch.object(join,"QUEUE",Path(tmp)/"queue.json"):
+            join.write_queue([item],{"symbol_uses":[]},Context())
+            queue=json.loads(join.QUEUE.read_text())
+        self.assertEqual(len(queue["items"]),1)
+        self.assertEqual(queue["items"][0]["sha"],item["sha"])
+        self.assertEqual(queue["items"][0]["current_disposition"],"needs-individual-review")
+        self.assertEqual(queue["items"][0]["category"],"pending-disposition")
+        self.assertEqual(queue["groups"],[])
+
+    def test_every_pending_state_stays_open_even_with_a_proof_object(self):
+        for disposition in ["open","needs-individual-review","security-review"]:
+            with self.subTest(disposition=disposition):
+                self.assertIn("unresolved-disposition",join.proof_defects({"final_disposition":disposition,"individual_proof":{"decision":"unadmitted"}},None))
 
 
 if __name__ == "__main__":
