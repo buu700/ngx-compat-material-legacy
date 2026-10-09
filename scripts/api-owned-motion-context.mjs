@@ -14,9 +14,11 @@ import {fileURLToPath} from 'node:url';
 const require=createRequire(import.meta.url),flags=['optional','self','skipSelf','host'];
 export const SELECT_MOTION_SYMBOL='legacy-select/primary/MatLegacySelect';
 export const PSEUDO_MOTION_SYMBOL='legacy-core/primary/MatLegacyPseudoCheckbox';
+export const SNACK_MOTION_SYMBOL='legacy-snack-bar/primary/MatLegacySnackBarContainer';
 const ownedMotionProfiles=Object.freeze({
  [SELECT_MOTION_SYMBOL]:Object.freeze({family:'legacy-select',property:'_animationsEnabled',enabled:true}),
  [PSEUDO_MOTION_SYMBOL]:Object.freeze({family:'legacy-core',property:'_animationsDisabled',enabled:false}),
+ [SNACK_MOTION_SYMBOL]:Object.freeze({family:'legacy-snack-bar',property:'_animationsEnabled',enabled:true}),
 });
 export const ownedMotionProfile=symbolId=>Object.hasOwn(ownedMotionProfiles,symbolId)?ownedMotionProfiles[symbolId]:null;
 const sha=text=>createHash('sha256').update(text).digest('hex');
@@ -153,6 +155,9 @@ export function ownedSelectMotionProblems(observation,symbolId=SELECT_MOTION_SYM
  if(['state','disabled','caller'].some(name=>!x.sources?.[name]?.file
   ||!/^([a-f0-9]{64})$/.test(x.sources[name].sha256)||!/^([a-f0-9]{64})$/.test(x.sources[name].function_text_sha256)))
   problems.push('owned motion source/caller correlation incomplete');
+ if(symbolId===SNACK_MOTION_SYMBOL&&(x.caller?.file!==x.sources?.caller?.file
+  ||!x.sources?.caller?.file?.endsWith('/fesm2022/ngx-compat-material-legacy-legacy-snack-bar.mjs')))
+  problems.push('owned snack-bar motion caller belongs to a different public entry');
  const names=['LEGACY_ANIMATIONS_TEST_OVERRIDE','MATERIAL_ANIMATIONS','ANIMATION_MODULE_TYPE','MediaMatcher'];
  const check=(requests,count,unresolved=false)=>Array.isArray(requests)&&requests.length===count&&requests.every((r,index)=>
   r.ident===names[index]&&r.identity_matched===true&&r.optional===(index<3)
