@@ -1303,7 +1303,7 @@ export abstract class _MatSelectBase<C>
 
   /** Whether the panel is allowed to open. */
   protected _canOpen(): boolean {
-    return !this._panelOpen && !this.disabled && this.options?.length > 0;
+    return !this._motionDestroyed && !this._panelOpen && !this.disabled && this.options?.length > 0;
   }
 
   /** Focuses the select element. */
