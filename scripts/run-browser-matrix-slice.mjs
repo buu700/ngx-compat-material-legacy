@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import {tabPaginationNativeOkay} from './tab-pagination-native-contract.mjs';
 import {componentHighContrastOkay} from './component-high-contrast-contract.mjs';
 import {peerIconTtOkay} from './peer-icon-tt-admission.mjs';
 import {legacyCoreHighContrastOkay} from './legacy-core-high-contrast-contract.mjs';
@@ -145,6 +146,7 @@ const scenarios = [
       && report.families?.tooltip?.shown
       && report.families?.autocomplete?.panel_opened
       && report.families?.tabs?.second_selected
+      && tabPaginationNativeOkay(report.families?.tabs?.pagination)
       && !report.error,
   },
   {
@@ -171,6 +173,7 @@ const scenarios = [
       && report.families?.tooltip?.shown
       && report.families?.autocomplete?.panel_opened
       && report.families?.tabs?.second_selected
+      && tabPaginationNativeOkay(report.families?.tabs?.pagination)
       && !report.error,
   },
   {

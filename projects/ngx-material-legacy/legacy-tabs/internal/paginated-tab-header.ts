@@ -663,6 +663,11 @@ export abstract class MatPaginatedTabHeader
       return;
     }
 
+    // Keep the historical aria-hidden buttons from taking focus from the tab list.
+    // Mouse-down cancellation preserves the later click and hold-scroll handlers.
+    mouseEvent?.preventDefault?.();
+    if (this._isDestroyed) return;
+
     // Avoid overlapping timers.
     this._stopInterval();
 

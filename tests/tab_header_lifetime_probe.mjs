@@ -184,6 +184,36 @@ async function observations(Base) {
     try {f.init(); f.destroy(); f.stable.next(); f.viewport.next(); f.direction.next(); assert.deepEqual(events, [0, 1, 2]);
     } finally {borrowed.forEach(s => s.unsubscribe()); f.close();}
   });
+  await check('left-paginator-press-cancels-default-focus-and-retains-hold-scroll', async () => {
+    const f = fixture(Base); try {f.init();
+      const event = new Event('mousedown', {cancelable: true}); Object.defineProperty(event, 'button', {value: 0});
+      f.header._handlePaginatorPress('after', event); assert.equal(event.defaultPrevented, true);
+      assert.equal(f.c.jobs.size, 1); f.c.advance(650); assert.equal(f.header.scrollDistance, 30);
+      f.header._stopInterval(); assert.equal(f.c.jobs.size, 0);
+    } finally {f.close();}
+  });
+  await check('destroy-in-event-cancellation-cannot-start-a-paginator-timer', async () => {
+    const f = fixture(Base); try {f.init();
+      const event = new Event('mousedown', {cancelable: true}); Object.defineProperty(event, 'button', {value: 0});
+      const prevent = event.preventDefault.bind(event); event.preventDefault = () => {prevent(); f.destroy();};
+      f.header._handlePaginatorPress('after', event); assert.equal(event.defaultPrevented, true);
+      assert.equal(f.c.jobs.size, 0);
+    } finally {f.close();}
+  });
+  await check('right-paginator-press-keeps-default-and-does-not-scroll', async () => {
+    const f = fixture(Base); try {f.init();
+      const event = new Event('mousedown', {cancelable: true}); Object.defineProperty(event, 'button', {value: 2});
+      f.header._handlePaginatorPress('after', event); assert.equal(event.defaultPrevented, false);
+      assert.equal(f.c.jobs.size, 0);
+    } finally {f.close();}
+  });
+  await check('destroyed-paginator-press-leaves-event-default-untouched', async () => {
+    const f = fixture(Base); try {f.init(); f.destroy();
+      const event = new Event('mousedown', {cancelable: true}); Object.defineProperty(event, 'button', {value: 0});
+      f.header._handlePaginatorPress('after', event); assert.equal(event.defaultPrevented, false);
+      assert.equal(f.c.jobs.size, 0);
+    } finally {f.close();}
+  });
   await check('destroy-cancels-active-paginator-timer', async () => {
     const f = fixture(Base); try {f.init(); f.header._handlePaginatorPress('after'); assert.equal(f.c.jobs.size, 1);
       f.destroy(); assert.equal(f.c.jobs.size, 0); const before = work(f); f.c.advance(850); assert.deepEqual(work(f), before);
@@ -248,8 +278,10 @@ if (!baseline) {
       'destroy-in-index-focused-observer-prevents-own-and-public-parent-focus'],
     ['repeated-destruction', source.replace('ngOnDestroy() {\n    if (this._isDestroyed) return;', 'ngOnDestroy() {'),
       'destroy-is-idempotent-and-releases-live-observers'],
-    ['late-paginator-timer', source.replace('this._isDestroyed || (mouseEvent && mouseEvent.button != null && mouseEvent.button !== 0)',
-      '(mouseEvent && mouseEvent.button != null && mouseEvent.button !== 0)'), 'late-paginator-press-cannot-create-new-timer-after-destroy'],
+    ['event-cancellation-after-destruction', source.replace('this._isDestroyed || (mouseEvent && mouseEvent.button != null && mouseEvent.button !== 0)',
+      '(mouseEvent && mouseEvent.button != null && mouseEvent.button !== 0)'), 'destroyed-paginator-press-leaves-event-default-untouched'],
+    ['late-timer-after-event-cancellation', source.replace('mouseEvent?.preventDefault?.();\n    if (this._isDestroyed) return;', 'mouseEvent?.preventDefault?.();'), 'destroy-in-event-cancellation-cannot-start-a-paginator-timer'],
+    ['removed-pointer-focus-cancellation', source.replace('mouseEvent?.preventDefault?.();', ''), 'left-paginator-press-cancels-default-focus-and-retains-hold-scroll'],
     ['pagination-after-destruction-mark', source.replace('this._checkPaginationEnabled();\n    if (this._isDestroyed) return;',
       'this._checkPaginationEnabled();'), 'destroy-during-pagination-mark-prevents-later-style-and-ink-work'],
     ['late-content-zone-reentry', source.replace('_onContentChanges() {\n    if (this._isDestroyed) return;', '_onContentChanges() {'),
