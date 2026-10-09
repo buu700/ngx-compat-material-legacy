@@ -63,7 +63,7 @@ export interface LegacyTabTransitionEvent {
  * Base class with all of the `MatTabBody` functionality.
  * @docs-private
  */
-@Directive()
+@Directive({standalone: false})
 export abstract class _MatTabBodyBase implements OnInit, OnDestroy {
   private _positionIndex: number;
   private _dirChangeSubscription = Subscription.EMPTY;

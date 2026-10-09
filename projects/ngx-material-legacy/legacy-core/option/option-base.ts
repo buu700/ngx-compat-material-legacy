@@ -48,7 +48,7 @@ export class MatOptionSelectionChange<T = any> {
   ) {}
 }
 
-@Directive()
+@Directive({standalone: false})
 export class _MatOptionBase<T = any> implements FocusableOption, AfterViewChecked, OnDestroy {
   private _selected = false;
   private _active = false;

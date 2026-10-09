@@ -23,7 +23,7 @@ import {
 } from '@angular/core';
 import {Subject} from 'rxjs';
 
-@Directive()
+@Directive({standalone: false})
 export abstract class _MatMenuContentBase implements OnDestroy {
   private _portal: TemplatePortal<any>;
   private _outlet: DomPortalOutlet;

@@ -204,7 +204,7 @@ const _MatSelectMixinBase = mixinDisableRipple(
 );
 
 /** Base class with all of the `MatSelect` functionality. */
-@Directive()
+@Directive({standalone: false})
 export abstract class _MatSelectBase<C>
   extends _MatSelectMixinBase
   implements

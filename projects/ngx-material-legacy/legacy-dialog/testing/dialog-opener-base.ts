@@ -19,7 +19,7 @@ import {
 } from '@ngx-compat/material-legacy/legacy-dialog';
 
 /** Base class for a component that immediately opens a dialog when created. */
-@Directive()
+@Directive({standalone: false})
 export class _MatTestDialogOpenerBase<
   C extends MatLegacyDialogContainer = MatLegacyDialogContainer,
   T = unknown,

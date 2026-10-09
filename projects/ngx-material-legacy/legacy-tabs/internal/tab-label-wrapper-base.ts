@@ -20,7 +20,7 @@ const _MatTabLabelWrapperMixinBase = mixinDisabled(class {});
  * Used in the `mat-tab-group` view to display tab labels.
  * @docs-private
  */
-@Directive()
+@Directive({standalone: false})
 export class _MatTabLabelWrapperBase extends _MatTabLabelWrapperMixinBase implements CanDisable {
   constructor(public elementRef: ElementRef) {
     super();

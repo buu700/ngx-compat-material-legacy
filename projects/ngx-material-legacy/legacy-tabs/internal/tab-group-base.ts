@@ -68,7 +68,7 @@ export type MatTabHeaderPosition = 'above' | 'below';
  * Base class with all of the `MatTabGroupBase` functionality.
  * @docs-private
  */
-@Directive()
+@Directive({standalone: false})
 export abstract class _MatTabGroupBase
   extends _MatTabGroupMixinBase
   implements AfterContentInit, AfterContentChecked, OnDestroy, CanColor, CanDisableRipple

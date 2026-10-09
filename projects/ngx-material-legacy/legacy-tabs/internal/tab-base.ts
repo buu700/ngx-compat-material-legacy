@@ -48,7 +48,7 @@ const _MatTabMixinBase = mixinDisabled(class {});
 export const MAT_TAB_GROUP = new InjectionToken<any>('MAT_TAB_GROUP');
 
 /** @docs-private */
-@Directive()
+@Directive({standalone: false})
 export class _MatTabBase
   extends _MatTabMixinBase
   implements CanDisable, OnInit, OnChanges, OnDestroy

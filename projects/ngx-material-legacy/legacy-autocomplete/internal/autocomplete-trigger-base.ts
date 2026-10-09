@@ -77,7 +77,7 @@ export const MAT_AUTOCOMPLETE_SCROLL_STRATEGY_FACTORY_PROVIDER = {
 };
 
 /** Base class with all of the `MatAutocompleteTrigger` functionality. */
-@Directive()
+@Directive({standalone: false})
 export abstract class _MatAutocompleteTriggerBase
   implements ControlValueAccessor, AfterViewInit, OnChanges, OnDestroy
 {

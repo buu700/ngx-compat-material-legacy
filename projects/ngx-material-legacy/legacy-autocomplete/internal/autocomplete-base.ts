@@ -80,7 +80,7 @@ export function MAT_AUTOCOMPLETE_DEFAULT_OPTIONS_FACTORY(): MatAutocompleteDefau
 const _MatAutocompleteMixinBase = mixinDisableRipple(class {});
 
 /** Base class with all of the `MatAutocomplete` functionality. */
-@Directive()
+@Directive({standalone: false})
 export abstract class _MatAutocompleteBase
   extends _MatAutocompleteMixinBase
   implements AfterContentInit, CanDisableRipple, OnDestroy
