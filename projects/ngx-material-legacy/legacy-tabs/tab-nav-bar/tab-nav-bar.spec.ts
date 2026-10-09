@@ -1,4 +1,4 @@
-import {SPACE} from '@angular/cdk/keycodes';
+import {ENTER, SPACE} from '@angular/cdk/keycodes';
 import {waitForAsync, ComponentFixture, fakeAsync, TestBed, tick} from '@angular/core/testing';
 import {Component, ViewChild, ViewChildren, QueryList} from '@angular/core';
 import {MAT_RIPPLE_GLOBAL_OPTIONS, RippleGlobalOptions} from '@angular/material/core';
@@ -7,7 +7,7 @@ import {
   dispatchFakeEvent,
   dispatchKeyboardEvent,
   dispatchMouseEvent,
-} from '../../../cdk/testing/private';
+} from '../../internal/testing/owned-test-events';
 import {Direction, Directionality} from '@angular/cdk/bidi';
 import {Subject} from 'rxjs';
 import {MatLegacyTabLink, MatLegacyTabNav, MatLegacyTabsModule} from '../index';
@@ -333,6 +333,28 @@ describe('MatTabNavBar', () => {
     expect(tabLinks[1].classList.contains('mat-tab-label-active')).toBe(true);
   });
 
+  it('should activate a tab-panel link on enter without preventing navigation', () => {
+    const fixture = TestBed.createComponent(SimpleTabNavBarTestApp);
+    fixture.detectChanges();
+    const link = fixture.nativeElement.querySelectorAll('.mat-tab-link')[1];
+    const event = dispatchKeyboardEvent(link, 'keydown', ENTER);
+    fixture.detectChanges();
+    expect(fixture.componentInstance.activeIndex).toBe(1);
+    expect(link.classList.contains('mat-tab-label-active')).toBe(true);
+    expect(event.defaultPrevented).toBe(false);
+  });
+
+  it('should prevent enter on disabled tab-panel links without activating them', () => {
+    const fixture = TestBed.createComponent(SimpleTabNavBarTestApp);
+    fixture.componentInstance.disabled = true;
+    fixture.detectChanges();
+    const link = fixture.nativeElement.querySelectorAll('.mat-tab-link')[1];
+    const event = dispatchKeyboardEvent(link, 'keydown', ENTER);
+    fixture.detectChanges();
+    expect(fixture.componentInstance.activeIndex).toBe(0);
+    expect(event.defaultPrevented).toBe(true);
+  });
+
   describe('ripples', () => {
     let fixture: ComponentFixture<SimpleTabNavBarTestApp>;
 
@@ -467,6 +489,16 @@ describe('MatTabNavBar', () => {
       fixture.detectChanges();
 
       expect(tabLinks[1].classList.contains('mat-tab-label-active')).toBe(false);
+    });
+
+    it('should leave native enter navigation alone without a tab panel', () => {
+      const fixture = TestBed.createComponent(TabBarWithoutPanel);
+      fixture.detectChanges();
+      const link = fixture.nativeElement.querySelectorAll('.mat-tab-link')[1];
+      const event = dispatchKeyboardEvent(link, 'keydown', ENTER);
+      fixture.detectChanges();
+      expect(fixture.componentInstance.activeIndex).toBe(0);
+      expect(event.defaultPrevented).toBe(false);
     });
 
     it('should manage aria-current', () => {
