@@ -23,3 +23,9 @@ class TableOutletProtocolTests(unittest.TestCase):
         result = subprocess.run(['node', 'tests/table_outlet_type_probe.mjs'], cwd=ROOT,
             capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-7000:])
+
+    @unittest.skipUnless(runtime_available(), 'Angular/TypeScript unavailable; table partial compiler regression not executed')
+    def test_partial_compiler_rejects_the_retained_cycle_and_accepts_separated_directives(self):
+        result = subprocess.run(['node', 'tests/table_outlet_aot_source_probe.mjs'], cwd=ROOT,
+            capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-7000:])

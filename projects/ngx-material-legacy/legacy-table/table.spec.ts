@@ -17,7 +17,7 @@ import {MatSort, MatSortHeader, MatSortModule} from '../sort/index';
 import {MatLegacyTableModule} from './index';
 import {MatLegacyTable} from './table';
 import {MatLegacyTableDataSource} from './table-data-source';
-import {_LegacyTableDefinitionOwner} from './internal/table-outlet';
+import {_LegacyTableDefinitionOwner} from './internal/definition-owner';
 
 describe('MatTable', () => {
   beforeEach(waitForAsync(() => {

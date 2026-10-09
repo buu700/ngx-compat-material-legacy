@@ -30,7 +30,8 @@ import {
 } from './row';
 import {MatLegacyTextColumn} from './text-column';
 import {MatCommonModule} from './internal/common-module';
-import {_LegacyTableDefinitionOwner, _LegacyTableOutlet} from './internal/table-outlet';
+import {_LegacyTableOutlet} from './internal/table-outlet';
+import {_LegacyTableDefinitionOwner} from './internal/definition-owner';
 
 const EXPORTED_DECLARATIONS = [
   // Table
