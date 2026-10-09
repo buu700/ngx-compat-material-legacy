@@ -14,6 +14,8 @@ import {engineIdentityProblems} from './browser-matrix-roster.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
+export const SOURCE_LINE = 'main';
+
 export const ENGINES = ['chromium', 'firefox', 'webkit'];
 export const RUNTIMES = ['zoneful', 'zoneless'];
 export const COMPONENTS = ['dialog', 'snack-bar', 'menu', 'select', 'tooltip', 'tabs', 'form-field'];
@@ -95,7 +97,7 @@ export const NOT_APPLICABLE = [
 ];
 
 function id(engine, runtime, group, suffix) {
-  return `native-motion/main/${engine}/${runtime}/${group}/${suffix}`;
+  return `native-motion/${SOURCE_LINE}/${engine}/${runtime}/${group}/${suffix}`;
 }
 
 export function buttonsFor(scene, mode) {
@@ -219,7 +221,7 @@ function interruptProblem(suffix, obs) {
 
 export function assertCase(caseId, obs) {
   const parts = String(caseId || '').split('/');
-  if (parts.length < 6 || parts[0] !== 'native-motion' || parts[1] !== 'main') return ['unknown case'];
+  if (parts.length < 6 || parts[0] !== 'native-motion' || parts[1] !== SOURCE_LINE) return ['unknown case'];
   const group = parts[4];
   const suffix = parts.slice(5).join('/');
   if (group === 'enabled-disabled-reduced') {
@@ -298,10 +300,10 @@ function writeMatrix() {
   const matrix = JSON.parse(readFileSync(matrixPath, 'utf8'));
   const row = matrix.checks.find(item => item.check_id === 'native-motion');
   row.implemented = true;
-  row.acceptance.cases_by_line.main = roster.groups;
+  row.acceptance.cases_by_line[SOURCE_LINE] = roster.groups;
   for (const group of Object.keys(roster.groups)) row.acceptance.cases_by_line['21.x'][group] = null;
   writeFileSync(matrixPath, `${JSON.stringify(matrix, null, 2)}\n`);
-  console.log(`wrote native-motion main roster ${roster.ids.length}`);
+  console.log(`wrote native-motion ${SOURCE_LINE} roster ${roster.ids.length}`);
 }
 
 const entry = process.argv[1] ? resolve(process.argv[1]) : '';

@@ -14,6 +14,8 @@ import {
   MODE_BUTTONS,
   observationProblems,
   samplePass,
+  assertCase,
+  SOURCE_LINE,
   ZERO_BUTTONS,
 } from './native-motion-roster.mjs';
 import {
@@ -37,10 +39,16 @@ expect('102 per engine', roster.perEngine.chromium === 102 && roster.perEngine.f
 expect('138 enabled group', roster.perGroup['enabled-disabled-reduced'] === 138);
 expect('66 interruption group', roster.perGroup['interruption-destruction'] === 66);
 expect('102 notify group', roster.perGroup['exactly-once-notification'] === 102);
-expect('no 21.x', roster.ids.every(id => id.split('/')[1] === 'main'));
+expect('only current line', roster.ids.every(id => id.split('/')[1] === SOURCE_LINE));
+expect('foreign line rejected', assertCase(roster.ids[0].replace('/'+SOURCE_LINE+'/', '/21.x/'), samplePass(roster.ids[0])).includes('unknown case'));
 expect('no safari id', roster.ids.every(id => !id.includes('safari')));
 expect('safari is not applicable', roster.notApplicable.some(item => item.engine === 'safari' && /not Safari/.test(item.reason)));
 expect('zero fake is not a case', roster.notApplicable.some(item => item.mode === 'zero' && /0ms override would be a fake/.test(item.reason)));
+
+const currentPackage = JSON.parse(readFileSync(join(root, 'projects/ngx-material-legacy/package.json'), 'utf8'));
+const currentVersions = versionsFor(currentPackage);
+const expectedFloor = SOURCE_LINE === '21.x' ? {core: '21.2.23', cdk: '21.2.14', material: '21.2.14', typescript: '5.9.2'} : {core: '22.1.7', cdk: '22.1.7', material: '22.1.7', typescript: '6.0.3'};
+for (const [name, version] of Object.entries(expectedFloor)) expect('current branch consumer ' + name, currentVersions[name] === version);
 
 const page = readFileSync(join(root, 'scripts/native-motion-consumer.ts'), 'utf8');
 expect('page has no detectChanges', !page.includes('.detectChanges(') && !page.includes('markForCheck('));
@@ -53,8 +61,8 @@ expect('reduced has no zero button', !buttonsFor('modes', 'reduced').some(button
 
 const matrix = JSON.parse(readFileSync(join(root, 'compatibility/rc/matrices/full-verify.json'), 'utf8'));
 const row = matrix.checks.find(item => item.check_id === 'native-motion');
-expect('matrix main roster', JSON.stringify(row.acceptance.cases_by_line.main) === JSON.stringify(roster.groups));
-expect('21.x null', Object.values(row.acceptance.cases_by_line['21.x']).every(value => value === null));
+expect('matrix main roster', JSON.stringify(row.acceptance.cases_by_line[SOURCE_LINE]) === JSON.stringify(roster.groups));
+expect('other line null', Object.values(row.acceptance.cases_by_line['21.x']).every(value => value === null));
 expect('implemented', row.implemented === true);
 
 const goodEngines = {

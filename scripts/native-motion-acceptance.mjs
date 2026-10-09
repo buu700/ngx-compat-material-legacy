@@ -10,7 +10,7 @@ import {createHash} from 'node:crypto';
 import {dirname, join, relative, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {resolveLibraryFromRun} from './resolve-run-library.mjs';
-import {deriveMainRoster, observationProblems} from './native-motion-roster.mjs';
+import {deriveMainRoster, observationProblems, SOURCE_LINE} from './native-motion-roster.mjs';
 import {executeNativeMotion} from './native-motion-run.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -67,7 +67,7 @@ export async function runAcceptance({runPath}) {
   const roster = deriveMainRoster();
   const matrix = JSON.parse(readFileSync(join(root, 'compatibility/rc/matrices/full-verify.json'), 'utf8'));
   const row = matrix.checks.find(item => item.check_id === 'native-motion');
-  const matrixMismatch = JSON.stringify(row.acceptance.cases_by_line.main) !== JSON.stringify(roster.groups)
+  const matrixMismatch = JSON.stringify(row.acceptance.cases_by_line[SOURCE_LINE]) !== JSON.stringify(roster.groups)
     || Object.values(row.acceptance.cases_by_line['21.x']).some(value => value !== null);
   const library = runPath ? resolveLibraryFromRun(runPath) : null;
   const artifactSha = library ? library.digest : '';

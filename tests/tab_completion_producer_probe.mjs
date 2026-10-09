@@ -14,7 +14,7 @@ import {readFileSync, writeFileSync} from 'node:fs';
 import {dirname, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import vm from 'node:vm';
-import {assertCase} from '../scripts/native-motion-roster.mjs';
+import {assertCase, SOURCE_LINE} from '../scripts/native-motion-roster.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),require=createRequire(import.meta.url),ts=require('typescript');
 const raw=readFileSync(resolve(root,'scripts/native-motion-consumer.ts'),'utf8');
 const ast=ts.createSourceFile('producer.ts',raw,ts.ScriptTarget.Latest,true);
@@ -45,13 +45,13 @@ for(const [mode,zero]of [['enabled',false],['provider-disabled',false],['reduced
   assert.equal(result.value.key,'tabs/'+suffix);assert.equal(result.value.notify.key,'tabs/animationDone/'+suffix);
   assert.deepEqual(result.value.notify.observation,result.value.observation);
   for(const group of ['enabled-disabled-reduced','exactly-once-notification']) {
-    const id='native-motion/main/chromium/zoneful/'+group+'/tabs/'+(group==='exactly-once-notification'?'animationDone/':'')+suffix;
+    const id='native-motion/'+SOURCE_LINE+'/chromium/zoneful/'+group+'/tabs/'+(group==='exactly-once-notification'?'animationDone/':'')+suffix;
     assert.deepEqual(assertCase(id,result.value.observation),[]);
   }
   cases.push({id:'complete-producer-'+suffix,result:'pass'});
 }
 const duplicate=await run({outputs:2});assert.equal(duplicate.value.observation.notifications,2);
-assert.ok(assertCase('native-motion/main/chromium/zoneful/exactly-once-notification/tabs/animationDone/enabled',duplicate.value.observation).length);
+assert.ok(assertCase('native-motion/'+SOURCE_LINE+'/chromium/zoneful/exactly-once-notification/tabs/animationDone/enabled',duplicate.value.observation).length);
 assert.equal(duplicate.subscriptions,0);cases.push({id:'actual-double-output-is-rejected',result:'pass'});
 for(const options of [{outputs:0},{failDispatch:true}]) {
  const result=await run(options);assert.ok(result.error);assert.equal(result.subscriptions,0);
