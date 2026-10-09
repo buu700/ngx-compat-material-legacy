@@ -79,7 +79,7 @@ function isOriginalModule(symbol){
 export async function observePublicNodeFactory(value,core,packageRoot,symbol,symbols,importModule,{providers=[],constructorFactory}={}){
   let fixture,factory,parentExecution,requiredParent,requiredParentType,requiredParentToken,requiredParentCapture;
   let requiredParentDestroyed=false,parentLifetimeSubscription;
-  let callerConfig,menuContentState,simpleSnack,dialogOpener,autocompleteCapture;
+  let callerConfig,menuContentState,simpleSnack,dialogOpener,autocompleteCapture,tabPortalParent;
   const menuContent=menuContentContract(symbol);
   const tabBody=tabBodyProfile(symbol);
   let nodeKind=null;
@@ -95,7 +95,7 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
     // Reauthenticate the original context before using its constructor parameters.
     expectedFactoryDi(symbol.shape,{devMode:core.isDevMode()});
     const attributes=parameters.filter(p=>p.attribute);
-    const usesTemplate=parameters.some(p=>p.spec==='@angular/core'&&p.imported==='TemplateRef');
+    const usesTemplate=parameters.some(p=>p.spec==='@angular/core'&&p.imported==='TemplateRef') || symbol.symbol_id==='legacy-tabs/primary/MatLegacyTabBodyPortal';
     nodeKind=usesTemplate?'template':'element';
     requiredParent=requiredParentFactoryProfile(symbol);
     let parentHost;
@@ -110,6 +110,18 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
         throw Error('required parent public identities missing');
       parentHost={tag:requiredParent.parent_tag,attributes:requiredParent.parent_attributes,
         imports:[ownerModule],token:requiredParentToken};
+    }
+    if(symbol.symbol_id==='legacy-tabs/primary/MatLegacyTabBodyPortal'){
+      const owned=await loadRuntimeModule(packageRoot,'legacy-tabs','primary');
+      if(parentHost)throw Error('tab portal already has a caller parent');
+      // The historical body is exported by the package, but intentionally not
+      // by MatLegacyTabsModule. Its original tests declare it in a caller scope.
+      class TabBodyCallerModule {}
+      core.NgModule({declarations:[owned.MatLegacyTabBody,owned.MatLegacyTabBodyPortal],
+        imports:[(await importModule('@angular/common')).CommonModule,(await importModule('@angular/cdk/portal')).PortalModule,
+          (await importModule('@angular/cdk/scrolling')).ScrollingModule],exports:[owned.MatLegacyTabBody]})(TabBodyCallerModule);
+      parentHost={tag:'mat-tab-body',imports:[TabBodyCallerModule],token:owned.MatLegacyTabBody};
+      tabPortalParent=owned;
     }
     const configProfile=callerConfigProfile(symbol);
     if(configProfile){
@@ -172,6 +184,16 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
          return parentExecution.value;
        }},{provide:parentAlias,useExisting:parentType}]}:{}),
        ...(attributeContract?{nodeFactory:node=>{factory=executeAttributeFactory(value,core,attributeContract,node,runFactory);return factory.value;}}:{})});
+    if(tabPortalParent){
+      const parent=fixture.parentNode.owner;
+      if(!(parent instanceof tabPortalParent.MatLegacyTabBody)
+        ||fixture.parentNode.injector.get(tabPortalParent.MatLegacyTabBody,undefined,{self:true})!==parent
+        ||fixture.template.injector.get(tabPortalParent.MatLegacyTabBody)!==parent
+        ||fixture.template.injector.get(tabPortalParent.MatLegacyTabBody,null,{self:true,optional:true})!==null
+        ||parent._initialized!==true||!(parent._contentElement instanceof core.ElementRef)
+        ||!(parent._portalHost instanceof tabPortalParent.MatLegacyTabBodyPortal)||parent._portalHost.hasAttached())
+        throw Error('tab portal actual parent component/view/query/scope is incomplete');
+    }
     if(requiredParent?.owner_export==='MatLegacyChip')
       parentLifetimeSubscription=fixture.parentNode.owner.destroyed.subscribe(()=>{requiredParentDestroyed=true;});
     if(!attributeContract){
@@ -218,6 +240,10 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
     if(menuContent&&factory.outcome==='returned')menuContentState=observeMenuContentContext(menuContent,requiredParentCapture,fixture,core,await importModule('@angular/cdk/portal'));
     if(dialogOpener&&factory.outcome==='returned')factory.dialogOpenerContext=await observeDialogOpenerContext(dialogOpener,requiredParentCapture,fixture,core,runFactory);
     if(autocompleteCapture&&factory.outcome==='returned')factory.autocompleteContext=observeAutocompleteInputs(autocompleteCapture,requiredParentCapture,fixture);
+    if(tabPortalParent&&factory.outcome==='returned'){
+      if(factory.value._host!==fixture.parentNode.owner)throw Error('tab portal constructor received a different real parent');
+      factory.tabPortalParentContext={actual_parent_component:true,actual_parent_view_initialized:true,actual_content_element_and_portal_queries:true,parent_self_provider_identical:true,child_ancestor_provider_identical:true,child_self_provider_absent:true,actual_constructor_parent_identical:true};
+    }
     factory.context=fixture.context;
     if(factory.outcome==='returned'&&typeof factory.value?.ngOnDestroy==='function'){
       try{factory.value.ngOnDestroy();}catch(error){behaviorProblems.push('owned instance teardown: '+String(error?.message||error));}
@@ -238,6 +264,12 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
           &&!(requiredParent.owner_export==='MatLegacySelectionList'&&fixture.parentNode.owner._isDestroyed===true),
         borrowed_nodes_alive_after_child_teardown:!fixture.component.hostView.destroyed&&!fixture.element.destroyed&&!fixture.template.destroyed,
         borrowed_environment_alive_after_child_teardown:!fixture.environment.destroyed};
+    }
+    if(tabPortalParent&&factory.outcome==='returned'){
+      const alive=fixture.parentNode.owner._destroyed!==true&&!fixture.parentNode.destroyed
+        &&!fixture.component.hostView.destroyed&&!fixture.environment.destroyed;
+      factory.tabPortalParentContext.borrowed_parent_view_alive_after_child_teardown=alive;
+      if(!alive)behaviorProblems.push('tab portal destroyed borrowed parent/view context');
     }
     if(parentContract&&factory.outcome==='returned'&&!behaviorProblems.length){
       if(!parentExecution||!(parentExecution.value instanceof parentType)
@@ -530,7 +562,7 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = [], i
         }
       }
     }
-    results.push({symbol, problems, runtime_context, factory_unresolved_provider_labels:observed.filter(request=>request.unresolved).map(request=>request.label), factory_outcome:factory.outcome, factory_error:factory.error, factory_error_stack:factory.errorStack||null, original_factory_kind:symbol.shape.originalFactory?.deps_kind ?? null, original_inherited_factory:symbol.shape.originalFactory?.inherited_factory?.name ?? null, effective_original_factory_kind:originalKind ?? null, factory_context:factory.context, factory_context_modules:factory.callerModules || [], factory_node_kind:factory.nodeKind || null, factory_constructor_evidence:factory.constructorEvidence || [], factory_compiler_observation:factory.compilerObservation || null, factory_peer_constructor_partition:factory.peerConstructorPartition || null, factory_parent_construction:factory.parentConstruction || null, factory_required_parent_context:factory.requiredParentContext || null, factory_caller_config_context:factory.callerConfigContext || null, factory_owned_dialog_focus_context:factory.ownedDialogFocusContext || null, factory_menu_content_context:factory.menuContentContext || null, factory_simple_snack_context:factory.simpleSnackContext || null, factory_dialog_opener_context:factory.dialogOpenerContext || null, factory_autocomplete_context:factory.autocompleteContext || null, factory_tab_body_context:factory.tabBodyContext || null, factory_owned_motion_context:factory.ownedMotionContext || null, runtime_requests:observed.map((request,index)=>({...runtimeRequests[index],observation_evidence:request.evidence || 'public Injector request trace',observed_label:request.label,optional:Boolean(request.optional),self:Boolean(request.self),skipSelf:Boolean(request.skipSelf),host:Boolean(request.host),unresolved:Boolean(request.unresolved)})), factory_returned_owned_instance:factory.outcome==='returned' && (construction ? factory.behaviorProblems.length===0 : factory.value instanceof value), constructor_attributes:[...new Set(symbol.shape.originalFactoryContext ? symbol.shape.originalFactoryContext.factory_parameters?.filter(param=>param.attribute).map(param=>param.attribute) || [] : [...(symbol.shape.originalFactory?.inherited_factory?.attributes || []),...(symbol.shape.diParams || []).filter(param=>param.attribute).map(param=>param.attribute)])], observed: observed.map(item => `${item.label}${item.optional ? '?' : ''}`),
+    results.push({symbol, problems, runtime_context, factory_unresolved_provider_labels:observed.filter(request=>request.unresolved).map(request=>request.label), factory_outcome:factory.outcome, factory_error:factory.error, factory_error_stack:factory.errorStack||null, original_factory_kind:symbol.shape.originalFactory?.deps_kind ?? null, original_inherited_factory:symbol.shape.originalFactory?.inherited_factory?.name ?? null, effective_original_factory_kind:originalKind ?? null, factory_context:factory.context, factory_context_modules:factory.callerModules || [], factory_node_kind:factory.nodeKind || null, factory_constructor_evidence:factory.constructorEvidence || [], factory_compiler_observation:factory.compilerObservation || null, factory_peer_constructor_partition:factory.peerConstructorPartition || null, factory_parent_construction:factory.parentConstruction || null, factory_required_parent_context:factory.requiredParentContext || null, factory_caller_config_context:factory.callerConfigContext || null, factory_owned_dialog_focus_context:factory.ownedDialogFocusContext || null, factory_menu_content_context:factory.menuContentContext || null, factory_simple_snack_context:factory.simpleSnackContext || null, factory_dialog_opener_context:factory.dialogOpenerContext || null, factory_autocomplete_context:factory.autocompleteContext || null, factory_tab_body_context:factory.tabBodyContext || null, factory_tab_portal_parent_context:factory.tabPortalParentContext || null, factory_owned_motion_context:factory.ownedMotionContext || null, runtime_requests:observed.map((request,index)=>({...runtimeRequests[index],observation_evidence:request.evidence || 'public Injector request trace',observed_label:request.label,optional:Boolean(request.optional),self:Boolean(request.self),skipSelf:Boolean(request.skipSelf),host:Boolean(request.host),unresolved:Boolean(request.unresolved)})), factory_returned_owned_instance:factory.outcome==='returned' && (construction ? factory.behaviorProblems.length===0 : factory.value instanceof value), constructor_attributes:[...new Set(symbol.shape.originalFactoryContext ? symbol.shape.originalFactoryContext.factory_parameters?.filter(param=>param.attribute).map(param=>param.attribute) || [] : [...(symbol.shape.originalFactory?.inherited_factory?.attributes || []),...(symbol.shape.diParams || []).filter(param=>param.attribute).map(param=>param.attribute)])], observed: observed.map(item => `${item.label}${item.optional ? '?' : ''}`),
       ...(construction ? {approved_construction: {profile_id: construction.profile_id,
         contract_sha256: construction.contract_sha256, context: factory.context,
         behavior_problems: factory.behaviorProblems, counts: factory.counts,
