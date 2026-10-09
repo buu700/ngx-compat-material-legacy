@@ -20,6 +20,7 @@ export const SNACK_MOTION_SYMBOL='legacy-snack-bar/primary/MatLegacySnackBarCont
 export const FORM_FIELD_MOTION_SYMBOL='legacy-form-field/primary/MatLegacyFormField';
 export const MENU_MOTION_SYMBOL='legacy-menu/primary/MatLegacyMenu';
 export const TOOLTIP_MOTION_SYMBOL='legacy-tooltip/primary/LegacyTooltipComponent';
+export const DIALOG_MOTION_SYMBOL='legacy-dialog/primary/MatLegacyDialogContainer';
 const ownedMotionProfiles=Object.freeze({
  [SELECT_MOTION_SYMBOL]:Object.freeze({family:'legacy-select',property:'_animationsEnabled',enabled:true}),
  [PSEUDO_MOTION_SYMBOL]:Object.freeze({family:'legacy-core',property:'_animationsDisabled',enabled:false}),
@@ -30,6 +31,8 @@ const ownedMotionProfiles=Object.freeze({
   constructorOwnerExport:'_MatLegacyMenuBase',constructorOwnerDepth:1}),
  [TOOLTIP_MOTION_SYMBOL]:Object.freeze({family:'legacy-tooltip',property:'_animationsDisabled',enabled:false,
   constructorOwnerExport:'_LegacyTooltipComponentBase',constructorOwnerDepth:1,constructorAnimationIndex:2,constructorArity:3}),
+ [DIALOG_MOTION_SYMBOL]:Object.freeze({family:'legacy-dialog',property:'_animationsEnabled',enabled:true,
+  constructorOwnerExport:'MatLegacyDialogContainer',constructorOwnerDepth:0,wrapper:'dialogAnimationsDisabled'}),
 });
 export const ownedMotionProfile=symbolId=>Object.hasOwn(ownedMotionProfiles,symbolId)?ownedMotionProfiles[symbolId]:null;
 const sha=text=>createHash('sha256').update(text).digest('hex');
@@ -74,11 +77,28 @@ function inside(frame,scope){
  return frame?.file===scope.file&&line!==undefined&&frame.column>0
   &&scope.ranges.some(([start,end])=>line+frame.column-1>=start&&line+frame.column-1<end);
 }
-function helperOrigin(request,stateScope,disabledScope,callerScope){
+function wrapperScope(file,name,coreFile){
+ const ts=require('typescript'),source=readFileSync(file,'utf8'),parsed=ts.createSourceFile(file,source,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);
+ const functions=parsed.statements.filter(n=>ts.isFunctionDeclaration(n)&&n.name?.text===name);if(functions.length!==1)throw Error('owned motion wrapper source absent/ambiguous');
+ const fn=functions[0],items=fn.body?.statements,attempt=items?.[0],assertion=attempt?.tryBlock?.statements?.[0]?.expression,returned=items?.[1]?.expression;
+ const imported=(local,wanted,accept)=>parsed.statements.filter(ts.isImportDeclaration).some(n=>accept(n.moduleSpecifier.text)&&n.importClause?.namedBindings&&ts.isNamedImports(n.importClause.namedBindings)&&n.importClause.namedBindings.elements.some(e=>e.name.text===local&&(e.propertyName?.text||e.name.text)===wanted));
+ const ownedCore=spec=>spec==='@ngx-compat/material-legacy/legacy-core'||((spec.startsWith('file:')||spec.startsWith('.'))&&fileURLToPath(new URL(spec,'file://'+file))===coreFile);
+ if(parsed.parseDiagnostics.length)throw Error('owned motion wrapper syntax unavailable');
+ if(fn.parameters.length||items?.length!==2||!ts.isTryStatement(attempt)||attempt.tryBlock.statements.length!==1||attempt.finallyBlock
+  ||!assertion||!ts.isCallExpression(assertion)||!ts.isIdentifier(assertion.expression)||!imported(assertion.expression.text,'assertInInjectionContext',spec=>spec==='@angular/core')
+  ||assertion.arguments.length!==1||assertion.arguments[0].getText(parsed)!==name
+  ||attempt.catchClause?.block.statements.length!==1||!ts.isReturnStatement(attempt.catchClause.block.statements[0])||attempt.catchClause.block.statements[0].expression?.kind!==ts.SyntaxKind.FalseKeyword
+  ||!returned||!ts.isCallExpression(returned)||!ts.isIdentifier(returned.expression)||returned.arguments.length||!imported(returned.expression.text,'legacyAnimationsDisabled',ownedCore))
+  throw Error('owned motion manual wrapper behavior differs');
+ const lineStarts=[0];for(let at=source.indexOf('\n');at>=0;at=source.indexOf('\n',at+1))lineStarts.push(at+1);
+ return {file,ranges:[[fn.getStart(parsed),fn.end]],lineStarts,proof:{file,sha256:sha(source),function_text_sha256:sha(fn.getText(parsed))}};
+}
+function helperOrigin(request,stateScope,disabledScope,callerScope,manualWrapper){
  const calls=frames(request.stack),index=calls.findIndex(frame=>inside(frame,stateScope));
  if(index<0)return null;
  if(disabledScope&&!inside(calls[index+1],disabledScope))return null;
- const caller=calls[index+(disabledScope?2:1)];
+ let caller=calls[index+(disabledScope?2:1)];
+ if(manualWrapper){if(!inside(caller,manualWrapper))return null;caller=calls[index+(disabledScope?3:2)];}
  return callerScope&&!inside(caller,callerScope)?null:caller;
 }
 function assertRequests(requests,expected,{allowUnresolved=false}={}){
@@ -128,6 +148,7 @@ export function partitionOwnedSelectMotion(requests,core,owned,layout,material,T
    ident:param.ident,spec:param.spec,optional:true,actual_input_identical:true,constructor_calls:1,mode_was_noop:mode==='NoopAnimations'};
  }
  const callerScope=sourceScope(files.caller,callerType,{classConstructor:true});
+ const manualWrapper=profile.wrapper?wrapperScope(files.caller,profile.wrapper,files.core):null;
  const expected=[
   {ident:'LEGACY_ANIMATIONS_TEST_OVERRIDE',token:owned.LEGACY_ANIMATIONS_TEST_OVERRIDE,optional:true},
   {ident:'MATERIAL_ANIMATIONS',token:material.MATERIAL_ANIMATIONS,optional:true},
@@ -138,7 +159,7 @@ export function partitionOwnedSelectMotion(requests,core,owned,layout,material,T
   throw Error('owned motion public token identities missing');
  const retained=[],classified=[];
  for(const request of requests){
-  if(helperOrigin(request,stateScope,disabledScope,callerScope))classified.push(request);else retained.push(request);
+  if(helperOrigin(request,stateScope,disabledScope,callerScope,manualWrapper))classified.push(request);else retained.push(request);
  }
  const control=runFactory(owned.getLegacyAnimationsState,core.Injector,core.runInInjectionContext,{injector,captureStack:true});
  if(control.outcome!=='returned'||!['enabled','di-disabled','reduced-motion'].includes(control.value)
@@ -176,8 +197,8 @@ export function partitionOwnedSelectMotion(requests,core,owned,layout,material,T
  return {requests:retained,observation:{symbol_id:symbolId,
   role:'Owned helper source/caller, independent same-node control and finite state matrix; original constructor expectations unchanged',
   total_requests:requests.length,retained_requests:retained.length,classified_requests:classified.length,
-  sources:{state:stateScope.proof,disabled:disabledScope.proof,caller:callerScope.proof},
-  caller:helperOrigin(classified[0],stateScope,disabledScope,callerScope),
+  sources:{state:stateScope.proof,disabled:disabledScope.proof,caller:callerScope.proof,...(manualWrapper?{manual_wrapper:manualWrapper.proof}:{})},
+  caller:helperOrigin(classified[0],stateScope,disabledScope,callerScope,manualWrapper),
   state:control.value,component_enabled:profile.enabled?componentState:!componentState,verified:true,
   ...(constructorOwner?{constructor_owner:constructorOwner}:{}),
   ...(constructorAnimationMode?{constructor_animation_mode:constructorAnimationMode}:{}),
@@ -194,6 +215,9 @@ export function ownedSelectMotionProblems(observation,symbolId=SELECT_MOTION_SYM
    problems.push('owned motion constructor caller belongs to a different public entry');
  }
  const mode=x?.constructor_animation_mode;
+ if(profile?.wrapper&&(!x?.sources?.manual_wrapper?.file||x.sources.manual_wrapper.file!==x.sources?.caller?.file
+  ||!/^([a-f0-9]{64})$/.test(x.sources.manual_wrapper.sha256||'')||!/^([a-f0-9]{64})$/.test(x.sources.manual_wrapper.function_text_sha256||'')))
+  problems.push('owned motion manual wrapper source correlation incomplete');
  if(profile?.constructorAnimationIndex!==undefined&&(!mode||typeof mode.mode_was_noop!=='boolean'
   ||!isDeepStrictEqual(mode,{original_parameter_index:profile.constructorAnimationIndex,original_constructor_arity:profile.constructorArity,
    ident:'ANIMATION_MODULE_TYPE',spec:'@angular/platform-browser/animations',optional:true,actual_input_identical:true,constructor_calls:1,mode_was_noop:mode.mode_was_noop})))

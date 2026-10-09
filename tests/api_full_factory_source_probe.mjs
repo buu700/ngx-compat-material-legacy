@@ -21,7 +21,8 @@ import {createPublicFactoryContext} from '../scripts/api-public-node-context.mjs
 import {captureFactoryConstructorInputs} from '../scripts/api-factory-constructor-inputs.mjs';
 import {requiredParentFactoryProfile} from '../scripts/api-required-parent-context.mjs';
 import {callerConfigProfile,callerConfigObservationProblems} from '../scripts/api-caller-config-context.mjs';
-import {SNACK_MOTION_SYMBOL,FORM_FIELD_MOTION_SYMBOL,MENU_MOTION_SYMBOL,TOOLTIP_MOTION_SYMBOL,ownedMotionProfile,ownedSelectMotionProblems} from '../scripts/api-owned-motion-context.mjs';
+import {ownedDialogFocusObservationProblems} from '../scripts/api-owned-dialog-focus-context.mjs';
+import {SNACK_MOTION_SYMBOL,FORM_FIELD_MOTION_SYMBOL,MENU_MOTION_SYMBOL,TOOLTIP_MOTION_SYMBOL,DIALOG_MOTION_SYMBOL,ownedMotionProfile,ownedSelectMotionProblems} from '../scripts/api-owned-motion-context.mjs';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),require=createRequire(import.meta.url);
 const arg=name=>process.argv.includes(name)?process.argv[process.argv.indexOf(name)+1]:null;
@@ -167,9 +168,8 @@ try{
    callerConfigControls.push({symbol_id:symbol.symbol_id,id:mutation,result:'rejected',error:execution.error});
   }
   if(profile.overlay_index!==null){
-   class Mutant extends Type{}
-   Object.defineProperty(Mutant,'ɵfac',{value:Receiver=>Type.ɵfac(class extends Receiver{constructor(...inputs){super(...inputs);this.ngOnDestroy=()=>inputs[profile.overlay_index].dispose();}})});
-   const execution=await observePublicNodeFactory(Mutant,core,runtime,symbol,symbols,load);
+   const constructorFactory=Receiver=>Type.ɵfac(class extends Receiver{constructor(...inputs){super(...inputs);this.ngOnDestroy=()=>inputs[profile.overlay_index].dispose();}});
+   const execution=await observePublicNodeFactory(Type,core,runtime,symbol,symbols,load,{constructorFactory});
    assert.equal(execution.outcome,'returned',execution.error);
    assert.equal(execution.callerConfigContext.borrowed_overlay_alive_after_teardown,false);
    assert.ok(execution.behaviorProblems.includes('owned factory disposed the caller overlay reference'));
@@ -177,6 +177,33 @@ try{
   }
  }
  assert.equal(callerConfigControls.length,26);
+ const dialogFocusControls=[];
+ for(const name of ['MatLegacyDialogContainer','_MatLegacyDialogContainerBase']){
+  const symbol=selected.find(s=>s.symbol_id==='legacy-dialog/primary/'+name),family=await loadRuntimeModule(runtime,'legacy-dialog','primary'),Type=family[name];
+  const row=rows.find(r=>r.symbol.symbol_id===symbol.symbol_id);assert.equal(row.result,'pass',row.problems.join('\n'));
+  assert.deepEqual(ownedDialogFocusObservationProblems(row),[]);
+  dialogFocusControls.push({symbol_id:symbol.symbol_id,id:'actual-owned-focus-services-and-caller-view',result:'pass',evidence:row.factory_owned_dialog_focus_context});
+  for(const mutation of ['unrelated-optional-request','different-renderer-value','fake-detector-protocol']){
+   const constructorFactory=Receiver=>{
+    if(mutation==='unrelated-optional-request')core.inject(core.ChangeDetectorRef,{optional:true});
+    return Type.ɵfac(class extends Receiver{constructor(...inputs){super(...inputs);
+     if(mutation==='different-renderer-value')this._legacyFocusRenderer={};
+     if(mutation==='fake-detector-protocol')this._legacyChangeDetector={destroyed:false,destroy(){},markForCheck(){},detectChanges(){}};
+    }});
+   };
+   const execution=await observePublicNodeFactory(Type,core,runtime,symbol,symbols,load,{constructorFactory});
+   if(mutation==='unrelated-optional-request'){
+    assert.equal(execution.outcome,'returned',execution.error);
+    assert.equal(execution.requests.length,(name==='MatLegacyDialogContainer'?9:8)+1,'unclassified request was hidden');
+    dialogFocusControls.push({symbol_id:symbol.symbol_id,id:mutation,result:'retained-unclassified-request',retained_requests:execution.requests.length});
+   }else{
+    assert.equal(execution.outcome,'threw','different service/detector was accepted');
+    assert.match(execution.error,mutation==='different-renderer-value'?/service value differs/:/does not belong to the caller view/);
+    dialogFocusControls.push({symbol_id:symbol.symbol_id,id:mutation,result:'rejected',error:execution.error});
+   }
+  }
+ }
+ assert.equal(dialogFocusControls.length,8);
  const snackSymbol=selected.find(s=>s.symbol_id===SNACK_MOTION_SYMBOL),snack=await loadRuntimeModule(runtime,'legacy-snack-bar','primary');
  const ownedCore=await loadRuntimeModule(runtime,'legacy-core','primary'),material=await load('@angular/material/core'),snackMotionControls=[];
  assert.equal(ownedCore.legacyAnimationsDisabled(),false);
@@ -200,11 +227,11 @@ try{
  const constructorMotionControls=[];
  const manualMotionObservations=[];
  const manualMotionLifecycle=[];
- for(const symbolId of [FORM_FIELD_MOTION_SYMBOL,MENU_MOTION_SYMBOL,TOOLTIP_MOTION_SYMBOL]){
+ for(const symbolId of [FORM_FIELD_MOTION_SYMBOL,MENU_MOTION_SYMBOL,TOOLTIP_MOTION_SYMBOL,DIALOG_MOTION_SYMBOL]){
   const symbol=selected.find(s=>s.symbol_id===symbolId),profile=ownedMotionProfile(symbolId),family=await loadRuntimeModule(runtime,symbol.family,'primary'),Type=family[symbol.name];
   const row=rows.find(r=>r.symbol.symbol_id===symbolId);assert.equal(row.result,'pass',row.problems.join('\n'));
   const module=family[symbol.family==='legacy-form-field'?'MatLegacyFormFieldModule':symbol.family==='legacy-menu'?'MatLegacyMenuModule':'MatLegacyTooltipModule'];
-  for(const mode of [null,'NoopAnimations']){
+  for(const mode of symbolId===DIALOG_MOTION_SYMBOL?[]:[null,'NoopAnimations']){
    const f=await createPublicFactoryContext(core,load,{providers:[core.importProvidersFrom(module),{provide:core.ANIMATION_MODULE_TYPE,useValue:mode}]});
    let manual;
    try{
@@ -255,7 +282,7 @@ try{
    constructorMotionControls.push({symbol_id:symbolId,id:cell.id,result:'pass',enabled:cell.enabled,evidence:execution.ownedMotionContext});
   }
  }
- assert.equal(constructorMotionControls.length,21);
+ assert.equal(constructorMotionControls.length,28);
  assert.equal(manualMotionObservations.length,6);
  assert.equal(manualMotionLifecycle.length,4);
  const ownedMenu=await loadRuntimeModule(runtime,'legacy-menu','primary'),peerMenu=await load('@angular/material/menu');
@@ -277,7 +304,7 @@ try{
  const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
  const caps=[...new Set([...files.map(file=>file.fileName),...resources])].sort().map(file=>({path:file.slice(root.length+1),sha256:sha(readFileSync(file))}));
  const result={schema_version:1,role:'All original154 factory class source observations;not canonical packed/native/browser/floor qualification',
-  node:process.version,typescript:ts.version,runtime_peer:core.VERSION.full,entries,rows,selected_symbol_ids:[...selectedIds].sort(),emitted_public_import_routes:routes,public_parent_controls:publicParentControls,required_parent_controls:requiredParentControls,caller_config_controls:callerConfigControls,snack_motion_controls:snackMotionControls,constructor_motion_controls:constructorMotionControls,manual_motion_observations:manualMotionObservations,manual_motion_lifecycle:manualMotionLifecycle,
+  node:process.version,typescript:ts.version,runtime_peer:core.VERSION.full,entries,rows,selected_symbol_ids:[...selectedIds].sort(),emitted_public_import_routes:routes,public_parent_controls:publicParentControls,required_parent_controls:requiredParentControls,caller_config_controls:callerConfigControls,snack_motion_controls:snackMotionControls,constructor_motion_controls:constructorMotionControls,manual_motion_observations:manualMotionObservations,manual_motion_lifecycle:manualMotionLifecycle,dialog_focus_controls:dialogFocusControls,
   passed:rows.filter(row=>row.result==='pass').length,failed:rows.filter(row=>row.result!=='pass').length,
   source_files:files.length,resource_files:resources.size,source_caps:caps,virtual_typecheck_files:virtualFiles.length,
   styles:'SCSS/HTML resources read unchanged by Angular compiler;no Sass/rendered style qualification',
