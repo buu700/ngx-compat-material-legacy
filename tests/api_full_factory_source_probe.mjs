@@ -23,6 +23,7 @@ import {requiredParentFactoryProfile} from '../scripts/api-required-parent-conte
 import {callerConfigProfile,callerConfigObservationProblems} from '../scripts/api-caller-config-context.mjs';
 import {ownedDialogFocusObservationProblems} from '../scripts/api-owned-dialog-focus-context.mjs';
 import {MENU_CONTENT_SYMBOL,menuContentContract,menuContentObservationProblems} from '../scripts/api-menu-content-context.mjs';
+import {SIMPLE_SNACK_SYMBOL,simpleSnackObservationProblems} from '../scripts/api-simple-snack-context.mjs';
 import {SNACK_MOTION_SYMBOL,FORM_FIELD_MOTION_SYMBOL,MENU_MOTION_SYMBOL,TOOLTIP_MOTION_SYMBOL,DIALOG_MOTION_SYMBOL,ownedMotionProfile,ownedSelectMotionProblems} from '../scripts/api-owned-motion-context.mjs';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),require=createRequire(import.meta.url);
@@ -244,6 +245,27 @@ try{
    else{assert.equal(execution.outcome,'threw');assert.match(execution.error,cell.error);menuContentControls.push({id:cell.id,result:'rejected',error:execution.error});}
   }
  }
+ const simpleSnackControls=[];
+ {
+  const symbol=selected.find(s=>s.symbol_id===SIMPLE_SNACK_SYMBOL),family=await loadRuntimeModule(runtime,'legacy-snack-bar','primary'),Type=family.LegacySimpleSnackBar;
+  const row=rows.find(r=>r.symbol.symbol_id===SIMPLE_SNACK_SYMBOL);assert.equal(row.result,'pass',row.problems.join('\n'));assert.deepEqual(simpleSnackObservationProblems(row),[]);
+  simpleSnackControls.push({id:'actual-caller-reference-data-action-lifetime',result:'pass',evidence:row.factory_simple_snack_context});
+  for(const cell of [
+   {id:'foreign-reference-value',change:value=>{value.snackBarRef={};},error:/constructor borrowed inputs differ/},
+   {id:'foreign-data-value',change:value=>{value.data={};},error:/constructor borrowed inputs differ/},
+   {id:'has-action-hardcoded',change:value=>{Object.defineProperty(value,'hasAction',{get:()=>true});},error:/strictly equal/},
+   {id:'caller-data-mutated',change:value=>{value.data.message='foreign';},error:/teardown changed caller data/},
+   {id:'cyclic-caller-data-mutated',change:value=>{value.data.self=value.data;},error:/teardown changed caller data/},
+   {id:'action-noop',change:value=>{value.action=()=>{};},error:/action did not reach caller reference/},
+   {id:'premature-teardown-action',change:value=>{value.ngOnDestroy=()=>value.action();},error:/prematurely triggered an action/},
+   {id:'unrelated-optional-request',extra:true},
+  ]){
+   const constructorFactory=Receiver=>{if(cell.extra)core.inject(core.ChangeDetectorRef,{optional:true});return Type.ɵfac(class extends Receiver{constructor(...inputs){super(...inputs);cell.change?.(this);}});};
+   const execution=await observePublicNodeFactory(Type,core,runtime,symbol,symbols,load,{constructorFactory});
+   if(cell.extra){assert.equal(execution.outcome,'returned',execution.error);assert.equal(execution.requests.length,3);simpleSnackControls.push({id:cell.id,result:'retained-unclassified-request',retained_requests:3});}
+   else{assert.equal(execution.outcome,'threw');assert.match(execution.error,cell.error);assert.ok(execution.error.length<500,'simple snack mutant diagnostic must remain bounded');simpleSnackControls.push({id:cell.id,result:'rejected',error:execution.error});}
+  }
+ }
  const constructorMotionControls=[];
  const manualMotionObservations=[];
  const manualMotionLifecycle=[];
@@ -324,7 +346,7 @@ try{
  const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
  const caps=[...new Set([...files.map(file=>file.fileName),...resources])].sort().map(file=>({path:file.slice(root.length+1),sha256:sha(readFileSync(file))}));
  const result={schema_version:1,role:'All original154 factory class source observations;not canonical packed/native/browser/floor qualification',
-  node:process.version,typescript:ts.version,runtime_peer:core.VERSION.full,entries,rows,selected_symbol_ids:[...selectedIds].sort(),emitted_public_import_routes:routes,public_parent_controls:publicParentControls,required_parent_controls:requiredParentControls,caller_config_controls:callerConfigControls,snack_motion_controls:snackMotionControls,constructor_motion_controls:constructorMotionControls,manual_motion_observations:manualMotionObservations,manual_motion_lifecycle:manualMotionLifecycle,dialog_focus_controls:dialogFocusControls,menu_content_controls:menuContentControls,
+  node:process.version,typescript:ts.version,runtime_peer:core.VERSION.full,entries,rows,selected_symbol_ids:[...selectedIds].sort(),emitted_public_import_routes:routes,public_parent_controls:publicParentControls,required_parent_controls:requiredParentControls,caller_config_controls:callerConfigControls,snack_motion_controls:snackMotionControls,constructor_motion_controls:constructorMotionControls,manual_motion_observations:manualMotionObservations,manual_motion_lifecycle:manualMotionLifecycle,dialog_focus_controls:dialogFocusControls,menu_content_controls:menuContentControls,simple_snack_controls:simpleSnackControls,
   passed:rows.filter(row=>row.result==='pass').length,failed:rows.filter(row=>row.result!=='pass').length,
   source_files:files.length,resource_files:resources.size,source_caps:caps,virtual_typecheck_files:virtualFiles.length,
   styles:'SCSS/HTML resources read unchanged by Angular compiler;no Sass/rendered style qualification',
