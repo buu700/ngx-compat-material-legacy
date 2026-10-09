@@ -60,7 +60,7 @@ import {
   MAT_LEGACY_FORM_FIELD_DEFAULT_OPTIONS,
 } from '@ngx-compat/material-legacy/legacy-form-field';
 import {By} from '@angular/platform-browser';
-import {LEGACY_NOOP_ANIMATIONS} from '../internal/testing/owned-animation-modules';
+import {LEGACY_NOOP_ANIMATIONS, LEGACY_ENABLED_ANIMATIONS} from '../internal/testing/owned-animation-modules';
 import {LiveAnnouncer} from '@angular/cdk/a11y';
 import {MAT_SELECT_CONFIG, MatSelectConfig} from '@angular/material/select';
 import {Subject, Subscription, EMPTY, Observable} from 'rxjs';
@@ -1331,6 +1331,25 @@ describe('MatSelect', () => {
         fixture = TestBed.createComponent(BasicSelect);
         expect(() => fixture.componentInstance.select.open()).not.toThrow();
       });
+
+      it('should close an enabled-motion panel before its view is resolved', fakeAsync(() => {
+        fixture.destroy();
+        TestBed.resetTestingModule();
+        configureMatSelectTestingModule([BasicSelect], [LEGACY_ENABLED_ANIMATIONS]);
+        fixture = TestBed.createComponent(BasicSelect);
+        fixture.detectChanges();
+        const instance = fixture.componentInstance.select;
+        expect(instance.panel).toBeUndefined();
+        expect(() => {
+          instance.open();
+          instance.close();
+        }).not.toThrow();
+        expect(instance.panelOpen).toBe(false);
+        expect(instance._overlayAttached).toBe(false);
+        fixture.detectChanges();
+        flush();
+        expect(overlayContainerElement.querySelector('.mat-select-panel')).toBeNull();
+      }));
 
       it('should open the panel when trigger is clicked', fakeAsync(() => {
         trigger.click();
