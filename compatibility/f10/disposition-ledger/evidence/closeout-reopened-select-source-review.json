@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "86ad5150110522873dae2801fd3c2957502949e7",
+  "reviewer": "Codex primary implementer",
+  "recorded_at_utc": "2026-10-09T16:45:16.150774+00:00",
+  "review_depth": "individual-compatibility-source",
+  "patch_file": "compatibility/rc/resource-style-upstream-patches/86ad5150110522873dae2801fd3c2957502949e7.patch",
+  "diff_sha256": "e237a5b4d0aeb7afb5765e852a89945691ffa98604ba9bfddd2988e5068d3414",
+  "decision": "The full two-file patch guards a missing panel during enabled-motion immediate open/close and adds a regression without an animation module. The owned exit method already has the equivalent !animationsEnabled || !this.panel branch, followed by its locally owned CSS/state completion. Two added enabled/disabled missing-view lifecycle cases verify closed/detached state, one void completion and no timers/listeners; removing the guard fails the intended enabled case. All32 prior/new menu-select lifecycle cases and15 corruptions pass. Complete exact minimum exit and detach method bodies also detach/mark once for each missing-panel enabled/disabled receiver. The current public derived open has separately recorded stable-callback lifetime guards, but this diagnostic does not instantiate the public Angular directive. One actual enabled-motion legacy native test is added and remains unexecuted.",
+  "proof": "compatibility/rc/three-reopened-behavior-source-proof.json",
+  "prior_entry": {
+    "sha": "86ad5150110522873dae2801fd3c2957502949e7",
+    "bucket": "behavior-semantic",
+    "subject": "fix(material/select): avoid error if panel is closed too quickly (#30408)",
+    "final_disposition": "needs-individual-review",
+    "reason": "The recorded candidate member digest no longer names the current source. Two records also cite displaced lines. Preserve the old proof as historical evidence and reopen individual review; do not update coordinates or accept the prior behavior conclusion without reviewing the changed source context and required tests.",
+    "read_note_disposition": "prior-source-proof-stale-reopened",
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-stale-source-proof-86ad5150110522873dae2801fd3c2957502949e7.json",
+    "source_check": "Owned close already skips the exit animation when the panel is missing (legacy-select/internal/select-base",
+    "files": [
+      "src/material/select/select.ts"
+    ],
+    "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
+    "recorded_at_utc": "2026-10-09T16:21:49.864999+00:00",
+    "g11_claim": "not-passed",
+    "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+  },
+  "prior_evidence": {
+    "path": "compatibility/f10/disposition-ledger/evidence/closeout-stale-source-proof-86ad5150110522873dae2801fd3c2957502949e7.json",
+    "sha256": "3d1c268bdc4c02fcaf53eff1eda2b2bb9e32fcbbc8eccbf00f3625f7f139a610",
+    "bytes": 7722
+  },
+  "proposed_disposition": "already-adapted: owned missing-panel exit branch implements the quick-close guard through owned completion state",
+  "admission_status": "pending-native-floor-and-independent-review",
+  "g11_claim": "not-passed",
+  "proposal_status": "source-supported, pending native/floor and independent admission"
+}

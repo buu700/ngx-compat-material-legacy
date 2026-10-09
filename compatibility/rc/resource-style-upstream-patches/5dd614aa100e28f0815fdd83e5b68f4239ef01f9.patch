@@ -1,0 +1,45 @@
+diff --git a/src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts b/src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts
+index 444c290ffa96a4833650e84408f9581de72298f5..df4c41485d378eb99c91f72a253cf05ab708d381 100644
+--- a/src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts
++++ b/src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts
+@@ -327,6 +327,19 @@ describe('MDC-based MatTabNavBar', () => {
+     expect(tabLinks[1].classList.contains('mdc-tab--active')).toBe(true);
+   });
+ 
++  it('should activate a link when enter is pressed', () => {
++    const fixture = TestBed.createComponent(SimpleTabNavBarTestApp);
++    fixture.detectChanges();
++
++    const tabLinks = fixture.nativeElement.querySelectorAll('.mat-mdc-tab-link');
++    expect(tabLinks[1].classList.contains('mdc-tab--active')).toBe(false);
++
++    dispatchKeyboardEvent(tabLinks[1], 'keydown', ENTER);
++    fixture.detectChanges();
++
++    expect(tabLinks[1].classList.contains('mdc-tab--active')).toBe(true);
++  });
++
+   describe('ripples', () => {
+     let fixture: ComponentFixture<SimpleTabNavBarTestApp>;
+ 
+diff --git a/src/material/tabs/tab-nav-bar/tab-nav-bar.ts b/src/material/tabs/tab-nav-bar/tab-nav-bar.ts
+index 1fc9432424333fa4c1cba8ded8d0129ae1937198..4d6274dfb75bba8e9227d0f794930c996f08ad61 100644
+--- a/src/material/tabs/tab-nav-bar/tab-nav-bar.ts
++++ b/src/material/tabs/tab-nav-bar/tab-nav-bar.ts
+@@ -384,10 +384,12 @@ export class MatTabLink
+   }
+ 
+   _handleKeydown(event: KeyboardEvent) {
+-    if (this.disabled && (event.keyCode === SPACE || event.keyCode === ENTER)) {
+-      event.preventDefault();
+-    } else if (this._tabNavBar.tabPanel && event.keyCode === SPACE) {
+-      this.elementRef.nativeElement.click();
++    if (event.keyCode === SPACE || event.keyCode === ENTER) {
++      if (this.disabled) {
++        event.preventDefault();
++      } else if (this._tabNavBar.tabPanel) {
++        this.elementRef.nativeElement.click();
++      }
+     }
+   }
+ 

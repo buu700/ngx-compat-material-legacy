@@ -1,0 +1,44 @@
+diff --git a/src/material/select/select.spec.ts b/src/material/select/select.spec.ts
+index bb7ca95eba22b0a48bc52925d79d9070029627a7..878a64e61c104cfc0a66867f62aa0d28eea8eb92 100644
+--- a/src/material/select/select.spec.ts
++++ b/src/material/select/select.spec.ts
+@@ -1457,6 +1457,26 @@ describe('MatSelect', () => {
+         expect(() => fixture.componentInstance.select.open()).not.toThrow();
+       });
+ 
++      it('should not throw when closing too quickly after opening', () => {
++        // Need to recreate the testing module, because the issue we're
++        // testing for only happens when animations are enabled.
++        TestBed.resetTestingModule();
++        TestBed.configureTestingModule({
++          imports: [MatFormFieldModule, MatSelectModule],
++          declarations: [BasicSelect],
++        });
++
++        fixture = TestBed.createComponent(BasicSelect);
++        fixture.detectChanges();
++        const select = fixture.componentInstance.select;
++
++        expect(() => {
++          select.open();
++          select.close();
++        }).not.toThrow();
++        expect(select.panelOpen).toBe(false);
++      });
++
+       it('should open the panel when trigger is clicked', fakeAsync(() => {
+         trigger.click();
+         fixture.detectChanges();
+diff --git a/src/material/select/select.ts b/src/material/select/select.ts
+index c95ed420af5619c06c7fd78841dd71f5a8bdfe95..8f21d3dd60a7972832aa4aa41fc36b768403c2f3 100644
+--- a/src/material/select/select.ts
++++ b/src/material/select/select.ts
+@@ -844,7 +844,7 @@ export class MatSelect
+ 
+   /** Triggers the exit animation and detaches the overlay at the end. */
+   private _exitAndDetach() {
+-    if (this._animationsDisabled) {
++    if (this._animationsDisabled || !this.panel) {
+       this._overlayDir.detachOverlay();
+       return;
+     }
