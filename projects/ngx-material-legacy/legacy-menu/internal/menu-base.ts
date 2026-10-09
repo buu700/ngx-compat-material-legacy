@@ -76,7 +76,7 @@ import type {MatMenuPanel} from './menu-panel';
 let menuPanelUid = 0;
 
 /** Base class with all of the `MatMenu` functionality. */
-@Directive()
+@Directive({standalone: false})
 export class _MatMenuBase
   implements AfterContentInit, MatMenuPanel<MatMenuItem>, OnInit, OnDestroy
 {

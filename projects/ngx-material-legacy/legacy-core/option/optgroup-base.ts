@@ -43,7 +43,7 @@ const _MatOptgroupMixinBase = mixinDisabled(class {});
 // Counter for unique group ids.
 let _uniqueOptgroupIdCounter = 0;
 
-@Directive()
+@Directive({standalone: false})
 export class _MatOptgroupBase extends _MatOptgroupMixinBase implements CanDisable {
   /** Label for the option group. */
   @Input() label: string;

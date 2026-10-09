@@ -102,7 +102,7 @@ const UNBOUNDED_ANCHOR_GAP = 8;
 const MIN_HEIGHT = 24;
 const MAX_WIDTH = 200;
 
-@Directive()
+@Directive({standalone: false})
 export abstract class _MatTooltipBase<T extends _TooltipComponentBase>
   implements OnDestroy, AfterViewInit
 {
@@ -810,7 +810,7 @@ export abstract class _MatTooltipBase<T extends _TooltipComponentBase>
   }
 }
 
-@Directive()
+@Directive({standalone: false})
 export abstract class _TooltipComponentBase implements OnDestroy {
   /** Message to display in the tooltip */
   message: string;

@@ -29,7 +29,7 @@ import {take} from 'rxjs/operators';
 
 let uniqueId = 0;
 
-@Directive()
+@Directive({standalone: false})
 export abstract class _MatSnackBarContainerBase extends BasePortalOutlet implements OnDestroy {
   private _document = inject(DOCUMENT);
   private _trackedModals = new Set<Element>();

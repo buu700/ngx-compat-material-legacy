@@ -48,7 +48,7 @@ const _MatPaginatorMixinBase = mixinDisabled(mixinInitialized(class {}));
  * Base class with all of the `MatPaginator` functionality.
  * @docs-private
  */
-@Directive()
+@Directive({standalone: false})
 export abstract class _MatPaginatorBase<
     O extends {
       pageSize?: number;

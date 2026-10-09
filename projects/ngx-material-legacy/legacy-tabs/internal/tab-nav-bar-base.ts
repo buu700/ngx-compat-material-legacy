@@ -57,7 +57,7 @@ let nextUniqueId = 0;
  * Base class with all of the `MatTabNav` functionality.
  * @docs-private
  */
-@Directive()
+@Directive({standalone: false})
 export abstract class _MatTabNavBase
   extends MatPaginatedTabHeader
   implements AfterContentChecked, AfterContentInit, OnDestroy
@@ -165,7 +165,7 @@ export abstract class _MatTabNavBase
 const _MatTabLinkMixinBase = mixinTabIndex(mixinDisableRipple(mixinDisabled(class {})));
 
 /** Base class with all of the `MatTabLink` functionality. */
-@Directive()
+@Directive({standalone: false})
 export class _MatTabLinkBase
   extends _MatTabLinkMixinBase
   implements

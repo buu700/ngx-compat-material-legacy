@@ -30,7 +30,7 @@ import {coerceBooleanProperty} from '@angular/cdk/coercion';
 type BooleanInput = string | boolean | null | undefined;
 import {MatPaginatedTabHeader} from './paginated-tab-header';
 
-@Directive()
+@Directive({standalone: false})
 export abstract class _MatTabHeaderBase
   extends MatPaginatedTabHeader
   implements AfterContentChecked, AfterContentInit, AfterViewInit, OnDestroy

@@ -37,7 +37,7 @@ export function MAT_SNACK_BAR_DEFAULT_OPTIONS_FACTORY(): MatSnackBarConfig {
   return new MatLegacySnackBarConfig();
 }
 
-@Directive()
+@Directive({standalone: false})
 export abstract class _MatSnackBarBase implements OnDestroy {
   /**
    * Reference to the current snack bar in the view *at this level* (in the Angular injector tree).

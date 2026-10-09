@@ -77,7 +77,7 @@ export type MatPaginatedTabHeaderItem = FocusableOption & {elementRef: ElementRe
  * Base class for a tab header that supported pagination.
  * @docs-private
  */
-@Directive()
+@Directive({standalone: false})
 export abstract class MatPaginatedTabHeader
   implements AfterContentChecked, AfterContentInit, AfterViewInit, OnDestroy
 {

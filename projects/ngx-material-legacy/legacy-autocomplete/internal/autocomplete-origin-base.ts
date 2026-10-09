@@ -11,7 +11,7 @@
 import {Directive, ElementRef} from '@angular/core';
 
 /** Base class containing all of the functionality for `MatAutocompleteOrigin`. */
-@Directive()
+@Directive({standalone: false})
 export abstract class _MatAutocompleteOriginBase {
   constructor(
     /** Reference to the element on which the directive is applied. */
