@@ -25,7 +25,6 @@ import {
   Optional,
   SimpleChanges,
   ViewContainerRef,
-  inject,
 } from '@angular/core';
 import {DOCUMENT} from '@angular/common';
 import {Directionality} from '@angular/cdk/bidi';
@@ -112,7 +111,7 @@ export abstract class _MatAutocompleteTriggerBase
   private _viewportSubscription = Subscription.EMPTY;
 
   /** Detect handset landscape so the panel can grow into the viewport. */
-  private _breakpointObserver = inject(BreakpointObserver);
+  private _breakpointObserver: BreakpointObserver;
 
   /** Subscription to handset-landscape breakpoint changes. */
   private _handsetLandscapeSubscription = Subscription.EMPTY;
@@ -205,6 +204,9 @@ export abstract class _MatAutocompleteTriggerBase
     private _defaults?: MatAutocompleteDefaultOptions | null,
   ) {
     this._scrollStrategy = scrollStrategy;
+    // The supplied public view injector also works for the historical manual
+    // constructor, which has no ambient Angular injection context.
+    this._breakpointObserver = this._viewContainerRef.injector.get(BreakpointObserver);
   }
 
   /** Class to apply to the panel when it's above the input. */

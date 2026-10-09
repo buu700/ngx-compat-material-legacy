@@ -20,6 +20,7 @@ import {ownedDialogFocusProfile,partitionOwnedDialogFocus,challengeOwnedDialogFo
 import {menuContentContract,observeMenuContentContext,finishMenuContentContext} from './api-menu-content-context.mjs';
 import {simpleSnackProfile,createSimpleSnackContext,observeSimpleSnackInputs,finishSimpleSnackContext} from './api-simple-snack-context.mjs';
 import {dialogOpenerProfile,createDialogOpenerContext,observeDialogOpenerContext,finishDialogOpenerContext} from './api-dialog-opener-context.mjs';
+import {autocompleteProfile,autocompleteFormFieldTokenMatches,createAutocompleteCapture,observeAutocompleteInputs,finishAutocompleteContext} from './api-autocomplete-context.mjs';
 
 // verify-lite imports the checker before node_modules exists. Load Angular
 // only when a packed factory is actually executed.
@@ -77,7 +78,7 @@ function isOriginalModule(symbol){
 export async function observePublicNodeFactory(value,core,packageRoot,symbol,symbols,importModule,{providers=[],constructorFactory}={}){
   let fixture,factory,parentExecution,requiredParent,requiredParentType,requiredParentToken,requiredParentCapture;
   let requiredParentDestroyed=false,parentLifetimeSubscription;
-  let callerConfig,menuContentState,simpleSnack,dialogOpener;
+  let callerConfig,menuContentState,simpleSnack,dialogOpener,autocompleteCapture;
   const menuContent=menuContentContract(symbol);
   let nodeKind=null;
   const modules=[],behaviorProblems=[];
@@ -125,6 +126,8 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
     }
     const openerProfile=dialogOpenerProfile(symbol);
     if(openerProfile)dialogOpener=createDialogOpenerContext(openerProfile,value,await loadRuntimeModule(packageRoot,'legacy-dialog','primary'),core);
+    const autocomplete=autocompleteProfile(symbol);
+    if(autocomplete)autocompleteCapture=createAutocompleteCapture(autocomplete,core,value,await loadRuntimeModule(packageRoot,'legacy-autocomplete','primary'),resolve(packageRoot,'fesm2022/ngx-compat-material-legacy-legacy-autocomplete.mjs'),await importModule('@angular/cdk/layout'));
     let attributeContract,parentContract,parentType,parentAlias,parentSymbol;
     if(attributes.length){
       if(usesTemplate)throw Error('attribute/template combination remains unsupported');
@@ -159,7 +162,7 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
        ...(parentHost?{parentHost}:{}),
        ...(callerConfig?{parentProviders:callerConfig.providers}:{}),
        ...(simpleSnack?{parentProviders:simpleSnack.parentProviders}:{}),
-       ...(dialogOpener?{defaultViewTarget:true}:{}),
+       ...(dialogOpener||symbol.symbol_id==='legacy-autocomplete/primary/MatLegacyAutocompleteTrigger'?{defaultViewTarget:true}:{}),
        ...(parentContract?{parentProviders:[{provide:parentType,useFactory:()=>{
          parentExecution=executeAttributeFactory(parentType,core,parentContract,
            {injector:core.inject(core.Injector),element:core.inject(core.ElementRef)},runFactory);
@@ -173,9 +176,10 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
       const injector=(usesTemplate?fixture.template:fixture.element).injector;
       const captureMotionMode=ownedMotionProfile(symbol.symbol_id)?.constructorAnimationIndex!==undefined;
       if(constructorFactory!==undefined&&typeof constructorFactory!=='function')throw Error('diagnostic constructor factory must be callable');
-      factory=runFactory(requiredParent||callerConfig||captureMotionMode||menuContent||simpleSnack||dialogOpener?()=>captureFactoryConstructorInputs(value,constructorFactory||value.ɵfac):constructorFactory||value.ɵfac,
+      factory=runFactory(requiredParent||callerConfig||captureMotionMode||menuContent||simpleSnack||dialogOpener||autocompleteCapture?()=>captureFactoryConstructorInputs(value,constructorFactory||value.ɵfac,{beforeConstructor:autocompleteCapture?.beforeConstructor}):constructorFactory||value.ɵfac,
         core.Injector,core.runInInjectionContext,{injector,captureStack:true});
-      if((requiredParent||callerConfig||captureMotionMode||menuContent||simpleSnack||dialogOpener)&&factory.outcome==='returned'){
+      autocompleteCapture?.restore();
+      if((requiredParent||callerConfig||captureMotionMode||menuContent||simpleSnack||dialogOpener||autocompleteCapture)&&factory.outcome==='returned'){
         requiredParentCapture=factory.value;factory.value=requiredParentCapture.value;
         if(requiredParent)factory.requiredParentContext=observeRequiredParentInputs(requiredParent,requiredParentCapture,
           fixture,requiredParentType,requiredParentToken,core);
@@ -206,6 +210,7 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
     }
     if(menuContent&&factory.outcome==='returned')menuContentState=observeMenuContentContext(menuContent,requiredParentCapture,fixture,core,await importModule('@angular/cdk/portal'));
     if(dialogOpener&&factory.outcome==='returned')factory.dialogOpenerContext=await observeDialogOpenerContext(dialogOpener,requiredParentCapture,fixture,core,runFactory);
+    if(autocompleteCapture&&factory.outcome==='returned')factory.autocompleteContext=observeAutocompleteInputs(autocompleteCapture,requiredParentCapture,fixture);
     factory.context=fixture.context;
     if(factory.outcome==='returned'&&typeof factory.value?.ngOnDestroy==='function'){
       try{factory.value.ngOnDestroy();}catch(error){behaviorProblems.push('owned instance teardown: '+String(error?.message||error));}
@@ -251,10 +256,13 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
       factory.simpleSnackContext=await finishSimpleSnackContext(simpleSnack,factory.value,fixture,factory.simpleSnackContext);
     if(dialogOpener&&factory.outcome==='returned'&&!behaviorProblems.length)
       factory.dialogOpenerContext=finishDialogOpenerContext(dialogOpener,factory.value,fixture,factory.dialogOpenerContext);
+    if(autocompleteCapture&&factory.outcome==='returned'&&!behaviorProblems.length)
+      factory.autocompleteContext=await finishAutocompleteContext(autocompleteCapture,factory.value,fixture,factory.autocompleteContext);
   }catch(error){
     factory={requests:[],outcome:'threw',error:String(error?.message||error),errorStack:String(error?.stack||error),value:undefined,
       context:'public node/application context setup failed; no qualification'};
   }finally{
+    autocompleteCapture?.close();
     parentLifetimeSubscription?.unsubscribe();
     try{dialogOpener?.close();}catch(error){behaviorProblems.push('dialog opener caller cleanup: '+String(error?.message||error));}
     try{simpleSnack?.close();}catch(error){behaviorProblems.push('simple snack caller cleanup: '+String(error?.message||error));}
@@ -393,6 +401,10 @@ export async function runtimeTokenIdentity(family, param, loaded, aliases, obser
     const core=await importModule('@angular/core');
     return core.ANIMATION_MODULE_TYPE!=null&&core.ANIMATION_MODULE_TYPE===observedToken;
   }
+  if(originalSymbol?.symbol_id==='legacy-autocomplete/primary/MatLegacyAutocompleteTrigger'&&param.ident==='MAT_FORM_FIELD'){
+    if(!packageRoot)return false;
+    return autocompleteFormFieldTokenMatches(originalSymbol,param,await loadRuntimeModule(packageRoot,'legacy-form-field','primary'),await importModule('@angular/material/form-field'),observedToken);
+  }
   if(family==='legacy-select'&&param.ident==='MAT_FORM_FIELD'&&param.imported==='MAT_FORM_FIELD'
     &&param.spec==='@angular/material/form-field'){
     if(!packageRoot)return false;
@@ -511,7 +523,7 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = [], i
         }
       }
     }
-    results.push({symbol, problems, runtime_context, factory_unresolved_provider_labels:observed.filter(request=>request.unresolved).map(request=>request.label), factory_outcome:factory.outcome, factory_error:factory.error, factory_error_stack:factory.errorStack||null, original_factory_kind:symbol.shape.originalFactory?.deps_kind ?? null, original_inherited_factory:symbol.shape.originalFactory?.inherited_factory?.name ?? null, effective_original_factory_kind:originalKind ?? null, factory_context:factory.context, factory_context_modules:factory.callerModules || [], factory_node_kind:factory.nodeKind || null, factory_constructor_evidence:factory.constructorEvidence || [], factory_compiler_observation:factory.compilerObservation || null, factory_peer_constructor_partition:factory.peerConstructorPartition || null, factory_parent_construction:factory.parentConstruction || null, factory_required_parent_context:factory.requiredParentContext || null, factory_caller_config_context:factory.callerConfigContext || null, factory_owned_dialog_focus_context:factory.ownedDialogFocusContext || null, factory_menu_content_context:factory.menuContentContext || null, factory_simple_snack_context:factory.simpleSnackContext || null, factory_dialog_opener_context:factory.dialogOpenerContext || null, factory_owned_motion_context:factory.ownedMotionContext || null, runtime_requests:observed.map((request,index)=>({...runtimeRequests[index],observation_evidence:request.evidence || 'public Injector request trace',observed_label:request.label,optional:Boolean(request.optional),self:Boolean(request.self),skipSelf:Boolean(request.skipSelf),host:Boolean(request.host),unresolved:Boolean(request.unresolved)})), factory_returned_owned_instance:factory.outcome==='returned' && (construction ? factory.behaviorProblems.length===0 : factory.value instanceof value), constructor_attributes:[...new Set(symbol.shape.originalFactoryContext ? symbol.shape.originalFactoryContext.factory_parameters?.filter(param=>param.attribute).map(param=>param.attribute) || [] : [...(symbol.shape.originalFactory?.inherited_factory?.attributes || []),...(symbol.shape.diParams || []).filter(param=>param.attribute).map(param=>param.attribute)])], observed: observed.map(item => `${item.label}${item.optional ? '?' : ''}`),
+    results.push({symbol, problems, runtime_context, factory_unresolved_provider_labels:observed.filter(request=>request.unresolved).map(request=>request.label), factory_outcome:factory.outcome, factory_error:factory.error, factory_error_stack:factory.errorStack||null, original_factory_kind:symbol.shape.originalFactory?.deps_kind ?? null, original_inherited_factory:symbol.shape.originalFactory?.inherited_factory?.name ?? null, effective_original_factory_kind:originalKind ?? null, factory_context:factory.context, factory_context_modules:factory.callerModules || [], factory_node_kind:factory.nodeKind || null, factory_constructor_evidence:factory.constructorEvidence || [], factory_compiler_observation:factory.compilerObservation || null, factory_peer_constructor_partition:factory.peerConstructorPartition || null, factory_parent_construction:factory.parentConstruction || null, factory_required_parent_context:factory.requiredParentContext || null, factory_caller_config_context:factory.callerConfigContext || null, factory_owned_dialog_focus_context:factory.ownedDialogFocusContext || null, factory_menu_content_context:factory.menuContentContext || null, factory_simple_snack_context:factory.simpleSnackContext || null, factory_dialog_opener_context:factory.dialogOpenerContext || null, factory_autocomplete_context:factory.autocompleteContext || null, factory_owned_motion_context:factory.ownedMotionContext || null, runtime_requests:observed.map((request,index)=>({...runtimeRequests[index],observation_evidence:request.evidence || 'public Injector request trace',observed_label:request.label,optional:Boolean(request.optional),self:Boolean(request.self),skipSelf:Boolean(request.skipSelf),host:Boolean(request.host),unresolved:Boolean(request.unresolved)})), factory_returned_owned_instance:factory.outcome==='returned' && (construction ? factory.behaviorProblems.length===0 : factory.value instanceof value), constructor_attributes:[...new Set(symbol.shape.originalFactoryContext ? symbol.shape.originalFactoryContext.factory_parameters?.filter(param=>param.attribute).map(param=>param.attribute) || [] : [...(symbol.shape.originalFactory?.inherited_factory?.attributes || []),...(symbol.shape.diParams || []).filter(param=>param.attribute).map(param=>param.attribute)])], observed: observed.map(item => `${item.label}${item.optional ? '?' : ''}`),
       ...(construction ? {approved_construction: {profile_id: construction.profile_id,
         contract_sha256: construction.contract_sha256, context: factory.context,
         behavior_problems: factory.behaviorProblems, counts: factory.counts,
