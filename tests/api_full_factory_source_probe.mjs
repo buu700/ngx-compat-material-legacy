@@ -15,8 +15,9 @@ import {fileURLToPath,pathToFileURL} from 'node:url';
 import {tmpdir} from 'node:os';
 import {createHash} from 'node:crypto';
 import {deriveSurface} from '../scripts/api-surface.mjs';
-import {observeRuntimeDi} from '../scripts/api-di-observe.mjs';
+import {observeRuntimeDi,loadRuntimeModule,runFactory} from '../scripts/api-di-observe.mjs';
 import {settleDi} from '../scripts/api-completeness.mjs';
+import {createPublicFactoryContext} from '../scripts/api-public-node-context.mjs';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),require=createRequire(import.meta.url);
 const arg=name=>process.argv.includes(name)?process.argv[process.argv.indexOf(name)+1]:null;
@@ -91,10 +92,26 @@ try{
  const symbols=surface.symbols.map(symbol=>({...symbol,di_id:selectedIds.has(symbol.symbol_id)?symbol.di_id:null}));
  const rows=(await observeRuntimeDi(runtime,symbols,[],load)).map(row=>settleDi(row,[]));
  assert.equal(rows.length,154);assert.deepEqual(rows.map(r=>r.symbol.symbol_id).sort(),[...selectedIds].sort());
+ const ownedMenu=await loadRuntimeModule(runtime,'legacy-menu','primary'),peerMenu=await load('@angular/material/menu');
+ const menuContext=await createPublicFactoryContext(core,load,{providers:[core.importProvidersFrom(ownedMenu.MatLegacyMenuModule)]});
+ let menuItem;const publicParentControls=[];
+ try{
+  const host=menuContext.document.createElement('button');menuContext.document.body.appendChild(host);
+  menuItem=core.createComponent(ownedMenu.MatLegacyMenuItem,{hostElement:host,environmentInjector:menuContext.environment});
+  menuItem.changeDetectorRef.detectChanges();
+  assert.ok(menuItem.instance instanceof ownedMenu.MatLegacyMenuItem&&menuItem.instance instanceof peerMenu.MatMenuItem);
+  const request=runFactory(()=>core.inject(peerMenu.MatMenuItem,{self:true,optional:true}),core.Injector,core.runInInjectionContext,{injector:menuItem.injector});
+  assert.equal(request.outcome,'returned',request.error);assert.equal(request.value,menuItem.instance);assert.equal(request.requests.length,1);
+  assert.equal(request.requests[0].token,peerMenu.MatMenuItem);assert.equal(request.requests[0].self,true);assert.equal(request.requests[0].optional,true);
+  assert.equal(menuItem.injector.get(ownedMenu.MatLegacyMenuItem),menuItem.instance);
+  const twin=class MatMenuItem{};assert.equal(menuItem.injector.get(twin,null,{self:true,optional:true}),null);
+  menuItem.destroy();menuItem=null;assert.equal(menuContext.component.hostView.destroyed,false);assert.equal(menuContext.environment.destroyed,false);
+  publicParentControls.push({id:'actual-owned-menu-node-exposes-identical-public-parent',result:'pass',public_parent_instance:true,owned_node_provider_value_identical:true,self:true,optional:true,lookalike_token_rejected:true,borrowed_context_alive:true});
+ }finally{menuItem?.destroy();menuContext.close();}
  const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
  const caps=[...new Set([...files.map(file=>file.fileName),...resources])].sort().map(file=>({path:file.slice(root.length+1),sha256:sha(readFileSync(file))}));
  const result={schema_version:1,role:'All original154 factory class source observations;not canonical packed/native/browser/floor qualification',
-  node:process.version,typescript:ts.version,runtime_peer:core.VERSION.full,entries,rows,selected_symbol_ids:[...selectedIds].sort(),emitted_public_import_routes:routes,
+  node:process.version,typescript:ts.version,runtime_peer:core.VERSION.full,entries,rows,selected_symbol_ids:[...selectedIds].sort(),emitted_public_import_routes:routes,public_parent_controls:publicParentControls,
   passed:rows.filter(row=>row.result==='pass').length,failed:rows.filter(row=>row.result!=='pass').length,
   source_files:files.length,resource_files:resources.size,source_caps:caps,virtual_typecheck_files:virtualFiles.length,
   styles:'SCSS/HTML resources read unchanged by Angular compiler;no Sass/rendered style qualification',

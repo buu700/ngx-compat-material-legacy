@@ -4,6 +4,23 @@ import subprocess
 import unittest
 ROOT=Path(__file__).resolve().parents[1]
 class OriginalFactoryContextTests(unittest.TestCase):
+    def test_two_authenticated_forward_refs_keep_required_owned_objects(self):
+        code=r'''
+import assert from 'node:assert/strict';import {originalFactoryContract} from './scripts/api-surface.mjs';
+import {originalCompilerFactoryContext,originalContextDi} from './scripts/api-original-factory-contexts.mjs';
+import {runtimeTokenIdentity} from './scripts/api-di-observe.mjs';
+for(const [family,file,name,parent]of [['legacy-list','selection-list','MatLegacyListOption','MatLegacySelectionList'],['legacy-tabs','tab-body','MatLegacyTabBodyPortal','MatLegacyTabBody']]){
+ const originalFactory=originalFactoryContract('/baseline/src/material/'+family+'/'+file+'.ts',name),shape={originalFactory,originalFactoryContext:originalCompilerFactoryContext(originalFactory)};
+ const p=originalContextDi(shape)[2];assert.equal(p.ident,parent);assert.equal(p.imported,parent);assert.equal(p.spec,null);assert.equal(p.optional,false);assert.equal(p.original_reference_expression,'forwardRef(() => '+parent+')');
+ const owned=class OwnedParent{},twin=class OwnedParent{},loaded={[parent]:owned},noPeer=async()=>{throw Error('owned forwardRef must not load a modern peer');};
+ assert.equal(await runtimeTokenIdentity(family,p,loaded,{},owned,noPeer),true);assert.equal(await runtimeTokenIdentity(family,p,loaded,{},twin,noPeer),false);assert.equal(await runtimeTokenIdentity(family,p,{}, {},owned,noPeer),false);
+ for(const change of [s=>s.originalFactoryContext.factory_parameters[2].unresolved_expression='forwardRef(() => Other)',s=>s.originalFactoryContext.factory_parameters[2].optional=true,s=>s.originalFactoryContext.parameter_factory_key='foreign',s=>s.originalFactory.declaration+=' ']){const bad=structuredClone(shape);change(bad);assert.throws(()=>originalContextDi(bad));}
+ assert.equal(shape.originalFactoryContext.factory_parameters[2].ident,undefined,'frozen context must stay unchanged');
+}
+'''
+        result=subprocess.run(['node','--input-type=module','-e',code],cwd=ROOT,capture_output=True,text=True)
+        self.assertEqual(result.returncode,0,result.stderr)
+
     def test_complete_selected_factory_ancestry_flags_attributes_body_and_identity_guards(self):
         code=r"""
 import assert from 'node:assert/strict';import{readFileSync}from'node:fs';import{createHash}from'node:crypto';

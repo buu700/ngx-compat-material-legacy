@@ -37,6 +37,7 @@ import {MENU_ITEM_SYMBOL, approvedMenuItemContract} from './menu-item-constructi
 import {TABLE_SYMBOL, approvedTableContract, tableConstructionObservationComplete} from './table-construction-contract.mjs';
 import {RIPPLE_SYMBOL,approvedRippleContract} from './ripple-construction-contract.mjs';
 import {rippleFactoryObservationProblems} from './api-ripple-factory.mjs';
+import {publicParentTokenRoleObservationProblems} from './api-public-parent-token-role.mjs';
 
 // verify-lite imports this module before node_modules exists. Load the parser
 // on first use so compareContracts can be unit-tested without typescript.
@@ -501,6 +502,7 @@ if (isMain) {
 }
 
 export function settleDi(row, records) {
+  row={...row,problems:[...row.problems,...publicParentTokenRoleObservationProblems(row)]};
   if(row.symbol.symbol_id===RIPPLE_SYMBOL){
     const contract=approvedRippleContract(row.symbol),problems=[...row.problems,...rippleFactoryObservationProblems(row,contract)];
     return {...row,problems,result:problems.length?'fail':'pass',status:problems.length?'mismatch':'intentional-legacy-difference',

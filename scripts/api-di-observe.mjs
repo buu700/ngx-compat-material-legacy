@@ -12,6 +12,7 @@ import {createPublicFactoryContext} from './api-public-node-context.mjs';
 import {attributeFactoryContract,executeAttributeFactory,challengeAttributeDetectorScopes} from './api-attribute-factory.mjs';
 import {partitionPublicConstructorRequests} from './api-public-constructor-internals.mjs';
 import {ownedMotionProfile,partitionOwnedSelectMotion} from './api-owned-motion-context.mjs';
+import {originalPublicParentTokenRole} from './api-public-parent-token-role.mjs';
 
 // verify-lite imports the checker before node_modules exists. Load Angular
 // only when a packed factory is actually executed.
@@ -286,7 +287,14 @@ export function originalRuntimeAliases(symbols, family) {
   return Object.fromEntries(Object.entries(aliases).map(([name,exports])=>[name,[...new Set(exports)]]));
 }
 
-export async function runtimeTokenIdentity(family, param, loaded, aliases, observedToken, importModule = spec => import(spec), packageRoot = null) {
+export async function runtimeTokenIdentity(family, param, loaded, aliases, observedToken, importModule = spec => import(spec), packageRoot = null, originalSymbol = null) {
+  const publicParent=originalPublicParentTokenRole(originalSymbol,param);
+  if(publicParent){
+    try{const module=await importModule(publicParent.public_spec);
+      return Object.hasOwn(module,publicParent.public_export)&&module[publicParent.public_export]!=null
+        &&module[publicParent.public_export]===observedToken;
+    }catch{return false;}
+  }
   if(param.ident==='ANIMATION_MODULE_TYPE'&&param.imported==='ANIMATION_MODULE_TYPE'
     &&param.spec==='@angular/platform-browser/animations'){
     const core=await importModule('@angular/core');
@@ -394,10 +402,11 @@ export async function observeRuntimeDi(packageRoot, symbols, differences = [], i
           ? await loadRuntimeModule(packageRoot, 'legacy-core', 'primary') : null;
         const ownedViewport = ownedViewportIdentity(symbol.family, param, coreExports || {}, got.token);
         const same = ownedViewport !== null ? ownedViewport : await runtimeTokenIdentity(symbol.family, param, exports,
-          originalRuntimeAliases(symbols, symbol.family), got.token, importModule,packageRoot);
+          originalRuntimeAliases(symbols, symbol.family), got.token, importModule,packageRoot,symbol);
         runtimeRequests.push({expected_ident:param.ident,expected_spec:param.spec,identity_matched:same,
           expected_optional:Boolean(param.optional),expected_self:Boolean(param.self),
-          expected_skipSelf:Boolean(param.skipSelf),expected_host:Boolean(param.host)});
+          expected_skipSelf:Boolean(param.skipSelf),expected_host:Boolean(param.host),
+          public_parent_token_role:originalPublicParentTokenRole(symbol,param)});
         if (symbol.symbol_id===TABLE_SYMBOL) publicNodeRequests.push({ident:param.ident,spec:param.spec,
           observed_label:got.label+(got.optional?'?':''),identity_matched:same,
           optional:Boolean(got.optional),self:Boolean(got.self),skipSelf:Boolean(got.skipSelf),host:Boolean(got.host)});
