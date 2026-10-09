@@ -24,6 +24,7 @@ import {callerConfigProfile,callerConfigObservationProblems} from '../scripts/ap
 import {ownedDialogFocusObservationProblems} from '../scripts/api-owned-dialog-focus-context.mjs';
 import {MENU_CONTENT_SYMBOL,menuContentContract,menuContentObservationProblems} from '../scripts/api-menu-content-context.mjs';
 import {SIMPLE_SNACK_SYMBOL,simpleSnackObservationProblems} from '../scripts/api-simple-snack-context.mjs';
+import {DIALOG_OPENER_SYMBOL,dialogOpenerObservationProblems} from '../scripts/api-dialog-opener-context.mjs';
 import {SNACK_MOTION_SYMBOL,FORM_FIELD_MOTION_SYMBOL,MENU_MOTION_SYMBOL,TOOLTIP_MOTION_SYMBOL,DIALOG_MOTION_SYMBOL,ownedMotionProfile,ownedSelectMotionProblems} from '../scripts/api-owned-motion-context.mjs';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),require=createRequire(import.meta.url);
@@ -266,6 +267,28 @@ try{
    else{assert.equal(execution.outcome,'threw');assert.match(execution.error,cell.error);assert.ok(execution.error.length<500,'simple snack mutant diagnostic must remain bounded');simpleSnackControls.push({id:cell.id,result:'rejected',error:execution.error});}
   }
  }
+ const dialogOpenerControls=[];
+ {
+  const symbol=selected.find(s=>s.symbol_id===DIALOG_OPENER_SYMBOL),family=await loadRuntimeModule(runtime,'legacy-dialog','testing'),Type=family.MatTestLegacyDialogOpener;
+  const row=rows.find(r=>r.symbol.symbol_id===DIALOG_OPENER_SYMBOL);assert.equal(row.result,'pass',row.problems.join('\n'));assert.deepEqual(dialogOpenerObservationProblems(row),[]);
+  dialogOpenerControls.push({id:'actual-configured-service-ref-result-and-pending-escape-lifetimes',result:'pass',evidence:row.factory_dialog_opener_context});
+  for(const cell of [
+   {id:'foreign-service-value',change:value=>{value.dialog={};},error:/genuine caller service differs/},
+   {id:'foreign-reference-value',change:value=>{value.dialogRef={};},error:/reference\/content identity differs/},
+   {id:'foreign-content-data',change:value=>{value.dialogRef.componentInstance.data={};},error:/content data differs/},
+   {id:'result-delivery-noop',change:value=>{Object.defineProperty(value,'closedResult',{get:()=>undefined,set:()=>{}});},error:/normal result did not reach helper/},
+   {id:'teardown-noop',change:value=>{value.ngOnDestroy=()=>{};},error:/did not clear component configuration/},
+   {id:'destroy-borrowed-view',destroy:true},
+   {id:'unrelated-optional-request',extra:true},
+  ]){
+   const constructorFactory=Receiver=>{if(cell.extra)core.inject(core.ChangeDetectorRef,{optional:true});return Type.ɵfac(class extends Receiver{constructor(...inputs){super(...inputs);cell.change?.(this);if(cell.destroy){const detector=core.inject(core.ChangeDetectorRef),original=this.ngOnDestroy.bind(this);this.ngOnDestroy=()=>{original();detector.destroy();};}}});};
+   const execution=await observePublicNodeFactory(Type,core,runtime,symbol,symbols,load,{constructorFactory});
+   if(cell.extra){assert.equal(execution.outcome,'returned',execution.error);assert.equal(execution.requests.length,2);dialogOpenerControls.push({id:cell.id,result:'retained-unclassified-request',retained_requests:2});}
+   else if(cell.destroy){assert.equal(execution.outcome,'returned',execution.error);assert.ok(execution.behaviorProblems.some(p=>/borrowed/.test(p)));assert.ok(dialogOpenerObservationProblems({symbol,factory_outcome:execution.outcome,factory_dialog_opener_context:execution.dialogOpenerContext}).length);dialogOpenerControls.push({id:cell.id,result:'rejected',problems:execution.behaviorProblems});}
+   else{assert.equal(execution.outcome,'threw');assert.match(execution.error,cell.error);dialogOpenerControls.push({id:cell.id,result:'rejected',error:execution.error});}
+   assert.equal(Type.component,undefined,'dialog opener context did not restore original component state');assert.equal(Type.config,undefined,'dialog opener context did not restore original config state');
+  }
+ }
  const constructorMotionControls=[];
  const manualMotionObservations=[];
  const manualMotionLifecycle=[];
@@ -346,7 +369,7 @@ try{
  const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
  const caps=[...new Set([...files.map(file=>file.fileName),...resources])].sort().map(file=>({path:file.slice(root.length+1),sha256:sha(readFileSync(file))}));
  const result={schema_version:1,role:'All original154 factory class source observations;not canonical packed/native/browser/floor qualification',
-  node:process.version,typescript:ts.version,runtime_peer:core.VERSION.full,entries,rows,selected_symbol_ids:[...selectedIds].sort(),emitted_public_import_routes:routes,public_parent_controls:publicParentControls,required_parent_controls:requiredParentControls,caller_config_controls:callerConfigControls,snack_motion_controls:snackMotionControls,constructor_motion_controls:constructorMotionControls,manual_motion_observations:manualMotionObservations,manual_motion_lifecycle:manualMotionLifecycle,dialog_focus_controls:dialogFocusControls,menu_content_controls:menuContentControls,simple_snack_controls:simpleSnackControls,
+  node:process.version,typescript:ts.version,runtime_peer:core.VERSION.full,entries,rows,selected_symbol_ids:[...selectedIds].sort(),emitted_public_import_routes:routes,public_parent_controls:publicParentControls,required_parent_controls:requiredParentControls,caller_config_controls:callerConfigControls,snack_motion_controls:snackMotionControls,constructor_motion_controls:constructorMotionControls,manual_motion_observations:manualMotionObservations,manual_motion_lifecycle:manualMotionLifecycle,dialog_focus_controls:dialogFocusControls,menu_content_controls:menuContentControls,simple_snack_controls:simpleSnackControls,dialog_opener_controls:dialogOpenerControls,
   passed:rows.filter(row=>row.result==='pass').length,failed:rows.filter(row=>row.result!=='pass').length,
   source_files:files.length,resource_files:resources.size,source_caps:caps,virtual_typecheck_files:virtualFiles.length,
   styles:'SCSS/HTML resources read unchanged by Angular compiler;no Sass/rendered style qualification',
