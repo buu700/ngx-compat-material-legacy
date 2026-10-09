@@ -214,7 +214,11 @@ button.mat-list-item, button.mat-list-option {
   border: none;
   outline: inherit;
   -webkit-tap-highlight-color: transparent;
-  text-align: start;
+  text-align: left;
+
+  [dir='rtl'] & {
+    text-align: right;
+  }
 
   &::-moz-focus-inner {
     border: 0;
@@ -311,7 +315,7 @@ mat-action-list {
   }
 }
 
-@include cdk.high-contrast(active) {
+@include cdk.high-contrast(active, off) {
   .mat-list-option,
   .mat-nav-list .mat-list-item,
   mat-action-list .mat-list-item {
