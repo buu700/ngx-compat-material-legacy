@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "86ad5150110522873dae2801fd3c2957502949e7",
+  "recorded_at_utc": "2026-10-09T16:21:49.864999+00:00",
+  "role": "Preserved stale source-proof finding; no replacement behavior admission",
+  "finding": {
+    "sha": "86ad5150110522873dae2801fd3c2957502949e7",
+    "subject": "fix(material/select): avoid error if panel is closed too quickly (#30408)",
+    "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+    "old_sha256": "6d45059a74b6b405d57804b11a632818b566b2ee131c81008d1f86f4ccc5ccc4",
+    "current_sha256": "ba6f6790553271e0296608aaad77ef9f8392a3cc2c1c01b359142010e4d9218b",
+    "bad_lines": [
+      {
+        "needle": "if (!animationsEnabled || !this.panel) {",
+        "recorded_line": 724,
+        "actual_locations": [
+          751
+        ]
+      }
+    ]
+  },
+  "prior_entry": {
+    "sha": "86ad5150110522873dae2801fd3c2957502949e7",
+    "bucket": "behavior-semantic",
+    "subject": "fix(material/select): avoid error if panel is closed too quickly (#30408)",
+    "final_disposition": "already-adapted",
+    "reason": "The patch detaches the select overlay immediately when close runs before the panel exists. Owned close already skips the exit animation when the panel is missing (legacy-select/internal/select-base.ts). That guard was not added.",
+    "read_note_disposition": "already-present",
+    "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+    "source_check": "Owned close already skips the exit animation when the panel is missing (legacy-select/internal/select-base",
+    "files": [
+      "src/material/select/select.ts"
+    ],
+    "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
+    "recorded_at_utc": "2026-10-01T16:46:41Z",
+    "g11_claim": "not-passed",
+    "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+    "individual_proof": {
+      "diff_sha256": "040d162a30fac34d6298da796b61bc31b5049051e98d8f75666fe5cc47259813",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "decision": "Upstream makes _exitAndDetach detach the overlay immediately when the panel element does not exist yet (`this._animationsDisabled || !this.panel`) instead of waiting for an exit animation on a missing element. The owned legacy select base _exitAndDetach has the same early branch (`!animationsEnabled || !this.panel`): it clears _overlayAttached, emits the void done state and returns, which detaches the connected overlay without touching the panel.",
+      "proof_kind": "candidate-source-equivalent",
+      "upstream_file": "src/material/select/select.ts",
+      "candidate_member": {
+        "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+        "sha256": "6d45059a74b6b405d57804b11a632818b566b2ee131c81008d1f86f4ccc5ccc4"
+      },
+      "added_lines": [],
+      "equivalent_candidate_lines": [
+        {
+          "candidate_snippet": "if (!animationsEnabled || !this.panel) {",
+          "candidate_lines": [
+            724
+          ]
+        }
+      ],
+      "replaced_upstream_lines": [
+        "if (this._animationsDisabled || !this.panel) {"
+      ],
+      "read_note": "already-present",
+      "recorded_by": "Grok, FIN-02-C02; Codex validates in FIN-02-C05",
+      "recomputed_by": "scripts/record-candidate-line-proofs.py",
+      "coordinate_relocation": {
+        "source_parent": "09d435656",
+        "change": "Local unexported BooleanInput/NumberInput types; unchanged matching behavior lines relocated only",
+        "method": "Exact line-block mapping; changed lines refused",
+        "prior_proof": {
+          "diff_sha256": "040d162a30fac34d6298da796b61bc31b5049051e98d8f75666fe5cc47259813",
+          "review_depth": "individual-compatibility",
+          "affected_branches": [
+            "main"
+          ],
+          "decision": "Upstream makes _exitAndDetach detach the overlay immediately when the panel element does not exist yet (`this._animationsDisabled || !this.panel`) instead of waiting for an exit animation on a missing element. The owned legacy select base _exitAndDetach has the same early branch (`!animationsEnabled || !this.panel`): it clears _overlayAttached, emits the void done state and returns, which detaches the connected overlay without touching the panel.",
+          "proof_kind": "candidate-source-equivalent",
+          "upstream_file": "src/material/select/select.ts",
+          "candidate_member": {
+            "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+            "sha256": "5ca1d31f6ac3b19a8d8ae81e1dc2245f77ec222e5570a915fc8fbb5797ed6486"
+          },
+          "added_lines": [],
+          "equivalent_candidate_lines": [
+            {
+              "candidate_snippet": "if (!animationsEnabled || !this.panel) {",
+              "candidate_lines": [
+                727
+              ]
+            }
+          ],
+          "replaced_upstream_lines": [
+            "if (this._animationsDisabled || !this.panel) {"
+          ],
+          "read_note": "already-present",
+          "recorded_by": "Grok, FIN-02-C02; Codex validates in FIN-02-C05",
+          "recomputed_by": "scripts/record-candidate-line-proofs.py",
+          "coordinate_relocation": {
+            "source_parent": "02cb35cfa",
+            "source_after": "0096fbeb7",
+            "method": "Exact matching line blocks only; changed lines are refused, prior text and conclusions retained",
+            "prior_proof": {
+              "diff_sha256": "040d162a30fac34d6298da796b61bc31b5049051e98d8f75666fe5cc47259813",
+              "review_depth": "individual-compatibility",
+              "affected_branches": [
+                "main"
+              ],
+              "decision": "Upstream makes _exitAndDetach detach the overlay immediately when the panel element does not exist yet (`this._animationsDisabled || !this.panel`) instead of waiting for an exit animation on a missing element. The owned legacy select base _exitAndDetach has the same early branch (`!animationsEnabled || !this.panel`): it clears _overlayAttached, emits the void done state and returns, which detaches the connected overlay without touching the panel.",
+              "proof_kind": "candidate-source-equivalent",
+              "upstream_file": "src/material/select/select.ts",
+              "candidate_member": {
+                "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+                "sha256": "f445ce2492896a7beffbd94b7acd4955305525f75af76ae97ed1ef03e87aac95"
+              },
+              "added_lines": [],
+              "equivalent_candidate_lines": [
+                {
+                  "candidate_snippet": "if (!animationsEnabled || !this.panel) {",
+                  "candidate_lines": [
+                    725
+                  ]
+                }
+              ],
+              "replaced_upstream_lines": [
+                "if (this._animationsDisabled || !this.panel) {"
+              ],
+              "read_note": "already-present",
+              "recorded_by": "Grok, FIN-02-C02; Codex validates in FIN-02-C05",
+              "recomputed_by": "scripts/record-candidate-line-proofs.py"
+            }
+          }
+        }
+      }
+    }
+  },
+  "decision": "The recorded candidate member digest no longer names the current source. Two records also cite displaced lines. Preserve the old proof as historical evidence and reopen individual review; do not update coordinates or accept the prior behavior conclusion without reviewing the changed source context and required tests.",
+  "admission_status": "needs-fresh-individual-source-and-behavior-review",
+  "g11_claim": "not-passed"
+}

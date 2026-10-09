@@ -1,0 +1,192 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "77ffdf98ba71c11d908b29e02b516dddf487ae0b",
+  "recorded_at_utc": "2026-10-09T16:21:49.864999+00:00",
+  "role": "Preserved stale source-proof finding; no replacement behavior admission",
+  "finding": {
+    "sha": "77ffdf98ba71c11d908b29e02b516dddf487ae0b",
+    "subject": "fix(material/autocomplete): don't assign to model value while typing when requireSelection is enabled (#27572)",
+    "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+    "old_sha256": "5cc0825493fb756df3298b2e87309c40ea5acb66761a3a2ca40784499737940c",
+    "current_sha256": "aa7a743dbfc4123f1d4a83d0472723d4035ed8cf057beefc0ab92b9c127bfaac",
+    "bad_lines": [
+      {
+        "needle": "if (!this.autocomplete || !this.autocomplete.requireSelection) {",
+        "recorded_line": 482,
+        "actual_locations": [
+          484
+        ]
+      },
+      {
+        "needle": "this._onChange(value);",
+        "recorded_line": 483,
+        "actual_locations": [
+          485
+        ]
+      }
+    ]
+  },
+  "prior_entry": {
+    "sha": "77ffdf98ba71c11d908b29e02b516dddf487ae0b",
+    "bucket": "behavior-semantic",
+    "subject": "fix(material/autocomplete): don't assign to model value while typing when requireSelection is enabled (#27572)",
+    "final_disposition": "already-adapted",
+    "reason": "legacy-autocomplete/internal/autocomplete-trigger-base.ts already skips _onChange while typing when requireSelection is set.",
+    "read_note_disposition": "already-present",
+    "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+    "source_check": "autocomplete-trigger-base.ts requireSelection guard around _onChange",
+    "files": [
+      "src/material/autocomplete/autocomplete-trigger.ts",
+      "src/material/autocomplete/autocomplete.spec.ts",
+      "src/dev-app/autocomplete/autocomplete-demo.ts",
+      "src/components-examples/material/autocomplete/autocomplete-require-selection"
+    ],
+    "batch_id": "security-already-present-2026-10-01-b",
+    "recorded_at_utc": "2026-10-01T16:30:02Z",
+    "g11_claim": "not-passed",
+    "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+    "individual_proof": {
+      "diff_sha256": "98754a36c31e10ac256779888887af07bcddae1411ba569d1417f4a8b64babd5",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "decision": "Upstream wraps this._onChange(value) in _handleInput with `if (!this.autocomplete || !this.autocomplete.requireSelection)` so typing does not write the CVA when requireSelection is set. The owned legacy trigger base has the same guard and the same explanatory comment in its _handleInput, so the fix was already present. No candidate change was needed. The upstream example and demo edits are not shipped.",
+      "proof_kind": "candidate-source-line-match",
+      "upstream_file": "src/material/autocomplete/autocomplete-trigger.ts",
+      "candidate_member": {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+        "sha256": "5cc0825493fb756df3298b2e87309c40ea5acb66761a3a2ca40784499737940c"
+      },
+      "added_lines": [
+        {
+          "upstream_added": "if (!this.autocomplete || !this.autocomplete.requireSelection) {",
+          "candidate_lines": [
+            482
+          ]
+        },
+        {
+          "upstream_added": "this._onChange(value);",
+          "candidate_lines": [
+            483
+          ]
+        }
+      ],
+      "read_note": "already-present",
+      "recorded_by": "Grok, FIN-02-C02; Codex validates in FIN-02-C05",
+      "recomputed_by": "scripts/record-candidate-line-proofs.py",
+      "coordinate_relocation": {
+        "source_parent": "09d435656",
+        "change": "Local unexported BooleanInput/NumberInput types; unchanged matching behavior lines relocated only",
+        "method": "Exact line-block mapping; changed lines refused",
+        "prior_proof": {
+          "diff_sha256": "98754a36c31e10ac256779888887af07bcddae1411ba569d1417f4a8b64babd5",
+          "review_depth": "individual-compatibility",
+          "affected_branches": [
+            "main"
+          ],
+          "decision": "Upstream wraps this._onChange(value) in _handleInput with `if (!this.autocomplete || !this.autocomplete.requireSelection)` so typing does not write the CVA when requireSelection is set. The owned legacy trigger base has the same guard and the same explanatory comment in its _handleInput, so the fix was already present. No candidate change was needed. The upstream example and demo edits are not shipped.",
+          "proof_kind": "candidate-source-line-match",
+          "upstream_file": "src/material/autocomplete/autocomplete-trigger.ts",
+          "candidate_member": {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+            "sha256": "d7baf2c194dbd4c90be215d7c258f92f8c7fffe5b6649ce4d27ac46393c8eac8"
+          },
+          "added_lines": [
+            {
+              "upstream_added": "if (!this.autocomplete || !this.autocomplete.requireSelection) {",
+              "candidate_lines": [
+                481
+              ]
+            },
+            {
+              "upstream_added": "this._onChange(value);",
+              "candidate_lines": [
+                482
+              ]
+            }
+          ],
+          "read_note": "already-present",
+          "recorded_by": "Grok, FIN-02-C02; Codex validates in FIN-02-C05",
+          "recomputed_by": "scripts/record-candidate-line-proofs.py",
+          "coordinate_relocation": {
+            "source_parent": "31a6b252d",
+            "change": "Local ownership of original missing-panel helper; unchanged matching source lines relocated only",
+            "method": "Exact line-block mapping; changed lines refused",
+            "prior_proof": {
+              "diff_sha256": "98754a36c31e10ac256779888887af07bcddae1411ba569d1417f4a8b64babd5",
+              "review_depth": "individual-compatibility",
+              "affected_branches": [
+                "main"
+              ],
+              "decision": "Upstream wraps this._onChange(value) in _handleInput with `if (!this.autocomplete || !this.autocomplete.requireSelection)` so typing does not write the CVA when requireSelection is set. The owned legacy trigger base has the same guard and the same explanatory comment in its _handleInput, so the fix was already present. No candidate change was needed. The upstream example and demo edits are not shipped.",
+              "proof_kind": "candidate-source-line-match",
+              "upstream_file": "src/material/autocomplete/autocomplete-trigger.ts",
+              "candidate_member": {
+                "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+                "sha256": "015222d0b5f4f104047e3d5f3d8174a8a01ccf71abe5340f82050de00a739964"
+              },
+              "added_lines": [
+                {
+                  "upstream_added": "if (!this.autocomplete || !this.autocomplete.requireSelection) {",
+                  "candidate_lines": [
+                    481
+                  ]
+                },
+                {
+                  "upstream_added": "this._onChange(value);",
+                  "candidate_lines": [
+                    482
+                  ]
+                }
+              ],
+              "read_note": "already-present",
+              "recorded_by": "Grok, FIN-02-C02; Codex validates in FIN-02-C05",
+              "recomputed_by": "scripts/record-candidate-line-proofs.py",
+              "coordinate_relocation": {
+                "source_parent": "02cb35cfa",
+                "source_after": "0096fbeb7",
+                "method": "Exact matching line blocks only; changed lines are refused, prior text and conclusions retained",
+                "prior_proof": {
+                  "diff_sha256": "98754a36c31e10ac256779888887af07bcddae1411ba569d1417f4a8b64babd5",
+                  "review_depth": "individual-compatibility",
+                  "affected_branches": [
+                    "main"
+                  ],
+                  "decision": "Upstream wraps this._onChange(value) in _handleInput with `if (!this.autocomplete || !this.autocomplete.requireSelection)` so typing does not write the CVA when requireSelection is set. The owned legacy trigger base has the same guard and the same explanatory comment in its _handleInput, so the fix was already present. No candidate change was needed. The upstream example and demo edits are not shipped.",
+                  "proof_kind": "candidate-source-line-match",
+                  "upstream_file": "src/material/autocomplete/autocomplete-trigger.ts",
+                  "candidate_member": {
+                    "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+                    "sha256": "c61178b73599a69247a20dcd3ec2bb62337a46801c70e47a71049cca2911167f"
+                  },
+                  "added_lines": [
+                    {
+                      "upstream_added": "if (!this.autocomplete || !this.autocomplete.requireSelection) {",
+                      "candidate_lines": [
+                        480
+                      ]
+                    },
+                    {
+                      "upstream_added": "this._onChange(value);",
+                      "candidate_lines": [
+                        481
+                      ]
+                    }
+                  ],
+                  "read_note": "already-present",
+                  "recorded_by": "Grok, FIN-02-C02; Codex validates in FIN-02-C05",
+                  "recomputed_by": "scripts/record-candidate-line-proofs.py"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "decision": "The recorded candidate member digest no longer names the current source. Two records also cite displaced lines. Preserve the old proof as historical evidence and reopen individual review; do not update coordinates or accept the prior behavior conclusion without reviewing the changed source context and required tests.",
+  "admission_status": "needs-fresh-individual-source-and-behavior-review",
+  "g11_claim": "not-passed"
+}

@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "5dd614aa100e28f0815fdd83e5b68f4239ef01f9",
+  "recorded_at_utc": "2026-10-09T16:21:49.864999+00:00",
+  "role": "Preserved stale source-proof finding; no replacement behavior admission",
+  "finding": {
+    "sha": "5dd614aa100e28f0815fdd83e5b68f4239ef01f9",
+    "subject": "fix(material/tabs): nav bar not navigating on enter presses (#27862)",
+    "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+    "old_sha256": "0e3617049209a071a0ce446da0c17befc71ccec66bdbc48d524577f8e923a3fa",
+    "current_sha256": "fe45e7e30365d2ecb4644bdf4e9ff8fd4e4c8a163e2b2b4d44b76a528112a93a",
+    "bad_lines": []
+  },
+  "prior_entry": {
+    "sha": "5dd614aa100e28f0815fdd83e5b68f4239ef01f9",
+    "bucket": "behavior-semantic",
+    "subject": "fix(material/tabs): nav bar not navigating on enter presses (#27862)",
+    "final_disposition": "already-adapted",
+    "reason": "tab-nav-bar-base.ts _handleKeydown clicks on Enter and Space when a tab panel is set, and prevents the key when disabled.",
+    "read_note_disposition": "already-present",
+    "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+    "source_check": "legacy-tabs/internal/tab-nav-bar-base.ts ENTER|SPACE handler",
+    "files": [
+      "src/material/tabs/tab-nav-bar/tab-nav-bar.ts",
+      "src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts"
+    ],
+    "batch_id": "security-already-present-2026-10-01-b",
+    "recorded_at_utc": "2026-10-01T16:30:02Z",
+    "g11_claim": "not-passed",
+    "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+    "individual_proof": {
+      "diff_sha256": "bc7f365f37be09c0a09618b21be4b4dedd46f83cbc06f53e485a11f5f7ebcbf2",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "decision": "Upstream makes the nav-bar link _handleKeydown react to ENTER as well as SPACE when a tab panel is set, still preventing default for a disabled link and only preventing default on SPACE before clicking. The owned legacy link base _handleKeydown has exactly that branch structure, so the fix was already present in the candidate.",
+      "proof_kind": "candidate-source-line-match",
+      "upstream_file": "src/material/tabs/tab-nav-bar/tab-nav-bar.ts",
+      "candidate_member": {
+        "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+        "sha256": "0e3617049209a071a0ce446da0c17befc71ccec66bdbc48d524577f8e923a3fa"
+      },
+      "added_lines": [
+        {
+          "upstream_added": "if (event.keyCode === SPACE || event.keyCode === ENTER) {",
+          "candidate_lines": [
+            260
+          ]
+        },
+        {
+          "upstream_added": "if (this.disabled) {",
+          "candidate_lines": [
+            261
+          ]
+        },
+        {
+          "upstream_added": "event.preventDefault();",
+          "candidate_lines": [
+            262,
+            267
+          ]
+        },
+        {
+          "upstream_added": "this.elementRef.nativeElement.click();",
+          "candidate_lines": [
+            270
+          ]
+        }
+      ],
+      "read_note": "already-present",
+      "recorded_by": "Grok, FIN-02-C02; Codex validates in FIN-02-C05",
+      "recomputed_by": "scripts/record-candidate-line-proofs.py",
+      "coordinate_relocation": {
+        "source_parent": "09d435656",
+        "change": "Local unexported BooleanInput/NumberInput types; unchanged matching behavior lines relocated only",
+        "method": "Exact line-block mapping; changed lines refused",
+        "prior_proof": {
+          "diff_sha256": "bc7f365f37be09c0a09618b21be4b4dedd46f83cbc06f53e485a11f5f7ebcbf2",
+          "review_depth": "individual-compatibility",
+          "affected_branches": [
+            "main"
+          ],
+          "decision": "Upstream makes the nav-bar link _handleKeydown react to ENTER as well as SPACE when a tab panel is set, still preventing default for a disabled link and only preventing default on SPACE before clicking. The owned legacy link base _handleKeydown has exactly that branch structure, so the fix was already present in the candidate.",
+          "proof_kind": "candidate-source-line-match",
+          "upstream_file": "src/material/tabs/tab-nav-bar/tab-nav-bar.ts",
+          "candidate_member": {
+            "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+            "sha256": "345331d2018fd3146e0fa09e87705a0709f777a65767d25bd11e6325276e7617"
+          },
+          "added_lines": [
+            {
+              "upstream_added": "if (event.keyCode === SPACE || event.keyCode === ENTER) {",
+              "candidate_lines": [
+                257
+              ]
+            },
+            {
+              "upstream_added": "if (this.disabled) {",
+              "candidate_lines": [
+                258
+              ]
+            },
+            {
+              "upstream_added": "event.preventDefault();",
+              "candidate_lines": [
+                259,
+                264
+              ]
+            },
+            {
+              "upstream_added": "this.elementRef.nativeElement.click();",
+              "candidate_lines": [
+                267
+              ]
+            }
+          ],
+          "read_note": "already-present",
+          "recorded_by": "Grok, FIN-02-C02; Codex validates in FIN-02-C05",
+          "recomputed_by": "scripts/record-candidate-line-proofs.py"
+        }
+      }
+    }
+  },
+  "decision": "The recorded candidate member digest no longer names the current source. Two records also cite displaced lines. Preserve the old proof as historical evidence and reopen individual review; do not update coordinates or accept the prior behavior conclusion without reviewing the changed source context and required tests.",
+  "admission_status": "needs-fresh-individual-source-and-behavior-review",
+  "g11_claim": "not-passed"
+}
