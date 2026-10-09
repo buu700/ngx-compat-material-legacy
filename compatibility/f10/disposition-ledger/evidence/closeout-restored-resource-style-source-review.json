@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "recorded_at_utc": "2026-10-09T12:04:35.279180+00:00",
+  "role": "Individual six-SHA owned/current source review and scoped repairs; native qualification remains pending",
+  "g11_claim": "not-passed",
+  "code_heads": {
+    "main": "eaf4cd6e14c7fbc50f3c5b81cf3ec38edccad9c2",
+    "21.x": "842557329ce027f2ccaa5d2b48d363587154cf3e"
+  },
+  "code_trees": {
+    "main": "229f309ccdf7d90ae6c8ac2e5d2569fdb28065f2",
+    "21.x": "671852e54884331d6014452cb3ff4b7aa856df5f"
+  },
+  "reviews": [
+    {
+      "sha": "4d0719a6a0d0472ee1729750100167d9941b1641",
+      "topic": "Paginator narrow layout",
+      "source_review": "complete hunk and both public-minimum style contexts inspected individually",
+      "reviewer": "Codex primary implementer",
+      "proposed_disposition": "owned-retained with separate current-peer MDC implementation",
+      "admission_status": "pending-rendered-regression-and-independent-audit",
+      "patch": {
+        "path": "compatibility/rc/resource-style-upstream-patches/4d0719a6a0d0472ee1729750100167d9941b1641.patch",
+        "sha256": "0ca09c7c06b26bbe9faa4768f365424335384b3609ccc295a8ccfe9b624ecb3c",
+        "bytes": 434
+      },
+      "decision": "The one upstream paginator hunk changes wrap-reverse to wrap in the modern paginator container. The earlier note claimed the owned source still used wrap-reverse, but both captured current owned sources used wrap. Historical owned CSS and Cyph paginator structure require preserving16 behavior. Restore wrap-reverse; leave the authentic public current MDC paginator wrap behavior untouched.",
+      "regression": "paginator-wrap-modernization",
+      "current_source_head": "eaf4cd6e14c7fbc50f3c5b81cf3ec38edccad9c2",
+      "proof": "compatibility/rc/restored-resource-css-source-proof.json",
+      "both_actual_public_peer_contexts": "compatibility/rc/resource-style-peer-source-contexts.json",
+      "source_renderer_scope": "Full authentic historical CSS + independent actual-minimum public native media output; no pixel/layout/interaction or browser claim."
+    },
+    {
+      "sha": "99b33120e774768467120b77703ee4fb9d98d411",
+      "topic": "Paginator touch overlay",
+      "source_review": "complete hunk and both public-minimum style contexts inspected individually",
+      "reviewer": "Codex primary implementer",
+      "proposed_disposition": "owned-retained with separate current-peer MDC implementation",
+      "admission_status": "pending-rendered-regression-and-independent-audit",
+      "patch": {
+        "path": "compatibility/rc/resource-style-upstream-patches/99b33120e774768467120b77703ee4fb9d98d411.patch",
+        "sha256": "cd278707def752a1809075fa28e91ad67df9c497453110efadfd6cdd4de626d2",
+        "bytes": 4710
+      },
+      "decision": "The complete upstream hunk adds a selectRef template variable, touch overlay, relative layout and token-based density/display geometry in modern paginator and M2 density files. The owned port had copied a fixed48px/84px overlay without those modern density contracts. Restore the entire tagged legacy paginator template and original style layout. The public current minimum MDC components retain their token-aware overlay; no legacy template source or required consumer stylesheet adaptation is authorized by that modern change.",
+      "regression": "paginator-touch-target-addition",
+      "current_source_head": "eaf4cd6e14c7fbc50f3c5b81cf3ec38edccad9c2",
+      "proof": "compatibility/rc/restored-resource-css-source-proof.json",
+      "both_actual_public_peer_contexts": "compatibility/rc/resource-style-peer-source-contexts.json",
+      "source_renderer_scope": "Full authentic historical CSS + independent actual-minimum public native media output; no pixel/layout/interaction or browser claim."
+    },
+    {
+      "sha": "777d1d295aaa8bc6e47a7c76e8fe9246ed30db2e",
+      "topic": "Chip remove geometry",
+      "source_review": "complete hunk and both public-minimum style contexts inspected individually",
+      "reviewer": "Codex primary implementer",
+      "proposed_disposition": "owned-retained with separate current-peer MDC implementation",
+      "admission_status": "pending-rendered-regression-and-independent-audit",
+      "patch": {
+        "path": "compatibility/rc/resource-style-upstream-patches/777d1d295aaa8bc6e47a7c76e8fe9246ed30db2e.patch",
+        "sha256": "305cff39a6e8907115e4489aecce0638f5a31ae6d3c5ebdeb9344ca367557893",
+        "bytes": 1515
+      },
+      "decision": "The full upstream patch expands modern trailing-action pseudo-element hit regions with12px padding/-12px margin around24px ripple and3px offsets, while changing state-layer background token slots. The legacy port changed the real18px remove button to padding15px/-15px margin instead. This differs in target/geometry and lacks the modern token/pseudo-element context. Restore unchanged16 legacy18px icon/button geometry; modern minimum CSS remains on MDC remove/edit pseudo-elements.",
+      "regression": "chips-touch-padding",
+      "current_source_head": "eaf4cd6e14c7fbc50f3c5b81cf3ec38edccad9c2",
+      "proof": "compatibility/rc/restored-resource-css-source-proof.json",
+      "both_actual_public_peer_contexts": "compatibility/rc/resource-style-peer-source-contexts.json",
+      "source_renderer_scope": "Full authentic historical CSS + independent actual-minimum public native media output; no pixel/layout/interaction or browser claim."
+    },
+    {
+      "sha": "c5213fd3ef4202e9a6896be0f9202bbba78bde6b",
+      "topic": "Disabled chip forced colors",
+      "source_review": "complete hunk and both public-minimum style contexts inspected individually",
+      "reviewer": "Codex primary implementer",
+      "proposed_disposition": "owned-retained with separate current-peer MDC implementation",
+      "admission_status": "pending-rendered-regression-and-independent-audit",
+      "patch": {
+        "path": "compatibility/rc/resource-style-upstream-patches/c5213fd3ef4202e9a6896be0f9202bbba78bde6b.patch",
+        "sha256": "96f47ca362f42be71f1354f47afcfeea4b807ae0babb5bbb90bc0bd588c1dfbb",
+        "bytes": 438
+      },
+      "decision": "The upstream three-line patch disables forced color adjustment for MDC evolution-chip disabled action selectors. The legacy port copied it onto mat-standard-chip.mat-chip-disabled although the earlier read note said it was absent. Restore tagged legacy disabled-chip CSS and retain exact historical high-contrast outline/selection behavior plus the current native media equivalent. Modern MDC disabled rules stay in the public peer; their colors/token domains and DOM classes are distinct.",
+      "regression": "chips-disabled-color-adjust",
+      "current_source_head": "eaf4cd6e14c7fbc50f3c5b81cf3ec38edccad9c2",
+      "proof": "compatibility/rc/restored-resource-css-source-proof.json",
+      "both_actual_public_peer_contexts": "compatibility/rc/resource-style-peer-source-contexts.json",
+      "source_renderer_scope": "Full authentic historical CSS + independent actual-minimum public native media output; no pixel/layout/interaction or browser claim."
+    },
+    {
+      "sha": "f2cf22987220ac087c665524708fd95f5da15119",
+      "topic": "Paginator disabled contrast",
+      "source_review": "complete hunk and both public-minimum style contexts inspected individually",
+      "reviewer": "Codex primary implementer",
+      "proposed_disposition": "owned-retained with separate current-peer MDC implementation",
+      "admission_status": "pending-rendered-regression-and-independent-audit",
+      "patch": {
+        "path": "compatibility/rc/resource-style-upstream-patches/f2cf22987220ac087c665524708fd95f5da15119.patch",
+        "sha256": "022042c3366f2498081250a9053ee64da1454d7c4c9c32a28e4333d7d47957e5",
+        "bytes": 880
+      },
+      "decision": "The complete upstream patch corrects aria-disabled MDC icon-button selectors, removes their CanvasText fallback and adds GrayText. Owned legacy buttons retain native disabled attributes and legacy style identities. The port had removed the historical CanvasText fallback and copied an extra disabled outline/color block, contradicting the prior note. Restore tagged CanvasText behavior and original stylesheet; public current MDC aria-disabled/GrayText rules remain independent.",
+      "regression": "paginator-currentcolor",
+      "current_source_head": "eaf4cd6e14c7fbc50f3c5b81cf3ec38edccad9c2",
+      "proof": "compatibility/rc/restored-resource-css-source-proof.json",
+      "both_actual_public_peer_contexts": "compatibility/rc/resource-style-peer-source-contexts.json",
+      "source_renderer_scope": "Full authentic historical CSS + independent actual-minimum public native media output; no pixel/layout/interaction or browser claim."
+    },
+    {
+      "sha": "28aa37ae5e1945be87ddde473cbe107f16f63b61",
+      "topic": "Checkbox focus shape",
+      "source_review": "complete hunk and both public-minimum style contexts inspected individually",
+      "reviewer": "Codex primary implementer",
+      "proposed_disposition": "owned-retained with separate current-peer MDC implementation",
+      "admission_status": "pending-rendered-regression-and-independent-audit",
+      "patch": {
+        "path": "compatibility/rc/resource-style-upstream-patches/28aa37ae5e1945be87ddde473cbe107f16f63b61.patch",
+        "sha256": "a1f02769d907f4234eccf90040b2ed5596fb164b95245c380a13851d8efa9a84",
+        "bytes": 706
+      },
+      "decision": "The upstream three-line change raises specificity of an existing circular MDC focus indicator. The legacy port introduced a circular pseudo-element rule absent from16, as well as a redundant absolute-position rule. Complete original/candidate CSS reveals16 already emits mat-checkbox.mat-checkbox-ripple absolute positioning at greater specificity than shared mat-ripple. Restore the original focus geometry and remove both additions. Preserve the separately owned original black-on-white class rule because current CDK maps that target to generic active media.",
+      "regression": "checkbox-focus-shape",
+      "current_source_head": "eaf4cd6e14c7fbc50f3c5b81cf3ec38edccad9c2",
+      "proof": "compatibility/rc/restored-resource-css-source-proof.json",
+      "both_actual_public_peer_contexts": "compatibility/rc/resource-style-peer-source-contexts.json",
+      "source_renderer_scope": "Full authentic historical CSS + independent actual-minimum public native media output; no pixel/layout/interaction or browser claim."
+    }
+  ],
+  "limits": [
+    "No new terminal SHA or authored-use closure. Old read-note statements and final classifications are not silently promoted.",
+    "Full39hunk f4a02adb review, remainder1697SHA/1736uses, actual native both-line/current packed/minimum matrix and complete independent audit remain open."
+  ]
+}
