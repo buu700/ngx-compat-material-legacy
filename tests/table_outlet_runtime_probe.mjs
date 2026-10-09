@@ -26,14 +26,14 @@ const subjects=JSON.parse(readFileSync(resolve(root,'compatibility/rc/table-publ
 const actualSubject=subjects.find(s=>s.members.find(m=>m.path.endsWith('.mjs')).sha256===peerHash);
 assert.ok(actualSubject,'The diagnostic must execute one of the authenticated minimum table implementations.');
 const base='projects/ngx-material-legacy/legacy-table/';
-const tablePath=base+'table.ts',helperPath=base+'internal/table-outlet.ts';
-const tableSource=readFileSync(resolve(root,tablePath),'utf8'),helperSource=readFileSync(resolve(root,helperPath),'utf8');
+const tablePath=base+'table.ts',helperPath=base+'internal/table-outlet.ts',ownerPath=base+'internal/definition-owner.ts';
+const tableSource=readFileSync(resolve(root,tablePath),'utf8'),helperSource=readFileSync(resolve(root,helperPath),'utf8'),ownerSource=readFileSync(resolve(root,ownerPath),'utf8');
 const data=text=>'data:text/javascript;base64,'+Buffer.from(text).toString('base64');
 const emit=text=>ts.transpileModule(text,{compilerOptions:{target:ts.ScriptTarget.ES2022,
   module:ts.ModuleKind.ESNext,experimentalDecorators:true}}).outputText
   .replace(/(['"])(@angular\/[^'"]+)\1/g,(_,q,name)=>JSON.stringify(url(name)));
 const tableUrl=data(emit(tableSource)),{MatLegacyTable}=await import(tableUrl);
-async function load(source=helperSource){return import(data(emit(source).replaceAll("'../table'",JSON.stringify(tableUrl))));}
+async function load(source=helperSource,definition=ownerSource){return {...await import(data(emit(source))),...await import(data(emit(definition).replaceAll("'../table'",JSON.stringify(tableUrl))))};}
 const provenance=JSON.parse(readFileSync(resolve(root,'reference/material-16.2.14/table-outlet-sources/provenance.json'),'utf8'));
 for(const subject of provenance.files){const bytes=readFileSync(resolve(root,subject.path));assert.equal(sha(bytes),subject.sha256);assert.equal(bytes.length,subject.bytes);}
 const originalSource=readFileSync(resolve(root,provenance.files.find(x=>x.tag_source==='src/cdk/table/table.ts').path),'utf8');
@@ -172,8 +172,8 @@ try{
     ['unbound-definitions','definition._table = table','definition._table = null'],
     ['clobber-current-table','table instanceof MatLegacyTable','table instanceof CdkTable'],
     ['missing-row-owner','[column, header, footer, row]','[column, header, footer]']];
-  const mutants=[];for(const [id,from,to]of edits){assert.ok(helperSource.includes(from));
-    const observed=await observations(await load(helperSource.replace(from,to)));
+  const mutants=[];for(const [id,from,to]of edits){assert.ok(helperSource.includes(from)||ownerSource.includes(from));
+    const observed=await observations(await load(helperSource.replace(from,to),ownerSource.replace(from,to)));
     const failures=observed.filter(c=>c.result==='fail');assert.ok(failures.length,id+' escaped');mutants.push({id,failed_cases:failures});
   }
   for(const [id,text,actual,expected]of [
@@ -181,7 +181,7 @@ try{
     ['wrong-flex-no-data-outlet',template.replace(/(} @else {[\s\S]*)legacyTableOutlet="empty"/,'$1legacyTableOutlet="footer"'),flexFrame,expectedFlex],
   ]){assert.notEqual(text,template);assert.notDeepEqual(actual(text),expected);mutants.push({id,rejected_by:'untouched-tagged-structure-comparison'});}
   assert.equal(borrowedDestroyed,0);
-  result={node:process.version,compiler:ts.version,actual_peer:{path:peerPath,sha256:peerHash,version:actualSubject.version},sources:[tablePath,helperPath].map(path=>({path,sha256:sha(readFileSync(resolve(root,path)))})),
+  result={node:process.version,compiler:ts.version,actual_peer:{path:peerPath,sha256:peerHash,version:actualSubject.version},sources:[tablePath,helperPath,ownerPath].map(path=>({path,sha256:sha(readFileSync(resolve(root,path)))})),
     original_provenance:provenance,selected_original_class_source:selectedClasses,selected_original_ownership_source:ownership.getText(originalAst),
     selected_original_sections_source:sections.getText(originalAst),tagged_native_frame:expectedFrame,tagged_flex_outlet_order:expectedFlex,cases,mutants,
     borrowed_destroyed:borrowedDestroyed,limits:['Real current public CdkTable and definition constructors under a synthetic public node/root context.',

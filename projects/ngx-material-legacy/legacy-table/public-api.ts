@@ -8,7 +8,7 @@
  */
 
 export {MatLegacyTableModule} from './table-module';
-export {_LegacyTableDefinitionOwner} from './internal/table-outlet';
+export {_LegacyTableDefinitionOwner} from './internal/definition-owner';
 export {
   MatLegacyCellDef,
   MatLegacyHeaderCellDef,

@@ -16,9 +16,10 @@ import {fileURLToPath} from 'node:url';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const runtime = process.env.CLOSEOUT_DIAGNOSTIC_PEER_ROOT || root;
 const ts = createRequire(import.meta.url)('typescript');
-const path = 'projects/ngx-material-legacy/legacy-table/internal/table-outlet.ts';
+const path = 'projects/ngx-material-legacy/legacy-table/internal/table-outlet.ts',ownerPath='projects/ngx-material-legacy/legacy-table/internal/definition-owner.ts';
 const fixture = resolve(root, '__table_outlet_protocol_diagnostic__.ts');
-let positive = `import {_LegacyTableOutlet, _LegacyTableDefinitionOwner} from '${resolve(root, path)}';
+let positive = `import {_LegacyTableOutlet} from '${resolve(root, path)}';
+import {_LegacyTableDefinitionOwner} from '${resolve(root,ownerPath)}';
 import {CdkTable, CdkColumnDef, CdkHeaderRowDef, CdkFooterRowDef, CdkRowDef} from '@angular/cdk/table';
 import {ElementRef, ViewContainerRef} from '@angular/core';
 declare const table:CdkTable<unknown>, container:ViewContainerRef, element:ElementRef;
@@ -79,7 +80,7 @@ const good=compile(positive),bad=compile(negative);
 assert.deepEqual(good,[]);assert.deepEqual(bad.map(d=>d.code).sort(),[2322,2345,2741]);
 const args=process.argv.slice(2),at=args.indexOf('--report');
 const result={node:process.version,compiler:ts.version,options,
-  source:{path,sha256:sha(readFileSync(resolve(root,path)))},positive_fixture:positive,
+  sources:[path,ownerPath].map(path=>({path,sha256:sha(readFileSync(resolve(root,path)))})),positive_fixture:positive,
   positive_diagnostics:good,negative_fixture:negative,expected_negative_diagnostics:bad,public_protocols:publicProtocols,
   limits:['Actual owned source plus borrowed public peer declarations; not actual21 compiler/runtime or native/AOT/packed qualification.']};
 if(at>=0)writeFileSync(args[at+1],JSON.stringify(result,null,2)+'\n');
