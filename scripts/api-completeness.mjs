@@ -32,6 +32,7 @@ import {originalCompilerFactoryContext} from './api-original-factory-contexts.mj
 import {observeRuntimeDi, expectedFactoryDi} from './api-di-observe.mjs';
 import {attributeConstructorObservationProblems} from './api-attribute-factory.mjs';
 import {publicConstructorPartitionProblems} from './api-public-constructor-internals.mjs';
+import {TAB_PORTAL_SYMBOL,tabPortalObservationProblems} from './api-tab-portal-context.mjs';
 import {tabBodyObservationProblems} from './api-tab-body-context.mjs';
 import {ownedMotionProfile,ownedSelectMotionProblems} from './api-owned-motion-context.mjs';
 import {MENU_ITEM_SYMBOL, approvedMenuItemContract} from './menu-item-construction-contract.mjs';
@@ -512,7 +513,7 @@ if (isMain) {
 }
 
 export function settleDi(row, records) {
-  row={...row,problems:[...row.problems,...publicParentTokenRoleObservationProblems(row),...requiredParentContextObservationProblems(row),...callerConfigObservationProblems(row),...ownedDialogFocusObservationProblems(row),...menuContentObservationProblems(row),...simpleSnackObservationProblems(row),...dialogOpenerObservationProblems(row),...autocompleteObservationProblems(row),...tabBodyObservationProblems(row)]};
+  row={...row,problems:[...row.problems,...publicParentTokenRoleObservationProblems(row),...requiredParentContextObservationProblems(row),...callerConfigObservationProblems(row),...ownedDialogFocusObservationProblems(row),...menuContentObservationProblems(row),...simpleSnackObservationProblems(row),...dialogOpenerObservationProblems(row),...autocompleteObservationProblems(row),...tabBodyObservationProblems(row),...tabPortalObservationProblems(row)]};
   if(row.symbol.symbol_id===RIPPLE_SYMBOL){
     const contract=approvedRippleContract(row.symbol),problems=[...row.problems,...rippleFactoryObservationProblems(row,contract)];
     return {...row,problems,result:problems.length?'fail':'pass',status:problems.length?'mismatch':'intentional-legacy-difference',
@@ -572,6 +573,7 @@ export function settleDi(row, records) {
   }
   if (!row.problems.length) {
     if(row.symbol.symbol_id===MENU_CONTENT_SYMBOL)return {...row,result:'pass',status:'intentional-legacy-difference',historical,owned,rationale:'Maintainer delegated conservative TypeScript changes with unchanged required consumer styles and Cyph sanity. Only the authenticated unused resolver slot is removed; all other token objects/options remain checked. Actual public template/outlet identities, contexts, reattachment, movement, detach, owned teardown and borrowed caller view/lifetime execute. Original seven dependencies remain visible.'};
+    if(row.symbol.symbol_id===TAB_PORTAL_SYMBOL)return {...row,result:'pass',status:'intentional-legacy-difference',historical,owned,rationale:'Only the authenticated removed resolver slot is retired. Genuine original parent/input scope and public CdkPortalOutlet identity/source/request controls execute with actual Angular template views, attach/detach/preserve/teardown. Original four dependencies remain authenticated; native/packed/minimum qualification is separate.'};
     return {...row, result: 'pass', status: 'match', historical, owned};
   }
   const record = records.find(item => item.symbol_id === row.symbol.symbol_id
@@ -677,6 +679,7 @@ function writeAcceptance(request, surface, groups, declared, diSettled, summary,
           autocomplete_context:di.factory_autocomplete_context||null,
           owned_motion_context:di.factory_owned_motion_context||null,
           tab_body_context:di.factory_tab_body_context||null,
+          tab_portal_context:di.factory_tab_portal_context||null,
           historical:di.historical,owned:di.owned,constructor_attributes:di.constructor_attributes||[],
           ...(di.approved_construction?{approved_construction:di.approved_construction}:{})}:null});
     }
