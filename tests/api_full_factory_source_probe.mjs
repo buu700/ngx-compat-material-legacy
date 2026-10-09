@@ -21,7 +21,7 @@ import {createPublicFactoryContext} from '../scripts/api-public-node-context.mjs
 import {captureFactoryConstructorInputs} from '../scripts/api-factory-constructor-inputs.mjs';
 import {requiredParentFactoryProfile} from '../scripts/api-required-parent-context.mjs';
 import {callerConfigProfile,callerConfigObservationProblems} from '../scripts/api-caller-config-context.mjs';
-import {SNACK_MOTION_SYMBOL,ownedSelectMotionProblems} from '../scripts/api-owned-motion-context.mjs';
+import {SNACK_MOTION_SYMBOL,FORM_FIELD_MOTION_SYMBOL,MENU_MOTION_SYMBOL,TOOLTIP_MOTION_SYMBOL,ownedMotionProfile,ownedSelectMotionProblems} from '../scripts/api-owned-motion-context.mjs';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),require=createRequire(import.meta.url);
 const arg=name=>process.argv.includes(name)?process.argv[process.argv.indexOf(name)+1]:null;
@@ -179,6 +179,10 @@ try{
  assert.equal(callerConfigControls.length,26);
  const snackSymbol=selected.find(s=>s.symbol_id===SNACK_MOTION_SYMBOL),snack=await loadRuntimeModule(runtime,'legacy-snack-bar','primary');
  const ownedCore=await loadRuntimeModule(runtime,'legacy-core','primary'),material=await load('@angular/material/core'),snackMotionControls=[];
+ assert.equal(ownedCore.legacyAnimationsDisabled(),false);
+ assert.throws(()=>ownedCore.getLegacyAnimationsState(),/injection context/);
+ const invalidPolicy=core.Injector.create({providers:[{provide:ownedCore.LEGACY_ANIMATIONS_TEST_OVERRIDE,useFactory(){throw Error('controlled policy provider failure');}}]});
+ try{assert.throws(()=>core.runInInjectionContext(invalidPolicy,ownedCore.legacyAnimationsDisabled),/controlled policy provider failure/);}finally{invalidPolicy.destroy();}
  for(const cell of [
   {id:'default-server-enabled',providers:[],enabled:true},
   {id:'override-enabled',providers:[{provide:ownedCore.LEGACY_ANIMATIONS_TEST_OVERRIDE,useValue:'enabled'}],enabled:true},
@@ -193,6 +197,67 @@ try{
   assert.equal(execution.value._animationsEnabled,cell.enabled);
   snackMotionControls.push({id:cell.id,result:'pass',enabled:cell.enabled,evidence:execution.ownedMotionContext});
  }
+ const constructorMotionControls=[];
+ const manualMotionObservations=[];
+ const manualMotionLifecycle=[];
+ for(const symbolId of [FORM_FIELD_MOTION_SYMBOL,MENU_MOTION_SYMBOL,TOOLTIP_MOTION_SYMBOL]){
+  const symbol=selected.find(s=>s.symbol_id===symbolId),profile=ownedMotionProfile(symbolId),family=await loadRuntimeModule(runtime,symbol.family,'primary'),Type=family[symbol.name];
+  const row=rows.find(r=>r.symbol.symbol_id===symbolId);assert.equal(row.result,'pass',row.problems.join('\n'));
+  const module=family[symbol.family==='legacy-form-field'?'MatLegacyFormFieldModule':symbol.family==='legacy-menu'?'MatLegacyMenuModule':'MatLegacyTooltipModule'];
+  for(const mode of [null,'NoopAnimations']){
+   const f=await createPublicFactoryContext(core,load,{providers:[core.importProvidersFrom(module),{provide:core.ANIMATION_MODULE_TYPE,useValue:mode}]});
+   let manual;
+   try{
+    const capture=runFactory(()=>captureFactoryConstructorInputs(Type),core.Injector,core.runInInjectionContext,{injector:f.element.injector});
+    assert.equal(capture.outcome,'returned',capture.error);
+    manual=new Type(...capture.value.inputs);
+    const enabled=profile.enabled?manual[profile.property]:!manual[profile.property];
+    assert.equal(enabled,profile.constructorAnimationIndex===undefined||mode!=='NoopAnimations');
+    manualMotionObservations.push({symbol_id:symbolId,mode,outcome:'returned',enabled});
+    if(symbolId===TOOLTIP_MOTION_SYMBOL){
+     manual._tooltip=f.element.element;
+     const hidden=[];let completed=false;const subscription=manual.afterHidden().subscribe({next:()=>hidden.push('hidden'),complete:()=>{completed=true;}});
+     manual.show(0);await new Promise(resolve=>setTimeout(resolve,2));
+     assert.equal(manual.isVisible(),true);assert.ok(f.element.element.nativeElement.classList.contains('mat-tooltip-show'));
+     assert.equal(f.element.element.nativeElement.classList.contains('_mat-animation-noopable'),mode==='NoopAnimations');
+     manual.hide(0);await new Promise(resolve=>setTimeout(resolve,2));assert.equal(manual.isVisible(),false);
+     assert.equal(hidden.length,mode==='NoopAnimations'?1:0);
+     manual.show(20);manual.ngOnDestroy();await new Promise(resolve=>setTimeout(resolve,25));
+     assert.equal(manual.isVisible(),false);assert.equal(completed,true);subscription.unsubscribe();
+     manualMotionLifecycle.push({symbol_id:symbolId,mode,show_hide_state:true,noop_class:mode==='NoopAnimations',pending_show_cancelled_on_destroy:true,completion:true});
+     manual=null;
+    }else if(symbolId===MENU_MOTION_SYMBOL){
+     const states=[],subscription=manual._animationDone.subscribe(event=>states.push(event.toState));
+     manual._startAnimation();assert.equal(manual._panelAnimationState,'enter');
+     manual._onCssAnimationDone('mat-legacy-menu-enter');manual._onCssAnimationDone('mat-legacy-menu-enter');
+     manual._resetAnimation();assert.equal(manual._panelAnimationState,'void');
+     manual._onCssAnimationDone('mat-legacy-menu-exit');manual._onCssAnimationDone('mat-legacy-menu-exit');
+     assert.deepEqual(states,['enter','void']);subscription.unsubscribe();
+     manualMotionLifecycle.push({symbol_id:symbolId,mode,enter_exit_states:true,duplicate_completions_rejected:true});
+    }
+    capture.value.value.ngOnDestroy?.();manual?.ngOnDestroy?.();
+    assert.equal(f.component.hostView.destroyed,false);assert.equal(f.environment.destroyed,false);
+   }finally{f.close();}
+  }
+  for(const cell of [
+   {id:'default-server-enabled',providers:[],enabled:true},
+   {id:'override-enabled',providers:[{provide:ownedCore.LEGACY_ANIMATIONS_TEST_OVERRIDE,useValue:'enabled'}],enabled:true},
+   {id:'override-disabled',providers:[{provide:ownedCore.LEGACY_ANIMATIONS_TEST_OVERRIDE,useValue:'di-disabled'}],enabled:false},
+   {id:'override-reduced',providers:[{provide:ownedCore.LEGACY_ANIMATIONS_TEST_OVERRIDE,useValue:'reduced-motion'}],enabled:false},
+   {id:'material-disabled',providers:[{provide:material.MATERIAL_ANIMATIONS,useValue:{animationsDisabled:true}}],enabled:false},
+   {id:'noop-module',providers:[{provide:core.ANIMATION_MODULE_TYPE,useValue:'NoopAnimations'}],enabled:false},
+   {id:'enabled-override-with-original-noop',providers:[{provide:ownedCore.LEGACY_ANIMATIONS_TEST_OVERRIDE,useValue:'enabled'},{provide:core.ANIMATION_MODULE_TYPE,useValue:'NoopAnimations'}],enabled:profile.constructorAnimationIndex===undefined},
+  ]){
+   const execution=await observePublicNodeFactory(Type,core,runtime,symbol,symbols,load,{providers:cell.providers});
+   assert.equal(execution.outcome,'returned',execution.error);assert.deepEqual(execution.behaviorProblems,[]);
+   assert.deepEqual(ownedSelectMotionProblems(execution.ownedMotionContext,symbolId),[]);
+   assert.equal(profile.enabled?execution.value[profile.property]:!execution.value[profile.property],cell.enabled);
+   constructorMotionControls.push({symbol_id:symbolId,id:cell.id,result:'pass',enabled:cell.enabled,evidence:execution.ownedMotionContext});
+  }
+ }
+ assert.equal(constructorMotionControls.length,21);
+ assert.equal(manualMotionObservations.length,6);
+ assert.equal(manualMotionLifecycle.length,4);
  const ownedMenu=await loadRuntimeModule(runtime,'legacy-menu','primary'),peerMenu=await load('@angular/material/menu');
  const menuContext=await createPublicFactoryContext(core,load,{providers:[core.importProvidersFrom(ownedMenu.MatLegacyMenuModule)]});
  let menuItem;const publicParentControls=[];
@@ -212,7 +277,7 @@ try{
  const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
  const caps=[...new Set([...files.map(file=>file.fileName),...resources])].sort().map(file=>({path:file.slice(root.length+1),sha256:sha(readFileSync(file))}));
  const result={schema_version:1,role:'All original154 factory class source observations;not canonical packed/native/browser/floor qualification',
-  node:process.version,typescript:ts.version,runtime_peer:core.VERSION.full,entries,rows,selected_symbol_ids:[...selectedIds].sort(),emitted_public_import_routes:routes,public_parent_controls:publicParentControls,required_parent_controls:requiredParentControls,caller_config_controls:callerConfigControls,snack_motion_controls:snackMotionControls,
+  node:process.version,typescript:ts.version,runtime_peer:core.VERSION.full,entries,rows,selected_symbol_ids:[...selectedIds].sort(),emitted_public_import_routes:routes,public_parent_controls:publicParentControls,required_parent_controls:requiredParentControls,caller_config_controls:callerConfigControls,snack_motion_controls:snackMotionControls,constructor_motion_controls:constructorMotionControls,manual_motion_observations:manualMotionObservations,manual_motion_lifecycle:manualMotionLifecycle,
   passed:rows.filter(row=>row.result==='pass').length,failed:rows.filter(row=>row.result!=='pass').length,
   source_files:files.length,resource_files:resources.size,source_caps:caps,virtual_typecheck_files:virtualFiles.length,
   styles:'SCSS/HTML resources read unchanged by Angular compiler;no Sass/rendered style qualification',

@@ -154,9 +154,10 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
       parentLifetimeSubscription=fixture.parentNode.owner.destroyed.subscribe(()=>{requiredParentDestroyed=true;});
     if(!attributeContract){
       const injector=(usesTemplate?fixture.template:fixture.element).injector;
-      factory=runFactory(requiredParent||callerConfig?()=>captureFactoryConstructorInputs(value):value.ɵfac,
+      const captureMotionMode=ownedMotionProfile(symbol.symbol_id)?.constructorAnimationIndex!==undefined;
+      factory=runFactory(requiredParent||callerConfig||captureMotionMode?()=>captureFactoryConstructorInputs(value):value.ɵfac,
         core.Injector,core.runInInjectionContext,{injector,captureStack:true});
-      if((requiredParent||callerConfig)&&factory.outcome==='returned'){
+      if((requiredParent||callerConfig||captureMotionMode)&&factory.outcome==='returned'){
         requiredParentCapture=factory.value;factory.value=requiredParentCapture.value;
         if(requiredParent)factory.requiredParentContext=observeRequiredParentInputs(requiredParent,requiredParentCapture,
           fixture,requiredParentType,requiredParentToken,core);
@@ -173,7 +174,8 @@ export async function observePublicNodeFactory(value,core,packageRoot,symbol,sym
         await importModule('@angular/cdk/layout'),await importModule('@angular/material/core'),value,
         {core:resolve(packageRoot,'fesm2022/ngx-compat-material-legacy-legacy-core.mjs'),
          caller:resolve(packageRoot,'fesm2022',`ngx-compat-material-legacy-${ownedMotionProfile(symbol.symbol_id).family}.mjs`)},
-        runFactory,fixture.element.injector,factory.value,symbol.symbol_id);
+        runFactory,fixture.element.injector,factory.value,symbol.symbol_id,
+        {familyExports:await loadRuntimeModule(packageRoot,symbol.family,'primary'),originalSymbol:symbol,constructorCapture:requiredParentCapture});
       factory.requests=partition.requests;factory.ownedMotionContext=partition.observation;
     }
     factory.context=fixture.context;
