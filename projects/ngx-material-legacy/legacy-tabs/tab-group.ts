@@ -41,7 +41,7 @@ import {MAT_TAB_GROUP} from './internal/tab-base';
   styleUrls: ['tab-group.scss'],
   encapsulation: ViewEncapsulation.None,
   // tslint:disable-next-line:validate-decorators
-  changeDetection: ChangeDetectionStrategy.Default,
+  changeDetection: ChangeDetectionStrategy.Eager,
   inputs: ['color', 'disableRipple'],
   providers: [
     {

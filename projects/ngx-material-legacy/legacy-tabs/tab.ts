@@ -25,7 +25,7 @@ import {MAT_TAB} from './internal/tab-token';
   templateUrl: 'tab.html',
   inputs: ['disabled'],
   // tslint:disable-next-line:validate-decorators
-  changeDetection: ChangeDetectionStrategy.Default,
+  changeDetection: ChangeDetectionStrategy.Eager,
   encapsulation: ViewEncapsulation.None,
   exportAs: 'matTab',
   providers: [{provide: MAT_TAB, useExisting: MatLegacyTab}],

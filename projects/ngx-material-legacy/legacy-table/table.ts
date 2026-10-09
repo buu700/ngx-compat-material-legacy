@@ -79,7 +79,7 @@ export class MatLegacyRecycleRows {
   encapsulation: ViewEncapsulation.None,
   // See note on CdkTable for explanation on why this uses the default change detection strategy.
   // tslint:disable-next-line:validate-decorators
-  changeDetection: ChangeDetectionStrategy.Default,
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class MatLegacyTable<T> extends CdkTable<T> {
   /** Construct through Angular node DI; manual dependency arguments are unsupported. */

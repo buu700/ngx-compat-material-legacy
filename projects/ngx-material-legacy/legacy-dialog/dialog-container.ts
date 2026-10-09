@@ -87,7 +87,7 @@ function parseCssTime(value: string | number | undefined | null): number | null 
   encapsulation: ViewEncapsulation.None,
   // Using OnPush for dialogs caused some G3 sync issues. Disabled until we can track them down.
   // tslint:disable-next-line:validate-decorators
-  changeDetection: ChangeDetectionStrategy.Default,
+  changeDetection: ChangeDetectionStrategy.Eager,
   host: {
     'class': 'mat-dialog-container',
     'tabindex': '-1',

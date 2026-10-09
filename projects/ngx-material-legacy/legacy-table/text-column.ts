@@ -45,7 +45,7 @@ import {ChangeDetectionStrategy, Component, Inject, Optional, ViewEncapsulation}
   // mean's the template in the table's view will not have the updated value (and in fact will cause
   // an ExpressionChangedAfterItHasBeenCheckedError).
   // tslint:disable-next-line:validate-decorators
-  changeDetection: ChangeDetectionStrategy.Default,
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class MatLegacyTextColumn<T> extends CdkTextColumn<T> {
   // @ts-expect-error TS2377: valid derived object return preserves manual arguments.

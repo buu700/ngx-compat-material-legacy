@@ -118,7 +118,7 @@ export class MatLegacyRowDef<T> extends CdkRowDef<T> {
   },
   // See note on CdkTable for explanation on why this uses the default change detection strategy.
   // tslint:disable-next-line:validate-decorators
-  changeDetection: ChangeDetectionStrategy.Default,
+  changeDetection: ChangeDetectionStrategy.Eager,
   encapsulation: ViewEncapsulation.None,
   exportAs: 'matHeaderRow',
   providers: [{provide: CdkHeaderRow, useExisting: MatLegacyHeaderRow}],
@@ -138,7 +138,7 @@ export class MatLegacyHeaderRow extends CdkHeaderRow {}
   },
   // See note on CdkTable for explanation on why this uses the default change detection strategy.
   // tslint:disable-next-line:validate-decorators
-  changeDetection: ChangeDetectionStrategy.Default,
+  changeDetection: ChangeDetectionStrategy.Eager,
   encapsulation: ViewEncapsulation.None,
   exportAs: 'matFooterRow',
   providers: [{provide: CdkFooterRow, useExisting: MatLegacyFooterRow}],
@@ -158,7 +158,7 @@ export class MatLegacyFooterRow extends CdkFooterRow {}
   },
   // See note on CdkTable for explanation on why this uses the default change detection strategy.
   // tslint:disable-next-line:validate-decorators
-  changeDetection: ChangeDetectionStrategy.Default,
+  changeDetection: ChangeDetectionStrategy.Eager,
   encapsulation: ViewEncapsulation.None,
   exportAs: 'matRow',
   providers: [{provide: CdkRow, useExisting: MatLegacyRow}],
