@@ -77,8 +77,8 @@ function renderer(core,document){
  };
 }
 
-function fixtureDefinitions(core,{nodeFactory,attributes={},parentProviders=[],parentHost}={}){
- const cacheable=!nodeFactory&&Object.keys(attributes).length===0&&parentProviders.length===0&&!parentHost;
+function fixtureDefinitions(core,{nodeFactory,attributes={},parentProviders=[],parentHost,additionalTemplate=''}={}){
+ const cacheable=!nodeFactory&&Object.keys(attributes).length===0&&parentProviders.length===0&&!parentHost&&!additionalTemplate;
  if(cacheable&&definitions.has(core))return definitions.get(core);
  const scopeToken=new core.InjectionToken('API fixture node scope');
  const parentValue={scope:'parent'},childValue={scope:'child'};
@@ -92,6 +92,13 @@ function fixtureDefinitions(core,{nodeFactory,attributes={},parentProviders=[],p
  }
  core.Directive({selector:'[apiFactoryParent]',standalone:true,
   providers:[{provide:scopeToken,useValue:parentValue},...parentProviders]})(Parent);
+ class OuterParent {
+  destroyed=false;
+  injector=core.inject(core.Injector);
+  owner=core.inject(parentHost?.outerToken,{self:true});
+  ngOnDestroy(){this.destroyed=true;}
+ }
+ if(parentHost?.outerTag)core.Directive({selector:'[apiFactoryOuterParent]',standalone:true})(OuterParent);
  class ElementProbe {
   destroyed=false;
   injector=core.inject(core.Injector);
@@ -116,8 +123,10 @@ function fixtureDefinitions(core,{nodeFactory,attributes={},parentProviders=[],p
  core.Directive({selector:'ng-template[apiFactoryTemplate]',standalone:true})(TemplateProbe);
  class Host{}
  core.ViewChild(Parent)(Host.prototype,'parent');
+ if(parentHost?.outerTag)core.ViewChild(OuterParent)(Host.prototype,'outerParent');
  core.ViewChild(ElementProbe)(Host.prototype,'element');
  core.ViewChild(TemplateProbe)(Host.prototype,'template');
+ core.ViewChildren(core.TemplateRef)(Host.prototype,'templates');
  const serializeAttributes=(values,pattern)=>Object.entries(values).map(([name,value])=>{
   if(!pattern.test(name)||typeof value!=='string')throw Error('invalid fixture literal attribute');
   return ' '+name+'="'+value.replaceAll('&','&amp;').replaceAll('"','&quot;').replaceAll('<','&lt;').replaceAll('>','&gt;')+'"';
@@ -128,10 +137,14 @@ function fixtureDefinitions(core,{nodeFactory,attributes={},parentProviders=[],p
  const parentAttributes=serializeAttributes(parentHost?.attributes||{},/^[a-zA-Z][a-zA-Z0-9-]*$/);
  const elementTag=parentHost?.elementTag||'div';if(!/^[a-z][a-z0-9-]*$/.test(elementTag))throw Error('invalid fixture element tag');
  const elementAttributes=serializeAttributes(parentHost?.elementAttributes||{},/^[a-zA-Z][a-zA-Z0-9-]*$/);
+ const extraTemplate=(parentHost?.additionalTemplate||'')+additionalTemplate;if(typeof additionalTemplate!=='string'||parentHost?.additionalTemplate!==undefined&&typeof parentHost.additionalTemplate!=='string')throw Error('fixture additional template must be a string');
  const elementMarkup='<'+elementTag+' apiFactoryElement'+literalAttributes+elementAttributes+'>'+(['area','base','br','col','embed','hr','img','input','link','meta','param','source','track','wbr'].includes(elementTag)?'':'</'+elementTag+'>');
+ const markup='<'+parentTag+' apiFactoryParent'+parentAttributes+'>'+elementMarkup+'<ng-template apiFactoryTemplate></ng-template>'+extraTemplate+'</'+parentTag+'>';
+ const outerTag=parentHost?.outerTag;if(outerTag&&!/^[a-z][a-z0-9-]*$/.test(outerTag))throw Error('invalid fixture outer parent tag');
+ const outerTemplate=parentHost?.outerTemplate||'';if(typeof outerTemplate!=='string')throw Error('fixture outer template must be a string');
  core.Component({selector:'api-factory-host-'+fixtureId++,standalone:true,
-  imports:[Parent,ElementProbe,TemplateProbe,...(parentHost?.imports||[])],
-  template:'<'+parentTag+' apiFactoryParent'+parentAttributes+'>'+elementMarkup+'<ng-template apiFactoryTemplate></ng-template></'+parentTag+'>'})(Host);
+  imports:[Parent,ElementProbe,TemplateProbe,...(outerTag?[OuterParent]:[]),...(parentHost?.imports||[])],
+  template:outerTag?'<'+outerTag+' apiFactoryOuterParent>'+markup+outerTemplate+'</'+outerTag+'>':markup})(Host);
  const result={Host,scopeToken,parentValue,childValue};if(cacheable)definitions.set(core,result);return result;
 }
 
@@ -140,7 +153,7 @@ function fixtureDefinitions(core,{nodeFactory,attributes={},parentProviders=[],p
  * TemplateRef. Providers are caller-supplied public module/configuration values;
  * missing services propagate. There is no private token discovery or fallback.
  */
-export async function createPublicFactoryContext(core,importModule,{providers=[],nodeFactory,attributes={},parentProviders=[],parentHost,defaultViewTarget=false}={}){
+export async function createPublicFactoryContext(core,importModule,{providers=[],nodeFactory,attributes={},parentProviders=[],parentHost,additionalTemplate='',defaultViewTarget=false}={}){
  if(typeof defaultViewTarget!=='boolean')throw Error('synthetic defaultView target option must be boolean');
  const defaultView=defaultViewTarget?new EventTarget():null;
  const {BrowserModule}=await importModule('@angular/platform-browser');
@@ -159,7 +172,7 @@ export async function createPublicFactoryContext(core,importModule,{providers=[]
   const found=[];const visit=element=>{if(element.classList?.contains(name))found.push(element);for(const child of element.children||[])visit(child);};
   visit(document.documentElement);return found;
  };
- const fixtureRenderer=renderer(core,document),defs=fixtureDefinitions(core,{nodeFactory,attributes,parentProviders,parentHost});
+ const fixtureRenderer=renderer(core,document),defs=fixtureDefinitions(core,{nodeFactory,attributes,parentProviders,parentHost,additionalTemplate});
  let parent,environment,component,closed=false;
  const close=()=>{
   if(closed)return;closed=true;
@@ -176,7 +189,7 @@ export async function createPublicFactoryContext(core,importModule,{providers=[]
   component=core.createComponent(defs.Host,{hostElement:host,environmentInjector:environment});
   component.changeDetectorRef.detectChanges();
   if(!component.instance.element||!component.instance.template||!component.instance.parent)throw Error('public Angular node probes were not created');
-  return {environment,component,document,host,platformLocation,parentNode:component.instance.parent,element:component.instance.element,template:component.instance.template,
+  return {environment,component,document,host,platformLocation,parentNode:component.instance.parent,outerParentNode:component.instance.outerParent||null,element:component.instance.element,template:component.instance.template,templates:component.instance.templates,
    scopeToken:defs.scopeToken,parentValue:defs.parentValue,childValue:defs.childValue,close,
    context:'actual Angular element/template nodes and public application providers with synthetic Renderer2/server DOM and public MockPlatformLocation URL backend; native/browser/AOT/packed/floors separate'+(defaultViewTarget?'; explicit synthetic defaultView EventTarget, no browser geometry':'')};
  }catch(error){close();throw error;}
