@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Coordinator path for native-motion. Derives the main roster before launching
+ * Coordinator path for native-motion. Derives the 21.x roster before launching
  * browsers, then binds observations to the packed artifact. WebKitGTK is the
  * webkit engine, not Safari. Does not claim G04 or G10.
  */
@@ -10,7 +10,7 @@ import {createHash} from 'node:crypto';
 import {dirname, join, relative, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {resolveLibraryFromRun} from './resolve-run-library.mjs';
-import {deriveMainRoster, observationProblems} from './native-motion-roster.mjs';
+import {deriveMainRoster, observationProblems, SOURCE_LINE} from './native-motion-roster.mjs';
 import {executeNativeMotion} from './native-motion-run.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -67,7 +67,7 @@ export async function runAcceptance({runPath}) {
   const roster = deriveMainRoster();
   const matrix = JSON.parse(readFileSync(join(root, 'compatibility/rc/matrices/full-verify.json'), 'utf8'));
   const row = matrix.checks.find(item => item.check_id === 'native-motion');
-  const matrixMismatch = JSON.stringify(row.acceptance.cases_by_line['21.x']) !== JSON.stringify(roster.groups)
+  const matrixMismatch = JSON.stringify(row.acceptance.cases_by_line[SOURCE_LINE]) !== JSON.stringify(roster.groups)
     || Object.values(row.acceptance.cases_by_line.main).some(value => value !== null);
   const library = runPath ? resolveLibraryFromRun(runPath) : null;
   const artifactSha = library ? library.digest : '';
@@ -103,7 +103,7 @@ export async function runAcceptance({runPath}) {
     if (request.binding.source_tree !== tree) identity.push('source tree mismatch');
     if (request.line !== '21.x') identity.push('line is not 21.x');
   }
-  if (matrixMismatch) identity.push('matrix roster is not the derived main native-motion roster');
+  if (matrixMismatch) identity.push('matrix roster is not the derived 21.x native-motion roster');
   if (launch.missing.length) identity.push(`missing browser ${launch.missing.join(', ')}`);
   if (launchError) identity.push(launchError);
   for (const [name, info] of Object.entries(engines)) {
@@ -181,7 +181,6 @@ export async function runAcceptance({runPath}) {
       'WebKit evidence is WebKitGTK WebKit2 4.1 with the process sandbox enabled, not Safari certification.',
       'Does not claim G04 or G10.',
       'Source motion-smoke is a separate check.',
-      '21.x was not executed.',
     ] : problems.slice(0, 30),
     preflight: launch.notes,
   };
