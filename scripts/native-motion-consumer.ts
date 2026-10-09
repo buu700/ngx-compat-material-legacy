@@ -492,6 +492,21 @@ export class MotionRoot {
 
   private async selectFallback(): Promise<unknown> {
     await this.ensureSurfaces();
+    let touchedReopens = 0;
+    this.select.registerOnTouched(() => {
+      touchedReopens++;
+      this.select.open();
+      return {};
+    });
+    this.select.open();
+    await this.waitFor(() => !!document.querySelector('.mat-select-panel'));
+    this.select.close();
+    await this.wait(300);
+    const reopenedPanelVisible = this.select.panelOpen &&
+      this.visible(document.querySelector('.mat-select-panel') as HTMLElement | null);
+    this.select.registerOnTouched(() => ({}));
+    this.select.close();
+    await this.wait(300);
     this.select.open();
     await this.waitFor(() => !!document.querySelector('.mat-select-panel'));
     this.select.close();
@@ -499,7 +514,10 @@ export class MotionRoot {
     if (panel) panel.style.setProperty('animation', 'none');
     await this.wait(450);
     const gone = !document.querySelector('.mat-select-panel');
-    return {key: 'select/missing-end-fallback', observation: {endEventDispatched: false, fallbackCompleted: gone, detectChangesCalls: 0}};
+    return {key: 'select/missing-end-fallback', observation: {
+      endEventDispatched: false, fallbackCompleted: gone,
+      touchedReopens, reopenedPanelVisible, detectChangesCalls: 0,
+    }};
   }
 
   private async tooltipDestroy(): Promise<unknown> {

@@ -108,15 +108,17 @@ $placeholder-arrow-space: 2 * ($arrow-size + $arrow-margin);
   max-height: $panel-max-height;
   // Engine-free resting width for the open panel. Historical Angular
   // `transformPanel` states set minWidth to calc(100% + 32px) when showing and
-  // calc(100% + 64px) when showing-multiple; CSS keyframes only animate
-  // opacity/transform, so restore those widths here. Void still used 100%.
+  // calc(100% + 64px) when showing-multiple. Keep the final width at rest;
+  // the enter keyframes interpolate from the historical void width of 100%.
   // min-width wins over menu-common max-width: 280px when the trigger is wider.
   min-width: calc(100% + 32px);
+  --mat-legacy-select-open-min-width: calc(100% + 32px);
   border-radius: 4px;
   outline: 0;
 
   &.mat-select-panel-multiple {
     min-width: calc(100% + 64px);
+    --mat-legacy-select-open-min-width: calc(100% + 64px);
   }
 
   @include cdk.high-contrast(active) {
@@ -188,10 +190,12 @@ $placeholder-arrow-space: 2 * ($arrow-size + $arrow-margin);
 @keyframes mat-legacy-select-enter {
   from {
     opacity: 0;
+    min-width: 100%;
     transform: scaleY(0.8);
   }
   to {
     opacity: 1;
+    min-width: var(--mat-legacy-select-open-min-width);
     transform: none;
   }
 }
@@ -209,6 +213,6 @@ $placeholder-arrow-space: 2 * ($arrow-size + $arrow-margin);
   animation: mat-legacy-select-enter 120ms cubic-bezier(0, 0, 0.2, 1);
 
   &.mat-select-panel-exit {
-    animation: mat-legacy-select-exit 100ms linear forwards;
+    animation: mat-legacy-select-exit 100ms 25ms linear forwards;
   }
 }

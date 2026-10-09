@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /**
- * 21.x-line native-motion roster.
+ * Main-line native-motion roster.
  *
  * Ids are derived from the components that own native CSS/timer motion
  * before any browser launches. WebKitGTK is the webkit engine. It is not
- * Safari. Main is not part of this roster. motion-smoke stays a separate
+ * Safari. 21.x is not part of this roster. motion-smoke stays a separate
  * source check.
  */
 import {readFileSync, writeFileSync} from 'node:fs';
@@ -95,7 +95,7 @@ export const NOT_APPLICABLE = [
 ];
 
 function id(engine, runtime, group, suffix) {
-  return `native-motion/21.x/${engine}/${runtime}/${group}/${suffix}`;
+  return `native-motion/main/${engine}/${runtime}/${group}/${suffix}`;
 }
 
 export function buttonsFor(scene, mode) {
@@ -201,6 +201,7 @@ function interruptProblem(suffix, obs) {
   if (suffix === 'select/missing-end-fallback') {
     if (obs.endEventDispatched !== false) return 'fallback was not isolated from an end event';
     if (obs.fallbackCompleted !== true) return 'missing fallback completion';
+    if (obs.touchedReopens !== 1 || obs.reopenedPanelVisible !== true) return 'touched callback closed the reopened panel';
     return null;
   }
   if (suffix === 'tooltip/destroy-while-shown') {
@@ -217,7 +218,7 @@ function interruptProblem(suffix, obs) {
 
 export function assertCase(caseId, obs) {
   const parts = String(caseId || '').split('/');
-  if (parts.length < 6 || parts[0] !== 'native-motion' || parts[1] !== '21.x') return ['unknown case'];
+  if (parts.length < 6 || parts[0] !== 'native-motion' || parts[1] !== 'main') return ['unknown case'];
   const group = parts[4];
   const suffix = parts.slice(5).join('/');
   if (group === 'enabled-disabled-reduced') {
@@ -262,7 +263,7 @@ export function samplePass(caseId) {
   if (suffix === 'snack-bar/fallback-without-end-event') return {...base, endEventDispatched: false, fallbackCompleted: true, completions: 1};
   if (suffix === 'menu/duplicate-end') return {...base, duplicateDispatched: true, completions: 1};
   if (suffix === 'select/descendant-end') return {...base, descendantIgnored: true, panelRemained: true};
-  if (suffix === 'select/missing-end-fallback') return {...base, endEventDispatched: false, fallbackCompleted: true};
+  if (suffix === 'select/missing-end-fallback') return {...base, endEventDispatched: false, fallbackCompleted: true, touchedReopens: 1, reopenedPanelVisible: true};
   if (suffix === 'tooltip/destroy-while-shown') return {...base, destroyed: true, leaks: 0};
   if (suffix === 'tabs/rapid-reversal') return {...base, durationMs: MIN_ENABLED_MS.tabs, finalState: 'visible', animating: false};
   return base;
@@ -294,10 +295,10 @@ function writeMatrix() {
   const matrix = JSON.parse(readFileSync(matrixPath, 'utf8'));
   const row = matrix.checks.find(item => item.check_id === 'native-motion');
   row.implemented = true;
-  row.acceptance.cases_by_line['21.x'] = roster.groups;
-  for (const group of Object.keys(roster.groups)) row.acceptance.cases_by_line.main[group] = null;
+  row.acceptance.cases_by_line.main = roster.groups;
+  for (const group of Object.keys(roster.groups)) row.acceptance.cases_by_line['21.x'][group] = null;
   writeFileSync(matrixPath, `${JSON.stringify(matrix, null, 2)}\n`);
-  console.log(`wrote native-motion 21.x roster ${roster.ids.length}`);
+  console.log(`wrote native-motion main roster ${roster.ids.length}`);
 }
 
 const entry = process.argv[1] ? resolve(process.argv[1]) : '';
