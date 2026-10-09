@@ -20,6 +20,8 @@ import {settleDi} from '../scripts/api-completeness.mjs';
 import {createPublicFactoryContext} from '../scripts/api-public-node-context.mjs';
 import {captureFactoryConstructorInputs} from '../scripts/api-factory-constructor-inputs.mjs';
 import {requiredParentFactoryProfile} from '../scripts/api-required-parent-context.mjs';
+import {callerConfigProfile,callerConfigObservationProblems} from '../scripts/api-caller-config-context.mjs';
+import {SNACK_MOTION_SYMBOL,ownedSelectMotionProblems} from '../scripts/api-owned-motion-context.mjs';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),require=createRequire(import.meta.url);
 const arg=name=>process.argv.includes(name)?process.argv[process.argv.indexOf(name)+1]:null;
@@ -135,6 +137,62 @@ try{
   }
  }
  assert.equal(requiredParentControls.length,27);
+ const callerConfigControls=[];
+ for(const symbol of selected.filter(s=>callerConfigProfile(s))){
+  console.error('Caller-config controls: '+symbol.symbol_id);
+  const profile=callerConfigProfile(symbol),row=rows.find(r=>r.symbol.symbol_id===symbol.symbol_id);
+  assert.equal(row.factory_outcome,'returned',row.factory_error);assert.deepEqual(callerConfigObservationProblems(row),[]);
+  callerConfigControls.push({symbol_id:symbol.symbol_id,id:'actual-caller-config-construction-and-teardown',result:'pass',evidence:row.factory_caller_config_context,DI_settlement:row.result});
+  const owned=await loadRuntimeModule(runtime,symbol.family,'primary'),Type=owned[symbol.name],peer=await load(profile.public_spec);
+  const module=owned[symbol.family==='legacy-dialog'?'MatLegacyDialogModule':'MatLegacySnackBarModule'];
+  const empty=await createPublicFactoryContext(core,load,{providers:[core.importProvidersFrom(module)]});
+  try{
+   const execution=runFactory(()=>captureFactoryConstructorInputs(Type),core.Injector,core.runInInjectionContext,{injector:empty.element.injector});
+   const token=profile.token_export===profile.owner_export?owned[profile.owner_export]:peer[profile.public_export];
+   assert.equal(execution.outcome,'threw');assert.ok(execution.requests.some(r=>r.token===token&&r.unresolved));
+   callerConfigControls.push({symbol_id:symbol.symbol_id,id:'missing-required-caller-config-rejected',result:'rejected',error:execution.error});
+  }finally{empty.close();}
+  for(const mutation of ['discard-constructor-type-override','replace-caller-config-input','mutate-caller-config','cycle-caller-config-data']){
+   class Mutant extends Type{}
+   Object.defineProperty(Mutant,'ɵfac',{value:Receiver=>mutation==='discard-constructor-type-override'?Type.ɵfac(Mutant)
+    :Type.ɵfac(class extends Receiver{constructor(...inputs){
+     if(mutation==='replace-caller-config-input')inputs[profile.parameter_index]={};
+     else if(mutation==='cycle-caller-config-data')inputs[profile.parameter_index].data=inputs[profile.element_index].nativeElement;
+     else inputs[profile.parameter_index].data={case:'wrong-caller-data'};
+     super(...inputs);
+    }})});
+   const execution=await observePublicNodeFactory(Mutant,core,runtime,symbol,symbols,load);
+   assert.equal(execution.outcome,'threw','changed caller config was accepted');
+   assert.ok(execution.error.length<1000,'constructor failure formatted a live Angular graph');
+   callerConfigControls.push({symbol_id:symbol.symbol_id,id:mutation,result:'rejected',error:execution.error});
+  }
+  if(profile.overlay_index!==null){
+   class Mutant extends Type{}
+   Object.defineProperty(Mutant,'ɵfac',{value:Receiver=>Type.ɵfac(class extends Receiver{constructor(...inputs){super(...inputs);this.ngOnDestroy=()=>inputs[profile.overlay_index].dispose();}})});
+   const execution=await observePublicNodeFactory(Mutant,core,runtime,symbol,symbols,load);
+   assert.equal(execution.outcome,'returned',execution.error);
+   assert.equal(execution.callerConfigContext.borrowed_overlay_alive_after_teardown,false);
+   assert.ok(execution.behaviorProblems.includes('owned factory disposed the caller overlay reference'));
+   callerConfigControls.push({symbol_id:symbol.symbol_id,id:'disposing-borrowed-overlay-rejected',result:'rejected',problems:execution.behaviorProblems});
+  }
+ }
+ assert.equal(callerConfigControls.length,26);
+ const snackSymbol=selected.find(s=>s.symbol_id===SNACK_MOTION_SYMBOL),snack=await loadRuntimeModule(runtime,'legacy-snack-bar','primary');
+ const ownedCore=await loadRuntimeModule(runtime,'legacy-core','primary'),material=await load('@angular/material/core'),snackMotionControls=[];
+ for(const cell of [
+  {id:'default-server-enabled',providers:[],enabled:true},
+  {id:'override-enabled',providers:[{provide:ownedCore.LEGACY_ANIMATIONS_TEST_OVERRIDE,useValue:'enabled'}],enabled:true},
+  {id:'override-disabled',providers:[{provide:ownedCore.LEGACY_ANIMATIONS_TEST_OVERRIDE,useValue:'di-disabled'}],enabled:false},
+  {id:'override-reduced',providers:[{provide:ownedCore.LEGACY_ANIMATIONS_TEST_OVERRIDE,useValue:'reduced-motion'}],enabled:false},
+  {id:'material-disabled',providers:[{provide:material.MATERIAL_ANIMATIONS,useValue:{animationsDisabled:true}}],enabled:false},
+  {id:'noop-module',providers:[{provide:core.ANIMATION_MODULE_TYPE,useValue:'NoopAnimations'}],enabled:false},
+ ]){
+  const execution=await observePublicNodeFactory(snack.MatLegacySnackBarContainer,core,runtime,snackSymbol,symbols,load,{providers:cell.providers});
+  assert.equal(execution.outcome,'returned',execution.error);assert.deepEqual(execution.behaviorProblems,[]);
+  assert.deepEqual(ownedSelectMotionProblems(execution.ownedMotionContext,SNACK_MOTION_SYMBOL),[]);
+  assert.equal(execution.value._animationsEnabled,cell.enabled);
+  snackMotionControls.push({id:cell.id,result:'pass',enabled:cell.enabled,evidence:execution.ownedMotionContext});
+ }
  const ownedMenu=await loadRuntimeModule(runtime,'legacy-menu','primary'),peerMenu=await load('@angular/material/menu');
  const menuContext=await createPublicFactoryContext(core,load,{providers:[core.importProvidersFrom(ownedMenu.MatLegacyMenuModule)]});
  let menuItem;const publicParentControls=[];
@@ -154,7 +212,7 @@ try{
  const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
  const caps=[...new Set([...files.map(file=>file.fileName),...resources])].sort().map(file=>({path:file.slice(root.length+1),sha256:sha(readFileSync(file))}));
  const result={schema_version:1,role:'All original154 factory class source observations;not canonical packed/native/browser/floor qualification',
-  node:process.version,typescript:ts.version,runtime_peer:core.VERSION.full,entries,rows,selected_symbol_ids:[...selectedIds].sort(),emitted_public_import_routes:routes,public_parent_controls:publicParentControls,required_parent_controls:requiredParentControls,
+  node:process.version,typescript:ts.version,runtime_peer:core.VERSION.full,entries,rows,selected_symbol_ids:[...selectedIds].sort(),emitted_public_import_routes:routes,public_parent_controls:publicParentControls,required_parent_controls:requiredParentControls,caller_config_controls:callerConfigControls,snack_motion_controls:snackMotionControls,
   passed:rows.filter(row=>row.result==='pass').length,failed:rows.filter(row=>row.result!=='pass').length,
   source_files:files.length,resource_files:resources.size,source_caps:caps,virtual_typecheck_files:virtualFiles.length,
   styles:'SCSS/HTML resources read unchanged by Angular compiler;no Sass/rendered style qualification',

@@ -128,6 +128,9 @@ function fixtureDefinitions(core,{nodeFactory,attributes={},parentProviders=[],p
  */
 export async function createPublicFactoryContext(core,importModule,{providers=[],nodeFactory,attributes={},parentProviders=[],parentHost}={}){
  const {BrowserModule}=await importModule('@angular/platform-browser');
+ const {PlatformLocation}=await importModule('@angular/common');
+ const {MockPlatformLocation}=await importModule('@angular/common/testing');
+ const platformLocation=new MockPlatformLocation({startUrl:'https://factory-context.invalid/'});
  const document=Object.assign(new EventTarget(),{activeElement:null,defaultView:null,doctype:{},
   createElement(name){return node(name,document);},
   createTextNode(value){return{nodeType:3,textContent:value,parentNode:null};},
@@ -149,13 +152,14 @@ export async function createPublicFactoryContext(core,importModule,{providers=[]
   if(!(parent instanceof core.EnvironmentInjector))throw Error('public Injector.create did not return an EnvironmentInjector parent');
   environment=core.createEnvironmentInjector([core.importProvidersFrom(BrowserModule),core.provideZonelessChangeDetection(),
    {provide:core.PLATFORM_ID,useValue:'server'},{provide:core.DOCUMENT,useValue:document},
+   {provide:PlatformLocation,useValue:platformLocation},
    {provide:core.RendererFactory2,useValue:{createRenderer(){return fixtureRenderer;}}},...providers],parent);
   const host=node('api-factory-host',document);document.body.appendChild(host);
   component=core.createComponent(defs.Host,{hostElement:host,environmentInjector:environment});
   component.changeDetectorRef.detectChanges();
   if(!component.instance.element||!component.instance.template||!component.instance.parent)throw Error('public Angular node probes were not created');
-  return {environment,component,document,host,parentNode:component.instance.parent,element:component.instance.element,template:component.instance.template,
+  return {environment,component,document,host,platformLocation,parentNode:component.instance.parent,element:component.instance.element,template:component.instance.template,
    scopeToken:defs.scopeToken,parentValue:defs.parentValue,childValue:defs.childValue,close,
-   context:'actual Angular element/template nodes and public application providers with synthetic Renderer2/server DOM; native/browser/AOT/packed/floors separate'};
+   context:'actual Angular element/template nodes and public application providers with synthetic Renderer2/server DOM and public MockPlatformLocation URL backend; native/browser/AOT/packed/floors separate'};
  }catch(error){close();throw error;}
 }

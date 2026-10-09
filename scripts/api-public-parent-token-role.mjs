@@ -13,6 +13,12 @@ import {originalCompilerFactoryContext,originalContextDi} from './api-original-f
 // local name. These finite unchanged public parent roles are not owned aliases.
 // Removed/private tokens (including CDK_TABLE) deliberately have no entry.
 const profiles={
+ 'legacy-dialog/primary/_MatLegacyDialogContainerBase':[
+  {factory:'@angular/material:fesm2022/dialog.mjs#_MatDialogContainerBase',index:3,name:'MatDialogConfig',spec:'@angular/material/dialog'},
+ ],
+ ...Object.fromEntries(['MatLegacySnackBarContainer','_MatLegacySnackBarContainerBase'].map(name=>[
+  'legacy-snack-bar/primary/'+name,[{factory:'@angular/material:fesm2022/snack-bar.mjs#_MatSnackBarContainerBase',index:4,name:'MatSnackBarConfig',spec:'@angular/material/snack-bar'}],
+ ])),
  'legacy-menu/primary/MatLegacyMenuTrigger':[
   {factory:'@angular/material:fesm2022/menu.mjs#_MatMenuTriggerBase',index:5,name:'MatMenuItem',spec:'@angular/material/menu'},
  ],
