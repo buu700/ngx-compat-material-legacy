@@ -7,6 +7,36 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class OwnedMotionEvidenceTests(unittest.TestCase):
+    def test_owned_constructor_roles_preserve_original_noop_and_reject_forged_or_missing_evidence(self):
+        script = r"""
+import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';
+import {ownedSelectMotionProblems} from './scripts/api-owned-motion-context.mjs';
+const proof=JSON.parse(readFileSync('compatibility/rc/constructor-motion-context-source-proof.json'));
+let rejected=0;
+for(const control of proof.default_constructor_motion_contexts){
+ const observation=control.evidence,id=control.symbol_id;
+ assert.deepEqual(ownedSelectMotionProblems(observation,id),[]);
+ for(const change of [x=>delete x.constructor_owner,x=>x.constructor_owner.public_export='Foreign',x=>x.constructor_owner.depth++,x=>x.constructor_owner.owned_class_identity_matched=false,x=>x.constructor_owner.extra='waiver',x=>x.caller.file='foreign',x=>x.sources.caller.file='foreign',x=>x.component_enabled=!x.component_enabled,x=>x.requests[0].self=true,x=>x.control_requests[0].identity_matched=false,x=>x.cases.pop()]){
+  const bad=structuredClone(observation);change(bad);assert.ok(ownedSelectMotionProblems(bad,id).length);rejected++;
+ }
+ if(observation.constructor_animation_mode)for(const change of [x=>delete x.constructor_animation_mode,x=>x.constructor_animation_mode.original_parameter_index++,x=>x.constructor_animation_mode.original_constructor_arity++,x=>x.constructor_animation_mode.optional=false,x=>x.constructor_animation_mode.actual_input_identical=false,x=>x.constructor_animation_mode.constructor_calls=0,x=>x.constructor_animation_mode.mode_was_noop=true,x=>x.constructor_animation_mode.extra='waiver']){
+  const bad=structuredClone(observation);change(bad);assert.ok(ownedSelectMotionProblems(bad,id).length);rejected++;
+ }
+}
+assert.equal(rejected,49);
+for(const symbol of ['legacy-form-field/primary/MatLegacyFormField','legacy-tooltip/primary/LegacyTooltipComponent']){
+ const mixed=proof.original_noop_conflict_contexts.find(c=>c.symbol_id===symbol).evidence;
+ assert.equal(mixed.state,'enabled');assert.equal(mixed.constructor_animation_mode.mode_was_noop,true);assert.equal(mixed.component_enabled,false);
+ assert.deepEqual(ownedSelectMotionProblems(mixed,symbol),[]);
+ const bad=structuredClone(mixed);bad.constructor_animation_mode.mode_was_noop=false;assert.ok(ownedSelectMotionProblems(bad,symbol).length);
+}
+assert.equal(proof.manual_constructor_observations.length,6);assert.ok(proof.manual_constructor_observations.every(x=>x.outcome==='returned'));
+assert.equal(proof.manual_motion_lifecycle.length,4);
+"""
+        result = subprocess.run(['node', '--input-type=module', '-e', script], cwd=ROOT,
+                                capture_output=True, text=True, timeout=10)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_snack_profile_uses_actual_component_modes_and_rejects_changed_or_foreign_caller_evidence(self):
         script = r"""
 import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';

@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -11,7 +12,7 @@
  */
 
 import {MediaMatcher} from '@angular/cdk/layout';
-import {ANIMATION_MODULE_TYPE, InjectionToken, inject} from '@angular/core';
+import {ANIMATION_MODULE_TYPE, InjectionToken, assertInInjectionContext, inject} from '@angular/core';
 import {MATERIAL_ANIMATIONS} from '@angular/material/core';
 
 /** Public re-export for consumers/docs that prefer the legacy-core entry. */
@@ -57,8 +58,17 @@ export function getLegacyAnimationsState(): LegacyAnimationsState {
   }
 }
 
-/** True when DI or reduced-motion asks overlays to skip meaningful motion. */
+/**
+ * True when DI or reduced-motion asks overlays to skip meaningful motion.
+ * Historical explicit constructors can run outside DI. In that case there is
+ * no ambient policy to read; their supplied animation-mode arguments still apply.
+ */
 export function legacyAnimationsDisabled(): boolean {
+  try {
+    assertInInjectionContext(legacyAnimationsDisabled);
+  } catch {
+    return false;
+  }
   return getLegacyAnimationsState() !== 'enabled';
 }
 

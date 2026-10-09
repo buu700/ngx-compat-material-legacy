@@ -10,15 +10,26 @@ import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
 import {fileURLToPath} from 'node:url';
+import {isDeepStrictEqual} from 'node:util';
+import {originalCompilerFactoryContext,originalContextDi} from './api-original-factory-contexts.mjs';
 
 const require=createRequire(import.meta.url),flags=['optional','self','skipSelf','host'];
 export const SELECT_MOTION_SYMBOL='legacy-select/primary/MatLegacySelect';
 export const PSEUDO_MOTION_SYMBOL='legacy-core/primary/MatLegacyPseudoCheckbox';
 export const SNACK_MOTION_SYMBOL='legacy-snack-bar/primary/MatLegacySnackBarContainer';
+export const FORM_FIELD_MOTION_SYMBOL='legacy-form-field/primary/MatLegacyFormField';
+export const MENU_MOTION_SYMBOL='legacy-menu/primary/MatLegacyMenu';
+export const TOOLTIP_MOTION_SYMBOL='legacy-tooltip/primary/LegacyTooltipComponent';
 const ownedMotionProfiles=Object.freeze({
  [SELECT_MOTION_SYMBOL]:Object.freeze({family:'legacy-select',property:'_animationsEnabled',enabled:true}),
  [PSEUDO_MOTION_SYMBOL]:Object.freeze({family:'legacy-core',property:'_animationsDisabled',enabled:false}),
  [SNACK_MOTION_SYMBOL]:Object.freeze({family:'legacy-snack-bar',property:'_animationsEnabled',enabled:true}),
+ [FORM_FIELD_MOTION_SYMBOL]:Object.freeze({family:'legacy-form-field',property:'_animationsEnabled',enabled:true,
+  constructorOwnerExport:'MatLegacyFormField',constructorOwnerDepth:0,constructorAnimationIndex:6,constructorArity:7}),
+ [MENU_MOTION_SYMBOL]:Object.freeze({family:'legacy-menu',property:'_animationsEnabled',enabled:true,
+  constructorOwnerExport:'_MatLegacyMenuBase',constructorOwnerDepth:1}),
+ [TOOLTIP_MOTION_SYMBOL]:Object.freeze({family:'legacy-tooltip',property:'_animationsDisabled',enabled:false,
+  constructorOwnerExport:'_LegacyTooltipComponentBase',constructorOwnerDepth:1,constructorAnimationIndex:2,constructorArity:3}),
 });
 export const ownedMotionProfile=symbolId=>Object.hasOwn(ownedMotionProfiles,symbolId)?ownedMotionProfiles[symbolId]:null;
 const sha=text=>createHash('sha256').update(text).digest('hex');
@@ -85,12 +96,38 @@ function serialized(requests,expected){
 }
 
 /** Additional owned motion behavior is proved separately from the immutable original constructor DI. */
-export function partitionOwnedSelectMotion(requests,core,owned,layout,material,Type,files,runFactory,injector,value,symbolId=SELECT_MOTION_SYMBOL){
+export function partitionOwnedSelectMotion(requests,core,owned,layout,material,Type,files,runFactory,injector,value,symbolId=SELECT_MOTION_SYMBOL,{familyExports,originalSymbol,constructorCapture}={}){
  const profile=ownedMotionProfile(symbolId);
  if(!profile)throw Error('unknown owned motion caller');
  const stateScope=sourceScope(files.core,owned.getLegacyAnimationsState);
  const disabledScope=sourceScope(files.core,owned.legacyAnimationsDisabled);
- const callerScope=sourceScope(files.caller,Type,{classConstructor:true});
+ let callerType=Type,constructorOwner,constructorAnimationMode;
+ if(profile.constructorOwnerExport){
+  const owner=familyExports?.[profile.constructorOwnerExport];
+  if(typeof owner!=='function'||profile.constructorOwnerDepth===0&&owner!==Type
+   ||profile.constructorOwnerDepth===1&&(Object.getPrototypeOf(Type)!==owner||!(Type.prototype instanceof owner)))
+   throw Error('owned motion constructor owner is not the exact public owned export');
+  callerType=owner;
+  constructorOwner={public_export:profile.constructorOwnerExport,depth:profile.constructorOwnerDepth,owned_class_identity_matched:true};
+ }
+ if(profile.constructorAnimationIndex!==undefined){
+  if(originalSymbol?.symbol_id!==symbolId)throw Error('original motion-mode constructor owner missing');
+  const original=originalCompilerFactoryContext(originalSymbol.shape.originalFactory);
+  if(!isDeepStrictEqual(originalSymbol.shape.originalFactoryContext,original))throw Error('original motion-mode factory context differs');
+  const param=originalContextDi(originalSymbol.shape)[profile.constructorAnimationIndex];
+  if(param?.ident!=='ANIMATION_MODULE_TYPE'||param.imported!=='ANIMATION_MODULE_TYPE'
+   ||param.spec!=='@angular/platform-browser/animations'||param.optional!==true
+   ||['self','skipSelf','host'].some(flag=>Boolean(param[flag]))
+   ||original.factory_parameters.length!==profile.constructorArity)
+   throw Error('original constructor motion-mode parameter differs');
+  if(constructorCapture?.constructor_calls!==1||constructorCapture.inputs?.length!==profile.constructorArity)
+   throw Error('actual original motion-mode constructor input capture missing');
+  const mode=constructorCapture.inputs[profile.constructorAnimationIndex];
+  if(mode!==injector.get(core.ANIMATION_MODULE_TYPE,null,{optional:true}))throw Error('constructor motion-mode input differs from actual caller provider');
+  constructorAnimationMode={original_parameter_index:profile.constructorAnimationIndex,original_constructor_arity:profile.constructorArity,
+   ident:param.ident,spec:param.spec,optional:true,actual_input_identical:true,constructor_calls:1,mode_was_noop:mode==='NoopAnimations'};
+ }
+ const callerScope=sourceScope(files.caller,callerType,{classConstructor:true});
  const expected=[
   {ident:'LEGACY_ANIMATIONS_TEST_OVERRIDE',token:owned.LEGACY_ANIMATIONS_TEST_OVERRIDE,optional:true},
   {ident:'MATERIAL_ANIMATIONS',token:material.MATERIAL_ANIMATIONS,optional:true},
@@ -108,7 +145,8 @@ export function partitionOwnedSelectMotion(requests,core,owned,layout,material,T
   ||control.requests.some(request=>!helperOrigin(request,stateScope)))throw Error('owned motion independent control incomplete');
  assertRequests(control.requests,expected.slice(0,control.requests.length));
  assertRequests(classified,expected.slice(0,control.requests.length));
- const componentState=value[profile.property],expectedState=profile.enabled?control.value==='enabled':control.value!=='enabled';
+ const componentState=value[profile.property],componentEnabled=control.value==='enabled'&&!constructorAnimationMode?.mode_was_noop;
+ const expectedState=profile.enabled?componentEnabled:!componentEnabled;
  if(!classified.length||componentState!==expectedState)throw Error('owned component motion state differs from control');
  const cases=[];
  for(const cell of matrix){
@@ -141,15 +179,29 @@ export function partitionOwnedSelectMotion(requests,core,owned,layout,material,T
   sources:{state:stateScope.proof,disabled:disabledScope.proof,caller:callerScope.proof},
   caller:helperOrigin(classified[0],stateScope,disabledScope,callerScope),
   state:control.value,component_enabled:profile.enabled?componentState:!componentState,verified:true,
+  ...(constructorOwner?{constructor_owner:constructorOwner}:{}),
+  ...(constructorAnimationMode?{constructor_animation_mode:constructorAnimationMode}:{}),
   requests:serialized(classified,expected),control_requests:serialized(control.requests,expected),cases}};
 }
 
 export function ownedSelectMotionProblems(observation,symbolId=SELECT_MOTION_SYMBOL){
- const x=observation,problems=[];
+ const x=observation,problems=[],profile=ownedMotionProfile(symbolId);
+ if(profile?.constructorOwnerExport){
+  if(!isDeepStrictEqual(x?.constructor_owner,{public_export:profile.constructorOwnerExport,depth:profile.constructorOwnerDepth,owned_class_identity_matched:true}))
+   problems.push('owned motion constructor owner identity evidence incomplete');
+  if(x?.caller?.file!==x?.sources?.caller?.file
+   ||!x?.sources?.caller?.file?.endsWith('/fesm2022/ngx-compat-material-legacy-'+profile.family+'.mjs'))
+   problems.push('owned motion constructor caller belongs to a different public entry');
+ }
+ const mode=x?.constructor_animation_mode;
+ if(profile?.constructorAnimationIndex!==undefined&&(!mode||typeof mode.mode_was_noop!=='boolean'
+  ||!isDeepStrictEqual(mode,{original_parameter_index:profile.constructorAnimationIndex,original_constructor_arity:profile.constructorArity,
+   ident:'ANIMATION_MODULE_TYPE',spec:'@angular/platform-browser/animations',optional:true,actual_input_identical:true,constructor_calls:1,mode_was_noop:mode.mode_was_noop})))
+  problems.push('owned motion original constructor-mode evidence incomplete');
  if(!ownedMotionProfile(symbolId)||!x||x.symbol_id!==symbolId||x.verified!==true
   ||!Number.isInteger(x.total_requests)||!Number.isInteger(x.retained_requests)||!Number.isInteger(x.classified_requests)
   ||x.retained_requests<0||x.classified_requests<1||x.retained_requests+x.classified_requests!==x.total_requests
-  ||!['enabled','di-disabled','reduced-motion'].includes(x.state)||x.component_enabled!==(x.state==='enabled')
+  ||!['enabled','di-disabled','reduced-motion'].includes(x.state)||x.component_enabled!==(x.state==='enabled'&&!(profile?.constructorAnimationIndex!==undefined&&mode?.mode_was_noop))
   ||!x.caller?.file||!Number.isInteger(x.caller.line)||!Number.isInteger(x.caller.column))
   return ['owned select motion execution/control evidence incomplete'];
  if(['state','disabled','caller'].some(name=>!x.sources?.[name]?.file
