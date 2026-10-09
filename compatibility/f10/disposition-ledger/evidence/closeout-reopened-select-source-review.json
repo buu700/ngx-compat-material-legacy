@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "86ad5150110522873dae2801fd3c2957502949e7",
+  "reviewer": "Codex primary implementer",
+  "recorded_at_utc": "2026-10-09T16:45:16.150774+00:00",
+  "review_depth": "individual-compatibility-source",
+  "patch_file": "compatibility/rc/resource-style-upstream-patches/86ad5150110522873dae2801fd3c2957502949e7.patch",
+  "diff_sha256": "e237a5b4d0aeb7afb5765e852a89945691ffa98604ba9bfddd2988e5068d3414",
+  "decision": "The full two-file patch guards a missing panel during enabled-motion immediate open/close and adds a regression without an animation module. The owned exit method already has the equivalent !animationsEnabled || !this.panel branch, followed by its locally owned CSS/state completion. Two added enabled/disabled missing-view lifecycle cases verify closed/detached state, one void completion and no timers/listeners; removing the guard fails the intended enabled case. All32 prior/new menu-select lifecycle cases and15 corruptions pass. Complete exact minimum exit and detach method bodies also detach/mark once for each missing-panel enabled/disabled receiver. The current public derived open has separately recorded stable-callback lifetime guards, but this diagnostic does not instantiate the public Angular directive. One actual enabled-motion legacy native test is added and remains unexecuted.",
+  "proof": "compatibility/rc/three-reopened-behavior-source-proof.json",
+  "prior_entry": {
+    "sha": "86ad5150110522873dae2801fd3c2957502949e7",
+    "bucket": "behavior-semantic",
+    "subject": "fix(material/select): avoid error if panel is closed too quickly (#30408)",
+    "files": [
+      "src/material/select/select.spec.ts",
+      "src/material/select/select.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+    "read_note_disposition": "unreviewed-on-21.x",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": null
+  },
+  "prior_evidence": null,
+  "proposed_disposition": "already-adapted: owned missing-panel exit branch implements the quick-close guard through owned completion state",
+  "admission_status": "pending-native-floor-and-independent-review",
+  "g11_claim": "not-passed",
+  "proposal_status": "source-supported, pending native/floor and independent admission"
+}

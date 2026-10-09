@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "5dd614aa100e28f0815fdd83e5b68f4239ef01f9",
+  "reviewer": "Codex primary implementer",
+  "recorded_at_utc": "2026-10-09T16:45:16.150774+00:00",
+  "review_depth": "individual-compatibility-source",
+  "patch_file": "compatibility/rc/resource-style-upstream-patches/5dd614aa100e28f0815fdd83e5b68f4239ef01f9.patch",
+  "diff_sha256": "ee5e90a8d85ee282ae185775732e8e6a56e907bb60cda7c9fe36923d406006bf",
+  "decision": "The complete two-file patch adds Enter to the tab-panel link activation condition and a keyboard regression. It is already in untouched16.2.14 and retained in the owned legacy handler. Eight Enter cases preserve original enabled/disabled/panel/native behavior; the complete current method matches both exact minimum peer methods across24 Node Event/click cases. Five corruptions reject. The existing extra Space preventDefault is recorded as two explicit differences from16, outside this SHA Enter fix; this review does not silently equate all keyboard behavior or admit that separate adaptation. Three actual legacy native tests are added, and their local private-testing alias is replaced by the existing owned event helper. Native browser default anchor navigation/Angular hosting remains pending.",
+  "proof": "compatibility/rc/three-reopened-behavior-source-proof.json",
+  "prior_entry": {
+    "sha": "5dd614aa100e28f0815fdd83e5b68f4239ef01f9",
+    "bucket": "behavior-semantic",
+    "subject": "fix(material/tabs): nav bar not navigating on enter presses (#27862)",
+    "files": [
+      "src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+      "src/material/tabs/tab-nav-bar/tab-nav-bar.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+    "read_note_disposition": "unreviewed-on-21.x",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": null
+  },
+  "prior_evidence": null,
+  "proposed_disposition": "already-present: original tagged Enter activation route is retained; separate Space adaptation remains separately accounted",
+  "admission_status": "pending-native-floor-and-independent-review",
+  "g11_claim": "not-passed",
+  "proposal_status": "source-supported, pending native/floor and independent admission"
+}

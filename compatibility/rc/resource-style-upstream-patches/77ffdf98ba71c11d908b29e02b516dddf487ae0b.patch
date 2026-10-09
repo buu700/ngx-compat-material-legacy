@@ -1,0 +1,206 @@
+diff --git a/src/components-examples/material/autocomplete/autocomplete-require-selection/autocomplete-require-selection-example.css b/src/components-examples/material/autocomplete/autocomplete-require-selection/autocomplete-require-selection-example.css
+index 08fa67536b1fd9289a085fdae8bd9444fa36e997..951aee759961fa2490df7194c6b90e21cacf3166 100644
+--- a/src/components-examples/material/autocomplete/autocomplete-require-selection/autocomplete-require-selection-example.css
++++ b/src/components-examples/material/autocomplete/autocomplete-require-selection/autocomplete-require-selection-example.css
+@@ -2,6 +2,7 @@
+   min-width: 150px;
+   max-width: 500px;
+   width: 100%;
++  margin-top: 16px;
+ }
+ 
+ .example-full-width {
+diff --git a/src/components-examples/material/autocomplete/autocomplete-require-selection/autocomplete-require-selection-example.html b/src/components-examples/material/autocomplete/autocomplete-require-selection/autocomplete-require-selection-example.html
+index 6b428b0b45c9e5edac1b0475d785f333aa912faa..e5c96b37e9d3f6bd22826c859719e53de7510f70 100644
+--- a/src/components-examples/material/autocomplete/autocomplete-require-selection/autocomplete-require-selection-example.html
++++ b/src/components-examples/material/autocomplete/autocomplete-require-selection/autocomplete-require-selection-example.html
+@@ -1,18 +1,20 @@
++Control value: {{myControl.value || 'empty'}}
++
+ <form class="example-form">
+   <mat-form-field class="example-full-width">
+     <mat-label>Number</mat-label>
+-    <input type="text"
++    <input #input
++           type="text"
+            placeholder="Pick one"
+-           aria-label="Number"
+            matInput
+            [formControl]="myControl"
+-           [matAutocomplete]="auto">
++           [matAutocomplete]="auto"
++           (input)="filter()"
++           (focus)="filter()">
+     <mat-autocomplete requireSelection #auto="matAutocomplete">
+-      <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
++      <mat-option *ngFor="let option of filteredOptions" [value]="option">
+         {{option}}
+       </mat-option>
+     </mat-autocomplete>
+   </mat-form-field>
+ </form>
+-
+-Control value: {{myControl.value}}
+diff --git a/src/components-examples/material/autocomplete/autocomplete-require-selection/autocomplete-require-selection-example.ts b/src/components-examples/material/autocomplete/autocomplete-require-selection/autocomplete-require-selection-example.ts
+index a93619ae3748db67b24a7b47a01d893ae4bbfd22..5da4fc8810881404d181f2d5d7053e6b94b2129b 100644
+--- a/src/components-examples/material/autocomplete/autocomplete-require-selection/autocomplete-require-selection-example.ts
++++ b/src/components-examples/material/autocomplete/autocomplete-require-selection/autocomplete-require-selection-example.ts
+@@ -1,14 +1,12 @@
+-import {Component, OnInit} from '@angular/core';
++import {Component, ElementRef, ViewChild} from '@angular/core';
+ import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+-import {Observable} from 'rxjs';
+-import {map, startWith} from 'rxjs/operators';
+ import {NgFor, AsyncPipe} from '@angular/common';
+ import {MatAutocompleteModule} from '@angular/material/autocomplete';
+ import {MatInputModule} from '@angular/material/input';
+ import {MatFormFieldModule} from '@angular/material/form-field';
+ 
+ /**
+- * @title Require an autocomplete option to be selected.
++ * @title Require an autocomplete option to be selected
+  */
+ @Component({
+   selector: 'autocomplete-require-selection-example',
+@@ -25,21 +23,18 @@ import {MatFormFieldModule} from '@angular/material/form-field';
+     AsyncPipe,
+   ],
+ })
+-export class AutocompleteRequireSelectionExample implements OnInit {
++export class AutocompleteRequireSelectionExample {
++  @ViewChild('input') input: ElementRef<HTMLInputElement>;
+   myControl = new FormControl('');
+-  options: string[] = ['One', 'Two', 'Three', 'Three', 'Four'];
+-  filteredOptions: Observable<string[]>;
++  options: string[] = ['One', 'Two', 'Three', 'Four', 'Five'];
++  filteredOptions: string[];
+ 
+-  ngOnInit() {
+-    this.filteredOptions = this.myControl.valueChanges.pipe(
+-      startWith(''),
+-      map(value => this._filter(value || '')),
+-    );
++  constructor() {
++    this.filteredOptions = this.options.slice();
+   }
+ 
+-  private _filter(value: string): string[] {
+-    const filterValue = value.toLowerCase();
+-
+-    return this.options.filter(option => option.toLowerCase().includes(filterValue));
++  filter(): void {
++    const filterValue = this.input.nativeElement.value.toLowerCase();
++    this.filteredOptions = this.options.filter(o => o.toLowerCase().includes(filterValue));
+   }
+ }
+diff --git a/src/dev-app/autocomplete/autocomplete-demo.html b/src/dev-app/autocomplete/autocomplete-demo.html
+index e2d04e637bd851f6de93331ea8438bf32ce330f5..27960dc3fce6bcffd4924835cab105153b1841a8 100644
+--- a/src/dev-app/autocomplete/autocomplete-demo.html
++++ b/src/dev-app/autocomplete/autocomplete-demo.html
+@@ -1,21 +1,27 @@
+ Space above cards: <input type="number" [formControl]="topHeightCtrl">
+ <div [style.height.px]="topHeightCtrl.value"></div>
+ <div class="demo-autocomplete">
+-  <mat-card *ngIf="(reactiveStates | async) as tempStates">
+-    Reactive length: {{ tempStates?.length }}
++  <mat-card>
++    Reactive length: {{ reactiveStates.length }}
+     <div>Reactive value: {{ stateCtrl.value | json }}</div>
+     <div>Reactive dirty: {{ stateCtrl.dirty }}</div>
+ 
+     <mat-form-field [color]="reactiveStatesTheme">
+       <mat-label>State</mat-label>
+-      <input matInput [matAutocomplete]="reactiveAuto" [formControl]="stateCtrl">
++      <input
++        #reactiveInput
++        matInput
++        [matAutocomplete]="reactiveAuto"
++        [formControl]="stateCtrl"
++        (input)="reactiveStates = filterStates(reactiveInput.value)"
++        (focus)="reactiveStates = filterStates(reactiveInput.value)">
+     </mat-form-field>
+     <mat-autocomplete #reactiveAuto="matAutocomplete"
+       [displayWith]="displayFn"
+       [hideSingleSelectionIndicator]="reactiveHideSingleSelectionIndicator"
+       [autoActiveFirstOption]="reactiveAutoActiveFirstOption"
+       [requireSelection]="reactiveRequireSelection">
+-      <mat-option *ngFor="let state of tempStates; let index = index" [value]="state"
++      <mat-option *ngFor="let state of reactiveStates; let index = index" [value]="state"
+         [disabled]="reactiveIsStateDisabled(state.index)">
+         <span>{{ state.name }}</span>
+         <span class="demo-secondary-text"> ({{ state.code }}) </span>
+diff --git a/src/dev-app/autocomplete/autocomplete-demo.ts b/src/dev-app/autocomplete/autocomplete-demo.ts
+index d43a358ad72de57439f7270c6a7dc474ec1c46d1..8c87e89ae06c39825726037757c886815c527b7d 100644
+--- a/src/dev-app/autocomplete/autocomplete-demo.ts
++++ b/src/dev-app/autocomplete/autocomplete-demo.ts
+@@ -14,8 +14,6 @@ import {MatButtonModule} from '@angular/material/button';
+ import {MatCardModule} from '@angular/material/card';
+ import {MatCheckboxModule} from '@angular/material/checkbox';
+ import {MatInputModule} from '@angular/material/input';
+-import {Observable} from 'rxjs';
+-import {map, startWith} from 'rxjs/operators';
+ import {ThemePalette} from '@angular/material/core';
+ import {MatDialog, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
+ 
+@@ -50,12 +48,12 @@ type DisableStateOption = 'none' | 'first-middle-last' | 'all';
+   ],
+ })
+ export class AutocompleteDemo {
+-  stateCtrl = new FormControl({code: 'CA', name: 'California'});
++  stateCtrl = new FormControl();
+   currentState = '';
+   currentGroupedState = '';
+   topHeightCtrl = new FormControl(0);
+ 
+-  reactiveStates: Observable<State[]>;
++  reactiveStates: State[];
+   tdStates: State[];
+ 
+   tdDisabled = false;
+@@ -138,12 +136,8 @@ export class AutocompleteDemo {
+   ].map((state, index) => ({...state, index}));
+ 
+   constructor() {
+-    this.tdStates = this.states;
+-    this.reactiveStates = this.stateCtrl.valueChanges.pipe(
+-      startWith(this.stateCtrl.value),
+-      map(val => this.displayFn(val)),
+-      map(name => this.filterStates(name)),
+-    );
++    this.tdStates = this.states.slice();
++    this.reactiveStates = this.states.slice();
+ 
+     this.filteredGroupedStates = this.groupedStates = this.states.reduce<StateGroup[]>(
+       (groups, state) => {
+diff --git a/src/material/autocomplete/autocomplete-trigger.ts b/src/material/autocomplete/autocomplete-trigger.ts
+index 9a2460b75c390fc96385262f8d40299884641890..b2cd6c5612e440718cc2e70723e5ba59bb1e75ea 100644
+--- a/src/material/autocomplete/autocomplete-trigger.ts
++++ b/src/material/autocomplete/autocomplete-trigger.ts
+@@ -470,7 +470,13 @@ export abstract class _MatAutocompleteTriggerBase
+     if (this._previousValue !== value) {
+       this._previousValue = value;
+       this._pendingAutoselectedOption = null;
+-      this._onChange(value);
++
++      // If selection is required we don't write to the CVA while the user is typing.
++      // At the end of the selection either the user will have picked something
++      // or we'll reset the value back to null.
++      if (!this.autocomplete || !this.autocomplete.requireSelection) {
++        this._onChange(value);
++      }
+ 
+       if (!value) {
+         this._clearPreviousSelectedOption(null, false);
+diff --git a/src/material/autocomplete/autocomplete.spec.ts b/src/material/autocomplete/autocomplete.spec.ts
+index ca4dd3f627736d77307113150c1adefebdec0c1e..27365fa5b76f32a8dff87648d2d5bad410843568 100644
+--- a/src/material/autocomplete/autocomplete.spec.ts
++++ b/src/material/autocomplete/autocomplete.spec.ts
+@@ -2622,7 +2622,7 @@ describe('MDC-based MatAutocomplete', () => {
+       tick();
+ 
+       expect(input.value).toBe('Cali');
+-      expect(stateCtrl.value).toBe('Cali');
++      expect(stateCtrl.value).toEqual({code: 'CA', name: 'California'});
+       expect(spy).not.toHaveBeenCalled();
+ 
+       dispatchFakeEvent(document, 'click');
