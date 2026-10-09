@@ -24,6 +24,19 @@ for (let index = 0; index < args.length; index += 2) {
   options[args[index]] = args[index + 1];
 }
 report.type_compilation = compileHarnessBaseTypes(models, options['--compiler-root'] ?? process.env.CLOSEOUT_TYPESCRIPT_ROOT);
+// Current emitted fields define an own data property before constructor assignment.
+// This JS accessor override is outside the readonly data-property TypeScript contract;
+// the strict source fixture independently rejects it on all three declarations.
+report.unsupported_accessor_override = models.map(model => {
+  let setterCalls = 0;
+  class Unsupported extends model.runtime.ComponentHarness {
+    set locatorFactory(value) {setterCalls++;}
+    get locatorFactory() {return null;}
+  }
+  new Unsupported({rootElement: {}});
+  assert.equal(setterCalls, model.subject.line === 'original' ? 1 : 0);
+  return {line: model.subject.line, setter_calls: setterCalls, supported_typed_contract: false};
+});
 const mutations = [];
 for (const model of models.filter(model => model.subject.line !== 'original')) {
   const Base = model.runtime.ComponentHarness;
@@ -53,6 +66,8 @@ for (const [id, changed, expected] of [
   ['runtime-construction', text + '\nnew ComponentHarness(null as any);\n', /unsupported ComponentHarness reference/],
   ['type-only-runtime-import', text.replace('{ComponentHarness, HarnessPredicate}', '{type ComponentHarness, HarnessPredicate}'), /runtime base imported as type only/],
   ['generic-runtime-base', text.replace('extends ComponentHarness {', 'extends ComponentHarness<string> {'), /non-generic public base/],
+  ['subclass-constructor', text.replace('extends ComponentHarness {', 'extends ComponentHarness { constructor(factory: any) { super(factory); }'), /authored base constructor needs separate review/],
+  ['subclass-accessor', text.replace('extends ComponentHarness {', 'extends ComponentHarness { get locatorFactory(): any {return null;}'), /authored locatorFactory redeclaration needs separate review/],
 ]) {
   assert.notEqual(changed, text);
   await assert.rejects(reviewComponentHarnessBoundary({root, readSource: path => path === file ? changed : read(path)}), expected);
@@ -90,7 +105,7 @@ try {
     mutations.push({id, rejected: true});
   }
 } finally {rmSync(scratch, {recursive: true, force: true});}
-report.mutations = mutations; report.alias_positive = true; assert.equal(mutations.length, 43);
+report.mutations = mutations; report.alias_positive = true; assert.equal(mutations.length, 45);
 if (options['--report']) {assert.equal(existsSync(options['--report']), false); writeFileSync(options['--report'], JSON.stringify(report, null, 2) + '\n');}
 console.log(JSON.stringify({line: report.line, uses: report.uses, files: report.files,
   protocol_cases_per_subject: 23, subjects: 3, mutations: mutations.length, native_executed: false}));

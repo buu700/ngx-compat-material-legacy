@@ -16,5 +16,5 @@ class ComponentHarnessBoundaryTests(unittest.TestCase):
         self.assertEqual(report['files'], 26)
         self.assertEqual(report['subjects'], 3)
         self.assertEqual(report['protocol_cases_per_subject'], 23)
-        self.assertEqual(report['mutations'], 43)
+        self.assertEqual(report['mutations'], 45)
         self.assertFalse(report['native_executed'])
