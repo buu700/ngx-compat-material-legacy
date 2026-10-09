@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "recorded_at_utc": "2026-10-09T14:51:44.022827+00:00",
+  "source_head": "3404a6305e78108cbbe63f31068e0ad275da4f4e",
+  "role": "C04-K03 observer environment interference diagnostic; neither positioning failure nor G11 is closed.",
+  "sources": [
+    {
+      "path": "scripts/delegated-observation-page.mjs",
+      "sha256": "4936934b6901a704055f8b7985670cfe4d158b57d16114ed8aa5b692fff5e213"
+    },
+    {
+      "path": "tests/delegated_observation_page_probe.mjs",
+      "sha256": "515c8c80aaa70e8ce0e83859e0a97ab1157655874dc81b815ae607f12abad474"
+    },
+    {
+      "path": "tests/test_delegated_observation_page.py",
+      "sha256": "7cdf0989a981a27ac11867a3c559baf8aaefd1eff94bacab1edbba874114fedf"
+    },
+    {
+      "path": "scripts/observe-delegated-execution.mjs",
+      "sha256": "ae63dd24d906824638888670894755607f28915cf25fe5883495aef9af7077a3"
+    }
+  ],
+  "finding": "The original main inherited-coverage collector inserts jasmine.css and boot1.js, which creates a flowing HTML reporter above fixtures. Karma executes the same spec bundle without this body UI or stylesheet. Consequently instrumented fixtures can have different trigger positions and different available fallback space.",
+  "repair": "Use the plain Jasmine core/HTML-library/boot0 globals without boot1 UI or Jasmine CSS; execute on window load after spec registration. Preserve assertion messages/stacks, overall/global failures and actual viewport/body layout alongside coverage counts. No product source, consumer stylesheet, historical assertion or oracle changes.",
+  "browser_diagnostic": {
+    "browser": "Google Chrome for Testing156.0.8078.4",
+    "inputs": {
+      "scope": "Reporter-only layout diagnostic.2150empty Jasmine specs, synthetic64px menu/20px select geometry; no Angular component or packed native qualification.",
+      "jasmine_version": "4.6.1",
+      "source_files": [
+        {
+          "name": "jasmine.js",
+          "sha256": "6f3ecfea79b770c054180c8177a5f4ba47ecca1af929aba6637b74e034460fbf"
+        },
+        {
+          "name": "boot0.js",
+          "sha256": "489e49ef3466c46b902863d63f0bd07b73202acbb6c9953dfe2cfd4047c7da57"
+        },
+        {
+          "name": "jasmine-html.js",
+          "sha256": "aeb3ca74c7d7689eae8673f003c92755447433615e129eb5d0dee3344b1ddc43"
+        },
+        {
+          "name": "boot1.js",
+          "sha256": "6d3c00ed69711dc66cd87f26c1cf739f1aedb4dd8316ada8375f2c3c01e91f85"
+        },
+        {
+          "name": "jasmine.css",
+          "sha256": "540d7821fbc1d67e01c3eabc44eaf45b4ca919da0e905d61af6ad9caa8c49c23"
+        }
+      ]
+    },
+    "fixture_generator_sha256": "677675ccf1da2f0e6029117df973c7b7f8eb5d8c804cd81bbd0a8753e2e8985e",
+    "fixture_sha256": {
+      "html-reporter": "758a8df48c1b40d98603a72c852b1a525bab9dbf9671b2eb09976ce99bb8f201",
+      "core-only": "61890911d7010ec6267dfc194cc71d3a5bcb72dea66fc4f15ba6ba66540b6498"
+    },
+    "observations": {
+      "html-reporter": [
+        {
+          "kind": "menu",
+          "triggerTop": 748,
+          "triggerBottom": 769,
+          "above64pxPanelFits": true,
+          "reporterHeight": 756
+        },
+        {
+          "kind": "select",
+          "triggerTop": 798,
+          "triggerHeight": 20,
+          "topSpaceAvailable": 790,
+          "historicalLastOptionOffset": 238,
+          "aboveLastOptionFits": true,
+          "viewportHeight": 1000,
+          "scrollY": 1950
+        },
+        {
+          "result": "passed",
+          "globalFailures": []
+        }
+      ],
+      "core-only": [
+        {
+          "kind": "menu",
+          "triggerTop": 8,
+          "triggerBottom": 29,
+          "above64pxPanelFits": false,
+          "reporterHeight": 0
+        },
+        {
+          "kind": "select",
+          "triggerTop": 58,
+          "triggerHeight": 20,
+          "topSpaceAvailable": 50,
+          "historicalLastOptionOffset": 238,
+          "aboveLastOptionFits": false,
+          "viewportHeight": 1000,
+          "scrollY": 1950
+        },
+        {
+          "result": "passed",
+          "globalFailures": []
+        }
+      ]
+    },
+    "scope": "2150empty Jasmine specs followed by one synthetic DOM measurement. No Angular component, actual CDK overlay strategy, original animation engine, packed historical run or21runtime. The synthetic238px last-option offset is illustrative and is not an executed original component expectation.",
+    "result": "HTML UI shifts a default button from top8px to748px; a scrolled synthetic select from58px to798px, changing both tested fit preconditions. This establishes layout interference and a plausible cause for the old failures, not their actual resolution.",
+    "vendor_identity": "Measured installed borrowed jasmine-core4.6.1 sources, individually hashed. This is an isolated runner diagnostic; no package admission/archive audit clearance claimed."
+  },
+  "reporter_contract_tests": {
+    "summary_events": 58,
+    "mutants_rejected": 4,
+    "result": "pass",
+    "scope": "NodeVM bootstrap/report serialization; both-line source test, no actual Angular/native run"
+  },
+  "application": "Existing main-only observer now consumes the plain page.",
+  "historical_failure_status": "Both original main-only failures remain unresolved pending exact-current instrumented/native execution. Old delegated-execution.json is unchanged and keeps2152executed/2150passed/2failed. No21observation substituted.",
+  "new_SHA_closures": 0,
+  "g11_claim": "not-passed",
+  "pushed": false,
+  "actions_started": false
+}
