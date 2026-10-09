@@ -311,29 +311,47 @@ export class MotionRoot {
   private async measureTabs(zero: boolean): Promise<unknown> {
     await this.ensureSurfaces();
     this.tabDuration = zero ? '0ms' : '500ms';
-    // selectedIndex is applied in ngAfterContentChecked. A template click schedules
-    // that pass; assigning the field after an await does not.
     this.clickTab('One');
-    await this.wait(40);
-    this.clickTab('Two');
-    const limit = zero || this.mode() !== 'enabled' ? 500 : 1200;
     await this.waitFor(() => {
       const node = document.querySelector('.mat-tab-body-active .mat-tab-body-content');
-      return !!node && (node.textContent || '').includes('Two') && getComputedStyle(node).visibility !== 'hidden';
-    }, limit);
-    const el = document.querySelector('.mat-tab-body-active .mat-tab-body-content') as HTMLElement | null;
-    const mode = zero ? 'zero' : this.mode();
-    const observation = {
-      selector: el && el.classList.contains('mat-tab-body-content') ? '.mat-tab-body-content' : '',
-      selectorMatches: !!el && el.classList.contains('mat-tab-body-content'),
-      durationMs: el ? this.duration(el, 'transition-duration') : 0,
-      finalState: el && (el.textContent || '').includes('Two') && getComputedStyle(el).visibility !== 'hidden' ? 'visible' : 'hidden',
-      notifications: 0,
-      detectChangesCalls: 0,
-    };
-    this.tabs.selectedIndex = 0;
-    this.tabDuration = '500ms';
-    return {key: `tabs/${mode}`, observation};
+      return !!node && (node.textContent || '').includes('One') &&
+        getComputedStyle(node).visibility !== 'hidden' && !document.querySelector('.mat-tab-body-animating');
+    }, 1500);
+    // The historical centered output is asynchronous. Flush the initial selection before observing.
+    await this.wait(20);
+    let notifications = 0;
+    const sub = this.tabs.animationDone.subscribe(() => { notifications += 1; });
+    try {
+      this.clickTab('Two');
+      const limit = zero || this.mode() !== 'enabled' ? 500 : 1500;
+      await this.waitFor(() => {
+        const node = document.querySelector('.mat-tab-body-active .mat-tab-body-content');
+        return !!node && (node.textContent || '').includes('Two') &&
+          getComputedStyle(node).visibility !== 'hidden' &&
+          !document.querySelector('.mat-tab-body-animating') && notifications > 0;
+      }, limit);
+      const el = document.querySelector('.mat-tab-body-active .mat-tab-body-content') as HTMLElement | null;
+      // Duplicate native completion events after settling must not produce a second group output.
+      for (let i = 0; i < 2; i++) el?.dispatchEvent(new TransitionEvent('transitionend', {
+        bubbles: true, propertyName: 'transform',
+      }));
+      await this.wait(20);
+      const mode = zero ? 'zero' : this.mode();
+      const observation = {
+        selector: el && el.classList.contains('mat-tab-body-content') ? '.mat-tab-body-content' : '',
+        selectorMatches: !!el && el.classList.contains('mat-tab-body-content'),
+        durationMs: el ? this.duration(el, 'transition-duration') : 0,
+        finalState: el && (el.textContent || '').includes('Two') && getComputedStyle(el).visibility !== 'hidden' ? 'visible' : 'hidden',
+        notifications,
+        duplicateEndEventsDispatched: !!el,
+        detectChangesCalls: 0,
+      };
+      return {key: `tabs/${mode}`, observation, notify: {key: `tabs/animationDone/${mode}`, observation}};
+    } finally {
+      sub.unsubscribe();
+      this.tabs.selectedIndex = 0;
+      this.tabDuration = '500ms';
+    }
   }
 
   private async measureField(): Promise<unknown> {
