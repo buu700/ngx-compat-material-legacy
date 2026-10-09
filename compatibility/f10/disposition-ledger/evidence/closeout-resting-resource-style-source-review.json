@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "recorded_at_utc": "2026-10-09T13:05:41.955848+00:00",
+  "role": "Individual four-SHA source review and six resting-style repairs; retained motion additions and native qualification remain separate.",
+  "code_heads": {
+    "main": "57c89d50e4663c632bebdeeb02e4b2744dc5e1cb",
+    "21.x": "a41b3453717f337870457cbe5af3d2624fbf4365"
+  },
+  "code_trees": {
+    "main": "ae50129ddfcc3770954f929cce4c16a6feec2ea0",
+    "21.x": "a28c003022ba1c4fd83ead9120fa058f8aab2245"
+  },
+  "g11_claim": "not-passed",
+  "reviews": [
+    {
+      "sha": "48b2680f6b41be5dc9bda7f261279cc4c9ad7d64",
+      "topic": "Textarea cols width",
+      "source_review": "Complete hunk inspected individually; actual public-minimum module/style contexts inspected on both lines.",
+      "reviewer": "Codex primary implementer",
+      "admission_status": "pending-rendered-regression-and-independent-audit",
+      "proposed_disposition": "owned-retained with separate current public peer implementation",
+      "patch": {
+        "path": "compatibility/rc/resting-style-upstream-patches/48b2680f6b41be5dc9bda7f261279cc4c9ad7d64.patch",
+        "sha256": "ffbc10cc8c3093462e17a2081d12d0900cfa5134eb4527f435613fad216d68ac",
+        "bytes": 1345
+      },
+      "decision": "The one complete upstream hunk adds an auto-width :has(textarea[cols]) rule to modern MDC form-field. The copied owned rule changes original180px infix sizing. Restore16 owned rule; current public peer keeps its separate MDC textarea behavior.",
+      "regression": "textarea-cols-width",
+      "proof": "compatibility/rc/resting-resource-css-source-proof.json",
+      "public_minimum_contexts": "compatibility/rc/resting-style-peer-source-contexts.json",
+      "current_source_head": "a41b3453717f337870457cbe5af3d2624fbf4365"
+    },
+    {
+      "sha": "4f518f9fffd1c85cddef9d573ae7bbda4981f7cb",
+      "topic": "List text alignment",
+      "source_review": "Complete hunk inspected individually; actual public-minimum module/style contexts inspected on both lines.",
+      "reviewer": "Codex primary implementer",
+      "admission_status": "pending-rendered-regression-and-independent-audit",
+      "proposed_disposition": "owned-retained with separate current public peer implementation",
+      "patch": {
+        "path": "compatibility/rc/resting-style-upstream-patches/4f518f9fffd1c85cddef9d573ae7bbda4981f7cb.patch",
+        "sha256": "aaaaa5bda2755f525f3292baf54f6776bd4b3c31e8f52302af8288ebd3acb5af",
+        "bytes": 863
+      },
+      "decision": "The complete upstream hunk replaces explicit left/dirRTL-right rules with text-align:start in modern list. Preserve exact legacy selector/RTL contract. Current public list remains direction-agnostic.",
+      "regression": "list-logical-alignment",
+      "proof": "compatibility/rc/resting-resource-css-source-proof.json",
+      "public_minimum_contexts": "compatibility/rc/resting-style-peer-source-contexts.json",
+      "current_source_head": "a41b3453717f337870457cbe5af3d2624fbf4365"
+    },
+    {
+      "sha": "d27f79357786e6d0b67d3895cb6e79135954ac11",
+      "topic": "Button focus shape",
+      "source_review": "Complete hunk inspected individually; actual public-minimum module/style contexts inspected on both lines.",
+      "reviewer": "Codex primary implementer",
+      "admission_status": "pending-rendered-regression-and-independent-audit",
+      "proposed_disposition": "owned-retained with separate current public peer implementation",
+      "patch": {
+        "path": "compatibility/rc/resting-style-upstream-patches/d27f79357786e6d0b67d3895cb6e79135954ac11.patch",
+        "sha256": "e23b102fd9014dd635bfe3e7a7df617b6dd1000e6b3ee4ec62ab831099f2a597",
+        "bytes": 2197
+      },
+      "decision": "The full upstream patch adds configurable focus-indicator shape inheritance to modern button interactive machinery, with FAB explicitly opting out. The owned port adds new pseudo-element radius selectors absent from16. Restore historical owned focus geometry, without altering current public MDC focus styles.",
+      "regression": "button-focus-radius",
+      "proof": "compatibility/rc/resting-resource-css-source-proof.json",
+      "public_minimum_contexts": "compatibility/rc/resting-style-peer-source-contexts.json",
+      "current_source_head": "a41b3453717f337870457cbe5af3d2624fbf4365"
+    },
+    {
+      "sha": "f67ffa5c0f3c45ca4ce1661b8be6356dd615feed",
+      "topic": "Button icon stacking",
+      "source_review": "Complete hunk inspected individually; actual public-minimum module/style contexts inspected on both lines.",
+      "reviewer": "Codex primary implementer",
+      "admission_status": "pending-rendered-regression-and-independent-audit",
+      "proposed_disposition": "owned-retained with separate current public peer implementation",
+      "patch": {
+        "path": "compatibility/rc/resting-style-upstream-patches/f67ffa5c0f3c45ca4ce1661b8be6356dd615feed.patch",
+        "sha256": "1225f6f0c038983afcba3d08ee8cec6db7b05a5eb9e41bbb7061b279dc51ed44",
+        "bytes": 1067
+      },
+      "decision": "The complete upstream hunk puts modern .mat-icon alongside .mdc-button__label above modern touch/state layers. The owned port copies stacking onto the historical wrapper and i elements. Those additions are absent from the tagged legacy structural CSS. Restore16 wrapper geometry; current public MDC markup and stacking remain independent.",
+      "regression": "button-icon-stacking",
+      "proof": "compatibility/rc/resting-resource-css-source-proof.json",
+      "public_minimum_contexts": "compatibility/rc/resting-style-peer-source-contexts.json",
+      "current_source_head": "a41b3453717f337870457cbe5af3d2624fbf4365"
+    }
+  ],
+  "other_owned_repairs": [
+    "Restore selected single-option indicator selectors using the existing historical mat-option-multiple host binding; no DOM inference selector.",
+    "Remove extra optgroup inherited color absent from original CSS.",
+    "Restore menu max-height calc(100vh -48px); do not weaken historical positioning assertions or reinterpret100vh as a gutter."
+  ],
+  "limits": [
+    "No new terminal SHA or authored-use closure.",
+    "The exact retained form-field/menu motion and empty-panel extensions are bound as unqualified receipts; lifecycle/native rendered review remains required.",
+    "No full Sass seal, Angular runtime, packed artifact, native matrix, consumer build or independent audit executed."
+  ]
+}
