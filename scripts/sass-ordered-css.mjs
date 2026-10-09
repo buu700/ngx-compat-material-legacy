@@ -22,6 +22,7 @@ import {fileURLToPath} from 'node:url';
 import {ORDERED_CORE_CASES,ORDERED_CORE_CONTRACT,orderedCoreResultMatches} from './sass-ordered-core-contract.mjs';
 import {ORDERED_AGGREGATE_CASES,ORDERED_AGGREGATE_CONTRACT,orderedAggregateResultMatches} from './sass-ordered-aggregate-contract.mjs';
 
+import {RIPPLE_COLOR_ORDERED_CASES,RIPPLE_COLOR_CONTRACT,orderedRippleColorResultsMatch} from './sass-ripple-color-contract.mjs';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 export const ORDERED_CSS_FIXTURE_IDS = Object.freeze([
@@ -158,6 +159,14 @@ export function orderedCssResults(report, compiledReport = null) {
     const rows=(report?.files||[]).filter(item=>item.file===`${id}.css`);
     const row=rows.length===1?files.get(`${id}.css`):null;
     const exact = row?.status === 'exact';
+    if(Object.hasOwn(RIPPLE_COLOR_ORDERED_CASES,id)&&compiledReport!==null){
+      const records=(compiledReport?.fixtures||[]).filter(item=>item.id===id),record=records.length===1?records[0]:null;
+      const conforms=orderedRippleColorResultsMatch(row,record),entry=RIPPLE_COLOR_ORDERED_CASES[id];
+      return {case_id:id,result:conforms?'pass':'fail',kind:'assertion',status:conforms?'conforming-current-companion':row?.status??'missing',
+        raw_status:row?.status??'missing',baseline_sha256:row?.baseline_sha256??null,candidate_sha256:row?.candidate_sha256??null,
+        fixture:entry.fixture,fixture_sha256:record?.fixture_sha256??null,reference:entry.reference,reference_sha256:entry.original.css_sha256,
+        comparison:RIPPLE_COLOR_CONTRACT,actual_measurement:record?.actual_measurement??null,current_companion:record?.current_companion??null};
+    }
     if(Object.hasOwn(ORDERED_AGGREGATE_CASES,id)&&compiledReport!==null){
       const records=(compiledReport?.fixtures||[]).filter(item=>item.id===id),record=records.length===1?records[0]:null;
       const conforming=orderedAggregateResultMatches(row,record),entry=ORDERED_AGGREGATE_CASES[id];
@@ -198,7 +207,7 @@ export function writeOrderedCssAssertions(outputDir, results, identity = null) {
       status: item.status,
       baseline_sha256: item.baseline_sha256,
       candidate_sha256: item.candidate_sha256,
-      note: item.comparison===ORDERED_AGGREGATE_CONTRACT?'Complete historical aggregate sequence with independently measured public contributions;raw golden difference retained.':item.comparison===ORDERED_CORE_CONTRACT?'Complete historical owned core CSS with independently measured public CDK contributions;raw golden difference retained.':'Exact ordered CSS against the sealed Material16.2.14 reference. Rendering is checked separately.',
+      note: item.comparison===RIPPLE_COLOR_CONTRACT?'Complete historical ripple colors with the independently measured public color binding;raw golden difference retained.':item.comparison===ORDERED_AGGREGATE_CONTRACT?'Complete historical aggregate sequence with independently measured public contributions;raw golden difference retained.':item.comparison===ORDERED_CORE_CONTRACT?'Complete historical owned core CSS with independently measured public CDK contributions;raw golden difference retained.':'Exact ordered CSS against the sealed Material16.2.14 reference. Rendering is checked separately.',
     }, null, 2)}\n`);
     const name = `${item.case_id}.json`;
     writeFileSync(join(outputDir, name), body);

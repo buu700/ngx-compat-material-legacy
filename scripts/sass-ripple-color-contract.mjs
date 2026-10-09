@@ -8,7 +8,9 @@
  */
 /**39 finite insertions into complete untouched16 CSS;3 legacy-core-color controls stay exact. */
 import {createHash} from 'node:crypto';
-import {readFileSync} from 'node:fs';
+import {readFileSync,realpathSync} from 'node:fs';
+import {relative,isAbsolute} from 'node:path';
+import {fileURLToPath} from 'node:url';
 import {measureM2PeerProgram,peerMeasurementMatches} from './sass-current-companion-peer.mjs';
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 const bytes=readFileSync(new URL('../fixtures/sass/ripple-color-contracts.json',import.meta.url));
@@ -102,4 +104,35 @@ for(const [id,e] of Object.entries(catalog.cases)){
   if(!peerMeasurementMatches({...p,sources:ss},program,{})||p.member_css.length!==e.slots.length
    ||p.member_css.some((css,i)=>css!==e.slots[i].scope+' {\n  --mat-ripple-color: '+e.slots[i].token+';\n}'))throw Error('public ripple override evidence changed');
  }
+}
+
+/** Reconstruct only the immutable original capsule; callers cannot mutate the catalog. */
+export function rippleColorOriginalMeasurement(id){
+ const e=entry(id);return e?structuredClone({...e.original,sources:catalog.original_source_sets[e.original.source_set]}):null;
+}
+export function rippleColorDefaultResultsMatch(id,actual,contract){
+ if(!Object.hasOwn(RIPPLE_COLOR_DEFAULT_CASES,id)||contract?.classification!=='conforming-current-companion'||contract.contract!==RIPPLE_COLOR_CONTRACT)return false;
+ const m=actual?.actual_measurement;
+ return rippleColorMeasurementOkay(id,m,contract.peer?.line)&&m.css===actual.css&&m.css_sha256===actual.sha256
+  &&rippleColorResultsMatch(id,rippleColorOriginalMeasurement(id),m,contract.peer);
+}
+export function rippleColorArgumentResultsMatch(id,original,actual,contract){
+ if(!(Object.hasOwn(RIPPLE_COLOR_ARGUMENT_CASES,id)||Object.hasOwn(RIPPLE_COLOR_OWNED_CASES,id))||contract?.classification!=='conforming-current-companion'||contract.contract!==RIPPLE_COLOR_CONTRACT)return false;
+ return rippleColorMeasurementOkay(id,actual,contract.peer?.line)&&rippleColorResultsMatch(id,original,actual,contract.peer);
+}
+export function measureOrderedRippleColor({id,source,fixtureFile,result,roots,sass,line}){
+ const e=RIPPLE_COLOR_ORDERED_CASES[id];if(!e||roots.length!==3||sha(source.replace("'@angular/material'","'__entry__'"))!==e.program_sha256)throw Error('ordered ripple fixture recipe changed');
+ const invocation=realpathSync(fixtureFile),fixtureHash=sha(readFileSync(new URL('../'+e.fixture,import.meta.url)));
+ if(sha(source)!==fixtureHash||sha(readFileSync(invocation))!==fixtureHash)throw Error('ordered ripple fixture bytes changed');
+ roots=roots.map(path=>realpathSync(path));
+ const sources=result.loadedUrls.map(url=>{if(url.protocol!=='file:')throw Error('ordered ripple non-file source');const file=realpathSync(fileURLToPath(url));if(file===invocation)return null;const which=roots.findIndex(base=>{const p=relative(base,file);return !isAbsolute(p)&&p!=='..'&&!p.startsWith('../');});if(which<0)throw Error('ordered ripple source outside artifact/peers');const bytes=readFileSync(file);return {root:which,path:relative(roots[which],file).replaceAll('\\','/'),sha256:sha(bytes),bytes:bytes.length};}).filter(Boolean).sort((a,b)=>a.root-b.root||a.path.localeCompare(b.path));
+ const m={line,css:result.css,css_sha256:sha(result.css),css_bytes:Buffer.byteLength(result.css),program_sha256:e.program_sha256,sass_version:sass.info,sources};
+ if(!rippleColorMeasurementOkay(id,m,line))throw Error('ordered ripple measurement incomplete');return m;
+}
+export function orderedRippleColorResultsMatch(row,record){
+ const id=record?.id,e=RIPPLE_COLOR_ORDERED_CASES[id],m=record?.actual_measurement,c=record?.current_companion;
+ return !!e&&!Object.hasOwn(record,'current_infrastructure')&&row?.status==='blocked'&&record.status==='compiled'&&record.module==='@ngx-compat/material-legacy'&&record.fixture_sha256===sha(readFileSync(new URL('../'+e.fixture,import.meta.url)))
+  &&record.css_sha256===m?.css_sha256&&record.css_bytes===m?.css_bytes&&row?.baseline_sha256===e.original.css_sha256
+  &&row?.candidate_sha256===m?.css_sha256&&c?.classification==='conforming-current-companion'&&c.contract===RIPPLE_COLOR_CONTRACT
+  &&rippleColorMeasurementOkay(id,m,c.peer?.line)&&rippleColorResultsMatch(id,rippleColorOriginalMeasurement(id),m,c.peer);
 }

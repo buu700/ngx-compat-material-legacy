@@ -39,7 +39,8 @@ try {
  const aggregateTypographyCases=Object.keys((await import('./scripts/sass-aggregate-typography-contract.mjs')).AGGREGATE_TYPOGRAPHY_CASES);
  const aggregateColorThemeCases=Object.keys((await import('./scripts/sass-aggregate-color-theme-contract.mjs')).AGGREGATE_COLOR_THEME_CASES);
  const formFieldStateCases=Object.keys((await import('./scripts/sass-form-field-state-contract.mjs')).FORM_FIELD_STATE_ARGUMENT_CASES);
- assert.deepEqual(result.results.filter(p=>p.result!=='pass').map(p=>p.case_id).sort(),[...sortCases,...treeCases,...additionCases,...aliasCases,...shapeCases,...controlsCases,...aggregateDensityCases,...aggregateTypographyCases,...aggregateColorThemeCases,...formFieldStateCases].sort());
+ const rippleCases=Object.keys((await import('./scripts/sass-ripple-color-contract.mjs')).RIPPLE_COLOR_ARGUMENT_CASES);
+ assert.deepEqual(result.results.filter(p=>p.result!=='pass').map(p=>p.case_id).sort(),[...sortCases,...treeCases,...additionCases,...aliasCases,...shapeCases,...controlsCases,...aggregateDensityCases,...aggregateTypographyCases,...aggregateColorThemeCases,...formFieldStateCases,...rippleCases].sort());
  const observed=result.results[0];assert.equal(mixinArgumentResultsMatch(observed.expected,observed.actual),true);
  assert.equal(mixinArgumentResultsMatch(observed.expected,{...observed.actual,css:'wrong'}),false);
  assert.equal(mixinArgumentResultsMatch(observed.expected,observed.mutation),false);

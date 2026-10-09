@@ -1,9 +1,10 @@
-/** Exact owned-only aggregate CSS against untouched16 legacy membership. */
+/** Historical owned aggregate CSS with a finite public ripple binding. */
 import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import {join} from 'node:path';
 import {measureMixinArgument,mixinArgumentResultsMatch} from './sass-mixin-arguments.mjs';
+import {RIPPLE_COLOR_OWNED_CASES,RIPPLE_COLOR_CONTRACT,measureRippleColorPeer,rippleColorArgumentResultsMatch} from './sass-ripple-color-contract.mjs';
 const root=fileURLToPath(new URL('..',import.meta.url));
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
 export const OWNED_AGGREGATE_CATALOG='fixtures/sass/owned-aggregate-contracts.json';
@@ -24,16 +25,23 @@ export function runOwnedAggregateContracts({sass,entry,loadPaths,allowedRoots,im
  const catalog=ownedAggregateCatalog();
  const provenance={...identity,catalog:OWNED_AGGREGATE_CATALOG,catalog_sha256:catalog.sha256};
  const results=catalog.cases.map(probe=>{
-  let expected,actual,error;
+  let expected,actual,error,current_companion;
   try {
    expected=measureMixinArgument(sass,referenceEntry,[referenceRoot],catalog,{...probe,call:probe.reference_call},[referenceRoot]);
    actual=measureMixinArgument(sass,entry,loadPaths,catalog,probe,allowedRoots,importers);
+   if(Object.hasOwn(RIPPLE_COLOR_OWNED_CASES,probe.case_id)){
+    actual={...actual,line,sass_version:sass.info};
+    const peer=measureRippleColorPeer({sass,materialRoot:allowedRoots[1],cdkRoot:allowedRoots[2],caseId:probe.case_id,line});
+    current_companion={classification:'conforming-current-companion',contract:RIPPLE_COLOR_CONTRACT,peer};
+   }
   }catch(caught){error=String(caught.message||caught);}
   const css=(actual?.css||'')+'\n.wrong-nonempty-mixin { color: red; }\n';
   const mutation={css,css_sha256:hash(css),css_bytes:Buffer.byteLength(css)};
-  const mutation_rejected=Boolean(expected&&actual&&!mixinArgumentResultsMatch(expected,mutation));
+  const conforms=value=>Object.hasOwn(RIPPLE_COLOR_OWNED_CASES,probe.case_id)?rippleColorArgumentResultsMatch(probe.case_id,expected,{...actual,...value},current_companion):mixinArgumentResultsMatch(expected,value);
+  const mutation_rejected=Boolean(expected&&actual&&!conforms(mutation));
   return {...probe,line,expected,actual,error:error??null,identity:provenance,mutation,mutation_rejected,
-   result:!error&&mixinArgumentResultsMatch(expected,actual)&&mutation_rejected?'pass':'fail'};
+   ...(current_companion?{current_companion,comparison:'current-companion-contract'}:{}),
+   result:!error&&conforms(actual)&&mutation_rejected?'pass':'fail'};
  });
  return {results,identity:provenance,ok:results.length===20&&results.every(row=>row.result==='pass')};
 }

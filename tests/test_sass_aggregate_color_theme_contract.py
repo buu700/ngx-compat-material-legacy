@@ -83,12 +83,12 @@ import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';imp
 import {AGGREGATE_COLOR_THEME_CASES,aggregateColorThemeExpectedCss,aggregateColorThemeResultsMatch,aggregateColorThemePeerProgram} from './scripts/sass-aggregate-color-theme-contract.mjs';
 const f=JSON.parse(readFileSync('tests/sass_aggregate_color_theme_fixture.json')),sha=s=>createHash('sha256').update(s).digest('hex'),measure=css=>({css,css_sha256:sha(css),css_bytes:Buffer.byteLength(css)});
 for(const line of ['main','21.x'])for(const [id,entry] of Object.entries(AGGREGATE_COLOR_THEME_CASES)){
- const original=measure(f.originals[id]),actual=measure(f.candidate_inputs[id+'-'+line]),peer=f.peers[entry.peer_profile+'-'+line];
+ const original=measure(f.originals[id]),stored=f.measurements[id+'-'+line],source=JSON.parse(readFileSync('tests/'+f.source_fixture)),actual={...stored,sources:source.source_sets[stored.source_set]},peer=f.peers[entry.peer_profile+'-'+line];
  assert.equal(aggregateColorThemePeerProgram(id),peer.program);assert.equal(aggregateColorThemeExpectedCss(id,original,peer),actual.css);assert.ok(aggregateColorThemeResultsMatch(id,original,actual,peer));
  const changes=[actual.css+'\n.unrelated { color: red; }',actual.css.replace('.cdk-high-contrast-active .sass-argument-probe .mat-badge-content','.missing-historical-class'),actual.css.replace('transition: transform 200ms','transition: transform 0ms'),actual.css.replace('var(--mat-badge-container-shape, 50%)','var(--mat-badge-container-shape, 49%)')];
  if(id.includes('-themes/'))changes.push(actual.css.replace('var(--mat-icon-button-touch-target-display, none)','var(--mat-icon-button-touch-target-display, block)'));
  if(entry.profile==='2018')changes.push(actual.css.replace('@keyframes mdc-linear-progress-buffering','@keyframes wrong-buffering'),actual.css.replace('data:image/svg+xml','data:image/wrong-svg'));
- for(const css of changes){assert.notEqual(css,actual.css);assert.equal(aggregateColorThemeResultsMatch(id,original,measure(css),peer),false);}
+ for(const css of changes){assert.notEqual(css,actual.css);assert.equal(aggregateColorThemeResultsMatch(id,original,{...actual,...measure(css)},peer),false);}
  for(const source of peer.sources.filter(s=>s.root===1||s.path==='badge/_badge-theme.scss')){const wrong=structuredClone(peer);wrong.sources=wrong.sources.filter(s=>s.root!==source.root||s.path!==source.path);assert.equal(aggregateColorThemeExpectedCss(id,original,wrong),null);}
  const wrong=structuredClone(peer);wrong.sources[0].sha256='0'.repeat(64);assert.equal(aggregateColorThemeExpectedCss(id,original,wrong),null);
  const key=Object.keys(f.peers).find(k=>k.endsWith('-'+line)&&k!==entry.peer_profile+'-'+line);assert.equal(aggregateColorThemeExpectedCss(id,original,f.peers[key]),null);

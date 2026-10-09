@@ -13,6 +13,10 @@ def _companion_programs(root):
     return json.loads(subprocess.run(['node','--input-type=module','-e',code],cwd=root,check=True,capture_output=True,text=True).stdout)
 
 def mixin_receipt(root,active,case,invocation):
+    from sass_ripple_color_admission import RIPPLE_COLOR_ARGUMENT_CASES
+    if case in RIPPLE_COLOR_ARGUMENT_CASES:
+        from sass_ripple_color_fixture import ripple_color_receipt
+        return ripple_color_receipt(active,case,invocation)
     from sass_form_field_state_admission import FORM_FIELD_STATE_ARGUMENT_CASES
     if case in FORM_FIELD_STATE_ARGUMENT_CASES:
         from sass_form_field_state_fixture import form_field_state_receipt
@@ -73,6 +77,8 @@ def mixin_receipt(root,active,case,invocation):
             fixture=json.loads((Path(__file__).parent/'sass_aggregate_color_theme_fixture.json').read_bytes())
             line=body['line'];original=fixture['originals'][case];actual=fixture['candidate_inputs'][case+'-'+line]
             for role,value in [('expected',original),('actual',actual)]:body[role].update(css=value,css_sha256=hashlib.sha256(value.encode()).hexdigest(),css_bytes=len(value.encode()))
+            measurement=copy.deepcopy(fixture['measurements'][case+'-'+line]);source=json.loads((Path(__file__).parent/fixture['source_fixture']).read_bytes())
+            measurement['sources']=copy.deepcopy(source['source_sets'][measurement.pop('source_set')]);body['actual']=measurement
             body['current_companion']=dict(classification='conforming-current-companion',contract='historical-color-theme-aggregate-with-qualified-members',peer=copy.deepcopy(fixture['peers'][AGGREGATE_COLOR_THEME_CASES[case]['peer_profile']+'-'+line]))
             body['comparison']='current-companion-contract'
             wrong=actual+'\n.wrong-nonempty-mixin { color: red; }\n';body['mutation']=dict(css=wrong,css_sha256=hashlib.sha256(wrong.encode()).hexdigest(),css_bytes=len(wrong.encode()))
@@ -135,6 +141,10 @@ def mixin_receipt(root,active,case,invocation):
 
 def owned_aggregate_receipt(root,active,case,invocation):
     """Synthetic validator input, not an original or candidate Sass observation."""
+    from sass_ripple_color_admission import RIPPLE_COLOR_OWNED_CASES
+    if case in RIPPLE_COLOR_OWNED_CASES:
+        from sass_ripple_color_fixture import ripple_color_receipt
+        return ripple_color_receipt(active,case,invocation)
     raw=(root/'fixtures/sass/owned-aggregate-contracts.json').read_bytes();catalog=json.loads(raw)
     probe=next(p for p in catalog['cases'] if p['case_id']==case)
     # Owned-only synthetic receipts must not inherit current companion CSS.

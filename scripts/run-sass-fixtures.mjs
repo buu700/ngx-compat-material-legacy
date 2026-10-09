@@ -11,6 +11,7 @@ import crypto from 'node:crypto';
 import {ORDERED_CORE_CASES,ORDERED_CORE_CONTRACT,measureOrderedCore,measureOrderedCorePeer} from './sass-ordered-core-contract.mjs';
 import {ORDERED_AGGREGATE_CASES,ORDERED_AGGREGATE_CONTRACT,measureOrderedAggregate,measureOrderedAggregatePeers} from './sass-ordered-aggregate-contract.mjs';
 
+import {RIPPLE_COLOR_ORDERED_CASES,RIPPLE_COLOR_CONTRACT,measureOrderedRippleColor,measureRippleColorPeer} from './sass-ripple-color-contract.mjs';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
 if (args.includes('--help')) {
@@ -66,6 +67,12 @@ for (const c of selected) {
     });
     fs.writeFileSync(path.join(output,c.id+'.css'), result.css);
     Object.assign(record,{status:'compiled',css_sha256:hash(result.css),warnings:warningMessages});
+    if(targetModule==='@ngx-compat/material-legacy'&&Object.hasOwn(RIPPLE_COLOR_ORDERED_CASES,c.id)){
+      const roots=['@ngx-compat/material-legacy','@angular/material','@angular/cdk'].map(pkg=>path.join(env,'node_modules',...pkg.split('/')));
+      const actual_measurement=measureOrderedRippleColor({id:c.id,source,fixtureFile:sourceFile,result,roots,sass,line});
+      const peer=measureRippleColorPeer({sass,materialRoot:roots[1],cdkRoot:roots[2],line,caseId:c.id});
+      Object.assign(record,{css_bytes:actual_measurement.css_bytes,actual_measurement,current_companion:{classification:'conforming-current-companion',contract:RIPPLE_COLOR_CONTRACT,peer}});
+    }
     if(targetModule==='@ngx-compat/material-legacy'&&Object.hasOwn(ORDERED_CORE_CASES,c.id)){
       const roots=['@ngx-compat/material-legacy','@angular/material','@angular/cdk'].map(pkg=>path.join(env,'node_modules',...pkg.split('/')));
       const actual_measurement=measureOrderedCore({id:c.id,source,fixtureFile:sourceFile,result,roots,sass,line});

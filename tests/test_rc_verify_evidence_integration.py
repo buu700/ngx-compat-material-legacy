@@ -389,6 +389,10 @@ class CoordinatorTests(unittest.TestCase):
             elif case_id.startswith('function-value/'):
                 from sass_function_fixture import function_receipt
                 body=function_receipt(ROOT,self.run,case_id,invocation)
+            elif case_id in verify.RIPPLE_COLOR_DEFAULT_CASES or case_id in verify.RIPPLE_COLOR_ORDERED_CASES:
+                from sass_ripple_color_fixture import ripple_color_receipt
+                body=ripple_color_receipt(self.run,case_id,invocation)
+                if tarball is not None:body['tarball_sha256']=tarball
             elif case_id in verify.FORM_FIELD_STATE_DEFAULT_CASES:
                 from sass_form_field_state_fixture import form_field_state_receipt
                 body=form_field_state_receipt(self.run,case_id,invocation)
