@@ -239,8 +239,9 @@ export class MatLegacySelect extends _MatSelectBase<MatLegacySelectChange> imple
       this._calculateOverlayPosition();
 
       // Set the font size on the panel element once it exists.
-      this._ngZone.onStable.pipe(take(1)).subscribe(() => {
+      this._ngZone.onStable.pipe(take(1), takeUntil(this._destroy)).subscribe(() => {
         if (
+          this.panelOpen &&
           this._triggerFontSize &&
           this._overlayDir.overlayRef &&
           this._overlayDir.overlayRef.overlayElement
