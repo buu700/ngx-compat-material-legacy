@@ -10,6 +10,7 @@ import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
 import {readFileSync, writeFileSync, existsSync} from 'node:fs';
 import {createHash} from 'node:crypto';
+import {gunzipSync} from 'node:zlib';
 import {resolve, dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..'), require = createRequire(import.meta.url), ts = require('typescript');
@@ -94,6 +95,15 @@ export async function observations(family, prototype) {
     await check('nested-and-unknown-native-events-are-inert', true, f => {f.open(); const host = {}; f.instance._onCssAnimationDone({target: {}, currentTarget: host, animationName: 'mat-legacy-menu-enter'}); f.end('foreign-animation'); assert.deepEqual(f.events, []); f.instance._onCssAnimationDone({target: host, currentTarget: host, animationName: 'mat-legacy-menu-enter'}); assert.deepEqual(f.events, ['enter']);});
   } else {
     await check('enter-completes-once', true, f => {f.open(); f.end('mat-legacy-select-enter'); f.end('mat-legacy-select-enter'); assert.deepEqual(f.events, ['showing']);});
+    for (const enabled of [true, false]) await check('close-before-panel-view-resolves-' + (enabled ? 'enabled' : 'disabled'), enabled, f => {
+      f.instance.panel = undefined;
+      f.open(); f.closePanel();
+      assert.equal(f.instance._panelOpen, false);
+      assert.equal(f.instance._overlayAttached, false);
+      assert.deepEqual(f.events, ['void']);
+      assert.equal(f.c.timers.size, 0);
+      assert.equal(f.dom.callbacks.size, 0);
+    });
     await check('exit-fallback-detaches-once', true, f => {f.open(); f.closePanel(); const stale = [...f.c.timers.values()][0].run; f.c.advance(199); assert.equal(f.instance._overlayAttached, true); f.c.advance(1); stale(); assert.deepEqual(f.events, ['void']); assert.equal(f.instance._overlayAttached, false); assert.equal(f.dom.callbacks.size, 0);});
     await check('real-host-exit-event-cancels-fallback', true, f => {f.open(); f.closePanel(); f.dom.end('foreign-animation'); assert.deepEqual(f.events, []); f.dom.end(); f.c.advance(500); assert.deepEqual(f.events, ['void']); assert.equal(f.dom.callbacks.size, 0); assert.equal(f.c.timers.size, 0);});
     await check('nested-exit-event-is-inert', true, f => {f.open(); f.closePanel(); const handler = [...f.dom.callbacks][0]; handler({target: {}, currentTarget: f.dom.target, animationName: 'mat-legacy-select-exit'}); assert.deepEqual(f.events, []); f.dom.end(); assert.deepEqual(f.events, ['void']);});
@@ -113,9 +123,27 @@ export async function observations(family, prototype) {
   }
   return cases;
 }
+const minimumUnresolvedPanelGuards = [];
+for (const cap of JSON.parse(readFileSync(resolve(root, 'compatibility/rc/select-unresolved-panel-peer-sources/identities.json'), 'utf8'))) {
+  const compressed = readFileSync(resolve(root, cap.retained.path)); assert.equal(sha(compressed), cap.retained.sha256);
+  const bytes = gunzipSync(compressed); assert.equal(sha(bytes), cap.member_sha256); assert.equal(bytes.length, cap.member_bytes);
+  const file = ts.createSourceFile('peer-select.mjs', bytes.toString('utf8'), ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+  const owner = file.statements.find(node => ts.isClassDeclaration(node) && node.name?.text === 'MatSelect');
+  const method = owner.members.find(node => node.name?.getText(file) === '_exitAndDetach'); assert.ok(method);
+  const detach = owner.members.find(node => node.name?.getText(file) === '_detachOverlay'); assert.ok(detach);
+  const exports = {}; new Function('exports', emit('export class Peer {' + method.getText(file) + detach.getText(file) + '}'))(exports);
+  for (const disabled of [false, true]) {
+    let detaches = 0, marks = 0; const instance = Object.create(exports.Peer.prototype);
+    Object.assign(instance, {_animationsDisabled: disabled, panel: undefined, _overlayDir: {detachOverlay() { detaches++; }}, _changeDetectorRef: {markForCheck() { marks++; }}});
+    instance._exitAndDetach(); assert.equal(detaches, 1); assert.equal(marks, 1);
+    minimumUnresolvedPanelGuards.push({line: cap.line, version: cap.version, member_sha256: cap.member_sha256,
+      complete_method_sha256: sha(method.getText(file)), complete_method: method.getText(file), animations_disabled: disabled,
+      detaches, marks, detach_method_sha256: sha(detach.getText(file)), detach_method: detach.getText(file), scope: 'Complete exact minimum exit and detach methods on unresolved-panel synthetic receiver only; no constructor, DI, native or full minimum runtime qualification.'});
+  }
+}
 const args = process.argv.slice(2), options = {};
 for (let i = 0; i < args.length; i += 2) {assert.ok(['--report', '--allow-failures'].includes(args[i])); options[args[i]] = args[i + 1];}
-const report = {schema_version: 1, line: JSON.parse(readFileSync(resolve(root, 'projects/ngx-material-legacy/package.json'))).version.startsWith('21.') ? '21.x' : 'main', node: process.version, compiler: ts.version, source_sha256: Object.fromEntries(Object.entries(raw).map(([family, text]) => [family, sha(text)])), helper_sha256: sha(helperSource), families: {}, scope: 'Actual whole owned prototype method bodies, with constructor/decorator execution excluded. Deterministic timers, real Promise microtasks, Node EventTarget host events, borrowed RxJS7.8.2 streams, synthetic view/key/position services. No Angular constructor, public OverlayRef, browser, packed or full minimum runtime qualification.', g11_claim: 'not-passed'};
+const report = {minimum_unresolved_panel_guards: minimumUnresolvedPanelGuards, schema_version: 1, line: JSON.parse(readFileSync(resolve(root, 'projects/ngx-material-legacy/package.json'))).version.startsWith('21.') ? '21.x' : 'main', node: process.version, compiler: ts.version, source_sha256: Object.fromEntries(Object.entries(raw).map(([family, text]) => [family, sha(text)])), helper_sha256: sha(helperSource), families: {}, scope: 'Actual whole owned prototype method bodies, with constructor/decorator execution excluded. Deterministic timers, real Promise microtasks, Node EventTarget host events, borrowed RxJS7.8.2 streams, synthetic view/key/position services. No Angular constructor, public OverlayRef, browser, packed or full minimum runtime qualification.', g11_claim: 'not-passed'};
 for (const family of ['menu', 'select']) report.families[family] = await observations(family, ownedPrototype(family));
 report.failures = Object.values(report.families).flat().filter(row => row.result !== 'pass');
 report.mutations = [];
@@ -136,6 +164,7 @@ if (!report.failures.length) {
     ['menu', 'repeat-exit-timers', '_resetAnimation', text => text.replace('this._clearExitFallback();', ''), 'repeated-reset-replaces-fallback'],
     ['menu', 'do-not-complete-subject-on-destroy', 'ngOnDestroy', text => text.replace('this._animationDone.complete();', ''), 'destroy-discards-noop-microtask'],
     ['menu', 'late-state-write-after-notification', '_completeAnimation', text => text.replace("this._isAnimating = false;\n    this._animationDone.next({toState: isExit ? 'void' : 'enter'});", "this._animationDone.next({toState: isExit ? 'void' : 'enter'});\n    this._isAnimating = false;"), 'completion-observer-restarts-without-old-phase-clobber'],
+    ['select', 'lose-unresolved-panel-exit-guard', '_exitAndDetach', text => text.replace('!animationsEnabled || !this.panel', '!animationsEnabled'), 'close-before-panel-view-resolves-enabled'],
     ['select', 'remove-enter-deduplication', '_completePanelEnter', text => text.replace('&& !this._completedEnterAnimation', ''), 'enter-completes-once'],
     ['select', 'remove-exit-sequence', '_completePanelExit', text => text.replace('sequence !== this._motionSequence ||', ''), 'old-exit-cannot-complete-a-later-exit'],
     ['select', 'repeat-detached-exit-completion', '_completePanelExit', text => text.replace('|| !this._overlayAttached', ''), 'exit-fallback-detaches-once'],
