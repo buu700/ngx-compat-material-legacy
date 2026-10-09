@@ -12,6 +12,7 @@
  *   node scripts/browser-control-families.mjs --tarball <path> --zoneless
  */
 import {createHash} from 'node:crypto';
+import {observeComponentHighContrast,componentHighContrastOkay} from './component-high-contrast-contract.mjs';
 import {announcedChromeEndpoint,debuggerMatchesChild} from './chromium-debug-endpoint.mjs';
 import {spawnSync as __spawnSyncForWs} from 'node:child_process';
 if (typeof globalThis.WebSocket !== 'function') {
@@ -348,6 +349,7 @@ const families = {
 let error = null;
 let diagnostic = null;
 let zoneGlobal = null;
+let componentHighContrast = null;
 
 try {
   await send('Runtime.enable');
@@ -424,6 +426,8 @@ try {
     '!!document.querySelector("mat-slide-toggle#toggle-disabled.mat-disabled")',
   );
 
+  componentHighContrast = await observeComponentHighContrast({send,evaluate});
+
   zoneGlobal = await evaluate('typeof Zone === "undefined" ? "undefined" : typeof Zone');
 } catch (err) {
   error = String(err);
@@ -454,6 +458,7 @@ const zoneOk = zoneless
 const ok =
   !error
   && zoneOk
+  && componentHighContrastOkay(componentHighContrast)
   && families.input.present && families.input.focused
   && families.list.present && families.list.disabled_class
   && families.slider.present && families.slider.disabled_class && families.slider.value_reflected
@@ -472,6 +477,7 @@ const report = {
   bundle_has_zone: bundleHasZone,
   zone_global: zoneGlobal,
   families,
+  component_high_contrast: componentHighContrast,
   credited_cell_ids: ok ? cells : [],
   matrix_updated: false,
   error,
@@ -488,6 +494,7 @@ const report = {
     'Radio credit is button presence + disabled class on group-disabled mat-radio-button; keyboard/focus/invalid not exercised.',
     'Checkbox credit includes actual forced-color light/dark palettes, detector body classes and black/white checkmark strokes with a wrong-stroke negative; indeterminate/checked/focus/invalid not exercised.',
     'Slide-toggle credit is presence + mat-disabled host class; focus/invalid/checked interaction not exercised.',
+    'Supplemental list opacity, slider thumb-label outline and slide-toggle bar border guards require separate class/native/combined modes and wrong-style negatives; no extra matrix cell credit.',
     'Success is not copied to unexecuted cells.',
     'Does not claim G10.',
   ],
