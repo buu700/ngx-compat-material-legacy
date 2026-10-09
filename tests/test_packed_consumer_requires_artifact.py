@@ -54,3 +54,15 @@ class PackedConsumerRequiresArtifact(unittest.TestCase):
                         self.assertIn(message, result.stderr)
                         self.assertNotIn('Missing tarball', result.stderr)
                         self.assertEqual(list(out.iterdir()), [])
+
+    @unittest.skipUnless(subprocess.run(['node', '-e', "require.resolve('typescript')"],
+        cwd=ROOT, capture_output=True).returncode == 0, 'TypeScript parser unavailable; table admission probe unexecuted')
+    def test_table_construction_case_cannot_disappear_or_admit_false_observation(self):
+        result = subprocess.run(['node', 'tests/packed_table_construction_admission_probe.mjs'],
+            cwd=ROOT, capture_output=True, text=True, timeout=15)
+        self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
+        observation = json.loads(result.stdout)
+        self.assertEqual(observation['cases'], 9)
+        self.assertEqual(observation['mutants_rejected'], 2)
+        self.assertEqual(observation['derived_cases'], 91)
+        self.assertFalse(observation['native_executed'])
