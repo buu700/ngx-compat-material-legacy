@@ -1,0 +1,127 @@
+diff --git a/src/material/core/tokens/_density.scss b/src/material/core/tokens/_density.scss
+index 992efa604..a3063ff10 100644
+--- a/src/material/core/tokens/_density.scss
++++ b/src/material/core/tokens/_density.scss
+@@ -120,6 +120,7 @@ $_density-tokens: (
+     container-size: (56px, 52px, 48px, 40px),
+     form-field-container-height: (40px, 40px, 40px, 40px, 40px, 36px),
+     form-field-container-vertical-padding: (8px, 8px, 8px, 8px, 8px, 6px),
++    touch-target-display: (block, block, none, none),
+   ),
+   (mat, radio): (
+     touch-target-display: (block, block, none, none),
+diff --git a/src/material/core/tokens/m2/mat/_paginator.scss b/src/material/core/tokens/m2/mat/_paginator.scss
+index 4405b905d..8a2398484 100644
+--- a/src/material/core/tokens/m2/mat/_paginator.scss
++++ b/src/material/core/tokens/m2/mat/_paginator.scss
+@@ -69,6 +69,7 @@ $prefix: (mat, paginator);
+     container-size: map.get($size-scale, $density-scale),
+     form-field-container-height: $form-field-height,
+     form-field-container-vertical-padding: $form-field-vertical-padding,
++    touch-target-display: if($density-scale < -2, none, block),
+   );
+ }
+ 
+diff --git a/src/material/paginator/paginator.html b/src/material/paginator/paginator.html
+index d1bf7519d..2e3e31147 100644
+--- a/src/material/paginator/paginator.html
++++ b/src/material/paginator/paginator.html
+@@ -12,6 +12,7 @@
+             [color]="color"
+             class="mat-mdc-paginator-page-size-select">
+             <mat-select
++              #selectRef
+               [value]="pageSize"
+               [disabled]="disabled"
+               [aria-labelledby]="_pageSizeLabelId"
+@@ -25,6 +26,7 @@
+                 </mat-option>
+               }
+             </mat-select>
++          <div class="mat-mdc-paginator-touch-target" (click)="selectRef.open()"></div>
+           </mat-form-field>
+         }
+ 
+diff --git a/src/material/paginator/paginator.scss b/src/material/paginator/paginator.scss
+index 3994a8269..4c66c6e45 100644
+--- a/src/material/paginator/paginator.scss
++++ b/src/material/paginator/paginator.scss
+@@ -9,6 +9,7 @@ $page-size-margin-right: 8px;
+ $items-per-page-label-margin: 0 4px;
+ $selector-margin: 0 4px;
+ $selector-trigger-width: 84px;
++$touch-target-height: 48px;
+ 
+ $range-label-margin: 0 32px 0 24px;
+ $button-icon-size: 28px;
+@@ -17,7 +18,9 @@ $button-icon-size: 28px;
+   display: block;
+ 
+   @include token-utils.use-tokens(
+-    tokens-mat-paginator.$prefix, tokens-mat-paginator.get-token-slots()) {
++    tokens-mat-paginator.$prefix,
++    tokens-mat-paginator.get-token-slots()
++  ) {
+     @include mdc-typography.smooth-font();
+     @include token-utils.create-token-slot(color, container-text-color);
+     @include token-utils.create-token-slot(background-color, container-background-color);
+@@ -29,9 +32,13 @@ $button-icon-size: 28px;
+ 
+     // Apply custom form-field density for paginator.
+     @include token-utils.create-token-slot(
+-        --mat-form-field-container-height, form-field-container-height);
++      --mat-form-field-container-height,
++      form-field-container-height
++    );
+     @include token-utils.create-token-slot(
+-        --mat-form-field-container-vertical-padding, form-field-container-vertical-padding);
++      --mat-form-field-container-vertical-padding,
++      form-field-container-vertical-padding
++    );
+ 
+     .mat-mdc-select-value {
+       @include token-utils.create-token-slot(font-size, select-trigger-text-size);
+@@ -66,7 +73,9 @@ $button-icon-size: 28px;
+   width: 100%;
+ 
+   @include token-utils.use-tokens(
+-    tokens-mat-paginator.$prefix, tokens-mat-paginator.get-token-slots()) {
++    tokens-mat-paginator.$prefix,
++    tokens-mat-paginator.get-token-slots()
++  ) {
+     @include token-utils.create-token-slot(min-height, container-size);
+   }
+ }
+@@ -105,7 +114,9 @@ $button-icon-size: 28px;
+   width: $button-icon-size;
+ 
+   @include token-utils.use-tokens(
+-    tokens-mat-paginator.$prefix, tokens-mat-paginator.get-token-slots()) {
++    tokens-mat-paginator.$prefix,
++    tokens-mat-paginator.get-token-slots()
++  ) {
+     @include token-utils.create-token-slot(fill, enabled-icon-color);
+ 
+     .mat-mdc-icon-button[disabled] & {
+@@ -133,3 +144,21 @@ $button-icon-size: 28px;
+     outline: solid 1px;
+   }
+ }
++
++.mat-mdc-paginator-touch-target {
++  @include token-utils.use-tokens(
++    tokens-mat-paginator.$prefix,
++    tokens-mat-paginator.get-token-slots()
++  ) {
++    @include token-utils.create-token-slot(display, touch-target-display);
++  }
++
++  position: absolute;
++  top: 50%;
++  left: 50%;
++  width: $selector-trigger-width;
++  height: $touch-target-height;
++  background-color: transparent;
++  transform: translate(-50%, -50%);
++  cursor: pointer;
++}
