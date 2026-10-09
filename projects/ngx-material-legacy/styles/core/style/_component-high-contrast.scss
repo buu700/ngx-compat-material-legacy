@@ -1,0 +1,45 @@
+// The MIT License
+// Copyright (c) 2023 Google LLC.
+// Copyright (c) 2026 Ryan Lester.
+// See the package LICENSE for the full terms.
+@use '@angular/cdk' as current-cdk;
+
+// Finite legacy component boundary: explicit `active` calls historically used
+// encapsulation off; the one argument-free list call used encapsulation any.
+// Keep those selector contexts before adding native forced-colors support.
+// This module owns the removed class-nesting helper, not CDK infrastructure.
+@mixin _class-content($host: false) {
+  @at-root {
+    $selector-context: #{&};
+    $class-context: '.cdk-high-contrast-active';
+    @if $host {
+      $class-context: '#{$class-context} :host';
+    }
+    #{$class-context} {
+      @if $selector-context == '' {
+        @content;
+      } @else {
+        #{$selector-context} {
+          @content;
+        }
+      }
+    }
+  }
+}
+
+@mixin high-contrast($target: null) {
+  @if $target != null and $target != active {
+    @error 'The owned legacy component boundary supports only active high contrast.';
+  }
+  @include _class-content() {
+    @content;
+  }
+  @if $target == null {
+    @include _class-content(true) {
+      @content;
+    }
+  }
+  @include current-cdk.high-contrast(active) {
+    @content;
+  }
+}
