@@ -2,6 +2,7 @@
 import {tabPaginationNativeOkay} from './tab-pagination-native-contract.mjs';
 import {componentHighContrastOkay} from './component-high-contrast-contract.mjs';
 import {peerIconTtOkay} from './peer-icon-tt-admission.mjs';
+import {progressCspStyleOkay} from './progress-csp-style-contract.mjs';
 import {legacyCoreHighContrastOkay} from './legacy-core-high-contrast-contract.mjs';
 /**
  * Execute a real Chromium browser slice against a packed artifact and credit
@@ -323,6 +324,7 @@ const scenarios = [
       && report.families?.['progress-spinner']?.present
       && report.families?.['progress-spinner']?.value_reflected
       && peerIconTtOkay(report.peer_icon_tt)
+      && progressCspStyleOkay(report.progress_csp)
       && legacyCoreHighContrastOkay(report.core_high_contrast)
       && !report.error,
   },
@@ -353,6 +355,7 @@ const scenarios = [
       && report.families?.['progress-spinner']?.present
       && report.families?.['progress-spinner']?.value_reflected
       && peerIconTtOkay(report.peer_icon_tt)
+      && progressCspStyleOkay(report.progress_csp)
       && legacyCoreHighContrastOkay(report.core_high_contrast)
       && !report.error,
   },
@@ -386,7 +389,7 @@ for (const scenario of scenarios) {
     }));
   }
   if (detail?.progress_csp) {
-    console.log('progress-bar CSP diagnostic (no acceptance credit): '+JSON.stringify({
+    console.log('progress-bar fixed style/CSP guard (no additional matrix credit): '+JSON.stringify({
       scenario:scenario.id,observation:detail.progress_csp,
     }));
   }

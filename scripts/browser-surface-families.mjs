@@ -16,6 +16,7 @@ import {announcedChromeEndpoint,debuggerMatchesChild} from './chromium-debug-end
 import {observeLegacyCoreHighContrast,legacyCoreHighContrastOkay} from './legacy-core-high-contrast-contract.mjs';
 import {observeRippleColorBinding,rippleColorBindingOkay} from './ripple-color-binding-observation.mjs';
 import {PEER_ICON_TT_CSP, peerIconTtOkay} from './peer-icon-tt-admission.mjs';
+import {progressCspStyleOkay} from './progress-csp-style-contract.mjs';
 import {formFieldStateTokensOkay} from './form-field-state-style-observation.mjs';
 import {spawnSync as __spawnSyncForWs} from 'node:child_process';
 if (typeof globalThis.WebSocket !== 'function') {
@@ -122,7 +123,7 @@ const installed = realpathSync(join(consumer, 'node_modules/@ngx-compat/material
 if (relative(realpathSync(consumer), installed).startsWith('..')) fail(1, `Library resolved outside the consumer: ${installed}`);
 
 // Compile the exported ordinary and legacy progress-bar themes from the packed
-// consumer. The historical IE-only data URI stays intact for this diagnostic.
+// consumer. The historical IE-only data URI stays intact; the guard requires modern dots and CSP enforcement.
 const progressSass = createRequire(join(root, 'package.json'))('sass');
 const progressCss = progressSass.compileString(`
 @use 'sass:map';
@@ -682,6 +683,7 @@ const ok =
   !error
   && zoneOk
   && peerIconTtOkay(peerIconTt)
+  && progressCspStyleOkay(progressCsp)
   && formFieldStateTokensOkay(peerFormHover?.state_token_scenarios)
   && legacyCoreHighContrastOkay(coreHighContrast)
   && rippleColorBindingOkay(rippleColorBinding)
@@ -724,7 +726,7 @@ const report = {
     'Success is not copied to unexecuted cells.',
     'Peer icon TT probe uses actual Chromium require-trusted-types-for enforcement and an allowed Angular policy list; this is not a full script/style/network CSP matrix or arbitrary SVG trust audit.',
     'Public MediaMatcher unsafe-query diagnostic uses one fixed reversible CSS marker; it earns no acceptance/matrix credit and does not establish an owned input path or security clearance.',
-    'Progress CSP diagnostic covers four current modes and legacy buffer with the actual packed exported themes, img-src none and a blocked data-image negative; it earns no acceptance/matrix credit or complete CSP/motion qualification.',
+    'Fixed indigo M2 progress guard requires dots only in current buffer mode, the expected radial gradient and color, retained legacy inline SVG and IE-only data URI, zero positive image violations and an enforced blocked-data-image negative. No additional matrix cells or complete CSP/motion qualification are credited.',
     'Current form-field state check requires light/dark baseline, wrapper/hint hover, focus, token consumption negative and restoration with packed exported Sass. Historical selectors are retained; no additional matrix cells, full Sass or general style qualification are credited.',
     'Ripple color guard consumes packed root/scoped/light/dark/custom/CSS-variable Sass through shared public MatRipple, challenges late public styles and token consumption, and preserves explicit colors and a separate modern color scope. This earns no full Sass/peer-floor/motion/matrix credit.',
     'Does not claim G10.',
