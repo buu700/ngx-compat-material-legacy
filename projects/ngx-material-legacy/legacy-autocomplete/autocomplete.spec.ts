@@ -729,6 +729,75 @@ describe('MatAutocomplete', () => {
         .toEqual('al');
     });
 
+    function prepareRequiredSelection() {
+      fixture.componentInstance.panel.requireSelection = true;
+      const selected = fixture.componentInstance.states[1];
+      fixture.componentInstance.stateCtrl.setValue(selected);
+      tick();
+      fixture.componentInstance.filteredStates = fixture.componentInstance.states;
+      fixture.detectChanges();
+      fixture.componentInstance.trigger.openPanel();
+      fixture.detectChanges();
+      zone.simulateZoneExit();
+      return selected;
+    }
+
+    it('should retain the selected model while typing when selection is required', fakeAsync(() => {
+      const selected = prepareRequiredSelection();
+      const changes = jasmine.createSpy('required selection model changes');
+      const subscription = fixture.componentInstance.stateCtrl.valueChanges.subscribe(changes);
+      input.value = 'Cali';
+      dispatchFakeEvent(input, 'input');
+      fixture.detectChanges();
+      tick();
+      expect(input.value).toBe('Cali');
+      expect(fixture.componentInstance.stateCtrl.value).toBe(selected);
+      expect(changes).not.toHaveBeenCalled();
+      subscription.unsubscribe();
+    }));
+
+    it('should publish the chosen option once after required-selection typing', fakeAsync(() => {
+      prepareRequiredSelection();
+      const changes = jasmine.createSpy('required selection model changes');
+      const subscription = fixture.componentInstance.stateCtrl.valueChanges.subscribe(changes);
+      input.value = 'Al';
+      dispatchFakeEvent(input, 'input');
+      fixture.detectChanges();
+      tick();
+      expect(changes).not.toHaveBeenCalled();
+      const option = overlayContainerElement.querySelector('mat-option') as HTMLElement;
+      expect(option).toBeTruthy();
+      option.click();
+      fixture.detectChanges();
+      tick();
+      expect(fixture.componentInstance.stateCtrl.value).toBe(fixture.componentInstance.states[0]);
+      expect(changes).toHaveBeenCalledTimes(1);
+      expect(changes).toHaveBeenCalledWith(fixture.componentInstance.states[0]);
+      expect(input.value).toBe('Alabama');
+      expect(fixture.componentInstance.trigger.panelOpen).toBe(false);
+      subscription.unsubscribe();
+    }));
+
+    it('should reset unmatched required-selection text once on outside click', fakeAsync(() => {
+      prepareRequiredSelection();
+      const changes = jasmine.createSpy('required selection model changes');
+      const subscription = fixture.componentInstance.stateCtrl.valueChanges.subscribe(changes);
+      input.value = 'Cali';
+      dispatchFakeEvent(input, 'input');
+      fixture.detectChanges();
+      tick();
+      expect(changes).not.toHaveBeenCalled();
+      dispatchFakeEvent(document, 'click');
+      fixture.detectChanges();
+      tick();
+      expect(fixture.componentInstance.stateCtrl.value).toBeNull();
+      expect(changes).toHaveBeenCalledTimes(1);
+      expect(changes).toHaveBeenCalledWith(null);
+      expect(input.value).toBe('');
+      expect(fixture.componentInstance.trigger.panelOpen).toBe(false);
+      subscription.unsubscribe();
+    }));
+
     it('should update control value when autofilling', () => {
       // Simulate the browser autofilling the input by setting a value and
       // dispatching an `input` event while the input is out of focus.
