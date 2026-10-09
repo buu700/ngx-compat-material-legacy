@@ -26,6 +26,7 @@ import {MENU_CONTENT_SYMBOL,menuContentContract,menuContentObservationProblems} 
 import {SIMPLE_SNACK_SYMBOL,simpleSnackObservationProblems} from '../scripts/api-simple-snack-context.mjs';
 import {DIALOG_OPENER_SYMBOL,dialogOpenerObservationProblems} from '../scripts/api-dialog-opener-context.mjs';
 import {AUTOCOMPLETE_SYMBOL,autocompleteProfile,createAutocompleteCapture,observeAutocompleteInputs,finishAutocompleteContext,autocompleteObservationProblems} from '../scripts/api-autocomplete-context.mjs';
+import {INPUT_SYMBOL,inputObservationProblems} from '../scripts/api-input-context.mjs';
 import {tableDefinitionContract,tableDefinitionObservationProblems} from '../scripts/api-table-definition-context.mjs';
 import {TAB_PORTAL_SYMBOL,tabPortalObservationProblems} from '../scripts/api-tab-portal-context.mjs';
 import {SNACK_MOTION_SYMBOL,FORM_FIELD_MOTION_SYMBOL,MENU_MOTION_SYMBOL,TOOLTIP_MOTION_SYMBOL,DIALOG_MOTION_SYMBOL,TAB_BODY_MOTION_SYMBOL,TAB_BODY_BASE_MOTION_SYMBOL,ownedMotionProfile,ownedSelectMotionProblems} from '../scripts/api-owned-motion-context.mjs';
@@ -406,6 +407,39 @@ try{
    else{assert.equal(execution.outcome,'threw');assert.match(execution.error,cell.error);assert.ok(execution.error.length<700);tableDefinitionControls.push({symbol_id:symbol.symbol_id,id:cell.id,result:'rejected',error:execution.error});}
   }
  }
+ const inputControls=[];
+ {
+  const symbol=selected.find(s=>s.symbol_id===INPUT_SYMBOL),owned=await loadRuntimeModule(runtime,'legacy-input','primary'),Type=owned.MatLegacyInput,row=rows.find(r=>r.symbol.symbol_id===INPUT_SYMBOL);
+  assert.equal(row.result,'pass',row.problems.join('\n'));assert.deepEqual(inputObservationProblems(row),[]);inputControls.push({id:'actual-public-parent-legacy-field-native-behavior-and-lifetime',result:'pass',evidence:row.factory_input_context});
+  for(const kind of ['standalone','forms']){
+   const execution=await observePublicNodeFactory(Type,core,runtime,symbol,symbols,load,{inputParentKind:kind});assert.equal(execution.outcome,'returned',kind+': '+(execution.errorStack||execution.error));assert.deepEqual(execution.behaviorProblems,[]);assert.equal(execution.inputContext.caller_kind,kind);assert.equal(execution.inputContext.borrowed_autofill_destroy_calls,0);assert.equal(execution.inputContext.borrowed_parent_destroy_calls,0);
+   if(kind==='forms')assert.ok(execution.inputContext.behavior_checks.some(c=>c.id==='genuine-ng-model-errors-native-value-and-disabled-state'));
+   inputControls.push({id:kind+'-caller-behavior-and-lifetime',result:'pass',evidence:execution.inputContext});
+  }
+  for(const cell of [
+   {id:'foreign-native-node',change:v=>{v._elementRef=new core.ElementRef({});},error:/different native node/},
+   {id:'foreign-autofill-service',change:v=>{v._autofillMonitor={};},error:/borrowed public services differ/},
+   {id:'foreign-zone-service',change:v=>{v._ngZone={};},error:/borrowed public services differ/},
+   {id:'foreign-legacy-field-value',change:v=>{v._legacyFormField={};},error:/legacy field value differs/},
+   {id:'placeholder-override-noop',change:v=>{v._getPlaceholder=()=>v.placeholder;},error:/legacy placeholder promotion differs/},
+   {id:'native-value-notification-noop',change:v=>{v.ngDoCheck=()=>{};},error:/strictly equal/},
+   {id:'focus-noop',change:v=>{v.focus=()=>{};},error:/falsy|false == true/},
+   {id:'aria-describe-noop',change:v=>{v.setDescribedByIds=()=>{};},error:/strictly equal/},
+   {id:'teardown-noop',change:v=>{v.ngOnDestroy=()=>{};},error:/destroy did not complete/},
+   {id:'destroy-borrowed-autofill-service',change:v=>{const destroy=v.ngOnDestroy.bind(v);v.ngOnDestroy=()=>{destroy();v._autofillMonitor.ngOnDestroy();};},error:/destroyed borrowed autofill service/},
+   {id:'destroy-borrowed-legacy-field',change:v=>{const destroy=v.ngOnDestroy.bind(v);v.ngOnDestroy=()=>{destroy();v._legacyFormField.ngOnDestroy();};},error:/destroyed borrowed legacy field/},
+   {id:'unrelated-optional-request',extra:true},
+  ]){
+   const constructorFactory=Receiver=>{if(cell.extra)core.inject(core.Renderer2,{optional:true});return Type.ɵfac(class extends Receiver{constructor(...inputs){super(...inputs);cell.change?.(this);}});};
+   const execution=await observePublicNodeFactory(Type,core,runtime,symbol,symbols,load,{constructorFactory});
+   if(cell.extra){assert.equal(execution.outcome,'returned',execution.error);assert.equal(execution.requests.length,2);inputControls.push({id:cell.id,result:'retained-unclassified-request',retained_requests:2});}
+   else{assert.equal(execution.outcome,'threw');assert.match(execution.error,cell.error);assert.ok(execution.error.length<800);inputControls.push({id:cell.id,result:'rejected',error:execution.error});}
+  }
+  const fixture=await createPublicFactoryContext(core,load,{elementTag:'input',providers:[core.importProvidersFrom(owned.MatLegacyInputModule)]});
+  try{
+   for(const count of [1,10]){const before=runFactory(()=>Reflect.construct(Type,Array.from({length:count},()=>({historicalArgument:true}))),core.Injector,core.runInInjectionContext,{injector:fixture.element.injector});assert.equal(before.outcome,'threw');assert.match(before.error,/manual dependency arguments are not supported/);assert.equal(before.requests.length,0);inputControls.push({id:'retired-'+count+'-argument-construction-explicitly-rejects-before-injection',result:'rejected',requests:0});}
+  }finally{fixture.close();}
+ }
  const constructorMotionControls=[];
  const manualMotionObservations=[];
  const manualMotionLifecycle=[];
@@ -486,7 +520,7 @@ try{
  const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
  const caps=[...new Set([...files.map(file=>file.fileName),...resources])].sort().map(file=>({path:file.slice(root.length+1),sha256:sha(readFileSync(file))}));
  const result={schema_version:1,role:'All original154 factory class source observations;not canonical packed/native/browser/floor qualification',
-  node:process.version,typescript:ts.version,runtime_peer:core.VERSION.full,entries,rows,selected_symbol_ids:[...selectedIds].sort(),emitted_public_import_routes:routes,public_parent_controls:publicParentControls,required_parent_controls:requiredParentControls,caller_config_controls:callerConfigControls,snack_motion_controls:snackMotionControls,constructor_motion_controls:constructorMotionControls,manual_motion_observations:manualMotionObservations,manual_motion_lifecycle:manualMotionLifecycle,dialog_focus_controls:dialogFocusControls,menu_content_controls:menuContentControls,simple_snack_controls:simpleSnackControls,dialog_opener_controls:dialogOpenerControls,autocomplete_manual:autocompleteManual,autocomplete_controls:autocompleteControls,tab_body_manual:tabBodyManual,tab_body_controls:tabBodyControls,tab_portal_controls:tabPortalControls,table_definition_controls:tableDefinitionControls,
+  node:process.version,typescript:ts.version,runtime_peer:core.VERSION.full,entries,rows,selected_symbol_ids:[...selectedIds].sort(),emitted_public_import_routes:routes,public_parent_controls:publicParentControls,required_parent_controls:requiredParentControls,caller_config_controls:callerConfigControls,snack_motion_controls:snackMotionControls,constructor_motion_controls:constructorMotionControls,manual_motion_observations:manualMotionObservations,manual_motion_lifecycle:manualMotionLifecycle,dialog_focus_controls:dialogFocusControls,menu_content_controls:menuContentControls,simple_snack_controls:simpleSnackControls,dialog_opener_controls:dialogOpenerControls,autocomplete_manual:autocompleteManual,autocomplete_controls:autocompleteControls,tab_body_manual:tabBodyManual,tab_body_controls:tabBodyControls,tab_portal_controls:tabPortalControls,table_definition_controls:tableDefinitionControls,input_controls:inputControls,
   passed:rows.filter(row=>row.result==='pass').length,failed:rows.filter(row=>row.result!=='pass').length,
   source_files:files.length,resource_files:resources.size,source_caps:caps,virtual_typecheck_files:virtualFiles.length,
   styles:'SCSS/HTML resources read unchanged by Angular compiler;no Sass/rendered style qualification',

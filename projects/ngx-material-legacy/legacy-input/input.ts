@@ -46,6 +46,14 @@ import {
 export class MatLegacyInput extends BaseMatInput {
   private _legacyFormField = inject<MatLegacyFormField>(MAT_LEGACY_FORM_FIELD, {optional: true});
 
+  /** Construct through Angular node DI; retired dependency arguments must not be ignored. */
+  constructor() {
+    if (arguments.length) {
+      throw new Error('MatLegacyInput manual dependency arguments are not supported.');
+    }
+    super();
+  }
+
   protected override _getPlaceholder() {
     // If we're hiding the native placeholder, it should also be cleared from the DOM, otherwise
     // screen readers will read it out twice: once from the label and once from the attribute.
