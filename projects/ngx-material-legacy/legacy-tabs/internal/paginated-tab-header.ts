@@ -522,6 +522,7 @@ export abstract class MatPaginatedTabHeader
   _handlePaginatorClick(direction: ScrollDirection) {
     if (this._isDestroyed) return;
     this._stopInterval();
+    if (this._isDestroyed) return;
     this._scrollHeader(direction);
   }
 
@@ -670,6 +671,7 @@ export abstract class MatPaginatedTabHeader
 
     // Avoid overlapping timers.
     this._stopInterval();
+    if (this._isDestroyed) return;
 
     // Start a timer after the delay and keep firing based on the interval.
     timer(HEADER_SCROLL_DELAY, HEADER_SCROLL_INTERVAL)

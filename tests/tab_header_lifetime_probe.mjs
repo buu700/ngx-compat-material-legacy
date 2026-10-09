@@ -195,9 +195,23 @@ async function observations(Base) {
   await check('destroy-in-event-cancellation-cannot-start-a-paginator-timer', async () => {
     const f = fixture(Base); try {f.init();
       const event = new Event('mousedown', {cancelable: true}); Object.defineProperty(event, 'button', {value: 0});
+      let stops = 0;const stop = f.header._stopInterval.bind(f.header);f.header._stopInterval = () => {stops++;stop();};
       const prevent = event.preventDefault.bind(event); event.preventDefault = () => {prevent(); f.destroy();};
       f.header._handlePaginatorPress('after', event); assert.equal(event.defaultPrevented, true);
-      assert.equal(f.c.jobs.size, 0);
+      assert.equal(stops, 0);assert.equal(f.c.jobs.size, 0);
+    } finally {f.close();}
+  });
+  await check('destroy-in-stop-callback-cannot-start-a-paginator-timer', async () => {
+    const f = fixture(Base); try {f.init();let destroyed = false;
+      const stop = f.header._stopInterval.bind(f.header);f.header._stopInterval = () => {stop();if (!destroyed) {destroyed = true;f.destroy();}};
+      f.header._handlePaginatorPress('after');assert.equal(f.c.jobs.size, 0);
+    } finally {f.close();}
+  });
+  await check('destroy-in-click-stop-callback-prevents-scroll-measurement', async () => {
+    const f = fixture(Base); try {f.init();let destroyed = false;
+      const stop = f.header._stopInterval.bind(f.header);f.header._stopInterval = () => {stop();if (!destroyed) {destroyed = true;f.destroy();}};
+      const measured = f.counts.measurements, distance = f.header.scrollDistance;f.header._handlePaginatorClick('after');assert.equal(f.counts.measurements, measured);
+      assert.equal(f.header.scrollDistance, distance);
     } finally {f.close();}
   });
   await check('right-paginator-press-keeps-default-and-does-not-scroll', async () => {
@@ -280,7 +294,9 @@ if (!baseline) {
       'destroy-is-idempotent-and-releases-live-observers'],
     ['event-cancellation-after-destruction', source.replace('this._isDestroyed || (mouseEvent && mouseEvent.button != null && mouseEvent.button !== 0)',
       '(mouseEvent && mouseEvent.button != null && mouseEvent.button !== 0)'), 'destroyed-paginator-press-leaves-event-default-untouched'],
-    ['late-timer-after-event-cancellation', source.replace('mouseEvent?.preventDefault?.();\n    if (this._isDestroyed) return;', 'mouseEvent?.preventDefault?.();'), 'destroy-in-event-cancellation-cannot-start-a-paginator-timer'],
+    ['work-after-event-cancellation-destruction', source.replace('mouseEvent?.preventDefault?.();\n    if (this._isDestroyed) return;', 'mouseEvent?.preventDefault?.();'), 'destroy-in-event-cancellation-cannot-start-a-paginator-timer'],
+    ['timer-after-stop-callback-destroy', source.replace('// Avoid overlapping timers.\n    this._stopInterval();\n    if (this._isDestroyed) return;', '// Avoid overlapping timers.\n    this._stopInterval();'), 'destroy-in-stop-callback-cannot-start-a-paginator-timer'],
+    ['scroll-after-click-stop-callback-destroy', source.replace('this._stopInterval();\n    if (this._isDestroyed) return;\n    this._scrollHeader(direction);', 'this._stopInterval();\n    this._scrollHeader(direction);'), 'destroy-in-click-stop-callback-prevents-scroll-measurement'],
     ['removed-pointer-focus-cancellation', source.replace('mouseEvent?.preventDefault?.();', ''), 'left-paginator-press-cancels-default-focus-and-retains-hold-scroll'],
     ['pagination-after-destruction-mark', source.replace('this._checkPaginationEnabled();\n    if (this._isDestroyed) return;',
       'this._checkPaginationEnabled();'), 'destroy-during-pagination-mark-prevents-later-style-and-ink-work'],
