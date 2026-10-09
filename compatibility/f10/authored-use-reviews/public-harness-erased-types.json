@@ -1,0 +1,1032 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "status": "reviewed",
+  "recorded_at_utc": "2026-10-09T19:57:54.011324+00:00",
+  "criteria": "C04 33 exact frozen testing dependency uses in 26 files: 27 retained erased imports (14 BaseHarnessFilters, 12 ComponentHarnessConstructor, one HarnessQuery) and six removed AsyncFactoryFn imports. No owned runtime or full API qualification. Three stable retained declarations match; deprecated factory alias is absent and explicitly expanded.",
+  "reviews": [
+    {
+      "file": "legacy-card/testing/card-harness-filters.ts",
+      "module": "@angular/cdk/testing",
+      "symbol": "BaseHarnessFilters",
+      "candidate_source_sha256": "3b8c491b6be691b2b76e35119ca0dcb9a593beee64780725ea247930a0b38b93",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "In legacy-card/testing/card-harness-filters.ts, public BaseHarnessFilters resolves to exact local binding BaseHarnessFilters at these erased positions: line 15: erased-interface-inheritance: BaseHarnessFilters. The complete independently authenticated original and both minimum declarations match, with stable public exports and tags. Interface inheritance and type/generic references are erased; runtime aliases or class inheritance reject. Strict minimum compiler fixtures prove filter, constructor/query and result contracts, including relevant negative controls. This closes the imported type boundary only; owned runtime behavior, complete API and native/full floor/upstream SHA review remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/harness-erased-types-source-proof.json",
+          "sha256": "d635e79faba3acbd5448909523e84cf9e59a67057618e66141fdd772f388f189"
+        },
+        {
+          "path": "compatibility/rc/harness-erased-types-minimum-source-diagnostic.json",
+          "sha256": "339dd7822516663c9fc9675892805ef313d8127e31dc3accbf3ef39c0bd9926d"
+        },
+        {
+          "path": "scripts/harness-erased-types-review.mjs",
+          "sha256": "1a45b74cf281944fcd20ee6bee192420077453a20a305b290b2ed02ed6ba5f6c"
+        },
+        {
+          "path": "tests/harness_erased_types_probe.mjs",
+          "sha256": "fece5376353865b2408630fe9ca0c01c8665e5eaa41618640fb46889e3e46093"
+        },
+        {
+          "path": "compatibility/rc/component-harness-public-subjects.json",
+          "sha256": "4379f0c1121a731ea7024b2c24af0c0b2f54d1a900d424162f34c4870d1889ff"
+        }
+      ]
+    },
+    {
+      "file": "legacy-tooltip/testing/tooltip-harness-base.ts",
+      "module": "@angular/cdk/testing",
+      "symbol": "AsyncFactoryFn",
+      "candidate_source_sha256": "bc14da07067e0383d85d00a078f70655b3e3a66080bd2d4f26a1785fdba2e765",
+      "conclusion": "removed-use",
+      "reviewer": "Codex primary implementer",
+      "decision": "In legacy-tooltip/testing/tooltip-harness-base.ts, AsyncFactoryFn is absent from imports and all code identifiers. Actual replacement factories: line 14 _optionalPanel: () => Promise<TestElement | null>. The untouched public original alias is exactly () => Promise<T>; both current minima retain it only with deprecated/private/removal tags, and the owned source uses the explicit shape. Zero parameters and Promise result shape are guarded, with result type arguments recorded. Strict branch-minimum standalone fixtures verify the original expansion in both directions. This closes this removed dependency use, while whole historical member/API equality, owned actions and native/full floor qualification remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/harness-erased-types-source-proof.json",
+          "sha256": "d635e79faba3acbd5448909523e84cf9e59a67057618e66141fdd772f388f189"
+        },
+        {
+          "path": "compatibility/rc/harness-erased-types-minimum-source-diagnostic.json",
+          "sha256": "339dd7822516663c9fc9675892805ef313d8127e31dc3accbf3ef39c0bd9926d"
+        },
+        {
+          "path": "scripts/harness-erased-types-review.mjs",
+          "sha256": "1a45b74cf281944fcd20ee6bee192420077453a20a305b290b2ed02ed6ba5f6c"
+        },
+        {
+          "path": "tests/harness_erased_types_probe.mjs",
+          "sha256": "fece5376353865b2408630fe9ca0c01c8665e5eaa41618640fb46889e3e46093"
+        },
+        {
+          "path": "compatibility/rc/component-harness-public-subjects.json",
+          "sha256": "4379f0c1121a731ea7024b2c24af0c0b2f54d1a900d424162f34c4870d1889ff"
+        }
+      ]
+    },
+    {
+      "file": "legacy-paginator/testing/paginator-harness-base.ts",
+      "module": "@angular/cdk/testing",
+      "symbol": "AsyncFactoryFn",
+      "candidate_source_sha256": "34c7600a15b6001a6162b8793eedf6912c7d466553f545219b2a3cd47fa19fd5",
+      "conclusion": "removed-use",
+      "reviewer": "Codex primary implementer",
+      "decision": "In legacy-paginator/testing/paginator-harness-base.ts, AsyncFactoryFn is absent from imports and all code identifiers. Actual replacement factories: line 18 _nextButton: () => Promise<TestElement>; line 19 _previousButton: () => Promise<TestElement>; line 20 _firstPageButton: () => Promise<TestElement | null>; line 21 _lastPageButton: () => Promise<TestElement | null>; line 22 _select: () => Promise<(ComponentHarness & {\n    getValueText(): Promise<string>;\n    clickOptions(...filters: unknown[]): Promise<void>;\n}) | null>; line 29 _pageSizeFallback: () => Promise<TestElement>; line 30 _rangeLabel: () => Promise<TestElement>. The untouched public original alias is exactly () => Promise<T>; both current minima retain it only with deprecated/private/removal tags, and the owned source uses the explicit shape. Zero parameters and Promise result shape are guarded, with result type arguments recorded. Strict branch-minimum standalone fixtures verify the original expansion in both directions. This closes this removed dependency use, while whole historical member/API equality, owned actions and native/full floor qualification remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/harness-erased-types-source-proof.json",
+          "sha256": "d635e79faba3acbd5448909523e84cf9e59a67057618e66141fdd772f388f189"
+        },
+        {
+          "path": "compatibility/rc/harness-erased-types-minimum-source-diagnostic.json",
+          "sha256": "339dd7822516663c9fc9675892805ef313d8127e31dc3accbf3ef39c0bd9926d"
+        },
+        {
+          "path": "scripts/harness-erased-types-review.mjs",
+          "sha256": "1a45b74cf281944fcd20ee6bee192420077453a20a305b290b2ed02ed6ba5f6c"
+        },
+        {
+          "path": "tests/harness_erased_types_probe.mjs",
+          "sha256": "fece5376353865b2408630fe9ca0c01c8665e5eaa41618640fb46889e3e46093"
+        },
+        {
+          "path": "compatibility/rc/component-harness-public-subjects.json",
+          "sha256": "4379f0c1121a731ea7024b2c24af0c0b2f54d1a900d424162f34c4870d1889ff"
+        }
+      ]
+    },
+    {
+      "file": "legacy-table/testing/table-harness-base.ts",
+      "module": "@angular/cdk/testing",
+      "symbol": "ComponentHarnessConstructor",
+      "candidate_source_sha256": "537d249e950c6e44d4becf3e62df9e31e0c21dba6c5616ac0cb5ce7b66ee960c",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "In legacy-table/testing/table-harness-base.ts, public ComponentHarnessConstructor resolves to exact local binding ComponentHarnessConstructor at these erased positions: line 38: erased-type-reference: ComponentHarnessConstructor<HeaderRow>; line 42: erased-type-reference: ComponentHarnessConstructor<Row>; line 46: erased-type-reference: ComponentHarnessConstructor<FooterRow>. The complete independently authenticated original and both minimum declarations match, with stable public exports and tags. Interface inheritance and type/generic references are erased; runtime aliases or class inheritance reject. Strict minimum compiler fixtures prove filter, constructor/query and result contracts, including relevant negative controls. This closes the imported type boundary only; owned runtime behavior, complete API and native/full floor/upstream SHA review remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/harness-erased-types-source-proof.json",
+          "sha256": "d635e79faba3acbd5448909523e84cf9e59a67057618e66141fdd772f388f189"
+        },
+        {
+          "path": "compatibility/rc/harness-erased-types-minimum-source-diagnostic.json",
+          "sha256": "339dd7822516663c9fc9675892805ef313d8127e31dc3accbf3ef39c0bd9926d"
+        },
+        {
+          "path": "scripts/harness-erased-types-review.mjs",
+          "sha256": "1a45b74cf281944fcd20ee6bee192420077453a20a305b290b2ed02ed6ba5f6c"
+        },
+        {
+          "path": "tests/harness_erased_types_probe.mjs",
+          "sha256": "fece5376353865b2408630fe9ca0c01c8665e5eaa41618640fb46889e3e46093"
+        },
+        {
+          "path": "compatibility/rc/component-harness-public-subjects.json",
+          "sha256": "4379f0c1121a731ea7024b2c24af0c0b2f54d1a900d424162f34c4870d1889ff"
+        }
+      ]
+    },
+    {
+      "file": "legacy-table/testing/internal/row-harness-base.ts",
+      "module": "@angular/cdk/testing",
+      "symbol": "ComponentHarnessConstructor",
+      "candidate_source_sha256": "23451db2fc2ef6923faddd709c85fcc66993f887de2aeec494927fa2f7c18592",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "In legacy-table/testing/internal/row-harness-base.ts, public ComponentHarnessConstructor resolves to exact local binding ComponentHarnessConstructor at these erased positions: line 27: erased-type-reference: ComponentHarnessConstructor<Cell>. The complete independently authenticated original and both minimum declarations match, with stable public exports and tags. Interface inheritance and type/generic references are erased; runtime aliases or class inheritance reject. Strict minimum compiler fixtures prove filter, constructor/query and result contracts, including relevant negative controls. This closes the imported type boundary only; owned runtime behavior, complete API and native/full floor/upstream SHA review remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/harness-erased-types-source-proof.json",
+          "sha256": "d635e79faba3acbd5448909523e84cf9e59a67057618e66141fdd772f388f189"
+        },
+        {
+          "path": "compatibility/rc/harness-erased-types-minimum-source-diagnostic.json",
+          "sha256": "339dd7822516663c9fc9675892805ef313d8127e31dc3accbf3ef39c0bd9926d"
+        },
+        {
+          "path": "scripts/harness-erased-types-review.mjs",
+          "sha256": "1a45b74cf281944fcd20ee6bee192420077453a20a305b290b2ed02ed6ba5f6c"
+        },
+        {
+          "path": "tests/harness_erased_types_probe.mjs",
+          "sha256": "fece5376353865b2408630fe9ca0c01c8665e5eaa41618640fb46889e3e46093"
+        },
+        {
+          "path": "compatibility/rc/component-harness-public-subjects.json",
+          "sha256": "4379f0c1121a731ea7024b2c24af0c0b2f54d1a900d424162f34c4870d1889ff"
+        }
+      ]
+    },
+    {
+      "file": "legacy-table/testing/internal/cell-harness-base.ts",
+      "module": "@angular/cdk/testing",
+      "symbol": "ComponentHarnessConstructor",
+      "candidate_source_sha256": "5f6807930e82603f8b777a4c3f36c1bb58d4bf9207060806dd66c033df1aa77e",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "In legacy-table/testing/internal/cell-harness-base.ts, public ComponentHarnessConstructor resolves to exact local binding ComponentHarnessConstructor at these erased positions: line 46: erased-type-reference: ComponentHarnessConstructor<T>. The complete independently authenticated original and both minimum declarations match, with stable public exports and tags. Interface inheritance and type/generic references are erased; runtime aliases or class inheritance reject. Strict minimum compiler fixtures prove filter, constructor/query and result contracts, including relevant negative controls. This closes the imported type boundary only; owned runtime behavior, complete API and native/full floor/upstream SHA review remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/harness-erased-types-source-proof.json",
+          "sha256": "d635e79faba3acbd5448909523e84cf9e59a67057618e66141fdd772f388f189"
+        },
+        {
+          "path": "compatibility/rc/harness-erased-types-minimum-source-diagnostic.json",
+          "sha256": "339dd7822516663c9fc9675892805ef313d8127e31dc3accbf3ef39c0bd9926d"
+        },
+        {
+          "path": "scripts/harness-erased-types-review.mjs",
+          "sha256": "1a45b74cf281944fcd20ee6bee192420077453a20a305b290b2ed02ed6ba5f6c"
+        },
+        {
+          "path": "tests/harness_erased_types_probe.mjs",
+          "sha256": "fece5376353865b2408630fe9ca0c01c8665e5eaa41618640fb46889e3e46093"
+        },
+        {
+          "path": "compatibility/rc/component-harness-public-subjects.json",
+          "sha256": "4379f0c1121a731ea7024b2c24af0c0b2f54d1a900d424162f34c4870d1889ff"
+        }
+      ]
+    },
+    {
+      "file": "legacy-slider/testing/slider-harness-filters.ts",
+      "module": "@angular/cdk/testing",
+      "symbol": "BaseHarnessFilters",
+      "candidate_source_sha256": "12977bac4a91404dec07b432f293d1500c9a82be514dea09c0c4ca5a1cce3e89",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "In legacy-slider/testing/slider-harness-filters.ts, public BaseHarnessFilters resolves to exact local binding BaseHarnessFilters at these erased positions: line 14: erased-interface-inheritance: BaseHarnessFilters. The complete independently authenticated original and both minimum declarations match, with stable public exports and tags. Interface inheritance and type/generic references are erased; runtime aliases or class inheritance reject. Strict minimum compiler fixtures prove filter, constructor/query and result contracts, including relevant negative controls. This closes the imported type boundary only; owned runtime behavior, complete API and native/full floor/upstream SHA review remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/harness-erased-types-source-proof.json",
+          "sha256": "d635e79faba3acbd5448909523e84cf9e59a67057618e66141fdd772f388f189"
+        },
+        {
+          "path": "compatibility/rc/harness-erased-types-minimum-source-diagnostic.json",
+          "sha256": "339dd7822516663c9fc9675892805ef313d8127e31dc3accbf3ef39c0bd9926d"
+        },
+        {
+          "path": "scripts/harness-erased-types-review.mjs",
+          "sha256": "1a45b74cf281944fcd20ee6bee192420077453a20a305b290b2ed02ed6ba5f6c"
+        },
+        {
+          "path": "tests/harness_erased_types_probe.mjs",
+          "sha256": "fece5376353865b2408630fe9ca0c01c8665e5eaa41618640fb46889e3e46093"
+        },
+        {
+          "path": "compatibility/rc/component-harness-public-subjects.json",
+          "sha256": "4379f0c1121a731ea7024b2c24af0c0b2f54d1a900d424162f34c4870d1889ff"
+        }
+      ]
+    },
+    {
+      "file": "legacy-button/testing/button-harness.ts",
+      "module": "@angular/cdk/testing",
+      "symbol": "BaseHarnessFilters",
+      "candidate_source_sha256": "7203027585f8baec99349e9dff57a2db62872ac6a22d3b3faac497ab8d14f001",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "In legacy-button/testing/button-harness.ts, public BaseHarnessFilters resolves to exact local binding BaseHarnessFilters at these erased positions: line 28: erased-interface-inheritance: BaseHarnessFilters. The complete independently authenticated original and both minimum declarations match, with stable public exports and tags. Interface inheritance and type/generic references are erased; runtime aliases or class inheritance reject. Strict minimum compiler fixtures prove filter, constructor/query and result contracts, including relevant negative controls. This closes the imported type boundary only; owned runtime behavior, complete API and native/full floor/upstream SHA review remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/harness-erased-types-source-proof.json",
+          "sha256": "d635e79faba3acbd5448909523e84cf9e59a67057618e66141fdd772f388f189"
+        },
+        {
+          "path": "compatibility/rc/harness-erased-types-minimum-source-diagnostic.json",
+          "sha256": "339dd7822516663c9fc9675892805ef313d8127e31dc3accbf3ef39c0bd9926d"
+        },
+        {
+          "path": "scripts/harness-erased-types-review.mjs",
+          "sha256": "1a45b74cf281944fcd20ee6bee192420077453a20a305b290b2ed02ed6ba5f6c"
+        },
+        {
+          "path": "tests/harness_erased_types_probe.mjs",
+          "sha256": "fece5376353865b2408630fe9ca0c01c8665e5eaa41618640fb46889e3e46093"
+        },
+        {
+          "path": "compatibility/rc/component-harness-public-subjects.json",
+          "sha256": "4379f0c1121a731ea7024b2c24af0c0b2f54d1a900d424162f34c4870d1889ff"
+        }
+      ]
+    },
+    {
+      "file": "legacy-tabs/testing/tab-harness-filters.ts",
+      "module": "@angular/cdk/testing",
+      "symbol": "BaseHarnessFilters",
+      "candidate_source_sha256": "a79b15c9cfb180fd2bd08a97c7e770586a39f807a4f3473598dcc76d1027bb95",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "In legacy-tabs/testing/tab-harness-filters.ts, public BaseHarnessFilters resolves to exact local binding BaseHarnessFilters at these erased positions: line 14: erased-interface-inheritance: BaseHarnessFilters; line 24: erased-interface-inheritance: BaseHarnessFilters; line 32: erased-interface-inheritance: BaseHarnessFilters; line 40: erased-interface-inheritance: BaseHarnessFilters; line 45: erased-interface-inheritance: BaseHarnessFilters. The complete independently authenticated original and both minimum declarations match, with stable public exports and tags. Interface inheritance and type/generic references are erased; runtime aliases or class inheritance reject. Strict minimum compiler fixtures prove filter, constructor/query and result contracts, including relevant negative controls. This closes the imported type boundary only; owned runtime behavior, complete API and native/full floor/upstream SHA review remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/harness-erased-types-source-proof.json",
+          "sha256": "d635e79faba3acbd5448909523e84cf9e59a67057618e66141fdd772f388f189"
+        },
+        {
+          "path": "compatibility/rc/harness-erased-types-minimum-source-diagnostic.json",
+          "sha256": "339dd7822516663c9fc9675892805ef313d8127e31dc3accbf3ef39c0bd9926d"
+        },
+        {
+          "path": "scripts/harness-erased-types-review.mjs",
+          "sha256": "1a45b74cf281944fcd20ee6bee192420077453a20a305b290b2ed02ed6ba5f6c"
+        },
+        {
+          "path": "tests/harness_erased_types_probe.mjs",
+          "sha256": "fece5376353865b2408630fe9ca0c01c8665e5eaa41618640fb46889e3e46093"
+        },
+        {
+          "path": "compatibility/rc/component-harness-public-subjects.json",
+          "sha256": "4379f0c1121a731ea7024b2c24af0c0b2f54d1a900d424162f34c4870d1889ff"
+        }
+      ]
+    },
+    {
+      "file": "legacy-checkbox/testing/checkbox-harness-base.ts",
+      "module": "@angular/cdk/testing",
+      "symbol": "AsyncFactoryFn",
+      "candidate_source_sha256": "c9b01b4fa1f644e4ed10392d68cdadf10b38e677c56bbe6973cdd8c94a88f037",
+      "conclusion": "removed-use",
+      "reviewer": "Codex primary implementer",
+      "decision": "In legacy-checkbox/testing/checkbox-harness-base.ts, AsyncFactoryFn is absent from imports and all code identifiers. Actual replacement factories: line 18 _input: () => Promise<TestElement>; line 19 _label: () => Promise<TestElement>. The untouched public original alias is exactly () => Promise<T>; both current minima retain it only with deprecated/private/removal tags, and the owned source uses the explicit shape. Zero parameters and Promise result shape are guarded, with result type arguments recorded. Strict branch-minimum standalone fixtures verify the original expansion in both directions. This closes this removed dependency use, while whole historical member/API equality, owned actions and native/full floor qualification remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/harness-erased-types-source-proof.json",
+          "sha256": "d635e79faba3acbd5448909523e84cf9e59a67057618e66141fdd772f388f189"
+        },
+        {
+          "path": "compatibility/rc/harness-erased-types-minimum-source-diagnostic.json",
+          "sha256": "339dd7822516663c9fc9675892805ef313d8127e31dc3accbf3ef39c0bd9926d"
+        },
+        {
+          "path": "scripts/harness-erased-types-review.mjs",
+          "sha256": "1a45b74cf281944fcd20ee6bee192420077453a20a305b290b2ed02ed6ba5f6c"
+        },
+        {
+          "path": "tests/harness_erased_types_probe.mjs",
+          "sha256": "fece5376353865b2408630fe9ca0c01c8665e5eaa41618640fb46889e3e46093"
+        },
+        {
+          "path": "compatibility/rc/component-harness-public-subjects.json",
+          "sha256": "4379f0c1121a731ea7024b2c24af0c0b2f54d1a900d424162f34c4870d1889ff"
+        }
+      ]
+    },
+    {
+      "file": "legacy-core/testing/option-harness-filters.ts",
+      "module": "@angular/cdk/testing",
+      "symbol": "BaseHarnessFilters",
+      "candidate_source_sha256": "8a80a389f69aa0d3d8ef8f9604e0a14d3e4a52e8de61d568de805a0c75a63d02",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "In legacy-core/testing/option-harness-filters.ts, public BaseHarnessFilters resolves to exact local binding BaseHarnessFilters at these erased positions: line 13: erased-interface-inheritance: BaseHarnessFilters. The complete independently authenticated original and both minimum declarations match, with stable public exports and tags. Interface inheritance and type/generic references are erased; runtime aliases or class inheritance reject. Strict minimum compiler fixtures prove filter, constructor/query and result contracts, including relevant negative controls. This closes the imported type boundary only; owned runtime behavior, complete API and native/full floor/upstream SHA review remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/harness-erased-types-source-proof.json",
+          "sha256": "d635e79faba3acbd5448909523e84cf9e59a67057618e66141fdd772f388f189"
+        },
+        {
+          "path": "compatibility/rc/harness-erased-types-minimum-source-diagnostic.json",
+          "sha256": "339dd7822516663c9fc9675892805ef313d8127e31dc3accbf3ef39c0bd9926d"
+        },
+        {
+          "path": "scripts/harness-erased-types-review.mjs",
+          "sha256": "1a45b74cf281944fcd20ee6bee192420077453a20a305b290b2ed02ed6ba5f6c"
+        },
+        {
+          "path": "tests/harness_erased_types_probe.mjs",
+          "sha256": "fece5376353865b2408630fe9ca0c01c8665e5eaa41618640fb46889e3e46093"
+        },
+        {
+          "path": "compatibility/rc/component-harness-public-subjects.json",
+          "sha256": "4379f0c1121a731ea7024b2c24af0c0b2f54d1a900d424162f34c4870d1889ff"
+        }
+      ]
+    },
+    {
+      "file": "legacy-core/testing/optgroup-harness-filters.ts",
+      "module": "@angular/cdk/testing",
+      "symbol": "BaseHarnessFilters",
+      "candidate_source_sha256": "f9684121a3e6fee150e022fc34c99c04752b9882be55f36298a1e43768ece689",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "In legacy-core/testing/optgroup-harness-filters.ts, public BaseHarnessFilters resolves to exact local binding BaseHarnessFilters at these erased positions: line 13: erased-interface-inheritance: BaseHarnessFilters. The complete independently authenticated original and both minimum declarations match, with stable public exports and tags. Interface inheritance and type/generic references are erased; runtime aliases or class inheritance reject. Strict minimum compiler fixtures prove filter, constructor/query and result contracts, including relevant negative controls. This closes the imported type boundary only; owned runtime behavior, complete API and native/full floor/upstream SHA review remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/harness-erased-types-source-proof.json",
+          "sha256": "d635e79faba3acbd5448909523e84cf9e59a67057618e66141fdd772f388f189"
+        },
+        {
+          "path": "compatibility/rc/harness-erased-types-minimum-source-diagnostic.json",
+          "sha256": "339dd7822516663c9fc9675892805ef313d8127e31dc3accbf3ef39c0bd9926d"
+        },
+        {
+          "path": "scripts/harness-erased-types-review.mjs",
+          "sha256": "1a45b74cf281944fcd20ee6bee192420077453a20a305b290b2ed02ed6ba5f6c"
+        },
+        {
+          "path": "tests/harness_erased_types_probe.mjs",
+          "sha256": "fece5376353865b2408630fe9ca0c01c8665e5eaa41618640fb46889e3e46093"
+        },
+        {
+          "path": "compatibility/rc/component-harness-public-subjects.json",
+          "sha256": "4379f0c1121a731ea7024b2c24af0c0b2f54d1a900d424162f34c4870d1889ff"
+        }
+      ]
+    },
+    {
+      "file": "legacy-list/testing/list-item-harness-base.ts",
+      "module": "@angular/cdk/testing",
+      "symbol": "ComponentHarnessConstructor",
+      "candidate_source_sha256": "b49f36b9a6e12fd0f5681556a7ebc7944bfed652855d114a1cf1111a8fe786c1",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "In legacy-list/testing/list-item-harness-base.ts, public ComponentHarnessConstructor resolves to exact local binding ComponentHarnessConstructor at these erased positions: line 34: erased-type-reference: ComponentHarnessConstructor<H>. The complete independently authenticated original and both minimum declarations match, with stable public exports and tags. Interface inheritance and type/generic references are erased; runtime aliases or class inheritance reject. Strict minimum compiler fixtures prove filter, constructor/query and result contracts, including relevant negative controls. This closes the imported type boundary only; owned runtime behavior, complete API and native/full floor/upstream SHA review remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/harness-erased-types-source-proof.json",
+          "sha256": "d635e79faba3acbd5448909523e84cf9e59a67057618e66141fdd772f388f189"
+        },
+        {
+          "path": "compatibility/rc/harness-erased-types-minimum-source-diagnostic.json",
+          "sha256": "339dd7822516663c9fc9675892805ef313d8127e31dc3accbf3ef39c0bd9926d"
+        },
+        {
+          "path": "scripts/harness-erased-types-review.mjs",
+          "sha256": "1a45b74cf281944fcd20ee6bee192420077453a20a305b290b2ed02ed6ba5f6c"
+        },
+        {
+          "path": "tests/harness_erased_types_probe.mjs",
+          "sha256": "fece5376353865b2408630fe9ca0c01c8665e5eaa41618640fb46889e3e46093"
+        },
+        {
+          "path": "compatibility/rc/component-harness-public-subjects.json",
+          "sha256": "4379f0c1121a731ea7024b2c24af0c0b2f54d1a900d424162f34c4870d1889ff"
+        }
+      ]
+    },
+    {
+      "file": "legacy-list/testing/list-harness-filters.ts",
+      "module": "@angular/cdk/testing",
+      "symbol": "BaseHarnessFilters",
+      "candidate_source_sha256": "2261cbe7b8e9a5b0b0cbe362ebbba89476594a49e7c2fbb460720f017be3c9f8",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "In legacy-list/testing/list-harness-filters.ts, public BaseHarnessFilters resolves to exact local binding BaseHarnessFilters at these erased positions: line 13: erased-interface-inheritance: BaseHarnessFilters; line 16: erased-interface-inheritance: BaseHarnessFilters; line 19: erased-interface-inheritance: BaseHarnessFilters; line 22: erased-interface-inheritance: BaseHarnessFilters; line 25: erased-interface-inheritance: BaseHarnessFilters; line 46: erased-interface-inheritance: BaseHarnessFilters. The complete independently authenticated original and both minimum declarations match, with stable public exports and tags. Interface inheritance and type/generic references are erased; runtime aliases or class inheritance reject. Strict minimum compiler fixtures prove filter, constructor/query and result contracts, including relevant negative controls. This closes the imported type boundary only; owned runtime behavior, complete API and native/full floor/upstream SHA review remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/harness-erased-types-source-proof.json",
+          "sha256": "d635e79faba3acbd5448909523e84cf9e59a67057618e66141fdd772f388f189"
+        },
+        {
+          "path": "compatibility/rc/harness-erased-types-minimum-source-diagnostic.json",
+          "sha256": "339dd7822516663c9fc9675892805ef313d8127e31dc3accbf3ef39c0bd9926d"
+        },
+        {
+          "path": "scripts/harness-erased-types-review.mjs",
+          "sha256": "1a45b74cf281944fcd20ee6bee192420077453a20a305b290b2ed02ed6ba5f6c"
+        },
+        {
+          "path": "tests/harness_erased_types_probe.mjs",
+          "sha256": "fece5376353865b2408630fe9ca0c01c8665e5eaa41618640fb46889e3e46093"
+        },
+        {
+          "path": "compatibility/rc/component-harness-public-subjects.json",
+          "sha256": "4379f0c1121a731ea7024b2c24af0c0b2f54d1a900d424162f34c4870d1889ff"
+        }
+      ]
+    },
+    {
+      "file": "legacy-list/testing/list-harness-base.ts",
+      "module": "@angular/cdk/testing",
+      "symbol": "ComponentHarnessConstructor",
+      "candidate_source_sha256": "c511626638a75dc4ef705e01c706765b6eb90975e42291395144de94794d468f",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "In legacy-list/testing/list-harness-base.ts, public ComponentHarnessConstructor resolves to exact local binding ComponentHarnessConstructor at these erased positions: line 42: erased-type-reference: ComponentHarnessConstructor<C>. The complete independently authenticated original and both minimum declarations match, with stable public exports and tags. Interface inheritance and type/generic references are erased; runtime aliases or class inheritance reject. Strict minimum compiler fixtures prove filter, constructor/query and result contracts, including relevant negative controls. This closes the imported type boundary only; owned runtime behavior, complete API and native/full floor/upstream SHA review remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/harness-erased-types-source-proof.json",
+          "sha256": "d635e79faba3acbd5448909523e84cf9e59a67057618e66141fdd772f388f189"
+        },
+        {
+          "path": "compatibility/rc/harness-erased-types-minimum-source-diagnostic.json",
+          "sha256": "339dd7822516663c9fc9675892805ef313d8127e31dc3accbf3ef39c0bd9926d"
+        },
+        {
+          "path": "scripts/harness-erased-types-review.mjs",
+          "sha256": "1a45b74cf281944fcd20ee6bee192420077453a20a305b290b2ed02ed6ba5f6c"
+        },
+        {
+          "path": "tests/harness_erased_types_probe.mjs",
+          "sha256": "fece5376353865b2408630fe9ca0c01c8665e5eaa41618640fb46889e3e46093"
+        },
+        {
+          "path": "compatibility/rc/component-harness-public-subjects.json",
+          "sha256": "4379f0c1121a731ea7024b2c24af0c0b2f54d1a900d424162f34c4870d1889ff"
+        }
+      ]
+    },
+    {
+      "file": "legacy-radio/testing/radio-harness-base.ts",
+      "module": "@angular/cdk/testing",
+      "symbol": "AsyncFactoryFn",
+      "candidate_source_sha256": "ad0dd10d72e1cbe0a995a8c3bf06481b983ffde21bdf617ac0c0330003acc998",
+      "conclusion": "removed-use",
+      "reviewer": "Codex primary implementer",
+      "decision": "In legacy-radio/testing/radio-harness-base.ts, AsyncFactoryFn is absent from imports and all code identifiers. Actual replacement factories: line 166 _textLabel: () => Promise<TestElement>; line 167 _clickLabel: () => Promise<TestElement>. The untouched public original alias is exactly () => Promise<T>; both current minima retain it only with deprecated/private/removal tags, and the owned source uses the explicit shape. Zero parameters and Promise result shape are guarded, with result type arguments recorded. Strict branch-minimum standalone fixtures verify the original expansion in both directions. This closes this removed dependency use, while whole historical member/API equality, owned actions and native/full floor qualification remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/harness-erased-types-source-proof.json",
+          "sha256": "d635e79faba3acbd5448909523e84cf9e59a67057618e66141fdd772f388f189"
+        },
+        {
+          "path": "compatibility/rc/harness-erased-types-minimum-source-diagnostic.json",
+          "sha256": "339dd7822516663c9fc9675892805ef313d8127e31dc3accbf3ef39c0bd9926d"
+        },
+        {
+          "path": "scripts/harness-erased-types-review.mjs",
+          "sha256": "1a45b74cf281944fcd20ee6bee192420077453a20a305b290b2ed02ed6ba5f6c"
+        },
+        {
+          "path": "tests/harness_erased_types_probe.mjs",
+          "sha256": "fece5376353865b2408630fe9ca0c01c8665e5eaa41618640fb46889e3e46093"
+        },
+        {
+          "path": "compatibility/rc/component-harness-public-subjects.json",
+          "sha256": "4379f0c1121a731ea7024b2c24af0c0b2f54d1a900d424162f34c4870d1889ff"
+        }
+      ]
+    },
+    {
+      "file": "legacy-radio/testing/radio-harness-base.ts",
+      "module": "@angular/cdk/testing",
+      "symbol": "BaseHarnessFilters",
+      "candidate_source_sha256": "ad0dd10d72e1cbe0a995a8c3bf06481b983ffde21bdf617ac0c0330003acc998",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "In legacy-radio/testing/radio-harness-base.ts, public BaseHarnessFilters resolves to exact local binding BaseHarnessFilters at these erased positions: line 30: erased-type-reference: BaseHarnessFilters. The complete independently authenticated original and both minimum declarations match, with stable public exports and tags. Interface inheritance and type/generic references are erased; runtime aliases or class inheritance reject. Strict minimum compiler fixtures prove filter, constructor/query and result contracts, including relevant negative controls. This closes the imported type boundary only; owned runtime behavior, complete API and native/full floor/upstream SHA review remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/harness-erased-types-source-proof.json",
+          "sha256": "d635e79faba3acbd5448909523e84cf9e59a67057618e66141fdd772f388f189"
+        },
+        {
+          "path": "compatibility/rc/harness-erased-types-minimum-source-diagnostic.json",
+          "sha256": "339dd7822516663c9fc9675892805ef313d8127e31dc3accbf3ef39c0bd9926d"
+        },
+        {
+          "path": "scripts/harness-erased-types-review.mjs",
+          "sha256": "1a45b74cf281944fcd20ee6bee192420077453a20a305b290b2ed02ed6ba5f6c"
+        },
+        {
+          "path": "tests/harness_erased_types_probe.mjs",
+          "sha256": "fece5376353865b2408630fe9ca0c01c8665e5eaa41618640fb46889e3e46093"
+        },
+        {
+          "path": "compatibility/rc/component-harness-public-subjects.json",
+          "sha256": "4379f0c1121a731ea7024b2c24af0c0b2f54d1a900d424162f34c4870d1889ff"
+        }
+      ]
+    },
+    {
+      "file": "legacy-radio/testing/radio-harness-base.ts",
+      "module": "@angular/cdk/testing",
+      "symbol": "ComponentHarnessConstructor",
+      "candidate_source_sha256": "ad0dd10d72e1cbe0a995a8c3bf06481b983ffde21bdf617ac0c0330003acc998",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "In legacy-radio/testing/radio-harness-base.ts, public ComponentHarnessConstructor resolves to exact local binding ComponentHarnessConstructor at these erased positions: line 21: erased-type-reference: ComponentHarnessConstructor<Button>. The complete independently authenticated original and both minimum declarations match, with stable public exports and tags. Interface inheritance and type/generic references are erased; runtime aliases or class inheritance reject. Strict minimum compiler fixtures prove filter, constructor/query and result contracts, including relevant negative controls. This closes the imported type boundary only; owned runtime behavior, complete API and native/full floor/upstream SHA review remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/harness-erased-types-source-proof.json",
+          "sha256": "d635e79faba3acbd5448909523e84cf9e59a67057618e66141fdd772f388f189"
+        },
+        {
+          "path": "compatibility/rc/harness-erased-types-minimum-source-diagnostic.json",
+          "sha256": "339dd7822516663c9fc9675892805ef313d8127e31dc3accbf3ef39c0bd9926d"
+        },
+        {
+          "path": "scripts/harness-erased-types-review.mjs",
+          "sha256": "1a45b74cf281944fcd20ee6bee192420077453a20a305b290b2ed02ed6ba5f6c"
+        },
+        {
+          "path": "tests/harness_erased_types_probe.mjs",
+          "sha256": "fece5376353865b2408630fe9ca0c01c8665e5eaa41618640fb46889e3e46093"
+        },
+        {
+          "path": "compatibility/rc/component-harness-public-subjects.json",
+          "sha256": "4379f0c1121a731ea7024b2c24af0c0b2f54d1a900d424162f34c4870d1889ff"
+        }
+      ]
+    },
+    {
+      "file": "legacy-slide-toggle/testing/slide-toggle-harness-base.ts",
+      "module": "@angular/cdk/testing",
+      "symbol": "AsyncFactoryFn",
+      "candidate_source_sha256": "b9676560e0abe4707d47d0d0785ffd7d9192c22309a86be80914b7e1dffbced4",
+      "conclusion": "removed-use",
+      "reviewer": "Codex primary implementer",
+      "decision": "In legacy-slide-toggle/testing/slide-toggle-harness-base.ts, AsyncFactoryFn is absent from imports and all code identifiers. Actual replacement factories: line 19 _nativeElement: () => Promise<TestElement>. The untouched public original alias is exactly () => Promise<T>; both current minima retain it only with deprecated/private/removal tags, and the owned source uses the explicit shape. Zero parameters and Promise result shape are guarded, with result type arguments recorded. Strict branch-minimum standalone fixtures verify the original expansion in both directions. This closes this removed dependency use, while whole historical member/API equality, owned actions and native/full floor qualification remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/harness-erased-types-source-proof.json",
+          "sha256": "d635e79faba3acbd5448909523e84cf9e59a67057618e66141fdd772f388f189"
+        },
+        {
+          "path": "compatibility/rc/harness-erased-types-minimum-source-diagnostic.json",
+          "sha256": "339dd7822516663c9fc9675892805ef313d8127e31dc3accbf3ef39c0bd9926d"
+        },
+        {
+          "path": "scripts/harness-erased-types-review.mjs",
+          "sha256": "1a45b74cf281944fcd20ee6bee192420077453a20a305b290b2ed02ed6ba5f6c"
+        },
+        {
+          "path": "tests/harness_erased_types_probe.mjs",
+          "sha256": "fece5376353865b2408630fe9ca0c01c8665e5eaa41618640fb46889e3e46093"
+        },
+        {
+          "path": "compatibility/rc/component-harness-public-subjects.json",
+          "sha256": "4379f0c1121a731ea7024b2c24af0c0b2f54d1a900d424162f34c4870d1889ff"
+        }
+      ]
+    },
+    {
+      "file": "legacy-autocomplete/testing/autocomplete-harness-base.ts",
+      "module": "@angular/cdk/testing",
+      "symbol": "BaseHarnessFilters",
+      "candidate_source_sha256": "070ca29a92c0c6548d00421fac640868b676602ac9976c9e917fd536193fa020",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "In legacy-autocomplete/testing/autocomplete-harness-base.ts, public BaseHarnessFilters resolves to exact local binding BaseHarnessFilters at these erased positions: line 25: erased-type-reference: BaseHarnessFilters; line 30: erased-type-reference: BaseHarnessFilters. The complete independently authenticated original and both minimum declarations match, with stable public exports and tags. Interface inheritance and type/generic references are erased; runtime aliases or class inheritance reject. Strict minimum compiler fixtures prove filter, constructor/query and result contracts, including relevant negative controls. This closes the imported type boundary only; owned runtime behavior, complete API and native/full floor/upstream SHA review remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/harness-erased-types-source-proof.json",
+          "sha256": "d635e79faba3acbd5448909523e84cf9e59a67057618e66141fdd772f388f189"
+        },
+        {
+          "path": "compatibility/rc/harness-erased-types-minimum-source-diagnostic.json",
+          "sha256": "339dd7822516663c9fc9675892805ef313d8127e31dc3accbf3ef39c0bd9926d"
+        },
+        {
+          "path": "scripts/harness-erased-types-review.mjs",
+          "sha256": "1a45b74cf281944fcd20ee6bee192420077453a20a305b290b2ed02ed6ba5f6c"
+        },
+        {
+          "path": "tests/harness_erased_types_probe.mjs",
+          "sha256": "fece5376353865b2408630fe9ca0c01c8665e5eaa41618640fb46889e3e46093"
+        },
+        {
+          "path": "compatibility/rc/component-harness-public-subjects.json",
+          "sha256": "4379f0c1121a731ea7024b2c24af0c0b2f54d1a900d424162f34c4870d1889ff"
+        }
+      ]
+    },
+    {
+      "file": "legacy-autocomplete/testing/autocomplete-harness-base.ts",
+      "module": "@angular/cdk/testing",
+      "symbol": "ComponentHarnessConstructor",
+      "candidate_source_sha256": "070ca29a92c0c6548d00421fac640868b676602ac9976c9e917fd536193fa020",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "In legacy-autocomplete/testing/autocomplete-harness-base.ts, public ComponentHarnessConstructor resolves to exact local binding ComponentHarnessConstructor at these erased positions: line 21: erased-type-reference: ComponentHarnessConstructor<Option>; line 26: erased-type-reference: ComponentHarnessConstructor<OptionGroup>. The complete independently authenticated original and both minimum declarations match, with stable public exports and tags. Interface inheritance and type/generic references are erased; runtime aliases or class inheritance reject. Strict minimum compiler fixtures prove filter, constructor/query and result contracts, including relevant negative controls. This closes the imported type boundary only; owned runtime behavior, complete API and native/full floor/upstream SHA review remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/harness-erased-types-source-proof.json",
+          "sha256": "d635e79faba3acbd5448909523e84cf9e59a67057618e66141fdd772f388f189"
+        },
+        {
+          "path": "compatibility/rc/harness-erased-types-minimum-source-diagnostic.json",
+          "sha256": "339dd7822516663c9fc9675892805ef313d8127e31dc3accbf3ef39c0bd9926d"
+        },
+        {
+          "path": "scripts/harness-erased-types-review.mjs",
+          "sha256": "1a45b74cf281944fcd20ee6bee192420077453a20a305b290b2ed02ed6ba5f6c"
+        },
+        {
+          "path": "tests/harness_erased_types_probe.mjs",
+          "sha256": "fece5376353865b2408630fe9ca0c01c8665e5eaa41618640fb46889e3e46093"
+        },
+        {
+          "path": "compatibility/rc/component-harness-public-subjects.json",
+          "sha256": "4379f0c1121a731ea7024b2c24af0c0b2f54d1a900d424162f34c4870d1889ff"
+        }
+      ]
+    },
+    {
+      "file": "legacy-autocomplete/testing/autocomplete-harness-filters.ts",
+      "module": "@angular/cdk/testing",
+      "symbol": "BaseHarnessFilters",
+      "candidate_source_sha256": "36a517aa940c6f753dd45b2314c4439154f1ebe7216c4e938065326e3bcc3229",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "In legacy-autocomplete/testing/autocomplete-harness-filters.ts, public BaseHarnessFilters resolves to exact local binding BaseHarnessFilters at these erased positions: line 15: erased-interface-inheritance: BaseHarnessFilters. The complete independently authenticated original and both minimum declarations match, with stable public exports and tags. Interface inheritance and type/generic references are erased; runtime aliases or class inheritance reject. Strict minimum compiler fixtures prove filter, constructor/query and result contracts, including relevant negative controls. This closes the imported type boundary only; owned runtime behavior, complete API and native/full floor/upstream SHA review remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/harness-erased-types-source-proof.json",
+          "sha256": "d635e79faba3acbd5448909523e84cf9e59a67057618e66141fdd772f388f189"
+        },
+        {
+          "path": "compatibility/rc/harness-erased-types-minimum-source-diagnostic.json",
+          "sha256": "339dd7822516663c9fc9675892805ef313d8127e31dc3accbf3ef39c0bd9926d"
+        },
+        {
+          "path": "scripts/harness-erased-types-review.mjs",
+          "sha256": "1a45b74cf281944fcd20ee6bee192420077453a20a305b290b2ed02ed6ba5f6c"
+        },
+        {
+          "path": "tests/harness_erased_types_probe.mjs",
+          "sha256": "fece5376353865b2408630fe9ca0c01c8665e5eaa41618640fb46889e3e46093"
+        },
+        {
+          "path": "compatibility/rc/component-harness-public-subjects.json",
+          "sha256": "4379f0c1121a731ea7024b2c24af0c0b2f54d1a900d424162f34c4870d1889ff"
+        }
+      ]
+    },
+    {
+      "file": "legacy-select/testing/select-harness-base.ts",
+      "module": "@angular/cdk/testing",
+      "symbol": "BaseHarnessFilters",
+      "candidate_source_sha256": "76dd504f9744c34493c32b95311ed92047cc000974361402db7037214adeb6e7",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "In legacy-select/testing/select-harness-base.ts, public BaseHarnessFilters resolves to exact local binding BaseHarnessFilters at these erased positions: line 25: erased-type-reference: BaseHarnessFilters; line 30: erased-type-reference: BaseHarnessFilters. The complete independently authenticated original and both minimum declarations match, with stable public exports and tags. Interface inheritance and type/generic references are erased; runtime aliases or class inheritance reject. Strict minimum compiler fixtures prove filter, constructor/query and result contracts, including relevant negative controls. This closes the imported type boundary only; owned runtime behavior, complete API and native/full floor/upstream SHA review remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/harness-erased-types-source-proof.json",
+          "sha256": "d635e79faba3acbd5448909523e84cf9e59a67057618e66141fdd772f388f189"
+        },
+        {
+          "path": "compatibility/rc/harness-erased-types-minimum-source-diagnostic.json",
+          "sha256": "339dd7822516663c9fc9675892805ef313d8127e31dc3accbf3ef39c0bd9926d"
+        },
+        {
+          "path": "scripts/harness-erased-types-review.mjs",
+          "sha256": "1a45b74cf281944fcd20ee6bee192420077453a20a305b290b2ed02ed6ba5f6c"
+        },
+        {
+          "path": "tests/harness_erased_types_probe.mjs",
+          "sha256": "fece5376353865b2408630fe9ca0c01c8665e5eaa41618640fb46889e3e46093"
+        },
+        {
+          "path": "compatibility/rc/component-harness-public-subjects.json",
+          "sha256": "4379f0c1121a731ea7024b2c24af0c0b2f54d1a900d424162f34c4870d1889ff"
+        }
+      ]
+    },
+    {
+      "file": "legacy-select/testing/select-harness-base.ts",
+      "module": "@angular/cdk/testing",
+      "symbol": "ComponentHarnessConstructor",
+      "candidate_source_sha256": "76dd504f9744c34493c32b95311ed92047cc000974361402db7037214adeb6e7",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "In legacy-select/testing/select-harness-base.ts, public ComponentHarnessConstructor resolves to exact local binding ComponentHarnessConstructor at these erased positions: line 21: erased-type-reference: ComponentHarnessConstructor<Option>; line 26: erased-type-reference: ComponentHarnessConstructor<OptionGroup>. The complete independently authenticated original and both minimum declarations match, with stable public exports and tags. Interface inheritance and type/generic references are erased; runtime aliases or class inheritance reject. Strict minimum compiler fixtures prove filter, constructor/query and result contracts, including relevant negative controls. This closes the imported type boundary only; owned runtime behavior, complete API and native/full floor/upstream SHA review remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/harness-erased-types-source-proof.json",
+          "sha256": "d635e79faba3acbd5448909523e84cf9e59a67057618e66141fdd772f388f189"
+        },
+        {
+          "path": "compatibility/rc/harness-erased-types-minimum-source-diagnostic.json",
+          "sha256": "339dd7822516663c9fc9675892805ef313d8127e31dc3accbf3ef39c0bd9926d"
+        },
+        {
+          "path": "scripts/harness-erased-types-review.mjs",
+          "sha256": "1a45b74cf281944fcd20ee6bee192420077453a20a305b290b2ed02ed6ba5f6c"
+        },
+        {
+          "path": "tests/harness_erased_types_probe.mjs",
+          "sha256": "fece5376353865b2408630fe9ca0c01c8665e5eaa41618640fb46889e3e46093"
+        },
+        {
+          "path": "compatibility/rc/component-harness-public-subjects.json",
+          "sha256": "4379f0c1121a731ea7024b2c24af0c0b2f54d1a900d424162f34c4870d1889ff"
+        }
+      ]
+    },
+    {
+      "file": "legacy-select/testing/select-harness-filters.ts",
+      "module": "@angular/cdk/testing",
+      "symbol": "BaseHarnessFilters",
+      "candidate_source_sha256": "6e511ef54dc399b79724b0be2946c13d7eabf0f475ca898728ed3f0aec4c90b6",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "In legacy-select/testing/select-harness-filters.ts, public BaseHarnessFilters resolves to exact local binding BaseHarnessFilters at these erased positions: line 15: erased-interface-inheritance: BaseHarnessFilters. The complete independently authenticated original and both minimum declarations match, with stable public exports and tags. Interface inheritance and type/generic references are erased; runtime aliases or class inheritance reject. Strict minimum compiler fixtures prove filter, constructor/query and result contracts, including relevant negative controls. This closes the imported type boundary only; owned runtime behavior, complete API and native/full floor/upstream SHA review remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/harness-erased-types-source-proof.json",
+          "sha256": "d635e79faba3acbd5448909523e84cf9e59a67057618e66141fdd772f388f189"
+        },
+        {
+          "path": "compatibility/rc/harness-erased-types-minimum-source-diagnostic.json",
+          "sha256": "339dd7822516663c9fc9675892805ef313d8127e31dc3accbf3ef39c0bd9926d"
+        },
+        {
+          "path": "scripts/harness-erased-types-review.mjs",
+          "sha256": "1a45b74cf281944fcd20ee6bee192420077453a20a305b290b2ed02ed6ba5f6c"
+        },
+        {
+          "path": "tests/harness_erased_types_probe.mjs",
+          "sha256": "fece5376353865b2408630fe9ca0c01c8665e5eaa41618640fb46889e3e46093"
+        },
+        {
+          "path": "compatibility/rc/component-harness-public-subjects.json",
+          "sha256": "4379f0c1121a731ea7024b2c24af0c0b2f54d1a900d424162f34c4870d1889ff"
+        }
+      ]
+    },
+    {
+      "file": "legacy-chips/testing/chip-harness-filters.ts",
+      "module": "@angular/cdk/testing",
+      "symbol": "BaseHarnessFilters",
+      "candidate_source_sha256": "9d4e6e02dbc1a7ac36023205d0cfbeab3a90342c7893ce8411ae4c26a6f91aaf",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "In legacy-chips/testing/chip-harness-filters.ts, public BaseHarnessFilters resolves to exact local binding BaseHarnessFilters at these erased positions: line 14: erased-interface-inheritance: BaseHarnessFilters; line 36: erased-interface-inheritance: BaseHarnessFilters; line 41: erased-interface-inheritance: BaseHarnessFilters; line 46: erased-interface-inheritance: BaseHarnessFilters; line 56: erased-interface-inheritance: BaseHarnessFilters; line 61: erased-interface-inheritance: BaseHarnessFilters. The complete independently authenticated original and both minimum declarations match, with stable public exports and tags. Interface inheritance and type/generic references are erased; runtime aliases or class inheritance reject. Strict minimum compiler fixtures prove filter, constructor/query and result contracts, including relevant negative controls. This closes the imported type boundary only; owned runtime behavior, complete API and native/full floor/upstream SHA review remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/harness-erased-types-source-proof.json",
+          "sha256": "d635e79faba3acbd5448909523e84cf9e59a67057618e66141fdd772f388f189"
+        },
+        {
+          "path": "compatibility/rc/harness-erased-types-minimum-source-diagnostic.json",
+          "sha256": "339dd7822516663c9fc9675892805ef313d8127e31dc3accbf3ef39c0bd9926d"
+        },
+        {
+          "path": "scripts/harness-erased-types-review.mjs",
+          "sha256": "1a45b74cf281944fcd20ee6bee192420077453a20a305b290b2ed02ed6ba5f6c"
+        },
+        {
+          "path": "tests/harness_erased_types_probe.mjs",
+          "sha256": "fece5376353865b2408630fe9ca0c01c8665e5eaa41618640fb46889e3e46093"
+        },
+        {
+          "path": "compatibility/rc/component-harness-public-subjects.json",
+          "sha256": "4379f0c1121a731ea7024b2c24af0c0b2f54d1a900d424162f34c4870d1889ff"
+        }
+      ]
+    },
+    {
+      "file": "legacy-menu/testing/menu-harness-base.ts",
+      "module": "@angular/cdk/testing",
+      "symbol": "BaseHarnessFilters",
+      "candidate_source_sha256": "559477ca79dff7fa492526a9c1e040fff9fdd019339ff0fb0da7268c49ca7479",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "In legacy-menu/testing/menu-harness-base.ts, public BaseHarnessFilters resolves to exact local binding BaseHarnessFilters at these erased positions: line 32: erased-type-reference: BaseHarnessFilters. The complete independently authenticated original and both minimum declarations match, with stable public exports and tags. Interface inheritance and type/generic references are erased; runtime aliases or class inheritance reject. Strict minimum compiler fixtures prove filter, constructor/query and result contracts, including relevant negative controls. This closes the imported type boundary only; owned runtime behavior, complete API and native/full floor/upstream SHA review remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/harness-erased-types-source-proof.json",
+          "sha256": "d635e79faba3acbd5448909523e84cf9e59a67057618e66141fdd772f388f189"
+        },
+        {
+          "path": "compatibility/rc/harness-erased-types-minimum-source-diagnostic.json",
+          "sha256": "339dd7822516663c9fc9675892805ef313d8127e31dc3accbf3ef39c0bd9926d"
+        },
+        {
+          "path": "scripts/harness-erased-types-review.mjs",
+          "sha256": "1a45b74cf281944fcd20ee6bee192420077453a20a305b290b2ed02ed6ba5f6c"
+        },
+        {
+          "path": "tests/harness_erased_types_probe.mjs",
+          "sha256": "fece5376353865b2408630fe9ca0c01c8665e5eaa41618640fb46889e3e46093"
+        },
+        {
+          "path": "compatibility/rc/component-harness-public-subjects.json",
+          "sha256": "4379f0c1121a731ea7024b2c24af0c0b2f54d1a900d424162f34c4870d1889ff"
+        }
+      ]
+    },
+    {
+      "file": "legacy-menu/testing/menu-harness-base.ts",
+      "module": "@angular/cdk/testing",
+      "symbol": "ComponentHarnessConstructor",
+      "candidate_source_sha256": "559477ca79dff7fa492526a9c1e040fff9fdd019339ff0fb0da7268c49ca7479",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "In legacy-menu/testing/menu-harness-base.ts, public ComponentHarnessConstructor resolves to exact local binding ComponentHarnessConstructor at these erased positions: line 25: erased-type-reference: ComponentHarnessConstructor<Item>; line 126: erased-type-reference: ComponentHarnessConstructor<Menu>. The complete independently authenticated original and both minimum declarations match, with stable public exports and tags. Interface inheritance and type/generic references are erased; runtime aliases or class inheritance reject. Strict minimum compiler fixtures prove filter, constructor/query and result contracts, including relevant negative controls. This closes the imported type boundary only; owned runtime behavior, complete API and native/full floor/upstream SHA review remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/harness-erased-types-source-proof.json",
+          "sha256": "d635e79faba3acbd5448909523e84cf9e59a67057618e66141fdd772f388f189"
+        },
+        {
+          "path": "compatibility/rc/harness-erased-types-minimum-source-diagnostic.json",
+          "sha256": "339dd7822516663c9fc9675892805ef313d8127e31dc3accbf3ef39c0bd9926d"
+        },
+        {
+          "path": "scripts/harness-erased-types-review.mjs",
+          "sha256": "1a45b74cf281944fcd20ee6bee192420077453a20a305b290b2ed02ed6ba5f6c"
+        },
+        {
+          "path": "tests/harness_erased_types_probe.mjs",
+          "sha256": "fece5376353865b2408630fe9ca0c01c8665e5eaa41618640fb46889e3e46093"
+        },
+        {
+          "path": "compatibility/rc/component-harness-public-subjects.json",
+          "sha256": "4379f0c1121a731ea7024b2c24af0c0b2f54d1a900d424162f34c4870d1889ff"
+        }
+      ]
+    },
+    {
+      "file": "legacy-form-field/testing/form-field-harness-base.ts",
+      "module": "@angular/cdk/testing",
+      "symbol": "AsyncFactoryFn",
+      "candidate_source_sha256": "e4910d6f5291a880375ac0b9a58f8d9468ad28a5644743a8ef765ec87878cac4",
+      "conclusion": "removed-use",
+      "reviewer": "Codex primary implementer",
+      "decision": "In legacy-form-field/testing/form-field-harness-base.ts, AsyncFactoryFn is absent from imports and all code identifiers. Actual replacement factories: line 32 _prefixContainer: () => Promise<TestElement | null>; line 33 _suffixContainer: () => Promise<TestElement | null>; line 34 _label: () => Promise<TestElement | null>; line 35 _hints: () => Promise<TestElement[]>; line 36 _inputControl: () => Promise<ControlHarness | null>; line 37 _selectControl: () => Promise<ControlHarness | null>; line 38 _datepickerInputControl: () => Promise<ControlHarness | null>; line 39 _dateRangeInputControl: () => Promise<ControlHarness | null>. The untouched public original alias is exactly () => Promise<T>; both current minima retain it only with deprecated/private/removal tags, and the owned source uses the explicit shape. Zero parameters and Promise result shape are guarded, with result type arguments recorded. Strict branch-minimum standalone fixtures verify the original expansion in both directions. This closes this removed dependency use, while whole historical member/API equality, owned actions and native/full floor qualification remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/harness-erased-types-source-proof.json",
+          "sha256": "d635e79faba3acbd5448909523e84cf9e59a67057618e66141fdd772f388f189"
+        },
+        {
+          "path": "compatibility/rc/harness-erased-types-minimum-source-diagnostic.json",
+          "sha256": "339dd7822516663c9fc9675892805ef313d8127e31dc3accbf3ef39c0bd9926d"
+        },
+        {
+          "path": "scripts/harness-erased-types-review.mjs",
+          "sha256": "1a45b74cf281944fcd20ee6bee192420077453a20a305b290b2ed02ed6ba5f6c"
+        },
+        {
+          "path": "tests/harness_erased_types_probe.mjs",
+          "sha256": "fece5376353865b2408630fe9ca0c01c8665e5eaa41618640fb46889e3e46093"
+        },
+        {
+          "path": "compatibility/rc/component-harness-public-subjects.json",
+          "sha256": "4379f0c1121a731ea7024b2c24af0c0b2f54d1a900d424162f34c4870d1889ff"
+        }
+      ]
+    },
+    {
+      "file": "legacy-form-field/testing/form-field-harness-base.ts",
+      "module": "@angular/cdk/testing",
+      "symbol": "ComponentHarnessConstructor",
+      "candidate_source_sha256": "e4910d6f5291a880375ac0b9a58f8d9468ad28a5644743a8ef765ec87878cac4",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "In legacy-form-field/testing/form-field-harness-base.ts, public ComponentHarnessConstructor resolves to exact local binding ComponentHarnessConstructor at these erased positions: line 28: erased-type-reference: ComponentHarnessConstructor<ErrorBase>; line 65: erased-type-reference: ComponentHarnessConstructor<X>. The complete independently authenticated original and both minimum declarations match, with stable public exports and tags. Interface inheritance and type/generic references are erased; runtime aliases or class inheritance reject. Strict minimum compiler fixtures prove filter, constructor/query and result contracts, including relevant negative controls. This closes the imported type boundary only; owned runtime behavior, complete API and native/full floor/upstream SHA review remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/harness-erased-types-source-proof.json",
+          "sha256": "d635e79faba3acbd5448909523e84cf9e59a67057618e66141fdd772f388f189"
+        },
+        {
+          "path": "compatibility/rc/harness-erased-types-minimum-source-diagnostic.json",
+          "sha256": "339dd7822516663c9fc9675892805ef313d8127e31dc3accbf3ef39c0bd9926d"
+        },
+        {
+          "path": "scripts/harness-erased-types-review.mjs",
+          "sha256": "1a45b74cf281944fcd20ee6bee192420077453a20a305b290b2ed02ed6ba5f6c"
+        },
+        {
+          "path": "tests/harness_erased_types_probe.mjs",
+          "sha256": "fece5376353865b2408630fe9ca0c01c8665e5eaa41618640fb46889e3e46093"
+        },
+        {
+          "path": "compatibility/rc/component-harness-public-subjects.json",
+          "sha256": "4379f0c1121a731ea7024b2c24af0c0b2f54d1a900d424162f34c4870d1889ff"
+        }
+      ]
+    },
+    {
+      "file": "legacy-form-field/testing/form-field-harness-base.ts",
+      "module": "@angular/cdk/testing",
+      "symbol": "HarnessQuery",
+      "candidate_source_sha256": "e4910d6f5291a880375ac0b9a58f8d9468ad28a5644743a8ef765ec87878cac4",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "In legacy-form-field/testing/form-field-harness-base.ts, public HarnessQuery resolves to exact local binding HarnessQuery at these erased positions: line 70: erased-type-reference: HarnessQuery<X>. The complete independently authenticated original and both minimum declarations match, with stable public exports and tags. Interface inheritance and type/generic references are erased; runtime aliases or class inheritance reject. Strict minimum compiler fixtures prove filter, constructor/query and result contracts, including relevant negative controls. This closes the imported type boundary only; owned runtime behavior, complete API and native/full floor/upstream SHA review remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/harness-erased-types-source-proof.json",
+          "sha256": "d635e79faba3acbd5448909523e84cf9e59a67057618e66141fdd772f388f189"
+        },
+        {
+          "path": "compatibility/rc/harness-erased-types-minimum-source-diagnostic.json",
+          "sha256": "339dd7822516663c9fc9675892805ef313d8127e31dc3accbf3ef39c0bd9926d"
+        },
+        {
+          "path": "scripts/harness-erased-types-review.mjs",
+          "sha256": "1a45b74cf281944fcd20ee6bee192420077453a20a305b290b2ed02ed6ba5f6c"
+        },
+        {
+          "path": "tests/harness_erased_types_probe.mjs",
+          "sha256": "fece5376353865b2408630fe9ca0c01c8665e5eaa41618640fb46889e3e46093"
+        },
+        {
+          "path": "compatibility/rc/component-harness-public-subjects.json",
+          "sha256": "4379f0c1121a731ea7024b2c24af0c0b2f54d1a900d424162f34c4870d1889ff"
+        }
+      ]
+    },
+    {
+      "file": "legacy-form-field/testing/error-harness.ts",
+      "module": "@angular/cdk/testing",
+      "symbol": "ComponentHarnessConstructor",
+      "candidate_source_sha256": "7d259447752aea972328fcc9f5c3c126893720ffab84bc4ea755b38cd4c0848f",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "In legacy-form-field/testing/error-harness.ts, public ComponentHarnessConstructor resolves to exact local binding ComponentHarnessConstructor at these erased positions: line 24: erased-type-reference: ComponentHarnessConstructor<T>. The complete independently authenticated original and both minimum declarations match, with stable public exports and tags. Interface inheritance and type/generic references are erased; runtime aliases or class inheritance reject. Strict minimum compiler fixtures prove filter, constructor/query and result contracts, including relevant negative controls. This closes the imported type boundary only; owned runtime behavior, complete API and native/full floor/upstream SHA review remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/harness-erased-types-source-proof.json",
+          "sha256": "d635e79faba3acbd5448909523e84cf9e59a67057618e66141fdd772f388f189"
+        },
+        {
+          "path": "compatibility/rc/harness-erased-types-minimum-source-diagnostic.json",
+          "sha256": "339dd7822516663c9fc9675892805ef313d8127e31dc3accbf3ef39c0bd9926d"
+        },
+        {
+          "path": "scripts/harness-erased-types-review.mjs",
+          "sha256": "1a45b74cf281944fcd20ee6bee192420077453a20a305b290b2ed02ed6ba5f6c"
+        },
+        {
+          "path": "tests/harness_erased_types_probe.mjs",
+          "sha256": "fece5376353865b2408630fe9ca0c01c8665e5eaa41618640fb46889e3e46093"
+        },
+        {
+          "path": "compatibility/rc/component-harness-public-subjects.json",
+          "sha256": "4379f0c1121a731ea7024b2c24af0c0b2f54d1a900d424162f34c4870d1889ff"
+        }
+      ]
+    },
+    {
+      "file": "legacy-dialog/testing/dialog-harness-base.ts",
+      "module": "@angular/cdk/testing",
+      "symbol": "ComponentHarnessConstructor",
+      "candidate_source_sha256": "0ea37a7bcdcafcad72ff21483223f89682857961fdfcbddff80c919985bba0f3",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "In legacy-dialog/testing/dialog-harness-base.ts, public ComponentHarnessConstructor resolves to exact local binding ComponentHarnessConstructor at these erased positions: line 89: erased-type-reference: ComponentHarnessConstructor<T>. The complete independently authenticated original and both minimum declarations match, with stable public exports and tags. Interface inheritance and type/generic references are erased; runtime aliases or class inheritance reject. Strict minimum compiler fixtures prove filter, constructor/query and result contracts, including relevant negative controls. This closes the imported type boundary only; owned runtime behavior, complete API and native/full floor/upstream SHA review remain separate.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/harness-erased-types-source-proof.json",
+          "sha256": "d635e79faba3acbd5448909523e84cf9e59a67057618e66141fdd772f388f189"
+        },
+        {
+          "path": "compatibility/rc/harness-erased-types-minimum-source-diagnostic.json",
+          "sha256": "339dd7822516663c9fc9675892805ef313d8127e31dc3accbf3ef39c0bd9926d"
+        },
+        {
+          "path": "scripts/harness-erased-types-review.mjs",
+          "sha256": "1a45b74cf281944fcd20ee6bee192420077453a20a305b290b2ed02ed6ba5f6c"
+        },
+        {
+          "path": "tests/harness_erased_types_probe.mjs",
+          "sha256": "fece5376353865b2408630fe9ca0c01c8665e5eaa41618640fb46889e3e46093"
+        },
+        {
+          "path": "compatibility/rc/component-harness-public-subjects.json",
+          "sha256": "4379f0c1121a731ea7024b2c24af0c0b2f54d1a900d424162f34c4870d1889ff"
+        }
+      ]
+    }
+  ]
+}
