@@ -10,9 +10,13 @@
 const definitions=new WeakMap();
 let fixtureId=0;
 
+function leaf(nodeType,value,document){
+ return {nodeType,textContent:value,parentNode:null,ownerDocument:document,remove(){this.parentNode?.removeChild(this);}};
+}
+
 function node(name,document){
- const attributes=new Map(),classes=new Set(),styles=new Map(),listeners=new Map();
- return {nodeType:1,nodeName:name.toUpperCase(),tagName:name.toUpperCase(),ownerDocument:document,
+ const attributes=new Map(),classes=new Set(),styles=new Map();
+ return Object.defineProperties(new EventTarget(),Object.getOwnPropertyDescriptors({nodeType:1,nodeName:name.toUpperCase(),tagName:name.toUpperCase(),ownerDocument:document,
   childNodes:[],parentNode:null,textContent:'',attributes,
   get children(){return this.childNodes.filter(n=>n.nodeType===1);},
   get parentElement(){return this.parentNode;},
@@ -27,11 +31,9 @@ function node(name,document){
    remove(...names){for(const n of names)classes.delete(n);attributes.set('class',[...classes].join(' '));},contains(name){return classes.has(name);}},
   style:{setProperty(name,value){styles.set(name,value);},removeProperty(name){styles.delete(name);}},
   querySelector(){return null;},querySelectorAll(){return [];},
-  addEventListener(name,fn){if(!listeners.has(name))listeners.set(name,new Set());listeners.get(name).add(fn);},
-  removeEventListener(name,fn){listeners.get(name)?.delete(fn);},
   focus(){document.activeElement=this;},blur(){if(document.activeElement===this)document.activeElement=null;},
   getBoundingClientRect(){return{top:0,left:0,width:0,height:0,right:0,bottom:0};},
- };
+ }));
 }
 
 /** A public Renderer2 for empty fixture nodes; it deliberately supplies no browser geometry/CSS. */
@@ -39,8 +41,8 @@ function renderer(core,document){
  return new class extends core.Renderer2 {
   data={};destroyNode=null;destroy(){}
   createElement(name){return node(name,document);}
-  createText(value){return{nodeType:3,textContent:value,parentNode:null};}
-  createComment(value){return{nodeType:8,textContent:value,parentNode:null};}
+  createText(value){return leaf(3,value,document);}
+  createComment(value){return leaf(8,value,document);}
   appendChild(parent,child){parent.appendChild(child);}
   insertBefore(parent,child,next){
    // Angular can request a container anchor before content projection attaches
@@ -50,7 +52,11 @@ function renderer(core,document){
     parent.insertBefore(child,next);
    }
   }
-  removeChild(parent,child){parent.removeChild(child);}
+  removeChild(_parent,child){
+   // Angular's public DOM renderer removes the child from its actual parent,
+   // including already-detached nodes during portal/view cleanup.
+   child.remove();
+  }
   selectRootElement(target){if(typeof target==='string')throw Error('fixture requires an explicit host element');return target;}
   parentNode(target){return target.parentNode;}
   nextSibling(target){const siblings=target.parentNode?.childNodes||[];return siblings[siblings.indexOf(target)+1]||null;}
@@ -62,7 +68,12 @@ function renderer(core,document){
   removeStyle(target,name){target.style.removeProperty(name);}
   setProperty(target,name,value){target[name]=value;}
   setValue(target,value){target.textContent=value;}
-  listen(target,name,fn){if(typeof target==='string')throw Error('synthetic fixture cannot register global browser events');target.addEventListener(name,fn);return()=>target.removeEventListener(name,fn);}
+  listen(target,name,fn){
+   if(typeof target==='string')target=({body:document.body,document,window:document.defaultView})[target];
+   if(!target||typeof target.addEventListener!=='function')throw Error('synthetic fixture event target unavailable');
+   const callback=event=>{if(fn(event)===false)event.preventDefault();};
+   target.addEventListener(name,callback);return()=>target.removeEventListener(name,callback);
+  }
  };
 }
 
@@ -126,15 +137,19 @@ function fixtureDefinitions(core,{nodeFactory,attributes={},parentProviders=[],p
  * TemplateRef. Providers are caller-supplied public module/configuration values;
  * missing services propagate. There is no private token discovery or fallback.
  */
-export async function createPublicFactoryContext(core,importModule,{providers=[],nodeFactory,attributes={},parentProviders=[],parentHost}={}){
+export async function createPublicFactoryContext(core,importModule,{providers=[],nodeFactory,attributes={},parentProviders=[],parentHost,defaultViewTarget=false}={}){
+ if(typeof defaultViewTarget!=='boolean')throw Error('synthetic defaultView target option must be boolean');
+ const defaultView=defaultViewTarget?new EventTarget():null;
  const {BrowserModule}=await importModule('@angular/platform-browser');
  const {PlatformLocation}=await importModule('@angular/common');
  const {MockPlatformLocation}=await importModule('@angular/common/testing');
  const platformLocation=new MockPlatformLocation({startUrl:'https://factory-context.invalid/'});
- const document=Object.assign(new EventTarget(),{activeElement:null,defaultView:null,doctype:{},
+ const document=Object.assign(new EventTarget(),{activeElement:null,defaultView,doctype:{},
   createElement(name){return node(name,document);},
-  createTextNode(value){return{nodeType:3,textContent:value,parentNode:null};},
+  createTextNode(value){return leaf(3,value,document);},
+  createComment(value){return leaf(8,value,document);},
   querySelector(){return null;},querySelectorAll(){return [];}});
+ if(defaultView)defaultView.document=document;
  document.head=node('head',document);document.body=node('body',document);document.documentElement=node('html',document);
  document.documentElement.appendChild(document.head);document.documentElement.appendChild(document.body);
  document.getElementsByClassName=name=>{
@@ -160,6 +175,6 @@ export async function createPublicFactoryContext(core,importModule,{providers=[]
   if(!component.instance.element||!component.instance.template||!component.instance.parent)throw Error('public Angular node probes were not created');
   return {environment,component,document,host,platformLocation,parentNode:component.instance.parent,element:component.instance.element,template:component.instance.template,
    scopeToken:defs.scopeToken,parentValue:defs.parentValue,childValue:defs.childValue,close,
-   context:'actual Angular element/template nodes and public application providers with synthetic Renderer2/server DOM and public MockPlatformLocation URL backend; native/browser/AOT/packed/floors separate'};
+   context:'actual Angular element/template nodes and public application providers with synthetic Renderer2/server DOM and public MockPlatformLocation URL backend; native/browser/AOT/packed/floors separate'+(defaultViewTarget?'; explicit synthetic defaultView EventTarget, no browser geometry':'')};
  }catch(error){close();throw error;}
 }

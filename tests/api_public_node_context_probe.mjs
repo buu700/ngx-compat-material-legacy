@@ -2,6 +2,7 @@
  * @license
  * Copyright Google LLC All Rights Reserved.
  * Copyright (c) 2026 Ryan Lester.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -63,6 +64,20 @@ try{
  assert.equal(disposed,false);reference.dispose();assert.equal(disposed,true);subscription.unsubscribe();
  assert.equal(fixture.component.hostView.destroyed,false);assert.equal(fixture.environment.destroyed,false);
  cases.push({id:'genuine-public-overlay-reference-and-caller-disposal',result:'pass'});
+ const publicRenderer=fixture.element.injector.get(core.Renderer2);
+ for(const surface of ['body','document']){
+  const target=surface==='body'?fixture.document.body:fixture.document,events=[];
+  const stop=publicRenderer.listen(surface,'api-fixture-event',event=>{events.push(event.target);return false;});
+  const event=new Event('api-fixture-event',{cancelable:true});target.dispatchEvent(event);
+  assert.equal(events.length,1);assert.ok(events[0]===target,'fixture listener changed event target');assert.equal(event.defaultPrevented,true);stop();target.dispatchEvent(new Event('api-fixture-event'));assert.equal(events.length,1);
+ }
+ assert.throws(()=>publicRenderer.listen('window','api-fixture-event',()=>{}),/event target unavailable/);
+ assert.throws(()=>publicRenderer.listen('foreign','api-fixture-event',()=>{}),/event target unavailable/);
+ cases.push({id:'actual-EventTarget-body-document-delivery-cancellation-and-unsubscribe',result:'pass'});
+ for(const child of [publicRenderer.createElement('span'),publicRenderer.createText('fixture'),publicRenderer.createComment('fixture')]){
+  fixture.document.body.appendChild(child);publicRenderer.removeChild(null,child);assert.equal(child.parentNode,null);publicRenderer.removeChild(null,child);
+ }
+ cases.push({id:'public-renderer-detached-element-text-comment-removal-is-idempotent',result:'pass'});
  const unknown=new core.InjectionToken('Unknown required API fixture service');
  const missing=runFactory(()=>core.inject(unknown),core.Injector,core.runInInjectionContext,{injector:fixture.element.injector});
  assert.equal(missing.outcome,'threw');assert.equal(missing.requests.length,1);assert.ok(missing.requests[0].token===unknown,'wrong unresolved token');
@@ -71,6 +86,17 @@ try{
 }finally{fixture.close();fixture.close();}
 assert.equal(fixture.component.hostView.destroyed,true);assert.equal(fixture.environment.destroyed,true);
 cases.push({id:'caller-view-and-environment-cleanup-is-idempotent',result:'pass'});
+
+const windowFixture=await createPublicFactoryContext(core,load,{defaultViewTarget:true});
+try{
+ const renderer=windowFixture.element.injector.get(core.Renderer2),target=windowFixture.document.defaultView;
+ assert.ok(target instanceof EventTarget);assert.ok(target.document===windowFixture.document);let delivered=0;
+ const stop=renderer.listen('window','api-window-event',()=>delivered++);target.dispatchEvent(new Event('api-window-event'));assert.equal(delivered,1);stop();target.dispatchEvent(new Event('api-window-event'));assert.equal(delivered,1);
+ assert.ok(windowFixture.context.includes('explicit synthetic defaultView EventTarget, no browser geometry'));
+ cases.push({id:'explicit-synthetic-defaultView-event-target-delivery-and-unsubscribe',result:'pass'});
+}finally{windowFixture.close();}
+await assert.rejects(()=>createPublicFactoryContext(core,load,{defaultViewTarget:'invalid'}),/must be boolean/);
+cases.push({id:'invalid-synthetic-defaultView-option-rejected',result:'rejected'});
 
 class ProjectingOwner{destroyed=false;ngOnDestroy(){this.destroyed=true;}}
 core.Component({selector:'api-projecting-owner',standalone:true,template:'<article><ng-content></ng-content></article>'})(ProjectingOwner);
