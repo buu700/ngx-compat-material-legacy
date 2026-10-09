@@ -48,9 +48,22 @@ function callback(source,name,kind){
 const caps=JSON.parse(readFileSync(resolve(root,'compatibility/rc/autocomplete-landscape-cdk-sources/identities.json'),'utf8'));
 const materialCaps=JSON.parse(readFileSync(resolve(root,'compatibility/rc/autocomplete-input-peer-sources/identities.json'),'utf8'));
 function member(cap,suffix){const x=cap.members.find(x=>x.archive_member.endsWith(suffix));assert.ok(x);const compressed=readFileSync(resolve(root,x.retained.path));assert.equal(hash(compressed),x.retained.sha256);const bytes=gunzipSync(compressed);assert.equal(hash(bytes),x.member_sha256);assert.equal(bytes.length,x.member_bytes);return bytes.toString('utf8');}
+function publicStrategyBinding(cap){
+ const runtime=member(cap,'/overlay.mjs'),declarations=member(cap,'/overlay.d.ts'),name='FlexibleConnectedPositionStrategy';
+ assert.deepEqual(cap.exports['./overlay'],{types:'./types/overlay.d.ts',default:'./fesm2022/overlay.mjs'});
+ const runtimeFile=ts.createSourceFile('overlay.mjs',runtime,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);
+ const runtimeExports=runtimeFile.statements.filter(ts.isExportDeclaration).filter(n=>n.moduleSpecifier?.text==='./_overlay-module-chunk.mjs'&&n.exportClause&&ts.isNamedExports(n.exportClause)).flatMap(n=>[...n.exportClause.elements]);
+ const runtimeBinding=runtimeExports.filter(n=>n.name.text===name);assert.equal(runtimeBinding.length,1);assert.equal(runtimeBinding[0].propertyName?.text||runtimeBinding[0].name.text,name);
+ const typesFile=ts.createSourceFile('overlay.d.ts',declarations,ts.ScriptTarget.Latest,true);
+ const localExports=typesFile.statements.filter(ts.isExportDeclaration).filter(n=>!n.moduleSpecifier&&!n.isTypeOnly&&n.exportClause&&ts.isNamedExports(n.exportClause)).flatMap(n=>[...n.exportClause.elements]);
+ const typeBinding=localExports.filter(n=>n.name.text===name);assert.equal(typeBinding.length,1);const importedName=typeBinding[0].propertyName?.text||typeBinding[0].name.text;
+ const imports=typesFile.statements.filter(ts.isImportDeclaration).filter(n=>n.moduleSpecifier.text==='./_overlay-module-chunk.js'&&n.importClause?.namedBindings&&ts.isNamedImports(n.importClause.namedBindings)).flatMap(n=>[...n.importClause.namedBindings.elements]);
+ const imported=imports.filter(n=>n.name.text===importedName);assert.equal(imported.length,1);assert.equal(imported[0].propertyName?.text||imported[0].name.text,name);
+ return {entrypoint:'@angular/cdk/overlay',export:name,runtime_root_sha256:hash(runtime),declaration_root_sha256:hash(declarations),runtime_target:'./_overlay-module-chunk.mjs',declaration_target:'./_overlay-module-chunk.js',result:'pass'};
+}
 const floors=[];
 for(const cap of caps){
- const source=member(cap,'_overlay-module-chunk.mjs'),layout=member(cap,'layout.mjs');
+ const public_binding=publicStrategyBinding(cap),source=member(cap,'_overlay-module-chunk.mjs'),layout=member(cap,'layout.mjs');
  const layoutFile=ts.createSourceFile('layout.mjs',layout,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);
  const declaration=layoutFile.statements.filter(ts.isVariableStatement).flatMap(n=>[...n.declarationList.declarations]).find(n=>n.name.getText(layoutFile)==='Breakpoints');assert.ok(declaration&&ts.isObjectLiteralExpression(declaration.initializer));
  const literal=node=>{if(ts.isStringLiteral(node))return node.text;assert.ok(ts.isBinaryExpression(node)&&node.operatorToken.kind===ts.SyntaxKind.PlusToken);return literal(node.left)+literal(node.right);};
@@ -63,7 +76,7 @@ for(const cap of caps){
  for(const name of names){const method=dts.node.members.find(n=>n.name?.getText(dts.file)===name);assert.ok(method&&!method.jsDoc?.some(x=>x.tags?.some(tag=>tag.tagName.text==='deprecated')));}
  const peer=materialCaps.find(x=>x.line===cap.line),compressed=readFileSync(resolve(root,peer.retained.path));assert.equal(hash(compressed),peer.retained.sha256);const bytes=gunzipSync(compressed);assert.equal(hash(bytes),peer.member_sha256);
  const peerCallback=callback(bytes.toString('utf8'),'MatAutocompleteTrigger',ts.ScriptKind.JS);assert.deepEqual(tokens(peerCallback),tokens(callback(raw,'_MatAutocompleteTriggerBase',ts.ScriptKind.TS)));
- floors.push({line:cap.line,version:cap.version,Type:exports.Peer,methods:methods.map(n=>({name:n.name.getText(file),text:n.getText(file),sha256:hash(n.getText(file))})),callback_sha256:hash(peerCallback),callback_tokens_sha256:hash(JSON.stringify(tokens(peerCallback)))});
+ floors.push({line:cap.line,version:cap.version,public_binding,Type:exports.Peer,methods:methods.map(n=>({name:n.name.getText(file),text:n.getText(file),sha256:hash(n.getText(file))})),callback_sha256:hash(peerCallback),callback_tokens_sha256:hash(JSON.stringify(tokens(peerCallback)))});
 }
 function fixture(Type,floor,initial=false){
  const state=value=>({matches:value,breakpoints:{[HANDSET]:value}}),changes=initial===null?new Subject():new BehaviorSubject(state(initial)),viewport=new Subject(),calls=[],sizes=[],atAttach=[],queries=[];
@@ -95,7 +108,7 @@ function observations(Type,floor){
  return rows;
 }
 const report={schema_version:1,line:JSON.parse(readFileSync(resolve(root,'projects/ngx-material-legacy/package.json'))).version.startsWith('21.')?'21.x':'main',node:process.version,typescript:ts.version,source:{path:sourcePath,sha256:hash(raw),whole_callback_sha256:hash(callback(raw,'_MatAutocompleteTriggerBase',ts.ScriptKind.TS))},floors:[],mutants:[],scope:'Complete owned source prototype methods with constructors/decorators/fields excluded; real borrowed RxJS streams and public host TemplatePortal/OverlayConfig data constructors; complete exact-minimum public strategy setters on synthetic receivers; viewport/layout/OverlayRef/Angular/native/packed/full minimum runtime execution excluded.',g11_claim:'not-passed'};
-for(const floor of floors){const rows=observations(owned(),floor);assert.ok(rows.every(x=>x.result==='pass'),JSON.stringify(rows));report.floors.push({line:floor.line,version:floor.version,methods:floor.methods,callback_sha256:floor.callback_sha256,callback_tokens_sha256:floor.callback_tokens_sha256,cases:rows});}
+for(const floor of floors){const rows=observations(owned(),floor);assert.ok(rows.every(x=>x.result==='pass'),JSON.stringify(rows));report.floors.push({line:floor.line,version:floor.version,public_binding:floor.public_binding,methods:floor.methods,callback_sha256:floor.callback_sha256,callback_tokens_sha256:floor.callback_tokens_sha256,cases:rows});}
 for(const [id,method,find,replacement]of [
  ['wrong-handset-query','_attachOverlay','observe(Breakpoints.HandsetLandscape)','observe("wrong query")'],
  ['disable-growth-in-landscape','_attachOverlay','withGrowAfterOpen(true)','withGrowAfterOpen(false)'],
