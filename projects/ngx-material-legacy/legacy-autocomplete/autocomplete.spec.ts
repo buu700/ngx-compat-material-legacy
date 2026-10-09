@@ -1,4 +1,5 @@
 import {Directionality} from '@angular/cdk/bidi';
+import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
 import {DOWN_ARROW, ENTER, ESCAPE, SPACE, TAB, UP_ARROW} from '@angular/cdk/keycodes';
 import {Overlay, OverlayContainer} from '@angular/cdk/overlay';
 import {supportsShadowDom} from '../internal/owned-shadow-dom';
@@ -40,7 +41,7 @@ import {MatLegacyOption, MatLegacyOptionSelectionChange} from '@ngx-compat/mater
 import {MatLegacyFormField, MatLegacyFormFieldModule} from '@ngx-compat/material-legacy/legacy-form-field';
 import {By} from '@angular/platform-browser';
 import {LEGACY_NOOP_ANIMATIONS} from '../internal/testing/owned-animation-modules';
-import {EMPTY, Observable, Subject, Subscription} from 'rxjs';
+import {BehaviorSubject, EMPTY, Observable, Subject, Subscription} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 
 import {MatLegacyInputModule} from '../legacy-input/index';
@@ -2010,6 +2011,91 @@ describe('MatAutocomplete', () => {
         .toEqual(Math.floor(panelBottom));
 
       expect(panel.classList).toContain('mat-autocomplete-panel-above');
+    }));
+
+    it('should fit an above-position panel inside the handset landscape viewport', fakeAsync(() => {
+      const changes = new BehaviorSubject({matches: true, breakpoints: {[Breakpoints.HandsetLandscape]: true}});
+      const observer = {observe: (query: string) => {
+        expect(query).toBe(Breakpoints.HandsetLandscape);
+        return changes.asObservable();
+      }};
+      const fixture = createComponent(SimpleAutocomplete, [{provide: BreakpointObserver, useValue: observer}]);
+      fixture.componentInstance.position = 'above';
+      fixture.detectChanges();
+      const origin = fixture.debugElement.query(By.css('.mat-form-field-flex')).nativeElement as HTMLElement;
+      origin.style.position = 'fixed';
+      origin.style.top = '100px';
+      fixture.componentInstance.trigger.openPanel();
+      fixture.detectChanges();
+      zone.simulateZoneExit();
+      tick();
+      fixture.detectChanges();
+      const panel = overlayContainerElement.querySelector('.mat-autocomplete-panel') as HTMLElement;
+      expect(panel).toBeTruthy();
+      const originRect = origin.getBoundingClientRect();
+      const panelRect = panel.getBoundingClientRect();
+      expect(panelRect.height).toBeGreaterThan(0);
+      expect(panelRect.top).toBeGreaterThanOrEqual(7);
+      expect(panelRect.bottom).toBeLessThanOrEqual(originRect.top + 1);
+      expect(panelRect.height).toBeLessThanOrEqual(originRect.top - 7);
+      fixture.destroy();
+      changes.complete();
+    }));
+
+    it('should reset landscape configuration and unsubscribe without destroying the observer', fakeAsync(() => {
+      const changes = new BehaviorSubject({matches: true, breakpoints: {[Breakpoints.HandsetLandscape]: true}});
+      const observe = jasmine.createSpy('handset observer').and.callFake((query: string) => {
+        expect(query).toBe(Breakpoints.HandsetLandscape);
+        return changes.asObservable();
+      });
+      const fixture = createComponent(SimpleAutocomplete, [{provide: BreakpointObserver, useValue: {observe}}]);
+      fixture.detectChanges();
+      fixture.componentInstance.trigger.openPanel();
+      fixture.detectChanges();
+      zone.simulateZoneExit();
+      const strategy = (fixture.componentInstance.trigger as any)._positionStrategy;
+      const flexible = spyOn(strategy, 'withFlexibleDimensions').and.callThrough();
+      const grow = spyOn(strategy, 'withGrowAfterOpen').and.callThrough();
+      const margin = spyOn(strategy, 'withViewportMargin').and.callThrough();
+      changes.next({matches: false, breakpoints: {[Breakpoints.HandsetLandscape]: false}});
+      expect(flexible).toHaveBeenCalledOnceWith(false);
+      expect(grow).toHaveBeenCalledOnceWith(false);
+      expect(margin).toHaveBeenCalledOnceWith(0);
+      expect(observe).toHaveBeenCalledTimes(1);
+      fixture.destroy();
+      changes.next({matches: true, breakpoints: {[Breakpoints.HandsetLandscape]: true}});
+      expect(flexible).toHaveBeenCalledTimes(1);
+      expect(grow).toHaveBeenCalledTimes(1);
+      expect(margin).toHaveBeenCalledTimes(1);
+      let borrowedObserverDeliveries = 0;
+      const subscription = changes.subscribe(() => borrowedObserverDeliveries++);
+      expect(borrowedObserverDeliveries).toBe(1);
+      subscription.unsubscribe();
+      changes.complete();
+    }));
+
+    it('should reuse one handset subscription across panel close and reopen', fakeAsync(() => {
+      const changes = new BehaviorSubject({matches: false, breakpoints: {[Breakpoints.HandsetLandscape]: false}});
+      const observe = jasmine.createSpy('handset observer').and.returnValue(changes.asObservable());
+      const fixture = createComponent(SimpleAutocomplete, [{provide: BreakpointObserver, useValue: {observe}}]);
+      fixture.detectChanges();
+      fixture.componentInstance.trigger.openPanel();
+      fixture.detectChanges();
+      zone.simulateZoneExit();
+      const strategy = (fixture.componentInstance.trigger as any)._positionStrategy;
+      const margin = spyOn(strategy, 'withViewportMargin').and.callThrough();
+      fixture.componentInstance.trigger.closePanel();
+      fixture.detectChanges();
+      changes.next({matches: true, breakpoints: {[Breakpoints.HandsetLandscape]: true}});
+      expect(margin).toHaveBeenCalledOnceWith(8);
+      fixture.componentInstance.trigger.openPanel();
+      fixture.detectChanges();
+      zone.simulateZoneExit();
+      expect(fixture.componentInstance.trigger.panelOpen).toBe(true);
+      expect((fixture.componentInstance.trigger as any)._positionStrategy).toBe(strategy);
+      expect(observe).toHaveBeenCalledTimes(1);
+      fixture.destroy();
+      changes.complete();
     }));
 
     it('should allow the panel to expand when the number of results increases', fakeAsync(() => {
