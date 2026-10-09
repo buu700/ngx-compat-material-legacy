@@ -3990,5 +3990,46 @@
       "pending_shas": 7,
       "g11_claim": "not-passed"
     }
+  },
+  "animation_policy_review_lead": {
+    "recorded_at_utc": "2026-10-09T22:55:40.073056+00:00",
+    "status": "needs-review; no token/API repair implemented or admitted",
+    "frozen_uses": 22,
+    "exact_minimum_archives": [
+      {
+        "version": "22.1.7",
+        "archive_sha256": "06115b963b565428d8d5f79cc1cdd07a3f0d5a58dbaebf9955639f38b35ac43d",
+        "members": [
+          {
+            "file": "package/fesm2022/_animation-chunk.mjs",
+            "sha256": "aee503778d1b8828786122a1a322d53115159461ef0a96b09a84d87bdb36b37e"
+          },
+          {
+            "file": "package/types/core.d.ts",
+            "sha256": "06e2cf0c67ba3d8555edb38626bd7264e7c0871e3f1fa4d517725935589aa880"
+          }
+        ]
+      },
+      {
+        "version": "21.2.14",
+        "archive_sha256": "2f8c0fce7967b8a91a07bc3a184cf5da6023eac3828d15fa23b6c338b340e23c",
+        "members": [
+          {
+            "file": "package/fesm2022/_animation-chunk.mjs",
+            "sha256": "aee503778d1b8828786122a1a322d53115159461ef0a96b09a84d87bdb36b37e"
+          },
+          {
+            "file": "package/types/core.d.ts",
+            "sha256": "e69eba12b87eaae09de70629e0637fc9b07751a7fb4493dac9d7e3cf0ed21964"
+          }
+        ]
+      }
+    ],
+    "material_animation_chunk_source": "import { MediaMatcher } from '@angular/cdk/layout';\nimport { InjectionToken, inject, ANIMATION_MODULE_TYPE } from '@angular/core';\n\nconst MATERIAL_ANIMATIONS = new InjectionToken('MATERIAL_ANIMATIONS');\nlet reducedMotion = null;\nfunction _getAnimationsState() {\n  if (inject(MATERIAL_ANIMATIONS, {\n    optional: true\n  })?.animationsDisabled || inject(ANIMATION_MODULE_TYPE, {\n    optional: true\n  }) === 'NoopAnimations') {\n    return 'di-disabled';\n  }\n  reducedMotion ??= inject(MediaMatcher).matchMedia('(prefers-reduced-motion)').matches;\n  return reducedMotion ? 'reduced-motion' : 'enabled';\n}\nfunction _animationsDisabled() {\n  return _getAnimationsState() !== 'enabled';\n}\n\nexport { MATERIAL_ANIMATIONS, _animationsDisabled, _getAnimationsState };\n//# sourceMappingURL=_animation-chunk.mjs.map\n",
+    "observation": "Both exact Material minimum animation chunks define MATERIAL_ANIMATIONS as a bare public InjectionToken with no providedIn/factory. It does not automatically derive NoopAnimations state. Their private helper independently reads optional deprecated core ANIMATION_MODULE_TYPE. Therefore replacing the old dependency with MATERIAL_ANIMATIONS alone loses old Noop auto-detection; do not assume an upstream config factory exists or call the private helper.",
+    "consumer_sanity": "Read-only Cyph source uses BrowserAnimationsModule in cyph-shared.module.ts. No NoopAnimationsModule/provideAnimations/LEGACY_ANIMATIONS configuration found in the targeted shared/js non-spec scan. No Cyph build/edit.",
+    "acquisition_scope": "Existing cached exact-minimum archives read only;21.2.14 archive metadata SHA/SRI revalidated against existing proof.json. Main archive/current public export provenance and complete dependencies still need binding before admission.",
+    "candidate_evaluation": "Any owned adapter needs explicit conservative TypeScript configuration and historical constructor/Noop/reduced-motion lifecycle proof. Owner delegated conservative TS API choices with Material16 HTML/CSS/SCSS preservation and Cyph sanity. Do not convert native/floor/contract obligations into a metadata-only pass.",
+    "g11_claim": "not-passed"
   }
 }
