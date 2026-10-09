@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "recorded_at_utc": "2026-10-09T18:30:34.892602+00:00",
+  "source_commit": "b85e110378391dfe44acdc2a4980bb34a151de14",
+  "source_tree": "8fd947f0b704ea5e1140544dd821a0fe1faf38ea",
+  "scope": "C00/C03 browser source admission and post-execution drift; no native browser or product qualification.",
+  "reproduced_gap": "Original actual browser runAcceptance read the absent artifact manifest for a foreign-line request rather than refusing its source binding first. Its bespoke request helper omitted actual dirty-source validation. Original observation writer repeated the claimed clean flag even when the new post-execution status check recorded dirty source.",
+  "repair": "Use the shared branch/commit/tree/clean/prepack request guard before roster,artifact reads or browser preflight. Recheck actual commit/tree/porcelain after native execution; unknown or dirty state is a report defect. Observation records actual clean status,commit and tree.",
+  "entrypoint_diagnostics": {
+    "schema_version": 1,
+    "role": "Actual browser runAcceptance with copied clean Git source; no artifact install or browser execution.",
+    "cases": [
+      {
+        "id": "valid-current-source",
+        "result": "pass",
+        "exit_code": 2,
+        "reached_artifact_read": true
+      },
+      {
+        "id": "foreign-line",
+        "result": "pass",
+        "exit_code": 2,
+        "reached_artifact_read": false
+      },
+      {
+        "id": "false-clean",
+        "result": "pass",
+        "exit_code": 2,
+        "reached_artifact_read": false
+      },
+      {
+        "id": "missing-clean",
+        "result": "pass",
+        "exit_code": 2,
+        "reached_artifact_read": false
+      },
+      {
+        "id": "foreign-commit",
+        "result": "pass",
+        "exit_code": 2,
+        "reached_artifact_read": false
+      },
+      {
+        "id": "foreign-tree",
+        "result": "pass",
+        "exit_code": 2,
+        "reached_artifact_read": false
+      },
+      {
+        "id": "prepack-binding",
+        "result": "pass",
+        "exit_code": 2,
+        "reached_artifact_read": false
+      },
+      {
+        "id": "untracked-dirty-source",
+        "result": "pass",
+        "exit_code": 2,
+        "reached_artifact_read": false
+      },
+      {
+        "id": "tracked-dirty-source",
+        "result": "pass",
+        "exit_code": 2,
+        "reached_artifact_read": false
+      },
+      {
+        "id": "repaired-current-source",
+        "result": "pass",
+        "exit_code": 2,
+        "reached_artifact_read": true
+      }
+    ],
+    "native_executed": false,
+    "line": "main"
+  },
+  "complete_report_path": {
+    "scenarios": 6,
+    "actual_function": "Entire actual runAcceptance function extracted by TypeScript parser; actual roster,observationProblems and qualifyRelease used; artifact/preflight/browser results are explicit synthetic test doubles.",
+    "controls": [
+      "clean after native stage",
+      "tracked dirty after native stage",
+      "untracked dirty after native stage",
+      "unknown Git status after native stage",
+      "changed commit after native stage",
+      "changed tree after native stage"
+    ],
+    "source_drift_gate_mutant_rejected": 1,
+    "native_executed": false,
+    "acceptance_credit": false
+  },
+  "tests": {
+    "python_tests": 2,
+    "python_result": "pass",
+    "browser_matrix_regressions": "pass",
+    "host_node": "22.23.3",
+    "typescript_parser": "6.0.3",
+    "diff_check": "pass"
+  },
+  "files": [
+    {
+      "path": "scripts/browser-matrix-acceptance.mjs",
+      "sha256": "e7f926f1e99ff4082f2848a994ed0ab71d57cb408dd18d2b871bc486fb6ac292",
+      "bytes": 14813
+    },
+    {
+      "path": "scripts/packed-consumer-evidence.mjs",
+      "sha256": "6941e2d8e68c3149ff14f727eb805dec3a240d7b1e1e896cc8423639bc625841",
+      "bytes": 14051
+    },
+    {
+      "path": "tests/browser_source_identity_probe.mjs",
+      "sha256": "8101b32c6789bd739280f4d84881112db8927103f0cb473e965d151fd809b2e9",
+      "bytes": 5254
+    },
+    {
+      "path": "tests/browser_source_completion_probe.mjs",
+      "sha256": "81ca731d4be24a4dbe9a2500135b63d541249472240b80de8ed8d88f30a3703b",
+      "bytes": 6034
+    },
+    {
+      "path": "tests/test_browser_source_identity.py",
+      "sha256": "116d1a0f22b5c858f526617b09bce1cc980b129f6bd1499b42c53b4d6b875e29",
+      "bytes": 1346
+    },
+    {
+      "path": "compatibility/rc/matrices/full-verify.json",
+      "sha256": "8e06b604212c0b0d61a33cc10c6bb079de117ff2987453586ced2e2be79e546d",
+      "bytes": 608028
+    }
+  ],
+  "product_api_html_css_scss_or_goldens_changed": false,
+  "matrix_population_changed": false,
+  "new_sha_closures": 0,
+  "reviewed_authored_uses": 430,
+  "open_authored_uses": 1306,
+  "g11_claim": "not-passed",
+  "pushed": false,
+  "actions_started": false,
+  "unexecuted": [
+    "Current exact-source native/packed/browser/floor qualification on both lines",
+    "Complete C02/C04/C05,A01-A10,R01-R03 and G01-G13"
+  ]
+}
