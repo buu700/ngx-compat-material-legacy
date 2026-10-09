@@ -10,10 +10,16 @@ import assert from 'node:assert/strict';
 import {originalFactoryContract} from './scripts/api-surface.mjs';import {originalCompilerFactoryContext} from './scripts/api-original-factory-contexts.mjs';
 import {originalPublicParentTokenRole,publicParentTokenRoleObservationProblems} from './scripts/api-public-parent-token-role.mjs';
 import {expectedFactoryDi} from './scripts/api-di-observe.mjs';import {settleDi} from './scripts/api-completeness.mjs';
+import {requiredParentFactoryProfile} from './scripts/api-required-parent-context.mjs';
 let rejected=0;
 for(const [family,name,file]of [['legacy-menu','MatLegacyMenuTrigger','menu-trigger'],['legacy-table','MatLegacyTextColumn','text-column'],...['MatLegacyCell','MatLegacyHeaderCell','MatLegacyFooterCell'].map(n=>['legacy-table',n,'cell'])]){
  const originalFactory=originalFactoryContract('/original/src/material/'+family+'/'+file+'.ts',name),symbol={symbol_id:family+'/primary/'+name,family,name,kind:'primary',shape:{originalFactory,originalFactoryContext:originalCompilerFactoryContext(originalFactory)}};
  const params=expectedFactoryDi(symbol.shape),row={symbol,problems:[],observed:params.map(p=>p.ident),factory_outcome:'returned',runtime_requests:params.map(p=>({expected_ident:p.ident,expected_spec:p.spec,identity_matched:true,unresolved:false,...Object.fromEntries(['optional','self','skipSelf','host'].flatMap(f=>[[f,Boolean(p[f])],['expected_'+f,Boolean(p[f])]])),public_parent_token_role:originalPublicParentTokenRole(symbol,p)}))};
+ const parent=requiredParentFactoryProfile(symbol);
+ if(parent)row.factory_required_parent_context={profile:parent,constructor_calls:1,constructor_arity:parent.constructor_arity,
+  required_input_identical:true,owned_parent_instance:true,parent_self_provider_identical:true,child_ancestor_provider_identical:true,
+  child_self_provider_absent:true,child_element_identical:true,separate_parent_node:true,angular_parent_initialized:true,
+  borrowed_parent_alive_after_child_teardown:true,borrowed_nodes_alive_after_child_teardown:true,borrowed_environment_alive_after_child_teardown:true};
  assert.deepEqual(publicParentTokenRoleObservationProblems(row),[]);assert.equal(settleDi(row,[]).result,'pass');
  for(const [index,request]of row.runtime_requests.entries())if(request.public_parent_token_role){
   for(const change of [r=>delete r.public_parent_token_role,r=>r.public_parent_token_role.public_spec='foreign',r=>r.public_parent_token_role.public_export='OwnedAlias',r=>r.public_parent_token_role.parameter_index++,r=>r.public_parent_token_role.original_source_sha256='0'.repeat(64),r=>r.public_parent_token_role.extra='waiver',r=>r.identity_matched=false,r=>r.unresolved=true,r=>r.optional=!r.optional,r=>r.expected_self=!r.expected_self]){

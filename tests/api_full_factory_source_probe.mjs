@@ -15,9 +15,11 @@ import {fileURLToPath,pathToFileURL} from 'node:url';
 import {tmpdir} from 'node:os';
 import {createHash} from 'node:crypto';
 import {deriveSurface} from '../scripts/api-surface.mjs';
-import {observeRuntimeDi,loadRuntimeModule,runFactory} from '../scripts/api-di-observe.mjs';
+import {observeRuntimeDi,observePublicNodeFactory,loadRuntimeModule,runFactory} from '../scripts/api-di-observe.mjs';
 import {settleDi} from '../scripts/api-completeness.mjs';
 import {createPublicFactoryContext} from '../scripts/api-public-node-context.mjs';
+import {captureFactoryConstructorInputs} from '../scripts/api-factory-constructor-inputs.mjs';
+import {requiredParentFactoryProfile} from '../scripts/api-required-parent-context.mjs';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),require=createRequire(import.meta.url);
 const arg=name=>process.argv.includes(name)?process.argv[process.argv.indexOf(name)+1]:null;
@@ -92,6 +94,47 @@ try{
  const symbols=surface.symbols.map(symbol=>({...symbol,di_id:selectedIds.has(symbol.symbol_id)?symbol.di_id:null}));
  const rows=(await observeRuntimeDi(runtime,symbols,[],load)).map(row=>settleDi(row,[]));
  assert.equal(rows.length,154);assert.deepEqual(rows.map(r=>r.symbol.symbol_id).sort(),[...selectedIds].sort());
+ const requiredParentControls=[];
+ console.error("Required-parent controls: start");
+ for(const symbol of selected.filter(s=>requiredParentFactoryProfile(s))){
+  console.error("Required-parent controls: "+symbol.symbol_id);
+  const profile=requiredParentFactoryProfile(symbol),row=rows.find(r=>r.symbol.symbol_id===symbol.symbol_id);
+  assert.equal(row.result,'pass',row.problems.join('\n'));
+  requiredParentControls.push({symbol_id:symbol.symbol_id,id:'actual-required-parent-construction-and-child-teardown',result:'pass',evidence:row.factory_required_parent_context});
+  const owned=await loadRuntimeModule(runtime,symbol.family,'primary'),Type=owned[symbol.name];
+  const missingHost=await createPublicFactoryContext(core,load,{providers:[core.importProvidersFrom(owned[profile.owner_module])]});
+  try{
+   const execution=runFactory(()=>captureFactoryConstructorInputs(Type),core.Injector,core.runInInjectionContext,{injector:missingHost.element.injector});
+   assert.equal(execution.outcome,'threw');assert.ok(execution.requests.some(r=>r.unresolved));
+   assert.equal(missingHost.component.hostView.destroyed,false);assert.equal(missingHost.environment.destroyed,false);
+   requiredParentControls.push({symbol_id:symbol.symbol_id,id:'actual-missing-required-parent-rejected',result:'rejected',error:execution.error});
+  }finally{missingHost.close();}
+  for(const mutation of ['discard-constructor-type-override','replace-required-constructor-input']){
+   console.error('Required-parent mutation: '+mutation);
+   class Mutant extends Type{}
+   Object.defineProperty(Mutant,'ɵfac',{value:Receiver=>mutation==='discard-constructor-type-override'
+    ?Type.ɵfac(Mutant):Type.ɵfac(class extends Receiver{constructor(...inputs){inputs[profile.parameter_index]={};super(...inputs);}})});
+   const execution=await observePublicNodeFactory(Mutant,core,runtime,symbol,symbols,load);
+   assert.equal(execution.outcome,'threw','invalid constructor evidence was accepted');
+   assert.equal(execution.requiredParentContext,undefined);
+   requiredParentControls.push({symbol_id:symbol.symbol_id,id:mutation,result:'rejected',error:execution.error});
+  }
+  for(const destruction of ['destroy-borrowed-view',...(profile.owner_export==='MatLegacyChip'||profile.owner_export==='MatLegacySelectionList'?['destroy-borrowed-parent']:[])]){
+   class Mutant extends Type{}
+   Object.defineProperty(Mutant,'ɵfac',{value:Receiver=>{
+    const detector=core.inject(core.ChangeDetectorRef),instance=Type.ɵfac(Receiver);
+    instance.ngOnDestroy=()=>destruction==='destroy-borrowed-view'?detector.destroy():instance[profile.owner_export==='MatLegacyChip'?'_parentChip':'selectionList'].ngOnDestroy();
+    return instance;
+   }});
+   const execution=await observePublicNodeFactory(Mutant,core,runtime,symbol,symbols,load);
+   assert.equal(execution.outcome,'returned',execution.error);
+   console.error('Required-parent lifetime: '+JSON.stringify({symbol:symbol.symbol_id,destruction,problems:execution.behaviorProblems,parent:execution.requiredParentContext.borrowed_parent_alive_after_child_teardown}));
+   assert.match(execution.behaviorProblems.join('|'),/destroyed (the borrowed (fixture view|parent)|borrowed Angular node probes)/);
+   assert.equal(execution.requiredParentContext.borrowed_parent_alive_after_child_teardown,false);
+   requiredParentControls.push({symbol_id:symbol.symbol_id,id:destruction,result:'rejected',problems:execution.behaviorProblems});
+  }
+ }
+ assert.equal(requiredParentControls.length,27);
  const ownedMenu=await loadRuntimeModule(runtime,'legacy-menu','primary'),peerMenu=await load('@angular/material/menu');
  const menuContext=await createPublicFactoryContext(core,load,{providers:[core.importProvidersFrom(ownedMenu.MatLegacyMenuModule)]});
  let menuItem;const publicParentControls=[];
@@ -111,7 +154,7 @@ try{
  const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
  const caps=[...new Set([...files.map(file=>file.fileName),...resources])].sort().map(file=>({path:file.slice(root.length+1),sha256:sha(readFileSync(file))}));
  const result={schema_version:1,role:'All original154 factory class source observations;not canonical packed/native/browser/floor qualification',
-  node:process.version,typescript:ts.version,runtime_peer:core.VERSION.full,entries,rows,selected_symbol_ids:[...selectedIds].sort(),emitted_public_import_routes:routes,public_parent_controls:publicParentControls,
+  node:process.version,typescript:ts.version,runtime_peer:core.VERSION.full,entries,rows,selected_symbol_ids:[...selectedIds].sort(),emitted_public_import_routes:routes,public_parent_controls:publicParentControls,required_parent_controls:requiredParentControls,
   passed:rows.filter(row=>row.result==='pass').length,failed:rows.filter(row=>row.result!=='pass').length,
   source_files:files.length,resource_files:resources.size,source_caps:caps,virtual_typecheck_files:virtualFiles.length,
   styles:'SCSS/HTML resources read unchanged by Angular compiler;no Sass/rendered style qualification',
