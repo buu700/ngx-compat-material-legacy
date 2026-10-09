@@ -4,12 +4,13 @@
  * before launching browsers, then binds observations to the packed artifact.
  * WebKitGTK is recorded as webkitgtk, not Safari. Does not claim G10.
  */
-import {existsSync, lstatSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
+import {existsSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
 import {spawnSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
-import {dirname, join, relative, resolve} from 'node:path';
+import {dirname, join, relative} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {resolveLibraryFromRun} from './resolve-run-library.mjs';
+import {coordinatorRequest} from './packed-consumer-evidence.mjs';
 import {legacyCoreHighContrastOkay} from './legacy-core-high-contrast-contract.mjs';
 import {loadReleaseRoster, observationProblems} from './browser-matrix-roster.mjs';
 import {executeIds, fixtureQualificationDefects, fixtureQualificationDefectsFromTarball} from './browser-required-cells.mjs';
@@ -18,39 +19,9 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const detailPath = join(root, 'compatibility/rc/reports/browser-matrix-slice.json');
 
 function gitValue(args) {
-  const result = spawnSync('git', args, {cwd: root, encoding: 'utf8'});
-  if (result.status !== 0) return '';
+  const result = spawnSync('git', ['-c', 'gc.auto=0', '-c', 'maintenance.auto=0', ...args], {cwd: root, encoding: 'utf8'});
+  if (result.status !== 0) return null;
   return result.stdout.trim();
-}
-
-function coordinatorRequest() {
-  const names = ['RC_CHECK_ID', 'RC_RUN_ID', 'RC_INVOCATION_ID', 'RC_EVIDENCE_BINDING', 'RC_ASSERTION_OUTPUT_DIR'];
-  const present = names.filter(name => process.env[name]);
-  if (present.length !== names.length) return {error: `incomplete coordinator environment: ${present.join(', ')}`};
-  if (process.env.RC_CHECK_ID !== 'browser-matrix') return {error: 'RC_CHECK_ID is not browser-matrix'};
-  const invocation = process.env.RC_INVOCATION_ID;
-  if (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,191}$/.test(invocation)) return {error: 'invalid invocation identity'};
-  let binding;
-  try {
-    binding = JSON.parse(process.env.RC_EVIDENCE_BINDING);
-  } catch {
-    return {error: 'RC_EVIDENCE_BINDING is not JSON'};
-  }
-  if (!binding || typeof binding !== 'object' || Array.isArray(binding)) return {error: 'binding is not an object'};
-  if (binding.run_id !== process.env.RC_RUN_ID) return {error: 'binding run_id does not match RC_RUN_ID'};
-  const outputDir = process.env.RC_ASSERTION_OUTPUT_DIR;
-  if (!outputDir || !existsSync(outputDir)) return {error: 'assertion output directory is missing'};
-  const stat = lstatSync(outputDir);
-  if (!stat.isDirectory() || stat.isSymbolicLink()) return {error: 'assertion output directory is not a real directory'};
-  if (!outputDir.endsWith(join('evidence', 'browser-matrix', invocation))) return {error: 'assertion directory is not check-owned'};
-  return {
-    binding,
-    invocation,
-    runId: process.env.RC_RUN_ID,
-    outputDir,
-    runDir: resolve(outputDir, '..', '..', '..'),
-    line: binding.source_line,
-  };
 }
 
 function preflight() {
@@ -164,7 +135,11 @@ function runCloseoutDiagnostic(request, library, launch) {
 }
 
 export async function runAcceptance({tarball, runPath}) {
-  const request = coordinatorRequest();
+  const request = coordinatorRequest('browser-matrix');
+  if (!request || request.error) {
+    console.error('browser-matrix: refusing acceptance report: ' + (request?.error ?? 'missing coordinator request'));
+    return 2;
+  }
   const roster = loadReleaseRoster('21.x');
   const matrix = JSON.parse(readFileSync(join(root, 'compatibility/rc/matrices/full-verify.json'), 'utf8'));
   const row = matrix.checks.find(item => item.check_id === 'browser-matrix');
@@ -210,7 +185,10 @@ export async function runAcceptance({tarball, runPath}) {
   });
   const commit = gitValue(['rev-parse', 'HEAD']);
   const tree = gitValue(['rev-parse', 'HEAD^{tree}']);
+  const status = gitValue(['status', '--porcelain', '--untracked-files=normal']);
   const identity = [];
+  if (status === null) identity.push('checkout clean source state is unknown');
+  else if (status !== '') identity.push('checkout source became dirty during browser execution');
   if (!request || request.error) identity.push(request ? request.error : 'missing coordinator request');
   if (request && request.binding) {
     if (request.binding.source_clean !== true) identity.push('dirty source');
@@ -260,7 +238,9 @@ export async function runAcceptance({tarball, runPath}) {
     run_id: request.runId,
     invocation_id: request.invocation,
     library_sha256: artifactSha,
-    source_clean: request.binding.source_clean === true,
+    source_clean: request.binding.source_clean === true && status === '',
+    source_commit: commit,
+    source_tree: tree,
     webkit_backend: 'webkitgtk',
     safari_certification: false,
     engines,
