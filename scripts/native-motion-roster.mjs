@@ -24,6 +24,7 @@ export const NOTIFY = [
   ['snack-bar', 'afterOpened', ['enabled', 'provider-disabled', 'reduced']],
   ['menu', 'menuOpened', ['enabled', 'provider-disabled', 'reduced']],
   ['select', 'openedChange', ['enabled', 'provider-disabled', 'reduced']],
+  ['tabs', 'animationDone', ['enabled', 'provider-disabled', 'reduced', 'zero']],
 ];
 export const INTERRUPTIONS = [
   'dialog/rapid-reversal',
@@ -56,7 +57,7 @@ export const MIN_ENABLED_MS = {
   tabs: 400,
   'form-field': 200,
 };
-const NOTIFICATION_CONTRACT = new Set(['dialog', 'snack-bar', 'menu', 'select']);
+const NOTIFICATION_CONTRACT = new Set(['dialog', 'snack-bar', 'menu', 'select', 'tabs']);
 
 export const MODE_BUTTONS = [
   'probe-dialog',
@@ -89,7 +90,6 @@ export const NOT_APPLICABLE = [
   {component: 'form-field', mode: 'zero', reason: 'subscript motion has no public duration input; a stylesheet 0ms override would be a fake'},
   {component: 'tooltip', group: 'exactly-once-notification', reason: 'no public completion event; visibility stays in enabled-disabled-reduced'},
   {component: 'form-field', group: 'exactly-once-notification', reason: 'subscript motion has no public completion event'},
-  {component: 'tabs', group: 'exactly-once-notification', reason: 'selectedIndex is not a motion completion event'},
   {component: 'form-field', group: 'interruption-destruction', reason: 'subscript motion has no overlay, timer fallback, or end-event lifecycle'},
   {engine: 'safari', reason: 'the card names the webkit engine, not Safari; WebKitGTK is that engine and is not Safari certification'},
 ];
@@ -157,6 +157,7 @@ function enabledProblem(component, mode, obs) {
   } else if (obs.durationMs !== 0) {
     return 'disabled motion still running';
   }
+  if (component === 'tabs' && obs.duplicateEndEventsDispatched !== true) return 'tab duplicate completion control missing';
   if (NOTIFICATION_CONTRACT.has(component) && obs.notifications !== 1) return 'notification count';
   return null;
 }
@@ -233,6 +234,7 @@ export function assertCase(caseId, obs) {
   if (group === 'exactly-once-notification') {
     if (!obs || typeof obs !== 'object') return ['missing observation'];
     if (obs.detectChangesCalls !== 0) return ['detectChanges stand-in'];
+    if (suffix.startsWith('tabs/') && obs.duplicateEndEventsDispatched !== true) return ['tab duplicate completion control missing'];
     if (obs.notifications !== 1) return ['emitted more than once'];
     return [];
   }
@@ -251,10 +253,11 @@ export function samplePass(caseId) {
       durationMs: mode === 'enabled' ? MIN_ENABLED_MS[component] : 0,
       finalState: 'visible',
       notifications: NOTIFICATION_CONTRACT.has(component) ? 1 : 0,
+      ...(component === 'tabs' ? {duplicateEndEventsDispatched: true} : {}),
       detectChangesCalls: 0,
     };
   }
-  if (group === 'exactly-once-notification') return {notifications: 1, detectChangesCalls: 0};
+  if (group === 'exactly-once-notification') return {notifications: 1, detectChangesCalls: 0, ...(suffix.startsWith('tabs/') ? {duplicateEndEventsDispatched: true} : {})};
   const base = {detectChangesCalls: 0};
   if (suffix === 'dialog/rapid-reversal') return {...base, containers: 0, leaks: 0, openedAfterClose: 0};
   if (suffix === 'dialog/reopen-instance') return {...base, secondInstance: true, staleClosed: false, leaks: 0};

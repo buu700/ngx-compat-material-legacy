@@ -32,11 +32,11 @@ function expect(name, condition) {
 }
 
 const roster = deriveMainRoster();
-expect('282 cases', roster.ids.length === 282);
-expect('94 per engine', roster.perEngine.chromium === 94 && roster.perEngine.firefox === 94 && roster.perEngine.webkit === 94);
+expect('306 cases', roster.ids.length === 306);
+expect('102 per engine', roster.perEngine.chromium === 102 && roster.perEngine.firefox === 102 && roster.perEngine.webkit === 102);
 expect('138 enabled group', roster.perGroup['enabled-disabled-reduced'] === 138);
 expect('66 interruption group', roster.perGroup['interruption-destruction'] === 66);
-expect('78 notify group', roster.perGroup['exactly-once-notification'] === 78);
+expect('102 notify group', roster.perGroup['exactly-once-notification'] === 102);
 expect('no 21.x', roster.ids.every(id => id.split('/')[1] === 'main'));
 expect('no safari id', roster.ids.every(id => !id.includes('safari')));
 expect('safari is not applicable', roster.notApplicable.some(item => item.engine === 'safari' && /not Safari/.test(item.reason)));
@@ -125,6 +125,18 @@ const twice = observationProblems({
   engines: goodEngines, sourceClean: true, artifactSha: 'abc', boundSha: 'abc',
 });
 expect('emitted twice', twice.problems.some(item => item.includes('emitted more than once')));
+
+for (const group of ['enabled-disabled-reduced', 'exactly-once-notification']) {
+  const tabId = roster.ids.find(id => id.includes('/' + group + '/tabs/') && id.endsWith('/enabled'));
+  expect('real tab completion cell ' + group, !!tabId);
+  for (const changed of [{notifications: 0}, {notifications: 2}, {notifications: '1'},
+    {duplicateEndEventsDispatched: false}, {duplicateEndEventsDispatched: undefined}]) {
+    const rejected = observationProblems({requiredIds: roster.ids,
+      outcomes: withOne(tabId, () => changed), engines: goodEngines,
+      sourceClean: true, artifactSha: 'abc', boundSha: 'abc'});
+    expect('tab completion rejected ' + group + JSON.stringify(changed), rejected.problems.length > 0 && rejected.skipped.includes(tabId));
+  }
+}
 
 const staleId = roster.ids.find(id => id.endsWith('/interruption-destruction/dialog/reopen-instance'));
 const selectReopenId = roster.ids.find(id => id.endsWith('/interruption-destruction/select/missing-end-fallback'));

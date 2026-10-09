@@ -8,6 +8,8 @@
  */
 /** Owned source lifecycle diagnostic; deterministic clock/synthetic DOM, not native qualification. */
 import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {gunzipSync} from 'node:zlib';
 import {createRequire} from 'node:module';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {resolve,dirname} from 'node:path';
@@ -21,6 +23,19 @@ const flags=await import(data(emit(readFileSync(resolve(root,'projects/ngx-mater
 const raw=readFileSync(resolve(root,'projects/ngx-material-legacy/legacy-tabs/internal/tab-body-base.ts'),'utf8');
 export async function ownedType(source=raw){return (await import(data(emit(source).replaceAll("'@ngx-compat/material-legacy/legacy-core'",JSON.stringify(data(emit(readFileSync(resolve(root,'projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts'),'utf8'))))))))._MatTabBodyBase;}
 const Type=await ownedType();
+const originalPath='reference/material-16.2.14/component-motion-sources/tabs/tab-body.ts';
+const originalRaw=readFileSync(resolve(root,originalPath),'utf8');
+const hash=value=>createHash('sha256').update(value).digest('hex');
+assert.equal(hash(originalRaw),'b8cae68f00521586ecf1b69d3bce277c3e1eeba35997b05b91223b1ffcbdfaf7');
+const originalFile=ts.createSourceFile('original-tab-body.ts',originalRaw,ts.ScriptTarget.Latest,true);
+const originalOwner=originalFile.statements.find(node=>ts.isClassDeclaration(node)&&node.name?.text==='_MatTabBodyBase');
+assert.ok(originalOwner);
+// Keep the complete untouched historical base. Remove unrelated portal/component declarations;
+// transpilation erases its unused type imports. Borrowed framework execution is diagnostic only.
+const originalImports=originalFile.statements.filter(ts.isImportDeclaration).filter(node=>
+ ['@angular/core','@angular/cdk/portal','@angular/cdk/bidi','rxjs','rxjs/operators'].includes(node.moduleSpecifier.text));
+const originalProgram=originalImports.map(node=>node.getText(originalFile)).join('\n')+'\n'+originalOwner.getText(originalFile);
+const OriginalType=(await import(data(emit(originalProgram))))._MatTabBodyBase;
 function clock(){
  const original=[globalThis.setTimeout,globalThis.clearTimeout],timers=new Map();let id=0,now=0;
  globalThis.setTimeout=(run,delay=0)=>{const key=++id;timers.set(key,{run,delay,due:now+delay});return key;};globalThis.clearTimeout=key=>timers.delete(key);
@@ -53,8 +68,32 @@ export function observations(Type){
  check('reentrant-start-cannot-schedule-obsolete-phase',()=>{const f=fixture(Type);try{f.body.position=1;f.body.ngOnInit();const sub=f.body._beforeCentering.subscribe(v=>{if(v)f.body.position=1;});f.body.position=0;f.c.advance(1000);assert.equal(f.center.length,0);assert.equal(f.done.length,1);assert.deepEqual(f.done[0],{fromState:'center',toState:'right'});sub.unsubscribe();}finally{f.close();}});
  return cases;
 }
+function completionContract(Type){
+ const rows=[];
+ const scenarios=[
+  ['duplicate-center',[['center','left','center'],['center','left','center']]],
+  ['duplicate-leave',[['right','center','right'],['right','center','right']]],
+  ['successive-real-round-trips',[['center','left','center'],['left','center','left'],['center','left','center'],['left','center','left'],['center','left','center']]],
+  ['changed-source-state-is-distinct',[['center','left','center'],['center','right','center']]],
+  ['changed-destination-state-is-distinct',[['center','left','center'],['center','left','left-origin-center']]],
+  ['obsolete-center-event',[['left','left','center']]],
+  ['obsolete-leaving-event',[['center','center','right']]],
+  ['origin-center-states',[['left-origin-center','left','left-origin-center'],['left-origin-center','left','left-origin-center'],['right','left-origin-center','right'],['right-origin-center','right','right-origin-center']]],
+ ];
+ for(const [id,events]of scenarios){
+  const f=fixture(Type);
+  try{for(const [position,fromState,toState]of events){f.body._position=position;f.body._translateTabComplete.next({fromState,toState});}
+   const centeredBeforeAsyncFlush=f.center.length;f.c.advance(0);
+   rows.push({id,centeredBeforeAsyncFlush,centered:f.center.length,left:f.left.length,rawCompletions:f.done.length});
+  }finally{f.close();}
+ }
+ return rows;
+}
+const referenceCompletion=completionContract(OriginalType),ownedCompletion=completionContract(Type);
+assert.deepEqual(ownedCompletion,referenceCompletion,'complete historical output subscription contract');
 const cases=observations(Type),mutants=[];
 if(!process.argv.includes('--record-failures'))for(const [id,find,replacement] of [
+ ['drop-historical-completion-filter',"      .pipe(distinctUntilChanged((a, b) => a.fromState === b.fromState && a.toState === b.toState))\n",""],
  ['early-fallback',"milliseconds + 100","100"],
  ['accept-stale-completion',"this._pendingTransition !== transition","false"],
  ['keep-completed-phase',"    this._pendingTransition = undefined;\n    this._elementRef.nativeElement.classList.remove","    this._elementRef.nativeElement.classList.remove"],
@@ -64,6 +103,26 @@ if(!process.argv.includes('--record-failures'))for(const [id,find,replacement] o
  ['skip-zone-reentry',"this._ngZone.run(() => this._finishTransition(transition));","this._finishTransition(transition);"],
  ['keep-direction-subscription',"    this._dirChangeSubscription.unsubscribe();",""],
  ]){assert.ok(raw.includes(find),'mutation anchor missing: '+id);const bad=raw.replaceAll(find,replacement),failures=observations(await ownedType(bad)).filter(c=>c.result==='fail');assert.ok(failures.length,'mutant survived: '+id);mutants.push({id,result:'rejected',failed_case_ids:failures.map(c=>c.id)});}
-const result={role:'Owned tab-body transpiled source with real Angular/rxjs; deterministic clock and synthetic DOM only',cases,mutants,passed:cases.filter(c=>c.result==='pass').length,failed:cases.filter(c=>c.result==='fail').length,native_browser_execution:false,packed_execution:false,actual21_execution:false};
+const minimumPeerContrasts=[];
+for(const cap of JSON.parse(readFileSync(resolve(root,'compatibility/rc/tab-completion-peer-sources/identities.json'),'utf8'))){
+ const compressed=readFileSync(resolve(root,cap.retained.path));assert.equal(hash(compressed),cap.retained.sha256);
+ const bytes=gunzipSync(compressed);assert.equal(hash(bytes),cap.member_sha256);assert.equal(bytes.length,cap.member_bytes);
+ const file=ts.createSourceFile('peer-tabs.mjs',bytes.toString('utf8'),ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);
+ const owner=file.statements.find(node=>ts.isClassDeclaration(node)&&node.name?.text==='MatTabBody');
+ const method=owner.members.find(node=>node.name?.getText(file)==='_transitionDone');assert.ok(method);
+ const Peer=(await import(data('export class Peer {'+method.getText(file)+'}'))).Peer;
+ const c=clock(),peer=new Peer(),center=[],left=[];
+ peer._onCentered=new core.EventEmitter(true);peer._afterLeavingCenter=new core.EventEmitter();
+ peer._onCentered.subscribe(()=>center.push('center'));peer._afterLeavingCenter.subscribe(()=>left.push('left'));
+ try{peer._position='center';peer._previousPosition='left';peer._transitionDone();peer._transitionDone();c.advance(0);
+  peer._position='right';peer._previousPosition='center';peer._transitionDone();peer._transitionDone();
+  assert.deepEqual(center,['center','center']);assert.deepEqual(left,['left','left']);
+  minimumPeerContrasts.push({line:cap.line,version:cap.version,member_sha256:cap.member_sha256,complete_method:method.getText(file),method_sha256:hash(method.getText(file)),duplicate_center_outputs:center.length,duplicate_leaving_outputs:left.length,
+   scope:'Complete exact minimum peer method only, called on synthetic state/output receivers; no constructor/DI/native/minimum runtime qualification.'});
+ }finally{c.restore();}
+}
+const completionMutant=completionContract(await ownedType(raw.replace('      .pipe(distinctUntilChanged((a, b) => a.fromState === b.fromState && a.toState === b.toState))\n','')));
+assert.notDeepEqual(completionMutant,referenceCompletion,'removed upstream filter must change historical contract');
+const result={minimum_peer_contrasts:minimumPeerContrasts,original_source:{path:originalPath,sha256:hash(originalRaw),extracted_complete_base_sha256:hash(originalProgram)},source_sha256:hash(raw),node:process.version,typescript:ts.version,borrowed_angular:core.VERSION.full,completion_contract:{reference:referenceCompletion,candidate:ownedCompletion,removed_filter:completionMutant},role:'Owned tab-body transpiled source with real Angular/rxjs; deterministic clock and synthetic DOM only',cases,mutants,passed:cases.filter(c=>c.result==='pass').length,failed:cases.filter(c=>c.result==='fail').length,native_browser_execution:false,packed_execution:false,actual21_execution:false};
 const out=process.argv.indexOf('--out');if(out>=0)writeFileSync(process.argv[out+1],JSON.stringify(result,null,2)+'\n');
 if(process.argv.includes('--record-failures'))console.log(JSON.stringify(result,null,2));else{assert.equal(result.failed,0,JSON.stringify(cases.filter(c=>c.result==='fail'),null,2));console.log(JSON.stringify(result,null,2));}

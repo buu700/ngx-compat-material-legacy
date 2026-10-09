@@ -10,3 +10,8 @@ class TabBodyMotionRuntimeTests(unittest.TestCase):
     def test_actual_owned_source_lifecycle_and_regression_mutants(self):
         result=subprocess.run(['node','tests/tab_body_motion_runtime_probe.mjs'],cwd=ROOT,capture_output=True,text=True,timeout=15)
         self.assertEqual(result.returncode,0,(result.stderr or result.stdout)[-6000:])
+
+    @unittest.skipUnless(angular_available(),'TypeScript unavailable; producer diagnostic not executed')
+    def test_complete_native_tab_completion_producer(self):
+        result=subprocess.run(['node','tests/tab_completion_producer_probe.mjs'],cwd=ROOT,capture_output=True,text=True,timeout=15)
+        self.assertEqual(result.returncode,0,(result.stderr or result.stdout)[-6000:])
