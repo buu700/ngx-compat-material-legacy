@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "recorded_at_utc": "2026-10-09T13:17:34.809325+00:00",
+  "role": "Individual source review for hidden autocomplete and tooltip gap changes, with scoped original/current CSS and isolated browser reproduction.",
+  "code_heads": {
+    "main": "ce27eb9b0ff80c81c1c840d458ee729ce593830b",
+    "21.x": "4864361a878ba820abdbd001b9c0f961197df049"
+  },
+  "g11_claim": "not-passed",
+  "reviews": [
+    {
+      "sha": "979e903020ec8e23747fa35414708be2c99e7e99",
+      "topic": "Hidden autocomplete pointer events",
+      "source_review": "Complete hunk inspected individually; owned source/callers and exact historical/current CDK CSS contexts inspected.",
+      "reviewer": "Codex primary implementer",
+      "admission_status": "pending-full-native-regression-and-independent-audit",
+      "decision": "The complete one-line modern MDC change sets pointer-events:none on the hidden panel. The legacy empty panel has no modern padding/min-height and is0px in the isolated original/current CSS cases. With synthetic nonempty hidden content, both before and after child-only styles still hit the ancestor pane. Restore full16 owned CSS rather than retaining an unproven copy; leave modern public-peer CSS separate. No TypeScript/geometry adaptation is introduced by this repair.",
+      "patch": {
+        "path": "compatibility/rc/overlay-resource-upstream-patches/979e903020ec8e23747fa35414708be2c99e7e99.patch",
+        "sha256": "fd663d8bd9b84b7ec819b0faa86d9a41cce5c80f88aca08d803ae66f77c3f75d",
+        "bytes": 918
+      },
+      "proof": "compatibility/rc/overlay-resource-css-source-proof.json",
+      "isolated_browser_proof": "compatibility/rc/overlay-css-isolated-browser-diagnostic.json",
+      "current_source_head": "4864361a878ba820abdbd001b9c0f961197df049"
+    },
+    {
+      "sha": "c04f84fd3b81dbf5e1e76304845f51d16f365ab3",
+      "topic": "Tooltip inherited line height",
+      "source_review": "Complete hunk inspected individually; owned source/callers and exact historical/current CDK CSS contexts inspected.",
+      "reviewer": "Codex primary implementer",
+      "admission_status": "pending-full-native-regression-and-independent-audit",
+      "decision": "The complete modern tooltip hunk adds line-height:normal on the panel and retains an already stronger non-interactive selector. The owned port copied the reset and strengthened the original one-class pointer rule. Isolated true CSS rendering reproduces an owned geometry regression:40px body line height yields52px historical tooltip height versus23px before repair. Restore all historical sizing/keyframes; retain only the exact two-class non-interactive pointer rule. Both owned classes are assigned by the historical base, and same-order/late current-CDK CSS tests prove intended click-through without affecting interactive panes or inherited geometry.",
+      "patch": {
+        "path": "compatibility/rc/overlay-resource-upstream-patches/c04f84fd3b81dbf5e1e76304845f51d16f365ab3.patch",
+        "sha256": "319a5803b9226cbcae61fe0f59aefe34772ec8551c847ead3f37b1118b274287",
+        "bytes": 1226
+      },
+      "proof": "compatibility/rc/overlay-resource-css-source-proof.json",
+      "isolated_browser_proof": "compatibility/rc/overlay-css-isolated-browser-diagnostic.json",
+      "current_source_head": "4864361a878ba820abdbd001b9c0f961197df049"
+    }
+  ],
+  "limits": [
+    "No new terminal SHA/use closure or independent-audit admission.",
+    "The isolated browser runs CSS/model DOM only, with byte-identical candidate fixture output on both lines. It executes no Angular/native library components or actual public OverlayRef, and grants no packed/floor/native matrix credit.",
+    "A custom hidden autocomplete child can still leave the visible ancestor pane hit-testable. The removed child-only pointer rule did not fix this. Actual dynamic-options/overlay consumer behavior remains under the full historical and browser suites."
+  ]
+}

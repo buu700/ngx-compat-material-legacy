@@ -1,0 +1,24 @@
+commit 979e903020ec8e23747fa35414708be2c99e7e99
+Author:     Kristiyan Kostadinov <crisbeto@users.noreply.github.com>
+AuthorDate: Mon Mar 4 17:27:22 2024 +0100
+Commit:     GitHub <noreply@github.com>
+CommitDate: Mon Mar 4 17:27:22 2024 +0100
+
+    fix(material/autocomplete): prevent hidden overlay from blocking clicks (#28677)
+    
+    The autocomplete hides its dropdown if there are no options, but it is still clickable. These changes add `pointer-events: none` to prevent it from blocking interactions.
+    
+    Fixes #28670.
+
+diff --git a/src/material/autocomplete/autocomplete.scss b/src/material/autocomplete/autocomplete.scss
+index 06d07c5f9..09cf50fcf 100644
+--- a/src/material/autocomplete/autocomplete.scss
++++ b/src/material/autocomplete/autocomplete.scss
+@@ -46,6 +46,7 @@ div.mat-mdc-autocomplete-panel {
+ 
+   &.mat-mdc-autocomplete-hidden {
+     visibility: hidden;
++    pointer-events: none;
+   }
+ }
+ 
