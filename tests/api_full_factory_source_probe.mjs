@@ -26,6 +26,7 @@ import {MENU_CONTENT_SYMBOL,menuContentContract,menuContentObservationProblems} 
 import {SIMPLE_SNACK_SYMBOL,simpleSnackObservationProblems} from '../scripts/api-simple-snack-context.mjs';
 import {DIALOG_OPENER_SYMBOL,dialogOpenerObservationProblems} from '../scripts/api-dialog-opener-context.mjs';
 import {AUTOCOMPLETE_SYMBOL,autocompleteProfile,createAutocompleteCapture,observeAutocompleteInputs,finishAutocompleteContext,autocompleteObservationProblems} from '../scripts/api-autocomplete-context.mjs';
+import {tableDefinitionContract,tableDefinitionObservationProblems} from '../scripts/api-table-definition-context.mjs';
 import {TAB_PORTAL_SYMBOL,tabPortalObservationProblems} from '../scripts/api-tab-portal-context.mjs';
 import {SNACK_MOTION_SYMBOL,FORM_FIELD_MOTION_SYMBOL,MENU_MOTION_SYMBOL,TOOLTIP_MOTION_SYMBOL,DIALOG_MOTION_SYMBOL,TAB_BODY_MOTION_SYMBOL,TAB_BODY_BASE_MOTION_SYMBOL,ownedMotionProfile,ownedSelectMotionProblems} from '../scripts/api-owned-motion-context.mjs';
 
@@ -376,6 +377,35 @@ try{
    else{assert.equal(execution.outcome,'threw');assert.match(execution.error,cell.error);assert.ok(execution.error.length<800,'tab portal mutant diagnostic is unbounded');tabPortalControls.push({id:cell.id,result:'rejected',error:execution.error});}
   }
  }
+ const tableDefinitionControls=[];
+ for(const symbol of selected.filter(s=>tableDefinitionContract(s))){
+  const contract=tableDefinitionContract(symbol),owned=await loadRuntimeModule(runtime,'legacy-table','primary'),Type=owned[symbol.name],row=rows.find(r=>r.symbol.symbol_id===symbol.symbol_id);
+  assert.equal(row.result,'pass',row.problems.join('\n'));assert.deepEqual(tableDefinitionObservationProblems(row),[]);
+  tableDefinitionControls.push({symbol_id:symbol.symbol_id,id:'legacy-parent-original-inputs-manual-subclass-and-behavior',result:'pass',evidence:row.factory_table_definition_context});
+  for(const kind of ['peer','none','nested']){
+   const execution=await observePublicNodeFactory(Type,core,runtime,symbol,symbols,load,{tableParentKind:kind});
+   assert.equal(execution.outcome,'returned',execution.error);assert.deepEqual(execution.behaviorProblems,[]);assert.equal(execution.tableDefinitionContext.table_kind,kind);
+   assert.equal(execution.tableDefinitionContext.manual_outside_di_preserved,true);assert.equal(execution.tableDefinitionContext.borrowed_table_destroy_calls,0);assert.equal(execution.tableDefinitionContext.borrowed_context_alive,true);
+   tableDefinitionControls.push({symbol_id:symbol.symbol_id,id:kind+'-caller-original-inputs-and-behavior',result:'pass',evidence:execution.tableDefinitionContext});
+  }
+  for(const cell of [
+   {id:'foreign-ownership-value',change:v=>{v._table={};},error:/supplied ownership differs/},
+   ...(contract.table_index===2?[
+    {id:'foreign-template-value',change:v=>{v.template={};},error:/supplied template differs/},
+    {id:'foreign-differ-value',change:v=>{v._differs={};},error:/differ service differs/},
+    {id:'wrong-cell-template-selection',change:v=>{v.extractCellTemplate=column=>column.footerCell.template;},...(contract.public_parent_export==='CdkFooterRowDef'?{change:v=>{v.extractCellTemplate=column=>column.cell.template;}}:{}),error:/selected a different cell template/},
+   ]:[]),
+   ...(contract.public_parent_export!=='CdkRowDef'?[{id:'sticky-coercion-noop',change:v=>{Object.defineProperty(v,'sticky',{get:()=>false,set:()=>{}});},error:/strictly equal/}]:[]),
+   ...(contract.table_index===0?[{id:'missing-historical-material-class-prefix',change:v=>{v._updateColumnCssClassName=()=>{v._columnCssClassName=['cdk-column-'+v.cssClassFriendlyName];};},error:/deep-equal/}]:[]),
+   {id:'destroy-borrowed-table',change:v=>{v.ngOnDestroy=()=>v._table.ngOnDestroy();},error:/destroyed its borrowed table/},
+   {id:'unrelated-optional-request',extra:true},
+  ]){
+   const peer=await load('@angular/cdk/table'),constructorFactory=Receiver=>{if(cell.extra)core.inject(peer.CdkTable,{optional:true});return Type.ɵfac(class extends Receiver{constructor(...inputs){super(...inputs);cell.change?.(this);}});};
+   const execution=await observePublicNodeFactory(Type,core,runtime,symbol,symbols,load,{constructorFactory});
+   if(cell.extra){assert.equal(execution.outcome,'returned',execution.error);assert.equal(execution.requests.length,contract.constructor_arity+1);tableDefinitionControls.push({symbol_id:symbol.symbol_id,id:cell.id,result:'retained-unclassified-request',retained_requests:execution.requests.length});}
+   else{assert.equal(execution.outcome,'threw');assert.match(execution.error,cell.error);assert.ok(execution.error.length<700);tableDefinitionControls.push({symbol_id:symbol.symbol_id,id:cell.id,result:'rejected',error:execution.error});}
+  }
+ }
  const constructorMotionControls=[];
  const manualMotionObservations=[];
  const manualMotionLifecycle=[];
@@ -456,7 +486,7 @@ try{
  const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
  const caps=[...new Set([...files.map(file=>file.fileName),...resources])].sort().map(file=>({path:file.slice(root.length+1),sha256:sha(readFileSync(file))}));
  const result={schema_version:1,role:'All original154 factory class source observations;not canonical packed/native/browser/floor qualification',
-  node:process.version,typescript:ts.version,runtime_peer:core.VERSION.full,entries,rows,selected_symbol_ids:[...selectedIds].sort(),emitted_public_import_routes:routes,public_parent_controls:publicParentControls,required_parent_controls:requiredParentControls,caller_config_controls:callerConfigControls,snack_motion_controls:snackMotionControls,constructor_motion_controls:constructorMotionControls,manual_motion_observations:manualMotionObservations,manual_motion_lifecycle:manualMotionLifecycle,dialog_focus_controls:dialogFocusControls,menu_content_controls:menuContentControls,simple_snack_controls:simpleSnackControls,dialog_opener_controls:dialogOpenerControls,autocomplete_manual:autocompleteManual,autocomplete_controls:autocompleteControls,tab_body_manual:tabBodyManual,tab_body_controls:tabBodyControls,tab_portal_controls:tabPortalControls,
+  node:process.version,typescript:ts.version,runtime_peer:core.VERSION.full,entries,rows,selected_symbol_ids:[...selectedIds].sort(),emitted_public_import_routes:routes,public_parent_controls:publicParentControls,required_parent_controls:requiredParentControls,caller_config_controls:callerConfigControls,snack_motion_controls:snackMotionControls,constructor_motion_controls:constructorMotionControls,manual_motion_observations:manualMotionObservations,manual_motion_lifecycle:manualMotionLifecycle,dialog_focus_controls:dialogFocusControls,menu_content_controls:menuContentControls,simple_snack_controls:simpleSnackControls,dialog_opener_controls:dialogOpenerControls,autocomplete_manual:autocompleteManual,autocomplete_controls:autocompleteControls,tab_body_manual:tabBodyManual,tab_body_controls:tabBodyControls,tab_portal_controls:tabPortalControls,table_definition_controls:tableDefinitionControls,
   passed:rows.filter(row=>row.result==='pass').length,failed:rows.filter(row=>row.result!=='pass').length,
   source_files:files.length,resource_files:resources.size,source_caps:caps,virtual_typecheck_files:virtualFiles.length,
   styles:'SCSS/HTML resources read unchanged by Angular compiler;no Sass/rendered style qualification',
