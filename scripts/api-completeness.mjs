@@ -40,6 +40,7 @@ import {rippleFactoryObservationProblems} from './api-ripple-factory.mjs';
 import {publicParentTokenRoleObservationProblems} from './api-public-parent-token-role.mjs';
 import {requiredParentContextObservationProblems} from './api-required-parent-context.mjs';
 import {callerConfigObservationProblems} from './api-caller-config-context.mjs';
+import {ownedDialogFocusObservationProblems} from './api-owned-dialog-focus-context.mjs';
 
 // verify-lite imports this module before node_modules exists. Load the parser
 // on first use so compareContracts can be unit-tested without typescript.
@@ -506,7 +507,7 @@ if (isMain) {
 }
 
 export function settleDi(row, records) {
-  row={...row,problems:[...row.problems,...publicParentTokenRoleObservationProblems(row),...requiredParentContextObservationProblems(row),...callerConfigObservationProblems(row)]};
+  row={...row,problems:[...row.problems,...publicParentTokenRoleObservationProblems(row),...requiredParentContextObservationProblems(row),...callerConfigObservationProblems(row),...ownedDialogFocusObservationProblems(row)]};
   if(row.symbol.symbol_id===RIPPLE_SYMBOL){
     const contract=approvedRippleContract(row.symbol),problems=[...row.problems,...rippleFactoryObservationProblems(row,contract)];
     return {...row,problems,result:problems.length?'fail':'pass',status:problems.length?'mismatch':'intentional-legacy-difference',
@@ -662,6 +663,7 @@ function writeAcceptance(request, surface, groups, declared, diSettled, summary,
           parent_construction:di.factory_parent_construction||null,
           required_parent_context:di.factory_required_parent_context||null,
           caller_config_context:di.factory_caller_config_context||null,
+          owned_dialog_focus_context:di.factory_owned_dialog_focus_context||null,
           owned_motion_context:di.factory_owned_motion_context||null,
           historical:di.historical,owned:di.owned,constructor_attributes:di.constructor_attributes||[],
           ...(di.approved_construction?{approved_construction:di.approved_construction}:{})}:null});
