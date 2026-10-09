@@ -1,0 +1,241 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "node": "v22.23.3",
+  "compiler": "6.0.3",
+  "source_sha256": {
+    "menu": "c0830fca23f02ec1bbd5377010f1af735341c7049458b4915e70e4d7ebd35b72",
+    "select": "d7527ff2f5108157788f98382e01b835d4ba93efd765afbebda0ed06ed280bf9"
+  },
+  "helper_sha256": "8cf84411934f43287f6045dd146a8e42044a2d68d80587c31feeeb707b723667",
+  "families": {
+    "menu": [
+      {
+        "id": "enter-completes-once",
+        "result": "pass"
+      },
+      {
+        "id": "wrong-phase-enter-end-cannot-complete-exit",
+        "result": "fail",
+        "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ [\n+   'enter'\n+ ]\n- []\n"
+      },
+      {
+        "id": "reopen-rejects-captured-old-exit-fallback",
+        "result": "fail",
+        "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ [\n+   'void'\n+ ]\n- []\n"
+      },
+      {
+        "id": "repeated-reset-replaces-fallback",
+        "result": "fail",
+        "error": "Expected values to be strictly equal:\n\n2 !== 1\n"
+      },
+      {
+        "id": "noop-close-before-open-completion",
+        "result": "fail",
+        "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n+   'enter',\n    'void'\n  ]\n"
+      },
+      {
+        "id": "noop-reopen-discards-earlier-phase-microtasks",
+        "result": "fail",
+        "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    'enter',\n+   'void',\n+   'enter'\n  ]\n"
+      },
+      {
+        "id": "destroy-discards-noop-microtask",
+        "result": "fail",
+        "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ [\n+   'enter'\n+ ]\n- []\n"
+      },
+      {
+        "id": "destroy-rejects-captured-fallback-and-late-events",
+        "result": "fail",
+        "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ [\n+   'void'\n+ ]\n- []\n"
+      },
+      {
+        "id": "completion-observer-restarts-without-old-phase-clobber",
+        "result": "fail",
+        "error": "Expected values to be strictly equal:\n\nfalse !== true\n"
+      },
+      {
+        "id": "animation-start-after-completion-is-inert",
+        "result": "fail",
+        "error": "Expected values to be strictly equal:\n\ntrue !== false\n"
+      },
+      {
+        "id": "nested-and-unknown-native-events-are-inert",
+        "result": "pass"
+      }
+    ],
+    "select": [
+      {
+        "id": "enter-completes-once",
+        "result": "fail",
+        "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    'showing',\n+   'showing'\n  ]\n"
+      },
+      {
+        "id": "exit-fallback-detaches-once",
+        "result": "fail",
+        "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    'void',\n+   'void'\n  ]\n"
+      },
+      {
+        "id": "real-host-exit-event-cancels-fallback",
+        "result": "pass"
+      },
+      {
+        "id": "nested-exit-event-is-inert",
+        "result": "pass"
+      },
+      {
+        "id": "reopen-rejects-captured-old-exit-fallback",
+        "result": "fail",
+        "error": "Expected values to be strictly equal:\n\nfalse !== true\n"
+      },
+      {
+        "id": "destroy-cancels-fallback-and-no-late-view-work",
+        "result": "fail",
+        "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ [\n+   'void'\n+ ]\n- []\n"
+      },
+      {
+        "id": "touched-callback-reopen-does-not-detach-new-panel",
+        "result": "fail",
+        "error": "Expected values to be strictly equal:\n\nfalse !== true\n"
+      },
+      {
+        "id": "touched-callback-destroy-does-not-schedule-exit",
+        "result": "fail",
+        "error": "Expected values to be strictly equal:\n\n1 !== 0\n"
+      },
+      {
+        "id": "completion-is-last-old-phase-observable-work",
+        "result": "fail",
+        "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n-   'mark:closed',\n    'event:void',\n    'mark:open',\n+   'mark:open'\n  ]\n"
+      },
+      {
+        "id": "stale-position-receipt-after-close-does-no-work",
+        "result": "fail",
+        "error": "Expected values to be strictly equal:\n\n1 !== 0\n"
+      },
+      {
+        "id": "only-latest-reopened-position-receipt-settles",
+        "result": "fail",
+        "error": "Expected values to be strictly equal:\n\n2 !== 1\n"
+      },
+      {
+        "id": "destroy-before-position-receipt-cancels-work",
+        "result": "fail",
+        "error": "Expected values to be strictly equal:\n\n1 !== 0\n"
+      },
+      {
+        "id": "noop-and-native-enter-completion-share-one-boundary",
+        "result": "fail",
+        "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    'showing',\n+   'showing'\n  ]\n"
+      },
+      {
+        "id": "multiple-enter-retains-historical-state-name",
+        "result": "pass"
+      }
+    ]
+  },
+  "scope": "Actual whole owned prototype method bodies, with constructor/decorator execution excluded. Deterministic timers, real Promise microtasks, Node EventTarget host events, borrowed RxJS7.8.2 streams, synthetic view/key/position services. No Angular constructor, public OverlayRef, browser, packed or full minimum runtime qualification.",
+  "g11_claim": "not-passed",
+  "failures": [
+    {
+      "id": "wrong-phase-enter-end-cannot-complete-exit",
+      "result": "fail",
+      "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ [\n+   'enter'\n+ ]\n- []\n"
+    },
+    {
+      "id": "reopen-rejects-captured-old-exit-fallback",
+      "result": "fail",
+      "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ [\n+   'void'\n+ ]\n- []\n"
+    },
+    {
+      "id": "repeated-reset-replaces-fallback",
+      "result": "fail",
+      "error": "Expected values to be strictly equal:\n\n2 !== 1\n"
+    },
+    {
+      "id": "noop-close-before-open-completion",
+      "result": "fail",
+      "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n+   'enter',\n    'void'\n  ]\n"
+    },
+    {
+      "id": "noop-reopen-discards-earlier-phase-microtasks",
+      "result": "fail",
+      "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    'enter',\n+   'void',\n+   'enter'\n  ]\n"
+    },
+    {
+      "id": "destroy-discards-noop-microtask",
+      "result": "fail",
+      "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ [\n+   'enter'\n+ ]\n- []\n"
+    },
+    {
+      "id": "destroy-rejects-captured-fallback-and-late-events",
+      "result": "fail",
+      "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ [\n+   'void'\n+ ]\n- []\n"
+    },
+    {
+      "id": "completion-observer-restarts-without-old-phase-clobber",
+      "result": "fail",
+      "error": "Expected values to be strictly equal:\n\nfalse !== true\n"
+    },
+    {
+      "id": "animation-start-after-completion-is-inert",
+      "result": "fail",
+      "error": "Expected values to be strictly equal:\n\ntrue !== false\n"
+    },
+    {
+      "id": "enter-completes-once",
+      "result": "fail",
+      "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    'showing',\n+   'showing'\n  ]\n"
+    },
+    {
+      "id": "exit-fallback-detaches-once",
+      "result": "fail",
+      "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    'void',\n+   'void'\n  ]\n"
+    },
+    {
+      "id": "reopen-rejects-captured-old-exit-fallback",
+      "result": "fail",
+      "error": "Expected values to be strictly equal:\n\nfalse !== true\n"
+    },
+    {
+      "id": "destroy-cancels-fallback-and-no-late-view-work",
+      "result": "fail",
+      "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ [\n+   'void'\n+ ]\n- []\n"
+    },
+    {
+      "id": "touched-callback-reopen-does-not-detach-new-panel",
+      "result": "fail",
+      "error": "Expected values to be strictly equal:\n\nfalse !== true\n"
+    },
+    {
+      "id": "touched-callback-destroy-does-not-schedule-exit",
+      "result": "fail",
+      "error": "Expected values to be strictly equal:\n\n1 !== 0\n"
+    },
+    {
+      "id": "completion-is-last-old-phase-observable-work",
+      "result": "fail",
+      "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n-   'mark:closed',\n    'event:void',\n    'mark:open',\n+   'mark:open'\n  ]\n"
+    },
+    {
+      "id": "stale-position-receipt-after-close-does-no-work",
+      "result": "fail",
+      "error": "Expected values to be strictly equal:\n\n1 !== 0\n"
+    },
+    {
+      "id": "only-latest-reopened-position-receipt-settles",
+      "result": "fail",
+      "error": "Expected values to be strictly equal:\n\n2 !== 1\n"
+    },
+    {
+      "id": "destroy-before-position-receipt-cancels-work",
+      "result": "fail",
+      "error": "Expected values to be strictly equal:\n\n1 !== 0\n"
+    },
+    {
+      "id": "noop-and-native-enter-completion-share-one-boundary",
+      "result": "fail",
+      "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    'showing',\n+   'showing'\n  ]\n"
+    }
+  ]
+}
