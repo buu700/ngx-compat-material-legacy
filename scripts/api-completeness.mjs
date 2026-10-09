@@ -32,6 +32,7 @@ import {originalCompilerFactoryContext} from './api-original-factory-contexts.mj
 import {observeRuntimeDi, expectedFactoryDi} from './api-di-observe.mjs';
 import {attributeConstructorObservationProblems} from './api-attribute-factory.mjs';
 import {publicConstructorPartitionProblems} from './api-public-constructor-internals.mjs';
+import {tabBodyObservationProblems} from './api-tab-body-context.mjs';
 import {ownedMotionProfile,ownedSelectMotionProblems} from './api-owned-motion-context.mjs';
 import {MENU_ITEM_SYMBOL, approvedMenuItemContract} from './menu-item-construction-contract.mjs';
 import {TABLE_SYMBOL, approvedTableContract, tableConstructionObservationComplete} from './table-construction-contract.mjs';
@@ -511,7 +512,7 @@ if (isMain) {
 }
 
 export function settleDi(row, records) {
-  row={...row,problems:[...row.problems,...publicParentTokenRoleObservationProblems(row),...requiredParentContextObservationProblems(row),...callerConfigObservationProblems(row),...ownedDialogFocusObservationProblems(row),...menuContentObservationProblems(row),...simpleSnackObservationProblems(row),...dialogOpenerObservationProblems(row),...autocompleteObservationProblems(row)]};
+  row={...row,problems:[...row.problems,...publicParentTokenRoleObservationProblems(row),...requiredParentContextObservationProblems(row),...callerConfigObservationProblems(row),...ownedDialogFocusObservationProblems(row),...menuContentObservationProblems(row),...simpleSnackObservationProblems(row),...dialogOpenerObservationProblems(row),...autocompleteObservationProblems(row),...tabBodyObservationProblems(row)]};
   if(row.symbol.symbol_id===RIPPLE_SYMBOL){
     const contract=approvedRippleContract(row.symbol),problems=[...row.problems,...rippleFactoryObservationProblems(row,contract)];
     return {...row,problems,result:problems.length?'fail':'pass',status:problems.length?'mismatch':'intentional-legacy-difference',
@@ -675,6 +676,7 @@ function writeAcceptance(request, surface, groups, declared, diSettled, summary,
           dialog_opener_context:di.factory_dialog_opener_context||null,
           autocomplete_context:di.factory_autocomplete_context||null,
           owned_motion_context:di.factory_owned_motion_context||null,
+          tab_body_context:di.factory_tab_body_context||null,
           historical:di.historical,owned:di.owned,constructor_attributes:di.constructor_attributes||[],
           ...(di.approved_construction?{approved_construction:di.approved_construction}:{})}:null});
     }
