@@ -83,7 +83,7 @@ export class MatLegacyTabBodyPortal extends CdkPortalOutlet {
   styleUrls: ['tab-body.scss'],
   encapsulation: ViewEncapsulation.None,
   // tslint:disable-next-line:validate-decorators
-  changeDetection: ChangeDetectionStrategy.Default,
+  changeDetection: ChangeDetectionStrategy.Eager,
   host: {
     'class': 'mat-tab-body',
   },

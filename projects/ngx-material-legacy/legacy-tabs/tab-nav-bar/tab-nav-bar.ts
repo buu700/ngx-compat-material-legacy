@@ -59,7 +59,7 @@ let nextUniqueId = 0;
   },
   encapsulation: ViewEncapsulation.None,
   // tslint:disable-next-line:validate-decorators
-  changeDetection: ChangeDetectionStrategy.Default,
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class MatLegacyTabNav extends _MatTabNavBase {
   @ContentChildren(forwardRef(() => MatLegacyTabLink), {descendants: true})
