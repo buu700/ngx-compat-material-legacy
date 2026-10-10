@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "work_item": "C03/C04 owned ripple fallback lifetime",
+  "code_commit": "7a464ba485ee052014807aa8e03d3939e4f627b2",
+  "code_tree": "0600a8ecfbaff535ce30dc6b44968528ff28ff83",
+  "sources": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/ripple/ripple-renderer.ts",
+      "sha256": "e6cb6501bc303fbb2fa061fff272d9dce171216a7c58eb8fc6980c50b7c8c08b"
+    },
+    {
+      "path": "scripts/ripple-delegation-lifetime-fixture.mjs",
+      "sha256": "bea85bf8e2c8574cfd609ff64ab485d4ee5e6370fb572a0cc33c5974dfe80987"
+    },
+    {
+      "path": "scripts/browser-required-probe.js",
+      "sha256": "0db0ed8caf6e5bcc304a309916063668dbc1afc83a053dc817ba9bb66d52bc78"
+    },
+    {
+      "path": "tests/ripple_renderer_lifetime_probe.mjs",
+      "sha256": "22a8ff6b87db8aed63241e029e54487282f6a525c3f5ce8941f99034f67bec7a"
+    },
+    {
+      "path": "tests/test_ripple_renderer_lifetime.py",
+      "sha256": "d598223cf70cafecd5ce9a5ff1befaf7458e6bbde69342ee337cea62e15c2397"
+    },
+    {
+      "path": "tests/ripple_delegation_fixture_subject.mjs",
+      "sha256": "c7146b4bbde4da47136ac766fb74afc952d40553f7e7834dc367c5e0df39d14b"
+    },
+    {
+      "path": "tests/canonical_control_geometry_probe_contract.mjs",
+      "sha256": "a3921f996869f098161b8b1fac6b110d948dcc5abb7a31766a7204431d8a95a8"
+    },
+    {
+      "path": "tests/test_canonical_control_geometry_probe.py",
+      "sha256": "b6b1e0d7355c0b53746d4e0560f01f68a235e6cb3cdaaf94b2ba9aec59970c2d"
+    }
+  ],
+  "reports": {
+    "baseline": {
+      "path": "compatibility/rc/ripple-held-baseline-diagnostic.json",
+      "sha256": "387de5292f61e4362a998f49b05c20dd4b72983d6cb02d44bd3a7ca67e2efc0f"
+    },
+    "runtime": {
+      "path": "compatibility/rc/ripple-held-runtime-diagnostic.json",
+      "sha256": "5f02ed7b8d69c59ce765c2d147bd31a4470bfc4094c3fc426e544a4a147098a6"
+    },
+    "types": {
+      "path": "compatibility/rc/ripple-held-types-diagnostic.json",
+      "sha256": "84a0ba6abfdb8199da754174577a65ccf6da4a872900bf1e1ffe65f372a15163"
+    },
+    "fixture": {
+      "path": "compatibility/rc/ripple-held-fixture-diagnostic.json",
+      "sha256": "7222555b497157f0bac738d309f9c28dfa242785a0ca412719f8700f2a1fdc0c"
+    },
+    "canonical": {
+      "path": "compatibility/rc/ripple-held-canonical-diagnostic.json",
+      "sha256": "c5feed4b2fee25894b78080873084eba440331ff97c04b142cdb8f057d74d2e4"
+    },
+    "admission": {
+      "path": "compatibility/rc/ripple-held-admission-diagnostic.json",
+      "sha256": "692096c14c003d7f78e14dae01f3a034cacd609fc625d88649a3c5c4084bc0e2"
+    }
+  },
+  "finding": "Candidate-only enter fallback called destructive cancellation at225+100ms. Untouched16renderer preserves held/persistent ripples. Whole original/priorcandidate reproduction shows the held ripple survives tagged source and is prematurely removed by candidate.",
+  "repair": "Enter fallback now completes only FADING_IN, preserving held/persistent VISIBLE state. Exit schedules its own150+100ms fallback outside Angular. Each live completion clears the current timer, canceled refs are ignored, stale enter callback cannot terminate a later exit; timer0 cleanup retained. Trusted native motion still requires actual225ms transform/150ms opacity ends.",
+  "historical_difference": "Original16 has no timeout fallback. Owned finite missing-event fallback is retained, but does not shorten a held/persistent ripple. Missing-event completion uses existing state transitions instead of cancellation. Public4argconstructor and all public member signatures remain unchanged.",
+  "validation": {
+    "whole_source_lifecycle_cases": 10,
+    "mutation_rejections": 5,
+    "strict_actual_owned_and_genuine_Core_CDK_subjects": 2,
+    "type_negatives": 4,
+    "genuine_Core_view_fixture_cases": 32,
+    "fixture_negative_variants": 24,
+    "canonical_probe_cases": 133,
+    "canonical_mutants": 6,
+    "actual_native_or_packed_AOT_executed": false
+  },
+  "native_obligation": "Existing core/default actual renderer fixture retains trusted motion. A controlled native mousedown withoutmouseup suppresses actualtransitionenddelivery; after400ms both refs must beVISIBLE/connected. Release then300ms later must leaveHIDDEN/removed refs by the actual exit fallback. No new matrix cell. Full packed/native bothlines remains required.",
+  "consumer_contract": {
+    "cyph_head": "a56a0603636cac5aaabe8fe408f7429b4224f011",
+    "read_only": true,
+    "direct_renderer_private_api_references": 0,
+    "HTML_CSS_SCSS_changes": 0,
+    "public_TS_API_changes": 0,
+    "consumer_build_executed": false
+  },
+  "admission": "Only existingElementRef source binding refreshed by actual67/72-use checker;67docpointers rehashed.1252reviewed/484open/0insufficient retained,1697SHA/1736uses unchanged. No new closure,G11/C05/audit or native pass. No push/Actions."
+}
