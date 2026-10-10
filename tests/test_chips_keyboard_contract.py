@@ -32,7 +32,15 @@ class ChipsKeyboardContractTests(unittest.TestCase):
         notice=' * Copyright (c) 2026 Ryan Lester.\n'
         self.assertEqual(candidate.count(notice),1)
         candidate=candidate.replace(notice,'',1)
-        self.assertEqual(candidate,(REFERENCE/'chip-input.ts').read_text().replace('@Directive({','@Directive({\n  standalone: false,',1))
+        expected=(REFERENCE/'chip-input.ts').read_text().replace('@Directive({','@Directive({\n  standalone: false,',1)
+        # The earlier recorded comment cleanup removed exactly these obsolete
+        # Material17 replacement notices. Keep the untouched oracle and require
+        # every other source byte, including other comments, to remain identical.
+        for declaration in ['MatChipInputEvent','MatChipInput']:
+            notice=f" * @deprecated Use `{declaration}` from `@angular/material/chips` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.\n * @breaking-change 17.0.0\n"
+            self.assertEqual(expected.count(notice),1)
+            expected=expected.replace(notice,'',1)
+        self.assertEqual(candidate,expected)
         self.assertEqual(body((source/'chip.ts').read_text(),'_handleKeydown'),body((REFERENCE/'chip.ts').read_text(),'_handleKeydown'))
         needle="        it(\n          'should not focus the last chip when pressing BACKSPACE after changing input, '"
         end="        it('should focus last chip after pressing BACKSPACE after creating a chip'"

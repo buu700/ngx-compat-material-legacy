@@ -12,6 +12,7 @@
  */
 import {createHash} from 'node:crypto';
 import {legacyFormFieldOutlineNativeOkay, legacyFormFieldOutlineSequenceOkay, observeLegacyFormFieldOutlineNative} from './legacy-form-field-outline-native-contract.mjs';
+import {legacyChipBlurNativeOkay, observeLegacyChipBlurNative} from './legacy-chip-blur-native-contract.mjs';
 import {announcedChromeEndpoint,debuggerMatchesChild} from './chromium-debug-endpoint.mjs';
 import {spawnSync as __spawnSyncForWs} from 'node:child_process';
 if (typeof globalThis.WebSocket !== 'function') {
@@ -113,7 +114,7 @@ writeFileSync(join(consumer, 'src/main.ts'), `${zoneless ? '' : `import 'zone.js
 `}import {Component, NgModule${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
-import {FormsModule} from '@angular/forms';
+import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MATERIAL_ANIMATIONS} from '@angular/material/core';
 import {MatLegacyChipsModule} from '@ngx-compat/material-legacy/legacy-chips';
 import {MatLegacyFormFieldModule} from '@ngx-compat/material-legacy/legacy-form-field';
@@ -123,10 +124,11 @@ import {MatLegacyInputModule} from '@ngx-compat/material-legacy/legacy-input';
   standalone: false,
   selector: 'lab-root',
   template: \`
-    <mat-chip-list id="chip-list" selectable>
+    <mat-chip-list id="chip-list" #labChips="matChipList" [formControl]="chipControl" selectable>
       <mat-chip id="chip-a">Alpha</mat-chip>
       <mat-chip id="chip-b">Beta</mat-chip>
     </mat-chip-list>
+    <output id="chip-form-state" [attr.data-focused]="labChips.focused" [attr.data-touched]="chipControl.touched"></output>
 
     <mat-form-field id="ff" appearance="fill" floatLabel="auto">
       <mat-label>Name</mat-label>
@@ -147,6 +149,7 @@ import {MatLegacyInputModule} from '@ngx-compat/material-legacy/legacy-input';
   \`,
 })
 export class LabRoot {
+  readonly chipControl = new FormControl<string | null>(null);
   name = '';
   outlineVisible = true;
   outlinePrefix = false;
@@ -157,6 +160,7 @@ export class LabRoot {
   imports: [
     BrowserModule,
     FormsModule,
+    ReactiveFormsModule,
     MatLegacyChipsModule,
     MatLegacyFormFieldModule,
     MatLegacyInputModule,
@@ -358,6 +362,7 @@ try {
   families.chips.chip_selected_class = await waitFor(
     '!!document.getElementById("chip-a")?.classList.contains("mat-chip-selected")',
   );
+  families.chips.blur = await observeLegacyChipBlurNative({evaluate,waitFor});
 
   // Form-field: present with hint; focus input; assert focused class and floating label.
   families['form-field'].present = await waitFor('!!document.querySelector("mat-form-field#ff")');
@@ -423,6 +428,7 @@ const ok =
   !error
   && zoneOk
   && families.chips.list_present && families.chips.chip_clicked && families.chips.chip_selected_class
+  && legacyChipBlurNativeOkay(families.chips.blur)
   && families['form-field'].present && families['form-field'].hint_visible
   && families['form-field'].input_focused && families['form-field'].focused_class
   && families['form-field'].label_floating

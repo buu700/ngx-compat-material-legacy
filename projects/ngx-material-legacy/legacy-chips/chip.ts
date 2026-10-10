@@ -36,7 +36,7 @@ import {
   LegacyRippleTarget as RippleTarget,
 } from '@ngx-compat/material-legacy/legacy-core';
 import {CanColor, CanDisable, CanDisableRipple, HasTabIndex, mixinColor, mixinDisableRipple, mixinTabIndex} from './internal/common-behaviors';
-import {Subject} from 'rxjs';
+import {Subject, Subscription} from 'rxjs';
 import {take} from 'rxjs/operators';
 
 /**
@@ -187,6 +187,9 @@ export class MatLegacyChip
 
   /** Whether the chip has focus. */
   _hasFocus: boolean = false;
+
+  private _isDestroyed = false;
+  private _blurSubscription?: Subscription;
 
   /** Whether animations for the chip are enabled. */
   _animationsDisabled: boolean;
@@ -347,6 +350,9 @@ export class MatLegacyChip
   }
 
   ngOnDestroy() {
+    if (this._isDestroyed) return;
+    this._isDestroyed = true;
+    this._blurSubscription?.unsubscribe();
     this.destroyed.emit({chip: this});
     this._chipRipple._removeTriggerEvents();
   }
@@ -388,6 +394,8 @@ export class MatLegacyChip
 
   /** Allows for programmatic focusing of the chip. */
   focus(): void {
+    if (this._isDestroyed) return;
+    this._blurSubscription?.unsubscribe();
     if (!this._hasFocus) {
       this._elementRef.nativeElement.focus();
       this._onFocus.next({chip: this});
@@ -441,16 +449,27 @@ export class MatLegacyChip
   }
 
   _blur(): void {
+    if (this._isDestroyed) return;
+    this._blurSubscription?.unsubscribe();
     // When animations are enabled, Angular may end up removing the chip from the DOM a little
     // earlier than usual, causing it to be blurred and throwing off the logic in the chip list
     // that moves focus to the next item. To work around the issue, we defer marking the chip
     // as not focused until the next time the zone stabilizes.
-    this._ngZone.onStable.pipe(take(1)).subscribe(() => {
+    const request = new Subscription();
+    this._blurSubscription = request;
+    const apply = () => {
+      if (request.closed || this._isDestroyed) return;
+      request.unsubscribe();
       this._ngZone.run(() => {
         this._hasFocus = false;
         this._onBlur.next({chip: this});
       });
-    });
+    };
+    request.add(this._ngZone.onStable.pipe(take(1)).subscribe(apply));
+    // Zoneless providers are already stable and emit no stability event.
+    if (this._ngZone.isStable) {
+      Promise.resolve().then(apply);
+    }
   }
 
   private _dispatchSelectionChange(isUserInput = false) {
