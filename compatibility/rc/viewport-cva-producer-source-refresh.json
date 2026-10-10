@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "role": "Source-only revalidation of viewport producer after separate value-accessor fixtures",
+  "recorded_at_utc": "2026-10-10T21:17:25.597932+00:00",
+  "source_checkpoint": "49b23c64e6ee2cc24692b88ca96ab8f6903d6f73",
+  "prior_source_checkpoint": "385b23fc1",
+  "producer": {
+    "path": "scripts/packed-consumer-aot-smoke.mjs",
+    "prior_sha256": "7e21bb7f5b2d517f616968cc067aa91cb46cccdad0c3a25f207ce0dd91edf5ad",
+    "current_sha256": "5eae2d87af7ae6b240d3352b1eeb40e46d35a2a01f024d7b9f5069602ca9f39f",
+    "reviewed_git_diff_sha256": "32c3f20a877b13fe2cf4e0013292a7ec87443341c50eb0de25c505d7f2264d83"
+  },
+  "unchanged_viewport_observation": {
+    "source": "  const ownedViewport=TestBed.inject(_LegacyViewport);\n  const viewportNodes=fixture.debugElement.queryAll(By.css('mat-select, mat-tab-header'));\n  const viewportShared=viewportNodes.length>=2\n    && viewportNodes.every(node=>node.injector.get(_LegacyViewport)===ownedViewport)\n    && ownedViewport.getViewportSize().width===window.innerWidth\n    && ownedViewport.getViewportSize().height===window.innerHeight;",
+    "sha256": "fe003ec761fff28dcb33e97bc3bafc8852b5acae38d2a74a5b7fde094cfc606f",
+    "collector_mappings": [
+      "    'packed-consumer/harness/legacy-select': parsed.selectOpened === true && parsed.selectClosed === true && parsed.viewportShared === true,",
+      "    'packed-consumer/harness/legacy-tabs': parsed.tabCount === 2 && parsed.selectedTab === 'Two' && parsed.viewportShared === true,"
+    ],
+    "public_import": "import {_LegacyViewport} from '@ngx-compat/material-legacy/legacy-core';"
+  },
+  "reviewed_delta": "Complete producer diff adds six independent value-accessor fixtures and mandatory acceptance rows, invokes their observer after existing viewport assertions, and adds their result to overall acceptance. The viewport singleton source and both select/tab mapping predicates are byte-identical. No viewport or product source changed.",
+  "historical_executions_rebound": false,
+  "packed_AOT_native_executed": false,
+  "g11_claim": "not-passed"
+}
