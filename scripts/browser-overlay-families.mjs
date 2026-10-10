@@ -1,5 +1,12 @@
 #!/usr/bin/env node
 /**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+/**
  * Chromium PR-slice for additional legacy overlay/form families beyond
  * dialog/select: menu, snack-bar, tooltip, autocomplete, tabs.
  *
@@ -13,6 +20,7 @@
  */
 import {createHash} from 'node:crypto';
 import {observeTabPaginationNative,tabPaginationNativeOkay} from './tab-pagination-native-contract.mjs';
+import {observeLegacyInkBarNative,legacyInkBarSelectionSequenceOkay} from './legacy-ink-bar-native-contract.mjs';
 import {announcedChromeEndpoint,debuggerMatchesChild} from './chromium-debug-endpoint.mjs';
 import {spawnSync as __spawnSyncForWs} from 'node:child_process';
 if (typeof globalThis.WebSocket !== 'function') {
@@ -436,18 +444,25 @@ try {
   families.autocomplete.option_selected = false;
   families.autocomplete.panel_closed_after_select = false;
 
-  // Tabs: click second label, assert second body visible.
+  // Tabs: retain the historical ink positioner through first/second/first selection.
+  await waitFor('!!document.querySelector("#tabs .mat-tab-label-active")');
+  families.tabs.ink_alignment = [await observeLegacyInkBarNative({evaluate})];
+  // Click second label, assert second body visible.
   await evaluate(`(() => {
-    const labels = Array.from(document.querySelectorAll(".mat-tab-label"));
+    const labels = Array.from(document.querySelectorAll("#tabs .mat-tab-label"));
     const second = labels[1];
     if (second) second.click();
   })()`);
   families.tabs.second_selected = await waitFor(
-    '!!document.querySelectorAll(".mat-tab-label")[1]?.classList.contains("mat-tab-label-active")',
+    '!!document.querySelectorAll("#tabs .mat-tab-label")[1]?.classList.contains("mat-tab-label-active")',
   );
   families.tabs.second_body_visible = await waitFor(
     '!!document.getElementById("tab-two") && getComputedStyle(document.getElementById("tab-two")).display !== "none"',
   );
+  families.tabs.ink_alignment.push(await observeLegacyInkBarNative({evaluate}));
+  await evaluate('document.querySelector("#tabs .mat-tab-label").click()');
+  await waitFor('!!document.querySelector("#tabs .mat-tab-label")?.classList.contains("mat-tab-label-active")');
+  families.tabs.ink_alignment.push(await observeLegacyInkBarNative({evaluate}));
 
   families.tabs.pagination = await observeTabPaginationNative({send,evaluate,waitFor});
 
@@ -482,6 +497,7 @@ const ok =
   && families.tooltip.shown
   && families.autocomplete.panel_opened && families.autocomplete.typed_filter_visible && families.autocomplete.input_focused
   && families.tabs.second_selected && families.tabs.second_body_visible
+  && legacyInkBarSelectionSequenceOkay(families.tabs.ink_alignment)
   && tabPaginationNativeOkay(families.tabs.pagination);
 
 const report = {
