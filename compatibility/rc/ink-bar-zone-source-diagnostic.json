@@ -1,0 +1,2306 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "source": {
+    "path": "projects/ngx-material-legacy/legacy-tabs/ink-bar.ts",
+    "sha256": "739dd3b4acb9c0d9eba8039d47c0d8e7f07d045c6880cfecda4df5168ec28ff3"
+  },
+  "reference": {
+    "path": "reference/material-16.2.14/ink-bar-zone-sources/ink-bar.ts",
+    "sha256": "b7dfb4ce490555fcf415d2e0123ff3ce388c8843594c35688bfeaca7693af25f"
+  },
+  "tagged_shared_reference": {
+    "path": "reference/material-16.2.14/ink-bar-zone-sources/ink-bar-shared.ts",
+    "sha256": "77bf032d56af3e7bde5de166702761203e78974f466bccb1587be0ced392ee52"
+  },
+  "historical_constructor_selector_host_show_hide_and_positioner_unchanged": true,
+  "namespace_capsule_sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3",
+  "node": "v22.23.3",
+  "binding_parser": "6.0.3",
+  "public_contracts": [
+    {
+      "line": "original",
+      "path": "@angular/core/index.d.ts",
+      "source_sha256": "9fedfcf08d61d0709a96f157bab028ce05c7fe27a0c179e12e19b00922052fab",
+      "name": "NgZone",
+      "tags": [
+        "usageNotes",
+        "Component",
+        "publicApi"
+      ],
+      "whole": "export declare class NgZone {\n    readonly hasPendingMacrotasks: boolean;\n    readonly hasPendingMicrotasks: boolean;\n    /**\n     * Whether there are no outstanding microtasks or macrotasks.\n     */\n    readonly isStable: boolean;\n    /**\n     * Notifies when code enters Angular Zone. This gets fired first on VM Turn.\n     */\n    readonly onUnstable: EventEmitter<any>;\n    /**\n     * Notifies when there is no more microtasks enqueued in the current VM Turn.\n     * This is a hint for Angular to do change detection, which may enqueue more microtasks.\n     * For this reason this event can fire multiple times per VM Turn.\n     */\n    readonly onMicrotaskEmpty: EventEmitter<any>;\n    /**\n     * Notifies when the last `onMicrotaskEmpty` has run and there are no more microtasks, which\n     * implies we are about to relinquish VM turn.\n     * This event gets called just once.\n     */\n    readonly onStable: EventEmitter<any>;\n    /**\n     * Notifies that an error has been delivered.\n     */\n    readonly onError: EventEmitter<any>;\n    constructor({ enableLongStackTrace, shouldCoalesceEventChangeDetection, shouldCoalesceRunChangeDetection }: {\n        enableLongStackTrace?: boolean | undefined;\n        shouldCoalesceEventChangeDetection?: boolean | undefined;\n        shouldCoalesceRunChangeDetection?: boolean | undefined;\n    });\n    /**\n     This method checks whether the method call happens within an Angular Zone instance.\n     */\n    static isInAngularZone(): boolean;\n    /**\n     Assures that the method is called within the Angular Zone, otherwise throws an error.\n     */\n    static assertInAngularZone(): void;\n    /**\n     Assures that the method is called outside of the Angular Zone, otherwise throws an error.\n     */\n    static assertNotInAngularZone(): void;\n    /**\n     * Executes the `fn` function synchronously within the Angular zone and returns value returned by\n     * the function.\n     *\n     * Running functions via `run` allows you to reenter Angular zone from a task that was executed\n     * outside of the Angular zone (typically started via {@link #runOutsideAngular}).\n     *\n     * Any future tasks or microtasks scheduled from within this function will continue executing from\n     * within the Angular zone.\n     *\n     * If a synchronous error happens it will be rethrown and not reported via `onError`.\n     */\n    run<T>(fn: (...args: any[]) => T, applyThis?: any, applyArgs?: any[]): T;\n    /**\n     * Executes the `fn` function synchronously within the Angular zone as a task and returns value\n     * returned by the function.\n     *\n     * Running functions via `run` allows you to reenter Angular zone from a task that was executed\n     * outside of the Angular zone (typically started via {@link #runOutsideAngular}).\n     *\n     * Any future tasks or microtasks scheduled from within this function will continue executing from\n     * within the Angular zone.\n     *\n     * If a synchronous error happens it will be rethrown and not reported via `onError`.\n     */\n    runTask<T>(fn: (...args: any[]) => T, applyThis?: any, applyArgs?: any[], name?: string): T;\n    /**\n     * Same as `run`, except that synchronous errors are caught and forwarded via `onError` and not\n     * rethrown.\n     */\n    runGuarded<T>(fn: (...args: any[]) => T, applyThis?: any, applyArgs?: any[]): T;\n    /**\n     * Executes the `fn` function synchronously in Angular's parent zone and returns value returned by\n     * the function.\n     *\n     * Running functions via {@link #runOutsideAngular} allows you to escape Angular's zone and do\n     * work that\n     * doesn't trigger Angular change-detection or is subject to Angular's error handling.\n     *\n     * Any future tasks or microtasks scheduled from within this function will continue executing from\n     * outside of the Angular zone.\n     *\n     * Use {@link #run} to reenter the Angular zone and do work that updates the application model.\n     */\n    runOutsideAngular<T>(fn: (...args: any[]) => T): T;\n}"
+    },
+    {
+      "line": "main",
+      "path": "@angular/core/types/_debug_node-chunk.d.ts",
+      "source_sha256": "359fdc800f92be1be371c69aa3a01c902976e8de13520eaf03dd5c85160e628b",
+      "name": "NgZone",
+      "tags": [
+        "usageNotes",
+        "Component",
+        "if",
+        "see",
+        "publicApi"
+      ],
+      "whole": "declare class NgZone {\n    readonly hasPendingMacrotasks: boolean;\n    readonly hasPendingMicrotasks: boolean;\n    /**\n     * Whether there are no outstanding microtasks or macrotasks.\n     */\n    readonly isStable: boolean;\n    /**\n     * Notifies when code enters Angular Zone. This gets fired first on VM Turn.\n     */\n    readonly onUnstable: EventEmitter<any>;\n    /**\n     * Notifies when there is no more microtasks enqueued in the current VM Turn.\n     * This is a hint for Angular to do change detection, which may enqueue more microtasks.\n     * For this reason this event can fire multiple times per VM Turn.\n     */\n    readonly onMicrotaskEmpty: EventEmitter<any>;\n    /**\n     * Notifies when the last `onMicrotaskEmpty` has run and there are no more microtasks, which\n     * implies we are about to relinquish VM turn.\n     * This event gets called just once.\n     */\n    readonly onStable: EventEmitter<any>;\n    /**\n     * Notifies that an error has been delivered.\n     */\n    readonly onError: EventEmitter<any>;\n    constructor(options: {\n        enableLongStackTrace?: boolean;\n        shouldCoalesceEventChangeDetection?: boolean;\n        shouldCoalesceRunChangeDetection?: boolean;\n    });\n    /**\n      This method checks whether the method call happens within an Angular Zone instance.\n    */\n    static isInAngularZone(): boolean;\n    /**\n      Assures that the method is called within the Angular Zone, otherwise throws an error.\n    */\n    static assertInAngularZone(): void;\n    /**\n      Assures that the method is called outside of the Angular Zone, otherwise throws an error.\n    */\n    static assertNotInAngularZone(): void;\n    /**\n     * Executes the `fn` function synchronously within the Angular zone and returns value returned by\n     * the function.\n     *\n     * Running functions via `run` allows you to reenter Angular zone from a task that was executed\n     * outside of the Angular zone (typically started via {@link #runOutsideAngular}).\n     *\n     * Any future tasks or microtasks scheduled from within this function will continue executing from\n     * within the Angular zone.\n     *\n     * If a synchronous error happens it will be rethrown and not reported via `onError`.\n     */\n    run<T>(fn: (...args: any[]) => T, applyThis?: any, applyArgs?: any[]): T;\n    /**\n     * Executes the `fn` function synchronously within the Angular zone as a task and returns value\n     * returned by the function.\n     *\n     * Running functions via `runTask` allows you to reenter Angular zone from a task that was executed\n     * outside of the Angular zone (typically started via {@link #runOutsideAngular}).\n     *\n     * Any future tasks or microtasks scheduled from within this function will continue executing from\n     * within the Angular zone.\n     *\n     * If a synchronous error happens it will be rethrown and not reported via `onError`.\n     */\n    runTask<T>(fn: (...args: any[]) => T, applyThis?: any, applyArgs?: any[], name?: string): T;\n    /**\n     * Same as `run`, except that synchronous errors are caught and forwarded via `onError` and not\n     * rethrown.\n     */\n    runGuarded<T>(fn: (...args: any[]) => T, applyThis?: any, applyArgs?: any[]): T;\n    /**\n     * Executes the `fn` function synchronously in Angular's parent zone and returns value returned by\n     * the function.\n     *\n     * Running functions via {@link #runOutsideAngular} allows you to escape Angular's zone and do\n     * work that\n     * doesn't trigger Angular change-detection or is subject to Angular's error handling.\n     *\n     * Any future tasks or microtasks scheduled from within this function will continue executing from\n     * outside of the Angular zone.\n     *\n     * Use {@link #run} to reenter the Angular zone and do work that updates the application model.\n     */\n    runOutsideAngular<T>(fn: (...args: any[]) => T): T;\n}"
+    },
+    {
+      "line": "main",
+      "path": "@angular/core/types/core.d.ts",
+      "source_sha256": "7d9eea93a0ccb308851fe7b50af8b8d894e8f0ae456e339fe8dcd87bf3fcfd84",
+      "name": "provideZonelessChangeDetection",
+      "tags": [
+        "usageNotes",
+        "publicApi",
+        "see",
+        "see"
+      ],
+      "whole": "declare function provideZonelessChangeDetection(): EnvironmentProviders;"
+    },
+    {
+      "line": "21.x",
+      "path": "@angular/core/types/_discovery-chunk.d.ts",
+      "source_sha256": "779438592d99f241f4f0c961f3973595d4473883630b81c5b19b5d1b79329211",
+      "name": "NgZone",
+      "tags": [
+        "usageNotes",
+        "Component",
+        "if",
+        "see",
+        "publicApi"
+      ],
+      "whole": "declare class NgZone {\n    readonly hasPendingMacrotasks: boolean;\n    readonly hasPendingMicrotasks: boolean;\n    /**\n     * Whether there are no outstanding microtasks or macrotasks.\n     */\n    readonly isStable: boolean;\n    /**\n     * Notifies when code enters Angular Zone. This gets fired first on VM Turn.\n     */\n    readonly onUnstable: EventEmitter<any>;\n    /**\n     * Notifies when there is no more microtasks enqueued in the current VM Turn.\n     * This is a hint for Angular to do change detection, which may enqueue more microtasks.\n     * For this reason this event can fire multiple times per VM Turn.\n     */\n    readonly onMicrotaskEmpty: EventEmitter<any>;\n    /**\n     * Notifies when the last `onMicrotaskEmpty` has run and there are no more microtasks, which\n     * implies we are about to relinquish VM turn.\n     * This event gets called just once.\n     */\n    readonly onStable: EventEmitter<any>;\n    /**\n     * Notifies that an error has been delivered.\n     */\n    readonly onError: EventEmitter<any>;\n    constructor(options: {\n        enableLongStackTrace?: boolean;\n        shouldCoalesceEventChangeDetection?: boolean;\n        shouldCoalesceRunChangeDetection?: boolean;\n    });\n    /**\n      This method checks whether the method call happens within an Angular Zone instance.\n    */\n    static isInAngularZone(): boolean;\n    /**\n      Assures that the method is called within the Angular Zone, otherwise throws an error.\n    */\n    static assertInAngularZone(): void;\n    /**\n      Assures that the method is called outside of the Angular Zone, otherwise throws an error.\n    */\n    static assertNotInAngularZone(): void;\n    /**\n     * Executes the `fn` function synchronously within the Angular zone and returns value returned by\n     * the function.\n     *\n     * Running functions via `run` allows you to reenter Angular zone from a task that was executed\n     * outside of the Angular zone (typically started via {@link #runOutsideAngular}).\n     *\n     * Any future tasks or microtasks scheduled from within this function will continue executing from\n     * within the Angular zone.\n     *\n     * If a synchronous error happens it will be rethrown and not reported via `onError`.\n     */\n    run<T>(fn: (...args: any[]) => T, applyThis?: any, applyArgs?: any[]): T;\n    /**\n     * Executes the `fn` function synchronously within the Angular zone as a task and returns value\n     * returned by the function.\n     *\n     * Running functions via `runTask` allows you to reenter Angular zone from a task that was executed\n     * outside of the Angular zone (typically started via {@link #runOutsideAngular}).\n     *\n     * Any future tasks or microtasks scheduled from within this function will continue executing from\n     * within the Angular zone.\n     *\n     * If a synchronous error happens it will be rethrown and not reported via `onError`.\n     */\n    runTask<T>(fn: (...args: any[]) => T, applyThis?: any, applyArgs?: any[], name?: string): T;\n    /**\n     * Same as `run`, except that synchronous errors are caught and forwarded via `onError` and not\n     * rethrown.\n     */\n    runGuarded<T>(fn: (...args: any[]) => T, applyThis?: any, applyArgs?: any[]): T;\n    /**\n     * Executes the `fn` function synchronously in Angular's parent zone and returns value returned by\n     * the function.\n     *\n     * Running functions via {@link #runOutsideAngular} allows you to escape Angular's zone and do\n     * work that\n     * doesn't trigger Angular change-detection or is subject to Angular's error handling.\n     *\n     * Any future tasks or microtasks scheduled from within this function will continue executing from\n     * outside of the Angular zone.\n     *\n     * Use {@link #run} to reenter the Angular zone and do work that updates the application model.\n     */\n    runOutsideAngular<T>(fn: (...args: any[]) => T): T;\n}"
+    },
+    {
+      "line": "21.x",
+      "path": "@angular/core/types/core.d.ts",
+      "source_sha256": "b5bad26c29a5dc40bf2c0fefc94574dc0c5a2e158c47e56040c7bd5c7b3334df",
+      "name": "provideZonelessChangeDetection",
+      "tags": [
+        "usageNotes",
+        "publicApi",
+        "see",
+        "see"
+      ],
+      "whole": "declare function provideZonelessChangeDetection(): EnvironmentProviders;"
+    }
+  ],
+  "type_compilation": {
+    "compiler": "6.0.2",
+    "compiler_source_sha256": "630f808ac32d968a49a392c42cc06fd72abd939aaa7edfe3302810c067934653",
+    "subjects": [
+      {
+        "line": "original",
+        "negative_checks": 7,
+        "fixture_sha256": "5d4405f397c6f79a7a1c8a11e19fafe258e42cf4329b0d795707c70e7f37a986"
+      },
+      {
+        "line": "main",
+        "negative_checks": 7,
+        "fixture_sha256": "ef6b67e454b60bd6b2a00837acb7075138b641c4ae4e60b8b3f16d510d1c0556"
+      },
+      {
+        "line": "21.x",
+        "negative_checks": 7,
+        "fixture_sha256": "ef6b67e454b60bd6b2a00837acb7075138b641c4ae4e60b8b3f16d510d1c0556"
+      }
+    ]
+  },
+  "results": [
+    {
+      "line": "original",
+      "mode": "zoneful",
+      "production": false,
+      "zone_subject": {
+        "version": "0.13.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-MKPbmZie6fASC/ps4dkmIhaT5eonHkEt6eAy80K42tAm0G2W+AahLJjbfi6X9NPdciOE9GRFTTM8u2IiF6O3ww==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "8558046e49533b728403672b515caa0e30f2e7b4e0b8d4824f6198faffbd099d",
+        "authenticated_commonjs_require_forwarders": 0,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "inside": {
+        "isStable": false,
+        "inAngularZone": true
+      },
+      "original": {
+        "states": [
+          {
+            "id": "initial",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "hidden",
+            "style": {
+              "visibility": "hidden",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "shown",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "second-alignment",
+            "style": {
+              "visibility": "visible",
+              "left": "96px",
+              "width": "77px"
+            },
+            "calls": 2
+          },
+          {
+            "id": "return-first",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 3
+          }
+        ],
+        "writes": [
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "42px"
+          },
+          {
+            "key": "width",
+            "value": "124px"
+          },
+          {
+            "key": "visibility",
+            "value": "hidden"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "96px"
+          },
+          {
+            "key": "width",
+            "value": "77px"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "42px"
+          },
+          {
+            "key": "width",
+            "value": "124px"
+          }
+        ]
+      },
+      "candidate": {
+        "states": [
+          {
+            "id": "initial",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "hidden",
+            "style": {
+              "visibility": "hidden",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "shown",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "second-alignment",
+            "style": {
+              "visibility": "visible",
+              "left": "96px",
+              "width": "77px"
+            },
+            "calls": 2
+          },
+          {
+            "id": "return-first",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 3
+          }
+        ],
+        "writes": [
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "42px"
+          },
+          {
+            "key": "width",
+            "value": "124px"
+          },
+          {
+            "key": "visibility",
+            "value": "hidden"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "96px"
+          },
+          {
+            "key": "width",
+            "value": "77px"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "42px"
+          },
+          {
+            "key": "width",
+            "value": "124px"
+          }
+        ]
+      },
+      "original_stable_events": 3,
+      "candidate_stable_events": 3,
+      "zone_global": "function",
+      "mutations": [],
+      "actual_whole_source_classes": true,
+      "synthetic_elements_positioner_offsets": true
+    },
+    {
+      "line": "original",
+      "mode": "zoneful",
+      "production": true,
+      "zone_subject": {
+        "version": "0.13.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-MKPbmZie6fASC/ps4dkmIhaT5eonHkEt6eAy80K42tAm0G2W+AahLJjbfi6X9NPdciOE9GRFTTM8u2IiF6O3ww==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "8558046e49533b728403672b515caa0e30f2e7b4e0b8d4824f6198faffbd099d",
+        "authenticated_commonjs_require_forwarders": 0,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "inside": {
+        "isStable": false,
+        "inAngularZone": true
+      },
+      "original": {
+        "states": [
+          {
+            "id": "initial",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "hidden",
+            "style": {
+              "visibility": "hidden",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "shown",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "second-alignment",
+            "style": {
+              "visibility": "visible",
+              "left": "96px",
+              "width": "77px"
+            },
+            "calls": 2
+          },
+          {
+            "id": "return-first",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 3
+          }
+        ],
+        "writes": [
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "42px"
+          },
+          {
+            "key": "width",
+            "value": "124px"
+          },
+          {
+            "key": "visibility",
+            "value": "hidden"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "96px"
+          },
+          {
+            "key": "width",
+            "value": "77px"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "42px"
+          },
+          {
+            "key": "width",
+            "value": "124px"
+          }
+        ]
+      },
+      "candidate": {
+        "states": [
+          {
+            "id": "initial",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "hidden",
+            "style": {
+              "visibility": "hidden",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "shown",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "second-alignment",
+            "style": {
+              "visibility": "visible",
+              "left": "96px",
+              "width": "77px"
+            },
+            "calls": 2
+          },
+          {
+            "id": "return-first",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 3
+          }
+        ],
+        "writes": [
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "42px"
+          },
+          {
+            "key": "width",
+            "value": "124px"
+          },
+          {
+            "key": "visibility",
+            "value": "hidden"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "96px"
+          },
+          {
+            "key": "width",
+            "value": "77px"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "42px"
+          },
+          {
+            "key": "width",
+            "value": "124px"
+          }
+        ]
+      },
+      "original_stable_events": 3,
+      "candidate_stable_events": 3,
+      "zone_global": "function",
+      "mutations": [],
+      "actual_whole_source_classes": true,
+      "synthetic_elements_positioner_offsets": true
+    },
+    {
+      "line": "main",
+      "mode": "zoneful",
+      "production": false,
+      "zone_subject": {
+        "version": "0.16.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-ihXL9+vhYyEhXz4TDNpHeAOZN9FVrbog0Il64OIEI28UP/n5AaI6gsccRuOHBfx+206agzyoK527bYIO0Foy6A==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "94d3f7278878a57f7b4be6d9174fd2835bbf54bef1e54babd5e61c98495ebc4c",
+        "authenticated_commonjs_require_forwarders": 1,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "inside": {
+        "isStable": false,
+        "inAngularZone": true
+      },
+      "original": {
+        "states": [
+          {
+            "id": "initial",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "hidden",
+            "style": {
+              "visibility": "hidden",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "shown",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "second-alignment",
+            "style": {
+              "visibility": "visible",
+              "left": "96px",
+              "width": "77px"
+            },
+            "calls": 2
+          },
+          {
+            "id": "return-first",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 3
+          }
+        ],
+        "writes": [
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "42px"
+          },
+          {
+            "key": "width",
+            "value": "124px"
+          },
+          {
+            "key": "visibility",
+            "value": "hidden"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "96px"
+          },
+          {
+            "key": "width",
+            "value": "77px"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "42px"
+          },
+          {
+            "key": "width",
+            "value": "124px"
+          }
+        ]
+      },
+      "candidate": {
+        "states": [
+          {
+            "id": "initial",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "hidden",
+            "style": {
+              "visibility": "hidden",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "shown",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "second-alignment",
+            "style": {
+              "visibility": "visible",
+              "left": "96px",
+              "width": "77px"
+            },
+            "calls": 2
+          },
+          {
+            "id": "return-first",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 3
+          }
+        ],
+        "writes": [
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "42px"
+          },
+          {
+            "key": "width",
+            "value": "124px"
+          },
+          {
+            "key": "visibility",
+            "value": "hidden"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "96px"
+          },
+          {
+            "key": "width",
+            "value": "77px"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "42px"
+          },
+          {
+            "key": "width",
+            "value": "124px"
+          }
+        ]
+      },
+      "original_stable_events": 3,
+      "candidate_stable_events": 3,
+      "zone_global": "function",
+      "mutations": [
+        {
+          "id": "inverted",
+          "rejected": true
+        },
+        {
+          "id": "wrongWidth",
+          "rejected": true
+        }
+      ],
+      "actual_whole_source_classes": true,
+      "synthetic_elements_positioner_offsets": true
+    },
+    {
+      "line": "main",
+      "mode": "zoneful",
+      "production": true,
+      "zone_subject": {
+        "version": "0.16.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-ihXL9+vhYyEhXz4TDNpHeAOZN9FVrbog0Il64OIEI28UP/n5AaI6gsccRuOHBfx+206agzyoK527bYIO0Foy6A==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "94d3f7278878a57f7b4be6d9174fd2835bbf54bef1e54babd5e61c98495ebc4c",
+        "authenticated_commonjs_require_forwarders": 1,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "inside": {
+        "isStable": false,
+        "inAngularZone": true
+      },
+      "original": {
+        "states": [
+          {
+            "id": "initial",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "hidden",
+            "style": {
+              "visibility": "hidden",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "shown",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "second-alignment",
+            "style": {
+              "visibility": "visible",
+              "left": "96px",
+              "width": "77px"
+            },
+            "calls": 2
+          },
+          {
+            "id": "return-first",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 3
+          }
+        ],
+        "writes": [
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "42px"
+          },
+          {
+            "key": "width",
+            "value": "124px"
+          },
+          {
+            "key": "visibility",
+            "value": "hidden"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "96px"
+          },
+          {
+            "key": "width",
+            "value": "77px"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "42px"
+          },
+          {
+            "key": "width",
+            "value": "124px"
+          }
+        ]
+      },
+      "candidate": {
+        "states": [
+          {
+            "id": "initial",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "hidden",
+            "style": {
+              "visibility": "hidden",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "shown",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "second-alignment",
+            "style": {
+              "visibility": "visible",
+              "left": "96px",
+              "width": "77px"
+            },
+            "calls": 2
+          },
+          {
+            "id": "return-first",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 3
+          }
+        ],
+        "writes": [
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "42px"
+          },
+          {
+            "key": "width",
+            "value": "124px"
+          },
+          {
+            "key": "visibility",
+            "value": "hidden"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "96px"
+          },
+          {
+            "key": "width",
+            "value": "77px"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "42px"
+          },
+          {
+            "key": "width",
+            "value": "124px"
+          }
+        ]
+      },
+      "original_stable_events": 3,
+      "candidate_stable_events": 3,
+      "zone_global": "function",
+      "mutations": [],
+      "actual_whole_source_classes": true,
+      "synthetic_elements_positioner_offsets": true
+    },
+    {
+      "line": "main",
+      "mode": "zoneless",
+      "production": false,
+      "zone_subject": {
+        "version": "0.16.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-ihXL9+vhYyEhXz4TDNpHeAOZN9FVrbog0Il64OIEI28UP/n5AaI6gsccRuOHBfx+206agzyoK527bYIO0Foy6A==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "94d3f7278878a57f7b4be6d9174fd2835bbf54bef1e54babd5e61c98495ebc4c",
+        "authenticated_commonjs_require_forwarders": 1,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "inside": {
+        "isStable": true,
+        "inAngularZone": false
+      },
+      "original": {
+        "states": [
+          {
+            "id": "initial",
+            "style": {
+              "visibility": "visible"
+            },
+            "calls": 0
+          },
+          {
+            "id": "hidden",
+            "style": {
+              "visibility": "hidden"
+            },
+            "calls": 0
+          },
+          {
+            "id": "shown",
+            "style": {
+              "visibility": "visible"
+            },
+            "calls": 0
+          },
+          {
+            "id": "second-alignment",
+            "style": {
+              "visibility": "visible"
+            },
+            "calls": 0
+          },
+          {
+            "id": "return-first",
+            "style": {
+              "visibility": "visible"
+            },
+            "calls": 0
+          }
+        ],
+        "writes": [
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "visibility",
+            "value": "hidden"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          }
+        ]
+      },
+      "candidate": {
+        "states": [
+          {
+            "id": "initial",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "hidden",
+            "style": {
+              "visibility": "hidden",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "shown",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "second-alignment",
+            "style": {
+              "visibility": "visible",
+              "left": "96px",
+              "width": "77px"
+            },
+            "calls": 2
+          },
+          {
+            "id": "return-first",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 3
+          }
+        ],
+        "writes": [
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "42px"
+          },
+          {
+            "key": "width",
+            "value": "124px"
+          },
+          {
+            "key": "visibility",
+            "value": "hidden"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "96px"
+          },
+          {
+            "key": "width",
+            "value": "77px"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "42px"
+          },
+          {
+            "key": "width",
+            "value": "124px"
+          }
+        ]
+      },
+      "original_stable_events": 0,
+      "candidate_stable_events": 0,
+      "zone_global": "undefined",
+      "mutations": [
+        {
+          "id": "noFallback",
+          "rejected": true
+        },
+        {
+          "id": "inverted",
+          "rejected": true
+        },
+        {
+          "id": "wrongWidth",
+          "rejected": true
+        }
+      ],
+      "actual_whole_source_classes": true,
+      "synthetic_elements_positioner_offsets": true
+    },
+    {
+      "line": "main",
+      "mode": "zoneless",
+      "production": true,
+      "zone_subject": {
+        "version": "0.16.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-ihXL9+vhYyEhXz4TDNpHeAOZN9FVrbog0Il64OIEI28UP/n5AaI6gsccRuOHBfx+206agzyoK527bYIO0Foy6A==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "94d3f7278878a57f7b4be6d9174fd2835bbf54bef1e54babd5e61c98495ebc4c",
+        "authenticated_commonjs_require_forwarders": 1,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "inside": {
+        "isStable": true,
+        "inAngularZone": false
+      },
+      "original": {
+        "states": [
+          {
+            "id": "initial",
+            "style": {
+              "visibility": "visible"
+            },
+            "calls": 0
+          },
+          {
+            "id": "hidden",
+            "style": {
+              "visibility": "hidden"
+            },
+            "calls": 0
+          },
+          {
+            "id": "shown",
+            "style": {
+              "visibility": "visible"
+            },
+            "calls": 0
+          },
+          {
+            "id": "second-alignment",
+            "style": {
+              "visibility": "visible"
+            },
+            "calls": 0
+          },
+          {
+            "id": "return-first",
+            "style": {
+              "visibility": "visible"
+            },
+            "calls": 0
+          }
+        ],
+        "writes": [
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "visibility",
+            "value": "hidden"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          }
+        ]
+      },
+      "candidate": {
+        "states": [
+          {
+            "id": "initial",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "hidden",
+            "style": {
+              "visibility": "hidden",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "shown",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "second-alignment",
+            "style": {
+              "visibility": "visible",
+              "left": "96px",
+              "width": "77px"
+            },
+            "calls": 2
+          },
+          {
+            "id": "return-first",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 3
+          }
+        ],
+        "writes": [
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "42px"
+          },
+          {
+            "key": "width",
+            "value": "124px"
+          },
+          {
+            "key": "visibility",
+            "value": "hidden"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "96px"
+          },
+          {
+            "key": "width",
+            "value": "77px"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "42px"
+          },
+          {
+            "key": "width",
+            "value": "124px"
+          }
+        ]
+      },
+      "original_stable_events": 0,
+      "candidate_stable_events": 0,
+      "zone_global": "undefined",
+      "mutations": [],
+      "actual_whole_source_classes": true,
+      "synthetic_elements_positioner_offsets": true
+    },
+    {
+      "line": "21.x",
+      "mode": "zoneful",
+      "production": false,
+      "zone_subject": {
+        "version": "0.16.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-ihXL9+vhYyEhXz4TDNpHeAOZN9FVrbog0Il64OIEI28UP/n5AaI6gsccRuOHBfx+206agzyoK527bYIO0Foy6A==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "94d3f7278878a57f7b4be6d9174fd2835bbf54bef1e54babd5e61c98495ebc4c",
+        "authenticated_commonjs_require_forwarders": 1,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "inside": {
+        "isStable": false,
+        "inAngularZone": true
+      },
+      "original": {
+        "states": [
+          {
+            "id": "initial",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "hidden",
+            "style": {
+              "visibility": "hidden",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "shown",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "second-alignment",
+            "style": {
+              "visibility": "visible",
+              "left": "96px",
+              "width": "77px"
+            },
+            "calls": 2
+          },
+          {
+            "id": "return-first",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 3
+          }
+        ],
+        "writes": [
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "42px"
+          },
+          {
+            "key": "width",
+            "value": "124px"
+          },
+          {
+            "key": "visibility",
+            "value": "hidden"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "96px"
+          },
+          {
+            "key": "width",
+            "value": "77px"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "42px"
+          },
+          {
+            "key": "width",
+            "value": "124px"
+          }
+        ]
+      },
+      "candidate": {
+        "states": [
+          {
+            "id": "initial",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "hidden",
+            "style": {
+              "visibility": "hidden",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "shown",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "second-alignment",
+            "style": {
+              "visibility": "visible",
+              "left": "96px",
+              "width": "77px"
+            },
+            "calls": 2
+          },
+          {
+            "id": "return-first",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 3
+          }
+        ],
+        "writes": [
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "42px"
+          },
+          {
+            "key": "width",
+            "value": "124px"
+          },
+          {
+            "key": "visibility",
+            "value": "hidden"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "96px"
+          },
+          {
+            "key": "width",
+            "value": "77px"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "42px"
+          },
+          {
+            "key": "width",
+            "value": "124px"
+          }
+        ]
+      },
+      "original_stable_events": 3,
+      "candidate_stable_events": 3,
+      "zone_global": "function",
+      "mutations": [
+        {
+          "id": "inverted",
+          "rejected": true
+        },
+        {
+          "id": "wrongWidth",
+          "rejected": true
+        }
+      ],
+      "actual_whole_source_classes": true,
+      "synthetic_elements_positioner_offsets": true
+    },
+    {
+      "line": "21.x",
+      "mode": "zoneful",
+      "production": true,
+      "zone_subject": {
+        "version": "0.16.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-ihXL9+vhYyEhXz4TDNpHeAOZN9FVrbog0Il64OIEI28UP/n5AaI6gsccRuOHBfx+206agzyoK527bYIO0Foy6A==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "94d3f7278878a57f7b4be6d9174fd2835bbf54bef1e54babd5e61c98495ebc4c",
+        "authenticated_commonjs_require_forwarders": 1,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "inside": {
+        "isStable": false,
+        "inAngularZone": true
+      },
+      "original": {
+        "states": [
+          {
+            "id": "initial",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "hidden",
+            "style": {
+              "visibility": "hidden",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "shown",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "second-alignment",
+            "style": {
+              "visibility": "visible",
+              "left": "96px",
+              "width": "77px"
+            },
+            "calls": 2
+          },
+          {
+            "id": "return-first",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 3
+          }
+        ],
+        "writes": [
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "42px"
+          },
+          {
+            "key": "width",
+            "value": "124px"
+          },
+          {
+            "key": "visibility",
+            "value": "hidden"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "96px"
+          },
+          {
+            "key": "width",
+            "value": "77px"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "42px"
+          },
+          {
+            "key": "width",
+            "value": "124px"
+          }
+        ]
+      },
+      "candidate": {
+        "states": [
+          {
+            "id": "initial",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "hidden",
+            "style": {
+              "visibility": "hidden",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "shown",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "second-alignment",
+            "style": {
+              "visibility": "visible",
+              "left": "96px",
+              "width": "77px"
+            },
+            "calls": 2
+          },
+          {
+            "id": "return-first",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 3
+          }
+        ],
+        "writes": [
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "42px"
+          },
+          {
+            "key": "width",
+            "value": "124px"
+          },
+          {
+            "key": "visibility",
+            "value": "hidden"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "96px"
+          },
+          {
+            "key": "width",
+            "value": "77px"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "42px"
+          },
+          {
+            "key": "width",
+            "value": "124px"
+          }
+        ]
+      },
+      "original_stable_events": 3,
+      "candidate_stable_events": 3,
+      "zone_global": "function",
+      "mutations": [],
+      "actual_whole_source_classes": true,
+      "synthetic_elements_positioner_offsets": true
+    },
+    {
+      "line": "21.x",
+      "mode": "zoneless",
+      "production": false,
+      "zone_subject": {
+        "version": "0.16.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-ihXL9+vhYyEhXz4TDNpHeAOZN9FVrbog0Il64OIEI28UP/n5AaI6gsccRuOHBfx+206agzyoK527bYIO0Foy6A==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "94d3f7278878a57f7b4be6d9174fd2835bbf54bef1e54babd5e61c98495ebc4c",
+        "authenticated_commonjs_require_forwarders": 1,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "inside": {
+        "isStable": true,
+        "inAngularZone": false
+      },
+      "original": {
+        "states": [
+          {
+            "id": "initial",
+            "style": {
+              "visibility": "visible"
+            },
+            "calls": 0
+          },
+          {
+            "id": "hidden",
+            "style": {
+              "visibility": "hidden"
+            },
+            "calls": 0
+          },
+          {
+            "id": "shown",
+            "style": {
+              "visibility": "visible"
+            },
+            "calls": 0
+          },
+          {
+            "id": "second-alignment",
+            "style": {
+              "visibility": "visible"
+            },
+            "calls": 0
+          },
+          {
+            "id": "return-first",
+            "style": {
+              "visibility": "visible"
+            },
+            "calls": 0
+          }
+        ],
+        "writes": [
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "visibility",
+            "value": "hidden"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          }
+        ]
+      },
+      "candidate": {
+        "states": [
+          {
+            "id": "initial",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "hidden",
+            "style": {
+              "visibility": "hidden",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "shown",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "second-alignment",
+            "style": {
+              "visibility": "visible",
+              "left": "96px",
+              "width": "77px"
+            },
+            "calls": 2
+          },
+          {
+            "id": "return-first",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 3
+          }
+        ],
+        "writes": [
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "42px"
+          },
+          {
+            "key": "width",
+            "value": "124px"
+          },
+          {
+            "key": "visibility",
+            "value": "hidden"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "96px"
+          },
+          {
+            "key": "width",
+            "value": "77px"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "42px"
+          },
+          {
+            "key": "width",
+            "value": "124px"
+          }
+        ]
+      },
+      "original_stable_events": 0,
+      "candidate_stable_events": 0,
+      "zone_global": "undefined",
+      "mutations": [
+        {
+          "id": "noFallback",
+          "rejected": true
+        },
+        {
+          "id": "inverted",
+          "rejected": true
+        },
+        {
+          "id": "wrongWidth",
+          "rejected": true
+        }
+      ],
+      "actual_whole_source_classes": true,
+      "synthetic_elements_positioner_offsets": true
+    },
+    {
+      "line": "21.x",
+      "mode": "zoneless",
+      "production": true,
+      "zone_subject": {
+        "version": "0.16.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-ihXL9+vhYyEhXz4TDNpHeAOZN9FVrbog0Il64OIEI28UP/n5AaI6gsccRuOHBfx+206agzyoK527bYIO0Foy6A==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "94d3f7278878a57f7b4be6d9174fd2835bbf54bef1e54babd5e61c98495ebc4c",
+        "authenticated_commonjs_require_forwarders": 1,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "inside": {
+        "isStable": true,
+        "inAngularZone": false
+      },
+      "original": {
+        "states": [
+          {
+            "id": "initial",
+            "style": {
+              "visibility": "visible"
+            },
+            "calls": 0
+          },
+          {
+            "id": "hidden",
+            "style": {
+              "visibility": "hidden"
+            },
+            "calls": 0
+          },
+          {
+            "id": "shown",
+            "style": {
+              "visibility": "visible"
+            },
+            "calls": 0
+          },
+          {
+            "id": "second-alignment",
+            "style": {
+              "visibility": "visible"
+            },
+            "calls": 0
+          },
+          {
+            "id": "return-first",
+            "style": {
+              "visibility": "visible"
+            },
+            "calls": 0
+          }
+        ],
+        "writes": [
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "visibility",
+            "value": "hidden"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          }
+        ]
+      },
+      "candidate": {
+        "states": [
+          {
+            "id": "initial",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "hidden",
+            "style": {
+              "visibility": "hidden",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "shown",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 1
+          },
+          {
+            "id": "second-alignment",
+            "style": {
+              "visibility": "visible",
+              "left": "96px",
+              "width": "77px"
+            },
+            "calls": 2
+          },
+          {
+            "id": "return-first",
+            "style": {
+              "visibility": "visible",
+              "left": "42px",
+              "width": "124px"
+            },
+            "calls": 3
+          }
+        ],
+        "writes": [
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "42px"
+          },
+          {
+            "key": "width",
+            "value": "124px"
+          },
+          {
+            "key": "visibility",
+            "value": "hidden"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "96px"
+          },
+          {
+            "key": "width",
+            "value": "77px"
+          },
+          {
+            "key": "visibility",
+            "value": "visible"
+          },
+          {
+            "key": "left",
+            "value": "42px"
+          },
+          {
+            "key": "width",
+            "value": "124px"
+          }
+        ]
+      },
+      "original_stable_events": 0,
+      "candidate_stable_events": 0,
+      "zone_global": "undefined",
+      "mutations": [],
+      "actual_whole_source_classes": true,
+      "synthetic_elements_positioner_offsets": true
+    }
+  ],
+  "source_mutations": [
+    {
+      "id": "selector-changed",
+      "rejected": true
+    },
+    {
+      "id": "host-class-changed",
+      "rejected": true
+    },
+    {
+      "id": "show-visibility-changed",
+      "rejected": true
+    },
+    {
+      "id": "constructor-zone-optional",
+      "rejected": true
+    }
+  ],
+  "runtime_mutations": [
+    {
+      "id": "main:zoneful:inverted",
+      "rejected": true
+    },
+    {
+      "id": "main:zoneful:wrongWidth",
+      "rejected": true
+    },
+    {
+      "id": "main:zoneless:noFallback",
+      "rejected": true
+    },
+    {
+      "id": "main:zoneless:inverted",
+      "rejected": true
+    },
+    {
+      "id": "main:zoneless:wrongWidth",
+      "rejected": true
+    },
+    {
+      "id": "21.x:zoneful:inverted",
+      "rejected": true
+    },
+    {
+      "id": "21.x:zoneful:wrongWidth",
+      "rejected": true
+    },
+    {
+      "id": "21.x:zoneless:noFallback",
+      "rejected": true
+    },
+    {
+      "id": "21.x:zoneless:inverted",
+      "rejected": true
+    },
+    {
+      "id": "21.x:zoneless:wrongWidth",
+      "rejected": true
+    }
+  ],
+  "native_packed_or_full_legacy_scheduler_qualified": false,
+  "g11_claim": "not-passed",
+  "limits": [
+    "Complete class bodies and actual public core decorators/classes/zoneful Zone.js and public zoneless provider used. Imported positioner token is a diagnostic token; element/style offsets are explicit protocols. Native measurements, AOT node DI, actual packed application and native browser route of Zone.js remain separately required.",
+    "The original class in current genuine zoneless environments is an intentional negative reference: it never positions. Original Angular16 has no corresponding stable public zoneless provider and is not relabeled as that subject.",
+    "Ten isolated development/production subjects; exact original zoneful method/visibility/style-write behavior retained. Runtime mutants fail at intended phase, including rejection of bypassed historical stable timing. No required consumer API/HTML/CSS/SCSS changes."
+  ]
+}
