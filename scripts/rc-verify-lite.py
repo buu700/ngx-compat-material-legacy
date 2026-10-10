@@ -11,6 +11,7 @@ from pathlib import Path
 if str(Path(__file__).resolve().parent) not in sys.path:
     sys.path.insert(0, str(Path(__file__).resolve().parent))
 from rc_acceptance import EvidenceError, checked_file, contained_file, read_json, validate_matrix
+from historical_inventory_source import check_inventory_source_bindings
 
 ROOT = Path(__file__).resolve().parents[1]
 OMITTED = (
@@ -298,6 +299,7 @@ def main() -> None:
     inventory_candidates = {row["candidate"] for row in inventory["rows"]}
     if spec_candidates != inventory_candidates:
         fail("historical-specs.json candidates do not match the inventory")
+    check_inventory_source_bindings(inventory, specs)
     for row in inventory["rows"]:
         if not (ROOT / row["candidate"]).is_file():
             fail(f"missing candidate {row['candidate']}")
