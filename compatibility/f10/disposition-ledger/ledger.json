@@ -4,8 +4,8 @@
   "g11_claim": "not-passed",
   "seed_rows": 1697,
   "ledger_rows": 1697,
-  "closed_dispositions": 1685,
-  "open_or_deferred": 12,
+  "closed_dispositions": 1684,
+  "open_or_deferred": 13,
   "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
   "batch_id": "unread-seed-content-review-2026-10-02",
   "entries": [
@@ -5210,18 +5210,46 @@
       "sha": "86a96c9290e3896485c6b6c0d039873652f543df",
       "bucket": "behavior-semantic",
       "subject": "fix(material/menu): lazy content not detached after animation (#30301)",
-      "final_disposition": "already-adapted",
-      "reason": "The patch detaches lazy menu content when the exit animation finishes, and immediately when another trigger owns the panel. Owned menu close already detaches lazy content after the void animation and immediately in the other branch (legacy-menu/internal/menu-trigger-base.ts). That detach was already present.",
+      "final_disposition": "needs-individual-review",
+      "reason": "Complete two-path original patch read. Modern trigger restores lazy-content detach in both owner-animation-completion and immediate other-owner branches, plus a real directive destroy counter test and exact query-list disappearance. Earlier ledger recorded only the trigger path and claims after-void behavior that is no longer current. Current owned trigger unsubscribes closing actions, detaches the overlay, restores focus, closes semantically, resets the owned menu and immediately detaches lazy content; no after-void claim is retained. Tagged16 source originally deferred lazy detach until void or reattachment while the animation engine could retain removed DOM. This record does not approve or certify current native exit painting/timing. Current historical legacy test checks query-list emptiness after500ms but lacks the added destruction witness. New mandatory packed producer creates a real probe directive alongside two actual legacy items in actual matMenuContent, verifies initial lazy absence,2 created/no destruction on first open,2 destroyed/query empty on close,distinct recreated items/count4 on reopen,then4 destroyed/empty aftersecondclose. Product code/resources/pins and authentic original test assertions are unchanged. The packed producer is prepared but unexecuted; no inherited/adapted terminal label is sufficient for release qualification. Full menu motion/native lifetime and complete audit obligations remain.",
       "read_note_disposition": "already-present",
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
-      "source_check": "Owned menu close already detaches lazy content after the void animation and immediately in the other branch (legacy-menu/internal/menu-trigger-base",
       "files": [
-        "src/material/menu/menu-trigger.ts"
+        "src/material/menu/menu-trigger.ts",
+        "src/material/menu/menu.spec.ts"
       ],
-      "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
-      "recorded_at_utc": "2026-10-01T16:46:41Z",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-menu-lazy-detachment-source-review.json",
+      "batch_id": "closeout-menu-lazy-detachment-source-review",
+      "recorded_at_utc": "2026-10-10T16:54:31.879985+00:00",
       "g11_claim": "not-passed",
-      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "review_depth": "individual-compatibility",
+      "source_check": {
+        "diff_sha256": "43ed5d9c6e88c0275fd0acd049ddeb31a34f56e1268806db5c5b65371afa9c29",
+        "patch_path": "compatibility/f10/disposition-ledger/evidence/patches/86a96c9290e3896485c6b6c0d039873652f543df-menu-lazy-full.patch",
+        "review_membership": "86a96c9290e3896485c6b6c0d039873652f543df"
+      },
+      "prior_dispositions": [
+        {
+          "sha": "86a96c9290e3896485c6b6c0d039873652f543df",
+          "bucket": "behavior-semantic",
+          "subject": "fix(material/menu): lazy content not detached after animation (#30301)",
+          "final_disposition": "already-adapted",
+          "reason": "The patch detaches lazy menu content when the exit animation finishes, and immediately when another trigger owns the panel. Owned menu close already detaches lazy content after the void animation and immediately in the other branch (legacy-menu/internal/menu-trigger-base.ts). That detach was already present.",
+          "read_note_disposition": "already-present",
+          "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+          "source_check": "Owned menu close already detaches lazy content after the void animation and immediately in the other branch (legacy-menu/internal/menu-trigger-base",
+          "files": [
+            "src/material/menu/menu-trigger.ts"
+          ],
+          "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
+          "recorded_at_utc": "2026-10-01T16:46:41Z",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+        }
+      ]
     },
     {
       "sha": "0eb901277742e23a0528342252051b8e007a7615",

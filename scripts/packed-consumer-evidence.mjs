@@ -24,6 +24,7 @@ export const HARNESS_CASE_IDS = [
   'packed-consumer/harness/legacy-select',
   'packed-consumer/harness/legacy-dialog',
   'packed-consumer/harness/legacy-menu',
+  'packed-consumer/harness/menu-lazy-item-destruction',
   'packed-consumer/harness/legacy-snack-bar',
   'packed-consumer/harness/legacy-tooltip',
   'packed-consumer/harness/legacy-tabs',

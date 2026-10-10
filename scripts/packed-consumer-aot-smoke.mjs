@@ -466,6 +466,7 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
     'packed-consumer/harness/legacy-select': parsed.selectOpened === true && parsed.selectClosed === true && parsed.viewportShared === true,
     'packed-consumer/harness/legacy-dialog': typeof parsed.dialogText === 'string' && parsed.dialogText.includes('Hello dialog') && parsed.dialogsAfterClose === 0,
     'packed-consumer/harness/legacy-menu': parsed.menuOpen === true && parsed.menuItemConstruction === true,
+    'packed-consumer/harness/menu-lazy-item-destruction': parsed.lazyMenuLifecycle === true,
     'packed-consumer/harness/legacy-snack-bar': typeof parsed.snackText === 'string' && parsed.snackText.includes('Snack message'),
     'packed-consumer/harness/legacy-tooltip': parsed.tipVisible === true && typeof parsed.tipText === 'string' && parsed.tipText.includes('Tip text'),
     'packed-consumer/harness/legacy-tabs': parsed.tabCount === 2 && parsed.selectedTab === 'Two' && parsed.viewportShared === true,
@@ -902,7 +903,7 @@ Object.defineProperty(globalThis, 'navigator', {
 
 import 'zone.js';
 import '@angular/compiler';
-import {Component, ElementRef, TemplateRef, ViewChild, Injector, ViewContainerRef, EventEmitter, InjectionToken, ANIMATION_MODULE_TYPE, NgZone, inject, isDevMode, createEnvironmentInjector, createNgModule, EnvironmentInjector, IterableDiffers, SimpleChange, runInInjectionContext} from '@angular/core';
+import {Component, Directive, ElementRef, TemplateRef, ViewChild, Injector, ViewContainerRef, EventEmitter, InjectionToken, ANIMATION_MODULE_TYPE, NgZone, inject, isDevMode, createEnvironmentInjector, createNgModule, EnvironmentInjector, IterableDiffers, SimpleChange, runInInjectionContext} from '@angular/core';
 import {Subject} from 'rxjs';
 import {FormControl, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {MatStepperModule, MatStepper} from '@angular/material/stepper';
@@ -932,7 +933,7 @@ import {MatLegacySelectModule} from '@ngx-compat/material-legacy/legacy-select';
 import {MatLegacySelectHarness} from '@ngx-compat/material-legacy/legacy-select/testing';
 import {MatLegacyDialog, MatLegacyDialogModule} from '@ngx-compat/material-legacy/legacy-dialog';
 import {MatLegacyDialogHarness} from '@ngx-compat/material-legacy/legacy-dialog/testing';
-import {MatLegacyMenuModule,MatLegacyMenuItem,MAT_LEGACY_MENU_PANEL} from '@ngx-compat/material-legacy/legacy-menu';
+import {MatLegacyMenuModule,MatLegacyMenu,MatLegacyMenuItem,MAT_LEGACY_MENU_PANEL} from '@ngx-compat/material-legacy/legacy-menu';
 import {MatMenuItem} from '@angular/material/menu';
 import {MatLegacyMenuHarness} from '@ngx-compat/material-legacy/legacy-menu/testing';
 import {MatLegacySnackBar, MatLegacySnackBarModule} from '@ngx-compat/material-legacy/legacy-snack-bar';
@@ -960,7 +961,15 @@ getTestBed().initTestEnvironment(
 );
 
 const CELL_DEF_NODE_INJECTOR=new InjectionToken<Injector>('closeout-cell-def-node-injector');
+const LAZY_MENU_LIFETIME=new InjectionToken<{created:number;destroyed:number}>('closeout-lazy-menu-lifetime');
 const ORIGINAL_TEXT_OPTIONS=Object.freeze({defaultHeaderTextTransform:(name:string)=>'Header '+name,defaultDataAccessor:(data:any,name:string)=>'Cell '+data[name]});
+
+@Directive({selector:'[legacyMenuDestroyProbe]',standalone:true})
+class MenuDestroyProbe {
+  private readonly state=inject(LAZY_MENU_LIFETIME);
+  constructor(){this.state.created++;}
+  ngOnDestroy(){this.state.destroyed++;}
+}
 
 @Component({
   standalone: true,
@@ -977,6 +986,7 @@ class SmokeDialogContent {}
     MatLegacySelectModule,
     MatLegacyDialogModule,
     MatLegacyMenuModule,
+    MenuDestroyProbe,
     MatLegacySnackBarModule,
     MatLegacyTooltipModule,
     MatLegacyTableModule,
@@ -1054,6 +1064,13 @@ class SmokeDialogContent {}
       <button mat-menu-item disabled id="menu-disabled">Disabled</button>
       <button mat-menu-item disableRipple id="menu-no-ripple">No ripple</button>
     </mat-menu>
+    <button mat-button [matMenuTriggerFor]="lazyMenu" id="lazy-menu-trigger">Lazy menu</button>
+    <mat-menu #lazyMenu="matMenu">
+      <ng-template matMenuContent>
+        <button mat-menu-item legacyMenuDestroyProbe>Lazy one</button>
+        <button mat-menu-item legacyMenuDestroyProbe>Lazy two</button>
+      </ng-template>
+    </mat-menu>
     <button mat-button id="snack-open">Snack</button>
     <button mat-button matTooltip="Tip text" id="tip">Hover</button>
     <table mat-table id="constructor-text-table" [dataSource]="[{value:'value'}]">
@@ -1106,8 +1123,11 @@ class SmokeDialogContent {}
       <mat-tab label="Two">Tab two</mat-tab>
     </mat-tab-group>
   \`,
+  providers:[{provide:LAZY_MENU_LIFETIME,useFactory:()=>({created:0,destroyed:0})}],
 })
 class HarnessHost {
+  readonly lazyMenuLifetime=inject(LAZY_MENU_LIFETIME);
+  @ViewChild('lazyMenu',{static:true}) lazyMenu!:MatLegacyMenu;
   constructorGridData=[{value:'Grid value'}];
   constructorGridWhen=()=>true;
   @ViewChild(MatLegacyRowDef,{static:true}) originalRowDefinition!:MatLegacyRowDef<any>;
@@ -1570,6 +1590,24 @@ async function main() {
   fixture.detectChanges();
   await sleep(20);
 
+  const lazyMenu=await loader.getHarness(MatLegacyMenuHarness.with({selector:'#lazy-menu-trigger'}));
+  const lazyState=fixture.componentInstance.lazyMenuLifetime;
+  const lazyInitial=fixture.componentInstance.lazyMenu.items.length===0&&lazyState.created===0&&lazyState.destroyed===0;
+  await lazyMenu.open();fixture.detectChanges();await fixture.whenStable();
+  const firstLazyItem=fixture.componentInstance.lazyMenu.items.first;
+  const lazyFirstOpen=await lazyMenu.isOpen()&&fixture.componentInstance.lazyMenu.items.length===2
+    &&lazyState.created===2&&lazyState.destroyed===0;
+  await lazyMenu.close();fixture.detectChanges();await fixture.whenStable();
+  const lazyFirstClose=!(await lazyMenu.isOpen())&&fixture.componentInstance.lazyMenu.items.length===0
+    &&lazyState.created===2&&lazyState.destroyed===2;
+  await lazyMenu.open();fixture.detectChanges();await fixture.whenStable();
+  const lazyReopen=await lazyMenu.isOpen()&&fixture.componentInstance.lazyMenu.items.length===2
+    &&fixture.componentInstance.lazyMenu.items.first!==firstLazyItem&&lazyState.created===4&&lazyState.destroyed===2;
+  await lazyMenu.close();fixture.detectChanges();await fixture.whenStable();
+  const lazySecondClose=!(await lazyMenu.isOpen())&&fixture.componentInstance.lazyMenu.items.length===0
+    &&lazyState.created===4&&lazyState.destroyed===4;
+  const lazyMenuLifecycle=lazyInitial&&lazyFirstOpen&&lazyFirstClose&&lazyReopen&&lazySecondClose;
+
   // Snack-bar open under NoopAnimations.
   fixture.componentInstance.openSnack();
   fixture.detectChanges();
@@ -1856,7 +1894,7 @@ async function main() {
       isOpen === false &&
       dialogText.includes('Hello dialog') &&
       dialogsAfter.length === 0 &&
-      menuOpen === true && menuItemConstruction &&
+      menuOpen === true && menuItemConstruction && lazyMenuLifecycle &&
       snackText.includes('Snack message') &&
       tipVisible === true &&
       tipText.includes('Tip text') &&
@@ -1870,6 +1908,7 @@ async function main() {
     dialogsAfterClose: dialogsAfter.length,
     menuOpen,
     menuItemConstruction,
+    lazyMenuLifecycle,
     viewportShared,
     snackText,
     tipVisible,

@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "sha": "86a96c9290e3896485c6b6c0d039873652f543df",
+  "line": "main",
+  "kind": "individual-original-menu-lazy-content-destruction-review",
+  "review_depth": "individual-compatibility",
+  "affected_branches": [
+    "main",
+    "21.x"
+  ],
+  "patch_file": "compatibility/f10/disposition-ledger/evidence/patches/86a96c9290e3896485c6b6c0d039873652f543df-menu-lazy-full.patch",
+  "diff_sha256": "43ed5d9c6e88c0275fd0acd049ddeb31a34f56e1268806db5c5b65371afa9c29",
+  "patch_paths": [
+    "src/material/menu/menu-trigger.ts",
+    "src/material/menu/menu.spec.ts"
+  ],
+  "upstream_commit_object": "tree 87616b395b8bd3ed879ad2ab37f623da6331a8c3\nparent c37f29eeb8477d67534dd0de231d406a53e1c408\nauthor Kristiyan Kostadinov <crisbeto@users.noreply.github.com> 1736545564 +0100\ncommitter GitHub <noreply@github.com> 1736545564 +0100\ngpgsig -----BEGIN PGP SIGNATURE-----\n \n wsFcBAABCAAQBQJngZUcCRC1aQ7uu5UhlAAAy40QAKrluSoV3v5BEVdHdM2dG+OE\n BCa6ZAaQ6c8thQw5FwHOZXbCRHe9y2Tw4iRUB7E1k7FGLpkyw6ExkJ1w1zTl/dPB\n hSOjb8fqeJObD8uTzymjP5g2tgjEsEKm0qELsiGDtM/5ClusN/Knr6Oi1SB5A3XO\n dhp09iwGSAg5VeeeAjdO1fOluoHfn3CgRimix7soC0XTYzcG/Mg0ANROqV90ghyC\n nERVEXCPcsR3i/Rnk9EJMESJDNwqzRcjeFr5slbkVQgqCM5WQfx58efYqBV1AiPk\n 2oh/H6IXp65JWcuwsLeEhWXusZJKwUvErFWVdkfPYrGnsTTFcSCBSe2aeP0WS5yr\n y2NjV3wTJMA1UTkVaDg/poKswfQCEAlgGx0ZLniKX4DxZM3yKADtW2rxhZdcR4KD\n N+WsB+W90BbaHnS3HzoQZd3E5bM0t2Yaltvqb0F+r9ApfWew2F37cLxPgDfMp03f\n 5vqeMSu89mlaUjW64nkVAFN/SLgxFXMMMggndWpDU7YYp44xGBzbM6CHQ97mzoW/\n KcUr+09bqsWCihpoobUw/QhbbuTjY4DEsromxPSpNAyKTLwFO1ff9iCbq0WqvHn5\n 8qsY3dcUeK2xEP141NFtvEQm5KQz7OrN9R9eOwDZO4TNnrjkCokMW0Mgg4KFAAFG\n 3kFIU9q8m9mRuynZzcEV\n =rf6g\n -----END PGP SIGNATURE-----\n \n\nfix(material/menu): lazy content not detached after animation (#30301)\n\nFixes a regression after #30148 where we no longer detached the lazy content panel, causing its items to be retained until the next open when they get destroyed and re-created.",
+  "upstream_commit_object_sha256": "7ae060d585e736ee3f14b6d8ab730b040cfd2e5a6d6559272c5127fcb21d0e02",
+  "decision": "Complete two-path original patch read. Modern trigger restores lazy-content detach in both owner-animation-completion and immediate other-owner branches, plus a real directive destroy counter test and exact query-list disappearance. Earlier ledger recorded only the trigger path and claims after-void behavior that is no longer current. Current owned trigger unsubscribes closing actions, detaches the overlay, restores focus, closes semantically, resets the owned menu and immediately detaches lazy content; no after-void claim is retained. Tagged16 source originally deferred lazy detach until void or reattachment while the animation engine could retain removed DOM. This record does not approve or certify current native exit painting/timing. Current historical legacy test checks query-list emptiness after500ms but lacks the added destruction witness. New mandatory packed producer creates a real probe directive alongside two actual legacy items in actual matMenuContent, verifies initial lazy absence,2 created/no destruction on first open,2 destroyed/query empty on close,distinct recreated items/count4 on reopen,then4 destroyed/empty aftersecondclose. Product code/resources/pins and authentic original test assertions are unchanged. The packed producer is prepared but unexecuted; no inherited/adapted terminal label is sufficient for release qualification. Full menu motion/native lifetime and complete audit obligations remain.",
+  "required_packed_case": "packed-consumer/harness/menu-lazy-item-destruction",
+  "packed_roster_count": 95,
+  "native_or_packed_executed": false,
+  "final_disposition": "needs-individual-review",
+  "g11_claim": "not-passed",
+  "recorded_at_utc": "2026-10-10T16:54:31.879985+00:00",
+  "evidence_files": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+      "sha256": "4de69f71a35cd027da2d02a3d642b3ee0a38df2422f7dbea6d4fe0b599729f3b"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-content-base.ts",
+      "sha256": "b0118e2200c6cf629bf5ca181277fb4e08d381c595aacc528d6f5724f416503f"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+      "sha256": "6bf0b3a87276b025d95d4692b05bc0cd31ce2af04f8028aab3f38f82fae5ba3b"
+    },
+    {
+      "path": "scripts/packed-consumer-aot-smoke.mjs",
+      "sha256": "a7ccb58c9bc416113f797d8d3933d9001b6f781f57ffc2e3ae523fdcab8f0126"
+    },
+    {
+      "path": "scripts/packed-consumer-evidence.mjs",
+      "sha256": "f860c0ce3e64918355ee1039ebff290e7ad8dc58d6a185cf9ff728d24996966f"
+    },
+    {
+      "path": "compatibility/rc/matrices/full-verify.json",
+      "sha256": "8ce8828e467a558f301b57a45575332759e4cfc5e9b459463dd975e5207360f0"
+    },
+    {
+      "path": "tests/packed_required_contract_admission.mjs",
+      "sha256": "571d153199b2421e07b7416f6efc402a9a0e6e9d81501786ba6546773fc53eb9"
+    },
+    {
+      "path": "tests/test_menu_lazy_admission.py",
+      "sha256": "de510b703ddae3d1a5ea99803b6b29e132fd31bda507d664854e93d2168ef67c"
+    }
+  ]
+}
