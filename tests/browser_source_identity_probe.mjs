@@ -25,6 +25,7 @@ try {
   for (const path of [
     ...['browser-matrix-acceptance', 'resolve-run-library', 'legacy-core-high-contrast-contract',
       'browser-matrix-roster', 'browser-required-cells', 'chromium-debug-endpoint',
+      'tooltip-aria-lifetime-fixture', 'legacy-tooltip-native-contract',
       'safe-package-extract', 'packed-consumer-evidence'].map(name => `scripts/${name}.mjs`),
     'projects/ngx-material-legacy/package.json', 'testing/legacy-runner/historical-inventory.json',
     'compatibility/rc/matrices/full-verify.json',

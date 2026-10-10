@@ -19,6 +19,7 @@
  *   node scripts/browser-overlay-families.mjs --tarball <path> --zoneless
  */
 import {createHash} from 'node:crypto';
+import {tooltipAriaLifetimeFixture} from './tooltip-aria-lifetime-fixture.mjs';
 import {observeTabPaginationNative,tabPaginationNativeOkay} from './tab-pagination-native-contract.mjs';
 import {observeLegacyInkBarNative,legacyInkBarSelectionSequenceOkay} from './legacy-ink-bar-native-contract.mjs';
 import {legacyTooltipMessageSequenceOkay, observeLegacyTooltipNative,
@@ -122,7 +123,7 @@ if (relative(realpathSync(consumer), installed).startsWith('..')) fail(1, `Libra
 
 mkdirSync(join(consumer, 'src'), {recursive: true});
 writeFileSync(join(consumer, 'src/main.ts'), `${zoneless ? '' : `import 'zone.js';
-`}import {Component, NgModule, TemplateRef, ViewChild, ViewContainerRef, inject, signal${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';
+`}import {Component, Directive, NgModule, TemplateRef, ViewChild, ViewContainerRef, inject, signal${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {MATERIAL_ANIMATIONS} from '@angular/material/core';
@@ -135,45 +136,7 @@ import {MatLegacyInputModule} from '@ngx-compat/material-legacy/legacy-input';
 import {MatLegacyTabsModule} from '@ngx-compat/material-legacy/legacy-tabs';
 import {LEGACY_ANIMATIONS_TEST_OVERRIDE} from '@ngx-compat/material-legacy/legacy-core';
 
-@Component({
-  standalone: false,
-  selector: 'lab-tooltip-aria-lifetime',
-  template: \`
-    <ng-template #probe><button matTooltip="" #tooltip="matTooltip"
-      [attr.data-probe]="register(tooltip)">Temporary tooltip</button></ng-template>
-    <button id="tip-aria-run" type="button" (click)="run()">Tooltip cleanup</button>
-    <output id="tip-aria-result" [attr.data-complete]="completed()">{{result()}}</output>
-  \`,
-})
-export class TooltipAriaLifetimeLab {
-  @ViewChild('probe', {read: TemplateRef, static: true}) template!: TemplateRef<unknown>;
-  @ViewChild('probe', {read: ViewContainerRef, static: true}) outlet!: ViewContainerRef;
-  readonly result = signal('');
-  readonly completed = signal(false);
-  private tooltip?: MatLegacyTooltip;
-  register(tooltip: MatLegacyTooltip) {this.tooltip = tooltip; return 'registered';}
-  run() {
-    this.completed.set(false);
-    const view = this.outlet.createEmbeddedView(this.template);
-    view.detectChanges();
-    const host = view.rootNodes.find(node => node instanceof HTMLElement) as HTMLElement | undefined;
-    const tooltip = this.tooltip;
-    if (!host || !tooltip) {view.destroy(); this.result.set(JSON.stringify({error: 'missing actual tooltip'})); this.completed.set(true); return;}
-    tooltip.message = 'Tooltip description pending destruction';
-    const initial_description_absent = !host.hasAttribute('aria-describedby');
-    view.destroy();
-    Promise.resolve().then(() => {
-      const pending_cleanup_clear = !host.hasAttribute('aria-describedby');
-      tooltip.message = 'Tooltip description requested after destruction';
-      Promise.resolve().then(() => {
-        this.result.set(JSON.stringify({actual_directive_created: true, host_removed: !host.isConnected,
-          initial_description_absent, pending_cleanup_clear,
-          later_request_clear: !host.hasAttribute('aria-describedby')}));
-        this.completed.set(true);
-      });
-    });
-  }
-}
+${tooltipAriaLifetimeFixture}
 
 @Component({
   standalone: false,
@@ -281,7 +244,7 @@ export class LabRoot {
     MatLegacyInputModule,
     MatLegacyTabsModule,
   ],
-  declarations: [LabRoot, SnackMotionLab, TooltipAriaLifetimeLab],
+  declarations: [LabRoot, SnackMotionLab, TooltipAriaLifetimeLab, CaptureTooltipForAriaLifetime],
   bootstrap: [LabRoot],
   providers: [${zoneless ? 'provideZonelessChangeDetection(), ' : ''}{provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}}],
 })

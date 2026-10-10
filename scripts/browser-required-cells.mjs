@@ -11,11 +11,13 @@
  * for them. Pass --ssr to also run scripts/ssr-dialog.mjs for the main tarball.
  */
 import {createHash} from 'node:crypto';
+import {tooltipAriaLifetimeFixture} from './tooltip-aria-lifetime-fixture.mjs';
+import {legacyTooltipAriaLifetimeNativeOkay} from './legacy-tooltip-native-contract.mjs';
 import {announcedChromeEndpoint,debuggerMatchesChild,announcedFirefoxEndpoint} from './chromium-debug-endpoint.mjs';
 import {spawn, spawnSync} from 'node:child_process';
 import {createRequire} from 'node:module';
 import {createServer} from 'node:http';
-import {chmodSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync} from 'node:fs';
+import {chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync} from 'node:fs';
 import {dirname, join, relative, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {sha256File} from './resolve-run-library.mjs';
@@ -44,6 +46,11 @@ function firefoxBin() {
   if (process.env.FIREFOX_BIN && existsSync(process.env.FIREFOX_BIN)) return process.env.FIREFOX_BIN;
   if (existsSync('/usr/bin/firefox')) return '/usr/bin/firefox';
   throw new Error('No Firefox binary found; set FIREFOX_BIN');
+}
+
+/** The browser executes this exact contract and probe, without npm imports. */
+export function requiredProbeSource() {
+  return legacyTooltipAriaLifetimeNativeOkay.toString() + '\n' + readFileSync(probePath, 'utf8');
 }
 
 export function summarizeCells(requiredIds, outcomes) {
@@ -145,7 +152,7 @@ function labHtml() {
     '<mat-form-field id="p-input-disabled-field"><input matInput disabled value="off"></mat-form-field>',
     '</div>',
     '<div id="wrap-autocomplete" *ngIf="!cspOnly">',
-    '<mat-form-field id="p-auto-field"><input id="p-auto" matInput #autoTrigger="matAutocompleteTrigger" [matAutocomplete]="labAuto" [errorStateMatcher]="matcher"><mat-autocomplete #labAuto="matAutocomplete"><mat-option value="a">Alpha</mat-option></mat-autocomplete></mat-form-field>',
+    '<mat-form-field id="p-auto-field"><input id="p-auto" matInput #autoTrigger="matAutocompleteTrigger" [matAutocomplete]="labAuto" [errorStateMatcher]="matcher"><mat-autocomplete #labAuto="matAutocomplete" (optionSelected)="autoSelection.set($event.option.value)"><mat-option value="a">Alpha</mat-option></mat-autocomplete></mat-form-field>',
     '<input id="p-auto-disabled" matInput disabled [matAutocomplete]="labAutoOff">',
     '<mat-autocomplete #labAutoOff="matAutocomplete"><mat-option value="b">Beta</mat-option></mat-autocomplete>',
     '</div>',
@@ -194,6 +201,7 @@ function labHtml() {
     '<div id="wrap-tooltip" *ngIf="!cspOnly">',
     '<button id="p-tooltip" type="button" #tip="matTooltip" matTooltip="Hello tip">Tip</button>',
     '<button id="p-tooltip-off" type="button" #tipOff="matTooltip" matTooltip="Nope" matTooltipDisabled>Off</button>',
+    '<lab-tooltip-aria-lifetime></lab-tooltip-aria-lifetime>',
     '</div>',
     '</div>',
   ].join('');
@@ -203,7 +211,7 @@ function labSource(zoneless) {
   const zoneImport = zoneless ? '' : "import 'zone.js';\n";
   const zoneNamed = zoneless ? ', provideZonelessChangeDetection' : '';
   const zoneProvider = zoneless ? 'provideZonelessChangeDetection(), ' : '';
-  return `${zoneImport}import {CSP_NONCE, ChangeDetectorRef, Component, Directive, Input, NgModule, QueryList, ViewChild, ViewChildren, forwardRef, inject${zoneNamed}} from '@angular/core';
+  return `${zoneImport}import {CSP_NONCE, ChangeDetectorRef, Component, Directive, Input, NgModule, QueryList, TemplateRef, ViewChild, ViewChildren, ViewContainerRef, forwardRef, inject, signal${zoneNamed}} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {AbstractControl, FormsModule, NG_VALIDATORS, ValidationErrors, Validator} from '@angular/forms';
@@ -229,7 +237,9 @@ import {MatLegacySliderModule} from '@ngx-compat/material-legacy/legacy-slider';
 import {MatLegacySnackBar, MatLegacySnackBarModule} from '@ngx-compat/material-legacy/legacy-snack-bar';
 import {MatLegacyTableModule} from '@ngx-compat/material-legacy/legacy-table';
 import {MatLegacyTabsModule} from '@ngx-compat/material-legacy/legacy-tabs';
-import {MatLegacyTooltipModule} from '@ngx-compat/material-legacy/legacy-tooltip';
+import {MatLegacyTooltip, MatLegacyTooltipModule} from '@ngx-compat/material-legacy/legacy-tooltip';
+
+${tooltipAriaLifetimeFixture}
 
 @Directive({
   selector: '[labForceInvalid]',
@@ -266,12 +276,14 @@ export class LabRoot {
   matcher = new LabMatcher();
   forceSliderInvalid = false;
   sliderValue = 20;
+  readonly autoSelection = signal<string | null>(null);
   cols = ['name'];
   rows = [{name: 'Ada'}];
   @ViewChild('menuTrigger') menuTrigger!: any;
   @ViewChild('autoTrigger') autoTrigger!: any;
   @ViewChild('tip') tip!: any;
   @ViewChild('tipOff') tipOff!: any;
+  @ViewChild(TooltipAriaLifetimeLab) ariaLifetimeLab?: TooltipAriaLifetimeLab;
   @ViewChildren(MatLegacyInput) inputs!: QueryList<MatLegacyInput>;
   @ViewChildren(MatLegacySelect) selects!: QueryList<MatLegacySelect>;
   @ViewChildren(MatLegacyChipList) chipLists!: QueryList<MatLegacyChipList>;
@@ -301,10 +313,16 @@ export class LabRoot {
         try { lab.tip && lab.tip.hide(0); } catch { /* tooltip already hidden */ }
         lab.matcher.on = false;
         lab.forceSliderInvalid = false;
+        lab.autoSelection.set(null);
       },
       openDialog() { lab.openDialog(); },
       openMenu() { lab.openMenu(); },
       openSnack() { lab.openSnack(); },
+      runTooltipAriaLifetime() {
+        if (!lab.ariaLifetimeLab) return Promise.reject(new Error('tooltip ARIA fixture missing'));
+        return lab.ariaLifetimeLab.run();
+      },
+      readAutocompleteSelection() { return lab.autoSelection(); },
       matcher: lab.matcher,
       setSliderFlag(on: boolean) { lab.forceSliderInvalid = on; },
       selectSecondTab() {
@@ -344,7 +362,7 @@ export class LabRoot {
     MatLegacyTabsModule,
     MatLegacyTooltipModule,
   ],
-  declarations: [LabRoot, DialogBody, LabForceInvalid],
+  declarations: [LabRoot, DialogBody, LabForceInvalid, TooltipAriaLifetimeLab, CaptureTooltipForAriaLifetime],
   bootstrap: [LabRoot],
   providers: [
     ...((window as unknown as {__cspNonce?: string}).__cspNonce ? [{provide: CSP_NONCE, useValue: (window as unknown as {__cspNonce: string}).__cspNonce}] : []),
@@ -598,7 +616,7 @@ export async function buildConsumer(tarball, zoneless) {
   }
   mkdirSync(join(consumer, 'dist'), {recursive: true});
   writeFileSync(join(consumer, 'dist/theme.css'), css);
-  copyFileSync(probePath, join(consumer, 'dist/probe.js'));
+  writeFileSync(join(consumer, 'dist/probe.js'), requiredProbeSource());
   const page = '<!doctype html><html><head><link rel="stylesheet" href="/theme.css"></head><body><lab-root></lab-root><script src="/app.js"></script><script src="/probe.js"></script></body></html>\n';
   const nonceBoot = `<script nonce="${CSP_NONCE}">window.__cspOnly=true;window.__cspViolations=[];document.addEventListener('securitypolicyviolation',function(event){window.__cspViolations.push(event.violatedDirective+' '+(event.sample||event.blockedURI||''));});</script>`;
   const nonceSet = `<script nonce="${CSP_NONCE}">window.__cspNonce=${JSON.stringify(CSP_NONCE)};</script>`;
