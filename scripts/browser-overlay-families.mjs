@@ -19,6 +19,7 @@
  *   node scripts/browser-overlay-families.mjs --tarball <path> --zoneless
  */
 import {createHash} from 'node:crypto';
+import {snackMotionFixture} from './snack-motion-fixture.mjs';
 import {tooltipAriaLifetimeFixture} from './tooltip-aria-lifetime-fixture.mjs';
 import {observeTabPaginationNative,tabPaginationNativeOkay} from './tab-pagination-native-contract.mjs';
 import {observeLegacyInkBarNative,legacyInkBarSelectionSequenceOkay} from './legacy-ink-bar-native-contract.mjs';
@@ -138,52 +139,7 @@ import {LEGACY_ANIMATIONS_TEST_OVERRIDE} from '@ngx-compat/material-legacy/legac
 
 ${tooltipAriaLifetimeFixture}
 
-@Component({
-  standalone: false,
-  selector: 'lab-snack-motion',
-  providers: [{provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: 'enabled'}],
-  template: \`
-    <button id="snack-motion-open" type="button" (click)="open()">Snack motion</button>
-    <output id="snack-motion-state" [attr.data-entered]="entered()" [attr.data-enter-ms]="enterMs()"
-      [attr.data-dismissed]="dismissed()" [attr.data-dismissed-at]="dismissedAt()"
-      [attr.data-enter-delivery]="enterDelivery()" [attr.data-exit-delivery]="exitDelivery()"
-      [attr.data-completed]="completed()" [attr.data-action]="action()"></output>
-  \`,
-})
-export class SnackMotionLab {
-  readonly entered = signal(0);
-  readonly enterMs = signal(0);
-  readonly enterDelivery = signal('none');
-  readonly exitDelivery = signal('none');
-  readonly dismissed = signal(0);
-  readonly dismissedAt = signal(0);
-  readonly completed = signal(false);
-  readonly action = signal(false);
-  private viewContainerRef = inject(ViewContainerRef);
-  private snack = inject(MatLegacySnackBar);
-  open() {
-    this.entered.set(0); this.dismissed.set(0); this.completed.set(false); this.action.set(false);
-    const start = performance.now();
-    const ref = this.snack.open('Enabled snack motion', 'Dismiss', {duration: 0, viewContainerRef: this.viewContainerRef});
-    // Observe the actual owned handler argument without changing event routing or timers.
-    const container = ref.containerInstance as MatLegacySnackBarContainer;
-    const handle = container.onAnimationEnd.bind(container);
-    let depth = 0, delivery = 'none';
-    container.onAnimationEnd = event => {
-      if (depth === 0) {
-        delivery = event instanceof AnimationEvent && event.isTrusted && event.target === event.currentTarget
-          ? 'event' : typeof event === 'string' ? 'fallback' : 'other';
-      }
-      depth++;
-      try {handle(event);} finally {depth--;}
-    };
-    ref.afterOpened().subscribe(() => {this.entered.update(value => value + 1); this.enterMs.set(performance.now() - start); this.enterDelivery.set(delivery);});
-    ref.afterDismissed().subscribe({
-      next: event => {this.dismissed.update(value => value + 1); this.dismissedAt.set(performance.now()); this.action.set(event.dismissedByAction); this.exitDelivery.set(delivery);},
-      complete: () => this.completed.set(true),
-    });
-  }
-}
+${snackMotionFixture}
 
 @Component({
   standalone: false,

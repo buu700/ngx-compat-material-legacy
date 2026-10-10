@@ -40,7 +40,8 @@ function preflight() {
     notes.push((version.stdout || version.stderr || '').trim());
     if (version.status !== 0) missing.push('firefox');
   }
-  if (!process.env.DISPLAY) missing.push('webkit');
+  const xvfb = spawnSync('Xvfb', ['-help'], {encoding: 'utf8', timeout: 5000});
+  if (xvfb.error || xvfb.status !== 0) {missing.push('webkit'); notes.push('Private Xvfb unavailable');}
   const probe = spawnSync('/usr/bin/python3', ['-c', 'import gi; gi.require_version("WebKit2", "4.1"); from gi.repository import WebKit2; print("%s.%s.%s" % (WebKit2.get_major_version(), WebKit2.get_minor_version(), WebKit2.get_micro_version()))'], {encoding: 'utf8', timeout: 30000});
   if (probe.status !== 0) {
     missing.push('webkit');

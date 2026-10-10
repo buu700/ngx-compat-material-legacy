@@ -171,7 +171,7 @@ for (const zoneless of [false, true]) {
     rxjs: '7.8.2', typescript: ts.version, zone: '0.16.3', tslib: '2.8.1', sass: '1.104.1'}, zoneless);
   assert.equal(spec.labSource.split(tooltipAriaLifetimeFixture).length - 1, 1, 'one shared native fixture owner');
   assert.ok(spec.labSource.includes('runTooltipAriaLifetime()'));
-  assert.ok(spec.labSource.includes('declarations: [LabRoot, DialogBody, LabForceInvalid, TooltipAriaLifetimeLab, CaptureTooltipForAriaLifetime]'));
+  assert.ok(spec.labSource.includes('declarations: [LabRoot, DialogBody, LabForceInvalid, SnackMotionLab, TooltipAriaLifetimeLab, CaptureTooltipForAriaLifetime]'));
   const source = ts.createSourceFile('main.ts', spec.labSource, ts.ScriptTarget.Latest, true);
   assert.equal(source.parseDiagnostics.length, 0);
   const result = ts.transpileModule(spec.labSource, {compilerOptions: {target: ts.ScriptTarget.ES2022,
