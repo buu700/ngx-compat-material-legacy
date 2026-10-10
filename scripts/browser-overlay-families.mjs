@@ -21,6 +21,7 @@
 import {createHash} from 'node:crypto';
 import {observeTabPaginationNative,tabPaginationNativeOkay} from './tab-pagination-native-contract.mjs';
 import {observeLegacyInkBarNative,legacyInkBarSelectionSequenceOkay} from './legacy-ink-bar-native-contract.mjs';
+import {legacyTooltipMessageSequenceOkay, observeLegacyTooltipNative} from './legacy-tooltip-native-contract.mjs';
 import {announcedChromeEndpoint,debuggerMatchesChild} from './chromium-debug-endpoint.mjs';
 import {spawnSync as __spawnSyncForWs} from 'node:child_process';
 if (typeof globalThis.WebSocket !== 'function') {
@@ -142,7 +143,8 @@ import {MatLegacyTabsModule} from '@ngx-compat/material-legacy/legacy-tabs';
 
     <button id="snack-open" type="button" (click)="openSnack()">Snack</button>
 
-    <button id="tip-host" type="button" matTooltip="Hello tip" [matTooltipShowDelay]="0" [matTooltipHideDelay]="0">Tip</button>
+    <button id="tip-host" type="button" [matTooltip]="tipMessage" [matTooltipShowDelay]="0" [matTooltipHideDelay]="0">Tip</button>
+    <button id="tip-change" type="button" (click)="tipMessage = 'A longer tooltip message for repositioning'">Change tooltip</button>
 
     <mat-form-field>
       <input id="ac-input" matInput [matAutocomplete]="auto" placeholder="ac">
@@ -169,6 +171,7 @@ import {MatLegacyTabsModule} from '@ngx-compat/material-legacy/legacy-tabs';
 })
 export class LabRoot {
   selectedValue = '';
+  tipMessage = 'Hello tip';
   private snack = inject(MatLegacySnackBar);
   openSnack() {
     this.snack.open('Snack message', 'Dismiss', {duration: 0});
@@ -418,6 +421,10 @@ try {
     await evaluate(`document.getElementById("tip-host").dispatchEvent(new MouseEvent("mouseenter", {bubbles: true}))`);
   }
   families.tooltip.shown = await waitFor('!!document.querySelector(".mat-tooltip")');
+  families.tooltip.message_positions = [await observeLegacyTooltipNative({evaluate})];
+  await evaluate(`document.getElementById('tip-change').click()`);
+  await waitFor(`document.querySelector('.mat-tooltip')?.textContent.trim() === 'A longer tooltip message for repositioning'`);
+  families.tooltip.message_positions.push(await observeLegacyTooltipNative({evaluate}));
   if (tipBox) {
     await send('Input.dispatchMouseEvent', {type: 'mouseMoved', x: tipBox.x + 400, y: tipBox.y + 400});
     await evaluate(`document.getElementById("tip-host").dispatchEvent(new MouseEvent("mouseleave", {bubbles: true}))`);
@@ -501,6 +508,7 @@ const ok =
   && families.menu.opened && menuClosedOk
   && families['snack-bar'].opened && families['snack-bar'].dismissed
   && families.tooltip.shown
+  && legacyTooltipMessageSequenceOkay(families.tooltip.message_positions)
   && families.autocomplete.panel_opened && families.autocomplete.typed_filter_visible && families.autocomplete.input_focused
   && families.autocomplete.option_selected && families.autocomplete.panel_closed_after_select
   && families.tabs.second_selected && families.tabs.second_body_visible
@@ -528,9 +536,9 @@ const report = {
       : 'Only Chromium main-line zoneful default for the five families above.',
     'Firefox/WebKit, CSP, motion, and other states stay not-executed.',
     'MATERIAL_ANIMATIONS.animationsDisabled=true for deterministic open/close; not enabled-motion proof.',
-    'Tooltip hide is best-effort; shown is required for credit.',
+    'Tooltip hide is best-effort; shown and centered below-host geometry before/after a wider message are required for credit.',
     'Menu focuses first item before Escape; zoneless may fall back to backdrop click if Escape does not detach.',
-    'Autocomplete credits panel open + typed filter under focus; CDP option-select/Escape close not proven here.',
+    'Autocomplete requires panel open, typing, focus, optionSelected, updated input and panel closure after option activation.',
     'Success is not copied to unexecuted cells.',
     'Does not claim G10.',
   ],

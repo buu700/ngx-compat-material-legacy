@@ -61,7 +61,8 @@ import {
 } from '@angular/material/tooltip';
 import {getMatTooltipInvalidPositionError} from '../owned-errors';
 import {Observable, Subject} from 'rxjs';
-import {take, takeUntil} from 'rxjs/operators';
+import {takeUntil} from 'rxjs/operators';
+import {afterTooltipRender} from './after-tooltip-render';
 
 /** @docs-private */
 export function MAT_TOOLTIP_SCROLL_STRATEGY_FACTORY(overlay: Overlay): () => ScrollStrategy {
@@ -585,11 +586,12 @@ export abstract class _MatTooltipBase<T extends _TooltipComponentBase>
       this._tooltipInstance.message = this.message;
       this._tooltipInstance._markForCheck();
 
-      this._ngZone.onMicrotaskEmpty.pipe(take(1), takeUntil(this._destroyed)).subscribe(() => {
-        if (this._tooltipInstance) {
-          this._overlayRef!.updatePosition();
-        }
-      });
+      afterTooltipRender(this._ngZone, this._viewContainerRef.injector)
+        .pipe(takeUntil(this._destroyed)).subscribe(() => {
+          if (this._tooltipInstance) {
+            this._overlayRef!.updatePosition();
+          }
+        });
     }
   }
 
