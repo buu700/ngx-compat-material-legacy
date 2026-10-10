@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "role": "Read-only Cyph supplied-injector and manual legacy-service construction sanity check",
+  "recorded_at_utc": "2026-10-10T21:12:19.237534+00:00",
+  "source_commit": "a56a0603636cac5aaabe8fe408f7429b4224f011",
+  "source_clean": true,
+  "command": [
+    "rg",
+    "-n",
+    "\\bInjector\\b|new\\s+Mat(Legacy)?(Dialog|SnackBar|MenuContent)\\b",
+    "shared/js",
+    "--glob",
+    "*.ts",
+    "--glob",
+    "*.tsx"
+  ],
+  "stdout": "shared/js/cyph.com/app.module.ts:13:import {DoBootstrap, Injector, NgModule, NgZone} from '@angular/core';\nshared/js/cyph.com/app.module.ts:52:\t\tprivate readonly injector: Injector\n",
+  "stderr": "",
+  "exit_code": 0,
+  "source": {
+    "path": "shared/js/cyph.com/app.module.ts",
+    "sha256": "527092cfe247a3c3ab4fd849b7130fcaa8fc6bfe276f566d4078db94a0b209a2",
+    "observed_role": "AppModule stores the supplied public Injector and forwards it unchanged to createCustomElement. No matching manual legacy dialog/snack/menu-content construction was found."
+  },
+  "product_API_HTML_CSS_SCSS_changes": false,
+  "consumer_files_written": false,
+  "consumer_build_executed": false,
+  "scope": "Static authored TS/TSX scan and contextual source read only. No consumer build/application/element/legacy service qualification."
+}
