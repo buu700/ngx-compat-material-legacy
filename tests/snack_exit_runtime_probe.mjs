@@ -55,7 +55,7 @@ const leafPath='projects/ngx-material-legacy/legacy-snack-bar/snack-bar-containe
 const originalRef=read(originalRefPath),reference=read(refPath),leaf=read(leafPath);
 assert.equal(hash(originalRef),'dd0c31f1907650bf197f97b75de8eaac94d4cb203e9ed01c4b872cb5bfba8f66');
 assert.equal(bodyProgram(reference,'MatSnackBarRef',null),bodyProgram(originalRef,'MatSnackBarRef',null));
-const baseline=execFileSync('git',['-c','gc.auto=0','-c','maintenance.auto=0','show','ba7d09b6c:'+candidatePath],{cwd:root,encoding:'utf8'});
+const baseline=execFileSync('git',['-c','gc.auto=0','-c','maintenance.auto=0','show','fe5b8ef8b:'+candidatePath],{cwd:root,encoding:'utf8'});
 const constructorText=text=>{const {source,cls}=owner(text);return printer.printNode(ts.EmitHint.Unspecified,cls.members.find(ts.isConstructorDeclaration),source);};
 assert.equal(constructorText(candidate),constructorText(original));
 assert.equal(constructorText(candidate),constructorText(baseline));
@@ -64,6 +64,9 @@ function abi(text){const {source,cls}=owner(text);return cls.members.filter(node
 assert.deepEqual(abi(candidate),abi(baseline));
 const changed=(text,from,to)=>{const value=text.replace(from,to);assert.notEqual(value,text);return value;};
 const mutations={
+ noAnnouncementCancel:bodyProgram(changed(candidate,'    this._destroyed = true;\n    clearTimeout(this._announceTimeoutId);','    this._destroyed = true;')),
+ noAnnouncementGuard:bodyProgram(changed(candidate,'          if (this._destroyed) {\n            return;\n          }\n','')),
+ noLiveAnnouncement:bodyProgram(changed(candidate,'            this._onAnnounce.next();','')), 
  priorWait:bodyProgram(baseline),
  synchronous:bodyProgram(changed(candidate,'queueMicrotask(finish);','finish();')),
  noGuard:bodyProgram(changed(candidate,'    if (this._exitCompletionPending) {\n      return;\n    }','')),
