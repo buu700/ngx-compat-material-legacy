@@ -7,7 +7,7 @@ class UpstreamPatchBinding(unittest.TestCase):
     def test_inline_archived_and_negative_patch_subjects(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);(root/'scripts').mkdir();(root/'evidence').mkdir()
-            for name in ('check-upstream-audit-disposition.mjs','upstream-advisory-admission.mjs','authored-use-inventory.mjs'):
+            for name in ('check-upstream-audit-disposition.mjs','upstream-advisory-admission.mjs','authored-use-inventory.mjs','upstream-build-scope-evidence.mjs'):
                 shutil.copyfile(ROOT/'scripts'/name,root/'scripts'/name)
             sha='1'*40
             patch='diff --git a/doc.md b/doc.md\n--- a/doc.md\n+++ b/doc.md\n@@ -1 +1 @@\n-old\n+new\n'
@@ -30,6 +30,7 @@ class UpstreamPatchBinding(unittest.TestCase):
                     '--seed',str(root/'seed.json'),'--ledger',str(root/'ledger.json'),
                     '--symbols',str(root/'symbols.json'),'--report',str(root/'report.json'),
                     '--admission','--line','main'],text=True,capture_output=True)
+                self.assertTrue(result.stdout,result.stderr)
                 data=json.loads(result.stdout)
                 # This fixture isolates patch proof. Its closed authored-use labels
                 # deliberately have no source reviews, so whole admission fails.

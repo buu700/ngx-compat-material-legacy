@@ -1,0 +1,772 @@
+diff --git a/src/cdk-experimental/accordion/BUILD.bazel b/src/cdk-experimental/accordion/BUILD.bazel
+index 14315b05848ca6ed01551c34d237497bf8580ec1..a2b5740e328de2e01e05a4f05bdcc5697d7e3e8e 100644
+--- a/src/cdk-experimental/accordion/BUILD.bazel
++++ b/src/cdk-experimental/accordion/BUILD.bazel
+@@ -10,6 +10,7 @@ ng_project(
+         "public-api.ts",
+     ],
+     deps = [
++        "//:node_modules/@angular/core",
+         "//src/cdk-experimental/deferred-content",
+         "//src/cdk-experimental/ui-patterns",
+         "//src/cdk/a11y",
+diff --git a/src/cdk-experimental/accordion/accordion.ts b/src/cdk-experimental/accordion/accordion.ts
+index 15bcea4a0f4f45d212659898b9ba15fb17bb16db..8ddd363f499378b78d9affcdff81fdce4b0bffd8 100644
+--- a/src/cdk-experimental/accordion/accordion.ts
++++ b/src/cdk-experimental/accordion/accordion.ts
+@@ -26,7 +26,7 @@ import {
+   AccordionGroupPattern,
+   AccordionPanelPattern,
+   AccordionTriggerPattern,
+-} from '../ui-patterns/';
++} from '../ui-patterns';
+ 
+ /**
+  * Represents the content panel of an accordion item. It is controlled by an
+diff --git a/src/cdk-experimental/tabs/BUILD.bazel b/src/cdk-experimental/tabs/BUILD.bazel
+index 96828e6d98be4a3a47aa9b9748e7f87d545c57df..6384bc2bb5b5b8e7cd7b447f34bb4d7c952bc5dc 100644
+--- a/src/cdk-experimental/tabs/BUILD.bazel
++++ b/src/cdk-experimental/tabs/BUILD.bazel
+@@ -10,6 +10,7 @@ ng_project(
+         "tabs.ts",
+     ],
+     deps = [
++        "//:node_modules/@angular/core",
+         "//src/cdk-experimental/deferred-content",
+         "//src/cdk-experimental/ui-patterns",
+         "//src/cdk/a11y",
+diff --git a/src/cdk-experimental/tree/BUILD.bazel b/src/cdk-experimental/tree/BUILD.bazel
+index 67822af2acd2cf2b790e5b583adcea08b1847d3f..b78d54d306e6d529100ca21cd432af96c6b04260 100644
+--- a/src/cdk-experimental/tree/BUILD.bazel
++++ b/src/cdk-experimental/tree/BUILD.bazel
+@@ -10,8 +10,9 @@ ng_project(
+         "tree.ts",
+     ],
+     deps = [
++        "//:node_modules/@angular/core",
+         "//src/cdk-experimental/deferred-content",
+-        "//src/cdk-experimental/ui-patterns",
++        "//src/cdk-experimental/ui-patterns/tree",
+         "//src/cdk/a11y",
+         "//src/cdk/bidi",
+     ],
+@@ -25,6 +26,7 @@ ts_project(
+     ],
+     deps = [
+         ":tree",
++        "//:node_modules/@angular/common",
+         "//:node_modules/@angular/core",
+         "//:node_modules/@angular/platform-browser",
+         "//src/cdk/testing/private",
+diff --git a/src/cdk-experimental/ui-patterns/accordion/BUILD.bazel b/src/cdk-experimental/ui-patterns/accordion/BUILD.bazel
+index 2bc65f76efbff9c0726a46e45f0975829401971d..f5065bd6661ed723420964bd0e06043d98a32b06 100644
+--- a/src/cdk-experimental/ui-patterns/accordion/BUILD.bazel
++++ b/src/cdk-experimental/ui-patterns/accordion/BUILD.bazel
+@@ -27,6 +27,7 @@ ts_project(
+     deps = [
+         ":accordion",
+         "//:node_modules/@angular/core",
++        "//src/cdk-experimental/ui-patterns/behaviors/signal-like",
+         "//src/cdk/keycodes",
+         "//src/cdk/testing/private",
+     ],
+diff --git a/src/cdk-experimental/ui-patterns/behaviors/grid-navigation/BUILD.bazel b/src/cdk-experimental/ui-patterns/behaviors/grid-navigation/BUILD.bazel
+index a9b146b2e2955cf4f2e71ad27d4a6a4607dc3c6e..29ff31f190ff005cc0d5e778d02c3799fc7702ce 100644
+--- a/src/cdk-experimental/ui-patterns/behaviors/grid-navigation/BUILD.bazel
++++ b/src/cdk-experimental/ui-patterns/behaviors/grid-navigation/BUILD.bazel
+@@ -19,6 +19,7 @@ ts_project(
+     deps = [
+         ":grid-navigation",
+         "//:node_modules/@angular/core",
++        "//src/cdk-experimental/ui-patterns/behaviors/grid-focus",
+     ],
+ )
+ 
+diff --git a/src/cdk-experimental/ui-patterns/behaviors/list-selection/BUILD.bazel b/src/cdk-experimental/ui-patterns/behaviors/list-selection/BUILD.bazel
+index 6ad349761c2a236c4ed21800731ff47ac760b516..d6ab35ded6389e736995d2d3c8bc31c1ab280371 100644
+--- a/src/cdk-experimental/ui-patterns/behaviors/list-selection/BUILD.bazel
++++ b/src/cdk-experimental/ui-patterns/behaviors/list-selection/BUILD.bazel
+@@ -22,6 +22,7 @@ ts_project(
+     deps = [
+         ":list-selection",
+         "//:node_modules/@angular/core",
++        "//src/cdk-experimental/ui-patterns/behaviors/list-focus",
+         "//src/cdk-experimental/ui-patterns/behaviors/list-focus:unit_test_sources",
+     ],
+ )
+diff --git a/src/cdk-experimental/ui-patterns/behaviors/list-typeahead/BUILD.bazel b/src/cdk-experimental/ui-patterns/behaviors/list-typeahead/BUILD.bazel
+index 049cec743f45cdb3bfc1b481cc2907ca5b306ad3..3f5690d01ee49379205f1b7288d2469a5c7a4f1e 100644
+--- a/src/cdk-experimental/ui-patterns/behaviors/list-typeahead/BUILD.bazel
++++ b/src/cdk-experimental/ui-patterns/behaviors/list-typeahead/BUILD.bazel
+@@ -22,6 +22,7 @@ ts_project(
+     deps = [
+         ":list-typeahead",
+         "//:node_modules/@angular/core",
++        "//src/cdk-experimental/ui-patterns/behaviors/list-focus",
+         "//src/cdk-experimental/ui-patterns/behaviors/list-focus:unit_test_sources",
+     ],
+ )
+diff --git a/src/cdk-experimental/ui-patterns/tabs/BUILD.bazel b/src/cdk-experimental/ui-patterns/tabs/BUILD.bazel
+index 8520d843bf0e1868fd9e38f6acd249ca01f31f5e..e2ce49075d8613789d2a326e8b8a8b57401090f6 100644
+--- a/src/cdk-experimental/ui-patterns/tabs/BUILD.bazel
++++ b/src/cdk-experimental/ui-patterns/tabs/BUILD.bazel
+@@ -26,6 +26,7 @@ ts_project(
+     deps = [
+         ":tabs",
+         "//:node_modules/@angular/core",
++        "//src/cdk-experimental/ui-patterns/behaviors/signal-like",
+         "//src/cdk/keycodes",
+         "//src/cdk/testing/private",
+     ],
+diff --git a/src/cdk-experimental/ui-patterns/toolbar/BUILD.bazel b/src/cdk-experimental/ui-patterns/toolbar/BUILD.bazel
+index bcae2e3c2086ed150e2ebe761003cb037779a233..75115071c3ecb0f9b2c507a224a25c8fed1a27d5 100644
+--- a/src/cdk-experimental/ui-patterns/toolbar/BUILD.bazel
++++ b/src/cdk-experimental/ui-patterns/toolbar/BUILD.bazel
+@@ -23,6 +23,8 @@ ts_project(
+     deps = [
+         ":toolbar",
+         "//:node_modules/@angular/core",
++        "//src/cdk-experimental/radio-group",
++        "//src/cdk-experimental/ui-patterns/radio-group",
+         "//src/cdk/keycodes",
+         "//src/cdk/testing/private",
+     ],
+diff --git a/src/cdk-experimental/ui-patterns/tree/BUILD.bazel b/src/cdk-experimental/ui-patterns/tree/BUILD.bazel
+index 14147b62a329f5911c83f0e25618230c3b4633f8..3b6ed14b78e55a894fc67c004e08c182c1ab362e 100644
+--- a/src/cdk-experimental/ui-patterns/tree/BUILD.bazel
++++ b/src/cdk-experimental/ui-patterns/tree/BUILD.bazel
+@@ -25,6 +25,7 @@ ts_project(
+     deps = [
+         ":tree",
+         "//:node_modules/@angular/core",
++        "//src/cdk-experimental/ui-patterns/behaviors/signal-like",
+         "//src/cdk/keycodes",
+         "//src/cdk/testing/private",
+     ],
+diff --git a/src/cdk/listbox/BUILD.bazel b/src/cdk/listbox/BUILD.bazel
+index 8f560dd5643731f927bdc6dc516fbe30f23fd516..2e44162e481a8e4015f8cd9fa3b4cd8fd964ebb1 100644
+--- a/src/cdk/listbox/BUILD.bazel
++++ b/src/cdk/listbox/BUILD.bazel
+@@ -14,8 +14,10 @@ ng_project(
+         "//:node_modules/rxjs",
+         "//src/cdk/a11y",
+         "//src/cdk/bidi",
++        "//src/cdk/coercion",
+         "//src/cdk/collections",
+         "//src/cdk/keycodes",
++        "//src/cdk/platform",
+     ],
+ )
+ 
+diff --git a/src/cdk/menu/BUILD.bazel b/src/cdk/menu/BUILD.bazel
+index fa76e43ec94020e389dbaa5cd8fccbbde617e74d..749971bfc0de928f5c346ae98327ed850f2cedc8 100644
+--- a/src/cdk/menu/BUILD.bazel
++++ b/src/cdk/menu/BUILD.bazel
+@@ -24,6 +24,8 @@ ng_project(
+         "//src/cdk/collections",
+         "//src/cdk/keycodes",
+         "//src/cdk/overlay",
++        "//src/cdk/platform",
++        "//src/cdk/portal",
+     ],
+ )
+ 
+diff --git a/src/cdk/schematics/BUILD.bazel b/src/cdk/schematics/BUILD.bazel
+index a47a9c8bf73b6224a5ec97be7c4c665ff7f07387..f646e959fcecc4119f4f6c23001c5e7f44fd0b1b 100644
+--- a/src/cdk/schematics/BUILD.bazel
++++ b/src/cdk/schematics/BUILD.bazel
+@@ -29,6 +29,14 @@ rules_js_tsconfig(
+     src = "tsconfig.json",
+ )
+ 
++rules_js_tsconfig(
++    name = "tsconfig_test",
++    src = "tsconfig-test.json",
++    deps = [
++        ":tsconfig",
++    ],
++)
++
+ ts_project(
+     name = "schematics",
+     srcs = glob(
+@@ -39,7 +47,7 @@ ts_project(
+             "testing/**/*.ts",
+         ],
+     ),
+-    tsconfig = "tsconfig.json",
++    tsconfig = ":tsconfig",
+     deps = [
+         "//:node_modules/@angular-devkit/core",
+         "//:node_modules/@angular-devkit/schematics",
+@@ -77,8 +85,7 @@ ts_project(
+             "**/files/**/*.spec.ts",
+         ],
+     ),
+-    extends = "tsconfig.json",
+-    tsconfig = "tsconfig-test.json",
++    tsconfig = "tsconfig_test",
+     deps = [
+         ":schematics",
+         "//:node_modules/@angular-devkit/schematics",
+diff --git a/src/cdk/schematics/testing/BUILD.bazel b/src/cdk/schematics/testing/BUILD.bazel
+index ab868ebd40eb1472df290566d16985910f3960e6..e89e0fa452a45e3e169136a872a54a5d3659a5f1 100644
+--- a/src/cdk/schematics/testing/BUILD.bazel
++++ b/src/cdk/schematics/testing/BUILD.bazel
+@@ -1,7 +1,16 @@
++load("@aspect_rules_ts//ts:defs.bzl", "ts_config")
+ load("//tools:defaults.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
++ts_config(
++    name = "tsconfig",
++    src = "tsconfig.json",
++    deps = [
++        "//src/cdk/schematics:tsconfig",
++    ],
++)
++
+ ts_project(
+     name = "testing",
+     testonly = True,
+@@ -9,8 +18,7 @@ ts_project(
+     # Needed to ensure these files are picked up as CommonJS, as otherwise
+     # the higher-level `package.json` from `src/package.json` is `type: module`.
+     data = ["//src/cdk/schematics:package_json"],
+-    extends = "//src/cdk/schematics:tsconfig",
+-    tsconfig = "tsconfig.json",
++    tsconfig = ":tsconfig",
+     deps = [
+         "//:node_modules/@angular-devkit/core",
+         "//:node_modules/@angular-devkit/schematics",
+diff --git a/src/cdk/schematics/update-tool/BUILD.bazel b/src/cdk/schematics/update-tool/BUILD.bazel
+index 892c6e76710ef3989d1b9af9becda7b9180d8a2f..5a73870de954e5cbfec807e12e30e341582f6547 100644
+--- a/src/cdk/schematics/update-tool/BUILD.bazel
++++ b/src/cdk/schematics/update-tool/BUILD.bazel
+@@ -1,12 +1,20 @@
++load("@aspect_rules_ts//ts:defs.bzl", "ts_config")
+ load("//tools:defaults.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
++ts_config(
++    name = "tsconfig",
++    src = "tsconfig.json",
++    deps = [
++        "//src/cdk/schematics:tsconfig",
++    ],
++)
++
+ ts_project(
+     name = "update-tool",
+     srcs = glob(["**/*.ts"]),
+-    extends = "//src/cdk/schematics:tsconfig",
+-    tsconfig = ":tsconfig.json",
++    tsconfig = ":tsconfig",
+     deps = [
+         "//:node_modules/@types/node",
+         "//:node_modules/typescript",
+diff --git a/src/cdk/table/BUILD.bazel b/src/cdk/table/BUILD.bazel
+index 8eabfd1a582199fbeff8cecaa6923164190e550f..1c34c5b99924657cb0e0c0f419fd4c9527e24e8b 100644
+--- a/src/cdk/table/BUILD.bazel
++++ b/src/cdk/table/BUILD.bazel
+@@ -43,6 +43,7 @@ ts_project(
+     ),
+     deps = [
+         ":table",
++        "//:node_modules/@angular/common",
+         "//:node_modules/@angular/core",
+         "//:node_modules/@angular/platform-browser",
+         "//:node_modules/rxjs",
+diff --git a/src/cdk/testing/private/BUILD.bazel b/src/cdk/testing/private/BUILD.bazel
+index 9af9daa568f33b867d41699913836b1e85885f61..4a2772a8ec6e0c00d7862da767f6fada0e9ce290 100644
+--- a/src/cdk/testing/private/BUILD.bazel
++++ b/src/cdk/testing/private/BUILD.bazel
+@@ -13,6 +13,7 @@ ts_project(
+         "//:node_modules/@angular/core",
+         "//:node_modules/@types/jasmine",
+         "//:node_modules/axe-core",
++        "//:node_modules/rxjs",
+         "//src/cdk/bidi",
+         "//src/cdk/testing/testbed",
+     ],
+diff --git a/src/cdk/tree/BUILD.bazel b/src/cdk/tree/BUILD.bazel
+index 58ab2cd377755eb46cad8e22f84760f417d99912..a14065f7f3550bd9d76bf72a64655253d4c1d1c8 100644
+--- a/src/cdk/tree/BUILD.bazel
++++ b/src/cdk/tree/BUILD.bazel
+@@ -35,6 +35,7 @@ ts_project(
+     ),
+     deps = [
+         ":tree",
++        "//:node_modules/@angular/common",
+         "//:node_modules/@angular/core",
+         "//:node_modules/rxjs",
+         "//src/cdk/a11y",
+diff --git a/src/components-examples/cdk-experimental/accordion/BUILD.bazel b/src/components-examples/cdk-experimental/accordion/BUILD.bazel
+index f94820f50f63c611c27852cdbdbb54c946e50c5d..9f5b2afe9ffc45d5da5c171c615b27bd299ee93d 100644
+--- a/src/components-examples/cdk-experimental/accordion/BUILD.bazel
++++ b/src/components-examples/cdk-experimental/accordion/BUILD.bazel
+@@ -10,6 +10,8 @@ ng_project(
+         "**/*.css",
+     ]),
+     deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
+         "//src/cdk-experimental/accordion",
+         "//src/material/checkbox",
+         "//src/material/form-field",
+diff --git a/src/components-examples/cdk-experimental/tabs/BUILD.bazel b/src/components-examples/cdk-experimental/tabs/BUILD.bazel
+index de7662fa9a27e77eecd91000373f589f75f4405d..192134fde12a554f96d7a8d0a42d5665f9059e70 100644
+--- a/src/components-examples/cdk-experimental/tabs/BUILD.bazel
++++ b/src/components-examples/cdk-experimental/tabs/BUILD.bazel
+@@ -10,6 +10,8 @@ ng_project(
+         "**/*.css",
+     ]),
+     deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/forms",
+         "//src/cdk-experimental/tabs",
+         "//src/material/checkbox",
+         "//src/material/form-field",
+diff --git a/src/components-examples/cdk-experimental/tree/BUILD.bazel b/src/components-examples/cdk-experimental/tree/BUILD.bazel
+index 2c349fb1e6815f959243d1efceeaaf4e632af068..9b1e542f8cb7c01c458f137712196affc3f4eb6b 100644
+--- a/src/components-examples/cdk-experimental/tree/BUILD.bazel
++++ b/src/components-examples/cdk-experimental/tree/BUILD.bazel
+@@ -10,6 +10,7 @@ ng_project(
+         "**/*.css",
+     ]),
+     deps = [
++        "//:node_modules/@angular/common",
+         "//:node_modules/@angular/core",
+         "//:node_modules/@angular/forms",
+         "//src/cdk-experimental/tree",
+diff --git a/src/dev-app/cdk-experimental-accordion/BUILD.bazel b/src/dev-app/cdk-experimental-accordion/BUILD.bazel
+index 91c35abf9d6b9401d1b3154a7f87f7284a9ac14c..e188392476bb7d5b98ba10dad0812c59ad069894 100644
+--- a/src/dev-app/cdk-experimental-accordion/BUILD.bazel
++++ b/src/dev-app/cdk-experimental-accordion/BUILD.bazel
+@@ -9,5 +9,8 @@ ng_project(
+         "cdk-accordion-demo.html",
+         "cdk-accordion-demo.css",
+     ],
+-    deps = ["//src/components-examples/cdk-experimental/accordion"],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//src/components-examples/cdk-experimental/accordion",
++    ],
+ )
+diff --git a/src/dev-app/cdk-experimental-tabs/BUILD.bazel b/src/dev-app/cdk-experimental-tabs/BUILD.bazel
+index b8c1ac443d0dc2d6d6a0952f833d3e288c1586e6..d2ac9cffd4683ac2e230d27a71eb2eb00603bef7 100644
+--- a/src/dev-app/cdk-experimental-tabs/BUILD.bazel
++++ b/src/dev-app/cdk-experimental-tabs/BUILD.bazel
+@@ -9,5 +9,8 @@ ng_project(
+         "cdk-tabs-demo.html",
+         "cdk-tabs-demo.css",
+     ],
+-    deps = ["//src/components-examples/cdk-experimental/tabs"],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//src/components-examples/cdk-experimental/tabs",
++    ],
+ )
+diff --git a/src/dev-app/cdk-experimental-tree/BUILD.bazel b/src/dev-app/cdk-experimental-tree/BUILD.bazel
+index 09b225cf66cd29a9c1f987ca10ecbc5d6c9b44e7..13c86f0ae0d98bc1775e76e31a58afdc6f7abb86 100644
+--- a/src/dev-app/cdk-experimental-tree/BUILD.bazel
++++ b/src/dev-app/cdk-experimental-tree/BUILD.bazel
+@@ -9,5 +9,8 @@ ng_project(
+         "cdk-tree-demo.html",
+         "cdk-tree-demo.css",
+     ],
+-    deps = ["//src/components-examples/cdk-experimental/tree"],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//src/components-examples/cdk-experimental/tree",
++    ],
+ )
+diff --git a/src/dev-app/dev-app/BUILD.bazel b/src/dev-app/dev-app/BUILD.bazel
+index 1c95ce661a27772548ce34cd599b9204d968fd7a..f842dfd6e53031d382d1a71a6efc32d82aa59ad5 100644
+--- a/src/dev-app/dev-app/BUILD.bazel
++++ b/src/dev-app/dev-app/BUILD.bazel
+@@ -13,6 +13,7 @@ ng_project(
+         "//:node_modules/@angular/common",
+         "//:node_modules/@angular/core",
+         "//:node_modules/@angular/router",
++        "//:node_modules/rxjs",
+         "//src/cdk/bidi",
+         "//src/cdk/overlay",
+         "//src/material/button",
+diff --git a/src/material/autocomplete/BUILD.bazel b/src/material/autocomplete/BUILD.bazel
+index f9435e185f7b71f4bacc1a23e56aa9501dfbc611..594f3c1814a55855012a825bd36fe1322e5f980f 100644
+--- a/src/material/autocomplete/BUILD.bazel
++++ b/src/material/autocomplete/BUILD.bazel
+@@ -101,6 +101,7 @@ ts_project(
+     ),
+     deps = [
+         ":autocomplete",
++        "//:node_modules/@angular/common",
+         "//:node_modules/@angular/core",
+         "//:node_modules/@angular/forms",
+         "//:node_modules/@angular/platform-browser",
+diff --git a/src/material/bottom-sheet/BUILD.bazel b/src/material/bottom-sheet/BUILD.bazel
+index 064adf1ae332b6e9c9d2f5510ad7a8dc1f2dbde3..1c7d21b88c59a9e644213a77b0f9e8978ed864ee 100644
+--- a/src/material/bottom-sheet/BUILD.bazel
++++ b/src/material/bottom-sheet/BUILD.bazel
+@@ -112,6 +112,7 @@ ts_project(
+         "//src/cdk/platform",
+         "//src/cdk/scrolling",
+         "//src/cdk/testing/private",
++        "//src/material/core",
+     ],
+ )
+ 
+diff --git a/src/material/core/BUILD.bazel b/src/material/core/BUILD.bazel
+index f9e3445e3ad5107257357ee5e07632af3c6cb4c4..c14ca3c6772baad8d729aa3a9b0f05b587951e39 100644
+--- a/src/material/core/BUILD.bazel
++++ b/src/material/core/BUILD.bazel
+@@ -44,6 +44,7 @@ ng_project(
+     ],
+     deps = [
+         ":version",
++        "//:node_modules/@angular/core",
+         "//:node_modules/rxjs",
+         "//src:dev_mode_types",
+         "//src/material/core:ripple",
+@@ -112,11 +113,13 @@ ts_project(
+     ),
+     deps = [
+         ":core",
++        ":ripple",
+         "//:node_modules/@angular/core",
+         "//:node_modules/@angular/platform-browser",
+         "//src/cdk/keycodes",
+         "//src/cdk/platform",
+         "//src/cdk/testing/private",
++        "//src/material/core/animation",
+         "//src/material/testing",
+     ],
+ )
+@@ -220,6 +223,7 @@ ng_project(
+         ":ripple_structure",
+     ],
+     deps = [
++        "//:node_modules/@angular/core",
+         "//src/cdk/a11y",
+         "//src/cdk/coercion",
+         "//src/cdk/platform",
+diff --git a/src/material/core/common-behaviors/BUILD.bazel b/src/material/core/common-behaviors/BUILD.bazel
+index 037dae9c8197684298b4092345a250aee405974b..100288aa375ec1f2bcfe651d2b5e834d4e25c869 100644
+--- a/src/material/core/common-behaviors/BUILD.bazel
++++ b/src/material/core/common-behaviors/BUILD.bazel
+@@ -10,6 +10,7 @@ ng_project(
+         "palette.ts",
+     ],
+     deps = [
++        "//:node_modules/@angular/core",
+         "//:node_modules/@angular/forms",
+         "//:node_modules/rxjs",
+         "//src/cdk/a11y",
+diff --git a/src/material/core/option/BUILD.bazel b/src/material/core/option/BUILD.bazel
+index b5f5a5983f473d293c1c92f5841104b4c7772f89..db193878f52da573837561dd0f1722ef5dda3b64 100644
+--- a/src/material/core/option/BUILD.bazel
++++ b/src/material/core/option/BUILD.bazel
+@@ -61,6 +61,7 @@ ng_project(
+         ":option_css",
+     ],
+     deps = [
++        "//:node_modules/@angular/core",
+         "//:node_modules/rxjs",
+         "//src/cdk/a11y",
+         "//src/cdk/keycodes",
+diff --git a/src/material/core/private/BUILD.bazel b/src/material/core/private/BUILD.bazel
+index e315c676436bfec7ae30251ea83a8895c5a5de44..0401bbd4cb2b8a4d73436b446a5b56ae43fe9f16 100644
+--- a/src/material/core/private/BUILD.bazel
++++ b/src/material/core/private/BUILD.bazel
+@@ -10,6 +10,7 @@ ng_project(
+     ],
+     deps = [
+         "//:node_modules/@angular/common",
++        "//:node_modules/@angular/core",
+         "//src/cdk/platform",
+         "//src/cdk/private",
+         "//src/material/core:ripple",
+diff --git a/src/material/core/testing/BUILD.bazel b/src/material/core/testing/BUILD.bazel
+index fc22908d52e8206b9137c77318fadf7d288eb622..ea9fcfecc4176bc874aa01edba0c303a98be82be 100644
+--- a/src/material/core/testing/BUILD.bazel
++++ b/src/material/core/testing/BUILD.bazel
+@@ -28,6 +28,7 @@ ts_project(
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
+         "//src/material/core",
++        "//src/material/core/option",
+     ],
+ )
+ 
+diff --git a/src/material/datepicker/BUILD.bazel b/src/material/datepicker/BUILD.bazel
+index 88691a77e73bf29dc83e75705883cf3e04ac040d..9e181ca7cdfa9c59e4886af497a7792b5da0f048 100644
+--- a/src/material/datepicker/BUILD.bazel
++++ b/src/material/datepicker/BUILD.bazel
+@@ -204,6 +204,7 @@ ts_project(
+         "//src/cdk/platform",
+         "//src/cdk/scrolling",
+         "//src/cdk/testing/private",
++        "//src/material/button",
+         "//src/material/core",
+         "//src/material/form-field",
+         "//src/material/input",
+diff --git a/src/material/datepicker/testing/BUILD.bazel b/src/material/datepicker/testing/BUILD.bazel
+index ffd3a6c6db22bae80818decbe5be473c8312dcec..de3bcdd0f9a3fbb141d97d66bc2dbfc27403e53c 100644
+--- a/src/material/datepicker/testing/BUILD.bazel
++++ b/src/material/datepicker/testing/BUILD.bazel
+@@ -33,6 +33,8 @@ ts_project(
+         "//src/cdk/testing/testbed",
+         "//src/material/core",
+         "//src/material/datepicker",
++        "//src/material/form-field",
++        "//src/material/input",
+     ],
+ )
+ 
+diff --git a/src/material/dialog/BUILD.bazel b/src/material/dialog/BUILD.bazel
+index b62763a2b168fe04021616eca4f2a593ba948470..3cb8f67a67a98269b645adc17a5ba2d327b08420 100644
+--- a/src/material/dialog/BUILD.bazel
++++ b/src/material/dialog/BUILD.bazel
+@@ -92,6 +92,7 @@ ng_project(
+         "//src/cdk/overlay",
+         "//src/cdk/portal",
+         "//src/material/core",
++        "//src/material/core/animation",
+     ],
+ )
+ 
+@@ -119,6 +120,7 @@ ts_project(
+         "//src/cdk/platform",
+         "//src/cdk/scrolling",
+         "//src/cdk/testing/private",
++        "//src/material/core",
+     ],
+ )
+ 
+diff --git a/src/material/dialog/testing/BUILD.bazel b/src/material/dialog/testing/BUILD.bazel
+index 2b1cd6f68684bb5d96f6da7cf35ca3e5c89be805..0039521a6ed226c77bb93c7ffdae52522e09647f 100644
+--- a/src/material/dialog/testing/BUILD.bazel
++++ b/src/material/dialog/testing/BUILD.bazel
+@@ -34,6 +34,7 @@ ts_project(
+         "//src/cdk/overlay",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
++        "//src/material/core",
+         "//src/material/dialog",
+     ],
+ )
+diff --git a/src/material/expansion/BUILD.bazel b/src/material/expansion/BUILD.bazel
+index 967539c334148046c1ac125fe9868677a5375cb0..9d66ced674984a9f6b2a34e9d199fd651be5c775 100644
+--- a/src/material/expansion/BUILD.bazel
++++ b/src/material/expansion/BUILD.bazel
+@@ -125,6 +125,7 @@ ts_project(
+         "//src/cdk/a11y",
+         "//src/cdk/keycodes",
+         "//src/cdk/testing/private",
++        "//src/material/core",
+     ],
+ )
+ 
+diff --git a/src/material/form-field/directives/BUILD.bazel b/src/material/form-field/directives/BUILD.bazel
+index 424473332c17a79aa3f15a442786c754a02d201f..5d5e7db6a335ab4d43f95f6e1cf846f217a1b64e 100644
+--- a/src/material/form-field/directives/BUILD.bazel
++++ b/src/material/form-field/directives/BUILD.bazel
+@@ -18,6 +18,7 @@ ng_project(
+         "notched-outline.html",
+     ],
+     deps = [
++        "//:node_modules/@angular/core",
+         "//:node_modules/rxjs",
+         "//src/cdk/a11y",
+         "//src/cdk/observers/private",
+diff --git a/src/material/paginator/BUILD.bazel b/src/material/paginator/BUILD.bazel
+index 14f68711b8b0cec5df8a8d71077876c8c40cb263..3457832e87dd83fcf2967c906a26d35f32d2c841 100644
+--- a/src/material/paginator/BUILD.bazel
++++ b/src/material/paginator/BUILD.bazel
+@@ -81,6 +81,7 @@ ng_project(
+         "//:node_modules/rxjs",
+         "//src/material/button",
+         "//src/material/core",
++        "//src/material/form-field",
+         "//src/material/select",
+         "//src/material/tooltip",
+     ],
+diff --git a/src/material/schematics/BUILD.bazel b/src/material/schematics/BUILD.bazel
+index 8bafb4f8140f95919734f3ba30ef3663807e0df3..e695d1279db21612178fbe1beb3a4bf3104a55ae 100644
+--- a/src/material/schematics/BUILD.bazel
++++ b/src/material/schematics/BUILD.bazel
+@@ -1,7 +1,7 @@
+ load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
++load("@aspect_rules_js//npm:defs.bzl", "npm_link_package")
+ load("@aspect_rules_ts//ts:defs.bzl", rules_js_tsconfig = "ts_config")
+ load("//tools:defaults.bzl", "jasmine_test", "npm_package", "ts_project")
+-load("@aspect_rules_js//npm:defs.bzl", "npm_link_package")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -50,7 +50,7 @@ rules_js_tsconfig(
+     name = "tsconfig-test",
+     src = "tsconfig-test.json",
+     deps = [
+-        "tsconfig.json",
++        ":tsconfig",
+         "//:node_modules/@types/jasmine",
+     ],
+ )
+diff --git a/src/material/select/testing/BUILD.bazel b/src/material/select/testing/BUILD.bazel
+index 25ae1399dcb51def490bc9821411ed4d60818a65..5d6f78263d7fa5f709b79d9079ed09898c2409a2 100644
+--- a/src/material/select/testing/BUILD.bazel
++++ b/src/material/select/testing/BUILD.bazel
+@@ -32,6 +32,7 @@ ts_project(
+         "//src/cdk/overlay",
+         "//src/cdk/testing",
+         "//src/cdk/testing/testbed",
++        "//src/material/core",
+         "//src/material/form-field",
+         "//src/material/form-field/testing/control",
+         "//src/material/select",
+diff --git a/src/material/sidenav/BUILD.bazel b/src/material/sidenav/BUILD.bazel
+index c06981b0244b7fd1ad017afe6c05d8775cf24203..5dcf2c467e3f73e6cab651fde84341fbe2d0c9b9 100644
+--- a/src/material/sidenav/BUILD.bazel
++++ b/src/material/sidenav/BUILD.bazel
+@@ -110,6 +110,7 @@ ts_project(
+         "//src/cdk/scrolling",
+         "//src/cdk/testing",
+         "//src/cdk/testing/private",
++        "//src/material/core",
+     ],
+ )
+ 
+diff --git a/src/material/snack-bar/BUILD.bazel b/src/material/snack-bar/BUILD.bazel
+index 6fd74b0949e576bd601b995e69f55f969203011d..ca02916614019d61d0dae983a31c0982169417f2 100644
+--- a/src/material/snack-bar/BUILD.bazel
++++ b/src/material/snack-bar/BUILD.bazel
+@@ -117,6 +117,7 @@ ts_project(
+         "//src/cdk/a11y",
+         "//src/cdk/overlay",
+         "//src/cdk/platform",
++        "//src/material/core",
+     ],
+ )
+ 
+diff --git a/src/material/snack-bar/testing/BUILD.bazel b/src/material/snack-bar/testing/BUILD.bazel
+index 7cafc2180c658d85031d23649ae4f7e54538c212..d7af3ca9eecfcf507ff8e9a7a37547b45f896748 100644
+--- a/src/material/snack-bar/testing/BUILD.bazel
++++ b/src/material/snack-bar/testing/BUILD.bazel
+@@ -31,6 +31,7 @@ ts_project(
+         "//src/cdk/testing",
+         "//src/cdk/testing/private",
+         "//src/cdk/testing/testbed",
++        "//src/material/core",
+         "//src/material/snack-bar",
+     ],
+ )
+diff --git a/src/material/timepicker/BUILD.bazel b/src/material/timepicker/BUILD.bazel
+index b63ca8f54fabffcb14818b1c928296e30c5c31c5..86494e77fe27cefbdb10852ce1cc14e92f75786b 100644
+--- a/src/material/timepicker/BUILD.bazel
++++ b/src/material/timepicker/BUILD.bazel
+@@ -90,6 +90,7 @@ ng_project(
+         "//src/cdk/scrolling",
+         "//src/material/button",
+         "//src/material/core",
++        "//src/material/form-field",
+         "//src/material/input",
+     ],
+ )
+diff --git a/src/material/tree/BUILD.bazel b/src/material/tree/BUILD.bazel
+index cb4ea6a507aa3fcc492d42016abfc4a342c48b3b..31cc62c6fd328eeea286019c84ed7ea2e136fa4e 100644
+--- a/src/material/tree/BUILD.bazel
++++ b/src/material/tree/BUILD.bazel
+@@ -95,6 +95,7 @@ ts_project(
+     ),
+     deps = [
+         ":tree",
++        "//:node_modules/@angular/common",
+         "//:node_modules/@angular/core",
+         "//:node_modules/rxjs",
+         "//src/cdk/a11y",
+diff --git a/tools/defaults.bzl b/tools/defaults.bzl
+index 8b90d0269ea3c3f060f319f3a6df1b2fc3ee4ffc..059379e5401b80b07530a3a52b528a694cd5dc7f 100644
+--- a/tools/defaults.bzl
++++ b/tools/defaults.bzl
+@@ -129,13 +129,12 @@ def npm_package(name, srcs = [], **kwargs):
+ 
+ def ts_project(
+         name,
++        srcs = [],
+         deps = [],
+         source_map = True,
+         testonly = False,
+         tsconfig = None,
+         visibility = None,
+-        # TODO: Switch this flag as we no longer depend on `interop_deps`.
+-        ignore_strict_deps = True,
+         **kwargs):
+     if tsconfig == None and native.package_name().startswith("src"):
+         tsconfig = "//src:test-tsconfig" if testonly else "//src:build-tsconfig"
+@@ -147,16 +146,17 @@ def ts_project(
+         declaration = True,
+         tsconfig = tsconfig,
+         visibility = visibility,
++        srcs = srcs,
+         deps = deps,
+         **kwargs
+     )
+ 
+-    if not ignore_strict_deps:
+-        strict_deps_test(
+-            name = "%s_strict_deps_test" % name,
+-            srcs = kwargs.get("srcs", []),
+-            deps = deps,
+-        )
++    strict_deps_test(
++        name = "%s_strict_deps_test" % name,
++        srcs = srcs,
++        deps = deps,
++        tsconfig = tsconfig,
++    )
+ 
+     # TODO(devversion): Partner with ISE team to support `rules_js` here.
+     # if False and not testonly:
+@@ -164,13 +164,12 @@ def ts_project(
+ 
+ def ng_project(
+         name,
++        srcs = [],
+         deps = [],
+         source_map = True,
+         testonly = False,
+         tsconfig = None,
+         visibility = None,
+-        # TODO: Switch this flag as we no longer depend on `interop_deps`.
+-        ignore_strict_deps = True,
+         **kwargs):
+     if tsconfig == None and native.package_name().startswith("src"):
+         tsconfig = "//src:test-tsconfig" if testonly else "//src:build-tsconfig"
+@@ -182,16 +181,17 @@ def ng_project(
+         declaration = True,
+         tsconfig = tsconfig,
+         visibility = visibility,
++        srcs = srcs,
+         deps = deps,
+         **kwargs
+     )
+ 
+-    if not ignore_strict_deps:
+-        strict_deps_test(
+-            name = "%s_strict_deps_test" % name,
+-            srcs = kwargs.get("srcs", []),
+-            deps = deps,
+-        )
++    strict_deps_test(
++        name = "%s_strict_deps_test" % name,
++        srcs = srcs,
++        deps = deps,
++        tsconfig = tsconfig,
++    )
+ 
+     # TODO(devversion): Partner with ISE team to support `rules_js` here.
+     # if False and not testonly:

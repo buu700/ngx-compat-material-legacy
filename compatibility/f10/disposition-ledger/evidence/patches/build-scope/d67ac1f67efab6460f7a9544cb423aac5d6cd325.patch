@@ -1,0 +1,360 @@
+diff --git a/docs/defs.bzl b/docs/defs.bzl
+index aa9d3720a682461ce7e890a7d8a0cdea3291a1c0..dcca8899fa410d6c59a3355e363efd825e26b314 100644
+--- a/docs/defs.bzl
++++ b/docs/defs.bzl
+@@ -45,7 +45,6 @@ TEST_DEPS = [
+     "//docs:node_modules/karma-coverage",
+     "//docs:node_modules/karma-firefox-launcher",
+     "//docs:node_modules/karma-jasmine",
+-    "//docs:node_modules/karma-jasmine-html-reporter",
+ ]
+ 
+ # Common dependencies of Angular CLI test suites
+diff --git a/docs/karma.conf.js b/docs/karma.conf.js
+index 019fdb55e0c8fcaf2f2374bcef4fc008f94cbde2..1d2a99f9242e0d8e935f1f49990e91e75417db78 100644
+--- a/docs/karma.conf.js
++++ b/docs/karma.conf.js
+@@ -16,7 +16,6 @@ module.exports = function (config) {
+       require('karma-jasmine'),
+       require('karma-chrome-launcher'),
+       require('karma-firefox-launcher'),
+-      require('karma-jasmine-html-reporter'),
+       require('@angular-devkit/build-angular/plugins/karma'),
+     ],
+     client: {
+@@ -27,7 +26,7 @@ module.exports = function (config) {
+       reports: ['html', 'lcovonly', 'text-summary'],
+       fixWebpackSourcePaths: true,
+     },
+-    reporters: ['progress', 'kjhtml'],
++    reporters: ['progress'],
+     port: 9876,
+     colors: true,
+     logLevel: config.LOG_INFO,
+diff --git a/docs/package.json b/docs/package.json
+index 56e34ba803008376f23a0802b599f0f50a1b0821..7ced509a11afdf9569cff76b2d338a895ee9232e 100644
+--- a/docs/package.json
++++ b/docs/package.json
+@@ -58,18 +58,17 @@
+     "@angular/cli": "catalog:",
+     "@angular/compiler-cli": "catalog:",
+     "@bazel/bazelisk": "^1.12.1",
+-    "@types/jasmine": "5.1.15",
++    "@types/jasmine": "^6.0.0",
+     "@types/node": "^22.14.1",
+     "@types/shelljs": "0.10.0",
+     "firebase-tools": "15.2.1",
+-    "jasmine-core": "5.13.0",
++    "jasmine-core": "^6.0.0",
+     "jasmine-spec-reporter": "7.0.0",
+     "karma": "~6.4.4",
+     "karma-chrome-launcher": "^3.1.1",
+     "karma-coverage": "~2.2.0",
+     "karma-firefox-launcher": "^2.1.0",
+     "karma-jasmine": "^5.0.0",
+-    "karma-jasmine-html-reporter": "^2.0.0",
+     "light-server": "^2.9.1",
+     "lighthouse": "^13.0.0",
+     "lighthouse-logger": "~2.0.0",
+diff --git a/docs/scenes/karma.conf.js b/docs/scenes/karma.conf.js
+index c885a859527fef3db6808e9e5a021a8d262af046..98989dd2cf0b44339c07488758ab3e4d185164e2 100644
+--- a/docs/scenes/karma.conf.js
++++ b/docs/scenes/karma.conf.js
+@@ -20,7 +20,6 @@ module.exports = function (config) {
+       require('karma-jasmine'),
+       require('karma-chrome-launcher'),
+       require('karma-firefox-launcher'),
+-      require('karma-jasmine-html-reporter'),
+       require('@angular-devkit/build-angular/plugins/karma'),
+     ],
+     client: {
+@@ -31,7 +30,7 @@ module.exports = function (config) {
+       reports: ['html', 'lcovonly', 'text-summary'],
+       fixWebpackSourcePaths: true,
+     },
+-    reporters: ['progress', 'kjhtml'],
++    reporters: ['progress'],
+     port: 9876,
+     colors: true,
+     logLevel: config.LOG_INFO,
+diff --git a/package.json b/package.json
+index 07e6aae892236f8c70d901464d329dffe638b775..f09ba37a24575552096e7797a04394700f332a11 100644
+--- a/package.json
++++ b/package.json
+@@ -92,7 +92,7 @@
+     "@schematics/angular": "catalog:",
+     "@types/babel__core": "^7.1.18",
+     "@types/fs-extra": "^11.0.0",
+-    "@types/jasmine": "^5.0.0",
++    "@types/jasmine": "^6.0.0",
+     "@types/luxon": "^3.0.0",
+     "@types/node": "^22.14.1",
+     "@types/selenium-webdriver": "^3.0.17",
+@@ -110,8 +110,8 @@
+     "glob": "^13.0.0",
+     "highlight.js": "^11.0.0",
+     "husky": "^9.0.1",
+-    "jasmine": "^5.6.0",
+-    "jasmine-core": "5.13.0",
++    "jasmine": "^6.0.0",
++    "jasmine-core": "^6.0.0",
+     "jasmine-reporters": "^2.5.2",
+     "jsonc-parser": "^3.3.1",
+     "kagekiri": "^2.0.0",
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+index e02bb42b36d9fefe530e5fa46f3eb4540865f583..30c45c276bdd18a2b0bd093940ae4260f7b2db6e 100644
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -174,8 +174,8 @@ importers:
+         specifier: ^11.0.0
+         version: 11.0.4
+       '@types/jasmine':
+-        specifier: ^5.0.0
+-        version: 5.1.15
++        specifier: ^6.0.0
++        version: 6.0.0
+       '@types/luxon':
+         specifier: ^3.0.0
+         version: 3.7.1
+@@ -228,11 +228,11 @@ importers:
+         specifier: ^9.0.1
+         version: 9.1.7
+       jasmine:
+-        specifier: ^5.6.0
+-        version: 5.13.0
++        specifier: ^6.0.0
++        version: 6.0.0
+       jasmine-core:
+-        specifier: 5.13.0
+-        version: 5.13.0
++        specifier: ^6.0.0
++        version: 6.0.1
+       jasmine-reporters:
+         specifier: ^2.5.2
+         version: 2.5.2
+@@ -436,8 +436,8 @@ importers:
+         specifier: ^1.12.1
+         version: 1.26.0
+       '@types/jasmine':
+-        specifier: 5.1.15
+-        version: 5.1.15
++        specifier: ^6.0.0
++        version: 6.0.0
+       '@types/node':
+         specifier: ^22.14.1
+         version: 22.19.7
+@@ -448,8 +448,8 @@ importers:
+         specifier: 15.2.1
+         version: 15.2.1(@types/node@22.19.7)(bufferutil@4.1.0)(encoding@0.1.13)(typescript@5.9.2)
+       jasmine-core:
+-        specifier: 5.13.0
+-        version: 5.13.0
++        specifier: ^6.0.0
++        version: 6.0.1
+       jasmine-spec-reporter:
+         specifier: 7.0.0
+         version: 7.0.0
+@@ -468,9 +468,6 @@ importers:
+       karma-jasmine:
+         specifier: ^5.0.0
+         version: 5.1.0(karma@6.4.4(bufferutil@4.1.0))
+-      karma-jasmine-html-reporter:
+-        specifier: ^2.0.0
+-        version: 2.1.0(jasmine-core@5.13.0)(karma-jasmine@5.1.0(karma@6.4.4(bufferutil@4.1.0)))(karma@6.4.4(bufferutil@4.1.0))
+       light-server:
+         specifier: ^2.9.1
+         version: 2.9.1(bufferutil@4.1.0)
+@@ -2382,6 +2379,9 @@ packages:
+     resolution: {integrity: sha512-ZXRY4jNvVgSVQ8DL3LTcakaAtXwTVUxE81hslsyD2AtoXW/wVob10HkOJ1X/pAlcI7D+2YoZKg5do8G/w6RYgA==}
+     engines: {node: '>=8'}
+ 
++  '@jasminejs/reporters@1.0.0':
++    resolution: {integrity: sha512-rM3GG4vx2H1Gp5kYCTr9aKlOEJFd43pzpiMAiy5b1+FUc2ub4e6bS6yCi/WQNDzAa5MVp9++dwcoEtcIfoEnhA==}
++
+   '@jridgewell/gen-mapping@0.3.13':
+     resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
+ 
+@@ -3626,6 +3626,9 @@ packages:
+   '@types/jasmine@5.1.15':
+     resolution: {integrity: sha512-ZAC8KjmV2MJxbNTrwXFN+HKeajpXQZp6KpPiR6Aa4XvaEnjP6qh23lL/Rqb7AYzlp3h/rcwDrQ7Gg7q28cQTQg==}
+ 
++  '@types/jasmine@6.0.0':
++    resolution: {integrity: sha512-18lgGsLmEh3VJk9eZ5wAjTISxdqzl6YOwu8UdMpolajN57QOCNbl+AbHUd+Yu9ItrsFdB+c8LSZSGNg8nHaguw==}
++
+   '@types/json-schema@7.0.15':
+     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
+ 
+@@ -6452,6 +6455,9 @@ packages:
+   jasmine-core@5.13.0:
+     resolution: {integrity: sha512-vsYjfh7lyqvZX5QgqKc4YH8phs7g96Z8bsdIFNEU3VqXhlHaq+vov/Fgn/sr6MiUczdZkyXRC3TX369Ll4Nzbw==}
+ 
++  jasmine-core@6.0.1:
++    resolution: {integrity: sha512-gUtzV5ASR0MLBwDNqri4kBsgKNCcRQd9qOlNw/w/deavD0cl3JmWXXfH8JhKM4LTg6LPTt2IOQ4px3YYfgh2Xg==}
++
+   jasmine-reporters@2.5.2:
+     resolution: {integrity: sha512-qdewRUuFOSiWhiyWZX8Yx3YNQ9JG51ntBEO4ekLQRpktxFTwUHy24a86zD/Oi2BRTKksEdfWQZcQFqzjqIkPig==}
+ 
+@@ -6466,6 +6472,10 @@ packages:
+     resolution: {integrity: sha512-oLCXIhEb5e0zzjn9GyuvcuisvLBwUjmgz7a0RNGWKwQtJCDld4m+vwKUpAIJVLB5vbmQFdtKhT86/tIZlJ5gYw==}
+     hasBin: true
+ 
++  jasmine@6.0.0:
++    resolution: {integrity: sha512-eSPL6LPWT39WwvHSEEbRXuSvioXMTheNhIPaeUT1OPmSprDZwj4S29884DkTx6/tyiOWTWB1N+LdW2ZSg74aEA==}
++    hasBin: true
++
+   jasminewd2@2.2.0:
+     resolution: {integrity: sha512-Rn0nZe4rfDhzA63Al3ZGh0E+JTmM6ESZYXJGKuqKGZObsAB9fwXPD03GjtIEvJBDOhN94T5MzbwZSqzFHSQPzg==}
+     engines: {node: '>= 6.9.x'}
+@@ -6604,13 +6614,6 @@ packages:
+   karma-firefox-launcher@2.1.3:
+     resolution: {integrity: sha512-LMM2bseebLbYjODBOVt7TCPP9OI2vZIXCavIXhkO9m+10Uj5l7u/SKoeRmYx8FYHTVGZSpk6peX+3BMHC1WwNw==}
+ 
+-  karma-jasmine-html-reporter@2.1.0:
+-    resolution: {integrity: sha512-sPQE1+nlsn6Hwb5t+HHwyy0A1FNCVKuL1192b+XNauMYWThz2kweiBVW1DqloRpVvZIJkIoHVB7XRpK78n1xbQ==}
+-    peerDependencies:
+-      jasmine-core: ^4.0.0 || ^5.0.0
+-      karma: ^6.0.0
+-      karma-jasmine: ^5.0.0
+-
+   karma-jasmine@5.1.0:
+     resolution: {integrity: sha512-i/zQLFrfEpRyQoJF9fsCdTMOF5c2dK7C7OmsuKg2D0YSsuZSfQDiLuaiktbuio6F2wiCsZSnSnieIQ0ant/uzQ==}
+     engines: {node: '>=12'}
+@@ -7917,7 +7920,6 @@ packages:
+     engines: {node: '>=0.6.0', teleport: '>=0.2.0'}
+     deprecated: |-
+       You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
+-
+       (For a CapTP with native promises, see @endo/eventual-send and @endo/captp)
+ 
+   q@1.5.1:
+@@ -7925,7 +7927,6 @@ packages:
+     engines: {node: '>=0.6.0', teleport: '>=0.2.0'}
+     deprecated: |-
+       You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
+-
+       (For a CapTP with native promises, see @endo/eventual-send and @endo/captp)
+ 
+   qjobs@1.2.0:
+@@ -11835,6 +11836,8 @@ snapshots:
+ 
+   '@istanbuljs/schema@0.1.3': {}
+ 
++  '@jasminejs/reporters@1.0.0': {}
++
+   '@jridgewell/gen-mapping@0.3.13':
+     dependencies:
+       '@jridgewell/sourcemap-codec': 1.5.5
+@@ -11953,8 +11956,8 @@ snapshots:
+       json-schema-typed: 8.0.2
+       pkce-challenge: 5.0.1
+       raw-body: 3.0.2
+-      zod: 3.25.76
+-      zod-to-json-schema: 3.25.1(zod@3.25.76)
++      zod: 4.3.5
++      zod-to-json-schema: 3.25.1(zod@4.3.5)
+     transitivePeerDependencies:
+       - hono
+       - supports-color
+@@ -13083,6 +13086,8 @@ snapshots:
+ 
+   '@types/jasmine@5.1.15': {}
+ 
++  '@types/jasmine@6.0.0': {}
++
+   '@types/json-schema@7.0.15': {}
+ 
+   '@types/jsonfile@6.1.4':
+@@ -16316,7 +16321,7 @@ snapshots:
+ 
+   istanbul-lib-instrument@6.0.3:
+     dependencies:
+-      '@babel/core': 7.28.5
++      '@babel/core': 7.28.6
+       '@babel/parser': 7.28.6
+       '@istanbuljs/schema': 0.1.3
+       istanbul-lib-coverage: 3.2.2
+@@ -16382,6 +16387,8 @@ snapshots:
+ 
+   jasmine-core@5.13.0: {}
+ 
++  jasmine-core@6.0.1: {}
++
+   jasmine-reporters@2.5.2:
+     dependencies:
+       '@xmldom/xmldom': 0.8.11
+@@ -16402,6 +16409,12 @@ snapshots:
+       glob: 10.5.0
+       jasmine-core: 5.13.0
+ 
++  jasmine@6.0.0:
++    dependencies:
++      '@jasminejs/reporters': 1.0.0
++      glob: 13.0.0
++      jasmine-core: 6.0.1
++
+   jasminewd2@2.2.0: {}
+ 
+   jest-worker@27.5.1:
+@@ -16554,12 +16567,6 @@ snapshots:
+       is-wsl: 2.2.0
+       which: 3.0.1
+ 
+-  karma-jasmine-html-reporter@2.1.0(jasmine-core@5.13.0)(karma-jasmine@5.1.0(karma@6.4.4(bufferutil@4.1.0)))(karma@6.4.4(bufferutil@4.1.0)):
+-    dependencies:
+-      jasmine-core: 5.13.0
+-      karma: 6.4.4(bufferutil@4.1.0)
+-      karma-jasmine: 5.1.0(karma@6.4.4(bufferutil@4.1.0))
+-
+   karma-jasmine@5.1.0(karma@6.4.4(bufferutil@4.1.0)):
+     dependencies:
+       jasmine-core: 4.6.1
+@@ -19246,7 +19253,7 @@ snapshots:
+       jest-worker: 27.5.1
+       schema-utils: 4.3.3
+       serialize-javascript: 6.0.2
+-      terser: 5.44.1
++      terser: 5.46.0
+       webpack: 5.104.1(esbuild@0.27.2)
+     optionalDependencies:
+       esbuild: 0.27.2
+@@ -20160,6 +20167,10 @@ snapshots:
+     dependencies:
+       zod: 3.25.76
+ 
++  zod-to-json-schema@3.25.1(zod@4.3.5):
++    dependencies:
++      zod: 4.3.5
++
+   zod@3.25.76: {}
+ 
+   zod@4.3.5: {}
+diff --git a/src/material/core/theming/tests/BUILD.bazel b/src/material/core/theming/tests/BUILD.bazel
+index 70e2742092a8e87ac63c903f8faac5888398f1a7..49dd08d74b0beb5ca7086dcfcb2d78097fd12bb3 100644
+--- a/src/material/core/theming/tests/BUILD.bazel
++++ b/src/material/core/theming/tests/BUILD.bazel
+@@ -88,5 +88,4 @@ jasmine_test(
+         "//src/material:sass_lib",
+         "//src/material-experimental:sass_lib",
+     ],
+-    shard_count = 4,
+ )
+diff --git a/src/material/schematics/ng-generate/theme-color/BUILD.bazel b/src/material/schematics/ng-generate/theme-color/BUILD.bazel
+index d557aa39f45966c53981a58ad4bfd4404d2252aa..e1483b39eb989afb33401a2ffd3324fd10eda77e 100644
+--- a/src/material/schematics/ng-generate/theme-color/BUILD.bazel
++++ b/src/material/schematics/ng-generate/theme-color/BUILD.bazel
+@@ -96,5 +96,4 @@ jasmine_test(
+         "//src/material:sass_lib",
+         "//src/material-experimental:sass_lib",
+     ],
+-    shard_count = 10,
+ )
+diff --git a/src/material/schematics/ng-update/BUILD.bazel b/src/material/schematics/ng-update/BUILD.bazel
+index 92a6ea981dd8e3684d12dd54b43b0e50fbbf4761..9e2e41d1cfd9c05addda4033d45914a95126c06d 100644
+--- a/src/material/schematics/ng-update/BUILD.bazel
++++ b/src/material/schematics/ng-update/BUILD.bazel
+@@ -66,5 +66,4 @@ jasmine_test(
+         "//src/material/schematics:node_modules/@angular/cdk/schematics",
+         "//src/material/schematics:package_json",
+     ],
+-    shard_count = 4,
+ )

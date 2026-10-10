@@ -1,0 +1,717 @@
+diff --git a/.bazelrc b/.bazelrc
+index 235349ee660ed82ef49ba917bdbf83c9abb6c3be..34647d8f37ec05b622a3002b4ee85aeab49d33d2 100644
+--- a/.bazelrc
++++ b/.bazelrc
+@@ -11,7 +11,7 @@ common --@aspect_rules_ts//ts:default_to_tsc_transpiler
+ # https://github.com/bazelbuild/rules_typescript/issues/12 which affects the common case of
+ # having `tsconfig.json` in the WORKSPACE directory. Instead, you should run
+ # `bazel info output_base` to find out where the outputs went.
+-build --symlink_prefix=/
++build --symlink_prefix=dist/
+ 
+ # Performance: avoid stat'ing input files
+ build --watchfs
+diff --git a/integration/size-test/BUILD.bazel b/integration/size-test/BUILD.bazel
+index 41db55a67cf5972d79bb9b17c1743e072d654087..4f2f95d393418e7d51843421c5ac607579950d14 100644
+--- a/integration/size-test/BUILD.bazel
++++ b/integration/size-test/BUILD.bazel
+@@ -1,5 +1,5 @@
+ load("@npm//@bazel/esbuild:index.bzl", "esbuild_config")
+-load("//tools:defaults.bzl", "ts_library")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -19,16 +19,14 @@ esbuild_config(
+     ],
+ )
+ 
+-ts_library(
++ts_project(
+     name = "check-size",
+     srcs = ["check-size.ts"],
+-    # TODO(ESM): remove this once the Bazel NodeJS rules can handle ESM with `nodejs_binary`.
+-    devmode_module = "commonjs",
+     deps = [
+-        "@npm//@bazel/runfiles",
+-        "@npm//@types/node",
+-        "@npm//@types/yaml",
+-        "@npm//chalk",
+-        "@npm//yaml",
++        "//:node_modules/@bazel/runfiles",
++        "//:node_modules/@types/node",
++        "//:node_modules/@types/yaml",
++        "//:node_modules/chalk",
++        "//:node_modules/yaml",
+     ],
+ )
+diff --git a/src/BUILD.bazel b/src/BUILD.bazel
+index b324cc433b2418aae47a339acba4377800ae3261..ddae46fb16f90cda9fd29a721a3c95d27b340402 100644
+--- a/src/BUILD.bazel
++++ b/src/BUILD.bazel
+@@ -4,7 +4,7 @@ load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
+ load("//src/cdk:config.bzl", "CDK_ENTRYPOINTS")
+ load("//src/material:config.bzl", "MATERIAL_ENTRYPOINTS", "MATERIAL_TESTING_ENTRYPOINTS")
+ load("//tools/dgeni:index.bzl", "dgeni_api_docs")
+-load("//tools:defaults.bzl", "ts_library")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -56,7 +56,7 @@ dgeni_api_docs(
+     tags = ["docs-package"],
+ )
+ 
+-ts_library(
++ts_project(
+     name = "dev_mode_types",
+     srcs = ["dev-mode-types.d.ts"],
+ )
+diff --git a/src/cdk-experimental/BUILD.bazel b/src/cdk-experimental/BUILD.bazel
+index f9804d89bcb9d50e637e4767188c3cde1b251858..e3b41c7f03eb9674f4dd06c64d1ebcccd1e4e83a 100644
+--- a/src/cdk-experimental/BUILD.bazel
++++ b/src/cdk-experimental/BUILD.bazel
+@@ -1,15 +1,16 @@
+ load("//src/cdk-experimental:config.bzl", "CDK_EXPERIMENTAL_TARGETS")
+-load("//tools:defaults.bzl", "ng_package", "ts_library")
++load("//tools:defaults.bzl", "ng_package")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+-ts_library(
++ts_project(
+     name = "cdk-experimental",
+     srcs = glob(
+         ["*.ts"],
+         exclude = ["**/*.spec.ts"],
+     ),
+-    deps = ["@npm//@angular/core"],
++    deps = ["//:node_modules/@angular/core"],
+ )
+ 
+ ng_package(
+diff --git a/src/cdk-experimental/ui-patterns/BUILD.bazel b/src/cdk-experimental/ui-patterns/BUILD.bazel
+index e9a32359e01286838cd528eb234adbea81c16583..eaed798277af3faeaa1f3070a33d97b3509a7b14 100644
+--- a/src/cdk-experimental/ui-patterns/BUILD.bazel
++++ b/src/cdk-experimental/ui-patterns/BUILD.bazel
+@@ -1,16 +1,16 @@
+-load("//tools:defaults.bzl", "ts_library")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+-ts_library(
++ts_project(
+     name = "ui-patterns",
+     srcs = glob(
+         ["**/*.ts"],
+         exclude = ["**/*.spec.ts"],
+     ),
+     deps = [
+-        "//src/cdk-experimental/ui-patterns/behaviors/signal-like",
+-        "//src/cdk-experimental/ui-patterns/listbox",
+-        "@npm//@angular/core",
++        "//:node_modules/@angular/core",
++        "//src/cdk-experimental/ui-patterns/behaviors/signal-like:signal-like_rjs",
++        "//src/cdk-experimental/ui-patterns/listbox:listbox_rjs",
+     ],
+ )
+diff --git a/src/cdk-experimental/ui-patterns/behaviors/event-manager/BUILD.bazel b/src/cdk-experimental/ui-patterns/behaviors/event-manager/BUILD.bazel
+index 563b0ff1ba1517427b9c2c79886572ddb6de5b6c..e2682f2952a4de819713c5de8f756db9a4b56ea9 100644
+--- a/src/cdk-experimental/ui-patterns/behaviors/event-manager/BUILD.bazel
++++ b/src/cdk-experimental/ui-patterns/behaviors/event-manager/BUILD.bazel
+@@ -1,14 +1,14 @@
+-load("//tools:defaults.bzl", "ts_library")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+-ts_library(
++ts_project(
+     name = "event-manager",
+     srcs = glob(
+         ["**/*.ts"],
+         exclude = ["**/*.spec.ts"],
+     ),
+     deps = [
+-        "//src/cdk-experimental/ui-patterns/behaviors/signal-like",
++        "//src/cdk-experimental/ui-patterns/behaviors/signal-like:signal-like_rjs",
+     ],
+ )
+diff --git a/src/cdk-experimental/ui-patterns/behaviors/list-focus/BUILD.bazel b/src/cdk-experimental/ui-patterns/behaviors/list-focus/BUILD.bazel
+index 37bda0ab9d9740864b5ae389b71ef7be003c0084..b5ee34e7ee2ab07bc63a15582e0d267b2be55322 100644
+--- a/src/cdk-experimental/ui-patterns/behaviors/list-focus/BUILD.bazel
++++ b/src/cdk-experimental/ui-patterns/behaviors/list-focus/BUILD.bazel
+@@ -1,16 +1,17 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite", "ts_library")
++load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+-ts_library(
++ts_project(
+     name = "list-focus",
+     srcs = glob(
+         ["**/*.ts"],
+         exclude = ["**/*.spec.ts"],
+     ),
+     deps = [
+-        "//src/cdk-experimental/ui-patterns/behaviors/list-navigation",
+-        "//src/cdk-experimental/ui-patterns/behaviors/signal-like",
++        "//src/cdk-experimental/ui-patterns/behaviors/list-navigation:list-navigation_rjs",
++        "//src/cdk-experimental/ui-patterns/behaviors/signal-like:signal-like_rjs",
+     ],
+ )
+ 
+diff --git a/src/cdk-experimental/ui-patterns/behaviors/list-navigation/BUILD.bazel b/src/cdk-experimental/ui-patterns/behaviors/list-navigation/BUILD.bazel
+index 9bf541fbe51783448eab032ad9f79a9f7468c47e..b65828fec5c2a6966efcaaa7ef9a73c7459d1cfd 100644
+--- a/src/cdk-experimental/ui-patterns/behaviors/list-navigation/BUILD.bazel
++++ b/src/cdk-experimental/ui-patterns/behaviors/list-navigation/BUILD.bazel
+@@ -1,16 +1,17 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite", "ts_library")
++load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+-ts_library(
++ts_project(
+     name = "list-navigation",
+     srcs = glob(
+         ["**/*.ts"],
+         exclude = ["**/*.spec.ts"],
+     ),
+     deps = [
+-        "//src/cdk-experimental/ui-patterns/behaviors/signal-like",
+-        "@npm//@angular/core",
++        "//:node_modules/@angular/core",
++        "//src/cdk-experimental/ui-patterns/behaviors/signal-like:signal-like_rjs",
+     ],
+ )
+ 
+diff --git a/src/cdk-experimental/ui-patterns/behaviors/list-selection/BUILD.bazel b/src/cdk-experimental/ui-patterns/behaviors/list-selection/BUILD.bazel
+index fad8ca69513da941574b413a768a0df3325faf55..70601961172939bddb8c6ba4fe400d189516b048 100644
+--- a/src/cdk-experimental/ui-patterns/behaviors/list-selection/BUILD.bazel
++++ b/src/cdk-experimental/ui-patterns/behaviors/list-selection/BUILD.bazel
+@@ -1,17 +1,18 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite", "ts_library")
++load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+-ts_library(
++ts_project(
+     name = "list-selection",
+     srcs = glob(
+         ["**/*.ts"],
+         exclude = ["**/*.spec.ts"],
+     ),
+     deps = [
+-        "//src/cdk-experimental/ui-patterns/behaviors/list-navigation",
+-        "//src/cdk-experimental/ui-patterns/behaviors/signal-like",
+-        "@npm//@angular/core",
++        "//:node_modules/@angular/core",
++        "//src/cdk-experimental/ui-patterns/behaviors/list-navigation:list-navigation_rjs",
++        "//src/cdk-experimental/ui-patterns/behaviors/signal-like:signal-like_rjs",
+     ],
+ )
+ 
+diff --git a/src/cdk-experimental/ui-patterns/behaviors/list-typeahead/BUILD.bazel b/src/cdk-experimental/ui-patterns/behaviors/list-typeahead/BUILD.bazel
+index 9c415122deb3db86257d9fe1c7558699b76e8984..f7b3e5b768d88a47796b075780e36c8a6d579a39 100644
+--- a/src/cdk-experimental/ui-patterns/behaviors/list-typeahead/BUILD.bazel
++++ b/src/cdk-experimental/ui-patterns/behaviors/list-typeahead/BUILD.bazel
+@@ -1,17 +1,18 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite", "ts_library")
++load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+-ts_library(
++ts_project(
+     name = "list-typeahead",
+     srcs = glob(
+         ["**/*.ts"],
+         exclude = ["**/*.spec.ts"],
+     ),
+     deps = [
+-        "//src/cdk-experimental/ui-patterns/behaviors/list-navigation",
+-        "//src/cdk-experimental/ui-patterns/behaviors/signal-like",
+-        "@npm//@angular/core",
++        "//:node_modules/@angular/core",
++        "//src/cdk-experimental/ui-patterns/behaviors/list-navigation:list-navigation_rjs",
++        "//src/cdk-experimental/ui-patterns/behaviors/signal-like:signal-like_rjs",
+     ],
+ )
+ 
+diff --git a/src/cdk-experimental/ui-patterns/behaviors/signal-like/BUILD.bazel b/src/cdk-experimental/ui-patterns/behaviors/signal-like/BUILD.bazel
+index 47d4636683580e39d990fc116d152b5ee8507e6d..e64b0007568bb8e4b8f5df6398992881cf265227 100644
+--- a/src/cdk-experimental/ui-patterns/behaviors/signal-like/BUILD.bazel
++++ b/src/cdk-experimental/ui-patterns/behaviors/signal-like/BUILD.bazel
+@@ -1,8 +1,8 @@
+-load("//tools:defaults.bzl", "ts_library")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+-ts_library(
++ts_project(
+     name = "signal-like",
+     srcs = ["signal-like.ts"],
+     deps = [],
+diff --git a/src/cdk-experimental/ui-patterns/listbox/BUILD.bazel b/src/cdk-experimental/ui-patterns/listbox/BUILD.bazel
+index 9d68e2822333c34f1f025d1148ca79fcea1014b1..00b3dd6c0603b4ae14929e6ad5cfe62b4fba6644 100644
+--- a/src/cdk-experimental/ui-patterns/listbox/BUILD.bazel
++++ b/src/cdk-experimental/ui-patterns/listbox/BUILD.bazel
+@@ -1,20 +1,20 @@
+-load("//tools:defaults.bzl", "ts_library")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+-ts_library(
++ts_project(
+     name = "listbox",
+     srcs = glob(
+         ["**/*.ts"],
+         exclude = ["**/*.spec.ts"],
+     ),
+     deps = [
+-        "//src/cdk-experimental/ui-patterns/behaviors/event-manager",
+-        "//src/cdk-experimental/ui-patterns/behaviors/list-focus",
+-        "//src/cdk-experimental/ui-patterns/behaviors/list-navigation",
+-        "//src/cdk-experimental/ui-patterns/behaviors/list-selection",
+-        "//src/cdk-experimental/ui-patterns/behaviors/list-typeahead",
+-        "//src/cdk-experimental/ui-patterns/behaviors/signal-like",
+-        "@npm//@angular/core",
++        "//:node_modules/@angular/core",
++        "//src/cdk-experimental/ui-patterns/behaviors/event-manager:event-manager_rjs",
++        "//src/cdk-experimental/ui-patterns/behaviors/list-focus:list-focus_rjs",
++        "//src/cdk-experimental/ui-patterns/behaviors/list-navigation:list-navigation_rjs",
++        "//src/cdk-experimental/ui-patterns/behaviors/list-selection:list-selection_rjs",
++        "//src/cdk-experimental/ui-patterns/behaviors/list-typeahead:list-typeahead_rjs",
++        "//src/cdk-experimental/ui-patterns/behaviors/signal-like:signal-like_rjs",
+     ],
+ )
+diff --git a/src/cdk/BUILD.bazel b/src/cdk/BUILD.bazel
+index 41f22fa3e977956d1182e2745f692721675f0280..68bff715317efbf94b2fabfa84297b76a088a8ac 100644
+--- a/src/cdk/BUILD.bazel
++++ b/src/cdk/BUILD.bazel
+@@ -1,15 +1,16 @@
+ load("//src/cdk:config.bzl", "CDK_ENTRYPOINTS", "CDK_ENTRYPOINTS_WITH_STYLES", "CDK_SCSS_LIBS", "CDK_TARGETS")
+-load("//tools:defaults.bzl", "ng_package", "sass_library", "ts_library")
++load("//tools:defaults.bzl", "ng_package", "sass_library")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+-ts_library(
++ts_project(
+     name = "cdk",
+     srcs = glob(
+         ["*.ts"],
+         exclude = ["**/*.spec.ts"],
+     ),
+-    deps = ["@npm//@angular/core"],
++    deps = ["//:node_modules/@angular/core"],
+ )
+ 
+ # List of style files that need to be copied to the root of the CDK package. We do this
+diff --git a/src/cdk/coercion/BUILD.bazel b/src/cdk/coercion/BUILD.bazel
+index c6887bee13c647fd08c0c73d58b8c52e434473b3..99c194d711444daeca087d0b054da59f826bf7d9 100644
+--- a/src/cdk/coercion/BUILD.bazel
++++ b/src/cdk/coercion/BUILD.bazel
+@@ -1,19 +1,20 @@
+-load("//tools:defaults.bzl", "karma_web_test_suite", "markdown_to_html", "ts_library")
++load("//tools:defaults.bzl", "karma_web_test_suite", "markdown_to_html")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+-ts_library(
++ts_project(
+     name = "coercion",
+     srcs = glob(
+         ["**/*.ts"],
+         exclude = ["**/*.spec.ts"],
+     ),
+     deps = [
+-        "@npm//@angular/core",
++        "//:node_modules/@angular/core",
+     ],
+ )
+ 
+-ts_library(
++ts_project(
+     name = "unit_test_sources",
+     testonly = True,
+     srcs = glob(
+@@ -21,9 +22,8 @@ ts_library(
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+     deps = [
+-        ":coercion",
+-        "@npm//@angular/core",
+-        "@npm//@types/jasmine",
++        ":coercion_rjs",
++        "//:node_modules/@angular/core",
+     ],
+ )
+ 
+diff --git a/src/cdk/keycodes/BUILD.bazel b/src/cdk/keycodes/BUILD.bazel
+index 5fb355a70006f5163cf60035f0c1d49c4b97d16d..c7c4a1198f023a107760e3b3171ed610717f1db9 100644
+--- a/src/cdk/keycodes/BUILD.bazel
++++ b/src/cdk/keycodes/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "karma_web_test_suite", "markdown_to_html", "ng_module", "ts_library")
++load("//tools:defaults.bzl", "karma_web_test_suite", "markdown_to_html", "ng_module")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -14,17 +15,19 @@ ng_module(
+     ),
+ )
+ 
+-ts_library(
++ts_project(
+     name = "unit_test_sources",
+     testonly = True,
+     srcs = glob(
+         ["**/*.spec.ts"],
+         exclude = ["**/*.e2e.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         ":keycodes",
+         "//src/cdk/testing/private",
+-        "@npm//@types/jasmine",
++    ],
++    deps = [
++        "//:node_modules/@types/jasmine",
+     ],
+ )
+ 
+diff --git a/src/cdk/testing/private/BUILD.bazel b/src/cdk/testing/private/BUILD.bazel
+index fb1b5b5212eb0870dabb40edc4bd77cb8f50507b..2b46e900eed2392ff29488608cb41105c5ff1502 100644
+--- a/src/cdk/testing/private/BUILD.bazel
++++ b/src/cdk/testing/private/BUILD.bazel
+@@ -1,17 +1,19 @@
+-load("//tools:defaults.bzl", "ts_library")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+-ts_library(
++ts_project(
+     name = "private",
+     testonly = True,
+     srcs = glob(
+         ["**/*.ts"],
+         exclude = ["**/*.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         "//src/cdk/testing/testbed",
+-        "@npm//@angular/core",
+-        "@npm//@types/jasmine",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@types/jasmine",
+     ],
+ )
+diff --git a/src/cdk/testing/protractor/BUILD.bazel b/src/cdk/testing/protractor/BUILD.bazel
+index 53d5a5ebfb034a7072fa42309123f4748b34d286..043383573e7b3ec8c3cbbfaae26b9923297b8d5c 100644
+--- a/src/cdk/testing/protractor/BUILD.bazel
++++ b/src/cdk/testing/protractor/BUILD.bazel
+@@ -1,16 +1,18 @@
+-load("//tools:defaults.bzl", "ts_library")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+-ts_library(
++ts_project(
+     name = "protractor",
+     srcs = glob(
+         ["**/*.ts"],
+         exclude = ["**/*.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         "//src/cdk/testing",
+-        "@npm//protractor",
++    ],
++    deps = [
++        "//:node_modules/protractor",
+     ],
+ )
+ 
+diff --git a/src/cdk/testing/selenium-webdriver/BUILD.bazel b/src/cdk/testing/selenium-webdriver/BUILD.bazel
+index 2835524b0b011ef1d87f11888505da0c8507bcad..9163d54678e2f7a1915ac205209818c40699b4ae 100644
+--- a/src/cdk/testing/selenium-webdriver/BUILD.bazel
++++ b/src/cdk/testing/selenium-webdriver/BUILD.bazel
+@@ -1,17 +1,19 @@
+-load("//tools:defaults.bzl", "ts_library")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+-ts_library(
++ts_project(
+     name = "selenium-webdriver",
+     srcs = glob(
+         ["**/*.ts"],
+         exclude = ["**/*.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         "//src/cdk/testing",
+-        "@npm//@types/selenium-webdriver",
+-        "@npm//selenium-webdriver",
++    ],
++    deps = [
++        "//:node_modules/@types/selenium-webdriver",
++        "//:node_modules/selenium-webdriver",
+     ],
+ )
+ 
+diff --git a/src/cdk/testing/testbed/BUILD.bazel b/src/cdk/testing/testbed/BUILD.bazel
+index b5379ee5679787e37c66b32d2192ad71be1c16ef..65980379140b5621a3597dfd66209a689701d27a 100644
+--- a/src/cdk/testing/testbed/BUILD.bazel
++++ b/src/cdk/testing/testbed/BUILD.bazel
+@@ -1,18 +1,21 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite", "ts_library")
++load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+-ts_library(
++ts_project(
+     name = "testbed",
+     srcs = glob(
+         ["**/*.ts"],
+         exclude = ["**/*.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         "//src/cdk/keycodes",
+         "//src/cdk/testing",
+-        "@npm//@angular/core",
+-        "@npm//rxjs",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/rxjs",
+     ],
+ )
+ 
+diff --git a/src/cdk/testing/tests/BUILD.bazel b/src/cdk/testing/tests/BUILD.bazel
+index 39f63038169411b392835066a450f8df66ffc038..115a65df68d1f29358c22524af9a6483c429401e 100644
+--- a/src/cdk/testing/tests/BUILD.bazel
++++ b/src/cdk/testing/tests/BUILD.bazel
+@@ -1,4 +1,5 @@
+-load("//tools:defaults.bzl", "ng_e2e_test_library", "ng_module", "ng_test_library", "ts_library")
++load("//tools:defaults.bzl", "ng_e2e_test_library", "ng_module", "ng_test_library")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -20,10 +21,10 @@ ng_module(
+     ],
+ )
+ 
+-ts_library(
++ts_project(
+     name = "test_harnesses",
+     srcs = glob(["harnesses/**/*.ts"]),
+-    deps = [
++    interop_deps = [
+         "//src/cdk/testing",
+     ],
+ )
+@@ -78,20 +79,20 @@ ng_e2e_test_library(
+     ],
+ )
+ 
+-ts_library(
++ts_project(
+     name = "webdriver_test_sources",
+     testonly = True,
+     srcs = ["webdriver.e2e.spec.ts"],
+-    # TODO(ESM): remove this once the Bazel NodeJS rules can handle ESM with `nodejs_binary`.
+-    devmode_module = "commonjs",
+-    deps = [
++    interop_deps = [
+         ":cross_environment_specs",
+         ":test_harnesses",
+         "//src/cdk/testing",
+         "//src/cdk/testing/selenium-webdriver",
+-        "@npm//@bazel/runfiles",
+-        "@npm//@types/jasmine",
+-        "@npm//@types/node",
+-        "@npm//@types/selenium-webdriver",
++    ],
++    deps = [
++        "//:node_modules/@bazel/runfiles",
++        "//:node_modules/@types/jasmine",
++        "//:node_modules/@types/node",
++        "//:node_modules/@types/selenium-webdriver",
+     ],
+ )
+diff --git a/src/components-examples/private/BUILD.bazel b/src/components-examples/private/BUILD.bazel
+index 6b0a0abf7b3032b6f11c420142e7b1b1c8c1e2c2..56753e6876090bf9915263f9a6df09d3fd5e103d 100644
+--- a/src/components-examples/private/BUILD.bazel
++++ b/src/components-examples/private/BUILD.bazel
+@@ -1,17 +1,19 @@
+-load("//tools:defaults.bzl", "ts_library")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+-ts_library(
++ts_project(
+     name = "private",
+     srcs = glob(["*.ts"]),
+-    deps = [
++    interop_deps = [
+         "//src/components-examples",
+-        "@npm//@angular/core",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
+     ],
+ )
+ 
+-ts_library(
++ts_project(
+     name = "localize_types",
+     srcs = ["localize-types.d.ts"],
+ )
+diff --git a/src/google-maps/testing/BUILD.bazel b/src/google-maps/testing/BUILD.bazel
+index 415807b6a3b6e11d0e257899665aba7bec4830e0..2f31d31981cf748e42010dc3f912e75d6eaa5ba7 100644
+--- a/src/google-maps/testing/BUILD.bazel
++++ b/src/google-maps/testing/BUILD.bazel
+@@ -1,14 +1,16 @@
+-load("//tools:defaults.bzl", "ts_library")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+-ts_library(
++ts_project(
+     name = "testing",
+     testonly = True,
+     srcs = glob(["**/*.ts"]),
+-    deps = [
++    interop_deps = [
+         "//src/google-maps",
+-        "@npm//@types/google.maps",
+-        "@npm//@types/jasmine",
++    ],
++    deps = [
++        "//:node_modules/@types/google.maps",
++        "//:node_modules/@types/jasmine",
+     ],
+ )
+diff --git a/src/material/BUILD.bazel b/src/material/BUILD.bazel
+index eb248fe7e30ca6ae533113f8bf17c59d4ac8c145..5b402621d38f011d64f073b5948f39632c9e70d4 100644
+--- a/src/material/BUILD.bazel
++++ b/src/material/BUILD.bazel
+@@ -5,11 +5,12 @@ load(
+     "MATERIAL_TARGETS",
+     "MATERIAL_TESTING_TARGETS",
+ )
+-load("//tools:defaults.bzl", "ng_package", "sass_library", "ts_library")
++load("//tools:defaults.bzl", "ng_package", "sass_library")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+-ts_library(
++ts_project(
+     name = "material",
+     srcs = ["index.ts"],
+ )
+diff --git a/src/material/autocomplete/testing/BUILD.bazel b/src/material/autocomplete/testing/BUILD.bazel
+index de2a2bc5940094b7b63c927fe7a3947aae4219fa..34e93ade64160c9ab4fcab0153dffe33b8701481 100644
+--- a/src/material/autocomplete/testing/BUILD.bazel
++++ b/src/material/autocomplete/testing/BUILD.bazel
+@@ -1,14 +1,15 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite", "ts_library")
++load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+-ts_library(
++ts_project(
+     name = "testing",
+     srcs = glob(
+         ["**/*.ts"],
+         exclude = ["**/*.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         "//src/cdk/coercion",
+         "//src/cdk/testing",
+         "//src/material/core/testing",
+diff --git a/src/material/badge/testing/BUILD.bazel b/src/material/badge/testing/BUILD.bazel
+index c04825a62a99b12760dcb8bdb4d6c204a7afbdf8..8b9b236b7c92058b1e3fd230497ff77a76d25eb2 100644
+--- a/src/material/badge/testing/BUILD.bazel
++++ b/src/material/badge/testing/BUILD.bazel
+@@ -1,14 +1,15 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite", "ts_library")
++load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+-ts_library(
++ts_project(
+     name = "testing",
+     srcs = glob(
+         ["**/*.ts"],
+         exclude = ["**/*.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         "//src/cdk/testing",
+         "//src/material/badge",
+     ],
+diff --git a/tools/bazel/ts_project_interop.bzl b/tools/bazel/ts_project_interop.bzl
+index 0827437a18413b7b59ebcba117755cddf11b9d6c..72e4f28e64cb3ba7641cf4b5049c4342113023da 100644
+--- a/tools/bazel/ts_project_interop.bzl
++++ b/tools/bazel/ts_project_interop.bzl
+@@ -2,7 +2,6 @@ load("@aspect_rules_js//js:providers.bzl", "JsInfo", "js_info")
+ load("@aspect_rules_ts//ts:defs.bzl", _ts_project = "ts_project")
+ load("@build_bazel_rules_nodejs//:providers.bzl", "DeclarationInfo", "JSEcmaScriptModuleInfo", "JSModuleInfo", "LinkablePackageInfo")
+ load("@devinfra//bazel/ts_project:index.bzl", "strict_deps_test")
+-load("@build_bazel_rules_nodejs//internal/linker:link_node_modules.bzl", "LinkerPackageMappingInfo")
+ 
+ def _ts_deps_interop_impl(ctx):
+     types = []
+@@ -82,18 +81,6 @@ def _ts_project_module_impl(ctx):
+                 files = info.sources,
+             ),
+         )
+-        providers.append(
+-            LinkerPackageMappingInfo(
+-                mappings = depset([
+-                    struct(
+-                        package_name = ctx.attr.module_name,
+-                        package_path = "",
+-                        link_path = ctx.label.package,
+-                    ),
+-                ]),
+-                node_modules_roots = depset([]),
+-            ),
+-        )
+ 
+     return providers
+ 
