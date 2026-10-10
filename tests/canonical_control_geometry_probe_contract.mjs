@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import {runInNewContext} from 'node:vm';
 import {writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
-import {requiredProbeSource, candidateInstallSpec} from '../scripts/browser-required-cells.mjs';
+import {requiredProbeSource, candidateInstallSpec, candidateQualificationDefects} from '../scripts/browser-required-cells.mjs';
 const raw = requiredProbeSource(), turn = () => new Promise(resolve => setImmediate(resolve));
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 function fixture(family, faults = {}, source = raw) {
@@ -97,7 +97,14 @@ function fixture(family, faults = {}, source = raw) {
     querySelector: () => ({disabled: !faults.noLabelEnabled,value: faults.noLabelWrongValue?'': 'off'}),
     querySelectorAll: () => faults.noLabelElement?[{}]:[]};
   window.__lab = {closeTransient() {},
+    runFormFieldDirectionLifetime: () => faults.directionReject ? Promise.reject(new Error('fixture failure')) :
+      faults.directionPending ? new Promise(() => {}) : Promise.resolve(faults.directionMissingResult ? undefined : {
+        actual_field_created: !faults.directionNoField, actual_directionality_created: !faults.directionNoDir,
+        initialized: !faults.directionUninitialized, live_updates: faults.directionNoLive ? 0 : faults.directionBadCount ? 1.5 : 1,
+        queued_updates_before_destroy: faults.directionImmediate ? 1 : 0, view_destroyed: !faults.directionNotDestroyed,
+        host_removed: !faults.directionHostRetained, late_updates: faults.directionLate ? 2 : 0}),
     readChipFormState: () => ({focused, touched}), resetChipFormState() {touched = !!faults.touchedBefore;}};
+  if (faults.directionMissingApi) delete window.__lab.runFormFieldDirectionLifetime;
   if (faults.noChipApi) delete window.__lab.readChipFormState;
   const document = {activeElement: null, getElementById: id => id === 'surface' ? surface : null,
     querySelector(selector) {
@@ -185,6 +192,17 @@ for (const faults of [{noLabelHasLabel:true},{noLabelDoesNotFloat:true},{noLabel
     {noLabelWrongValue:true},{noLabelElement:true},{noLabelMissing:true}]) {
   await check('tagged-no-label-state-reject-'+JSON.stringify(faults),'form-field',faults,false);
 }
+for (const faults of [{directionReject:true},{directionPending:true},{directionMissingResult:true},
+    {directionNoField:true},{directionNoDir:true},{directionUninitialized:true},{directionNoLive:true},
+    {directionBadCount:true},{directionImmediate:true},{directionNotDestroyed:true},
+    {directionHostRetained:true},{directionLate:true},{directionMissingApi:true}]) {
+  await check('direction-lifetime-reject-'+JSON.stringify(faults),'form-field',faults,false);
+}
+const bypassLifetime = raw.replace('finish(legacyFormFieldDirectionLifetimeNativeOkay(lifetime),', 'finish(true,');
+assert.notEqual(bypassLifetime, raw);
+const lateDirection = fixture('form-field', {directionLate:true}, bypassLifetime);
+lateDirection.begin(); await lateDirection.advance(1700);
+assert.equal(lateDirection.status().ok, true, 'removing direction lifetime gate must expose a late-update false pass');
 const bypassFont = raw.replace('return legacySelectFontNativeOkay(observation) ? observation : null;',
   'return observation.panel_count === 1 ? observation : null;');
 assert.notEqual(bypassFont, raw);
@@ -202,6 +220,13 @@ async function replacedWait(source = raw) {
   assert.equal(f.status().done, false, 'prior-wait-cannot-complete-replacement-cell');
 }
 await replacedWait(); cases.push({id: 'queued-wait-cannot-complete-replacement-cell', result: 'pass'});
+const replacedLifetime = fixture('form-field', {directionPending:true});
+replacedLifetime.begin(); await replacedLifetime.advance(0);
+assert.equal(replacedLifetime.status().done, false);
+replacedLifetime.window.__status = {done:false, ok:false, evidence:'replacement field cell'};
+await replacedLifetime.advance(1700);
+assert.equal(replacedLifetime.status().done, false, 'pending field lifetime cannot complete replacement cell');
+cases.push({id:'field-lifetime-timeout-cannot-complete-replacement-cell',result:'pass'});
 const leakedWait = raw.replace('      if (window.__status !== request) return;', '');
 assert.notEqual(leakedWait, raw);
 await assert.rejects(() => replacedWait(leakedWait), error => error.code === 'ERR_ASSERTION' &&
@@ -212,12 +237,15 @@ for (const zoneless of [false, true]) {
     rxjs: '7.8.2', typescript: '6.0.3', zone: '0.16.3', tslib: '2.8.1', sass: '1.104.1'}, zoneless);
   assert.ok(spec.labSource.includes('readonly chipControl = new FormControl<string | null>(null)'));
   assert.ok(spec.labSource.includes('ReactiveFormsModule,'));
+  assert.ok(spec.labSource.includes('runFormFieldDirectionLifetime()'));
+  assert.ok(spec.labSource.includes('afterNextRender(() =>'));
+  assert.deepEqual(candidateQualificationDefects(spec), []);
   assert.ok(spec.labSource.includes(JSON.stringify('id="p-tabs"').slice(1, -1)));
   assert.ok(spec.labSource.includes(JSON.stringify('style="font-size:20px"').slice(1, -1)));
   generated.push({zoneless, source_sha256: hash(spec.labSource)});
 }
-const report = {schema_version: 1, cases, mutation_rejections: 3, generated,
+const report = {schema_version: 1, cases, mutation_rejections: 4, generated,
   complete_probe_sha256: hash(raw), native_executed: false, actual_legacy_or_forms_executed: false,
   scope: 'Complete canonical default tabs/select/chips/form-field browser probe under explicit DOM/style/geometry/control/timer protocols. Shared actual predicates and DOM readers execute; no browser, Angular/forms/legacy instances, packed artifact, AOT or consumer floors are qualified.'};
 if (process.argv[2]) writeFileSync(process.argv[2], JSON.stringify(report, null, 2) + '\n', {flag: 'wx'});
-console.log(JSON.stringify({cases: cases.length, mutation_rejections: 3, native_executed: false}));
+console.log(JSON.stringify({cases: cases.length, mutation_rejections: 4, native_executed: false}));
