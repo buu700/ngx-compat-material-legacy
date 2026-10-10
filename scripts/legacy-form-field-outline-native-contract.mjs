@@ -43,3 +43,18 @@ export function readLegacyFormFieldOutlineNative(host) {
     start_widths:Array.from(container.querySelectorAll('.mat-form-field-outline-start')).map(node=>parseFloat(node.style.width)),
     gap_widths:Array.from(container.querySelectorAll('.mat-form-field-outline-gap')).map(node=>parseFloat(node.style.width))};
 }
+
+/** Independent long-label arithmetic on an actually rendered fixed host. */
+export function legacyFormFieldOutlineBoundaryNativeOkay(o) {
+  return legacyFormFieldOutlineNativeOkay(o) && o.fixed_host === true && o.null_offset_parent === true &&
+    o.document_root === true && o.prefix === true && o.suffix === true &&
+    o.expected_gap > o.container_width + 1.5;
+}
+
+export function readLegacyFormFieldOutlineBoundaryNative(host) {
+  const geometry=readLegacyFormFieldOutlineNative(host);
+  if(!geometry||!host)return null;
+  return {...geometry,fixed_host:getComputedStyle(host).position==='fixed',null_offset_parent:host.offsetParent===null,
+    document_root:host.getRootNode()===document,prefix:!!host.querySelector('.mat-form-field-prefix'),
+    suffix:!!host.querySelector('.mat-form-field-suffix')};
+}

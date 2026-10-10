@@ -247,8 +247,14 @@
             show.click();
             record('ltr', false, () => {
               rtl.click();
-              record('rtl', false, () => finish(legacyFormFieldOutlineSequenceOkay(rows),
-                'form-field; outline prefix/hide/show/RTL ' + JSON.stringify(rows)));
+              record('rtl', false, () => {
+                if (!legacyFormFieldOutlineSequenceOkay(rows)) {finish(false, 'outline sequence failed'); return;}
+                waitFor(() => {
+                  const boundary = readLegacyFormFieldOutlineBoundaryNative(query('#p-outline-boundary'));
+                  return legacyFormFieldOutlineBoundaryNativeOkay(boundary) ? boundary : null;
+                }, 1500, boundary => finish(!!boundary,
+                  'form-field; outline prefix/hide/show/RTL ' + JSON.stringify(rows) + '; fixed long-label boundary ' + JSON.stringify(boundary)));
+              });
             });
           });
         });

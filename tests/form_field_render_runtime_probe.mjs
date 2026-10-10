@@ -35,13 +35,24 @@ assert.equal(oldCtor.parameters.length,7);assert.equal(newCtor.parameters.length
 assert.deepEqual(newCtor.parameters.slice(0,7).map(n=>print(n,after.source)),oldCtor.parameters.map(n=>print(n,before.source)));
 assert.equal(print(oldCtor.body,before.source),print(newCtor.body,after.source));
 assert.equal(newCtor.parameters[7].name.text,'_injector');assert.equal(newCtor.parameters[7].type.getText(after.source),'Injector');assert.ok(newCtor.parameters[7].questionToken);assert.equal(ts.getDecorators(newCtor.parameters[7]),undefined);
-for(const name of ['updateOutlineGap','_getStartEnd','_isAttachedToDOM','_resolveShadowRoot']){
- const old=before.node.members.find(n=>n.name?.text===name),now=after.node.members.find(n=>n.name?.text===name);assert.equal(print(now,after.source),print(old,before.source),'existing geometry method changed');
+const tagged=owner(original);
+for(const name of ['updateOutlineGap','_getStartEnd','_isAttachedToDOM']){
+ const oracle=tagged.node.members.find(n=>n.name?.text===name),now=after.node.members.find(n=>n.name?.text===name);
+ assert.equal(print(now,after.source),print(oracle,tagged.source),'geometry-matches-immutable-tag');
 }
+assert.equal(after.node.members.some(n=>['_cachedShadowRoot','_resolveShadowRoot'].includes(n.name?.text)),false);
+const geometryBefore=execFileSync('git',['-c','gc.auto=0','-c','maintenance.auto=0','show','385e7d41d:'+paths.field],{cwd:root,encoding:'utf8'});
+
 for(const text of [original,candidate]){const source=parse(text);const declarations=source.statements.filter(ts.isVariableStatement).flatMap(node=>node.declarationList.declarations);
  assert.equal(declarations.find(n=>n.name.text==='floatingLabelScale').initializer.getText(source),'0.75');assert.equal(declarations.find(n=>n.name.text==='outlineGapPadding').initializer.getText(source),'5');}
 const changed=(text,from,to)=>{const value=text.replace(from,to);assert.notEqual(value,text);return value;};
-const mutations={priorWait:program(changed(candidate,'afterFormFieldRender(this._ngZone, this._injector)','this._ngZone.onStable')),
+const mutations={
+ visibleOffsetParent:program(changed(candidate,'return rootNode && rootNode !== element;', 'return rootNode && rootNode !== element && element.offsetParent !== null;')),
+ staleShadowRoot:program(changed(candidate,'return rootNode && rootNode !== element;', 'const cached=(this as any).__cachedRoot ??= rootNode; return rootNode && rootNode !== element && rootNode === cached;')),
+ priorGeometry:program(geometryBefore),
+ noFallback:program(changed(candidate,'return document.documentElement!.contains(element);','return false;')),
+ noLabelScale:program(changed(candidate,'labelWidth * floatingLabelScale + outlineGapPadding * 2','labelWidth + outlineGapPadding * 2')),
+ priorWait:program(changed(candidate,'afterFormFieldRender(this._ngZone, this._injector)','this._ngZone.onStable')),
  noDestroy:program(changed(candidate,'        .pipe(takeUntil(this._destroyed)).subscribe(() => {','        .subscribe(() => {')),
  noFlag:program(changed(candidate,'if (this._outlineGapCalculationNeededOnStable)','if (true)')),
  leakedRender:helperProgram(changed(helper,'      rendered?.destroy();','')),
@@ -52,7 +63,10 @@ const loaded=prepareMaterialPublicSubjects(root),results=[];
 try{
  const compilerPath=process.env.CLOSEOUT_TYPESCRIPT_ROOT?join(process.env.CLOSEOUT_TYPESCRIPT_ROOT,'lib/typescript.js'):require.resolve('typescript'),compiler=require(compilerPath),types=[],contracts=[];
  for(const model of loaded.models.filter(m=>m.line!=='original')){
-  const fixture=helper+`\nimport {Injector as PublicInjector,NgZone as PublicZone} from '@angular/core';
+  const attachment=print(after.node.members.find(node=>node.name?.text==='_isAttachedToDOM'),after.source);
+  const fixture=helper+`\nimport {Injector as PublicInjector,NgZone as PublicZone,ElementRef as PublicElementRef} from '@angular/core';
+class AttachmentReceipt{constructor(private _elementRef:PublicElementRef<HTMLElement>){}${attachment}}
+new AttachmentReceipt(new PublicElementRef(document.body));
 declare const zone:PublicZone,injector:PublicInjector;
 const renders:Observable<void>=afterFormFieldRender(zone,injector);afterFormFieldRender(zone);afterFormFieldRender(zone,null);
 class TrailingInjector{constructor(first:string,private _injector?:PublicInjector){}}
@@ -102,17 +116,21 @@ ${mode==='zoneless'?"assert.equal(typeof globalThis.Zone,'undefined');":''}
 `}
 let callbacks=0;const trackedRender=(callback,options)=>core.afterEveryRender(()=>{callbacks++;callback();},options);
 function helper(js){const exports={};new Function('exports','afterEveryRender','ApplicationRef','Observable','take',js)(exports,trackedRender,core.ApplicationRef,rx.Observable,ops.take);return exports.afterFormFieldRender;}
-function fixture(js=payload.candidate,helperJs=payload.helper,injector=app?.injector){
- let attached=true,visible=true,labelWidth=80,labelStart=120,labelRight=200,writes=0;const doc={documentElement:{contains:()=>attached}};
+function fixture(js=payload.candidate,helperJs=payload.helper,injector=app?.injector,boundary={}){
+ let attached=!boundary.detached,visible=true,labelWidth=boundary.labelWidth??80,labelStart=120,labelRight=200,writes=0;
+ let currentRoot;const shadowA={host:{}},shadowB={host:{}};const doc={documentElement:{contains:()=>attached}};
  const style=()=>new Proxy({},{set(target,key,value){writes++;target[key]=value;return true;}}),starts=[{style:style()},{style:style()}],gaps=[{style:style()},{style:style()}];
- const native={getRootNode:()=>attached?doc:native,offsetParent:{},classList:{add(){},remove(){}}};
- const container={getBoundingClientRect:()=>({left:100,right:300,width:visible?200:0,height:visible?40:0}),
-  querySelectorAll:selector=>selector.includes(',')?[...starts,...gaps]:selector.endsWith('-start')?starts:gaps,querySelector:()=>null};
+ const native={getRootNode:()=>attached?(currentRoot??doc):native,offsetParent:boundary.fixed?null:{},classList:{add(){},remove(){}}};
+ if(boundary.noRootMethod)delete native.getRootNode;
+ if(boundary.shadow)currentRoot=shadowA;
+ const container={getBoundingClientRect:()=>({left:100,right:300,width:visible?(boundary.width??200):0,height:visible?40:0}),
+  querySelectorAll:selector=>selector.includes(',')?[...starts,...gaps]:selector.endsWith('-start')?starts:gaps,querySelector:selector=>boundary.prefixSuffix&&['.mat-form-field-prefix','.mat-form-field-suffix'].includes(selector)?{getBoundingClientRect:()=>({width:30})}:null};
  const label={textContent:'Label',children:[{get offsetWidth(){return labelWidth;},getBoundingClientRect:()=>({left:labelStart,right:labelRight})}]};
  class ProtocolColor{constructor(element){this._elementRef=element;this.color=this.defaultColor='primary';}}
  const exports={},values={_MatFormFieldBase:ProtocolColor,Subject:rx.Subject,Subscription:rx.Subscription,merge:rx.merge,fromEvent:rx.fromEvent,
  filter:ops.filter,map:ops.map,pairwise:ops.pairwise,startWith:ops.startWith,take:ops.take,takeUntil:ops.takeUntil,
- afterFormFieldRender:helper(helperJs),legacyAnimationsDisabled:()=>true,document:doc};
+ afterFormFieldRender:helper(helperJs),legacyAnimationsDisabled:()=>true,document:doc,
+ getShadowRoot:()=>currentRoot??null};
  new Function('exports',...Object.keys(values),js)(exports,...Object.values(values));
  const cdr=shell?.changeDetectorRef??{markForCheck(){},detectChanges(){}},dir={value:'ltr',change:new rx.Subject()},args=[new core.ElementRef(native),cdr,dir,{appearance:'outline'},{isBrowser:true},zone,'NoopAnimations'];
  if(injector!=null)args.push(injector);const instance=new exports.MatLegacyFormField(...args);
@@ -124,7 +142,27 @@ function fixture(js=payload.candidate,helperJs=payload.helper,injector=app?.inje
   _hintChildren:query(),_errorChildren:query(),_labelChildNonStatic:{},_connectionContainerRef:new core.ElementRef(container),_label:new core.ElementRef(label)});
  return{instance,dir,starts,gaps,counts:()=>writes,snapshot:()=>({start:starts.map(n=>n.style.width??null),gap:gaps.map(n=>n.style.width??null)}),
   prefix(){labelStart=150;labelRight=230;instance._prefixChildren.notifyOnChanges();},hide(){visible=false;},show(){visible=true;},
-  detach(){attached=false;},attach(){attached=true;},empty(){label.textContent='';},rtl(){dir.value='rtl';labelRight=280;instance._prefixChildren.notifyOnChanges();}};
+  detach(){attached=false;},attach(){attached=true;},empty(){label.textContent='';},rtl(){dir.value='rtl';labelRight=280;instance._prefixChildren.notifyOnChanges();},
+  reparent(){currentRoot=shadowB;labelWidth=120;}};
+}
+function geometry(js=payload.candidate){
+ const rows=[];
+ for(const [id,boundary,expected]of [
+  ['long-prefix-suffix',{labelWidth:640,width:200,prefixSuffix:true},{start:['15px','15px'],gap:['490px','490px']}],
+  ['fixed-host',{fixed:true},{start:['15px','15px'],gap:['70px','70px']}],
+  ['document-fallback',{noRootMethod:true},{start:['15px','15px'],gap:['70px','70px']}],
+  ['detached-fallback',{noRootMethod:true,detached:true},{start:[null,null],gap:[null,null]}],
+  ['detached-root',{detached:true},{start:[null,null],gap:[null,null]}],
+  ['shadow-reparent',{shadow:true},{start:['15px','15px'],gap:['70px','70px']}],
+ ]){
+  const f=fixture(js,payload.helper,null,boundary);
+  try{
+   f.instance.updateOutlineGap();assert.deepEqual(f.snapshot(),expected,'tagged-geometry-'+id);
+   if(boundary.shadow){f.reparent();f.instance.updateOutlineGap();assert.deepEqual(f.snapshot().gap,['100px','100px'],'tagged-geometry-reparented-shadow');}
+   rows.push({id,snapshot:f.snapshot()});
+  }finally{f.instance.ngOnDestroy();}
+ }
+ return rows;
 }
 const drain=()=>new Promise(resolve=>setTimeout(resolve,0));function render(){shell?.changeDetectorRef.markForCheck();app?.tick();}
 function turn(fn){zone.run(()=>{fn();${mode==='zoneful'?"render();":''}});render();}
@@ -146,18 +184,24 @@ async function errorCleanup(js){let active=0;const emitter=zone.onStable,subscri
 try{
  const old=await sequence(payload.original,payload.helper,app?.injector,${mode==='zoneful'}),candidate=await sequence();${mode==='zoneful'?'assert.deepEqual(candidate,old);':''}
  await canceled();await errorCleanup(payload.helper);let manual=null;${mode==='zoneful'?"manual=await sequence(payload.candidate,payload.helper,null);assert.deepEqual(manual,old);":''}
+ const geometryReference=geometry(payload.original),geometryCandidate=geometry();assert.deepEqual(geometryCandidate,geometryReference);
  const mutations=[];${model.line!=='original'?`
- const reject=async(id,op,message)=>{await assert.rejects(op,error=>error.code==='ERR_ASSERTION'&&error.message.startsWith(message));mutations.push({id,rejected:true});};
+ const reject=async(id,op,message)=>{await assert.rejects(async()=>op(),error=>error.code==='ERR_ASSERTION'&&error.message.startsWith(message));mutations.push({id,rejected:true});};
  if(${mode==='zoneless'}){
   await reject('prior-zone-only-outline-wait',()=>sequence(payload.mutations.priorWait),'initial-outline');
   await reject('destroy-without-render-unsubscribe',()=>canceled(payload.mutations.noDestroy),'canceled-continuous-render-hook');
   await reject('retained-continuous-render-handle',()=>canceled(payload.candidate,payload.mutations.leakedRender),'canceled-continuous-render-hook');
  }else await reject('removed-stability-guard',()=>sequence(payload.candidate,payload.mutations.premature),'zoneful-render-cannot-preempt-stability');
+ await reject('pre-existing-notch-cap',()=>geometry(payload.mutations.priorGeometry),'tagged-geometry-long-prefix-suffix');
+ await reject('visible-offset-parent-only',()=>geometry(payload.mutations.visibleOffsetParent),'tagged-geometry-fixed-host');
+ await reject('cached-shadow-root',()=>geometry(payload.mutations.staleShadowRoot),'tagged-geometry-reparented-shadow');
+ await reject('missing-document-fallback',()=>geometry(payload.mutations.noFallback),'tagged-geometry-document-fallback');
+ await reject('lost-historical-label-scale',()=>geometry(payload.mutations.noLabelScale),'tagged-geometry-long-prefix-suffix');
  await reject('continuous-hook-reduced-to-once',()=>sequence(payload.candidate,payload.mutations.oneShot),'prefix-outline-updated');
  await reject('idle-render-forces-measurement',()=>sequence(payload.mutations.noFlag),'idle-render-does-no-gap-work');
  await reject('lookup-error-leaks-zone-subscription',()=>errorCleanup(payload.mutations.noErrorCleanup),'lookup-error-cleans-zone-subscription');
  `:''}
- console.log(JSON.stringify({old,candidate,manual,callbacks,mutations,genuine_public_application:!!app,
+ console.log(JSON.stringify({old,candidate,manual,callbacks,geometryReference,geometryCandidate,mutations,genuine_public_application:!!app,
   whole_source_constructors_replayed:true,actual_legacy_traits_node_DI_or_DOM_qualified:false,native_executed:false}));
 }finally{shell?.destroy();app?.destroy();core.destroyPlatform();}
 `;
@@ -168,8 +212,8 @@ try{
  const report={schema_version:1,line:JSON.parse(read('projects/ngx-material-legacy/package.json')).version.startsWith('21.')?'21.x':'main',sources:Object.values(paths).map(path=>({path,sha256:hash(read(path))})),
   reference:{path:originalPath,sha256:hash(original)},node:process.version,binding_parser:ts.version,namespace_capsule_sha256:loaded.capsule_hash,results,public_contracts:contracts,
   constructor_change:{original_parameters:7,current_parameters:8,old_parameters_and_authored_body_identical:true,new_optional_trailing_Injector:true,actual_node_DI_compiled_or_executed:false},
-  existing_geometry_methods_unchanged:true,type_compilation:{compiler:compiler.version,compiler_source_sha256:hash(readFileSync(compilerPath)),subjects:types},
-  scope:'Complete original/owned field constructor and members with a protocol color-trait parent; Angular decorators removed. Genuine public NgZone/QueryList/FormControl and current public application/continuous render hook. A real Angular OnPush shell/view and ChangeDetectorRef drive current render cycles with a protocol renderer; this is not a legacy field Angular view. Control wrapper, DOM geometry/styles/document attachment, direction and disabled-motion policy are protocols; original uses a change-detector protocol. Original standard geometry is exercised independently; candidate pre-existing notch cap and visible-offset-parent rule are unchanged, not universally qualified. No actual legacy traits/node DI/AOT/packed/native geometry, consumer builds or Rx/Node floor qualification.',
+  geometry_methods_equal_immutable_tag:true,type_compilation:{compiler:compiler.version,compiler_source_sha256:hash(readFileSync(compilerPath)),subjects:types},
+  scope:'Complete original/owned field constructor and members with a protocol color-trait parent; Angular decorators removed. Genuine public NgZone/QueryList/FormControl and current public application/continuous render hook. A real Angular OnPush shell/view and ChangeDetectorRef drive current render cycles with a protocol renderer; this is not a legacy field Angular view. Control wrapper, DOM geometry/styles/document attachment, direction and disabled-motion policy are protocols; original uses a change-detector protocol. Original standard geometry is exercised independently; candidate geometry methods match the immutable tagged methods; long-label/prefix/suffix, fixed offset-parent, document fallback, detachment and shadow reparenting are protocol observations, not native DOM qualification. No actual legacy traits/node DI/AOT/packed/native geometry, consumer builds or Rx/Node floor qualification.',
   native_or_actual_legacy_instances_qualified:false,g11_claim:'not-passed'};assert.equal(results.length,10);
  if(process.argv[2])writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({line:report.line,subjects:10,mutation_rejections:results.flatMap(r=>r.mutations).length,compiler:compiler.version,native_executed:false,actual_legacy_instances_qualified:false}));
 }finally{loaded.dispose();}
