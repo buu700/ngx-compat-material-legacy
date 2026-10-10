@@ -250,7 +250,7 @@
           let completed = false, observation;
           Promise.resolve().then(() => lab.finishRippleFrame()).then(value => {observation = value; completed = true;},
             error => {observation = {error: String(error)}; completed = true;});
-          waitFor(() => completed ? {observation} : null, 2000, result => {
+          waitFor(() => completed ? {observation} : null, 3000, result => {
             if (window.__status !== owner) return;
             const ripple = result && result.observation;
             finish(legacyRippleDelegationLifetimeNativeOkay(ripple), 'mat-pseudo-checkbox-checked; owned ripple native ' + JSON.stringify(ripple));

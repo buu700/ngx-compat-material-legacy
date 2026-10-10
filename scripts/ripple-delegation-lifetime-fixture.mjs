@@ -101,6 +101,11 @@ export class RippleDelegationLab {
           };
           ref.element.addEventListener('transitionend', ended as EventListener);
           this.cleanup.push(() => ref.element.removeEventListener('transitionend', ended as EventListener));
+          if (this.phase === 'held-missing-transition') {
+            const suppress = (event: Event) => event.stopImmediatePropagation();
+            ref.element.addEventListener('transitionend', suppress, true);
+            this.cleanup.push(() => ref.element.removeEventListener('transitionend', suppress, true));
+          }
           this.rows.push(row); return ref;
         };
         this.cleanup.push(() => {renderer.fadeInRipple = original;});
@@ -128,6 +133,17 @@ export class RippleDelegationLab {
       }
       const missing_path_order = this.rows.filter(row => row.phase === 'missing-path').map(row => row.trigger);
       const throwing_path_order = this.rows.filter(row => row.phase === 'throwing-path').map(row => row.trigger);
+      this.renderers.forEach(renderer => renderer.fadeOutAll());
+      await this.sleep(300);
+      this.phase = 'held-missing-transition';
+      this.inner.dispatchEvent(new MouseEvent('mousedown', {bubbles: true, composed: true, detail: 1, buttons: 1,
+        clientX: box.x + box.width / 2, clientY: box.y + box.height / 2}));
+      await this.sleep(400);
+      const held = this.rows.filter(row => row.phase === 'held-missing-transition');
+      const held_past_enter_fallback = held.length === 2 && held.every(row => row.ref.state === LegacyRippleState.VISIBLE && row.ref.element.isConnected);
+      this.inner.dispatchEvent(new MouseEvent('mouseup', {bubbles: true, composed: true, detail: 1}));
+      await this.sleep(300);
+      const missing_exit_fallback_removed = held.length === 2 && held.every(row => row.ref.state === LegacyRippleState.HIDDEN && !row.ref.element.isConnected);
       this.renderers.forEach(renderer => renderer._removeTriggerEvents());
       const callsBefore = this.rows.length;
       this.phase = 'removed';
@@ -141,7 +157,8 @@ export class RippleDelegationLab {
       const observation = {actual_owned_renderers: this.renderers.length, actual_view_created: true,
         trusted_mousedown_events: this.trustedDown, owned_listener_adds: this.listenerAdds,
         owned_listener_removes: this.listenerRemoves, owned_listener_balance: Array.from(this.listenerBalance.values()).reduce((sum, handlers) => sum + handlers.size, 0), trusted_order: trusted.map(row => row.trigger), native_motion,
-        missing_path_order, throwing_path_order, calls_after_removal, controlled_ripples_removed,
+        missing_path_order, throwing_path_order, held_past_enter_fallback, missing_exit_fallback_removed,
+        calls_after_removal, controlled_ripples_removed,
         view_destroyed: this.view.destroyed, host_removed: !this.outer.isConnected,
         uncaught_window_errors: this.errors.length, actual_angular_hydration_replay_executed: false};
       this.result.set(JSON.stringify(observation)); return observation;
@@ -217,6 +234,7 @@ export function legacyRippleDelegationLifetimeNativeOkay(o) {
   return !!o && !o.error && o.actual_owned_renderers === 2 && o.actual_view_created === true && o.trusted_mousedown_events === 1 &&
     o.owned_listener_adds === 2 && o.owned_listener_removes === 2 && o.owned_listener_balance === 0 &&
     order(o.trusted_order) && order(o.missing_path_order) && order(o.throwing_path_order) &&
+    o.held_past_enter_fallback === true && o.missing_exit_fallback_removed === true &&
     Array.isArray(o.native_motion) && o.native_motion.length === 2 && order(o.native_motion.map(row => row.trigger)) && o.native_motion.every(motion) &&
     o.calls_after_removal === 0 && o.controlled_ripples_removed === true && o.view_destroyed === true && o.host_removed === true &&
     o.uncaught_window_errors === 0 && o.actual_angular_hydration_replay_executed === false;

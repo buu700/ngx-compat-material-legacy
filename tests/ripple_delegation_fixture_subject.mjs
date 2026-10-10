@@ -56,20 +56,21 @@ const delegate={handleEvent(event){const entries=[...active];if(variant==='rever
  for(const[node,ripple]of entries)if(node.contains(event.target))ripple.fadeInRipple(event.clientX,event.clientY,{});}};
 class RefProtocol{constructor(element){this.element=element;this.state=0;}fadeOut(){}}
 class RippleProtocol{
- constructor(_target,zone,node){this.zone=zone;this.node=node;this.refs=[];}
- setupTriggerEvents(node){if(!active.size)this.zone.runOutsideAngular(()=>{for(const type of['mousedown','touchstart'])document.addEventListener(type,delegate,{capture:true,passive:true});registrations+=2;});active.set(node,this);}
+ constructor(_target,zone,node){this.zone=zone;this.node=node;this.refs=[];this.up=()=>{for(const ref of this.refs)if(ref.held&&ref.state===1)clockTimeout(()=>{ref.state=3;ref.element.remove();},250);};}
+ setupTriggerEvents(node){if(!active.size)this.zone.runOutsideAngular(()=>{for(const type of['mousedown','touchstart'])document.addEventListener(type,delegate,{capture:true,passive:true});registrations+=2;});active.set(node,this);node.addEventListener('mouseup',this.up);}
  fadeInRipple(){const node=new ElementProtocol('ripple');node.style.transitionDuration='225ms';insert(this.node,node);const ref=new RefProtocol(node);this.refs.push(ref);
-  clockTimeout(()=>{if(variant!=='no-motion')node.emit({type:'transitionend',target:node,isTrusted:true,propertyName:'transform',elapsedTime:0.225});
+  clockTimeout(()=>{if(child.instance.phase==='held-missing-transition'){ref.held=true;ref.state=1;return;}
+   if(variant!=='no-motion')node.emit({type:'transitionend',target:node,isTrusted:true,propertyName:'transform',elapsedTime:0.225});
    clockTimeout(()=>{ref.state=3;node.remove();if(variant!=='no-motion')node.emit({type:'transitionend',target:node,isTrusted:true,propertyName:'opacity',elapsedTime:0.15});},150);},225);
   return ref;}
- _removeTriggerEvents(){active.delete(this.node);if(!active.size&&variant!=='missing-remove')for(const type of['mousedown','touchstart'])document.removeEventListener(type,delegate,true);}
+ _removeTriggerEvents(){active.delete(this.node);this.node.removeEventListener('mouseup',this.up);if(!active.size&&variant!=='missing-remove')for(const type of['mousedown','touchstart'])document.removeEventListener(type,delegate,true);}
  fadeOutAll(){for(const ref of this.refs){ref.state=3;ref.element.remove();}}
 }
 const exported={};
 new Function('exports','Component','ViewChild','TemplateRef','ViewContainerRef','ElementRef','NgZone','Injector','inject','signal','afterNextRender','Platform',
  'LegacyRippleRenderer','LegacyRippleRef','LegacyRippleState','HTMLElement','document','window','location','MouseEvent','getComputedStyle','performance','setTimeout','clearTimeout',payload.fixture)
  (exported,core.Component,core.ViewChild,core.TemplateRef,core.ViewContainerRef,core.ElementRef,core.NgZone,core.Injector,core.inject,core.signal,core.afterNextRender,platform.Platform,
- RippleProtocol,RefProtocol,{HIDDEN:3},ElementProtocol,document,window,location,MouseProtocol,
+ RippleProtocol,RefProtocol,{VISIBLE:1,HIDDEN:3},ElementProtocol,document,window,location,MouseProtocol,
  ()=>({transitionProperty:'opacity, transform',transitionDuration:'0.225s'}),{now:()=>now},clockTimeout,clockClear);
 class FixtureModule{}
 core.NgModule({declarations:[exported.RippleDelegationLab,exported.RippleDelegationFrameLab]})(FixtureModule);
