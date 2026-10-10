@@ -20,6 +20,7 @@ import {validateCurrentAdvisories} from './upstream-advisory-admission.mjs';
 import {spawnSync} from 'node:child_process';
 import {BUILD_SCOPE_ROLE,BUILD_SCOPE_PATCHES,buildScopeEvidenceOk} from './upstream-build-scope-evidence.mjs';
 import {TEST_CONSOLIDATION_ROLE,TEST_CONSOLIDATION_PATCHES,testConsolidationBatchOk,testConsolidationEntryOk} from './upstream-test-consolidation-evidence.mjs';
+import {COMMENT_SCOPE_ROLE,COMMENT_SHAS,commentScopeEvidenceOk} from './upstream-comment-review.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -137,6 +138,10 @@ function evidenceClass(entry) {
   if (rel.endsWith('.json')) {
     const body = evidenceJson(file);
     if (!body || typeof body !== 'object') return 'unreadable';
+    if (COMMENT_SHAS.includes(entry.sha) || body.role === COMMENT_SCOPE_ROLE) {
+      const readMember = rel => {const member = regularRepoMember(rel); return member ? readFileSync(member) : null;};
+      if (!commentScopeEvidenceOk(body, entry, readMember, line || body.line)) return 'invalid-comment-scope';
+    }
     if(consolidationScope||body.role===TEST_CONSOLIDATION_ROLE){
       const readMember=rel=>{const member=regularRepoMember(rel);return member?readFileSync(member):null;};
       if(!testConsolidationCache.has(file))testConsolidationCache.set(file,testConsolidationBatchOk(body,readMember,currentProductPaths()));
