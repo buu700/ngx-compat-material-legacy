@@ -6,7 +6,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {Injector, runInInjectionContext} from '@angular/core';
+import {Injector, runInInjectionContext, type ProviderToken} from '@angular/core';
 
 /** A bounded context borrows supplied objects without registering destroy hooks. */
 class BorrowedDependencyInjector extends Injector {
@@ -14,7 +14,7 @@ class BorrowedDependencyInjector extends Injector {
     super();
   }
 
-  override get(token: any, notFoundValue?: any): any {
+  override get(token: ProviderToken<unknown>, notFoundValue?: any): any {
     if (this.values.has(token)) return this.values.get(token);
     return Injector.NULL.get(token, notFoundValue);
   }

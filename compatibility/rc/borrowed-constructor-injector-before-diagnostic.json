@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "role": "Before annotation repair: exact NULL fallback overload comparison, not runtime regression or consumer failure",
+  "compiler": "5.9.3",
+  "node": "v22.23.3",
+  "source": {
+    "path": "projects/ngx-material-legacy/internal/public-constructor-context.ts",
+    "sha256": "5fc78b1916b5a189a64e5ab68a810b1304a742c6f084a327cd1f3bbdcf4c27dd",
+    "text": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\nimport {Injector, runInInjectionContext} from '@angular/core';\n\n/** A bounded context borrows supplied objects without registering destroy hooks. */\nclass BorrowedDependencyInjector extends Injector {\n  constructor(private readonly values: Map<unknown, unknown>) {\n    super();\n  }\n\n  override get(token: any, notFoundValue?: any): any {\n    if (this.values.has(token)) return this.values.get(token);\n    return Injector.NULL.get(token, notFoundValue);\n  }\n}\n\n/**\n * Construct the public parent with exactly the original supplied dependencies.\n * Only use for owned subclasses with no emitted instance fields/parameter\n * properties: returning this object skips their own instance initializers.\n * Supplied objects belong to the caller; this context must never destroy them.\n */\nexport function constructWithPublicDependencies<T>(parent: new () => T, target: Function, providers: {provide: unknown; useValue: unknown}[]): T {\n  const context = new BorrowedDependencyInjector(new Map(providers.map(({provide, useValue}) => [provide, useValue])));\n  return runInInjectionContext(context, () => Reflect.construct(parent, [], target));\n}\n",
+    "emitted_sha256": "caa2330e1870f731b556d44791c8de4b1551c4de26fec714f7af289407d3703a"
+  },
+  "results": [
+    {
+      "line": "original",
+      "call": "Injector.NULL.get(token, notFoundValue)",
+      "resolved_signature": "abstract get(token: any, notFoundValue?: any): any;",
+      "deprecated": true
+    },
+    {
+      "line": "main",
+      "call": "Injector.NULL.get(token, notFoundValue)",
+      "resolved_signature": "abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions): T;",
+      "deprecated": false
+    },
+    {
+      "line": "21.x",
+      "call": "Injector.NULL.get(token, notFoundValue)",
+      "resolved_signature": "abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions): T;",
+      "deprecated": false
+    }
+  ],
+  "namespace_capsule_sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3",
+  "g11_claim": "not-passed"
+}

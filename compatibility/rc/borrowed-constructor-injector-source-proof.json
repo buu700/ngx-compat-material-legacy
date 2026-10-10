@@ -1,0 +1,1123 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "node": "v22.23.3",
+  "compiler": "5.9.3",
+  "emitted_javascript_unchanged": true,
+  "emitted_sha256": "caa2330e1870f731b556d44791c8de4b1551c4de26fec714f7af289407d3703a",
+  "helpers": [
+    {
+      "path": "projects/ngx-material-legacy/internal/public-constructor-context.ts",
+      "sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef",
+      "source": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\nimport {Injector, runInInjectionContext, type ProviderToken} from '@angular/core';\n\n/** A bounded context borrows supplied objects without registering destroy hooks. */\nclass BorrowedDependencyInjector extends Injector {\n  constructor(private readonly values: Map<unknown, unknown>) {\n    super();\n  }\n\n  override get(token: ProviderToken<unknown>, notFoundValue?: any): any {\n    if (this.values.has(token)) return this.values.get(token);\n    return Injector.NULL.get(token, notFoundValue);\n  }\n}\n\n/**\n * Construct the public parent with exactly the original supplied dependencies.\n * Only use for owned subclasses with no emitted instance fields/parameter\n * properties: returning this object skips their own instance initializers.\n * Supplied objects belong to the caller; this context must never destroy them.\n */\nexport function constructWithPublicDependencies<T>(parent: new () => T, target: Function, providers: {provide: unknown; useValue: unknown}[]): T {\n  const context = new BorrowedDependencyInjector(new Map(providers.map(({provide, useValue}) => [provide, useValue])));\n  return runInInjectionContext(context, () => Reflect.construct(parent, [], target));\n}\n",
+      "production_callers": []
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/internal/public-constructor-context.ts",
+      "sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef",
+      "source": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\nimport {Injector, runInInjectionContext, type ProviderToken} from '@angular/core';\n\n/** A bounded context borrows supplied objects without registering destroy hooks. */\nclass BorrowedDependencyInjector extends Injector {\n  constructor(private readonly values: Map<unknown, unknown>) {\n    super();\n  }\n\n  override get(token: ProviderToken<unknown>, notFoundValue?: any): any {\n    if (this.values.has(token)) return this.values.get(token);\n    return Injector.NULL.get(token, notFoundValue);\n  }\n}\n\n/**\n * Construct the public parent with exactly the original supplied dependencies.\n * Only use for owned subclasses with no emitted instance fields/parameter\n * properties: returning this object skips their own instance initializers.\n * Supplied objects belong to the caller; this context must never destroy them.\n */\nexport function constructWithPublicDependencies<T>(parent: new () => T, target: Function, providers: {provide: unknown; useValue: unknown}[]): T {\n  const context = new BorrowedDependencyInjector(new Map(providers.map(({provide, useValue}) => [provide, useValue])));\n  return runInInjectionContext(context, () => Reflect.construct(parent, [], target));\n}\n",
+      "production_callers": [
+        "MatLegacyHeaderRowDef",
+        "MatLegacyFooterRowDef",
+        "MatLegacyRowDef",
+        "MatLegacyNoDataRow",
+        "MatLegacyTextColumn",
+        "MatLegacyCellDef",
+        "MatLegacyHeaderCellDef",
+        "MatLegacyFooterCellDef",
+        "MatLegacyColumnDef",
+        "MatLegacyHeaderCell",
+        "MatLegacyFooterCell",
+        "MatLegacyCell"
+      ]
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/internal/public-constructor-context.ts",
+      "sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef",
+      "source": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\nimport {Injector, runInInjectionContext, type ProviderToken} from '@angular/core';\n\n/** A bounded context borrows supplied objects without registering destroy hooks. */\nclass BorrowedDependencyInjector extends Injector {\n  constructor(private readonly values: Map<unknown, unknown>) {\n    super();\n  }\n\n  override get(token: ProviderToken<unknown>, notFoundValue?: any): any {\n    if (this.values.has(token)) return this.values.get(token);\n    return Injector.NULL.get(token, notFoundValue);\n  }\n}\n\n/**\n * Construct the public parent with exactly the original supplied dependencies.\n * Only use for owned subclasses with no emitted instance fields/parameter\n * properties: returning this object skips their own instance initializers.\n * Supplied objects belong to the caller; this context must never destroy them.\n */\nexport function constructWithPublicDependencies<T>(parent: new () => T, target: Function, providers: {provide: unknown; useValue: unknown}[]): T {\n  const context = new BorrowedDependencyInjector(new Map(providers.map(({provide, useValue}) => [provide, useValue])));\n  return runInInjectionContext(context, () => Reflect.construct(parent, [], target));\n}\n",
+      "production_callers": [
+        "MatLegacyTabContent",
+        "MatLegacyTabLabel"
+      ]
+    }
+  ],
+  "callers": [
+    {
+      "file": "legacy-tabs/tab-content.ts",
+      "source_sha256": "256886c4891ad0b7e6833e795e0e7586855cd6704b48b658b89490e4aeba0478",
+      "class": "MatLegacyTabContent",
+      "helper": "legacy-tabs/internal/public-constructor-context.ts",
+      "parent": "MatNonLegacyTabContent",
+      "providers": "[\n      {provide: TemplateRef, useValue: template},\n    ]",
+      "constructor": "constructor(template: TemplateRef<any>) {\n    return constructWithPublicDependencies(MatNonLegacyTabContent, new.target, [\n      {provide: TemplateRef, useValue: template},\n    ]);\n  }"
+    },
+    {
+      "file": "legacy-tabs/tab-label.ts",
+      "source_sha256": "5ff08854377bb33070d69ee6fb4f7a346d37bebf4aefb6f0fd7a48f6a98621ff",
+      "class": "MatLegacyTabLabel",
+      "helper": "legacy-tabs/internal/public-constructor-context.ts",
+      "parent": "MatNonLegacyTabLabel",
+      "providers": "[\n      {provide: TemplateRef, useValue: templateRef},\n      {provide: ViewContainerRef, useValue: viewContainerRef},\n    ]",
+      "constructor": "constructor(@Inject(TemplateRef) templateRef: TemplateRef<any>,\n      @Inject(ViewContainerRef) viewContainerRef: ViewContainerRef,\n      @Optional() @Inject(MAT_TAB) closestTab: any) {\n    const label = constructWithPublicDependencies(MatNonLegacyTabLabel, new.target, [\n      {provide: TemplateRef, useValue: templateRef},\n      {provide: ViewContainerRef, useValue: viewContainerRef},\n    ]);\n    label._closestTab = closestTab;\n    return label;\n  }"
+    },
+    {
+      "file": "legacy-table/row.ts",
+      "source_sha256": "c9fa4b3b1c42eda48baf88a4f89922f8aafe388aa1980ebbe4d73ee9713c20fa",
+      "class": "MatLegacyHeaderRowDef",
+      "helper": "legacy-table/internal/public-constructor-context.ts",
+      "parent": "CdkHeaderRowDef",
+      "providers": "[\n      {provide: TemplateRef, useValue: template},\n      {provide: IterableDiffers, useValue: differs},\n    ]",
+      "constructor": "constructor(template: TemplateRef<any>, differs: IterableDiffers,\n      @Optional() @Inject(CdkTable) table?: any) {\n    const definition = constructWithPublicDependencies(CdkHeaderRowDef, new.target, [\n      {provide: TemplateRef, useValue: template},\n      {provide: IterableDiffers, useValue: differs},\n    ]);\n    definition._table = table;\n    return definition;\n  }"
+    },
+    {
+      "file": "legacy-table/row.ts",
+      "source_sha256": "c9fa4b3b1c42eda48baf88a4f89922f8aafe388aa1980ebbe4d73ee9713c20fa",
+      "class": "MatLegacyFooterRowDef",
+      "helper": "legacy-table/internal/public-constructor-context.ts",
+      "parent": "CdkFooterRowDef",
+      "providers": "[\n      {provide: TemplateRef, useValue: template},\n      {provide: IterableDiffers, useValue: differs},\n    ]",
+      "constructor": "constructor(template: TemplateRef<any>, differs: IterableDiffers,\n      @Optional() @Inject(CdkTable) table?: any) {\n    const definition = constructWithPublicDependencies(CdkFooterRowDef, new.target, [\n      {provide: TemplateRef, useValue: template},\n      {provide: IterableDiffers, useValue: differs},\n    ]);\n    definition._table = table;\n    return definition;\n  }"
+    },
+    {
+      "file": "legacy-table/row.ts",
+      "source_sha256": "c9fa4b3b1c42eda48baf88a4f89922f8aafe388aa1980ebbe4d73ee9713c20fa",
+      "class": "MatLegacyRowDef",
+      "helper": "legacy-table/internal/public-constructor-context.ts",
+      "parent": "CdkRowDef",
+      "providers": "[\n      {provide: TemplateRef, useValue: template},\n      {provide: IterableDiffers, useValue: differs},\n    ]",
+      "constructor": "constructor(template: TemplateRef<any>, differs: IterableDiffers,\n      @Optional() @Inject(CdkTable) table?: any) {\n    const definition = constructWithPublicDependencies(CdkRowDef, new.target, [\n      {provide: TemplateRef, useValue: template},\n      {provide: IterableDiffers, useValue: differs},\n    ]);\n    definition._table = table;\n    return definition as MatLegacyRowDef<T>;\n  }"
+    },
+    {
+      "file": "legacy-table/row.ts",
+      "source_sha256": "c9fa4b3b1c42eda48baf88a4f89922f8aafe388aa1980ebbe4d73ee9713c20fa",
+      "class": "MatLegacyNoDataRow",
+      "helper": "legacy-table/internal/public-constructor-context.ts",
+      "parent": "CdkNoDataRow",
+      "providers": "[\n      {provide: TemplateRef, useValue: templateRef},\n    ]",
+      "constructor": "constructor(templateRef: TemplateRef<any>) {\n    const row = constructWithPublicDependencies(CdkNoDataRow, new.target, [\n      {provide: TemplateRef, useValue: templateRef},\n    ]) as MatLegacyNoDataRow;\n    row._contentClassName = 'mat-no-data-row';\n    row._contentClassNames = ['mat-no-data-row'];\n    return row;\n  }"
+    },
+    {
+      "file": "legacy-table/text-column.ts",
+      "source_sha256": "157c01cc18f67ff7e499442e6f16a7a23ec08284d069b2318a5d8bae11dc4431",
+      "class": "MatLegacyTextColumn",
+      "helper": "legacy-table/internal/public-constructor-context.ts",
+      "parent": "CdkTextColumn<T>",
+      "providers": "[\n      {provide: CdkTable, useValue: table},\n      {provide: TEXT_COLUMN_OPTIONS, useValue: options},\n    ]",
+      "constructor": "constructor(@Optional() table: CdkTable<T>, @Optional() @Inject(TEXT_COLUMN_OPTIONS) options: TextColumnOptions<T>) {\n    return constructWithPublicDependencies(CdkTextColumn<T>, new.target, [\n      {provide: CdkTable, useValue: table},\n      {provide: TEXT_COLUMN_OPTIONS, useValue: options},\n    ]);\n  }"
+    },
+    {
+      "file": "legacy-table/cell.ts",
+      "source_sha256": "17dfbe36aca2aea11ef1c84c700b4c3eab703a66643d82753a07b706e9b8b09c",
+      "class": "MatLegacyCellDef",
+      "helper": "legacy-table/internal/public-constructor-context.ts",
+      "parent": "CdkCellDef",
+      "providers": "[{provide: TemplateRef, useValue: template}]",
+      "constructor": "constructor(template: TemplateRef<any>) {\n    return constructWithPublicDependencies(CdkCellDef, new.target, [{provide: TemplateRef, useValue: template}]);\n  }"
+    },
+    {
+      "file": "legacy-table/cell.ts",
+      "source_sha256": "17dfbe36aca2aea11ef1c84c700b4c3eab703a66643d82753a07b706e9b8b09c",
+      "class": "MatLegacyHeaderCellDef",
+      "helper": "legacy-table/internal/public-constructor-context.ts",
+      "parent": "CdkHeaderCellDef",
+      "providers": "[{provide: TemplateRef, useValue: template}]",
+      "constructor": "constructor(template: TemplateRef<any>) {\n    return constructWithPublicDependencies(CdkHeaderCellDef, new.target, [{provide: TemplateRef, useValue: template}]);\n  }"
+    },
+    {
+      "file": "legacy-table/cell.ts",
+      "source_sha256": "17dfbe36aca2aea11ef1c84c700b4c3eab703a66643d82753a07b706e9b8b09c",
+      "class": "MatLegacyFooterCellDef",
+      "helper": "legacy-table/internal/public-constructor-context.ts",
+      "parent": "CdkFooterCellDef",
+      "providers": "[{provide: TemplateRef, useValue: template}]",
+      "constructor": "constructor(template: TemplateRef<any>) {\n    return constructWithPublicDependencies(CdkFooterCellDef, new.target, [{provide: TemplateRef, useValue: template}]);\n  }"
+    },
+    {
+      "file": "legacy-table/cell.ts",
+      "source_sha256": "17dfbe36aca2aea11ef1c84c700b4c3eab703a66643d82753a07b706e9b8b09c",
+      "class": "MatLegacyColumnDef",
+      "helper": "legacy-table/internal/public-constructor-context.ts",
+      "parent": "CdkColumnDef",
+      "providers": "[]",
+      "constructor": "constructor(@Optional() @Inject(CdkTable) table?: any) {\n    const definition = constructWithPublicDependencies(CdkColumnDef, new.target, []);\n    definition._table = table;\n    return definition as MatLegacyColumnDef;\n  }"
+    },
+    {
+      "file": "legacy-table/cell.ts",
+      "source_sha256": "17dfbe36aca2aea11ef1c84c700b4c3eab703a66643d82753a07b706e9b8b09c",
+      "class": "MatLegacyHeaderCell",
+      "helper": "legacy-table/internal/public-constructor-context.ts",
+      "parent": "CdkHeaderCell",
+      "providers": "[\n      {provide: CdkColumnDef, useValue: columnDef},\n      {provide: ElementRef, useValue: elementRef},\n    ]",
+      "constructor": "constructor(columnDef: CdkColumnDef, elementRef: ElementRef) {\n    return constructWithPublicDependencies(CdkHeaderCell, new.target, [\n      {provide: CdkColumnDef, useValue: columnDef},\n      {provide: ElementRef, useValue: elementRef},\n    ]);\n  }"
+    },
+    {
+      "file": "legacy-table/cell.ts",
+      "source_sha256": "17dfbe36aca2aea11ef1c84c700b4c3eab703a66643d82753a07b706e9b8b09c",
+      "class": "MatLegacyFooterCell",
+      "helper": "legacy-table/internal/public-constructor-context.ts",
+      "parent": "CdkFooterCell",
+      "providers": "[\n      {provide: CdkColumnDef, useValue: columnDef},\n      {provide: ElementRef, useValue: elementRef},\n    ]",
+      "constructor": "constructor(columnDef: CdkColumnDef, elementRef: ElementRef) {\n    return constructWithPublicDependencies(CdkFooterCell, new.target, [\n      {provide: CdkColumnDef, useValue: columnDef},\n      {provide: ElementRef, useValue: elementRef},\n    ]);\n  }"
+    },
+    {
+      "file": "legacy-table/cell.ts",
+      "source_sha256": "17dfbe36aca2aea11ef1c84c700b4c3eab703a66643d82753a07b706e9b8b09c",
+      "class": "MatLegacyCell",
+      "helper": "legacy-table/internal/public-constructor-context.ts",
+      "parent": "CdkCell",
+      "providers": "[\n      {provide: CdkColumnDef, useValue: columnDef},\n      {provide: ElementRef, useValue: elementRef},\n    ]",
+      "constructor": "constructor(columnDef: CdkColumnDef, elementRef: ElementRef) {\n    return constructWithPublicDependencies(CdkCell, new.target, [\n      {provide: CdkColumnDef, useValue: columnDef},\n      {provide: ElementRef, useValue: elementRef},\n    ]);\n  }"
+    }
+  ],
+  "types": [
+    {
+      "line": "original",
+      "strict": true,
+      "skipLibCheck": false,
+      "diagnostics": 0,
+      "negative_types": 3,
+      "nondeprecated_fallback_gets": [
+        {
+          "call": "Injector.NULL.get(token, notFoundValue)",
+          "signature": "abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions | InjectFlags): T;"
+        },
+        {
+          "call": "Injector.NULL.get(token, notFoundValue)",
+          "signature": "abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions | InjectFlags): T;"
+        },
+        {
+          "call": "Injector.NULL.get(token, notFoundValue)",
+          "signature": "abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions | InjectFlags): T;"
+        }
+      ]
+    },
+    {
+      "line": "main",
+      "strict": true,
+      "skipLibCheck": false,
+      "diagnostics": 0,
+      "negative_types": 3,
+      "nondeprecated_fallback_gets": [
+        {
+          "call": "Injector.NULL.get(token, notFoundValue)",
+          "signature": "abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions): T;"
+        },
+        {
+          "call": "Injector.NULL.get(token, notFoundValue)",
+          "signature": "abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions): T;"
+        },
+        {
+          "call": "Injector.NULL.get(token, notFoundValue)",
+          "signature": "abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions): T;"
+        }
+      ]
+    },
+    {
+      "line": "21.x",
+      "strict": true,
+      "skipLibCheck": false,
+      "diagnostics": 0,
+      "negative_types": 3,
+      "nondeprecated_fallback_gets": [
+        {
+          "call": "Injector.NULL.get(token, notFoundValue)",
+          "signature": "abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions): T;"
+        },
+        {
+          "call": "Injector.NULL.get(token, notFoundValue)",
+          "signature": "abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions): T;"
+        },
+        {
+          "call": "Injector.NULL.get(token, notFoundValue)",
+          "signature": "abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions): T;"
+        }
+      ]
+    }
+  ],
+  "results": [
+    {
+      "line": "original",
+      "mode": "development",
+      "cases": [
+        {
+          "helper": 0,
+          "id": "exact-borrowed-token-value-and-parent-target-identities"
+        },
+        {
+          "helper": 0,
+          "id": "same-description-token-remains-distinct"
+        },
+        {
+          "helper": 0,
+          "id": "missing-optional-token-null-and-required-token-error"
+        },
+        {
+          "helper": 0,
+          "id": "explicit-null-and-undefined-values-do-not-fall-through"
+        },
+        {
+          "helper": 0,
+          "id": "duplicate-supplied-token-retains-last-map-value"
+        },
+        {
+          "helper": 0,
+          "id": "ambient-context-cannot-replace-manual-values-and-is-restored"
+        },
+        {
+          "helper": 0,
+          "id": "throwing-parent-restores-outer-context-and-does-not-own-values"
+        },
+        {
+          "helper": 0,
+          "id": "parent-initializes-once-and-consumer-derived-fields-run"
+        },
+        {
+          "helper": 0,
+          "id": "hydrated-supplied-services-are-never-registered-for-destruction"
+        },
+        {
+          "helper": 1,
+          "id": "exact-borrowed-token-value-and-parent-target-identities"
+        },
+        {
+          "helper": 1,
+          "id": "same-description-token-remains-distinct"
+        },
+        {
+          "helper": 1,
+          "id": "missing-optional-token-null-and-required-token-error"
+        },
+        {
+          "helper": 1,
+          "id": "explicit-null-and-undefined-values-do-not-fall-through"
+        },
+        {
+          "helper": 1,
+          "id": "duplicate-supplied-token-retains-last-map-value"
+        },
+        {
+          "helper": 1,
+          "id": "ambient-context-cannot-replace-manual-values-and-is-restored"
+        },
+        {
+          "helper": 1,
+          "id": "throwing-parent-restores-outer-context-and-does-not-own-values"
+        },
+        {
+          "helper": 1,
+          "id": "parent-initializes-once-and-consumer-derived-fields-run"
+        },
+        {
+          "helper": 1,
+          "id": "hydrated-supplied-services-are-never-registered-for-destruction"
+        },
+        {
+          "helper": 2,
+          "id": "exact-borrowed-token-value-and-parent-target-identities"
+        },
+        {
+          "helper": 2,
+          "id": "same-description-token-remains-distinct"
+        },
+        {
+          "helper": 2,
+          "id": "missing-optional-token-null-and-required-token-error"
+        },
+        {
+          "helper": 2,
+          "id": "explicit-null-and-undefined-values-do-not-fall-through"
+        },
+        {
+          "helper": 2,
+          "id": "duplicate-supplied-token-retains-last-map-value"
+        },
+        {
+          "helper": 2,
+          "id": "ambient-context-cannot-replace-manual-values-and-is-restored"
+        },
+        {
+          "helper": 2,
+          "id": "throwing-parent-restores-outer-context-and-does-not-own-values"
+        },
+        {
+          "helper": 2,
+          "id": "parent-initializes-once-and-consumer-derived-fields-run"
+        },
+        {
+          "helper": 2,
+          "id": "hydrated-supplied-services-are-never-registered-for-destruction"
+        }
+      ],
+      "whole_helpers_executed": 3,
+      "parent_and_service_values_are_protocols": true,
+      "actual_legacy_components_or_node_DI_executed": false,
+      "g11_claim": "not-passed",
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/cyph/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/cyph/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "original",
+      "mode": "production",
+      "cases": [
+        {
+          "helper": 0,
+          "id": "exact-borrowed-token-value-and-parent-target-identities"
+        },
+        {
+          "helper": 0,
+          "id": "same-description-token-remains-distinct"
+        },
+        {
+          "helper": 0,
+          "id": "missing-optional-token-null-and-required-token-error"
+        },
+        {
+          "helper": 0,
+          "id": "explicit-null-and-undefined-values-do-not-fall-through"
+        },
+        {
+          "helper": 0,
+          "id": "duplicate-supplied-token-retains-last-map-value"
+        },
+        {
+          "helper": 0,
+          "id": "ambient-context-cannot-replace-manual-values-and-is-restored"
+        },
+        {
+          "helper": 0,
+          "id": "throwing-parent-restores-outer-context-and-does-not-own-values"
+        },
+        {
+          "helper": 0,
+          "id": "parent-initializes-once-and-consumer-derived-fields-run"
+        },
+        {
+          "helper": 0,
+          "id": "hydrated-supplied-services-are-never-registered-for-destruction"
+        },
+        {
+          "helper": 1,
+          "id": "exact-borrowed-token-value-and-parent-target-identities"
+        },
+        {
+          "helper": 1,
+          "id": "same-description-token-remains-distinct"
+        },
+        {
+          "helper": 1,
+          "id": "missing-optional-token-null-and-required-token-error"
+        },
+        {
+          "helper": 1,
+          "id": "explicit-null-and-undefined-values-do-not-fall-through"
+        },
+        {
+          "helper": 1,
+          "id": "duplicate-supplied-token-retains-last-map-value"
+        },
+        {
+          "helper": 1,
+          "id": "ambient-context-cannot-replace-manual-values-and-is-restored"
+        },
+        {
+          "helper": 1,
+          "id": "throwing-parent-restores-outer-context-and-does-not-own-values"
+        },
+        {
+          "helper": 1,
+          "id": "parent-initializes-once-and-consumer-derived-fields-run"
+        },
+        {
+          "helper": 1,
+          "id": "hydrated-supplied-services-are-never-registered-for-destruction"
+        },
+        {
+          "helper": 2,
+          "id": "exact-borrowed-token-value-and-parent-target-identities"
+        },
+        {
+          "helper": 2,
+          "id": "same-description-token-remains-distinct"
+        },
+        {
+          "helper": 2,
+          "id": "missing-optional-token-null-and-required-token-error"
+        },
+        {
+          "helper": 2,
+          "id": "explicit-null-and-undefined-values-do-not-fall-through"
+        },
+        {
+          "helper": 2,
+          "id": "duplicate-supplied-token-retains-last-map-value"
+        },
+        {
+          "helper": 2,
+          "id": "ambient-context-cannot-replace-manual-values-and-is-restored"
+        },
+        {
+          "helper": 2,
+          "id": "throwing-parent-restores-outer-context-and-does-not-own-values"
+        },
+        {
+          "helper": 2,
+          "id": "parent-initializes-once-and-consumer-derived-fields-run"
+        },
+        {
+          "helper": 2,
+          "id": "hydrated-supplied-services-are-never-registered-for-destruction"
+        }
+      ],
+      "whole_helpers_executed": 3,
+      "parent_and_service_values_are_protocols": true,
+      "actual_legacy_components_or_node_DI_executed": false,
+      "g11_claim": "not-passed",
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/cyph/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/cyph/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "main",
+      "mode": "development",
+      "cases": [
+        {
+          "helper": 0,
+          "id": "exact-borrowed-token-value-and-parent-target-identities"
+        },
+        {
+          "helper": 0,
+          "id": "same-description-token-remains-distinct"
+        },
+        {
+          "helper": 0,
+          "id": "missing-optional-token-null-and-required-token-error"
+        },
+        {
+          "helper": 0,
+          "id": "explicit-null-and-undefined-values-do-not-fall-through"
+        },
+        {
+          "helper": 0,
+          "id": "duplicate-supplied-token-retains-last-map-value"
+        },
+        {
+          "helper": 0,
+          "id": "ambient-context-cannot-replace-manual-values-and-is-restored"
+        },
+        {
+          "helper": 0,
+          "id": "throwing-parent-restores-outer-context-and-does-not-own-values"
+        },
+        {
+          "helper": 0,
+          "id": "parent-initializes-once-and-consumer-derived-fields-run"
+        },
+        {
+          "helper": 0,
+          "id": "hydrated-supplied-services-are-never-registered-for-destruction"
+        },
+        {
+          "helper": 1,
+          "id": "exact-borrowed-token-value-and-parent-target-identities"
+        },
+        {
+          "helper": 1,
+          "id": "same-description-token-remains-distinct"
+        },
+        {
+          "helper": 1,
+          "id": "missing-optional-token-null-and-required-token-error"
+        },
+        {
+          "helper": 1,
+          "id": "explicit-null-and-undefined-values-do-not-fall-through"
+        },
+        {
+          "helper": 1,
+          "id": "duplicate-supplied-token-retains-last-map-value"
+        },
+        {
+          "helper": 1,
+          "id": "ambient-context-cannot-replace-manual-values-and-is-restored"
+        },
+        {
+          "helper": 1,
+          "id": "throwing-parent-restores-outer-context-and-does-not-own-values"
+        },
+        {
+          "helper": 1,
+          "id": "parent-initializes-once-and-consumer-derived-fields-run"
+        },
+        {
+          "helper": 1,
+          "id": "hydrated-supplied-services-are-never-registered-for-destruction"
+        },
+        {
+          "helper": 2,
+          "id": "exact-borrowed-token-value-and-parent-target-identities"
+        },
+        {
+          "helper": 2,
+          "id": "same-description-token-remains-distinct"
+        },
+        {
+          "helper": 2,
+          "id": "missing-optional-token-null-and-required-token-error"
+        },
+        {
+          "helper": 2,
+          "id": "explicit-null-and-undefined-values-do-not-fall-through"
+        },
+        {
+          "helper": 2,
+          "id": "duplicate-supplied-token-retains-last-map-value"
+        },
+        {
+          "helper": 2,
+          "id": "ambient-context-cannot-replace-manual-values-and-is-restored"
+        },
+        {
+          "helper": 2,
+          "id": "throwing-parent-restores-outer-context-and-does-not-own-values"
+        },
+        {
+          "helper": 2,
+          "id": "parent-initializes-once-and-consumer-derived-fields-run"
+        },
+        {
+          "helper": 2,
+          "id": "hydrated-supplied-services-are-never-registered-for-destruction"
+        }
+      ],
+      "whole_helpers_executed": 3,
+      "parent_and_service_values_are_protocols": true,
+      "actual_legacy_components_or_node_DI_executed": false,
+      "g11_claim": "not-passed",
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/cyph/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/cyph/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "main",
+      "mode": "production",
+      "cases": [
+        {
+          "helper": 0,
+          "id": "exact-borrowed-token-value-and-parent-target-identities"
+        },
+        {
+          "helper": 0,
+          "id": "same-description-token-remains-distinct"
+        },
+        {
+          "helper": 0,
+          "id": "missing-optional-token-null-and-required-token-error"
+        },
+        {
+          "helper": 0,
+          "id": "explicit-null-and-undefined-values-do-not-fall-through"
+        },
+        {
+          "helper": 0,
+          "id": "duplicate-supplied-token-retains-last-map-value"
+        },
+        {
+          "helper": 0,
+          "id": "ambient-context-cannot-replace-manual-values-and-is-restored"
+        },
+        {
+          "helper": 0,
+          "id": "throwing-parent-restores-outer-context-and-does-not-own-values"
+        },
+        {
+          "helper": 0,
+          "id": "parent-initializes-once-and-consumer-derived-fields-run"
+        },
+        {
+          "helper": 0,
+          "id": "hydrated-supplied-services-are-never-registered-for-destruction"
+        },
+        {
+          "helper": 1,
+          "id": "exact-borrowed-token-value-and-parent-target-identities"
+        },
+        {
+          "helper": 1,
+          "id": "same-description-token-remains-distinct"
+        },
+        {
+          "helper": 1,
+          "id": "missing-optional-token-null-and-required-token-error"
+        },
+        {
+          "helper": 1,
+          "id": "explicit-null-and-undefined-values-do-not-fall-through"
+        },
+        {
+          "helper": 1,
+          "id": "duplicate-supplied-token-retains-last-map-value"
+        },
+        {
+          "helper": 1,
+          "id": "ambient-context-cannot-replace-manual-values-and-is-restored"
+        },
+        {
+          "helper": 1,
+          "id": "throwing-parent-restores-outer-context-and-does-not-own-values"
+        },
+        {
+          "helper": 1,
+          "id": "parent-initializes-once-and-consumer-derived-fields-run"
+        },
+        {
+          "helper": 1,
+          "id": "hydrated-supplied-services-are-never-registered-for-destruction"
+        },
+        {
+          "helper": 2,
+          "id": "exact-borrowed-token-value-and-parent-target-identities"
+        },
+        {
+          "helper": 2,
+          "id": "same-description-token-remains-distinct"
+        },
+        {
+          "helper": 2,
+          "id": "missing-optional-token-null-and-required-token-error"
+        },
+        {
+          "helper": 2,
+          "id": "explicit-null-and-undefined-values-do-not-fall-through"
+        },
+        {
+          "helper": 2,
+          "id": "duplicate-supplied-token-retains-last-map-value"
+        },
+        {
+          "helper": 2,
+          "id": "ambient-context-cannot-replace-manual-values-and-is-restored"
+        },
+        {
+          "helper": 2,
+          "id": "throwing-parent-restores-outer-context-and-does-not-own-values"
+        },
+        {
+          "helper": 2,
+          "id": "parent-initializes-once-and-consumer-derived-fields-run"
+        },
+        {
+          "helper": 2,
+          "id": "hydrated-supplied-services-are-never-registered-for-destruction"
+        }
+      ],
+      "whole_helpers_executed": 3,
+      "parent_and_service_values_are_protocols": true,
+      "actual_legacy_components_or_node_DI_executed": false,
+      "g11_claim": "not-passed",
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/cyph/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/cyph/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "21.x",
+      "mode": "development",
+      "cases": [
+        {
+          "helper": 0,
+          "id": "exact-borrowed-token-value-and-parent-target-identities"
+        },
+        {
+          "helper": 0,
+          "id": "same-description-token-remains-distinct"
+        },
+        {
+          "helper": 0,
+          "id": "missing-optional-token-null-and-required-token-error"
+        },
+        {
+          "helper": 0,
+          "id": "explicit-null-and-undefined-values-do-not-fall-through"
+        },
+        {
+          "helper": 0,
+          "id": "duplicate-supplied-token-retains-last-map-value"
+        },
+        {
+          "helper": 0,
+          "id": "ambient-context-cannot-replace-manual-values-and-is-restored"
+        },
+        {
+          "helper": 0,
+          "id": "throwing-parent-restores-outer-context-and-does-not-own-values"
+        },
+        {
+          "helper": 0,
+          "id": "parent-initializes-once-and-consumer-derived-fields-run"
+        },
+        {
+          "helper": 0,
+          "id": "hydrated-supplied-services-are-never-registered-for-destruction"
+        },
+        {
+          "helper": 1,
+          "id": "exact-borrowed-token-value-and-parent-target-identities"
+        },
+        {
+          "helper": 1,
+          "id": "same-description-token-remains-distinct"
+        },
+        {
+          "helper": 1,
+          "id": "missing-optional-token-null-and-required-token-error"
+        },
+        {
+          "helper": 1,
+          "id": "explicit-null-and-undefined-values-do-not-fall-through"
+        },
+        {
+          "helper": 1,
+          "id": "duplicate-supplied-token-retains-last-map-value"
+        },
+        {
+          "helper": 1,
+          "id": "ambient-context-cannot-replace-manual-values-and-is-restored"
+        },
+        {
+          "helper": 1,
+          "id": "throwing-parent-restores-outer-context-and-does-not-own-values"
+        },
+        {
+          "helper": 1,
+          "id": "parent-initializes-once-and-consumer-derived-fields-run"
+        },
+        {
+          "helper": 1,
+          "id": "hydrated-supplied-services-are-never-registered-for-destruction"
+        },
+        {
+          "helper": 2,
+          "id": "exact-borrowed-token-value-and-parent-target-identities"
+        },
+        {
+          "helper": 2,
+          "id": "same-description-token-remains-distinct"
+        },
+        {
+          "helper": 2,
+          "id": "missing-optional-token-null-and-required-token-error"
+        },
+        {
+          "helper": 2,
+          "id": "explicit-null-and-undefined-values-do-not-fall-through"
+        },
+        {
+          "helper": 2,
+          "id": "duplicate-supplied-token-retains-last-map-value"
+        },
+        {
+          "helper": 2,
+          "id": "ambient-context-cannot-replace-manual-values-and-is-restored"
+        },
+        {
+          "helper": 2,
+          "id": "throwing-parent-restores-outer-context-and-does-not-own-values"
+        },
+        {
+          "helper": 2,
+          "id": "parent-initializes-once-and-consumer-derived-fields-run"
+        },
+        {
+          "helper": 2,
+          "id": "hydrated-supplied-services-are-never-registered-for-destruction"
+        }
+      ],
+      "whole_helpers_executed": 3,
+      "parent_and_service_values_are_protocols": true,
+      "actual_legacy_components_or_node_DI_executed": false,
+      "g11_claim": "not-passed",
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/cyph/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/cyph/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "21.x",
+      "mode": "production",
+      "cases": [
+        {
+          "helper": 0,
+          "id": "exact-borrowed-token-value-and-parent-target-identities"
+        },
+        {
+          "helper": 0,
+          "id": "same-description-token-remains-distinct"
+        },
+        {
+          "helper": 0,
+          "id": "missing-optional-token-null-and-required-token-error"
+        },
+        {
+          "helper": 0,
+          "id": "explicit-null-and-undefined-values-do-not-fall-through"
+        },
+        {
+          "helper": 0,
+          "id": "duplicate-supplied-token-retains-last-map-value"
+        },
+        {
+          "helper": 0,
+          "id": "ambient-context-cannot-replace-manual-values-and-is-restored"
+        },
+        {
+          "helper": 0,
+          "id": "throwing-parent-restores-outer-context-and-does-not-own-values"
+        },
+        {
+          "helper": 0,
+          "id": "parent-initializes-once-and-consumer-derived-fields-run"
+        },
+        {
+          "helper": 0,
+          "id": "hydrated-supplied-services-are-never-registered-for-destruction"
+        },
+        {
+          "helper": 1,
+          "id": "exact-borrowed-token-value-and-parent-target-identities"
+        },
+        {
+          "helper": 1,
+          "id": "same-description-token-remains-distinct"
+        },
+        {
+          "helper": 1,
+          "id": "missing-optional-token-null-and-required-token-error"
+        },
+        {
+          "helper": 1,
+          "id": "explicit-null-and-undefined-values-do-not-fall-through"
+        },
+        {
+          "helper": 1,
+          "id": "duplicate-supplied-token-retains-last-map-value"
+        },
+        {
+          "helper": 1,
+          "id": "ambient-context-cannot-replace-manual-values-and-is-restored"
+        },
+        {
+          "helper": 1,
+          "id": "throwing-parent-restores-outer-context-and-does-not-own-values"
+        },
+        {
+          "helper": 1,
+          "id": "parent-initializes-once-and-consumer-derived-fields-run"
+        },
+        {
+          "helper": 1,
+          "id": "hydrated-supplied-services-are-never-registered-for-destruction"
+        },
+        {
+          "helper": 2,
+          "id": "exact-borrowed-token-value-and-parent-target-identities"
+        },
+        {
+          "helper": 2,
+          "id": "same-description-token-remains-distinct"
+        },
+        {
+          "helper": 2,
+          "id": "missing-optional-token-null-and-required-token-error"
+        },
+        {
+          "helper": 2,
+          "id": "explicit-null-and-undefined-values-do-not-fall-through"
+        },
+        {
+          "helper": 2,
+          "id": "duplicate-supplied-token-retains-last-map-value"
+        },
+        {
+          "helper": 2,
+          "id": "ambient-context-cannot-replace-manual-values-and-is-restored"
+        },
+        {
+          "helper": 2,
+          "id": "throwing-parent-restores-outer-context-and-does-not-own-values"
+        },
+        {
+          "helper": 2,
+          "id": "parent-initializes-once-and-consumer-derived-fields-run"
+        },
+        {
+          "helper": 2,
+          "id": "hydrated-supplied-services-are-never-registered-for-destruction"
+        }
+      ],
+      "whole_helpers_executed": 3,
+      "parent_and_service_values_are_protocols": true,
+      "actual_legacy_components_or_node_DI_executed": false,
+      "g11_claim": "not-passed",
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/cyph/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/cyph/node_modules/tslib"
+        }
+      }
+    }
+  ],
+  "mutants": [
+    {
+      "line": "original",
+      "helper": 0,
+      "id": "borrowed-services-destroyed",
+      "rejected": true
+    },
+    {
+      "line": "original",
+      "helper": 0,
+      "id": "new-target-discarded",
+      "rejected": true
+    },
+    {
+      "line": "original",
+      "helper": 1,
+      "id": "borrowed-services-destroyed",
+      "rejected": true
+    },
+    {
+      "line": "original",
+      "helper": 1,
+      "id": "new-target-discarded",
+      "rejected": true
+    },
+    {
+      "line": "original",
+      "helper": 2,
+      "id": "borrowed-services-destroyed",
+      "rejected": true
+    },
+    {
+      "line": "original",
+      "helper": 2,
+      "id": "new-target-discarded",
+      "rejected": true
+    },
+    {
+      "line": "main",
+      "helper": 0,
+      "id": "borrowed-services-destroyed",
+      "rejected": true
+    },
+    {
+      "line": "main",
+      "helper": 0,
+      "id": "new-target-discarded",
+      "rejected": true
+    },
+    {
+      "line": "main",
+      "helper": 1,
+      "id": "borrowed-services-destroyed",
+      "rejected": true
+    },
+    {
+      "line": "main",
+      "helper": 1,
+      "id": "new-target-discarded",
+      "rejected": true
+    },
+    {
+      "line": "main",
+      "helper": 2,
+      "id": "borrowed-services-destroyed",
+      "rejected": true
+    },
+    {
+      "line": "main",
+      "helper": 2,
+      "id": "new-target-discarded",
+      "rejected": true
+    },
+    {
+      "line": "21.x",
+      "helper": 0,
+      "id": "borrowed-services-destroyed",
+      "rejected": true
+    },
+    {
+      "line": "21.x",
+      "helper": 0,
+      "id": "new-target-discarded",
+      "rejected": true
+    },
+    {
+      "line": "21.x",
+      "helper": 1,
+      "id": "borrowed-services-destroyed",
+      "rejected": true
+    },
+    {
+      "line": "21.x",
+      "helper": 1,
+      "id": "new-target-discarded",
+      "rejected": true
+    },
+    {
+      "line": "21.x",
+      "helper": 2,
+      "id": "borrowed-services-destroyed",
+      "rejected": true
+    },
+    {
+      "line": "21.x",
+      "helper": 2,
+      "id": "new-target-discarded",
+      "rejected": true
+    }
+  ],
+  "namespace_capsule_sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3",
+  "limits": [
+    "Three complete helper modules execute with genuine entire original/current Core namespaces. Parent classes and borrowed values are explicit protocols. Fourteen actual caller constructors are source-bound and have no skipped emitted instance fields/parameter properties.",
+    "No actual fourteen legacy/current parent classes, Angular node/factory/AOT, DOM paint, packed/native or complete supported runtime/compiler/RxJS floor qualification. The central helper has no production callers."
+  ],
+  "g11_claim": "not-passed"
+}
