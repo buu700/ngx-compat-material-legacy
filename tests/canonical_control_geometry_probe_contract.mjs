@@ -76,6 +76,21 @@ function fixture(family, faults = {}, source = raw) {
     return {'.mat-tab-header-pagination-before': before, '.mat-tab-header-pagination-after': after,
       '.mat-tab-list': paginationList, '.mat-tab-label': paginationLabel}[selector] || null;
   }};
+  const boundaryContainer = {getBoundingClientRect: () => ({left: 0, right: 200, width: 200}),
+    querySelectorAll: selector => [0, 1].map(() => ({style: {width: String(
+      selector === '.mat-form-field-outline-start' ? 45 : faults.boundaryClamp ? 140 : faults.boundaryShort ? 70 : 490) + 'px'}}))};
+  const boundary = {tagName: 'MAT-FORM-FIELD', classList: classes('mat-form-field-appearance-outline'),
+    offsetParent: faults.boundaryOffsetParent ? {} : null, getRootNode: () => faults.boundaryRoot ? {} : document,
+    getBoundingClientRect: () => ({width: 200, height: 50}),
+    computed: {direction: 'ltr', position: faults.boundaryPosition ? 'absolute' : 'fixed'},
+    querySelector(selector) {
+      if (selector === '.mat-form-field-flex') return boundaryContainer;
+      if (selector === '.mat-form-field-label') return {children: [{offsetWidth: faults.boundaryShort ? 80 : 640,
+        getBoundingClientRect: () => ({left: 50, right: 690})}]};
+      if (selector === '.mat-form-field-prefix') return faults.boundaryPrefix ? null : {};
+      if (selector === '.mat-form-field-suffix') return faults.boundarySuffix ? null : {};
+      return null;
+    }};
   window.__lab = {closeTransient() {},
     readChipFormState: () => ({focused, touched}), resetChipFormState() {touched = !!faults.touchedBefore;}};
   if (faults.noChipApi) delete window.__lab.readChipFormState;
@@ -85,6 +100,7 @@ function fixture(family, faults = {}, source = raw) {
       if (selector === '#wrap-field' && family === 'form-field') return {};
       if (selector === '#p-field.mat-form-field #p-hint') return {};
       if (selector === '#p-outline') return outline;
+      if (selector === '#p-outline-boundary') return faults.boundaryMissing ? null : boundary;
       if (selector === '#p-outline-wrapper') return wrapper;
       if (outlineButtons[selector]) return outlineButtons[selector];
       if (selector === '#p-tabs') return group;
@@ -154,6 +170,10 @@ await check('outlined-prefix-hide-show-and-rtl', 'form-field', {}, true);
 for (const faults of [{wrongOutlineStart: true}, {wrongOutlineGap: true}, {noOutlinePrefix: true},
     {noOutlineHide: true}, {noOutlineShow: true}, {noOutlineRtl: true}, {wrongRtlStart: true}]) {
   await check('outline-reject-' + JSON.stringify(faults), 'form-field', faults, false);
+}
+for (const faults of [{boundaryClamp: true}, {boundaryShort: true}, {boundaryPosition: true},
+    {boundaryOffsetParent: true}, {boundaryRoot: true}, {boundaryPrefix: true}, {boundarySuffix: true}, {boundaryMissing: true}]) {
+  await check('outline-boundary-reject-' + JSON.stringify(faults), 'form-field', faults, false);
 }
 const bypassFont = raw.replace('return legacySelectFontNativeOkay(observation) ? observation : null;',
   'return observation.panel_count === 1 ? observation : null;');

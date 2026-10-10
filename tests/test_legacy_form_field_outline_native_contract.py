@@ -15,9 +15,13 @@ class LegacyFormFieldOutlineNativeContractTests(unittest.TestCase):
     def test_missing_stale_and_wrong_sequence_observations_fail(self):
         subprocess.run(['node', '--input-type=module', '-e', r'''
 import assert from 'node:assert/strict';
-import {legacyFormFieldOutlineNativeOkay as okay,legacyFormFieldOutlineSequenceOkay as sequence} from './scripts/legacy-form-field-outline-native-contract.mjs';
+import {legacyFormFieldOutlineNativeOkay as okay,legacyFormFieldOutlineSequenceOkay as sequence,legacyFormFieldOutlineBoundaryNativeOkay as boundary} from './scripts/legacy-form-field-outline-native-contract.mjs';
 const first={visible:true,historical_host:true,direction:'ltr',label_children:1,container_width:200,expected_start:15,expected_gap:70,start_widths:[15,15],gap_widths:[70,70]};
 const prefix={...first,expected_start:45,start_widths:[45,45]},rtl={...first,direction:'rtl'};
+const fixed={...first,container_width:200,expected_gap:490,gap_widths:[490,490],fixed_host:true,null_offset_parent:true,document_root:true,prefix:true,suffix:true};
+assert.equal(boundary(fixed),true);assert.equal(boundary(null),false);
+for(const key of ['fixed_host','null_offset_parent','document_root','prefix','suffix']){const missing={...fixed};delete missing[key];assert.equal(boundary(missing),false);assert.equal(boundary({...fixed,[key]:false}),false);}
+assert.equal(boundary({...fixed,expected_gap:70,gap_widths:[70,70]}),false);assert.equal(boundary({...fixed,gap_widths:[140,140]}),false);
 assert.equal(okay(first),true);assert.equal(sequence([first,prefix,first,rtl]),true);
 assert.equal(okay(null),false);assert.equal(sequence(null),false);
 for(const key of Object.keys(first)){const missing={...first};delete missing[key];assert.equal(okay(missing),false,key);}

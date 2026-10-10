@@ -19,7 +19,7 @@ import {legacyInkBarNativeOkay, legacyInkBarSelectionSequenceOkay, readLegacyInk
 import {legacySelectFontNativeOkay, readLegacySelectFontNative} from './legacy-select-font-native-contract.mjs';
 import {legacyChipBlurNativeOkay} from './legacy-chip-blur-native-contract.mjs';
 import {tabPaginationNativeOkay, readTabPaginationNative} from './tab-pagination-native-contract.mjs';
-import {legacyFormFieldOutlineNativeOkay, legacyFormFieldOutlineSequenceOkay, readLegacyFormFieldOutlineNative} from './legacy-form-field-outline-native-contract.mjs';
+import {legacyFormFieldOutlineNativeOkay, legacyFormFieldOutlineSequenceOkay, readLegacyFormFieldOutlineNative, legacyFormFieldOutlineBoundaryNativeOkay, readLegacyFormFieldOutlineBoundaryNative} from './legacy-form-field-outline-native-contract.mjs';
 import {announcedChromeEndpoint,debuggerMatchesChild,announcedFirefoxEndpoint} from './chromium-debug-endpoint.mjs';
 import {spawn, spawnSync} from 'node:child_process';
 import {cdpPointerClick, bidiPointerClick, pointerPoint, withPrivateXDisplay, servicePointerRequest} from './browser-pointer-input.mjs';
@@ -60,7 +60,7 @@ function firefoxBin() {
 export function requiredProbeSource() {
   return [legacyTooltipAriaLifetimeNativeOkay, legacyTooltipNativeOkay, legacyTooltipMessageSequenceOkay, readLegacyTooltipNative, legacyInkBarNativeOkay, legacyInkBarSelectionSequenceOkay,
     readLegacyInkBarNative, legacySelectFontNativeOkay, readLegacySelectFontNative, legacyChipBlurNativeOkay,
-    legacyFormFieldOutlineNativeOkay, legacyFormFieldOutlineSequenceOkay, readLegacyFormFieldOutlineNative,
+    legacyFormFieldOutlineNativeOkay, legacyFormFieldOutlineSequenceOkay, readLegacyFormFieldOutlineNative, legacyFormFieldOutlineBoundaryNativeOkay, readLegacyFormFieldOutlineBoundaryNative,
     tabPaginationNativeOkay, readTabPaginationNative, legacySnackMotionNativeOkay,
     trackLegacySnackMotionNative, readLegacySnackMotionEnterNative, readLegacySnackMotionExitNative]
     .map(contract => contract.toString()).join('\n') + '\n' + readFileSync(probePath, 'utf8');
@@ -163,6 +163,7 @@ function labHtml() {
     '<mat-form-field id="p-outline" appearance="outline" floatLabel="always"><mat-label>Outline</mat-label>',
     '<span matPrefix *ngIf="outlinePrefix()">USD&nbsp;</span><input matInput value="Value"></mat-form-field>',
     '</div>',
+    '<mat-form-field id="p-outline-boundary" appearance="outline" floatLabel="always" style="position:fixed;top:10px;right:10px;width:200px"><mat-label><span style="display:inline-block;width:640px">Long floating label</span></mat-label><span matPrefix>USD&nbsp;</span><input matInput value="Value"><span matSuffix>suffix</span></mat-form-field>',
     '<button id="p-outline-prefix" type="button" (click)="outlinePrefix.set(true)">Add prefix</button>',
     '<button id="p-outline-hide" type="button" (click)="outlineVisible.set(false); outlinePrefix.set(false)">Hide and remove prefix</button>',
     '<button id="p-outline-show" type="button" (click)="outlineVisible.set(true)">Show</button>',
