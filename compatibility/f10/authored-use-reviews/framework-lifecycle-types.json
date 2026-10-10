@@ -618,7 +618,7 @@
       "symbol": "OnDestroy",
       "conclusion": "stable-public-peer",
       "reviewer": "Codex primary implementer",
-      "candidate_source_sha256": "24b671b71563f60e857639e0ac51bbc95c4adffefc4b8e74fbaad8440188aa08",
+      "candidate_source_sha256": "df6a4cfe02079393bdbb593ad0654af0c04b47548b8ef2c58a96611be944de15",
       "independent_evidence": [
         {
           "path": "reference/material-16.2.14/environment-package-lock.json",
@@ -643,9 +643,31 @@
         {
           "path": "compatibility/rc/framework-lifecycle-type-use-review.json",
           "sha256": "4417cc68f4ee8633d272101c60c1c4bc1663064f17b5d9b5de6f4ad534151776"
+        },
+        {
+          "path": "compatibility/rc/chip-blur-binding-refresh.json",
+          "sha256": "ff39f668460eace05e6fa3523235e575cecf723f1f0b7ef2a7bdd49f42add990"
         }
       ],
-      "decision": "The exact OnDestroy import at legacy-chips/chip.ts:28 binds to the stable public @angular/core root export at this line's actual published minimum. Its 1 current references are unparameterized type-only positions; whole diagnostic emit is unchanged with the selected type imports removed. The original and both minimum peers have the identical OnDestroy hook interface member shape. The full independently authenticated declaration closure passes strict mutual assignment, exact default equality and dynamic dictionary lookup, with semantic/default/private/stale-source mutants rejected. Close this type boundary only; actual hook execution/body, DI/change detection, generic opt-in API, minimum runtime/compiler, native/AOT/packed and other component/security contracts remain separate."
+      "decision": "The exact OnDestroy import at legacy-chips/chip.ts:28 binds to the stable public @angular/core root export at this line's actual published minimum. Its 1 current references are unparameterized type-only positions; whole diagnostic emit is unchanged with the selected type imports removed. The original and both minimum peers have the identical OnDestroy hook interface member shape. The full independently authenticated declaration closure passes strict mutual assignment, exact default equality and dynamic dictionary lookup, with semantic/default/private/stale-source mutants rejected. Close this type boundary only; actual hook execution/body, DI/change detection, generic opt-in API, minimum runtime/compiler, native/AOT/packed and other component/security contracts remain separate. Chip blur follow-up rechecks this exact boundary at current source. The constructor and public declarations are unchanged; pending blur lifetime, refocus and teardown guards are separately documented. Product HTML/CSS/SCSS and historical goldens are untouched.",
+      "chip_blur_source_refresh": {
+        "prior_source_sha256": "24b671b71563f60e857639e0ac51bbc95c4adffefc4b8e74fbaad8440188aa08",
+        "fresh_source_binding": {
+          "module": "@angular/core",
+          "symbol": "OnDestroy",
+          "file": "legacy-chips/chip.ts",
+          "status": "inventory-seed",
+          "disposition": "open",
+          "candidate_source_sha256": "df6a4cfe02079393bdbb593ad0654af0c04b47548b8ef2c58a96611be944de15",
+          "import_line": 28,
+          "local_name": "OnDestroy",
+          "reference_lines": [
+            150
+          ],
+          "minimum_public_declaration": "compatibility/rc/peer-type-sources/core-21.2.23.d.ts"
+        },
+        "scope": "Source/type/pure-helper binding refresh only; earlier actual component/runtime evidence retains its provenance. Actual native/packed/floor chip and list qualification remains separate."
+      }
     },
     {
       "file": "legacy-chips/chip-input.ts",
@@ -5031,5 +5053,5 @@
       ]
     }
   ],
-  "latest_source_refresh_at_utc": "2026-10-10T05:10:18.760538+00:00"
+  "latest_source_refresh_at_utc": "2026-10-10T05:24:24.431739+00:00"
 }

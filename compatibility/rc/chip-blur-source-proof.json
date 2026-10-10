@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "recorded_at_utc": "2026-10-10T05:24:24.431739+00:00",
+  "status": "source/public-zone/chip-list form-state/lifecycle/type repair passed; actual packed/native chip qualification pending",
+  "source_heads": {
+    "main": "87243b0c30f8c25035ee562a056b82032abf6420",
+    "21.x": "87c9e67337e2b9fd26e5a567e5adfa78dc8005f5"
+  },
+  "source_trees": {
+    "main": "cf76a429474f4663251ffcf75dffd15190d56373",
+    "21.x": "0f45dd4344e2b466be41ebc5f6283443b3102357"
+  },
+  "problem": "The tagged and candidate chip wait for onStable before clearing _hasFocus and emitting blur. Genuine zoneless providers never emit the event, leaving chip/list focus and the connected blur-to-touched path stale. The previous pending wait also survived refocus and destruction.",
+  "repair": [
+    "A per-blur public Subscription owns its stability child and guards the stable-zone Promise through its closed state. Active-zone event timing remains the original path; already-stable zones can complete asynchronously without a zone event.",
+    "Refocus, a replacement blur and destruction cancel the pending request. Destroyed chips reject new blur/focus work; destruction is idempotent and removes ripple event handlers once.",
+    "The focused flag remains available to the existing destroyed/removal observers. No list focus algorithm, constructor, HTML or styling is changed."
+  ],
+  "preserved": {
+    "historical_8_parameter_constructor_and_body_identical": true,
+    "existing_public_declarations_unchanged": true,
+    "chip_list_source_unchanged": true,
+    "eight_selected_list_members_match_untouched_tag": true,
+    "product_HTML_CSS_SCSS_changed": false,
+    "required_consumer_HTML_CSS_SCSS_changes": false,
+    "consumer_TS_edits_found_necessary": false,
+    "goldens_changed": false
+  },
+  "tests": {
+    "python_tests": 6,
+    "isolated_framework_subjects": 10,
+    "current_zoneful_zoneless_development_production_subjects": 8,
+    "original_zoneful_subjects": 2,
+    "specific_mutation_rejections": 36,
+    "strict_blur_negative_checks_per_current_subject": 4,
+    "strict_compiler": "5.9.2",
+    "historical_keyboard_tests": 2,
+    "native_predicate_tests": 1,
+    "browser_source_identity_tests": 2,
+    "generated_consumer_TS_syntax_cases": 2,
+    "syntax_binding_parser": "6.0.3"
+  },
+  "observations": [
+    "The whole chip constructor and members execute with protocol trait/ripple/DOM/CDR services. Historical eight-argument construction creates one ripple target and binds its trigger once. Real public NgZone, QueryList, EventEmitter, FocusKeyManager and FormControl execute.",
+    "Eight complete list focus/blur/form/query members match the untouched tag and execute on an explicit list receiver. Zoneful candidate observations match the tagged chip/list focused and touched sequence. At current zoneless minima the candidate clears chip/list focus and marks the genuine FormControl touched with and without a chip-input protocol; the tagged path remains pending.",
+    "Refocus, replacement blur and destruction reject stale callbacks. Destruction retains the historical focus flag for removal observers and cleans ripple handlers once. Thirty-six controls reject the prior zone-only path and missing cancellation at destruction/refocus/replacement or post-destruction request entry."
+  ],
+  "runtime_scope": "Whole original/owned chip constructors/members replayed with trait/ripple/DOM/CDR/platform/document protocols and Angular decorators removed. Eight complete list focus/blur/query/form-state members match the untouched tag; list constructor and remaining members are not executed. Genuine public NgZone, QueryList, EventEmitter, FocusKeyManager, FormControl and current public-provider application. No actual Angular legacy chip/list node DI, ripple renderer, native DOM focus/styles, packed/AOT/consumer build or Rx/Node floors.",
+  "historical_difference": "Refocus/destroy cancellation and idempotent teardown intentionally harden the earlier lifetime behavior. Normal zoneful blur timing and payload identity match the exercised untouched reference. Actual trait/ripple implementations, full list constructor, removed-chip sibling focus and native timing still need qualification.",
+  "targeted_style_review": "The chip directive host bindings, role/tabindex/selection/disabled classes and appended mat-chip-ripple target remain unchanged. Chip-list source and all product HTML/CSS/SCSS are unchanged. Cyph wallet chip-list height/width/spacing rules were read without edits; native rendered geometry is unqualified.",
+  "native_producer": "The existing packed form fixture retains Space selection and connects its chip list to a real reactive FormControl. It reads the public focused and touched states before/after moving real DOM focus to the existing form-field input. The supplemental predicate requires the complete focus/touched transition and actual focus movement. No additional matrix cells; native execution unrun.",
+  "keyboard_harness_reconciliation": "The old whole-file input assertion predated the recorded removal of obsolete current-Material replacement/Material17-removal comments. It now accounts for exactly two known two-line notices in the untouched reference before full source-byte comparison. Other comments, all remaining bytes, keyboard bodies and the original restored BACKSPACE assertion remain checked. No golden, product input source, keyboard expectation or configurable compatibility exception changed.",
+  "source_binding_refresh": {
+    "previous_frozen_reviewed_rows": 18,
+    "fresh_checker_calls": 13,
+    "review_documents_refreshed": 13,
+    "new_frozen_use_admissions": 0,
+    "new_upstream_SHA_closures": 0,
+    "historical_component_or_native_runs_restamped": false
+  },
+  "cyph_sanity": {
+    "head": "a56a0603636cac5aaabe8fe408f7429b4224f011",
+    "clean": true,
+    "chip_templates": 7,
+    "scope": "Read-only chip module, seven chip-list template uses including recipient inputs/removal and wallet chip layout. The TypeScript search found the module import/export and no direct chip constructor/subclass/blur/focus-state API use. No consumer build or edits.",
+    "typescript_search": "shared/js/cyph/modules/cyph-shared.module.ts:8:import {MatLegacyChipsModule as MatChipsModule} from '@angular/material/legacy-chips';\nshared/js/cyph/modules/cyph-shared.module.ts:103:\t\tMatChipsModule,\nshared/js/cyph/modules/cyph-shared.module.ts:136:\t\tMatChipsModule,\n",
+    "files": [
+      {
+        "path": "shared/js/cyph/modules/cyph-shared.module.ts",
+        "sha256": "42fea0471f52148b9f6938d670a4fd9fd65363e2f34ae000efd58b9ec3a82c29"
+      },
+      {
+        "path": "shared/js/cyph/components/account-wallets/account-wallets.component.scss",
+        "sha256": "61aabe39e3ede3650e5ea0f4f1da88a63a7ec347724cb247094d23c03a0d162f"
+      },
+      {
+        "path": "shared/js/cyph/components/email-compose/email-compose.component.html",
+        "sha256": "fb41ff21cec259e9456c32e0c630e2bcf7ed58dce9401232566117461cf45272"
+      },
+      {
+        "path": "shared/js/cyph/components/search-bar/search-bar.component.html",
+        "sha256": "f733c8a7b4864e9054adae72f467f0511055eac4b55d40b667c610a347201e4c"
+      }
+    ],
+    "consumer_build_executed": false
+  },
+  "environment": {
+    "host_node": "v22.23.3",
+    "borrowed_rxjs": "7.8.2",
+    "borrowed_tslib": "2.8.1",
+    "binding_parser": "6.0.3",
+    "advertised_runtime_Rx_native_packed_floors_qualified": false
+  },
+  "remaining": [
+    "All 25 frozen NgZone boundaries remain open pending complete caller/lifecycle and native qualification.",
+    "Reconcile the full remaining zone/observer callers rather than treating the repaired stability paths as an all-NgZone pass.",
+    "Complete packed/native/floors/Sass/security/SHA closeout, C05 and independent A01-A10/R01-R03 audit remain required."
+  ],
+  "pushed": false,
+  "actions_started": false,
+  "g11_claim": "not-passed"
+}
