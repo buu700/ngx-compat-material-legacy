@@ -1,0 +1,918 @@
+{
+  "schema_version": 1,
+  "node": "v22.23.3",
+  "compiler": "6.0.3",
+  "role": "Original selection comparator bug and both genuine public minimum fixes; exact identity-only owned recipes",
+  "subjects_capsule_sha256": "4932727a9d031223efc0108d2d22c4a95019b81ee06e834424246173bf7998cc",
+  "core_capsule_sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3",
+  "producer_sha256": "73d641880e18a201d74a2563bafc0eb0d1d261315bb0c4f79eb8c55ba9fc7cc9",
+  "worker_sha256": "b08e0dc20f2eeb7ad910276fb3752e5b48e267d2f1e12c943288183e483bbe3f",
+  "declarations": [
+    {
+      "line": "original",
+      "version": "16.2.14",
+      "entry": {
+        "path": "collections/index.d.ts",
+        "sha256": "ef32a2c8f06426f20a08d801238e167e9155a8341d1177a7446077be50c8a63e"
+      },
+      "target": {
+        "path": "collections/index.d.ts",
+        "sha256": "ef32a2c8f06426f20a08d801238e167e9155a8341d1177a7446077be50c8a63e"
+      },
+      "public_chain": [
+        "collections/index.d.ts#SelectionModel"
+      ],
+      "declaration": "export declare class SelectionModel<T> {\n    private _multiple;\n    private _emitChanges;\n    compareWith?: ((o1: T, o2: T) => boolean) | undefined;\n    /** Currently-selected values. */\n    private _selection;\n    /** Keeps track of the deselected options that haven't been emitted by the change event. */\n    private _deselectedToEmit;\n    /** Keeps track of the selected options that haven't been emitted by the change event. */\n    private _selectedToEmit;\n    /** Cache for the array value of the selected items. */\n    private _selected;\n    /** Selected values. */\n    get selected(): T[];\n    /** Event emitted when the value has changed. */\n    readonly changed: Subject<SelectionChange<T>>;\n    constructor(_multiple?: boolean, initiallySelectedValues?: T[], _emitChanges?: boolean, compareWith?: ((o1: T, o2: T) => boolean) | undefined);\n    /**\n     * Selects a value or an array of values.\n     * @param values The values to select\n     * @return Whether the selection changed as a result of this call\n     * @breaking-change 16.0.0 make return type boolean\n     */\n    select(...values: T[]): boolean | void;\n    /**\n     * Deselects a value or an array of values.\n     * @param values The values to deselect\n     * @return Whether the selection changed as a result of this call\n     * @breaking-change 16.0.0 make return type boolean\n     */\n    deselect(...values: T[]): boolean | void;\n    /**\n     * Sets the selected values\n     * @param values The new selected values\n     * @return Whether the selection changed as a result of this call\n     * @breaking-change 16.0.0 make return type boolean\n     */\n    setSelection(...values: T[]): boolean | void;\n    /**\n     * Toggles a value between selected and deselected.\n     * @param value The value to toggle\n     * @return Whether the selection changed as a result of this call\n     * @breaking-change 16.0.0 make return type boolean\n     */\n    toggle(value: T): boolean | void;\n    /**\n     * Clears all of the selected values.\n     * @param flushEvent Whether to flush the changes in an event.\n     *   If false, the changes to the selection will be flushed along with the next event.\n     * @return Whether the selection changed as a result of this call\n     * @breaking-change 16.0.0 make return type boolean\n     */\n    clear(flushEvent?: boolean): boolean | void;\n    /**\n     * Determines whether a value is selected.\n     */\n    isSelected(value: T): boolean;\n    /**\n     * Determines whether the model does not have a value.\n     */\n    isEmpty(): boolean;\n    /**\n     * Determines whether the model has a value.\n     */\n    hasValue(): boolean;\n    /**\n     * Sorts the selected values based on a predicate function.\n     */\n    sort(predicate?: (a: T, b: T) => number): void;\n    /**\n     * Gets whether multiple values can be selected.\n     */\n    isMultipleSelection(): boolean;\n    /** Emits a change event and clears the records of selected and deselected values. */\n    private _emitChangeEvent;\n    /** Selects a value. */\n    private _markSelected;\n    /** Deselects a value. */\n    private _unmarkSelected;\n    /** Clears out the selected values. */\n    private _unmarkAll;\n    /**\n     * Verifies the value assignment and throws an error if the specified value array is\n     * including multiple values while the selection model is not supporting multiple values.\n     */\n    private _verifyValueAssignment;\n    /** Whether there are queued up change to be emitted. */\n    private _hasQueuedChanges;\n    /** Returns a value that is comparable to inputValue by applying compareWith function, returns the same inputValue otherwise. */\n    private _getConcreteValue;\n}",
+      "members": [
+        "selected",
+        "changed",
+        "select",
+        "deselect",
+        "setSelection",
+        "toggle",
+        "clear",
+        "isSelected",
+        "isEmpty",
+        "hasValue",
+        "sort",
+        "isMultipleSelection",
+        "compareWith"
+      ],
+      "public_current_methods_return_boolean": false
+    },
+    {
+      "line": "main",
+      "version": "22.1.7",
+      "entry": {
+        "path": "types/collections.d.ts",
+        "sha256": "19bbd91064ebe0469f554155572a0b4bb4713ad7cafbc0af9d31cbafdbf223bb"
+      },
+      "target": {
+        "path": "types/_selection-model-chunk.d.ts",
+        "sha256": "49a973c9bf6f3cf5ca945ebd76a663b66f31c99867deccff5063df5d7000303b"
+      },
+      "public_chain": [
+        "types/collections.d.ts#SelectionModel",
+        "types/_selection-model-chunk.d.ts#SelectionModel"
+      ],
+      "declaration": "declare class SelectionModel<T> {\n    private _multiple;\n    private _emitChanges;\n    compareWith?: ((o1: T, o2: T) => boolean) | undefined;\n    /** Currently-selected values. */\n    private _selection;\n    /** Keeps track of the deselected options that haven't been emitted by the change event. */\n    private _deselectedToEmit;\n    /** Keeps track of the selected options that haven't been emitted by the change event. */\n    private _selectedToEmit;\n    /** Cache for the array value of the selected items. */\n    private _selected;\n    /** Selected values. */\n    get selected(): T[];\n    /** Event emitted when the value has changed. */\n    readonly changed: Subject<SelectionChange<T>>;\n    /**\n     * Exposes selection/deselection methods that work on array of values and don't expect a spread.\n     * This is useful in the cases where you may have a large collection of items that can't be\n     * easily spread into the existing methods without hitting browser limits.\n     */\n    readonly bulk: Readonly<{\n        select: (values: T[]) => boolean;\n        deselect: (values: T[]) => boolean;\n        setSelection: (values: T[]) => boolean;\n    }>;\n    constructor(_multiple?: boolean, initiallySelectedValues?: T[], _emitChanges?: boolean, compareWith?: ((o1: T, o2: T) => boolean) | undefined);\n    /**\n     * Selects a value or an array of values.\n     * @param values The values to select\n     * @return Whether the selection changed as a result of this call\n     */\n    select(...values: T[]): boolean;\n    /**\n     * Deselects a value or an array of values.\n     * @param values The values to deselect\n     * @return Whether the selection changed as a result of this call\n     */\n    deselect(...values: T[]): boolean;\n    /**\n     * Sets the selected values\n     * @param values The new selected values\n     * @return Whether the selection changed as a result of this call\n     */\n    setSelection(...values: T[]): boolean;\n    /**\n     * Toggles a value between selected and deselected.\n     * @param value The value to toggle\n     * @return Whether the selection changed as a result of this call\n     */\n    toggle(value: T): boolean;\n    /**\n     * Clears all of the selected values.\n     * @param flushEvent Whether to flush the changes in an event.\n     *   If false, the changes to the selection will be flushed along with the next event.\n     * @return Whether the selection changed as a result of this call\n     */\n    clear(flushEvent?: boolean): boolean;\n    /**\n     * Determines whether a value is selected.\n     */\n    isSelected(value: T): boolean;\n    /**\n     * Determines whether the model does not have a value.\n     */\n    isEmpty(): boolean;\n    /**\n     * Determines whether the model has a value.\n     */\n    hasValue(): boolean;\n    /**\n     * Sorts the selected values based on a predicate function.\n     */\n    sort(predicate?: (a: T, b: T) => number): void;\n    /**\n     * Gets whether multiple values can be selected.\n     */\n    isMultipleSelection(): boolean;\n    /** Selects an array of values. */\n    private _select;\n    /** Deselects an array of values. */\n    private _deselect;\n    /** Sets the current selection from an array of items. */\n    private _setSelection;\n    /** Emits a change event and clears the records of selected and deselected values. */\n    private _emitChangeEvent;\n    /** Selects a value. */\n    private _markSelected;\n    /** Deselects a value. */\n    private _unmarkSelected;\n    /** Clears out the selected values. */\n    private _unmarkAll;\n    /**\n     * Verifies the value assignment and throws an error if the specified value array is\n     * including multiple values while the selection model is not supporting multiple values.\n     */\n    private _verifyValueAssignment;\n    /** Whether there are queued up change to be emitted. */\n    private _hasQueuedChanges;\n    /** Returns a value that is comparable to inputValue by applying compareWith function, returns the same inputValue otherwise. */\n    private _getConcreteValue;\n}",
+      "members": [
+        "selected",
+        "changed",
+        "select",
+        "deselect",
+        "setSelection",
+        "toggle",
+        "clear",
+        "isSelected",
+        "isEmpty",
+        "hasValue",
+        "sort",
+        "isMultipleSelection",
+        "compareWith"
+      ],
+      "public_current_methods_return_boolean": true
+    },
+    {
+      "line": "21.x",
+      "version": "21.2.14",
+      "entry": {
+        "path": "types/collections.d.ts",
+        "sha256": "19bbd91064ebe0469f554155572a0b4bb4713ad7cafbc0af9d31cbafdbf223bb"
+      },
+      "target": {
+        "path": "types/_selection-model-chunk.d.ts",
+        "sha256": "0e4b16f47b470e8fbfa8d48d3f2edcee1265f892dc6fbf2d1753277a359f22c0"
+      },
+      "public_chain": [
+        "types/collections.d.ts#SelectionModel",
+        "types/_selection-model-chunk.d.ts#SelectionModel"
+      ],
+      "declaration": "declare class SelectionModel<T> {\n    private _multiple;\n    private _emitChanges;\n    compareWith?: ((o1: T, o2: T) => boolean) | undefined;\n    /** Currently-selected values. */\n    private _selection;\n    /** Keeps track of the deselected options that haven't been emitted by the change event. */\n    private _deselectedToEmit;\n    /** Keeps track of the selected options that haven't been emitted by the change event. */\n    private _selectedToEmit;\n    /** Cache for the array value of the selected items. */\n    private _selected;\n    /** Selected values. */\n    get selected(): T[];\n    /** Event emitted when the value has changed. */\n    readonly changed: Subject<SelectionChange<T>>;\n    constructor(_multiple?: boolean, initiallySelectedValues?: T[], _emitChanges?: boolean, compareWith?: ((o1: T, o2: T) => boolean) | undefined);\n    /**\n     * Selects a value or an array of values.\n     * @param values The values to select\n     * @return Whether the selection changed as a result of this call\n     */\n    select(...values: T[]): boolean;\n    /**\n     * Deselects a value or an array of values.\n     * @param values The values to deselect\n     * @return Whether the selection changed as a result of this call\n     */\n    deselect(...values: T[]): boolean;\n    /**\n     * Sets the selected values\n     * @param values The new selected values\n     * @return Whether the selection changed as a result of this call\n     */\n    setSelection(...values: T[]): boolean;\n    /**\n     * Toggles a value between selected and deselected.\n     * @param value The value to toggle\n     * @return Whether the selection changed as a result of this call\n     */\n    toggle(value: T): boolean;\n    /**\n     * Clears all of the selected values.\n     * @param flushEvent Whether to flush the changes in an event.\n     *   If false, the changes to the selection will be flushed along with the next event.\n     * @return Whether the selection changed as a result of this call\n     */\n    clear(flushEvent?: boolean): boolean;\n    /**\n     * Determines whether a value is selected.\n     */\n    isSelected(value: T): boolean;\n    /**\n     * Determines whether the model does not have a value.\n     */\n    isEmpty(): boolean;\n    /**\n     * Determines whether the model has a value.\n     */\n    hasValue(): boolean;\n    /**\n     * Sorts the selected values based on a predicate function.\n     */\n    sort(predicate?: (a: T, b: T) => number): void;\n    /**\n     * Gets whether multiple values can be selected.\n     */\n    isMultipleSelection(): boolean;\n    /** Emits a change event and clears the records of selected and deselected values. */\n    private _emitChangeEvent;\n    /** Selects a value. */\n    private _markSelected;\n    /** Deselects a value. */\n    private _unmarkSelected;\n    /** Clears out the selected values. */\n    private _unmarkAll;\n    /**\n     * Verifies the value assignment and throws an error if the specified value array is\n     * including multiple values while the selection model is not supporting multiple values.\n     */\n    private _verifyValueAssignment;\n    /** Whether there are queued up change to be emitted. */\n    private _hasQueuedChanges;\n    /** Returns a value that is comparable to inputValue by applying compareWith function, returns the same inputValue otherwise. */\n    private _getConcreteValue;\n}",
+      "members": [
+        "selected",
+        "changed",
+        "select",
+        "deselect",
+        "setSelection",
+        "toggle",
+        "clear",
+        "isSelected",
+        "isEmpty",
+        "hasValue",
+        "sort",
+        "isMultipleSelection",
+        "compareWith"
+      ],
+      "public_current_methods_return_boolean": true
+    }
+  ],
+  "typeChecks": [
+    {
+      "line": "original",
+      "compiler": "6.0.3",
+      "strict": true,
+      "skipLibCheck": false,
+      "fixture_sha256": "2e96bd56832208b8b84bb56d46b0ccda49198e4a70b7c387e0c169ec0e3754e9",
+      "negative_type_controls": 4,
+      "diagnostics": 0
+    },
+    {
+      "line": "main",
+      "compiler": "6.0.3",
+      "strict": true,
+      "skipLibCheck": false,
+      "fixture_sha256": "2e96bd56832208b8b84bb56d46b0ccda49198e4a70b7c387e0c169ec0e3754e9",
+      "negative_type_controls": 4,
+      "diagnostics": 0
+    },
+    {
+      "line": "21.x",
+      "compiler": "6.0.3",
+      "strict": true,
+      "skipLibCheck": false,
+      "fixture_sha256": "2e96bd56832208b8b84bb56d46b0ccda49198e4a70b7c387e0c169ec0e3754e9",
+      "negative_type_controls": 4,
+      "diagnostics": 0
+    }
+  ],
+  "declarationControls": [
+    {
+      "line": "original",
+      "id": "deprecated-class",
+      "assertion_rejected": true
+    },
+    {
+      "line": "original",
+      "id": "private-selected",
+      "assertion_rejected": true
+    },
+    {
+      "line": "original",
+      "id": "deprecated-select",
+      "assertion_rejected": true
+    },
+    {
+      "line": "original",
+      "id": "missing-changed",
+      "assertion_rejected": true
+    },
+    {
+      "line": "main",
+      "id": "deprecated-class",
+      "assertion_rejected": true
+    },
+    {
+      "line": "main",
+      "id": "private-selected",
+      "assertion_rejected": true
+    },
+    {
+      "line": "main",
+      "id": "deprecated-select",
+      "assertion_rejected": true
+    },
+    {
+      "line": "main",
+      "id": "missing-changed",
+      "assertion_rejected": true
+    },
+    {
+      "line": "21.x",
+      "id": "deprecated-class",
+      "assertion_rejected": true
+    },
+    {
+      "line": "21.x",
+      "id": "private-selected",
+      "assertion_rejected": true
+    },
+    {
+      "line": "21.x",
+      "id": "deprecated-select",
+      "assertion_rejected": true
+    },
+    {
+      "line": "21.x",
+      "id": "missing-changed",
+      "assertion_rejected": true
+    }
+  ],
+  "results": [
+    {
+      "line": "original",
+      "mode": "development",
+      "mutated": false,
+      "cases": [
+        "untouched-comparator-bug-reproduced",
+        "owned-identity-only-single-and-multiple",
+        "owned-chip-model-suppressed-events",
+        "selection-list-replacement-retains-selected-identities",
+        "single-mode-multiple-values-observe-dev-guard",
+        "exact-single-and-multiple-events-noop-and-source-identity",
+        "sort-orders-identity-cache-without-membership-or-event-change",
+        "deferred-clear-merges-next-event-and-preserves-object-identity",
+        "unsubscribed-change-observer-stops-receiving-updates",
+        "initial-values-multiplicity-and-equal-valued-distinct-identities"
+      ],
+      "original_bug": true,
+      "genuine_entire_public_collections_executed": true,
+      "native_legacy_caller_executed": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "original",
+      "mode": "production",
+      "mutated": false,
+      "cases": [
+        "untouched-comparator-bug-reproduced",
+        "owned-identity-only-single-and-multiple",
+        "owned-chip-model-suppressed-events",
+        "selection-list-replacement-retains-selected-identities",
+        "single-mode-multiple-values-observe-dev-guard",
+        "exact-single-and-multiple-events-noop-and-source-identity",
+        "sort-orders-identity-cache-without-membership-or-event-change",
+        "deferred-clear-merges-next-event-and-preserves-object-identity",
+        "unsubscribed-change-observer-stops-receiving-updates",
+        "initial-values-multiplicity-and-equal-valued-distinct-identities"
+      ],
+      "original_bug": true,
+      "genuine_entire_public_collections_executed": true,
+      "native_legacy_caller_executed": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "main",
+      "mode": "development",
+      "mutated": false,
+      "cases": [
+        "peer-comparator-fix-retains-concrete-identity",
+        "owned-identity-only-single-and-multiple",
+        "owned-chip-model-suppressed-events",
+        "selection-list-replacement-retains-selected-identities",
+        "single-mode-multiple-values-observe-dev-guard",
+        "exact-single-and-multiple-events-noop-and-source-identity",
+        "sort-orders-identity-cache-without-membership-or-event-change",
+        "deferred-clear-merges-next-event-and-preserves-object-identity",
+        "unsubscribed-change-observer-stops-receiving-updates",
+        "initial-values-multiplicity-and-equal-valued-distinct-identities",
+        "comparator-changed-key-and-multiple-reselection"
+      ],
+      "original_bug": false,
+      "genuine_entire_public_collections_executed": true,
+      "native_legacy_caller_executed": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "main",
+      "mode": "production",
+      "mutated": false,
+      "cases": [
+        "peer-comparator-fix-retains-concrete-identity",
+        "owned-identity-only-single-and-multiple",
+        "owned-chip-model-suppressed-events",
+        "selection-list-replacement-retains-selected-identities",
+        "single-mode-multiple-values-observe-dev-guard",
+        "exact-single-and-multiple-events-noop-and-source-identity",
+        "sort-orders-identity-cache-without-membership-or-event-change",
+        "deferred-clear-merges-next-event-and-preserves-object-identity",
+        "unsubscribed-change-observer-stops-receiving-updates",
+        "initial-values-multiplicity-and-equal-valued-distinct-identities",
+        "comparator-changed-key-and-multiple-reselection"
+      ],
+      "original_bug": false,
+      "genuine_entire_public_collections_executed": true,
+      "native_legacy_caller_executed": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "21.x",
+      "mode": "development",
+      "mutated": false,
+      "cases": [
+        "peer-comparator-fix-retains-concrete-identity",
+        "owned-identity-only-single-and-multiple",
+        "owned-chip-model-suppressed-events",
+        "selection-list-replacement-retains-selected-identities",
+        "single-mode-multiple-values-observe-dev-guard",
+        "exact-single-and-multiple-events-noop-and-source-identity",
+        "sort-orders-identity-cache-without-membership-or-event-change",
+        "deferred-clear-merges-next-event-and-preserves-object-identity",
+        "unsubscribed-change-observer-stops-receiving-updates",
+        "initial-values-multiplicity-and-equal-valued-distinct-identities",
+        "comparator-changed-key-and-multiple-reselection"
+      ],
+      "original_bug": false,
+      "genuine_entire_public_collections_executed": true,
+      "native_legacy_caller_executed": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "21.x",
+      "mode": "production",
+      "mutated": false,
+      "cases": [
+        "peer-comparator-fix-retains-concrete-identity",
+        "owned-identity-only-single-and-multiple",
+        "owned-chip-model-suppressed-events",
+        "selection-list-replacement-retains-selected-identities",
+        "single-mode-multiple-values-observe-dev-guard",
+        "exact-single-and-multiple-events-noop-and-source-identity",
+        "sort-orders-identity-cache-without-membership-or-event-change",
+        "deferred-clear-merges-next-event-and-preserves-object-identity",
+        "unsubscribed-change-observer-stops-receiving-updates",
+        "initial-values-multiplicity-and-equal-valued-distinct-identities",
+        "comparator-changed-key-and-multiple-reselection"
+      ],
+      "original_bug": false,
+      "genuine_entire_public_collections_executed": true,
+      "native_legacy_caller_executed": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    }
+  ],
+  "mutations": [
+    {
+      "line": "original",
+      "id": "suppress-public-change-events",
+      "assertion_rejected": true
+    },
+    {
+      "line": "original",
+      "id": "disable-public-sort",
+      "assertion_rejected": true
+    },
+    {
+      "line": "original",
+      "id": "flush-deferred-clear-immediately",
+      "assertion_rejected": true
+    },
+    {
+      "line": "main",
+      "id": "suppress-public-change-events",
+      "assertion_rejected": true
+    },
+    {
+      "line": "main",
+      "id": "disable-public-sort",
+      "assertion_rejected": true
+    },
+    {
+      "line": "main",
+      "id": "flush-deferred-clear-immediately",
+      "assertion_rejected": true
+    },
+    {
+      "line": "main",
+      "id": "restore-original16-comparator-deletion-algorithm",
+      "assertion_rejected": true,
+      "note": "A set-normalization-only revert is masked by the peer concrete-value deletion predicate; both original16 defects are restored for this targeted negative."
+    },
+    {
+      "line": "21.x",
+      "id": "suppress-public-change-events",
+      "assertion_rejected": true
+    },
+    {
+      "line": "21.x",
+      "id": "disable-public-sort",
+      "assertion_rejected": true
+    },
+    {
+      "line": "21.x",
+      "id": "flush-deferred-clear-immediately",
+      "assertion_rejected": true
+    },
+    {
+      "line": "21.x",
+      "id": "restore-original16-comparator-deletion-algorithm",
+      "assertion_rejected": true,
+      "note": "A set-normalization-only revert is masked by the peer concrete-value deletion predicate; both original16 defects are restored for this targeted negative."
+    }
+  ],
+  "source_review": {
+    "schema_version": 1,
+    "line": "main",
+    "cases": [
+      {
+        "module": "@angular/cdk/collections",
+        "symbol": "SelectionModel",
+        "file": "legacy-chips/chip-list.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "6be4ef5b4100e7d1122dc3a0842d66c8a57315374e438ecd8ddf2e29e9f8c3e2",
+        "references": [
+          {
+            "line": 182,
+            "kind": "type"
+          },
+          {
+            "line": 444,
+            "kind": "constructor"
+          }
+        ],
+        "constructors": [
+          {
+            "line": 444,
+            "arguments": [
+              "this.multiple",
+              "undefined",
+              "false"
+            ]
+          }
+        ],
+        "calls": [
+          {
+            "line": 642,
+            "receiver": "this._selectionModel",
+            "method": "select",
+            "arguments": [
+              "correspondingChip"
+            ]
+          },
+          {
+            "line": 664,
+            "receiver": "this._selectionModel",
+            "method": "clear",
+            "arguments": []
+          },
+          {
+            "line": 679,
+            "receiver": "this._selectionModel",
+            "method": "clear",
+            "arguments": []
+          },
+          {
+            "line": 683,
+            "receiver": "this._selectionModel",
+            "method": "select",
+            "arguments": [
+              "chip"
+            ]
+          },
+          {
+            "line": 790,
+            "receiver": "this._selectionModel",
+            "method": "select",
+            "arguments": [
+              "event.source"
+            ]
+          },
+          {
+            "line": 791,
+            "receiver": "this._selectionModel",
+            "method": "deselect",
+            "arguments": [
+              "event.source"
+            ]
+          },
+          {
+            "line": 796,
+            "receiver": "this._selectionModel",
+            "method": "isSelected",
+            "arguments": [
+              "chip"
+            ]
+          }
+        ],
+        "member_uses": [
+          {
+            "line": 186,
+            "receiver": "this._selectionModel",
+            "member": "selected",
+            "kind": "read"
+          },
+          {
+            "line": 186,
+            "receiver": "this._selectionModel",
+            "member": "selected",
+            "kind": "read"
+          },
+          {
+            "line": 642,
+            "receiver": "this._selectionModel",
+            "member": "select",
+            "kind": "call"
+          },
+          {
+            "line": 664,
+            "receiver": "this._selectionModel",
+            "member": "clear",
+            "kind": "call"
+          },
+          {
+            "line": 679,
+            "receiver": "this._selectionModel",
+            "member": "clear",
+            "kind": "call"
+          },
+          {
+            "line": 683,
+            "receiver": "this._selectionModel",
+            "member": "select",
+            "kind": "call"
+          },
+          {
+            "line": 790,
+            "receiver": "this._selectionModel",
+            "member": "select",
+            "kind": "call"
+          },
+          {
+            "line": 791,
+            "receiver": "this._selectionModel",
+            "member": "deselect",
+            "kind": "call"
+          },
+          {
+            "line": 796,
+            "receiver": "this._selectionModel",
+            "member": "isSelected",
+            "kind": "call"
+          }
+        ],
+        "comparison_method": {
+          "name": "_selectValue",
+          "source": "private _selectValue(value: any, isUserInput: boolean = true): MatLegacyChip | undefined {\n    const correspondingChip = this.chips.find(chip => {\n      return chip.value != null && this._compareWith(chip.value, value);\n    });\n\n    if (correspondingChip) {\n      isUserInput ? correspondingChip.selectViaInteraction() : correspondingChip.select();\n      this._selectionModel.select(correspondingChip);\n    }\n\n    return correspondingChip;\n  }"
+        },
+        "publicly_exposed_model": false
+      },
+      {
+        "module": "@angular/cdk/collections",
+        "symbol": "SelectionModel",
+        "file": "legacy-list/selection-list.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "e408bbc42e122dcb9197d2fb850740a9cf769d650ec70442b595428ce747c206",
+        "references": [
+          {
+            "line": 411,
+            "kind": "constructor"
+          },
+          {
+            "line": 416,
+            "kind": "constructor"
+          }
+        ],
+        "constructors": [
+          {
+            "line": 411,
+            "arguments": [
+              "this._multiple",
+              "this.selectedOptions.selected"
+            ]
+          },
+          {
+            "line": 416,
+            "arguments": [
+              "this._multiple"
+            ]
+          }
+        ],
+        "calls": [
+          {
+            "line": 185,
+            "receiver": "this.selectionList.selectedOptions",
+            "method": "isSelected",
+            "arguments": [
+              "this"
+            ]
+          },
+          {
+            "line": 309,
+            "receiver": "this.selectionList.selectedOptions",
+            "method": "select",
+            "arguments": [
+              "this"
+            ]
+          },
+          {
+            "line": 311,
+            "receiver": "this.selectionList.selectedOptions",
+            "method": "deselect",
+            "arguments": [
+              "this"
+            ]
+          }
+        ],
+        "member_uses": [
+          {
+            "line": 185,
+            "receiver": "this.selectionList.selectedOptions",
+            "member": "isSelected",
+            "kind": "call"
+          },
+          {
+            "line": 309,
+            "receiver": "this.selectionList.selectedOptions",
+            "member": "select",
+            "kind": "call"
+          },
+          {
+            "line": 311,
+            "receiver": "this.selectionList.selectedOptions",
+            "member": "deselect",
+            "kind": "call"
+          },
+          {
+            "line": 411,
+            "receiver": "this.selectedOptions",
+            "member": "selected",
+            "kind": "read"
+          },
+          {
+            "line": 469,
+            "receiver": "this.selectedOptions",
+            "member": "changed",
+            "kind": "read"
+          }
+        ],
+        "comparison_method": {
+          "name": "_setOptionsFromValues",
+          "source": "private _setOptionsFromValues(values: string[]) {\n    this.options.forEach(option => option._setSelected(false));\n\n    values.forEach(value => {\n      const correspondingOption = this.options.find(option => {\n        // Skip options that are already in the model. This allows us to handle cases\n        // where the same primitive value is selected multiple times.\n        return option.selected ? false : this.compareWith(option.value, value);\n      });\n\n      if (correspondingOption) {\n        correspondingOption._setSelected(true);\n      }\n    });\n  }"
+        },
+        "publicly_exposed_model": true
+      },
+      {
+        "module": "@angular/cdk/collections",
+        "symbol": "SelectionModel",
+        "file": "legacy-select/internal/select-base.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "3a0e28d25fa553220d0faeff8c00b4bd3c343cdd27051e25eda7efef6a80b432",
+        "references": [
+          {
+            "line": 301,
+            "kind": "type"
+          },
+          {
+            "line": 550,
+            "kind": "constructor"
+          }
+        ],
+        "constructors": [
+          {
+            "line": 550,
+            "arguments": [
+              "this.multiple"
+            ]
+          }
+        ],
+        "calls": [
+          {
+            "line": 1061,
+            "receiver": "this._selectionModel",
+            "method": "isEmpty",
+            "arguments": []
+          },
+          {
+            "line": 1083,
+            "receiver": "this._selectionModel",
+            "method": "clear",
+            "arguments": []
+          },
+          {
+            "line": 1117,
+            "receiver": "this._selectionModel",
+            "method": "isSelected",
+            "arguments": [
+              "option"
+            ]
+          },
+          {
+            "line": 1134,
+            "receiver": "this._selectionModel",
+            "method": "select",
+            "arguments": [
+              "correspondingOption"
+            ]
+          },
+          {
+            "line": 1221,
+            "receiver": "this._selectionModel",
+            "method": "isSelected",
+            "arguments": [
+              "option"
+            ]
+          },
+          {
+            "line": 1225,
+            "receiver": "this._selectionModel",
+            "method": "clear",
+            "arguments": []
+          },
+          {
+            "line": 1233,
+            "receiver": "this._selectionModel",
+            "method": "select",
+            "arguments": [
+              "option"
+            ]
+          },
+          {
+            "line": 1234,
+            "receiver": "this._selectionModel",
+            "method": "deselect",
+            "arguments": [
+              "option"
+            ]
+          },
+          {
+            "line": 1254,
+            "receiver": "this._selectionModel",
+            "method": "isSelected",
+            "arguments": [
+              "option"
+            ]
+          },
+          {
+            "line": 1266,
+            "receiver": "this._selectionModel",
+            "method": "sort",
+            "arguments": [
+              "(a, b) => {\n        return this.sortComparator\n          ? this.sortComparator(a, b, options)\n          : options.indexOf(a) - options.indexOf(b);\n      }"
+            ]
+          }
+        ],
+        "member_uses": [
+          {
+            "line": 564,
+            "receiver": "this._selectionModel",
+            "member": "changed",
+            "kind": "read"
+          },
+          {
+            "line": 898,
+            "receiver": "this._selectionModel",
+            "member": "selected",
+            "kind": "read"
+          },
+          {
+            "line": 898,
+            "receiver": "this._selectionModel",
+            "member": "selected",
+            "kind": "read"
+          },
+          {
+            "line": 908,
+            "receiver": "this._selectionModel",
+            "member": "selected",
+            "kind": "read"
+          },
+          {
+            "line": 918,
+            "receiver": "this._selectionModel",
+            "member": "selected",
+            "kind": "read"
+          },
+          {
+            "line": 1061,
+            "receiver": "this._selectionModel",
+            "member": "isEmpty",
+            "kind": "call"
+          },
+          {
+            "line": 1083,
+            "receiver": "this._selectionModel",
+            "member": "clear",
+            "kind": "call"
+          },
+          {
+            "line": 1117,
+            "receiver": "this._selectionModel",
+            "member": "isSelected",
+            "kind": "call"
+          },
+          {
+            "line": 1134,
+            "receiver": "this._selectionModel",
+            "member": "select",
+            "kind": "call"
+          },
+          {
+            "line": 1221,
+            "receiver": "this._selectionModel",
+            "member": "isSelected",
+            "kind": "call"
+          },
+          {
+            "line": 1225,
+            "receiver": "this._selectionModel",
+            "member": "clear",
+            "kind": "call"
+          },
+          {
+            "line": 1233,
+            "receiver": "this._selectionModel",
+            "member": "select",
+            "kind": "call"
+          },
+          {
+            "line": 1234,
+            "receiver": "this._selectionModel",
+            "member": "deselect",
+            "kind": "call"
+          },
+          {
+            "line": 1254,
+            "receiver": "this._selectionModel",
+            "member": "isSelected",
+            "kind": "call"
+          },
+          {
+            "line": 1266,
+            "receiver": "this._selectionModel",
+            "member": "sort",
+            "kind": "call"
+          },
+          {
+            "line": 1313,
+            "receiver": "this._selectionModel",
+            "member": "selected",
+            "kind": "read"
+          }
+        ],
+        "comparison_method": {
+          "name": "_selectOptionByValue",
+          "source": "private _selectOptionByValue(value: any): MatOption | undefined {\n    const correspondingOption = this.options.find((option: MatOption) => {\n      // Skip options that are already in the model. This allows us to handle cases\n      // where the same primitive value is selected multiple times.\n      if (this._selectionModel.isSelected(option)) {\n        return false;\n      }\n\n      try {\n        // Treat null as a special reset value.\n        return option.value != null && this._compareWith(option.value, value);\n      } catch (error) {\n        if (typeof ngDevMode === 'undefined' || ngDevMode) {\n          // Notify developers of errors in their comparator.\n          console.warn(error);\n        }\n        return false;\n      }\n    });\n\n    if (correspondingOption) {\n      this._selectionModel.select(correspondingOption);\n    }\n\n    return correspondingOption;\n  }"
+        },
+        "publicly_exposed_model": false
+      }
+    ],
+    "delta_sources": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-select/select.ts",
+        "sha256": "8fa3a142a8c70b69300896a96e56a031798ad27feb0d84db22f9fd5083408739",
+        "reads": [
+          {
+            "line": 323,
+            "source": "this._selectionModel.selected[0]"
+          },
+          {
+            "line": 487,
+            "source": "this._selectionModel.selected[0]"
+          }
+        ]
+      }
+    ],
+    "scope": "Exact3 public model imports/4 constructor recipes and current call surface, with comparator resolution method context and2 inherited first-selected reads. No whole legacy caller execution/native/AOT/packed/floor/security pass.",
+    "g11_claim": "not-passed"
+  },
+  "source_negative_controls": 9,
+  "delta_negative_controls": 2,
+  "scope": "Whole authenticated publiccollections modules with genuine original/minimum Core/Compiler and borrowedRxJS. Model operations and source recipes only, no actual legacy component execution, AOT/packed/native/NodeRx floors/security or completeG11 qualification.",
+  "g11_claim": "not-passed"
+}
