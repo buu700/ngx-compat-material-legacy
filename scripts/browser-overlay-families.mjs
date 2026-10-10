@@ -426,9 +426,9 @@ try {
   // Menu: open via trigger click, Escape closes.
   await evaluate('document.getElementById("menu-trigger").click()');
   families.menu.opened = await waitFor('!!document.querySelector(".cdk-overlay-pane .mat-menu-panel #menu-item-a")');
-  if (families.menu.opened) {
-    await evaluate('document.querySelector(".cdk-overlay-pane .mat-menu-panel #menu-item-a")?.focus()');
-  }
+  families.menu.first_item_focused = families.menu.opened && await waitFor(
+    'document.activeElement===document.querySelector(".cdk-overlay-pane .mat-menu-panel #menu-item-a")',
+  );
   // Zoneful: CDP Escape (prior green proof). Zoneless: Escape often fails under CDP; backdrop fallback.
   await send('Input.dispatchKeyEvent', {type: 'keyDown', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27});
   await send('Input.dispatchKeyEvent', {type: 'keyUp', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27});
@@ -560,6 +560,7 @@ const ok =
   !error
   && zoneOk
   && families.menu.opened && menuClosedOk
+  && families.menu.first_item_focused
   && families['snack-bar'].opened && families['snack-bar'].dismissed
   && families['snack-bar'].enabled_motion?.length === 2
   && families['snack-bar'].enabled_motion.every(legacySnackMotionNativeOkay)
