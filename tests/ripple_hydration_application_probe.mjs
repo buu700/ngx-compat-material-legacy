@@ -46,7 +46,12 @@ const snapshot = replay => ({clicks:replay?1:2,deliveries:replay?[event('mousedo
 const positive = {server_hydration_metadata:true,before_bootstrap:true,
   captured_native:['mousedown','mouseup','click'].map(type=>({type,trusted:true,target_id:'replay-peer'})),
   ssr_button_reused:true,window_errors:[],replayed:snapshot(true),live:snapshot(false),destroyed:true,remaining_ripple_nodes:0};
-assert.equal(rippleHydrationReplayOkay(positive),true);
+const nativeEvents = line => ({phase:'fault', normal_creations:1, fault_creations:line==='main'?1:0,
+  normal_input:['mousedown','mouseup','click'].map(type=>({type,trusted:true,target_id:'native-peer'})),
+  fault_input:['mousedown','mouseup','click'].map(type=>({type,trusted:true,target_id:'native-peer'})),
+  normal_errors:[], fault_errors:line==='main'?[]:['Error: __PEER_COMPOSED_PATH_CONTROL__'], path_calls:1});
+for(const line of ['main','21.x']) assert.equal(rippleHydrationReplayOkay({...positive,native_peer_events:nativeEvents(line)},line),true);
+positive.native_peer_events=nativeEvents('main');
 const mutants = [
   row=>{row.server_hydration_metadata=false;}, row=>{row.before_bootstrap=false;},
   row=>{row.captured_native[0].trusted=false;}, row=>{row.captured_native.pop();},
@@ -58,8 +63,14 @@ const mutants = [
   row=>{row.live.clicks=1;}, row=>{row.live.deliveries[2].path_threw=true;},
   row=>{row.live.owned_ripple_launches=1;}, row=>{row.live.peer_ripple_launches=1;},
   row=>{row.destroyed=false;}, row=>{row.remaining_ripple_nodes=1;},
+  row=>{delete row.native_peer_events;}, row=>{row.native_peer_events.normal_creations=0;},
+  row=>{row.native_peer_events.normal_input[0].trusted=false;}, row=>{row.native_peer_events.path_calls=0;},
+  row=>{row.native_peer_events.normal_errors.push('unexpected');},
+  row=>{row.native_peer_events.fault_errors.push('unexpected');},
 ];
-for(const mutate of mutants) {const row=structuredClone(positive);mutate(row);assert.equal(rippleHydrationReplayOkay(row),false);}
+for(const mutate of mutants) {const row=structuredClone(positive);mutate(row);assert.equal(rippleHydrationReplayOkay(row,'main'),false);}
+assert.equal(rippleHydrationReplayOkay(positive,'21.x'),false);
+assert.equal(rippleHydrationReplayOkay(positive),false);
 console.log(JSON.stringify({specifications,negative_mutations:mutants.length,positive_contract:true,
   source_sha256:sha(readFileSync(new URL('../scripts/ripple-hydration-application.mjs',import.meta.url))),
   native_or_packed_AOT_executed:false}));

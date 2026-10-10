@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {rippleHydrationComponentFixture} from './ripple-hydration-component-fixture.mjs';
+import {publicRippleNativeEventsOkay} from './ripple-native-event-probe.mjs';
 
 /** Exact supported-floor application inputs. Installation/build belong to the packed runner. */
 export function rippleHydrationApplication(line, runtime) {
@@ -97,10 +98,11 @@ if (isMainModule(import.meta.url)) {
 }
 
 /** Accept real pre-bootstrap native capture, replay and ordinary post-hydration interaction. */
-export function rippleHydrationReplayOkay(row) {
+export function rippleHydrationReplayOkay(row, line) {
   const replay = row?.replayed, live = row?.live;
   const deliveries = replay?.deliveries;
-  return row?.server_hydration_metadata === true && row?.before_bootstrap === true
+  return publicRippleNativeEventsOkay(row?.native_peer_events, line)
+    && row?.server_hydration_metadata === true && row?.before_bootstrap === true
     && Array.isArray(row?.captured_native) && row.captured_native.length === 3
     && row.captured_native.map(event => event.type).join(',') === 'mousedown,mouseup,click'
     && row.captured_native.every(event => event.trusted === true && event.target_id === 'replay-peer')

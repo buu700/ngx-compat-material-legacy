@@ -33,6 +33,7 @@ const html=await server.renderApplication(bootstrap,options);
 assert.match(html,/<ripple-hydration-lab[^>]*\bngh="0"[^>]*>/);
 assert.match(html,/<button[^>]*id="replay-peer"[^>]*class="mat-ripple"[^>]*jsaction="mousedown:;mouseup:;click:;"[^>]*>Hydration 0<\/button>/);
 assert.match(html,/<div[^>]*id="replay-owned"[^>]*class="mat-ripple"/);
+assert.match(html,/<button[^>]*id="native-peer"[^>]*class="mat-ripple"[^>]*>Native peer only<\/button>/);
 assert.match(html,/id="ng-state"[^>]*>\{"__nghData__":/);
 await assert.rejects(()=>server.renderApplication(bootstrap,{...options,allowedHosts:[]}),error=>error.code===5706);
 console.log(JSON.stringify({html,html_sha256:hash(html),genuine_peer_directive_SSR:true,owned_component_and_helpers_loaded:true,

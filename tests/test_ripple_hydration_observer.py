@@ -17,6 +17,6 @@ class RippleHydrationObserverTests(unittest.TestCase):
                                 capture_output=True, text=True, timeout=30)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         report = json.loads(result.stdout)
-        self.assertEqual(report['protocol_cases'], 2)
+        self.assertEqual(report['protocol_cases'], 3)
         self.assertTrue(report['failure_cleanup'])
         self.assertFalse(report['native_or_angular_replay_executed'])

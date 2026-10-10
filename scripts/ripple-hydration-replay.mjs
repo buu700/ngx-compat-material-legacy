@@ -14,6 +14,7 @@ import {fileURLToPath} from 'node:url';
 import {createHash} from 'node:crypto';
 import {parseLegacyArgs, resolveLibraryFromRun, sha256File} from './resolve-run-library.mjs';
 import {rippleHydrationApplication, rippleHydrationReplayOkay} from './ripple-hydration-application.mjs';
+import {observePublicRippleNativeEvents} from './ripple-native-event-probe.mjs';
 import {withChromium} from './browser-required-cells.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -35,7 +36,9 @@ export async function observeHydrationReplay(driver) {
   try {
   const before = await evaluate(`(() => {
     window.__hydrationNative = []; window.__hydrationErrors = [];
-    window.__hydrationErrorListener = event => window.__hydrationErrors.push(String(event.error || event.message));
+    window.__hydrationErrorListener = event => {
+      if (window.__rippleNativeFaultActive !== true) window.__hydrationErrors.push(String(event.error || event.message));
+    };
     window.addEventListener('error', window.__hydrationErrorListener);
     window.__hydrationNativeListener = event => window.__hydrationNative.push({type:event.type, trusted:event.isTrusted, target_id:event.target.id});
     ['mousedown','mouseup','click'].forEach(type => document.addEventListener(type, window.__hydrationNativeListener, true));
@@ -57,6 +60,7 @@ export async function observeHydrationReplay(driver) {
   await pointerClick(before.point);
   await wait('window.__hydrationSnapshot?.().clicks === 2', 'Live interaction missing');
   const live = await evaluate('window.__hydrationSnapshot()');
+  const native_peer_events = await observePublicRippleNativeEvents(driver);
   await evaluate('window.__destroyHydration()');
   await wait('document.querySelectorAll(".mat-ripple-element").length === 0', 'Ripple nodes survived destruction');
   const cleanup = await evaluate(`(() => {
@@ -65,7 +69,7 @@ export async function observeHydrationReplay(driver) {
       remaining_ripple_nodes:document.querySelectorAll('.mat-ripple-element').length, window_errors:window.__hydrationErrors};
   })()`);
   return {...before, before_bootstrap:before.before_bootstrap && captured.still_before,
-    captured_native:captured.events, replayed, live, ssr_button_reused:reused, ...cleanup};
+    captured_native:captured.events, replayed, live, native_peer_events, ssr_button_reused:reused, ...cleanup};
   } finally {
     await evaluate(`(() => {
       ['mousedown','mouseup','click'].forEach(type => document.removeEventListener(type, window.__hydrationNativeListener, true));
@@ -100,8 +104,9 @@ async function build(tarball, line, runtime) {
     source_sha256:Object.fromEntries(Object.entries(spec.files).map(([path,source]) => [path,hash(source)]))};
 }
 
-async function withServer(built, callback) {
+export async function withServer(built, callback) {
   const child = spawn(process.execPath, ['dist/server/server.mjs'], {cwd:built.consumer, env:built.env, stdio:['ignore','pipe','pipe']});
+  const closed = new Promise(done => child.once('close', done));
   let output = '', errors = '';
   child.stdout.on('data', bytes => {output += bytes;}); child.stderr.on('data', bytes => {errors += bytes;});
   try {
@@ -109,12 +114,15 @@ async function withServer(built, callback) {
     for (let i=0; i<200; i++) {
       origin = output.match(/__HYDRATION_ORIGIN__(http:\/\/127\.0\.0\.1:\d+)/)?.[1];
       if (origin) break;
-      if (child.exitCode !== null) throw Error((output + errors).slice(-3000));
+      if (child.exitCode !== null || child.signalCode !== null) throw Error((output + errors).slice(-3000));
       await sleep(25);
     }
     if (!origin) throw Error('SSR server did not announce loopback origin');
     await callback(origin);
-  } finally {child.kill(); await new Promise(done => {if(child.exitCode!==null)done();else child.once('close',done);});}
+  } finally {
+    if (child.exitCode === null && child.signalCode === null) child.kill();
+    await closed;
+  }
 }
 
 export async function runRippleHydrationReplay({tarball, runId=null, reportPath}) {
@@ -125,7 +133,7 @@ export async function runRippleHydrationReplay({tarball, runId=null, reportPath}
   if (!line) throw Error('Unsupported packed peer line');
   const report = {schema_version:1, line, run_id:runId, tarball_sha256:sha256File(tarball),
     producer_sha256:sha256File(fileURLToPath(import.meta.url)), node:process.version, results:[],
-    scope:'Packed strict AOT public CLI SSR/client build at exact current peers and Rx7.5.5. Trusted Chromium pre-bootstrap input, genuine Angular replay and actual owned renderer/public MatRipple. No full Node/Rx/browser matrix or new release matrix cells.'};
+    scope:'Packed strict AOT public CLI SSR/client build at exact current peers and Rx7.5.5. Trusted Chromium pre-bootstrap input and genuine replay through the owned helper/renderer. Public MatRipple creation is separate from directive-only native input. A controlled native composedPath fault records the missing21 minimum guard; it does not qualify shared peer replay safety or clear10db3. No full Node/Rx/browser matrix or new release matrix cells.'};
   try {
     for (const runtime of ['zoneful','zoneless']) {
       const built = await build(tarball,line,runtime);
@@ -133,8 +141,8 @@ export async function runRippleHydrationReplay({tarball, runId=null, reportPath}
         await withChromium(origin, async driver => {
           const observed = await observeHydrationReplay(driver);
           report.results.push({runtime, dependencies:built.spec.dependencies, lock_sha256:built.lock_sha256,
-            source_sha256:built.source_sha256, browser:driver.browser, ...observed, ok:rippleHydrationReplayOkay(observed)});
-          if (!rippleHydrationReplayOkay(observed)) throw Error(`Hydration replay contract failed: ${runtime}`);
+            source_sha256:built.source_sha256, browser:driver.browser, ...observed, ok:rippleHydrationReplayOkay(observed, line)});
+          if (!rippleHydrationReplayOkay(observed, line)) throw Error(`Hydration replay contract failed: ${runtime}`);
         });
       });
     }
