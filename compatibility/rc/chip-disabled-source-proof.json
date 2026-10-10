@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "task": "C04 original chip disabled-state forms review and required packed regression",
+  "line": "21.x",
+  "source_commit": "5922738ed923181eba0c4cb14520626d42eaf606",
+  "source_tree": "7361f46c8274c2a849d5ed2e087f99bc3b950c36",
+  "source_clean_before_diagnostic": true,
+  "files": [
+    {
+      "path": "scripts/packed-consumer-aot-smoke.mjs",
+      "sha256": "ce85b75ae899bb313e4af2a08cd3590b6b7718ad771b7b6c7f16358b33e04f29",
+      "bytes": 108264
+    },
+    {
+      "path": "scripts/packed-consumer-evidence.mjs",
+      "sha256": "ba7513355b861993aeb8f7558d5a96a1b9d3a9c4b3c8627cf0f5c28d989466da",
+      "bytes": 14149
+    },
+    {
+      "path": "compatibility/rc/matrices/full-verify.json",
+      "sha256": "ce5d0b5c570587850a6cc59898f6f250e32494e280936da216aea754f157516a",
+      "bytes": 625141
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+      "sha256": "9cc1002428887bd85097fbfac6980b4ce3c88018619b801364c27a7b6ff12c80",
+      "bytes": 66462
+    },
+    {
+      "path": "tests/packed_chip_disabled_admission_probe.mjs",
+      "sha256": "2f13f261b476f0c6c10b80023170d74a89500c45c363d69cff876e3be2fbf27e",
+      "bytes": 4778
+    },
+    {
+      "path": "tests/test_chip_disabled_admission.py",
+      "sha256": "d756aa0c11159fe3bf17616a5becacbf825ba1b27bb0d6f9326f8e829380d4e8",
+      "bytes": 847
+    },
+    {
+      "path": "tests/packed_table_construction_admission_probe.mjs",
+      "sha256": "287d85d43454b47b0870eb386ba343d23df463737548c1c343f5d48cf425c480",
+      "bytes": 4771
+    },
+    {
+      "path": "tests/test_packed_consumer_requires_artifact.py",
+      "sha256": "67804545e423107210efd2664b0d9203ba0468899a07c063f05cd8f1f304ef69",
+      "bytes": 4414
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-chip-disabled-source-review.json",
+      "sha256": "e459c985554c828cef0031348433e1b42e2976be72c046d4ba203ce4a284ff0d",
+      "bytes": 6187
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-fourteen-build-scope-review.json",
+      "sha256": "45d56a20a88b7cbdb3e4a766b9a95b7ebbe820d5d7efe4d4eb5bacf3fbdc65d6",
+      "bytes": 480927
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/ledger.json",
+      "sha256": "5a67b12c2e8a51e7679d91786f301c9ef61ad4659aeae1bf037a93c75304d1f0",
+      "bytes": 2227834
+    },
+    {
+      "path": "compatibility/f10/authored-use-reviews/owned-legacy-viewport-boundary.json",
+      "sha256": "ea6143e93f6267897be0a20c13aed42a44530749ea58e3e420c07fe3ccf8f504",
+      "bytes": 58889
+    },
+    {
+      "path": "compatibility/f10/authored-dependency-dispositions.json",
+      "sha256": "591eaae2575ef52a928ca2998aad3f4f8ebacdce214f7f15f5dac54ed2d854b6",
+      "bytes": 624010
+    }
+  ],
+  "diagnostics": [
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "test_chip_disabled_admission",
+        "test_packed_consumer_requires_artifact",
+        "test_consumer_floor_admission",
+        "test_legacy_viewport_public.LegacyViewportPublicTests.test_exact_owned_replacement_review_binding",
+        "test_upstream_build_scope_review",
+        "test_chips_keyboard_contract",
+        "-v"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 7.486,
+      "stdout": "",
+      "stderr": "test_missing_false_or_forged_disabled_observation_cannot_pass (test_chip_disabled_admission.ChipDisabledAdmissionTests.test_missing_false_or_forged_disabled_observation_cannot_pass) ... ok\ntest_actual_consumers_stop_invalid_subject_before_artifact_or_install (test_packed_consumer_requires_artifact.PackedConsumerRequiresArtifact.test_actual_consumers_stop_invalid_subject_before_artifact_or_install) ... ok\ntest_missing_run_and_tarball_exits_two (test_packed_consumer_requires_artifact.PackedConsumerRequiresArtifact.test_missing_run_and_tarball_exits_two) ... ok\ntest_shared_coordinator_rejects_wrong_line_and_dirty_source (test_packed_consumer_requires_artifact.PackedConsumerRequiresArtifact.test_shared_coordinator_rejects_wrong_line_and_dirty_source) ... ok\ntest_table_construction_case_cannot_disappear_or_admit_false_observation (test_packed_consumer_requires_artifact.PackedConsumerRequiresArtifact.test_table_construction_case_cannot_disappear_or_admit_false_observation) ... ok\ntest_both_lines_and_invalid_receipts (test_consumer_floor_admission.FloorAdmissionTests.test_both_lines_and_invalid_receipts) ... ok\ntest_engine_present_or_unproven_receipts_are_rejected_after_rehash (test_consumer_floor_admission.FloorAdmissionTests.test_engine_present_or_unproven_receipts_are_rejected_after_rehash) ... ok\ntest_exact_owned_replacement_review_binding (test_legacy_viewport_public.LegacyViewportPublicTests.test_exact_owned_replacement_review_binding) ... ok\ntest_actual_checker_cannot_bypass_scope_by_relabelling_report (test_upstream_build_scope_review.UpstreamBuildScopeTests.test_actual_checker_cannot_bypass_scope_by_relabelling_report) ... ok\ntest_complete_original_patches_and_candidate_context_are_bound (test_upstream_build_scope_review.UpstreamBuildScopeTests.test_complete_original_patches_and_candidate_context_are_bound) ... ok\ntest_exact_original_source_and_restored_original_assertion (test_chips_keyboard_contract.ChipsKeyboardContractTests.test_exact_original_source_and_restored_original_assertion) ... ok\ntest_original_and_candidate_method_state_transitions (test_chips_keyboard_contract.ChipsKeyboardContractTests.test_original_and_candidate_method_state_transitions) ... ok\n\n----------------------------------------------------------------------\nRan 12 tests in 7.384s\n\nOK\n"
+    },
+    {
+      "command": [
+        "node",
+        "scripts/check-upstream-audit-disposition.mjs",
+        "--line",
+        "21.x",
+        "--admission",
+        "--report",
+        "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/compatibility/rc/chip-disabled-admission-diagnostic.json"
+      ],
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "elapsed_seconds": 2.208,
+      "stdout": "{\n  \"ok\": false,\n  \"structural_inventory\": \"fail\",\n  \"disposition_admission\": \"incomplete\",\n  \"security_clearance\": \"not-passed\",\n  \"g11_claim\": \"not-passed\",\n  \"seed_rows\": 1697,\n  \"ledger_rows\": 1697,\n  \"missing\": 0,\n  \"unresolved\": 1602,\n  \"conflicting_sha_rows\": 0,\n  \"outside_seed\": 0,\n  \"security_hunk_labeled_docs_only\": 0,\n  \"unknown_disposition\": 0,\n  \"missing_evidence\": 1591,\n  \"circular_evidence\": 0,\n  \"insufficient_sensitive\": 103,\n  \"insufficient_inherited\": 0,\n  \"insufficient_behavior\": 0,\n  \"missing_branch_applicability\": 102,\n  \"authored_use_inventory\": {\n    \"complete\": true,\n    \"expected\": 1736,\n    \"observed\": 1736,\n    \"missing\": 0,\n    \"duplicates\": 0,\n    \"outside\": 0,\n    \"invalid\": 0,\n    \"open\": 445\n  },\n  \"authored_use_review_evidence\": {\n    \"reviewed\": 1291,\n    \"insufficient\": 0,\n    \"insufficient_use_sample\": []\n  },\n  \"symbol_uses_open\": 445,\n  \"symbol_status\": \"in-progress\",\n  \"symbol_dispositions_sha256\": \"591eaae2575ef52a928ca2998aad3f4f8ebacdce214f7f15f5dac54ed2d854b6\",\n  \"forged_clearance\": false\n}\n",
+      "stderr": "upstream-audit-disposition incomplete: missing=0 unresolved=1602 conflicting=0 outside=0 security_docs_only=0 unknown=0\n"
+    }
+  ],
+  "admission": {
+    "path": "compatibility/rc/chip-disabled-admission-diagnostic.json",
+    "sha256": "83cf78b70d14975962af441ef0b5efb2dbe02fdbcb4b8044f539f8937d64eb18",
+    "bytes": 1806
+  },
+  "result": {
+    "packed_roster_count": 92,
+    "new_packed_case": "packed-consumer/harness/chip-individual-disabled-form-isolation",
+    "native_regression_implemented": true,
+    "native_or_packed_executed": false,
+    "upstream_sha_disposition": "needs-individual-review",
+    "reviewed_authored_uses": 1291,
+    "open_authored_uses": 445,
+    "g11_claim": "not-passed"
+  },
+  "product_resources_unchanged_count": 439,
+  "qualifications": [
+    "Whole actual acceptance collector/report writer exercised with synthetic observations; absent,false,unconditional and omitted-case controls reject weak evidence.",
+    "All original1697SHA/1736use identities remain; prior shallow main conclusion preserved and reopened until actual native/artifact behavior evidence.",
+    "Library/component implementation,consumer resources,Cyph,peer/toolchain pins unchanged; one native test fixture and packed producer added.",
+    "No Actions/push/install/fullbuild/native/product gate/independent audit/publication credit."
+  ]
+}
