@@ -24,6 +24,7 @@ const report = {schema_version: 1, role: 'Actual browser runAcceptance with copi
 try {
   for (const path of [
     ...['browser-matrix-acceptance', 'resolve-run-library', 'legacy-core-high-contrast-contract',
+      'ripple-hydration-replay', 'ripple-hydration-application', 'ripple-hydration-component-fixture',
       'browser-matrix-roster', 'browser-required-cells', 'chromium-debug-endpoint',
       'tooltip-aria-lifetime-fixture', 'form-field-direction-lifetime-fixture', 'checkbox-timer-lifetime-fixture', 'ripple-delegation-lifetime-fixture', 'snack-announcement-lifetime-fixture', 'legacy-tooltip-native-contract',
       'legacy-ink-bar-native-contract', 'legacy-select-font-native-contract', 'legacy-chip-blur-native-contract',

@@ -21,7 +21,7 @@ class BrowserSourceIdentityTests(unittest.TestCase):
                                 capture_output=True, text=True, timeout=20)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         report = json.loads(result.stdout)
-        self.assertEqual(report['scenarios'], 6)
+        self.assertEqual(report['scenarios'], 7)
         self.assertEqual(report['mutant_rejected'], 1)
         self.assertFalse(report['native_executed'])
         self.assertFalse(report['acceptance_credit'])

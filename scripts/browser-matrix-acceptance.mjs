@@ -11,6 +11,7 @@ import {dirname, join, relative} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {resolveLibraryFromRun} from './resolve-run-library.mjs';
 import {coordinatorRequest} from './packed-consumer-evidence.mjs';
+import {runRippleHydrationReplay} from './ripple-hydration-replay.mjs';
 import {legacyCoreHighContrastOkay} from './legacy-core-high-contrast-contract.mjs';
 import {loadReleaseRoster, observationProblems} from './browser-matrix-roster.mjs';
 import {executeIds, fixtureQualificationDefects, fixtureQualificationDefectsFromTarball} from './browser-required-cells.mjs';
@@ -174,6 +175,14 @@ export async function runAcceptance({tarball, runPath}) {
       launchError = error instanceof Error ? error.message : String(error);
     }
   }
+  let hydrationReplay = null;
+  if (qualifiedFixture && !matrixMismatch && library && request.binding.source_clean === true && launch.chrome) {
+    try {
+      hydrationReplay = await runRippleHydrationReplay({tarball:library.tarball, runId:request.runId,
+        reportPath:join(request.runDir,'reports','ripple-hydration-replay.json')});
+    } catch (error) {hydrationReplay = {ok:false,error:String(error)};}
+  }
+  if (hydrationReplay?.ok !== true) qualificationDefects.push('genuine packed Angular hydration replay missing or failed');
   const closeoutDiagnostic=runCloseoutDiagnostic(request,library,launch);
   if(!closeoutDiagnostic?.core_high_contrast_passed)qualificationDefects.push('legacy core high contrast/ripple native guard missing or failed');
   const observed = observationProblems({
@@ -218,6 +227,7 @@ export async function runAcceptance({tarball, runPath}) {
     schema_version: 1,
     role: 'diagnostic browser-matrix detail; acceptance is the coordinator report',
     closeout_diagnostic:closeoutDiagnostic,
+    hydration_replay:hydrationReplay,
     check_id: 'browser-matrix',
     result: accepted ? 'pass' : 'fail',
     g10_claim: 'not-passed',
@@ -235,6 +245,7 @@ export async function runAcceptance({tarball, runPath}) {
   }
   const assertion = {
     kind: 'browser-matrix-observations',
+    hydration_replay:hydrationReplay,
     check_id: 'browser-matrix',
     run_id: request.runId,
     invocation_id: request.invocation,

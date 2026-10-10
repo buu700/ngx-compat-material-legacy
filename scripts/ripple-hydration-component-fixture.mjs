@@ -19,6 +19,8 @@ export class RippleHydrationLab {
   private readonly zone = inject(NgZone);
   private readonly platform = inject(Platform);
   private owned?: LegacyRippleRenderer;
+  private ownedLaunches = 0;
+  private peerLaunches = 0;
   ngAfterViewInit() {
     if (this.platform.isBrowser) {
       this.owned = new LegacyRippleRenderer({rippleConfig: {animation: {enterDuration: 0, exitDuration: 0}}, rippleDisabled: false},
@@ -32,7 +34,10 @@ export class RippleHydrationLab {
     const target = legacyGetEventTarget<HTMLElement>(event);
     this.deliveries.push({type: event.type, path_threw, target_id: target?.id ?? '', peer_present: !!this.peer});
     this.owned?.handleEvent(event);
-    this.peer.launch(event.clientX, event.clientY, {animation: {enterDuration: 0, exitDuration: 0}});
+    if (this.ownedHost.nativeElement.querySelector('.mat-ripple-element')) this.ownedLaunches++;
+    const ref = this.peer.launch(event.clientX, event.clientY, {persistent: true, animation: {enterDuration: 0, exitDuration: 0}});
+    if (ref.element.isConnected) this.peerLaunches++;
+    ref.fadeOut();
   }
   up(event: MouseEvent) {this.owned?.handleEvent(event);}
   clicked(event: MouseEvent) {
@@ -43,7 +48,8 @@ export class RippleHydrationLab {
     this.clicks.update(value => value + 1);
   }
   snapshot() {return {clicks: this.clicks(), deliveries: this.deliveries.map(row => ({...row})),
-    actual_peer_directive_present: !!this.peer, actual_owned_renderer_present: !!this.owned};}
+    actual_peer_directive_present: !!this.peer, actual_owned_renderer_present: !!this.owned,
+    owned_ripple_launches: this.ownedLaunches, peer_ripple_launches: this.peerLaunches};}
   ngOnDestroy() {this.owned?._removeTriggerEvents(); this.owned?.fadeOutAll(); this.peer?.fadeOutAll();}
 }
 `;
