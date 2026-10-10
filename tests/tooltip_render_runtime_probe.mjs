@@ -70,6 +70,11 @@ const mutations = {
   premature: helperProgram(changed(helper, 'if (zone.isStable)', 'if (true)')),
   noOnce: helperProgram(changed(helper, '  }).pipe(take(1));', '  });')),
   noErrorCleanup: helperProgram(changed(helper, '      empty.unsubscribe();\n      throw error;', '      throw error;')),
+  ariaNoDestroy: bodyProgram(changed(candidate, '    this._ariaDescriptionDestroyed = true;', '')),
+  ariaNoEntryGuard: bodyProgram(changed(candidate,
+    'if (this._ariaDescriptionPending || this._ariaDescriptionDestroyed)', 'if (this._ariaDescriptionPending)')),
+  ariaNoCompletionGuard: bodyProgram(changed(candidate,
+    'if (!this._ariaDescriptionDestroyed && this.message && !this.disabled)', 'if (this.message && !this.disabled)')),
 };
 const loaded = prepareMaterialPublicSubjects(root), results = [];
 try {
@@ -159,8 +164,22 @@ async function update(js,helperJs=payload.helper,injector=app?.injector??manual,
 async function cancel(js,helperJs=payload.helper,detach=false){const f=fixture(js,helperJs),before=renders;
  zone.run(()=>{f.instance.message='Pending';if(detach){f.instance._tooltipInstance=null;f.instance._overlayRef=null;}else f.instance.ngOnDestroy();});
  render();await drain();assert.equal(f.changes.length,0,'no-position-after-detach-or-destroy');
+ if(!detach){assert.deepEqual(f.aria.filter(event=>event[0]==='describe'),[],'no-description-after-destroy');
+  assert.equal(f.instance._ariaDescriptionPending,false,'pending-aria-request-settles');}
  if(!detach)assert.equal(renders,before,'canceled-render-hook');
  if(detach)f.instance.ngOnDestroy();return{positions:f.changes.length,canceled:!detach};}
+async function ariaLifetime(js){const f=fixture(js);
+ try{zone.run(()=>{f.instance.message=' First description ';f.instance.message='Latest description';});
+  render();await drain();assert.deepEqual(f.aria.filter(event=>event[0]==='describe'),[['describe','Latest description']],'live-aria-coalesces-latest-message');
+  assert.equal(f.instance._ariaDescriptionPending,false,'live-aria-request-settles');
+  return{descriptions:f.aria.filter(event=>event[0]==='describe')};
+ }finally{f.instance.ngOnDestroy();}}
+async function ariaAfterDestroy(js){const f=fixture(js);
+ f.instance.ngOnDestroy();const before=[...f.aria];
+ zone.run(()=>{f.instance.message='Request after destruction';});render();await drain();
+ assert.deepEqual(f.aria,before,'destroyed-tooltip-rejects-aria-requests');
+ assert.equal(f.instance._ariaDescriptionPending,false,'destroyed-tooltip-keeps-no-pending-aria-request');
+ return{afterDestroyResourceCalls:f.aria.length-before.length};}
 async function errorCleanup(helperJs){let active=0;const emitter=zone.onMicrotaskEmpty,originalSubscribe=emitter.subscribe;
  emitter.subscribe=function(...args){const sub=originalSubscribe.apply(this,args);active++;sub.add(()=>active--);return sub;};
  const failing=core.Injector.create({providers:[{provide:core.ApplicationRef,useFactory:()=>{throw new Error('expected-lookup-failure');}}]});
@@ -172,6 +191,7 @@ try{
  const candidate=await update(payload.candidate);
  ${mode === 'zoneful' ? 'assert.deepEqual(candidate,old);' : ''}
  const canceled=await cancel(payload.candidate),detached=await cancel(payload.candidate,payload.helper,true);
+ const ariaLive=await ariaLifetime(payload.candidate),ariaDestroyed=await ariaAfterDestroy(payload.candidate);
  let manualResult=null;
  ${mode === 'zoneful' ? `const bare=core.Injector.create({providers:[]});try{manualResult=await update(payload.candidate,payload.helper,bare);}finally{bare.destroy();}` : ''}
  await errorCleanup(payload.helper);
@@ -187,8 +207,11 @@ try{
   await reject('removed-once-only-completion',()=>update(payload.candidate,payload.mutations.noOnce),'rendered-message-positioned');
  }
  await reject('lookup-error-leaks-subscription',()=>errorCleanup(payload.mutations.noErrorCleanup),'lookup-error-cleans-zone-subscription');
+ await reject('aria-destroy-flag-removed',()=>cancel(payload.mutations.ariaNoDestroy),'no-description-after-destroy');
+ await reject('aria-completion-guard-removed',()=>cancel(payload.mutations.ariaNoCompletionGuard),'no-description-after-destroy');
+ await reject('aria-entry-guard-removed',()=>ariaAfterDestroy(payload.mutations.ariaNoEntryGuard),'destroyed-tooltip-rejects-aria-requests');
  ` : ''}
- console.log(JSON.stringify({old,candidate,canceled,detached,manualResult,registrations,renders,mutations,
+ console.log(JSON.stringify({old,candidate,canceled,detached,ariaLive,ariaDestroyed,manualResult,registrations,renders,mutations,
   genuine_public_application:!!app,genuine_public_zone:true,whole_constructor_executed:true,
   angular_decorators_or_node_DI_executed:false,native_executed:false}));
 }finally{app?.destroy();manual?.destroy();core.destroyPlatform();}

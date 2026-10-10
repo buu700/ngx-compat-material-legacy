@@ -12,6 +12,20 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class LegacyTooltipNativeContractTests(unittest.TestCase):
+    def test_missing_or_failed_aria_cleanup_observations_fail(self):
+        subprocess.run(['node', '--input-type=module', '-e', r'''
+import assert from 'node:assert/strict';
+import {legacyTooltipAriaLifetimeNativeOkay as okay} from './scripts/legacy-tooltip-native-contract.mjs';
+const observation={actual_directive_created:true,host_removed:true,initial_description_absent:true,
+ pending_cleanup_clear:true,later_request_clear:true};
+assert.equal(okay(observation),true);
+for(const value of [null,{},[],{...observation,error:'browser failed'}])assert.equal(okay(value),false);
+for(const key of Object.keys(observation)){
+ const missing={...observation};delete missing[key];assert.equal(okay(missing),false,key);
+ for(const value of [false,'true',1,undefined])assert.equal(okay({...observation,[key]:value}),false,key);
+}
+'''], cwd=ROOT, check=True, capture_output=True, text=True)
+
     def test_wrong_message_geometry_and_missing_observations_fail(self):
         subprocess.run(['node', '--input-type=module', '-e', r'''
 import assert from 'node:assert/strict';

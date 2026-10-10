@@ -21,7 +21,8 @@
 import {createHash} from 'node:crypto';
 import {observeTabPaginationNative,tabPaginationNativeOkay} from './tab-pagination-native-contract.mjs';
 import {observeLegacyInkBarNative,legacyInkBarSelectionSequenceOkay} from './legacy-ink-bar-native-contract.mjs';
-import {legacyTooltipMessageSequenceOkay, observeLegacyTooltipNative} from './legacy-tooltip-native-contract.mjs';
+import {legacyTooltipMessageSequenceOkay, observeLegacyTooltipNative,
+  legacyTooltipAriaLifetimeNativeOkay, observeLegacyTooltipAriaLifetimeNative} from './legacy-tooltip-native-contract.mjs';
 import {legacySnackMotionNativeOkay, observeLegacySnackMotionNative} from './legacy-snack-motion-native-contract.mjs';
 import {announcedChromeEndpoint,debuggerMatchesChild} from './chromium-debug-endpoint.mjs';
 import {spawnSync as __spawnSyncForWs} from 'node:child_process';
@@ -121,18 +122,58 @@ if (relative(realpathSync(consumer), installed).startsWith('..')) fail(1, `Libra
 
 mkdirSync(join(consumer, 'src'), {recursive: true});
 writeFileSync(join(consumer, 'src/main.ts'), `${zoneless ? '' : `import 'zone.js';
-`}import {Component, NgModule, ViewContainerRef, inject, signal${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';
+`}import {Component, NgModule, TemplateRef, ViewChild, ViewContainerRef, inject, signal${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {MATERIAL_ANIMATIONS} from '@angular/material/core';
 import {MatLegacyMenuModule} from '@ngx-compat/material-legacy/legacy-menu';
 import {MatLegacySnackBar, MatLegacySnackBarContainer, MatLegacySnackBarModule} from '@ngx-compat/material-legacy/legacy-snack-bar';
-import {MatLegacyTooltipModule} from '@ngx-compat/material-legacy/legacy-tooltip';
+import {MatLegacyTooltip, MatLegacyTooltipModule} from '@ngx-compat/material-legacy/legacy-tooltip';
 import {MatLegacyAutocompleteModule} from '@ngx-compat/material-legacy/legacy-autocomplete';
 import {MatLegacyFormFieldModule} from '@ngx-compat/material-legacy/legacy-form-field';
 import {MatLegacyInputModule} from '@ngx-compat/material-legacy/legacy-input';
 import {MatLegacyTabsModule} from '@ngx-compat/material-legacy/legacy-tabs';
 import {LEGACY_ANIMATIONS_TEST_OVERRIDE} from '@ngx-compat/material-legacy/legacy-core';
+
+@Component({
+  standalone: false,
+  selector: 'lab-tooltip-aria-lifetime',
+  template: \`
+    <ng-template #probe><button matTooltip="" #tooltip="matTooltip"
+      [attr.data-probe]="register(tooltip)">Temporary tooltip</button></ng-template>
+    <button id="tip-aria-run" type="button" (click)="run()">Tooltip cleanup</button>
+    <output id="tip-aria-result" [attr.data-complete]="completed()">{{result()}}</output>
+  \`,
+})
+export class TooltipAriaLifetimeLab {
+  @ViewChild('probe', {read: TemplateRef, static: true}) template!: TemplateRef<unknown>;
+  @ViewChild('probe', {read: ViewContainerRef, static: true}) outlet!: ViewContainerRef;
+  readonly result = signal('');
+  readonly completed = signal(false);
+  private tooltip?: MatLegacyTooltip;
+  register(tooltip: MatLegacyTooltip) {this.tooltip = tooltip; return 'registered';}
+  run() {
+    this.completed.set(false);
+    const view = this.outlet.createEmbeddedView(this.template);
+    view.detectChanges();
+    const host = view.rootNodes.find(node => node instanceof HTMLElement) as HTMLElement | undefined;
+    const tooltip = this.tooltip;
+    if (!host || !tooltip) {view.destroy(); this.result.set(JSON.stringify({error: 'missing actual tooltip'})); this.completed.set(true); return;}
+    tooltip.message = 'Tooltip description pending destruction';
+    const initial_description_absent = !host.hasAttribute('aria-describedby');
+    view.destroy();
+    Promise.resolve().then(() => {
+      const pending_cleanup_clear = !host.hasAttribute('aria-describedby');
+      tooltip.message = 'Tooltip description requested after destruction';
+      Promise.resolve().then(() => {
+        this.result.set(JSON.stringify({actual_directive_created: true, host_removed: !host.isConnected,
+          initial_description_absent, pending_cleanup_clear,
+          later_request_clear: !host.hasAttribute('aria-describedby')}));
+        this.completed.set(true);
+      });
+    });
+  }
+}
 
 @Component({
   standalone: false,
@@ -195,6 +236,7 @@ export class SnackMotionLab {
 
     <button id="tip-host" type="button" [matTooltip]="tipMessage" [matTooltipShowDelay]="0" [matTooltipHideDelay]="0">Tip</button>
     <button id="tip-change" type="button" (click)="tipMessage = 'A longer tooltip message for repositioning'">Change tooltip</button>
+    <lab-tooltip-aria-lifetime></lab-tooltip-aria-lifetime>
 
     <mat-form-field>
       <input id="ac-input" matInput [matAutocomplete]="auto" placeholder="ac">
@@ -239,7 +281,7 @@ export class LabRoot {
     MatLegacyInputModule,
     MatLegacyTabsModule,
   ],
-  declarations: [LabRoot, SnackMotionLab],
+  declarations: [LabRoot, SnackMotionLab, TooltipAriaLifetimeLab],
   bootstrap: [LabRoot],
   providers: [${zoneless ? 'provideZonelessChangeDetection(), ' : ''}{provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}}],
 })
@@ -486,6 +528,9 @@ try {
   }
   const tipHidden = await waitFor('!document.querySelector(".mat-tooltip")');
   families.tooltip.hidden = families.tooltip.shown && tipHidden;
+  await evaluate(`document.getElementById('tip-aria-run').click()`);
+  await waitFor(`document.getElementById('tip-aria-result')?.getAttribute('data-complete') === 'true'`);
+  families.tooltip.aria_lifetime = await observeLegacyTooltipAriaLifetimeNative({evaluate});
 
   // Autocomplete: focus, type, then activate the real option and observe its public selection event.
   await evaluate(`(() => {
@@ -567,6 +612,7 @@ const ok =
   && families['snack-bar'].enabled_motion.every(legacySnackMotionNativeOkay)
   && families.tooltip.shown
   && legacyTooltipMessageSequenceOkay(families.tooltip.message_positions)
+  && legacyTooltipAriaLifetimeNativeOkay(families.tooltip.aria_lifetime)
   && families.autocomplete.panel_opened && families.autocomplete.typed_filter_visible && families.autocomplete.input_focused
   && families.autocomplete.option_selected && families.autocomplete.panel_closed_after_select
   && families.tabs.second_selected && families.tabs.second_body_visible
