@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "task": "C04 fourteen complete upstream build applicability reviews",
+  "line": "21.x",
+  "source_commit": "5f6a725479f09389d67704521a3ae3d03dd66d01",
+  "source_tree": "904ab652f1776923deff882f703fea70ccb518f4",
+  "source_clean_before_diagnostic": true,
+  "files": [
+    {
+      "path": "scripts/check-upstream-audit-disposition.mjs",
+      "sha256": "a38e0a30babbdfcf436fed1b39fb40890ddc3049377a62d2c7044da4158111f6",
+      "bytes": 25230
+    },
+    {
+      "path": "scripts/upstream-build-scope-evidence.mjs",
+      "sha256": "6b2ba2b5e054836a67076c5f17a628d2262ed7c27ed435385723e5e2dd013d8b",
+      "bytes": 6501
+    },
+    {
+      "path": "tests/test_upstream_build_scope_review.py",
+      "sha256": "ec276c3c6d4def22da4790a684d1c6363db74393b7c5a48f7b91e4abb139c201",
+      "bytes": 2941
+    },
+    {
+      "path": "tests/upstream_build_scope_probe.mjs",
+      "sha256": "31837b0012113f4c7bab8263fc303d6cf2d2c3fda3cdd02ec0084246b77087eb",
+      "bytes": 4570
+    },
+    {
+      "path": "tests/test_upstream_patch_binding.py",
+      "sha256": "9b73eeb2269e013e6396fe66b064142b0431d50a06c009b17651f187e32ce20f",
+      "bytes": 4188
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/ledger.json",
+      "sha256": "648675fdd9f5bfb69e3c399b3189411a32e21a1afc7318e4743d4139010754dd",
+      "bytes": 2225263
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-fourteen-build-scope-review.json",
+      "sha256": "7e6d9854a83bb7878d8ad27419d06b7fd82d7285ce22524a15c8875d2d6a3b5f",
+      "bytes": 480101
+    },
+    {
+      "path": "compatibility/f10/upstream-sha-risk-bootstrap.json",
+      "sha256": "400e89f53e41975dd5056158c60bdac2e4a2c9dcabaee1204eda782492f5f456",
+      "bytes": 613558
+    },
+    {
+      "path": "compatibility/f10/authored-dependency-dispositions.json",
+      "sha256": "ec1962befa4f290f3c18f4b25ed1fa915ee7351689e90363a3f2d20f989b873a",
+      "bytes": 612992
+    }
+  ],
+  "diagnostics": [
+    {
+      "command": [
+        "node",
+        "tests/upstream_build_scope_probe.mjs"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 0.317,
+      "stdout": "{\"line\":\"21.x\",\"cases\":14,\"negative_controls\":20,\"canonical_path_memberships\":1020,\"scope\":\"Fourteen source-scope evidence bindings only; no native product, installed behavior, security, full audit or G11 pass.\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "test_upstream_build_scope_review",
+        "test_upstream_patch_binding",
+        "-v"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 6.095,
+      "stdout": "",
+      "stderr": "test_actual_checker_cannot_bypass_scope_by_relabelling_report (test_upstream_build_scope_review.UpstreamBuildScopeTests.test_actual_checker_cannot_bypass_scope_by_relabelling_report) ... ok\ntest_complete_original_patches_and_candidate_context_are_bound (test_upstream_build_scope_review.UpstreamBuildScopeTests.test_complete_original_patches_and_candidate_context_are_bound) ... ok\ntest_inline_archived_and_negative_patch_subjects (test_upstream_patch_binding.UpstreamPatchBinding.test_inline_archived_and_negative_patch_subjects) ... ok\n\n----------------------------------------------------------------------\nRan 3 tests in 6.047s\n\nOK\n"
+    },
+    {
+      "command": [
+        "node",
+        "scripts/check-upstream-audit-disposition.mjs",
+        "--line",
+        "21.x",
+        "--admission",
+        "--report",
+        "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/compatibility/rc/fourteen-build-scope-admission-diagnostic.json"
+      ],
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "elapsed_seconds": 2.125,
+      "stdout": "{\n  \"ok\": false,\n  \"structural_inventory\": \"fail\",\n  \"disposition_admission\": \"incomplete\",\n  \"security_clearance\": \"not-passed\",\n  \"g11_claim\": \"not-passed\",\n  \"seed_rows\": 1697,\n  \"ledger_rows\": 1697,\n  \"missing\": 0,\n  \"unresolved\": 1602,\n  \"conflicting_sha_rows\": 0,\n  \"outside_seed\": 0,\n  \"security_hunk_labeled_docs_only\": 0,\n  \"unknown_disposition\": 0,\n  \"missing_evidence\": 1592,\n  \"circular_evidence\": 0,\n  \"insufficient_sensitive\": 103,\n  \"insufficient_inherited\": 0,\n  \"insufficient_behavior\": 0,\n  \"missing_branch_applicability\": 102,\n  \"authored_use_inventory\": {\n    \"complete\": true,\n    \"expected\": 1736,\n    \"observed\": 1736,\n    \"missing\": 0,\n    \"duplicates\": 0,\n    \"outside\": 0,\n    \"invalid\": 0,\n    \"open\": 478\n  },\n  \"authored_use_review_evidence\": {\n    \"reviewed\": 1258,\n    \"insufficient\": 0,\n    \"insufficient_use_sample\": []\n  },\n  \"symbol_uses_open\": 478,\n  \"symbol_status\": \"in-progress\",\n  \"symbol_dispositions_sha256\": \"ec1962befa4f290f3c18f4b25ed1fa915ee7351689e90363a3f2d20f989b873a\",\n  \"forged_clearance\": false\n}\n",
+      "stderr": "upstream-audit-disposition incomplete: missing=0 unresolved=1602 conflicting=0 outside=0 security_docs_only=0 unknown=0\n"
+    }
+  ],
+  "admission": {
+    "path": "compatibility/rc/fourteen-build-scope-admission-diagnostic.json",
+    "sha256": "4bb049ac2c8d880de48127abe4d5f72b57f0f5a75427f517d065af88defa7429",
+    "bytes": 1806
+  },
+  "result": {
+    "upstream_reviews_closed": 14,
+    "canonical_path_memberships": 1020,
+    "source_binding_positives": 14,
+    "source_binding_negatives": 20,
+    "actual_checker_relabelling_negatives": 2,
+    "remaining_unresolved_shas": 1602,
+    "g11_claim": "not-passed"
+  },
+  "scope": "Complete original patch and actual product/build source bytes, with finite individually described compiler/demo/experimental/style-generator implications. Source-scope exclusion only; no inherited runtime, current advisory, native, complete-audit or publication credit.",
+  "qualification": {
+    "consumer_resources_changed": false,
+    "Cyph_files_changed": false,
+    "peer_or_toolchain_pins_changed": false,
+    "Actions_started": false,
+    "C04_complete": false,
+    "G11_passed": false,
+    "independent_audit_started": false
+  },
+  "remaining": "Both full SHA/use reviews, current advisories, actual packed/native/floor execution and independent A01-A10/R01-R03 remain required."
+}
