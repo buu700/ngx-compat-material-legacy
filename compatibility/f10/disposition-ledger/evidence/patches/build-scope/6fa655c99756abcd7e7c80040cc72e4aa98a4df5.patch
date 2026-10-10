@@ -1,0 +1,323 @@
+diff --git a/src/cdk/coercion/BUILD.bazel b/src/cdk/coercion/BUILD.bazel
+index 466495f4ea93cd7383b3c213527c50cc019d149f..af96c507b219c4c25c19cfdf7f4704c2949165d7 100644
+--- a/src/cdk/coercion/BUILD.bazel
++++ b/src/cdk/coercion/BUILD.bazel
+@@ -1,5 +1,5 @@
+-load("//tools:defaults.bzl", "karma_web_test_suite", "markdown_to_html")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "markdown_to_html")
++load("//tools:defaults2.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -27,7 +27,7 @@ ts_project(
+     ],
+ )
+ 
+-karma_web_test_suite(
++ng_web_test_suite(
+     name = "unit_tests",
+     deps = [":unit_test_sources"],
+ )
+diff --git a/src/cdk/keycodes/BUILD.bazel b/src/cdk/keycodes/BUILD.bazel
+index 17458595420cb2d94c45fd95635839749158570e..14d9ee796e3cb9da037d6f0448ef4e092bb8225d 100644
+--- a/src/cdk/keycodes/BUILD.bazel
++++ b/src/cdk/keycodes/BUILD.bazel
+@@ -1,5 +1,5 @@
+-load("//tools:defaults.bzl", "karma_web_test_suite", "markdown_to_html")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "markdown_to_html")
++load("//tools:defaults2.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -31,7 +31,7 @@ ts_project(
+     ],
+ )
+ 
+-karma_web_test_suite(
++ng_web_test_suite(
+     name = "unit_tests",
+     deps = [":unit_test_sources"],
+ )
+diff --git a/src/e2e-app/test_suite.bzl b/src/e2e-app/test_suite.bzl
+index f0a9a9dee8c128adf24ccdb12cc7e1740c11857c..d95e59c8d984fbf813bd3b13b0bf858c903501f7 100644
+--- a/src/e2e-app/test_suite.bzl
++++ b/src/e2e-app/test_suite.bzl
+@@ -1,4 +1,4 @@
+-load("//tools:defaults.bzl", "protractor_web_test_suite")
++load("//tools:defaults2.bzl", "protractor_web_test_suite")
+ 
+ def e2e_test_suite(name, tags = ["e2e"], deps = []):
+     protractor_web_test_suite(
+diff --git a/src/universal-app/BUILD.bazel b/src/universal-app/BUILD.bazel
+index 6ede2638b7fe9bcf025a840b7dba488f362aa028..4eecc7db66475f064d1e88bf9d2f5dc529bc9874 100644
+--- a/src/universal-app/BUILD.bazel
++++ b/src/universal-app/BUILD.bazel
+@@ -1,7 +1,7 @@
+ load("@bazel_skylib//rules:build_test.bzl", "build_test")
+ load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary")
+-load("//tools:defaults.bzl", "protractor_web_test_suite", "sass_binary")
+-load("//tools:defaults2.bzl", "http_server", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "sass_binary")
++load("//tools:defaults2.bzl", "http_server", "ng_project", "protractor_web_test_suite", "ts_project")
+ load("@aspect_rules_ts//ts:defs.bzl", rules_js_tsconfig = "ts_config")
+ load("@aspect_rules_esbuild//esbuild:defs.bzl", "esbuild")
+ load("//src/cdk:config.bzl", "CDK_TARGETS")
+diff --git a/tools/bazel/web_test_suite.bzl b/tools/bazel/web_test_suite.bzl
+new file mode 100644
+index 0000000000000000000000000000000000000000..c2177119ffe1cb3ee108ce2e86ce2d418e77a80a
+--- /dev/null
++++ b/tools/bazel/web_test_suite.bzl
+@@ -0,0 +1,70 @@
++load("@rules_browsers//src/wtr:index.bzl", "wtr_test")
++load("@devinfra//bazel/spec-bundling:index_rjs.bzl", "spec_bundle")
++
++def _web_test(name, tags = [], deps = [], bootstrap = [], **kwargs):
++    spec_bundle(
++        name = "%s_bundle" % name,
++        srcs = ["//src:build-tsconfig"],
++        bootstrap = bootstrap,
++        deps = deps,
++        config = {
++            "resolveExtensions": [".js"],
++            "tsconfig": "./src/bazel-tsconfig-build.json",
++        },
++    )
++
++    test_tags = ["partial-compilation-integration"] + tags
++
++    wtr_test(
++        name = name,
++        deps = [":%s_bundle" % name],
++        tags = test_tags,
++        **kwargs
++    )
++
++def ng_web_test_suite(deps = [], static_css = [], **kwargs):
++    # Always include a prebuilt theme in the test suite because otherwise tests, which depend on CSS
++    # that is needed for measuring, will unexpectedly fail. Also always adding a prebuilt theme
++    # reduces the amount of setup that is needed to create a test suite Bazel target. Note that the
++    # prebuilt theme will be also added to CDK test suites but shouldn't affect anything.
++    static_css = static_css + [
++        "//src/material/prebuilt-themes:azure-blue",
++    ]
++
++    bootstrap = []
++
++    # Workaround for https://github.com/bazelbuild/rules_typescript/issues/301
++    # Since some of our tests depend on CSS files which are not part of the `ng_project` rule,
++    # we need to somehow load static CSS files within Karma (e.g. overlay prebuilt). Those styles
++    # are required for successful test runs. Since the `karma_web_test_suite` rule currently only
++    # allows JS files to be included and served within Karma, we need to create a JS file that
++    # loads the given CSS file.
++    for css_label in static_css:
++        css_id = "static-css-file-%s" % (css_label.replace("/", "_").replace(":", "-"))
++        bootstrap.append(":%s" % css_id)
++
++        native.genrule(
++            name = css_id,
++            srcs = [css_label],
++            outs = ["%s.css.init.js" % css_id],
++            output_to_bindir = True,
++            cmd = """
++        files=($(execpaths %s))
++        # Escape all double-quotes so that the content can be safely inlined into the
++        # JS template. Note that it needs to be escaped a second time because the string
++        # will be evaluated first in Bash and will then be stored in the JS output.
++        css_content=$$(cat $${files[0]} | sed 's/"/\\\\"/g')
++        js_template='var cssElement = document.createElement("style"); \
++                    cssElement.type = "text/css"; \
++                    cssElement.innerHTML = "'"$$css_content"'"; \
++                    document.head.appendChild(cssElement);'
++         echo "$$js_template" > $@
++      """ % css_label,
++        )
++
++    _web_test(
++        # Depend on our custom test initialization script. This needs to be the first dependency.
++        deps = deps,
++        bootstrap = ["//test:angular_test_init"] + bootstrap,
++        **kwargs
++    )
+diff --git a/tools/defaults.bzl b/tools/defaults.bzl
+index 40244394c2ad3d53a2ae32de4bdb27fbc1928eb2..e93acc27e37350b639629da200b5bb98bd316ec9 100644
+--- a/tools/defaults.bzl
++++ b/tools/defaults.bzl
+@@ -9,8 +9,7 @@ load("//:pkg-externals.bzl", "PKG_EXTERNALS")
+ load("//tools/markdown-to-html:index.bzl", _markdown_to_html = "markdown_to_html")
+ load("//tools/extract-tokens:index.bzl", _extract_tokens = "extract_tokens")
+ load("//tools/bazel:ng_package_interop.bzl", "ng_package_interop")
+-load("//tools:defaults2.bzl", "spec_bundle", _karma_web_test_suite = "karma_web_test_suite")
+-load("@rules_browsers//src/protractor_test:index.bzl", "protractor_test")
++load("//tools:defaults2.bzl", _ng_web_test_suite = "ng_web_test_suite")
+ 
+ npmPackageSubstitutions = select({
+     "//tools:stamp": NPM_PACKAGE_SUBSTITUTIONS,
+@@ -20,7 +19,7 @@ npmPackageSubstitutions = select({
+ # Re-exports to simplify build file load statements
+ markdown_to_html = _markdown_to_html
+ extract_tokens = _extract_tokens
+-karma_web_test_suite = _karma_web_test_suite
++ng_web_test_suite = _ng_web_test_suite
+ 
+ def sass_binary(sourcemap = False, include_paths = [], **kwargs):
+     _sass_binary(
+@@ -122,89 +121,3 @@ def pkg_npm(name, visibility = None, **kwargs):
+         visibility = visibility,
+         **kwargs
+     )
+-
+-    pkg_tar(
+-        name = name + "_archive",
+-        srcs = [":%s" % name],
+-        package_dir = "package/",
+-        extension = "tar.gz",
+-        strip_prefix = "./%s" % name,
+-        # Target should not build on CI unless it is explicitly requested.
+-        tags = ["manual"],
+-        visibility = visibility,
+-    )
+-
+-def protractor_web_test_suite(name, deps, **kwargs):
+-    spec_bundle(
+-        name = "%s_bundle" % name,
+-        deps = deps,
+-        external = ["protractor", "selenium-webdriver"],
+-    )
+-
+-    protractor_test(
+-        name = name,
+-        deps = [":%s_bundle" % name],
+-        extra_config = {
+-            "useAllAngular2AppRoots": True,
+-            "allScriptsTimeout": 120000,
+-            "getPageTimeout": 120000,
+-            "jasmineNodeOpts": {
+-                "defaultTimeoutInterval": 120000,
+-            },
+-            # Since we want to use async/await we don't want to mix up with selenium's promise
+-            # manager. In order to enforce this, we disable the promise manager.
+-            "SELENIUM_PROMISE_MANAGER": False,
+-        },
+-        data = [
+-            "//:node_modules/protractor",
+-            "//:node_modules/selenium-webdriver",
+-        ],
+-        **kwargs
+-    )
+-
+-def ng_web_test_suite(deps = [], static_css = [], **kwargs):
+-    # Always include a prebuilt theme in the test suite because otherwise tests, which depend on CSS
+-    # that is needed for measuring, will unexpectedly fail. Also always adding a prebuilt theme
+-    # reduces the amount of setup that is needed to create a test suite Bazel target. Note that the
+-    # prebuilt theme will be also added to CDK test suites but shouldn't affect anything.
+-    static_css = static_css + [
+-        "//src/material/prebuilt-themes:azure-blue",
+-    ]
+-
+-    bootstrap = []
+-
+-    # Workaround for https://github.com/bazelbuild/rules_typescript/issues/301
+-    # Since some of our tests depend on CSS files which are not part of the `ng_project` rule,
+-    # we need to somehow load static CSS files within Karma (e.g. overlay prebuilt). Those styles
+-    # are required for successful test runs. Since the `karma_web_test_suite` rule currently only
+-    # allows JS files to be included and served within Karma, we need to create a JS file that
+-    # loads the given CSS file.
+-    for css_label in static_css:
+-        css_id = "static-css-file-%s" % (css_label.replace("/", "_").replace(":", "-"))
+-        bootstrap.append(":%s" % css_id)
+-
+-        native.genrule(
+-            name = css_id,
+-            srcs = [css_label],
+-            outs = ["%s.css.init.js" % css_id],
+-            output_to_bindir = True,
+-            cmd = """
+-        files=($(execpaths %s))
+-        # Escape all double-quotes so that the content can be safely inlined into the
+-        # JS template. Note that it needs to be escaped a second time because the string
+-        # will be evaluated first in Bash and will then be stored in the JS output.
+-        css_content=$$(cat $${files[0]} | sed 's/"/\\\\"/g')
+-        js_template='var cssElement = document.createElement("style"); \
+-                    cssElement.type = "text/css"; \
+-                    cssElement.innerHTML = "'"$$css_content"'"; \
+-                    document.head.appendChild(cssElement);'
+-         echo "$$js_template" > $@
+-      """ % css_label,
+-        )
+-
+-    karma_web_test_suite(
+-        # Depend on our custom test initialization script. This needs to be the first dependency.
+-        deps = deps,
+-        bootstrap = ["//test:angular_test_init"] + bootstrap,
+-        **kwargs
+-    )
+diff --git a/tools/defaults2.bzl b/tools/defaults2.bzl
+index 04c96b7dfbddd548af0ad8788582698e410175f8..dc5e008b108cc2cf3c907bb9fa3020bddffe45e5 100644
+--- a/tools/defaults2.bzl
++++ b/tools/defaults2.bzl
+@@ -1,14 +1,16 @@
+ load("@aspect_rules_jasmine//jasmine:defs.bzl", _jasmine_test = "jasmine_test")
+-load("//tools/bazel:ts_project_interop.bzl", _ts_project = "ts_project")
+-load("//tools/bazel:module_name.bzl", "compute_module_name")
+ load("@aspect_rules_js//npm:defs.bzl", _npm_package = "npm_package")
+-load("@rules_angular//src/ng_project:index.bzl", _ng_project = "ng_project")
+-load("@devinfra//bazel/spec-bundling:index_rjs.bzl", _spec_bundle = "spec_bundle")
+-load("@rules_browsers//src/wtr:index.bzl", "wtr_test")
+ load("@devinfra//bazel/http-server:index.bzl", _http_server = "http_server")
++load("@devinfra//bazel/spec-bundling:index_rjs.bzl", _spec_bundle = "spec_bundle")
++load("@rules_angular//src/ng_project:index.bzl", _ng_project = "ng_project")
++load("@rules_browsers//src/protractor_test:index.bzl", "protractor_test")
++load("//tools/bazel:module_name.bzl", "compute_module_name")
++load("//tools/bazel:ts_project_interop.bzl", _ts_project = "ts_project")
++load("//tools/bazel:web_test_suite.bzl", _ng_web_test_suite = "ng_web_test_suite")
+ 
+ spec_bundle = _spec_bundle
+ http_server = _http_server
++ng_web_test_suite = _ng_web_test_suite
+ 
+ def npm_package(**kwargs):
+     _npm_package(**kwargs)
+@@ -79,23 +81,30 @@ def jasmine_test(name, data = [], args = [], **kwargs):
+         **kwargs
+     )
+ 
+-def karma_web_test_suite(name, tags = [], deps = [], bootstrap = [], **kwargs):
++def protractor_web_test_suite(name, deps, **kwargs):
+     spec_bundle(
+         name = "%s_bundle" % name,
+-        srcs = ["//src:build-tsconfig"],
+-        bootstrap = bootstrap,
+         deps = deps,
+-        config = {
+-            "resolveExtensions": [".js"],
+-            "tsconfig": "./src/bazel-tsconfig-build.json",
+-        },
++        external = ["protractor", "selenium-webdriver"],
+     )
+ 
+-    test_tags = ["partial-compilation-integration"] + tags
+-
+-    wtr_test(
++    protractor_test(
+         name = name,
+         deps = [":%s_bundle" % name],
+-        tags = test_tags,
++        extra_config = {
++            "useAllAngular2AppRoots": True,
++            "allScriptsTimeout": 120000,
++            "getPageTimeout": 120000,
++            "jasmineNodeOpts": {
++                "defaultTimeoutInterval": 120000,
++            },
++            # Since we want to use async/await we don't want to mix up with selenium's promise
++            # manager. In order to enforce this, we disable the promise manager.
++            "SELENIUM_PROMISE_MANAGER": False,
++        },
++        data = [
++            "//:node_modules/protractor",
++            "//:node_modules/selenium-webdriver",
++        ],
+         **kwargs
+     )

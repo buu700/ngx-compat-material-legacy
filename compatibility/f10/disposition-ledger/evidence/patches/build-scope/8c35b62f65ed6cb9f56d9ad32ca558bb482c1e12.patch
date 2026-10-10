@@ -1,0 +1,233 @@
+diff --git a/.bazelrc b/.bazelrc
+index 93b4fc60f7989ff050e0752deb6b5f50304f2661..43235cc019cae9c301c6734e4afe3a625dbe83c0 100644
+--- a/.bazelrc
++++ b/.bazelrc
+@@ -91,8 +91,6 @@ build:remote --google_default_credentials=true
+ 
+ # Setup the toolchain and platform for the remote build execution. The platform
+ # is provided by the shared dev-infra package and targets k8 remote containers.
+-build:remote --crosstool_top=@npm//@angular/build-tooling/bazel/remote-execution/cpp:cc_toolchain_suite
+-build:remote --extra_toolchains=@npm//@angular/build-tooling/bazel/remote-execution/cpp:cc_toolchain
+ build:remote --extra_execution_platforms=@npm//@angular/build-tooling/bazel/remote-execution:platform_with_network
+ build:remote --host_platform=@npm//@angular/build-tooling/bazel/remote-execution:platform_with_network
+ build:remote --platforms=@npm//@angular/build-tooling/bazel/remote-execution:platform_with_network
+diff --git a/src/BUILD.bazel b/src/BUILD.bazel
+index 3ac0c454070d92f1d908796e77666407a6a38861..d6fdcdd2993cd1e06fbf00f8d8d1c8aedba8ef49 100644
+--- a/src/BUILD.bazel
++++ b/src/BUILD.bazel
+@@ -63,7 +63,9 @@ ts_config(
+ rules_js_tsconfig(
+     name = "build-tsconfig",
+     src = "bazel-tsconfig-build.json",
+-    deps = [],
++    deps = [
++        "//:node_modules/tslib",
++    ],
+ )
+ 
+ rules_js_tsconfig(
+diff --git a/src/material/dialog/testing/BUILD.bazel b/src/material/dialog/testing/BUILD.bazel
+index b732761d2b1bbe1a61eae229f2a4265a8cd35307..a8e5fb0a7d2e0f351ae8535bca8b8757b60d65c4 100644
+--- a/src/material/dialog/testing/BUILD.bazel
++++ b/src/material/dialog/testing/BUILD.bazel
+@@ -1,20 +1,23 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite", "ts_library")
++load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+-ts_library(
++ts_project(
+     name = "testing",
+     srcs = glob(
+         ["**/*.ts"],
+         exclude = ["**/*.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         "//src/cdk/overlay",
+         "//src/cdk/testing",
+         "//src/material/dialog",
+-        "@npm//@angular/core",
+-        "@npm//@angular/platform-browser",
+-        "@npm//rxjs",
++    ],
++    deps = [
++        "//:node_modules/@angular/core",
++        "//:node_modules/@angular/platform-browser",
++        "//:node_modules/rxjs",
+     ],
+ )
+ 
+diff --git a/src/material/divider/testing/BUILD.bazel b/src/material/divider/testing/BUILD.bazel
+index 0cd22f88d4d8bbe46429f5e71a98a537ec4d1ee2..68efbb212de390761c8db817b69d8d9af27dc3c3 100644
+--- a/src/material/divider/testing/BUILD.bazel
++++ b/src/material/divider/testing/BUILD.bazel
+@@ -1,14 +1,15 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite", "ts_library")
++load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+-ts_library(
++ts_project(
+     name = "testing",
+     srcs = glob(
+         ["**/*.ts"],
+         exclude = ["**/*.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         "//src/cdk/testing",
+     ],
+ )
+diff --git a/src/material/expansion/testing/BUILD.bazel b/src/material/expansion/testing/BUILD.bazel
+index 1cb28edb5d0a7cf87fba5ec06ffc3f645c563909..57bb80c1dd9148896e5b67b3364ab5aa0ad67ba2 100644
+--- a/src/material/expansion/testing/BUILD.bazel
++++ b/src/material/expansion/testing/BUILD.bazel
+@@ -1,14 +1,15 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite", "ts_library")
++load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+-ts_library(
++ts_project(
+     name = "testing",
+     srcs = glob(
+         ["**/*.ts"],
+         exclude = ["**/*.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         "//src/cdk/testing",
+     ],
+ )
+diff --git a/src/material/form-field/testing/BUILD.bazel b/src/material/form-field/testing/BUILD.bazel
+index 1fcca75e9bcb1d284cc83de5d711d17952b386fe..a8188b4de4ecf636cead7a70ec5e9231150af65b 100644
+--- a/src/material/form-field/testing/BUILD.bazel
++++ b/src/material/form-field/testing/BUILD.bazel
+@@ -1,14 +1,15 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite", "ts_library")
++load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+-ts_library(
++ts_project(
+     name = "testing",
+     srcs = glob(
+         ["**/*.ts"],
+         exclude = ["**/*.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         "//src/cdk/testing",
+         "//src/material/datepicker/testing",
+         "//src/material/form-field/testing/control",
+diff --git a/src/material/form-field/testing/control/BUILD.bazel b/src/material/form-field/testing/control/BUILD.bazel
+index 9ea4aff13f837b4e6964a72a39b4af005605e93b..0e2fb4d83dbea45bb60ba2df9d300da395155b68 100644
+--- a/src/material/form-field/testing/control/BUILD.bazel
++++ b/src/material/form-field/testing/control/BUILD.bazel
+@@ -1,11 +1,11 @@
+-load("//tools:defaults.bzl", "ts_library")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+-ts_library(
++ts_project(
+     name = "control",
+     srcs = glob(["**/*.ts"]),
+-    deps = ["//src/cdk/testing"],
++    interop_deps = ["//src/cdk/testing"],
+ )
+ 
+ filegroup(
+diff --git a/src/material/grid-list/testing/BUILD.bazel b/src/material/grid-list/testing/BUILD.bazel
+index c116bb84e835355cf65e491a5b1140c07c4a131f..ed7784a66ff18deb05dedf6282da25f3fceefacd 100644
+--- a/src/material/grid-list/testing/BUILD.bazel
++++ b/src/material/grid-list/testing/BUILD.bazel
+@@ -1,14 +1,15 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite", "ts_library")
++load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+-ts_library(
++ts_project(
+     name = "testing",
+     srcs = glob(
+         ["**/*.ts"],
+         exclude = ["**/*.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         "//src/cdk/testing",
+         "//src/material/grid-list",
+     ],
+diff --git a/src/material/input/testing/BUILD.bazel b/src/material/input/testing/BUILD.bazel
+index 53f6c8688cc5ecf0f86ac6db8ed618a2beae8774..e267b0c3950cb38c5d7e4e72d0661302dd8f73c3 100644
+--- a/src/material/input/testing/BUILD.bazel
++++ b/src/material/input/testing/BUILD.bazel
+@@ -1,14 +1,15 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite", "ts_library")
++load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+-ts_library(
++ts_project(
+     name = "testing",
+     srcs = glob(
+         ["**/*.ts"],
+         exclude = ["**/*.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         "//src/cdk/coercion",
+         "//src/cdk/testing",
+         "//src/material/form-field/testing/control",
+diff --git a/src/material/list/testing/BUILD.bazel b/src/material/list/testing/BUILD.bazel
+index 4785b41e2bbec8380c38a0d502f4bd0476ccc6fa..ed06bcc011a9d0e4927f52450c21d992b76047d6 100644
+--- a/src/material/list/testing/BUILD.bazel
++++ b/src/material/list/testing/BUILD.bazel
+@@ -1,14 +1,15 @@
+-load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite", "ts_library")
++load("//tools:defaults.bzl", "ng_test_library", "ng_web_test_suite")
++load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+-ts_library(
++ts_project(
+     name = "testing",
+     srcs = glob(
+         ["**/*.ts"],
+         exclude = ["**/*.spec.ts"],
+     ),
+-    deps = [
++    interop_deps = [
+         "//src/cdk/coercion",
+         "//src/cdk/testing",
+         "//src/material/divider/testing",
+diff --git a/tools/bazel/ts_project_interop.bzl b/tools/bazel/ts_project_interop.bzl
+index b8e7131f9c1628bdedd192ef127c2c902a1168cb..72e4f28e64cb3ba7641cf4b5049c4342113023da 100644
+--- a/tools/bazel/ts_project_interop.bzl
++++ b/tools/bazel/ts_project_interop.bzl
+@@ -106,7 +106,8 @@ def ts_project(
+         tsconfig = None,
+         testonly = False,
+         visibility = None,
+-        ignore_strict_deps = False,
++        # TODO: Switch this flag as we no longer depend on `interop_deps`.
++        ignore_strict_deps = True,
+         enable_runtime_rnjs_interop = True,
+         **kwargs):
+     # Pull in the `rules_nodejs` variants of dependencies we know are "hybrid". This

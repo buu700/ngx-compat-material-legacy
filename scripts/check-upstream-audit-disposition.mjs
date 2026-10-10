@@ -17,6 +17,8 @@ import {dirname, join, relative, resolve} from 'node:path';
 import {fileURLToPath, pathToFileURL} from 'node:url';
 import {authoredUseInventory, authoredUseReviewEvidence} from './authored-use-inventory.mjs';
 import {validateCurrentAdvisories} from './upstream-advisory-admission.mjs';
+import {spawnSync} from 'node:child_process';
+import {BUILD_SCOPE_ROLE,BUILD_SCOPE_PATCHES,buildScopeEvidenceOk} from './upstream-build-scope-evidence.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -97,6 +99,15 @@ function sensitiveClass(entry) {
 }
 
 const evidenceCache = new Map();
+let buildScopeProductPaths;
+function currentProductPaths() {
+  if (!buildScopeProductPaths) {
+    const result=spawnSync('git',['-c','gc.auto=0','-c','maintenance.auto=0','ls-files','projects/ngx-material-legacy'],{cwd:root,encoding:'utf8'});
+    if (result.status!==0) return [];
+    buildScopeProductPaths=result.stdout.trim().split('\n').filter(Boolean);
+  }
+  return buildScopeProductPaths;
+}
 function evidenceJson(file) {
   if (!evidenceCache.has(file)) {
     let body = null;
@@ -121,6 +132,10 @@ function evidenceClass(entry) {
   if (rel.endsWith('.json')) {
     const body = evidenceJson(file);
     if (!body || typeof body !== 'object') return 'unreadable';
+    if ((Object.hasOwn(BUILD_SCOPE_PATCHES,entry.sha) || body.role===BUILD_SCOPE_ROLE || rel==='compatibility/f10/disposition-ledger/evidence/closeout-fourteen-build-scope-review.json'
+        || entry.batch_id==='closeout-fourteen-build-source-scope') && !buildScopeEvidenceOk(body,entry,rel=>{
+        const member=regularRepoMember(rel);return member?readFileSync(member):null;
+      },currentProductPaths())) return 'invalid-build-scope';
     if (Array.isArray(body.reviews)) {
       return body.reviews.some(item => item && item.sha === entry.sha) ? 'file' : 'not-in-report';
     }

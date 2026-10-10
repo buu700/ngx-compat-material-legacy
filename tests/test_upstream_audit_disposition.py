@@ -54,8 +54,8 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0, combined)
             summary = json.loads(result.stdout)
             self.assertFalse(summary["ok"])
-            # Qualified bounded source/runtime decisions leave three original subjects, the reopened tab contract and three stale source proofs pending on main.
-            self.assertEqual(summary["unresolved"], 7)
+            # Three original subjects, two tab contracts and three reopened source proofs remain pending.
+            self.assertEqual(summary["unresolved"], 8)
             self.assertEqual(summary["seed_rows"], 1697)
             self.assertEqual(summary["ledger_rows"], 1697)
             self.assertEqual(summary["missing"], 0)

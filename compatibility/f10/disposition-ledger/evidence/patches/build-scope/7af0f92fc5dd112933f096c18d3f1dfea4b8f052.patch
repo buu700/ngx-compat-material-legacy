@@ -1,0 +1,336 @@
+diff --git a/.bazelrc b/.bazelrc
+index c610f6bf9ae98646252be4575fcd0d06fb4b5ff8..18ff63393532829c1568761d9bfb70270c4835c6 100644
+--- a/.bazelrc
++++ b/.bazelrc
+@@ -35,7 +35,7 @@ build --nobuild_runfile_links
+ ###############################
+ 
+ # A more useful default output mode for bazel query
+-# Prints eg. "ng_module rule //foo:bar" rather than just "//foo:bar"
++# Prints eg. "ng_project rule //foo:bar" rather than just "//foo:bar"
+ query --output=label_kind
+ 
+ # By default, failing tests don't print any output, it goes to the log file
+diff --git a/WORKSPACE b/WORKSPACE
+index 933ce1d49ff3f0eb283a8c337ffea28cbc907594..2e08b4fb99054bf08d9add3618fd0ac54444cfe9 100644
+--- a/WORKSPACE
++++ b/WORKSPACE
+@@ -112,7 +112,7 @@ yarn_install(
+         "//:.yarn/releases/yarn-1.22.17.cjs",
+         "//:.yarnrc",
+         "//:tools/postinstall/apply-patches.js",
+-        "//:tools/postinstall/patches/@angular+bazel+20.0.0-next.1.patch",
++        "//:tools/postinstall/patches/@angular+bazel+20.0.0-next.3.patch",
+         "//:tools/postinstall/patches/@angular+build-tooling+0.0.0-1ebf18a3a60b182a3dbad12e9a149fd93af5c29b.patch",
+         "//:tools/postinstall/patches/tsec+0.2.2.patch",
+         "//src/cdk:package.json",
+diff --git a/src/cdk/keycodes/BUILD.bazel b/src/cdk/keycodes/BUILD.bazel
+index 8d18178f8f79f8d8855cdad3f3512e0a608469e3..de1ac94e4f7a078b9698cf87006d08c4b8c6fdfc 100644
+--- a/src/cdk/keycodes/BUILD.bazel
++++ b/src/cdk/keycodes/BUILD.bazel
+@@ -3,7 +3,7 @@ load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+-# We need to use "ng_module" here since we want metadata to be generated for keycode
++# We need to use "ng_project" here since we want metadata to be generated for keycode
+ # constants. This is necessary because some of these constants are statically used in
+ # component/directive metadata (e.g. chips) and NGC needs to be able to evaluate these
+ # at compile time.
+diff --git a/src/components-examples/config.bzl b/src/components-examples/config.bzl
+index 36a1e59c850c159e7ba0faa5a98cd40037e1c3e0..c9b41c2e21a2af7e241e30640d53ed90c05c69bb 100644
+--- a/src/components-examples/config.bzl
++++ b/src/components-examples/config.bzl
+@@ -1,7 +1,7 @@
+ ALL_EXAMPLES = [
+     # TODO(devversion): try to have for each entry-point a bazel package so that
+     # we can automate this using the "package.bzl" variables. Currently generated
+-    # with "bazel query 'kind("ng_module", //src/components-examples/...:*)' --output="label"
++    # with "bazel query 'kind("ng_project", //src/components-examples/...:*)' --output="label"
+     "//src/components-examples/material/tree",
+     "//src/components-examples/material/tooltip",
+     "//src/components-examples/material/toolbar",
+diff --git a/tools/defaults.bzl b/tools/defaults.bzl
+index 85723742eda63fd6a23204d8639a82812bcf2b70..8984da5987821756fcabe95d197fcb552dc3ca6b 100644
+--- a/tools/defaults.bzl
++++ b/tools/defaults.bzl
+@@ -3,7 +3,7 @@
+ load("@rules_pkg//:pkg.bzl", "pkg_tar")
+ load("@build_bazel_rules_nodejs//:index.bzl", _pkg_npm = "pkg_npm")
+ load("@io_bazel_rules_sass//:defs.bzl", _npm_sass_library = "npm_sass_library", _sass_binary = "sass_binary", _sass_library = "sass_library")
+-load("@npm//@angular/bazel:index.bzl", _ng_module = "ng_module", _ng_package = "ng_package")
++load("@npm//@angular/bazel:index.bzl", _ng_package = "ng_package")
+ load("@npm//@angular/build-tooling/bazel/integration:index.bzl", _integration_test = "integration_test")
+ load("@npm//@angular/build-tooling/bazel/karma:index.bzl", _karma_web_test_suite = "karma_web_test_suite")
+ load("@npm//@angular/build-tooling/bazel/esbuild:index.bzl", _esbuild = "esbuild", _esbuild_config = "esbuild_config")
+@@ -12,16 +12,11 @@ load("@npm//@angular/build-tooling/bazel/http-server:index.bzl", _http_server =
+ load("@npm//@angular/build-tooling/bazel:extract_js_module_output.bzl", "extract_js_module_output")
+ load("@npm//@bazel/jasmine:index.bzl", _jasmine_node_test = "jasmine_node_test")
+ load("@npm//@bazel/protractor:index.bzl", _protractor_web_test_suite = "protractor_web_test_suite")
+-load("@npm//tsec:index.bzl", _tsec_test = "tsec_test")
+ load("//:packages.bzl", "NO_STAMP_NPM_PACKAGE_SUBSTITUTIONS", "NPM_PACKAGE_SUBSTITUTIONS")
+ load("//:pkg-externals.bzl", "PKG_EXTERNALS")
+ load("//tools/markdown-to-html:index.bzl", _markdown_to_html = "markdown_to_html")
+ load("//tools/extract-tokens:index.bzl", _extract_tokens = "extract_tokens")
+ load("//tools/angular:index.bzl", "LINKER_PROCESSED_FW_PACKAGES")
+-load("//tools/bazel:module_name.bzl", "compute_module_name")
+-
+-_DEFAULT_TSCONFIG_BUILD = "//src:bazel-tsconfig-build.json"
+-_DEFAULT_TSCONFIG_TEST = "//src:tsconfig-test"
+ 
+ npmPackageSubstitutions = select({
+     "//tools:stamp": NPM_PACKAGE_SUBSTITUTIONS,
+@@ -36,23 +31,6 @@ esbuild = _esbuild
+ esbuild_config = _esbuild_config
+ http_server = _http_server
+ 
+-def _make_tsec_test(target):
+-    package_name = native.package_name()
+-    if not package_name.startswith("src/components-examples") and \
+-       not package_name.endswith("/testing") and \
+-       not package_name.endswith("/schematics"):
+-        _tsec_test(
+-            name = target + "_tsec_test",
+-            target = target,
+-            tsconfig = "//src:tsec_config",
+-        )
+-
+-def _getDefaultTsConfig(testonly):
+-    if testonly:
+-        return _DEFAULT_TSCONFIG_TEST
+-    else:
+-        return _DEFAULT_TSCONFIG_BUILD
+-
+ def sass_binary(sourcemap = False, include_paths = [], **kwargs):
+     _sass_binary(
+         sourcemap = sourcemap,
+@@ -67,47 +45,6 @@ def sass_library(**kwargs):
+ def npm_sass_library(**kwargs):
+     _npm_sass_library(**kwargs)
+ 
+-def ng_module(
+-        deps = [],
+-        srcs = [],
+-        tsconfig = None,
+-        testonly = False,
+-        **kwargs):
+-    if not tsconfig:
+-        tsconfig = _getDefaultTsConfig(testonly)
+-
+-    # Compute an AMD module name for the target.
+-    module_name = compute_module_name(testonly)
+-
+-    local_deps = [
+-        # Add tslib because we use import helpers for all public packages.
+-        "@npm//tslib",
+-    ]
+-
+-    # Append given deps only if they're not in the default set of deps
+-    for d in deps:
+-        if d not in local_deps:
+-            local_deps = local_deps + [d]
+-
+-    _ng_module(
+-        srcs = srcs,
+-        # `module_name` is used for AMD module names within emitted JavaScript files.
+-        module_name = module_name,
+-        # We use the module name as package name, so that the target can be resolved within
+-        # NodeJS executions, by activating the Bazel NodeJS linker.
+-        # See: https://github.com/bazelbuild/rules_nodejs/pull/2799.
+-        package_name = module_name,
+-        strict_templates = True,
+-        deps = local_deps,
+-        tsconfig = tsconfig,
+-        testonly = testonly,
+-        **kwargs
+-    )
+-
+-    # TODO(devversion): Partner with ISE team to support `rules_js` here.
+-    if False and module_name and not testonly:
+-        _make_tsec_test(kwargs["name"])
+-
+ def ng_package(name, srcs = [], deps = [], externals = PKG_EXTERNALS, readme_md = None, visibility = None, **kwargs):
+     # If no readme file has been specified explicitly, use the default readme for
+     # release packages from "src/README.md".
+@@ -295,7 +232,7 @@ def ng_web_test_suite(deps = [], static_css = [], exclude_init_script = False, *
+     ]
+ 
+     # Workaround for https://github.com/bazelbuild/rules_typescript/issues/301
+-    # Since some of our tests depend on CSS files which are not part of the `ng_module` rule,
++    # Since some of our tests depend on CSS files which are not part of the `ng_project` rule,
+     # we need to somehow load static CSS files within Karma (e.g. overlay prebuilt). Those styles
+     # are required for successful test runs. Since the `karma_web_test_suite` rule currently only
+     # allows JS files to be included and served within Karma, we need to create a JS file that
+diff --git a/tools/postinstall/patches/@angular+bazel+20.0.0-next.1.patch b/tools/postinstall/patches/@angular+bazel+20.0.0-next.1.patch
+deleted file mode 100644
+index 05e3646d32c1f3f8bd91ef6e7d1782ad6972c7ac..0000000000000000000000000000000000000000
+--- a/tools/postinstall/patches/@angular+bazel+20.0.0-next.1.patch
++++ /dev/null
+@@ -1,131 +0,0 @@
+-diff --git a/node_modules/@angular/bazel/src/ng_module/ng_module.bzl b/node_modules/@angular/bazel/src/ng_module/ng_module.bzl
+-index 4c61ba9..f495e99 100755
+---- a/node_modules/@angular/bazel/src/ng_module/ng_module.bzl
+-+++ b/node_modules/@angular/bazel/src/ng_module/ng_module.bzl
+-@@ -17,6 +17,7 @@ load(
+-     "TsConfigInfo",
+-     "compile_ts",
+-     "js_ecma_script_module_info",
+-+    "js_named_module_info",
+-     "js_module_info",
+-     "node_modules_aspect",
+-     "ts_providers_dict_to_struct",
+-@@ -151,9 +152,9 @@ def _ngc_tsconfig(ctx, files, srcs, **kwargs):
+-     is_devmode = "devmode_manifest" in kwargs
+-     outs = _expected_outs(ctx)
+-     if is_devmode:
+--        expected_outs = outs.devmode_js
+-+        expected_outs = outs.devmode_js + outs.declarations
+-     else:
+--        expected_outs = outs.closure_js + outs.declarations
+-+        expected_outs = outs.closure_js
+- 
+-     if not ctx.attr.type_check and ctx.attr.strict_templates:
+-         fail("Cannot set type_check = False and strict_templates = True for ng_module()")
+-@@ -356,11 +357,11 @@ def _compile_action(
+- 
+- def _prodmode_compile_action(ctx, inputs, outputs, tsconfig_file, node_opts):
+-     outs = _expected_outs(ctx)
+--    return _compile_action(ctx, inputs, outputs + outs.closure_js + outs.prod_perf_files + outs.declarations, tsconfig_file, node_opts, "prodmode")
+-+    return _compile_action(ctx, inputs, outputs + outs.closure_js + outs.prod_perf_files, tsconfig_file, node_opts, "prodmode")
+- 
+- def _devmode_compile_action(ctx, inputs, outputs, tsconfig_file, node_opts):
+-     outs = _expected_outs(ctx)
+--    compile_action_outputs = outputs + outs.devmode_js + outs.dev_perf_files
+-+    compile_action_outputs = outputs + outs.devmode_js + outs.dev_perf_files + outs.declarations
+-     _compile_action(ctx, inputs, compile_action_outputs, tsconfig_file, node_opts, "devmode")
+- 
+- # Note: We need to define `label` and `srcs_files` as `tsc_wrapped` passes
+-@@ -414,9 +415,13 @@ def _ng_module_impl(ctx):
+-     # and issue https://github.com/bazelbuild/rules_nodejs/issues/57 for more details.
+-     ts_providers["providers"].extend([
+-         js_module_info(
+--            sources = ts_providers["typescript"]["es6_sources"],
+-+            sources = ts_providers["typescript"]["es5_sources"],
+-             deps = ctx.attr.deps,
+-         ),
+-+        js_named_module_info(
+-+           sources = ts_providers["typescript"]["es5_sources"],
+-+           deps = ctx.attr.deps,
+-+        ),
+-         js_ecma_script_module_info(
+-             sources = ts_providers["typescript"]["es6_sources"],
+-             deps = ctx.attr.deps,
+-@@ -432,7 +437,7 @@ def _ng_module_impl(ctx):
+-             package_name = ctx.attr.package_name,
+-             package_path = ctx.attr.package_path,
+-             path = path,
+--            files = ts_providers["typescript"]["es6_sources"],
+-+            files = ts_providers["typescript"]["es5_sources"],
+-         ))
+- 
+-     return ts_providers_dict_to_struct(ts_providers)
+-diff --git a/node_modules/@angular/bazel/src/ng_module/partial_compilation.bzl b/node_modules/@angular/bazel/src/ng_module/partial_compilation.bzl
+-index 5fd9a73..c155cea 100755
+---- a/node_modules/@angular/bazel/src/ng_module/partial_compilation.bzl
+-+++ b/node_modules/@angular/bazel/src/ng_module/partial_compilation.bzl
+-@@ -16,10 +16,10 @@ ng_partial_compilation_flag = rule(
+- )
+- 
+- def _partial_compilation_transition_impl(_settings, _attr):
+--    return {"@npm//@angular/bazel/src:partial_compilation": True}
+-+    return {"@rules_angular//src/ng_project/config:partial_compilation": True}
+- 
+- partial_compilation_transition = transition(
+-     implementation = _partial_compilation_transition_impl,
+-     inputs = [],
+--    outputs = ["@npm//@angular/bazel/src:partial_compilation"],
+-+    outputs = ["@rules_angular//src/ng_project/config:partial_compilation"],
+- )
+-diff --git a/node_modules/@angular/bazel/src/ng_package/packager.mjs b/node_modules/@angular/bazel/src/ng_package/packager.mjs
+-index 20604c5..6066214 100755
+---- a/node_modules/@angular/bazel/src/ng_package/packager.mjs
+-+++ b/node_modules/@angular/bazel/src/ng_package/packager.mjs
+-@@ -8,7 +8,7 @@
+- import * as fs from 'fs';
+- import * as path from 'path';
+- import { globSync } from 'tinyglobby';
+--import { analyzeFileAndEnsureNoCrossImports } from './cross_entry_points_imports';
+-+import { analyzeFileAndEnsureNoCrossImports } from './cross_entry_points_imports.mjs';
+- /**
+-  * List of known `package.json` fields which provide information about
+-  * supported package formats and their associated entry paths.
+-diff --git a/node_modules/@angular/bazel/src/ngc-wrapped/index.mjs b/node_modules/@angular/bazel/src/ngc-wrapped/index.mjs
+-index a315d24..021dea9 100755
+---- a/node_modules/@angular/bazel/src/ngc-wrapped/index.mjs
+-+++ b/node_modules/@angular/bazel/src/ngc-wrapped/index.mjs
+-@@ -12,7 +12,7 @@ import tscw from '@bazel/concatjs/internal/tsc_wrapped/index.js';
+- import * as fs from 'fs';
+- import * as path from 'path';
+- import ts from 'typescript';
+--import { EXT, patchNgHostWithFileNameToModuleName as patchNgHost, relativeToRootDirs } from './utils';
+-+import { EXT, patchNgHostWithFileNameToModuleName as patchNgHost, relativeToRootDirs } from './utils.mjs';
+- // FIXME: we should be able to add the assets to the tsconfig so FileLoader
+- // knows about them
+- const NGC_ASSETS = /\.(css|html)$/;
+-@@ -351,6 +351,12 @@ function gatherDiagnosticsForInputsOnly(options, bazelOpts, ngProgram) {
+-     }
+-     return diagnostics;
+- }
+-+
+-+main(process.argv.slice(2)).then(exitCode => process.exitCode = exitCode).catch(e => {
+-+  console.error(e);
+-+  process.exitCode = 1;
+-+});
+-+
+- /**
+-  * @deprecated
+-  * Kept here just for compatibility with 1P tools. To be removed soon after 1P update.
+-diff --git a/node_modules/@angular/bazel/src/ngc-wrapped/ngc-wrapped-main.mjs b/node_modules/@angular/bazel/src/ngc-wrapped/ngc-wrapped-main.mjs
+-index 8efba56..be29334 100755
+---- a/node_modules/@angular/bazel/src/ngc-wrapped/ngc-wrapped-main.mjs
+-+++ b/node_modules/@angular/bazel/src/ngc-wrapped/ngc-wrapped-main.mjs
+-@@ -5,7 +5,7 @@
+-  * Use of this source code is governed by an MIT-style license that can be
+-  * found in the LICENSE file at https://angular.dev/license
+-  */
+--import { main } from './index';
+-+import { main } from './index.mjs';
+- main(process.argv.slice(2))
+-     .then((exitCode) => (process.exitCode = exitCode))
+-     .catch((e) => {
+diff --git a/tools/postinstall/patches/@angular+bazel+20.0.0-next.3.patch b/tools/postinstall/patches/@angular+bazel+20.0.0-next.3.patch
+new file mode 100644
+index 0000000000000000000000000000000000000000..cbf4732208ec6348fa1d7fe6603b8dae762654f1
+--- /dev/null
++++ b/tools/postinstall/patches/@angular+bazel+20.0.0-next.3.patch
+@@ -0,0 +1,30 @@
++diff --git a/node_modules/@angular/bazel/src/ng_module/partial_compilation.bzl b/node_modules/@angular/bazel/src/ng_module/partial_compilation.bzl
++index 5fd9a73..c155cea 100755
++--- a/node_modules/@angular/bazel/src/ng_module/partial_compilation.bzl
+++++ b/node_modules/@angular/bazel/src/ng_module/partial_compilation.bzl
++@@ -16,10 +16,10 @@ ng_partial_compilation_flag = rule(
++ )
++
++ def _partial_compilation_transition_impl(_settings, _attr):
++-    return {"@npm//@angular/bazel/src:partial_compilation": True}
+++    return {"@rules_angular//src/ng_project/config:partial_compilation": True}
++
++ partial_compilation_transition = transition(
++     implementation = _partial_compilation_transition_impl,
++     inputs = [],
++-    outputs = ["@npm//@angular/bazel/src:partial_compilation"],
+++    outputs = ["@rules_angular//src/ng_project/config:partial_compilation"],
++ )
++diff --git a/node_modules/@angular/bazel/src/ng_package/packager.mjs b/node_modules/@angular/bazel/src/ng_package/packager.mjs
++index 20604c5..6066214 100755
++--- a/node_modules/@angular/bazel/src/ng_package/packager.mjs
+++++ b/node_modules/@angular/bazel/src/ng_package/packager.mjs
++@@ -8,7 +8,7 @@
++ import * as fs from 'fs';
++ import * as path from 'path';
++ import { globSync } from 'tinyglobby';
++-import { analyzeFileAndEnsureNoCrossImports } from './cross_entry_points_imports';
+++import { analyzeFileAndEnsureNoCrossImports } from './cross_entry_points_imports.mjs';
++ /**
++  * List of known `package.json` fields which provide information about
++  * supported package formats and their associated entry paths.

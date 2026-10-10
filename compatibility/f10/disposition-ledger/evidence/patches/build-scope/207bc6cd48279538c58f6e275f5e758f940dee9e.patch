@@ -1,0 +1,880 @@
+diff --git a/.aspect/rules/external_repository_action_cache/npm_translate_lock_MzA5NzUwNzMx b/.aspect/rules/external_repository_action_cache/npm_translate_lock_MzA5NzUwNzMx
+index b799859bd1ca51e7a73dd3b21a0c937fee51dfa9..1cf17d0e3178e332e31b7687717a0c3079ef411c 100755
+--- a/.aspect/rules/external_repository_action_cache/npm_translate_lock_MzA5NzUwNzMx
++++ b/.aspect/rules/external_repository_action_cache/npm_translate_lock_MzA5NzUwNzMx
+@@ -3,18 +3,18 @@
+ # This file should be checked into version control along with the pnpm-lock.yaml file.
+ .npmrc=-1406867100
+ integration/package.json=-620011313
+-package.json=-635422980
++package.json=20540807
+ patches/@angular__compiler-cli.patch=-65319555
+-pnpm-lock.yaml=-1494189058
++pnpm-lock.yaml=-1601778403
+ pnpm-workspace.yaml=334858811
+-src/cdk-experimental/package.json=2063150503
++src/cdk-experimental/package.json=237487315
+ src/cdk/package.json=-908433069
+ src/components-examples/package.json=560048349
+ src/dev-app/package.json=624475908
+ src/e2e-app/package.json=-1971485006
+ src/google-maps/package.json=-886415500
+ src/material-date-fns-adapter/package.json=-332076964
+-src/material-experimental/package.json=592784609
++src/material-experimental/package.json=1822916455
+ src/material-luxon-adapter/package.json=-199007660
+ src/material-moment-adapter/package.json=-1407689629
+ src/material/package.json=-1237533685
+diff --git a/WORKSPACE b/WORKSPACE
+index 7339bdc6e93c7e0418c4910879e817329ded32de..a25a10dd9a47c8cc2021b17c768c1d7c37f11dd9 100644
+--- a/WORKSPACE
++++ b/WORKSPACE
+@@ -167,9 +167,10 @@ npm_translate_lock(
+         "@angular/animations": "node ../../@nginfra/angular-linking/index.mjs",
+         "@angular/common": "node ../../@nginfra/angular-linking/index.mjs",
+         "@angular/forms": "node ../../@nginfra/angular-linking/index.mjs",
++        "@angular/localize": "node ../../@nginfra/angular-linking/index.mjs",
+         "@angular/platform-browser": "node ../../@nginfra/angular-linking/index.mjs",
++        "@angular/platform-server": "node ../../@nginfra/angular-linking/index.mjs",
+         "@angular/router": "node ../../@nginfra/angular-linking/index.mjs",
+-        "@angular/localize": "node ../../@nginfra/angular-linking/index.mjs",
+     },
+     data = [
+         "//:package.json",
+@@ -191,6 +192,17 @@ npm_translate_lock(
+         "//src/youtube-player:package.json",
+     ],
+     npmrc = "//:.npmrc",
++    package_visibility = {
++        "@angular/cdk": ["//integration:__subpackages__"],
++        "@angular/cdk-experimental": ["//integration:__subpackages__"],
++        "@angular/material": ["//integration:__subpackages__"],
++        "@angular/material-experimental": ["//integration:__subpackages__"],
++        "@angular/google-maps": ["//integration:__subpackages__"],
++        "@angular/youtube-player": ["//integration:__subpackages__"],
++        "@angular/material-moment-adapter": ["//integration:__subpackages__"],
++        "@angular/material-date-fns-adapter": ["//integration:__subpackages__"],
++        "@angular/material-luxon-adapter": ["//integration:__subpackages__"],
++    },
+     pnpm_lock = "//:pnpm-lock.yaml",
+     update_pnpm_lock = True,
+     verify_node_modules_ignored = "//:.bazelignore",
+@@ -238,7 +250,7 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+ 
+ git_repository(
+     name = "devinfra",
+-    commit = "b9bcdb3f9dff85fbfe8d1ca1d95531ddfe475f80",
++    commit = "492cc1f5295d3ededcd6b226354a1e2924c64246",
+     remote = "https://github.com/angular/dev-infra.git",
+ )
+ 
+@@ -252,7 +264,7 @@ setup_dependencies_2()
+ 
+ git_repository(
+     name = "rules_angular",
+-    commit = "92127883c3a3714e63782a51bac1a7c03ec8b0f5",
++    commit = "60d0dbdf18224f5167da1a43f4de9c4cb717b593",
+     remote = "https://github.com/devversion/rules_angular.git",
+ )
+ 
+diff --git a/package.json b/package.json
+index 8f37da4f7d5052adddcd3a65a084addf7ebc1542..59c946ef15dc72a73f10c96cfda8f5f298e6db06 100644
+--- a/package.json
++++ b/package.json
+@@ -65,8 +65,8 @@
+     "date-fns": "^4.1.0",
+     "luxon": "^3.0.0",
+     "moment": "^2.29.1",
+-    "rxjs-tslint-rules": "^4.34.8",
+     "rxjs": "^6.6.7",
++    "rxjs-tslint-rules": "^4.34.8",
+     "tslib": "^2.3.1",
+     "zone.js": "~0.15.0"
+   },
+@@ -226,6 +226,11 @@
+         "dependencies": {
+           "@nginfra/angular-linking": "1.0.6"
+         }
++      },
++      "@angular/platform-server": {
++        "dependencies": {
++          "@nginfra/angular-linking": "1.0.6"
++        }
+       }
+     }
+   }
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+index caa1a3cb7b68de030fb5ecebf1f9a195bcbffa42..efa8f5c0c14ccda6fd01bfda21747d16aa484811 100644
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -13,7 +13,7 @@ overrides:
+   string-width: 4.2.3
+   wrap-ansi: 7.0.0
+ 
+-packageExtensionsChecksum: 7c98045a9c49ce191158d99623d18a74
++packageExtensionsChecksum: 8f389e19c3029fbb48347f408e442e2e
+ 
+ patchedDependencies:
+   '@angular/compiler-cli@20.0.0-next.4':
+@@ -102,7 +102,7 @@ importers:
+         version: github.com/angular/dev-infra-private-ng-dev-builds/1fa3a08b6a111de820da092799319ed47c058849
+       '@angular/platform-server':
+         specifier: ^20.0.0-next.4
+-        version: 20.0.0-next.4(@angular/common@20.0.0-next.4)(@angular/compiler@20.0.0-next.4)(@angular/core@20.0.0-next.4)(@angular/platform-browser@20.0.0-next.4)(rxjs@6.6.7)
++        version: 20.0.0-next.4(@angular/common@20.0.0-next.4)(@angular/compiler-cli@20.0.0-next.4)(@angular/compiler@20.0.0-next.4)(@angular/core@20.0.0-next.4)(@angular/platform-browser@20.0.0-next.4)(rxjs@6.6.7)
+       '@angular/router':
+         specifier: ^20.0.0-next.4
+         version: 20.0.0-next.4(@angular/common@20.0.0-next.4)(@angular/compiler-cli@20.0.0-next.4)(@angular/core@20.0.0-next.4)(@angular/platform-browser@20.0.0-next.4)(rxjs@6.6.7)
+@@ -418,6 +418,10 @@ importers:
+       tslib:
+         specifier: ^2.3.0
+         version: 2.8.1
++    devDependencies:
++      '@angular/cdk':
++        specifier: workspace:*
++        version: link:../cdk
+ 
+   src/components-examples:
+     dependencies:
+@@ -498,6 +502,16 @@ importers:
+       tslib:
+         specifier: ^2.3.0
+         version: 2.8.1
++    devDependencies:
++      '@angular/cdk':
++        specifier: workspace:*
++        version: link:../cdk
++      '@angular/cdk-experimental':
++        specifier: workspace:*
++        version: link:../cdk-experimental
++      '@angular/material':
++        specifier: workspace:*
++        version: link:../material
+ 
+   src/material-luxon-adapter:
+     dependencies:
+@@ -636,7 +650,7 @@ packages:
+       '@angular/compiler-cli': 20.0.0-next.4(patch_hash=bkmikb4osdzaovoldc46tgsqpe)(@angular/compiler@20.0.0-next.4)(typescript@5.8.2)
+       '@angular/localize': 20.0.0-next.4(@angular/compiler-cli@20.0.0-next.4)(@angular/compiler@20.0.0-next.4)
+       '@angular/platform-browser': 20.0.0-next.4(@angular/animations@20.0.0-next.4)(@angular/common@20.0.0-next.4)(@angular/compiler-cli@20.0.0-next.4)(@angular/core@20.0.0-next.4)
+-      '@angular/platform-server': 20.0.0-next.4(@angular/common@20.0.0-next.4)(@angular/compiler@20.0.0-next.4)(@angular/core@20.0.0-next.4)(@angular/platform-browser@20.0.0-next.4)(rxjs@6.6.7)
++      '@angular/platform-server': 20.0.0-next.4(@angular/common@20.0.0-next.4)(@angular/compiler-cli@20.0.0-next.4)(@angular/compiler@20.0.0-next.4)(@angular/core@20.0.0-next.4)(@angular/platform-browser@20.0.0-next.4)(rxjs@6.6.7)
+       '@babel/core': 7.26.10
+       '@babel/generator': 7.27.0
+       '@babel/helper-annotate-as-pure': 7.25.9
+@@ -845,7 +859,7 @@ packages:
+       '@angular/compiler': 20.0.0-next.4
+       '@angular/compiler-cli': 20.0.0-next.4(patch_hash=bkmikb4osdzaovoldc46tgsqpe)(@angular/compiler@20.0.0-next.4)(typescript@5.8.2)
+       '@angular/localize': 20.0.0-next.4(@angular/compiler-cli@20.0.0-next.4)(@angular/compiler@20.0.0-next.4)
+-      '@angular/platform-server': 20.0.0-next.4(@angular/common@20.0.0-next.4)(@angular/compiler@20.0.0-next.4)(@angular/core@20.0.0-next.4)(@angular/platform-browser@20.0.0-next.4)(rxjs@6.6.7)
++      '@angular/platform-server': 20.0.0-next.4(@angular/common@20.0.0-next.4)(@angular/compiler-cli@20.0.0-next.4)(@angular/compiler@20.0.0-next.4)(@angular/core@20.0.0-next.4)(@angular/platform-browser@20.0.0-next.4)(rxjs@6.6.7)
+       '@babel/core': 7.26.9
+       '@babel/helper-annotate-as-pure': 7.25.9
+       '@babel/helper-split-export-declaration': 7.24.7
+@@ -934,7 +948,7 @@ packages:
+       '@angular/compiler-cli': 20.0.0-next.4(patch_hash=bkmikb4osdzaovoldc46tgsqpe)(@angular/compiler@20.0.0-next.4)(typescript@5.8.2)
+       '@angular/localize': 20.0.0-next.4(@angular/compiler-cli@20.0.0-next.4)(@angular/compiler@20.0.0-next.4)
+       '@angular/platform-browser': 20.0.0-next.4(@angular/animations@20.0.0-next.4)(@angular/common@20.0.0-next.4)(@angular/compiler-cli@20.0.0-next.4)(@angular/core@20.0.0-next.4)
+-      '@angular/platform-server': 20.0.0-next.4(@angular/common@20.0.0-next.4)(@angular/compiler@20.0.0-next.4)(@angular/core@20.0.0-next.4)(@angular/platform-browser@20.0.0-next.4)(rxjs@6.6.7)
++      '@angular/platform-server': 20.0.0-next.4(@angular/common@20.0.0-next.4)(@angular/compiler-cli@20.0.0-next.4)(@angular/compiler@20.0.0-next.4)(@angular/core@20.0.0-next.4)(@angular/platform-browser@20.0.0-next.4)(rxjs@6.6.7)
+       '@babel/core': 7.26.10
+       '@babel/helper-annotate-as-pure': 7.25.9
+       '@babel/helper-split-export-declaration': 7.24.7
+@@ -1139,7 +1153,7 @@ packages:
+       - '@angular/compiler-cli'
+       - supports-color
+ 
+-  /@angular/platform-server@20.0.0-next.4(@angular/common@20.0.0-next.4)(@angular/compiler@20.0.0-next.4)(@angular/core@20.0.0-next.4)(@angular/platform-browser@20.0.0-next.4)(rxjs@6.6.7):
++  /@angular/platform-server@20.0.0-next.4(@angular/common@20.0.0-next.4)(@angular/compiler-cli@20.0.0-next.4)(@angular/compiler@20.0.0-next.4)(@angular/core@20.0.0-next.4)(@angular/platform-browser@20.0.0-next.4)(rxjs@6.6.7):
+     resolution: {integrity: sha512-Iaszz4BBK882sNLo03cDV07P/qyDXmqax4N5f2QuoEx/GNDFSbePsRDJLshlB8MxnMClamEhOisZSVfwFZ+aKg==}
+     engines: {node: ^18.19.1 || ^20.11.1 || >=22.0.0}
+     peerDependencies:
+@@ -1153,9 +1167,13 @@ packages:
+       '@angular/compiler': 20.0.0-next.4
+       '@angular/core': 20.0.0-next.4(@angular/compiler@20.0.0-next.4)(rxjs@6.6.7)(zone.js@0.15.0)
+       '@angular/platform-browser': 20.0.0-next.4(@angular/animations@20.0.0-next.4)(@angular/common@20.0.0-next.4)(@angular/compiler-cli@20.0.0-next.4)(@angular/core@20.0.0-next.4)
++      '@nginfra/angular-linking': 1.0.6(@angular/compiler-cli@20.0.0-next.4)
+       rxjs: 6.6.7
+       tslib: 2.8.1
+       xhr2: 0.2.1
++    transitivePeerDependencies:
++      - '@angular/compiler-cli'
++      - supports-color
+     dev: true
+ 
+   /@angular/router@20.0.0-next.4(@angular/common@20.0.0-next.4)(@angular/compiler-cli@20.0.0-next.4)(@angular/core@20.0.0-next.4)(@angular/platform-browser@20.0.0-next.4)(rxjs@6.6.7):
+diff --git a/src/BUILD.bazel b/src/BUILD.bazel
+index ddae46fb16f90cda9fd29a721a3c95d27b340402..7fc1547649d3fd8027cf127f2bc534e9e09e88b3 100644
+--- a/src/BUILD.bazel
++++ b/src/BUILD.bazel
+@@ -5,6 +5,7 @@ load("//src/cdk:config.bzl", "CDK_ENTRYPOINTS")
+ load("//src/material:config.bzl", "MATERIAL_ENTRYPOINTS", "MATERIAL_TESTING_ENTRYPOINTS")
+ load("//tools/dgeni:index.bzl", "dgeni_api_docs")
+ load("//tools:defaults2.bzl", "ts_project")
++load("@aspect_rules_js//js:defs.bzl", "js_library")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -37,6 +38,11 @@ copy_to_bin(
+     srcs = ["package.json"],
+ )
+ 
++js_library(
++    name = "esbuild-linked-config",
++    srcs = ["esbuild-linked.config.mjs"],
++)
++
+ dgeni_api_docs(
+     name = "api-docs",
+     srcs = apiSourceFiles + [
+diff --git a/src/cdk-experimental/BUILD.bazel b/src/cdk-experimental/BUILD.bazel
+index b5bcb939724dc24a44a2cc37bfa1dc6d4b0f34d4..fc101aad04e64fde6429c82839883c6181a7f923 100644
+--- a/src/cdk-experimental/BUILD.bazel
++++ b/src/cdk-experimental/BUILD.bazel
+@@ -2,7 +2,7 @@ load("//src/cdk-experimental:config.bzl", "CDK_EXPERIMENTAL_TARGETS")
+ load("//tools:defaults.bzl", "ng_package")
+ load("//tools:defaults2.bzl", "ts_project")
+ load("//tools/bazel:legacy_target.bzl", "get_legacy_label")
+-load("@npm2//defs:bzl", "npm_link_all_packages")
++load("@npm2//:defs.bzl", "npm_link_all_packages")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -21,6 +21,13 @@ ng_package(
+     name = "npm_package",
+     package_name = "@angular/cdk-experimental",
+     srcs = ["package.json"],
++    package_deps = [":node_modules/@angular/cdk"],
+     tags = ["release-package"],
++    visibility = [
++        "//:__pkg__",
++        "//goldens:__pkg__",
++        "//integration:__subpackages__",
++        "//src/material-experimental:__subpackages__",
++    ],
+     deps = [get_legacy_label(t) for t in CDK_EXPERIMENTAL_TARGETS],
+ )
+diff --git a/src/cdk-experimental/package.json b/src/cdk-experimental/package.json
+index fc3b2a6d6b59ffcf0c83fb6173499983f06f31ca..a004e0ed1a3154b049bc84026d9c82d06fd66c45 100644
+--- a/src/cdk-experimental/package.json
++++ b/src/cdk-experimental/package.json
+@@ -15,6 +15,9 @@
+     "@angular/cdk": "0.0.0-PLACEHOLDER",
+     "@angular/core": "0.0.0-NG"
+   },
++  "devDependencies": {
++    "@angular/cdk": "workspace:*"
++  },
+   "dependencies": {
+     "tslib": "^2.3.0"
+   },
+diff --git a/src/cdk/BUILD.bazel b/src/cdk/BUILD.bazel
+index 692424020948ff180bf84f15a321d9924adff755..0774b0a5f4f067b9022f9ead8c1cbadd64b403cf 100644
+--- a/src/cdk/BUILD.bazel
++++ b/src/cdk/BUILD.bazel
+@@ -63,6 +63,11 @@ ng_package(
+         "//src/cdk/schematics:npm_package",
+     ],
+     tags = ["release-package"],
++    visibility = [
++        "//:__pkg__",
++        "//goldens:__pkg__",
++        "//integration:__subpackages__",
++    ],
+     deps = [get_legacy_label(t) for t in CDK_TARGETS],
+ )
+ 
+diff --git a/src/cdk/schematics/BUILD.bazel b/src/cdk/schematics/BUILD.bazel
+index 44e7743a1c22b8e5927baafd9ae00669be067592..d1202199f41a4a6153c9a25f92e8e10391bf250b 100644
+--- a/src/cdk/schematics/BUILD.bazel
++++ b/src/cdk/schematics/BUILD.bazel
+@@ -1,9 +1,8 @@
+ load("@build_bazel_rules_nodejs//:index.bzl", "copy_to_bin")
+-load("//tools:defaults.bzl", "jasmine_node_test")
+-load("//tools:defaults2.bzl", "npm_package", "ts_project")
++load("//tools:defaults2.bzl", "jasmine_test", "npm_package", "ts_project")
+ load("@aspect_rules_ts//ts:defs.bzl", rules_js_tsconfig = "ts_config")
+ 
+-package(default_visibility = ["//visibility:public"])
++package(default_visibility = [":__subpackages__"])
+ 
+ copy_to_bin(
+     name = "schematics_assets",
+@@ -63,6 +62,10 @@ npm_package(
+         ":schematics_assets",
+     ],
+     package = "@angular/cdk/schematics",
++    visibility = [
++        "//src/cdk:__pkg__",
++        "//src/material/schematics:__pkg__",
++    ],
+ )
+ 
+ ts_project(
+@@ -91,10 +94,10 @@ ts_project(
+     ],
+ )
+ 
+-jasmine_node_test(
++jasmine_test(
+     name = "unit_tests",
+-    srcs = [":unit_test_sources_legacy"],
+     data = [
+         ":schematics_assets",
++        ":unit_test_sources",
+     ],
+ )
+diff --git a/src/cdk/testing/tests/webdriver.e2e.spec.ts b/src/cdk/testing/tests/webdriver.e2e.spec.ts
+index f0e017923daf63f831d0e89fd570e14073efa52c..9db630d6f06829e13d701c238908de0ed29bcbe0 100644
+--- a/src/cdk/testing/tests/webdriver.e2e.spec.ts
++++ b/src/cdk/testing/tests/webdriver.e2e.spec.ts
+@@ -27,8 +27,6 @@ setDefaultService(
+   new ServiceBuilder(chromeDriver).enableVerboseLogging().loggingTo('/tmp/test.txt').build(),
+ );
+ 
+-process.env['CHROMEDRIVER_EXE'] = chromeDriver;
+-
+ // Kagekiri is available globally in the browser. We declare it here so we can use it in the
+ // browser-side script passed to `By.js`.
+ declare const kagekiri: {
+diff --git a/src/components-examples/BUILD.bazel b/src/components-examples/BUILD.bazel
+index 16f99a16933c0b6ea11fd50e44e6c6bd6df34c10..2c4865fff6f6921f9601f66b1b69726af73d77fb 100644
+--- a/src/components-examples/BUILD.bazel
++++ b/src/components-examples/BUILD.bazel
+@@ -4,9 +4,12 @@ load("//tools/package-docs-content:index.bzl", "package_docs_content")
+ load(":config.bzl", "ALL_EXAMPLES")
+ load("//tools:defaults2.bzl", "ng_project")
+ load("//tools/bazel:legacy_target.bzl", "get_legacy_label")
++load("@npm2//:defs.bzl", "npm_link_all_packages")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
++npm_link_all_packages()
++
+ ng_project(
+     name = "components-examples",
+     srcs = glob(
+@@ -59,11 +62,13 @@ package_docs_content(
+ 
+ ng_package(
+     name = "npm_package",
++    package_name = "@angular/components-examples",
+     srcs = ["package.json"],
+     # this is a workaround to store a tree artifact in the ng_package.
+     # ng_package does not properly handle tree artifacts currently so we escalate to nested_packages
+     nested_packages = [":docs-content"],
+     tags = ["docs-package"],
++    visibility = ["//visibility:private"],
+     deps = [":components-examples_legacy"] + [get_legacy_label(t) for t in ALL_EXAMPLES],
+ )
+ 
+diff --git a/src/dev-app/BUILD.bazel b/src/dev-app/BUILD.bazel
+index 978051ef54f0a6ac3d4425cacb1edc424f115592..56fcf5533cdb3ac0a45f59938c6d1eb5683c26bb 100644
+--- a/src/dev-app/BUILD.bazel
++++ b/src/dev-app/BUILD.bazel
+@@ -1,16 +1,20 @@
+ load("@build_bazel_rules_nodejs//:index.bzl", "pkg_web")
+-load("//tools:defaults.bzl", "devmode_esbuild", "esbuild_config", "http_server", "sass_binary")
+-load("//src/components-examples:config.bzl", "ALL_EXAMPLES")
+-load("//tools/angular:index.bzl", "LINKER_PROCESSED_FW_PACKAGES")
++load("//tools:defaults.bzl", "http_server", "sass_binary")
+ load("//tools:defaults2.bzl", "ng_project")
++load("@npm2//:defs.bzl", "npm_link_all_packages")
++load("@aspect_rules_esbuild//esbuild:defs.bzl", "esbuild")
++load("//src/components-examples:config.bzl", "ALL_EXAMPLES")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
++npm_link_all_packages()
++
+ ng_project(
+     name = "dev-app",
+     srcs = [
+         "dev-app.ts",
+         "main.ts",
++        "polyfills.ts",
+         "routes.ts",
+     ],
+     deps = [
+@@ -91,24 +95,25 @@ ng_project(
+     ],
+ )
+ 
+-esbuild_config(
+-    name = "esbuild_config",
+-    config_file = "esbuild.config.mjs",
+-)
+-
+-devmode_esbuild(
++esbuild(
+     name = "bundles",
+-    config = ":esbuild_config",
+-    entry_points = [":main.ts"] + ["%s:index.ts" % e for e in ALL_EXAMPLES],
++    srcs = [
++        "//src:build-tsconfig",
++    ],
++    bundle = True,
++    config = "//src:esbuild-linked-config",
++    entry_points = [
++        ":main.js",
++        ":polyfills.js",
++    ] + ["%s:index.js" % e for e in ALL_EXAMPLES],
++    minify = True,
+     platform = "browser",
+     splitting = True,
+     # We cannot use `ES2017` or higher as that would result in `async/await` not being downleveled.
+     # ZoneJS needs to be able to intercept these as otherwise change detection would not work properly.
+     target = "es2016",
+-    # Note: We add all linker-processed FW packages as dependencies here so that ESBuild will
+-    # map all framework packages to their linker-processed bundles from `tools/angular`.
+-    deps = LINKER_PROCESSED_FW_PACKAGES + [
+-        ":dev-app_legacy",
++    deps = ALL_EXAMPLES + [
++        ":dev-app",
+     ],
+ )
+ 
+diff --git a/src/dev-app/esbuild.config.mjs b/src/dev-app/esbuild.config.mjs
+deleted file mode 100644
+index 200fac9e03d5f82863eee9cba0db56c76d5965a6..0000000000000000000000000000000000000000
+--- a/src/dev-app/esbuild.config.mjs
++++ /dev/null
+@@ -1,12 +0,0 @@
+-/**
+- * @license
+- * Copyright Google LLC All Rights Reserved.
+- *
+- * Use of this source code is governed by an MIT-style license that can be
+- * found in the LICENSE file at https://angular.dev/license
+- */
+-
+-export default {
+-  resolveExtensions: ['.js'],
+-  format: 'esm',
+-};
+diff --git a/src/dev-app/polyfills.ts b/src/dev-app/polyfills.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..4cfb72d218508d29ccb8035b8f4bc1ad17cf9d1e
+--- /dev/null
++++ b/src/dev-app/polyfills.ts
+@@ -0,0 +1,10 @@
++/**
++ * @license
++ * Copyright Google LLC All Rights Reserved.
++ *
++ * Use of this source code is governed by an MIT-style license that can be
++ * found in the LICENSE file at https://angular.dev/license
++ */
++
++// Load `$localize` for examples using it.
++import '@angular/localize/init';
+diff --git a/src/e2e-app/BUILD.bazel b/src/e2e-app/BUILD.bazel
+index a17e6284026087a5caceaba7053fa83520771207..d18dc771e6a6f21bb1d88e877478dae1d4bbed25 100644
+--- a/src/e2e-app/BUILD.bazel
++++ b/src/e2e-app/BUILD.bazel
+@@ -1,8 +1,12 @@
++load("@aspect_rules_esbuild//esbuild:defs.bzl", "esbuild")
++load("@npm2//:defs.bzl", "npm_link_all_packages")
+ load("//tools:defaults.bzl", "http_server", "sass_binary")
+ load("//tools:defaults2.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
++npm_link_all_packages()
++
+ # List of dependencies that are referenced in the `index.html` file.
+ devserverIndexHtmlDependencies = [
+     "//:node_modules/zone.js",
+@@ -56,27 +60,26 @@ sass_binary(
+     ],
+ )
+ 
+-esbuild_config(
+-    name = "esbuild_config",
+-    testonly = True,
+-    config_file = "esbuild.config.mjs",
+-)
+-
+-devmode_esbuild(
++esbuild(
+     name = "bundles",
+     testonly = True,
+-    config = ":esbuild_config",
+-    entry_points = [":main.ts"] + ["%s:index.ts" % e for e in ALL_EXAMPLES],
++    srcs = [
++        ":e2e-app",
++        "//:node_modules/tslib",
++        "//src:build-tsconfig",
++    ],
++    bundle = True,
++    config = "//src:esbuild-linked-config",
++    entry_point = ":main.js",
++    format = "esm",
++    metafile = True,
++    output_dir = True,
+     platform = "browser",
++    sourcemap = "external",
+     splitting = True,
+-    # We cannot use `ES2017` or higher as that would result in `async/await` not being downleveled.
++    # We cannot use `ES2017` or high as that would result in `async/await` not being downleveled.
+     # ZoneJS needs to be able to intercept these as otherwise change detection would not work properly.
+     target = "es2016",
+-    # Note: We add all linker-processed FW packages as dependencies here so that ESBuild will
+-    # map all framework packages to their linker-processed bundles from `tools/angular`.
+-    deps = LINKER_PROCESSED_FW_PACKAGES + [
+-        ":e2e-app_legacy",
+-    ],
+ )
+ 
+ http_server(
+diff --git a/src/esbuild-linked.config.mjs b/src/esbuild-linked.config.mjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..2c4996537bf6ac35254ce054de354b3c5ff2637e
+--- /dev/null
++++ b/src/esbuild-linked.config.mjs
+@@ -0,0 +1,13 @@
++/**
++ * @license
++ * Copyright Google LLC All Rights Reserved.
++ *
++ * Use of this source code is governed by an MIT-style license that can be
++ * found in the LICENSE file at https://angular.dev/license
++ */
++
++export default {
++  conditions: ['ng-linked', 'module'],
++  tsconfig: import.meta.dirname + '/bazel-tsconfig-build.json',
++  resolveExtensions: ['.js'],
++};
+diff --git a/src/google-maps/BUILD.bazel b/src/google-maps/BUILD.bazel
+index 8678ec952646ccd135579e7bf7f2e1a7365ec655..6d8066f0cfb9ef9fb8c07832ece483da63ce2e8d 100644
+--- a/src/google-maps/BUILD.bazel
++++ b/src/google-maps/BUILD.bazel
+@@ -39,6 +39,11 @@ ng_package(
+     srcs = ["package.json"],
+     nested_packages = ["//src/google-maps/schematics:npm_package"],
+     tags = ["release-package"],
++    visibility = [
++        "//:__pkg__",
++        "//goldens:__pkg__",
++        "//integration:__subpackages__",
++    ],
+     deps = [":google-maps_legacy"],
+ )
+ 
+diff --git a/src/material-date-fns-adapter/BUILD.bazel b/src/material-date-fns-adapter/BUILD.bazel
+index 3da9485c5224da081e2a180f225a7a59740fd875..8cbeb8a1e95eebe4e5b5f74837aace4a428de328 100644
+--- a/src/material-date-fns-adapter/BUILD.bazel
++++ b/src/material-date-fns-adapter/BUILD.bazel
+@@ -45,5 +45,10 @@ ng_package(
+     srcs = ["package.json"],
+     nested_packages = ["//src/material-date-fns-adapter/schematics:npm_package"],
+     tags = ["release-package"],
++    visibility = [
++        "//:__pkg__",
++        "//goldens:__pkg__",
++        "//integration:__subpackages__",
++    ],
+     deps = [":material-date-fns-adapter_legacy"],
+ )
+diff --git a/src/material-experimental/BUILD.bazel b/src/material-experimental/BUILD.bazel
+index 570681165ffb6746b74c71eb92c577648260eb24..e18cdc1dbcd7853338a3af9bb9aadae6b8ee8346 100644
+--- a/src/material-experimental/BUILD.bazel
++++ b/src/material-experimental/BUILD.bazel
+@@ -42,6 +42,16 @@ ng_package(
+         "package.json",
+         ":sass_lib",
+     ],
++    package_deps = [
++        ":node_modules/@angular/material",
++        ":node_modules/@angular/cdk",
++        ":node_modules/@angular/cdk-experimental",
++    ],
+     tags = ["release-package"],
++    visibility = [
++        "//:__pkg__",
++        "//goldens:__pkg__",
++        "//integration:__subpackages__",
++    ],
+     deps = [get_legacy_label(t) for t in MATERIAL_EXPERIMENTAL_TARGETS + MATERIAL_EXPERIMENTAL_TESTING_TARGETS],
+ )
+diff --git a/src/material-experimental/package.json b/src/material-experimental/package.json
+index 4592a6d591d4b3a227943042da3d06e3131fac10..af3e3355853ccc8dba9ef7b9d95b802172520e43 100644
+--- a/src/material-experimental/package.json
++++ b/src/material-experimental/package.json
+@@ -22,7 +22,13 @@
+     "@angular/common": "0.0.0-NG",
+     "@angular/forms": "0.0.0-NG",
+     "@angular/platform-browser": "0.0.0-NG",
+-    "@angular/material": "0.0.0-PLACEHOLDER"
++    "@angular/material": "0.0.0-PLACEHOLDER",
++    "@angular/cdk-experimental": "0.0.0-PLACEHOLDER"
++  },
++  "devDependencies": {
++    "@angular/material": "workspace:*",
++    "@angular/cdk": "workspace:*",
++    "@angular/cdk-experimental": "workspace:*"
+   },
+   "dependencies": {
+     "tslib": "^2.3.0"
+diff --git a/src/material-luxon-adapter/BUILD.bazel b/src/material-luxon-adapter/BUILD.bazel
+index 5b0f54771fc6d1c11970b45da0d05eeaf02cc89f..1678a3e52f7e0cdb577725c01c12a3b5f5b22b5e 100644
+--- a/src/material-luxon-adapter/BUILD.bazel
++++ b/src/material-luxon-adapter/BUILD.bazel
+@@ -47,5 +47,10 @@ ng_package(
+     srcs = ["package.json"],
+     nested_packages = ["//src/material-luxon-adapter/schematics:npm_package"],
+     tags = ["release-package"],
++    visibility = [
++        "//:__pkg__",
++        "//goldens:__pkg__",
++        "//integration:__subpackages__",
++    ],
+     deps = [":material-luxon-adapter_legacy"],
+ )
+diff --git a/src/material-moment-adapter/BUILD.bazel b/src/material-moment-adapter/BUILD.bazel
+index 20ec1f8b63fdfa8eedbb7b16e1f25c62acabffbe..a6d0bbb3a12dd8080a3957eaf36b7afe154eb657 100644
+--- a/src/material-moment-adapter/BUILD.bazel
++++ b/src/material-moment-adapter/BUILD.bazel
+@@ -46,5 +46,10 @@ ng_package(
+     srcs = ["package.json"],
+     nested_packages = ["//src/material-moment-adapter/schematics:npm_package"],
+     tags = ["release-package"],
++    visibility = [
++        "//:__pkg__",
++        "//goldens:__pkg__",
++        "//integration:__subpackages__",
++    ],
+     deps = [":material-moment-adapter_legacy"],
+ )
+diff --git a/src/material/BUILD.bazel b/src/material/BUILD.bazel
+index 621233660667ed3ccc9c1cc93cef490e6cc048f9..d10b5a615b2e4e204267696cbd1f64c19af42198 100644
+--- a/src/material/BUILD.bazel
++++ b/src/material/BUILD.bazel
+@@ -184,6 +184,14 @@ ng_package(
+         "//src/material/tree:theme",
+     ],
+     nested_packages = ["//src/material/schematics:npm_package"],
++    package_deps = [
++        ":node_modules/@angular/cdk",
++    ],
+     tags = ["release-package"],
++    visibility = [
++        "//:__pkg__",
++        "//goldens:__pkg__",
++        "//integration:__subpackages__",
++    ],
+     deps = [get_legacy_label(t) for t in MATERIAL_TARGETS + MATERIAL_TESTING_TARGETS],
+ )
+diff --git a/src/material/core/BUILD.bazel b/src/material/core/BUILD.bazel
+index 4a0bdc17104af5d9869b79c7ffcb95e8d8ce2977..81fa7ffa1ae21e7b4764563eeaf4d924190511ae 100644
+--- a/src/material/core/BUILD.bazel
++++ b/src/material/core/BUILD.bazel
+@@ -45,7 +45,6 @@ ng_project(
+         ":version",
+         "//:node_modules/rxjs",
+         "//src:dev_mode_types",
+-        "//src/material:node_modules/@angular/cdk",
+         "//src/material/core:ripple",
+         "//src/material/core/animation",
+         "//src/material/core/common-behaviors",
+diff --git a/src/material/divider/BUILD.bazel b/src/material/divider/BUILD.bazel
+index 751003a87729c6203a8a24d4dbeb7de198e59e7c..99a2173aca14a7de9b040bdc71cb5b4b93e074f2 100644
+--- a/src/material/divider/BUILD.bazel
++++ b/src/material/divider/BUILD.bazel
+@@ -72,7 +72,6 @@ ng_project(
+     assets = [":css"],
+     deps = [
+         "//:node_modules/@angular/core",
+-        "//src/material:node_modules/@angular/cdk",
+         "//src/material/core",
+     ],
+ )
+diff --git a/src/material/form-field/BUILD.bazel b/src/material/form-field/BUILD.bazel
+index 884e3c352a5551b5bcda1c678c4f2f9487c8bcf5..4210664d553b7934d2c010fa4f44d1982b869061 100644
+--- a/src/material/form-field/BUILD.bazel
++++ b/src/material/form-field/BUILD.bazel
+@@ -119,7 +119,6 @@ ng_project(
+         "//:node_modules/@angular/forms",
+         "//:node_modules/rxjs",
+         "//src:dev_mode_types",
+-        "//src/material:node_modules/@angular/cdk",
+         "//src/material/core",
+         "//src/material/form-field/directives",
+     ],
+diff --git a/src/material/schematics/BUILD.bazel b/src/material/schematics/BUILD.bazel
+index d7ae9f13fab86c7e4012fd898d8c23939ec04d7f..1706e278ff2c6ffdb751153b2f086d49cd1f1c9d 100644
+--- a/src/material/schematics/BUILD.bazel
++++ b/src/material/schematics/BUILD.bazel
+@@ -5,7 +5,6 @@ load("@aspect_rules_js//npm:defs.bzl", "npm_link_package")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+-# TODO(devversion): Remove when CDK is fully linked properly.
+ npm_link_package(
+     name = "node_modules/@angular/cdk/schematics",
+     src = "//src/cdk/schematics:npm_package",
+@@ -146,6 +145,7 @@ jasmine_test(
+         ":collection_assets",
+         ":ng_generate_assets",
+         ":schema_assets",
++        ":schematics",
+         ":schematics_test_cases",
+         ":unit_test_sources",
+         "//src/material/schematics:package_json",
+diff --git a/src/material/schematics/ng-generate/theme-color/BUILD.bazel b/src/material/schematics/ng-generate/theme-color/BUILD.bazel
+index 468b172720c5e93ccdcdc9912220119e1c31ed2d..64fcc19ab2f624b0b2e9d0a66f9c11ceab1ead99 100644
+--- a/src/material/schematics/ng-generate/theme-color/BUILD.bazel
++++ b/src/material/schematics/ng-generate/theme-color/BUILD.bazel
+@@ -21,7 +21,7 @@ ts_project(
+         "//:node_modules/@types/node",
+         "//:node_modules/sass",
+         "//:node_modules/typescript",
+-        "//src/cdk/schematics",
++        "//src/material/schematics:node_modules/@angular/cdk/schematics",
+     ],
+ )
+ 
+diff --git a/src/material/schematics/ng-update/BUILD.bazel b/src/material/schematics/ng-update/BUILD.bazel
+index a17b254511e0f57fd0781809a2758be77a3f410f..f3245ae312ef85813148a3a81a2cbebb09c55f8a 100644
+--- a/src/material/schematics/ng-update/BUILD.bazel
++++ b/src/material/schematics/ng-update/BUILD.bazel
+@@ -1,5 +1,5 @@
+-load("//tools:defaults.bzl", "esbuild")
+ load("//tools:defaults2.bzl", "jasmine_test", "ts_project")
++load("@aspect_rules_esbuild//esbuild:defs.bzl", "esbuild")
+ 
+ ts_project(
+     name = "ng_update_lib",
+@@ -24,7 +24,7 @@ ts_project(
+ 
+ esbuild(
+     name = "ng_update_index",
+-    entry_point = ":index.ts",
++    entry_point = ":index.js",
+     external = [
+         "@angular/cdk/schematics",
+         "@schematics/angular",
+@@ -37,7 +37,7 @@ esbuild(
+     platform = "node",
+     target = "es2015",
+     visibility = ["//src/material/schematics:__pkg__"],
+-    deps = [":ng_update_lib_legacy"],
++    deps = [":ng_update_lib"],
+ )
+ 
+ filegroup(
+diff --git a/src/universal-app/BUILD.bazel b/src/universal-app/BUILD.bazel
+index 772cbef8def6940b41f9a33a605590eabefdf54c..88d85bf9141fa114943558ead20c6c4846a76efd 100644
+--- a/src/universal-app/BUILD.bazel
++++ b/src/universal-app/BUILD.bazel
+@@ -4,6 +4,11 @@ load("//tools:defaults.bzl", "http_server", "protractor_web_test_suite", "sass_b
+ load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ load("@aspect_rules_ts//ts:defs.bzl", rules_js_tsconfig = "ts_config")
+ load("@aspect_rules_esbuild//esbuild:defs.bzl", "esbuild")
++load("//src/cdk:config.bzl", "CDK_TARGETS")
++load("//src/cdk-experimental:config.bzl", "CDK_EXPERIMENTAL_TARGETS")
++load("//src/components-examples:config.bzl", "ALL_EXAMPLES")
++load("//src/material:config.bzl", "MATERIAL_TARGETS")
++load("//src/material-experimental:config.bzl", "MATERIAL_EXPERIMENTAL_TARGETS")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+@@ -86,6 +91,8 @@ js_binary(
+ 
+ esbuild(
+     name = "client_bundle",
++    srcs = ["//src:build-tsconfig"],
++    config = "//src:esbuild-linked-config",
+     entry_points = [":main.js"],
+     platform = "browser",
+     target = "es2016",
+@@ -96,6 +103,8 @@ esbuild(
+ 
+ esbuild(
+     name = "prerender_bundle",
++    srcs = ["//src:build-tsconfig"],
++    config = "//src:esbuild-linked-config",
+     entry_point = ":prerender.js",
+     platform = "node",
+     # We cannot use `ES2017` or higher as that would result in `async/await` not being downleveled.
+diff --git a/src/youtube-player/BUILD.bazel b/src/youtube-player/BUILD.bazel
+index 109dd050b1c36d4bd493ce56cc1e503b7f35dc5d..f4e8a5fe46c5aad607798dcb36466d39fcd091c8 100644
+--- a/src/youtube-player/BUILD.bazel
++++ b/src/youtube-player/BUILD.bazel
+@@ -58,6 +58,11 @@ ng_package(
+     srcs = ["package.json"],
+     nested_packages = ["//src/youtube-player/schematics:npm_package"],
+     tags = ["release-package"],
++    visibility = [
++        "//:__pkg__",
++        "//goldens:__pkg__",
++        "//integration:__subpackages__",
++    ],
+     deps = [":youtube-player_legacy"],
+ )
+ 
+diff --git a/tools/defaults.bzl b/tools/defaults.bzl
+index 84d832394c9ef56f642d1a7e40038ea9fc425362..9d3563e39f053f97f6f5a22e36b88ab6e39571b6 100644
+--- a/tools/defaults.bzl
++++ b/tools/defaults.bzl
+@@ -47,6 +47,7 @@ def npm_sass_library(**kwargs):
+ def ng_package(
+         name,
+         package_name,
++        package_deps = [],
+         srcs = [],
+         deps = [],
+         externals = PKG_EXTERNALS,
+@@ -104,7 +105,8 @@ def ng_package(
+     ng_package_interop(
+         name = "pkg",
+         src = ":%s" % name,
+-        interop_deps = [d.replace("_legacy", "") for d in deps],
++        visibility = visibility,
++        interop_deps = [d.replace("_legacy", "") for d in deps] + package_deps,
+         package_name = package_name,
+     )
+ 
+diff --git a/tools/defaults2.bzl b/tools/defaults2.bzl
+index c6dda8bd6dcc36001d495ccc4b2ab6215b4d286a..793349e37aa0d80f78c349c222c5ff44a956c16b 100644
+--- a/tools/defaults2.bzl
++++ b/tools/defaults2.bzl
+@@ -56,12 +56,13 @@ def ng_project(
+     # if False and not testonly:
+     #    _make_tsec_test(kwargs["name"])
+ 
+-def jasmine_test(data = [], args = [], **kwargs):
++def jasmine_test(name, data = [], args = [], external = [], **kwargs):
+     # Create relative path to root, from current package dir. Necessary as
+     # we change the `chdir` below to the package directory.
+     relative_to_root = "/".join([".."] * len(native.package_name().split("/")))
+ 
+     _jasmine_test(
++        name = name,
+         node_modules = "//:node_modules",
+         chdir = native.package_name(),
+         fixed_args = [
+@@ -80,7 +81,12 @@ def karma_web_test_suite(name, tags = [], deps = [], browsers = None, **kwargs):
+     spec_bundle_amd(
+         name = "%s_bundle" % name,
+         workspace_name = "angular_material",
++        srcs = ["//src:build-tsconfig"],
+         deps = deps,
++        config = {
++            "resolveExtensions": [".js"],
++            "tsconfig": "./src/bazel-tsconfig-build.json",
++        },
+     )
+ 
+     test_tags = ["partial-compilation-integration"] + tags
+diff --git a/tools/markdown-to-html/BUILD.bazel b/tools/markdown-to-html/BUILD.bazel
+index 1261528880baaaffae2a1dbfb789356a07a1abd7..755ed473aa58dd2bf5f3f7851bf3324c3b24d2a8 100644
+--- a/tools/markdown-to-html/BUILD.bazel
++++ b/tools/markdown-to-html/BUILD.bazel
+@@ -47,5 +47,4 @@ ts_project(
+ jasmine_test(
+     name = "unit_tests",
+     data = [":unit_test_lib"],
+-    visibility = ["//visibility:private"],
+ )

@@ -1,0 +1,4019 @@
+diff --git a/integration/module-tests/BUILD.bazel b/integration/module-tests/BUILD.bazel
+index 5479627f2dc0be5fead481aac4c7c0d2167f0d55..7f054902ae2c676af423dea747a655d8743e6e31 100644
+--- a/integration/module-tests/BUILD.bazel
++++ b/integration/module-tests/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ts_project")
+ load("//integration/module-tests:index.bzl", "module_test")
+ 
+ ts_project(
+diff --git a/src/BUILD.bazel b/src/BUILD.bazel
+index c62be019d07df6bc44290ecaadb7483fcdddffc2..28d44fe4c07b82a0d28ddc1dc0e0901bf71675af 100644
+--- a/src/BUILD.bazel
++++ b/src/BUILD.bazel
+@@ -3,7 +3,7 @@ load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
+ load("//src/cdk:config.bzl", "CDK_ENTRYPOINTS")
+ load("//src/material:config.bzl", "MATERIAL_ENTRYPOINTS", "MATERIAL_TESTING_ENTRYPOINTS")
+ load("//tools/dgeni:index.bzl", "dgeni_api_docs")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ts_project")
+ load("@aspect_rules_js//js:defs.bzl", "js_library")
+ 
+ package(default_visibility = ["//visibility:public"])
+diff --git a/src/cdk-experimental/BUILD.bazel b/src/cdk-experimental/BUILD.bazel
+index 2b3f3fa2818c87bec0ec5689d00386b26b1e36ef..d437cba9ccf3db070a478b41a6f56c8c6dd52f94 100644
+--- a/src/cdk-experimental/BUILD.bazel
++++ b/src/cdk-experimental/BUILD.bazel
+@@ -1,6 +1,5 @@
+ load("//src/cdk-experimental:config.bzl", "CDK_EXPERIMENTAL_TARGETS")
+-load("//tools:defaults.bzl", "ng_package")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_package", "ts_project")
+ load("@npm//:defs.bzl", "npm_link_all_packages")
+ 
+ package(default_visibility = ["//visibility:public"])
+diff --git a/src/cdk-experimental/column-resize/BUILD.bazel b/src/cdk-experimental/column-resize/BUILD.bazel
+index 6b2929181fa8adca2505757d1dfcc26e3ddd3faf..2cb1c2c81b9f43695b94b2d76a1c414b453b3927 100644
+--- a/src/cdk-experimental/column-resize/BUILD.bazel
++++ b/src/cdk-experimental/column-resize/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk-experimental/combobox/BUILD.bazel b/src/cdk-experimental/combobox/BUILD.bazel
+index 58003e8ac46981d65e887cde3c592af9187513f9..63430d6332eca0d07359b1e248b3c48d3a3e9ad3 100644
+--- a/src/cdk-experimental/combobox/BUILD.bazel
++++ b/src/cdk-experimental/combobox/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk-experimental/deferred-content/BUILD.bazel b/src/cdk-experimental/deferred-content/BUILD.bazel
+index 344e62508b66b15030f28a98dd68baee30ada632..cd0e0901bab718817a0ee6f46d81d5fa238ebd4a 100644
+--- a/src/cdk-experimental/deferred-content/BUILD.bazel
++++ b/src/cdk-experimental/deferred-content/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk-experimental/listbox/BUILD.bazel b/src/cdk-experimental/listbox/BUILD.bazel
+index 26e8be39840d7bd11adcdf7e23a1b84c23e1869f..221f787c431606a694393e207a4d968987c64a58 100644
+--- a/src/cdk-experimental/listbox/BUILD.bazel
++++ b/src/cdk-experimental/listbox/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk-experimental/popover-edit/BUILD.bazel b/src/cdk-experimental/popover-edit/BUILD.bazel
+index ce7b1e60c04708002ffee2fc3b37c35048c9d29a..9bdac70c91d6448cded409f8e5c686d192df3fb6 100644
+--- a/src/cdk-experimental/popover-edit/BUILD.bazel
++++ b/src/cdk-experimental/popover-edit/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk-experimental/scrolling/BUILD.bazel b/src/cdk-experimental/scrolling/BUILD.bazel
+index 66b92993953641be52d0198b27b856b26517dfa7..807edc3a576fa36e8499db007a497f34adae057a 100644
+--- a/src/cdk-experimental/scrolling/BUILD.bazel
++++ b/src/cdk-experimental/scrolling/BUILD.bazel
+@@ -1,6 +1,5 @@
+ load("//src/e2e-app:test_suite.bzl", "e2e_test_suite")
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk-experimental/selection/BUILD.bazel b/src/cdk-experimental/selection/BUILD.bazel
+index 662a63ff0e7460e5c4af6164367d78009a3f82e0..9fcf80caac3f0b72d6d2fe8ae1a59fe020fa3552 100644
+--- a/src/cdk-experimental/selection/BUILD.bazel
++++ b/src/cdk-experimental/selection/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk-experimental/table-scroll-container/BUILD.bazel b/src/cdk-experimental/table-scroll-container/BUILD.bazel
+index 9320dc4caf910c5307bb4bb0cd6708c0ebc215c1..16b8791bc26c9da38345f036b6fe942b2b6cd48c 100644
+--- a/src/cdk-experimental/table-scroll-container/BUILD.bazel
++++ b/src/cdk-experimental/table-scroll-container/BUILD.bazel
+@@ -1,8 +1,9 @@
+ load(
+     "//tools:defaults.bzl",
++    "ng_project",
+     "ng_web_test_suite",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk-experimental/tabs/BUILD.bazel b/src/cdk-experimental/tabs/BUILD.bazel
+index 1da2a457c61e933ed8dff72b2f7a1f3a6ec2fbc0..d9993da6e0494bdf3786151879d6d6181feb7ccb 100644
+--- a/src/cdk-experimental/tabs/BUILD.bazel
++++ b/src/cdk-experimental/tabs/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk-experimental/ui-patterns/BUILD.bazel b/src/cdk-experimental/ui-patterns/BUILD.bazel
+index 90b8d27573f3a2feb3f3edb868a83e4a421632df..fee524d85d428da52b8320a1e04a64b46b6bc0de 100644
+--- a/src/cdk-experimental/ui-patterns/BUILD.bazel
++++ b/src/cdk-experimental/ui-patterns/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk-experimental/ui-patterns/behaviors/event-manager/BUILD.bazel b/src/cdk-experimental/ui-patterns/behaviors/event-manager/BUILD.bazel
+index 82fb9923673306eeb198967e59cda769ab59fe83..363e0a0d3554f92f97ccbe414b868d9bee8c2d0e 100644
+--- a/src/cdk-experimental/ui-patterns/behaviors/event-manager/BUILD.bazel
++++ b/src/cdk-experimental/ui-patterns/behaviors/event-manager/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk-experimental/ui-patterns/behaviors/list-focus/BUILD.bazel b/src/cdk-experimental/ui-patterns/behaviors/list-focus/BUILD.bazel
+index ccfd64500c97355a2fda35f59007b8538b5d55d2..e6db91f0798a1e39b5c2a230319630900a3dd176 100644
+--- a/src/cdk-experimental/ui-patterns/behaviors/list-focus/BUILD.bazel
++++ b/src/cdk-experimental/ui-patterns/behaviors/list-focus/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk-experimental/ui-patterns/behaviors/list-navigation/BUILD.bazel b/src/cdk-experimental/ui-patterns/behaviors/list-navigation/BUILD.bazel
+index deb61ca4f912c1e5a46aafa2603deec74c7485a3..68440a1655c603a89e403230dc7eb0f13a03d26f 100644
+--- a/src/cdk-experimental/ui-patterns/behaviors/list-navigation/BUILD.bazel
++++ b/src/cdk-experimental/ui-patterns/behaviors/list-navigation/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk-experimental/ui-patterns/behaviors/list-selection/BUILD.bazel b/src/cdk-experimental/ui-patterns/behaviors/list-selection/BUILD.bazel
+index 1b163af1b9eb7ddacd71bb43024360290c6427dc..6ad349761c2a236c4ed21800731ff47ac760b516 100644
+--- a/src/cdk-experimental/ui-patterns/behaviors/list-selection/BUILD.bazel
++++ b/src/cdk-experimental/ui-patterns/behaviors/list-selection/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk-experimental/ui-patterns/behaviors/list-typeahead/BUILD.bazel b/src/cdk-experimental/ui-patterns/behaviors/list-typeahead/BUILD.bazel
+index 288b6cf0752cd8e08737d1fbce60e900e4b415a8..049cec743f45cdb3bfc1b481cc2907ca5b306ad3 100644
+--- a/src/cdk-experimental/ui-patterns/behaviors/list-typeahead/BUILD.bazel
++++ b/src/cdk-experimental/ui-patterns/behaviors/list-typeahead/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk-experimental/ui-patterns/behaviors/signal-like/BUILD.bazel b/src/cdk-experimental/ui-patterns/behaviors/signal-like/BUILD.bazel
+index e64b0007568bb8e4b8f5df6398992881cf265227..d8dda4c30030b5fd91f77be05f26456b9e10c481 100644
+--- a/src/cdk-experimental/ui-patterns/behaviors/signal-like/BUILD.bazel
++++ b/src/cdk-experimental/ui-patterns/behaviors/signal-like/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk-experimental/ui-patterns/listbox/BUILD.bazel b/src/cdk-experimental/ui-patterns/listbox/BUILD.bazel
+index bd856fecdf4aa920c4f7c0ff87db3c88b662e02b..1f29a905a79c6f56b5fa64eabe3b313c0c0cca97 100644
+--- a/src/cdk-experimental/ui-patterns/listbox/BUILD.bazel
++++ b/src/cdk-experimental/ui-patterns/listbox/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk-experimental/ui-patterns/tabs/BUILD.bazel b/src/cdk-experimental/ui-patterns/tabs/BUILD.bazel
+index c20038751c5cab3c37850ca98c59776e39ec7467..299e39ee25456eafbda22b0aead322ee8d74452f 100644
+--- a/src/cdk-experimental/ui-patterns/tabs/BUILD.bazel
++++ b/src/cdk-experimental/ui-patterns/tabs/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk/BUILD.bazel b/src/cdk/BUILD.bazel
+index c899386673010158243686f3441123da9f54f0b6..7f96065e40397ed33f8768dcb0e0200550904335 100644
+--- a/src/cdk/BUILD.bazel
++++ b/src/cdk/BUILD.bazel
+@@ -1,6 +1,5 @@
+ load("//src/cdk:config.bzl", "CDK_ENTRYPOINTS", "CDK_ENTRYPOINTS_WITH_STYLES", "CDK_SCSS_LIBS", "CDK_TARGETS")
+-load("//tools:defaults.bzl", "ng_package", "sass_library")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_package", "sass_library", "ts_project")
+ load("@npm//:defs.bzl", "npm_link_all_packages")
+ 
+ package(default_visibility = ["//visibility:public"])
+diff --git a/src/cdk/a11y/BUILD.bazel b/src/cdk/a11y/BUILD.bazel
+index a745c895bf76641977391e8ca9153514dca1a23f..9cf2331d8d4a0b7142982c7dfb2966dbbe2bd6f0 100644
+--- a/src/cdk/a11y/BUILD.bazel
++++ b/src/cdk/a11y/BUILD.bazel
+@@ -1,11 +1,12 @@
+ load(
+     "//tools:defaults.bzl",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk/accordion/BUILD.bazel b/src/cdk/accordion/BUILD.bazel
+index 6a86d99164716d4cceb4845b38c9a03aa9f6f79a..7c8efa6850bf30824c1f46e78b9da3353a6ef49d 100644
+--- a/src/cdk/accordion/BUILD.bazel
++++ b/src/cdk/accordion/BUILD.bazel
+@@ -1,9 +1,10 @@
+ load(
+     "//tools:defaults.bzl",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk/bidi/BUILD.bazel b/src/cdk/bidi/BUILD.bazel
+index b0fc936d51f95f9b02e973b73e371580ed702978..4cc3e1a9f4d6ceec0bd464104d168bacab59fd54 100644
+--- a/src/cdk/bidi/BUILD.bazel
++++ b/src/cdk/bidi/BUILD.bazel
+@@ -1,9 +1,10 @@
+ load(
+     "//tools:defaults.bzl",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk/clipboard/BUILD.bazel b/src/cdk/clipboard/BUILD.bazel
+index 41f41672fde0e72a05f4e73dce1b1686f06a9dd1..a36a71188db29c51d25186246151c116b504ff9b 100644
+--- a/src/cdk/clipboard/BUILD.bazel
++++ b/src/cdk/clipboard/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "markdown_to_html", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "markdown_to_html", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk/coercion/BUILD.bazel b/src/cdk/coercion/BUILD.bazel
+index af96c507b219c4c25c19cfdf7f4704c2949165d7..06960b29a36eb872ceca0f8f0a28893ede7e8fad 100644
+--- a/src/cdk/coercion/BUILD.bazel
++++ b/src/cdk/coercion/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "markdown_to_html")
+-load("//tools:defaults2.bzl", "ng_web_test_suite", "ts_project")
++load("//tools:defaults.bzl", "markdown_to_html", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk/coercion/private/BUILD.bazel b/src/cdk/coercion/private/BUILD.bazel
+index 81679755f56340c06b98b39ab5e8e8df82d7ad06..2448cf624fff5fc4c604c69e32c7dde2cf5bffc0 100644
+--- a/src/cdk/coercion/private/BUILD.bazel
++++ b/src/cdk/coercion/private/BUILD.bazel
+@@ -1,8 +1,9 @@
+ load(
+     "//tools:defaults.bzl",
++    "ng_project",
+     "ng_web_test_suite",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk/collections/BUILD.bazel b/src/cdk/collections/BUILD.bazel
+index e5ee987664a795ba95af434ecc44068b84593ed2..d83914e59aadf4d17464a35feef4ac961c40bc14 100644
+--- a/src/cdk/collections/BUILD.bazel
++++ b/src/cdk/collections/BUILD.bazel
+@@ -1,10 +1,10 @@
+ load(
+     "//tools:defaults.bzl",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ts_project")
+-load("//tools:defaults2.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk/dialog/BUILD.bazel b/src/cdk/dialog/BUILD.bazel
+index 6dbabf3a19554593c089e899921eb0a4c389c5a8..252e8c6b2ee7641517f08f2a33ca38d8b668e112 100644
+--- a/src/cdk/dialog/BUILD.bazel
++++ b/src/cdk/dialog/BUILD.bazel
+@@ -1,10 +1,11 @@
+ load(
+     "//tools:defaults.bzl",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk/drag-drop/BUILD.bazel b/src/cdk/drag-drop/BUILD.bazel
+index bbc9c43756ec234e41812dbf86c8bdced65345d3..9b0680d0e26971a59c3a96d96fd64e482844547a 100644
+--- a/src/cdk/drag-drop/BUILD.bazel
++++ b/src/cdk/drag-drop/BUILD.bazel
+@@ -1,10 +1,11 @@
+ load(
+     "//tools:defaults.bzl",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk/keycodes/BUILD.bazel b/src/cdk/keycodes/BUILD.bazel
+index 14d9ee796e3cb9da037d6f0448ef4e092bb8225d..5688a30a65425e13d941e7879ab9738eef03b5a8 100644
+--- a/src/cdk/keycodes/BUILD.bazel
++++ b/src/cdk/keycodes/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "markdown_to_html")
+-load("//tools:defaults2.bzl", "ng_project", "ng_web_test_suite", "ts_project")
++load("//tools:defaults.bzl", "markdown_to_html", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk/layout/BUILD.bazel b/src/cdk/layout/BUILD.bazel
+index 05dc04f5917ae1d13a69c5d3bd2b4a4b23ff9903..adb0c9c0e4ae6286440e358a1e5f5d6b93463a2e 100644
+--- a/src/cdk/layout/BUILD.bazel
++++ b/src/cdk/layout/BUILD.bazel
+@@ -1,9 +1,10 @@
+ load(
+     "//tools:defaults.bzl",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk/listbox/BUILD.bazel b/src/cdk/listbox/BUILD.bazel
+index 68965a0bda8806d4e3f0c594559c088336c646f0..8f560dd5643731f927bdc6dc516fbe30f23fd516 100644
+--- a/src/cdk/listbox/BUILD.bazel
++++ b/src/cdk/listbox/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "markdown_to_html", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "markdown_to_html", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk/menu/BUILD.bazel b/src/cdk/menu/BUILD.bazel
+index b2fcc7539e8c5acc4bcd22be8fe4d839ff88a7a2..fa76e43ec94020e389dbaa5cd8fccbbde617e74d 100644
+--- a/src/cdk/menu/BUILD.bazel
++++ b/src/cdk/menu/BUILD.bazel
+@@ -1,9 +1,10 @@
+ load(
+     "//tools:defaults.bzl",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk/observers/BUILD.bazel b/src/cdk/observers/BUILD.bazel
+index 03ceab1ef5ddbf6bec86597ffe6d576ca93aa646..aefff76b9bc00d07d33bba1c5be16dd5fe408088 100644
+--- a/src/cdk/observers/BUILD.bazel
++++ b/src/cdk/observers/BUILD.bazel
+@@ -1,9 +1,10 @@
+ load(
+     "//tools:defaults.bzl",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk/observers/private/BUILD.bazel b/src/cdk/observers/private/BUILD.bazel
+index 5e2206655d4b166028cab0012cc87d74a5976c33..55048581ab970667f76895ae9abee8a4e488d4d6 100644
+--- a/src/cdk/observers/private/BUILD.bazel
++++ b/src/cdk/observers/private/BUILD.bazel
+@@ -1,8 +1,9 @@
+ load(
+     "//tools:defaults.bzl",
++    "ng_project",
+     "ng_web_test_suite",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk/overlay/BUILD.bazel b/src/cdk/overlay/BUILD.bazel
+index f493641335e7b925546baac907025a723e4d1183..4c5f7497104317e5117c4bc6349295e5cf491883 100644
+--- a/src/cdk/overlay/BUILD.bazel
++++ b/src/cdk/overlay/BUILD.bazel
+@@ -2,11 +2,12 @@ load("//src/e2e-app:test_suite.bzl", "e2e_test_suite")
+ load(
+     "//tools:defaults.bzl",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk/platform/BUILD.bazel b/src/cdk/platform/BUILD.bazel
+index f04ad6f44a29c4ebc7db6a251d89f3f1e2a2aaf4..3ab1e86127829d84c58372d99dd6aa51a55e78a8 100644
+--- a/src/cdk/platform/BUILD.bazel
++++ b/src/cdk/platform/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "markdown_to_html")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "markdown_to_html", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk/portal/BUILD.bazel b/src/cdk/portal/BUILD.bazel
+index 64d4c5e4231e3e6a50e8fa011ae472f12c210217..ca44b0a0b95526e814c33a278d3948d3b755137b 100644
+--- a/src/cdk/portal/BUILD.bazel
++++ b/src/cdk/portal/BUILD.bazel
+@@ -1,10 +1,10 @@
+ load(
+     "//tools:defaults.bzl",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ts_project")
+-load("//tools:defaults2.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk/private/BUILD.bazel b/src/cdk/private/BUILD.bazel
+index a13ae468bd5ffddec9bfceba260d0c6e5b273ec3..47ab5a1a5b2fad2c7f6635cb70f110f9c84484b4 100644
+--- a/src/cdk/private/BUILD.bazel
++++ b/src/cdk/private/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "markdown_to_html", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "markdown_to_html", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk/schematics/BUILD.bazel b/src/cdk/schematics/BUILD.bazel
+index c5b7130e926ae9cea99257119fc34805b821b729..2499dea4b11eaf548b80eccb2d3ac90ef8bc1f3e 100644
+--- a/src/cdk/schematics/BUILD.bazel
++++ b/src/cdk/schematics/BUILD.bazel
+@@ -1,5 +1,5 @@
+ load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
+-load("//tools:defaults2.bzl", "jasmine_test", "npm_package", "ts_project")
++load("//tools:defaults.bzl", "jasmine_test", "npm_package", "ts_project")
+ load("@aspect_rules_ts//ts:defs.bzl", rules_js_tsconfig = "ts_config")
+ 
+ package(default_visibility = [":__subpackages__"])
+diff --git a/src/cdk/schematics/testing/BUILD.bazel b/src/cdk/schematics/testing/BUILD.bazel
+index cd573fd516ad9ad9c93d99710d4bdb8f44afc703..b018fffc8680646f35da88293c420caa6219ee16 100644
+--- a/src/cdk/schematics/testing/BUILD.bazel
++++ b/src/cdk/schematics/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk/schematics/update-tool/BUILD.bazel b/src/cdk/schematics/update-tool/BUILD.bazel
+index 1ce5a0914d0163888fb57932cbe29b1230e9c6af..892c6e76710ef3989d1b9af9becda7b9180d8a2f 100644
+--- a/src/cdk/schematics/update-tool/BUILD.bazel
++++ b/src/cdk/schematics/update-tool/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk/scrolling/BUILD.bazel b/src/cdk/scrolling/BUILD.bazel
+index afe056d6e717df823cd898331d8dd3aac5877ab2..504255fd04c7ad35fc5d9a1c90106c45c58ad2ff 100644
+--- a/src/cdk/scrolling/BUILD.bazel
++++ b/src/cdk/scrolling/BUILD.bazel
+@@ -1,10 +1,11 @@
+ load(
+     "//tools:defaults.bzl",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk/stepper/BUILD.bazel b/src/cdk/stepper/BUILD.bazel
+index 921ac099cb19ef8e9fe4f4ffc13f0d3784c84482..7290b8a2728d74d544e576c2676aaa2cc3437582 100644
+--- a/src/cdk/stepper/BUILD.bazel
++++ b/src/cdk/stepper/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "markdown_to_html")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "markdown_to_html", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk/table/BUILD.bazel b/src/cdk/table/BUILD.bazel
+index 818a24085c6baf982b1a9c6f3285d94af97545e4..8eabfd1a582199fbeff8cecaa6923164190e550f 100644
+--- a/src/cdk/table/BUILD.bazel
++++ b/src/cdk/table/BUILD.bazel
+@@ -1,10 +1,11 @@
+ load(
+     "//tools:defaults.bzl",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk/testing/BUILD.bazel b/src/cdk/testing/BUILD.bazel
+index 63312ed538aada868765705142bab1c986f123c6..ee78a483799122fa5f9418b17abd185d8982919a 100644
+--- a/src/cdk/testing/BUILD.bazel
++++ b/src/cdk/testing/BUILD.bazel
+@@ -1,7 +1,6 @@
+ load("//src/e2e-app:test_suite.bzl", "e2e_test_suite")
+-load("//tools:defaults.bzl", "markdown_to_html", "ng_web_test_suite")
++load("//tools:defaults.bzl", "markdown_to_html", "ng_web_test_suite", "ts_project")
+ load("//src/cdk/testing/tests:webdriver-test.bzl", "webdriver_test")
+-load("//tools:defaults2.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk/testing/private/BUILD.bazel b/src/cdk/testing/private/BUILD.bazel
+index 4b8106275296f62471256df69479b81eabc938e0..b6f2bc75385aebf7c99c6fea495d5a5c73ef54a4 100644
+--- a/src/cdk/testing/private/BUILD.bazel
++++ b/src/cdk/testing/private/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk/testing/protractor/BUILD.bazel b/src/cdk/testing/protractor/BUILD.bazel
+index ed928bbb068fe93f7b89b91dd9b844d98595689f..94c1d441ee834193545b8956fbaf143b2e248d6f 100644
+--- a/src/cdk/testing/protractor/BUILD.bazel
++++ b/src/cdk/testing/protractor/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk/testing/selenium-webdriver/BUILD.bazel b/src/cdk/testing/selenium-webdriver/BUILD.bazel
+index 1d9fa385e902e4f517f023f83c35098648e4718d..72145766a41bf36b680a6ad467e048e44e93f821 100644
+--- a/src/cdk/testing/selenium-webdriver/BUILD.bazel
++++ b/src/cdk/testing/selenium-webdriver/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk/testing/testbed/BUILD.bazel b/src/cdk/testing/testbed/BUILD.bazel
+index 6d85e744230d3f51311217cf1f68e21479867f9c..eafb3450939411fb5f2b43227034d3efae417379 100644
+--- a/src/cdk/testing/testbed/BUILD.bazel
++++ b/src/cdk/testing/testbed/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults2.bzl", "ts_project")
+-load("//tools:defaults.bzl", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk/testing/tests/BUILD.bazel b/src/cdk/testing/tests/BUILD.bazel
+index d5f29ce9a59f2d4b14a93cfd8d223b7dc8a0a936..a1dd7f35a7dd20ebee1d333d1c88214502085d8c 100644
+--- a/src/cdk/testing/tests/BUILD.bazel
++++ b/src/cdk/testing/tests/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk/testing/tests/webdriver-test.bzl b/src/cdk/testing/tests/webdriver-test.bzl
+index bc6adb56f8dde5dc51c4e9ebff0f7d700fe149ef..42bdc2def61a94d358c6575655a06ff93d5e8df3 100644
+--- a/src/cdk/testing/tests/webdriver-test.bzl
++++ b/src/cdk/testing/tests/webdriver-test.bzl
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "jasmine_test", "spec_bundle")
++load("//tools:defaults.bzl", "jasmine_test", "spec_bundle")
+ load("@rules_browsers//src/server_test:index.bzl", "server_test")
+ 
+ def webdriver_test(name, deps, tags = [], **kwargs):
+diff --git a/src/cdk/text-field/BUILD.bazel b/src/cdk/text-field/BUILD.bazel
+index 5febc5e11910265000a5ca74e3e5998f59c8b4ce..cb260e86306b01076401a50b7e68fac094bbf6f7 100644
+--- a/src/cdk/text-field/BUILD.bazel
++++ b/src/cdk/text-field/BUILD.bazel
+@@ -1,11 +1,12 @@
+ load(
+     "//tools:defaults.bzl",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/cdk/tree/BUILD.bazel b/src/cdk/tree/BUILD.bazel
+index bcb26df524ea2554720aaaa4d3cc7428bacdf805..7f8e06db6fec706a31deb29bd6d69bd1a2cd6b30 100644
+--- a/src/cdk/tree/BUILD.bazel
++++ b/src/cdk/tree/BUILD.bazel
+@@ -1,10 +1,10 @@
+ load(
+     "//tools:defaults.bzl",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ts_project")
+-load("//tools:defaults2.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/BUILD.bazel b/src/components-examples/BUILD.bazel
+index fe579ed8df2d84c57ed9d5f63fa4514baee3f976..6920798c3ea70f868eed9f2f955e29e2befec924 100644
+--- a/src/components-examples/BUILD.bazel
++++ b/src/components-examples/BUILD.bazel
+@@ -1,8 +1,7 @@
+-load("//tools:defaults.bzl", "ng_package")
++load("//tools:defaults.bzl", "ng_package", "ng_project")
+ load("//tools/highlight-files:index.bzl", "highlight_files")
+ load("//tools/package-docs-content:index.bzl", "package_docs_content")
+ load(":config.bzl", "ALL_EXAMPLES")
+-load("//tools:defaults2.bzl", "ng_project")
+ load("@npm//:defs.bzl", "npm_link_all_packages")
+ 
+ package(default_visibility = ["//visibility:public"])
+diff --git a/src/components-examples/cdk-experimental/listbox/BUILD.bazel b/src/components-examples/cdk-experimental/listbox/BUILD.bazel
+index 809529b6c4b0e74a26d191601de161a3c67fcb2c..243a699a62e8391ecb67ba1b225185c1cbc79759 100644
+--- a/src/components-examples/cdk-experimental/listbox/BUILD.bazel
++++ b/src/components-examples/cdk-experimental/listbox/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/cdk-experimental/popover-edit/BUILD.bazel b/src/components-examples/cdk-experimental/popover-edit/BUILD.bazel
+index cc665c3ea1312e94d5446b5f72b3b0601ce9063d..d586839d8e39e0c408304858441bffc9af602eda 100644
+--- a/src/components-examples/cdk-experimental/popover-edit/BUILD.bazel
++++ b/src/components-examples/cdk-experimental/popover-edit/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/cdk-experimental/selection/BUILD.bazel b/src/components-examples/cdk-experimental/selection/BUILD.bazel
+index 08e8580b0c53247dda4ab4b76d9733eba70f9992..57c09af1a2b3f996da9617f1e6ac3b2d6207afc8 100644
+--- a/src/components-examples/cdk-experimental/selection/BUILD.bazel
++++ b/src/components-examples/cdk-experimental/selection/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/cdk-experimental/tabs/BUILD.bazel b/src/components-examples/cdk-experimental/tabs/BUILD.bazel
+index b35f7d0b74da87a2bc486a10da771d951725e382..de7662fa9a27e77eecd91000373f589f75f4405d 100644
+--- a/src/components-examples/cdk-experimental/tabs/BUILD.bazel
++++ b/src/components-examples/cdk-experimental/tabs/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/cdk/a11y/BUILD.bazel b/src/components-examples/cdk/a11y/BUILD.bazel
+index e70ccdede9781f52647d790e748792b7bea97527..de84ef0e22983cebcec33bb6559404dd04750eb4 100644
+--- a/src/components-examples/cdk/a11y/BUILD.bazel
++++ b/src/components-examples/cdk/a11y/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/cdk/accordion/BUILD.bazel b/src/components-examples/cdk/accordion/BUILD.bazel
+index 4b207f8078778f42182de1015d2a49ea8ec04854..f8b30e0eeef4ff51263106619caa097d717e19ad 100644
+--- a/src/components-examples/cdk/accordion/BUILD.bazel
++++ b/src/components-examples/cdk/accordion/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/cdk/clipboard/BUILD.bazel b/src/components-examples/cdk/clipboard/BUILD.bazel
+index 669d990ee5af6a926058dd13e9cfde063feda287..9d09fcc9cca16f79e82a342ed7a7c46d4f16fb4a 100644
+--- a/src/components-examples/cdk/clipboard/BUILD.bazel
++++ b/src/components-examples/cdk/clipboard/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/cdk/dialog/BUILD.bazel b/src/components-examples/cdk/dialog/BUILD.bazel
+index 64f3a850f1da963e41c97f59d11c8b469ff9dc2b..7ae823354d5ba0b3cf954716bf239e92fc6dca0b 100644
+--- a/src/components-examples/cdk/dialog/BUILD.bazel
++++ b/src/components-examples/cdk/dialog/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/cdk/drag-drop/BUILD.bazel b/src/components-examples/cdk/drag-drop/BUILD.bazel
+index 8f2515484e66b533bca3f3f0e36b1c414f328a0a..aa9bd195dec60fb228261440f188f7d9c89caa30 100644
+--- a/src/components-examples/cdk/drag-drop/BUILD.bazel
++++ b/src/components-examples/cdk/drag-drop/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/cdk/layout/BUILD.bazel b/src/components-examples/cdk/layout/BUILD.bazel
+index d5d623364ffee3f6eb8ea28f3730703e92ddaf99..a6d1e0c3895d5f765b568795f265d47389585b05 100644
+--- a/src/components-examples/cdk/layout/BUILD.bazel
++++ b/src/components-examples/cdk/layout/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/cdk/listbox/BUILD.bazel b/src/components-examples/cdk/listbox/BUILD.bazel
+index 2b83a957e5b2bf8d66ad3a8520581e0642780f8a..60757654bf0a1799142e977d102f057e668ac905 100644
+--- a/src/components-examples/cdk/listbox/BUILD.bazel
++++ b/src/components-examples/cdk/listbox/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/cdk/menu/BUILD.bazel b/src/components-examples/cdk/menu/BUILD.bazel
+index 24f361340bacc122a3857df9adcde11ee9f4bef5..e47eae560a51c5cffe760c0633955293fe717320 100644
+--- a/src/components-examples/cdk/menu/BUILD.bazel
++++ b/src/components-examples/cdk/menu/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/cdk/overlay/BUILD.bazel b/src/components-examples/cdk/overlay/BUILD.bazel
+index 505cefb485b90672514152f9fc9bc43a11433125..4fab16826344b9f024a0e3f80a469816c9a4de94 100644
+--- a/src/components-examples/cdk/overlay/BUILD.bazel
++++ b/src/components-examples/cdk/overlay/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/cdk/platform/BUILD.bazel b/src/components-examples/cdk/platform/BUILD.bazel
+index 2c57e90a8612f5f6443568e5e662c2657ac0557c..64aad3c0275e456d4ab40839629fbb3469ebc38a 100644
+--- a/src/components-examples/cdk/platform/BUILD.bazel
++++ b/src/components-examples/cdk/platform/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/cdk/portal/BUILD.bazel b/src/components-examples/cdk/portal/BUILD.bazel
+index d4185a79fba1ab95f20cfdfda98b72fbd8f2f46e..824c70aa65ef93f2b89982246d57a11371ca2106 100644
+--- a/src/components-examples/cdk/portal/BUILD.bazel
++++ b/src/components-examples/cdk/portal/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/cdk/scrolling/BUILD.bazel b/src/components-examples/cdk/scrolling/BUILD.bazel
+index 58c10a3a02cbe29e8c5c167920312b4b2ceaeef6..168abf525762694e9ac60e16dc13a7f644fcff0f 100644
+--- a/src/components-examples/cdk/scrolling/BUILD.bazel
++++ b/src/components-examples/cdk/scrolling/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/cdk/stepper/BUILD.bazel b/src/components-examples/cdk/stepper/BUILD.bazel
+index 791c2d417829a366910938fd447ac26252edcb73..ee0903a069046f5215d4036ef5c675a10bd60c82 100644
+--- a/src/components-examples/cdk/stepper/BUILD.bazel
++++ b/src/components-examples/cdk/stepper/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/cdk/table/BUILD.bazel b/src/components-examples/cdk/table/BUILD.bazel
+index 0c7444fc3cc28bfb0db806fb81064c2bf4fdccb9..9db86a6da7a71ad624081e5fb5e483a5853ab169 100644
+--- a/src/components-examples/cdk/table/BUILD.bazel
++++ b/src/components-examples/cdk/table/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/cdk/text-field/BUILD.bazel b/src/components-examples/cdk/text-field/BUILD.bazel
+index eec7c8fe00495cd5bd4a93064731cf588a20b24e..d765d13cf12f845455c051a46d8c810a276284c8 100644
+--- a/src/components-examples/cdk/text-field/BUILD.bazel
++++ b/src/components-examples/cdk/text-field/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/cdk/tree/BUILD.bazel b/src/components-examples/cdk/tree/BUILD.bazel
+index b722372ef9e110465ca430d3137731707727b95e..a589dd8f48a06ac89d49bb59bb1ef41ef29b8b59 100644
+--- a/src/components-examples/cdk/tree/BUILD.bazel
++++ b/src/components-examples/cdk/tree/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material-experimental/column-resize/BUILD.bazel b/src/components-examples/material-experimental/column-resize/BUILD.bazel
+index 2a64a4f586a2be54cfbe2388784092590cb3c15b..b09099e83b5875c836382f3cc812fc691cdd9e38 100644
+--- a/src/components-examples/material-experimental/column-resize/BUILD.bazel
++++ b/src/components-examples/material-experimental/column-resize/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material-experimental/popover-edit/BUILD.bazel b/src/components-examples/material-experimental/popover-edit/BUILD.bazel
+index bd9062ec41a6631e2a9ee7e3b2b3bf12d48ac5b8..80bf33ed492f137d8f48afaccc2d4f0994ffa3ce 100644
+--- a/src/components-examples/material-experimental/popover-edit/BUILD.bazel
++++ b/src/components-examples/material-experimental/popover-edit/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material-experimental/selection/BUILD.bazel b/src/components-examples/material-experimental/selection/BUILD.bazel
+index 0333469fac1fbf2d727f20fbadd43b3f1cb3ccd6..f5e6b578515a646db3d588d3685cb75996a4777f 100644
+--- a/src/components-examples/material-experimental/selection/BUILD.bazel
++++ b/src/components-examples/material-experimental/selection/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/autocomplete/BUILD.bazel b/src/components-examples/material/autocomplete/BUILD.bazel
+index a01b615f15ae8faa1f8bf5e56aa83f7a2f704369..78291f06d18ec950e10b237b6a3b8255fcf768fa 100644
+--- a/src/components-examples/material/autocomplete/BUILD.bazel
++++ b/src/components-examples/material/autocomplete/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/badge/BUILD.bazel b/src/components-examples/material/badge/BUILD.bazel
+index 32a52c775b87127b270213b35f60ea787aee43a8..b251b23b0a0151d810ba315c80c725d3409e62b4 100644
+--- a/src/components-examples/material/badge/BUILD.bazel
++++ b/src/components-examples/material/badge/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/bottom-sheet/BUILD.bazel b/src/components-examples/material/bottom-sheet/BUILD.bazel
+index aefca6c244a8c1ab8b842ac4ddeb3448e130de40..81f01105b0ae3ed3fc0f1b5a8cd284c051fe0153 100644
+--- a/src/components-examples/material/bottom-sheet/BUILD.bazel
++++ b/src/components-examples/material/bottom-sheet/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/button-toggle/BUILD.bazel b/src/components-examples/material/button-toggle/BUILD.bazel
+index 7965a51850fc21ddff8e4c65ca3202af40ed3bcf..0af78b168276704d2a717b99d32bfab6a916606a 100644
+--- a/src/components-examples/material/button-toggle/BUILD.bazel
++++ b/src/components-examples/material/button-toggle/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/button/BUILD.bazel b/src/components-examples/material/button/BUILD.bazel
+index 950d74ddc3798259f46130eaca4a8043e33beb93..28d7c076d6702e89481702de6b230beae2d819c6 100644
+--- a/src/components-examples/material/button/BUILD.bazel
++++ b/src/components-examples/material/button/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/card/BUILD.bazel b/src/components-examples/material/card/BUILD.bazel
+index eada092bd3b7634ead8ce3443d4ee369b11cff9a..9a404d28b1881dc764fba2ebd3e74c5f7cad9bf7 100644
+--- a/src/components-examples/material/card/BUILD.bazel
++++ b/src/components-examples/material/card/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/checkbox/BUILD.bazel b/src/components-examples/material/checkbox/BUILD.bazel
+index 8109e64cdcb04c98aff4fea7678faf070d645eed..8be031692712e05816e78b00d8c424b87e0fd902 100644
+--- a/src/components-examples/material/checkbox/BUILD.bazel
++++ b/src/components-examples/material/checkbox/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/chips/BUILD.bazel b/src/components-examples/material/chips/BUILD.bazel
+index 54ac55d38b8bc0887abc6a5981ce6018b50f624a..55a5c3f0acd0e7d06cfcdf0531ffb9e011f0168f 100644
+--- a/src/components-examples/material/chips/BUILD.bazel
++++ b/src/components-examples/material/chips/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/core/BUILD.bazel b/src/components-examples/material/core/BUILD.bazel
+index dbd0faa281ce5452519f4c224d5948686610b274..365ed02d29ed6650696ec79ec565292250c12625 100644
+--- a/src/components-examples/material/core/BUILD.bazel
++++ b/src/components-examples/material/core/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/datepicker/BUILD.bazel b/src/components-examples/material/datepicker/BUILD.bazel
+index b735d2431a8579c412c77dfab22cda9dfcf8190f..635ebe79973531247a60dee284824e77993308c7 100644
+--- a/src/components-examples/material/datepicker/BUILD.bazel
++++ b/src/components-examples/material/datepicker/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/dialog/BUILD.bazel b/src/components-examples/material/dialog/BUILD.bazel
+index 5cd82af5e05ea7615b6535efc9056ba5e6e1f3f2..d275664f63c00c9acbe71bc9a6e7df266080c455 100644
+--- a/src/components-examples/material/dialog/BUILD.bazel
++++ b/src/components-examples/material/dialog/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/divider/BUILD.bazel b/src/components-examples/material/divider/BUILD.bazel
+index f2ab783ba2a526c0839199b28e3eeaa2786bb7b2..c52fde9d9647bb851f413ae61ed1680b241f4de6 100644
+--- a/src/components-examples/material/divider/BUILD.bazel
++++ b/src/components-examples/material/divider/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/expansion/BUILD.bazel b/src/components-examples/material/expansion/BUILD.bazel
+index 66a51d9a8c65ae54eab88eec45787ac41e170834..4cad6c913db52b4d71be58db8286ba6198c665af 100644
+--- a/src/components-examples/material/expansion/BUILD.bazel
++++ b/src/components-examples/material/expansion/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/form-field/BUILD.bazel b/src/components-examples/material/form-field/BUILD.bazel
+index e2aad0b99071f46f5a71224f416695e6541d6cc1..e23e44e56f6b685e0b3b595b05ccd91998492cff 100644
+--- a/src/components-examples/material/form-field/BUILD.bazel
++++ b/src/components-examples/material/form-field/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/grid-list/BUILD.bazel b/src/components-examples/material/grid-list/BUILD.bazel
+index 2194f083b65476d566219050b43cfb330033b6f6..44d7df284a12e964bf0b2e890437a0843614cd5a 100644
+--- a/src/components-examples/material/grid-list/BUILD.bazel
++++ b/src/components-examples/material/grid-list/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/icon/BUILD.bazel b/src/components-examples/material/icon/BUILD.bazel
+index c50fb16c0ca17e5c3134dd5ee1b0afd9bfc63b7a..83808cf837473da7358e4882b79329ac005d4f73 100644
+--- a/src/components-examples/material/icon/BUILD.bazel
++++ b/src/components-examples/material/icon/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/input/BUILD.bazel b/src/components-examples/material/input/BUILD.bazel
+index dba4677c9f2c57b2a4aef4eef78412580897ff17..9c8522d144ba683218805d3b3f1cf386cb82cc92 100644
+--- a/src/components-examples/material/input/BUILD.bazel
++++ b/src/components-examples/material/input/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/list/BUILD.bazel b/src/components-examples/material/list/BUILD.bazel
+index 0e166a2f5420eec57a7ddb6bdaef331aba84765a..566d3debaef5d3dc2c12d160332c52174a15d56d 100644
+--- a/src/components-examples/material/list/BUILD.bazel
++++ b/src/components-examples/material/list/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/menu/BUILD.bazel b/src/components-examples/material/menu/BUILD.bazel
+index 4e4e90559298d988e0064dfad15a792a96fc6f75..1fdd24c4320dc945fd23c567e1fd57097edd4bd0 100644
+--- a/src/components-examples/material/menu/BUILD.bazel
++++ b/src/components-examples/material/menu/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/paginator/BUILD.bazel b/src/components-examples/material/paginator/BUILD.bazel
+index 5a69f9926436ba96067a72d93bc61d9e89bbb2ed..2501a2f6ad97da72a9f3521ece20a790950c6948 100644
+--- a/src/components-examples/material/paginator/BUILD.bazel
++++ b/src/components-examples/material/paginator/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/progress-bar/BUILD.bazel b/src/components-examples/material/progress-bar/BUILD.bazel
+index b18198ca5ad69434c9641b7e797656805f39624e..89f5351879744b1d8a75544b1a9b90d9893286b5 100644
+--- a/src/components-examples/material/progress-bar/BUILD.bazel
++++ b/src/components-examples/material/progress-bar/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/progress-spinner/BUILD.bazel b/src/components-examples/material/progress-spinner/BUILD.bazel
+index 742a1974d065b776592c7d87bc7c2b2e1f948c88..808638ce0078eb79f24b45a251273a4c86e31f85 100644
+--- a/src/components-examples/material/progress-spinner/BUILD.bazel
++++ b/src/components-examples/material/progress-spinner/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/radio/BUILD.bazel b/src/components-examples/material/radio/BUILD.bazel
+index 470c73cb7a69f5fcf71815baa709e107f3e77023..35beff9296aa79ab1124b8d2a28cd6795281e9ee 100644
+--- a/src/components-examples/material/radio/BUILD.bazel
++++ b/src/components-examples/material/radio/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/select/BUILD.bazel b/src/components-examples/material/select/BUILD.bazel
+index e26a874442ea0a9ceb18f69601d8a330ddf4df2f..c92fa43e71fe1e647a0112de6dbf37ecb47e45d8 100644
+--- a/src/components-examples/material/select/BUILD.bazel
++++ b/src/components-examples/material/select/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/sidenav/BUILD.bazel b/src/components-examples/material/sidenav/BUILD.bazel
+index d482e99642b6627497fa80d4629a42c59768c64a..0a24c6c2aa99eaf6f0810a4aa568aa5bc1c5700f 100644
+--- a/src/components-examples/material/sidenav/BUILD.bazel
++++ b/src/components-examples/material/sidenav/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/slide-toggle/BUILD.bazel b/src/components-examples/material/slide-toggle/BUILD.bazel
+index 70e1d6bf36df2cc68dd397b375fa4636dcbb4632..6bfdfc85cd0f55308fa6da72b21b9e3105819308 100644
+--- a/src/components-examples/material/slide-toggle/BUILD.bazel
++++ b/src/components-examples/material/slide-toggle/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/slider/BUILD.bazel b/src/components-examples/material/slider/BUILD.bazel
+index 9fbb6527c1024cfd6c194d76a227eb9bfb19871a..bbc3ccce9c4f54ef2f0b54f95d8e2458fa1c164f 100644
+--- a/src/components-examples/material/slider/BUILD.bazel
++++ b/src/components-examples/material/slider/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/snack-bar/BUILD.bazel b/src/components-examples/material/snack-bar/BUILD.bazel
+index 6f83775e3c1f4b7c14177f0f2a45d2547c6d3d77..f189fdd2210a5fec4afd98cd3693ab606b696c6a 100644
+--- a/src/components-examples/material/snack-bar/BUILD.bazel
++++ b/src/components-examples/material/snack-bar/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/sort/BUILD.bazel b/src/components-examples/material/sort/BUILD.bazel
+index 8cd6e6a77b9ff50c684b3626a855f9e625765ecb..16188ac27ade101d57c9ec0ead14a3b403aa27b6 100644
+--- a/src/components-examples/material/sort/BUILD.bazel
++++ b/src/components-examples/material/sort/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/stepper/BUILD.bazel b/src/components-examples/material/stepper/BUILD.bazel
+index a33304af37f58291d0b23cbd6eceb470ec2a4eea..baef41b7bca459de967b529a351bf97c5dbc25e8 100644
+--- a/src/components-examples/material/stepper/BUILD.bazel
++++ b/src/components-examples/material/stepper/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/table/BUILD.bazel b/src/components-examples/material/table/BUILD.bazel
+index 634be32cf5289ae847605bf6bdc2fd0308587c49..662f8c8746d31622cb70b4f9f816ce80c8d3f41f 100644
+--- a/src/components-examples/material/table/BUILD.bazel
++++ b/src/components-examples/material/table/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/tabs/BUILD.bazel b/src/components-examples/material/tabs/BUILD.bazel
+index 61e2ce34363bb7b10ecbb99892c2cbd8439c6a0d..b180f9039ba65282683a9d869ed5785f249ad055 100644
+--- a/src/components-examples/material/tabs/BUILD.bazel
++++ b/src/components-examples/material/tabs/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/timepicker/BUILD.bazel b/src/components-examples/material/timepicker/BUILD.bazel
+index a3775e7f45ef73f19f9fbe269ce352083dc88284..ae0279c7b06a178bc93c8701d11f252bd59a81e3 100644
+--- a/src/components-examples/material/timepicker/BUILD.bazel
++++ b/src/components-examples/material/timepicker/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/toolbar/BUILD.bazel b/src/components-examples/material/toolbar/BUILD.bazel
+index 9c3ace9534a07b4b8a374f31aab79302e3d13082..b30ca000876b9756a163369abdd854bfdd65c789 100644
+--- a/src/components-examples/material/toolbar/BUILD.bazel
++++ b/src/components-examples/material/toolbar/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/tooltip/BUILD.bazel b/src/components-examples/material/tooltip/BUILD.bazel
+index 8a0b3555f0fa3210ee7b0103e3a61004f82c6d44..959b2ce41646d3cf257238204fdb1ac29c967983 100644
+--- a/src/components-examples/material/tooltip/BUILD.bazel
++++ b/src/components-examples/material/tooltip/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/material/tree/BUILD.bazel b/src/components-examples/material/tree/BUILD.bazel
+index 0aed77982e8992ea7c89f5db86f8b3d8ed30286d..d5c55498fa6918c6cfe48b2b511b464e056b6cf6 100644
+--- a/src/components-examples/material/tree/BUILD.bazel
++++ b/src/components-examples/material/tree/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/components-examples/private/BUILD.bazel b/src/components-examples/private/BUILD.bazel
+index 91cd2c01e2352a7d89f83c194873c87f12cc870a..4ed949f6424f08921547d33b8a4663a0c561002f 100644
+--- a/src/components-examples/private/BUILD.bazel
++++ b/src/components-examples/private/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/BUILD.bazel b/src/dev-app/BUILD.bazel
+index 9d8be7f22338cc196b5a4bcf69284d8e5d7f8da1..c864a7131321716f9d765c25a2986756b7224c98 100644
+--- a/src/dev-app/BUILD.bazel
++++ b/src/dev-app/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "http_server", "ng_project")
++load("//tools:defaults.bzl", "http_server", "ng_project", "sass_binary")
+ load("@npm//:defs.bzl", "npm_link_all_packages")
+ load("@aspect_rules_esbuild//esbuild:defs.bzl", "esbuild")
+ load("@aspect_rules_js//npm:defs.bzl", "npm_package")
+diff --git a/src/dev-app/autocomplete/BUILD.bazel b/src/dev-app/autocomplete/BUILD.bazel
+index 02f7bc2ccecf5d02161ea29b63c3562d2f3aee0f..8ed724206443989bb9b14c1dd3b71e8340b1591e 100644
+--- a/src/dev-app/autocomplete/BUILD.bazel
++++ b/src/dev-app/autocomplete/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/badge/BUILD.bazel b/src/dev-app/badge/BUILD.bazel
+index e786f7656714cbd6f6d6ab90d903b7a98f0348f7..750bce703c79122a94f253696ad09fde32babbf6 100644
+--- a/src/dev-app/badge/BUILD.bazel
++++ b/src/dev-app/badge/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/baseline/BUILD.bazel b/src/dev-app/baseline/BUILD.bazel
+index e50d1e3734a83a141808cc61b5bcce91261e1d48..d5dab485c9fdc748c3a122c1b194df259b15bab9 100644
+--- a/src/dev-app/baseline/BUILD.bazel
++++ b/src/dev-app/baseline/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/bottom-sheet/BUILD.bazel b/src/dev-app/bottom-sheet/BUILD.bazel
+index 760a075279624fb15ef741d5f4e5e8a118bb1428..f2e809516902592d706dd546bda012f8e1934a96 100644
+--- a/src/dev-app/bottom-sheet/BUILD.bazel
++++ b/src/dev-app/bottom-sheet/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/button-toggle/BUILD.bazel b/src/dev-app/button-toggle/BUILD.bazel
+index 4f12ef8415e755c47ff40cdae05202a35fa85e76..4fba164af33ac26c92583c0ee9ab0f0be823534c 100644
+--- a/src/dev-app/button-toggle/BUILD.bazel
++++ b/src/dev-app/button-toggle/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/button/BUILD.bazel b/src/dev-app/button/BUILD.bazel
+index e0272d587854b4926d0ba6713fc6c107e2909f10..c94c68c9b705706470be113616c4396484201c16 100644
+--- a/src/dev-app/button/BUILD.bazel
++++ b/src/dev-app/button/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/card/BUILD.bazel b/src/dev-app/card/BUILD.bazel
+index 5d420cda0d55b5f6e141aceb6f81f1c6a93a5727..4352227e8dd639535b3e6ed8cb82155b7399167e 100644
+--- a/src/dev-app/card/BUILD.bazel
++++ b/src/dev-app/card/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/cdk-dialog/BUILD.bazel b/src/dev-app/cdk-dialog/BUILD.bazel
+index d637334ec443e38f0696c59a9df1d0f6c6bd8cb1..b9bb3912637082f2a74011b9bb2293fde2614991 100644
+--- a/src/dev-app/cdk-dialog/BUILD.bazel
++++ b/src/dev-app/cdk-dialog/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/cdk-experimental-combobox/BUILD.bazel b/src/dev-app/cdk-experimental-combobox/BUILD.bazel
+index c06f00e10eabf9138f07d6cec40a73c40c6c5e09..7599efce5d7b1bf55b0b7b23944b3114d51fab21 100644
+--- a/src/dev-app/cdk-experimental-combobox/BUILD.bazel
++++ b/src/dev-app/cdk-experimental-combobox/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/cdk-experimental-listbox/BUILD.bazel b/src/dev-app/cdk-experimental-listbox/BUILD.bazel
+index 90c97d9a24331621b81de764e5a78913dd47aafb..20e2e352c5ae9c0b9f3659fd22855cb2c82135ea 100644
+--- a/src/dev-app/cdk-experimental-listbox/BUILD.bazel
++++ b/src/dev-app/cdk-experimental-listbox/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/cdk-experimental-tabs/BUILD.bazel b/src/dev-app/cdk-experimental-tabs/BUILD.bazel
+index fedb006d613a8bd01d283a0d70427d4c33c8f70e..fdb482cdf87e2e8d3131d00b3772de5b884e757e 100644
+--- a/src/dev-app/cdk-experimental-tabs/BUILD.bazel
++++ b/src/dev-app/cdk-experimental-tabs/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/cdk-listbox/BUILD.bazel b/src/dev-app/cdk-listbox/BUILD.bazel
+index 76ea8ab813ed8f761a23b3801c296b760ff24abc..210e34e3b500cd620e2d38abe8d1f14fa3fb92ef 100644
+--- a/src/dev-app/cdk-listbox/BUILD.bazel
++++ b/src/dev-app/cdk-listbox/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/cdk-menu/BUILD.bazel b/src/dev-app/cdk-menu/BUILD.bazel
+index ce551a5caa10589e9f0fc151661b95e5e1b8ea88..6c42e0a67e113eccde43cf64953b92ae52bcdf28 100644
+--- a/src/dev-app/cdk-menu/BUILD.bazel
++++ b/src/dev-app/cdk-menu/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/checkbox/BUILD.bazel b/src/dev-app/checkbox/BUILD.bazel
+index 9c02cd846897b575808928591b9670b6158ee0be..bbb7fec0930dd13540a1430c7f20d07814ca6eb6 100644
+--- a/src/dev-app/checkbox/BUILD.bazel
++++ b/src/dev-app/checkbox/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/chips/BUILD.bazel b/src/dev-app/chips/BUILD.bazel
+index 0d36286a33f39774cba9103dfba3905fc8929fcf..46217854af2848e5ed2b6c430a9cd51c5b6ced31 100644
+--- a/src/dev-app/chips/BUILD.bazel
++++ b/src/dev-app/chips/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/clipboard/BUILD.bazel b/src/dev-app/clipboard/BUILD.bazel
+index b0cb1f85bf12e3c4f743f8b8b2393d11325cf3e8..d4823539a8ebdd76040be35820c3cd27a540813f 100644
+--- a/src/dev-app/clipboard/BUILD.bazel
++++ b/src/dev-app/clipboard/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/column-resize/BUILD.bazel b/src/dev-app/column-resize/BUILD.bazel
+index 43f911b00d2871812075c04db398a8b819c16a20..6a3d98a1d4b922d9db2fc1cdbfb964bd9cd3a9d2 100644
+--- a/src/dev-app/column-resize/BUILD.bazel
++++ b/src/dev-app/column-resize/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/connected-overlay/BUILD.bazel b/src/dev-app/connected-overlay/BUILD.bazel
+index 1bad51b1fe34a7574f0cd814e165231c126068f0..74a06400aa9f12f6ab837e0a2eaf4ddfc5ef9060 100644
+--- a/src/dev-app/connected-overlay/BUILD.bazel
++++ b/src/dev-app/connected-overlay/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/datepicker/BUILD.bazel b/src/dev-app/datepicker/BUILD.bazel
+index 0a8abc72f7f56d06011886abf324e3f0df502c77..9684308d948c17bfb6a0e4aca611efd9f5b61757 100644
+--- a/src/dev-app/datepicker/BUILD.bazel
++++ b/src/dev-app/datepicker/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/dev-app/BUILD.bazel b/src/dev-app/dev-app/BUILD.bazel
+index b556a79b7dcedc7fd67355a362cd205536e3b2db..1c95ce661a27772548ce34cd599b9204d968fd7a 100644
+--- a/src/dev-app/dev-app/BUILD.bazel
++++ b/src/dev-app/dev-app/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/dialog/BUILD.bazel b/src/dev-app/dialog/BUILD.bazel
+index d0308d99bdf19adf1a7c5241dbdfb5d3dded3719..958c9ebc1e985b47f838019ae887fe13e09e52d7 100644
+--- a/src/dev-app/dialog/BUILD.bazel
++++ b/src/dev-app/dialog/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/drag-drop/BUILD.bazel b/src/dev-app/drag-drop/BUILD.bazel
+index 0caf424a24d9a013f1eea2ac8aeec8a72fc9c84f..0e5312b17d66badbe307319bd45863e8eff6d82e 100644
+--- a/src/dev-app/drag-drop/BUILD.bazel
++++ b/src/dev-app/drag-drop/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/drawer/BUILD.bazel b/src/dev-app/drawer/BUILD.bazel
+index e6ef1d0de94666fcd985106e7de4f81dc85c389b..17d68797ccfc4651dcc132cbddd85ef64ba0202f 100644
+--- a/src/dev-app/drawer/BUILD.bazel
++++ b/src/dev-app/drawer/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/example/BUILD.bazel b/src/dev-app/example/BUILD.bazel
+index a6b4102651ece08715accb7ba15f7f63768541e4..8da08f6557a5c13af6a84091b85dcdb5df55400c 100644
+--- a/src/dev-app/example/BUILD.bazel
++++ b/src/dev-app/example/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/examples-page/BUILD.bazel b/src/dev-app/examples-page/BUILD.bazel
+index ccdc97725b7061a1b7c51e976827f512cbaa12e3..f16f75325803cb43ee765be5748a0f3cfb79e9fc 100644
+--- a/src/dev-app/examples-page/BUILD.bazel
++++ b/src/dev-app/examples-page/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/expansion/BUILD.bazel b/src/dev-app/expansion/BUILD.bazel
+index 33da223a2d4d3c67aeb89dea67f9b76df82bd0a7..ffb36011403403633ccc37ccc159ffa8d6cc649c 100644
+--- a/src/dev-app/expansion/BUILD.bazel
++++ b/src/dev-app/expansion/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/focus-origin/BUILD.bazel b/src/dev-app/focus-origin/BUILD.bazel
+index ba957573bdeb4197497b4a1a2a584859b047626b..adc0014307fc9ff53af5d2355f371c0cfa7f6b88 100644
+--- a/src/dev-app/focus-origin/BUILD.bazel
++++ b/src/dev-app/focus-origin/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/focus-trap/BUILD.bazel b/src/dev-app/focus-trap/BUILD.bazel
+index a1f22c8cce217d2aacaa0a93617b023e5e3dc8a0..ddcdba23c116097aab271d22ecc3ba7834c276d3 100644
+--- a/src/dev-app/focus-trap/BUILD.bazel
++++ b/src/dev-app/focus-trap/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/google-map/BUILD.bazel b/src/dev-app/google-map/BUILD.bazel
+index 18b31d30aa52fd6ce569be3e11448335c7d8ceb7..96cc61c7d94220542227ecaffbeac62f849475ad 100644
+--- a/src/dev-app/google-map/BUILD.bazel
++++ b/src/dev-app/google-map/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/grid-list/BUILD.bazel b/src/dev-app/grid-list/BUILD.bazel
+index 22ae1d2e8323deaec26684b91fdc3a6d26071657..c31b6e96f15e9b4fba357b81e869d2b6908749bc 100644
+--- a/src/dev-app/grid-list/BUILD.bazel
++++ b/src/dev-app/grid-list/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/icon/BUILD.bazel b/src/dev-app/icon/BUILD.bazel
+index 069f9050de0db20352a884adaa56af0080854b87..52387f45a330cc339326e6d07522f109f30a7a07 100644
+--- a/src/dev-app/icon/BUILD.bazel
++++ b/src/dev-app/icon/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/input-modality/BUILD.bazel b/src/dev-app/input-modality/BUILD.bazel
+index 4393180d9654cb3811233f21571ae503cb2f27b6..74705a77bc21e09776ea2e432955b54c7ed4439c 100644
+--- a/src/dev-app/input-modality/BUILD.bazel
++++ b/src/dev-app/input-modality/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/input/BUILD.bazel b/src/dev-app/input/BUILD.bazel
+index 2a8a01cd68f82cd6d73bda178d02d70de427037c..ea6f6867f8885750b4344ae7ff371ab87784dfeb 100644
+--- a/src/dev-app/input/BUILD.bazel
++++ b/src/dev-app/input/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/layout/BUILD.bazel b/src/dev-app/layout/BUILD.bazel
+index 2af0f4fe34ce0c0e2ed0dec1ba4681805e3472d3..648294dbcaaef1460b5516e94bb299bac0d1864e 100644
+--- a/src/dev-app/layout/BUILD.bazel
++++ b/src/dev-app/layout/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/list/BUILD.bazel b/src/dev-app/list/BUILD.bazel
+index da6b561e8a91192775bcf3b14775921e6ae13635..43c46fa803e92e198dc11853e630c96cc24a026e 100644
+--- a/src/dev-app/list/BUILD.bazel
++++ b/src/dev-app/list/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/live-announcer/BUILD.bazel b/src/dev-app/live-announcer/BUILD.bazel
+index 7f877ad7d12e74bf7a4a8b066f575b4fe4446892..58e65a89157f0a82ab32e5a57287186c90a29e76 100644
+--- a/src/dev-app/live-announcer/BUILD.bazel
++++ b/src/dev-app/live-announcer/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/menu/BUILD.bazel b/src/dev-app/menu/BUILD.bazel
+index d49f90285623046ee813e81cebb7087acd1435f2..7f7ae4f3e6044281a3508013a502bbe3880c227d 100644
+--- a/src/dev-app/menu/BUILD.bazel
++++ b/src/dev-app/menu/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/menubar/BUILD.bazel b/src/dev-app/menubar/BUILD.bazel
+index a8354a566d8dce124e33f92243a7c30da7f36791..9bde5b72272c12820c82efc651e06bb15fbb2dbf 100644
+--- a/src/dev-app/menubar/BUILD.bazel
++++ b/src/dev-app/menubar/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/paginator/BUILD.bazel b/src/dev-app/paginator/BUILD.bazel
+index 76b4b7b87774a68948fb7b01426951badb76c6ee..9f82c4d49004a1cf5cca93274be23f8b06b77d6d 100644
+--- a/src/dev-app/paginator/BUILD.bazel
++++ b/src/dev-app/paginator/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/performance/BUILD.bazel b/src/dev-app/performance/BUILD.bazel
+index 2f07fb0c94098b3cb42721747ed22b6c8b4be662..c137e9f5bba58a732a55b7094d1dae851495c454 100644
+--- a/src/dev-app/performance/BUILD.bazel
++++ b/src/dev-app/performance/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/platform/BUILD.bazel b/src/dev-app/platform/BUILD.bazel
+index 1504a7d42b716838406ec0eb1105c2f3827f7831..42aa21df4cba3abc04e91ca45c59df2fc6de91cb 100644
+--- a/src/dev-app/platform/BUILD.bazel
++++ b/src/dev-app/platform/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/popover-edit/BUILD.bazel b/src/dev-app/popover-edit/BUILD.bazel
+index 04cd5541893e9ac20ecdf05de6034a5d52411a54..6c00e3960a35d77f4456d5cedf25ba7fc9281571 100644
+--- a/src/dev-app/popover-edit/BUILD.bazel
++++ b/src/dev-app/popover-edit/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/portal/BUILD.bazel b/src/dev-app/portal/BUILD.bazel
+index ff754b0701c9e2a8b4ea14c15ce9da4b1cd6b72e..ccefecf0189b5d80dd2b4dd0f10543b98ba96de0 100644
+--- a/src/dev-app/portal/BUILD.bazel
++++ b/src/dev-app/portal/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/progress-bar/BUILD.bazel b/src/dev-app/progress-bar/BUILD.bazel
+index e2c88dfd08ff778e91755323d40c0ac531de1b25..e4d339e44ca3d1c34e585a1fe17d869f55beb0a9 100644
+--- a/src/dev-app/progress-bar/BUILD.bazel
++++ b/src/dev-app/progress-bar/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/progress-spinner/BUILD.bazel b/src/dev-app/progress-spinner/BUILD.bazel
+index 82e0a4b4a87313bafdc1ac4c76d374a075e728e6..63a7767293303431e2e75da42850016499a33b9f 100644
+--- a/src/dev-app/progress-spinner/BUILD.bazel
++++ b/src/dev-app/progress-spinner/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/radio/BUILD.bazel b/src/dev-app/radio/BUILD.bazel
+index 16bd5b6a96acb0b86d3a8619153821637d186264..22c32ee41c1056ddf3869d38a7266914505efb37 100644
+--- a/src/dev-app/radio/BUILD.bazel
++++ b/src/dev-app/radio/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/ripple/BUILD.bazel b/src/dev-app/ripple/BUILD.bazel
+index 0ea17d5ba16edbb09883e4c2ae953fd9bea0a6ec..34821a712e8208ec4779eceba5223018f592b077 100644
+--- a/src/dev-app/ripple/BUILD.bazel
++++ b/src/dev-app/ripple/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/screen-type/BUILD.bazel b/src/dev-app/screen-type/BUILD.bazel
+index 4e389198dc141e1d266f8022c7bd11e71a139577..decb6061462fea7ca8e32966801a7c02eaa66ea8 100644
+--- a/src/dev-app/screen-type/BUILD.bazel
++++ b/src/dev-app/screen-type/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/select/BUILD.bazel b/src/dev-app/select/BUILD.bazel
+index c357fc8ef107286b16de3ef8d468cc1068247cef..1e83f5f21ce49282bb6439ad380a16ef2937775b 100644
+--- a/src/dev-app/select/BUILD.bazel
++++ b/src/dev-app/select/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/selection/BUILD.bazel b/src/dev-app/selection/BUILD.bazel
+index d348c4d78603f37862f963819980131ad582a893..ea25a027cdf3ca3091b2acd8257abb950dee009e 100644
+--- a/src/dev-app/selection/BUILD.bazel
++++ b/src/dev-app/selection/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/sidenav/BUILD.bazel b/src/dev-app/sidenav/BUILD.bazel
+index 1b31f92c6d7bb464e1fba834e0f84cf939d57d5a..b0822b1ffa8969a670df898c127c6a3fea08466e 100644
+--- a/src/dev-app/sidenav/BUILD.bazel
++++ b/src/dev-app/sidenav/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/slide-toggle/BUILD.bazel b/src/dev-app/slide-toggle/BUILD.bazel
+index d775d9f30e9ce650e81d9ff50e017d791b3a664b..dc184702b6bb4bd98b906c48ced495c80b55514d 100644
+--- a/src/dev-app/slide-toggle/BUILD.bazel
++++ b/src/dev-app/slide-toggle/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/slider/BUILD.bazel b/src/dev-app/slider/BUILD.bazel
+index 0d69d1ec7865edca031a4cc6fe68e7e29ad3344c..2192664705e09021d2804dbb61e4770f06ecf2a3 100644
+--- a/src/dev-app/slider/BUILD.bazel
++++ b/src/dev-app/slider/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/snack-bar/BUILD.bazel b/src/dev-app/snack-bar/BUILD.bazel
+index 339da5f375f2535d553d1720562f78207ab98c49..c1422d0acaa0cdb0de41a60f261a812e4288194f 100644
+--- a/src/dev-app/snack-bar/BUILD.bazel
++++ b/src/dev-app/snack-bar/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/stepper/BUILD.bazel b/src/dev-app/stepper/BUILD.bazel
+index 412bc3d7c24c79993ec80bc404b9834f2c5f2cee..8592efd354252ccaa72df637e5f926d7f704b5f7 100644
+--- a/src/dev-app/stepper/BUILD.bazel
++++ b/src/dev-app/stepper/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/table-scroll-container/BUILD.bazel b/src/dev-app/table-scroll-container/BUILD.bazel
+index 7ba16774f85b2c53ff68854b31f35e5d2036a763..bde069e902ad88e39b734ad1a77335b02df981be 100644
+--- a/src/dev-app/table-scroll-container/BUILD.bazel
++++ b/src/dev-app/table-scroll-container/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/table/BUILD.bazel b/src/dev-app/table/BUILD.bazel
+index 9331821cc831a7e6d32096cd2f53ad3a7f7ff2fd..6783fe66ce1fb6baf9c862ef5cfb8588b409db15 100644
+--- a/src/dev-app/table/BUILD.bazel
++++ b/src/dev-app/table/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/tabs/BUILD.bazel b/src/dev-app/tabs/BUILD.bazel
+index a0fd2474552e9c949398ec3226272bbe6f959ced..443f803ac7999c367f588f3250a78e9cb766fa11 100644
+--- a/src/dev-app/tabs/BUILD.bazel
++++ b/src/dev-app/tabs/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/theme/BUILD.bazel b/src/dev-app/theme/BUILD.bazel
+index 22d83499e0e92a22934e3a17899d9d4c7f9a367a..c4d82bebf664cc2d34039c7312761a9ca7bb7672 100644
+--- a/src/dev-app/theme/BUILD.bazel
++++ b/src/dev-app/theme/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/timepicker/BUILD.bazel b/src/dev-app/timepicker/BUILD.bazel
+index 04162ea264c6b4f22e76f70451cac5c9926e20b3..8e91f3decb5ee02a65f66f6acc3366fb83a6f732 100644
+--- a/src/dev-app/timepicker/BUILD.bazel
++++ b/src/dev-app/timepicker/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/toolbar/BUILD.bazel b/src/dev-app/toolbar/BUILD.bazel
+index 0618b2e07a1c0521f73148b96a11633c89883fa8..92b30b371351c4a225d0b6f45420545c3ad34228 100644
+--- a/src/dev-app/toolbar/BUILD.bazel
++++ b/src/dev-app/toolbar/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/tooltip/BUILD.bazel b/src/dev-app/tooltip/BUILD.bazel
+index 2d6f603bb9ec018be0f0492aecb859bd3622cbb3..b4c84a62ced6c9a2d63a1cd939d03f5fa534f07b 100644
+--- a/src/dev-app/tooltip/BUILD.bazel
++++ b/src/dev-app/tooltip/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/tree/BUILD.bazel b/src/dev-app/tree/BUILD.bazel
+index 42e83fa28a95897949f02eeecbe5fba02653cf44..51651d4297d8955c36fc23ec6fb613db0ba1520d 100644
+--- a/src/dev-app/tree/BUILD.bazel
++++ b/src/dev-app/tree/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/typography/BUILD.bazel b/src/dev-app/typography/BUILD.bazel
+index b1a5f5b8fdbc84bbe493e212ae945265105a39bc..00fe07546d2fde3170178a75ec32f9991ea1a12a 100644
+--- a/src/dev-app/typography/BUILD.bazel
++++ b/src/dev-app/typography/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/virtual-scroll/BUILD.bazel b/src/dev-app/virtual-scroll/BUILD.bazel
+index 6be4c82703c693afc5913d0a7bf83ec710921b7f..d43b818fde4b92e294931fd701c01584a1071642 100644
+--- a/src/dev-app/virtual-scroll/BUILD.bazel
++++ b/src/dev-app/virtual-scroll/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/dev-app/youtube-player/BUILD.bazel b/src/dev-app/youtube-player/BUILD.bazel
+index bc4120ca5616172151f479e8b0eb18441b6c5abd..6621f5f4aa3b9336cbfb60cab6fbc361fb3d3a20 100644
+--- a/src/dev-app/youtube-player/BUILD.bazel
++++ b/src/dev-app/youtube-player/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/e2e-app/BUILD.bazel b/src/e2e-app/BUILD.bazel
+index 73157dc326e11d2eec83b02dd4f4f2c16ceddb55..659b2c473d52b4b146bfcbf25b17fd192d8af02a 100644
+--- a/src/e2e-app/BUILD.bazel
++++ b/src/e2e-app/BUILD.bazel
+@@ -1,7 +1,6 @@
+ load("@aspect_rules_esbuild//esbuild:defs.bzl", "esbuild")
+ load("@npm//:defs.bzl", "npm_link_all_packages")
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "http_server", "ng_project")
++load("//tools:defaults.bzl", "http_server", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/e2e-app/test_suite.bzl b/src/e2e-app/test_suite.bzl
+index d95e59c8d984fbf813bd3b13b0bf858c903501f7..f0a9a9dee8c128adf24ccdb12cc7e1740c11857c 100644
+--- a/src/e2e-app/test_suite.bzl
++++ b/src/e2e-app/test_suite.bzl
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "protractor_web_test_suite")
++load("//tools:defaults.bzl", "protractor_web_test_suite")
+ 
+ def e2e_test_suite(name, tags = ["e2e"], deps = []):
+     protractor_web_test_suite(
+diff --git a/src/google-maps/BUILD.bazel b/src/google-maps/BUILD.bazel
+index abb9dc8aeb324e9b478456ce2997947c9756f610..71f46106e101629f97856d43d10d656cbc628494 100644
+--- a/src/google-maps/BUILD.bazel
++++ b/src/google-maps/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_package", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_package", "ng_project", "ng_web_test_suite", "ts_project")
+ load("@aspect_rules_ts//ts:defs.bzl", rules_js_tsconfig = "ts_config")
+ 
+ package(default_visibility = ["//visibility:public"])
+diff --git a/src/google-maps/schematics/BUILD.bazel b/src/google-maps/schematics/BUILD.bazel
+index 0587cd67bae9ac07981a2862b6b4ffd6ddaa7afa..cbf773d41063b171c661a94703bbf79d7cbe1fea 100644
+--- a/src/google-maps/schematics/BUILD.bazel
++++ b/src/google-maps/schematics/BUILD.bazel
+@@ -1,5 +1,5 @@
+ load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
+-load("//tools:defaults2.bzl", "npm_package", "ts_project")
++load("//tools:defaults.bzl", "npm_package", "ts_project")
+ load("@aspect_rules_ts//ts:defs.bzl", rules_js_tsconfig = "ts_config")
+ 
+ package(default_visibility = ["//visibility:public"])
+diff --git a/src/google-maps/schematics/ng-update/BUILD.bazel b/src/google-maps/schematics/ng-update/BUILD.bazel
+index 2ba08b29cd45ffc9a089be06bbed4f237666fd20..70c1cd774c17ff176efa7fcd8f9da628ff900a00 100644
+--- a/src/google-maps/schematics/ng-update/BUILD.bazel
++++ b/src/google-maps/schematics/ng-update/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ts_project")
+ 
+ ts_project(
+     name = "ng-update",
+diff --git a/src/google-maps/testing/BUILD.bazel b/src/google-maps/testing/BUILD.bazel
+index 42ddb4e8ce18b328422521fff3fa5db387681217..e8809cadb377a93dd7e7ee79971b337274a0ac31 100644
+--- a/src/google-maps/testing/BUILD.bazel
++++ b/src/google-maps/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material-date-fns-adapter/BUILD.bazel b/src/material-date-fns-adapter/BUILD.bazel
+index e1692f333278a9c8d03bd8c343c86e4f0502db7d..935ebfc84958b4663fafdd6465caef59ce1f4b93 100644
+--- a/src/material-date-fns-adapter/BUILD.bazel
++++ b/src/material-date-fns-adapter/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_package", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_package", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material-date-fns-adapter/schematics/BUILD.bazel b/src/material-date-fns-adapter/schematics/BUILD.bazel
+index 3b54af999800d2324ff9865dfbac71bef213e072..ef216aefaae4735fa5736b52fb60660642f09213 100644
+--- a/src/material-date-fns-adapter/schematics/BUILD.bazel
++++ b/src/material-date-fns-adapter/schematics/BUILD.bazel
+@@ -1,5 +1,5 @@
+ load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
+-load("//tools:defaults2.bzl", "npm_package", "ts_project")
++load("//tools:defaults.bzl", "npm_package", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material-experimental/BUILD.bazel b/src/material-experimental/BUILD.bazel
+index 7382aa69660c0ec503a93d311f1b395f636d3e6f..4e3f9f8b86e52ea27f5fce1f07629028761fd3af 100644
+--- a/src/material-experimental/BUILD.bazel
++++ b/src/material-experimental/BUILD.bazel
+@@ -4,8 +4,7 @@ load(
+     "MATERIAL_EXPERIMENTAL_TARGETS",
+     "MATERIAL_EXPERIMENTAL_TESTING_TARGETS",
+ )
+-load("//tools:defaults.bzl", "ng_package", "sass_library")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_package", "sass_library", "ts_project")
+ load("@npm//:defs.bzl", "npm_link_all_packages")
+ 
+ package(default_visibility = ["//visibility:public"])
+diff --git a/src/material-experimental/column-resize/BUILD.bazel b/src/material-experimental/column-resize/BUILD.bazel
+index 0c7affa8e1e91e1a1d94f391a1450063566d9bd9..c542d186ed38ea7c55bb904aaa07db9dfbc3fef6 100644
+--- a/src/material-experimental/column-resize/BUILD.bazel
++++ b/src/material-experimental/column-resize/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite", "sass_library")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "sass_library", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material-experimental/menubar/BUILD.bazel b/src/material-experimental/menubar/BUILD.bazel
+index f839f7caf25ca34286830f0521877443a09b4c73..2ec3620b2ed554ea922ec29015f4b4f02e7ca323 100644
+--- a/src/material-experimental/menubar/BUILD.bazel
++++ b/src/material-experimental/menubar/BUILD.bazel
+@@ -1,10 +1,11 @@
+ load(
+     "//tools:defaults.bzl",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material-experimental/popover-edit/BUILD.bazel b/src/material-experimental/popover-edit/BUILD.bazel
+index 59de3c89cc5e71f0763ec7721043cf0e343f5980..5402743e4d0e57f08aa245e8402bb06a4971dca5 100644
+--- a/src/material-experimental/popover-edit/BUILD.bazel
++++ b/src/material-experimental/popover-edit/BUILD.bazel
+@@ -1,9 +1,10 @@
+ load(
+     "//tools:defaults.bzl",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material-experimental/selection/BUILD.bazel b/src/material-experimental/selection/BUILD.bazel
+index 7d632b0a47d3d118ac16bac26124a21c6fbb0db8..2cc414f9276d58e406d8954c0ec3dabf3529251d 100644
+--- a/src/material-experimental/selection/BUILD.bazel
++++ b/src/material-experimental/selection/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary", "sass_library")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary", "sass_library")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material-luxon-adapter/BUILD.bazel b/src/material-luxon-adapter/BUILD.bazel
+index 2c6c4d4cfcb599ea85c26511dc08856a527875eb..9c7c3768d419af0f9e8c0b97064e4d03ab3d6bf1 100644
+--- a/src/material-luxon-adapter/BUILD.bazel
++++ b/src/material-luxon-adapter/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_package", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_package", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material-luxon-adapter/schematics/BUILD.bazel b/src/material-luxon-adapter/schematics/BUILD.bazel
+index 1108227a17304ae40457a6e6f939bb52037669ef..fe2f6bf496e03fcee4bb449ec975c7da22b66e36 100644
+--- a/src/material-luxon-adapter/schematics/BUILD.bazel
++++ b/src/material-luxon-adapter/schematics/BUILD.bazel
+@@ -1,5 +1,5 @@
+ load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
+-load("//tools:defaults2.bzl", "npm_package", "ts_project")
++load("//tools:defaults.bzl", "npm_package", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material-moment-adapter/BUILD.bazel b/src/material-moment-adapter/BUILD.bazel
+index eb3a40af61e0666a7e8cb65da5f60e1a5c9d0335..5b05c4ad9eae368bf8926632f3352d3eea3f71e7 100644
+--- a/src/material-moment-adapter/BUILD.bazel
++++ b/src/material-moment-adapter/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_package", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_package", "ng_project", "ng_web_test_suite", "ts_project")
+ load("@npm//:defs.bzl", "npm_link_all_packages")
+ 
+ package(default_visibility = ["//visibility:public"])
+diff --git a/src/material-moment-adapter/schematics/BUILD.bazel b/src/material-moment-adapter/schematics/BUILD.bazel
+index 7f32aed7601b384249e9569e9d58e71262a511ea..08b55d8dcca8dab9e8fa3ad65f00c9381900857b 100644
+--- a/src/material-moment-adapter/schematics/BUILD.bazel
++++ b/src/material-moment-adapter/schematics/BUILD.bazel
+@@ -1,5 +1,5 @@
+ load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
+-load("//tools:defaults2.bzl", "npm_package", "ts_project")
++load("//tools:defaults.bzl", "npm_package", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/BUILD.bazel b/src/material/BUILD.bazel
+index 91d3439ea6508b6ca2ccbc24f9b8bb93d2fc33ab..aae5b5bf91be1dad9ab9a0e12ae1c0003563ede1 100644
+--- a/src/material/BUILD.bazel
++++ b/src/material/BUILD.bazel
+@@ -5,8 +5,7 @@ load(
+     "MATERIAL_TARGETS",
+     "MATERIAL_TESTING_TARGETS",
+ )
+-load("//tools:defaults.bzl", "ng_package", "sass_library")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_package", "sass_library", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/autocomplete/BUILD.bazel b/src/material/autocomplete/BUILD.bazel
+index 60af1b9e64c23e8c30bf029890330a8e737a2ac0..daae0aa320bfb7f8b00873d9ad422ba24829f460 100644
+--- a/src/material/autocomplete/BUILD.bazel
++++ b/src/material/autocomplete/BUILD.bazel
+@@ -2,11 +2,12 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/autocomplete/testing/BUILD.bazel b/src/material/autocomplete/testing/BUILD.bazel
+index be334138e37834954865a97b68ddfbffce7eac83..e64ded5869351748a9de2c4d291d2cf82946f516 100644
+--- a/src/material/autocomplete/testing/BUILD.bazel
++++ b/src/material/autocomplete/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/badge/BUILD.bazel b/src/material/badge/BUILD.bazel
+index d572870325ebca62dc1af9026727aeda965b5d38..b44cb37fab258993aa8762b5d54c403644018085 100644
+--- a/src/material/badge/BUILD.bazel
++++ b/src/material/badge/BUILD.bazel
+@@ -2,11 +2,12 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/badge/testing/BUILD.bazel b/src/material/badge/testing/BUILD.bazel
+index 7b749e898b925391c79f0e2cbe233f31c8eced6e..b159f93e0132e3d0f979dcc98feb6e1c41c0a01d 100644
+--- a/src/material/badge/testing/BUILD.bazel
++++ b/src/material/badge/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/bottom-sheet/BUILD.bazel b/src/material/bottom-sheet/BUILD.bazel
+index a7df249eb617f36c3bfc508fc6556510534136a2..5adb1678c5c9eeed38dfc5eabe9d81fc45e7fa53 100644
+--- a/src/material/bottom-sheet/BUILD.bazel
++++ b/src/material/bottom-sheet/BUILD.bazel
+@@ -2,11 +2,12 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/bottom-sheet/testing/BUILD.bazel b/src/material/bottom-sheet/testing/BUILD.bazel
+index b805c132fdf4fc7e1c7d73c7e46dfacd51acbea3..2e2dbbb514ac5d78c4f77b653a505fe2259667a5 100644
+--- a/src/material/bottom-sheet/testing/BUILD.bazel
++++ b/src/material/bottom-sheet/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/button-toggle/BUILD.bazel b/src/material/button-toggle/BUILD.bazel
+index 505c59b4a24b81e1c768ffc84e5084ffb8ca703d..2808294ee67b8b655cb668a536840cc1fedfb630 100644
+--- a/src/material/button-toggle/BUILD.bazel
++++ b/src/material/button-toggle/BUILD.bazel
+@@ -2,11 +2,12 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/button-toggle/testing/BUILD.bazel b/src/material/button-toggle/testing/BUILD.bazel
+index 4a1a400b94f216829c3a83a91939f29fa9ad32cb..afbf985058ef6a4d18b45ad9820a37702b881832 100644
+--- a/src/material/button-toggle/testing/BUILD.bazel
++++ b/src/material/button-toggle/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/button/BUILD.bazel b/src/material/button/BUILD.bazel
+index 02983779025edb9ed3cb76568a60a670be7d05b5..036bf223f458840c8c394adeb2b05ae6806d1bb3 100644
+--- a/src/material/button/BUILD.bazel
++++ b/src/material/button/BUILD.bazel
+@@ -2,11 +2,12 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/button/testing/BUILD.bazel b/src/material/button/testing/BUILD.bazel
+index f97e846bd7c5525ba19a869e2d82847c2b2ca42e..2490bd8565478984e9b1cf6cc16c98583c55fa06 100644
+--- a/src/material/button/testing/BUILD.bazel
++++ b/src/material/button/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/card/BUILD.bazel b/src/material/card/BUILD.bazel
+index 1301cd68e52e62108e7b5706ef732e4461d1121d..1511613d56b5d458f4c9b47f81d445f648651b1e 100644
+--- a/src/material/card/BUILD.bazel
++++ b/src/material/card/BUILD.bazel
+@@ -2,11 +2,12 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/card/testing/BUILD.bazel b/src/material/card/testing/BUILD.bazel
+index c29b59c83fe32b3054a72222f2bcd7650b8c9d48..24227e040edf670f08598fd468d0dc49e072cbdc 100644
+--- a/src/material/card/testing/BUILD.bazel
++++ b/src/material/card/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/checkbox/BUILD.bazel b/src/material/checkbox/BUILD.bazel
+index 161acdbbd7823175edda67ddc37428bc38be1e4e..443e706556ebf0985fb5ef9b00d69fdeb744a3ce 100644
+--- a/src/material/checkbox/BUILD.bazel
++++ b/src/material/checkbox/BUILD.bazel
+@@ -2,11 +2,12 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/checkbox/testing/BUILD.bazel b/src/material/checkbox/testing/BUILD.bazel
+index 1865cbde46844b5c3e6ab641cca8657483c57fe7..7ebceee7ad6d38a2d27d1937bba6cec1d15f406c 100644
+--- a/src/material/checkbox/testing/BUILD.bazel
++++ b/src/material/checkbox/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/chips/BUILD.bazel b/src/material/chips/BUILD.bazel
+index ef8496d1bda855b76caca1eafa562c632f20acbe..9b5d385a21555d2de2a938ab00cec607e2d127b6 100644
+--- a/src/material/chips/BUILD.bazel
++++ b/src/material/chips/BUILD.bazel
+@@ -2,11 +2,12 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/chips/testing/BUILD.bazel b/src/material/chips/testing/BUILD.bazel
+index 9346e16f3a19ea49532939d18b98ba63ff5adb2c..aa384ffabdbe7c714519152837f8efbeedd6251b 100644
+--- a/src/material/chips/testing/BUILD.bazel
++++ b/src/material/chips/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/core/BUILD.bazel b/src/material/core/BUILD.bazel
+index 81fa7ffa1ae21e7b4764563eeaf4d924190511ae..464cf8261e5e9f37339eb143e08abc5c7023184e 100644
+--- a/src/material/core/BUILD.bazel
++++ b/src/material/core/BUILD.bazel
+@@ -2,11 +2,12 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/core/animation/BUILD.bazel b/src/material/core/animation/BUILD.bazel
+index dbb79b2e703022286c03ae08f20cf20d1d5ea4e2..832994055274d6f253bc9eb6779147b2e7a222f7 100644
+--- a/src/material/core/animation/BUILD.bazel
++++ b/src/material/core/animation/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/core/common-behaviors/BUILD.bazel b/src/material/core/common-behaviors/BUILD.bazel
+index 0ad4cdcdbf1d684f233c7e33d7c3fb687723157c..556fde453e1c33834266edd8f3eddd89327dcde4 100644
+--- a/src/material/core/common-behaviors/BUILD.bazel
++++ b/src/material/core/common-behaviors/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/core/datetime/BUILD.bazel b/src/material/core/datetime/BUILD.bazel
+index 571f52f441e43f0b68a7effc2ca65fb8632d3d6e..2017ce59eea8784a3173b1cb7d81a7886f1d4e25 100644
+--- a/src/material/core/datetime/BUILD.bazel
++++ b/src/material/core/datetime/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/core/error/BUILD.bazel b/src/material/core/error/BUILD.bazel
+index 0ae787f1ed67cd29f77051164c4ad7feb7d0c229..137c0b3c655a602c179e32572686941a6bf48c17 100644
+--- a/src/material/core/error/BUILD.bazel
++++ b/src/material/core/error/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/core/focus-indicators/BUILD.bazel b/src/material/core/focus-indicators/BUILD.bazel
+index 1958970228c3e49d009ac783d8f59a5f7afdef3c..17495d4bbdafcc40bb2cdff15b2b570604eae36b 100644
+--- a/src/material/core/focus-indicators/BUILD.bazel
++++ b/src/material/core/focus-indicators/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary", "sass_library")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary", "sass_library")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/core/internal-form-field/BUILD.bazel b/src/material/core/internal-form-field/BUILD.bazel
+index 80e9369e71e925d5afd746d7a303cd337e6f94a2..032b2f748a536b331b2676992d67b19e9974e592 100644
+--- a/src/material/core/internal-form-field/BUILD.bazel
++++ b/src/material/core/internal-form-field/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/core/option/BUILD.bazel b/src/material/core/option/BUILD.bazel
+index b268e24bfe9cd6689e3ead5427d44b803bda2089..7313d8ef22c7a60d62c27b3f58f5cea133d09aad 100644
+--- a/src/material/core/option/BUILD.bazel
++++ b/src/material/core/option/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary", "sass_library")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary", "sass_library")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/core/private/BUILD.bazel b/src/material/core/private/BUILD.bazel
+index ccce2eb7b86ad31af3fa28ccfb2bd9bb25d3e688..e315c676436bfec7ae30251ea83a8895c5a5de44 100644
+--- a/src/material/core/private/BUILD.bazel
++++ b/src/material/core/private/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/core/selection/BUILD.bazel b/src/material/core/selection/BUILD.bazel
+index 206305ac0bd1ac9ba58555223e56d5676964dcc9..925ba5ad6cac0b8f5c9af676517e04037855dbeb 100644
+--- a/src/material/core/selection/BUILD.bazel
++++ b/src/material/core/selection/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/core/selection/pseudo-checkbox/BUILD.bazel b/src/material/core/selection/pseudo-checkbox/BUILD.bazel
+index 45ae49fa39d9e270ed3cd762c71361bf1fdbc68f..7fa6756d4d9295aaba13f719d3f85246593105eb 100644
+--- a/src/material/core/selection/pseudo-checkbox/BUILD.bazel
++++ b/src/material/core/selection/pseudo-checkbox/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "sass_binary", "sass_library")
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project", "sass_binary", "sass_library")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/core/testing/BUILD.bazel b/src/material/core/testing/BUILD.bazel
+index 4d74cd5b44f1544b1de7a233a57fa081436c1a1e..fc22908d52e8206b9137c77318fadf7d288eb622 100644
+--- a/src/material/core/testing/BUILD.bazel
++++ b/src/material/core/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/core/theming/tests/BUILD.bazel b/src/material/core/theming/tests/BUILD.bazel
+index 3466ef95ea48c78e978d51e7e5306a68befb378e..70e2742092a8e87ac63c903f8faac5888398f1a7 100644
+--- a/src/material/core/theming/tests/BUILD.bazel
++++ b/src/material/core/theming/tests/BUILD.bazel
+@@ -1,6 +1,5 @@
+ load("@bazel_skylib//rules:build_test.bzl", "build_test")
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "jasmine_test", "ts_project")
++load("//tools:defaults.bzl", "jasmine_test", "sass_binary", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/datepicker/BUILD.bazel b/src/material/datepicker/BUILD.bazel
+index 509149cd0253ff01096a4b99e1280cf63fa6575a..b5865c4b58a42c48c790a85a045a9269eefd75ad 100644
+--- a/src/material/datepicker/BUILD.bazel
++++ b/src/material/datepicker/BUILD.bazel
+@@ -2,11 +2,12 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/datepicker/testing/BUILD.bazel b/src/material/datepicker/testing/BUILD.bazel
+index a1c678231b5edad40c8eaef5c347254ac3763e63..ffd3a6c6db22bae80818decbe5be473c8312dcec 100644
+--- a/src/material/datepicker/testing/BUILD.bazel
++++ b/src/material/datepicker/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/dialog/BUILD.bazel b/src/material/dialog/BUILD.bazel
+index 109ff6cf9e0f6150ee37c0c4cb90000564513f7e..90c49aca6b562243685a215605908be006566a45 100644
+--- a/src/material/dialog/BUILD.bazel
++++ b/src/material/dialog/BUILD.bazel
+@@ -2,11 +2,12 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/dialog/testing/BUILD.bazel b/src/material/dialog/testing/BUILD.bazel
+index 7b13c71f4218564b2224dbbb9914f3dde4adcfe1..2b1cd6f68684bb5d96f6da7cf35ca3e5c89be805 100644
+--- a/src/material/dialog/testing/BUILD.bazel
++++ b/src/material/dialog/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/divider/BUILD.bazel b/src/material/divider/BUILD.bazel
+index 99a2173aca14a7de9b040bdc71cb5b4b93e074f2..8abebc2803f9319e6fd1a9677d08eecd989ee93c 100644
+--- a/src/material/divider/BUILD.bazel
++++ b/src/material/divider/BUILD.bazel
+@@ -2,11 +2,12 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/divider/testing/BUILD.bazel b/src/material/divider/testing/BUILD.bazel
+index d5d712d6cb829569ee7631e5cf0fa00ffcdc9712..3379032c9103fb04a685d02c47c2e129d0c57501 100644
+--- a/src/material/divider/testing/BUILD.bazel
++++ b/src/material/divider/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/expansion/BUILD.bazel b/src/material/expansion/BUILD.bazel
+index 687a1ce1b42de51ac9e0f845b84fe59e8b617c97..d0255088ea16fc89a65198d1f5cac6a67601f2c2 100644
+--- a/src/material/expansion/BUILD.bazel
++++ b/src/material/expansion/BUILD.bazel
+@@ -2,11 +2,12 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/expansion/testing/BUILD.bazel b/src/material/expansion/testing/BUILD.bazel
+index e1bbeb936728ad47a525a4b6126a9859155d9287..756e8a65e3b187fccc182b709aed9c9e93bc97c2 100644
+--- a/src/material/expansion/testing/BUILD.bazel
++++ b/src/material/expansion/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/form-field/BUILD.bazel b/src/material/form-field/BUILD.bazel
+index 4872ca371c53db9f28a4ac6951e386b194336d31..ccfdbc352d11cdcadfa3ce3de57593ece5f050f8 100644
+--- a/src/material/form-field/BUILD.bazel
++++ b/src/material/form-field/BUILD.bazel
+@@ -2,10 +2,10 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "sass_binary",
+     "sass_library",
+ )
+-load("//tools:defaults2.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/form-field/directives/BUILD.bazel b/src/material/form-field/directives/BUILD.bazel
+index ff583dd5d324fb99dd1ea8993e6e310e1774a89b..424473332c17a79aa3f15a442786c754a02d201f 100644
+--- a/src/material/form-field/directives/BUILD.bazel
++++ b/src/material/form-field/directives/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/form-field/testing/BUILD.bazel b/src/material/form-field/testing/BUILD.bazel
+index c1df8f7fdbd722fe1bcfd7b6519e3115c600aea4..f78aa99b205dcfa25d0cd20b0cee28df5fc51391 100644
+--- a/src/material/form-field/testing/BUILD.bazel
++++ b/src/material/form-field/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/form-field/testing/control/BUILD.bazel b/src/material/form-field/testing/control/BUILD.bazel
+index 6865929b828c55c2b3404754aa2ebc111b6abe97..dbe086fe6d21b3acb6edd960cb8ac19c2e9ccb5a 100644
+--- a/src/material/form-field/testing/control/BUILD.bazel
++++ b/src/material/form-field/testing/control/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/grid-list/BUILD.bazel b/src/material/grid-list/BUILD.bazel
+index 418681ba121b8268f565592fc0aca807874b6645..b1155f61a9ae334c748f119c0ffdaad38b1e9d56 100644
+--- a/src/material/grid-list/BUILD.bazel
++++ b/src/material/grid-list/BUILD.bazel
+@@ -2,11 +2,12 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/grid-list/testing/BUILD.bazel b/src/material/grid-list/testing/BUILD.bazel
+index 6a5267e48a5b68dae368508d5366bba61240dbeb..14074ebca648cd631553035ae514a8b1c0f21b3a 100644
+--- a/src/material/grid-list/testing/BUILD.bazel
++++ b/src/material/grid-list/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/icon/BUILD.bazel b/src/material/icon/BUILD.bazel
+index d1d45141023d7c4b3315a8f0746693061703b92c..0803279984e6e49d5cccc0cf6586880a66bbd5f6 100644
+--- a/src/material/icon/BUILD.bazel
++++ b/src/material/icon/BUILD.bazel
+@@ -2,11 +2,12 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/icon/testing/BUILD.bazel b/src/material/icon/testing/BUILD.bazel
+index 7a330f0744408c528afe6b2ff1f9b639187a9fd0..e4f1fb185f212de70e6cba0be25a4f521dbd2650 100644
+--- a/src/material/icon/testing/BUILD.bazel
++++ b/src/material/icon/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/input/BUILD.bazel b/src/material/input/BUILD.bazel
+index 77c24df09277a3191e3bfadd7462b55cc4e46849..d107cf248744cc36345a3c738c9da1da3b49c3af 100644
+--- a/src/material/input/BUILD.bazel
++++ b/src/material/input/BUILD.bazel
+@@ -2,10 +2,11 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/input/testing/BUILD.bazel b/src/material/input/testing/BUILD.bazel
+index 9dca428dcfdee4a86c19f31e8c11e2ba444f8b23..68e07f70ed1c93cf37956ec229b8d11251cebb53 100644
+--- a/src/material/input/testing/BUILD.bazel
++++ b/src/material/input/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/list/BUILD.bazel b/src/material/list/BUILD.bazel
+index 2545b01e5987ece2e830e8457b9f4e3df618c6ca..ac1f11f3beeb310326f8a18ee594e30fa6bb742f 100644
+--- a/src/material/list/BUILD.bazel
++++ b/src/material/list/BUILD.bazel
+@@ -2,11 +2,12 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/list/testing/BUILD.bazel b/src/material/list/testing/BUILD.bazel
+index 626ba114d663e7b1b6f52d8fba45a4fd94d2dda4..200d8bca5b56ae62bb2e6086d03d69b9d6ae50e5 100644
+--- a/src/material/list/testing/BUILD.bazel
++++ b/src/material/list/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/menu/BUILD.bazel b/src/material/menu/BUILD.bazel
+index bba1651cdbe34aadc7bcc104358b4e9b71532c9a..2b2fea4110f3943ccfac89d8705baec4211ce4b4 100644
+--- a/src/material/menu/BUILD.bazel
++++ b/src/material/menu/BUILD.bazel
+@@ -2,11 +2,12 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/menu/testing/BUILD.bazel b/src/material/menu/testing/BUILD.bazel
+index f05c13f0cc8f8a4b7cd5451d5be42cc802880437..a81121dd37eed3babc7f4c9319077ea52727ff22 100644
+--- a/src/material/menu/testing/BUILD.bazel
++++ b/src/material/menu/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/paginator/BUILD.bazel b/src/material/paginator/BUILD.bazel
+index ebb43ba2f6129860097e25ef6b498b5140fd9b05..91168f94537299434b6284bceb6897e159b6b4ec 100644
+--- a/src/material/paginator/BUILD.bazel
++++ b/src/material/paginator/BUILD.bazel
+@@ -2,11 +2,12 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/paginator/testing/BUILD.bazel b/src/material/paginator/testing/BUILD.bazel
+index cc95dad2caa452493469d459fb71308f94c60dd1..f0f67d55ec8a349c4bb37cca39579b076c8d6d51 100644
+--- a/src/material/paginator/testing/BUILD.bazel
++++ b/src/material/paginator/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/progress-bar/BUILD.bazel b/src/material/progress-bar/BUILD.bazel
+index 10d90d2e436ebf3f5c3bf2e9b087cea5c87afd9c..5c63b0ab21de95daf48edfe0e5d00dbbba7b4d15 100644
+--- a/src/material/progress-bar/BUILD.bazel
++++ b/src/material/progress-bar/BUILD.bazel
+@@ -2,11 +2,12 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/progress-bar/testing/BUILD.bazel b/src/material/progress-bar/testing/BUILD.bazel
+index 352ad6a033b7b527872b5b85b7e650e4ad739c57..b5baad321ebfc4882c96450728a2914df88d6672 100644
+--- a/src/material/progress-bar/testing/BUILD.bazel
++++ b/src/material/progress-bar/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/progress-spinner/BUILD.bazel b/src/material/progress-spinner/BUILD.bazel
+index 45cf1ebfc8ff950a428932636cf18c96315c90fa..01b39d7354a974977a1287e102c28cb0b8098594 100644
+--- a/src/material/progress-spinner/BUILD.bazel
++++ b/src/material/progress-spinner/BUILD.bazel
+@@ -2,11 +2,12 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/progress-spinner/testing/BUILD.bazel b/src/material/progress-spinner/testing/BUILD.bazel
+index 151dee4f01bfbd717867c32be69bb7bdffac8101..6dc3e0439cb4008d5e2df50a7a5ded02589c29d0 100644
+--- a/src/material/progress-spinner/testing/BUILD.bazel
++++ b/src/material/progress-spinner/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
++load("//tools:defaults.bzl", "ng_project", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/radio/BUILD.bazel b/src/material/radio/BUILD.bazel
+index 4d83d2a0eae399401b694fd7fa8105d75b0b2f0e..63b3aa9b60dc5d0faf9c52b29fa1dddaef4ea87d 100644
+--- a/src/material/radio/BUILD.bazel
++++ b/src/material/radio/BUILD.bazel
+@@ -2,11 +2,12 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/radio/testing/BUILD.bazel b/src/material/radio/testing/BUILD.bazel
+index 99266e820cdb4d1fddd74a3dfe401a7caa9ed0c1..1191b213aa20f815d866d964cfca16f31cb7f454 100644
+--- a/src/material/radio/testing/BUILD.bazel
++++ b/src/material/radio/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/schematics/BUILD.bazel b/src/material/schematics/BUILD.bazel
+index 91c6a1617c5231ed3bffe5ea24ec17194fe23c9c..8bafb4f8140f95919734f3ba30ef3663807e0df3 100644
+--- a/src/material/schematics/BUILD.bazel
++++ b/src/material/schematics/BUILD.bazel
+@@ -1,6 +1,6 @@
+ load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
+ load("@aspect_rules_ts//ts:defs.bzl", rules_js_tsconfig = "ts_config")
+-load("//tools:defaults2.bzl", "jasmine_test", "npm_package", "ts_project")
++load("//tools:defaults.bzl", "jasmine_test", "npm_package", "ts_project")
+ load("@aspect_rules_js//npm:defs.bzl", "npm_link_package")
+ 
+ package(default_visibility = ["//visibility:public"])
+diff --git a/src/material/schematics/migration-utilities/BUILD.bazel b/src/material/schematics/migration-utilities/BUILD.bazel
+index f881da5b21c89136141719fe5d44317f1ba0ef9b..36ddf07c87492d4be8b9275f25f300d94fe99a1d 100644
+--- a/src/material/schematics/migration-utilities/BUILD.bazel
++++ b/src/material/schematics/migration-utilities/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "jasmine_test", "ts_project")
++load("//tools:defaults.bzl", "jasmine_test", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/schematics/ng-generate/theme-color/BUILD.bazel b/src/material/schematics/ng-generate/theme-color/BUILD.bazel
+index 20c91718f4db60ee3badc7bebef60073cb4e8db0..2c09bc59d95478a373777be4cf8c8d2ced13f27c 100644
+--- a/src/material/schematics/ng-generate/theme-color/BUILD.bazel
++++ b/src/material/schematics/ng-generate/theme-color/BUILD.bazel
+@@ -1,6 +1,6 @@
+ load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
+ load("@aspect_rules_esbuild//esbuild:defs.bzl", "esbuild")
+-load("//tools:defaults2.bzl", "jasmine_test", "ts_project")
++load("//tools:defaults.bzl", "jasmine_test", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/schematics/ng-update/BUILD.bazel b/src/material/schematics/ng-update/BUILD.bazel
+index f3245ae312ef85813148a3a81a2cbebb09c55f8a..5457154fa98d50f116fe453e75e502f1d94ca921 100644
+--- a/src/material/schematics/ng-update/BUILD.bazel
++++ b/src/material/schematics/ng-update/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "jasmine_test", "ts_project")
++load("//tools:defaults.bzl", "jasmine_test", "ts_project")
+ load("@aspect_rules_esbuild//esbuild:defs.bzl", "esbuild")
+ 
+ ts_project(
+diff --git a/src/material/select/BUILD.bazel b/src/material/select/BUILD.bazel
+index 03ec9950f6dac06b9ff1f81d2fbe00ef65d80ad6..7e56561a211aa4a746ef5d3d23f426899a9ada1f 100644
+--- a/src/material/select/BUILD.bazel
++++ b/src/material/select/BUILD.bazel
+@@ -2,11 +2,12 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/select/testing/BUILD.bazel b/src/material/select/testing/BUILD.bazel
+index bcb23ba82e9d1a2bcca725d637f1d9e24f585023..25ae1399dcb51def490bc9821411ed4d60818a65 100644
+--- a/src/material/select/testing/BUILD.bazel
++++ b/src/material/select/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/sidenav/BUILD.bazel b/src/material/sidenav/BUILD.bazel
+index b991fd8b60c39919a1ecf1f435ab0323a347de49..cae8abb4a504738c0682b34f218a419429a8fc3e 100644
+--- a/src/material/sidenav/BUILD.bazel
++++ b/src/material/sidenav/BUILD.bazel
+@@ -2,11 +2,12 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/sidenav/testing/BUILD.bazel b/src/material/sidenav/testing/BUILD.bazel
+index 27ee4f03781ec7bacd35ae78c5894789770d107d..a79e0c8505789d985c911bc8d4c1ec99aa4f6c76 100644
+--- a/src/material/sidenav/testing/BUILD.bazel
++++ b/src/material/sidenav/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/slide-toggle/BUILD.bazel b/src/material/slide-toggle/BUILD.bazel
+index d44b1d3ed0f14731c730a395f897e54a53443880..6481aa1e20d98f856ef4b266e03219a7a6427a00 100644
+--- a/src/material/slide-toggle/BUILD.bazel
++++ b/src/material/slide-toggle/BUILD.bazel
+@@ -2,11 +2,12 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/slide-toggle/testing/BUILD.bazel b/src/material/slide-toggle/testing/BUILD.bazel
+index 38263c705b7dc174d08be36dd0f797b6f296f0d8..76cff32b200bea1b2782d2efd9ec0546e2466173 100644
+--- a/src/material/slide-toggle/testing/BUILD.bazel
++++ b/src/material/slide-toggle/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/slider/BUILD.bazel b/src/material/slider/BUILD.bazel
+index 93e3d802f53ebc32a243eebd5080ac8798fc24bd..2f6ceaaa80173d0da9826cfb22231d9021e1043f 100644
+--- a/src/material/slider/BUILD.bazel
++++ b/src/material/slider/BUILD.bazel
+@@ -3,11 +3,12 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/slider/testing/BUILD.bazel b/src/material/slider/testing/BUILD.bazel
+index c69b310bcd6219330b2dd3d1cfcc0016334b7c97..c0a8b9f38b159b3c5afd71e2a3beed5e2600ff85 100644
+--- a/src/material/slider/testing/BUILD.bazel
++++ b/src/material/slider/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/snack-bar/BUILD.bazel b/src/material/snack-bar/BUILD.bazel
+index 104746e4a4e665e09f7d51ba13b783705a1aa2ed..853efdcd831b74a4dc5e05272493f20a8f2fab2f 100644
+--- a/src/material/snack-bar/BUILD.bazel
++++ b/src/material/snack-bar/BUILD.bazel
+@@ -2,11 +2,12 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/snack-bar/testing/BUILD.bazel b/src/material/snack-bar/testing/BUILD.bazel
+index e12a68fb1c3d40330d13886b3a273cf544525898..7cafc2180c658d85031d23649ae4f7e54538c212 100644
+--- a/src/material/snack-bar/testing/BUILD.bazel
++++ b/src/material/snack-bar/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/sort/BUILD.bazel b/src/material/sort/BUILD.bazel
+index e25d59c38f482b3e37ad79f4388276b4a2f3df30..7a4d034b9a61dba0eb1d65a0412fb6c5b3cd0524 100644
+--- a/src/material/sort/BUILD.bazel
++++ b/src/material/sort/BUILD.bazel
+@@ -2,11 +2,12 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/sort/testing/BUILD.bazel b/src/material/sort/testing/BUILD.bazel
+index e0fc57f2cdaa0ca30abfb31b67089c869e407c26..6dfb9212887d92456ed757ba3a38baa6af26958a 100644
+--- a/src/material/sort/testing/BUILD.bazel
++++ b/src/material/sort/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/stepper/BUILD.bazel b/src/material/stepper/BUILD.bazel
+index e6d7ceae7ea1568f41995b03da1f541ea39a4738..72f91b46923d97e7ff3bb475e3f73294dba0d9a0 100644
+--- a/src/material/stepper/BUILD.bazel
++++ b/src/material/stepper/BUILD.bazel
+@@ -2,11 +2,12 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/stepper/testing/BUILD.bazel b/src/material/stepper/testing/BUILD.bazel
+index 9eeed8565d9c7187ecde7a06b50fbe1193c01d4c..f4d441589b617d997b12aa56fe98061bfd50a3a8 100644
+--- a/src/material/stepper/testing/BUILD.bazel
++++ b/src/material/stepper/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/table/BUILD.bazel b/src/material/table/BUILD.bazel
+index e5b1e40ebd397adb0de04fbbf7e8ae6dc02b6007..9ff31c27ac8d51b54fd23719ee76b6f32958f411 100644
+--- a/src/material/table/BUILD.bazel
++++ b/src/material/table/BUILD.bazel
+@@ -2,11 +2,12 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/table/testing/BUILD.bazel b/src/material/table/testing/BUILD.bazel
+index 3a4c756a902995a253618b40adcf7ff789208aba..d3b84765d2665be0d9e1689feb36f305ed8dda8f 100644
+--- a/src/material/table/testing/BUILD.bazel
++++ b/src/material/table/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults2.bzl", "ts_project")
+-load("//tools:defaults.bzl", "ng_web_test_suite")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/tabs/BUILD.bazel b/src/material/tabs/BUILD.bazel
+index 6d860b1c1b58fb84e6a402509c07797dd3aefe47..e1125c36b23b0606bdfd9f065a33fdcc384d7760 100644
+--- a/src/material/tabs/BUILD.bazel
++++ b/src/material/tabs/BUILD.bazel
+@@ -2,11 +2,12 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/tabs/testing/BUILD.bazel b/src/material/tabs/testing/BUILD.bazel
+index 7ef396f677808c7c5ec4913969ddc7e283abd9bb..9cb094bb884d39fcba36b9cab09d456efee08edc 100644
+--- a/src/material/tabs/testing/BUILD.bazel
++++ b/src/material/tabs/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/testing/BUILD.bazel b/src/material/testing/BUILD.bazel
+index 011419393213b6a2d611c61987348ee84e6eb817..f977ff3cdfc4a6296a1a48933d0c1265cbe4d3d6 100644
+--- a/src/material/testing/BUILD.bazel
++++ b/src/material/testing/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ng_project")
++load("//tools:defaults.bzl", "ng_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/timepicker/BUILD.bazel b/src/material/timepicker/BUILD.bazel
+index a63f790102f0b147ac9879fdacd4091a93db222e..b63ca8f54fabffcb14818b1c928296e30c5c31c5 100644
+--- a/src/material/timepicker/BUILD.bazel
++++ b/src/material/timepicker/BUILD.bazel
+@@ -2,11 +2,12 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/timepicker/testing/BUILD.bazel b/src/material/timepicker/testing/BUILD.bazel
+index 0cf18d970d6fb9ded2ed32fc89dd7a61fb05d124..867daa21824bd8e872019e3301ca04b10a35ccee 100644
+--- a/src/material/timepicker/testing/BUILD.bazel
++++ b/src/material/timepicker/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/toolbar/BUILD.bazel b/src/material/toolbar/BUILD.bazel
+index 45d7910ef7ae53f07e647f31f89dc532abbce5d6..bc4860caab2c507bede07916a9a1707063185588 100644
+--- a/src/material/toolbar/BUILD.bazel
++++ b/src/material/toolbar/BUILD.bazel
+@@ -2,11 +2,12 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/toolbar/testing/BUILD.bazel b/src/material/toolbar/testing/BUILD.bazel
+index 9aa33752a5c8dde1beed49ba2e06e4131a8fad8d..506b7153720b3feb9baacff180c7894cf45536fb 100644
+--- a/src/material/toolbar/testing/BUILD.bazel
++++ b/src/material/toolbar/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/tooltip/BUILD.bazel b/src/material/tooltip/BUILD.bazel
+index a7703950320da5a9187d221f8886b2c57ce0f9bc..9d6e696bdc556804020f26a2f92221064cfb03b3 100644
+--- a/src/material/tooltip/BUILD.bazel
++++ b/src/material/tooltip/BUILD.bazel
+@@ -2,11 +2,12 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/tooltip/testing/BUILD.bazel b/src/material/tooltip/testing/BUILD.bazel
+index f2b4e5443a1880c95016963f646aadf56578ed3e..a75aa2d42a0fb607e4f00edfe78ce7068e5128ce 100644
+--- a/src/material/tooltip/testing/BUILD.bazel
++++ b/src/material/tooltip/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/tree/BUILD.bazel b/src/material/tree/BUILD.bazel
+index 0d398c5775e662a30cf92a9ea5bbe5eac6bd00ab..cb4ea6a507aa3fcc492d42016abfc4a342c48b3b 100644
+--- a/src/material/tree/BUILD.bazel
++++ b/src/material/tree/BUILD.bazel
+@@ -2,11 +2,12 @@ load(
+     "//tools:defaults.bzl",
+     "extract_tokens",
+     "markdown_to_html",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
+     "sass_library",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/material/tree/testing/BUILD.bazel b/src/material/tree/testing/BUILD.bazel
+index fe526bf693eecfc2fdd4540bc9396747053ef17b..c30831be175dbef75603ba8a350f4383b293c53f 100644
+--- a/src/material/tree/testing/BUILD.bazel
++++ b/src/material/tree/testing/BUILD.bazel
+@@ -1,5 +1,4 @@
+-load("//tools:defaults.bzl", "ng_web_test_suite")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ng_web_test_suite", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/src/universal-app/BUILD.bazel b/src/universal-app/BUILD.bazel
+index 4eecc7db66475f064d1e88bf9d2f5dc529bc9874..e5d73c154a5b4e6ea7bb546b5fef47078fc72742 100644
+--- a/src/universal-app/BUILD.bazel
++++ b/src/universal-app/BUILD.bazel
+@@ -1,7 +1,6 @@
+ load("@bazel_skylib//rules:build_test.bzl", "build_test")
+ load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary")
+-load("//tools:defaults.bzl", "sass_binary")
+-load("//tools:defaults2.bzl", "http_server", "ng_project", "protractor_web_test_suite", "ts_project")
++load("//tools:defaults.bzl", "http_server", "ng_project", "protractor_web_test_suite", "sass_binary", "ts_project")
+ load("@aspect_rules_ts//ts:defs.bzl", rules_js_tsconfig = "ts_config")
+ load("@aspect_rules_esbuild//esbuild:defs.bzl", "esbuild")
+ load("//src/cdk:config.bzl", "CDK_TARGETS")
+diff --git a/src/youtube-player/BUILD.bazel b/src/youtube-player/BUILD.bazel
+index 94f25134b7130f0fefbee41f711187f718d5a54b..7d720e16dbc85764b25fa5c108fdfedd11c1b137 100644
+--- a/src/youtube-player/BUILD.bazel
++++ b/src/youtube-player/BUILD.bazel
+@@ -1,10 +1,11 @@
+ load(
+     "//tools:defaults.bzl",
+     "ng_package",
++    "ng_project",
+     "ng_web_test_suite",
+     "sass_binary",
++    "ts_project",
+ )
+-load("//tools:defaults2.bzl", "ng_project", "ts_project")
+ load("@aspect_rules_ts//ts:defs.bzl", rules_js_tsconfig = "ts_config")
+ 
+ package(default_visibility = ["//visibility:public"])
+diff --git a/src/youtube-player/schematics/BUILD.bazel b/src/youtube-player/schematics/BUILD.bazel
+index 8c9174af22541631e74955ef41d547e1eb2051cc..038d26a7d73e31629fe0852a0f2ee8af8b6969ab 100644
+--- a/src/youtube-player/schematics/BUILD.bazel
++++ b/src/youtube-player/schematics/BUILD.bazel
+@@ -1,5 +1,5 @@
+ load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
+-load("//tools:defaults2.bzl", "npm_package", "ts_project")
++load("//tools:defaults.bzl", "npm_package", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/test/BUILD.bazel b/test/BUILD.bazel
+index d7f3caf8dff070ebb4e23fd3da8859b0b215f502..fcf31a1ec9e7e4083bd2ab3fb23727e2ca096175 100644
+--- a/test/BUILD.bazel
++++ b/test/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ts_project")
+ load("@aspect_rules_ts//ts:defs.bzl", rules_js_tsconfig = "ts_config")
+ 
+ package(default_visibility = ["//visibility:public"])
+diff --git a/tools/defaults.bzl b/tools/defaults.bzl
+index cf62b27e7f4fe6f840cca4f46bb187cda6316aeb..94536aa7e108b76f3c2d380724ed8cef55028657 100644
+--- a/tools/defaults.bzl
++++ b/tools/defaults.bzl
+@@ -8,17 +8,23 @@ load("//:pkg-externals.bzl", "PKG_EXTERNALS")
+ load("//tools/markdown-to-html:index.bzl", _markdown_to_html = "markdown_to_html")
+ load("//tools/extract-tokens:index.bzl", _extract_tokens = "extract_tokens")
+ load("//tools/bazel:ng_package_interop.bzl", "ng_package_interop")
+-load("//tools:defaults2.bzl", _ng_web_test_suite = "ng_web_test_suite")
+-
+-npmPackageSubstitutions = select({
+-    "//tools:stamp": NPM_PACKAGE_SUBSTITUTIONS,
+-    "//conditions:default": NO_STAMP_NPM_PACKAGE_SUBSTITUTIONS,
+-})
++load("@devinfra//bazel/http-server:index.bzl", _http_server = "http_server")
++load("@devinfra//bazel/spec-bundling:index_rjs.bzl", _spec_bundle = "spec_bundle")
++load("//tools/bazel:web_test_suite.bzl", _ng_web_test_suite = "ng_web_test_suite")
++load("@aspect_rules_js//npm:defs.bzl", _npm_package = "npm_package")
++load("@rules_angular//src/ng_package/text_replace:index.bzl", _text_replace = "text_replace")
++load("@rules_angular//src/ng_project:index.bzl", _ng_project = "ng_project")
++load("@rules_angular//src/ts_project:index.bzl", _ts_project = "ts_project")
++load("@devinfra//bazel/ts_project:index.bzl", "strict_deps_test")
++load("@aspect_rules_jasmine//jasmine:defs.bzl", _jasmine_test = "jasmine_test")
++load("@rules_browsers//src/protractor_test:index.bzl", "protractor_test")
+ 
+ # Re-exports to simplify build file load statements
+ markdown_to_html = _markdown_to_html
+ extract_tokens = _extract_tokens
+ ng_web_test_suite = _ng_web_test_suite
++spec_bundle = _spec_bundle
++http_server = _http_server
+ 
+ def sass_binary(sourcemap = False, include_paths = [], **kwargs):
+     _sass_binary(
+@@ -66,7 +72,10 @@ def ng_package(
+         deps = deps,
+         package = package_name,
+         readme_md = readme_md,
+-        substitutions = npmPackageSubstitutions,
++        substitutions = select({
++            "//tools:stamp": NPM_PACKAGE_SUBSTITUTIONS,
++            "//conditions:default": NO_STAMP_NPM_PACKAGE_SUBSTITUTIONS,
++        }),
+         visibility = visibility,
+         rollup_runtime_deps = [
+             "//:node_modules/@rollup/plugin-commonjs",
+@@ -96,3 +105,143 @@ def ng_package(
+         interop_deps = deps + package_deps,
+         package_name = package_name,
+     )
++
++def npm_package(name, srcs = [], **kwargs):
++    _text_replace(
++        name = "%s_substituted" % name,
++        srcs = srcs,
++        substitutions = select({
++            "//tools:stamp": NPM_PACKAGE_SUBSTITUTIONS,
++            "//conditions:default": NO_STAMP_NPM_PACKAGE_SUBSTITUTIONS,
++        }),
++    )
++    _npm_package(
++        name = name,
++        srcs = srcs + [
++            "%s_substituted" % name,
++        ],
++        replace_prefixes = {
++            "%s_substituted" % name: "/",
++        },
++        allow_overwrites = True,
++        **kwargs
++    )
++
++def ts_project(
++        name,
++        deps = [],
++        source_map = True,
++        testonly = False,
++        tsconfig = None,
++        visibility = None,
++        # TODO: Switch this flag as we no longer depend on `interop_deps`.
++        ignore_strict_deps = True,
++        **kwargs):
++    if tsconfig == None and native.package_name().startswith("src"):
++        tsconfig = "//src:test-tsconfig" if testonly else "//src:build-tsconfig"
++
++    _ts_project(
++        name = name,
++        source_map = source_map,
++        testonly = testonly,
++        declaration = True,
++        tsconfig = tsconfig,
++        visibility = visibility,
++        deps = deps,
++        **kwargs
++    )
++
++    if not ignore_strict_deps:
++        strict_deps_test(
++            name = "%s_strict_deps_test" % name,
++            srcs = kwargs.get("srcs", []),
++            deps = deps,
++        )
++
++    # TODO(devversion): Partner with ISE team to support `rules_js` here.
++    # if False and not testonly:
++    #    _make_tsec_test(kwargs["name"])
++
++def ng_project(
++        name,
++        deps = [],
++        source_map = True,
++        testonly = False,
++        tsconfig = None,
++        visibility = None,
++        # TODO: Switch this flag as we no longer depend on `interop_deps`.
++        ignore_strict_deps = True,
++        **kwargs):
++    if tsconfig == None and native.package_name().startswith("src"):
++        tsconfig = "//src:test-tsconfig" if testonly else "//src:build-tsconfig"
++
++    _ng_project(
++        name = name,
++        source_map = source_map,
++        testonly = testonly,
++        declaration = True,
++        tsconfig = tsconfig,
++        visibility = visibility,
++        deps = deps,
++        **kwargs
++    )
++
++    if not ignore_strict_deps:
++        strict_deps_test(
++            name = "%s_strict_deps_test" % name,
++            srcs = kwargs.get("srcs", []),
++            deps = deps,
++        )
++
++    # TODO(devversion): Partner with ISE team to support `rules_js` here.
++    # if False and not testonly:
++    #    _make_tsec_test(kwargs["name"])
++
++def jasmine_test(name, data = [], args = [], **kwargs):
++    # Create relative path to root, from current package dir. Necessary as
++    # we change the `chdir` below to the package directory.
++    relative_to_root = "/".join([".."] * len(native.package_name().split("/")))
++
++    _jasmine_test(
++        name = name,
++        node_modules = "//:node_modules",
++        chdir = native.package_name(),
++        fixed_args = [
++            "--require=%s/node_modules/source-map-support/register.js" % relative_to_root,
++            "**/*spec.js",
++            "**/*spec.mjs",
++            "**/*spec.cjs",
++        ] + args,
++        data = data + [
++            "//:node_modules/source-map-support",
++        ],
++        **kwargs
++    )
++
++def protractor_web_test_suite(name, deps, **kwargs):
++    spec_bundle(
++        name = "%s_bundle" % name,
++        deps = deps,
++        external = ["protractor", "selenium-webdriver"],
++    )
++
++    protractor_test(
++        name = name,
++        deps = [":%s_bundle" % name],
++        extra_config = {
++            "useAllAngular2AppRoots": True,
++            "allScriptsTimeout": 120000,
++            "getPageTimeout": 120000,
++            "jasmineNodeOpts": {
++                "defaultTimeoutInterval": 120000,
++            },
++            # Since we want to use async/await we don't want to mix up with selenium's promise
++            # manager. In order to enforce this, we disable the promise manager.
++            "SELENIUM_PROMISE_MANAGER": False,
++        },
++        data = [
++            "//:node_modules/protractor",
++            "//:node_modules/selenium-webdriver",
++        ],
++        **kwargs
++    )
+diff --git a/tools/defaults2.bzl b/tools/defaults2.bzl
+deleted file mode 100644
+index a726b5c62674d9893c517994b03c133b23978dfd..0000000000000000000000000000000000000000
+--- a/tools/defaults2.bzl
++++ /dev/null
+@@ -1,155 +0,0 @@
+-load("@aspect_rules_jasmine//jasmine:defs.bzl", _jasmine_test = "jasmine_test")
+-load("@aspect_rules_js//npm:defs.bzl", _npm_package = "npm_package")
+-load("@devinfra//bazel/http-server:index.bzl", _http_server = "http_server")
+-load("@devinfra//bazel/spec-bundling:index_rjs.bzl", _spec_bundle = "spec_bundle")
+-load("@rules_angular//src/ng_project:index.bzl", _ng_project = "ng_project")
+-load("@rules_angular//src/ts_project:index.bzl", _ts_project = "ts_project")
+-load("@devinfra//bazel/ts_project:index.bzl", "strict_deps_test")
+-load("@rules_angular//src/ng_package/text_replace:index.bzl", _text_replace = "text_replace")
+-load("@rules_browsers//src/protractor_test:index.bzl", "protractor_test")
+-load("//tools/bazel:web_test_suite.bzl", _ng_web_test_suite = "ng_web_test_suite")
+-load("//:packages.bzl", "NO_STAMP_NPM_PACKAGE_SUBSTITUTIONS", "NPM_PACKAGE_SUBSTITUTIONS")
+-
+-spec_bundle = _spec_bundle
+-http_server = _http_server
+-ng_web_test_suite = _ng_web_test_suite
+-
+-def npm_package(name, srcs = [], **kwargs):
+-    _text_replace(
+-        name = "%s_substituted" % name,
+-        srcs = srcs,
+-        substitutions = select({
+-            "//tools:stamp": NPM_PACKAGE_SUBSTITUTIONS,
+-            "//conditions:default": NO_STAMP_NPM_PACKAGE_SUBSTITUTIONS,
+-        }),
+-    )
+-    _npm_package(
+-        name = name,
+-        srcs = srcs + [
+-            "%s_substituted" % name,
+-        ],
+-        replace_prefixes = {
+-            "%s_substituted" % name: "/",
+-        },
+-        allow_overwrites = True,
+-        **kwargs
+-    )
+-
+-def ts_project(
+-        name,
+-        deps = [],
+-        source_map = True,
+-        testonly = False,
+-        tsconfig = None,
+-        visibility = None,
+-        # TODO: Switch this flag as we no longer depend on `interop_deps`.
+-        ignore_strict_deps = True,
+-        **kwargs):
+-    if tsconfig == None and native.package_name().startswith("src"):
+-        tsconfig = "//src:test-tsconfig" if testonly else "//src:build-tsconfig"
+-
+-    _ts_project(
+-        name = name,
+-        source_map = source_map,
+-        testonly = testonly,
+-        declaration = True,
+-        tsconfig = tsconfig,
+-        visibility = visibility,
+-        deps = deps,
+-        **kwargs
+-    )
+-
+-    if not ignore_strict_deps:
+-        strict_deps_test(
+-            name = "%s_strict_deps_test" % name,
+-            srcs = kwargs.get("srcs", []),
+-            deps = deps,
+-        )
+-
+-    # TODO(devversion): Partner with ISE team to support `rules_js` here.
+-    # if False and not testonly:
+-    #    _make_tsec_test(kwargs["name"])
+-
+-def ng_project(
+-        name,
+-        deps = [],
+-        source_map = True,
+-        testonly = False,
+-        tsconfig = None,
+-        visibility = None,
+-        # TODO: Switch this flag as we no longer depend on `interop_deps`.
+-        ignore_strict_deps = True,
+-        **kwargs):
+-    if tsconfig == None and native.package_name().startswith("src"):
+-        tsconfig = "//src:test-tsconfig" if testonly else "//src:build-tsconfig"
+-
+-    _ng_project(
+-        name = name,
+-        source_map = source_map,
+-        testonly = testonly,
+-        declaration = True,
+-        tsconfig = tsconfig,
+-        visibility = visibility,
+-        deps = deps,
+-        **kwargs
+-    )
+-
+-    if not ignore_strict_deps:
+-        strict_deps_test(
+-            name = "%s_strict_deps_test" % name,
+-            srcs = kwargs.get("srcs", []),
+-            deps = deps,
+-        )
+-
+-    # TODO(devversion): Partner with ISE team to support `rules_js` here.
+-    # if False and not testonly:
+-    #    _make_tsec_test(kwargs["name"])
+-
+-def jasmine_test(name, data = [], args = [], **kwargs):
+-    # Create relative path to root, from current package dir. Necessary as
+-    # we change the `chdir` below to the package directory.
+-    relative_to_root = "/".join([".."] * len(native.package_name().split("/")))
+-
+-    _jasmine_test(
+-        name = name,
+-        node_modules = "//:node_modules",
+-        chdir = native.package_name(),
+-        fixed_args = [
+-            "--require=%s/node_modules/source-map-support/register.js" % relative_to_root,
+-            "**/*spec.js",
+-            "**/*spec.mjs",
+-            "**/*spec.cjs",
+-        ] + args,
+-        data = data + [
+-            "//:node_modules/source-map-support",
+-        ],
+-        **kwargs
+-    )
+-
+-def protractor_web_test_suite(name, deps, **kwargs):
+-    spec_bundle(
+-        name = "%s_bundle" % name,
+-        deps = deps,
+-        external = ["protractor", "selenium-webdriver"],
+-    )
+-
+-    protractor_test(
+-        name = name,
+-        deps = [":%s_bundle" % name],
+-        extra_config = {
+-            "useAllAngular2AppRoots": True,
+-            "allScriptsTimeout": 120000,
+-            "getPageTimeout": 120000,
+-            "jasmineNodeOpts": {
+-                "defaultTimeoutInterval": 120000,
+-            },
+-            # Since we want to use async/await we don't want to mix up with selenium's promise
+-            # manager. In order to enforce this, we disable the promise manager.
+-            "SELENIUM_PROMISE_MANAGER": False,
+-        },
+-        data = [
+-            "//:node_modules/protractor",
+-            "//:node_modules/selenium-webdriver",
+-        ],
+-        **kwargs
+-    )
+diff --git a/tools/dgeni/BUILD.bazel b/tools/dgeni/BUILD.bazel
+index 5627a7a0841711714150371167a7d7ce8463e514..4290621514c26c5cf7dcdde9392deb22f92380b8 100644
+--- a/tools/dgeni/BUILD.bazel
++++ b/tools/dgeni/BUILD.bazel
+@@ -1,5 +1,5 @@
+ load("@aspect_rules_js//js:defs.bzl", "js_binary")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/tools/example-module/BUILD.bazel b/tools/example-module/BUILD.bazel
+index d92c4da1c8412f4c8d3dc9549e0348298d3fd950..aca7320c0b85b171f2fbc6a9316f2050c5f43423 100644
+--- a/tools/example-module/BUILD.bazel
++++ b/tools/example-module/BUILD.bazel
+@@ -1,5 +1,5 @@
+ load("@aspect_rules_js//js:defs.bzl", "js_binary")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/tools/extract-tokens/BUILD.bazel b/tools/extract-tokens/BUILD.bazel
+index f315fcf60aee02843923f4478c2c261380d66c4a..8f4763b38ccd52ec8488117ed6ee7122fbaf112e 100644
+--- a/tools/extract-tokens/BUILD.bazel
++++ b/tools/extract-tokens/BUILD.bazel
+@@ -1,5 +1,5 @@
+ load("@aspect_rules_js//js:defs.bzl", "js_binary")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/tools/highlight-files/BUILD.bazel b/tools/highlight-files/BUILD.bazel
+index 68b4973cc22849e054d54525ba8c056bdf55bb6d..c59808a8dd5a2cca70f4cc335506551d0158c3cb 100644
+--- a/tools/highlight-files/BUILD.bazel
++++ b/tools/highlight-files/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ts_project")
+ load("@aspect_rules_js//js:defs.bzl", "js_binary")
+ 
+ package(default_visibility = ["//visibility:public"])
+diff --git a/tools/markdown-to-html/BUILD.bazel b/tools/markdown-to-html/BUILD.bazel
+index 755ed473aa58dd2bf5f3f7851bf3324c3b24d2a8..0a0a08a74051588e6085be166f7f751573341afc 100644
+--- a/tools/markdown-to-html/BUILD.bazel
++++ b/tools/markdown-to-html/BUILD.bazel
+@@ -1,5 +1,5 @@
+ load("@aspect_rules_js//js:defs.bzl", "js_binary")
+-load("//tools:defaults2.bzl", "jasmine_test", "ts_project")
++load("//tools:defaults.bzl", "jasmine_test", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/tools/package-docs-content/BUILD.bazel b/tools/package-docs-content/BUILD.bazel
+index 59e86b74096eefccaf5641719bb11e49700df76d..df0c28117dbb570906d63c4ee7ba2b343aa49880 100644
+--- a/tools/package-docs-content/BUILD.bazel
++++ b/tools/package-docs-content/BUILD.bazel
+@@ -1,5 +1,5 @@
+ load("@aspect_rules_js//js:defs.bzl", "js_binary")
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/tools/postcss/BUILD.bazel b/tools/postcss/BUILD.bazel
+index 6e679581ed43457edbda104859ce8007935f97c9..cc1419e24e88b1e36c2ce9af494de28f798aef99 100644
+--- a/tools/postcss/BUILD.bazel
++++ b/tools/postcss/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/tools/region-parser/BUILD.bazel b/tools/region-parser/BUILD.bazel
+index 75db002c01f2f5bcbe46c1e1b1c094daa7638535..5af8f96805c59be482d20166daff4ed804c43350 100644
+--- a/tools/region-parser/BUILD.bazel
++++ b/tools/region-parser/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
+diff --git a/tools/sass/BUILD.bazel b/tools/sass/BUILD.bazel
+index b1da3e20bf0f0d55c55ed20de364477a34b463a3..b82b32a5ed1c488caf18fcf0f2beb892fd08b09e 100644
+--- a/tools/sass/BUILD.bazel
++++ b/tools/sass/BUILD.bazel
+@@ -1,4 +1,4 @@
+-load("//tools:defaults2.bzl", "ts_project")
++load("//tools:defaults.bzl", "ts_project")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 
