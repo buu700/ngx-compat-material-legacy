@@ -3,9 +3,9 @@
  * Packed-consumer AOT + harness runtime expansion beyond ESM import smoke.
  *
  * Creates a clean temp consumer, installs the packed tarball + aged Angular
- * peers, AOT-compiles representative legacy entries (button, dialog,
- * form-field/select), and runs a minimal TestBed harness runtime check for
- * MatLegacyButtonHarness.
+ * peers, compiles strict declarations and separate consumer scopes, and runs
+ * Angular TestBed DOM/harness contracts, including six actual legacy value
+ * accessors. TestBed uses JSDOM; native browser qualification is separate.
  *
  * Usage:
  *   node scripts/packed-consumer-aot-smoke.mjs --tarball path [--skip-harness]
