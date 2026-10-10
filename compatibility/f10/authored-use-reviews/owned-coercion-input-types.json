@@ -92,7 +92,7 @@
       "symbol": "BooleanInput",
       "conclusion": "owned-replacement",
       "reviewer": "Codex primary implementer",
-      "candidate_source_sha256": "24b671b71563f60e857639e0ac51bbc95c4adffefc4b8e74fbaad8440188aa08",
+      "candidate_source_sha256": "df6a4cfe02079393bdbb593ad0654af0c04b47548b8ef2c58a96611be944de15",
       "independent_evidence": [
         {
           "path": "reference/material-16.2.14/error-helper-sources/coercion-original.d.ts",
@@ -105,9 +105,39 @@
         {
           "path": "compatibility/rc/coercion-input-type-use-review.json",
           "sha256": "db1a100701a21e64f7a7634bece04bda5d441fd17318e7097506e3d861464a48"
+        },
+        {
+          "path": "compatibility/rc/chip-blur-binding-refresh.json",
+          "sha256": "a9c9d24e08ba5d3dffd7b2485ac95b55ba3d86efecdb46d6b31ed1133cf5f5ac"
         }
       ],
-      "decision": "The frozen BooleanInput import is replaced by one unexported local union with the identical independently authenticated Material/CDK16 primitive members: boolean, null, string, undefined. Complete current source inspection finds 4 type-only references and no imported current compatibility alias or runtime alias reference. Both assignment directions and valid literal categories compile under strict nullability;wrong primitive/object values are rejected. Whole diagnostic JavaScript emit is unchanged when the owned aliases are erased. Close this exact type boundary only;runtime coercion/helper behavior,other component contracts and minimum/native/packed qualification remain open separately."
+      "decision": "The frozen BooleanInput import is replaced by one unexported local union with the identical independently authenticated Material/CDK16 primitive members: boolean, null, string, undefined. Complete current source inspection finds 4 type-only references and no imported current compatibility alias or runtime alias reference. Both assignment directions and valid literal categories compile under strict nullability;wrong primitive/object values are rejected. Whole diagnostic JavaScript emit is unchanged when the owned aliases are erased. Close this exact type boundary only;runtime coercion/helper behavior,other component contracts and minimum/native/packed qualification remain open separately. Chip blur follow-up rechecks this exact boundary at current source. The constructor and public declarations are unchanged; pending blur lifetime, refocus and teardown guards are separately documented. Product HTML/CSS/SCSS and historical goldens are untouched.",
+      "chip_blur_source_refresh": {
+        "prior_source_sha256": "24b671b71563f60e857639e0ac51bbc95c4adffefc4b8e74fbaad8440188aa08",
+        "fresh_source_binding": {
+          "module": "@angular/cdk/coercion",
+          "symbol": "BooleanInput",
+          "file": "legacy-chips/chip.ts",
+          "status": "inventory-seed",
+          "disposition": "open",
+          "candidate_source_sha256": "df6a4cfe02079393bdbb593ad0654af0c04b47548b8ef2c58a96611be944de15",
+          "alias_line": 12,
+          "declaration": "type BooleanInput = string | boolean | null | undefined;",
+          "primitive_members": [
+            "boolean",
+            "null",
+            "string",
+            "undefined"
+          ],
+          "reference_lines": [
+            223,
+            253,
+            263,
+            275
+          ]
+        },
+        "scope": "Source/type/pure-helper binding refresh only; earlier actual component/runtime evidence retains its provenance. Actual native/packed/floor chip and list qualification remains separate."
+      }
     },
     {
       "file": "legacy-chips/chip-input.ts",
@@ -1358,5 +1388,5 @@
     }
   ],
   "g11_claim": "not-passed",
-  "latest_source_refresh_at_utc": "2026-10-10T05:10:18.760538+00:00"
+  "latest_source_refresh_at_utc": "2026-10-10T05:24:24.431739+00:00"
 }
