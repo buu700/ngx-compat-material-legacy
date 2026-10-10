@@ -21,5 +21,5 @@ class RippleHydrationTypesTests(unittest.TestCase):
         self.assertEqual(result.returncode,0,result.stdout+result.stderr)
         report=json.loads(result.stdout)
         self.assertEqual(report['subjects'],2)
-        self.assertEqual(report['negative_checks'],2)
+        self.assertEqual(report['negative_checks'],4)
         self.assertFalse(report['native_AOT_or_packed_qualified'])

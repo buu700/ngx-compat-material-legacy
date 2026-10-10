@@ -157,6 +157,15 @@ jobs:
           export CHROME_BIN
           just chainman exec -- node scripts/run-browser-matrix-slice.mjs --run "${RUN}/run.json"
 
+      - name: Packed Angular hydration event replay (zoneful and zoneless)
+        run: |
+          set -euo pipefail
+          RUN="${{ steps.pack.outputs.run_dir }}"
+          CHROME_BIN="$(command -v chromium-browser || command -v chromium || command -v google-chrome || true)"
+          test -n "$CHROME_BIN"
+          export CHROME_BIN
+          just chainman exec -- node scripts/ripple-hydration-replay.mjs --run "${RUN}/run.json"
+
       - name: Artifact-bound historical families (all 22)
         run: |
           set -euo pipefail

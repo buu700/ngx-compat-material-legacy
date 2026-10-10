@@ -122,6 +122,8 @@ CHECKS = (
     ["node", "scripts/declare-browser-matrix.mjs", "--check"],
     ["node", "--check", "scripts/browser-dialog-escape.mjs"],
     ["node", "--check", "scripts/ssr-dialog.mjs"],
+    ["node", "--check", "scripts/ripple-hydration-application.mjs"],
+    ["node", "--check", "scripts/ripple-hydration-replay.mjs"],
     ["node", "scripts/freeze-upstream-audit.mjs", "--check"],
     ["node", "scripts/check-security-deep-review.mjs"],
     ["node", "scripts/group-docs-build-batch.mjs", "--check"],

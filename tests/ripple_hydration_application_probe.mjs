@@ -1,0 +1,65 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {createRequire} from 'node:module';
+import {rippleHydrationApplication, rippleHydrationReplayOkay} from '../scripts/ripple-hydration-application.mjs';
+const require = createRequire(import.meta.url), ts = require('typescript');
+const sha = value => createHash('sha256').update(value).digest('hex');
+let specifications = 0;
+for (const line of ['main','21.x']) for (const runtime of ['zoneful','zoneless']) {
+  const spec = rippleHydrationApplication(line,runtime), major = line === 'main' ? '22' : '21';
+  const record = JSON.parse(readFileSync(new URL(`../compatibility/rc/hydration-build-schema-${major}.json`,import.meta.url)));
+  assert.equal(record.archive_sri_verified,true);
+  const options = spec.angular.projects.replay.architect.build.options;
+  for (const key of Object.keys(options)) assert.ok(Object.hasOwn(record.schema.properties,key),key);
+  for (const key of record.schema.required) assert.ok(Object.hasOwn(options,key),key);
+  assert.equal(options.ssr.entry,'src/server.ts');
+  assert.equal(options.polyfills.length,runtime === 'zoneful' ? 1 : 0);
+  assert.equal(spec.tsconfig.compilerOptions.skipLibCheck,false);
+  assert.equal(spec.angular.projects.replay.architect.build.builder,'@angular/build:application');
+  assert.equal(spec.dependencies['@angular/platform-server'],spec.dependencies['@angular/core']);
+  assert.equal(spec.dependencies['@angular/ssr'],spec.dependencies['@angular/core']);
+  assert.equal(spec.dependencies['@angular/cdk'],line === 'main' ? '22.1.7' : '21.2.14');
+  assert.equal(spec.dependencies.rxjs,'7.5.5');
+  assert.equal(spec.dependencies.typescript,line === 'main' ? '6.0.2' : '5.9.2');
+  assert.ok(!Object.hasOwn(spec.dependencies,'@angular/animations'));
+  for (const [path, source] of Object.entries(spec.files)) if(path.endsWith('.ts')) {
+    assert.equal(ts.transpileModule(source,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext,
+      experimentalDecorators:true},reportDiagnostics:true,fileName:path}).diagnostics.length,0,path);
+    assert.doesNotMatch(source,/CommonEngine|ɵ|__jsaction_bootstrap|dispatchEvent\(|composedPath\s*=/);
+  }
+  specifications++;
+}
+assert.throws(()=>rippleHydrationApplication('next','zoneful'));
+assert.throws(()=>rippleHydrationApplication('main','other'));
+const event = (type, replay) => ({type,path_threw:replay,target_id:'replay-peer',peer_present:true});
+const snapshot = replay => ({clicks:replay?1:2,deliveries:replay?[event('mousedown',true),event('click',true)]
+  :[event('mousedown',true),event('click',true),event('mousedown',false),event('click',false)],
+  actual_peer_directive_present:true,actual_owned_renderer_present:true,owned_ripple_launches:replay?1:2,peer_ripple_launches:replay?1:2});
+const positive = {server_hydration_metadata:true,before_bootstrap:true,
+  captured_native:['mousedown','mouseup','click'].map(type=>({type,trusted:true,target_id:'replay-peer'})),
+  ssr_button_reused:true,window_errors:[],replayed:snapshot(true),live:snapshot(false),destroyed:true,remaining_ripple_nodes:0};
+assert.equal(rippleHydrationReplayOkay(positive),true);
+const mutants = [
+  row=>{row.server_hydration_metadata=false;}, row=>{row.before_bootstrap=false;},
+  row=>{row.captured_native[0].trusted=false;}, row=>{row.captured_native.pop();},
+  row=>{row.ssr_button_reused=false;}, row=>{row.window_errors.push('composedPath failure');},
+  row=>{row.replayed.clicks=0;}, row=>{row.replayed.actual_peer_directive_present=false;},
+  row=>{row.replayed.actual_owned_renderer_present=false;}, row=>{row.replayed.deliveries[0].path_threw=false;},
+  row=>{row.replayed.deliveries[0].target_id='';}, row=>{row.replayed.deliveries.reverse();},
+  row=>{row.replayed.owned_ripple_launches=0;}, row=>{row.replayed.peer_ripple_launches=0;},
+  row=>{row.live.clicks=1;}, row=>{row.live.deliveries[2].path_threw=true;},
+  row=>{row.live.owned_ripple_launches=1;}, row=>{row.live.peer_ripple_launches=1;},
+  row=>{row.destroyed=false;}, row=>{row.remaining_ripple_nodes=1;},
+];
+for(const mutate of mutants) {const row=structuredClone(positive);mutate(row);assert.equal(rippleHydrationReplayOkay(row),false);}
+console.log(JSON.stringify({specifications,negative_mutations:mutants.length,positive_contract:true,
+  source_sha256:sha(readFileSync(new URL('../scripts/ripple-hydration-application.mjs',import.meta.url))),
+  native_or_packed_AOT_executed:false}));

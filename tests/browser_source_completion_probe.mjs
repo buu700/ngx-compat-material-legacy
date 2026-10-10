@@ -35,6 +35,7 @@ const scenarios = [
   {id: 'unknown-after-native-stage', status: null, expected: 1},
   {id: 'changed-commit-after-native-stage', status: '', commit: 'c'.repeat(40), expected: 1},
   {id: 'changed-tree-after-native-stage', status: '', tree: 'c'.repeat(40), expected: 1},
+  {id: 'missing-genuine-hydration', status: '', hydration: false, expected: 1},
 ];
 async function run(scenario, functionSource = expression) {
   const runDir = join(scratch, scenario.id + '-' + createHash('sha256').update(functionSource).digest('hex').slice(0, 8));
@@ -48,6 +49,7 @@ async function run(scenario, functionSource = expression) {
     preflight: () => ({missing: [], notes: [], chrome: 'fixture-only'}),
     fixtureQualificationDefects: () => [], fixtureQualificationDefectsFromTarball: () => [],
     runCloseoutDiagnostic: () => ({core_high_contrast_passed: true}), writeDetail: value => {detail = value;},
+    runRippleHydrationReplay: async () => ({ok:scenario.hydration !== false, protocol_only:true}),
     executeIds: async () => {
       nativeStageReached = true;
       return {outcomes: roster.ids.map(id => ({id, ok: true, evidence: 'Synthetic assertion fixture; no native execution'})),
