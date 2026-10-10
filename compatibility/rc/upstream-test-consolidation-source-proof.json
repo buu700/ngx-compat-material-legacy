@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "role": "C04 original shared-test consolidation source checkpoint",
+  "line": "21.x",
+  "source_checkpoint": "b124e61ffcb68f67fe902bb18be12166476fea33",
+  "recorded_at_utc": "2026-10-10T17:42:47.428794+00:00",
+  "inputs": [
+    {
+      "path": "compatibility/f10/disposition-ledger/ledger.json",
+      "sha256": "f66583c029878657c8c9aa0b0208c0d33c9024b7d30b213967462259a386986f"
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-test-consolidation-source-review.json",
+      "sha256": "c8d8b347595bba5fc3d016d644304d7bc5da425ce48532fc702319fd917a0ba1"
+    },
+    {
+      "path": "compatibility/rc/upstream-test-consolidation-subjects.json",
+      "sha256": "5fd4dc58c2365c659696d4e9f6927a02184f868db043a7055a3bf1afcdebf989"
+    },
+    {
+      "path": "scripts/check-upstream-audit-disposition.mjs",
+      "sha256": "c603e98b8c2f86a6aedfcfc65c16291f9da5220da84a1cfeaf19207a7b173808"
+    },
+    {
+      "path": "scripts/upstream-test-consolidation-analysis.mjs",
+      "sha256": "2a655afc3707e3d79a16dfda9c4c26d192719f5022007ac8985979d8aa39aeb8"
+    },
+    {
+      "path": "scripts/upstream-test-consolidation-evidence.mjs",
+      "sha256": "b63cca132301d4684e3cad64264b884bb9166b40a4eb84617ed0554547f9e824"
+    },
+    {
+      "path": "tests/upstream_test_consolidation_probe.mjs",
+      "sha256": "da9cde77c42f522db4d0bed47cc834dafb46dabf2fadacdf6072790ea76b3351"
+    },
+    {
+      "path": "tests/test_upstream_test_consolidation.py",
+      "sha256": "5b45c78ea5ecfa84be0d01b49bec84fd8bae58451fc1ba22be5d53b672c82c97"
+    },
+    {
+      "path": "compatibility/rc/upstream-test-consolidation-admission-diagnostic.json",
+      "sha256": "e369790bd4e11e47290322916b19a29896bf07b1a868324a5909efd4140b30ae"
+    },
+    {
+      "path": "compatibility/rc/upstream-test-consolidation-source-diagnostic-final.json",
+      "sha256": "885092dc3a1f8a41a882a517d671fbe08703d3130dffe0ce558a238043a871f0"
+    }
+  ],
+  "diagnostic_environment": {
+    "node": "22.23.3",
+    "typescript": "6.0.3",
+    "canonical_private_toolchain": false,
+    "dependency_location": "borrowed primary workspace node_modules"
+  },
+  "focused_tests": [
+    {
+      "command": "NODE_PATH=/home/parallels/ngx-compat-material-legacy/node_modules node tests/upstream_test_consolidation_probe.mjs compatibility/rc/upstream-test-consolidation-source-diagnostic-final.json",
+      "exit_code": 0,
+      "subjects": 32,
+      "paths": 111,
+      "exact_test_body_and_fixture_relocations": 27,
+      "pending_residuals": 5,
+      "positive_entry_bindings": 32,
+      "negative_controls": 17
+    }
+  ],
+  "admission": {
+    "command": "NODE_PATH=/home/parallels/ngx-compat-material-legacy/node_modules node scripts/check-upstream-audit-disposition.mjs --line 21.x --admission --report compatibility/rc/upstream-test-consolidation-admission-diagnostic.json",
+    "exit_code": 1,
+    "expected_incomplete": true,
+    "unresolved": 1575,
+    "missing_evidence": 1555,
+    "authored_uses_reviewed": 1316,
+    "authored_uses_open": 420,
+    "g11_claim": "not-passed"
+  },
+  "cyph_sanity": {
+    "head": "a56a0603636cac5aaabe8fe408f7429b4224f011",
+    "working_tree_clean": true,
+    "product_source_or_resource_change_in_this_batch": false,
+    "consumer_build_executed": false
+  },
+  "limitations": [
+    "Original upstream tests and product runtime did not execute. The positive predicate covers instantiated runner bodies plus fixture/helper declarations, not imported module resolution.",
+    "Five non-exact commits remain individual review obligations. This checkpoint does not qualify canonical toolchain, peer floors, packed/AOT/native behavior, security, G11 or the full plan.",
+    "No push or Actions run occurred."
+  ]
+}
