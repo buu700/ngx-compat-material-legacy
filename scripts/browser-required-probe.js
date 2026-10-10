@@ -27,8 +27,30 @@
     tooltip: '#wrap-tooltip',
   };
 
+  let pointerSerial = 0;
+  let pendingPointer = null;
+  let cleanup = () => {};
+
+  window.__pointerDone = function (id) {
+    if (!pendingPointer || pendingPointer.id !== id || window.__status !== pendingPointer.owner) return false;
+    const complete = pendingPointer.complete; pendingPointer = null;
+    complete(); return true;
+  };
+
+  function pointerClick(node, then) {
+    node.scrollIntoView({block: 'center'});
+    const box = node.getBoundingClientRect();
+    const x = box.x + box.width / 2, y = box.y + box.height / 2;
+    if (pendingPointer || box.width <= 0 || box.height <= 0 || !Number.isFinite(x) || !Number.isFinite(y) ||
+        x < 0 || y < 0 || x >= innerWidth || y >= innerHeight) {
+      finish(false, 'native pointer geometry unavailable'); return;
+    }
+    pendingPointer = {id: ++pointerSerial, owner: window.__status, x, y, complete: then};
+  }
+
   function finish(ok, evidence) {
     if (window.__status && window.__status.done) return;
+    cleanup(); cleanup = () => {}; pendingPointer = null;
     window.__status = {done: true, ok: !!ok, evidence: String(evidence || '')};
   }
 
@@ -89,6 +111,7 @@
   }
 
   window.__begin = function (spec) {
+    cleanup(); cleanup = () => {}; pendingPointer = null;
     window.__status = {done: false, ok: false, evidence: ''};
     const family = spec && spec.family;
     const state = spec && spec.state;
@@ -123,7 +146,11 @@
   };
 
   window.__poll = function () {
-    return window.__status || {done: false, ok: false, evidence: ''};
+    const status = window.__status || {done: false, ok: false, evidence: ''};
+    if (!status.done && pendingPointer && pendingPointer.owner === status) {
+      return {...status, pointer: {id: pendingPointer.id, type: 'pointer-click', x: pendingPointer.x, y: pendingPointer.y}};
+    }
+    return status;
   };
 
   function runState(family, state, root, lab) {
@@ -361,7 +388,14 @@
     if (family === 'snack-bar') {
       const opener = query('#p-snack');
       if (opener) opener.click();
-      waitFor(() => query('.mat-snack-bar-container'), 1500, node => finish(!!node, 'mat-snack-bar-container'));
+      waitFor(() => query('.mat-snack-bar-container'), 1500, node => {
+        if (!node) {finish(false, 'disabled snack container missing'); return;}
+        lab.closeTransient();
+        waitFor(() => !query('.mat-snack-bar-container'), 1500, removed => {
+          if (!removed) {finish(false, 'disabled snack did not dispose'); return;}
+          runSnackMotion('event', []);
+        });
+      });
       return;
     }
     if (family === 'tabs') {
@@ -380,13 +414,80 @@
         labels[1].click();
         observe(1, () => {
           labels[0].click();
-          observe(0, () => finish(legacyInkBarSelectionSequenceOkay(sequence),
-            'tabs; first/second/first ink-bar alignment ' + JSON.stringify(sequence)));
+          observe(0, () => {
+            if (!legacyInkBarSelectionSequenceOkay(sequence)) {finish(false, 'tabs ink-bar sequence failed'); return;}
+            runPagination(sequence);
+          });
         });
       });
       return;
     }
     finish(false, 'no default for ' + family);
+  }
+
+  function runSnackMotion(mode, observations) {
+    const opener = query('#snack-motion-open');
+    if (!opener) {finish(false, 'enabled snack fixture missing'); return;}
+    const trace = trackLegacySnackMotionNative(mode);
+    cleanup = () => trace.cleanup();
+    opener.click();
+    waitFor(() => {
+      const before = readLegacySnackMotionEnterNative();
+      return before.entered === 1 && before.enabled && before.box && before.box.width > 0 && before.box.height > 0 ? before : null;
+    }, 1500, before => {
+      if (!before) {finish(false, 'enabled snack did not enter: ' + mode); return;}
+      const button = query('.mat-snack-bar-container .mat-simple-snackbar-action button');
+      if (!button) {finish(false, 'enabled snack action missing'); return;}
+      pointerClick(button, () => waitFor(() => {
+        const observation = {mode, enabled: before.enabled, entered: before.entered, enter_ms: before.enter_ms,
+          ...readLegacySnackMotionExitNative(trace)};
+        return observation.trusted_action_events === 1 && legacySnackMotionNativeOkay(observation) ? observation : null;
+      }, 1500, observation => {
+        if (!observation) {finish(false, 'enabled snack completion failed: ' + mode); return;}
+        trace.cleanup(); cleanup = () => {};
+        observations.push(observation);
+        if (mode === 'event') runSnackMotion('fallback', observations);
+        else finish(observations.length === 2, 'snack; trusted CSS event and suppressed-event fallback ' + JSON.stringify(observations));
+      }));
+    });
+  }
+
+  function runPagination(inkSequence) {
+    const group = query('#p-pagination-tabs');
+    waitFor(() => {
+      const observation = readTabPaginationNative(group);
+      return !observation.missing && observation.elements === 2 && observation.button_semantics &&
+        observation.scroll === 0 && observation.after_box.width > 0 && observation.after_box.height > 0 ? observation : null;
+    }, 1500, initial => {
+      if (!initial) {finish(false, 'pagination initial geometry or semantics missing'); return;}
+      const before = group.querySelector('.mat-tab-header-pagination-before');
+      const after = group.querySelector('.mat-tab-header-pagination-after');
+      const label = group.querySelector('.mat-tab-label');
+      before.click();
+      const owner = window.__status;
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        if (window.__status !== owner) return;
+        const inert = readTabPaginationNative(group).scroll === initial.scroll;
+        if (!inert || !label || !after) {finish(false, 'disabled pagination changed scroll'); return;}
+        label.focus();
+        waitFor(() => document.activeElement === label, 500, focused => {
+          if (!focused) {finish(false, 'pagination label did not focus'); return;}
+          let trustedClicks = 0;
+          const request = window.__status;
+          const clicked = event => {if (window.__status === request && event.isTrusted) trustedClicks++;};
+          after.addEventListener('click', clicked);
+          cleanup = () => after.removeEventListener('click', clicked);
+          pointerClick(after, () => waitFor(() => {
+            const end = readTabPaginationNative(group);
+            const observation = {elements: initial.elements, button_semantics: initial.button_semantics,
+              disabled_click_inert: !!inert, pointer_focus_retained: end.focus_retained,
+              scroll_before: initial.scroll, scroll_after: end.scroll};
+            return trustedClicks === 1 && tabPaginationNativeOkay(observation) ? observation : null;
+          }, 1500, observation => finish(!!observation,
+            'tabs; ink-bar sequence ' + JSON.stringify(inkSequence) + '; trusted pagination ' + JSON.stringify(observation))));
+        });
+      }));
+    });
   }
 
   function runDisabled(family) {

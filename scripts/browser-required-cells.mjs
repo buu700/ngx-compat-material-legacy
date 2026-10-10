@@ -7,18 +7,22 @@
  *
  * Chromium uses CDP. Firefox uses WebDriver BiDi. WebKit uses system WebKitGTK.
  * A cell is recorded only when the page probe returns ok. This does not claim G10.
- * Enabled-motion and SSR stay unexpanded because the declaration has no cell ids
- * for them. Pass --ssr to also run scripts/ssr-dialog.mjs for the main tarball.
+ * Enabled snack motion supplements the default snack cell without new matrix ids.
+ * SSR has no declared cell ids. Pass --ssr to also run scripts/ssr-dialog.mjs for main.
  */
 import {createHash} from 'node:crypto';
+import {snackMotionFixture} from './snack-motion-fixture.mjs';
+import {legacySnackMotionNativeOkay, trackLegacySnackMotionNative, readLegacySnackMotionEnterNative, readLegacySnackMotionExitNative} from './legacy-snack-motion-native-contract.mjs';
 import {tooltipAriaLifetimeFixture} from './tooltip-aria-lifetime-fixture.mjs';
 import {legacyTooltipAriaLifetimeNativeOkay, legacyTooltipNativeOkay, legacyTooltipMessageSequenceOkay, readLegacyTooltipNative} from './legacy-tooltip-native-contract.mjs';
 import {legacyInkBarNativeOkay, legacyInkBarSelectionSequenceOkay, readLegacyInkBarNative} from './legacy-ink-bar-native-contract.mjs';
 import {legacySelectFontNativeOkay, readLegacySelectFontNative} from './legacy-select-font-native-contract.mjs';
 import {legacyChipBlurNativeOkay} from './legacy-chip-blur-native-contract.mjs';
+import {tabPaginationNativeOkay, readTabPaginationNative} from './tab-pagination-native-contract.mjs';
 import {legacyFormFieldOutlineNativeOkay, legacyFormFieldOutlineSequenceOkay, readLegacyFormFieldOutlineNative} from './legacy-form-field-outline-native-contract.mjs';
 import {announcedChromeEndpoint,debuggerMatchesChild,announcedFirefoxEndpoint} from './chromium-debug-endpoint.mjs';
 import {spawn, spawnSync} from 'node:child_process';
+import {cdpPointerClick, bidiPointerClick, pointerPoint, withPrivateXDisplay, servicePointerRequest} from './browser-pointer-input.mjs';
 import {createRequire} from 'node:module';
 import {createServer} from 'node:http';
 import {chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync} from 'node:fs';
@@ -56,7 +60,9 @@ function firefoxBin() {
 export function requiredProbeSource() {
   return [legacyTooltipAriaLifetimeNativeOkay, legacyTooltipNativeOkay, legacyTooltipMessageSequenceOkay, readLegacyTooltipNative, legacyInkBarNativeOkay, legacyInkBarSelectionSequenceOkay,
     readLegacyInkBarNative, legacySelectFontNativeOkay, readLegacySelectFontNative, legacyChipBlurNativeOkay,
-    legacyFormFieldOutlineNativeOkay, legacyFormFieldOutlineSequenceOkay, readLegacyFormFieldOutlineNative]
+    legacyFormFieldOutlineNativeOkay, legacyFormFieldOutlineSequenceOkay, readLegacyFormFieldOutlineNative,
+    tabPaginationNativeOkay, readTabPaginationNative, legacySnackMotionNativeOkay,
+    trackLegacySnackMotionNative, readLegacySnackMotionEnterNative, readLegacySnackMotionExitNative]
     .map(contract => contract.toString()).join('\n') + '\n' + readFileSync(probePath, 'utf8');
 }
 
@@ -206,13 +212,13 @@ function labHtml() {
     '<span id="slider-invalid">{{sl.invalid}}</span>',
     '<mat-slider id="p-slider-disabled" disabled [value]="10"></mat-slider>',
     '</div>',
-    '<div id="wrap-snack" *ngIf="!cspOnly"><button id="p-snack" type="button" (click)="openSnack()">Snack</button></div>',
+    '<div id="wrap-snack" *ngIf="!cspOnly"><button id="p-snack" type="button" (click)="openSnack()">Snack</button><lab-snack-motion></lab-snack-motion></div>',
     '<div id="wrap-table" *ngIf="!cspOnly">',
     '<table mat-table id="p-table" [dataSource]="rows">',
     '<ng-container matColumnDef="name"><th mat-header-cell *matHeaderCellDef>Name</th><td mat-cell *matCellDef="let row"><button id="p-table-focus" type="button">{{row.name}}</button></td></ng-container>',
     '<tr mat-header-row *matHeaderRowDef="cols"></tr><tr mat-row *matRowDef="let row; columns: cols"></tr>',
     '</table></div>',
-    '<div id="wrap-tabs" *ngIf="!cspOnly"><mat-tab-group id="p-tabs"><mat-tab label="One">One</mat-tab><mat-tab label="Two">Two</mat-tab><mat-tab label="Off" disabled>Off</mat-tab></mat-tab-group></div>',
+    '<div id="wrap-tabs" *ngIf="!cspOnly"><mat-tab-group id="p-tabs"><mat-tab label="One">One</mat-tab><mat-tab label="Two">Two</mat-tab><mat-tab label="Off" disabled>Off</mat-tab></mat-tab-group><mat-tab-group *ngFor="let instance of [paginationEpoch()]" id="p-pagination-tabs" style="width:220px"><mat-tab *ngFor="let label of paginationLabels" [label]="label">Narrow tab</mat-tab></mat-tab-group></div>',
     '<div id="wrap-tooltip" *ngIf="!cspOnly">',
     '<button id="p-tooltip" type="button" #tip="matTooltip" [matTooltip]="tipMessage()">Tip</button>',
     '<button id="p-tooltip-off" type="button" #tipOff="matTooltip" matTooltip="Nope" matTooltipDisabled>Off</button>',
@@ -232,6 +238,7 @@ import {BrowserModule} from '@angular/platform-browser';
 import {BidiModule} from '@angular/cdk/bidi';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {AbstractControl, FormControl, FormsModule, NG_VALIDATORS, ReactiveFormsModule, ValidationErrors, Validator} from '@angular/forms';
+import {LEGACY_ANIMATIONS_TEST_OVERRIDE} from '@ngx-compat/material-legacy/legacy-core';
 import {ErrorStateMatcher, MATERIAL_ANIMATIONS} from '@angular/material/core';
 import {MatLegacyAutocompleteModule} from '@ngx-compat/material-legacy/legacy-autocomplete';
 import {MatLegacyButtonModule} from '@ngx-compat/material-legacy/legacy-button';
@@ -251,12 +258,13 @@ import {MatLegacyRadioModule} from '@ngx-compat/material-legacy/legacy-radio';
 import {MatLegacySelect, MatLegacySelectModule} from '@ngx-compat/material-legacy/legacy-select';
 import {MatLegacySlideToggleModule} from '@ngx-compat/material-legacy/legacy-slide-toggle';
 import {MatLegacySliderModule} from '@ngx-compat/material-legacy/legacy-slider';
-import {MatLegacySnackBar, MatLegacySnackBarModule} from '@ngx-compat/material-legacy/legacy-snack-bar';
+import {MatLegacySnackBar, MatLegacySnackBarContainer, MatLegacySnackBarModule} from '@ngx-compat/material-legacy/legacy-snack-bar';
 import {MatLegacyTableModule} from '@ngx-compat/material-legacy/legacy-table';
 import {MatLegacyTabsModule} from '@ngx-compat/material-legacy/legacy-tabs';
 import {MatLegacyTooltip, MatLegacyTooltipModule} from '@ngx-compat/material-legacy/legacy-tooltip';
 
 ${tooltipAriaLifetimeFixture}
+${snackMotionFixture}
 
 @Directive({
   selector: '[labForceInvalid]',
@@ -299,6 +307,8 @@ export class LabRoot {
   readonly outlineVisible = signal(true);
   readonly outlinePrefix = signal(false);
   readonly outlineDirection = signal<'ltr' | 'rtl'>('ltr');
+  readonly paginationEpoch = signal(0);
+  readonly paginationLabels = ['Pagination 0', 'Pagination 1', 'Pagination 2', 'Pagination 3', 'Pagination 4', 'Pagination 5'];
   cols = ['name'];
   rows = [{name: 'Ada'}];
   @ViewChild('menuTrigger') menuTrigger!: any;
@@ -338,6 +348,7 @@ export class LabRoot {
         lab.forceSliderInvalid = false;
         lab.autoSelection.set(null);
         lab.tipMessage.set('Hello tip');
+        lab.paginationEpoch.update(value => value + 1);
         lab.outlineVisible.set(true); lab.outlinePrefix.set(false); lab.outlineDirection.set('ltr');
       },
       openDialog() { lab.openDialog(); },
@@ -391,7 +402,7 @@ export class LabRoot {
     MatLegacyTabsModule,
     MatLegacyTooltipModule,
   ],
-  declarations: [LabRoot, DialogBody, LabForceInvalid, TooltipAriaLifetimeLab, CaptureTooltipForAriaLifetime],
+  declarations: [LabRoot, DialogBody, LabForceInvalid, SnackMotionLab, TooltipAriaLifetimeLab, CaptureTooltipForAriaLifetime],
   bootstrap: [LabRoot],
   providers: [
     ...((window as unknown as {__cspNonce?: string}).__cspNonce ? [{provide: CSP_NONCE, useValue: (window as unknown as {__cspNonce: string}).__cspNonce}] : []),
@@ -766,7 +777,7 @@ export async function withChromium(origin, fn, options = {}) {
       await send('Emulation.setEmulatedMedia', {features: [{name: 'prefers-reduced-motion', value: 'reduce'}]}, sessionId);
     }
     await goto(`${origin}${options.startPath || '/'}`);
-    await fn({evaluate, goto, browser: {
+    await fn({evaluate, goto, pointerClick: point => cdpPointerClick(send, sessionId, point), browser: {
       launched: true,
       engine: 'chromium',
       product: version.Browser || '',
@@ -849,7 +860,7 @@ export async function withFirefox(origin, fn, options = {}) {
     };
     await goto(`${origin}${options.startPath || '/'}`);
     const capabilities = session.result?.capabilities || {};
-    await fn({evaluate, goto, browser: {
+    await fn({evaluate, goto, pointerClick: point => bidiPointerClick(send, context, point), browser: {
       launched: true,
       engine: 'firefox',
       browserName: capabilities.browserName || '',
@@ -865,6 +876,10 @@ export async function withFirefox(origin, fn, options = {}) {
 }
 
 export function withWebKit(origin, fn, options = {}) {
+  return withPrivateXDisplay(display => withWebKitDisplay(origin, fn, options, display));
+}
+
+function withWebKitDisplay(origin, fn, options, display) {
   return new Promise((resolveDone, rejectDone) => {
     const runtimeDir = allocateLauncherDir('webkit-runtime-');
     chmodSync(runtimeDir, 0o700);
@@ -873,7 +888,8 @@ export function withWebKit(origin, fn, options = {}) {
       env: {
         ...process.env,
         PYTHONUNBUFFERED: '1',
-        DISPLAY: process.env.DISPLAY || ':0',
+        DISPLAY: display,
+        NGX_PRIVATE_X_DISPLAY: display,
         GDK_BACKEND: 'x11',
         XDG_RUNTIME_DIR: runtimeDir,
         WEBKIT_DISABLE_COMPOSITING_MODE: '1',
@@ -901,12 +917,14 @@ export function withWebKit(origin, fn, options = {}) {
         newline = buffer.indexOf('\n');
       }
     });
-    child.on('exit', code => {
-      const waiter = queue.shift();
-      if (waiter) waiter.reject(new Error(`webkit exited ${code}: ${errLog.slice(-400)}`));
-    });
+    const failRequests = error => {while (queue.length) queue.shift().reject(error);};
+    child.on('error', failRequests);
+    child.stdin.on('error', failRequests);
+    child.on('exit', code => failRequests(new Error(`webkit exited ${code}: ${errLog.slice(-400)}`)));
     const request = payload => new Promise((resolveRequest, rejectRequest) => {
-      queue.push({resolve: resolveRequest, reject: rejectRequest});
+      const timer = setTimeout(() => rejectRequest(new Error(`webkit ${payload.cmd} timed out`)), 10000);
+      queue.push({resolve(value) {clearTimeout(timer); resolveRequest(value);},
+        reject(error) {clearTimeout(timer); rejectRequest(error);}});
       child.stdin.write(JSON.stringify(payload) + '\n');
     });
     (async () => {
@@ -924,6 +942,10 @@ export function withWebKit(origin, fn, options = {}) {
       const agent = await evaluate('navigator.userAgent');
       await fn({
         evaluate,
+        pointerClick: async point => {
+          const response = await request({cmd: 'pointer', ...pointerPoint(point)});
+          if (!response.ok) throw new Error(response.error || 'webkit pointer input failed');
+        },
         goto: async url => {
           const response = await request({cmd: 'load', url});
           if (!response.ok) throw new Error(response.error || 'webkit goto failed');
@@ -978,9 +1000,12 @@ async function runCells(driver, ids) {
     if (state === 'csp-nonce') continue;
     await driver.evaluate(`window.__begin(${JSON.stringify({family, state})})`);
     let status = null;
-    for (let attempt = 0; attempt < 120; attempt += 1) {
+    // Sequential geometry/motion phases retain individual 1.5s deadlines.
+    const deadline = Date.now() + 12000;
+    while (Date.now() < deadline) {
       status = asJson(await driver.evaluate('JSON.stringify(window.__poll())'));
       if (status && status.done) break;
+      if (status && status.pointer) await servicePointerRequest(driver, status.pointer);
       await sleep(40);
     }
     const ok = !!(status && status.done && status.ok && status.evidence);

@@ -7,6 +7,7 @@ because this host's GDK backend has no GL context. This is system WebKitGTK (Web
 from __future__ import annotations
 
 import json
+import math
 import os
 import sys
 
@@ -14,7 +15,7 @@ import gi
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('WebKit2', '4.1')
-from gi.repository import GLib, Gtk, WebKit2
+from gi.repository import Gdk, GLib, Gtk, WebKit2
 
 
 def reply(payload: dict) -> None:
@@ -86,6 +87,24 @@ def on_stdin(_source, _condition) -> bool:
         reply({'ok': True})
         Gtk.main_quit()
         return False
+    if command == 'pointer':
+        # GDK test input must never warp the user's shared desktop pointer.
+        if not os.environ.get('NGX_PRIVATE_X_DISPLAY') or os.environ['NGX_PRIVATE_X_DISPLAY'] != os.environ.get('DISPLAY'):
+            reply({'ok': False, 'error': 'pointer input requires an owned private X display'})
+            return True
+        x, y = message.get('x'), message.get('y')
+        if (isinstance(x, bool) or isinstance(y, bool) or not isinstance(x, (int, float)) or
+                not isinstance(y, (int, float)) or not math.isfinite(x) or not math.isfinite(y) or
+                not 0 <= x < view.get_allocated_width() or not 0 <= y < view.get_allocated_height() or
+                not view.get_has_window()):
+            reply({'ok': False, 'error': 'pointer input requires finite WebView coordinates and its native window'})
+            return True
+        native = view.get_window()
+        pressed = Gdk.test_simulate_button(native, int(x), int(y), 1, Gdk.ModifierType(0), Gdk.EventType.BUTTON_PRESS)
+        released = Gdk.test_simulate_button(native, int(x), int(y), 1, Gdk.ModifierType.BUTTON1_MASK, Gdk.EventType.BUTTON_RELEASE)
+        Gdk.Display.get_default().sync()
+        reply({'ok': bool(pressed and released), 'error': '' if pressed and released else 'GDK pointer delivery failed'})
+        return True
     if command == 'load':
         busy['on'] = True
         url = message.get('url')

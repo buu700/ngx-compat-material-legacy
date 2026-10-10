@@ -16,7 +16,7 @@ const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 function fixture(family, faults = {}, source = raw) {
   const window = {}, jobs = new Map(), classes = name => ({contains: value => name === value});
   let now = 0, serial = 0, selected = 0, selectOpen = false, focused = false, touched = false;
-  let outlineVisible = true, outlinePrefix = false, direction = 'ltr';
+  let outlineVisible = true, outlinePrefix = false, direction = 'ltr', scroll = 0, labelFocused = false;
   const clicked = [], surface = {setAttribute() {}};
   const labels = [0, 1].map(index => ({offsetLeft: index * 100, offsetWidth: 100,
     click() {clicked.push(index); selected = index;}}));
@@ -62,6 +62,20 @@ function fixture(family, faults = {}, source = raw) {
     '#p-outline-show': {click() {clicked.push('show'); outlineVisible = !faults.noOutlineShow;}},
     '#p-outline-rtl': {click() {clicked.push('rtl'); direction = faults.noOutlineRtl ? 'ltr' : 'rtl';}},
   };
+  const paginationLabel = {focus() {labelFocused = true; document.activeElement = paginationLabel;}};
+  const pointerListeners = new Set();
+  const before = {tagName: 'BUTTON', type: 'button', tabIndex: -1, disabled: true,
+    getAttribute: () => 'true', click() {if (faults.disabledScroll) scroll = -10;}};
+  const after = {tagName: faults.paginationNotButton ? 'DIV' : 'BUTTON', type: 'button', tabIndex: -1,
+    disabled: false, getAttribute: () => 'true', scrollIntoView() {},
+    getBoundingClientRect: () => ({x: labelFocused ? 100 : 500, y: 50,
+      width: faults.noPaginationBox ? 0 : 20, height: 20}),
+    addEventListener: (_type, fn) => pointerListeners.add(fn), removeEventListener: (_type, fn) => pointerListeners.delete(fn)};
+  const paginationList = {get style() {return {transform: 'translateX(' + scroll + 'px)'};}};
+  const pagination = {querySelectorAll: () => [before, after], querySelector(selector) {
+    return {'.mat-tab-header-pagination-before': before, '.mat-tab-header-pagination-after': after,
+      '.mat-tab-list': paginationList, '.mat-tab-label': paginationLabel}[selector] || null;
+  }};
   window.__lab = {closeTransient() {},
     readChipFormState: () => ({focused, touched}), resetChipFormState() {touched = !!faults.touchedBefore;}};
   if (faults.noChipApi) delete window.__lab.readChipFormState;
@@ -74,6 +88,7 @@ function fixture(family, faults = {}, source = raw) {
       if (selector === '#p-outline-wrapper') return wrapper;
       if (outlineButtons[selector]) return outlineButtons[selector];
       if (selector === '#p-tabs') return group;
+      if (selector === '#p-pagination-tabs') return faults.noPagination ? null : pagination;
       if (selector === '#p-select .mat-select-trigger') return trigger;
       if (selector === '#p-chip-list .mat-chip') return faults.noChip ? null : chip;
       if (selector === '#p-field-input') return target;
@@ -81,6 +96,10 @@ function fixture(family, faults = {}, source = raw) {
     },
     querySelectorAll: selector => selector === '.cdk-overlay-pane .mat-select-panel' && selectOpen ? [panel] : []};
   runInNewContext(source, {window, document, Promise, JSON, String, Number, Array, parseFloat,
+    DOMMatrix: class {constructor(transform) {this.m41 = Number(transform.match(/translateX\(([-\d.]+)px\)/)[1]);}},
+    innerWidth: 1280, innerHeight: 900, requestAnimationFrame(callback) {
+      const id = ++serial; jobs.set(id, {callback, due: now + 16}); return id;
+    },
     getComputedStyle: node => node.computed, Date: {now: () => now},
     setTimeout(callback, delay = 0) {const id = ++serial; jobs.set(id, {callback, due: now + delay}); return id;},
     clearTimeout: id => jobs.delete(id)});
@@ -92,6 +111,15 @@ function fixture(family, faults = {}, source = raw) {
         if (!next || next[1].due > end) break;
         assert.ok(iterations++ < 250, 'clock protocol did not quiesce');
         now = next[1].due; jobs.delete(next[0]); next[1].callback(); await turn();
+        const action = window.__poll().pointer;
+        if (action && !faults.missingPointerDriver) {
+          assert.equal(action.x, 110, 'pointer box must be measured after label focus');
+          clicked.push('pointer');
+          if (!faults.noPaginationScroll) scroll = -100;
+          if (faults.pointerStealsFocus) document.activeElement = after;
+          for (const fn of pointerListeners) fn({isTrusted: !faults.untrustedPointer});
+          assert.equal(window.__pointerDone(action.id), true);
+        }
       }
       now = end; await turn();
     }};
@@ -100,13 +128,17 @@ const cases = [];
 async function check(id, family, faults, expected) {
   const f = fixture(family, faults); f.begin(); await f.advance(1700);
   assert.equal(f.status().done, true, id); assert.equal(f.status().ok, expected, id);
-  if (family === 'tabs' && expected) assert.deepEqual(f.clicked, [0, 1, 0]);
+  if (family === 'tabs' && expected) assert.deepEqual(f.clicked, [0, 1, 0, 'pointer']);
   if (family === 'form-field' && expected) assert.deepEqual(f.clicked, ['prefix', 'hide', 'show', 'rtl']);
   cases.push({id, result: 'pass'});
 }
 await check('tabs-first-second-first', 'tabs', {}, true);
 for (const faults of [{wrongInkAt: 0}, {wrongInkAt: 1}, {zeroInk: true}, {hiddenInk: true}, {noInk: true}]) {
   await check('tabs-reject-' + JSON.stringify(faults), 'tabs', faults, false);
+}
+for (const faults of [{paginationNotButton: true}, {disabledScroll: true}, {pointerStealsFocus: true},
+    {noPaginationScroll: true}, {untrustedPointer: true}, {noPagination: true}, {noPaginationBox: true}]) {
+  await check('pagination-reject-' + JSON.stringify(faults), 'tabs', faults, false);
 }
 await check('select-all-fonts-and-historical-height', 'select', {}, true);
 for (const faults of [{triggerFont: '16px'}, {paneFont: '16px'}, {panelFont: '16px'},
