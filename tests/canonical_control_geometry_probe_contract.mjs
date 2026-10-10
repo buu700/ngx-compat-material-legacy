@@ -22,6 +22,7 @@ const rippleMotion = trigger => ({trigger, inside_angular:false, enter_ms:225,
 const rippleObservation = {actual_owned_renderers:2,actual_view_created:true,trusted_mousedown_events:1,
   owned_listener_adds:2,owned_listener_removes:2,owned_listener_balance:0,trusted_order:['outer','inner'],
   native_motion:[rippleMotion('outer'),rippleMotion('inner')],missing_path_order:['outer','inner'],throwing_path_order:['outer','inner'],
+  held_past_enter_fallback:true,missing_exit_fallback_removed:true,
   calls_after_removal:0,controlled_ripples_removed:true,view_destroyed:true,host_removed:true,
   uncaught_window_errors:0,actual_angular_hydration_replay_executed:false};
 const raw = requiredProbeSource(), turn = () => new Promise(resolve => setImmediate(resolve));
@@ -263,6 +264,7 @@ for (const faults of [{ripplePrepareReject:true},{ripplePreparePending:true},{ri
   {rippleObservation:{native_motion:[{...rippleMotion('outer'),enter_ms:0},rippleMotion('inner')]}},
   {rippleObservation:{native_motion:[{...rippleMotion('outer'),inside_angular:true},rippleMotion('inner')]}},
   {rippleObservation:{calls_after_removal:1}},{rippleObservation:{uncaught_window_errors:1}},
+  {rippleObservation:{held_past_enter_fallback:false}},{rippleObservation:{missing_exit_fallback_removed:false}},
   {rippleObservation:{actual_angular_hydration_replay_executed:true}}]) {
   await check('core-ripple-reject-'+JSON.stringify(faults),'core',faults,false);
 }

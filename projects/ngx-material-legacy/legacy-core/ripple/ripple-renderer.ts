@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -42,7 +43,7 @@ const pointerDownEvents = ['mousedown', 'touchstart'];
 const pointerUpEvents = ['mouseup', 'mouseleave', 'touchend', 'touchcancel'];
 
 interface RippleEventListeners {
-  onTransitionEnd: EventListener;
+  onTransitionEnd: () => void;
   onTransitionCancel: EventListener;
   fallbackTimer: ReturnType<typeof setTimeout> | null;
 }
@@ -130,15 +131,25 @@ export class LegacyRippleRenderer implements EventListenerObject {
     if (!animationForciblyDisabledThroughCss && (enterDuration || animationConfig.exitDuration)) {
       this._ngZone.runOutsideAngular(() => {
         const onTransitionEnd = () => {
+          if (!this._activeRipples.has(rippleRef)) {
+            return;
+          }
           if (eventListeners) {
+            if (eventListeners.fallbackTimer !== null) {
+              clearTimeout(eventListeners.fallbackTimer);
+            }
             eventListeners.fallbackTimer = null;
           }
-          clearTimeout(fallbackTimer);
           this._finishRippleTransition(rippleRef);
         };
         const onTransitionCancel = () => this._destroyRipple(rippleRef);
         // Fallback when neither transitionend nor transitioncancel fires under load.
-        const fallbackTimer = setTimeout(onTransitionCancel, enterDuration + 100);
+        // Complete the current state: a held or persistent ripple must remain visible.
+        const fallbackTimer = setTimeout(() => {
+          if (rippleRef.state === LegacyRippleState.FADING_IN) {
+            onTransitionEnd();
+          }
+        }, enterDuration + 100);
         ripple.addEventListener('transitionend', onTransitionEnd);
         ripple.addEventListener('transitioncancel', onTransitionCancel);
         eventListeners = {onTransitionEnd, onTransitionCancel, fallbackTimer};
@@ -168,6 +179,23 @@ export class LegacyRippleRenderer implements EventListenerObject {
 
     if (rippleRef._animationForciblyDisabledThroughCss || !animationConfig.exitDuration) {
       this._finishRippleTransition(rippleRef);
+    } else {
+      const eventListeners = this._activeRipples.get(rippleRef);
+      if (eventListeners) {
+        if (eventListeners.fallbackTimer !== null) {
+          clearTimeout(eventListeners.fallbackTimer);
+        }
+        this._ngZone.runOutsideAngular(() => {
+          eventListeners.fallbackTimer = setTimeout(
+            () => {
+              if (rippleRef.state === LegacyRippleState.FADING_OUT) {
+                eventListeners.onTransitionEnd();
+              }
+            },
+            animationConfig.exitDuration + 100,
+          );
+        });
+      }
     }
   }
 
