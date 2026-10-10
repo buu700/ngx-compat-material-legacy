@@ -1,0 +1,298 @@
+{
+  "schema_version": 1,
+  "sha": "9494ff2d65c98726046e6a20dd6a6d938e97a2f6",
+  "line": "main",
+  "kind": "individual-original-selection-comparator-review",
+  "patch_file": "compatibility/f10/disposition-ledger/evidence/patches/9494ff2d65c98726046e6a20dd6a6d938e97a2f6-selection-comparator-full.patch",
+  "diff_sha256": "cf574324e4e76ccd1ea45bf25e3bddf9e28b9db07d9fce40e804d04b0a55a73c",
+  "patch_paths": [
+    "src/cdk/collections/selection-model.ts",
+    "src/cdk/collections/selection.spec.ts"
+  ],
+  "upstream_commit_object": "tree 5b256d59844b4af64f7643f89101dfea83a3b6ff\nparent c5213fd3ef4202e9a6896be0f9202bbba78bde6b\nauthor iladovi <138984680+iladovi@users.noreply.github.com> 1740079265 +0100\ncommitter GitHub <noreply@github.com> 1740079265 -0800\ngpgsig -----BEGIN PGP SIGNATURE-----\n \n wsFcBAABCAAQBQJnt4ChCRC1aQ7uu5UhlAAAG7IQAH9w1NdfGGusoFFUec/xssxA\n GyLFrhfA2GS27DTKKqEnqIygKXqq5HnrnFHGLocn63huTsRgYTJI9EM4Rw5ggD8u\n gLUMfpX5f6/mGWglxV0LaUfrw56vBWZFe1RaexiZtFjoFnwiVwZwvO5m6sAcOtxt\n JnIghf7EfLhDHCw8AXfdhruR4m/h6SMIH2BNhMMJ9/i9VURp+AmIxcrzsEShAbSQ\n b83f06Z1mQzNDiokazeucsstMV9KncAPREn6/KfkFnnZF0161erwFAeavNnO8qKc\n +7Lyhdq/qsRGHDBHjYXYb7AcR9cQ69eJa/qrMH3w0sMJhQO1wtmJ0RH+2z0pDQ0m\n kn1N9DZsQ1GXKFhq1dcFnMGzelElq3L/NrP4oM2UxXKlFnStkYo+sSUi81cTYzPj\n Y33Vm1p1/EcLqgNk2XW6Ad+YZo4RvDWncftgafmvPygIMYS80EVGtYrZw6s/PoWo\n 2bBD8hUUUWKeNF+qs2vxcBzrra/CxZfF4aHU13RxvVxMlYEq/OZlbdvR8a7xgpO3\n tMRoW2j89y8j8L/iqCg0v+ePChmPyZ3b5qWceffLv4QADN3DCygTbTIW3RmXEvF0\n nrprvQlK36Z4stBaxd2CWjb3+k/TyI0x9Odyd3G4tnrnicwKsF/ft+GsT5bnw9VA\n uwtsMiTHFsy8+w5OgnMQ\n =ICcp\n -----END PGP SIGNATURE-----\n \n\nfix(cdk/collections): SelectionModel setSelection method inconsistent with compareWith (#27460)\n\nFix bug in SelectionModel where compareWith function\nwas not consistently respected in setSelection method.\n\nFixes #27425",
+  "upstream_commit_object_sha256": "ea03eee8a96026aa6268cfcd589e43c96dbf2d272b746a534eabe418e78d7917",
+  "review_depth": "individual-compatibility",
+  "affected_branches": [
+    "main",
+    "21.x"
+  ],
+  "decision": "Complete2-path original patch and regression reviewed. Untouched16 public SelectionModel empties selection on repeated equivalent-object setSelection. Both exact22.1.7/21.2.14 public collections closures execute and retain the original concrete selected identity; original defect reproduced and both full-original-algorithm mutation negatives reject. A normalization-only revert is masked by the later peer concrete-value deletion predicate, so tag ancestry or mere presence of the new Set expression is not proof. Four owned constructors in3 files supply no model comparator and the owned callers do not use setSelection; their chip/select/list value comparator resolution methods remain separate. However public selection-list.selectedOptions can be mutated by application code, making this a relevant public peer path. Whole peer model observations and exact source recipes strengthen the inherited conclusion but do not execute actual legacy component delegation, public external model changes through a real node, compiled types/packed/native/floors or all current source contracts. Preserve old inherited ancestry conclusion in history and keep release disposition pending until actual packed legacy model exposure/caller behavior is demonstrated. No component/style/API repair is made.",
+  "path_reviews": {
+    "src/cdk/collections/selection-model.ts": "setSelection canonicalizes prospective set values using existing concrete selected identities before deletion, preserving comparator-equivalent entries. Current complete algorithms also canonicalize removed-value comparisons.",
+    "src/cdk/collections/selection.spec.ts": "Original single-selection/noemit repeated object comparator regression transcribed exactly to whole authentic model; public event/multi/identity operations separately tested."
+  },
+  "source_diagnostic": {
+    "path": "compatibility/rc/selection-model-current-source-diagnostic.json",
+    "sha256": "f101ef53c331edb055798db0c9915de978e8e394ec06d95a8a3e8af0edd905ae"
+  },
+  "source_review": {
+    "schema_version": 1,
+    "line": "main",
+    "cases": [
+      {
+        "module": "@angular/cdk/collections",
+        "symbol": "SelectionModel",
+        "file": "legacy-chips/chip-list.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "6be4ef5b4100e7d1122dc3a0842d66c8a57315374e438ecd8ddf2e29e9f8c3e2",
+        "references": [
+          {
+            "line": 182,
+            "kind": "type"
+          },
+          {
+            "line": 444,
+            "kind": "constructor"
+          }
+        ],
+        "constructors": [
+          {
+            "line": 444,
+            "arguments": [
+              "this.multiple",
+              "undefined",
+              "false"
+            ]
+          }
+        ],
+        "calls": [
+          {
+            "line": 642,
+            "receiver": "this._selectionModel",
+            "method": "select",
+            "arguments": [
+              "correspondingChip"
+            ]
+          },
+          {
+            "line": 664,
+            "receiver": "this._selectionModel",
+            "method": "clear",
+            "arguments": []
+          },
+          {
+            "line": 679,
+            "receiver": "this._selectionModel",
+            "method": "clear",
+            "arguments": []
+          },
+          {
+            "line": 683,
+            "receiver": "this._selectionModel",
+            "method": "select",
+            "arguments": [
+              "chip"
+            ]
+          },
+          {
+            "line": 790,
+            "receiver": "this._selectionModel",
+            "method": "select",
+            "arguments": [
+              "event.source"
+            ]
+          },
+          {
+            "line": 791,
+            "receiver": "this._selectionModel",
+            "method": "deselect",
+            "arguments": [
+              "event.source"
+            ]
+          },
+          {
+            "line": 796,
+            "receiver": "this._selectionModel",
+            "method": "isSelected",
+            "arguments": [
+              "chip"
+            ]
+          }
+        ],
+        "comparison_method": {
+          "name": "_selectValue",
+          "source": "private _selectValue(value: any, isUserInput: boolean = true): MatLegacyChip | undefined {\n    const correspondingChip = this.chips.find(chip => {\n      return chip.value != null && this._compareWith(chip.value, value);\n    });\n\n    if (correspondingChip) {\n      isUserInput ? correspondingChip.selectViaInteraction() : correspondingChip.select();\n      this._selectionModel.select(correspondingChip);\n    }\n\n    return correspondingChip;\n  }"
+        },
+        "publicly_exposed_model": false
+      },
+      {
+        "module": "@angular/cdk/collections",
+        "symbol": "SelectionModel",
+        "file": "legacy-list/selection-list.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "e408bbc42e122dcb9197d2fb850740a9cf769d650ec70442b595428ce747c206",
+        "references": [
+          {
+            "line": 411,
+            "kind": "constructor"
+          },
+          {
+            "line": 416,
+            "kind": "constructor"
+          }
+        ],
+        "constructors": [
+          {
+            "line": 411,
+            "arguments": [
+              "this._multiple",
+              "this.selectedOptions.selected"
+            ]
+          },
+          {
+            "line": 416,
+            "arguments": [
+              "this._multiple"
+            ]
+          }
+        ],
+        "calls": [
+          {
+            "line": 185,
+            "receiver": "this.selectionList.selectedOptions",
+            "method": "isSelected",
+            "arguments": [
+              "this"
+            ]
+          },
+          {
+            "line": 309,
+            "receiver": "this.selectionList.selectedOptions",
+            "method": "select",
+            "arguments": [
+              "this"
+            ]
+          },
+          {
+            "line": 311,
+            "receiver": "this.selectionList.selectedOptions",
+            "method": "deselect",
+            "arguments": [
+              "this"
+            ]
+          }
+        ],
+        "comparison_method": {
+          "name": "_setOptionsFromValues",
+          "source": "private _setOptionsFromValues(values: string[]) {\n    this.options.forEach(option => option._setSelected(false));\n\n    values.forEach(value => {\n      const correspondingOption = this.options.find(option => {\n        // Skip options that are already in the model. This allows us to handle cases\n        // where the same primitive value is selected multiple times.\n        return option.selected ? false : this.compareWith(option.value, value);\n      });\n\n      if (correspondingOption) {\n        correspondingOption._setSelected(true);\n      }\n    });\n  }"
+        },
+        "publicly_exposed_model": true
+      },
+      {
+        "module": "@angular/cdk/collections",
+        "symbol": "SelectionModel",
+        "file": "legacy-select/internal/select-base.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "3a0e28d25fa553220d0faeff8c00b4bd3c343cdd27051e25eda7efef6a80b432",
+        "references": [
+          {
+            "line": 301,
+            "kind": "type"
+          },
+          {
+            "line": 550,
+            "kind": "constructor"
+          }
+        ],
+        "constructors": [
+          {
+            "line": 550,
+            "arguments": [
+              "this.multiple"
+            ]
+          }
+        ],
+        "calls": [
+          {
+            "line": 1061,
+            "receiver": "this._selectionModel",
+            "method": "isEmpty",
+            "arguments": []
+          },
+          {
+            "line": 1083,
+            "receiver": "this._selectionModel",
+            "method": "clear",
+            "arguments": []
+          },
+          {
+            "line": 1117,
+            "receiver": "this._selectionModel",
+            "method": "isSelected",
+            "arguments": [
+              "option"
+            ]
+          },
+          {
+            "line": 1134,
+            "receiver": "this._selectionModel",
+            "method": "select",
+            "arguments": [
+              "correspondingOption"
+            ]
+          },
+          {
+            "line": 1221,
+            "receiver": "this._selectionModel",
+            "method": "isSelected",
+            "arguments": [
+              "option"
+            ]
+          },
+          {
+            "line": 1225,
+            "receiver": "this._selectionModel",
+            "method": "clear",
+            "arguments": []
+          },
+          {
+            "line": 1233,
+            "receiver": "this._selectionModel",
+            "method": "select",
+            "arguments": [
+              "option"
+            ]
+          },
+          {
+            "line": 1234,
+            "receiver": "this._selectionModel",
+            "method": "deselect",
+            "arguments": [
+              "option"
+            ]
+          },
+          {
+            "line": 1254,
+            "receiver": "this._selectionModel",
+            "method": "isSelected",
+            "arguments": [
+              "option"
+            ]
+          },
+          {
+            "line": 1266,
+            "receiver": "this._selectionModel",
+            "method": "sort",
+            "arguments": [
+              "(a, b) => {\n        return this.sortComparator\n          ? this.sortComparator(a, b, options)\n          : options.indexOf(a) - options.indexOf(b);\n      }"
+            ]
+          }
+        ],
+        "comparison_method": {
+          "name": "_selectOptionByValue",
+          "source": "private _selectOptionByValue(value: any): MatOption | undefined {\n    const correspondingOption = this.options.find((option: MatOption) => {\n      // Skip options that are already in the model. This allows us to handle cases\n      // where the same primitive value is selected multiple times.\n      if (this._selectionModel.isSelected(option)) {\n        return false;\n      }\n\n      try {\n        // Treat null as a special reset value.\n        return option.value != null && this._compareWith(option.value, value);\n      } catch (error) {\n        if (typeof ngDevMode === 'undefined' || ngDevMode) {\n          // Notify developers of errors in their comparator.\n          console.warn(error);\n        }\n        return false;\n      }\n    });\n\n    if (correspondingOption) {\n      this._selectionModel.select(correspondingOption);\n    }\n\n    return correspondingOption;\n  }"
+        },
+        "publicly_exposed_model": false
+      }
+    ],
+    "scope": "Exact3 public model imports/4 constructor recipes and current call surface, with comparator resolution method context. No whole legacy caller execution/native/AOT/packed/floor/security pass.",
+    "g11_claim": "not-passed"
+  },
+  "native_or_packed_executed": false,
+  "final_disposition": "needs-individual-review",
+  "g11_claim": "not-passed",
+  "recorded_at_utc": "2026-10-10T16:08:05.747626+00:00"
+}

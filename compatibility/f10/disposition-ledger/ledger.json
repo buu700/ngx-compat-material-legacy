@@ -4,8 +4,8 @@
   "g11_claim": "not-passed",
   "seed_rows": 1697,
   "ledger_rows": 1697,
-  "closed_dispositions": 1688,
-  "open_or_deferred": 9,
+  "closed_dispositions": 1687,
+  "open_or_deferred": 10,
   "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
   "batch_id": "unread-seed-content-review-2026-10-02",
   "entries": [
@@ -9435,13 +9435,14 @@
       "sha": "9494ff2d65c98726046e6a20dd6a6d938e97a2f6",
       "bucket": "behavior-semantic",
       "subject": "fix(cdk/collections): SelectionModel setSelection method inconsistent with compareWith (#27460)",
-      "final_disposition": "inherited",
-      "reason": "The patch stores setSelection values through compareWith so equivalent items stay selected. This package does not define SelectionModel. That comparison was not changed. Inherited via installed peer @angular/cdk@22.1.7 (advertised floor ^22.1.7); upstream SHA is an ancestor of v22.1.7.",
+      "final_disposition": "needs-individual-review",
+      "reason": "Complete2-path original patch and regression reviewed. Untouched16 public SelectionModel empties selection on repeated equivalent-object setSelection. Both exact22.1.7/21.2.14 public collections closures execute and retain the original concrete selected identity; original defect reproduced and both full-original-algorithm mutation negatives reject. A normalization-only revert is masked by the later peer concrete-value deletion predicate, so tag ancestry or mere presence of the new Set expression is not proof. Four owned constructors in3 files supply no model comparator and the owned callers do not use setSelection; their chip/select/list value comparator resolution methods remain separate. However public selection-list.selectedOptions can be mutated by application code, making this a relevant public peer path. Whole peer model observations and exact source recipes strengthen the inherited conclusion but do not execute actual legacy component delegation, public external model changes through a real node, compiled types/packed/native/floors or all current source contracts. Preserve old inherited ancestry conclusion in history and keep release disposition pending until actual packed legacy model exposure/caller behavior is demonstrated. No component/style/API repair is made.",
       "read_note_disposition": "not-owned",
       "files": [
-        "src/cdk/collections/selection-model.ts"
+        "src/cdk/collections/selection-model.ts",
+        "src/cdk/collections/selection.spec.ts"
       ],
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-selection-comparator-source-review.json",
       "peer_floor": {
         "package": "@angular/cdk",
         "advertised_range": "^22.1.7",
@@ -9455,10 +9456,47 @@
           "collections"
         ]
       },
-      "batch_id": "cdk-inherited-not-owned-retain-2026-10-01-d",
+      "batch_id": "selection-comparator-native-delegation-pending-2026-10-10",
       "recorded_at_utc": "2026-10-01T16:49:17Z",
       "g11_claim": "not-passed",
-      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "prior_dispositions": [
+        {
+          "sha": "9494ff2d65c98726046e6a20dd6a6d938e97a2f6",
+          "bucket": "behavior-semantic",
+          "subject": "fix(cdk/collections): SelectionModel setSelection method inconsistent with compareWith (#27460)",
+          "final_disposition": "inherited",
+          "reason": "The patch stores setSelection values through compareWith so equivalent items stay selected. This package does not define SelectionModel. That comparison was not changed. Inherited via installed peer @angular/cdk@22.1.7 (advertised floor ^22.1.7); upstream SHA is an ancestor of v22.1.7.",
+          "read_note_disposition": "not-owned",
+          "files": [
+            "src/cdk/collections/selection-model.ts"
+          ],
+          "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+          "peer_floor": {
+            "package": "@angular/cdk",
+            "advertised_range": "^22.1.7",
+            "installed_version": "22.1.7",
+            "contains_fix_tag": "v22.1.7",
+            "sha_is_ancestor_of_tag": true,
+            "cdk_modules": [
+              "collections"
+            ],
+            "owned_import_intersection": [
+              "collections"
+            ]
+          },
+          "batch_id": "cdk-inherited-not-owned-retain-2026-10-01-d",
+          "recorded_at_utc": "2026-10-01T16:49:17Z",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+        }
+      ],
+      "review_depth": "individual-compatibility",
+      "source_check": {
+        "diff_sha256": "cf574324e4e76ccd1ea45bf25e3bddf9e28b9db07d9fce40e804d04b0a55a73c",
+        "patch_path": "compatibility/f10/disposition-ledger/evidence/patches/9494ff2d65c98726046e6a20dd6a6d938e97a2f6-selection-comparator-full.patch",
+        "review_membership": "9494ff2d65c98726046e6a20dd6a6d938e97a2f6"
+      }
     },
     {
       "sha": "11599f808f823b38e7c3eca99fb5bbf1b48ad922",
