@@ -43,6 +43,8 @@ import {dirname, join, relative, resolve, sep} from 'node:path';
 import {fileURLToPath, pathToFileURL} from 'node:url';
 import {parseLegacyArgs, resolveLibraryFromRun, sha256File} from './resolve-run-library.mjs';
 import {assessBadgeHighContrast,observeBadgeHighContrast} from './badge-high-contrast-contract.mjs';
+import {isolatedHarnessInputs} from './bundle-consumer-harness.mjs';
+import {assertEngineFreeHarnessInputs} from './consumer-animation-engine.mjs';
 import {
   BINDINGS, CHECK_ID, COMPANIONS, DEFAULT_SCENARIOS, DIMENSIONS, GROUP_DIMENSIONS, GROUP_ORACLE,
   NEGATIVE_SCENARIO, PEER_PACKAGE, SCENARIOS,
@@ -575,7 +577,7 @@ function compileCandidate(sass, nodeModules, installed, identity) {
   return {css: compiled.css, sha256: sha256(compiled.css), loaded_files: loaded.length};
 }
 
-export async function buildLab(consumer, env, versions, source = labSource(), {strictDeclarations = false} = {}) {
+export async function buildLab(consumer, env, versions, source = labSource(), {strictDeclarations = false, engineFree = false} = {}) {
   mkdirSync(join(consumer, 'src'), {recursive: true});
   writeFileSync(join(consumer, 'src/main.ts'), source);
   const compilerOptions = {
@@ -591,14 +593,17 @@ export async function buildLab(consumer, env, versions, source = labSource(), {s
   const compiled = spawnSync(process.execPath, [ngc, '-p', 'tsconfig.json'], {cwd: consumer, encoding: 'utf8', timeout: 300000, env});
   if (compiled.status !== 0) throw new Error(`ngc failed:\n${compiled.stdout || ''}\n${compiled.stderr || ''}`.slice(-4000));
   const esbuild = require('esbuild');
+  if (engineFree && esbuild.version !== JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).devDependencies.esbuild) {
+    throw new Error('migrated consumer bundler differs from the pinned tool');
+  }
   const linkerRequire = createRequire(join(consumer, 'node_modules/@angular/compiler-cli/package.json'));
   const {transformSync} = linkerRequire('@babel/core');
   const linkerPlugin = linkerRequire('@angular/compiler-cli/linker/babel').default;
   const {needsLinking} = linkerRequire('@angular/compiler-cli/linker');
   mkdirSync(join(consumer, 'dist'), {recursive: true});
-  await esbuild.build({
+  const built = await esbuild.build({
     absWorkingDir: consumer, entryPoints: ['out/main.js'], bundle: true, format: 'iife',
-    outfile: 'dist/app.js', platform: 'browser', logLevel: 'silent',
+    outfile: 'dist/app.js', platform: 'browser', logLevel: 'silent', metafile: engineFree,
     plugins: [{
       name: 'ng-linker',
       setup(build) {
@@ -617,6 +622,12 @@ export async function buildLab(consumer, env, versions, source = labSource(), {s
   const bundle = readFileSync(join(consumer, 'dist/app.js'), 'utf8');
   if (bundle.includes('ɵɵngDeclare') || /(?:from|require\()\s*['"]@angular\/compiler['"]/.test(bundle)) {
     throw new Error('bundle still contains partial declarations or compiler imports');
+  }
+  if (engineFree) {
+    const inputs = isolatedHarnessInputs(consumer, built.metafile).map(({path, actual}) => ({path, sha256: sha256(readFileSync(actual))}));
+    assertEngineFreeHarnessInputs(inputs);
+    return {module_loader: 'linked-consumer-browser-iife', format: 'iife', platform: 'browser',
+      tool_version: esbuild.version, input_paths_confined: true, inputs, bundle_sha256: sha256(bundle)};
   }
 }
 

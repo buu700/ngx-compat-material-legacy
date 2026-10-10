@@ -33,7 +33,7 @@ from rc_acceptance import (
 )
 from archive_run_closure import ClosureError, write_closure
 from owned_rendered_admission import owned_rendered_ok
-from migration_workspace_admission import old_workspace_assertion_ok
+from migration_workspace_admission import old_workspace_assertion_ok, workspace_support_records
 from migration_transaction_admission import transaction_assertion_ok
 from migration_frontend_admission import frontend_assertion_ok
 from sass_function_admission import function_assertion_ok
@@ -737,6 +737,11 @@ def _complete_migration_report(run_dir: Path, run_id: str) -> dict | None:
         if record["path"] not in seen:
             outputs.append(record)
             seen.add(record["path"])
+        body = read_json(run_dir / record["path"])
+        for support in workspace_support_records(body):
+            if support["path"] not in seen:
+                outputs.append(support)
+                seen.add(support["path"])
         case_results.append({
             "case_id": case_id,
             "result": "pass",

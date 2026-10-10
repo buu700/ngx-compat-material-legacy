@@ -2,6 +2,64 @@
 import hashlib
 import json
 import re
+from rc_acceptance import EvidenceError, assertion_directory, checked_file
+from consumer_floor_admission import ENGINE_PACKAGE, ENGINE_ENTRY, HEX
+
+SUPPORT_FILES = dict(application='application.ts',styles='styles.scss',css='css.css',package='package.json',
+                     lock='lock.json',tsconfig='tsconfig.json',bundle='bundle.js',bundle_inputs='bundle_inputs.json')
+
+def migrated_template_sources(root):
+    source=(root/'scripts/migrated-consumer-proof.mjs').read_text()
+    application=re.search(r'export const OLD_APPLICATION = `(.*?)`;',source,re.S)
+    styles=re.search(r'export const OLD_STYLES = `(.*?)`;',source,re.S)
+    if not application or not styles:raise ValueError('missing historical migration templates')
+    return (application.group(1).replace('@angular/material/legacy-','@ngx-compat/material-legacy/legacy-'),
+            styles.group(1).replace("'@angular/material'","'@ngx-compat/material-legacy'"))
+
+def workspace_support_records(body):
+    return list(body['upgraded_consumer']['support'].values()) if body.get('group')=='old-workspace-cli' else []
+
+def migrated_support_ok(root,active,upgraded,invocation,versions):
+    support=upgraded['support']
+    if not isinstance(support,dict) or set(support)!=set(SUPPORT_FILES):return False
+    prefix=assertion_directory('migration-packaged',invocation)+'/upgraded-consumer/'
+    contents={}
+    for name,filename in SUPPORT_FILES.items():
+        record=support[name]
+        if record['path']!=prefix+filename:return False
+        contents[name]=checked_file(active.run_dir,record,'migrated consumer '+name).read_bytes()
+    application,styles=migrated_template_sources(root)
+    if contents['application'].decode()!=application or contents['styles'].decode()!=styles:return False
+    for name,field in [('application','application_sha256'),('styles','styles_sha256'),('css','css_sha256'),('lock','lock_sha256')]:
+        if upgraded[field]!=support[name]['sha256']:return False
+    css=contents['css'].decode()
+    if '.mat-select' not in css or '.mat-raised-button' not in css:return False
+    config=json.loads(contents['tsconfig']);compiler=config['compilerOptions'];angular=config['angularCompilerOptions']
+    if (compiler.get('strict') is not True or compiler.get('skipLibCheck') is not False or compiler.get('paths')
+        or compiler.get('rootDir')!='src' or compiler.get('types')!=[] or config.get('files')!=['src/main.ts']
+        or angular.get('strictTemplates') is not True or angular.get('compilationMode')!='full'):return False
+    package=json.loads(contents['package']);dependencies=package['dependencies']
+    expected={f'@angular/{name}':versions['core'] for name in ('common','compiler','compiler-cli','core','forms','platform-browser','platform-browser-dynamic')}
+    expected.update({'@angular/cdk':versions['cdk'],'@angular/material':versions['material'],
+                     'rxjs':versions['rxjs'],'typescript':versions['typescript'],'tslib':versions['tslib'],'zone.js':versions['zone']})
+    if set(dependencies)!=set(expected)|{'@ngx-compat/material-legacy'} or any(dependencies[k]!=v for k,v in expected.items()):return False
+    if not dependencies['@ngx-compat/material-legacy'].startswith('file:'):return False
+    lock=json.loads(contents['lock']);packages=lock['packages']
+    if packages['']['dependencies']!=dependencies or any(ENGINE_PACKAGE.search(path) for path in packages):return False
+    if any(packages['node_modules/'+name]['version']!=version for name,version in expected.items()):return False
+    library_version=json.loads((root/'projects/ngx-material-legacy/package.json').read_text())['version']
+    if packages['node_modules/@ngx-compat/material-legacy']['version']!=library_version:return False
+    if upgraded.get('animation_engine')!={'installed_packages':[],'lock_packages':[]}:return False
+    bundle=json.loads(contents['bundle_inputs'])
+    if bundle!=upgraded['bundle'] or bundle.get('bundle_sha256')!=support['bundle']['sha256']:return False
+    if any(bundle.get(k)!=v for k,v in dict(module_loader='linked-consumer-browser-iife',format='iife',platform='browser',input_paths_confined=True).items()):return False
+    if bundle.get('tool_version')!=json.loads((root/'package.json').read_text())['devDependencies']['esbuild']:return False
+    inputs=bundle['inputs'];paths=[item['path'] for item in inputs]
+    if not inputs or len(paths)!=len(set(paths)) or any(not HEX.fullmatch(item['sha256']) for item in inputs):return False
+    if any(path.startswith('/') or '\\' in path or any(part in ('','.','..') for part in path.split('/')) for path in paths):return False
+    if any(ENGINE_PACKAGE.search(path) or ENGINE_ENTRY.search(path) for path in paths):return False
+    if 'out/main.js' not in paths or not all(any(path.startswith(prefix) for path in paths) for prefix in ('node_modules/@ngx-compat/material-legacy/','node_modules/@angular/core/','node_modules/rxjs/')):return False
+    return True
 
 def old_workspace_ids(root):
     catalog=json.loads((root/'fixtures/migration/cases.json').read_text())
@@ -29,6 +87,7 @@ def old_workspace_assertion_ok(root,active,body,invocation):
         row=plan['lines'][line]
         expected=dict(core=row['framework'],cdk=row['cdk'],material=row['material'],rxjs=plan['current_configuration']['rxjs'],typescript=plan['current_configuration']['typescript_by_line'][line],zone='0.16.3' if line=='main' else '0.15.1',tslib='2.8.1')
         if upgraded['versions']!=expected:return False
+        if not migrated_support_ok(root,active,upgraded,invocation,expected):return False
         if any(not re.fullmatch(r'[0-9a-f]{64}',upgraded[k]) for k in ('application_sha256','styles_sha256','css_sha256','lock_sha256')):return False
         browser=upgraded['browser']
         if browser['result']!='pass' or not browser['browser']:return False
@@ -39,4 +98,4 @@ def old_workspace_assertion_ok(root,active,body,invocation):
             for k in ('before','after'):
                 if body[k+'_sha256']!=hashlib.sha256(body[k].encode()).hexdigest():return False
         return True
-    except (KeyError,ValueError,TypeError,OSError):return False
+    except (KeyError,ValueError,TypeError,OSError,EvidenceError,AttributeError):return False

@@ -5,6 +5,8 @@ import {mkdirSync, readFileSync, realpathSync, rmSync, writeFileSync} from 'node
 import {join, relative} from 'node:path';
 import {buildLab, readPackedPackage, versionsFor, withChromium} from './check-companion-computed-styles.mjs';
 import {digest} from './migration-run-inputs.mjs';
+import {assertEngineFreeConsumer} from './consumer-animation-engine.mjs';
+import {retainMigratedConsumer} from './migrated-consumer-support.mjs';
 
 export const OLD_APPLICATION = `
 import 'zone.js';
@@ -39,7 +41,7 @@ export async function proveMigratedConsumer(work, application, styles, input) {
   if (packed.name !== '@ngx-compat/material-legacy' || packed.version.split('.')[0] !== (input.line === 'main' ? '22' : '21')) throw new Error('wrong library artifact line');
   const versions = versionsFor(packed);
   const packageJson = {name:'migrated-material-16-consumer',private:true,dependencies:{
-    ...Object.fromEntries(['animations','common','compiler','compiler-cli','core','forms','platform-browser','platform-browser-dynamic'].map(n=>['@angular/'+n,versions.core])),
+    ...Object.fromEntries(['common','compiler','compiler-cli','core','forms','platform-browser','platform-browser-dynamic'].map(n=>['@angular/'+n,versions.core])),
     '@angular/cdk':versions.cdk,'@angular/material':versions.material,'@ngx-compat/material-legacy':`file:${library.absolute}`,
     rxjs:versions.rxjs,typescript:versions.typescript,tslib:versions.tslib,'zone.js':versions.zone,
   }};
@@ -58,7 +60,8 @@ export async function proveMigratedConsumer(work, application, styles, input) {
   }
   const installed=realpathSync(join(work,'node_modules/@ngx-compat/material-legacy'));
   if(relative(realpathSync(work),installed).startsWith('..'))throw new Error('upgraded consumer borrowed library resolution');
-  await buildLab(work,env,versions,application,{strictDeclarations:true});
+  const animationEngine = assertEngineFreeConsumer(work);
+  const bundle = await buildLab(work,env,versions,application,{strictDeclarations:true,engineFree:true});
   const sass = createRequire(new URL('../package.json',import.meta.url))('sass');
   const compiled=sass.compileString(styles,{loadPaths:[join(work,'node_modules')],silenceDeprecations:['if-function','global-builtin','color-functions','import']});
   if(!compiled.css.includes('.mat-select')||!compiled.css.includes('.mat-raised-button'))throw new Error('migrated Sass omitted legacy control styles');
@@ -78,7 +81,9 @@ export async function proveMigratedConsumer(work, application, styles, input) {
     return {browser,before,after,result:'pass'};
   },{debugPort:9346});
   const lock=readFileSync(join(work,'package-lock.json'));
+  const support = retainMigratedConsumer(work, input, bundle);
   return {result:'pass',line:input.line,versions,node:process.version,strict_templates:true,skip_lib_check:false,
     application_sha256:digest(application),styles_sha256:digest(styles),css_sha256:digest(compiled.css),
-    lock_sha256:digest(lock),library_sha256:library.sha256,cli_sha256:input.artifacts['migrate-cli'].sha256,browser:browserProof};
+    lock_sha256:digest(lock),library_sha256:library.sha256,cli_sha256:input.artifacts['migrate-cli'].sha256,
+    animation_engine:animationEngine,bundle,support,browser:browserProof};
 }

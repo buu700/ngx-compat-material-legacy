@@ -49,6 +49,8 @@ class CoordinatorTests(unittest.TestCase):
             target=self.root/relative;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes((ROOT/relative).read_bytes())
         write_json(self.root / "compatibility/rc/matrices/full-verify.json", acceptance.read_json(ROOT / "compatibility/rc/matrices/full-verify.json"))
         write_json(self.root / "compatibility/rc/consumer-floor-plan.json", acceptance.read_json(ROOT / "compatibility/rc/consumer-floor-plan.json"))
+        for relative in ['scripts/migrated-consumer-proof.mjs','projects/ngx-material-legacy/package.json']:
+            target=self.root/relative;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes((ROOT/relative).read_bytes())
         self.run = verify.RunEvidence(self.f.run, self.f.run_dir, self.f.matrix_sha)
         # These coordinator tests use deliberately non-package artifact bytes.
         # Source-specific transaction admission is tested through the real CLI
