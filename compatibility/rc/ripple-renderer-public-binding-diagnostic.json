@@ -1,0 +1,444 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "file": "legacy-core/ripple/ripple-renderer.ts",
+      "module": "@angular/core",
+      "symbol": "NgZone",
+      "candidate_source_sha256": "e6cb6501bc303fbb2fa061fff272d9dce171216a7c58eb8fc6980c50b7c8c08b",
+      "references": [
+        {
+          "role": "constructor-input",
+          "expression": "private _ngZone: NgZone"
+        }
+      ]
+    },
+    {
+      "file": "legacy-core/ripple/ripple-renderer.ts",
+      "module": "@angular/cdk/platform",
+      "symbol": "Platform",
+      "candidate_source_sha256": "e6cb6501bc303fbb2fa061fff272d9dce171216a7c58eb8fc6980c50b7c8c08b",
+      "references": [
+        {
+          "role": "constructor-input",
+          "expression": "private _platform: Platform"
+        }
+      ]
+    },
+    {
+      "file": "legacy-core/ripple/ripple-renderer.ts",
+      "module": "@angular/cdk/platform",
+      "symbol": "normalizePassiveListenerOptions",
+      "candidate_source_sha256": "e6cb6501bc303fbb2fa061fff272d9dce171216a7c58eb8fc6980c50b7c8c08b",
+      "references": [
+        {
+          "role": "public-call",
+          "expression": "normalizePassiveListenerOptions({\n  passive: true,\n  capture: true,\n})"
+        }
+      ]
+    },
+    {
+      "file": "legacy-core/ripple/ripple-renderer.ts",
+      "module": "@angular/cdk/a11y",
+      "symbol": "isFakeMousedownFromScreenReader",
+      "candidate_source_sha256": "e6cb6501bc303fbb2fa061fff272d9dce171216a7c58eb8fc6980c50b7c8c08b",
+      "references": [
+        {
+          "role": "public-call",
+          "expression": "isFakeMousedownFromScreenReader(event)"
+        }
+      ]
+    },
+    {
+      "file": "legacy-core/ripple/ripple-renderer.ts",
+      "module": "@angular/cdk/a11y",
+      "symbol": "isFakeTouchstartFromScreenReader",
+      "candidate_source_sha256": "e6cb6501bc303fbb2fa061fff272d9dce171216a7c58eb8fc6980c50b7c8c08b",
+      "references": [
+        {
+          "role": "public-call",
+          "expression": "isFakeTouchstartFromScreenReader(event)"
+        }
+      ]
+    },
+    {
+      "file": "legacy-core/ripple/ripple-renderer.ts",
+      "module": "@angular/cdk/coercion",
+      "symbol": "coerceElement",
+      "candidate_source_sha256": "e6cb6501bc303fbb2fa061fff272d9dce171216a7c58eb8fc6980c50b7c8c08b",
+      "references": [
+        {
+          "role": "public-call",
+          "expression": "coerceElement(elementOrElementRef)"
+        },
+        {
+          "role": "public-call",
+          "expression": "coerceElement(elementOrElementRef)"
+        }
+      ]
+    }
+  ],
+  "public_zone_accesses": [
+    {
+      "file": "legacy-core/ripple/ripple-renderer.ts",
+      "line": 132,
+      "member": "runOutsideAngular",
+      "expression": "this._ngZone.runOutsideAngular",
+      "source_sha256": "e6cb6501bc303fbb2fa061fff272d9dce171216a7c58eb8fc6980c50b7c8c08b",
+      "receiver_declarations": [
+        {
+          "file": "legacy-core/ripple/ripple-renderer.ts",
+          "line": 68
+        }
+      ]
+    },
+    {
+      "file": "legacy-core/ripple/ripple-renderer.ts",
+      "line": 188,
+      "member": "runOutsideAngular",
+      "expression": "this._ngZone.runOutsideAngular",
+      "source_sha256": "e6cb6501bc303fbb2fa061fff272d9dce171216a7c58eb8fc6980c50b7c8c08b",
+      "receiver_declarations": [
+        {
+          "file": "legacy-core/ripple/ripple-renderer.ts",
+          "line": 68
+        }
+      ]
+    },
+    {
+      "file": "legacy-core/ripple/ripple-renderer.ts",
+      "line": 239,
+      "member": "runOutsideAngular",
+      "expression": "this._ngZone.runOutsideAngular",
+      "source_sha256": "e6cb6501bc303fbb2fa061fff272d9dce171216a7c58eb8fc6980c50b7c8c08b",
+      "receiver_declarations": [
+        {
+          "file": "legacy-core/ripple/ripple-renderer.ts",
+          "line": 68
+        }
+      ]
+    }
+  ],
+  "owned_zone_forwarding": [
+    {
+      "file": "legacy-core/ripple/ripple-renderer.ts",
+      "line": 225,
+      "target": "LegacyRippleRenderer._eventManager.addHandler",
+      "kind": "call",
+      "argument": "this._ngZone",
+      "source_sha256": "e6cb6501bc303fbb2fa061fff272d9dce171216a7c58eb8fc6980c50b7c8c08b"
+    }
+  ],
+  "platform_member_reads": [
+    "isBrowser",
+    "isBrowser"
+  ],
+  "subjects": [
+    {
+      "line": "original",
+      "cdk_version": "16.2.14",
+      "bodies": {
+        "normalizePassiveListenerOptions": "function normalizePassiveListenerOptions(options) { return supportsPassiveEventListeners() ? options : !!options.capture; }",
+        "supportsPassiveEventListeners": "function supportsPassiveEventListeners() { if (supportsPassiveEvents == null && typeof window !== 'undefined') { try { window.addEventListener('test', null, Object.defineProperty({}, 'passive', { get: () => supportsPassiveEvents = true })); } finally { supportsPassiveEvents = supportsPassiveEvents || false; } } return supportsPassiveEvents; }",
+        "isFakeMousedownFromScreenReader": "function isFakeMousedownFromScreenReader(event) { return event.buttons === 0 || event.detail === 0; }",
+        "isFakeTouchstartFromScreenReader": "function isFakeTouchstartFromScreenReader(event) { const touch = event.touches && event.touches[0] || event.changedTouches && event.changedTouches[0]; return !!touch && touch.identifier === -1 && (touch.radiusX == null || touch.radiusX === 1) && (touch.radiusY == null || touch.radiusY === 1); }",
+        "coerceElement": "function coerceElement(elementOrRef) { return elementOrRef instanceof ElementRef ? elementOrRef.nativeElement : elementOrRef; }",
+        "Platform": "_platformId ? isPlatformBrowser(_platformId) : typeof document === 'object' && !!document",
+        "NgZone": "runOutsideAngular(fn) { return this._outer.run(fn); }"
+      },
+      "declarations": {
+        "normalizePassiveListenerOptions": "declare function normalizePassiveListenerOptions(options: AddEventListenerOptions): AddEventListenerOptions | boolean;",
+        "isFakeMousedownFromScreenReader": "declare function isFakeMousedownFromScreenReader(event: MouseEvent): boolean;",
+        "isFakeTouchstartFromScreenReader": "declare function isFakeTouchstartFromScreenReader(event: TouchEvent): boolean;",
+        "coerceElement": "declare function coerceElement<T>(elementOrRef: ElementRef<T> | T): T;",
+        "Platform": "public isBrowser:boolean",
+        "NgZone": "runOutsideAngular<T>(fn: (...args: any[]) => T): T;"
+      },
+      "whole_members": [
+        {
+          "symbol": "normalizePassiveListenerOptions",
+          "kind": "runtime",
+          "path": "@angular/cdk/fesm2022/platform.mjs",
+          "sha256": "563703d7f97eb68a4eb11def16e9ba7e16c959181a6cae7c647da37f9137e836"
+        },
+        {
+          "symbol": "normalizePassiveListenerOptions",
+          "kind": "types",
+          "path": "@angular/cdk/platform/index.d.ts",
+          "sha256": "2a7e6241c05770b21ac324f8d6162f53d54f2278cc532a90d21ad7f3c9d6d5f2"
+        },
+        {
+          "symbol": "supportsPassiveEventListeners",
+          "kind": "runtime",
+          "path": "@angular/cdk/fesm2022/platform.mjs",
+          "sha256": "563703d7f97eb68a4eb11def16e9ba7e16c959181a6cae7c647da37f9137e836"
+        },
+        {
+          "symbol": "isFakeMousedownFromScreenReader",
+          "kind": "runtime",
+          "path": "@angular/cdk/fesm2022/a11y.mjs",
+          "sha256": "20fd67cd6c248220d6d40af5d82accc7cdd7299d9fd53e6d286c2e43035efc56"
+        },
+        {
+          "symbol": "isFakeMousedownFromScreenReader",
+          "kind": "types",
+          "path": "@angular/cdk/a11y/index.d.ts",
+          "sha256": "ed9103e5f0877a65229960ef138b193333a36259238bddb91ac839fe37bb2a17"
+        },
+        {
+          "symbol": "isFakeTouchstartFromScreenReader",
+          "kind": "runtime",
+          "path": "@angular/cdk/fesm2022/a11y.mjs",
+          "sha256": "20fd67cd6c248220d6d40af5d82accc7cdd7299d9fd53e6d286c2e43035efc56"
+        },
+        {
+          "symbol": "isFakeTouchstartFromScreenReader",
+          "kind": "types",
+          "path": "@angular/cdk/a11y/index.d.ts",
+          "sha256": "ed9103e5f0877a65229960ef138b193333a36259238bddb91ac839fe37bb2a17"
+        },
+        {
+          "symbol": "coerceElement",
+          "kind": "runtime",
+          "path": "@angular/cdk/fesm2022/coercion.mjs",
+          "sha256": "00a2c7cf54b95e05479ad09cfe2653243bf8bbb01acb0e550381cd115896af0d"
+        },
+        {
+          "symbol": "coerceElement",
+          "kind": "types",
+          "path": "@angular/cdk/coercion/index.d.ts",
+          "sha256": "ddf66648b065311cbc226d6585caa14b37f461698d525857aff60c988b66a6c9"
+        },
+        {
+          "symbol": "Platform",
+          "kind": "runtime",
+          "path": "@angular/cdk/fesm2022/platform.mjs",
+          "sha256": "563703d7f97eb68a4eb11def16e9ba7e16c959181a6cae7c647da37f9137e836"
+        },
+        {
+          "symbol": "Platform",
+          "kind": "types",
+          "path": "@angular/cdk/platform/index.d.ts",
+          "sha256": "2a7e6241c05770b21ac324f8d6162f53d54f2278cc532a90d21ad7f3c9d6d5f2"
+        },
+        {
+          "symbol": "NgZone",
+          "kind": "runtime",
+          "path": "@angular/core/fesm2022/core.mjs",
+          "sha256": "c9a01bde3197fd5498d145e7dd6864651ee11de5f74201e08be1eac9dfb013a8"
+        },
+        {
+          "symbol": "NgZone",
+          "kind": "types",
+          "path": "@angular/core/index.d.ts",
+          "sha256": "9fedfcf08d61d0709a96f157bab028ce05c7fe27a0c179e12e19b00922052fab"
+        }
+      ]
+    },
+    {
+      "line": "main",
+      "cdk_version": "22.1.7",
+      "bodies": {
+        "normalizePassiveListenerOptions": "function normalizePassiveListenerOptions(options) { return supportsPassiveEventListeners() ? options : !!options.capture; }",
+        "supportsPassiveEventListeners": "function supportsPassiveEventListeners() { if (supportsPassiveEvents == null && typeof window !== 'undefined') { try { window.addEventListener('test', null, Object.defineProperty({}, 'passive', { get: () => supportsPassiveEvents = true })); } finally { supportsPassiveEvents = supportsPassiveEvents || false; } } return supportsPassiveEvents; }",
+        "isFakeMousedownFromScreenReader": "function isFakeMousedownFromScreenReader(event) { return event.buttons === 0 || event.detail === 0; }",
+        "isFakeTouchstartFromScreenReader": "function isFakeTouchstartFromScreenReader(event) { const touch = event.touches && event.touches[0] || event.changedTouches && event.changedTouches[0]; return !!touch && touch.identifier === -1 && (touch.radiusX == null || touch.radiusX === 1) && (touch.radiusY == null || touch.radiusY === 1); }",
+        "coerceElement": "function coerceElement(elementOrRef) { return elementOrRef instanceof ElementRef ? elementOrRef.nativeElement : elementOrRef; }",
+        "Platform": "_platformId ? isPlatformBrowser(_platformId) : typeof document === 'object' && !!document",
+        "NgZone": "runOutsideAngular(fn) { return this._outer.run(fn); }"
+      },
+      "declarations": {
+        "normalizePassiveListenerOptions": "declare function normalizePassiveListenerOptions(options: AddEventListenerOptions): AddEventListenerOptions | boolean;",
+        "isFakeMousedownFromScreenReader": "declare function isFakeMousedownFromScreenReader(event: MouseEvent): boolean;",
+        "isFakeTouchstartFromScreenReader": "declare function isFakeTouchstartFromScreenReader(event: TouchEvent): boolean;",
+        "coerceElement": "declare function coerceElement<T>(elementOrRef: ElementRef<T> | T): T;",
+        "Platform": "public isBrowser:boolean",
+        "NgZone": "runOutsideAngular<T>(fn: (...args: any[]) => T): T;"
+      },
+      "whole_members": [
+        {
+          "symbol": "normalizePassiveListenerOptions",
+          "kind": "runtime",
+          "path": "@angular/cdk/fesm2022/_passive-listeners-chunk.mjs",
+          "sha256": "7773842912be5590f727ca1fbbbc349fa71b4fb0d9d5ee125aa0ad88de9e3cbe"
+        },
+        {
+          "symbol": "normalizePassiveListenerOptions",
+          "kind": "types",
+          "path": "@angular/cdk/types/platform.d.ts",
+          "sha256": "43070746987eb03aada20e6c9999c0155e4649b7e7a317b318226d0107051496"
+        },
+        {
+          "symbol": "supportsPassiveEventListeners",
+          "kind": "runtime",
+          "path": "@angular/cdk/fesm2022/_passive-listeners-chunk.mjs",
+          "sha256": "7773842912be5590f727ca1fbbbc349fa71b4fb0d9d5ee125aa0ad88de9e3cbe"
+        },
+        {
+          "symbol": "isFakeMousedownFromScreenReader",
+          "kind": "runtime",
+          "path": "@angular/cdk/fesm2022/_fake-event-detection-chunk.mjs",
+          "sha256": "c0a3ee4354b15e99157782330c2fa18e026943c189b6f3c46496b4dc400e01cf"
+        },
+        {
+          "symbol": "isFakeMousedownFromScreenReader",
+          "kind": "types",
+          "path": "@angular/cdk/types/a11y.d.ts",
+          "sha256": "d3c1b9be3d42573c4ef2bea969a3749c41bd26f86f89d8a921cdc5ce3ae73be6"
+        },
+        {
+          "symbol": "isFakeTouchstartFromScreenReader",
+          "kind": "runtime",
+          "path": "@angular/cdk/fesm2022/_fake-event-detection-chunk.mjs",
+          "sha256": "c0a3ee4354b15e99157782330c2fa18e026943c189b6f3c46496b4dc400e01cf"
+        },
+        {
+          "symbol": "isFakeTouchstartFromScreenReader",
+          "kind": "types",
+          "path": "@angular/cdk/types/a11y.d.ts",
+          "sha256": "d3c1b9be3d42573c4ef2bea969a3749c41bd26f86f89d8a921cdc5ce3ae73be6"
+        },
+        {
+          "symbol": "coerceElement",
+          "kind": "runtime",
+          "path": "@angular/cdk/fesm2022/_element-chunk.mjs",
+          "sha256": "c6873321426cc9b75d4106149027c34bf0b513da2f262997e9e02aa323ca3027"
+        },
+        {
+          "symbol": "coerceElement",
+          "kind": "types",
+          "path": "@angular/cdk/types/coercion.d.ts",
+          "sha256": "1aa6bcf3982760e6fb605975f64b28374b608256baf9c0730140a3697de1a4c9"
+        },
+        {
+          "symbol": "Platform",
+          "kind": "runtime",
+          "path": "@angular/cdk/fesm2022/_platform-chunk.mjs",
+          "sha256": "d0275ce933f6de1a3979f45253000ba243f51125d36400a8628540607b62aefd"
+        },
+        {
+          "symbol": "Platform",
+          "kind": "types",
+          "path": "@angular/cdk/types/_platform-chunk.d.ts",
+          "sha256": "243c0912f4380940ca17b8f62779a431d9c59dd428682e3630c12d6d88e209b5"
+        },
+        {
+          "symbol": "NgZone",
+          "kind": "runtime",
+          "path": "@angular/core/fesm2022/_pending_tasks-chunk.mjs",
+          "sha256": "6541e20d7b33de200a7fb5d4a073dc1df9cdbd710ff482999f7e2cb0ec7f40fc"
+        },
+        {
+          "symbol": "NgZone",
+          "kind": "types",
+          "path": "@angular/core/types/_debug_node-chunk.d.ts",
+          "sha256": "359fdc800f92be1be371c69aa3a01c902976e8de13520eaf03dd5c85160e628b"
+        }
+      ]
+    },
+    {
+      "line": "21.x",
+      "cdk_version": "21.2.14",
+      "bodies": {
+        "normalizePassiveListenerOptions": "function normalizePassiveListenerOptions(options) { return supportsPassiveEventListeners() ? options : !!options.capture; }",
+        "supportsPassiveEventListeners": "function supportsPassiveEventListeners() { if (supportsPassiveEvents == null && typeof window !== 'undefined') { try { window.addEventListener('test', null, Object.defineProperty({}, 'passive', { get: () => supportsPassiveEvents = true })); } finally { supportsPassiveEvents = supportsPassiveEvents || false; } } return supportsPassiveEvents; }",
+        "isFakeMousedownFromScreenReader": "function isFakeMousedownFromScreenReader(event) { return event.buttons === 0 || event.detail === 0; }",
+        "isFakeTouchstartFromScreenReader": "function isFakeTouchstartFromScreenReader(event) { const touch = event.touches && event.touches[0] || event.changedTouches && event.changedTouches[0]; return !!touch && touch.identifier === -1 && (touch.radiusX == null || touch.radiusX === 1) && (touch.radiusY == null || touch.radiusY === 1); }",
+        "coerceElement": "function coerceElement(elementOrRef) { return elementOrRef instanceof ElementRef ? elementOrRef.nativeElement : elementOrRef; }",
+        "Platform": "_platformId ? isPlatformBrowser(_platformId) : typeof document === 'object' && !!document",
+        "NgZone": "runOutsideAngular(fn) { return this._outer.run(fn); }"
+      },
+      "declarations": {
+        "normalizePassiveListenerOptions": "declare function normalizePassiveListenerOptions(options: AddEventListenerOptions): AddEventListenerOptions | boolean;",
+        "isFakeMousedownFromScreenReader": "declare function isFakeMousedownFromScreenReader(event: MouseEvent): boolean;",
+        "isFakeTouchstartFromScreenReader": "declare function isFakeTouchstartFromScreenReader(event: TouchEvent): boolean;",
+        "coerceElement": "declare function coerceElement<T>(elementOrRef: ElementRef<T> | T): T;",
+        "Platform": "public isBrowser:boolean",
+        "NgZone": "runOutsideAngular<T>(fn: (...args: any[]) => T): T;"
+      },
+      "whole_members": [
+        {
+          "symbol": "normalizePassiveListenerOptions",
+          "kind": "runtime",
+          "path": "@angular/cdk/fesm2022/_passive-listeners-chunk.mjs",
+          "sha256": "7773842912be5590f727ca1fbbbc349fa71b4fb0d9d5ee125aa0ad88de9e3cbe"
+        },
+        {
+          "symbol": "normalizePassiveListenerOptions",
+          "kind": "types",
+          "path": "@angular/cdk/types/platform.d.ts",
+          "sha256": "43070746987eb03aada20e6c9999c0155e4649b7e7a317b318226d0107051496"
+        },
+        {
+          "symbol": "supportsPassiveEventListeners",
+          "kind": "runtime",
+          "path": "@angular/cdk/fesm2022/_passive-listeners-chunk.mjs",
+          "sha256": "7773842912be5590f727ca1fbbbc349fa71b4fb0d9d5ee125aa0ad88de9e3cbe"
+        },
+        {
+          "symbol": "isFakeMousedownFromScreenReader",
+          "kind": "runtime",
+          "path": "@angular/cdk/fesm2022/_fake-event-detection-chunk.mjs",
+          "sha256": "c0a3ee4354b15e99157782330c2fa18e026943c189b6f3c46496b4dc400e01cf"
+        },
+        {
+          "symbol": "isFakeMousedownFromScreenReader",
+          "kind": "types",
+          "path": "@angular/cdk/types/a11y.d.ts",
+          "sha256": "c7cb507235c6a481ec46b581092a0855986e1c817b798221e7da56eb2e25ce16"
+        },
+        {
+          "symbol": "isFakeTouchstartFromScreenReader",
+          "kind": "runtime",
+          "path": "@angular/cdk/fesm2022/_fake-event-detection-chunk.mjs",
+          "sha256": "c0a3ee4354b15e99157782330c2fa18e026943c189b6f3c46496b4dc400e01cf"
+        },
+        {
+          "symbol": "isFakeTouchstartFromScreenReader",
+          "kind": "types",
+          "path": "@angular/cdk/types/a11y.d.ts",
+          "sha256": "c7cb507235c6a481ec46b581092a0855986e1c817b798221e7da56eb2e25ce16"
+        },
+        {
+          "symbol": "coerceElement",
+          "kind": "runtime",
+          "path": "@angular/cdk/fesm2022/_element-chunk.mjs",
+          "sha256": "c6873321426cc9b75d4106149027c34bf0b513da2f262997e9e02aa323ca3027"
+        },
+        {
+          "symbol": "coerceElement",
+          "kind": "types",
+          "path": "@angular/cdk/types/coercion.d.ts",
+          "sha256": "1aa6bcf3982760e6fb605975f64b28374b608256baf9c0730140a3697de1a4c9"
+        },
+        {
+          "symbol": "Platform",
+          "kind": "runtime",
+          "path": "@angular/cdk/fesm2022/_platform-chunk.mjs",
+          "sha256": "7665177cc8f2da8a68f7aa5cd37b5dfe895d60178544117215f57e0af5be249d"
+        },
+        {
+          "symbol": "Platform",
+          "kind": "types",
+          "path": "@angular/cdk/types/_platform-chunk.d.ts",
+          "sha256": "91d9de4d3888ec1767f406307b333103aeb33469f81a8f8743ece26549f8f856"
+        },
+        {
+          "symbol": "NgZone",
+          "kind": "runtime",
+          "path": "@angular/core/fesm2022/_effect-chunk2.mjs",
+          "sha256": "7f0451bc3f7cea99de98a6b3635b3d8102b49825f0163faee5568c52330cb8b0"
+        },
+        {
+          "symbol": "NgZone",
+          "kind": "types",
+          "path": "@angular/core/types/_discovery-chunk.d.ts",
+          "sha256": "779438592d99f241f4f0c961f3973595d4473883630b81c5b19b5d1b79329211"
+        }
+      ]
+    }
+  ],
+  "stable_public_functions_and_consumed_platform_field": true,
+  "source_override_used": false,
+  "scope": "Six exact frozen owned renderer import contracts. Complete tagged/minimum CDK function bodies and public declarations plus consumed Platform.isBrowser match; supportsPassive implementation inspected within public module, never imported by product. NgZone public proof/runtime is separate; constructor acquisition differences do not authorize manual current Platform construction outside DI. Native/browser hydration, whole consumer/full floors and all SHA audits remain separate."
+}
