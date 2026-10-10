@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "role": "Read-only Cyph render-injector source sanity; no consumer build",
+  "recorded_at_utc": "2026-10-10T21:54:05.901127+00:00",
+  "source_commit": "a56a0603636cac5aaabe8fe408f7429b4224f011",
+  "source_clean": true,
+  "command": [
+    "rg",
+    "-n",
+    "\\b(Mat(Legacy)?FormField|Mat(Legacy)?Select|afterLegacyRender|afterFormFieldRender|afterSelectRender|tabHeaderRenderInjector|afterTabHeaderRender|afterTooltipRender)\\b",
+    "shared/js",
+    "--glob",
+    "*.ts",
+    "--glob",
+    "*.tsx"
+  ],
+  "exit_code": 0,
+  "stdout": "shared/js/cyph/components/email-view/email-view.component.ts:11:import {MatLegacySelect as MatSelect} from '@angular/material/legacy-select';\nshared/js/cyph/components/email-view/email-view.component.ts:41:\t@ViewChild('attachmentsDropdown', {read: MatSelect})\nshared/js/cyph/components/email-view/email-view.component.ts:42:\tpublic attachmentsDropdown?: MatSelect;\nshared/js/cyph/components/email-compose/email-compose.component.ts:13:import {MatLegacySelect as MatSelect} from '@angular/material/legacy-select';\nshared/js/cyph/components/email-compose/email-compose.component.ts:58:\t@ViewChild('attachmentsDropdown', {read: MatSelect})\nshared/js/cyph/components/email-compose/email-compose.component.ts:59:\tpublic attachmentsDropdown?: MatSelect;\n",
+  "sources": [
+    {
+      "path": "shared/js/cyph/components/email-compose/email-compose.component.ts",
+      "sha256": "54885c76d15a7a1755d651f9a8188e5095a337f2270a75a0d2d21f66a5678574"
+    },
+    {
+      "path": "shared/js/cyph/components/email-view/email-view.component.ts",
+      "sha256": "2ad0aab4bd120265bfb7b8b962be319c64283c593848daa92b987a3127d96ea0"
+    }
+  ],
+  "consumer_files_written": false,
+  "consumer_build_executed": false,
+  "candidate_API_HTML_CSS_SCSS_changes_in_this_step": false,
+  "scope": "Named TS/TSX references and contextual source inspection only. Alias-complete consumer API and rendered geometry qualification remain separate."
+}
