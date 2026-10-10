@@ -1,0 +1,389 @@
+{
+  "schema_version": 1,
+  "role": "Owned legacy viewport native primitives vs independent untouched tagged execution; source/synthetic window/clock only",
+  "node": "v22.23.3",
+  "compiler": "6.0.3",
+  "source": {
+    "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.ts",
+    "sha256": "522d8dfc0362b7ed01b6dc9155a10d7f36f67aef4152249f56db1f631ad935b0"
+  },
+  "untouched_reference": {
+    "path": "reference/material-16.2.14/viewport-sources/viewport-ruler.ts",
+    "sha256": "2cd3078732370fd98fad1fdf1c443acbaab5b5986fbf3cadd7ff546d51c3ed76"
+  },
+  "original": [
+    {
+      "id": "one-owner-two-native-listeners-outside-zone",
+      "result": "pass",
+      "value": {
+        "registrations": [
+          {
+            "name": "resize",
+            "outside": true
+          },
+          {
+            "name": "orientationchange",
+            "outside": true
+          }
+        ],
+        "removals": [
+          "resize",
+          "orientationchange"
+        ]
+      }
+    },
+    {
+      "id": "size-copies-cache-and-default-twenty-ms-invalidation",
+      "result": "pass",
+      "value": {
+        "size": {
+          "width": 820,
+          "height": 480
+        },
+        "reads": 2
+      }
+    },
+    {
+      "id": "default-change-audits-latest-event-and-cache-is-invalidated-first",
+      "result": "pass",
+      "value": [
+        [
+          "orientationchange",
+          900
+        ]
+      ]
+    },
+    {
+      "id": "nonpositive-0-shares-synchronous-subject",
+      "result": "pass",
+      "value": [
+        "resize"
+      ]
+    },
+    {
+      "id": "nonpositive--1-shares-synchronous-subject",
+      "result": "pass",
+      "value": [
+        "resize"
+      ]
+    },
+    {
+      "id": "one-fifty-ms-control-stream-keeps-last-event",
+      "result": "pass",
+      "value": [
+        "orientationchange"
+      ]
+    },
+    {
+      "id": "pinch-zoom-client-rect-precedes-scroll-properties",
+      "result": "pass",
+      "value": {
+        "top": 41.25,
+        "left": 52.5,
+        "bottom": 521.25,
+        "right": 692.5,
+        "height": 480,
+        "width": 640
+      }
+    },
+    {
+      "id": "body-window-element-zero-scroll-fallback-order",
+      "result": "pass",
+      "value": [
+        {
+          "top": 7,
+          "left": 11
+        },
+        {
+          "top": 13,
+          "left": 17
+        },
+        {
+          "top": 23,
+          "left": 29
+        },
+        {
+          "top": 0,
+          "left": 0
+        }
+      ]
+    },
+    {
+      "id": "document-default-view-and-global-window-fallback",
+      "result": "pass",
+      "value": {
+        "top": 41.25,
+        "left": 52.5,
+        "bottom": 521.25,
+        "right": 692.5,
+        "height": 480,
+        "width": 640
+      }
+    },
+    {
+      "id": "nonbrowser-geometry-has-no-listeners-or-scroll-reads",
+      "result": "pass",
+      "value": {
+        "rect": {
+          "top": 0,
+          "left": 0,
+          "bottom": 0,
+          "right": 0,
+          "height": 0,
+          "width": 0
+        },
+        "registrations": []
+      }
+    },
+    {
+      "id": "destroy-removes-events-completes-own-stream-without-destroying-borrowed-values",
+      "result": "pass",
+      "value": {
+        "got": [
+          "resize"
+        ],
+        "complete": 1,
+        "removals": [
+          "resize",
+          "orientationchange"
+        ]
+      }
+    },
+    {
+      "id": "pending-audit-completion-remains-peer-operator-behavior",
+      "result": "pass",
+      "value": [
+        "resize",
+        "complete"
+      ]
+    },
+    {
+      "id": "unsubscribed-control-stream-does-not-complete-root-stream",
+      "result": "pass",
+      "value": [
+        "resize",
+        "orientationchange"
+      ]
+    }
+  ],
+  "candidate": [
+    {
+      "id": "one-owner-two-native-listeners-outside-zone",
+      "result": "pass",
+      "value": {
+        "registrations": [
+          {
+            "name": "resize",
+            "outside": true
+          },
+          {
+            "name": "orientationchange",
+            "outside": true
+          }
+        ],
+        "removals": [
+          "resize",
+          "orientationchange"
+        ]
+      }
+    },
+    {
+      "id": "size-copies-cache-and-default-twenty-ms-invalidation",
+      "result": "pass",
+      "value": {
+        "size": {
+          "width": 820,
+          "height": 480
+        },
+        "reads": 2
+      }
+    },
+    {
+      "id": "default-change-audits-latest-event-and-cache-is-invalidated-first",
+      "result": "pass",
+      "value": [
+        [
+          "orientationchange",
+          900
+        ]
+      ]
+    },
+    {
+      "id": "nonpositive-0-shares-synchronous-subject",
+      "result": "pass",
+      "value": [
+        "resize"
+      ]
+    },
+    {
+      "id": "nonpositive--1-shares-synchronous-subject",
+      "result": "pass",
+      "value": [
+        "resize"
+      ]
+    },
+    {
+      "id": "one-fifty-ms-control-stream-keeps-last-event",
+      "result": "pass",
+      "value": [
+        "orientationchange"
+      ]
+    },
+    {
+      "id": "pinch-zoom-client-rect-precedes-scroll-properties",
+      "result": "pass",
+      "value": {
+        "top": 41.25,
+        "left": 52.5,
+        "bottom": 521.25,
+        "right": 692.5,
+        "height": 480,
+        "width": 640
+      }
+    },
+    {
+      "id": "body-window-element-zero-scroll-fallback-order",
+      "result": "pass",
+      "value": [
+        {
+          "top": 7,
+          "left": 11
+        },
+        {
+          "top": 13,
+          "left": 17
+        },
+        {
+          "top": 23,
+          "left": 29
+        },
+        {
+          "top": 0,
+          "left": 0
+        }
+      ]
+    },
+    {
+      "id": "document-default-view-and-global-window-fallback",
+      "result": "pass",
+      "value": {
+        "top": 41.25,
+        "left": 52.5,
+        "bottom": 521.25,
+        "right": 692.5,
+        "height": 480,
+        "width": 640
+      }
+    },
+    {
+      "id": "nonbrowser-geometry-has-no-listeners-or-scroll-reads",
+      "result": "pass",
+      "value": {
+        "rect": {
+          "top": 0,
+          "left": 0,
+          "bottom": 0,
+          "right": 0,
+          "height": 0,
+          "width": 0
+        },
+        "registrations": []
+      }
+    },
+    {
+      "id": "destroy-removes-events-completes-own-stream-without-destroying-borrowed-values",
+      "result": "pass",
+      "value": {
+        "got": [
+          "resize"
+        ],
+        "complete": 1,
+        "removals": [
+          "resize",
+          "orientationchange"
+        ]
+      }
+    },
+    {
+      "id": "pending-audit-completion-remains-peer-operator-behavior",
+      "result": "pass",
+      "value": [
+        "resize",
+        "complete"
+      ]
+    },
+    {
+      "id": "unsubscribed-control-stream-does-not-complete-root-stream",
+      "result": "pass",
+      "value": [
+        "resize",
+        "orientationchange"
+      ]
+    }
+  ],
+  "mutations": [
+    {
+      "id": "default-delay-one",
+      "rejected": true,
+      "failed_cases": [
+        "size-copies-cache-and-default-twenty-ms-invalidation",
+        "default-change-audits-latest-event-and-cache-is-invalidated-first"
+      ]
+    },
+    {
+      "id": "no-orientation-listener",
+      "rejected": true,
+      "failed_cases": [
+        "one-owner-two-native-listeners-outside-zone",
+        "default-change-audits-latest-event-and-cache-is-invalidated-first",
+        "one-fifty-ms-control-stream-keeps-last-event",
+        "unsubscribed-control-stream-does-not-complete-root-stream"
+      ]
+    },
+    {
+      "id": "cache-invalidates-immediately",
+      "rejected": true,
+      "failed_cases": [
+        "size-copies-cache-and-default-twenty-ms-invalidation"
+      ]
+    },
+    {
+      "id": "cache-exposed-to-callers",
+      "rejected": true,
+      "failed_cases": [
+        "size-copies-cache-and-default-twenty-ms-invalidation"
+      ]
+    },
+    {
+      "id": "window-scroll-before-client-rect",
+      "rejected": true,
+      "failed_cases": [
+        "pinch-zoom-client-rect-precedes-scroll-properties",
+        "body-window-element-zero-scroll-fallback-order",
+        "document-default-view-and-global-window-fallback"
+      ]
+    },
+    {
+      "id": "no-listener-removal",
+      "rejected": true,
+      "failed_cases": [
+        "one-owner-two-native-listeners-outside-zone",
+        "destroy-removes-events-completes-own-stream-without-destroying-borrowed-values"
+      ]
+    },
+    {
+      "id": "no-root-completion",
+      "rejected": true,
+      "failed_cases": [
+        "destroy-removes-events-completes-own-stream-without-destroying-borrowed-values",
+        "pending-audit-completion-remains-peer-operator-behavior"
+      ]
+    }
+  ],
+  "limits": [
+    "Reference bytes remain untouched; only its DOCUMENT import resolves to the current public Core token for manual constructor execution.",
+    "Both classes execute against the same borrowed installed RxJS/Angular22 runtime with synthetic windows/geometry/clock.",
+    "Cache/event/scroll observations come from tagged code, not candidate expectations or current private ruler execution.",
+    "No native Angular zoneful/zoneless/root-singleton/AOT/packed/actual21/minimum/floor qualification."
+  ]
+}
