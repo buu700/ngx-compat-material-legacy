@@ -26,18 +26,20 @@ export function legacyFormFieldOutlineSequenceOkay(rows) {
 
 export async function observeLegacyFormFieldOutlineNative({evaluate}) {
   try {
-    return await evaluate(`(() => {
-      const host=document.getElementById('ff-outline'),container=host?.querySelector('.mat-form-field-flex'),label=host?.querySelector('.mat-form-field-label');
-      if(!host||!container||!label||!label.children.length)return null;
-      const direction=getComputedStyle(host).direction,r=container.getBoundingClientRect(),first=label.children[0].getBoundingClientRect();
-      const edge=rect=>direction==='rtl'?rect.right:rect.left;
-      const labelWidth=Array.from(label.children).reduce((total,child)=>total+child.offsetWidth,0);
-      return {visible:host.getBoundingClientRect().width>0&&host.getBoundingClientRect().height>0,
-        historical_host:host.tagName==='MAT-FORM-FIELD'&&host.classList.contains('mat-form-field-appearance-outline'),
-        direction,label_children:label.children.length,container_width:r.width,
-        expected_start:Math.abs(edge(first)-edge(r))-5,expected_gap:labelWidth>0?labelWidth*0.75+10:0,
-        start_widths:Array.from(container.querySelectorAll('.mat-form-field-outline-start')).map(node=>parseFloat(node.style.width)),
-        gap_widths:Array.from(container.querySelectorAll('.mat-form-field-outline-gap')).map(node=>parseFloat(node.style.width))};
-    })()`);
+    return await evaluate(`(${readLegacyFormFieldOutlineNative.toString()})(document.getElementById('ff-outline'))`);
   } catch(error){return {error:String(error.message||error)};}
+}
+
+export function readLegacyFormFieldOutlineNative(host) {
+  const container=host?.querySelector('.mat-form-field-flex'),label=host?.querySelector('.mat-form-field-label');
+  if(!host||!container||!label||!label.children.length)return null;
+  const direction=getComputedStyle(host).direction,r=container.getBoundingClientRect(),first=label.children[0].getBoundingClientRect();
+  const edge=rect=>direction==='rtl'?rect.right:rect.left;
+  const labelWidth=Array.from(label.children).reduce((total,child)=>total+child.offsetWidth,0);
+  return {visible:host.getBoundingClientRect().width>0&&host.getBoundingClientRect().height>0,
+    historical_host:host.tagName==='MAT-FORM-FIELD'&&host.classList.contains('mat-form-field-appearance-outline'),
+    direction,label_children:label.children.length,container_width:r.width,
+    expected_start:Math.abs(edge(first)-edge(r))-5,expected_gap:labelWidth>0?labelWidth*0.75+10:0,
+    start_widths:Array.from(container.querySelectorAll('.mat-form-field-outline-start')).map(node=>parseFloat(node.style.width)),
+    gap_widths:Array.from(container.querySelectorAll('.mat-form-field-outline-gap')).map(node=>parseFloat(node.style.width))};
 }

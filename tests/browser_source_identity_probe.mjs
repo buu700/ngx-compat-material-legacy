@@ -27,6 +27,7 @@ try {
       'browser-matrix-roster', 'browser-required-cells', 'chromium-debug-endpoint',
       'tooltip-aria-lifetime-fixture', 'legacy-tooltip-native-contract',
       'legacy-ink-bar-native-contract', 'legacy-select-font-native-contract', 'legacy-chip-blur-native-contract',
+      'legacy-form-field-outline-native-contract',
       'safe-package-extract', 'packed-consumer-evidence'].map(name => `scripts/${name}.mjs`),
     'projects/ngx-material-legacy/package.json', 'testing/legacy-runner/historical-inventory.json',
     'compatibility/rc/matrices/full-verify.json',

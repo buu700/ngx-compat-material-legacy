@@ -16,6 +16,7 @@ const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 function fixture(family, faults = {}, source = raw) {
   const window = {}, jobs = new Map(), classes = name => ({contains: value => name === value});
   let now = 0, serial = 0, selected = 0, selectOpen = false, focused = false, touched = false;
+  let outlineVisible = true, outlinePrefix = false, direction = 'ltr';
   const clicked = [], surface = {setAttribute() {}};
   const labels = [0, 1].map(index => ({offsetLeft: index * 100, offsetWidth: 100,
     click() {clicked.push(index); selected = index;}}));
@@ -40,12 +41,38 @@ function fixture(family, faults = {}, source = raw) {
     if (!faults.noDomFocusMove || !focused) document.activeElement = target;
     if (focused) {focused = !!faults.blurStaysFocused; if (!faults.noTouched) touched = true;}
   }};
+  const startWidth = () => (outlinePrefix ? 45 : 15) +
+    (faults.wrongOutlineStart || (faults.wrongRtlStart && direction === 'rtl') ? 10 : 0);
+  const container = {getBoundingClientRect: () => ({left: 0, right: 300, width: 300}),
+    querySelectorAll: selector => [0, 1].map(() => ({style: {width: String(
+      selector === '.mat-form-field-outline-start' ? startWidth() : faults.wrongOutlineGap ? 80 : 70) + 'px'}}))};
+  const label = {children: [{offsetWidth: 80, getBoundingClientRect: () => ({left: outlinePrefix ? 50 : 20, right: 280})}]};
+  const outline = {tagName: 'MAT-FORM-FIELD', classList: classes('mat-form-field-appearance-outline'),
+    getBoundingClientRect: () => ({width: outlineVisible ? 300 : 0, height: outlineVisible ? 50 : 0}),
+    get computed() {return {direction};}, querySelector(selector) {
+      if (selector === '.mat-form-field-flex') return container;
+      if (selector === '.mat-form-field-label') return label;
+      if (selector === '.mat-form-field-prefix') return outlinePrefix ? {} : null;
+      return null;
+    }};
+  const wrapper = {get computed() {return {display: outlineVisible ? 'block' : 'none'};}};
+  const outlineButtons = {
+    '#p-outline-prefix': {click() {clicked.push('prefix'); outlinePrefix = !faults.noOutlinePrefix;}},
+    '#p-outline-hide': {click() {clicked.push('hide'); outlineVisible = !!faults.noOutlineHide; outlinePrefix = false;}},
+    '#p-outline-show': {click() {clicked.push('show'); outlineVisible = !faults.noOutlineShow;}},
+    '#p-outline-rtl': {click() {clicked.push('rtl'); direction = faults.noOutlineRtl ? 'ltr' : 'rtl';}},
+  };
   window.__lab = {closeTransient() {},
     readChipFormState: () => ({focused, touched}), resetChipFormState() {touched = !!faults.touchedBefore;}};
   if (faults.noChipApi) delete window.__lab.readChipFormState;
   const document = {activeElement: null, getElementById: id => id === 'surface' ? surface : null,
     querySelector(selector) {
       if (selector === '#wrap-' + family) return {};
+      if (selector === '#wrap-field' && family === 'form-field') return {};
+      if (selector === '#p-field.mat-form-field #p-hint') return {};
+      if (selector === '#p-outline') return outline;
+      if (selector === '#p-outline-wrapper') return wrapper;
+      if (outlineButtons[selector]) return outlineButtons[selector];
       if (selector === '#p-tabs') return group;
       if (selector === '#p-select .mat-select-trigger') return trigger;
       if (selector === '#p-chip-list .mat-chip') return faults.noChip ? null : chip;
@@ -74,6 +101,7 @@ async function check(id, family, faults, expected) {
   const f = fixture(family, faults); f.begin(); await f.advance(1700);
   assert.equal(f.status().done, true, id); assert.equal(f.status().ok, expected, id);
   if (family === 'tabs' && expected) assert.deepEqual(f.clicked, [0, 1, 0]);
+  if (family === 'form-field' && expected) assert.deepEqual(f.clicked, ['prefix', 'hide', 'show', 'rtl']);
   cases.push({id, result: 'pass'});
 }
 await check('tabs-first-second-first', 'tabs', {}, true);
@@ -89,6 +117,11 @@ await check('chip-real-focus-and-control-touch-transition', 'chips', {}, true);
 for (const faults of [{noChipFocus: true}, {blurStaysFocused: true}, {noTouched: true},
     {touchedBefore: true}, {noDomFocusMove: true}, {noChipApi: true}, {noChip: true}]) {
   await check('chips-reject-' + JSON.stringify(faults), 'chips', faults, false);
+}
+await check('outlined-prefix-hide-show-and-rtl', 'form-field', {}, true);
+for (const faults of [{wrongOutlineStart: true}, {wrongOutlineGap: true}, {noOutlinePrefix: true},
+    {noOutlineHide: true}, {noOutlineShow: true}, {noOutlineRtl: true}, {wrongRtlStart: true}]) {
+  await check('outline-reject-' + JSON.stringify(faults), 'form-field', faults, false);
 }
 const bypassFont = raw.replace('return legacySelectFontNativeOkay(observation) ? observation : null;',
   'return observation.panel_count === 1 ? observation : null;');
@@ -123,6 +156,6 @@ for (const zoneless of [false, true]) {
 }
 const report = {schema_version: 1, cases, mutation_rejections: 3, generated,
   complete_probe_sha256: hash(raw), native_executed: false, actual_legacy_or_forms_executed: false,
-  scope: 'Complete canonical default tabs/select/chips browser probe under explicit DOM/style/geometry/control/timer protocols. Shared actual predicates and DOM readers execute; no browser, Angular/forms/legacy instances, packed artifact, AOT or consumer floors are qualified.'};
+  scope: 'Complete canonical default tabs/select/chips/form-field browser probe under explicit DOM/style/geometry/control/timer protocols. Shared actual predicates and DOM readers execute; no browser, Angular/forms/legacy instances, packed artifact, AOT or consumer floors are qualified.'};
 if (process.argv[2]) writeFileSync(process.argv[2], JSON.stringify(report, null, 2) + '\n', {flag: 'wx'});
 console.log(JSON.stringify({cases: cases.length, mutation_rejections: 3, native_executed: false}));
