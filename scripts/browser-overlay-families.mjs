@@ -22,6 +22,7 @@ import {createHash} from 'node:crypto';
 import {observeTabPaginationNative,tabPaginationNativeOkay} from './tab-pagination-native-contract.mjs';
 import {observeLegacyInkBarNative,legacyInkBarSelectionSequenceOkay} from './legacy-ink-bar-native-contract.mjs';
 import {legacyTooltipMessageSequenceOkay, observeLegacyTooltipNative} from './legacy-tooltip-native-contract.mjs';
+import {legacySnackMotionNativeOkay, observeLegacySnackMotionNative} from './legacy-snack-motion-native-contract.mjs';
 import {announcedChromeEndpoint,debuggerMatchesChild} from './chromium-debug-endpoint.mjs';
 import {spawnSync as __spawnSyncForWs} from 'node:child_process';
 if (typeof globalThis.WebSocket !== 'function') {
@@ -120,17 +121,65 @@ if (relative(realpathSync(consumer), installed).startsWith('..')) fail(1, `Libra
 
 mkdirSync(join(consumer, 'src'), {recursive: true});
 writeFileSync(join(consumer, 'src/main.ts'), `${zoneless ? '' : `import 'zone.js';
-`}import {Component, NgModule, inject${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';
+`}import {Component, NgModule, ViewContainerRef, inject, signal${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {MATERIAL_ANIMATIONS} from '@angular/material/core';
 import {MatLegacyMenuModule} from '@ngx-compat/material-legacy/legacy-menu';
-import {MatLegacySnackBar, MatLegacySnackBarModule} from '@ngx-compat/material-legacy/legacy-snack-bar';
+import {MatLegacySnackBar, MatLegacySnackBarContainer, MatLegacySnackBarModule} from '@ngx-compat/material-legacy/legacy-snack-bar';
 import {MatLegacyTooltipModule} from '@ngx-compat/material-legacy/legacy-tooltip';
 import {MatLegacyAutocompleteModule} from '@ngx-compat/material-legacy/legacy-autocomplete';
 import {MatLegacyFormFieldModule} from '@ngx-compat/material-legacy/legacy-form-field';
 import {MatLegacyInputModule} from '@ngx-compat/material-legacy/legacy-input';
 import {MatLegacyTabsModule} from '@ngx-compat/material-legacy/legacy-tabs';
+import {LEGACY_ANIMATIONS_TEST_OVERRIDE} from '@ngx-compat/material-legacy/legacy-core';
+
+@Component({
+  standalone: false,
+  selector: 'lab-snack-motion',
+  providers: [{provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: 'enabled'}],
+  template: \`
+    <button id="snack-motion-open" type="button" (click)="open()">Snack motion</button>
+    <output id="snack-motion-state" [attr.data-entered]="entered()" [attr.data-enter-ms]="enterMs()"
+      [attr.data-dismissed]="dismissed()" [attr.data-dismissed-at]="dismissedAt()"
+      [attr.data-enter-delivery]="enterDelivery()" [attr.data-exit-delivery]="exitDelivery()"
+      [attr.data-completed]="completed()" [attr.data-action]="action()"></output>
+  \`,
+})
+export class SnackMotionLab {
+  readonly entered = signal(0);
+  readonly enterMs = signal(0);
+  readonly enterDelivery = signal('none');
+  readonly exitDelivery = signal('none');
+  readonly dismissed = signal(0);
+  readonly dismissedAt = signal(0);
+  readonly completed = signal(false);
+  readonly action = signal(false);
+  private viewContainerRef = inject(ViewContainerRef);
+  private snack = inject(MatLegacySnackBar);
+  open() {
+    this.entered.set(0); this.dismissed.set(0); this.completed.set(false); this.action.set(false);
+    const start = performance.now();
+    const ref = this.snack.open('Enabled snack motion', 'Dismiss', {duration: 0, viewContainerRef: this.viewContainerRef});
+    // Observe the actual owned handler argument without changing event routing or timers.
+    const container = ref.containerInstance as MatLegacySnackBarContainer;
+    const handle = container.onAnimationEnd.bind(container);
+    let depth = 0, delivery = 'none';
+    container.onAnimationEnd = event => {
+      if (depth === 0) {
+        delivery = event instanceof AnimationEvent && event.isTrusted && event.target === event.currentTarget
+          ? 'event' : typeof event === 'string' ? 'fallback' : 'other';
+      }
+      depth++;
+      try {handle(event);} finally {depth--;}
+    };
+    ref.afterOpened().subscribe(() => {this.entered.update(value => value + 1); this.enterMs.set(performance.now() - start); this.enterDelivery.set(delivery);});
+    ref.afterDismissed().subscribe({
+      next: event => {this.dismissed.update(value => value + 1); this.dismissedAt.set(performance.now()); this.action.set(event.dismissedByAction); this.exitDelivery.set(delivery);},
+      complete: () => this.completed.set(true),
+    });
+  }
+}
 
 @Component({
   standalone: false,
@@ -142,6 +191,7 @@ import {MatLegacyTabsModule} from '@ngx-compat/material-legacy/legacy-tabs';
     </mat-menu>
 
     <button id="snack-open" type="button" (click)="openSnack()">Snack</button>
+    <lab-snack-motion></lab-snack-motion>
 
     <button id="tip-host" type="button" [matTooltip]="tipMessage" [matTooltipShowDelay]="0" [matTooltipHideDelay]="0">Tip</button>
     <button id="tip-change" type="button" (click)="tipMessage = 'A longer tooltip message for repositioning'">Change tooltip</button>
@@ -189,7 +239,7 @@ export class LabRoot {
     MatLegacyInputModule,
     MatLegacyTabsModule,
   ],
-  declarations: [LabRoot],
+  declarations: [LabRoot, SnackMotionLab],
   bootstrap: [LabRoot],
   providers: [${zoneless ? 'provideZonelessChangeDetection(), ' : ''}{provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}}],
 })
@@ -408,6 +458,10 @@ try {
   })()`);
   const snackGone = await waitFor('!document.querySelector(".mat-snack-bar-container")');
   families['snack-bar'].dismissed = families['snack-bar'].opened && snackGone;
+  families['snack-bar'].enabled_motion = [];
+  for (const mode of ['event', 'fallback']) {
+    families['snack-bar'].enabled_motion.push(await observeLegacySnackMotionNative({send,evaluate,waitFor},mode));
+  }
 
   // Tooltip: mouseenter host, then mouseleave.
   const tipBox = await evaluate(`(() => {
@@ -507,6 +561,8 @@ const ok =
   && zoneOk
   && families.menu.opened && menuClosedOk
   && families['snack-bar'].opened && families['snack-bar'].dismissed
+  && families['snack-bar'].enabled_motion?.length === 2
+  && families['snack-bar'].enabled_motion.every(legacySnackMotionNativeOkay)
   && families.tooltip.shown
   && legacyTooltipMessageSequenceOkay(families.tooltip.message_positions)
   && families.autocomplete.panel_opened && families.autocomplete.typed_filter_visible && families.autocomplete.input_focused
