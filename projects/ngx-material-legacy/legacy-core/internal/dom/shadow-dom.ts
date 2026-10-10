@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -47,13 +48,17 @@ export function legacyGetShadowRoot(element: HTMLElement): ShadowRoot | null {
 
 /**
  * Gets the target of an event while accounting for Shadow DOM composed paths.
- * Preserves historical empty/missing composedPath fallback to `event.target`.
+ * Retains the owned empty/missing-path fallback and handles event replay paths that throw.
  */
 export function legacyGetEventTarget<T extends EventTarget>(event: Event): T | null {
   if (typeof event.composedPath === 'function') {
-    const path = event.composedPath();
-    if (path && path.length > 0) {
-      return path[0] as T;
+    try {
+      const path = event.composedPath();
+      if (path && path.length > 0) {
+        return path[0] as T;
+      }
+    } catch {
+      // Angular event replay may not provide a usable composed path.
     }
   }
   return (event.target as T | null) ?? null;

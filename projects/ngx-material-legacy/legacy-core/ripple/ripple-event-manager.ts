@@ -1,12 +1,14 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
 
 import {NgZone} from '@angular/core';
+import {legacyGetEventTarget} from '../internal/dom/shadow-dom';
 
 /**
  * Handles the event registration for ripples. Delegates events so each renderer
@@ -58,15 +60,14 @@ export class LegacyRippleEventManager {
     if (!targets) {
       return;
     }
-    const path = typeof event.composedPath === 'function' ? event.composedPath() : [];
-    for (const node of path) {
-      if (!(node instanceof HTMLElement)) {
-        continue;
-      }
-      const handlers = targets.get(node);
-      if (handlers) {
-        handlers.forEach(handler => handler.handleEvent(event));
-      }
+    const target = legacyGetEventTarget<Node>(event);
+    if (target) {
+      // Material 16 dispatches matching triggers in registration order.
+      targets.forEach((handlers, element) => {
+        if (element === target || element.contains(target)) {
+          handlers.forEach(handler => handler.handleEvent(event));
+        }
+      });
     }
   }
 }
