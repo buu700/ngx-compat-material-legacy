@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "role": "C03/C04 public ripple native event-target floor provenance and producer correction",
+  "line": "21.x",
+  "sha": "10db3e30f94c8cfd160679da7ba22e4c6c0dd8bb",
+  "diff": "diff --git a/src/cdk/platform/features/shadow-dom.ts b/src/cdk/platform/features/shadow-dom.ts\nindex 6c0720f6d69f8dab27d6b72e95b40ce4ee2d5ac6..f65450f556810cd21ba34be3f0536820a5d5fad1 100644\n--- a/src/cdk/platform/features/shadow-dom.ts\n+++ b/src/cdk/platform/features/shadow-dom.ts\n@@ -57,7 +57,14 @@ export function _getFocusedElementPierceShadowDom(): HTMLElement | null {\n \n /** Gets the target of an event while accounting for Shadow DOM. */\n export function _getEventTarget<T extends EventTarget>(event: Event): T | null {\n-  // If an event is bound outside the Shadow DOM, the `event.target` will\n-  // point to the shadow root so we have to use `composedPath` instead.\n-  return (event.composedPath ? event.composedPath()[0] : event.target) as T | null;\n+  // If an event is bound outside the Shadow DOM, the `event.target` will point to the shadow root\n+  // so we have to use `composedPath` instead. Note that `composedPath` can throw if it's called\n+  // during event replay (see #33386).\n+  // TODO(crisbeto): it seems like `preventDefault` throws during replay as well.\n+  if (event.composedPath) {\n+    try {\n+      return event.composedPath()[0] as T | null;\n+    } catch {}\n+  }\n+  return event.target as T | null;\n }\n",
+  "diff_sha256": "c5a3cab8777ece5990a5e00eaa506a871971176c33e8ade45277d7a2a169b037",
+  "raw_commit": "tree 331b2f744a4ca5f0000faf448fdedff50b386a9a\nparent e31d3fd2477348bf9c47b39f05650735e6c4e536\nauthor Kristiyan Kostadinov <crisbeto@users.noreply.github.com> 1781718901 +0200\ncommitter GitHub <noreply@github.com> 1781718901 +0200\ngpgsig -----BEGIN PGP SIGNATURE-----\n \n wsFcBAABCAAQBQJqMt91CRC1aQ7uu5UhlAAAHvUQAAmbxD8ub2lN0890N8IFstko\n xLDC5sIPFHaEKP3XHmd1BtfqfuSF+1J6fLN/ANH1mqzeSafs1iZDxsRnTgmjKkIX\n LcZmqmoSZri7IgeCM4OXN8mvcunLTjede2nhpCX2GT6Hzmxpn0gFwbrmb/eFalnO\n 26htyftHB6KOAUCBwyW1A17yjnQeyQdRicGuQHQmq1LI2XMkXfRh94vUpQ8EYpN3\n 50o69ACcbGSOQtvMm/KhGLFSHJoggI4LJJpVGlW/768tCaNeUj2/Yvwipa+V0Vrt\n reUadxuHUVotdAPRGdEl4fm7+gwAtL4FYJPZsOXMlsr5XejxCh+kZWZ2ZxVs4+Zo\n Md77wFfHdMzVsoRhXZ0u3CJM5kjf/0zWOEdZUS9+YqE/+MgtRioKvmF0JOVzrNsw\n a9UUsXXIiCrKnmdqkdKIraXGj16Zq3zTvKlDRkk9YAWjD8Qq4LIjHpCI/e3o+m9S\n AybzoKihmEoT7UbxTbT5aUY/JiHAPjxpQ/bAp0k7Wm19uncxoPs7bYxLBi5sYUKY\n r+560Mzxd43QMP6Zi9gy66NGb+I4pcvdJ+4DeWSpFylWhUnyTYgA75c5izR9D7ef\n 1p/1KiJWU2jtdfnDkbwUpYwCK12Z0xJ7ovpM6D8UgK03twoybLbCKSA89ys//p61\n Fzh46rbMBfvQXi5wwzW+\n =AR36\n -----END PGP SIGNATURE-----\n \n\nfix(cdk/platform): account for composedPath error during event replay (#33409)\n\nCalling `event.composedPath` during event replay throws an error. These changes add a `try/catch` around it so it doesn't show up for users.\n\nFixes #33386.",
+  "prior_diff_format": {
+    "unified_context": 0,
+    "sha256": "27c2f81acfe97b71173499f4e73810b4e8f621c189fab74d88f27732d6da1445",
+    "original_digest_reconciled": true
+  },
+  "recorded_at_utc": "2026-10-10T20:08:39.726933+00:00",
+  "prior_entry": {
+    "sha": "10db3e30f94c8cfd160679da7ba22e4c6c0dd8bb",
+    "bucket": "behavior-semantic",
+    "subject": "fix(cdk/platform): account for composedPath error during event replay (#33409)",
+    "files": [
+      "src/cdk/platform/features/shadow-dom.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "The original main inherited rationale cites an unrelated normalizePassiveListenerOptions import in slider.ts. That call does not delegate this event-target behavior. Current source has an owned public event-target helper and an owned ripple manager using composed paths; both need contextual review. The new owned repair does not prove shared public MatRipple at both floors or genuine native replay/hydration. Complete exact floor private-member provenance through genuine public callers and packed/native controlled event plus actual hydration/replay qualification. Keep SHA open; a pending item is not an audit pass. The new public NgZone import admission is a separate finite boundary.",
+    "read_note_disposition": "unreviewed-on-21.x",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": "compatibility/rc/ripple-event-replay-upstream-correction.json",
+    "current_owned_repair": {
+      "path": "compatibility/rc/ripple-event-manager-source-proof.json",
+      "sha256": "72abb9dfade645fef395c3d9507bead935ac889f06c3c80e33aeb592a07876cd"
+    }
+  },
+  "reviewer": "Codex primary implementer",
+  "finding": "Exact main22.1.7 private event-target source contains a try/catch fallback. Exact21.2.14 and original16.2.14 do not. Both current public MatRipple implementations delegate native document-capture events through their private RippleEventManager and the CDK helper. The existing hydration peer_ripple_launches counts manual public launch() calls from the component; that public API does not receive the replay event. Those counts do not prove shared peer event-target error handling, and21 must not be called inherited-fixed.",
+  "implementation": "Added an exported-directive-only button with no component input handler or manual launch. Trusted ordinary native input must create one peer ripple. Window capture injects a controlled composedPath function error before the existing document-capture manager, and the resulting native behavior is recorded separately. Main must handle it;21 must reproduce its missing guard as a diagnostic. Actual owned Angular replay remains a separate mandatory case. All ordinary window errors fail; the controlled phase records all errors and rejects unrelated messages. The current source floor is neither raised nor privately patched.",
+  "lifecycle_repair": "Attach the owned SSR server close promise before startup/interaction and check both exitCode and signalCode. Cleanup cannot miss an already emitted close after a signal. A real self-signaled Node child regression passed; this is not Angular/server runtime qualification.",
+  "evidence": [
+    {
+      "path": "compatibility/rc/ripple-native-channel-floor-source.json",
+      "sha256": "6b0bc9c8bf28eaf1eeaf5c50fcd00bc4fe582c25f7f95f05708f53c8247e8204"
+    },
+    {
+      "path": "compatibility/rc/material-public-subjects.json",
+      "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+    },
+    {
+      "path": "tests/ripple_event_floor_source_probe.mjs",
+      "sha256": "4d8a70ce9112fa9845f692367a0c4b01b2c88fa96b1c2665c1f4afaac0056063"
+    }
+  ],
+  "source_context": [
+    {
+      "path": "scripts/ripple-hydration-component-fixture.mjs",
+      "sha256": "44bbea2bcbf9a6c3a8202cd3bd6e2c614d77b848f1fe0937d11d3af0f4e8a2f6"
+    },
+    {
+      "path": "scripts/ripple-hydration-application.mjs",
+      "sha256": "60c362bee412525c779c200fefe3ce90159f7d574760f1f5616f4dc387622df3"
+    },
+    {
+      "path": "scripts/ripple-hydration-replay.mjs",
+      "sha256": "9360f56d99116855ddff7771debee6a3cc87ccabab987bb88f57ac08bb2865a1"
+    },
+    {
+      "path": "scripts/ripple-native-event-probe.mjs",
+      "sha256": "e4dcc033d6bd29c2a80fa16246330486ad0c5f9b487f21915ea1d54edb6616de"
+    }
+  ],
+  "remaining": "Packed AOT/client native execution, genuine supported replay reachability, the21 public-peer applicability decision and final10db3 disposition are still pending. Controlled failure is diagnostic evidence, not a risk exception or compatibility pass. No product/consumer API, HTML, CSS or SCSS change; no source-baseline increase, G11 clearance, push or Actions dispatch.",
+  "g11_claim": "not-passed"
+}

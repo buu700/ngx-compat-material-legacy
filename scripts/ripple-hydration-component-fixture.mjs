@@ -10,6 +10,7 @@ export const rippleHydrationComponentFixture = `
 @Component({standalone: true, selector: 'ripple-hydration-lab', imports: [MatLegacyRippleModule],
   template: \`<button id="replay-peer" matRipple (mousedown)="down($event)" (mouseup)="up($event)"
     (click)="clicked($event)">Hydration {{clicks()}}</button>
+    <button id="native-peer" matRipple #nativePeer="matRipple">Native peer only</button>
     <div #owned id="replay-owned" class="mat-ripple" style="width:120px;height:48px"></div>\`})
 export class RippleHydrationLab {
   @ViewChild(MatLegacyRipple, {static: true}) peer!: MatLegacyRipple;
