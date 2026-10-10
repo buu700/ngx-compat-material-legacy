@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "recorded_at_utc": "2026-10-10T10:44:59.455853+00:00",
+  "source_heads": {
+    "main": "4b3d39b392288d2bad2864a06d9cbf011d52d432",
+    "21.x": "67ef1188a415a763783a0c6ea46c56d03088898a"
+  },
+  "source_trees": {
+    "main": "42715d09d3f12df42a7d9439f97e418a77035c5f",
+    "21.x": "65e2a32222672f3ad2aba8c9ef79acf0522c5cdf"
+  },
+  "sources": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/ripple/ripple-event-manager.ts",
+      "sha256": "2cb38621b0481e8745d306422dca5eba1ad4dce31f3e86931680feaf4f2fe0be"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/dom/shadow-dom.ts",
+      "sha256": "39a8a95c574620b4aa4ef50a30b86eba359c793d69d504b53fb98d4962c4119e"
+    },
+    {
+      "path": "scripts/ripple-event-manager-use-review.mjs",
+      "sha256": "2cc72466ff892efa9dca29c7696a1a7c7bc8061233256de42d878db1d1066a26"
+    },
+    {
+      "path": "tests/ripple_event_manager_runtime_probe.mjs",
+      "sha256": "0d80e2cc8e90562621f67273adbe7f08e0396690b4cd0a83de640d70cbabbbc3"
+    },
+    {
+      "path": "tests/ripple_event_manager_runtime_subject.mjs",
+      "sha256": "d104ea2c86bec74ff3a6d98d4dc7faaa7fd9a66403225a01254734f88be8683c"
+    },
+    {
+      "path": "tests/test_ripple_event_manager_runtime.py",
+      "sha256": "f9df605adc4df5f1b258f9d2c492b1de2e00413cc185a810eef3ec363af8f105"
+    },
+    {
+      "path": "tests/test_ripple_event_manager_use_review.py",
+      "sha256": "e5f5c67932f724823e40afb1bb6a7f95116b1b7348cee3788f76ce4fb8aa72d4"
+    }
+  ],
+  "original_subject": {
+    "path": "compatibility/rc/ripple-event-manager-original-subjects.json",
+    "sha256": "a3046ffb6a2d56c93fa9e22c7a325d6e20822c00720d24a5c74a8c39dd5cf775"
+  },
+  "baseline": {
+    "path": "compatibility/rc/ripple-event-manager-baseline-diagnostic.json",
+    "sha256": "1e9cb652d1c11da4ef88185854d5578f7a190e13c72a52599426ca56ffab50a7"
+  },
+  "runtime_diagnostic": {
+    "path": "compatibility/rc/ripple-event-manager-runtime-diagnostic.json",
+    "sha256": "34f9b6d0b9edd5777db4d1f92fd37f9f07bf47de6f765f76cb450450f7bb0fc8"
+  },
+  "fresh_binding": {
+    "path": "compatibility/rc/ripple-event-manager-binding-diagnostic.json",
+    "sha256": "cf079559a7afc6cf9fa11e2132b3a29a45bc7b109fd7a89a21ff9275e4dea79b"
+  },
+  "upstream_replay_patch": {
+    "commit": "10db3e30f94c8cfd160679da7ba22e4c6c0dd8bb",
+    "url": "https://github.com/angular/components/commit/10db3e30f94c8cfd160679da7ba22e4c6c0dd8bb",
+    "download_url": "https://github.com/angular/components/commit/10db3e30f94c8cfd160679da7ba22e4c6c0dd8bb.patch",
+    "captured": {
+      "path": "compatibility/rc/ripple-event-replay-10db3.patch",
+      "sha256": "8bd8b617ea94c9f0247ba826490f292576385832119e5d4188b24ce3f62e112e"
+    },
+    "scope": "Primary GitHub patch with From commit identity and full one-file hunk. Raw patch bytes include mail metadata and abbreviated index hashes; its digest is not relabeled as an existing ledger git-show digest."
+  },
+  "repair": "The owned manager now selects one target through the existing owned helper, then dispatches matching equality/Node.contains triggers in registration order as Material16 does. Shared capture/passive outside-zone listener ownership is retained. The existing owned event-target helper catches unusable composed paths during replay and falls back to event.target. No current private upstream helper import.",
+  "historical_deviations": "Ordinary registration order and missing-path fallback are restored to the untouched tag. The tag itself throws for a throwing composedPath; suppression/fallback is an explicit small locally owned adaptation of the frozen upstream replay fix. The owned helper already fell back for an empty path, unlike tagged _getEventTarget; that owned public behavior is retained and its use by the manager is explicitly tested, not described as exact tag parity.",
+  "runtime_subjects": 10,
+  "runtime_cases": 100,
+  "mutation_rejections": 76,
+  "strict_types": [
+    {
+      "line": "main",
+      "compiler": "6.0.2",
+      "compiler_source_sha256": "630f808ac32d968a49a392c42cc06fd72abd939aaa7edfe3302810c067934653",
+      "fixture_sha256": "0a7a35dd4f9aa8b53e1f27eb5c8cfda5e29ce5984c56db9083054e22e1c5a03d",
+      "negative_checks": 3,
+      "whole_owned_manager_and_helper_strict_checked": true,
+      "legacy_AOT_compiled": false
+    },
+    {
+      "line": "21.x",
+      "compiler": "6.0.2",
+      "compiler_source_sha256": "630f808ac32d968a49a392c42cc06fd72abd939aaa7edfe3302810c067934653",
+      "fixture_sha256": "0a7a35dd4f9aa8b53e1f27eb5c8cfda5e29ce5984c56db9083054e22e1c5a03d",
+      "negative_checks": 3,
+      "whole_owned_manager_and_helper_strict_checked": true,
+      "legacy_AOT_compiled": false
+    }
+  ],
+  "source_negative_controls": 3,
+  "mutation_scope": "Eight controls cover reverse dispatch order, missing fallback/replay guard, missing/wrong-capture root listener removal, registration inside Angular, nonpassive capture, and lost listener sharing. The inside-zone negative executes for six genuine zoneful subjects; four public zoneless subjects are explicitly excluded because their zone has no inside context.",
+  "runtime_scope": "Complete original private event-manager constructor/methods/delegate and original target helper from untouched whole tagged modules; complete owned manager and shadow helper module. Genuine public original/minimum NgZone plus current public zoneful/zoneless providers. Explicit document/listener/Node containment/path protocols; only legacyGetEventTarget is executed from the full owned shadow helper module. No actual DOM/ShadowRoot/replayed Angular event, ripple renderer, legacy node DI, CSS/native/packed/AOT/consumer or full Node/Rx floor qualification.",
+  "source_binding_scope": "Actual finite source binding and exactly one public runOutsideAngular call. Complete manager/helper runtime and strict minimum declarations supply separate evidence; no native or full renderer qualification.",
+  "public_contract": "Existing owned manager methods, public helper generic signature and four-argument owned renderer constructor remain unchanged. Actual full packed API/goldens and legacy consumers are not qualified by this delta.",
+  "targeted_style_review": {
+    "files": [
+      {
+        "path": "projects/ngx-material-legacy/styles/core/ripple/_ripple.scss",
+        "sha256": "1c48a3a25770755f2e600d18058b184ab406131833d9009e1f9d972c7d9679d3"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/core/ripple/_ripple-theme.scss",
+        "sha256": "3712195361cdda06540e739ca1eb646d58de59ade265191c320bb2f609349623"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.html",
+        "sha256": "b1b76d778dfebc650343150afa0b82c200097c7b61a8d1a0059e4ac51b5d20c8"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.scss",
+        "sha256": "222d57e2e1491b2608cb607a293eeef79b772ec076c5f9dbf192175fafc68b0b"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip.ts",
+        "sha256": "df6a4cfe02079393bdbb593ad0654af0c04b47548b8ef2c58a96611be944de15"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/ripple/ripple-renderer.ts",
+        "sha256": "0635d2c840c6f7322b2cdb9a499ab26a03023255d91e8be9d12b1a9fa9d92114"
+      }
+    ],
+    "result": "All listed renderer/consumer/template/ripple style bytes are unchanged from the previous commit. The repair changes event target/order and error handling only; element creation, selectors, color, duration and geometry source stay unchanged. Actual native nested ripple timing/style observation remains pending."
+  },
+  "cyph_sanity": {
+    "head": "a56a0603636cac5aaabe8fe408f7429b4224f011",
+    "clean": true,
+    "scope": "Read-only shared/js TS/HTML/CSS/SCSS search finds no direct LegacyRippleRenderer, LegacyRippleEventManager, legacyGetEventTarget or composedPath use. Seven existing HTML files contain chip/tab-link controls. Existing templates/styles require no edits; no consumer build was executed.",
+    "required_consumer_HTML_CSS_SCSS_changes": false
+  },
+  "source_review": "One frozen NgZone type/primitive boundary may be admitted after complete source/runtime/minimum-declaration proof. Native ripple delegation, actual Angular replay/hydration, public shared MatRipple floor behavior and the upstream SHA remain separate open obligations.",
+  "native_producer": "pending-implementation: add canonical packed actual owned renderer nested-trigger order, listener removal, and native controlled missing/throwing-path cases; actual Angular replay/hydration must remain separately identified from a synthetic DOM event.",
+  "no_reference_or_golden_change": true,
+  "native_packed_AOT_consumer_or_full_floors_qualified": false,
+  "g11_claim": "not-passed",
+  "pushed": false,
+  "actions_started": false
+}
