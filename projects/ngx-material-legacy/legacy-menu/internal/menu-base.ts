@@ -357,6 +357,8 @@ export class _MatMenuBase
     this._clearExitFallback();
     this._isAnimating = false;
     this._animationDone.complete();
+    // A public key-manager change observer may destroy the menu before focus() resumes.
+    this._keyManager?.updateActiveItem(-1);
     this._keyManager?.destroy();
     this._directDescendantItems.destroy();
     this.closed.complete();
@@ -426,20 +428,21 @@ export class _MatMenuBase
    * @param origin Action from which the focus originated. Used to set the correct styling.
    */
   focusFirstItem(origin: FocusOrigin = 'program'): void {
+    if (this._motionDestroyed) return;
     // Wait for `onStable` to ensure iOS VoiceOver screen reader focuses the first item (#24735).
     // An already-stable zone never emits onStable. Noop token providers do not schedule an
     // animation task, so a click-open would otherwise leave focus on document.body.
     this._firstItemFocusSubscription?.unsubscribe();
-    let applied = false;
+    const request = new Subscription();
+    this._firstItemFocusSubscription = request;
     const apply = () => {
-      if (applied) {
+      if (request.closed || this._motionDestroyed) {
         return;
       }
-      applied = true;
-      this._firstItemFocusSubscription?.unsubscribe();
+      request.unsubscribe();
       this._applyFirstItemFocus(origin);
     };
-    this._firstItemFocusSubscription = this._ngZone.onStable.pipe(take(1)).subscribe(apply);
+    request.add(this._ngZone.onStable.pipe(take(1)).subscribe(apply));
     if (this._ngZone.isStable) {
       Promise.resolve().then(apply);
     }
@@ -460,6 +463,7 @@ export class _MatMenuBase
     if (!menuPanel || !menuPanel.contains(document.activeElement)) {
       const manager = this._keyManager;
       manager.setFocusOrigin(origin).setFirstItemActive();
+      if (this._motionDestroyed) return;
 
       // If there's no active item at this point, it means that all the items are disabled.
       // Move focus to the menuPanel panel so keyboard events like Escape still work. Also this will
@@ -541,6 +545,7 @@ export class _MatMenuBase
     if (this._motionDestroyed) {
       return;
     }
+    this._firstItemFocusSubscription?.unsubscribe();
     const sequence = ++this._motionSequence;
     this._clearExitFallback();
     this._completedAnimation = undefined;
