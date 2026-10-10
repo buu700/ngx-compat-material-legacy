@@ -1,0 +1,147 @@
+diff --git a/src/material/divider/testing/BUILD.bazel b/src/material/divider/testing/BUILD.bazel
+index 6d078a39e5a263e73d259b3b008c1a7efc8b4584..0cd22f88d4d8bbe46429f5e71a98a537ec4d1ee2 100644
+--- a/src/material/divider/testing/BUILD.bazel
++++ b/src/material/divider/testing/BUILD.bazel
+@@ -19,8 +19,8 @@ filegroup(
+ )
+ 
+ ng_test_library(
+-    name = "harness_tests_lib",
+-    srcs = ["shared.spec.ts"],
++    name = "unit_tests_lib",
++    srcs = glob(["**/*.spec.ts"]),
+     deps = [
+         ":testing",
+         "//src/cdk/testing",
+@@ -30,19 +30,6 @@ ng_test_library(
+     ],
+ )
+ 
+-ng_test_library(
+-    name = "unit_tests_lib",
+-    srcs = glob(
+-        ["**/*.spec.ts"],
+-        exclude = ["shared.spec.ts"],
+-    ),
+-    deps = [
+-        ":harness_tests_lib",
+-        ":testing",
+-        "//src/material/divider",
+-    ],
+-)
+-
+ ng_web_test_suite(
+     name = "unit_tests",
+     deps = [":unit_tests_lib"],
+diff --git a/src/material/divider/testing/divider-harness.spec.ts b/src/material/divider/testing/divider-harness.spec.ts
+index 28b7018ef4f582fe28bd8c0b28c95897f8b6826a..784f1fc891d27bd138948c81272184ea40afa575 100644
+--- a/src/material/divider/testing/divider-harness.spec.ts
++++ b/src/material/divider/testing/divider-harness.spec.ts
+@@ -1,7 +1,47 @@
++import {Component} from '@angular/core';
++import {ComponentFixture, TestBed} from '@angular/core/testing';
++import {HarnessLoader} from '@angular/cdk/testing';
++import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+ import {MatDividerModule} from '@angular/material/divider';
+ import {MatDividerHarness} from './divider-harness';
+-import {runHarnessTests} from './shared.spec';
+ 
+-describe('Non-MDC-based MatLegacyButtonHarness', () => {
+-  runHarnessTests(MatDividerModule, MatDividerHarness);
++describe('MatLegacyButtonHarness', () => {
++  let fixture: ComponentFixture<DividerHarnessTest>;
++  let loader: HarnessLoader;
++
++  beforeEach(async () => {
++    await TestBed.configureTestingModule({
++      imports: [MatDividerModule],
++      declarations: [DividerHarnessTest],
++    }).compileComponents();
++
++    fixture = TestBed.createComponent(DividerHarnessTest);
++    fixture.detectChanges();
++    loader = TestbedHarnessEnvironment.loader(fixture);
++  });
++
++  it('should load all divider harnesses', async () => {
++    const dividers = await loader.getAllHarnesses(MatDividerHarness);
++    expect(dividers.length).toBe(2);
++  });
++
++  it('should check if divider is inset', async () => {
++    const dividers = await loader.getAllHarnesses(MatDividerHarness);
++    expect(await dividers[0].isInset()).toBe(false);
++    expect(await dividers[1].isInset()).toBe(true);
++  });
++
++  it('should get divider orientation', async () => {
++    const dividers = await loader.getAllHarnesses(MatDividerHarness);
++    expect(await dividers[0].getOrientation()).toBe('horizontal');
++    expect(await dividers[1].getOrientation()).toBe('vertical');
++  });
+ });
++
++@Component({
++  template: `
++    <mat-divider></mat-divider>
++    <mat-divider inset vertical></mat-divider>
++  `,
++})
++class DividerHarnessTest {}
+diff --git a/src/material/divider/testing/shared.spec.ts b/src/material/divider/testing/shared.spec.ts
+deleted file mode 100644
+index dfd67509089a9f0f9df8434f11bd1c5405c672f6..0000000000000000000000000000000000000000
+--- a/src/material/divider/testing/shared.spec.ts
++++ /dev/null
+@@ -1,51 +0,0 @@
+-import {HarnessLoader} from '@angular/cdk/testing';
+-import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+-import {Component} from '@angular/core';
+-import {ComponentFixture, TestBed} from '@angular/core/testing';
+-import {MatDividerModule} from '@angular/material/divider';
+-import {MatDividerHarness} from './divider-harness';
+-
+-/** Shared tests to run on both the original and MDC-based dividers. */
+-export function runHarnessTests(
+-  dividerModule: typeof MatDividerModule,
+-  dividerHarness: typeof MatDividerHarness,
+-) {
+-  let fixture: ComponentFixture<DividerHarnessTest>;
+-  let loader: HarnessLoader;
+-
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
+-      imports: [dividerModule],
+-      declarations: [DividerHarnessTest],
+-    }).compileComponents();
+-
+-    fixture = TestBed.createComponent(DividerHarnessTest);
+-    fixture.detectChanges();
+-    loader = TestbedHarnessEnvironment.loader(fixture);
+-  });
+-
+-  it('should load all divider harnesses', async () => {
+-    const dividers = await loader.getAllHarnesses(dividerHarness);
+-    expect(dividers.length).toBe(2);
+-  });
+-
+-  it('should check if divider is inset', async () => {
+-    const dividers = await loader.getAllHarnesses(dividerHarness);
+-    expect(await dividers[0].isInset()).toBe(false);
+-    expect(await dividers[1].isInset()).toBe(true);
+-  });
+-
+-  it('should get divider orientation', async () => {
+-    const dividers = await loader.getAllHarnesses(dividerHarness);
+-    expect(await dividers[0].getOrientation()).toBe('horizontal');
+-    expect(await dividers[1].getOrientation()).toBe('vertical');
+-  });
+-}
+-
+-@Component({
+-  template: `
+-    <mat-divider></mat-divider>
+-    <mat-divider inset vertical></mat-divider>
+-  `,
+-})
+-class DividerHarnessTest {}

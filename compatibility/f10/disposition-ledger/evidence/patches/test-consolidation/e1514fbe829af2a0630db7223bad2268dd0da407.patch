@@ -1,0 +1,347 @@
+diff --git a/src/material/snack-bar/testing/BUILD.bazel b/src/material/snack-bar/testing/BUILD.bazel
+index 1d0aa7381d0730f109ad862f77978f29b5c247f2..85aeb269b87b9441376c97417a2069c5d78a6f9f 100644
+--- a/src/material/snack-bar/testing/BUILD.bazel
++++ b/src/material/snack-bar/testing/BUILD.bazel
+@@ -20,8 +20,8 @@ filegroup(
+ )
+ 
+ ng_test_library(
+-    name = "harness_tests_lib",
+-    srcs = ["shared.spec.ts"],
++    name = "unit_tests_lib",
++    srcs = glob(["**/*.spec.ts"]),
+     deps = [
+         ":testing",
+         "//src/cdk/overlay",
+@@ -33,22 +33,6 @@ ng_test_library(
+     ],
+ )
+ 
+-ng_test_library(
+-    name = "unit_tests_lib",
+-    srcs = glob(
+-        ["**/*.spec.ts"],
+-        exclude = ["shared.spec.ts"],
+-    ),
+-    deps = [
+-        ":harness_tests_lib",
+-        ":testing",
+-        "//src/cdk/testing",
+-        "//src/cdk/testing/testbed",
+-        "//src/material/snack-bar",
+-        "@npm//@angular/platform-browser",
+-    ],
+-)
+-
+ ng_web_test_suite(
+     name = "unit_tests",
+     deps = [
+diff --git a/src/material/snack-bar/testing/shared.spec.ts b/src/material/snack-bar/testing/shared.spec.ts
+deleted file mode 100644
+index f3367a0ec0621eae201dd8228ce0f5b4a4c32f59..0000000000000000000000000000000000000000
+--- a/src/material/snack-bar/testing/shared.spec.ts
++++ /dev/null
+@@ -1,155 +0,0 @@
+-import {HarnessLoader} from '@angular/cdk/testing';
+-import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+-import {Component, TemplateRef, ViewChild, Injector} from '@angular/core';
+-import {ComponentFixture, TestBed} from '@angular/core/testing';
+-import {MatSnackBar, MatSnackBarConfig, MatSnackBarModule} from '@angular/material/snack-bar';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+-import {MatSnackBarHarness} from './snack-bar-harness';
+-
+-/**
+- * Function that can be used to run the shared snack-bar harness tests for either
+- * the non-MDC or MDC based snack-bar harness.
+- */
+-export function runHarnessTests(
+-  snackBarModule: typeof MatSnackBarModule,
+-  snackBarToken: typeof MatSnackBar,
+-  snackBarHarness: typeof MatSnackBarHarness,
+-) {
+-  let fixture: ComponentFixture<SnackbarHarnessTest>;
+-  let loader: HarnessLoader;
+-
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
+-      imports: [snackBarModule, NoopAnimationsModule],
+-      declarations: [SnackbarHarnessTest],
+-    }).compileComponents();
+-
+-    fixture = TestBed.createComponent(SnackbarHarnessTest);
+-    fixture.detectChanges();
+-    loader = TestbedHarnessEnvironment.documentRootLoader(fixture);
+-  });
+-
+-  it('should load harness for simple snack-bar', async () => {
+-    const snackBarRef = fixture.componentInstance.openSimple('Hello!', '');
+-    let snackBars = await loader.getAllHarnesses(snackBarHarness);
+-
+-    expect(snackBars.length).toBe(1);
+-
+-    snackBarRef.dismiss();
+-    snackBars = await loader.getAllHarnesses(snackBarHarness);
+-    expect(snackBars.length).toBe(0);
+-  });
+-
+-  it('should load harness for custom snack-bar', async () => {
+-    const snackBarRef = fixture.componentInstance.openCustom();
+-    let snackBars = await loader.getAllHarnesses(snackBarHarness);
+-
+-    expect(snackBars.length).toBe(1);
+-
+-    snackBarRef.dismiss();
+-    snackBars = await loader.getAllHarnesses(snackBarHarness);
+-    expect(snackBars.length).toBe(0);
+-  });
+-
+-  it('should load snack-bar harness by selector', async () => {
+-    fixture.componentInstance.openSimple('Hello!', '', {panelClass: 'my-snack-bar'});
+-    const snackBars = await loader.getAllHarnesses(
+-      snackBarHarness.with({
+-        selector: '.my-snack-bar',
+-      }),
+-    );
+-    expect(snackBars.length).toBe(1);
+-  });
+-
+-  it('should be able to get role of snack-bar', async () => {
+-    // Get role is now deprecated, so it should always return null.
+-    fixture.componentInstance.openCustom();
+-    let snackBar = await loader.getHarness(snackBarHarness);
+-    expect(await snackBar.getRole()).toBe(null);
+-
+-    fixture.componentInstance.openCustom({politeness: 'polite'});
+-    snackBar = await loader.getHarness(snackBarHarness);
+-    expect(await snackBar.getRole()).toBe(null);
+-
+-    fixture.componentInstance.openCustom({politeness: 'off'});
+-    snackBar = await loader.getHarness(snackBarHarness);
+-    expect(await snackBar.getRole()).toBe(null);
+-  });
+-
+-  it('should be able to get aria-live of snack-bar', async () => {
+-    fixture.componentInstance.openCustom();
+-    let snackBar = await loader.getHarness(snackBarHarness);
+-    expect(await snackBar.getAriaLive()).toBe('assertive');
+-
+-    fixture.componentInstance.openCustom({politeness: 'polite'});
+-    snackBar = await loader.getHarness(snackBarHarness);
+-    expect(await snackBar.getAriaLive()).toBe('polite');
+-
+-    fixture.componentInstance.openCustom({politeness: 'off'});
+-    snackBar = await loader.getHarness(snackBarHarness);
+-    expect(await snackBar.getAriaLive()).toBe('off');
+-  });
+-
+-  it('should be able to get message of simple snack-bar', async () => {
+-    fixture.componentInstance.openSimple('Subscribed to newsletter.');
+-    let snackBar = await loader.getHarness(snackBarHarness);
+-    expect(await snackBar.getMessage()).toBe('Subscribed to newsletter.');
+-  });
+-
+-  it('should be able to get action description of simple snack-bar', async () => {
+-    fixture.componentInstance.openSimple('Hello', 'Unsubscribe');
+-    let snackBar = await loader.getHarness(snackBarHarness);
+-    expect(await snackBar.getActionDescription()).toBe('Unsubscribe');
+-  });
+-
+-  it('should be able to check whether simple snack-bar has action', async () => {
+-    fixture.componentInstance.openSimple('With action', 'Unsubscribe');
+-    let snackBar = await loader.getHarness(snackBarHarness);
+-    expect(await snackBar.hasAction()).toBe(true);
+-
+-    fixture.componentInstance.openSimple('No action');
+-    snackBar = await loader.getHarness(snackBarHarness);
+-    expect(await snackBar.hasAction()).toBe(false);
+-  });
+-
+-  it('should be able to dismiss simple snack-bar with action', async () => {
+-    const snackBarRef = fixture.componentInstance.openSimple('With action', 'Unsubscribe');
+-    let snackBar = await loader.getHarness(snackBarHarness);
+-    let actionCount = 0;
+-    snackBarRef.onAction().subscribe(() => actionCount++);
+-
+-    expect(await snackBar.isDismissed())
+-      .withContext('The snackbar should be present in the DOM before dismiss')
+-      .toBe(false);
+-
+-    await snackBar.dismissWithAction();
+-    expect(actionCount).toBe(1);
+-    expect(await snackBar.isDismissed())
+-      .withContext('The snackbar should be absent from the DOM after dismiss')
+-      .toBe(true);
+-
+-    fixture.componentInstance.openSimple('No action');
+-    snackBar = await loader.getHarness(snackBarHarness);
+-    await expectAsync(snackBar.dismissWithAction()).toBeRejectedWithError(/without an action/);
+-  });
+-
+-  @Component({
+-    template: `<ng-template>My custom snack-bar.</ng-template>`,
+-  })
+-  class SnackbarHarnessTest {
+-    @ViewChild(TemplateRef) customTmpl: TemplateRef<any>;
+-    snackBar: MatSnackBar;
+-
+-    constructor(injector: Injector) {
+-      this.snackBar = injector.get(snackBarToken);
+-    }
+-
+-    openSimple(message: string, action = '', config?: MatSnackBarConfig) {
+-      return this.snackBar.open(message, action, config);
+-    }
+-
+-    openCustom(config?: MatSnackBarConfig) {
+-      return this.snackBar.openFromTemplate(this.customTmpl, config);
+-    }
+-  }
+-}
+diff --git a/src/material/snack-bar/testing/snack-bar-harness.spec.ts b/src/material/snack-bar/testing/snack-bar-harness.spec.ts
+index 166a2bee18170b7ea565f9f0cf2e595d779a18b4..5def8c89960628ef98920f686f7beb20db3a895d 100644
+--- a/src/material/snack-bar/testing/snack-bar-harness.spec.ts
++++ b/src/material/snack-bar/testing/snack-bar-harness.spec.ts
+@@ -1,17 +1,12 @@
+-import {MatSnackBar, MatSnackBarConfig, MatSnackBarModule} from '@angular/material/snack-bar';
+-import {runHarnessTests} from './shared.spec';
++import {Component, TemplateRef, ViewChild} from '@angular/core';
+ import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {HarnessLoader} from '@angular/cdk/testing';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+-import {Component, TemplateRef, ViewChild} from '@angular/core';
++import {MatSnackBar, MatSnackBarConfig, MatSnackBarModule} from '@angular/material/snack-bar';
++import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MatSnackBarHarness} from './snack-bar-harness';
+ 
+-describe('MDC-based MatSnackBarHarness', () => {
+-  runHarnessTests(MatSnackBarModule, MatSnackBar, MatSnackBarHarness);
+-});
+-
+-describe('MDC-based MatSnackBarHarness (MDC only behavior)', () => {
++describe('MatSnackBarHarness', () => {
+   let fixture: ComponentFixture<SnackbarHarnessTest>;
+   let loader: HarnessLoader;
+ 
+@@ -26,6 +21,110 @@ describe('MDC-based MatSnackBarHarness (MDC only behavior)', () => {
+     loader = TestbedHarnessEnvironment.documentRootLoader(fixture);
+   });
+ 
++  it('should load harness for simple snack-bar', async () => {
++    const snackBarRef = fixture.componentInstance.openSimple('Hello!', '');
++    let snackBars = await loader.getAllHarnesses(MatSnackBarHarness);
++
++    expect(snackBars.length).toBe(1);
++
++    snackBarRef.dismiss();
++    snackBars = await loader.getAllHarnesses(MatSnackBarHarness);
++    expect(snackBars.length).toBe(0);
++  });
++
++  it('should load harness for custom snack-bar', async () => {
++    const snackBarRef = fixture.componentInstance.openCustom();
++    let snackBars = await loader.getAllHarnesses(MatSnackBarHarness);
++
++    expect(snackBars.length).toBe(1);
++
++    snackBarRef.dismiss();
++    snackBars = await loader.getAllHarnesses(MatSnackBarHarness);
++    expect(snackBars.length).toBe(0);
++  });
++
++  it('should load snack-bar harness by selector', async () => {
++    fixture.componentInstance.openSimple('Hello!', '', {panelClass: 'my-snack-bar'});
++    const snackBars = await loader.getAllHarnesses(
++      MatSnackBarHarness.with({
++        selector: '.my-snack-bar',
++      }),
++    );
++    expect(snackBars.length).toBe(1);
++  });
++
++  it('should be able to get role of snack-bar', async () => {
++    // Get role is now deprecated, so it should always return null.
++    fixture.componentInstance.openCustom();
++    let snackBar = await loader.getHarness(MatSnackBarHarness);
++    expect(await snackBar.getRole()).toBe(null);
++
++    fixture.componentInstance.openCustom({politeness: 'polite'});
++    snackBar = await loader.getHarness(MatSnackBarHarness);
++    expect(await snackBar.getRole()).toBe(null);
++
++    fixture.componentInstance.openCustom({politeness: 'off'});
++    snackBar = await loader.getHarness(MatSnackBarHarness);
++    expect(await snackBar.getRole()).toBe(null);
++  });
++
++  it('should be able to get aria-live of snack-bar', async () => {
++    fixture.componentInstance.openCustom();
++    let snackBar = await loader.getHarness(MatSnackBarHarness);
++    expect(await snackBar.getAriaLive()).toBe('assertive');
++
++    fixture.componentInstance.openCustom({politeness: 'polite'});
++    snackBar = await loader.getHarness(MatSnackBarHarness);
++    expect(await snackBar.getAriaLive()).toBe('polite');
++
++    fixture.componentInstance.openCustom({politeness: 'off'});
++    snackBar = await loader.getHarness(MatSnackBarHarness);
++    expect(await snackBar.getAriaLive()).toBe('off');
++  });
++
++  it('should be able to get message of simple snack-bar', async () => {
++    fixture.componentInstance.openSimple('Subscribed to newsletter.');
++    let snackBar = await loader.getHarness(MatSnackBarHarness);
++    expect(await snackBar.getMessage()).toBe('Subscribed to newsletter.');
++  });
++
++  it('should be able to get action description of simple snack-bar', async () => {
++    fixture.componentInstance.openSimple('Hello', 'Unsubscribe');
++    let snackBar = await loader.getHarness(MatSnackBarHarness);
++    expect(await snackBar.getActionDescription()).toBe('Unsubscribe');
++  });
++
++  it('should be able to check whether simple snack-bar has action', async () => {
++    fixture.componentInstance.openSimple('With action', 'Unsubscribe');
++    let snackBar = await loader.getHarness(MatSnackBarHarness);
++    expect(await snackBar.hasAction()).toBe(true);
++
++    fixture.componentInstance.openSimple('No action');
++    snackBar = await loader.getHarness(MatSnackBarHarness);
++    expect(await snackBar.hasAction()).toBe(false);
++  });
++
++  it('should be able to dismiss simple snack-bar with action', async () => {
++    const snackBarRef = fixture.componentInstance.openSimple('With action', 'Unsubscribe');
++    let snackBar = await loader.getHarness(MatSnackBarHarness);
++    let actionCount = 0;
++    snackBarRef.onAction().subscribe(() => actionCount++);
++
++    expect(await snackBar.isDismissed())
++      .withContext('The snackbar should be present in the DOM before dismiss')
++      .toBe(false);
++
++    await snackBar.dismissWithAction();
++    expect(actionCount).toBe(1);
++    expect(await snackBar.isDismissed())
++      .withContext('The snackbar should be absent from the DOM after dismiss')
++      .toBe(true);
++
++    fixture.componentInstance.openSimple('No action');
++    snackBar = await loader.getHarness(MatSnackBarHarness);
++    await expectAsync(snackBar.dismissWithAction()).toBeRejectedWithError(/without an action/);
++  });
++
+   it('should be able to get message of a snack-bar with custom content', async () => {
+     fixture.componentInstance.openCustom();
+     let snackBar = await loader.getHarness(MatSnackBarHarness);
+@@ -74,6 +173,10 @@ class SnackbarHarnessTest {
+ 
+   constructor(public snackBar: MatSnackBar) {}
+ 
++  openSimple(message: string, action = '', config?: MatSnackBarConfig) {
++    return this.snackBar.open(message, action, config);
++  }
++
+   openCustom(config?: MatSnackBarConfig) {
+     return this.snackBar.openFromTemplate(this.customTmpl, config);
+   }

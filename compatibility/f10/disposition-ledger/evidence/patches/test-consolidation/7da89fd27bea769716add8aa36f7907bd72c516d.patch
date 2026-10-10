@@ -1,0 +1,222 @@
+diff --git a/src/material/toolbar/testing/BUILD.bazel b/src/material/toolbar/testing/BUILD.bazel
+index 001771a2f45146ecd3d9f3d5e02d8ebc66ee0137..a09f4eda55fa56a37999855dda4a726752dd7fec 100644
+--- a/src/material/toolbar/testing/BUILD.bazel
++++ b/src/material/toolbar/testing/BUILD.bazel
+@@ -19,8 +19,8 @@ filegroup(
+ )
+ 
+ ng_test_library(
+-    name = "harness_tests_lib",
+-    srcs = ["shared.spec.ts"],
++    name = "unit_tests_lib",
++    srcs = glob(["**/*.spec.ts"]),
+     deps = [
+         ":testing",
+         "//src/cdk/testing",
+@@ -30,21 +30,6 @@ ng_test_library(
+     ],
+ )
+ 
+-ng_test_library(
+-    name = "unit_tests_lib",
+-    srcs = glob(
+-        ["**/*.spec.ts"],
+-        exclude = [
+-            "shared.spec.ts",
+-        ],
+-    ),
+-    deps = [
+-        ":harness_tests_lib",
+-        ":testing",
+-        "//src/material/toolbar",
+-    ],
+-)
+-
+ ng_web_test_suite(
+     name = "unit_tests",
+     deps = [":unit_tests_lib"],
+diff --git a/src/material/toolbar/testing/shared.spec.ts b/src/material/toolbar/testing/shared.spec.ts
+deleted file mode 100644
+index a7643df2d6225838ed832139947caa93dda26d06..0000000000000000000000000000000000000000
+--- a/src/material/toolbar/testing/shared.spec.ts
++++ /dev/null
+@@ -1,87 +0,0 @@
+-import {Component} from '@angular/core';
+-import {ComponentHarness, HarnessLoader} from '@angular/cdk/testing';
+-import {MatToolbarModule} from '@angular/material/toolbar';
+-import {MatToolbarHarness, MatToolbarSection} from '@angular/material/toolbar/testing';
+-import {ComponentFixture, TestBed} from '@angular/core/testing';
+-import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+-
+-/** Shared tests to run on both the original and MDC-based toolbars. */
+-export function runHarnessTests(
+-  toolbarModule: typeof MatToolbarModule,
+-  toolbarHarness: typeof MatToolbarHarness,
+-) {
+-  let fixture: ComponentFixture<ToolbarHarnessTest>;
+-  let loader: HarnessLoader;
+-
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
+-      imports: [toolbarModule],
+-      declarations: [ToolbarHarnessTest],
+-    }).compileComponents();
+-
+-    fixture = TestBed.createComponent(ToolbarHarnessTest);
+-    fixture.detectChanges();
+-    loader = TestbedHarnessEnvironment.loader(fixture);
+-  });
+-
+-  it('should find all toolbars', async () => {
+-    const toolbars = await loader.getAllHarnesses(toolbarHarness);
+-
+-    expect(toolbars.length).toBe(2);
+-  });
+-
+-  it('should find toolbar with text', async () => {
+-    const toolbars = await loader.getAllHarnesses(toolbarHarness.with({text: 'My App'}));
+-
+-    expect(toolbars.length).toBe(1);
+-    expect(await toolbars[0].hasMultipleRows()).toBeFalse();
+-  });
+-
+-  it('should find toolbar with regex', async () => {
+-    const toolbars = await loader.getAllHarnesses(toolbarHarness.with({text: /Row/}));
+-
+-    expect(toolbars.length).toBe(1);
+-    expect(await toolbars[0].hasMultipleRows()).toBeTrue();
+-  });
+-
+-  it('should get toolbar text', async () => {
+-    const toolbars = await loader.getAllHarnesses(toolbarHarness);
+-
+-    expect(await toolbars[0].getRowsAsText()).toEqual(['My App']);
+-    expect(await toolbars[1].getRowsAsText()).toEqual(['Row 1', 'Row 2 Button 1  Button 2']);
+-  });
+-
+-  it('should get harness loaders for toolbar row', async () => {
+-    const toolbar = await loader.getHarness(toolbarHarness.with({text: /Button/}));
+-    const rowLoaders = await toolbar.getAllChildLoaders(MatToolbarSection.ROW);
+-    const row1 = rowLoaders[0] as HarnessLoader;
+-    const row1Subcomponents = await row1.getAllHarnesses(DummyHarness);
+-    const row2 = rowLoaders[1] as HarnessLoader;
+-    const row2Subcomponents = await row2.getAllHarnesses(DummyHarness);
+-
+-    expect(row1Subcomponents.length).toBe(1);
+-    expect(row2Subcomponents.length).toBe(3);
+-  });
+-}
+-
+-@Component({
+-  template: `
+-    <mat-toolbar><span>My App</span></mat-toolbar>
+-    <mat-toolbar>
+-      <mat-toolbar-row><span>Row 1</span></mat-toolbar-row>
+-      <mat-toolbar-row><span>Row 2</span>
+-        <button mat-button>
+-          Button 1
+-        </button>
+-        <button mat-button>
+-          Button 2
+-        </button>
+-      </mat-toolbar-row>
+-    </mat-toolbar>
+-  `,
+-})
+-class ToolbarHarnessTest {}
+-
+-export class DummyHarness extends ComponentHarness {
+-  static hostSelector = 'span, button';
+-}
+diff --git a/src/material/toolbar/testing/toolbar-harness.spec.ts b/src/material/toolbar/testing/toolbar-harness.spec.ts
+index f847003a0f099b01ec7a6671da12a9d09bb8054e..622ca1225a59104ad024bf65cb7d9717404e71b5 100644
+--- a/src/material/toolbar/testing/toolbar-harness.spec.ts
++++ b/src/material/toolbar/testing/toolbar-harness.spec.ts
+@@ -1,7 +1,83 @@
+-import {runHarnessTests} from '@angular/material/toolbar/testing/shared.spec';
++import {Component} from '@angular/core';
++import {ComponentHarness, HarnessLoader} from '@angular/cdk/testing';
+ import {MatToolbarModule} from '@angular/material/toolbar';
+-import {MatToolbarHarness} from '@angular/material/toolbar/testing';
++import {MatToolbarHarness, MatToolbarSection} from '@angular/material/toolbar/testing';
++import {ComponentFixture, TestBed} from '@angular/core/testing';
++import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+ 
+-describe('Non-MDC-based MatToolbarHarness', () => {
+-  runHarnessTests(MatToolbarModule, MatToolbarHarness);
++describe('MatToolbarHarness', () => {
++  let fixture: ComponentFixture<ToolbarHarnessTest>;
++  let loader: HarnessLoader;
++
++  beforeEach(async () => {
++    await TestBed.configureTestingModule({
++      imports: [MatToolbarModule],
++      declarations: [ToolbarHarnessTest],
++    }).compileComponents();
++
++    fixture = TestBed.createComponent(ToolbarHarnessTest);
++    fixture.detectChanges();
++    loader = TestbedHarnessEnvironment.loader(fixture);
++  });
++
++  it('should find all toolbars', async () => {
++    const toolbars = await loader.getAllHarnesses(MatToolbarHarness);
++
++    expect(toolbars.length).toBe(2);
++  });
++
++  it('should find toolbar with text', async () => {
++    const toolbars = await loader.getAllHarnesses(MatToolbarHarness.with({text: 'My App'}));
++
++    expect(toolbars.length).toBe(1);
++    expect(await toolbars[0].hasMultipleRows()).toBeFalse();
++  });
++
++  it('should find toolbar with regex', async () => {
++    const toolbars = await loader.getAllHarnesses(MatToolbarHarness.with({text: /Row/}));
++
++    expect(toolbars.length).toBe(1);
++    expect(await toolbars[0].hasMultipleRows()).toBeTrue();
++  });
++
++  it('should get toolbar text', async () => {
++    const toolbars = await loader.getAllHarnesses(MatToolbarHarness);
++
++    expect(await toolbars[0].getRowsAsText()).toEqual(['My App']);
++    expect(await toolbars[1].getRowsAsText()).toEqual(['Row 1', 'Row 2 Button 1  Button 2']);
++  });
++
++  it('should get harness loaders for toolbar row', async () => {
++    const toolbar = await loader.getHarness(MatToolbarHarness.with({text: /Button/}));
++    const rowLoaders = await toolbar.getAllChildLoaders(MatToolbarSection.ROW);
++    const row1 = rowLoaders[0] as HarnessLoader;
++    const row1Subcomponents = await row1.getAllHarnesses(DummyHarness);
++    const row2 = rowLoaders[1] as HarnessLoader;
++    const row2Subcomponents = await row2.getAllHarnesses(DummyHarness);
++
++    expect(row1Subcomponents.length).toBe(1);
++    expect(row2Subcomponents.length).toBe(3);
++  });
+ });
++
++@Component({
++  template: `
++    <mat-toolbar><span>My App</span></mat-toolbar>
++    <mat-toolbar>
++      <mat-toolbar-row><span>Row 1</span></mat-toolbar-row>
++      <mat-toolbar-row><span>Row 2</span>
++        <button mat-button>
++          Button 1
++        </button>
++        <button mat-button>
++          Button 2
++        </button>
++      </mat-toolbar-row>
++    </mat-toolbar>
++  `,
++})
++class ToolbarHarnessTest {}
++
++class DummyHarness extends ComponentHarness {
++  static hostSelector = 'span, button';
++}
