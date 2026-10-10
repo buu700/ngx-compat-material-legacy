@@ -252,8 +252,15 @@
                 waitFor(() => {
                   const boundary = readLegacyFormFieldOutlineBoundaryNative(query('#p-outline-boundary'));
                   return legacyFormFieldOutlineBoundaryNativeOkay(boundary) ? boundary : null;
-                }, 1500, boundary => finish(!!boundary,
-                  'form-field; outline prefix/hide/show/RTL ' + JSON.stringify(rows) + '; fixed long-label boundary ' + JSON.stringify(boundary)));
+                }, 1500, boundary => {
+                  if (!boundary) {finish(false, 'fixed long-label geometry missing'); return;}
+                  waitFor(() => {
+                    const state = readLegacyFormFieldNoLabelNative(query('#p-field-disabled'));
+                    return legacyFormFieldNoLabelNativeOkay(state) ? state : null;
+                  }, 1500, state => finish(!!state,
+                    'form-field; outline prefix/hide/show/RTL ' + JSON.stringify(rows) + '; fixed long-label boundary ' + JSON.stringify(boundary)
+                    + '; tagged no-label float state ' + JSON.stringify(state)));
+                });
               });
             });
           });

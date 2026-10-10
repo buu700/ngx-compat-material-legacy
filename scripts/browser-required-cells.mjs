@@ -19,7 +19,7 @@ import {legacyInkBarNativeOkay, legacyInkBarSelectionSequenceOkay, readLegacyInk
 import {legacySelectFontNativeOkay, readLegacySelectFontNative} from './legacy-select-font-native-contract.mjs';
 import {legacyChipBlurNativeOkay} from './legacy-chip-blur-native-contract.mjs';
 import {tabPaginationNativeOkay, readTabPaginationNative} from './tab-pagination-native-contract.mjs';
-import {legacyFormFieldOutlineNativeOkay, legacyFormFieldOutlineSequenceOkay, readLegacyFormFieldOutlineNative, legacyFormFieldOutlineBoundaryNativeOkay, readLegacyFormFieldOutlineBoundaryNative} from './legacy-form-field-outline-native-contract.mjs';
+import {legacyFormFieldOutlineNativeOkay, legacyFormFieldOutlineSequenceOkay, readLegacyFormFieldOutlineNative, legacyFormFieldOutlineBoundaryNativeOkay, readLegacyFormFieldOutlineBoundaryNative, legacyFormFieldNoLabelNativeOkay, readLegacyFormFieldNoLabelNative} from './legacy-form-field-outline-native-contract.mjs';
 import {announcedChromeEndpoint,debuggerMatchesChild,announcedFirefoxEndpoint} from './chromium-debug-endpoint.mjs';
 import {spawn, spawnSync} from 'node:child_process';
 import {cdpPointerClick, bidiPointerClick, pointerPoint, withPrivateXDisplay, servicePointerRequest} from './browser-pointer-input.mjs';
@@ -60,7 +60,7 @@ function firefoxBin() {
 export function requiredProbeSource() {
   return [legacyTooltipAriaLifetimeNativeOkay, legacyTooltipNativeOkay, legacyTooltipMessageSequenceOkay, readLegacyTooltipNative, legacyInkBarNativeOkay, legacyInkBarSelectionSequenceOkay,
     readLegacyInkBarNative, legacySelectFontNativeOkay, readLegacySelectFontNative, legacyChipBlurNativeOkay,
-    legacyFormFieldOutlineNativeOkay, legacyFormFieldOutlineSequenceOkay, readLegacyFormFieldOutlineNative, legacyFormFieldOutlineBoundaryNativeOkay, readLegacyFormFieldOutlineBoundaryNative,
+    legacyFormFieldOutlineNativeOkay, legacyFormFieldOutlineSequenceOkay, readLegacyFormFieldOutlineNative, legacyFormFieldOutlineBoundaryNativeOkay, readLegacyFormFieldOutlineBoundaryNative, legacyFormFieldNoLabelNativeOkay, readLegacyFormFieldNoLabelNative,
     tabPaginationNativeOkay, readTabPaginationNative, legacySnackMotionNativeOkay,
     trackLegacySnackMotionNative, readLegacySnackMotionEnterNative, readLegacySnackMotionExitNative]
     .map(contract => contract.toString()).join('\n') + '\n' + readFileSync(probePath, 'utf8');
@@ -158,7 +158,7 @@ function labHtml() {
     '<div id="wrap-dialog"><button id="p-dialog-open" type="button" (click)="openDialog()">Open dialog</button></div>',
     '<div id="wrap-field" *ngIf="!cspOnly">',
     '<mat-form-field id="p-field"><mat-label>Name</mat-label><input id="p-field-input" matInput [errorStateMatcher]="matcher"><mat-hint id="p-hint">Hint text</mat-hint></mat-form-field>',
-    '<mat-form-field id="p-field-disabled"><input matInput disabled value="off"></mat-form-field>',
+    '<mat-form-field id="p-field-disabled" floatLabel="always"><input matInput disabled value="off"></mat-form-field>',
     '<div id="p-outline-wrapper" [style.display]="outlineVisible() ? \'\' : \'none\'" [dir]="outlineDirection()">',
     '<mat-form-field id="p-outline" appearance="outline" floatLabel="always"><mat-label>Outline</mat-label>',
     '<span matPrefix *ngIf="outlinePrefix()">USD&nbsp;</span><input matInput value="Value"></mat-form-field>',

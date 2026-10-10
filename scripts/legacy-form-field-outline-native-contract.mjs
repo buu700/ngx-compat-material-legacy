@@ -58,3 +58,18 @@ export function readLegacyFormFieldOutlineBoundaryNative(host) {
     document_root:host.getRootNode()===document,prefix:!!host.querySelector('.mat-form-field-prefix'),
     suffix:!!host.querySelector('.mat-form-field-suffix')};
 }
+
+/** Tagged always-float host class remains true even with no label/placeholder. */
+export function legacyFormFieldNoLabelNativeOkay(o) {
+  return !!o&&!o.error&&o.historical_host===true&&o.has_label===false&&o.can_float===true&&o.should_float===true&&
+    o.label_elements===0&&o.input_disabled===true&&o.input_value==='off';
+}
+
+export function readLegacyFormFieldNoLabelNative(host) {
+  if(!host)return null;
+  const input=host.querySelector('input');
+  return {historical_host:host.tagName==='MAT-FORM-FIELD'&&host.classList.contains('mat-form-field'),
+    has_label:host.classList.contains('mat-form-field-has-label'),can_float:host.classList.contains('mat-form-field-can-float'),
+    should_float:host.classList.contains('mat-form-field-should-float'),
+    label_elements:host.querySelectorAll('.mat-form-field-label').length,input_disabled:input?.disabled===true,input_value:input?.value};
+}
