@@ -54,9 +54,10 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0, combined)
             summary = json.loads(result.stdout)
             self.assertFalse(summary["ok"])
-            # Thirteen prior behavior subjects plus five shared-test consolidation
-            # residuals need individual review; exact relocation checks cannot clear them.
-            self.assertEqual(summary["unresolved"], 18)
+            # Thirteen behavior subjects still need execution evidence. The five
+            # test-consolidation residuals now have individual ownership reviews
+            # preserving complete tagged legacy sources, with no runtime claim.
+            self.assertEqual(summary["unresolved"], 13)
             self.assertEqual(summary["seed_rows"], 1697)
             self.assertEqual(summary["ledger_rows"], 1697)
             self.assertEqual(summary["missing"], 0)

@@ -16,6 +16,8 @@ import {fileURLToPath} from 'node:url';
 import {analyzeSharedTestMove,bazelProductionCalls} from '../scripts/upstream-test-consolidation-analysis.mjs';
 import {analyzeConsolidationSubjects,testConsolidationBatchOk,testConsolidationEntryOk,
   TEST_CONSOLIDATION_CAPSULE,TEST_CONSOLIDATION_CAPSULE_SHA256} from '../scripts/upstream-test-consolidation-evidence.mjs';
+import {retainedConsolidationSources,HISTORICAL_CONSOLIDATION_CAPSULE,HISTORICAL_CONSOLIDATION_SHA256}
+  from '../scripts/upstream-test-consolidation-historical.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),ts=createRequire(import.meta.url)('typescript');
 const read=path=>readFileSync(join(root,path)),hash=bytes=>createHash('sha256').update(bytes).digest('hex');
 const reportPath='compatibility/f10/disposition-ledger/evidence/closeout-test-consolidation-source-review.json';
@@ -37,6 +39,21 @@ reject('changed-original-patch',()=>{},{[sourceResults[0].patch_file]:Buffer.fro
 reject('changed-current-product',()=>{},{'projects/ngx-material-legacy/legacy-menu/menu-item.html':Buffer.from('changed product')});
 reject('changed-current-tooling',()=>{},{'projects/ngx-material-legacy/tsconfig.lib.json':Buffer.from('{}')});
 reject('fake-exact-relocation',r=>{const row=r.reviews.find(x=>!x.source_analysis.exact_test_body_and_fixture_relocation);row.source_analysis.exact_test_body_and_fixture_relocation=true;row.final_disposition='not-applicable';});
+reject('changed-tagged-capsule',()=>{},{[HISTORICAL_CONSOLIDATION_CAPSULE]:Buffer.from('changed untouched reference')});
+reject('missing-individual-source-review',r=>{delete r.reviews.find(x=>x.individual_source_review).individual_source_review;});
+reject('forged-modern-equivalence',r=>{r.reviews.find(x=>x.individual_source_review).individual_source_review.whole_modern_suite_equivalence_claimed=true;});
+const retained=retainedConsolidationSources(read(HISTORICAL_CONSOLIDATION_CAPSULE),read);
+assert.equal(retained.length,12);
+for(const [id,path,before,after] of [
+ ['lost-legacy-appearance','testing/legacy-runner/shims/harness/form-field/shared.spec.ts',"isMdcImplementation ? 'fill' : 'legacy'","isMdcImplementation ? 'fill' : 'fill'"],
+ ['lost-dialog-service-alias','testing/legacy-runner/shims/harness/dialog/shared.spec.ts','dialogService !== MatDialog','dialogService === MatDialog'],
+ ['lost-distinct-option-token','testing/legacy-runner/shims/harness/core/option-shared.spec.ts','MAT_LEGACY_OPTION_PARENT_COMPONENT as MAT_OPTION_PARENT_COMPONENT','MAT_OPTION_PARENT_COMPONENT'],
+ ['lost-snack-custom-content-rejection','projects/ngx-material-legacy/legacy-snack-bar/testing/snack-bar-harness.spec.ts','toBeRejectedWithError(/custom content/)','toBeResolved()'],
+ ['changed-checkbox-fixture-label','testing/legacy-runner/shims/harness/checkbox/shared.spec.ts','        First','        Changed'],
+]){
+ const original=read(path).toString(),changed=Buffer.from(original.replace(before,after));assert.notEqual(changed.toString(),original,id);
+ assert.throws(()=>retainedConsolidationSources(read(HISTORICAL_CONSOLIDATION_CAPSULE),p=>p===path?changed:read(p)),undefined,id);controls.push(id);
+}
 for(const [id,change] of [['terminal-label-bypass',e=>{e.final_disposition='inherited';}],['row-hash-bypass',e=>{e.source_check.evidence_report_sha256='a'.repeat(64);}]] ){
  const entry=clone(entries[0]);change(entry);assert.equal(testConsolidationEntryOk(body,entry,read,true),false,id);controls.push(id);
 }
@@ -57,7 +74,7 @@ try{
  assert.equal(baseline.status,1,baseline.stderr);const missingBefore=JSON.parse(baseline.stdout).missing_evidence;
  for(const [id,choose,change] of [['cli-terminal-label',e=>e.sha===entries[0].sha,e=>{e.final_disposition='irrelevant';}],
   ['cli-non-json-pointer',e=>e.sha===entries[0].sha,e=>{e.evidence_report='AGENTS.md';delete e.batch_id;}],
-  ['cli-pending-residual',e=>e.sha==='518ac69a7e0f787327e971c710a13bb2da6461cc',e=>{e.final_disposition='not-applicable';}]] ){
+  ['cli-individual-review-bypass',e=>e.sha==='518ac69a7e0f787327e971c710a13bb2da6461cc',e=>{e.final_disposition='irrelevant';}]] ){
   const changed=clone(ledger),target=changed.entries.find(choose);assert.ok(target);change(target);
   const path=join(scratch,id+'.json'),report=join(scratch,id+'-report.json');writeFileSync(path,JSON.stringify(changed));
   const result=spawnSync(process.execPath,['scripts/check-upstream-audit-disposition.mjs','--line',body.line,'--admission','--ledger',path,'--report',report],{cwd:root,encoding:'utf8',timeout:30000});
@@ -67,9 +84,12 @@ try{
  }
 }finally{rmSync(scratch,{recursive:true,force:true});}
 const result={schema_version:1,line:body.line,node:process.version,compiler:ts.version,
- subjects:32,patch_paths:sourceResults.reduce((n,r)=>n+r.patch_paths.length,0),exact_relocations:27,pending_residuals:5,
+ subjects:32,patch_paths:sourceResults.reduce((n,r)=>n+r.patch_paths.length,0),exact_relocations:27,
+ individual_source_reviews:5,retained_historical_sources:retained.length,pending_residuals:0,
  positive_entry_bindings:entries.length,negative_controls:controls.length,controls,
  source_capsule_sha256:TEST_CONSOLIDATION_CAPSULE_SHA256,
+ historical_capsule_sha256:HISTORICAL_CONSOLIDATION_SHA256,
+ historical_validator_sha256:hash(read('scripts/upstream-test-consolidation-historical.mjs')),
  producer_sha256:hash(readFileSync(fileURLToPath(import.meta.url))),analysis_sha256:hash(read('scripts/upstream-test-consolidation-analysis.mjs')),
  validator_sha256:hash(read('scripts/upstream-test-consolidation-evidence.mjs')),
  actual_original_tests_or_product_runtime_executed:false,g11_claim:'not-passed'};
