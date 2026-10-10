@@ -146,10 +146,11 @@ import {MatLegacyTabsModule} from '@ngx-compat/material-legacy/legacy-tabs';
 
     <mat-form-field>
       <input id="ac-input" matInput [matAutocomplete]="auto" placeholder="ac">
-      <mat-autocomplete #auto="matAutocomplete">
+      <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectedValue = $event.option.value">
         <mat-option id="ac-option-a" value="a">A</mat-option>
       </mat-autocomplete>
     </mat-form-field>
+    <output id="ac-selected-value">{{selectedValue}}</output>
 
     <mat-tab-group id="tabs">
       <mat-tab label="One"><div id="tab-one">One body</div></mat-tab>
@@ -167,6 +168,7 @@ import {MatLegacyTabsModule} from '@ngx-compat/material-legacy/legacy-tabs';
   \`,
 })
 export class LabRoot {
+  selectedValue = '';
   private snack = inject(MatLegacySnackBar);
   openSnack() {
     this.snack.open('Snack message', 'Dismiss', {duration: 0});
@@ -424,8 +426,7 @@ try {
   const tipHidden = await waitFor('!document.querySelector(".mat-tooltip")');
   families.tooltip.hidden = families.tooltip.shown && tipHidden;
 
-  // Autocomplete: focus opens panel; type to filter; assert panel + option visible.
-  // CDP ArrowDown/click did not activate MatOption under this headless harness; do not claim selection.
+  // Autocomplete: focus, type, then activate the real option and observe its public selection event.
   await evaluate(`(() => {
     const input = document.getElementById("ac-input");
     input.focus();
@@ -442,8 +443,13 @@ try {
     100,
   );
   families.autocomplete.input_focused = await evaluate('document.activeElement && document.activeElement.id === "ac-input"');
-  families.autocomplete.option_selected = false;
-  families.autocomplete.panel_closed_after_select = false;
+  await evaluate('document.getElementById("ac-option-a")?.click()');
+  families.autocomplete.option_selected = await waitFor(
+    'document.getElementById("ac-selected-value")?.textContent === "a" && document.getElementById("ac-input")?.value === "a"',
+  );
+  families.autocomplete.panel_closed_after_select = await waitFor(
+    '!document.querySelector(".mat-autocomplete-panel #ac-option-a")',
+  );
 
   // Tabs: retain the historical ink positioner through first/second/first selection.
   await waitFor('!!document.querySelector("#tabs .mat-tab-label-active")');
@@ -497,6 +503,7 @@ const ok =
   && families['snack-bar'].opened && families['snack-bar'].dismissed
   && families.tooltip.shown
   && families.autocomplete.panel_opened && families.autocomplete.typed_filter_visible && families.autocomplete.input_focused
+  && families.autocomplete.option_selected && families.autocomplete.panel_closed_after_select
   && families.tabs.second_selected && families.tabs.second_body_visible
   && legacyInkBarSelectionSequenceOkay(families.tabs.ink_alignment)
   && tabPaginationNativeOkay(families.tabs.pagination);

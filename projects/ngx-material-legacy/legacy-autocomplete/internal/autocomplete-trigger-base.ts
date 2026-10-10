@@ -63,6 +63,7 @@ import {
 } from '@angular/material/autocomplete';
 import {_MatAutocompleteBase} from './autocomplete-base';
 import {getMatAutocompleteMissingPanelError} from '../owned-errors';
+import {afterLegacyRender} from './after-legacy-render';
 
 /** @docs-private */
 export function MAT_AUTOCOMPLETE_SCROLL_STRATEGY_FACTORY(overlay: Overlay): () => ScrollStrategy {
@@ -134,6 +135,9 @@ export abstract class _MatAutocompleteTriggerBase
 
   /** Stream of keyboard events that can close the panel. */
   private readonly _closeKeyEventStream = new Subject<void>();
+
+  /** Resolves early option subscriptions when the view queries have initialized. */
+  private readonly _initialized = new Subject<void>();
 
   /**
    * Event handler for when the window is blurred. Needs to be an
@@ -213,6 +217,8 @@ export abstract class _MatAutocompleteTriggerBase
   protected abstract _aboveClass: string;
 
   ngAfterViewInit() {
+    this._initialized.next();
+    this._initialized.complete();
     const window = this._getWindow();
 
     if (typeof window !== 'undefined') {
@@ -240,6 +246,8 @@ export abstract class _MatAutocompleteTriggerBase
     this._viewportSubscription.unsubscribe();
     this._handsetLandscapeSubscription.unsubscribe();
     this._componentDestroyed = true;
+    this._initialized.complete();
+    this._closingActionsSubscription?.unsubscribe();
     this._destroyPanel();
     this._closeKeyEventStream.complete();
     this._clearFromModal();
@@ -349,8 +357,7 @@ export abstract class _MatAutocompleteTriggerBase
 
     // If there are any subscribers before `ngAfterViewInit`, the `autocomplete` will be undefined.
     // Return a stream that we'll replace with the real one once everything is in place.
-    return this._zone.onStable.pipe(
-      take(1),
+    return this._initialized.pipe(
       switchMap(() => this.optionSelections),
     );
   }) as Observable<MatOptionSelectionChange>;
@@ -564,7 +571,7 @@ export abstract class _MatAutocompleteTriggerBase
    * stream every time the option list changes.
    */
   private _subscribeToClosingActions(): Subscription {
-    const firstStable = this._zone.onStable.pipe(take(1));
+    const firstStable = afterLegacyRender(this._zone, this._viewContainerRef.injector);
     const optionChanges = this.autocomplete.options.changes.pipe(
       tap(() => this._positionStrategy.reapplyLastPosition()),
       // Defer emitting to the stream until the next tick, because changing
