@@ -26,18 +26,19 @@ export function legacyTooltipMessageSequenceOkay(sequence) {
 
 export async function observeLegacyTooltipNative({evaluate}) {
   try {
-    return await evaluate(`(() => {
-      const tips = document.querySelectorAll('.mat-tooltip'), tip = tips[0];
-      const host = document.getElementById('tip-host');
-      if (!tip || !host) return {count: tips.length};
-      const r = tip.getBoundingClientRect(), h = host.getBoundingClientRect();
-      return {count: tips.length, historical_element: tip.classList.contains('mat-tooltip'),
-        visible: getComputedStyle(tip).visibility === 'visible' && getComputedStyle(tip).display !== 'none',
-        text: tip.textContent.trim(), left: r.left, top: r.top, width: r.width, height: r.height,
-        host_center: h.left + h.width / 2, host_bottom: h.bottom,
-        viewport_width: innerWidth, viewport_height: innerHeight};
-    })()`);
+    return await evaluate(`(${readLegacyTooltipNative.toString()})(document.getElementById('tip-host'))`);
   } catch (error) {return {error: String(error.message || error)};}
+}
+
+export function readLegacyTooltipNative(host) {
+  const tips = document.querySelectorAll('.mat-tooltip'), tip = tips[0];
+  if (!tip || !host) return {count: tips.length};
+  const r = tip.getBoundingClientRect(), h = host.getBoundingClientRect();
+  return {count: tips.length, historical_element: tip.classList.contains('mat-tooltip'),
+    visible: getComputedStyle(tip).visibility === 'visible' && getComputedStyle(tip).display !== 'none',
+    text: tip.textContent.trim(), left: r.left, top: r.top, width: r.width, height: r.height,
+    host_center: h.left + h.width / 2, host_bottom: h.bottom,
+    viewport_width: innerWidth, viewport_height: innerHeight};
 }
 
 export function legacyTooltipAriaLifetimeNativeOkay(observation) {

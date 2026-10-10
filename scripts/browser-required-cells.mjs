@@ -12,7 +12,10 @@
  */
 import {createHash} from 'node:crypto';
 import {tooltipAriaLifetimeFixture} from './tooltip-aria-lifetime-fixture.mjs';
-import {legacyTooltipAriaLifetimeNativeOkay} from './legacy-tooltip-native-contract.mjs';
+import {legacyTooltipAriaLifetimeNativeOkay, legacyTooltipNativeOkay, legacyTooltipMessageSequenceOkay, readLegacyTooltipNative} from './legacy-tooltip-native-contract.mjs';
+import {legacyInkBarNativeOkay, legacyInkBarSelectionSequenceOkay, readLegacyInkBarNative} from './legacy-ink-bar-native-contract.mjs';
+import {legacySelectFontNativeOkay, readLegacySelectFontNative} from './legacy-select-font-native-contract.mjs';
+import {legacyChipBlurNativeOkay} from './legacy-chip-blur-native-contract.mjs';
 import {announcedChromeEndpoint,debuggerMatchesChild,announcedFirefoxEndpoint} from './chromium-debug-endpoint.mjs';
 import {spawn, spawnSync} from 'node:child_process';
 import {createRequire} from 'node:module';
@@ -50,7 +53,9 @@ function firefoxBin() {
 
 /** The browser executes this exact contract and probe, without npm imports. */
 export function requiredProbeSource() {
-  return legacyTooltipAriaLifetimeNativeOkay.toString() + '\n' + readFileSync(probePath, 'utf8');
+  return [legacyTooltipAriaLifetimeNativeOkay, legacyTooltipNativeOkay, legacyTooltipMessageSequenceOkay, readLegacyTooltipNative, legacyInkBarNativeOkay, legacyInkBarSelectionSequenceOkay,
+    readLegacyInkBarNative, legacySelectFontNativeOkay, readLegacySelectFontNative, legacyChipBlurNativeOkay]
+    .map(contract => contract.toString()).join('\n') + '\n' + readFileSync(probePath, 'utf8');
 }
 
 export function summarizeCells(requiredIds, outcomes) {
@@ -138,7 +143,7 @@ function labHtml() {
     '</div>',
     '<div id="wrap-chips" *ngIf="!cspOnly">',
     '<button id="p-mark-invalid" type="button" (click)="markInvalid()">Mark invalid</button>',
-    '<mat-chip-list [errorStateMatcher]="matcher"><mat-chip>One</mat-chip></mat-chip-list>',
+    '<mat-chip-list id="p-chip-list" #chipList="matChipList" [formControl]="chipControl" [errorStateMatcher]="matcher"><mat-chip>One</mat-chip></mat-chip-list>',
     '<mat-chip-list disabled><mat-chip>Off</mat-chip></mat-chip-list>',
     '</div>',
     '<div id="wrap-core" *ngIf="!cspOnly"><mat-pseudo-checkbox id="p-core" state="checked"></mat-pseudo-checkbox></div>',
@@ -177,7 +182,7 @@ function labHtml() {
     '<mat-radio-button id="p-radio-invalid" name="lab-req" required value="req">Req</mat-radio-button>',
     '</div>',
     '<div id="wrap-select" *ngIf="!cspOnly">',
-    '<mat-form-field><mat-select id="p-select" [errorStateMatcher]="matcher"><mat-option value="a">A</mat-option></mat-select></mat-form-field>',
+    '<mat-form-field><mat-select id="p-select" style="font-size:20px" [errorStateMatcher]="matcher"><mat-option value="a">A</mat-option></mat-select></mat-form-field>',
     '<mat-form-field><mat-select id="p-select-disabled" disabled><mat-option value="b">B</mat-option></mat-select></mat-form-field>',
     '</div>',
     '<div id="wrap-toggle" *ngIf="!cspOnly">',
@@ -197,10 +202,11 @@ function labHtml() {
     '<ng-container matColumnDef="name"><th mat-header-cell *matHeaderCellDef>Name</th><td mat-cell *matCellDef="let row"><button id="p-table-focus" type="button">{{row.name}}</button></td></ng-container>',
     '<tr mat-header-row *matHeaderRowDef="cols"></tr><tr mat-row *matRowDef="let row; columns: cols"></tr>',
     '</table></div>',
-    '<div id="wrap-tabs" *ngIf="!cspOnly"><mat-tab-group><mat-tab label="One">One</mat-tab><mat-tab label="Two">Two</mat-tab><mat-tab label="Off" disabled>Off</mat-tab></mat-tab-group></div>',
+    '<div id="wrap-tabs" *ngIf="!cspOnly"><mat-tab-group id="p-tabs"><mat-tab label="One">One</mat-tab><mat-tab label="Two">Two</mat-tab><mat-tab label="Off" disabled>Off</mat-tab></mat-tab-group></div>',
     '<div id="wrap-tooltip" *ngIf="!cspOnly">',
-    '<button id="p-tooltip" type="button" #tip="matTooltip" matTooltip="Hello tip">Tip</button>',
+    '<button id="p-tooltip" type="button" #tip="matTooltip" [matTooltip]="tipMessage()">Tip</button>',
     '<button id="p-tooltip-off" type="button" #tipOff="matTooltip" matTooltip="Nope" matTooltipDisabled>Off</button>',
+    '<button id="p-tooltip-change" type="button" (click)="tipMessage.set(\'A longer tooltip message for repositioning\')">Change tooltip</button>',
     '<lab-tooltip-aria-lifetime></lab-tooltip-aria-lifetime>',
     '</div>',
     '</div>',
@@ -214,7 +220,7 @@ function labSource(zoneless) {
   return `${zoneImport}import {CSP_NONCE, ChangeDetectorRef, Component, Directive, Input, NgModule, QueryList, TemplateRef, ViewChild, ViewChildren, ViewContainerRef, forwardRef, inject, signal${zoneNamed}} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
-import {AbstractControl, FormsModule, NG_VALIDATORS, ValidationErrors, Validator} from '@angular/forms';
+import {AbstractControl, FormControl, FormsModule, NG_VALIDATORS, ReactiveFormsModule, ValidationErrors, Validator} from '@angular/forms';
 import {ErrorStateMatcher, MATERIAL_ANIMATIONS} from '@angular/material/core';
 import {MatLegacyAutocompleteModule} from '@ngx-compat/material-legacy/legacy-autocomplete';
 import {MatLegacyButtonModule} from '@ngx-compat/material-legacy/legacy-button';
@@ -277,12 +283,15 @@ export class LabRoot {
   forceSliderInvalid = false;
   sliderValue = 20;
   readonly autoSelection = signal<string | null>(null);
+  readonly chipControl = new FormControl<string | null>(null);
+  readonly tipMessage = signal('Hello tip');
   cols = ['name'];
   rows = [{name: 'Ada'}];
   @ViewChild('menuTrigger') menuTrigger!: any;
   @ViewChild('autoTrigger') autoTrigger!: any;
   @ViewChild('tip') tip!: any;
   @ViewChild('tipOff') tipOff!: any;
+  @ViewChild('chipList') chipList?: MatLegacyChipList;
   @ViewChild(TooltipAriaLifetimeLab) ariaLifetimeLab?: TooltipAriaLifetimeLab;
   @ViewChildren(MatLegacyInput) inputs!: QueryList<MatLegacyInput>;
   @ViewChildren(MatLegacySelect) selects!: QueryList<MatLegacySelect>;
@@ -314,6 +323,7 @@ export class LabRoot {
         lab.matcher.on = false;
         lab.forceSliderInvalid = false;
         lab.autoSelection.set(null);
+        lab.tipMessage.set('Hello tip');
       },
       openDialog() { lab.openDialog(); },
       openMenu() { lab.openMenu(); },
@@ -323,6 +333,8 @@ export class LabRoot {
         return lab.ariaLifetimeLab.run();
       },
       readAutocompleteSelection() { return lab.autoSelection(); },
+      readChipFormState() { return {focused: lab.chipList?.focused, touched: lab.chipControl.touched}; },
+      resetChipFormState() { lab.chipControl.markAsUntouched(); },
       matcher: lab.matcher,
       setSliderFlag(on: boolean) { lab.forceSliderInvalid = on; },
       selectSecondTab() {
@@ -339,6 +351,7 @@ export class LabRoot {
   imports: [
     BrowserModule,
     FormsModule,
+    ReactiveFormsModule,
     MatLegacyAutocompleteModule,
     MatLegacyButtonModule,
     MatLegacyCardModule,
