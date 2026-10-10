@@ -64,6 +64,9 @@ function abi(text){const {source,cls}=owner(text);return cls.members.filter(node
 assert.deepEqual(abi(candidate),abi(baseline));
 const changed=(text,from,to)=>{const value=text.replace(from,to);assert.notEqual(value,text);return value;};
 const mutations={
+ noAnnouncementCancel:bodyProgram(changed(candidate,'    this._destroyed = true;\n    clearTimeout(this._announceTimeoutId);','    this._destroyed = true;')),
+ noAnnouncementGuard:bodyProgram(changed(candidate,'          if (this._destroyed) {\n            return;\n          }\n','')),
+ noLiveAnnouncement:bodyProgram(changed(candidate,'            this._onAnnounce.next();','')), 
  priorWait:bodyProgram(baseline),
  synchronous:bodyProgram(changed(candidate,'queueMicrotask(finish);','finish();')),
  noGuard:bodyProgram(changed(candidate,'    if (this._exitCompletionPending) {\n      return;\n    }','')),

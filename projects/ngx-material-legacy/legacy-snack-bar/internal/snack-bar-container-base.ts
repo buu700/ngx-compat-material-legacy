@@ -239,6 +239,7 @@ export abstract class _MatSnackBarContainerBase extends BasePortalOutlet impleme
   /** Makes sure the exit callbacks have been invoked when the element is destroyed. */
   ngOnDestroy() {
     this._destroyed = true;
+    clearTimeout(this._announceTimeoutId);
     this._clearFromModals();
     this._completeExit();
   }
@@ -354,6 +355,9 @@ export abstract class _MatSnackBarContainerBase extends BasePortalOutlet impleme
     if (!this._announceTimeoutId) {
       this._ngZone.runOutsideAngular(() => {
         this._announceTimeoutId = setTimeout(() => {
+          if (this._destroyed) {
+            return;
+          }
           const inertElement = this._elementRef.nativeElement.querySelector('[aria-hidden]');
           const liveElement = this._elementRef.nativeElement.querySelector('[aria-live]');
 

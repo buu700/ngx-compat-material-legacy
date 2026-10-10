@@ -22,6 +22,6 @@ class SnackExitRuntimeTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         report = json.loads(result.stdout)
         self.assertEqual(report['subjects'], 10)
-        self.assertEqual(report['mutation_rejections'], 24)
+        self.assertEqual(report['mutation_rejections'], 54)
         self.assertFalse(report['native_executed'])
         self.assertFalse(report['actual_legacy_instances_qualified'])
