@@ -225,7 +225,10 @@
     if (family === 'menu') {
       const trigger = query('#p-menu-trigger');
       if (trigger) trigger.click();
-      waitFor(() => query('.mat-menu-panel #p-menu-item'), 1500, node => finish(!!node, 'mat-menu-panel'));
+      waitFor(() => {
+        const item = query('.mat-menu-panel #p-menu-item');
+        return item && (document.activeElement === item || item.contains(document.activeElement)) ? item : null;
+      }, 1500, node => finish(!!node, 'mat-menu-panel; automatic first-item focus'));
       return;
     }
     if (family === 'select') {
@@ -243,7 +246,19 @@
         input.dispatchEvent(new InputEvent('input', {bubbles: true, data: 'A'}));
         input.dispatchEvent(new KeyboardEvent('keydown', {key: 'ArrowDown', bubbles: true}));
       }
-      waitFor(() => query('.mat-autocomplete-panel'), 1500, node => finish(!!node, 'mat-autocomplete-panel'));
+      waitFor(() => query('.mat-autocomplete-panel .mat-option'), 1500, option => {
+        if (!option) {finish(false, 'autocomplete option missing'); return;}
+        if (typeof lab.readAutocompleteSelection !== 'function') {
+          finish(false, 'autocomplete selection fixture API missing'); return;
+        }
+        const request = window.__status;
+        option.click();
+        waitFor(() => !query('.mat-autocomplete-panel') && input && input.value === 'a'
+          && lab.readAutocompleteSelection() === 'a', 1500, selected => {
+          if (window.__status === request) finish(!!selected,
+            'mat-autocomplete; DOM option activation, public selection, input value, and panel closure');
+        });
+      });
       return;
     }
     if (family === 'tooltip') {
@@ -255,7 +270,25 @@
       waitFor(() => {
         const tip = query('.mat-tooltip');
         return tip && (tip.textContent || '').includes('Hello tip') ? tip : null;
-      }, 1500, node => finish(!!node, 'mat-tooltip'));
+      }, 1500, node => {
+        if (!node) {finish(false, 'tooltip did not show'); return;}
+        if (typeof lab.runTooltipAriaLifetime !== 'function') {
+          finish(false, 'tooltip ARIA fixture API missing'); return;
+        }
+        const request = window.__status;
+        const complete = (ok, evidence) => {
+          if (window.__status === request) finish(ok, evidence);
+        };
+        const timeout = setTimeout(() => complete(false, 'tooltip ARIA fixture timed out'), 1500);
+        Promise.resolve().then(() => lab.runTooltipAriaLifetime()).then(observation => {
+          clearTimeout(timeout);
+          complete(legacyTooltipAriaLifetimeNativeOkay(observation),
+            'mat-tooltip; ARIA destruction ' + JSON.stringify(observation));
+        }, error => {
+          clearTimeout(timeout);
+          complete(false, 'tooltip ARIA fixture ' + String(error));
+        });
+      });
       return;
     }
     if (family === 'snack-bar') {
