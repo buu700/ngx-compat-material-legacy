@@ -16,6 +16,7 @@ import {existsSync, lstatSync, mkdirSync, readFileSync, writeFileSync} from 'nod
 import {dirname, join, relative, resolve} from 'node:path';
 import {fileURLToPath, pathToFileURL} from 'node:url';
 import {authoredUseInventory, authoredUseReviewEvidence} from './authored-use-inventory.mjs';
+import {scanCurrentAuthoredUses, currentAuthoredUseAdmission} from './authored-current-use-inventory.mjs';
 import {validateCurrentAdvisories} from './upstream-advisory-admission.mjs';
 import {spawnSync} from 'node:child_process';
 import {BUILD_SCOPE_ROLE,BUILD_SCOPE_PATCHES,buildScopeEvidenceOk} from './upstream-build-scope-evidence.mjs';
@@ -58,6 +59,7 @@ const seedPath = arg('--seed', join(root, 'compatibility/f10/upstream-sha-risk-b
 const ledgerPath = arg('--ledger', join(root, 'compatibility/f10/disposition-ledger/ledger.json'));
 const reportPath = arg('--report', join(root, 'compatibility/rc/reports/upstream-audit-disposition.json'));
 const symbolsPath = arg('--symbols', join(root, 'compatibility/f10/authored-dependency-dispositions.json'));
+const currentSymbolsPath = arg('--current-symbols', join(root, 'compatibility/f10/authored-dependency-current-dispositions.json'));
 const patchesDir = arg('--patches', '');
 const line = arg('--line', '');
 const admission = hasFlag('--admission');
@@ -279,13 +281,23 @@ if (existsSync(symbolsPath)) {
     + symbolInventory.outside + symbolInventory.invalid;
 } 
 
+// The immutable seed remains fully required. Later authored imports and public
+// reexports are separate obligations discovered from actual current source.
+const currentAuthoredSource = scanCurrentAuthoredUses({root});
+let currentSymbols = null;
+try { currentSymbols = JSON.parse(readFileSync(currentSymbolsPath, 'utf8')); } catch { /* Missing/unreadable is incomplete. */ }
+const currentSymbolAdmission = currentAuthoredUseAdmission({current: currentAuthoredSource,
+  frozen: authoredReference.symbol_uses, candidate: currentSymbols, line: reviewLine,
+  readMember: rel => {const file = regularRepoMember(rel); return file ? readFileSync(file) : null;}});
+
 const structuralOk = missing.length === 0 && unresolved.length === 0 && conflicts.length === 0
   && outside.length === 0 && securityDocsOnly.length === 0 && unknown.length === 0
   && !forgedClearance && ledger.g11_claim === 'not-passed';
 const dispositionOk = structuralOk && missingEvidence.length === 0 && circularEvidence.length === 0
   && insufficientSensitive.length === 0 && insufficientInherited.length === 0
   && insufficientBehavior.length === 0 && missingBranch.length === 0
-  && symbolInventory.complete && symbolUsesOpen === 0 && symbolStatus === 'closed' && symbolReviewEvidence.insufficient === 0;
+  && symbolInventory.complete && symbolUsesOpen === 0 && symbolStatus === 'closed' && symbolReviewEvidence.insufficient === 0
+  && currentSymbolAdmission.ready;
 
 const summary = {
   ok: structuralOk,
@@ -309,6 +321,7 @@ const summary = {
   missing_branch_applicability: missingBranch.length,
   authored_use_inventory: symbolInventory,
   authored_use_review_evidence: {reviewed:symbolReviewEvidence.reviewed,insufficient:symbolReviewEvidence.insufficient,insufficient_use_sample:symbolReviewEvidence.insufficient_uses.slice(0,20)},
+  current_authored_use_inventory: currentSymbolAdmission,
   symbol_uses_open: symbolUsesOpen,
   symbol_status: symbolStatus,
   symbol_dispositions_sha256: symbolDispositionsSha256,
@@ -335,6 +348,7 @@ const report = {
   missing_branch_applicability: missingBranch.length,
   authored_use_inventory: symbolInventory,
   authored_use_review_evidence: symbolReviewEvidence,
+  current_authored_use_inventory: currentSymbolAdmission,
   symbol_uses_open: symbolUsesOpen,
   symbol_status: symbolStatus,
   symbol_dispositions_sha256: symbolDispositionsSha256,
@@ -349,6 +363,7 @@ const report = {
     'Sensitive rows and inherited or other material behavior decisions need individual proof. Tag ancestry or an import path is not that proof.',
     'A ledger string cannot set security clearance. g11_claim stays not-passed.',
     'Authored-use closed labels require exact per-use source/line/import review and independently hashed evidence. These bindings do not replace complete semantic G11 review of each conclusion.',
+    'Current named imports, reexports, namespace/default/side-effect/import-type and unresolved dynamic routes are discovered independently. Added uses require their own complete source-bound dispositions; removed uses remain in the frozen roster.',
     'Does not claim G11.',
   ],
 };
@@ -394,7 +409,7 @@ const CASE_RESULTS = [
   ['upstream-shas', 'upstream-audit/upstream-shas/allowed-vocabulary', unknown.length === 0 && !forgedClearance],
   ['upstream-shas', 'upstream-audit/upstream-shas/sensitive-individual-proof', insufficientSensitive.length === 0],
   ['upstream-shas', 'upstream-audit/upstream-shas/independent-evidence', missingEvidence.length === 0 && circularEvidence.length === 0],
-  ['authored-symbols', 'upstream-audit/authored-symbols/complete-use-dispositions', symbolInventory.complete && symbolUsesOpen === 0 && symbolStatus === 'closed' && symbolReviewEvidence.insufficient === 0],
+  ['authored-symbols', 'upstream-audit/authored-symbols/complete-use-dispositions', symbolInventory.complete && symbolUsesOpen === 0 && symbolStatus === 'closed' && symbolReviewEvidence.insufficient === 0 && currentSymbolAdmission.ready],
   ['installed-peer-fixes', 'upstream-audit/installed-peer-fixes/content-not-ancestry', insufficientInherited.length === 0],
   ['installed-peer-fixes', 'upstream-audit/installed-peer-fixes/branch-applicability', missingBranch.length === 0 && insufficientBehavior.length === 0],
   ['current-advisories', 'upstream-audit/current-advisories/bound-current-lookup', advisory.ok],
@@ -471,7 +486,7 @@ function writeAcceptance(request) {
     command: ['node', 'scripts/check-upstream-audit-disposition.mjs', '--admission', '--line', line || request.line],
     limitations: [
       `structural_inventory=${summary.structural_inventory}; disposition_admission=${summary.disposition_admission}; security_clearance=not-passed`,
-      `insufficient_sensitive=${insufficientSensitive.length}; insufficient_inherited=${insufficientInherited.length}; insufficient_behavior=${insufficientBehavior.length}; missing_evidence=${missingEvidence.length}; circular_evidence=${circularEvidence.length}; symbol_uses_open=${symbolUsesOpen}`,
+      `insufficient_sensitive=${insufficientSensitive.length}; insufficient_inherited=${insufficientInherited.length}; insufficient_behavior=${insufficientBehavior.length}; missing_evidence=${missingEvidence.length}; circular_evidence=${circularEvidence.length}; symbol_uses_open=${symbolUsesOpen}; current_uses_open=${currentSymbolAdmission.inventory.open}; current_authored_ready=${currentSymbolAdmission.ready}`,
       'Ledger equality does not admit this check. Current advisories require this run’s complete, hashed dependency observations.',
     ],
   };
@@ -488,12 +503,12 @@ console.log(JSON.stringify(summary, null, 2));
 if (request) {
   const accepted = writeAcceptance(request);
   if (!accepted || !dispositionOk) {
-    fail(1, `upstream-audit-disposition admission incomplete: sensitive=${insufficientSensitive.length} inherited=${insufficientInherited.length} behavior=${insufficientBehavior.length} missing_evidence=${missingEvidence.length} circular=${circularEvidence.length} symbols_open=${symbolUsesOpen} authored_reviews_missing=${symbolReviewEvidence.insufficient}`);
+    fail(1, `upstream-audit-disposition admission incomplete: sensitive=${insufficientSensitive.length} inherited=${insufficientInherited.length} behavior=${insufficientBehavior.length} missing_evidence=${missingEvidence.length} circular=${circularEvidence.length} symbols_open=${symbolUsesOpen} authored_reviews_missing=${symbolReviewEvidence.insufficient} current_uses_open=${currentSymbolAdmission.inventory.open} current_authored_ready=${currentSymbolAdmission.ready}`);
   }
 }
 if (!structuralOk) {
   fail(1, `upstream-audit-disposition incomplete: missing=${missing.length} unresolved=${unresolved.length} conflicting=${conflicts.length} outside=${outside.length} security_docs_only=${securityDocsOnly.length} unknown=${unknown.length}`);
 }
 if (admission && !dispositionOk) {
-  fail(1, `upstream-audit-disposition admission incomplete: sensitive=${insufficientSensitive.length} inherited=${insufficientInherited.length} behavior=${insufficientBehavior.length} missing_evidence=${missingEvidence.length} circular=${circularEvidence.length} symbols_open=${symbolUsesOpen} authored_reviews_missing=${symbolReviewEvidence.insufficient} branch=${missingBranch.length}`);
+  fail(1, `upstream-audit-disposition admission incomplete: sensitive=${insufficientSensitive.length} inherited=${insufficientInherited.length} behavior=${insufficientBehavior.length} missing_evidence=${missingEvidence.length} circular=${circularEvidence.length} symbols_open=${symbolUsesOpen} authored_reviews_missing=${symbolReviewEvidence.insufficient} branch=${missingBranch.length} current_uses_open=${currentSymbolAdmission.inventory.open} current_authored_ready=${currentSymbolAdmission.ready}`);
 }
