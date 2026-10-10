@@ -60,7 +60,7 @@ function fixture(family, prototype, enabled = true) {
   stream.subscribe({next(value) {events.push(typeof value === 'string' ? value : value.toState); order.push('event:' + events.at(-1));}, complete() {completed++;}});
   Object.assign(instance, {_motionSequence: 0, _motionDestroyed: false, _completedEnterAnimation: false, _animationsEnabled: enabled, _isAnimating: false,
     _panelAnimationState: 'void', _panelOpen: false, _overlayAttached: false, _panelExiting: false,
-    _animationDone: stream, _panelDoneAnimatingStream: stream, _destroy: destroyed, stateChanges: new Subject(), closed: new Subject(),
+    _animationDone: stream, _panelDoneAnimatingStream: stream, _destroy: destroyed, _initialized: new Subject(), stateChanges: new Subject(), closed: new Subject(),
     _directDescendantItems: {length: 0, destroy() {}}, _keyManager: {activeItemIndex: -1, destroy() {}, withHorizontalOrientation() {}},
     _changeDetectorRef: {markForCheck() {marks++; order.push('mark:' + (instance._panelOpen ? 'open' : 'closed'));}, detectChanges() {detects++;}},
     panel: {nativeElement: dom.target}, _overlayDir: {positionChange: position}, _applyModalPanelOwnership() {}, _clearFromModal() {},

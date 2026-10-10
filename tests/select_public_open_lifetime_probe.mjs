@@ -15,10 +15,11 @@ import {fileURLToPath} from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const require = createRequire(import.meta.url), ts = require('typescript');
-const {Subject} = require('rxjs'), {take, takeUntil} = require('rxjs/operators');
+const {Observable, Subject} = require('rxjs'), {take, takeUntil} = require('rxjs/operators');
 const paths = {
   base: 'projects/ngx-material-legacy/legacy-select/internal/select-base.ts',
   public: 'projects/ngx-material-legacy/legacy-select/select.ts',
+  helper: 'projects/ngx-material-legacy/legacy-select/internal/after-select-render.ts',
 };
 const raw = Object.fromEntries(Object.entries(paths).map(([key, path]) => [key, readFileSync(resolve(root, path), 'utf8')]));
 const sha = value => createHash('sha256').update(value).digest('hex');
@@ -40,10 +41,16 @@ function declaration(source, name) {
 }
 function prototype(sources) {
   const base = {}, derived = {};
+  const helper = {}, parsed = ts.createSourceFile('helper.ts', sources.helper, ts.ScriptTarget.Latest, true);
+  const helperText = parsed.statements.filter(node => !ts.isImportDeclaration(node))
+    .map(node => node.getFullText(parsed)).join('\n');
+  new Function('exports', 'Observable', 'take', ts.transpileModule(helperText, {compilerOptions: {
+    target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS,
+  }}).outputText)(helper, Observable, take);
   new Function('exports', '_MatSelectMixinBase', 'take', 'takeUntil', declaration(sources.base, '_MatSelectBase'))(
     base, class {}, take, takeUntil);
-  new Function('exports', '_MatSelectBase', 'take', 'takeUntil', 'getComputedStyle', declaration(sources.public, 'MatLegacySelect'))(
-    derived, base._MatSelectBase, take, takeUntil, () => ({fontSize: '16px'}));
+  new Function('exports', '_MatSelectBase', 'take', 'takeUntil', 'getComputedStyle', 'afterSelectRender', declaration(sources.public, 'MatLegacySelect'))(
+    derived, base._MatSelectBase, take, takeUntil, () => ({fontSize: '16px'}), helper.afterSelectRender);
   return derived.MatLegacySelect.prototype;
 }
 function fixture(proto) {
@@ -54,7 +61,7 @@ function fixture(proto) {
   Object.assign(instance, {
     _motionSequence: 0, _motionDestroyed: false, _completedEnterAnimation: false,
     _panelOpen: false, _overlayAttached: false, _panelExiting: false,
-    _destroy: destroy, _panelDoneAnimatingStream: new Subject(), stateChanges: new Subject(),
+    _destroy: destroy, _initialized: new Subject(), _panelDoneAnimatingStream: new Subject(), stateChanges: new Subject(),
     _ngZone: {onStable: stable}, disabled: false, options: {length: 1},
     _keyManager: {withHorizontalOrientation() {}, destroy() {}},
     _changeDetectorRef: {markForCheck() {}}, _onTouched() {},
@@ -103,8 +110,8 @@ const cases = observations(raw), failures = cases.filter(row => row.result !== '
 if (!failures.length) {
   for (const [key, before, after, id, intended] of [
     ['base', 'return !this._motionDestroyed && !this._panelOpen', 'return !this._panelOpen', 'remove-open-predicate-destroy-guard', 'public-open-after-destroy-is-inert'],
-    ['public', 'take(1), takeUntil(this._destroy)', 'take(1)', 'retain-stable-subscription-after-destroy', 'destroy-before-stable-unsubscribes-font-work'],
-    ['public', 'this.panelOpen &&\n          this._triggerFontSize', 'this._triggerFontSize', 'font-work-on-closed-panel', 'close-before-stable-does-no-closed-panel-font-work'],
+    ['public', '        .pipe(takeUntil(this._destroy)).subscribe(() => {', '        .subscribe(() => {', 'retain-stable-subscription-after-destroy', 'destroy-before-stable-unsubscribes-font-work'],
+    ['public', 'this.panelOpen &&\n            this._triggerFontSize', 'this._triggerFontSize', 'font-work-on-closed-panel', 'close-before-stable-does-no-closed-panel-font-work'],
   ]) {
     assert.ok(raw[key].includes(before));
     const rows = observations({...raw, [key]: raw[key].replace(before, after)});

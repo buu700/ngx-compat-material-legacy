@@ -31,7 +31,8 @@ import {
 import {MAT_SELECT_TRIGGER, MatSelectConfig} from '@angular/material/select';
 import {_MatSelectBase} from './internal/select-base';
 import {MatLegacyFormFieldControl} from '@ngx-compat/material-legacy/legacy-form-field';
-import {take, takeUntil} from 'rxjs/operators';
+import {takeUntil} from 'rxjs/operators';
+import {afterSelectRender} from './internal/after-select-render';
 
 /**
  * The following style constants are necessary to save here in order
@@ -239,16 +240,17 @@ export class MatLegacySelect extends _MatSelectBase<MatLegacySelectChange> imple
       this._calculateOverlayPosition();
 
       // Set the font size on the panel element once it exists.
-      this._ngZone.onStable.pipe(take(1), takeUntil(this._destroy)).subscribe(() => {
-        if (
-          this.panelOpen &&
-          this._triggerFontSize &&
-          this._overlayDir.overlayRef &&
-          this._overlayDir.overlayRef.overlayElement
-        ) {
-          this._overlayDir.overlayRef.overlayElement.style.fontSize = `${this._triggerFontSize}px`;
-        }
-      });
+      afterSelectRender(this._ngZone, this._injector)
+        .pipe(takeUntil(this._destroy)).subscribe(() => {
+          if (
+            this.panelOpen &&
+            this._triggerFontSize &&
+            this._overlayDir.overlayRef &&
+            this._overlayDir.overlayRef.overlayElement
+          ) {
+            this._overlayDir.overlayRef.overlayElement.style.fontSize = `${this._triggerFontSize}px`;
+          }
+        });
     }
   }
 

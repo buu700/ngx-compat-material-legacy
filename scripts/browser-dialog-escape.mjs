@@ -5,6 +5,7 @@
  *   node scripts/browser-dialog-escape.mjs --tarball <path>
  */
 import {createHash} from 'node:crypto';
+import {legacySelectFontNativeOkay, observeLegacySelectFontNative} from './legacy-select-font-native-contract.mjs';
 import {announcedChromeEndpoint,debuggerMatchesChild} from './chromium-debug-endpoint.mjs';
 import {spawnSync as __spawnSyncForWs} from 'node:child_process';
 if (typeof globalThis.WebSocket !== 'function') {
@@ -132,7 +133,7 @@ export class DialogBody {}
 @Component({
   standalone: false,
   selector: 'lab-root',
-  template: '<button id="open" type="button" (click)="open()">Open</button><mat-select id="choice"><mat-option id="option-a" value="a">A</mat-option></mat-select>',
+  template: '<button id="open" type="button" (click)="open()">Open</button><mat-select id="choice" style="font-size:20px"><mat-option id="option-a" value="a">A</mat-option></mat-select>',
 })
 export class LabRoot {
   private dialog = inject(MatLegacyDialog);
@@ -370,6 +371,7 @@ let focusAfter = null;
 let outsideClosed = false;
 let selectOpened = false;
 let selectClosed = false;
+let selectFontGeometry = null;
 let dialogMotion = null;
 let zoneGlobal = null;
 let error = null;
@@ -441,6 +443,11 @@ try {
   await evaluate('document.querySelector("#choice .mat-select-trigger").click()');
   for (let i = 0; i < 50 && !(await evaluate('!!document.querySelector(".cdk-overlay-pane .mat-select-panel #option-a")')); i += 1) await sleep(100);
   selectOpened = await evaluate('!!document.querySelector(".cdk-overlay-pane .mat-select-panel #option-a")');
+  selectFontGeometry = await observeLegacySelectFontNative({evaluate});
+  for (let i = 0; i < 40 && !legacySelectFontNativeOkay(selectFontGeometry); i += 1) {
+    await sleep(50);
+    selectFontGeometry = await observeLegacySelectFontNative({evaluate});
+  }
   await send('Input.dispatchKeyEvent', {type: 'keyDown', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27});
   await send('Input.dispatchKeyEvent', {type: 'keyUp', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27});
   for (let i = 0; i < 50 && await evaluate('!!document.querySelector(".cdk-overlay-pane .mat-select-panel")'); i += 1) await sleep(100);
@@ -470,6 +477,8 @@ const report = {
   closed_by_backdrop_click: outsideClosed,
   select_panel_opened: selectOpened,
   select_panel_closed_by_escape: selectOpened && selectClosed,
+  select_font_geometry: selectFontGeometry,
+  select_font_geometry_ok: legacySelectFontNativeOkay(selectFontGeometry),
   dialog_motion: dialogMotion,
   dialog_transition_on_container: transitionOnContainer,
   dialog_noop_under_reduced_motion: reducedMotion ? reducedNoop : null,
@@ -506,4 +515,4 @@ console.log(JSON.stringify({
 }, null, 2));
 const motionOk = reducedMotion ? report.dialog_noop_under_reduced_motion : report.dialog_transition_on_container;
 const zoneOk = zoneless ? zoneGlobal === 'undefined' && bundleHasZone === false : true;
-if (!report.closed_by_escape || !report.focus_restored_to_open_button || !report.closed_by_backdrop_click || !report.select_panel_closed_by_escape || !motionOk || !zoneOk) process.exit(1);
+if (!report.closed_by_escape || !report.focus_restored_to_open_button || !report.closed_by_backdrop_click || !report.select_panel_closed_by_escape || !report.select_font_geometry_ok || !motionOk || !zoneOk) process.exit(1);

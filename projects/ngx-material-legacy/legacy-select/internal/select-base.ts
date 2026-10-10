@@ -50,6 +50,7 @@ import {
   ElementRef,
   EventEmitter,
   Inject,
+  Injector,
   InjectionToken,
   Input,
   NgZone,
@@ -287,6 +288,9 @@ export abstract class _MatSelectBase<C>
   /** Emits whenever the component is destroyed. */
   protected readonly _destroy = new Subject<void>();
 
+  /** Content readiness for stable zoneless option streams. */
+  private readonly _initialized = new Subject<void>();
+
   /**
    * Implemented as part of MatFormFieldControl.
    * @docs-private
@@ -465,8 +469,13 @@ export abstract class _MatSelectBase<C>
       );
     }
 
-    return this._ngZone.onStable.pipe(
+    return merge(
+      this._ngZone.onStable,
+      this._initialized.pipe(filter(() => this._ngZone.isStable)),
+    ).pipe(
+      filter(() => !!this.options),
       take(1),
+      takeUntil(this._destroy),
       switchMap(() => this.optionSelectionChanges),
     );
   }) as Observable<MatOptionSelectionChange>;
@@ -511,6 +520,7 @@ export abstract class _MatSelectBase<C>
     @Inject(MAT_SELECT_SCROLL_STRATEGY) scrollStrategyFactory: any,
     private _liveAnnouncer: LiveAnnouncer,
     @Optional() @Inject(MAT_SELECT_CONFIG) protected _defaultOptions?: MatSelectConfig,
+    protected _injector?: Injector,
   ) {
     super(elementRef, _defaultErrorStateMatcher, _parentForm, _parentFormGroup, ngControl);
     this._overlayPanelClass = this._defaultOptions?.overlayPanelClass || '';
@@ -560,6 +570,9 @@ export abstract class _MatSelectBase<C>
       this._resetOptions();
       this._initializeSelection();
     });
+
+    this._initialized.next();
+    this._initialized.complete();
   }
 
   ngDoCheck() {
@@ -618,6 +631,7 @@ export abstract class _MatSelectBase<C>
     this._cancelExit();
     this._panelOpen = this._overlayAttached = this._panelExiting = false;
     this._keyManager?.destroy();
+    this._initialized.complete();
     this._destroy.next();
     this._destroy.complete();
     this._panelDoneAnimatingStream.complete();
