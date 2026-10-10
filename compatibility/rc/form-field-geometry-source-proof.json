@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "recorded_at_utc": "2026-10-10T08:03:58.109386+00:00",
+  "source_heads": {
+    "main": "2442eec383e6f6327fdbb48e44c62b884ad6452f",
+    "21.x": "45efb007f8a89f64c0afc5df66c25227cde89853"
+  },
+  "source_trees": {
+    "main": "c34fa94187fde4b7759a4aa2a6382fb471b0d205",
+    "21.x": "f09d4d78d647c0f7555268b7312a5249f2ed7754"
+  },
+  "sources": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+      "sha256": "38c70a9a3323b78ab3bee436885b9fb7ab77b3e903a75b5dc1ecfec0eb7d32b9"
+    },
+    {
+      "path": "tests/form_field_render_runtime_probe.mjs",
+      "sha256": "46f4b86a094bed32da85ee116f908e1b00ff9f9733addb3b9c503ee49c3f3d0a"
+    },
+    {
+      "path": "scripts/browser-required-cells.mjs",
+      "sha256": "dc2e62b781b235a67eddf2948ec8c8ecf0132b0ecb114d14d5d57aa618883a2c"
+    },
+    {
+      "path": "scripts/browser-required-probe.js",
+      "sha256": "ba2718283de917d4ff69afbb25f5e8b50b6a37767b7e59eae0e516370a0ec070"
+    },
+    {
+      "path": "scripts/legacy-form-field-outline-native-contract.mjs",
+      "sha256": "7ccfd3f40e1a290c631c2435f2e202e85db70cc5fffca6b0893a1e9fa78b2c2c"
+    },
+    {
+      "path": "tests/canonical_control_geometry_probe_contract.mjs",
+      "sha256": "2dd5616353b1820ca1fd03fc7dc1f518d5acda862b8c0738e6fb800fa5a1a137"
+    }
+  ],
+  "reference": {
+    "path": "reference/material-16.2.14/control-forwarding-sources/form-field.ts",
+    "sha256": "c32e86f1be87568387a09abcd7e6c47e6cb33fd63ea0cff8b224e98073dd1726"
+  },
+  "diagnostics": [
+    {
+      "path": "compatibility/rc/form-field-geometry-runtime-diagnostic.json",
+      "sha256": "409a03d7aac426f7677b7703c3149ee17837824e4efb21ac9143c38747890d52"
+    },
+    {
+      "path": "compatibility/rc/form-field-geometry-canonical-diagnostic.json",
+      "sha256": "668657fc3dbae3ea82f6d300bb3de99425800204241558a8a30b4d217fa8997f"
+    },
+    {
+      "path": "compatibility/rc/form-field-geometry-bindings-diagnostic.json",
+      "sha256": "16d86db46a89cc3db185a479788ef8f52ef58a18b1aadadbd98034587910bb0d"
+    }
+  ],
+  "problem": "Candidate cap and visible-offset-parent restriction differed from the untouched Material16 field. A long label with two 30px prefixes/suffixes in a 200px container produced a 140px cap instead of the historical 490px gap. A fixed host with a real document root and null offsetParent could remain unmeasured. Cached shadow-root identity could reject a reparented host; missing getRootNode lost the historical document.contains fallback.",
+  "origins": {
+    "notch_cap_commit": "c36cb444acab75dea2fb0667d27bf5f40bc88e03",
+    "attachment_and_cached_root_commit": "8803862ef",
+    "classification": "Authored RC adaptations; no source-verified requirement overrides the owner contract to preserve Material16 HTML/CSS/SCSS geometry. Current owner authority permits conservative TypeScript work and requires read-only Cyph sanity checks."
+  },
+  "repair": "Three complete geometry methods now match normalized untouched tagged source: updateOutlineGap, _getStartEnd and _isAttachedToDOM. Remove the added notch cap, cached-root field/helper and now-unused local helper import. The owned shadow helper file remains untouched. Existing 0.75/5px arithmetic, field resources, selectors, seven historical constructor inputs plus previously added optional private Injector, and continuous render ownership remain unchanged.",
+  "runtime_subjects": 10,
+  "independent_boundary_cases": 60,
+  "mutation_rejections": 80,
+  "canonical_protocol_cases": 46,
+  "canonical_gate_mutation_rejections": 3,
+  "strict_types": {
+    "compiler": "5.9.2",
+    "compiler_source_sha256": "e5f1f6b3e82228a89873cc7b941b2465185e839c0692860f83e3e63e53f94c2b",
+    "subjects": [
+      {
+        "line": "main",
+        "negative_checks": 6,
+        "fixture_sha256": "3e88c06df29ddd35236dcbec1f0adf2a97136afc2446d6733dcf615d8f0f806f",
+        "actual_legacy_constructor_compiled": false
+      },
+      {
+        "line": "21.x",
+        "negative_checks": 6,
+        "fixture_sha256": "3e88c06df29ddd35236dcbec1f0adf2a97136afc2446d6733dcf615d8f0f806f",
+        "actual_legacy_constructor_compiled": false
+      }
+    ]
+  },
+  "geometry_methods_equal_immutable_tag": true,
+  "runtime_scope": "Complete original/owned field constructor and members with a protocol color-trait parent; Angular decorators removed. Genuine public NgZone/QueryList/FormControl and current public application/continuous render hook. A real Angular OnPush shell/view and ChangeDetectorRef drive current render cycles with a protocol renderer; this is not a legacy field Angular view. Control wrapper, DOM geometry/styles/document attachment, direction and disabled-motion policy are protocols; original uses a change-detector protocol. Original standard geometry is exercised independently; candidate geometry methods match the immutable tagged methods; long-label/prefix/suffix, fixed offset-parent, document fallback, detachment and shadow reparenting are protocol observations, not native DOM qualification. No actual legacy traits/node DI/AOT/packed/native geometry, consumer builds or Rx/Node floor qualification.",
+  "public_constructor": {
+    "original_parameters": 7,
+    "current_parameters": 8,
+    "old_parameters_and_authored_body_identical": true,
+    "new_optional_trailing_Injector": true,
+    "actual_node_DI_compiled_or_executed": false
+  },
+  "added_boundary_cases": "Whole original/candidate classes compare long-prefix/suffix, fixed-host null-offsetParent, document fallback, detached fallback, detached getRootNode and shadow reparenting observations. Controls reject former cap, visible-parent-only rule, cached root, removed fallback and lost label scale. Existing repeated rendering/teardown and error cleanup controls remain. Strict minimum compiler receipt now includes the entire restored attachment method with genuine ElementRef<HTMLElement> and DOM declarations.",
+  "canonical_native_producer": "Existing four-phase outline sequence remains; an additional fixed-position outlined field with prefix/suffix and a 640px label child must satisfy the same independent tagged reader and predicate, a real document root, null offsetParent and gap wider than the container. This runs within form-field/default; no new matrix cells. This generated consumer fixture uses local layout styles to exercise the boundary; library/consumer resources do not change.",
+  "targeted_style_review": {
+    "files": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+        "sha256": "2f196834f2f6d5b57e8d105f9761f4edb01ea4d1a499e76a10f1bf9ce41c9d4e"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-form-field/form-field.scss",
+        "sha256": "d77ca5a115ac70fbd9eb2cc37f73ccb3fe86c16f3318749883f68f9e1182d26b"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-form-field/form-field-outline.scss",
+        "sha256": "14ab7d5a327fb1ef1617fd40d529428dc23415060a9528be81cf73b805328e76"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-form-field/form-field-legacy.scss",
+        "sha256": "bf174708fa01a9d4cbd6919e0695152818783bb81c38ffa8e15829e6fdc085b2"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-form-field/form-field-input.scss",
+        "sha256": "8dc187ec61b21252220ef168712485166447e1f09f44120151a01da85dfe28fa"
+      }
+    ],
+    "result": "HTML/SCSS resource bytes, namespace calls and selectors are unchanged by this delta. Only outline inline width/attachment behavior returns to the tagged implementation. Native packed geometry remains unexecuted."
+  },
+  "cyph_sanity": {
+    "root": "/home/parallels/cyph",
+    "head": "a56a0603636cac5aaabe8fe408f7429b4224f011",
+    "read_only": true,
+    "build_executed": false,
+    "files": [
+      {
+        "path": "shared/js/cyph/components/dynamic-form/dynamic-form.component.scss",
+        "sha256": "9609a535a229801622c75f6fdcc9f1bffc7e2f55dcb3e77b5081a0ab17e4d048"
+      },
+      {
+        "path": "shared/js/cyph/components/account-profile/account-profile.component.scss",
+        "sha256": "aec4efeafdd08566a1a68d2bc582a160f51ed7aea1a649c2c1b62596544fb161"
+      },
+      {
+        "path": "shared/js/cyph/components/pin-input/pin-input.component.scss",
+        "sha256": "56dda758e7a1efc5ce1ab57747d2d109b1aa4658f92a0546e566c6d70bfa602c"
+      },
+      {
+        "path": "shared/js/cyph/components/checkout/checkout.component.html",
+        "sha256": "4d38c16ffab2946a327c291a622947b15b0ec713784fceda46b4689fef9032ff"
+      }
+    ],
+    "result": "No direct manual form-field constructor, subclass or updateOutlineGap use found in the shared/js TypeScript search. Existing prefix/suffix templates and infix width/profile padding/wrapper padding remain compatible at the source boundary. No consumer edit or build qualification."
+  },
+  "source_binding_refresh": {
+    "fresh_jobs": 15,
+    "existing_reviewed_frozen_uses": 22,
+    "supplementary_ValidatorFn_uses": 1,
+    "review_documents": 15,
+    "new_use_or_SHA_admissions": 0,
+    "historical_component_native_reports_restamped": false
+  },
+  "test_notes": "The initial mutation driver used assert.rejects with a synchronous geometry operation and failed before classifying the expected rejection; the driver now wraps operations in an async function. Expectations and tag bytes are unchanged. One canonical report was initially named main while executed from 21.x; its filename was corrected to 21 and the actual main report generated separately. No product/floor/native claim derives from either protocol run.",
+  "remaining": "Actual packed/native geometry, full resources/migration/floors, every upstream SHA and use, independent C05/A01-A10/R01-R03 remain pending. Other field behavior differences and direction-frame ownership need separate contextual review; matching these three methods does not certify the entire component.",
+  "public_API_or_required_consumer_HTML_CSS_SCSS_changes": false,
+  "actual_native_packed_AOT_or_full_floors_qualified": false,
+  "new_matrix_cells": 0,
+  "g11_claim": "not-passed",
+  "pushed": false,
+  "actions_started": false
+}
