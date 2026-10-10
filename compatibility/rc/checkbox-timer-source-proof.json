@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "recorded_at_utc": "2026-10-10T10:18:05.893540+00:00",
+  "source_heads": {
+    "main": "85dbd48cceafa17d3e2923d08999d22b63212414",
+    "21.x": "ccad549d4a63441a9bd92cd346bdf0735e9f1a44"
+  },
+  "source_trees": {
+    "main": "35632985915726306f01481e2c43669176c2bfb5",
+    "21.x": "50175f9b7825e4863bfbbb30a8c849f816cf1b90"
+  },
+  "sources": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.ts",
+      "sha256": "774db12b55590d631d0a69c68a9aa7289adf600ac3fe62e288dd22fcf3c86766"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/internal/checkbox-base.ts",
+      "sha256": "901114fbc4682f2a8d37136e23b0331ec1ff868d73fb3f8acae05e7b705d60f6"
+    },
+    {
+      "path": "tests/checkbox_timer_runtime_probe.mjs",
+      "sha256": "b6ccacfc4b7d7cc6adf38cc2254421bf5288bc5df50f423b35613f6e473049bb"
+    },
+    {
+      "path": "tests/checkbox_timer_runtime_subject.mjs",
+      "sha256": "2d0c87de67b2a0b10038f6d63cc988c01558e8199d8824d39f8e00c5a78f1676"
+    },
+    {
+      "path": "tests/test_checkbox_timer_runtime.py",
+      "sha256": "384561bcc6ca9e022b3375160c1f5a7e666a8cd31ad82f9cc09d7bd377aca7a2"
+    }
+  ],
+  "baseline": {
+    "path": "compatibility/rc/checkbox-timer-baseline-diagnostic.json",
+    "sha256": "6519a77febb7d604a4b5eb037b4a4dd22939c6a58ca2d243be46e7d91940718a"
+  },
+  "runtime_diagnostic": {
+    "path": "compatibility/rc/checkbox-timer-runtime-diagnostic.json",
+    "sha256": "2797371261466ea57687d115048d9f77b0a291aa7f50d3855b94a3e9483132f5"
+  },
+  "fresh_binding_checks": {
+    "path": "compatibility/rc/checkbox-timer-binding-refresh.json",
+    "sha256": "0ab1ab805e0c433018daded0f1e7e0c93e73db7ff70b3daaa50094340764067f"
+  },
+  "original_subject": {
+    "path": "compatibility/rc/checkbox-timer-original-subject.json",
+    "sha256": "5fd4014ac0c41c451308fef651a536131ae4bacd114548a4ef14e4e8824b9054"
+  },
+  "repair": "Preserve the historical transition classifier, animation classes and one1000ms timer per animated transition. Capture each target/class/handle; an older timer cannot remove a class still owned by a newer transition on the same target. Direct leaf destruction forwards to the owned base, cancels all handles, removes owned classes and clears records. Captured callbacks and private transitions after destruction cannot mutate classes or create timers.",
+  "historical_deviation": "The untouched tag shares the premature reused-class cleanup and direct-destruction leak. These are explicitly repaired deviations; tagged live timing and NoopAnimations behavior remain the oracle. No reference/golden update.",
+  "runtime_subjects": 10,
+  "lifecycle_cases": 60,
+  "mutation_rejections": 70,
+  "minimum_compiler_receipt": [
+    {
+      "line": "main",
+      "compiler": "6.0.2",
+      "compiler_source_sha256": "630f808ac32d968a49a392c42cc06fd72abd939aaa7edfe3302810c067934653",
+      "fixture_sha256": "abe5cc55740eba93fb1b9e9b703596fb23a6e4c683b6d1266b177fb4c2b2df82",
+      "negative_checks": 4,
+      "actual_legacy_class_AOT_compiled": false
+    },
+    {
+      "line": "21.x",
+      "compiler": "6.0.2",
+      "compiler_source_sha256": "630f808ac32d968a49a392c42cc06fd72abd939aaa7edfe3302810c067934653",
+      "fixture_sha256": "abe5cc55740eba93fb1b9e9b703596fb23a6e4c683b6d1266b177fb4c2b2df82",
+      "negative_checks": 4,
+      "actual_legacy_class_AOT_compiled": false
+    }
+  ],
+  "runtime_scope": "Whole original/current checkbox base and leaf constructors/business members with Angular decorators and compiled fac/dir/cmp metadata removed; genuine public Core NgZone/ElementRef/EventEmitter and CDK coercion. Parent traits, host/classList/input/focus-monitor/CDR/timer clock are protocols. Complete user-input handler drives transition states. No actual legacy Angular node DI, native CSS/clock, AOT/packed/consumer or Node/Rx floor qualification. The default-options factory and parent mixin traits are configuration/trait protocols; Angular compiled metadata/factories are excluded.",
+  "type_scope": "Complete timer fields, transition and base destruction bodies under actual public Core declarations. Classifier/target methods and owned enum declaration are receipt protocols. This is not whole product or legacy AOT compilation.",
+  "targeted_style_review": {
+    "files": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.html",
+        "sha256": "f630375b769dac8ba62c05c74d8f6abbb640bb9d6a9539ce01f220220f7b93b5"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.scss",
+        "sha256": "5bb880767ff062ead6604140938cd5d23136a135494e817291a81b13fc20d7b1"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/core/style/_checkbox-common.scss",
+        "sha256": "8058927c0e63ae433363e395d7ecb68e8622c7d09afbae32a679eb863938773d"
+      }
+    ],
+    "result": "Exact resource bytes unchanged from the pre-repair commit. Historical checkbox-common transition duration is90ms; unchecked-to-checked background/checkmark animations use twice that duration. The old100ms class lifetime after re-add can truncate the180ms declaration; native CSS confirmation remains pending. No selector, class name, timing declaration or HTML structure changes."
+  },
+  "public_api_scope": "MatLegacyCheckbox retains its seven-argument constructor and existing ngOnDestroy():void method; the owned internal base gains ngOnDestroy():void and private timer fields. Full packed declaration/API comparison remains required.",
+  "cyph_sanity": {
+    "head": "a56a0603636cac5aaabe8fe408f7429b4224f011",
+    "clean": true,
+    "scope": "Read-only shared/js TS/CSS/SCSS search for MatLegacyCheckbox, MatCheckbox, _currentAnimationClass and mat-checkbox-anim: three existing MatLegacyCheckboxModule alias/import/export lines in cyph-shared.module.ts, no direct constructor or animation-private-member use. No consumer build or broad compatibility claim.",
+    "required_consumer_HTML_CSS_SCSS_changes": false
+  },
+  "source_binding_refresh": {
+    "existing_reviewed_uses": 26,
+    "fresh_checker_jobs": 16,
+    "review_documents": 16,
+    "new_frozen_use_closures": 0,
+    "checker_parser_versions": [
+      "6.0.2",
+      "6.0.3"
+    ],
+    "prior_component_or_native_runs_restamped": false
+  },
+  "native_producer": "pending-implementation; actual checkbox initialized/live reuse and direct view destruction must be integrated into the canonical checkbox/default producer before C05.",
+  "native_or_actual_legacy_node_DI_or_packed_or_AOT_or_floors_qualified": false,
+  "g11_claim": "not-passed",
+  "pushed": false,
+  "actions_started": false
+}
