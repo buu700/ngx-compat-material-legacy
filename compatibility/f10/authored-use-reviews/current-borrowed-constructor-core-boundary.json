@@ -1,0 +1,947 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "status": "reviewed",
+  "recorded_at_utc": "2026-10-10T22:17:25.858919+00:00",
+  "source_checkpoint": "1efb912a193f86d18bc082641af0402628d3ec10",
+  "criteria": "Nine individually stated public Core type/subclass/fallback/context contracts in three bounded helper copies. Caller and service protocols do not substitute for actual legacy/current component qualification. Menu context adapter and other public parent dependencies remain separate.",
+  "reviews": [
+    {
+      "file": "internal/public-constructor-context.ts",
+      "module": "@angular/core",
+      "symbol": "Injector",
+      "candidate_source_sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The public abstract Injector is subclassed with a finite token/value Map; missing values use the public NULL fallback. Explicit null/undefined and exact object identities remain, and no resource-owning child or application is created. Strict whole declarations choose a nondeprecated fallback signature on all three captured versions. The central copy has no production caller; it remains the canonical helper exercised by the existing lifecycle test. All fourteen current callers are source-bound; object-return constructors have no skipped emitted instance fields or parameter properties. Complete helpers execute under entire authenticated original/current Core namespaces in six development/production contexts:162 protocol cases and18 whole-helper mutations reject wrong target prototypes and destruction of borrowed values. Parent/service classes are explicit protocols; this is not actual fourteen legacy/peer parent, node factory, native/packed or full floor qualification. Only the declared public Core dependency contract is closed. No CSS/SCSS/HTML or emitted JavaScript changed.",
+      "source_binding": {
+        "helper": {
+          "path": "projects/ngx-material-legacy/internal/public-constructor-context.ts",
+          "sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef",
+          "source": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\nimport {Injector, runInInjectionContext, type ProviderToken} from '@angular/core';\n\n/** A bounded context borrows supplied objects without registering destroy hooks. */\nclass BorrowedDependencyInjector extends Injector {\n  constructor(private readonly values: Map<unknown, unknown>) {\n    super();\n  }\n\n  override get(token: ProviderToken<unknown>, notFoundValue?: any): any {\n    if (this.values.has(token)) return this.values.get(token);\n    return Injector.NULL.get(token, notFoundValue);\n  }\n}\n\n/**\n * Construct the public parent with exactly the original supplied dependencies.\n * Only use for owned subclasses with no emitted instance fields/parameter\n * properties: returning this object skips their own instance initializers.\n * Supplied objects belong to the caller; this context must never destroy them.\n */\nexport function constructWithPublicDependencies<T>(parent: new () => T, target: Function, providers: {provide: unknown; useValue: unknown}[]): T {\n  const context = new BorrowedDependencyInjector(new Map(providers.map(({provide, useValue}) => [provide, useValue])));\n  return runInInjectionContext(context, () => Reflect.construct(parent, [], target));\n}\n",
+          "production_callers": []
+        },
+        "callers": []
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/borrowed-constructor-injector-source-proof.json",
+          "sha256": "4c76950b3457b2f87c1a18f26acf36d16a31c36ee44a0901b5755d6b42959fdc"
+        },
+        {
+          "path": "compatibility/rc/borrowed-constructor-injector-before-diagnostic.json",
+          "sha256": "95f66f769b85b6ca2c28b977e454a10c63baf9396bb361b3f8a88986d1f70de3"
+        },
+        {
+          "path": "tests/borrowed_constructor_injector_probe.mjs",
+          "sha256": "fc10a823d3852c6035699891243db6d901f8f3e8b46fb40116b844fd6c846a7b"
+        },
+        {
+          "path": "tests/borrowed_constructor_injector_subject.mjs",
+          "sha256": "cbcc5ebb91638038c815d661382428a4b1b69c35e4f32409390d235e05f34257"
+        },
+        {
+          "path": "tests/test_borrowed_constructor_injector.py",
+          "sha256": "853fc217d13a19a5277e2b180885f12aeef7aaaac4cd08a2bcaeacdaad65a2d5"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "tests/test_constructor_dependency_lifecycle.py",
+          "sha256": "7b3b96200aca520fa26c565639096cfeeea2fa858e6002d11826ab4f628a3c30"
+        }
+      ]
+    },
+    {
+      "file": "internal/public-constructor-context.ts",
+      "module": "@angular/core",
+      "symbol": "ProviderToken",
+      "candidate_source_sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The added type-only ProviderToken<unknown> gives the private get implementation the public token domain. It replaces any solely in the annotation: emitted JavaScript is byte-identical. The former any selected a deprecated fallback only against original16 declarations; both current floors already selected stable overloads. Actual helper strict compilation selects stable signatures across all three versions and expected invalid constructor/factory-provider fixtures fail. This is a type/dependency judgment, not a consumer public API change. The central copy has no production caller; it remains the canonical helper exercised by the existing lifecycle test. All fourteen current callers are source-bound; object-return constructors have no skipped emitted instance fields or parameter properties. Complete helpers execute under entire authenticated original/current Core namespaces in six development/production contexts:162 protocol cases and18 whole-helper mutations reject wrong target prototypes and destruction of borrowed values. Parent/service classes are explicit protocols; this is not actual fourteen legacy/peer parent, node factory, native/packed or full floor qualification. Only the declared public Core dependency contract is closed. No CSS/SCSS/HTML or emitted JavaScript changed.",
+      "source_binding": {
+        "helper": {
+          "path": "projects/ngx-material-legacy/internal/public-constructor-context.ts",
+          "sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef",
+          "source": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\nimport {Injector, runInInjectionContext, type ProviderToken} from '@angular/core';\n\n/** A bounded context borrows supplied objects without registering destroy hooks. */\nclass BorrowedDependencyInjector extends Injector {\n  constructor(private readonly values: Map<unknown, unknown>) {\n    super();\n  }\n\n  override get(token: ProviderToken<unknown>, notFoundValue?: any): any {\n    if (this.values.has(token)) return this.values.get(token);\n    return Injector.NULL.get(token, notFoundValue);\n  }\n}\n\n/**\n * Construct the public parent with exactly the original supplied dependencies.\n * Only use for owned subclasses with no emitted instance fields/parameter\n * properties: returning this object skips their own instance initializers.\n * Supplied objects belong to the caller; this context must never destroy them.\n */\nexport function constructWithPublicDependencies<T>(parent: new () => T, target: Function, providers: {provide: unknown; useValue: unknown}[]): T {\n  const context = new BorrowedDependencyInjector(new Map(providers.map(({provide, useValue}) => [provide, useValue])));\n  return runInInjectionContext(context, () => Reflect.construct(parent, [], target));\n}\n",
+          "production_callers": []
+        },
+        "callers": []
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/borrowed-constructor-injector-source-proof.json",
+          "sha256": "4c76950b3457b2f87c1a18f26acf36d16a31c36ee44a0901b5755d6b42959fdc"
+        },
+        {
+          "path": "compatibility/rc/borrowed-constructor-injector-before-diagnostic.json",
+          "sha256": "95f66f769b85b6ca2c28b977e454a10c63baf9396bb361b3f8a88986d1f70de3"
+        },
+        {
+          "path": "tests/borrowed_constructor_injector_probe.mjs",
+          "sha256": "fc10a823d3852c6035699891243db6d901f8f3e8b46fb40116b844fd6c846a7b"
+        },
+        {
+          "path": "tests/borrowed_constructor_injector_subject.mjs",
+          "sha256": "cbcc5ebb91638038c815d661382428a4b1b69c35e4f32409390d235e05f34257"
+        },
+        {
+          "path": "tests/test_borrowed_constructor_injector.py",
+          "sha256": "853fc217d13a19a5277e2b180885f12aeef7aaaac4cd08a2bcaeacdaad65a2d5"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "tests/test_constructor_dependency_lifecycle.py",
+          "sha256": "7b3b96200aca520fa26c565639096cfeeea2fa858e6002d11826ab4f628a3c30"
+        }
+      ]
+    },
+    {
+      "file": "internal/public-constructor-context.ts",
+      "module": "@angular/core",
+      "symbol": "runInInjectionContext",
+      "candidate_source_sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The stable public runInInjectionContext scopes exactly one Reflect.construct(parent, [], target) operation to the finite borrowed context. Genuine Core tests preserve outer contexts on success and throw, clear the context afterward, initialize the parent once and retain consumer subclass fields/prototypes. Supplied hydrated services are never registered or destroyed by the helper; reverting to an owning Injector.create/destroy path is rejected. The central copy has no production caller; it remains the canonical helper exercised by the existing lifecycle test. All fourteen current callers are source-bound; object-return constructors have no skipped emitted instance fields or parameter properties. Complete helpers execute under entire authenticated original/current Core namespaces in six development/production contexts:162 protocol cases and18 whole-helper mutations reject wrong target prototypes and destruction of borrowed values. Parent/service classes are explicit protocols; this is not actual fourteen legacy/peer parent, node factory, native/packed or full floor qualification. Only the declared public Core dependency contract is closed. No CSS/SCSS/HTML or emitted JavaScript changed.",
+      "source_binding": {
+        "helper": {
+          "path": "projects/ngx-material-legacy/internal/public-constructor-context.ts",
+          "sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef",
+          "source": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\nimport {Injector, runInInjectionContext, type ProviderToken} from '@angular/core';\n\n/** A bounded context borrows supplied objects without registering destroy hooks. */\nclass BorrowedDependencyInjector extends Injector {\n  constructor(private readonly values: Map<unknown, unknown>) {\n    super();\n  }\n\n  override get(token: ProviderToken<unknown>, notFoundValue?: any): any {\n    if (this.values.has(token)) return this.values.get(token);\n    return Injector.NULL.get(token, notFoundValue);\n  }\n}\n\n/**\n * Construct the public parent with exactly the original supplied dependencies.\n * Only use for owned subclasses with no emitted instance fields/parameter\n * properties: returning this object skips their own instance initializers.\n * Supplied objects belong to the caller; this context must never destroy them.\n */\nexport function constructWithPublicDependencies<T>(parent: new () => T, target: Function, providers: {provide: unknown; useValue: unknown}[]): T {\n  const context = new BorrowedDependencyInjector(new Map(providers.map(({provide, useValue}) => [provide, useValue])));\n  return runInInjectionContext(context, () => Reflect.construct(parent, [], target));\n}\n",
+          "production_callers": []
+        },
+        "callers": []
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/borrowed-constructor-injector-source-proof.json",
+          "sha256": "4c76950b3457b2f87c1a18f26acf36d16a31c36ee44a0901b5755d6b42959fdc"
+        },
+        {
+          "path": "compatibility/rc/borrowed-constructor-injector-before-diagnostic.json",
+          "sha256": "95f66f769b85b6ca2c28b977e454a10c63baf9396bb361b3f8a88986d1f70de3"
+        },
+        {
+          "path": "tests/borrowed_constructor_injector_probe.mjs",
+          "sha256": "fc10a823d3852c6035699891243db6d901f8f3e8b46fb40116b844fd6c846a7b"
+        },
+        {
+          "path": "tests/borrowed_constructor_injector_subject.mjs",
+          "sha256": "cbcc5ebb91638038c815d661382428a4b1b69c35e4f32409390d235e05f34257"
+        },
+        {
+          "path": "tests/test_borrowed_constructor_injector.py",
+          "sha256": "853fc217d13a19a5277e2b180885f12aeef7aaaac4cd08a2bcaeacdaad65a2d5"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "tests/test_constructor_dependency_lifecycle.py",
+          "sha256": "7b3b96200aca520fa26c565639096cfeeea2fa858e6002d11826ab4f628a3c30"
+        }
+      ]
+    },
+    {
+      "file": "legacy-table/internal/public-constructor-context.ts",
+      "module": "@angular/core",
+      "symbol": "Injector",
+      "candidate_source_sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The public abstract Injector is subclassed with a finite token/value Map; missing values use the public NULL fallback. Explicit null/undefined and exact object identities remain, and no resource-owning child or application is created. Strict whole declarations choose a nondeprecated fallback signature on all three captured versions. This entry-local copy has twelve table caller constructors, including cell/row definitions, cell containers, text-column and no-data-row adapters. All fourteen current callers are source-bound; object-return constructors have no skipped emitted instance fields or parameter properties. Complete helpers execute under entire authenticated original/current Core namespaces in six development/production contexts:162 protocol cases and18 whole-helper mutations reject wrong target prototypes and destruction of borrowed values. Parent/service classes are explicit protocols; this is not actual fourteen legacy/peer parent, node factory, native/packed or full floor qualification. Only the declared public Core dependency contract is closed. No CSS/SCSS/HTML or emitted JavaScript changed.",
+      "source_binding": {
+        "helper": {
+          "path": "projects/ngx-material-legacy/legacy-table/internal/public-constructor-context.ts",
+          "sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef",
+          "source": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\nimport {Injector, runInInjectionContext, type ProviderToken} from '@angular/core';\n\n/** A bounded context borrows supplied objects without registering destroy hooks. */\nclass BorrowedDependencyInjector extends Injector {\n  constructor(private readonly values: Map<unknown, unknown>) {\n    super();\n  }\n\n  override get(token: ProviderToken<unknown>, notFoundValue?: any): any {\n    if (this.values.has(token)) return this.values.get(token);\n    return Injector.NULL.get(token, notFoundValue);\n  }\n}\n\n/**\n * Construct the public parent with exactly the original supplied dependencies.\n * Only use for owned subclasses with no emitted instance fields/parameter\n * properties: returning this object skips their own instance initializers.\n * Supplied objects belong to the caller; this context must never destroy them.\n */\nexport function constructWithPublicDependencies<T>(parent: new () => T, target: Function, providers: {provide: unknown; useValue: unknown}[]): T {\n  const context = new BorrowedDependencyInjector(new Map(providers.map(({provide, useValue}) => [provide, useValue])));\n  return runInInjectionContext(context, () => Reflect.construct(parent, [], target));\n}\n",
+          "production_callers": [
+            "MatLegacyHeaderRowDef",
+            "MatLegacyFooterRowDef",
+            "MatLegacyRowDef",
+            "MatLegacyNoDataRow",
+            "MatLegacyTextColumn",
+            "MatLegacyCellDef",
+            "MatLegacyHeaderCellDef",
+            "MatLegacyFooterCellDef",
+            "MatLegacyColumnDef",
+            "MatLegacyHeaderCell",
+            "MatLegacyFooterCell",
+            "MatLegacyCell"
+          ]
+        },
+        "callers": [
+          {
+            "file": "legacy-table/row.ts",
+            "source_sha256": "c9fa4b3b1c42eda48baf88a4f89922f8aafe388aa1980ebbe4d73ee9713c20fa",
+            "class": "MatLegacyHeaderRowDef",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkHeaderRowDef",
+            "providers": "[\n      {provide: TemplateRef, useValue: template},\n      {provide: IterableDiffers, useValue: differs},\n    ]",
+            "constructor": "constructor(template: TemplateRef<any>, differs: IterableDiffers,\n      @Optional() @Inject(CdkTable) table?: any) {\n    const definition = constructWithPublicDependencies(CdkHeaderRowDef, new.target, [\n      {provide: TemplateRef, useValue: template},\n      {provide: IterableDiffers, useValue: differs},\n    ]);\n    definition._table = table;\n    return definition;\n  }"
+          },
+          {
+            "file": "legacy-table/row.ts",
+            "source_sha256": "c9fa4b3b1c42eda48baf88a4f89922f8aafe388aa1980ebbe4d73ee9713c20fa",
+            "class": "MatLegacyFooterRowDef",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkFooterRowDef",
+            "providers": "[\n      {provide: TemplateRef, useValue: template},\n      {provide: IterableDiffers, useValue: differs},\n    ]",
+            "constructor": "constructor(template: TemplateRef<any>, differs: IterableDiffers,\n      @Optional() @Inject(CdkTable) table?: any) {\n    const definition = constructWithPublicDependencies(CdkFooterRowDef, new.target, [\n      {provide: TemplateRef, useValue: template},\n      {provide: IterableDiffers, useValue: differs},\n    ]);\n    definition._table = table;\n    return definition;\n  }"
+          },
+          {
+            "file": "legacy-table/row.ts",
+            "source_sha256": "c9fa4b3b1c42eda48baf88a4f89922f8aafe388aa1980ebbe4d73ee9713c20fa",
+            "class": "MatLegacyRowDef",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkRowDef",
+            "providers": "[\n      {provide: TemplateRef, useValue: template},\n      {provide: IterableDiffers, useValue: differs},\n    ]",
+            "constructor": "constructor(template: TemplateRef<any>, differs: IterableDiffers,\n      @Optional() @Inject(CdkTable) table?: any) {\n    const definition = constructWithPublicDependencies(CdkRowDef, new.target, [\n      {provide: TemplateRef, useValue: template},\n      {provide: IterableDiffers, useValue: differs},\n    ]);\n    definition._table = table;\n    return definition as MatLegacyRowDef<T>;\n  }"
+          },
+          {
+            "file": "legacy-table/row.ts",
+            "source_sha256": "c9fa4b3b1c42eda48baf88a4f89922f8aafe388aa1980ebbe4d73ee9713c20fa",
+            "class": "MatLegacyNoDataRow",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkNoDataRow",
+            "providers": "[\n      {provide: TemplateRef, useValue: templateRef},\n    ]",
+            "constructor": "constructor(templateRef: TemplateRef<any>) {\n    const row = constructWithPublicDependencies(CdkNoDataRow, new.target, [\n      {provide: TemplateRef, useValue: templateRef},\n    ]) as MatLegacyNoDataRow;\n    row._contentClassName = 'mat-no-data-row';\n    row._contentClassNames = ['mat-no-data-row'];\n    return row;\n  }"
+          },
+          {
+            "file": "legacy-table/text-column.ts",
+            "source_sha256": "157c01cc18f67ff7e499442e6f16a7a23ec08284d069b2318a5d8bae11dc4431",
+            "class": "MatLegacyTextColumn",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkTextColumn<T>",
+            "providers": "[\n      {provide: CdkTable, useValue: table},\n      {provide: TEXT_COLUMN_OPTIONS, useValue: options},\n    ]",
+            "constructor": "constructor(@Optional() table: CdkTable<T>, @Optional() @Inject(TEXT_COLUMN_OPTIONS) options: TextColumnOptions<T>) {\n    return constructWithPublicDependencies(CdkTextColumn<T>, new.target, [\n      {provide: CdkTable, useValue: table},\n      {provide: TEXT_COLUMN_OPTIONS, useValue: options},\n    ]);\n  }"
+          },
+          {
+            "file": "legacy-table/cell.ts",
+            "source_sha256": "17dfbe36aca2aea11ef1c84c700b4c3eab703a66643d82753a07b706e9b8b09c",
+            "class": "MatLegacyCellDef",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkCellDef",
+            "providers": "[{provide: TemplateRef, useValue: template}]",
+            "constructor": "constructor(template: TemplateRef<any>) {\n    return constructWithPublicDependencies(CdkCellDef, new.target, [{provide: TemplateRef, useValue: template}]);\n  }"
+          },
+          {
+            "file": "legacy-table/cell.ts",
+            "source_sha256": "17dfbe36aca2aea11ef1c84c700b4c3eab703a66643d82753a07b706e9b8b09c",
+            "class": "MatLegacyHeaderCellDef",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkHeaderCellDef",
+            "providers": "[{provide: TemplateRef, useValue: template}]",
+            "constructor": "constructor(template: TemplateRef<any>) {\n    return constructWithPublicDependencies(CdkHeaderCellDef, new.target, [{provide: TemplateRef, useValue: template}]);\n  }"
+          },
+          {
+            "file": "legacy-table/cell.ts",
+            "source_sha256": "17dfbe36aca2aea11ef1c84c700b4c3eab703a66643d82753a07b706e9b8b09c",
+            "class": "MatLegacyFooterCellDef",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkFooterCellDef",
+            "providers": "[{provide: TemplateRef, useValue: template}]",
+            "constructor": "constructor(template: TemplateRef<any>) {\n    return constructWithPublicDependencies(CdkFooterCellDef, new.target, [{provide: TemplateRef, useValue: template}]);\n  }"
+          },
+          {
+            "file": "legacy-table/cell.ts",
+            "source_sha256": "17dfbe36aca2aea11ef1c84c700b4c3eab703a66643d82753a07b706e9b8b09c",
+            "class": "MatLegacyColumnDef",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkColumnDef",
+            "providers": "[]",
+            "constructor": "constructor(@Optional() @Inject(CdkTable) table?: any) {\n    const definition = constructWithPublicDependencies(CdkColumnDef, new.target, []);\n    definition._table = table;\n    return definition as MatLegacyColumnDef;\n  }"
+          },
+          {
+            "file": "legacy-table/cell.ts",
+            "source_sha256": "17dfbe36aca2aea11ef1c84c700b4c3eab703a66643d82753a07b706e9b8b09c",
+            "class": "MatLegacyHeaderCell",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkHeaderCell",
+            "providers": "[\n      {provide: CdkColumnDef, useValue: columnDef},\n      {provide: ElementRef, useValue: elementRef},\n    ]",
+            "constructor": "constructor(columnDef: CdkColumnDef, elementRef: ElementRef) {\n    return constructWithPublicDependencies(CdkHeaderCell, new.target, [\n      {provide: CdkColumnDef, useValue: columnDef},\n      {provide: ElementRef, useValue: elementRef},\n    ]);\n  }"
+          },
+          {
+            "file": "legacy-table/cell.ts",
+            "source_sha256": "17dfbe36aca2aea11ef1c84c700b4c3eab703a66643d82753a07b706e9b8b09c",
+            "class": "MatLegacyFooterCell",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkFooterCell",
+            "providers": "[\n      {provide: CdkColumnDef, useValue: columnDef},\n      {provide: ElementRef, useValue: elementRef},\n    ]",
+            "constructor": "constructor(columnDef: CdkColumnDef, elementRef: ElementRef) {\n    return constructWithPublicDependencies(CdkFooterCell, new.target, [\n      {provide: CdkColumnDef, useValue: columnDef},\n      {provide: ElementRef, useValue: elementRef},\n    ]);\n  }"
+          },
+          {
+            "file": "legacy-table/cell.ts",
+            "source_sha256": "17dfbe36aca2aea11ef1c84c700b4c3eab703a66643d82753a07b706e9b8b09c",
+            "class": "MatLegacyCell",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkCell",
+            "providers": "[\n      {provide: CdkColumnDef, useValue: columnDef},\n      {provide: ElementRef, useValue: elementRef},\n    ]",
+            "constructor": "constructor(columnDef: CdkColumnDef, elementRef: ElementRef) {\n    return constructWithPublicDependencies(CdkCell, new.target, [\n      {provide: CdkColumnDef, useValue: columnDef},\n      {provide: ElementRef, useValue: elementRef},\n    ]);\n  }"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/borrowed-constructor-injector-source-proof.json",
+          "sha256": "4c76950b3457b2f87c1a18f26acf36d16a31c36ee44a0901b5755d6b42959fdc"
+        },
+        {
+          "path": "compatibility/rc/borrowed-constructor-injector-before-diagnostic.json",
+          "sha256": "95f66f769b85b6ca2c28b977e454a10c63baf9396bb361b3f8a88986d1f70de3"
+        },
+        {
+          "path": "tests/borrowed_constructor_injector_probe.mjs",
+          "sha256": "fc10a823d3852c6035699891243db6d901f8f3e8b46fb40116b844fd6c846a7b"
+        },
+        {
+          "path": "tests/borrowed_constructor_injector_subject.mjs",
+          "sha256": "cbcc5ebb91638038c815d661382428a4b1b69c35e4f32409390d235e05f34257"
+        },
+        {
+          "path": "tests/test_borrowed_constructor_injector.py",
+          "sha256": "853fc217d13a19a5277e2b180885f12aeef7aaaac4cd08a2bcaeacdaad65a2d5"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-table/cell.ts",
+          "sha256": "17dfbe36aca2aea11ef1c84c700b4c3eab703a66643d82753a07b706e9b8b09c"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-table/row.ts",
+          "sha256": "c9fa4b3b1c42eda48baf88a4f89922f8aafe388aa1980ebbe4d73ee9713c20fa"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-table/text-column.ts",
+          "sha256": "157c01cc18f67ff7e499442e6f16a7a23ec08284d069b2318a5d8bae11dc4431"
+        }
+      ]
+    },
+    {
+      "file": "legacy-table/internal/public-constructor-context.ts",
+      "module": "@angular/core",
+      "symbol": "ProviderToken",
+      "candidate_source_sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The added type-only ProviderToken<unknown> gives the private get implementation the public token domain. It replaces any solely in the annotation: emitted JavaScript is byte-identical. The former any selected a deprecated fallback only against original16 declarations; both current floors already selected stable overloads. Actual helper strict compilation selects stable signatures across all three versions and expected invalid constructor/factory-provider fixtures fail. This is a type/dependency judgment, not a consumer public API change. This entry-local copy has twelve table caller constructors, including cell/row definitions, cell containers, text-column and no-data-row adapters. All fourteen current callers are source-bound; object-return constructors have no skipped emitted instance fields or parameter properties. Complete helpers execute under entire authenticated original/current Core namespaces in six development/production contexts:162 protocol cases and18 whole-helper mutations reject wrong target prototypes and destruction of borrowed values. Parent/service classes are explicit protocols; this is not actual fourteen legacy/peer parent, node factory, native/packed or full floor qualification. Only the declared public Core dependency contract is closed. No CSS/SCSS/HTML or emitted JavaScript changed.",
+      "source_binding": {
+        "helper": {
+          "path": "projects/ngx-material-legacy/legacy-table/internal/public-constructor-context.ts",
+          "sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef",
+          "source": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\nimport {Injector, runInInjectionContext, type ProviderToken} from '@angular/core';\n\n/** A bounded context borrows supplied objects without registering destroy hooks. */\nclass BorrowedDependencyInjector extends Injector {\n  constructor(private readonly values: Map<unknown, unknown>) {\n    super();\n  }\n\n  override get(token: ProviderToken<unknown>, notFoundValue?: any): any {\n    if (this.values.has(token)) return this.values.get(token);\n    return Injector.NULL.get(token, notFoundValue);\n  }\n}\n\n/**\n * Construct the public parent with exactly the original supplied dependencies.\n * Only use for owned subclasses with no emitted instance fields/parameter\n * properties: returning this object skips their own instance initializers.\n * Supplied objects belong to the caller; this context must never destroy them.\n */\nexport function constructWithPublicDependencies<T>(parent: new () => T, target: Function, providers: {provide: unknown; useValue: unknown}[]): T {\n  const context = new BorrowedDependencyInjector(new Map(providers.map(({provide, useValue}) => [provide, useValue])));\n  return runInInjectionContext(context, () => Reflect.construct(parent, [], target));\n}\n",
+          "production_callers": [
+            "MatLegacyHeaderRowDef",
+            "MatLegacyFooterRowDef",
+            "MatLegacyRowDef",
+            "MatLegacyNoDataRow",
+            "MatLegacyTextColumn",
+            "MatLegacyCellDef",
+            "MatLegacyHeaderCellDef",
+            "MatLegacyFooterCellDef",
+            "MatLegacyColumnDef",
+            "MatLegacyHeaderCell",
+            "MatLegacyFooterCell",
+            "MatLegacyCell"
+          ]
+        },
+        "callers": [
+          {
+            "file": "legacy-table/row.ts",
+            "source_sha256": "c9fa4b3b1c42eda48baf88a4f89922f8aafe388aa1980ebbe4d73ee9713c20fa",
+            "class": "MatLegacyHeaderRowDef",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkHeaderRowDef",
+            "providers": "[\n      {provide: TemplateRef, useValue: template},\n      {provide: IterableDiffers, useValue: differs},\n    ]",
+            "constructor": "constructor(template: TemplateRef<any>, differs: IterableDiffers,\n      @Optional() @Inject(CdkTable) table?: any) {\n    const definition = constructWithPublicDependencies(CdkHeaderRowDef, new.target, [\n      {provide: TemplateRef, useValue: template},\n      {provide: IterableDiffers, useValue: differs},\n    ]);\n    definition._table = table;\n    return definition;\n  }"
+          },
+          {
+            "file": "legacy-table/row.ts",
+            "source_sha256": "c9fa4b3b1c42eda48baf88a4f89922f8aafe388aa1980ebbe4d73ee9713c20fa",
+            "class": "MatLegacyFooterRowDef",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkFooterRowDef",
+            "providers": "[\n      {provide: TemplateRef, useValue: template},\n      {provide: IterableDiffers, useValue: differs},\n    ]",
+            "constructor": "constructor(template: TemplateRef<any>, differs: IterableDiffers,\n      @Optional() @Inject(CdkTable) table?: any) {\n    const definition = constructWithPublicDependencies(CdkFooterRowDef, new.target, [\n      {provide: TemplateRef, useValue: template},\n      {provide: IterableDiffers, useValue: differs},\n    ]);\n    definition._table = table;\n    return definition;\n  }"
+          },
+          {
+            "file": "legacy-table/row.ts",
+            "source_sha256": "c9fa4b3b1c42eda48baf88a4f89922f8aafe388aa1980ebbe4d73ee9713c20fa",
+            "class": "MatLegacyRowDef",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkRowDef",
+            "providers": "[\n      {provide: TemplateRef, useValue: template},\n      {provide: IterableDiffers, useValue: differs},\n    ]",
+            "constructor": "constructor(template: TemplateRef<any>, differs: IterableDiffers,\n      @Optional() @Inject(CdkTable) table?: any) {\n    const definition = constructWithPublicDependencies(CdkRowDef, new.target, [\n      {provide: TemplateRef, useValue: template},\n      {provide: IterableDiffers, useValue: differs},\n    ]);\n    definition._table = table;\n    return definition as MatLegacyRowDef<T>;\n  }"
+          },
+          {
+            "file": "legacy-table/row.ts",
+            "source_sha256": "c9fa4b3b1c42eda48baf88a4f89922f8aafe388aa1980ebbe4d73ee9713c20fa",
+            "class": "MatLegacyNoDataRow",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkNoDataRow",
+            "providers": "[\n      {provide: TemplateRef, useValue: templateRef},\n    ]",
+            "constructor": "constructor(templateRef: TemplateRef<any>) {\n    const row = constructWithPublicDependencies(CdkNoDataRow, new.target, [\n      {provide: TemplateRef, useValue: templateRef},\n    ]) as MatLegacyNoDataRow;\n    row._contentClassName = 'mat-no-data-row';\n    row._contentClassNames = ['mat-no-data-row'];\n    return row;\n  }"
+          },
+          {
+            "file": "legacy-table/text-column.ts",
+            "source_sha256": "157c01cc18f67ff7e499442e6f16a7a23ec08284d069b2318a5d8bae11dc4431",
+            "class": "MatLegacyTextColumn",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkTextColumn<T>",
+            "providers": "[\n      {provide: CdkTable, useValue: table},\n      {provide: TEXT_COLUMN_OPTIONS, useValue: options},\n    ]",
+            "constructor": "constructor(@Optional() table: CdkTable<T>, @Optional() @Inject(TEXT_COLUMN_OPTIONS) options: TextColumnOptions<T>) {\n    return constructWithPublicDependencies(CdkTextColumn<T>, new.target, [\n      {provide: CdkTable, useValue: table},\n      {provide: TEXT_COLUMN_OPTIONS, useValue: options},\n    ]);\n  }"
+          },
+          {
+            "file": "legacy-table/cell.ts",
+            "source_sha256": "17dfbe36aca2aea11ef1c84c700b4c3eab703a66643d82753a07b706e9b8b09c",
+            "class": "MatLegacyCellDef",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkCellDef",
+            "providers": "[{provide: TemplateRef, useValue: template}]",
+            "constructor": "constructor(template: TemplateRef<any>) {\n    return constructWithPublicDependencies(CdkCellDef, new.target, [{provide: TemplateRef, useValue: template}]);\n  }"
+          },
+          {
+            "file": "legacy-table/cell.ts",
+            "source_sha256": "17dfbe36aca2aea11ef1c84c700b4c3eab703a66643d82753a07b706e9b8b09c",
+            "class": "MatLegacyHeaderCellDef",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkHeaderCellDef",
+            "providers": "[{provide: TemplateRef, useValue: template}]",
+            "constructor": "constructor(template: TemplateRef<any>) {\n    return constructWithPublicDependencies(CdkHeaderCellDef, new.target, [{provide: TemplateRef, useValue: template}]);\n  }"
+          },
+          {
+            "file": "legacy-table/cell.ts",
+            "source_sha256": "17dfbe36aca2aea11ef1c84c700b4c3eab703a66643d82753a07b706e9b8b09c",
+            "class": "MatLegacyFooterCellDef",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkFooterCellDef",
+            "providers": "[{provide: TemplateRef, useValue: template}]",
+            "constructor": "constructor(template: TemplateRef<any>) {\n    return constructWithPublicDependencies(CdkFooterCellDef, new.target, [{provide: TemplateRef, useValue: template}]);\n  }"
+          },
+          {
+            "file": "legacy-table/cell.ts",
+            "source_sha256": "17dfbe36aca2aea11ef1c84c700b4c3eab703a66643d82753a07b706e9b8b09c",
+            "class": "MatLegacyColumnDef",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkColumnDef",
+            "providers": "[]",
+            "constructor": "constructor(@Optional() @Inject(CdkTable) table?: any) {\n    const definition = constructWithPublicDependencies(CdkColumnDef, new.target, []);\n    definition._table = table;\n    return definition as MatLegacyColumnDef;\n  }"
+          },
+          {
+            "file": "legacy-table/cell.ts",
+            "source_sha256": "17dfbe36aca2aea11ef1c84c700b4c3eab703a66643d82753a07b706e9b8b09c",
+            "class": "MatLegacyHeaderCell",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkHeaderCell",
+            "providers": "[\n      {provide: CdkColumnDef, useValue: columnDef},\n      {provide: ElementRef, useValue: elementRef},\n    ]",
+            "constructor": "constructor(columnDef: CdkColumnDef, elementRef: ElementRef) {\n    return constructWithPublicDependencies(CdkHeaderCell, new.target, [\n      {provide: CdkColumnDef, useValue: columnDef},\n      {provide: ElementRef, useValue: elementRef},\n    ]);\n  }"
+          },
+          {
+            "file": "legacy-table/cell.ts",
+            "source_sha256": "17dfbe36aca2aea11ef1c84c700b4c3eab703a66643d82753a07b706e9b8b09c",
+            "class": "MatLegacyFooterCell",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkFooterCell",
+            "providers": "[\n      {provide: CdkColumnDef, useValue: columnDef},\n      {provide: ElementRef, useValue: elementRef},\n    ]",
+            "constructor": "constructor(columnDef: CdkColumnDef, elementRef: ElementRef) {\n    return constructWithPublicDependencies(CdkFooterCell, new.target, [\n      {provide: CdkColumnDef, useValue: columnDef},\n      {provide: ElementRef, useValue: elementRef},\n    ]);\n  }"
+          },
+          {
+            "file": "legacy-table/cell.ts",
+            "source_sha256": "17dfbe36aca2aea11ef1c84c700b4c3eab703a66643d82753a07b706e9b8b09c",
+            "class": "MatLegacyCell",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkCell",
+            "providers": "[\n      {provide: CdkColumnDef, useValue: columnDef},\n      {provide: ElementRef, useValue: elementRef},\n    ]",
+            "constructor": "constructor(columnDef: CdkColumnDef, elementRef: ElementRef) {\n    return constructWithPublicDependencies(CdkCell, new.target, [\n      {provide: CdkColumnDef, useValue: columnDef},\n      {provide: ElementRef, useValue: elementRef},\n    ]);\n  }"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/borrowed-constructor-injector-source-proof.json",
+          "sha256": "4c76950b3457b2f87c1a18f26acf36d16a31c36ee44a0901b5755d6b42959fdc"
+        },
+        {
+          "path": "compatibility/rc/borrowed-constructor-injector-before-diagnostic.json",
+          "sha256": "95f66f769b85b6ca2c28b977e454a10c63baf9396bb361b3f8a88986d1f70de3"
+        },
+        {
+          "path": "tests/borrowed_constructor_injector_probe.mjs",
+          "sha256": "fc10a823d3852c6035699891243db6d901f8f3e8b46fb40116b844fd6c846a7b"
+        },
+        {
+          "path": "tests/borrowed_constructor_injector_subject.mjs",
+          "sha256": "cbcc5ebb91638038c815d661382428a4b1b69c35e4f32409390d235e05f34257"
+        },
+        {
+          "path": "tests/test_borrowed_constructor_injector.py",
+          "sha256": "853fc217d13a19a5277e2b180885f12aeef7aaaac4cd08a2bcaeacdaad65a2d5"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-table/cell.ts",
+          "sha256": "17dfbe36aca2aea11ef1c84c700b4c3eab703a66643d82753a07b706e9b8b09c"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-table/row.ts",
+          "sha256": "c9fa4b3b1c42eda48baf88a4f89922f8aafe388aa1980ebbe4d73ee9713c20fa"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-table/text-column.ts",
+          "sha256": "157c01cc18f67ff7e499442e6f16a7a23ec08284d069b2318a5d8bae11dc4431"
+        }
+      ]
+    },
+    {
+      "file": "legacy-table/internal/public-constructor-context.ts",
+      "module": "@angular/core",
+      "symbol": "runInInjectionContext",
+      "candidate_source_sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The stable public runInInjectionContext scopes exactly one Reflect.construct(parent, [], target) operation to the finite borrowed context. Genuine Core tests preserve outer contexts on success and throw, clear the context afterward, initialize the parent once and retain consumer subclass fields/prototypes. Supplied hydrated services are never registered or destroyed by the helper; reverting to an owning Injector.create/destroy path is rejected. This entry-local copy has twelve table caller constructors, including cell/row definitions, cell containers, text-column and no-data-row adapters. All fourteen current callers are source-bound; object-return constructors have no skipped emitted instance fields or parameter properties. Complete helpers execute under entire authenticated original/current Core namespaces in six development/production contexts:162 protocol cases and18 whole-helper mutations reject wrong target prototypes and destruction of borrowed values. Parent/service classes are explicit protocols; this is not actual fourteen legacy/peer parent, node factory, native/packed or full floor qualification. Only the declared public Core dependency contract is closed. No CSS/SCSS/HTML or emitted JavaScript changed.",
+      "source_binding": {
+        "helper": {
+          "path": "projects/ngx-material-legacy/legacy-table/internal/public-constructor-context.ts",
+          "sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef",
+          "source": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\nimport {Injector, runInInjectionContext, type ProviderToken} from '@angular/core';\n\n/** A bounded context borrows supplied objects without registering destroy hooks. */\nclass BorrowedDependencyInjector extends Injector {\n  constructor(private readonly values: Map<unknown, unknown>) {\n    super();\n  }\n\n  override get(token: ProviderToken<unknown>, notFoundValue?: any): any {\n    if (this.values.has(token)) return this.values.get(token);\n    return Injector.NULL.get(token, notFoundValue);\n  }\n}\n\n/**\n * Construct the public parent with exactly the original supplied dependencies.\n * Only use for owned subclasses with no emitted instance fields/parameter\n * properties: returning this object skips their own instance initializers.\n * Supplied objects belong to the caller; this context must never destroy them.\n */\nexport function constructWithPublicDependencies<T>(parent: new () => T, target: Function, providers: {provide: unknown; useValue: unknown}[]): T {\n  const context = new BorrowedDependencyInjector(new Map(providers.map(({provide, useValue}) => [provide, useValue])));\n  return runInInjectionContext(context, () => Reflect.construct(parent, [], target));\n}\n",
+          "production_callers": [
+            "MatLegacyHeaderRowDef",
+            "MatLegacyFooterRowDef",
+            "MatLegacyRowDef",
+            "MatLegacyNoDataRow",
+            "MatLegacyTextColumn",
+            "MatLegacyCellDef",
+            "MatLegacyHeaderCellDef",
+            "MatLegacyFooterCellDef",
+            "MatLegacyColumnDef",
+            "MatLegacyHeaderCell",
+            "MatLegacyFooterCell",
+            "MatLegacyCell"
+          ]
+        },
+        "callers": [
+          {
+            "file": "legacy-table/row.ts",
+            "source_sha256": "c9fa4b3b1c42eda48baf88a4f89922f8aafe388aa1980ebbe4d73ee9713c20fa",
+            "class": "MatLegacyHeaderRowDef",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkHeaderRowDef",
+            "providers": "[\n      {provide: TemplateRef, useValue: template},\n      {provide: IterableDiffers, useValue: differs},\n    ]",
+            "constructor": "constructor(template: TemplateRef<any>, differs: IterableDiffers,\n      @Optional() @Inject(CdkTable) table?: any) {\n    const definition = constructWithPublicDependencies(CdkHeaderRowDef, new.target, [\n      {provide: TemplateRef, useValue: template},\n      {provide: IterableDiffers, useValue: differs},\n    ]);\n    definition._table = table;\n    return definition;\n  }"
+          },
+          {
+            "file": "legacy-table/row.ts",
+            "source_sha256": "c9fa4b3b1c42eda48baf88a4f89922f8aafe388aa1980ebbe4d73ee9713c20fa",
+            "class": "MatLegacyFooterRowDef",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkFooterRowDef",
+            "providers": "[\n      {provide: TemplateRef, useValue: template},\n      {provide: IterableDiffers, useValue: differs},\n    ]",
+            "constructor": "constructor(template: TemplateRef<any>, differs: IterableDiffers,\n      @Optional() @Inject(CdkTable) table?: any) {\n    const definition = constructWithPublicDependencies(CdkFooterRowDef, new.target, [\n      {provide: TemplateRef, useValue: template},\n      {provide: IterableDiffers, useValue: differs},\n    ]);\n    definition._table = table;\n    return definition;\n  }"
+          },
+          {
+            "file": "legacy-table/row.ts",
+            "source_sha256": "c9fa4b3b1c42eda48baf88a4f89922f8aafe388aa1980ebbe4d73ee9713c20fa",
+            "class": "MatLegacyRowDef",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkRowDef",
+            "providers": "[\n      {provide: TemplateRef, useValue: template},\n      {provide: IterableDiffers, useValue: differs},\n    ]",
+            "constructor": "constructor(template: TemplateRef<any>, differs: IterableDiffers,\n      @Optional() @Inject(CdkTable) table?: any) {\n    const definition = constructWithPublicDependencies(CdkRowDef, new.target, [\n      {provide: TemplateRef, useValue: template},\n      {provide: IterableDiffers, useValue: differs},\n    ]);\n    definition._table = table;\n    return definition as MatLegacyRowDef<T>;\n  }"
+          },
+          {
+            "file": "legacy-table/row.ts",
+            "source_sha256": "c9fa4b3b1c42eda48baf88a4f89922f8aafe388aa1980ebbe4d73ee9713c20fa",
+            "class": "MatLegacyNoDataRow",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkNoDataRow",
+            "providers": "[\n      {provide: TemplateRef, useValue: templateRef},\n    ]",
+            "constructor": "constructor(templateRef: TemplateRef<any>) {\n    const row = constructWithPublicDependencies(CdkNoDataRow, new.target, [\n      {provide: TemplateRef, useValue: templateRef},\n    ]) as MatLegacyNoDataRow;\n    row._contentClassName = 'mat-no-data-row';\n    row._contentClassNames = ['mat-no-data-row'];\n    return row;\n  }"
+          },
+          {
+            "file": "legacy-table/text-column.ts",
+            "source_sha256": "157c01cc18f67ff7e499442e6f16a7a23ec08284d069b2318a5d8bae11dc4431",
+            "class": "MatLegacyTextColumn",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkTextColumn<T>",
+            "providers": "[\n      {provide: CdkTable, useValue: table},\n      {provide: TEXT_COLUMN_OPTIONS, useValue: options},\n    ]",
+            "constructor": "constructor(@Optional() table: CdkTable<T>, @Optional() @Inject(TEXT_COLUMN_OPTIONS) options: TextColumnOptions<T>) {\n    return constructWithPublicDependencies(CdkTextColumn<T>, new.target, [\n      {provide: CdkTable, useValue: table},\n      {provide: TEXT_COLUMN_OPTIONS, useValue: options},\n    ]);\n  }"
+          },
+          {
+            "file": "legacy-table/cell.ts",
+            "source_sha256": "17dfbe36aca2aea11ef1c84c700b4c3eab703a66643d82753a07b706e9b8b09c",
+            "class": "MatLegacyCellDef",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkCellDef",
+            "providers": "[{provide: TemplateRef, useValue: template}]",
+            "constructor": "constructor(template: TemplateRef<any>) {\n    return constructWithPublicDependencies(CdkCellDef, new.target, [{provide: TemplateRef, useValue: template}]);\n  }"
+          },
+          {
+            "file": "legacy-table/cell.ts",
+            "source_sha256": "17dfbe36aca2aea11ef1c84c700b4c3eab703a66643d82753a07b706e9b8b09c",
+            "class": "MatLegacyHeaderCellDef",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkHeaderCellDef",
+            "providers": "[{provide: TemplateRef, useValue: template}]",
+            "constructor": "constructor(template: TemplateRef<any>) {\n    return constructWithPublicDependencies(CdkHeaderCellDef, new.target, [{provide: TemplateRef, useValue: template}]);\n  }"
+          },
+          {
+            "file": "legacy-table/cell.ts",
+            "source_sha256": "17dfbe36aca2aea11ef1c84c700b4c3eab703a66643d82753a07b706e9b8b09c",
+            "class": "MatLegacyFooterCellDef",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkFooterCellDef",
+            "providers": "[{provide: TemplateRef, useValue: template}]",
+            "constructor": "constructor(template: TemplateRef<any>) {\n    return constructWithPublicDependencies(CdkFooterCellDef, new.target, [{provide: TemplateRef, useValue: template}]);\n  }"
+          },
+          {
+            "file": "legacy-table/cell.ts",
+            "source_sha256": "17dfbe36aca2aea11ef1c84c700b4c3eab703a66643d82753a07b706e9b8b09c",
+            "class": "MatLegacyColumnDef",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkColumnDef",
+            "providers": "[]",
+            "constructor": "constructor(@Optional() @Inject(CdkTable) table?: any) {\n    const definition = constructWithPublicDependencies(CdkColumnDef, new.target, []);\n    definition._table = table;\n    return definition as MatLegacyColumnDef;\n  }"
+          },
+          {
+            "file": "legacy-table/cell.ts",
+            "source_sha256": "17dfbe36aca2aea11ef1c84c700b4c3eab703a66643d82753a07b706e9b8b09c",
+            "class": "MatLegacyHeaderCell",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkHeaderCell",
+            "providers": "[\n      {provide: CdkColumnDef, useValue: columnDef},\n      {provide: ElementRef, useValue: elementRef},\n    ]",
+            "constructor": "constructor(columnDef: CdkColumnDef, elementRef: ElementRef) {\n    return constructWithPublicDependencies(CdkHeaderCell, new.target, [\n      {provide: CdkColumnDef, useValue: columnDef},\n      {provide: ElementRef, useValue: elementRef},\n    ]);\n  }"
+          },
+          {
+            "file": "legacy-table/cell.ts",
+            "source_sha256": "17dfbe36aca2aea11ef1c84c700b4c3eab703a66643d82753a07b706e9b8b09c",
+            "class": "MatLegacyFooterCell",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkFooterCell",
+            "providers": "[\n      {provide: CdkColumnDef, useValue: columnDef},\n      {provide: ElementRef, useValue: elementRef},\n    ]",
+            "constructor": "constructor(columnDef: CdkColumnDef, elementRef: ElementRef) {\n    return constructWithPublicDependencies(CdkFooterCell, new.target, [\n      {provide: CdkColumnDef, useValue: columnDef},\n      {provide: ElementRef, useValue: elementRef},\n    ]);\n  }"
+          },
+          {
+            "file": "legacy-table/cell.ts",
+            "source_sha256": "17dfbe36aca2aea11ef1c84c700b4c3eab703a66643d82753a07b706e9b8b09c",
+            "class": "MatLegacyCell",
+            "helper": "legacy-table/internal/public-constructor-context.ts",
+            "parent": "CdkCell",
+            "providers": "[\n      {provide: CdkColumnDef, useValue: columnDef},\n      {provide: ElementRef, useValue: elementRef},\n    ]",
+            "constructor": "constructor(columnDef: CdkColumnDef, elementRef: ElementRef) {\n    return constructWithPublicDependencies(CdkCell, new.target, [\n      {provide: CdkColumnDef, useValue: columnDef},\n      {provide: ElementRef, useValue: elementRef},\n    ]);\n  }"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/borrowed-constructor-injector-source-proof.json",
+          "sha256": "4c76950b3457b2f87c1a18f26acf36d16a31c36ee44a0901b5755d6b42959fdc"
+        },
+        {
+          "path": "compatibility/rc/borrowed-constructor-injector-before-diagnostic.json",
+          "sha256": "95f66f769b85b6ca2c28b977e454a10c63baf9396bb361b3f8a88986d1f70de3"
+        },
+        {
+          "path": "tests/borrowed_constructor_injector_probe.mjs",
+          "sha256": "fc10a823d3852c6035699891243db6d901f8f3e8b46fb40116b844fd6c846a7b"
+        },
+        {
+          "path": "tests/borrowed_constructor_injector_subject.mjs",
+          "sha256": "cbcc5ebb91638038c815d661382428a4b1b69c35e4f32409390d235e05f34257"
+        },
+        {
+          "path": "tests/test_borrowed_constructor_injector.py",
+          "sha256": "853fc217d13a19a5277e2b180885f12aeef7aaaac4cd08a2bcaeacdaad65a2d5"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-table/cell.ts",
+          "sha256": "17dfbe36aca2aea11ef1c84c700b4c3eab703a66643d82753a07b706e9b8b09c"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-table/row.ts",
+          "sha256": "c9fa4b3b1c42eda48baf88a4f89922f8aafe388aa1980ebbe4d73ee9713c20fa"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-table/text-column.ts",
+          "sha256": "157c01cc18f67ff7e499442e6f16a7a23ec08284d069b2318a5d8bae11dc4431"
+        }
+      ]
+    },
+    {
+      "file": "legacy-tabs/internal/public-constructor-context.ts",
+      "module": "@angular/core",
+      "symbol": "Injector",
+      "candidate_source_sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The public abstract Injector is subclassed with a finite token/value Map; missing values use the public NULL fallback. Explicit null/undefined and exact object identities remain, and no resource-owning child or application is created. Strict whole declarations choose a nondeprecated fallback signature on all three captured versions. This entry-local copy has the two tab content/label caller constructors. All fourteen current callers are source-bound; object-return constructors have no skipped emitted instance fields or parameter properties. Complete helpers execute under entire authenticated original/current Core namespaces in six development/production contexts:162 protocol cases and18 whole-helper mutations reject wrong target prototypes and destruction of borrowed values. Parent/service classes are explicit protocols; this is not actual fourteen legacy/peer parent, node factory, native/packed or full floor qualification. Only the declared public Core dependency contract is closed. No CSS/SCSS/HTML or emitted JavaScript changed.",
+      "source_binding": {
+        "helper": {
+          "path": "projects/ngx-material-legacy/legacy-tabs/internal/public-constructor-context.ts",
+          "sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef",
+          "source": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\nimport {Injector, runInInjectionContext, type ProviderToken} from '@angular/core';\n\n/** A bounded context borrows supplied objects without registering destroy hooks. */\nclass BorrowedDependencyInjector extends Injector {\n  constructor(private readonly values: Map<unknown, unknown>) {\n    super();\n  }\n\n  override get(token: ProviderToken<unknown>, notFoundValue?: any): any {\n    if (this.values.has(token)) return this.values.get(token);\n    return Injector.NULL.get(token, notFoundValue);\n  }\n}\n\n/**\n * Construct the public parent with exactly the original supplied dependencies.\n * Only use for owned subclasses with no emitted instance fields/parameter\n * properties: returning this object skips their own instance initializers.\n * Supplied objects belong to the caller; this context must never destroy them.\n */\nexport function constructWithPublicDependencies<T>(parent: new () => T, target: Function, providers: {provide: unknown; useValue: unknown}[]): T {\n  const context = new BorrowedDependencyInjector(new Map(providers.map(({provide, useValue}) => [provide, useValue])));\n  return runInInjectionContext(context, () => Reflect.construct(parent, [], target));\n}\n",
+          "production_callers": [
+            "MatLegacyTabContent",
+            "MatLegacyTabLabel"
+          ]
+        },
+        "callers": [
+          {
+            "file": "legacy-tabs/tab-content.ts",
+            "source_sha256": "256886c4891ad0b7e6833e795e0e7586855cd6704b48b658b89490e4aeba0478",
+            "class": "MatLegacyTabContent",
+            "helper": "legacy-tabs/internal/public-constructor-context.ts",
+            "parent": "MatNonLegacyTabContent",
+            "providers": "[\n      {provide: TemplateRef, useValue: template},\n    ]",
+            "constructor": "constructor(template: TemplateRef<any>) {\n    return constructWithPublicDependencies(MatNonLegacyTabContent, new.target, [\n      {provide: TemplateRef, useValue: template},\n    ]);\n  }"
+          },
+          {
+            "file": "legacy-tabs/tab-label.ts",
+            "source_sha256": "5ff08854377bb33070d69ee6fb4f7a346d37bebf4aefb6f0fd7a48f6a98621ff",
+            "class": "MatLegacyTabLabel",
+            "helper": "legacy-tabs/internal/public-constructor-context.ts",
+            "parent": "MatNonLegacyTabLabel",
+            "providers": "[\n      {provide: TemplateRef, useValue: templateRef},\n      {provide: ViewContainerRef, useValue: viewContainerRef},\n    ]",
+            "constructor": "constructor(@Inject(TemplateRef) templateRef: TemplateRef<any>,\n      @Inject(ViewContainerRef) viewContainerRef: ViewContainerRef,\n      @Optional() @Inject(MAT_TAB) closestTab: any) {\n    const label = constructWithPublicDependencies(MatNonLegacyTabLabel, new.target, [\n      {provide: TemplateRef, useValue: templateRef},\n      {provide: ViewContainerRef, useValue: viewContainerRef},\n    ]);\n    label._closestTab = closestTab;\n    return label;\n  }"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/borrowed-constructor-injector-source-proof.json",
+          "sha256": "4c76950b3457b2f87c1a18f26acf36d16a31c36ee44a0901b5755d6b42959fdc"
+        },
+        {
+          "path": "compatibility/rc/borrowed-constructor-injector-before-diagnostic.json",
+          "sha256": "95f66f769b85b6ca2c28b977e454a10c63baf9396bb361b3f8a88986d1f70de3"
+        },
+        {
+          "path": "tests/borrowed_constructor_injector_probe.mjs",
+          "sha256": "fc10a823d3852c6035699891243db6d901f8f3e8b46fb40116b844fd6c846a7b"
+        },
+        {
+          "path": "tests/borrowed_constructor_injector_subject.mjs",
+          "sha256": "cbcc5ebb91638038c815d661382428a4b1b69c35e4f32409390d235e05f34257"
+        },
+        {
+          "path": "tests/test_borrowed_constructor_injector.py",
+          "sha256": "853fc217d13a19a5277e2b180885f12aeef7aaaac4cd08a2bcaeacdaad65a2d5"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/tab-content.ts",
+          "sha256": "256886c4891ad0b7e6833e795e0e7586855cd6704b48b658b89490e4aeba0478"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/tab-label.ts",
+          "sha256": "5ff08854377bb33070d69ee6fb4f7a346d37bebf4aefb6f0fd7a48f6a98621ff"
+        }
+      ]
+    },
+    {
+      "file": "legacy-tabs/internal/public-constructor-context.ts",
+      "module": "@angular/core",
+      "symbol": "ProviderToken",
+      "candidate_source_sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The added type-only ProviderToken<unknown> gives the private get implementation the public token domain. It replaces any solely in the annotation: emitted JavaScript is byte-identical. The former any selected a deprecated fallback only against original16 declarations; both current floors already selected stable overloads. Actual helper strict compilation selects stable signatures across all three versions and expected invalid constructor/factory-provider fixtures fail. This is a type/dependency judgment, not a consumer public API change. This entry-local copy has the two tab content/label caller constructors. All fourteen current callers are source-bound; object-return constructors have no skipped emitted instance fields or parameter properties. Complete helpers execute under entire authenticated original/current Core namespaces in six development/production contexts:162 protocol cases and18 whole-helper mutations reject wrong target prototypes and destruction of borrowed values. Parent/service classes are explicit protocols; this is not actual fourteen legacy/peer parent, node factory, native/packed or full floor qualification. Only the declared public Core dependency contract is closed. No CSS/SCSS/HTML or emitted JavaScript changed.",
+      "source_binding": {
+        "helper": {
+          "path": "projects/ngx-material-legacy/legacy-tabs/internal/public-constructor-context.ts",
+          "sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef",
+          "source": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\nimport {Injector, runInInjectionContext, type ProviderToken} from '@angular/core';\n\n/** A bounded context borrows supplied objects without registering destroy hooks. */\nclass BorrowedDependencyInjector extends Injector {\n  constructor(private readonly values: Map<unknown, unknown>) {\n    super();\n  }\n\n  override get(token: ProviderToken<unknown>, notFoundValue?: any): any {\n    if (this.values.has(token)) return this.values.get(token);\n    return Injector.NULL.get(token, notFoundValue);\n  }\n}\n\n/**\n * Construct the public parent with exactly the original supplied dependencies.\n * Only use for owned subclasses with no emitted instance fields/parameter\n * properties: returning this object skips their own instance initializers.\n * Supplied objects belong to the caller; this context must never destroy them.\n */\nexport function constructWithPublicDependencies<T>(parent: new () => T, target: Function, providers: {provide: unknown; useValue: unknown}[]): T {\n  const context = new BorrowedDependencyInjector(new Map(providers.map(({provide, useValue}) => [provide, useValue])));\n  return runInInjectionContext(context, () => Reflect.construct(parent, [], target));\n}\n",
+          "production_callers": [
+            "MatLegacyTabContent",
+            "MatLegacyTabLabel"
+          ]
+        },
+        "callers": [
+          {
+            "file": "legacy-tabs/tab-content.ts",
+            "source_sha256": "256886c4891ad0b7e6833e795e0e7586855cd6704b48b658b89490e4aeba0478",
+            "class": "MatLegacyTabContent",
+            "helper": "legacy-tabs/internal/public-constructor-context.ts",
+            "parent": "MatNonLegacyTabContent",
+            "providers": "[\n      {provide: TemplateRef, useValue: template},\n    ]",
+            "constructor": "constructor(template: TemplateRef<any>) {\n    return constructWithPublicDependencies(MatNonLegacyTabContent, new.target, [\n      {provide: TemplateRef, useValue: template},\n    ]);\n  }"
+          },
+          {
+            "file": "legacy-tabs/tab-label.ts",
+            "source_sha256": "5ff08854377bb33070d69ee6fb4f7a346d37bebf4aefb6f0fd7a48f6a98621ff",
+            "class": "MatLegacyTabLabel",
+            "helper": "legacy-tabs/internal/public-constructor-context.ts",
+            "parent": "MatNonLegacyTabLabel",
+            "providers": "[\n      {provide: TemplateRef, useValue: templateRef},\n      {provide: ViewContainerRef, useValue: viewContainerRef},\n    ]",
+            "constructor": "constructor(@Inject(TemplateRef) templateRef: TemplateRef<any>,\n      @Inject(ViewContainerRef) viewContainerRef: ViewContainerRef,\n      @Optional() @Inject(MAT_TAB) closestTab: any) {\n    const label = constructWithPublicDependencies(MatNonLegacyTabLabel, new.target, [\n      {provide: TemplateRef, useValue: templateRef},\n      {provide: ViewContainerRef, useValue: viewContainerRef},\n    ]);\n    label._closestTab = closestTab;\n    return label;\n  }"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/borrowed-constructor-injector-source-proof.json",
+          "sha256": "4c76950b3457b2f87c1a18f26acf36d16a31c36ee44a0901b5755d6b42959fdc"
+        },
+        {
+          "path": "compatibility/rc/borrowed-constructor-injector-before-diagnostic.json",
+          "sha256": "95f66f769b85b6ca2c28b977e454a10c63baf9396bb361b3f8a88986d1f70de3"
+        },
+        {
+          "path": "tests/borrowed_constructor_injector_probe.mjs",
+          "sha256": "fc10a823d3852c6035699891243db6d901f8f3e8b46fb40116b844fd6c846a7b"
+        },
+        {
+          "path": "tests/borrowed_constructor_injector_subject.mjs",
+          "sha256": "cbcc5ebb91638038c815d661382428a4b1b69c35e4f32409390d235e05f34257"
+        },
+        {
+          "path": "tests/test_borrowed_constructor_injector.py",
+          "sha256": "853fc217d13a19a5277e2b180885f12aeef7aaaac4cd08a2bcaeacdaad65a2d5"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/tab-content.ts",
+          "sha256": "256886c4891ad0b7e6833e795e0e7586855cd6704b48b658b89490e4aeba0478"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/tab-label.ts",
+          "sha256": "5ff08854377bb33070d69ee6fb4f7a346d37bebf4aefb6f0fd7a48f6a98621ff"
+        }
+      ]
+    },
+    {
+      "file": "legacy-tabs/internal/public-constructor-context.ts",
+      "module": "@angular/core",
+      "symbol": "runInInjectionContext",
+      "candidate_source_sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The stable public runInInjectionContext scopes exactly one Reflect.construct(parent, [], target) operation to the finite borrowed context. Genuine Core tests preserve outer contexts on success and throw, clear the context afterward, initialize the parent once and retain consumer subclass fields/prototypes. Supplied hydrated services are never registered or destroyed by the helper; reverting to an owning Injector.create/destroy path is rejected. This entry-local copy has the two tab content/label caller constructors. All fourteen current callers are source-bound; object-return constructors have no skipped emitted instance fields or parameter properties. Complete helpers execute under entire authenticated original/current Core namespaces in six development/production contexts:162 protocol cases and18 whole-helper mutations reject wrong target prototypes and destruction of borrowed values. Parent/service classes are explicit protocols; this is not actual fourteen legacy/peer parent, node factory, native/packed or full floor qualification. Only the declared public Core dependency contract is closed. No CSS/SCSS/HTML or emitted JavaScript changed.",
+      "source_binding": {
+        "helper": {
+          "path": "projects/ngx-material-legacy/legacy-tabs/internal/public-constructor-context.ts",
+          "sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef",
+          "source": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\nimport {Injector, runInInjectionContext, type ProviderToken} from '@angular/core';\n\n/** A bounded context borrows supplied objects without registering destroy hooks. */\nclass BorrowedDependencyInjector extends Injector {\n  constructor(private readonly values: Map<unknown, unknown>) {\n    super();\n  }\n\n  override get(token: ProviderToken<unknown>, notFoundValue?: any): any {\n    if (this.values.has(token)) return this.values.get(token);\n    return Injector.NULL.get(token, notFoundValue);\n  }\n}\n\n/**\n * Construct the public parent with exactly the original supplied dependencies.\n * Only use for owned subclasses with no emitted instance fields/parameter\n * properties: returning this object skips their own instance initializers.\n * Supplied objects belong to the caller; this context must never destroy them.\n */\nexport function constructWithPublicDependencies<T>(parent: new () => T, target: Function, providers: {provide: unknown; useValue: unknown}[]): T {\n  const context = new BorrowedDependencyInjector(new Map(providers.map(({provide, useValue}) => [provide, useValue])));\n  return runInInjectionContext(context, () => Reflect.construct(parent, [], target));\n}\n",
+          "production_callers": [
+            "MatLegacyTabContent",
+            "MatLegacyTabLabel"
+          ]
+        },
+        "callers": [
+          {
+            "file": "legacy-tabs/tab-content.ts",
+            "source_sha256": "256886c4891ad0b7e6833e795e0e7586855cd6704b48b658b89490e4aeba0478",
+            "class": "MatLegacyTabContent",
+            "helper": "legacy-tabs/internal/public-constructor-context.ts",
+            "parent": "MatNonLegacyTabContent",
+            "providers": "[\n      {provide: TemplateRef, useValue: template},\n    ]",
+            "constructor": "constructor(template: TemplateRef<any>) {\n    return constructWithPublicDependencies(MatNonLegacyTabContent, new.target, [\n      {provide: TemplateRef, useValue: template},\n    ]);\n  }"
+          },
+          {
+            "file": "legacy-tabs/tab-label.ts",
+            "source_sha256": "5ff08854377bb33070d69ee6fb4f7a346d37bebf4aefb6f0fd7a48f6a98621ff",
+            "class": "MatLegacyTabLabel",
+            "helper": "legacy-tabs/internal/public-constructor-context.ts",
+            "parent": "MatNonLegacyTabLabel",
+            "providers": "[\n      {provide: TemplateRef, useValue: templateRef},\n      {provide: ViewContainerRef, useValue: viewContainerRef},\n    ]",
+            "constructor": "constructor(@Inject(TemplateRef) templateRef: TemplateRef<any>,\n      @Inject(ViewContainerRef) viewContainerRef: ViewContainerRef,\n      @Optional() @Inject(MAT_TAB) closestTab: any) {\n    const label = constructWithPublicDependencies(MatNonLegacyTabLabel, new.target, [\n      {provide: TemplateRef, useValue: templateRef},\n      {provide: ViewContainerRef, useValue: viewContainerRef},\n    ]);\n    label._closestTab = closestTab;\n    return label;\n  }"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/borrowed-constructor-injector-source-proof.json",
+          "sha256": "4c76950b3457b2f87c1a18f26acf36d16a31c36ee44a0901b5755d6b42959fdc"
+        },
+        {
+          "path": "compatibility/rc/borrowed-constructor-injector-before-diagnostic.json",
+          "sha256": "95f66f769b85b6ca2c28b977e454a10c63baf9396bb361b3f8a88986d1f70de3"
+        },
+        {
+          "path": "tests/borrowed_constructor_injector_probe.mjs",
+          "sha256": "fc10a823d3852c6035699891243db6d901f8f3e8b46fb40116b844fd6c846a7b"
+        },
+        {
+          "path": "tests/borrowed_constructor_injector_subject.mjs",
+          "sha256": "cbcc5ebb91638038c815d661382428a4b1b69c35e4f32409390d235e05f34257"
+        },
+        {
+          "path": "tests/test_borrowed_constructor_injector.py",
+          "sha256": "853fc217d13a19a5277e2b180885f12aeef7aaaac4cd08a2bcaeacdaad65a2d5"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/tab-content.ts",
+          "sha256": "256886c4891ad0b7e6833e795e0e7586855cd6704b48b658b89490e4aeba0478"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/tab-label.ts",
+          "sha256": "5ff08854377bb33070d69ee6fb4f7a346d37bebf4aefb6f0fd7a48f6a98621ff"
+        }
+      ]
+    }
+  ],
+  "g11_claim": "not-passed"
+}
