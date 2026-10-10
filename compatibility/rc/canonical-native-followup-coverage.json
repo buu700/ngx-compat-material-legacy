@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
   "line": "main",
-  "recorded_at_utc": "2026-10-10T08:48:38.864349+00:00",
+  "recorded_at_utc": "2026-10-10T09:10:18.331135+00:00",
   "source_heads": {
-    "main": "35c4dca2dbd915de9e68074b99b12f104f1749e5",
-    "21.x": "7ffec84a95f542a9c4de07d824c057529d39f2f6"
+    "main": "e2e6b18151ec848528c2dcd39674090295339884",
+    "21.x": "f18bcdb6569b81971d0e568aacc3eff0dd758b88"
   },
   "source_trees": {
-    "main": "3ddca737dd35a3e5723e710c6e6c338ee5425704",
-    "21.x": "58421dec2c423cf40240d37cf2bd18f85c4b2517"
+    "main": "de3c0273066dc6d1c35256104a4193dc17b8645c",
+    "21.x": "6ae64f97fd9d180a02a9f60b314b3ffe26756e76"
   },
   "canonical_producer": {
     "path": "scripts/browser-required-cells.mjs",
-    "sha256": "314d05bc3de880affc03bf5f9f04411d1e353f77366c0985d4e3430e0c009920"
+    "sha256": "7292991e1a0137edb5f5aa638fdba8216bbb460006439c935786e12a62a16f60"
   },
   "canonical_probe": {
     "path": "scripts/browser-required-probe.js",
-    "sha256": "70acc758579c77c3d67f377bad02d34ccf2599c2f565c01fb691f0400414b0a7"
+    "sha256": "c9eaccaa162a8fc25878b2ebb6eb4440f45d3b7d467f82e9582d496b2bf3cc95"
   },
   "scope": "Explicit closeout native follow-ups reviewed against the current canonical default family branches and generated consumer. Diagnostic overlay/form/dialog producer observations do not automatically run in browser-required-cells. This is an obligation inventory, not a browser verdict or release matrix change.",
   "rows": [
@@ -144,8 +144,8 @@
       "proof": "snack-exit-source-proof.json",
       "family": "snack-bar",
       "canonical_source_integration": "implemented-unexecuted",
-      "current_canonical_assertion": "Shared enabled test-override fixture wraps the actual owned handler without changing timers or routing. Both event and suppressed-actual-CSS-event fallback modes require one trusted enter/exit/action, correct delivery origin, fallback deadlines, action dismissal, completion and removal. Owned listeners/input requests clean up on completion or replacement. Direct pending announcement destruction remains separate.",
-      "required": "Actual trusted CSS enter/exit, controlled missing-event fallback, one action dismissal/completion/removal and applicable deadlines; pending announcement destruction is separate.",
+      "current_canonical_assertion": "Shared enabled test-override fixture wraps the actual owned handler without changing timers or routing. Both event and suppressed-actual-CSS-event fallback modes require one trusted enter/exit/action, correct delivery origin, fallback deadlines, action dismissal, completion and removal. Owned listeners/input requests clean up on completion or replacement. Direct pending announcement destruction is now additionally required by the snack-announcement-direct-destruction row before this same default cell can pass.",
+      "required": "Actual trusted CSS enter/exit, controlled missing-event fallback, one action dismissal/completion/removal and applicable deadlines; pending announcement destruction is now an additional gate in the same default cell.",
       "historical_source_proof": {
         "path": "compatibility/rc/snack-exit-source-proof.json",
         "sha256": "632d8af0737348ce9ddb4f2ae153e990d79eb135c375820ce5b39bb25eacaf21"
@@ -201,34 +201,48 @@
       "integration_source_proof": {
         "path": "compatibility/rc/form-field-direction-lifetime-source-proof.json",
         "sha256": "a45885f634224ff74c81c66c2c0c92854cfec1973a47ab1610ada1b793fc3b53"
+      },
+      "compiler_selection_correction": {
+        "path": "compatibility/rc/fixture-compiler-selection-correction.json",
+        "sha256": "a4367fe3c4cfd7ae8bdef42f6dd02fb6a2789224f656a133f9156e8ff3af9cc5"
       }
     },
     {
       "id": "snack-announcement-direct-destruction",
       "proof": "snack-announcement-source-proof.json",
       "family": "snack-bar",
-      "canonical_source_integration": "pending-implementation",
-      "current_canonical_assertion": "Absent. The canonical enabled CSS event/fallback and dismissal cases do not directly destroy a container while its announcement timer is pending. Earlier source replay covers that path, but is not actual native view destruction.",
-      "required": "Add actual Angular-owned container creation/initialization and direct ComponentRef destruction, with a live positive announcement case and retained native inert/live DOM proving no movement or announcement after destruction. Dismiss-before-destroy is insufficient. Preserve native timing and product markup/styles; use the existing snack-bar/default cell.",
+      "canonical_source_integration": "implemented-unexecuted",
+      "current_canonical_assertion": "Actual Angular initialized container/template-portal views; a living announcement/content-move/completion positive and immediate direct pending-timer destruction negative in both enabled/di-disabled policy modes. Retained actual host inert/live nodes must show no late move/notification/completion after225ms; no prior dismiss/exit, timer override, forced application render or new release matrix id.",
+      "required": "Actual packed/native initialized/live/direct-destroy observations at exact supported line/runtime subjects. Framework/portal/node timer and canonical DOM/clock protocols are diagnostic scope only.",
       "historical_source_proof": {
         "path": "compatibility/rc/snack-announcement-source-proof.json",
         "sha256": "634992fc48e97eb78e5a80adcae2bb073089eb54bf5d0d430e2b2cb7ec8e5264"
       },
-      "native_execution": "pending"
+      "native_execution": "pending",
+      "integration_source_proof": {
+        "path": "compatibility/rc/snack-announcement-lifetime-source-proof.json",
+        "sha256": "eb8615ccff649bc04bf9cc848aa3cf0b391bc166fd59933bb29accee664568fe"
+      }
     }
   ],
-  "implemented_source_integration": 11,
-  "pending_source_integration": 1,
+  "implemented_source_integration": 12,
+  "pending_source_integration": 0,
   "actual_qualified_native_followups": 0,
   "new_release_matrix_cells": 0,
   "g11_claim": "not-passed",
   "current_integration_delta_source_proof": {
-    "path": "compatibility/rc/form-field-direction-lifetime-source-proof.json",
-    "sha256": "a45885f634224ff74c81c66c2c0c92854cfec1973a47ab1610ada1b793fc3b53"
+    "path": "compatibility/rc/snack-announcement-lifetime-source-proof.json",
+    "sha256": "eb8615ccff649bc04bf9cc848aa3cf0b391bc166fd59933bb29accee664568fe"
   },
   "prior_integration_delta_source_proof": {
     "path": "compatibility/rc/canonical-native-completion-source-proof.json",
     "sha256": "f68c5ac3b03c6610b72c681b5af5bcf4ef2e04a9cdef2d58d3ba59ba2e4a1b03"
   },
-  "next_bounded_source_integration": "snack-announcement-direct-destruction; implementation remains closeout work before C05/audit"
+  "remaining_qualification": "All twelve listed native integrations are implemented in source and remain unexecuted against actual packed/native artifacts. This finite follow-up inventory does not complete the whole closeout plan or independent audit.",
+  "integration_delta_source_proof_history": [
+    {
+      "path": "compatibility/rc/form-field-direction-lifetime-source-proof.json",
+      "sha256": "a45885f634224ff74c81c66c2c0c92854cfec1973a47ab1610ada1b793fc3b53"
+    }
+  ]
 }
