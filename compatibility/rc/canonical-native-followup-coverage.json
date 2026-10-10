@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
   "line": "21.x",
-  "recorded_at_utc": "2026-10-10T10:18:05.893540+00:00",
+  "recorded_at_utc": "2026-10-10T10:28:07.376869+00:00",
   "source_heads": {
-    "main": "e2e6b18151ec848528c2dcd39674090295339884",
-    "21.x": "f18bcdb6569b81971d0e568aacc3eff0dd758b88"
+    "main": "25199302caba4a5f0b5bc99cf2625c3deea11e1f",
+    "21.x": "a6a41e7e71c8d7f155855981d879a7607381af04"
   },
   "source_trees": {
-    "main": "de3c0273066dc6d1c35256104a4193dc17b8645c",
-    "21.x": "6ae64f97fd9d180a02a9f60b314b3ffe26756e76"
+    "main": "7a784c6bd419ec372a077e0862fe7c4c9bee502c",
+    "21.x": "beffb0533f587fa54aa24b69f6131500402c949b"
   },
   "canonical_producer": {
     "path": "scripts/browser-required-cells.mjs",
-    "sha256": "94a6a61697faf19bab39ff5c96b295589c8dc45e5687676f8331a1611dce3b3f"
+    "sha256": "8bcd2c9c416744a0266a6ceb71bf5ffb1bc5c98fa14dd948c241babb3a7ba718"
   },
   "canonical_probe": {
     "path": "scripts/browser-required-probe.js",
-    "sha256": "c9eaccaa162a8fc25878b2ebb6eb4440f45d3b7d467f82e9582d496b2bf3cc95"
+    "sha256": "7c225435c79eb638e7edae88db6474884c17611ecdf4c3ed9cb5261576c0ce77"
   },
   "scope": "Explicit closeout native follow-ups reviewed against the current canonical default family branches and generated consumer. Diagnostic overlay/form/dialog producer observations do not automatically run in browser-required-cells. This is an obligation inventory, not a browser verdict or release matrix change.",
   "rows": [
@@ -228,34 +228,42 @@
       "id": "checkbox-animation-timer-lifetime",
       "proof": "checkbox-timer-source-proof.json",
       "family": "checkbox",
-      "canonical_source_integration": "pending-implementation",
-      "current_canonical_assertion": "The existing default branch only requires checkbox presence; it does not exercise transition reuse or direct pending-timer destruction.",
-      "required": "Actual initialized checkbox view/input transitions; a reused class survives an older cleanup but is removed at the latest historical deadline. Direct view destruction removes pending classes and no later retained-host writes occur. Actual native CSS timing must be observed, no new matrix ids or consumer resource edits.",
+      "canonical_source_integration": "implemented-unexecuted",
+      "current_canonical_assertion": "First click starts the historical checked transition; clicks after850ms and50ms re-use the class before its first1000ms cleanup. At250ms after reuse, the old deadline must have passed while the new one remains future and the class survives. At1100ms after reuse the class is removed. Computed180ms checkmark CSS and one trusted180ms native animationend are required. A second initialized checkbox is destroyed directly while its animation timer is pending; retained-host classes must clear immediately, its view/host must be gone, and a native MutationObserver must see zero late class writes after1100ms.",
+      "required": "Actual packed/native observations at exact supported line/runtime subjects. Genuine Angular fixture wiring and canonical DOM/timer protocols are diagnostic scope only.",
       "historical_source_proof": {
         "path": "compatibility/rc/checkbox-timer-source-proof.json",
         "sha256": "72b6914620b5e2b946b18724ddb3f7886e8ba6f782fbf30b491d88088dda3646"
       },
-      "native_execution": "pending"
+      "native_execution": "pending",
+      "integration_source_proof": {
+        "path": "compatibility/rc/checkbox-timer-lifetime-source-proof.json",
+        "sha256": "7139d60f7f9097ae4dafe2bbe6c25b1b831dd6a4baa0e36805dfc473ee6f3240"
+      }
     }
   ],
-  "implemented_source_integration": 12,
-  "pending_source_integration": 1,
+  "implemented_source_integration": 13,
+  "pending_source_integration": 0,
   "actual_qualified_native_followups": 0,
   "new_release_matrix_cells": 0,
   "g11_claim": "not-passed",
   "current_integration_delta_source_proof": {
-    "path": "compatibility/rc/snack-announcement-lifetime-source-proof.json",
-    "sha256": "f0a05de1723b46f74f9eba6cc06bced07f21ec0131cc331e85aa12fb79ddb551"
+    "path": "compatibility/rc/checkbox-timer-lifetime-source-proof.json",
+    "sha256": "7139d60f7f9097ae4dafe2bbe6c25b1b831dd6a4baa0e36805dfc473ee6f3240"
   },
   "prior_integration_delta_source_proof": {
     "path": "compatibility/rc/canonical-native-completion-source-proof.json",
     "sha256": "1ef6aab67486645fa78b52879af5fc5551b7454ca06a28f932efbe56444c2122"
   },
-  "remaining_qualification": "Twelve earlier native source integrations remain unexecuted; the new checkbox timer lifecycle producer remains unimplemented and must be completed before C05. This inventory is not the whole closeout plan or independent audit.",
+  "remaining_qualification": "All thirteen listed native integrations are implemented in source and remain unexecuted against actual packed/native artifacts. This finite follow-up inventory does not complete the whole closeout plan or independent audit. Earlier source proofs preserve their historical missing-producer statements; this fresh integration receipt records their subsequent completion without restamping runtime results.",
   "integration_delta_source_proof_history": [
     {
       "path": "compatibility/rc/form-field-direction-lifetime-source-proof.json",
       "sha256": "b644b3e90bcc52f3941b7f85a21ff9e6a14021e00adfc5c2d3d90b5b29247c84"
+    },
+    {
+      "path": "compatibility/rc/snack-announcement-lifetime-source-proof.json",
+      "sha256": "f0a05de1723b46f74f9eba6cc06bced07f21ec0131cc331e85aa12fb79ddb551"
     }
   ]
 }
