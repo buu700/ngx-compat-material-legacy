@@ -1,0 +1,921 @@
+{
+  "schema_version": 1,
+  "role": "Finite public Directionality dependency review",
+  "line": "main",
+  "node": "v22.23.3",
+  "compiler": "6.0.3",
+  "source_review": {
+    "schema_version": 1,
+    "line": "main",
+    "compiler": "6.0.3",
+    "cases": [
+      {
+        "module": "@angular/cdk/bidi",
+        "symbol": "Directionality",
+        "file": "legacy-form-field/form-field.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "580387e18e311ed166b078623d3f9889611f459349f1468371f07d9a2e281582",
+        "constructor_parameters": [
+          {
+            "index": 2,
+            "declaration": "@Optional() private _dir: Directionality",
+            "implementation": true
+          }
+        ],
+        "parameter_property": true,
+        "members": [
+          {
+            "member": "change",
+            "line": 378
+          },
+          {
+            "member": "value",
+            "line": 742
+          }
+        ],
+        "forwards": [],
+        "contexts": [
+          {
+            "line": 296,
+            "source": "constructor(\n    elementRef: ElementRef,\n    private _changeDetectorRef: ChangeDetectorRef,\n    @Optional() private _dir: Directionality,\n    @Optional()\n    @Inject(MAT_LEGACY_FORM_FIELD_DEFAULT_OPTIONS)\n    private _defaults: MatLegacyFormFieldDefaultOptions,\n    private _platform: Platform,\n    private _ngZone: NgZone,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) _animationMode: string,\n    private _injector?: Injector,\n  ) {\n    super(elementRef);\n\n    this.floatLabel = this._getDefaultFloatLabelState();\n    this._legacyAnimationsDisabled = legacyAnimationsDisabled();\n    this._animationsEnabled =\n      !this._legacyAnimationsDisabled && _animationMode !== 'NoopAnimations';\n\n    // Set the default through here so we invoke the setter on the first run.\n    this.appearance = _defaults?.appearance || 'legacy';\n    if (_defaults) {\n      this._hideRequiredMarker = Boolean(_defaults.hideRequiredMarker);\n      if (_defaults.color) {\n        this.color = this.defaultColor = _defaults.color;\n      }\n    }\n  }"
+          },
+          {
+            "line": 340,
+            "source": "ngAfterContentInit() {\n    this._validateControlChild();\n    // Control initialization (type class + subscriptions) happens in\n    // ngAfterContentChecked so a swapped projected control is re-wired.\n\n    // Note that we have to run outside of the `NgZone` explicitly,\n    // in order to avoid throwing users into an infinite loop\n    // if `zone-patch-rxjs` is included.\n    this._ngZone.runOutsideAngular(() => {\n      afterFormFieldRender(this._ngZone, this._injector)\n        .pipe(takeUntil(this._destroyed)).subscribe(() => {\n          if (this._outlineGapCalculationNeededOnStable) {\n            this.updateOutlineGap();\n          }\n        });\n    });\n\n    // Run change detection and update the outline if the suffix or prefix changes.\n    merge(this._prefixChildren.changes, this._suffixChildren.changes).subscribe(() => {\n      this._outlineGapCalculationNeededOnStable = true;\n      this._changeDetectorRef.markForCheck();\n    });\n\n    // Re-validate when the number of hints changes.\n    this._hintChildren.changes.subscribe(() => {\n      this._processHints();\n      this._changeDetectorRef.markForCheck();\n    });\n    this._processHints();\n\n    // Update the aria-described by when the number of errors changes.\n    this._errorChildren.changes.subscribe(() => {\n      this._syncDescribedByIds();\n      this._changeDetectorRef.markForCheck();\n    });\n    this._syncDescribedByIds();\n\n    if (this._dir) {\n      this._dir.change.pipe(takeUntil(this._destroyed)).subscribe(() => {\n        if (this._formFieldDestroyed) {\n          return;\n        }\n        if (typeof requestAnimationFrame === 'function') {\n          this._ngZone.runOutsideAngular(() => {\n            const frameId = requestAnimationFrame(() => {\n              this._directionFrames.delete(frameId);\n              if (!this._formFieldDestroyed) {\n                this.updateOutlineGap();\n              }\n            });\n            this._directionFrames.add(frameId);\n          });\n        } else {\n          this.updateOutlineGap();\n        }\n      });\n    }\n  }"
+          },
+          {
+            "line": 741,
+            "source": "private _getStartEnd(rect: ClientRect): number {\n    return this._dir && this._dir.value === 'rtl' ? rect.right : rect.left;\n  }"
+          }
+        ]
+      },
+      {
+        "module": "@angular/cdk/bidi",
+        "symbol": "Directionality",
+        "file": "legacy-chips/chip-list.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "6be4ef5b4100e7d1122dc3a0842d66c8a57315374e438ecd8ddf2e29e9f8c3e2",
+        "constructor_parameters": [
+          {
+            "index": 2,
+            "declaration": "@Optional() private _dir: Directionality",
+            "implementation": true
+          }
+        ],
+        "parameter_property": true,
+        "members": [
+          {
+            "member": "value",
+            "line": 408
+          },
+          {
+            "member": "change",
+            "line": 411
+          }
+        ],
+        "forwards": [],
+        "contexts": [
+          {
+            "line": 388,
+            "source": "constructor(\n    protected _elementRef: ElementRef<HTMLElement>,\n    private _changeDetectorRef: ChangeDetectorRef,\n    @Optional() private _dir: Directionality,\n    @Optional() _parentForm: NgForm,\n    @Optional() _parentFormGroup: FormGroupDirective,\n    _defaultErrorStateMatcher: ErrorStateMatcher,\n    @Optional() @Self() ngControl: NgControl,\n  ) {\n    super(_defaultErrorStateMatcher, _parentForm, _parentFormGroup, ngControl);\n    if (this.ngControl) {\n      this.ngControl.valueAccessor = this;\n    }\n  }"
+          },
+          {
+            "line": 403,
+            "source": "ngAfterContentInit() {\n    this._keyManager = new FocusKeyManager<MatLegacyChip>(this.chips)\n      .withWrap()\n      .withVerticalOrientation()\n      .withHomeAndEnd()\n      .withHorizontalOrientation(this._dir ? this._dir.value : 'ltr');\n\n    if (this._dir) {\n      this._dir.change\n        .pipe(takeUntil(this._destroyed))\n        .subscribe(dir => this._keyManager.withHorizontalOrientation(dir));\n    }\n\n    this._keyManager.tabOut.subscribe(() => this._allowFocusEscape());\n\n    // When the list changes, re-subscribe\n    this.chips.changes.pipe(startWith(null), takeUntil(this._destroyed)).subscribe(() => {\n      if (this.disabled || !this.selectable) {\n        // Since this happens after the content has been\n        // checked, we need to defer it to the next tick.\n        Promise.resolve().then(() => {\n          this._syncChipsState();\n        });\n      }\n\n      this._resetChips();\n\n      // Reset chips selected/deselected status\n      this._initializeSelection();\n\n      // Check to see if we need to update our tab index\n      this._updateTabIndex();\n\n      // Check to see if we have a destroyed chip and need to refocus\n      this._updateFocusForDestroyedChips();\n\n      this.stateChanges.next();\n    });\n  }"
+          }
+        ]
+      },
+      {
+        "module": "@angular/cdk/bidi",
+        "symbol": "Directionality",
+        "file": "legacy-tabs/tab-header.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "650d50f3007c67c0c4aa9fa6e63b0fe6f246d7443fcb9967d5943c1fd7e90f9a",
+        "constructor_parameters": [
+          {
+            "index": 3,
+            "declaration": "@Optional() dir: Directionality",
+            "implementation": true
+          }
+        ],
+        "parameter_property": false,
+        "members": [],
+        "forwards": [
+          {
+            "argument_index": 3,
+            "arguments": [
+              "elementRef",
+              "changeDetectorRef",
+              "viewportRuler",
+              "dir",
+              "ngZone",
+              "platform",
+              "animationMode"
+            ]
+          }
+        ],
+        "contexts": [
+          {
+            "line": 64,
+            "source": "constructor(\n    elementRef: ElementRef,\n    changeDetectorRef: ChangeDetectorRef,\n    viewportRuler: ViewportRuler,\n    @Optional() dir: Directionality,\n    ngZone: NgZone,\n    platform: Platform,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n  ) {\n    super(elementRef, changeDetectorRef, viewportRuler, dir, ngZone, platform, animationMode);\n  }"
+          }
+        ]
+      },
+      {
+        "module": "@angular/cdk/bidi",
+        "symbol": "Directionality",
+        "file": "legacy-tabs/tab-body.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "7560de8c08198b04eddb701df4008225bbaa1f93847de7a17439295fec85fd80",
+        "constructor_parameters": [
+          {
+            "index": 1,
+            "declaration": "@Optional() dir: Directionality",
+            "implementation": true
+          }
+        ],
+        "parameter_property": false,
+        "members": [],
+        "forwards": [
+          {
+            "argument_index": 1,
+            "arguments": [
+              "elementRef",
+              "dir",
+              "changeDetectorRef"
+            ]
+          }
+        ],
+        "contexts": [
+          {
+            "line": 94,
+            "source": "constructor(\n    elementRef: ElementRef,\n    @Optional() dir: Directionality,\n    changeDetectorRef: ChangeDetectorRef,\n  ) {\n    super(elementRef, dir, changeDetectorRef);\n  }"
+          }
+        ]
+      },
+      {
+        "module": "@angular/cdk/bidi",
+        "symbol": "Directionality",
+        "file": "legacy-slider/slider.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "2dd6d9756260ae23ce7fc1dd55fee8d001a678996f80af0bb04eeee766cb274d",
+        "constructor_parameters": [
+          {
+            "index": 3,
+            "declaration": "@Optional() private _dir: Directionality",
+            "implementation": true
+          }
+        ],
+        "parameter_property": true,
+        "members": [
+          {
+            "member": "value",
+            "line": 505
+          },
+          {
+            "member": "change",
+            "line": 550
+          }
+        ],
+        "forwards": [],
+        "contexts": [
+          {
+            "line": 523,
+            "source": "constructor(\n    elementRef: ElementRef,\n    private _focusMonitor: FocusMonitor,\n    private _changeDetectorRef: ChangeDetectorRef,\n    @Optional() private _dir: Directionality,\n    @Attribute('tabindex') tabIndex: string,\n    private _ngZone: NgZone,\n    @Inject(DOCUMENT) _document: any,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) public _animationMode?: string,\n  ) {\n    super(elementRef);\n    this._document = _document;\n    this.tabIndex = parseInt(tabIndex) || 0;\n\n    _ngZone.runOutsideAngular(() => {\n      const element = elementRef.nativeElement;\n      element.addEventListener('mousedown', this._pointerDown, activeEventOptions);\n      element.addEventListener('touchstart', this._pointerDown, activeEventOptions);\n    });\n  }"
+          },
+          {
+            "line": 504,
+            "source": "private _getDirection() {\n    return this._dir && this._dir.value == 'rtl' ? 'rtl' : 'ltr';\n  }"
+          },
+          {
+            "line": 544,
+            "source": "ngAfterViewInit() {\n    this._focusMonitor.monitor(this._elementRef, true).subscribe((origin: FocusOrigin) => {\n      this._isActive = !!origin && origin !== 'keyboard';\n      this._changeDetectorRef.detectChanges();\n    });\n    if (this._dir) {\n      this._dirChangeSubscription = this._dir.change.subscribe(() => {\n        this._changeDetectorRef.markForCheck();\n      });\n    }\n  }"
+          }
+        ]
+      },
+      {
+        "module": "@angular/cdk/bidi",
+        "symbol": "Directionality",
+        "file": "legacy-tooltip/tooltip.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29",
+        "constructor_parameters": [
+          {
+            "index": 9,
+            "declaration": "@Optional() dir: Directionality",
+            "implementation": true
+          }
+        ],
+        "parameter_property": false,
+        "members": [],
+        "forwards": [
+          {
+            "argument_index": 9,
+            "arguments": [
+              "overlay",
+              "elementRef",
+              "scrollDispatcher",
+              "viewContainerRef",
+              "ngZone",
+              "platform",
+              "ariaDescriber",
+              "focusMonitor",
+              "scrollStrategy",
+              "dir",
+              "defaultOptions",
+              "_document"
+            ]
+          }
+        ],
+        "contexts": [
+          {
+            "line": 57,
+            "source": "constructor(\n    overlay: Overlay,\n    elementRef: ElementRef<HTMLElement>,\n    scrollDispatcher: ScrollDispatcher,\n    viewContainerRef: ViewContainerRef,\n    ngZone: NgZone,\n    platform: Platform,\n    ariaDescriber: AriaDescriber,\n    focusMonitor: FocusMonitor,\n    @Inject(MAT_TOOLTIP_SCROLL_STRATEGY) scrollStrategy: any,\n    @Optional() dir: Directionality,\n    @Optional() @Inject(MAT_TOOLTIP_DEFAULT_OPTIONS) defaultOptions: MatTooltipDefaultOptions,\n    @Inject(DOCUMENT) _document: any,\n  ) {\n    super(\n      overlay,\n      elementRef,\n      scrollDispatcher,\n      viewContainerRef,\n      ngZone,\n      platform,\n      ariaDescriber,\n      focusMonitor,\n      scrollStrategy,\n      dir,\n      defaultOptions,\n      _document,\n    );\n  }"
+          }
+        ]
+      },
+      {
+        "module": "@angular/cdk/bidi",
+        "symbol": "Directionality",
+        "file": "legacy-tooltip/internal/tooltip-base.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "948fd1d57f52e617eca301b693261127e42b3e4d23d0db8b2a3e2f012db0a85d",
+        "constructor_parameters": [
+          {
+            "index": 9,
+            "declaration": "protected _dir: Directionality",
+            "implementation": true
+          }
+        ],
+        "parameter_property": true,
+        "members": [
+          {
+            "member": "change",
+            "line": 314
+          },
+          {
+            "member": "value",
+            "line": 519
+          },
+          {
+            "member": "value",
+            "line": 551
+          },
+          {
+            "member": "value",
+            "line": 638
+          }
+        ],
+        "forwards": [],
+        "contexts": [
+          {
+            "line": 280,
+            "source": "constructor(\n    private _overlay: Overlay,\n    private _elementRef: ElementRef<HTMLElement>,\n    private _scrollDispatcher: ScrollDispatcher,\n    private _viewContainerRef: ViewContainerRef,\n    private _ngZone: NgZone,\n    private _platform: Platform,\n    private _ariaDescriber: AriaDescriber,\n    private _focusMonitor: FocusMonitor,\n    scrollStrategy: any,\n    protected _dir: Directionality,\n    private _defaultOptions: MatTooltipDefaultOptions,\n    @Inject(DOCUMENT) _document: any,\n  ) {\n    this._scrollStrategy = scrollStrategy;\n    this._document = _document;\n\n    if (_defaultOptions) {\n      this._showDelay = _defaultOptions.showDelay;\n      this._hideDelay = _defaultOptions.hideDelay;\n\n      if (_defaultOptions.position) {\n        this.position = _defaultOptions.position;\n      }\n\n      if (_defaultOptions.positionAtOrigin) {\n        this.positionAtOrigin = _defaultOptions.positionAtOrigin;\n      }\n\n      if (_defaultOptions.touchGestures) {\n        this.touchGestures = _defaultOptions.touchGestures;\n      }\n    }\n\n    _dir.change.pipe(takeUntil(this._destroyed)).subscribe(() => {\n      if (this._overlayRef) {\n        this._updatePosition(this._overlayRef);\n      }\n    });\n  }"
+          },
+          {
+            "line": 414,
+            "source": "private _createOverlay(origin?: {x: number; y: number}): OverlayRef {\n    if (this._overlayRef) {\n      const existingStrategy = this._overlayRef.getConfig()\n        .positionStrategy as FlexibleConnectedPositionStrategy;\n\n      if ((!this.positionAtOrigin || !origin) && existingStrategy._origin instanceof ElementRef) {\n        return this._overlayRef;\n      }\n\n      this._detach();\n    }\n\n    const scrollableAncestors = this._scrollDispatcher.getAncestorScrollContainers(\n      this._elementRef,\n    );\n\n    // Create connected position strategy that listens for scroll events to reposition.\n    const strategy = this._overlay\n      .position()\n      .flexibleConnectedTo(this.positionAtOrigin ? origin || this._elementRef : this._elementRef)\n      .withTransformOriginOn(`.${this._cssClassPrefix}-tooltip`)\n      .withFlexibleDimensions(false)\n      .withViewportMargin(this._viewportMargin)\n      .withScrollableContainers(scrollableAncestors);\n\n    strategy.positionChanges.pipe(takeUntil(this._destroyed)).subscribe((change: ConnectedOverlayPositionChange) => {\n      this._updateCurrentPositionClass(change.connectionPair);\n\n      if (this._tooltipInstance) {\n        if (change.scrollableViewProperties.isOverlayClipped && this._tooltipInstance.isVisible()) {\n          // After position changes occur and the overlay is clipped by\n          // a parent scrollable then close the tooltip.\n          this._ngZone.run(() => this.hide(0));\n        }\n      }\n    });\n\n    this._overlayRef = this._overlay.create({\n      direction: this._dir,\n      positionStrategy: strategy,\n      panelClass: `${this._cssClassPrefix}-${PANEL_CLASS}`,\n      scrollStrategy: this._scrollStrategy(),\n    });\n\n    this._updatePosition(this._overlayRef);\n\n    this._overlayRef\n      .detachments()\n      .pipe(takeUntil(this._destroyed))\n      .subscribe(() => this._detach());\n\n    this._overlayRef\n      .outsidePointerEvents()\n      .pipe(takeUntil(this._destroyed))\n      .subscribe(() => this._tooltipInstance?._handleBodyInteraction());\n\n    this._overlayRef\n      .keydownEvents()\n      .pipe(takeUntil(this._destroyed))\n      .subscribe((event: KeyboardEvent) => {\n        if (this._isTooltipVisible() && event.keyCode === ESCAPE && !hasModifierKey(event)) {\n          event.preventDefault();\n          event.stopPropagation();\n          this._ngZone.run(() => this.hide(0));\n        }\n      });\n\n    if (this._defaultOptions?.disableTooltipInteractivity) {\n      this._overlayRef.addPanelClass(`${this._cssClassPrefix}-tooltip-panel-non-interactive`);\n    }\n\n    return this._overlayRef;\n  }"
+          },
+          {
+            "line": 518,
+            "source": "_getOrigin(): {main: OriginConnectionPosition; fallback: OriginConnectionPosition} {\n    const isLtr = !this._dir || this._dir.value == 'ltr';\n    const position = this.position;\n    let originPosition: OriginConnectionPosition;\n\n    if (position == 'above' || position == 'below') {\n      originPosition = {originX: 'center', originY: position == 'above' ? 'top' : 'bottom'};\n    } else if (\n      position == 'before' ||\n      (position == 'left' && isLtr) ||\n      (position == 'right' && !isLtr)\n    ) {\n      originPosition = {originX: 'start', originY: 'center'};\n    } else if (\n      position == 'after' ||\n      (position == 'right' && isLtr) ||\n      (position == 'left' && !isLtr)\n    ) {\n      originPosition = {originX: 'end', originY: 'center'};\n    } else if (typeof ngDevMode === 'undefined' || ngDevMode) {\n      throw getMatTooltipInvalidPositionError(position);\n    }\n\n    const {x, y} = this._invertPosition(originPosition!.originX, originPosition!.originY);\n\n    return {\n      main: originPosition!,\n      fallback: {originX: x, originY: y},\n    };\n  }"
+          },
+          {
+            "line": 550,
+            "source": "_getOverlayPosition(): {main: OverlayConnectionPosition; fallback: OverlayConnectionPosition} {\n    const isLtr = !this._dir || this._dir.value == 'ltr';\n    const position = this.position;\n    let overlayPosition: OverlayConnectionPosition;\n\n    if (position == 'above') {\n      overlayPosition = {overlayX: 'center', overlayY: 'bottom'};\n    } else if (position == 'below') {\n      overlayPosition = {overlayX: 'center', overlayY: 'top'};\n    } else if (\n      position == 'before' ||\n      (position == 'left' && isLtr) ||\n      (position == 'right' && !isLtr)\n    ) {\n      overlayPosition = {overlayX: 'end', overlayY: 'center'};\n    } else if (\n      position == 'after' ||\n      (position == 'right' && isLtr) ||\n      (position == 'left' && !isLtr)\n    ) {\n      overlayPosition = {overlayX: 'start', overlayY: 'center'};\n    } else if (typeof ngDevMode === 'undefined' || ngDevMode) {\n      throw getMatTooltipInvalidPositionError(position);\n    }\n\n    const {x, y} = this._invertPosition(overlayPosition!.overlayX, overlayPosition!.overlayY);\n\n    return {\n      main: overlayPosition!,\n      fallback: {overlayX: x, overlayY: y},\n    };\n  }"
+          },
+          {
+            "line": 628,
+            "source": "private _updateCurrentPositionClass(connectionPair: ConnectionPositionPair): void {\n    const {overlayY, originX, originY} = connectionPair;\n    let newPosition: TooltipPosition;\n\n    // If the overlay is in the middle along the Y axis,\n    // it means that it's either before or after.\n    if (overlayY === 'center') {\n      // Note that since this information is used for styling, we want to\n      // resolve `start` and `end` to their real values, otherwise consumers\n      // would have to remember to do it themselves on each consumption.\n      if (this._dir && this._dir.value === 'rtl') {\n        newPosition = originX === 'end' ? 'left' : 'right';\n      } else {\n        newPosition = originX === 'start' ? 'left' : 'right';\n      }\n    } else {\n      newPosition = overlayY === 'bottom' && originY === 'top' ? 'above' : 'below';\n    }\n\n    if (newPosition !== this._currentPosition) {\n      const overlayRef = this._overlayRef;\n\n      if (overlayRef) {\n        const classPrefix = `${this._cssClassPrefix}-${PANEL_CLASS}-`;\n        overlayRef.removePanelClass(classPrefix + this._currentPosition);\n        overlayRef.addPanelClass(classPrefix + newPosition);\n      }\n\n      this._currentPosition = newPosition;\n    }\n  }"
+          }
+        ]
+      },
+      {
+        "module": "@angular/cdk/bidi",
+        "symbol": "Directionality",
+        "file": "legacy-tabs/internal/paginated-tab-header.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "a738ff2ac3d901f5c2e9614130dddbcb19ce306376a662279a6df7d385148225",
+        "constructor_parameters": [
+          {
+            "index": 3,
+            "declaration": "@Optional() private _dir: Directionality",
+            "implementation": true
+          }
+        ],
+        "parameter_property": true,
+        "members": [
+          {
+            "member": "change",
+            "line": 216
+          },
+          {
+            "member": "value",
+            "line": 470
+          }
+        ],
+        "forwards": [],
+        "contexts": [
+          {
+            "line": 176,
+            "source": "constructor(\n    protected _elementRef: ElementRef<HTMLElement>,\n    protected _changeDetectorRef: ChangeDetectorRef,\n    private _viewportRuler: ViewportRuler,\n    @Optional() private _dir: Directionality,\n    private _ngZone: NgZone,\n    private _platform: Platform,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) public _animationMode?: string,\n  ) {\n    // Bind the `mouseleave` event on the outside since it doesn't change anything in the view.\n    _ngZone.runOutsideAngular(() => {\n      fromEvent(_elementRef.nativeElement, 'mouseleave')\n        .pipe(takeUntil(this._destroyed))\n        .subscribe(() => {\n          this._stopInterval();\n        });\n    });\n  }"
+          },
+          {
+            "line": 214,
+            "source": "ngAfterContentInit() {\n    if (this._isDestroyed) return;\n    const dirChange = this._dir ? this._dir.change : observableOf('ltr');\n    // Debounce resize events because the alignment logic is expensive.\n    const resize = ownedHeaderResize(this._elementRef.nativeElement, this._ngZone).pipe(\n      debounceTime(32),\n      takeUntil(this._destroyed),\n    );\n    // Viewport resize retained for screenshot-test compatibility with historical layouts.\n    const viewportResize = this._viewportRuler.change(150).pipe(takeUntil(this._destroyed));\n    const realign = () => {\n      if (this._isDestroyed) return;\n      this.updatePagination();\n      if (!this._isDestroyed) this._alignInkBarToSelectedTab();\n    };\n\n    this._keyManager = new FocusKeyManager<MatPaginatedTabHeaderItem>(this._items)\n      .withHorizontalOrientation(this._getLayoutDirection())\n      .withHomeAndEnd()\n      .withWrap()\n      // Allow focus to land on disabled tabs, as per https://w3c.github.io/aria-practices/#kbd_disabled_controls\n      .skipPredicate(() => false);\n\n    // A tab nav bar can have no selected index. Fall back to the first item\n    // so keyboard focus still has a tabindex target.\n    this._keyManager.updateActiveItem(Math.max(this._selectedIndex, 0));\n\n    // Defer the first call in order to allow for slower browsers to lay out the elements.\n    // This helps in cases where the user lands directly on a page with paginated tabs.\n    // Keep zoneful stability timing and wait for a zoneless view to render. Avoid animation\n    // frames here, since they can hold up tests that are in a background tab.\n    afterTabHeaderRender(this._ngZone, this._renderInjector)\n      .pipe(takeUntil(this._destroyed)).subscribe(realign);\n\n    // On dir change or resize, realign the ink bar and update the orientation of\n    // the key manager if the direction has changed.\n    merge(dirChange, viewportResize, resize, this._items.changes, this._itemsResized())\n      .pipe(takeUntil(this._destroyed))\n      .subscribe(() => {\n        // We need to defer this to give the browser some time to recalculate\n        // the element dimensions. The call has to be wrapped in `NgZone.run`,\n        // because the viewport change handler runs outside of Angular.\n        this._ngZone.run(() => {\n          Promise.resolve().then(() => {\n            if (this._isDestroyed) return;\n            // Clamp the scroll distance, because it can change with the number of tabs.\n            this._scrollDistance = Math.max(\n              0,\n              Math.min(this._getMaxScrollDistance(), this._scrollDistance),\n            );\n            realign();\n          });\n        });\n        this._keyManager.withHorizontalOrientation(this._getLayoutDirection());\n      });\n\n    // If there is a change in the focus key manager we need to emit the `indexFocused`\n    // event in order to provide a public event that notifies about focus changes. Also we realign\n    // the tabs container by scrolling the new focused tab into the visible section.\n    this._keyManager.change.pipe(takeUntil(this._destroyed)).subscribe(newFocusIndex => {\n      this.indexFocused.emit(newFocusIndex);\n      if (!this._isDestroyed) this._setTabFocus(newFocusIndex);\n    });\n  }"
+          },
+          {
+            "line": 469,
+            "source": "_getLayoutDirection(): Direction {\n    return this._dir && this._dir.value === 'rtl' ? 'rtl' : 'ltr';\n  }"
+          }
+        ]
+      },
+      {
+        "module": "@angular/cdk/bidi",
+        "symbol": "Directionality",
+        "file": "legacy-tabs/internal/tab-body-base.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "bf02faabd1d0fff61c0e756ee6422af4d417b4d045c475179807c195b4edf7b4",
+        "constructor_parameters": [
+          {
+            "index": 1,
+            "declaration": "@Optional() private _dir: Directionality",
+            "implementation": true
+          }
+        ],
+        "parameter_property": true,
+        "members": [
+          {
+            "member": "change",
+            "line": 123
+          },
+          {
+            "member": "value",
+            "line": 271
+          }
+        ],
+        "forwards": [],
+        "contexts": [
+          {
+            "line": 117,
+            "source": "constructor(\n    protected _elementRef: ElementRef<HTMLElement>,\n    @Optional() private _dir: Directionality,\n    changeDetectorRef: ChangeDetectorRef,\n  ) {\n    if (_dir) {\n      this._dirChangeSubscription = _dir.change.subscribe((dir: Direction) => {\n        this._computePositionAnimationState(dir);\n        changeDetectorRef.markForCheck();\n      });\n    }\n\n    this._translateTabComplete\n      .pipe(distinctUntilChanged((a, b) => a.fromState === b.fromState && a.toState === b.toState))\n      .subscribe(event => {\n        if (this._isCenterPosition(event.toState) && this._isCenterPosition(this._position)) {\n          this._onCentered.emit();\n        }\n\n        if (this._isCenterPosition(event.fromState) && !this._isCenterPosition(this._position)) {\n          this._afterLeavingCenter.emit();\n        }\n      });\n  }"
+          },
+          {
+            "line": 270,
+            "source": "_getLayoutDirection(): Direction {\n    return this._dir && this._dir.value === 'rtl' ? 'rtl' : 'ltr';\n  }"
+          }
+        ]
+      },
+      {
+        "module": "@angular/cdk/bidi",
+        "symbol": "Directionality",
+        "file": "legacy-tabs/internal/tab-nav-bar-base.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "a2a5aa08c670b3c30a0fa590519231401ebe4eaf33727a6078b87922865e2d22",
+        "constructor_parameters": [
+          {
+            "index": 1,
+            "declaration": "@Optional() dir: Directionality",
+            "implementation": true
+          }
+        ],
+        "parameter_property": false,
+        "members": [],
+        "forwards": [
+          {
+            "argument_index": 3,
+            "arguments": [
+              "elementRef",
+              "changeDetectorRef",
+              "viewportRuler",
+              "dir",
+              "ngZone",
+              "platform",
+              "animationMode"
+            ]
+          }
+        ],
+        "contexts": [
+          {
+            "line": 109,
+            "source": "constructor(\n    elementRef: ElementRef,\n    @Optional() dir: Directionality,\n    ngZone: NgZone,\n    changeDetectorRef: ChangeDetectorRef,\n    viewportRuler: ViewportRuler,\n    platform: Platform,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n  ) {\n    super(elementRef, changeDetectorRef, viewportRuler, dir, ngZone, platform, animationMode);\n  }"
+          }
+        ]
+      },
+      {
+        "module": "@angular/cdk/bidi",
+        "symbol": "Directionality",
+        "file": "legacy-tabs/internal/tab-header-base.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "eb75b2bf760e70744c3c85fee76dd2164cbb6b3242cb47f023300ebad0ce2b7e",
+        "constructor_parameters": [
+          {
+            "index": 3,
+            "declaration": "@Optional() dir: Directionality",
+            "implementation": true
+          }
+        ],
+        "parameter_property": false,
+        "members": [],
+        "forwards": [
+          {
+            "argument_index": 3,
+            "arguments": [
+              "elementRef",
+              "changeDetectorRef",
+              "viewportRuler",
+              "dir",
+              "ngZone",
+              "platform",
+              "animationMode"
+            ]
+          }
+        ],
+        "contexts": [
+          {
+            "line": 50,
+            "source": "constructor(\n    elementRef: ElementRef,\n    changeDetectorRef: ChangeDetectorRef,\n    viewportRuler: ViewportRuler,\n    @Optional() dir: Directionality,\n    ngZone: NgZone,\n    platform: Platform,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n  ) {\n    super(elementRef, changeDetectorRef, viewportRuler, dir, ngZone, platform, animationMode);\n  }"
+          }
+        ]
+      },
+      {
+        "module": "@angular/cdk/bidi",
+        "symbol": "Directionality",
+        "file": "legacy-tabs/tab-nav-bar/tab-nav-bar.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "6ee670b25761cf6f478a2d34950a4edba6422785c3a3682735d179e1d5cca6be",
+        "constructor_parameters": [
+          {
+            "index": 1,
+            "declaration": "@Optional() dir: Directionality",
+            "implementation": true
+          }
+        ],
+        "parameter_property": false,
+        "members": [],
+        "forwards": [
+          {
+            "argument_index": 1,
+            "arguments": [
+              "elementRef",
+              "dir",
+              "ngZone",
+              "changeDetectorRef",
+              "viewportRuler",
+              "platform",
+              "animationMode"
+            ]
+          }
+        ],
+        "contexts": [
+          {
+            "line": 74,
+            "source": "constructor(\n    elementRef: ElementRef,\n    @Optional() dir: Directionality,\n    ngZone: NgZone,\n    changeDetectorRef: ChangeDetectorRef,\n    viewportRuler: ViewportRuler,\n    platform: Platform,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n  ) {\n    super(elementRef, dir, ngZone, changeDetectorRef, viewportRuler, platform, animationMode);\n  }"
+          }
+        ]
+      },
+      {
+        "module": "@angular/cdk/bidi",
+        "symbol": "Directionality",
+        "file": "legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1",
+        "constructor_parameters": [
+          {
+            "index": 6,
+            "declaration": "@Optional() private _dir: Directionality | null",
+            "implementation": true
+          }
+        ],
+        "parameter_property": true,
+        "members": [],
+        "forwards": [],
+        "contexts": [
+          {
+            "line": 195,
+            "source": "constructor(\n    private _element: ElementRef<HTMLInputElement>,\n    private _overlay: Overlay,\n    private _viewContainerRef: ViewContainerRef,\n    private _zone: NgZone,\n    private _changeDetectorRef: ChangeDetectorRef,\n    @Inject(MAT_AUTOCOMPLETE_SCROLL_STRATEGY) scrollStrategy: any,\n    @Optional() private _dir: Directionality | null,\n    @Optional() @Inject(MAT_FORM_FIELD) @Host() private _formField: MatFormField | null,\n    @Optional() @Inject(DOCUMENT) private _document: any,\n    private _viewportRuler: ViewportRuler,\n    @Optional()\n    @Inject(MAT_AUTOCOMPLETE_DEFAULT_OPTIONS)\n    private _defaults?: MatAutocompleteDefaultOptions | null,\n  ) {\n    this._scrollStrategy = scrollStrategy;\n    // The supplied public view injector also works for the historical manual\n    // constructor, which has no ambient Angular injection context.\n    this._breakpointObserver = this._viewContainerRef.injector.get(BreakpointObserver);\n  }"
+          },
+          {
+            "line": 848,
+            "source": "private _getOverlayConfig(): OverlayConfig {\n    return new OverlayConfig({\n      positionStrategy: this._getOverlayPosition(),\n      scrollStrategy: this._scrollStrategy(),\n      width: this._getPanelWidth(),\n      direction: this._dir ?? undefined,\n      panelClass: this._defaults?.overlayPanelClass,\n    });\n  }"
+          }
+        ]
+      },
+      {
+        "module": "@angular/cdk/bidi",
+        "symbol": "Directionality",
+        "file": "legacy-select/internal/select-base.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "3a0e28d25fa553220d0faeff8c00b4bd3c343cdd27051e25eda7efef6a80b432",
+        "constructor_parameters": [
+          {
+            "index": 5,
+            "declaration": "@Optional() private _dir: Directionality",
+            "implementation": true
+          }
+        ],
+        "parameter_property": true,
+        "members": [
+          {
+            "member": "value",
+            "line": 923
+          }
+        ],
+        "forwards": [],
+        "contexts": [
+          {
+            "line": 508,
+            "source": "constructor(\n    protected _viewportRuler: ViewportRuler,\n    protected _changeDetectorRef: ChangeDetectorRef,\n    protected _ngZone: NgZone,\n    _defaultErrorStateMatcher: ErrorStateMatcher,\n    elementRef: ElementRef,\n    @Optional() private _dir: Directionality,\n    @Optional() _parentForm: NgForm,\n    @Optional() _parentFormGroup: FormGroupDirective,\n    @Optional() @Inject(MAT_FORM_FIELD) protected _parentFormField: MatFormField,\n    @Self() @Optional() ngControl: NgControl,\n    @Attribute('tabindex') tabIndex: string,\n    @Inject(MAT_SELECT_SCROLL_STRATEGY) scrollStrategyFactory: any,\n    private _liveAnnouncer: LiveAnnouncer,\n    @Optional() @Inject(MAT_SELECT_CONFIG) protected _defaultOptions?: MatSelectConfig,\n    protected _injector?: Injector,\n  ) {\n    super(elementRef, _defaultErrorStateMatcher, _parentForm, _parentFormGroup, ngControl);\n    this._overlayPanelClass = this._defaultOptions?.overlayPanelClass || '';\n    this._disableOptionCentering = this._defaultOptions?.disableOptionCentering ?? false;\n\n    if (this.ngControl) {\n      // Note: we provide the value accessor through here, instead of\n      // the `providers` to avoid running into a circular import.\n      this.ngControl.valueAccessor = this;\n    }\n\n    // Note that we only want to set this when the defaults pass it in, otherwise it should\n    // stay as `undefined` so that it falls back to the default in the key manager.\n    if (_defaultOptions?.typeaheadDebounceInterval != null) {\n      this._typeaheadDebounceInterval = _defaultOptions.typeaheadDebounceInterval;\n    }\n\n    this._scrollStrategyFactory = scrollStrategyFactory;\n    this._scrollStrategy = this._scrollStrategyFactory();\n    this.tabIndex = parseInt(tabIndex) || 0;\n\n    // Force setter to be called in case id was not specified.\n    this.id = this.id;\n  }"
+          },
+          {
+            "line": 922,
+            "source": "_isRtl(): boolean {\n    return this._dir ? this._dir.value === 'rtl' : false;\n  }"
+          }
+        ]
+      },
+      {
+        "module": "@angular/cdk/bidi",
+        "symbol": "Directionality",
+        "file": "legacy-menu/internal/menu-trigger-base.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "4de69f71a35cd027da2d02a3d642b3ee0a38df2422f7dbea6d4fe0b599729f3b",
+        "constructor_parameters": [
+          {
+            "index": 6,
+            "declaration": "dir: Directionality",
+            "implementation": false
+          },
+          {
+            "index": 6,
+            "declaration": "dir: Directionality",
+            "implementation": false
+          },
+          {
+            "index": 6,
+            "declaration": "dir: Directionality",
+            "implementation": false
+          },
+          {
+            "index": 6,
+            "declaration": "@Optional() private _dir: Directionality",
+            "implementation": true
+          }
+        ],
+        "parameter_property": true,
+        "members": [
+          {
+            "member": "value",
+            "line": 301
+          }
+        ],
+        "forwards": [],
+        "contexts": [
+          {
+            "line": 208,
+            "source": "constructor(\n    overlay: Overlay,\n    element: ElementRef<HTMLElement>,\n    viewContainerRef: ViewContainerRef,\n    scrollStrategy: any,\n    parentMenu: MatMenuPanel,\n    menuItemInstance: MatMenuItem,\n    dir: Directionality,\n    focusMonitor: FocusMonitor,\n    ngZone: NgZone,\n  );"
+          },
+          {
+            "line": 224,
+            "source": "constructor(\n    overlay: Overlay,\n    element: ElementRef<HTMLElement>,\n    viewContainerRef: ViewContainerRef,\n    scrollStrategy: any,\n    parentMenu: MatMenuPanel,\n    menuItemInstance: MatMenuItem,\n    dir: Directionality,\n    focusMonitor?: FocusMonitor | null,\n  );"
+          },
+          {
+            "line": 239,
+            "source": "constructor(\n    overlay: Overlay,\n    element: ElementRef<HTMLElement>,\n    viewContainerRef: ViewContainerRef,\n    scrollStrategy: any,\n    parentMenu: MatMenuPanel,\n    menuItemInstance: MatMenuItem,\n    dir: Directionality,\n    focusMonitor: FocusMonitor,\n  );"
+          },
+          {
+            "line": 250,
+            "source": "constructor(\n    private _overlay: Overlay,\n    private _element: ElementRef<HTMLElement>,\n    private _viewContainerRef: ViewContainerRef,\n    @Inject(MAT_MENU_SCROLL_STRATEGY) scrollStrategy: any,\n    @Inject(MAT_MENU_PANEL) @Optional() parentMenu: MatMenuPanel,\n    // `MatMenuTrigger` is commonly used in combination with a `MatMenuItem`.\n    // tslint:disable-next-line: lightweight-tokens\n    @Optional() @Self() private _menuItemInstance: MatMenuItem,\n    @Optional() private _dir: Directionality,\n    private _focusMonitor: FocusMonitor | null,\n    private _ngZone?: NgZone,\n  ) {\n    this._scrollStrategy = scrollStrategy;\n    this._parentMaterialMenu = parentMenu instanceof _MatMenuBase ? parentMenu : undefined;\n\n    _element.nativeElement.addEventListener(\n      'touchstart',\n      this._handleTouchStart,\n      passiveEventListenerOptions,\n    );\n  }"
+          },
+          {
+            "line": 300,
+            "source": "get dir(): Direction {\n    return this._dir && this._dir.value === 'rtl' ? 'rtl' : 'ltr';\n  }"
+          },
+          {
+            "line": 476,
+            "source": "private _getOverlayConfig(menu: MatMenuPanel): OverlayConfig {\n    return new OverlayConfig({\n      positionStrategy: this._overlay\n        .position()\n        .flexibleConnectedTo(this._element)\n        .withLockedPosition()\n        .withGrowAfterOpen()\n        .withTransformOriginOn('.mat-menu-panel, .mat-mdc-menu-panel'),\n      backdropClass: menu.backdropClass || 'cdk-overlay-transparent-backdrop',\n      panelClass: menu.overlayPanelClass,\n      scrollStrategy: this._scrollStrategy(),\n      direction: this._dir,\n    });\n  }"
+          }
+        ]
+      }
+    ],
+    "scope": "Exactly 15 frozen Directionality dependencies; constructor annotations, public value/change reads and forwarding only. No complete legacy component, native or packed execution claim.",
+    "g11_claim": "not-passed"
+  },
+  "source_negative_controls": 10,
+  "public_namespace_capsule_sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3",
+  "declarations": [
+    {
+      "line": "original",
+      "version": "16.2.14",
+      "entry": {
+        "path": "@angular/cdk/bidi/index.d.ts",
+        "sha256": "f9b8fedff6c1b0e53221b7890999346cf22f3ffe5fae4e94438530e8e131f5ac"
+      },
+      "target": {
+        "path": "@angular/cdk/bidi/index.d.ts",
+        "sha256": "f9b8fedff6c1b0e53221b7890999346cf22f3ffe5fae4e94438530e8e131f5ac"
+      },
+      "runtime": {
+        "path": "@angular/cdk/fesm2022/bidi.mjs",
+        "sha256": "e2d2efa615c72cdee995729a090a1c0a549d8942e20cea9b52658d730d644fcb"
+      },
+      "declaration": "export declare class Directionality implements OnDestroy {\n    /** The current 'ltr' or 'rtl' value. */\n    readonly value: Direction;\n    /** Stream that emits whenever the 'ltr' / 'rtl' state changes. */\n    readonly change: EventEmitter<Direction>;\n    constructor(_document?: any);\n    ngOnDestroy(): void;\n    static ɵfac: i0.ɵɵFactoryDeclaration<Directionality, [{ optional: true; }]>;\n    static ɵprov: i0.ɵɵInjectableDeclaration<Directionality>;\n}"
+    },
+    {
+      "line": "main",
+      "version": "22.1.7",
+      "entry": {
+        "path": "@angular/cdk/types/bidi.d.ts",
+        "sha256": "769187ce194c8dc07761a9e7d3576475e8ace31b42cbc2e2935e3a74f3e4a9b5"
+      },
+      "target": {
+        "path": "@angular/cdk/types/_bidi-module-chunk.d.ts",
+        "sha256": "0268e701ec17daa78e322d73365861673a4f1238ba8673c2f1dc0996e60bfa90"
+      },
+      "runtime": {
+        "path": "@angular/cdk/fesm2022/_directionality-chunk.mjs",
+        "sha256": "0db67adbfeeb1d633a999e8cf603ae6f8f26e66191e450e86284f0119652b07e"
+      },
+      "declaration": "declare class Directionality implements OnDestroy {\n    /** The current 'ltr' or 'rtl' value. */\n    get value(): Direction;\n    /**\n     * The current 'ltr' or 'rtl' value.\n     */\n    readonly valueSignal: i0.WritableSignal<Direction>;\n    /** Stream that emits whenever the 'ltr' / 'rtl' state changes. */\n    readonly change: EventEmitter<Direction>;\n    constructor();\n    ngOnDestroy(): void;\n    static ɵfac: i0.ɵɵFactoryDeclaration<Directionality, never>;\n    static ɵprov: i0.ɵɵInjectableDeclaration<any>;\n}"
+    },
+    {
+      "line": "21.x",
+      "version": "21.2.14",
+      "entry": {
+        "path": "@angular/cdk/types/bidi.d.ts",
+        "sha256": "769187ce194c8dc07761a9e7d3576475e8ace31b42cbc2e2935e3a74f3e4a9b5"
+      },
+      "target": {
+        "path": "@angular/cdk/types/_bidi-module-chunk.d.ts",
+        "sha256": "3a9323fd680c0d3d8d8fe14f8f951c1e1e1b762fea0a8de48d876f0d435e406d"
+      },
+      "runtime": {
+        "path": "@angular/cdk/fesm2022/_directionality-chunk.mjs",
+        "sha256": "eb37160785a209351f725f1e635b9a2a4e7415b02dd7f9813c913b0fca365fba"
+      },
+      "declaration": "declare class Directionality implements OnDestroy {\n    /** The current 'ltr' or 'rtl' value. */\n    get value(): Direction;\n    /**\n     * The current 'ltr' or 'rtl' value.\n     */\n    readonly valueSignal: i0.WritableSignal<Direction>;\n    /** Stream that emits whenever the 'ltr' / 'rtl' state changes. */\n    readonly change: EventEmitter<Direction>;\n    constructor(...args: unknown[]);\n    ngOnDestroy(): void;\n    static ɵfac: i0.ɵɵFactoryDeclaration<Directionality, never>;\n    static ɵprov: i0.ɵɵInjectableDeclaration<Directionality>;\n}"
+    }
+  ],
+  "results": [
+    {
+      "line": "original",
+      "production": false,
+      "cases": [
+        "null-document",
+        "empty-document",
+        "body-before-html",
+        "empty-body-falls-back-to-html",
+        "invalid-body-does-not-fall-back-to-html",
+        "case-normalization",
+        "absent-optional-document",
+        "synchronous-public-change-and-injector-owned-completion",
+        "stable-provider-identity-child-inheritance-and-dir-override",
+        "manual-constructor-contract-is-an-explicit-peer-difference",
+        "auto-locale-normalization"
+      ],
+      "actual_public_service_factory_and_injector_executed": true,
+      "actual_legacy_components_executed": false,
+      "native_or_packed_qualified": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "original",
+      "production": true,
+      "cases": [
+        "null-document",
+        "empty-document",
+        "body-before-html",
+        "empty-body-falls-back-to-html",
+        "invalid-body-does-not-fall-back-to-html",
+        "case-normalization",
+        "absent-optional-document",
+        "synchronous-public-change-and-injector-owned-completion",
+        "stable-provider-identity-child-inheritance-and-dir-override",
+        "manual-constructor-contract-is-an-explicit-peer-difference",
+        "auto-locale-normalization"
+      ],
+      "actual_public_service_factory_and_injector_executed": true,
+      "actual_legacy_components_executed": false,
+      "native_or_packed_qualified": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "main",
+      "production": false,
+      "cases": [
+        "null-document",
+        "empty-document",
+        "body-before-html",
+        "empty-body-falls-back-to-html",
+        "invalid-body-does-not-fall-back-to-html",
+        "case-normalization",
+        "absent-optional-document",
+        "synchronous-public-change-and-injector-owned-completion",
+        "stable-provider-identity-child-inheritance-and-dir-override",
+        "manual-constructor-contract-is-an-explicit-peer-difference",
+        "auto-locale-normalization"
+      ],
+      "actual_public_service_factory_and_injector_executed": true,
+      "actual_legacy_components_executed": false,
+      "native_or_packed_qualified": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "main",
+      "production": true,
+      "cases": [
+        "null-document",
+        "empty-document",
+        "body-before-html",
+        "empty-body-falls-back-to-html",
+        "invalid-body-does-not-fall-back-to-html",
+        "case-normalization",
+        "absent-optional-document",
+        "synchronous-public-change-and-injector-owned-completion",
+        "stable-provider-identity-child-inheritance-and-dir-override",
+        "manual-constructor-contract-is-an-explicit-peer-difference",
+        "auto-locale-normalization"
+      ],
+      "actual_public_service_factory_and_injector_executed": true,
+      "actual_legacy_components_executed": false,
+      "native_or_packed_qualified": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "21.x",
+      "production": false,
+      "cases": [
+        "null-document",
+        "empty-document",
+        "body-before-html",
+        "empty-body-falls-back-to-html",
+        "invalid-body-does-not-fall-back-to-html",
+        "case-normalization",
+        "absent-optional-document",
+        "synchronous-public-change-and-injector-owned-completion",
+        "stable-provider-identity-child-inheritance-and-dir-override",
+        "manual-constructor-contract-is-an-explicit-peer-difference",
+        "auto-locale-normalization"
+      ],
+      "actual_public_service_factory_and_injector_executed": true,
+      "actual_legacy_components_executed": false,
+      "native_or_packed_qualified": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "21.x",
+      "production": true,
+      "cases": [
+        "null-document",
+        "empty-document",
+        "body-before-html",
+        "empty-body-falls-back-to-html",
+        "invalid-body-does-not-fall-back-to-html",
+        "case-normalization",
+        "absent-optional-document",
+        "synchronous-public-change-and-injector-owned-completion",
+        "stable-provider-identity-child-inheritance-and-dir-override",
+        "manual-constructor-contract-is-an-explicit-peer-difference",
+        "auto-locale-normalization"
+      ],
+      "actual_public_service_factory_and_injector_executed": true,
+      "actual_legacy_components_executed": false,
+      "native_or_packed_qualified": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    }
+  ],
+  "mutations": [
+    {
+      "line": "original",
+      "id": "document-precedence",
+      "assertion_rejected": true
+    },
+    {
+      "line": "original",
+      "id": "service-completion",
+      "assertion_rejected": true
+    },
+    {
+      "line": "original",
+      "id": "initial-value",
+      "assertion_rejected": true
+    },
+    {
+      "line": "original",
+      "id": "optional-document",
+      "assertion_rejected": true
+    },
+    {
+      "line": "main",
+      "id": "document-precedence",
+      "assertion_rejected": true
+    },
+    {
+      "line": "main",
+      "id": "service-completion",
+      "assertion_rejected": true
+    },
+    {
+      "line": "main",
+      "id": "initial-value",
+      "assertion_rejected": true
+    },
+    {
+      "line": "main",
+      "id": "optional-document",
+      "assertion_rejected": true
+    },
+    {
+      "line": "21.x",
+      "id": "document-precedence",
+      "assertion_rejected": true
+    },
+    {
+      "line": "21.x",
+      "id": "service-completion",
+      "assertion_rejected": true
+    },
+    {
+      "line": "21.x",
+      "id": "initial-value",
+      "assertion_rejected": true
+    },
+    {
+      "line": "21.x",
+      "id": "optional-document",
+      "assertion_rejected": true
+    }
+  ],
+  "producer_sha256": "cb88aeabd3e2c02c35902182ad4ea75d27596f5d7fe3ba6fe4bc5cda2b4439d4",
+  "worker_sha256": "a243a82a449e05986db4903364a01a741d39a8334b8035f1f14a81f0d7f16929",
+  "scope": "Whole authenticated original16 and advertised main/21 minimum public modules. Actual public factories and explicit Injector providers execute with genuine Core/Compiler and borrowed RxJS. Document records are protocols. Original manual Directionality construction works; current service requires DI. Owned callers only inject/forward and read value/change. No actual legacy components, automatic application root provision, native rendering, packed AOT, full Node/RxJS floors or G11 qualification.",
+  "g11_claim": "not-passed"
+}
