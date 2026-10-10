@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "recorded_at_utc": "2026-10-10T05:10:18.760538+00:00",
+  "status": "source/public-zone/key-manager lifecycle/type repair passed; actual packed/native menu qualification pending",
+  "source_heads": {
+    "main": "c7a4ef0ebdad459f134ee2c51c8fbbc838d70d54",
+    "21.x": "30d47a8045eb31a1485b75987af5de8f379529db"
+  },
+  "source_trees": {
+    "main": "d57c656981f1795f0af8fea3caf38cfd2cb006cc",
+    "21.x": "e02a9f83ccaa254e0c5c5a3d9346d0105e58277a"
+  },
+  "problem": "The stable-zone Promise in the prior focusFirstItem was not owned by its subscription. Destruction or a newer request could cancel the stability stream but leave the Promise applying old focus. The public FocusKeyManager can resume focus after a change observer destroys the menu. A closing menu also retained its pending first-focus request.",
+  "repair": [
+    "A per-request public Subscription owns the stability child and guards the queued Promise through its closed state. Both paths preserve the existing timing race and complete only the current live request.",
+    "Destruction rejects new requests and clears the public key-manager active item before destroying it. The continuation checks destruction before panel fallback, stopping reentrant parent focus and fallback work.",
+    "The existing reset/close motion hook cancels its pending focus request before transitioning. Explicit later focus calls keep the existing public API; no new open-state restriction was introduced."
+  ],
+  "preserved": {
+    "historical_constructor_overloads_and_authored_body_identical": true,
+    "existing_public_declarations_unchanged": true,
+    "product_HTML_CSS_SCSS_changed": false,
+    "required_consumer_HTML_CSS_SCSS_changes": false,
+    "consumer_TS_edits_found_necessary": false,
+    "goldens_changed": false
+  },
+  "tests": {
+    "python_tests": 5,
+    "isolated_framework_subjects": 10,
+    "current_zoneful_zoneless_development_production_subjects": 8,
+    "original_zoneful_subjects": 2,
+    "specific_mutation_rejections": 40,
+    "strict_focus_negative_checks_per_current_subject": 4,
+    "strict_compiler": "6.0.2",
+    "supporting_menu_select_motion_and_select_open_tests": 2,
+    "browser_source_identity_tests": 2
+  },
+  "observations": [
+    "The whole original and owned constructors/fields/members execute with genuine public QueryList, FocusKeyManager, EventEmitter, NgZone and current public-provider applications. The normal zoneful touch-origin focus observations match the tagged reference.",
+    "Current zoneless normal focus still works. Destruction before readiness, a superseding request, a call after destruction, destruction in the public key-manager change observer, and close before readiness do no stale focus work. Existing in-panel focus and all-disabled fallback behavior are retained.",
+    "Forty controls reject the prior unowned Promise, ignored cancellation state, new requests after destruction, retained parent active item, post-destruction panel fallback and missed close cancellation. Existing motion/source tests retain their assertions; their key-manager protocol now implements the newly used public updateActiveItem method."
+  ],
+  "runtime_scope": "Whole original/owned menu constructors and members replayed without Angular decorators. Genuine public NgZone, QueryList, EventEmitter and FocusKeyManager, with current public-provider application. Host/panel/document geometry, item focus/label/hover protocol, default options/CDR and animation-policy result are protocols. No actual legacy Angular node DI/menu item implementations, DOM focus/styles/native motion, packed/AOT/consumer build or Rx/Node floors.",
+  "historical_difference": "The untouched tagged source also allows explicit post-destroy focus requests and can resume parent focus after reentrant destruction. The candidate intentionally guards these lifetimes. Normal focus-origin/zoneful timing and in-panel/all-disabled behavior are preserved; this is not a claim of universal internal equivalence.",
+  "targeted_style_review": {
+    "files": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-menu/menu.ts",
+        "sha256": "e53577eef744606d3368bf4fa61cc49f669ea945b64f26e411c113ba572f2877"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-menu/menu.html",
+        "sha256": "c0de05010295b38649dec59fa3c54b9aa6dc4c88f20d18ea78053e0f7e102a47"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-menu/menu.scss",
+        "sha256": "12060fcd8ce36c824a71fd9ecaaa801ab381d0a56158ed7bcbf4a85e29ebdc75"
+      }
+    ],
+    "result": "Wrapper constructor, host metadata, template and SCSS unchanged. Enter/exit animation recipes and completion deadlines are untouched. Closing cancels pending focus before its existing phase transition; no native rendering qualification is claimed."
+  },
+  "native_producer": "The existing packed overlay fixture now requires automatic first-item DOM focus before Escape. Its prior explicit focus() call was removed so it cannot hide an initialization failure. No additional matrix cells; actual native destroy/supersede/reentrant states and packed execution remain unrun.",
+  "source_binding_refresh": {
+    "previous_frozen_reviewed_rows": 32,
+    "fresh_checker_calls": 15,
+    "additional_owned_type_removed_token_checks": 2,
+    "review_documents_refreshed": 16,
+    "new_frozen_use_admissions": 0,
+    "new_upstream_SHA_closures": 0,
+    "historical_component_or_native_runs_restamped": false
+  },
+  "cyph_sanity": {
+    "head": "a56a0603636cac5aaabe8fe408f7429b4224f011",
+    "clean": true,
+    "menu_templates": 10,
+    "scope": "Read-only shared/js/menu templates and chat-message programmatic MatLegacyMenuTrigger.openMenu use. No direct focusFirstItem call, menu constructor or subclass found in the searched TypeScript. No menu-specific SCSS override found in shared/js/shared/css. No consumer build or edits.",
+    "files": [
+      {
+        "path": "shared/js/cyph/components/chat-message/chat-message.component.ts",
+        "sha256": "058e017dbf929f2624aff824c8ace19e96a773706620f4dddd5764e372ef7c10"
+      },
+      {
+        "path": "shared/js/cyph/components/chat-message/chat-message.component.html",
+        "sha256": "86449662e8534014fcb486656d4b9ae33291770c2ad27e2f7fa5376ed3ea60c3"
+      },
+      {
+        "path": "shared/js/cyph/modules/cyph-web.module.ts",
+        "sha256": "4b50f3b89c32ac00cff95891891e5e2284682afade511861fb0852bbc04d1a36"
+      }
+    ],
+    "consumer_build_executed": false
+  },
+  "environment": {
+    "host_node": "v22.23.3",
+    "borrowed_rxjs": "7.8.2",
+    "borrowed_tslib": "2.8.1",
+    "binding_parser": "6.0.3",
+    "advertised_runtime_Rx_native_packed_floors_qualified": false
+  },
+  "harness_correction": "The owned MatMenuPanel has three current type references (implements, parentMenu and the descendant-filter cast). The fresh erasure check records all three; the initial count assumption of two was corrected without changing source or any golden.",
+  "remaining": [
+    "All 25 frozen NgZone boundaries remain open pending complete caller/lifecycle and native qualification.",
+    "Reproduce chips onStable blur at genuine minima next.",
+    "Complete packed/native/floors/Sass/security/SHA closeout, C05 and independent A01-A10/R01-R03 audit remain required."
+  ],
+  "pushed": false,
+  "actions_started": false,
+  "g11_claim": "not-passed"
+}
