@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "role": "historical inventory source repair diagnostic checkpoint",
+  "line": "main",
+  "source_checkpoint": "08dac9f6dac32359003c73cddb4e45b63bf69650",
+  "recorded_at_utc": "2026-10-10T17:57:16.224814+00:00",
+  "inputs": [
+    {
+      "path": "scripts/historical_inventory_source.py",
+      "sha256": "ea001a53909ab5f7227814b8690f62e5c9e22ce847888db5ebb349c599f0c8cf"
+    },
+    {
+      "path": "tests/test_historical_inventory_source.py",
+      "sha256": "086ff4415e2dd6d193f359ec14dd0400506524babfcacaa231d62ab148d670d9"
+    },
+    {
+      "path": "scripts/rc-verify.py",
+      "sha256": "02d5e27ee7524483a328d48375ef7d081e07f03b206d44b2faf70a84a4409db4"
+    },
+    {
+      "path": "testing/legacy-runner/historical-inventory.json",
+      "sha256": "df93faba03659cd0c7776da605ad637d1ccc0131c26e254438e8c484a241d03c"
+    },
+    {
+      "path": "testing/legacy-runner/historical-specs.json",
+      "sha256": "520d88c578fb20393b45e4ab7d98be0c9b4953707cd84f093a3fae1ce262ed8d"
+    },
+    {
+      "path": "compatibility/handoff/codex-closeout/reference/historical-paths.csv",
+      "sha256": "33e24c7a3350004bda35236d5e643ae0d6f67bad5149faaf85e81cd108368d74"
+    },
+    {
+      "path": "compatibility/rc/upstream-test-consolidation-historical-subjects.json",
+      "sha256": "00d0917447af71f78ffe79f34220f6cd76ce5cda2ea64a93eb8e9bbbb019250c"
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-test-consolidation-source-review.json",
+      "sha256": "9f5725ce9303f2aea99f909bff6cf813ed0416ac89402563107c8f795eee1cfe"
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/ledger.json",
+      "sha256": "d5de5de9f413cf024277f801ff54054de4e68b27ef31c5a4ff3e2c25ee171752"
+    },
+    {
+      "path": "compatibility/rc/historical-inventory-repair-admission-diagnostic.json",
+      "sha256": "ca0eb7099637ee1dc262623611582d21c01a5e4c891d3a2b0e739b8e1da89d26"
+    },
+    {
+      "path": "scripts/rc-verify-lite.py",
+      "sha256": "92655b8a34895671c616b19eed6b51152a9c4a0775ab7742bddba859de7a2087"
+    }
+  ],
+  "candidate_snapshots_corrected": 52,
+  "current_candidate_files_rehashed": 57,
+  "current_shared_suite_shims_rehashed": 21,
+  "untouched_tag_reference_hashes_checked": 57,
+  "untouched_tag_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+  "all_reference_identities_and_prior_execution_records_preserved": true,
+  "untouched_individual_review_sources_archived": 12,
+  "focused_unit_tests": {
+    "command": "PYTHONPATH=tests python3 -m unittest test_historical_inventory_source test_rc_verify_lite_family_reports test_historical_totals",
+    "exit_code": 0,
+    "tests": 8,
+    "inventory_negative_controls": 9
+  },
+  "inventory_cli": {
+    "command": "python3 scripts/historical_inventory_source.py",
+    "exit_code": 0
+  },
+  "source_review_bindings": {
+    "subjects": 32,
+    "positive_entry_bindings": 32,
+    "pending_individual_residuals": 5,
+    "result": "valid for changed context; no disposition closed"
+  },
+  "admission": {
+    "exit_code": 1,
+    "expected_incomplete": true,
+    "unresolved": 18,
+    "missing_evidence": 0,
+    "authored_uses_reviewed": 1316,
+    "authored_uses_open": 420,
+    "g11_claim": "not-passed"
+  },
+  "cyph_sanity": {
+    "head": "a56a0603636cac5aaabe8fe408f7429b4224f011",
+    "working_tree_clean": true,
+    "product_changes_in_this_batch": false,
+    "consumer_build_executed": false
+  },
+  "limitations": [
+    "Host diagnostic tests only; no canonical full verifier, original product tests, packed/AOT/native/floor execution or security clearance.",
+    "The five consolidation residuals remain individually pending. Existing runtime receipts are retained as historical checkpoints and are not attributed to current inputs.",
+    "No push or Actions run occurred."
+  ]
+}
