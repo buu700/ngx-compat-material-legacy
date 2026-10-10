@@ -28,5 +28,5 @@ class SelectionModelPublicTests(unittest.TestCase):
         observed = json.loads(result.stdout.strip().splitlines()[-1])
         self.assertEqual(observed['cases'], 9)
         self.assertEqual(observed['mutants_rejected'], 2)
-        self.assertEqual(observed['derived_cases'], 93)
+        self.assertTrue(observed['roster_bound'])
         self.assertFalse(observed['native_executed'])

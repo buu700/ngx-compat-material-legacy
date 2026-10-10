@@ -36,15 +36,16 @@ export function reviewBidiModuleUses({root = rootDefault, readSource} = {}) {
     assert.equal(bindings.length, 1, 'missing or ambiguous BidiModule import');
     const binding = bindings[0];
     assert.equal(binding.isTypeOnly || binding.parent.parent.isTypeOnly, false, 'BidiModule must be a runtime import');
-    const host = ts.createCompilerHost({noResolve: true});
+    const options = {noResolve: true, noLib: true};
+    const host = ts.createCompilerHost(options);
     host.getSourceFile = filename => filename === resolve(root, path) ? file : undefined;
-    const checker = ts.createProgram([resolve(root, path)], {noResolve: true}, host).getTypeChecker();
+    const checker = ts.createProgram([resolve(root, path)], options, host).getTypeChecker();
     const symbol = checker.getSymbolAtLocation(binding.name);
     assert.ok(symbol);
     const refs = [];
     const visit = node => {
       if (ts.isIdentifier(node) && node.text === binding.name.text && node !== binding.name && node !== binding.propertyName) {
-        assert.equal(checker.getSymbolAtLocation(node), symbol, 'shadowed BidiModule binding');
+        assert.ok(checker.getSymbolAtLocation(node) === symbol, 'shadowed BidiModule binding');
         const array = node.parent, property = array.parent, object = property.parent, call = object.parent;
         assert.ok(ts.isArrayLiteralExpression(array) && ts.isPropertyAssignment(property) && ts.isObjectLiteralExpression(object)
           && ts.isCallExpression(call) && ts.isIdentifier(call.expression) && call.expression.text === 'NgModule'
@@ -52,7 +53,7 @@ export function reviewBidiModuleUses({root = rootDefault, readSource} = {}) {
         const ngImport = imports.filter(n => n.moduleSpecifier.text === '@angular/core' && n.importClause?.namedBindings && ts.isNamedImports(n.importClause.namedBindings))
           .flatMap(n => n.importClause.namedBindings.elements.filter(e => e.name.text === 'NgModule' && (e.propertyName || e.name).text === 'NgModule'));
         assert.equal(ngImport.length, 1);
-        assert.equal(checker.getSymbolAtLocation(call.expression), checker.getSymbolAtLocation(ngImport[0].name), 'shadowed NgModule decorator');
+        assert.ok(checker.getSymbolAtLocation(call.expression) === checker.getSymbolAtLocation(ngImport[0].name), 'shadowed NgModule decorator');
         const role = property.name.getText(file);
         assert.ok(['imports', 'exports'].includes(role));
         assert.ok(!array.elements.some(ts.isSpreadElement), 'dynamic module membership');

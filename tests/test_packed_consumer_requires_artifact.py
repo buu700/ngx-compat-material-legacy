@@ -64,5 +64,5 @@ class PackedConsumerRequiresArtifact(unittest.TestCase):
         observation = json.loads(result.stdout)
         self.assertEqual(observation['cases'], 9)
         self.assertEqual(observation['mutants_rejected'], 2)
-        self.assertEqual(observation['derived_cases'], 93)
+        self.assertTrue(observation['roster_bound'])
         self.assertFalse(observation['native_executed'])

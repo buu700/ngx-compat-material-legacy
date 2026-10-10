@@ -477,6 +477,7 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
     'packed-consumer/harness/chip-repeated-removal-and-separator': parsed.chipRepeatedEvents === true,
     'packed-consumer/harness/chip-individual-disabled-form-isolation': parsed.chipDisabledIsolation === true,
     'packed-consumer/harness/selection-model-comparator-public-list': parsed.selectionComparatorExposure === true,
+    'packed-consumer/harness/bidi-module-legacy-node-scope': parsed.legacyBidiScope === true,
     'packed-consumer/harness/form-field-error-live-region': parsed.errorLiveRegion === true,
     'packed-consumer/harness/form-field-token-isolation': parsed.formFieldTokenIsolation === true,
     'packed-consumer/harness/progress-bar-location-and-defaults': parsed.progressLocationAndDefaults === true,
@@ -922,7 +923,7 @@ import {By} from '@angular/platform-browser';
 import {CdkTableModule,CdkCellDef,CdkHeaderCellDef,CdkFooterCellDef,CdkCell,CdkHeaderCell,CdkFooterCell,CdkTextColumn,TEXT_COLUMN_OPTIONS,CdkNoDataRow,CdkTable,CdkColumnDef,CdkHeaderRowDef,CdkFooterRowDef,CdkRowDef} from '@angular/cdk/table';
 import {_LegacyTableDefinitionOwner,MatLegacyTableModule,MatLegacyCellDef,MatLegacyHeaderCellDef,MatLegacyFooterCellDef,MatLegacyColumnDef,MatLegacyCell,MatLegacyHeaderCell,MatLegacyFooterCell,MatLegacyTable,MatLegacyTextColumn,MatLegacyNoDataRow,MatLegacyHeaderRowDef,MatLegacyFooterRowDef,MatLegacyRowDef} from '@ngx-compat/material-legacy/legacy-table';
 import {Platform} from '@angular/cdk/platform';
-import {Directionality} from '@angular/cdk/bidi';
+import {Dir, Directionality} from '@angular/cdk/bidi';
 import {MatLegacyButtonModule} from '@ngx-compat/material-legacy/legacy-button';
 import {MatLegacyButtonHarness} from '@ngx-compat/material-legacy/legacy-button/testing';
 import {MatLegacyError, MatLegacyFormField, MatLegacyPrefix, MatLegacySuffix, MatLegacyFormFieldModule, MAT_LEGACY_FORM_FIELD, MAT_LEGACY_ERROR, MAT_LEGACY_PREFIX, MAT_LEGACY_SUFFIX} from '@ngx-compat/material-legacy/legacy-form-field';
@@ -946,6 +947,7 @@ import {MatLegacyProgressBar, MatLegacyProgressBarModule, MAT_LEGACY_PROGRESS_BA
 import {MAT_PROGRESS_BAR_DEFAULT_OPTIONS} from '@angular/material/progress-bar';
 import {MatLegacyChip, MatLegacyChipList, MatLegacyChipsModule} from '@ngx-compat/material-legacy/legacy-chips';
 import {MatLegacyListModule, MatLegacySelectionList} from '@ngx-compat/material-legacy/legacy-list';
+import {MatLegacyInputModule} from '@ngx-compat/material-legacy/legacy-input';
 import {MatLegacyRadioModule} from '@ngx-compat/material-legacy/legacy-radio';
 import {MatIconModule, MatIconRegistry} from '@angular/material/icon';
 import {DomSanitizer} from '@angular/platform-browser';
@@ -982,6 +984,7 @@ class SmokeDialogContent {}
     MatLegacyTabsModule,
     MatLegacyChipsModule,
     MatLegacyListModule,
+    MatLegacyInputModule,
     FormsModule,
     ReactiveFormsModule,
     MatLegacyRadioModule,
@@ -1026,6 +1029,12 @@ class SmokeDialogContent {}
       <mat-list-option value="one">Comparable one</mat-list-option>
       <mat-list-option value="two">Comparable two</mat-list-option>
     </mat-selection-list>
+    <section id="bidi-legacy-scope" [dir]="legacyDirection" (dirChange)="legacyDirectionChanges=legacyDirectionChanges+1">
+      <mat-form-field id="bidi-legacy-field">
+        <mat-label>Scoped direction</mat-label>
+        <input matInput value="Scoped one">
+      </mat-form-field>
+    </section>
     <mat-progress-bar id="location-progress" [value]="45" aria-label="Location progress"></mat-progress-bar>
     <mat-radio-button id="attribute-radio" tabindex="8">Attribute radio</mat-radio-button>
     <mat-error id="error-live-default">Default error</mat-error>
@@ -1130,6 +1139,8 @@ class HarnessHost {
   repeatRemovals=0;
   repeatEnds=0;
   disabledChipControl=new FormControl<string[] | null>(null);
+  legacyDirection:'ltr'|'rtl'='rtl';
+  legacyDirectionChanges=0;
   private readonly _dialog = inject(MatLegacyDialog);
   private readonly _snack = inject(MatLegacySnackBar);
 
@@ -1636,6 +1647,19 @@ async function main() {
     &&selectionList.selectedOptions.selected[0]===selectionOptions[0]
     &&selectionOptions[0].selected&&!selectionOptions[1].selected
     &&fixture.nativeElement.querySelector('#selection-comparator-list mat-list-option').getAttribute('aria-selected')==='true';
+  const bidiNode=fixture.debugElement.query(By.css('#bidi-legacy-scope'));
+  const bidiField=fixture.debugElement.query(By.css('#bidi-legacy-field'));
+  const bidiInput=bidiField.query(By.css('input'));
+  const scopedDir=bidiNode.injector.get(Dir);
+  const bidiInitial=scopedDir.value==='rtl'&&bidiNode.nativeElement.getAttribute('dir')==='rtl'
+    &&bidiField.injector.get(Directionality)===scopedDir&&bidiInput.injector.get(Directionality)===scopedDir
+    &&fixture.componentInstance.legacyDirectionChanges===0;
+  fixture.componentInstance.legacyDirection='ltr';fixture.detectChanges();await fixture.whenStable();
+  const bidiUpdated=scopedDir.value==='ltr'&&bidiNode.nativeElement.getAttribute('dir')==='ltr'
+    &&bidiField.injector.get(Directionality).value==='ltr'&&bidiInput.injector.get(Directionality).value==='ltr'
+    &&fixture.componentInstance.legacyDirectionChanges===1;
+  fixture.detectChanges();
+  const legacyBidiScope=bidiInitial&&bidiUpdated&&fixture.componentInstance.legacyDirectionChanges===1;
   const chipTabIndex = (fixture.nativeElement.querySelector('#attribute-chip') as HTMLElement).tabIndex;
   const radioTabIndex = (fixture.nativeElement.querySelector('#attribute-radio input') as HTMLInputElement).tabIndex;
   const liveDefault=fixture.nativeElement.querySelector('#error-live-default') as HTMLElement;
@@ -1839,7 +1863,7 @@ async function main() {
       selectOpened === true &&
       selectClosed === true &&
       tabCount === 2 &&
-      selected === 'Two' && viewportShared && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && chipDisabledIsolation && selectionComparatorExposure && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor && tabContentOriginalConstructor && noDataRowOriginalConstructor && constructorBorrowedProviderLifecycle && tableOriginalStickyBehavior && tableOriginalBooleanInputs && tableRecycleRowIdentity && tableDefinitionOriginalConstructors && tableAngularDiConstruction && tableOutletAndDefinitionOwnership && tabLabelOriginalConstructor && engineFreeAnimationPolicy,
+      selected === 'Two' && viewportShared && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && chipDisabledIsolation && selectionComparatorExposure && legacyBidiScope && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor && tabContentOriginalConstructor && noDataRowOriginalConstructor && constructorBorrowedProviderLifecycle && tableOriginalStickyBehavior && tableOriginalBooleanInputs && tableRecycleRowIdentity && tableDefinitionOriginalConstructors && tableAngularDiConstruction && tableOutletAndDefinitionOwnership && tabLabelOriginalConstructor && engineFreeAnimationPolicy,
     buttonText: text,
     selectIsOpen: isOpen,
     dialogText,
@@ -1862,6 +1886,7 @@ async function main() {
     chipRepeatedEvents,
     chipDisabledIsolation,
     selectionComparatorExposure,
+    legacyBidiScope,
     errorLiveRegion,
     formFieldTokenIsolation,
     progressLocationAndDefaults,
