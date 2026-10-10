@@ -81,6 +81,7 @@ try {
       premature:replaceAll('&& this._isInitialized','&& true',1),
       completion:replaceAll('this.change.complete();','this.change.emit("ltr");',model.line==='original'?2:1),
     };
+    if(model.line!=='original')mutated.rawDefault=replaceAll("_rawDir = '';","_rawDir = 'rtl';",1);
     for (const [id,text] of Object.entries(mutated)) {
       writeFileSync(runtimePath,text);
       const result = spawnSync(process.execPath,[workerPath,model.line,'false'],{cwd:model.root,encoding:'utf8',timeout:10000});

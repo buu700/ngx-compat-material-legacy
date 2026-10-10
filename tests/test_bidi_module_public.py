@@ -15,9 +15,9 @@ class BidiModulePublicTests(unittest.TestCase):
         observed = json.loads(result.stdout.strip().splitlines()[-1])
         self.assertEqual(observed['uses'], 25)
         self.assertEqual(observed['subjects'], 6)
-        self.assertEqual(observed['cases'], 30)
+        self.assertEqual(observed['cases'], 36)
         self.assertEqual(observed['source_negative_controls'], 9)
-        self.assertEqual(observed['runtime_mutation_rejections'], 15)
+        self.assertEqual(observed['runtime_mutation_rejections'], 17)
         self.assertFalse(observed['native_or_packed_qualified'])
 
     def test_exact_review_bindings_and_tamper_controls(self):

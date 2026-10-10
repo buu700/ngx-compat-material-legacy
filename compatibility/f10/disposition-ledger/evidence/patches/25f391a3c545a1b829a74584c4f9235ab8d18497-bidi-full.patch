@@ -1,0 +1,44 @@
+diff --git a/src/cdk/bidi/dir.ts b/src/cdk/bidi/dir.ts
+index 20c1874718f3a8427a80e79f12b9ad38fd0e4efd..ae85f8e21266a0ac2d2a2d9dcf200752d5e5ef6a 100644
+--- a/src/cdk/bidi/dir.ts
++++ b/src/cdk/bidi/dir.ts
+@@ -35,7 +35,7 @@ export class Dir implements Directionality, AfterContentInit, OnDestroy {
+   private _isInitialized: boolean = false;
+ 
+   /** Direction as passed in by the consumer. */
+-  _rawDir: string;
++  _rawDir: string = '';
+ 
+   /** Event emitted when the direction changes. */
+   @Output('dirChange') readonly change = new EventEmitter<Direction>();
+diff --git a/src/cdk/bidi/directionality.spec.ts b/src/cdk/bidi/directionality.spec.ts
+index 295f292bfa05ae7c6d6f4e4a3f475d5f23edba8e..f21993819f25561d53728e4fdf6ed4bdda1d49ca 100644
+--- a/src/cdk/bidi/directionality.spec.ts
++++ b/src/cdk/bidi/directionality.spec.ts
+@@ -170,7 +170,7 @@ class InjectsDirectionality {
+   imports: [Dir, InjectsDirectionality],
+ })
+ class ElementWithDir {
+-  @ViewChild(Dir) dir: Dir;
++  @ViewChild(Dir) dir!: Dir;
+   direction = signal<Direction>('rtl');
+   changeCount = 0;
+ }
+@@ -180,7 +180,7 @@ class ElementWithDir {
+   imports: [Dir],
+ })
+ class ElementWithPredefinedAutoDir {
+-  @ViewChild(Dir) dir: Dir;
++  @ViewChild(Dir) dir!: Dir;
+ }
+ 
+ @Component({
+@@ -188,7 +188,7 @@ class ElementWithPredefinedAutoDir {
+   imports: [Dir],
+ })
+ class ElementWithPredefinedUppercaseDir {
+-  @ViewChild(Dir) dir: Dir;
++  @ViewChild(Dir) dir!: Dir;
+ }
+ 
+ interface FakeDocument {

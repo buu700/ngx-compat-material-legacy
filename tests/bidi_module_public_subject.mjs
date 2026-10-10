@@ -12,6 +12,10 @@ const core = await import('@angular/core');
 const bidi = await import('@angular/cdk/bidi');
 const cases = [];
 const check = (id, action) => {action(); cases.push(id);};
+check('initial-raw-direction-default', () => {
+  const dir=new bidi.Dir();assert.equal(dir.value,'ltr');
+  assert.equal(dir._rawDir,process.argv[2]==='original'?undefined:'');dir.ngOnDestroy();
+});
 check('public-module-dir-export-and-owning-scope', () => {
   // Inspect actual peer metadata only; no private peer symbol enters product source.
   const metadata = bidi.BidiModule.ɵmod;

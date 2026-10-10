@@ -1,0 +1,147 @@
+diff --git a/src/cdk/bidi/bidi-module.ts b/src/cdk/bidi/bidi-module.ts
+index 9f0cd61935c572d421c7599a971dd50b7d125d42..dfe5929d944e21128b1ebbcd952d121e67d9797f 100644
+--- a/src/cdk/bidi/bidi-module.ts
++++ b/src/cdk/bidi/bidi-module.ts
+@@ -10,7 +10,7 @@ import {NgModule} from '@angular/core';
+ import {Dir} from './dir';
+ 
+ @NgModule({
++  imports: [Dir],
+   exports: [Dir],
+-  declarations: [Dir],
+ })
+ export class BidiModule {}
+diff --git a/src/cdk/bidi/bidi.md b/src/cdk/bidi/bidi.md
+index 3c79bdf5709d38c95f8927b271c42f55cd570241..385f5e9106724d4c1ae4f787dd2ad2cfceafa69e 100644
+--- a/src/cdk/bidi/bidi.md
++++ b/src/cdk/bidi/bidi.md
+@@ -7,6 +7,7 @@ When including the CDK's `BidiModule`, components can inject `Directionality` to
+ text direction (RTL or LTR);
+ 
+ #### Example
++
+ ```ts
+ @Component({ ... })
+ export class MyWidget implements OnDestroy {
+@@ -32,12 +33,14 @@ export class MyWidget implements OnDestroy {
+ ```
+ 
+ ### The `Dir` directive
++
+ The `BidiModule` also includes a directive that matches any elements with a `dir` attribute. This
+ directive has the same API as Directionality and provides itself _as_ `Directionality`. By doing
+ this, any component that injects `Directionality` will get the closest ancestor layout direction
+ context.
+ 
+ ### Interpreting the `auto` value
++
+ The CDK also supports the native `auto` value for the `dir` attribute, however there's a difference
+ in how it is interpreted. Some parts of the CDK, like overlays and keyboard navigation, need to know
+ if the element is in an RTL or LTR layout in order to work correctly. For performance reasons, we
+diff --git a/src/cdk/bidi/dir.ts b/src/cdk/bidi/dir.ts
+index 249fab27b4673438c93ece4d8e625dca63f40837..e3c804f701bab23f66d81f392d540a7809f1a851 100644
+--- a/src/cdk/bidi/dir.ts
++++ b/src/cdk/bidi/dir.ts
+@@ -21,6 +21,7 @@ import {Direction, Directionality, _resolveDirectionality} from './directionalit
+   providers: [{provide: Directionality, useExisting: Dir}],
+   host: {'[attr.dir]': '_rawDir'},
+   exportAs: 'dir',
++  standalone: true,
+ })
+ export class Dir implements Directionality, AfterContentInit, OnDestroy {
+   /** Normalized direction that accounts for invalid/unsupported values. */
+diff --git a/src/cdk/bidi/directionality.spec.ts b/src/cdk/bidi/directionality.spec.ts
+index 5a97ea287d0a616ce4c35ddee771e21de1cc1ea0..94a4326a868a3003bdcb4f757490888776649c68 100644
+--- a/src/cdk/bidi/directionality.spec.ts
++++ b/src/cdk/bidi/directionality.spec.ts
+@@ -10,8 +10,8 @@ describe('Directionality', () => {
+     fakeDocument = {body: {}, documentElement: {}};
+ 
+     TestBed.configureTestingModule({
+-      imports: [BidiModule],
+-      declarations: [
++      imports: [
++        BidiModule,
+         ElementWithDir,
+         ElementWithPredefinedAutoDir,
+         InjectsDirectionality,
+@@ -157,12 +157,25 @@ describe('Directionality', () => {
+   });
+ });
+ 
++/** Test component with Dir directive. */
++@Component({
++  selector: 'injects-directionality',
++  template: `<div></div>`,
++  standalone: true,
++  imports: [BidiModule],
++})
++class InjectsDirectionality {
++  constructor(public dir: Directionality) {}
++}
++
+ @Component({
+   template: `
+     <div [dir]="direction" (dirChange)="changeCount = changeCount + 1">
+       <injects-directionality></injects-directionality>
+     </div>
+   `,
++  standalone: true,
++  imports: [Dir, InjectsDirectionality],
+ })
+ class ElementWithDir {
+   @ViewChild(Dir) dir: Dir;
+@@ -172,6 +185,8 @@ class ElementWithDir {
+ 
+ @Component({
+   template: '<div dir="auto"></div>',
++  standalone: true,
++  imports: [Dir],
+ })
+ class ElementWithPredefinedAutoDir {
+   @ViewChild(Dir) dir: Dir;
+@@ -179,20 +194,13 @@ class ElementWithPredefinedAutoDir {
+ 
+ @Component({
+   template: '<div dir="RTL"></div>',
++  standalone: true,
++  imports: [Dir],
+ })
+ class ElementWithPredefinedUppercaseDir {
+   @ViewChild(Dir) dir: Dir;
+ }
+ 
+-/** Test component with Dir directive. */
+-@Component({
+-  selector: 'injects-directionality',
+-  template: `<div></div>`,
+-})
+-class InjectsDirectionality {
+-  constructor(public dir: Directionality) {}
+-}
+-
+ interface FakeDocument {
+   documentElement: {dir?: string};
+   body: {dir?: string};
+diff --git a/tools/public_api_guard/cdk/bidi.md b/tools/public_api_guard/cdk/bidi.md
+index 665e6cb26f2f06441aa56bfba6c3256170594e70..b10b1c2ec9331234cf7fe57add4ea72feafc936b 100644
+--- a/tools/public_api_guard/cdk/bidi.md
++++ b/tools/public_api_guard/cdk/bidi.md
+@@ -17,7 +17,7 @@ export class BidiModule {
+     // (undocumented)
+     static ɵinj: i0.ɵɵInjectorDeclaration<BidiModule>;
+     // (undocumented)
+-    static ɵmod: i0.ɵɵNgModuleDeclaration<BidiModule, [typeof i1.Dir], never, [typeof i1.Dir]>;
++    static ɵmod: i0.ɵɵNgModuleDeclaration<BidiModule, never, [typeof i1.Dir], [typeof i1.Dir]>;
+ }
+ 
+ // @public
+@@ -31,7 +31,7 @@ export class Dir implements Directionality, AfterContentInit, OnDestroy {
+     _rawDir: string;
+     get value(): Direction;
+     // (undocumented)
+-    static ɵdir: i0.ɵɵDirectiveDeclaration<Dir, "[dir]", ["dir"], { "dir": { "alias": "dir"; "required": false; }; }, { "change": "dirChange"; }, never, never, false, never>;
++    static ɵdir: i0.ɵɵDirectiveDeclaration<Dir, "[dir]", ["dir"], { "dir": { "alias": "dir"; "required": false; }; }, { "change": "dirChange"; }, never, never, true, never>;
+     // (undocumented)
+     static ɵfac: i0.ɵɵFactoryDeclaration<Dir, never>;
+ }
