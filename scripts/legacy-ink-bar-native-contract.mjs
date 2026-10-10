@@ -17,20 +17,21 @@ export function legacyInkBarNativeOkay(o) {
 
 export async function observeLegacyInkBarNative({evaluate}) {
   try {
-    return await evaluate(`(() => {
-      const root = document.getElementById('tabs');
-      const inks = root?.querySelectorAll('mat-ink-bar.mat-ink-bar');
-      const selected = root?.querySelectorAll('.mat-tab-label.mat-tab-label-active');
-      const ink = inks?.[0], label = selected?.[0];
-      if (!ink || !label) return {ink_count: inks?.length || 0, selected_count: selected?.length || 0};
-      return {ink_count: inks.length, selected_count: selected.length,
-        historical_element: ink.tagName === 'MAT-INK-BAR' && ink.classList.contains('mat-ink-bar'),
-        selected_index: Array.from(root.querySelectorAll('.mat-tab-label')).indexOf(label),
-        visible: getComputedStyle(ink).visibility === 'visible',
-        left: parseFloat(ink.style.left), width: parseFloat(ink.style.width),
-        expected_left: label.offsetLeft || 0, expected_width: label.offsetWidth || 0};
-    })()`);
+    return await evaluate(`(${readLegacyInkBarNative.toString()})(document.getElementById('tabs'))`);
   } catch (error) { return {error: String(error.message || error)}; }
+}
+
+export function readLegacyInkBarNative(root) {
+  const inks = root?.querySelectorAll('mat-ink-bar.mat-ink-bar');
+  const selected = root?.querySelectorAll('.mat-tab-label.mat-tab-label-active');
+  const ink = inks?.[0], label = selected?.[0];
+  if (!ink || !label) return {ink_count: inks?.length || 0, selected_count: selected?.length || 0};
+  return {ink_count: inks.length, selected_count: selected.length,
+    historical_element: ink.tagName === 'MAT-INK-BAR' && ink.classList.contains('mat-ink-bar'),
+    selected_index: Array.from(root.querySelectorAll('.mat-tab-label')).indexOf(label),
+    visible: getComputedStyle(ink).visibility === 'visible',
+    left: parseFloat(ink.style.left), width: parseFloat(ink.style.width),
+    expected_left: label.offsetLeft || 0, expected_width: label.offsetWidth || 0};
 }
 
 export function legacyInkBarSelectionSequenceOkay(sequence) {

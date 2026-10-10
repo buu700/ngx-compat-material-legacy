@@ -33,8 +33,10 @@
   }
 
   function waitFor(predicate, ms, then) {
+    const request = window.__status;
     const started = Date.now();
     const tick = () => {
+      if (window.__status !== request) return;
       let value = null;
       try {
         value = predicate();
@@ -165,7 +167,30 @@
       return;
     }
     if (family === 'chips') {
-      finish(!!query('#wrap-chips .mat-chip-list .mat-chip'), 'mat-chip-list');
+      const chip = query('#p-chip-list .mat-chip'), target = query('#p-field-input');
+      if (!chip || !target || typeof lab.readChipFormState !== 'function' || typeof lab.resetChipFormState !== 'function') {
+        finish(false, 'chip blur fixture missing'); return;
+      }
+      target.focus();
+      waitFor(() => lab.readChipFormState().focused === false, 1500, unfocused => {
+        if (!unfocused) {finish(false, 'chip list did not reset focus'); return;}
+        lab.resetChipFormState();
+        chip.focus();
+        waitFor(() => lab.readChipFormState().focused === true, 1500, focused => {
+          if (!focused) {finish(false, 'chip list did not receive native focus'); return;}
+          const before = lab.readChipFormState();
+          target.focus();
+          waitFor(() => {
+            const state = lab.readChipFormState();
+            return state.focused === false && state.touched === true ? state : null;
+          }, 1500, after => {
+            const observation = {focused_before: before.focused, touched_before: before.touched,
+              focused_after: after && after.focused, touched_after: after && after.touched,
+              dom_focus_moved: document.activeElement === target};
+            finish(legacyChipBlurNativeOkay(observation), 'mat-chip-list; blur/form state ' + JSON.stringify(observation));
+          });
+        });
+      });
       return;
     }
     if (family === 'core') {
@@ -234,7 +259,10 @@
     if (family === 'select') {
       const trigger = query('#p-select .mat-select-trigger');
       if (trigger) trigger.click();
-      waitFor(() => query('.mat-select-panel'), 1500, node => finish(!!node, 'mat-select-panel'));
+      waitFor(() => {
+        const observation = readLegacySelectFontNative(query('#p-select .mat-select-trigger'));
+        return legacySelectFontNativeOkay(observation) ? observation : null;
+      }, 1500, observation => finish(!!observation, 'mat-select-panel; font inheritance ' + JSON.stringify(observation)));
       return;
     }
     if (family === 'autocomplete') {
@@ -262,31 +290,43 @@
       return;
     }
     if (family === 'tooltip') {
-      const button = query('#p-tooltip');
+      const button = query('#p-tooltip'), sequence = [];
       if (button) {
+        button.scrollIntoView({block: 'center'});
         button.focus();
         button.dispatchEvent(new MouseEvent('mouseenter', {bubbles: true}));
       }
       waitFor(() => {
-        const tip = query('.mat-tooltip');
-        return tip && (tip.textContent || '').includes('Hello tip') ? tip : null;
-      }, 1500, node => {
-        if (!node) {finish(false, 'tooltip did not show'); return;}
-        if (typeof lab.runTooltipAriaLifetime !== 'function') {
-          finish(false, 'tooltip ARIA fixture API missing'); return;
-        }
-        const request = window.__status;
-        const complete = (ok, evidence) => {
-          if (window.__status === request) finish(ok, evidence);
-        };
-        const timeout = setTimeout(() => complete(false, 'tooltip ARIA fixture timed out'), 1500);
-        Promise.resolve().then(() => lab.runTooltipAriaLifetime()).then(observation => {
-          clearTimeout(timeout);
-          complete(legacyTooltipAriaLifetimeNativeOkay(observation),
-            'mat-tooltip; ARIA destruction ' + JSON.stringify(observation));
-        }, error => {
-          clearTimeout(timeout);
-          complete(false, 'tooltip ARIA fixture ' + String(error));
+        const observation = readLegacyTooltipNative(button);
+        return legacyTooltipNativeOkay(observation, 'Hello tip') ? observation : null;
+      }, 1500, first => {
+        if (!first) {finish(false, 'tooltip initial geometry missing'); return;}
+        sequence.push(first);
+        const change = query('#p-tooltip-change');
+        if (!change) {finish(false, 'tooltip message change fixture missing'); return;}
+        change.click();
+        waitFor(() => {
+          const observation = readLegacyTooltipNative(button);
+          return legacyTooltipNativeOkay(observation, 'A longer tooltip message for repositioning') ? observation : null;
+        }, 1500, second => {
+          if (!second) {finish(false, 'tooltip replacement geometry missing'); return;}
+          sequence.push(second);
+          if (typeof lab.runTooltipAriaLifetime !== 'function') {
+            finish(false, 'tooltip ARIA fixture API missing'); return;
+          }
+          const request = window.__status;
+          const complete = (ok, evidence) => {
+            if (window.__status === request) finish(ok, evidence);
+          };
+          const timeout = setTimeout(() => complete(false, 'tooltip ARIA fixture timed out'), 1500);
+          Promise.resolve().then(() => lab.runTooltipAriaLifetime()).then(observation => {
+            clearTimeout(timeout);
+            complete(legacyTooltipMessageSequenceOkay(sequence) && legacyTooltipAriaLifetimeNativeOkay(observation),
+              'mat-tooltip; message geometry ' + JSON.stringify(sequence) + '; ARIA destruction ' + JSON.stringify(observation));
+          }, error => {
+            clearTimeout(timeout);
+            complete(false, 'tooltip ARIA fixture ' + String(error));
+          });
         });
       });
       return;
@@ -298,11 +338,25 @@
       return;
     }
     if (family === 'tabs') {
-      lab.selectSecondTab();
-      waitFor(() => {
-        const labels = document.querySelectorAll('#wrap-tabs .mat-tab-label');
-        return labels[1] && labels[1].getAttribute('aria-selected') === 'true' ? labels[1] : null;
-      }, 1500, node => finish(!!node, 'second tab selected'));
+      const group = query('#p-tabs'), sequence = [];
+      const labels = group && group.querySelectorAll('.mat-tab-label');
+      if (!labels || labels.length < 2) {finish(false, 'tab labels missing'); return;}
+      const observe = (index, then) => waitFor(() => {
+        const observation = readLegacyInkBarNative(group);
+        return legacyInkBarNativeOkay(observation) && observation.selected_index === index ? observation : null;
+      }, 1500, observation => {
+        if (!observation) {finish(false, 'tab ink-bar alignment missing at ' + index); return;}
+        sequence.push(observation); then();
+      });
+      labels[0].click();
+      observe(0, () => {
+        labels[1].click();
+        observe(1, () => {
+          labels[0].click();
+          observe(0, () => finish(legacyInkBarSelectionSequenceOkay(sequence),
+            'tabs; first/second/first ink-bar alignment ' + JSON.stringify(sequence)));
+        });
+      });
       return;
     }
     finish(false, 'no default for ' + family);

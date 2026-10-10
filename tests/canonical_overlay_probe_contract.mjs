@@ -20,10 +20,11 @@ const raw = requiredProbeSource(), turn = () => new Promise(resolve => setImmedi
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 function fixture({observation = good, api = true, reject = false, show = true, source = raw,
     family = 'tooltip', automaticFocus = true, selectionApi = true, selectionEvent = true,
-    selectionValue = true, selectionCloses = true, optionPresent = true} = {}) {
+    selectionValue = true, selectionCloses = true, optionPresent = true,
+    wrongTooltipPosition = false, noWidthGrowth = false, staleMessage = false} = {}) {
   let now = 0, next = 0, visible = false, calls = 0;
   const jobs = new Map(), surface = {className: '', setAttribute() {}}, window = {};
-  window.__lab = {closeTransient() {visible = false;}};
+  window.__lab = {closeTransient() {visible = false; wider = false;}};
   if (api) window.__lab.runTooltipAriaLifetime = () => {
     calls++;
     if (reject) return Promise.reject(new Error('fixture operation failed'));
@@ -38,7 +39,13 @@ function fixture({observation = good, api = true, reject = false, show = true, s
     if (selectionCloses) autoVisible = false;
   }};
   const menuTrigger = {click() {menuVisible = true; if (automaticFocus) document.activeElement = item;}};
-  const host = {focus() {}, dispatchEvent() {visible = show;}};
+  let wider = false;
+  const host = {focus() {}, scrollIntoView() {}, dispatchEvent() {visible = show;},
+    getBoundingClientRect: () => ({left: 190, width: 20, bottom: 40})};
+  const tip = {classList: {contains: name => name === 'mat-tooltip'},
+    get textContent() {return wider && !staleMessage ? 'A longer tooltip message for repositioning' : 'Hello tip';},
+    getBoundingClientRect: () => ({left: wider && !noWidthGrowth ? 100 : 175,
+      top: wrongTooltipPosition ? 10 : 48, width: wider && !noWidthGrowth ? 200 : 50, height: 24})};
   if (selectionApi) window.__lab.readAutocompleteSelection = () => selected;
   const document = {getElementById: id => id === 'surface' ? surface : null,
     querySelector: selector => {
@@ -50,10 +57,12 @@ function fixture({observation = good, api = true, reject = false, show = true, s
       if (selector === '.mat-autocomplete-panel .mat-option') return autoVisible && optionPresent ? option : null;
       if (selector === '.mat-autocomplete-panel') return autoVisible ? {} : null;
       if (selector === '#p-tooltip') return host;
-      if (selector === '.mat-tooltip') return visible ? {textContent: 'Hello tip'} : null;
+      if (selector === '#p-tooltip-change') return {click() {wider = true;}};
+      if (selector === '.mat-tooltip') return visible ? tip : null;
       return null;
-    }};
+    }, querySelectorAll: selector => selector === '.mat-tooltip' && visible ? [tip] : []};
   const context = {window, document, Promise, JSON, String, MouseEvent: class MouseEvent {},
+    innerWidth: 800, innerHeight: 600, getComputedStyle: () => ({visibility: 'visible', display: 'block'}),
     FocusEvent: class FocusEvent {}, InputEvent: class InputEvent {}, KeyboardEvent: class KeyboardEvent {},
     Date: {now: () => now},
     setTimeout(callback, delay = 0) {const id = ++next; jobs.set(id, {callback, due: now + delay}); return id;},
@@ -109,6 +118,12 @@ await check('missing-visible-tooltip-does-not-run-lifetime-operation', async () 
   const f = fixture({show: false}); f.begin(); await f.advance(1600);
   assert.equal(f.status().ok, false); assert.equal(f.calls, 0);
 });
+for (const flag of ['wrongTooltipPosition', 'noWidthGrowth', 'staleMessage']) {
+  await check('tooltip-rejects-' + flag, async () => {
+    const f = fixture({[flag]: true}); f.begin(); await f.advance(1600);
+    assert.equal(f.status().done, true); assert.equal(f.status().ok, false);
+  });
+}
 async function replaced(source = raw) {
   let firstResolve, secondResolve, requests = 0;
   const first = new Promise(resolve => {firstResolve = resolve;});

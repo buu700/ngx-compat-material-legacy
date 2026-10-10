@@ -1,0 +1,128 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+/** Entire canonical probe; explicit DOM/geometry/control/clock protocols only. */
+import assert from 'node:assert/strict';
+import {runInNewContext} from 'node:vm';
+import {writeFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {requiredProbeSource, candidateInstallSpec} from '../scripts/browser-required-cells.mjs';
+const raw = requiredProbeSource(), turn = () => new Promise(resolve => setImmediate(resolve));
+const hash = bytes => createHash('sha256').update(bytes).digest('hex');
+function fixture(family, faults = {}, source = raw) {
+  const window = {}, jobs = new Map(), classes = name => ({contains: value => name === value});
+  let now = 0, serial = 0, selected = 0, selectOpen = false, focused = false, touched = false;
+  const clicked = [], surface = {setAttribute() {}};
+  const labels = [0, 1].map(index => ({offsetLeft: index * 100, offsetWidth: 100,
+    click() {clicked.push(index); selected = index;}}));
+  const ink = {tagName: 'MAT-INK-BAR', classList: classes('mat-ink-bar'),
+    computed: {visibility: faults.hiddenInk ? 'hidden' : 'visible'}};
+  Object.defineProperty(ink, 'style', {get: () => ({left: String(selected * 100 +
+    (faults.wrongInkAt === selected ? 1 : 0)) + 'px', width: (faults.zeroInk ? '0' : '100') + 'px'})});
+  const group = {querySelectorAll(selector) {
+    if (selector === 'mat-ink-bar.mat-ink-bar') return faults.noInk ? [] : [ink];
+    if (selector === '.mat-tab-label.mat-tab-label-active') return [labels[selected]];
+    if (selector === '.mat-tab-label') return labels;
+    return [];
+  }};
+  const pane = {style: {fontSize: faults.paneFont || '20px'}};
+  const option = {tagName: 'MAT-OPTION', classList: classes(faults.optionClass || 'mat-option'),
+    computed: {fontSize: faults.optionFont || '20px'}, getBoundingClientRect: () => ({height: faults.optionHeight ?? 60})};
+  const panel = {classList: classes('mat-select-panel'), computed: {fontSize: faults.panelFont || '20px'},
+    querySelectorAll: () => faults.noOption ? [] : [option], closest: () => pane};
+  const trigger = {computed: {fontSize: faults.triggerFont || '20px'}, click() {selectOpen = true;}};
+  const chip = {focus() {document.activeElement = chip; focused = !faults.noChipFocus;}};
+  const target = {focus() {
+    if (!faults.noDomFocusMove || !focused) document.activeElement = target;
+    if (focused) {focused = !!faults.blurStaysFocused; if (!faults.noTouched) touched = true;}
+  }};
+  window.__lab = {closeTransient() {},
+    readChipFormState: () => ({focused, touched}), resetChipFormState() {touched = !!faults.touchedBefore;}};
+  if (faults.noChipApi) delete window.__lab.readChipFormState;
+  const document = {activeElement: null, getElementById: id => id === 'surface' ? surface : null,
+    querySelector(selector) {
+      if (selector === '#wrap-' + family) return {};
+      if (selector === '#p-tabs') return group;
+      if (selector === '#p-select .mat-select-trigger') return trigger;
+      if (selector === '#p-chip-list .mat-chip') return faults.noChip ? null : chip;
+      if (selector === '#p-field-input') return target;
+      return null;
+    },
+    querySelectorAll: selector => selector === '.cdk-overlay-pane .mat-select-panel' && selectOpen ? [panel] : []};
+  runInNewContext(source, {window, document, Promise, JSON, String, Number, Array, parseFloat,
+    getComputedStyle: node => node.computed, Date: {now: () => now},
+    setTimeout(callback, delay = 0) {const id = ++serial; jobs.set(id, {callback, due: now + delay}); return id;},
+    clearTimeout: id => jobs.delete(id)});
+  return {window, clicked, jobs, begin() {window.__begin({family, state: 'default'});}, status() {return window.__poll();},
+    async advance(ms) {
+      const end = now + ms; let iterations = 0;
+      while (true) {
+        const next = [...jobs].sort((a, b) => a[1].due - b[1].due)[0];
+        if (!next || next[1].due > end) break;
+        assert.ok(iterations++ < 250, 'clock protocol did not quiesce');
+        now = next[1].due; jobs.delete(next[0]); next[1].callback(); await turn();
+      }
+      now = end; await turn();
+    }};
+}
+const cases = [];
+async function check(id, family, faults, expected) {
+  const f = fixture(family, faults); f.begin(); await f.advance(1700);
+  assert.equal(f.status().done, true, id); assert.equal(f.status().ok, expected, id);
+  if (family === 'tabs' && expected) assert.deepEqual(f.clicked, [0, 1, 0]);
+  cases.push({id, result: 'pass'});
+}
+await check('tabs-first-second-first', 'tabs', {}, true);
+for (const faults of [{wrongInkAt: 0}, {wrongInkAt: 1}, {zeroInk: true}, {hiddenInk: true}, {noInk: true}]) {
+  await check('tabs-reject-' + JSON.stringify(faults), 'tabs', faults, false);
+}
+await check('select-all-fonts-and-historical-height', 'select', {}, true);
+for (const faults of [{triggerFont: '16px'}, {paneFont: '16px'}, {panelFont: '16px'},
+    {optionFont: '16px'}, {optionHeight: 48}, {noOption: true}, {optionClass: 'mdc-list-item'}]) {
+  await check('select-reject-' + JSON.stringify(faults), 'select', faults, false);
+}
+await check('chip-real-focus-and-control-touch-transition', 'chips', {}, true);
+for (const faults of [{noChipFocus: true}, {blurStaysFocused: true}, {noTouched: true},
+    {touchedBefore: true}, {noDomFocusMove: true}, {noChipApi: true}, {noChip: true}]) {
+  await check('chips-reject-' + JSON.stringify(faults), 'chips', faults, false);
+}
+const bypassFont = raw.replace('return legacySelectFontNativeOkay(observation) ? observation : null;',
+  'return observation.panel_count === 1 ? observation : null;');
+assert.notEqual(bypassFont, raw);
+const exposed = fixture('select', {paneFont: '16px'}, bypassFont); exposed.begin(); await exposed.advance(1700);
+assert.equal(exposed.status().ok, true, 'removing the font gate must expose the former presence-only pass');
+const bypassChip = raw.replace('finish(legacyChipBlurNativeOkay(observation),', 'finish(true,');
+assert.notEqual(bypassChip, raw);
+const wrongFocus = fixture('chips', {noDomFocusMove: true}, bypassChip); wrongFocus.begin(); await wrongFocus.advance(1700);
+assert.equal(wrongFocus.status().ok, true, 'removing the complete blur observation gate must expose a false pass');
+async function replacedWait(source = raw) {
+  const f = fixture('chips', {noChipFocus: true}, source); f.begin(); await f.advance(0);
+  assert.equal(f.status().done, false);
+  f.window.__status = {done: false, ok: false, evidence: 'replacement cell'};
+  await f.advance(1700);
+  assert.equal(f.status().done, false, 'prior-wait-cannot-complete-replacement-cell');
+}
+await replacedWait(); cases.push({id: 'queued-wait-cannot-complete-replacement-cell', result: 'pass'});
+const leakedWait = raw.replace('      if (window.__status !== request) return;', '');
+assert.notEqual(leakedWait, raw);
+await assert.rejects(() => replacedWait(leakedWait), error => error.code === 'ERR_ASSERTION' &&
+  error.message.startsWith('prior-wait-cannot-complete-replacement-cell'));
+const generated = [];
+for (const zoneless of [false, true]) {
+  const spec = candidateInstallSpec({core: '22.1.7', cdk: '22.1.7', material: '22.1.7',
+    rxjs: '7.8.2', typescript: '6.0.3', zone: '0.16.3', tslib: '2.8.1', sass: '1.104.1'}, zoneless);
+  assert.ok(spec.labSource.includes('readonly chipControl = new FormControl<string | null>(null)'));
+  assert.ok(spec.labSource.includes('ReactiveFormsModule,'));
+  assert.ok(spec.labSource.includes(JSON.stringify('id="p-tabs"').slice(1, -1)));
+  assert.ok(spec.labSource.includes(JSON.stringify('style="font-size:20px"').slice(1, -1)));
+  generated.push({zoneless, source_sha256: hash(spec.labSource)});
+}
+const report = {schema_version: 1, cases, mutation_rejections: 3, generated,
+  complete_probe_sha256: hash(raw), native_executed: false, actual_legacy_or_forms_executed: false,
+  scope: 'Complete canonical default tabs/select/chips browser probe under explicit DOM/style/geometry/control/timer protocols. Shared actual predicates and DOM readers execute; no browser, Angular/forms/legacy instances, packed artifact, AOT or consumer floors are qualified.'};
+if (process.argv[2]) writeFileSync(process.argv[2], JSON.stringify(report, null, 2) + '\n', {flag: 'wx'});
+console.log(JSON.stringify({cases: cases.length, mutation_rejections: 3, native_executed: false}));

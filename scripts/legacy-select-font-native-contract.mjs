@@ -16,18 +16,19 @@ export function legacySelectFontNativeOkay(o) {
 
 export async function observeLegacySelectFontNative({evaluate}) {
   try {
-    return await evaluate(`(() => {
-      const trigger = document.querySelector('#choice .mat-select-trigger');
-      const panels = document.querySelectorAll('.cdk-overlay-pane .mat-select-panel'), panel = panels[0];
-      const options = panel?.querySelectorAll('.mat-option'), option = options?.[0];
-      const pane = panel?.closest('.cdk-overlay-pane');
-      if (!trigger || !panel || !option || !pane) return {panel_count: panels.length, option_count: options?.length || 0};
-      return {panel_count: panels.length, option_count: options.length,
-        historical_panel: panel.classList.contains('mat-select-panel'),
-        historical_option: option.tagName === 'MAT-OPTION' && option.classList.contains('mat-option'),
-        trigger_font: getComputedStyle(trigger).fontSize, pane_inline_font: pane.style.fontSize,
-        panel_font: getComputedStyle(panel).fontSize, option_font: getComputedStyle(option).fontSize,
-        option_height: option.getBoundingClientRect().height};
-    })()`);
+    return await evaluate(`(${readLegacySelectFontNative.toString()})(document.querySelector('#choice .mat-select-trigger'))`);
   } catch (error) {return {error: String(error.message || error)};}
+}
+
+export function readLegacySelectFontNative(trigger) {
+  const panels = document.querySelectorAll('.cdk-overlay-pane .mat-select-panel'), panel = panels[0];
+  const options = panel?.querySelectorAll('.mat-option'), option = options?.[0];
+  const pane = panel?.closest('.cdk-overlay-pane');
+  if (!trigger || !panel || !option || !pane) return {panel_count: panels.length, option_count: options?.length || 0};
+  return {panel_count: panels.length, option_count: options.length,
+    historical_panel: panel.classList.contains('mat-select-panel'),
+    historical_option: option.tagName === 'MAT-OPTION' && option.classList.contains('mat-option'),
+    trigger_font: getComputedStyle(trigger).fontSize, pane_inline_font: pane.style.fontSize,
+    panel_font: getComputedStyle(panel).fontSize, option_font: getComputedStyle(option).fontSize,
+    option_height: option.getBoundingClientRect().height};
 }
