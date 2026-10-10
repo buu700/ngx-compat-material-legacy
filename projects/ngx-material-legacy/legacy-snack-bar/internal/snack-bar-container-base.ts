@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -42,6 +43,9 @@ export abstract class _MatSnackBarContainerBase extends BasePortalOutlet impleme
 
   /** Whether the component has been destroyed. */
   private _destroyed = false;
+
+  /** Exit motion and destruction can both request completion for the same container. */
+  private _exitCompletionPending = false;
 
   /** The portal outlet inside of this container into which the snack bar content will be loaded. */
   @ViewChild(CdkPortalOutlet, {static: true}) _portalOutlet: CdkPortalOutlet;
@@ -244,12 +248,27 @@ export abstract class _MatSnackBarContainerBase extends BasePortalOutlet impleme
    * errors where we end up removing an element which is in the middle of an animation.
    */
   private _completeExit() {
-    this._ngZone.onMicrotaskEmpty.pipe(take(1)).subscribe(() => {
-      this._ngZone.run(() => {
-        this._onExit.next();
-        this._onExit.complete();
+    if (this._exitCompletionPending) {
+      return;
+    }
+    this._exitCompletionPending = true;
+
+    const zone = this._ngZone;
+    const onExit = this._onExit;
+    const finish = () => {
+      zone.run(() => {
+        onExit.next();
+        onExit.complete();
       });
-    });
+    };
+
+    // Zoneless providers have an already-stable zone and never emit onMicrotaskEmpty.
+    // Keep removal asynchronous after motion while retaining the original zoneful wait.
+    if (zone.isStable) {
+      queueMicrotask(finish);
+    } else {
+      zone.onMicrotaskEmpty.pipe(take(1)).subscribe(finish);
+    }
   }
 
   /**
