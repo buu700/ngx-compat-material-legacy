@@ -1,0 +1,108 @@
+{
+  "getters": [
+    {
+      "current": {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+        "body": "{\n    return this._required ?? this.ngControl?.control?.hasValidator(Validators.required) ?? false;\n}",
+        "signature": "@Input()\nget required(): boolean {\n    return this._required ?? this.ngControl?.control?.hasValidator(Validators.required) ?? false;\n}",
+        "whole_parent_class": "MatLegacyChipList"
+      },
+      "tagged": {
+        "path": "reference/material-16.2.14/required-validator-sources/chip-list.ts",
+        "body": "{\n    return this._required ?? this.ngControl?.control?.hasValidator(Validators.required) ?? false;\n}",
+        "signature": "@Input()\nget required(): boolean {\n    return this._required ?? this.ngControl?.control?.hasValidator(Validators.required) ?? false;\n}",
+        "whole_parent_class": "MatLegacyChipList"
+      },
+      "whole_body_equal": true
+    },
+    {
+      "current": {
+        "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+        "body": "{\n    return this._required ?? this.ngControl?.control?.hasValidator(Validators.required) ?? false;\n}",
+        "signature": "@Input()\nget required(): boolean {\n    return this._required ?? this.ngControl?.control?.hasValidator(Validators.required) ?? false;\n}",
+        "whole_parent_class": "_MatSelectBase"
+      },
+      "tagged": {
+        "path": "reference/material-16.2.14/abstract-control-sources/select.ts",
+        "body": "{\n    return this._required ?? this.ngControl?.control?.hasValidator(Validators.required) ?? false;\n}",
+        "signature": "@Input()\nget required(): boolean {\n    return this._required ?? this.ngControl?.control?.hasValidator(Validators.required) ?? false;\n}",
+        "whole_parent_class": "_MatSelectBase"
+      },
+      "whole_body_equal": true
+    }
+  ],
+  "providers": [
+    {
+      "current": "projects/ngx-material-legacy/legacy-checkbox/internal/checkbox-required-validator.ts",
+      "reference": "reference/material-16.2.14/required-validator-sources/checkbox-required-validator.ts",
+      "class_name": "MatCheckboxRequiredValidator",
+      "empty_historical_public_subclass": true,
+      "provider_and_selector_equal": true,
+      "candidate": {
+        "provider": "{\n    provide: NG_VALIDATORS,\n    useExisting: forwardRef(() => MatCheckboxRequiredValidator),\n    multi: true,\n}",
+        "selector": "mat-checkbox[required][formControlName],\n             mat-checkbox[required][formControl], mat-checkbox[required][ngModel]",
+        "standalone": "false"
+      },
+      "tagged": {
+        "provider": "{\n    provide: NG_VALIDATORS,\n    useExisting: forwardRef(() => MatCheckboxRequiredValidator),\n    multi: true,\n}",
+        "selector": "mat-checkbox[required][formControlName],\n             mat-checkbox[required][formControl], mat-checkbox[required][ngModel]"
+      }
+    },
+    {
+      "current": "projects/ngx-material-legacy/legacy-slide-toggle/internal/slide-toggle-required-validator.ts",
+      "reference": "reference/material-16.2.14/required-validator-sources/slide-toggle-required-validator.ts",
+      "class_name": "MatSlideToggleRequiredValidator",
+      "empty_historical_public_subclass": true,
+      "provider_and_selector_equal": true,
+      "candidate": {
+        "provider": "{\n    provide: NG_VALIDATORS,\n    useExisting: forwardRef(() => MatSlideToggleRequiredValidator),\n    multi: true,\n}",
+        "selector": "mat-slide-toggle[required][formControlName],\n             mat-slide-toggle[required][formControl], mat-slide-toggle[required][ngModel]",
+        "standalone": "false"
+      },
+      "tagged": {
+        "provider": "{\n    provide: NG_VALIDATORS,\n    useExisting: forwardRef(() => MatSlideToggleRequiredValidator),\n    multi: true,\n}",
+        "selector": "mat-slide-toggle[required][formControlName],\n             mat-slide-toggle[required][formControl], mat-slide-toggle[required][ngModel]"
+      }
+    }
+  ],
+  "form_field_validator_cache_method": "ngAfterContentChecked() {\n    this._validateControlChild();\n    if (this._control !== this._previousControl) {\n        this._initializeControl(this._previousControl);\n        if (this._control.ngControl && this._control.ngControl.control) {\n            this._previousControlValidatorFn = this._control.ngControl.control.validator;\n        }\n        else {\n            this._previousControlValidatorFn = null;\n        }\n        this._previousControl = this._control;\n    }\n    if (this._control.ngControl && this._control.ngControl.control) {\n        const validatorFn = this._control.ngControl.control.validator;\n        if (validatorFn !== this._previousControlValidatorFn) {\n            this._previousControlValidatorFn = validatorFn;\n            this._changeDetectorRef.markForCheck();\n        }\n    }\n    if (this._outlineGapCalculationNeededImmediately) {\n        this.updateOutlineGap();\n    }\n}",
+  "public_interfaces": [
+    {
+      "line": "original",
+      "path": "@angular/core/index.d.ts",
+      "name": "OnChanges",
+      "whole": "export declare interface OnChanges {\n    /**\n     * A callback method that is invoked immediately after the\n     * default change detector has checked data-bound properties\n     * if at least one has changed, and before the view and content\n     * children are checked.\n     * @param changes The changed properties.\n     */\n    ngOnChanges(changes: SimpleChanges): void;\n}"
+    },
+    {
+      "line": "original",
+      "path": "@angular/forms/index.d.ts",
+      "name": "Validator",
+      "whole": "export declare interface Validator {\n    /**\n     * @description\n     * Method that performs synchronous validation against the provided control.\n     *\n     * @param control The control to validate against.\n     *\n     * @returns A map of validation errors if validation fails,\n     * otherwise null.\n     */\n    validate(control: AbstractControl): ValidationErrors | null;\n    /**\n     * @description\n     * Registers a callback function to call when the validator inputs change.\n     *\n     * @param fn The callback function\n     */\n    registerOnValidatorChange?(fn: () => void): void;\n}"
+    },
+    {
+      "line": "main",
+      "path": "@angular/core/types/core.d.ts",
+      "name": "OnChanges",
+      "whole": "interface OnChanges {\n    /**\n     * A callback method that is invoked immediately after the\n     * default change detector has checked data-bound properties\n     * if at least one has changed, and before the view and content\n     * children are checked.\n     * @param changes The changed properties.\n     */\n    ngOnChanges(changes: SimpleChanges): void;\n}"
+    },
+    {
+      "line": "main",
+      "path": "@angular/forms/types/forms.d.ts",
+      "name": "Validator",
+      "whole": "interface Validator {\n    /**\n     * @description\n     * Method that performs synchronous validation against the provided control.\n     *\n     * @param control The control to validate against.\n     *\n     * @returns A map of validation errors if validation fails,\n     * otherwise null.\n     */\n    validate(control: AbstractControl): ValidationErrors | null;\n    /**\n     * @description\n     * Registers a callback function to call when the validator inputs change.\n     *\n     * @param fn The callback function\n     */\n    registerOnValidatorChange?(fn: () => void): void;\n}"
+    },
+    {
+      "line": "21.x",
+      "path": "@angular/core/types/core.d.ts",
+      "name": "OnChanges",
+      "whole": "interface OnChanges {\n    /**\n     * A callback method that is invoked immediately after the\n     * default change detector has checked data-bound properties\n     * if at least one has changed, and before the view and content\n     * children are checked.\n     * @param changes The changed properties.\n     */\n    ngOnChanges(changes: SimpleChanges): void;\n}"
+    },
+    {
+      "line": "21.x",
+      "path": "@angular/forms/types/forms.d.ts",
+      "name": "Validator",
+      "whole": "interface Validator {\n    /**\n     * @description\n     * Method that performs synchronous validation against the provided control.\n     *\n     * @param control The control to validate against.\n     *\n     * @returns A map of validation errors if validation fails,\n     * otherwise null.\n     */\n    validate(control: AbstractControl): ValidationErrors | null;\n    /**\n     * @description\n     * Registers a callback function to call when the validator inputs change.\n     *\n     * @param fn The callback function\n     */\n    registerOnValidatorChange?(fn: () => void): void;\n}"
+    }
+  ],
+  "native_claim": false
+}

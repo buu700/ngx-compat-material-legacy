@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "status": "in-progress; source/runtime/type leads only; six frozen uses not admitted",
+  "recorded_at_utc": "2026-10-10T00:47:53.613586+00:00",
+  "source_heads": {
+    "main": "d940760e2bce498033e3ddd0e288ab7eab8ed062",
+    "21.x": "fa87dd9af920d61f78854101b9fac08b7d4e37d3"
+  },
+  "source_trees": {
+    "main": "0e9f2692bc6f806630953497189115695f19e968",
+    "21.x": "e68214ec95d6abd89679d0f2bb9d87221cbdc2d7"
+  },
+  "frozen_uses": {
+    "Validators": 2,
+    "CheckboxRequiredValidator": 2,
+    "NG_VALIDATORS": 2
+  },
+  "current_supplemental_uses": {
+    "ValidatorFn": 1
+  },
+  "frozen_denominator_changed": false,
+  "source_bindings": [
+    {
+      "file": "legacy-chips/chip-list.ts",
+      "main_sha256": "6be4ef5b4100e7d1122dc3a0842d66c8a57315374e438ecd8ddf2e29e9f8c3e2",
+      "line_21_sha256": "6be4ef5b4100e7d1122dc3a0842d66c8a57315374e438ecd8ddf2e29e9f8c3e2",
+      "byte_identical": true
+    },
+    {
+      "file": "legacy-select/internal/select-base.ts",
+      "main_sha256": "093ffb5a66d4909782a2e07cfebc95728a3dd76188eb14fcf69834bd25c55c3e",
+      "line_21_sha256": "093ffb5a66d4909782a2e07cfebc95728a3dd76188eb14fcf69834bd25c55c3e",
+      "byte_identical": true
+    },
+    {
+      "file": "legacy-form-field/form-field.ts",
+      "main_sha256": "1770ec580bbb08ba9222cbf1725cc82e1ca3ea4819aa1f996826690267ea2769",
+      "line_21_sha256": "1770ec580bbb08ba9222cbf1725cc82e1ca3ea4819aa1f996826690267ea2769",
+      "byte_identical": true
+    },
+    {
+      "file": "legacy-checkbox/internal/checkbox-required-validator.ts",
+      "main_sha256": "88f2ea043de50069c4abb38c9e53c884d9f3973a71766ba27d0695897734f019",
+      "line_21_sha256": "88f2ea043de50069c4abb38c9e53c884d9f3973a71766ba27d0695897734f019",
+      "byte_identical": true
+    },
+    {
+      "file": "legacy-slide-toggle/internal/slide-toggle-required-validator.ts",
+      "main_sha256": "9af8bc6257f2e7f4b3f681d682ed7840a23f7ea6f366bfbd73d0e1fb31c2c7aa",
+      "line_21_sha256": "9af8bc6257f2e7f4b3f681d682ed7840a23f7ea6f366bfbd73d0e1fb31c2c7aa",
+      "byte_identical": true
+    }
+  ],
+  "tagged_references": [
+    {
+      "path": "reference/material-16.2.14/required-validator-sources/chip-list.ts",
+      "sha256": "83c17cd61f9ecb8cc4dcc7947a493a78a93a6b880d3c69f9284eb39106662414",
+      "upstream_path": "src/material/legacy-chips/chip-list.ts"
+    },
+    {
+      "path": "reference/material-16.2.14/required-validator-sources/checkbox-required-validator.ts",
+      "sha256": "0fdde92babb15669a8bfafd48f7f04a98f3c1854f81ec3bf1ff9762e9f9f6951",
+      "upstream_path": "src/material/checkbox/checkbox-required-validator.ts"
+    },
+    {
+      "path": "reference/material-16.2.14/required-validator-sources/slide-toggle-required-validator.ts",
+      "sha256": "e5990e4436cfac932e997f6024d9d47d159f4d2979fe9f83f3bd9b33cb4739fc",
+      "upstream_path": "src/material/slide-toggle/slide-toggle-required-validator.ts"
+    }
+  ],
+  "namespace_capsule": {
+    "path": "compatibility/rc/material-public-subjects.json",
+    "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+  },
+  "observations": [
+    "Both entire required getter bodies equal the tagged source; actual calls test public Validators.required reference identity through FormControl.hasValidator, rather than calling that validator directly.",
+    "Both empty owned checkbox/slide-toggle subclasses, provider initializer objects and selector strings match the tagged shared Material 16 helpers. Current explicit standalone:false preserves the original implicit false setting; added local NgModule wrappers remain under earlier class-decorator review.",
+    "Current public NG_VALIDATORS type is readonly (Function|Validator)[]; original type is mutable. Strict probes preserve the distinction, with current mutation rejected and original mutation accepted. Owned providers register multi values and do not mutate an injected list.",
+    "Public ValidatorFn signature remains (AbstractControl)=>ValidationErrors|null. The supplemental nullable private cache field is used by the whole ngAfterContentChecked method to compare the actual public control.validator callback and markForCheck. It is not an unused field, and it is not the ngDoCheck method.",
+    "Current internal AbstractValidatorDirective marks implementation hooks docs-private. Product subclasses do not import that ancestor or call enabled/normalizeInput/createValidator. Genuine instances satisfy the independently public Validator and core OnChanges interfaces; strict fixtures call those public contracts.",
+    "RequiredValidator/CheckboxRequiredValidator public required input, boolean/string normalization, required-true validation and callback notification match in the observed true/false/empty-string/string-boolean cases across all three genuine subjects.",
+    "Empty Set values are accepted by original Validators.required and rejected by both minima through the new lengthOrSize helper. This difference is retained explicitly and does not change the reference-identity predicate in the owned required getters. No universal validator equivalence or native forms qualification is claimed."
+  ],
+  "type_probes": {
+    "strict": true,
+    "skip_lib_check": false,
+    "compilers": [
+      "6.0.2",
+      "5.9.2"
+    ],
+    "subjects": [
+      "original",
+      "main",
+      "21.x"
+    ],
+    "result": "pass",
+    "original_negative_checks": 5,
+    "minimum_negative_checks": 6,
+    "scope": "Main 6.0.2 and 21.x 5.9.2 are the advertised compiler subjects; remaining cross-compilations are auxiliary diagnostics, not floor changes."
+  },
+  "cyph_sanity": {
+    "head": "a56a0603636cac5aaabe8fe408f7429b4224f011",
+    "read_only": true,
+    "clean": true,
+    "scope": "Exact CheckboxRequiredValidator, ValidatorFn, Validators.required and NG_VALIDATORS in non-spec shared/js TypeScript",
+    "matches": 0,
+    "consumer_build_executed": false
+  },
+  "evidence": [
+    {
+      "path": "compatibility/rc/required-validator-namespace-source-lead.json",
+      "sha256": "86cca097d60e7722b5bc0b233deec8863c91397afeb9c01c296b70e9542c9cb5"
+    },
+    {
+      "path": "compatibility/rc/required-validator-runtime-lead.json",
+      "sha256": "1b820ca42db802b7d834f1f613b710328ecad1afe5b8359cebc678dc46898bc3"
+    },
+    {
+      "path": "compatibility/rc/required-validator-minimum-types-lead.json",
+      "sha256": "ee94f99a8600a60d440f325b0afb184dc69aefe0bf2138e3d674825d20cbf3e2"
+    },
+    {
+      "path": "compatibility/rc/required-validator-authored-source-lead.json",
+      "sha256": "28003827c8d7e10928ed3ab138558492865bd4d9da9bb7dc5a7349573461f7e8"
+    }
+  ],
+  "reviewed_total_unchanged": 1200,
+  "open_total_unchanged": 536,
+  "new_sha_closures": 0,
+  "g11_claim": "not-passed",
+  "product_or_consumer_changes": false,
+  "required_css_scss_changes": false,
+  "pushed": false,
+  "actions_started": false,
+  "next_action": "Finish durable checker-bound per-use guards and whole tagged required-getter/public identity, real validator callback-cache, empty subclass and actual multi-provider suites. Include meaningful source/runtime mutations and strict minimum type receipts. Explicitly retain readonly/empty-Set/field-initializer/private-implementation differences; then decide six finite frozen uses and the separate current ValidatorFn supplement. Preserve native node/forms/CVA/metadata inheritance/full components/application/root/AOT/packed/floors/Sass/upstream SHA/G11 obligations separately."
+}
