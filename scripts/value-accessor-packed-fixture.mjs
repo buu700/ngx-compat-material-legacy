@@ -70,7 +70,7 @@ export async function observePackedValueAccessors() {
       interact:()=>check.toggle(),touch:async()=>{await check.focus();await check.blur();},disabled:()=>check.isDisabled()});
     const listNode=node('selection-list',MatLegacySelectionList),list=await loader.getHarness(MatLegacySelectionListHarness.with({selector:'#cva-selection-list'}));
     specs.push({family:'selection-list',owner:MatLegacySelectionList,control:host.selectionList,model:['one'],after:['one'],harness:list,
-      read:async()=>listNode.instance.selectedOptions.selected.map((option:any)=>option.value),retained:()=>listNode.instance.selectedOptions.selected.map((option:any)=>option.value),
+      read:async()=>{const selected=await list.getItems({selected:true});return Promise.all(selected.map(async(option:any)=>(await option.getText()).trim().toLowerCase()));},retained:()=>listNode.instance.selectedOptions.selected.map((option:any)=>option.value),
       interact:()=>list.selectItems({text:'Two'}),touch:async()=>{const options=await list.getItems({text:'Two'});await options[0].focus();await options[0].blur();},disabled:()=>list.isDisabled()});
     const radioNode=node('radio',MatLegacyRadioGroup),radio=await loader.getHarness(MatLegacyRadioGroupHarness.with({selector:'#cva-radio'}));
     specs.push({family:'radio',owner:MatLegacyRadioGroup,control:host.radio,model:'one',after:'one',harness:radio,read:()=>radio.getCheckedValue(),retained:()=>radioNode.instance.value,
