@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "recorded_at_utc": "2026-10-10T06:04:34.075640+00:00",
+  "source_heads": {
+    "main": "137eded1db8d8bf479f6c3287ce5ea62268a4b78",
+    "21.x": "7b93eddbb9e2c013604a63387d7b3a2579403973"
+  },
+  "source_trees": {
+    "main": "5c65630e526e0dac808f1b9a6bc15f84903738ae",
+    "21.x": "ca1f3f9832f81741cb7c155c5d19e84dd708bfb2"
+  },
+  "candidate": {
+    "path": "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
+    "sha256": "948fd1d57f52e617eca301b693261127e42b3e4d23d0db8b2a3e2f012db0a85d"
+  },
+  "problem": "A message change followed by synchronous destruction queues one late describe call after the destruction removal. The whole candidate baseline replay reproduces it with a genuine public zone and an explicit AriaDescriber protocol.",
+  "repair": "Private _ariaDescriptionDestroyed flag set at ngOnDestroy entry. ARIA scheduling rejects destroyed owners and queued completion clears its pending flag before refusing a description. Live coalescing still describes the latest message once.",
+  "runtime": {
+    "path": "compatibility/rc/tooltip-aria-source-diagnostic.json",
+    "sha256": "685c9e0fe3a2256f365a05c7c162c7be8b57aa0ec9d1fd3434685ee6cbea1584"
+  },
+  "baseline": {
+    "path": "compatibility/rc/tooltip-aria-baseline-source-diagnostic.json",
+    "sha256": "1b612b334b6bf8f137979d6968eab62bc4a58d447671bca534719c88aeaf868e"
+  },
+  "bindings": {
+    "path": "compatibility/rc/tooltip-aria-binding-refresh.json",
+    "sha256": "83acf68c7457606c27b3ba64b4e983eba92ae6892897f0ef56061ecef7304a35"
+  },
+  "source_subjects": 10,
+  "mutation_rejections": 52,
+  "new_aria_mutation_rejections": 24,
+  "type_compiler": "5.9.2",
+  "type_scope": "Existing public-render helper fixtures at exact line compiler. Whole tooltip replay excludes Angular decorators and uses ARIA/overlay/DOM/focus/direction protocols; it is not product AOT or a native legacy directive instance.",
+  "constructor_and_public_declarations_unchanged": true,
+  "only_product_file_changed": "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
+  "product_HTML_CSS_SCSS_changes": false,
+  "required_consumer_HTML_CSS_SCSS_changes": false,
+  "consumer_TS_edits_found_necessary": false,
+  "cyph": {
+    "head": "a56a0603636cac5aaabe8fe408f7429b4224f011",
+    "read_only": true,
+    "clean": true,
+    "build_executed": false,
+    "sanity_scope": "Existing tooltip attributes/placement/font/touch uses and project constructor/subclass search. This repair introduces no public signature or resources; no direct MatLegacy construction/subclass use was found in shared/js/cyph. Existing source/style checks remain historical, not a new Cyph build."
+  },
+  "native_producer": {
+    "path": "scripts/browser-overlay-families.mjs",
+    "sha256": "e195fd53cc924764a69a4ae2a7c7f2c82a40411954d7fc1bcb192ed5399ea0f5"
+  },
+  "native_contract": {
+    "path": "scripts/legacy-tooltip-native-contract.mjs",
+    "sha256": "d23ae72ef06ebf23b41689e3bd3e349eca1b1624c4e90d8553c003e6414a2a48"
+  },
+  "native_case": "Actual embedded-view legacy tooltip created through Angular, message requested and view destroyed synchronously before Promise completion, then another request after the first queue drain. Native host aria-describedby must remain absent in both states. Added to existing tooltip cell; no new matrix credit.",
+  "native_execution": false,
+  "packed_or_full_floors_qualified": false,
+  "reviewed_import_bindings_refreshed": 19,
+  "review_documents_refreshed": 12,
+  "fresh_source_checker_calls": 12,
+  "new_frozen_use_closures": 0,
+  "g11_claim": "not-passed",
+  "pushed": false,
+  "actions_started": false,
+  "remaining": "Native producer AOT/browser execution, actual packed legacy components and runtime/consumer floor qualification remain pending. C04 SHA/public-dependency dispositions and C05/independent audit/finalization are still incomplete.",
+  "current_audit_state": {
+    "path": "compatibility/rc/tooltip-aria-current-audit-state.json",
+    "sha256": "c75f1a37405d32620ebf4fab8c1349c8f2136566eca161436d5438e043c2e085"
+  },
+  "current_reviewed_use_evidence": {
+    "reviewed": 1244,
+    "open": 492,
+    "insufficient": 0,
+    "full_admission_exit_code": 1,
+    "G11": "not-passed"
+  },
+  "native_integration_scope": "The added case is in the diagnostic overlay-family CLI producer. The canonical browser matrix uses browser-required-cells.mjs; integration of this lifecycle observation into that canonical fixture/probe remains an implementation obligation. No existing matrix report qualifies this case."
+}
