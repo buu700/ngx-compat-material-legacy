@@ -11,6 +11,11 @@ import {runInNewContext} from 'node:vm';
 import {writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {requiredProbeSource, candidateInstallSpec, candidateQualificationDefects} from '../scripts/browser-required-cells.mjs';
+const checkboxObservation = {actual_checkbox_created: true, initialized: true, unchecked_between_clicks: true, live_checked: true,
+  old_cleanup_elapsed_ms: 1150, newest_cleanup_elapsed_at_sample_ms: 250, survives_old_cleanup: true,
+  latest_cleanup_elapsed_ms: 1100, latest_cleanup: true, animation_name: 'mat-checkbox-unchecked-checked-checkmark-path',
+  animation_duration_ms: 180, trusted_animation_ends: 1, animation_elapsed_seconds: 0.18,
+  pending_class_before_destroy: true, view_destroyed: true, host_removed: true, classes_cleared_on_destroy: true, late_class_writes: 0};
 const raw = requiredProbeSource(), turn = () => new Promise(resolve => setImmediate(resolve));
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 function fixture(family, faults = {}, source = raw) {
@@ -97,6 +102,9 @@ function fixture(family, faults = {}, source = raw) {
     querySelector: () => ({disabled: !faults.noLabelEnabled,value: faults.noLabelWrongValue?'': 'off'}),
     querySelectorAll: () => faults.noLabelElement?[{}]:[]};
   window.__lab = {closeTransient() {},
+    runCheckboxTimerLifetime: () => faults.checkboxReject ? Promise.reject(new Error('fixture failure')) :
+      faults.checkboxPending ? new Promise(() => {}) : Promise.resolve(faults.checkboxMissingResult ? undefined :
+        {...checkboxObservation, ...(faults.checkboxObservation || {})}),
     runFormFieldDirectionLifetime: () => faults.directionReject ? Promise.reject(new Error('fixture failure')) :
       faults.directionPending ? new Promise(() => {}) : Promise.resolve(faults.directionMissingResult ? undefined : {
         actual_field_created: !faults.directionNoField, actual_directionality_created: !faults.directionNoDir,
@@ -104,12 +112,14 @@ function fixture(family, faults = {}, source = raw) {
         queued_updates_before_destroy: faults.directionImmediate ? 1 : 0, view_destroyed: !faults.directionNotDestroyed,
         host_removed: !faults.directionHostRetained, late_updates: faults.directionLate ? 2 : 0}),
     readChipFormState: () => ({focused, touched}), resetChipFormState() {touched = !!faults.touchedBefore;}};
+  if (faults.checkboxMissingApi) delete window.__lab.runCheckboxTimerLifetime;
   if (faults.directionMissingApi) delete window.__lab.runFormFieldDirectionLifetime;
   if (faults.noChipApi) delete window.__lab.readChipFormState;
   const document = {activeElement: null, getElementById: id => id === 'surface' ? surface : null,
     querySelector(selector) {
       if (selector === '#wrap-' + family) return {};
       if (selector === '#wrap-field' && family === 'form-field') return {};
+      if (selector === '#p-checkbox.mat-checkbox') return {};
       if (selector === '#p-field.mat-form-field #p-hint') return {};
       if (selector === '#p-field-disabled') return faults.noLabelMissing?null:noLabel;
       if (selector === '#p-outline') return outline;
@@ -155,7 +165,7 @@ function fixture(family, faults = {}, source = raw) {
 }
 const cases = [];
 async function check(id, family, faults, expected) {
-  const f = fixture(family, faults); f.begin(); await f.advance(1700);
+  const f = fixture(family, faults); f.begin(); await f.advance(family === 'checkbox' ? 4700 : 1700);
   assert.equal(f.status().done, true, id); assert.equal(f.status().ok, expected, id);
   if (family === 'tabs' && expected) assert.deepEqual(f.clicked, [0, 1, 0, 'pointer']);
   if (family === 'form-field' && expected) assert.deepEqual(f.clicked, ['prefix', 'hide', 'show', 'rtl']);
@@ -198,6 +208,28 @@ for (const faults of [{directionReject:true},{directionPending:true},{directionM
     {directionHostRetained:true},{directionLate:true},{directionMissingApi:true}]) {
   await check('direction-lifetime-reject-'+JSON.stringify(faults),'form-field',faults,false);
 }
+await check('checkbox-complete-timer-and-native-animation-observation', 'checkbox', {}, true);
+for (const field of Object.keys(checkboxObservation)) {
+  await check('checkbox-reject-missing-' + field, 'checkbox', {checkboxObservation: {[field]: undefined}}, false);
+}
+for (const faults of [{checkboxReject:true}, {checkboxPending:true}, {checkboxMissingResult:true}, {checkboxMissingApi:true},
+  {checkboxObservation:{old_cleanup_elapsed_ms:999}}, {checkboxObservation:{newest_cleanup_elapsed_at_sample_ms:1000}},
+  {checkboxObservation:{latest_cleanup_elapsed_ms:999}}, {checkboxObservation:{animation_duration_ms:100}},
+  {checkboxObservation:{trusted_animation_ends:0}}, {checkboxObservation:{late_class_writes:1}}]) {
+  await check('checkbox-reject-'+JSON.stringify(faults), 'checkbox', faults, false);
+}
+const bypassCheckbox = raw.replace('finish(legacyCheckboxTimerLifetimeNativeOkay(lifetime),', 'finish(true,');
+assert.notEqual(bypassCheckbox, raw);
+const leakedCheckbox = fixture('checkbox', {checkboxObservation:{late_class_writes:1}}, bypassCheckbox);
+leakedCheckbox.begin(); await leakedCheckbox.advance(4700);
+assert.equal(leakedCheckbox.status().ok, true, 'removing checkbox lifetime gate must expose a late-write false pass');
+const replacedCheckbox = fixture('checkbox', {checkboxPending:true});
+replacedCheckbox.begin(); await replacedCheckbox.advance(0);
+assert.equal(replacedCheckbox.status().done, false);
+replacedCheckbox.window.__status = {done:false, ok:false, evidence:'replacement checkbox cell'};
+await replacedCheckbox.advance(4700);
+assert.equal(replacedCheckbox.status().done, false, 'pending checkbox lifetime cannot complete replacement cell');
+cases.push({id:'checkbox-lifetime-timeout-cannot-complete-replacement-cell',result:'pass'});
 const bypassLifetime = raw.replace('finish(legacyFormFieldDirectionLifetimeNativeOkay(lifetime),', 'finish(true,');
 assert.notEqual(bypassLifetime, raw);
 const lateDirection = fixture('form-field', {directionLate:true}, bypassLifetime);
@@ -238,14 +270,16 @@ for (const zoneless of [false, true]) {
   assert.ok(spec.labSource.includes('readonly chipControl = new FormControl<string | null>(null)'));
   assert.ok(spec.labSource.includes('ReactiveFormsModule,'));
   assert.ok(spec.labSource.includes('runFormFieldDirectionLifetime()'));
+  assert.ok(spec.labSource.includes('runCheckboxTimerLifetime()'));
+  assert.ok(spec.labSource.includes('CaptureCheckboxTimerLifetime,'));
   assert.ok(spec.labSource.includes('afterNextRender(() =>'));
   assert.deepEqual(candidateQualificationDefects(spec), []);
   assert.ok(spec.labSource.includes(JSON.stringify('id="p-tabs"').slice(1, -1)));
   assert.ok(spec.labSource.includes(JSON.stringify('style="font-size:20px"').slice(1, -1)));
   generated.push({zoneless, source_sha256: hash(spec.labSource)});
 }
-const report = {schema_version: 1, cases, mutation_rejections: 4, generated,
+const report = {schema_version: 1, cases, mutation_rejections: 5, generated,
   complete_probe_sha256: hash(raw), native_executed: false, actual_legacy_or_forms_executed: false,
-  scope: 'Complete canonical default tabs/select/chips/form-field browser probe under explicit DOM/style/geometry/control/timer protocols. Shared actual predicates and DOM readers execute; no browser, Angular/forms/legacy instances, packed artifact, AOT or consumer floors are qualified.'};
+  scope: 'Complete canonical default tabs/select/chips/form-field/checkbox browser probe under explicit DOM/style/geometry/control/timer protocols. Shared actual predicates and DOM readers execute; no browser, Angular/forms/legacy instances, packed artifact, AOT or consumer floors are qualified.'};
 if (process.argv[2]) writeFileSync(process.argv[2], JSON.stringify(report, null, 2) + '\n', {flag: 'wx'});
-console.log(JSON.stringify({cases: cases.length, mutation_rejections: 4, native_executed: false}));
+console.log(JSON.stringify({cases: cases.length, mutation_rejections: 5, native_executed: false}));

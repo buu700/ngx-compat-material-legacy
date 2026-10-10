@@ -21,6 +21,6 @@ class CanonicalControlGeometryProbeTests(unittest.TestCase):
         result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=30)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         report = json.loads(result.stdout)
-        self.assertEqual(report['cases'], 66)
-        self.assertEqual(report['mutation_rejections'], 4)
+        self.assertEqual(report['cases'], 96)
+        self.assertEqual(report['mutation_rejections'], 5)
         self.assertFalse(report['native_executed'])
