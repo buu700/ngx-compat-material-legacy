@@ -1,0 +1,533 @@
+{
+  "schema_version": 1,
+  "role": "C04 ten individual production TypeScript documentation reviews",
+  "line": "21.x",
+  "reviewer": "Codex primary implementer",
+  "recorded_at_utc": "2026-10-10T19:09:58.864868+00:00",
+  "source_checkpoint": "2feec878000f423caa081a3b871190f88af63a12",
+  "scope_sha_ids": [
+    "0782913bbfd5055d3534bfec70fd7171109297ae",
+    "27503ed285f3ba964cc861443a7bc1ab7b2cf19a",
+    "39b15dcc527f054733eaaa5916d51a77bb53fb61",
+    "a0fc66f6d2a379d42ea05d0673fa77488b2b0fe3",
+    "25cbbd1f8a0f09dc1338c964fdaf51ce0eb4ea6c",
+    "e85c8656bfd787d85bf2600f6da890eab36f9608",
+    "ede6331377b053edd3ecd53da5e4cce79bb3ba63",
+    "963a299e9d8c0a783314c81eeaa6b2396aa7044f",
+    "0c0b033fb256e26c409899ce7b4325f162a6ed2d",
+    "b83c6c1effc53f97a981cc95c7b4e53174290d45"
+  ],
+  "subjects_sha256": "20655d9c0cc92fc222e6d167682a795e788bf3da836f0bafc2302def995bc853",
+  "compiler_observation": "5.9.3",
+  "context_members": [
+    {
+      "path": "projects/ngx-material-legacy/package.json",
+      "sha256": "757aa562a156f04ff55ef86bc2d886049a1fc78da2ead2c0f82112ca58d9c43d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-dialog/dialog-config.ts",
+      "sha256": "73a0631f279f6770d7f033b021ae1864cbe830c6bea8bfc45a7810cd4417daff"
+    }
+  ],
+  "method": "Read all complete original hunks and authenticated raw commit/before/after Git blobs. Independently reason about each documentation change. Compare every noncomment syntax/type token, all JSDoc tags and compiler/bundler/test annotations in all32 whole programs. No installed-runtime or broad docs-label inference.",
+  "reviews": [
+    {
+      "sha": "0782913bbfd5055d3534bfec70fd7171109297ae",
+      "subject": "docs(material/list): fix grammar in MAT_LIST_CONFIG token description (#28284)",
+      "diff": "diff --git a/src/material/list/tokens.ts b/src/material/list/tokens.ts\nindex 9f0ccb30f..6fa5ace51 100644\n--- a/src/material/list/tokens.ts\n+++ b/src/material/list/tokens.ts\n@@ -14,5 +14,5 @@ export interface MatListConfig {\n   hideSingleSelectionIndicator?: boolean;\n }\n \n-/** Injection token that can be used to provide the default options the list module. */\n+/** Injection token that can be used to provide the default options for the list module. */\n export const MAT_LIST_CONFIG = new InjectionToken<MatListConfig>('MAT_LIST_CONFIG');\n",
+      "diff_sha256": "fb1faf7fe4e6c150e4f6bba6fc5a3fa1ef3ddfdd4d3385f9a678c2530cc9da55",
+      "members": [
+        {
+          "path": "src/material/list/tokens.ts",
+          "before_sha256": "d40c7ef04030f97c84b273914710c698c2fb3ef725fc6e19c4cd2b2ed292ea7e",
+          "after_sha256": "2f4b7b14eed7c3f38c9818a95044acc00dd8b0eaaa4592c8167068ad1e2064a1",
+          "program_tokens_sha256": "a1bfb9e0f79f4d36e5d7a5f29752fa4fae6c3e580901241612f1646a684145fc",
+          "tokens": 31,
+          "jsdoc_tags_sha256": "725d75d63805cae2b3efd2c9290be44d20d1618997d1669014ba452a75119b87",
+          "jsdoc_tags": 1,
+          "annotation_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "annotations": 0
+        }
+      ],
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "decision": "Only the MAT_LIST_CONFIG description adds the missing word “for”. The complete token declaration, import, options interface and all executable/type syntax are unchanged. This is documentation grammar, not a token-identity or default-options fix to adopt."
+    },
+    {
+      "sha": "27503ed285f3ba964cc861443a7bc1ab7b2cf19a",
+      "subject": "docs(multiple): Update color input comments to standarize across the components (#29254)",
+      "diff": "diff --git a/src/material/button/button-base.ts b/src/material/button/button-base.ts\nindex 56525b85f..59b81efb4 100644\n--- a/src/material/button/button-base.ts\n+++ b/src/material/button/button-base.ts\n@@ -108,11 +108,11 @@ export class MatButtonBase implements AfterViewInit, OnDestroy {\n   }\n \n   /**\n-   * Theme color palette of the button. This API is supported in M2 themes\n-   * only, it has no effect in M3 themes.\n+   * Theme color of the button. This API is supported in M2 themes only, it has\n+   * no effect in M3 themes.\n    *\n    * For information on applying color variants in M3, see\n-   * https://material.angular.io/guide/theming#using-component-color-variants\n+   * https://material.angular.io/guide/theming#using-component-color-variants.\n    */\n   @Input() color?: string | null;\n \ndiff --git a/src/material/checkbox/checkbox.ts b/src/material/checkbox/checkbox.ts\nindex 92f424d32..58a588772 100644\n--- a/src/material/checkbox/checkbox.ts\n+++ b/src/material/checkbox/checkbox.ts\n@@ -203,9 +203,11 @@ export class MatCheckbox\n   // TODO(crisbeto): this should be a ThemePalette, but some internal apps were abusing\n   // the lack of type checking previously and assigning random strings.\n   /**\n-   * Palette color of the checkbox. This API is supported in M2 themes only, it has no effect in M3\n-   * themes. For information on applying color variants in M3, see\n-   * https://material.angular.io/guide/theming#using-component-color-variants\n+   * Theme color of the checkbox. This API is supported in M2 themes only, it\n+   * has no effect in M3 themes.\n+   *\n+   * For information on applying color variants in M3, see\n+   * https://material.angular.io/guide/theming#using-component-color-variants.\n    */\n   @Input() color: string | undefined;\n \ndiff --git a/src/material/chips/chip.ts b/src/material/chips/chip.ts\nindex 57f6a1899..21b7308b3 100644\n--- a/src/material/chips/chip.ts\n+++ b/src/material/chips/chip.ts\n@@ -173,9 +173,11 @@ export class MatChip implements OnInit, AfterViewInit, AfterContentInit, DoCheck\n \n   // TODO: should be typed as `ThemePalette` but internal apps pass in arbitrary strings.\n   /**\n-   * Theme color palette of the chip. This API is supported in M2 themes only, it has no effect in\n-   * M3 themes. For information on applying color variants in M3, see\n-   * https://material.angular.io/guide/theming#using-component-color-variants\n+   * Theme color of the chip. This API is supported in M2 themes only, it has no\n+   * effect in M3 themes.\n+   *\n+   * For information on applying color variants in M3, see\n+   * https://material.angular.io/guide/theming#using-component-color-variants.\n    */\n   @Input() color?: string | null;\n \ndiff --git a/src/material/datepicker/datepicker-base.ts b/src/material/datepicker/datepicker-base.ts\nindex 57ff4dfdc..65d488d5f 100644\n--- a/src/material/datepicker/datepicker-base.ts\n+++ b/src/material/datepicker/datepicker-base.ts\n@@ -145,7 +145,13 @@ export class MatDatepickerContent<S, D = ExtractDateTypeFromSelection<S>>\n   /** Reference to the internal calendar component. */\n   @ViewChild(MatCalendar) _calendar: MatCalendar<D>;\n \n-  /** Palette color of the internal calendar. */\n+  /**\n+   * Theme color of the internal calendar. This API is supported in M2 themes\n+   * only, it has no effect in M3 themes.\n+   *\n+   * For information on applying color variants in M3, see\n+   * https://material.angular.io/guide/theming#using-component-color-variants.\n+   */\n   @Input() color: ThemePalette;\n \n   /** Reference to the datepicker that created the overlay. */\ndiff --git a/src/material/form-field/form-field.ts b/src/material/form-field/form-field.ts\nindex c0c3b8947..2706d2260 100644\n--- a/src/material/form-field/form-field.ts\n+++ b/src/material/form-field/form-field.ts\n@@ -213,9 +213,11 @@ export class MatFormField\n   private _hideRequiredMarker = false;\n \n   /**\n-   * The color palette for the form field. This API is supported in M2 themes only, it has no\n-   * effect in M3 themes. For information on applying color variants in M3, see\n-   * https://material.angular.io/guide/theming#using-component-color-variants\n+   * Theme color of the form field. This API is supported in M2 themes only, it\n+   * has no effect in M3 themes.\n+   *\n+   * For information on applying color variants in M3, see\n+   * https://material.angular.io/guide/theming#using-component-color-variants.\n    */\n   @Input() color: ThemePalette = 'primary';\n \ndiff --git a/src/material/list/selection-list.ts b/src/material/list/selection-list.ts\nindex 49a884bf7..7a0e96772 100644\n--- a/src/material/list/selection-list.ts\n+++ b/src/material/list/selection-list.ts\n@@ -93,7 +93,14 @@ export class MatSelectionList\n   @Output() readonly selectionChange: EventEmitter<MatSelectionListChange> =\n     new EventEmitter<MatSelectionListChange>();\n \n-  /** Theme color of the selection list. This sets the checkbox color for all list options. */\n+  /**\n+   * Theme color of the selection list. This sets the checkbox color for all\n+   * list options. This API is supported in M2 themes only, it has no effect in\n+   * M3 themes.\n+   *\n+   * For information on applying color variants in M3, see\n+   * https://material.angular.io/guide/theming#using-component-color-variants.\n+   */\n   @Input() color: ThemePalette = 'accent';\n \n   /**\ndiff --git a/src/material/paginator/paginator.ts b/src/material/paginator/paginator.ts\nindex cf3d178dc..0e589fdb4 100644\n--- a/src/material/paginator/paginator.ts\n+++ b/src/material/paginator/paginator.ts\n@@ -122,7 +122,13 @@ export class MatPaginator implements OnInit, OnDestroy {\n   private _isInitialized = false;\n   private _initializedStream = new ReplaySubject<void>(1);\n \n-  /** Theme color to be used for the underlying form controls. */\n+  /**\n+   * Theme color of the underlying form controls. This API is supported in M2\n+   * themes only,it has no effect in M3 themes.\n+   *\n+   * For information on applying color variants in M3, see\n+   * https://material.angular.io/guide/theming#using-component-color-variants.\n+   */\n   @Input() color: ThemePalette;\n \n   /** The zero-based page index of the displayed list of items. Defaulted to 0. */\ndiff --git a/src/material/radio/radio.ts b/src/material/radio/radio.ts\nindex a620689f1..e163988bf 100644\n--- a/src/material/radio/radio.ts\n+++ b/src/material/radio/radio.ts\n@@ -152,7 +152,13 @@ export class MatRadioGroup implements AfterContentInit, OnDestroy, ControlValueA\n   @ContentChildren(forwardRef(() => MatRadioButton), {descendants: true})\n   _radios: QueryList<MatRadioButton>;\n \n-  /** Theme color for all of the radio buttons in the group. */\n+  /**\n+   * Theme color of the radio buttons in the group. This API is supported in M2\n+   * themes only, it has no effect in M3 themes.\n+   *\n+   * For information on applying color variants in M3, see\n+   * https://material.angular.io/guide/theming#using-component-color-variants.\n+   */\n   @Input() color: ThemePalette;\n \n   /** Name of the radio button group. All radio buttons inside this group will use this name. */\ndiff --git a/src/material/slide-toggle/slide-toggle.ts b/src/material/slide-toggle/slide-toggle.ts\nindex 9147078e6..2e4501a8b 100644\n--- a/src/material/slide-toggle/slide-toggle.ts\n+++ b/src/material/slide-toggle/slide-toggle.ts\n@@ -155,7 +155,13 @@ export class MatSlideToggle\n \n   // TODO(crisbeto): this should be a ThemePalette, but some internal apps were abusing\n   // the lack of type checking previously and assigning random strings.\n-  /** Palette color of slide toggle. */\n+  /**\n+   * Theme color of the slide toggle. This API is supported in M2 themes only,\n+   * it has no effect in M3 themes.\n+   *\n+   * For information on applying color variants in M3, see\n+   * https://material.angular.io/guide/theming#using-component-color-variants.\n+   */\n   @Input() color: string | undefined;\n \n   /** Whether the slide toggle is disabled. */\ndiff --git a/src/material/stepper/step-header.ts b/src/material/stepper/step-header.ts\nindex 3688c066a..37535f17c 100644\n--- a/src/material/stepper/step-header.ts\n+++ b/src/material/stepper/step-header.ts\n@@ -71,7 +71,13 @@ export class MatStepHeader extends CdkStepHeader implements AfterViewInit, OnDes\n   /** Whether the ripple should be disabled. */\n   @Input() disableRipple: boolean;\n \n-  /** Theme palette color of the step header. */\n+  /**\n+   * Theme color of the step header. This API is supported in M2 themes only, it\n+   * has no effect in M3 themes.\n+   *\n+   * For information on applying color variants in M3, see\n+   * https://material.angular.io/guide/theming#using-component-color-variants.\n+   */\n   @Input() color: ThemePalette;\n \n   constructor(\ndiff --git a/src/material/stepper/stepper.ts b/src/material/stepper/stepper.ts\nindex 050f03522..dc22c14af 100644\n--- a/src/material/stepper/stepper.ts\n+++ b/src/material/stepper/stepper.ts\n@@ -79,7 +79,13 @@ export class MatStep extends CdkStep implements ErrorStateMatcher, AfterContentI\n   // We need an initializer here to avoid a TS error.\n   @ContentChild(MatStepLabel) override stepLabel: MatStepLabel = undefined!;\n \n-  /** Theme color for the particular step. */\n+  /**\n+   * Theme color for the particular step. This API is supported in M2 themes\n+   * only, it has no effect in M3 themes.\n+   *\n+   * For information on applying color variants in M3, see\n+   * https://material.angular.io/guide/theming#using-component-color-variants.\n+   */\n   @Input() color: ThemePalette;\n \n   /** Content that will be rendered lazily. */\n@@ -180,7 +186,13 @@ export class MatStepper extends CdkStepper implements AfterContentInit {\n   /** Whether ripples should be disabled for the step headers. */\n   @Input() disableRipple: boolean;\n \n-  /** Theme color for all of the steps in stepper. */\n+  /**\n+   * Theme color for all of the steps in stepper. This API is supported in M2\n+   * themes only, it has no effect in M3 themes.\n+   *\n+   * For information on applying color variants in M3, see\n+   * https://material.angular.io/guide/theming#using-component-color-variants.\n+   */\n   @Input() color: ThemePalette;\n \n   /**\ndiff --git a/src/material/tabs/tab-nav-bar/tab-nav-bar.ts b/src/material/tabs/tab-nav-bar/tab-nav-bar.ts\nindex 90adb2289..614b41a66 100644\n--- a/src/material/tabs/tab-nav-bar/tab-nav-bar.ts\n+++ b/src/material/tabs/tab-nav-bar/tab-nav-bar.ts\n@@ -135,7 +135,13 @@ export class MatTabNav\n   @Input({transform: booleanAttribute})\n   disableRipple: boolean = false;\n \n-  /** Theme color of the nav bar. */\n+  /**\n+   * Theme color of the nav bar. This API is supported in M2 themes only, it has\n+   * no effect in M3 themes.\n+   *\n+   * For information on applying color variants in M3, see\n+   * https://material.angular.io/guide/theming#using-component-color-variants.\n+   */\n   @Input() color: ThemePalette = 'primary';\n \n   /**\ndiff --git a/src/material/toolbar/toolbar.ts b/src/material/toolbar/toolbar.ts\nindex 69ab0b6ab..4eedd4bc7 100644\n--- a/src/material/toolbar/toolbar.ts\n+++ b/src/material/toolbar/toolbar.ts\n@@ -46,7 +46,13 @@ export class MatToolbarRow {}\n })\n export class MatToolbar implements AfterViewInit {\n   // TODO: should be typed as `ThemePalette` but internal apps pass in arbitrary strings.\n-  /** Palette color of the toolbar. */\n+  /**\n+   * Theme color of the toolbar. This API is supported in M2 themes only, it has\n+   * no effect in M3 themes.\n+   *\n+   * For information on applying color variants in M3, see\n+   * https://material.angular.io/guide/theming#using-component-color-variants.\n+   */\n   @Input() color?: string | null;\n \n   private _document: Document;\n",
+      "diff_sha256": "062d812e324679493236c1834100560491a0d87aa3be55d2633b2bd42aee377e",
+      "members": [
+        {
+          "path": "src/material/button/button-base.ts",
+          "before_sha256": "e293488b5c1875a7c65c166305f839c81c786ed528d70c47faf2091c56dcf0bf",
+          "after_sha256": "7df6951d7c3c3b4e95065497bf25492f740d53a566de32fad20e516de09fc72c",
+          "program_tokens_sha256": "8339e2f661d7bf963d0cec1a63c17aa40681d42092852b28d4901560dd805be4",
+          "tokens": 1016,
+          "jsdoc_tags_sha256": "efa8b2224909b03f35284d1679281cd06fdbc20d46f41f31d231c9c430aa8d37",
+          "jsdoc_tags": 3,
+          "annotation_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "annotations": 0
+        },
+        {
+          "path": "src/material/checkbox/checkbox.ts",
+          "before_sha256": "f7b835ce8c6438b5df635c9d877f1b9f6825615493835235c5f9286fd0bcb04d",
+          "after_sha256": "0ae8d9f2145c8689a2f7343ff2617392b59c0f44573ebab0e27296eb2373c4a0",
+          "program_tokens_sha256": "8f1c6437655118e7f1ec23de84cf1d0e8da3ee2a1b5d3108b447d6c0f56cf3a4",
+          "tokens": 1874,
+          "jsdoc_tags_sha256": "38a4947ba0486d288c1ad11e19c60375b90709f52f3f298d882cac7f822a7a5f",
+          "jsdoc_tags": 18,
+          "annotation_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "annotations": 0
+        },
+        {
+          "path": "src/material/chips/chip.ts",
+          "before_sha256": "c24e8dd882d9502c92e84e848331e348b279f03d24fb6d34e835ce8c04481c58",
+          "after_sha256": "d0dca7417e92e5f5a08dc2e1689bea0d1d27336e2b836b89b11865488acb2962",
+          "program_tokens_sha256": "46e658bf4ab8241ecfd44dd7bf6a49730f6c04ef8a155d99a3eae9d8d081561d",
+          "tokens": 1584,
+          "jsdoc_tags_sha256": "efa8b2224909b03f35284d1679281cd06fdbc20d46f41f31d231c9c430aa8d37",
+          "jsdoc_tags": 3,
+          "annotation_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "annotations": 0
+        },
+        {
+          "path": "src/material/datepicker/datepicker-base.ts",
+          "before_sha256": "575301d789a03f0c0b0386a1a3d1974be5c8131b39c184ba14be973557001604",
+          "after_sha256": "0b3c58e88db10ec3f9bb05ce6dd66da9fad4aeff5e7a50634d96c8809a47d5cb",
+          "program_tokens_sha256": "01d5ae4134d2cfb3c99b79ae14f2f21bd350496e9ebbf51b6ec73ea6ae3b0101",
+          "tokens": 3410,
+          "jsdoc_tags_sha256": "c53cd0454a33c5dbfdcb4cf26df98cb0a191ff47e48e907f1343ef7c8cd8c04a",
+          "jsdoc_tags": 20,
+          "annotation_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "annotations": 0
+        },
+        {
+          "path": "src/material/form-field/form-field.ts",
+          "before_sha256": "788afb9989b0a8e416ab63b43f2bb2acef8959ae50bdf7f32d1e9887cdddc596",
+          "after_sha256": "0aa7fabb03a0d9ab1aff65686c7434c6fbadc1afd2c1c4d9a7deca7b7efc6842",
+          "program_tokens_sha256": "91f865f1e069f1b8255b95bd2944dec52f74dd52dfe13429f686971220085c6a",
+          "tokens": 2730,
+          "jsdoc_tags_sha256": "717a8fd9e027f092910bfdee70eef65b30f13b0017300e14980b50dbee0fdfd1",
+          "jsdoc_tags": 6,
+          "annotation_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "annotations": 0
+        },
+        {
+          "path": "src/material/list/selection-list.ts",
+          "before_sha256": "119f9a05b97206405c124152f228f7ce7ad21950ba95f5a5a4645a4e2853544d",
+          "after_sha256": "bddaa6daa17d29dc1d9c1850edd5528a5559b5ac166ee39e088dd73e02880e76",
+          "program_tokens_sha256": "b257f17d7e518e5c0d992a2b4acaaefd486ea198eed65afacfd04fd067be673d",
+          "tokens": 1963,
+          "jsdoc_tags_sha256": "8ac048ea8d955782de1b271fb85314cb87836fb97e727c13b19f9e9032f37497",
+          "jsdoc_tags": 3,
+          "annotation_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "annotations": 0
+        },
+        {
+          "path": "src/material/paginator/paginator.ts",
+          "before_sha256": "6a0ff71c39c09fc2b5e7b7551babd10d0dabd6d25ce1569fcecf41b15060e266",
+          "after_sha256": "9b56235bd9c5c640b0b041482392d4fbf6b2d5d579bddcc625a566a62b27403c",
+          "program_tokens_sha256": "02bdf7c2b20d8df0989d71c87debb92a2957daf1a29828c6c586444c37af138e",
+          "tokens": 1342,
+          "jsdoc_tags_sha256": "bb65c42944058e05afcd0f843a0464d4bc2ab1c5ec9dbb691941a468abd36ee6",
+          "jsdoc_tags": 3,
+          "annotation_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "annotations": 0
+        },
+        {
+          "path": "src/material/radio/radio.ts",
+          "before_sha256": "2f6193660bf0878f3d2a5cd851822995f61627dfe4f33d181b55c8a7b951c81e",
+          "after_sha256": "3d85b8ba20322e2621160db1f95430326148c6cdee63c03d01ae4188f67fb481",
+          "program_tokens_sha256": "babda0f73d0ead096fe8309cd097ef1bca2a4d4c0fef2f523915b528bafd991b",
+          "tokens": 2638,
+          "jsdoc_tags_sha256": "08375b3306fe36245f304754b0a1e85e9682a674e1f0a2f06b699b8703530ecc",
+          "jsdoc_tags": 17,
+          "annotation_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "annotations": 0
+        },
+        {
+          "path": "src/material/slide-toggle/slide-toggle.ts",
+          "before_sha256": "54f66808c632f790935caffbb1c578f03a9185188bd721dac34cc973bff29f03",
+          "after_sha256": "e9cbd101e92f4d359d0ac5350736dd58a7e5e1969b618d96745b490b8e8ba9a6",
+          "program_tokens_sha256": "7707dd8eddf97faa9c5816a01365d2d04d60698ca675e1b036b12b3fceddf5c3",
+          "tokens": 1175,
+          "jsdoc_tags_sha256": "59901d902bdd3ef8b137e9b8c0918ac4914d99460f8fe96aafb1e44a3e4fbee0",
+          "jsdoc_tags": 9,
+          "annotation_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "annotations": 0
+        },
+        {
+          "path": "src/material/stepper/step-header.ts",
+          "before_sha256": "150ef39ff95a9bef7b29c0f4770f72d8bf57a4271de95f6af61e2b4395e1fe64",
+          "after_sha256": "19a2b9b9b817268e9f76f757a06a4dc5f6b72a6c3a6472b848f871a964d484a9",
+          "program_tokens_sha256": "8ba8cf140dc5f3d100e39279e6cec574a35ea9406d42a68b34853229135d5068",
+          "tokens": 544,
+          "jsdoc_tags_sha256": "725d75d63805cae2b3efd2c9290be44d20d1618997d1669014ba452a75119b87",
+          "jsdoc_tags": 1,
+          "annotation_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "annotations": 0
+        },
+        {
+          "path": "src/material/stepper/stepper.ts",
+          "before_sha256": "a80917852b54dd575b60143c141b6972b2600fe498922804dfa28d8c1cd74dc6",
+          "after_sha256": "424617dca07ca4ee37c0d2c904311d1407056bb30d15b4ba22767d44688629d3",
+          "program_tokens_sha256": "9ddc550d1ee2c44d2c1cf62d028b8e16bc4a42a418c4c7e313a89ffca89253ca",
+          "tokens": 1154,
+          "jsdoc_tags_sha256": "725d75d63805cae2b3efd2c9290be44d20d1618997d1669014ba452a75119b87",
+          "jsdoc_tags": 1,
+          "annotation_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "annotations": 0
+        },
+        {
+          "path": "src/material/tabs/tab-nav-bar/tab-nav-bar.ts",
+          "before_sha256": "cce8e24d9b0ab1a6d146d83bba0a8f4de70f2d41e9e2f87c67fabd002fb04ca7",
+          "after_sha256": "bafc46e54e75ea50beb4ec024bb6f55a462720a810446cd6196294340586414a",
+          "program_tokens_sha256": "3fbccd732059e2ce93d6e9f0a18e3b3bc7fa141e57ce62c0686176d3bb56a63b",
+          "tokens": 1839,
+          "jsdoc_tags_sha256": "3af77c00eb10b9b42ed731756b0c981a6a02be86f7da620fc4a59ac87c95b516",
+          "jsdoc_tags": 5,
+          "annotation_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "annotations": 0
+        },
+        {
+          "path": "src/material/toolbar/toolbar.ts",
+          "before_sha256": "11705183a5ba28cbc0d035d89f9733f93f86983cdc426605b36c8f4bca96c071",
+          "after_sha256": "3467c065572f9fcc8d00eae1f813ba9303af882edd96839c534a7eac7b0e6f9a",
+          "program_tokens_sha256": "afba5ba083bcdaeaf0dfcecd35f258405f832815fa228dd3a2442d337f32916a",
+          "tokens": 379,
+          "jsdoc_tags_sha256": "a6539fe59129bf9e2c13681969757b32c54c1a54d4359ef31f2be47e1f7270b7",
+          "jsdoc_tags": 2,
+          "annotation_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "annotations": 0
+        }
+      ],
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "decision": "All thirteen modern component files change color-input prose or its M3 guide link; their complete code, signatures and policy tags are unchanged. These descriptions do not authorize narrowing the owned historical color/M2 palette contract or requiring consumer Sass/CSS changes. Native M3 theming of legacy controls remains outside the first-stable requirement."
+    },
+    {
+      "sha": "39b15dcc527f054733eaaa5916d51a77bb53fb61",
+      "subject": "docs(material/datepicker): Added context to docs for date picker null value #29385 (#29387)",
+      "diff": "diff --git a/src/material/datepicker/datepicker-input-base.ts b/src/material/datepicker/datepicker-input-base.ts\nindex 611d39a2e..f0980c5a6 100644\n--- a/src/material/datepicker/datepicker-input-base.ts\n+++ b/src/material/datepicker/datepicker-input-base.ts\n@@ -56,7 +56,11 @@ export class MatDatepickerInputEvent<D, S = unknown> {\n   }\n }\n \n-/** Function that can be used to filter out dates from a calendar. */\n+/**\n+ * Function that can be used to filter out dates from a calendar.\n+ * Datepicker can sometimes receive a null value as input for the date argument.\n+ * This doesn't represent a \"null date\" but rather signifies that no date has been selected yet in the calendar.\n+ */\n export type DateFilterFn<D> = (date: D | null) => boolean;\n \n /**\n",
+      "diff_sha256": "56bd388badd5a036b30fa7ee74ab74d52fc552904fdd632867fd910b8560930b",
+      "members": [
+        {
+          "path": "src/material/datepicker/datepicker-input-base.ts",
+          "before_sha256": "eb64bfa00431fa05c31612d862ff21e03a0b1e7b6fd6b6548a438867bda87724",
+          "after_sha256": "c8797760a4a1d132863096da1b9568271e176b2e5cab8a53c6e7128542b17455",
+          "program_tokens_sha256": "f13f1dc25687d06286102dc720b78293ad710f895ae78ccace5f33eb30fcb441",
+          "tokens": 1973,
+          "jsdoc_tags_sha256": "50cf9b2af44a696900f8b90352f9bae1acd166c9a89e9135ff7722c46c37d656",
+          "jsdoc_tags": 3,
+          "annotation_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "annotations": 0
+        }
+      ],
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "decision": "The date-filter documentation explains an already nullable date argument and the absence of selection. The complete DateFilterFn type and implementation-bearing file are unchanged. No new null-handling behavior or consumer TypeScript fix follows from this documentation patch; actual datepicker runtime qualification remains separate."
+    },
+    {
+      "sha": "a0fc66f6d2a379d42ea05d0673fa77488b2b0fe3",
+      "subject": "docs(material/icon): #29838 update broken link in icon documentation (#29849)",
+      "diff": "diff --git a/src/material/icon/icon.ts b/src/material/icon/icon.ts\nindex e6439a026..4156b47f8 100644\n--- a/src/material/icon/icon.ts\n+++ b/src/material/icon/icon.ts\n@@ -127,7 +127,7 @@ const funcIriPattern = /^url\\(['\"]?#(.*?)['\"]?\\)$/;\n  * - Specify a font glyph to be included via CSS rules by setting the fontSet input to specify the\n  *   font, and the fontIcon input to specify the icon. Typically the fontIcon will specify a\n  *   CSS class which causes the glyph to be displayed via a :before selector, as in\n- *   https://fortawesome.github.io/Font-Awesome/examples/\n+ *   https://fontawesome-v4.github.io/examples/\n  *   Example:\n  *     `<mat-icon fontSet=\"fa\" fontIcon=\"alarm\"></mat-icon>`\n  */\n",
+      "diff_sha256": "61f715050511f62f32777685dafe2c16b53b3c4ae4a090972caf22f22dcf2890",
+      "members": [
+        {
+          "path": "src/material/icon/icon.ts",
+          "before_sha256": "e7d6c05ba97de3daa1031c97ce8e841362a68e58b6613e464244b5e1c9684513",
+          "after_sha256": "384f2155a7ff9875daa000ba085237b74f8e9602757e1b595f4df031d15d3744",
+          "program_tokens_sha256": "c099f62af8d046355cd7e54e0b9d80075cc85a77189fe13251a6061654ebb32e",
+          "tokens": 1718,
+          "jsdoc_tags_sha256": "74d723e22728cca708f9eefcfcfecb4d09d631a759318ce76e91bf00214175d0",
+          "jsdoc_tags": 6,
+          "annotation_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "annotations": 0
+        }
+      ],
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "decision": "Only the Font Awesome v4 example URL in icon documentation changes. Complete icon imports, declarations, selectors, host metadata and method bodies are identical. No font, icon class or resource changes are required for the legacy add-on; target-site availability is not qualified by this review."
+    },
+    {
+      "sha": "25cbbd1f8a0f09dc1338c964fdaf51ce0eb4ea6c",
+      "subject": "docs: fix whether typos",
+      "diff": "diff --git a/src/material/autocomplete/autocomplete.ts b/src/material/autocomplete/autocomplete.ts\nindex d9a1af933..390183a1f 100644\n--- a/src/material/autocomplete/autocomplete.ts\n+++ b/src/material/autocomplete/autocomplete.ts\n@@ -74,7 +74,7 @@ export interface MatAutocompleteDefaultOptions {\n   /** Class or list of classes to be applied to the autocomplete's overlay panel. */\n   overlayPanelClass?: string | string[];\n \n-  /** Wheter icon indicators should be hidden for single-selection. */\n+  /** Whether icon indicators should be hidden for single-selection. */\n   hideSingleSelectionIndicator?: boolean;\n }\n \ndiff --git a/src/material/chips/tokens.ts b/src/material/chips/tokens.ts\nindex 197c3fa4d..9e70ec83f 100644\n--- a/src/material/chips/tokens.ts\n+++ b/src/material/chips/tokens.ts\n@@ -14,7 +14,7 @@ export interface MatChipsDefaultOptions {\n   /** The list of key codes that will trigger a chipEnd event. */\n   separatorKeyCodes: readonly number[] | ReadonlySet<number>;\n \n-  /** Wheter icon indicators should be hidden for single-selection. */\n+  /** Whether icon indicators should be hidden for single-selection. */\n   hideSingleSelectionIndicator?: boolean;\n }\n \ndiff --git a/src/material/list/tokens.ts b/src/material/list/tokens.ts\nindex 9389fa311..d882ceed9 100644\n--- a/src/material/list/tokens.ts\n+++ b/src/material/list/tokens.ts\n@@ -10,7 +10,7 @@ import {InjectionToken} from '@angular/core';\n \n /** Object that can be used to configure the default options for the list module. */\n export interface MatListConfig {\n-  /** Wheter icon indicators should be hidden for single-selection. */\n+  /** Whether icon indicators should be hidden for single-selection. */\n   hideSingleSelectionIndicator?: boolean;\n }\n \ndiff --git a/src/material/select/select.ts b/src/material/select/select.ts\nindex 3c5937e6d..e99ce6b7d 100644\n--- a/src/material/select/select.ts\n+++ b/src/material/select/select.ts\n@@ -127,7 +127,7 @@ export interface MatSelectConfig {\n   /** Class or list of classes to be applied to the menu's overlay panel. */\n   overlayPanelClass?: string | string[];\n \n-  /** Wheter icon indicators should be hidden for single-selection. */\n+  /** Whether icon indicators should be hidden for single-selection. */\n   hideSingleSelectionIndicator?: boolean;\n \n   /**\n",
+      "diff_sha256": "3ddca8c124b7eebc6e8bc33d19f321974ff24388264b96a34e78059713bde889",
+      "members": [
+        {
+          "path": "src/material/autocomplete/autocomplete.ts",
+          "before_sha256": "0976e2e03a5818379c2bbe141ab3d1172d21ede32c2c6d8785c4d43ef8bf5a2a",
+          "after_sha256": "339c9419d3584b36a78bdfc2e33fa40dd840eb6d8490f5821dfa68c88e715855",
+          "program_tokens_sha256": "418930409a7116d43c3952f91b4f4ea16820d269ef89684f0cf32d006670eddd",
+          "tokens": 1156,
+          "jsdoc_tags_sha256": "44bb035dac066d82840103ef4f59499e825c90e77211b6e9244e4ff5ca9947af",
+          "jsdoc_tags": 9,
+          "annotation_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "annotations": 0
+        },
+        {
+          "path": "src/material/chips/tokens.ts",
+          "before_sha256": "1d19e3e52074ee3339eaf0f75d45d2c6d5611d811f060442337a7b808c7073d1",
+          "after_sha256": "9364025b0ac24c6dbce8b33567bef23da36b420c93aa5c76d71d9d4a37cd25f4",
+          "program_tokens_sha256": "540dbfc5ba7f2556b8aa561874cb4785724f2a1ca2c258bdcc5462a2ff7c1aa2",
+          "tokens": 114,
+          "jsdoc_tags_sha256": "738b98e988dd3826ce677d41cb8c925b99bf4528d7aed9e79d07874c068422dd",
+          "jsdoc_tags": 1,
+          "annotation_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "annotations": 0
+        },
+        {
+          "path": "src/material/list/tokens.ts",
+          "before_sha256": "ccdb5fe0d7b5ef91664a8601fa87c5c70bb9b39594c663a58efeb4d4536837fa",
+          "after_sha256": "d123af1af3fe06fcc0531e31701cc41c5aecd44bb99506458adeb17c325577af",
+          "program_tokens_sha256": "a1bfb9e0f79f4d36e5d7a5f29752fa4fae6c3e580901241612f1646a684145fc",
+          "tokens": 31,
+          "jsdoc_tags_sha256": "738b98e988dd3826ce677d41cb8c925b99bf4528d7aed9e79d07874c068422dd",
+          "jsdoc_tags": 1,
+          "annotation_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "annotations": 0
+        },
+        {
+          "path": "src/material/select/select.ts",
+          "before_sha256": "98602c4e75d8b623ceb4ed8267091733d67474707b3553948af3f79843e6d49a",
+          "after_sha256": "5136e7607b9710d3464a110b3978e26325dee5128fb346d4a32bcb0007147ae3",
+          "program_tokens_sha256": "339fb5d96151a4b16377b2521cdbf89a7906991523107c0fcd8917c655a5a83b",
+          "tokens": 5686,
+          "jsdoc_tags_sha256": "424dc922161bbc254f5ba8213493a30857364b6724c0d9741a3d7ec34604b4d2",
+          "jsdoc_tags": 26,
+          "annotation_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "annotations": 0
+        }
+      ],
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "decision": "Four component comments correct “Wheter” to “Whether”. The hideSingleSelectionIndicator declarations and all complete option/select/list/selectable-list code remain identical. This neither adds the modern input to the owned frozen API nor changes selection, icon visibility or styling."
+    },
+    {
+      "sha": "e85c8656bfd787d85bf2600f6da890eab36f9608",
+      "subject": "docs(material/dialog): remove default value from doc string (#31025)",
+      "diff": "diff --git a/src/cdk/dialog/dialog-config.ts b/src/cdk/dialog/dialog-config.ts\nindex 888b5efc3..e61ed8e56 100644\n--- a/src/cdk/dialog/dialog-config.ts\n+++ b/src/cdk/dialog/dialog-config.ts\n@@ -74,7 +74,7 @@ export class DialogConfig<D = unknown, R = unknown, C extends BasePortalOutlet =\n   /** Min-height of the dialog. If a number is provided, assumes pixel units. */\n   minHeight?: number | string;\n \n-  /** Max-width of the dialog. If a number is provided, assumes pixel units. Defaults to 80vw. */\n+  /** Max-width of the dialog. If a number is provided, assumes pixel units. */\n   maxWidth?: number | string;\n \n   /** Max-height of the dialog. If a number is provided, assumes pixel units. */\ndiff --git a/src/material/dialog/dialog-config.ts b/src/material/dialog/dialog-config.ts\nindex a684362fb..0d04af221 100644\n--- a/src/material/dialog/dialog-config.ts\n+++ b/src/material/dialog/dialog-config.ts\n@@ -92,7 +92,7 @@ export class MatDialogConfig<D = any> {\n   /** Min-height of the dialog. If a number is provided, assumes pixel units. */\n   minHeight?: number | string;\n \n-  /** Max-width of the dialog. If a number is provided, assumes pixel units. Defaults to 80vw. */\n+  /** Max-width of the dialog. If a number is provided, assumes pixel units. */\n   maxWidth?: number | string;\n \n   /** Max-height of the dialog. If a number is provided, assumes pixel units. */\n",
+      "diff_sha256": "b689d07ace2a5e65f1bb0132f90c58188c693eef0664587f15334307526e122d",
+      "members": [
+        {
+          "path": "src/cdk/dialog/dialog-config.ts",
+          "before_sha256": "296107b1dae8c1b82f67b84db3709a1bd834b20dcdf2efa8c2831a4ad7546303",
+          "after_sha256": "e18f1b9579df074d985c604f037c076e56c57ef3819a55b09b2cbb09def542f4",
+          "program_tokens_sha256": "8a52a3e3f8558996694c0d9e6f6a5f700b5358e17dd4b01ddd03907cdd898099",
+          "tokens": 418,
+          "jsdoc_tags_sha256": "cac2a94c27f56a1dd266171a222228a33d492bfb4e22ba15bb8ea38b1cd21932",
+          "jsdoc_tags": 3,
+          "annotation_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "annotations": 0
+        },
+        {
+          "path": "src/material/dialog/dialog-config.ts",
+          "before_sha256": "ddc7bb7689f06ce22e68a481648a2fece564e90ca61798aa3efe7507fbfa2f08",
+          "after_sha256": "5b07a4987181223d52b55499411377e4e8e26940abadd5d50a5e6b9929bf6465",
+          "program_tokens_sha256": "a908a3d55fcbacc94b1f168730112095371ddc2e55803008ce616a6ad20de5f5",
+          "tokens": 335,
+          "jsdoc_tags_sha256": "6b76343aab2b365f02dcbb25b30f4d3c3cec6c9d68556e4544b26cb6bbcb6f5a",
+          "jsdoc_tags": 7,
+          "annotation_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "annotations": 0
+        }
+      ],
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "decision": "Both CDK and Material dialog configuration comments remove the stated80vw default; neither complete configuration program changes. The filtered inventory omitted the CDK file, now included in this review. The owned MatLegacyDialogConfig explicitly retains override maxWidth =80vw, bound to its actual source hash. This prose removal is not permission to remove the historical default. Packed/default-width behavior remains a separate product gate."
+    },
+    {
+      "sha": "ede6331377b053edd3ecd53da5e4cce79bb3ba63",
+      "subject": "docs(multiple): remove invalid tags from doc strings (#31317)",
+      "diff": "diff --git a/src/cdk/collections/dispose-view-repeater-strategy.ts b/src/cdk/collections/dispose-view-repeater-strategy.ts\nindex c2b10ecff..3404ee747 100644\n--- a/src/cdk/collections/dispose-view-repeater-strategy.ts\n+++ b/src/cdk/collections/dispose-view-repeater-strategy.ts\n@@ -23,7 +23,7 @@ import {\n \n /**\n  * A repeater that destroys views when they are removed from a\n- * {@link ViewContainerRef}. When new items are inserted into the container,\n+ * `ViewContainerRef`. When new items are inserted into the container,\n  * the repeater will always construct a new embedded view for each item.\n  *\n  * @template T The type for the embedded view's $implicit property.\ndiff --git a/src/cdk/collections/recycle-view-repeater-strategy.ts b/src/cdk/collections/recycle-view-repeater-strategy.ts\nindex 2e91cad9f..735e32aec 100644\n--- a/src/cdk/collections/recycle-view-repeater-strategy.ts\n+++ b/src/cdk/collections/recycle-view-repeater-strategy.ts\n@@ -24,7 +24,7 @@ import {\n \n /**\n  * A repeater that caches views when they are removed from a\n- * {@link ViewContainerRef}. When new items are inserted into the container,\n+ * `ViewContainerRef`. When new items are inserted into the container,\n  * the repeater will reuse one of the cached views instead of creating a new\n  * embedded view. Recycling cached views reduces the quantity of expensive DOM\n  * inserts.\ndiff --git a/src/cdk/collections/view-repeater.ts b/src/cdk/collections/view-repeater.ts\nindex eeaf232cd..1a0a2970a 100644\n--- a/src/cdk/collections/view-repeater.ts\n+++ b/src/cdk/collections/view-repeater.ts\n@@ -50,14 +50,14 @@ export type _ViewRepeaterItemContextFactory<T, R, C extends _ViewRepeaterItemCon\n ) => _ViewRepeaterItemInsertArgs<C>;\n \n /**\n- * Extracts the value of an item from an {@link IterableChangeRecord}.\n+ * Extracts the value of an item from an `IterableChangeRecord`.\n  *\n  * @template T The type for the embedded view's $implicit property.\n  * @template R The type for the item in each IterableDiffer change record.\n  */\n export type _ViewRepeaterItemValueResolver<T, R> = (record: IterableChangeRecord<R>) => T;\n \n-/** Indicates how a view was changed by a {@link _ViewRepeater}. */\n+/** Indicates how a view was changed by a `_ViewRepeater`. */\n export enum _ViewRepeaterOperation {\n   /** The content of an existing view was replaced with another item. */\n   REPLACED,\n@@ -70,8 +70,7 @@ export enum _ViewRepeaterOperation {\n }\n \n /**\n- * Meta data describing the state of a view after it was updated by a\n- * {@link _ViewRepeater}.\n+ * Meta data describing the state of a view after it was updated by a `_ViewRepeater`.\n  *\n  * @template R The type for the item in each IterableDiffer change record.\n  * @template C The type for the context passed to each embedded view.\n@@ -94,7 +93,7 @@ export interface _ViewRepeaterItemChange<R, C> {\n export type _ViewRepeaterItemChanged<R, C> = (change: _ViewRepeaterItemChange<R, C>) => void;\n \n /**\n- * Describes a strategy for rendering items in a {@link ViewContainerRef}.\n+ * Describes a strategy for rendering items in a `ViewContainerRef`.\n  *\n  * @template T The type for the embedded view's $implicit property.\n  * @template R The type for the item in each IterableDiffer change record.\n@@ -113,7 +112,7 @@ export interface _ViewRepeater<T, R, C extends _ViewRepeaterItemContext<T>> {\n }\n \n /**\n- * Injection token for {@link _ViewRepeater}. This token is for use by Angular Material only.\n+ * Injection token for `_ViewRepeater`. This token is for use by Angular Material only.\n  * @docs-private\n  */\n export const _VIEW_REPEATER_STRATEGY = new InjectionToken<\ndiff --git a/src/cdk/scrolling/virtual-scrollable.ts b/src/cdk/scrolling/virtual-scrollable.ts\nindex 52f2ae36b..78c3ceead 100644\n--- a/src/cdk/scrolling/virtual-scrollable.ts\n+++ b/src/cdk/scrolling/virtual-scrollable.ts\n@@ -12,7 +12,7 @@ import {CdkScrollable} from './scrollable';\n export const VIRTUAL_SCROLLABLE = new InjectionToken<CdkVirtualScrollable>('VIRTUAL_SCROLLABLE');\n \n /**\n- * Extending the {@link CdkScrollable} to be used as scrolling container for virtual scrolling.\n+ * Extending the `CdkScrollable` to be used as scrolling container for virtual scrolling.\n  */\n @Directive()\n export abstract class CdkVirtualScrollable extends CdkScrollable {\ndiff --git a/src/cdk/table/table.ts b/src/cdk/table/table.ts\nindex 6debac739..a8ffcfabc 100644\n--- a/src/cdk/table/table.ts\n+++ b/src/cdk/table/table.ts\n@@ -389,7 +389,7 @@ export class CdkTable<T>\n   /**\n    * Whether the sticky styler should recalculate cell widths when applying sticky styles. If\n    * `false`, cached values will be used instead. This is only applicable to tables with\n-   * {@link fixedLayout} enabled. For other tables, cell widths will always be recalculated.\n+   * `_fixedLayout` enabled. For other tables, cell widths will always be recalculated.\n    */\n   private _forceRecalculateCellWidths = true;\n \ndiff --git a/src/google-maps/map-marker-clusterer/map-marker-clusterer-types.ts b/src/google-maps/map-marker-clusterer/map-marker-clusterer-types.ts\nindex c0dae7a90..0401167bb 100644\n--- a/src/google-maps/map-marker-clusterer/map-marker-clusterer-types.ts\n+++ b/src/google-maps/map-marker-clusterer/map-marker-clusterer-types.ts\n@@ -68,16 +68,16 @@ export type onClusterClickHandler = (\n export interface MarkerClustererOptions {\n   markers?: Marker[];\n   /**\n-   * An algorithm to cluster markers. Default is {@link SuperClusterAlgorithm}. Must\n-   * provide a `calculate` method accepting {@link AlgorithmInput} and returning\n-   * an array of {@link Cluster}.\n+   * An algorithm to cluster markers. Default is `SuperClusterAlgorithm`. Must\n+   * provide a `calculate` method accepting `AlgorithmInput` and returning\n+   * an array of `Cluster`.\n    */\n   algorithm?: Algorithm;\n   algorithmOptions?: AlgorithmOptions;\n   map?: google.maps.Map | null;\n   /**\n-   * An object that converts a {@link Cluster} into a `google.maps.Marker`.\n-   * Default is {@link DefaultRenderer}.\n+   * An object that converts a `Cluster` into a `google.maps.Marker`.\n+   * Default is `DefaultRenderer`.\n    */\n   renderer?: Renderer;\n   onClusterClick?: onClusterClickHandler;\n@@ -93,7 +93,7 @@ export declare const defaultOnClusterClickHandler: onClusterClickHandler;\n \n export interface Renderer {\n   /**\n-   * Turn a {@link Cluster} into a `Marker`.\n+   * Turn a `Cluster` into a `Marker`.\n    *\n    * Below is a simple example to create a marker with the number of markers in the cluster as a label.\n    *\n@@ -125,7 +125,7 @@ export interface ClusterStats {\n \n export interface Algorithm {\n   /**\n-   * Calculates an array of {@link Cluster}.\n+   * Calculates an array of `Cluster`.\n    */\n   calculate: ({markers, map}: AlgorithmInput) => AlgorithmOutput;\n }\n@@ -156,7 +156,7 @@ export interface AlgorithmInput {\n \n export interface AlgorithmOutput {\n   /**\n-   * The clusters returned based upon the {@link AlgorithmInput}.\n+   * The clusters returned based upon the `AlgorithmInput`.\n    */\n   clusters: Cluster[];\n   /**\ndiff --git a/src/material/datepicker/datepicker-base.ts b/src/material/datepicker/datepicker-base.ts\nindex 52b846ad9..35075750e 100644\n--- a/src/material/datepicker/datepicker-base.ts\n+++ b/src/material/datepicker/datepicker-base.ts\n@@ -352,7 +352,7 @@ export interface MatDatepickerControl<D> {\n   stateChanges: Observable<void>;\n }\n \n-/** A datepicker that can be attached to a {@link MatDatepickerControl}. */\n+/** A datepicker that can be attached to a `MatDatepickerControl`. */\n export interface MatDatepickerPanel<\n   C extends MatDatepickerControl<D>,\n   S,\n",
+      "diff_sha256": "cc2d8d3eba68ab17ea05c811fb3cc825e7013945c052a3699b4b78ecf872561c",
+      "members": [
+        {
+          "path": "src/cdk/collections/dispose-view-repeater-strategy.ts",
+          "before_sha256": "c68bc54abe9777e7b29ea8271249cbaf1f092d81ee27e82606921502b8e9fd44",
+          "after_sha256": "a54a068d20911f749300fe6f8cae26823c649e66406203bc1253607ee60ef673",
+          "program_tokens_sha256": "8ebcec9a31c4e54bd1d20b8803074830a23189f5d0de0c7737027ab0e4e0deaf",
+          "tokens": 283,
+          "jsdoc_tags_sha256": "d7869c12f75df73d0755d443a49baf44900ba59d15a62d9816b63784c8364d55",
+          "jsdoc_tags": 7,
+          "annotation_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "annotations": 0
+        },
+        {
+          "path": "src/cdk/collections/recycle-view-repeater-strategy.ts",
+          "before_sha256": "49c70d7f29bafadeda95af33ac3e8bb982ef6e915efe5c3a2851b650c5571ecc",
+          "after_sha256": "1ce59be86bab6869cc6a1f8d486d492b67a5450f25ea0221390200daafaa1d43",
+          "program_tokens_sha256": "495f0a8a8139ad85ab2488755c5cb759cb3b05dabc93b4c71b264120d455a65d",
+          "tokens": 655,
+          "jsdoc_tags_sha256": "8cb60684b6f784801ddcafb7cd7d869857e49be68dd7cc670a4f8127fb540b5b",
+          "jsdoc_tags": 7,
+          "annotation_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "annotations": 0
+        },
+        {
+          "path": "src/cdk/collections/view-repeater.ts",
+          "before_sha256": "cf6b3d22668ffa9894d71f41942bb1aeac6d70df1145e86988a4ea26f55ef20d",
+          "after_sha256": "3cb0860aa4b6213f2038f0b3f6f54bcd456ef12d9eee752ab3ec8b6f2db9ffa5",
+          "program_tokens_sha256": "f37aa73100a1b0e26762fd6ca06ccda67a76152881c501188d48196a67d8c0c4",
+          "tokens": 272,
+          "jsdoc_tags_sha256": "31edc8f5673781aa8cb8a20040651a857937e8bc7f65dde64f5c52dfce971113",
+          "jsdoc_tags": 32,
+          "annotation_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "annotations": 0
+        },
+        {
+          "path": "src/cdk/scrolling/virtual-scrollable.ts",
+          "before_sha256": "87457d4ad5a3d7e6258572814b17c262c1ce6e027c6a68b0ff9cfebc8f828ab2",
+          "after_sha256": "ef4163355a4fbc21e4d51ba4ceb8bd1983531eb1994eddfec3fb2bb998e73193",
+          "program_tokens_sha256": "bb3a0102debb2a6035ec0efb9b14b2a685eae40bab827fc85437bd2799577c5e",
+          "tokens": 110,
+          "jsdoc_tags_sha256": "3efba58d93bc2d50497d92fcfe0b8651c8e2b0845620b07844b97eee737bd37d",
+          "jsdoc_tags": 5,
+          "annotation_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "annotations": 0
+        },
+        {
+          "path": "src/cdk/table/table.ts",
+          "before_sha256": "a79a7f3eb191538f98269e8ce85f1a6e83d460eb2d494868a8d0b6e12ba89be8",
+          "after_sha256": "ff84a75a2fbdb9028959b52e9e442c4d53ed54795618ea7191e29d3bc13e86d7",
+          "program_tokens_sha256": "ad61001b1b07710fa7f02e550aab2db43043218a72a5ce1ffea3e328dfc111d8",
+          "tokens": 5563,
+          "jsdoc_tags_sha256": "0be20d513eac9849c6f7e546bea41fb71ed8aff64d3d6746d924c474f6826906",
+          "jsdoc_tags": 10,
+          "annotation_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "annotations": 0
+        },
+        {
+          "path": "src/google-maps/map-marker-clusterer/map-marker-clusterer-types.ts",
+          "before_sha256": "773be3739a3382c357eb0a69f4be24d83207cfdcd37ac67a0a447075996a54ab",
+          "after_sha256": "8af6d8e2973d0e9e16ceaa221c2c1c1beeb37da235da1758e648f5d0ea4da276",
+          "program_tokens_sha256": "ed0f02aa523a53dabb806e1f5f7bea6df540861e66a229b93b47ae1e7c99e1e1",
+          "tokens": 536,
+          "jsdoc_tags_sha256": "aa4c5c347efdcb4a7ce8c8f8c29fc7381a725f21a1d16bd47794f351bb1f3a01",
+          "jsdoc_tags": 2,
+          "annotation_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "annotations": 0
+        },
+        {
+          "path": "src/material/datepicker/datepicker-base.ts",
+          "before_sha256": "584995e008eccf003adfe56558efd81a4ee7858418fbcf5e67eebf02e9283a7b",
+          "after_sha256": "a61e25fd2441bbd75f574c3095e6f4e9baf8e0a20b1b05882186790de1a754c8",
+          "program_tokens_sha256": "2c1d7795a0143d43171f6cedaf6140c6920a12389c6926bd1eb84f462696a162",
+          "tokens": 3702,
+          "jsdoc_tags_sha256": "21ae0fb7efbb125e4bdda72ec909e9fd31ec0fac8b66f77f7f02db236b959679",
+          "jsdoc_tags": 28,
+          "annotation_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "annotations": 0
+        }
+      ],
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "decision": "All seven complete TypeScript files only replace invalid inline link markup with code formatting or clarify the fixed-layout identifier in prose. The full patch includes Google Maps marker-clusterer types omitted by the filtered inventory. Every existing JSDoc tag, including docs-private on the view-repeater token, remains identical; no private API becomes public and no local-helper ownership restriction is relaxed."
+    },
+    {
+      "sha": "963a299e9d8c0a783314c81eeaa6b2396aa7044f",
+      "subject": "docs(material/datepicker): fix typo in aria-accessible-name comment (#32703)",
+      "diff": "diff --git a/src/material/datepicker/aria-accessible-name.ts b/src/material/datepicker/aria-accessible-name.ts\nindex 17afa7364..d070e8978 100644\n--- a/src/material/datepicker/aria-accessible-name.ts\n+++ b/src/material/datepicker/aria-accessible-name.ts\n@@ -70,7 +70,7 @@ function ssrSafeIsElement(node: Node): node is Element {\n }\n \n /**\n- * Determine if argument node is an HTMLInputElement based on `nodeName` property. This funciton is\n+ * Determine if argument node is an HTMLInputElement based on `nodeName` property. This function is\n  * safe to use with server-side rendering.\n  */\n function ssrSafeIsHTMLInputElement(node: Node): node is HTMLInputElement {\n",
+      "diff_sha256": "c97056b835604ec9164eca3cca4c372d2fff08881b386a9f936a21d234b2def6",
+      "members": [
+        {
+          "path": "src/material/datepicker/aria-accessible-name.ts",
+          "before_sha256": "058dd70cbdf9dfd1dd4af20fbd7c457e5b8add3d09df1a8e8b9330401646fc00",
+          "after_sha256": "73d84bce49c24f16b12ee112631282b2921a6d55158fe406cfc93034ba9df240",
+          "program_tokens_sha256": "9519e5b8678e1b1004395edd31d6d1e34ada071f4ab97b849910565a7228e9aa",
+          "tokens": 371,
+          "jsdoc_tags_sha256": "139033e9ac2045aa5bae6486c4eb1db118f990cfcf7abf427095b3a440e37323",
+          "jsdoc_tags": 8,
+          "annotation_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "annotations": 0
+        }
+      ],
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "decision": "The datepicker input-element helper comment corrects “funciton” to “function”; complete SSR checks, node-name predicate, signatures and metadata are unchanged. Main previously labeled this typo inherited without behavior proof. It is a documentation-only patch, not an inherited runtime repair or SSR compatibility qualification."
+    },
+    {
+      "sha": "0c0b033fb256e26c409899ce7b4325f162a6ed2d",
+      "subject": "docs(material/datepicker): fixed typo in ssrSafeIsHTMLTextAreaElement function description (#33107)",
+      "diff": "diff --git a/src/material/datepicker/aria-accessible-name.ts b/src/material/datepicker/aria-accessible-name.ts\nindex d070e8978..b7a3377a8 100644\n--- a/src/material/datepicker/aria-accessible-name.ts\n+++ b/src/material/datepicker/aria-accessible-name.ts\n@@ -79,7 +79,7 @@ function ssrSafeIsHTMLInputElement(node: Node): node is HTMLInputElement {\n \n /**\n  * Determine if argument node is an HTMLTextAreaElement based on `nodeName` property. This\n- * funciton is safe to use with server-side rendering.\n+ * function is safe to use with server-side rendering.\n  */\n function ssrSafeIsHTMLTextAreaElement(node: Node): node is HTMLTextAreaElement {\n   return node.nodeName === 'TEXTAREA';\n",
+      "diff_sha256": "b3f7e90980bf3b0cfc4847ce53c25880f96a34e0778d12999f42cd05a02e0148",
+      "members": [
+        {
+          "path": "src/material/datepicker/aria-accessible-name.ts",
+          "before_sha256": "73d84bce49c24f16b12ee112631282b2921a6d55158fe406cfc93034ba9df240",
+          "after_sha256": "55c455e011409d70977aca24c35755f7ca9e9b369a5661cf79727ae59c3dc254",
+          "program_tokens_sha256": "9519e5b8678e1b1004395edd31d6d1e34ada071f4ab97b849910565a7228e9aa",
+          "tokens": 371,
+          "jsdoc_tags_sha256": "139033e9ac2045aa5bae6486c4eb1db118f990cfcf7abf427095b3a440e37323",
+          "jsdoc_tags": 8,
+          "annotation_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "annotations": 0
+        }
+      ],
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "decision": "The textarea helper description corrects the same spelling error. Complete source tokens, signatures, JSDoc tags and build annotations are unchanged. This does not change or certify SSR safety, browser element identity or the current public datepicker behavior; those remain separately accountable."
+    },
+    {
+      "sha": "b83c6c1effc53f97a981cc95c7b4e53174290d45",
+      "subject": "docs(material/bottom-sheet): update panelClass comment (#33321)",
+      "diff": "diff --git a/src/material/bottom-sheet/bottom-sheet-config.ts b/src/material/bottom-sheet/bottom-sheet-config.ts\nindex dd7b6e5fc..9f25f53c0 100644\n--- a/src/material/bottom-sheet/bottom-sheet-config.ts\n+++ b/src/material/bottom-sheet/bottom-sheet-config.ts\n@@ -30,7 +30,7 @@ export class MatBottomSheetConfig<D = any> {\n    */\n   injector?: Injector;\n \n-  /** Extra CSS classes to be added to the bottom sheet container. */\n+  /** Extra CSS classes to be added to the overlay panel containing the bottom sheet. */\n   panelClass?: string | string[];\n \n   /** Text layout direction for the bottom sheet. */\n",
+      "diff_sha256": "20141f8c1793be614e44af2d7f6b3e2bf93360c7e5fce0dde445b88cd9702cd7",
+      "members": [
+        {
+          "path": "src/material/bottom-sheet/bottom-sheet-config.ts",
+          "before_sha256": "f3baddc556bc5049acb281d9dd7ea17f56368f5d960cbbcd953576cf8900f494",
+          "after_sha256": "fc3f0a568be0f4475e0ff79942e26cfbb05ba70e661c725bf8a9f0486238e603",
+          "program_tokens_sha256": "e856cd926215cdef0cef369697fe0cda0ba28d0b914028281840cfeb5018fe7b",
+          "tokens": 194,
+          "jsdoc_tags_sha256": "cac2a94c27f56a1dd266171a222228a33d492bfb4e22ba15bb8ea38b1cd21932",
+          "jsdoc_tags": 3,
+          "annotation_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "annotations": 0
+        }
+      ],
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "21.x"
+      ],
+      "final_disposition": "not-applicable",
+      "decision": "Only the ordinary bottom-sheet panelClass description changes from container to overlay panel. Neither complete configuration syntax nor any class-placement implementation changes. This does not authorize a component fork, a relocated legacy class or consumer CSS changes; actual current companion overlay behavior remains separate."
+    }
+  ],
+  "g11_claim": "not-passed",
+  "limitations": [
+    "These ten documentation-only subjects are the finite scope, not all docs-labeled commits or the whole upstream inventory. Sass/body/API/test/demo changes remain outside it.",
+    "Original source observations do not execute installed peers, constructors, components, browser/SSR/Sass, packed artifacts or complete consumer floors.",
+    "No product or consumer API/HTML/CSS/SCSS is changed; inherited behavior, security review and all other G11 obligations remain separate."
+  ]
+}
