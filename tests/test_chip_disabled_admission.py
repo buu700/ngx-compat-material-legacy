@@ -15,5 +15,5 @@ class ChipDisabledAdmissionTests(unittest.TestCase):
         observation = json.loads(result.stdout.strip().splitlines()[-1])
         self.assertEqual(observation['cases'], 9)
         self.assertEqual(observation['mutants_rejected'], 2)
-        self.assertEqual(observation['derived_cases'], 92)
+        self.assertEqual(observation['derived_cases'], 93)
         self.assertFalse(observation['native_executed'])

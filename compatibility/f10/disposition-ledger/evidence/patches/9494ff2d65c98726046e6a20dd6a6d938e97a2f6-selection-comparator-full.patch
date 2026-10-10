@@ -1,0 +1,35 @@
+diff --git a/src/cdk/collections/selection-model.ts b/src/cdk/collections/selection-model.ts
+index 8ad03692bcff5854be40f997db5b28ef493bcaa5..cf9ca587d95937464762adc1b309a63e3120091d 100644
+--- a/src/cdk/collections/selection-model.ts
++++ b/src/cdk/collections/selection-model.ts
+@@ -91,7 +91,7 @@ export class SelectionModel<T> {
+   setSelection(...values: T[]): boolean | void {
+     this._verifyValueAssignment(values);
+     const oldValues = this.selected;
+-    const newSelectedSet = new Set(values);
++    const newSelectedSet = new Set(values.map(value => this._getConcreteValue(value)));
+     values.forEach(value => this._markSelected(value));
+     oldValues
+       .filter(value => !newSelectedSet.has(this._getConcreteValue(value, newSelectedSet)))
+diff --git a/src/cdk/collections/selection.spec.ts b/src/cdk/collections/selection.spec.ts
+index 85cecb4d5614811ff46e793710b9352bd73bb539..be902b68a4783bc54e6dba65535e313255313afc 100644
+--- a/src/cdk/collections/selection.spec.ts
++++ b/src/cdk/collections/selection.spec.ts
+@@ -300,6 +300,17 @@ describe('SelectionModel', () => {
+     expect(model.selected.length).toBe(1);
+   });
+ 
++  it('should not empty selection when caling setSelection twice with comparable', () => {
++    type Item = {id: number};
++    const compareFn = (x: Item, y: Item) => x.id === y.id;
++    const model = new SelectionModel<Item>(false, [], false, compareFn);
++    model.setSelection({id: 1});
++    expect(model.selected).toEqual([{id: 1}]);
++
++    model.setSelection({id: 1});
++    expect(model.selected).toEqual([{id: 1}]);
++  });
++
+   describe('setSelection', () => {
+     it('should not deselect an already selected value', () => {
+       type Item = {key: number; value: string};

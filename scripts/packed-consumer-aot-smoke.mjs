@@ -475,6 +475,7 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
     'packed-consumer/harness/chip-input-backspace-release': parsed.chipBackspaceRelease === true,
     'packed-consumer/harness/chip-repeated-removal-and-separator': parsed.chipRepeatedEvents === true,
     'packed-consumer/harness/chip-individual-disabled-form-isolation': parsed.chipDisabledIsolation === true,
+    'packed-consumer/harness/selection-model-comparator-public-list': parsed.selectionComparatorExposure === true,
     'packed-consumer/harness/form-field-error-live-region': parsed.errorLiveRegion === true,
     'packed-consumer/harness/form-field-token-isolation': parsed.formFieldTokenIsolation === true,
     'packed-consumer/harness/progress-bar-location-and-defaults': parsed.progressLocationAndDefaults === true,
@@ -942,6 +943,7 @@ import {MatLegacySlider, MatLegacySliderModule} from '@ngx-compat/material-legac
 import {MatLegacyProgressBar, MatLegacyProgressBarModule, MAT_LEGACY_PROGRESS_BAR_LOCATION, MAT_LEGACY_PROGRESS_BAR_LOCATION_FACTORY, MAT_LEGACY_PROGRESS_BAR_DEFAULT_OPTIONS} from '@ngx-compat/material-legacy/legacy-progress-bar';
 import {MAT_PROGRESS_BAR_DEFAULT_OPTIONS} from '@angular/material/progress-bar';
 import {MatLegacyChip, MatLegacyChipList, MatLegacyChipsModule} from '@ngx-compat/material-legacy/legacy-chips';
+import {MatLegacyListModule, MatLegacySelectionList} from '@ngx-compat/material-legacy/legacy-list';
 import {MatLegacyRadioModule} from '@ngx-compat/material-legacy/legacy-radio';
 import {MatIconModule, MatIconRegistry} from '@angular/material/icon';
 import {DomSanitizer} from '@angular/platform-browser';
@@ -977,6 +979,7 @@ class SmokeDialogContent {}
     CdkTableModule,
     MatLegacyTabsModule,
     MatLegacyChipsModule,
+    MatLegacyListModule,
     FormsModule,
     ReactiveFormsModule,
     MatLegacyRadioModule,
@@ -1017,6 +1020,10 @@ class SmokeDialogContent {}
       <mat-chip id="disabled-individual-chip" value="one" disabled>Individual</mat-chip>
       <mat-chip id="disabled-inherited-chip" value="two">Inherited</mat-chip>
     </mat-chip-list>
+    <mat-selection-list id="selection-comparator-list" [multiple]="false">
+      <mat-list-option value="one">Comparable one</mat-list-option>
+      <mat-list-option value="two">Comparable two</mat-list-option>
+    </mat-selection-list>
     <mat-progress-bar id="location-progress" [value]="45" aria-label="Location progress"></mat-progress-bar>
     <mat-radio-button id="attribute-radio" tabindex="8">Attribute radio</mat-radio-button>
     <mat-error id="error-live-default">Default error</mat-error>
@@ -1616,6 +1623,17 @@ async function main() {
   const chipDisabledDom=fixture.nativeElement.querySelector('#disabled-individual-chip').getAttribute('aria-disabled')==='true'
     &&fixture.nativeElement.querySelector('#disabled-inherited-chip').getAttribute('aria-disabled')==='false';
   const chipDisabledIsolation=chipDisabledInitial&&chipDisabledDuring&&chipDisabledAfter&&chipDisabledDom;
+  const selectionList=fixture.debugElement.query(By.css('#selection-comparator-list')).injector.get(MatLegacySelectionList);
+  const selectionOptions=selectionList.options.toArray();
+  selectionList.selectedOptions.compareWith=(a,b)=>a.value===b.value;
+  selectionList.selectedOptions.setSelection(selectionOptions[0]);fixture.detectChanges();
+  // Pass a structurally compatible comparator value through the public peer model.
+  // It must resolve back to the original real option instance and keep node state.
+  selectionList.selectedOptions.setSelection({value:'one'} as typeof selectionOptions[number]);fixture.detectChanges();
+  const selectionComparatorExposure=selectionList.selectedOptions.selected.length===1
+    &&selectionList.selectedOptions.selected[0]===selectionOptions[0]
+    &&selectionOptions[0].selected&&!selectionOptions[1].selected
+    &&fixture.nativeElement.querySelector('#selection-comparator-list mat-list-option').getAttribute('aria-selected')==='true';
   const chipTabIndex = (fixture.nativeElement.querySelector('#attribute-chip') as HTMLElement).tabIndex;
   const radioTabIndex = (fixture.nativeElement.querySelector('#attribute-radio input') as HTMLInputElement).tabIndex;
   const liveDefault=fixture.nativeElement.querySelector('#error-live-default') as HTMLElement;
@@ -1819,7 +1837,7 @@ async function main() {
       selectOpened === true &&
       selectClosed === true &&
       tabCount === 2 &&
-      selected === 'Two' && viewportShared && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && chipDisabledIsolation && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor && tabContentOriginalConstructor && noDataRowOriginalConstructor && constructorBorrowedProviderLifecycle && tableOriginalStickyBehavior && tableOriginalBooleanInputs && tableRecycleRowIdentity && tableDefinitionOriginalConstructors && tableAngularDiConstruction && tableOutletAndDefinitionOwnership && tabLabelOriginalConstructor && engineFreeAnimationPolicy,
+      selected === 'Two' && viewportShared && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && chipDisabledIsolation && selectionComparatorExposure && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor && tabContentOriginalConstructor && noDataRowOriginalConstructor && constructorBorrowedProviderLifecycle && tableOriginalStickyBehavior && tableOriginalBooleanInputs && tableRecycleRowIdentity && tableDefinitionOriginalConstructors && tableAngularDiConstruction && tableOutletAndDefinitionOwnership && tabLabelOriginalConstructor && engineFreeAnimationPolicy,
     buttonText: text,
     selectIsOpen: isOpen,
     dialogText,
@@ -1841,6 +1859,7 @@ async function main() {
     chipBackspaceRelease,
     chipRepeatedEvents,
     chipDisabledIsolation,
+    selectionComparatorExposure,
     errorLiveRegion,
     formFieldTokenIsolation,
     progressLocationAndDefaults,
