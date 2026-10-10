@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "status": "source/constructor/framework render/type repair passed; actual packed/native directive validation pending",
+  "recorded_at_utc": "2026-10-10T03:04:00.788444+00:00",
+  "source_heads": {
+    "main": "5aff18ac7b779821b29dd7acb16fdca83582c271",
+    "21.x": "ac7cabfcd567de810713baf74f2dc73e9109346a"
+  },
+  "source_trees": {
+    "main": "d3c3d78904b9373baff7cadd34ffff3f7beb2458",
+    "21.x": "2f611fee1dc02777a666955f6f92207323701589"
+  },
+  "problem": "The tagged Material-16 tooltip assigns and marks a changed message but waits for onMicrotaskEmpty before repositioning. The genuine public-provider zoneless NgZone emits no such event; whole tagged constructor/member replay leaves both message updates without positions at each current minimum.",
+  "repair": [
+    "Owned tooltip-only afterTooltipRender keeps the historical microtask event and registers public afterNextRender through the supplied view injector only when an existing ApplicationRef is available. The callback emits only while public NgZone.isStable; the exercised zoneful in-zone render cannot preempt microtask timing.",
+    "Completion/unsubscription cancels both the event subscription and public render handle. Existing takeUntil destruction cancels pending callbacks; existing tooltip-instance guard prevents repositioning after detachment. Lookup failure cleans the event subscription before propagating the error. Manual construction with a genuine public injector lacking an application retains the old event-only path. No application is created by the component."
+  ],
+  "preserved": {
+    "existing_constructor_body_and_parameters": true,
+    "existing_public_declarations_and_method_signatures": true,
+    "consumer_HTML_CSS_SCSS_changes_required": false,
+    "consumer_public_TS_changes_required": false,
+    "product_HTML_CSS_SCSS_files_changed": false,
+    "goldens_changed": false
+  },
+  "tests": {
+    "python_tests": 4,
+    "isolated_subjects": 10,
+    "current_zoneful_zoneless_development_production_subjects": 8,
+    "original_zoneful_subjects": 2,
+    "mutation_rejections": 28,
+    "strict_helper_negative_checks_per_current_subject": 4,
+    "strict_compiler": "5.9.2",
+    "main_browser_source_identity_tests": 2,
+    "main_browser_source_identity_elapsed_seconds": 1.019,
+    "reported_python_suite_elapsed_seconds": 8.113
+  },
+  "runtime_scope": "Whole tooltip-base constructor and members replayed without Angular decorators. Genuine public NgZone and current public application/render callbacks. Element host, overlay, tooltip instance, change detector, directionality, focus/ARIA services and view container are explicit protocols. No actual legacy directive/node DI, DOM paint, packed/AOT/native geometry, consumer build or Rx/Node floor qualification.",
+  "observations": [
+    "Whole actual tooltip-base constructors and all members execute with genuine public NgZone and current public application/render hooks. Two public message assignments update the tooltip instance, mark it, and position the correct latest message; candidate zoneful sequences match the original reference.",
+    "Original current-minimum zoneless sequences produce zero positioning calls. The candidate positions both messages. Destruction before rendering cancels the actual registered hook; detachment does not position. Manual application-free zoneful sequences match.",
+    "28 mutation rejections cover the prior event-only wait, omitted takeUntil teardown, retained render handle, removed stability guard, removed once-only completion and lookup-failure subscription leakage. No native DOM paint or actual legacy Angular directive/node DI is claimed.",
+    "The exact current declarations expose both afterNextRender overloads and AfterRenderRef without deprecated/internal/preview/experimental tags. Helper fixtures compile strictly with skipLibCheck=false at the branch compiler; auxiliary other-line types do not qualify new floors."
+  ],
+  "native_producer": "Existing packed Chromium tooltip slice now observes actual historical .mat-tooltip text/bounding rectangles before and after a wider message changed by the consumer click handler. Admission requires below-host centered geometry, finite positive size and viewport containment at both messages plus width growth. Predicate tests reject missing/stale/mispositioned observations; browser producer remains unexecuted locally, with no new matrix credits.",
+  "source_binding_refresh": {
+    "prior_frozen_rows": 19,
+    "fresh_checker_calls": 12,
+    "native_or_historical_runtime_restamped": false,
+    "new_frozen_use_admissions": 0,
+    "new_upstream_SHA_closures": 0
+  },
+  "cyph_sanity": {
+    "head": "a56a0603636cac5aaabe8fe408f7429b4224f011",
+    "clean": true,
+    "templates_with_tooltip": 40,
+    "attribute_mentions": 345,
+    "direct_private_constructor_or_subclass_found": false,
+    "scope": "Read-only search in shared/js TypeScript excluding specs, all shared/js HTML and shared CSS/SCSS. Cyph legacy module, translation attribute, dynamic messages/positions/disabled states and existing .mat-tooltip font/fake-tooltip/touch workaround rules inspected. No consumer build run or files edited.",
+    "inspected_files": [
+      {
+        "path": "shared/js/cyph/modules/cyph-shared.module.ts",
+        "sha256": "42fea0471f52148b9f6938d670a4fd9fd65363e2f34ae000efd58b9ec3a82c29"
+      },
+      {
+        "path": "shared/js/cyph/directives/translate.directive.ts",
+        "sha256": "8b80cf5381e3fbb173eccf036da358be7935257c99c3672265e3d14cb26a2bed"
+      },
+      {
+        "path": "shared/js/cyph/components/chat-message/chat-message.component.scss",
+        "sha256": "b979888d02cc9b16bca9a0b3f445fba3a9ffe6e635ae1c54bb9b24a3175794a0"
+      },
+      {
+        "path": "shared/js/cyph/components/account-contact/account-contact.component.html",
+        "sha256": "9f93833372f07fe18400d0f2565f50159db2c91f03c62ecedec9106584ebb0ea"
+      },
+      {
+        "path": "shared/css/cyph.base.scss",
+        "sha256": "44db9a3820a38154df9c2fa68163f5df91510f1f343214703068663eaf003267"
+      }
+    ]
+  },
+  "environment": {
+    "host_node": "v22.23.3",
+    "borrowed_rxjs": "7.8.2",
+    "borrowed_tslib": "2.8.1",
+    "binding_parser": "6.0.3",
+    "advertised_runtime_Rx_native_packed_floors_qualified": false
+  },
+  "test_harness_corrections": [
+    "Counted both real afterNextRender overloads at each minimum rather than one declaration.",
+    "The removed-once mutation correctly fails the duplicate-position assertion before the later event assertion; accepted that exact semantic rejection.",
+    "The destroy mutation was narrowed to the tooltip callback indentation rather than accidentally changing the earlier directionality subscription. Product assertions and original reference remained intact."
+  ],
+  "remaining": [
+    "All 25 frozen NgZone authored-use boundaries stay open pending complete caller/event/timing analysis and native validation.",
+    "Remaining select, form-field and paginated-tab-header event waits need whole-source/minimum reproduction and bounded repair.",
+    "Full packed/native matrix, genuine floors, complete Sass/metadata/security/upstream-SHA closeout, C05 and independent A01-A10/R01-R03 audit remain open."
+  ],
+  "pushed": false,
+  "actions_started": false,
+  "g11_claim": "not-passed"
+}
