@@ -1,0 +1,559 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "status": "reviewed",
+  "recorded_at_utc": "2026-10-10T21:55:04.938115+00:00",
+  "source_checkpoint": "95748c045f96a8b49c55a932aa1b6b18384abf9d",
+  "criteria": "Seven individually reviewed current public Injector dependency boundaries. Genuine application callbacks and complete source-member replay remain explicitly distinct from actual legacy Angular factories/node DI/native/packed qualification. Other helper imports and four constructor/menu context adapters remain pending.",
+  "reviews": [
+    {
+      "file": "legacy-autocomplete/internal/after-legacy-render.ts",
+      "module": "@angular/core",
+      "symbol": "Injector",
+      "candidate_source_sha256": "afd5687000abc7b89968b0c03454f0fc6ac452e69d34bd162b8523ae11fcaf85",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "A type-only public Injector parameter is borrowed by afterLegacyRender. Its only member lookup is get(ApplicationRef, null), and the same object is supplied to afterNextRender. The real framework applications preserve the historical zone-stability route, stable zoneless rendering, one-shot completion and registration cancellation; factory lookup errors unsubscribe the zone observer. Source replay covers trigger members and field initializers, not the original trigger constructor or Angular decorators. Whole minimum declarations select the stable generic get overload on the actual helper source. This closes the Injector type/lookup/forward dependency only; trigger node DI, other helper dependencies, native paint, packed/AOT and complete consumer floors remain open.",
+      "source_binding": {
+        "file": "legacy-autocomplete/internal/after-legacy-render.ts",
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "family": "autocomplete",
+        "candidate_source_sha256": "afd5687000abc7b89968b0c03454f0fc6ac452e69d34bd162b8523ae11fcaf85",
+        "helper": "export function afterLegacyRender(zone: NgZone, injector: Injector): Observable<void> {\n  return new Observable<void>(subscriber => {\n    const stable = zone.onStable.subscribe(() => subscriber.next());\n    // The supplied view injector also preserves the historical manual constructor.\n    // A manual injector without an application keeps the original zone-only path.\n    let rendered: AfterRenderRef | null = null;\n    try {\n      if (injector.get(ApplicationRef, null)) {\n        rendered = afterNextRender(() => {\n          if (zone.isStable) {\n            subscriber.next();\n          }\n        }, {injector});\n      }\n    } catch (error) {\n      stable.unsubscribe();\n      throw error;\n    }\n\n    return () => {\n      stable.unsubscribe();\n      rendered?.destroy();\n    };\n  }).pipe(take(1));\n}",
+        "gets": [
+          "injector.get(ApplicationRef, null)"
+        ],
+        "renders": [
+          "afterNextRender(() => {\n          if (zone.isStable) {\n            subscriber.next();\n          }\n        }, {injector})"
+        ],
+        "ownership": "Borrow supplied injector; only the returned render registration is destroyed",
+        "capture": false
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/injector-render-type-current-diagnostic.json",
+          "sha256": "0e4b639eb6052ab3df0dfa9991285084785d4a017638966416315ff3db4cd02b"
+        },
+        {
+          "path": "scripts/injector-render-use-review.mjs",
+          "sha256": "88a9c0011de26bc83e67ebe19e82421eecc036a05cb866aef0a7df1a0cc4cdbf"
+        },
+        {
+          "path": "tests/injector_render_type_probe.mjs",
+          "sha256": "a43aa38be43c5d653f88675517561bf674d28543c59adb6dc9f721c276a27107"
+        },
+        {
+          "path": "tests/test_injector_render_current.py",
+          "sha256": "a4b156cf6bcce337efaa9462d8dceaf3c2a66d33aaf6b40d38ddf47008ba020b"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/ng-zone-public-subjects.mjs",
+          "sha256": "0eb7c8966e8c1e8fc0e974a2c25f48e32c28a7d5b6f7448df839a6e67866763d"
+        },
+        {
+          "path": "compatibility/rc/ng-zone-public-subjects.json",
+          "sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175"
+        },
+        {
+          "path": "compatibility/rc/injector-render-autocomplete-current-diagnostic.json",
+          "sha256": "ece82b82937dda7e7b8a17c1a2b262f948c376475f1c070ad525c81995d2e1f4"
+        },
+        {
+          "path": "compatibility/rc/injector-render-cyph-source-sanity.json",
+          "sha256": "eef1d226f0716368f0e23a3bf38a0cf88eb3bb84575c7bafbbdf55f5c58d79d5"
+        },
+        {
+          "path": "tests/autocomplete_render_runtime_probe.mjs",
+          "sha256": "9e44ca5c47da794ce6883283cd59ba588570942feb1cf49899a92e20b86af96e"
+        },
+        {
+          "path": "tests/test_autocomplete_render_runtime.py",
+          "sha256": "42612127ec9a2c8c6eee3f7aa0e2b8e1bd9cba148bc09a44a45c8089d6574771"
+        }
+      ]
+    },
+    {
+      "file": "legacy-form-field/internal/after-form-field-render.ts",
+      "module": "@angular/core",
+      "symbol": "Injector",
+      "candidate_source_sha256": "3edca3208021bf71f1b9f8e6c7cdc9832b057b60c10fdd676b69d34d2e3f825a",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The type-only optional Injector parameter is checked with the stable public get(ApplicationRef, null) overload and forwarded as the exact afterEveryRender options object. A missing/null injector preserves the manual zone route. The helper owns the render registration, not the supplied injector. Genuine zoneful/zoneless application callbacks exercise repeated outline updates and cleanup, with controlled geometry and color-trait protocols; cancellation and lookup-error mutants are rejected. This is the public Injector dependency judgment. It does not close the separate afterEveryRender/ApplicationRef/NgZone imports, actual legacy Angular DI, native rendered outline compatibility or complete runtime/RxJS floor admission.",
+      "source_binding": {
+        "file": "legacy-form-field/internal/after-form-field-render.ts",
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "family": "form-field",
+        "candidate_source_sha256": "3edca3208021bf71f1b9f8e6c7cdc9832b057b60c10fdd676b69d34d2e3f825a",
+        "helper": "export function afterFormFieldRender(zone: NgZone, injector?: Injector | null): Observable<void> {\n  return new Observable<void>(subscriber => {\n    const stable = zone.onStable.subscribe(() => subscriber.next());\n    // A manually constructed field without an application retains its original zone path.\n    let rendered: AfterRenderRef | null = null;\n    try {\n      if (injector?.get(ApplicationRef, null)) {\n        rendered = afterEveryRender(() => {\n          if (zone.isStable) {\n            subscriber.next();\n          }\n        }, {injector});\n      }\n    } catch (error) {\n      stable.unsubscribe();\n      throw error;\n    }\n\n    return () => {\n      stable.unsubscribe();\n      rendered?.destroy();\n    };\n  });\n}",
+        "gets": [
+          "injector?.get(ApplicationRef, null)"
+        ],
+        "renders": [
+          "afterEveryRender(() => {\n          if (zone.isStable) {\n            subscriber.next();\n          }\n        }, {injector})"
+        ],
+        "ownership": "Borrow supplied injector; only the returned render registration is destroyed",
+        "capture": false
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/injector-render-type-current-diagnostic.json",
+          "sha256": "0e4b639eb6052ab3df0dfa9991285084785d4a017638966416315ff3db4cd02b"
+        },
+        {
+          "path": "scripts/injector-render-use-review.mjs",
+          "sha256": "88a9c0011de26bc83e67ebe19e82421eecc036a05cb866aef0a7df1a0cc4cdbf"
+        },
+        {
+          "path": "tests/injector_render_type_probe.mjs",
+          "sha256": "a43aa38be43c5d653f88675517561bf674d28543c59adb6dc9f721c276a27107"
+        },
+        {
+          "path": "tests/test_injector_render_current.py",
+          "sha256": "a4b156cf6bcce337efaa9462d8dceaf3c2a66d33aaf6b40d38ddf47008ba020b"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/ng-zone-public-subjects.mjs",
+          "sha256": "0eb7c8966e8c1e8fc0e974a2c25f48e32c28a7d5b6f7448df839a6e67866763d"
+        },
+        {
+          "path": "compatibility/rc/ng-zone-public-subjects.json",
+          "sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175"
+        },
+        {
+          "path": "compatibility/rc/injector-render-form-field-current-diagnostic.json",
+          "sha256": "75db43298f47b88f10a4c8b2c08d10b59fd4f500b0edd8b45e799e6b78292b13"
+        },
+        {
+          "path": "compatibility/rc/injector-render-cyph-source-sanity.json",
+          "sha256": "eef1d226f0716368f0e23a3bf38a0cf88eb3bb84575c7bafbbdf55f5c58d79d5"
+        },
+        {
+          "path": "tests/form_field_render_runtime_probe.mjs",
+          "sha256": "ffa7240e0fb75376ccf60cf21609a8edd6ddb23c9d3c20ea34533443b921fba7"
+        },
+        {
+          "path": "tests/test_form_field_render_runtime.py",
+          "sha256": "8bee5feb6ff5eee4a0a1645287543e1f434fe28d48f0af569f92fe082caab2ce"
+        }
+      ]
+    },
+    {
+      "file": "legacy-select/internal/after-select-render.ts",
+      "module": "@angular/core",
+      "symbol": "Injector",
+      "candidate_source_sha256": "10a2bbbe02fb0a4578646e802888a5e075bb909a36fd1c19049b5fa2d731e570",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The type-only optional Injector parameter remains nullable and uses exactly one stable public get(ApplicationRef, null) lookup. The same supplied reference is passed to afterNextRender; no injector is created or destroyed. Existing manual construction can omit it and retain the zone-only route. Real current applications exercise stable zoneless initialization, zoneful timing, once-only completion, panel/font source-member behavior and teardown with explicit host/overlay/option protocols. Strict actual-helper compilation selects nondeprecated generic get. This closes only the borrowed public Injector dependency; separate hook/application dependencies, actual legacy select node factories/providers, native panel geometry and packed/runtime floors remain pending.",
+      "source_binding": {
+        "file": "legacy-select/internal/after-select-render.ts",
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "family": "select",
+        "candidate_source_sha256": "10a2bbbe02fb0a4578646e802888a5e075bb909a36fd1c19049b5fa2d731e570",
+        "helper": "export function afterSelectRender(zone: NgZone, injector?: Injector | null): Observable<void> {\n  return new Observable<void>(subscriber => {\n    const stable = zone.onStable.subscribe(() => subscriber.next());\n    // The trailing optional injector preserves historical manual construction.\n    let rendered: AfterRenderRef | null = null;\n    try {\n      if (injector?.get(ApplicationRef, null)) {\n        rendered = afterNextRender(() => {\n          if (zone.isStable) {\n            subscriber.next();\n          }\n        }, {injector});\n      }\n    } catch (error) {\n      stable.unsubscribe();\n      throw error;\n    }\n\n    return () => {\n      stable.unsubscribe();\n      rendered?.destroy();\n    };\n  }).pipe(take(1));\n}",
+        "gets": [
+          "injector?.get(ApplicationRef, null)"
+        ],
+        "renders": [
+          "afterNextRender(() => {\n          if (zone.isStable) {\n            subscriber.next();\n          }\n        }, {injector})"
+        ],
+        "ownership": "Borrow supplied injector; only the returned render registration is destroyed",
+        "capture": false
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/injector-render-type-current-diagnostic.json",
+          "sha256": "0e4b639eb6052ab3df0dfa9991285084785d4a017638966416315ff3db4cd02b"
+        },
+        {
+          "path": "scripts/injector-render-use-review.mjs",
+          "sha256": "88a9c0011de26bc83e67ebe19e82421eecc036a05cb866aef0a7df1a0cc4cdbf"
+        },
+        {
+          "path": "tests/injector_render_type_probe.mjs",
+          "sha256": "a43aa38be43c5d653f88675517561bf674d28543c59adb6dc9f721c276a27107"
+        },
+        {
+          "path": "tests/test_injector_render_current.py",
+          "sha256": "a4b156cf6bcce337efaa9462d8dceaf3c2a66d33aaf6b40d38ddf47008ba020b"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/ng-zone-public-subjects.mjs",
+          "sha256": "0eb7c8966e8c1e8fc0e974a2c25f48e32c28a7d5b6f7448df839a6e67866763d"
+        },
+        {
+          "path": "compatibility/rc/ng-zone-public-subjects.json",
+          "sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175"
+        },
+        {
+          "path": "compatibility/rc/injector-render-select-current-diagnostic.json",
+          "sha256": "b36b1e4e82b9f80517356965eec9426cfb7e972f51e6e8889e83c57be2265f6c"
+        },
+        {
+          "path": "compatibility/rc/injector-render-cyph-source-sanity.json",
+          "sha256": "eef1d226f0716368f0e23a3bf38a0cf88eb3bb84575c7bafbbdf55f5c58d79d5"
+        },
+        {
+          "path": "tests/select_render_runtime_probe.mjs",
+          "sha256": "0ed0f30b529ec98d6f1a3bb63c315ae5cf7928b4da1a0acd04aa0317063647ce"
+        },
+        {
+          "path": "tests/test_select_render_runtime.py",
+          "sha256": "ffa4cb27f5c41371cd46c239cb742ece200bc3cda8715e7d547b0fb39e9eaeeb"
+        }
+      ]
+    },
+    {
+      "file": "legacy-tabs/internal/after-tab-header-render.ts",
+      "module": "@angular/core",
+      "symbol": "Injector",
+      "candidate_source_sha256": "02edb608845d4cb4c28ad410f74309ad1cc02214dae823f3c15ad40fd41c699a",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "This runtime Injector import is both a public captured DI token and a nullable type. tabHeaderRenderInjector checks the public context boundary, returns inject(Injector) inside that context and returns null for manual construction. The render helper conditionally resolves ApplicationRef with the stable public null-fallback get overload and passes the same context to afterNextRender. Real current applications exercise captured-context initial alignment, pagination, stable zone timing, once-only completion, cancellation and lookup failure cleanup in development/production and zoneful/zoneless modes. Header host/item geometry and ink-bar services are explicit protocols and Angular decorators are removed. This closes the Injector capture/type/get dependency only, not actual legacy header node DI or native/packed geometry.",
+      "source_binding": {
+        "file": "legacy-tabs/internal/after-tab-header-render.ts",
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "family": "tab-header",
+        "candidate_source_sha256": "02edb608845d4cb4c28ad410f74309ad1cc02214dae823f3c15ad40fd41c699a",
+        "helper": "export function afterTabHeaderRender(zone: NgZone, injector: Injector | null): Observable<void> {\n  return new Observable<void>(subscriber => {\n    const stable = zone.onStable.subscribe(() => subscriber.next());\n    let rendered: AfterRenderRef | null = null;\n    try {\n      if (injector?.get(ApplicationRef, null)) {\n        rendered = afterNextRender(() => {\n          if (zone.isStable) {\n            subscriber.next();\n          }\n        }, {injector});\n      }\n    } catch (error) {\n      stable.unsubscribe();\n      throw error;\n    }\n\n    return () => {\n      stable.unsubscribe();\n      rendered?.destroy();\n    };\n  }).pipe(take(1));\n}",
+        "gets": [
+          "injector?.get(ApplicationRef, null)"
+        ],
+        "renders": [
+          "afterNextRender(() => {\n          if (zone.isStable) {\n            subscriber.next();\n          }\n        }, {injector})"
+        ],
+        "ownership": "Borrow supplied injector; only the returned render registration is destroyed",
+        "capture": true
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/injector-render-type-current-diagnostic.json",
+          "sha256": "0e4b639eb6052ab3df0dfa9991285084785d4a017638966416315ff3db4cd02b"
+        },
+        {
+          "path": "scripts/injector-render-use-review.mjs",
+          "sha256": "88a9c0011de26bc83e67ebe19e82421eecc036a05cb866aef0a7df1a0cc4cdbf"
+        },
+        {
+          "path": "tests/injector_render_type_probe.mjs",
+          "sha256": "a43aa38be43c5d653f88675517561bf674d28543c59adb6dc9f721c276a27107"
+        },
+        {
+          "path": "tests/test_injector_render_current.py",
+          "sha256": "a4b156cf6bcce337efaa9462d8dceaf3c2a66d33aaf6b40d38ddf47008ba020b"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/ng-zone-public-subjects.mjs",
+          "sha256": "0eb7c8966e8c1e8fc0e974a2c25f48e32c28a7d5b6f7448df839a6e67866763d"
+        },
+        {
+          "path": "compatibility/rc/ng-zone-public-subjects.json",
+          "sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175"
+        },
+        {
+          "path": "compatibility/rc/injector-render-tab-header-current-diagnostic.json",
+          "sha256": "d86cd940175355dae05705df98392f4c4de2d29bc2e2524097a738fa0b9e2fe8"
+        },
+        {
+          "path": "compatibility/rc/injector-render-cyph-source-sanity.json",
+          "sha256": "eef1d226f0716368f0e23a3bf38a0cf88eb3bb84575c7bafbbdf55f5c58d79d5"
+        },
+        {
+          "path": "tests/tab_header_render_runtime_probe.mjs",
+          "sha256": "b021bac33822cfe3d04117968ce1a15a6441e0d5889b095c1a05922d664f3d46"
+        },
+        {
+          "path": "tests/test_tab_header_render_runtime.py",
+          "sha256": "04a8b25362a88503e75b81725d8fcf88d0052229984fc5aabdd01c9179618028"
+        },
+        {
+          "path": "tests/tab_header_render_subject.mjs",
+          "sha256": "d920286a25927cd05b8e5703a89f7661c2050f3827e61ee33e97c970221a9619"
+        }
+      ]
+    },
+    {
+      "file": "legacy-tooltip/internal/after-tooltip-render.ts",
+      "module": "@angular/core",
+      "symbol": "Injector",
+      "candidate_source_sha256": "025887d2460a74da9bbbf898ca911d3dd82234e41bf34615b65573f500c125f9",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The type-only Injector argument is borrowed from the existing tooltip service context. Its exact get(ApplicationRef, null) uses the nondeprecated generic public overload; afterNextRender receives that same injector. The original onMicrotaskEmpty route and take(1) completion remain, while stable zoneless rendering can complete positioning. Real framework callbacks exercise message source-member updates, detach/destroy cancellation and lookup-error cleanup with explicit tooltip/overlay/ARIA protocols. Only the render registration is destroyed. This closes the public Injector type/get/forward dependency; the actual tooltip node/provider graph, ARIA service implementation, other hook dependencies, native paint and complete floors remain separate.",
+      "source_binding": {
+        "file": "legacy-tooltip/internal/after-tooltip-render.ts",
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "family": "tooltip",
+        "candidate_source_sha256": "025887d2460a74da9bbbf898ca911d3dd82234e41bf34615b65573f500c125f9",
+        "helper": "export function afterTooltipRender(zone: NgZone, injector: Injector): Observable<void> {\n  return new Observable<void>(subscriber => {\n    const empty = zone.onMicrotaskEmpty.subscribe(() => subscriber.next());\n    // Manual construction without an application retains the original zone-only path.\n    let rendered: AfterRenderRef | null = null;\n    try {\n      if (injector.get(ApplicationRef, null)) {\n        rendered = afterNextRender(() => {\n          if (zone.isStable) {\n            subscriber.next();\n          }\n        }, {injector});\n      }\n    } catch (error) {\n      empty.unsubscribe();\n      throw error;\n    }\n\n    return () => {\n      empty.unsubscribe();\n      rendered?.destroy();\n    };\n  }).pipe(take(1));\n}",
+        "gets": [
+          "injector.get(ApplicationRef, null)"
+        ],
+        "renders": [
+          "afterNextRender(() => {\n          if (zone.isStable) {\n            subscriber.next();\n          }\n        }, {injector})"
+        ],
+        "ownership": "Borrow supplied injector; only the returned render registration is destroyed",
+        "capture": false
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/injector-render-type-current-diagnostic.json",
+          "sha256": "0e4b639eb6052ab3df0dfa9991285084785d4a017638966416315ff3db4cd02b"
+        },
+        {
+          "path": "scripts/injector-render-use-review.mjs",
+          "sha256": "88a9c0011de26bc83e67ebe19e82421eecc036a05cb866aef0a7df1a0cc4cdbf"
+        },
+        {
+          "path": "tests/injector_render_type_probe.mjs",
+          "sha256": "a43aa38be43c5d653f88675517561bf674d28543c59adb6dc9f721c276a27107"
+        },
+        {
+          "path": "tests/test_injector_render_current.py",
+          "sha256": "a4b156cf6bcce337efaa9462d8dceaf3c2a66d33aaf6b40d38ddf47008ba020b"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/ng-zone-public-subjects.mjs",
+          "sha256": "0eb7c8966e8c1e8fc0e974a2c25f48e32c28a7d5b6f7448df839a6e67866763d"
+        },
+        {
+          "path": "compatibility/rc/ng-zone-public-subjects.json",
+          "sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175"
+        },
+        {
+          "path": "compatibility/rc/injector-render-tooltip-current-diagnostic.json",
+          "sha256": "874757e3cfd74638da45897093161db09aa4ee478ba69d33ed56a7008c542691"
+        },
+        {
+          "path": "compatibility/rc/injector-render-cyph-source-sanity.json",
+          "sha256": "eef1d226f0716368f0e23a3bf38a0cf88eb3bb84575c7bafbbdf55f5c58d79d5"
+        },
+        {
+          "path": "tests/tooltip_render_runtime_probe.mjs",
+          "sha256": "c9eb1005aae281eafbe9db7214076bd9ea0a42aec4b76a847caab359948a86f6"
+        },
+        {
+          "path": "tests/test_tooltip_render_runtime.py",
+          "sha256": "b2e84e23ee336d3da56e81f5229af58a59f3eb4eb6e578a6e2874ca8d4be35b7"
+        }
+      ]
+    },
+    {
+      "file": "legacy-form-field/form-field.ts",
+      "module": "@angular/core",
+      "symbol": "Injector",
+      "candidate_source_sha256": "580387e18e311ed166b078623d3f9889611f459349f1468371f07d9a2e281582",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The imported runtime Injector token annotates the optional trailing constructor slot7. Existing constructor arguments remain in their prior order; the captured field is forwarded unchanged to afterFormFieldRender in the existing runOutsideAngular subscription. A missing manual argument keeps the historical zone-only path. Complete owned/original source constructors and members execute with a protocol color-trait parent and genuine public application/zone callbacks, including continuous outline updates, teardown and controlled lookup failures. The helper strict compilation resolves its get to a nondeprecated public Injector overload. This closes the runtime token/type/borrowed-field/forward dependency, not the actual Angular form-field factory, node provider graph or native geometry. No consumer signature or style change is made by this review.",
+      "source_binding": {
+        "file": "legacy-form-field/form-field.ts",
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "family": "form-field",
+        "candidate_source_sha256": "580387e18e311ed166b078623d3f9889611f459349f1468371f07d9a2e281582",
+        "constructor_parameter": {
+          "index": 7,
+          "declaration": "private _injector?: Injector"
+        },
+        "consumer": {
+          "file": "legacy-form-field/form-field.ts",
+          "sha256": "580387e18e311ed166b078623d3f9889611f459349f1468371f07d9a2e281582",
+          "calls": [
+            "afterFormFieldRender(this._ngZone, this._injector)"
+          ]
+        },
+        "ownership": "Optional trailing borrowed field forwarded unchanged to the family render helper"
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/injector-render-type-current-diagnostic.json",
+          "sha256": "0e4b639eb6052ab3df0dfa9991285084785d4a017638966416315ff3db4cd02b"
+        },
+        {
+          "path": "scripts/injector-render-use-review.mjs",
+          "sha256": "88a9c0011de26bc83e67ebe19e82421eecc036a05cb866aef0a7df1a0cc4cdbf"
+        },
+        {
+          "path": "tests/injector_render_type_probe.mjs",
+          "sha256": "a43aa38be43c5d653f88675517561bf674d28543c59adb6dc9f721c276a27107"
+        },
+        {
+          "path": "tests/test_injector_render_current.py",
+          "sha256": "a4b156cf6bcce337efaa9462d8dceaf3c2a66d33aaf6b40d38ddf47008ba020b"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/ng-zone-public-subjects.mjs",
+          "sha256": "0eb7c8966e8c1e8fc0e974a2c25f48e32c28a7d5b6f7448df839a6e67866763d"
+        },
+        {
+          "path": "compatibility/rc/ng-zone-public-subjects.json",
+          "sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175"
+        },
+        {
+          "path": "compatibility/rc/injector-render-form-field-current-diagnostic.json",
+          "sha256": "75db43298f47b88f10a4c8b2c08d10b59fd4f500b0edd8b45e799e6b78292b13"
+        },
+        {
+          "path": "compatibility/rc/injector-render-cyph-source-sanity.json",
+          "sha256": "eef1d226f0716368f0e23a3bf38a0cf88eb3bb84575c7bafbbdf55f5c58d79d5"
+        },
+        {
+          "path": "tests/form_field_render_runtime_probe.mjs",
+          "sha256": "ffa7240e0fb75376ccf60cf21609a8edd6ddb23c9d3c20ea34533443b921fba7"
+        },
+        {
+          "path": "tests/test_form_field_render_runtime.py",
+          "sha256": "8bee5feb6ff5eee4a0a1645287543e1f434fe28d48f0af569f92fe082caab2ce"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-form-field/internal/after-form-field-render.ts",
+          "sha256": "3edca3208021bf71f1b9f8e6c7cdc9832b057b60c10fdd676b69d34d2e3f825a"
+        }
+      ]
+    },
+    {
+      "file": "legacy-select/internal/select-base.ts",
+      "module": "@angular/core",
+      "symbol": "Injector",
+      "candidate_source_sha256": "3a0e28d25fa553220d0faeff8c00b4bd3c343cdd27051e25eda7efef6a80b432",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The runtime Injector token annotates optional trailing constructor slot14 and is stored as a protected borrowed field. The derived select open path passes this field unchanged to afterSelectRender; the source checker binds that separate consumer and rejects a required trailing argument. Complete base and derived source constructors/members replay with genuine application/zone callbacks and a protocol mixed-trait parent, including manual omission, initialization, font transfer and destruction. Actual helper strict types resolve the public get overload without deprecated flags. This closes the token/type/field forwarding dependency, preserving prior manual argument shapes. Actual Angular factory/provider behavior and native/packed layout remain separate obligations; no consumer or product API/style edit occurs here.",
+      "source_binding": {
+        "file": "legacy-select/internal/select-base.ts",
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "family": "select",
+        "candidate_source_sha256": "3a0e28d25fa553220d0faeff8c00b4bd3c343cdd27051e25eda7efef6a80b432",
+        "constructor_parameter": {
+          "index": 14,
+          "declaration": "protected _injector?: Injector"
+        },
+        "consumer": {
+          "file": "legacy-select/select.ts",
+          "sha256": "8fa3a142a8c70b69300896a96e56a031798ad27feb0d84db22f9fd5083408739",
+          "calls": [
+            "afterSelectRender(this._ngZone, this._injector)"
+          ]
+        },
+        "ownership": "Optional trailing borrowed field forwarded unchanged to the family render helper"
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/injector-render-type-current-diagnostic.json",
+          "sha256": "0e4b639eb6052ab3df0dfa9991285084785d4a017638966416315ff3db4cd02b"
+        },
+        {
+          "path": "scripts/injector-render-use-review.mjs",
+          "sha256": "88a9c0011de26bc83e67ebe19e82421eecc036a05cb866aef0a7df1a0cc4cdbf"
+        },
+        {
+          "path": "tests/injector_render_type_probe.mjs",
+          "sha256": "a43aa38be43c5d653f88675517561bf674d28543c59adb6dc9f721c276a27107"
+        },
+        {
+          "path": "tests/test_injector_render_current.py",
+          "sha256": "a4b156cf6bcce337efaa9462d8dceaf3c2a66d33aaf6b40d38ddf47008ba020b"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/ng-zone-public-subjects.mjs",
+          "sha256": "0eb7c8966e8c1e8fc0e974a2c25f48e32c28a7d5b6f7448df839a6e67866763d"
+        },
+        {
+          "path": "compatibility/rc/ng-zone-public-subjects.json",
+          "sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175"
+        },
+        {
+          "path": "compatibility/rc/injector-render-select-current-diagnostic.json",
+          "sha256": "b36b1e4e82b9f80517356965eec9426cfb7e972f51e6e8889e83c57be2265f6c"
+        },
+        {
+          "path": "compatibility/rc/injector-render-cyph-source-sanity.json",
+          "sha256": "eef1d226f0716368f0e23a3bf38a0cf88eb3bb84575c7bafbbdf55f5c58d79d5"
+        },
+        {
+          "path": "tests/select_render_runtime_probe.mjs",
+          "sha256": "0ed0f30b529ec98d6f1a3bb63c315ae5cf7928b4da1a0acd04aa0317063647ce"
+        },
+        {
+          "path": "tests/test_select_render_runtime.py",
+          "sha256": "ffa4cb27f5c41371cd46c239cb742ece200bc3cda8715e7d547b0fb39e9eaeeb"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-select/select.ts",
+          "sha256": "8fa3a142a8c70b69300896a96e56a031798ad27feb0d84db22f9fd5083408739"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-select/internal/after-select-render.ts",
+          "sha256": "10a2bbbe02fb0a4578646e802888a5e075bb909a36fd1c19049b5fa2d731e570"
+        }
+      ]
+    }
+  ],
+  "earlier_frozen_proof_scope": "The prior six-use Injector proof separately inventoried eleven current imports outside its own review scope. This current ledger resolves seven of those imports without changing or reattributing historical execution receipts.",
+  "g11_claim": "not-passed"
+}

@@ -39,8 +39,12 @@ class CurrentAuthoredUseInventoryTests(unittest.TestCase):
                 result = subprocess.run(['node', 'scripts/check-upstream-audit-disposition.mjs',
                     '--admission', '--line', ledger['line'], '--current-symbols', str(candidate),
                     '--report', str(report)], cwd=ROOT, capture_output=True, text=True)
-                self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                self.assertIn(result.returncode, [0, 1], result.stdout + result.stderr)
                 observed = json.loads(result.stdout)
+                self.assertEqual(result.returncode,
+                    0 if observed['disposition_admission'] == 'pass' else 1)
+                if omitted:
+                    self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
                 live = observed['current_authored_use_inventory']
                 self.assertEqual(live['inventory']['missing'], 1 if omitted else 0)
                 self.assertEqual(live['inventory']['complete'], not omitted)

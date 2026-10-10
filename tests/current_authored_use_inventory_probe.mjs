@@ -158,8 +158,12 @@ const ledger = JSON.parse(readFileSync(join(root, 'compatibility/f10/authored-de
 const observed = currentAuthoredUseAdmission({current: actual, frozen: actualSeed.symbol_uses,
   candidate: ledger, line: ledger.line, readMember: path => readFileSync(join(root, path))});
 assert.equal(observed.inventory.complete, true); assert.equal(observed.scope_valid, true);
-assert.equal(observed.source_snapshot_valid, true); assert.equal(observed.ready, false);
-assert.ok(observed.additional_uses > 0); assert.equal(observed.inventory.open, observed.additional_uses);
+assert.equal(observed.source_snapshot_valid, true);
+const closed = ledger.symbol_uses.filter(row => row.status === 'reviewed' && row.disposition === 'closed').length;
+assert.equal(observed.review_evidence.insufficient, 0);
+assert.equal(observed.review_evidence.reviewed, closed);
+assert.equal(observed.inventory.open, ledger.symbol_use_count - closed);
+assert.equal(observed.ready, ledger.status === 'closed' && closed === ledger.symbol_use_count);
 const result = {schema_version: 1, line: ledger.line, compiler: ts.version, node: process.version,
   fixture_discovered_routes: discovered.symbol_uses.length, discovery_path_or_syntax_controls: 5,
   whole_discovery_mutants_rejected: discoveryMutants, admission_negative_controls: admissionControls,

@@ -1,0 +1,219 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "node": "v22.23.3",
+  "compiler": "6.0.3",
+  "source_review": {
+    "schema_version": 1,
+    "cases": [
+      {
+        "file": "legacy-autocomplete/internal/after-legacy-render.ts",
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "family": "autocomplete",
+        "candidate_source_sha256": "afd5687000abc7b89968b0c03454f0fc6ac452e69d34bd162b8523ae11fcaf85",
+        "helper": "export function afterLegacyRender(zone: NgZone, injector: Injector): Observable<void> {\n  return new Observable<void>(subscriber => {\n    const stable = zone.onStable.subscribe(() => subscriber.next());\n    // The supplied view injector also preserves the historical manual constructor.\n    // A manual injector without an application keeps the original zone-only path.\n    let rendered: AfterRenderRef | null = null;\n    try {\n      if (injector.get(ApplicationRef, null)) {\n        rendered = afterNextRender(() => {\n          if (zone.isStable) {\n            subscriber.next();\n          }\n        }, {injector});\n      }\n    } catch (error) {\n      stable.unsubscribe();\n      throw error;\n    }\n\n    return () => {\n      stable.unsubscribe();\n      rendered?.destroy();\n    };\n  }).pipe(take(1));\n}",
+        "gets": [
+          "injector.get(ApplicationRef, null)"
+        ],
+        "renders": [
+          "afterNextRender(() => {\n          if (zone.isStable) {\n            subscriber.next();\n          }\n        }, {injector})"
+        ],
+        "ownership": "Borrow supplied injector; only the returned render registration is destroyed",
+        "capture": false
+      },
+      {
+        "file": "legacy-form-field/internal/after-form-field-render.ts",
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "family": "form-field",
+        "candidate_source_sha256": "3edca3208021bf71f1b9f8e6c7cdc9832b057b60c10fdd676b69d34d2e3f825a",
+        "helper": "export function afterFormFieldRender(zone: NgZone, injector?: Injector | null): Observable<void> {\n  return new Observable<void>(subscriber => {\n    const stable = zone.onStable.subscribe(() => subscriber.next());\n    // A manually constructed field without an application retains its original zone path.\n    let rendered: AfterRenderRef | null = null;\n    try {\n      if (injector?.get(ApplicationRef, null)) {\n        rendered = afterEveryRender(() => {\n          if (zone.isStable) {\n            subscriber.next();\n          }\n        }, {injector});\n      }\n    } catch (error) {\n      stable.unsubscribe();\n      throw error;\n    }\n\n    return () => {\n      stable.unsubscribe();\n      rendered?.destroy();\n    };\n  });\n}",
+        "gets": [
+          "injector?.get(ApplicationRef, null)"
+        ],
+        "renders": [
+          "afterEveryRender(() => {\n          if (zone.isStable) {\n            subscriber.next();\n          }\n        }, {injector})"
+        ],
+        "ownership": "Borrow supplied injector; only the returned render registration is destroyed",
+        "capture": false
+      },
+      {
+        "file": "legacy-select/internal/after-select-render.ts",
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "family": "select",
+        "candidate_source_sha256": "10a2bbbe02fb0a4578646e802888a5e075bb909a36fd1c19049b5fa2d731e570",
+        "helper": "export function afterSelectRender(zone: NgZone, injector?: Injector | null): Observable<void> {\n  return new Observable<void>(subscriber => {\n    const stable = zone.onStable.subscribe(() => subscriber.next());\n    // The trailing optional injector preserves historical manual construction.\n    let rendered: AfterRenderRef | null = null;\n    try {\n      if (injector?.get(ApplicationRef, null)) {\n        rendered = afterNextRender(() => {\n          if (zone.isStable) {\n            subscriber.next();\n          }\n        }, {injector});\n      }\n    } catch (error) {\n      stable.unsubscribe();\n      throw error;\n    }\n\n    return () => {\n      stable.unsubscribe();\n      rendered?.destroy();\n    };\n  }).pipe(take(1));\n}",
+        "gets": [
+          "injector?.get(ApplicationRef, null)"
+        ],
+        "renders": [
+          "afterNextRender(() => {\n          if (zone.isStable) {\n            subscriber.next();\n          }\n        }, {injector})"
+        ],
+        "ownership": "Borrow supplied injector; only the returned render registration is destroyed",
+        "capture": false
+      },
+      {
+        "file": "legacy-tabs/internal/after-tab-header-render.ts",
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "family": "tab-header",
+        "candidate_source_sha256": "02edb608845d4cb4c28ad410f74309ad1cc02214dae823f3c15ad40fd41c699a",
+        "helper": "export function afterTabHeaderRender(zone: NgZone, injector: Injector | null): Observable<void> {\n  return new Observable<void>(subscriber => {\n    const stable = zone.onStable.subscribe(() => subscriber.next());\n    let rendered: AfterRenderRef | null = null;\n    try {\n      if (injector?.get(ApplicationRef, null)) {\n        rendered = afterNextRender(() => {\n          if (zone.isStable) {\n            subscriber.next();\n          }\n        }, {injector});\n      }\n    } catch (error) {\n      stable.unsubscribe();\n      throw error;\n    }\n\n    return () => {\n      stable.unsubscribe();\n      rendered?.destroy();\n    };\n  }).pipe(take(1));\n}",
+        "gets": [
+          "injector?.get(ApplicationRef, null)"
+        ],
+        "renders": [
+          "afterNextRender(() => {\n          if (zone.isStable) {\n            subscriber.next();\n          }\n        }, {injector})"
+        ],
+        "ownership": "Borrow supplied injector; only the returned render registration is destroyed",
+        "capture": true
+      },
+      {
+        "file": "legacy-tooltip/internal/after-tooltip-render.ts",
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "family": "tooltip",
+        "candidate_source_sha256": "025887d2460a74da9bbbf898ca911d3dd82234e41bf34615b65573f500c125f9",
+        "helper": "export function afterTooltipRender(zone: NgZone, injector: Injector): Observable<void> {\n  return new Observable<void>(subscriber => {\n    const empty = zone.onMicrotaskEmpty.subscribe(() => subscriber.next());\n    // Manual construction without an application retains the original zone-only path.\n    let rendered: AfterRenderRef | null = null;\n    try {\n      if (injector.get(ApplicationRef, null)) {\n        rendered = afterNextRender(() => {\n          if (zone.isStable) {\n            subscriber.next();\n          }\n        }, {injector});\n      }\n    } catch (error) {\n      empty.unsubscribe();\n      throw error;\n    }\n\n    return () => {\n      empty.unsubscribe();\n      rendered?.destroy();\n    };\n  }).pipe(take(1));\n}",
+        "gets": [
+          "injector.get(ApplicationRef, null)"
+        ],
+        "renders": [
+          "afterNextRender(() => {\n          if (zone.isStable) {\n            subscriber.next();\n          }\n        }, {injector})"
+        ],
+        "ownership": "Borrow supplied injector; only the returned render registration is destroyed",
+        "capture": false
+      },
+      {
+        "file": "legacy-form-field/form-field.ts",
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "family": "form-field",
+        "candidate_source_sha256": "580387e18e311ed166b078623d3f9889611f459349f1468371f07d9a2e281582",
+        "constructor_parameter": {
+          "index": 7,
+          "declaration": "private _injector?: Injector"
+        },
+        "consumer": {
+          "file": "legacy-form-field/form-field.ts",
+          "sha256": "580387e18e311ed166b078623d3f9889611f459349f1468371f07d9a2e281582",
+          "calls": [
+            "afterFormFieldRender(this._ngZone, this._injector)"
+          ]
+        },
+        "ownership": "Optional trailing borrowed field forwarded unchanged to the family render helper"
+      },
+      {
+        "file": "legacy-select/internal/select-base.ts",
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "family": "select",
+        "candidate_source_sha256": "3a0e28d25fa553220d0faeff8c00b4bd3c343cdd27051e25eda7efef6a80b432",
+        "constructor_parameter": {
+          "index": 14,
+          "declaration": "protected _injector?: Injector"
+        },
+        "consumer": {
+          "file": "legacy-select/select.ts",
+          "sha256": "8fa3a142a8c70b69300896a96e56a031798ad27feb0d84db22f9fd5083408739",
+          "calls": [
+            "afterSelectRender(this._ngZone, this._injector)"
+          ]
+        },
+        "ownership": "Optional trailing borrowed field forwarded unchanged to the family render helper"
+      }
+    ],
+    "scope": "Seven current public Injector type/capture/get/forward contracts; helper registrations and complete source-member replay have separate runtime evidence. Actual legacy Angular factories/node DI, packed/native and complete consumer/runtime floors are not qualified."
+  },
+  "source_negative_controls": 12,
+  "types": [
+    {
+      "line": "main",
+      "strict": true,
+      "skipLibCheck": false,
+      "diagnostics": 0,
+      "negative_types": 3,
+      "fixture_sha256": "6c47d13c450e5e6ca1685ccc056a701daef7363d547bae2a2c49934fcbba282c",
+      "resolved_nondeprecated_gets": [
+        {
+          "helper": "helper-0.ts",
+          "call": "injector.get(ApplicationRef, null)",
+          "signature": "abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions): T;",
+          "declaration_sha256": "1ac581e22272aa978a1d265ddd1d49b82883c1faafe13b6d6ad3329a1dff3a58"
+        },
+        {
+          "helper": "helper-1.ts",
+          "call": "injector?.get(ApplicationRef, null)",
+          "signature": "abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions): T;",
+          "declaration_sha256": "1ac581e22272aa978a1d265ddd1d49b82883c1faafe13b6d6ad3329a1dff3a58"
+        },
+        {
+          "helper": "helper-2.ts",
+          "call": "injector?.get(ApplicationRef, null)",
+          "signature": "abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions): T;",
+          "declaration_sha256": "1ac581e22272aa978a1d265ddd1d49b82883c1faafe13b6d6ad3329a1dff3a58"
+        },
+        {
+          "helper": "helper-3.ts",
+          "call": "injector?.get(ApplicationRef, null)",
+          "signature": "abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions): T;",
+          "declaration_sha256": "1ac581e22272aa978a1d265ddd1d49b82883c1faafe13b6d6ad3329a1dff3a58"
+        },
+        {
+          "helper": "helper-4.ts",
+          "call": "injector.get(ApplicationRef, null)",
+          "signature": "abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions): T;",
+          "declaration_sha256": "1ac581e22272aa978a1d265ddd1d49b82883c1faafe13b6d6ad3329a1dff3a58"
+        }
+      ]
+    },
+    {
+      "line": "21.x",
+      "strict": true,
+      "skipLibCheck": false,
+      "diagnostics": 0,
+      "negative_types": 3,
+      "fixture_sha256": "6c47d13c450e5e6ca1685ccc056a701daef7363d547bae2a2c49934fcbba282c",
+      "resolved_nondeprecated_gets": [
+        {
+          "helper": "helper-0.ts",
+          "call": "injector.get(ApplicationRef, null)",
+          "signature": "abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions): T;",
+          "declaration_sha256": "3cb3136229287079f3debe572c0370c9eb734b12a9296d6d34c8f3f1e34d8e5a"
+        },
+        {
+          "helper": "helper-1.ts",
+          "call": "injector?.get(ApplicationRef, null)",
+          "signature": "abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions): T;",
+          "declaration_sha256": "3cb3136229287079f3debe572c0370c9eb734b12a9296d6d34c8f3f1e34d8e5a"
+        },
+        {
+          "helper": "helper-2.ts",
+          "call": "injector?.get(ApplicationRef, null)",
+          "signature": "abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions): T;",
+          "declaration_sha256": "3cb3136229287079f3debe572c0370c9eb734b12a9296d6d34c8f3f1e34d8e5a"
+        },
+        {
+          "helper": "helper-3.ts",
+          "call": "injector?.get(ApplicationRef, null)",
+          "signature": "abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions): T;",
+          "declaration_sha256": "3cb3136229287079f3debe572c0370c9eb734b12a9296d6d34c8f3f1e34d8e5a"
+        },
+        {
+          "helper": "helper-4.ts",
+          "call": "injector.get(ApplicationRef, null)",
+          "signature": "abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions): T;",
+          "declaration_sha256": "3cb3136229287079f3debe572c0370c9eb734b12a9296d6d34c8f3f1e34d8e5a"
+        }
+      ]
+    }
+  ],
+  "namespace_capsule_sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3",
+  "limits": [
+    "Actual helper source compiles against whole authenticated current minimum declarations with borrowed RxJS/tslib and host compiler. Source controls reject numeric get flags, destroying borrowed contexts and required trailing constructor arguments.",
+    "No actual legacy component/factory/node DI, native/packed/AOT or complete supported compiler/runtime/RxJS floor execution. Five family render runtime replays are recorded separately."
+  ],
+  "g11_claim": "not-passed"
+}
