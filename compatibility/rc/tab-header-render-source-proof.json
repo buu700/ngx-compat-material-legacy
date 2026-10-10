@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "recorded_at_utc": "2026-10-10T04:32:20.402867+00:00",
+  "status": "source/constructor/public minimum initial-render/type repair passed; actual packed/native header qualification pending",
+  "source_heads": {
+    "main": "7935519cfaf50f42166764a284f33a3c0fd11c49",
+    "21.x": "a67626e7c30a0cad76cd3f5dc2e8061ccc1c3dcd"
+  },
+  "source_trees": {
+    "main": "8d11bba8ab4062960b46b8b9776fb308f0113f8c",
+    "21.x": "75bb76aca4a7198563dc34de2b8e9e8bbc3a6684"
+  },
+  "problem": "With no ResizeObserver callback, viewport or direction event, the tagged header initial onStable wait never fires in a public-provider zoneless application. The candidate can also realign via native ResizeObserver; this is a missing initial-render path, not a claim that normal browsers universally fail.",
+  "repair": [
+    "A header-owned observable preserves one-shot zone stability and adds stable public afterNextRender through an existing application injector. A public isStable guard preserves exercised zoneful timing.",
+    "A private field captures the public Injector in an existing injection context. Outside DI it stays null, preserving the historical seven-argument manual constructor. No wrapper constructor changed.",
+    "The existing destruction boundary unsubscribes zone stability and destroys the pending public AfterRenderRef. Lookup/registration failure cleans the zone subscription before propagating."
+  ],
+  "preserved": {
+    "historical_7_argument_constructor_byte_identical": true,
+    "existing_public_declarations_unchanged": true,
+    "required_consumer_HTML_CSS_SCSS_changes": false,
+    "consumer_TS_edits_found_necessary": false,
+    "product_HTML_CSS_SCSS_changed": false,
+    "goldens_changed": false
+  },
+  "tests": {
+    "python_tests": 5,
+    "isolated_framework_subjects": 10,
+    "current_zoneful_zoneless_development_production_subjects": 8,
+    "original_zoneful_subjects": 2,
+    "specific_mutation_rejections": 32,
+    "strict_helper_negative_checks_per_current_subject": 5,
+    "strict_compiler": "6.0.2",
+    "supporting_lifetime_cases": 27,
+    "supporting_lifetime_mutants": 14,
+    "native_predicate_tests": 1,
+    "browser_source_identity_tests": 2
+  },
+  "observations": [
+    "Whole original and candidate constructors/members execute against genuine public FocusKeyManager, QueryList and NgZone. Original and candidate zoneful initial ink/pagination/transform observations match in the exercised geometry.",
+    "At both current minima in zoneless development and production, the tagged wait stays pending and the candidate aligns item0 and enables overflow pagination after a genuine public render callback. Subsequent renders or stability events do not repeat initial alignment.",
+    "Seven-argument manual construction outside DI retains the original zoneful path and the original pending zoneless path. Destruction before render cancels its hook. Specific mutants reject lost injection-context capture, prior zone-only wait, missing cancellation, leaked handle, premature zoneful execution, repeated initial work and lookup-error leakage."
+  ],
+  "runtime_scope": "Whole original and owned header constructors and members replayed without Angular decorators. Genuine public NgZone, QueryList, FocusKeyManager and current application/render callbacks. Host/item geometry, ink bar, change detector, viewport, directionality and platform are explicit protocols. ResizeObserver absent to isolate initial alignment; real browsers can also realign from resize. No actual legacy directive/node DI, native paint, packed/AOT geometry, consumer build or Rx/Node floor qualification. The render probe suppresses owned header-resize observations with EMPTY, uses coercion and passive-listener protocols, and authenticates the supplied historical constants. The separate existing lifetime probe executes the actual owned resize/render helper and whole header using borrowed current22 peers with synthetic geometry/events/clock; it is not an actual21 or floor run.",
+  "native_producer": "The existing packed overlay producer already requires real pagination controls to initialize, inert disabled clicks, pointer focus retention, scrolling and selected ink-bar geometry. It remains unchanged and unexecuted at this checkpoint; no extra browser matrix credit is claimed.",
+  "source_binding_refresh": {
+    "previous_frozen_reviewed_rows": 21,
+    "fresh_checker_calls": 24,
+    "review_documents_refreshed": 13,
+    "new_frozen_use_admissions": 0,
+    "new_upstream_SHA_closures": 0,
+    "historical_component_or_native_runs_restamped": false
+  },
+  "new_current_helper_imports": {
+    "file": "projects/ngx-material-legacy/legacy-tabs/internal/after-tab-header-render.ts",
+    "core": [
+      "afterNextRender",
+      "ApplicationRef",
+      "assertInInjectionContext",
+      "inject",
+      "Injector",
+      "AfterRenderRef",
+      "NgZone"
+    ],
+    "scope": "Separate current uses. Public contracts and strict helper types checked at both actual minima; this does not alter the frozen 1736-use denominator or close all NgZone callers."
+  },
+  "cyph_sanity": {
+    "head": "a56a0603636cac5aaabe8fe408f7429b4224f011",
+    "clean": true,
+    "tab_group_templates": 5,
+    "scope": "Read-only shared/js TypeScript excluding specs and five tab-group templates with associated styles. No direct header/nav constructor, subclass, alignment or pagination API use found. Contacts half-width labels/ink bar, register hidden header and shared tab/disabled-label selectors remain untouched. No consumer build or edits.",
+    "files": [
+      {
+        "path": "shared/css/cyph.base.scss",
+        "sha256": "44db9a3820a38154df9c2fa68163f5df91510f1f343214703068663eaf003267"
+      },
+      {
+        "path": "shared/css/mixins.scss",
+        "sha256": "cc248f0e8b86175c9f6edab6e0193300ad5e13f2d37f5575b556d246584baf2b"
+      },
+      {
+        "path": "shared/js/cyph/components/account-wallets/account-wallets.component.html",
+        "sha256": "398cc6533da794348a623a24ede839a16cda6f3eb85a2494e6a079e2e53959c8"
+      },
+      {
+        "path": "shared/js/cyph/components/account-wallets/account-wallets.component.scss",
+        "sha256": "61aabe39e3ede3650e5ea0f4f1da88a63a7ec347724cb247094d23c03a0d162f"
+      },
+      {
+        "path": "shared/js/cyph/components/account-register/account-register.component.html",
+        "sha256": "29fcf4bb13a0dbfe91292455ca3e4adec64b7c6cb88a543a9bf14e111b444b12"
+      },
+      {
+        "path": "shared/js/cyph/components/account-register/account-register.component.scss",
+        "sha256": "7d362de4da851e92e86e2ac4f57b1f463267e8cc51053acb54fbf885e37282b6"
+      },
+      {
+        "path": "shared/js/cyph/components/account-pgp/account-pgp.component.html",
+        "sha256": "860b6cc45402ba7fce67532b9805c59e2f3a321e6f5dfb4e12ad8918645fd73e"
+      },
+      {
+        "path": "shared/js/cyph/components/account-pgp/account-pgp.component.scss",
+        "sha256": "97ee46fbff6b5dee11f93f48b98d919234164a68486b233f3a6b76f6bf81b1c5"
+      },
+      {
+        "path": "shared/js/cyph/components/help/help.component.html",
+        "sha256": "651b60ee6134abfb482184dd5e855150933bcf15e5ce1cb89b92ce342343b603"
+      },
+      {
+        "path": "shared/js/cyph/components/help/help.component.scss",
+        "sha256": "d3d100ea142d53dd281e0176f610081311237365a8a78509dbfaf732fdff3bf6"
+      },
+      {
+        "path": "shared/js/cyph/components/account-contacts/account-contacts.component.html",
+        "sha256": "907c84cca8361acef721edb542ad391d0e2c1382cce77b1079422c44fa9f6157"
+      },
+      {
+        "path": "shared/js/cyph/components/account-contacts/account-contacts.component.scss",
+        "sha256": "2daf19b04ed2706167bae5de78282a5727da658b561c89cbfc9a5d033c3f6d61"
+      }
+    ],
+    "consumer_build_executed": false
+  },
+  "environment": {
+    "host_node": "v22.23.3",
+    "borrowed_rxjs": "7.8.2",
+    "borrowed_tslib": "2.8.1",
+    "binding_parser": "6.0.3",
+    "advertised_runtime_Rx_native_packed_floors_qualified": false
+  },
+  "remaining": [
+    "All 25 frozen NgZone boundaries remain open pending complete caller/lifecycle and native qualification.",
+    "The pre-existing form-field long-label cap and visible-offset-parent rule remain separate audit items.",
+    "Complete packed/native/floors/Sass/security/SHA closeout, C05 and independent A01-A10/R01-R03 audit remain required."
+  ],
+  "pushed": false,
+  "actions_started": false,
+  "g11_claim": "not-passed"
+}
