@@ -1,0 +1,631 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "role": "Public Injector types, actual Core hierarchy/context/value ownership protocols and exact six caller source routes",
+  "node": "v22.23.3",
+  "compiler": "6.0.3",
+  "source_review": {
+    "schema_version": 1,
+    "line": "main",
+    "compiler": "6.0.3",
+    "cases": [
+      {
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "file": "legacy-dialog/dialog.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "7f7250274cdd11c1e71474553fc7387843262265f8b44c49339b2467abd68f5d",
+        "constructor_parameter": {
+          "index": 1,
+          "declaration": "injector: Injector"
+        },
+        "forwards": [
+          {
+            "kind": "super",
+            "argument_index": 1,
+            "arguments": [
+              "overlay",
+              "injector",
+              "defaultOptions",
+              "parentDialog",
+              "overlayContainer",
+              "scrollStrategy",
+              "MatLegacyDialogRef",
+              "MatLegacyDialogContainer",
+              "MAT_LEGACY_DIALOG_DATA",
+              "animationMode"
+            ]
+          }
+        ],
+        "gets": [],
+        "children": [],
+        "contexts": [
+          {
+            "line": 70,
+            "source": "constructor(\n    overlay: Overlay,\n    injector: Injector,\n    /**\n     * @deprecated `_location` parameter to be removed.\n     * @breaking-change 10.0.0\n     */\n    @Optional() _location: Location,\n    @Optional() @Inject(MAT_LEGACY_DIALOG_DEFAULT_OPTIONS) defaultOptions: MatLegacyDialogConfig,\n    @Inject(MAT_LEGACY_DIALOG_SCROLL_STRATEGY) scrollStrategy: any,\n    @Optional() @SkipSelf() parentDialog: MatLegacyDialog,\n    /**\n     * @deprecated No longer used. To be removed.\n     * @breaking-change 15.0.0\n     */\n    overlayContainer: OverlayContainer,\n    /**\n     * @deprecated No longer used. To be removed.\n     * @breaking-change 14.0.0\n     */\n    @Optional()\n    @Inject(ANIMATION_MODULE_TYPE)\n    animationMode?: 'NoopAnimations' | 'BrowserAnimations',\n  ) {\n    super(\n      overlay,\n      injector,\n      defaultOptions,\n      parentDialog,\n      overlayContainer,\n      scrollStrategy,\n      MatLegacyDialogRef,\n      MatLegacyDialogContainer,\n      MAT_LEGACY_DIALOG_DATA,\n      animationMode,\n    );\n  }"
+          }
+        ]
+      },
+      {
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "file": "legacy-menu/menu-content.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "f682059286b3dd21faf6676cfe5e6c36d4f9ab08e515f1c76f7f31e6b2b506af",
+        "constructor_parameter": {
+          "index": 2,
+          "declaration": "injector: Injector"
+        },
+        "forwards": [
+          {
+            "kind": "super",
+            "argument_index": 2,
+            "arguments": [
+              "template",
+              "appRef",
+              "injector",
+              "viewContainerRef",
+              "document",
+              "changeDetectorRef"
+            ]
+          }
+        ],
+        "gets": [],
+        "children": [],
+        "contexts": [
+          {
+            "line": 32,
+            "source": "constructor(\n    template: TemplateRef<any>,\n    appRef: ApplicationRef,\n    injector: Injector,\n    viewContainerRef: ViewContainerRef,\n    @Inject(DOCUMENT) document: any,\n    changeDetectorRef: ChangeDetectorRef,\n  ) {\n    super(template, appRef, injector, viewContainerRef, document, changeDetectorRef);\n  }"
+          }
+        ]
+      },
+      {
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "file": "legacy-snack-bar/snack-bar.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "53d6c2ca45605161a7adc88c6edb8c7a9a4d772bd75e9d91e8412409cf0fdd8b",
+        "constructor_parameter": {
+          "index": 2,
+          "declaration": "injector: Injector"
+        },
+        "forwards": [
+          {
+            "kind": "super",
+            "argument_index": 2,
+            "arguments": [
+              "overlay",
+              "live",
+              "injector",
+              "breakpointObserver",
+              "parentSnackBar",
+              "defaultConfig"
+            ]
+          }
+        ],
+        "gets": [],
+        "children": [],
+        "contexts": [
+          {
+            "line": 32,
+            "source": "constructor(\n    overlay: Overlay,\n    live: LiveAnnouncer,\n    injector: Injector,\n    breakpointObserver: BreakpointObserver,\n    @Optional() @SkipSelf() parentSnackBar: MatLegacySnackBar,\n    @Inject(MAT_SNACK_BAR_DEFAULT_OPTIONS) defaultConfig: MatSnackBarConfig,\n  ) {\n    super(overlay, live, injector, breakpointObserver, parentSnackBar, defaultConfig);\n  }"
+          }
+        ]
+      },
+      {
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "file": "legacy-snack-bar/internal/snack-bar-base.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "1faece639aa44d426b249e15a3a3cca82ae6291371102ce88d8e3ef02baef38c",
+        "constructor_parameter": {
+          "index": 2,
+          "declaration": "private _injector: Injector"
+        },
+        "forwards": [],
+        "gets": [],
+        "children": [
+          {
+            "line": 159,
+            "parent": "userInjector || this._injector",
+            "providers": [
+              {
+                "provide": "MatSnackBarConfig",
+                "useValue": "config"
+              }
+            ],
+            "recipient": "ComponentPortal argument2"
+          },
+          {
+            "line": 299,
+            "parent": "userInjector || this._injector",
+            "providers": [
+              {
+                "provide": "MatSnackBarRef",
+                "useValue": "snackBarRef"
+              },
+              {
+                "provide": "MAT_SNACK_BAR_DATA",
+                "useValue": "config.data"
+              }
+            ],
+            "recipient": "ComponentPortal argument2 through _createInjector"
+          }
+        ],
+        "contexts": [
+          {
+            "line": 72,
+            "source": "constructor(\n    private _overlay: Overlay,\n    private _live: LiveAnnouncer,\n    private _injector: Injector,\n    private _breakpointObserver: BreakpointObserver,\n    @Optional() @SkipSelf() private _parentSnackBar: _MatSnackBarBase,\n    @Inject(MAT_SNACK_BAR_DEFAULT_OPTIONS) private _defaultConfig: MatSnackBarConfig,\n  ) {}"
+          },
+          {
+            "line": 154,
+            "source": "private _attachSnackBarContainer(\n    overlayRef: OverlayRef,\n    config: MatSnackBarConfig,\n  ): _MatSnackBarContainerBase {\n    const userInjector = config && config.viewContainerRef && config.viewContainerRef.injector;\n    const injector = Injector.create({\n      parent: userInjector || this._injector,\n      providers: [{provide: MatSnackBarConfig, useValue: config}],\n    });\n\n    const containerPortal = new ComponentPortal(\n      this.snackBarContainerComponent,\n      config.viewContainerRef,\n      injector,\n    );\n    const containerRef: ComponentRef<_MatSnackBarContainerBase> =\n      overlayRef.attach(containerPortal);\n    containerRef.instance.snackBarConfig = config;\n    return containerRef.instance;\n  }"
+          },
+          {
+            "line": 296,
+            "source": "private _createInjector<T>(config: MatSnackBarConfig, snackBarRef: MatSnackBarRef<T>): Injector {\n    const userInjector = config && config.viewContainerRef && config.viewContainerRef.injector;\n\n    return Injector.create({\n      parent: userInjector || this._injector,\n      providers: [\n        {provide: MatSnackBarRef, useValue: snackBarRef},\n        {provide: MAT_SNACK_BAR_DATA, useValue: config.data},\n      ],\n    });\n  }"
+          },
+          {
+            "line": 178,
+            "source": "private _attach<T>(\n    content: ComponentType<T> | TemplateRef<T>,\n    userConfig?: MatSnackBarConfig,\n  ): MatSnackBarRef<T | EmbeddedViewRef<any>> {\n    const config = {...new MatLegacySnackBarConfig(), ...this._defaultConfig, ...userConfig};\n    const overlayRef = this._createOverlay(config);\n    const container = this._attachSnackBarContainer(overlayRef, config);\n    const snackBarRef = new MatSnackBarRef<T | EmbeddedViewRef<any>>(container, overlayRef);\n\n    if (content instanceof TemplateRef) {\n      const portal = new TemplatePortal(content, null!, {\n        $implicit: config.data,\n        snackBarRef,\n      } as any);\n\n      snackBarRef.instance = container.attachTemplatePortal(portal);\n    } else {\n      const injector = this._createInjector(config, snackBarRef);\n      const portal = new ComponentPortal(content, undefined, injector);\n      const contentRef = container.attachComponentPortal<T>(portal);\n\n      // We can't pass this via the injector, because the injector is created earlier.\n      snackBarRef.instance = contentRef.instance;\n    }\n\n    // Subscribe to the breakpoint observer and attach the mat-snack-bar-handset class as\n    // appropriate. This class is applied to the overlay element because the overlay must expand to\n    // fill the width of the screen for full width snackbars.\n    this._breakpointObserver\n      .observe(Breakpoints.HandsetPortrait)\n      .pipe(takeUntil(overlayRef.detachments()))\n      .subscribe((state: BreakpointState) => {\n        overlayRef.overlayElement.classList.toggle(this.handsetCssClass, state.matches);\n      });\n\n    if (config.announcementMessage) {\n      // Wait until the snack bar contents have been announced then deliver this message.\n      container._onAnnounce.subscribe(() => {\n        this._live.announce(config.announcementMessage!, config.politeness);\n      });\n    }\n\n    this._animateSnackBar(snackBarRef, config);\n    this._openedSnackBarRef = snackBarRef;\n    return this._openedSnackBarRef;\n  }"
+          }
+        ]
+      },
+      {
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "file": "legacy-menu/internal/menu-content-base.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "b0118e2200c6cf629bf5ca181277fb4e08d381c595aacc528d6f5724f416503f",
+        "constructor_parameter": {
+          "index": 2,
+          "declaration": "private _injector: Injector"
+        },
+        "forwards": [
+          {
+            "kind": "DomPortalOutlet",
+            "argument_index": 2,
+            "arguments": [
+              "this._document.createElement('div')",
+              "this._appRef",
+              "this._injector"
+            ]
+          }
+        ],
+        "gets": [],
+        "children": [],
+        "contexts": [
+          {
+            "line": 34,
+            "source": "constructor(\n    private _template: TemplateRef<any>,\n    private _appRef: ApplicationRef,\n    private _injector: Injector,\n    private _viewContainerRef: ViewContainerRef,\n    @Inject(DOCUMENT) private _document: any,\n    private _changeDetectorRef: ChangeDetectorRef,\n  ) {}"
+          },
+          {
+            "line": 47,
+            "source": "attach(context: any = {}) {\n    if (!this._portal) {\n      this._portal = new TemplatePortal(this._template, this._viewContainerRef);\n    }\n\n    this.detach();\n\n    if (!this._outlet) {\n      this._outlet = new DomPortalOutlet(\n        this._document.createElement('div'),\n        this._appRef,\n        this._injector,\n      );\n    }\n\n    const element: HTMLElement = this._template.elementRef.nativeElement;\n\n    // Because we support opening the same menu from different triggers (which in turn have their\n    // own `OverlayRef` panel), we have to re-insert the host element every time, otherwise we\n    // risk it staying attached to a pane that's no longer in the DOM.\n    element.parentNode!.insertBefore(this._outlet.outletElement, element);\n\n    // When `MatMenuContent` is used in an `OnPush` component, the insertion of the menu\n    // content via `createEmbeddedView` does not cause the content to be seen as \"dirty\"\n    // by Angular. This causes the `@ContentChildren` for menu items within the menu to\n    // not be updated by Angular. By explicitly marking for check here, we tell Angular that\n    // it needs to check for new menu items and update the `@ContentChild` in `MatMenu`.\n    this._changeDetectorRef.markForCheck();\n    this._portal.attach(this._outlet, context);\n    this._attached.next();\n  }"
+          }
+        ]
+      },
+      {
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "file": "legacy-dialog/internal/dialog-base.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "93cd62dc0e5b5ea64943632d9f4c64cfe674c178135f0fb609e9d39ec6cff8b0",
+        "constructor_parameter": {
+          "index": 1,
+          "declaration": "injector: Injector"
+        },
+        "forwards": [],
+        "gets": [
+          {
+            "token": "Dialog",
+            "line": 95
+          }
+        ],
+        "children": [],
+        "contexts": [
+          {
+            "line": 74,
+            "source": "constructor(\n    private _overlay: Overlay,\n    injector: Injector,\n    private _defaultOptions: MatDialogConfig | undefined,\n    private _parentDialog: _MatDialogBase<C> | undefined,\n    /**\n     * @deprecated No longer used. To be removed.\n     * @breaking-change 15.0.0\n     */\n    _overlayContainer: OverlayContainer,\n    scrollStrategy: any,\n    private _dialogRefConstructor: Type<MatLegacyDialogRef<any>>,\n    private _dialogContainerType: Type<C>,\n    private _dialogDataToken: InjectionToken<any>,\n    /**\n     * @deprecated No longer used. To be removed.\n     * @breaking-change 14.0.0\n     */\n    _animationMode?: 'NoopAnimations' | 'BrowserAnimations',\n  ) {\n    this._scrollStrategy = scrollStrategy;\n    this._dialog = injector.get(Dialog);\n  }"
+          }
+        ]
+      }
+    ],
+    "current_named_imports": 17,
+    "delta_inventory": [
+      {
+        "file": "internal/public-constructor-context.ts",
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "candidate_source_sha256": "5fc78b1916b5a189a64e5ab68a810b1304a742c6f084a327cd1f3bbdcf4c27dd",
+        "status": "pending-individual-delta-review"
+      },
+      {
+        "file": "legacy-autocomplete/internal/after-legacy-render.ts",
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "candidate_source_sha256": "afd5687000abc7b89968b0c03454f0fc6ac452e69d34bd162b8523ae11fcaf85",
+        "status": "pending-individual-delta-review"
+      },
+      {
+        "file": "legacy-form-field/form-field.ts",
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "candidate_source_sha256": "580387e18e311ed166b078623d3f9889611f459349f1468371f07d9a2e281582",
+        "status": "pending-individual-delta-review"
+      },
+      {
+        "file": "legacy-form-field/internal/after-form-field-render.ts",
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "candidate_source_sha256": "3edca3208021bf71f1b9f8e6c7cdc9832b057b60c10fdd676b69d34d2e3f825a",
+        "status": "pending-individual-delta-review"
+      },
+      {
+        "file": "legacy-menu/internal/menu-item-context.ts",
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "candidate_source_sha256": "c3b8f61d99dd73f64a246f63b59df9291d7cb13e1e9a44b500c9182159448b21",
+        "status": "pending-individual-delta-review"
+      },
+      {
+        "file": "legacy-select/internal/after-select-render.ts",
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "candidate_source_sha256": "10a2bbbe02fb0a4578646e802888a5e075bb909a36fd1c19049b5fa2d731e570",
+        "status": "pending-individual-delta-review"
+      },
+      {
+        "file": "legacy-select/internal/select-base.ts",
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "candidate_source_sha256": "3a0e28d25fa553220d0faeff8c00b4bd3c343cdd27051e25eda7efef6a80b432",
+        "status": "pending-individual-delta-review"
+      },
+      {
+        "file": "legacy-table/internal/public-constructor-context.ts",
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "candidate_source_sha256": "5fc78b1916b5a189a64e5ab68a810b1304a742c6f084a327cd1f3bbdcf4c27dd",
+        "status": "pending-individual-delta-review"
+      },
+      {
+        "file": "legacy-tabs/internal/after-tab-header-render.ts",
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "candidate_source_sha256": "02edb608845d4cb4c28ad410f74309ad1cc02214dae823f3c15ad40fd41c699a",
+        "status": "pending-individual-delta-review"
+      },
+      {
+        "file": "legacy-tabs/internal/public-constructor-context.ts",
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "candidate_source_sha256": "5fc78b1916b5a189a64e5ab68a810b1304a742c6f084a327cd1f3bbdcf4c27dd",
+        "status": "pending-individual-delta-review"
+      },
+      {
+        "file": "legacy-tooltip/internal/after-tooltip-render.ts",
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "candidate_source_sha256": "025887d2460a74da9bbbf898ca911d3dd82234e41bf34615b65573f500c125f9",
+        "status": "pending-individual-delta-review"
+      }
+    ],
+    "scope": "Six frozen public Injector annotation/forward/get/object-create boundaries. Two children provide existing values; there is no imported static/private/deprecated/numeric-flags constructor or child destruction call. Eleven additional current imports are inventoried separately and remain pending individual delta review. Portal/dialog/snack behavior and actual component/application/packed/native/full floors remain separate.",
+    "g11_claim": "not-passed"
+  },
+  "source_negative_controls": 12,
+  "public_namespace_capsule_sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3",
+  "declarations": [
+    {
+      "line": "original",
+      "path": "@angular/core/index.d.ts",
+      "sha256": "9fedfcf08d61d0709a96f157bab028ce05c7fe27a0c179e12e19b00922052fab",
+      "whole": "export declare abstract class Injector {\n    static THROW_IF_NOT_FOUND: {};\n    static NULL: Injector;\n    /**\n     * Internal note on the `options?: InjectOptions|InjectFlags` override of the `get`\n     * method: consider dropping the `InjectFlags` part in one of the major versions.\n     * It can **not** be done in minor/patch, since it's breaking for custom injectors\n     * that only implement the old `InjectorFlags` interface.\n     */\n    /**\n     * Retrieves an instance from the injector based on the provided token.\n     * @returns The instance from the injector if defined, otherwise the `notFoundValue`.\n     * @throws When the `notFoundValue` is `undefined` or `Injector.THROW_IF_NOT_FOUND`.\n     */\n    abstract get<T>(token: ProviderToken<T>, notFoundValue: undefined, options: InjectOptions & {\n        optional?: false;\n    }): T;\n    /**\n     * Retrieves an instance from the injector based on the provided token.\n     * @returns The instance from the injector if defined, otherwise the `notFoundValue`.\n     * @throws When the `notFoundValue` is `undefined` or `Injector.THROW_IF_NOT_FOUND`.\n     */\n    abstract get<T>(token: ProviderToken<T>, notFoundValue: null | undefined, options: InjectOptions): T | null;\n    /**\n     * Retrieves an instance from the injector based on the provided token.\n     * @returns The instance from the injector if defined, otherwise the `notFoundValue`.\n     * @throws When the `notFoundValue` is `undefined` or `Injector.THROW_IF_NOT_FOUND`.\n     */\n    abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions | InjectFlags): T;\n    /**\n     * Retrieves an instance from the injector based on the provided token.\n     * @returns The instance from the injector if defined, otherwise the `notFoundValue`.\n     * @throws When the `notFoundValue` is `undefined` or `Injector.THROW_IF_NOT_FOUND`.\n     * @deprecated use object-based flags (`InjectOptions`) instead.\n     */\n    abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, flags?: InjectFlags): T;\n    /**\n     * @deprecated from v4.0.0 use ProviderToken<T>\n     * @suppress {duplicate}\n     */\n    abstract get(token: any, notFoundValue?: any): any;\n    /**\n     * @deprecated from v5 use the new signature Injector.create(options)\n     */\n    static create(providers: StaticProvider[], parent?: Injector): Injector;\n    /**\n     * Creates a new injector instance that provides one or more dependencies,\n     * according to a given type or types of `StaticProvider`.\n     *\n     * @param options An object with the following properties:\n     * * `providers`: An array of providers of the [StaticProvider type](api/core/StaticProvider).\n     * * `parent`: (optional) A parent injector.\n     * * `name`: (optional) A developer-defined identifying name for the new injector.\n     *\n     * @returns The new injector instance.\n     *\n     */\n    static create(options: {\n        providers: Array<Provider | StaticProvider>;\n        parent?: Injector;\n        name?: string;\n    }): Injector;\n    /** @nocollapse */\n    static ɵprov: unknown;\n}",
+      "stable_object_create": "static create(options: {\n        providers: Array<Provider | StaticProvider>;\n        parent?: Injector;\n        name?: string;\n    }): Injector;",
+      "stable_generic_get_overloads": [
+        "abstract get<T>(token: ProviderToken<T>, notFoundValue: undefined, options: InjectOptions & {\n        optional?: false;\n    }): T;",
+        "abstract get<T>(token: ProviderToken<T>, notFoundValue: null | undefined, options: InjectOptions): T | null;",
+        "abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions | InjectFlags): T;"
+      ],
+      "create_return": "Injector"
+    },
+    {
+      "line": "main",
+      "path": "@angular/core/types/_chrome_dev_tools_performance-chunk.d.ts",
+      "sha256": "1ac581e22272aa978a1d265ddd1d49b82883c1faafe13b6d6ad3329a1dff3a58",
+      "whole": "declare abstract class Injector {\n    static THROW_IF_NOT_FOUND: {};\n    static NULL: Injector;\n    /**\n     * Retrieves an instance from the injector based on the provided token.\n     * @returns The instance from the injector if defined, otherwise the `notFoundValue`.\n     * @throws When the `notFoundValue` is `undefined` or `Injector.THROW_IF_NOT_FOUND`.\n     */\n    abstract get<T>(token: ProviderToken<T>, notFoundValue: undefined, options: InjectOptions & {\n        optional?: false;\n    }): T;\n    /**\n     * Retrieves an instance from the injector based on the provided token.\n     * @returns The instance from the injector if defined, otherwise the `notFoundValue`.\n     * @throws When the `notFoundValue` is `undefined` or `Injector.THROW_IF_NOT_FOUND`.\n     */\n    abstract get<T>(token: ProviderToken<T>, notFoundValue: null | undefined, options: InjectOptions): T | null;\n    /**\n     * Retrieves an instance from the injector based on the provided token.\n     * @returns The instance from the injector if defined, otherwise the `notFoundValue`.\n     * @throws When the `notFoundValue` is `undefined` or `Injector.THROW_IF_NOT_FOUND`.\n     */\n    abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions): T;\n    /**\n     * @deprecated from v4.0.0 use ProviderToken<T>\n     * @suppress {duplicate}\n     */\n    abstract get<T>(token: string | ProviderToken<T>, notFoundValue?: any): any;\n    /**\n     * @deprecated from v5 use the new signature Injector.create(options)\n     */\n    static create(providers: StaticProvider[], parent?: Injector): Injector;\n    /**\n     * Creates a new injector instance that provides one or more dependencies,\n     * according to a given type or types of `StaticProvider`.\n     *\n     * @param options An object with the following properties:\n     * * `providers`: An array of providers of the [StaticProvider type](api/core/StaticProvider).\n     * * `parent`: (optional) A parent injector.\n     * * `name`: (optional) A developer-defined identifying name for the new injector.\n     *\n     * @returns The new injector instance.\n     *\n     */\n    static create(options: {\n        providers: Array<Provider | StaticProvider>;\n        parent?: Injector;\n        name?: string;\n    }): DestroyableInjector;\n    /** @nocollapse */\n    static ɵprov: _angular_core.ɵɵInjectableDeclaration<Injector>;\n}",
+      "stable_object_create": "static create(options: {\n        providers: Array<Provider | StaticProvider>;\n        parent?: Injector;\n        name?: string;\n    }): DestroyableInjector;",
+      "stable_generic_get_overloads": [
+        "abstract get<T>(token: ProviderToken<T>, notFoundValue: undefined, options: InjectOptions & {\n        optional?: false;\n    }): T;",
+        "abstract get<T>(token: ProviderToken<T>, notFoundValue: null | undefined, options: InjectOptions): T | null;",
+        "abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions): T;"
+      ],
+      "create_return": "DestroyableInjector"
+    },
+    {
+      "line": "21.x",
+      "path": "@angular/core/types/_chrome_dev_tools_performance-chunk.d.ts",
+      "sha256": "3cb3136229287079f3debe572c0370c9eb734b12a9296d6d34c8f3f1e34d8e5a",
+      "whole": "declare abstract class Injector {\n    static THROW_IF_NOT_FOUND: {};\n    static NULL: Injector;\n    /**\n     * Retrieves an instance from the injector based on the provided token.\n     * @returns The instance from the injector if defined, otherwise the `notFoundValue`.\n     * @throws When the `notFoundValue` is `undefined` or `Injector.THROW_IF_NOT_FOUND`.\n     */\n    abstract get<T>(token: ProviderToken<T>, notFoundValue: undefined, options: InjectOptions & {\n        optional?: false;\n    }): T;\n    /**\n     * Retrieves an instance from the injector based on the provided token.\n     * @returns The instance from the injector if defined, otherwise the `notFoundValue`.\n     * @throws When the `notFoundValue` is `undefined` or `Injector.THROW_IF_NOT_FOUND`.\n     */\n    abstract get<T>(token: ProviderToken<T>, notFoundValue: null | undefined, options: InjectOptions): T | null;\n    /**\n     * Retrieves an instance from the injector based on the provided token.\n     * @returns The instance from the injector if defined, otherwise the `notFoundValue`.\n     * @throws When the `notFoundValue` is `undefined` or `Injector.THROW_IF_NOT_FOUND`.\n     */\n    abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions): T;\n    /**\n     * @deprecated from v4.0.0 use ProviderToken<T>\n     * @suppress {duplicate}\n     */\n    abstract get<T>(token: string | ProviderToken<T>, notFoundValue?: any): any;\n    /**\n     * @deprecated from v5 use the new signature Injector.create(options)\n     */\n    static create(providers: StaticProvider[], parent?: Injector): Injector;\n    /**\n     * Creates a new injector instance that provides one or more dependencies,\n     * according to a given type or types of `StaticProvider`.\n     *\n     * @param options An object with the following properties:\n     * * `providers`: An array of providers of the [StaticProvider type](api/core/StaticProvider).\n     * * `parent`: (optional) A parent injector.\n     * * `name`: (optional) A developer-defined identifying name for the new injector.\n     *\n     * @returns The new injector instance.\n     *\n     */\n    static create(options: {\n        providers: Array<Provider | StaticProvider>;\n        parent?: Injector;\n        name?: string;\n    }): DestroyableInjector;\n    /** @nocollapse */\n    static ɵprov: _angular_core.ɵɵInjectableDeclaration<Injector>;\n}",
+      "stable_object_create": "static create(options: {\n        providers: Array<Provider | StaticProvider>;\n        parent?: Injector;\n        name?: string;\n    }): DestroyableInjector;",
+      "stable_generic_get_overloads": [
+        "abstract get<T>(token: ProviderToken<T>, notFoundValue: undefined, options: InjectOptions & {\n        optional?: false;\n    }): T;",
+        "abstract get<T>(token: ProviderToken<T>, notFoundValue: null | undefined, options: InjectOptions): T | null;",
+        "abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions): T;"
+      ],
+      "create_return": "DestroyableInjector"
+    }
+  ],
+  "typeChecks": [
+    {
+      "line": "original",
+      "compiler": "6.0.3",
+      "strict": true,
+      "skipLibCheck": false,
+      "diagnostics": 0,
+      "expected_type_errors": 4,
+      "fixture_sha256": "6101b44aedb7ed3220b077218ad92584a9fa16613fc85fe8051b842583d0c81d",
+      "nondeprecated_resolved_calls": 4
+    },
+    {
+      "line": "main",
+      "compiler": "6.0.3",
+      "strict": true,
+      "skipLibCheck": false,
+      "diagnostics": 0,
+      "expected_type_errors": 4,
+      "fixture_sha256": "6101b44aedb7ed3220b077218ad92584a9fa16613fc85fe8051b842583d0c81d",
+      "nondeprecated_resolved_calls": 4
+    },
+    {
+      "line": "21.x",
+      "compiler": "6.0.3",
+      "strict": true,
+      "skipLibCheck": false,
+      "diagnostics": 0,
+      "expected_type_errors": 4,
+      "fixture_sha256": "6101b44aedb7ed3220b077218ad92584a9fa16613fc85fe8051b842583d0c81d",
+      "nondeprecated_resolved_calls": 4
+    }
+  ],
+  "results": [
+    {
+      "line": "original",
+      "mode": "development",
+      "cases": [
+        "object-create-and-supplied-value-identity",
+        "public-injector-token-is-the-exact-receiver",
+        "caller-view-container-parent-precedes-service-parent",
+        "same-description-token-is-not-an-alias",
+        "generic-get-fallback-required-and-object-optional",
+        "self-and-skip-self-use-object-options",
+        "class-token-get-is-a-cached-supplied-object",
+        "nested-public-context-restores-outer-injector",
+        "throwing-context-restores-outer-and-clears-outside-context",
+        "value-only-child-config-ref-and-data-identities",
+        "child-destroy-does-not-own-inherited-parent-values",
+        "destroying-locally-registered-useValue-invokes-its-hook"
+      ],
+      "whole_public_core_executed": true,
+      "values_and_class_targets_are_protocols": true,
+      "actual_legacy_components_executed": false,
+      "automatic_application_or_node_di_qualified": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "original",
+      "mode": "production",
+      "cases": [
+        "object-create-and-supplied-value-identity",
+        "public-injector-token-is-the-exact-receiver",
+        "caller-view-container-parent-precedes-service-parent",
+        "same-description-token-is-not-an-alias",
+        "generic-get-fallback-required-and-object-optional",
+        "self-and-skip-self-use-object-options",
+        "class-token-get-is-a-cached-supplied-object",
+        "nested-public-context-restores-outer-injector",
+        "throwing-context-restores-outer-and-clears-outside-context",
+        "value-only-child-config-ref-and-data-identities",
+        "child-destroy-does-not-own-inherited-parent-values",
+        "destroying-locally-registered-useValue-invokes-its-hook"
+      ],
+      "whole_public_core_executed": true,
+      "values_and_class_targets_are_protocols": true,
+      "actual_legacy_components_executed": false,
+      "automatic_application_or_node_di_qualified": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "main",
+      "mode": "development",
+      "cases": [
+        "object-create-and-supplied-value-identity",
+        "public-injector-token-is-the-exact-receiver",
+        "caller-view-container-parent-precedes-service-parent",
+        "same-description-token-is-not-an-alias",
+        "generic-get-fallback-required-and-object-optional",
+        "self-and-skip-self-use-object-options",
+        "class-token-get-is-a-cached-supplied-object",
+        "nested-public-context-restores-outer-injector",
+        "throwing-context-restores-outer-and-clears-outside-context",
+        "value-only-child-config-ref-and-data-identities",
+        "child-destroy-does-not-own-inherited-parent-values",
+        "destroying-locally-registered-useValue-invokes-its-hook"
+      ],
+      "whole_public_core_executed": true,
+      "values_and_class_targets_are_protocols": true,
+      "actual_legacy_components_executed": false,
+      "automatic_application_or_node_di_qualified": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "main",
+      "mode": "production",
+      "cases": [
+        "object-create-and-supplied-value-identity",
+        "public-injector-token-is-the-exact-receiver",
+        "caller-view-container-parent-precedes-service-parent",
+        "same-description-token-is-not-an-alias",
+        "generic-get-fallback-required-and-object-optional",
+        "self-and-skip-self-use-object-options",
+        "class-token-get-is-a-cached-supplied-object",
+        "nested-public-context-restores-outer-injector",
+        "throwing-context-restores-outer-and-clears-outside-context",
+        "value-only-child-config-ref-and-data-identities",
+        "child-destroy-does-not-own-inherited-parent-values",
+        "destroying-locally-registered-useValue-invokes-its-hook"
+      ],
+      "whole_public_core_executed": true,
+      "values_and_class_targets_are_protocols": true,
+      "actual_legacy_components_executed": false,
+      "automatic_application_or_node_di_qualified": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "21.x",
+      "mode": "development",
+      "cases": [
+        "object-create-and-supplied-value-identity",
+        "public-injector-token-is-the-exact-receiver",
+        "caller-view-container-parent-precedes-service-parent",
+        "same-description-token-is-not-an-alias",
+        "generic-get-fallback-required-and-object-optional",
+        "self-and-skip-self-use-object-options",
+        "class-token-get-is-a-cached-supplied-object",
+        "nested-public-context-restores-outer-injector",
+        "throwing-context-restores-outer-and-clears-outside-context",
+        "value-only-child-config-ref-and-data-identities",
+        "child-destroy-does-not-own-inherited-parent-values",
+        "destroying-locally-registered-useValue-invokes-its-hook"
+      ],
+      "whole_public_core_executed": true,
+      "values_and_class_targets_are_protocols": true,
+      "actual_legacy_components_executed": false,
+      "automatic_application_or_node_di_qualified": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "21.x",
+      "mode": "production",
+      "cases": [
+        "object-create-and-supplied-value-identity",
+        "public-injector-token-is-the-exact-receiver",
+        "caller-view-container-parent-precedes-service-parent",
+        "same-description-token-is-not-an-alias",
+        "generic-get-fallback-required-and-object-optional",
+        "self-and-skip-self-use-object-options",
+        "class-token-get-is-a-cached-supplied-object",
+        "nested-public-context-restores-outer-injector",
+        "throwing-context-restores-outer-and-clears-outside-context",
+        "value-only-child-config-ref-and-data-identities",
+        "child-destroy-does-not-own-inherited-parent-values",
+        "destroying-locally-registered-useValue-invokes-its-hook"
+      ],
+      "whole_public_core_executed": true,
+      "values_and_class_targets_are_protocols": true,
+      "actual_legacy_components_executed": false,
+      "automatic_application_or_node_di_qualified": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    }
+  ],
+  "mutations": [
+    {
+      "line": "original",
+      "id": "discard-object-parent",
+      "rejected": true
+    },
+    {
+      "line": "original",
+      "id": "clone-supplied-useValue",
+      "rejected": true
+    },
+    {
+      "line": "main",
+      "id": "discard-object-parent",
+      "rejected": true
+    },
+    {
+      "line": "main",
+      "id": "clone-supplied-useValue",
+      "rejected": true
+    },
+    {
+      "line": "21.x",
+      "id": "discard-object-parent",
+      "rejected": true
+    },
+    {
+      "line": "21.x",
+      "id": "clone-supplied-useValue",
+      "rejected": true
+    }
+  ],
+  "producer_sha256": "e48d9b832ba20fc75d8bd64d3a2a806ff136ef737181222d9949dcdfe2102897",
+  "worker_sha256": "9bb4e1638d10b33f9ce616a75a3f33018fc6be76bd44c5de525a1037d165e92e",
+  "limits": [
+    "Genuine entire original/minimum Core/Compiler namespaces execute with borrowed RxJS/tslib. Supplied values and class-token targets are explicit protocols; no actual legacy components, automatic node/application provider graphs, dialogs/snack/portal behavior, native/packed/AOT or full runtime/RxJS floor qualification.",
+    "The narrower current create result exposes destroy; authentic original runtime also has it. Calling it on a locally registered useValue can invoke that supplied value hook. The owned children contain existing values and do not add a child-destroy path."
+  ],
+  "g11_claim": "not-passed"
+}

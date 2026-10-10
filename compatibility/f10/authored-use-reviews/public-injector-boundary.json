@@ -1,0 +1,575 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "status": "reviewed",
+  "recorded_at_utc": "2026-10-10T21:12:19.345762+00:00",
+  "candidate_product_source_checkpoint": "5579aa2d9cc51dbad4226f9e14c88acd89bf366b",
+  "criteria": "Six exact frozen public Injector dependency/annotation/forward/get/object-create contracts supported by whole authenticated namespaces, public operation protocols and strict types. Current delta and component/application/portal behavior is expressly separate.",
+  "reviews": [
+    {
+      "file": "legacy-dialog/dialog.ts",
+      "module": "@angular/core",
+      "symbol": "Injector",
+      "candidate_source_sha256": "7f7250274cdd11c1e71474553fc7387843262265f8b44c49339b2467abd68f5d",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "Constructor slot1 takes the public Injector token and forwards that exact supplied reference to slot1 of the locally owned dialog base. It does not construct an injector, select deprecated get/create overloads or dispose the supplied service. The base performs a one-token public get for the actual imported CDK Dialog token; that distinct peer dependency and dialog behavior remain separate review obligations. Whole authenticated original/current minimum Core namespaces preserve typed class/token lookup, cached supplied-instance identity, parent precedence and context restoration in72 public protocol checks and6 whole-module mutation rejections. Strict whole declarations compile with4 expected errors per subject and resolved valid calls select nondeprecated signatures. This is an exact Injector dependency/forwarding judgment, not automatic application/node/actual-dialog construction or complete product qualification. Cyph has no matching manual legacy service construction in the recorded source scan. No product or consumer TypeScript/HTML/CSS/SCSS repair is required.",
+      "source_binding": {
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "file": "legacy-dialog/dialog.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "7f7250274cdd11c1e71474553fc7387843262265f8b44c49339b2467abd68f5d",
+        "constructor_parameter": {
+          "index": 1,
+          "declaration": "injector: Injector"
+        },
+        "forwards": [
+          {
+            "kind": "super",
+            "argument_index": 1,
+            "arguments": [
+              "overlay",
+              "injector",
+              "defaultOptions",
+              "parentDialog",
+              "overlayContainer",
+              "scrollStrategy",
+              "MatLegacyDialogRef",
+              "MatLegacyDialogContainer",
+              "MAT_LEGACY_DIALOG_DATA",
+              "animationMode"
+            ]
+          }
+        ],
+        "gets": [],
+        "children": [],
+        "contexts": [
+          {
+            "line": 70,
+            "source": "constructor(\n    overlay: Overlay,\n    injector: Injector,\n    /**\n     * @deprecated `_location` parameter to be removed.\n     * @breaking-change 10.0.0\n     */\n    @Optional() _location: Location,\n    @Optional() @Inject(MAT_LEGACY_DIALOG_DEFAULT_OPTIONS) defaultOptions: MatLegacyDialogConfig,\n    @Inject(MAT_LEGACY_DIALOG_SCROLL_STRATEGY) scrollStrategy: any,\n    @Optional() @SkipSelf() parentDialog: MatLegacyDialog,\n    /**\n     * @deprecated No longer used. To be removed.\n     * @breaking-change 15.0.0\n     */\n    overlayContainer: OverlayContainer,\n    /**\n     * @deprecated No longer used. To be removed.\n     * @breaking-change 14.0.0\n     */\n    @Optional()\n    @Inject(ANIMATION_MODULE_TYPE)\n    animationMode?: 'NoopAnimations' | 'BrowserAnimations',\n  ) {\n    super(\n      overlay,\n      injector,\n      defaultOptions,\n      parentDialog,\n      overlayContainer,\n      scrollStrategy,\n      MatLegacyDialogRef,\n      MatLegacyDialogContainer,\n      MAT_LEGACY_DIALOG_DATA,\n      animationMode,\n    );\n  }"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/injector-public-source-proof.json",
+          "sha256": "84aa578683b5fa291eb57f35e2fe66f235a22761363f83e148120c2ce5251cc8"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/injector-use-review.mjs",
+          "sha256": "97388fa66c4f0c2f159dc6b328045a54bdf4681690e46df882fe3f76eb4211c5"
+        },
+        {
+          "path": "tests/injector_public_probe.mjs",
+          "sha256": "e48d9b832ba20fc75d8bd64d3a2a806ff136ef737181222d9949dcdfe2102897"
+        },
+        {
+          "path": "tests/injector_public_subject.mjs",
+          "sha256": "9bb4e1638d10b33f9ce616a75a3f33018fc6be76bd44c5de525a1037d165e92e"
+        },
+        {
+          "path": "tests/test_injector_public.py",
+          "sha256": "d30921f6a0936346345b2e6643c8050d67430dc82c9d96c57b8d0bf7e32876b9"
+        },
+        {
+          "path": "compatibility/rc/injector-cyph-source-sanity.json",
+          "sha256": "f54e6c4e20ba1ae122d3cd0e6dc1c8c7eca1616b81db8019d8b22f9c707b0a99"
+        }
+      ]
+    },
+    {
+      "file": "legacy-menu/menu-content.ts",
+      "module": "@angular/core",
+      "symbol": "Injector",
+      "candidate_source_sha256": "f682059286b3dd21faf6676cfe5e6c36d4f9ab08e515f1c76f7f31e6b2b506af",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "Constructor slot2 takes the public Injector and forwards it unchanged to slot2 of the owned menu-content base alongside the caller-provided template/application/view/document/detector references. There is no static injector creation or new root application here. Whole authenticated original/current minimum Core namespaces preserve supplied instance, class/token retrieval, parent hierarchy and context behavior; object get/create contracts use nondeprecated public signatures, and the changed current create return is a narrower DestroyableInjector. The caller uses only the supplied Injector interface. The base later forwards it to the public portal outlet; current portal behavior and lazy view lifecycle are independent unclosed dependencies/gates. Source forwarding controls reject swapped arguments. This source/API boundary requires no consumer resources or API change, with Cyph static sanity retained; genuine Angular node creation, packed lazy menu and full floors remain unexecuted by this record.",
+      "source_binding": {
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "file": "legacy-menu/menu-content.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "f682059286b3dd21faf6676cfe5e6c36d4f9ab08e515f1c76f7f31e6b2b506af",
+        "constructor_parameter": {
+          "index": 2,
+          "declaration": "injector: Injector"
+        },
+        "forwards": [
+          {
+            "kind": "super",
+            "argument_index": 2,
+            "arguments": [
+              "template",
+              "appRef",
+              "injector",
+              "viewContainerRef",
+              "document",
+              "changeDetectorRef"
+            ]
+          }
+        ],
+        "gets": [],
+        "children": [],
+        "contexts": [
+          {
+            "line": 32,
+            "source": "constructor(\n    template: TemplateRef<any>,\n    appRef: ApplicationRef,\n    injector: Injector,\n    viewContainerRef: ViewContainerRef,\n    @Inject(DOCUMENT) document: any,\n    changeDetectorRef: ChangeDetectorRef,\n  ) {\n    super(template, appRef, injector, viewContainerRef, document, changeDetectorRef);\n  }"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/injector-public-source-proof.json",
+          "sha256": "84aa578683b5fa291eb57f35e2fe66f235a22761363f83e148120c2ce5251cc8"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/injector-use-review.mjs",
+          "sha256": "97388fa66c4f0c2f159dc6b328045a54bdf4681690e46df882fe3f76eb4211c5"
+        },
+        {
+          "path": "tests/injector_public_probe.mjs",
+          "sha256": "e48d9b832ba20fc75d8bd64d3a2a806ff136ef737181222d9949dcdfe2102897"
+        },
+        {
+          "path": "tests/injector_public_subject.mjs",
+          "sha256": "9bb4e1638d10b33f9ce616a75a3f33018fc6be76bd44c5de525a1037d165e92e"
+        },
+        {
+          "path": "tests/test_injector_public.py",
+          "sha256": "d30921f6a0936346345b2e6643c8050d67430dc82c9d96c57b8d0bf7e32876b9"
+        },
+        {
+          "path": "compatibility/rc/injector-cyph-source-sanity.json",
+          "sha256": "f54e6c4e20ba1ae122d3cd0e6dc1c8c7eca1616b81db8019d8b22f9c707b0a99"
+        }
+      ]
+    },
+    {
+      "file": "legacy-snack-bar/snack-bar.ts",
+      "module": "@angular/core",
+      "symbol": "Injector",
+      "candidate_source_sha256": "53d6c2ca45605161a7adc88c6edb8c7a9a4d772bd75e9d91e8412409cf0fdd8b",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "Constructor slot2 receives the public Injector token and passes the same instance to slot2 of the local snack-bar base. No Root/child injection scope or provider is created by this wrapper, and it performs no destruction. Genuine original/minimum Core operations prove cached useValue/class-token identity, hierarchy, object options and successful/throwing context restoration; all3 strict complete declaration subjects pass and no valid fixture selects a deprecated overload. Source slot and receiver guards bind this exact forwarding behavior. The base value-only child configurations and their parent order are separately recorded in the companion per-use judgment; actual snack service/container/announcement/portal lifecycle is not discharged. No product API or HTML/CSS/SCSS change is needed, and no direct matching Cyph manual constructor use was found. Eleven post-seed Injector imports are explicitly inventoried pending their own review; this does not close them or G11.",
+      "source_binding": {
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "file": "legacy-snack-bar/snack-bar.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "53d6c2ca45605161a7adc88c6edb8c7a9a4d772bd75e9d91e8412409cf0fdd8b",
+        "constructor_parameter": {
+          "index": 2,
+          "declaration": "injector: Injector"
+        },
+        "forwards": [
+          {
+            "kind": "super",
+            "argument_index": 2,
+            "arguments": [
+              "overlay",
+              "live",
+              "injector",
+              "breakpointObserver",
+              "parentSnackBar",
+              "defaultConfig"
+            ]
+          }
+        ],
+        "gets": [],
+        "children": [],
+        "contexts": [
+          {
+            "line": 32,
+            "source": "constructor(\n    overlay: Overlay,\n    live: LiveAnnouncer,\n    injector: Injector,\n    breakpointObserver: BreakpointObserver,\n    @Optional() @SkipSelf() parentSnackBar: MatLegacySnackBar,\n    @Inject(MAT_SNACK_BAR_DEFAULT_OPTIONS) defaultConfig: MatSnackBarConfig,\n  ) {\n    super(overlay, live, injector, breakpointObserver, parentSnackBar, defaultConfig);\n  }"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/injector-public-source-proof.json",
+          "sha256": "84aa578683b5fa291eb57f35e2fe66f235a22761363f83e148120c2ce5251cc8"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/injector-use-review.mjs",
+          "sha256": "97388fa66c4f0c2f159dc6b328045a54bdf4681690e46df882fe3f76eb4211c5"
+        },
+        {
+          "path": "tests/injector_public_probe.mjs",
+          "sha256": "e48d9b832ba20fc75d8bd64d3a2a806ff136ef737181222d9949dcdfe2102897"
+        },
+        {
+          "path": "tests/injector_public_subject.mjs",
+          "sha256": "9bb4e1638d10b33f9ce616a75a3f33018fc6be76bd44c5de525a1037d165e92e"
+        },
+        {
+          "path": "tests/test_injector_public.py",
+          "sha256": "d30921f6a0936346345b2e6643c8050d67430dc82c9d96c57b8d0bf7e32876b9"
+        },
+        {
+          "path": "compatibility/rc/injector-cyph-source-sanity.json",
+          "sha256": "f54e6c4e20ba1ae122d3cd0e6dc1c8c7eca1616b81db8019d8b22f9c707b0a99"
+        }
+      ]
+    },
+    {
+      "file": "legacy-snack-bar/internal/snack-bar-base.ts",
+      "module": "@angular/core",
+      "symbol": "Injector",
+      "candidate_source_sha256": "1faece639aa44d426b249e15a3a3cca82ae6291371102ce88d8e3ef02baef38c",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The supplied constructor slot2 is retained as _injector. Two stable object-form Injector.create calls prioritize config.viewContainerRef.injector when present, falling back to the supplied service injector. One child aliases the existing config through MatSnackBarConfig; the other aliases the supplied snackBarRef and config.data through the actual public token/ref imports. Both children flow once to ComponentPortal argument2; the returned factory route and caller are source-bound and no child destroy/private/numeric-flags/deprecated-array path is accepted. Genuine original/minimum Core tests preserve parent preference and all supplied object identities. They also demonstrate a material ownership distinction: child destruction leaves inherited parent values alone, but destroying an injector after retrieving a locally registered useValue invokes that value ngOnDestroy hook. The owned code therefore does not gain speculative cleanup that could destroy caller values. This dependency/API and exact source ownership judgment does not prove portal/component lifetime or absence of retained views; those actual product paths remain pending. No source, API or consumer resource change is needed; all11 newer Injector uses and complete G11 remain pending.",
+      "source_binding": {
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "file": "legacy-snack-bar/internal/snack-bar-base.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "1faece639aa44d426b249e15a3a3cca82ae6291371102ce88d8e3ef02baef38c",
+        "constructor_parameter": {
+          "index": 2,
+          "declaration": "private _injector: Injector"
+        },
+        "forwards": [],
+        "gets": [],
+        "children": [
+          {
+            "line": 159,
+            "parent": "userInjector || this._injector",
+            "providers": [
+              {
+                "provide": "MatSnackBarConfig",
+                "useValue": "config"
+              }
+            ],
+            "recipient": "ComponentPortal argument2"
+          },
+          {
+            "line": 299,
+            "parent": "userInjector || this._injector",
+            "providers": [
+              {
+                "provide": "MatSnackBarRef",
+                "useValue": "snackBarRef"
+              },
+              {
+                "provide": "MAT_SNACK_BAR_DATA",
+                "useValue": "config.data"
+              }
+            ],
+            "recipient": "ComponentPortal argument2 through _createInjector"
+          }
+        ],
+        "contexts": [
+          {
+            "line": 72,
+            "source": "constructor(\n    private _overlay: Overlay,\n    private _live: LiveAnnouncer,\n    private _injector: Injector,\n    private _breakpointObserver: BreakpointObserver,\n    @Optional() @SkipSelf() private _parentSnackBar: _MatSnackBarBase,\n    @Inject(MAT_SNACK_BAR_DEFAULT_OPTIONS) private _defaultConfig: MatSnackBarConfig,\n  ) {}"
+          },
+          {
+            "line": 154,
+            "source": "private _attachSnackBarContainer(\n    overlayRef: OverlayRef,\n    config: MatSnackBarConfig,\n  ): _MatSnackBarContainerBase {\n    const userInjector = config && config.viewContainerRef && config.viewContainerRef.injector;\n    const injector = Injector.create({\n      parent: userInjector || this._injector,\n      providers: [{provide: MatSnackBarConfig, useValue: config}],\n    });\n\n    const containerPortal = new ComponentPortal(\n      this.snackBarContainerComponent,\n      config.viewContainerRef,\n      injector,\n    );\n    const containerRef: ComponentRef<_MatSnackBarContainerBase> =\n      overlayRef.attach(containerPortal);\n    containerRef.instance.snackBarConfig = config;\n    return containerRef.instance;\n  }"
+          },
+          {
+            "line": 296,
+            "source": "private _createInjector<T>(config: MatSnackBarConfig, snackBarRef: MatSnackBarRef<T>): Injector {\n    const userInjector = config && config.viewContainerRef && config.viewContainerRef.injector;\n\n    return Injector.create({\n      parent: userInjector || this._injector,\n      providers: [\n        {provide: MatSnackBarRef, useValue: snackBarRef},\n        {provide: MAT_SNACK_BAR_DATA, useValue: config.data},\n      ],\n    });\n  }"
+          },
+          {
+            "line": 178,
+            "source": "private _attach<T>(\n    content: ComponentType<T> | TemplateRef<T>,\n    userConfig?: MatSnackBarConfig,\n  ): MatSnackBarRef<T | EmbeddedViewRef<any>> {\n    const config = {...new MatLegacySnackBarConfig(), ...this._defaultConfig, ...userConfig};\n    const overlayRef = this._createOverlay(config);\n    const container = this._attachSnackBarContainer(overlayRef, config);\n    const snackBarRef = new MatSnackBarRef<T | EmbeddedViewRef<any>>(container, overlayRef);\n\n    if (content instanceof TemplateRef) {\n      const portal = new TemplatePortal(content, null!, {\n        $implicit: config.data,\n        snackBarRef,\n      } as any);\n\n      snackBarRef.instance = container.attachTemplatePortal(portal);\n    } else {\n      const injector = this._createInjector(config, snackBarRef);\n      const portal = new ComponentPortal(content, undefined, injector);\n      const contentRef = container.attachComponentPortal<T>(portal);\n\n      // We can't pass this via the injector, because the injector is created earlier.\n      snackBarRef.instance = contentRef.instance;\n    }\n\n    // Subscribe to the breakpoint observer and attach the mat-snack-bar-handset class as\n    // appropriate. This class is applied to the overlay element because the overlay must expand to\n    // fill the width of the screen for full width snackbars.\n    this._breakpointObserver\n      .observe(Breakpoints.HandsetPortrait)\n      .pipe(takeUntil(overlayRef.detachments()))\n      .subscribe((state: BreakpointState) => {\n        overlayRef.overlayElement.classList.toggle(this.handsetCssClass, state.matches);\n      });\n\n    if (config.announcementMessage) {\n      // Wait until the snack bar contents have been announced then deliver this message.\n      container._onAnnounce.subscribe(() => {\n        this._live.announce(config.announcementMessage!, config.politeness);\n      });\n    }\n\n    this._animateSnackBar(snackBarRef, config);\n    this._openedSnackBarRef = snackBarRef;\n    return this._openedSnackBarRef;\n  }"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/injector-public-source-proof.json",
+          "sha256": "84aa578683b5fa291eb57f35e2fe66f235a22761363f83e148120c2ce5251cc8"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/injector-use-review.mjs",
+          "sha256": "97388fa66c4f0c2f159dc6b328045a54bdf4681690e46df882fe3f76eb4211c5"
+        },
+        {
+          "path": "tests/injector_public_probe.mjs",
+          "sha256": "e48d9b832ba20fc75d8bd64d3a2a806ff136ef737181222d9949dcdfe2102897"
+        },
+        {
+          "path": "tests/injector_public_subject.mjs",
+          "sha256": "9bb4e1638d10b33f9ce616a75a3f33018fc6be76bd44c5de525a1037d165e92e"
+        },
+        {
+          "path": "tests/test_injector_public.py",
+          "sha256": "d30921f6a0936346345b2e6643c8050d67430dc82c9d96c57b8d0bf7e32876b9"
+        },
+        {
+          "path": "compatibility/rc/injector-cyph-source-sanity.json",
+          "sha256": "f54e6c4e20ba1ae122d3cd0e6dc1c8c7eca1616b81db8019d8b22f9c707b0a99"
+        }
+      ]
+    },
+    {
+      "file": "legacy-menu/internal/menu-content-base.ts",
+      "module": "@angular/core",
+      "symbol": "Injector",
+      "candidate_source_sha256": "b0118e2200c6cf629bf5ca181277fb4e08d381c595aacc528d6f5724f416503f",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "Constructor slot2 stores the supplied Injector as a private parameter property and forwards that unchanged reference to argument2 of DomPortalOutlet. The owned base does not get/create/destroy the injector or create an application. Disposal here targets the portal outlet; this judgment does not substitute for the still-separate current portal implementation, template attachment, parent application ownership or lazy menu lifecycle review. Exact source guards record the only supplied receiver use and reject unknown members/aliases/argument shifts. Genuine original/current minimum public Core contracts retain the nondeprecated Injector interface, class/token identity and parent/context semantics; the narrower current create result is unused in this caller. Source and type evidence support the public Injector dependency/forwarding boundary while actual component/native/packed/floor gates remain pending. There is no required consumer TypeScript or resource repair.",
+      "source_binding": {
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "file": "legacy-menu/internal/menu-content-base.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "b0118e2200c6cf629bf5ca181277fb4e08d381c595aacc528d6f5724f416503f",
+        "constructor_parameter": {
+          "index": 2,
+          "declaration": "private _injector: Injector"
+        },
+        "forwards": [
+          {
+            "kind": "DomPortalOutlet",
+            "argument_index": 2,
+            "arguments": [
+              "this._document.createElement('div')",
+              "this._appRef",
+              "this._injector"
+            ]
+          }
+        ],
+        "gets": [],
+        "children": [],
+        "contexts": [
+          {
+            "line": 34,
+            "source": "constructor(\n    private _template: TemplateRef<any>,\n    private _appRef: ApplicationRef,\n    private _injector: Injector,\n    private _viewContainerRef: ViewContainerRef,\n    @Inject(DOCUMENT) private _document: any,\n    private _changeDetectorRef: ChangeDetectorRef,\n  ) {}"
+          },
+          {
+            "line": 47,
+            "source": "attach(context: any = {}) {\n    if (!this._portal) {\n      this._portal = new TemplatePortal(this._template, this._viewContainerRef);\n    }\n\n    this.detach();\n\n    if (!this._outlet) {\n      this._outlet = new DomPortalOutlet(\n        this._document.createElement('div'),\n        this._appRef,\n        this._injector,\n      );\n    }\n\n    const element: HTMLElement = this._template.elementRef.nativeElement;\n\n    // Because we support opening the same menu from different triggers (which in turn have their\n    // own `OverlayRef` panel), we have to re-insert the host element every time, otherwise we\n    // risk it staying attached to a pane that's no longer in the DOM.\n    element.parentNode!.insertBefore(this._outlet.outletElement, element);\n\n    // When `MatMenuContent` is used in an `OnPush` component, the insertion of the menu\n    // content via `createEmbeddedView` does not cause the content to be seen as \"dirty\"\n    // by Angular. This causes the `@ContentChildren` for menu items within the menu to\n    // not be updated by Angular. By explicitly marking for check here, we tell Angular that\n    // it needs to check for new menu items and update the `@ContentChild` in `MatMenu`.\n    this._changeDetectorRef.markForCheck();\n    this._portal.attach(this._outlet, context);\n    this._attached.next();\n  }"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/injector-public-source-proof.json",
+          "sha256": "84aa578683b5fa291eb57f35e2fe66f235a22761363f83e148120c2ce5251cc8"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/injector-use-review.mjs",
+          "sha256": "97388fa66c4f0c2f159dc6b328045a54bdf4681690e46df882fe3f76eb4211c5"
+        },
+        {
+          "path": "tests/injector_public_probe.mjs",
+          "sha256": "e48d9b832ba20fc75d8bd64d3a2a806ff136ef737181222d9949dcdfe2102897"
+        },
+        {
+          "path": "tests/injector_public_subject.mjs",
+          "sha256": "9bb4e1638d10b33f9ce616a75a3f33018fc6be76bd44c5de525a1037d165e92e"
+        },
+        {
+          "path": "tests/test_injector_public.py",
+          "sha256": "d30921f6a0936346345b2e6643c8050d67430dc82c9d96c57b8d0bf7e32876b9"
+        },
+        {
+          "path": "compatibility/rc/injector-cyph-source-sanity.json",
+          "sha256": "f54e6c4e20ba1ae122d3cd0e6dc1c8c7eca1616b81db8019d8b22f9c707b0a99"
+        }
+      ]
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-base.ts",
+      "module": "@angular/core",
+      "symbol": "Injector",
+      "candidate_source_sha256": "93cd62dc0e5b5ea64943632d9f4c64cfe674c178135f0fb609e9d39ec6cff8b0",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The supplied constructor slot1 is used once in injector.get(Dialog), where Dialog is the actual named public import from @angular/cdk/dialog. Source guards reject numeric flags, extra get arguments, changed token routes or unknown member/ownership operations. Stable generic public get and class/token lookup are proven through the complete original/current minimum declarations and real Core modules; strict valid calls resolve nondeprecated signatures. This use does not create/destroy an injector and caches the resulting peer service in the existing owned _dialog field. CDK Dialog token availability, construction/open behavior, provider composition, focus/overlay teardown and actual legacy dialog integration remain separate pending contracts, rather than being inferred from protocol service values. No product or consumer API/HTML/CSS/SCSS change is required for this public Injector API binding, and all11 newer Injector dependencies remain separately pending.",
+      "source_binding": {
+        "module": "@angular/core",
+        "symbol": "Injector",
+        "file": "legacy-dialog/internal/dialog-base.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "93cd62dc0e5b5ea64943632d9f4c64cfe674c178135f0fb609e9d39ec6cff8b0",
+        "constructor_parameter": {
+          "index": 1,
+          "declaration": "injector: Injector"
+        },
+        "forwards": [],
+        "gets": [
+          {
+            "token": "Dialog",
+            "line": 95
+          }
+        ],
+        "children": [],
+        "contexts": [
+          {
+            "line": 74,
+            "source": "constructor(\n    private _overlay: Overlay,\n    injector: Injector,\n    private _defaultOptions: MatDialogConfig | undefined,\n    private _parentDialog: _MatDialogBase<C> | undefined,\n    /**\n     * @deprecated No longer used. To be removed.\n     * @breaking-change 15.0.0\n     */\n    _overlayContainer: OverlayContainer,\n    scrollStrategy: any,\n    private _dialogRefConstructor: Type<MatLegacyDialogRef<any>>,\n    private _dialogContainerType: Type<C>,\n    private _dialogDataToken: InjectionToken<any>,\n    /**\n     * @deprecated No longer used. To be removed.\n     * @breaking-change 14.0.0\n     */\n    _animationMode?: 'NoopAnimations' | 'BrowserAnimations',\n  ) {\n    this._scrollStrategy = scrollStrategy;\n    this._dialog = injector.get(Dialog);\n  }"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/injector-public-source-proof.json",
+          "sha256": "84aa578683b5fa291eb57f35e2fe66f235a22761363f83e148120c2ce5251cc8"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/injector-use-review.mjs",
+          "sha256": "97388fa66c4f0c2f159dc6b328045a54bdf4681690e46df882fe3f76eb4211c5"
+        },
+        {
+          "path": "tests/injector_public_probe.mjs",
+          "sha256": "e48d9b832ba20fc75d8bd64d3a2a806ff136ef737181222d9949dcdfe2102897"
+        },
+        {
+          "path": "tests/injector_public_subject.mjs",
+          "sha256": "9bb4e1638d10b33f9ce616a75a3f33018fc6be76bd44c5de525a1037d165e92e"
+        },
+        {
+          "path": "tests/test_injector_public.py",
+          "sha256": "d30921f6a0936346345b2e6643c8050d67430dc82c9d96c57b8d0bf7e32876b9"
+        },
+        {
+          "path": "compatibility/rc/injector-cyph-source-sanity.json",
+          "sha256": "f54e6c4e20ba1ae122d3cd0e6dc1c8c7eca1616b81db8019d8b22f9c707b0a99"
+        }
+      ]
+    }
+  ],
+  "pending_current_delta_imports": [
+    {
+      "file": "internal/public-constructor-context.ts",
+      "module": "@angular/core",
+      "symbol": "Injector",
+      "candidate_source_sha256": "5fc78b1916b5a189a64e5ab68a810b1304a742c6f084a327cd1f3bbdcf4c27dd",
+      "status": "pending-individual-delta-review"
+    },
+    {
+      "file": "legacy-autocomplete/internal/after-legacy-render.ts",
+      "module": "@angular/core",
+      "symbol": "Injector",
+      "candidate_source_sha256": "afd5687000abc7b89968b0c03454f0fc6ac452e69d34bd162b8523ae11fcaf85",
+      "status": "pending-individual-delta-review"
+    },
+    {
+      "file": "legacy-form-field/form-field.ts",
+      "module": "@angular/core",
+      "symbol": "Injector",
+      "candidate_source_sha256": "580387e18e311ed166b078623d3f9889611f459349f1468371f07d9a2e281582",
+      "status": "pending-individual-delta-review"
+    },
+    {
+      "file": "legacy-form-field/internal/after-form-field-render.ts",
+      "module": "@angular/core",
+      "symbol": "Injector",
+      "candidate_source_sha256": "3edca3208021bf71f1b9f8e6c7cdc9832b057b60c10fdd676b69d34d2e3f825a",
+      "status": "pending-individual-delta-review"
+    },
+    {
+      "file": "legacy-menu/internal/menu-item-context.ts",
+      "module": "@angular/core",
+      "symbol": "Injector",
+      "candidate_source_sha256": "c3b8f61d99dd73f64a246f63b59df9291d7cb13e1e9a44b500c9182159448b21",
+      "status": "pending-individual-delta-review"
+    },
+    {
+      "file": "legacy-select/internal/after-select-render.ts",
+      "module": "@angular/core",
+      "symbol": "Injector",
+      "candidate_source_sha256": "10a2bbbe02fb0a4578646e802888a5e075bb909a36fd1c19049b5fa2d731e570",
+      "status": "pending-individual-delta-review"
+    },
+    {
+      "file": "legacy-select/internal/select-base.ts",
+      "module": "@angular/core",
+      "symbol": "Injector",
+      "candidate_source_sha256": "3a0e28d25fa553220d0faeff8c00b4bd3c343cdd27051e25eda7efef6a80b432",
+      "status": "pending-individual-delta-review"
+    },
+    {
+      "file": "legacy-table/internal/public-constructor-context.ts",
+      "module": "@angular/core",
+      "symbol": "Injector",
+      "candidate_source_sha256": "5fc78b1916b5a189a64e5ab68a810b1304a742c6f084a327cd1f3bbdcf4c27dd",
+      "status": "pending-individual-delta-review"
+    },
+    {
+      "file": "legacy-tabs/internal/after-tab-header-render.ts",
+      "module": "@angular/core",
+      "symbol": "Injector",
+      "candidate_source_sha256": "02edb608845d4cb4c28ad410f74309ad1cc02214dae823f3c15ad40fd41c699a",
+      "status": "pending-individual-delta-review"
+    },
+    {
+      "file": "legacy-tabs/internal/public-constructor-context.ts",
+      "module": "@angular/core",
+      "symbol": "Injector",
+      "candidate_source_sha256": "5fc78b1916b5a189a64e5ab68a810b1304a742c6f084a327cd1f3bbdcf4c27dd",
+      "status": "pending-individual-delta-review"
+    },
+    {
+      "file": "legacy-tooltip/internal/after-tooltip-render.ts",
+      "module": "@angular/core",
+      "symbol": "Injector",
+      "candidate_source_sha256": "025887d2460a74da9bbbf898ca911d3dd82234e41bf34615b65573f500c125f9",
+      "status": "pending-individual-delta-review"
+    }
+  ],
+  "g11_claim": "not-passed"
+}
