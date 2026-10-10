@@ -49,12 +49,20 @@ export class MatLegacyInkBar {
     // `onStable` might not run for a while if the zone has already stabilized.
     // Wrap the call in `NgZone.run` to ensure that it runs relatively soon.
     this._ngZone.run(() => {
-      this._ngZone.onStable.pipe(take(1)).subscribe(() => {
+      const align = () => {
         const positions = this._inkBarPositioner(element);
         const inkBar = this._elementRef.nativeElement;
         inkBar.style.left = positions.left;
         inkBar.style.width = positions.width;
-      });
+      };
+
+      // A zoneless zone stays stable inside `run` and never emits `onStable`.
+      // The supplied label is already available for the historical positioner.
+      if (this._ngZone.isStable) {
+        align();
+      } else {
+        this._ngZone.onStable.pipe(take(1)).subscribe(align);
+      }
     });
   }
 
