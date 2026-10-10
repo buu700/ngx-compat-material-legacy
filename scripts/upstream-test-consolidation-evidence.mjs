@@ -10,6 +10,8 @@ import {createHash} from 'node:crypto';
 import {gunzipSync} from 'node:zlib';
 import {analyzeSharedTestMove,bazelProductionCalls} from './upstream-test-consolidation-analysis.mjs';
 import {buildScopeEvidenceOk} from './upstream-build-scope-evidence.mjs';
+import {HISTORICAL_CONSOLIDATION_CAPSULE, retainedConsolidationSources,
+  individualConsolidationScope} from './upstream-test-consolidation-historical.mjs';
 export const TEST_CONSOLIDATION_ROLE='C04 finite original32 shared harness consolidation source review';
 export const TEST_CONSOLIDATION_CAPSULE='compatibility/rc/upstream-test-consolidation-subjects.json';
 export const TEST_CONSOLIDATION_CAPSULE_SHA256='5fd4dc58c2365c659696d4e9f6927a02184f868db043a7055a3bf1afcdebf989';
@@ -50,7 +52,7 @@ export const TEST_CONSOLIDATION_PATCHES=Object.freeze({
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
 const historicalContextPaths=['scripts/run-legacy-artifact-suite.mjs','testing/legacy-runner/historical-inventory.json','testing/legacy-runner/historical-specs.json'];
 const objectHash=(kind,bytes)=>createHash('sha1').update(Buffer.from(kind+' '+bytes.length+'\0')).update(bytes).digest('hex');
-export const TEST_CONSOLIDATION_PENDING=Object.freeze([
+export const TEST_CONSOLIDATION_NON_EXACT=Object.freeze([
   '126e4ec8869507ca449db1365a0b061c8713f9d8','a41ce098b0eb4e56c05f3ac596aa97fd5a5d53ab',
   'e1514fbe829af2a0630db7223bad2268dd0da407','518ac69a7e0f787327e971c710a13bb2da6461cc',
   'bff5283469258fc90ad9eddbd31cab829d7ebfdf',
@@ -99,10 +101,10 @@ export function analyzeConsolidationSubjects(bytes,readRepo) {
     assert.ok(builds.length&&suites.length);
     assert.deepEqual([...sources].filter(([p])=>p.endsWith('.spec.ts')).map(([p])=>p).sort(),suites.flatMap(s=>[s.shared_path,s.consumer_path]).sort(),'spec path omitted or ambiguous');
     const equivalent=suites.every(s=>s.equivalent);
-    assert.equal(equivalent,!TEST_CONSOLIDATION_PENDING.includes(subject.sha),'exact relocation boundary changed');
+    assert.equal(equivalent,!TEST_CONSOLIDATION_NON_EXACT.includes(subject.sha),'exact relocation boundary changed');
     results.push({sha:subject.sha,subject:subject.subject,patch_file:subject.patch_file,diff_sha256:hash(patch),patch_paths:paths,
       original_commit_sha256:subject.commit_sha256,builds,suites,exact_test_body_and_fixture_relocation:equivalent,
-      final_disposition:equivalent?'not-applicable':'needs-individual-review'});
+      relocation_predicate_disposition:equivalent?'not-applicable':'needs-individual-review'});
   }
   return results;
 }
@@ -129,11 +131,17 @@ export function testConsolidationBatchOk(body,readRepo,currentProductPaths){
     assert.equal(inventory.denominator,57);assert.equal(inventory.historical_tag,'16.2.14');
     assert.equal(body.subject_capsule.path,TEST_CONSOLIDATION_CAPSULE);assert.equal(body.subject_capsule.sha256,TEST_CONSOLIDATION_CAPSULE_SHA256);
     const actual=analyzeConsolidationSubjects(readRepo(TEST_CONSOLIDATION_CAPSULE),readRepo);
+    const retained=retainedConsolidationSources(readRepo(HISTORICAL_CONSOLIDATION_CAPSULE),readRepo);
     for(const result of actual){
       const row=body.reviews.find(r=>r.sha===result.sha);assert.ok(row);
       assert.deepEqual(row.source_analysis,result);
       assert.equal(row.diff_sha256,result.diff_sha256);assert.equal(row.patch_file,result.patch_file);assert.deepEqual(row.patch_paths,result.patch_paths);
-      assert.equal(row.final_disposition,result.final_disposition);assert.deepEqual(row.affected_branches,['main','21.x']);
+      assert.equal(row.final_disposition,'not-applicable');assert.deepEqual(row.affected_branches,['main','21.x']);
+      if (result.exact_test_body_and_fixture_relocation) {
+        assert.equal(row.individual_source_review,undefined);
+      } else {
+        assert.deepEqual(row.individual_source_review,individualConsolidationScope(result.sha,retained));
+      }
       assert.equal(row.review_depth,result.exact_test_body_and_fixture_relocation?'bounded-exact-test-relocation':'individual-compatibility');
       assert.ok(typeof row.decision==='string'&&row.decision.length>=120);
     }
