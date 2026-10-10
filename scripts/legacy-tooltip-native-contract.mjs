@@ -39,3 +39,19 @@ export async function observeLegacyTooltipNative({evaluate}) {
     })()`);
   } catch (error) {return {error: String(error.message || error)};}
 }
+
+export function legacyTooltipAriaLifetimeNativeOkay(observation) {
+  return !!observation && !observation.error &&
+    ['actual_directive_created', 'host_removed', 'initial_description_absent',
+      'pending_cleanup_clear', 'later_request_clear'].every(key => observation[key] === true);
+}
+
+export async function observeLegacyTooltipAriaLifetimeNative({evaluate}) {
+  try {
+    return await evaluate(`(() => {
+      const output = document.getElementById('tip-aria-result');
+      if (output?.getAttribute('data-complete') !== 'true') return null;
+      return JSON.parse(output.textContent);
+    })()`);
+  } catch (error) {return {error: String(error.message || error)};}
+}

@@ -115,6 +115,7 @@ export abstract class _MatTooltipBase<T extends _TooltipComponentBase>
   private _positionAtOrigin: boolean = false;
   private _disabled: boolean = false;
   private _ariaDescriptionPending = false;
+  private _ariaDescriptionDestroyed = false;
   private _tooltipClass: string | string[] | Set<string> | {[key: string]: any};
   private _scrollStrategy: () => ScrollStrategy;
   private _viewInitialized = false;
@@ -339,6 +340,7 @@ export abstract class _MatTooltipBase<T extends _TooltipComponentBase>
    * Dispose the tooltip when destroyed.
    */
   ngOnDestroy() {
+    this._ariaDescriptionDestroyed = true;
     const nativeElement = this._elementRef.nativeElement;
 
     clearTimeout(this._touchstartTimeout);
@@ -792,7 +794,7 @@ export abstract class _MatTooltipBase<T extends _TooltipComponentBase>
 
   /** Updates the tooltip's ARIA description based on its current state. */
   private _syncAriaDescription(oldMessage: string): void {
-    if (this._ariaDescriptionPending) {
+    if (this._ariaDescriptionPending || this._ariaDescriptionDestroyed) {
       return;
     }
 
@@ -804,7 +806,7 @@ export abstract class _MatTooltipBase<T extends _TooltipComponentBase>
       Promise.resolve().then(() => {
         this._ariaDescriptionPending = false;
 
-        if (this.message && !this.disabled) {
+        if (!this._ariaDescriptionDestroyed && this.message && !this.disabled) {
           this._ariaDescriber.describe(this._elementRef.nativeElement, this.message, 'tooltip');
         }
       });
