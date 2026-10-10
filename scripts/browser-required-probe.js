@@ -190,7 +190,19 @@
       return;
     }
     if (family === 'checkbox') {
-      finish(!!query('#p-checkbox.mat-checkbox'), 'mat-checkbox');
+      if (!query('#p-checkbox.mat-checkbox') || typeof lab.runCheckboxTimerLifetime !== 'function') {
+        finish(false, 'checkbox timer fixture missing'); return;
+      }
+      const owner = window.__status;
+      let completed = false, observation;
+      Promise.resolve().then(() => lab.runCheckboxTimerLifetime()).then(value => {
+        observation = value; completed = true;
+      }, error => {observation = {error: String(error)}; completed = true;});
+      waitFor(() => completed ? {observation} : null, 4500, result => {
+        if (window.__status !== owner) return;
+        const lifetime = result && result.observation;
+        finish(legacyCheckboxTimerLifetimeNativeOkay(lifetime), 'mat-checkbox; timer lifetime ' + JSON.stringify(lifetime));
+      });
       return;
     }
     if (family === 'chips') {

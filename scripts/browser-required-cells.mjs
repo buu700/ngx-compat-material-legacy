@@ -16,6 +16,7 @@ import {snackAnnouncementLifetimeFixture, legacySnackAnnouncementLifetimeNativeO
 import {legacySnackMotionNativeOkay, trackLegacySnackMotionNative, readLegacySnackMotionEnterNative, readLegacySnackMotionExitNative} from './legacy-snack-motion-native-contract.mjs';
 import {tooltipAriaLifetimeFixture} from './tooltip-aria-lifetime-fixture.mjs';
 import {formFieldDirectionLifetimeFixture, legacyFormFieldDirectionLifetimeNativeOkay} from './form-field-direction-lifetime-fixture.mjs';
+import {checkboxTimerLifetimeFixture, legacyCheckboxTimerLifetimeNativeOkay} from './checkbox-timer-lifetime-fixture.mjs';
 import {legacyTooltipAriaLifetimeNativeOkay, legacyTooltipNativeOkay, legacyTooltipMessageSequenceOkay, readLegacyTooltipNative} from './legacy-tooltip-native-contract.mjs';
 import {legacyInkBarNativeOkay, legacyInkBarSelectionSequenceOkay, readLegacyInkBarNative} from './legacy-ink-bar-native-contract.mjs';
 import {legacySelectFontNativeOkay, readLegacySelectFontNative} from './legacy-select-font-native-contract.mjs';
@@ -63,7 +64,7 @@ export function requiredProbeSource() {
   return [legacyTooltipAriaLifetimeNativeOkay, legacyTooltipNativeOkay, legacyTooltipMessageSequenceOkay, readLegacyTooltipNative, legacyInkBarNativeOkay, legacyInkBarSelectionSequenceOkay,
     readLegacyInkBarNative, legacySelectFontNativeOkay, readLegacySelectFontNative, legacyChipBlurNativeOkay,
     legacyFormFieldOutlineNativeOkay, legacyFormFieldOutlineSequenceOkay, readLegacyFormFieldOutlineNative, legacyFormFieldOutlineBoundaryNativeOkay, readLegacyFormFieldOutlineBoundaryNative, legacyFormFieldNoLabelNativeOkay, readLegacyFormFieldNoLabelNative,
-    legacyFormFieldDirectionLifetimeNativeOkay,
+    legacyFormFieldDirectionLifetimeNativeOkay, legacyCheckboxTimerLifetimeNativeOkay,
     tabPaginationNativeOkay, readTabPaginationNative, legacySnackMotionNativeOkay,
     legacySnackAnnouncementLifetimeNativeOkay,
     trackLegacySnackMotionNative, readLegacySnackMotionEnterNative, readLegacySnackMotionExitNative]
@@ -149,7 +150,7 @@ function labHtml() {
     '</div>',
     '<div id="wrap-card" *ngIf="!cspOnly"><mat-card id="p-card"><mat-card-title>Title</mat-card-title><mat-card-content>Body</mat-card-content></mat-card></div>',
     '<div id="wrap-checkbox" *ngIf="!cspOnly">',
-    '<mat-checkbox id="p-checkbox">Check</mat-checkbox>',
+    '<mat-checkbox id="p-checkbox">Check</mat-checkbox><lab-checkbox-timer-lifetime></lab-checkbox-timer-lifetime>',
     '<mat-checkbox id="p-checkbox-disabled" disabled>Off</mat-checkbox>',
     '<mat-checkbox id="p-checkbox-invalid" required>Req</mat-checkbox>',
     '</div>',
@@ -251,7 +252,7 @@ import {ErrorStateMatcher, MATERIAL_ANIMATIONS} from '@angular/material/core';
 import {MatLegacyAutocompleteModule} from '@ngx-compat/material-legacy/legacy-autocomplete';
 import {MatLegacyButtonModule} from '@ngx-compat/material-legacy/legacy-button';
 import {MatLegacyCardModule} from '@ngx-compat/material-legacy/legacy-card';
-import {MatLegacyCheckboxModule} from '@ngx-compat/material-legacy/legacy-checkbox';
+import {MatLegacyCheckbox, MatLegacyCheckboxModule} from '@ngx-compat/material-legacy/legacy-checkbox';
 import {MatLegacyChipList, MatLegacyChipsModule} from '@ngx-compat/material-legacy/legacy-chips';
 import {MatLegacyPseudoCheckboxModule} from '@ngx-compat/material-legacy/legacy-core';
 import {MatLegacyDialog, MatLegacyDialogModule} from '@ngx-compat/material-legacy/legacy-dialog';
@@ -273,6 +274,7 @@ import {MatLegacyTooltip, MatLegacyTooltipModule} from '@ngx-compat/material-leg
 
 ${tooltipAriaLifetimeFixture}
 ${formFieldDirectionLifetimeFixture}
+${checkboxTimerLifetimeFixture}
 ${snackMotionFixture}
 ${snackAnnouncementLifetimeFixture}
 
@@ -327,6 +329,7 @@ export class LabRoot {
   @ViewChild('tipOff') tipOff!: any;
   @ViewChild('chipList') chipList?: MatLegacyChipList;
   @ViewChild(TooltipAriaLifetimeLab) ariaLifetimeLab?: TooltipAriaLifetimeLab;
+  @ViewChild(CheckboxTimerLifetimeLab) checkboxTimerLifetimeLab?: CheckboxTimerLifetimeLab;
   @ViewChild(FormFieldDirectionLifetimeLab) fieldDirectionLifetimeLab?: FormFieldDirectionLifetimeLab;
   @ViewChild(SnackAnnouncementLifetimeLab) snackAnnouncementLifetimeLab?: SnackAnnouncementLifetimeLab;
   @ViewChildren(MatLegacyInput) inputs!: QueryList<MatLegacyInput>;
@@ -369,6 +372,10 @@ export class LabRoot {
       runTooltipAriaLifetime() {
         if (!lab.ariaLifetimeLab) return Promise.reject(new Error('tooltip ARIA fixture missing'));
         return lab.ariaLifetimeLab.run();
+      },
+      runCheckboxTimerLifetime() {
+        if (!lab.checkboxTimerLifetimeLab) return Promise.reject(new Error('checkbox timer fixture missing'));
+        return lab.checkboxTimerLifetimeLab.run();
       },
       runFormFieldDirectionLifetime() {
         if (!lab.fieldDirectionLifetimeLab) return Promise.reject(new Error('field direction fixture missing'));
@@ -422,7 +429,7 @@ export class LabRoot {
     MatLegacyTabsModule,
     MatLegacyTooltipModule,
   ],
-  declarations: [LabRoot, DialogBody, LabForceInvalid, SnackMotionLab, TooltipAriaLifetimeLab, CaptureTooltipForAriaLifetime, FormFieldDirectionLifetimeLab, CaptureFieldDirectionLifetime, SnackAnnouncementLifetimeLab, CaptureSnackAnnouncementLifetime],
+  declarations: [CheckboxTimerLifetimeLab, CaptureCheckboxTimerLifetime, LabRoot, DialogBody, LabForceInvalid, SnackMotionLab, TooltipAriaLifetimeLab, CaptureTooltipForAriaLifetime, FormFieldDirectionLifetimeLab, CaptureFieldDirectionLifetime, SnackAnnouncementLifetimeLab, CaptureSnackAnnouncementLifetime],
   bootstrap: [LabRoot],
   providers: [
     ...((window as unknown as {__cspNonce?: string}).__cspNonce ? [{provide: CSP_NONCE, useValue: (window as unknown as {__cspNonce: string}).__cspNonce}] : []),
