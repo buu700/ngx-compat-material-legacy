@@ -25,7 +25,7 @@ try {
   for (const path of [
     ...['browser-matrix-acceptance', 'resolve-run-library', 'legacy-core-high-contrast-contract',
       'browser-matrix-roster', 'browser-required-cells', 'chromium-debug-endpoint',
-      'tooltip-aria-lifetime-fixture', 'form-field-direction-lifetime-fixture', 'legacy-tooltip-native-contract',
+      'tooltip-aria-lifetime-fixture', 'form-field-direction-lifetime-fixture', 'snack-announcement-lifetime-fixture', 'legacy-tooltip-native-contract',
       'legacy-ink-bar-native-contract', 'legacy-select-font-native-contract', 'legacy-chip-blur-native-contract',
       'legacy-form-field-outline-native-contract', 'browser-pointer-input', 'tab-pagination-native-contract', 'snack-motion-fixture', 'legacy-snack-motion-native-contract',
       'safe-package-extract', 'packed-consumer-evidence'].map(name => `scripts/${name}.mjs`),

@@ -10,9 +10,14 @@ import assert from 'node:assert/strict';
 import {runInNewContext} from 'node:vm';
 import {writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
-import {requiredProbeSource, candidateInstallSpec} from '../scripts/browser-required-cells.mjs';
+import {requiredProbeSource, candidateInstallSpec, candidateQualificationDefects} from '../scripts/browser-required-cells.mjs';
 const raw = requiredProbeSource(), turn = () => new Promise(resolve => setImmediate(resolve));
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
+const announcementRow = mode => ({mode,actual_container_created:true,initialized:true,portal_content_present:true,
+  live_announcements:1,live_completed:true,live_content_moved:true,live_inert_hidden_removed:true,
+  queued_announcements_before_destroy:0,queued_inert_hidden:true,entered_state:true,direct_view_destroyed:true,
+  host_removed:true,retained_inert_and_live_nodes:true,late_announcements:0,late_completion:false,
+  late_content_moved:false,late_inert_hidden_removed:false});
 
 function fixture(fault = {}, source = raw) {
   const window = {}, jobs = new Map(), listeners = new Map(), opened = [];
@@ -43,7 +48,16 @@ function fixture(fault = {}, source = raw) {
     schedule(() => {if (!emit('animationend', container, 'mat-legacy-snack-bar-enter')) enter('event');}, 150);
     schedule(() => enter('fallback'), applies && fault.earlyFallback ? 170 : 200);
   }};
-  window.__lab = {closeTransient() {host = null;}};
+  window.__lab = {closeTransient() {host = null;}, runSnackAnnouncementLifetime() {
+    if (fault.announcementReject) return Promise.reject(new Error('announcement fixture failure'));
+    if (fault.announcementPending) return new Promise(() => {});
+    const observations = [announcementRow('enabled'),announcementRow('disabled')];
+    if (fault.announcementField) observations[fault.announcementIndex || 0][fault.announcementField] = fault.announcementValue;
+    return Promise.resolve(fault.announcementMissingResult ? undefined :
+      fault.announcementNullRow ? {observations:[null,observations[1]]} :
+      fault.announcementMissingMode ? {observations:[observations[0]]} : {observations});
+  }};
+  if (fault.announcementMissingApi) delete window.__lab.runSnackAnnouncementLifetime;
   const surface = {setAttribute() {}};
   const document = {getElementById: id => id === 'surface' ? surface : id === 'snack-motion-state' ? state : null,
     querySelector(selector) {
@@ -91,7 +105,7 @@ function fixture(fault = {}, source = raw) {
 
 const cases = [];
 async function check(id, fault, expected, source = raw) {
-  const f = fixture(fault, source); f.begin(); await f.advance(4000);
+  const f = fixture(fault, source); f.begin(); await f.advance(5000);
   const status = f.window.__poll();
   assert.equal(status.done, true, id); assert.equal(status.ok, expected, id + ': ' + status.evidence);
   assert.equal([...f.listeners.values()].reduce((n, set) => n + set.size, 0), 0, 'case-owned listeners released');
@@ -106,6 +120,25 @@ for (const mode of ['event', 'fallback']) for (const key of ['untrustedCss', 'un
   await check(mode + '-reject-' + key, {mode, [key]: true}, false);
 }
 await check('fallback-deadlines-required', {mode: 'fallback', earlyFallback: true}, false);
+for (const fault of [{announcementMissingApi:true},{announcementReject:true},{announcementPending:true},
+    {announcementMissingResult:true},{announcementNullRow:true},{announcementMissingMode:true}]) {
+  await check('announcement-reject-'+JSON.stringify(fault),fault,false);
+}
+for (const index of [0,1]) {
+  const expected = announcementRow(index === 0 ? 'enabled' : 'disabled');
+  for (const [key,value] of Object.entries(expected)) {
+    const broken = typeof value === 'boolean' ? !value : typeof value === 'number' ? value+1 : 'wrong-mode';
+    await check('announcement-'+index+'-reject-'+key,
+      {announcementIndex:index,announcementField:key,announcementValue:broken},false);
+  }
+}
+const pendingAnnouncement = fixture({announcementPending:true}); pendingAnnouncement.begin();
+await pendingAnnouncement.advance(800);
+assert.equal(pendingAnnouncement.window.__poll().done,false);
+pendingAnnouncement.window.__status = {done:false,ok:false,evidence:'replacement snack cell'};
+await pendingAnnouncement.advance(5000);
+assert.equal(pendingAnnouncement.window.__poll().done,false,'old announcement timeout cannot finish replacement');
+cases.push({id:'pending-announcement-cannot-finish-replacement-cell',result:'pass'});
 const stale = fixture(); stale.begin(); await stale.advance(250, false);
 const request = stale.window.__poll().pointer; assert.ok(request);
 stale.begin(); assert.equal(stale.window.__pointerDone(request.id), false, 'replacement rejects old pointer acknowledgment');
@@ -121,16 +154,24 @@ const completeBypass = raw.replace('legacySnackMotionNativeOkay(observation) ? o
 assert.notEqual(completeBypass, raw);
 const incomplete = fixture({mode: 'event', noComplete: true}, completeBypass); incomplete.begin(); await incomplete.advance(4000);
 assert.equal(incomplete.window.__poll().ok, true, 'dropping completion gate exposes unfinished dismissal');
+const announcementBypass = raw.replace('motion.length === 2 && legacySnackAnnouncementLifetimeNativeOkay(announcement)',
+  'motion.length === 2');
+assert.notEqual(announcementBypass,raw);
+const lateAnnouncement = fixture({announcementField:'late_announcements',announcementValue:1},announcementBypass);
+lateAnnouncement.begin(); await lateAnnouncement.advance(5000);
+assert.equal(lateAnnouncement.window.__poll().ok,true,'dropping announcement gate exposes a late notification false pass');
 const generated = [];
 for (const zoneless of [false, true]) {
   const spec = candidateInstallSpec({core: '22.1.7', cdk: '22.1.7', material: '22.1.7', rxjs: '7.8.2',
     typescript: '6.0.3', zone: '0.16.3', tslib: '2.8.1', sass: '1.104.1'}, zoneless);
   for (const text of ['class SnackMotionLab', "useValue: 'enabled'", 'SnackMotionLab, TooltipAriaLifetimeLab',
-    '<lab-snack-motion></lab-snack-motion>']) assert.ok(spec.labSource.includes(text), text);
+    '<lab-snack-motion></lab-snack-motion>','class SnackAnnouncementLifetimeLab',
+    'runSnackAnnouncementLifetime()']) assert.ok(spec.labSource.includes(text), text);
+  assert.deepEqual(candidateQualificationDefects(spec),[]);
   generated.push({zoneless, source_sha256: hash(spec.labSource)});
 }
-const report = {schema_version: 1, cases, mutation_rejections: 2, generated, complete_probe_sha256: hash(raw),
+const report = {schema_version: 1, cases, mutation_rejections: 3, generated, complete_probe_sha256: hash(raw),
   native_executed: false, actual_legacy_executed: false,
   scope: 'Complete canonical snack probe under explicit DOM/CSS-event/clock protocols. Shared actual readers, trace ownership and predicate execute. No browser, actual Angular/legacy lifecycle, CSS engine, packed artifact, AOT or floors qualified.'};
 if (process.argv[2]) writeFileSync(process.argv[2], JSON.stringify(report, null, 2) + '\n', {flag: 'wx'});
-console.log(JSON.stringify({cases: cases.length, mutation_rejections: 2, native_executed: false}));
+console.log(JSON.stringify({cases: cases.length, mutation_rejections: 3, native_executed: false}));
