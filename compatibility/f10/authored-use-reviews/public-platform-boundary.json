@@ -1,0 +1,1053 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "status": "reviewed",
+  "recorded_at_utc": "2026-10-10T18:49:34.402033+00:00",
+  "candidate_product_source_checkpoint": "6071d02280f89ab95313fe7c63c7944770a91d31",
+  "criteria": "Finite public DI token, immutable boolean reads and supplied-instance forwarding. Whole authenticated original/current minimum public modules and genuine factories execute; no complete product, native, packed or full floor qualification.",
+  "public_contract": {
+    "fields": [
+      "isBrowser",
+      "EDGE",
+      "TRIDENT",
+      "BLINK",
+      "WEBKIT",
+      "IOS",
+      "FIREFOX",
+      "ANDROID",
+      "SAFARI"
+    ],
+    "nondeprecated_public_declarations": true,
+    "subjects": [
+      "Material/CDK16.2.14 with Angular16.2.12",
+      "main22.1.7",
+      "CDK21.2.14 with Angular21.2.23"
+    ],
+    "current_constructor_requires_di": true,
+    "current21_compatibility_constructor_arguments_used": false,
+    "service_automatically_provided_at_application_root_qualified": false
+  },
+  "reviews": [
+    {
+      "file": "legacy-form-field/form-field.ts",
+      "module": "@angular/cdk/platform",
+      "symbol": "Platform",
+      "candidate_source_sha256": "580387e18e311ed166b078623d3f9889611f459349f1468371f07d9a2e281582",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "Constructor slot4 injects the public Platform token. updateOutlineGap reads isBrowser to avoid server geometry work before applying the owned outline width calculation. There is no platform construction or flag mutation; DOM geometry and render scheduling remain separate product obligations. Genuine original and advertised minimum public modules retain the nine nondeprecated boolean fields;96 dev/prod checks and15 complete-module mutants validate detection and explicit-provider identity. Current construction requires DI, whereas original construction works manually; this caller never constructs Platform. No consumer resource or API repair is needed for this boundary.",
+      "source_binding": {
+        "module": "@angular/cdk/platform",
+        "symbol": "Platform",
+        "file": "legacy-form-field/form-field.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "580387e18e311ed166b078623d3f9889611f459349f1468371f07d9a2e281582",
+        "constructor_parameters": [
+          {
+            "index": 4,
+            "declaration": "private _platform: Platform",
+            "implementation": true
+          }
+        ],
+        "parameter_properties": [
+          true
+        ],
+        "members": [
+          {
+            "member": "isBrowser",
+            "line": 674
+          }
+        ],
+        "forwards": [],
+        "contexts": [
+          {
+            "line": 296,
+            "source": "constructor(\n    elementRef: ElementRef,\n    private _changeDetectorRef: ChangeDetectorRef,\n    @Optional() private _dir: Directionality,\n    @Optional()\n    @Inject(MAT_LEGACY_FORM_FIELD_DEFAULT_OPTIONS)\n    private _defaults: MatLegacyFormFieldDefaultOptions,\n    private _platform: Platform,\n    private _ngZone: NgZone,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) _animationMode: string,\n    private _injector?: Injector,\n  ) {\n    super(elementRef);\n\n    this.floatLabel = this._getDefaultFloatLabelState();\n    this._legacyAnimationsDisabled = legacyAnimationsDisabled();\n    this._animationsEnabled =\n      !this._legacyAnimationsDisabled && _animationMode !== 'NoopAnimations';\n\n    // Set the default through here so we invoke the setter on the first run.\n    this.appearance = _defaults?.appearance || 'legacy';\n    if (_defaults) {\n      this._hideRequiredMarker = Boolean(_defaults.hideRequiredMarker);\n      if (_defaults.color) {\n        this.color = this.defaultColor = _defaults.color;\n      }\n    }\n  }"
+          },
+          {
+            "line": 667,
+            "source": "updateOutlineGap() {\n    const labelEl = this._label ? this._label.nativeElement : null;\n    const container = this._connectionContainerRef.nativeElement;\n    const outlineStartSelector = '.mat-form-field-outline-start';\n    const outlineGapSelector = '.mat-form-field-outline-gap';\n\n    // getBoundingClientRect isn't available on the server.\n    if (this.appearance !== 'outline' || !this._platform.isBrowser) {\n      return;\n    }\n\n    // If there is no content, set the gap elements to zero.\n    if (!labelEl || !labelEl.children.length || !labelEl.textContent!.trim()) {\n      const gapElements = container.querySelectorAll(\n        `${outlineStartSelector}, ${outlineGapSelector}`,\n      );\n      for (let i = 0; i < gapElements.length; i++) {\n        gapElements[i].style.width = '0';\n      }\n      return;\n    }\n\n    // If the element is not present in the DOM, the outline gap will need to be calculated\n    // the next time it is checked and in the DOM.\n    if (!this._isAttachedToDOM()) {\n      this._outlineGapCalculationNeededImmediately = true;\n      return;\n    }\n\n    let startWidth = 0;\n    let gapWidth = 0;\n\n    const startEls = container.querySelectorAll(outlineStartSelector);\n    const gapEls = container.querySelectorAll(outlineGapSelector);\n\n    if (this._label && this._label.nativeElement.children.length) {\n      const containerRect = container.getBoundingClientRect();\n\n      // If the container's width and height are zero, it means that the element is\n      // invisible and we can't calculate the outline gap. Mark the element as needing\n      // to be checked the next time the zone stabilizes. We can't do this immediately\n      // on the next change detection, because even if the element becomes visible,\n      // the `ClientRect` won't be recalculated immediately. We reset the\n      // `_outlineGapCalculationNeededImmediately` flag some we don't run the checks twice.\n      if (containerRect.width === 0 && containerRect.height === 0) {\n        this._outlineGapCalculationNeededOnStable = true;\n        this._outlineGapCalculationNeededImmediately = false;\n        return;\n      }\n\n      const containerStart = this._getStartEnd(containerRect);\n      const labelChildren = labelEl.children;\n      const labelStart = this._getStartEnd(labelChildren[0].getBoundingClientRect());\n      let labelWidth = 0;\n\n      for (let i = 0; i < labelChildren.length; i++) {\n        labelWidth += (labelChildren[i] as HTMLElement).offsetWidth;\n      }\n      startWidth = Math.abs(labelStart - containerStart) - outlineGapPadding;\n      gapWidth = labelWidth > 0 ? labelWidth * floatingLabelScale + outlineGapPadding * 2 : 0;\n    }\n\n    for (let i = 0; i < startEls.length; i++) {\n      startEls[i].style.width = `${startWidth}px`;\n    }\n    for (let i = 0; i < gapEls.length; i++) {\n      gapEls[i].style.width = `${gapWidth}px`;\n    }\n\n    this._outlineGapCalculationNeededOnStable = this._outlineGapCalculationNeededImmediately =\n      false;\n  }"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/platform-public-source-proof.json",
+          "sha256": "c179ec31ab13ead3e2ce7dd2629185fc44fd86033b170c1675f762f3a13936cd"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/platform-use-review.mjs",
+          "sha256": "0345da26b30fa9931205df277a48773f10ce4e28d75813a6c5e11eba1efbd24f"
+        },
+        {
+          "path": "tests/platform_public_probe.mjs",
+          "sha256": "c2c07df9b7454021c31856919ea3190ad08aca7a16fc487a24869f5b10ba8cb6"
+        },
+        {
+          "path": "tests/platform_public_subject.mjs",
+          "sha256": "95cb30c88e94d3efe1f6e1f0ffcd526a87e734a2efccf552586e6d198d17ced4"
+        },
+        {
+          "path": "tests/test_platform_public.py",
+          "sha256": "26a1e4046d7622b8cc7cbcef94da288730bf655d4bc368d238bc9f33d0103804"
+        },
+        {
+          "path": "compatibility/rc/platform-cyph-source-sanity.json",
+          "sha256": "17e9485fc18b61bf9164b3813ded7457d934023ebc0f9f5740e27e08b50c9445"
+        }
+      ]
+    },
+    {
+      "file": "legacy-chips/chip.ts",
+      "module": "@angular/cdk/platform",
+      "symbol": "Platform",
+      "candidate_source_sha256": "df6a4cfe02079393bdbb593ad0654af0c04b47548b8ef2c58a96611be944de15",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "Constructor slot2 receives the public Platform instance and passes that same reference to argument3 of the locally owned LegacyRippleRenderer, imported under its RippleRenderer alias. No current upstream renderer is instantiated here. The existing chip target/class/setup and renderer lifecycle remain separately tested owned behavior. Genuine original and advertised minimum public modules retain the nine nondeprecated boolean fields;96 dev/prod checks and15 complete-module mutants validate detection and explicit-provider identity. Current construction requires DI, whereas original construction works manually; this caller never constructs Platform. No consumer resource or API repair is needed for this boundary.",
+      "source_binding": {
+        "module": "@angular/cdk/platform",
+        "symbol": "Platform",
+        "file": "legacy-chips/chip.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "df6a4cfe02079393bdbb593ad0654af0c04b47548b8ef2c58a96611be944de15",
+        "constructor_parameters": [
+          {
+            "index": 2,
+            "declaration": "platform: Platform",
+            "implementation": true
+          }
+        ],
+        "parameter_properties": [
+          false
+        ],
+        "members": [],
+        "forwards": [
+          {
+            "kind": "owned-new",
+            "argument_index": 3,
+            "arguments": [
+              "this",
+              "_ngZone",
+              "this._chipRippleTarget",
+              "platform"
+            ]
+          }
+        ],
+        "contexts": [
+          {
+            "line": 307,
+            "source": "constructor(\n    elementRef: ElementRef<HTMLElement>,\n    private _ngZone: NgZone,\n    platform: Platform,\n    @Optional()\n    @Inject(MAT_RIPPLE_GLOBAL_OPTIONS)\n    globalRippleOptions: RippleGlobalOptions | null,\n    private _changeDetectorRef: ChangeDetectorRef,\n    @Inject(DOCUMENT) _document: any,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n    @Attribute('tabindex') tabIndex?: string,\n  ) {\n    super(elementRef);\n\n    this._addHostClassName();\n\n    // Dynamically create the ripple target, append it within the chip, and use it as the\n    // chip's ripple target. Adding the class '.mat-chip-ripple' ensures that it will have\n    // the proper styles.\n    this._chipRippleTarget = _document.createElement('div');\n    this._chipRippleTarget.classList.add('mat-chip-ripple');\n    this._elementRef.nativeElement.appendChild(this._chipRippleTarget);\n    this._chipRipple = new RippleRenderer(this, _ngZone, this._chipRippleTarget, platform);\n    this._chipRipple.setupTriggerEvents(elementRef);\n\n    this.rippleConfig = globalRippleOptions || {};\n    this._animationsDisabled = animationMode === 'NoopAnimations';\n    this.tabIndex = tabIndex != null ? parseInt(tabIndex) || -1 : -1;\n  }"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/platform-public-source-proof.json",
+          "sha256": "c179ec31ab13ead3e2ce7dd2629185fc44fd86033b170c1675f762f3a13936cd"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/platform-use-review.mjs",
+          "sha256": "0345da26b30fa9931205df277a48773f10ce4e28d75813a6c5e11eba1efbd24f"
+        },
+        {
+          "path": "tests/platform_public_probe.mjs",
+          "sha256": "c2c07df9b7454021c31856919ea3190ad08aca7a16fc487a24869f5b10ba8cb6"
+        },
+        {
+          "path": "tests/platform_public_subject.mjs",
+          "sha256": "95cb30c88e94d3efe1f6e1f0ffcd526a87e734a2efccf552586e6d198d17ced4"
+        },
+        {
+          "path": "tests/test_platform_public.py",
+          "sha256": "26a1e4046d7622b8cc7cbcef94da288730bf655d4bc368d238bc9f33d0103804"
+        },
+        {
+          "path": "compatibility/rc/platform-cyph-source-sanity.json",
+          "sha256": "17e9485fc18b61bf9164b3813ded7457d934023ebc0f9f5740e27e08b50c9445"
+        }
+      ]
+    },
+    {
+      "file": "legacy-tabs/tab-header.ts",
+      "module": "@angular/cdk/platform",
+      "symbol": "Platform",
+      "candidate_source_sha256": "650d50f3007c67c0c4aa9fa6e63b0fe6f246d7443fcb9967d5943c1fd7e90f9a",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "Constructor slot5 forwards the supplied Platform reference unchanged to super argument5. The owned header base and paginated header retain the same route. No Platform constructor, flag read or current private symbol is introduced by this wrapper. Genuine original and advertised minimum public modules retain the nine nondeprecated boolean fields;96 dev/prod checks and15 complete-module mutants validate detection and explicit-provider identity. Current construction requires DI, whereas original construction works manually; this caller never constructs Platform. No consumer resource or API repair is needed for this boundary.",
+      "source_binding": {
+        "module": "@angular/cdk/platform",
+        "symbol": "Platform",
+        "file": "legacy-tabs/tab-header.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "650d50f3007c67c0c4aa9fa6e63b0fe6f246d7443fcb9967d5943c1fd7e90f9a",
+        "constructor_parameters": [
+          {
+            "index": 5,
+            "declaration": "platform: Platform",
+            "implementation": true
+          }
+        ],
+        "parameter_properties": [
+          false
+        ],
+        "members": [],
+        "forwards": [
+          {
+            "kind": "super",
+            "argument_index": 5,
+            "arguments": [
+              "elementRef",
+              "changeDetectorRef",
+              "viewportRuler",
+              "dir",
+              "ngZone",
+              "platform",
+              "animationMode"
+            ]
+          }
+        ],
+        "contexts": [
+          {
+            "line": 64,
+            "source": "constructor(\n    elementRef: ElementRef,\n    changeDetectorRef: ChangeDetectorRef,\n    viewportRuler: ViewportRuler,\n    @Optional() dir: Directionality,\n    ngZone: NgZone,\n    platform: Platform,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n  ) {\n    super(elementRef, changeDetectorRef, viewportRuler, dir, ngZone, platform, animationMode);\n  }"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/platform-public-source-proof.json",
+          "sha256": "c179ec31ab13ead3e2ce7dd2629185fc44fd86033b170c1675f762f3a13936cd"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/platform-use-review.mjs",
+          "sha256": "0345da26b30fa9931205df277a48773f10ce4e28d75813a6c5e11eba1efbd24f"
+        },
+        {
+          "path": "tests/platform_public_probe.mjs",
+          "sha256": "c2c07df9b7454021c31856919ea3190ad08aca7a16fc487a24869f5b10ba8cb6"
+        },
+        {
+          "path": "tests/platform_public_subject.mjs",
+          "sha256": "95cb30c88e94d3efe1f6e1f0ffcd526a87e734a2efccf552586e6d198d17ced4"
+        },
+        {
+          "path": "tests/test_platform_public.py",
+          "sha256": "26a1e4046d7622b8cc7cbcef94da288730bf655d4bc368d238bc9f33d0103804"
+        },
+        {
+          "path": "compatibility/rc/platform-cyph-source-sanity.json",
+          "sha256": "17e9485fc18b61bf9164b3813ded7457d934023ebc0f9f5740e27e08b50c9445"
+        }
+      ]
+    },
+    {
+      "file": "legacy-progress-spinner/progress-spinner.ts",
+      "module": "@angular/cdk/platform",
+      "symbol": "Platform",
+      "candidate_source_sha256": "85936bc7161a1dcbbc377fbf19c3de46b09f13a32adaa3d503d7dc09204c736c",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "Constructor slot1 reads the supplied isBrowser and SAFARI boolean fields to guard the existing optional viewport/change-detector/zone resize subscription. Its indeterminate-mode transform-origin recalculation remains owned. Public flag shape and detection are preserved; this dependency review does not certify native Safari zoom or component subscription teardown. Genuine original and advertised minimum public modules retain the nine nondeprecated boolean fields;96 dev/prod checks and15 complete-module mutants validate detection and explicit-provider identity. Current construction requires DI, whereas original construction works manually; this caller never constructs Platform. No consumer resource or API repair is needed for this boundary.",
+      "source_binding": {
+        "module": "@angular/cdk/platform",
+        "symbol": "Platform",
+        "file": "legacy-progress-spinner/progress-spinner.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "85936bc7161a1dcbbc377fbf19c3de46b09f13a32adaa3d503d7dc09204c736c",
+        "constructor_parameters": [
+          {
+            "index": 1,
+            "declaration": "_platform: Platform",
+            "implementation": true
+          }
+        ],
+        "parameter_properties": [
+          false
+        ],
+        "members": [
+          {
+            "member": "isBrowser",
+            "line": 237
+          },
+          {
+            "member": "SAFARI",
+            "line": 237
+          }
+        ],
+        "forwards": [],
+        "contexts": [
+          {
+            "line": 182,
+            "source": "constructor(\n    elementRef: ElementRef<HTMLElement>,\n    _platform: Platform,\n    @Optional() @Inject(DOCUMENT) private _document: any,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode: string,\n    @Inject(MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS)\n    defaults?: MatProgressSpinnerDefaultOptions,\n    /**\n     * @deprecated `changeDetectorRef`, `viewportRuler` and `ngZone`\n     * parameters to become required.\n     * @breaking-change 14.0.0\n     */\n    changeDetectorRef?: ChangeDetectorRef,\n    viewportRuler?: ViewportRuler,\n    ngZone?: NgZone,\n    @Inject(CSP_NONCE) @Optional() private _nonce?: string | null,\n  ) {\n    super(elementRef);\n\n    const trackedDiameters = MatLegacyProgressSpinner._diameters;\n    this._spinnerAnimationLabel = this._getSpinnerAnimationLabel();\n\n    // The base size is already inserted via the component's structural styles. We still\n    // need to track it so we don't end up adding the same styles again.\n    if (!trackedDiameters.has(_document.head)) {\n      trackedDiameters.set(_document.head, new Set<number>([BASE_SIZE]));\n    }\n\n    this._noopAnimations =\n      animationMode === 'NoopAnimations' && !!defaults && !defaults._forceAnimations;\n\n    if (elementRef.nativeElement.nodeName.toLowerCase() === 'mat-spinner') {\n      this.mode = 'indeterminate';\n    }\n\n    if (defaults) {\n      if (defaults.color) {\n        this.color = this.defaultColor = defaults.color;\n      }\n\n      if (defaults.diameter) {\n        this.diameter = defaults.diameter;\n      }\n\n      if (defaults.strokeWidth) {\n        this.strokeWidth = defaults.strokeWidth;\n      }\n    }\n\n    // Safari has an issue where the circle isn't positioned correctly when the page has a\n    // different zoom level from the default. This handler triggers a recalculation of the\n    // `transform-origin` when the page zoom level changes.\n    // See `_getCircleTransformOrigin` for more info.\n    // @breaking-change 14.0.0 Remove null checks for `_changeDetectorRef`,\n    // `viewportRuler` and `ngZone`.\n    if (_platform.isBrowser && _platform.SAFARI && viewportRuler && changeDetectorRef && ngZone) {\n      this._resizeSubscription = viewportRuler.change(150).subscribe(() => {\n        // When the window is resize while the spinner is in `indeterminate` mode, we\n        // have to mark for check so the transform origin of the circle can be recomputed.\n        if (this.mode === 'indeterminate') {\n          ngZone.run(() => changeDetectorRef.markForCheck());\n        }\n      });\n    }\n  }"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/platform-public-source-proof.json",
+          "sha256": "c179ec31ab13ead3e2ce7dd2629185fc44fd86033b170c1675f762f3a13936cd"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/platform-use-review.mjs",
+          "sha256": "0345da26b30fa9931205df277a48773f10ce4e28d75813a6c5e11eba1efbd24f"
+        },
+        {
+          "path": "tests/platform_public_probe.mjs",
+          "sha256": "c2c07df9b7454021c31856919ea3190ad08aca7a16fc487a24869f5b10ba8cb6"
+        },
+        {
+          "path": "tests/platform_public_subject.mjs",
+          "sha256": "95cb30c88e94d3efe1f6e1f0ffcd526a87e734a2efccf552586e6d198d17ced4"
+        },
+        {
+          "path": "tests/test_platform_public.py",
+          "sha256": "26a1e4046d7622b8cc7cbcef94da288730bf655d4bc368d238bc9f33d0103804"
+        },
+        {
+          "path": "compatibility/rc/platform-cyph-source-sanity.json",
+          "sha256": "17e9485fc18b61bf9164b3813ded7457d934023ebc0f9f5740e27e08b50c9445"
+        }
+      ]
+    },
+    {
+      "file": "legacy-tooltip/tooltip.ts",
+      "module": "@angular/cdk/platform",
+      "symbol": "Platform",
+      "candidate_source_sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "Constructor slot5 forwards the supplied Platform reference unchanged to the owned tooltip base at super argument5. This wrapper introduces no Platform construction, private API, signal access or service mutation. Full overlay, event and tooltip destruction behavior remain separate. Genuine original and advertised minimum public modules retain the nine nondeprecated boolean fields;96 dev/prod checks and15 complete-module mutants validate detection and explicit-provider identity. Current construction requires DI, whereas original construction works manually; this caller never constructs Platform. No consumer resource or API repair is needed for this boundary.",
+      "source_binding": {
+        "module": "@angular/cdk/platform",
+        "symbol": "Platform",
+        "file": "legacy-tooltip/tooltip.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29",
+        "constructor_parameters": [
+          {
+            "index": 5,
+            "declaration": "platform: Platform",
+            "implementation": true
+          }
+        ],
+        "parameter_properties": [
+          false
+        ],
+        "members": [],
+        "forwards": [
+          {
+            "kind": "super",
+            "argument_index": 5,
+            "arguments": [
+              "overlay",
+              "elementRef",
+              "scrollDispatcher",
+              "viewContainerRef",
+              "ngZone",
+              "platform",
+              "ariaDescriber",
+              "focusMonitor",
+              "scrollStrategy",
+              "dir",
+              "defaultOptions",
+              "_document"
+            ]
+          }
+        ],
+        "contexts": [
+          {
+            "line": 57,
+            "source": "constructor(\n    overlay: Overlay,\n    elementRef: ElementRef<HTMLElement>,\n    scrollDispatcher: ScrollDispatcher,\n    viewContainerRef: ViewContainerRef,\n    ngZone: NgZone,\n    platform: Platform,\n    ariaDescriber: AriaDescriber,\n    focusMonitor: FocusMonitor,\n    @Inject(MAT_TOOLTIP_SCROLL_STRATEGY) scrollStrategy: any,\n    @Optional() dir: Directionality,\n    @Optional() @Inject(MAT_TOOLTIP_DEFAULT_OPTIONS) defaultOptions: MatTooltipDefaultOptions,\n    @Inject(DOCUMENT) _document: any,\n  ) {\n    super(\n      overlay,\n      elementRef,\n      scrollDispatcher,\n      viewContainerRef,\n      ngZone,\n      platform,\n      ariaDescriber,\n      focusMonitor,\n      scrollStrategy,\n      dir,\n      defaultOptions,\n      _document,\n    );\n  }"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/platform-public-source-proof.json",
+          "sha256": "c179ec31ab13ead3e2ce7dd2629185fc44fd86033b170c1675f762f3a13936cd"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/platform-use-review.mjs",
+          "sha256": "0345da26b30fa9931205df277a48773f10ce4e28d75813a6c5e11eba1efbd24f"
+        },
+        {
+          "path": "tests/platform_public_probe.mjs",
+          "sha256": "c2c07df9b7454021c31856919ea3190ad08aca7a16fc487a24869f5b10ba8cb6"
+        },
+        {
+          "path": "tests/platform_public_subject.mjs",
+          "sha256": "95cb30c88e94d3efe1f6e1f0ffcd526a87e734a2efccf552586e6d198d17ced4"
+        },
+        {
+          "path": "tests/test_platform_public.py",
+          "sha256": "26a1e4046d7622b8cc7cbcef94da288730bf655d4bc368d238bc9f33d0103804"
+        },
+        {
+          "path": "compatibility/rc/platform-cyph-source-sanity.json",
+          "sha256": "17e9485fc18b61bf9164b3813ded7457d934023ebc0f9f5740e27e08b50c9445"
+        }
+      ]
+    },
+    {
+      "file": "legacy-tooltip/internal/tooltip-base.ts",
+      "module": "@angular/cdk/platform",
+      "symbol": "Platform",
+      "candidate_source_sha256": "948fd1d57f52e617eca301b693261127e42b3e4d23d0db8b2a3e2f012db0a85d",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "Constructor slot5 retains the supplied Platform in its parameter property. _platformSupportsMouseEvents reads IOS and ANDROID to choose the owned mouse-event path. Both fields remain plain public booleans; no current service methods, constructor arguments or private symbols are required. Genuine original and advertised minimum public modules retain the nine nondeprecated boolean fields;96 dev/prod checks and15 complete-module mutants validate detection and explicit-provider identity. Current construction requires DI, whereas original construction works manually; this caller never constructs Platform. No consumer resource or API repair is needed for this boundary.",
+      "source_binding": {
+        "module": "@angular/cdk/platform",
+        "symbol": "Platform",
+        "file": "legacy-tooltip/internal/tooltip-base.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "948fd1d57f52e617eca301b693261127e42b3e4d23d0db8b2a3e2f012db0a85d",
+        "constructor_parameters": [
+          {
+            "index": 5,
+            "declaration": "private _platform: Platform",
+            "implementation": true
+          }
+        ],
+        "parameter_properties": [
+          true
+        ],
+        "members": [
+          {
+            "member": "IOS",
+            "line": 747
+          },
+          {
+            "member": "ANDROID",
+            "line": 747
+          }
+        ],
+        "forwards": [],
+        "contexts": [
+          {
+            "line": 280,
+            "source": "constructor(\n    private _overlay: Overlay,\n    private _elementRef: ElementRef<HTMLElement>,\n    private _scrollDispatcher: ScrollDispatcher,\n    private _viewContainerRef: ViewContainerRef,\n    private _ngZone: NgZone,\n    private _platform: Platform,\n    private _ariaDescriber: AriaDescriber,\n    private _focusMonitor: FocusMonitor,\n    scrollStrategy: any,\n    protected _dir: Directionality,\n    private _defaultOptions: MatTooltipDefaultOptions,\n    @Inject(DOCUMENT) _document: any,\n  ) {\n    this._scrollStrategy = scrollStrategy;\n    this._document = _document;\n\n    if (_defaultOptions) {\n      this._showDelay = _defaultOptions.showDelay;\n      this._hideDelay = _defaultOptions.hideDelay;\n\n      if (_defaultOptions.position) {\n        this.position = _defaultOptions.position;\n      }\n\n      if (_defaultOptions.positionAtOrigin) {\n        this.positionAtOrigin = _defaultOptions.positionAtOrigin;\n      }\n\n      if (_defaultOptions.touchGestures) {\n        this.touchGestures = _defaultOptions.touchGestures;\n      }\n    }\n\n    _dir.change.pipe(takeUntil(this._destroyed)).subscribe(() => {\n      if (this._overlayRef) {\n        this._updatePosition(this._overlayRef);\n      }\n    });\n  }"
+          },
+          {
+            "line": 746,
+            "source": "private _platformSupportsMouseEvents() {\n    return !this._platform.IOS && !this._platform.ANDROID;\n  }"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/platform-public-source-proof.json",
+          "sha256": "c179ec31ab13ead3e2ce7dd2629185fc44fd86033b170c1675f762f3a13936cd"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/platform-use-review.mjs",
+          "sha256": "0345da26b30fa9931205df277a48773f10ce4e28d75813a6c5e11eba1efbd24f"
+        },
+        {
+          "path": "tests/platform_public_probe.mjs",
+          "sha256": "c2c07df9b7454021c31856919ea3190ad08aca7a16fc487a24869f5b10ba8cb6"
+        },
+        {
+          "path": "tests/platform_public_subject.mjs",
+          "sha256": "95cb30c88e94d3efe1f6e1f0ffcd526a87e734a2efccf552586e6d198d17ced4"
+        },
+        {
+          "path": "tests/test_platform_public.py",
+          "sha256": "26a1e4046d7622b8cc7cbcef94da288730bf655d4bc368d238bc9f33d0103804"
+        },
+        {
+          "path": "compatibility/rc/platform-cyph-source-sanity.json",
+          "sha256": "17e9485fc18b61bf9164b3813ded7457d934023ebc0f9f5740e27e08b50c9445"
+        }
+      ]
+    },
+    {
+      "file": "legacy-tabs/internal/paginated-tab-header.ts",
+      "module": "@angular/cdk/platform",
+      "symbol": "Platform",
+      "candidate_source_sha256": "a738ff2ac3d901f5c2e9614130dddbcb19ce306376a662279a6df7d385148225",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "Constructor slot5 retains the supplied Platform. _updateTabScrollPosition reads TRIDENT and EDGE only to reset the parent scrollLeft after the existing rounded translateX update. The historical conditional intentionally avoids disturbing Chrome RTL scrolling. Detection protocol checks preserve both booleans; actual browser scrolling support is not inferred from synthetic user agents. Genuine original and advertised minimum public modules retain the nine nondeprecated boolean fields;96 dev/prod checks and15 complete-module mutants validate detection and explicit-provider identity. Current construction requires DI, whereas original construction works manually; this caller never constructs Platform. No consumer resource or API repair is needed for this boundary.",
+      "source_binding": {
+        "module": "@angular/cdk/platform",
+        "symbol": "Platform",
+        "file": "legacy-tabs/internal/paginated-tab-header.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "a738ff2ac3d901f5c2e9614130dddbcb19ce306376a662279a6df7d385148225",
+        "constructor_parameters": [
+          {
+            "index": 5,
+            "declaration": "private _platform: Platform",
+            "implementation": true
+          }
+        ],
+        "parameter_properties": [
+          true
+        ],
+        "members": [
+          {
+            "member": "TRIDENT",
+            "line": 494
+          },
+          {
+            "member": "EDGE",
+            "line": 494
+          }
+        ],
+        "forwards": [],
+        "contexts": [
+          {
+            "line": 176,
+            "source": "constructor(\n    protected _elementRef: ElementRef<HTMLElement>,\n    protected _changeDetectorRef: ChangeDetectorRef,\n    private _viewportRuler: ViewportRuler,\n    @Optional() private _dir: Directionality,\n    private _ngZone: NgZone,\n    private _platform: Platform,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) public _animationMode?: string,\n  ) {\n    // Bind the `mouseleave` event on the outside since it doesn't change anything in the view.\n    _ngZone.runOutsideAngular(() => {\n      fromEvent(_elementRef.nativeElement, 'mouseleave')\n        .pipe(takeUntil(this._destroyed))\n        .subscribe(() => {\n          this._stopInterval();\n        });\n    });\n  }"
+          },
+          {
+            "line": 474,
+            "source": "_updateTabScrollPosition() {\n    if (this._isDestroyed || this.disablePagination) {\n      return;\n    }\n\n    const scrollDistance = this.scrollDistance;\n    const translateX = this._getLayoutDirection() === 'ltr' ? -scrollDistance : scrollDistance;\n\n    // Don't use `translate3d` here because we don't want to create a new layer. A new layer\n    // seems to cause flickering and overflow in Internet Explorer. For example, the ink bar\n    // and ripples will exceed the boundaries of the visible tab bar.\n    // See: https://github.com/angular/components/issues/10276\n    // We round the `transform` here, because transforms with sub-pixel precision cause some\n    // browsers to blur the content of the element.\n    this._tabList.nativeElement.style.transform = `translateX(${Math.round(translateX)}px)`;\n\n    // Setting the `transform` on IE will change the scroll offset of the parent, causing the\n    // position to be thrown off in some cases. We have to reset it ourselves to ensure that\n    // it doesn't get thrown off. Note that we scope it only to IE and Edge, because messing\n    // with the scroll position throws off Chrome 71+ in RTL mode (see #14689).\n    if (this._platform.TRIDENT || this._platform.EDGE) {\n      this._tabListContainer.nativeElement.scrollLeft = 0;\n    }\n  }"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/platform-public-source-proof.json",
+          "sha256": "c179ec31ab13ead3e2ce7dd2629185fc44fd86033b170c1675f762f3a13936cd"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/platform-use-review.mjs",
+          "sha256": "0345da26b30fa9931205df277a48773f10ce4e28d75813a6c5e11eba1efbd24f"
+        },
+        {
+          "path": "tests/platform_public_probe.mjs",
+          "sha256": "c2c07df9b7454021c31856919ea3190ad08aca7a16fc487a24869f5b10ba8cb6"
+        },
+        {
+          "path": "tests/platform_public_subject.mjs",
+          "sha256": "95cb30c88e94d3efe1f6e1f0ffcd526a87e734a2efccf552586e6d198d17ced4"
+        },
+        {
+          "path": "tests/test_platform_public.py",
+          "sha256": "26a1e4046d7622b8cc7cbcef94da288730bf655d4bc368d238bc9f33d0103804"
+        },
+        {
+          "path": "compatibility/rc/platform-cyph-source-sanity.json",
+          "sha256": "17e9485fc18b61bf9164b3813ded7457d934023ebc0f9f5740e27e08b50c9445"
+        }
+      ]
+    },
+    {
+      "file": "legacy-tabs/internal/tab-nav-bar-base.ts",
+      "module": "@angular/cdk/platform",
+      "symbol": "Platform",
+      "candidate_source_sha256": "a2a5aa08c670b3c30a0fa590519231401ebe4eaf33727a6078b87922865e2d22",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "Constructor slot5 forwards the supplied Platform to the owned paginated header at super argument5. No service construction or new platform behavior is introduced, and the unchanged forwarded instance reaches the reviewed historical flag-read owner. Genuine original and advertised minimum public modules retain the nine nondeprecated boolean fields;96 dev/prod checks and15 complete-module mutants validate detection and explicit-provider identity. Current construction requires DI, whereas original construction works manually; this caller never constructs Platform. No consumer resource or API repair is needed for this boundary.",
+      "source_binding": {
+        "module": "@angular/cdk/platform",
+        "symbol": "Platform",
+        "file": "legacy-tabs/internal/tab-nav-bar-base.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "a2a5aa08c670b3c30a0fa590519231401ebe4eaf33727a6078b87922865e2d22",
+        "constructor_parameters": [
+          {
+            "index": 5,
+            "declaration": "platform: Platform",
+            "implementation": true
+          }
+        ],
+        "parameter_properties": [
+          false
+        ],
+        "members": [],
+        "forwards": [
+          {
+            "kind": "super",
+            "argument_index": 5,
+            "arguments": [
+              "elementRef",
+              "changeDetectorRef",
+              "viewportRuler",
+              "dir",
+              "ngZone",
+              "platform",
+              "animationMode"
+            ]
+          }
+        ],
+        "contexts": [
+          {
+            "line": 109,
+            "source": "constructor(\n    elementRef: ElementRef,\n    @Optional() dir: Directionality,\n    ngZone: NgZone,\n    changeDetectorRef: ChangeDetectorRef,\n    viewportRuler: ViewportRuler,\n    platform: Platform,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n  ) {\n    super(elementRef, changeDetectorRef, viewportRuler, dir, ngZone, platform, animationMode);\n  }"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/platform-public-source-proof.json",
+          "sha256": "c179ec31ab13ead3e2ce7dd2629185fc44fd86033b170c1675f762f3a13936cd"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/platform-use-review.mjs",
+          "sha256": "0345da26b30fa9931205df277a48773f10ce4e28d75813a6c5e11eba1efbd24f"
+        },
+        {
+          "path": "tests/platform_public_probe.mjs",
+          "sha256": "c2c07df9b7454021c31856919ea3190ad08aca7a16fc487a24869f5b10ba8cb6"
+        },
+        {
+          "path": "tests/platform_public_subject.mjs",
+          "sha256": "95cb30c88e94d3efe1f6e1f0ffcd526a87e734a2efccf552586e6d198d17ced4"
+        },
+        {
+          "path": "tests/test_platform_public.py",
+          "sha256": "26a1e4046d7622b8cc7cbcef94da288730bf655d4bc368d238bc9f33d0103804"
+        },
+        {
+          "path": "compatibility/rc/platform-cyph-source-sanity.json",
+          "sha256": "17e9485fc18b61bf9164b3813ded7457d934023ebc0f9f5740e27e08b50c9445"
+        }
+      ]
+    },
+    {
+      "file": "legacy-tabs/internal/tab-header-base.ts",
+      "module": "@angular/cdk/platform",
+      "symbol": "Platform",
+      "candidate_source_sha256": "eb75b2bf760e70744c3c85fee76dd2164cbb6b3242cb47f023300ebad0ce2b7e",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "Constructor slot5 forwards the same supplied Platform to the owned paginated header at super argument5. The exact source binding contains no additional member or constructor dependency. Full pagination rendering and keyboard behavior remain outside this finite token/forwarding review. Genuine original and advertised minimum public modules retain the nine nondeprecated boolean fields;96 dev/prod checks and15 complete-module mutants validate detection and explicit-provider identity. Current construction requires DI, whereas original construction works manually; this caller never constructs Platform. No consumer resource or API repair is needed for this boundary.",
+      "source_binding": {
+        "module": "@angular/cdk/platform",
+        "symbol": "Platform",
+        "file": "legacy-tabs/internal/tab-header-base.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "eb75b2bf760e70744c3c85fee76dd2164cbb6b3242cb47f023300ebad0ce2b7e",
+        "constructor_parameters": [
+          {
+            "index": 5,
+            "declaration": "platform: Platform",
+            "implementation": true
+          }
+        ],
+        "parameter_properties": [
+          false
+        ],
+        "members": [],
+        "forwards": [
+          {
+            "kind": "super",
+            "argument_index": 5,
+            "arguments": [
+              "elementRef",
+              "changeDetectorRef",
+              "viewportRuler",
+              "dir",
+              "ngZone",
+              "platform",
+              "animationMode"
+            ]
+          }
+        ],
+        "contexts": [
+          {
+            "line": 50,
+            "source": "constructor(\n    elementRef: ElementRef,\n    changeDetectorRef: ChangeDetectorRef,\n    viewportRuler: ViewportRuler,\n    @Optional() dir: Directionality,\n    ngZone: NgZone,\n    platform: Platform,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n  ) {\n    super(elementRef, changeDetectorRef, viewportRuler, dir, ngZone, platform, animationMode);\n  }"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/platform-public-source-proof.json",
+          "sha256": "c179ec31ab13ead3e2ce7dd2629185fc44fd86033b170c1675f762f3a13936cd"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/platform-use-review.mjs",
+          "sha256": "0345da26b30fa9931205df277a48773f10ce4e28d75813a6c5e11eba1efbd24f"
+        },
+        {
+          "path": "tests/platform_public_probe.mjs",
+          "sha256": "c2c07df9b7454021c31856919ea3190ad08aca7a16fc487a24869f5b10ba8cb6"
+        },
+        {
+          "path": "tests/platform_public_subject.mjs",
+          "sha256": "95cb30c88e94d3efe1f6e1f0ffcd526a87e734a2efccf552586e6d198d17ced4"
+        },
+        {
+          "path": "tests/test_platform_public.py",
+          "sha256": "26a1e4046d7622b8cc7cbcef94da288730bf655d4bc368d238bc9f33d0103804"
+        },
+        {
+          "path": "compatibility/rc/platform-cyph-source-sanity.json",
+          "sha256": "17e9485fc18b61bf9164b3813ded7457d934023ebc0f9f5740e27e08b50c9445"
+        }
+      ]
+    },
+    {
+      "file": "legacy-tabs/tab-nav-bar/tab-nav-bar.ts",
+      "module": "@angular/cdk/platform",
+      "symbol": "Platform",
+      "candidate_source_sha256": "6ee670b25761cf6f478a2d34950a4edba6422785c3a3682735d179e1d5cca6be",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "Both classes in this file are accounted for: MatLegacyTabNav constructor slot5 forwards Platform to its owned base at super argument5; MatLegacyTabLink slot3 passes the supplied reference to argument3 of the locally owned LegacyRippleRenderer. The two class scopes are inspected independently so shared variable spelling cannot hide the second route. Genuine original and advertised minimum public modules retain the nine nondeprecated boolean fields;96 dev/prod checks and15 complete-module mutants validate detection and explicit-provider identity. Current construction requires DI, whereas original construction works manually; this caller never constructs Platform. No consumer resource or API repair is needed for this boundary.",
+      "source_binding": {
+        "module": "@angular/cdk/platform",
+        "symbol": "Platform",
+        "file": "legacy-tabs/tab-nav-bar/tab-nav-bar.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "6ee670b25761cf6f478a2d34950a4edba6422785c3a3682735d179e1d5cca6be",
+        "constructor_parameters": [
+          {
+            "index": 5,
+            "declaration": "platform: Platform",
+            "implementation": true
+          },
+          {
+            "index": 3,
+            "declaration": "platform: Platform",
+            "implementation": true
+          }
+        ],
+        "parameter_properties": [
+          false,
+          false
+        ],
+        "members": [],
+        "forwards": [
+          {
+            "kind": "super",
+            "argument_index": 5,
+            "arguments": [
+              "elementRef",
+              "dir",
+              "ngZone",
+              "changeDetectorRef",
+              "viewportRuler",
+              "platform",
+              "animationMode"
+            ]
+          },
+          {
+            "kind": "owned-new",
+            "argument_index": 3,
+            "arguments": [
+              "this",
+              "ngZone",
+              "elementRef",
+              "platform"
+            ]
+          }
+        ],
+        "contexts": [
+          {
+            "line": 74,
+            "source": "constructor(\n    elementRef: ElementRef,\n    @Optional() dir: Directionality,\n    ngZone: NgZone,\n    changeDetectorRef: ChangeDetectorRef,\n    viewportRuler: ViewportRuler,\n    platform: Platform,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n  ) {\n    super(elementRef, dir, ngZone, changeDetectorRef, viewportRuler, platform, animationMode);\n  }"
+          },
+          {
+            "line": 114,
+            "source": "constructor(\n    tabNavBar: MatLegacyTabNav,\n    elementRef: ElementRef,\n    ngZone: NgZone,\n    platform: Platform,\n    @Optional() @Inject(MAT_RIPPLE_GLOBAL_OPTIONS) globalRippleOptions: RippleGlobalOptions | null,\n    @Attribute('tabindex') tabIndex: string,\n    focusMonitor: FocusMonitor,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n  ) {\n    super(tabNavBar, elementRef, globalRippleOptions, tabIndex, focusMonitor, animationMode);\n    this._tabLinkRipple = new RippleRenderer(this, ngZone, elementRef, platform);\n    this._tabLinkRipple.setupTriggerEvents(elementRef.nativeElement);\n  }"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/platform-public-source-proof.json",
+          "sha256": "c179ec31ab13ead3e2ce7dd2629185fc44fd86033b170c1675f762f3a13936cd"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/platform-use-review.mjs",
+          "sha256": "0345da26b30fa9931205df277a48773f10ce4e28d75813a6c5e11eba1efbd24f"
+        },
+        {
+          "path": "tests/platform_public_probe.mjs",
+          "sha256": "c2c07df9b7454021c31856919ea3190ad08aca7a16fc487a24869f5b10ba8cb6"
+        },
+        {
+          "path": "tests/platform_public_subject.mjs",
+          "sha256": "95cb30c88e94d3efe1f6e1f0ffcd526a87e734a2efccf552586e6d198d17ced4"
+        },
+        {
+          "path": "tests/test_platform_public.py",
+          "sha256": "26a1e4046d7622b8cc7cbcef94da288730bf655d4bc368d238bc9f33d0103804"
+        },
+        {
+          "path": "compatibility/rc/platform-cyph-source-sanity.json",
+          "sha256": "17e9485fc18b61bf9164b3813ded7457d934023ebc0f9f5740e27e08b50c9445"
+        }
+      ]
+    },
+    {
+      "file": "legacy-snack-bar/internal/snack-bar-container-base.ts",
+      "module": "@angular/cdk/platform",
+      "symbol": "Platform",
+      "candidate_source_sha256": "e05fbb1a107b185b873a675ede5401101da24c1af0733a73eacda0609d4f88c3",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "Constructor slot3 retains the supplied Platform. FIREFOX selects the existing status/alert role from the owned live-region politeness; isBrowser guards document focus capture when moving announced content. The class does not construct or mutate Platform. Screen-reader and timed announcement/focus behavior still require their product-level validation. Genuine original and advertised minimum public modules retain the nine nondeprecated boolean fields;96 dev/prod checks and15 complete-module mutants validate detection and explicit-provider identity. Current construction requires DI, whereas original construction works manually; this caller never constructs Platform. No consumer resource or API repair is needed for this boundary.",
+      "source_binding": {
+        "module": "@angular/cdk/platform",
+        "symbol": "Platform",
+        "file": "legacy-snack-bar/internal/snack-bar-container-base.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "e05fbb1a107b185b873a675ede5401101da24c1af0733a73eacda0609d4f88c3",
+        "constructor_parameters": [
+          {
+            "index": 3,
+            "declaration": "private _platform: Platform",
+            "implementation": true
+          }
+        ],
+        "parameter_properties": [
+          true
+        ],
+        "members": [
+          {
+            "member": "FIREFOX",
+            "line": 99
+          },
+          {
+            "member": "isBrowser",
+            "line": 369
+          }
+        ],
+        "forwards": [],
+        "contexts": [
+          {
+            "line": 77,
+            "source": "constructor(\n    private _ngZone: NgZone,\n    protected _elementRef: ElementRef<HTMLElement>,\n    private _changeDetectorRef: ChangeDetectorRef,\n    private _platform: Platform,\n    /** The snack bar configuration. */\n    public snackBarConfig: MatSnackBarConfig,\n  ) {\n    super();\n\n    // Use aria-live rather than a live role like 'alert' or 'status'\n    // because NVDA and JAWS have show inconsistent behavior with live roles.\n    if (snackBarConfig.politeness === 'assertive' && !snackBarConfig.announcementMessage) {\n      this._live = 'assertive';\n    } else if (snackBarConfig.politeness === 'off') {\n      this._live = 'off';\n    } else {\n      this._live = 'polite';\n    }\n\n    // Only set role for Firefox. Set role based on aria-live because setting role=\"alert\" implies\n    // aria-live=\"assertive\" which may cause issues if aria-live is set to \"polite\" above.\n    if (this._platform.FIREFOX) {\n      if (this._live === 'polite') {\n        this._role = 'status';\n      }\n      if (this._live === 'assertive') {\n        this._role = 'alert';\n      }\n    }\n  }"
+          },
+          {
+            "line": 354,
+            "source": "private _screenReaderAnnounce() {\n    if (!this._announceTimeoutId) {\n      this._ngZone.runOutsideAngular(() => {\n        this._announceTimeoutId = setTimeout(() => {\n          if (this._destroyed) {\n            return;\n          }\n          const inertElement = this._elementRef.nativeElement.querySelector('[aria-hidden]');\n          const liveElement = this._elementRef.nativeElement.querySelector('[aria-live]');\n\n          if (inertElement && liveElement) {\n            // If an element in the snack bar content is focused before being moved\n            // track it and restore focus after moving to the live region.\n            let focusedElement: HTMLElement | null = null;\n            if (\n              this._platform.isBrowser &&\n              document.activeElement instanceof HTMLElement &&\n              inertElement.contains(document.activeElement)\n            ) {\n              focusedElement = document.activeElement;\n            }\n\n            inertElement.removeAttribute('aria-hidden');\n            liveElement.appendChild(inertElement);\n            focusedElement?.focus();\n\n            this._onAnnounce.next();\n            this._onAnnounce.complete();\n          }\n        }, this._announceDelay);\n      });\n    }\n  }"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/platform-public-source-proof.json",
+          "sha256": "c179ec31ab13ead3e2ce7dd2629185fc44fd86033b170c1675f762f3a13936cd"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/platform-use-review.mjs",
+          "sha256": "0345da26b30fa9931205df277a48773f10ce4e28d75813a6c5e11eba1efbd24f"
+        },
+        {
+          "path": "tests/platform_public_probe.mjs",
+          "sha256": "c2c07df9b7454021c31856919ea3190ad08aca7a16fc487a24869f5b10ba8cb6"
+        },
+        {
+          "path": "tests/platform_public_subject.mjs",
+          "sha256": "95cb30c88e94d3efe1f6e1f0ffcd526a87e734a2efccf552586e6d198d17ced4"
+        },
+        {
+          "path": "tests/test_platform_public.py",
+          "sha256": "26a1e4046d7622b8cc7cbcef94da288730bf655d4bc368d238bc9f33d0103804"
+        },
+        {
+          "path": "compatibility/rc/platform-cyph-source-sanity.json",
+          "sha256": "17e9485fc18b61bf9164b3813ded7457d934023ebc0f9f5740e27e08b50c9445"
+        }
+      ]
+    },
+    {
+      "file": "legacy-autocomplete/internal/autocomplete-base.ts",
+      "module": "@angular/cdk/platform",
+      "symbol": "Platform",
+      "candidate_source_sha256": "f874b1dbd357dacc0044302fb728ef4155428866435a0d102ab85d2a8de48374",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "Optional constructor slot3 reads platform?.SAFARI || false for the existing inertGroups choice. Absence retains false; a supplied reference uses the public Safari boolean. There is no service construction, mutation or upstream private member, and VoiceOver behavior remains a separate native/accessibility obligation. Genuine original and advertised minimum public modules retain the nine nondeprecated boolean fields;96 dev/prod checks and15 complete-module mutants validate detection and explicit-provider identity. Current construction requires DI, whereas original construction works manually; this caller never constructs Platform. No consumer resource or API repair is needed for this boundary.",
+      "source_binding": {
+        "module": "@angular/cdk/platform",
+        "symbol": "Platform",
+        "file": "legacy-autocomplete/internal/autocomplete-base.ts",
+        "status": "inventory-seed",
+        "disposition": "open",
+        "candidate_source_sha256": "f874b1dbd357dacc0044302fb728ef4155428866435a0d102ab85d2a8de48374",
+        "constructor_parameters": [
+          {
+            "index": 3,
+            "declaration": "platform?: Platform",
+            "implementation": true
+          }
+        ],
+        "parameter_properties": [
+          false
+        ],
+        "members": [
+          {
+            "member": "SAFARI",
+            "line": 247
+          }
+        ],
+        "forwards": [],
+        "contexts": [
+          {
+            "line": 235,
+            "source": "constructor(\n    private _changeDetectorRef: ChangeDetectorRef,\n    private _elementRef: ElementRef<HTMLElement>,\n    @Inject(MAT_AUTOCOMPLETE_DEFAULT_OPTIONS) protected _defaults: MatAutocompleteDefaultOptions,\n    platform?: Platform,\n  ) {\n    super();\n\n    // TODO(crisbeto): the problem that the `inertGroups` option resolves is only present on\n    // Safari using VoiceOver. We should occasionally check back to see whether the bug\n    // wasn't resolved in VoiceOver, and if it has, we can remove this and the `inertGroups`\n    // option altogether.\n    this.inertGroups = platform?.SAFARI || false;\n    this._autoActiveFirstOption = !!_defaults.autoActiveFirstOption;\n    this._autoSelectActiveOption = !!_defaults.autoSelectActiveOption;\n    this._requireSelection = !!_defaults.requireSelection;\n  }"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/platform-public-source-proof.json",
+          "sha256": "c179ec31ab13ead3e2ce7dd2629185fc44fd86033b170c1675f762f3a13936cd"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/platform-use-review.mjs",
+          "sha256": "0345da26b30fa9931205df277a48773f10ce4e28d75813a6c5e11eba1efbd24f"
+        },
+        {
+          "path": "tests/platform_public_probe.mjs",
+          "sha256": "c2c07df9b7454021c31856919ea3190ad08aca7a16fc487a24869f5b10ba8cb6"
+        },
+        {
+          "path": "tests/platform_public_subject.mjs",
+          "sha256": "95cb30c88e94d3efe1f6e1f0ffcd526a87e734a2efccf552586e6d198d17ced4"
+        },
+        {
+          "path": "tests/test_platform_public.py",
+          "sha256": "26a1e4046d7622b8cc7cbcef94da288730bf655d4bc368d238bc9f33d0103804"
+        },
+        {
+          "path": "compatibility/rc/platform-cyph-source-sanity.json",
+          "sha256": "17e9485fc18b61bf9164b3813ded7457d934023ebc0f9f5740e27e08b50c9445"
+        }
+      ]
+    }
+  ],
+  "previously_reviewed_ripple": {
+    "module": "@angular/cdk/platform",
+    "symbol": "Platform",
+    "file": "legacy-core/ripple/ripple-renderer.ts",
+    "status": "reviewed",
+    "disposition": "closed",
+    "source_review": {
+      "path": "compatibility/f10/authored-use-reviews/public-ripple-renderer-boundaries.json",
+      "sha256": "1c93a9885739402a9c9dde89ffcde7b0899a62c3e2849987c89eefc6d217ec35"
+    }
+  },
+  "delta_sources": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.ts",
+      "sha256": "522d8dfc0362b7ed01b6dc9155a10d7f36f67aef4152249f56db1f631ad935b0",
+      "scope": "Already-owned supplied Platform retained in WeakMap state; isBrowser reads only. Prior genuine-provider viewport execution remains separate."
+    }
+  ],
+  "viewport_prior_diagnostic": {
+    "path": "compatibility/rc/legacy-viewport-public-source-proof.json",
+    "sha256": "4a1d2c6a6b720f463b66e23d2daa83f1075b707ffbf5041f4c22521538ac0726",
+    "reexecuted_or_reattributed": false
+  },
+  "scope": "All13 frozen Platform bindings inspected; only12 open rows close here and prior owned-ripple review is preserved. The one current-added viewport binding remains outside the frozen1736 denominator and is hash-bound without replacing its prior genuine-provider evidence. No product or consumer TypeScript/HTML/CSS/SCSS changes. Cyph stayed clean with623 TypeScript files inspected and zero direct import/construction matches. Upstream semantic/security decisions, complete component/native/packed qualification and G11 remain separate.",
+  "g11_claim": "not-passed"
+}
