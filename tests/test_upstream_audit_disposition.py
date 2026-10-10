@@ -54,8 +54,8 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0, combined)
             summary = json.loads(result.stdout)
             self.assertFalse(summary["ok"])
-            # Three original subjects, two tab contracts and three reopened source proofs remain pending.
-            self.assertEqual(summary["unresolved"], 8)
+            # Eight prior subjects plus the chip forms disabled-state source proof await required behavior evidence.
+            self.assertEqual(summary["unresolved"], 9)
             self.assertEqual(summary["seed_rows"], 1697)
             self.assertEqual(summary["ledger_rows"], 1697)
             self.assertEqual(summary["missing"], 0)

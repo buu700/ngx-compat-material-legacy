@@ -151,6 +151,18 @@ describe('MatChipList', () => {
           false,
         ]);
       });
+
+      it('should preserve an individually disabled chip during form initialization', fakeAsync(() => {
+        fixture.destroy();
+        TestBed.resetTestingModule();
+        const disabledFixture = createComponent(IndividuallyDisabledChipInsideForm);
+        disabledFixture.detectChanges();
+        tick();
+        disabledFixture.detectChanges();
+        expect(disabledFixture.componentInstance.chip.disabled).toBe(true);
+        expect(disabledFixture.nativeElement.querySelector('mat-chip').getAttribute('aria-disabled'))
+          .toBe('true');
+      }));
     });
 
     describe('with selected chips', () => {
@@ -1885,6 +1897,19 @@ class ChipListInsideDynamicFormGroup {
       control: {value: [], disabled: isDisabled},
     });
   }
+}
+
+@Component({
+  template: `
+    <form>
+      <mat-chip-list name="test" [ngModel]="null">
+        <mat-chip value="one" disabled>Individually disabled</mat-chip>
+      </mat-chip-list>
+    </form>
+  `,
+})
+class IndividuallyDisabledChipInsideForm {
+  @ViewChild(MatLegacyChip) chip: MatLegacyChip;
 }
 
 @Component({

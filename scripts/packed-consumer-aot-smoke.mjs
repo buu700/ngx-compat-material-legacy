@@ -475,6 +475,7 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
     'packed-consumer/harness/radio-tabindex-attribute': parsed.radioTabIndex === 8,
     'packed-consumer/harness/chip-input-backspace-release': parsed.chipBackspaceRelease === true,
     'packed-consumer/harness/chip-repeated-removal-and-separator': parsed.chipRepeatedEvents === true,
+    'packed-consumer/harness/chip-individual-disabled-form-isolation': parsed.chipDisabledIsolation === true,
     'packed-consumer/harness/form-field-error-live-region': parsed.errorLiveRegion === true,
     'packed-consumer/harness/form-field-token-isolation': parsed.formFieldTokenIsolation === true,
     'packed-consumer/harness/progress-bar-location-and-defaults': parsed.progressLocationAndDefaults === true,
@@ -901,7 +902,7 @@ import 'zone.js';
 import '@angular/compiler';
 import {Component, ElementRef, TemplateRef, ViewChild, Injector, ViewContainerRef, EventEmitter, InjectionToken, ANIMATION_MODULE_TYPE, NgZone, inject, isDevMode, createEnvironmentInjector, createNgModule, EnvironmentInjector, IterableDiffers, SimpleChange, runInInjectionContext} from '@angular/core';
 import {Subject} from 'rxjs';
-import {FormControl, Validators} from '@angular/forms';
+import {FormControl, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {MatStepperModule, MatStepper} from '@angular/material/stepper';
 import {MatTabContent,MatTabLabel} from '@angular/material/tabs';
 import {_LegacyViewport} from '@ngx-compat/material-legacy/legacy-core';
@@ -942,7 +943,7 @@ import {MatLegacySlideToggle, MatLegacySlideToggleModule} from '@ngx-compat/mate
 import {MatLegacySlider, MatLegacySliderModule} from '@ngx-compat/material-legacy/legacy-slider';
 import {MatLegacyProgressBar, MatLegacyProgressBarModule, MAT_LEGACY_PROGRESS_BAR_LOCATION, MAT_LEGACY_PROGRESS_BAR_LOCATION_FACTORY, MAT_LEGACY_PROGRESS_BAR_DEFAULT_OPTIONS} from '@ngx-compat/material-legacy/legacy-progress-bar';
 import {MAT_PROGRESS_BAR_DEFAULT_OPTIONS} from '@angular/material/progress-bar';
-import {MatLegacyChipsModule} from '@ngx-compat/material-legacy/legacy-chips';
+import {MatLegacyChip, MatLegacyChipList, MatLegacyChipsModule} from '@ngx-compat/material-legacy/legacy-chips';
 import {MatLegacyRadioModule} from '@ngx-compat/material-legacy/legacy-radio';
 import {MatIconModule, MatIconRegistry} from '@angular/material/icon';
 import {DomSanitizer} from '@angular/platform-browser';
@@ -978,6 +979,8 @@ class SmokeDialogContent {}
     CdkTableModule,
     MatLegacyTabsModule,
     MatLegacyChipsModule,
+    FormsModule,
+    ReactiveFormsModule,
     MatLegacyRadioModule,
     MatIconModule,
     MatStepperModule,
@@ -1006,6 +1009,15 @@ class SmokeDialogContent {}
       <mat-chip id="repeat-first">First chip</mat-chip>
       <mat-chip id="repeat-last" (removed)="repeatRemovals=repeatRemovals+1">Last chip</mat-chip>
       <input id="repeat-input" [matChipInputFor]="repeatChipList" [matChipInputSeparatorKeyCodes]="[188]" (matChipInputTokenEnd)="repeatEnds=repeatEnds+1">
+    </mat-chip-list>
+    <form>
+      <mat-chip-list id="disabled-template-list" name="disabled-template" [ngModel]="null">
+        <mat-chip id="disabled-template-chip" value="one" disabled>Individually disabled</mat-chip>
+      </mat-chip-list>
+    </form>
+    <mat-chip-list id="disabled-reactive-list" [formControl]="disabledChipControl">
+      <mat-chip id="disabled-individual-chip" value="one" disabled>Individual</mat-chip>
+      <mat-chip id="disabled-inherited-chip" value="two">Inherited</mat-chip>
     </mat-chip-list>
     <mat-progress-bar id="location-progress" [value]="45" aria-label="Location progress"></mat-progress-bar>
     <mat-radio-button id="attribute-radio" tabindex="8">Attribute radio</mat-radio-button>
@@ -1110,6 +1122,7 @@ class HarnessHost {
   stepControl = new FormControl('', Validators.required);
   repeatRemovals=0;
   repeatEnds=0;
+  disabledChipControl=new FormControl<string[] | null>(null);
   private readonly _dialog = inject(MatLegacyDialog);
   private readonly _snack = inject(MatLegacySnackBar);
 
@@ -1591,6 +1604,20 @@ async function main() {
   const repeatedSeparator=keyboard(repeatInput,'keydown',188,true);
   const chipRepeatedEvents=fixture.componentInstance.repeatRemovals===2&&fixture.componentInstance.repeatEnds===2
     &&firstRemoval.defaultPrevented&&repeatedRemoval.defaultPrevented&&firstSeparator.defaultPrevented&&repeatedSeparator.defaultPrevented;
+  // #29783/#29795: forms must not overwrite an individual disabled input.
+  await fixture.whenStable();fixture.detectChanges();
+  const templateChip=fixture.debugElement.query(By.css('#disabled-template-chip')).injector.get(MatLegacyChip);
+  const individualChip=fixture.debugElement.query(By.css('#disabled-individual-chip')).injector.get(MatLegacyChip);
+  const inheritedChip=fixture.debugElement.query(By.css('#disabled-inherited-chip')).injector.get(MatLegacyChip);
+  const disabledList=fixture.debugElement.query(By.css('#disabled-reactive-list')).injector.get(MatLegacyChipList);
+  const chipDisabledInitial=templateChip.disabled&&individualChip.disabled&&!inheritedChip.disabled;
+  fixture.componentInstance.disabledChipControl.disable();fixture.detectChanges();
+  const chipDisabledDuring=individualChip.disabled&&inheritedChip.disabled&&disabledList.disabled;
+  fixture.componentInstance.disabledChipControl.enable();fixture.detectChanges();
+  const chipDisabledAfter=individualChip.disabled&&!inheritedChip.disabled&&!disabledList.disabled;
+  const chipDisabledDom=fixture.nativeElement.querySelector('#disabled-individual-chip').getAttribute('aria-disabled')==='true'
+    &&fixture.nativeElement.querySelector('#disabled-inherited-chip').getAttribute('aria-disabled')==='false';
+  const chipDisabledIsolation=chipDisabledInitial&&chipDisabledDuring&&chipDisabledAfter&&chipDisabledDom;
   const chipTabIndex = (fixture.nativeElement.querySelector('#attribute-chip') as HTMLElement).tabIndex;
   const radioTabIndex = (fixture.nativeElement.querySelector('#attribute-radio input') as HTMLInputElement).tabIndex;
   const liveDefault=fixture.nativeElement.querySelector('#error-live-default') as HTMLElement;
@@ -1794,7 +1821,7 @@ async function main() {
       selectOpened === true &&
       selectClosed === true &&
       tabCount === 2 &&
-      selected === 'Two' && viewportShared && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor && tabContentOriginalConstructor && noDataRowOriginalConstructor && constructorBorrowedProviderLifecycle && tableOriginalStickyBehavior && tableOriginalBooleanInputs && tableRecycleRowIdentity && tableDefinitionOriginalConstructors && tableAngularDiConstruction && tableOutletAndDefinitionOwnership && tabLabelOriginalConstructor && engineFreeAnimationPolicy,
+      selected === 'Two' && viewportShared && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && chipDisabledIsolation && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor && tabContentOriginalConstructor && noDataRowOriginalConstructor && constructorBorrowedProviderLifecycle && tableOriginalStickyBehavior && tableOriginalBooleanInputs && tableRecycleRowIdentity && tableDefinitionOriginalConstructors && tableAngularDiConstruction && tableOutletAndDefinitionOwnership && tabLabelOriginalConstructor && engineFreeAnimationPolicy,
     buttonText: text,
     selectIsOpen: isOpen,
     dialogText,
@@ -1815,6 +1842,7 @@ async function main() {
     radioTabIndex,
     chipBackspaceRelease,
     chipRepeatedEvents,
+    chipDisabledIsolation,
     errorLiveRegion,
     formFieldTokenIsolation,
     progressLocationAndDefaults,
