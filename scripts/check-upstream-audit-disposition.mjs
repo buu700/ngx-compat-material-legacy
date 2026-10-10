@@ -19,6 +19,7 @@ import {authoredUseInventory, authoredUseReviewEvidence} from './authored-use-in
 import {validateCurrentAdvisories} from './upstream-advisory-admission.mjs';
 import {spawnSync} from 'node:child_process';
 import {BUILD_SCOPE_ROLE,BUILD_SCOPE_PATCHES,buildScopeEvidenceOk} from './upstream-build-scope-evidence.mjs';
+import {TEST_CONSOLIDATION_ROLE,TEST_CONSOLIDATION_PATCHES,testConsolidationBatchOk,testConsolidationEntryOk} from './upstream-test-consolidation-evidence.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -99,6 +100,7 @@ function sensitiveClass(entry) {
 }
 
 const evidenceCache = new Map();
+const testConsolidationCache = new Map();
 let buildScopeProductPaths;
 function currentProductPaths() {
   if (!buildScopeProductPaths) {
@@ -123,6 +125,9 @@ function evidenceJson(file) {
 function evidenceClass(entry) {
   const rel = entry.evidence_report;
   if (typeof rel !== 'string' || !rel.trim()) return 'missing';
+  const consolidationScope = Object.hasOwn(TEST_CONSOLIDATION_PATCHES, entry.sha)
+    || entry.batch_id === 'closeout-test-consolidation-source-review';
+  if (consolidationScope && !rel.endsWith('.json')) return 'invalid-test-consolidation-scope';
   if (rel.startsWith('/') || rel.split('/').includes('..')) return 'missing';
   if (rel === 'compatibility/rc/reports/upstream-audit-disposition.json') return 'circular';
   const file = join(root, rel);
@@ -132,6 +137,11 @@ function evidenceClass(entry) {
   if (rel.endsWith('.json')) {
     const body = evidenceJson(file);
     if (!body || typeof body !== 'object') return 'unreadable';
+    if(consolidationScope||body.role===TEST_CONSOLIDATION_ROLE){
+      const readMember=rel=>{const member=regularRepoMember(rel);return member?readFileSync(member):null;};
+      if(!testConsolidationCache.has(file))testConsolidationCache.set(file,testConsolidationBatchOk(body,readMember,currentProductPaths()));
+      if(!testConsolidationEntryOk(body,entry,readMember,testConsolidationCache.get(file)))return 'invalid-test-consolidation-scope';
+    }
     if ((Object.hasOwn(BUILD_SCOPE_PATCHES,entry.sha) || body.role===BUILD_SCOPE_ROLE || rel==='compatibility/f10/disposition-ledger/evidence/closeout-fourteen-build-scope-review.json'
         || entry.batch_id==='closeout-fourteen-build-source-scope') && !buildScopeEvidenceOk(body,entry,rel=>{
         const member=regularRepoMember(rel);return member?readFileSync(member):null;

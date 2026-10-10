@@ -1,0 +1,1963 @@
+diff --git a/src/material/datepicker/testing/BUILD.bazel b/src/material/datepicker/testing/BUILD.bazel
+index 36f6fd151ab53971a040c852192e4d830e002ed3..9b3b5fd0f903a68dbf9a3886a060405eb2d17037 100644
+--- a/src/material/datepicker/testing/BUILD.bazel
++++ b/src/material/datepicker/testing/BUILD.bazel
+@@ -21,13 +21,8 @@ filegroup(
+ )
+ 
+ ng_test_library(
+-    name = "harness_tests_lib",
+-    srcs = [
+-        "calendar-harness-shared.spec.ts",
+-        "date-range-input-harness-shared.spec.ts",
+-        "datepicker-input-harness-shared.spec.ts",
+-        "datepicker-toggle-harness-shared.spec.ts",
+-    ],
++    name = "unit_tests_lib",
++    srcs = glob(["**/*.spec.ts"]),
+     deps = [
+         ":testing",
+         "//src/cdk/testing",
+@@ -39,24 +34,6 @@ ng_test_library(
+     ],
+ )
+ 
+-ng_test_library(
+-    name = "unit_tests_lib",
+-    srcs = glob(
+-        ["**/*.spec.ts"],
+-        exclude = [
+-            "date-range-input-harness-shared.spec.ts",
+-            "datepicker-input-harness-shared.spec.ts",
+-            "datepicker-toggle-harness-shared.spec.ts",
+-            "calendar-harness-shared.spec.ts",
+-        ],
+-    ),
+-    deps = [
+-        ":harness_tests_lib",
+-        ":testing",
+-        "//src/material/datepicker",
+-    ],
+-)
+-
+ ng_web_test_suite(
+     name = "unit_tests",
+     deps = [":unit_tests_lib"],
+diff --git a/src/material/datepicker/testing/calendar-harness-shared.spec.ts b/src/material/datepicker/testing/calendar-harness-shared.spec.ts
+deleted file mode 100644
+index 8e9b264f7ab1a3261415e14a2d4a696ea6a62296..0000000000000000000000000000000000000000
+--- a/src/material/datepicker/testing/calendar-harness-shared.spec.ts
++++ /dev/null
+@@ -1,355 +0,0 @@
+-import {HarnessLoader, parallel} from '@angular/cdk/testing';
+-import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+-import {Component} from '@angular/core';
+-import {ComponentFixture, TestBed} from '@angular/core/testing';
+-import {
+-  MatDatepickerModule,
+-  DateRange,
+-  MAT_DATE_RANGE_SELECTION_STRATEGY,
+-  DefaultMatCalendarRangeStrategy,
+-} from '@angular/material/datepicker';
+-import {MatNativeDateModule} from '@angular/material/core';
+-import {MatCalendarHarness, CalendarView} from './calendar-harness';
+-
+-/** Date at which the calendars are set. */
+-const calendarDate = new Date(2020, 7, 1);
+-
+-/** Shared tests to run on both the original and MDC-based calendars. */
+-export function runCalendarHarnessTests(
+-  datepickerModule: typeof MatDatepickerModule,
+-  calendarHarness: typeof MatCalendarHarness,
+-) {
+-  let fixture: ComponentFixture<CalendarHarnessTest>;
+-  let loader: HarnessLoader;
+-
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
+-      imports: [MatNativeDateModule, datepickerModule],
+-      declarations: [CalendarHarnessTest],
+-      providers: [
+-        {
+-          // Usually it's the date range picker that provides the default range selection strategy,
+-          // but since we're testing the calendar on its own, we have to provide it manually.
+-          provide: MAT_DATE_RANGE_SELECTION_STRATEGY,
+-          useClass: DefaultMatCalendarRangeStrategy,
+-        },
+-      ],
+-    }).compileComponents();
+-
+-    fixture = TestBed.createComponent(CalendarHarnessTest);
+-    fixture.detectChanges();
+-    loader = TestbedHarnessEnvironment.loader(fixture);
+-  });
+-
+-  it('should load all calendar harnesses', async () => {
+-    const calendars = await loader.getAllHarnesses(calendarHarness);
+-    expect(calendars.length).toBe(2);
+-  });
+-
+-  it('should go to a different view', async () => {
+-    const calendar = await loader.getHarness(calendarHarness.with({selector: '#single'}));
+-    expect(await calendar.getCurrentView()).toBe(CalendarView.MONTH);
+-
+-    await calendar.changeView();
+-    expect(await calendar.getCurrentView()).toBe(CalendarView.MULTI_YEAR);
+-  });
+-
+-  it('should get the current view label', async () => {
+-    const calendar = await loader.getHarness(calendarHarness.with({selector: '#single'}));
+-    expect(await calendar.getCurrentViewLabel()).toBe('AUG 2020');
+-
+-    await calendar.changeView();
+-    expect(await calendar.getCurrentViewLabel()).toBe('2016 – 2039');
+-  });
+-
+-  it('should go to the next page in the view', async () => {
+-    const calendar = await loader.getHarness(calendarHarness.with({selector: '#single'}));
+-    expect(await calendar.getCurrentViewLabel()).toBe('AUG 2020');
+-
+-    await calendar.next();
+-    expect(await calendar.getCurrentViewLabel()).toBe('SEP 2020');
+-  });
+-
+-  it('should go to the previous page in the view', async () => {
+-    const calendar = await loader.getHarness(calendarHarness.with({selector: '#single'}));
+-    expect(await calendar.getCurrentViewLabel()).toBe('AUG 2020');
+-
+-    await calendar.previous();
+-    expect(await calendar.getCurrentViewLabel()).toBe('JUL 2020');
+-  });
+-
+-  it('should get all of the date cells inside the calendar', async () => {
+-    const calendar = await loader.getHarness(calendarHarness.with({selector: '#single'}));
+-    expect((await calendar.getCells()).length).toBe(31);
+-  });
+-
+-  it('should get the text of a calendar cell', async () => {
+-    const calendar = await loader.getHarness(calendarHarness.with({selector: '#single'}));
+-    const cells = await calendar.getCells();
+-
+-    expect(await cells[0].getText()).toBe('1');
+-    expect(await cells[15].getText()).toBe('16');
+-    expect(await cells[30].getText()).toBe('31');
+-  });
+-
+-  it('should be able to select a specific cell through the calendar', async () => {
+-    const calendar = await loader.getHarness(calendarHarness.with({selector: '#single'}));
+-    const targetCell = (await calendar.getCells({text: '16'}))[0];
+-    expect(await targetCell.isSelected()).toBe(false);
+-
+-    await calendar.selectCell({text: '16'});
+-    expect(await targetCell.isSelected()).toBe(true);
+-  });
+-
+-  it('should get the aria-label of a cell', async () => {
+-    const calendar = await loader.getHarness(calendarHarness.with({selector: '#single'}));
+-    const cells = await calendar.getCells();
+-
+-    expect(await cells[0].getAriaLabel()).toBe('August 1, 2020');
+-    expect(await cells[15].getAriaLabel()).toBe('August 16, 2020');
+-    expect(await cells[30].getAriaLabel()).toBe('August 31, 2020');
+-  });
+-
+-  it('should get the disabled state of a cell', async () => {
+-    fixture.componentInstance.minDate = new Date(
+-      calendarDate.getFullYear(),
+-      calendarDate.getMonth(),
+-      20,
+-    );
+-
+-    const calendar = await loader.getHarness(calendarHarness.with({selector: '#single'}));
+-    const cells = await calendar.getCells();
+-
+-    expect(await cells[0].isDisabled()).toBe(true);
+-    expect(await cells[15].isDisabled()).toBe(true);
+-    expect(await cells[30].isDisabled()).toBe(false);
+-  });
+-
+-  it('should select a cell', async () => {
+-    const calendar = await loader.getHarness(calendarHarness.with({selector: '#single'}));
+-    const cell = (await calendar.getCells())[10];
+-    expect(await cell.isSelected()).toBe(false);
+-
+-    await cell.select();
+-    expect(await cell.isSelected()).toBe(true);
+-  });
+-
+-  it('should get whether a cell is active', async () => {
+-    const calendar = await loader.getHarness(calendarHarness.with({selector: '#single'}));
+-    const cells = await calendar.getCells();
+-
+-    expect(await cells[0].isActive()).toBe(true);
+-    expect(await cells[15].isActive()).toBe(false);
+-  });
+-
+-  it('should get the state of the cell within the main range', async () => {
+-    const calendar = await loader.getHarness(calendarHarness.with({selector: '#range'}));
+-    const allCells = await calendar.getCells();
+-    const [initialStartStates, initialInRangeStates, initialEndStates] = await parallel(() => [
+-      parallel(() => allCells.map(cell => cell.isRangeStart())),
+-      parallel(() => allCells.map(cell => cell.isInRange())),
+-      parallel(() => allCells.map(cell => cell.isRangeEnd())),
+-    ]);
+-
+-    expect(initialStartStates.every(state => state === false)).toBe(true);
+-    expect(initialInRangeStates.every(state => state === false)).toBe(true);
+-    expect(initialEndStates.every(state => state === false)).toBe(true);
+-
+-    await (await calendar.getCells({text: '5'}))[0].select();
+-    await (await calendar.getCells({text: '8'}))[0].select();
+-
+-    expect(await allCells[4].isRangeStart()).toBe(true);
+-    expect(await allCells[4].isInRange()).toBe(true);
+-    expect(await allCells[4].isRangeEnd()).toBe(false);
+-
+-    expect(await allCells[5].isRangeStart()).toBe(false);
+-    expect(await allCells[5].isInRange()).toBe(true);
+-    expect(await allCells[5].isRangeEnd()).toBe(false);
+-
+-    expect(await allCells[6].isRangeStart()).toBe(false);
+-    expect(await allCells[6].isInRange()).toBe(true);
+-    expect(await allCells[6].isRangeEnd()).toBe(false);
+-
+-    expect(await allCells[7].isRangeStart()).toBe(false);
+-    expect(await allCells[7].isInRange()).toBe(true);
+-    expect(await allCells[7].isRangeEnd()).toBe(true);
+-  });
+-
+-  it('should get the state of the cell within the comparison range', async () => {
+-    const calendar = await loader.getHarness(calendarHarness.with({selector: '#range'}));
+-    const allCells = await calendar.getCells();
+-    const [initialStartStates, initialInRangeStates, initialEndStates] = await parallel(() => [
+-      parallel(() => allCells.map(cell => cell.isComparisonRangeStart())),
+-      parallel(() => allCells.map(cell => cell.isInComparisonRange())),
+-      parallel(() => allCells.map(cell => cell.isComparisonRangeEnd())),
+-    ]);
+-
+-    expect(initialStartStates.every(state => state === false)).toBe(true);
+-    expect(initialInRangeStates.every(state => state === false)).toBe(true);
+-    expect(initialEndStates.every(state => state === false)).toBe(true);
+-
+-    fixture.componentInstance.comparisonStart = new Date(
+-      calendarDate.getFullYear(),
+-      calendarDate.getMonth(),
+-      5,
+-    );
+-    fixture.componentInstance.comparisonEnd = new Date(
+-      calendarDate.getFullYear(),
+-      calendarDate.getMonth(),
+-      8,
+-    );
+-
+-    expect(await allCells[4].isComparisonRangeStart()).toBe(true);
+-    expect(await allCells[4].isInComparisonRange()).toBe(true);
+-    expect(await allCells[4].isComparisonRangeEnd()).toBe(false);
+-
+-    expect(await allCells[5].isComparisonRangeStart()).toBe(false);
+-    expect(await allCells[5].isInComparisonRange()).toBe(true);
+-    expect(await allCells[5].isComparisonRangeEnd()).toBe(false);
+-
+-    expect(await allCells[6].isComparisonRangeStart()).toBe(false);
+-    expect(await allCells[6].isInComparisonRange()).toBe(true);
+-    expect(await allCells[6].isComparisonRangeEnd()).toBe(false);
+-
+-    expect(await allCells[7].isComparisonRangeStart()).toBe(false);
+-    expect(await allCells[7].isInComparisonRange()).toBe(true);
+-    expect(await allCells[7].isComparisonRangeEnd()).toBe(true);
+-  });
+-
+-  it('should get the state of the cell within the preview range', async () => {
+-    const calendar = await loader.getHarness(calendarHarness.with({selector: '#range'}));
+-    const allCells = await calendar.getCells();
+-    const [initialStartStates, initialInRangeStates, initialEndStates] = await parallel(() => [
+-      parallel(() => allCells.map(cell => cell.isPreviewRangeStart())),
+-      parallel(() => allCells.map(cell => cell.isInPreviewRange())),
+-      parallel(() => allCells.map(cell => cell.isPreviewRangeEnd())),
+-    ]);
+-
+-    expect(initialStartStates.every(state => state === false)).toBe(true);
+-    expect(initialInRangeStates.every(state => state === false)).toBe(true);
+-    expect(initialEndStates.every(state => state === false)).toBe(true);
+-
+-    await (await calendar.getCells({text: '5'}))[0].select();
+-    await (await calendar.getCells({text: '8'}))[0].hover();
+-
+-    expect(await allCells[4].isPreviewRangeStart()).toBe(true);
+-    expect(await allCells[4].isInPreviewRange()).toBe(true);
+-    expect(await allCells[4].isPreviewRangeEnd()).toBe(false);
+-
+-    expect(await allCells[5].isPreviewRangeStart()).toBe(false);
+-    expect(await allCells[5].isInPreviewRange()).toBe(true);
+-    expect(await allCells[5].isPreviewRangeEnd()).toBe(false);
+-
+-    expect(await allCells[6].isPreviewRangeStart()).toBe(false);
+-    expect(await allCells[6].isInPreviewRange()).toBe(true);
+-    expect(await allCells[6].isPreviewRangeEnd()).toBe(false);
+-
+-    expect(await allCells[7].isPreviewRangeStart()).toBe(false);
+-    expect(await allCells[7].isInPreviewRange()).toBe(true);
+-    expect(await allCells[7].isPreviewRangeEnd()).toBe(true);
+-  });
+-
+-  it('should filter cells by their text', async () => {
+-    const calendar = await loader.getHarness(calendarHarness.with({selector: '#single'}));
+-    const cells = await calendar.getCells({text: /^3/});
+-    expect(await parallel(() => cells.map(cell => cell.getText()))).toEqual(['3', '30', '31']);
+-  });
+-
+-  it('should filter cells by their selected state', async () => {
+-    const calendar = await loader.getHarness(calendarHarness.with({selector: '#single'}));
+-    const allCells = await calendar.getCells();
+-
+-    await allCells[0].select();
+-
+-    const selectedCells = await calendar.getCells({selected: true});
+-    expect(await parallel(() => selectedCells.map(cell => cell.getText()))).toEqual(['1']);
+-  });
+-
+-  it('should filter cells by their active state', async () => {
+-    const calendar = await loader.getHarness(calendarHarness.with({selector: '#single'}));
+-    const cells = await calendar.getCells({active: true});
+-    expect(await parallel(() => cells.map(cell => cell.getText()))).toEqual(['1']);
+-  });
+-
+-  it('should filter cells by their disabled state', async () => {
+-    fixture.componentInstance.minDate = new Date(
+-      calendarDate.getFullYear(),
+-      calendarDate.getMonth(),
+-      3,
+-    );
+-
+-    const calendar = await loader.getHarness(calendarHarness.with({selector: '#single'}));
+-    const cells = await calendar.getCells({disabled: true});
+-    expect(await parallel(() => cells.map(cell => cell.getText()))).toEqual(['1', '2']);
+-  });
+-
+-  it('should filter cells based on whether they are inside the comparison range', async () => {
+-    const calendar = await loader.getHarness(calendarHarness.with({selector: '#range'}));
+-
+-    fixture.componentInstance.comparisonStart = new Date(
+-      calendarDate.getFullYear(),
+-      calendarDate.getMonth(),
+-      5,
+-    );
+-    fixture.componentInstance.comparisonEnd = new Date(
+-      calendarDate.getFullYear(),
+-      calendarDate.getMonth(),
+-      8,
+-    );
+-
+-    const cells = await calendar.getCells({inComparisonRange: true});
+-    expect(await parallel(() => cells.map(cell => cell.getText()))).toEqual(['5', '6', '7', '8']);
+-  });
+-
+-  it('should filter cells based on whether they are inside the preview range', async () => {
+-    const calendar = await loader.getHarness(calendarHarness.with({selector: '#range'}));
+-
+-    await (await calendar.getCells({text: '5'}))[0].select();
+-    await (await calendar.getCells({text: '8'}))[0].hover();
+-
+-    const cells = await calendar.getCells({inPreviewRange: true});
+-    expect(await parallel(() => cells.map(cell => cell.getText()))).toEqual(['5', '6', '7', '8']);
+-  });
+-}
+-
+-@Component({
+-  template: `
+-    <mat-calendar
+-      id="single"
+-      [startAt]="startAt"
+-      [minDate]="minDate"
+-      [selected]="singleValue"
+-      (selectedChange)="singleValue = $event"></mat-calendar>
+-
+-    <mat-calendar
+-      id="range"
+-      [startAt]="startAt"
+-      [minDate]="minDate"
+-      [selected]="rangeValue"
+-      [comparisonStart]="comparisonStart"
+-      [comparisonEnd]="comparisonEnd"
+-      (selectedChange)="rangeChanged($event)"></mat-calendar>
+-  `,
+-})
+-class CalendarHarnessTest {
+-  // Start the datepickers off at a specific date so tests
+-  // run consistently no matter what the current date is.
+-  readonly startAt = new Date(calendarDate);
+-  minDate: Date | null;
+-  singleValue: Date | null = null;
+-  rangeValue = new DateRange<Date>(null, null);
+-  comparisonStart: Date | null = null;
+-  comparisonEnd: Date | null = null;
+-
+-  rangeChanged(selectedDate: Date) {
+-    let {start, end} = this.rangeValue;
+-
+-    if (start == null || end != null) {
+-      start = selectedDate;
+-    } else if (end == null) {
+-      end = selectedDate;
+-    }
+-
+-    this.rangeValue = new DateRange<Date>(start, end);
+-  }
+-}
+diff --git a/src/material/datepicker/testing/calendar-harness.spec.ts b/src/material/datepicker/testing/calendar-harness.spec.ts
+index 84190b48db320da971684e88a4326c8eee08e9b9..6609c9d89524517e5cdb677ecb8c96255f79308d 100644
+--- a/src/material/datepicker/testing/calendar-harness.spec.ts
++++ b/src/material/datepicker/testing/calendar-harness.spec.ts
+@@ -1,7 +1,351 @@
+-import {MatDatepickerModule} from '@angular/material/datepicker';
+-import {runCalendarHarnessTests} from './calendar-harness-shared.spec';
+-import {MatCalendarHarness} from './calendar-harness';
++import {Component} from '@angular/core';
++import {ComponentFixture, TestBed} from '@angular/core/testing';
++import {HarnessLoader, parallel} from '@angular/cdk/testing';
++import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
++import {
++  MatDatepickerModule,
++  DateRange,
++  MAT_DATE_RANGE_SELECTION_STRATEGY,
++  DefaultMatCalendarRangeStrategy,
++} from '@angular/material/datepicker';
++import {MatNativeDateModule} from '@angular/material/core';
++import {MatCalendarHarness, CalendarView} from './calendar-harness';
+ 
+-describe('Non-MDC-based calendar harness', () => {
+-  runCalendarHarnessTests(MatDatepickerModule, MatCalendarHarness);
++/** Date at which the calendars are set. */
++const calendarDate = new Date(2020, 7, 1);
++
++describe('MatCalendarHarness', () => {
++  let fixture: ComponentFixture<CalendarHarnessTest>;
++  let loader: HarnessLoader;
++
++  beforeEach(async () => {
++    await TestBed.configureTestingModule({
++      imports: [MatNativeDateModule, MatDatepickerModule],
++      declarations: [CalendarHarnessTest],
++      providers: [
++        {
++          // Usually it's the date range picker that provides the default range selection strategy,
++          // but since we're testing the calendar on its own, we have to provide it manually.
++          provide: MAT_DATE_RANGE_SELECTION_STRATEGY,
++          useClass: DefaultMatCalendarRangeStrategy,
++        },
++      ],
++    }).compileComponents();
++
++    fixture = TestBed.createComponent(CalendarHarnessTest);
++    fixture.detectChanges();
++    loader = TestbedHarnessEnvironment.loader(fixture);
++  });
++
++  it('should load all calendar harnesses', async () => {
++    const calendars = await loader.getAllHarnesses(MatCalendarHarness);
++    expect(calendars.length).toBe(2);
++  });
++
++  it('should go to a different view', async () => {
++    const calendar = await loader.getHarness(MatCalendarHarness.with({selector: '#single'}));
++    expect(await calendar.getCurrentView()).toBe(CalendarView.MONTH);
++
++    await calendar.changeView();
++    expect(await calendar.getCurrentView()).toBe(CalendarView.MULTI_YEAR);
++  });
++
++  it('should get the current view label', async () => {
++    const calendar = await loader.getHarness(MatCalendarHarness.with({selector: '#single'}));
++    expect(await calendar.getCurrentViewLabel()).toBe('AUG 2020');
++
++    await calendar.changeView();
++    expect(await calendar.getCurrentViewLabel()).toBe('2016 – 2039');
++  });
++
++  it('should go to the next page in the view', async () => {
++    const calendar = await loader.getHarness(MatCalendarHarness.with({selector: '#single'}));
++    expect(await calendar.getCurrentViewLabel()).toBe('AUG 2020');
++
++    await calendar.next();
++    expect(await calendar.getCurrentViewLabel()).toBe('SEP 2020');
++  });
++
++  it('should go to the previous page in the view', async () => {
++    const calendar = await loader.getHarness(MatCalendarHarness.with({selector: '#single'}));
++    expect(await calendar.getCurrentViewLabel()).toBe('AUG 2020');
++
++    await calendar.previous();
++    expect(await calendar.getCurrentViewLabel()).toBe('JUL 2020');
++  });
++
++  it('should get all of the date cells inside the calendar', async () => {
++    const calendar = await loader.getHarness(MatCalendarHarness.with({selector: '#single'}));
++    expect((await calendar.getCells()).length).toBe(31);
++  });
++
++  it('should get the text of a calendar cell', async () => {
++    const calendar = await loader.getHarness(MatCalendarHarness.with({selector: '#single'}));
++    const cells = await calendar.getCells();
++
++    expect(await cells[0].getText()).toBe('1');
++    expect(await cells[15].getText()).toBe('16');
++    expect(await cells[30].getText()).toBe('31');
++  });
++
++  it('should be able to select a specific cell through the calendar', async () => {
++    const calendar = await loader.getHarness(MatCalendarHarness.with({selector: '#single'}));
++    const targetCell = (await calendar.getCells({text: '16'}))[0];
++    expect(await targetCell.isSelected()).toBe(false);
++
++    await calendar.selectCell({text: '16'});
++    expect(await targetCell.isSelected()).toBe(true);
++  });
++
++  it('should get the aria-label of a cell', async () => {
++    const calendar = await loader.getHarness(MatCalendarHarness.with({selector: '#single'}));
++    const cells = await calendar.getCells();
++
++    expect(await cells[0].getAriaLabel()).toBe('August 1, 2020');
++    expect(await cells[15].getAriaLabel()).toBe('August 16, 2020');
++    expect(await cells[30].getAriaLabel()).toBe('August 31, 2020');
++  });
++
++  it('should get the disabled state of a cell', async () => {
++    fixture.componentInstance.minDate = new Date(
++      calendarDate.getFullYear(),
++      calendarDate.getMonth(),
++      20,
++    );
++
++    const calendar = await loader.getHarness(MatCalendarHarness.with({selector: '#single'}));
++    const cells = await calendar.getCells();
++
++    expect(await cells[0].isDisabled()).toBe(true);
++    expect(await cells[15].isDisabled()).toBe(true);
++    expect(await cells[30].isDisabled()).toBe(false);
++  });
++
++  it('should select a cell', async () => {
++    const calendar = await loader.getHarness(MatCalendarHarness.with({selector: '#single'}));
++    const cell = (await calendar.getCells())[10];
++    expect(await cell.isSelected()).toBe(false);
++
++    await cell.select();
++    expect(await cell.isSelected()).toBe(true);
++  });
++
++  it('should get whether a cell is active', async () => {
++    const calendar = await loader.getHarness(MatCalendarHarness.with({selector: '#single'}));
++    const cells = await calendar.getCells();
++
++    expect(await cells[0].isActive()).toBe(true);
++    expect(await cells[15].isActive()).toBe(false);
++  });
++
++  it('should get the state of the cell within the main range', async () => {
++    const calendar = await loader.getHarness(MatCalendarHarness.with({selector: '#range'}));
++    const allCells = await calendar.getCells();
++    const [initialStartStates, initialInRangeStates, initialEndStates] = await parallel(() => [
++      parallel(() => allCells.map(cell => cell.isRangeStart())),
++      parallel(() => allCells.map(cell => cell.isInRange())),
++      parallel(() => allCells.map(cell => cell.isRangeEnd())),
++    ]);
++
++    expect(initialStartStates.every(state => state === false)).toBe(true);
++    expect(initialInRangeStates.every(state => state === false)).toBe(true);
++    expect(initialEndStates.every(state => state === false)).toBe(true);
++
++    await (await calendar.getCells({text: '5'}))[0].select();
++    await (await calendar.getCells({text: '8'}))[0].select();
++
++    expect(await allCells[4].isRangeStart()).toBe(true);
++    expect(await allCells[4].isInRange()).toBe(true);
++    expect(await allCells[4].isRangeEnd()).toBe(false);
++
++    expect(await allCells[5].isRangeStart()).toBe(false);
++    expect(await allCells[5].isInRange()).toBe(true);
++    expect(await allCells[5].isRangeEnd()).toBe(false);
++
++    expect(await allCells[6].isRangeStart()).toBe(false);
++    expect(await allCells[6].isInRange()).toBe(true);
++    expect(await allCells[6].isRangeEnd()).toBe(false);
++
++    expect(await allCells[7].isRangeStart()).toBe(false);
++    expect(await allCells[7].isInRange()).toBe(true);
++    expect(await allCells[7].isRangeEnd()).toBe(true);
++  });
++
++  it('should get the state of the cell within the comparison range', async () => {
++    const calendar = await loader.getHarness(MatCalendarHarness.with({selector: '#range'}));
++    const allCells = await calendar.getCells();
++    const [initialStartStates, initialInRangeStates, initialEndStates] = await parallel(() => [
++      parallel(() => allCells.map(cell => cell.isComparisonRangeStart())),
++      parallel(() => allCells.map(cell => cell.isInComparisonRange())),
++      parallel(() => allCells.map(cell => cell.isComparisonRangeEnd())),
++    ]);
++
++    expect(initialStartStates.every(state => state === false)).toBe(true);
++    expect(initialInRangeStates.every(state => state === false)).toBe(true);
++    expect(initialEndStates.every(state => state === false)).toBe(true);
++
++    fixture.componentInstance.comparisonStart = new Date(
++      calendarDate.getFullYear(),
++      calendarDate.getMonth(),
++      5,
++    );
++    fixture.componentInstance.comparisonEnd = new Date(
++      calendarDate.getFullYear(),
++      calendarDate.getMonth(),
++      8,
++    );
++
++    expect(await allCells[4].isComparisonRangeStart()).toBe(true);
++    expect(await allCells[4].isInComparisonRange()).toBe(true);
++    expect(await allCells[4].isComparisonRangeEnd()).toBe(false);
++
++    expect(await allCells[5].isComparisonRangeStart()).toBe(false);
++    expect(await allCells[5].isInComparisonRange()).toBe(true);
++    expect(await allCells[5].isComparisonRangeEnd()).toBe(false);
++
++    expect(await allCells[6].isComparisonRangeStart()).toBe(false);
++    expect(await allCells[6].isInComparisonRange()).toBe(true);
++    expect(await allCells[6].isComparisonRangeEnd()).toBe(false);
++
++    expect(await allCells[7].isComparisonRangeStart()).toBe(false);
++    expect(await allCells[7].isInComparisonRange()).toBe(true);
++    expect(await allCells[7].isComparisonRangeEnd()).toBe(true);
++  });
++
++  it('should get the state of the cell within the preview range', async () => {
++    const calendar = await loader.getHarness(MatCalendarHarness.with({selector: '#range'}));
++    const allCells = await calendar.getCells();
++    const [initialStartStates, initialInRangeStates, initialEndStates] = await parallel(() => [
++      parallel(() => allCells.map(cell => cell.isPreviewRangeStart())),
++      parallel(() => allCells.map(cell => cell.isInPreviewRange())),
++      parallel(() => allCells.map(cell => cell.isPreviewRangeEnd())),
++    ]);
++
++    expect(initialStartStates.every(state => state === false)).toBe(true);
++    expect(initialInRangeStates.every(state => state === false)).toBe(true);
++    expect(initialEndStates.every(state => state === false)).toBe(true);
++
++    await (await calendar.getCells({text: '5'}))[0].select();
++    await (await calendar.getCells({text: '8'}))[0].hover();
++
++    expect(await allCells[4].isPreviewRangeStart()).toBe(true);
++    expect(await allCells[4].isInPreviewRange()).toBe(true);
++    expect(await allCells[4].isPreviewRangeEnd()).toBe(false);
++
++    expect(await allCells[5].isPreviewRangeStart()).toBe(false);
++    expect(await allCells[5].isInPreviewRange()).toBe(true);
++    expect(await allCells[5].isPreviewRangeEnd()).toBe(false);
++
++    expect(await allCells[6].isPreviewRangeStart()).toBe(false);
++    expect(await allCells[6].isInPreviewRange()).toBe(true);
++    expect(await allCells[6].isPreviewRangeEnd()).toBe(false);
++
++    expect(await allCells[7].isPreviewRangeStart()).toBe(false);
++    expect(await allCells[7].isInPreviewRange()).toBe(true);
++    expect(await allCells[7].isPreviewRangeEnd()).toBe(true);
++  });
++
++  it('should filter cells by their text', async () => {
++    const calendar = await loader.getHarness(MatCalendarHarness.with({selector: '#single'}));
++    const cells = await calendar.getCells({text: /^3/});
++    expect(await parallel(() => cells.map(cell => cell.getText()))).toEqual(['3', '30', '31']);
++  });
++
++  it('should filter cells by their selected state', async () => {
++    const calendar = await loader.getHarness(MatCalendarHarness.with({selector: '#single'}));
++    const allCells = await calendar.getCells();
++
++    await allCells[0].select();
++
++    const selectedCells = await calendar.getCells({selected: true});
++    expect(await parallel(() => selectedCells.map(cell => cell.getText()))).toEqual(['1']);
++  });
++
++  it('should filter cells by their active state', async () => {
++    const calendar = await loader.getHarness(MatCalendarHarness.with({selector: '#single'}));
++    const cells = await calendar.getCells({active: true});
++    expect(await parallel(() => cells.map(cell => cell.getText()))).toEqual(['1']);
++  });
++
++  it('should filter cells by their disabled state', async () => {
++    fixture.componentInstance.minDate = new Date(
++      calendarDate.getFullYear(),
++      calendarDate.getMonth(),
++      3,
++    );
++
++    const calendar = await loader.getHarness(MatCalendarHarness.with({selector: '#single'}));
++    const cells = await calendar.getCells({disabled: true});
++    expect(await parallel(() => cells.map(cell => cell.getText()))).toEqual(['1', '2']);
++  });
++
++  it('should filter cells based on whether they are inside the comparison range', async () => {
++    const calendar = await loader.getHarness(MatCalendarHarness.with({selector: '#range'}));
++
++    fixture.componentInstance.comparisonStart = new Date(
++      calendarDate.getFullYear(),
++      calendarDate.getMonth(),
++      5,
++    );
++    fixture.componentInstance.comparisonEnd = new Date(
++      calendarDate.getFullYear(),
++      calendarDate.getMonth(),
++      8,
++    );
++
++    const cells = await calendar.getCells({inComparisonRange: true});
++    expect(await parallel(() => cells.map(cell => cell.getText()))).toEqual(['5', '6', '7', '8']);
++  });
++
++  it('should filter cells based on whether they are inside the preview range', async () => {
++    const calendar = await loader.getHarness(MatCalendarHarness.with({selector: '#range'}));
++
++    await (await calendar.getCells({text: '5'}))[0].select();
++    await (await calendar.getCells({text: '8'}))[0].hover();
++
++    const cells = await calendar.getCells({inPreviewRange: true});
++    expect(await parallel(() => cells.map(cell => cell.getText()))).toEqual(['5', '6', '7', '8']);
++  });
+ });
++
++@Component({
++  template: `
++    <mat-calendar
++      id="single"
++      [startAt]="startAt"
++      [minDate]="minDate"
++      [selected]="singleValue"
++      (selectedChange)="singleValue = $event"></mat-calendar>
++
++    <mat-calendar
++      id="range"
++      [startAt]="startAt"
++      [minDate]="minDate"
++      [selected]="rangeValue"
++      [comparisonStart]="comparisonStart"
++      [comparisonEnd]="comparisonEnd"
++      (selectedChange)="rangeChanged($event)"></mat-calendar>
++  `,
++})
++class CalendarHarnessTest {
++  // Start the datepickers off at a specific date so tests
++  // run consistently no matter what the current date is.
++  readonly startAt = new Date(calendarDate);
++  minDate: Date | null;
++  singleValue: Date | null = null;
++  rangeValue = new DateRange<Date>(null, null);
++  comparisonStart: Date | null = null;
++  comparisonEnd: Date | null = null;
++
++  rangeChanged(selectedDate: Date) {
++    let {start, end} = this.rangeValue;
++
++    if (start == null || end != null) {
++      start = selectedDate;
++    } else if (end == null) {
++      end = selectedDate;
++    }
++
++    this.rangeValue = new DateRange<Date>(start, end);
++  }
++}
+diff --git a/src/material/datepicker/testing/date-range-input-harness-shared.spec.ts b/src/material/datepicker/testing/date-range-input-harness-shared.spec.ts
+deleted file mode 100644
+index 68f97a012ffcdd6c08f54900523b1796b912b95d..0000000000000000000000000000000000000000
+--- a/src/material/datepicker/testing/date-range-input-harness-shared.spec.ts
++++ /dev/null
+@@ -1,272 +0,0 @@
+-import {HarnessLoader, parallel} from '@angular/cdk/testing';
+-import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+-import {Component} from '@angular/core';
+-import {MatNativeDateModule} from '@angular/material/core';
+-import {ComponentFixture, TestBed} from '@angular/core/testing';
+-import {FormsModule} from '@angular/forms';
+-import {MatDatepickerModule} from '@angular/material/datepicker';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+-import {MatCalendarHarness} from './calendar-harness';
+-import {
+-  MatDateRangeInputHarness,
+-  MatStartDateHarness,
+-  MatEndDateHarness,
+-} from './date-range-input-harness';
+-
+-/** Shared tests to run on both the original and MDC-based date range inputs. */
+-export function runDateRangeInputHarnessTests(
+-  datepickerModule: typeof MatDatepickerModule,
+-  dateRangeInputHarness: typeof MatDateRangeInputHarness,
+-  startInputHarness: typeof MatStartDateHarness,
+-  endInputHarness: typeof MatEndDateHarness,
+-  calendarHarness: typeof MatCalendarHarness,
+-) {
+-  let fixture: ComponentFixture<DateRangeInputHarnessTest>;
+-  let loader: HarnessLoader;
+-
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
+-      imports: [NoopAnimationsModule, MatNativeDateModule, datepickerModule, FormsModule],
+-      declarations: [DateRangeInputHarnessTest],
+-    }).compileComponents();
+-
+-    fixture = TestBed.createComponent(DateRangeInputHarnessTest);
+-    fixture.detectChanges();
+-    loader = TestbedHarnessEnvironment.loader(fixture);
+-  });
+-
+-  it('should load all date range input harnesses', async () => {
+-    const inputs = await loader.getAllHarnesses(dateRangeInputHarness);
+-    expect(inputs.length).toBe(2);
+-  });
+-
+-  it('should get whether the input is disabled', async () => {
+-    const input = await loader.getHarness(dateRangeInputHarness.with({selector: '[basic]'}));
+-    expect(await input.isDisabled()).toBe(false);
+-
+-    fixture.componentInstance.disabled = true;
+-    expect(await input.isDisabled()).toBe(true);
+-  });
+-
+-  it('should get whether the input is required', async () => {
+-    const input = await loader.getHarness(dateRangeInputHarness.with({selector: '[basic]'}));
+-    expect(await input.isRequired()).toBe(false);
+-
+-    fixture.componentInstance.required = true;
+-    expect(await input.isRequired()).toBe(true);
+-  });
+-
+-  it('should get the input separator', async () => {
+-    const input = await loader.getHarness(dateRangeInputHarness.with({selector: '[basic]'}));
+-    expect(await input.getSeparator()).toBe('–');
+-  });
+-
+-  it('should get the combined input value including the separator', async () => {
+-    const input = await loader.getHarness(dateRangeInputHarness.with({selector: '[basic]'}));
+-
+-    fixture.componentInstance.startDate = new Date(2020, 0, 1, 12, 0, 0);
+-    fixture.componentInstance.endDate = new Date(2020, 1, 2, 12, 0, 0);
+-
+-    expect(await input.getValue()).toBe('1/1/2020 – 2/2/2020');
+-  });
+-
+-  it('should get harnesses for the inner inputs', async () => {
+-    const input = await loader.getHarness(dateRangeInputHarness.with({selector: '[basic]'}));
+-    const [start, end] = await parallel(() => [input.getStartInput(), input.getEndInput()]);
+-    expect(start).toBeInstanceOf(startInputHarness);
+-    expect(end).toBeInstanceOf(endInputHarness);
+-  });
+-
+-  it('should be able to open and close a calendar in popup mode', async () => {
+-    const input = await loader.getHarness(dateRangeInputHarness.with({selector: '[basic]'}));
+-    expect(await input.isCalendarOpen()).toBe(false);
+-
+-    await input.openCalendar();
+-    expect(await input.isCalendarOpen()).toBe(true);
+-
+-    await input.closeCalendar();
+-    expect(await input.isCalendarOpen()).toBe(false);
+-  });
+-
+-  it('should be able to open and close a calendar in touch mode', async () => {
+-    fixture.componentInstance.touchUi = true;
+-    const input = await loader.getHarness(dateRangeInputHarness.with({selector: '[basic]'}));
+-    expect(await input.isCalendarOpen()).toBe(false);
+-
+-    await input.openCalendar();
+-    expect(await input.isCalendarOpen()).toBe(true);
+-
+-    await input.closeCalendar();
+-    expect(await input.isCalendarOpen()).toBe(false);
+-  });
+-
+-  it('should be able to get the harness for the associated calendar', async () => {
+-    const input = await loader.getHarness(dateRangeInputHarness.with({selector: '[basic]'}));
+-    await input.openCalendar();
+-    expect(await input.getCalendar()).toBeInstanceOf(calendarHarness);
+-  });
+-
+-  it('should get whether the inner inputs are disabled', async () => {
+-    const input = await loader.getHarness(dateRangeInputHarness.with({selector: '[basic]'}));
+-    const [start, end] = await parallel(() => [input.getStartInput(), input.getEndInput()]);
+-
+-    expect(await parallel(() => [start.isDisabled(), end.isDisabled()])).toEqual([false, false]);
+-
+-    fixture.componentInstance.subInputsDisabled = true;
+-    expect(await parallel(() => [start.isDisabled(), end.isDisabled()])).toEqual([true, true]);
+-  });
+-
+-  it('should get whether the inner inputs are required', async () => {
+-    const input = await loader.getHarness(dateRangeInputHarness.with({selector: '[basic]'}));
+-    const [start, end] = await parallel(() => [input.getStartInput(), input.getEndInput()]);
+-
+-    expect(await parallel(() => [start.isRequired(), end.isRequired()])).toEqual([false, false]);
+-
+-    fixture.componentInstance.subInputsRequired = true;
+-    expect(await parallel(() => [start.isRequired(), end.isRequired()])).toEqual([true, true]);
+-  });
+-
+-  it('should get the values of the inner inputs', async () => {
+-    const input = await loader.getHarness(dateRangeInputHarness.with({selector: '[basic]'}));
+-    const [start, end] = await parallel(() => [input.getStartInput(), input.getEndInput()]);
+-
+-    fixture.componentInstance.startDate = new Date(2020, 0, 1, 12, 0, 0);
+-    fixture.componentInstance.endDate = new Date(2020, 1, 2, 12, 0, 0);
+-
+-    expect(
+-      await parallel(() => {
+-        return [start.getValue(), end.getValue()];
+-      }),
+-    ).toEqual(['1/1/2020', '2/2/2020']);
+-  });
+-
+-  it('should set the values of the inner inputs', async () => {
+-    const input = await loader.getHarness(dateRangeInputHarness.with({selector: '[basic]'}));
+-    const [start, end] = await parallel(() => [input.getStartInput(), input.getEndInput()]);
+-
+-    expect(await parallel(() => [start.getValue(), end.getValue()])).toEqual(['', '']);
+-
+-    await parallel(() => [start.setValue('1/1/2020'), end.setValue('2/2/2020')]);
+-
+-    expect(
+-      await parallel(() => {
+-        return [start.getValue(), end.getValue()];
+-      }),
+-    ).toEqual(['1/1/2020', '2/2/2020']);
+-  });
+-
+-  it('should get the placeholders of the inner inputs', async () => {
+-    const input = await loader.getHarness(dateRangeInputHarness.with({selector: '[basic]'}));
+-    const [start, end] = await parallel(() => [input.getStartInput(), input.getEndInput()]);
+-
+-    expect(await parallel(() => [start.getPlaceholder(), end.getPlaceholder()])).toEqual([
+-      'Start date',
+-      'End date',
+-    ]);
+-  });
+-
+-  it('should be able to change the inner input focused state', async () => {
+-    const input = await loader.getHarness(dateRangeInputHarness.with({selector: '[basic]'}));
+-    const [start, end] = await parallel(() => [input.getStartInput(), input.getEndInput()]);
+-
+-    expect(await start.isFocused()).toBe(false);
+-    await start.focus();
+-    expect(await start.isFocused()).toBe(true);
+-    await start.blur();
+-    expect(await start.isFocused()).toBe(false);
+-
+-    expect(await end.isFocused()).toBe(false);
+-    await end.focus();
+-    expect(await end.isFocused()).toBe(true);
+-    await end.blur();
+-    expect(await end.isFocused()).toBe(false);
+-  });
+-
+-  it('should get the minimum date of the inner inputs', async () => {
+-    const input = await loader.getHarness(dateRangeInputHarness.with({selector: '[basic]'}));
+-    const [start, end] = await parallel(() => [input.getStartInput(), input.getEndInput()]);
+-
+-    expect(await parallel(() => [start.getMin(), end.getMin()])).toEqual([null, null]);
+-
+-    fixture.componentInstance.minDate = new Date(2020, 0, 1, 12, 0, 0);
+-    expect(
+-      await parallel(() => {
+-        return [start.getMin(), end.getMin()];
+-      }),
+-    ).toEqual(['2020-01-01', '2020-01-01']);
+-  });
+-
+-  it('should get the maximum date of the inner inputs', async () => {
+-    const input = await loader.getHarness(dateRangeInputHarness.with({selector: '[basic]'}));
+-    const [start, end] = await parallel(() => [input.getStartInput(), input.getEndInput()]);
+-
+-    expect(await parallel(() => [start.getMax(), end.getMax()])).toEqual([null, null]);
+-
+-    fixture.componentInstance.maxDate = new Date(2020, 0, 1, 12, 0, 0);
+-
+-    expect(
+-      await parallel(() => {
+-        return [start.getMax(), end.getMax()];
+-      }),
+-    ).toEqual(['2020-01-01', '2020-01-01']);
+-  });
+-
+-  it('should dispatch the dateChange event when the inner input values have changed', async () => {
+-    const input = await loader.getHarness(dateRangeInputHarness.with({selector: '[basic]'}));
+-    const [start, end] = await parallel(() => [input.getStartInput(), input.getEndInput()]);
+-
+-    expect(fixture.componentInstance.startDateChangeCount).toBe(0);
+-    expect(fixture.componentInstance.endDateChangeCount).toBe(0);
+-
+-    await parallel(() => [start.setValue('1/1/2020'), end.setValue('2/2/2020')]);
+-
+-    expect(fixture.componentInstance.startDateChangeCount).toBe(1);
+-    expect(fixture.componentInstance.endDateChangeCount).toBe(1);
+-  });
+-}
+-
+-@Component({
+-  template: `
+-    <mat-date-range-input
+-      basic
+-      [disabled]="disabled"
+-      [required]="required"
+-      [min]="minDate"
+-      [max]="maxDate"
+-      [rangePicker]="picker">
+-      <input
+-        matStartDate
+-        [(ngModel)]="startDate"
+-        (dateChange)="startDateChangeCount = startDateChangeCount + 1"
+-        [disabled]="subInputsDisabled"
+-        [required]="subInputsRequired"
+-        placeholder="Start date">
+-      <input
+-        matEndDate
+-        [(ngModel)]="endDate"
+-        (dateChange)="endDateChangeCount = endDateChangeCount + 1"
+-        [disabled]="subInputsDisabled"
+-        [required]="subInputsRequired"
+-        placeholder="End date">
+-    </mat-date-range-input>
+-    <mat-date-range-picker #picker [touchUi]="touchUi"></mat-date-range-picker>
+-
+-    <mat-date-range-input no-range-picker>
+-      <input matStartDate>
+-      <input matEndDate>
+-    </mat-date-range-input>
+-  `,
+-})
+-class DateRangeInputHarnessTest {
+-  startDate: Date | null = null;
+-  endDate: Date | null = null;
+-  minDate: Date | null = null;
+-  maxDate: Date | null = null;
+-  touchUi = false;
+-  disabled = false;
+-  required = false;
+-  subInputsDisabled = false;
+-  subInputsRequired = false;
+-  startDateChangeCount = 0;
+-  endDateChangeCount = 0;
+-}
+diff --git a/src/material/datepicker/testing/date-range-input-harness.spec.ts b/src/material/datepicker/testing/date-range-input-harness.spec.ts
+index a78d3994e6fadbfe7fe5851f0021f729af7ac2ee..544a73980232737a3a4ab0ffc596029ddc141bd7 100644
+--- a/src/material/datepicker/testing/date-range-input-harness.spec.ts
++++ b/src/material/datepicker/testing/date-range-input-harness.spec.ts
+@@ -1,18 +1,265 @@
++import {Component} from '@angular/core';
++import {ComponentFixture, TestBed} from '@angular/core/testing';
++import {HarnessLoader, parallel} from '@angular/cdk/testing';
++import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
++import {MatNativeDateModule} from '@angular/material/core';
++import {FormsModule} from '@angular/forms';
+ import {MatDatepickerModule} from '@angular/material/datepicker';
++import {NoopAnimationsModule} from '@angular/platform-browser/animations';
++import {MatCalendarHarness} from './calendar-harness';
+ import {
+   MatDateRangeInputHarness,
+   MatStartDateHarness,
+   MatEndDateHarness,
+ } from './date-range-input-harness';
+-import {runDateRangeInputHarnessTests} from './date-range-input-harness-shared.spec';
+-import {MatCalendarHarness} from './calendar-harness';
+ 
+-describe('Non-MDC-based date range input harness', () => {
+-  runDateRangeInputHarnessTests(
+-    MatDatepickerModule,
+-    MatDateRangeInputHarness,
+-    MatStartDateHarness,
+-    MatEndDateHarness,
+-    MatCalendarHarness,
+-  );
++describe('matDateRangeInputHarness', () => {
++  let fixture: ComponentFixture<DateRangeInputHarnessTest>;
++  let loader: HarnessLoader;
++
++  beforeEach(async () => {
++    await TestBed.configureTestingModule({
++      imports: [NoopAnimationsModule, MatNativeDateModule, MatDatepickerModule, FormsModule],
++      declarations: [DateRangeInputHarnessTest],
++    }).compileComponents();
++
++    fixture = TestBed.createComponent(DateRangeInputHarnessTest);
++    fixture.detectChanges();
++    loader = TestbedHarnessEnvironment.loader(fixture);
++  });
++
++  it('should load all date range input harnesses', async () => {
++    const inputs = await loader.getAllHarnesses(MatDateRangeInputHarness);
++    expect(inputs.length).toBe(2);
++  });
++
++  it('should get whether the input is disabled', async () => {
++    const input = await loader.getHarness(MatDateRangeInputHarness.with({selector: '[basic]'}));
++    expect(await input.isDisabled()).toBe(false);
++
++    fixture.componentInstance.disabled = true;
++    expect(await input.isDisabled()).toBe(true);
++  });
++
++  it('should get whether the input is required', async () => {
++    const input = await loader.getHarness(MatDateRangeInputHarness.with({selector: '[basic]'}));
++    expect(await input.isRequired()).toBe(false);
++
++    fixture.componentInstance.required = true;
++    expect(await input.isRequired()).toBe(true);
++  });
++
++  it('should get the input separator', async () => {
++    const input = await loader.getHarness(MatDateRangeInputHarness.with({selector: '[basic]'}));
++    expect(await input.getSeparator()).toBe('–');
++  });
++
++  it('should get the combined input value including the separator', async () => {
++    const input = await loader.getHarness(MatDateRangeInputHarness.with({selector: '[basic]'}));
++
++    fixture.componentInstance.startDate = new Date(2020, 0, 1, 12, 0, 0);
++    fixture.componentInstance.endDate = new Date(2020, 1, 2, 12, 0, 0);
++
++    expect(await input.getValue()).toBe('1/1/2020 – 2/2/2020');
++  });
++
++  it('should get harnesses for the inner inputs', async () => {
++    const input = await loader.getHarness(MatDateRangeInputHarness.with({selector: '[basic]'}));
++    const [start, end] = await parallel(() => [input.getStartInput(), input.getEndInput()]);
++    expect(start).toBeInstanceOf(MatStartDateHarness);
++    expect(end).toBeInstanceOf(MatEndDateHarness);
++  });
++
++  it('should be able to open and close a calendar in popup mode', async () => {
++    const input = await loader.getHarness(MatDateRangeInputHarness.with({selector: '[basic]'}));
++    expect(await input.isCalendarOpen()).toBe(false);
++
++    await input.openCalendar();
++    expect(await input.isCalendarOpen()).toBe(true);
++
++    await input.closeCalendar();
++    expect(await input.isCalendarOpen()).toBe(false);
++  });
++
++  it('should be able to open and close a calendar in touch mode', async () => {
++    fixture.componentInstance.touchUi = true;
++    const input = await loader.getHarness(MatDateRangeInputHarness.with({selector: '[basic]'}));
++    expect(await input.isCalendarOpen()).toBe(false);
++
++    await input.openCalendar();
++    expect(await input.isCalendarOpen()).toBe(true);
++
++    await input.closeCalendar();
++    expect(await input.isCalendarOpen()).toBe(false);
++  });
++
++  it('should be able to get the harness for the associated calendar', async () => {
++    const input = await loader.getHarness(MatDateRangeInputHarness.with({selector: '[basic]'}));
++    await input.openCalendar();
++    expect(await input.getCalendar()).toBeInstanceOf(MatCalendarHarness);
++  });
++
++  it('should get whether the inner inputs are disabled', async () => {
++    const input = await loader.getHarness(MatDateRangeInputHarness.with({selector: '[basic]'}));
++    const [start, end] = await parallel(() => [input.getStartInput(), input.getEndInput()]);
++
++    expect(await parallel(() => [start.isDisabled(), end.isDisabled()])).toEqual([false, false]);
++
++    fixture.componentInstance.subInputsDisabled = true;
++    expect(await parallel(() => [start.isDisabled(), end.isDisabled()])).toEqual([true, true]);
++  });
++
++  it('should get whether the inner inputs are required', async () => {
++    const input = await loader.getHarness(MatDateRangeInputHarness.with({selector: '[basic]'}));
++    const [start, end] = await parallel(() => [input.getStartInput(), input.getEndInput()]);
++
++    expect(await parallel(() => [start.isRequired(), end.isRequired()])).toEqual([false, false]);
++
++    fixture.componentInstance.subInputsRequired = true;
++    expect(await parallel(() => [start.isRequired(), end.isRequired()])).toEqual([true, true]);
++  });
++
++  it('should get the values of the inner inputs', async () => {
++    const input = await loader.getHarness(MatDateRangeInputHarness.with({selector: '[basic]'}));
++    const [start, end] = await parallel(() => [input.getStartInput(), input.getEndInput()]);
++
++    fixture.componentInstance.startDate = new Date(2020, 0, 1, 12, 0, 0);
++    fixture.componentInstance.endDate = new Date(2020, 1, 2, 12, 0, 0);
++
++    expect(
++      await parallel(() => {
++        return [start.getValue(), end.getValue()];
++      }),
++    ).toEqual(['1/1/2020', '2/2/2020']);
++  });
++
++  it('should set the values of the inner inputs', async () => {
++    const input = await loader.getHarness(MatDateRangeInputHarness.with({selector: '[basic]'}));
++    const [start, end] = await parallel(() => [input.getStartInput(), input.getEndInput()]);
++
++    expect(await parallel(() => [start.getValue(), end.getValue()])).toEqual(['', '']);
++
++    await parallel(() => [start.setValue('1/1/2020'), end.setValue('2/2/2020')]);
++
++    expect(
++      await parallel(() => {
++        return [start.getValue(), end.getValue()];
++      }),
++    ).toEqual(['1/1/2020', '2/2/2020']);
++  });
++
++  it('should get the placeholders of the inner inputs', async () => {
++    const input = await loader.getHarness(MatDateRangeInputHarness.with({selector: '[basic]'}));
++    const [start, end] = await parallel(() => [input.getStartInput(), input.getEndInput()]);
++
++    expect(await parallel(() => [start.getPlaceholder(), end.getPlaceholder()])).toEqual([
++      'Start date',
++      'End date',
++    ]);
++  });
++
++  it('should be able to change the inner input focused state', async () => {
++    const input = await loader.getHarness(MatDateRangeInputHarness.with({selector: '[basic]'}));
++    const [start, end] = await parallel(() => [input.getStartInput(), input.getEndInput()]);
++
++    expect(await start.isFocused()).toBe(false);
++    await start.focus();
++    expect(await start.isFocused()).toBe(true);
++    await start.blur();
++    expect(await start.isFocused()).toBe(false);
++
++    expect(await end.isFocused()).toBe(false);
++    await end.focus();
++    expect(await end.isFocused()).toBe(true);
++    await end.blur();
++    expect(await end.isFocused()).toBe(false);
++  });
++
++  it('should get the minimum date of the inner inputs', async () => {
++    const input = await loader.getHarness(MatDateRangeInputHarness.with({selector: '[basic]'}));
++    const [start, end] = await parallel(() => [input.getStartInput(), input.getEndInput()]);
++
++    expect(await parallel(() => [start.getMin(), end.getMin()])).toEqual([null, null]);
++
++    fixture.componentInstance.minDate = new Date(2020, 0, 1, 12, 0, 0);
++    expect(
++      await parallel(() => {
++        return [start.getMin(), end.getMin()];
++      }),
++    ).toEqual(['2020-01-01', '2020-01-01']);
++  });
++
++  it('should get the maximum date of the inner inputs', async () => {
++    const input = await loader.getHarness(MatDateRangeInputHarness.with({selector: '[basic]'}));
++    const [start, end] = await parallel(() => [input.getStartInput(), input.getEndInput()]);
++
++    expect(await parallel(() => [start.getMax(), end.getMax()])).toEqual([null, null]);
++
++    fixture.componentInstance.maxDate = new Date(2020, 0, 1, 12, 0, 0);
++
++    expect(
++      await parallel(() => {
++        return [start.getMax(), end.getMax()];
++      }),
++    ).toEqual(['2020-01-01', '2020-01-01']);
++  });
++
++  it('should dispatch the dateChange event when the inner input values have changed', async () => {
++    const input = await loader.getHarness(MatDateRangeInputHarness.with({selector: '[basic]'}));
++    const [start, end] = await parallel(() => [input.getStartInput(), input.getEndInput()]);
++
++    expect(fixture.componentInstance.startDateChangeCount).toBe(0);
++    expect(fixture.componentInstance.endDateChangeCount).toBe(0);
++
++    await parallel(() => [start.setValue('1/1/2020'), end.setValue('2/2/2020')]);
++
++    expect(fixture.componentInstance.startDateChangeCount).toBe(1);
++    expect(fixture.componentInstance.endDateChangeCount).toBe(1);
++  });
+ });
++
++@Component({
++  template: `
++    <mat-date-range-input
++      basic
++      [disabled]="disabled"
++      [required]="required"
++      [min]="minDate"
++      [max]="maxDate"
++      [rangePicker]="picker">
++      <input
++        matStartDate
++        [(ngModel)]="startDate"
++        (dateChange)="startDateChangeCount = startDateChangeCount + 1"
++        [disabled]="subInputsDisabled"
++        [required]="subInputsRequired"
++        placeholder="Start date">
++      <input
++        matEndDate
++        [(ngModel)]="endDate"
++        (dateChange)="endDateChangeCount = endDateChangeCount + 1"
++        [disabled]="subInputsDisabled"
++        [required]="subInputsRequired"
++        placeholder="End date">
++    </mat-date-range-input>
++    <mat-date-range-picker #picker [touchUi]="touchUi"></mat-date-range-picker>
++
++    <mat-date-range-input no-range-picker>
++      <input matStartDate>
++      <input matEndDate>
++    </mat-date-range-input>
++  `,
++})
++class DateRangeInputHarnessTest {
++  startDate: Date | null = null;
++  endDate: Date | null = null;
++  minDate: Date | null = null;
++  maxDate: Date | null = null;
++  touchUi = false;
++  disabled = false;
++  required = false;
++  subInputsDisabled = false;
++  subInputsRequired = false;
++  startDateChangeCount = 0;
++  endDateChangeCount = 0;
++}
+diff --git a/src/material/datepicker/testing/datepicker-input-harness-shared.spec.ts b/src/material/datepicker/testing/datepicker-input-harness-shared.spec.ts
+deleted file mode 100644
+index 0513cb32cb34208d4830c3fd6451b8284319fd32..0000000000000000000000000000000000000000
+--- a/src/material/datepicker/testing/datepicker-input-harness-shared.spec.ts
++++ /dev/null
+@@ -1,211 +0,0 @@
+-import {HarnessLoader, parallel} from '@angular/cdk/testing';
+-import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+-import {Component} from '@angular/core';
+-import {DateAdapter, MatNativeDateModule} from '@angular/material/core';
+-import {ComponentFixture, TestBed} from '@angular/core/testing';
+-import {FormsModule} from '@angular/forms';
+-import {MatDatepickerModule} from '@angular/material/datepicker';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+-import {MatDatepickerInputHarness} from './datepicker-input-harness';
+-import {MatCalendarHarness} from './calendar-harness';
+-
+-/** Shared tests to run on both the original and MDC-based datepicker inputs. */
+-export function runDatepickerInputHarnessTests(
+-  datepickerModule: typeof MatDatepickerModule,
+-  datepickerInputHarness: typeof MatDatepickerInputHarness,
+-  calendarHarness: typeof MatCalendarHarness,
+-) {
+-  let fixture: ComponentFixture<DatepickerInputHarnessTest>;
+-  let loader: HarnessLoader;
+-
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
+-      imports: [NoopAnimationsModule, MatNativeDateModule, datepickerModule, FormsModule],
+-      declarations: [DatepickerInputHarnessTest],
+-    }).compileComponents();
+-
+-    fixture = TestBed.createComponent(DatepickerInputHarnessTest);
+-    fixture.detectChanges();
+-    loader = TestbedHarnessEnvironment.loader(fixture);
+-  });
+-
+-  it('should load all datepicker input harnesses', async () => {
+-    const inputs = await loader.getAllHarnesses(datepickerInputHarness);
+-    expect(inputs.length).toBe(2);
+-  });
+-
+-  it('should filter inputs based on their value', async () => {
+-    fixture.componentInstance.date = new Date(2020, 0, 1, 12, 0, 0);
+-    const inputs = await loader.getAllHarnesses(datepickerInputHarness.with({value: /2020/}));
+-    expect(inputs.length).toBe(1);
+-  });
+-
+-  it('should filter inputs based on their placeholder', async () => {
+-    const inputs = await loader.getAllHarnesses(
+-      datepickerInputHarness.with({
+-        placeholder: /^Type/,
+-      }),
+-    );
+-
+-    expect(inputs.length).toBe(1);
+-  });
+-
+-  it('should get whether the input has an associated calendar', async () => {
+-    const inputs = await loader.getAllHarnesses(datepickerInputHarness);
+-    expect(await parallel(() => inputs.map(input => input.hasCalendar()))).toEqual([true, false]);
+-  });
+-
+-  it('should get whether the input is disabled', async () => {
+-    const input = await loader.getHarness(datepickerInputHarness.with({selector: '#basic'}));
+-    expect(await input.isDisabled()).toBe(false);
+-
+-    fixture.componentInstance.disabled = true;
+-    expect(await input.isDisabled()).toBe(true);
+-  });
+-
+-  it('should get whether the input is required', async () => {
+-    const input = await loader.getHarness(datepickerInputHarness.with({selector: '#basic'}));
+-    expect(await input.isRequired()).toBe(false);
+-
+-    fixture.componentInstance.required = true;
+-    expect(await input.isRequired()).toBe(true);
+-  });
+-
+-  it('should get the input value', async () => {
+-    const input = await loader.getHarness(datepickerInputHarness.with({selector: '#basic'}));
+-    fixture.componentInstance.date = new Date(2020, 0, 1, 12, 0, 0);
+-
+-    expect(await input.getValue()).toBe('1/1/2020');
+-  });
+-
+-  it('should set the input value', async () => {
+-    const input = await loader.getHarness(datepickerInputHarness.with({selector: '#basic'}));
+-    expect(await input.getValue()).toBeFalsy();
+-
+-    await input.setValue('1/1/2020');
+-    expect(await input.getValue()).toBe('1/1/2020');
+-  });
+-
+-  it('should set the input value based on date adapter validation and formatting', async () => {
+-    const adapter = fixture.debugElement.injector.get(DateAdapter);
+-    const input = await loader.getHarness(datepickerInputHarness.with({selector: '#basic'}));
+-    const validValues: any[] = [new Date(0), '', 0, false];
+-    const invalidValues: any[] = [null, undefined];
+-    spyOn(adapter, 'format').and.returnValue('FORMATTED_VALUE');
+-    spyOn(adapter, 'isValid').and.callFake(value => validValues.includes(value));
+-    spyOn(adapter, 'deserialize').and.callFake(value =>
+-      validValues.includes(value) ? value : null,
+-    );
+-    spyOn(adapter, 'getValidDateOrNull').and.callFake(value =>
+-      adapter.isValid(value) ? value : null,
+-    );
+-
+-    for (let value of validValues) {
+-      fixture.componentInstance.date = value;
+-      expect(await input.getValue()).toBe('FORMATTED_VALUE');
+-    }
+-
+-    for (let value of invalidValues) {
+-      fixture.componentInstance.date = value;
+-      expect(await input.getValue()).toBe('');
+-    }
+-  });
+-
+-  it('should get the input placeholder', async () => {
+-    const inputs = await loader.getAllHarnesses(datepickerInputHarness);
+-    expect(
+-      await parallel(() =>
+-        inputs.map(input => {
+-          return input.getPlaceholder();
+-        }),
+-      ),
+-    ).toEqual(['Type a date', '']);
+-  });
+-
+-  it('should be able to change the input focused state', async () => {
+-    const input = await loader.getHarness(datepickerInputHarness.with({selector: '#basic'}));
+-    expect(await input.isFocused()).toBe(false);
+-
+-    await input.focus();
+-    expect(await input.isFocused()).toBe(true);
+-
+-    await input.blur();
+-    expect(await input.isFocused()).toBe(false);
+-  });
+-
+-  it('should get the minimum date of the input', async () => {
+-    const inputs = await loader.getAllHarnesses(datepickerInputHarness);
+-    fixture.componentInstance.minDate = new Date(2020, 0, 1, 12, 0, 0);
+-    expect(await parallel(() => inputs.map(input => input.getMin()))).toEqual(['2020-01-01', null]);
+-  });
+-
+-  it('should get the maximum date of the input', async () => {
+-    const inputs = await loader.getAllHarnesses(datepickerInputHarness);
+-    fixture.componentInstance.maxDate = new Date(2020, 0, 1, 12, 0, 0);
+-    expect(await parallel(() => inputs.map(input => input.getMax()))).toEqual(['2020-01-01', null]);
+-  });
+-
+-  it('should be able to open and close a calendar in popup mode', async () => {
+-    const input = await loader.getHarness(datepickerInputHarness.with({selector: '#basic'}));
+-    expect(await input.isCalendarOpen()).toBe(false);
+-
+-    await input.openCalendar();
+-    expect(await input.isCalendarOpen()).toBe(true);
+-
+-    await input.closeCalendar();
+-    expect(await input.isCalendarOpen()).toBe(false);
+-  });
+-
+-  it('should be able to open and close a calendar in touch mode', async () => {
+-    fixture.componentInstance.touchUi = true;
+-    const input = await loader.getHarness(datepickerInputHarness.with({selector: '#basic'}));
+-    expect(await input.isCalendarOpen()).toBe(false);
+-
+-    await input.openCalendar();
+-    expect(await input.isCalendarOpen()).toBe(true);
+-
+-    await input.closeCalendar();
+-    expect(await input.isCalendarOpen()).toBe(false);
+-  });
+-
+-  it('should be able to get the harness for the associated calendar', async () => {
+-    const input = await loader.getHarness(datepickerInputHarness.with({selector: '#basic'}));
+-    await input.openCalendar();
+-    expect(await input.getCalendar()).toBeInstanceOf(calendarHarness);
+-  });
+-
+-  it('should emit the `dateChange` event when the value is changed', async () => {
+-    const input = await loader.getHarness(datepickerInputHarness.with({selector: '#basic'}));
+-    expect(fixture.componentInstance.dateChangeCount).toBe(0);
+-
+-    await input.setValue('1/1/2020');
+-    expect(fixture.componentInstance.dateChangeCount).toBe(1);
+-  });
+-}
+-
+-@Component({
+-  template: `
+-    <input
+-      id="basic"
+-      matInput
+-      [matDatepicker]="picker"
+-      (dateChange)="dateChangeCount = dateChangeCount + 1"
+-      [(ngModel)]="date"
+-      [min]="minDate"
+-      [max]="maxDate"
+-      [disabled]="disabled"
+-      [required]="required"
+-      placeholder="Type a date">
+-    <mat-datepicker #picker [touchUi]="touchUi"></mat-datepicker>
+-    <input id="no-datepicker" matDatepicker>
+-  `,
+-})
+-class DatepickerInputHarnessTest {
+-  date: Date | null = null;
+-  minDate: Date | null = null;
+-  maxDate: Date | null = null;
+-  touchUi = false;
+-  disabled = false;
+-  required = false;
+-  dateChangeCount = 0;
+-}
+diff --git a/src/material/datepicker/testing/datepicker-input-harness.spec.ts b/src/material/datepicker/testing/datepicker-input-harness.spec.ts
+index e5ed1bc86d9f7e5ab63c7ea593ce21bedb70089a..9f766a5bf3c5df9ec923994ff4371cae9d0e5240 100644
+--- a/src/material/datepicker/testing/datepicker-input-harness.spec.ts
++++ b/src/material/datepicker/testing/datepicker-input-harness.spec.ts
+@@ -1,12 +1,206 @@
++import {Component} from '@angular/core';
++import {ComponentFixture, TestBed} from '@angular/core/testing';
++import {HarnessLoader, parallel} from '@angular/cdk/testing';
++import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
++import {DateAdapter, MatNativeDateModule} from '@angular/material/core';
++import {FormsModule} from '@angular/forms';
+ import {MatDatepickerModule} from '@angular/material/datepicker';
++import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MatDatepickerInputHarness} from './datepicker-input-harness';
+-import {runDatepickerInputHarnessTests} from './datepicker-input-harness-shared.spec';
+ import {MatCalendarHarness} from './calendar-harness';
+ 
+-describe('Non-MDC-based datepicker input harness', () => {
+-  runDatepickerInputHarnessTests(
+-    MatDatepickerModule,
+-    MatDatepickerInputHarness,
+-    MatCalendarHarness,
+-  );
++describe('MatDatepickerInputHarness', () => {
++  let fixture: ComponentFixture<DatepickerInputHarnessTest>;
++  let loader: HarnessLoader;
++
++  beforeEach(async () => {
++    await TestBed.configureTestingModule({
++      imports: [NoopAnimationsModule, MatNativeDateModule, MatDatepickerModule, FormsModule],
++      declarations: [DatepickerInputHarnessTest],
++    }).compileComponents();
++
++    fixture = TestBed.createComponent(DatepickerInputHarnessTest);
++    fixture.detectChanges();
++    loader = TestbedHarnessEnvironment.loader(fixture);
++  });
++
++  it('should load all datepicker input harnesses', async () => {
++    const inputs = await loader.getAllHarnesses(MatDatepickerInputHarness);
++    expect(inputs.length).toBe(2);
++  });
++
++  it('should filter inputs based on their value', async () => {
++    fixture.componentInstance.date = new Date(2020, 0, 1, 12, 0, 0);
++    const inputs = await loader.getAllHarnesses(MatDatepickerInputHarness.with({value: /2020/}));
++    expect(inputs.length).toBe(1);
++  });
++
++  it('should filter inputs based on their placeholder', async () => {
++    const inputs = await loader.getAllHarnesses(
++      MatDatepickerInputHarness.with({
++        placeholder: /^Type/,
++      }),
++    );
++
++    expect(inputs.length).toBe(1);
++  });
++
++  it('should get whether the input has an associated calendar', async () => {
++    const inputs = await loader.getAllHarnesses(MatDatepickerInputHarness);
++    expect(await parallel(() => inputs.map(input => input.hasCalendar()))).toEqual([true, false]);
++  });
++
++  it('should get whether the input is disabled', async () => {
++    const input = await loader.getHarness(MatDatepickerInputHarness.with({selector: '#basic'}));
++    expect(await input.isDisabled()).toBe(false);
++
++    fixture.componentInstance.disabled = true;
++    expect(await input.isDisabled()).toBe(true);
++  });
++
++  it('should get whether the input is required', async () => {
++    const input = await loader.getHarness(MatDatepickerInputHarness.with({selector: '#basic'}));
++    expect(await input.isRequired()).toBe(false);
++
++    fixture.componentInstance.required = true;
++    expect(await input.isRequired()).toBe(true);
++  });
++
++  it('should get the input value', async () => {
++    const input = await loader.getHarness(MatDatepickerInputHarness.with({selector: '#basic'}));
++    fixture.componentInstance.date = new Date(2020, 0, 1, 12, 0, 0);
++
++    expect(await input.getValue()).toBe('1/1/2020');
++  });
++
++  it('should set the input value', async () => {
++    const input = await loader.getHarness(MatDatepickerInputHarness.with({selector: '#basic'}));
++    expect(await input.getValue()).toBeFalsy();
++
++    await input.setValue('1/1/2020');
++    expect(await input.getValue()).toBe('1/1/2020');
++  });
++
++  it('should set the input value based on date adapter validation and formatting', async () => {
++    const adapter = fixture.debugElement.injector.get(DateAdapter);
++    const input = await loader.getHarness(MatDatepickerInputHarness.with({selector: '#basic'}));
++    const validValues: any[] = [new Date(0), '', 0, false];
++    const invalidValues: any[] = [null, undefined];
++    spyOn(adapter, 'format').and.returnValue('FORMATTED_VALUE');
++    spyOn(adapter, 'isValid').and.callFake(value => validValues.includes(value));
++    spyOn(adapter, 'deserialize').and.callFake(value =>
++      validValues.includes(value) ? value : null,
++    );
++    spyOn(adapter, 'getValidDateOrNull').and.callFake(value =>
++      adapter.isValid(value) ? value : null,
++    );
++
++    for (let value of validValues) {
++      fixture.componentInstance.date = value;
++      expect(await input.getValue()).toBe('FORMATTED_VALUE');
++    }
++
++    for (let value of invalidValues) {
++      fixture.componentInstance.date = value;
++      expect(await input.getValue()).toBe('');
++    }
++  });
++
++  it('should get the input placeholder', async () => {
++    const inputs = await loader.getAllHarnesses(MatDatepickerInputHarness);
++    expect(
++      await parallel(() =>
++        inputs.map(input => {
++          return input.getPlaceholder();
++        }),
++      ),
++    ).toEqual(['Type a date', '']);
++  });
++
++  it('should be able to change the input focused state', async () => {
++    const input = await loader.getHarness(MatDatepickerInputHarness.with({selector: '#basic'}));
++    expect(await input.isFocused()).toBe(false);
++
++    await input.focus();
++    expect(await input.isFocused()).toBe(true);
++
++    await input.blur();
++    expect(await input.isFocused()).toBe(false);
++  });
++
++  it('should get the minimum date of the input', async () => {
++    const inputs = await loader.getAllHarnesses(MatDatepickerInputHarness);
++    fixture.componentInstance.minDate = new Date(2020, 0, 1, 12, 0, 0);
++    expect(await parallel(() => inputs.map(input => input.getMin()))).toEqual(['2020-01-01', null]);
++  });
++
++  it('should get the maximum date of the input', async () => {
++    const inputs = await loader.getAllHarnesses(MatDatepickerInputHarness);
++    fixture.componentInstance.maxDate = new Date(2020, 0, 1, 12, 0, 0);
++    expect(await parallel(() => inputs.map(input => input.getMax()))).toEqual(['2020-01-01', null]);
++  });
++
++  it('should be able to open and close a calendar in popup mode', async () => {
++    const input = await loader.getHarness(MatDatepickerInputHarness.with({selector: '#basic'}));
++    expect(await input.isCalendarOpen()).toBe(false);
++
++    await input.openCalendar();
++    expect(await input.isCalendarOpen()).toBe(true);
++
++    await input.closeCalendar();
++    expect(await input.isCalendarOpen()).toBe(false);
++  });
++
++  it('should be able to open and close a calendar in touch mode', async () => {
++    fixture.componentInstance.touchUi = true;
++    const input = await loader.getHarness(MatDatepickerInputHarness.with({selector: '#basic'}));
++    expect(await input.isCalendarOpen()).toBe(false);
++
++    await input.openCalendar();
++    expect(await input.isCalendarOpen()).toBe(true);
++
++    await input.closeCalendar();
++    expect(await input.isCalendarOpen()).toBe(false);
++  });
++
++  it('should be able to get the harness for the associated calendar', async () => {
++    const input = await loader.getHarness(MatDatepickerInputHarness.with({selector: '#basic'}));
++    await input.openCalendar();
++    expect(await input.getCalendar()).toBeInstanceOf(MatCalendarHarness);
++  });
++
++  it('should emit the `dateChange` event when the value is changed', async () => {
++    const input = await loader.getHarness(MatDatepickerInputHarness.with({selector: '#basic'}));
++    expect(fixture.componentInstance.dateChangeCount).toBe(0);
++
++    await input.setValue('1/1/2020');
++    expect(fixture.componentInstance.dateChangeCount).toBe(1);
++  });
+ });
++
++@Component({
++  template: `
++    <input
++      id="basic"
++      matInput
++      [matDatepicker]="picker"
++      (dateChange)="dateChangeCount = dateChangeCount + 1"
++      [(ngModel)]="date"
++      [min]="minDate"
++      [max]="maxDate"
++      [disabled]="disabled"
++      [required]="required"
++      placeholder="Type a date">
++    <mat-datepicker #picker [touchUi]="touchUi"></mat-datepicker>
++    <input id="no-datepicker" matDatepicker>
++  `,
++})
++class DatepickerInputHarnessTest {
++  date: Date | null = null;
++  minDate: Date | null = null;
++  maxDate: Date | null = null;
++  touchUi = false;
++  disabled = false;
++  required = false;
++  dateChangeCount = 0;
++}
+diff --git a/src/material/datepicker/testing/datepicker-toggle-harness-shared.spec.ts b/src/material/datepicker/testing/datepicker-toggle-harness-shared.spec.ts
+deleted file mode 100644
+index a5bc632df7a7c53352afb5ed309c0db88e0751e9..0000000000000000000000000000000000000000
+--- a/src/material/datepicker/testing/datepicker-toggle-harness-shared.spec.ts
++++ /dev/null
+@@ -1,95 +0,0 @@
+-import {HarnessLoader, parallel} from '@angular/cdk/testing';
+-import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+-import {Component} from '@angular/core';
+-import {MatNativeDateModule} from '@angular/material/core';
+-import {ComponentFixture, TestBed} from '@angular/core/testing';
+-import {MatDatepickerModule} from '@angular/material/datepicker';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+-import {MatDatepickerToggleHarness} from './datepicker-toggle-harness';
+-import {MatCalendarHarness} from './calendar-harness';
+-
+-/** Shared tests to run on both the original and MDC-based datepicker toggles. */
+-export function runDatepickerToggleHarnessTests(
+-  datepickerModule: typeof MatDatepickerModule,
+-  datepickerToggleHarness: typeof MatDatepickerToggleHarness,
+-  calendarHarness: typeof MatCalendarHarness,
+-) {
+-  let fixture: ComponentFixture<DatepickerToggleHarnessTest>;
+-  let loader: HarnessLoader;
+-
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
+-      imports: [NoopAnimationsModule, MatNativeDateModule, datepickerModule],
+-      declarations: [DatepickerToggleHarnessTest],
+-    }).compileComponents();
+-
+-    fixture = TestBed.createComponent(DatepickerToggleHarnessTest);
+-    fixture.detectChanges();
+-    loader = TestbedHarnessEnvironment.loader(fixture);
+-  });
+-
+-  it('should load all toggle harnesses', async () => {
+-    const toggles = await loader.getAllHarnesses(datepickerToggleHarness);
+-    expect(toggles.length).toBe(2);
+-  });
+-
+-  it('should get whether the toggle is disabled', async () => {
+-    const toggle = await loader.getHarness(datepickerToggleHarness.with({selector: '#basic'}));
+-    expect(await toggle.isDisabled()).toBe(false);
+-
+-    fixture.componentInstance.disabled = true;
+-    expect(await toggle.isDisabled()).toBe(true);
+-  });
+-
+-  it('should get whether the toggle has a calendar associated with it', async () => {
+-    const toggles = await loader.getAllHarnesses(datepickerToggleHarness);
+-    expect(
+-      await parallel(() => {
+-        return toggles.map(toggle => toggle.hasCalendar());
+-      }),
+-    ).toEqual([true, false]);
+-  });
+-
+-  it('should be able to open and close a calendar in popup mode', async () => {
+-    const toggle = await loader.getHarness(datepickerToggleHarness.with({selector: '#basic'}));
+-    expect(await toggle.isCalendarOpen()).toBe(false);
+-
+-    await toggle.openCalendar();
+-    expect(await toggle.isCalendarOpen()).toBe(true);
+-
+-    await toggle.closeCalendar();
+-    expect(await toggle.isCalendarOpen()).toBe(false);
+-  });
+-
+-  it('should be able to open and close a calendar in touch mode', async () => {
+-    fixture.componentInstance.touchUi = true;
+-    const toggle = await loader.getHarness(datepickerToggleHarness.with({selector: '#basic'}));
+-    expect(await toggle.isCalendarOpen()).toBe(false);
+-
+-    await toggle.openCalendar();
+-    expect(await toggle.isCalendarOpen()).toBe(true);
+-
+-    await toggle.closeCalendar();
+-    expect(await toggle.isCalendarOpen()).toBe(false);
+-  });
+-
+-  it('should be able to get the harness for the associated calendar', async () => {
+-    const toggle = await loader.getHarness(datepickerToggleHarness.with({selector: '#basic'}));
+-    await toggle.openCalendar();
+-    expect(await toggle.getCalendar()).toBeInstanceOf(calendarHarness);
+-  });
+-}
+-
+-@Component({
+-  template: `
+-    <input [matDatepicker]="picker">
+-    <mat-datepicker-toggle id="basic" [for]="picker" [disabled]="disabled"></mat-datepicker-toggle>
+-    <mat-datepicker #picker [touchUi]="touchUi"></mat-datepicker>
+-
+-    <mat-datepicker-toggle id="no-calendar"></mat-datepicker-toggle>
+-  `,
+-})
+-class DatepickerToggleHarnessTest {
+-  touchUi = false;
+-  disabled = false;
+-}
+diff --git a/src/material/datepicker/testing/datepicker-toggle-harness.spec.ts b/src/material/datepicker/testing/datepicker-toggle-harness.spec.ts
+index 3125bd317b06ba3a1fddfc20c1ad9218218972d1..b580fb55b66d9947388787f1b02bdba521bf1c0e 100644
+--- a/src/material/datepicker/testing/datepicker-toggle-harness.spec.ts
++++ b/src/material/datepicker/testing/datepicker-toggle-harness.spec.ts
+@@ -1,12 +1,90 @@
++import {Component} from '@angular/core';
++import {ComponentFixture, TestBed} from '@angular/core/testing';
++import {HarnessLoader, parallel} from '@angular/cdk/testing';
++import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
++import {MatNativeDateModule} from '@angular/material/core';
+ import {MatDatepickerModule} from '@angular/material/datepicker';
+-import {runDatepickerToggleHarnessTests} from './datepicker-toggle-harness-shared.spec';
++import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MatDatepickerToggleHarness} from './datepicker-toggle-harness';
+ import {MatCalendarHarness} from './calendar-harness';
+ 
+-describe('Non-MDC-based datepicker toggle harness', () => {
+-  runDatepickerToggleHarnessTests(
+-    MatDatepickerModule,
+-    MatDatepickerToggleHarness,
+-    MatCalendarHarness,
+-  );
++describe('MatDatepickerToggleHarness', () => {
++  let fixture: ComponentFixture<DatepickerToggleHarnessTest>;
++  let loader: HarnessLoader;
++
++  beforeEach(async () => {
++    await TestBed.configureTestingModule({
++      imports: [NoopAnimationsModule, MatNativeDateModule, MatDatepickerModule],
++      declarations: [DatepickerToggleHarnessTest],
++    }).compileComponents();
++
++    fixture = TestBed.createComponent(DatepickerToggleHarnessTest);
++    fixture.detectChanges();
++    loader = TestbedHarnessEnvironment.loader(fixture);
++  });
++
++  it('should load all toggle harnesses', async () => {
++    const toggles = await loader.getAllHarnesses(MatDatepickerToggleHarness);
++    expect(toggles.length).toBe(2);
++  });
++
++  it('should get whether the toggle is disabled', async () => {
++    const toggle = await loader.getHarness(MatDatepickerToggleHarness.with({selector: '#basic'}));
++    expect(await toggle.isDisabled()).toBe(false);
++
++    fixture.componentInstance.disabled = true;
++    expect(await toggle.isDisabled()).toBe(true);
++  });
++
++  it('should get whether the toggle has a calendar associated with it', async () => {
++    const toggles = await loader.getAllHarnesses(MatDatepickerToggleHarness);
++    expect(
++      await parallel(() => {
++        return toggles.map(toggle => toggle.hasCalendar());
++      }),
++    ).toEqual([true, false]);
++  });
++
++  it('should be able to open and close a calendar in popup mode', async () => {
++    const toggle = await loader.getHarness(MatDatepickerToggleHarness.with({selector: '#basic'}));
++    expect(await toggle.isCalendarOpen()).toBe(false);
++
++    await toggle.openCalendar();
++    expect(await toggle.isCalendarOpen()).toBe(true);
++
++    await toggle.closeCalendar();
++    expect(await toggle.isCalendarOpen()).toBe(false);
++  });
++
++  it('should be able to open and close a calendar in touch mode', async () => {
++    fixture.componentInstance.touchUi = true;
++    const toggle = await loader.getHarness(MatDatepickerToggleHarness.with({selector: '#basic'}));
++    expect(await toggle.isCalendarOpen()).toBe(false);
++
++    await toggle.openCalendar();
++    expect(await toggle.isCalendarOpen()).toBe(true);
++
++    await toggle.closeCalendar();
++    expect(await toggle.isCalendarOpen()).toBe(false);
++  });
++
++  it('should be able to get the harness for the associated calendar', async () => {
++    const toggle = await loader.getHarness(MatDatepickerToggleHarness.with({selector: '#basic'}));
++    await toggle.openCalendar();
++    expect(await toggle.getCalendar()).toBeInstanceOf(MatCalendarHarness);
++  });
+ });
++
++@Component({
++  template: `
++    <input [matDatepicker]="picker">
++    <mat-datepicker-toggle id="basic" [for]="picker" [disabled]="disabled"></mat-datepicker-toggle>
++    <mat-datepicker #picker [touchUi]="touchUi"></mat-datepicker>
++
++    <mat-datepicker-toggle id="no-calendar"></mat-datepicker-toggle>
++  `,
++})
++class DatepickerToggleHarnessTest {
++  touchUi = false;
++  disabled = false;
++}

@@ -1,0 +1,552 @@
+diff --git a/src/material/button-toggle/testing/BUILD.bazel b/src/material/button-toggle/testing/BUILD.bazel
+index d140040318e5f04bedfd6c80d8fb1a44e03388c7..1417959d0433b0189f2ffd1c131ee97970084466 100644
+--- a/src/material/button-toggle/testing/BUILD.bazel
++++ b/src/material/button-toggle/testing/BUILD.bazel
+@@ -21,11 +21,8 @@ filegroup(
+ )
+ 
+ ng_test_library(
+-    name = "harness_tests_lib",
+-    srcs = [
+-        "button-toggle-group-shared.spec.ts",
+-        "button-toggle-shared.spec.ts",
+-    ],
++    name = "unit_tests_lib",
++    srcs = glob(["**/*.spec.ts"]),
+     deps = [
+         ":testing",
+         "//src/cdk/testing",
+@@ -34,22 +31,6 @@ ng_test_library(
+     ],
+ )
+ 
+-ng_test_library(
+-    name = "unit_tests_lib",
+-    srcs = glob(
+-        ["**/*.spec.ts"],
+-        exclude = [
+-            "button-toggle-shared.spec.ts",
+-            "button-toggle-group-shared.spec.ts",
+-        ],
+-    ),
+-    deps = [
+-        ":harness_tests_lib",
+-        ":testing",
+-        "//src/material/button-toggle",
+-    ],
+-)
+-
+ ng_web_test_suite(
+     name = "unit_tests",
+     deps = [":unit_tests_lib"],
+diff --git a/src/material/button-toggle/testing/button-toggle-group-shared.spec.ts b/src/material/button-toggle/testing/button-toggle-group-shared.spec.ts
+deleted file mode 100644
+index ac423d83e9021ab234e12bf3797aea3bcc99b4e9..0000000000000000000000000000000000000000
+--- a/src/material/button-toggle/testing/button-toggle-group-shared.spec.ts
++++ /dev/null
+@@ -1,90 +0,0 @@
+-import {HarnessLoader} from '@angular/cdk/testing';
+-import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+-import {Component} from '@angular/core';
+-import {ComponentFixture, TestBed} from '@angular/core/testing';
+-import {MatButtonToggleModule, MatButtonToggleAppearance} from '@angular/material/button-toggle';
+-import {MatButtonToggleGroupHarness} from './button-toggle-group-harness';
+-
+-/** Shared tests to run on both the original and MDC-based button toggle group. */
+-export function runHarnessTests(
+-  buttonToggleModule: typeof MatButtonToggleModule,
+-  buttonToggleGroupHarness: typeof MatButtonToggleGroupHarness,
+-) {
+-  let fixture: ComponentFixture<ButtonToggleGroupHarnessTest>;
+-  let loader: HarnessLoader;
+-
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
+-      imports: [buttonToggleModule],
+-      declarations: [ButtonToggleGroupHarnessTest],
+-    }).compileComponents();
+-
+-    fixture = TestBed.createComponent(ButtonToggleGroupHarnessTest);
+-    fixture.detectChanges();
+-    loader = TestbedHarnessEnvironment.loader(fixture);
+-  });
+-
+-  it('should load all button toggle group harnesses', async () => {
+-    const groups = await loader.getAllHarnesses(buttonToggleGroupHarness);
+-    expect(groups.length).toBe(1);
+-  });
+-
+-  it('should load the toggles inside the group', async () => {
+-    const group = await loader.getHarness(buttonToggleGroupHarness);
+-    const toggles = await group.getToggles();
+-    expect(toggles.length).toBe(2);
+-  });
+-
+-  it('should get whether the group is disabled', async () => {
+-    const group = await loader.getHarness(buttonToggleGroupHarness);
+-    expect(await group.isDisabled()).toBe(false);
+-    fixture.componentInstance.disabled = true;
+-    expect(await group.isDisabled()).toBe(true);
+-  });
+-
+-  it('should filter by whether the group is disabled', async () => {
+-    let enabledGroups = await loader.getAllHarnesses(
+-      buttonToggleGroupHarness.with({disabled: false}),
+-    );
+-    let disabledGroups = await loader.getAllHarnesses(
+-      buttonToggleGroupHarness.with({disabled: true}),
+-    );
+-    expect(enabledGroups.length).toBe(1);
+-    expect(disabledGroups.length).toBe(0);
+-
+-    fixture.componentInstance.disabled = true;
+-
+-    enabledGroups = await loader.getAllHarnesses(buttonToggleGroupHarness.with({disabled: false}));
+-    disabledGroups = await loader.getAllHarnesses(buttonToggleGroupHarness.with({disabled: true}));
+-    expect(enabledGroups.length).toBe(0);
+-    expect(disabledGroups.length).toBe(1);
+-  });
+-
+-  it('should get whether the group is vertical', async () => {
+-    const group = await loader.getHarness(buttonToggleGroupHarness);
+-    expect(await group.isVertical()).toBe(false);
+-    fixture.componentInstance.vertical = true;
+-    expect(await group.isVertical()).toBe(true);
+-  });
+-
+-  it('should get whether the group appearance', async () => {
+-    const group = await loader.getHarness(buttonToggleGroupHarness);
+-    expect(await group.getAppearance()).toBe('standard');
+-    fixture.componentInstance.appearance = 'legacy';
+-    expect(await group.getAppearance()).toBe('legacy');
+-  });
+-}
+-
+-@Component({
+-  template: `
+-    <mat-button-toggle-group [disabled]="disabled" [vertical]="vertical" [appearance]="appearance">
+-      <mat-button-toggle value="1">One</mat-button-toggle>
+-      <mat-button-toggle value="2">Two</mat-button-toggle>
+-    </mat-button-toggle-group>
+-  `,
+-})
+-class ButtonToggleGroupHarnessTest {
+-  disabled = false;
+-  vertical = false;
+-  appearance: MatButtonToggleAppearance = 'standard';
+-}
+diff --git a/src/material/button-toggle/testing/button-toggle-group.spec.ts b/src/material/button-toggle/testing/button-toggle-group.spec.ts
+index 5046d8acb1ff31ec04edf7d73dd405709883c59a..be5787724606ed0f19b58d59db807b069d4b7ebd 100644
+--- a/src/material/button-toggle/testing/button-toggle-group.spec.ts
++++ b/src/material/button-toggle/testing/button-toggle-group.spec.ts
+@@ -1,7 +1,90 @@
+-import {MatButtonToggleModule} from '@angular/material/button-toggle';
+-import {runHarnessTests} from './button-toggle-group-shared.spec';
++import {Component} from '@angular/core';
++import {ComponentFixture, TestBed} from '@angular/core/testing';
++import {HarnessLoader} from '@angular/cdk/testing';
++import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
++import {MatButtonToggleModule, MatButtonToggleAppearance} from '@angular/material/button-toggle';
+ import {MatButtonToggleGroupHarness} from './button-toggle-group-harness';
+ 
+-describe('Non-MDC-based MatButtonToggleGroupHarness', () => {
+-  runHarnessTests(MatButtonToggleModule, MatButtonToggleGroupHarness);
++describe('MatButtonToggleGroupHarness', () => {
++  let fixture: ComponentFixture<ButtonToggleGroupHarnessTest>;
++  let loader: HarnessLoader;
++
++  beforeEach(async () => {
++    await TestBed.configureTestingModule({
++      imports: [MatButtonToggleModule],
++      declarations: [ButtonToggleGroupHarnessTest],
++    }).compileComponents();
++
++    fixture = TestBed.createComponent(ButtonToggleGroupHarnessTest);
++    fixture.detectChanges();
++    loader = TestbedHarnessEnvironment.loader(fixture);
++  });
++
++  it('should load all button toggle group harnesses', async () => {
++    const groups = await loader.getAllHarnesses(MatButtonToggleGroupHarness);
++    expect(groups.length).toBe(1);
++  });
++
++  it('should load the toggles inside the group', async () => {
++    const group = await loader.getHarness(MatButtonToggleGroupHarness);
++    const toggles = await group.getToggles();
++    expect(toggles.length).toBe(2);
++  });
++
++  it('should get whether the group is disabled', async () => {
++    const group = await loader.getHarness(MatButtonToggleGroupHarness);
++    expect(await group.isDisabled()).toBe(false);
++    fixture.componentInstance.disabled = true;
++    expect(await group.isDisabled()).toBe(true);
++  });
++
++  it('should filter by whether the group is disabled', async () => {
++    let enabledGroups = await loader.getAllHarnesses(
++      MatButtonToggleGroupHarness.with({disabled: false}),
++    );
++    let disabledGroups = await loader.getAllHarnesses(
++      MatButtonToggleGroupHarness.with({disabled: true}),
++    );
++    expect(enabledGroups.length).toBe(1);
++    expect(disabledGroups.length).toBe(0);
++
++    fixture.componentInstance.disabled = true;
++
++    enabledGroups = await loader.getAllHarnesses(
++      MatButtonToggleGroupHarness.with({disabled: false}),
++    );
++    disabledGroups = await loader.getAllHarnesses(
++      MatButtonToggleGroupHarness.with({disabled: true}),
++    );
++    expect(enabledGroups.length).toBe(0);
++    expect(disabledGroups.length).toBe(1);
++  });
++
++  it('should get whether the group is vertical', async () => {
++    const group = await loader.getHarness(MatButtonToggleGroupHarness);
++    expect(await group.isVertical()).toBe(false);
++    fixture.componentInstance.vertical = true;
++    expect(await group.isVertical()).toBe(true);
++  });
++
++  it('should get whether the group appearance', async () => {
++    const group = await loader.getHarness(MatButtonToggleGroupHarness);
++    expect(await group.getAppearance()).toBe('standard');
++    fixture.componentInstance.appearance = 'legacy';
++    expect(await group.getAppearance()).toBe('legacy');
++  });
+ });
++
++@Component({
++  template: `
++    <mat-button-toggle-group [disabled]="disabled" [vertical]="vertical" [appearance]="appearance">
++      <mat-button-toggle value="1">One</mat-button-toggle>
++      <mat-button-toggle value="2">Two</mat-button-toggle>
++    </mat-button-toggle-group>
++  `,
++})
++class ButtonToggleGroupHarnessTest {
++  disabled = false;
++  vertical = false;
++  appearance: MatButtonToggleAppearance = 'standard';
++}
+diff --git a/src/material/button-toggle/testing/button-toggle-harness.spec.ts b/src/material/button-toggle/testing/button-toggle-harness.spec.ts
+index b7894e93c86cb81c5a69c3ba0d5e6fa38de04660..5041804f9a4ffc34036c1baec8f853c5e5cd51ef 100644
+--- a/src/material/button-toggle/testing/button-toggle-harness.spec.ts
++++ b/src/material/button-toggle/testing/button-toggle-harness.spec.ts
+@@ -1,7 +1,149 @@
++import {Component} from '@angular/core';
++import {ComponentFixture, TestBed} from '@angular/core/testing';
++import {HarnessLoader} from '@angular/cdk/testing';
++import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+ import {MatButtonToggleModule} from '@angular/material/button-toggle';
+-import {runHarnessTests} from './button-toggle-shared.spec';
+ import {MatButtonToggleHarness} from './button-toggle-harness';
+ 
+-describe('Non-MDC-based MatButtonToggleHarness', () => {
+-  runHarnessTests(MatButtonToggleModule, MatButtonToggleHarness);
++describe('MatButtonToggleHarness', () => {
++  let fixture: ComponentFixture<ButtonToggleHarnessTest>;
++  let loader: HarnessLoader;
++
++  beforeEach(async () => {
++    await TestBed.configureTestingModule({
++      imports: [MatButtonToggleModule],
++      declarations: [ButtonToggleHarnessTest],
++    }).compileComponents();
++
++    fixture = TestBed.createComponent(ButtonToggleHarnessTest);
++    fixture.detectChanges();
++    loader = TestbedHarnessEnvironment.loader(fixture);
++  });
++
++  it('should load all button toggle harnesses', async () => {
++    const toggles = await loader.getAllHarnesses(MatButtonToggleHarness);
++    expect(toggles.length).toBe(2);
++  });
++
++  it('should load a button toggle with exact label', async () => {
++    const toggles = await loader.getAllHarnesses(MatButtonToggleHarness.with({text: 'First'}));
++    expect(toggles.length).toBe(1);
++    expect(await toggles[0].getText()).toBe('First');
++  });
++
++  it('should load a button toggle with regex label match', async () => {
++    const toggles = await loader.getAllHarnesses(MatButtonToggleHarness.with({text: /^s/i}));
++    expect(toggles.length).toBe(1);
++    expect(await toggles[0].getText()).toBe('Second');
++  });
++
++  it('should get the toggle checked state', async () => {
++    const [checkedToggle, uncheckedToggle] = await loader.getAllHarnesses(MatButtonToggleHarness);
++    expect(await checkedToggle.isChecked()).toBe(true);
++    expect(await uncheckedToggle.isChecked()).toBe(false);
++  });
++
++  it('should filter by whether the group is disabled', async () => {
++    const enabledToggles = await loader.getAllHarnesses(
++      MatButtonToggleHarness.with({disabled: false}),
++    );
++    const disabledToggles = await loader.getAllHarnesses(
++      MatButtonToggleHarness.with({disabled: true}),
++    );
++    expect(enabledToggles.length).toBe(1);
++    expect(disabledToggles.length).toBe(1);
++  });
++
++  it('should get the toggle disabled state', async () => {
++    const [enabledToggle, disabledToggle] = await loader.getAllHarnesses(MatButtonToggleHarness);
++    expect(await enabledToggle.isDisabled()).toBe(false);
++    expect(await disabledToggle.isDisabled()).toBe(true);
++  });
++
++  it('should get the toggle name', async () => {
++    const toggle = await loader.getHarness(MatButtonToggleHarness.with({text: 'First'}));
++    expect(await toggle.getName()).toBe('first-name');
++  });
++
++  it('should get the toggle aria-label', async () => {
++    const toggle = await loader.getHarness(MatButtonToggleHarness.with({text: 'First'}));
++    expect(await toggle.getAriaLabel()).toBe('First toggle');
++  });
++
++  it('should get the toggle aria-labelledby', async () => {
++    const toggle = await loader.getHarness(MatButtonToggleHarness.with({text: 'Second'}));
++    expect(await toggle.getAriaLabelledby()).toBe('second-label');
++  });
++
++  it('should get the toggle label text', async () => {
++    const [firstToggle, secondToggle] = await loader.getAllHarnesses(MatButtonToggleHarness);
++    expect(await firstToggle.getText()).toBe('First');
++    expect(await secondToggle.getText()).toBe('Second');
++  });
++
++  it('should get the toggle appearance', async () => {
++    const [firstToggle, secondToggle] = await loader.getAllHarnesses(MatButtonToggleHarness);
++    expect(await firstToggle.getAppearance()).toBe('standard');
++    expect(await secondToggle.getAppearance()).toBe('legacy');
++  });
++
++  it('should focus the button toggle', async () => {
++    const toggle = await loader.getHarness(MatButtonToggleHarness.with({text: 'First'}));
++    expect(await toggle.isFocused()).toBe(false);
++    await toggle.focus();
++    expect(await toggle.isFocused()).toBe(true);
++  });
++
++  it('should blur the button toggle', async () => {
++    const toggle = await loader.getHarness(MatButtonToggleHarness.with({text: 'First'}));
++    await toggle.focus();
++    expect(await toggle.isFocused()).toBe(true);
++    await toggle.blur();
++    expect(await toggle.isFocused()).toBe(false);
++  });
++
++  it('should toggle the button value', async () => {
++    fixture.componentInstance.disabled = false;
++    const [checkedToggle, uncheckedToggle] = await loader.getAllHarnesses(MatButtonToggleHarness);
++    await checkedToggle.toggle();
++    await uncheckedToggle.toggle();
++    expect(await checkedToggle.isChecked()).toBe(false);
++    expect(await uncheckedToggle.isChecked()).toBe(true);
++  });
++
++  it('should check the button toggle', async () => {
++    fixture.componentInstance.disabled = false;
++    const [checkedToggle, uncheckedToggle] = await loader.getAllHarnesses(MatButtonToggleHarness);
++    await checkedToggle.check();
++    await uncheckedToggle.check();
++    expect(await checkedToggle.isChecked()).toBe(true);
++    expect(await uncheckedToggle.isChecked()).toBe(true);
++  });
++
++  it('should uncheck the button toggle', async () => {
++    fixture.componentInstance.disabled = false;
++    const [checkedToggle, uncheckedToggle] = await loader.getAllHarnesses(MatButtonToggleHarness);
++    await checkedToggle.uncheck();
++    await uncheckedToggle.uncheck();
++    expect(await checkedToggle.isChecked()).toBe(false);
++    expect(await uncheckedToggle.isChecked()).toBe(false);
++  });
+ });
++
++@Component({
++  template: `
++      <mat-button-toggle
++        name="first-name"
++        value="first-value"
++        aria-label="First toggle"
++        checked>First</mat-button-toggle>
++      <mat-button-toggle
++        [disabled]="disabled"
++        aria-labelledby="second-label"
++        appearance="legacy">Second</mat-button-toggle>
++      <span id="second-label">Second toggle</span>
++  `,
++})
++class ButtonToggleHarnessTest {
++  disabled = true;
++}
+diff --git a/src/material/button-toggle/testing/button-toggle-shared.spec.ts b/src/material/button-toggle/testing/button-toggle-shared.spec.ts
+deleted file mode 100644
+index acbddbaaa93c160998bc7082be54832977499b7c..0000000000000000000000000000000000000000
+--- a/src/material/button-toggle/testing/button-toggle-shared.spec.ts
++++ /dev/null
+@@ -1,153 +0,0 @@
+-import {HarnessLoader} from '@angular/cdk/testing';
+-import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+-import {Component} from '@angular/core';
+-import {ComponentFixture, TestBed} from '@angular/core/testing';
+-import {MatButtonToggleModule} from '@angular/material/button-toggle';
+-import {MatButtonToggleHarness} from './button-toggle-harness';
+-
+-/** Shared tests to run on both the original and MDC-based button toggles. */
+-export function runHarnessTests(
+-  buttonToggleModule: typeof MatButtonToggleModule,
+-  buttonToggleHarness: typeof MatButtonToggleHarness,
+-) {
+-  let fixture: ComponentFixture<ButtonToggleHarnessTest>;
+-  let loader: HarnessLoader;
+-
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
+-      imports: [buttonToggleModule],
+-      declarations: [ButtonToggleHarnessTest],
+-    }).compileComponents();
+-
+-    fixture = TestBed.createComponent(ButtonToggleHarnessTest);
+-    fixture.detectChanges();
+-    loader = TestbedHarnessEnvironment.loader(fixture);
+-  });
+-
+-  it('should load all button toggle harnesses', async () => {
+-    const toggles = await loader.getAllHarnesses(buttonToggleHarness);
+-    expect(toggles.length).toBe(2);
+-  });
+-
+-  it('should load a button toggle with exact label', async () => {
+-    const toggles = await loader.getAllHarnesses(buttonToggleHarness.with({text: 'First'}));
+-    expect(toggles.length).toBe(1);
+-    expect(await toggles[0].getText()).toBe('First');
+-  });
+-
+-  it('should load a button toggle with regex label match', async () => {
+-    const toggles = await loader.getAllHarnesses(buttonToggleHarness.with({text: /^s/i}));
+-    expect(toggles.length).toBe(1);
+-    expect(await toggles[0].getText()).toBe('Second');
+-  });
+-
+-  it('should get the toggle checked state', async () => {
+-    const [checkedToggle, uncheckedToggle] = await loader.getAllHarnesses(buttonToggleHarness);
+-    expect(await checkedToggle.isChecked()).toBe(true);
+-    expect(await uncheckedToggle.isChecked()).toBe(false);
+-  });
+-
+-  it('should filter by whether the group is disabled', async () => {
+-    const enabledToggles = await loader.getAllHarnesses(
+-      buttonToggleHarness.with({disabled: false}),
+-    );
+-    const disabledToggles = await loader.getAllHarnesses(
+-      buttonToggleHarness.with({disabled: true}),
+-    );
+-    expect(enabledToggles.length).toBe(1);
+-    expect(disabledToggles.length).toBe(1);
+-  });
+-
+-  it('should get the toggle disabled state', async () => {
+-    const [enabledToggle, disabledToggle] = await loader.getAllHarnesses(buttonToggleHarness);
+-    expect(await enabledToggle.isDisabled()).toBe(false);
+-    expect(await disabledToggle.isDisabled()).toBe(true);
+-  });
+-
+-  it('should get the toggle name', async () => {
+-    const toggle = await loader.getHarness(buttonToggleHarness.with({text: 'First'}));
+-    expect(await toggle.getName()).toBe('first-name');
+-  });
+-
+-  it('should get the toggle aria-label', async () => {
+-    const toggle = await loader.getHarness(buttonToggleHarness.with({text: 'First'}));
+-    expect(await toggle.getAriaLabel()).toBe('First toggle');
+-  });
+-
+-  it('should get the toggle aria-labelledby', async () => {
+-    const toggle = await loader.getHarness(buttonToggleHarness.with({text: 'Second'}));
+-    expect(await toggle.getAriaLabelledby()).toBe('second-label');
+-  });
+-
+-  it('should get the toggle label text', async () => {
+-    const [firstToggle, secondToggle] = await loader.getAllHarnesses(buttonToggleHarness);
+-    expect(await firstToggle.getText()).toBe('First');
+-    expect(await secondToggle.getText()).toBe('Second');
+-  });
+-
+-  it('should get the toggle appearance', async () => {
+-    const [firstToggle, secondToggle] = await loader.getAllHarnesses(buttonToggleHarness);
+-    expect(await firstToggle.getAppearance()).toBe('standard');
+-    expect(await secondToggle.getAppearance()).toBe('legacy');
+-  });
+-
+-  it('should focus the button toggle', async () => {
+-    const toggle = await loader.getHarness(buttonToggleHarness.with({text: 'First'}));
+-    expect(await toggle.isFocused()).toBe(false);
+-    await toggle.focus();
+-    expect(await toggle.isFocused()).toBe(true);
+-  });
+-
+-  it('should blur the button toggle', async () => {
+-    const toggle = await loader.getHarness(buttonToggleHarness.with({text: 'First'}));
+-    await toggle.focus();
+-    expect(await toggle.isFocused()).toBe(true);
+-    await toggle.blur();
+-    expect(await toggle.isFocused()).toBe(false);
+-  });
+-
+-  it('should toggle the button value', async () => {
+-    fixture.componentInstance.disabled = false;
+-    const [checkedToggle, uncheckedToggle] = await loader.getAllHarnesses(buttonToggleHarness);
+-    await checkedToggle.toggle();
+-    await uncheckedToggle.toggle();
+-    expect(await checkedToggle.isChecked()).toBe(false);
+-    expect(await uncheckedToggle.isChecked()).toBe(true);
+-  });
+-
+-  it('should check the button toggle', async () => {
+-    fixture.componentInstance.disabled = false;
+-    const [checkedToggle, uncheckedToggle] = await loader.getAllHarnesses(buttonToggleHarness);
+-    await checkedToggle.check();
+-    await uncheckedToggle.check();
+-    expect(await checkedToggle.isChecked()).toBe(true);
+-    expect(await uncheckedToggle.isChecked()).toBe(true);
+-  });
+-
+-  it('should uncheck the button toggle', async () => {
+-    fixture.componentInstance.disabled = false;
+-    const [checkedToggle, uncheckedToggle] = await loader.getAllHarnesses(buttonToggleHarness);
+-    await checkedToggle.uncheck();
+-    await uncheckedToggle.uncheck();
+-    expect(await checkedToggle.isChecked()).toBe(false);
+-    expect(await uncheckedToggle.isChecked()).toBe(false);
+-  });
+-}
+-
+-@Component({
+-  template: `
+-      <mat-button-toggle
+-        name="first-name"
+-        value="first-value"
+-        aria-label="First toggle"
+-        checked>First</mat-button-toggle>
+-      <mat-button-toggle
+-        [disabled]="disabled"
+-        aria-labelledby="second-label"
+-        appearance="legacy">Second</mat-button-toggle>
+-      <span id="second-label">Second toggle</span>
+-  `,
+-})
+-class ButtonToggleHarnessTest {
+-  disabled = true;
+-}

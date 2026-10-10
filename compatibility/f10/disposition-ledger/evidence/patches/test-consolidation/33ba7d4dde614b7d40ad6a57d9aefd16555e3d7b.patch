@@ -1,0 +1,168 @@
+diff --git a/src/material/progress-spinner/testing/BUILD.bazel b/src/material/progress-spinner/testing/BUILD.bazel
+index 9922b347c4f9bdfea9e2bc43a057addbe3211e02..210f2f380c90a0ccd4b3f5b7891f4609dd1c4121 100644
+--- a/src/material/progress-spinner/testing/BUILD.bazel
++++ b/src/material/progress-spinner/testing/BUILD.bazel
+@@ -21,8 +21,8 @@ filegroup(
+ )
+ 
+ ng_test_library(
+-    name = "harness_tests_lib",
+-    srcs = ["shared.spec.ts"],
++    name = "unit_tests_lib",
++    srcs = glob(["**/*.spec.ts"]),
+     deps = [
+         ":testing",
+         "//src/cdk/testing",
+@@ -32,19 +32,6 @@ ng_test_library(
+     ],
+ )
+ 
+-ng_test_library(
+-    name = "unit_tests_lib",
+-    srcs = glob(
+-        ["**/*.spec.ts"],
+-        exclude = ["shared.spec.ts"],
+-    ),
+-    deps = [
+-        ":harness_tests_lib",
+-        ":testing",
+-        "//src/material/progress-spinner",
+-    ],
+-)
+-
+ ng_web_test_suite(
+     name = "unit_tests",
+     deps = [
+diff --git a/src/material/progress-spinner/testing/progress-spinner-harness.spec.ts b/src/material/progress-spinner/testing/progress-spinner-harness.spec.ts
+index ea15d90dadbc4145e0d943eb42aeb118b653f1c7..13f3e72c4fcfe07be051e8531558070443f955f6 100644
+--- a/src/material/progress-spinner/testing/progress-spinner-harness.spec.ts
++++ b/src/material/progress-spinner/testing/progress-spinner-harness.spec.ts
+@@ -1,7 +1,57 @@
+-import {runHarnessTests} from '@angular/material/progress-spinner/testing/shared.spec';
++import {Component} from '@angular/core';
++import {ComponentFixture, TestBed} from '@angular/core/testing';
++import {HarnessLoader} from '@angular/cdk/testing';
++import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
++import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+ import {MatProgressSpinnerHarness} from './progress-spinner-harness';
+-import {MatProgressSpinnerModule} from '../index';
+ 
+-describe('MDC-based MatProgressSpinnerHarness', () => {
+-  runHarnessTests(MatProgressSpinnerModule, MatProgressSpinnerHarness);
++describe('MatProgressSpinnerHarness', () => {
++  let fixture: ComponentFixture<ProgressSpinnerHarnessTest>;
++  let loader: HarnessLoader;
++
++  beforeEach(async () => {
++    await TestBed.configureTestingModule({
++      imports: [MatProgressSpinnerModule],
++      declarations: [ProgressSpinnerHarnessTest],
++    }).compileComponents();
++
++    fixture = TestBed.createComponent(ProgressSpinnerHarnessTest);
++    fixture.detectChanges();
++    loader = TestbedHarnessEnvironment.loader(fixture);
++  });
++
++  it('should load all progress spinner harnesses', async () => {
++    const progressSpinners = await loader.getAllHarnesses(MatProgressSpinnerHarness);
++    expect(progressSpinners.length).toBe(3);
++  });
++
++  it('should get the value', async () => {
++    fixture.componentInstance.value = 50;
++    const [determinate, indeterminate, impliedIndeterminate] = await loader.getAllHarnesses(
++      MatProgressSpinnerHarness,
++    );
++    expect(await determinate.getValue()).toBe(50);
++    expect(await indeterminate.getValue()).toBe(null);
++    expect(await impliedIndeterminate.getValue()).toBe(null);
++  });
++
++  it('should get the mode', async () => {
++    const [determinate, indeterminate, impliedIndeterminate] = await loader.getAllHarnesses(
++      MatProgressSpinnerHarness,
++    );
++    expect(await determinate.getMode()).toBe('determinate');
++    expect(await indeterminate.getMode()).toBe('indeterminate');
++    expect(await impliedIndeterminate.getMode()).toBe('indeterminate');
++  });
+ });
++
++@Component({
++  template: `
++    <mat-progress-spinner mode="determinate" [value]="value"></mat-progress-spinner>
++    <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
++    <mat-spinner></mat-spinner>
++  `,
++})
++class ProgressSpinnerHarnessTest {
++  value: number;
++}
+diff --git a/src/material/progress-spinner/testing/shared.spec.ts b/src/material/progress-spinner/testing/shared.spec.ts
+deleted file mode 100644
+index 73aeb8aab98782e3c65dec7e12c32defa60cceaf..0000000000000000000000000000000000000000
+--- a/src/material/progress-spinner/testing/shared.spec.ts
++++ /dev/null
+@@ -1,61 +0,0 @@
+-import {HarnessLoader} from '@angular/cdk/testing';
+-import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+-import {Component} from '@angular/core';
+-import {ComponentFixture, TestBed} from '@angular/core/testing';
+-import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+-import {MatProgressSpinnerHarness} from './progress-spinner-harness';
+-
+-/** Runs the shared unit tests for the progress spinner test harness. */
+-export function runHarnessTests(
+-  progressSpinnerModule: typeof MatProgressSpinnerModule,
+-  progressSpinnerHarness: typeof MatProgressSpinnerHarness,
+-) {
+-  let fixture: ComponentFixture<ProgressSpinnerHarnessTest>;
+-  let loader: HarnessLoader;
+-
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
+-      imports: [progressSpinnerModule],
+-      declarations: [ProgressSpinnerHarnessTest],
+-    }).compileComponents();
+-
+-    fixture = TestBed.createComponent(ProgressSpinnerHarnessTest);
+-    fixture.detectChanges();
+-    loader = TestbedHarnessEnvironment.loader(fixture);
+-  });
+-
+-  it('should load all progress spinner harnesses', async () => {
+-    const progressSpinners = await loader.getAllHarnesses(progressSpinnerHarness);
+-    expect(progressSpinners.length).toBe(3);
+-  });
+-
+-  it('should get the value', async () => {
+-    fixture.componentInstance.value = 50;
+-    const [determinate, indeterminate, impliedIndeterminate] = await loader.getAllHarnesses(
+-      progressSpinnerHarness,
+-    );
+-    expect(await determinate.getValue()).toBe(50);
+-    expect(await indeterminate.getValue()).toBe(null);
+-    expect(await impliedIndeterminate.getValue()).toBe(null);
+-  });
+-
+-  it('should get the mode', async () => {
+-    const [determinate, indeterminate, impliedIndeterminate] = await loader.getAllHarnesses(
+-      progressSpinnerHarness,
+-    );
+-    expect(await determinate.getMode()).toBe('determinate');
+-    expect(await indeterminate.getMode()).toBe('indeterminate');
+-    expect(await impliedIndeterminate.getMode()).toBe('indeterminate');
+-  });
+-}
+-
+-@Component({
+-  template: `
+-    <mat-progress-spinner mode="determinate" [value]="value"></mat-progress-spinner>
+-    <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+-    <mat-spinner></mat-spinner>
+-  `,
+-})
+-class ProgressSpinnerHarnessTest {
+-  value: number;
+-}

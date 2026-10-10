@@ -1,0 +1,330 @@
+diff --git a/src/material/badge/testing/BUILD.bazel b/src/material/badge/testing/BUILD.bazel
+index 01ba836d57701045aee028c54dc11e9ddefd3817..c04825a62a99b12760dcb8bdb4d6c204a7afbdf8 100644
+--- a/src/material/badge/testing/BUILD.bazel
++++ b/src/material/badge/testing/BUILD.bazel
+@@ -20,8 +20,8 @@ filegroup(
+ )
+ 
+ ng_test_library(
+-    name = "harness_tests_lib",
+-    srcs = ["shared.spec.ts"],
++    name = "unit_tests_lib",
++    srcs = glob(["**/*.spec.ts"]),
+     deps = [
+         ":testing",
+         "//src/cdk/testing",
+@@ -31,19 +31,6 @@ ng_test_library(
+     ],
+ )
+ 
+-ng_test_library(
+-    name = "unit_tests_lib",
+-    srcs = glob(
+-        ["**/*.spec.ts"],
+-        exclude = ["shared.spec.ts"],
+-    ),
+-    deps = [
+-        ":harness_tests_lib",
+-        ":testing",
+-        "//src/material/badge",
+-    ],
+-)
+-
+ ng_web_test_suite(
+     name = "unit_tests",
+     deps = [":unit_tests_lib"],
+diff --git a/src/material/badge/testing/badge-harness.spec.ts b/src/material/badge/testing/badge-harness.spec.ts
+index 6b6028d79494999bf5def9b8a0b556d44d749332..f396406baf68f915df141af5763d744457731aab 100644
+--- a/src/material/badge/testing/badge-harness.spec.ts
++++ b/src/material/badge/testing/badge-harness.spec.ts
+@@ -1,7 +1,138 @@
+-import {MatBadgeModule} from '@angular/material/badge';
+-import {runHarnessTests} from '@angular/material/badge/testing/shared.spec';
++import {Component} from '@angular/core';
++import {ComponentFixture, TestBed} from '@angular/core/testing';
++import {HarnessLoader} from '@angular/cdk/testing';
++import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
++import {MatBadgeModule, MatBadgePosition, MatBadgeSize} from '@angular/material/badge';
+ import {MatBadgeHarness} from './badge-harness';
+ 
+-describe('Non-MDC-based MatBadgeHarness', () => {
+-  runHarnessTests(MatBadgeModule, MatBadgeHarness);
++describe('MatBadgeHarness', () => {
++  let fixture: ComponentFixture<BadgeHarnessTest>;
++  let loader: HarnessLoader;
++
++  beforeEach(async () => {
++    await TestBed.configureTestingModule({
++      imports: [MatBadgeModule],
++      declarations: [BadgeHarnessTest],
++    }).compileComponents();
++
++    fixture = TestBed.createComponent(BadgeHarnessTest);
++    fixture.detectChanges();
++    loader = TestbedHarnessEnvironment.loader(fixture);
++  });
++
++  it('should load all badge harnesses', async () => {
++    const badges = await loader.getAllHarnesses(MatBadgeHarness);
++    expect(badges.length).toBe(6);
++  });
++
++  it('should be able to get the text of a badge', async () => {
++    const badge = await loader.getHarness(MatBadgeHarness.with({selector: '#simple'}));
++
++    expect(await badge.getText()).toBe('Simple badge');
++    fixture.componentInstance.simpleContent = 'Changed simple badge';
++    expect(await badge.getText()).toBe('Changed simple badge');
++  });
++
++  it('should load badge with exact text', async () => {
++    const badges = await loader.getAllHarnesses(MatBadgeHarness.with({text: 'Simple badge'}));
++    expect(badges.length).toBe(1);
++    expect(await badges[0].getText()).toBe('Simple badge');
++  });
++
++  it('should load badge with regex label match', async () => {
++    const badges = await loader.getAllHarnesses(MatBadgeHarness.with({text: /sized|disabled/i}));
++    expect(badges.length).toBe(2);
++    expect(await badges[0].getText()).toBe('Sized badge');
++    expect(await badges[1].getText()).toBe('Disabled badge');
++  });
++
++  it('should get whether a badge is overlapping', async () => {
++    const badge = await loader.getHarness(MatBadgeHarness.with({selector: '#overlapping'}));
++
++    expect(await badge.isOverlapping()).toBe(true);
++    fixture.componentInstance.overlap = false;
++    expect(await badge.isOverlapping()).toBe(false);
++  });
++
++  it('should get whether a badge is disabled', async () => {
++    const badge = await loader.getHarness(MatBadgeHarness.with({selector: '#disabled'}));
++
++    expect(await badge.isDisabled()).toBe(true);
++    fixture.componentInstance.disabled = false;
++    expect(await badge.isDisabled()).toBe(false);
++  });
++
++  it('should get whether a badge is hidden', async () => {
++    const badge = await loader.getHarness(MatBadgeHarness.with({selector: '#hidden'}));
++
++    expect(await badge.isHidden()).toBe(true);
++    fixture.componentInstance.hidden = false;
++    expect(await badge.isHidden()).toBe(false);
++  });
++
++  it('should get the position of a badge', async () => {
++    const instance = fixture.componentInstance;
++    const badge = await loader.getHarness(MatBadgeHarness.with({selector: '#positioned'}));
++
++    expect(await badge.getPosition()).toBe('above after');
++
++    instance.position = 'below';
++    expect(await badge.getPosition()).toBe('below after');
++
++    instance.position = 'below before';
++    expect(await badge.getPosition()).toBe('below before');
++
++    instance.position = 'above';
++    expect(await badge.getPosition()).toBe('above after');
++
++    instance.position = 'above before';
++    expect(await badge.getPosition()).toBe('above before');
++  });
++
++  it('should get the size of a badge', async () => {
++    const instance = fixture.componentInstance;
++    const badge = await loader.getHarness(MatBadgeHarness.with({selector: '#sized'}));
++
++    expect(await badge.getSize()).toBe('medium');
++
++    instance.size = 'small';
++    expect(await badge.getSize()).toBe('small');
++
++    instance.size = 'large';
++    expect(await badge.getSize()).toBe('large');
++  });
+ });
++
++@Component({
++  template: `
++    <button id="simple" [matBadge]="simpleContent">Simple</button>
++    <button
++      id="positioned"
++      matBadge="Positioned badge"
++      [matBadgePosition]="position">Positioned</button>
++    <button
++      id="sized"
++      matBadge="Sized badge"
++      [matBadgeSize]="size">Sized</button>
++    <button
++      id="overlapping"
++      matBadge="Overlapping badge"
++      [matBadgeOverlap]="overlap">Overlapping</button>
++    <button
++      id="hidden"
++      matBadge="Hidden badge"
++      [matBadgeHidden]="hidden">Hidden</button>
++    <button
++      id="disabled"
++      matBadge="Disabled badge"
++      [matBadgeDisabled]="disabled">Disabled</button>
++  `,
++})
++class BadgeHarnessTest {
++  simpleContent = 'Simple badge';
++  position: MatBadgePosition = 'above after';
++  size: MatBadgeSize = 'medium';
++  overlap = true;
++  hidden = true;
++  disabled = true;
++}
+diff --git a/src/material/badge/testing/shared.spec.ts b/src/material/badge/testing/shared.spec.ts
+deleted file mode 100644
+index 028280e3af06092981dfedcfeb32e4868b39ce0a..0000000000000000000000000000000000000000
+--- a/src/material/badge/testing/shared.spec.ts
++++ /dev/null
+@@ -1,142 +0,0 @@
+-import {HarnessLoader} from '@angular/cdk/testing';
+-import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+-import {Component} from '@angular/core';
+-import {ComponentFixture, TestBed} from '@angular/core/testing';
+-import {MatBadgeModule, MatBadgePosition, MatBadgeSize} from '@angular/material/badge';
+-import {MatBadgeHarness} from '@angular/material/badge/testing/badge-harness';
+-
+-/** Shared tests to run on both the original and MDC-based badges. */
+-export function runHarnessTests(
+-  badgeModule: typeof MatBadgeModule,
+-  badgeHarness: typeof MatBadgeHarness,
+-) {
+-  let fixture: ComponentFixture<BadgeHarnessTest>;
+-  let loader: HarnessLoader;
+-
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
+-      imports: [badgeModule],
+-      declarations: [BadgeHarnessTest],
+-    }).compileComponents();
+-
+-    fixture = TestBed.createComponent(BadgeHarnessTest);
+-    fixture.detectChanges();
+-    loader = TestbedHarnessEnvironment.loader(fixture);
+-  });
+-
+-  it('should load all badge harnesses', async () => {
+-    const badges = await loader.getAllHarnesses(badgeHarness);
+-    expect(badges.length).toBe(6);
+-  });
+-
+-  it('should be able to get the text of a badge', async () => {
+-    const badge = await loader.getHarness(badgeHarness.with({selector: '#simple'}));
+-
+-    expect(await badge.getText()).toBe('Simple badge');
+-    fixture.componentInstance.simpleContent = 'Changed simple badge';
+-    expect(await badge.getText()).toBe('Changed simple badge');
+-  });
+-
+-  it('should load badge with exact text', async () => {
+-    const badges = await loader.getAllHarnesses(badgeHarness.with({text: 'Simple badge'}));
+-    expect(badges.length).toBe(1);
+-    expect(await badges[0].getText()).toBe('Simple badge');
+-  });
+-
+-  it('should load badge with regex label match', async () => {
+-    const badges = await loader.getAllHarnesses(badgeHarness.with({text: /sized|disabled/i}));
+-    expect(badges.length).toBe(2);
+-    expect(await badges[0].getText()).toBe('Sized badge');
+-    expect(await badges[1].getText()).toBe('Disabled badge');
+-  });
+-
+-  it('should get whether a badge is overlapping', async () => {
+-    const badge = await loader.getHarness(badgeHarness.with({selector: '#overlapping'}));
+-
+-    expect(await badge.isOverlapping()).toBe(true);
+-    fixture.componentInstance.overlap = false;
+-    expect(await badge.isOverlapping()).toBe(false);
+-  });
+-
+-  it('should get whether a badge is disabled', async () => {
+-    const badge = await loader.getHarness(badgeHarness.with({selector: '#disabled'}));
+-
+-    expect(await badge.isDisabled()).toBe(true);
+-    fixture.componentInstance.disabled = false;
+-    expect(await badge.isDisabled()).toBe(false);
+-  });
+-
+-  it('should get whether a badge is hidden', async () => {
+-    const badge = await loader.getHarness(badgeHarness.with({selector: '#hidden'}));
+-
+-    expect(await badge.isHidden()).toBe(true);
+-    fixture.componentInstance.hidden = false;
+-    expect(await badge.isHidden()).toBe(false);
+-  });
+-
+-  it('should get the position of a badge', async () => {
+-    const instance = fixture.componentInstance;
+-    const badge = await loader.getHarness(badgeHarness.with({selector: '#positioned'}));
+-
+-    expect(await badge.getPosition()).toBe('above after');
+-
+-    instance.position = 'below';
+-    expect(await badge.getPosition()).toBe('below after');
+-
+-    instance.position = 'below before';
+-    expect(await badge.getPosition()).toBe('below before');
+-
+-    instance.position = 'above';
+-    expect(await badge.getPosition()).toBe('above after');
+-
+-    instance.position = 'above before';
+-    expect(await badge.getPosition()).toBe('above before');
+-  });
+-
+-  it('should get the size of a badge', async () => {
+-    const instance = fixture.componentInstance;
+-    const badge = await loader.getHarness(badgeHarness.with({selector: '#sized'}));
+-
+-    expect(await badge.getSize()).toBe('medium');
+-
+-    instance.size = 'small';
+-    expect(await badge.getSize()).toBe('small');
+-
+-    instance.size = 'large';
+-    expect(await badge.getSize()).toBe('large');
+-  });
+-}
+-
+-@Component({
+-  template: `
+-    <button id="simple" [matBadge]="simpleContent">Simple</button>
+-    <button
+-      id="positioned"
+-      matBadge="Positioned badge"
+-      [matBadgePosition]="position">Positioned</button>
+-    <button
+-      id="sized"
+-      matBadge="Sized badge"
+-      [matBadgeSize]="size">Sized</button>
+-    <button
+-      id="overlapping"
+-      matBadge="Overlapping badge"
+-      [matBadgeOverlap]="overlap">Overlapping</button>
+-    <button
+-      id="hidden"
+-      matBadge="Hidden badge"
+-      [matBadgeHidden]="hidden">Hidden</button>
+-    <button
+-      id="disabled"
+-      matBadge="Disabled badge"
+-      [matBadgeDisabled]="disabled">Disabled</button>
+-  `,
+-})
+-class BadgeHarnessTest {
+-  simpleContent = 'Simple badge';
+-  position: MatBadgePosition = 'above after';
+-  size: MatBadgeSize = 'medium';
+-  overlap = true;
+-  hidden = true;
+-  disabled = true;
+-}

@@ -1,0 +1,155 @@
+diff --git a/src/material/progress-bar/testing/BUILD.bazel b/src/material/progress-bar/testing/BUILD.bazel
+index 50be99c5925cdbf4e1a79b8a63c8f6782bb4aaa4..344c9a954598b50ba84a43109a52c0adea98b2f6 100644
+--- a/src/material/progress-bar/testing/BUILD.bazel
++++ b/src/material/progress-bar/testing/BUILD.bazel
+@@ -15,8 +15,8 @@ ng_module(
+ )
+ 
+ ng_test_library(
+-    name = "harness_tests_lib",
+-    srcs = ["shared.spec.ts"],
++    name = "unit_tests_lib",
++    srcs = glob(["**/*.spec.ts"]),
+     deps = [
+         ":testing",
+         "//src/cdk/testing",
+@@ -26,19 +26,6 @@ ng_test_library(
+     ],
+ )
+ 
+-ng_test_library(
+-    name = "unit_tests_lib",
+-    srcs = glob(
+-        ["**/*.spec.ts"],
+-        exclude = ["shared.spec.ts"],
+-    ),
+-    deps = [
+-        ":harness_tests_lib",
+-        ":testing",
+-        "//src/material/progress-bar",
+-    ],
+-)
+-
+ ng_web_test_suite(
+     name = "unit_tests",
+     deps = [
+diff --git a/src/material/progress-bar/testing/progress-bar-harness.spec.ts b/src/material/progress-bar/testing/progress-bar-harness.spec.ts
+index fa6b489f8f73cb1254fe7d1e8b59bde1e486a5a6..32b60030ee11be22d22ca098823b7db375f7ff73 100644
+--- a/src/material/progress-bar/testing/progress-bar-harness.spec.ts
++++ b/src/material/progress-bar/testing/progress-bar-harness.spec.ts
+@@ -1,7 +1,51 @@
+-import {MatProgressBarModule} from '../index';
++import {Component} from '@angular/core';
++import {ComponentFixture, TestBed} from '@angular/core/testing';
++import {HarnessLoader} from '@angular/cdk/testing';
++import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
++import {MatProgressBarModule} from '@angular/material/progress-bar';
+ import {MatProgressBarHarness} from './progress-bar-harness';
+-import {runHarnessTests} from '@angular/material/progress-bar/testing/shared.spec';
+ 
+-describe('MDC-based MatProgressBarHarness', () => {
+-  runHarnessTests(MatProgressBarModule, MatProgressBarHarness);
++describe('MatProgressBarHarness', () => {
++  let fixture: ComponentFixture<ProgressBarHarnessTest>;
++  let loader: HarnessLoader;
++
++  beforeEach(async () => {
++    await TestBed.configureTestingModule({
++      imports: [MatProgressBarModule],
++      declarations: [ProgressBarHarnessTest],
++    }).compileComponents();
++
++    fixture = TestBed.createComponent(ProgressBarHarnessTest);
++    fixture.detectChanges();
++    loader = TestbedHarnessEnvironment.loader(fixture);
++  });
++
++  it('should load all progress bar harnesses', async () => {
++    const progressBars = await loader.getAllHarnesses(MatProgressBarHarness);
++    expect(progressBars.length).toBe(2);
++  });
++
++  it('should get the value', async () => {
++    fixture.componentInstance.value = 50;
++    const [determinate, indeterminate] = await loader.getAllHarnesses(MatProgressBarHarness);
++    expect(await determinate.getValue()).toBe(50);
++    expect(await indeterminate.getValue()).toBe(null);
++  });
++
++  it('should get the mode', async () => {
++    const [determinate, indeterminate] = await loader.getAllHarnesses(MatProgressBarHarness);
++    expect(await determinate.getMode()).toBe('determinate');
++    expect(await indeterminate.getMode()).toBe('indeterminate');
++  });
+ });
++
++// TODO: Add and test progress bars with modes `buffer` and `query`.
++@Component({
++  template: `
++    <mat-progress-bar mode="determinate" [value]="value"></mat-progress-bar>
++    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
++  `,
++})
++class ProgressBarHarnessTest {
++  value: number;
++}
+diff --git a/src/material/progress-bar/testing/shared.spec.ts b/src/material/progress-bar/testing/shared.spec.ts
+deleted file mode 100644
+index 052285d503bc32db7c019e541f6ca1a89ca48796..0000000000000000000000000000000000000000
+--- a/src/material/progress-bar/testing/shared.spec.ts
++++ /dev/null
+@@ -1,54 +0,0 @@
+-import {HarnessLoader} from '@angular/cdk/testing';
+-import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+-import {Component} from '@angular/core';
+-import {ComponentFixture, TestBed} from '@angular/core/testing';
+-import {MatProgressBarModule} from '@angular/material/progress-bar';
+-import {MatProgressBarHarness} from './progress-bar-harness';
+-
+-export function runHarnessTests(
+-  progressBarModule: typeof MatProgressBarModule,
+-  progressBarHarness: typeof MatProgressBarHarness,
+-) {
+-  let fixture: ComponentFixture<ProgressBarHarnessTest>;
+-  let loader: HarnessLoader;
+-
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
+-      imports: [progressBarModule],
+-      declarations: [ProgressBarHarnessTest],
+-    }).compileComponents();
+-
+-    fixture = TestBed.createComponent(ProgressBarHarnessTest);
+-    fixture.detectChanges();
+-    loader = TestbedHarnessEnvironment.loader(fixture);
+-  });
+-
+-  it('should load all progress bar harnesses', async () => {
+-    const progressBars = await loader.getAllHarnesses(progressBarHarness);
+-    expect(progressBars.length).toBe(2);
+-  });
+-
+-  it('should get the value', async () => {
+-    fixture.componentInstance.value = 50;
+-    const [determinate, indeterminate] = await loader.getAllHarnesses(progressBarHarness);
+-    expect(await determinate.getValue()).toBe(50);
+-    expect(await indeterminate.getValue()).toBe(null);
+-  });
+-
+-  it('should get the mode', async () => {
+-    const [determinate, indeterminate] = await loader.getAllHarnesses(progressBarHarness);
+-    expect(await determinate.getMode()).toBe('determinate');
+-    expect(await indeterminate.getMode()).toBe('indeterminate');
+-  });
+-}
+-
+-// TODO: Add and test progress bars with modes `buffer` and `query`.
+-@Component({
+-  template: `
+-    <mat-progress-bar mode="determinate" [value]="value"></mat-progress-bar>
+-    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+-  `,
+-})
+-class ProgressBarHarnessTest {
+-  value: number;
+-}
