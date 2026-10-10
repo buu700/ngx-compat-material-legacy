@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "status": "source/constructor/framework continuous-render/type repair passed; actual packed/native field qualification pending",
+  "recorded_at_utc": "2026-10-10T04:16:35.720551+00:00",
+  "source_heads": {
+    "main": "69b4a216f3ab9ac09929923f6aac37abaae519ee",
+    "21.x": "88bc471388e5f73fe06db06f74ebd300cf5dc4a9"
+  },
+  "source_trees": {
+    "main": "82acf0802ddf4c3fbbddbb77c461219bf7b6d954",
+    "21.x": "968ac1071e40a9ea81c8f2be00d3746fc1e2d9c6"
+  },
+  "problem": "The tagged field subscribes continuously to onStable for pending outline updates. Genuine public-provider zoneless NgZone emits no onStable event; the original field source leaves the initial and prefix outline geometry pending at the current minima.",
+  "repair": [
+    "A field-owned afterFormFieldRender observable keeps the existing continuous onStable path and registers stable public afterEveryRender through an existing application injector. The callback emits only while public NgZone.isStable, preserving the exercised zoneful timing. It does not reduce the update stream to a single render.",
+    "Existing takeUntil destruction tears down the stability subscription and public continuous AfterRenderRef. Lookup/registration failure cleans the subscription before propagating the error. A manual field without an application injector retains the original continuous zone path.",
+    "One optional trailing private Injector parameter stores the public injector supplied by Angular. The existing seven authored parameters/decorators and constructor body are unchanged. Old seven-argument construction is exercised; actual legacy node-DI/AOT remains unqualified."
+  ],
+  "preserved": {
+    "old_7_argument_constructor_calls_supported": true,
+    "new_optional_trailing_Injector_argument": true,
+    "existing_7_parameters_and_authored_body_identical": true,
+    "existing_geometry_methods_unchanged": true,
+    "consumer_HTML_CSS_SCSS_changes_required": false,
+    "consumer_TS_edits_found_necessary": false,
+    "product_HTML_CSS_SCSS_files_changed": false,
+    "goldens_changed": false
+  },
+  "tests": {
+    "python_tests": 5,
+    "elapsed_seconds": 18.72,
+    "isolated_framework_subjects": 10,
+    "current_zoneful_zoneless_development_production_subjects": 8,
+    "original_zoneful_subjects": 2,
+    "specific_mutation_rejections": 40,
+    "strict_helper_negative_checks_per_current_subject": 6,
+    "strict_compiler": "6.0.2",
+    "native_predicate_tests": 1,
+    "browser_source_identity_tests": 2,
+    "existing_state_style_predicate_tests": 1
+  },
+  "observations": [
+    "Entire source constructors and members are replayed with a protocol color-trait parent. Seven-argument manual construction and the eighth parameter-property assignment execute. The current application uses a real Angular OnPush shell/view and genuine ChangeDetectorRef to drive real render cycles; this shell is not the legacy form-field Angular view.",
+    "The initial short label produces two 15px starts and two 70px gaps from the untouched tagged 0.75 scale/5px padding. Prefix change produces 45px starts. Zero-sized attached-container measurement stays pending and retries after showing; RTL and empty-label paths execute. Zoneful candidate sequences and manual application-free sequences match the independent tagged reference for the exercised protocol geometry.",
+    "In current zoneless subjects, the tagged initial/prefix widths stay pending; the candidate updates them across repeated actual public render callbacks. Idle renders produce no extra gap writes. Destroy before the render phase cancels the callback, including later renders.",
+    "Forty specific mutants reject the original zone-only wait, a one-shot update stream, missing destruction/unsubscription, retained render handles, removed stability guard, forced idle measurements and lookup-failure subscription leakage."
+  ],
+  "runtime_scope": "Complete original/owned field constructor and members with a protocol color-trait parent; Angular decorators removed. Genuine public NgZone/QueryList/FormControl and current public application/continuous render hook. A real Angular OnPush shell/view and ChangeDetectorRef drive current render cycles with a protocol renderer; this is not a legacy field Angular view. Control wrapper, DOM geometry/styles/document attachment, direction and disabled-motion policy are protocols; original uses a change-detector protocol. Original standard geometry is exercised independently; candidate pre-existing notch cap and visible-offset-parent rule are unchanged, not universally qualified. No actual legacy traits/node DI/AOT/packed/native geometry, consumer builds or Rx/Node floor qualification.",
+  "existing_differences_not_waived": "The candidate already has a long-label notch cap and a visible-offset-parent attachment rule absent in the tagged source. This repair leaves those methods unchanged and exercises common short-label/attached/zero-rect cases; it does not claim universal geometry identity or approve the existing differences. Their original decisions and relevant native/SHA evidence still need complete audit.",
+  "native_producer": "Packed Chromium form slice retains fill/hint/focus and adds an outlined short-label fixture. Actual inline widths on both historical start/gap element pairs must match independent tagged arithmetic against real DOM measurements, with prefix addition, hidden prefix removal then show, and RTL. The hide is observed explicitly; no new cells are credited. Native browser execution remains deferred.",
+  "source_binding_refresh": {
+    "previous_frozen_rows": 22,
+    "separate_current_ValidatorFn_row": 1,
+    "fresh_checker_calls": 24,
+    "new_frozen_use_admissions": 0,
+    "new_upstream_SHA_closures": 0,
+    "historical_component_or_native_runs_restamped": false
+  },
+  "cyph_sanity": {
+    "head": "a56a0603636cac5aaabe8fe408f7429b4224f011",
+    "clean": true,
+    "form_field_templates": 25,
+    "scope": "Read-only shared/js TypeScript excluding specs, form-field HTML and relevant SCSS. No direct MatLegacyFormField construction, subclass or updateOutlineGap call found in that search. Existing prefix/suffix templates, dynamic infix width, profile/pin-input infix padding and checkout label/state selectors inspected. No explicit appearance=outline binding found in the searched Cyph templates; no consumer build or edits.",
+    "files": [
+      {
+        "path": "shared/js/cyph/modules/cyph-shared.module.ts",
+        "sha256": "42fea0471f52148b9f6938d670a4fd9fd65363e2f34ae000efd58b9ec3a82c29"
+      },
+      {
+        "path": "shared/js/cyph/components/search-bar/search-bar.component.html",
+        "sha256": "f733c8a7b4864e9054adae72f467f0511055eac4b55d40b667c610a347201e4c"
+      },
+      {
+        "path": "shared/js/cyph/components/pin-input/pin-input.component.scss",
+        "sha256": "56dda758e7a1efc5ce1ab57747d2d109b1aa4658f92a0546e566c6d70bfa602c"
+      },
+      {
+        "path": "shared/js/cyph/components/account-profile/account-profile.component.scss",
+        "sha256": "aec4efeafdd08566a1a68d2bc582a160f51ed7aea1a649c2c1b62596544fb161"
+      },
+      {
+        "path": "shared/js/cyph/components/checkout/checkout.component.scss",
+        "sha256": "cd93a5485ef58a3e17892b0f0a53234e18accf9c3ac3084c4df697ccf802ba36"
+      },
+      {
+        "path": "shared/js/cyph/components/dynamic-form/dynamic-form.component.scss",
+        "sha256": "9609a535a229801622c75f6fdcc9f1bffc7e2f55dcb3e77b5081a0ab17e4d048"
+      }
+    ],
+    "consumer_build_executed": false
+  },
+  "environment": {
+    "host_node": "v22.23.3",
+    "borrowed_rxjs": "7.8.2",
+    "borrowed_tslib": "2.8.1",
+    "binding_parser": "6.0.3",
+    "advertised_runtime_Rx_native_packed_floors_qualified": false
+  },
+  "harness_corrections": [
+    "The stability assertion was moved after the actual in-zone render call, so removing the guard is consumed by the assertion.",
+    "An empty zoneless application does not render repeatedly merely from tick(). A genuine OnPush shell and ChangeDetectorRef now drive actual render work, avoiding a fabricated every-render callback schedule.",
+    "The synthetic DOCUMENT head implements querySelectorAll for actual public component/style-host creation, and the protocol renderer tolerates removing an already detached root. These are explicit DOM/renderer protocols, not private provider replacements."
+  ],
+  "remaining": [
+    "All 25 frozen NgZone boundaries stay open pending complete caller/lifecycle and native qualification.",
+    "Paginated-tab-header initial alignment is the next stability consumer to reproduce; existing field geometry differences remain separate audit items.",
+    "Complete packed/native/floors/Sass/security/SHA closeout, C05 and independent A01-A10/R01-R03 audit remain required."
+  ],
+  "pushed": false,
+  "actions_started": false,
+  "g11_claim": "not-passed"
+}
