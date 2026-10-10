@@ -1,0 +1,710 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "status": "reviewed",
+  "recorded_at_utc": "2026-10-10T16:44:45.697095+00:00",
+  "source_checkpoint": "b28ed03573b2d2b8438680790a9d0d3f42766830",
+  "criteria": "Finite10 frozen and2 current-added public token injection boundaries. Genuine public token identity, exact source annotation/call replay, explicit DI and whole owned location factory; native/component/packed/SSR/floor work remains separate.",
+  "reviews": [
+    {
+      "file": "legacy-chips/chip.ts",
+      "module": "@angular/common",
+      "symbol": "DOCUMENT",
+      "candidate_source_sha256": "df6a4cfe02079393bdbb593ad0654af0c04b47548b8ef2c58a96611be944de15",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The required public token remains in constructor slot5. The chip uses the supplied document to create its historical ripple div with the existing class, then appends it to the supplied chip element. The annotation identity is replayed through genuine DI; this review does not claim to execute real chip DOM creation, ripple timing or native teardown. Whole SRI-authenticated original16.2.14 and both advertised minimum Core/Common namespaces retain a public nondeprecated InjectionToken<Document>. In both current minima, Common reexports the exact Core token; the original defines it in Common. Six dev/prod contexts pass96 assertions, replay all12 exact source annotation/inject expressions and10 constructor slots, and reject15 token/provider/whole-function controls. Ten actual source controls reject private or type-only imports, dropped optionality, cloned tokens, wrong parameter positions, shadowed bindings and changed inject calls. Close only the stable token dependency and explicit DI metadata boundary. Documents and metadata targets are protocols; there is no complete owned component, native DOM/SSR renderer, packed AOT, full Node/RxJS floor, upstream security or G11 qualification. No source/API/HTML/CSS/SCSS changes or consumer edits are required.",
+      "source_binding": {
+        "file": "legacy-chips/chip.ts",
+        "module": "@angular/common",
+        "symbol": "DOCUMENT",
+        "frozen_use": true,
+        "local_name": "DOCUMENT",
+        "candidate_source_sha256": "df6a4cfe02079393bdbb593ad0654af0c04b47548b8ef2c58a96611be944de15",
+        "references": [
+          {
+            "role": "constructor-token",
+            "line": 315,
+            "expression": "Inject(DOCUMENT)",
+            "class": "MatLegacyChip",
+            "index": 5,
+            "optional": false,
+            "declaration": "@Inject(DOCUMENT) _document: any",
+            "constructor_source": "constructor(\n    elementRef: ElementRef<HTMLElement>,\n    private _ngZone: NgZone,\n    platform: Platform,\n    @Optional()\n    @Inject(MAT_RIPPLE_GLOBAL_OPTIONS)\n    globalRippleOptions: RippleGlobalOptions | null,\n    private _changeDetectorRef: ChangeDetectorRef,\n    @Inject(DOCUMENT) _document: any,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n    @Attribute('tabindex') tabIndex?: string,\n  ) {\n    super(elementRef);\n\n    this._addHostClassName();\n\n    // Dynamically create the ripple target, append it within the chip, and use it as the\n    // chip's ripple target. Adding the class '.mat-chip-ripple' ensures that it will have\n    // the proper styles.\n    this._chipRippleTarget = _document.createElement('div');\n    this._chipRippleTarget.classList.add('mat-chip-ripple');\n    this._elementRef.nativeElement.appendChild(this._chipRippleTarget);\n    this._chipRipple = new RippleRenderer(this, _ngZone, this._chipRippleTarget, platform);\n    this._chipRipple.setupTriggerEvents(elementRef);\n\n    this.rippleConfig = globalRippleOptions || {};\n    this._animationsDisabled = animationMode === 'NoopAnimations';\n    this.tabIndex = tabIndex != null ? parseInt(tabIndex) || -1 : -1;\n  }"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/document-token-public-source-diagnostic.json",
+          "sha256": "3f71c712c86dcff0099ca22487e003f8fd3a5a26a6012f240abc080a07c89fd9"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/document-token-use-review.mjs",
+          "sha256": "15a29c33bc03315c0c275d0524dd487373880c2cda05f64da34a1d99ac1abcd7"
+        },
+        {
+          "path": "tests/document_token_public_probe.mjs",
+          "sha256": "f4069e3f5f338de3d39d7e4f95b48e61d308d323d10304d5c14dd00b9772e975"
+        },
+        {
+          "path": "tests/document_token_public_subject.mjs",
+          "sha256": "e974c1b225e37349b8d2f55dca73003c26dbedc2f448435a75d0f869533c854b"
+        },
+        {
+          "path": "tests/test_document_token_public.py",
+          "sha256": "f249821e0b38a956c4ca7edb1d40f63e72d7b0f8ae8659648ec1470d88b30fdc"
+        }
+      ]
+    },
+    {
+      "file": "legacy-progress-bar/internal/progress-bar-location.ts",
+      "module": "@angular/common",
+      "symbol": "DOCUMENT",
+      "candidate_source_sha256": "5a4c922b79216263125ce5dca54cee8fbcc07a8950f42aad51883c35383288cf",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "This current-added use is the required public inject(DOCUMENT) call in the complete owned MAT_PROGRESS_BAR_LOCATION_FACTORY. That whole function is executed with genuine Core DI and original/current public tokens against explicit null/empty/location protocols. Dynamic pathname plus search is re-read on each call and omits hash; static snapshot, missing search and substituted token controls fail. The root token factory and actual component/node/SSR renderer lifecycle are not claimed executed. This addition remains separate from the frozen roster. Whole SRI-authenticated original16.2.14 and both advertised minimum Core/Common namespaces retain a public nondeprecated InjectionToken<Document>. In both current minima, Common reexports the exact Core token; the original defines it in Common. Six dev/prod contexts pass96 assertions, replay all12 exact source annotation/inject expressions and10 constructor slots, and reject15 token/provider/whole-function controls. Ten actual source controls reject private or type-only imports, dropped optionality, cloned tokens, wrong parameter positions, shadowed bindings and changed inject calls. Close only the stable token dependency and explicit DI metadata boundary. Documents and metadata targets are protocols; there is no complete owned component, native DOM/SSR renderer, packed AOT, full Node/RxJS floor, upstream security or G11 qualification. No source/API/HTML/CSS/SCSS changes or consumer edits are required.",
+      "source_binding": {
+        "file": "legacy-progress-bar/internal/progress-bar-location.ts",
+        "module": "@angular/common",
+        "symbol": "DOCUMENT",
+        "frozen_use": false,
+        "local_name": "DOCUMENT",
+        "candidate_source_sha256": "5a4c922b79216263125ce5dca54cee8fbcc07a8950f42aad51883c35383288cf",
+        "references": [
+          {
+            "role": "public-inject-call",
+            "line": 33,
+            "expression": "inject(DOCUMENT)",
+            "optional": false
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/document-token-public-source-diagnostic.json",
+          "sha256": "3f71c712c86dcff0099ca22487e003f8fd3a5a26a6012f240abc080a07c89fd9"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/document-token-use-review.mjs",
+          "sha256": "15a29c33bc03315c0c275d0524dd487373880c2cda05f64da34a1d99ac1abcd7"
+        },
+        {
+          "path": "tests/document_token_public_probe.mjs",
+          "sha256": "f4069e3f5f338de3d39d7e4f95b48e61d308d323d10304d5c14dd00b9772e975"
+        },
+        {
+          "path": "tests/document_token_public_subject.mjs",
+          "sha256": "e974c1b225e37349b8d2f55dca73003c26dbedc2f448435a75d0f869533c854b"
+        },
+        {
+          "path": "tests/test_document_token_public.py",
+          "sha256": "f249821e0b38a956c4ca7edb1d40f63e72d7b0f8ae8659648ec1470d88b30fdc"
+        }
+      ]
+    },
+    {
+      "file": "legacy-core/internal/common-module.ts",
+      "module": "@angular/common",
+      "symbol": "DOCUMENT",
+      "candidate_source_sha256": "8f8d7dbcf89c151f6bb953f8a0e803b2d64cdb07fbcedfa460415c7f5c22afe6",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "This current-added use annotates the common-module constructor slot2 with required Inject(DOCUMENT), preserving the real document for its owned doctype/theme sanity checks. The high-contrast and public module behavior remain separate reviewed dependencies. It is accounted for as a current addition, rather than being inserted into the frozen1736-use denominator. Whole SRI-authenticated original16.2.14 and both advertised minimum Core/Common namespaces retain a public nondeprecated InjectionToken<Document>. In both current minima, Common reexports the exact Core token; the original defines it in Common. Six dev/prod contexts pass96 assertions, replay all12 exact source annotation/inject expressions and10 constructor slots, and reject15 token/provider/whole-function controls. Ten actual source controls reject private or type-only imports, dropped optionality, cloned tokens, wrong parameter positions, shadowed bindings and changed inject calls. Close only the stable token dependency and explicit DI metadata boundary. Documents and metadata targets are protocols; there is no complete owned component, native DOM/SSR renderer, packed AOT, full Node/RxJS floor, upstream security or G11 qualification. No source/API/HTML/CSS/SCSS changes or consumer edits are required.",
+      "source_binding": {
+        "file": "legacy-core/internal/common-module.ts",
+        "module": "@angular/common",
+        "symbol": "DOCUMENT",
+        "frozen_use": false,
+        "local_name": "DOCUMENT",
+        "candidate_source_sha256": "8f8d7dbcf89c151f6bb953f8a0e803b2d64cdb07fbcedfa460415c7f5c22afe6",
+        "references": [
+          {
+            "role": "constructor-token",
+            "line": 41,
+            "expression": "Inject(DOCUMENT)",
+            "class": "MatCommonModule",
+            "index": 2,
+            "optional": false,
+            "declaration": "@Inject(DOCUMENT) private _document: Document",
+            "constructor_source": "constructor(\n    highContrastModeDetector: HighContrastModeDetector,\n    @Optional() @Inject(MATERIAL_SANITY_CHECKS) private _sanityChecks: SanityChecks,\n    @Inject(DOCUMENT) private _document: Document,\n  ) {\n    // The public A11yModule import initializes high contrast and observes mode\n    // changes. Keep the historical constructor token without importing or\n    // copying the detector's private body-class/lifecycle implementation.\n    void highContrastModeDetector;\n\n    if (!this._hasDoneGlobalChecks) {\n      this._hasDoneGlobalChecks = true;\n\n      if (isDevMode()) {\n        // Inject in here so the reference to `Platform` can be removed in production mode.\n        const platform = inject(Platform, {optional: true});\n\n        if (this._checkIsEnabled('doctype')) {\n          _checkDoctypeIsDefined(this._document);\n        }\n\n        if (this._checkIsEnabled('theme')) {\n          _checkThemeIsPresent(this._document, !!platform?.isBrowser);\n        }\n\n        if (this._checkIsEnabled('version')) {\n          _checkCdkVersionMatch();\n        }\n      }\n    }\n  }"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/document-token-public-source-diagnostic.json",
+          "sha256": "3f71c712c86dcff0099ca22487e003f8fd3a5a26a6012f240abc080a07c89fd9"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/document-token-use-review.mjs",
+          "sha256": "15a29c33bc03315c0c275d0524dd487373880c2cda05f64da34a1d99ac1abcd7"
+        },
+        {
+          "path": "tests/document_token_public_probe.mjs",
+          "sha256": "f4069e3f5f338de3d39d7e4f95b48e61d308d323d10304d5c14dd00b9772e975"
+        },
+        {
+          "path": "tests/document_token_public_subject.mjs",
+          "sha256": "e974c1b225e37349b8d2f55dca73003c26dbedc2f448435a75d0f869533c854b"
+        },
+        {
+          "path": "tests/test_document_token_public.py",
+          "sha256": "f249821e0b38a956c4ca7edb1d40f63e72d7b0f8ae8659648ec1470d88b30fdc"
+        }
+      ]
+    },
+    {
+      "file": "legacy-progress-spinner/progress-spinner.ts",
+      "module": "@angular/common",
+      "symbol": "DOCUMENT",
+      "candidate_source_sha256": "85936bc7161a1dcbbc377fbf19c3de46b09f13a32adaa3d503d7dc09204c736c",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The public token remains optional in constructor slot2. The owned spinner still consumes document.head and creates its existing style nodes, including the separately owned CSP nonce path. Optional DI absence returns null, but this does not promise that the historical constructor body tolerates a null document. No style, nonce policy or null-handling behavior is changed or waived. Whole SRI-authenticated original16.2.14 and both advertised minimum Core/Common namespaces retain a public nondeprecated InjectionToken<Document>. In both current minima, Common reexports the exact Core token; the original defines it in Common. Six dev/prod contexts pass96 assertions, replay all12 exact source annotation/inject expressions and10 constructor slots, and reject15 token/provider/whole-function controls. Ten actual source controls reject private or type-only imports, dropped optionality, cloned tokens, wrong parameter positions, shadowed bindings and changed inject calls. Close only the stable token dependency and explicit DI metadata boundary. Documents and metadata targets are protocols; there is no complete owned component, native DOM/SSR renderer, packed AOT, full Node/RxJS floor, upstream security or G11 qualification. No source/API/HTML/CSS/SCSS changes or consumer edits are required.",
+      "source_binding": {
+        "file": "legacy-progress-spinner/progress-spinner.ts",
+        "module": "@angular/common",
+        "symbol": "DOCUMENT",
+        "frozen_use": true,
+        "local_name": "DOCUMENT",
+        "candidate_source_sha256": "85936bc7161a1dcbbc377fbf19c3de46b09f13a32adaa3d503d7dc09204c736c",
+        "references": [
+          {
+            "role": "constructor-token",
+            "line": 185,
+            "expression": "Inject(DOCUMENT)",
+            "class": "MatLegacyProgressSpinner",
+            "index": 2,
+            "optional": true,
+            "declaration": "@Optional() @Inject(DOCUMENT) private _document: any",
+            "constructor_source": "constructor(\n    elementRef: ElementRef<HTMLElement>,\n    _platform: Platform,\n    @Optional() @Inject(DOCUMENT) private _document: any,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode: string,\n    @Inject(MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS)\n    defaults?: MatProgressSpinnerDefaultOptions,\n    /**\n     * @deprecated `changeDetectorRef`, `viewportRuler` and `ngZone`\n     * parameters to become required.\n     * @breaking-change 14.0.0\n     */\n    changeDetectorRef?: ChangeDetectorRef,\n    viewportRuler?: ViewportRuler,\n    ngZone?: NgZone,\n    @Inject(CSP_NONCE) @Optional() private _nonce?: string | null,\n  ) {\n    super(elementRef);\n\n    const trackedDiameters = MatLegacyProgressSpinner._diameters;\n    this._spinnerAnimationLabel = this._getSpinnerAnimationLabel();\n\n    // The base size is already inserted via the component's structural styles. We still\n    // need to track it so we don't end up adding the same styles again.\n    if (!trackedDiameters.has(_document.head)) {\n      trackedDiameters.set(_document.head, new Set<number>([BASE_SIZE]));\n    }\n\n    this._noopAnimations =\n      animationMode === 'NoopAnimations' && !!defaults && !defaults._forceAnimations;\n\n    if (elementRef.nativeElement.nodeName.toLowerCase() === 'mat-spinner') {\n      this.mode = 'indeterminate';\n    }\n\n    if (defaults) {\n      if (defaults.color) {\n        this.color = this.defaultColor = defaults.color;\n      }\n\n      if (defaults.diameter) {\n        this.diameter = defaults.diameter;\n      }\n\n      if (defaults.strokeWidth) {\n        this.strokeWidth = defaults.strokeWidth;\n      }\n    }\n\n    // Safari has an issue where the circle isn't positioned correctly when the page has a\n    // different zoom level from the default. This handler triggers a recalculation of the\n    // `transform-origin` when the page zoom level changes.\n    // See `_getCircleTransformOrigin` for more info.\n    // @breaking-change 14.0.0 Remove null checks for `_changeDetectorRef`,\n    // `viewportRuler` and `ngZone`.\n    if (_platform.isBrowser && _platform.SAFARI && viewportRuler && changeDetectorRef && ngZone) {\n      this._resizeSubscription = viewportRuler.change(150).subscribe(() => {\n        // When the window is resize while the spinner is in `indeterminate` mode, we\n        // have to mark for check so the transform origin of the circle can be recomputed.\n        if (this.mode === 'indeterminate') {\n          ngZone.run(() => changeDetectorRef.markForCheck());\n        }\n      });\n    }\n  }"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/document-token-public-source-diagnostic.json",
+          "sha256": "3f71c712c86dcff0099ca22487e003f8fd3a5a26a6012f240abc080a07c89fd9"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/document-token-use-review.mjs",
+          "sha256": "15a29c33bc03315c0c275d0524dd487373880c2cda05f64da34a1d99ac1abcd7"
+        },
+        {
+          "path": "tests/document_token_public_probe.mjs",
+          "sha256": "f4069e3f5f338de3d39d7e4f95b48e61d308d323d10304d5c14dd00b9772e975"
+        },
+        {
+          "path": "tests/document_token_public_subject.mjs",
+          "sha256": "e974c1b225e37349b8d2f55dca73003c26dbedc2f448435a75d0f869533c854b"
+        },
+        {
+          "path": "tests/test_document_token_public.py",
+          "sha256": "f249821e0b38a956c4ca7edb1d40f63e72d7b0f8ae8659648ec1470d88b30fdc"
+        }
+      ]
+    },
+    {
+      "file": "legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "module": "@angular/common",
+      "symbol": "DOCUMENT",
+      "candidate_source_sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The public document token remains optional in constructor slot8 and is stored unchanged as a private parameter property. The owned trigger consumes document events and its defaultView fallback. This review retains original optional DI semantics while leaving the consumer body and native listener/window behavior to their own tests; no new promise of a null-safe full constructor is made. Whole SRI-authenticated original16.2.14 and both advertised minimum Core/Common namespaces retain a public nondeprecated InjectionToken<Document>. In both current minima, Common reexports the exact Core token; the original defines it in Common. Six dev/prod contexts pass96 assertions, replay all12 exact source annotation/inject expressions and10 constructor slots, and reject15 token/provider/whole-function controls. Ten actual source controls reject private or type-only imports, dropped optionality, cloned tokens, wrong parameter positions, shadowed bindings and changed inject calls. Close only the stable token dependency and explicit DI metadata boundary. Documents and metadata targets are protocols; there is no complete owned component, native DOM/SSR renderer, packed AOT, full Node/RxJS floor, upstream security or G11 qualification. No source/API/HTML/CSS/SCSS changes or consumer edits are required.",
+      "source_binding": {
+        "file": "legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+        "module": "@angular/common",
+        "symbol": "DOCUMENT",
+        "frozen_use": true,
+        "local_name": "DOCUMENT",
+        "candidate_source_sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1",
+        "references": [
+          {
+            "role": "constructor-token",
+            "line": 204,
+            "expression": "Inject(DOCUMENT)",
+            "class": "_MatAutocompleteTriggerBase",
+            "index": 8,
+            "optional": true,
+            "declaration": "@Optional() @Inject(DOCUMENT) private _document: any",
+            "constructor_source": "constructor(\n    private _element: ElementRef<HTMLInputElement>,\n    private _overlay: Overlay,\n    private _viewContainerRef: ViewContainerRef,\n    private _zone: NgZone,\n    private _changeDetectorRef: ChangeDetectorRef,\n    @Inject(MAT_AUTOCOMPLETE_SCROLL_STRATEGY) scrollStrategy: any,\n    @Optional() private _dir: Directionality | null,\n    @Optional() @Inject(MAT_FORM_FIELD) @Host() private _formField: MatFormField | null,\n    @Optional() @Inject(DOCUMENT) private _document: any,\n    private _viewportRuler: ViewportRuler,\n    @Optional()\n    @Inject(MAT_AUTOCOMPLETE_DEFAULT_OPTIONS)\n    private _defaults?: MatAutocompleteDefaultOptions | null,\n  ) {\n    this._scrollStrategy = scrollStrategy;\n    // The supplied public view injector also works for the historical manual\n    // constructor, which has no ambient Angular injection context.\n    this._breakpointObserver = this._viewContainerRef.injector.get(BreakpointObserver);\n  }"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/document-token-public-source-diagnostic.json",
+          "sha256": "3f71c712c86dcff0099ca22487e003f8fd3a5a26a6012f240abc080a07c89fd9"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/document-token-use-review.mjs",
+          "sha256": "15a29c33bc03315c0c275d0524dd487373880c2cda05f64da34a1d99ac1abcd7"
+        },
+        {
+          "path": "tests/document_token_public_probe.mjs",
+          "sha256": "f4069e3f5f338de3d39d7e4f95b48e61d308d323d10304d5c14dd00b9772e975"
+        },
+        {
+          "path": "tests/document_token_public_subject.mjs",
+          "sha256": "e974c1b225e37349b8d2f55dca73003c26dbedc2f448435a75d0f869533c854b"
+        },
+        {
+          "path": "tests/test_document_token_public.py",
+          "sha256": "f249821e0b38a956c4ca7edb1d40f63e72d7b0f8ae8659648ec1470d88b30fdc"
+        }
+      ]
+    },
+    {
+      "file": "legacy-tooltip/tooltip.ts",
+      "module": "@angular/common",
+      "symbol": "DOCUMENT",
+      "candidate_source_sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The required public document token remains in constructor slot11 and is forwarded unchanged into slot11 of the owned tooltip base. This preserves the historical constructor order and supplied document identity without introducing ambient DI into manual wrapper construction. Whole SRI-authenticated original16.2.14 and both advertised minimum Core/Common namespaces retain a public nondeprecated InjectionToken<Document>. In both current minima, Common reexports the exact Core token; the original defines it in Common. Six dev/prod contexts pass96 assertions, replay all12 exact source annotation/inject expressions and10 constructor slots, and reject15 token/provider/whole-function controls. Ten actual source controls reject private or type-only imports, dropped optionality, cloned tokens, wrong parameter positions, shadowed bindings and changed inject calls. Close only the stable token dependency and explicit DI metadata boundary. Documents and metadata targets are protocols; there is no complete owned component, native DOM/SSR renderer, packed AOT, full Node/RxJS floor, upstream security or G11 qualification. No source/API/HTML/CSS/SCSS changes or consumer edits are required.",
+      "source_binding": {
+        "file": "legacy-tooltip/tooltip.ts",
+        "module": "@angular/common",
+        "symbol": "DOCUMENT",
+        "frozen_use": true,
+        "local_name": "DOCUMENT",
+        "candidate_source_sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29",
+        "references": [
+          {
+            "role": "constructor-token",
+            "line": 69,
+            "expression": "Inject(DOCUMENT)",
+            "class": "MatLegacyTooltip",
+            "index": 11,
+            "optional": false,
+            "declaration": "@Inject(DOCUMENT) _document: any",
+            "constructor_source": "constructor(\n    overlay: Overlay,\n    elementRef: ElementRef<HTMLElement>,\n    scrollDispatcher: ScrollDispatcher,\n    viewContainerRef: ViewContainerRef,\n    ngZone: NgZone,\n    platform: Platform,\n    ariaDescriber: AriaDescriber,\n    focusMonitor: FocusMonitor,\n    @Inject(MAT_TOOLTIP_SCROLL_STRATEGY) scrollStrategy: any,\n    @Optional() dir: Directionality,\n    @Optional() @Inject(MAT_TOOLTIP_DEFAULT_OPTIONS) defaultOptions: MatTooltipDefaultOptions,\n    @Inject(DOCUMENT) _document: any,\n  ) {\n    super(\n      overlay,\n      elementRef,\n      scrollDispatcher,\n      viewContainerRef,\n      ngZone,\n      platform,\n      ariaDescriber,\n      focusMonitor,\n      scrollStrategy,\n      dir,\n      defaultOptions,\n      _document,\n    );\n  }"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/document-token-public-source-diagnostic.json",
+          "sha256": "3f71c712c86dcff0099ca22487e003f8fd3a5a26a6012f240abc080a07c89fd9"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/document-token-use-review.mjs",
+          "sha256": "15a29c33bc03315c0c275d0524dd487373880c2cda05f64da34a1d99ac1abcd7"
+        },
+        {
+          "path": "tests/document_token_public_probe.mjs",
+          "sha256": "f4069e3f5f338de3d39d7e4f95b48e61d308d323d10304d5c14dd00b9772e975"
+        },
+        {
+          "path": "tests/document_token_public_subject.mjs",
+          "sha256": "e974c1b225e37349b8d2f55dca73003c26dbedc2f448435a75d0f869533c854b"
+        },
+        {
+          "path": "tests/test_document_token_public.py",
+          "sha256": "f249821e0b38a956c4ca7edb1d40f63e72d7b0f8ae8659648ec1470d88b30fdc"
+        }
+      ]
+    },
+    {
+      "file": "legacy-tooltip/internal/tooltip-base.ts",
+      "module": "@angular/common",
+      "symbol": "DOCUMENT",
+      "candidate_source_sha256": "948fd1d57f52e617eca301b693261127e42b3e4d23d0db8b2a3e2f012db0a85d",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The required document token remains in constructor slot11 and is assigned to the existing owned Document field. The base uses elementFromPoint in its pointer path. That browser behavior, overlay scope and listener lifecycle remain separate obligations; the DI boundary proof neither substitutes a fake browser nor certifies them. Whole SRI-authenticated original16.2.14 and both advertised minimum Core/Common namespaces retain a public nondeprecated InjectionToken<Document>. In both current minima, Common reexports the exact Core token; the original defines it in Common. Six dev/prod contexts pass96 assertions, replay all12 exact source annotation/inject expressions and10 constructor slots, and reject15 token/provider/whole-function controls. Ten actual source controls reject private or type-only imports, dropped optionality, cloned tokens, wrong parameter positions, shadowed bindings and changed inject calls. Close only the stable token dependency and explicit DI metadata boundary. Documents and metadata targets are protocols; there is no complete owned component, native DOM/SSR renderer, packed AOT, full Node/RxJS floor, upstream security or G11 qualification. No source/API/HTML/CSS/SCSS changes or consumer edits are required.",
+      "source_binding": {
+        "file": "legacy-tooltip/internal/tooltip-base.ts",
+        "module": "@angular/common",
+        "symbol": "DOCUMENT",
+        "frozen_use": true,
+        "local_name": "DOCUMENT",
+        "candidate_source_sha256": "948fd1d57f52e617eca301b693261127e42b3e4d23d0db8b2a3e2f012db0a85d",
+        "references": [
+          {
+            "role": "constructor-token",
+            "line": 292,
+            "expression": "Inject(DOCUMENT)",
+            "class": "_MatTooltipBase",
+            "index": 11,
+            "optional": false,
+            "declaration": "@Inject(DOCUMENT) _document: any",
+            "constructor_source": "constructor(\n    private _overlay: Overlay,\n    private _elementRef: ElementRef<HTMLElement>,\n    private _scrollDispatcher: ScrollDispatcher,\n    private _viewContainerRef: ViewContainerRef,\n    private _ngZone: NgZone,\n    private _platform: Platform,\n    private _ariaDescriber: AriaDescriber,\n    private _focusMonitor: FocusMonitor,\n    scrollStrategy: any,\n    protected _dir: Directionality,\n    private _defaultOptions: MatTooltipDefaultOptions,\n    @Inject(DOCUMENT) _document: any,\n  ) {\n    this._scrollStrategy = scrollStrategy;\n    this._document = _document;\n\n    if (_defaultOptions) {\n      this._showDelay = _defaultOptions.showDelay;\n      this._hideDelay = _defaultOptions.hideDelay;\n\n      if (_defaultOptions.position) {\n        this.position = _defaultOptions.position;\n      }\n\n      if (_defaultOptions.positionAtOrigin) {\n        this.positionAtOrigin = _defaultOptions.positionAtOrigin;\n      }\n\n      if (_defaultOptions.touchGestures) {\n        this.touchGestures = _defaultOptions.touchGestures;\n      }\n    }\n\n    _dir.change.pipe(takeUntil(this._destroyed)).subscribe(() => {\n      if (this._overlayRef) {\n        this._updatePosition(this._overlayRef);\n      }\n    });\n  }"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/document-token-public-source-diagnostic.json",
+          "sha256": "3f71c712c86dcff0099ca22487e003f8fd3a5a26a6012f240abc080a07c89fd9"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/document-token-use-review.mjs",
+          "sha256": "15a29c33bc03315c0c275d0524dd487373880c2cda05f64da34a1d99ac1abcd7"
+        },
+        {
+          "path": "tests/document_token_public_probe.mjs",
+          "sha256": "f4069e3f5f338de3d39d7e4f95b48e61d308d323d10304d5c14dd00b9772e975"
+        },
+        {
+          "path": "tests/document_token_public_subject.mjs",
+          "sha256": "e974c1b225e37349b8d2f55dca73003c26dbedc2f448435a75d0f869533c854b"
+        },
+        {
+          "path": "tests/test_document_token_public.py",
+          "sha256": "f249821e0b38a956c4ca7edb1d40f63e72d7b0f8ae8659648ec1470d88b30fdc"
+        }
+      ]
+    },
+    {
+      "file": "legacy-slider/slider.ts",
+      "module": "@angular/common",
+      "symbol": "DOCUMENT",
+      "candidate_source_sha256": "2dd6d9756260ae23ce7fc1dd55fee8d001a678996f80af0bb04eeee766cb274d",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The required public token remains in constructor slot6 and is assigned unchanged to the owned Document field. Its downstream defaultView and pointer/document operations remain owned behavior. The public token and provider semantics are established here; native slider events and SSR behavior are not inferred from sentinel values. Whole SRI-authenticated original16.2.14 and both advertised minimum Core/Common namespaces retain a public nondeprecated InjectionToken<Document>. In both current minima, Common reexports the exact Core token; the original defines it in Common. Six dev/prod contexts pass96 assertions, replay all12 exact source annotation/inject expressions and10 constructor slots, and reject15 token/provider/whole-function controls. Ten actual source controls reject private or type-only imports, dropped optionality, cloned tokens, wrong parameter positions, shadowed bindings and changed inject calls. Close only the stable token dependency and explicit DI metadata boundary. Documents and metadata targets are protocols; there is no complete owned component, native DOM/SSR renderer, packed AOT, full Node/RxJS floor, upstream security or G11 qualification. No source/API/HTML/CSS/SCSS changes or consumer edits are required.",
+      "source_binding": {
+        "file": "legacy-slider/slider.ts",
+        "module": "@angular/common",
+        "symbol": "DOCUMENT",
+        "frozen_use": true,
+        "local_name": "DOCUMENT",
+        "candidate_source_sha256": "2dd6d9756260ae23ce7fc1dd55fee8d001a678996f80af0bb04eeee766cb274d",
+        "references": [
+          {
+            "role": "constructor-token",
+            "line": 530,
+            "expression": "Inject(DOCUMENT)",
+            "class": "MatLegacySlider",
+            "index": 6,
+            "optional": false,
+            "declaration": "@Inject(DOCUMENT) _document: any",
+            "constructor_source": "constructor(\n    elementRef: ElementRef,\n    private _focusMonitor: FocusMonitor,\n    private _changeDetectorRef: ChangeDetectorRef,\n    @Optional() private _dir: Directionality,\n    @Attribute('tabindex') tabIndex: string,\n    private _ngZone: NgZone,\n    @Inject(DOCUMENT) _document: any,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) public _animationMode?: string,\n  ) {\n    super(elementRef);\n    this._document = _document;\n    this.tabIndex = parseInt(tabIndex) || 0;\n\n    _ngZone.runOutsideAngular(() => {\n      const element = elementRef.nativeElement;\n      element.addEventListener('mousedown', this._pointerDown, activeEventOptions);\n      element.addEventListener('touchstart', this._pointerDown, activeEventOptions);\n    });\n  }"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/document-token-public-source-diagnostic.json",
+          "sha256": "3f71c712c86dcff0099ca22487e003f8fd3a5a26a6012f240abc080a07c89fd9"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/document-token-use-review.mjs",
+          "sha256": "15a29c33bc03315c0c275d0524dd487373880c2cda05f64da34a1d99ac1abcd7"
+        },
+        {
+          "path": "tests/document_token_public_probe.mjs",
+          "sha256": "f4069e3f5f338de3d39d7e4f95b48e61d308d323d10304d5c14dd00b9772e975"
+        },
+        {
+          "path": "tests/document_token_public_subject.mjs",
+          "sha256": "e974c1b225e37349b8d2f55dca73003c26dbedc2f448435a75d0f869533c854b"
+        },
+        {
+          "path": "tests/test_document_token_public.py",
+          "sha256": "f249821e0b38a956c4ca7edb1d40f63e72d7b0f8ae8659648ec1470d88b30fdc"
+        }
+      ]
+    },
+    {
+      "file": "legacy-snack-bar/internal/snack-bar-container-base.ts",
+      "module": "@angular/common",
+      "symbol": "DOCUMENT",
+      "candidate_source_sha256": "e05fbb1a107b185b873a675ede5401101da24c1af0733a73eacda0609d4f88c3",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The existing private field initializer remains the public inject(DOCUMENT) call with one argument and required resolution. Its exact expression is replayed inside genuine public injection contexts. The stored document is subsequently used to query modals; complete container construction, overlay handling and native modal queries remain separate obligations. Whole SRI-authenticated original16.2.14 and both advertised minimum Core/Common namespaces retain a public nondeprecated InjectionToken<Document>. In both current minima, Common reexports the exact Core token; the original defines it in Common. Six dev/prod contexts pass96 assertions, replay all12 exact source annotation/inject expressions and10 constructor slots, and reject15 token/provider/whole-function controls. Ten actual source controls reject private or type-only imports, dropped optionality, cloned tokens, wrong parameter positions, shadowed bindings and changed inject calls. Close only the stable token dependency and explicit DI metadata boundary. Documents and metadata targets are protocols; there is no complete owned component, native DOM/SSR renderer, packed AOT, full Node/RxJS floor, upstream security or G11 qualification. No source/API/HTML/CSS/SCSS changes or consumer edits are required.",
+      "source_binding": {
+        "file": "legacy-snack-bar/internal/snack-bar-container-base.ts",
+        "module": "@angular/common",
+        "symbol": "DOCUMENT",
+        "frozen_use": true,
+        "local_name": "DOCUMENT",
+        "candidate_source_sha256": "e05fbb1a107b185b873a675ede5401101da24c1af0733a73eacda0609d4f88c3",
+        "references": [
+          {
+            "role": "public-inject-call",
+            "line": 35,
+            "expression": "inject(DOCUMENT)",
+            "optional": false
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/document-token-public-source-diagnostic.json",
+          "sha256": "3f71c712c86dcff0099ca22487e003f8fd3a5a26a6012f240abc080a07c89fd9"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/document-token-use-review.mjs",
+          "sha256": "15a29c33bc03315c0c275d0524dd487373880c2cda05f64da34a1d99ac1abcd7"
+        },
+        {
+          "path": "tests/document_token_public_probe.mjs",
+          "sha256": "f4069e3f5f338de3d39d7e4f95b48e61d308d323d10304d5c14dd00b9772e975"
+        },
+        {
+          "path": "tests/document_token_public_subject.mjs",
+          "sha256": "e974c1b225e37349b8d2f55dca73003c26dbedc2f448435a75d0f869533c854b"
+        },
+        {
+          "path": "tests/test_document_token_public.py",
+          "sha256": "f249821e0b38a956c4ca7edb1d40f63e72d7b0f8ae8659648ec1470d88b30fdc"
+        }
+      ]
+    },
+    {
+      "file": "legacy-menu/menu-content.ts",
+      "module": "@angular/common",
+      "symbol": "DOCUMENT",
+      "candidate_source_sha256": "f682059286b3dd21faf6676cfe5e6c36d4f9ab08e515f1c76f7f31e6b2b506af",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The public Inject(DOCUMENT) annotation remains on constructor slot4 and passes the same supplied document into the owned menu-content base in slot4. There is no separate provider, document replacement or API change in this wrapper. Whole SRI-authenticated original16.2.14 and both advertised minimum Core/Common namespaces retain a public nondeprecated InjectionToken<Document>. In both current minima, Common reexports the exact Core token; the original defines it in Common. Six dev/prod contexts pass96 assertions, replay all12 exact source annotation/inject expressions and10 constructor slots, and reject15 token/provider/whole-function controls. Ten actual source controls reject private or type-only imports, dropped optionality, cloned tokens, wrong parameter positions, shadowed bindings and changed inject calls. Close only the stable token dependency and explicit DI metadata boundary. Documents and metadata targets are protocols; there is no complete owned component, native DOM/SSR renderer, packed AOT, full Node/RxJS floor, upstream security or G11 qualification. No source/API/HTML/CSS/SCSS changes or consumer edits are required.",
+      "source_binding": {
+        "file": "legacy-menu/menu-content.ts",
+        "module": "@angular/common",
+        "symbol": "DOCUMENT",
+        "frozen_use": true,
+        "local_name": "DOCUMENT",
+        "candidate_source_sha256": "f682059286b3dd21faf6676cfe5e6c36d4f9ab08e515f1c76f7f31e6b2b506af",
+        "references": [
+          {
+            "role": "constructor-token",
+            "line": 37,
+            "expression": "Inject(DOCUMENT)",
+            "class": "MatLegacyMenuContent",
+            "index": 4,
+            "optional": false,
+            "declaration": "@Inject(DOCUMENT) document: any",
+            "constructor_source": "constructor(\n    template: TemplateRef<any>,\n    appRef: ApplicationRef,\n    injector: Injector,\n    viewContainerRef: ViewContainerRef,\n    @Inject(DOCUMENT) document: any,\n    changeDetectorRef: ChangeDetectorRef,\n  ) {\n    super(template, appRef, injector, viewContainerRef, document, changeDetectorRef);\n  }"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/document-token-public-source-diagnostic.json",
+          "sha256": "3f71c712c86dcff0099ca22487e003f8fd3a5a26a6012f240abc080a07c89fd9"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/document-token-use-review.mjs",
+          "sha256": "15a29c33bc03315c0c275d0524dd487373880c2cda05f64da34a1d99ac1abcd7"
+        },
+        {
+          "path": "tests/document_token_public_probe.mjs",
+          "sha256": "f4069e3f5f338de3d39d7e4f95b48e61d308d323d10304d5c14dd00b9772e975"
+        },
+        {
+          "path": "tests/document_token_public_subject.mjs",
+          "sha256": "e974c1b225e37349b8d2f55dca73003c26dbedc2f448435a75d0f869533c854b"
+        },
+        {
+          "path": "tests/test_document_token_public.py",
+          "sha256": "f249821e0b38a956c4ca7edb1d40f63e72d7b0f8ae8659648ec1470d88b30fdc"
+        }
+      ]
+    },
+    {
+      "file": "legacy-menu/internal/menu-content-base.ts",
+      "module": "@angular/common",
+      "symbol": "DOCUMENT",
+      "candidate_source_sha256": "b0118e2200c6cf629bf5ca181277fb4e08d381c595aacc528d6f5724f416503f",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The public token remains a required Inject annotation on constructor slot4. The base retains the supplied document as a private parameter property and uses it to create the lazy-content portal container. This boundary review preserves the injected object; portal attachment, lazy detachment and document DOM operations remain separate behavior obligations. Whole SRI-authenticated original16.2.14 and both advertised minimum Core/Common namespaces retain a public nondeprecated InjectionToken<Document>. In both current minima, Common reexports the exact Core token; the original defines it in Common. Six dev/prod contexts pass96 assertions, replay all12 exact source annotation/inject expressions and10 constructor slots, and reject15 token/provider/whole-function controls. Ten actual source controls reject private or type-only imports, dropped optionality, cloned tokens, wrong parameter positions, shadowed bindings and changed inject calls. Close only the stable token dependency and explicit DI metadata boundary. Documents and metadata targets are protocols; there is no complete owned component, native DOM/SSR renderer, packed AOT, full Node/RxJS floor, upstream security or G11 qualification. No source/API/HTML/CSS/SCSS changes or consumer edits are required.",
+      "source_binding": {
+        "file": "legacy-menu/internal/menu-content-base.ts",
+        "module": "@angular/common",
+        "symbol": "DOCUMENT",
+        "frozen_use": true,
+        "local_name": "DOCUMENT",
+        "candidate_source_sha256": "b0118e2200c6cf629bf5ca181277fb4e08d381c595aacc528d6f5724f416503f",
+        "references": [
+          {
+            "role": "constructor-token",
+            "line": 39,
+            "expression": "Inject(DOCUMENT)",
+            "class": "_MatMenuContentBase",
+            "index": 4,
+            "optional": false,
+            "declaration": "@Inject(DOCUMENT) private _document: any",
+            "constructor_source": "constructor(\n    private _template: TemplateRef<any>,\n    private _appRef: ApplicationRef,\n    private _injector: Injector,\n    private _viewContainerRef: ViewContainerRef,\n    @Inject(DOCUMENT) private _document: any,\n    private _changeDetectorRef: ChangeDetectorRef,\n  ) {}"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/document-token-public-source-diagnostic.json",
+          "sha256": "3f71c712c86dcff0099ca22487e003f8fd3a5a26a6012f240abc080a07c89fd9"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/document-token-use-review.mjs",
+          "sha256": "15a29c33bc03315c0c275d0524dd487373880c2cda05f64da34a1d99ac1abcd7"
+        },
+        {
+          "path": "tests/document_token_public_probe.mjs",
+          "sha256": "f4069e3f5f338de3d39d7e4f95b48e61d308d323d10304d5c14dd00b9772e975"
+        },
+        {
+          "path": "tests/document_token_public_subject.mjs",
+          "sha256": "e974c1b225e37349b8d2f55dca73003c26dbedc2f448435a75d0f869533c854b"
+        },
+        {
+          "path": "tests/test_document_token_public.py",
+          "sha256": "f249821e0b38a956c4ca7edb1d40f63e72d7b0f8ae8659648ec1470d88b30fdc"
+        }
+      ]
+    },
+    {
+      "file": "legacy-tabs/tab-body.ts",
+      "module": "@angular/common",
+      "symbol": "DOCUMENT",
+      "candidate_source_sha256": "7560de8c08198b04eddb701df4008225bbaa1f93847de7a17439295fec85fd80",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The required document annotation remains on the portal directive constructor slot2, alongside the existing tab-body host and view container parameters. The historical parameter remains unused in that constructor body. No constructor parameter removal or peer service construction is proposed. Whole SRI-authenticated original16.2.14 and both advertised minimum Core/Common namespaces retain a public nondeprecated InjectionToken<Document>. In both current minima, Common reexports the exact Core token; the original defines it in Common. Six dev/prod contexts pass96 assertions, replay all12 exact source annotation/inject expressions and10 constructor slots, and reject15 token/provider/whole-function controls. Ten actual source controls reject private or type-only imports, dropped optionality, cloned tokens, wrong parameter positions, shadowed bindings and changed inject calls. Close only the stable token dependency and explicit DI metadata boundary. Documents and metadata targets are protocols; there is no complete owned component, native DOM/SSR renderer, packed AOT, full Node/RxJS floor, upstream security or G11 qualification. No source/API/HTML/CSS/SCSS changes or consumer edits are required.",
+      "source_binding": {
+        "file": "legacy-tabs/tab-body.ts",
+        "module": "@angular/common",
+        "symbol": "DOCUMENT",
+        "frozen_use": true,
+        "local_name": "DOCUMENT",
+        "candidate_source_sha256": "7560de8c08198b04eddb701df4008225bbaa1f93847de7a17439295fec85fd80",
+        "references": [
+          {
+            "role": "constructor-token",
+            "line": 47,
+            "expression": "Inject(DOCUMENT)",
+            "class": "MatLegacyTabBodyPortal",
+            "index": 2,
+            "optional": false,
+            "declaration": "@Inject(DOCUMENT) _document: any",
+            "constructor_source": "constructor(\n    viewContainerRef: ViewContainerRef,\n    @Inject(forwardRef(() => MatLegacyTabBody)) private _host: MatLegacyTabBody,\n    @Inject(DOCUMENT) _document: any,\n  ) {\n    super();\n  }"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/document-token-public-source-diagnostic.json",
+          "sha256": "3f71c712c86dcff0099ca22487e003f8fd3a5a26a6012f240abc080a07c89fd9"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/document-token-use-review.mjs",
+          "sha256": "15a29c33bc03315c0c275d0524dd487373880c2cda05f64da34a1d99ac1abcd7"
+        },
+        {
+          "path": "tests/document_token_public_probe.mjs",
+          "sha256": "f4069e3f5f338de3d39d7e4f95b48e61d308d323d10304d5c14dd00b9772e975"
+        },
+        {
+          "path": "tests/document_token_public_subject.mjs",
+          "sha256": "e974c1b225e37349b8d2f55dca73003c26dbedc2f448435a75d0f869533c854b"
+        },
+        {
+          "path": "tests/test_document_token_public.py",
+          "sha256": "f249821e0b38a956c4ca7edb1d40f63e72d7b0f8ae8659648ec1470d88b30fdc"
+        }
+      ]
+    }
+  ]
+}
