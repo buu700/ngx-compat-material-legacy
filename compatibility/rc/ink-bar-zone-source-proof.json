@@ -1,0 +1,186 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "status": "reproduced and repaired zoneless alignment; genuine zoneful/type/source checks passed; packed native validation pending",
+  "recorded_at_utc": "2026-10-10T02:04:55.230281+00:00",
+  "source_heads": {
+    "main": "1cc9b31dd53c39682856f856fd2e4a21a62f333a",
+    "21.x": "3da82f7b9d0bca9aa5f63662a9714ab0f7123e38"
+  },
+  "source_trees": {
+    "main": "889e5f53c69caa8d48d49fd669036073932cd38f",
+    "21.x": "7b690e0b96ac51ce42666b3dad15e28b001f481d"
+  },
+  "problem": "The whole candidate MatLegacyInkBar becomes visible but never writes left/width in a genuine public-provider zoneless NgZone, because onStable never emits. Tagged16 class exhibits the same missing behavior when placed in that current environment; its supported original zoneful behavior passes.",
+  "repair": "Inside public NgZone.run, position immediately if public isStable remains true; otherwise retain the historical onStable.pipe(take(1)) callback. This handles transparent/stable zones through public behavior, without importing or identifying a private NoopNgZone class. No new timer, subscription, destroy hook, constructor argument or public API is introduced.",
+  "preserved": {
+    "constructor_parameters": 4,
+    "selector": "mat-ink-bar",
+    "host_metadata": true,
+    "show_hide_methods": true,
+    "whole_positioner_factory_equals_tag": true,
+    "style_properties": [
+      "visibility",
+      "left",
+      "width"
+    ],
+    "HTML_CSS_SCSS_files_changed": false,
+    "consumer_changes_required": false,
+    "goldens_changed": false
+  },
+  "tests": {
+    "python_runtime_tests": 1,
+    "runtime_elapsed_seconds": 9.942,
+    "runtime_subjects": 10,
+    "states_per_subject": 5,
+    "source_mutations": 4,
+    "runtime_mutations": 10,
+    "zoneful_genuine_original_equivalence": true,
+    "zoneless_provider_genuine_without_zone_global": true,
+    "minimum_typescript": "5.9.2",
+    "strict_skipLibCheck_false": true,
+    "negative_type_checks_per_subject": 7,
+    "native_predicate_tests": 1,
+    "native_predicate_elapsed_seconds": 0.068,
+    "browser_source_identity_tests": 2,
+    "browser_source_identity_elapsed_seconds": 1.535,
+    "browser_source_identity_rejections": 8,
+    "browser_source_completion_scenarios": 6,
+    "browser_source_completion_mutation_rejected": 1,
+    "native_or_packed_browser_executed": false
+  },
+  "runtime_scope": "Whole untouched tagged and current owned classes decorated with genuine public core values; real NgZone constructed with authenticated peer-compatible Node Zone.js; actual public provideZonelessChangeDetection/environment injector supplies zone without Zone.js. Element/styles/offsets and import positioner token remain explicit diagnostics, not native or actual packaged node DI. Original Angular16 has no stable corresponding zoneless provider.",
+  "public_contracts": "NgZone, its readonly isStable and public run/onStable, and current provideZonelessChangeDetection declarations are stable/nondeprecated at their authenticated actual minima. Entire owned class strict type fixtures use exact pinned line compilers; cross-line auxiliary fixtures do not change floors.",
+  "execution_environment": {
+    "host_node": "22.23.3",
+    "borrowed_rxjs": "7.8.2",
+    "borrowed_tslib": "2.8.1",
+    "original_zone_js": "0.13.3",
+    "minimum_workspace_zone_js": "0.16.3",
+    "full_Node_Rx_browser_floor_qualification": false
+  },
+  "native_producer": "The existing packed browser-overlay producer now requires first/second/first active label and exact historical offsetLeft/offsetWidth alignment of mat-ink-bar, with positive measured width. The new observation predicate rejects missing, stale, wrong index, wrong geometry and failed observations. No extra browser matrix cells are credited.",
+  "harness_repairs": [
+    "Initial static Zone closure scan only recognized require. Inspected authenticated0.16.3 Node entry and explicitly bound its __require wrapper plus one require.apply forwarder and the same four literal Node builtins. Whole file/member/capsule hashes remain fixed; no source/golden weakened.",
+    "One local browser identity invocation lacked NODE_PATH; rerun with the existing borrowed dependency path passed. No dependency install.",
+    "A guarded21 copy stopped on its genuine branch-specific TS option difference; only the bounded browser source hunks were applied, preserving21 configuration. No-test selections during that stopped copy were not counted as executed tests."
+  ],
+  "cyph_sanity": {
+    "head": "a56a0603636cac5aaabe8fe408f7429b4224f011",
+    "read_only": true,
+    "clean": true,
+    "consumer_build_executed": false,
+    "sources": [
+      {
+        "path": "/home/parallels/cyph/shared/js/cyph/components/account-contacts/account-contacts.component.scss",
+        "sha256": "2daf19b04ed2706167bae5de78282a5727da658b561c89cbfc9a5d033c3f6d61"
+      },
+      {
+        "path": "/home/parallels/cyph/shared/js/cyph/components/account-contacts/account-contacts.component.html",
+        "sha256": "907c84cca8361acef721edb542ad391d0e2c1382cce77b1079422c44fa9f6157"
+      },
+      {
+        "path": "/home/parallels/cyph/shared/js/cyph/components/account-wallets/account-wallets.component.html",
+        "sha256": "398cc6533da794348a623a24ede839a16cda6f3eb85a2494e6a079e2e53959c8"
+      },
+      {
+        "path": "/home/parallels/cyph/shared/js/cyph/components/account-pgp/account-pgp.component.html",
+        "sha256": "860b6cc45402ba7fce67532b9805c59e2f3a321e6f5dfb4e12ad8918645fd73e"
+      },
+      {
+        "path": "/home/parallels/cyph/shared/js/cyph/components/help/help.component.html",
+        "sha256": "651b60ee6134abfb482184dd5e855150933bcf15e5ce1cb89b92ce342343b603"
+      },
+      {
+        "path": "/home/parallels/cyph/shared/js/cyph/components/account-register/account-register.component.html",
+        "sha256": "29fcf4bb13a0dbfe91292455ca3e4adec64b7c6cb88a543a9bf14e111b444b12"
+      }
+    ],
+    "observations": [
+      "Five actual tab-group template sources inspected. No direct MatLegacyInkBar constructor/identifier found in non-spec shared/js source scan.",
+      "Account-contacts SCSS targets mat-tab-group ::ng-deep .mat-ink-bar/.mat-tab-label with width/min-width/max-width calc(50% - 1px) !important. Selector/class and style properties stay historical; this consumer rule needs no edit."
+    ],
+    "api_html_css_scss_changes_required": false
+  },
+  "evidence": [
+    {
+      "path": "compatibility/rc/ink-bar-zone-source-diagnostic.json",
+      "sha256": "74c5141d34fa4db773ce016ee164eeab0c25ec6cbeb88df5db6e3d297550818f"
+    },
+    {
+      "path": "compatibility/rc/ink-bar-zone-prerepair-lead.json",
+      "sha256": "9bd359231a0cce709498b028f9b7b553b7863023a42ddfe67f9a0f47c208029f"
+    },
+    {
+      "path": "compatibility/rc/ink-bar-zone-binding-refresh.json",
+      "sha256": "d546e426cc8f485aa9a9302c62c44a86b4e299d1a58fe6c6e09a8b81f63d3219"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/ink-bar.ts",
+      "sha256": "739dd3b4acb9c0d9eba8039d47c0d8e7f07d045c6880cfecda4df5168ec28ff3"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/internal/ink-bar-shared.ts",
+      "sha256": "ba5f8e98a683790f3f3f53b435ec87efd22cdbfad7b715f860feb9ddd670a5e1"
+    },
+    {
+      "path": "scripts/ng-zone-public-subjects.mjs",
+      "sha256": "0eb7c8966e8c1e8fc0e974a2c25f48e32c28a7d5b6f7448df839a6e67866763d"
+    },
+    {
+      "path": "compatibility/rc/ng-zone-public-subjects.json",
+      "sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175"
+    },
+    {
+      "path": "scripts/legacy-ink-bar-native-contract.mjs",
+      "sha256": "0cbbee4387fe333f3709a49aed5121ea727920ac6c7454dc6dec960ebcb81923"
+    },
+    {
+      "path": "scripts/browser-overlay-families.mjs",
+      "sha256": "d01414f9f007ba1b95ba1db44d6324671267c12065716a7c121010347e8b0264"
+    },
+    {
+      "path": "tests/ink_bar_zone_runtime_probe.mjs",
+      "sha256": "13f99f71dd2a5201273f25adfffb6f6899cb482b5f6d58a3499a2f8915f9e289"
+    },
+    {
+      "path": "tests/test_ink_bar_zone_runtime.py",
+      "sha256": "51d667e81606879edbe0e27df3bc63c7e08bf9a45a04ec65513e0324220ddc9b"
+    },
+    {
+      "path": "tests/test_legacy_ink_bar_native_contract.py",
+      "sha256": "d79f6c6833c6063bd0b69f7160094aa090b7d135065508763321b94d2ba67ccc"
+    },
+    {
+      "path": "reference/material-16.2.14/ink-bar-zone-sources/ink-bar.ts",
+      "sha256": "b7dfb4ce490555fcf415d2e0123ff3ce388c8843594c35688bfeaca7693af25f"
+    },
+    {
+      "path": "reference/material-16.2.14/ink-bar-zone-sources/ink-bar-shared.ts",
+      "sha256": "77bf032d56af3e7bde5de166702761203e78974f466bccb1587be0ced392ee52"
+    },
+    {
+      "path": "scripts/material-public-subjects.mjs",
+      "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+    },
+    {
+      "path": "compatibility/rc/material-public-subjects.json",
+      "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+    }
+  ],
+  "prior_five_import_reviews_refreshed": 5,
+  "new_frozen_use_closures": 0,
+  "NgZone_frozen_uses_still_pending": 25,
+  "reviewed_total_unchanged": 1244,
+  "open_total_unchanged": 492,
+  "new_SHA_closures": 0,
+  "g11_claim": "not-passed",
+  "pushed": false,
+  "actions_started": false,
+  "open_obligations": [
+    "Current source-matched packed zoneful/zoneless native tab layout, dynamic/late labels, resize and CSS transition review; preserve full browser matrix/G02/G10 obligations.",
+    "Continue all remaining actual NgZone stable/microtask callers, including autocomplete closing actions and option streams, tooltip positioning, select streams/positioning and form-field outline timing. Do not admit the25 frozen NgZone imports solely because this ink-bar case passes.",
+    "All consumer Node/Rx floors, packed/AOT/full legacy classes,651 Sass cases/498 mixins,1697 substantive SHA/security decisions and C05/A01-A10/R01-R03/G01-G13 remain required."
+  ],
+  "next_action": "Reproduce and repair remaining zoneless stable-event callers using genuine public environments and whole tagged/owned bodies. Keep full packed/native builds and Actions deferred until implementation plausibly complete."
+}
