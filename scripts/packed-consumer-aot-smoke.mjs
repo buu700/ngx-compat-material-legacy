@@ -32,6 +32,8 @@ import {fileURLToPath} from 'node:url';
 import {spawnSync} from 'node:child_process';
 import {floorConfigurations,candidateFloorConfigurations} from './consumer-floor-roster.mjs';
 import {bundleConsumerHarness} from './bundle-consumer-harness.mjs';
+import {valueAccessorPackedFixture} from './value-accessor-packed-fixture.mjs';
+import {packedValueAccessorCases} from './value-accessor-packed-contract.mjs';
 import {assertEngineFreeConsumer, assertEngineFreeHarnessInputs} from './consumer-animation-engine.mjs';
 import {
   allConsumerCaseIds,
@@ -460,6 +462,7 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
     if (item.result !== 'pass' && !item.failure) item.failure = 'AOT scope did not succeed';
   }
   const parsed = result.harness && result.harness.result ? result.harness.result : {};
+  const valueAccessorCases = new Map(packedValueAccessorCases(parsed.valueAccessorRegistration).map(row => [row.case_id, row]));
   const harnessMap = {
     'packed-consumer/harness/legacy-button': parsed.buttonText === 'Go',
     'packed-consumer/harness/legacy-select': parsed.selectOpened === true && parsed.selectClosed === true && parsed.viewportShared === true,
@@ -517,6 +520,7 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
       const ok = Boolean(result.peer && result.peer.ok);
       return {case_id: caseId, result: ok ? 'pass' : 'fail', legacy_path: result.peer ? result.peer.legacy_path : null, peer_path: result.peer ? result.peer.peer_path : null, failure: ok ? null : 'peer harness was not compiled in a separate scope'};
     }
+    if (valueAccessorCases.has(caseId)) return valueAccessorCases.get(caseId);
     const ok = harnessMap[caseId] === true;
     return {case_id: caseId, result: ok ? 'pass' : 'fail', failure: ok ? null : 'harness behavior did not match the reviewed fixture'};
   });
@@ -860,6 +864,8 @@ platformBrowserDynamic().bootstrapModule(AotSmokeModule).catch(err => console.er
   }
 
   if (!skipHarness && aotOk) {
+    writeFileSync(join(consumer, 'src/value-accessor-probe.ts'), valueAccessorPackedFixture());
+    writeFileSync(join(consumer, 'src/value-accessor-contract.mjs'), readFileSync(join(root, 'scripts/value-accessor-packed-contract.mjs')));
     writeFileSync(
       join(consumer, 'src/harness-runtime.ts'),
       `import {JSDOM} from 'jsdom';
@@ -904,6 +910,7 @@ import '@angular/compiler';
 import {Component, Directive, ElementRef, TemplateRef, ViewChild, Injector, ViewContainerRef, EventEmitter, InjectionToken, ANIMATION_MODULE_TYPE, NgZone, inject, isDevMode, createEnvironmentInjector, createNgModule, EnvironmentInjector, IterableDiffers, SimpleChange, runInInjectionContext} from '@angular/core';
 import {Subject} from 'rxjs';
 import {FormControl, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {observePackedValueAccessors} from './value-accessor-probe';
 import {MatStepperModule, MatStepper} from '@angular/material/stepper';
 import {MatTabContent,MatTabLabel} from '@angular/material/tabs';
 import {_LegacyViewport} from '@ngx-compat/material-legacy/legacy-core';
@@ -1886,7 +1893,9 @@ async function main() {
     &&contrastLifecycle
     &&sanityWarnings.length===(checksEnabled?1:0)
     &&(!checksEnabled||sanityWarnings[0].includes('Current document does not have a doctype.'));
+  const valueAccessors=await observePackedValueAccessors();
   const out = {
+    valueAccessorRegistration:valueAccessors.rows,
     ok:
       text === 'Go' &&
       isOpen === false &&
@@ -1899,7 +1908,7 @@ async function main() {
       selectOpened === true &&
       selectClosed === true &&
       tabCount === 2 &&
-      selected === 'Two' && viewportShared && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && chipDisabledIsolation && selectionComparatorExposure && legacyBidiScope && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor && tabContentOriginalConstructor && noDataRowOriginalConstructor && constructorBorrowedProviderLifecycle && tableOriginalStickyBehavior && tableOriginalBooleanInputs && tableRecycleRowIdentity && tableDefinitionOriginalConstructors && tableAngularDiConstruction && tableOutletAndDefinitionOwnership && tabLabelOriginalConstructor && engineFreeAnimationPolicy,
+      selected === 'Two' && viewportShared && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && chipDisabledIsolation && selectionComparatorExposure && legacyBidiScope && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor && tabContentOriginalConstructor && noDataRowOriginalConstructor && constructorBorrowedProviderLifecycle && tableOriginalStickyBehavior && tableOriginalBooleanInputs && tableRecycleRowIdentity && tableDefinitionOriginalConstructors && tableAngularDiConstruction && tableOutletAndDefinitionOwnership && tabLabelOriginalConstructor && valueAccessors.okay && engineFreeAnimationPolicy,
     buttonText: text,
     selectIsOpen: isOpen,
     dialogText,

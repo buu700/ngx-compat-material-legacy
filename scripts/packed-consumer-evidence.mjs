@@ -61,6 +61,12 @@ export const HARNESS_CASE_IDS = [
   'packed-consumer/harness/table-angular-di-construction',
   'packed-consumer/harness/table-definition-original-constructors',
   'packed-consumer/harness/tab-label-original-constructor-and-nearest-tab',
+  'packed-consumer/harness/value-accessor-autocomplete',
+  'packed-consumer/harness/value-accessor-checkbox',
+  'packed-consumer/harness/value-accessor-selection-list',
+  'packed-consumer/harness/value-accessor-radio',
+  'packed-consumer/harness/value-accessor-slide-toggle',
+  'packed-consumer/harness/value-accessor-slider',
   'packed-consumer/harness/owned-resolution',
   'packed-consumer/harness/peer-harness-separate-scope',
 ];
