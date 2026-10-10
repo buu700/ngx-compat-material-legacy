@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "recorded_at_utc": "2026-10-10T07:26:51.494347+00:00",
+  "status": "source lifecycle defect reproduced; remediation pending",
+  "source_heads": {
+    "main": "c3a0d7e43af06b4982ad64dcb2c174b852cb88a2",
+    "21.x": "f73ea4d2b213f6b52c2260fd00e9cca86e7c1cdb"
+  },
+  "candidate_source": {
+    "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts",
+    "sha256": "bef6552aaf4a39e6b9091e8b39e75d2bbedf26cf51c3360a1dad5482d25248cc"
+  },
+  "reproduction": {
+    "path": "compatibility/rc/snack-announcement-destruction-baseline.json",
+    "sha256": "1a9cd5f5812611f756db035bcf8254dea92642c5fd50954c5c5225a62869d305"
+  },
+  "trigger": "enter() starts the 150ms screen-reader announcement timer; direct ngOnDestroy() without exit() leaves the timer pending. If the host retains its inert/live children, the later callback removes aria-hidden, moves the content and emits _onAnnounce after destruction.",
+  "observed_subjects": "Whole tagged and current owned class bodies, three authenticated framework namespaces, genuine public zoneful NgZone and Injector/DOCUMENT, controlled host/timer/portal/CDR/platform/config protocols. Both original and current bodies retain one timer and produce one late DOM move and announcement in all three namespace subjects.",
+  "correction": "The earlier snack-exit-source-proof phrase that motion and announcement timers clear on exit/destruction was too broad: destroyBeforeMotion invokes ref.dismiss() first, and exit() clears the announcement timer before destruction. Its host querySelector also returns null. That case does not test direct destruction with pending announcement content. The prior run remains historical evidence of its narrower dismissal path.",
+  "next_repair": "Add private destruction cancellation and a destroyed guard against an already captured late callback. Extend the whole source replay with real enter(), inert/live DOM protocols, normal live announcement, dismiss-first cancellation, direct destruction, and late delivery controls; preserve the five-argument constructor and existing public declarations. Recheck current import bindings after the product source changes.",
+  "required_consumer_HTML_CSS_SCSS_changes": false,
+  "actual_legacy_node_DI_or_portal_or_native_or_screen_reader_qualification": false,
+  "g11_claim": "not-passed"
+}
