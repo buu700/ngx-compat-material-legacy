@@ -20,7 +20,7 @@ import {inventoryNgZoneUses} from './scripts/ng-zone-use-inventory.mjs';
 const report = inventoryNgZoneUses();
 assert.equal(report.frozen_uses,25);assert.equal(report.current_uses,36);
 assert.equal(report.cases.filter(row=>row.testing_only).length,1);
-assert.equal(report.accesses.length,61);assert.equal(report.forwarding.length,17);
+assert.equal(report.accesses.length,62);assert.equal(report.forwarding.length,17);
 const constructed=report.forwarding.filter(row=>row.kind==='construct');
 assert.equal(constructed.length,2);
 assert.deepEqual(constructed.map(({file,target,argument})=>({file,target,argument})),[
@@ -46,7 +46,7 @@ const dropped=tabSource.replace('new RippleRenderer(this, ngZone, elementRef, pl
 assert.notEqual(dropped,tabSource);
 assert.throws(()=>inventoryNgZoneUses({readSource:path=>path===tab?dropped:readFileSync(path,'utf8')}),
  error=>error.code==='ERR_ASSERTION'&&error.message.startsWith('NgZone forwarding roster changed'));
-console.log(JSON.stringify({frozen:25,current:36,accesses:61,forwarding:17,mutations:4}));
+console.log(JSON.stringify({frozen:25,current:36,accesses:62,forwarding:17,mutations:4}));
 '''
         result = subprocess.run(['node', '--max-old-space-size=512', '--input-type=module', '-e', code],
                                 cwd=ROOT, capture_output=True, text=True, timeout=120)
