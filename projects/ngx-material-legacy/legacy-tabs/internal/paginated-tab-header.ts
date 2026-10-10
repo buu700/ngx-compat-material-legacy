@@ -30,6 +30,7 @@ import {coerceBooleanProperty, coerceNumberProperty} from '@angular/cdk/coercion
 type BooleanInput = string | boolean | null | undefined;
 type NumberInput = string | number | null | undefined;
 import {ownedHeaderResize} from './owned-header-resize';
+import {afterTabHeaderRender, tabHeaderRenderInjector} from './after-tab-header-render';
 import {_LegacyViewport as ViewportRuler} from '@ngx-compat/material-legacy/legacy-core';
 import {FocusKeyManager, FocusableOption} from '@angular/cdk/a11y';
 import {ENTER, SPACE, hasModifierKey} from '@angular/cdk/keycodes';
@@ -81,6 +82,7 @@ export type MatPaginatedTabHeaderItem = FocusableOption & {elementRef: ElementRe
 export abstract class MatPaginatedTabHeader
   implements AfterContentChecked, AfterContentInit, AfterViewInit, OnDestroy
 {
+  private readonly _renderInjector = tabHeaderRenderInjector();
   abstract _items: QueryList<MatPaginatedTabHeaderItem>;
   abstract _inkBar: {hide: () => void; alignToElement: (element: HTMLElement) => void};
   abstract _tabListContainer: ElementRef<HTMLElement>;
@@ -238,9 +240,10 @@ export abstract class MatPaginatedTabHeader
 
     // Defer the first call in order to allow for slower browsers to lay out the elements.
     // This helps in cases where the user lands directly on a page with paginated tabs.
-    // Note that we use `onStable` instead of `requestAnimationFrame`, because the latter
-    // can hold up tests that are in a background tab.
-    this._ngZone.onStable.pipe(take(1), takeUntil(this._destroyed)).subscribe(realign);
+    // Keep zoneful stability timing and wait for a zoneless view to render. Avoid animation
+    // frames here, since they can hold up tests that are in a background tab.
+    afterTabHeaderRender(this._ngZone, this._renderInjector)
+      .pipe(takeUntil(this._destroyed)).subscribe(realign);
 
     // On dir change or resize, realign the ink bar and update the orientation of
     // the key manager if the direction has changed.
