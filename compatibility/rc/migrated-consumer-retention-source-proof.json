@@ -1,0 +1,229 @@
+{
+  "schema_version": 1,
+  "task": "C03 retain and admit the actual upgraded migrated consumer",
+  "line": "main",
+  "source_commit": "f685f9ae390d024b7c80b18f897551122f4d5ced",
+  "source_tree": "2fdbd7ae0c8ea67c0d434208566eca22ba0ebb3a",
+  "source_clean_before_diagnostic": true,
+  "changed_paths": [
+    "scripts/check-companion-computed-styles.mjs",
+    "scripts/migrated-consumer-proof.mjs",
+    "scripts/migrated-consumer-support.mjs",
+    "scripts/migration_workspace_admission.py",
+    "scripts/rc-verify-lite.py",
+    "scripts/rc-verify.py",
+    "tests/migrated_consumer_build_probe.mjs",
+    "tests/migration_workspace_fixture.py",
+    "tests/test_migrated_consumer_build.py",
+    "tests/test_migrated_consumer_evidence.py",
+    "tests/test_migration_workspace_admission.py",
+    "tests/test_rc_verify_evidence_integration.py"
+  ],
+  "files": [
+    {
+      "path": "scripts/check-companion-computed-styles.mjs",
+      "sha256": "06089fabd7c6d1deedf4e02001a382f889378bb8f026b1b6ca39f9ed2967319e",
+      "bytes": 55452
+    },
+    {
+      "path": "scripts/migrated-consumer-proof.mjs",
+      "sha256": "37c3f6a94e11b77a0126c27d18c6cd044f03450875d89f13572e44de3b3dee01",
+      "bytes": 7337
+    },
+    {
+      "path": "scripts/migrated-consumer-support.mjs",
+      "sha256": "45468d4ebf3dcc627879f58be3f4e176652c1b569ab6afe1a98687c71725b5eb",
+      "bytes": 2248
+    },
+    {
+      "path": "scripts/migration_workspace_admission.py",
+      "sha256": "9b78362cdf760911506d81bcfcaca77fde6995202bc49bd95bbf4a1dda3fe756",
+      "bytes": 8596
+    },
+    {
+      "path": "scripts/rc-verify.py",
+      "sha256": "31590e03f8545aea7358bf27b8143df6bbe57d06a09ba9cb566fdcf031807b64",
+      "bytes": 93045
+    },
+    {
+      "path": "scripts/consumer-animation-engine.mjs",
+      "sha256": "37aa5b5bf2a0cd0527e72304da17f9413cbac0aaa915709d642b34a40c7d3dcb",
+      "bytes": 1860
+    },
+    {
+      "path": "scripts/bundle-consumer-harness.mjs",
+      "sha256": "b4b96b7589e5a5701df6fe7543e5eabfe9d460c2d756945e73a55eeb3301644e",
+      "bytes": 2742
+    },
+    {
+      "path": "tests/migration_workspace_fixture.py",
+      "sha256": "c80c2acef518469711d57ddb604789ba3f79f47036e68e7755c35398c8e8b1f4",
+      "bytes": 4991
+    },
+    {
+      "path": "tests/test_migration_workspace_admission.py",
+      "sha256": "5050160d26495c37b3dd508a15a2030c983e1700fbf08b92e15075477f71318a",
+      "bytes": 7634
+    },
+    {
+      "path": "tests/migrated_consumer_build_probe.mjs",
+      "sha256": "48ba048a488fbf5de88e18de80cba16a1db30b0609d72255f940e3e9ace04bd5",
+      "bytes": 6561
+    },
+    {
+      "path": "tests/test_migrated_consumer_build.py",
+      "sha256": "8c21ca55792695465d1fd9ce70158deac684702a3a09c04296b0451f88678649",
+      "bytes": 499
+    },
+    {
+      "path": "tests/test_migrated_consumer_evidence.py",
+      "sha256": "f73c088547e8020f7998b40a2bcd47308ba254f022342d6671e477dff9cb25b7",
+      "bytes": 4427
+    },
+    {
+      "path": "tests/test_old_workspace_cli.py",
+      "sha256": "d7e581b12c3c1301fbb93ab5b25b94d96e59992f98d553fbabd388b10553d91a",
+      "bytes": 3602
+    },
+    {
+      "path": "compatibility/rc/consumer-floor-plan.json",
+      "sha256": "93f50163001b16d9aea5df9fe381bae7518cebbea229896d66ac139ad011327b",
+      "bytes": 5273
+    },
+    {
+      "path": "compatibility/rc/matrices/full-verify.json",
+      "sha256": "8e06b604212c0b0d61a33cc10c6bb079de117ff2987453586ced2e2be79e546d",
+      "bytes": 608028
+    },
+    {
+      "path": "scripts/rc-verify-lite.py",
+      "sha256": "a61950d2f63afb638f0f8d5375a98ec0af60e44b17a14dfbd8f309539bf62b29",
+      "bytes": 15678
+    },
+    {
+      "path": "tests/test_rc_verify_evidence_integration.py",
+      "sha256": "98890aa400307bceb193cefc5f1b9ea239d35706b28d4829de9e5cee0c92d92c",
+      "bytes": 74629
+    }
+  ],
+  "source_roster": {
+    "old-workspace-cli": 15,
+    "packaged-schematic": 14,
+    "transaction-negatives": 10,
+    "frontend-parity": 14
+  },
+  "changes": [
+    "Upgraded consumer no longer declares @angular/animations; its installed/locked absence is checked before the existing strict build.",
+    "The opt-in build helper captures and hashes actual linked browser bundle inputs, rejects animation-engine entries and borrowed inputs, and checks the pinned esbuild version.",
+    "Retain eight actual source/output files before disposable cleanup: application, Sass, generated CSS, package declaration, lock, compiler config, browser bundle and bundle receipt.",
+    "Independent admission rehashes those files and checks module-source-only migration, exact peer versions, strict declarations/templates, preserved Sass calls and bundle scope.",
+    "The actual branch coordinator includes all eight retained files in its accepted-output snapshot; mutation of any retained file invalidates the check."
+  ],
+  "diagnostics": [
+    {
+      "command": [
+        "node",
+        "tests/migrated_consumer_build_probe.mjs"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.664,
+      "stdout": "{\"cases\":2,\"negative_controls\":7,\"compiler_protocol\":true,\"real_esbuild\":\"0.25.5\",\"scope\":\"Whole actual buildLab plus actual retention writer. Synthetic compiler/linker and JavaScript input; no Angular compile, artifact install, full migrated consumer or native/browser product execution.\"}\n",
+      "stderr": "",
+      "role": "Local source/protocol/admission diagnostic, not packed migration or native qualification"
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "test_migration_workspace_admission",
+        "test_migrated_consumer_build",
+        "test_migrated_consumer_evidence",
+        "test_old_workspace_cli",
+        "-v"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.673,
+      "stdout": "",
+      "stderr": "test_both_lines_and_unbound_or_failed_evidence (test_migration_workspace_admission.WorkspaceAdmissionTests.test_both_lines_and_unbound_or_failed_evidence) ... ok\ntest_retained_consumer_inputs_and_engine_negatives (test_migration_workspace_admission.WorkspaceAdmissionTests.test_retained_consumer_inputs_and_engine_negatives) ... ok\ntest_actual_build_and_retention_protocols (test_migrated_consumer_build.MigratedConsumerBuildTests.test_actual_build_and_retention_protocols) ... ok\ntest_actual_line_coordinator_seals_support_and_detects_tamper (test_migrated_consumer_evidence.MigratedConsumerEvidenceTests.test_actual_line_coordinator_seals_support_and_detects_tamper) ... ok\ntest_cli_acquisition_requires_exact_bound_artifact (test_old_workspace_cli.OldWorkspaceCliTests.test_cli_acquisition_requires_exact_bound_artifact) ... ok\ntest_no_workspace_cli_fallback (test_old_workspace_cli.OldWorkspaceCliTests.test_no_workspace_cli_fallback) ... ok\n\n----------------------------------------------------------------------\nRan 6 tests in 1.588s\n\nOK\n",
+      "role": "Local source/protocol/admission diagnostic, not packed migration or native qualification"
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "test_rc_verify_evidence_integration.CoordinatorTests.test_complete_main_migration_report_uses_real_ids_and_is_not_overwritten",
+        "test_rc_verify_evidence_integration.CoordinatorTests.test_failed_migration_child_stays_incomplete_slice",
+        "test_rc_verify_evidence_integration.CoordinatorTests.test_missing_or_copied_migration_assertion_stays_slice",
+        "test_rc_verify_evidence_integration.CoordinatorTests.test_21x_migration_report_does_not_roster_main_cases",
+        "-v"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.423,
+      "stdout": "",
+      "stderr": "test_complete_main_migration_report_uses_real_ids_and_is_not_overwritten (test_rc_verify_evidence_integration.CoordinatorTests.test_complete_main_migration_report_uses_real_ids_and_is_not_overwritten) ... ok\ntest_failed_migration_child_stays_incomplete_slice (test_rc_verify_evidence_integration.CoordinatorTests.test_failed_migration_child_stays_incomplete_slice) ... ok\ntest_missing_or_copied_migration_assertion_stays_slice (test_rc_verify_evidence_integration.CoordinatorTests.test_missing_or_copied_migration_assertion_stays_slice) ... ok\ntest_21x_migration_report_does_not_roster_main_cases (test_rc_verify_evidence_integration.CoordinatorTests.test_21x_migration_report_does_not_roster_main_cases) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 0.284s\n\nOK\n",
+      "role": "Local source/protocol/admission diagnostic, not packed migration or native qualification"
+    }
+  ],
+  "controls": {
+    "rehash_and_semantic_admission_negatives_per_line": 20,
+    "retained_file_tamper_negatives_per_line": 8,
+    "build_and_retention_protocol_negatives": 7,
+    "coordinator_support_tamper_negatives_actual_line": 8
+  },
+  "qualification": {
+    "actual_packed_cli_used": false,
+    "actual_Angular_build_executed": false,
+    "full_migrated_browser_consumer_executed": false,
+    "consumer_floor_matrix_executed": false,
+    "native_css_qualified": false,
+    "Cyph_files_changed": false,
+    "Cyph_build_executed": false,
+    "Actions_dispatched": false,
+    "C03_closed": false,
+    "G04_G05_G07_G12_credit": false
+  },
+  "next_required_execution": "Run the existing artifact-bound old-workspace route through the full verifier on both exact committed source lines; validate its retained actual outputs and native interaction before crediting C03.",
+  "earlier_same_build_helper_checks": [
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_companion_computed_styles.py",
+        "-v"
+      ],
+      "exit_code": 0,
+      "tests": 16,
+      "skipped": 2,
+      "skip_reason": "No installed peer/Sass in the worktree; peer derivation and peer Sass oracle were unexecuted.",
+      "scope": "Pure assessment/roster checks; no browser execution."
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_m3_rendered_coexistence.py",
+        "-v"
+      ],
+      "exit_code": 0,
+      "tests": 9,
+      "scope": "Synthetic rendering assessment/admission; no native rendering."
+    }
+  ],
+  "diagnostic_runtime": {
+    "node": "v22.23.3",
+    "borrowed_node_modules": "/home/parallels/ngx-compat-material-legacy/node_modules",
+    "advertised_runtime_floor_credit": false
+  }
+}
