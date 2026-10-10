@@ -1,0 +1,2518 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "frozen_uses": 1,
+  "current_uses": 1,
+  "case": {
+    "file": "legacy-form-field/form-field.ts",
+    "module": "@angular/forms",
+    "symbol": "AbstractControlDirective",
+    "local_name": "AbstractControlDirective",
+    "candidate_source_sha256": "1770ec580bbb08ba9222cbf1725cc82e1ca3ea4819aa1f996826690267ea2769",
+    "references": [
+      {
+        "line": 431,
+        "role": "keyof-public-ancestor-state-class-forwarder",
+        "context": "keyof AbstractControlDirective"
+      }
+    ]
+  },
+  "bindings": [
+    {
+      "host_class": "[class.ng-untouched]",
+      "expression": "_shouldForward(\"untouched\")"
+    },
+    {
+      "host_class": "[class.ng-touched]",
+      "expression": "_shouldForward(\"touched\")"
+    },
+    {
+      "host_class": "[class.ng-pristine]",
+      "expression": "_shouldForward(\"pristine\")"
+    },
+    {
+      "host_class": "[class.ng-dirty]",
+      "expression": "_shouldForward(\"dirty\")"
+    },
+    {
+      "host_class": "[class.ng-valid]",
+      "expression": "_shouldForward(\"valid\")"
+    },
+    {
+      "host_class": "[class.ng-invalid]",
+      "expression": "_shouldForward(\"invalid\")"
+    },
+    {
+      "host_class": "[class.ng-pending]",
+      "expression": "_shouldForward(\"pending\")"
+    }
+  ],
+  "keys": [
+    "untouched",
+    "touched",
+    "pristine",
+    "dirty",
+    "valid",
+    "invalid",
+    "pending"
+  ],
+  "original_method": "_shouldForward(prop: keyof AbstractControlDirective): boolean {\n    const control = this._control ? this._control.ngControl : null;\n    return control && control[prop];\n}",
+  "owned_method": "_shouldForward(prop: keyof AbstractControlDirective): boolean {\n    const control = this._control ? this._control.ngControl : null;\n    return control && control[prop];\n}",
+  "source_override_used": false,
+  "contracts": [
+    {
+      "line": "original",
+      "whole_declaration": "export declare abstract class NgControl extends AbstractControlDirective {\n    name: string | number | null;\n    valueAccessor: ControlValueAccessor | null;\n    abstract viewToModelUpdate(newValue: any): void;\n}",
+      "whole_runtime_class": "class NgControl extends AbstractControlDirective {\n    constructor() {\n        super(...arguments);\n        /**\n         * @description\n         * The parent form for the control.\n         *\n         * @internal\n         */\n        this._parent = null;\n        /**\n         * @description\n         * The name for the control\n         */\n        this.name = null;\n        /**\n         * @description\n         * The value accessor for the control\n         */\n        this.valueAccessor = null;\n    }\n}",
+      "whole_ancestor_declaration": "export declare abstract class AbstractControlDirective {\n    abstract get control(): AbstractControl | null;\n    get value(): any;\n    get valid(): boolean | null;\n    get invalid(): boolean | null;\n    get pending(): boolean | null;\n    get disabled(): boolean | null;\n    get enabled(): boolean | null;\n    get errors(): ValidationErrors | null;\n    get pristine(): boolean | null;\n    get dirty(): boolean | null;\n    get touched(): boolean | null;\n    get status(): string | null;\n    get untouched(): boolean | null;\n    get statusChanges(): Observable<any> | null;\n    get valueChanges(): Observable<any> | null;\n    get path(): string[] | null;\n    private _composedValidatorFn;\n    private _composedAsyncValidatorFn;\n    get validator(): ValidatorFn | null;\n    get asyncValidator(): AsyncValidatorFn | null;\n    private _onDestroyCallbacks;\n    reset(value?: any): void;\n    hasError(errorCode: string, path?: Array<string | number> | string): boolean;\n    getError(errorCode: string, path?: Array<string | number> | string): any;\n}",
+      "whole_ancestor_runtime": "class AbstractControlDirective {\n    constructor() {\n        /**\n         * Set of synchronous validators as they were provided while calling `setValidators` function.\n         * @internal\n         */\n        this._rawValidators = [];\n        /**\n         * Set of asynchronous validators as they were provided while calling `setAsyncValidators`\n         * function.\n         * @internal\n         */\n        this._rawAsyncValidators = [];\n        /*\n         * The set of callbacks to be invoked when directive instance is being destroyed.\n         */\n        this._onDestroyCallbacks = [];\n    }\n    /**\n     * @description\n     * Reports the value of the control if it is present, otherwise null.\n     */\n    get value() {\n        return this.control ? this.control.value : null;\n    }\n    /**\n     * @description\n     * Reports whether the control is valid. A control is considered valid if no\n     * validation errors exist with the current value.\n     * If the control is not present, null is returned.\n     */\n    get valid() {\n        return this.control ? this.control.valid : null;\n    }\n    /**\n     * @description\n     * Reports whether the control is invalid, meaning that an error exists in the input value.\n     * If the control is not present, null is returned.\n     */\n    get invalid() {\n        return this.control ? this.control.invalid : null;\n    }\n    /**\n     * @description\n     * Reports whether a control is pending, meaning that async validation is occurring and\n     * errors are not yet available for the input value. If the control is not present, null is\n     * returned.\n     */\n    get pending() {\n        return this.control ? this.control.pending : null;\n    }\n    /**\n     * @description\n     * Reports whether the control is disabled, meaning that the control is disabled\n     * in the UI and is exempt from validation checks and excluded from aggregate\n     * values of ancestor controls. If the control is not present, null is returned.\n     */\n    get disabled() {\n        return this.control ? this.control.disabled : null;\n    }\n    /**\n     * @description\n     * Reports whether the control is enabled, meaning that the control is included in ancestor\n     * calculations of validity or value. If the control is not present, null is returned.\n     */\n    get enabled() {\n        return this.control ? this.control.enabled : null;\n    }\n    /**\n     * @description\n     * Reports the control's validation errors. If the control is not present, null is returned.\n     */\n    get errors() {\n        return this.control ? this.control.errors : null;\n    }\n    /**\n     * @description\n     * Reports whether the control is pristine, meaning that the user has not yet changed\n     * the value in the UI. If the control is not present, null is returned.\n     */\n    get pristine() {\n        return this.control ? this.control.pristine : null;\n    }\n    /**\n     * @description\n     * Reports whether the control is dirty, meaning that the user has changed\n     * the value in the UI. If the control is not present, null is returned.\n     */\n    get dirty() {\n        return this.control ? this.control.dirty : null;\n    }\n    /**\n     * @description\n     * Reports whether the control is touched, meaning that the user has triggered\n     * a `blur` event on it. If the control is not present, null is returned.\n     */\n    get touched() {\n        return this.control ? this.control.touched : null;\n    }\n    /**\n     * @description\n     * Reports the validation status of the control. Possible values include:\n     * 'VALID', 'INVALID', 'DISABLED', and 'PENDING'.\n     * If the control is not present, null is returned.\n     */\n    get status() {\n        return this.control ? this.control.status : null;\n    }\n    /**\n     * @description\n     * Reports whether the control is untouched, meaning that the user has not yet triggered\n     * a `blur` event on it. If the control is not present, null is returned.\n     */\n    get untouched() {\n        return this.control ? this.control.untouched : null;\n    }\n    /**\n     * @description\n     * Returns a multicasting observable that emits a validation status whenever it is\n     * calculated for the control. If the control is not present, null is returned.\n     */\n    get statusChanges() {\n        return this.control ? this.control.statusChanges : null;\n    }\n    /**\n     * @description\n     * Returns a multicasting observable of value changes for the control that emits every time the\n     * value of the control changes in the UI or programmatically.\n     * If the control is not present, null is returned.\n     */\n    get valueChanges() {\n        return this.control ? this.control.valueChanges : null;\n    }\n    /**\n     * @description\n     * Returns an array that represents the path from the top-level form to this control.\n     * Each index is the string name of the control on that level.\n     */\n    get path() {\n        return null;\n    }\n    /**\n     * Sets synchronous validators for this directive.\n     * @internal\n     */\n    _setValidators(validators) {\n        this._rawValidators = validators || [];\n        this._composedValidatorFn = composeValidators(this._rawValidators);\n    }\n    /**\n     * Sets asynchronous validators for this directive.\n     * @internal\n     */\n    _setAsyncValidators(validators) {\n        this._rawAsyncValidators = validators || [];\n        this._composedAsyncValidatorFn = composeAsyncValidators(this._rawAsyncValidators);\n    }\n    /**\n     * @description\n     * Synchronous validator function composed of all the synchronous validators registered with this\n     * directive.\n     */\n    get validator() {\n        return this._composedValidatorFn || null;\n    }\n    /**\n     * @description\n     * Asynchronous validator function composed of all the asynchronous validators registered with\n     * this directive.\n     */\n    get asyncValidator() {\n        return this._composedAsyncValidatorFn || null;\n    }\n    /**\n     * Internal function to register callbacks that should be invoked\n     * when directive instance is being destroyed.\n     * @internal\n     */\n    _registerOnDestroy(fn) {\n        this._onDestroyCallbacks.push(fn);\n    }\n    /**\n     * Internal function to invoke all registered \"on destroy\" callbacks.\n     * Note: calling this function also clears the list of callbacks.\n     * @internal\n     */\n    _invokeOnDestroyCallbacks() {\n        this._onDestroyCallbacks.forEach(fn => fn());\n        this._onDestroyCallbacks = [];\n    }\n    /**\n     * @description\n     * Resets the control with the provided value if the control is present.\n     */\n    reset(value = undefined) {\n        if (this.control)\n            this.control.reset(value);\n    }\n    /**\n     * @description\n     * Reports whether the control with the given path has the error specified.\n     *\n     * @param errorCode The code of the error to check\n     * @param path A list of control names that designates how to move from the current control\n     * to the control that should be queried for errors.\n     *\n     * @usageNotes\n     * For example, for the following `FormGroup`:\n     *\n     * ```\n     * form = new FormGroup({\n     *   address: new FormGroup({ street: new FormControl() })\n     * });\n     * ```\n     *\n     * The path to the 'street' control from the root form would be 'address' -> 'street'.\n     *\n     * It can be provided to this method in one of two formats:\n     *\n     * 1. An array of string control names, e.g. `['address', 'street']`\n     * 1. A period-delimited list of control names in one string, e.g. `'address.street'`\n     *\n     * If no path is given, this method checks for the error on the current control.\n     *\n     * @returns whether the given error is present in the control at the given path.\n     *\n     * If the control is not present, false is returned.\n     */\n    hasError(errorCode, path) {\n        return this.control ? this.control.hasError(errorCode, path) : false;\n    }\n    /**\n     * @description\n     * Reports error data for the control with the given path.\n     *\n     * @param errorCode The code of the error to check\n     * @param path A list of control names that designates how to move from the current control\n     * to the control that should be queried for errors.\n     *\n     * @usageNotes\n     * For example, for the following `FormGroup`:\n     *\n     * ```\n     * form = new FormGroup({\n     *   address: new FormGroup({ street: new FormControl() })\n     * });\n     * ```\n     *\n     * The path to the 'street' control from the root form would be 'address' -> 'street'.\n     *\n     * It can be provided to this method in one of two formats:\n     *\n     * 1. An array of string control names, e.g. `['address', 'street']`\n     * 1. A period-delimited list of control names in one string, e.g. `'address.street'`\n     *\n     * @returns error data for that particular error. If the control or error is not present,\n     * null is returned.\n     */\n    getError(errorCode, path) {\n        return this.control ? this.control.getError(errorCode, path) : null;\n    }\n}",
+      "classic_members": [
+        "name: string | number | null;",
+        "valueAccessor: ControlValueAccessor | null;",
+        "abstract viewToModelUpdate(newValue: any): void;"
+      ],
+      "public_ancestor_members": [
+        "abstract get control(): AbstractControl | null;",
+        "get value(): any;",
+        "get valid(): boolean | null;",
+        "get invalid(): boolean | null;",
+        "get pending(): boolean | null;",
+        "get disabled(): boolean | null;",
+        "get enabled(): boolean | null;",
+        "get errors(): ValidationErrors | null;",
+        "get pristine(): boolean | null;",
+        "get dirty(): boolean | null;",
+        "get touched(): boolean | null;",
+        "get status(): string | null;",
+        "get untouched(): boolean | null;",
+        "get statusChanges(): Observable<any> | null;",
+        "get valueChanges(): Observable<any> | null;",
+        "get path(): string[] | null;",
+        "get validator(): ValidatorFn | null;",
+        "get asyncValidator(): AsyncValidatorFn | null;",
+        "reset(value?: any): void;",
+        "hasError(errorCode: string, path?: Array<string | number> | string): boolean;",
+        "getError(errorCode: string, path?: Array<string | number> | string): any;"
+      ],
+      "constructor_new_optional_parameters": 0,
+      "added_private_protected_custom_control_machinery": false,
+      "public_core_reference": "Actual @angular/forms public namespace/complete package routes,not an extracted class import."
+    },
+    {
+      "line": "main",
+      "whole_declaration": "declare abstract class NgControl extends AbstractControlDirective {\n    name: string | number | null;\n    valueAccessor: ControlValueAccessor | null;\n    protected isCustomControlBased: boolean;\n    private userOnReset?;\n    private resetSubscription?;\n    private isNativeFormElement;\n    private readonly rawValueAccessors;\n    private _selectedValueAccessor;\n    protected get selectedValueAccessor(): ControlValueAccessor | null;\n    abstract viewToModelUpdate(newValue: any): void;\n    protected parseErrorsValidator: ValidatorFn | null;\n    private renderer;\n    private readonly injector;\n    private requiredValidatorViaDi;\n    private subscription;\n    protected customControlBindings: {\n        value?: unknown;\n        disabled?: boolean;\n        touched?: boolean;\n        dirty?: boolean;\n        valid?: boolean;\n        invalid?: boolean;\n        pending?: boolean;\n        required?: boolean;\n        errors?: ValidationErrors | null;\n    } | null;\n    constructor(injector?: Injector, renderer?: Renderer2, rawValueAccessors?: ControlValueAccessor[]);\n    protected setupCustomControl(): void;\n    protected ngControlUpdate(host: _ControlDirectiveHost, bindRequired: boolean): void;\n    private get isRequired();\n    protected get shouldBindRequired(): boolean;\n    private bindControlProperty;\n    private _convertErrors;\n    protected removeParseErrorsValidator(control: AbstractControl | null | undefined): void;\n}",
+      "whole_runtime_class": "class NgControl extends AbstractControlDirective {\n  _parent = null;\n  name = null;\n  valueAccessor = null;\n  isCustomControlBased = false;\n  userOnReset;\n  resetSubscription;\n  set onReset(callback) {\n    this.userOnReset = callback;\n    this.resetSubscription?.unsubscribe();\n    this.resetSubscription = undefined;\n    if (this.control) {\n      this.resetSubscription = this.control.events.subscribe(event => {\n        if (event instanceof FormResetEvent && this.control) {\n          this.userOnReset?.(this.control.value);\n        }\n      });\n      this.subscription?.add(this.resetSubscription);\n    }\n  }\n  isNativeFormElement = false;\n  rawValueAccessors;\n  _selectedValueAccessor = null;\n  get selectedValueAccessor() {\n    return this._selectedValueAccessor ??= selectValueAccessor(this, this.rawValueAccessors);\n  }\n  parseErrorsValidator = null;\n  renderer;\n  injector;\n  requiredValidatorViaDi;\n  subscription;\n  customControlBindings = null;\n  constructor(injector, renderer, rawValueAccessors) {\n    super();\n    this.injector = injector;\n    this.renderer = renderer;\n    this.rawValueAccessors = rawValueAccessors;\n    this.injector?.get(DestroyRef)?.onDestroy(() => {\n      this.removeParseErrorsValidator(this.control);\n      this.subscription?.unsubscribe();\n    });\n  }\n  setupCustomControl() {\n    this.subscription?.unsubscribe();\n    const cdr = this.injector?.get(ChangeDetectorRef);\n    if (!this.control || !cdr) {\n      return;\n    }\n    const markForCheck = cdr.markForCheck.bind(cdr);\n    this.subscription = new Subscription();\n    this.subscription.add(this.control.valueChanges.subscribe(markForCheck));\n    this.subscription.add(this.control.statusChanges.subscribe(markForCheck));\n    this.resetSubscription?.unsubscribe();\n    this.resetSubscription = undefined;\n    if (this.userOnReset) {\n      this.resetSubscription = this.control.events.subscribe(event => {\n        if (event instanceof FormResetEvent && this.control) {\n          this.userOnReset?.(this.control.value);\n        }\n      });\n      this.subscription.add(this.resetSubscription);\n    }\n    if (this.parseErrorsValidator) {\n      this.control.addValidators(this.parseErrorsValidator);\n    }\n  }\n  ngControlCreate(host) {\n    const hasNgNoCva = host.nativeElement.hasAttribute?.('ngNoCva');\n    const hasCva = !hasNgNoCva && (this.rawValueAccessors && this.rawValueAccessors.length > 0 || this.valueAccessor !== null);\n    if (hasCva || !host.customControl) {\n      return;\n    }\n    this.isCustomControlBased = true;\n    host.listenToCustomControlModel(value => {\n      this.control?.markAsDirty();\n      this.control?.setValue(value, {\n        emitModelToViewChange: false\n      });\n      this.viewToModelUpdate(value);\n    });\n    host.listenToCustomControlOutput('touch', () => {\n      this.control?.markAsTouched();\n    });\n    this.customControlBindings = {};\n    this.isNativeFormElement = isNativeFormElement(host.nativeElement);\n    this.requiredValidatorViaDi = this._rawValidators.find(v => v instanceof RequiredValidator);\n  }\n  ngControlUpdate(host, bindRequired) {\n    if (!this.isCustomControlBased) {\n      return;\n    }\n    const control = this.control;\n    const bindings = this.customControlBindings;\n    if (!Object.is(bindings.value, control.value)) {\n      bindings.value = control.value;\n      host.setCustomControlModelInput(control.value);\n    }\n    this.bindControlProperty(host, bindings, 'touched', control.touched);\n    this.bindControlProperty(host, bindings, 'dirty', control.dirty);\n    this.bindControlProperty(host, bindings, 'valid', control.valid);\n    this.bindControlProperty(host, bindings, 'invalid', control.invalid);\n    this.bindControlProperty(host, bindings, 'pending', control.pending);\n    this.bindControlProperty(host, bindings, 'disabled', control.disabled);\n    if (this.shouldBindRequired) {\n      this.bindControlProperty(host, bindings, 'required', this.isRequired);\n    }\n    const errorObject = control.errors;\n    if (bindings.errors !== errorObject) {\n      bindings.errors = errorObject;\n      const errorArray = this._convertErrors(errorObject);\n      host.setInputOnDirectives('errors', errorArray);\n    }\n  }\n  get isRequired() {\n    return (this.requiredValidatorViaDi?._enabled || this.control?._hasRequired()) ?? false;\n  }\n  get shouldBindRequired() {\n    return true;\n  }\n  bindControlProperty(host, bindings, name, value) {\n    if (bindings[name] === value) {\n      return;\n    }\n    bindings[name] = value;\n    const wasSet = host.setInputOnDirectives(name, value);\n    if (this.isNativeFormElement && !wasSet && (name === 'disabled' || name === 'required') && this.renderer) {\n      setNativeDomProperty(this.renderer, host.nativeElement, name, value);\n    }\n  }\n  _convertErrors(errors) {\n    if (errors === null) {\n      return [];\n    }\n    const control = this.control;\n    return Object.entries(errors).map(([kind, context]) => {\n      return new ReactiveValidationError({\n        context,\n        kind,\n        control\n      });\n    });\n  }\n  setParseErrorSource(parseErrors) {\n    if (parseErrors === undefined) {\n      return;\n    }\n    let convertedErrors = null;\n    const convertedParseErrors = computed(() => {\n      const rawErrors = parseErrors();\n      if (rawErrors.length === 0) {\n        return null;\n      }\n      return rawErrors.reduce((acc, err) => {\n        acc[err.kind] = err;\n        return acc;\n      }, {});\n    }, ...(ngDevMode ? [{\n      debugName: \"convertedParseErrors\"\n    }] : []));\n    this.parseErrorsValidator = (() => convertedErrors).bind(this);\n    effect(() => {\n      convertedErrors = convertedParseErrors();\n      this.control?.updateValueAndValidity({\n        emitEvent: false\n      });\n    }, {\n      injector: this.injector\n    });\n  }\n  removeParseErrorsValidator(control) {\n    if (this.parseErrorsValidator) {\n      control?.removeValidators(this.parseErrorsValidator);\n      control?.updateValueAndValidity({\n        emitEvent: false\n      });\n    }\n  }\n}",
+      "whole_ancestor_declaration": "declare abstract class AbstractControlDirective {\n    abstract get control(): AbstractControl | null;\n    get value(): any;\n    get valid(): boolean | null;\n    get invalid(): boolean | null;\n    get pending(): boolean | null;\n    get disabled(): boolean | null;\n    get enabled(): boolean | null;\n    get errors(): ValidationErrors | null;\n    get pristine(): boolean | null;\n    get dirty(): boolean | null;\n    get touched(): boolean | null;\n    get status(): string | null;\n    get untouched(): boolean | null;\n    get statusChanges(): Observable<any> | null;\n    get valueChanges(): Observable<any> | null;\n    get path(): string[] | null;\n    private _composedValidatorFn;\n    private _composedAsyncValidatorFn;\n    get validator(): ValidatorFn | null;\n    get asyncValidator(): AsyncValidatorFn | null;\n    private _onDestroyCallbacks;\n    reset(value?: any): void;\n    hasError(errorCode: string, path?: Array<string | number> | string): boolean;\n    getError(errorCode: string, path?: Array<string | number> | string): any;\n}",
+      "whole_ancestor_runtime": "class AbstractControlDirective {\n  get value() {\n    return this.control ? this.control.value : null;\n  }\n  get valid() {\n    return this.control ? this.control.valid : null;\n  }\n  get invalid() {\n    return this.control ? this.control.invalid : null;\n  }\n  get pending() {\n    return this.control ? this.control.pending : null;\n  }\n  get disabled() {\n    return this.control ? this.control.disabled : null;\n  }\n  get enabled() {\n    return this.control ? this.control.enabled : null;\n  }\n  get errors() {\n    return this.control ? this.control.errors : null;\n  }\n  get pristine() {\n    return this.control ? this.control.pristine : null;\n  }\n  get dirty() {\n    return this.control ? this.control.dirty : null;\n  }\n  get touched() {\n    return this.control ? this.control.touched : null;\n  }\n  get status() {\n    return this.control ? this.control.status : null;\n  }\n  get untouched() {\n    return this.control ? this.control.untouched : null;\n  }\n  get statusChanges() {\n    return this.control ? this.control.statusChanges : null;\n  }\n  get valueChanges() {\n    return this.control ? this.control.valueChanges : null;\n  }\n  get path() {\n    return null;\n  }\n  _composedValidatorFn;\n  _composedAsyncValidatorFn;\n  _rawValidators = [];\n  _rawAsyncValidators = [];\n  _setValidators(validators) {\n    this._rawValidators = validators || [];\n    this._composedValidatorFn = composeValidators(this._rawValidators);\n  }\n  _setAsyncValidators(validators) {\n    this._rawAsyncValidators = validators || [];\n    this._composedAsyncValidatorFn = composeAsyncValidators(this._rawAsyncValidators);\n  }\n  get validator() {\n    return this._composedValidatorFn || null;\n  }\n  get asyncValidator() {\n    return this._composedAsyncValidatorFn || null;\n  }\n  _onDestroyCallbacks = [];\n  _registerOnDestroy(fn) {\n    this._onDestroyCallbacks.push(fn);\n  }\n  _invokeOnDestroyCallbacks() {\n    this._onDestroyCallbacks.forEach(fn => fn());\n    this._onDestroyCallbacks = [];\n  }\n  reset(value = undefined) {\n    this.control?.reset(value);\n  }\n  hasError(errorCode, path) {\n    return this.control ? this.control.hasError(errorCode, path) : false;\n  }\n  getError(errorCode, path) {\n    return this.control ? this.control.getError(errorCode, path) : null;\n  }\n}",
+      "classic_members": [
+        "name: string | number | null;",
+        "valueAccessor: ControlValueAccessor | null;",
+        "abstract viewToModelUpdate(newValue: any): void;"
+      ],
+      "public_ancestor_members": [
+        "abstract get control(): AbstractControl | null;",
+        "get value(): any;",
+        "get valid(): boolean | null;",
+        "get invalid(): boolean | null;",
+        "get pending(): boolean | null;",
+        "get disabled(): boolean | null;",
+        "get enabled(): boolean | null;",
+        "get errors(): ValidationErrors | null;",
+        "get pristine(): boolean | null;",
+        "get dirty(): boolean | null;",
+        "get touched(): boolean | null;",
+        "get status(): string | null;",
+        "get untouched(): boolean | null;",
+        "get statusChanges(): Observable<any> | null;",
+        "get valueChanges(): Observable<any> | null;",
+        "get path(): string[] | null;",
+        "get validator(): ValidatorFn | null;",
+        "get asyncValidator(): AsyncValidatorFn | null;",
+        "reset(value?: any): void;",
+        "hasError(errorCode: string, path?: Array<string | number> | string): boolean;",
+        "getError(errorCode: string, path?: Array<string | number> | string): any;"
+      ],
+      "constructor_new_optional_parameters": 3,
+      "added_private_protected_custom_control_machinery": true,
+      "public_core_reference": "Actual @angular/forms public namespace/complete package routes,not an extracted class import."
+    },
+    {
+      "line": "21.x",
+      "whole_declaration": "declare abstract class NgControl extends AbstractControlDirective {\n    name: string | number | null;\n    valueAccessor: ControlValueAccessor | null;\n    abstract viewToModelUpdate(newValue: any): void;\n}",
+      "whole_runtime_class": "class NgControl extends AbstractControlDirective {\n  _parent = null;\n  name = null;\n  valueAccessor = null;\n}",
+      "whole_ancestor_declaration": "declare abstract class AbstractControlDirective {\n    abstract get control(): AbstractControl | null;\n    get value(): any;\n    get valid(): boolean | null;\n    get invalid(): boolean | null;\n    get pending(): boolean | null;\n    get disabled(): boolean | null;\n    get enabled(): boolean | null;\n    get errors(): ValidationErrors | null;\n    get pristine(): boolean | null;\n    get dirty(): boolean | null;\n    get touched(): boolean | null;\n    get status(): string | null;\n    get untouched(): boolean | null;\n    get statusChanges(): Observable<any> | null;\n    get valueChanges(): Observable<any> | null;\n    get path(): string[] | null;\n    private _composedValidatorFn;\n    private _composedAsyncValidatorFn;\n    get validator(): ValidatorFn | null;\n    get asyncValidator(): AsyncValidatorFn | null;\n    private _onDestroyCallbacks;\n    reset(value?: any): void;\n    hasError(errorCode: string, path?: Array<string | number> | string): boolean;\n    getError(errorCode: string, path?: Array<string | number> | string): any;\n}",
+      "whole_ancestor_runtime": "class AbstractControlDirective {\n  get value() {\n    return this.control ? this.control.value : null;\n  }\n  get valid() {\n    return this.control ? this.control.valid : null;\n  }\n  get invalid() {\n    return this.control ? this.control.invalid : null;\n  }\n  get pending() {\n    return this.control ? this.control.pending : null;\n  }\n  get disabled() {\n    return this.control ? this.control.disabled : null;\n  }\n  get enabled() {\n    return this.control ? this.control.enabled : null;\n  }\n  get errors() {\n    return this.control ? this.control.errors : null;\n  }\n  get pristine() {\n    return this.control ? this.control.pristine : null;\n  }\n  get dirty() {\n    return this.control ? this.control.dirty : null;\n  }\n  get touched() {\n    return this.control ? this.control.touched : null;\n  }\n  get status() {\n    return this.control ? this.control.status : null;\n  }\n  get untouched() {\n    return this.control ? this.control.untouched : null;\n  }\n  get statusChanges() {\n    return this.control ? this.control.statusChanges : null;\n  }\n  get valueChanges() {\n    return this.control ? this.control.valueChanges : null;\n  }\n  get path() {\n    return null;\n  }\n  _composedValidatorFn;\n  _composedAsyncValidatorFn;\n  _rawValidators = [];\n  _rawAsyncValidators = [];\n  _setValidators(validators) {\n    this._rawValidators = validators || [];\n    this._composedValidatorFn = composeValidators(this._rawValidators);\n  }\n  _setAsyncValidators(validators) {\n    this._rawAsyncValidators = validators || [];\n    this._composedAsyncValidatorFn = composeAsyncValidators(this._rawAsyncValidators);\n  }\n  get validator() {\n    return this._composedValidatorFn || null;\n  }\n  get asyncValidator() {\n    return this._composedAsyncValidatorFn || null;\n  }\n  _onDestroyCallbacks = [];\n  _registerOnDestroy(fn) {\n    this._onDestroyCallbacks.push(fn);\n  }\n  _invokeOnDestroyCallbacks() {\n    this._onDestroyCallbacks.forEach(fn => fn());\n    this._onDestroyCallbacks = [];\n  }\n  reset(value = undefined) {\n    this.control?.reset(value);\n  }\n  hasError(errorCode, path) {\n    return this.control ? this.control.hasError(errorCode, path) : false;\n  }\n  getError(errorCode, path) {\n    return this.control ? this.control.getError(errorCode, path) : null;\n  }\n}",
+      "classic_members": [
+        "name: string | number | null;",
+        "valueAccessor: ControlValueAccessor | null;",
+        "abstract viewToModelUpdate(newValue: any): void;"
+      ],
+      "public_ancestor_members": [
+        "abstract get control(): AbstractControl | null;",
+        "get value(): any;",
+        "get valid(): boolean | null;",
+        "get invalid(): boolean | null;",
+        "get pending(): boolean | null;",
+        "get disabled(): boolean | null;",
+        "get enabled(): boolean | null;",
+        "get errors(): ValidationErrors | null;",
+        "get pristine(): boolean | null;",
+        "get dirty(): boolean | null;",
+        "get touched(): boolean | null;",
+        "get status(): string | null;",
+        "get untouched(): boolean | null;",
+        "get statusChanges(): Observable<any> | null;",
+        "get valueChanges(): Observable<any> | null;",
+        "get path(): string[] | null;",
+        "get validator(): ValidatorFn | null;",
+        "get asyncValidator(): AsyncValidatorFn | null;",
+        "reset(value?: any): void;",
+        "hasError(errorCode: string, path?: Array<string | number> | string): boolean;",
+        "getError(errorCode: string, path?: Array<string | number> | string): any;"
+      ],
+      "constructor_new_optional_parameters": 0,
+      "added_private_protected_custom_control_machinery": false,
+      "public_core_reference": "Actual @angular/forms public namespace/complete package routes,not an extracted class import."
+    }
+  ],
+  "runtime": [
+    {
+      "line": "original",
+      "results": [
+        {
+          "id": "tagged-original",
+          "observations": [
+            {
+              "label": "absent-component-control",
+              "values": {
+                "untouched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "touched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pristine": {
+                  "kind": "null",
+                  "value": null
+                },
+                "dirty": {
+                  "kind": "null",
+                  "value": null
+                },
+                "valid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "invalid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pending": {
+                  "kind": "null",
+                  "value": null
+                }
+              }
+            },
+            {
+              "label": "null-control-directive",
+              "values": {
+                "untouched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "touched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pristine": {
+                  "kind": "null",
+                  "value": null
+                },
+                "dirty": {
+                  "kind": "null",
+                  "value": null
+                },
+                "valid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "invalid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pending": {
+                  "kind": "null",
+                  "value": null
+                }
+              }
+            },
+            {
+              "label": "undefined-control-directive",
+              "values": {
+                "untouched": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "touched": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "pristine": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "dirty": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "valid": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "invalid": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "pending": {
+                  "kind": "undefined",
+                  "value": null
+                }
+              }
+            },
+            {
+              "label": "directive-without-control",
+              "values": {
+                "untouched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "touched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pristine": {
+                  "kind": "null",
+                  "value": null
+                },
+                "dirty": {
+                  "kind": "null",
+                  "value": null
+                },
+                "valid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "invalid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pending": {
+                  "kind": "null",
+                  "value": null
+                }
+              }
+            },
+            {
+              "label": "invalid-untouched",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": false
+                }
+              }
+            },
+            {
+              "label": "invalid-touched-dirty",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": false
+                }
+              }
+            },
+            {
+              "label": "valid-touched-dirty",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": false
+                }
+              }
+            },
+            {
+              "label": "disabled",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": false
+                }
+              }
+            },
+            {
+              "label": "pending",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": true
+                }
+              }
+            },
+            {
+              "label": "replaced-valid-pristine",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": false
+                }
+              }
+            },
+            {
+              "label": "replaced-null",
+              "values": {
+                "untouched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "touched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pristine": {
+                  "kind": "null",
+                  "value": null
+                },
+                "dirty": {
+                  "kind": "null",
+                  "value": null
+                },
+                "valid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "invalid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pending": {
+                  "kind": "null",
+                  "value": null
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "owned-forwarder",
+          "observations": [
+            {
+              "label": "absent-component-control",
+              "values": {
+                "untouched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "touched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pristine": {
+                  "kind": "null",
+                  "value": null
+                },
+                "dirty": {
+                  "kind": "null",
+                  "value": null
+                },
+                "valid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "invalid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pending": {
+                  "kind": "null",
+                  "value": null
+                }
+              }
+            },
+            {
+              "label": "null-control-directive",
+              "values": {
+                "untouched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "touched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pristine": {
+                  "kind": "null",
+                  "value": null
+                },
+                "dirty": {
+                  "kind": "null",
+                  "value": null
+                },
+                "valid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "invalid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pending": {
+                  "kind": "null",
+                  "value": null
+                }
+              }
+            },
+            {
+              "label": "undefined-control-directive",
+              "values": {
+                "untouched": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "touched": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "pristine": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "dirty": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "valid": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "invalid": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "pending": {
+                  "kind": "undefined",
+                  "value": null
+                }
+              }
+            },
+            {
+              "label": "directive-without-control",
+              "values": {
+                "untouched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "touched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pristine": {
+                  "kind": "null",
+                  "value": null
+                },
+                "dirty": {
+                  "kind": "null",
+                  "value": null
+                },
+                "valid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "invalid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pending": {
+                  "kind": "null",
+                  "value": null
+                }
+              }
+            },
+            {
+              "label": "invalid-untouched",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": false
+                }
+              }
+            },
+            {
+              "label": "invalid-touched-dirty",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": false
+                }
+              }
+            },
+            {
+              "label": "valid-touched-dirty",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": false
+                }
+              }
+            },
+            {
+              "label": "disabled",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": false
+                }
+              }
+            },
+            {
+              "label": "pending",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": true
+                }
+              }
+            },
+            {
+              "label": "replaced-valid-pristine",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": false
+                }
+              }
+            },
+            {
+              "label": "replaced-null",
+              "values": {
+                "untouched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "touched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pristine": {
+                  "kind": "null",
+                  "value": null
+                },
+                "dirty": {
+                  "kind": "null",
+                  "value": null
+                },
+                "valid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "invalid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pending": {
+                  "kind": "null",
+                  "value": null
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "keys": [
+        "untouched",
+        "touched",
+        "pristine",
+        "dirty",
+        "valid",
+        "invalid",
+        "pending"
+      ],
+      "reads_per_subject": 154,
+      "actual_public_namespace_and_reactive_controls": true,
+      "host_control_wrapper_is_protocol": true,
+      "native_host_class_application_or_rendering": false
+    },
+    {
+      "line": "main",
+      "results": [
+        {
+          "id": "tagged-original",
+          "observations": [
+            {
+              "label": "absent-component-control",
+              "values": {
+                "untouched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "touched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pristine": {
+                  "kind": "null",
+                  "value": null
+                },
+                "dirty": {
+                  "kind": "null",
+                  "value": null
+                },
+                "valid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "invalid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pending": {
+                  "kind": "null",
+                  "value": null
+                }
+              }
+            },
+            {
+              "label": "null-control-directive",
+              "values": {
+                "untouched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "touched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pristine": {
+                  "kind": "null",
+                  "value": null
+                },
+                "dirty": {
+                  "kind": "null",
+                  "value": null
+                },
+                "valid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "invalid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pending": {
+                  "kind": "null",
+                  "value": null
+                }
+              }
+            },
+            {
+              "label": "undefined-control-directive",
+              "values": {
+                "untouched": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "touched": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "pristine": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "dirty": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "valid": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "invalid": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "pending": {
+                  "kind": "undefined",
+                  "value": null
+                }
+              }
+            },
+            {
+              "label": "directive-without-control",
+              "values": {
+                "untouched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "touched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pristine": {
+                  "kind": "null",
+                  "value": null
+                },
+                "dirty": {
+                  "kind": "null",
+                  "value": null
+                },
+                "valid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "invalid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pending": {
+                  "kind": "null",
+                  "value": null
+                }
+              }
+            },
+            {
+              "label": "invalid-untouched",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": false
+                }
+              }
+            },
+            {
+              "label": "invalid-touched-dirty",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": false
+                }
+              }
+            },
+            {
+              "label": "valid-touched-dirty",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": false
+                }
+              }
+            },
+            {
+              "label": "disabled",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": false
+                }
+              }
+            },
+            {
+              "label": "pending",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": true
+                }
+              }
+            },
+            {
+              "label": "replaced-valid-pristine",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": false
+                }
+              }
+            },
+            {
+              "label": "replaced-null",
+              "values": {
+                "untouched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "touched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pristine": {
+                  "kind": "null",
+                  "value": null
+                },
+                "dirty": {
+                  "kind": "null",
+                  "value": null
+                },
+                "valid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "invalid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pending": {
+                  "kind": "null",
+                  "value": null
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "owned-forwarder",
+          "observations": [
+            {
+              "label": "absent-component-control",
+              "values": {
+                "untouched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "touched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pristine": {
+                  "kind": "null",
+                  "value": null
+                },
+                "dirty": {
+                  "kind": "null",
+                  "value": null
+                },
+                "valid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "invalid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pending": {
+                  "kind": "null",
+                  "value": null
+                }
+              }
+            },
+            {
+              "label": "null-control-directive",
+              "values": {
+                "untouched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "touched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pristine": {
+                  "kind": "null",
+                  "value": null
+                },
+                "dirty": {
+                  "kind": "null",
+                  "value": null
+                },
+                "valid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "invalid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pending": {
+                  "kind": "null",
+                  "value": null
+                }
+              }
+            },
+            {
+              "label": "undefined-control-directive",
+              "values": {
+                "untouched": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "touched": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "pristine": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "dirty": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "valid": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "invalid": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "pending": {
+                  "kind": "undefined",
+                  "value": null
+                }
+              }
+            },
+            {
+              "label": "directive-without-control",
+              "values": {
+                "untouched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "touched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pristine": {
+                  "kind": "null",
+                  "value": null
+                },
+                "dirty": {
+                  "kind": "null",
+                  "value": null
+                },
+                "valid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "invalid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pending": {
+                  "kind": "null",
+                  "value": null
+                }
+              }
+            },
+            {
+              "label": "invalid-untouched",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": false
+                }
+              }
+            },
+            {
+              "label": "invalid-touched-dirty",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": false
+                }
+              }
+            },
+            {
+              "label": "valid-touched-dirty",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": false
+                }
+              }
+            },
+            {
+              "label": "disabled",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": false
+                }
+              }
+            },
+            {
+              "label": "pending",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": true
+                }
+              }
+            },
+            {
+              "label": "replaced-valid-pristine",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": false
+                }
+              }
+            },
+            {
+              "label": "replaced-null",
+              "values": {
+                "untouched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "touched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pristine": {
+                  "kind": "null",
+                  "value": null
+                },
+                "dirty": {
+                  "kind": "null",
+                  "value": null
+                },
+                "valid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "invalid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pending": {
+                  "kind": "null",
+                  "value": null
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "keys": [
+        "untouched",
+        "touched",
+        "pristine",
+        "dirty",
+        "valid",
+        "invalid",
+        "pending"
+      ],
+      "reads_per_subject": 154,
+      "actual_public_namespace_and_reactive_controls": true,
+      "host_control_wrapper_is_protocol": true,
+      "native_host_class_application_or_rendering": false
+    },
+    {
+      "line": "21.x",
+      "results": [
+        {
+          "id": "tagged-original",
+          "observations": [
+            {
+              "label": "absent-component-control",
+              "values": {
+                "untouched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "touched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pristine": {
+                  "kind": "null",
+                  "value": null
+                },
+                "dirty": {
+                  "kind": "null",
+                  "value": null
+                },
+                "valid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "invalid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pending": {
+                  "kind": "null",
+                  "value": null
+                }
+              }
+            },
+            {
+              "label": "null-control-directive",
+              "values": {
+                "untouched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "touched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pristine": {
+                  "kind": "null",
+                  "value": null
+                },
+                "dirty": {
+                  "kind": "null",
+                  "value": null
+                },
+                "valid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "invalid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pending": {
+                  "kind": "null",
+                  "value": null
+                }
+              }
+            },
+            {
+              "label": "undefined-control-directive",
+              "values": {
+                "untouched": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "touched": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "pristine": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "dirty": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "valid": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "invalid": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "pending": {
+                  "kind": "undefined",
+                  "value": null
+                }
+              }
+            },
+            {
+              "label": "directive-without-control",
+              "values": {
+                "untouched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "touched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pristine": {
+                  "kind": "null",
+                  "value": null
+                },
+                "dirty": {
+                  "kind": "null",
+                  "value": null
+                },
+                "valid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "invalid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pending": {
+                  "kind": "null",
+                  "value": null
+                }
+              }
+            },
+            {
+              "label": "invalid-untouched",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": false
+                }
+              }
+            },
+            {
+              "label": "invalid-touched-dirty",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": false
+                }
+              }
+            },
+            {
+              "label": "valid-touched-dirty",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": false
+                }
+              }
+            },
+            {
+              "label": "disabled",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": false
+                }
+              }
+            },
+            {
+              "label": "pending",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": true
+                }
+              }
+            },
+            {
+              "label": "replaced-valid-pristine",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": false
+                }
+              }
+            },
+            {
+              "label": "replaced-null",
+              "values": {
+                "untouched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "touched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pristine": {
+                  "kind": "null",
+                  "value": null
+                },
+                "dirty": {
+                  "kind": "null",
+                  "value": null
+                },
+                "valid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "invalid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pending": {
+                  "kind": "null",
+                  "value": null
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "owned-forwarder",
+          "observations": [
+            {
+              "label": "absent-component-control",
+              "values": {
+                "untouched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "touched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pristine": {
+                  "kind": "null",
+                  "value": null
+                },
+                "dirty": {
+                  "kind": "null",
+                  "value": null
+                },
+                "valid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "invalid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pending": {
+                  "kind": "null",
+                  "value": null
+                }
+              }
+            },
+            {
+              "label": "null-control-directive",
+              "values": {
+                "untouched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "touched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pristine": {
+                  "kind": "null",
+                  "value": null
+                },
+                "dirty": {
+                  "kind": "null",
+                  "value": null
+                },
+                "valid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "invalid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pending": {
+                  "kind": "null",
+                  "value": null
+                }
+              }
+            },
+            {
+              "label": "undefined-control-directive",
+              "values": {
+                "untouched": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "touched": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "pristine": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "dirty": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "valid": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "invalid": {
+                  "kind": "undefined",
+                  "value": null
+                },
+                "pending": {
+                  "kind": "undefined",
+                  "value": null
+                }
+              }
+            },
+            {
+              "label": "directive-without-control",
+              "values": {
+                "untouched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "touched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pristine": {
+                  "kind": "null",
+                  "value": null
+                },
+                "dirty": {
+                  "kind": "null",
+                  "value": null
+                },
+                "valid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "invalid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pending": {
+                  "kind": "null",
+                  "value": null
+                }
+              }
+            },
+            {
+              "label": "invalid-untouched",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": false
+                }
+              }
+            },
+            {
+              "label": "invalid-touched-dirty",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": false
+                }
+              }
+            },
+            {
+              "label": "valid-touched-dirty",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": false
+                }
+              }
+            },
+            {
+              "label": "disabled",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": false
+                }
+              }
+            },
+            {
+              "label": "pending",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": true
+                }
+              }
+            },
+            {
+              "label": "replaced-valid-pristine",
+              "values": {
+                "untouched": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "touched": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pristine": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "dirty": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "valid": {
+                  "kind": "boolean",
+                  "value": true
+                },
+                "invalid": {
+                  "kind": "boolean",
+                  "value": false
+                },
+                "pending": {
+                  "kind": "boolean",
+                  "value": false
+                }
+              }
+            },
+            {
+              "label": "replaced-null",
+              "values": {
+                "untouched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "touched": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pristine": {
+                  "kind": "null",
+                  "value": null
+                },
+                "dirty": {
+                  "kind": "null",
+                  "value": null
+                },
+                "valid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "invalid": {
+                  "kind": "null",
+                  "value": null
+                },
+                "pending": {
+                  "kind": "null",
+                  "value": null
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "keys": [
+        "untouched",
+        "touched",
+        "pristine",
+        "dirty",
+        "valid",
+        "invalid",
+        "pending"
+      ],
+      "reads_per_subject": 154,
+      "actual_public_namespace_and_reactive_controls": true,
+      "host_control_wrapper_is_protocol": true,
+      "native_host_class_application_or_rendering": false
+    }
+  ],
+  "type_compilation": {
+    "compiler": "5.9.2",
+    "compiler_source_sha256": "e5f1f6b3e82228a89873cc7b941b2465185e839c0692860f83e3e63e53f94c2b",
+    "subjects": [
+      {
+        "line": "original",
+        "negative_checks": 6,
+        "fixture_sha256": "d26a1bdb19997cb6dc492a697dd26ab1b6883c06b2f5fa2e9a2bf0531d9df44b"
+      },
+      {
+        "line": "main",
+        "negative_checks": 6,
+        "fixture_sha256": "d26a1bdb19997cb6dc492a697dd26ab1b6883c06b2f5fa2e9a2bf0531d9df44b"
+      },
+      {
+        "line": "21.x",
+        "negative_checks": 6,
+        "fixture_sha256": "d26a1bdb19997cb6dc492a697dd26ab1b6883c06b2f5fa2e9a2bf0531d9df44b"
+      }
+    ]
+  },
+  "reference": {
+    "path": "reference/material-16.2.14/control-forwarding-sources/form-field.ts",
+    "sha256": "c32e86f1be87568387a09abcd7e6c47e6cb33fd63ea0cff8b224e98073dd1726"
+  },
+  "namespace_capsule_sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3",
+  "node": "v22.23.3",
+  "binding_parser": "6.0.3",
+  "limits": [
+    "Seven exact historical class bindings and whole helper with genuine public ancestor/reactive control states. The form-field control wrapper is a protocol; no native DOM class application/rendering/AOT/packed/application/full Node/Rx qualification.",
+    "Declared Boolean return and historical runtime null/undefined absent-control values both retained. No truthiness normalization or public/private upstream API change."
+  ],
+  "g11_claim": "not-passed",
+  "alias_positive": true,
+  "mutations": [
+    {
+      "id": "duplicate-ancestor-import",
+      "rejected": true
+    },
+    {
+      "id": "unreviewed-runtime-construction",
+      "rejected": true
+    },
+    {
+      "id": "keyof-type-role-changed",
+      "rejected": true
+    },
+    {
+      "id": "historical-null-values-normalized",
+      "rejected": true
+    },
+    {
+      "id": "host-class-name-changed",
+      "rejected": true
+    },
+    {
+      "id": "host-state-key-swapped",
+      "rejected": true
+    },
+    {
+      "id": "main:absent-controls-coerced-to-false",
+      "rejected": true
+    },
+    {
+      "id": "main:state-lookup-always-invalid",
+      "rejected": true
+    },
+    {
+      "id": "21.x:absent-controls-coerced-to-false",
+      "rejected": true
+    },
+    {
+      "id": "21.x:state-lookup-always-invalid",
+      "rejected": true
+    }
+  ]
+}
