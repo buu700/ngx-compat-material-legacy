@@ -32,6 +32,7 @@ import {fileURLToPath} from 'node:url';
 import {spawnSync} from 'node:child_process';
 import {floorConfigurations,candidateFloorConfigurations} from './consumer-floor-roster.mjs';
 import {bundleConsumerHarness} from './bundle-consumer-harness.mjs';
+import {assertEngineFreeConsumer, assertEngineFreeHarnessInputs} from './consumer-animation-engine.mjs';
 import {
   allConsumerCaseIds,
   coordinatorRequest,
@@ -188,6 +189,7 @@ function compilePeerHarness(consumer, rootReal) {
 }
 
 function assertIsolatedInstall(consumer, consumerReal, rootReal) {
+  const animationEngine = assertEngineFreeConsumer(consumer);
   const pkgRoot = join(consumer, 'node_modules/@ngx-compat/material-legacy');
   const pkgReal = realpathSync(pkgRoot);
   if (
@@ -403,6 +405,7 @@ export class ModernStrictModule {}
     strict_templates: ['legacy-button', 'modern-button'],
     separate_compilation_scopes: true,
     animation_engine_imports: [],
+    animation_engine: animationEngine,
     registry_core_version: lockedCore,
     sass_include_paths: [],
     sass_compile: 'not run in this consumer',
@@ -682,7 +685,6 @@ try {
     private: true,
     type: 'module',
     dependencies: {
-      '@angular/animations': '22.1.7',
       '@angular/cdk': '22.1.7',
       '@angular/common': '22.1.7',
       '@angular/compiler': '22.1.7',
@@ -752,7 +754,6 @@ try {
     join(consumer, 'src/app.module.ts'),
     `import {NgModule, Component} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {ReactiveFormsModule} from '@angular/forms';
 import {MatLegacyButtonModule} from '@ngx-compat/material-legacy/legacy-button';
 import {MatLegacyDialogModule} from '@ngx-compat/material-legacy/legacy-dialog';
@@ -777,7 +778,6 @@ export class AotSmokeRoot {}
 @NgModule({
   imports: [
     BrowserModule,
-    BrowserAnimationsModule,
     ReactiveFormsModule,
     MatLegacyButtonModule,
     MatLegacyDialogModule,
@@ -914,7 +914,6 @@ import {
 } from '@angular/platform-browser-dynamic/testing';
 import {getTestBed, TestBed} from '@angular/core/testing';
 import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
-import {provideNoopAnimations} from '@angular/platform-browser/animations';
 import {Overlay, OverlayContainer} from '@angular/cdk/overlay';
 import {ScrollDispatcher} from '@angular/cdk/scrolling';
 import {By} from '@angular/platform-browser';
@@ -948,7 +947,7 @@ import {MatLegacyRadioModule} from '@ngx-compat/material-legacy/legacy-radio';
 import {MatIconModule, MatIconRegistry} from '@angular/material/icon';
 import {DomSanitizer} from '@angular/platform-browser';
 import {MatLegacyTabGroupHarness} from '@ngx-compat/material-legacy/legacy-tabs/testing';
-import {MatLegacyCommonModule, MATERIAL_LEGACY_SANITY_CHECKS, LegacyNativeDateAdapter, LegacyNativeDateModule, MatLegacyNativeDateModule, LegacyDateAdapter, MAT_LEGACY_DATE_LOCALE, MAT_LEGACY_DATE_FORMATS, MAT_LEGACY_NATIVE_DATE_FORMATS} from '@ngx-compat/material-legacy/legacy-core';
+import {MatLegacyCommonModule, MATERIAL_ANIMATIONS, MATERIAL_LEGACY_SANITY_CHECKS, LegacyNativeDateAdapter, LegacyNativeDateModule, MatLegacyNativeDateModule, LegacyDateAdapter, MAT_LEGACY_DATE_LOCALE, MAT_LEGACY_DATE_FORMATS, MAT_LEGACY_NATIVE_DATE_FORMATS} from '@ngx-compat/material-legacy/legacy-core';
 
 getTestBed().initTestEnvironment(
   BrowserDynamicTestingModule,
@@ -1171,8 +1170,16 @@ async function main() {
   }
   TestBed.configureTestingModule({
     imports: [HarnessHost, SmokeDialogContent, LegacyNativeDateModule, MatLegacyNativeDateModule],
-    providers: [provideNoopAnimations(), {provide: MAT_LEGACY_DATE_LOCALE, useValue: 'en-GB'}, {provide:TEXT_COLUMN_OPTIONS,useValue:ORIGINAL_TEXT_OPTIONS}],
+    providers: [
+      {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
+      // Preserve historical constructor-mode checks without installing an engine.
+      {provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations'},
+      {provide: MAT_LEGACY_DATE_LOCALE, useValue: 'en-GB'},
+      {provide: TEXT_COLUMN_OPTIONS, useValue: ORIGINAL_TEXT_OPTIONS},
+    ],
   });
+  const engineFreeAnimationPolicy = TestBed.inject(MATERIAL_ANIMATIONS).animationsDisabled === true
+    && TestBed.inject(ANIMATION_MODULE_TYPE) === 'NoopAnimations';
   const provided = TestBed.inject(LegacyDateAdapter);
   const nativeDateProvider = provided instanceof LegacyNativeDateAdapter &&
     provided !== direct && provided.getYear(provided.createDate(2024, 1, 29)) === 2024 &&
@@ -1787,7 +1794,7 @@ async function main() {
       selectOpened === true &&
       selectClosed === true &&
       tabCount === 2 &&
-      selected === 'Two' && viewportShared && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor && tabContentOriginalConstructor && noDataRowOriginalConstructor && constructorBorrowedProviderLifecycle && tableOriginalStickyBehavior && tableOriginalBooleanInputs && tableRecycleRowIdentity && tableDefinitionOriginalConstructors && tableAngularDiConstruction && tableOutletAndDefinitionOwnership && tabLabelOriginalConstructor,
+      selected === 'Two' && viewportShared && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor && tabContentOriginalConstructor && noDataRowOriginalConstructor && constructorBorrowedProviderLifecycle && tableOriginalStickyBehavior && tableOriginalBooleanInputs && tableRecycleRowIdentity && tableDefinitionOriginalConstructors && tableAngularDiConstruction && tableOutletAndDefinitionOwnership && tabLabelOriginalConstructor && engineFreeAnimationPolicy,
     buttonText: text,
     selectIsOpen: isOpen,
     dialogText,
@@ -1842,7 +1849,8 @@ async function main() {
       'MatLegacyTooltipHarness',
       'MatLegacyTabGroupHarness',
     ],
-    animationsProvider: 'provideNoopAnimations',
+    engineFreeAnimationPolicy,
+    animationsProvider: 'MATERIAL_ANIMATIONS + ANIMATION_MODULE_TYPE',
   };
   console.log(JSON.stringify(out));
   if (!out.ok) {
@@ -1879,6 +1887,7 @@ main().catch(err => {
       result.errors.push('Harness compile failed');
     } else {
       const bundle = bundleConsumerHarness(consumer);
+      assertEngineFreeHarnessInputs(bundle.receipt.inputs);
       const harness = run(process.execPath, [bundle.output], {
         cwd: consumer,
         timeout: 120000,

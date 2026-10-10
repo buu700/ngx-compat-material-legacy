@@ -1,5 +1,6 @@
 """Floor admission rejects borrowed, stale, arithmetic-only or failed receipts."""
 import copy
+import hashlib
 import json
 from pathlib import Path
 import sys
@@ -12,6 +13,39 @@ from consumer_floor_admission import floor_assertion_ok, reviewed_configurations
 from consumer_floor_fixture import write_floor_receipt
 
 class FloorAdmissionTests(unittest.TestCase):
+    def test_engine_present_or_unproven_receipts_are_rejected_after_rehash(self):
+        plan=json.loads((ROOT/'compatibility/rc/consumer-floor-plan.json').read_text())
+        for line in ('main','21.x'):
+            with tempfile.TemporaryDirectory() as tmp:
+                active=SimpleNamespace(run_dir=Path(tmp),binding={'source_line':line},manifest={'run_id':'synthetic','artifacts':[{'id':'library','sha256':'d'*64},{'id':'migrate-cli','sha256':'e'*64}]})
+                case=next(k for k,c in reviewed_configurations(plan,line).items() if c['group']=='library-runtime')
+                def rehash(record, value):
+                    path=active.run_dir/record['path'];raw=json.dumps(value).encode();path.write_bytes(raw)
+                    record.update(sha256=hashlib.sha256(raw).hexdigest(),bytes=len(raw))
+                for mutation in ('omitted-install-proof','installed-engine','locked-engine','omitted-policy','false-policy','old-provider','engine-bundle','nested-engine-bundle','browser-engine-bundle','async-engine-bundle','engine-lock','nested-engine-lock','old-version-roster'):
+                    body=write_floor_receipt(ROOT,active,case,'one')
+                    self.assertTrue(floor_assertion_ok(ROOT,active,body,'one'))
+                    detail=json.loads((active.run_dir/body['consumer_detail']['path']).read_text())
+                    if mutation=='omitted-install-proof':del detail['isolation']['animation_engine']
+                    elif mutation=='installed-engine':detail['isolation']['animation_engine']['installed_packages']=['node_modules/@angular/animations']
+                    elif mutation=='locked-engine':detail['isolation']['animation_engine']['lock_packages']=['node_modules/@angular/animations']
+                    elif mutation=='omitted-policy':del detail['harness']['result']['engineFreeAnimationPolicy']
+                    elif mutation=='false-policy':detail['harness']['result']['engineFreeAnimationPolicy']=False
+                    elif mutation=='old-provider':detail['harness']['result']['animationsProvider']='provideNoopAnimations'
+                    elif mutation.endswith('-bundle'):
+                        path={'engine-bundle':'node_modules/@angular/animations/fesm2022/animations.mjs','nested-engine-bundle':'node_modules/example/node_modules/@angular/animations/fesm2022/animations.mjs','browser-engine-bundle':'node_modules/@angular/platform-browser/fesm2022/animations.mjs','async-engine-bundle':'node_modules/@angular/platform-browser/fesm2022/async.mjs'}[mutation]
+                        detail['harness']['bundle']['inputs'].append({'path':path,'sha256':'f'*64})
+                    elif mutation.endswith('-lock'):
+                        lock=json.loads((active.run_dir/body['consumer_lock']['path']).read_text())
+                        key='node_modules/@angular/animations' if mutation=='engine-lock' else 'node_modules/example/node_modules/@angular/animations'
+                        lock['packages'][key]={'version':detail['floor_configuration']['framework']}
+                        rehash(body['consumer_lock'],lock);detail['consumer_lock']=body['consumer_lock']
+                    elif mutation=='old-version-roster':
+                        body['installed_versions']['@angular/animations']=detail['floor_configuration']['framework']
+                        detail['installed_floor_versions']=body['installed_versions']
+                    rehash(body['consumer_detail'],detail)
+                    self.assertFalse(floor_assertion_ok(ROOT,active,body,'one'),(line,mutation))
+
     def test_both_lines_and_invalid_receipts(self):
         plan=json.loads((ROOT/'compatibility/rc/consumer-floor-plan.json').read_text())
         for line in ('main','21.x'):
