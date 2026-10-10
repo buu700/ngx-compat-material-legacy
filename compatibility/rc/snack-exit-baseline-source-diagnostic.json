@@ -1,0 +1,140 @@
+{
+  "results": [
+    {
+      "line": "original",
+      "mode": "zoneful",
+      "production": false,
+      "original": {
+        "next": 1,
+        "complete": 1
+      },
+      "candidate": {
+        "next": 1,
+        "complete": 1
+      }
+    },
+    {
+      "line": "original",
+      "mode": "zoneful",
+      "production": true,
+      "original": {
+        "next": 1,
+        "complete": 1
+      },
+      "candidate": {
+        "next": 1,
+        "complete": 1
+      }
+    },
+    {
+      "line": "main",
+      "mode": "zoneful",
+      "production": false,
+      "original": {
+        "next": 1,
+        "complete": 1
+      },
+      "candidate": {
+        "next": 1,
+        "complete": 1
+      }
+    },
+    {
+      "line": "main",
+      "mode": "zoneful",
+      "production": true,
+      "original": {
+        "next": 1,
+        "complete": 1
+      },
+      "candidate": {
+        "next": 1,
+        "complete": 1
+      }
+    },
+    {
+      "line": "main",
+      "mode": "zoneless",
+      "production": false,
+      "original": {
+        "next": 0,
+        "complete": 0
+      },
+      "candidate": {
+        "next": 0,
+        "complete": 0
+      }
+    },
+    {
+      "line": "main",
+      "mode": "zoneless",
+      "production": true,
+      "original": {
+        "next": 0,
+        "complete": 0
+      },
+      "candidate": {
+        "next": 0,
+        "complete": 0
+      }
+    },
+    {
+      "line": "21.x",
+      "mode": "zoneful",
+      "production": false,
+      "original": {
+        "next": 1,
+        "complete": 1
+      },
+      "candidate": {
+        "next": 1,
+        "complete": 1
+      }
+    },
+    {
+      "line": "21.x",
+      "mode": "zoneful",
+      "production": true,
+      "original": {
+        "next": 1,
+        "complete": 1
+      },
+      "candidate": {
+        "next": 1,
+        "complete": 1
+      }
+    },
+    {
+      "line": "21.x",
+      "mode": "zoneless",
+      "production": false,
+      "original": {
+        "next": 0,
+        "complete": 0
+      },
+      "candidate": {
+        "next": 0,
+        "complete": 0
+      }
+    },
+    {
+      "line": "21.x",
+      "mode": "zoneless",
+      "production": true,
+      "original": {
+        "next": 0,
+        "complete": 0
+      },
+      "candidate": {
+        "next": 0,
+        "complete": 0
+      }
+    }
+  ],
+  "scope": "Whole base constructor/members, Angular decorators removed; portal parent, DOM, CDR, config/platform protocols. Genuine NgZone and current public-provider application. No actual native/packed legacy instances.",
+  "driver_source": "import assert from 'node:assert/strict';import{createRequire}from'node:module';import{readFileSync,writeFileSync}from'node:fs';import{execFileSync}from'node:child_process';import{join}from'node:path';\nconst root=process.argv[2],require=createRequire(join(root,'package.json')),ts=require('typescript');\nconst{prepareMaterialPublicSubjects}=await import(join(root,'scripts/material-public-subjects.mjs'));\nconst{installNgZonePublicSubject}=await import(join(root,'scripts/ng-zone-public-subjects.mjs'));\nconst loaded=prepareMaterialPublicSubjects(root),results=[];\nfunction replay(path){const source=ts.createSourceFile(path,readFileSync(join(root,path),'utf8'),ts.ScriptTarget.Latest,true),cls=source.statements.find(n=>ts.isClassDeclaration(n)&&n.name.text==='_MatSnackBarContainerBase');assert.ok(cls);\n const value=ts.factory.updateClassDeclaration(cls,[ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],ts.factory.createIdentifier('Replay'),undefined,[ts.factory.createHeritageClause(ts.SyntaxKind.ExtendsKeyword,[ts.factory.createExpressionWithTypeArguments(ts.factory.createIdentifier('PortalProtocol'),undefined)])],cls.members);\n const changed=ts.transform(value,[context=>node=>{const visit=node=>ts.isDecorator(node)?undefined:ts.visitEachChild(node,visit,context);return ts.visitNode(node,visit);}]);\n try{return ts.transpileModule(ts.createPrinter().printNode(ts.EmitHint.Unspecified,changed.transformed[0],source),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;}finally{changed.dispose();}}\ntry{for(const model of loaded.models){installNgZonePublicSubject(model,root);writeFileSync(join(model.root,'payload.json'),JSON.stringify({original:replay('reference/material-16.2.14/snack-exit-sources/snack-bar-container.ts'),candidate:replay('projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts')}));\n for(const mode of model.line==='original'?['zoneful']:['zoneful','zoneless'])for(const production of [false,true]){const script=`${production?'globalThis.ngDevMode=false;':''}\nimport assert from'node:assert/strict';import{readFileSync}from'node:fs';${mode==='zoneful'?\"await import('zone.js/node');\":''}\nawait import('@angular/compiler');const core=await import('@angular/core'),common=await import('@angular/common'),rx=await import('rxjs'),ops=await import('rxjs/operators');\nconst payload=JSON.parse(readFileSync(new URL('./payload.json',import.meta.url)));let app,zone;\n${model.line==='original'?`zone=new core.NgZone({enableLongStackTrace:false});`:`const browser=await import('@angular/platform-browser');app=await browser.createApplication({providers:[core.${mode==='zoneful'?'provideZoneChangeDetection':'provideZonelessChangeDetection'}(),{provide:common.IMAGE_CONFIG,useValue:{disableImageSizeWarning:true,disableImageLazyLoadWarning:true}},{provide:core.DOCUMENT,useValue:{head:{children:[]}}},{provide:core.RendererFactory2,useValue:{createRenderer:()=>({})}}]});zone=app.injector.get(core.NgZone);`}\nconst injector=core.Injector.create({providers:[{provide:common.DOCUMENT,useValue:{querySelectorAll:()=>[]}}]});\nasync function observe(js){const exports={};new Function('exports','PortalProtocol','inject','DOCUMENT','Subject','take','uniqueId',js)(exports,class{},core.inject,common.DOCUMENT,rx.Subject,ops.take,0);\n const Type=exports.Replay;assert.equal(Type.length,5);const instance=core.runInInjectionContext(injector,()=>new Type(zone,new core.ElementRef({}),{markForCheck(){},detectChanges(){}},{FIREFOX:false},{politeness:'polite'}));let next=0,complete=0;\n instance._onExit.subscribe({next:()=>next++,complete:()=>complete++});zone.run(()=>{instance.onAnimationEnd({fromState:'visible',toState:'hidden'});assert.equal(next,0);});await new Promise(resolve=>setTimeout(resolve,0));return{next,complete};}\ntry{const original=await observe(payload.original),candidate=await observe(payload.candidate);assert.deepEqual(original,candidate);assert.equal(candidate.next,${mode==='zoneful'?1:0});console.log(JSON.stringify({original,candidate}));}finally{injector.destroy();app?.destroy();core.destroyPlatform();}\n`;const path=join(model.root,'probe.mjs');writeFileSync(path,script);results.push({line:model.line,mode,production,...JSON.parse(execFileSync(process.execPath,[path],{cwd:model.root,encoding:'utf8',timeout:30000,maxBuffer:1024*1024}))});}}\n writeFileSync('/tmp/closeout-snack-exit-baseline-20261010.json',JSON.stringify({results,scope:'Whole base constructor/members, Angular decorators removed; portal parent, DOM, CDR, config/platform protocols. Genuine NgZone and current public-provider application. No actual native/packed legacy instances.'},null,2)+'\\n',{flag:'wx'});console.log(JSON.stringify(results));\n}finally{loaded.dispose();}\n",
+  "driver_sha256": "514d695662c7c51fb0e8ace895fee54725a535aaac878d85084aacc4db486013",
+  "candidate_source_head": "fe5b8ef8b",
+  "branch_local_source_execution": "main",
+  "candidate_source_sha256": "ad1a2aa2b0ad1dbf04811979eacfc0bfe6055b692f2ae58c4acc9979af99d446"
+}

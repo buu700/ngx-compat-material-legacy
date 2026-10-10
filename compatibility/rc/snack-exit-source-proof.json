@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "recorded_at_utc": "2026-10-10T04:51:24.908602+00:00",
+  "status": "source/public-zone/motion-lifecycle/type repair passed; actual packed/native snack qualification pending",
+  "source_heads": {
+    "main": "de7908218df2c620d768514365c8cf85d17c1b18",
+    "21.x": "b22170b29eb91ad76c4258f74517e09bf37057f6"
+  },
+  "source_trees": {
+    "main": "bf8d2ed4570c0a3714d317421f642193aa30eeca",
+    "21.x": "27fe272bd3813c6ff0a375cb80e9e130a61fd747"
+  },
+  "problem": "The tagged and candidate container base wait for onMicrotaskEmpty after exit. At both current minima genuine zoneless providers emit no such event, leaving enabled CSS-event/fallback dismissal pending. The prior disabled-motion leaf directly emits on a microtask and masks this in the existing browser fixture.",
+  "repair": [
+    "A private pending flag makes base completion one-shot across motion and destruction.",
+    "An already-stable zone completes asynchronously on queueMicrotask, then runs the historical void exit notification through public NgZone.run. A currently active zone retains the original one-shot onMicrotaskEmpty wait.",
+    "Completion still occurs when the container is destroyed; this callback must deliver the historical dismissal notification rather than be canceled by destruction."
+  ],
+  "preserved": {
+    "historical_5_parameter_constructor_and_body_identical": true,
+    "existing_public_declarations_unchanged": true,
+    "owned_reference_class_body_matches_untouched_tag": true,
+    "owned_leaf_unchanged": true,
+    "product_HTML_CSS_SCSS_changed": false,
+    "required_consumer_HTML_CSS_SCSS_changes": false,
+    "consumer_TS_edits_found_necessary": false,
+    "goldens_changed": false
+  },
+  "tests": {
+    "python_tests": 4,
+    "isolated_framework_subjects": 10,
+    "current_zoneful_zoneless_development_production_subjects": 8,
+    "original_zoneful_subjects": 2,
+    "specific_mutation_rejections": 24,
+    "strict_completion_negative_checks_per_current_subject": 4,
+    "strict_compiler": "6.0.2",
+    "native_predicate_tests": 1,
+    "browser_source_identity_tests": 2,
+    "generated_test_consumer_TS_syntax_cases": 2,
+    "syntax_check_binding_parser": "6.0.3"
+  },
+  "observations": [
+    "The whole original/owned base constructors and members execute in a genuine public injector context for the historical DOCUMENT initializer. The complete owned MatSnackBarRef class matches the untouched tagged class body. The current public application obtains its real NgZone through zoneful/zoneless providers.",
+    "Exit observers and actual reference disposal/afterDismissed output match the tagged zoneful path. The current zoneless tagged path remains pending, while the candidate emits once and disposes the overlay protocol. Stable completion remains asynchronous and zoneful stable outside-zone callbacks re-enter Angular.",
+    "The unchanged actual owned CSS-motion leaf and motion-event helper execute with controlled animation-policy and timeout delivery. Native-shaped host events, ignored child events, 125ms fallback, disabled motion, action dismissal and destruction-before-motion all preserve one observable dismissal and one disposal. Enter/exit states and mat-exit attributes remain intact; motion and announcement timers clear on exit/destruction.",
+    "Twenty-four controls reject the prior wait, synchronous stable removal, duplicate base scheduling, preempted zoneful timing, retained repeating zone waits and omitted Angular re-entry."
+  ],
+  "runtime_scope": "Whole original/owned base constructors/members, actual owned CSS-motion subclass, owned motion-event helper and complete historical reference class replayed without Angular decorators. Genuine public NgZone, Injector/runInInjectionContext/DOCUMENT and current public-provider application. Portal parent, host DOM, CDR, platform/config, animation-policy return and timeout clock are protocols. Historical pending subscriptions are explicitly canceled only by fixture cleanup. No actual legacy Angular node DI, native CSS frames/event/overlay, packed/AOT/consumer build or Rx/Node floors.",
+  "historical_difference": "The tagged source may register another wait during reentrant reference disposal/destruction. Further Subject.next calls after completion do not notify observers. Candidate one-shot base scheduling intentionally removes those extra waits. The unchanged disabled-motion leaf still directly completes its Subject; its subsequent base destruction completion is inert for subscribers. This is observable-contract preservation, not equality of all internal invocation counts.",
+  "targeted_style_review": {
+    "files": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.html",
+        "sha256": "9b92fdf9e5e74ea73f6f7cd3305dfd79dc832c25f5de1f6d2aa1f63b17ccaee2"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.scss",
+        "sha256": "f87776ff2d2a32075eb2794b68cc2a8eb018ec7cedbe494dcdf4c0c586504dfc"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts",
+        "sha256": "0024d9887c6f28e9339098f43a40ae84590f26950aa09a8f0e0d8a7494dbeae5"
+      }
+    ],
+    "result": "Existing leaf host state bindings, native-event filter, 150ms enter/75ms exit CSS recipes and 200ms/125ms fallback deadlines remain unchanged. The repair changes completion scheduling after motion only. This source review does not qualify native rendered frames."
+  },
+  "native_producer": "The packed overlay slice retains its disabled-motion case and adds an isolated enabled-motion fixture using the existing test override through viewContainerRef. Event and deliberately suppressed-event fallback cases require real trusted CSS enter/exit events, actual owned onAnimationEnd delivery classification, one completed action dismissal, removal and fallback deadlines. The handler wrapper forwards arguments and leaves event routing/timers intact. No added matrix cells; native execution unrun.",
+  "source_binding_refresh": {
+    "previous_frozen_reviewed_rows": 5,
+    "fresh_checker_calls": 24,
+    "review_documents_refreshed": 5,
+    "new_frozen_use_admissions": 0,
+    "new_upstream_SHA_closures": 0,
+    "historical_component_or_native_runs_restamped": false
+  },
+  "cyph_sanity": {
+    "head": "a56a0603636cac5aaabe8fe408f7429b4224f011",
+    "clean": true,
+    "scope": "Read-only service/module imports and toast lifecycle. Cyph opens snack bars with duration, dismiss/dismissWithAction and awaits onAction. No direct container construction or subclass found in shared/js TypeScript excluding specs. No snackbar CSS/SCSS override found in the searched shared tree. No consumer build or edits.",
+    "files": [
+      {
+        "path": "shared/js/cyph/services/material-dialog.service.ts",
+        "sha256": "45607f3bd9d68f21e98b38cbda7d091d4a176c49bb14374f05c9d744642fb214"
+      },
+      {
+        "path": "shared/js/cyph/modules/cyph-web.module.ts",
+        "sha256": "4b50f3b89c32ac00cff95891891e5e2284682afade511861fb0852bbc04d1a36"
+      }
+    ],
+    "consumer_build_executed": false
+  },
+  "environment": {
+    "host_node": "v22.23.3",
+    "borrowed_rxjs": "7.8.2",
+    "borrowed_tslib": "2.8.1",
+    "binding_parser": "6.0.3",
+    "advertised_runtime_Rx_native_packed_floors_qualified": false
+  },
+  "harness_corrections": [
+    "A stronger retained-wait assertion is applied to the candidate; the untouched original remains an independent observable oracle with its real reentrant teardown behavior recorded.",
+    "Zone context is recorded by the observer then asserted outside it so RxJS asynchronous error reporting cannot masquerade as a specific mutation rejection."
+  ],
+  "remaining": [
+    "All 25 frozen NgZone boundaries remain open pending complete caller/lifecycle and native qualification.",
+    "Reproduce menu queued first-focus destruction and chips deferred blur; these still have deferred stability paths needing contextual review.",
+    "Complete packed/native/floors/Sass/security/SHA closeout, C05 and independent A01-A10/R01-R03 audit remain required."
+  ],
+  "pushed": false,
+  "actions_started": false,
+  "g11_claim": "not-passed"
+}
