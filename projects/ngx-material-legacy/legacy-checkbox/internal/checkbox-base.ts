@@ -183,6 +183,13 @@ export abstract class _MatCheckboxBase<E>
 
   private _currentAnimationClass: string = '';
 
+  private _checkboxDestroyed = false;
+  private readonly _animationCleanups = new Set<{
+    element: HTMLElement;
+    animationClass: string;
+    timeout: ReturnType<typeof setTimeout> | undefined;
+  }>();
+
   private _currentCheckState: TransitionCheckState = TransitionCheckState.Init;
 
   private _controlValueAccessorChangeFn: (value: any) => void = () => {};
@@ -205,6 +212,18 @@ export abstract class _MatCheckboxBase<E>
 
   ngAfterViewInit() {
     this._syncIndeterminate(this._indeterminate);
+  }
+
+  ngOnDestroy() {
+    if (this._checkboxDestroyed) {
+      return;
+    }
+    this._checkboxDestroyed = true;
+    this._animationCleanups.forEach(cleanup => {
+      clearTimeout(cleanup.timeout);
+      cleanup.element.classList.remove(cleanup.animationClass);
+    });
+    this._animationCleanups.clear();
   }
 
   /** Whether the checkbox is checked. */
@@ -304,6 +323,9 @@ export abstract class _MatCheckboxBase<E>
   }
 
   private _transitionCheckState(newState: TransitionCheckState) {
+    if (this._checkboxDestroyed) {
+      return;
+    }
     let oldState = this._currentCheckState;
     let element = this._getAnimationTargetElement();
 
@@ -327,9 +349,17 @@ export abstract class _MatCheckboxBase<E>
       const animationClass = this._currentAnimationClass;
 
       this._ngZone.runOutsideAngular(() => {
-        setTimeout(() => {
-          element!.classList.remove(animationClass);
+        const cleanup = {element: element!, animationClass, timeout: undefined as ReturnType<typeof setTimeout> | undefined};
+        cleanup.timeout = setTimeout(() => {
+          this._animationCleanups.delete(cleanup);
+          // An earlier timer must not remove a class reused by a later transition.
+          const reused = Array.from(this._animationCleanups).some(pending =>
+            pending.element === cleanup.element && pending.animationClass === animationClass);
+          if (!this._checkboxDestroyed && !reused) {
+            cleanup.element.classList.remove(animationClass);
+          }
         }, 1000);
+        this._animationCleanups.add(cleanup);
       });
     }
   }
