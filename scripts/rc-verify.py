@@ -32,6 +32,7 @@ from rc_acceptance import (
     assertion_directory, expected_cases, prepack_binding_for,
 )
 from archive_run_closure import ClosureError, write_closure
+from historical_inventory_source import check_inventory_source_bindings
 from owned_rendered_admission import owned_rendered_ok
 from migration_workspace_admission import old_workspace_assertion_ok, workspace_support_records
 from migration_transaction_admission import transaction_assertion_ok
@@ -1372,6 +1373,9 @@ def main() -> int:
         print('verify: matrix structure valid; no product checks executed')
         return 0
     out_dir, line = parse_args(sys.argv[1:])
+    check_inventory_source_bindings(
+        json.loads((ROOT / "testing/legacy-runner/historical-inventory.json").read_text()),
+        json.loads((ROOT / "testing/legacy-runner/historical-specs.json").read_text()))
     out_dir = out_dir.resolve()
     allowed_bases = ((ROOT / "artifacts").resolve(), Path(tempfile.gettempdir()).resolve())
     allowed = False
