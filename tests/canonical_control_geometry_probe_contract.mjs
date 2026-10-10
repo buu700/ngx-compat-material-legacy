@@ -91,6 +91,11 @@ function fixture(family, faults = {}, source = raw) {
       if (selector === '.mat-form-field-suffix') return faults.boundarySuffix ? null : {};
       return null;
     }};
+  const noLabel = {tagName: 'MAT-FORM-FIELD',classList:{contains: name => name==='mat-form-field'||
+    name==='mat-form-field-can-float'||(name==='mat-form-field-has-label'&&!!faults.noLabelHasLabel)||
+    (name==='mat-form-field-should-float'&&!faults.noLabelDoesNotFloat)},
+    querySelector: () => ({disabled: !faults.noLabelEnabled,value: faults.noLabelWrongValue?'': 'off'}),
+    querySelectorAll: () => faults.noLabelElement?[{}]:[]};
   window.__lab = {closeTransient() {},
     readChipFormState: () => ({focused, touched}), resetChipFormState() {touched = !!faults.touchedBefore;}};
   if (faults.noChipApi) delete window.__lab.readChipFormState;
@@ -99,6 +104,7 @@ function fixture(family, faults = {}, source = raw) {
       if (selector === '#wrap-' + family) return {};
       if (selector === '#wrap-field' && family === 'form-field') return {};
       if (selector === '#p-field.mat-form-field #p-hint') return {};
+      if (selector === '#p-field-disabled') return faults.noLabelMissing?null:noLabel;
       if (selector === '#p-outline') return outline;
       if (selector === '#p-outline-boundary') return faults.boundaryMissing ? null : boundary;
       if (selector === '#p-outline-wrapper') return wrapper;
@@ -174,6 +180,10 @@ for (const faults of [{wrongOutlineStart: true}, {wrongOutlineGap: true}, {noOut
 for (const faults of [{boundaryClamp: true}, {boundaryShort: true}, {boundaryPosition: true},
     {boundaryOffsetParent: true}, {boundaryRoot: true}, {boundaryPrefix: true}, {boundarySuffix: true}, {boundaryMissing: true}]) {
   await check('outline-boundary-reject-' + JSON.stringify(faults), 'form-field', faults, false);
+}
+for (const faults of [{noLabelHasLabel:true},{noLabelDoesNotFloat:true},{noLabelEnabled:true},
+    {noLabelWrongValue:true},{noLabelElement:true},{noLabelMissing:true}]) {
+  await check('tagged-no-label-state-reject-'+JSON.stringify(faults),'form-field',faults,false);
 }
 const bypassFont = raw.replace('return legacySelectFontNativeOkay(observation) ? observation : null;',
   'return observation.panel_count === 1 ? observation : null;');

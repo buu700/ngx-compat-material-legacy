@@ -169,6 +169,8 @@ export class MatLegacyFormField
   private _outlineGapCalculationNeededOnStable = false;
 
   private readonly _destroyed = new Subject<void>();
+  private _formFieldDestroyed = false;
+  private readonly _directionFrames = new Set<number>();
 
   /** The form field appearance style. */
   @Input()
@@ -374,9 +376,18 @@ export class MatLegacyFormField
 
     if (this._dir) {
       this._dir.change.pipe(takeUntil(this._destroyed)).subscribe(() => {
+        if (this._formFieldDestroyed) {
+          return;
+        }
         if (typeof requestAnimationFrame === 'function') {
           this._ngZone.runOutsideAngular(() => {
-            requestAnimationFrame(() => this.updateOutlineGap());
+            const frameId = requestAnimationFrame(() => {
+              this._directionFrames.delete(frameId);
+              if (!this._formFieldDestroyed) {
+                this.updateOutlineGap();
+              }
+            });
+            this._directionFrames.add(frameId);
           });
         } else {
           this.updateOutlineGap();
@@ -420,6 +431,11 @@ export class MatLegacyFormField
   }
 
   ngOnDestroy() {
+    this._formFieldDestroyed = true;
+    if (typeof cancelAnimationFrame === 'function') {
+      this._directionFrames.forEach(frameId => cancelAnimationFrame(frameId));
+    }
+    this._directionFrames.clear();
     this._stateChanges?.unsubscribe();
     this._valueChanges?.unsubscribe();
     this._describedByChanges?.unsubscribe();
@@ -445,10 +461,6 @@ export class MatLegacyFormField
   }
 
   _shouldLabelFloat(): boolean {
-    // Avoid leaving a floated gap when the floating label was removed dynamically.
-    if (!this._hasFloatingLabel()) {
-      return false;
-    }
     return (
       this._canLabelFloat() &&
       ((this._control && this._control.shouldLabelFloat) || this._shouldAlwaysFloat())
