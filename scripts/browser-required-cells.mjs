@@ -17,6 +17,7 @@ import {legacySnackMotionNativeOkay, trackLegacySnackMotionNative, readLegacySna
 import {tooltipAriaLifetimeFixture} from './tooltip-aria-lifetime-fixture.mjs';
 import {formFieldDirectionLifetimeFixture, legacyFormFieldDirectionLifetimeNativeOkay} from './form-field-direction-lifetime-fixture.mjs';
 import {checkboxTimerLifetimeFixture, legacyCheckboxTimerLifetimeNativeOkay} from './checkbox-timer-lifetime-fixture.mjs';
+import {rippleDelegationLifetimeFixture, legacyRippleDelegationLifetimeNativeOkay} from './ripple-delegation-lifetime-fixture.mjs';
 import {legacyTooltipAriaLifetimeNativeOkay, legacyTooltipNativeOkay, legacyTooltipMessageSequenceOkay, readLegacyTooltipNative} from './legacy-tooltip-native-contract.mjs';
 import {legacyInkBarNativeOkay, legacyInkBarSelectionSequenceOkay, readLegacyInkBarNative} from './legacy-ink-bar-native-contract.mjs';
 import {legacySelectFontNativeOkay, readLegacySelectFontNative} from './legacy-select-font-native-contract.mjs';
@@ -64,7 +65,7 @@ export function requiredProbeSource() {
   return [legacyTooltipAriaLifetimeNativeOkay, legacyTooltipNativeOkay, legacyTooltipMessageSequenceOkay, readLegacyTooltipNative, legacyInkBarNativeOkay, legacyInkBarSelectionSequenceOkay,
     readLegacyInkBarNative, legacySelectFontNativeOkay, readLegacySelectFontNative, legacyChipBlurNativeOkay,
     legacyFormFieldOutlineNativeOkay, legacyFormFieldOutlineSequenceOkay, readLegacyFormFieldOutlineNative, legacyFormFieldOutlineBoundaryNativeOkay, readLegacyFormFieldOutlineBoundaryNative, legacyFormFieldNoLabelNativeOkay, readLegacyFormFieldNoLabelNative,
-    legacyFormFieldDirectionLifetimeNativeOkay, legacyCheckboxTimerLifetimeNativeOkay,
+    legacyFormFieldDirectionLifetimeNativeOkay, legacyCheckboxTimerLifetimeNativeOkay, legacyRippleDelegationLifetimeNativeOkay,
     tabPaginationNativeOkay, readTabPaginationNative, legacySnackMotionNativeOkay,
     legacySnackAnnouncementLifetimeNativeOkay,
     trackLegacySnackMotionNative, readLegacySnackMotionEnterNative, readLegacySnackMotionExitNative]
@@ -142,6 +143,7 @@ function dependenciesWithLibrary(dependencies, librarySpec) {
 
 function labHtml() {
   return [
+    '<ng-container *ngIf="!rippleOnly">',
     '<div id="surface" class="lab-light mat-app-background" dir="ltr">',
     '<div id="wrap-button" *ngIf="!cspOnly">',
     '<button id="p-button" mat-button type="button">Default</button>',
@@ -159,7 +161,7 @@ function labHtml() {
     '<mat-chip-list id="p-chip-list" #chipList="matChipList" [formControl]="chipControl" [errorStateMatcher]="matcher"><mat-chip>One</mat-chip></mat-chip-list>',
     '<mat-chip-list disabled><mat-chip>Off</mat-chip></mat-chip-list>',
     '</div>',
-    '<div id="wrap-core" *ngIf="!cspOnly"><mat-pseudo-checkbox id="p-core" state="checked"></mat-pseudo-checkbox></div>',
+    '<div id="wrap-core" *ngIf="!cspOnly"><mat-pseudo-checkbox id="p-core" state="checked"></mat-pseudo-checkbox><lab-ripple-frame></lab-ripple-frame></div>',
     '<div id="wrap-dialog"><button id="p-dialog-open" type="button" (click)="openDialog()">Open dialog</button></div>',
     '<div id="wrap-field" *ngIf="!cspOnly">',
     '<mat-form-field id="p-field"><mat-label>Name</mat-label><input id="p-field-input" matInput [errorStateMatcher]="matcher"><mat-hint id="p-hint">Hint text</mat-hint></mat-form-field>',
@@ -233,6 +235,7 @@ function labHtml() {
     '<lab-tooltip-aria-lifetime></lab-tooltip-aria-lifetime>',
     '</div>',
     '</div>',
+    '</ng-container><div *ngIf="rippleOnly" id="surface" class="lab-light mat-app-background"><lab-ripple-delegation></lab-ripple-delegation></div>',
   ].join('');
 }
 
@@ -240,13 +243,15 @@ function labSource(zoneless) {
   const zoneImport = zoneless ? '' : "import 'zone.js';\n";
   const zoneNamed = zoneless ? ', provideZonelessChangeDetection' : '';
   const zoneProvider = zoneless ? 'provideZonelessChangeDetection(), ' : '';
-  return `${zoneImport}import {CSP_NONCE, ChangeDetectorRef, Component, Directive, Injector, Input, NgModule, QueryList, TemplateRef, ViewChild, ViewChildren, ViewContainerRef, afterNextRender, forwardRef, inject, signal${zoneNamed}} from '@angular/core';
+  return `${zoneImport}import {CSP_NONCE, ChangeDetectorRef, Component, ElementRef, NgZone, Directive, Injector, Input, NgModule, QueryList, TemplateRef, ViewChild, ViewChildren, ViewContainerRef, afterNextRender, forwardRef, inject, signal${zoneNamed}} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {BidiModule, Dir, Directionality} from '@angular/cdk/bidi';
+import {Platform} from '@angular/cdk/platform';
 import {TemplatePortal} from '@angular/cdk/portal';
 import {MatSnackBarConfig} from '@angular/material/snack-bar';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {AbstractControl, FormControl, FormsModule, NG_VALIDATORS, ReactiveFormsModule, ValidationErrors, Validator} from '@angular/forms';
+import {LegacyRippleRenderer, LegacyRippleRef, LegacyRippleState} from '@ngx-compat/material-legacy/legacy-core';
 import {LEGACY_ANIMATIONS_TEST_OVERRIDE} from '@ngx-compat/material-legacy/legacy-core';
 import {ErrorStateMatcher, MATERIAL_ANIMATIONS} from '@angular/material/core';
 import {MatLegacyAutocompleteModule} from '@ngx-compat/material-legacy/legacy-autocomplete';
@@ -275,6 +280,7 @@ import {MatLegacyTooltip, MatLegacyTooltipModule} from '@ngx-compat/material-leg
 ${tooltipAriaLifetimeFixture}
 ${formFieldDirectionLifetimeFixture}
 ${checkboxTimerLifetimeFixture}
+${rippleDelegationLifetimeFixture}
 ${snackMotionFixture}
 ${snackAnnouncementLifetimeFixture}
 
@@ -307,6 +313,7 @@ export class DialogBody {}
   template: ${JSON.stringify(labHtml())},
 })
 export class LabRoot {
+  readonly rippleOnly = typeof window !== 'undefined' && new URL(window.location.href).searchParams.get('legacyRippleOnly') === '1';
   private dialog = inject(MatLegacyDialog);
   private snack = inject(MatLegacySnackBar);
   cspOnly = typeof window !== 'undefined' && !!(window as unknown as {__cspOnly?: boolean}).__cspOnly;
@@ -329,6 +336,8 @@ export class LabRoot {
   @ViewChild('tipOff') tipOff!: any;
   @ViewChild('chipList') chipList?: MatLegacyChipList;
   @ViewChild(TooltipAriaLifetimeLab) ariaLifetimeLab?: TooltipAriaLifetimeLab;
+  @ViewChild(RippleDelegationLab) rippleDelegationLab?: RippleDelegationLab;
+  @ViewChild(RippleDelegationFrameLab) rippleFrameLab?: RippleDelegationFrameLab;
   @ViewChild(CheckboxTimerLifetimeLab) checkboxTimerLifetimeLab?: CheckboxTimerLifetimeLab;
   @ViewChild(FormFieldDirectionLifetimeLab) fieldDirectionLifetimeLab?: FormFieldDirectionLifetimeLab;
   @ViewChild(SnackAnnouncementLifetimeLab) snackAnnouncementLifetimeLab?: SnackAnnouncementLifetimeLab;
@@ -354,6 +363,7 @@ export class LabRoot {
     const lab = this;
     (window as unknown as {__lab: unknown}).__lab = {
       closeTransient() {
+        lab.rippleFrameLab?.dispose();
         try { lab.dialog.closeAll(); } catch { /* overlay already gone */ }
         try { lab.snack.dismiss(); } catch { /* snack already gone */ }
         try { lab.menuTrigger && lab.menuTrigger.closeMenu(); } catch { /* menu already closed */ }
@@ -372,6 +382,30 @@ export class LabRoot {
       runTooltipAriaLifetime() {
         if (!lab.ariaLifetimeLab) return Promise.reject(new Error('tooltip ARIA fixture missing'));
         return lab.ariaLifetimeLab.run();
+      },
+      prepareRippleDelegation() {
+        if (!lab.rippleOnly || !lab.rippleDelegationLab) return Promise.reject(new Error('ripple-only child unavailable'));
+        return lab.rippleDelegationLab.prepare();
+      },
+      finishRippleDelegation() {
+        if (!lab.rippleDelegationLab) return Promise.reject(new Error('ripple child unavailable'));
+        return lab.rippleDelegationLab.finish();
+      },
+      disposeRippleDelegation() {lab.rippleDelegationLab?.dispose();},
+      rippleDelegationTarget() {
+        if (!lab.rippleDelegationLab) throw new Error('ripple child unavailable');
+        return lab.rippleDelegationLab.target();
+      },
+      prepareRippleFrame() {
+        if (lab.rippleOnly || !lab.rippleFrameLab) return Promise.reject(new Error('ripple parent unavailable'));
+        return lab.rippleFrameLab.prepare();
+      },
+      disposeRippleFrame() {lab.rippleFrameLab?.dispose();},
+      scrollRippleFrame() {lab.rippleFrameLab?.scrollIntoView();},
+      rippleFrameTargetBox() {return lab.rippleFrameLab?.targetBox();},
+      finishRippleFrame() {
+        if (!lab.rippleFrameLab) return Promise.reject(new Error('ripple parent unavailable'));
+        return lab.rippleFrameLab.finish();
       },
       runCheckboxTimerLifetime() {
         if (!lab.checkboxTimerLifetimeLab) return Promise.reject(new Error('checkbox timer fixture missing'));
@@ -429,7 +463,7 @@ export class LabRoot {
     MatLegacyTabsModule,
     MatLegacyTooltipModule,
   ],
-  declarations: [CheckboxTimerLifetimeLab, CaptureCheckboxTimerLifetime, LabRoot, DialogBody, LabForceInvalid, SnackMotionLab, TooltipAriaLifetimeLab, CaptureTooltipForAriaLifetime, FormFieldDirectionLifetimeLab, CaptureFieldDirectionLifetime, SnackAnnouncementLifetimeLab, CaptureSnackAnnouncementLifetime],
+  declarations: [RippleDelegationLab, RippleDelegationFrameLab, CheckboxTimerLifetimeLab, CaptureCheckboxTimerLifetime, LabRoot, DialogBody, LabForceInvalid, SnackMotionLab, TooltipAriaLifetimeLab, CaptureTooltipForAriaLifetime, FormFieldDirectionLifetimeLab, CaptureFieldDirectionLifetime, SnackAnnouncementLifetimeLab, CaptureSnackAnnouncementLifetime],
   bootstrap: [LabRoot],
   providers: [
     ...((window as unknown as {__cspNonce?: string}).__cspNonce ? [{provide: CSP_NONCE, useValue: (window as unknown as {__cspNonce: string}).__cspNonce}] : []),

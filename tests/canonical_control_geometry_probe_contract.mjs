@@ -16,13 +16,21 @@ const checkboxObservation = {actual_checkbox_created: true, initialized: true, u
   latest_cleanup_elapsed_ms: 1100, latest_cleanup: true, animation_name: 'mat-checkbox-unchecked-checked-checkmark-path',
   animation_duration_ms: 180, trusted_animation_ends: 1, animation_elapsed_seconds: 0.18,
   pending_class_before_destroy: true, view_destroyed: true, host_removed: true, classes_cleared_on_destroy: true, late_class_writes: 0};
+const rippleMotion = trigger => ({trigger, inside_angular:false, enter_ms:225,
+  transition_properties:['opacity','transform'],transition_durations_ms:[225],
+  ends:[{property:'transform',seconds:0.225,trusted:true},{property:'opacity',seconds:0.15,trusted:true}],hidden:true,removed:true});
+const rippleObservation = {actual_owned_renderers:2,actual_view_created:true,trusted_mousedown_events:1,
+  owned_listener_adds:2,owned_listener_removes:2,owned_listener_balance:0,trusted_order:['outer','inner'],
+  native_motion:[rippleMotion('outer'),rippleMotion('inner')],missing_path_order:['outer','inner'],throwing_path_order:['outer','inner'],
+  calls_after_removal:0,controlled_ripples_removed:true,view_destroyed:true,host_removed:true,
+  uncaught_window_errors:0,actual_angular_hydration_replay_executed:false};
 const raw = requiredProbeSource(), turn = () => new Promise(resolve => setImmediate(resolve));
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 function fixture(family, faults = {}, source = raw) {
   const window = {}, jobs = new Map(), classes = name => ({contains: value => name === value});
   let now = 0, serial = 0, selected = 0, selectOpen = false, focused = false, touched = false;
   let outlineVisible = true, outlinePrefix = false, direction = 'ltr', scroll = 0, labelFocused = false;
-  const clicked = [], surface = {setAttribute() {}};
+  const clicked = [], disposed = [], surface = {setAttribute() {}};
   const labels = [0, 1].map(index => ({offsetLeft: index * 100, offsetWidth: 100,
     click() {clicked.push(index); selected = index;}}));
   const ink = {tagName: 'MAT-INK-BAR', classList: classes('mat-ink-bar'),
@@ -102,6 +110,13 @@ function fixture(family, faults = {}, source = raw) {
     querySelector: () => ({disabled: !faults.noLabelEnabled,value: faults.noLabelWrongValue?'': 'off'}),
     querySelectorAll: () => faults.noLabelElement?[{}]:[]};
   window.__lab = {closeTransient() {},
+    prepareRippleFrame: () => faults.ripplePrepareReject ? Promise.reject(new Error('child bootstrap failed')) :
+      faults.ripplePreparePending ? new Promise(() => {}) : Promise.resolve(),
+    scrollRippleFrame() {}, rippleFrameTargetBox: () => ({x:100,y:80,width:faults.rippleNoGeometry?0:200,height:100}),
+    disposeRippleFrame() {disposed.push('frame');},
+    finishRippleFrame: () => faults.rippleFinishReject ? Promise.reject(new Error('child observation failed')) :
+      faults.rippleFinishPending ? new Promise(() => {}) : Promise.resolve(faults.rippleMissingResult?undefined:
+        {...rippleObservation,...(faults.rippleObservation||{})}),
     runCheckboxTimerLifetime: () => faults.checkboxReject ? Promise.reject(new Error('fixture failure')) :
       faults.checkboxPending ? new Promise(() => {}) : Promise.resolve(faults.checkboxMissingResult ? undefined :
         {...checkboxObservation, ...(faults.checkboxObservation || {})}),
@@ -112,6 +127,7 @@ function fixture(family, faults = {}, source = raw) {
         queued_updates_before_destroy: faults.directionImmediate ? 1 : 0, view_destroyed: !faults.directionNotDestroyed,
         host_removed: !faults.directionHostRetained, late_updates: faults.directionLate ? 2 : 0}),
     readChipFormState: () => ({focused, touched}), resetChipFormState() {touched = !!faults.touchedBefore;}};
+  if (faults.rippleMissingApi) delete window.__lab.prepareRippleFrame;
   if (faults.checkboxMissingApi) delete window.__lab.runCheckboxTimerLifetime;
   if (faults.directionMissingApi) delete window.__lab.runFormFieldDirectionLifetime;
   if (faults.noChipApi) delete window.__lab.readChipFormState;
@@ -119,6 +135,7 @@ function fixture(family, faults = {}, source = raw) {
     querySelector(selector) {
       if (selector === '#wrap-' + family) return {};
       if (selector === '#wrap-field' && family === 'form-field') return {};
+      if (selector === '#p-core.mat-pseudo-checkbox-checked') return {};
       if (selector === '#p-checkbox.mat-checkbox') return {};
       if (selector === '#p-field.mat-form-field #p-hint') return {};
       if (selector === '#p-field-disabled') return faults.noLabelMissing?null:noLabel;
@@ -142,7 +159,7 @@ function fixture(family, faults = {}, source = raw) {
     getComputedStyle: node => node.computed, Date: {now: () => now},
     setTimeout(callback, delay = 0) {const id = ++serial; jobs.set(id, {callback, due: now + delay}); return id;},
     clearTimeout: id => jobs.delete(id)});
-  return {window, clicked, jobs, begin() {window.__begin({family, state: 'default'});}, status() {return window.__poll();},
+  return {window, clicked, disposed, jobs, begin() {window.__begin({family, state: 'default'});}, status() {return window.__poll();},
     async advance(ms) {
       const end = now + ms; let iterations = 0;
       while (true) {
@@ -152,11 +169,15 @@ function fixture(family, faults = {}, source = raw) {
         now = next[1].due; jobs.delete(next[0]); next[1].callback(); await turn();
         const action = window.__poll().pointer;
         if (action && !faults.missingPointerDriver) {
-          assert.equal(action.x, 110, 'pointer box must be measured after label focus');
+          if (family === 'core') {
+            assert.equal(action.x,200,'owned ripple iframe coordinate must be translated');assert.equal(action.y,130);
+          } else {
+            assert.equal(action.x, 110, 'pointer box must be measured after label focus');
+            if (!faults.noPaginationScroll) scroll = -100;
+            if (faults.pointerStealsFocus) document.activeElement = after;
+            for (const fn of pointerListeners) fn({isTrusted: !faults.untrustedPointer});
+          }
           clicked.push('pointer');
-          if (!faults.noPaginationScroll) scroll = -100;
-          if (faults.pointerStealsFocus) document.activeElement = after;
-          for (const fn of pointerListeners) fn({isTrusted: !faults.untrustedPointer});
           assert.equal(window.__pointerDone(action.id), true);
         }
       }
@@ -165,8 +186,9 @@ function fixture(family, faults = {}, source = raw) {
 }
 const cases = [];
 async function check(id, family, faults, expected) {
-  const f = fixture(family, faults); f.begin(); await f.advance(family === 'checkbox' ? 4700 : 1700);
+  const f = fixture(family, faults); f.begin(); await f.advance(family === 'core' ? 6200 : family === 'checkbox' ? 4700 : 1700);
   assert.equal(f.status().done, true, id); assert.equal(f.status().ok, expected, id);
+  if (family === 'core' && !faults.rippleMissingApi) assert.equal(f.disposed.length,1,id+' must dispose owned frame');
   if (family === 'tabs' && expected) assert.deepEqual(f.clicked, [0, 1, 0, 'pointer']);
   if (family === 'form-field' && expected) assert.deepEqual(f.clicked, ['prefix', 'hide', 'show', 'rtl']);
   cases.push({id, result: 'pass'});
@@ -230,6 +252,28 @@ replacedCheckbox.window.__status = {done:false, ok:false, evidence:'replacement 
 await replacedCheckbox.advance(4700);
 assert.equal(replacedCheckbox.status().done, false, 'pending checkbox lifetime cannot complete replacement cell');
 cases.push({id:'checkbox-lifetime-timeout-cannot-complete-replacement-cell',result:'pass'});
+await check('core-owned-ripple-complete-native-observation','core',{},true);
+for (const field of Object.keys(rippleObservation)) {
+  await check('core-ripple-reject-missing-'+field,'core',{rippleObservation:{[field]:undefined}},false);
+}
+for (const faults of [{ripplePrepareReject:true},{ripplePreparePending:true},{rippleFinishReject:true},{rippleFinishPending:true},
+  {rippleMissingResult:true},{rippleMissingApi:true},{rippleNoGeometry:true},
+  {rippleObservation:{trusted_order:['inner','outer']}},{rippleObservation:{owned_listener_balance:1}},
+  {rippleObservation:{native_motion:[{...rippleMotion('outer'),ends:[]},rippleMotion('inner')]}},
+  {rippleObservation:{native_motion:[{...rippleMotion('outer'),enter_ms:0},rippleMotion('inner')]}},
+  {rippleObservation:{native_motion:[{...rippleMotion('outer'),inside_angular:true},rippleMotion('inner')]}},
+  {rippleObservation:{calls_after_removal:1}},{rippleObservation:{uncaught_window_errors:1}},
+  {rippleObservation:{actual_angular_hydration_replay_executed:true}}]) {
+  await check('core-ripple-reject-'+JSON.stringify(faults),'core',faults,false);
+}
+const bypassRipple = raw.replace('finish(legacyRippleDelegationLifetimeNativeOkay(ripple),','finish(true,');
+assert.notEqual(bypassRipple,raw);
+const leakedRipple = fixture('core',{rippleObservation:{owned_listener_balance:1}},bypassRipple);
+leakedRipple.begin();await leakedRipple.advance(6200);assert.equal(leakedRipple.status().ok,true,'removing owned ripple gate exposes listener-leak false pass');
+const replacedRipple = fixture('core',{ripplePreparePending:true});replacedRipple.begin();await replacedRipple.advance(0);
+assert.equal(replacedRipple.status().done,false);replacedRipple.window.__status={done:false,ok:false,evidence:'replacement core cell'};
+await replacedRipple.advance(6200);assert.equal(replacedRipple.status().done,false,'obsolete ripple preparation cannot complete replacement cell');
+cases.push({id:'core-ripple-prepare-timeout-cannot-complete-replacement-cell',result:'pass'});
 const bypassLifetime = raw.replace('finish(legacyFormFieldDirectionLifetimeNativeOkay(lifetime),', 'finish(true,');
 assert.notEqual(bypassLifetime, raw);
 const lateDirection = fixture('form-field', {directionLate:true}, bypassLifetime);
@@ -271,6 +315,10 @@ for (const zoneless of [false, true]) {
   assert.ok(spec.labSource.includes('ReactiveFormsModule,'));
   assert.ok(spec.labSource.includes('runFormFieldDirectionLifetime()'));
   assert.ok(spec.labSource.includes('runCheckboxTimerLifetime()'));
+  assert.ok(spec.labSource.includes('prepareRippleFrame()'));
+  assert.ok(spec.labSource.includes('legacyRippleOnly'));
+  assert.ok(spec.labSource.includes('disposeRippleDelegation()'));
+  assert.ok(spec.labSource.includes('new LegacyRippleRenderer('));
   assert.ok(spec.labSource.includes('CaptureCheckboxTimerLifetime,'));
   assert.ok(spec.labSource.includes('afterNextRender(() =>'));
   assert.deepEqual(candidateQualificationDefects(spec), []);
@@ -278,8 +326,8 @@ for (const zoneless of [false, true]) {
   assert.ok(spec.labSource.includes(JSON.stringify('style="font-size:20px"').slice(1, -1)));
   generated.push({zoneless, source_sha256: hash(spec.labSource)});
 }
-const report = {schema_version: 1, cases, mutation_rejections: 5, generated,
+const report = {schema_version: 1, cases, mutation_rejections: 6, generated,
   complete_probe_sha256: hash(raw), native_executed: false, actual_legacy_or_forms_executed: false,
-  scope: 'Complete canonical default tabs/select/chips/form-field/checkbox browser probe under explicit DOM/style/geometry/control/timer protocols. Shared actual predicates and DOM readers execute; no browser, Angular/forms/legacy instances, packed artifact, AOT or consumer floors are qualified.'};
+  scope: 'Complete canonical default tabs/select/chips/form-field/checkbox/core browser probe under explicit DOM/style/geometry/control/timer protocols. Shared actual predicates and DOM readers execute; no browser, Angular/forms/legacy instances, packed artifact, AOT or consumer floors are qualified.'};
 if (process.argv[2]) writeFileSync(process.argv[2], JSON.stringify(report, null, 2) + '\n', {flag: 'wx'});
-console.log(JSON.stringify({cases: cases.length, mutation_rejections: 5, native_executed: false}));
+console.log(JSON.stringify({cases: cases.length, mutation_rejections: 6, native_executed: false}));

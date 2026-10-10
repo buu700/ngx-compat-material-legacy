@@ -233,7 +233,30 @@
       return;
     }
     if (family === 'core') {
-      finish(!!query('#p-core.mat-pseudo-checkbox-checked'), 'mat-pseudo-checkbox-checked');
+      if (!query('#p-core.mat-pseudo-checkbox-checked') || typeof lab.prepareRippleFrame !== 'function' ||
+          typeof lab.rippleFrameTargetBox !== 'function' || typeof lab.finishRippleFrame !== 'function' ||
+          typeof lab.scrollRippleFrame !== 'function' || typeof lab.disposeRippleFrame !== 'function') {
+        finish(false, 'owned ripple native fixture missing'); return;
+      }
+      const owner = window.__status, priorCleanup = cleanup;
+      cleanup = () => {priorCleanup(); lab.disposeRippleFrame();};
+      let prepared = false, failed;
+      Promise.resolve().then(() => lab.prepareRippleFrame()).then(() => {prepared = true;}, error => {failed = String(error); prepared = true;});
+      waitFor(() => prepared, 3000, ready => {
+        if (window.__status !== owner) return;
+        if (!ready || failed) {finish(false, 'ripple child preparation ' + (failed || 'timed out')); return;}
+        pointerClick({scrollIntoView: () => lab.scrollRippleFrame(), getBoundingClientRect: () => lab.rippleFrameTargetBox()}, () => {
+          if (window.__status !== owner) return;
+          let completed = false, observation;
+          Promise.resolve().then(() => lab.finishRippleFrame()).then(value => {observation = value; completed = true;},
+            error => {observation = {error: String(error)}; completed = true;});
+          waitFor(() => completed ? {observation} : null, 2000, result => {
+            if (window.__status !== owner) return;
+            const ripple = result && result.observation;
+            finish(legacyRippleDelegationLifetimeNativeOkay(ripple), 'mat-pseudo-checkbox-checked; owned ripple native ' + JSON.stringify(ripple));
+          });
+        });
+      });
       return;
     }
     if (family === 'form-field') {
