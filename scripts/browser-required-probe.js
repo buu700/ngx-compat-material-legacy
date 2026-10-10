@@ -475,8 +475,26 @@
         trace.cleanup(); cleanup = () => {};
         observations.push(observation);
         if (mode === 'event') runSnackMotion('fallback', observations);
-        else finish(observations.length === 2, 'snack; trusted CSS event and suppressed-event fallback ' + JSON.stringify(observations));
+        else runSnackAnnouncement(observations);
       }));
+    });
+  }
+
+  function runSnackAnnouncement(motion) {
+    const owner = window.__status;
+    if (!window.__lab || typeof window.__lab.runSnackAnnouncementLifetime !== 'function') {
+      finish(false, 'snack announcement fixture missing'); return;
+    }
+    let completed = false, observation;
+    Promise.resolve().then(() => window.__lab.runSnackAnnouncementLifetime()).then(value => {
+      observation = value; completed = true;
+    }, error => {observation = {error: String(error)}; completed = true;});
+    waitFor(() => completed ? {observation} : null, 3500, result => {
+      if (window.__status !== owner) return;
+      const announcement = result && result.observation;
+      finish(motion.length === 2 && legacySnackAnnouncementLifetimeNativeOkay(announcement),
+        'snack; trusted CSS event and suppressed-event fallback ' + JSON.stringify(motion)
+        + '; live/direct-destroy announcement ' + JSON.stringify(announcement));
     });
   }
 

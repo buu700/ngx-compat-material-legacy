@@ -12,6 +12,7 @@
  */
 import {createHash} from 'node:crypto';
 import {snackMotionFixture} from './snack-motion-fixture.mjs';
+import {snackAnnouncementLifetimeFixture, legacySnackAnnouncementLifetimeNativeOkay} from './snack-announcement-lifetime-fixture.mjs';
 import {legacySnackMotionNativeOkay, trackLegacySnackMotionNative, readLegacySnackMotionEnterNative, readLegacySnackMotionExitNative} from './legacy-snack-motion-native-contract.mjs';
 import {tooltipAriaLifetimeFixture} from './tooltip-aria-lifetime-fixture.mjs';
 import {formFieldDirectionLifetimeFixture, legacyFormFieldDirectionLifetimeNativeOkay} from './form-field-direction-lifetime-fixture.mjs';
@@ -64,6 +65,7 @@ export function requiredProbeSource() {
     legacyFormFieldOutlineNativeOkay, legacyFormFieldOutlineSequenceOkay, readLegacyFormFieldOutlineNative, legacyFormFieldOutlineBoundaryNativeOkay, readLegacyFormFieldOutlineBoundaryNative, legacyFormFieldNoLabelNativeOkay, readLegacyFormFieldNoLabelNative,
     legacyFormFieldDirectionLifetimeNativeOkay,
     tabPaginationNativeOkay, readTabPaginationNative, legacySnackMotionNativeOkay,
+    legacySnackAnnouncementLifetimeNativeOkay,
     trackLegacySnackMotionNative, readLegacySnackMotionEnterNative, readLegacySnackMotionExitNative]
     .map(contract => contract.toString()).join('\n') + '\n' + readFileSync(probePath, 'utf8');
 }
@@ -216,7 +218,7 @@ function labHtml() {
     '<span id="slider-invalid">{{sl.invalid}}</span>',
     '<mat-slider id="p-slider-disabled" disabled [value]="10"></mat-slider>',
     '</div>',
-    '<div id="wrap-snack" *ngIf="!cspOnly"><button id="p-snack" type="button" (click)="openSnack()">Snack</button><lab-snack-motion></lab-snack-motion></div>',
+    '<div id="wrap-snack" *ngIf="!cspOnly"><button id="p-snack" type="button" (click)="openSnack()">Snack</button><lab-snack-motion></lab-snack-motion><lab-snack-announcement-lifetime></lab-snack-announcement-lifetime></div>',
     '<div id="wrap-table" *ngIf="!cspOnly">',
     '<table mat-table id="p-table" [dataSource]="rows">',
     '<ng-container matColumnDef="name"><th mat-header-cell *matHeaderCellDef>Name</th><td mat-cell *matCellDef="let row"><button id="p-table-focus" type="button">{{row.name}}</button></td></ng-container>',
@@ -240,6 +242,8 @@ function labSource(zoneless) {
   return `${zoneImport}import {CSP_NONCE, ChangeDetectorRef, Component, Directive, Injector, Input, NgModule, QueryList, TemplateRef, ViewChild, ViewChildren, ViewContainerRef, afterNextRender, forwardRef, inject, signal${zoneNamed}} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {BidiModule, Dir, Directionality} from '@angular/cdk/bidi';
+import {TemplatePortal} from '@angular/cdk/portal';
+import {MatSnackBarConfig} from '@angular/material/snack-bar';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {AbstractControl, FormControl, FormsModule, NG_VALIDATORS, ReactiveFormsModule, ValidationErrors, Validator} from '@angular/forms';
 import {LEGACY_ANIMATIONS_TEST_OVERRIDE} from '@ngx-compat/material-legacy/legacy-core';
@@ -262,7 +266,7 @@ import {MatLegacyRadioModule} from '@ngx-compat/material-legacy/legacy-radio';
 import {MatLegacySelect, MatLegacySelectModule} from '@ngx-compat/material-legacy/legacy-select';
 import {MatLegacySlideToggleModule} from '@ngx-compat/material-legacy/legacy-slide-toggle';
 import {MatLegacySliderModule} from '@ngx-compat/material-legacy/legacy-slider';
-import {MatLegacySnackBar, MatLegacySnackBarContainer, MatLegacySnackBarModule} from '@ngx-compat/material-legacy/legacy-snack-bar';
+import {MatLegacySnackBar, MatLegacySnackBarConfig, MatLegacySnackBarContainer, MatLegacySnackBarModule} from '@ngx-compat/material-legacy/legacy-snack-bar';
 import {MatLegacyTableModule} from '@ngx-compat/material-legacy/legacy-table';
 import {MatLegacyTabsModule} from '@ngx-compat/material-legacy/legacy-tabs';
 import {MatLegacyTooltip, MatLegacyTooltipModule} from '@ngx-compat/material-legacy/legacy-tooltip';
@@ -270,6 +274,7 @@ import {MatLegacyTooltip, MatLegacyTooltipModule} from '@ngx-compat/material-leg
 ${tooltipAriaLifetimeFixture}
 ${formFieldDirectionLifetimeFixture}
 ${snackMotionFixture}
+${snackAnnouncementLifetimeFixture}
 
 @Directive({
   selector: '[labForceInvalid]',
@@ -323,6 +328,7 @@ export class LabRoot {
   @ViewChild('chipList') chipList?: MatLegacyChipList;
   @ViewChild(TooltipAriaLifetimeLab) ariaLifetimeLab?: TooltipAriaLifetimeLab;
   @ViewChild(FormFieldDirectionLifetimeLab) fieldDirectionLifetimeLab?: FormFieldDirectionLifetimeLab;
+  @ViewChild(SnackAnnouncementLifetimeLab) snackAnnouncementLifetimeLab?: SnackAnnouncementLifetimeLab;
   @ViewChildren(MatLegacyInput) inputs!: QueryList<MatLegacyInput>;
   @ViewChildren(MatLegacySelect) selects!: QueryList<MatLegacySelect>;
   @ViewChildren(MatLegacyChipList) chipLists!: QueryList<MatLegacyChipList>;
@@ -368,6 +374,10 @@ export class LabRoot {
         if (!lab.fieldDirectionLifetimeLab) return Promise.reject(new Error('field direction fixture missing'));
         return lab.fieldDirectionLifetimeLab.run();
       },
+      runSnackAnnouncementLifetime() {
+        if (!lab.snackAnnouncementLifetimeLab) return Promise.reject(new Error('snack announcement fixture missing'));
+        return lab.snackAnnouncementLifetimeLab.run();
+      },
       readAutocompleteSelection() { return lab.autoSelection(); },
       readChipFormState() { return {focused: lab.chipList?.focused, touched: lab.chipControl.touched}; },
       resetChipFormState() { lab.chipControl.markAsUntouched(); },
@@ -412,7 +422,7 @@ export class LabRoot {
     MatLegacyTabsModule,
     MatLegacyTooltipModule,
   ],
-  declarations: [LabRoot, DialogBody, LabForceInvalid, SnackMotionLab, TooltipAriaLifetimeLab, CaptureTooltipForAriaLifetime, FormFieldDirectionLifetimeLab, CaptureFieldDirectionLifetime],
+  declarations: [LabRoot, DialogBody, LabForceInvalid, SnackMotionLab, TooltipAriaLifetimeLab, CaptureTooltipForAriaLifetime, FormFieldDirectionLifetimeLab, CaptureFieldDirectionLifetime, SnackAnnouncementLifetimeLab, CaptureSnackAnnouncementLifetime],
   bootstrap: [LabRoot],
   providers: [
     ...((window as unknown as {__cspNonce?: string}).__cspNonce ? [{provide: CSP_NONCE, useValue: (window as unknown as {__cspNonce: string}).__cspNonce}] : []),
