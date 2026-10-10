@@ -20,7 +20,8 @@ const withoutExport = text => text.replace(/^export\s+/, '');
 
 function runtimeTree(source) {
   const emitted = ts.transpileModule(source, {compilerOptions: {target: ts.ScriptTarget.ES2022,
-    module: ts.ModuleKind.CommonJS, experimentalDecorators: true, removeComments: true}, reportDiagnostics: true});
+    module: ts.ModuleKind.CommonJS, experimentalDecorators: true, removeComments: true,
+    alwaysStrict: true}, reportDiagnostics: true});
   assert.equal(emitted.diagnostics.length, 0);
   const file = parse('runtime.js', emitted.outputText, ts.ScriptKind.JS);
   const tree = node => {
