@@ -198,7 +198,34 @@
       return;
     }
     if (family === 'form-field') {
-      finish(!!query('#p-field.mat-form-field #p-hint'), 'form field hint');
+      if (!query('#p-field.mat-form-field #p-hint')) {finish(false, 'form field hint missing'); return;}
+      const host = query('#p-outline'), wrapper = query('#p-outline-wrapper'), rows = [];
+      const prefix = query('#p-outline-prefix'), hide = query('#p-outline-hide');
+      const show = query('#p-outline-show'), rtl = query('#p-outline-rtl');
+      if (!host || !wrapper || !prefix || !hide || !show || !rtl) {finish(false, 'outline fixture missing'); return;}
+      const record = (direction, hasPrefix, then) => waitFor(() => {
+        const observation = readLegacyFormFieldOutlineNative(host);
+        return legacyFormFieldOutlineNativeOkay(observation) && observation.direction === direction
+          && !!host.querySelector('.mat-form-field-prefix') === hasPrefix ? observation : null;
+      }, 1500, observation => {
+        if (!observation) {finish(false, 'outline geometry missing at ' + direction + '/' + hasPrefix); return;}
+        rows.push(observation); then();
+      });
+      record('ltr', false, () => {
+        prefix.click();
+        record('ltr', true, () => {
+          hide.click();
+          waitFor(() => getComputedStyle(wrapper).display === 'none', 1500, hidden => {
+            if (!hidden) {finish(false, 'outline hide was not rendered'); return;}
+            show.click();
+            record('ltr', false, () => {
+              rtl.click();
+              record('rtl', false, () => finish(legacyFormFieldOutlineSequenceOkay(rows),
+                'form-field; outline prefix/hide/show/RTL ' + JSON.stringify(rows)));
+            });
+          });
+        });
+      });
       return;
     }
     if (family === 'input') {

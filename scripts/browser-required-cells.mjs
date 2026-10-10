@@ -16,6 +16,7 @@ import {legacyTooltipAriaLifetimeNativeOkay, legacyTooltipNativeOkay, legacyTool
 import {legacyInkBarNativeOkay, legacyInkBarSelectionSequenceOkay, readLegacyInkBarNative} from './legacy-ink-bar-native-contract.mjs';
 import {legacySelectFontNativeOkay, readLegacySelectFontNative} from './legacy-select-font-native-contract.mjs';
 import {legacyChipBlurNativeOkay} from './legacy-chip-blur-native-contract.mjs';
+import {legacyFormFieldOutlineNativeOkay, legacyFormFieldOutlineSequenceOkay, readLegacyFormFieldOutlineNative} from './legacy-form-field-outline-native-contract.mjs';
 import {announcedChromeEndpoint,debuggerMatchesChild,announcedFirefoxEndpoint} from './chromium-debug-endpoint.mjs';
 import {spawn, spawnSync} from 'node:child_process';
 import {createRequire} from 'node:module';
@@ -54,7 +55,8 @@ function firefoxBin() {
 /** The browser executes this exact contract and probe, without npm imports. */
 export function requiredProbeSource() {
   return [legacyTooltipAriaLifetimeNativeOkay, legacyTooltipNativeOkay, legacyTooltipMessageSequenceOkay, readLegacyTooltipNative, legacyInkBarNativeOkay, legacyInkBarSelectionSequenceOkay,
-    readLegacyInkBarNative, legacySelectFontNativeOkay, readLegacySelectFontNative, legacyChipBlurNativeOkay]
+    readLegacyInkBarNative, legacySelectFontNativeOkay, readLegacySelectFontNative, legacyChipBlurNativeOkay,
+    legacyFormFieldOutlineNativeOkay, legacyFormFieldOutlineSequenceOkay, readLegacyFormFieldOutlineNative]
     .map(contract => contract.toString()).join('\n') + '\n' + readFileSync(probePath, 'utf8');
 }
 
@@ -151,6 +153,14 @@ function labHtml() {
     '<div id="wrap-field" *ngIf="!cspOnly">',
     '<mat-form-field id="p-field"><mat-label>Name</mat-label><input id="p-field-input" matInput [errorStateMatcher]="matcher"><mat-hint id="p-hint">Hint text</mat-hint></mat-form-field>',
     '<mat-form-field id="p-field-disabled"><input matInput disabled value="off"></mat-form-field>',
+    '<div id="p-outline-wrapper" [style.display]="outlineVisible() ? \'\' : \'none\'" [dir]="outlineDirection()">',
+    '<mat-form-field id="p-outline" appearance="outline" floatLabel="always"><mat-label>Outline</mat-label>',
+    '<span matPrefix *ngIf="outlinePrefix()">USD&nbsp;</span><input matInput value="Value"></mat-form-field>',
+    '</div>',
+    '<button id="p-outline-prefix" type="button" (click)="outlinePrefix.set(true)">Add prefix</button>',
+    '<button id="p-outline-hide" type="button" (click)="outlineVisible.set(false); outlinePrefix.set(false)">Hide and remove prefix</button>',
+    '<button id="p-outline-show" type="button" (click)="outlineVisible.set(true)">Show</button>',
+    '<button id="p-outline-rtl" type="button" (click)="outlineDirection.set(\'rtl\')">RTL</button>',
     '</div>',
     '<div id="wrap-input" *ngIf="!cspOnly">',
     '<mat-form-field id="p-input-field"><input id="p-input" matInput [errorStateMatcher]="matcher" value="typed"></mat-form-field>',
@@ -219,6 +229,7 @@ function labSource(zoneless) {
   const zoneProvider = zoneless ? 'provideZonelessChangeDetection(), ' : '';
   return `${zoneImport}import {CSP_NONCE, ChangeDetectorRef, Component, Directive, Input, NgModule, QueryList, TemplateRef, ViewChild, ViewChildren, ViewContainerRef, forwardRef, inject, signal${zoneNamed}} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
+import {BidiModule} from '@angular/cdk/bidi';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {AbstractControl, FormControl, FormsModule, NG_VALIDATORS, ReactiveFormsModule, ValidationErrors, Validator} from '@angular/forms';
 import {ErrorStateMatcher, MATERIAL_ANIMATIONS} from '@angular/material/core';
@@ -285,6 +296,9 @@ export class LabRoot {
   readonly autoSelection = signal<string | null>(null);
   readonly chipControl = new FormControl<string | null>(null);
   readonly tipMessage = signal('Hello tip');
+  readonly outlineVisible = signal(true);
+  readonly outlinePrefix = signal(false);
+  readonly outlineDirection = signal<'ltr' | 'rtl'>('ltr');
   cols = ['name'];
   rows = [{name: 'Ada'}];
   @ViewChild('menuTrigger') menuTrigger!: any;
@@ -324,6 +338,7 @@ export class LabRoot {
         lab.forceSliderInvalid = false;
         lab.autoSelection.set(null);
         lab.tipMessage.set('Hello tip');
+        lab.outlineVisible.set(true); lab.outlinePrefix.set(false); lab.outlineDirection.set('ltr');
       },
       openDialog() { lab.openDialog(); },
       openMenu() { lab.openMenu(); },
@@ -350,6 +365,7 @@ export class LabRoot {
 @NgModule({
   imports: [
     BrowserModule,
+    BidiModule,
     FormsModule,
     ReactiveFormsModule,
     MatLegacyAutocompleteModule,
