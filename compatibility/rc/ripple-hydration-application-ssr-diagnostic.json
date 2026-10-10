@@ -1,0 +1,550 @@
+{
+  "schema_version": 1,
+  "node": "v22.23.3",
+  "parser": "6.0.3",
+  "producer_sha256": "a5ad8162d06c27ba484d9c1ec5f1f142af3f5ac1778b61b9a579cfdfe3617d7b",
+  "worker_sha256": "59ba806489cf1ae495ba156ab1b917e06a557e541ba3055e2d1a9d7fe91302ee",
+  "shared_component_sha256": "482c9e1875e5892476fbfb05f865a47c05bfabb4e9e066c6ba9e5199f08cbefb",
+  "source_bindings": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/ripple/ripple-renderer.ts",
+      "sha256": "0635d2c840c6f7322b2cdb9a499ab26a03023255d91e8be9d12b1a9fa9d92114"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/ripple/ripple-ref.ts",
+      "sha256": "4821492afe8b8f13782032fee0e16886fe002d8c79f33bc1332fd4813d91edd2"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/ripple/ripple-event-manager.ts",
+      "sha256": "2cb38621b0481e8745d306422dca5eba1ad4dce31f3e86931680feaf4f2fe0be"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/dom/shadow-dom.ts",
+      "sha256": "39a8a95c574620b4aa4ef50a30b86eba359c793d69d504b53fb98d4962c4119e"
+    }
+  ],
+  "public_namespace_capsule_sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3",
+  "results": [
+    {
+      "line": "main",
+      "mode": "zoneful",
+      "production": false,
+      "server_subject": {
+        "capsule_sha256": "2c69381ebc791cfacc57918d336ec5478c16808943c332d39b3a1b254bc8c687",
+        "installed": [
+          {
+            "name": "@angular/platform-server",
+            "version": "22.1.7",
+            "archive_sha256": "d8c1853a3a4dab6c7bcc2a8473cc1ed77a93d5ba276e779dec9603f27d8c41ce",
+            "integrity": "sha512-nSIqfspoIFkFoEDG8qf1VAzgrU+ueLwhGwbaXHs2Gq7G72i/qcTsLTdqOtSGTITsHopH1F9f4G6BEE+SQI29Cg==",
+            "archive_sri_verified": true,
+            "complete_members": 10
+          },
+          {
+            "name": "xhr2",
+            "version": "0.2.1",
+            "archive_sha256": "3756c7bc5c8f86f581e0c919534365a8edf1c121fb19f44c74378814e957b326",
+            "integrity": "sha512-sID0rrVCqkVNUn8t6xuv9+6FViXjUVXq8H5rWOH2rz9fDNQEd4g0EA2XlcEdJXRz5BMEn4O1pJFdT+z4YHhoWw==",
+            "archive_sri_verified": true,
+            "complete_members": 3
+          }
+        ],
+        "scope": "Matching complete pinned server public modules/types/manifests and xhr2 dependency in the existing owned public replay directory. No package install, private extraction, native/packed/floor or hydration-client qualification."
+      },
+      "zone_subject": {
+        "version": "0.16.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-ihXL9+vhYyEhXz4TDNpHeAOZN9FVrbog0Il64OIEI28UP/n5AaI6gsccRuOHBfx+206agzyoK527bYIO0Foy6A==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "94d3f7278878a57f7b4be6d9174fd2835bbf54bef1e54babd5e61c98495ebc4c",
+        "authenticated_commonjs_require_forwarders": 1,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      },
+      "html": "<!DOCTYPE html><html><head><style ng-app-id=\"ng\">.mat-ripple {\n  overflow: hidden;\n  position: relative;\n}\n.mat-ripple:not(:empty) {\n  transform: translateZ(0);\n}\n\n.mat-ripple.mat-ripple-unbounded {\n  overflow: visible;\n}\n\n.mat-ripple-element {\n  position: absolute;\n  border-radius: 50%;\n  pointer-events: none;\n  transition: opacity, transform 0ms cubic-bezier(0, 0, 0.2, 1);\n  transform: scale3d(0, 0, 0);\n  background-color: var(--mat-ripple-color, color-mix(in srgb, var(--mat-sys-on-surface) 10%, transparent));\n}\n@media (forced-colors: active) {\n  .mat-ripple-element {\n    display: none;\n  }\n}\n.cdk-drag-preview .mat-ripple-element, .cdk-drag-placeholder .mat-ripple-element {\n  display: none;\n}\n</style></head><body><!--nghm--><ripple-hydration-lab ng-version=\"22.1.7\" ngh=\"0\" ng-server-context=\"other\"><button id=\"replay-peer\" matripple=\"\" class=\"mat-ripple\" jsaction=\"mousedown:;mouseup:;click:;\">Hydration 0</button><div id=\"replay-owned\" class=\"mat-ripple\" style=\"width: 120px; height: 48px;\"></div></ripple-hydration-lab><script id=\"ng-state\" type=\"application/json\">{\"__nghData__\":[{}]}</script></body></html>",
+      "html_sha256": "19413adfc8d846a13afd9820efb982da2c3f42f8bb51c39e05553d5d2e3559af",
+      "genuine_peer_directive_SSR": true,
+      "owned_component_and_helpers_loaded": true,
+      "actual_server_DOM_and_public_renderApplication": true,
+      "hydration_metadata": true,
+      "replay_event_bindings": 3,
+      "exact_loopback_allowlist_negative": true,
+      "public_server_version": "22.1.7",
+      "peer_directive_version": "22.1.7",
+      "actual_client_hydration_or_replayed_event_or_owned_renderer_instance_executed": false
+    },
+    {
+      "line": "main",
+      "mode": "zoneful",
+      "production": true,
+      "server_subject": {
+        "capsule_sha256": "2c69381ebc791cfacc57918d336ec5478c16808943c332d39b3a1b254bc8c687",
+        "installed": [
+          {
+            "name": "@angular/platform-server",
+            "version": "22.1.7",
+            "archive_sha256": "d8c1853a3a4dab6c7bcc2a8473cc1ed77a93d5ba276e779dec9603f27d8c41ce",
+            "integrity": "sha512-nSIqfspoIFkFoEDG8qf1VAzgrU+ueLwhGwbaXHs2Gq7G72i/qcTsLTdqOtSGTITsHopH1F9f4G6BEE+SQI29Cg==",
+            "archive_sri_verified": true,
+            "complete_members": 10
+          },
+          {
+            "name": "xhr2",
+            "version": "0.2.1",
+            "archive_sha256": "3756c7bc5c8f86f581e0c919534365a8edf1c121fb19f44c74378814e957b326",
+            "integrity": "sha512-sID0rrVCqkVNUn8t6xuv9+6FViXjUVXq8H5rWOH2rz9fDNQEd4g0EA2XlcEdJXRz5BMEn4O1pJFdT+z4YHhoWw==",
+            "archive_sri_verified": true,
+            "complete_members": 3
+          }
+        ],
+        "scope": "Matching complete pinned server public modules/types/manifests and xhr2 dependency in the existing owned public replay directory. No package install, private extraction, native/packed/floor or hydration-client qualification."
+      },
+      "zone_subject": {
+        "version": "0.16.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-ihXL9+vhYyEhXz4TDNpHeAOZN9FVrbog0Il64OIEI28UP/n5AaI6gsccRuOHBfx+206agzyoK527bYIO0Foy6A==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "94d3f7278878a57f7b4be6d9174fd2835bbf54bef1e54babd5e61c98495ebc4c",
+        "authenticated_commonjs_require_forwarders": 1,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      },
+      "html": "<!DOCTYPE html><html><head><style ng-app-id=\"ng\">.mat-ripple {\n  overflow: hidden;\n  position: relative;\n}\n.mat-ripple:not(:empty) {\n  transform: translateZ(0);\n}\n\n.mat-ripple.mat-ripple-unbounded {\n  overflow: visible;\n}\n\n.mat-ripple-element {\n  position: absolute;\n  border-radius: 50%;\n  pointer-events: none;\n  transition: opacity, transform 0ms cubic-bezier(0, 0, 0.2, 1);\n  transform: scale3d(0, 0, 0);\n  background-color: var(--mat-ripple-color, color-mix(in srgb, var(--mat-sys-on-surface) 10%, transparent));\n}\n@media (forced-colors: active) {\n  .mat-ripple-element {\n    display: none;\n  }\n}\n.cdk-drag-preview .mat-ripple-element, .cdk-drag-placeholder .mat-ripple-element {\n  display: none;\n}\n</style></head><body><!--nghm--><ripple-hydration-lab ng-version=\"22.1.7\" ngh=\"0\" ng-server-context=\"other\"><button id=\"replay-peer\" matripple=\"\" class=\"mat-ripple\" jsaction=\"mousedown:;mouseup:;click:;\">Hydration 0</button><div id=\"replay-owned\" class=\"mat-ripple\" style=\"width: 120px; height: 48px;\"></div></ripple-hydration-lab><script id=\"ng-state\" type=\"application/json\">{\"__nghData__\":[{}]}</script></body></html>",
+      "html_sha256": "19413adfc8d846a13afd9820efb982da2c3f42f8bb51c39e05553d5d2e3559af",
+      "genuine_peer_directive_SSR": true,
+      "owned_component_and_helpers_loaded": true,
+      "actual_server_DOM_and_public_renderApplication": true,
+      "hydration_metadata": true,
+      "replay_event_bindings": 3,
+      "exact_loopback_allowlist_negative": true,
+      "public_server_version": "22.1.7",
+      "peer_directive_version": "22.1.7",
+      "actual_client_hydration_or_replayed_event_or_owned_renderer_instance_executed": false
+    },
+    {
+      "line": "main",
+      "mode": "zoneless",
+      "production": false,
+      "server_subject": {
+        "capsule_sha256": "2c69381ebc791cfacc57918d336ec5478c16808943c332d39b3a1b254bc8c687",
+        "installed": [
+          {
+            "name": "@angular/platform-server",
+            "version": "22.1.7",
+            "archive_sha256": "d8c1853a3a4dab6c7bcc2a8473cc1ed77a93d5ba276e779dec9603f27d8c41ce",
+            "integrity": "sha512-nSIqfspoIFkFoEDG8qf1VAzgrU+ueLwhGwbaXHs2Gq7G72i/qcTsLTdqOtSGTITsHopH1F9f4G6BEE+SQI29Cg==",
+            "archive_sri_verified": true,
+            "complete_members": 10
+          },
+          {
+            "name": "xhr2",
+            "version": "0.2.1",
+            "archive_sha256": "3756c7bc5c8f86f581e0c919534365a8edf1c121fb19f44c74378814e957b326",
+            "integrity": "sha512-sID0rrVCqkVNUn8t6xuv9+6FViXjUVXq8H5rWOH2rz9fDNQEd4g0EA2XlcEdJXRz5BMEn4O1pJFdT+z4YHhoWw==",
+            "archive_sri_verified": true,
+            "complete_members": 3
+          }
+        ],
+        "scope": "Matching complete pinned server public modules/types/manifests and xhr2 dependency in the existing owned public replay directory. No package install, private extraction, native/packed/floor or hydration-client qualification."
+      },
+      "zone_subject": {
+        "version": "0.16.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-ihXL9+vhYyEhXz4TDNpHeAOZN9FVrbog0Il64OIEI28UP/n5AaI6gsccRuOHBfx+206agzyoK527bYIO0Foy6A==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "94d3f7278878a57f7b4be6d9174fd2835bbf54bef1e54babd5e61c98495ebc4c",
+        "authenticated_commonjs_require_forwarders": 1,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      },
+      "html": "<!DOCTYPE html><html><head><style ng-app-id=\"ng\">.mat-ripple {\n  overflow: hidden;\n  position: relative;\n}\n.mat-ripple:not(:empty) {\n  transform: translateZ(0);\n}\n\n.mat-ripple.mat-ripple-unbounded {\n  overflow: visible;\n}\n\n.mat-ripple-element {\n  position: absolute;\n  border-radius: 50%;\n  pointer-events: none;\n  transition: opacity, transform 0ms cubic-bezier(0, 0, 0.2, 1);\n  transform: scale3d(0, 0, 0);\n  background-color: var(--mat-ripple-color, color-mix(in srgb, var(--mat-sys-on-surface) 10%, transparent));\n}\n@media (forced-colors: active) {\n  .mat-ripple-element {\n    display: none;\n  }\n}\n.cdk-drag-preview .mat-ripple-element, .cdk-drag-placeholder .mat-ripple-element {\n  display: none;\n}\n</style></head><body><!--nghm--><ripple-hydration-lab ng-version=\"22.1.7\" ngh=\"0\" ng-server-context=\"other\"><button id=\"replay-peer\" matripple=\"\" class=\"mat-ripple\" jsaction=\"mousedown:;mouseup:;click:;\">Hydration 0</button><div id=\"replay-owned\" class=\"mat-ripple\" style=\"width: 120px; height: 48px;\"></div></ripple-hydration-lab><script id=\"ng-state\" type=\"application/json\">{\"__nghData__\":[{}]}</script></body></html>",
+      "html_sha256": "19413adfc8d846a13afd9820efb982da2c3f42f8bb51c39e05553d5d2e3559af",
+      "genuine_peer_directive_SSR": true,
+      "owned_component_and_helpers_loaded": true,
+      "actual_server_DOM_and_public_renderApplication": true,
+      "hydration_metadata": true,
+      "replay_event_bindings": 3,
+      "exact_loopback_allowlist_negative": true,
+      "public_server_version": "22.1.7",
+      "peer_directive_version": "22.1.7",
+      "actual_client_hydration_or_replayed_event_or_owned_renderer_instance_executed": false
+    },
+    {
+      "line": "main",
+      "mode": "zoneless",
+      "production": true,
+      "server_subject": {
+        "capsule_sha256": "2c69381ebc791cfacc57918d336ec5478c16808943c332d39b3a1b254bc8c687",
+        "installed": [
+          {
+            "name": "@angular/platform-server",
+            "version": "22.1.7",
+            "archive_sha256": "d8c1853a3a4dab6c7bcc2a8473cc1ed77a93d5ba276e779dec9603f27d8c41ce",
+            "integrity": "sha512-nSIqfspoIFkFoEDG8qf1VAzgrU+ueLwhGwbaXHs2Gq7G72i/qcTsLTdqOtSGTITsHopH1F9f4G6BEE+SQI29Cg==",
+            "archive_sri_verified": true,
+            "complete_members": 10
+          },
+          {
+            "name": "xhr2",
+            "version": "0.2.1",
+            "archive_sha256": "3756c7bc5c8f86f581e0c919534365a8edf1c121fb19f44c74378814e957b326",
+            "integrity": "sha512-sID0rrVCqkVNUn8t6xuv9+6FViXjUVXq8H5rWOH2rz9fDNQEd4g0EA2XlcEdJXRz5BMEn4O1pJFdT+z4YHhoWw==",
+            "archive_sri_verified": true,
+            "complete_members": 3
+          }
+        ],
+        "scope": "Matching complete pinned server public modules/types/manifests and xhr2 dependency in the existing owned public replay directory. No package install, private extraction, native/packed/floor or hydration-client qualification."
+      },
+      "zone_subject": {
+        "version": "0.16.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-ihXL9+vhYyEhXz4TDNpHeAOZN9FVrbog0Il64OIEI28UP/n5AaI6gsccRuOHBfx+206agzyoK527bYIO0Foy6A==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "94d3f7278878a57f7b4be6d9174fd2835bbf54bef1e54babd5e61c98495ebc4c",
+        "authenticated_commonjs_require_forwarders": 1,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      },
+      "html": "<!DOCTYPE html><html><head><style ng-app-id=\"ng\">.mat-ripple {\n  overflow: hidden;\n  position: relative;\n}\n.mat-ripple:not(:empty) {\n  transform: translateZ(0);\n}\n\n.mat-ripple.mat-ripple-unbounded {\n  overflow: visible;\n}\n\n.mat-ripple-element {\n  position: absolute;\n  border-radius: 50%;\n  pointer-events: none;\n  transition: opacity, transform 0ms cubic-bezier(0, 0, 0.2, 1);\n  transform: scale3d(0, 0, 0);\n  background-color: var(--mat-ripple-color, color-mix(in srgb, var(--mat-sys-on-surface) 10%, transparent));\n}\n@media (forced-colors: active) {\n  .mat-ripple-element {\n    display: none;\n  }\n}\n.cdk-drag-preview .mat-ripple-element, .cdk-drag-placeholder .mat-ripple-element {\n  display: none;\n}\n</style></head><body><!--nghm--><ripple-hydration-lab ng-version=\"22.1.7\" ngh=\"0\" ng-server-context=\"other\"><button id=\"replay-peer\" matripple=\"\" class=\"mat-ripple\" jsaction=\"mousedown:;mouseup:;click:;\">Hydration 0</button><div id=\"replay-owned\" class=\"mat-ripple\" style=\"width: 120px; height: 48px;\"></div></ripple-hydration-lab><script id=\"ng-state\" type=\"application/json\">{\"__nghData__\":[{}]}</script></body></html>",
+      "html_sha256": "19413adfc8d846a13afd9820efb982da2c3f42f8bb51c39e05553d5d2e3559af",
+      "genuine_peer_directive_SSR": true,
+      "owned_component_and_helpers_loaded": true,
+      "actual_server_DOM_and_public_renderApplication": true,
+      "hydration_metadata": true,
+      "replay_event_bindings": 3,
+      "exact_loopback_allowlist_negative": true,
+      "public_server_version": "22.1.7",
+      "peer_directive_version": "22.1.7",
+      "actual_client_hydration_or_replayed_event_or_owned_renderer_instance_executed": false
+    },
+    {
+      "line": "21.x",
+      "mode": "zoneful",
+      "production": false,
+      "server_subject": {
+        "capsule_sha256": "2c69381ebc791cfacc57918d336ec5478c16808943c332d39b3a1b254bc8c687",
+        "installed": [
+          {
+            "name": "@angular/platform-server",
+            "version": "21.2.23",
+            "archive_sha256": "0c796658ab0fc3340d312a99882871d5286c613add01fb13e1025aa3f8f1ff1c",
+            "integrity": "sha512-6uAjIbTzaBbb3cv/9fjNN4xmlCvkfybSqIK3J5spYErCPx+/U/911LqWLXeyskXqEQgAoY1tZn/ss/eiHfkYSQ==",
+            "archive_sri_verified": true,
+            "complete_members": 10
+          },
+          {
+            "name": "xhr2",
+            "version": "0.2.1",
+            "archive_sha256": "3756c7bc5c8f86f581e0c919534365a8edf1c121fb19f44c74378814e957b326",
+            "integrity": "sha512-sID0rrVCqkVNUn8t6xuv9+6FViXjUVXq8H5rWOH2rz9fDNQEd4g0EA2XlcEdJXRz5BMEn4O1pJFdT+z4YHhoWw==",
+            "archive_sri_verified": true,
+            "complete_members": 3
+          }
+        ],
+        "scope": "Matching complete pinned server public modules/types/manifests and xhr2 dependency in the existing owned public replay directory. No package install, private extraction, native/packed/floor or hydration-client qualification."
+      },
+      "zone_subject": {
+        "version": "0.16.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-ihXL9+vhYyEhXz4TDNpHeAOZN9FVrbog0Il64OIEI28UP/n5AaI6gsccRuOHBfx+206agzyoK527bYIO0Foy6A==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "94d3f7278878a57f7b4be6d9174fd2835bbf54bef1e54babd5e61c98495ebc4c",
+        "authenticated_commonjs_require_forwarders": 1,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      },
+      "html": "<!DOCTYPE html><html><head><style ng-app-id=\"ng\">.mat-ripple {\n  overflow: hidden;\n  position: relative;\n}\n.mat-ripple:not(:empty) {\n  transform: translateZ(0);\n}\n\n.mat-ripple.mat-ripple-unbounded {\n  overflow: visible;\n}\n\n.mat-ripple-element {\n  position: absolute;\n  border-radius: 50%;\n  pointer-events: none;\n  transition: opacity, transform 0ms cubic-bezier(0, 0, 0.2, 1);\n  transform: scale3d(0, 0, 0);\n  background-color: var(--mat-ripple-color, color-mix(in srgb, var(--mat-sys-on-surface) 10%, transparent));\n}\n@media (forced-colors: active) {\n  .mat-ripple-element {\n    display: none;\n  }\n}\n.cdk-drag-preview .mat-ripple-element, .cdk-drag-placeholder .mat-ripple-element {\n  display: none;\n}\n</style></head><body><!--nghm--><ripple-hydration-lab ng-version=\"21.2.23\" ngh=\"0\" ng-server-context=\"other\"><button id=\"replay-peer\" matripple=\"\" class=\"mat-ripple\" jsaction=\"mousedown:;mouseup:;click:;\">Hydration 0</button><div id=\"replay-owned\" class=\"mat-ripple\" style=\"width: 120px; height: 48px;\"></div></ripple-hydration-lab><script id=\"ng-state\" type=\"application/json\">{\"__nghData__\":[{}]}</script></body></html>",
+      "html_sha256": "d5ba7d8d8b987201c2289d36a449cc98c977feac541f863ecd413215592dee19",
+      "genuine_peer_directive_SSR": true,
+      "owned_component_and_helpers_loaded": true,
+      "actual_server_DOM_and_public_renderApplication": true,
+      "hydration_metadata": true,
+      "replay_event_bindings": 3,
+      "exact_loopback_allowlist_negative": true,
+      "public_server_version": "21.2.23",
+      "peer_directive_version": "21.2.14",
+      "actual_client_hydration_or_replayed_event_or_owned_renderer_instance_executed": false
+    },
+    {
+      "line": "21.x",
+      "mode": "zoneful",
+      "production": true,
+      "server_subject": {
+        "capsule_sha256": "2c69381ebc791cfacc57918d336ec5478c16808943c332d39b3a1b254bc8c687",
+        "installed": [
+          {
+            "name": "@angular/platform-server",
+            "version": "21.2.23",
+            "archive_sha256": "0c796658ab0fc3340d312a99882871d5286c613add01fb13e1025aa3f8f1ff1c",
+            "integrity": "sha512-6uAjIbTzaBbb3cv/9fjNN4xmlCvkfybSqIK3J5spYErCPx+/U/911LqWLXeyskXqEQgAoY1tZn/ss/eiHfkYSQ==",
+            "archive_sri_verified": true,
+            "complete_members": 10
+          },
+          {
+            "name": "xhr2",
+            "version": "0.2.1",
+            "archive_sha256": "3756c7bc5c8f86f581e0c919534365a8edf1c121fb19f44c74378814e957b326",
+            "integrity": "sha512-sID0rrVCqkVNUn8t6xuv9+6FViXjUVXq8H5rWOH2rz9fDNQEd4g0EA2XlcEdJXRz5BMEn4O1pJFdT+z4YHhoWw==",
+            "archive_sri_verified": true,
+            "complete_members": 3
+          }
+        ],
+        "scope": "Matching complete pinned server public modules/types/manifests and xhr2 dependency in the existing owned public replay directory. No package install, private extraction, native/packed/floor or hydration-client qualification."
+      },
+      "zone_subject": {
+        "version": "0.16.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-ihXL9+vhYyEhXz4TDNpHeAOZN9FVrbog0Il64OIEI28UP/n5AaI6gsccRuOHBfx+206agzyoK527bYIO0Foy6A==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "94d3f7278878a57f7b4be6d9174fd2835bbf54bef1e54babd5e61c98495ebc4c",
+        "authenticated_commonjs_require_forwarders": 1,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      },
+      "html": "<!DOCTYPE html><html><head><style ng-app-id=\"ng\">.mat-ripple {\n  overflow: hidden;\n  position: relative;\n}\n.mat-ripple:not(:empty) {\n  transform: translateZ(0);\n}\n\n.mat-ripple.mat-ripple-unbounded {\n  overflow: visible;\n}\n\n.mat-ripple-element {\n  position: absolute;\n  border-radius: 50%;\n  pointer-events: none;\n  transition: opacity, transform 0ms cubic-bezier(0, 0, 0.2, 1);\n  transform: scale3d(0, 0, 0);\n  background-color: var(--mat-ripple-color, color-mix(in srgb, var(--mat-sys-on-surface) 10%, transparent));\n}\n@media (forced-colors: active) {\n  .mat-ripple-element {\n    display: none;\n  }\n}\n.cdk-drag-preview .mat-ripple-element, .cdk-drag-placeholder .mat-ripple-element {\n  display: none;\n}\n</style></head><body><!--nghm--><ripple-hydration-lab ng-version=\"21.2.23\" ngh=\"0\" ng-server-context=\"other\"><button id=\"replay-peer\" matripple=\"\" class=\"mat-ripple\" jsaction=\"mousedown:;mouseup:;click:;\">Hydration 0</button><div id=\"replay-owned\" class=\"mat-ripple\" style=\"width: 120px; height: 48px;\"></div></ripple-hydration-lab><script id=\"ng-state\" type=\"application/json\">{\"__nghData__\":[{}]}</script></body></html>",
+      "html_sha256": "d5ba7d8d8b987201c2289d36a449cc98c977feac541f863ecd413215592dee19",
+      "genuine_peer_directive_SSR": true,
+      "owned_component_and_helpers_loaded": true,
+      "actual_server_DOM_and_public_renderApplication": true,
+      "hydration_metadata": true,
+      "replay_event_bindings": 3,
+      "exact_loopback_allowlist_negative": true,
+      "public_server_version": "21.2.23",
+      "peer_directive_version": "21.2.14",
+      "actual_client_hydration_or_replayed_event_or_owned_renderer_instance_executed": false
+    },
+    {
+      "line": "21.x",
+      "mode": "zoneless",
+      "production": false,
+      "server_subject": {
+        "capsule_sha256": "2c69381ebc791cfacc57918d336ec5478c16808943c332d39b3a1b254bc8c687",
+        "installed": [
+          {
+            "name": "@angular/platform-server",
+            "version": "21.2.23",
+            "archive_sha256": "0c796658ab0fc3340d312a99882871d5286c613add01fb13e1025aa3f8f1ff1c",
+            "integrity": "sha512-6uAjIbTzaBbb3cv/9fjNN4xmlCvkfybSqIK3J5spYErCPx+/U/911LqWLXeyskXqEQgAoY1tZn/ss/eiHfkYSQ==",
+            "archive_sri_verified": true,
+            "complete_members": 10
+          },
+          {
+            "name": "xhr2",
+            "version": "0.2.1",
+            "archive_sha256": "3756c7bc5c8f86f581e0c919534365a8edf1c121fb19f44c74378814e957b326",
+            "integrity": "sha512-sID0rrVCqkVNUn8t6xuv9+6FViXjUVXq8H5rWOH2rz9fDNQEd4g0EA2XlcEdJXRz5BMEn4O1pJFdT+z4YHhoWw==",
+            "archive_sri_verified": true,
+            "complete_members": 3
+          }
+        ],
+        "scope": "Matching complete pinned server public modules/types/manifests and xhr2 dependency in the existing owned public replay directory. No package install, private extraction, native/packed/floor or hydration-client qualification."
+      },
+      "zone_subject": {
+        "version": "0.16.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-ihXL9+vhYyEhXz4TDNpHeAOZN9FVrbog0Il64OIEI28UP/n5AaI6gsccRuOHBfx+206agzyoK527bYIO0Foy6A==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "94d3f7278878a57f7b4be6d9174fd2835bbf54bef1e54babd5e61c98495ebc4c",
+        "authenticated_commonjs_require_forwarders": 1,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      },
+      "html": "<!DOCTYPE html><html><head><style ng-app-id=\"ng\">.mat-ripple {\n  overflow: hidden;\n  position: relative;\n}\n.mat-ripple:not(:empty) {\n  transform: translateZ(0);\n}\n\n.mat-ripple.mat-ripple-unbounded {\n  overflow: visible;\n}\n\n.mat-ripple-element {\n  position: absolute;\n  border-radius: 50%;\n  pointer-events: none;\n  transition: opacity, transform 0ms cubic-bezier(0, 0, 0.2, 1);\n  transform: scale3d(0, 0, 0);\n  background-color: var(--mat-ripple-color, color-mix(in srgb, var(--mat-sys-on-surface) 10%, transparent));\n}\n@media (forced-colors: active) {\n  .mat-ripple-element {\n    display: none;\n  }\n}\n.cdk-drag-preview .mat-ripple-element, .cdk-drag-placeholder .mat-ripple-element {\n  display: none;\n}\n</style></head><body><!--nghm--><ripple-hydration-lab ng-version=\"21.2.23\" ngh=\"0\" ng-server-context=\"other\"><button id=\"replay-peer\" matripple=\"\" class=\"mat-ripple\" jsaction=\"mousedown:;mouseup:;click:;\">Hydration 0</button><div id=\"replay-owned\" class=\"mat-ripple\" style=\"width: 120px; height: 48px;\"></div></ripple-hydration-lab><script id=\"ng-state\" type=\"application/json\">{\"__nghData__\":[{}]}</script></body></html>",
+      "html_sha256": "d5ba7d8d8b987201c2289d36a449cc98c977feac541f863ecd413215592dee19",
+      "genuine_peer_directive_SSR": true,
+      "owned_component_and_helpers_loaded": true,
+      "actual_server_DOM_and_public_renderApplication": true,
+      "hydration_metadata": true,
+      "replay_event_bindings": 3,
+      "exact_loopback_allowlist_negative": true,
+      "public_server_version": "21.2.23",
+      "peer_directive_version": "21.2.14",
+      "actual_client_hydration_or_replayed_event_or_owned_renderer_instance_executed": false
+    },
+    {
+      "line": "21.x",
+      "mode": "zoneless",
+      "production": true,
+      "server_subject": {
+        "capsule_sha256": "2c69381ebc791cfacc57918d336ec5478c16808943c332d39b3a1b254bc8c687",
+        "installed": [
+          {
+            "name": "@angular/platform-server",
+            "version": "21.2.23",
+            "archive_sha256": "0c796658ab0fc3340d312a99882871d5286c613add01fb13e1025aa3f8f1ff1c",
+            "integrity": "sha512-6uAjIbTzaBbb3cv/9fjNN4xmlCvkfybSqIK3J5spYErCPx+/U/911LqWLXeyskXqEQgAoY1tZn/ss/eiHfkYSQ==",
+            "archive_sri_verified": true,
+            "complete_members": 10
+          },
+          {
+            "name": "xhr2",
+            "version": "0.2.1",
+            "archive_sha256": "3756c7bc5c8f86f581e0c919534365a8edf1c121fb19f44c74378814e957b326",
+            "integrity": "sha512-sID0rrVCqkVNUn8t6xuv9+6FViXjUVXq8H5rWOH2rz9fDNQEd4g0EA2XlcEdJXRz5BMEn4O1pJFdT+z4YHhoWw==",
+            "archive_sri_verified": true,
+            "complete_members": 3
+          }
+        ],
+        "scope": "Matching complete pinned server public modules/types/manifests and xhr2 dependency in the existing owned public replay directory. No package install, private extraction, native/packed/floor or hydration-client qualification."
+      },
+      "zone_subject": {
+        "version": "0.16.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-ihXL9+vhYyEhXz4TDNpHeAOZN9FVrbog0Il64OIEI28UP/n5AaI6gsccRuOHBfx+206agzyoK527bYIO0Foy6A==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "94d3f7278878a57f7b4be6d9174fd2835bbf54bef1e54babd5e61c98495ebc4c",
+        "authenticated_commonjs_require_forwarders": 1,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      },
+      "html": "<!DOCTYPE html><html><head><style ng-app-id=\"ng\">.mat-ripple {\n  overflow: hidden;\n  position: relative;\n}\n.mat-ripple:not(:empty) {\n  transform: translateZ(0);\n}\n\n.mat-ripple.mat-ripple-unbounded {\n  overflow: visible;\n}\n\n.mat-ripple-element {\n  position: absolute;\n  border-radius: 50%;\n  pointer-events: none;\n  transition: opacity, transform 0ms cubic-bezier(0, 0, 0.2, 1);\n  transform: scale3d(0, 0, 0);\n  background-color: var(--mat-ripple-color, color-mix(in srgb, var(--mat-sys-on-surface) 10%, transparent));\n}\n@media (forced-colors: active) {\n  .mat-ripple-element {\n    display: none;\n  }\n}\n.cdk-drag-preview .mat-ripple-element, .cdk-drag-placeholder .mat-ripple-element {\n  display: none;\n}\n</style></head><body><!--nghm--><ripple-hydration-lab ng-version=\"21.2.23\" ngh=\"0\" ng-server-context=\"other\"><button id=\"replay-peer\" matripple=\"\" class=\"mat-ripple\" jsaction=\"mousedown:;mouseup:;click:;\">Hydration 0</button><div id=\"replay-owned\" class=\"mat-ripple\" style=\"width: 120px; height: 48px;\"></div></ripple-hydration-lab><script id=\"ng-state\" type=\"application/json\">{\"__nghData__\":[{}]}</script></body></html>",
+      "html_sha256": "d5ba7d8d8b987201c2289d36a449cc98c977feac541f863ecd413215592dee19",
+      "genuine_peer_directive_SSR": true,
+      "owned_component_and_helpers_loaded": true,
+      "actual_server_DOM_and_public_renderApplication": true,
+      "hydration_metadata": true,
+      "replay_event_bindings": 3,
+      "exact_loopback_allowlist_negative": true,
+      "public_server_version": "21.2.23",
+      "peer_directive_version": "21.2.14",
+      "actual_client_hydration_or_replayed_event_or_owned_renderer_instance_executed": false
+    }
+  ],
+  "scope": "Complete matching pinned public platform-server runtime/DOM and genuine Core/Browser/Material/CDK namespaces; actual shared component SSR with genuine public MatRipple identity (the existing alias lead), real withEventReplay server metadata, three serialized event bindings and exact host rejection. Complete owned renderer/ref/manager/helper source is loaded, but Platform.isBrowser=false prevents owned renderer instantiation. JIT diagnostic with borrowed Rx/tslib. No packed library, Angular AOT, client bootstrap, early capture script, native event/replay, actual owned renderer or full Node/Rx floors."
+}
