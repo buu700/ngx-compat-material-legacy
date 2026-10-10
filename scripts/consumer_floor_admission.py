@@ -5,6 +5,8 @@ from pathlib import Path
 from rc_acceptance import EvidenceError, checked_file, assertion_directory
 
 HEX = re.compile(r'^[0-9a-f]{64}$')
+ENGINE_PACKAGE = re.compile(r'(?:^|/)node_modules/@angular/animations(?:/|$)')
+ENGINE_ENTRY = re.compile(r'(?:^|/)node_modules/@angular/platform-browser/(?:animations/|(?:fesm2022|types)/(?:animations(?:-async)?|async)\.)')
 
 def reviewed_configurations(plan, line):
     row = plan['lines'][line]
@@ -64,7 +66,7 @@ def floor_assertion_ok(root: Path, active, body: dict, invocation: str) -> bool:
                 checked_file(active.run_dir, record, 'floor support')
             detail = json.loads(checked_file(active.run_dir, body['consumer_detail'], 'floor detail').read_text())
             versions = {f'@angular/{name}': config['cdk'] if name == 'cdk' else config['material'] if name == 'material' else config['framework']
-                        for name in ('animations','cdk','common','compiler','compiler-cli','core','forms','material','platform-browser','platform-browser-dynamic')}
+                        for name in ('cdk','common','compiler','compiler-cli','core','forms','material','platform-browser','platform-browser-dynamic')}
             versions.update(rxjs=config['rxjs'], typescript=config['typescript'])
             if body['installed_versions'] != versions or detail['installed_floor_versions'] != versions:
                 return False
@@ -87,6 +89,8 @@ def floor_assertion_ok(root: Path, active, body: dict, invocation: str) -> bool:
                 return False
             if any(not HEX.fullmatch(item['sha256']) for item in bundle['inputs']):
                 return False
+            if any(ENGINE_PACKAGE.search(path) or ENGINE_ENTRY.search(path) for path in paths):
+                return False
             if not all(any(path.startswith(prefix) for path in paths) for prefix in ('out-tsc/', 'node_modules/rxjs/', 'node_modules/@ngx-compat/material-legacy/')):
                 return False
 
@@ -97,7 +101,14 @@ def floor_assertion_ok(root: Path, active, body: dict, invocation: str) -> bool:
                 return False
             if detail['isolation'].get('declaration_program_ok') is not True or detail['isolation'].get('declaration_check') != 'skipLibCheck:false':
                 return False
+            if detail['isolation'].get('animation_engine') != {'installed_packages': [], 'lock_packages': []}:
+                return False
+            policy = detail['harness'].get('result', {})
+            if policy.get('engineFreeAnimationPolicy') is not True or policy.get('animationsProvider') != 'MATERIAL_ANIMATIONS + ANIMATION_MODULE_TYPE':
+                return False
             lock = json.loads(checked_file(active.run_dir, body['consumer_lock'], 'floor lock').read_text())
+            if any(ENGINE_PACKAGE.search(path) for path in lock['packages']):
+                return False
             for name, version in versions.items():
                 if lock['packages']['node_modules/'+name]['version'] != version:
                     return False

@@ -112,6 +112,10 @@ try {
         const detail = JSON.parse(readFileSync(detailPath, 'utf8'));
         if ((experiment && (detail.experimental_peer !== true || detail.advertised_floor_acceptance_credit !== false)) || detail.status !== 'ok' || detail.node_runtime.version !== `v${configuration.node}`
           || detail.tarball.sha256 !== library.sha256 || detail.aot.status !== 'ok' || detail.harness.status !== 'ok'
+          || detail.isolation?.animation_engine?.installed_packages?.length !== 0
+          || detail.isolation?.animation_engine?.lock_packages?.length !== 0
+          || detail.harness.result?.engineFreeAnimationPolicy !== true
+          || detail.harness.result?.animationsProvider !== 'MATERIAL_ANIMATIONS + ANIMATION_MODULE_TYPE'
           || !Array.isArray(detail.acceptanceCases) || !detail.acceptanceCases.length
           || detail.acceptanceCases.some(item => item.result !== 'pass')) throw new Error('floor consumer did not satisfy every probe');
         observation.command = [node.executable, ...command];
