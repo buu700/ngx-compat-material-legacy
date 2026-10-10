@@ -17,7 +17,8 @@ const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),ts=createRequir
 const contracts={table:{id:'packed-consumer/harness/table-angular-di-construction',field:'tableAngularDiConstruction'},
  chip:{id:'packed-consumer/harness/chip-individual-disabled-form-isolation',field:'chipDisabledIsolation'},
  selection:{id:'packed-consumer/harness/selection-model-comparator-public-list',field:'selectionComparatorExposure'},
- bidi:{id:'packed-consumer/harness/bidi-module-legacy-node-scope',field:'legacyBidiScope'}};
+ bidi:{id:'packed-consumer/harness/bidi-module-legacy-node-scope',field:'legacyBidiScope'},
+ menu:{id:'packed-consumer/harness/menu-lazy-item-destruction',field:'lazyMenuLifecycle'}};
 
 /** Whole actual collector/writer with finite synthetic observations; no product execution. */
 export function probeRequiredPackedContract(name){

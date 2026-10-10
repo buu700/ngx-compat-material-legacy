@@ -1,0 +1,77 @@
+diff --git a/src/material/menu/menu-trigger.ts b/src/material/menu/menu-trigger.ts
+index e9fa1aa6cf17588fe8d535241097b770fe4d57f6..338253c89667aa35b30eb961c4b95638c7f6bc99 100644
+--- a/src/material/menu/menu-trigger.ts
++++ b/src/material/menu/menu-trigger.ts
+@@ -368,10 +368,14 @@ export class MatMenuTrigger implements AfterContentInit, OnDestroy {
+     // Note that we don't wait for the animation to finish if another trigger took
+     // over the menu, because the panel will end up empty which looks glitchy.
+     if (menu instanceof MatMenu && this._ownsMenu(menu)) {
+-      this._pendingRemoval = menu._animationDone.pipe(take(1)).subscribe(() => overlayRef.detach());
++      this._pendingRemoval = menu._animationDone.pipe(take(1)).subscribe(() => {
++        overlayRef.detach();
++        menu.lazyContent?.detach();
++      });
+       menu._setIsOpen(false);
+     } else {
+       overlayRef.detach();
++      menu?.lazyContent?.detach();
+     }
+ 
+     if (menu && this._ownsMenu(menu)) {
+diff --git a/src/material/menu/menu.spec.ts b/src/material/menu/menu.spec.ts
+index d25a6c9713b110d3965012f22187d94e0c99dfc2..a065f4404038632d44ab7f97da271da3ebb4a62b 100644
+--- a/src/material/menu/menu.spec.ts
++++ b/src/material/menu/menu.spec.ts
+@@ -15,9 +15,11 @@ import {ScrollDispatcher, ViewportRuler} from '@angular/cdk/scrolling';
+ import {
+   ChangeDetectionStrategy,
+   Component,
++  Directive,
+   ElementRef,
+   EventEmitter,
+   Input,
++  OnDestroy,
+   Output,
+   Provider,
+   QueryList,
+@@ -1219,6 +1221,40 @@ describe('MatMenu', () => {
+         .toBe(true);
+     }));
+ 
++    it('should detach the lazy content when the menu is closed', fakeAsync(() => {
++      let destroyCount = 0;
++
++      // Note: for some reason doing `spyOn(item, 'ngOnDestroy')` doesn't work, even though a
++      // `console.log` shows that the `ngOnDestroy` gets called. We work around it with a custom
++      // directive that increments a counter.
++      @Directive({selector: '[mat-menu-item]', standalone: false})
++      class DestroyChecker implements OnDestroy {
++        ngOnDestroy(): void {
++          destroyCount++;
++        }
++      }
++
++      const fixture = createComponent(SimpleLazyMenu, undefined, [DestroyChecker]);
++      fixture.detectChanges();
++      fixture.componentInstance.trigger.openMenu();
++      fixture.detectChanges();
++      tick(500);
++      fixture.detectChanges();
++
++      expect(fixture.componentInstance.items.length).toBe(2);
++      expect(destroyCount).toBe(0);
++
++      fixture.componentInstance.trigger.closeMenu();
++      fixture.detectChanges();
++      tick(500);
++      fixture.detectChanges();
++
++      expect(fixture.componentInstance.items.length)
++        .withContext('Expected items to be removed from query list')
++        .toBe(0);
++      expect(destroyCount).withContext('Expected ngOnDestroy to have been called').toBe(2);
++    }));
++
+     it('should focus the first menu item when opening a lazy menu via keyboard', async () => {
+       const fixture = createComponent(SimpleLazyMenu);
+       fixture.autoDetectChanges();
