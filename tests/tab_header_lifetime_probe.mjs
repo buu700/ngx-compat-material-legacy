@@ -29,10 +29,14 @@ const emit = text => ts.transpileModule(text, {compilerOptions: {target: ts.Scri
   module: ts.ModuleKind.ESNext, experimentalDecorators: true}}).outputText
   .replace(/(['"])(@angular\/[^'"]+|rxjs(?:\/operators)?)\1/g, (_, quote, name) => JSON.stringify(url(name)));
 const helperUrl = data(emit(helper));
+const renderHelperPath = 'projects/ngx-material-legacy/legacy-tabs/internal/after-tab-header-render.ts';
+const renderHelper = readFileSync(resolve(root, renderHelperPath), 'utf8');
+const renderHelperUrl = data(emit(renderHelper));
 const viewportPath = 'projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.ts';
 const viewportUrl = data(emit(readFileSync(resolve(root, viewportPath), 'utf8')));
 async function load(text = source) {
   return (await import(data(emit(text).replaceAll("'./owned-header-resize'", JSON.stringify(helperUrl))
+    .replaceAll("'./after-tab-header-render'", JSON.stringify(renderHelperUrl))
     .replaceAll("'@ngx-compat/material-legacy/legacy-core'", JSON.stringify(viewportUrl)))))
     .MatPaginatedTabHeader;
 }
@@ -277,14 +281,15 @@ if (!baseline) assert.ok(cases.every(c => c.result === 'pass'), JSON.stringify(c
 const report = {schema_version: 1, role: 'Owned tab-header source lifecycle/state and targeted transform diagnostic only',
   line: JSON.parse(readFileSync(resolve(root, 'projects/ngx-material-legacy/package.json'))).version.startsWith('21.') ? '21.x' : 'main',
   node: process.version, compiler: ts.version, runtime_peer: core.VERSION.full,
-  sources: [{path: sourcePath, sha256: sha(source)}, {path: helperPath, sha256: sha(helper)}], cases,
+  sources: [{path: sourcePath, sha256: sha(source)}, {path: helperPath, sha256: sha(helper)},
+    {path: renderHelperPath, sha256: sha(renderHelper)}], cases,
   limits: ['Actual owned class/helper and public current22 FocusKeyManager execute; geometry/events/clock are synthetic.',
     'No native browser rendering, actual21 runtime, AOT, packed, canonical or minimum runtime/compiler qualification.',
     'Viewport private-source boundary, table/menu constructors and every other plan requirement remain separate.']};
 if (!baseline) {
   report.mutations = [];
   const mutants = [
-    ['leaked-stable-subscription', source.replace('take(1), takeUntil(this._destroyed)', 'take(1)'),
+    ['leaked-stable-subscription', source.replace('.pipe(takeUntil(this._destroyed)).subscribe(realign)', '.subscribe(realign)'),
       'destroy-before-stable-unsubscribes-without-late-work'],
     ['stale-promise-realignment', source.replace('Promise.resolve().then(() => {\n            if (this._isDestroyed) return;',
       'Promise.resolve().then(() => {'), 'viewport-queued-realignment-is-cancelled-on-destroy'],
