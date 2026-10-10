@@ -138,7 +138,11 @@ export function inventoryNgZoneUses({root = rootDefault, readSource} = {}) {
     }
     visit(source);
   }
-  assert.equal(accesses.length, 61, 'NgZone access roster changed; review the new contexts');
+  assert.equal(accesses.length, 62, 'NgZone access roster changed; review the new contexts');
+  assert.deepEqual(accesses.filter(row => row.file === 'legacy-core/ripple/ripple-renderer.ts')
+    .map(({member,expression}) => ({member,expression})), Array.from({length:3}, () =>
+      ({member:'runOutsideAngular',expression:'this._ngZone.runOutsideAngular'})),
+    'Renderer enter/exit timer and pointer-up registration boundary changed');
   assert.equal(forwarding.length, 17, 'NgZone forwarding roster changed; review the new contexts: '+
     JSON.stringify(forwarding.filter(row=>row.kind==='construct').map(({file,target,argument})=>({file,target,argument}))));
   assert.deepEqual(forwarding.filter(row=>row.kind==='construct').map(({file,target,argument})=>({file,target,argument})),[
