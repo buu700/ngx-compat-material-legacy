@@ -202,10 +202,23 @@
         "path": "compatibility/rc/form-field-direction-lifetime-source-proof.json",
         "sha256": "a45885f634224ff74c81c66c2c0c92854cfec1973a47ab1610ada1b793fc3b53"
       }
+    },
+    {
+      "id": "snack-announcement-direct-destruction",
+      "proof": "snack-announcement-source-proof.json",
+      "family": "snack-bar",
+      "canonical_source_integration": "pending-implementation",
+      "current_canonical_assertion": "Absent. The canonical enabled CSS event/fallback and dismissal cases do not directly destroy a container while its announcement timer is pending. Earlier source replay covers that path, but is not actual native view destruction.",
+      "required": "Add actual Angular-owned container creation/initialization and direct ComponentRef destruction, with a live positive announcement case and retained native inert/live DOM proving no movement or announcement after destruction. Dismiss-before-destroy is insufficient. Preserve native timing and product markup/styles; use the existing snack-bar/default cell.",
+      "historical_source_proof": {
+        "path": "compatibility/rc/snack-announcement-source-proof.json",
+        "sha256": "634992fc48e97eb78e5a80adcae2bb073089eb54bf5d0d430e2b2cb7ec8e5264"
+      },
+      "native_execution": "pending"
     }
   ],
   "implemented_source_integration": 11,
-  "pending_source_integration": 0,
+  "pending_source_integration": 1,
   "actual_qualified_native_followups": 0,
   "new_release_matrix_cells": 0,
   "g11_claim": "not-passed",
@@ -216,5 +229,6 @@
   "prior_integration_delta_source_proof": {
     "path": "compatibility/rc/canonical-native-completion-source-proof.json",
     "sha256": "f68c5ac3b03c6610b72c681b5af5bcf4ef2e04a9cdef2d58d3ba59ba2e4a1b03"
-  }
+  },
+  "next_bounded_source_integration": "snack-announcement-direct-destruction; implementation remains closeout work before C05/audit"
 }
