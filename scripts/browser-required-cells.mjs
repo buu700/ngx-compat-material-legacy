@@ -14,6 +14,7 @@ import {createHash} from 'node:crypto';
 import {snackMotionFixture} from './snack-motion-fixture.mjs';
 import {legacySnackMotionNativeOkay, trackLegacySnackMotionNative, readLegacySnackMotionEnterNative, readLegacySnackMotionExitNative} from './legacy-snack-motion-native-contract.mjs';
 import {tooltipAriaLifetimeFixture} from './tooltip-aria-lifetime-fixture.mjs';
+import {formFieldDirectionLifetimeFixture, legacyFormFieldDirectionLifetimeNativeOkay} from './form-field-direction-lifetime-fixture.mjs';
 import {legacyTooltipAriaLifetimeNativeOkay, legacyTooltipNativeOkay, legacyTooltipMessageSequenceOkay, readLegacyTooltipNative} from './legacy-tooltip-native-contract.mjs';
 import {legacyInkBarNativeOkay, legacyInkBarSelectionSequenceOkay, readLegacyInkBarNative} from './legacy-ink-bar-native-contract.mjs';
 import {legacySelectFontNativeOkay, readLegacySelectFontNative} from './legacy-select-font-native-contract.mjs';
@@ -61,6 +62,7 @@ export function requiredProbeSource() {
   return [legacyTooltipAriaLifetimeNativeOkay, legacyTooltipNativeOkay, legacyTooltipMessageSequenceOkay, readLegacyTooltipNative, legacyInkBarNativeOkay, legacyInkBarSelectionSequenceOkay,
     readLegacyInkBarNative, legacySelectFontNativeOkay, readLegacySelectFontNative, legacyChipBlurNativeOkay,
     legacyFormFieldOutlineNativeOkay, legacyFormFieldOutlineSequenceOkay, readLegacyFormFieldOutlineNative, legacyFormFieldOutlineBoundaryNativeOkay, readLegacyFormFieldOutlineBoundaryNative, legacyFormFieldNoLabelNativeOkay, readLegacyFormFieldNoLabelNative,
+    legacyFormFieldDirectionLifetimeNativeOkay,
     tabPaginationNativeOkay, readTabPaginationNative, legacySnackMotionNativeOkay,
     trackLegacySnackMotionNative, readLegacySnackMotionEnterNative, readLegacySnackMotionExitNative]
     .map(contract => contract.toString()).join('\n') + '\n' + readFileSync(probePath, 'utf8');
@@ -159,6 +161,7 @@ function labHtml() {
     '<div id="wrap-field" *ngIf="!cspOnly">',
     '<mat-form-field id="p-field"><mat-label>Name</mat-label><input id="p-field-input" matInput [errorStateMatcher]="matcher"><mat-hint id="p-hint">Hint text</mat-hint></mat-form-field>',
     '<mat-form-field id="p-field-disabled" floatLabel="always"><input matInput disabled value="off"></mat-form-field>',
+    '<lab-field-direction-lifetime></lab-field-direction-lifetime>',
     '<div id="p-outline-wrapper" [style.display]="outlineVisible() ? \'\' : \'none\'" [dir]="outlineDirection()">',
     '<mat-form-field id="p-outline" appearance="outline" floatLabel="always"><mat-label>Outline</mat-label>',
     '<span matPrefix *ngIf="outlinePrefix()">USD&nbsp;</span><input matInput value="Value"></mat-form-field>',
@@ -234,9 +237,9 @@ function labSource(zoneless) {
   const zoneImport = zoneless ? '' : "import 'zone.js';\n";
   const zoneNamed = zoneless ? ', provideZonelessChangeDetection' : '';
   const zoneProvider = zoneless ? 'provideZonelessChangeDetection(), ' : '';
-  return `${zoneImport}import {CSP_NONCE, ChangeDetectorRef, Component, Directive, Input, NgModule, QueryList, TemplateRef, ViewChild, ViewChildren, ViewContainerRef, forwardRef, inject, signal${zoneNamed}} from '@angular/core';
+  return `${zoneImport}import {CSP_NONCE, ChangeDetectorRef, Component, Directive, Injector, Input, NgModule, QueryList, TemplateRef, ViewChild, ViewChildren, ViewContainerRef, afterNextRender, forwardRef, inject, signal${zoneNamed}} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
-import {BidiModule} from '@angular/cdk/bidi';
+import {BidiModule, Dir, Directionality} from '@angular/cdk/bidi';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {AbstractControl, FormControl, FormsModule, NG_VALIDATORS, ReactiveFormsModule, ValidationErrors, Validator} from '@angular/forms';
 import {LEGACY_ANIMATIONS_TEST_OVERRIDE} from '@ngx-compat/material-legacy/legacy-core';
@@ -265,6 +268,7 @@ import {MatLegacyTabsModule} from '@ngx-compat/material-legacy/legacy-tabs';
 import {MatLegacyTooltip, MatLegacyTooltipModule} from '@ngx-compat/material-legacy/legacy-tooltip';
 
 ${tooltipAriaLifetimeFixture}
+${formFieldDirectionLifetimeFixture}
 ${snackMotionFixture}
 
 @Directive({
@@ -318,6 +322,7 @@ export class LabRoot {
   @ViewChild('tipOff') tipOff!: any;
   @ViewChild('chipList') chipList?: MatLegacyChipList;
   @ViewChild(TooltipAriaLifetimeLab) ariaLifetimeLab?: TooltipAriaLifetimeLab;
+  @ViewChild(FormFieldDirectionLifetimeLab) fieldDirectionLifetimeLab?: FormFieldDirectionLifetimeLab;
   @ViewChildren(MatLegacyInput) inputs!: QueryList<MatLegacyInput>;
   @ViewChildren(MatLegacySelect) selects!: QueryList<MatLegacySelect>;
   @ViewChildren(MatLegacyChipList) chipLists!: QueryList<MatLegacyChipList>;
@@ -358,6 +363,10 @@ export class LabRoot {
       runTooltipAriaLifetime() {
         if (!lab.ariaLifetimeLab) return Promise.reject(new Error('tooltip ARIA fixture missing'));
         return lab.ariaLifetimeLab.run();
+      },
+      runFormFieldDirectionLifetime() {
+        if (!lab.fieldDirectionLifetimeLab) return Promise.reject(new Error('field direction fixture missing'));
+        return lab.fieldDirectionLifetimeLab.run();
       },
       readAutocompleteSelection() { return lab.autoSelection(); },
       readChipFormState() { return {focused: lab.chipList?.focused, touched: lab.chipControl.touched}; },
@@ -403,7 +412,7 @@ export class LabRoot {
     MatLegacyTabsModule,
     MatLegacyTooltipModule,
   ],
-  declarations: [LabRoot, DialogBody, LabForceInvalid, SnackMotionLab, TooltipAriaLifetimeLab, CaptureTooltipForAriaLifetime],
+  declarations: [LabRoot, DialogBody, LabForceInvalid, SnackMotionLab, TooltipAriaLifetimeLab, CaptureTooltipForAriaLifetime, FormFieldDirectionLifetimeLab, CaptureFieldDirectionLifetime],
   bootstrap: [LabRoot],
   providers: [
     ...((window as unknown as {__cspNonce?: string}).__cspNonce ? [{provide: CSP_NONCE, useValue: (window as unknown as {__cspNonce: string}).__cspNonce}] : []),

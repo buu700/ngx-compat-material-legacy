@@ -257,9 +257,24 @@
                   waitFor(() => {
                     const state = readLegacyFormFieldNoLabelNative(query('#p-field-disabled'));
                     return legacyFormFieldNoLabelNativeOkay(state) ? state : null;
-                  }, 1500, state => finish(!!state,
-                    'form-field; outline prefix/hide/show/RTL ' + JSON.stringify(rows) + '; fixed long-label boundary ' + JSON.stringify(boundary)
-                    + '; tagged no-label float state ' + JSON.stringify(state)));
+                  }, 1500, state => {
+                    if (!state) {finish(false, 'tagged no-label float state missing'); return;}
+                    const owner = window.__status;
+                    if (!window.__lab || typeof window.__lab.runFormFieldDirectionLifetime !== 'function') {
+                      finish(false, 'field direction lifetime fixture missing'); return;
+                    }
+                    let completed = false, observation;
+                    Promise.resolve().then(() => window.__lab.runFormFieldDirectionLifetime()).then(value => {
+                      observation = value; completed = true;
+                    }, error => {observation = {error: String(error)}; completed = true;});
+                    waitFor(() => completed ? {observation} : null, 1500, result => {
+                      if (window.__status !== owner) return;
+                      const lifetime = result && result.observation;
+                      finish(legacyFormFieldDirectionLifetimeNativeOkay(lifetime),
+                        'form-field; outline prefix/hide/show/RTL ' + JSON.stringify(rows) + '; fixed long-label boundary ' + JSON.stringify(boundary)
+                        + '; tagged no-label float state ' + JSON.stringify(state) + '; direction lifetime ' + JSON.stringify(lifetime));
+                    });
+                  });
                 });
               });
             });
