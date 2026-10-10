@@ -21,6 +21,7 @@ import {
   ContentChildren,
   ElementRef,
   Inject,
+  Injector,
   Input,
   NgZone,
   Optional,
@@ -42,6 +43,7 @@ import {MatLegacyPrefix} from './prefix';
 import {MatLegacySuffix} from './suffix';
 import {Platform} from '@angular/cdk/platform';
 import {getShadowRoot} from './owned-shadow-dom';
+import {afterFormFieldRender} from './internal/after-form-field-render';
 import {AbstractControlDirective, ValidatorFn} from '@angular/forms';
 import {ANIMATION_MODULE_TYPE} from '@angular/core';
 import {MatFormFieldControl} from '@angular/material/form-field';
@@ -300,6 +302,7 @@ export class MatLegacyFormField
     private _platform: Platform,
     private _ngZone: NgZone,
     @Optional() @Inject(ANIMATION_MODULE_TYPE) _animationMode: string,
+    private _injector?: Injector,
   ) {
     super(elementRef);
 
@@ -342,11 +345,12 @@ export class MatLegacyFormField
     // in order to avoid throwing users into an infinite loop
     // if `zone-patch-rxjs` is included.
     this._ngZone.runOutsideAngular(() => {
-      this._ngZone.onStable.pipe(takeUntil(this._destroyed)).subscribe(() => {
-        if (this._outlineGapCalculationNeededOnStable) {
-          this.updateOutlineGap();
-        }
-      });
+      afterFormFieldRender(this._ngZone, this._injector)
+        .pipe(takeUntil(this._destroyed)).subscribe(() => {
+          if (this._outlineGapCalculationNeededOnStable) {
+            this.updateOutlineGap();
+          }
+        });
     });
 
     // Run change detection and update the outline if the suffix or prefix changes.

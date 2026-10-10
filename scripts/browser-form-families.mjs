@@ -11,6 +11,7 @@
  *   node scripts/browser-form-families.mjs --tarball <path> --zoneless
  */
 import {createHash} from 'node:crypto';
+import {legacyFormFieldOutlineNativeOkay, legacyFormFieldOutlineSequenceOkay, observeLegacyFormFieldOutlineNative} from './legacy-form-field-outline-native-contract.mjs';
 import {announcedChromeEndpoint,debuggerMatchesChild} from './chromium-debug-endpoint.mjs';
 import {spawnSync as __spawnSyncForWs} from 'node:child_process';
 if (typeof globalThis.WebSocket !== 'function') {
@@ -132,10 +133,24 @@ import {MatLegacyInputModule} from '@ngx-compat/material-legacy/legacy-input';
       <input id="ff-input" matInput [(ngModel)]="name" required>
       <mat-hint id="ff-hint">Hint text</mat-hint>
     </mat-form-field>
+    <div id="outline-wrapper" [style.display]="outlineVisible ? '' : 'none'" [dir]="outlineDirection">
+      <mat-form-field id="ff-outline" appearance="outline" floatLabel="always">
+        <mat-label>Outline</mat-label>
+        <span matPrefix *ngIf="outlinePrefix">USD&nbsp;</span>
+        <input matInput value="Value">
+      </mat-form-field>
+    </div>
+    <button id="outline-prefix" type="button" (click)="outlinePrefix = true">Add prefix</button>
+    <button id="outline-hide" type="button" (click)="outlineVisible = false; outlinePrefix = false">Hide and remove prefix</button>
+    <button id="outline-show" type="button" (click)="outlineVisible = true">Show</button>
+    <button id="outline-rtl" type="button" (click)="outlineDirection = 'rtl'">RTL</button>
   \`,
 })
 export class LabRoot {
   name = '';
+  outlineVisible = true;
+  outlinePrefix = false;
+  outlineDirection = 'ltr';
 }
 
 @NgModule({
@@ -363,6 +378,29 @@ try {
     '!!document.querySelector("mat-form-field#ff.mat-form-field-should-float, mat-form-field#ff.mat-focused .mat-form-field-label")',
   );
 
+  const outlineRows = [];
+  async function recordOutline() {
+    let observation = await observeLegacyFormFieldOutlineNative({evaluate});
+    for (let i = 0; i < 40 && !legacyFormFieldOutlineNativeOkay(observation); i += 1) {
+      await sleep(50);
+      observation = await observeLegacyFormFieldOutlineNative({evaluate});
+    }
+    outlineRows.push(observation);
+  }
+  await recordOutline();
+  await evaluate(`document.getElementById('outline-prefix').click()`);
+  await waitFor(`!!document.querySelector('#ff-outline .mat-form-field-prefix')`);
+  await recordOutline();
+  await evaluate(`document.getElementById('outline-hide').click()`);
+  families['form-field'].outline_hidden = await waitFor(`getComputedStyle(document.getElementById('outline-wrapper')).display === 'none'`);
+  await evaluate(`document.getElementById('outline-show').click()`);
+  await waitFor(`getComputedStyle(document.getElementById('outline-wrapper')).display !== 'none'`);
+  await recordOutline();
+  await evaluate(`document.getElementById('outline-rtl').click()`);
+  await waitFor(`getComputedStyle(document.getElementById('ff-outline')).direction === 'rtl'`);
+  await recordOutline();
+  families['form-field'].outline_geometry = outlineRows;
+
   zoneGlobal = await evaluate('typeof Zone === "undefined" ? "undefined" : typeof Zone');
 } catch (err) {
   error = String(err);
@@ -386,7 +424,9 @@ const ok =
   && families.chips.list_present && families.chips.chip_clicked && families.chips.chip_selected_class
   && families['form-field'].present && families['form-field'].hint_visible
   && families['form-field'].input_focused && families['form-field'].focused_class
-  && families['form-field'].label_floating;
+  && families['form-field'].label_floating
+  && families['form-field'].outline_hidden
+  && legacyFormFieldOutlineSequenceOkay(families['form-field'].outline_geometry);
 
 const report = {
   schema_version: 1,
@@ -410,7 +450,7 @@ const report = {
     'Firefox/WebKit, CSP, motion, invalid/disabled/RTL/density, and other states stay not-executed.',
     'MATERIAL_ANIMATIONS.animationsDisabled=true for deterministic layout; not enabled-motion proof.',
     'Chip credit is list presence + Space toggles mat-chip-selected on focused chip; remove/input/avatar not exercised.',
-    'Form-field credit is fill appearance + hint + focus float/focused class; error/outline/legacy appearance not exercised.',
+    'Form-field requires fill/hint/focus plus short-label outlined gap geometry, prefix update, hide/show and RTL in this fixture; error and legacy appearance remain unexecuted.',
     'Success is not copied to unexecuted cells.',
     'Does not claim G10.',
   ],
