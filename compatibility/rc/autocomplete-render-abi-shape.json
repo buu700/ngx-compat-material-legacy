@@ -1,0 +1,41 @@
+{
+  "source": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+  "before_source_sha256": "2ef5fc211116700602aea3a1e705849e0583833fb0e6c7648283c405c8205767",
+  "after_source_sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1",
+  "scope": "Existing constructor body, decorator, explicit public declarations and method signatures; public property initializers are behavior covered separately. Added private initialization subject is intentionally outside this API comparison.",
+  "unchanged": {
+    "constructor": "constructor(private _element: ElementRef<HTMLInputElement>, private _overlay: Overlay, private _viewContainerRef: ViewContainerRef, private _zone: NgZone, private _changeDetectorRef: ChangeDetectorRef, \n@Inject(MAT_AUTOCOMPLETE_SCROLL_STRATEGY)\nscrollStrategy: any, \n@Optional()\nprivate _dir: Directionality | null, \n@Optional()\n@Inject(MAT_FORM_FIELD)\n@Host()\nprivate _formField: MatFormField | null, \n@Optional()\n@Inject(DOCUMENT)\nprivate _document: any, private _viewportRuler: ViewportRuler, \n@Optional()\n@Inject(MAT_AUTOCOMPLETE_DEFAULT_OPTIONS)\nprivate _defaults?: MatAutocompleteDefaultOptions | null) {\n    this._scrollStrategy = scrollStrategy;\n    this._breakpointObserver = this._viewContainerRef.injector.get(BreakpointObserver);\n}",
+    "class_decorator": [
+      "@Directive({ standalone: false })"
+    ],
+    "public_signatures": [
+      "_onChange: (value: any) => void;",
+      "_onTouched;",
+      "@Input('matAutocomplete')\nautocomplete: _MatAutocompleteBase;",
+      "@Input('matAutocompletePosition')\nposition: 'auto' | 'above' | 'below';",
+      "@Input('matAutocompleteConnectedTo')\nconnectedTo: _MatAutocompleteOriginBase;",
+      "@Input('autocomplete')\nautocompleteAttribute: string;",
+      "@Input('matAutocompleteDisabled')\nget autocompleteDisabled(): boolean {\n    return this._autocompleteDisabled;\n}",
+      "set autocompleteDisabled(value: BooleanInput) {\n    this._autocompleteDisabled = coerceBooleanProperty(value);\n}",
+      "constructor(private _element: ElementRef<HTMLInputElement>, private _overlay: Overlay, private _viewContainerRef: ViewContainerRef, private _zone: NgZone, private _changeDetectorRef: ChangeDetectorRef, \n@Inject(MAT_AUTOCOMPLETE_SCROLL_STRATEGY)\nscrollStrategy: any, \n@Optional()\nprivate _dir: Directionality | null, \n@Optional()\n@Inject(MAT_FORM_FIELD)\n@Host()\nprivate _formField: MatFormField | null, \n@Optional()\n@Inject(DOCUMENT)\nprivate _document: any, private _viewportRuler: ViewportRuler, \n@Optional()\n@Inject(MAT_AUTOCOMPLETE_DEFAULT_OPTIONS)\nprivate _defaults?: MatAutocompleteDefaultOptions | null) {\n    this._scrollStrategy = scrollStrategy;\n    this._breakpointObserver = this._viewContainerRef.injector.get(BreakpointObserver);\n}",
+      "ngAfterViewInit();",
+      "ngOnChanges(changes: SimpleChanges);",
+      "ngOnDestroy();",
+      "get panelOpen(): boolean {\n    return this._overlayAttached && this.autocomplete.showPanel;\n}",
+      "openPanel(): void;",
+      "closePanel(): void;",
+      "updatePosition(): void;",
+      "get panelClosingActions(): Observable<MatOptionSelectionChange | null> {\n    return merge(this.optionSelections, this.autocomplete._keyManager.tabOut.pipe(filter(() => this._overlayAttached)), this._closeKeyEventStream, this._getOutsideClickStream(), this._overlayRef\n        ? this._overlayRef.detachments().pipe(filter(() => this._overlayAttached))\n        : observableOf()).pipe(map(event => (event instanceof MatOptionSelectionChange ? event : null)));\n}",
+      "readonly optionSelections: Observable<MatOptionSelectionChange>;",
+      "get activeOption(): _MatOptionBase | null {\n    if (this.autocomplete && this.autocomplete._keyManager) {\n        return this.autocomplete._keyManager.activeItem;\n    }\n    return null;\n}",
+      "writeValue(value: any): void;",
+      "registerOnChange(fn: (value: any) => {}): void;",
+      "registerOnTouched(fn: () => {});",
+      "setDisabledState(isDisabled: boolean);",
+      "_handleKeydown(event: KeyboardEvent): void;",
+      "_handleInput(event: KeyboardEvent): void;",
+      "_handleFocus(): void;",
+      "_handleClick(): void;"
+    ]
+  }
+}

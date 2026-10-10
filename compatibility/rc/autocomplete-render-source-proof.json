@@ -1,0 +1,175 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "status": "source/prototype/framework render/type repair passed; actual packed/native directive validation pending",
+  "recorded_at_utc": "2026-10-10T02:47:48.688193+00:00",
+  "source_heads": {
+    "main": "bd8085e85bf8f07b7a99aaf779be3a7c7e4fad1b",
+    "21.x": "4b51c372da565d9f745baf9cdcabcccc3094be57"
+  },
+  "source_trees": {
+    "main": "af423e727086b16dc8ad15ef1958fd98073b936e",
+    "21.x": "58840ec33e3693035d81e6a4478fda428ae47c58"
+  },
+  "problem": "Zone-only first-stable and early option streams never activate in a genuine public-provider zoneless environment. The untouched tagged class retains initial model/open panel and receives no early option event in that environment; it works in the supported original zoneful reference.",
+  "repair": [
+    "Owned afterLegacyRender waits for the existing zone event, and also registers a public afterNextRender callback through the supplied view injector when an existing ApplicationRef is available. The render fallback emits only while public NgZone.isStable is true, preserving the exercised zoneful timing without probing/entering a zone merely to identify it.",
+    "Either delivery completes the once-only stream and tears down both the zone subscription and public AfterRenderRef. Unsubscription before render cancels the pending callback. Application lookup/registration failure cleans the already-created zone subscription before propagating the error.",
+    "A private initialization Subject emitted/completed by existing ngAfterViewInit activates early optionSelections independently of zone events. Destroy completes this pending initialization stream and explicitly cancels closing actions even if the overlay is already detached. The legacy component never creates an application."
+  ],
+  "preserved": {
+    "existing_constructor_body_and_parameters": true,
+    "existing_base_decorator": true,
+    "explicit_public_declarations_and_method_signatures": true,
+    "private_initialization_subject_added": true,
+    "consumer_HTML_CSS_SCSS_changes_required": false,
+    "consumer_public_TS_changes_required": false,
+    "product_HTML_CSS_SCSS_files_changed": false,
+    "goldens_changed": false
+  },
+  "tests": {
+    "python_render_tests": 1,
+    "elapsed_seconds": 36.421,
+    "isolated_subjects": 10,
+    "minimum_development_production_zoneful_zoneless_subjects": 8,
+    "original_zoneful_subjects": 2,
+    "meaningful_runtime_mutations_rejected": 16,
+    "strict_skipLibCheck_false": true,
+    "line_minimum_TS": "6.0.2",
+    "negative_type_checks_per_minimum_subject": 4,
+    "old_input_CVA_source_test": {
+      "result": "pass",
+      "python_tests": 1,
+      "elapsed_seconds": 3.165,
+      "historical_cases": 22,
+      "peer_input_cases_each": 18,
+      "mutations": 6
+    },
+    "browser_source_identity": {
+      "result": "pass",
+      "python_tests": 2,
+      "elapsed_seconds": 1.948,
+      "identity_rejections": 8,
+      "completion_scenarios": 6,
+      "completion_mutation_rejected": 1
+    },
+    "fresh_prior_binding_rows": 22,
+    "actual_legacy_node_DI_packed_native_or_full_floors_executed": false
+  },
+  "observations": [
+    "Selected options update genuine public FormControl model/input, emit the selection and close the panel once; replacement options reapply position and switch subscriptions so stale option events no longer close the panel. These exercised zoneful sequences match the whole tagged reference.",
+    "The genuine current public application and afterNextRender callback activate the same candidate source in a process without Zone.js. Before-view subscriptions receive the expected option after ngAfterViewInit. Pending initialization completes on destruction.",
+    "Close before render and destruction with a detached overlay cancel actual registered render callbacks. Removing callback destruction, destroy cancellation, initialization completion or error cleanup is rejected; removing the stability guard is rejected by the before-zone-stable assertion.",
+    "The public APIs and AfterRenderRef declaration are available/nondeprecated/nonexperimental at both advertised minima. Strict helper fixtures use TS6.0.2 for main and TS5.9.2 for21; auxiliary other-line types do not change floors."
+  ],
+  "runtime_scope": "Entire trigger member bodies and actual field initializers replayed with the original constructor/decorators/heritage deliberately excluded. Genuine public QueryList/EventEmitter/FormControl/NgZone, exact peer-compatible Node Zone.js and current public createApplication/render-hook APIs. Original/current input, option, overlay, document, position, change detector and view-injector containers are protocols. The application has no actual legacy directive or native DOM; no source replay is relabeled as packaged/native node DI.",
+  "native_producer": "The existing packed browser-overlay fixture now observes the real optionSelected event in an output element and requires input value plus overlay closure after actual DOM option activation. Prior explicitly-unqualified selection=false fields are replaced by executed observation requirements, not prefilled success. No extra matrix cells are credited and the producer is not executed locally.",
+  "environment": {
+    "host_node": "22.23.3",
+    "borrowed_rxjs": "7.8.2",
+    "borrowed_tslib": "2.8.1",
+    "original_zone": "0.13.3",
+    "minimum_zone": "0.16.3",
+    "full_Node_Rx_browser_floors_qualified": false
+  },
+  "harness_repairs": [
+    "First application scratch probes referenced IMAGE_CONFIG from core, where it is absent. Verified the real public export from @angular/common; the definitive fixture uses that public token to disable browser image diagnostics, alongside explicit synthetic DOCUMENT/RendererFactory2. No private document setter/global monkey patch.",
+    "Replay initially spread all Rx namespace keys into function arguments and included reserved default; corrected to the finite actual source imports, including the of alias. Baseline assertions unchanged.",
+    "Early view-initialization fixture initially claimed an attached overlay without a closing subscription. Corrected it to the actual pre-open state (no overlay); did not change product closePanel or tagged reference.",
+    "ABI comparison initially included public property initializer behavior. Corrected the explicitly declared-signature comparison to omit initializers; the changed initializer behavior remains covered by the complete source replay and actual framework regression. Private initialization state remains explicit."
+  ],
+  "cyph_sanity": {
+    "head": "a56a0603636cac5aaabe8fe408f7429b4224f011",
+    "read_only": true,
+    "clean": true,
+    "consumer_build_executed": false,
+    "sources": [
+      {
+        "path": "/home/parallels/cyph/shared/js/cyph/components/search-bar/search-bar.component.html",
+        "sha256": "f733c8a7b4864e9054adae72f467f0511055eac4b55d40b667c610a347201e4c"
+      },
+      {
+        "path": "/home/parallels/cyph/shared/js/cyph/components/search-bar/search-bar.component.ts",
+        "sha256": "714cfa7c35ee5e195865d8a580d4eb91c3b03a4000955333966ae3c339ab3dff"
+      },
+      {
+        "path": "/home/parallels/cyph/shared/js/cyph/components/account-compose/account-compose.component.html",
+        "sha256": "12b15fc4e0c1f8464d68a9fe88bb79435a8ffeb6306ce48ac2f3d7392df03526"
+      }
+    ],
+    "observations": [
+      "Search-bar template binds matAutocomplete, a FormControl, dynamic options and optionSelected to pushToFilter($event.option.value.toString()). Account-compose supplies two autocomplete panels with dynamic options. These public template/event contracts remain unchanged.",
+      "No direct MatAutocompleteTrigger constructor/private-field access found in the searched non-spec shared/js source. Existing constructor body, class metadata and explicit public declarations/method signatures compare equal; private initialization state is new. No consumer HTML/CSS/SCSS or public TS edits are required."
+    ],
+    "required_consumer_HTML_CSS_SCSS_changes": false,
+    "required_consumer_public_TS_changes": false
+  },
+  "evidence": [
+    {
+      "path": "compatibility/rc/autocomplete-render-source-diagnostic.json",
+      "sha256": "964af24044f2c602102a5c5ad591bbeec0c807ec28e2b5be03047afa63907e1f"
+    },
+    {
+      "path": "compatibility/rc/autocomplete-render-binding-refresh.json",
+      "sha256": "d49060b947d82039f021f9413558be9b3a402e0dbb70143da51d79579ed4a528"
+    },
+    {
+      "path": "compatibility/rc/autocomplete-render-abi-shape.json",
+      "sha256": "cb705fdd12bf9b03140784c7872240bc658f0ff3d79fb30e263a3cf8d0d0c443"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/after-legacy-render.ts",
+      "sha256": "afd5687000abc7b89968b0c03454f0fc6ac452e69d34bd162b8523ae11fcaf85"
+    },
+    {
+      "path": "tests/autocomplete_render_runtime_probe.mjs",
+      "sha256": "9e44ca5c47da794ce6883283cd59ba588570942feb1cf49899a92e20b86af96e"
+    },
+    {
+      "path": "tests/test_autocomplete_render_runtime.py",
+      "sha256": "42612127ec9a2c8c6eee3f7aa0e2b8e1bd9cba148bc09a44a45c8089d6574771"
+    },
+    {
+      "path": "scripts/browser-overlay-families.mjs",
+      "sha256": "d95951f7e6d8d454b74cb08395a048da22304f9f249bcdc9c2b330b6d4eea552"
+    },
+    {
+      "path": "reference/material-16.2.14/component-behavior-sources/autocomplete/autocomplete-trigger.ts",
+      "sha256": "b69decaf81ef29dd665a0b267f3a121837212157b31ddd02c3b617fa958844f2"
+    },
+    {
+      "path": "scripts/ng-zone-public-subjects.mjs",
+      "sha256": "0eb7c8966e8c1e8fc0e974a2c25f48e32c28a7d5b6f7448df839a6e67866763d"
+    },
+    {
+      "path": "compatibility/rc/ng-zone-public-subjects.json",
+      "sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175"
+    },
+    {
+      "path": "scripts/material-public-subjects.mjs",
+      "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+    },
+    {
+      "path": "compatibility/rc/material-public-subjects.json",
+      "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+    }
+  ],
+  "new_frozen_use_closures": 0,
+  "NgZone_frozen_uses_still_pending": 25,
+  "reviewed_total_unchanged": 1244,
+  "open_total_unchanged": 492,
+  "new_SHA_closures": 0,
+  "g11_claim": "not-passed",
+  "pushed": false,
+  "actions_started": false,
+  "open_obligations": [
+    "Source-matched extracted-artifact actual legacy autocomplete constructor/node/provider/CVA/render/overlay/options and mouse/keyboard lifecycles on both supported lines; complete zoneful/zoneless native matrix and current full floors.",
+    "Remaining NgZone callers: tooltip microtask positioning, select initialization/font timing, form-field outlines, tab-header initial alignment and other explicit streams. The25 frozen NgZone uses remain pending.",
+    "All651 Sass cases/498 mixins, all1697 substantive SHA/security decisions, C05 and independent A01-A10/R01-R03/G01-G13 remain required."
+  ],
+  "next_action": "Reproduce the remaining zoneless stable/microtask consumers, starting with tooltip repositioning. Keep the full packed/native producer and Actions deferred until implementation is plausibly complete."
+}
