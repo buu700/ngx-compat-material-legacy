@@ -20,7 +20,13 @@ import {inventoryNgZoneUses} from './scripts/ng-zone-use-inventory.mjs';
 const report = inventoryNgZoneUses();
 assert.equal(report.frozen_uses,25);assert.equal(report.current_uses,36);
 assert.equal(report.cases.filter(row=>row.testing_only).length,1);
-assert.equal(report.accesses.length,61);assert.equal(report.forwarding.length,15);
+assert.equal(report.accesses.length,61);assert.equal(report.forwarding.length,17);
+const constructed=report.forwarding.filter(row=>row.kind==='construct');
+assert.equal(constructed.length,2);
+assert.deepEqual(constructed.map(({file,target,argument})=>({file,target,argument})),[
+ {file:'legacy-chips/chip.ts',target:'RippleRenderer',argument:'_ngZone'},
+ {file:'legacy-tabs/tab-nav-bar/tab-nav-bar.ts',target:'RippleRenderer',argument:'ngZone'},
+]);
 assert.equal(report.new_frozen_use_closures,0);
 const file='projects/ngx-material-legacy/legacy-tabs/internal/owned-header-resize.ts';
 const source=readFileSync(file,'utf8');
@@ -33,7 +39,14 @@ for(const [from,to,message] of [
  assert.throws(()=>inventoryNgZoneUses({readSource:path=>path===file?changed:readFileSync(path,'utf8')}),
   error=>error.code==='ERR_ASSERTION'&&error.message.startsWith(message));
 }
-console.log(JSON.stringify({frozen:25,current:36,accesses:61,forwarding:15,mutations:3}));
+const tab='projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.ts';
+const tabSource=readFileSync(tab,'utf8');
+const dropped=tabSource.replace('new RippleRenderer(this, ngZone, elementRef, platform)',
+ 'new RippleRenderer(this, elementRef, platform)');
+assert.notEqual(dropped,tabSource);
+assert.throws(()=>inventoryNgZoneUses({readSource:path=>path===tab?dropped:readFileSync(path,'utf8')}),
+ error=>error.code==='ERR_ASSERTION'&&error.message.startsWith('NgZone forwarding roster changed'));
+console.log(JSON.stringify({frozen:25,current:36,accesses:61,forwarding:17,mutations:4}));
 '''
         result = subprocess.run(['node', '--max-old-space-size=512', '--input-type=module', '-e', code],
                                 cwd=ROOT, capture_output=True, text=True, timeout=120)

@@ -129,8 +129,9 @@ export function inventoryNgZoneUses({root = rootDefault, readSource} = {}) {
           source_sha256: hash(source.text), receiver_declarations: declarations(node.expression)
             .filter(declaration => receivers.has(declaration)).map(locate)});
       }
-      if (ts.isCallExpression(node)) for (const argument of node.arguments) if (isReceiver(argument)) {
+      if (ts.isCallExpression(node) || ts.isNewExpression(node)) for (const argument of node.arguments || []) if (isReceiver(argument)) {
         forwarding.push({...locate(argument), target: node.expression.getText(source),
+          kind: ts.isNewExpression(node) ? 'construct' : 'call',
           argument: argument.getText(source), source_sha256: hash(source.text)});
       }
       ts.forEachChild(node, visit);
@@ -138,7 +139,12 @@ export function inventoryNgZoneUses({root = rootDefault, readSource} = {}) {
     visit(source);
   }
   assert.equal(accesses.length, 61, 'NgZone access roster changed; review the new contexts');
-  assert.equal(forwarding.length, 15, 'NgZone forwarding roster changed; review the new contexts');
+  assert.equal(forwarding.length, 17, 'NgZone forwarding roster changed; review the new contexts: '+
+    JSON.stringify(forwarding.filter(row=>row.kind==='construct').map(({file,target,argument})=>({file,target,argument}))));
+  assert.deepEqual(forwarding.filter(row=>row.kind==='construct').map(({file,target,argument})=>({file,target,argument})),[
+    {file:'legacy-chips/chip.ts',target:'RippleRenderer',argument:'_ngZone'},
+    {file:'legacy-tabs/tab-nav-bar/tab-nav-bar.ts',target:'RippleRenderer',argument:'ngZone'},
+  ],'constructed NgZone receiver roster changed');
   return {schema_version: 1, frozen_uses: frozen.length, current_uses: cases.length, cases,
     receiver_declarations: [...receivers].map(locate), accesses, forwarding, binding_parser: ts.version,
     source_override_used: !!readSource, new_frozen_use_closures: 0,
