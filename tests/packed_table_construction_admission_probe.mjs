@@ -26,7 +26,7 @@ report.cases=observations(collect);
 for(const [name,from,to]of [['unconditional-table-pass','parsed.tableAngularDiConstruction === true','true'],['omit-table-observation-key',"    'packed-consumer/harness/table-angular-di-construction': parsed.tableAngularDiConstruction === true,",'']]){
  assert.ok(source.includes(from));assert.throws(()=>observations(load(source.replace(from,to))));report.mutants.push({id:name,result:'rejected'});
 }
-const expected=allConsumerCaseIds(keys);assert.equal(expected.length,91);assert.equal(new Set(expected).size,91);
+const expected=allConsumerCaseIds(keys);assert.equal(expected.length,92);assert.equal(new Set(expected).size,92);
 const line=JSON.parse(readFileSync(join(root,'projects/ngx-material-legacy/package.json'))).version.startsWith('21.')?'21.x':'main';report.line=line;
 const scratch=mkdtempSync(join(tmpdir(),'packed-table-admission-'));
 try{
@@ -35,4 +35,4 @@ try{
  }
 }finally{rmSync(scratch,{recursive:true,force:true});}
 const at=process.argv.indexOf('--report');if(at>=0){assert.equal(existsSync(process.argv[at+1]),false);writeFileSync(process.argv[at+1],JSON.stringify(report,null,2)+'\n');}
-console.log(JSON.stringify({line,cases:report.cases.length,mutants_rejected:report.mutants.length,derived_cases:91,native_executed:false}));
+console.log(JSON.stringify({line,cases:report.cases.length,mutants_rejected:report.mutants.length,derived_cases:92,native_executed:false}));

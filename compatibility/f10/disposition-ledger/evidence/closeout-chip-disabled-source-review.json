@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "sha": "86ebb9bfd55e637be1e6d0117a10e290c5247ebd",
+  "line": "21.x",
+  "kind": "individual-original-chip-disabled-scope-review",
+  "review_depth": "individual-compatibility",
+  "affected_branches": [
+    "main",
+    "21.x"
+  ],
+  "patch_file": "compatibility/f10/disposition-ledger/evidence/patches/86ebb9bfd55e637be1e6d0117a10e290c5247ebd-chip-disabled-full.patch",
+  "diff_sha256": "d3ed5898e018bf496e5769ffd2dfdc1e148c3869beb78d8a992b36323814ea21",
+  "patch_paths": [
+    "src/material/chips/chip-listbox.spec.ts",
+    "src/material/chips/chip-set.ts",
+    "src/material/chips/chip.ts",
+    "tools/public_api_guard/material/chips.md"
+  ],
+  "upstream_commit_object": "tree 79d61b92a1c2c1b94b69f45409113c340083a89f\nparent 030cdd69d32638d97895f243b891f3af8dab552a\nauthor Kristiyan Kostadinov <crisbeto@users.noreply.github.com> 1727718808 +0200\ncommitter GitHub <noreply@github.com> 1727718808 +0200\ngpgsig -----BEGIN PGP SIGNATURE-----\n \n wsFcBAABCAAQBQJm+uWYCRC1aQ7uu5UhlAAAWNkQAKFEPsOGSO+Pc3eEE7GrW/lD\n h7m6BWF8n5o/oPuGSAiMCrdWQhNtIzZuPWVPuB/3mro7u74oOhE57wQZO4Xp2eYy\n c0xrt2rRxaQzLG8HdRvnr+b6O26ANbzIwJudSqOTR6xieDAYDKQhhSudgK9+QO3l\n 0e5vLd7TQCGAQpZuvlSpNO3Nu0UU7nZo8k8cD/xikgSoP9f8H4Nd87Q+CerKSDvd\n C6/anw6o4upPz8vk0O4cMRco0+U8WJj6PGOPphjHXGk0Lr1FCCnbAoki3lG8eCuN\n K9KNrynrK4S+Nkc539gVrWNHZzmDKmIyKE+mmPIZzbMhjufqoYmBfQv4kiLCNG6w\n XSq6JOrUre9hFUHX3Pn3okiKgHjoZ8o1xUClR/U/i9RIaHefiqqU69dHbJQ8oNxr\n d9L5J7hHVLIqU8O9tPvw7GBbtP6EdBp+LLnIEwFRljO3pdbI1gWLRgB/p8bsbU7i\n YC7WQy7ScX1Q+WwD90x2v3h9LA9aOIYV4qCrg3OLmtO3Oz80+67p85h04QPiyMzN\n ij273MVTcDKJhIQ8TlDcgCB2guh+GeLnDEPTnrVCCqB70V+jggp7re9Ck3s6VoJh\n dmH0fFNR9gcOWBgdBLnAyU9ijX075VnybgRzkRgmF51uFJ5ekp5y31mvivauDQBC\n DXTuhOf1RwkRVUH3SW4p\n =qZng\n -----END PGP SIGNATURE-----\n \n\nfix(material/chips): chip set overwriting disabled state (#29795)\n\nThe chip set has been set up in a way where it syncs its state to the chips, instead of the other way around which we follow in other components. This means that if its `disabled` state changes later, it can ovewrite the state that the user explicitly set on the chip.\n\nThese changes make the logic a bit more robust by writing to a different field.\n\nFixes #29783.",
+  "upstream_commit_object_sha256": "18c9eb63ecc894f9a3c4c481af11fa6a9a389b986a1b4af099cc81574a2ca555",
+  "decision": "Full original four-path patch reviewed: modern chip-set sync moves list disabled writes off the individual disabled input, chip getter combines both flags, listbox forms regression reproduces loss on NgModel initialization, and API guard reflects getter/setter separation. Untouched Material16 legacy chip/list already implement this separate-field contract, including original toggle regression; this is a real behavioral analogue, not a docs-only or ancestry exclusion. The old main already-adapted entry cited field names and omitted the test/API paths, with no executed forms regression. Preserve that historical conclusion but reopen release admission until the newly added exact forms initialization/aria regression and packed template/reactive disable-enable case execute against actual artifact. No product repair appears needed; candidate chip/list implementation remains unchanged. Stable current forms peers must run the actual legacy value accessor. New packed case is distinct and mandatory in both actual line rosters; false/omitted/forged reports fail admission controls. Native/AOT/packed execution is pending; no sensitive or complete G11 pass.",
+  "path_reviews": {
+    "src/material/chips/chip-listbox.spec.ts": "New IndividuallyDisabledChipInsideForm uses name/ngModel=null and disabled option; owner fixture transcribed to legacy list/chip and aria-disabled asserted.",
+    "src/material/chips/chip-set.ts": "_syncChipsState writes _chipListDisabled instead of chip.disabled; legacy _syncChipsState already separates list disabled/multiple/selectability.",
+    "src/material/chips/chip.ts": "Separate _chipListDisabled and own _disabled getter/setter; legacy preexisting BooleanInput coercion and OR satisfy historical API and analogous defect.",
+    "tools/public_api_guard/material/chips.md": "Modern property\u2192accessor and new internal flag, not a new legacy API. Legacy accessor and flag are present in untouched16."
+  },
+  "sources": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/chip.ts",
+      "sha256": "df6a4cfe02079393bdbb593ad0654af0c04b47548b8ef2c58a96611be944de15"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+      "sha256": "6be4ef5b4100e7d1122dc3a0842d66c8a57315374e438ecd8ddf2e29e9f8c3e2"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+      "sha256": "9cc1002428887bd85097fbfac6980b4ce3c88018619b801364c27a7b6ff12c80"
+    },
+    {
+      "path": "scripts/packed-consumer-aot-smoke.mjs",
+      "sha256": "ce85b75ae899bb313e4af2a08cd3590b6b7718ad771b7b6c7f16358b33e04f29"
+    },
+    {
+      "path": "scripts/packed-consumer-evidence.mjs",
+      "sha256": "ba7513355b861993aeb8f7558d5a96a1b9d3a9c4b3c8627cf0f5c28d989466da"
+    },
+    {
+      "path": "compatibility/rc/matrices/full-verify.json",
+      "sha256": "ce5d0b5c570587850a6cc59898f6f250e32494e280936da216aea754f157516a"
+    },
+    {
+      "path": "tests/packed_chip_disabled_admission_probe.mjs",
+      "sha256": "2f13f261b476f0c6c10b80023170d74a89500c45c363d69cff876e3be2fbf27e"
+    },
+    {
+      "path": "tests/test_chip_disabled_admission.py",
+      "sha256": "d756aa0c11159fe3bf17616a5becacbf825ba1b27bb0d6f9326f8e829380d4e8"
+    },
+    {
+      "path": "reference/material-16.2.14/chips-keyboard-sources/chip.ts",
+      "sha256": "a3809031dbb69a835b3766f2af6052073939bab62a70161fe57e39260377fe5a"
+    },
+    {
+      "path": "reference/material-16.2.14/chip-blur-sources/chip-list.ts",
+      "sha256": "83c17cd61f9ecb8cc4dcc7947a493a78a93a6b880d3c69f9284eb39106662414"
+    }
+  ],
+  "required_packed_case": "packed-consumer/harness/chip-individual-disabled-form-isolation",
+  "native_and_packed_executed": false,
+  "final_disposition": "needs-individual-review",
+  "g11_claim": "not-passed",
+  "recorded_at_utc": "2026-10-10T15:58:13.348644+00:00"
+}
