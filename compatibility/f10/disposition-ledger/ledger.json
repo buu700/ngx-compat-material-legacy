@@ -5561,10 +5561,10 @@
       "sha": "b13c6aa194cf560a304213961ae28725f8d0a4e2",
       "bucket": "behavior-semantic",
       "subject": "fix(material/slider): change slider to use MDC's token API (#27375)",
-      "final_disposition": "irrelevant",
-      "reason": "The patch moves the current mat-mdc-slider theme onto MDC slider token maps, including active-track height 6px and handle size 20px. It does not touch legacy-slider. The owned slider styles do not reference mdc-slider tokens, and they were not changed.",
+      "final_disposition": "do-not-adopt",
+      "reason": "Do not transplant this modern slider token-model and structural rewrite into the frozen add-on. The complete five-path patch adds mat/mdc token maps and token-validation slots, replaces modern mat-mdc-slider color/typography/density generation, and rewires modern structural CSS around token slots. The historical facade also publicly exports ordinary slider color/typography/density/theme, so the older main rationale that only legacy-slider matters is incomplete. Both complete ordinary and legacy theme sources retain untouched16 behavior, with only four ordinary vendor module-source relocations; all14 independently compiled custom/light/dark/raw-config CSS cases match the untouched tag per line and reject nonempty drift. Ordinary slider is outside the explicit13 current-runtime companion bridge roster; owned legacy slider and all finite historical Sass exports remain required. Current modern runtime/private token machinery is peer-owned and no owned runtime imports the modern slider component. Preserve historical selectors, palettes, namespace bindings, calls, aggregate membership and the original empty density behavior. No modern template/token implementation is copied, no consumer HTML/CSS/SCSS change or deviation is introduced, and no current modern-slider rendering or inherited-fix claim is made. Full651/498 packed Sass, native controls, floors and the independent audit remain open.",
       "read_note_disposition": "not-owned",
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-slider-token-frozen-sass-review.json",
       "files": [
         "src/material/core/tokens/m2/mat/_slider.scss",
         "src/material/core/tokens/m2/mdc/_slider.scss",
@@ -5572,10 +5572,53 @@
         "src/material/slider/_slider-theme.scss",
         "src/material/slider/slider.scss"
       ],
-      "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
-      "recorded_at_utc": "2026-10-01T16:46:41Z",
+      "batch_id": "individual-slider-frozen-sass-source-review-2026-10-11",
+      "recorded_at_utc": "2026-10-11T07:36:20.554370+00:00",
       "g11_claim": "not-passed",
-      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "prior_dispositions": [
+        {
+          "sha": "b13c6aa194cf560a304213961ae28725f8d0a4e2",
+          "bucket": "behavior-semantic",
+          "subject": "fix(material/slider): change slider to use MDC's token API (#27375)",
+          "final_disposition": "irrelevant",
+          "reason": "The patch moves the current mat-mdc-slider theme onto MDC slider token maps, including active-track height 6px and handle size 20px. It does not touch legacy-slider. The owned slider styles do not reference mdc-slider tokens, and they were not changed.",
+          "read_note_disposition": "not-owned",
+          "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+          "files": [
+            "src/material/core/tokens/m2/mat/_slider.scss",
+            "src/material/core/tokens/m2/mdc/_slider.scss",
+            "src/material/core/tokens/tests/test-validate-tokens.scss",
+            "src/material/slider/_slider-theme.scss",
+            "src/material/slider/slider.scss"
+          ],
+          "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
+          "recorded_at_utc": "2026-10-01T16:46:41Z",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+        }
+      ],
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ],
+      "source_check": {
+        "diff_sha256": "5745eadda9bcee6dd8ba3863a3875cde57c13746d5670337aca241009b4927eb",
+        "patch_path": "compatibility/f10/disposition-ledger/evidence/patches/b13c6aa194cf560a304213961ae28725f8d0a4e2-slider-full.patch",
+        "review_membership": "b13c6aa194cf560a304213961ae28725f8d0a4e2",
+        "evidence_report_sha256": "de0d302fdb55647dae686b58d2852e011bee7f96653d6cee3aee8f4ce5d16156"
+      },
+      "individual_proof": {
+        "diff_sha256": "5745eadda9bcee6dd8ba3863a3875cde57c13746d5670337aca241009b4927eb",
+        "review_depth": "individual-compatibility",
+        "proof_kind": "individual-frozen-sass-contract",
+        "affected_branches": [
+          "main",
+          "21.x"
+        ],
+        "decision": "Do not transplant this modern slider token-model and structural rewrite into the frozen add-on. The complete five-path patch adds mat/mdc token maps and token-validation slots, replaces modern mat-mdc-slider color/typography/density generation, and rewires modern structural CSS around token slots. The historical facade also publicly exports ordinary slider color/typography/density/theme, so the older main rationale that only legacy-slider matters is incomplete. Both complete ordinary and legacy theme sources retain untouched16 behavior, with only four ordinary vendor module-source relocations; all14 independently compiled custom/light/dark/raw-config CSS cases match the untouched tag per line and reject nonempty drift. Ordinary slider is outside the explicit13 current-runtime companion bridge roster; owned legacy slider and all finite historical Sass exports remain required. Current modern runtime/private token machinery is peer-owned and no owned runtime imports the modern slider component. Preserve historical selectors, palettes, namespace bindings, calls, aggregate membership and the original empty density behavior. No modern template/token implementation is copied, no consumer HTML/CSS/SCSS change or deviation is introduced, and no current modern-slider rendering or inherited-fix claim is made. Full651/498 packed Sass, native controls, floors and the independent audit remain open."
+      }
     },
     {
       "sha": "49f6859246bde08ff50c9a19de936227dccd0626",
