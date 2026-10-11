@@ -15,8 +15,14 @@ const args = process.argv.slice(2); for (let i = 0; i < args.length; i += 2) {as
 const subjects = await parameterDecoratorSubjects(root);
 try {
   const report = await reviewParameterDecoratorUses({root, subjects, compilerRoot: options['--compiler-root'] ?? process.env.CLOSEOUT_TYPESCRIPT_ROOT});
-  assert.equal(report.frozen_uses, 89); assert.equal(report.current_uses, 112); assert.equal(report.source_override_used, false); assert.equal(report.current_delta_uses, 23);
-  assert.equal(report.cases.flatMap(c => c.references).length, 207); assert.equal(report.cases.filter(c => c.unused_import_erasure).length, 5); assert.deepEqual(report.authored_annotations.map(c => c.annotation_count), [205, 205, 205]); assert.deepEqual(report.behaviors.map(c => c.cases.length), [15, 15, 15]);
+  assert.equal(report.frozen_uses, 89); assert.equal(report.current_uses, 114); assert.equal(report.source_override_used, false); assert.equal(report.current_delta_uses, 25);
+  assert.equal(report.cases.flatMap(c => c.references).length, 211); assert.equal(report.cases.filter(c => c.unused_import_erasure).length, 5); assert.deepEqual(report.authored_annotations.map(c => c.annotation_count), [209, 209, 209]); assert.deepEqual(report.behaviors.map(c => c.cases.length), [15, 15, 15]);
+  for (const subject of report.authored_annotations) {
+    assert.equal(subject.annotation_count, subject.annotations.length);
+    assert.deepEqual(subject.annotations.filter(row => row.file === 'legacy-menu/internal/menu-item-base.ts')
+      .map(row => [row.target_class, row.parameter_index, row.symbol]),
+      [['_LegacyMenuItemBase', 1, 'Inject'], ['_LegacyMenuItemBase', 3, 'Inject'], ['_LegacyMenuItemBase', 3, 'Optional']]);
+  }
   const mutations = [];
   for (const model of subjects.models.filter(m => m.subject.line !== 'original')) {
     const core = model.runtime;
@@ -43,7 +49,19 @@ try {
     ['dynamic-token-expression', text.replace('@Inject(ANIMATION_MODULE_TYPE)', '@Inject({token: ANIMATION_MODULE_TYPE})'), /unreviewed token expression shape/],
   ]) {assert.notEqual(changed, text); await assert.rejects(reviewParameterDecoratorUses({root, subjects, skipDiagnostics: true, readSource: p => p === file ? changed : read(p)}), pattern); mutations.push({id, rejected: true});}
   const alias = text.replace('  Optional,', '  Optional as Maybe,').replaceAll('@Optional()', '@Maybe()'); const aliased = await reviewParameterDecoratorUses({root, subjects, skipDiagnostics: true, readSource: p => p === file ? alias : read(p)}); assert.equal(aliased.cases.find(c => c.file === 'legacy-slider/slider.ts' && c.symbol === 'Optional').local_name, 'Maybe'); report.alias_positive = true;
-  report.mutations = mutations; assert.equal(mutations.length, 19);
+  const ownedFile = 'projects/ngx-material-legacy/legacy-menu/internal/menu-item-base.ts', ownedText = read(ownedFile);
+  for (const [id, changed] of [
+    ['owned-inject-imported-type-only', ownedText.replace('  Inject,', '  type Inject,')],
+    ['owned-optional-imported-type-only', ownedText.replace('  Optional,', '  type Optional,')],
+    ['owned-panel-optional-omitted', ownedText.replace('@Inject(MAT_MENU_PANEL) @Optional()', '@Inject(MAT_MENU_PANEL)')],
+    ['owned-document-token-omitted', ownedText.replace('@Inject(DOCUMENT)', '@Inject()')],
+  ]) {
+    assert.notEqual(changed, ownedText);
+    await assert.rejects(reviewParameterDecoratorUses({root, subjects, skipDiagnostics: true,
+      readSource: path => path === ownedFile ? changed : read(path)}));
+    mutations.push({id, rejected: true});
+  }
+  report.mutations = mutations; assert.equal(mutations.length, 23);
   if (options['--report']) {assert.equal(existsSync(options['--report']), false); writeFileSync(options['--report'], JSON.stringify(report, null, 2) + '\n');}
-  console.log(JSON.stringify({line: report.line, frozen_uses: 89, current_uses: 112, current_delta_uses: 23, references: 207, annotation_shapes_per_subject: 205, factory_metadata_objects: 2, unused_imports: 5, subjects: 3, controls_per_subject: 15, mutations: mutations.length, compiler: report.type_compilation.compiler, native_host_boundary_executed: false}));
+  console.log(JSON.stringify({line: report.line, frozen_uses: 89, current_uses: 114, current_delta_uses: 25, references: 211, annotation_shapes_per_subject: 209, factory_metadata_objects: 2, unused_imports: 5, subjects: 3, controls_per_subject: 15, mutations: mutations.length, compiler: report.type_compilation.compiler, native_host_boundary_executed: false}));
 } finally {subjects.dispose();}

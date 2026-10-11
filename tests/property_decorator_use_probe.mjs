@@ -15,8 +15,14 @@ const args = process.argv.slice(2); for (let i = 0; i < args.length; i += 2) {as
 const subjects = await propertyDecoratorSubjects(root);
 try {
   const report = await reviewPropertyDecoratorUses({root, subjects, compilerRoot: options['--compiler-root'] ?? process.env.CLOSEOUT_TYPESCRIPT_ROOT});
-  assert.equal(report.frozen_uses, 99); assert.equal(report.current_uses, 101); assert.equal(report.source_override_used, false); assert.equal(report.current_delta_uses, 2);
-  assert.equal(report.cases.flatMap(c => c.references).length, 321); assert.equal(report.cases.filter(c => c.unused_import_erasure).length, 9); assert.deepEqual(report.authored_annotations.map(c => c.annotation_count), [321, 321, 321]); assert.deepEqual(report.behaviors.map(c => c.cases.length), [14, 14, 14]);
+  assert.equal(report.frozen_uses, 99); assert.equal(report.current_uses, 102); assert.equal(report.source_override_used, false); assert.equal(report.current_delta_uses, 3);
+  assert.equal(report.cases.flatMap(c => c.references).length, 322); assert.equal(report.cases.filter(c => c.unused_import_erasure).length, 9); assert.deepEqual(report.authored_annotations.map(c => c.annotation_count), [322, 322, 322]); assert.deepEqual(report.behaviors.map(c => c.cases.length), [14, 14, 14]);
+  for (const subject of report.authored_annotations) {
+    assert.equal(subject.annotation_count, subject.annotations.length);
+    assert.deepEqual(subject.annotations.filter(row => row.file === 'legacy-menu/internal/menu-item-base.ts'),
+      [{file: 'legacy-menu/internal/menu-item-base.ts', target_class: '_LegacyMenuItemBase', member: 'role',
+        symbol: 'Input', metadata_name_and_registration_verified: true, selector_read_are_protocol: false}]);
+  }
   const mutations = [];
   for (const model of subjects.models.filter(m => m.subject.line !== 'original')) {
     const core = model.runtime;
@@ -44,7 +50,17 @@ try {
   ]) {assert.notEqual(changed, text); await assert.rejects(reviewPropertyDecoratorUses({root, subjects, skipDiagnostics: true, readSource: p => p === file ? changed : read(p)}), pattern); mutations.push({id, rejected: true});}
   const queryFile = 'projects/ngx-material-legacy/legacy-tabs/tab-group.ts', queryText = read(queryFile), deprecated = queryText.replace('{descendants: true}', '{descendants: true, emitDistinctChangesOnly:false}'); assert.notEqual(deprecated, queryText); await assert.rejects(reviewPropertyDecoratorUses({root, subjects, skipDiagnostics: true, readSource: p => p === queryFile ? deprecated : read(p)}), /deprecated query option is not admitted/); mutations.push({id: 'deprecated-query-option', rejected: true});
   const alias = text.replace('  Input,', '  Input as Bind,').replaceAll('@Input(', '@Bind('); const aliased = await reviewPropertyDecoratorUses({root, subjects, skipDiagnostics: true, readSource: p => p === file ? alias : read(p)}); assert.equal(aliased.cases.find(c => c.file === 'legacy-slider/slider.ts' && c.symbol === 'Input').local_name, 'Bind'); report.alias_positive = true;
-  report.mutations = mutations; assert.equal(mutations.length, 21);
+  const ownedFile = 'projects/ngx-material-legacy/legacy-menu/internal/menu-item-base.ts', ownedText = read(ownedFile);
+  for (const [id, changed] of [
+    ['owned-input-imported-type-only', ownedText.replace('  Input,', '  type Input,')],
+    ['owned-role-input-omitted', ownedText.replace('@Input() role:', 'role:')],
+  ]) {
+    assert.notEqual(changed, ownedText);
+    await assert.rejects(reviewPropertyDecoratorUses({root, subjects, skipDiagnostics: true,
+      readSource: path => path === ownedFile ? changed : read(path)}));
+    mutations.push({id, rejected: true});
+  }
+  report.mutations = mutations; assert.equal(mutations.length, 23);
   if (options['--report']) {assert.equal(existsSync(options['--report']), false); writeFileSync(options['--report'], JSON.stringify(report, null, 2) + '\n');}
-  console.log(JSON.stringify({line: report.line, frozen_uses: 99, current_uses: 101, current_delta_uses: 2, references: 321, annotation_shapes_per_subject: 321, unused_imports: 9, subjects: 3, controls_per_subject: 14, mutations: mutations.length, compiler: report.type_compilation.compiler, native_executed: false}));
+  console.log(JSON.stringify({line: report.line, frozen_uses: 99, current_uses: 102, current_delta_uses: 3, references: 322, annotation_shapes_per_subject: 322, unused_imports: 9, subjects: 3, controls_per_subject: 14, mutations: mutations.length, compiler: report.type_compilation.compiler, native_executed: false}));
 } finally {subjects.dispose();}
