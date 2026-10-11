@@ -1502,9 +1502,9 @@
         "main",
         "21.x"
       ],
-      "final_disposition": "needs-individual-review",
-      "review_depth": "outside-import-cleanup-predicate",
-      "decision": "Pending individual review: the complete 3-file patch falls outside the exact test-import cleanup predicate. Unqualified members: src/material/list/selection-list.spec.ts (non-import test program changed). A test-only label cannot discharge provider, callback scheduling, fixture, or other changes beyond this bounded predicate. Preserve the prior exact entry in this evidence record; the earlier blanket conclusion is not a semantic pass. No product repair or runtime qualification is claimed by this source comparison. Review the residual in its full original and historical/current context before closing this SHA.",
+      "final_disposition": "not-applicable",
+      "review_depth": "individual-compatibility",
+      "decision": "Individual full three-file review: the modern list cleanup removes setup imports and one private fixture, SelectionListWithOnlyOneOption, whose only two nondeclaration references are TestBed import registrations. After excluding that unused declaration, the remaining fixtures, providers, actions, callback scheduling and assertions satisfy the unchanged-program import predicate. The historical legacy fixture is retained with its untouched16 template on each line; it likewise has no direct createComponent call, so no live-test claim is invented for this fixture. The owned historical selection remains separate from modern standalone fixtures. This test-only removal carries no runtime list fix to transplant and does not justify dropping historical tests or merging upstream test setup. Not applicable to the owned product; no published TS, DOM, CSS or SCSS repair is needed. Browser, accessibility, packed and floor execution remain unqualified by this source review.",
       "source_analysis": {
         "sha": "8f0bde9c3976175e62685a5c0764b5d5626accbd",
         "subject": "test(material/list): clean up unnecessary imports in tests",
@@ -1568,7 +1568,167 @@
         "g11_claim": "not-passed",
         "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
         "evidence_report": null
-      }
+      },
+      "prior_source_review": {
+        "sha": "8f0bde9c3976175e62685a5c0764b5d5626accbd",
+        "paths": [
+          "src/material/list/list.spec.ts",
+          "src/material/list/selection-list.spec.ts",
+          "src/material/list/testing/list-harness.spec.ts"
+        ],
+        "diff_sha256": "b29c2260c1b0dd4265b752aa32ccc97d4dc34cda92e59cd151b8a36a46d0a608",
+        "affected_branches": [
+          "main",
+          "21.x"
+        ],
+        "final_disposition": "needs-individual-review",
+        "review_depth": "outside-import-cleanup-predicate",
+        "decision": "Pending individual review: the complete 3-file patch falls outside the exact test-import cleanup predicate. Unqualified members: src/material/list/selection-list.spec.ts (non-import test program changed). A test-only label cannot discharge provider, callback scheduling, fixture, or other changes beyond this bounded predicate. Preserve the prior exact entry in this evidence record; the earlier blanket conclusion is not a semantic pass. No product repair or runtime qualification is claimed by this source comparison. Review the residual in its full original and historical/current context before closing this SHA.",
+        "source_analysis": {
+          "sha": "8f0bde9c3976175e62685a5c0764b5d5626accbd",
+          "subject": "test(material/list): clean up unnecessary imports in tests",
+          "paths": [
+            "src/material/list/list.spec.ts",
+            "src/material/list/selection-list.spec.ts",
+            "src/material/list/testing/list-harness.spec.ts"
+          ],
+          "diff_sha256": "b29c2260c1b0dd4265b752aa32ccc97d4dc34cda92e59cd151b8a36a46d0a608",
+          "recovered_seed_paths": [],
+          "accepted": false,
+          "members": [
+            {
+              "accepted": true,
+              "path": "src/material/list/list.spec.ts",
+              "unchanged_test_program_sha256": "6479a6f7911122187f5b7e3c7b4cbdbd89be51abb46ee351ef068e183ec83aa4",
+              "before_config_calls": 1,
+              "after_config_calls": 0,
+              "removed_import_properties": 1,
+              "removed_empty_hooks": 1,
+              "removed_import_bindings": [
+                {
+                  "local": "waitForAsync",
+                  "original": "waitForAsync",
+                  "typeOnly": false
+                }
+              ]
+            },
+            {
+              "path": "src/material/list/selection-list.spec.ts",
+              "accepted": false,
+              "reason": "non-import test program changed"
+            },
+            {
+              "accepted": true,
+              "path": "src/material/list/testing/list-harness.spec.ts",
+              "unchanged_test_program_sha256": "fab2e2b44a8d1bc2fd7d4639326ddcadace4d8cb2fdb1b42e4b9dc9c24f9ba1b",
+              "before_config_calls": 4,
+              "after_config_calls": 0,
+              "removed_import_properties": 4,
+              "removed_empty_hooks": 0,
+              "removed_import_bindings": []
+            }
+          ]
+        },
+        "prior_entry": {
+          "sha": "8f0bde9c3976175e62685a5c0764b5d5626accbd",
+          "bucket": "test-only-batch-candidate",
+          "subject": "test(material/list): clean up unnecessary imports in tests",
+          "files": [
+            "src/material/list/list.spec.ts",
+            "src/material/list/selection-list.spec.ts",
+            "src/material/list/testing/list-harness.spec.ts"
+          ],
+          "final_disposition": "needs-individual-review",
+          "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+          "read_note_disposition": "unreviewed-on-21.x",
+          "affected_branches": [
+            "21.x"
+          ],
+          "g11_claim": "not-passed",
+          "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+          "evidence_report": null
+        }
+      },
+      "individual_retained_test_source_review": {
+        "schema_version": 1,
+        "line": "21.x",
+        "sha": "8f0bde9c3976175e62685a5c0764b5d5626accbd",
+        "diff_sha256": "b29c2260c1b0dd4265b752aa32ccc97d4dc34cda92e59cd151b8a36a46d0a608",
+        "complete_changed_files": [
+          "src/material/list/list.spec.ts",
+          "src/material/list/selection-list.spec.ts",
+          "src/material/list/testing/list-harness.spec.ts"
+        ],
+        "unused_modern_fixtures": [
+          {
+            "name": "SelectionListWithOnlyOneOption",
+            "setup_import_refs": 2,
+            "template_sha256": "ae5788d314e7f4a8febaf77ce31edda9e3172e7fa3939b09ee5e63f692eee67b",
+            "selector": null
+          }
+        ],
+        "unchanged_remaining_test_source": [
+          {
+            "path": "src/material/list/list.spec.ts",
+            "unchanged_test_program_sha256": "6479a6f7911122187f5b7e3c7b4cbdbd89be51abb46ee351ef068e183ec83aa4",
+            "before_config_calls": 1,
+            "after_config_calls": 0,
+            "removed_import_properties": 1,
+            "removed_empty_hooks": 1,
+            "removed_import_bindings": [
+              {
+                "local": "waitForAsync",
+                "original": "waitForAsync",
+                "typeOnly": false
+              }
+            ]
+          },
+          {
+            "path": "src/material/list/selection-list.spec.ts",
+            "unchanged_test_program_sha256": "6e081a85e10f20c073566d3afeaae8759aed68d2757706a1d6330d00ccfa7f67",
+            "before_config_calls": 9,
+            "after_config_calls": 1,
+            "removed_import_properties": 9,
+            "removed_empty_hooks": 6,
+            "removed_import_bindings": []
+          },
+          {
+            "path": "src/material/list/testing/list-harness.spec.ts",
+            "unchanged_test_program_sha256": "fab2e2b44a8d1bc2fd7d4639326ddcadace4d8cb2fdb1b42e4b9dc9c24f9ba1b",
+            "before_config_calls": 4,
+            "after_config_calls": 0,
+            "removed_import_properties": 4,
+            "removed_empty_hooks": 0,
+            "removed_import_bindings": []
+          }
+        ],
+        "original_subject_capsule_sha256": "d2c70db586071dcb462a140df1623adb1334b70ec86b9dafa08f05f8601362b0",
+        "original_tagged_member": {
+          "path": "src/material/legacy-list/selection-list.spec.ts",
+          "sha256": "bb4e81be636c399bd2ce5288d0203bdec01844360afc545c335260f533b367f4"
+        },
+        "retained_historical_member": {
+          "path": "projects/ngx-material-legacy/legacy-list/selection-list.spec.ts",
+          "sha256": "bb4e81be636c399bd2ce5288d0203bdec01844360afc545c335260f533b367f4"
+        },
+        "retained": [
+          {
+            "name": "SelectionListWithOnlyOneOption",
+            "original_template_sha256": "f40507066a55a4560f1569178b75f1965b94432e913a609ab081ac589793fd11",
+            "current_template_sha256": "f40507066a55a4560f1569178b75f1965b94432e913a609ab081ac589793fd11",
+            "original_selector": null,
+            "current_selector": null,
+            "original_encapsulation": null,
+            "current_encapsulation": null,
+            "original_create_calls": [],
+            "current_create_calls": []
+          }
+        ],
+        "source_only": true,
+        "shadow_DOM_label_projection_native_or_packed_executed": false,
+        "g11_claim": "not-passed"
+      },
+      "diff": "diff --git a/src/material/list/list.spec.ts b/src/material/list/list.spec.ts\nindex 171467313070d069ca1191b40d84540735519215..8bbe49a85432a5afb48bf58c8c85221c9b671dd8 100644\n--- a/src/material/list/list.spec.ts\n+++ b/src/material/list/list.spec.ts\n@@ -1,34 +1,10 @@\n import {dispatchFakeEvent, dispatchMouseEvent} from '@angular/cdk/testing/private';\n import {Component, QueryList, ViewChild, ViewChildren} from '@angular/core';\n-import {TestBed, fakeAsync, waitForAsync} from '@angular/core/testing';\n+import {TestBed, fakeAsync} from '@angular/core/testing';\n import {By} from '@angular/platform-browser';\n import {MatListItem, MatListModule} from './index';\n \n describe('MatList', () => {\n-  beforeEach(waitForAsync(() => {\n-    TestBed.configureTestingModule({\n-      imports: [\n-        MatListModule,\n-        ListWithOneAnchorItem,\n-        ListWithOneItem,\n-        ListWithTwoLineItem,\n-        ListWithThreeLineItem,\n-        ListWithAvatar,\n-        ListWithItemWithCssClass,\n-        ListWithDynamicNumberOfLines,\n-        ListWithMultipleItems,\n-        NavListWithOneAnchorItem,\n-        NavListWithActivatedItem,\n-        ActionListWithoutType,\n-        ActionListWithType,\n-        ActionListWithDisabledList,\n-        ActionListWithDisabledItem,\n-        ListWithDisabledItems,\n-        StandaloneListItem,\n-      ],\n-    });\n-  }));\n-\n   it('should apply an additional class to lists without lines', () => {\n     const fixture = TestBed.createComponent(ListWithOneItem);\n     const listItem = fixture.debugElement.query(By.css('mat-list-item'))!;\ndiff --git a/src/material/list/selection-list.spec.ts b/src/material/list/selection-list.spec.ts\nindex d83c25fa6589645f16c1e02becc271dad793d3db..0dfb913076666a55c8889ac6b9cb2c4e9cc73829 100644\n--- a/src/material/list/selection-list.spec.ts\n+++ b/src/material/list/selection-list.spec.ts\n@@ -691,12 +691,6 @@ describe('MatSelectionList without forms', () => {\n     let listOptionElements: DebugElement[];\n     let selectionList: DebugElement;\n \n-    beforeEach(waitForAsync(() => {\n-      TestBed.configureTestingModule({\n-        imports: [MatListModule, SelectionListWithSelectedOption],\n-      });\n-    }));\n-\n     beforeEach(waitForAsync(() => {\n       fixture = TestBed.createComponent(SelectionListWithSelectedOption);\n       listOptionElements = fixture.debugElement.queryAll(By.directive(MatListOption))!;\n@@ -727,12 +721,6 @@ describe('MatSelectionList without forms', () => {\n     let fixture: ComponentFixture<SingleSelectionListWithSelectedOption>;\n     let listOptionElements: DebugElement[];\n \n-    beforeEach(waitForAsync(() => {\n-      TestBed.configureTestingModule({\n-        imports: [MatListModule, SingleSelectionListWithSelectedOption],\n-      });\n-    }));\n-\n     beforeEach(waitForAsync(() => {\n       fixture = TestBed.createComponent(SingleSelectionListWithSelectedOption);\n       listOptionElements = fixture.debugElement.queryAll(By.directive(MatListOption))!;\n@@ -764,7 +752,6 @@ describe('MatSelectionList without forms', () => {\n       const matListConfig: MatListConfig = {hideSingleSelectionIndicator: true};\n \n       TestBed.configureTestingModule({\n-        imports: [MatListModule, SingleSelectionListWithSelectedOption],\n         providers: [{provide: MAT_LIST_CONFIG, useValue: matListConfig}],\n       });\n     }));\n@@ -795,12 +782,6 @@ describe('MatSelectionList without forms', () => {\n     let listOptionEl: HTMLElement;\n     let listOption: MatListOption;\n \n-    beforeEach(waitForAsync(() => {\n-      TestBed.configureTestingModule({\n-        imports: [MatListModule, SelectionListWithDisabledOption],\n-      });\n-    }));\n-\n     beforeEach(waitForAsync(() => {\n       fixture = TestBed.createComponent(SelectionListWithDisabledOption);\n \n@@ -842,18 +823,6 @@ describe('MatSelectionList without forms', () => {\n     let listOption: DebugElement[];\n     let selectionList: DebugElement;\n \n-    beforeEach(waitForAsync(() => {\n-      TestBed.configureTestingModule({\n-        imports: [\n-          MatListModule,\n-          SelectionListWithListOptions,\n-          SelectionListWithCheckboxPositionAfter,\n-          SelectionListWithListDisabled,\n-          SelectionListWithOnlyOneOption,\n-        ],\n-      });\n-    }));\n-\n     beforeEach(waitForAsync(() => {\n       fixture = TestBed.createComponent(SelectionListWithListDisabled);\n       listOption = fixture.debugElement.queryAll(By.directive(MatListOption));\n@@ -941,18 +910,6 @@ describe('MatSelectionList without forms', () => {\n   describe('with checkbox position after', () => {\n     let fixture: ComponentFixture<SelectionListWithCheckboxPositionAfter>;\n \n-    beforeEach(waitForAsync(() => {\n-      TestBed.configureTestingModule({\n-        imports: [\n-          MatListModule,\n-          SelectionListWithListOptions,\n-          SelectionListWithCheckboxPositionAfter,\n-          SelectionListWithListDisabled,\n-          SelectionListWithOnlyOneOption,\n-        ],\n-      });\n-    }));\n-\n     beforeEach(waitForAsync(() => {\n       fixture = TestBed.createComponent(SelectionListWithCheckboxPositionAfter);\n       fixture.detectChanges();\n@@ -969,12 +926,6 @@ describe('MatSelectionList without forms', () => {\n   });\n \n   describe('with list item elements', () => {\n-    beforeEach(waitForAsync(() => {\n-      TestBed.configureTestingModule({\n-        imports: [MatListModule, SelectionListWithAvatar, SelectionListWithIcon],\n-      });\n-    }));\n-\n     function expectCheckboxAtPosition(\n       listItemElement: HTMLElement,\n       position: MatListOptionTogglePosition,\n@@ -1102,10 +1053,6 @@ describe('MatSelectionList without forms', () => {\n     let selectionList: DebugElement;\n \n     beforeEach(waitForAsync(() => {\n-      TestBed.configureTestingModule({\n-        imports: [MatListModule, SelectionListWithListOptions],\n-      });\n-\n       fixture = TestBed.createComponent(SelectionListWithListOptions);\n       fixture.componentInstance.multiple = false;\n       fixture.changeDetectorRef.markForCheck();\n@@ -1228,10 +1175,6 @@ describe('MatSelectionList without forms', () => {\n     let option: MatListOption;\n \n     beforeEach(waitForAsync(() => {\n-      TestBed.configureTestingModule({\n-        imports: [MatListModule, ListOptionWithTwoWayBinding],\n-      });\n-\n       fixture = TestBed.createComponent(ListOptionWithTwoWayBinding);\n       fixture.detectChanges();\n       const optionDebug = fixture.debugElement.query(By.directive(MatListOption));\n@@ -1857,17 +1800,6 @@ class SelectionListWithSelectedOptionAndValue {\n   itemValue = 'item1';\n }\n \n-@Component({\n-  template: `\n-  <mat-selection-list id=\"selection-list-4\">\n-    <mat-list-option togglePosition=\"after\" class=\"test-focus\" id=\"123\">\n-      Inbox\n-    </mat-list-option>\n-  </mat-selection-list>`,\n-  imports: [MatListModule],\n-})\n-class SelectionListWithOnlyOneOption {}\n-\n @Component({\n   template: `\n     <mat-selection-list\ndiff --git a/src/material/list/testing/list-harness.spec.ts b/src/material/list/testing/list-harness.spec.ts\nindex 65d3cb6f8d75854b2d349e7e9c4f0c34e84f4544..feaa63dd73650149734bf318c5b065c2db70af93 100644\n--- a/src/material/list/testing/list-harness.spec.ts\n+++ b/src/material/list/testing/list-harness.spec.ts\n@@ -45,10 +45,6 @@ function runBaseListFunctionalityTests<\n \n     beforeEach(async () => {\n       const testComponent = testComponentFn();\n-      TestBed.configureTestingModule({\n-        imports: [MatListModule, testComponent],\n-      });\n-\n       fixture = TestBed.createComponent(testComponent);\n       fixture.detectChanges();\n       const loader = TestbedHarnessEnvironment.loader(fixture);\n@@ -319,10 +315,6 @@ describe('MatActionListHarness', () => {\n     let fixture: ComponentFixture<ActionListHarnessTest>;\n \n     beforeEach(async () => {\n-      TestBed.configureTestingModule({\n-        imports: [MatListModule, ActionListHarnessTest],\n-      });\n-\n       fixture = TestBed.createComponent(ActionListHarnessTest);\n       fixture.detectChanges();\n       const loader = TestbedHarnessEnvironment.loader(fixture);\n@@ -352,10 +344,6 @@ describe('MatNavListHarness', () => {\n     let fixture: ComponentFixture<NavListHarnessTest>;\n \n     beforeEach(async () => {\n-      TestBed.configureTestingModule({\n-        imports: [MatListModule, NavListHarnessTest],\n-      });\n-\n       fixture = TestBed.createComponent(NavListHarnessTest);\n       fixture.detectChanges();\n       const loader = TestbedHarnessEnvironment.loader(fixture);\n@@ -421,10 +409,6 @@ describe('MatSelectionListHarness', () => {\n     let fixture: ComponentFixture<SelectionListHarnessTest>;\n \n     beforeEach(async () => {\n-      TestBed.configureTestingModule({\n-        imports: [MatListModule, SelectionListHarnessTest],\n-      });\n-\n       fixture = TestBed.createComponent(SelectionListHarnessTest);\n       fixture.detectChanges();\n       const loader = TestbedHarnessEnvironment.loader(fixture);\n"
     },
     {
       "sha": "76f1bc1a8fe0ad1b8b7198a69169fb2e53811e30",
@@ -1653,9 +1813,9 @@
         "main",
         "21.x"
       ],
-      "final_disposition": "needs-individual-review",
-      "review_depth": "outside-import-cleanup-predicate",
-      "decision": "Pending individual review: the complete 2-file patch falls outside the exact test-import cleanup predicate. Unqualified members: src/material/progress-spinner/progress-spinner.spec.ts (non-import test program changed). A test-only label cannot discharge provider, callback scheduling, fixture, or other changes beyond this bounded predicate. Preserve the prior exact entry in this evidence record; the earlier blanket conclusion is not a semantic pass. No product repair or runtime qualification is claimed by this source comparison. Review the residual in its full original and historical/current context before closing this SHA.",
+      "final_disposition": "not-applicable",
+      "review_depth": "individual-compatibility",
+      "decision": "Individual full two-file review: the modern spinner cleanup deletes two private shadow-DOM fixtures that each occur only in the removed setup import list. With those exact unused declarations removed from the original context, all remaining test programs match under the strict import-removal predicate. The authentic16 legacy counterparts remain present on both lines, with exact original fixture templates and their two plus one direct createComponent calls retained. Those historical calls distinguish this owned suite from the modern dead fixtures; adopting the modern deletion would discard retained shadow-DOM coverage. The patch contains no production spinner change or shadow-DOM implementation fix to inherit. Not applicable to the owned product; preserve the historical suite and all public markup/style behavior. No native shadow-DOM, style geometry, packed or consumer-floor pass is claimed.",
       "source_analysis": {
         "sha": "195260b58ba90de63ff69c2ceed6af9d45c57b82",
         "subject": "test(material/progress-spinner): clean up unnecessary imports in tests",
@@ -1701,7 +1861,198 @@
         "g11_claim": "not-passed",
         "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
         "evidence_report": null
-      }
+      },
+      "prior_source_review": {
+        "sha": "195260b58ba90de63ff69c2ceed6af9d45c57b82",
+        "paths": [
+          "src/material/progress-spinner/progress-spinner.spec.ts",
+          "src/material/progress-spinner/testing/progress-spinner-harness.spec.ts"
+        ],
+        "diff_sha256": "27a9bf61bbe6a6ec33e36ab68913223c8e08f46f9a9b64958376dc0311efff85",
+        "affected_branches": [
+          "main",
+          "21.x"
+        ],
+        "final_disposition": "needs-individual-review",
+        "review_depth": "outside-import-cleanup-predicate",
+        "decision": "Pending individual review: the complete 2-file patch falls outside the exact test-import cleanup predicate. Unqualified members: src/material/progress-spinner/progress-spinner.spec.ts (non-import test program changed). A test-only label cannot discharge provider, callback scheduling, fixture, or other changes beyond this bounded predicate. Preserve the prior exact entry in this evidence record; the earlier blanket conclusion is not a semantic pass. No product repair or runtime qualification is claimed by this source comparison. Review the residual in its full original and historical/current context before closing this SHA.",
+        "source_analysis": {
+          "sha": "195260b58ba90de63ff69c2ceed6af9d45c57b82",
+          "subject": "test(material/progress-spinner): clean up unnecessary imports in tests",
+          "paths": [
+            "src/material/progress-spinner/progress-spinner.spec.ts",
+            "src/material/progress-spinner/testing/progress-spinner-harness.spec.ts"
+          ],
+          "diff_sha256": "27a9bf61bbe6a6ec33e36ab68913223c8e08f46f9a9b64958376dc0311efff85",
+          "recovered_seed_paths": [],
+          "accepted": false,
+          "members": [
+            {
+              "path": "src/material/progress-spinner/progress-spinner.spec.ts",
+              "accepted": false,
+              "reason": "non-import test program changed"
+            },
+            {
+              "accepted": true,
+              "path": "src/material/progress-spinner/testing/progress-spinner-harness.spec.ts",
+              "unchanged_test_program_sha256": "42641b3ad81392b6fbf410d9d5499f569a8411972ae7830c8c448c3b10bf8932",
+              "before_config_calls": 1,
+              "after_config_calls": 0,
+              "removed_import_properties": 1,
+              "removed_empty_hooks": 0,
+              "removed_import_bindings": []
+            }
+          ]
+        },
+        "prior_entry": {
+          "sha": "195260b58ba90de63ff69c2ceed6af9d45c57b82",
+          "bucket": "test-only-batch-candidate",
+          "subject": "test(material/progress-spinner): clean up unnecessary imports in tests",
+          "files": [
+            "src/material/progress-spinner/progress-spinner.spec.ts",
+            "src/material/progress-spinner/testing/progress-spinner-harness.spec.ts"
+          ],
+          "final_disposition": "needs-individual-review",
+          "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+          "read_note_disposition": "unreviewed-on-21.x",
+          "affected_branches": [
+            "21.x"
+          ],
+          "g11_claim": "not-passed",
+          "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+          "evidence_report": null
+        }
+      },
+      "individual_retained_test_source_review": {
+        "schema_version": 1,
+        "line": "21.x",
+        "sha": "195260b58ba90de63ff69c2ceed6af9d45c57b82",
+        "diff_sha256": "27a9bf61bbe6a6ec33e36ab68913223c8e08f46f9a9b64958376dc0311efff85",
+        "complete_changed_files": [
+          "src/material/progress-spinner/progress-spinner.spec.ts",
+          "src/material/progress-spinner/testing/progress-spinner-harness.spec.ts"
+        ],
+        "unused_modern_fixtures": [
+          {
+            "name": "IndeterminateSpinnerInShadowDom",
+            "setup_import_refs": 1,
+            "template_sha256": "bfc0a080e63e84f1ca099e58a4b2c8ad4aff0686c1d01ce8dbacb290cd86873a",
+            "selector": null
+          },
+          {
+            "name": "IndeterminateSpinnerInShadowDomWithNgIf",
+            "setup_import_refs": 1,
+            "template_sha256": "668bd249cb5d0ffe3dac73a500eedbabac225feff8b8c6555860e751f716f0d1",
+            "selector": null
+          }
+        ],
+        "unchanged_remaining_test_source": [
+          {
+            "path": "src/material/progress-spinner/progress-spinner.spec.ts",
+            "unchanged_test_program_sha256": "3ec2712ef8b80d8cce9abcd29b2cb2df329b9c28ef9680cf34d3328a1696687a",
+            "before_config_calls": 1,
+            "after_config_calls": 0,
+            "removed_import_properties": 1,
+            "removed_empty_hooks": 1,
+            "removed_import_bindings": [
+              {
+                "local": "waitForAsync",
+                "original": "waitForAsync",
+                "typeOnly": false
+              },
+              {
+                "local": "ElementRef",
+                "original": "ElementRef",
+                "typeOnly": false
+              },
+              {
+                "local": "ViewChild",
+                "original": "ViewChild",
+                "typeOnly": false
+              },
+              {
+                "local": "ViewEncapsulation",
+                "original": "ViewEncapsulation",
+                "typeOnly": false
+              }
+            ]
+          },
+          {
+            "path": "src/material/progress-spinner/testing/progress-spinner-harness.spec.ts",
+            "unchanged_test_program_sha256": "42641b3ad81392b6fbf410d9d5499f569a8411972ae7830c8c448c3b10bf8932",
+            "before_config_calls": 1,
+            "after_config_calls": 0,
+            "removed_import_properties": 1,
+            "removed_empty_hooks": 0,
+            "removed_import_bindings": []
+          }
+        ],
+        "original_subject_capsule_sha256": "d2c70db586071dcb462a140df1623adb1334b70ec86b9dafa08f05f8601362b0",
+        "original_tagged_member": {
+          "path": "src/material/legacy-progress-spinner/progress-spinner.spec.ts",
+          "sha256": "28a8ef2e4cee3c8fc4e1dad2e94bf69e8ca7b2ff51e593462f2a80b3be937a4a"
+        },
+        "retained_historical_member": {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.spec.ts",
+          "sha256": "aee88cfa13c68fb9143103c86c5d68f1d0b026cbe61cdc750fb9c7f2b1bbcf25"
+        },
+        "retained": [
+          {
+            "name": "IndeterminateSpinnerInShadowDom",
+            "original_template_sha256": "bfc0a080e63e84f1ca099e58a4b2c8ad4aff0686c1d01ce8dbacb290cd86873a",
+            "current_template_sha256": "bfc0a080e63e84f1ca099e58a4b2c8ad4aff0686c1d01ce8dbacb290cd86873a",
+            "original_selector": null,
+            "current_selector": null,
+            "original_encapsulation": "ViewEncapsulation.ShadowDom",
+            "current_encapsulation": "ViewEncapsulation.ShadowDom",
+            "original_create_calls": [
+              {
+                "line": 462,
+                "call": "TestBed.createComponent(IndeterminateSpinnerInShadowDom)"
+              },
+              {
+                "line": 483,
+                "call": "TestBed.createComponent(IndeterminateSpinnerInShadowDom)"
+              }
+            ],
+            "current_create_calls": [
+              {
+                "line": 462,
+                "call": "TestBed.createComponent(IndeterminateSpinnerInShadowDom)"
+              },
+              {
+                "line": 483,
+                "call": "TestBed.createComponent(IndeterminateSpinnerInShadowDom)"
+              }
+            ]
+          },
+          {
+            "name": "IndeterminateSpinnerInShadowDomWithNgIf",
+            "original_template_sha256": "ae796ebf0c5157d49a0db1f3ef5c8d403274db09e8e908e277493b510f60ab9f",
+            "current_template_sha256": "ae796ebf0c5157d49a0db1f3ef5c8d403274db09e8e908e277493b510f60ab9f",
+            "original_selector": null,
+            "current_selector": null,
+            "original_encapsulation": "ViewEncapsulation.ShadowDom",
+            "current_encapsulation": "ViewEncapsulation.ShadowDom",
+            "original_create_calls": [
+              {
+                "line": 516,
+                "call": "TestBed.createComponent(IndeterminateSpinnerInShadowDomWithNgIf)"
+              }
+            ],
+            "current_create_calls": [
+              {
+                "line": 516,
+                "call": "TestBed.createComponent(IndeterminateSpinnerInShadowDomWithNgIf)"
+              }
+            ]
+          }
+        ],
+        "source_only": true,
+        "shadow_DOM_label_projection_native_or_packed_executed": false,
+        "g11_claim": "not-passed"
+      },
+      "diff": "diff --git a/src/material/progress-spinner/progress-spinner.spec.ts b/src/material/progress-spinner/progress-spinner.spec.ts\nindex 4584b02ef4d2c6f38a4b996e58dd0e7a856b5dbf..4cba5111c3e358b1ba40ebd472785afc010fa476 100644\n--- a/src/material/progress-spinner/progress-spinner.spec.ts\n+++ b/src/material/progress-spinner/progress-spinner.spec.ts\n@@ -1,29 +1,10 @@\n-import {waitForAsync, TestBed} from '@angular/core/testing';\n+import {TestBed} from '@angular/core/testing';\n import {By} from '@angular/platform-browser';\n-import {Component, ElementRef, ViewChild, ViewEncapsulation, signal} from '@angular/core';\n+import {Component, signal} from '@angular/core';\n import {MatProgressSpinnerModule} from './progress-spinner-module';\n import {MatProgressSpinner, MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS} from './progress-spinner';\n \n describe('MatProgressSpinner', () => {\n-  beforeEach(waitForAsync(() => {\n-    TestBed.configureTestingModule({\n-      imports: [\n-        MatProgressSpinnerModule,\n-        BasicProgressSpinner,\n-        IndeterminateProgressSpinner,\n-        ProgressSpinnerWithValueAndBoundMode,\n-        ProgressSpinnerWithColor,\n-        ProgressSpinnerCustomStrokeWidth,\n-        ProgressSpinnerCustomDiameter,\n-        SpinnerWithColor,\n-        ProgressSpinnerWithStringValues,\n-        IndeterminateSpinnerInShadowDom,\n-        IndeterminateSpinnerInShadowDomWithNgIf,\n-        SpinnerWithMode,\n-      ],\n-    });\n-  }));\n-\n   it('should apply a mode of \"determinate\" if no mode is provided.', () => {\n     let fixture = TestBed.createComponent(BasicProgressSpinner);\n     fixture.detectChanges();\n@@ -456,35 +437,6 @@ class ProgressSpinnerWithColor {\n })\n class ProgressSpinnerWithStringValues {}\n \n-@Component({\n-  template: `\n-    <mat-progress-spinner mode=\"indeterminate\" [diameter]=\"diameter\"></mat-progress-spinner>\n-  `,\n-  encapsulation: ViewEncapsulation.ShadowDom,\n-  imports: [MatProgressSpinnerModule],\n-})\n-class IndeterminateSpinnerInShadowDom {\n-  diameter: number;\n-}\n-\n-@Component({\n-  template: `\n-    @if (true) {\n-      <div>\n-        <mat-progress-spinner mode=\"indeterminate\" [diameter]=\"diameter\"></mat-progress-spinner>\n-      </div>\n-    }\n-  `,\n-  encapsulation: ViewEncapsulation.ShadowDom,\n-  imports: [MatProgressSpinnerModule],\n-})\n-class IndeterminateSpinnerInShadowDomWithNgIf {\n-  @ViewChild(MatProgressSpinner, {read: ElementRef})\n-  spinner: ElementRef<HTMLElement>;\n-\n-  diameter: number;\n-}\n-\n @Component({\n   template: '<mat-spinner mode=\"determinate\"></mat-spinner>',\n   imports: [MatProgressSpinnerModule],\ndiff --git a/src/material/progress-spinner/testing/progress-spinner-harness.spec.ts b/src/material/progress-spinner/testing/progress-spinner-harness.spec.ts\nindex bb8b0dd9cd63f51ff505b7a7877eac351290309c..e3f60c47d8facd87e86ca04638309f64dcc23383 100644\n--- a/src/material/progress-spinner/testing/progress-spinner-harness.spec.ts\n+++ b/src/material/progress-spinner/testing/progress-spinner-harness.spec.ts\n@@ -10,10 +10,6 @@ describe('MatProgressSpinnerHarness', () => {\n   let loader: HarnessLoader;\n \n   beforeEach(() => {\n-    TestBed.configureTestingModule({\n-      imports: [MatProgressSpinnerModule, ProgressSpinnerHarnessTest],\n-    });\n-\n     fixture = TestBed.createComponent(ProgressSpinnerHarnessTest);\n     fixture.detectChanges();\n     loader = TestbedHarnessEnvironment.loader(fixture);\n"
     },
     {
       "sha": "459136f8b57267701f7a5eff64d8c6418389d802",
@@ -1833,9 +2184,9 @@
         "main",
         "21.x"
       ],
-      "final_disposition": "needs-individual-review",
-      "review_depth": "outside-import-cleanup-predicate",
-      "decision": "Pending individual review: the complete 2-file patch falls outside the exact test-import cleanup predicate. Unqualified members: src/material/slide-toggle/slide-toggle.spec.ts (non-import test program changed). A test-only label cannot discharge provider, callback scheduling, fixture, or other changes beyond this bounded predicate. Preserve the prior exact entry in this evidence record; the earlier blanket conclusion is not a semantic pass. No product repair or runtime qualification is claimed by this source comparison. Review the residual in its full original and historical/current context before closing this SHA.",
+      "final_disposition": "not-applicable",
+      "review_depth": "individual-compatibility",
+      "decision": "Individual full two-file review: the modern slide-toggle cleanup deletes three private label/projection fixtures whose named references are confined to setup imports. The some-text selector is contained within the deleted fixture graph and absent from the remaining fixture templates. All other providers, callbacks, assertions and fixture code match after exact import cleanup and those specific dead declarations are accounted for. The untouched16 legacy label and projected-label templates remain exact on both lines, their one plus one direct creation calls remain, and the text child fixture remains part of the historical projection template. Do not transplant a modern dead-fixture cleanup into that retained legacy coverage. Not applicable to the owned product; no production TS, HTML, CSS or SCSS change or API deviation is required. Actual label/projection behavior, native accessibility, packed and floor qualification still belongs to the artifact suites.",
       "source_analysis": {
         "sha": "a2a960a690e4d9dbb4f862585121eb150c280923",
         "subject": "test(material/slide-toggle): clean up unnecessary imports in tests",
@@ -1881,7 +2232,186 @@
         "g11_claim": "not-passed",
         "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
         "evidence_report": null
-      }
+      },
+      "prior_source_review": {
+        "sha": "a2a960a690e4d9dbb4f862585121eb150c280923",
+        "paths": [
+          "src/material/slide-toggle/slide-toggle.spec.ts",
+          "src/material/slide-toggle/testing/slide-toggle-harness.spec.ts"
+        ],
+        "diff_sha256": "5259fa37b16751c6011c583df0b651391308f93fa1eed443bb388e988f1f04dd",
+        "affected_branches": [
+          "main",
+          "21.x"
+        ],
+        "final_disposition": "needs-individual-review",
+        "review_depth": "outside-import-cleanup-predicate",
+        "decision": "Pending individual review: the complete 2-file patch falls outside the exact test-import cleanup predicate. Unqualified members: src/material/slide-toggle/slide-toggle.spec.ts (non-import test program changed). A test-only label cannot discharge provider, callback scheduling, fixture, or other changes beyond this bounded predicate. Preserve the prior exact entry in this evidence record; the earlier blanket conclusion is not a semantic pass. No product repair or runtime qualification is claimed by this source comparison. Review the residual in its full original and historical/current context before closing this SHA.",
+        "source_analysis": {
+          "sha": "a2a960a690e4d9dbb4f862585121eb150c280923",
+          "subject": "test(material/slide-toggle): clean up unnecessary imports in tests",
+          "paths": [
+            "src/material/slide-toggle/slide-toggle.spec.ts",
+            "src/material/slide-toggle/testing/slide-toggle-harness.spec.ts"
+          ],
+          "diff_sha256": "5259fa37b16751c6011c583df0b651391308f93fa1eed443bb388e988f1f04dd",
+          "recovered_seed_paths": [],
+          "accepted": false,
+          "members": [
+            {
+              "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+              "accepted": false,
+              "reason": "non-import test program changed"
+            },
+            {
+              "accepted": true,
+              "path": "src/material/slide-toggle/testing/slide-toggle-harness.spec.ts",
+              "unchanged_test_program_sha256": "9ec12c8e849030de95504622008f66999dc7b275290f147d28c2a0edc289b366",
+              "before_config_calls": 1,
+              "after_config_calls": 0,
+              "removed_import_properties": 1,
+              "removed_empty_hooks": 0,
+              "removed_import_bindings": []
+            }
+          ]
+        },
+        "prior_entry": {
+          "sha": "a2a960a690e4d9dbb4f862585121eb150c280923",
+          "bucket": "test-only-batch-candidate",
+          "subject": "test(material/slide-toggle): clean up unnecessary imports in tests",
+          "files": [
+            "src/material/slide-toggle/slide-toggle.spec.ts",
+            "src/material/slide-toggle/testing/slide-toggle-harness.spec.ts"
+          ],
+          "final_disposition": "needs-individual-review",
+          "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+          "read_note_disposition": "unreviewed-on-21.x",
+          "affected_branches": [
+            "21.x"
+          ],
+          "g11_claim": "not-passed",
+          "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+          "evidence_report": null
+        }
+      },
+      "individual_retained_test_source_review": {
+        "schema_version": 1,
+        "line": "21.x",
+        "sha": "a2a960a690e4d9dbb4f862585121eb150c280923",
+        "diff_sha256": "5259fa37b16751c6011c583df0b651391308f93fa1eed443bb388e988f1f04dd",
+        "complete_changed_files": [
+          "src/material/slide-toggle/slide-toggle.spec.ts",
+          "src/material/slide-toggle/testing/slide-toggle-harness.spec.ts"
+        ],
+        "unused_modern_fixtures": [
+          {
+            "name": "SlideToggleWithoutLabel",
+            "setup_import_refs": 1,
+            "template_sha256": "8ddfee88cecdcbd277d0401035c787a0a26bac81075eb442b6ff28cf3b02831a",
+            "selector": null
+          },
+          {
+            "name": "SlideToggleProjectedLabel",
+            "setup_import_refs": 1,
+            "template_sha256": "bcfa73b84ed265d6f5d90766f9c3a401bbbdd239458077435461c48ee031c3af",
+            "selector": null
+          },
+          {
+            "name": "TextBindingComponent",
+            "setup_import_refs": 1,
+            "template_sha256": "b997868efb8ff0bc62e38e985780369ac644872efcce75cb54542096d1c8e392",
+            "selector": "some-text"
+          }
+        ],
+        "unchanged_remaining_test_source": [
+          {
+            "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+            "unchanged_test_program_sha256": "fe34cca7edc24f824e4c6c52f4a4b0978e9b54cbb1567541b03748dd1165eb38",
+            "before_config_calls": 2,
+            "after_config_calls": 0,
+            "removed_import_properties": 2,
+            "removed_empty_hooks": 2,
+            "removed_import_bindings": []
+          },
+          {
+            "path": "src/material/slide-toggle/testing/slide-toggle-harness.spec.ts",
+            "unchanged_test_program_sha256": "9ec12c8e849030de95504622008f66999dc7b275290f147d28c2a0edc289b366",
+            "before_config_calls": 1,
+            "after_config_calls": 0,
+            "removed_import_properties": 1,
+            "removed_empty_hooks": 0,
+            "removed_import_bindings": []
+          }
+        ],
+        "original_subject_capsule_sha256": "d2c70db586071dcb462a140df1623adb1334b70ec86b9dafa08f05f8601362b0",
+        "original_tagged_member": {
+          "path": "src/material/legacy-slide-toggle/slide-toggle.spec.ts",
+          "sha256": "e51ec8282451d6a3babb9de0c7577154a38d60c7e0c8e5a4bc1b0e79e86580f8"
+        },
+        "retained_historical_member": {
+          "path": "projects/ngx-material-legacy/legacy-slide-toggle/slide-toggle.spec.ts",
+          "sha256": "166945084009dfed809cb38bf5b7421afbe3a7589793853f393c070f960a0fc7"
+        },
+        "retained": [
+          {
+            "name": "SlideToggleWithoutLabel",
+            "original_template_sha256": "8ddfee88cecdcbd277d0401035c787a0a26bac81075eb442b6ff28cf3b02831a",
+            "current_template_sha256": "8ddfee88cecdcbd277d0401035c787a0a26bac81075eb442b6ff28cf3b02831a",
+            "original_selector": null,
+            "current_selector": null,
+            "original_encapsulation": null,
+            "current_encapsulation": null,
+            "original_create_calls": [
+              {
+                "line": 503,
+                "call": "TestBed.createComponent(SlideToggleWithoutLabel)"
+              }
+            ],
+            "current_create_calls": [
+              {
+                "line": 497,
+                "call": "TestBed.createComponent(SlideToggleWithoutLabel)"
+              }
+            ]
+          },
+          {
+            "name": "SlideToggleProjectedLabel",
+            "original_template_sha256": "bcfa73b84ed265d6f5d90766f9c3a401bbbdd239458077435461c48ee031c3af",
+            "current_template_sha256": "bcfa73b84ed265d6f5d90766f9c3a401bbbdd239458077435461c48ee031c3af",
+            "original_selector": null,
+            "current_selector": null,
+            "original_encapsulation": null,
+            "current_encapsulation": null,
+            "original_create_calls": [
+              {
+                "line": 545,
+                "call": "TestBed.createComponent(SlideToggleProjectedLabel)"
+              }
+            ],
+            "current_create_calls": [
+              {
+                "line": 539,
+                "call": "TestBed.createComponent(SlideToggleProjectedLabel)"
+              }
+            ]
+          },
+          {
+            "name": "TextBindingComponent",
+            "original_template_sha256": "b997868efb8ff0bc62e38e985780369ac644872efcce75cb54542096d1c8e392",
+            "current_template_sha256": "b997868efb8ff0bc62e38e985780369ac644872efcce75cb54542096d1c8e392",
+            "original_selector": "some-text",
+            "current_selector": "some-text",
+            "original_encapsulation": null,
+            "current_encapsulation": null,
+            "original_create_calls": [],
+            "current_create_calls": []
+          }
+        ],
+        "source_only": true,
+        "shadow_DOM_label_projection_native_or_packed_executed": false,
+        "g11_claim": "not-passed"
+      },
+      "diff": "diff --git a/src/material/slide-toggle/slide-toggle.spec.ts b/src/material/slide-toggle/slide-toggle.spec.ts\nindex 7ef13fc56555502b437410f09b9dcea513e9ed66..abf1aa3c1f36a69fc00c81346cd8ac60a064dd9c 100644\n--- a/src/material/slide-toggle/slide-toggle.spec.ts\n+++ b/src/material/slide-toggle/slide-toggle.spec.ts\n@@ -16,22 +16,6 @@ import {MatSlideToggle, MatSlideToggleChange, MatSlideToggleModule} from './inde\n import {MAT_SLIDE_TOGGLE_DEFAULT_OPTIONS} from './slide-toggle-config';\n \n describe('MatSlideToggle without forms', () => {\n-  beforeEach(() => {\n-    TestBed.configureTestingModule({\n-      imports: [\n-        MatSlideToggleModule,\n-        BidiModule,\n-        SlideToggleBasic,\n-        SlideToggleCheckedAndDisabledAttr,\n-        SlideToggleWithTabindexAttr,\n-        SlideToggleWithoutLabel,\n-        SlideToggleProjectedLabel,\n-        TextBindingComponent,\n-        SlideToggleWithStaticAriaAttributes,\n-      ],\n-    });\n-  });\n-\n   describe('basic behavior', () => {\n     let fixture: ComponentFixture<any>;\n \n@@ -539,20 +523,6 @@ describe('MatSlideToggle without forms', () => {\n });\n \n describe('MatSlideToggle with forms', () => {\n-  beforeEach(() => {\n-    TestBed.configureTestingModule({\n-      imports: [\n-        MatSlideToggleModule,\n-        FormsModule,\n-        ReactiveFormsModule,\n-        SlideToggleWithForm,\n-        SlideToggleWithModel,\n-        SlideToggleWithFormControl,\n-        SlideToggleWithModelAndChangeEvent,\n-      ],\n-    });\n-  });\n-\n   describe('using ngModel', () => {\n     let fixture: ComponentFixture<SlideToggleWithModel>;\n \n@@ -958,14 +928,6 @@ class SlideToggleWithTabindexAttr {\n   disabled = false;\n }\n \n-@Component({\n-  template: `<mat-slide-toggle>{{label}}</mat-slide-toggle>`,\n-  imports: [MatSlideToggleModule, BidiModule],\n-})\n-class SlideToggleWithoutLabel {\n-  label: string;\n-}\n-\n @Component({\n   template: `<mat-slide-toggle [(ngModel)]=\"checked\" (change)=\"onChange()\"></mat-slide-toggle>`,\n   imports: [MatSlideToggleModule, FormsModule, ReactiveFormsModule],\n@@ -975,21 +937,6 @@ class SlideToggleWithModelAndChangeEvent {\n   onChange: () => void = () => {};\n }\n \n-@Component({\n-  template: `<mat-slide-toggle><some-text></some-text></mat-slide-toggle>`,\n-  imports: [MatSlideToggleModule, BidiModule],\n-})\n-class SlideToggleProjectedLabel {}\n-\n-@Component({\n-  selector: 'some-text',\n-  template: `<span>{{text}}</span>`,\n-  imports: [MatSlideToggleModule, BidiModule],\n-})\n-class TextBindingComponent {\n-  text: string = 'Some text';\n-}\n-\n @Component({\n   template: `\n     <mat-slide-toggle aria-label=\"Slide toggle\" aria-labelledby=\"something\"></mat-slide-toggle>\ndiff --git a/src/material/slide-toggle/testing/slide-toggle-harness.spec.ts b/src/material/slide-toggle/testing/slide-toggle-harness.spec.ts\nindex 212d2c54bee0c89fe8ddf11f02a8e14f0eec663d..3dc01182a86ca0a599cdbf06c90461fc89df84cf 100644\n--- a/src/material/slide-toggle/testing/slide-toggle-harness.spec.ts\n+++ b/src/material/slide-toggle/testing/slide-toggle-harness.spec.ts\n@@ -11,10 +11,6 @@ describe('MatSlideToggleHarness', () => {\n   let loader: HarnessLoader;\n \n   beforeEach(() => {\n-    TestBed.configureTestingModule({\n-      imports: [MatSlideToggleModule, ReactiveFormsModule, SlideToggleHarnessTest],\n-    });\n-\n     fixture = TestBed.createComponent(SlideToggleHarnessTest);\n     fixture.detectChanges();\n     loader = TestbedHarnessEnvironment.loader(fixture);\n"
     },
     {
       "sha": "48d92c8ca699118524d82ab2b0b51d9848b7a7b4",
@@ -2383,11 +2913,13 @@
     }
   ],
   "qualified_low_risk_SHAs": 22,
-  "residual_SHAs": 9,
+  "residual_SHAs": 6,
   "complete_changed_files": 79,
   "qualified_changed_files": 52,
   "production_or_original_reference_changes": false,
   "required_consumer_HTML_CSS_SCSS_changes": false,
   "native_browser_packed_or_full_floor_qualified": false,
-  "g11_claim": "not-passed"
+  "g11_claim": "not-passed",
+  "default_predicate_residual_SHAs": 9,
+  "individually_reviewed_fixture_removal_SHAs": 3
 }

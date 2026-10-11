@@ -9,6 +9,7 @@ import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {gunzipSync} from 'node:zlib';
 import {analyzeTestImportCleanup} from './upstream-test-import-cleanup-analysis.mjs';
+import {UNUSED_FIXTURE_PROFILES, unusedModernFixtureScope} from './upstream-unused-modern-fixture-scope.mjs';
 export const TEST_IMPORT_ROLE = 'C04 complete31 test import cleanup predicate and residual reviews';
 export const TEST_IMPORT_CAPSULE = 'compatibility/rc/upstream-test-import-cleanup-subjects.json.gz';
 export const TEST_IMPORT_SHAS = Object.freeze([
@@ -100,8 +101,13 @@ export function readTestImportSubjects(readMember) {
 }
 
 /** Import-only closure never covers providers, retained callbacks, fixture changes or assertions. */
+let immutableSourceAnalysis;
 export function analyzeTestImportSubjects(readMember) {
-  return readTestImportSubjects(readMember).map(s => {
+  // Authenticate on every read. Only immutable upstream analysis is reused;
+  // current branch ownership and retained fixture contexts are always rechecked.
+  const subjects = readTestImportSubjects(readMember);
+  if (immutableSourceAnalysis) return structuredClone(immutableSourceAnalysis);
+  immutableSourceAnalysis = subjects.map(s => {
     const members = s.members.map(m => {
       try {return {accepted: true, ...analyzeTestImportCleanup(m.path, m.before.text, m.after.text)};}
       catch (error) {return {path: m.path, accepted: false, reason: error.message.split('\n')[0]};}
@@ -111,6 +117,7 @@ export function analyzeTestImportSubjects(readMember) {
     return {sha: s.sha, subject: s.subject, paths: s.members.map(m => m.path), diff_sha256: s.diff_sha256,
       recovered_seed_paths: s.members.map(m => m.path).filter(p => !s.seed_paths.includes(p)), accepted, members};
   });
+  return structuredClone(immutableSourceAnalysis);
 }
 
 /** Product compile exclusion and the separate original57 historical selection are bounded context. */
@@ -138,12 +145,22 @@ export function testImportBatchOk(body, readMember, line) {
     assert.deepEqual(body.scope_sha_ids, TEST_IMPORT_SHAS);
     assert.deepEqual(body.ownership_context, testImportOwnershipContext(readMember, line));
     const actual = analyzeTestImportSubjects(readMember);
+    const subjects = readTestImportSubjects(readMember);
     assert.equal(body.reviews.length, 31); assert.deepEqual(body.reviews.map(r => r.sha), TEST_IMPORT_SHAS);
     for (const [i, source] of actual.entries()) {
       const review = body.reviews[i]; assert.deepEqual(review.source_analysis, source);
       assert.equal(review.diff_sha256, source.diff_sha256); assert.deepEqual(review.paths, source.paths);
-      assert.equal(review.final_disposition, source.accepted ? 'not-applicable' : 'needs-individual-review');
-      assert.equal(review.review_depth, source.accepted ? 'bounded-exact-test-import-cleanup' : 'outside-import-cleanup-predicate');
+      if (review.individual_retained_test_source_review) {
+        assert.ok(!source.accepted && UNUSED_FIXTURE_PROFILES[source.sha]);
+        const subject = subjects[i];
+        assert.deepEqual(review.individual_retained_test_source_review, unusedModernFixtureScope(source.sha, subject, readMember, line));
+        assert.equal(review.diff, subject.diff);
+        assert.equal(review.final_disposition, 'not-applicable');
+        assert.equal(review.review_depth, 'individual-compatibility');
+      } else {
+        assert.equal(review.final_disposition, source.accepted ? 'not-applicable' : 'needs-individual-review');
+        assert.equal(review.review_depth, source.accepted ? 'bounded-exact-test-import-cleanup' : 'outside-import-cleanup-predicate');
+      }
       assert.deepEqual(review.affected_branches, ['main', '21.x']); assert.ok(review.decision.length > 120);
     }
     return true;
