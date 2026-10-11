@@ -25,6 +25,7 @@ import {COMMENT_SCOPE_ROLE,COMMENT_SHAS,commentScopeEvidenceOk} from './upstream
 import {SLIDER_TOKEN_SHA,SLIDER_TOKEN_ROLE,sliderTokenEvidenceOk} from './upstream-slider-token-evidence.mjs';
 import {candidateSourceEvidenceOk, candidateProductSourcePaths} from './upstream-candidate-source-evidence.mjs';
 import {SLIDER_INPUT_ROLE, SLIDER_INPUT_SHAS, sliderInputScopeEvidenceOk} from './upstream-slider-input-scope.mjs';
+import {TEST_IMPORT_ROLE, TEST_IMPORT_SHAS, testImportBatchOk, testImportEntryOk} from './upstream-test-import-cleanup-evidence.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -107,6 +108,7 @@ function sensitiveClass(entry) {
 
 const evidenceCache = new Map();
 const testConsolidationCache = new Map();
+const testImportCache = new Map();
 let buildScopeProductPaths;
 function currentProductPaths() {
   if (!buildScopeProductPaths) {
@@ -131,6 +133,8 @@ function evidenceJson(file) {
 function evidenceClass(entry) {
   const rel = entry.evidence_report;
   if (typeof rel !== 'string' || !rel.trim()) return 'missing';
+  if (TEST_IMPORT_SHAS.includes(entry.sha) && !rel.endsWith('.json')) return 'invalid-test-import-cleanup-scope';
+  if (SLIDER_INPUT_SHAS.includes(entry.sha) && !rel.endsWith('.json')) return 'invalid-slider-input-scope';
   const consolidationScope = Object.hasOwn(TEST_CONSOLIDATION_PATCHES, entry.sha)
     || entry.batch_id === 'closeout-test-consolidation-source-review';
   if (consolidationScope && !rel.endsWith('.json')) return 'invalid-test-consolidation-scope';
@@ -143,6 +147,11 @@ function evidenceClass(entry) {
   if (rel.endsWith('.json')) {
     const body = evidenceJson(file);
     if (!body || typeof body !== 'object') return 'unreadable';
+    if (TEST_IMPORT_SHAS.includes(entry.sha) || body.role === TEST_IMPORT_ROLE) {
+      const readMember = rel => {const member = regularRepoMember(rel); return member ? readFileSync(member) : null;};
+      if (!testImportCache.has(file)) testImportCache.set(file, testImportBatchOk(body, readMember, line || body.line));
+      if (!testImportEntryOk(body, entry, readMember, testImportCache.get(file))) return 'invalid-test-import-cleanup-scope';
+    }
     if (SLIDER_INPUT_SHAS.includes(entry.sha) || body.role === SLIDER_INPUT_ROLE) {
       const readMember = rel => {const member = regularRepoMember(rel); return member ? readFileSync(member) : null;};
       if (!sliderInputScopeEvidenceOk(body, entry, readMember, () => candidateProductSourcePaths(root), line || body.line)) return 'invalid-slider-input-scope';
