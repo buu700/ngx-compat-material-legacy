@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "status": "reviewed",
+  "recorded_at_utc": "2026-10-11T18:42:31.948106+00:00",
+  "criteria": "One finite public NgZone import: every historical class member and actual owned color mixin is preserved; actual complete manual classes execute the callback, event filtering, zone re-entry and listener lifetime with genuine original and minimum public peers.",
+  "g11_claim": "not-passed",
+  "reviews": [
+    {
+      "file": "legacy-progress-bar/progress-bar.ts",
+      "module": "@angular/core",
+      "symbol": "NgZone",
+      "candidate_source_sha256": "815ce6bcc47f7218ee8cc175c84327829c7778ab429fc8b5e137a783e5d7aa3b",
+      "frozen_use": true,
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "This public NgZone import annotates the unchanged second constructor argument and is consumed only by the complete historical ngAfterViewInit callback. All historical class members, base initialization, ID counter, clamp helper, actual owned color mixin and HTML are independently exact against authenticated tagged16 source. Genuine Core public NgZone/EventEmitter/ElementRef and CDK coercion execute both whole manual classes across ten original/minimum, zoneful/currentzoneless and dev/production contexts. Registration stays outside Angular; child transition targets, indeterminate/query modes and absent observers do not re-enter or emit; determinate/buffer events re-enter once with the current value; destruction removes the listener and prevents further callbacks. Each mode is asserted separately after an aggregate-only draft test failed to reject a mode swap. The final producer rejects66 runtime and12 source faults, and checks the two consumed public methods are nondeprecated at each peer. Decorators are omitted, event target registration semantics are explicit protocols, and RxJS is borrowed. This closes the dependency import boundary only: native CSS transitions, node DI, AOT/packed, full Node/Rx/compiler floors and the remaining component/upstream/audit gates are not qualified. No product/API/resources or required Cyph HTML/CSS/SCSS changes.",
+      "source_context": {
+        "schema_version": 1,
+        "file": "legacy-progress-bar/progress-bar.ts",
+        "module": "@angular/core",
+        "symbol": "NgZone",
+        "candidate_source_sha256": "815ce6bcc47f7218ee8cc175c84327829c7778ab429fc8b5e137a783e5d7aa3b",
+        "original_subject": {
+          "path": "compatibility/rc/progress-bar-zone-original-subjects.json",
+          "sha256": "c9f2f2d241bf795eaf3481fd215cd25e3c9360578835eb7e3d034db39c469a99"
+        },
+        "historical_members": 18,
+        "constructor_and_all_members_match": true,
+        "owned_color": {
+          "path": "projects/ngx-material-legacy/legacy-progress-bar/internal/common-behaviors/color.ts",
+          "sha256": "1236aca56df8cf1d6c78e6378650ffffeeffc954033f26811fbc715daea94bfc"
+        },
+        "unchanged_template": {
+          "path": "projects/ngx-material-legacy/legacy-progress-bar/progress-bar.html",
+          "sha256": "00f81e3d99f77d0157c006d81f251a6325b26773885dd76c355720a0bf89ff8a"
+        },
+        "contexts": [
+          {
+            "name": "constructor",
+            "source": "constructor(\n    elementRef: ElementRef,\n    private _ngZone: NgZone,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) public _animationMode?: string,\n    /**\n     * @deprecated `location` parameter to be made required.\n     * @breaking-change 8.0.0\n     */\n    @Optional() @Inject(MAT_PROGRESS_BAR_LOCATION) location?: MatProgressBarLocation,\n    @Optional()\n    @Inject(MAT_PROGRESS_BAR_DEFAULT_OPTIONS)\n    defaults?: MatProgressBarDefaultOptions,\n    /**\n     * @deprecated `_changeDetectorRef` parameter to be made required.\n     * @breaking-change 11.0.0\n     */\n    private _changeDetectorRef?: ChangeDetectorRef,\n  ) {\n    super(elementRef);\n\n    // We need to prefix the SVG reference with the current path, otherwise they won't work\n    // in Safari if the page has a `<base>` tag. Note that we need quotes inside the `url()`,\n    // because named route URLs can contain parentheses (see #12338). Also we don't use `Location`\n    // since we can't tell the difference between whether the consumer is using the hash location\n    // strategy or not, because `Location` normalizes both `/#/foo/bar` and `/foo/bar` to\n    // the same thing.\n    const path = location ? location.getPathname().split('#')[0] : '';\n    this._rectangleFillValue = `url('${path}#${this.progressbarId}')`;\n    this._isNoopAnimation = _animationMode === 'NoopAnimations';\n\n    if (defaults) {\n      if (defaults.color) {\n        this.color = this.defaultColor = defaults.color;\n      }\n\n      this.mode = defaults.mode || this.mode;\n    }\n  }",
+            "sha256": "8f2410ddda999b53129fb6e466f4adb25e7df473ff76b8906050bd65e5279faf"
+          },
+          {
+            "name": "ngAfterViewInit",
+            "source": "ngAfterViewInit() {\n    // Run outside angular so change detection didn't get triggered on every transition end\n    // instead only on the animation that we care about (primary value bar's transitionend)\n    this._ngZone.runOutsideAngular(() => {\n      const element = this._primaryValueBar.nativeElement;\n\n      this._animationEndSubscription = (\n        fromEvent(element, 'transitionend') as Observable<TransitionEvent>\n      )\n        .pipe(filter((e: TransitionEvent) => e.target === element))\n        .subscribe(() => {\n          if (this.animationEnd.observers.length === 0) {\n            return;\n          }\n\n          if (this.mode === 'determinate' || this.mode === 'buffer') {\n            this._ngZone.run(() => this.animationEnd.next({value: this.value}));\n          }\n        });\n    });\n  }",
+            "sha256": "8fef8e24353e381a1affd68c919aaa0bdf23d57a41ca2f06abb12226fdb42de9"
+          },
+          {
+            "name": "ngOnDestroy",
+            "source": "ngOnDestroy() {\n    this._animationEndSubscription.unsubscribe();\n  }",
+            "sha256": "650a573c6210e1ad9fbae4c37ce7a46af064b3b3244c87b3429ffa46c37921c8"
+          }
+        ],
+        "scope": "One frozen public NgZone dependency and exact complete historical class members/mixin/template. The runtime producer tests manually constructed complete classes with genuine public peer NgZone/EventEmitter/ElementRef/coercion and borrowed RxJS. Decorators omitted; event target and geometry are explicit protocols. No Angular node DI, packed/AOT/native motion/style or full runtime-floor qualification."
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/progress-bar-zone-runtime-diagnostic.json",
+          "sha256": "7ebc9ea59413c1a4c6c1ce04c1d035ad2360864d266ced9105e4708d1f8f57f6"
+        },
+        {
+          "path": "compatibility/rc/progress-bar-zone-original-subjects.json",
+          "sha256": "c9f2f2d241bf795eaf3481fd215cd25e3c9360578835eb7e3d034db39c469a99"
+        },
+        {
+          "path": "compatibility/rc/progress-bar-zone-cyph-source-sanity.json",
+          "sha256": "8748b4489078d197862650e37db09870a440bd735f15003178a2af2d320add4f"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "compatibility/rc/ng-zone-public-subjects.json",
+          "sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/ng-zone-public-subjects.mjs",
+          "sha256": "0eb7c8966e8c1e8fc0e974a2c25f48e32c28a7d5b6f7448df839a6e67866763d"
+        },
+        {
+          "path": "scripts/progress-bar-zone-use-review.mjs",
+          "sha256": "3d289f0777bf2c176a814252c2b1fdeca405d35ca53eae99c5832600040b9cd9"
+        },
+        {
+          "path": "tests/progress_bar_zone_runtime_probe.mjs",
+          "sha256": "49e273176db1f923b7898f9d6b3f90178ea61136eb4960ed5e3033ed4313c537"
+        },
+        {
+          "path": "tests/progress_bar_zone_runtime_subject.mjs",
+          "sha256": "d7c09b5a3c2cc54a31de0540f7f5948a1895a51cdb92816a995c83953ec6b87f"
+        },
+        {
+          "path": "tests/test_progress_bar_zone_runtime.py",
+          "sha256": "c7e2f8ce05f2bc38e6140306b15814d9ece6a87192b614610930dfbe81437446"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-bar/internal/common-behaviors/color.ts",
+          "sha256": "1236aca56df8cf1d6c78e6378650ffffeeffc954033f26811fbc715daea94bfc"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-bar/progress-bar.html",
+          "sha256": "00f81e3d99f77d0157c006d81f251a6325b26773885dd76c355720a0bf89ff8a"
+        }
+      ]
+    }
+  ]
+}

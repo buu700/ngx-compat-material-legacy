@@ -23,6 +23,6 @@ class NgZoneRemainingRuntimeTests(unittest.TestCase):
         report = json.loads(result.stdout)
         self.assertEqual(report['subjects'], 10)
         self.assertEqual(report['mutation_rejections'], 36)
-        self.assertEqual(report['source_member_accesses'], 61)
+        self.assertEqual(report['source_member_accesses'], 62)
         self.assertEqual(report['new_frozen_use_closures'], 0)
         self.assertFalse(report['native_or_packed_qualified'])
