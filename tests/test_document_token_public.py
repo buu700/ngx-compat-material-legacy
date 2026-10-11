@@ -14,12 +14,12 @@ class DocumentTokenPublicTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         observed = json.loads(result.stdout.strip().splitlines()[-1])
         self.assertEqual(observed['frozen_uses'], 10)
-        self.assertEqual(observed['current_uses'], 12)
-        self.assertEqual(observed['delta_uses'], 2)
+        self.assertEqual(observed['current_uses'], 16)
+        self.assertEqual(observed['delta_uses'], 6)
         self.assertEqual(observed['subjects'], 6)
-        self.assertEqual(observed['cases'], 96)
-        self.assertEqual(observed['source_negative_controls'], 10)
-        self.assertEqual(observed['contract_negative_controls'], 15)
+        self.assertEqual(observed['cases'], 112)
+        self.assertEqual(observed['source_negative_controls'], 14)
+        self.assertEqual(observed['contract_negative_controls'], 17)
         self.assertFalse(observed['actual_legacy_components_executed'])
         self.assertFalse(observed['native_or_packed_qualified'])
 
@@ -40,8 +40,8 @@ const observe=(changed={},line=ledger.line)=>authoredUseReviewEvidence({symbol_u
 assert.deepEqual(observe(),{reviewed:10,insufficient:0,insufficient_uses:[]});
 for(const row of rows)assert.equal(observe({['projects/ngx-material-legacy/'+row.file]:Buffer.from('changed source')}).insufficient,1);
 const report=JSON.parse(readFileSync(rows[0].source_review.path));
-assert.equal(report.reviews.length,12);
-assert.equal(report.reviews.filter(r=>r.source_binding.frozen_use===false).length,2);
+assert.equal(report.reviews.length,16);
+assert.equal(report.reviews.filter(r=>r.source_binding.frozen_use===false).length,6);
 for(const e of report.reviews[0].independent_evidence)assert.equal(observe({[e.path]:Buffer.from('changed evidence')}).insufficient,10);
 assert.equal(observe({},ledger.line==='main'?'21.x':'main').insufficient,10);
 assert.equal(observe({[rows[0].source_review.path]:Buffer.from('changed review')}).insufficient,10);
