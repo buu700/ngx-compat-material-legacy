@@ -88,6 +88,29 @@ describe('MatSlideToggle without forms', () => {
       expect(slideToggleElement.classList).toContain('mat-accent');
     }));
 
+    it('should cancel deferred blur work when destroyed', fakeAsync(() => {
+      const touched = jasmine.createSpy('touched');
+      slideToggle.registerOnTouched(touched);
+      TestBed.inject(FocusMonitor).focusVia(inputElement, 'keyboard');
+      inputElement.blur();
+      expect(touched).not.toHaveBeenCalled();
+      fixture.destroy();
+      flush();
+      expect(touched).not.toHaveBeenCalled();
+    }));
+
+    it('should stop deferred view work if touching the form destroys it', fakeAsync(() => {
+      const marks = spyOn((slideToggle as any)._changeDetectorRef, 'markForCheck');
+      const touched = jasmine.createSpy('touched').and.callFake(() => fixture.destroy());
+      slideToggle.registerOnTouched(touched);
+      TestBed.inject(FocusMonitor).focusVia(inputElement, 'keyboard');
+      marks.calls.reset();
+      inputElement.blur();
+      flush();
+      expect(touched).toHaveBeenCalledTimes(1);
+      expect(marks).not.toHaveBeenCalled();
+    }));
+
     it('should correctly update the disabled property', fakeAsync(() => {
       expect(inputElement.disabled).toBeFalsy();
 
