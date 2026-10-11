@@ -1,0 +1,418 @@
+{
+  "schema_version": 1,
+  "role": "Menu-specific API/DI integration under delegated technical judgment; emitted source fixtures, not packed/AOT qualification",
+  "node": "v22.23.3",
+  "compiler": "6.0.3",
+  "runtime_peer": "22.1.7",
+  "source_caps": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/menu-item.ts",
+      "sha256": "78998cced10b89812010b41a0e6ea631d3e699c9f6b9e5ca228ebd6e1cd60283"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-item-context.ts",
+      "sha256": "c3b8f61d99dd73f64a246f63b59df9291d7cb13e1e9a44b500c9182159448b21"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-panel-token.ts",
+      "sha256": "3463226c000f63d599639bd1c400d744c9e02417bd9c57fe46e53827706180cd"
+    },
+    {
+      "path": "scripts/menu-item-construction-contract.mjs",
+      "sha256": "2324b8b60c9033fdf3b63bb4137609b846d72140d04ec3866fb4f7fcc883f7e1"
+    },
+    {
+      "path": "scripts/api-menu-item-factory.mjs",
+      "sha256": "a69870d4ffbaae484d81af58a3f159910dfe382dc258116638d7ce26d3f5c967"
+    },
+    {
+      "path": "scripts/api-di-observe.mjs",
+      "sha256": "4f5ea2f280f784f5c982f604b7f0de40c0d80a00e36ea36f0ab32867c70352ae"
+    },
+    {
+      "path": "scripts/api-surface.mjs",
+      "sha256": "d9c1901940f96febdffb227d68bc04e75bcc85987899d73e2b3e8491c0201b38"
+    },
+    {
+      "path": "scripts/api-completeness.mjs",
+      "sha256": "39877c4c2dd12db527be17448b156116c690d3a28faaca834cdcbfa3945a1c17"
+    },
+    {
+      "path": "tests/menu_item_api_contract_probe.mjs",
+      "sha256": "2073bb5addccca8c7461bd5341e90dfeb9e35724775531d7f70036ec6901246f"
+    },
+    {
+      "path": "compatibility/rc/api/menu-item-construction-contract.json",
+      "sha256": "9fc349c1a7b93c5d9174afd839dc480c89be26090795cb3b6c9895dfadeb1fd3"
+    },
+    {
+      "path": "compatibility/rc/menu-construction-consumer-decision.json",
+      "sha256": "82c9efa90f486ecb1cfb5e0a4bb782ccbd0a6aefb3e001d2b4c4de9d2cc74d0a"
+    },
+    {
+      "path": "compatibility/rc/menu-construction-consumer-decision-prior-attribution.json",
+      "sha256": "abd23806481867b903dad0518d770436c03ac31d608c42ddc21fe074183ed0b3"
+    },
+    {
+      "path": "compatibility/rc/api/signature-differences.json",
+      "sha256": "1a110e3337765fc494d5f9cc4d02059f47e8b62d734e51d10a30aa0a6314707c"
+    }
+  ],
+  "original": {
+    "constructor": {
+      "parent": "MatMenuItem",
+      "signatures": [
+        "public constructor(ElementRef<HTMLElement>,any,FocusMonitor,MatMenuPanel<MatMenuItem>|undefined,ChangeDetectorRef)",
+        "public constructor(ElementRef<HTMLElement>,any?,FocusMonitor?,MatMenuPanel<MatMenuItem>?,ChangeDetectorRef?)"
+      ],
+      "source_sha256": "f1c4c4a656aec1dafc93dbcc92507418b1a80abefd3a64fa85938ec8f9332b0a"
+    },
+    "factory": {
+      "family": "legacy-menu",
+      "name": "MatLegacyMenuItem",
+      "deps_kind": "inherited",
+      "declaration": "{ minVersion: \"12.0.0\", version: \"16.1.1\", ngImport: i0, type: MatLegacyMenuItem, deps: null, target: i0.ɵɵFactoryTarget.Component }",
+      "attributes": [],
+      "source": "fesm2022/legacy-menu.mjs",
+      "source_sha256": "bff6f9ebcded2d29c4c604efa6c3e56d66de567b6a21f54226f0bfb6b9dd29e4",
+      "inherited_factory": {
+        "family": "menu",
+        "name": "MatMenuItem",
+        "deps_kind": "dependencies",
+        "declaration": "{ minVersion: \"12.0.0\", version: \"16.1.1\", ngImport: i0, type: MatMenuItem, deps: [{ token: i0.ElementRef }, { token: DOCUMENT }, { token: i1.FocusMonitor }, { token: MAT_MENU_PANEL, optional: true }, { token: i0.ChangeDetectorRef }], target: i0.ɵɵFactoryTarget.Component }",
+        "attributes": [],
+        "source": "fesm2022/menu.mjs",
+        "source_sha256": "b959687b035871b5c718ca4ea75f293d67224cf6e25b0f1bf93f33519f3a3a6f"
+      }
+    },
+    "expected_factory_di": [
+      {
+        "ident": "ElementRef",
+        "imported": "ElementRef",
+        "spec": "@angular/core",
+        "optional": false
+      },
+      {
+        "ident": "DOCUMENT",
+        "imported": "DOCUMENT",
+        "spec": "@angular/common",
+        "optional": false
+      },
+      {
+        "ident": "FocusMonitor",
+        "imported": "FocusMonitor",
+        "spec": "@angular/cdk/a11y",
+        "optional": false
+      },
+      {
+        "ident": "MAT_MENU_PANEL",
+        "imported": "MAT_MENU_PANEL",
+        "spec": null,
+        "optional": true
+      },
+      {
+        "ident": "ChangeDetectorRef",
+        "imported": "ChangeDetectorRef",
+        "spec": "@angular/core",
+        "optional": false
+      }
+    ]
+  },
+  "signature_comparison": {
+    "comparison": "signature",
+    "blocking": [],
+    "rows": [
+      {
+        "status": "intentional-legacy-difference",
+        "historical": "public constructor(ElementRef<HTMLElement>,any,FocusMonitor,MatMenuPanel<MatMenuItem>|undefined,ChangeDetectorRef)",
+        "owned": "public constructor()",
+        "rationale": "Under the maintainer’s later delegation of conservative TypeScript choices, Codex retains the genuine current MatMenuItem parent and requires Angular DI construction, preserving Material16 legacy markup/styles. The earlier historical-implementation approval is not authority for this different choice. Only this authenticated historical menu-item overload changes; zero-argument DI construction replaces both manual forms. The finite owner-bound constructor/factory contract and actual execution are required; token identity, optional flags, errors and other APIs remain enforced.",
+        "construction_contract": "menu-item-angular-di-construction-v1"
+      },
+      {
+        "status": "intentional-legacy-difference",
+        "historical": "public constructor(ElementRef<HTMLElement>,any?,FocusMonitor?,MatMenuPanel<MatMenuItem>?,ChangeDetectorRef?)",
+        "owned": null,
+        "rationale": "Under the maintainer’s later delegation of conservative TypeScript choices, Codex retains the genuine current MatMenuItem parent and requires Angular DI construction, preserving Material16 legacy markup/styles. The earlier historical-implementation approval is not authority for this different choice. Only this authenticated historical menu-item overload changes; zero-argument DI construction replaces both manual forms. The finite owner-bound constructor/factory contract and actual execution are required; token identity, optional flags, errors and other APIs remain enforced.",
+        "construction_contract": "menu-item-angular-di-construction-v1"
+      }
+    ],
+    "reported_signatures": [
+      "public constructor()",
+      "public constructor(ElementRef<HTMLElement>,any,FocusMonitor,MatMenuPanel<MatMenuItem>|undefined,ChangeDetectorRef)",
+      "public constructor(ElementRef<HTMLElement>,any?,FocusMonitor?,MatMenuPanel<MatMenuItem>?,ChangeDetectorRef?)",
+      "type-params"
+    ],
+    "required_protected": [],
+    "required_constructor": false
+  },
+  "signature_mutants": [
+    {
+      "id": "missing-constructor",
+      "rejected": true,
+      "problems": [
+        "public constructor(ElementRef<HTMLElement>,any,FocusMonitor,MatMenuPanel<MatMenuItem>|undefined,ChangeDetectorRef)",
+        "public constructor(ElementRef<HTMLElement>,any?,FocusMonitor?,MatMenuPanel<MatMenuItem>?,ChangeDetectorRef?)",
+        "unresolved inherited constructor"
+      ]
+    },
+    {
+      "id": "rest-arguments",
+      "rejected": true,
+      "problems": [
+        "public constructor(ElementRef<HTMLElement>,any,FocusMonitor,MatMenuPanel<MatMenuItem>|undefined,ChangeDetectorRef)",
+        "public constructor(ElementRef<HTMLElement>,any?,FocusMonitor?,MatMenuPanel<MatMenuItem>?,ChangeDetectorRef?)",
+        "public constructor(...unknown[])"
+      ]
+    },
+    {
+      "id": "optional-manual-element",
+      "rejected": true,
+      "problems": [
+        "public constructor(ElementRef<HTMLElement>,any,FocusMonitor,MatMenuPanel<MatMenuItem>|undefined,ChangeDetectorRef)",
+        "public constructor(ElementRef<HTMLElement>,any?,FocusMonitor?,MatMenuPanel<MatMenuItem>?,ChangeDetectorRef?)",
+        "public constructor(unknown?)"
+      ]
+    },
+    {
+      "id": "extra-overload",
+      "rejected": true,
+      "problems": [
+        "public constructor(ElementRef<HTMLElement>,any,FocusMonitor,MatMenuPanel<MatMenuItem>|undefined,ChangeDetectorRef)",
+        "public constructor(ElementRef<HTMLElement>,any?,FocusMonitor?,MatMenuPanel<MatMenuItem>?,ChangeDetectorRef?)",
+        "public constructor()",
+        "public constructor(unknown)",
+        "public constructor(unknown?)"
+      ]
+    },
+    {
+      "id": "foreign-parent",
+      "rejected": true,
+      "problems": [
+        "public constructor(ElementRef<HTMLElement>,any,FocusMonitor,MatMenuPanel<MatMenuItem>|undefined,ChangeDetectorRef)",
+        "public constructor(ElementRef<HTMLElement>,any?,FocusMonitor?,MatMenuPanel<MatMenuItem>?,ChangeDetectorRef?)",
+        "public constructor()"
+      ]
+    },
+    {
+      "id": "shadow-parent",
+      "rejected": true,
+      "problems": [
+        "public constructor(ElementRef<HTMLElement>,any,FocusMonitor,MatMenuPanel<MatMenuItem>|undefined,ChangeDetectorRef)",
+        "public constructor(ElementRef<HTMLElement>,any?,FocusMonitor?,MatMenuPanel<MatMenuItem>?,ChangeDetectorRef?)",
+        "public constructor()"
+      ]
+    },
+    {
+      "id": "wrong-public-import",
+      "rejected": true,
+      "problems": [
+        "public constructor(ElementRef<HTMLElement>,any,FocusMonitor,MatMenuPanel<MatMenuItem>|undefined,ChangeDetectorRef)",
+        "public constructor(ElementRef<HTMLElement>,any?,FocusMonitor?,MatMenuPanel<MatMenuItem>?,ChangeDetectorRef?)",
+        "public constructor()"
+      ]
+    },
+    {
+      "id": "plain-rationale-cannot-authorize-construction",
+      "rejected": true
+    },
+    {
+      "id": "contract-identity-changed",
+      "rejected": true
+    },
+    {
+      "id": "authority-identity-changed",
+      "rejected": true
+    },
+    {
+      "id": "original-constructor-identity-changed",
+      "rejected": true
+    },
+    {
+      "id": "original-factory-identity-changed",
+      "rejected": true
+    }
+  ],
+  "authority_mutants": [
+    {
+      "id": "misattributed-specific-DI-approval",
+      "rejected": true
+    },
+    {
+      "id": "wrong-authority-kind",
+      "rejected": true
+    },
+    {
+      "id": "missing-delegation",
+      "rejected": true
+    },
+    {
+      "id": "lost-historical-proposal",
+      "rejected": true
+    }
+  ],
+  "runtime": [
+    {
+      "id": "actual-source-factory-checker-and-settlement",
+      "result": "pass",
+      "historical": "ElementRef|DOCUMENT|FocusMonitor|MAT_MENU_PANEL?|ChangeDetectorRef",
+      "observed": [
+        "Injector",
+        "MAT_MENU_PANEL?",
+        "ElementRef",
+        "DocumentToken",
+        "FocusMonitor",
+        "ChangeDetectorRef"
+      ],
+      "approved_construction": {
+        "profile_id": "menu-item-angular-di-construction-v1",
+        "contract_sha256": "9fc349c1a7b93c5d9174afd839dc480c89be26090795cb3b6c9895dfadeb1fd3",
+        "context": "actual factory/public application root with borrowed node services and synthetic DOM; native/AOT gates separate",
+        "behavior_problems": [],
+        "counts": {
+          "marks": 2,
+          "adds": 1,
+          "removes": 1,
+          "monitor": 1,
+          "stop": 1,
+          "focus": 1,
+          "foreignAdds": 0,
+          "foreignRemoves": 0,
+          "borrowedDestroyed": 0,
+          "styles": 1
+        },
+        "root_requests": [
+          {
+            "optional": false,
+            "unresolved": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "same-description-token-twin",
+      "result": "rejected",
+      "problems": [
+        "factory legacy-menu/primary/MatLegacyMenuItem owned panel and isolated peer panel: Values have same structure but are not reference-equal:\n\n{\n  addItem: [Function: addItem],\n  removeItem: [Function: removeItem]\n}\n",
+        "factory legacy-menu/primary/MatLegacyMenuItem owned teardown does not destroy borrowed services: Expected values to be strictly equal:\n\n0 !== 1\n",
+        "token legacy-menu/primary/MatLegacyMenuItem[1] expected MAT_MENU_PANEL observed MAT_MENU_PANEL",
+        "authorized menu construction observation incomplete"
+      ]
+    },
+    {
+      "id": "wrong-optional-flag",
+      "result": "rejected",
+      "problems": [
+        "optional legacy-menu/primary/MatLegacyMenuItem[1] expected true observed false"
+      ]
+    },
+    {
+      "id": "missing-manual-argument-rejection",
+      "result": "rejected",
+      "problems": [
+        "factory legacy-menu/primary/MatLegacyMenuItem manual dependency arguments explicitly reject: Missing expected exception.",
+        "token count legacy-menu/primary/MatLegacyMenuItem expected 6 observed 12 [Injector, MAT_MENU_PANEL, ElementRef, DocumentToken, FocusMonitor, ChangeDetectorRef, Injector, MAT_MENU_PANEL, ElementRef, DocumentToken, FocusMonitor, ChangeDetectorRef]",
+        "authorized menu construction observation incomplete"
+      ]
+    },
+    {
+      "id": "peer-optional-panel-leak",
+      "result": "rejected",
+      "problems": [
+        "factory legacy-menu/primary/MatLegacyMenuItem owned panel and isolated peer panel: Expected values to be strictly equal:\n\n1 !== 0\n",
+        "token count legacy-menu/primary/MatLegacyMenuItem expected 6 observed 7 [Injector, MAT_MENU_PANEL, ElementRef, DocumentToken, FocusMonitor, ChangeDetectorRef, MAT_MENU_PANEL]",
+        "authorized menu construction observation incomplete"
+      ]
+    },
+    {
+      "id": "wrong-new-target",
+      "result": "rejected",
+      "problems": [
+        "factory legacy-menu/primary/MatLegacyMenuItem real parent/leaf/node identity: The expression evaluated to a falsy value:\n\n  assert.ok(item instanceof Item)\n",
+        "authorized menu construction observation incomplete"
+      ]
+    },
+    {
+      "id": "empty-returning-factory",
+      "result": "rejected",
+      "problems": [
+        "factory legacy-menu/primary/MatLegacyMenuItem real parent/leaf/node identity: The expression evaluated to a falsy value:\n\n  assert.ok(item instanceof Item)\n",
+        "factory legacy-menu/primary/MatLegacyMenuItem owned panel and isolated peer panel: Expected values to be strictly equal:\n+ actual - expected\n\n+ undefined\n- {\n-   addItem: [Function: addItem],\n-   removeItem: [Function: removeItem]\n- }\n",
+        "factory legacy-menu/primary/MatLegacyMenuItem real caller root structural styles: Expected values to be strictly equal:\n\n0 !== 1\n",
+        "factory legacy-menu/primary/MatLegacyMenuItem borrowed monitor/document/detector behavior: item.ngAfterViewInit is not a function",
+        "factory legacy-menu/primary/MatLegacyMenuItem owned teardown does not destroy borrowed services: Cannot read properties of undefined (reading 'subscribe')",
+        "token count legacy-menu/primary/MatLegacyMenuItem expected 6 observed 0 []",
+        "authorized menu construction observation incomplete"
+      ]
+    },
+    {
+      "id": "throwing-factory",
+      "result": "rejected",
+      "problems": [
+        "factory legacy-menu/primary/MatLegacyMenuItem factory execution incomplete: factory did not complete",
+        "token count legacy-menu/primary/MatLegacyMenuItem expected 6 observed 0 []",
+        "authorized menu construction observation incomplete"
+      ]
+    }
+  ],
+  "settlement_mutants": [
+    {
+      "id": "missing-profile",
+      "rejected": true
+    },
+    {
+      "id": "wrong-profile",
+      "rejected": true
+    },
+    {
+      "id": "wrong-contract-hash",
+      "rejected": true
+    },
+    {
+      "id": "factory-not-returned",
+      "rejected": true
+    },
+    {
+      "id": "missing-root-execution",
+      "rejected": true
+    },
+    {
+      "id": "unresolved-root-provider",
+      "rejected": true
+    },
+    {
+      "id": "optional-root-service",
+      "rejected": true
+    },
+    {
+      "id": "borrowed-service-destroyed",
+      "rejected": true
+    },
+    {
+      "id": "missing-style-loading",
+      "rejected": true
+    },
+    {
+      "id": "missing-behavior-proof",
+      "rejected": true
+    },
+    {
+      "id": "behavior-failure",
+      "rejected": true
+    },
+    {
+      "id": "token-identity-failure",
+      "rejected": true
+    },
+    {
+      "id": "optional-flag-failure",
+      "rejected": true
+    }
+  ],
+  "limits": [
+    "Real Angular JIT factory executes emitted owned source against read-only22/publicroot with syntheticDOM/borrowed services.",
+    "Default CLI observes actual packed exports and peer modules; this test supplies real peer-module URLs only for worktree diagnostics.",
+    "Original reference/manual signatures and five-dependency DI expectation remain unchanged. Only the finite constructor choice under delegated TypeScript judgment is admitted; earlier historical-implementation approval is preserved separately.",
+    "No native boolean-input/provider/query, AOT/packed artifact, actual21/compiler,canonical/floor/security/G02 qualification."
+  ]
+}

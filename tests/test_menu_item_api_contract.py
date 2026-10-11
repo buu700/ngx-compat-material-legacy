@@ -1,4 +1,4 @@
-"""Finite owner-authorized menu construction cannot waive factory/identity failures."""
+"""Finite delegated menu construction cannot waive factory/identity failures."""
 from pathlib import Path
 import subprocess
 import unittest
