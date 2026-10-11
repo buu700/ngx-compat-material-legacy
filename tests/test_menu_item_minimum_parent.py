@@ -1,4 +1,4 @@
-"""Actual owned menu parent behavior uses each line's authenticated minimum peers."""
+"""Actual historical owned menu behavior uses each line's authenticated minimum peers."""
 # Copyright Google LLC All Rights Reserved.
 # Copyright (c) 2026 Ryan Lester.
 # MIT-style license: see LICENSE.
@@ -17,15 +17,13 @@ class MenuItemMinimumParentTests(unittest.TestCase):
             capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-7000:])
         observed = json.loads(result.stdout)
-        self.assertEqual(observed['current_uses'], 1)
         self.assertEqual(observed['minimum_namespaces'], 2)
         self.assertEqual(observed['development_production_contexts'], 4)
-        self.assertEqual(observed['parent_cases'], 52)
-        self.assertEqual(observed['parent_mutations_rejected'], 20)
-        self.assertEqual(observed['source_controls'], 9)
+        self.assertEqual(observed['signature_mutations_rejected'], 32)
+        self.assertEqual(observed['runtime_mutations_rejected'], 44)
+        self.assertEqual(observed['settlement_mutations_rejected'], 76)
         self.assertEqual(observed['namespace_controls'], 8)
-        self.assertEqual(observed['strict_subjects'], 2)
-        self.assertEqual(observed['actual_JIT_factory_subjects'], 2)
+        self.assertEqual(observed['actual_JIT_factory_subjects'], 4)
         self.assertFalse(observed['packed_or_native_qualified'])
 
 

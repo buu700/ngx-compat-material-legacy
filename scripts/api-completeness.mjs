@@ -563,14 +563,22 @@ export function settleDi(row, records) {
       && observation.contract_sha256 === contract.contract_sha256
       && row.factory_outcome === 'returned'
       && row.observed.length === contract.runtime_requests.length
+      && row.factory_returned_owned_instance === true
+      && Array.isArray(row.runtime_requests) && row.runtime_requests.length === contract.runtime_requests.length
+      && row.runtime_requests.every((request, index) => request.identity_matched === true
+        && request.unresolved === false && request.expected_ident === contract.runtime_requests[index].ident
+        && ['optional', 'self', 'skipSelf', 'host'].every(flag =>
+          request[flag] === Boolean(contract.runtime_requests[index][flag])))
       && Array.isArray(observation.behavior_problems) && observation.behavior_problems.length === 0
-      && observation.root_requests?.length === 1 && observation.root_requests[0].unresolved === false
-      && observation.root_requests[0].optional === false
-      && observation.counts?.borrowedDestroyed === 0 && observation.counts.styles > 0;
+      && observation.root_requests?.length === 0
+      && observation.counts?.borrowedDestroyed === 0
+      && observation.counts.requiredProviderControls === 4
+      && observation.counts.optionalPanelControls === 1
+      && observation.counts.manualOverloads === 2 && observation.counts.subclassControls === 1;
     if (!complete) return {...row, result: 'fail', status: 'mismatch', historical, owned,
       problems: [...row.problems, 'authorized menu construction observation incomplete']};
     if (!row.problems.length) return {...row, result: 'pass', status: 'intentional-legacy-difference', historical, owned,
-      rationale: 'Owner accepted Angular DI construction while preserving the genuine public parent and Material16 markup/styles. Original five-dependency/manual constructor evidence is retained. This exact executed public/owned context is checked by object identity, flags, real root resolution and lifetime behavior.'};
+      rationale: 'Owner explicitly approved the historical item implementation and current-parent subtype change. Original one/five-argument manual construction and inherited five-service factory execute without an application; exact public/owned token objects, flags, missing required providers, optional panel, behavior, subclassing and borrowed lifetime remain enforced. Native/AOT/packed and unchanged Material16 markup/styles are separate gates.'};
   }
   if (!row.problems.length) {
     if(row.symbol.symbol_id===MENU_CONTENT_SYMBOL)return {...row,result:'pass',status:'intentional-legacy-difference',historical,owned,rationale:'Maintainer delegated conservative TypeScript changes with unchanged required consumer styles and Cyph sanity. Only the authenticated unused resolver slot is removed; all other token objects/options remain checked. Actual public template/outlet identities, contexts, reattachment, movement, detach, owned teardown and borrowed caller view/lifetime execute. Original seven dependencies remain visible.'};

@@ -34,7 +34,6 @@ try {
   });
   check('strict-constructors-reject-outside-before-protocol-parent', () => {
     const before = {...scopes.counts};
-    assert.throws(() => new scopes.MatLegacyMenuItem(), /NG0203|injection context/);
     assert.throws(() => new scopes.MatLegacyTable(), /NG0203|injection context/);
     assert.deepEqual(scopes.counts, before);
   });
@@ -45,9 +44,6 @@ try {
     assert.equal(scopes.ambientService(valueToken), value);
     assert.equal(scopes.tabHeaderRenderInjector(), root);
     assert.equal(scopes.tabBodyNgZone(), zone);
-    const item = new scopes.MatLegacyMenuItem();
-    assert.ok(item instanceof scopes.MatLegacyMenuItem);
-    assert.equal(scopes.counts.menu, 1);
     assert.ok(new scopes.MatLegacyTable() instanceof scopes.MatLegacyTable);
     assert.equal(scopes.counts.table, 1);
   }));
@@ -58,7 +54,7 @@ try {
   }));
   check('obsolete-manual-arguments-reject-before-parent', () => core.runInInjectionContext(root, () => {
     const before = {...scopes.counts};
-    for (const construct of [() => new scopes.MatLegacyMenuItem(value), () => new scopes.MatLegacyTable(value)])
+    for (const construct of [() => new scopes.MatLegacyTable(value)])
       assert.throws(construct, /manual dependency arguments/);
     assert.deepEqual(scopes.counts, before);
   }));
@@ -94,7 +90,7 @@ try {
   });});
   await later; cases.push('context-does-not-leak-across-microtask');
   console.log(JSON.stringify({line, mode, framework: core.VERSION.full, cases,
-    actual_owned_guard_scopes: 8, direct_ambient_inject_scopes: 2,
+    actual_owned_guard_scopes: 7, direct_ambient_inject_scopes: 2,
     whole_public_core_executed: true, other_values_tokens_and_parents_are_protocols: true,
     complete_components_or_automatic_node_root_graphs_qualified: false}));
 } finally {plain.destroy(); root.destroy();}

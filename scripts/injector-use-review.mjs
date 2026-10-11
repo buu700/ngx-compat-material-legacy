@@ -28,7 +28,6 @@ const deltaFiles=[
  'legacy-autocomplete/internal/after-legacy-render.ts',
  'legacy-form-field/form-field.ts',
  'legacy-form-field/internal/after-form-field-render.ts',
- 'legacy-menu/internal/menu-item-context.ts',
  'legacy-select/internal/after-select-render.ts',
  'legacy-select/internal/select-base.ts',
  'legacy-table/internal/public-constructor-context.ts',
@@ -130,5 +129,5 @@ export function reviewInjectorUses({root=rootDefault,readSource}={}){
  assert.deepEqual(current,[...uses.map(u=>u.file),...deltaFiles].sort(),'current Injector dependency population changed');
  const deltaInventory=deltaFiles.map(file=>({file,module:'@angular/core',symbol:'Injector',candidate_source_sha256:hash(read('projects/ngx-material-legacy/'+file)),status:'pending-individual-delta-review'}));
  return {schema_version:1,line:JSON.parse(read('projects/ngx-material-legacy/package.json')).version.startsWith('21.')?'21.x':'main',compiler:ts.version,cases,current_named_imports:current.length,delta_inventory:deltaInventory,
-  scope:'Six frozen public Injector annotation/forward/get/object-create boundaries. Two children provide existing values; there is no imported static/private/deprecated/numeric-flags constructor or child destruction call. Eleven additional current imports are inventoried separately and remain pending individual delta review. Portal/dialog/snack behavior and actual component/application/packed/native/full floors remain separate.',g11_claim:'not-passed'};
+  scope:'Six frozen public Injector annotation/forward/get/object-create boundaries. Two children provide existing values; there is no imported static/private/deprecated/numeric-flags constructor or child destruction call. Ten additional current imports are inventoried separately and remain pending individual delta review. Portal/dialog/snack behavior and actual component/application/packed/native/full floors remain separate.',g11_claim:'not-passed'};
 }

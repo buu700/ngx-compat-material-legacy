@@ -50,10 +50,11 @@ try {
   const aliased = tooltipText.replace('  ElementRef,', '  ElementRef as NativeRef,').replace(/\bElementRef\b/g, 'NativeRef').replace('NativeRef as NativeRef', 'ElementRef as NativeRef');
   const alias = await reviewElementRefUses({root, subjects, skipDiagnostics: true, readSource: path => path === tooltip ? aliased : read(path)});
   assert.equal(alias.cases.find(c => c.file === 'legacy-tooltip/internal/tooltip-base.ts').local_name, 'NativeRef');
-  const context = 'projects/ngx-material-legacy/legacy-menu/internal/menu-item-context.ts', contextText = read(context);
-  const shadow = contextText.replace('inject(ElementRef)', 'fakeInject(ElementRef)') + '\nfunction fakeInject(token:any){return null;}\n';
-  await assert.rejects(reviewElementRefUses({root, subjects, skipDiagnostics: true, readSource: path => path === context ? shadow : read(path)}), /does not resolve to public imported function/);
-  mutations.push({id: 'supplementary-inject-shadow', rejected: true});
+  const context = 'projects/ngx-material-legacy/legacy-menu/internal/menu-item-base.ts', contextText = read(context);
+  const typeOnly = contextText.replace('  ElementRef,', '  type ElementRef,');
+  assert.notEqual(typeOnly, contextText);
+  await assert.rejects(reviewElementRefUses({root, subjects, skipDiagnostics: true, readSource: path => path === context ? typeOnly : read(path)}), /Angular ElementRef constructor token imported as type only/);
+  mutations.push({id: 'owned-menu-constructor-token-type-only', rejected: true});
   report.alias_positive = true; report.mutations = mutations; assert.equal(mutations.length, 21);
   report.angular_constructor_input_references = report.cases.flatMap(c => c.references).filter(r => r.angular_constructor_input).length;
   if (options['--report']) {assert.equal(existsSync(options['--report']), false); writeFileSync(options['--report'], JSON.stringify(report, null, 2) + '\n');}

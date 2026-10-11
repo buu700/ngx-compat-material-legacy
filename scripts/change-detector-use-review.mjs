@@ -21,7 +21,7 @@ const prefix = 'projects/ngx-material-legacy/';
 const supplements = ['legacy-dialog/dialog-container.ts',
   'legacy-dialog/internal/dialog-container-base.ts',
   'legacy-dialog/internal/dialog-container-state.ts',
-  'legacy-menu/internal/menu-item-context.ts'].sort();
+  'legacy-menu/internal/menu-item-base.ts'].sort();
 function one(nodes, label) { assert.equal(nodes.length, 1, label); return nodes[0]; }
 function imported(source, name) {
   return source.statements.filter(ts.isImportDeclaration).filter(node =>
@@ -76,6 +76,8 @@ export function scanChangeDetectorUses({root = rootDefault, readSource} = {}) {
           while (ts.isUnionTypeNode(context)) context = context.parent;
           assert.ok(ts.isParameter(context) || ts.isPropertyDeclaration(context) || ts.isPropertySignature(context),
             'unreviewed detector type context');
+          if (ts.isParameter(context) && ts.isConstructorDeclaration(context.parent)
+              && ts.getDecorators(context.parent.parent)?.length) coreBinding(checker, node, 'ChangeDetectorRef');
           role = 'type:' + ts.SyntaxKind[context.kind]; addReceiver(context);
         } else if (ts.isCallExpression(parent) && parent.arguments.length === 1 && parent.arguments[0] === node) {
           coreBinding(checker, node, 'ChangeDetectorRef');
@@ -86,14 +88,6 @@ export function scanChangeDetectorUses({root = rootDefault, readSource} = {}) {
           if (!isAmbient) coreBinding(checker, parent.expression, 'inject');
           role = isAmbient ? 'owned-optional-ambient-token' : 'public-inject-token';
           if (ts.isPropertyDeclaration(parent.parent)) addReceiver(parent.parent);
-        } else if (ts.isArrayLiteralExpression(parent) && file === 'legacy-menu/internal/menu-item-context.ts' &&
-                   parent.elements.length === 2 && parent.elements[0] === node) {
-          coreBinding(checker, node, 'ChangeDetectorRef');
-          const value = parent.elements[1];
-          assert.ok(ts.isCallExpression(value) && value.arguments.length === 1 &&
-            checker.getSymbolAtLocation(value.arguments[0]) === symbol, 'detector context token/value pair changed');
-          coreBinding(checker, value.expression, 'inject');
-          role = 'owned-menu-context-token-key'; context = parent;
         } else assert.fail('unreviewed detector import role');
         references.push({line: source.getLineAndCharacterOfPosition(node.getStart(source)).line + 1,
           role, context: context.getText(source)});
@@ -106,8 +100,8 @@ export function scanChangeDetectorUses({root = rootDefault, readSource} = {}) {
   }
   assert.deepEqual(cases.filter(row => row.supplementary).map(row => row.file).sort(), supplements);
   assert.deepEqual(cases.filter(row => !row.supplementary).map(row => row.file).sort(), frozen.map(row => row.file).sort());
-  assert.equal(cases.length, 42); assert.equal(cases.flatMap(row => row.references).length, 48);
-  assert.equal(receivers.size, 46);
+  assert.equal(cases.length, 42); assert.equal(cases.flatMap(row => row.references).length, 49);
+  assert.equal(receivers.size, 49);
   const calls = [];
   for (const path of paths) {
     const source = program.getSourceFile(join(root, path));
@@ -131,7 +125,7 @@ export function scanChangeDetectorUses({root = rootDefault, readSource} = {}) {
     }
     visit(source);
   }
-  assert.equal(calls.length, 94); assert.equal(calls.filter(row => row.method === 'markForCheck').length, 85);
+  assert.equal(calls.length, 96); assert.equal(calls.filter(row => row.method === 'markForCheck').length, 87);
   assert.equal(calls.filter(row => row.method === 'detectChanges').length, 9);
   return {frozen_uses: 38, current_uses: 42, supplementary_uses: 4, cases,
     receiver_declarations: receiverRecords, calls, binding_parser: ts.version,

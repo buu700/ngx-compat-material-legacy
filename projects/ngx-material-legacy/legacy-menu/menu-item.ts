@@ -8,13 +8,12 @@
  */
 
 import {
-  assertInInjectionContext,
   ChangeDetectionStrategy,
   Component,
   ViewEncapsulation,
 } from '@angular/core';
-import {MatMenuItem as BaseMatMenuItem} from '@angular/material/menu';
-import {constructLegacyMenuItem} from './internal/menu-item-context';
+import {MatMenuItem as PeerMatMenuItem} from '@angular/material/menu';
+import {_LegacyMenuItemBase} from './internal/menu-item-base';
 
 /**
  * Single item inside of a `mat-menu`. Provides the menu item styling and accessibility treatment.
@@ -23,6 +22,7 @@ import {constructLegacyMenuItem} from './internal/menu-item-context';
   standalone: false,
   selector: '[mat-menu-item]',
   exportAs: 'matMenuItem',
+  inputs: ['disabled', 'disableRipple'],
   host: {
     '[attr.role]': 'role',
     '[class.mat-menu-item]': 'true',
@@ -32,6 +32,8 @@ import {constructLegacyMenuItem} from './internal/menu-item-context';
     '[attr.aria-disabled]': 'disabled.toString()',
     '[attr.disabled]': 'disabled || null',
     'class': 'mat-focus-indicator',
+    '(click)': '_checkDisabled($event)',
+    '(mouseenter)': '_handleMouseEnter()',
 
     // Classes added by the base class that should be removed.
     '[class.mat-mdc-menu-item]': 'false',
@@ -43,19 +45,9 @@ import {constructLegacyMenuItem} from './internal/menu-item-context';
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
   templateUrl: 'menu-item.html',
-  providers: [{provide: BaseMatMenuItem, useExisting: MatLegacyMenuItem}],
+  providers: [
+    {provide: PeerMatMenuItem, useExisting: MatLegacyMenuItem},
+    {provide: _LegacyMenuItemBase, useExisting: MatLegacyMenuItem},
+  ],
 })
-export class MatLegacyMenuItem extends BaseMatMenuItem {
-  /** Construct through Angular DI; the current public parent supplies input transforms. */
-  // An ES derived constructor may return an object without calling super. The helper
-  // executes the genuine parent once with new.target; this class must have no fields.
-  // TypeScript currently requires a syntactic super call even for that valid ES case.
-  // @ts-expect-error TS2377: the returned genuine parent instance initializes this.
-  constructor() {
-    if (arguments.length) {
-      throw new Error('MatLegacyMenuItem requires Angular DI; manual dependency arguments are not supported.');
-    }
-    assertInInjectionContext(MatLegacyMenuItem);
-    return constructLegacyMenuItem(new.target);
-  }
-}
+export class MatLegacyMenuItem extends _LegacyMenuItemBase {}

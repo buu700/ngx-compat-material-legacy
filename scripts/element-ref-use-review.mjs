@@ -21,7 +21,7 @@ const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const seedHash = '3e059e3d9ba423b9f666fcf3ec960945cb43555750eb5fa3025a503d3cd8795b';
 const capsuleHash = 'e08da48b91457bdf614c290fa67ca1930c71ddcc80f0ac87968b5d81aff65b20';
 const pins = {original: '16.2.12', main: '22.1.7', '21.x': '21.2.23'}, moduleName = '@angular/core';
-const deltaFiles = ['legacy-dialog/internal/dialog-container-base.ts', 'legacy-dialog/dialog-container.ts', 'legacy-table/cell.ts', 'legacy-table/internal/table-outlet.ts', 'legacy-menu/internal/menu-item-context.ts'];
+const deltaFiles = ['legacy-dialog/internal/dialog-container-base.ts', 'legacy-dialog/dialog-container.ts', 'legacy-table/cell.ts', 'legacy-table/internal/table-outlet.ts', 'legacy-menu/internal/menu-item-base.ts'];
 const printer = ts.createPrinter({removeComments: true}), print = (node, source) => printer.printNode(ts.EmitHint.Unspecified, node, source).trim();
 function parse(path, text) {const source = ts.createSourceFile(path, text, ts.ScriptTarget.Latest, true); assert.equal(source.parseDiagnostics.length, 0); return source;}
 const stable = node => assert.ok(!ts.getJSDocTags(node).some(tag => ['deprecated', 'docs-private', 'experimental', 'breaking-change'].includes(tag.tagName.text)), 'unstable ElementRef declaration/export');
@@ -185,14 +185,6 @@ export async function reviewElementRefUses({root = defaultRoot, readSource, comp
             assert.ok(!binding.isTypeOnly && !binding.parent.parent.isTypeOnly, 'ElementRef runtime imported as type only');
             if (ts.isBinaryExpression(parent) && parent.operatorToken.kind === ts.SyntaxKind.InstanceOfKeyword && parent.right === node) {assert.equal(file, 'legacy-tooltip/internal/tooltip-base.ts'); kind = 'public-instanceof';}
             else if (ts.isPropertyAssignment(parent) && parent.name.getText(source) === 'provide' && parent.initializer === node) {assert.equal(file, 'legacy-table/cell.ts'); kind = 'public-provider-token';}
-            else if (ts.isCallExpression(parent) && parent.arguments.length === 1 && parent.arguments[0] === node && ts.isIdentifier(parent.expression)) {
-              assert.equal(file, 'legacy-menu/internal/menu-item-context.ts');
-              const injectBindings = source.statements.filter(ts.isImportDeclaration).filter(n => n.moduleSpecifier.text === moduleName && n.importClause?.namedBindings && ts.isNamedImports(n.importClause.namedBindings))
-                .flatMap(n => n.importClause.namedBindings.elements.filter(item => (item.propertyName || item.name).text === 'inject'));
-              assert.equal(injectBindings.length, 1); assert.ok(checker.getSymbolAtLocation(parent.expression) === checker.getSymbolAtLocation(injectBindings[0].name), 'ElementRef inject does not resolve to public imported function');
-              kind = 'public-inject-token';
-            }
-            else if (ts.isArrayLiteralExpression(parent) && parent.elements[0] === node && parent.elements.length === 2) {assert.equal(file, 'legacy-menu/internal/menu-item-context.ts'); kind = 'token-value-map-key';}
             else assert.fail('unreviewed ElementRef runtime/subclass/alias reference');
           }
           const angularConstructorInput = ts.isTypeReferenceNode(parent) && ts.isParameter(parent.parent) && ts.isConstructorDeclaration(parent.parent.parent) && !!ts.getDecorators(parent.parent.parent.parent)?.length;
@@ -203,7 +195,7 @@ export async function reviewElementRefUses({root = defaultRoot, readSource, comp
       visit(source); assert.ok(references.length); cases.push({file, module: moduleName, symbol: 'ElementRef', frozen_use: uses.some(u => u.file === file), local_name: binding.name.text, candidate_source_sha256: hash(source.text), references});
     }
     const population = cases.flatMap(c => c.references).reduce((o,r) => {o[r.kind] = (o[r.kind] ?? 0) + 1; return o;}, {});
-    assert.deepEqual(population, {'type-or-constructor-annotation': 138, 'public-instanceof': 1, 'public-provider-token': 3, 'token-value-map-key': 1, 'public-inject-token': 1});
+    assert.deepEqual(population, {'type-or-constructor-annotation': 141, 'public-instanceof': 1, 'public-provider-token': 3});
     const manifest = JSON.parse(read('projects/ngx-material-legacy/package.json')), line = manifest.version.startsWith('21.') ? '21.x' : 'main'; assert.equal(manifest.peerDependencies[moduleName], '^' + pins[line]);
     return {schema_version: 1, line, node: process.version, binding_parser: ts.version, frozen_uses: 67, current_uses: 72, current_delta_uses: 5, cases, population, rxjs, source_override_used: !!readSource,
       behaviors: skipDiagnostics ? [] : models.map(m => ({line: m.subject.line, ...exerciseElementRef(m.runtime)})), type_compilation: skipDiagnostics ? null : compileElementRefTypes(models, compilerRoot),

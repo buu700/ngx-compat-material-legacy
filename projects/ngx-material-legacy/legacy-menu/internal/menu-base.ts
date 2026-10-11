@@ -9,6 +9,7 @@
  * Owned Material-16 `_MatMenuBase` (removed from Angular Material 22).
  */
 
+import {_LegacyMenuItemBase as MatMenuItem} from './menu-item-base';
 import {
   AfterContentInit,
   ChangeDetectionStrategy,
@@ -63,8 +64,8 @@ import {startWith, switchMap, take} from 'rxjs/operators';
 import {
   MAT_MENU_CONTENT,
   MAT_MENU_DEFAULT_OPTIONS,
+  MatMenuItem as PeerMatMenuItem,
   MatMenuDefaultOptions,
-  MatMenuItem,
   MenuCloseReason,
   MenuPositionX,
   MenuPositionY,
@@ -91,7 +92,7 @@ export class _MatMenuBase
   protected _baseElevation: number;
 
   /** All items inside the menu. Includes items nested inside another menu. */
-  @ContentChildren(MatMenuItem, {descendants: true}) _allItems: QueryList<MatMenuItem>;
+  @ContentChildren(PeerMatMenuItem, {descendants: true}) _allItems: QueryList<MatMenuItem>;
 
   /** Only the direct descendant menu items. */
   _directDescendantItems = new QueryList<MatMenuItem>();
@@ -176,7 +177,7 @@ export class _MatMenuBase
    * @deprecated
    * @breaking-change 8.0.0
    */
-  @ContentChildren(MatMenuItem, {descendants: false}) items: QueryList<MatMenuItem>;
+  @ContentChildren(PeerMatMenuItem, {descendants: false}) items: QueryList<MatMenuItem>;
 
   /**
    * Menu content that will be rendered lazily.

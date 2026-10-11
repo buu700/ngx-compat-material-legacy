@@ -26,7 +26,6 @@ const recipes = [
   {file: 'legacy-core/pseudo-checkbox/pseudo-checkbox.ts', name: 'MatLegacyPseudoCheckbox', kind: 'constructor', fallback: 'inContext = false;'},
   {file: 'legacy-dialog/dialog-container.ts', name: 'dialogAnimationsDisabled', fallback: 'false', tail: 'return legacyAnimationsDisabled();'},
   {file: 'legacy-dialog/internal/dialog-container-base.ts', name: 'ambientService', fallback: 'null', tail: 'return inject(token, {optional: true});'},
-  {file: 'legacy-menu/menu-item.ts', name: 'MatLegacyMenuItem', kind: 'constructor', strict: true},
   {file: 'legacy-table/table.ts', name: 'MatLegacyTable', kind: 'constructor', strict: true},
   {file: 'legacy-tabs/internal/after-tab-header-render.ts', name: 'tabHeaderRenderInjector', fallback: 'null', tail: 'return inject(Injector);'},
   {file: 'legacy-tabs/internal/tab-body-base.ts', name: 'tabBodyNgZone', fallback: 'null', tail: 'return inject(NgZone, {optional: true});'},
@@ -44,7 +43,7 @@ export function prepareCurrentInjectionContexts({root = rootDefault} = {}) {
   const guardUses = current.symbol_uses.filter(r => r.module === '@angular/core' && r.symbol === 'assertInInjectionContext');
   assert.deepEqual(guardUses.map(r => r.file).sort(), recipes.map(r => r.file).sort(), 'unreviewed context guard population');
   const uses = [...guardUses, ...current.symbol_uses.filter(r => r.module === '@angular/core' && r.symbol === 'inject' && directInjectFiles.has(r.file))];
-  assert.equal(uses.length, 10);
+  assert.equal(uses.length, 9);
   return {uses, source_files: current.source_files, source_population_sha256: current.source_population_sha256};
 }
 
@@ -92,7 +91,7 @@ export function reviewCurrentInjectionContexts({root = rootDefault, model, readS
       assert.ok(ts.isNewExpression(rejection[0].expression) && rejection[0].expression.expression.getText(file) === 'Error');
       assert.ok(ts.isStringLiteral(rejection[0].expression.arguments[0]));
       assert.equal(normalize(print(statements[1], file)), normalize(`${guardName}(${recipe.name});`));
-      const tail = recipe.name === 'MatLegacyMenuItem' ? 'return constructLegacyMenuItem(new.target);' : 'super();';
+      const tail = 'super();';
       assert.equal(normalize(print(statements[2], file)), normalize(tail));
     } else {
       const at = recipe.kind === 'constructor' ? 1 : 0;
@@ -135,10 +134,10 @@ export function reviewCurrentInjectionContexts({root = rootDefault, model, readS
       snippets.getLegacyAnimationsState = print(policy, file).replace(/^export /, '');
     }
   }
-  assert.equal(cases.length, 10);
+  assert.equal(cases.length, 9);
   const line = JSON.parse(read(prefix + 'package.json')).version.startsWith('21.') ? '21.x' : 'main';
   return {schema_version: 1, line, cases, snippets,
     source_population_sha256: model.source_population_sha256,
     source_files: model.source_files.length,
-    scope: 'Eight actual guard scopes and two direct ambient-inject imports. Constructor/helper bodies execute separately with explicit dependency protocols; full components and their peer parent graphs, styles, motion lifecycle, automatic node/root DI, packed/AOT/native and complete consumer floors remain independent.', g11_claim: 'not-passed'};
+    scope: 'Seven actual guard scopes and two direct ambient-inject imports. Constructor/helper bodies execute separately with explicit dependency protocols; full components and their peer parent graphs, styles, motion lifecycle, automatic node/root DI, packed/AOT/native and complete consumer floors remain independent.', g11_claim: 'not-passed'};
 }
