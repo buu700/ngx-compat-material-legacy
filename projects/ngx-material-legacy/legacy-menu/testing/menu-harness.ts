@@ -8,11 +8,9 @@
  */
 
 import {HarnessPredicate} from '@angular/cdk/testing';
-import {
-  MenuHarnessFilters,
-  MenuItemHarnessFilters,
-} from '@angular/material/menu/testing';
+import {MenuItemHarnessFilters} from '@angular/material/menu/testing';
 import {_MatMenuHarnessBase, _MatMenuItemHarnessBase} from './menu-harness-base';
+import {LegacyMenuHarnessFilters} from './menu-harness-filters';
 
 /**
  * Harness for interacting with a standard mat-menu in tests.
@@ -25,7 +23,7 @@ export class MatLegacyMenuHarness extends _MatMenuHarnessBase<
   static hostSelector = '.mat-menu-trigger';
   protected _itemClass = MatLegacyMenuItemHarness;
 
-  static with(options: MenuHarnessFilters = {}): HarnessPredicate<MatLegacyMenuHarness> {
+  static with(options: LegacyMenuHarnessFilters = {}): HarnessPredicate<MatLegacyMenuHarness> {
     return new HarnessPredicate(MatLegacyMenuHarness, options).addOption(
       'triggerText',
       options.triggerText,

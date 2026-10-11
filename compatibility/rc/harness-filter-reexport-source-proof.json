@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "recorded_at_utc": "2026-10-11T04:52:50.172225+00:00",
+  "worksheet": "C04 exact historical filter declarations/imports/reexports and menu type ownership",
+  "source_head_before_changes": "31d8e0049ae75ecb721e43810b4047f2286b618d",
+  "problem": "The public current MenuHarnessFilters type adds triggerIconName, while the owned historical MatLegacyMenuHarness.with predicate only applies triggerText. Reexporting the current type exposes an ignored criterion.",
+  "repair": "Own exactly the tagged legacy menu filter interface and use it in the existing legacy harness signature/public alias. No selector or runtime predicate changes.",
+  "sources": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/testing/menu-harness-filters.ts",
+      "sha256": "f8e844a0895303f41fcd80307323f490c7994e73ca0faa64e9e4651beafae360"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/testing/menu-harness.ts",
+      "sha256": "8a5e3af02e255c572bb0d5380c8e9be1ef22700a7c79f921875049af8d2ed6ea"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/testing/public-api.ts",
+      "sha256": "d0ca66da4e63a90ccdd6189c23354b7af6060fcd203a0c72db762d447bc9bbf9"
+    },
+    {
+      "path": "scripts/harness-filter-reexports-review.mjs",
+      "sha256": "92cced3479de9c5e117f123b5eb93e65d65dc632b0c73a68fb3ffc894527ecb7"
+    },
+    {
+      "path": "tests/harness_filter_reexports_probe.mjs",
+      "sha256": "95e8ddcb7f693a7bb708be0b9a5a270c78aff945e34c78b739329eef6d03144f"
+    }
+  ],
+  "subjects": {
+    "path": "compatibility/rc/harness-filter-reexport-subjects.json",
+    "sha256": "6e7205b69715544f50b1bc50f6d567922437d0d3490555810d017a387b32f290"
+  },
+  "diagnostic": {
+    "path": "compatibility/rc/harness-filter-reexport-diagnostic.json",
+    "sha256": "91680dcacd1e78b32c5be33c1e4e08429b5333bc172737fa2e7e32e4ec315c27"
+  },
+  "predicate_revalidation": {
+    "path": "compatibility/rc/harness-filter-predicate-revalidation.json",
+    "sha256": "6410ec87f8e86953e2fa57df3856fcf3f98382e2aa9f123c005a3f8e0009818d"
+  },
+  "frozen_uses_reviewed": 23,
+  "current_uses_reviewed": 19,
+  "stable_declarations": 19,
+  "public_aliases": 18,
+  "menu_with_body_matches_tag": true,
+  "type_only_emit": {
+    "line": "main",
+    "prior_source_sha256": "3f5658dda413b42fd9e900c33335f00e9f3c17337f199977ab3bf7ff0d2fd265",
+    "current_source_sha256": "8a5e3af02e255c572bb0d5380c8e9be1ef22700a7c79f921875049af8d2ed6ea",
+    "emitted_js_sha256": "42d6f9e02a3a79322cff0295e1eb4b54c3c9fc7b478e1909c647294e4cd426f7",
+    "emitted_js_unchanged": true,
+    "compiler": "6.0.3"
+  },
+  "strict_type_checks": {
+    "compiler": "6.0.3",
+    "compiler_sha256": "569177652966bd528c319171c7dd22860dbf72bde116cbc4f644f1d02bb12e39",
+    "strict": true,
+    "skip_lib_check": false,
+    "declaration_contracts": 19,
+    "public_aliases": 18,
+    "negative_checks": 4,
+    "fixture_sha256": "8989a621474fa11448c3235f9884f482eeabb31a885f3e0a6fd8c442a66da974",
+    "scope": "Authentic extracted public erased declarations and aliases, not full Angular or packed consumer execution"
+  },
+  "negative_reviewer_controls": 4,
+  "cyph_sanity": {
+    "scope": "Read-only TypeScript/HTML/CSS/SCSS search for triggerIconName, legacy/current menu harness/filter names",
+    "matching_uses": 0,
+    "consumer_edits": false
+  },
+  "pending_input_filters": [
+    {
+      "symbol": "InputHarnessFilters",
+      "original": "interface InputHarnessFilters extends BaseHarnessFilters {\n    value?: string | RegExp;\n    placeholder?: string | RegExp;\n}",
+      "peer": "interface InputHarnessFilters extends MatFormFieldControlHarnessFilters {\n    value?: string | RegExp;\n    placeholder?: string | RegExp;\n}",
+      "reason": "Current form-field control filters add label; public class and legacy DOM behavior remain to be reviewed"
+    },
+    {
+      "symbol": "NativeSelectHarnessFilters",
+      "original": "interface NativeSelectHarnessFilters extends BaseHarnessFilters {\n}",
+      "peer": "interface NativeSelectHarnessFilters extends MatFormFieldControlHarnessFilters {\n}",
+      "reason": "Current form-field control filters add label; public class and legacy DOM behavior remain to be reviewed"
+    }
+  ],
+  "limits": [
+    "Only the 23 frozen and 19 enumerated current erased type/import/reexport routes are reviewed.",
+    "Two input filter types have current label inheritance and remain open for actual public harness class and legacy DOM behavior review.",
+    "No packed/AOT/native/full Node/RxJS floor consumer build ran; no required consumer HTML/CSS/SCSS change.",
+    "No G11 or full plan completion claim."
+  ],
+  "g11_claim": "not-passed"
+}
