@@ -15,10 +15,10 @@ import assert from 'node:assert/strict';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const MENU_ITEM_SYMBOL = 'legacy-menu/primary/MatLegacyMenuItem';
 export const MENU_ITEM_CONTRACT_PATH = 'compatibility/rc/api/menu-item-construction-contract.json';
-const contractSha = 'a6b359ddf6878f58512cbe63e87b7ddbcf9f21e494ed0e1d4144919f82c81a6f';
+const contractSha = '9fc349c1a7b93c5d9174afd839dc480c89be26090795cb3b6c9895dfadeb1fd3';
 const sha = bytes => createHash('sha256').update(bytes).digest('hex');
 
-/** Finite menu-only owner decision; never replace the original authenticated shape. */
+/** Finite menu-only judgment under delegated TypeScript authority; original shape retained. */
 export function approvedMenuItemContract(symbol, readMember = path => readFileSync(resolve(root, path))) {
   if (symbol?.symbol_id !== MENU_ITEM_SYMBOL) return null;
   assert.equal(symbol.family, 'legacy-menu');
@@ -32,9 +32,14 @@ export function approvedMenuItemContract(symbol, readMember = path => readFileSy
   const authority = readMember(contract.authority.path);
   assert.equal(sha(authority), contract.authority.sha256, 'menu owner decision identity changed');
   const decision = JSON.parse(authority.toString('utf8'));
-  assert.equal(decision.authority.recommendation_accepted, contract.authority.accepted_recommendation);
-  assert.equal(decision.authority.user_response,
-    "Sounds good to me. What else is needed from me? What's the padding issue?");
+  assert.equal(contract.authority.kind, 'delegated-technical-judgment');
+  assert.equal(decision.authority.kind, contract.authority.kind);
+  assert.equal(decision.authority.specific_DI_only_user_approval, false,
+    'Do not misattribute the earlier historical-implementation approval');
+  assert.equal(decision.authority.technical_judgment, contract.authority.technical_judgment);
+  assert.equal(decision.authority.delegation_quote, contract.authority.delegation_quote);
+  assert.equal(decision.authority.delegation_quote,
+    "As round as you strictly follow the standard of no required CSS/SCSS changes and sanity check against ~/cyph, I'll defer to your judgement on which TypeScript API changes are sufficiently conservative to be acceptable.");
   assert.deepEqual(symbol.shape.inheritedConstructor, contract.original_constructor,
     'original two-overload constructor contract changed');
   assert.deepEqual(symbol.shape.originalFactory, contract.original_factory,

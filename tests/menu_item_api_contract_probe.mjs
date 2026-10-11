@@ -38,6 +38,27 @@ symbol.shape.originalFactoryContext=originalCompilerFactoryContext(symbol.shape.
 const contract = approvedMenuItemContract(symbol), differences = loadDifferences();
 assert.equal(expectedFactoryDi(symbol.shape).length, 5, 'original expectation must not be replaced');
 assert.equal(contract.runtime_requests.length, 6);
+const decision = JSON.parse(read(contract.authority.path));
+assert.equal(decision.authority.kind, 'delegated-technical-judgment');
+assert.equal(decision.authority.specific_DI_only_user_approval, false);
+assert.ok(decision.authority.earlier_proposal.includes('narrowly owned historical legacy-item implementation'));
+assert.ok(decision.authority.earlier_response_scope.includes('do not attribute this response to a DI-only recommendation'));
+const prior = readFileSync(resolve(root, decision.attribution_correction.prior_record));
+assert.equal(sha(prior), decision.attribution_correction.prior_sha256);
+const authorityMutants = [];
+for (const [id, change] of [
+  ['misattributed-specific-DI-approval', row => row.authority.specific_DI_only_user_approval = true],
+  ['wrong-authority-kind', row => row.authority.kind = 'explicit-DI-approval'],
+  ['missing-delegation', row => delete row.authority.delegation_quote],
+  ['lost-historical-proposal', row => delete row.authority.earlier_proposal],
+]) {
+  const altered = structuredClone(decision); change(altered);
+  const bytes = Buffer.from(JSON.stringify(altered));
+  assert.throws(() => approvedMenuItemContract(symbol, p => p === contract.authority.path
+    ? bytes : readFileSync(resolve(root, p))), /decision identity changed/);
+  authorityMutants.push({id, rejected: true});
+}
+
 const source = read(path), candidate = packedShape(sf(source, path), symbol.name);
 const matched = compareSignatures(symbol, candidate, differences);
 assert.deepEqual(matched.blocking, []);
@@ -139,20 +160,21 @@ try {
     settlementMutants.push({id, rejected: true});
   }
 } finally {rmSync(temp, {recursive: true, force: true});}
-const report = {schema_version: 1, role: 'Menu-specific authorized API/DI producer integration; emitted source fixtures, not packed/AOT qualification',
+const report = {schema_version: 1, role: 'Menu-specific API/DI integration under delegated technical judgment; emitted source fixtures, not packed/AOT qualification',
   node: process.version, compiler: ts.version, runtime_peer: core.VERSION.full,
   source_caps: [path, base + 'internal/menu-item-context.ts', base + 'internal/menu-panel-token.ts',
     'scripts/menu-item-construction-contract.mjs', 'scripts/api-menu-item-factory.mjs', 'scripts/api-di-observe.mjs',
     'scripts/api-surface.mjs', 'scripts/api-completeness.mjs', 'tests/menu_item_api_contract_probe.mjs',
-    MENU_ITEM_CONTRACT_PATH].map(p => ({path: p, sha256: sha(readFileSync(resolve(root, p)))})),
+    MENU_ITEM_CONTRACT_PATH, contract.authority.path, decision.attribution_correction.prior_record,
+    'compatibility/rc/api/signature-differences.json'].map(p => ({path: p, sha256: sha(readFileSync(resolve(root, p)))})),
   original: {constructor: inherited, factory: symbol.shape.originalFactory, expected_factory_di: expectedFactoryDi(symbol.shape)},
-  signature_comparison: matched, signature_mutants: signatureMutants, runtime, settlement_mutants: settlementMutants,
+  signature_comparison: matched, signature_mutants: signatureMutants, authority_mutants: authorityMutants, runtime, settlement_mutants: settlementMutants,
   limits: ['Real Angular JIT factory executes emitted owned source against read-only22/publicroot with syntheticDOM/borrowed services.',
     'Default CLI observes actual packed exports and peer modules; this test supplies real peer-module URLs only for worktree diagnostics.',
-    'Original reference/manual signatures and five-dependency DI expectation remain unchanged. Only recorded owner-approved constructor difference is admitted.',
+    'Original reference/manual signatures and five-dependency DI expectation remain unchanged. Only the finite constructor choice under delegated TypeScript judgment is admitted; earlier historical-implementation approval is preserved separately.',
     'No native boolean-input/provider/query, AOT/packed artifact, actual21/compiler,canonical/floor/security/G02 qualification.']};
 const argv = process.argv.slice(2), at = argv.indexOf('--report');
 if (at !== -1) {assert.equal(existsSync(argv[at + 1]), false); writeFileSync(argv[at + 1], JSON.stringify(report, null, 2) + '\n');}
-console.log(JSON.stringify({signature_mutants: signatureMutants.length, runtime_positive: 1,
+console.log(JSON.stringify({authority_mutants: authorityMutants.length, signature_mutants: signatureMutants.length, runtime_positive: 1,
   runtime_mutants: runtime.length - 1, settlement_mutants: settlementMutants.length, original_factory_dependencies: 5,
   accepted_context_requests: 6, node: process.version, compiler: ts.version, runtime_peer: core.VERSION.full}));
