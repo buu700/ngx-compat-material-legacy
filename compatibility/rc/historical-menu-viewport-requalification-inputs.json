@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "producer_path": "scripts/packed-consumer-aot-smoke.mjs",
+  "lines": {
+    "main": {
+      "prior_producer_source_commit": "6c6d25a31784adf1d57220e2e27939cf35b1ebd8",
+      "prior_raw_sha256": "7615087845dadd533d775c37a61df6ba11157fe6367d5f7b440d1825f876f34e",
+      "archive": {
+        "path": "compatibility/rc/historical-menu-viewport-producer-prior-main.mjs.gz",
+        "sha256": "f555f05337d1607b4c8a4369d9eabb77e90f304c568351c4ba346a20f3e17fb5"
+      },
+      "before_block": "  let menuOutsideDiRejected=false;\n  try {new MatLegacyMenuItem();} catch(error) {menuOutsideDiRejected=/NG0203|injection context/.test(String(error));}\n  const menuItemConstruction=!!normalMenuItem && normalMenuItem instanceof MatMenuItem\n    && normalMenuNode!.injector.get(MatMenuItem)===normalMenuItem\n    && normalMenuNode!.injector.get(MAT_LEGACY_MENU_PANEL)===normalMenuItem._parentMenu\n    && normalMenuItem.disabled===false && normalMenuItem.disableRipple===false\n    && disabledMenuNode?.injector.get(MatLegacyMenuItem).disabled===true\n    && noRippleMenuNode?.injector.get(MatLegacyMenuItem).disableRipple===true && menuOutsideDiRejected;\n",
+      "after_block": "  const manualMenuElement=win.document.createElement('button');\n  const manualMenuItem=new MatLegacyMenuItem(new ElementRef(manualMenuElement));\n  const menuManualConstruction=manualMenuItem._getHostElement()===manualMenuElement\n    &&manualMenuItem.role==='menuitem'&&manualMenuItem._getTabIndex()==='0';\n  manualMenuItem.ngOnDestroy();\n  const menuItemConstruction=!!normalMenuItem && normalMenuItem instanceof MatLegacyMenuItem\n    && !(normalMenuItem instanceof MatMenuItem)\n    && normalMenuNode!.injector.get(MatMenuItem)===normalMenuItem\n    && normalMenuNode!.injector.get(MAT_LEGACY_MENU_PANEL)===normalMenuItem._parentMenu\n    && normalMenuItem.disabled===false && normalMenuItem.disableRipple===false\n    && disabledMenuNode?.injector.get(MatLegacyMenuItem).disabled===true\n    && noRippleMenuNode?.injector.get(MatLegacyMenuItem).disableRipple===true && menuManualConstruction;\n",
+      "members": {
+        "compatibility/f10/authored-use-reviews/owned-legacy-viewport-boundary.json": "0d97e56b8344bec722e336226ac45417603d134885885600d3a6f22e2895aff0",
+        "compatibility/rc/viewport-cva-producer-source-refresh.json": "901e102614396fef0faf81e1991db745402e1c9cb78b646dbe1a4f82006e9a1b",
+        "compatibility/rc/owned-menu-item-implementation-decision.json": "3d0c87a6a9e02ef6d72fd8777db3385672e3f4edad4e50db0ae875df4d992a80"
+      }
+    },
+    "21.x": {
+      "prior_producer_source_commit": "22b4e6ce843c2e8ae2f251b194e2750782aeecf3",
+      "prior_raw_sha256": "5eae2d87af7ae6b240d3352b1eeb40e46d35a2a01f024d7b9f5069602ca9f39f",
+      "archive": {
+        "path": "compatibility/rc/historical-menu-viewport-producer-prior-21.mjs.gz",
+        "sha256": "77b3561d7ad5a99e210c55d38ad9f12a4b0ec2d8c45dcfe9910e1837e8d713c8"
+      },
+      "before_block": "  let menuOutsideDiRejected=false;\n  try {new MatLegacyMenuItem();} catch(error) {menuOutsideDiRejected=/NG0203|injection context/.test(String(error));}\n  const menuItemConstruction=!!normalMenuItem && normalMenuItem instanceof MatMenuItem\n    && normalMenuNode!.injector.get(MatMenuItem)===normalMenuItem\n    && normalMenuNode!.injector.get(MAT_LEGACY_MENU_PANEL)===normalMenuItem._parentMenu\n    && normalMenuItem.disabled===false && normalMenuItem.disableRipple===false\n    && disabledMenuNode?.injector.get(MatLegacyMenuItem).disabled===true\n    && noRippleMenuNode?.injector.get(MatLegacyMenuItem).disableRipple===true && menuOutsideDiRejected;\n",
+      "after_block": "  const manualMenuElement=win.document.createElement('button');\n  const manualMenuItem=new MatLegacyMenuItem(new ElementRef(manualMenuElement));\n  const menuManualConstruction=manualMenuItem._getHostElement()===manualMenuElement\n    &&manualMenuItem.role==='menuitem'&&manualMenuItem._getTabIndex()==='0';\n  manualMenuItem.ngOnDestroy();\n  const menuItemConstruction=!!normalMenuItem && normalMenuItem instanceof MatLegacyMenuItem\n    && !(normalMenuItem instanceof MatMenuItem)\n    && normalMenuNode!.injector.get(MatMenuItem)===normalMenuItem\n    && normalMenuNode!.injector.get(MAT_LEGACY_MENU_PANEL)===normalMenuItem._parentMenu\n    && normalMenuItem.disabled===false && normalMenuItem.disableRipple===false\n    && disabledMenuNode?.injector.get(MatLegacyMenuItem).disabled===true\n    && noRippleMenuNode?.injector.get(MatLegacyMenuItem).disableRipple===true && menuManualConstruction;\n",
+      "members": {
+        "compatibility/f10/authored-use-reviews/owned-legacy-viewport-boundary.json": "5cc20c9a210a9c007f8dce620553c8a6c8029757d94cd6d4be4e3f745acd5cbb",
+        "compatibility/rc/viewport-cva-producer-source-refresh.json": "6b8696b901ec84ed1713d348e789fde413d3e8e62820c97576d751e136cf957b",
+        "compatibility/rc/owned-menu-item-implementation-decision.json": "3d0c87a6a9e02ef6d72fd8777db3385672e3f4edad4e50db0ae875df4d992a80"
+      }
+    }
+  }
+}
