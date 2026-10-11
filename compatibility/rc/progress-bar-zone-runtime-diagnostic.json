@@ -1,0 +1,584 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "source_review": {
+    "schema_version": 1,
+    "file": "legacy-progress-bar/progress-bar.ts",
+    "module": "@angular/core",
+    "symbol": "NgZone",
+    "candidate_source_sha256": "815ce6bcc47f7218ee8cc175c84327829c7778ab429fc8b5e137a783e5d7aa3b",
+    "original_subject": {
+      "path": "compatibility/rc/progress-bar-zone-original-subjects.json",
+      "sha256": "c9f2f2d241bf795eaf3481fd215cd25e3c9360578835eb7e3d034db39c469a99"
+    },
+    "historical_members": 18,
+    "constructor_and_all_members_match": true,
+    "owned_color": {
+      "path": "projects/ngx-material-legacy/legacy-progress-bar/internal/common-behaviors/color.ts",
+      "sha256": "1236aca56df8cf1d6c78e6378650ffffeeffc954033f26811fbc715daea94bfc"
+    },
+    "unchanged_template": {
+      "path": "projects/ngx-material-legacy/legacy-progress-bar/progress-bar.html",
+      "sha256": "00f81e3d99f77d0157c006d81f251a6325b26773885dd76c355720a0bf89ff8a"
+    },
+    "contexts": [
+      {
+        "name": "constructor",
+        "source": "constructor(\n    elementRef: ElementRef,\n    private _ngZone: NgZone,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) public _animationMode?: string,\n    /**\n     * @deprecated `location` parameter to be made required.\n     * @breaking-change 8.0.0\n     */\n    @Optional() @Inject(MAT_PROGRESS_BAR_LOCATION) location?: MatProgressBarLocation,\n    @Optional()\n    @Inject(MAT_PROGRESS_BAR_DEFAULT_OPTIONS)\n    defaults?: MatProgressBarDefaultOptions,\n    /**\n     * @deprecated `_changeDetectorRef` parameter to be made required.\n     * @breaking-change 11.0.0\n     */\n    private _changeDetectorRef?: ChangeDetectorRef,\n  ) {\n    super(elementRef);\n\n    // We need to prefix the SVG reference with the current path, otherwise they won't work\n    // in Safari if the page has a `<base>` tag. Note that we need quotes inside the `url()`,\n    // because named route URLs can contain parentheses (see #12338). Also we don't use `Location`\n    // since we can't tell the difference between whether the consumer is using the hash location\n    // strategy or not, because `Location` normalizes both `/#/foo/bar` and `/foo/bar` to\n    // the same thing.\n    const path = location ? location.getPathname().split('#')[0] : '';\n    this._rectangleFillValue = `url('${path}#${this.progressbarId}')`;\n    this._isNoopAnimation = _animationMode === 'NoopAnimations';\n\n    if (defaults) {\n      if (defaults.color) {\n        this.color = this.defaultColor = defaults.color;\n      }\n\n      this.mode = defaults.mode || this.mode;\n    }\n  }",
+        "sha256": "8f2410ddda999b53129fb6e466f4adb25e7df473ff76b8906050bd65e5279faf"
+      },
+      {
+        "name": "ngAfterViewInit",
+        "source": "ngAfterViewInit() {\n    // Run outside angular so change detection didn't get triggered on every transition end\n    // instead only on the animation that we care about (primary value bar's transitionend)\n    this._ngZone.runOutsideAngular(() => {\n      const element = this._primaryValueBar.nativeElement;\n\n      this._animationEndSubscription = (\n        fromEvent(element, 'transitionend') as Observable<TransitionEvent>\n      )\n        .pipe(filter((e: TransitionEvent) => e.target === element))\n        .subscribe(() => {\n          if (this.animationEnd.observers.length === 0) {\n            return;\n          }\n\n          if (this.mode === 'determinate' || this.mode === 'buffer') {\n            this._ngZone.run(() => this.animationEnd.next({value: this.value}));\n          }\n        });\n    });\n  }",
+        "sha256": "8fef8e24353e381a1affd68c919aaa0bdf23d57a41ca2f06abb12226fdb42de9"
+      },
+      {
+        "name": "ngOnDestroy",
+        "source": "ngOnDestroy() {\n    this._animationEndSubscription.unsubscribe();\n  }",
+        "sha256": "650a573c6210e1ad9fbae4c37ce7a46af064b3b3244c87b3429ffa46c37921c8"
+      }
+    ],
+    "scope": "One frozen public NgZone dependency and exact complete historical class members/mixin/template. The runtime producer tests manually constructed complete classes with genuine public peer NgZone/EventEmitter/ElementRef/coercion and borrowed RxJS. Decorators omitted; event target and geometry are explicit protocols. No Angular node DI, packed/AOT/native motion/style or full runtime-floor qualification."
+  },
+  "node": "v22.23.3",
+  "public_namespace_capsule_sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3",
+  "sources": [
+    {
+      "path": "scripts/progress-bar-zone-use-review.mjs",
+      "sha256": "3d289f0777bf2c176a814252c2b1fdeca405d35ca53eae99c5832600040b9cd9"
+    },
+    {
+      "path": "tests/progress_bar_zone_runtime_probe.mjs",
+      "sha256": "49e273176db1f923b7898f9d6b3f90178ea61136eb4960ed5e3033ed4313c537"
+    },
+    {
+      "path": "tests/progress_bar_zone_runtime_subject.mjs",
+      "sha256": "d7c09b5a3c2cc54a31de0540f7f5948a1895a51cdb92816a995c83953ec6b87f"
+    }
+  ],
+  "declarations": [
+    {
+      "line": "original",
+      "framework": "16.2.12",
+      "path": "@angular/core/index.d.ts",
+      "source_sha256": "9fedfcf08d61d0709a96f157bab028ce05c7fe27a0c179e12e19b00922052fab",
+      "members": [
+        "run<T>(fn: (...args: any[]) => T, applyThis?: any, applyArgs?: any[]): T;",
+        "runOutsideAngular<T>(fn: (...args: any[]) => T): T;"
+      ]
+    },
+    {
+      "line": "main",
+      "framework": "22.1.7",
+      "path": "@angular/core/types/_debug_node-chunk.d.ts",
+      "source_sha256": "359fdc800f92be1be371c69aa3a01c902976e8de13520eaf03dd5c85160e628b",
+      "members": [
+        "run<T>(fn: (...args: any[]) => T, applyThis?: any, applyArgs?: any[]): T;",
+        "runOutsideAngular<T>(fn: (...args: any[]) => T): T;"
+      ]
+    },
+    {
+      "line": "21.x",
+      "framework": "21.2.23",
+      "path": "@angular/core/types/_discovery-chunk.d.ts",
+      "source_sha256": "779438592d99f241f4f0c961f3973595d4473883630b81c5b19b5d1b79329211",
+      "members": [
+        "run<T>(fn: (...args: any[]) => T, applyThis?: any, applyArgs?: any[]): T;",
+        "runOutsideAngular<T>(fn: (...args: any[]) => T): T;"
+      ]
+    }
+  ],
+  "results": [
+    {
+      "line": "original",
+      "mode": "zoneful",
+      "production": false,
+      "cases": [
+        "complete-historical-mode-target-zone-and-teardown-parity",
+        "historical-value-buffer-clamping-and-transforms",
+        "noop-mode-retains-explicit-transition-contract",
+        "destroy-before-view-initialization-is-inert"
+      ],
+      "mutations": [
+        "inside-registration",
+        "child-target",
+        "no-observers",
+        "wrong-mode",
+        "wrong-value",
+        "missing-zone-entry",
+        "missing-teardown"
+      ],
+      "complete_manual_classes_executed": true,
+      "native_or_packed_qualified": false,
+      "zone_subject": {
+        "version": "0.13.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-MKPbmZie6fASC/ps4dkmIhaT5eonHkEt6eAy80K42tAm0G2W+AahLJjbfi6X9NPdciOE9GRFTTM8u2IiF6O3ww==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "8558046e49533b728403672b515caa0e30f2e7b4e0b8d4824f6198faffbd099d",
+        "authenticated_commonjs_require_forwarders": 0,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "original",
+      "mode": "zoneful",
+      "production": true,
+      "cases": [
+        "complete-historical-mode-target-zone-and-teardown-parity",
+        "historical-value-buffer-clamping-and-transforms",
+        "noop-mode-retains-explicit-transition-contract",
+        "destroy-before-view-initialization-is-inert"
+      ],
+      "mutations": [
+        "inside-registration",
+        "child-target",
+        "no-observers",
+        "wrong-mode",
+        "wrong-value",
+        "missing-zone-entry",
+        "missing-teardown"
+      ],
+      "complete_manual_classes_executed": true,
+      "native_or_packed_qualified": false,
+      "zone_subject": {
+        "version": "0.13.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-MKPbmZie6fASC/ps4dkmIhaT5eonHkEt6eAy80K42tAm0G2W+AahLJjbfi6X9NPdciOE9GRFTTM8u2IiF6O3ww==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "8558046e49533b728403672b515caa0e30f2e7b4e0b8d4824f6198faffbd099d",
+        "authenticated_commonjs_require_forwarders": 0,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "main",
+      "mode": "zoneful",
+      "production": false,
+      "cases": [
+        "complete-historical-mode-target-zone-and-teardown-parity",
+        "historical-value-buffer-clamping-and-transforms",
+        "noop-mode-retains-explicit-transition-contract",
+        "destroy-before-view-initialization-is-inert"
+      ],
+      "mutations": [
+        "inside-registration",
+        "child-target",
+        "no-observers",
+        "wrong-mode",
+        "wrong-value",
+        "missing-zone-entry",
+        "missing-teardown"
+      ],
+      "complete_manual_classes_executed": true,
+      "native_or_packed_qualified": false,
+      "zone_subject": {
+        "version": "0.16.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-ihXL9+vhYyEhXz4TDNpHeAOZN9FVrbog0Il64OIEI28UP/n5AaI6gsccRuOHBfx+206agzyoK527bYIO0Foy6A==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "94d3f7278878a57f7b4be6d9174fd2835bbf54bef1e54babd5e61c98495ebc4c",
+        "authenticated_commonjs_require_forwarders": 1,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "main",
+      "mode": "zoneful",
+      "production": true,
+      "cases": [
+        "complete-historical-mode-target-zone-and-teardown-parity",
+        "historical-value-buffer-clamping-and-transforms",
+        "noop-mode-retains-explicit-transition-contract",
+        "destroy-before-view-initialization-is-inert"
+      ],
+      "mutations": [
+        "inside-registration",
+        "child-target",
+        "no-observers",
+        "wrong-mode",
+        "wrong-value",
+        "missing-zone-entry",
+        "missing-teardown"
+      ],
+      "complete_manual_classes_executed": true,
+      "native_or_packed_qualified": false,
+      "zone_subject": {
+        "version": "0.16.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-ihXL9+vhYyEhXz4TDNpHeAOZN9FVrbog0Il64OIEI28UP/n5AaI6gsccRuOHBfx+206agzyoK527bYIO0Foy6A==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "94d3f7278878a57f7b4be6d9174fd2835bbf54bef1e54babd5e61c98495ebc4c",
+        "authenticated_commonjs_require_forwarders": 1,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "main",
+      "mode": "zoneless",
+      "production": false,
+      "cases": [
+        "complete-historical-mode-target-zone-and-teardown-parity",
+        "historical-value-buffer-clamping-and-transforms",
+        "noop-mode-retains-explicit-transition-contract",
+        "destroy-before-view-initialization-is-inert"
+      ],
+      "mutations": [
+        "child-target",
+        "no-observers",
+        "wrong-mode",
+        "wrong-value",
+        "missing-zone-entry",
+        "missing-teardown"
+      ],
+      "complete_manual_classes_executed": true,
+      "native_or_packed_qualified": false,
+      "zone_subject": {
+        "version": "0.16.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-ihXL9+vhYyEhXz4TDNpHeAOZN9FVrbog0Il64OIEI28UP/n5AaI6gsccRuOHBfx+206agzyoK527bYIO0Foy6A==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "94d3f7278878a57f7b4be6d9174fd2835bbf54bef1e54babd5e61c98495ebc4c",
+        "authenticated_commonjs_require_forwarders": 1,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "main",
+      "mode": "zoneless",
+      "production": true,
+      "cases": [
+        "complete-historical-mode-target-zone-and-teardown-parity",
+        "historical-value-buffer-clamping-and-transforms",
+        "noop-mode-retains-explicit-transition-contract",
+        "destroy-before-view-initialization-is-inert"
+      ],
+      "mutations": [
+        "child-target",
+        "no-observers",
+        "wrong-mode",
+        "wrong-value",
+        "missing-zone-entry",
+        "missing-teardown"
+      ],
+      "complete_manual_classes_executed": true,
+      "native_or_packed_qualified": false,
+      "zone_subject": {
+        "version": "0.16.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-ihXL9+vhYyEhXz4TDNpHeAOZN9FVrbog0Il64OIEI28UP/n5AaI6gsccRuOHBfx+206agzyoK527bYIO0Foy6A==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "94d3f7278878a57f7b4be6d9174fd2835bbf54bef1e54babd5e61c98495ebc4c",
+        "authenticated_commonjs_require_forwarders": 1,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "21.x",
+      "mode": "zoneful",
+      "production": false,
+      "cases": [
+        "complete-historical-mode-target-zone-and-teardown-parity",
+        "historical-value-buffer-clamping-and-transforms",
+        "noop-mode-retains-explicit-transition-contract",
+        "destroy-before-view-initialization-is-inert"
+      ],
+      "mutations": [
+        "inside-registration",
+        "child-target",
+        "no-observers",
+        "wrong-mode",
+        "wrong-value",
+        "missing-zone-entry",
+        "missing-teardown"
+      ],
+      "complete_manual_classes_executed": true,
+      "native_or_packed_qualified": false,
+      "zone_subject": {
+        "version": "0.16.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-ihXL9+vhYyEhXz4TDNpHeAOZN9FVrbog0Il64OIEI28UP/n5AaI6gsccRuOHBfx+206agzyoK527bYIO0Foy6A==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "94d3f7278878a57f7b4be6d9174fd2835bbf54bef1e54babd5e61c98495ebc4c",
+        "authenticated_commonjs_require_forwarders": 1,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "21.x",
+      "mode": "zoneful",
+      "production": true,
+      "cases": [
+        "complete-historical-mode-target-zone-and-teardown-parity",
+        "historical-value-buffer-clamping-and-transforms",
+        "noop-mode-retains-explicit-transition-contract",
+        "destroy-before-view-initialization-is-inert"
+      ],
+      "mutations": [
+        "inside-registration",
+        "child-target",
+        "no-observers",
+        "wrong-mode",
+        "wrong-value",
+        "missing-zone-entry",
+        "missing-teardown"
+      ],
+      "complete_manual_classes_executed": true,
+      "native_or_packed_qualified": false,
+      "zone_subject": {
+        "version": "0.16.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-ihXL9+vhYyEhXz4TDNpHeAOZN9FVrbog0Il64OIEI28UP/n5AaI6gsccRuOHBfx+206agzyoK527bYIO0Foy6A==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "94d3f7278878a57f7b4be6d9174fd2835bbf54bef1e54babd5e61c98495ebc4c",
+        "authenticated_commonjs_require_forwarders": 1,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "21.x",
+      "mode": "zoneless",
+      "production": false,
+      "cases": [
+        "complete-historical-mode-target-zone-and-teardown-parity",
+        "historical-value-buffer-clamping-and-transforms",
+        "noop-mode-retains-explicit-transition-contract",
+        "destroy-before-view-initialization-is-inert"
+      ],
+      "mutations": [
+        "child-target",
+        "no-observers",
+        "wrong-mode",
+        "wrong-value",
+        "missing-zone-entry",
+        "missing-teardown"
+      ],
+      "complete_manual_classes_executed": true,
+      "native_or_packed_qualified": false,
+      "zone_subject": {
+        "version": "0.16.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-ihXL9+vhYyEhXz4TDNpHeAOZN9FVrbog0Il64OIEI28UP/n5AaI6gsccRuOHBfx+206agzyoK527bYIO0Foy6A==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "94d3f7278878a57f7b4be6d9174fd2835bbf54bef1e54babd5e61c98495ebc4c",
+        "authenticated_commonjs_require_forwarders": 1,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "21.x",
+      "mode": "zoneless",
+      "production": true,
+      "cases": [
+        "complete-historical-mode-target-zone-and-teardown-parity",
+        "historical-value-buffer-clamping-and-transforms",
+        "noop-mode-retains-explicit-transition-contract",
+        "destroy-before-view-initialization-is-inert"
+      ],
+      "mutations": [
+        "child-target",
+        "no-observers",
+        "wrong-mode",
+        "wrong-value",
+        "missing-zone-entry",
+        "missing-teardown"
+      ],
+      "complete_manual_classes_executed": true,
+      "native_or_packed_qualified": false,
+      "zone_subject": {
+        "version": "0.16.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-ihXL9+vhYyEhXz4TDNpHeAOZN9FVrbog0Il64OIEI28UP/n5AaI6gsccRuOHBfx+206agzyoK527bYIO0Foy6A==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "94d3f7278878a57f7b4be6d9174fd2835bbf54bef1e54babd5e61c98495ebc4c",
+        "authenticated_commonjs_require_forwarders": 1,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    }
+  ],
+  "source_negative_controls": 12,
+  "runtime_mutation_rejections": 66,
+  "scope": "One frozen public NgZone dependency and exact complete historical class members/mixin/template. The runtime producer tests manually constructed complete classes with genuine public peer NgZone/EventEmitter/ElementRef/coercion and borrowed RxJS. Decorators omitted; event target and geometry are explicit protocols. No Angular node DI, packed/AOT/native motion/style or full runtime-floor qualification.",
+  "native_or_packed_or_full_floors_qualified": false,
+  "g11_claim": "not-passed"
+}
