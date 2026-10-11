@@ -8,10 +8,5 @@
  */
 
 export {MatLegacyMenuHarness, MatLegacyMenuItemHarness} from './menu-harness';
-export {
-
-  MenuHarnessFilters as LegacyMenuHarnessFilters,
-
-
-  MenuItemHarnessFilters as LegacyMenuItemHarnessFilters,
-} from '@angular/material/menu/testing';
+export {LegacyMenuHarnessFilters} from './menu-harness-filters';
+export {MenuItemHarnessFilters as LegacyMenuItemHarnessFilters} from '@angular/material/menu/testing';
