@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "status": "reviewed",
+  "recorded_at_utc": "2026-10-11T18:53:23.590288+00:00",
+  "criteria": "One public NgZone dependency: independently exact historical full constructor/field/resize callback/destruction and consumed accessors, genuine public Platform/NgZone at original and both peer minima; optional arguments retained.",
+  "g11_claim": "not-passed",
+  "reviews": [
+    {
+      "file": "legacy-progress-spinner/progress-spinner.ts",
+      "module": "@angular/core",
+      "symbol": "NgZone",
+      "candidate_source_sha256": "85936bc7161a1dcbbc377fbf19c3de46b09f13a32adaa3d503d7dc09204c736c",
+      "frozen_use": true,
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "NgZone remains the optional eighth argument of the historical nine-parameter spinner constructor. It is consumed only when the genuine public Platform identifies a Safari browser and viewport/change-detector/zone arguments are all supplied. The complete constructor, property initialization, source members except the separately owned shadow lookup, owned color mixin and template match authenticated tagged16. Loaded whole manual classes execute the resize callback/destruction under genuine original and both minimum public Core/Platform/NgZone in ten zoneful/currentzoneless dev/production contexts. The exact150ms viewport request is made once only for eligible Safari instances; only each individually asserted indeterminate resize re-enters the genuine zone and requests change detection. Server/non-Safari and each omitted historical optional service remain inert; destruction unsubscribes and stops subsequent marks. Sixty observations and96 runtime faults cover the platform/mode/throttle/optional guards, zone entry, mark and teardown;13 source mutations fail. Public NgZone/run declarations are nondeprecated in the independent minimum namespace review. UA/window, document-head, viewport and change-detector are explicit protocols; no counterfeit NgZone or Platform implementation is used. Decorators are omitted. This closes only the NgZone dependency boundary. ngOnInit, dynamic styles/shadow lookup/circle geometry, native Safari/zoom, Angular component DI, ngc/AOT/packed consumers, full runtime/compiler/RxJS floors and remaining upstream/audit work are unqualified. No product/API/template/style or required Cyph HTML/CSS/SCSS changes.",
+      "source_context": {
+        "file": "legacy-progress-spinner/progress-spinner.ts",
+        "module": "@angular/core",
+        "symbol": "NgZone",
+        "candidate_source_sha256": "85936bc7161a1dcbbc377fbf19c3de46b09f13a32adaa3d503d7dc09204c736c",
+        "original_subject": {
+          "path": "compatibility/rc/progress-spinner-zone-original-subjects.json.gz",
+          "sha256": "cca6bbbe97c179d4d7131a3b1cc9a708ed960ed0c64df953e696a55a9cfef7b9"
+        },
+        "constructor_parameter_count": 9,
+        "zone_parameter_index": 7,
+        "constructor_source": "constructor(\n    elementRef: ElementRef<HTMLElement>,\n    _platform: Platform,\n    @Optional() @Inject(DOCUMENT) private _document: any,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode: string,\n    @Inject(MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS)\n    defaults?: MatProgressSpinnerDefaultOptions,\n    /**\n     * @deprecated `changeDetectorRef`, `viewportRuler` and `ngZone`\n     * parameters to become required.\n     * @breaking-change 14.0.0\n     */\n    changeDetectorRef?: ChangeDetectorRef,\n    viewportRuler?: ViewportRuler,\n    ngZone?: NgZone,\n    @Inject(CSP_NONCE) @Optional() private _nonce?: string | null,\n  ) {\n    super(elementRef);\n\n    const trackedDiameters = MatLegacyProgressSpinner._diameters;\n    this._spinnerAnimationLabel = this._getSpinnerAnimationLabel();\n\n    // The base size is already inserted via the component's structural styles. We still\n    // need to track it so we don't end up adding the same styles again.\n    if (!trackedDiameters.has(_document.head)) {\n      trackedDiameters.set(_document.head, new Set<number>([BASE_SIZE]));\n    }\n\n    this._noopAnimations =\n      animationMode === 'NoopAnimations' && !!defaults && !defaults._forceAnimations;\n\n    if (elementRef.nativeElement.nodeName.toLowerCase() === 'mat-spinner') {\n      this.mode = 'indeterminate';\n    }\n\n    if (defaults) {\n      if (defaults.color) {\n        this.color = this.defaultColor = defaults.color;\n      }\n\n      if (defaults.diameter) {\n        this.diameter = defaults.diameter;\n      }\n\n      if (defaults.strokeWidth) {\n        this.strokeWidth = defaults.strokeWidth;\n      }\n    }\n\n    // Safari has an issue where the circle isn't positioned correctly when the page has a\n    // different zoom level from the default. This handler triggers a recalculation of the\n    // `transform-origin` when the page zoom level changes.\n    // See `_getCircleTransformOrigin` for more info.\n    // @breaking-change 14.0.0 Remove null checks for `_changeDetectorRef`,\n    // `viewportRuler` and `ngZone`.\n    if (_platform.isBrowser && _platform.SAFARI && viewportRuler && changeDetectorRef && ngZone) {\n      this._resizeSubscription = viewportRuler.change(150).subscribe(() => {\n        // When the window is resize while the spinner is in `indeterminate` mode, we\n        // have to mark for check so the transform origin of the circle can be recomputed.\n        if (this.mode === 'indeterminate') {\n          ngZone.run(() => changeDetectorRef.markForCheck());\n        }\n      });\n    }\n  }",
+        "destruction_source": "ngOnDestroy() {\n    this._resizeSubscription.unsubscribe();\n  }",
+        "constructor_fields_and_destruction_match_original": true,
+        "owned_color": {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/color.ts",
+          "sha256": "1236aca56df8cf1d6c78e6378650ffffeeffc954033f26811fbc715daea94bfc"
+        },
+        "unchanged_template": {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.html",
+          "sha256": "eb9068351eadefb859233dcc1c1bf3a58dc17231b88f5892604ebd5ed6180a69"
+        },
+        "scope": "One public NgZone import and its complete historical constructor/field/resize callback/destruction contract. Complete manual classes are loaded; ngOnInit, dynamic styles, shadow lookup, circle geometry and other methods are not qualified. Genuine minimum public Platform/NgZone with explicit UA/window and viewport/change-detector protocols, borrowed RxJS; decorators omitted. No packed/native/AOT or full floor qualification."
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/progress-spinner-zone-runtime-diagnostic.json",
+          "sha256": "b185ff5f2490dff1cd475b319fa698249becff0c9e0be0f83954f5ca7c08512a"
+        },
+        {
+          "path": "compatibility/rc/progress-spinner-zone-original-subjects.json.gz",
+          "sha256": "cca6bbbe97c179d4d7131a3b1cc9a708ed960ed0c64df953e696a55a9cfef7b9"
+        },
+        {
+          "path": "compatibility/rc/progress-spinner-zone-cyph-source-sanity.json",
+          "sha256": "e3ed55eb3b4e7a4abdc30d5e4c709c17cc139b1095eec38bbd77da57ecfdc730"
+        },
+        {
+          "path": "compatibility/rc/progress-bar-zone-runtime-diagnostic.json",
+          "sha256": "d29cb4844e63606e2b737b325af91ee5ceb22b75ae6f8286ae37af2e78c1bc52"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "compatibility/rc/ng-zone-public-subjects.json",
+          "sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/ng-zone-public-subjects.mjs",
+          "sha256": "0eb7c8966e8c1e8fc0e974a2c25f48e32c28a7d5b6f7448df839a6e67866763d"
+        },
+        {
+          "path": "scripts/progress-bar-zone-use-review.mjs",
+          "sha256": "3d289f0777bf2c176a814252c2b1fdeca405d35ca53eae99c5832600040b9cd9"
+        },
+        {
+          "path": "scripts/progress-spinner-zone-use-review.mjs",
+          "sha256": "79c6ea9ad4fc82deadb17fa31afdfb6fdf20726735112307d0446e2f07234624"
+        },
+        {
+          "path": "tests/progress_spinner_zone_runtime_probe.mjs",
+          "sha256": "8450ebb8b2adf37f27b913ac6790a1abad986bca44f62dde2de4f7a48ac15544"
+        },
+        {
+          "path": "tests/progress_spinner_zone_runtime_subject.mjs",
+          "sha256": "9d8b57663b41b8fe97f839d83e8d501897c053dd0a63eb46a59d23bf4612cffe"
+        },
+        {
+          "path": "tests/test_progress_spinner_zone_runtime.py",
+          "sha256": "08c43d77c99b2820cc6d24f1985863b324ab8dcf05149ed98d1d2de96e130161"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/color.ts",
+          "sha256": "1236aca56df8cf1d6c78e6378650ffffeeffc954033f26811fbc715daea94bfc"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.html",
+          "sha256": "eb9068351eadefb859233dcc1c1bf3a58dc17231b88f5892604ebd5ed6180a69"
+        }
+      ]
+    }
+  ]
+}
