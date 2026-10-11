@@ -10,6 +10,7 @@ import {createHash} from 'node:crypto';
 import {gunzipSync} from 'node:zlib';
 import {analyzeTestImportCleanup} from './upstream-test-import-cleanup-analysis.mjs';
 import {UNUSED_FIXTURE_PROFILES, unusedModernFixtureScope} from './upstream-unused-modern-fixture-scope.mjs';
+import {TEST_SETUP_PROFILES, individualTestSetupScope} from './upstream-individual-test-setup-scope.mjs';
 export const TEST_IMPORT_ROLE = 'C04 complete31 test import cleanup predicate and residual reviews';
 export const TEST_IMPORT_CAPSULE = 'compatibility/rc/upstream-test-import-cleanup-subjects.json.gz';
 export const TEST_IMPORT_SHAS = Object.freeze([
@@ -150,7 +151,14 @@ export function testImportBatchOk(body, readMember, line) {
     for (const [i, source] of actual.entries()) {
       const review = body.reviews[i]; assert.deepEqual(review.source_analysis, source);
       assert.equal(review.diff_sha256, source.diff_sha256); assert.deepEqual(review.paths, source.paths);
-      if (review.individual_retained_test_source_review) {
+      if (review.individual_setup_source_review) {
+        assert.ok(!source.accepted && TEST_SETUP_PROFILES[source.sha] && !review.individual_retained_test_source_review);
+        const subject = subjects[i];
+        assert.deepEqual(review.individual_setup_source_review, individualTestSetupScope(source.sha, subject, readMember, line));
+        assert.equal(review.diff, subject.diff);
+        assert.equal(review.final_disposition, 'not-applicable');
+        assert.equal(review.review_depth, 'individual-compatibility');
+      } else if (review.individual_retained_test_source_review) {
         assert.ok(!source.accepted && UNUSED_FIXTURE_PROFILES[source.sha]);
         const subject = subjects[i];
         assert.deepEqual(review.individual_retained_test_source_review, unusedModernFixtureScope(source.sha, subject, readMember, line));

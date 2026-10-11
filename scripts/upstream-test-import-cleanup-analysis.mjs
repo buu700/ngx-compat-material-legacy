@@ -69,3 +69,35 @@ export function analyzeTestImportCleanup(path,before,after){
  for(const name of removed)assert.ok(!ids.has(name.local),'removed binding still referenced');
  return {path,unchanged_test_program_sha256:na.sha256,before_config_calls:na.configs,after_config_calls:nb.configs,removed_import_properties:na.removedProperties-nb.removedProperties,removed_empty_hooks:na.removedHooks-nb.removedHooks,removed_import_bindings:removed};
 }
+
+/** Full program comparison after individually enumerated original-source edits. */
+export function analyzeExplicitTestEdits(path,before,after,edits){
+ const original=parse(path,before),current=parse(path,after),ai=imports(original),bi=imports(current);
+ let cursor=0;const removed=[];
+ for(const i of bi){
+  let found=-1;for(let j=cursor;j<ai.length;j++)if(ai[j].module===i.module&&ai[j].typeOnly===i.typeOnly){found=j;break;}
+  assert.ok(found>=0,'added or reordered import route');
+  for(let j=cursor;j<found;j++)removed.push(...ai[j].bindings);
+  const old=ai[found];assert.ok(i.bindings.every(n=>old.bindings.some(p=>JSON.stringify(p)===JSON.stringify(n))),'new import binding');
+  removed.push(...old.bindings.filter(p=>!i.bindings.some(n=>JSON.stringify(p)===JSON.stringify(n))));cursor=found+1;
+ }
+ for(let j=cursor;j<ai.length;j++)removed.push(...ai[j].bindings);
+ const ordered=[...edits].sort((a,b)=>a.start-b.start);let end=0;
+ for(const edit of ordered){assert.ok(Number.isInteger(edit.start)&&Number.isInteger(edit.end)&&edit.start>=end&&edit.end>edit.start&&edit.end<=before.length);assert.equal(typeof edit.text,'string');assert.ok(edit.role);end=edit.end;}
+ let expected=before;
+ for(const edit of [...ordered].reverse())expected=expected.slice(0,edit.start)+edit.text+expected.slice(edit.end);
+ const program=file=>{
+  const body=ts.factory.updateSourceFile(file,file.statements.filter(n=>!ts.isImportDeclaration(n)));
+  const text=printer.printFile(body),tree=parse(path,text),tokens=[];
+  // Parsed leaves preserve template head/middle/tail boundaries. A bare scanner
+  // cannot rescan template substitutions without parser state.
+  const visit=node=>{const children=node.getChildren(tree);if(children.length)children.forEach(visit);else if(node.kind!==ts.SyntaxKind.EndOfFileToken&&node.kind!==ts.SyntaxKind.SyntaxList)tokens.push([node.kind,node.getText(tree)]);};visit(tree);
+  return {text,tokens:tokens.filter((t,i)=>!(t[0]===ts.SyntaxKind.CommaToken&&[ts.SyntaxKind.CloseBraceToken,ts.SyntaxKind.CloseBracketToken,ts.SyntaxKind.CloseParenToken].includes(tokens[i+1]?.[0])&&![ts.SyntaxKind.CommaToken,ts.SyntaxKind.OpenBracketToken].includes(tokens[i-1]?.[0])))};
+ };
+ const exp=program(parse(path,expected)),observed=program(current);
+ assert.ok(JSON.stringify(exp.tokens)===JSON.stringify(observed.tokens),'unaccounted test program change');
+ const ids=new Set();const visit=n=>{if(ts.isIdentifier(n))ids.add(n.text);ts.forEachChild(n,visit);};visit(parse(path,observed.text));
+ for(const name of removed)assert.ok(!ids.has(name.local),'removed binding still referenced');
+ return {path,unchanged_remaining_test_program_sha256:hash(JSON.stringify(exp.tokens)),removed_import_bindings:removed,
+  original_edits:ordered.map(e=>({role:e.role,original_start:e.start,original_end:e.end,original_sha256:hash(before.slice(e.start,e.end)),replacement_sha256:hash(e.text)}))};
+}
