@@ -256,6 +256,7 @@ const missing = [...seedShas].filter(sha => !ledgerBySha.has(sha));
 const unresolved = [];
 const unknown = [];
 const missingEvidence = [];
+const evidenceFailures = [];
 const circularEvidence = [];
 const insufficientSensitive = [];
 const insufficientInherited = [];
@@ -267,7 +268,10 @@ for (const entry of ledgerBySha.values()) {
   else if (!ALLOWED_FINAL.has(disposition)) unknown.push(entry.sha);
   const evidence = evidenceClass(entry);
   if (evidence === 'circular') circularEvidence.push(entry.sha);
-  else if (evidence !== 'file') missingEvidence.push(entry.sha);
+  else if (evidence !== 'file') {
+    missingEvidence.push(entry.sha);
+    evidenceFailures.push({sha: entry.sha, reason: evidence, evidence_report: entry.evidence_report ?? null});
+  }
   const sensitive = sensitiveClass(entry);
   const needsIndividual = Boolean(sensitive) || INHERITED.has(disposition) || BEHAVIOR.has(disposition);
   if (needsIndividual && !individualProofOk(entry)) {
@@ -356,6 +360,13 @@ const report = {
   schema_version: 1,
   role: 'upstream audit disposition coverage',
   check_id: 'upstream-audit-disposition',
+  evidence_failures: evidenceFailures,
+  insufficient_review_sha_ids: {
+    sensitive: insufficientSensitive,
+    inherited: insufficientInherited,
+    behavior: insufficientBehavior,
+    branch_applicability: missingBranch,
+  },
   seed_rows: seedShas.size,
   ledger_rows: ledgerBySha.size,
   missing_from_ledger: missing.length,

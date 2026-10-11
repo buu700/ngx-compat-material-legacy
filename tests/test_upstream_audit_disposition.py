@@ -51,6 +51,34 @@ def run_checker(
 
 
 class UpstreamAuditDispositionTests(unittest.TestCase):
+    def test_failure_details_name_exact_sha_and_reason(self) -> None:
+        version = json.loads((ROOT / 'projects/ngx-material-legacy/package.json').read_text())['version']
+        line = '21.x' if version.startswith('21.') else 'main'
+        missing_sha, unsafe_sha = '1' * 40, 'f' * 40
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            seed, changed, report = [directory / name for name in ['seed.json', 'ledger.json', 'report.json']]
+            seed.write_text(json.dumps({'commits': [{'sha': missing_sha}, {'sha': unsafe_sha}]}))
+            changed.write_text(json.dumps({'entries': [
+                {'sha': missing_sha, 'final_disposition': 'irrelevant',
+                 'evidence_report': 'compatibility/f10/disposition-ledger/evidence/no-such-detail-fixture.json'},
+                {'sha': unsafe_sha, 'final_disposition': 'irrelevant', 'evidence_report': '../outside-evidence.json'},
+            ]}))
+            result = run_checker(seed, changed, report, admission=True, line=line)
+            self.assertNotEqual(result.returncode, 0)
+            body = json.loads(report.read_text())
+            self.assertEqual(body['missing_evidence'], 2)
+            self.assertEqual(body['evidence_failures'], [
+                {'sha': missing_sha, 'reason': 'missing-file',
+                 'evidence_report': 'compatibility/f10/disposition-ledger/evidence/no-such-detail-fixture.json'},
+                {'sha': unsafe_sha, 'reason': 'missing', 'evidence_report': '../outside-evidence.json'},
+            ])
+            for name, count in [('sensitive', 'insufficient_sensitive'), ('inherited', 'insufficient_inherited'),
+                                ('behavior', 'insufficient_behavior'), ('branch_applicability', 'missing_branch_applicability')]:
+                self.assertEqual(len(body['insufficient_review_sha_ids'][name]), body[count])
+            self.assertEqual(body['disposition_admission'], 'incomplete')
+            self.assertEqual(body['g11_claim'], 'not-passed')
+
     def test_intact_ledger_covers_every_seed_sha(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             report = Path(tmp) / "report.json"
