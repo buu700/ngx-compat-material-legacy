@@ -14,9 +14,11 @@ import {authoredUseReviewEvidence} from '../scripts/authored-use-inventory.mjs';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const read = path => readFileSync(resolve(root, path));
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
+const exactReviews = new Set(['element-ref', 'change-detector', 'injection-context'].map(kind =>
+  'compatibility/f10/authored-use-reviews/historical-menu-requalified-' + kind + '-boundaries.json'));
 const rows = ['compatibility/f10/authored-dependency-dispositions.json',
   'compatibility/f10/authored-dependency-current-dispositions.json'].flatMap(path => JSON.parse(read(path)).symbol_uses)
-  .filter(row => row.source_review?.path.startsWith('compatibility/f10/authored-use-reviews/historical-menu-requalified-'));
+  .filter(row => exactReviews.has(row.source_review?.path));
 assert.equal(rows.length, 123);
 const line = JSON.parse(read('projects/ngx-material-legacy/package.json')).version.startsWith('21.') ? '21.x' : 'main';
 const observe = (files = {}, actualLine = line, selected = rows) => authoredUseReviewEvidence({symbol_uses: selected},
@@ -35,7 +37,7 @@ controls.push({id: 'wrong-line', rejected: 123});
 const unique = new Set(rows.map(row => row.file));
 for (const file of unique) {
   const expected = rows.filter(row => row.file === file).length;
-  assert.equal(observe({['projects/ngx-material-legacy/' + file]: Buffer.from('different source role')}).insufficient, expected);
+  assert.equal(observe({['projects/ngx-material-legacy/' + file]: Buffer.from('different source role')}, line, rows.filter(row => row.file === file)).insufficient, expected);
 }
 controls.push({id: 'changed-caller-source', files: unique.size, rejected: 123});
 for (const path of new Set(rows.map(row => row.source_review.path))) {
