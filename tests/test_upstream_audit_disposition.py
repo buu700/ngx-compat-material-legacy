@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
+# Copyright Google LLC All Rights Reserved.
+# Copyright (c) 2026 Ryan Lester.
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file at https://angular.io/license
 """The shipped disposition checker rejects a missing seed row, a duplicate SHA, and a security hunk labeled docs-only."""
 
 from __future__ import annotations
 
 import json
+import hashlib
 import subprocess
 import tempfile
 import unittest
@@ -54,10 +59,10 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0, combined)
             summary = json.loads(result.stdout)
             self.assertFalse(summary["ok"])
-            # Thirteen behavior subjects still need execution evidence. The five
+            # Fourteen behavior subjects still need execution evidence. The five
             # test-consolidation residuals now have individual ownership reviews
             # preserving complete tagged legacy sources, with no runtime claim.
-            self.assertEqual(summary["unresolved"], 13)
+            self.assertEqual(summary["unresolved"], 14)
             self.assertEqual(summary["seed_rows"], 1697)
             self.assertEqual(summary["ledger_rows"], 1697)
             self.assertEqual(summary["missing"], 0)
@@ -199,7 +204,8 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
             self.assertEqual(summary["structural_inventory"], "fail")
             self.assertEqual(summary["disposition_admission"], "incomplete")
             self.assertGreaterEqual(summary["insufficient_inherited"], 1)
-            self.assertIn("unresolved=7", result.stderr)
+            self.assertIn(f"unresolved={summary['unresolved']}", result.stderr)
+            self.assertEqual(summary["unresolved"], 14)
             self.assertEqual(summary["security_clearance"], "not-passed")
             # The ledger object above is only used to prove the file still parses.
             self.assertEqual(ledger["g11_claim"], "not-passed")
@@ -361,12 +367,38 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
                     self.assert_table_transform_superseding_review(entry)
                     continue
                 prior = entry.get("prior_dispositions", [])
+                if entry['sha'] == '10db3e30f94c8cfd160679da7ba22e4c6c0dd8bb':
+                    correction_path = 'compatibility/rc/ripple-event-replay-upstream-correction.json'
+                    self.assertTrue(any(row.get('evidence_report') == correction_path for row in prior))
+                    correction = json.loads((ROOT / correction_path).read_text())
+                    self.assertEqual(correction['sha'], path.stem)
+                    prior = [correction['previous_row']]
                 self.assertTrue(any(row.get("evidence_report") == evidence_path
                                     and row.get("final_disposition") == body["final_disposition"] for row in prior))
                 report = json.loads((ROOT / entry["evidence_report"]).read_text())
+                if path.stem in {
+                    '10db3e30f94c8cfd160679da7ba22e4c6c0dd8bb',
+                    '8c3165582fcc1e307f8ddd261f5977c6f2f8b0fc',
+                    '25f391a3c545a1b829a74584c4f9235ab8d18497',
+                }:
+                    self.assert_pending_behavior_review(entry, report)
+                    continue
                 review = next(row for row in report["reviews"] if row["sha"] == path.stem)
                 self.assertEqual(review["final_disposition"], entry["final_disposition"])
-                self.assertTrue(review["diff"])
+                if report.get('role') == 'C04 finite original32 shared harness consolidation source review':
+                    self.assertEqual(len(report['reviews']), 32)
+                    patch = (ROOT / review['patch_file']).read_bytes()
+                    self.assertTrue(patch.startswith(b'diff --git '))
+                    self.assertEqual(hashlib.sha256(patch).hexdigest(), review['diff_sha256'])
+                    self.assertEqual(entry['source_check']['diff_sha256'], review['diff_sha256'])
+                    self.assertEqual(entry['source_check']['patch_path'], review['patch_file'])
+                    self.assertEqual(entry['source_check']['evidence_report_sha256'], hashlib.sha256((ROOT / entry['evidence_report']).read_bytes()).hexdigest())
+                    self.assertEqual(review['source_analysis']['sha'], entry['sha'])
+                    self.assertEqual(review['source_analysis']['diff_sha256'], review['diff_sha256'])
+                    self.assertEqual(review['source_analysis']['patch_paths'], review['patch_paths'])
+                    self.assertEqual(report['g11_claim'], 'not-passed')
+                else:
+                    self.assertTrue(review["diff"])
                 continue
             self.assertEqual(body["final_disposition"], entry["final_disposition"])
             self.assertFalse(body["final_disposition_changed"])
@@ -409,6 +441,43 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
         self.assertFalse(any(use.get("disposition") == "closed" for use in seed["symbol_uses"]))
         self.assertTrue((ROOT / "compatibility/f10/audit-join/braces-exception-facts.md").is_file())
 
+    def test_stale_source_proofs_are_retired_without_rehashing_them(self) -> None:
+        rows = {e['sha']: e for e in json.loads(LEDGER.read_text())['entries']}
+        comment = rows['7a2191906339aab259e59fb8cea05273538f4ebf']
+        self.assertEqual(comment['final_disposition'], 'not-applicable')
+        self.assertNotIn('individual_proof', comment)
+        retired = comment['retired_candidate_proofs'][-1]['proof']
+        self.assertEqual(retired['candidate_member']['sha256'], 'bb99348ac1fa6f9916fe435d7b4eba1dd7149a4d205c949d0b62c00b035e7dfd')
+        tooltip = rows['68b267dd59f3addf92a3b9f8ce9e8baa479df7f4']
+        review = json.loads((ROOT / tooltip['evidence_report']).read_text())
+        self.assert_pending_behavior_review(tooltip, review)
+        old = review['prior_entry']['individual_proof']
+        self.assertEqual(old['candidate_member']['sha256'], '672a9d4219e6c251022a3c2d5a311d4c920d99be128cecaf90513e3ad2a1428e')
+        member = review['current_candidate_source']
+        self.assertEqual(hashlib.sha256((ROOT / member['path']).read_bytes()).hexdigest(), member['sha256'])
+        code = '''
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {candidateSourceEvidenceOk,candidateProductSourcePaths} from './scripts/upstream-candidate-source-evidence.mjs';
+const proofs=JSON.parse(process.argv[1]);
+for(const proof of proofs)assert.equal(candidateSourceEvidenceOk(proof,p=>readFileSync(p),()=>candidateProductSourcePaths(process.cwd())),false);
+'''
+        result = subprocess.run(['node', '--input-type=module', '-e', code, json.dumps([retired, old])],
+                                cwd=ROOT, capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def assert_pending_behavior_review(self, entry, report):
+        self.assertEqual(entry['final_disposition'], 'needs-individual-review')
+        self.assertNotIn('individual_proof', entry)
+        self.assertEqual(report['sha'], entry['sha'])
+        self.assertEqual(report['g11_claim'], 'not-passed')
+        if entry['sha'] == '10db3e30f94c8cfd160679da7ba22e4c6c0dd8bb':
+            patch = report['diff'].encode()
+        else:
+            patch = (ROOT / report['patch_file']).read_bytes()
+        self.assertTrue(patch.startswith(b'diff --git '))
+        self.assertEqual(hashlib.sha256(patch).hexdigest(), report['diff_sha256'])
+
     def test_recorded_candidate_line_proofs_still_match_the_candidate(self) -> None:
         proofs = [e for e in json.loads(LEDGER.read_text())["entries"]
                   if (e.get("individual_proof") or {}).get("proof_kind") in ("candidate-source-line-match", "candidate-source-equivalent")]
@@ -418,7 +487,6 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
             self.assertEqual(proof["affected_branches"], ["main"])
             self.assertGreaterEqual(len(proof["decision"]), 40)
             member = ROOT / proof["candidate_member"]["path"]
-            import hashlib
             self.assertEqual(hashlib.sha256(member.read_bytes()).hexdigest(), proof["candidate_member"]["sha256"], entry["sha"])
             lines = member.read_text().split("\n")
             checks = [(item["upstream_added"], item["candidate_lines"]) for item in proof["added_lines"]]
@@ -451,11 +519,36 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
                 self.assertTrue(any(row.get('final_disposition') == 'inherited' for row in entry['superseded_closeout_source_judgments']))
                 self.assert_table_transform_superseding_review(entry)
                 continue
-            self.assertTrue(any(row.get("final_disposition") == "inherited"
-                                for row in entry.get("prior_dispositions", [])))
+            if sha == '10db3e30f94c8cfd160679da7ba22e4c6c0dd8bb':
+                prior = json.loads((ROOT / 'compatibility/rc/ripple-event-replay-upstream-correction.json').read_text())
+                self.assertEqual(prior['sha'], sha)
+                self.assertEqual(prior['previous_row']['final_disposition'], 'inherited')
+                self.assertTrue(any(row.get('evidence_report') == 'compatibility/rc/ripple-event-replay-upstream-correction.json'
+                                    for row in entry.get('prior_dispositions', [])))
+            else:
+                self.assertTrue(any(row.get("final_disposition") == "inherited"
+                                    for row in entry.get("prior_dispositions", [])))
+            if sha in {'9494ff2d65c98726046e6a20dd6a6d938e97a2f6',
+                       '8c3165582fcc1e307f8ddd261f5977c6f2f8b0fc',
+                       '25f391a3c545a1b829a74584c4f9235ab8d18497',
+                       '10db3e30f94c8cfd160679da7ba22e4c6c0dd8bb'}:
+                self.assert_pending_behavior_review(entry, json.loads((ROOT / entry['evidence_report']).read_text()))
+                continue
             self.assertEqual(entry["final_disposition"], "not-applicable")
             report = json.loads((ROOT / entry["evidence_report"]).read_text())
             review = next(row for row in report["reviews"] if row["sha"] == sha)
+            if sha == '963a299e9d8c0a783314c81eeaa6b2396aa7044f':
+                self.assertEqual(report['role'], 'C04 ten individual production TypeScript documentation reviews')
+                self.assertEqual(len(report['reviews']), 10)
+                self.assertEqual(hashlib.sha256(review['diff'].encode()).hexdigest(), review['diff_sha256'])
+                self.assertEqual(entry['individual_proof']['diff_sha256'], review['diff_sha256'])
+                self.assertEqual(entry['individual_proof']['proof_kind'], 'complete-syntax-and-documentation-review')
+                self.assertTrue(review['members'])
+                for member in review['members']:
+                    self.assertGreater(member['tokens'], 0)
+                    self.assertRegex(member['program_tokens_sha256'], r'^[0-9a-f]{64}$')
+                self.assertEqual(report['g11_claim'], 'not-passed')
+                continue
             self.assertFalse(review["runtime_change_in_patch"])
             self.assertTrue(all(line.startswith(("*", "//", "/**")) for line in review["changed_lines"]))
         statuses = {"all-added-lines-present-and-executed", "some-added-lines-executed", "present-not-executed",
