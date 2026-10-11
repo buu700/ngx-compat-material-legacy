@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "role": "bounded cyber follow-up; not a release or G11 security clearance",
+  "line": "21.x",
+  "checked_at_utc": "2026-10-11T04:36:40.507234+00:00",
+  "policy": "SECURITY.md requires reachable paths, shipped-runtime versus build-tool distinction, upstream fix review, tests and owner-authorized release.",
+  "braces": {
+    "advisory": "GHSA-vfj7-8cjw-p6xm",
+    "affected": "braces <=3.0.3",
+    "patched_version": null,
+    "registry_latest": "3.0.3",
+    "registry_checked_at_utc": "2026-10-10T22:48:29.709822+00:00",
+    "authenticated_archive": {
+      "version": "3.0.3",
+      "sha256": "1cd18e862c8640b4568b1425a7df4ee030ff201d45b2da8f9f222d2987494ffc",
+      "archive_sri": "sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA==",
+      "matches_both_locks": true
+    },
+    "supporting_archives": {
+      "fill-range": {
+        "version": "7.1.1",
+        "sha256": "1a6c3a3446cb1d693cf6b62785e2f6d8f9596305aff474dd2b31b2d8d427593c",
+        "archive_sri": "sha512-YsGpe3WHLK8ZYi4tWDg2Jy3ebRz2rXowDxnld4bkQB00cc/1Zw9AWnC0i9ztDJitivtQvaI9KaLyKrc+hBW0yg==",
+        "matches_both_locks": true
+      },
+      "to-regex-range": {
+        "version": "5.0.1",
+        "sha256": "a63a255ec20a935c3a3334a6645f9245db36e2319ddf1eb6bc0eab2bfe5b42d7",
+        "archive_sri": "sha512-65P7iz6X5yEr1cwcgvQxbbIw7Uk3gOy5dIdtZ4rDveLqhrdJP+Li/Hx6tyK0NEb+2GCyneCMJiGqrADCSNk8sQ==",
+        "matches_both_locks": true
+      },
+      "is-number": {
+        "version": "7.0.0",
+        "sha256": "7b75c1057198cf97696909a9bee176c9c5e9bcb5b03bf3ecef2f484defadd51e",
+        "archive_sri": "sha512-41Cifkg6e8TylSpdtTpeLVMqvSBEVzTttHvERD741+pnZ8ANv0004MRL43QKPDlK9cGvNp6NZWZUBlbGXYxxng==",
+        "matches_both_locks": true
+      },
+      "karma": {
+        "version": "6.4.4",
+        "sha256": "d14fbaacad9fe823c149c9dbad1f108caf7e4d6ed93b47d8596ecd3ecc74d188",
+        "archive_sri": "sha512-LrtUxbdvt1gOpo3gxG+VAJlJAEMhbWlM4YrFQgql98FwF7+K8K12LYO4hnDdUkNjeztYrOXEMqgTajSWgmtI/w==",
+        "matches_both_locks": true
+      },
+      "chokidar": {
+        "version": "3.6.0",
+        "sha256": "39f16d8239687a4d250ab91a96e10d946f82e1d9d039258fb35597c087daf7e2",
+        "archive_sri": "sha512-7VT13fmjotKpGipCW9JEQAusEPE+Ei8nl6/g4FBAmIm0GOOLMua9NDDo/DWp0ZAxCr3cPq5ZpBqmPAQgDda2Pw==",
+        "matches_both_locks": true
+      }
+    },
+    "validation": {
+      "method": "isolated Node child, 64 MiB heap, five-second timeout, exact SRI-matched npm archive",
+      "baseline": "braces.expand nested depth 3, 250, 1000, 2000 returned normally",
+      "trigger": "depth 4000, input length 8001 (under 10000 max), RangeError: Maximum call stack size exceeded",
+      "uncaught_process_exit": 1,
+      "primitive": "confirmed"
+    },
+    "locked_paths": [
+      [
+        "devDependency karma@6.4.4",
+        "braces@3.0.3"
+      ],
+      [
+        "devDependency karma@6.4.4",
+        "chokidar@3.6.0",
+        "braces@3.0.3"
+      ]
+    ],
+    "source_trace": [
+      "karma@6.4.4 watcher getWatchedPatterns expands only watched patterns",
+      "Karma server starts watcher only when autoWatch is true",
+      "chokidar@3.6.0 expands glob paths containing braces",
+      "testing/legacy-runner/karma.conf.cjs uses one fixed pattern with watched:false and autoWatch:false"
+    ],
+    "project_applicability": "needs-review: vulnerable dev dependency is present but the canonical test path does not feed it attacker-controlled patterns; custom Karma configurations are not established as a supported lower-trust input boundary",
+    "risk_treatment": "Existing user-authorized exact two-path temporary exception remains through 2026-11-04 or until a patched release appears, whichever comes first; no vulnerability fix or publication clearance",
+    "packed_runtime_evidence": "projects/ngx-material-legacy/package.json lists only tslib under dependencies; current packed artifact was not rebuilt or rehashed in this follow-up"
+  },
+  "other_dependency_observations": {
+    "osv_querybatch_checked_at_utc": "2026-10-11T04:36:40.507234+00:00",
+    "osv_http_status": 200,
+    "queried_versions": {
+      "@angular/core": "21.2.23",
+      "@angular/cdk": "21.2.14",
+      "@angular/material": "21.2.14",
+      "source-map-js": "1.2.2",
+      "braces": "3.0.3"
+    },
+    "osv_results": "Only braces@3.0.3 returned GHSA-vfj7-8cjw-p6xm among the eight cross-line package/version queries; an empty OSV result is not proof of no flaw",
+    "source_map_js_advisory": "GHSA-68fv-2mgg-jv7q lists <1.2.2 affected and 1.2.2 patched"
+  },
+  "upstream_security_deep": {
+    "datepicker_constructor": "not an owned implementation; existing individual disposition retained",
+    "tooltip_deferred_injection": "performance change, no identified security sink; existing individual disposition retained",
+    "trusted_types_relocation": "private CDK helper not owned or imported; existing individual disposition retained",
+    "progress_bar_csp": {
+      "shas": [
+        "cf3506adf1af1556d705dbb651e7e96a7141b81d",
+        "878700d10ab042b6a62c6f86f4fcc24d5a0ae685"
+      ],
+      "status": "pending current-artifact qualification",
+      "owned_legacy_html_sha256": "00f81e3d99f77d0157c006d81f251a6325b26773885dd76c355720a0bf89ff8a",
+      "vendor_linear_progress_theme_sha256": "8f0f8ceb75f565514e11e4579cdfe3a4378255ee4c1b736af589d180156cf802",
+      "current_companion_theme_sha256": "ab15375193165ec7eefe33eb919213e51a9f3a3aff6789a5abcd834dc34a4f7a",
+      "prior_browser_receipt": "compatibility/f10/disposition-ledger/evidence/closeout-browser-native-diagnostic-receipts.json",
+      "proof_gap": "Prior browser receipt predates the public MatProgressBar override now in the companion Sass theme; current packed CSS/CSP and visual behavior have not been rerun. The legacy template uses inline SVG and does not contain MDC buffer dots. No CSS/SCSS changed for this review."
+    },
+    "media_matcher": {
+      "sha": "231f94f5557bb58afc0070585688b3014d541eb2",
+      "status": "21.2.14 peer CSS marker injection reproduced previously; upstream peer issue remains open for 21.x",
+      "owned_direct_query": "literal (prefers-reduced-motion)",
+      "owned_source_sha256": "203162d90b57fa53211f6c8d815b3db33d01b3b221a82a8c29170eeb6385c6f3",
+      "indirect_queries": "Owned BreakpointObserver and high-contrast call sites use fixed public Breakpoints or literals, per closeout-media-matcher-caller-triage.json",
+      "21x_peer_versions": "npm registry latest 21.x @angular/cdk is 21.2.14; no later 21.x patch available as of this check",
+      "proof_gap": "No addon-controlled untrusted query found, but the required 21.x peer itself accepts raw CSS query text; no patched 21.x peer or addon-level repair is established"
+    }
+  },
+  "limits": [
+    "No current packed artifact, full CSP browser matrix, full lock advisory scan, or complete 1697-SHA security audit was executed.",
+    "No product HTML, CSS, SCSS, TypeScript, lockfile, or consumer file changed.",
+    "No push or Actions run."
+  ]
+}
