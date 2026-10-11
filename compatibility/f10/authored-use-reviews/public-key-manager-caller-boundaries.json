@@ -1,0 +1,387 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "status": "reviewed",
+  "recorded_at_utc": "2026-10-11T07:00:09.342076+00:00",
+  "criteria": "Six exact frozen public class constructor/member/alias boundaries, including related consumer routes; native/component gates remain separate",
+  "reviews": [
+    {
+      "file": "legacy-chips/chip-list.ts",
+      "module": "@angular/cdk/a11y",
+      "symbol": "FocusKeyManager",
+      "candidate_source_sha256": "6be4ef5b4100e7d1122dc3a0842d66c8a57315374e438ecd8ddf2e29e9f8c3e2",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "A genuine QueryList<MatLegacyChip> feeds FocusKeyManager with historical wrapping, vertical navigation, home/end and bidi horizontal orientation. Chip-input reaches the same field through setLastItemActive; all twelve manager references and no aliases are resolved. Exact constructor chains and owned predicates match untouched tag; complete public declarations preserve all consumed members and the prior genuine-runtime algorithm baseline supports their behavior. Strict genuine-declaration fixtures, original/minimum constructor replay and rejected counterexamples qualify this stable public dependency boundary. Whole owned methods/native views, AOT/packed/floor consumers, upstream SHA semantics and complete audit remain open; this closure does not imply those gates passed.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/key-manager-caller-source-proof.json",
+          "sha256": "05705bd8bb24fb2d99b04ad31625cc9b2b1c63e1594281eac3a9ad5773bea3b0"
+        },
+        {
+          "path": "compatibility/rc/key-manager-caller-diagnostic.json",
+          "sha256": "6c944b1693238dd57749e5e2cbfd49c9c66036c7b0bf543e5923358176132d53"
+        },
+        {
+          "path": "scripts/key-manager-caller-review.mjs",
+          "sha256": "5c5ec71564a497e5d31390aea6b8b2201a2aa1652fd5442b3ad793fb042bc6a3"
+        },
+        {
+          "path": "scripts/key-manager-public-subjects.mjs",
+          "sha256": "904eb0aca144a2d0b002572a1a671ffb021f5a06b5a09ad3514f5182f81b9f18"
+        },
+        {
+          "path": "scripts/element-ref-use-review.mjs",
+          "sha256": "72bcca55d79370c77c35c7c3439ecd35cb0e799a722e60663a51128ca52ce78a"
+        },
+        {
+          "path": "tests/key_manager_callers_probe.mjs",
+          "sha256": "02f98b531876b96f9f9544aeafbf18e9832fddbc08e5a684c847cdff5539d9c1"
+        },
+        {
+          "path": "tests/test_key_manager_callers.py",
+          "sha256": "06fde8ab6a8c31a131ebd9fd86f0d0c4730e50a8d2891a20594fb9cc9c07627b"
+        },
+        {
+          "path": "compatibility/rc/key-manager-public-subjects.json",
+          "sha256": "97733629aa03a8faa5dfa88ccf96efa9f1cb3b40914f65efed7123870eedc0fb"
+        },
+        {
+          "path": "compatibility/rc/element-ref-public-subjects.json",
+          "sha256": "e08da48b91457bdf614c290fa67ca1930c71ddcc80f0ac87968b5d81aff65b20"
+        },
+        {
+          "path": "compatibility/rc/key-manager-tagged-construction-subjects.json",
+          "sha256": "50e7f14e8460bef4eab432c53de985b502678d5c1f0257b1dbcc4a2e30e1aad2"
+        },
+        {
+          "path": "compatibility/rc/key-manager-baseline-source-proof.json",
+          "sha256": "1f470344d284b7a0253b8d82f307bd4bc7f2a02113e7103e12ff510b4b58edc5"
+        },
+        {
+          "path": "compatibility/rc/key-manager-baseline-diagnostic.json",
+          "sha256": "3055a64cae6501c18db9346844e39516ec05ab8fb72d15136573f4be478f0849"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-chips/chip-input.ts",
+          "sha256": "33570050813994128c0ba997912c66de993ea75fd9f27d03b85842ee509cbe27"
+        }
+      ]
+    },
+    {
+      "file": "legacy-list/selection-list.ts",
+      "module": "@angular/cdk/a11y",
+      "symbol": "FocusKeyManager",
+      "candidate_source_sha256": "e408bbc42e122dcb9197d2fb850740a9cf769d650ec70442b595428ce747c206",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "A genuine QueryList<MatLegacyListOption> feeds FocusKeyManager with historical wrap/typeahead/home/end, shift modifier and skipPredicate(()=>false). The disabled-item focus contract remains explicit, with sixteen references and one immutable manager alias. Exact constructor chains and owned predicates match untouched tag; complete public declarations preserve all consumed members and the prior genuine-runtime algorithm baseline supports their behavior. Strict genuine-declaration fixtures, original/minimum constructor replay and rejected counterexamples qualify this stable public dependency boundary. Whole owned methods/native views, AOT/packed/floor consumers, upstream SHA semantics and complete audit remain open; this closure does not imply those gates passed.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/key-manager-caller-source-proof.json",
+          "sha256": "05705bd8bb24fb2d99b04ad31625cc9b2b1c63e1594281eac3a9ad5773bea3b0"
+        },
+        {
+          "path": "compatibility/rc/key-manager-caller-diagnostic.json",
+          "sha256": "6c944b1693238dd57749e5e2cbfd49c9c66036c7b0bf543e5923358176132d53"
+        },
+        {
+          "path": "scripts/key-manager-caller-review.mjs",
+          "sha256": "5c5ec71564a497e5d31390aea6b8b2201a2aa1652fd5442b3ad793fb042bc6a3"
+        },
+        {
+          "path": "scripts/key-manager-public-subjects.mjs",
+          "sha256": "904eb0aca144a2d0b002572a1a671ffb021f5a06b5a09ad3514f5182f81b9f18"
+        },
+        {
+          "path": "scripts/element-ref-use-review.mjs",
+          "sha256": "72bcca55d79370c77c35c7c3439ecd35cb0e799a722e60663a51128ca52ce78a"
+        },
+        {
+          "path": "tests/key_manager_callers_probe.mjs",
+          "sha256": "02f98b531876b96f9f9544aeafbf18e9832fddbc08e5a684c847cdff5539d9c1"
+        },
+        {
+          "path": "tests/test_key_manager_callers.py",
+          "sha256": "06fde8ab6a8c31a131ebd9fd86f0d0c4730e50a8d2891a20594fb9cc9c07627b"
+        },
+        {
+          "path": "compatibility/rc/key-manager-public-subjects.json",
+          "sha256": "97733629aa03a8faa5dfa88ccf96efa9f1cb3b40914f65efed7123870eedc0fb"
+        },
+        {
+          "path": "compatibility/rc/element-ref-public-subjects.json",
+          "sha256": "e08da48b91457bdf614c290fa67ca1930c71ddcc80f0ac87968b5d81aff65b20"
+        },
+        {
+          "path": "compatibility/rc/key-manager-tagged-construction-subjects.json",
+          "sha256": "50e7f14e8460bef4eab432c53de985b502678d5c1f0257b1dbcc4a2e30e1aad2"
+        },
+        {
+          "path": "compatibility/rc/key-manager-baseline-source-proof.json",
+          "sha256": "1f470344d284b7a0253b8d82f307bd4bc7f2a02113e7103e12ff510b4b58edc5"
+        },
+        {
+          "path": "compatibility/rc/key-manager-baseline-diagnostic.json",
+          "sha256": "3055a64cae6501c18db9346844e39516ec05ab8fb72d15136573f4be478f0849"
+        }
+      ]
+    },
+    {
+      "file": "legacy-tabs/internal/paginated-tab-header.ts",
+      "module": "@angular/cdk/a11y",
+      "symbol": "FocusKeyManager",
+      "candidate_source_sha256": "a738ff2ac3d901f5c2e9614130dddbcb19ce306376a662279a6df7d385148225",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The genuine QueryList item collection feeds FocusKeyManager with historical layout direction, home/end, wrap and disabled-item focus predicate. Thirteen resolved references cover the owned field without manager aliases. Exact constructor chains and owned predicates match untouched tag; complete public declarations preserve all consumed members and the prior genuine-runtime algorithm baseline supports their behavior. Strict genuine-declaration fixtures, original/minimum constructor replay and rejected counterexamples qualify this stable public dependency boundary. Whole owned methods/native views, AOT/packed/floor consumers, upstream SHA semantics and complete audit remain open; this closure does not imply those gates passed.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/key-manager-caller-source-proof.json",
+          "sha256": "05705bd8bb24fb2d99b04ad31625cc9b2b1c63e1594281eac3a9ad5773bea3b0"
+        },
+        {
+          "path": "compatibility/rc/key-manager-caller-diagnostic.json",
+          "sha256": "6c944b1693238dd57749e5e2cbfd49c9c66036c7b0bf543e5923358176132d53"
+        },
+        {
+          "path": "scripts/key-manager-caller-review.mjs",
+          "sha256": "5c5ec71564a497e5d31390aea6b8b2201a2aa1652fd5442b3ad793fb042bc6a3"
+        },
+        {
+          "path": "scripts/key-manager-public-subjects.mjs",
+          "sha256": "904eb0aca144a2d0b002572a1a671ffb021f5a06b5a09ad3514f5182f81b9f18"
+        },
+        {
+          "path": "scripts/element-ref-use-review.mjs",
+          "sha256": "72bcca55d79370c77c35c7c3439ecd35cb0e799a722e60663a51128ca52ce78a"
+        },
+        {
+          "path": "tests/key_manager_callers_probe.mjs",
+          "sha256": "02f98b531876b96f9f9544aeafbf18e9832fddbc08e5a684c847cdff5539d9c1"
+        },
+        {
+          "path": "tests/test_key_manager_callers.py",
+          "sha256": "06fde8ab6a8c31a131ebd9fd86f0d0c4730e50a8d2891a20594fb9cc9c07627b"
+        },
+        {
+          "path": "compatibility/rc/key-manager-public-subjects.json",
+          "sha256": "97733629aa03a8faa5dfa88ccf96efa9f1cb3b40914f65efed7123870eedc0fb"
+        },
+        {
+          "path": "compatibility/rc/element-ref-public-subjects.json",
+          "sha256": "e08da48b91457bdf614c290fa67ca1930c71ddcc80f0ac87968b5d81aff65b20"
+        },
+        {
+          "path": "compatibility/rc/key-manager-tagged-construction-subjects.json",
+          "sha256": "50e7f14e8460bef4eab432c53de985b502678d5c1f0257b1dbcc4a2e30e1aad2"
+        },
+        {
+          "path": "compatibility/rc/key-manager-baseline-source-proof.json",
+          "sha256": "1f470344d284b7a0253b8d82f307bd4bc7f2a02113e7103e12ff510b4b58edc5"
+        },
+        {
+          "path": "compatibility/rc/key-manager-baseline-diagnostic.json",
+          "sha256": "3055a64cae6501c18db9346844e39516ec05ab8fb72d15136573f4be478f0849"
+        }
+      ]
+    },
+    {
+      "file": "legacy-autocomplete/internal/autocomplete-base.ts",
+      "module": "@angular/cdk/a11y",
+      "symbol": "ActiveDescendantKeyManager",
+      "candidate_source_sha256": "f874b1dbd357dacc0044302fb728ef4155428866435a0d102ab85d2a8de48374",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "A genuine option QueryList feeds ActiveDescendantKeyManager with historical wrap and the untouched owned skip predicate. Twelve resolved references include autocomplete-trigger active state, tab and keyboard paths, with no aliases. Exact constructor chains and owned predicates match untouched tag; complete public declarations preserve all consumed members and the prior genuine-runtime algorithm baseline supports their behavior. Strict genuine-declaration fixtures, original/minimum constructor replay and rejected counterexamples qualify this stable public dependency boundary. Whole owned methods/native views, AOT/packed/floor consumers, upstream SHA semantics and complete audit remain open; this closure does not imply those gates passed.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/key-manager-caller-source-proof.json",
+          "sha256": "05705bd8bb24fb2d99b04ad31625cc9b2b1c63e1594281eac3a9ad5773bea3b0"
+        },
+        {
+          "path": "compatibility/rc/key-manager-caller-diagnostic.json",
+          "sha256": "6c944b1693238dd57749e5e2cbfd49c9c66036c7b0bf543e5923358176132d53"
+        },
+        {
+          "path": "scripts/key-manager-caller-review.mjs",
+          "sha256": "5c5ec71564a497e5d31390aea6b8b2201a2aa1652fd5442b3ad793fb042bc6a3"
+        },
+        {
+          "path": "scripts/key-manager-public-subjects.mjs",
+          "sha256": "904eb0aca144a2d0b002572a1a671ffb021f5a06b5a09ad3514f5182f81b9f18"
+        },
+        {
+          "path": "scripts/element-ref-use-review.mjs",
+          "sha256": "72bcca55d79370c77c35c7c3439ecd35cb0e799a722e60663a51128ca52ce78a"
+        },
+        {
+          "path": "tests/key_manager_callers_probe.mjs",
+          "sha256": "02f98b531876b96f9f9544aeafbf18e9832fddbc08e5a684c847cdff5539d9c1"
+        },
+        {
+          "path": "tests/test_key_manager_callers.py",
+          "sha256": "06fde8ab6a8c31a131ebd9fd86f0d0c4730e50a8d2891a20594fb9cc9c07627b"
+        },
+        {
+          "path": "compatibility/rc/key-manager-public-subjects.json",
+          "sha256": "97733629aa03a8faa5dfa88ccf96efa9f1cb3b40914f65efed7123870eedc0fb"
+        },
+        {
+          "path": "compatibility/rc/element-ref-public-subjects.json",
+          "sha256": "e08da48b91457bdf614c290fa67ca1930c71ddcc80f0ac87968b5d81aff65b20"
+        },
+        {
+          "path": "compatibility/rc/key-manager-tagged-construction-subjects.json",
+          "sha256": "50e7f14e8460bef4eab432c53de985b502678d5c1f0257b1dbcc4a2e30e1aad2"
+        },
+        {
+          "path": "compatibility/rc/key-manager-baseline-source-proof.json",
+          "sha256": "1f470344d284b7a0253b8d82f307bd4bc7f2a02113e7103e12ff510b4b58edc5"
+        },
+        {
+          "path": "compatibility/rc/key-manager-baseline-diagnostic.json",
+          "sha256": "3055a64cae6501c18db9346844e39516ec05ab8fb72d15136573f4be478f0849"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+          "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+        }
+      ]
+    },
+    {
+      "file": "legacy-select/internal/select-base.ts",
+      "module": "@angular/cdk/a11y",
+      "symbol": "ActiveDescendantKeyManager",
+      "candidate_source_sha256": "3a0e28d25fa553220d0faeff8c00b4bd3c343cdd27051e25eda7efef6a80b432",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "A genuine option QueryList feeds ActiveDescendantKeyManager with historical debounce, vertical/bidi orientation, home/end/page navigation, shift modifier and the untouched owned skip predicate. Thirty-five resolved references include two immutable aliases. Actual owned exports show the constructor-only MatLegacyOption derived type adds no instance members to _MatLegacyOptionBase, preserving the collection/item boundary. The exact optional cancelTypeahead expression cancels a pending callback, returns the same manager and retains subsequent explicit selection on all three real subjects. Exact constructor chains and owned predicates match untouched tag; complete public declarations preserve all consumed members and the prior genuine-runtime algorithm baseline supports their behavior. Strict genuine-declaration fixtures, original/minimum constructor replay and rejected counterexamples qualify this stable public dependency boundary. Whole owned methods/native views, AOT/packed/floor consumers, upstream SHA semantics and complete audit remain open; this closure does not imply those gates passed.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/key-manager-caller-source-proof.json",
+          "sha256": "05705bd8bb24fb2d99b04ad31625cc9b2b1c63e1594281eac3a9ad5773bea3b0"
+        },
+        {
+          "path": "compatibility/rc/key-manager-caller-diagnostic.json",
+          "sha256": "6c944b1693238dd57749e5e2cbfd49c9c66036c7b0bf543e5923358176132d53"
+        },
+        {
+          "path": "scripts/key-manager-caller-review.mjs",
+          "sha256": "5c5ec71564a497e5d31390aea6b8b2201a2aa1652fd5442b3ad793fb042bc6a3"
+        },
+        {
+          "path": "scripts/key-manager-public-subjects.mjs",
+          "sha256": "904eb0aca144a2d0b002572a1a671ffb021f5a06b5a09ad3514f5182f81b9f18"
+        },
+        {
+          "path": "scripts/element-ref-use-review.mjs",
+          "sha256": "72bcca55d79370c77c35c7c3439ecd35cb0e799a722e60663a51128ca52ce78a"
+        },
+        {
+          "path": "tests/key_manager_callers_probe.mjs",
+          "sha256": "02f98b531876b96f9f9544aeafbf18e9832fddbc08e5a684c847cdff5539d9c1"
+        },
+        {
+          "path": "tests/test_key_manager_callers.py",
+          "sha256": "06fde8ab6a8c31a131ebd9fd86f0d0c4730e50a8d2891a20594fb9cc9c07627b"
+        },
+        {
+          "path": "compatibility/rc/key-manager-public-subjects.json",
+          "sha256": "97733629aa03a8faa5dfa88ccf96efa9f1cb3b40914f65efed7123870eedc0fb"
+        },
+        {
+          "path": "compatibility/rc/element-ref-public-subjects.json",
+          "sha256": "e08da48b91457bdf614c290fa67ca1930c71ddcc80f0ac87968b5d81aff65b20"
+        },
+        {
+          "path": "compatibility/rc/key-manager-tagged-construction-subjects.json",
+          "sha256": "50e7f14e8460bef4eab432c53de985b502678d5c1f0257b1dbcc4a2e30e1aad2"
+        },
+        {
+          "path": "compatibility/rc/key-manager-baseline-source-proof.json",
+          "sha256": "1f470344d284b7a0253b8d82f307bd4bc7f2a02113e7103e12ff510b4b58edc5"
+        },
+        {
+          "path": "compatibility/rc/key-manager-baseline-diagnostic.json",
+          "sha256": "3055a64cae6501c18db9346844e39516ec05ab8fb72d15136573f4be478f0849"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+          "sha256": "6a3f48147d777f9147d72cb2ed2fcf3a887819093a3886549188706c57acbd1d"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-core/option/index.ts",
+          "sha256": "8401473eb98adbdbdda06e00a47720894812c29e91f43a2faeccdef702ac5616"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-core/option/option.ts",
+          "sha256": "fc4bb9db4bbfb5ede0680b572cab060ad23b6f91d84791f69c09706dfd57db31"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-core/option/option-base.ts",
+          "sha256": "91342024231daf280fe2f3465c05645b0746e7a3685c9b95e7d52d0dbc281883"
+        }
+      ]
+    },
+    {
+      "file": "legacy-menu/internal/menu-base.ts",
+      "module": "@angular/cdk/a11y",
+      "symbol": "FocusKeyManager",
+      "candidate_source_sha256": "cd672ebc48c5048ab3d474d841508b4fba3c4d67428d28b4d7d8168d32bcbee8",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "A genuine QueryList<MatMenuItem> feeds FocusKeyManager with historical wrap/typeahead/home/end. Nineteen resolved references include three immutable aliases and the public setFocusOrigin fluent route; no upstream private state is accessed. Exact constructor chains and owned predicates match untouched tag; complete public declarations preserve all consumed members and the prior genuine-runtime algorithm baseline supports their behavior. Strict genuine-declaration fixtures, original/minimum constructor replay and rejected counterexamples qualify this stable public dependency boundary. Whole owned methods/native views, AOT/packed/floor consumers, upstream SHA semantics and complete audit remain open; this closure does not imply those gates passed.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/key-manager-caller-source-proof.json",
+          "sha256": "05705bd8bb24fb2d99b04ad31625cc9b2b1c63e1594281eac3a9ad5773bea3b0"
+        },
+        {
+          "path": "compatibility/rc/key-manager-caller-diagnostic.json",
+          "sha256": "6c944b1693238dd57749e5e2cbfd49c9c66036c7b0bf543e5923358176132d53"
+        },
+        {
+          "path": "scripts/key-manager-caller-review.mjs",
+          "sha256": "5c5ec71564a497e5d31390aea6b8b2201a2aa1652fd5442b3ad793fb042bc6a3"
+        },
+        {
+          "path": "scripts/key-manager-public-subjects.mjs",
+          "sha256": "904eb0aca144a2d0b002572a1a671ffb021f5a06b5a09ad3514f5182f81b9f18"
+        },
+        {
+          "path": "scripts/element-ref-use-review.mjs",
+          "sha256": "72bcca55d79370c77c35c7c3439ecd35cb0e799a722e60663a51128ca52ce78a"
+        },
+        {
+          "path": "tests/key_manager_callers_probe.mjs",
+          "sha256": "02f98b531876b96f9f9544aeafbf18e9832fddbc08e5a684c847cdff5539d9c1"
+        },
+        {
+          "path": "tests/test_key_manager_callers.py",
+          "sha256": "06fde8ab6a8c31a131ebd9fd86f0d0c4730e50a8d2891a20594fb9cc9c07627b"
+        },
+        {
+          "path": "compatibility/rc/key-manager-public-subjects.json",
+          "sha256": "97733629aa03a8faa5dfa88ccf96efa9f1cb3b40914f65efed7123870eedc0fb"
+        },
+        {
+          "path": "compatibility/rc/element-ref-public-subjects.json",
+          "sha256": "e08da48b91457bdf614c290fa67ca1930c71ddcc80f0ac87968b5d81aff65b20"
+        },
+        {
+          "path": "compatibility/rc/key-manager-tagged-construction-subjects.json",
+          "sha256": "50e7f14e8460bef4eab432c53de985b502678d5c1f0257b1dbcc4a2e30e1aad2"
+        },
+        {
+          "path": "compatibility/rc/key-manager-baseline-source-proof.json",
+          "sha256": "1f470344d284b7a0253b8d82f307bd4bc7f2a02113e7103e12ff510b4b58edc5"
+        },
+        {
+          "path": "compatibility/rc/key-manager-baseline-diagnostic.json",
+          "sha256": "3055a64cae6501c18db9346844e39516ec05ab8fb72d15136573f4be478f0849"
+        }
+      ]
+    }
+  ]
+}
