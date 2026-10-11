@@ -1,0 +1,761 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "role": "Ten current public DI import boundaries; actual owned guard scopes against genuine original and minimum Core namespaces",
+  "node": "v22.23.3",
+  "compiler": "6.0.3",
+  "source_review": {
+    "schema_version": 1,
+    "line": "21.x",
+    "cases": [
+      {
+        "file": "legacy-core/internal/legacy-animations.ts",
+        "module": "@angular/core",
+        "symbol": "assertInInjectionContext",
+        "candidate_source_sha256": "203162d90b57fa53211f6c8d815b3db33d01b3b221a82a8c29170eeb6385c6f3",
+        "references": [
+          {
+            "line": 68,
+            "kind": "context-guard-call",
+            "expression": "assertInInjectionContext(legacyAnimationsDisabled)",
+            "owner": "legacyAnimationsDisabled",
+            "scope": "export function legacyAnimationsDisabled(): boolean {\n    try {\n        assertInInjectionContext(legacyAnimationsDisabled);\n    }\n    catch {\n        return false;\n    }\n    return getLegacyAnimationsState() !== 'enabled';\n}"
+          }
+        ],
+        "manual_fallback": "false"
+      },
+      {
+        "file": "legacy-core/pseudo-checkbox/pseudo-checkbox.ts",
+        "module": "@angular/core",
+        "symbol": "assertInInjectionContext",
+        "candidate_source_sha256": "7c6cbffc3f95b6f30b0f599f781d2fcb882b75c308f5cadbffa8107a9fd20758",
+        "references": [
+          {
+            "line": 68,
+            "kind": "context-guard-call",
+            "expression": "assertInInjectionContext(MatLegacyPseudoCheckbox)",
+            "owner": "MatLegacyPseudoCheckbox",
+            "scope": "constructor(\n@Optional()\n@Inject(ANIMATION_MODULE_TYPE)\npublic _animationMode?: string) {\n    let inContext = true;\n    try {\n        assertInInjectionContext(MatLegacyPseudoCheckbox);\n    }\n    catch {\n        inContext = false;\n    }\n    this._diAnimationsDisabled = inContext ? legacyAnimationsDisabled() : false;\n}"
+          }
+        ],
+        "manual_fallback": "inContext = false;"
+      },
+      {
+        "file": "legacy-dialog/dialog-container.ts",
+        "module": "@angular/core",
+        "symbol": "assertInInjectionContext",
+        "candidate_source_sha256": "0495cc891e7e1578d05d9679fe61acf155c9bdb47b31032d53c324bc201616ac",
+        "references": [
+          {
+            "line": 38,
+            "kind": "context-guard-call",
+            "expression": "assertInInjectionContext(dialogAnimationsDisabled)",
+            "owner": "dialogAnimationsDisabled",
+            "scope": "function dialogAnimationsDisabled(): boolean {\n    try {\n        assertInInjectionContext(dialogAnimationsDisabled);\n    }\n    catch {\n        return false;\n    }\n    return legacyAnimationsDisabled();\n}"
+          }
+        ],
+        "manual_fallback": "false"
+      },
+      {
+        "file": "legacy-dialog/internal/dialog-container-base.ts",
+        "module": "@angular/core",
+        "symbol": "assertInInjectionContext",
+        "candidate_source_sha256": "752582e2bf49bc2f11431fa7bf35941f381a830dc5d837e14246a40ef010c01c",
+        "references": [
+          {
+            "line": 35,
+            "kind": "context-guard-call",
+            "expression": "assertInInjectionContext(ambientService)",
+            "owner": "ambientService",
+            "scope": "function ambientService<T>(token: ProviderToken<T>): T | null {\n    try {\n        assertInInjectionContext(ambientService);\n    }\n    catch {\n        return null;\n    }\n    return inject(token, { optional: true });\n}"
+          }
+        ],
+        "manual_fallback": "null"
+      },
+      {
+        "file": "legacy-dialog/internal/dialog-container-base.ts",
+        "module": "@angular/core",
+        "symbol": "inject",
+        "candidate_source_sha256": "752582e2bf49bc2f11431fa7bf35941f381a830dc5d837e14246a40ef010c01c",
+        "references": [
+          {
+            "line": 39,
+            "expression": "inject(token, {optional: true})"
+          }
+        ],
+        "owner": "ambientService"
+      },
+      {
+        "file": "legacy-menu/menu-item.ts",
+        "module": "@angular/core",
+        "symbol": "assertInInjectionContext",
+        "candidate_source_sha256": "78998cced10b89812010b41a0e6ea631d3e699c9f6b9e5ca228ebd6e1cd60283",
+        "references": [
+          {
+            "line": 58,
+            "kind": "context-guard-call",
+            "expression": "assertInInjectionContext(MatLegacyMenuItem)",
+            "owner": "MatLegacyMenuItem",
+            "scope": "constructor() {\n    if (arguments.length) {\n        throw new Error('MatLegacyMenuItem requires Angular DI; manual dependency arguments are not supported.');\n    }\n    assertInInjectionContext(MatLegacyMenuItem);\n    return constructLegacyMenuItem(new.target);\n}"
+          }
+        ],
+        "manual_fallback": "strict DI-only boundary"
+      },
+      {
+        "file": "legacy-table/table.ts",
+        "module": "@angular/core",
+        "symbol": "assertInInjectionContext",
+        "candidate_source_sha256": "156faca47dc2fa1efdd2fcfbbe9a0424aa48e7a840c62178c4f2d7068ae33683",
+        "references": [
+          {
+            "line": 88,
+            "kind": "context-guard-call",
+            "expression": "assertInInjectionContext(MatLegacyTable)",
+            "owner": "MatLegacyTable",
+            "scope": "constructor() {\n    if (arguments.length)\n        throw new Error('MatLegacyTable manual dependency arguments are not supported.');\n    assertInInjectionContext(MatLegacyTable);\n    super();\n}"
+          }
+        ],
+        "manual_fallback": "strict DI-only boundary"
+      },
+      {
+        "file": "legacy-tabs/internal/after-tab-header-render.ts",
+        "module": "@angular/core",
+        "symbol": "assertInInjectionContext",
+        "candidate_source_sha256": "02edb608845d4cb4c28ad410f74309ad1cc02214dae823f3c15ad40fd41c699a",
+        "references": [
+          {
+            "line": 16,
+            "kind": "context-guard-call",
+            "expression": "assertInInjectionContext(tabHeaderRenderInjector)",
+            "owner": "tabHeaderRenderInjector",
+            "scope": "export function tabHeaderRenderInjector(): Injector | null {\n    try {\n        assertInInjectionContext(tabHeaderRenderInjector);\n    }\n    catch {\n        return null;\n    }\n    return inject(Injector);\n}"
+          }
+        ],
+        "manual_fallback": "null"
+      },
+      {
+        "file": "legacy-tabs/internal/after-tab-header-render.ts",
+        "module": "@angular/core",
+        "symbol": "inject",
+        "candidate_source_sha256": "02edb608845d4cb4c28ad410f74309ad1cc02214dae823f3c15ad40fd41c699a",
+        "references": [
+          {
+            "line": 20,
+            "expression": "inject(Injector)"
+          }
+        ],
+        "owner": "tabHeaderRenderInjector"
+      },
+      {
+        "file": "legacy-tabs/internal/tab-body-base.ts",
+        "module": "@angular/core",
+        "symbol": "assertInInjectionContext",
+        "candidate_source_sha256": "bf02faabd1d0fff61c0e756ee6422af4d417b4d045c475179807c195b4edf7b4",
+        "references": [
+          {
+            "line": 37,
+            "kind": "context-guard-call",
+            "expression": "assertInInjectionContext(tabBodyNgZone)",
+            "owner": "tabBodyNgZone",
+            "scope": "function tabBodyNgZone(): NgZone | null {\n    try {\n        assertInInjectionContext(tabBodyNgZone);\n    }\n    catch {\n        return null;\n    }\n    return inject(NgZone, { optional: true });\n}"
+          }
+        ],
+        "manual_fallback": "null"
+      }
+    ],
+    "snippets": {
+      "legacyAnimationsDisabled": "function legacyAnimationsDisabled(): boolean {\n    try {\n        assertInInjectionContext(legacyAnimationsDisabled);\n    }\n    catch {\n        return false;\n    }\n    return getLegacyAnimationsState() !== 'enabled';\n}",
+      "getLegacyAnimationsState": "function getLegacyAnimationsState(): LegacyAnimationsState {\n    const testOverride = inject(LEGACY_ANIMATIONS_TEST_OVERRIDE, { optional: true });\n    if (testOverride) {\n        return testOverride;\n    }\n    const materialConfig = inject(MATERIAL_ANIMATIONS, { optional: true });\n    if (materialConfig?.animationsDisabled) {\n        return 'di-disabled';\n    }\n    if (inject(ANIMATION_MODULE_TYPE, { optional: true }) === 'NoopAnimations') {\n        return 'di-disabled';\n    }\n    try {\n        const reduced = inject(MediaMatcher).matchMedia('(prefers-reduced-motion)').matches;\n        return reduced ? 'reduced-motion' : 'enabled';\n    }\n    catch {\n        return 'enabled';\n    }\n}",
+      "MatLegacyPseudoCheckbox": "class MatLegacyPseudoCheckbox {constructor(\n@Optional()\n@Inject(ANIMATION_MODULE_TYPE)\npublic _animationMode?: string) {\n    let inContext = true;\n    try {\n        assertInInjectionContext(MatLegacyPseudoCheckbox);\n    }\n    catch {\n        inContext = false;\n    }\n    this._diAnimationsDisabled = inContext ? legacyAnimationsDisabled() : false;\n}}",
+      "dialogAnimationsDisabled": "function dialogAnimationsDisabled(): boolean {\n    try {\n        assertInInjectionContext(dialogAnimationsDisabled);\n    }\n    catch {\n        return false;\n    }\n    return legacyAnimationsDisabled();\n}",
+      "ambientService": "function ambientService<T>(token: ProviderToken<T>): T | null {\n    try {\n        assertInInjectionContext(ambientService);\n    }\n    catch {\n        return null;\n    }\n    return inject(token, { optional: true });\n}",
+      "MatLegacyMenuItem": "class MatLegacyMenuItem extends ContextParent {constructor() {\n    if (arguments.length) {\n        throw new Error('MatLegacyMenuItem requires Angular DI; manual dependency arguments are not supported.');\n    }\n    assertInInjectionContext(MatLegacyMenuItem);\n    return constructLegacyMenuItem(new.target);\n}}",
+      "MatLegacyTable": "class MatLegacyTable extends ContextParent {constructor() {\n    if (arguments.length)\n        throw new Error('MatLegacyTable manual dependency arguments are not supported.');\n    assertInInjectionContext(MatLegacyTable);\n    super();\n}}",
+      "tabHeaderRenderInjector": "function tabHeaderRenderInjector(): Injector | null {\n    try {\n        assertInInjectionContext(tabHeaderRenderInjector);\n    }\n    catch {\n        return null;\n    }\n    return inject(Injector);\n}",
+      "tabBodyNgZone": "function tabBodyNgZone(): NgZone | null {\n    try {\n        assertInInjectionContext(tabBodyNgZone);\n    }\n    catch {\n        return null;\n    }\n    return inject(NgZone, { optional: true });\n}"
+    },
+    "source_population_sha256": "90acc23c9d2674ff6247a79d50a772104fa9d3d474b9cc0d18f0a56c0861ded8",
+    "source_files": 528,
+    "scope": "Eight actual guard scopes and two direct ambient-inject imports. Constructor/helper bodies execute separately with explicit dependency protocols; full components and their peer parent graphs, styles, motion lifecycle, automatic node/root DI, packed/AOT/native and complete consumer floors remain independent.",
+    "g11_claim": "not-passed"
+  },
+  "public_namespace_capsule_sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3",
+  "declarations": [
+    {
+      "line": "original",
+      "symbol": "assertInInjectionContext",
+      "path": "@angular/core/index.d.ts",
+      "source_sha256": "9fedfcf08d61d0709a96f157bab028ce05c7fe27a0c179e12e19b00922052fab",
+      "declaration": "export declare function assertInInjectionContext(debugFn: Function): void;",
+      "deprecated_not_selected": false
+    },
+    {
+      "line": "original",
+      "symbol": "inject",
+      "path": "@angular/core/index.d.ts",
+      "source_sha256": "9fedfcf08d61d0709a96f157bab028ce05c7fe27a0c179e12e19b00922052fab",
+      "declaration": "export declare function inject<T>(token: ProviderToken<T>): T;",
+      "deprecated_not_selected": false
+    },
+    {
+      "line": "original",
+      "symbol": "inject",
+      "path": "@angular/core/index.d.ts",
+      "source_sha256": "9fedfcf08d61d0709a96f157bab028ce05c7fe27a0c179e12e19b00922052fab",
+      "declaration": "export declare function inject<T>(token: ProviderToken<T>, flags?: InjectFlags): T | null;",
+      "deprecated_not_selected": true
+    },
+    {
+      "line": "original",
+      "symbol": "inject",
+      "path": "@angular/core/index.d.ts",
+      "source_sha256": "9fedfcf08d61d0709a96f157bab028ce05c7fe27a0c179e12e19b00922052fab",
+      "declaration": "export declare function inject<T>(token: ProviderToken<T>, options: InjectOptions & {\n    optional?: false;\n}): T;",
+      "deprecated_not_selected": false
+    },
+    {
+      "line": "original",
+      "symbol": "inject",
+      "path": "@angular/core/index.d.ts",
+      "source_sha256": "9fedfcf08d61d0709a96f157bab028ce05c7fe27a0c179e12e19b00922052fab",
+      "declaration": "export declare function inject<T>(token: ProviderToken<T>, options: InjectOptions): T | null;",
+      "deprecated_not_selected": false
+    },
+    {
+      "line": "main",
+      "symbol": "assertInInjectionContext",
+      "path": "@angular/core/types/core.d.ts",
+      "source_sha256": "7d9eea93a0ccb308851fe7b50af8b8d894e8f0ae456e339fe8dcd87bf3fcfd84",
+      "declaration": "declare function assertInInjectionContext(debugFn: Function): void;",
+      "deprecated_not_selected": false
+    },
+    {
+      "line": "main",
+      "symbol": "inject",
+      "path": "@angular/core/types/core.d.ts",
+      "source_sha256": "7d9eea93a0ccb308851fe7b50af8b8d894e8f0ae456e339fe8dcd87bf3fcfd84",
+      "declaration": "declare function inject<T>(token: ProviderToken<T>): T;",
+      "deprecated_not_selected": false
+    },
+    {
+      "line": "main",
+      "symbol": "inject",
+      "path": "@angular/core/types/core.d.ts",
+      "source_sha256": "7d9eea93a0ccb308851fe7b50af8b8d894e8f0ae456e339fe8dcd87bf3fcfd84",
+      "declaration": "declare function inject<T>(token: ProviderToken<T>, options: InjectOptions & {\n    optional?: false;\n}): T;",
+      "deprecated_not_selected": false
+    },
+    {
+      "line": "main",
+      "symbol": "inject",
+      "path": "@angular/core/types/core.d.ts",
+      "source_sha256": "7d9eea93a0ccb308851fe7b50af8b8d894e8f0ae456e339fe8dcd87bf3fcfd84",
+      "declaration": "declare function inject<T>(token: ProviderToken<T>, options: InjectOptions): T | null;",
+      "deprecated_not_selected": false
+    },
+    {
+      "line": "main",
+      "symbol": "inject",
+      "path": "@angular/core/types/core.d.ts",
+      "source_sha256": "7d9eea93a0ccb308851fe7b50af8b8d894e8f0ae456e339fe8dcd87bf3fcfd84",
+      "declaration": "declare function inject(token: HostAttributeToken): string;",
+      "deprecated_not_selected": false
+    },
+    {
+      "line": "main",
+      "symbol": "inject",
+      "path": "@angular/core/types/core.d.ts",
+      "source_sha256": "7d9eea93a0ccb308851fe7b50af8b8d894e8f0ae456e339fe8dcd87bf3fcfd84",
+      "declaration": "declare function inject(token: HostAttributeToken, options: {\n    optional: true;\n}): string | null;",
+      "deprecated_not_selected": false
+    },
+    {
+      "line": "main",
+      "symbol": "inject",
+      "path": "@angular/core/types/core.d.ts",
+      "source_sha256": "7d9eea93a0ccb308851fe7b50af8b8d894e8f0ae456e339fe8dcd87bf3fcfd84",
+      "declaration": "declare function inject(token: HostAttributeToken, options: {\n    optional: false;\n}): string;",
+      "deprecated_not_selected": false
+    },
+    {
+      "line": "21.x",
+      "symbol": "assertInInjectionContext",
+      "path": "@angular/core/types/core.d.ts",
+      "source_sha256": "b5bad26c29a5dc40bf2c0fefc94574dc0c5a2e158c47e56040c7bd5c7b3334df",
+      "declaration": "declare function assertInInjectionContext(debugFn: Function): void;",
+      "deprecated_not_selected": false
+    },
+    {
+      "line": "21.x",
+      "symbol": "inject",
+      "path": "@angular/core/types/core.d.ts",
+      "source_sha256": "b5bad26c29a5dc40bf2c0fefc94574dc0c5a2e158c47e56040c7bd5c7b3334df",
+      "declaration": "declare function inject<T>(token: ProviderToken<T>): T;",
+      "deprecated_not_selected": false
+    },
+    {
+      "line": "21.x",
+      "symbol": "inject",
+      "path": "@angular/core/types/core.d.ts",
+      "source_sha256": "b5bad26c29a5dc40bf2c0fefc94574dc0c5a2e158c47e56040c7bd5c7b3334df",
+      "declaration": "declare function inject<T>(token: ProviderToken<T>, options: InjectOptions & {\n    optional?: false;\n}): T;",
+      "deprecated_not_selected": false
+    },
+    {
+      "line": "21.x",
+      "symbol": "inject",
+      "path": "@angular/core/types/core.d.ts",
+      "source_sha256": "b5bad26c29a5dc40bf2c0fefc94574dc0c5a2e158c47e56040c7bd5c7b3334df",
+      "declaration": "declare function inject<T>(token: ProviderToken<T>, options: InjectOptions): T | null;",
+      "deprecated_not_selected": false
+    },
+    {
+      "line": "21.x",
+      "symbol": "inject",
+      "path": "@angular/core/types/core.d.ts",
+      "source_sha256": "b5bad26c29a5dc40bf2c0fefc94574dc0c5a2e158c47e56040c7bd5c7b3334df",
+      "declaration": "declare function inject(token: HostAttributeToken): string;",
+      "deprecated_not_selected": false
+    },
+    {
+      "line": "21.x",
+      "symbol": "inject",
+      "path": "@angular/core/types/core.d.ts",
+      "source_sha256": "b5bad26c29a5dc40bf2c0fefc94574dc0c5a2e158c47e56040c7bd5c7b3334df",
+      "declaration": "declare function inject(token: HostAttributeToken, options: {\n    optional: true;\n}): string | null;",
+      "deprecated_not_selected": false
+    },
+    {
+      "line": "21.x",
+      "symbol": "inject",
+      "path": "@angular/core/types/core.d.ts",
+      "source_sha256": "b5bad26c29a5dc40bf2c0fefc94574dc0c5a2e158c47e56040c7bd5c7b3334df",
+      "declaration": "declare function inject(token: HostAttributeToken, options: {\n    optional: false;\n}): string;",
+      "deprecated_not_selected": false
+    }
+  ],
+  "typeChecks": [
+    {
+      "line": "original",
+      "strict": true,
+      "skipLibCheck": false,
+      "compiler": "6.0.3",
+      "diagnostics": 0,
+      "nondeprecated_selected_calls": [
+        "assertInInjectionContext(guard)",
+        "inject(token)",
+        "inject(token,{optional:true})",
+        "inject(Injector)",
+        "inject(NgZone,{optional:true})"
+      ],
+      "expected_negative_types": 4,
+      "fixture_sha256": "16cd314d9725f1416a37c144aee1ea37a18a27256e4dec7d6c76578ca56114d9"
+    },
+    {
+      "line": "main",
+      "strict": true,
+      "skipLibCheck": false,
+      "compiler": "6.0.3",
+      "diagnostics": 0,
+      "nondeprecated_selected_calls": [
+        "assertInInjectionContext(guard)",
+        "inject(token)",
+        "inject(token,{optional:true})",
+        "inject(Injector)",
+        "inject(NgZone,{optional:true})"
+      ],
+      "expected_negative_types": 4,
+      "fixture_sha256": "16cd314d9725f1416a37c144aee1ea37a18a27256e4dec7d6c76578ca56114d9"
+    },
+    {
+      "line": "21.x",
+      "strict": true,
+      "skipLibCheck": false,
+      "compiler": "6.0.3",
+      "diagnostics": 0,
+      "nondeprecated_selected_calls": [
+        "assertInInjectionContext(guard)",
+        "inject(token)",
+        "inject(token,{optional:true})",
+        "inject(Injector)",
+        "inject(NgZone,{optional:true})"
+      ],
+      "expected_negative_types": 4,
+      "fixture_sha256": "16cd314d9725f1416a37c144aee1ea37a18a27256e4dec7d6c76578ca56114d9"
+    }
+  ],
+  "results": [
+    {
+      "line": "original",
+      "mode": "development",
+      "framework": "16.2.12",
+      "cases": [
+        "outside-context-manual-helper-fallbacks",
+        "strict-constructors-reject-outside-before-protocol-parent",
+        "inside-context-actual-guard-scopes-and-borrowed-identity",
+        "optional-services-are-null-only-when-unprovided",
+        "obsolete-manual-arguments-reject-before-parent",
+        "provider-factory-errors-are-not-outside-context-fallbacks",
+        "nested-context-restores-caller-and-throw-restores-outside",
+        "context-does-not-leak-across-microtask"
+      ],
+      "actual_owned_guard_scopes": 8,
+      "direct_ambient_inject_scopes": 2,
+      "whole_public_core_executed": true,
+      "other_values_tokens_and_parents_are_protocols": true,
+      "complete_components_or_automatic_node_root_graphs_qualified": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      },
+      "emitted_scope_sha256": "707635f8510ad255fdd27be7dcfc879333726671643b1a3fec2a392e8d674e53"
+    },
+    {
+      "line": "original",
+      "mode": "production",
+      "framework": "16.2.12",
+      "cases": [
+        "outside-context-manual-helper-fallbacks",
+        "strict-constructors-reject-outside-before-protocol-parent",
+        "inside-context-actual-guard-scopes-and-borrowed-identity",
+        "optional-services-are-null-only-when-unprovided",
+        "obsolete-manual-arguments-reject-before-parent",
+        "provider-factory-errors-are-not-outside-context-fallbacks",
+        "nested-context-restores-caller-and-throw-restores-outside",
+        "context-does-not-leak-across-microtask"
+      ],
+      "actual_owned_guard_scopes": 8,
+      "direct_ambient_inject_scopes": 2,
+      "whole_public_core_executed": true,
+      "other_values_tokens_and_parents_are_protocols": true,
+      "complete_components_or_automatic_node_root_graphs_qualified": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      },
+      "emitted_scope_sha256": "707635f8510ad255fdd27be7dcfc879333726671643b1a3fec2a392e8d674e53"
+    },
+    {
+      "line": "main",
+      "mode": "development",
+      "framework": "22.1.7",
+      "cases": [
+        "outside-context-manual-helper-fallbacks",
+        "strict-constructors-reject-outside-before-protocol-parent",
+        "inside-context-actual-guard-scopes-and-borrowed-identity",
+        "optional-services-are-null-only-when-unprovided",
+        "obsolete-manual-arguments-reject-before-parent",
+        "provider-factory-errors-are-not-outside-context-fallbacks",
+        "nested-context-restores-caller-and-throw-restores-outside",
+        "context-does-not-leak-across-microtask"
+      ],
+      "actual_owned_guard_scopes": 8,
+      "direct_ambient_inject_scopes": 2,
+      "whole_public_core_executed": true,
+      "other_values_tokens_and_parents_are_protocols": true,
+      "complete_components_or_automatic_node_root_graphs_qualified": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      },
+      "emitted_scope_sha256": "707635f8510ad255fdd27be7dcfc879333726671643b1a3fec2a392e8d674e53"
+    },
+    {
+      "line": "main",
+      "mode": "production",
+      "framework": "22.1.7",
+      "cases": [
+        "outside-context-manual-helper-fallbacks",
+        "strict-constructors-reject-outside-before-protocol-parent",
+        "inside-context-actual-guard-scopes-and-borrowed-identity",
+        "optional-services-are-null-only-when-unprovided",
+        "obsolete-manual-arguments-reject-before-parent",
+        "provider-factory-errors-are-not-outside-context-fallbacks",
+        "nested-context-restores-caller-and-throw-restores-outside",
+        "context-does-not-leak-across-microtask"
+      ],
+      "actual_owned_guard_scopes": 8,
+      "direct_ambient_inject_scopes": 2,
+      "whole_public_core_executed": true,
+      "other_values_tokens_and_parents_are_protocols": true,
+      "complete_components_or_automatic_node_root_graphs_qualified": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      },
+      "emitted_scope_sha256": "707635f8510ad255fdd27be7dcfc879333726671643b1a3fec2a392e8d674e53"
+    },
+    {
+      "line": "21.x",
+      "mode": "development",
+      "framework": "21.2.23",
+      "cases": [
+        "outside-context-manual-helper-fallbacks",
+        "strict-constructors-reject-outside-before-protocol-parent",
+        "inside-context-actual-guard-scopes-and-borrowed-identity",
+        "optional-services-are-null-only-when-unprovided",
+        "obsolete-manual-arguments-reject-before-parent",
+        "provider-factory-errors-are-not-outside-context-fallbacks",
+        "nested-context-restores-caller-and-throw-restores-outside",
+        "context-does-not-leak-across-microtask"
+      ],
+      "actual_owned_guard_scopes": 8,
+      "direct_ambient_inject_scopes": 2,
+      "whole_public_core_executed": true,
+      "other_values_tokens_and_parents_are_protocols": true,
+      "complete_components_or_automatic_node_root_graphs_qualified": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      },
+      "emitted_scope_sha256": "707635f8510ad255fdd27be7dcfc879333726671643b1a3fec2a392e8d674e53"
+    },
+    {
+      "line": "21.x",
+      "mode": "production",
+      "framework": "21.2.23",
+      "cases": [
+        "outside-context-manual-helper-fallbacks",
+        "strict-constructors-reject-outside-before-protocol-parent",
+        "inside-context-actual-guard-scopes-and-borrowed-identity",
+        "optional-services-are-null-only-when-unprovided",
+        "obsolete-manual-arguments-reject-before-parent",
+        "provider-factory-errors-are-not-outside-context-fallbacks",
+        "nested-context-restores-caller-and-throw-restores-outside",
+        "context-does-not-leak-across-microtask"
+      ],
+      "actual_owned_guard_scopes": 8,
+      "direct_ambient_inject_scopes": 2,
+      "whole_public_core_executed": true,
+      "other_values_tokens_and_parents_are_protocols": true,
+      "complete_components_or_automatic_node_root_graphs_qualified": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      },
+      "emitted_scope_sha256": "707635f8510ad255fdd27be7dcfc879333726671643b1a3fec2a392e8d674e53"
+    }
+  ],
+  "source_negative_controls": [
+    {
+      "id": "missing-guard:legacy-core/internal/legacy-animations.ts",
+      "rejected": true
+    },
+    {
+      "id": "wrong-debug-owner:legacy-core/internal/legacy-animations.ts",
+      "rejected": true
+    },
+    {
+      "id": "changed-manual-fallback:legacy-core/internal/legacy-animations.ts",
+      "rejected": true
+    },
+    {
+      "id": "missing-guard:legacy-core/pseudo-checkbox/pseudo-checkbox.ts",
+      "rejected": true
+    },
+    {
+      "id": "wrong-debug-owner:legacy-core/pseudo-checkbox/pseudo-checkbox.ts",
+      "rejected": true
+    },
+    {
+      "id": "changed-manual-fallback:legacy-core/pseudo-checkbox/pseudo-checkbox.ts",
+      "rejected": true
+    },
+    {
+      "id": "missing-guard:legacy-dialog/dialog-container.ts",
+      "rejected": true
+    },
+    {
+      "id": "wrong-debug-owner:legacy-dialog/dialog-container.ts",
+      "rejected": true
+    },
+    {
+      "id": "changed-manual-fallback:legacy-dialog/dialog-container.ts",
+      "rejected": true
+    },
+    {
+      "id": "missing-guard:legacy-dialog/internal/dialog-container-base.ts",
+      "rejected": true
+    },
+    {
+      "id": "wrong-debug-owner:legacy-dialog/internal/dialog-container-base.ts",
+      "rejected": true
+    },
+    {
+      "id": "changed-manual-fallback:legacy-dialog/internal/dialog-container-base.ts",
+      "rejected": true
+    },
+    {
+      "id": "missing-guard:legacy-menu/menu-item.ts",
+      "rejected": true
+    },
+    {
+      "id": "wrong-debug-owner:legacy-menu/menu-item.ts",
+      "rejected": true
+    },
+    {
+      "id": "missing-guard:legacy-table/table.ts",
+      "rejected": true
+    },
+    {
+      "id": "wrong-debug-owner:legacy-table/table.ts",
+      "rejected": true
+    },
+    {
+      "id": "missing-guard:legacy-tabs/internal/after-tab-header-render.ts",
+      "rejected": true
+    },
+    {
+      "id": "wrong-debug-owner:legacy-tabs/internal/after-tab-header-render.ts",
+      "rejected": true
+    },
+    {
+      "id": "changed-manual-fallback:legacy-tabs/internal/after-tab-header-render.ts",
+      "rejected": true
+    },
+    {
+      "id": "missing-guard:legacy-tabs/internal/tab-body-base.ts",
+      "rejected": true
+    },
+    {
+      "id": "wrong-debug-owner:legacy-tabs/internal/tab-body-base.ts",
+      "rejected": true
+    },
+    {
+      "id": "changed-manual-fallback:legacy-tabs/internal/tab-body-base.ts",
+      "rejected": true
+    },
+    {
+      "id": "required-instead-of-optional-ambient",
+      "rejected": true
+    },
+    {
+      "id": "numeric-inject-flags",
+      "rejected": true
+    },
+    {
+      "id": "shadowed-public-guard",
+      "rejected": true
+    },
+    {
+      "id": "wrong-captured-token",
+      "rejected": true
+    },
+    {
+      "id": "escaped-guard-reference",
+      "rejected": true
+    },
+    {
+      "id": "changed-unreviewed-caller",
+      "rejected": true
+    }
+  ],
+  "alias_positive_controls": 1,
+  "runtime_controls": [
+    {
+      "line": "original",
+      "id": "public-guard-becomes-noop",
+      "rejected": true
+    },
+    {
+      "line": "original",
+      "id": "optional-ambient-becomes-required",
+      "rejected": true
+    },
+    {
+      "line": "original",
+      "id": "capture-wrong-current-injector",
+      "rejected": true
+    },
+    {
+      "line": "original",
+      "id": "swallow-ambient-provider-error",
+      "rejected": true
+    },
+    {
+      "line": "main",
+      "id": "public-guard-becomes-noop",
+      "rejected": true
+    },
+    {
+      "line": "main",
+      "id": "optional-ambient-becomes-required",
+      "rejected": true
+    },
+    {
+      "line": "main",
+      "id": "capture-wrong-current-injector",
+      "rejected": true
+    },
+    {
+      "line": "main",
+      "id": "swallow-ambient-provider-error",
+      "rejected": true
+    },
+    {
+      "line": "21.x",
+      "id": "public-guard-becomes-noop",
+      "rejected": true
+    },
+    {
+      "line": "21.x",
+      "id": "optional-ambient-becomes-required",
+      "rejected": true
+    },
+    {
+      "line": "21.x",
+      "id": "capture-wrong-current-injector",
+      "rejected": true
+    },
+    {
+      "line": "21.x",
+      "id": "swallow-ambient-provider-error",
+      "rejected": true
+    }
+  ],
+  "producer_sha256": "3ef8add15db287a2fe79ad08a26c262e407cfc905a75157664cefa950776f470",
+  "worker_sha256": "7852497d8279f2ccc1ac0729905a81a432187b9e2d836dbcc920c4e892d5fd8d",
+  "source_checker_sha256": "10659d66ec323d8c7d1ae62d3a627da4a9d9b22d618a24ca81bcd5d98be142b0",
+  "limits": [
+    "Selected actual constructor/helper scopes execute, not complete decorated components. Parent construction, motion policy tokens, NgZone/services and values are explicit protocols; genuine complete Core/Compiler runtime and declarations are authenticated.",
+    "Two ambient inject imports are bound to their real token expressions and optional/required public overloads. Three other current inject imports remain pending; the existing tab-body inject import is not a new closure.",
+    "No automatic node/application/root graphs, real peer parent execution, templates/styles, motion lifecycle, packed/AOT/native, Cyph build, full Node/RxJS/compiler floors or complete G02/G11 qualification."
+  ],
+  "g11_claim": "not-passed"
+}

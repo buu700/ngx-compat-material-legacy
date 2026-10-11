@@ -1,0 +1,453 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "status": "reviewed",
+  "role": "Eight current context guards and two ambient inject named-import boundaries only",
+  "reviews": [
+    {
+      "file": "legacy-core/internal/legacy-animations.ts",
+      "module": "@angular/core",
+      "symbol": "assertInInjectionContext",
+      "candidate_source_sha256": "203162d90b57fa53211f6c8d815b3db33d01b3b221a82a8c29170eeb6385c6f3",
+      "conclusion": "stable-public-peer",
+      "decision": "The assertInInjectionContext import in legacy-core/internal/legacy-animations.ts resolves through the stable public @angular/core namespace. The actual guarded legacyAnimationsDisabled scope returns false outside injection context, and otherwise evaluates the owned motion policy after the guard. Provider errors occur outside the guard catch and propagate. This preserves manual construction without implying a native-motion lifecycle pass. Complete genuine original16.2.12/main22.1.7/21.2.23 Core/Compiler namespaces and declarations are authenticated. All actual eight guard scopes execute in separate development and production contexts, with 48 assertions, three strict type subjects and four negative types per subject. Twenty-eight source controls and twelve runtime mutation controls reject missing/noop/wrong/shadowed guards or altered manual fallbacks, changed optional/required lookups, swallowed provider errors, escaped references and changed unreviewed source. Public overload resolution selects nondeprecated object options, never the retained historical deprecated numeric-flags overload. Protocol policy tokens/services/values and parent stand-ins limit this conclusion to the public named-import/context/call boundary; no complete component, automatic node/root graph, actual peer parent, native/AOT/packed, Cyph build, full runtime/RxJS/compiler floor or G11 claim. No product or consumer HTML/CSS/SCSS change.",
+      "reviewer": "Codex C04 public DI context caller review",
+      "scope": "public-context-assertion-and-two-ambient-inject-boundaries",
+      "recorded_references": [
+        {
+          "line": 68,
+          "kind": "context-guard-call",
+          "expression": "assertInInjectionContext(legacyAnimationsDisabled)",
+          "owner": "legacyAnimationsDisabled",
+          "scope": "export function legacyAnimationsDisabled(): boolean {\n    try {\n        assertInInjectionContext(legacyAnimationsDisabled);\n    }\n    catch {\n        return false;\n    }\n    return getLegacyAnimationsState() !== 'enabled';\n}"
+        }
+      ],
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/current-injection-context-source-proof.json",
+          "sha256": "9f3e6acaf49441cbd9f376e6e07cfb8d3ecef0f2d569c5537206c58eddf536a4"
+        },
+        {
+          "path": "scripts/current-injection-context-review.mjs",
+          "sha256": "10659d66ec323d8c7d1ae62d3a627da4a9d9b22d618a24ca81bcd5d98be142b0"
+        },
+        {
+          "path": "tests/current_injection_context_probe.mjs",
+          "sha256": "3ef8add15db287a2fe79ad08a26c262e407cfc905a75157664cefa950776f470"
+        },
+        {
+          "path": "tests/current_injection_context_subject.mjs",
+          "sha256": "7852497d8279f2ccc1ac0729905a81a432187b9e2d836dbcc920c4e892d5fd8d"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        }
+      ]
+    },
+    {
+      "file": "legacy-core/pseudo-checkbox/pseudo-checkbox.ts",
+      "module": "@angular/core",
+      "symbol": "assertInInjectionContext",
+      "candidate_source_sha256": "7c6cbffc3f95b6f30b0f599f781d2fcb882b75c308f5cadbffa8107a9fd20758",
+      "conclusion": "stable-public-peer",
+      "decision": "The assertInInjectionContext import in legacy-core/pseudo-checkbox/pseudo-checkbox.ts resolves through the stable public @angular/core namespace. The actual pseudo-checkbox constructor catches only the public context assertion, records whether ambient policy is available, and retains the explicit mutable animation-mode argument. The outside-context constructor remains usable; inside-context policy errors propagate. Component Input coercion, rendering and motion lifecycle remain separate obligations. Complete genuine original16.2.12/main22.1.7/21.2.23 Core/Compiler namespaces and declarations are authenticated. All actual eight guard scopes execute in separate development and production contexts, with 48 assertions, three strict type subjects and four negative types per subject. Twenty-eight source controls and twelve runtime mutation controls reject missing/noop/wrong/shadowed guards or altered manual fallbacks, changed optional/required lookups, swallowed provider errors, escaped references and changed unreviewed source. Public overload resolution selects nondeprecated object options, never the retained historical deprecated numeric-flags overload. Protocol policy tokens/services/values and parent stand-ins limit this conclusion to the public named-import/context/call boundary; no complete component, automatic node/root graph, actual peer parent, native/AOT/packed, Cyph build, full runtime/RxJS/compiler floor or G11 claim. No product or consumer HTML/CSS/SCSS change.",
+      "reviewer": "Codex C04 public DI context caller review",
+      "scope": "public-context-assertion-and-two-ambient-inject-boundaries",
+      "recorded_references": [
+        {
+          "line": 68,
+          "kind": "context-guard-call",
+          "expression": "assertInInjectionContext(MatLegacyPseudoCheckbox)",
+          "owner": "MatLegacyPseudoCheckbox",
+          "scope": "constructor(\n@Optional()\n@Inject(ANIMATION_MODULE_TYPE)\npublic _animationMode?: string) {\n    let inContext = true;\n    try {\n        assertInInjectionContext(MatLegacyPseudoCheckbox);\n    }\n    catch {\n        inContext = false;\n    }\n    this._diAnimationsDisabled = inContext ? legacyAnimationsDisabled() : false;\n}"
+        }
+      ],
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/current-injection-context-source-proof.json",
+          "sha256": "9f3e6acaf49441cbd9f376e6e07cfb8d3ecef0f2d569c5537206c58eddf536a4"
+        },
+        {
+          "path": "scripts/current-injection-context-review.mjs",
+          "sha256": "10659d66ec323d8c7d1ae62d3a627da4a9d9b22d618a24ca81bcd5d98be142b0"
+        },
+        {
+          "path": "tests/current_injection_context_probe.mjs",
+          "sha256": "3ef8add15db287a2fe79ad08a26c262e407cfc905a75157664cefa950776f470"
+        },
+        {
+          "path": "tests/current_injection_context_subject.mjs",
+          "sha256": "7852497d8279f2ccc1ac0729905a81a432187b9e2d836dbcc920c4e892d5fd8d"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        }
+      ]
+    },
+    {
+      "file": "legacy-dialog/dialog-container.ts",
+      "module": "@angular/core",
+      "symbol": "assertInInjectionContext",
+      "candidate_source_sha256": "0495cc891e7e1578d05d9679fe61acf155c9bdb47b31032d53c324bc201616ac",
+      "conclusion": "stable-public-peer",
+      "decision": "The assertInInjectionContext import in legacy-dialog/dialog-container.ts resolves through the stable public @angular/core namespace. The actual dialogAnimationsDisabled scope returns false for historical manual construction and calls the owned policy only in a valid context. It does not swallow a policy-provider failure. The complete container, focus, overlay and transition lifecycle remain separate obligations. Complete genuine original16.2.12/main22.1.7/21.2.23 Core/Compiler namespaces and declarations are authenticated. All actual eight guard scopes execute in separate development and production contexts, with 48 assertions, three strict type subjects and four negative types per subject. Twenty-eight source controls and twelve runtime mutation controls reject missing/noop/wrong/shadowed guards or altered manual fallbacks, changed optional/required lookups, swallowed provider errors, escaped references and changed unreviewed source. Public overload resolution selects nondeprecated object options, never the retained historical deprecated numeric-flags overload. Protocol policy tokens/services/values and parent stand-ins limit this conclusion to the public named-import/context/call boundary; no complete component, automatic node/root graph, actual peer parent, native/AOT/packed, Cyph build, full runtime/RxJS/compiler floor or G11 claim. No product or consumer HTML/CSS/SCSS change.",
+      "reviewer": "Codex C04 public DI context caller review",
+      "scope": "public-context-assertion-and-two-ambient-inject-boundaries",
+      "recorded_references": [
+        {
+          "line": 38,
+          "kind": "context-guard-call",
+          "expression": "assertInInjectionContext(dialogAnimationsDisabled)",
+          "owner": "dialogAnimationsDisabled",
+          "scope": "function dialogAnimationsDisabled(): boolean {\n    try {\n        assertInInjectionContext(dialogAnimationsDisabled);\n    }\n    catch {\n        return false;\n    }\n    return legacyAnimationsDisabled();\n}"
+        }
+      ],
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/current-injection-context-source-proof.json",
+          "sha256": "9f3e6acaf49441cbd9f376e6e07cfb8d3ecef0f2d569c5537206c58eddf536a4"
+        },
+        {
+          "path": "scripts/current-injection-context-review.mjs",
+          "sha256": "10659d66ec323d8c7d1ae62d3a627da4a9d9b22d618a24ca81bcd5d98be142b0"
+        },
+        {
+          "path": "tests/current_injection_context_probe.mjs",
+          "sha256": "3ef8add15db287a2fe79ad08a26c262e407cfc905a75157664cefa950776f470"
+        },
+        {
+          "path": "tests/current_injection_context_subject.mjs",
+          "sha256": "7852497d8279f2ccc1ac0729905a81a432187b9e2d836dbcc920c4e892d5fd8d"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        }
+      ]
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-container-base.ts",
+      "module": "@angular/core",
+      "symbol": "assertInInjectionContext",
+      "candidate_source_sha256": "752582e2bf49bc2f11431fa7bf35941f381a830dc5d837e14246a40ef010c01c",
+      "conclusion": "stable-public-peer",
+      "decision": "The assertInInjectionContext import in legacy-dialog/internal/dialog-container-base.ts resolves through the stable public @angular/core namespace. The actual generic ambientService helper returns null outside DI and performs inject(token, {optional:true}) after the guarded catch. In a valid context it returns the exact supplied value or null for an unprovided token; provider failures propagate rather than pretending the caller was outside DI. Automatic node/root service resolution and full dialog behavior remain separate. Complete genuine original16.2.12/main22.1.7/21.2.23 Core/Compiler namespaces and declarations are authenticated. All actual eight guard scopes execute in separate development and production contexts, with 48 assertions, three strict type subjects and four negative types per subject. Twenty-eight source controls and twelve runtime mutation controls reject missing/noop/wrong/shadowed guards or altered manual fallbacks, changed optional/required lookups, swallowed provider errors, escaped references and changed unreviewed source. Public overload resolution selects nondeprecated object options, never the retained historical deprecated numeric-flags overload. Protocol policy tokens/services/values and parent stand-ins limit this conclusion to the public named-import/context/call boundary; no complete component, automatic node/root graph, actual peer parent, native/AOT/packed, Cyph build, full runtime/RxJS/compiler floor or G11 claim. No product or consumer HTML/CSS/SCSS change.",
+      "reviewer": "Codex C04 public DI context caller review",
+      "scope": "public-context-assertion-and-two-ambient-inject-boundaries",
+      "recorded_references": [
+        {
+          "line": 35,
+          "kind": "context-guard-call",
+          "expression": "assertInInjectionContext(ambientService)",
+          "owner": "ambientService",
+          "scope": "function ambientService<T>(token: ProviderToken<T>): T | null {\n    try {\n        assertInInjectionContext(ambientService);\n    }\n    catch {\n        return null;\n    }\n    return inject(token, { optional: true });\n}"
+        }
+      ],
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/current-injection-context-source-proof.json",
+          "sha256": "9f3e6acaf49441cbd9f376e6e07cfb8d3ecef0f2d569c5537206c58eddf536a4"
+        },
+        {
+          "path": "scripts/current-injection-context-review.mjs",
+          "sha256": "10659d66ec323d8c7d1ae62d3a627da4a9d9b22d618a24ca81bcd5d98be142b0"
+        },
+        {
+          "path": "tests/current_injection_context_probe.mjs",
+          "sha256": "3ef8add15db287a2fe79ad08a26c262e407cfc905a75157664cefa950776f470"
+        },
+        {
+          "path": "tests/current_injection_context_subject.mjs",
+          "sha256": "7852497d8279f2ccc1ac0729905a81a432187b9e2d836dbcc920c4e892d5fd8d"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        }
+      ]
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-container-base.ts",
+      "module": "@angular/core",
+      "symbol": "inject",
+      "candidate_source_sha256": "752582e2bf49bc2f11431fa7bf35941f381a830dc5d837e14246a40ef010c01c",
+      "conclusion": "stable-public-peer",
+      "decision": "The inject import in legacy-dialog/internal/dialog-container-base.ts resolves through the stable public @angular/core namespace. The actual generic ambientService helper returns null outside DI and performs inject(token, {optional:true}) after the guarded catch. In a valid context it returns the exact supplied value or null for an unprovided token; provider failures propagate rather than pretending the caller was outside DI. Automatic node/root service resolution and full dialog behavior remain separate. Complete genuine original16.2.12/main22.1.7/21.2.23 Core/Compiler namespaces and declarations are authenticated. All actual eight guard scopes execute in separate development and production contexts, with 48 assertions, three strict type subjects and four negative types per subject. Twenty-eight source controls and twelve runtime mutation controls reject missing/noop/wrong/shadowed guards or altered manual fallbacks, changed optional/required lookups, swallowed provider errors, escaped references and changed unreviewed source. Public overload resolution selects nondeprecated object options, never the retained historical deprecated numeric-flags overload. Protocol policy tokens/services/values and parent stand-ins limit this conclusion to the public named-import/context/call boundary; no complete component, automatic node/root graph, actual peer parent, native/AOT/packed, Cyph build, full runtime/RxJS/compiler floor or G11 claim. No product or consumer HTML/CSS/SCSS change.",
+      "reviewer": "Codex C04 public DI context caller review",
+      "scope": "public-context-assertion-and-two-ambient-inject-boundaries",
+      "recorded_references": [
+        {
+          "line": 39,
+          "expression": "inject(token, {optional: true})"
+        }
+      ],
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/current-injection-context-source-proof.json",
+          "sha256": "9f3e6acaf49441cbd9f376e6e07cfb8d3ecef0f2d569c5537206c58eddf536a4"
+        },
+        {
+          "path": "scripts/current-injection-context-review.mjs",
+          "sha256": "10659d66ec323d8c7d1ae62d3a627da4a9d9b22d618a24ca81bcd5d98be142b0"
+        },
+        {
+          "path": "tests/current_injection_context_probe.mjs",
+          "sha256": "3ef8add15db287a2fe79ad08a26c262e407cfc905a75157664cefa950776f470"
+        },
+        {
+          "path": "tests/current_injection_context_subject.mjs",
+          "sha256": "7852497d8279f2ccc1ac0729905a81a432187b9e2d836dbcc920c4e892d5fd8d"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        }
+      ]
+    },
+    {
+      "file": "legacy-menu/menu-item.ts",
+      "module": "@angular/core",
+      "symbol": "assertInInjectionContext",
+      "candidate_source_sha256": "78998cced10b89812010b41a0e6ea631d3e699c9f6b9e5ca228ebd6e1cd60283",
+      "conclusion": "stable-public-peer",
+      "decision": "The assertInInjectionContext import in legacy-menu/menu-item.ts resolves through the stable public @angular/core namespace. The actual menu constructor rejects obsolete manual dependency arguments, asserts valid DI before entering the parent-construction helper, and preserves new.target in the return. This follows the finite technical construction choice under the maintainer\u2019s later TypeScript delegation, not an earlier explicit DI-only approval. The helper and genuine current parent are protocols in this guard test; their actual packed/native/provider/query behavior still requires independent qualification. Complete genuine original16.2.12/main22.1.7/21.2.23 Core/Compiler namespaces and declarations are authenticated. All actual eight guard scopes execute in separate development and production contexts, with 48 assertions, three strict type subjects and four negative types per subject. Twenty-eight source controls and twelve runtime mutation controls reject missing/noop/wrong/shadowed guards or altered manual fallbacks, changed optional/required lookups, swallowed provider errors, escaped references and changed unreviewed source. Public overload resolution selects nondeprecated object options, never the retained historical deprecated numeric-flags overload. Protocol policy tokens/services/values and parent stand-ins limit this conclusion to the public named-import/context/call boundary; no complete component, automatic node/root graph, actual peer parent, native/AOT/packed, Cyph build, full runtime/RxJS/compiler floor or G11 claim. No product or consumer HTML/CSS/SCSS change.",
+      "reviewer": "Codex C04 public DI context caller review",
+      "scope": "public-context-assertion-and-two-ambient-inject-boundaries",
+      "recorded_references": [
+        {
+          "line": 58,
+          "kind": "context-guard-call",
+          "expression": "assertInInjectionContext(MatLegacyMenuItem)",
+          "owner": "MatLegacyMenuItem",
+          "scope": "constructor() {\n    if (arguments.length) {\n        throw new Error('MatLegacyMenuItem requires Angular DI; manual dependency arguments are not supported.');\n    }\n    assertInInjectionContext(MatLegacyMenuItem);\n    return constructLegacyMenuItem(new.target);\n}"
+        }
+      ],
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/current-injection-context-source-proof.json",
+          "sha256": "9f3e6acaf49441cbd9f376e6e07cfb8d3ecef0f2d569c5537206c58eddf536a4"
+        },
+        {
+          "path": "scripts/current-injection-context-review.mjs",
+          "sha256": "10659d66ec323d8c7d1ae62d3a627da4a9d9b22d618a24ca81bcd5d98be142b0"
+        },
+        {
+          "path": "tests/current_injection_context_probe.mjs",
+          "sha256": "3ef8add15db287a2fe79ad08a26c262e407cfc905a75157664cefa950776f470"
+        },
+        {
+          "path": "tests/current_injection_context_subject.mjs",
+          "sha256": "7852497d8279f2ccc1ac0729905a81a432187b9e2d836dbcc920c4e892d5fd8d"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        }
+      ]
+    },
+    {
+      "file": "legacy-table/table.ts",
+      "module": "@angular/core",
+      "symbol": "assertInInjectionContext",
+      "candidate_source_sha256": "156faca47dc2fa1efdd2fcfbbe9a0424aa48e7a840c62178c4f2d7068ae33683",
+      "conclusion": "stable-public-peer",
+      "decision": "The assertInInjectionContext import in legacy-table/table.ts resolves through the stable public @angular/core namespace. The actual table constructor rejects obsolete manual dependency arguments and asserts valid DI before calling super. This guard review preserves the finite delegated constructor boundary. The parent is an explicit protocol in this test; genuine CdkTable definition/query/provider/render behavior remains independently required. Complete genuine original16.2.12/main22.1.7/21.2.23 Core/Compiler namespaces and declarations are authenticated. All actual eight guard scopes execute in separate development and production contexts, with 48 assertions, three strict type subjects and four negative types per subject. Twenty-eight source controls and twelve runtime mutation controls reject missing/noop/wrong/shadowed guards or altered manual fallbacks, changed optional/required lookups, swallowed provider errors, escaped references and changed unreviewed source. Public overload resolution selects nondeprecated object options, never the retained historical deprecated numeric-flags overload. Protocol policy tokens/services/values and parent stand-ins limit this conclusion to the public named-import/context/call boundary; no complete component, automatic node/root graph, actual peer parent, native/AOT/packed, Cyph build, full runtime/RxJS/compiler floor or G11 claim. No product or consumer HTML/CSS/SCSS change.",
+      "reviewer": "Codex C04 public DI context caller review",
+      "scope": "public-context-assertion-and-two-ambient-inject-boundaries",
+      "recorded_references": [
+        {
+          "line": 88,
+          "kind": "context-guard-call",
+          "expression": "assertInInjectionContext(MatLegacyTable)",
+          "owner": "MatLegacyTable",
+          "scope": "constructor() {\n    if (arguments.length)\n        throw new Error('MatLegacyTable manual dependency arguments are not supported.');\n    assertInInjectionContext(MatLegacyTable);\n    super();\n}"
+        }
+      ],
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/current-injection-context-source-proof.json",
+          "sha256": "9f3e6acaf49441cbd9f376e6e07cfb8d3ecef0f2d569c5537206c58eddf536a4"
+        },
+        {
+          "path": "scripts/current-injection-context-review.mjs",
+          "sha256": "10659d66ec323d8c7d1ae62d3a627da4a9d9b22d618a24ca81bcd5d98be142b0"
+        },
+        {
+          "path": "tests/current_injection_context_probe.mjs",
+          "sha256": "3ef8add15db287a2fe79ad08a26c262e407cfc905a75157664cefa950776f470"
+        },
+        {
+          "path": "tests/current_injection_context_subject.mjs",
+          "sha256": "7852497d8279f2ccc1ac0729905a81a432187b9e2d836dbcc920c4e892d5fd8d"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        }
+      ]
+    },
+    {
+      "file": "legacy-tabs/internal/after-tab-header-render.ts",
+      "module": "@angular/core",
+      "symbol": "assertInInjectionContext",
+      "candidate_source_sha256": "02edb608845d4cb4c28ad410f74309ad1cc02214dae823f3c15ad40fd41c699a",
+      "conclusion": "stable-public-peer",
+      "decision": "The assertInInjectionContext import in legacy-tabs/internal/after-tab-header-render.ts resolves through the stable public @angular/core namespace. The actual tabHeaderRenderInjector helper returns null outside DI and injects the required public Injector only after a successful context assertion. Real nested contexts yield the exact caller injector, restore it after failure, and do not leak across a microtask. The render registration and component lifecycle are separate obligations. Complete genuine original16.2.12/main22.1.7/21.2.23 Core/Compiler namespaces and declarations are authenticated. All actual eight guard scopes execute in separate development and production contexts, with 48 assertions, three strict type subjects and four negative types per subject. Twenty-eight source controls and twelve runtime mutation controls reject missing/noop/wrong/shadowed guards or altered manual fallbacks, changed optional/required lookups, swallowed provider errors, escaped references and changed unreviewed source. Public overload resolution selects nondeprecated object options, never the retained historical deprecated numeric-flags overload. Protocol policy tokens/services/values and parent stand-ins limit this conclusion to the public named-import/context/call boundary; no complete component, automatic node/root graph, actual peer parent, native/AOT/packed, Cyph build, full runtime/RxJS/compiler floor or G11 claim. No product or consumer HTML/CSS/SCSS change.",
+      "reviewer": "Codex C04 public DI context caller review",
+      "scope": "public-context-assertion-and-two-ambient-inject-boundaries",
+      "recorded_references": [
+        {
+          "line": 16,
+          "kind": "context-guard-call",
+          "expression": "assertInInjectionContext(tabHeaderRenderInjector)",
+          "owner": "tabHeaderRenderInjector",
+          "scope": "export function tabHeaderRenderInjector(): Injector | null {\n    try {\n        assertInInjectionContext(tabHeaderRenderInjector);\n    }\n    catch {\n        return null;\n    }\n    return inject(Injector);\n}"
+        }
+      ],
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/current-injection-context-source-proof.json",
+          "sha256": "9f3e6acaf49441cbd9f376e6e07cfb8d3ecef0f2d569c5537206c58eddf536a4"
+        },
+        {
+          "path": "scripts/current-injection-context-review.mjs",
+          "sha256": "10659d66ec323d8c7d1ae62d3a627da4a9d9b22d618a24ca81bcd5d98be142b0"
+        },
+        {
+          "path": "tests/current_injection_context_probe.mjs",
+          "sha256": "3ef8add15db287a2fe79ad08a26c262e407cfc905a75157664cefa950776f470"
+        },
+        {
+          "path": "tests/current_injection_context_subject.mjs",
+          "sha256": "7852497d8279f2ccc1ac0729905a81a432187b9e2d836dbcc920c4e892d5fd8d"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        }
+      ]
+    },
+    {
+      "file": "legacy-tabs/internal/after-tab-header-render.ts",
+      "module": "@angular/core",
+      "symbol": "inject",
+      "candidate_source_sha256": "02edb608845d4cb4c28ad410f74309ad1cc02214dae823f3c15ad40fd41c699a",
+      "conclusion": "stable-public-peer",
+      "decision": "The inject import in legacy-tabs/internal/after-tab-header-render.ts resolves through the stable public @angular/core namespace. The actual tabHeaderRenderInjector helper returns null outside DI and injects the required public Injector only after a successful context assertion. Real nested contexts yield the exact caller injector, restore it after failure, and do not leak across a microtask. The render registration and component lifecycle are separate obligations. Complete genuine original16.2.12/main22.1.7/21.2.23 Core/Compiler namespaces and declarations are authenticated. All actual eight guard scopes execute in separate development and production contexts, with 48 assertions, three strict type subjects and four negative types per subject. Twenty-eight source controls and twelve runtime mutation controls reject missing/noop/wrong/shadowed guards or altered manual fallbacks, changed optional/required lookups, swallowed provider errors, escaped references and changed unreviewed source. Public overload resolution selects nondeprecated object options, never the retained historical deprecated numeric-flags overload. Protocol policy tokens/services/values and parent stand-ins limit this conclusion to the public named-import/context/call boundary; no complete component, automatic node/root graph, actual peer parent, native/AOT/packed, Cyph build, full runtime/RxJS/compiler floor or G11 claim. No product or consumer HTML/CSS/SCSS change.",
+      "reviewer": "Codex C04 public DI context caller review",
+      "scope": "public-context-assertion-and-two-ambient-inject-boundaries",
+      "recorded_references": [
+        {
+          "line": 20,
+          "expression": "inject(Injector)"
+        }
+      ],
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/current-injection-context-source-proof.json",
+          "sha256": "9f3e6acaf49441cbd9f376e6e07cfb8d3ecef0f2d569c5537206c58eddf536a4"
+        },
+        {
+          "path": "scripts/current-injection-context-review.mjs",
+          "sha256": "10659d66ec323d8c7d1ae62d3a627da4a9d9b22d618a24ca81bcd5d98be142b0"
+        },
+        {
+          "path": "tests/current_injection_context_probe.mjs",
+          "sha256": "3ef8add15db287a2fe79ad08a26c262e407cfc905a75157664cefa950776f470"
+        },
+        {
+          "path": "tests/current_injection_context_subject.mjs",
+          "sha256": "7852497d8279f2ccc1ac0729905a81a432187b9e2d836dbcc920c4e892d5fd8d"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        }
+      ]
+    },
+    {
+      "file": "legacy-tabs/internal/tab-body-base.ts",
+      "module": "@angular/core",
+      "symbol": "assertInInjectionContext",
+      "candidate_source_sha256": "bf02faabd1d0fff61c0e756ee6422af4d417b4d045c475179807c195b4edf7b4",
+      "conclusion": "stable-public-peer",
+      "decision": "The assertInInjectionContext import in legacy-tabs/internal/tab-body-base.ts resolves through the stable public @angular/core namespace. The actual tabBodyNgZone helper preserves the historical manual constructor by returning null outside DI. In a valid context its optional NgZone lookup yields the exact supplied service or null, and a provider failure propagates. This closes the new assertion import only; the preexisting inject import, tab body motion and complete constructor behavior are separate obligations. Complete genuine original16.2.12/main22.1.7/21.2.23 Core/Compiler namespaces and declarations are authenticated. All actual eight guard scopes execute in separate development and production contexts, with 48 assertions, three strict type subjects and four negative types per subject. Twenty-eight source controls and twelve runtime mutation controls reject missing/noop/wrong/shadowed guards or altered manual fallbacks, changed optional/required lookups, swallowed provider errors, escaped references and changed unreviewed source. Public overload resolution selects nondeprecated object options, never the retained historical deprecated numeric-flags overload. Protocol policy tokens/services/values and parent stand-ins limit this conclusion to the public named-import/context/call boundary; no complete component, automatic node/root graph, actual peer parent, native/AOT/packed, Cyph build, full runtime/RxJS/compiler floor or G11 claim. No product or consumer HTML/CSS/SCSS change.",
+      "reviewer": "Codex C04 public DI context caller review",
+      "scope": "public-context-assertion-and-two-ambient-inject-boundaries",
+      "recorded_references": [
+        {
+          "line": 37,
+          "kind": "context-guard-call",
+          "expression": "assertInInjectionContext(tabBodyNgZone)",
+          "owner": "tabBodyNgZone",
+          "scope": "function tabBodyNgZone(): NgZone | null {\n    try {\n        assertInInjectionContext(tabBodyNgZone);\n    }\n    catch {\n        return null;\n    }\n    return inject(NgZone, { optional: true });\n}"
+        }
+      ],
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/current-injection-context-source-proof.json",
+          "sha256": "9f3e6acaf49441cbd9f376e6e07cfb8d3ecef0f2d569c5537206c58eddf536a4"
+        },
+        {
+          "path": "scripts/current-injection-context-review.mjs",
+          "sha256": "10659d66ec323d8c7d1ae62d3a627da4a9d9b22d618a24ca81bcd5d98be142b0"
+        },
+        {
+          "path": "tests/current_injection_context_probe.mjs",
+          "sha256": "3ef8add15db287a2fe79ad08a26c262e407cfc905a75157664cefa950776f470"
+        },
+        {
+          "path": "tests/current_injection_context_subject.mjs",
+          "sha256": "7852497d8279f2ccc1ac0729905a81a432187b9e2d836dbcc920c4e892d5fd8d"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        }
+      ]
+    }
+  ],
+  "g11_claim": "not-passed"
+}
