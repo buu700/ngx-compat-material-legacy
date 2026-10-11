@@ -5669,20 +5669,55 @@
       "sha": "776e530f7d9dbec0208f5f6302ad46db66a4da16",
       "bucket": "behavior-semantic",
       "subject": "fix(material/slider): match active & focus state on IOS (#27546)",
-      "final_disposition": "irrelevant",
-      "reason": "The patch keeps the MDC slider thumb active on iOS only when the pointer is on the thumb, and it skips pointer focus and animation on iOS. The owned slider has no MatSliderThumb and sets _isActive from the focus origin. That iOS path was not added.",
-      "read_note_disposition": "not-owned",
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "final_disposition": "not-applicable",
+      "reason": "The full six-file patch changes the modern MDC native-input thumb path, circular hit testing, iOS focus/transition behavior, delayed input-width reset and the modern public constructor/API guard. The owned legacy component has one div thumb, host mouse/touch listeners and host CVA value logic, not projected native input directives or separate visual/range thumbs. Its untouched16.2.14 DOM and eight constructor/focus/pointer/lifetime/value handlers remain exactly preserved. Those modern input-width and circle-hit-test paths are absent across the complete current product source. Replacing them would introduce modern input DOM and alter the historical interaction/constructor contract, outside the owned legacy scope. Do not adopt this modern implementation into the legacy slider. This is not an iOS Safari runtime pass or an inherited peer-fix claim.",
+      "read_note_disposition": "retained-historical-slider-architecture",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-three-slider-input-source-review.json",
       "files": [
-        "src/material/slider/slider.ts",
-        "src/material/slider/slider-thumb.ts",
         "src/material/slider/slider-input.ts",
-        "src/material/slider/slider-interface.ts"
+        "src/material/slider/slider-interface.ts",
+        "src/material/slider/slider-thumb.ts",
+        "src/material/slider/slider.spec.ts",
+        "src/material/slider/slider.ts",
+        "tools/public_api_guard/material/slider.md"
       ],
-      "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
+      "batch_id": "closeout-three-individual-slider-input-reviews",
       "recorded_at_utc": "2026-10-01T16:46:41Z",
       "g11_claim": "not-passed",
-      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "prior_dispositions": [
+        {
+          "sha": "776e530f7d9dbec0208f5f6302ad46db66a4da16",
+          "bucket": "behavior-semantic",
+          "subject": "fix(material/slider): match active & focus state on IOS (#27546)",
+          "final_disposition": "irrelevant",
+          "reason": "The patch keeps the MDC slider thumb active on iOS only when the pointer is on the thumb, and it skips pointer focus and animation on iOS. The owned slider has no MatSliderThumb and sets _isActive from the focus origin. That iOS path was not added.",
+          "read_note_disposition": "not-owned",
+          "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+          "files": [
+            "src/material/slider/slider.ts",
+            "src/material/slider/slider-thumb.ts",
+            "src/material/slider/slider-input.ts",
+            "src/material/slider/slider-interface.ts"
+          ],
+          "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
+          "recorded_at_utc": "2026-10-01T16:46:41Z",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+        }
+      ],
+      "review_depth": "individual-compatibility",
+      "individual_proof": {
+        "proof_kind": "retained-legacy-slider-input-scope",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main",
+          "21.x"
+        ],
+        "diff_sha256": "dceaecb315e1d9340d19bcdeae1b10828846d7ddbb16c79b3a6cd52f92407249",
+        "patch_file": "compatibility/f10/disposition-ledger/evidence/patches/776e530f7d9dbec0208f5f6302ad46db66a4da16-slider-input-full.patch",
+        "decision": "The full six-file patch changes the modern MDC native-input thumb path, circular hit testing, iOS focus/transition behavior, delayed input-width reset and the modern public constructor/API guard. The owned legacy component has one div thumb, host mouse/touch listeners and host CVA value logic, not projected native input directives or separate visual/range thumbs. Its untouched16.2.14 DOM and eight constructor/focus/pointer/lifetime/value handlers remain exactly preserved. Those modern input-width and circle-hit-test paths are absent across the complete current product source. Replacing them would introduce modern input DOM and alter the historical interaction/constructor contract, outside the owned legacy scope. Do not adopt this modern implementation into the legacy slider. This is not an iOS Safari runtime pass or an inherited peer-fix claim."
+      }
     },
     {
       "sha": "43dbbe2e5eec4fc4e76950a29edc3efd94027ff9",
@@ -5720,33 +5755,93 @@
       "sha": "eef45562035448212e0f827c5dbc31b3fd621255",
       "bucket": "behavior-semantic",
       "subject": "fix(material/slider): make selecting thumbs at min/max easier (#27702)",
-      "final_disposition": "irrelevant",
-      "reason": "The patch widens the MDC range thumb input at min and max by changing the ripple padding inside MatSliderRangeThumb. This package has no MatSliderRangeThumb and no slider-input. The owned legacy slider was not changed.",
-      "read_note_disposition": "not-owned",
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "final_disposition": "not-applicable",
+      "reason": "This complete one-file patch changes MatSliderRangeThumb native-input width: ripple padding becomes48 at percentage1 and0 at percentage0 so overlapping range inputs can select the intended thumb. The owned historical slider has one div thumb and one value/CVA; there is no range-thumb pair, native input width or overlapping input hit target to repair. Its exact original DOM and retained handlers remain unchanged. No public Sass or resource file is changed by this commit. The fix is not applicable to owned legacy code; it is not authorization to add range-input behavior or a declaration that every legacy min/max touch interaction has been runtime qualified.",
+      "read_note_disposition": "retained-historical-slider-architecture",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-three-slider-input-source-review.json",
       "files": [
         "src/material/slider/slider-input.ts"
       ],
-      "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
+      "batch_id": "closeout-three-individual-slider-input-reviews",
       "recorded_at_utc": "2026-10-01T16:46:41Z",
       "g11_claim": "not-passed",
-      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "prior_dispositions": [
+        {
+          "sha": "eef45562035448212e0f827c5dbc31b3fd621255",
+          "bucket": "behavior-semantic",
+          "subject": "fix(material/slider): make selecting thumbs at min/max easier (#27702)",
+          "final_disposition": "irrelevant",
+          "reason": "The patch widens the MDC range thumb input at min and max by changing the ripple padding inside MatSliderRangeThumb. This package has no MatSliderRangeThumb and no slider-input. The owned legacy slider was not changed.",
+          "read_note_disposition": "not-owned",
+          "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+          "files": [
+            "src/material/slider/slider-input.ts"
+          ],
+          "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
+          "recorded_at_utc": "2026-10-01T16:46:41Z",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+        }
+      ],
+      "review_depth": "individual-compatibility",
+      "individual_proof": {
+        "proof_kind": "retained-legacy-slider-input-scope",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main",
+          "21.x"
+        ],
+        "diff_sha256": "65a9635f52d5c3e4510f9d1847e250fc219685c9c40256611586e0dd34b9a3e4",
+        "patch_file": "compatibility/f10/disposition-ledger/evidence/patches/eef45562035448212e0f827c5dbc31b3fd621255-slider-input-full.patch",
+        "decision": "This complete one-file patch changes MatSliderRangeThumb native-input width: ripple padding becomes48 at percentage1 and0 at percentage0 so overlapping range inputs can select the intended thumb. The owned historical slider has one div thumb and one value/CVA; there is no range-thumb pair, native input width or overlapping input hit target to repair. Its exact original DOM and retained handlers remain unchanged. No public Sass or resource file is changed by this commit. The fix is not applicable to owned legacy code; it is not authorization to add range-input behavior or a declaration that every legacy min/max touch interaction has been runtime qualified."
+      }
     },
     {
       "sha": "291b9db9105846ff0ae37581263725bebb6f0a45",
       "bucket": "behavior-semantic",
       "subject": "fix(material/slider): keep ios safari slider value binding in sync (#27701)",
-      "final_disposition": "irrelevant",
-      "reason": "The patch updates MatSliderThumb so an iOS pointer on the thumb sets the active width and slider dimensions without also focusing the input. This package has no MatSliderThumb. The owned legacy slider was not changed.",
-      "read_note_disposition": "not-owned",
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "final_disposition": "not-applicable",
+      "reason": "This complete one-file follow-up sets modern MatSliderThumb active state from circular iOS hit testing, updates native-input width/dimensions and returns before the normal focus/value path. The owned slider uses the preserved historical host mouse/touch coordinate/value path and focus-origin active state. It has no MatSliderThumb, circular thumb classifier or active-width methods across the complete source population. Copying the early-return branch would replace a different historical interaction model and require new input architecture. The modern fix is not applicable to the retained legacy path; no iOS/native/browser or broader slider qualification is claimed.",
+      "read_note_disposition": "retained-historical-slider-architecture",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-three-slider-input-source-review.json",
       "files": [
         "src/material/slider/slider-input.ts"
       ],
-      "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
+      "batch_id": "closeout-three-individual-slider-input-reviews",
       "recorded_at_utc": "2026-10-01T16:46:41Z",
       "g11_claim": "not-passed",
-      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "prior_dispositions": [
+        {
+          "sha": "291b9db9105846ff0ae37581263725bebb6f0a45",
+          "bucket": "behavior-semantic",
+          "subject": "fix(material/slider): keep ios safari slider value binding in sync (#27701)",
+          "final_disposition": "irrelevant",
+          "reason": "The patch updates MatSliderThumb so an iOS pointer on the thumb sets the active width and slider dimensions without also focusing the input. This package has no MatSliderThumb. The owned legacy slider was not changed.",
+          "read_note_disposition": "not-owned",
+          "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+          "files": [
+            "src/material/slider/slider-input.ts"
+          ],
+          "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
+          "recorded_at_utc": "2026-10-01T16:46:41Z",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+        }
+      ],
+      "review_depth": "individual-compatibility",
+      "individual_proof": {
+        "proof_kind": "retained-legacy-slider-input-scope",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main",
+          "21.x"
+        ],
+        "diff_sha256": "55fee8d2b25ac67ee766bb5efba1f8d3876de94cbb6d3b5e8be5948f60877d50",
+        "patch_file": "compatibility/f10/disposition-ledger/evidence/patches/291b9db9105846ff0ae37581263725bebb6f0a45-slider-input-full.patch",
+        "decision": "This complete one-file follow-up sets modern MatSliderThumb active state from circular iOS hit testing, updates native-input width/dimensions and returns before the normal focus/value path. The owned slider uses the preserved historical host mouse/touch coordinate/value path and focus-origin active state. It has no MatSliderThumb, circular thumb classifier or active-width methods across the complete source population. Copying the early-return branch would replace a different historical interaction model and require new input architecture. The modern fix is not applicable to the retained legacy path; no iOS/native/browser or broader slider qualification is claimed."
+      }
     },
     {
       "sha": "3b25de95306f11a6ffb828769af331bb8c076652",

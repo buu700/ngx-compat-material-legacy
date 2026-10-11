@@ -24,6 +24,7 @@ import {TEST_CONSOLIDATION_ROLE,TEST_CONSOLIDATION_PATCHES,testConsolidationBatc
 import {COMMENT_SCOPE_ROLE,COMMENT_SHAS,commentScopeEvidenceOk} from './upstream-comment-review.mjs';
 import {SLIDER_TOKEN_SHA,SLIDER_TOKEN_ROLE,sliderTokenEvidenceOk} from './upstream-slider-token-evidence.mjs';
 import {candidateSourceEvidenceOk, candidateProductSourcePaths} from './upstream-candidate-source-evidence.mjs';
+import {SLIDER_INPUT_ROLE, SLIDER_INPUT_SHAS, sliderInputScopeEvidenceOk} from './upstream-slider-input-scope.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -142,6 +143,10 @@ function evidenceClass(entry) {
   if (rel.endsWith('.json')) {
     const body = evidenceJson(file);
     if (!body || typeof body !== 'object') return 'unreadable';
+    if (SLIDER_INPUT_SHAS.includes(entry.sha) || body.role === SLIDER_INPUT_ROLE) {
+      const readMember = rel => {const member = regularRepoMember(rel); return member ? readFileSync(member) : null;};
+      if (!sliderInputScopeEvidenceOk(body, entry, readMember, () => candidateProductSourcePaths(root), line || body.line)) return 'invalid-slider-input-scope';
+    }
     if(entry.sha===SLIDER_TOKEN_SHA||body.role===SLIDER_TOKEN_ROLE){
       const readMember=rel=>{const member=regularRepoMember(rel);return member?readFileSync(member):null;};
       if(!sliderTokenEvidenceOk(body,entry,readMember,line||body.line))return 'invalid-slider-token-scope';
