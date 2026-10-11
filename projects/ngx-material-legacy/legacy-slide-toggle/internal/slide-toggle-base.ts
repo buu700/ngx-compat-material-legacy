@@ -73,6 +73,7 @@ export abstract class _MatSlideToggleBase<T>
 {
   protected _onChange = (_: any) => {};
   private _onTouched = () => {};
+  private _slideToggleDestroyed = false;
 
   protected _uniqueId: string;
   private _required: boolean = false;
@@ -171,6 +172,9 @@ export abstract class _MatSlideToggleBase<T>
 
   ngAfterContentInit() {
     this._focusMonitor.monitor(this._elementRef, true).subscribe(focusOrigin => {
+      if (this._slideToggleDestroyed) {
+        return;
+      }
       if (focusOrigin === 'keyboard' || focusOrigin === 'program') {
         this._focused = true;
         this._changeDetectorRef.markForCheck();
@@ -181,15 +185,21 @@ export abstract class _MatSlideToggleBase<T>
         // See https://github.com/angular/angular/issues/17793. To work around this, we defer
         // telling the form control it has been touched until the next tick.
         Promise.resolve().then(() => {
+          if (this._slideToggleDestroyed) {
+            return;
+          }
           this._focused = false;
           this._onTouched();
-          this._changeDetectorRef.markForCheck();
+          if (!this._slideToggleDestroyed) {
+            this._changeDetectorRef.markForCheck();
+          }
         });
       }
     });
   }
 
   ngOnDestroy() {
+    this._slideToggleDestroyed = true;
     this._focusMonitor.stopMonitoring(this._elementRef);
   }
 

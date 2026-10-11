@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "cases": [
+    "checkbox/original-and-current-live-blur",
+    "checkbox/destroy-before-blur-microtask",
+    "checkbox/reentrant-touch-destruction",
+    "checkbox/original-late-touch-reproduced",
+    "slide/original-and-current-live-blur",
+    "slide/destroy-before-blur-microtask",
+    "slide/reentrant-touch-destruction",
+    "slide/original-late-touch-reproduced",
+    "checkbox/live-indeterminate-defer",
+    "checkbox/destroy-before-indeterminate-microtask",
+    "checkbox/post-destruction-blur-entry"
+  ],
+  "mutation_controls": [
+    {
+      "id": "checkbox-blur-callback-guard",
+      "rejected": true
+    },
+    {
+      "id": "checkbox-reentrant-touch-guard",
+      "rejected": true
+    },
+    {
+      "id": "checkbox-indeterminate-guard",
+      "rejected": true
+    },
+    {
+      "id": "slide-destroy-flag",
+      "rejected": true
+    },
+    {
+      "id": "slide-blur-callback-guard",
+      "rejected": true
+    },
+    {
+      "id": "slide-reentrant-touch-guard",
+      "rejected": true
+    }
+  ],
+  "sources": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/internal/checkbox-base.ts",
+      "sha256": "e4e3aaa653750e7d9ce901e76c3ee0b9fe3f242439bbf0850ad1594503dd1437"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-slide-toggle/internal/slide-toggle-base.ts",
+      "sha256": "567257c64fec60ccf3dc277f3bc9e446b8cba61d2b25b9a31049d3e35b3ae07b"
+    },
+    {
+      "path": "reference/material-16.2.14/deferred-control-sources/checkbox.ts",
+      "sha256": "6f362a270133996edea98bf03b6c1a212c3a3011e16562734e8ed9c1dea45e56"
+    },
+    {
+      "path": "reference/material-16.2.14/deferred-control-sources/slide-toggle.ts",
+      "sha256": "d930ac9f21781f68cc4568e670ce7bc2890ca9c4afe29bfed621a6945148b595"
+    }
+  ],
+  "scope": "Complete selected blur/click/destroy methods from untouched tag16 and owned classes, actual Promise microtasks. Fields, focus emissions, CDR/forms/output/transition functions are protocols; full constructors, Angular DI/zone/CVA, native focus/motion, packed and floors remain unqualified.",
+  "native_or_packed_qualified": false,
+  "g11_claim": "not-passed"
+}

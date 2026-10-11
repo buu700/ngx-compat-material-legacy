@@ -1,0 +1,900 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "compiler": "6.0.3",
+  "frozen_uses": 13,
+  "current_uses": 16,
+  "delta_uses": 3,
+  "cases": [
+    {
+      "file": "legacy-list/selection-list.ts",
+      "module": "@angular/cdk/a11y",
+      "symbol": "FocusMonitor",
+      "frozen_use": true,
+      "local_name": "FocusMonitor",
+      "candidate_source_sha256": "e408bbc42e122dcb9197d2fb850740a9cf769d650ec70442b595428ce747c206",
+      "references": [
+        {
+          "role": "constructor-dependency",
+          "class": "MatLegacySelectionList",
+          "index": 2,
+          "declaration": "private _focusMonitor: FocusMonitor",
+          "implementation": true
+        }
+      ],
+      "calls": [
+        {
+          "class": "MatLegacySelectionList",
+          "member": "ngAfterContentInit",
+          "method": "monitor",
+          "expression": "this._focusMonitor\n      .monitor(this._element)",
+          "member_source": "ngAfterContentInit(): void {\n    this._contentInitialized = true;\n\n    this._keyManager = new FocusKeyManager<MatLegacyListOption>(this.options)\n      .withWrap()\n      .withTypeAhead()\n      .withHomeAndEnd()\n      // Allow disabled items to be focusable. For accessibility reasons, there must be a way for\n      // screen reader users, that allows reading the different options of the list.\n      .skipPredicate(() => false)\n      .withAllowedModifierKeys(['shiftKey']);\n\n    if (this._value) {\n      this._setOptionsFromValues(this._value);\n    }\n\n    // If the user attempts to tab out of the selection list, allow focus to escape.\n    this._keyManager.tabOut.subscribe(() => this._allowFocusEscape());\n\n    // When the number of options change, update the tabindex of the selection list.\n    this.options.changes.pipe(startWith(null), takeUntil(this._destroyed)).subscribe(() => {\n      this._updateTabIndex();\n    });\n\n    // Sync external changes to the model back to the options.\n    this.selectedOptions.changed.pipe(takeUntil(this._destroyed)).subscribe(event => {\n      if (event.added) {\n        for (let item of event.added) {\n          item.selected = true;\n        }\n      }\n\n      if (event.removed) {\n        for (let item of event.removed) {\n          item.selected = false;\n        }\n      }\n    });\n\n    this._focusMonitor\n      .monitor(this._element)\n      .pipe(takeUntil(this._destroyed))\n      .subscribe(origin => {\n        if (origin === 'keyboard' || origin === 'program') {\n          let toFocus = 0;\n          for (let i = 0; i < this.options.length; i++) {\n            if (this.options.get(i)?.selected) {\n              toFocus = i;\n              break;\n            }\n          }\n          this._keyManager.setActiveItem(toFocus);\n        }\n      });\n  }"
+        },
+        {
+          "class": "MatLegacySelectionList",
+          "member": "ngOnDestroy",
+          "method": "stopMonitoring",
+          "expression": "this._focusMonitor.stopMonitoring(this._element)",
+          "member_source": "ngOnDestroy() {\n    this._keyManager?.destroy();\n    this._focusMonitor.stopMonitoring(this._element);\n    this._destroyed.next();\n    this._destroyed.complete();\n    this._isDestroyed = true;\n  }"
+        }
+      ],
+      "forwarding": []
+    },
+    {
+      "file": "legacy-tabs/tab-nav-bar/tab-nav-bar.ts",
+      "module": "@angular/cdk/a11y",
+      "symbol": "FocusMonitor",
+      "frozen_use": true,
+      "local_name": "FocusMonitor",
+      "candidate_source_sha256": "6ee670b25761cf6f478a2d34950a4edba6422785c3a3682735d179e1d5cca6be",
+      "references": [
+        {
+          "role": "constructor-dependency",
+          "class": "MatLegacyTabLink",
+          "index": 6,
+          "declaration": "focusMonitor: FocusMonitor",
+          "implementation": true
+        }
+      ],
+      "calls": [],
+      "forwarding": [
+        {
+          "class": "MatLegacyTabLink",
+          "slot": 4,
+          "expression": "super(tabNavBar, elementRef, globalRippleOptions, tabIndex, focusMonitor, animationMode)",
+          "constructor_source": "constructor(\n    tabNavBar: MatLegacyTabNav,\n    elementRef: ElementRef,\n    ngZone: NgZone,\n    platform: Platform,\n    @Optional() @Inject(MAT_RIPPLE_GLOBAL_OPTIONS) globalRippleOptions: RippleGlobalOptions | null,\n    @Attribute('tabindex') tabIndex: string,\n    focusMonitor: FocusMonitor,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n  ) {\n    super(tabNavBar, elementRef, globalRippleOptions, tabIndex, focusMonitor, animationMode);\n    this._tabLinkRipple = new RippleRenderer(this, ngZone, elementRef, platform);\n    this._tabLinkRipple.setupTriggerEvents(elementRef.nativeElement);\n  }"
+        }
+      ]
+    },
+    {
+      "file": "legacy-tabs/internal/tab-nav-bar-base.ts",
+      "module": "@angular/cdk/a11y",
+      "symbol": "FocusMonitor",
+      "frozen_use": true,
+      "local_name": "FocusMonitor",
+      "candidate_source_sha256": "a2a5aa08c670b3c30a0fa590519231401ebe4eaf33727a6078b87922865e2d22",
+      "references": [
+        {
+          "role": "constructor-dependency",
+          "class": "_MatTabLinkBase",
+          "index": 4,
+          "declaration": "private _focusMonitor: FocusMonitor",
+          "implementation": true
+        }
+      ],
+      "calls": [
+        {
+          "class": "_MatTabLinkBase",
+          "member": "ngAfterViewInit",
+          "method": "monitor",
+          "expression": "this._focusMonitor.monitor(this.elementRef)",
+          "member_source": "ngAfterViewInit() {\n    this._focusMonitor.monitor(this.elementRef);\n  }"
+        },
+        {
+          "class": "_MatTabLinkBase",
+          "member": "ngOnDestroy",
+          "method": "stopMonitoring",
+          "expression": "this._focusMonitor.stopMonitoring(this.elementRef)",
+          "member_source": "ngOnDestroy() {\n    this._focusMonitor.stopMonitoring(this.elementRef);\n  }"
+        }
+      ],
+      "forwarding": []
+    },
+    {
+      "file": "legacy-tooltip/tooltip.ts",
+      "module": "@angular/cdk/a11y",
+      "symbol": "FocusMonitor",
+      "frozen_use": true,
+      "local_name": "FocusMonitor",
+      "candidate_source_sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29",
+      "references": [
+        {
+          "role": "constructor-dependency",
+          "class": "MatLegacyTooltip",
+          "index": 7,
+          "declaration": "focusMonitor: FocusMonitor",
+          "implementation": true
+        }
+      ],
+      "calls": [],
+      "forwarding": [
+        {
+          "class": "MatLegacyTooltip",
+          "slot": 7,
+          "expression": "super(\n      overlay,\n      elementRef,\n      scrollDispatcher,\n      viewContainerRef,\n      ngZone,\n      platform,\n      ariaDescriber,\n      focusMonitor,\n      scrollStrategy,\n      dir,\n      defaultOptions,\n      _document,\n    )",
+          "constructor_source": "constructor(\n    overlay: Overlay,\n    elementRef: ElementRef<HTMLElement>,\n    scrollDispatcher: ScrollDispatcher,\n    viewContainerRef: ViewContainerRef,\n    ngZone: NgZone,\n    platform: Platform,\n    ariaDescriber: AriaDescriber,\n    focusMonitor: FocusMonitor,\n    @Inject(MAT_TOOLTIP_SCROLL_STRATEGY) scrollStrategy: any,\n    @Optional() dir: Directionality,\n    @Optional() @Inject(MAT_TOOLTIP_DEFAULT_OPTIONS) defaultOptions: MatTooltipDefaultOptions,\n    @Inject(DOCUMENT) _document: any,\n  ) {\n    super(\n      overlay,\n      elementRef,\n      scrollDispatcher,\n      viewContainerRef,\n      ngZone,\n      platform,\n      ariaDescriber,\n      focusMonitor,\n      scrollStrategy,\n      dir,\n      defaultOptions,\n      _document,\n    );\n  }"
+        }
+      ]
+    },
+    {
+      "file": "legacy-tooltip/internal/tooltip-base.ts",
+      "module": "@angular/cdk/a11y",
+      "symbol": "FocusMonitor",
+      "frozen_use": true,
+      "local_name": "FocusMonitor",
+      "candidate_source_sha256": "948fd1d57f52e617eca301b693261127e42b3e4d23d0db8b2a3e2f012db0a85d",
+      "references": [
+        {
+          "role": "constructor-dependency",
+          "class": "_MatTooltipBase",
+          "index": 7,
+          "declaration": "private _focusMonitor: FocusMonitor",
+          "implementation": true
+        }
+      ],
+      "calls": [
+        {
+          "class": "_MatTooltipBase",
+          "member": "ngAfterViewInit",
+          "method": "monitor",
+          "expression": "this._focusMonitor\n      .monitor(this._elementRef)",
+          "member_source": "ngAfterViewInit() {\n    // This needs to happen after view init so the initial values for all inputs have been set.\n    this._viewInitialized = true;\n    this._setupPointerEnterEventsIfNeeded();\n\n    this._focusMonitor\n      .monitor(this._elementRef)\n      .pipe(takeUntil(this._destroyed))\n      .subscribe(origin => {\n        // Note that the focus monitor runs outside the Angular zone.\n        if (!origin) {\n          this._ngZone.run(() => this.hide(0));\n        } else if (origin === 'keyboard') {\n          this._ngZone.run(() => this.show());\n        }\n      });\n  }"
+        },
+        {
+          "class": "_MatTooltipBase",
+          "member": "ngOnDestroy",
+          "method": "stopMonitoring",
+          "expression": "this._focusMonitor.stopMonitoring(nativeElement)",
+          "member_source": "ngOnDestroy() {\n    this._ariaDescriptionDestroyed = true;\n    const nativeElement = this._elementRef.nativeElement;\n\n    clearTimeout(this._touchstartTimeout);\n\n    if (this._overlayRef) {\n      this._overlayRef.dispose();\n      this._tooltipInstance = null;\n    }\n\n    // Clean up the event listeners set in the constructor\n    this._passiveListeners.forEach(([event, listener]) => {\n      nativeElement.removeEventListener(event, listener, passiveListenerOptions);\n    });\n    this._passiveListeners.length = 0;\n\n    this._destroyed.next();\n    this._destroyed.complete();\n\n    this._ariaDescriber.removeDescription(nativeElement, this.message, 'tooltip');\n    this._focusMonitor.stopMonitoring(nativeElement);\n  }"
+        }
+      ],
+      "forwarding": []
+    },
+    {
+      "file": "legacy-slide-toggle/slide-toggle.ts",
+      "module": "@angular/cdk/a11y",
+      "symbol": "FocusMonitor",
+      "frozen_use": true,
+      "local_name": "FocusMonitor",
+      "candidate_source_sha256": "2e0a9754b883f36fd8a8d146515c76fc3883d643794ccb524c9226b309bbbc74",
+      "references": [
+        {
+          "role": "constructor-dependency",
+          "class": "MatLegacySlideToggle",
+          "index": 1,
+          "declaration": "focusMonitor: FocusMonitor",
+          "implementation": true
+        }
+      ],
+      "calls": [
+        {
+          "class": "MatLegacySlideToggle",
+          "member": "focus",
+          "method": "focusVia",
+          "expression": "this._focusMonitor.focusVia(this._inputElement, origin, options)",
+          "member_source": "focus(options?: FocusOptions, origin?: FocusOrigin): void {\n    if (origin) {\n      this._focusMonitor.focusVia(this._inputElement, origin, options);\n    } else {\n      this._inputElement.nativeElement.focus(options);\n    }\n  }"
+        }
+      ],
+      "forwarding": [
+        {
+          "class": "MatLegacySlideToggle",
+          "slot": 1,
+          "expression": "super(\n      elementRef,\n      focusMonitor,\n      changeDetectorRef,\n      tabIndex,\n      defaults,\n      animationMode,\n      'mat-slide-toggle-',\n    )",
+          "constructor_source": "constructor(\n    elementRef: ElementRef,\n    focusMonitor: FocusMonitor,\n    changeDetectorRef: ChangeDetectorRef,\n    @Attribute('tabindex') tabIndex: string,\n    @Inject(MAT_LEGACY_SLIDE_TOGGLE_DEFAULT_OPTIONS)\n    defaults: MatLegacySlideToggleDefaultOptions,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n  ) {\n    super(\n      elementRef,\n      focusMonitor,\n      changeDetectorRef,\n      tabIndex,\n      defaults,\n      animationMode,\n      'mat-slide-toggle-',\n    );\n  }"
+        }
+      ]
+    },
+    {
+      "file": "legacy-slide-toggle/internal/slide-toggle-base.ts",
+      "module": "@angular/cdk/a11y",
+      "symbol": "FocusMonitor",
+      "frozen_use": true,
+      "local_name": "FocusMonitor",
+      "candidate_source_sha256": "567257c64fec60ccf3dc277f3bc9e446b8cba61d2b25b9a31049d3e35b3ae07b",
+      "references": [
+        {
+          "role": "constructor-dependency",
+          "class": "_MatSlideToggleBase",
+          "index": 1,
+          "declaration": "protected _focusMonitor: FocusMonitor",
+          "implementation": true
+        }
+      ],
+      "calls": [
+        {
+          "class": "_MatSlideToggleBase",
+          "member": "ngAfterContentInit",
+          "method": "monitor",
+          "expression": "this._focusMonitor.monitor(this._elementRef, true)",
+          "member_source": "ngAfterContentInit() {\n    this._focusMonitor.monitor(this._elementRef, true).subscribe(focusOrigin => {\n      if (this._slideToggleDestroyed) {\n        return;\n      }\n      if (focusOrigin === 'keyboard' || focusOrigin === 'program') {\n        this._focused = true;\n        this._changeDetectorRef.markForCheck();\n      } else if (!focusOrigin) {\n        // When a focused element becomes disabled, the browser *immediately* fires a blur event.\n        // Angular does not expect events to be raised during change detection, so any state\n        // change (such as a form control's ng-touched) will cause a changed-after-checked error.\n        // See https://github.com/angular/angular/issues/17793. To work around this, we defer\n        // telling the form control it has been touched until the next tick.\n        Promise.resolve().then(() => {\n          if (this._slideToggleDestroyed) {\n            return;\n          }\n          this._focused = false;\n          this._onTouched();\n          if (!this._slideToggleDestroyed) {\n            this._changeDetectorRef.markForCheck();\n          }\n        });\n      }\n    });\n  }"
+        },
+        {
+          "class": "_MatSlideToggleBase",
+          "member": "ngOnDestroy",
+          "method": "stopMonitoring",
+          "expression": "this._focusMonitor.stopMonitoring(this._elementRef)",
+          "member_source": "ngOnDestroy() {\n    this._slideToggleDestroyed = true;\n    this._focusMonitor.stopMonitoring(this._elementRef);\n  }"
+        }
+      ],
+      "forwarding": []
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-container-base.ts",
+      "module": "@angular/cdk/a11y",
+      "symbol": "FocusMonitor",
+      "frozen_use": false,
+      "local_name": "FocusMonitor",
+      "candidate_source_sha256": "752582e2bf49bc2f11431fa7bf35941f381a830dc5d837e14246a40ef010c01c",
+      "references": [
+        {
+          "role": "constructor-dependency",
+          "class": "_MatDialogContainerBase",
+          "index": 7,
+          "declaration": "private _legacyFocusMonitor?: FocusMonitor",
+          "implementation": true
+        }
+      ],
+      "calls": [
+        {
+          "class": "_MatDialogContainerBase",
+          "member": "_restoreLegacyFocus",
+          "method": "focusVia",
+          "expression": "this._legacyFocusMonitor.focusVia(target, this._closeInteractionType)",
+          "member_source": "private _restoreLegacyFocus(): void {\n    if (!this._isBrowser()) {\n      return;\n    }\n    const config = this._config.restoreFocus;\n    const target = typeof config === 'string' ? this._document.querySelector<HTMLElement>(config)\n      : typeof config === 'boolean' ? config ? this._legacyPreviousFocus : null : config;\n    if (config && target && typeof target.focus === 'function') {\n      const active = legacyDialogActiveElement();\n      const element = this._elementRef.nativeElement;\n      if (!active || active === this._document?.body || active === element || element.contains(active)) {\n        if (this._legacyFocusMonitor) {\n          this._legacyFocusMonitor.focusVia(target, this._closeInteractionType);\n          this._closeInteractionType = null;\n        } else {\n          target.focus();\n        }\n      }\n    }\n  }"
+        }
+      ],
+      "forwarding": []
+    },
+    {
+      "file": "legacy-dialog/dialog-container.ts",
+      "module": "@angular/cdk/a11y",
+      "symbol": "FocusMonitor",
+      "frozen_use": false,
+      "local_name": "FocusMonitor",
+      "candidate_source_sha256": "0495cc891e7e1578d05d9679fe61acf155c9bdb47b31032d53c324bc201616ac",
+      "references": [
+        {
+          "role": "constructor-dependency",
+          "class": "MatLegacyDialogContainer",
+          "index": 8,
+          "declaration": "focusMonitor?: FocusMonitor",
+          "implementation": true
+        }
+      ],
+      "calls": [],
+      "forwarding": [
+        {
+          "class": "MatLegacyDialogContainer",
+          "slot": 7,
+          "expression": "super(elementRef, focusTrapFactory, document, dialogConfig, checker, ngZone,\n      overlayRef, focusMonitor)",
+          "constructor_source": "constructor(\n    elementRef: ElementRef,\n    focusTrapFactory: FocusTrapFactory,\n    @Optional() @Inject(DOCUMENT) document: any,\n    dialogConfig: MatLegacyDialogConfig,\n    checker: InteractivityChecker,\n    ngZone: NgZone,\n    overlayRef: OverlayRef,\n    private _changeDetectorRef: ChangeDetectorRef,\n    focusMonitor?: FocusMonitor,\n  ) {\n    super(elementRef, focusTrapFactory, document, dialogConfig, checker, ngZone,\n      overlayRef, focusMonitor);\n  }"
+        }
+      ]
+    },
+    {
+      "file": "legacy-radio/radio.ts",
+      "module": "@angular/cdk/a11y",
+      "symbol": "FocusMonitor",
+      "frozen_use": true,
+      "local_name": "FocusMonitor",
+      "candidate_source_sha256": "dffd3e4daf0d50d915303b2e3d13d26e8c97fb77756ccf8c618e34022f548f1e",
+      "references": [
+        {
+          "role": "constructor-dependency",
+          "class": "MatLegacyRadioButton",
+          "index": 3,
+          "declaration": "focusMonitor: FocusMonitor",
+          "implementation": true
+        }
+      ],
+      "calls": [],
+      "forwarding": [
+        {
+          "class": "MatLegacyRadioButton",
+          "slot": 3,
+          "expression": "super(\n      radioGroup,\n      elementRef,\n      changeDetector,\n      focusMonitor,\n      radioDispatcher,\n      animationMode,\n      providerOverride,\n      tabIndex,\n    )",
+          "constructor_source": "constructor(\n    @Optional() @Inject(MAT_RADIO_GROUP) radioGroup: MatLegacyRadioGroup,\n    elementRef: ElementRef,\n    changeDetector: ChangeDetectorRef,\n    focusMonitor: FocusMonitor,\n    radioDispatcher: UniqueSelectionDispatcher,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n    @Optional()\n    @Inject(MAT_RADIO_DEFAULT_OPTIONS)\n    providerOverride?: MatRadioDefaultOptions,\n    @Attribute('tabindex') tabIndex?: string,\n  ) {\n    super(\n      radioGroup,\n      elementRef,\n      changeDetector,\n      focusMonitor,\n      radioDispatcher,\n      animationMode,\n      providerOverride,\n      tabIndex,\n    );\n  }"
+        }
+      ]
+    },
+    {
+      "file": "legacy-radio/internal/radio-base.ts",
+      "module": "@angular/cdk/a11y",
+      "symbol": "FocusMonitor",
+      "frozen_use": true,
+      "local_name": "FocusMonitor",
+      "candidate_source_sha256": "d88f1ee678e3b18707d7698be87f307c3c471eb6dd5b696571955444e5420f9b",
+      "references": [
+        {
+          "role": "constructor-dependency",
+          "class": "_MatRadioButtonBase",
+          "index": 3,
+          "declaration": "private _focusMonitor: FocusMonitor",
+          "implementation": true
+        }
+      ],
+      "calls": [
+        {
+          "class": "_MatRadioButtonBase",
+          "member": "focus",
+          "method": "focusVia",
+          "expression": "this._focusMonitor.focusVia(this._inputElement, origin, options)",
+          "member_source": "focus(options?: FocusOptions, origin?: FocusOrigin): void {\n    if (origin) {\n      this._focusMonitor.focusVia(this._inputElement, origin, options);\n    } else {\n      this._inputElement.nativeElement.focus(options);\n    }\n  }"
+        },
+        {
+          "class": "_MatRadioButtonBase",
+          "member": "ngAfterViewInit",
+          "method": "monitor",
+          "expression": "this._focusMonitor.monitor(this._elementRef, true)",
+          "member_source": "ngAfterViewInit() {\n    this._updateTabIndex();\n    this._focusMonitor.monitor(this._elementRef, true).subscribe(focusOrigin => {\n      if (!focusOrigin && this.radioGroup) {\n        this.radioGroup._touch();\n      }\n    });\n  }"
+        },
+        {
+          "class": "_MatRadioButtonBase",
+          "member": "ngOnDestroy",
+          "method": "stopMonitoring",
+          "expression": "this._focusMonitor.stopMonitoring(this._elementRef)",
+          "member_source": "ngOnDestroy() {\n    this._focusMonitor.stopMonitoring(this._elementRef);\n    this._removeUniqueSelectionListener();\n  }"
+        }
+      ],
+      "forwarding": []
+    },
+    {
+      "file": "legacy-button/button.ts",
+      "module": "@angular/cdk/a11y",
+      "symbol": "FocusMonitor",
+      "frozen_use": true,
+      "local_name": "FocusMonitor",
+      "candidate_source_sha256": "6d37f01619672b62496d5ffb8bec6df6dfe32214893191644d46012424ff5bb4",
+      "references": [
+        {
+          "role": "constructor-dependency",
+          "class": "MatLegacyButton",
+          "index": 1,
+          "declaration": "private _focusMonitor: FocusMonitor",
+          "implementation": true
+        },
+        {
+          "role": "constructor-dependency",
+          "class": "MatLegacyAnchor",
+          "index": 0,
+          "declaration": "focusMonitor: FocusMonitor",
+          "implementation": true
+        }
+      ],
+      "calls": [
+        {
+          "class": "MatLegacyButton",
+          "member": "ngAfterViewInit",
+          "method": "monitor",
+          "expression": "this._focusMonitor.monitor(this._elementRef, true)",
+          "member_source": "ngAfterViewInit() {\n    this._focusMonitor.monitor(this._elementRef, true);\n  }"
+        },
+        {
+          "class": "MatLegacyButton",
+          "member": "ngOnDestroy",
+          "method": "stopMonitoring",
+          "expression": "this._focusMonitor.stopMonitoring(this._elementRef)",
+          "member_source": "ngOnDestroy() {\n    this._focusMonitor.stopMonitoring(this._elementRef);\n  }"
+        },
+        {
+          "class": "MatLegacyButton",
+          "member": "focus",
+          "method": "focusVia",
+          "expression": "this._focusMonitor.focusVia(this._getHostElement(), origin, options)",
+          "member_source": "focus(origin?: FocusOrigin, options?: FocusOptions): void {\n    if (origin) {\n      this._focusMonitor.focusVia(this._getHostElement(), origin, options);\n    } else {\n      this._getHostElement().focus(options);\n    }\n  }"
+        }
+      ],
+      "forwarding": [
+        {
+          "class": "MatLegacyAnchor",
+          "slot": 1,
+          "expression": "super(elementRef, focusMonitor, animationMode)",
+          "constructor_source": "constructor(\n    focusMonitor: FocusMonitor,\n    elementRef: ElementRef,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode: string,\n    /** @breaking-change 14.0.0 _ngZone will be required. */\n    @Optional() private _ngZone?: NgZone,\n  ) {\n    super(elementRef, focusMonitor, animationMode);\n  }"
+        }
+      ]
+    },
+    {
+      "file": "legacy-checkbox/checkbox.ts",
+      "module": "@angular/cdk/a11y",
+      "symbol": "FocusMonitor",
+      "frozen_use": true,
+      "local_name": "FocusMonitor",
+      "candidate_source_sha256": "774db12b55590d631d0a69c68a9aa7289adf600ac3fe62e288dd22fcf3c86766",
+      "references": [
+        {
+          "role": "constructor-dependency",
+          "class": "MatLegacyCheckbox",
+          "index": 2,
+          "declaration": "private _focusMonitor: FocusMonitor",
+          "implementation": true
+        }
+      ],
+      "calls": [
+        {
+          "class": "MatLegacyCheckbox",
+          "member": "ngAfterViewInit",
+          "method": "monitor",
+          "expression": "this._focusMonitor.monitor(this._elementRef, true)",
+          "member_source": "override ngAfterViewInit() {\n    super.ngAfterViewInit();\n\n    this._focusMonitor.monitor(this._elementRef, true).subscribe(focusOrigin => {\n      if (!focusOrigin) {\n        this._onBlur();\n      }\n    });\n  }"
+        },
+        {
+          "class": "MatLegacyCheckbox",
+          "member": "ngOnDestroy",
+          "method": "stopMonitoring",
+          "expression": "this._focusMonitor.stopMonitoring(this._elementRef)",
+          "member_source": "override ngOnDestroy() {\n    super.ngOnDestroy();\n    this._focusMonitor.stopMonitoring(this._elementRef);\n  }"
+        },
+        {
+          "class": "MatLegacyCheckbox",
+          "member": "focus",
+          "method": "focusVia",
+          "expression": "this._focusMonitor.focusVia(this._inputElement, origin, options)",
+          "member_source": "focus(origin?: FocusOrigin, options?: FocusOptions): void {\n    if (origin) {\n      this._focusMonitor.focusVia(this._inputElement, origin, options);\n    } else {\n      this._inputElement.nativeElement.focus(options);\n    }\n  }"
+        }
+      ],
+      "forwarding": []
+    },
+    {
+      "file": "legacy-menu/internal/menu-item-base.ts",
+      "module": "@angular/cdk/a11y",
+      "symbol": "FocusMonitor",
+      "frozen_use": false,
+      "local_name": "FocusMonitor",
+      "candidate_source_sha256": "f2d261227d8fa8e04a8773d57373ca6c78ffe20081bff8a0c809991969fba368",
+      "references": [
+        {
+          "role": "constructor-dependency",
+          "class": "_LegacyMenuItemBase",
+          "index": 2,
+          "declaration": "focusMonitor: FocusMonitor",
+          "implementation": false
+        },
+        {
+          "role": "constructor-dependency",
+          "class": "_LegacyMenuItemBase",
+          "index": 2,
+          "declaration": "focusMonitor?: FocusMonitor",
+          "implementation": false
+        },
+        {
+          "role": "constructor-dependency",
+          "class": "_LegacyMenuItemBase",
+          "index": 2,
+          "declaration": "private _focusMonitor?: FocusMonitor",
+          "implementation": true
+        }
+      ],
+      "calls": [
+        {
+          "class": "_LegacyMenuItemBase",
+          "member": "focus",
+          "method": "focusVia",
+          "expression": "this._focusMonitor.focusVia(this._getHostElement(), origin, options)",
+          "member_source": "focus(origin?: FocusOrigin, options?: FocusOptions): void {\n    if (this._focusMonitor && origin) {\n      this._focusMonitor.focusVia(this._getHostElement(), origin, options);\n    } else {\n      this._getHostElement().focus(options);\n    }\n\n    this._focused.next(this);\n  }"
+        },
+        {
+          "class": "_LegacyMenuItemBase",
+          "member": "ngAfterViewInit",
+          "method": "monitor",
+          "expression": "this._focusMonitor.monitor(this._elementRef, false)",
+          "member_source": "ngAfterViewInit() {\n    if (this._focusMonitor) {\n      // Start monitoring the element, so it gets the appropriate focused classes. We want\n      // to show the focus style for menu items only when the focus was not caused by a\n      // mouse or touch interaction.\n      this._focusMonitor.monitor(this._elementRef, false);\n    }\n  }"
+        },
+        {
+          "class": "_LegacyMenuItemBase",
+          "member": "ngOnDestroy",
+          "method": "stopMonitoring",
+          "expression": "this._focusMonitor.stopMonitoring(this._elementRef)",
+          "member_source": "ngOnDestroy() {\n    if (this._focusMonitor) {\n      this._focusMonitor.stopMonitoring(this._elementRef);\n    }\n\n    if (this._parentMenu && this._parentMenu.removeItem) {\n      this._parentMenu.removeItem(this);\n    }\n\n    this._hovered.complete();\n    this._focused.complete();\n  }"
+        }
+      ],
+      "forwarding": []
+    },
+    {
+      "file": "legacy-menu/internal/menu-trigger-base.ts",
+      "module": "@angular/cdk/a11y",
+      "symbol": "FocusMonitor",
+      "frozen_use": true,
+      "local_name": "FocusMonitor",
+      "candidate_source_sha256": "9c3b605d77935394dd158547b85d3174fb1e1ea142bd3953bc706e51bbe95d66",
+      "references": [
+        {
+          "role": "constructor-dependency",
+          "class": "_MatMenuTriggerBase",
+          "index": 7,
+          "declaration": "focusMonitor: FocusMonitor",
+          "implementation": false
+        },
+        {
+          "role": "constructor-dependency",
+          "class": "_MatMenuTriggerBase",
+          "index": 7,
+          "declaration": "focusMonitor?: FocusMonitor | null",
+          "implementation": false
+        },
+        {
+          "role": "constructor-dependency",
+          "class": "_MatMenuTriggerBase",
+          "index": 7,
+          "declaration": "focusMonitor: FocusMonitor",
+          "implementation": false
+        },
+        {
+          "role": "constructor-dependency",
+          "class": "_MatMenuTriggerBase",
+          "index": 7,
+          "declaration": "private _focusMonitor: FocusMonitor | null",
+          "implementation": true
+        }
+      ],
+      "calls": [
+        {
+          "class": "_MatMenuTriggerBase",
+          "member": "focus",
+          "method": "focusVia",
+          "expression": "this._focusMonitor.focusVia(this._element, origin, options)",
+          "member_source": "focus(origin?: FocusOrigin, options?: FocusOptions) {\n    if (this._focusMonitor && origin) {\n      this._focusMonitor.focusVia(this._element, origin, options);\n    } else {\n      this._element.nativeElement.focus(options);\n    }\n  }"
+        }
+      ],
+      "forwarding": []
+    },
+    {
+      "file": "legacy-slider/slider.ts",
+      "module": "@angular/cdk/a11y",
+      "symbol": "FocusMonitor",
+      "frozen_use": true,
+      "local_name": "FocusMonitor",
+      "candidate_source_sha256": "2dd6d9756260ae23ce7fc1dd55fee8d001a678996f80af0bb04eeee766cb274d",
+      "references": [
+        {
+          "role": "constructor-dependency",
+          "class": "MatLegacySlider",
+          "index": 1,
+          "declaration": "private _focusMonitor: FocusMonitor",
+          "implementation": true
+        }
+      ],
+      "calls": [
+        {
+          "class": "MatLegacySlider",
+          "member": "ngAfterViewInit",
+          "method": "monitor",
+          "expression": "this._focusMonitor.monitor(this._elementRef, true)",
+          "member_source": "ngAfterViewInit() {\n    this._focusMonitor.monitor(this._elementRef, true).subscribe((origin: FocusOrigin) => {\n      this._isActive = !!origin && origin !== 'keyboard';\n      this._changeDetectorRef.detectChanges();\n    });\n    if (this._dir) {\n      this._dirChangeSubscription = this._dir.change.subscribe(() => {\n        this._changeDetectorRef.markForCheck();\n      });\n    }\n  }"
+        },
+        {
+          "class": "MatLegacySlider",
+          "member": "ngOnDestroy",
+          "method": "stopMonitoring",
+          "expression": "this._focusMonitor.stopMonitoring(this._elementRef)",
+          "member_source": "ngOnDestroy() {\n    const element = this._elementRef.nativeElement;\n    element.removeEventListener('mousedown', this._pointerDown, activeEventOptions);\n    element.removeEventListener('touchstart', this._pointerDown, activeEventOptions);\n    this._lastPointerEvent = null;\n    this._removeGlobalEvents();\n    this._focusMonitor.stopMonitoring(this._elementRef);\n    this._dirChangeSubscription.unsubscribe();\n  }"
+        }
+      ],
+      "forwarding": []
+    }
+  ],
+  "scope": "Complete16 current dependency/source contexts. SRI-authenticated complete Original16 and both minimum public service declarations and namespaces. Genuine public FocusMonitor factories/methods, Core injectors, ElementRef and RxJS execute against document/element/platform/NgZone/modality protocols. Seven original/minimum public method overloads are identical after the documented local original FocusOptions name is normalized; original preventScroll semantics survive. No full owned component factories, native DOM focus, actual zones/input detector, packed/AOT/compiler or Node/RxJS floors.",
+  "g11_claim": "not-passed",
+  "declarations": [
+    {
+      "line": "original",
+      "entry": "@angular/cdk/a11y/index.d.ts",
+      "chain": [
+        {
+          "path": "@angular/cdk/a11y/index.d.ts",
+          "name": "FocusMonitor",
+          "sha256": "ed9103e5f0877a65229960ef138b193333a36259238bddb91ac839fe37bb2a17"
+        }
+      ],
+      "signatures": [
+        "monitor(element: HTMLElement, checkChildren?: boolean): Observable<FocusOrigin>;",
+        "monitor(element: ElementRef<HTMLElement>, checkChildren?: boolean): Observable<FocusOrigin>;",
+        "stopMonitoring(element: HTMLElement): void;",
+        "stopMonitoring(element: ElementRef<HTMLElement>): void;",
+        "focusVia(element: HTMLElement, origin: FocusOrigin, options?: FocusOptions): void;",
+        "focusVia(element: ElementRef<HTMLElement>, origin: FocusOrigin, options?: FocusOptions): void;",
+        "ngOnDestroy(): void;"
+      ],
+      "original_options": "declare interface FocusOptions_2 {\n    preventScroll?: boolean;\n}"
+    },
+    {
+      "line": "main",
+      "entry": "@angular/cdk/types/a11y.d.ts",
+      "chain": [
+        {
+          "path": "@angular/cdk/types/a11y.d.ts",
+          "name": "FocusMonitor",
+          "sha256": "d3c1b9be3d42573c4ef2bea969a3749c41bd26f86f89d8a921cdc5ce3ae73be6"
+        },
+        {
+          "path": "@angular/cdk/types/_focus-monitor-chunk.d.ts",
+          "name": "FocusMonitor",
+          "sha256": "18c9c9b202cd4f2bc6ce1794266a578517cde96dc46fc1807171a6d22365a5d3"
+        }
+      ],
+      "signatures": [
+        "monitor(element: HTMLElement, checkChildren?: boolean): Observable<FocusOrigin>;",
+        "monitor(element: ElementRef<HTMLElement>, checkChildren?: boolean): Observable<FocusOrigin>;",
+        "stopMonitoring(element: HTMLElement): void;",
+        "stopMonitoring(element: ElementRef<HTMLElement>): void;",
+        "focusVia(element: HTMLElement, origin: FocusOrigin, options?: FocusOptions): void;",
+        "focusVia(element: ElementRef<HTMLElement>, origin: FocusOrigin, options?: FocusOptions): void;",
+        "ngOnDestroy(): void;"
+      ],
+      "original_options": null
+    },
+    {
+      "line": "21.x",
+      "entry": "@angular/cdk/types/a11y.d.ts",
+      "chain": [
+        {
+          "path": "@angular/cdk/types/a11y.d.ts",
+          "name": "FocusMonitor",
+          "sha256": "c7cb507235c6a481ec46b581092a0855986e1c817b798221e7da56eb2e25ce16"
+        },
+        {
+          "path": "@angular/cdk/types/_focus-monitor-chunk.d.ts",
+          "name": "FocusMonitor",
+          "sha256": "2c6d64e38b140134b741efc821f05c10410fcb09098c0e374c93e1db0b64d1e6"
+        }
+      ],
+      "signatures": [
+        "monitor(element: HTMLElement, checkChildren?: boolean): Observable<FocusOrigin>;",
+        "monitor(element: ElementRef<HTMLElement>, checkChildren?: boolean): Observable<FocusOrigin>;",
+        "stopMonitoring(element: HTMLElement): void;",
+        "stopMonitoring(element: ElementRef<HTMLElement>): void;",
+        "focusVia(element: HTMLElement, origin: FocusOrigin, options?: FocusOptions): void;",
+        "focusVia(element: ElementRef<HTMLElement>, origin: FocusOrigin, options?: FocusOptions): void;",
+        "ngOnDestroy(): void;"
+      ],
+      "original_options": null
+    }
+  ],
+  "results": [
+    {
+      "line": "original",
+      "production": false,
+      "cases": [
+        "public-service-token-and-inherited-injector-identity",
+        "element-ref-native-alias-and-repeat-monitor-cache",
+        "child-monitor-escalation-and-internal-blur",
+        "public-factory-has-explicit-manual-construction-difference",
+        "non-element-and-server-monitor-complete-without-events",
+        "injector-destruction-completes-streams-and-removes-listeners"
+      ],
+      "genuine_public_service_factory_and_methods_executed": true,
+      "DOM_document_platform_zone_modality_values_are_protocols": true,
+      "actual_legacy_components_executed": false,
+      "native_or_packed_qualified": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "original",
+      "production": true,
+      "cases": [
+        "public-service-token-and-inherited-injector-identity",
+        "element-ref-native-alias-and-repeat-monitor-cache",
+        "child-monitor-escalation-and-internal-blur",
+        "public-factory-has-explicit-manual-construction-difference",
+        "non-element-and-server-monitor-complete-without-events",
+        "injector-destruction-completes-streams-and-removes-listeners"
+      ],
+      "genuine_public_service_factory_and_methods_executed": true,
+      "DOM_document_platform_zone_modality_values_are_protocols": true,
+      "actual_legacy_components_executed": false,
+      "native_or_packed_qualified": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "main",
+      "production": false,
+      "cases": [
+        "public-service-token-and-inherited-injector-identity",
+        "element-ref-native-alias-and-repeat-monitor-cache",
+        "child-monitor-escalation-and-internal-blur",
+        "public-factory-has-explicit-manual-construction-difference",
+        "non-element-and-server-monitor-complete-without-events",
+        "injector-destruction-completes-streams-and-removes-listeners"
+      ],
+      "genuine_public_service_factory_and_methods_executed": true,
+      "DOM_document_platform_zone_modality_values_are_protocols": true,
+      "actual_legacy_components_executed": false,
+      "native_or_packed_qualified": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "main",
+      "production": true,
+      "cases": [
+        "public-service-token-and-inherited-injector-identity",
+        "element-ref-native-alias-and-repeat-monitor-cache",
+        "child-monitor-escalation-and-internal-blur",
+        "public-factory-has-explicit-manual-construction-difference",
+        "non-element-and-server-monitor-complete-without-events",
+        "injector-destruction-completes-streams-and-removes-listeners"
+      ],
+      "genuine_public_service_factory_and_methods_executed": true,
+      "DOM_document_platform_zone_modality_values_are_protocols": true,
+      "actual_legacy_components_executed": false,
+      "native_or_packed_qualified": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "21.x",
+      "production": false,
+      "cases": [
+        "public-service-token-and-inherited-injector-identity",
+        "element-ref-native-alias-and-repeat-monitor-cache",
+        "child-monitor-escalation-and-internal-blur",
+        "public-factory-has-explicit-manual-construction-difference",
+        "non-element-and-server-monitor-complete-without-events",
+        "injector-destruction-completes-streams-and-removes-listeners"
+      ],
+      "genuine_public_service_factory_and_methods_executed": true,
+      "DOM_document_platform_zone_modality_values_are_protocols": true,
+      "actual_legacy_components_executed": false,
+      "native_or_packed_qualified": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "21.x",
+      "production": true,
+      "cases": [
+        "public-service-token-and-inherited-injector-identity",
+        "element-ref-native-alias-and-repeat-monitor-cache",
+        "child-monitor-escalation-and-internal-blur",
+        "public-factory-has-explicit-manual-construction-difference",
+        "non-element-and-server-monitor-complete-without-events",
+        "injector-destruction-completes-streams-and-removes-listeners"
+      ],
+      "genuine_public_service_factory_and_methods_executed": true,
+      "DOM_document_platform_zone_modality_values_are_protocols": true,
+      "actual_legacy_components_executed": false,
+      "native_or_packed_qualified": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    }
+  ],
+  "source_controls": [
+    {
+      "id": "type-only-token",
+      "rejected": true
+    },
+    {
+      "id": "private-service-member",
+      "rejected": true
+    },
+    {
+      "id": "duplicate-import",
+      "rejected": true
+    },
+    {
+      "id": "runtime-construction",
+      "rejected": true
+    },
+    {
+      "id": "missing-import",
+      "rejected": true
+    },
+    {
+      "id": "missing-teardown",
+      "rejected": true
+    },
+    {
+      "id": "unreviewed-reference",
+      "rejected": true
+    }
+  ],
+  "actual_contract_controls": [
+    {
+      "line": "original",
+      "variant": "skip-stop",
+      "rejected_by_contract_assertion": true
+    },
+    {
+      "line": "original",
+      "variant": "lose-options",
+      "rejected_by_contract_assertion": true
+    },
+    {
+      "line": "original",
+      "variant": "lose-child-monitor",
+      "rejected_by_contract_assertion": true
+    },
+    {
+      "line": "main",
+      "variant": "skip-stop",
+      "rejected_by_contract_assertion": true
+    },
+    {
+      "line": "main",
+      "variant": "lose-options",
+      "rejected_by_contract_assertion": true
+    },
+    {
+      "line": "main",
+      "variant": "lose-child-monitor",
+      "rejected_by_contract_assertion": true
+    },
+    {
+      "line": "21.x",
+      "variant": "skip-stop",
+      "rejected_by_contract_assertion": true
+    },
+    {
+      "line": "21.x",
+      "variant": "lose-options",
+      "rejected_by_contract_assertion": true
+    },
+    {
+      "line": "21.x",
+      "variant": "lose-child-monitor",
+      "rejected_by_contract_assertion": true
+    }
+  ],
+  "public_subject_capsule_sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3",
+  "producer_sha256": "d62b2ac9d35770acb9cca6c15095f8594dda9272126210e56b2bdf4c862ad3e4",
+  "worker_sha256": "08efd2c4f773128da5639e095bcf624fe22248c09af6587d5cde560143e55b81"
+}

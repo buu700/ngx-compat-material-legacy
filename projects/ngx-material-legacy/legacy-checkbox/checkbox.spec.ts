@@ -64,6 +64,37 @@ describe('MatLegacyCheckbox', () => {
       expect(checkboxInstance.ripple).toBeTruthy();
     });
 
+    it('should cancel deferred blur work when destroyed', fakeAsync(() => {
+      const touched = jasmine.createSpy('touched');
+      checkboxInstance.registerOnTouched(touched);
+      checkboxInstance._onBlur();
+      expect(touched).not.toHaveBeenCalled();
+      fixture.destroy();
+      flushMicrotasks();
+      expect(touched).not.toHaveBeenCalled();
+    }));
+
+    it('should stop deferred view work if touching the form destroys it', fakeAsync(() => {
+      const marks = spyOn((checkboxInstance as any)._changeDetectorRef, 'markForCheck');
+      const touched = jasmine.createSpy('touched').and.callFake(() => fixture.destroy());
+      checkboxInstance.registerOnTouched(touched);
+      checkboxInstance._onBlur();
+      flushMicrotasks();
+      expect(touched).toHaveBeenCalledTimes(1);
+      expect(marks).not.toHaveBeenCalled();
+    }));
+
+    it('should cancel a queued indeterminate reset when destroyed', fakeAsync(() => {
+      checkboxInstance.indeterminate = true;
+      const changes = jasmine.createSpy('indeterminate changes');
+      checkboxInstance.indeterminateChange.subscribe(changes);
+      checkboxInstance._onInputClick(new MouseEvent('click'));
+      fixture.destroy();
+      flushMicrotasks();
+      expect(changes).not.toHaveBeenCalled();
+      expect(checkboxInstance.indeterminate).toBe(true);
+    }));
+
     it('should hide the internal SVG', () => {
       const svg = checkboxNativeElement.querySelector('svg')!;
       expect(svg.getAttribute('aria-hidden')).toBe('true');
