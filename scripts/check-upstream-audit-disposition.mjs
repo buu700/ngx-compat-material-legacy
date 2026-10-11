@@ -23,6 +23,7 @@ import {BUILD_SCOPE_ROLE,BUILD_SCOPE_PATCHES,buildScopeEvidenceOk} from './upstr
 import {TEST_CONSOLIDATION_ROLE,TEST_CONSOLIDATION_PATCHES,testConsolidationBatchOk,testConsolidationEntryOk} from './upstream-test-consolidation-evidence.mjs';
 import {COMMENT_SCOPE_ROLE,COMMENT_SHAS,commentScopeEvidenceOk} from './upstream-comment-review.mjs';
 import {SLIDER_TOKEN_SHA,SLIDER_TOKEN_ROLE,sliderTokenEvidenceOk} from './upstream-slider-token-evidence.mjs';
+import {candidateSourceEvidenceOk, candidateProductSourcePaths} from './upstream-candidate-source-evidence.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -204,6 +205,10 @@ function individualProofOk(entry) {
   const proof = entry.individual_proof;
   if (!proof || typeof proof !== 'object' || Array.isArray(proof)) return false;
   if (!HEX64.test(proof.diff_sha256 || '') || !individualPatchBound(entry, proof)) return false;
+  if (!candidateSourceEvidenceOk(proof, rel => {
+    const member = regularRepoMember(rel);
+    return member ? readFileSync(member) : null;
+  }, () => candidateProductSourcePaths(root))) return false;
   if (!REVIEW_DEPTHS.has(proof.review_depth)) return false;
   if (!Array.isArray(proof.affected_branches) || proof.affected_branches.length === 0) return false;
   if (!proof.affected_branches.every(branch => branch === 'main' || branch === '21.x')) return false;
