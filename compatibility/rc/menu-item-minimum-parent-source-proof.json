@@ -1,0 +1,1455 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "role": "One current inject import with actual owned leaf/current minimum public parent and caller root; source-only diagnostic",
+  "node": "v22.23.3",
+  "compiler": "6.0.3",
+  "source_review": {
+    "file": "legacy-menu/internal/menu-item-context.ts",
+    "module": "@angular/core",
+    "symbol": "inject",
+    "candidate_source_sha256": "c3b8f61d99dd73f64a246f63b59df9291d7cb13e1e9a44b500c9182159448b21",
+    "references": [
+      {
+        "line": 46,
+        "kind": "captured-public-token",
+        "token": "Injector",
+        "module": "@angular/core",
+        "optional": false,
+        "expression": "inject(Injector)"
+      },
+      {
+        "line": 47,
+        "kind": "captured-public-token",
+        "token": "MAT_MENU_PANEL",
+        "module": "./menu-panel-token",
+        "optional": true,
+        "expression": "inject(MAT_MENU_PANEL, {optional: true})"
+      },
+      {
+        "line": 49,
+        "kind": "captured-public-token",
+        "token": "ElementRef",
+        "module": "@angular/core",
+        "optional": false,
+        "expression": "inject(ElementRef)"
+      },
+      {
+        "line": 50,
+        "kind": "captured-public-token",
+        "token": "DOCUMENT",
+        "module": "@angular/core",
+        "optional": false,
+        "expression": "inject(DOCUMENT)"
+      },
+      {
+        "line": 51,
+        "kind": "captured-public-token",
+        "token": "FocusMonitor",
+        "module": "@angular/cdk/a11y",
+        "optional": false,
+        "expression": "inject(FocusMonitor)"
+      },
+      {
+        "line": 52,
+        "kind": "captured-public-token",
+        "token": "ChangeDetectorRef",
+        "module": "@angular/core",
+        "optional": false,
+        "expression": "inject(ChangeDetectorRef)"
+      }
+    ],
+    "scope": "export function constructLegacyMenuItem(target: Function): MatMenuItem {\n  const application = inject(Injector);\n  const parent = inject(MAT_MENU_PANEL, {optional: true});\n  const context = new MenuItemContext(new Map<unknown, unknown>([\n    [ElementRef, inject(ElementRef)],\n    [DOCUMENT, inject(DOCUMENT)],\n    [FocusMonitor, inject(FocusMonitor)],\n    [ChangeDetectorRef, inject(ChangeDetectorRef)],\n  ]), application);\n  const item: MatMenuItem = runInInjectionContext(context, () => Reflect.construct(MatMenuItem, [], target));\n  item._parentMenu = parent;\n  parent?.addItem?.(item);\n  return item;\n}"
+  },
+  "source_controls": [
+    {
+      "id": "wrong-Core-import",
+      "rejected": true
+    },
+    {
+      "id": "owned-panel-not-optional",
+      "rejected": true
+    },
+    {
+      "id": "required-document-is-optional",
+      "rejected": true
+    },
+    {
+      "id": "numeric-panel-flags",
+      "rejected": true
+    },
+    {
+      "id": "wrong-element-capture",
+      "rejected": true
+    },
+    {
+      "id": "wrong-detector-capture",
+      "rejected": true
+    },
+    {
+      "id": "wrong-application-capture",
+      "rejected": true
+    },
+    {
+      "id": "shadowed-import",
+      "rejected": true
+    },
+    {
+      "id": "escaped-import",
+      "rejected": true
+    }
+  ],
+  "namespace_controls": [
+    {
+      "id": "wrong-framework-base-capsule",
+      "rejected": true
+    },
+    {
+      "id": "wrong-line",
+      "rejected": true
+    },
+    {
+      "id": "borrowed-main-closure",
+      "rejected": true
+    },
+    {
+      "id": "missing-runtime-edge",
+      "rejected": true
+    },
+    {
+      "id": "missing-type-member",
+      "rejected": true
+    },
+    {
+      "id": "missing-peer-source",
+      "rejected": true
+    },
+    {
+      "id": "changed-compressed-peer-member",
+      "rejected": true
+    },
+    {
+      "id": "missing-compressed-peer-member",
+      "rejected": true
+    }
+  ],
+  "public_namespace_capsule_sha256": "4c2782e32c576959b6b36d999565f0205abf4ed44d0ba4b36a9aade625ab445f",
+  "base_capsule_sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3",
+  "declarations": [
+    {
+      "line": "main",
+      "version": "22.1.7",
+      "source_sha256": "42055c30ec251b3a272b68958fd7b877b347ed964f8f7e4236b1e5deaaf4fa1b",
+      "public_export": true,
+      "parent_member": "_parentMenu?: MatMenuPanel<MatMenuItem> | null | undefined;",
+      "constructor": "constructor();",
+      "no_unstable_markers": true
+    },
+    {
+      "line": "21.x",
+      "version": "21.2.14",
+      "source_sha256": "7789c2ffbc33fe9e0c656a6808a4e325c6a9c3f597c5348738c877d39a04a6a1",
+      "public_export": true,
+      "parent_member": "_parentMenu?: MatMenuPanel<MatMenuItem> | null | undefined;",
+      "constructor": "constructor(...args: unknown[]);",
+      "no_unstable_markers": true
+    }
+  ],
+  "strictTypes": [
+    {
+      "line": "main",
+      "compiler": "6.0.3",
+      "strict": true,
+      "skipLibCheck": false,
+      "diagnostics": 0,
+      "negative_types": 2,
+      "nondeprecated_actual_source_calls": [
+        {
+          "call": "this.application.get(token, notFoundValue, options)",
+          "declaration": "abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions): T;"
+        },
+        {
+          "call": "inject(Injector)",
+          "declaration": "declare function inject<T>(token: ProviderToken<T>): T;"
+        },
+        {
+          "call": "inject(MAT_MENU_PANEL, {optional: true})",
+          "declaration": "declare function inject<T>(token: ProviderToken<T>, options: InjectOptions): T | null;"
+        },
+        {
+          "call": "inject(ElementRef)",
+          "declaration": "declare function inject<T>(token: ProviderToken<T>): T;"
+        },
+        {
+          "call": "inject(DOCUMENT)",
+          "declaration": "declare function inject<T>(token: ProviderToken<T>): T;"
+        },
+        {
+          "call": "inject(FocusMonitor)",
+          "declaration": "declare function inject<T>(token: ProviderToken<T>): T;"
+        },
+        {
+          "call": "inject(ChangeDetectorRef)",
+          "declaration": "declare function inject<T>(token: ProviderToken<T>): T;"
+        }
+      ],
+      "actual_owned_source_files": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-panel.ts",
+          "sha256": "4212186406b92fc485c050ffae7a8fd7b1f8e7af855bfd0133b018435834018a"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-panel-token.ts",
+          "sha256": "3463226c000f63d599639bd1c400d744c9e02417bd9c57fe46e53827706180cd"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-item-context.ts",
+          "sha256": "c3b8f61d99dd73f64a246f63b59df9291d7cb13e1e9a44b500c9182159448b21"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/menu-item.ts",
+          "sha256": "78998cced10b89812010b41a0e6ea631d3e699c9f6b9e5ca228ebd6e1cd60283"
+        }
+      ],
+      "fixture_sha256": "a38df1dbba2142f2d07178cd03daa492674d63586e109be281dff45d556f3a40"
+    },
+    {
+      "line": "21.x",
+      "compiler": "6.0.3",
+      "strict": true,
+      "skipLibCheck": false,
+      "diagnostics": 0,
+      "negative_types": 2,
+      "nondeprecated_actual_source_calls": [
+        {
+          "call": "this.application.get(token, notFoundValue, options)",
+          "declaration": "abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions): T;"
+        },
+        {
+          "call": "inject(Injector)",
+          "declaration": "declare function inject<T>(token: ProviderToken<T>): T;"
+        },
+        {
+          "call": "inject(MAT_MENU_PANEL, {optional: true})",
+          "declaration": "declare function inject<T>(token: ProviderToken<T>, options: InjectOptions): T | null;"
+        },
+        {
+          "call": "inject(ElementRef)",
+          "declaration": "declare function inject<T>(token: ProviderToken<T>): T;"
+        },
+        {
+          "call": "inject(DOCUMENT)",
+          "declaration": "declare function inject<T>(token: ProviderToken<T>): T;"
+        },
+        {
+          "call": "inject(FocusMonitor)",
+          "declaration": "declare function inject<T>(token: ProviderToken<T>): T;"
+        },
+        {
+          "call": "inject(ChangeDetectorRef)",
+          "declaration": "declare function inject<T>(token: ProviderToken<T>): T;"
+        }
+      ],
+      "actual_owned_source_files": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-panel.ts",
+          "sha256": "4212186406b92fc485c050ffae7a8fd7b1f8e7af855bfd0133b018435834018a"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-panel-token.ts",
+          "sha256": "3463226c000f63d599639bd1c400d744c9e02417bd9c57fe46e53827706180cd"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-item-context.ts",
+          "sha256": "c3b8f61d99dd73f64a246f63b59df9291d7cb13e1e9a44b500c9182159448b21"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/menu-item.ts",
+          "sha256": "78998cced10b89812010b41a0e6ea631d3e699c9f6b9e5ca228ebd6e1cd60283"
+        }
+      ],
+      "fixture_sha256": "a38df1dbba2142f2d07178cd03daa492674d63586e109be281dff45d556f3a40"
+    }
+  ],
+  "runtime": [
+    {
+      "line": "main",
+      "mode": "development",
+      "framework": "22.1.7",
+      "components": "22.1.7",
+      "node": "v22.23.3",
+      "compiler": "6.0.3",
+      "cases": [
+        {
+          "id": "outside-di-construction-is-explicitly-rejected",
+          "result": "pass"
+        },
+        {
+          "id": "manual-1-argument-construction-is-explicitly-rejected",
+          "result": "pass"
+        },
+        {
+          "id": "manual-5-argument-construction-is-explicitly-rejected",
+          "result": "pass"
+        },
+        {
+          "id": "genuine-parent-leaf-and-caller-element-identity",
+          "result": "pass"
+        },
+        {
+          "id": "owned-panel-registers-once-and-peer-panel-does-not-leak",
+          "result": "pass"
+        },
+        {
+          "id": "missing-legacy-panel-is-optional-and-peer-panel-stays-isolated",
+          "result": "pass"
+        },
+        {
+          "id": "custom-panel-without-registration-hooks",
+          "result": "pass"
+        },
+        {
+          "id": "monitor-and-focus-origin-options-use-caller-services",
+          "result": "pass"
+        },
+        {
+          "id": "native-focus-and-document-identity-remain-historical",
+          "result": "pass"
+        },
+        {
+          "id": "public-state-setters-mark-the-caller-detector",
+          "result": "pass"
+        },
+        {
+          "id": "hover-focus-and-completion-streams-remain-real-parent-streams",
+          "result": "pass"
+        },
+        {
+          "id": "historical-disabled-tabindex-click-and-icon-free-label",
+          "result": "pass"
+        },
+        {
+          "id": "derived-construction-preserves-real-new-target-and-initializers",
+          "result": "pass"
+        }
+      ],
+      "mutations": [
+        {
+          "id": "optional-null-fallback-is-ignored",
+          "rejected": true,
+          "failed_cases": [
+            "owned-panel-registers-once-and-peer-panel-does-not-leak",
+            "missing-legacy-panel-is-optional-and-peer-panel-stays-isolated",
+            "custom-panel-without-registration-hooks"
+          ]
+        },
+        {
+          "id": "owned-panel-is-not-assigned",
+          "rejected": true,
+          "failed_cases": [
+            "owned-panel-registers-once-and-peer-panel-does-not-leak",
+            "custom-panel-without-registration-hooks"
+          ]
+        },
+        {
+          "id": "owned-panel-is-not-registered",
+          "rejected": true,
+          "failed_cases": [
+            "owned-panel-registers-once-and-peer-panel-does-not-leak"
+          ]
+        },
+        {
+          "id": "required-root-services-are-not-delegated",
+          "rejected": true,
+          "failed_cases": [
+            "genuine-parent-leaf-and-caller-element-identity",
+            "owned-panel-registers-once-and-peer-panel-does-not-leak",
+            "missing-legacy-panel-is-optional-and-peer-panel-stays-isolated",
+            "custom-panel-without-registration-hooks",
+            "monitor-and-focus-origin-options-use-caller-services",
+            "native-focus-and-document-identity-remain-historical",
+            "public-state-setters-mark-the-caller-detector",
+            "hover-focus-and-completion-streams-remain-real-parent-streams",
+            "historical-disabled-tabindex-click-and-icon-free-label",
+            "derived-construction-preserves-real-new-target-and-initializers"
+          ]
+        },
+        {
+          "id": "subclass-new-target-is-discarded",
+          "rejected": true,
+          "failed_cases": [
+            "genuine-parent-leaf-and-caller-element-identity",
+            "derived-construction-preserves-real-new-target-and-initializers"
+          ]
+        }
+      ],
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      },
+      "worker_sha256": "db32b156a2d6c00c452dacb722e1b3a9c58834e8f0422f20628f13aa37c2f149",
+      "assertion_body_sha256": "7b71f61f59f72e6e45627be164189c36a820ec030a7c77628a56886f8760c7c9"
+    },
+    {
+      "line": "main",
+      "mode": "production",
+      "framework": "22.1.7",
+      "components": "22.1.7",
+      "node": "v22.23.3",
+      "compiler": "6.0.3",
+      "cases": [
+        {
+          "id": "outside-di-construction-is-explicitly-rejected",
+          "result": "pass"
+        },
+        {
+          "id": "manual-1-argument-construction-is-explicitly-rejected",
+          "result": "pass"
+        },
+        {
+          "id": "manual-5-argument-construction-is-explicitly-rejected",
+          "result": "pass"
+        },
+        {
+          "id": "genuine-parent-leaf-and-caller-element-identity",
+          "result": "pass"
+        },
+        {
+          "id": "owned-panel-registers-once-and-peer-panel-does-not-leak",
+          "result": "pass"
+        },
+        {
+          "id": "missing-legacy-panel-is-optional-and-peer-panel-stays-isolated",
+          "result": "pass"
+        },
+        {
+          "id": "custom-panel-without-registration-hooks",
+          "result": "pass"
+        },
+        {
+          "id": "monitor-and-focus-origin-options-use-caller-services",
+          "result": "pass"
+        },
+        {
+          "id": "native-focus-and-document-identity-remain-historical",
+          "result": "pass"
+        },
+        {
+          "id": "public-state-setters-mark-the-caller-detector",
+          "result": "pass"
+        },
+        {
+          "id": "hover-focus-and-completion-streams-remain-real-parent-streams",
+          "result": "pass"
+        },
+        {
+          "id": "historical-disabled-tabindex-click-and-icon-free-label",
+          "result": "pass"
+        },
+        {
+          "id": "derived-construction-preserves-real-new-target-and-initializers",
+          "result": "pass"
+        }
+      ],
+      "mutations": [
+        {
+          "id": "optional-null-fallback-is-ignored",
+          "rejected": true,
+          "failed_cases": [
+            "owned-panel-registers-once-and-peer-panel-does-not-leak",
+            "missing-legacy-panel-is-optional-and-peer-panel-stays-isolated",
+            "custom-panel-without-registration-hooks"
+          ]
+        },
+        {
+          "id": "owned-panel-is-not-assigned",
+          "rejected": true,
+          "failed_cases": [
+            "owned-panel-registers-once-and-peer-panel-does-not-leak",
+            "custom-panel-without-registration-hooks"
+          ]
+        },
+        {
+          "id": "owned-panel-is-not-registered",
+          "rejected": true,
+          "failed_cases": [
+            "owned-panel-registers-once-and-peer-panel-does-not-leak"
+          ]
+        },
+        {
+          "id": "required-root-services-are-not-delegated",
+          "rejected": true,
+          "failed_cases": [
+            "genuine-parent-leaf-and-caller-element-identity",
+            "owned-panel-registers-once-and-peer-panel-does-not-leak",
+            "missing-legacy-panel-is-optional-and-peer-panel-stays-isolated",
+            "custom-panel-without-registration-hooks",
+            "monitor-and-focus-origin-options-use-caller-services",
+            "native-focus-and-document-identity-remain-historical",
+            "public-state-setters-mark-the-caller-detector",
+            "hover-focus-and-completion-streams-remain-real-parent-streams",
+            "historical-disabled-tabindex-click-and-icon-free-label",
+            "derived-construction-preserves-real-new-target-and-initializers"
+          ]
+        },
+        {
+          "id": "subclass-new-target-is-discarded",
+          "rejected": true,
+          "failed_cases": [
+            "genuine-parent-leaf-and-caller-element-identity",
+            "derived-construction-preserves-real-new-target-and-initializers"
+          ]
+        }
+      ],
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      },
+      "worker_sha256": "f9175040921f51d215759c56ae35d105d618804112fdd896297b2d2495d8725f",
+      "assertion_body_sha256": "7b71f61f59f72e6e45627be164189c36a820ec030a7c77628a56886f8760c7c9"
+    },
+    {
+      "line": "21.x",
+      "mode": "development",
+      "framework": "21.2.23",
+      "components": "21.2.14",
+      "node": "v22.23.3",
+      "compiler": "6.0.3",
+      "cases": [
+        {
+          "id": "outside-di-construction-is-explicitly-rejected",
+          "result": "pass"
+        },
+        {
+          "id": "manual-1-argument-construction-is-explicitly-rejected",
+          "result": "pass"
+        },
+        {
+          "id": "manual-5-argument-construction-is-explicitly-rejected",
+          "result": "pass"
+        },
+        {
+          "id": "genuine-parent-leaf-and-caller-element-identity",
+          "result": "pass"
+        },
+        {
+          "id": "owned-panel-registers-once-and-peer-panel-does-not-leak",
+          "result": "pass"
+        },
+        {
+          "id": "missing-legacy-panel-is-optional-and-peer-panel-stays-isolated",
+          "result": "pass"
+        },
+        {
+          "id": "custom-panel-without-registration-hooks",
+          "result": "pass"
+        },
+        {
+          "id": "monitor-and-focus-origin-options-use-caller-services",
+          "result": "pass"
+        },
+        {
+          "id": "native-focus-and-document-identity-remain-historical",
+          "result": "pass"
+        },
+        {
+          "id": "public-state-setters-mark-the-caller-detector",
+          "result": "pass"
+        },
+        {
+          "id": "hover-focus-and-completion-streams-remain-real-parent-streams",
+          "result": "pass"
+        },
+        {
+          "id": "historical-disabled-tabindex-click-and-icon-free-label",
+          "result": "pass"
+        },
+        {
+          "id": "derived-construction-preserves-real-new-target-and-initializers",
+          "result": "pass"
+        }
+      ],
+      "mutations": [
+        {
+          "id": "optional-null-fallback-is-ignored",
+          "rejected": true,
+          "failed_cases": [
+            "owned-panel-registers-once-and-peer-panel-does-not-leak",
+            "missing-legacy-panel-is-optional-and-peer-panel-stays-isolated",
+            "custom-panel-without-registration-hooks"
+          ]
+        },
+        {
+          "id": "owned-panel-is-not-assigned",
+          "rejected": true,
+          "failed_cases": [
+            "owned-panel-registers-once-and-peer-panel-does-not-leak",
+            "custom-panel-without-registration-hooks"
+          ]
+        },
+        {
+          "id": "owned-panel-is-not-registered",
+          "rejected": true,
+          "failed_cases": [
+            "owned-panel-registers-once-and-peer-panel-does-not-leak"
+          ]
+        },
+        {
+          "id": "required-root-services-are-not-delegated",
+          "rejected": true,
+          "failed_cases": [
+            "genuine-parent-leaf-and-caller-element-identity",
+            "owned-panel-registers-once-and-peer-panel-does-not-leak",
+            "missing-legacy-panel-is-optional-and-peer-panel-stays-isolated",
+            "custom-panel-without-registration-hooks",
+            "monitor-and-focus-origin-options-use-caller-services",
+            "native-focus-and-document-identity-remain-historical",
+            "public-state-setters-mark-the-caller-detector",
+            "hover-focus-and-completion-streams-remain-real-parent-streams",
+            "historical-disabled-tabindex-click-and-icon-free-label",
+            "derived-construction-preserves-real-new-target-and-initializers"
+          ]
+        },
+        {
+          "id": "subclass-new-target-is-discarded",
+          "rejected": true,
+          "failed_cases": [
+            "genuine-parent-leaf-and-caller-element-identity",
+            "derived-construction-preserves-real-new-target-and-initializers"
+          ]
+        }
+      ],
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      },
+      "worker_sha256": "db32b156a2d6c00c452dacb722e1b3a9c58834e8f0422f20628f13aa37c2f149",
+      "assertion_body_sha256": "7b71f61f59f72e6e45627be164189c36a820ec030a7c77628a56886f8760c7c9"
+    },
+    {
+      "line": "21.x",
+      "mode": "production",
+      "framework": "21.2.23",
+      "components": "21.2.14",
+      "node": "v22.23.3",
+      "compiler": "6.0.3",
+      "cases": [
+        {
+          "id": "outside-di-construction-is-explicitly-rejected",
+          "result": "pass"
+        },
+        {
+          "id": "manual-1-argument-construction-is-explicitly-rejected",
+          "result": "pass"
+        },
+        {
+          "id": "manual-5-argument-construction-is-explicitly-rejected",
+          "result": "pass"
+        },
+        {
+          "id": "genuine-parent-leaf-and-caller-element-identity",
+          "result": "pass"
+        },
+        {
+          "id": "owned-panel-registers-once-and-peer-panel-does-not-leak",
+          "result": "pass"
+        },
+        {
+          "id": "missing-legacy-panel-is-optional-and-peer-panel-stays-isolated",
+          "result": "pass"
+        },
+        {
+          "id": "custom-panel-without-registration-hooks",
+          "result": "pass"
+        },
+        {
+          "id": "monitor-and-focus-origin-options-use-caller-services",
+          "result": "pass"
+        },
+        {
+          "id": "native-focus-and-document-identity-remain-historical",
+          "result": "pass"
+        },
+        {
+          "id": "public-state-setters-mark-the-caller-detector",
+          "result": "pass"
+        },
+        {
+          "id": "hover-focus-and-completion-streams-remain-real-parent-streams",
+          "result": "pass"
+        },
+        {
+          "id": "historical-disabled-tabindex-click-and-icon-free-label",
+          "result": "pass"
+        },
+        {
+          "id": "derived-construction-preserves-real-new-target-and-initializers",
+          "result": "pass"
+        }
+      ],
+      "mutations": [
+        {
+          "id": "optional-null-fallback-is-ignored",
+          "rejected": true,
+          "failed_cases": [
+            "owned-panel-registers-once-and-peer-panel-does-not-leak",
+            "missing-legacy-panel-is-optional-and-peer-panel-stays-isolated",
+            "custom-panel-without-registration-hooks"
+          ]
+        },
+        {
+          "id": "owned-panel-is-not-assigned",
+          "rejected": true,
+          "failed_cases": [
+            "owned-panel-registers-once-and-peer-panel-does-not-leak",
+            "custom-panel-without-registration-hooks"
+          ]
+        },
+        {
+          "id": "owned-panel-is-not-registered",
+          "rejected": true,
+          "failed_cases": [
+            "owned-panel-registers-once-and-peer-panel-does-not-leak"
+          ]
+        },
+        {
+          "id": "required-root-services-are-not-delegated",
+          "rejected": true,
+          "failed_cases": [
+            "genuine-parent-leaf-and-caller-element-identity",
+            "owned-panel-registers-once-and-peer-panel-does-not-leak",
+            "missing-legacy-panel-is-optional-and-peer-panel-stays-isolated",
+            "custom-panel-without-registration-hooks",
+            "monitor-and-focus-origin-options-use-caller-services",
+            "native-focus-and-document-identity-remain-historical",
+            "public-state-setters-mark-the-caller-detector",
+            "hover-focus-and-completion-streams-remain-real-parent-streams",
+            "historical-disabled-tabindex-click-and-icon-free-label",
+            "derived-construction-preserves-real-new-target-and-initializers"
+          ]
+        },
+        {
+          "id": "subclass-new-target-is-discarded",
+          "rejected": true,
+          "failed_cases": [
+            "genuine-parent-leaf-and-caller-element-identity",
+            "derived-construction-preserves-real-new-target-and-initializers"
+          ]
+        }
+      ],
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      },
+      "worker_sha256": "f9175040921f51d215759c56ae35d105d618804112fdd896297b2d2495d8725f",
+      "assertion_body_sha256": "7b71f61f59f72e6e45627be164189c36a820ec030a7c77628a56886f8760c7c9"
+    }
+  ],
+  "api_factory": [
+    {
+      "line": "main",
+      "framework": "22.1.7",
+      "components": "22.1.7",
+      "relocated_worker_sha256": "0822904f8ab17655adc3fd7bd16f63d6e38abda8e426c9e249ca9b02bd75eb7b",
+      "original_worker_sha256": "2073bb5addccca8c7461bd5341e90dfeb9e35724775531d7f70036ec6901246f",
+      "summary": {
+        "authority_mutants": 4,
+        "signature_mutants": 12,
+        "runtime_positive": 1,
+        "runtime_mutants": 7,
+        "settlement_mutants": 13,
+        "original_factory_dependencies": 5,
+        "accepted_context_requests": 6,
+        "node": "v22.23.3",
+        "compiler": "6.0.3",
+        "runtime_peer": "22.1.7"
+      },
+      "source_caps": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/menu-item.ts",
+          "sha256": "78998cced10b89812010b41a0e6ea631d3e699c9f6b9e5ca228ebd6e1cd60283"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-item-context.ts",
+          "sha256": "c3b8f61d99dd73f64a246f63b59df9291d7cb13e1e9a44b500c9182159448b21"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-panel-token.ts",
+          "sha256": "3463226c000f63d599639bd1c400d744c9e02417bd9c57fe46e53827706180cd"
+        },
+        {
+          "path": "scripts/menu-item-construction-contract.mjs",
+          "sha256": "2324b8b60c9033fdf3b63bb4137609b846d72140d04ec3866fb4f7fcc883f7e1"
+        },
+        {
+          "path": "scripts/api-menu-item-factory.mjs",
+          "sha256": "a69870d4ffbaae484d81af58a3f159910dfe382dc258116638d7ce26d3f5c967"
+        },
+        {
+          "path": "scripts/api-di-observe.mjs",
+          "sha256": "4f5ea2f280f784f5c982f604b7f0de40c0d80a00e36ea36f0ab32867c70352ae"
+        },
+        {
+          "path": "scripts/api-surface.mjs",
+          "sha256": "d9c1901940f96febdffb227d68bc04e75bcc85987899d73e2b3e8491c0201b38"
+        },
+        {
+          "path": "scripts/api-completeness.mjs",
+          "sha256": "39877c4c2dd12db527be17448b156116c690d3a28faaca834cdcbfa3945a1c17"
+        },
+        {
+          "path": "tests/menu_item_api_contract_probe.mjs",
+          "sha256": "2073bb5addccca8c7461bd5341e90dfeb9e35724775531d7f70036ec6901246f"
+        },
+        {
+          "path": "compatibility/rc/api/menu-item-construction-contract.json",
+          "sha256": "9fc349c1a7b93c5d9174afd839dc480c89be26090795cb3b6c9895dfadeb1fd3"
+        },
+        {
+          "path": "compatibility/rc/menu-construction-consumer-decision.json",
+          "sha256": "82c9efa90f486ecb1cfb5e0a4bb782ccbd0a6aefb3e001d2b4c4de9d2cc74d0a"
+        },
+        {
+          "path": "compatibility/rc/menu-construction-consumer-decision-prior-attribution.json",
+          "sha256": "abd23806481867b903dad0518d770436c03ac31d608c42ddc21fe074183ed0b3"
+        },
+        {
+          "path": "compatibility/rc/api/signature-differences.json",
+          "sha256": "1a110e3337765fc494d5f9cc4d02059f47e8b62d734e51d10a30aa0a6314707c"
+        }
+      ],
+      "actual_factory": {
+        "id": "actual-source-factory-checker-and-settlement",
+        "result": "pass",
+        "historical": "ElementRef|DOCUMENT|FocusMonitor|MAT_MENU_PANEL?|ChangeDetectorRef",
+        "observed": [
+          "Injector",
+          "MAT_MENU_PANEL?",
+          "ElementRef",
+          "DocumentToken",
+          "FocusMonitor",
+          "ChangeDetectorRef"
+        ],
+        "approved_construction": {
+          "profile_id": "menu-item-angular-di-construction-v1",
+          "contract_sha256": "9fc349c1a7b93c5d9174afd839dc480c89be26090795cb3b6c9895dfadeb1fd3",
+          "context": "actual factory/public application root with borrowed node services and synthetic DOM; native/AOT gates separate",
+          "behavior_problems": [],
+          "counts": {
+            "marks": 2,
+            "adds": 1,
+            "removes": 1,
+            "monitor": 1,
+            "stop": 1,
+            "focus": 1,
+            "foreignAdds": 0,
+            "foreignRemoves": 0,
+            "borrowedDestroyed": 0,
+            "styles": 1
+          },
+          "root_requests": [
+            {
+              "optional": false,
+              "unresolved": false
+            }
+          ]
+        }
+      },
+      "authority_mutants": [
+        {
+          "id": "misattributed-specific-DI-approval",
+          "rejected": true
+        },
+        {
+          "id": "wrong-authority-kind",
+          "rejected": true
+        },
+        {
+          "id": "missing-delegation",
+          "rejected": true
+        },
+        {
+          "id": "lost-historical-proposal",
+          "rejected": true
+        }
+      ],
+      "signature_mutants": [
+        {
+          "id": "missing-constructor",
+          "rejected": true,
+          "problems": [
+            "public constructor(ElementRef<HTMLElement>,any,FocusMonitor,MatMenuPanel<MatMenuItem>|undefined,ChangeDetectorRef)",
+            "public constructor(ElementRef<HTMLElement>,any?,FocusMonitor?,MatMenuPanel<MatMenuItem>?,ChangeDetectorRef?)",
+            "public constructor()"
+          ]
+        },
+        {
+          "id": "rest-arguments",
+          "rejected": true,
+          "problems": [
+            "public constructor(ElementRef<HTMLElement>,any,FocusMonitor,MatMenuPanel<MatMenuItem>|undefined,ChangeDetectorRef)",
+            "public constructor(ElementRef<HTMLElement>,any?,FocusMonitor?,MatMenuPanel<MatMenuItem>?,ChangeDetectorRef?)",
+            "public constructor(...unknown[])"
+          ]
+        },
+        {
+          "id": "optional-manual-element",
+          "rejected": true,
+          "problems": [
+            "public constructor(ElementRef<HTMLElement>,any,FocusMonitor,MatMenuPanel<MatMenuItem>|undefined,ChangeDetectorRef)",
+            "public constructor(ElementRef<HTMLElement>,any?,FocusMonitor?,MatMenuPanel<MatMenuItem>?,ChangeDetectorRef?)",
+            "public constructor(unknown?)"
+          ]
+        },
+        {
+          "id": "extra-overload",
+          "rejected": true,
+          "problems": [
+            "public constructor(ElementRef<HTMLElement>,any,FocusMonitor,MatMenuPanel<MatMenuItem>|undefined,ChangeDetectorRef)",
+            "public constructor(ElementRef<HTMLElement>,any?,FocusMonitor?,MatMenuPanel<MatMenuItem>?,ChangeDetectorRef?)",
+            "public constructor()",
+            "public constructor(unknown)",
+            "public constructor(unknown?)"
+          ]
+        },
+        {
+          "id": "foreign-parent",
+          "rejected": true,
+          "problems": [
+            "public constructor(ElementRef<HTMLElement>,any,FocusMonitor,MatMenuPanel<MatMenuItem>|undefined,ChangeDetectorRef)",
+            "public constructor(ElementRef<HTMLElement>,any?,FocusMonitor?,MatMenuPanel<MatMenuItem>?,ChangeDetectorRef?)",
+            "public constructor()"
+          ]
+        },
+        {
+          "id": "shadow-parent",
+          "rejected": true,
+          "problems": [
+            "public constructor(ElementRef<HTMLElement>,any,FocusMonitor,MatMenuPanel<MatMenuItem>|undefined,ChangeDetectorRef)",
+            "public constructor(ElementRef<HTMLElement>,any?,FocusMonitor?,MatMenuPanel<MatMenuItem>?,ChangeDetectorRef?)",
+            "public constructor()"
+          ]
+        },
+        {
+          "id": "wrong-public-import",
+          "rejected": true,
+          "problems": [
+            "public constructor(ElementRef<HTMLElement>,any,FocusMonitor,MatMenuPanel<MatMenuItem>|undefined,ChangeDetectorRef)",
+            "public constructor(ElementRef<HTMLElement>,any?,FocusMonitor?,MatMenuPanel<MatMenuItem>?,ChangeDetectorRef?)",
+            "public constructor()"
+          ]
+        },
+        {
+          "id": "plain-rationale-cannot-authorize-construction",
+          "rejected": true
+        },
+        {
+          "id": "contract-identity-changed",
+          "rejected": true
+        },
+        {
+          "id": "authority-identity-changed",
+          "rejected": true
+        },
+        {
+          "id": "original-constructor-identity-changed",
+          "rejected": true
+        },
+        {
+          "id": "original-factory-identity-changed",
+          "rejected": true
+        }
+      ],
+      "runtime_mutants": [
+        {
+          "id": "same-description-token-twin",
+          "result": "rejected",
+          "problems": [
+            "factory legacy-menu/primary/MatLegacyMenuItem owned panel and isolated peer panel: Values have same structure but are not reference-equal:\n\n{\n  addItem: [Function: addItem],\n  removeItem: [Function: removeItem]\n}\n",
+            "factory legacy-menu/primary/MatLegacyMenuItem owned teardown does not destroy borrowed services: Expected values to be strictly equal:\n\n0 !== 1\n",
+            "token legacy-menu/primary/MatLegacyMenuItem[1] expected MAT_MENU_PANEL observed MAT_MENU_PANEL",
+            "authorized menu construction observation incomplete"
+          ]
+        },
+        {
+          "id": "wrong-optional-flag",
+          "result": "rejected",
+          "problems": [
+            "optional legacy-menu/primary/MatLegacyMenuItem[1] expected true observed false"
+          ]
+        },
+        {
+          "id": "missing-manual-argument-rejection",
+          "result": "rejected",
+          "problems": [
+            "factory legacy-menu/primary/MatLegacyMenuItem manual dependency arguments explicitly reject: Missing expected exception.",
+            "token count legacy-menu/primary/MatLegacyMenuItem expected 6 observed 12 [Injector, MAT_MENU_PANEL, ElementRef, DocumentToken, FocusMonitor, ChangeDetectorRef, Injector, MAT_MENU_PANEL, ElementRef, DocumentToken, FocusMonitor, ChangeDetectorRef]",
+            "authorized menu construction observation incomplete"
+          ]
+        },
+        {
+          "id": "peer-optional-panel-leak",
+          "result": "rejected",
+          "problems": [
+            "factory legacy-menu/primary/MatLegacyMenuItem owned panel and isolated peer panel: Expected values to be strictly equal:\n\n1 !== 0\n",
+            "token count legacy-menu/primary/MatLegacyMenuItem expected 6 observed 7 [Injector, MAT_MENU_PANEL, ElementRef, DocumentToken, FocusMonitor, ChangeDetectorRef, MAT_MENU_PANEL]",
+            "authorized menu construction observation incomplete"
+          ]
+        },
+        {
+          "id": "wrong-new-target",
+          "result": "rejected",
+          "problems": [
+            "factory legacy-menu/primary/MatLegacyMenuItem real parent/leaf/node identity: The expression evaluated to a falsy value:\n\n  assert.ok(item instanceof Item)\n",
+            "authorized menu construction observation incomplete"
+          ]
+        },
+        {
+          "id": "empty-returning-factory",
+          "result": "rejected",
+          "problems": [
+            "factory legacy-menu/primary/MatLegacyMenuItem real parent/leaf/node identity: The expression evaluated to a falsy value:\n\n  assert.ok(item instanceof Item)\n",
+            "factory legacy-menu/primary/MatLegacyMenuItem owned panel and isolated peer panel: Expected values to be strictly equal:\n+ actual - expected\n\n+ undefined\n- {\n-   addItem: [Function: addItem],\n-   removeItem: [Function: removeItem]\n- }\n",
+            "factory legacy-menu/primary/MatLegacyMenuItem real caller root structural styles: Expected values to be strictly equal:\n\n0 !== 1\n",
+            "factory legacy-menu/primary/MatLegacyMenuItem borrowed monitor/document/detector behavior: item.ngAfterViewInit is not a function",
+            "factory legacy-menu/primary/MatLegacyMenuItem owned teardown does not destroy borrowed services: Cannot read properties of undefined (reading 'subscribe')",
+            "token count legacy-menu/primary/MatLegacyMenuItem expected 6 observed 0 []",
+            "authorized menu construction observation incomplete"
+          ]
+        },
+        {
+          "id": "throwing-factory",
+          "result": "rejected",
+          "problems": [
+            "factory legacy-menu/primary/MatLegacyMenuItem factory execution incomplete: factory did not complete",
+            "token count legacy-menu/primary/MatLegacyMenuItem expected 6 observed 0 []",
+            "authorized menu construction observation incomplete"
+          ]
+        }
+      ],
+      "settlement_mutants": [
+        {
+          "id": "missing-profile",
+          "rejected": true
+        },
+        {
+          "id": "wrong-profile",
+          "rejected": true
+        },
+        {
+          "id": "wrong-contract-hash",
+          "rejected": true
+        },
+        {
+          "id": "factory-not-returned",
+          "rejected": true
+        },
+        {
+          "id": "missing-root-execution",
+          "rejected": true
+        },
+        {
+          "id": "unresolved-root-provider",
+          "rejected": true
+        },
+        {
+          "id": "optional-root-service",
+          "rejected": true
+        },
+        {
+          "id": "borrowed-service-destroyed",
+          "rejected": true
+        },
+        {
+          "id": "missing-style-loading",
+          "rejected": true
+        },
+        {
+          "id": "missing-behavior-proof",
+          "rejected": true
+        },
+        {
+          "id": "behavior-failure",
+          "rejected": true
+        },
+        {
+          "id": "token-identity-failure",
+          "rejected": true
+        },
+        {
+          "id": "optional-flag-failure",
+          "rejected": true
+        }
+      ]
+    },
+    {
+      "line": "21.x",
+      "framework": "21.2.23",
+      "components": "21.2.14",
+      "relocated_worker_sha256": "0822904f8ab17655adc3fd7bd16f63d6e38abda8e426c9e249ca9b02bd75eb7b",
+      "original_worker_sha256": "2073bb5addccca8c7461bd5341e90dfeb9e35724775531d7f70036ec6901246f",
+      "summary": {
+        "authority_mutants": 4,
+        "signature_mutants": 12,
+        "runtime_positive": 1,
+        "runtime_mutants": 7,
+        "settlement_mutants": 13,
+        "original_factory_dependencies": 5,
+        "accepted_context_requests": 6,
+        "node": "v22.23.3",
+        "compiler": "6.0.3",
+        "runtime_peer": "21.2.23"
+      },
+      "source_caps": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/menu-item.ts",
+          "sha256": "78998cced10b89812010b41a0e6ea631d3e699c9f6b9e5ca228ebd6e1cd60283"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-item-context.ts",
+          "sha256": "c3b8f61d99dd73f64a246f63b59df9291d7cb13e1e9a44b500c9182159448b21"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-panel-token.ts",
+          "sha256": "3463226c000f63d599639bd1c400d744c9e02417bd9c57fe46e53827706180cd"
+        },
+        {
+          "path": "scripts/menu-item-construction-contract.mjs",
+          "sha256": "2324b8b60c9033fdf3b63bb4137609b846d72140d04ec3866fb4f7fcc883f7e1"
+        },
+        {
+          "path": "scripts/api-menu-item-factory.mjs",
+          "sha256": "a69870d4ffbaae484d81af58a3f159910dfe382dc258116638d7ce26d3f5c967"
+        },
+        {
+          "path": "scripts/api-di-observe.mjs",
+          "sha256": "4f5ea2f280f784f5c982f604b7f0de40c0d80a00e36ea36f0ab32867c70352ae"
+        },
+        {
+          "path": "scripts/api-surface.mjs",
+          "sha256": "d9c1901940f96febdffb227d68bc04e75bcc85987899d73e2b3e8491c0201b38"
+        },
+        {
+          "path": "scripts/api-completeness.mjs",
+          "sha256": "39877c4c2dd12db527be17448b156116c690d3a28faaca834cdcbfa3945a1c17"
+        },
+        {
+          "path": "tests/menu_item_api_contract_probe.mjs",
+          "sha256": "2073bb5addccca8c7461bd5341e90dfeb9e35724775531d7f70036ec6901246f"
+        },
+        {
+          "path": "compatibility/rc/api/menu-item-construction-contract.json",
+          "sha256": "9fc349c1a7b93c5d9174afd839dc480c89be26090795cb3b6c9895dfadeb1fd3"
+        },
+        {
+          "path": "compatibility/rc/menu-construction-consumer-decision.json",
+          "sha256": "82c9efa90f486ecb1cfb5e0a4bb782ccbd0a6aefb3e001d2b4c4de9d2cc74d0a"
+        },
+        {
+          "path": "compatibility/rc/menu-construction-consumer-decision-prior-attribution.json",
+          "sha256": "abd23806481867b903dad0518d770436c03ac31d608c42ddc21fe074183ed0b3"
+        },
+        {
+          "path": "compatibility/rc/api/signature-differences.json",
+          "sha256": "1a110e3337765fc494d5f9cc4d02059f47e8b62d734e51d10a30aa0a6314707c"
+        }
+      ],
+      "actual_factory": {
+        "id": "actual-source-factory-checker-and-settlement",
+        "result": "pass",
+        "historical": "ElementRef|DOCUMENT|FocusMonitor|MAT_MENU_PANEL?|ChangeDetectorRef",
+        "observed": [
+          "Injector",
+          "MAT_MENU_PANEL?",
+          "ElementRef",
+          "DocumentToken",
+          "FocusMonitor",
+          "ChangeDetectorRef"
+        ],
+        "approved_construction": {
+          "profile_id": "menu-item-angular-di-construction-v1",
+          "contract_sha256": "9fc349c1a7b93c5d9174afd839dc480c89be26090795cb3b6c9895dfadeb1fd3",
+          "context": "actual factory/public application root with borrowed node services and synthetic DOM; native/AOT gates separate",
+          "behavior_problems": [],
+          "counts": {
+            "marks": 2,
+            "adds": 1,
+            "removes": 1,
+            "monitor": 1,
+            "stop": 1,
+            "focus": 1,
+            "foreignAdds": 0,
+            "foreignRemoves": 0,
+            "borrowedDestroyed": 0,
+            "styles": 1
+          },
+          "root_requests": [
+            {
+              "optional": false,
+              "unresolved": false
+            }
+          ]
+        }
+      },
+      "authority_mutants": [
+        {
+          "id": "misattributed-specific-DI-approval",
+          "rejected": true
+        },
+        {
+          "id": "wrong-authority-kind",
+          "rejected": true
+        },
+        {
+          "id": "missing-delegation",
+          "rejected": true
+        },
+        {
+          "id": "lost-historical-proposal",
+          "rejected": true
+        }
+      ],
+      "signature_mutants": [
+        {
+          "id": "missing-constructor",
+          "rejected": true,
+          "problems": [
+            "public constructor(ElementRef<HTMLElement>,any,FocusMonitor,MatMenuPanel<MatMenuItem>|undefined,ChangeDetectorRef)",
+            "public constructor(ElementRef<HTMLElement>,any?,FocusMonitor?,MatMenuPanel<MatMenuItem>?,ChangeDetectorRef?)",
+            "public constructor(...unknown[])"
+          ]
+        },
+        {
+          "id": "rest-arguments",
+          "rejected": true,
+          "problems": [
+            "public constructor(ElementRef<HTMLElement>,any,FocusMonitor,MatMenuPanel<MatMenuItem>|undefined,ChangeDetectorRef)",
+            "public constructor(ElementRef<HTMLElement>,any?,FocusMonitor?,MatMenuPanel<MatMenuItem>?,ChangeDetectorRef?)",
+            "public constructor(...unknown[])"
+          ]
+        },
+        {
+          "id": "optional-manual-element",
+          "rejected": true,
+          "problems": [
+            "public constructor(ElementRef<HTMLElement>,any,FocusMonitor,MatMenuPanel<MatMenuItem>|undefined,ChangeDetectorRef)",
+            "public constructor(ElementRef<HTMLElement>,any?,FocusMonitor?,MatMenuPanel<MatMenuItem>?,ChangeDetectorRef?)",
+            "public constructor(unknown?)"
+          ]
+        },
+        {
+          "id": "extra-overload",
+          "rejected": true,
+          "problems": [
+            "public constructor(ElementRef<HTMLElement>,any,FocusMonitor,MatMenuPanel<MatMenuItem>|undefined,ChangeDetectorRef)",
+            "public constructor(ElementRef<HTMLElement>,any?,FocusMonitor?,MatMenuPanel<MatMenuItem>?,ChangeDetectorRef?)",
+            "public constructor()",
+            "public constructor(unknown)",
+            "public constructor(unknown?)"
+          ]
+        },
+        {
+          "id": "foreign-parent",
+          "rejected": true,
+          "problems": [
+            "public constructor(ElementRef<HTMLElement>,any,FocusMonitor,MatMenuPanel<MatMenuItem>|undefined,ChangeDetectorRef)",
+            "public constructor(ElementRef<HTMLElement>,any?,FocusMonitor?,MatMenuPanel<MatMenuItem>?,ChangeDetectorRef?)",
+            "public constructor()"
+          ]
+        },
+        {
+          "id": "shadow-parent",
+          "rejected": true,
+          "problems": [
+            "public constructor(ElementRef<HTMLElement>,any,FocusMonitor,MatMenuPanel<MatMenuItem>|undefined,ChangeDetectorRef)",
+            "public constructor(ElementRef<HTMLElement>,any?,FocusMonitor?,MatMenuPanel<MatMenuItem>?,ChangeDetectorRef?)",
+            "public constructor()"
+          ]
+        },
+        {
+          "id": "wrong-public-import",
+          "rejected": true,
+          "problems": [
+            "public constructor(ElementRef<HTMLElement>,any,FocusMonitor,MatMenuPanel<MatMenuItem>|undefined,ChangeDetectorRef)",
+            "public constructor(ElementRef<HTMLElement>,any?,FocusMonitor?,MatMenuPanel<MatMenuItem>?,ChangeDetectorRef?)",
+            "public constructor()"
+          ]
+        },
+        {
+          "id": "plain-rationale-cannot-authorize-construction",
+          "rejected": true
+        },
+        {
+          "id": "contract-identity-changed",
+          "rejected": true
+        },
+        {
+          "id": "authority-identity-changed",
+          "rejected": true
+        },
+        {
+          "id": "original-constructor-identity-changed",
+          "rejected": true
+        },
+        {
+          "id": "original-factory-identity-changed",
+          "rejected": true
+        }
+      ],
+      "runtime_mutants": [
+        {
+          "id": "same-description-token-twin",
+          "result": "rejected",
+          "problems": [
+            "factory legacy-menu/primary/MatLegacyMenuItem owned panel and isolated peer panel: Values have same structure but are not reference-equal:\n\n{\n  addItem: [Function: addItem],\n  removeItem: [Function: removeItem]\n}\n",
+            "factory legacy-menu/primary/MatLegacyMenuItem owned teardown does not destroy borrowed services: Expected values to be strictly equal:\n\n0 !== 1\n",
+            "token legacy-menu/primary/MatLegacyMenuItem[1] expected MAT_MENU_PANEL observed MAT_MENU_PANEL",
+            "authorized menu construction observation incomplete"
+          ]
+        },
+        {
+          "id": "wrong-optional-flag",
+          "result": "rejected",
+          "problems": [
+            "optional legacy-menu/primary/MatLegacyMenuItem[1] expected true observed false"
+          ]
+        },
+        {
+          "id": "missing-manual-argument-rejection",
+          "result": "rejected",
+          "problems": [
+            "factory legacy-menu/primary/MatLegacyMenuItem manual dependency arguments explicitly reject: Missing expected exception.",
+            "token count legacy-menu/primary/MatLegacyMenuItem expected 6 observed 12 [Injector, MAT_MENU_PANEL, ElementRef, DocumentToken, FocusMonitor, ChangeDetectorRef, Injector, MAT_MENU_PANEL, ElementRef, DocumentToken, FocusMonitor, ChangeDetectorRef]",
+            "authorized menu construction observation incomplete"
+          ]
+        },
+        {
+          "id": "peer-optional-panel-leak",
+          "result": "rejected",
+          "problems": [
+            "factory legacy-menu/primary/MatLegacyMenuItem owned panel and isolated peer panel: Expected values to be strictly equal:\n\n1 !== 0\n",
+            "token count legacy-menu/primary/MatLegacyMenuItem expected 6 observed 7 [Injector, MAT_MENU_PANEL, ElementRef, DocumentToken, FocusMonitor, ChangeDetectorRef, MAT_MENU_PANEL]",
+            "authorized menu construction observation incomplete"
+          ]
+        },
+        {
+          "id": "wrong-new-target",
+          "result": "rejected",
+          "problems": [
+            "factory legacy-menu/primary/MatLegacyMenuItem real parent/leaf/node identity: The expression evaluated to a falsy value:\n\n  assert.ok(item instanceof Item)\n",
+            "authorized menu construction observation incomplete"
+          ]
+        },
+        {
+          "id": "empty-returning-factory",
+          "result": "rejected",
+          "problems": [
+            "factory legacy-menu/primary/MatLegacyMenuItem real parent/leaf/node identity: The expression evaluated to a falsy value:\n\n  assert.ok(item instanceof Item)\n",
+            "factory legacy-menu/primary/MatLegacyMenuItem owned panel and isolated peer panel: Expected values to be strictly equal:\n+ actual - expected\n\n+ undefined\n- {\n-   addItem: [Function: addItem],\n-   removeItem: [Function: removeItem]\n- }\n",
+            "factory legacy-menu/primary/MatLegacyMenuItem real caller root structural styles: Expected values to be strictly equal:\n\n0 !== 1\n",
+            "factory legacy-menu/primary/MatLegacyMenuItem borrowed monitor/document/detector behavior: item.ngAfterViewInit is not a function",
+            "factory legacy-menu/primary/MatLegacyMenuItem owned teardown does not destroy borrowed services: Cannot read properties of undefined (reading 'subscribe')",
+            "token count legacy-menu/primary/MatLegacyMenuItem expected 6 observed 0 []",
+            "authorized menu construction observation incomplete"
+          ]
+        },
+        {
+          "id": "throwing-factory",
+          "result": "rejected",
+          "problems": [
+            "factory legacy-menu/primary/MatLegacyMenuItem factory execution incomplete: factory did not complete",
+            "token count legacy-menu/primary/MatLegacyMenuItem expected 6 observed 0 []",
+            "authorized menu construction observation incomplete"
+          ]
+        }
+      ],
+      "settlement_mutants": [
+        {
+          "id": "missing-profile",
+          "rejected": true
+        },
+        {
+          "id": "wrong-profile",
+          "rejected": true
+        },
+        {
+          "id": "wrong-contract-hash",
+          "rejected": true
+        },
+        {
+          "id": "factory-not-returned",
+          "rejected": true
+        },
+        {
+          "id": "missing-root-execution",
+          "rejected": true
+        },
+        {
+          "id": "unresolved-root-provider",
+          "rejected": true
+        },
+        {
+          "id": "optional-root-service",
+          "rejected": true
+        },
+        {
+          "id": "borrowed-service-destroyed",
+          "rejected": true
+        },
+        {
+          "id": "missing-style-loading",
+          "rejected": true
+        },
+        {
+          "id": "missing-behavior-proof",
+          "rejected": true
+        },
+        {
+          "id": "behavior-failure",
+          "rejected": true
+        },
+        {
+          "id": "token-identity-failure",
+          "rejected": true
+        },
+        {
+          "id": "optional-flag-failure",
+          "rejected": true
+        }
+      ]
+    }
+  ],
+  "worker_source_sha256": "7b71f61f59f72e6e45627be164189c36a820ec030a7c77628a56886f8760c7c9",
+  "producer_sha256": "4a83f75272f8045219e32e6cef91b1b50af124631bce7687065fef92cc5c92de",
+  "namespace_helper_sha256": "f532d320ca23ecd47fc749c2f8309251d827e2b8e9227af1c0515ede92cb2f3c",
+  "limits": [
+    "Complete static runtime/type closures authenticate exact framework22.1.7/components22.1.7 and framework21.2.23/components21.2.14. RxJS/tslib, hostNode22.23.3 and TypeScript6.0.3 are borrowed; this is not the full installed Node/RxJS/compiler consumer-floor matrix.",
+    "Actual owned leaf, genuine peer parent and genuine public application root execute. Node services/panel and DOM are explicit protocols; native template Input transforms/query/provider identity, AOT/packed/SSR/CSP/style geometry and complete G02/G11/G12 qualification remain independent.",
+    "The original constructor/factory reference is untouched. Manual constructor parity remains deliberately absent under finite delegated technical judgment; the earlier historical-implementation approval is separate."
+  ],
+  "g11_claim": "not-passed"
+}
