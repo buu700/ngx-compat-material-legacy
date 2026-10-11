@@ -60,7 +60,12 @@ evidenceReject('missing-SHA', b => b.reviews.pop());
 evidenceReject('duplicate-SHA', b => {b.reviews[1] = b.reviews[0];});
 evidenceReject('missing-recovered-example', b => {const r = b.reviews.find(r => r.source_analysis.recovered_seed_paths.length); r.paths = r.paths.filter(p => !r.source_analysis.recovered_seed_paths.includes(p));});
 evidenceReject('wrong-patch-hash', b => {b.reviews[0].diff_sha256 = '0'.repeat(64);});
-evidenceReject('broadened-residual', b => {b.reviews.find(r => !r.source_analysis.accepted).final_disposition = 'not-applicable';});
+evidenceReject('broadened-residual', b => {
+  const row = b.reviews.find(r => !r.source_analysis.accepted);
+  delete row.individual_setup_source_review;
+  delete row.individual_retained_test_source_review;
+  row.final_disposition = 'not-applicable';
+});
 evidenceReject('wrong-branch', b => {b.reviews[0].affected_branches = ['main'];});
 evidenceReject('changed-token-proof', b => {b.reviews.find(r => r.source_analysis.accepted).source_analysis.members[0].unchanged_test_program_sha256 = '0'.repeat(64);});
 evidenceReject('changed-original-capsule', () => {}, p => p === TEST_IMPORT_CAPSULE ? Buffer.concat([read(p), Buffer.from('x')]) : read(p));
@@ -86,6 +91,10 @@ const inputs = [evidence, TEST_IMPORT_CAPSULE, 'scripts/upstream-test-import-cle
 const report = {schema_version: 1, line: body.line, role: 'Original31 complete-membership test import predicate diagnostics',
   node: process.version, subjects: 31, complete_changed_files: 79, qualified_SHAs: 22, qualified_changed_files: 52,
   residual_SHAs: 9, recovered_seed_paths: 4, negative_controls: negative, inputs: inputs.map(path => ({path, sha256: hash(read(path))})),
+  residual_SHAs_scope: 'original import-only predicate; individual follow-up is separate',
+  individual_fixture_reviews: body.reviews.filter(r => r.individual_retained_test_source_review).length,
+  individual_setup_reviews: body.reviews.filter(r => r.individual_setup_source_review).length,
+  pending_in_complete_group: body.reviews.filter(r => r.final_disposition === 'needs-individual-review').length,
   upstream_standalone_setup_or_product_runtime_executed: false, native_or_packed_qualified: false, g11_claim: 'not-passed'};
 if (process.argv[2]) writeFileSync(process.argv[2], JSON.stringify(report, null, 2) + '\n', {flag: 'wx'});
 console.log(JSON.stringify({...report, negative_controls: negative.length, inputs: undefined}));
