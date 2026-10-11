@@ -1583,14 +1583,18 @@ async function main() {
   const disabledMenuNode=menuNodes.find(node=>node.nativeElement.id==='menu-disabled');
   const noRippleMenuNode=menuNodes.find(node=>node.nativeElement.id==='menu-no-ripple');
   const normalMenuItem=normalMenuNode?.injector.get(MatLegacyMenuItem);
-  let menuOutsideDiRejected=false;
-  try {new MatLegacyMenuItem();} catch(error) {menuOutsideDiRejected=/NG0203|injection context/.test(String(error));}
-  const menuItemConstruction=!!normalMenuItem && normalMenuItem instanceof MatMenuItem
+  const manualMenuElement=win.document.createElement('button');
+  const manualMenuItem=new MatLegacyMenuItem(new ElementRef(manualMenuElement));
+  const menuManualConstruction=manualMenuItem._getHostElement()===manualMenuElement
+    &&manualMenuItem.role==='menuitem'&&manualMenuItem._getTabIndex()==='0';
+  manualMenuItem.ngOnDestroy();
+  const menuItemConstruction=!!normalMenuItem && normalMenuItem instanceof MatLegacyMenuItem
+    && !(normalMenuItem instanceof MatMenuItem)
     && normalMenuNode!.injector.get(MatMenuItem)===normalMenuItem
     && normalMenuNode!.injector.get(MAT_LEGACY_MENU_PANEL)===normalMenuItem._parentMenu
     && normalMenuItem.disabled===false && normalMenuItem.disableRipple===false
     && disabledMenuNode?.injector.get(MatLegacyMenuItem).disabled===true
-    && noRippleMenuNode?.injector.get(MatLegacyMenuItem).disableRipple===true && menuOutsideDiRejected;
+    && noRippleMenuNode?.injector.get(MatLegacyMenuItem).disableRipple===true && menuManualConstruction;
   await menu.close();
   fixture.detectChanges();
   await sleep(20);

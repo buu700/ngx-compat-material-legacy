@@ -46,7 +46,7 @@ const unrelated = 'projects/ngx-material-legacy/legacy-progress-bar/internal/pro
 rejected('changed-unreviewed-caller', unrelated, unrelatedRaw, unrelatedRaw + '\n// independent source change\n');
 const aliased = header.replaceAll('assertInInjectionContext', 'guardContext').replace('guardContext,', 'assertInInjectionContext as guardContext,');
 assert.notEqual(aliased, header);
-assert.equal(reviewCurrentInjectionContexts({root, model, readSource: p => p === headerPath ? aliased : read(p)}).cases.length, 10);
+assert.equal(reviewCurrentInjectionContexts({root, model, readSource: p => p === headerPath ? aliased : read(p)}).cases.length, 9);
 
 const fixture = `import {assertInInjectionContext,inject,InjectionToken,Injector,NgZone,runInInjectionContext} from '@angular/core';
 function guard() {assertInInjectionContext(guard);}
@@ -70,9 +70,8 @@ const {assertInInjectionContext,inject,Injector,NgZone,ANIMATION_MODULE_TYPE,Inj
 export const LEGACY_ANIMATIONS_TEST_OVERRIDE=new core.InjectionToken('owned-override-protocol');
 const MATERIAL_ANIMATIONS=new core.InjectionToken('material-policy-protocol');
 class MediaMatcher {}
-export const counts={menu:0,table:0};
+export const counts={table:0};
 class ContextParent {constructor(){counts.table++;}}
-function constructLegacyMenuItem(target){counts.menu++;return Object.create(target.prototype);}
 `;
 const exportNames = Object.keys(review.snippets).filter(n => n !== 'getLegacyAnimationsState');
 const bundleText = preamble + Object.values(review.snippets).join('\n') + '\nexport {' + exportNames.join(',') + '};\n';
@@ -136,7 +135,7 @@ try {
     }
     writeFileSync(bundle, emit(bundleText));
   }
-  const report = {schema_version: 1, line: review.line, role: 'Ten current public DI import boundaries; actual owned guard scopes against genuine original and minimum Core namespaces',
+  const report = {schema_version: 1, line: review.line, role: 'Nine current public DI import boundaries; actual owned guard scopes against genuine original and minimum Core namespaces',
     node: process.version, compiler: ts.version, source_review: review, public_namespace_capsule_sha256: subjects.capsule_hash,
     declarations, typeChecks, results, source_negative_controls: sourceControls, alias_positive_controls: 1, runtime_controls: runtimeControls,
     producer_sha256: hash(readFileSync(fileURLToPath(import.meta.url))), worker_sha256: hash(worker), source_checker_sha256: hash(read('scripts/current-injection-context-review.mjs')),
@@ -144,5 +143,5 @@ try {
       'Two ambient inject imports are bound to their real token expressions and optional/required public overloads. Three other current inject imports remain pending; the existing tab-body inject import is not a new closure.',
       'No automatic node/application/root graphs, real peer parent execution, templates/styles, motion lifecycle, packed/AOT/native, Cyph build, full Node/RxJS/compiler floors or complete G02/G11 qualification.'], g11_claim: 'not-passed'};
   if (process.argv[2]) writeFileSync(process.argv[2], JSON.stringify(report, null, 2) + '\n', {flag: 'wx'});
-  console.log(JSON.stringify({current_uses: 10, guarded_scopes: 8, namespaces: 3, development_production_contexts: results.length, cases: results.reduce((n, r) => n + r.cases.length, 0), strict_subjects: typeChecks.length, negative_types_per_subject: 4, source_negative_controls: sourceControls.length, runtime_control_rejections: runtimeControls.length, full_product_qualification: false}));
+  console.log(JSON.stringify({current_uses: 9, guarded_scopes: 7, namespaces: 3, development_production_contexts: results.length, cases: results.reduce((n, r) => n + r.cases.length, 0), strict_subjects: typeChecks.length, negative_types_per_subject: 4, source_negative_controls: sourceControls.length, runtime_control_rejections: runtimeControls.length, full_product_qualification: false}));
 } finally {subjects.dispose();}

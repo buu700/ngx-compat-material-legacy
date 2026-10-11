@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "profile_id": "menu-item-angular-di-construction-v1",
+  "symbol_id": "legacy-menu/primary/MatLegacyMenuItem",
+  "authority": {
+    "path": "compatibility/rc/menu-construction-consumer-decision.json",
+    "sha256": "82c9efa90f486ecb1cfb5e0a4bb782ccbd0a6aefb3e001d2b4c4de9d2cc74d0a",
+    "kind": "delegated-technical-judgment",
+    "technical_judgment": "Keep real current public MatMenuItem inheritance and accept a narrowly documented requirement for Angular DI construction; preserve legacy template/HTML/CSS/SCSS. Avoid an ordinary component fork.",
+    "delegation_quote": "As round as you strictly follow the standard of no required CSS/SCSS changes and sanity check against ~/cyph, I'll defer to your judgement on which TypeScript API changes are sufficiently conservative to be acceptable."
+  },
+  "original_constructor": {
+    "parent": "MatMenuItem",
+    "signatures": [
+      "public constructor(ElementRef<HTMLElement>,any,FocusMonitor,MatMenuPanel<MatMenuItem>|undefined,ChangeDetectorRef)",
+      "public constructor(ElementRef<HTMLElement>,any?,FocusMonitor?,MatMenuPanel<MatMenuItem>?,ChangeDetectorRef?)"
+    ],
+    "source_sha256": "f1c4c4a656aec1dafc93dbcc92507418b1a80abefd3a64fa85938ec8f9332b0a"
+  },
+  "original_factory": {
+    "family": "legacy-menu",
+    "name": "MatLegacyMenuItem",
+    "deps_kind": "inherited",
+    "declaration": "{ minVersion: \"12.0.0\", version: \"16.1.1\", ngImport: i0, type: MatLegacyMenuItem, deps: null, target: i0.ɵɵFactoryTarget.Component }",
+    "attributes": [],
+    "source": "fesm2022/legacy-menu.mjs",
+    "source_sha256": "bff6f9ebcded2d29c4c604efa6c3e56d66de567b6a21f54226f0bfb6b9dd29e4",
+    "inherited_factory": {
+      "family": "menu",
+      "name": "MatMenuItem",
+      "deps_kind": "dependencies",
+      "declaration": "{ minVersion: \"12.0.0\", version: \"16.1.1\", ngImport: i0, type: MatMenuItem, deps: [{ token: i0.ElementRef }, { token: DOCUMENT }, { token: i1.FocusMonitor }, { token: MAT_MENU_PANEL, optional: true }, { token: i0.ChangeDetectorRef }], target: i0.ɵɵFactoryTarget.Component }",
+      "attributes": [],
+      "source": "fesm2022/menu.mjs",
+      "source_sha256": "b959687b035871b5c718ca4ea75f293d67224cf6e25b0f1bf93f33519f3a3a6f"
+    }
+  },
+  "owned_constructor": "public constructor()",
+  "runtime_requests": [
+    {
+      "ident": "Injector",
+      "imported": "Injector",
+      "spec": "@angular/core",
+      "optional": false
+    },
+    {
+      "ident": "MAT_MENU_PANEL",
+      "imported": "MAT_MENU_PANEL",
+      "spec": "./internal/menu-panel-token",
+      "optional": true
+    },
+    {
+      "ident": "ElementRef",
+      "imported": "ElementRef",
+      "spec": "@angular/core",
+      "optional": false
+    },
+    {
+      "ident": "DOCUMENT",
+      "imported": "DOCUMENT",
+      "spec": "@angular/core",
+      "optional": false
+    },
+    {
+      "ident": "FocusMonitor",
+      "imported": "FocusMonitor",
+      "spec": "@angular/cdk/a11y",
+      "optional": false
+    },
+    {
+      "ident": "ChangeDetectorRef",
+      "imported": "ChangeDetectorRef",
+      "spec": "@angular/core",
+      "optional": false
+    }
+  ],
+  "requirements": [
+    "Original two-overload and five-dependency evidence remains authenticated and is reported without replacement.",
+    "Only this item changes to a zero-argument constructor that requires Angular DI; original one/five-argument manual construction must reject.",
+    "Genuine current public MatMenuItem inheritance and public provider/query identity remain; owned legacy panel token is distinct and consistently bound.",
+    "Actual factory must return with no unresolved-provider stub; direct public/owned token objects and optional flags are checked.",
+    "Borrowed node dependencies retain exact identity and lifecycle; real caller root services own structural-style loading.",
+    "Native/AOT/packed/minimum and consumer floors remain independent required gates; source protocol observation alone does not claim G02."
+  ]
+}

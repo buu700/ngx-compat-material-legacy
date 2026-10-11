@@ -103,13 +103,13 @@ describe('MatMenu', () => {
 
     const item = fixture.debugElement.query(By.directive(MatLegacyMenuItem))!;
     const legacyItem = item.injector.get(MatLegacyMenuItem);
-    expect(legacyItem instanceof MatMenuItem).toBe(true);
+    expect(legacyItem instanceof MatMenuItem).toBe(false);
     expect(item.injector.get(MatMenuItem)).toBe(legacyItem);
     expect(item.injector.get(MAT_LEGACY_MENU_PANEL)).toBe(fixture.componentInstance.menu);
     expect(legacyItem._parentMenu).toBe(fixture.componentInstance.menu);
   }));
 
-  it('should inherit boolean input transforms for bare legacy item attributes', fakeAsync(() => {
+  it('should preserve historical boolean coercion for bare legacy item attributes', fakeAsync(() => {
     const fixture = createComponent(SimpleMenu, [], [FakeIcon]);
     fixture.detectChanges();
     fixture.componentInstance.trigger.openMenu();
@@ -123,8 +123,15 @@ describe('MatMenu', () => {
     expect(items[2].injector.get(MatLegacyMenuItem).disableRipple).toBe(true);
   }));
 
-  it('should require an Angular injection context for direct item construction', () => {
-    expect(() => new MatLegacyMenuItem()).toThrowError(/NG0203|injection context/);
+  it('should retain original manual item construction outside Angular DI', () => {
+    const element = document.createElement('button');
+    const item = new MatLegacyMenuItem(new ElementRef(element));
+    expect(item._getHostElement()).toBe(element);
+    expect(item.role).toBe('menuitem');
+    expect(item._getTabIndex()).toBe('0');
+    item.disabled = true;
+    expect(item._getTabIndex()).toBe('-1');
+    item.ngOnDestroy();
   });
 
   it('should aria-controls the menu panel', fakeAsync(() => {

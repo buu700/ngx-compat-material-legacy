@@ -1,4 +1,4 @@
-"""Accepted menu DI construction using genuine public parent/root services."""
+"""Historical menu manual/DI construction with authenticated public peers."""
 from pathlib import Path
 import subprocess
 import unittest
@@ -13,13 +13,13 @@ def angular_available():
 
 class MenuItemDiRuntimeTests(unittest.TestCase):
     @unittest.skipUnless(angular_available(), 'Angular/TypeScript unavailable; source DI diagnostic not executed')
-    def test_owned_panel_identity_caller_services_and_accepted_construction_policy(self):
+    def test_owned_panel_identity_caller_services_and_historical_construction_policy(self):
         result = subprocess.run(['node', 'tests/menu_item_di_runtime_probe.mjs'], cwd=ROOT,
             capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-6000:])
 
     @unittest.skipUnless(angular_available(), 'Angular/TypeScript unavailable; source type diagnostic not executed')
-    def test_nominal_parent_token_and_exact_constructor_language_boundary(self):
+    def test_nominal_parent_token_and_historical_constructor_language_boundary(self):
         result = subprocess.run(['node', 'tests/menu_item_di_type_probe.mjs'], cwd=ROOT,
             capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-6000:])

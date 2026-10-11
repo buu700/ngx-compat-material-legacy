@@ -23,7 +23,7 @@ class ChangeDetectorUseTests(unittest.TestCase):
         report = json.loads(result.stdout)
         self.assertEqual(report['frozen_uses'], 38)
         self.assertEqual(report['supplementary_uses'], 4)
-        self.assertEqual(report['bound_calls'], 94)
+        self.assertEqual(report['bound_calls'], 96)
         self.assertEqual(report['runtime_subjects'], 6)
         self.assertEqual(report['states_per_subject'], 7)
         self.assertEqual(report['source_mutations'], 8)

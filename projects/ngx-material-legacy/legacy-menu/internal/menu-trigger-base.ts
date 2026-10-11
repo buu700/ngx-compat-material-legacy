@@ -9,6 +9,7 @@
  * Owned Material-16 `_MatMenuTriggerBase` (removed from Angular Material 22).
  */
 
+import {_LegacyMenuItemBase as MatMenuItem} from './menu-item-base';
 import {
   FocusMonitor,
   FocusOrigin,
@@ -29,7 +30,7 @@ import {
 import {TemplatePortal} from '@angular/cdk/portal';
 import {
   MAT_MENU_SCROLL_STRATEGY,
-  MatMenuItem,
+  MatMenuItem as PeerMatMenuItem,
   MenuCloseReason,
   MenuPositionX,
   MenuPositionY,
@@ -255,7 +256,7 @@ export abstract class _MatMenuTriggerBase implements AfterContentInit, OnDestroy
     @Inject(MAT_MENU_PANEL) @Optional() parentMenu: MatMenuPanel,
     // `MatMenuTrigger` is commonly used in combination with a `MatMenuItem`.
     // tslint:disable-next-line: lightweight-tokens
-    @Optional() @Self() private _menuItemInstance: MatMenuItem,
+    @Optional() @Self() @Inject(PeerMatMenuItem) private _menuItemInstance: MatMenuItem,
     @Optional() private _dir: Directionality,
     private _focusMonitor: FocusMonitor | null,
     private _ngZone?: NgZone,

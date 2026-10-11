@@ -11,7 +11,7 @@ import {createHash} from 'node:crypto';
 import {dirname, join, resolve} from 'node:path';
 import {createRequire} from 'node:module';
 import {fileURLToPath} from 'node:url';
-import {MENU_ITEM_SYMBOL, approvedMenuItemSignatureRecord} from './menu-item-construction-contract.mjs';
+import {MENU_ITEM_SYMBOL, approvedMenuItemContract, approvedMenuItemSignatureRecord} from './menu-item-construction-contract.mjs';
 import {TABLE_SYMBOL, approvedTableSignatureRecord} from './table-construction-contract.mjs';
 import {INPUT_SYMBOL,approvedInputSignatureRecord} from './api-input-context.mjs';
 import {RIPPLE_SYMBOL,rippleReexportSignatureProblems} from './ripple-construction-contract.mjs';
@@ -204,6 +204,16 @@ export function packedInheritedConstructor(sourceFile, name, loadPeer = (spec, f
   if (!node || !ts.isClassDeclaration(node)) return {parent: expectedParent, signatures: ['unresolved inherited constructor']};
   const own = declaredMembers(node, sourceFile);
   if (own.requiredConstructor) return null;
+  if (name === 'MatLegacyMenuItem') {
+    const bases = (node.heritageClauses || []).filter(c => c.token === ts.SyntaxKind.ExtendsKeyword)
+      .flatMap(c => [...c.types]);
+    const ident = bases.length === 1 ? heritageIdentifier(bases[0]) : null;
+    const parent = ident && indexFile(sourceFile).get(ident.local);
+    if (parent && ts.isClassDeclaration(parent) && parent.name.text === '_LegacyMenuItemBase') {
+      return {parent: parent.name.text, signatures: declaredMembers(parent, sourceFile).signatures
+        .filter(sig => sig.includes(' constructor('))};
+    }
+  }
   const bindings = importBindings(sourceFile);
   for (const clause of node.heritageClauses || []) {
     if (clause.token !== ts.SyntaxKind.ExtendsKeyword) continue;
@@ -1333,7 +1343,43 @@ function findLoose(sig, packedLeft) {
   return {candidate: hits[0], kind: sig.startsWith('token ') || hits[0].startsWith('token ') || sig.endsWith(':*') || hits[0].endsWith(':*') ? 'elaboration' : 'rename'};
 }
 
+/** Compare the complete authenticated historical parent, not only the legacy leaf. */
+function compareHistoricalMenuItem(symbol, packed) {
+  const contract = approvedMenuItemContract(symbol);
+  const config = INHERITED_PEER_CONSTRUCTORS.MatLegacyMenuItem;
+  const bytes = readFileSync(join(root, config.reference));
+  if (createHash('sha256').update(bytes).digest('hex') !== config.sha256)
+    throw new Error('untouched16 menu parent declaration identity mismatch');
+  const source = ts.createSourceFile(config.reference, bytes.toString(), ts.ScriptTarget.Latest, true);
+  const originalParent = packedShape(source, 'MatMenuItem');
+  const original = [...new Set([...symbol.shape.ownSignatures, ...originalParent.signatures])];
+  const actual = packed?.signatures || [];
+  const canonical = signature => signature.replace(/\b_LegacyMenuItemBase\b/g, 'MatMenuItem');
+  const remaining = new Set(actual);
+  const rows = [], blocking = [];
+  if (packed?.kind !== 'class' || packed.ownConstructor || packed.publicMenuItemParent
+      || packed.inheritedConstructor?.parent !== contract.owned_parent
+      || JSON.stringify([...new Set(packed.inheritedConstructor.signatures)].sort())
+        !== JSON.stringify([...contract.owned_constructor_signatures].sort()))
+    blocking.push('owned historical menu parent/overloads missing or changed');
+  for (const historical of original) {
+    const matches = [...remaining].filter(sig => canonical(sig) === historical);
+    if (matches.length !== 1) {
+      blocking.push(historical); rows.push({status: 'mismatch', historical, owned: null});
+    } else {
+      const owned = matches[0]; remaining.delete(owned);
+      if (historical !== owned) rows.push({status: 'intentional-legacy-difference', historical, owned,
+        construction_contract: contract.profile_id,
+        rationale: 'Explicitly approved owned historical parent identifier replaces the current-parent subtype; the exact historical member and manual overload remain.'});
+    }
+  }
+  for (const owned of remaining) {blocking.push(owned); rows.push({status: 'mismatch', historical: null, owned});}
+  return {comparison: 'signature', blocking, rows, reported_signatures: [...actual].sort(),
+    required_protected: originalParent.requiredProtected, required_constructor: true};
+}
+
 export function compareSignatures(symbol, packed, differences) {
+  if (symbol.symbol_id === MENU_ITEM_SYMBOL) return compareHistoricalMenuItem(symbol, packed);
   const historical = symbol.shape;
   if (!packed) {
     return {
