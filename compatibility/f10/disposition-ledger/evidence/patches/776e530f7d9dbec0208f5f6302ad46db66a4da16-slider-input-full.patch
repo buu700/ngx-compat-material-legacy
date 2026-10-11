@@ -1,0 +1,234 @@
+diff --git a/src/material/slider/slider-input.ts b/src/material/slider/slider-input.ts
+index abe82b08f4d5f133c4ab2a3bd934441db8c82f31..a5035c1bbc91266bc1d73340ac0eb24f484c720c 100644
+--- a/src/material/slider/slider-input.ts
++++ b/src/material/slider/slider-input.ts
+@@ -18,6 +18,7 @@ import {
+   ElementRef,
+   EventEmitter,
+   forwardRef,
++  inject,
+   Inject,
+   Input,
+   NgZone,
+@@ -36,6 +37,7 @@ import {
+   MAT_SLIDER_THUMB,
+   MAT_SLIDER,
+ } from './slider-interface';
++import {Platform} from '@angular/cdk/platform';
+ 
+ /**
+  * Provider that allows the slider thumb to register as a ControlValueAccessor.
+@@ -259,6 +261,8 @@ export class MatSliderThumb implements _MatSliderThumb, OnDestroy, ControlValueA
+    */
+   protected _isControlInitialized = false;
+ 
++  private _platform = inject(Platform);
++
+   constructor(
+     readonly _ngZone: NgZone,
+     readonly _elementRef: ElementRef<HTMLInputElement>,
+@@ -363,8 +367,22 @@ export class MatSliderThumb implements _MatSliderThumb, OnDestroy, ControlValueA
+       return;
+     }
+ 
+-    this._isActive = true;
+-    this._setIsFocused(true);
++    // On IOS, dragging only works if the pointer down happens on the
++    // slider thumb and the slider does not receive focus from pointer events.
++    if (this._platform.IOS) {
++      const isCursorOnSliderThumb = this._slider._isCursorOnSliderThumb(
++        event,
++        this._slider._getThumb(this.thumbPosition)._hostElement.getBoundingClientRect(),
++      );
++
++      if (isCursorOnSliderThumb) {
++        this._isActive = true;
++      }
++    } else {
++      this._isActive = true;
++      this._setIsFocused(true);
++    }
++
+     this._updateWidthActive();
+     this._slider._updateDimensions();
+ 
+@@ -452,7 +470,12 @@ export class MatSliderThumb implements _MatSliderThumb, OnDestroy, ControlValueA
+     if (this._isActive) {
+       this._isActive = false;
+       this.dragEnd.emit({source: this, parent: this._slider, value: this.value});
+-      setTimeout(() => this._updateWidthInactive());
++
++      // This setTimeout is to prevent the pointerup from triggering a value
++      // change on the input based on the inactive width. It's not clear why
++      // but for some reason on IOS this race condition is even more common so
++      // the timeout needs to be increased.
++      setTimeout(() => this._updateWidthInactive(), this._platform.IOS ? 10 : 0);
+     }
+   }
+ 
+diff --git a/src/material/slider/slider-interface.ts b/src/material/slider/slider-interface.ts
+index d5c1ed3f2a86e16c99d9d794a43df787262af7e1..c0b037447942ca8116c3e8e353c109eb4a14a8d5 100644
+--- a/src/material/slider/slider-interface.ts
++++ b/src/material/slider/slider-interface.ts
+@@ -82,6 +82,9 @@ export class MatSliderChange {
+ }
+ 
+ export interface _MatSlider {
++  /** Whether the given pointer event occurred within the bounds of the slider pointer's DOM Rect. */
++  _isCursorOnSliderThumb(event: PointerEvent, rect: DOMRect): boolean;
++
+   /** Gets the slider thumb input of the given thumb position. */
+   _getInput(thumbPosition: _MatThumb): _MatSliderThumb | _MatSliderRangeThumb | undefined;
+ 
+diff --git a/src/material/slider/slider-thumb.ts b/src/material/slider/slider-thumb.ts
+index 858465cc52002edb80384b53e3483439e6b68733..86d37dfd8615bd30e7949438df9fca91d2e00028 100644
+--- a/src/material/slider/slider-thumb.ts
++++ b/src/material/slider/slider-thumb.ts
+@@ -137,7 +137,7 @@ export class MatSliderVisualThumb implements _MatSliderVisualThumb, AfterViewIni
+     }
+ 
+     const rect = this._hostElement.getBoundingClientRect();
+-    const isHovered = this._isSliderThumbHovered(event, rect);
++    const isHovered = this._slider._isCursorOnSliderThumb(event, rect);
+     this._isHovered = isHovered;
+ 
+     if (isHovered) {
+@@ -299,13 +299,4 @@ export class MatSliderVisualThumb implements _MatSliderVisualThumb, AfterViewIni
+       this._isShowingRipple(this._activeRippleRef)
+     );
+   }
+-
+-  private _isSliderThumbHovered(event: PointerEvent, rect: DOMRect) {
+-    const radius = rect.width / 2;
+-    const centerX = rect.x + radius;
+-    const centerY = rect.y + radius;
+-    const dx = event.clientX - centerX;
+-    const dy = event.clientY - centerY;
+-    return Math.pow(dx, 2) + Math.pow(dy, 2) < Math.pow(radius, 2);
+-  }
+ }
+diff --git a/src/material/slider/slider.spec.ts b/src/material/slider/slider.spec.ts
+index a2263faa58cd6a87922e81f0b8bd41d418be90ce..0bf976280c64ee04f00eeeb1aca2a560e0585234 100644
+--- a/src/material/slider/slider.spec.ts
++++ b/src/material/slider/slider.spec.ts
+@@ -891,6 +891,8 @@ describe('MDC-based MatSlider', () => {
+     it('should set the aria-valuetext attribute with the given `displayWith` function', fakeAsync(() => {
+       expect(input._hostElement.getAttribute('aria-valuetext')).toBe('$1');
+       setValueByClick(slider, input, 199);
++      fixture.detectChanges();
++      flush();
+       expect(input._hostElement.getAttribute('aria-valuetext')).toBe('$199');
+     }));
+ 
+@@ -1177,7 +1179,6 @@ describe('MDC-based MatSlider', () => {
+       const startInput = slider._getInput(_MatThumb.START) as MatSliderRangeThumb;
+       const endInput = slider._getInput(_MatThumb.END) as MatSliderRangeThumb;
+       flush();
+-      console.log('result: ', startInput.value);
+       checkInput(startInput, {min: -1, max: -0.3, value: -0.7, translateX: 90});
+       checkInput(endInput, {min: -0.7, max: 0, value: -0.3, translateX: 210});
+     }));
+@@ -1733,7 +1734,7 @@ function slideToValue(slider: MatSlider, input: MatSliderThumb, value: number) {
+   dispatchEvent(input._hostElement, new Event('input'));
+   dispatchPointerEvent(sliderElement, 'pointerup', endX, endY);
+   dispatchEvent(input._hostElement, new Event('change'));
+-  tick();
++  tick(10);
+ }
+ 
+ /** Returns the x and y coordinates for the given slider value. */
+diff --git a/src/material/slider/slider.ts b/src/material/slider/slider.ts
+index 2c09622a5952d3be73764d6582a8bb19f49a2073..5f20ad665dbdb68c70d8567a96786f72b3947762 100644
+--- a/src/material/slider/slider.ts
++++ b/src/material/slider/slider.ts
+@@ -22,6 +22,7 @@ import {
+   ContentChild,
+   ContentChildren,
+   ElementRef,
++  inject,
+   Inject,
+   Input,
+   NgZone,
+@@ -404,10 +405,11 @@ export class MatSlider
+ 
+   private _resizeTimer: null | ReturnType<typeof setTimeout> = null;
+ 
++  private _platform = inject(Platform);
++
+   constructor(
+     readonly _ngZone: NgZone,
+     readonly _cdr: ChangeDetectorRef,
+-    readonly _platform: Platform,
+     elementRef: ElementRef<HTMLElement>,
+     @Optional() readonly _dir: Directionality,
+     @Optional()
+@@ -930,12 +932,22 @@ export class MatSlider
+   }
+ 
+   _setTransition(withAnimation: boolean): void {
+-    this._hasAnimation = withAnimation && !this._noopAnimations;
++    this._hasAnimation = !this._platform.IOS && withAnimation && !this._noopAnimations;
+     this._elementRef.nativeElement.classList.toggle(
+       'mat-mdc-slider-with-animation',
+       this._hasAnimation,
+     );
+   }
++
++  /** Whether the given pointer event occurred within the bounds of the slider pointer's DOM Rect. */
++  _isCursorOnSliderThumb(event: PointerEvent, rect: DOMRect) {
++    const radius = rect.width / 2;
++    const centerX = rect.x + radius;
++    const centerY = rect.y + radius;
++    const dx = event.clientX - centerX;
++    const dy = event.clientY - centerY;
++    return Math.pow(dx, 2) + Math.pow(dy, 2) < Math.pow(radius, 2);
++  }
+ }
+ 
+ /** Ensures that there is not an invalid configuration for the slider thumb inputs. */
+diff --git a/tools/public_api_guard/material/slider.md b/tools/public_api_guard/material/slider.md
+index a123d1bad943e62ae5cf40b41cfe4be60861e122..756f72cc3a95a61c4764fa5cd47b7f440d47657a 100644
+--- a/tools/public_api_guard/material/slider.md
++++ b/tools/public_api_guard/material/slider.md
+@@ -22,14 +22,13 @@ import { MatRipple } from '@angular/material/core';
+ import { NgZone } from '@angular/core';
+ import { NumberInput } from '@angular/cdk/coercion';
+ import { OnDestroy } from '@angular/core';
+-import { Platform } from '@angular/cdk/platform';
+ import { QueryList } from '@angular/core';
+ import { RippleGlobalOptions } from '@angular/material/core';
+ import { Subject } from 'rxjs';
+ 
+ // @public
+ export class MatSlider extends _MatSliderMixinBase implements AfterViewInit, CanDisableRipple, OnDestroy, _MatSlider {
+-    constructor(_ngZone: NgZone, _cdr: ChangeDetectorRef, _platform: Platform, elementRef: ElementRef<HTMLElement>, _dir: Directionality, _globalRippleOptions?: RippleGlobalOptions | undefined, animationMode?: string);
++    constructor(_ngZone: NgZone, _cdr: ChangeDetectorRef, elementRef: ElementRef<HTMLElement>, _dir: Directionality, _globalRippleOptions?: RippleGlobalOptions | undefined, animationMode?: string);
+     // (undocumented)
+     _cachedLeft: number;
+     // (undocumented)
+@@ -59,6 +58,7 @@ export class MatSlider extends _MatSliderMixinBase implements AfterViewInit, Can
+     // (undocumented)
+     _inputPadding: number;
+     _inputs: QueryList<_MatSliderRangeThumb>;
++    _isCursorOnSliderThumb(event: PointerEvent, rect: DOMRect): boolean;
+     // (undocumented)
+     _isRange: boolean;
+     _isRtl: boolean;
+@@ -85,8 +85,6 @@ export class MatSlider extends _MatSliderMixinBase implements AfterViewInit, Can
+     // (undocumented)
+     _onValueChange(source: _MatSliderThumb): void;
+     // (undocumented)
+-    readonly _platform: Platform;
+-    // (undocumented)
+     _rippleRadius: number;
+     _setTrackActiveStyles(styles: {
+         left: string;
+@@ -115,7 +113,7 @@ export class MatSlider extends _MatSliderMixinBase implements AfterViewInit, Can
+     // (undocumented)
+     static ɵcmp: i0.ɵɵComponentDeclaration<MatSlider, "mat-slider", ["matSlider"], { "color": { "alias": "color"; "required": false; }; "disableRipple": { "alias": "disableRipple"; "required": false; }; "disabled": { "alias": "disabled"; "required": false; }; "discrete": { "alias": "discrete"; "required": false; }; "showTickMarks": { "alias": "showTickMarks"; "required": false; }; "min": { "alias": "min"; "required": false; }; "max": { "alias": "max"; "required": false; }; "step": { "alias": "step"; "required": false; }; "displayWith": { "alias": "displayWith"; "required": false; }; }, {}, ["_input", "_inputs"], ["*"], false, never>;
+     // (undocumented)
+-    static ɵfac: i0.ɵɵFactoryDeclaration<MatSlider, [null, null, null, null, { optional: true; }, { optional: true; }, { optional: true; }]>;
++    static ɵfac: i0.ɵɵFactoryDeclaration<MatSlider, [null, null, null, { optional: true; }, { optional: true; }, { optional: true; }]>;
+ }
+ 
+ // @public @deprecated

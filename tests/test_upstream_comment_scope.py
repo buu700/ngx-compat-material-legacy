@@ -33,6 +33,11 @@ class UpstreamCommentScopeTests(unittest.TestCase):
         affected = [row['sha'] for row in report['reviews']]
         with tempfile.TemporaryDirectory(prefix='.comment-review-test-', dir=ROOT) as tmp:
             temporary = Path(tmp)
+            baseline_run = subprocess.run(['node', 'scripts/check-upstream-audit-disposition.mjs',
+                '--admission', '--line', report['line'], '--report', str(temporary / 'baseline.json')],
+                cwd=ROOT, capture_output=True, text=True)
+            self.assertIn(baseline_run.returncode, [0, 1], baseline_run.stderr)
+            baseline = json.loads(baseline_run.stdout)
             bad_report = temporary / 'review.json'
             bad_report.write_text(json.dumps(report))
             for entry in ledger['entries']:
@@ -44,7 +49,6 @@ class UpstreamCommentScopeTests(unittest.TestCase):
                 '--ledger', str(bad_ledger), '--admission', '--line', report['line'],
                 '--report', str(temporary / 'result.json')], cwd=ROOT, capture_output=True, text=True)
             self.assertNotEqual(run.returncode, 0, run.stdout + run.stderr)
-            baseline = json.loads((ROOT / 'compatibility/rc/upstream-comment-admission-diagnostic.json').read_text())
             observed = json.loads(run.stdout)
             self.assertEqual(observed['missing_evidence'], baseline['missing_evidence'] + 10)
             self.assertEqual(observed['g11_claim'], 'not-passed')

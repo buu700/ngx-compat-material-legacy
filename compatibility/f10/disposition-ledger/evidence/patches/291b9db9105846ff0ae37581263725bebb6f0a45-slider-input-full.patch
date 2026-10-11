@@ -1,0 +1,25 @@
+diff --git a/src/material/slider/slider-input.ts b/src/material/slider/slider-input.ts
+index 6cb8f0c14cc01935e21d554d83233af83e2805dc..6657a08c3e6e3eba99c7c9069791c1b8f5524f6e 100644
+--- a/src/material/slider/slider-input.ts
++++ b/src/material/slider/slider-input.ts
+@@ -375,14 +375,14 @@ export class MatSliderThumb implements _MatSliderThumb, OnDestroy, ControlValueA
+         this._slider._getThumb(this.thumbPosition)._hostElement.getBoundingClientRect(),
+       );
+ 
+-      if (isCursorOnSliderThumb) {
+-        this._isActive = true;
+-      }
+-    } else {
+-      this._isActive = true;
+-      this._setIsFocused(true);
++      this._isActive = isCursorOnSliderThumb;
++      this._updateWidthActive();
++      this._slider._updateDimensions();
++      return;
+     }
+ 
++    this._isActive = true;
++    this._setIsFocused(true);
+     this._updateWidthActive();
+     this._slider._updateDimensions();
+ 
