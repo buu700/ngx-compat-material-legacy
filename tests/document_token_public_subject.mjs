@@ -22,9 +22,13 @@ check('public-document-token-and-current-core-reexport-identity', () => {
   else assert.equal(token, core.DOCUMENT);
 });
 for (const row of payload.cases) {
+  if (line === 'original' && row.module === '@angular/core') continue;
   const ref = row.references[0];
   check('actual-source-token-boundary/' + row.file, () => {
-    const boundToken = variant === 'clone-token' ? new core.InjectionToken('DocumentToken') : token;
+    const importedToken = row.module === '@angular/core' ? core.DOCUMENT : common.DOCUMENT;
+    assert.equal(importedToken, token, 'source import route must resolve the genuine document token');
+    const boundToken = variant === 'clone-token' || variant === 'clone-core-token' && row.module === '@angular/core'
+      ? new core.InjectionToken('DocumentToken') : importedToken;
     const injector = core.Injector.create({providers: [{provide: token, useValue: sentinel}]});
     try {
       if (ref.role === 'constructor-token') {
@@ -49,8 +53,10 @@ for (const row of payload.cases) {
         annotations.push({file: row.file, index: ref.index, optional: ref.optional, actual_Inject_annotation_replayed: true,
           genuine_provider_dependency_resolution: true, metadata_target_is_protocol: true});
       } else {
-        const call = core.runInInjectionContext(injector, () =>
-          new Function('inject', row.local_name, 'return ' + ref.expression)(core.inject, boundToken));
+        let call;
+        assert.doesNotThrow(() => {call = core.runInInjectionContext(injector, () =>
+          new Function('inject', row.local_name, 'return ' + ref.expression)(core.inject, boundToken));},
+          'source document injection must resolve the supplied public token');
         assert.equal(call, sentinel);
       }
     } finally {injector.destroy();}
@@ -94,6 +100,8 @@ check('whole-owned-progress-location-factory-with-genuine-document-token', () =>
 });
 check('public-injection-context-is-restored', () => assert.throws(() => core.inject(token)));
 console.log(JSON.stringify({line, production: production === 'true', cases, annotations,
+  source_rows_executed: payload.cases.filter(row => line !== 'original' || row.module !== '@angular/core').length,
+  current_core_rows_unavailable_on_original: line === 'original' ? 4 : 0,
   genuine_public_token_and_DI_executed: true, document_values_and_metadata_targets_are_protocols: true,
   whole_owned_progress_location_factory_executed: true, actual_legacy_components_executed: false,
   native_or_packed_qualified: false}));

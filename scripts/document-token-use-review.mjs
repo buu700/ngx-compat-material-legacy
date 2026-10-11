@@ -26,8 +26,14 @@ const recipes = {
   'legacy-autocomplete/internal/autocomplete-trigger-base.ts': [8, true],
   'legacy-menu/internal/menu-content-base.ts': [4, false],
   'legacy-core/internal/common-module.ts': [2, false],
+  'legacy-core/internal/legacy-viewport.ts': [2, true],
+  'legacy-dialog/dialog-container.ts': [2, true],
+  'legacy-dialog/internal/dialog-container-base.ts': [2, true],
+  'legacy-menu/internal/menu-item-base.ts': [1, false],
 };
 const deltaFiles = ['legacy-core/internal/common-module.ts', 'legacy-progress-bar/internal/progress-bar-location.ts'];
+const coreDeltaFiles = ['legacy-core/internal/legacy-viewport.ts', 'legacy-dialog/dialog-container.ts',
+  'legacy-dialog/internal/dialog-container-base.ts', 'legacy-menu/internal/menu-item-base.ts'];
 
 /** Review the actual token binding, constructor slots and two injection calls. */
 export function reviewDocumentTokenUses({root = defaultRoot, readSource} = {}) {
@@ -41,13 +47,16 @@ export function reviewDocumentTokenUses({root = defaultRoot, readSource} = {}) {
   for (const path of paths) {
     const text = read(path), file = ts.createSourceFile(path, text, ts.ScriptTarget.Latest, true);
     assert.equal(file.parseDiagnostics.length, 0);
-    const imports = file.statements.filter(n => ts.isImportDeclaration(n) && n.moduleSpecifier.text === '@angular/common'
+    const imports = file.statements.filter(n => ts.isImportDeclaration(n) && ['@angular/common', '@angular/core'].includes(n.moduleSpecifier.text)
       && n.importClause?.namedBindings && ts.isNamedImports(n.importClause.namedBindings))
       .flatMap(n => n.importClause.namedBindings.elements.filter(e => (e.propertyName || e.name).text === 'DOCUMENT'));
     if (!imports.length) continue;
     assert.equal(imports.length, 1);
     const binding = imports[0], relative = path.slice('projects/ngx-material-legacy/'.length);
-    assert.ok(frozen.some(r => r.file === relative) || deltaFiles.includes(relative), 'new document token consumer needs review');
+    const module = binding.parent.parent.parent.moduleSpecifier.text;
+    const frozenUse = module === '@angular/common' && frozen.some(row => row.file === relative);
+    assert.ok(frozenUse || (module === '@angular/common' ? deltaFiles : coreDeltaFiles).includes(relative),
+      'new document token consumer or route needs review');
     assert.ok(!binding.isTypeOnly && !binding.parent.parent.isTypeOnly, 'runtime document token import required');
     const options = {noResolve: true, noLib: true}, host = ts.createCompilerHost(options);
     host.getSourceFile = p => p === resolve(root, path) ? file : undefined;
@@ -90,13 +99,16 @@ export function reviewDocumentTokenUses({root = defaultRoot, readSource} = {}) {
       ts.forEachChild(node, visit);
     };
     visit(file); assert.equal(references.length, 1);
-    cases.push({file: relative, module: '@angular/common', symbol: 'DOCUMENT', frozen_use: frozen.some(r => r.file === relative),
+    cases.push({file: relative, module, symbol: 'DOCUMENT', frozen_use: frozenUse,
       local_name: binding.name.text, candidate_source_sha256: hash(text), references});
   }
-  assert.equal(cases.length, 12);
-  assert.deepEqual(cases.filter(r => !r.frozen_use).map(r => r.file).sort(), deltaFiles);
-  assert.equal(cases.filter(r => r.references[0].role === 'constructor-token').length, 10);
+  assert.equal(cases.length, 16);
+  assert.deepEqual(cases.filter(r => !r.frozen_use).map(r => [r.file, r.module]).sort(),
+    [...deltaFiles.map(file => [file, '@angular/common']), ...coreDeltaFiles.map(file => [file, '@angular/core'])].sort());
+  for (const use of frozen) assert.ok(cases.some(row => row.file === use.file && row.module === use.module),
+    'frozen document token caller missing');
+  assert.equal(cases.filter(r => r.references[0].role === 'constructor-token').length, 14);
   return {schema_version: 1, line: JSON.parse(read('projects/ngx-material-legacy/package.json')).version.startsWith('21.') ? '21.x' : 'main',
-    compiler: ts.version, frozen_uses: 10, current_uses: 12, delta_uses: 2, cases,
+    compiler: ts.version, frozen_uses: 10, current_uses: 16, delta_uses: 6, core_uses: 4, common_uses: 12, cases,
     scope: 'Finite public document token injection identities and original constructor slots; no DOM operations or complete legacy component execution claim.', g11_claim: 'not-passed'};
 }

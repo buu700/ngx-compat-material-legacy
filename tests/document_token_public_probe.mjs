@@ -31,8 +31,16 @@ const negatives = [
   [snackPath, snack.replace('inject(DOCUMENT)', 'inject(DOCUMENT, {optional: true})')],
   [snackPath, snack.replace('inject(DOCUMENT)', 'DOCUMENT')],
 ];
+const corePath = 'projects/ngx-material-legacy/legacy-menu/internal/menu-item-base.ts';
+const coreSource = readFileSync(join(root, corePath), 'utf8');
+negatives.push(
+  [corePath, coreSource.replace("import {DOCUMENT} from '@angular/core';", "import type {DOCUMENT} from '@angular/core';")],
+  [corePath, coreSource.replace('@Inject(DOCUMENT) private _document?', '@Optional() @Inject(DOCUMENT) private _document?')],
+  [corePath, coreSource + "\nimport {DOCUMENT as DuplicateDocument} from '@angular/core';\n"],
+  [corePath, coreSource + '\nconst unexpectedCoreToken = DOCUMENT;\n'],
+);
 for (const [changed, text] of negatives) {
-  assert.notEqual(text, changed === path ? source : snack);
+  assert.notEqual(text, readFileSync(join(root, changed), 'utf8'));
   assert.throws(() => reviewDocumentTokenUses({root, readSource: p => p === changed ? text : readFileSync(join(root, p), 'utf8')}));
 }
 const progressPath = 'projects/ngx-material-legacy/legacy-progress-bar/internal/progress-bar-location.ts';
@@ -77,7 +85,9 @@ try {
       const stdout = execFileSync(process.execPath, [file, model.line, String(production)], {cwd: model.root, encoding: 'utf8', timeout: 10000});
       results.push({...JSON.parse(stdout.trim().split('\n').at(-1)), borrowed: model.borrowed});
     }
-    for (const variant of ['clone-token', 'drop-optional', 'clone-progress-token', 'static-progress-path', 'drop-progress-search']) {
+    const variants = ['clone-token', 'drop-optional', 'clone-progress-token', 'static-progress-path', 'drop-progress-search'];
+    if (model.line !== 'original') variants.push('clone-core-token');
+    for (const variant of variants) {
       const result = spawnSync(process.execPath, [file, model.line, 'false', variant], {cwd: model.root, encoding: 'utf8', timeout: 10000});
       assert.notEqual(result.status, 0, variant + ' escaped');
       assert.match(result.stderr, /AssertionError/, variant + ' did not reach the contract assertion');
@@ -90,7 +100,7 @@ try {
     producer_sha256: hash(readFileSync(fileURLToPath(import.meta.url))), worker_sha256: hash(worker),
     owned_progress_factory: {path: progressPath, source_sha256: hash(progressSource), selected_function_sha256: hash(selected),
       only_export_modifier_removed: true, emitted_function_sha256: hash(emitted.outputText)},
-    scope: 'Whole SRI-authenticated original16 and both peer-minimum Core/Common modules.10 frozen plus2 current-added bindings inspected;12 actual annotation/inject expressions replayed through genuine Core DI. Whole owned progress-location function executed against location protocols. Metadata targets and documents are protocols. No actual complete owned components/application factories/native DOM/SSR renderer/packed AOT/full Node-RxJS floors or G11 qualification.', g11_claim: 'not-passed'};
+    scope: 'Whole SRI-authenticated original16 and both peer-minimum Core/Common modules.10 frozen plus6 current-added bindings inspected. Original16 executes its12 Common-route expressions; both actual minima execute all16 Common/Core-route expressions through genuine Core DI. Core DOCUMENT is absent in the original namespace and the four current-only routes are explicitly excluded there, with no original qualification claim. Whole owned progress-location function executes against location protocols. Metadata targets and documents are protocols. No actual complete owned components/application factories/native DOM/SSR renderer/packed AOT/full Node-RxJS floors or G11 qualification.', g11_claim: 'not-passed'};
   if (process.argv[2]) writeFileSync(process.argv[2], JSON.stringify(report, null, 2) + '\n', {flag: 'wx'});
   console.log(JSON.stringify({frozen_uses: review.frozen_uses, current_uses: review.current_uses, delta_uses: review.delta_uses,
     subjects: results.length, cases: results.reduce((n, r) => n + r.cases.length, 0), source_negative_controls: negatives.length,
