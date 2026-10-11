@@ -1,0 +1,559 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "node": "v22.23.3",
+  "source_review": {
+    "file": "legacy-button/button.ts",
+    "module": "@angular/core",
+    "symbol": "NgZone",
+    "candidate_source_sha256": "6d37f01619672b62496d5ffb8bec6df6dfe32214893191644d46012424ff5bb4",
+    "original_subject": {
+      "path": "compatibility/rc/anchor-zone-original-subjects.json.gz",
+      "sha256": "8193b7fba7fff172b8cead965325d2005107790f8a7342430e2ba82cd77c3241"
+    },
+    "constructor_zone_index": 3,
+    "complete_parent_and_anchor_members_and_initialization_match": true,
+    "definite_assignment_exceptions": [
+      "MatLegacyButton.ripple",
+      "MatLegacyAnchor.tabIndex"
+    ],
+    "contexts": [
+      "@Input() tabIndex!: number;",
+      "constructor(\n    focusMonitor: FocusMonitor,\n    elementRef: ElementRef,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode: string,\n    /** @breaking-change 14.0.0 _ngZone will be required. */\n    @Optional() private _ngZone?: NgZone,\n  ) {\n    super(elementRef, focusMonitor, animationMode);\n  }",
+      "override ngAfterViewInit(): void {\n    super.ngAfterViewInit();\n\n    /** @breaking-change 14.0.0 _ngZone will be required. */\n    if (this._ngZone) {\n      this._ngZone.runOutsideAngular(() => {\n        this._elementRef.nativeElement.addEventListener('click', this._haltDisabledEvents);\n      });\n    } else {\n      this._elementRef.nativeElement.addEventListener('click', this._haltDisabledEvents);\n    }\n  }",
+      "override ngOnDestroy(): void {\n    super.ngOnDestroy();\n    this._elementRef.nativeElement.removeEventListener('click', this._haltDisabledEvents);\n  }",
+      "_haltDisabledEvents = (event: Event): void => {\n    // A disabled button shouldn't apply any actions\n    if (this.disabled) {\n      event.preventDefault();\n      event.stopImmediatePropagation();\n    }\n  };"
+    ],
+    "owned_mixins": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-button/internal/common-behaviors/color.ts",
+        "sha256": "1236aca56df8cf1d6c78e6378650ffffeeffc954033f26811fbc715daea94bfc"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-button/internal/common-behaviors/disabled.ts",
+        "sha256": "15f03d593b40045219a37c37ee5e23c25a262cf2876f705736cec8dd0177abf5"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-button/internal/common-behaviors/disable-ripple.ts",
+        "sha256": "c2aae62682a0aac5ebe46fd0abb02011171049fc9560dd2f3510b1d23537dd53"
+      }
+    ],
+    "unchanged_template": {
+      "path": "projects/ngx-material-legacy/legacy-button/button.html",
+      "sha256": "72ba2baa6286f061743e08da0d43bd3fa3d435587e6b9a653eed7e3295a0d3f9"
+    },
+    "scope": "One frozen public NgZone import and complete manually constructed button/anchor classes with exact owned historical mixins. Supplied genuine zones, optional-zone fallback, disabled click behavior and parent/listener teardown are exercised. FocusMonitor and event target are explicit protocols; decorators omitted. No public FocusMonitor/ripple, native navigation/focus, Angular component DI/AOT/packed/styles/full floors or whole audit qualification."
+  },
+  "namespace_capsule_sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3",
+  "sources": [
+    {
+      "path": "scripts/anchor-zone-use-review.mjs",
+      "sha256": "6d05b58435d1ad8866e3768bde0366b01448287b273be26e5ba1a18bba97b9c3"
+    },
+    {
+      "path": "tests/anchor_zone_runtime_probe.mjs",
+      "sha256": "a48fe28685d4283e7f28a60c7081915fc0e1e23d6720842baf16aa43f6c6aa3e"
+    },
+    {
+      "path": "tests/anchor_zone_runtime_subject.mjs",
+      "sha256": "f4784ff7dc9a3b84bee6c19e13aa172b667825a329fa1f8dab62d6d0af49743e"
+    },
+    {
+      "path": "scripts/progress-bar-zone-use-review.mjs",
+      "sha256": "3d289f0777bf2c176a814252c2b1fdeca405d35ca53eae99c5832600040b9cd9"
+    }
+  ],
+  "results": [
+    {
+      "line": "original",
+      "mode": "zoneful",
+      "production": false,
+      "cases": [
+        "supplied-public-zone",
+        "manual-optional-zone-fallback"
+      ],
+      "mutations": [
+        "inside-registration",
+        "missing-fallback",
+        "missing-listener-removal",
+        "wrong-removal-identity",
+        "missing-prevent-default",
+        "missing-propagation-stop",
+        "inverted-disabled",
+        "missing-parent-init",
+        "missing-parent-destroy"
+      ],
+      "complete_parent_anchor_and_mixins_executed": true,
+      "native_or_packed_qualified": false,
+      "zone_subject": {
+        "version": "0.13.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-MKPbmZie6fASC/ps4dkmIhaT5eonHkEt6eAy80K42tAm0G2W+AahLJjbfi6X9NPdciOE9GRFTTM8u2IiF6O3ww==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "8558046e49533b728403672b515caa0e30f2e7b4e0b8d4824f6198faffbd099d",
+        "authenticated_commonjs_require_forwarders": 0,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "original",
+      "mode": "zoneful",
+      "production": true,
+      "cases": [
+        "supplied-public-zone",
+        "manual-optional-zone-fallback"
+      ],
+      "mutations": [
+        "inside-registration",
+        "missing-fallback",
+        "missing-listener-removal",
+        "wrong-removal-identity",
+        "missing-prevent-default",
+        "missing-propagation-stop",
+        "inverted-disabled",
+        "missing-parent-init",
+        "missing-parent-destroy"
+      ],
+      "complete_parent_anchor_and_mixins_executed": true,
+      "native_or_packed_qualified": false,
+      "zone_subject": {
+        "version": "0.13.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-MKPbmZie6fASC/ps4dkmIhaT5eonHkEt6eAy80K42tAm0G2W+AahLJjbfi6X9NPdciOE9GRFTTM8u2IiF6O3ww==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "8558046e49533b728403672b515caa0e30f2e7b4e0b8d4824f6198faffbd099d",
+        "authenticated_commonjs_require_forwarders": 0,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "main",
+      "mode": "zoneful",
+      "production": false,
+      "cases": [
+        "supplied-public-zone",
+        "manual-optional-zone-fallback"
+      ],
+      "mutations": [
+        "inside-registration",
+        "missing-fallback",
+        "missing-listener-removal",
+        "wrong-removal-identity",
+        "missing-prevent-default",
+        "missing-propagation-stop",
+        "inverted-disabled",
+        "missing-parent-init",
+        "missing-parent-destroy"
+      ],
+      "complete_parent_anchor_and_mixins_executed": true,
+      "native_or_packed_qualified": false,
+      "zone_subject": {
+        "version": "0.16.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-ihXL9+vhYyEhXz4TDNpHeAOZN9FVrbog0Il64OIEI28UP/n5AaI6gsccRuOHBfx+206agzyoK527bYIO0Foy6A==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "94d3f7278878a57f7b4be6d9174fd2835bbf54bef1e54babd5e61c98495ebc4c",
+        "authenticated_commonjs_require_forwarders": 1,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "main",
+      "mode": "zoneful",
+      "production": true,
+      "cases": [
+        "supplied-public-zone",
+        "manual-optional-zone-fallback"
+      ],
+      "mutations": [
+        "inside-registration",
+        "missing-fallback",
+        "missing-listener-removal",
+        "wrong-removal-identity",
+        "missing-prevent-default",
+        "missing-propagation-stop",
+        "inverted-disabled",
+        "missing-parent-init",
+        "missing-parent-destroy"
+      ],
+      "complete_parent_anchor_and_mixins_executed": true,
+      "native_or_packed_qualified": false,
+      "zone_subject": {
+        "version": "0.16.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-ihXL9+vhYyEhXz4TDNpHeAOZN9FVrbog0Il64OIEI28UP/n5AaI6gsccRuOHBfx+206agzyoK527bYIO0Foy6A==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "94d3f7278878a57f7b4be6d9174fd2835bbf54bef1e54babd5e61c98495ebc4c",
+        "authenticated_commonjs_require_forwarders": 1,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "main",
+      "mode": "zoneless",
+      "production": false,
+      "cases": [
+        "supplied-public-zone",
+        "manual-optional-zone-fallback"
+      ],
+      "mutations": [
+        "missing-fallback",
+        "missing-listener-removal",
+        "wrong-removal-identity",
+        "missing-prevent-default",
+        "missing-propagation-stop",
+        "inverted-disabled",
+        "missing-parent-init",
+        "missing-parent-destroy"
+      ],
+      "complete_parent_anchor_and_mixins_executed": true,
+      "native_or_packed_qualified": false,
+      "zone_subject": {
+        "version": "0.16.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-ihXL9+vhYyEhXz4TDNpHeAOZN9FVrbog0Il64OIEI28UP/n5AaI6gsccRuOHBfx+206agzyoK527bYIO0Foy6A==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "94d3f7278878a57f7b4be6d9174fd2835bbf54bef1e54babd5e61c98495ebc4c",
+        "authenticated_commonjs_require_forwarders": 1,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "main",
+      "mode": "zoneless",
+      "production": true,
+      "cases": [
+        "supplied-public-zone",
+        "manual-optional-zone-fallback"
+      ],
+      "mutations": [
+        "missing-fallback",
+        "missing-listener-removal",
+        "wrong-removal-identity",
+        "missing-prevent-default",
+        "missing-propagation-stop",
+        "inverted-disabled",
+        "missing-parent-init",
+        "missing-parent-destroy"
+      ],
+      "complete_parent_anchor_and_mixins_executed": true,
+      "native_or_packed_qualified": false,
+      "zone_subject": {
+        "version": "0.16.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-ihXL9+vhYyEhXz4TDNpHeAOZN9FVrbog0Il64OIEI28UP/n5AaI6gsccRuOHBfx+206agzyoK527bYIO0Foy6A==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "94d3f7278878a57f7b4be6d9174fd2835bbf54bef1e54babd5e61c98495ebc4c",
+        "authenticated_commonjs_require_forwarders": 1,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "21.x",
+      "mode": "zoneful",
+      "production": false,
+      "cases": [
+        "supplied-public-zone",
+        "manual-optional-zone-fallback"
+      ],
+      "mutations": [
+        "inside-registration",
+        "missing-fallback",
+        "missing-listener-removal",
+        "wrong-removal-identity",
+        "missing-prevent-default",
+        "missing-propagation-stop",
+        "inverted-disabled",
+        "missing-parent-init",
+        "missing-parent-destroy"
+      ],
+      "complete_parent_anchor_and_mixins_executed": true,
+      "native_or_packed_qualified": false,
+      "zone_subject": {
+        "version": "0.16.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-ihXL9+vhYyEhXz4TDNpHeAOZN9FVrbog0Il64OIEI28UP/n5AaI6gsccRuOHBfx+206agzyoK527bYIO0Foy6A==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "94d3f7278878a57f7b4be6d9174fd2835bbf54bef1e54babd5e61c98495ebc4c",
+        "authenticated_commonjs_require_forwarders": 1,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "21.x",
+      "mode": "zoneful",
+      "production": true,
+      "cases": [
+        "supplied-public-zone",
+        "manual-optional-zone-fallback"
+      ],
+      "mutations": [
+        "inside-registration",
+        "missing-fallback",
+        "missing-listener-removal",
+        "wrong-removal-identity",
+        "missing-prevent-default",
+        "missing-propagation-stop",
+        "inverted-disabled",
+        "missing-parent-init",
+        "missing-parent-destroy"
+      ],
+      "complete_parent_anchor_and_mixins_executed": true,
+      "native_or_packed_qualified": false,
+      "zone_subject": {
+        "version": "0.16.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-ihXL9+vhYyEhXz4TDNpHeAOZN9FVrbog0Il64OIEI28UP/n5AaI6gsccRuOHBfx+206agzyoK527bYIO0Foy6A==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "94d3f7278878a57f7b4be6d9174fd2835bbf54bef1e54babd5e61c98495ebc4c",
+        "authenticated_commonjs_require_forwarders": 1,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "21.x",
+      "mode": "zoneless",
+      "production": false,
+      "cases": [
+        "supplied-public-zone",
+        "manual-optional-zone-fallback"
+      ],
+      "mutations": [
+        "missing-fallback",
+        "missing-listener-removal",
+        "wrong-removal-identity",
+        "missing-prevent-default",
+        "missing-propagation-stop",
+        "inverted-disabled",
+        "missing-parent-init",
+        "missing-parent-destroy"
+      ],
+      "complete_parent_anchor_and_mixins_executed": true,
+      "native_or_packed_qualified": false,
+      "zone_subject": {
+        "version": "0.16.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-ihXL9+vhYyEhXz4TDNpHeAOZN9FVrbog0Il64OIEI28UP/n5AaI6gsccRuOHBfx+206agzyoK527bYIO0Foy6A==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "94d3f7278878a57f7b4be6d9174fd2835bbf54bef1e54babd5e61c98495ebc4c",
+        "authenticated_commonjs_require_forwarders": 1,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "21.x",
+      "mode": "zoneless",
+      "production": true,
+      "cases": [
+        "supplied-public-zone",
+        "manual-optional-zone-fallback"
+      ],
+      "mutations": [
+        "missing-fallback",
+        "missing-listener-removal",
+        "wrong-removal-identity",
+        "missing-prevent-default",
+        "missing-propagation-stop",
+        "inverted-disabled",
+        "missing-parent-init",
+        "missing-parent-destroy"
+      ],
+      "complete_parent_anchor_and_mixins_executed": true,
+      "native_or_packed_qualified": false,
+      "zone_subject": {
+        "version": "0.16.3",
+        "public_specifier": "zone.js/node",
+        "selected_route": "./fesm2015/zone-node.js",
+        "capsule_sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175",
+        "archive_sri": "sha512-ihXL9+vhYyEhXz4TDNpHeAOZN9FVrbog0Il64OIEI28UP/n5AaI6gsccRuOHBfx+206agzyoK527bYIO0Foy6A==",
+        "archive_sri_verified": true,
+        "node_builtins": [
+          "crypto",
+          "events",
+          "fs",
+          "timers"
+        ],
+        "public_entry_sha256": "94d3f7278878a57f7b4be6d9174fd2835bbf54bef1e54babd5e61c98495ebc4c",
+        "authenticated_commonjs_require_forwarders": 1,
+        "scope": "Complete authenticated public Node runtime entry and manifest, not the browser route or all package subpaths. Original peer-compatible0.13.3; current pinned0.16.3. This does not narrow published consumer peers or qualify Node/Rx/browser floors."
+      },
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    }
+  ],
+  "source_negative_controls": 13,
+  "runtime_mutation_rejections": 86,
+  "scope": "One frozen public NgZone import and complete manually constructed button/anchor classes with exact owned historical mixins. Supplied genuine zones, optional-zone fallback, disabled click behavior and parent/listener teardown are exercised. FocusMonitor and event target are explicit protocols; decorators omitted. No public FocusMonitor/ripple, native navigation/focus, Angular component DI/AOT/packed/styles/full floors or whole audit qualification.",
+  "native_or_packed_or_full_floors_qualified": false,
+  "g11_claim": "not-passed"
+}
