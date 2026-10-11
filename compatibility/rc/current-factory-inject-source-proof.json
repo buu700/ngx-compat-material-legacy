@@ -1,0 +1,338 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "role": "Two current public inject call boundaries using actual constructor/factory scopes and genuine original/minimum namespaces",
+  "node": "v22.23.3",
+  "compiler": "6.0.3",
+  "cases": [
+    {
+      "file": "legacy-core/internal/common-module.ts",
+      "module": "@angular/core",
+      "symbol": "inject",
+      "candidate_source_sha256": "8f8d7dbcf89c151f6bb953f8a0e803b2d64cdb07fbcedfa460415c7f5c22afe6",
+      "references": [
+        {
+          "kind": "contextual-public-inject-call",
+          "line": 53,
+          "expression": "inject(Platform, {optional: true})",
+          "token": "Platform",
+          "scope": "constructor(highContrastModeDetector: HighContrastModeDetector, \n@Optional()\n@Inject(MATERIAL_SANITY_CHECKS)\nprivate _sanityChecks: SanityChecks, \n@Inject(DOCUMENT)\nprivate _document: Document) {\n    void highContrastModeDetector;\n    if (!this._hasDoneGlobalChecks) {\n        this._hasDoneGlobalChecks = true;\n        if (isDevMode()) {\n            const platform = inject(Platform, { optional: true });\n            if (this._checkIsEnabled('doctype')) {\n                _checkDoctypeIsDefined(this._document);\n            }\n            if (this._checkIsEnabled('theme')) {\n                _checkThemeIsPresent(this._document, !!platform?.isBrowser);\n            }\n            if (this._checkIsEnabled('version')) {\n                _checkCdkVersionMatch();\n            }\n        }\n    }\n}"
+        }
+      ]
+    },
+    {
+      "file": "legacy-progress-bar/internal/progress-bar-location.ts",
+      "module": "@angular/core",
+      "symbol": "inject",
+      "candidate_source_sha256": "5a4c922b79216263125ce5dca54cee8fbcc07a8950f42aad51883c35383288cf",
+      "references": [
+        {
+          "kind": "contextual-public-inject-call",
+          "line": 33,
+          "expression": "inject(DOCUMENT)",
+          "token": "DOCUMENT",
+          "scope": "export function MAT_PROGRESS_BAR_LOCATION_FACTORY(): MatProgressBarLocation {\n    const _document = inject(DOCUMENT);\n    const _location = _document ? _document.location : null;\n    return {\n        getPathname: () => (_location ? _location.pathname + _location.search : ''),\n    };\n}"
+        }
+      ]
+    }
+  ],
+  "source_controls": [
+    {
+      "id": "wrong-core-import",
+      "rejected": true
+    },
+    {
+      "id": "required-platform",
+      "rejected": true
+    },
+    {
+      "id": "numeric-platform-flags",
+      "rejected": true
+    },
+    {
+      "id": "wrong-platform-token",
+      "rejected": true
+    },
+    {
+      "id": "platform-outside-development-guard",
+      "rejected": true
+    },
+    {
+      "id": "escaped-inject",
+      "rejected": true
+    },
+    {
+      "id": "optional-document",
+      "rejected": true
+    },
+    {
+      "id": "cached-location",
+      "rejected": true
+    },
+    {
+      "id": "hash-instead-of-search",
+      "rejected": true
+    },
+    {
+      "id": "document-alias-not-bound",
+      "rejected": true
+    }
+  ],
+  "runtime_controls": [
+    {
+      "line": "original",
+      "id": "platform-required",
+      "rejected": true
+    },
+    {
+      "line": "original",
+      "id": "platform-always-injected",
+      "rejected": true
+    },
+    {
+      "line": "original",
+      "id": "document-optional",
+      "rejected": true
+    },
+    {
+      "line": "original",
+      "id": "location-hash-used",
+      "rejected": true
+    },
+    {
+      "line": "main",
+      "id": "platform-required",
+      "rejected": true
+    },
+    {
+      "line": "main",
+      "id": "platform-always-injected",
+      "rejected": true
+    },
+    {
+      "line": "main",
+      "id": "document-optional",
+      "rejected": true
+    },
+    {
+      "line": "main",
+      "id": "location-hash-used",
+      "rejected": true
+    },
+    {
+      "line": "21.x",
+      "id": "platform-required",
+      "rejected": true
+    },
+    {
+      "line": "21.x",
+      "id": "platform-always-injected",
+      "rejected": true
+    },
+    {
+      "line": "21.x",
+      "id": "document-optional",
+      "rejected": true
+    },
+    {
+      "line": "21.x",
+      "id": "location-hash-used",
+      "rejected": true
+    }
+  ],
+  "results": [
+    {
+      "line": "original",
+      "mode": "development",
+      "framework": "16.2.12",
+      "cases": [
+        "public-document-alias-identity",
+        "actual-common-constructor-development-only-platform",
+        "actual-common-optional-platform",
+        "actual-common-does-not-swallow-development-provider-error",
+        "common-outside-context-matches-development-only-injection",
+        "actual-location-required-document-and-context",
+        "actual-location-dynamic-path-search-and-captured-location",
+        "actual-location-null-document-and-missing-location",
+        "actual-location-provider-error-propagates"
+      ],
+      "whole_public_core_executed": true,
+      "common_constructor_and_location_factory_are_actual_scopes": true,
+      "document_services_and_version_values_are_protocols": true,
+      "complete_modules_or_automatic_application_root_graphs_qualified": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "original",
+      "mode": "production",
+      "framework": "16.2.12",
+      "cases": [
+        "public-document-alias-identity",
+        "actual-common-constructor-development-only-platform",
+        "actual-common-optional-platform",
+        "actual-common-does-not-swallow-development-provider-error",
+        "common-outside-context-matches-development-only-injection",
+        "actual-location-required-document-and-context",
+        "actual-location-dynamic-path-search-and-captured-location",
+        "actual-location-null-document-and-missing-location",
+        "actual-location-provider-error-propagates"
+      ],
+      "whole_public_core_executed": true,
+      "common_constructor_and_location_factory_are_actual_scopes": true,
+      "document_services_and_version_values_are_protocols": true,
+      "complete_modules_or_automatic_application_root_graphs_qualified": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "main",
+      "mode": "development",
+      "framework": "22.1.7",
+      "cases": [
+        "public-document-alias-identity",
+        "actual-common-constructor-development-only-platform",
+        "actual-common-optional-platform",
+        "actual-common-does-not-swallow-development-provider-error",
+        "common-outside-context-matches-development-only-injection",
+        "actual-location-required-document-and-context",
+        "actual-location-dynamic-path-search-and-captured-location",
+        "actual-location-null-document-and-missing-location",
+        "actual-location-provider-error-propagates"
+      ],
+      "whole_public_core_executed": true,
+      "common_constructor_and_location_factory_are_actual_scopes": true,
+      "document_services_and_version_values_are_protocols": true,
+      "complete_modules_or_automatic_application_root_graphs_qualified": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "main",
+      "mode": "production",
+      "framework": "22.1.7",
+      "cases": [
+        "public-document-alias-identity",
+        "actual-common-constructor-development-only-platform",
+        "actual-common-optional-platform",
+        "actual-common-does-not-swallow-development-provider-error",
+        "common-outside-context-matches-development-only-injection",
+        "actual-location-required-document-and-context",
+        "actual-location-dynamic-path-search-and-captured-location",
+        "actual-location-null-document-and-missing-location",
+        "actual-location-provider-error-propagates"
+      ],
+      "whole_public_core_executed": true,
+      "common_constructor_and_location_factory_are_actual_scopes": true,
+      "document_services_and_version_values_are_protocols": true,
+      "complete_modules_or_automatic_application_root_graphs_qualified": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "21.x",
+      "mode": "development",
+      "framework": "21.2.23",
+      "cases": [
+        "public-document-alias-identity",
+        "actual-common-constructor-development-only-platform",
+        "actual-common-optional-platform",
+        "actual-common-does-not-swallow-development-provider-error",
+        "common-outside-context-matches-development-only-injection",
+        "actual-location-required-document-and-context",
+        "actual-location-dynamic-path-search-and-captured-location",
+        "actual-location-null-document-and-missing-location",
+        "actual-location-provider-error-propagates"
+      ],
+      "whole_public_core_executed": true,
+      "common_constructor_and_location_factory_are_actual_scopes": true,
+      "document_services_and_version_values_are_protocols": true,
+      "complete_modules_or_automatic_application_root_graphs_qualified": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    },
+    {
+      "line": "21.x",
+      "mode": "production",
+      "framework": "21.2.23",
+      "cases": [
+        "public-document-alias-identity",
+        "actual-common-constructor-development-only-platform",
+        "actual-common-optional-platform",
+        "actual-common-does-not-swallow-development-provider-error",
+        "common-outside-context-matches-development-only-injection",
+        "actual-location-required-document-and-context",
+        "actual-location-dynamic-path-search-and-captured-location",
+        "actual-location-null-document-and-missing-location",
+        "actual-location-provider-error-propagates"
+      ],
+      "whole_public_core_executed": true,
+      "common_constructor_and_location_factory_are_actual_scopes": true,
+      "document_services_and_version_values_are_protocols": true,
+      "complete_modules_or_automatic_application_root_graphs_qualified": false,
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      }
+    }
+  ],
+  "public_namespace_capsule_sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3",
+  "producer_sha256": "3defa7d546f45c6898f3af4b3b71604bf605b5292a6b02559f5b214d9e2d6e93",
+  "worker_sha256": "b8adf2ac3ef9ca6cb4572bf43060dbefb535c06e075b582b13c78497fcc6f1c9",
+  "scope_emit_sha256": "590d4fe413f8197e32d5504a785e0f1fa644ede5bb56a7f508fcc6c7ee3f8c84",
+  "original_location_source": {
+    "path": "reference/material-16.2.14/error-helper-sources/progress-bar-location.ts",
+    "sha256": "5019507c69b86e1076ddfdbc4f3b332ae883a945a40486592419e10f3a3b3b48"
+  },
+  "limits": [
+    "Actual common class members/constructor and original-identical location factory execute. Common module decorators/import initialization and automatic default token/application roots are not executed. DOCUMENT/services/versions are explicit protocols; genuine public DOCUMENT, Platform and Core identities execute.",
+    "Public inject overload/type stability is separately bound to current-injection-context-source-proof; this runtime probe does not claim whole-class strict compilation, packed/AOT/native, Cyph build, full runtime/RxJS/compiler floors or complete G11."
+  ],
+  "g11_claim": "not-passed"
+}
