@@ -7,12 +7,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+export {MatLegacyInputHarness} from './input-harness';
+
 export {
 
   InputHarnessFilters as LegacyInputHarnessFilters,
-
-
-  MatInputHarness as MatLegacyInputHarness,
 
 
   MatNativeSelectHarness as MatLegacyNativeSelectHarness,

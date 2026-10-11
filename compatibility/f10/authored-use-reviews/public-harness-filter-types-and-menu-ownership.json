@@ -846,10 +846,10 @@
       "file": "legacy-input/testing/public-api.ts",
       "module": "@angular/material/input/testing",
       "symbol": "NativeOptionHarnessFilters",
-      "candidate_source_sha256": "96fa637914382fef293d23f3f74a9414fa859ce9abef7b24f56e195a4c49762b",
+      "candidate_source_sha256": "956aad3c92347b7acbbfbb5099c6dc02963079502485c57a3148c62aef39c3f7",
       "conclusion": "stable-public-peer",
       "reviewer": "Codex primary implementer",
-      "decision": "In legacy-input/testing/public-api.ts, NativeOptionHarnessFilters is an erased public historical alias LegacyNativeOptionHarnessFilters. The complete untouched 16.2.14 declaration and both advertised Material minima match after comment/modifier normalization; the original legacy package imports/exports this exact historical alias. Current declarations and members are publicly exported and contain no deprecated/private/removal/experimental tags. Exact named reexport or type-bound identifier analysis rejects unrelated or runtime routes. Strict original/minimum declaration assignments preserve the shape. This closes the type boundary only; owned harness runtime, whole API and packed/native/floor consumers remain separate.",
+      "decision": "In legacy-input/testing/public-api.ts, NativeOptionHarnessFilters is an erased public historical alias LegacyNativeOptionHarnessFilters. The complete untouched 16.2.14 declaration and both advertised Material minima match after comment/modifier normalization; the original legacy package imports/exports this exact historical alias. Current declarations and members are publicly exported and contain no deprecated/private/removal/experimental tags. Exact named reexport or type-bound identifier analysis rejects unrelated or runtime routes. Strict original/minimum declaration assignments preserve the shape. This closes the type boundary only; owned harness runtime, whole API and packed/native/floor consumers remain separate. Revalidated after replacing the input class reexport: the native-option alias and exact historical filter declaration remain unchanged, complete public API consumers still compile, and the freshly bound class/filter protocol receipt is retained.",
       "independent_evidence": [
         {
           "path": "compatibility/rc/harness-filter-reexport-source-proof.json",
@@ -870,6 +870,14 @@
         {
           "path": "tests/harness_filter_reexports_probe.mjs",
           "sha256": "95e8ddcb7f693a7bb708be0b9a5a270c78aff945e34c78b739329eef6d03144f"
+        },
+        {
+          "path": "compatibility/rc/input-harness-source-proof.json",
+          "sha256": "57bff83c3a9933a5ff12f925a534d7b152abf6194fe28e518a9871483f9c5754"
+        },
+        {
+          "path": "compatibility/rc/input-harness-filter-revalidation.json",
+          "sha256": "d633e0b01840e6b03bf575528afb59af1450afee0f92130d7e97ea219c0af39f"
         }
       ]
     },
@@ -1306,6 +1314,21 @@
           "sha256": "95e8ddcb7f693a7bb708be0b9a5a270c78aff945e34c78b739329eef6d03144f"
         }
       ]
+    }
+  ],
+  "source_binding_refreshes": [
+    {
+      "recorded_at_utc": "2026-10-11T05:28:54.382267+00:00",
+      "previous_review_sha256": "aa64d144f395c9d8c9cb85b5594de925536a0b79cb6da7353fa90ba1e3849616",
+      "file": "legacy-input/testing/public-api.ts",
+      "symbol": "NativeOptionHarnessFilters",
+      "prior_source_sha256": "96fa637914382fef293d23f3f74a9414fa859ce9abef7b24f56e195a4c49762b",
+      "current_source_sha256": "956aad3c92347b7acbbfbb5099c6dc02963079502485c57a3148c62aef39c3f7",
+      "proof": {
+        "path": "compatibility/rc/input-harness-source-proof.json",
+        "sha256": "57bff83c3a9933a5ff12f925a534d7b152abf6194fe28e518a9871483f9c5754"
+      },
+      "reason": "Exact retained erased native-option declaration and public API source binding revalidated after the owned input harness adapter."
     }
   ]
 }
