@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "status": "reviewed",
+  "role": "Two current public inject imports, contextual constructor/factory scope only",
+  "reviews": [
+    {
+      "file": "legacy-core/internal/common-module.ts",
+      "module": "@angular/core",
+      "symbol": "inject",
+      "candidate_source_sha256": "8f8d7dbcf89c151f6bb953f8a0e803b2d64cdb07fbcedfa460415c7f5c22afe6",
+      "conclusion": "stable-public-peer",
+      "decision": "The additional inject import in legacy-core/internal/common-module.ts is bound to stable public @angular/core. The actual common-module constructor performs its one optional Platform lookup only inside the real public isDevMode guard. Genuine public Platform is the exact registered token; absent services yield null, development provider errors propagate, production performs no lookup, and outside-context construction retains that same development/production distinction. Existing untouched-original check-body and constructor-factory regressions pass (three tests). The stripped module decorator/import initialization and high-contrast body behavior are separate obligations; protocol sanity inputs and version values do not qualify them. Genuine complete original16.2.12/main22.1.7/21.2.23 namespaces execute both development and production scopes: 54 assertions, ten source counterexamples and twelve runtime mutation rejections. Public nondeprecated inject/object-option typing is independently bound to the prior current-context proof, without adding a whole-class compilation claim. Public Platform/DOCUMENT objects execute; service/document/version values are explicit protocols. No complete module/application/node graph, native/packed/AOT, Cyph build, full Node/RxJS/compiler floor or G11 clearance. No product, consumer markup, CSS or SCSS change.",
+      "reviewer": "Codex C04 contextual public factory inject review",
+      "scope": "two-public-inject-contextual-call-boundaries",
+      "recorded_references": [
+        {
+          "kind": "contextual-public-inject-call",
+          "line": 53,
+          "expression": "inject(Platform, {optional: true})",
+          "token": "Platform",
+          "scope": "constructor(highContrastModeDetector: HighContrastModeDetector, \n@Optional()\n@Inject(MATERIAL_SANITY_CHECKS)\nprivate _sanityChecks: SanityChecks, \n@Inject(DOCUMENT)\nprivate _document: Document) {\n    void highContrastModeDetector;\n    if (!this._hasDoneGlobalChecks) {\n        this._hasDoneGlobalChecks = true;\n        if (isDevMode()) {\n            const platform = inject(Platform, { optional: true });\n            if (this._checkIsEnabled('doctype')) {\n                _checkDoctypeIsDefined(this._document);\n            }\n            if (this._checkIsEnabled('theme')) {\n                _checkThemeIsPresent(this._document, !!platform?.isBrowser);\n            }\n            if (this._checkIsEnabled('version')) {\n                _checkCdkVersionMatch();\n            }\n        }\n    }\n}"
+        }
+      ],
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/current-factory-inject-source-proof.json",
+          "sha256": "b10b5c26dbfad5d61a276d2d04102b62b6ddbc829273586d13a16b37cd2fe374"
+        },
+        {
+          "path": "tests/current_factory_inject_probe.mjs",
+          "sha256": "3defa7d546f45c6898f3af4b3b71604bf605b5292a6b02559f5b214d9e2d6e93"
+        },
+        {
+          "path": "tests/test_current_factory_inject.py",
+          "sha256": "3b884dd77d49c1f6c1e591a87f1413f0d545326d566ea27bd1cd3e70dcb2fcf6"
+        },
+        {
+          "path": "compatibility/rc/current-injection-context-source-proof.json",
+          "sha256": "d8de7b45237783586f7d2112c36701f95b8bd04a6d835e953f6e8f551b54c526"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "tests/test_common_module_ownership.py",
+          "sha256": "5f11a240f3535701fe2e877223a92af30a0e29a7ad9f95fcfab534b79e4fd06d"
+        },
+        {
+          "path": "tests/test_progress_location_ownership.py",
+          "sha256": "5246fb1f6b94b3b12ede5da0f048e61076f219f52921144c4599055899a06a3a"
+        },
+        {
+          "path": "compatibility/rc/common-module-ownership-source-proof.json",
+          "sha256": "ffb4fa1d8338ffc2e507dcb14714bd89c6aa096e3e69d5ad7ab2c97c2b40e51e"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-core/internal/test-environment.ts",
+          "sha256": "83f0fb37e81c2e5294719bac3b337f1fa7983152ae9693ff8c9d4459e66b0408"
+        },
+        {
+          "path": "reference/material-16.2.14/error-helper-sources/progress-bar-location.ts",
+          "sha256": "5019507c69b86e1076ddfdbc4f3b332ae883a945a40486592419e10f3a3b3b48"
+        }
+      ]
+    },
+    {
+      "file": "legacy-progress-bar/internal/progress-bar-location.ts",
+      "module": "@angular/core",
+      "symbol": "inject",
+      "candidate_source_sha256": "5a4c922b79216263125ce5dca54cee8fbcc07a8950f42aad51883c35383288cf",
+      "conclusion": "stable-public-peer",
+      "decision": "The additional inject import in legacy-progress-bar/internal/progress-bar-location.ts is bound to stable public @angular/core. The actual progress-location factory body exactly matches the independently hashed untouched16.2.14 source. Its required genuine public DOCUMENT lookup rejects missing providers/outside DI and propagates provider errors. Each getPathname reads the captured location\u2019s current pathname plus search, ignores hash, and does not accidentally cache a string or re-read a replaced location object. Four falsy/missing document/location protocols return the historical empty path. Current Common/Core DOCUMENT exports have equal token identity on both minimum lines. The existing authentic factory/default-shape regression passes (one test). Automatic root/default factory resolution and consumer SVG/SSR rendering remain separate obligations. Genuine complete original16.2.12/main22.1.7/21.2.23 namespaces execute both development and production scopes: 54 assertions, ten source counterexamples and twelve runtime mutation rejections. Public nondeprecated inject/object-option typing is independently bound to the prior current-context proof, without adding a whole-class compilation claim. Public Platform/DOCUMENT objects execute; service/document/version values are explicit protocols. No complete module/application/node graph, native/packed/AOT, Cyph build, full Node/RxJS/compiler floor or G11 clearance. No product, consumer markup, CSS or SCSS change.",
+      "reviewer": "Codex C04 contextual public factory inject review",
+      "scope": "two-public-inject-contextual-call-boundaries",
+      "recorded_references": [
+        {
+          "kind": "contextual-public-inject-call",
+          "line": 33,
+          "expression": "inject(DOCUMENT)",
+          "token": "DOCUMENT",
+          "scope": "export function MAT_PROGRESS_BAR_LOCATION_FACTORY(): MatProgressBarLocation {\n    const _document = inject(DOCUMENT);\n    const _location = _document ? _document.location : null;\n    return {\n        getPathname: () => (_location ? _location.pathname + _location.search : ''),\n    };\n}"
+        }
+      ],
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/current-factory-inject-source-proof.json",
+          "sha256": "b10b5c26dbfad5d61a276d2d04102b62b6ddbc829273586d13a16b37cd2fe374"
+        },
+        {
+          "path": "tests/current_factory_inject_probe.mjs",
+          "sha256": "3defa7d546f45c6898f3af4b3b71604bf605b5292a6b02559f5b214d9e2d6e93"
+        },
+        {
+          "path": "tests/test_current_factory_inject.py",
+          "sha256": "3b884dd77d49c1f6c1e591a87f1413f0d545326d566ea27bd1cd3e70dcb2fcf6"
+        },
+        {
+          "path": "compatibility/rc/current-injection-context-source-proof.json",
+          "sha256": "d8de7b45237783586f7d2112c36701f95b8bd04a6d835e953f6e8f551b54c526"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "tests/test_common_module_ownership.py",
+          "sha256": "5f11a240f3535701fe2e877223a92af30a0e29a7ad9f95fcfab534b79e4fd06d"
+        },
+        {
+          "path": "tests/test_progress_location_ownership.py",
+          "sha256": "5246fb1f6b94b3b12ede5da0f048e61076f219f52921144c4599055899a06a3a"
+        },
+        {
+          "path": "compatibility/rc/common-module-ownership-source-proof.json",
+          "sha256": "ffb4fa1d8338ffc2e507dcb14714bd89c6aa096e3e69d5ad7ab2c97c2b40e51e"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-core/internal/test-environment.ts",
+          "sha256": "83f0fb37e81c2e5294719bac3b337f1fa7983152ae9693ff8c9d4459e66b0408"
+        },
+        {
+          "path": "reference/material-16.2.14/error-helper-sources/progress-bar-location.ts",
+          "sha256": "5019507c69b86e1076ddfdbc4f3b332ae883a945a40486592419e10f3a3b3b48"
+        }
+      ]
+    }
+  ],
+  "g11_claim": "not-passed"
+}
