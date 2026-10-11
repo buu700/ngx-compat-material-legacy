@@ -1,0 +1,178 @@
+{
+  "schema_version": 1,
+  "sha": "b13c6aa194cf560a304213961ae28725f8d0a4e2",
+  "line": "21.x",
+  "role": "C04 individual modern slider token rewrite versus complete frozen Sass export scope",
+  "recorded_at_utc": "2026-10-11T07:36:20.554370+00:00",
+  "reviewer": "Codex primary implementer",
+  "review_depth": "individual-compatibility",
+  "affected_branches": [
+    "main",
+    "21.x"
+  ],
+  "patch_file": "compatibility/f10/disposition-ledger/evidence/patches/b13c6aa194cf560a304213961ae28725f8d0a4e2-slider-full.patch",
+  "diff_sha256": "5745eadda9bcee6dd8ba3863a3875cde57c13746d5670337aca241009b4927eb",
+  "patch_bytes": 24097,
+  "patch_paths": [
+    "src/material/core/tokens/m2/mat/_slider.scss",
+    "src/material/core/tokens/m2/mdc/_slider.scss",
+    "src/material/core/tokens/tests/test-validate-tokens.scss",
+    "src/material/slider/_slider-theme.scss",
+    "src/material/slider/slider.scss"
+  ],
+  "upstream_commit_object": "tree e791a63ce2103a3b45a98224dadf67bef7f98cee\nparent a162afdc74f83b1dbb02af4c6c9f83bed00ad9e6\nauthor Amy Sorto <8575252+amysorto@users.noreply.github.com> 1691009915 +0000\ncommitter GitHub <noreply@github.com> 1691009915 +0000\ngpgsig -----BEGIN PGP SIGNATURE-----\n \n wsBcBAABCAAQBQJkysN7CRBK7hj4Ov3rIwAAvTkIAISaN4KzauGl/dBzSUpO2ovF\n u6w+9oSUa2a8aphl3k9nVeIl9tfJF0EOit+S94T0cgEWgkM9Qsv7AP16zzpjEvAK\n 7pL1nYss3NNidN2WQIL/9XJ9yucWvDtFOToPH6tLNpLma/VZxhqSZgvIS31nfbCv\n vMe0HQYnAvaCYxXsZGEqbnUucKb/2IpTcCYkeW1ovG6peZPdJx3GXpBQdsFAHtIX\n n3PW5SCDhPoqbavHO8MiEIzZgCYrdlDIz+LZKvn3SVp821pDu/A8D++yN6/ZP5Ev\n DrSijf8p5AatamyQXOghympz9t8MCKvEC+kXZEea/VDloY+/Nwhc7jynlkqQAtw=\n =k66A\n -----END PGP SIGNATURE-----\n \n\nfix(material/slider): change slider to use MDC's token API (#27375)\n\n",
+  "upstream_commit_object_sha256": "2383e1b12136d8b6b3b0dd6fea95ed4e315d75b02382afc39f3d2412b9e55cb3",
+  "original_hunk_review": [
+    "The new mat/slider map defines the mat-slider prefix and theme-derived value-indicator opacity. Its unthemable/typography/density maps intentionally contain no slots at this revision; it is a new modern token model, not a legacy thumb/track model.",
+    "The new mdc/slider map supplies6px active track,4px inactive track,20px handle geometry, theme-dependent disabled/label/primary/accent/warn/elevation values and subtitle2 text. It declares several unused MDC slots null. None of those token files belongs to the independently owned16 model.",
+    "Token validation adds the MDC slider theme dependency, the new slot module and an m2.mdc.slider validation case. These are upstream development assertions; no upstream test is falsely claimed executed or ported into the library.",
+    "The modern slider theme removes using-mdc-theme/typography and the old _slider-color helper in favor of mat/mdc token maps, resolved elevation and direct color/typography/density slot emission. The four historical ordinary exports remain reachable from our finite facade, so this path cannot be excluded by considering only owned legacy selectors.",
+    "Modern structural SCSS changes its MDC static/theme configuration, inserts token-defined geometry/shadow/value-indicator slots and wraps existing input,transition,ripple,noop/focus rules. The owned legacy structure uses mat-slider wrapper/track/thumb/ticks, and no current modern implementation is mirrored or forked."
+  ],
+  "decision": "Do not transplant this modern slider token-model and structural rewrite into the frozen add-on. The complete five-path patch adds mat/mdc token maps and token-validation slots, replaces modern mat-mdc-slider color/typography/density generation, and rewires modern structural CSS around token slots. The historical facade also publicly exports ordinary slider color/typography/density/theme, so the older main rationale that only legacy-slider matters is incomplete. Both complete ordinary and legacy theme sources retain untouched16 behavior, with only four ordinary vendor module-source relocations; all14 independently compiled custom/light/dark/raw-config CSS cases match the untouched tag per line and reject nonempty drift. Ordinary slider is outside the explicit13 current-runtime companion bridge roster; owned legacy slider and all finite historical Sass exports remain required. Current modern runtime/private token machinery is peer-owned and no owned runtime imports the modern slider component. Preserve historical selectors, palettes, namespace bindings, calls, aggregate membership and the original empty density behavior. No modern template/token implementation is copied, no consumer HTML/CSS/SCSS change or deviation is introduced, and no current modern-slider rendering or inherited-fix claim is made. Full651/498 packed Sass, native controls, floors and the independent audit remain open.",
+  "final_disposition": "do-not-adopt",
+  "candidate_style_scope": {
+    "ordinary_public_exports": [
+      "slider-color",
+      "slider-typography",
+      "slider-density",
+      "slider-theme"
+    ],
+    "legacy_public_exports": [
+      "legacy-slider-color",
+      "legacy-slider-typography",
+      "legacy-slider-theme"
+    ],
+    "not_in_explicit_current_companion_roster": true,
+    "complete_source_bodies": [
+      {
+        "path": "projects/ngx-material-legacy/styles/slider/_slider-theme.scss",
+        "sha256": "e3147c5ad0689799c17ed1588c67be87fe4dfaff60dff6c7ab0a10169249f101",
+        "original_sha256": "c44467812b45fb6dfd9375912450144f0673b2c5eca0b1483df8a535d3dd67f9",
+        "only_change": "Four @material module sources relocated to owned vendor/mdc; namespace bindings and all function/mixin bodies unchanged"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/legacy-slider/_slider-theme.scss",
+        "sha256": "1c6f060e1ca9cc1ce42d5a939e6b8f15b46c382d792f805effb4e566d90f4a8c",
+        "original_sha256": "1c6f060e1ca9cc1ce42d5a939e6b8f15b46c382d792f805effb4e566d90f4a8c",
+        "only_change": "None; complete source byte identity"
+      }
+    ],
+    "source_css_cases_per_line": 14,
+    "original_density_cases_empty": 2,
+    "wrong_nonempty_css_controls_per_line": 14
+  },
+  "evidence": [
+    {
+      "path": "compatibility/rc/slider-token-historical-sass-diagnostic.json.gz",
+      "sha256": "b905171df9888e7cf07b8c4c6fcc57807954f65053f473634b994059d626a3a2",
+      "bytes": 49852
+    },
+    {
+      "path": "scripts/review-upstream-slider-token-sass.mjs",
+      "sha256": "af3785c4896973375be8a7e29ab8aa70911fbe4cb0bc663d6d61a3e859738dac",
+      "bytes": 6394
+    },
+    {
+      "path": "scripts/sass-mixin-arguments.mjs",
+      "sha256": "d332eb8803298d79a52ef15383e7808454194128cab3e0081029f85d8e791665",
+      "bytes": 13565
+    },
+    {
+      "path": "fixtures/sass/mixin-argument-contracts.json",
+      "sha256": "c1d1151a8c1fa02cea0c6fac5618bbefe11dd018bbfff1d30f5c3f35f8fc8770",
+      "bytes": 143838
+    },
+    {
+      "path": "fixtures/sass/default-companion-contracts.json",
+      "sha256": "6c3b5606bb608d734f08f769e1fd7510c117f3660ca3819f59e7aecc0cbd48ea",
+      "bytes": 124992
+    },
+    {
+      "path": "compatibility/rc/original16-sass-source-diagnostic-identity.json",
+      "sha256": "324762d77a76762518b1a1b4328a4abaf2c388597fd03b1ef4323d736441ddbe",
+      "bytes": 89908
+    },
+    {
+      "path": "compatibility/handoff/codex-closeout/reference/PRODUCT-CONTRACT.md",
+      "sha256": "60aeb5b5bf0b59acab729f4b355f895a9ac664317a0e208d68447bf4b40f00b0",
+      "bytes": 7805
+    },
+    {
+      "path": "compatibility/handoff/codex-closeout/reference/companion-contract.csv",
+      "sha256": "1ac212281f8723e61d5cb7dda60ef93a101843ef4e97d395e790ff7372b36afd",
+      "bytes": 5013
+    },
+    {
+      "path": "projects/ngx-material-legacy/_index.scss",
+      "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2",
+      "bytes": 14151
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/slider/_slider-theme.scss",
+      "sha256": "e3147c5ad0689799c17ed1588c67be87fe4dfaff60dff6c7ab0a10169249f101",
+      "bytes": 3649
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/legacy-slider/_slider-theme.scss",
+      "sha256": "1c6f060e1ca9cc1ce42d5a939e6b8f15b46c382d792f805effb4e566d90f4a8c",
+      "bytes": 6743
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-slider/slider.html",
+      "sha256": "0fd4bd35f3365e7c3eb57802e1841bd78025629d49d9725bc6bf3aa79455a5c3",
+      "bytes": 741
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-slider/slider.scss",
+      "sha256": "158706d8bd3151ef295b76e0be6e5cdc94f51ec8221b3608eb75188d6514a572",
+      "bytes": 10830
+    },
+    {
+      "path": "scripts/upstream-slider-token-evidence.mjs",
+      "sha256": "70a27fb526276b5d13bc3c2d68c6643cf9b0b8f06b895b65a4b742d09f1c9955",
+      "bytes": 9297
+    },
+    {
+      "path": "tests/test_upstream_slider_token_evidence.py",
+      "sha256": "40af231ba06689ea75c1c800ee952a99ce0dde5c218dd4d22c420da4d495d196",
+      "bytes": 4596
+    }
+  ],
+  "cyph_sanity": {
+    "read_only": true,
+    "observations": "Two maintained mat-slider templates use NgModel and the historical thumb/tick/displayWith inputs via MatLegacySliderModule aliased as MatSliderModule; three styles use all-legacy-component-themes. No files changed and no build or deployment performed.",
+    "source_files": [
+      {
+        "path": "/home/parallels/cyph/shared/js/cyph/modules/cyph-shared.module.ts",
+        "sha256": "42fea0471f52148b9f6938d670a4fd9fd65363e2f34ae000efd58b9ec3a82c29"
+      },
+      {
+        "path": "/home/parallels/cyph/shared/js/cyph/components/account-register/account-register.component.html",
+        "sha256": "29fcf4bb13a0dbfe91292455ca3e4adec64b7c6cb88a543a9bf14e111b444b12"
+      },
+      {
+        "path": "/home/parallels/cyph/shared/js/cyph/components/dynamic-form/dynamic-form.component.html",
+        "sha256": "78d27ff78c2d622ed2cb0cf09fefca1f3ee9e1192b4e234a7067bc6ed7569df3"
+      },
+      {
+        "path": "/home/parallels/cyph/shared/css/mixins.scss",
+        "sha256": "cc248f0e8b86175c9f6edab6e0193300ad5e13f2d37f5575b556d246584baf2b"
+      }
+    ]
+  },
+  "qualification": {
+    "source_css_only": true,
+    "complete_frozen_theme_sources_verified": true,
+    "packed_artifact_used": false,
+    "native_rendering_executed": false,
+    "current_modern_slider_behavior_qualified": false,
+    "full_651_or_498_executed": false,
+    "floor_matrix_executed": false,
+    "production_source_changes": false,
+    "required_consumer_HTML_CSS_SCSS_changes": false,
+    "pushed": false,
+    "actions_started": false
+  },
+  "g11_claim": "not-passed"
+}
