@@ -10,11 +10,13 @@ import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import {createRequire} from 'node:module';
+import {execFileSync} from 'node:child_process';
 import {dirname, join, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 const rootDefault = resolve(dirname(fileURLToPath(import.meta.url)), '..'), require = createRequire(import.meta.url), ts = require('typescript');
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const moduleName = '@angular/cdk/a11y', symbolName = 'FocusableOption';
+const addedUse = {file: 'legacy-menu/internal/menu-item-base.ts', module: moduleName, symbol: symbolName};
 const printer = ts.createPrinter({removeComments: true});
 const parse = (path, text) => {const source = ts.createSourceFile(path, text, ts.ScriptTarget.Latest, true); assert.equal(source.parseDiagnostics.length, 0); return source;};
 const print = (node, source) => printer.printNode(ts.EmitHint.Unspecified, node, source).trim().replace(/^(?:(?:export|declare) )+/, '');
@@ -98,8 +100,17 @@ declare const current${i}_${name}:Subject${i}.${name};const backward${i}_${name}
 
 export function inspectFocusableOptionCallers({root = rootDefault, readSource} = {}) {
   const seed = readFileSync(join(root, 'compatibility/f10/authored-dependency-inventory-seed.json')); assert.equal(hash(seed), '3e059e3d9ba423b9f666fcf3ec960945cb43555750eb5fa3025a503d3cd8795b');
-  const uses = JSON.parse(seed).symbol_uses.filter(r => r.module === moduleName && r.symbol === symbolName); assert.equal(uses.length, 7);
+  const frozen = JSON.parse(seed).symbol_uses.filter(r => r.module === moduleName && r.symbol === symbolName); assert.equal(frozen.length, 7);
+  const uses = [...frozen, addedUse];
   const authoredRoot = join(root, 'projects/ngx-material-legacy'), read = path => readSource ? readSource(path) : readFileSync(join(root, path), 'utf8');
+  const paths = execFileSync('rg', ['--files', 'projects/ngx-material-legacy', '-g', '*.ts', '-g', '!*.spec.ts'],
+    {cwd: root, encoding: 'utf8'}).trim().split('\n');
+  const actual = paths.filter(path => parse(path, read(path)).statements.some(node =>
+    ts.isImportDeclaration(node) && node.moduleSpecifier.text === moduleName && node.importClause?.namedBindings &&
+    ts.isNamedImports(node.importClause.namedBindings) && node.importClause.namedBindings.elements.some(binding =>
+      (binding.propertyName || binding.name).text === symbolName)));
+  assert.deepEqual(actual.map(path => path.slice('projects/ngx-material-legacy/'.length)).sort(),
+    uses.map(use => use.file).sort(), 'public option caller census changed; review the exact new/lost use');
   const config = ts.parseConfigFileTextToJson('tsconfig.lib.json', read('projects/ngx-material-legacy/tsconfig.lib.json')); assert.equal(config.error, undefined);
   const converted = ts.convertCompilerOptionsFromJson(config.config.compilerOptions, root); assert.equal(converted.errors.length, 0); assert.notEqual(converted.options.emitDecoratorMetadata, true);
   const options = {...converted.options, removeComments: true, sourceMap: false, declaration: false, declarationMap: false, inlineSources: false};
@@ -129,16 +140,18 @@ export function inspectFocusableOptionCallers({root = rootDefault, readSource} =
     const stripped = source.text.slice(0, start) + replacement + source.text.slice(end);
     const emit = text => {const r = ts.transpileModule(text, {compilerOptions: options, reportDiagnostics: true}); assert.equal(r.diagnostics.length, 0); return r.outputText;};
     const emitted = emit(source.text); assert.equal(emitted, emit(stripped), 'type import changes executable code');
-    cases.push({...use, candidate_source_sha256: hash(source.text), local_name: binding.name.text, references, emitted_js_sha256: hash(emitted), emitted_js_without_import_sha256: hash(emit(stripped))});
+    cases.push({...use, frozen_use: frozen.some(row => row.file === use.file), candidate_source_sha256: hash(source.text), local_name: binding.name.text, references, emitted_js_sha256: hash(emitted), emitted_js_without_import_sha256: hash(emit(stripped))});
   }
-  assert.equal(cases.filter(r => r.references[0].role === 'erased-implements').length, 6);
+  assert.equal(cases.filter(r => r.references[0].role === 'erased-implements').length, 7);
+  assert.equal(cases.length, 8);
   return {cases, compiler_emit_options: {target: options.target, module: options.module, experimental_decorators: options.experimentalDecorators, import_helpers: options.importHelpers, emit_decorator_metadata: options.emitDecoratorMetadata ?? false}};
 }
 
 export function reviewFocusableOptionTypes({root = rootDefault} = {}) {
   const models = loadFocusableOptionModels(root), callers = inspectFocusableOptionCallers({root}), manifest = JSON.parse(readFileSync(join(root, 'projects/ngx-material-legacy/package.json')));
   const line = manifest.version.startsWith('21.') ? '21.x' : 'main'; assert.equal(manifest.peerDependencies['@angular/cdk'], '^' + models.find(m => m.line === line).version);
-  return {schema_version: 1, line, role: 'Seven exact erased FocusableOption caller imports and their complete finite declaration closure', models, ...callers,
+  return {schema_version: 1, line, role: 'Seven frozen and one exact current erased FocusableOption caller imports and their complete finite declaration closure',
+    frozen_uses: 7, current_uses: 8, current_delta_uses: 1, models, ...callers,
     type_compilation: compileFocusableOptionClosure(models, root), node: process.version, compiler: ts.version,
     limits: ['Isolated structural declaration and TypeScript executable-erasure proof only; full component declarations/templates/native focus, key-manager/monitor behavior and lifecycle, complete packed/floor consumer and upstream SHA obligations remain open.'], g11_claim: 'not-passed'};
 }

@@ -20,6 +20,16 @@ for (const [id, file, change] of [
   const original = read(file), changed = change(original); assert.notEqual(original, changed);
   assert.throws(() => inspectFocusableOptionCallers({readSource: p => p === file ? changed : read(p)}), undefined, id); mutations.push(id);
 }
+const ownedFile = 'projects/ngx-material-legacy/legacy-menu/internal/menu-item-base.ts';
+for (const [id, change] of [
+  ['owned-runtime-interface-value', text => text + '\nconsole.log(FocusableOption);\n'],
+  ['owned-missing-public-interface-import', text => text.replace('FocusableOption, FocusMonitor', 'FocusMonitor')],
+  ['owned-interface-inheritance', text => text.replace('extends _MatMenuItemBase', 'extends FocusableOption')],
+]) {
+  const original = read(ownedFile), changed = change(original); assert.notEqual(original, changed);
+  assert.throws(() => inspectFocusableOptionCallers({readSource: path => path === ownedFile ? changed : read(path)}));
+  mutations.push(id);
+}
 for (const [id, name, change] of [
   ['missing-focus', 'FocusableOption', text => text.replace('focus(origin?: FocusOrigin): void;', '')],
   ['required-origin', 'FocusableOption', text => text.replace('origin?:', 'origin:')],
