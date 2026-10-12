@@ -14,6 +14,7 @@ import {MatLegacyButtonModule} from '@ngx-compat/material-legacy/legacy-button';
 import {MatLegacySelectModule} from '@ngx-compat/material-legacy/legacy-select';
 import {MatLegacyTooltipModule} from '@ngx-compat/material-legacy/legacy-tooltip';
 import {MatLegacyPaginator} from './paginator';
+import {_MatLegacyPaginatorOptions} from './internal/page-size-options';
 import {MAT_PAGINATOR_INTL_PROVIDER} from './internal/paginator-base';
 
 
@@ -26,7 +27,7 @@ import {MAT_PAGINATOR_INTL_PROVIDER} from './internal/paginator-base';
     MatCommonModule,
   ],
   exports: [MatLegacyPaginator],
-  declarations: [MatLegacyPaginator],
+  declarations: [MatLegacyPaginator, _MatLegacyPaginatorOptions],
   providers: [MAT_PAGINATOR_INTL_PROVIDER],
 })
 export class MatLegacyPaginatorModule {}

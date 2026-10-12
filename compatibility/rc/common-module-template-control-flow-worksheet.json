@@ -1,0 +1,317 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "recorded_at_utc": "2026-10-11T23:31:15.896687+00:00",
+  "source_parent": "7ac25e2c6f6106ecd559396280beece8b25be14f",
+  "task": "C04/A02 public CommonModule dependency and implicit template directive lifetime contracts",
+  "finding": "CommonModule itself is stable, but nine owned templates directly consume NgIf/NgForOf/NgSwitch-family directives deprecated and planned for removal at both actual minima. Do not close the thirteen CommonModule imports by ignoring their real template consumers.",
+  "actual_minimum_declarations": [
+    {
+      "line": "main",
+      "name": "CommonModule",
+      "path": "@angular/common/types/_common_module-chunk.d.ts",
+      "deprecated": []
+    },
+    {
+      "line": "main",
+      "name": "NgIf",
+      "path": "@angular/common/types/_common_module-chunk.d.ts",
+      "deprecated": [
+        "20.0\nUse the `@if` block instead. Intent to remove in a future major release"
+      ]
+    },
+    {
+      "line": "main",
+      "name": "NgForOf",
+      "path": "@angular/common/types/_common_module-chunk.d.ts",
+      "deprecated": [
+        "20.0\nUse the `@for` block instead. Intent to remove in a future major release"
+      ]
+    },
+    {
+      "line": "main",
+      "name": "NgSwitch",
+      "path": "@angular/common/types/_common_module-chunk.d.ts",
+      "deprecated": [
+        "20.0\nUse the `@switch` block instead. Intent to remove in a future major release"
+      ]
+    },
+    {
+      "line": "main",
+      "name": "NgSwitchCase",
+      "path": "@angular/common/types/_common_module-chunk.d.ts",
+      "deprecated": [
+        "20.0\nUse the `@case` block within a `@switch` block instead. Intent to remove in a future major release"
+      ]
+    },
+    {
+      "line": "main",
+      "name": "NgSwitchDefault",
+      "path": "@angular/common/types/_common_module-chunk.d.ts",
+      "deprecated": [
+        "20.0\nUse the `@default` block within a `@switch` block instead. Intent to remove in a future major release"
+      ]
+    },
+    {
+      "line": "21.x",
+      "name": "CommonModule",
+      "path": "@angular/common/types/_common_module-chunk.d.ts",
+      "deprecated": []
+    },
+    {
+      "line": "21.x",
+      "name": "NgIf",
+      "path": "@angular/common/types/_common_module-chunk.d.ts",
+      "deprecated": [
+        "20.0\nUse the `@if` block instead. Intent to remove in a future major release"
+      ]
+    },
+    {
+      "line": "21.x",
+      "name": "NgForOf",
+      "path": "@angular/common/types/_common_module-chunk.d.ts",
+      "deprecated": [
+        "20.0\nUse the `@for` block instead. Intent to remove in a future major release"
+      ]
+    },
+    {
+      "line": "21.x",
+      "name": "NgSwitch",
+      "path": "@angular/common/types/_common_module-chunk.d.ts",
+      "deprecated": [
+        "20.0\nUse the `@switch` block instead. Intent to remove in a future major release"
+      ]
+    },
+    {
+      "line": "21.x",
+      "name": "NgSwitchCase",
+      "path": "@angular/common/types/_common_module-chunk.d.ts",
+      "deprecated": [
+        "20.0\nUse the `@case` block within a `@switch` block instead. Intent to remove in a future major release"
+      ]
+    },
+    {
+      "line": "21.x",
+      "name": "NgSwitchDefault",
+      "path": "@angular/common/types/_common_module-chunk.d.ts",
+      "deprecated": [
+        "20.0\nUse the `@default` block within a `@switch` block instead. Intent to remove in a future major release"
+      ]
+    }
+  ],
+  "owned_templates": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/option/option.html",
+      "sha256": "5ffcf936ce83a2313b753c2697cad5906762f0ac9cc4e8065fe19ce1aa428712",
+      "sites": [
+        {
+          "line": 1,
+          "source": "<mat-pseudo-checkbox *ngIf=\"multiple\" class=\"mat-option-pseudo-checkbox\""
+        },
+        {
+          "line": 7,
+          "source": "<span class=\"cdk-visually-hidden\" *ngIf=\"group && group._inert\">({{ group.label }})</span>"
+        }
+      ]
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+      "sha256": "2f196834f2f6d5b57e8d105f9761f4edb01ea4d1a499e76a10f1bf9ce41c9d4e",
+      "sites": [
+        {
+          "line": 6,
+          "source": "<ng-container *ngIf=\"appearance == 'outline'\">"
+        },
+        {
+          "line": 21,
+          "source": "*ngIf=\"_prefixChildren.length\""
+        },
+        {
+          "line": 44,
+          "source": "*ngIf=\"_hasFloatingLabel()\""
+        },
+        {
+          "line": 45,
+          "source": "[ngSwitch]=\"_hasLabel()\">"
+        },
+        {
+          "line": 48,
+          "source": "<ng-container *ngSwitchCase=\"false\">"
+        },
+        {
+          "line": 53,
+          "source": "<ng-content select=\"mat-label\" *ngSwitchCase=\"true\"></ng-content>"
+        },
+        {
+          "line": 59,
+          "source": "*ngIf=\"!hideRequiredMarker && _control.required && !_control.disabled\">&#32;*</span>"
+        },
+        {
+          "line": 64,
+          "source": "<div class=\"mat-form-field-suffix\" *ngIf=\"_suffixChildren.length\">"
+        },
+        {
+          "line": 71,
+          "source": "*ngIf=\"appearance != 'outline'\">"
+        },
+        {
+          "line": 88,
+          "source": "[ngSwitch]=\"_getDisplayedMessages()\">"
+        },
+        {
+          "line": 89,
+          "source": "<ng-container *ngSwitchCase=\"'error'\">"
+        },
+        {
+          "line": 93,
+          "source": "<ng-container *ngSwitchCase=\"'hint'\">"
+        },
+        {
+          "line": 95,
+          "source": "<div *ngIf=\"hintLabel\" [id]=\"_hintLabelId\" class=\"mat-hint\">{{hintLabel}}</div>"
+        }
+      ]
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/list-option.html",
+      "sha256": "e5ca90c2d3a4d5fe0561619d14d97337275fcbe8ca154c0c2623b698874658a3",
+      "sites": [
+        {
+          "line": 10,
+          "source": "*ngIf=\"selectionList.multiple\""
+        }
+      ]
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/menu-item.html",
+      "sha256": "8a76150cd8b906ce81bd3480f7f5daf12b5067f6af8fe6e59cbb0b59b01aa930",
+      "sites": [
+        {
+          "line": 8,
+          "source": "*ngIf=\"_triggersSubmenu\""
+        }
+      ]
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-paginator/paginator.html",
+      "sha256": "cc9f27769734dd241cf5ae4ddcdd70b5dd9c92c0bfc1af1e23048c6c8d794d57",
+      "sites": [
+        {
+          "line": 3,
+          "source": "<div class=\"mat-paginator-page-size\" *ngIf=\"!hidePageSize\">"
+        },
+        {
+          "line": 9,
+          "source": "*ngIf=\"_displayedPageSizeOptions.length > 1\""
+        },
+        {
+          "line": 20,
+          "source": "<mat-option *ngFor=\"let pageSizeOption of _displayedPageSizeOptions\" [value]=\"pageSizeOption\">"
+        },
+        {
+          "line": 28,
+          "source": "*ngIf=\"_displayedPageSizeOptions.length <= 1\">{{pageSize}}</div>"
+        },
+        {
+          "line": 44,
+          "source": "*ngIf=\"showFirstLastButtons\">"
+        },
+        {
+          "line": 81,
+          "source": "*ngIf=\"showFirstLastButtons\">"
+        }
+      ]
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.html",
+      "sha256": "eb9068351eadefb859233dcc1c1bf3a58dc17231b88f5892604ebd5ed6180a69",
+      "sites": [
+        {
+          "line": 16,
+          "source": "[ngSwitch]=\"mode === 'indeterminate'\""
+        },
+        {
+          "line": 28,
+          "source": "*ngSwitchCase=\"true\""
+        },
+        {
+          "line": 39,
+          "source": "*ngSwitchCase=\"false\""
+        }
+      ]
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.html",
+      "sha256": "c54309b92719e6e9bf2e0b77decb82f4347b78a9565a4e22ba7f49f81353e5cf",
+      "sites": [
+        {
+          "line": 16,
+          "source": "<div class=\"mat-select-value\" [ngSwitch]=\"empty\" [attr.id]=\"_valueId\">"
+        },
+        {
+          "line": 17,
+          "source": "<span class=\"mat-select-placeholder mat-select-min-line\" *ngSwitchCase=\"true\">{{placeholder}}</span>"
+        },
+        {
+          "line": 18,
+          "source": "<span class=\"mat-select-value-text\" *ngSwitchCase=\"false\" [ngSwitch]=\"!!customTrigger\">"
+        },
+        {
+          "line": 19,
+          "source": "<span class=\"mat-select-min-line\" *ngSwitchDefault>{{triggerValue}}</span>"
+        },
+        {
+          "line": 20,
+          "source": "<ng-content select=\"mat-select-trigger\" *ngSwitchCase=\"true\"></ng-content>"
+        }
+      ]
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-snack-bar/simple-snack-bar.html",
+      "sha256": "8772ef5c3c34985af95aa881f81b26048d4abf959dbfc5104b97bbe8b513cd4c",
+      "sites": [
+        {
+          "line": 2,
+          "source": "<div class=\"mat-simple-snackbar-action\"  *ngIf=\"hasAction\">"
+        }
+      ]
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/tab-group.html",
+      "sha256": "1ce6acdffe51366ad6f439f81a4ecfd3e2d2b79630042cd5ef1ec8dcf23003f4",
+      "sites": [
+        {
+          "line": 11,
+          "source": "*ngFor=\"let tab of _tabs; let i = index\""
+        },
+        {
+          "line": 30,
+          "source": "<ng-template [ngIf]=\"tab.templateLabel\" [ngIfElse]=\"tabTextLabel\">"
+        },
+        {
+          "line": 45,
+          "source": "*ngFor=\"let tab of _tabs; let i = index\""
+        }
+      ]
+    }
+  ],
+  "required_repair_contract": [
+    "Use stable built-in control flow without consumer source or CSS/SCSS edits. Preserve actual element nesting, classes, attributes, interpolation, events, SVG namespace and projection selectors.",
+    "Keep tab and paginator iteration by item identity and index aliases; compare insertion/removal/reorder/view identity against untouched historical semantics, including duplicate item handling.",
+    "Retain tab label template fallback/projection and the independent determinate/indeterminate SVG circle instances.",
+    "For switch cases, verify boolean/string value domains and strict/loose behavior applicability before translating; preserve non-case siblings such as form-field required markers.",
+    "Use immutable tagged structure/style oracles and meaningful negative controls; preserve old receipts and requalify source dependencies changed by templates.",
+    "Run actual component/AOT/packed/browser cases in final Actions once development is plausibly complete; no static-only rendering claim."
+  ],
+  "status": "implemented-focused-source-and-peer-JIT-checks-passed-full-component-AOT-packed-and-audit-requalification-pending",
+  "consumer_HTML_CSS_SCSS_changes_required": false,
+  "product_changed_this_finding": true,
+  "native_or_packed_or_full_floors_qualified": false,
+  "g11_claim": "not-passed",
+  "implementation": "Nine templates use built-in flow. A private, view-scoped public-IterableDiffers adapter preserves option identities and values, including duplicates/custom differ behavior. The original paginator source and constructor are byte-identical to the parent. No stylesheet changes.",
+  "scoped_lifecycle_decision": "The new private adapter invokes IterableDiffer.onDestroy when its view disappears. Original16/minimum NgFor did not invoke that custom callback. Cleanup is a deliberate resource-lifetime improvement, independently asserted; removing cleanup fails a native negative control. No consumer constructor/HTML/CSS/SCSS edits required.",
+  "deferred_tests": [
+    "Added actual paginator duplicate-identity component case and tab reorder/ARIA component case are unexecuted pending final Actions.",
+    "Full owned native/AOT/packed/floors/G11/full audit are not qualified by the focused JIT/source probes."
+  ]
+}

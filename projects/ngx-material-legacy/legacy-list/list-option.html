@@ -6,10 +6,11 @@
     [matRippleTrigger]="_getHostElement()"
     [matRippleDisabled]="_isRippleDisabled()"></div>
 
-  <mat-pseudo-checkbox
-    *ngIf="selectionList.multiple"
-    [state]="selected ? 'checked' : 'unchecked'"
-    [disabled]="disabled"></mat-pseudo-checkbox>
+  @if (selectionList.multiple) {
+    <mat-pseudo-checkbox
+      [state]="selected ? 'checked' : 'unchecked'"
+      [disabled]="disabled"></mat-pseudo-checkbox>
+  }
 
   <div class="mat-list-text" #text><ng-content></ng-content></div>
 
