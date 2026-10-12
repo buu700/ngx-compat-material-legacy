@@ -9,12 +9,16 @@ file observations are separate and do not clear advisories.
 from __future__ import annotations
 
 import argparse
+import base64
 import hashlib
+import io
 import json
 import os
 import re
+import tarfile
+import tomllib
 from datetime import datetime, timedelta, timezone
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 ROOT = Path(__file__).resolve().parents[1]
 MAX_AGE_SECONDS = 7 * 24 * 60 * 60
@@ -26,6 +30,7 @@ MAIN_CASES = {
         "dependency-eligibility/locks-tools-maturity/cutoff-not-stale",
         "dependency-eligibility/locks-tools-maturity/lock-transitive-coverage",
         "dependency-eligibility/locks-tools-maturity/toolchain-age-known",
+        "dependency-eligibility/locks-tools-maturity/toolchain-advisory-coverage",
         "dependency-eligibility/locks-tools-maturity/unresolved-findings-block",
     ],
     "vendor-provenance-license": [
@@ -240,6 +245,248 @@ def _osv_batch(packages: list[tuple[str, str]]) -> tuple[int | None, list | None
     if not isinstance(results, list):
         return status, None, "advisory results missing"
     return status, results, ""
+
+
+def inspect_tool_archive(raw: bytes, pin: dict) -> list[dict]:
+    """Authenticate and inventory packaged manifests without extracting/executing files."""
+    if len(raw) != pin["archive_bytes"] or hashlib.sha256(raw).hexdigest() != pin["archive_sha256"]:
+        raise ValueError("tool archive size/hash does not match the reviewed subject")
+    sri = "sha512-" + base64.b64encode(hashlib.sha512(raw).digest()).decode()
+    if sri != pin["integrity"]:
+        raise ValueError("tool archive does not match registry integrity")
+    manifests, seen, total = [], set(), 0
+    with tarfile.open(fileobj=io.BytesIO(raw), mode="r:gz") as archive:
+        for member in archive:
+            name = member.name.rstrip("/")
+            path = PurePosixPath(name)
+            if (path.is_absolute() or str(path) != name or "\\" in name or
+                    any(part in {"", ".", ".."} for part in name.split("/")) or
+                    not name.startswith("package/") or name in seen or
+                    not (member.isfile() or member.isdir())):
+                raise ValueError("tool archive has an unsafe or duplicate member")
+            seen.add(name)
+            total += member.size
+            if len(seen) > 10000 or total > 128 * 1024 * 1024:
+                raise ValueError("tool archive exceeds inventory limits")
+            parts = path.parts
+            package_root = name == "package/package.json" or (len(parts) >= 3 and parts[-3] == "node_modules") or (
+                len(parts) >= 4 and parts[-4] == "node_modules" and parts[-3].startswith("@"))
+            if member.isfile() and parts[-1] == "package.json" and package_root:
+                if member.size > 1024 * 1024:
+                    raise ValueError("tool package manifest exceeds inventory limit")
+                data = archive.extractfile(member).read()
+                package = json.loads(data)
+                package_name, version = package.get("name"), package.get("version")
+                if not isinstance(package_name, str) or not package_name or not re.fullmatch(r"\d+\.\d+\.\d+(?:[-+][\w.-]+)?", str(version)):
+                    raise ValueError("tool package manifest has no exact package identity")
+                manifests.append({"path": name, "name": package_name, "version": version,
+                                  "sha256": hashlib.sha256(data).hexdigest(), "bytes": len(data)})
+    if len(manifests) != pin["manifest_count"]:
+        raise ValueError("tool bundled-manifest population changed")
+    top = [row for row in manifests if row["path"] == "package/package.json"]
+    if len(top) != 1 or (top[0]["name"], top[0]["version"]) != (pin["name"], pin["version"]):
+        raise ValueError("tool root package does not match its exact pin")
+    manifests.sort(key=lambda row: row["path"])
+    population = hashlib.sha256(json.dumps(manifests, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+    if population != pin["manifest_population_sha256"]:
+        raise ValueError("tool bundled-manifest identities changed")
+    return manifests
+
+
+def acquire_tool_archive(pin: dict) -> bytes:
+    from urllib.request import urlopen
+
+    status, metadata, error = _http_json(pin["registry_metadata"], timeout=45)
+    dist = metadata.get("dist", {}) if isinstance(metadata, dict) else {}
+    if (status != 200 or error or not isinstance(metadata, dict) or metadata.get("name") != pin["name"] or
+            metadata.get("version") != pin["version"] or dist.get("integrity") != pin["integrity"] or
+            dist.get("tarball") != pin["tarball"]):
+        raise ValueError("tool registry metadata does not match its reviewed exact pin")
+    cache = Path(os.environ.get("NGX_TOOL_ADVISORY_CACHE", str(Path.home() / ".cache/ngx-compat-material-legacy-closeout/tool-advisory-subjects")))
+    cache.mkdir(parents=True, exist_ok=True)
+    if cache.is_symlink():
+        raise ValueError("tool archive cache is a symlink")
+    path = cache / (pin["archive_sha256"] + ".tgz")
+    if path.exists():
+        if path.is_symlink() or not path.is_file():
+            raise ValueError("tool archive cache subject is not a regular file")
+        raw = path.read_bytes()
+    else:
+        with urlopen(pin["tarball"], timeout=45) as response:
+            raw = response.read(64 * 1024 * 1024 + 1)
+        if len(raw) > 64 * 1024 * 1024:
+            raise ValueError("tool archive download exceeds limit")
+    inspect_tool_archive(raw, pin)
+    if not path.exists():
+        try:
+            with path.open("xb") as target:
+                target.write(raw)
+        except FileExistsError:
+            if path.is_symlink() or path.read_bytes() != raw:
+                raise ValueError("concurrent tool archive cache changed")
+    return raw
+
+
+def tool_advisory_subjects(root: Path, acquire=acquire_tool_archive) -> dict:
+    """Include packaged npm dependencies and native pnpm's complete source lock."""
+    catalog_path = root / "compatibility/toolchain-advisory-subjects.json"
+    catalog_bytes = catalog_path.read_bytes()
+    catalog = json.loads(catalog_bytes)
+    toolchain = json.loads((root / "toolchain-lock.json").read_text())
+    expected = {"npm": toolchain["release"]["npm"], "pnpm": toolchain["repository"]["pnpm"],
+                "@pnpm/exe.linux-x64": toolchain["repository"]["pnpm"]}
+    pins = catalog.get("packages", [])
+    if catalog.get("schema_version") != 1 or len(pins) != 3 or {p["name"]: p["version"] for p in pins} != expected:
+        raise ValueError("tool advisory archive pins do not match the toolchain")
+    bootstrap = json.loads((root / "compatibility/tooling-release-evidence.json").read_text())["tools"]
+    archives, queries = [], {}
+    for pin in pins:
+        if pin["name"] in bootstrap and pin["integrity"] != bootstrap[pin["name"]]["artifact_integrity"]:
+            raise ValueError("tool archive integrity differs from the independently retained bootstrap")
+        raw = acquire(pin)
+        manifests = inspect_tool_archive(raw, pin)
+        archives.append({**pin, "manifests": manifests})
+        for package in manifests:
+            key = f"npm/{package['name']}@{package['version']}"
+            queries[key] = {"package": {"name": package["name"], "ecosystem": "npm"}, "version": package["version"]}
+    source = catalog["pnpm_source"]
+    cargo_pin, attestation_pin = source["cargo_lock"], source["registry_attestations"]
+    for pin in [cargo_pin, attestation_pin]:
+        path = PurePosixPath(pin["path"])
+        if path.is_absolute() or ".." in path.parts or not pin["path"].startswith("reference/toolchain/"):
+            raise ValueError("tool source reference escapes its scope")
+        data = (root / pin["path"]).read_bytes()
+        if len(data) != pin["bytes"] or hashlib.sha256(data).hexdigest() != pin["sha256"]:
+            raise ValueError("tool source reference changed")
+    attestations = json.loads((root / attestation_pin["path"]).read_bytes())
+    native = next(pin for pin in pins if pin["name"] == "@pnpm/exe.linux-x64")
+    found = False
+    for row in attestations.get("attestations", []):
+        if row.get("predicateType") != "https://slsa.dev/provenance/v1":
+            continue
+        payload = json.loads(base64.b64decode(row["bundle"]["dsseEnvelope"]["payload"], validate=True))
+        subjects = payload.get("subject", [])
+        digest = base64.b64decode(native["integrity"].split("-", 1)[1], validate=True).hex()
+        expected_subject = {"name": f"pkg:npm/%40pnpm/exe.linux-x64@{native['version']}", "digest": {"sha512": digest}}
+        if subjects != [expected_subject]:
+            raise ValueError("native tool provenance statement names a different archive")
+        dependencies = payload["predicate"]["buildDefinition"]["resolvedDependencies"]
+        found = any(dep.get("uri") == "git+" + source["repository"] + "@refs/tags/" + source["tag"]
+                    and dep.get("digest", {}).get("gitCommit") == source["commit"] for dep in dependencies)
+    if not found:
+        raise ValueError("native tool source commit is not bound to its registry provenance statement")
+    cargo = tomllib.loads((root / cargo_pin["path"]).read_text())
+    counts = {"registry": 0, "git": 0, "local": 0}
+    for package in cargo["package"]:
+        origin = package.get("source", "")
+        if origin == "registry+https://github.com/rust-lang/crates.io-index":
+            if not re.fullmatch(r"[0-9a-f]{64}", package.get("checksum", "")):
+                raise ValueError("tool Cargo registry package has no content checksum")
+            counts["registry"] += 1
+            key = f"crates.io/{package['name']}@{package['version']}"
+            queries[key] = {"package": {"name": package["name"], "ecosystem": "crates.io"}, "version": package["version"]}
+        elif origin.startswith("git+"):
+            counts["git"] += 1
+            commit = origin.rsplit("#", 1)[-1]
+            if not re.fullmatch(r"[0-9a-f]{40}", commit):
+                raise ValueError("tool Cargo git package has no immutable commit")
+            queries[f"git/{package['name']}@{commit}"] = {"commit": commit}
+        elif not origin:
+            counts["local"] += 1
+        else:
+            raise ValueError("tool Cargo source is not a supported registry or immutable git source")
+    if any(counts[k] != cargo_pin[k + "_packages"] for k in counts):
+        raise ValueError("complete tool Cargo source population changed")
+    queries[f"git/pnpm@{source['commit']}"] = {"commit": source["commit"]}
+    return {"result": "complete", "catalog_sha256": hashlib.sha256(catalog_bytes).hexdigest(),
+            "archives": archives, "pnpm_source": source, "cargo_populations": counts,
+            "queries": [{"id": key, "query": value} for key, value in sorted(queries.items())],
+            "limitations": ["Cargo.lock includes optional/dev crates; applicability is not inferred from inventory membership.",
+                            "Registry-supplied provenance statement signatures are not independently verified; archive integrity and source identities are checked.",
+                            "This census does not replace Node-core advisory review or a vulnerability applicability/clearance decision."]}
+
+
+def query_tool_advisories(subjects: dict) -> dict:
+    cutoff = datetime.now(timezone.utc).isoformat()
+    queries = subjects["queries"]
+    payload = json.dumps({"queries": [row["query"] for row in queries]}).encode()
+    status, response, error = _http_json("https://api.osv.dev/v1/querybatch", method="POST", payload=payload, timeout=120)
+    results = response.get("results") if isinstance(response, dict) else None
+    complete = status == 200 and not error and isinstance(results, list) and len(results) == len(queries)
+    rows, unresolved = [], []
+    if complete:
+        for subject, result in zip(queries, results):
+            if not isinstance(result, dict) or "error" in result or not isinstance(result.get("vulns", []), list):
+                complete = False
+                break
+            vulns = result.get("vulns", [])
+            if any(not isinstance(vuln, dict) or not isinstance(vuln.get("id"), str) or not vuln["id"] for vuln in vulns):
+                complete = False
+                break
+            rows.append({**subject, "vulns": vulns})
+            if vulns:
+                unresolved.append(subject["id"])
+    return {"result": "queried" if complete else "unknown", "http_status": status,
+            "cutoff": cutoff, "endpoint": "https://api.osv.dev/v1/querybatch",
+            "error": error, "expected_queries": len(queries), "rows": rows,
+            "uncovered": [] if complete else [row["id"] for row in queries if row["id"] not in {r["id"] for r in rows}],
+            "unresolved": unresolved, "inventory": subjects}
+
+
+def tool_advisory_coverage_ok(root: Path, observation: dict | None, now: datetime | None = None) -> bool:
+    """Do not accept a tool success label without its full census and query rows."""
+    try:
+        if observation["result"] != "queried" or observation["http_status"] != 200 or observation.get("error") or observation["uncovered"]:
+            return False
+        cutoff = parse_time(observation.get("cutoff"))
+        now = now or datetime.now(timezone.utc)
+        if cutoff is None or cutoff > now + timedelta(minutes=5) or (now - cutoff).total_seconds() > MAX_AGE_SECONDS:
+            return False
+        inventory = observation["inventory"]
+        catalog_bytes = (root / "compatibility/toolchain-advisory-subjects.json").read_bytes()
+        catalog = json.loads(catalog_bytes)
+        if inventory["result"] != "complete" or inventory["catalog_sha256"] != hashlib.sha256(catalog_bytes).hexdigest():
+            return False
+        if len(inventory["archives"]) != len(catalog["packages"]):
+            return False
+        by_name = {row["name"]: row for row in inventory["archives"]}
+        expected_queries = {}
+        for pin in catalog["packages"]:
+            archive = by_name[pin["name"]]
+            if any(archive.get(k) != value for k, value in pin.items()) or len(archive["manifests"]) != pin["manifest_count"]:
+                return False
+            population = hashlib.sha256(json.dumps(archive["manifests"], sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+            if population != pin["manifest_population_sha256"]:
+                return False
+            for package in archive["manifests"]:
+                key = f"npm/{package['name']}@{package['version']}"
+                expected_queries[key] = {"package": {"name": package["name"], "ecosystem": "npm"}, "version": package["version"]}
+        cargo = catalog["pnpm_source"]["cargo_lock"]
+        if inventory["pnpm_source"] != catalog["pnpm_source"] or any(inventory["cargo_populations"][k] != cargo[k + "_packages"] for k in ["registry", "git", "local"]):
+            return False
+        raw = (root / cargo["path"]).read_bytes()
+        if hashlib.sha256(raw).hexdigest() != cargo["sha256"] or len(raw) != cargo["bytes"]:
+            return False
+        for package in tomllib.loads(raw.decode())["package"]:
+            origin = package.get("source", "")
+            if origin.startswith("registry+"):
+                key = f"crates.io/{package['name']}@{package['version']}"
+                expected_queries[key] = {"package": {"name": package["name"], "ecosystem": "crates.io"}, "version": package["version"]}
+            elif origin.startswith("git+"):
+                commit = origin.rsplit("#", 1)[-1]
+                expected_queries[f"git/{package['name']}@{commit}"] = {"commit": commit}
+        source_commit = catalog["pnpm_source"]["commit"]
+        expected_queries[f"git/pnpm@{source_commit}"] = {"commit": source_commit}
+        queries = {row["id"]: row["query"] for row in inventory["queries"]}
+        rows = {row["id"]: row for row in observation["rows"]}
+        if (queries != expected_queries or len(queries) != len(inventory["queries"]) or
+                len(rows) != len(observation["rows"]) or observation["expected_queries"] != len(queries) or rows.keys() != queries.keys()):
+            return False
+        if not all(row["query"] == queries[key] and isinstance(row["vulns"], list) for key, row in rows.items()):
+            return False
+        return observation["unresolved"] == [row["id"] for row in observation["rows"] if row["vulns"]]
+    except (TypeError, KeyError, ValueError, OSError):
+        return False
 
 
 def _vuln_rows(packages: list[tuple[str, str]], results: list) -> tuple[dict, list[str]]:
@@ -706,7 +953,17 @@ def perform_lookup(root: Path, now: datetime) -> dict:
         if isinstance(name, str) and isinstance(vendor_version, str)
     ]
     toolchain = json.loads((root / "toolchain-lock.json").read_text())
-    queried = packages + [item for item in vendor_packages if item not in packages]
+    try:
+        tool_subjects = tool_advisory_subjects(root)
+        tool_advisories = query_tool_advisories(tool_subjects)
+    except Exception as exc:  # acquisition/reference failure stays an unexecuted tool census
+        tool_subjects = {"queries": []}
+        tool_advisories = {"result": "unknown", "http_status": None, "error": f"{type(exc).__name__}: {exc}",
+                           "rows": [], "uncovered": ["tool census unknown"], "unresolved": []}
+    tool_npm = [(q["query"]["package"]["name"], q["query"]["version"]) for q in tool_subjects["queries"]
+                if q["query"].get("package", {}).get("ecosystem") == "npm"]
+    age_packages = packages + [item for item in tool_npm if item not in packages]
+    queried = age_packages + [item for item in vendor_packages if item not in age_packages]
     status, results, error = _osv_batch(queried) if queried else (None, [], "no packages")
     truncated = bool(results is not None and len(results) != len(queried))
     rows, unresolved = ({}, [error or "advisory lookup failed"])
@@ -728,7 +985,7 @@ def perform_lookup(root: Path, now: datetime) -> dict:
             return f"{name}@{version}", published, age_error
 
         with ThreadPoolExecutor(max_workers=12) as pool:
-            for key, published, age_error in pool.map(_age, packages):
+            for key, published, age_error in pool.map(_age, age_packages):
                 if published is None:
                     age_unknown.append(f"{key}: {age_error}")
                 elif published > now:
@@ -786,6 +1043,10 @@ def perform_lookup(root: Path, now: datetime) -> dict:
     classified = classify_live_findings(rows, unresolved, dispositions, now)
     unresolved = classified["unresolved"]
     blocked = classified["blocked"]
+    if not tool_advisory_coverage_ok(root, tool_advisories, now):
+        unresolved.append("tool advisory census/query coverage is unknown")
+    # Workspace-specific exceptions do not cover a separate bundled tool path.
+    unresolved.extend("tool:" + key for key in tool_advisories["unresolved"])
     http_known = status == 200 and not truncated and not error and bool(rows or not queried)
     result = "queried" if http_known else "unknown"
     remediation = _remediation_notes(unresolved, rows, now) if http_known else []
@@ -806,6 +1067,7 @@ def perform_lookup(root: Path, now: datetime) -> dict:
         "toolchain_ok": tool_ok and http_known,
         "toolchain_detail": "; ".join(tool_detail) or error or "toolchain was not queried",
         "toolchain": toolchain_report,
+        "tool_advisories": tool_advisories,
         "vendor_ok": vendor_queried and http_known and not vendor_unknown,
         "vendor_detail": (
             f"vendor_packages={len(vendor_packages)} unknown={vendor_unknown[:6]}"
@@ -911,6 +1173,10 @@ def evaluate(root: Path, now: datetime, *, lookup_performed: bool, lookup: dict 
             bool(live and live.get("toolchain_ok")),
             (live or {}).get("toolchain_detail") or f"toolchain checked_on={toolchain.get('checked_on')} was not re-queried; registry age stays unknown",
         ),
+        "dependency-eligibility/locks-tools-maturity/toolchain-advisory-coverage": (
+            http_known and cutoff_known and tool_advisory_coverage_ok(root, (live or {}).get("tool_advisories"), now),
+            "exact npm/pnpm/native-pnpm archive manifests and source Cargo registry/git/workspace identities must all have this run's complete advisory query rows",
+        ),
         "dependency-eligibility/locks-tools-maturity/unresolved-findings-block": (
             http_known and not unresolved and not live_uncovered,
             "unresolved or blocked findings: " + ", ".join(unresolved[:8]) + "".join(
@@ -960,6 +1226,7 @@ def evaluate(root: Path, now: datetime, *, lookup_performed: bool, lookup: dict 
         "age_excepted": age_excepted,
         "age_exception_problems": age_problems,
         "unresolved_findings": len(unresolved),
+        "tool_advisories": (live or {}).get("tool_advisories"),
         "vendor": {key: vendor[key] for key in ("files", "hash_mismatches", "missing_files", "license_missing", "origin", "git_head", "license")},
         "security_clearance": "not-passed",
     }
@@ -1016,6 +1283,7 @@ def write_acceptance(request: dict, observation: dict) -> bool:
         "lock_packages": observation["lock_packages"],
         "uncovered_lock_packages": observation["uncovered_lock_packages"],
         "uncovered_sample": observation["uncovered_sample"],
+        "tool_advisories": observation.get("tool_advisories"),
         "vendor_files": observation["vendor"]["files"],
         "vendor_hash_mismatches": observation["vendor"]["hash_mismatches"],
         "security_clearance": "not-passed",

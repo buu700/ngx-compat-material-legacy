@@ -70,9 +70,14 @@ class MinimumAgeExceptionTests(unittest.TestCase):
         records, error = ELIGIBILITY.load_age_exceptions(ROOT)
         excludes = ELIGIBILITY.pnpm_age_excludes((ROOT / "pnpm-workspace.yaml").read_text())
         self.assertIsNone(error)
-        self.assertEqual(excludes, ["http-cache-semantics@4.3.0", "source-map-js@1.2.2"])
-        self.assertTrue(any("http-cache-semantics@4.3.0 has no single owner grant" in problem for problem in self.assess(records, excludes)["problems"]))
-        result = self.assess(records, excludes)
+        self.assertEqual(excludes, [])
+        # The historical authority claim is preserved, but its release is now mature.
+        expired = self.assess(records, excludes, datetime(2026, 10, 12, tzinfo=timezone.utc))
+        self.assertEqual(expired["active"], {})
+        self.assertEqual(expired["problems"], [])
+        self.assertIn("source-map-js@1.2.2", expired["expired"])
+        # Before maturity, that unverified authority could not admit an exclusion.
+        result = self.assess(records, ["source-map-js@1.2.2"])
         self.assertEqual(result["active"], {})
         self.assertTrue(any("owner authority pending" in problem for problem in result["problems"]))
         self.assertEqual(records[0]["classification"], "pending-owner-authority")
@@ -149,12 +154,16 @@ class OriginalAuthorityTests(unittest.TestCase):
         rows = {"braces@3.0.3": {"name": "braces", "version": "3.0.3", "vulns": [{"id": "GHSA-vfj7-8cjw-p6xm"}]}}
         dispositions = ELIGIBILITY.load_finding_dispositions(ROOT)
         record = dispositions["braces@3.0.3"][0]
-        self.assertEqual(record["classification"], "pending-owner-authority")
+        self.assertEqual(record["classification"], "temporary-exception")
+        self.assertEqual(record["granted_on"], "2026-10-07")
         self.assertEqual(record["prior_unverified_record"]["classification"], "temporary-exception")
+        # Retain the unverified-authority negative using an explicitly pending fixture.
+        pending = {**record, "classification": "pending-owner-authority", "authority_source": "unverified historical claim"}
+        dispositions = {"braces@3.0.3": [pending]}
         self.assertIsNone(record["fixed_version"])
         self.assertEqual(record["registry_latest"], "3.0.3")
         self.assertEqual(record["expires_on"], "2026-11-04")
-        during = datetime(2026, 10, 4, tzinfo=timezone.utc)
+        during = datetime(2026, 10, 12, tzinfo=timezone.utc)
         classified = ELIGIBILITY.classify_live_findings(rows, ["braces@3.0.3"], dispositions, during)
         self.assertEqual(classified["excepted"], [])
         self.assertEqual(classified["blocked"], [])
