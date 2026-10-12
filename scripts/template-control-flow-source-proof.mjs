@@ -55,7 +55,7 @@ export function proveTemplateControlFlow({readSource=p=>readFileSync(join(root,p
  const before=execFileSync('git',['-c','gc.auto=0','show',worksheet.source_parent+':'+path],{cwd:root,encoding:'utf8'});
  assert.equal(paginator,before,'historical paginator constructor/source changed');
  const helperPath='projects/ngx-material-legacy/legacy-paginator/internal/page-size-options.ts';
- const helper=readSource(helperPath);assert.match(helper,/ngOnDestroy\(\): void/);assert.match(helper,/this\._differ\?\.onDestroy\(\)/);
+ const helper=readSource(helperPath);assert.match(helper,/ngOnDestroy\(\): void/);assert.match(helper,/this\._differ = undefined;/);assert.match(helper,/this\._items = \[\];/);assert.match(helper,/this\.values = undefined;/);assert.doesNotMatch(helper,/\._differ\?\.onDestroy/);
  return{schema_version:1,line:worksheet.line,source_parent:worksheet.source_parent,observations,unchanged_styles:styles,paginator_sha256:hash(paginator),helper_sha256:hash(helper),
   scope:'Exact owned template element ancestry, static attributes, binding/event/reference/interpolation and projection selector structure, and unchanged predicates/cases; every pre-repair library stylesheet remains byte-identical. This source comparison supplements actual public-peer JIT DOM/view checks; it does not replace full owned component/AOT/packed/browser validation.',g11_claim:'not-passed'};
 }

@@ -8,7 +8,7 @@
     "stylesheets_byte_identical": 409,
     "paginator_constructor_and_source_unchanged": true,
     "no_consumer_HTML_CSS_SCSS_edits_required": true,
-    "new_private_differ_cleanup_callback": "Deliberate view-scoped cleanup, separately tested against Original16/minimum NgFor absence."
+    "new_private_differ_cleanup_callback": "Superseded: adapter now clears only owned references, with no unsupported callback."
   },
   "focused_validation": {
     "peer_models": 3,
@@ -22,11 +22,11 @@
   "evidence": [
     {
       "path": "compatibility/rc/template-control-flow-browser-diagnostic.json",
-      "sha256": "6c8f50c779106cd79df3bfe8a4bb27337b2152dfd03efe1e98777b66dfd399da"
+      "sha256": "79cdf8976b05d503d77b753f627c8c59bee7bccf54d0cb772f841752d0032b38"
     },
     {
       "path": "compatibility/rc/template-control-flow-source-proof.json",
-      "sha256": "6b24fe962c610b51049d21d550beb0875280fe7a99502b4f30ed062912f96641"
+      "sha256": "32f64c989f1bd27589bb1506ae2872a6d04f7531477789c0264d26b023f76e42"
     },
     {
       "path": "compatibility/rc/template-control-flow-original-context.json",
@@ -344,5 +344,6 @@
     "Canonical pinned environment and advertised runtime/RxJS/compiler floors.",
     "Independent A01-A10 audit and final R01-R03 qualification."
   ],
-  "next": "Complete source/upstream context requalification, CommonModule/public helper dependency reviews and remaining C04/C02/C03 work before final Actions."
+  "next": "Complete source/upstream context requalification, CommonModule/public helper dependency reviews and remaining C04/C02/C03 work before final Actions.",
+  "followup_correction": "Public type audit found that concrete differ onDestroy methods were absent from the public interface. The unsupported call was removed; focused native/source checks were rerun and exact helper types compile at all three peer namespaces."
 }

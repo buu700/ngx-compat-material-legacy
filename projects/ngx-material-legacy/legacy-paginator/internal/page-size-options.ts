@@ -39,6 +39,8 @@ export class _MatLegacyPaginatorOptions {
   }
 
   ngOnDestroy(): void {
-    this._differ?.onDestroy();
+    this._differ = undefined;
+    this._items = [];
+    this.values = undefined;
   }
 }

@@ -76,14 +76,15 @@ async function run() {
     const differLifetime={created:0,destroyed:0};const custom=record.variant.startsWith('custom/')||record.variant==='negative/differ-teardown';
     class Subject {constructor(){Object.defineProperties(this,Object.getOwnPropertyDescriptors(context()));}}
     ViewChild('projectedLabel')(Subject.prototype,'projectedLabel');
+    ViewChild(record.variant==='negative/differ-teardown'?OptionsWithoutTeardown:_MatLegacyPaginatorOptions)(Subject.prototype,'optionsHelper');
     Component({standalone:true,selector:'template-subject',imports:[CommonModule,Origin,Portal,record.variant==='negative/differ-teardown'?OptionsModuleWithoutTeardown:OptionsModule],
-      providers:custom?[{provide:IterableDiffers,useFactory:()=>{const parent=inject(IterableDiffers,{skipSelf:true});const factory=parent.find([]);return new IterableDiffers([{supports:items=>Array.isArray(items),create:()=>{differLifetime.created++;const differ=factory.create((index,value)=>Math.floor(value/10));const destroy=differ.onDestroy.bind(differ);differ.onDestroy=()=>{differLifetime.destroyed++;destroy();};return differ;}}]);}}]:[],
+      providers:custom?[{provide:IterableDiffers,useFactory:()=>{const parent=inject(IterableDiffers,{skipSelf:true});const factory=parent.find([]);return new IterableDiffers([{supports:items=>Array.isArray(items),create:()=>{differLifetime.created++;const differ=factory.create((index,value)=>Math.floor(value/10));return differ;}}]);}}]:[],
       schemas:[NO_ERRORS_SCHEMA],changeDetection:ChangeDetectionStrategy.Eager ?? ChangeDetectionStrategy.Default,template:record.template+'<ng-template #projectedLabel>Template label</ng-template>'})(Subject);
     const host=document.createElement('template-subject');document.body.append(host);
     const projected=reflectComponentType(Subject).ngContentSelectors.map(selector=>{const node=document.createElement('span');node.textContent=selector+' projected';return [node];});
     const ref=createComponent(Subject,{hostElement:host,environmentInjector:app.injector,projectableNodes:projected});
-    const s=ref.instance, states=[], ids=new WeakMap();let serial=0;
-    const snapshot=(name,selector)=>{ref.changeDetectorRef.markForCheck();ref.changeDetectorRef.detectChanges();const nodes=selector?[...host.querySelectorAll(selector)]:[];
+    const s=ref.instance, states=[], ids=new WeakMap();let serial=0,lastHelper;
+    const snapshot=(name,selector)=>{ref.changeDetectorRef.markForCheck();ref.changeDetectorRef.detectChanges();if(lastHelper&&lastHelper!==s.optionsHelper){assert(lastHelper.values===undefined&&lastHelper._items.length===0&&lastHelper._differ===undefined,'owned differ state cleanup');}lastHelper=s.optionsHelper;const nodes=selector?[...host.querySelectorAll(selector)]:[];
       states.push({name,...(custom?{differLifetime:{...differLifetime}}:{}),dom:[...host.childNodes].flatMap(dom),identities:nodes.map(n=>{if(!ids.has(n))ids.set(n,serial++);return ids.get(n);})});};
     const family=record.family;
     try {
@@ -101,7 +102,7 @@ async function run() {
         s._displayedPageSizeOptions=options;snapshot(name,'mat-option');}
       s.hidePageSize=true;s.showFirstLastButtons=true;snapshot('hidden size with end buttons');
       s.hidePageSize=false;s._displayedPageSizeOptions=[10];snapshot('single size');
-      if(custom){assert(differLifetime.created===2,'differ view creation count');assert(differLifetime.destroyed===(record.variant.endsWith('/before')?0:2),'differ teardown count');}
+      if(custom){assert(differLifetime.created===2,'differ view creation count');assert(differLifetime.destroyed===0,'no unsupported differ callbacks');}
     }else if(family==='legacy-progress-spinner'){
       snapshot('determinate','circle');s.mode='indeterminate';snapshot('indeterminate','circle');s.mode='determinate';snapshot('determinate again','circle');
       assert(states.map(x=>x.identities[0]).join(',')==='0,1,2','separate SVG circle lifetimes '+line+' '+JSON.stringify(states.map(x=>x.identities)));
