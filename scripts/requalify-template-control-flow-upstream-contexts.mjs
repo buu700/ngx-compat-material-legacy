@@ -1,0 +1,42 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+import assert from 'node:assert/strict';
+import {readFileSync,writeFileSync,existsSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {createRequire} from 'node:module';
+import {execFileSync} from 'node:child_process';
+import {dirname,join,resolve} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {reviewSliderInputScope} from './upstream-slider-input-scope.mjs';
+import {candidateProductSourcePaths} from './upstream-candidate-source-evidence.mjs';
+const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),ts=createRequire(import.meta.url)('typescript'),read=p=>readFileSync(join(root,p)),json=p=>JSON.parse(read(p)),hash=b=>createHash('sha256').update(b).digest('hex'),write=(p,v)=>writeFileSync(join(root,p),JSON.stringify(v,null,2)+'\n'),git=args=>execFileSync('git',['-c','gc.auto=0','-c','maintenance.auto=0',...args],{cwd:root});
+const worksheet=json('compatibility/rc/common-module-template-control-flow-worksheet.json'),line=worksheet.line,source=json('compatibility/rc/template-control-flow-source-proof.json'),native=json('compatibility/rc/template-control-flow-browser-diagnostic.json'),dependency=json('compatibility/rc/template-control-flow-dependency-diagnostic.json');
+assert.equal(source.line,line);assert.equal(native.line,line);assert.equal(dependency.line,line);
+for(const o of source.observations){assert.equal(hash(read(o.path)),o.candidate_sha256);assert.equal(hash(git(['show',worksheet.source_parent+':'+o.path])),o.before_sha256);}
+for(const o of source.unchanged_styles)assert.equal(hash(read(o.path)),o.sha256);
+const helper='projects/ngx-material-legacy/legacy-paginator/internal/page-size-options.ts';assert.equal(hash(read(helper)),source.helper_sha256);assert.equal(hash(read(helper)),native.helper_sha256);assert.equal(dependency.actual_helper_runtime.sha256,hash(read(dependency.actual_helper_runtime.path)));assert.equal(dependency.typeChecks.length,3);assert.ok(dependency.typeChecks.every(t=>t.diagnostics===0&&!t.skipLibCheck));
+const paths=['closeout-fourteen-build-scope-review','closeout-test-consolidation-source-review','closeout-three-slider-input-source-review'].map(n=>'compatibility/f10/disposition-ledger/evidence/'+n+'.json'),ledgerPath='compatibility/f10/disposition-ledger/ledger.json',ledger=json(ledgerPath),priorPath='compatibility/rc/template-control-flow-upstream-prior-contexts.json';
+const prior=existsSync(join(root,priorPath))?json(priorPath):{schema_version:1,line,source_parent:worksheet.source_parent,reports:paths.map(path=>({path,sha256:hash(read(path)),body:json(path)})),entries:ledger.entries.filter(e=>paths.includes(e.evidence_report))};
+assert.equal(prior.line,line);assert.equal(prior.source_parent,worksheet.source_parent);assert.equal(prior.entries.length,49);assert.equal(new Set(prior.entries.map(e=>e.sha)).size,49);
+for(const r of prior.reports){const bytes=git(['show',worksheet.source_parent+':'+r.path]);assert.equal(hash(bytes),r.sha256);assert.deepEqual(JSON.parse(bytes),r.body);}
+const [build,consolidation,slider]=prior.reports.map(r=>structuredClone(r.body)),before=build.candidate_context,tracked=git(['ls-files','projects/ngx-material-legacy']).toString().trim().split('\n');
+assert.deepEqual(tracked.filter(p=>p!==helper),before.tracked_product_paths);assert.ok(tracked.includes(helper));
+for(const r of before.files){const bytes=read(r.path);assert.equal(hash(bytes),r.sha256);assert.equal(bytes.length,r.bytes);}
+const changed=before.product_members.filter(r=>hash(read(r.path))!==r.sha256),expected=[...worksheet.owned_templates.map(o=>o.path),'projects/ngx-material-legacy/legacy-paginator/paginator-module.ts','projects/ngx-material-legacy/legacy-paginator/paginator.spec.ts','projects/ngx-material-legacy/legacy-tabs/tab-group.spec.ts'];assert.deepEqual(changed.map(r=>r.path).sort(),expected.sort());
+for(const r of changed)assert.equal(hash(git(['show',worksheet.source_parent+':'+r.path])),r.sha256);
+const printer=ts.createPrinter({removeComments:true}),newCases={'projects/ngx-material-legacy/legacy-paginator/paginator.spec.ts':'should preserve historical duplicate option identities across page size changes','projects/ngx-material-legacy/legacy-tabs/tab-group.spec.ts':'should retain label and body views by tab identity when tabs are reordered'};
+for(const[path,title]of Object.entries(newCases)){const text=read(path).toString(),ast=ts.createSourceFile(path,text,ts.ScriptTarget.Latest,true),matches=[];function visit(n){if(ts.isCallExpression(n)&&ts.isIdentifier(n.expression)&&n.expression.text==='it'&&ts.isStringLiteralLike(n.arguments[0])&&n.arguments[0].text===title){assert.ok(ts.isExpressionStatement(n.parent));matches.push(n.parent);}ts.forEachChild(n,visit);}visit(ast);assert.equal(matches.length,1);const n=matches[0],retained=text.slice(0,n.getFullStart())+text.slice(n.end),normalize=t=>printer.printFile(ts.createSourceFile(path,t,ts.ScriptTarget.Latest,true));assert.equal(normalize(retained),normalize(git(['show',worksheet.source_parent+':'+path]).toString()),'existing test program changed');}
+const modulePath='projects/ngx-material-legacy/legacy-paginator/paginator-module.ts';assert.equal(read(modulePath).toString().replace("import {_MatLegacyPaginatorOptions} from './internal/page-size-options';\n",'').replace('declarations: [MatLegacyPaginator, _MatLegacyPaginatorOptions]','declarations: [MatLegacyPaginator]'),git(['show',worksheet.source_parent+':'+modulePath]).toString());
+const refresh={schema_version:1,line,source_commit:git(['rev-parse','HEAD']).toString().trim(),source_tree:git(['rev-parse','HEAD^{tree}']).toString().trim(),source_parent:worksheet.source_parent,changed:changed.map(r=>({path:r.path,before_sha256:r.sha256,current_sha256:hash(read(r.path))})),added:[{path:helper,sha256:hash(read(helper))}],removed:[],build_inputs_unchanged:before.files.length,evidence:['compatibility/rc/template-control-flow-source-proof.json','compatibility/rc/template-control-flow-browser-diagnostic.json','compatibility/rc/template-control-flow-dependency-diagnostic.json'].map(path=>({path,sha256:hash(read(path))})),scope:'Only nine control-flow syntax repairs, one private view helper/module declaration and two new regression cases. Source-only upstream applicability; no unexecuted component/native/AOT/packed/floor evidence is rebound.'};
+if(!existsSync(join(root,priorPath)))write(priorPath,prior);
+const bind=path=>{const sha=hash(read(path));for(const e of ledger.entries.filter(e=>e.evidence_report===path)){if(e.source_check)e.source_check.evidence_report_sha256=sha;else assert.equal(path,paths[2]);}write(ledgerPath,ledger);};
+build.candidate_context={...before,source_commit:refresh.source_commit,source_tree:refresh.source_tree,tracked_product_paths:tracked,tracked_product_paths_sha256:hash(Buffer.from(tracked.join('\n')+'\n')),product_members:tracked.map(path=>{const b=read(path);return{path,sha256:hash(b),bytes:b.length};})};build.context_updates=[...(build.context_updates||[]),refresh];write(paths[0],build);bind(paths[0]);
+consolidation.candidate_context.sha256=hash(read(paths[0]));consolidation.context_updates=[...(consolidation.context_updates||[]),refresh];write(paths[1],consolidation);bind(paths[1]);
+const fresh=reviewSliderInputScope(read,()=>candidateProductSourcePaths(root),line),strip=o=>{const{product_source_files,product_source_population_sha256,...rest}=o;return rest;};assert.equal(fresh.product_source_files,slider.source_scope.product_source_files+1);assert.deepEqual(strip(fresh),strip(slider.source_scope));slider.source_scope=fresh;slider.source_context_requalification=refresh;write(paths[2],slider);bind(paths[2]);
+write('compatibility/rc/template-control-flow-upstream-context-requalification.json',{...refresh,prior_contexts:{path:priorPath,sha256:hash(read(priorPath))},reviews:prior.reports.map(r=>({path:r.path,sha_ids:r.body.reviews.map(v=>v.sha)})),original_decisions_and_semantic_analyses_unchanged:true,upstream_rows:49,full_native_or_packed_qualified:false,g11_claim:'not-passed'});
+console.log(JSON.stringify({line,source_only_upstream_rows:49,changed_product_files:changed.length,added_product_files:1,unchanged_build_inputs:before.files.length}));
